@@ -1,0 +1,49 @@
+/**
+ *
+ * Apply Here your Custom CSS
+ *
+*/
+
+body {
+
+}
+table {
+    font-size: 12px;
+}
+
+.table-header-search{
+	background-color: #FFFFFF !important;
+	border: none !important;
+}
+
+.table-bordered > thead > tr > th, .table-bordered > tbody > tr > th, .table-bordered > tfoot > tr > th, .table-bordered > thead > tr > td, .table-bordered > tbody > tr > td, .table-bordered > tfoot > tr > td{
+	border: none !important;
+}
+
+table.dataTable thead th, table.dataTable thead td {
+	padding: 10px 18px !important;
+    border-bottom: 1px solid #ebebeb!important;
+    background-color: #fff;
+}
+
+table.dataTable.compact tbody th, table.dataTable.compact tbody td {
+	vertical-align: middle;
+}
+
+.mail-env .mail-body .mail-table tbody tr.unread > td {
+	font-weight: bold;
+  background-color: #CCC;
+}
+
+.btn-success, .btn-green {
+    color: #fff !important;
+    background-color: #00a651 !important;
+    border-color: #008d45 !important;
+}
+
+.mail-env .mail-body .mail-header .mail-search, .mail-env .mail-body .mail-header .mail-links {
+  width: 50% !important;
+}
+.mail-env .mail-body .mail-header .mail-title{
+  width: 50% !important;
+}

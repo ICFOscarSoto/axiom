@@ -1,0 +1,227 @@
+{% set params = app.request.attributes.get('_route_params')|merge(app.request.query.all()) %}
+{% block header %}
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<meta name="description" content="Neon Admin Panel" />
+	<meta name="author" content="" />
+	<link rel="icon" href="images/favicon.ico">
+	{{ include('header.html.twig') }}
+
+{% endblock %}
+<title>{% block title %}{{ interfaceName }}{% endblock %}</title>
+<body class="page-body" data-url="{{ url('indexAdmin') }}">
+<div class="page-container"><!-- add class "sidebar-collapsed" to close sidebar by default, "chat-visible" to make chat appear always -->
+	{{ include('sidebar_menu.html.twig') }}
+	<div class="main-content">
+		{{ include('head.html.twig') }}
+		<hr />
+		{{ include('breadcrumb.html.twig') }}
+		<h2>{{ interfaceName }}</h2>
+		</br>
+		<!-- MAIN CONTENT -->
+		<script>
+					$(document).ready(function(){
+						function getEmails(url, params){
+							$("#list-messages").html('');
+							$.getJSON(url+params, function( data ) {
+								if ('messages' in data){
+									$("[id^='mail-pagination-']").html('<strong>'+(data.start+1)+'-'+(((data.start+data.limit)<=data.recordsFiltered)?(data.start+data.limit):data.recordsFiltered)+'</strong> <span>de '+data.recordsFiltered+'</span>');
+									((data.start<data.limit)?'disabled':'')
+									$("[id^='mail-pagination-']").append('<div class="btn-group"><a id="mail-pagination-button-previous" attr-url="'+url+'" attr-limit="'+data.limit+'" attr-start="'+(data.start-data.limit)+'" href="javascript:void(0);" class="'+((data.start<data.limit)?'disabled ':'')+'btn btn-sm btn-white"><i class="entypo-left-open"></i></a>'+
+																											 '<a id="mail-pagination-button-next" href="javascript:void(0);" attr-url="'+url+'" attr-limit="'+data.limit+'" attr-start="'+(data.start+data.limit)+'" class="'+(((data.recordsFiltered-data.start)<data.limit)?'disabled ':'')+'btn btn-sm btn-white"><i class="entypo-right-open"></i></a></div>')
+									$("#mail-folder-name").text(data.folderName+' ('+data.unseen+')');
+									$.each( data.messages, function( keyAccount, valAccount ) {
+										console.log(valAccount);
+										var message='';
+										message+='<tr class="'+((valAccount.seen)?'':'unread')+'"><td><div class="checkbox checkbox-replace"><input type="checkbox" /></div></td>';
+										message+='<td class="col-name"><a attr-url-flagged="'+valAccount.urlFlagged+'" attr-url-unflagged="'+valAccount.urlUnFlagged+'" id="flagged-star-'+valAccount.id+'" href="javascript:void(0);" class="star'+((valAccount.flagged)?' stared':'')+'"><i class="entypo-star"></i></a>';
+										message+='<a href="'+valAccount.url+'" class="col-name">'+valAccount.from+'</a></td>';
+										message+='<td class="col-subject"><a href="'+valAccount.url+'">'+valAccount.subject+'</a></td>';
+										message+='<td class="col-options"></td><td class="col-time">'+valAccount.date.date+'</td></tr>';
+										console.log(valAccount.date);
+										$("#list-messages").append(message);
+									});
+								}
+							}).always(function() {
+							});
+						}
+
+						$.getJSON('{{ url('foldersList') }}', function( data ) {
+							$.each( data, function( keyAccount, valAccount ) {
+									$.each( valAccount, function( key, val ) {
+										var folder='<li attr-name="'+val.name+'" attr-url="{{ url('emailsFolderList', {'folder': '_____'}) }}" id="folder-email-list-'+val.name+'" '+((val.default==true)? 'class="active"' : '')+'><a href="javascript:void(0);"><span class="badge badge-gray pull-right">'+val.unseen+'</span>'+val.name+'</a></li>';
+										$("#list-folders").append(folder);
+									});
+							});
+						}).always(function() {
+						});
+
+						$('body').on('click', "[id^='folder-email-list-']", function() {
+							url=$(this).attr('attr-url');
+							url=url.replace('_____',$(this).attr('attr-name'));
+							$("[id^='folder-email-list-']").removeClass('active');
+							$(this).addClass('active');
+							getEmails(url,'');
+						});
+						$('body').on('click', "[id^='mail-pagination-button-']", function() {
+							url=$(this).attr('attr-url');
+							getEmails(url,'?limit='+$(this).attr('attr-limit')+'&start='+$(this).attr('attr-start'));
+						});
+						$('body').on('click', "[id^='flagged-star-']", function() {
+							if($(this).hasClass('stared'))	url=$(this).attr('attr-url-unflagged');
+								else url=$(this).attr('attr-url-flagged');
+							element=$(this);
+							$.getJSON(url, function( data ){
+								if(element.hasClass('stared')) element.removeClass('stared');
+									else element.addClass('stared');
+							});
+						});
+						getEmails('{{ url('emailsFolderList', {'folder': 'INBOX'}) }}','');
+
+					});
+		</script>
+		<div class="mail-env">
+
+					<!-- compose new email button -->
+					<div class="mail-sidebar-row visible-xs">
+						<a href="{{url('emailNew')}}" class="btn btn-success btn-icon btn-block">
+							Redactar correo
+							<i class="entypo-pencil"></i>
+						</a>
+					</div>
+
+
+					<!-- Mail Body -->
+					<div class="mail-body">
+
+						<div class="mail-header">
+							<!-- title -->
+							<h3 id="mail-folder-name" class="mail-title">
+								Inbox
+								<span id="mail-unreaded-count" class="count">(6)</span>
+							</h3>
+
+							<!-- search -->
+							<form method="get" role="form" class="mail-search">
+								<div class="input-group">
+									<input type="text" class="form-control" name="s" placeholder="Buscar" />
+
+									<div class="input-group-addon">
+										<i class="entypo-search"></i>
+									</div>
+								</div>
+							</form>
+						</div>
+
+
+						<!-- mail table -->
+						<table class="table mail-table">
+							<!-- mail table header -->
+							<thead>
+								<tr>
+									<th width="5%">
+										<div class="checkbox checkbox-replace">
+											<input type="checkbox" />
+										</div>
+									</th>
+									<th colspan="4">
+
+										<div class="mail-select-options">Marcar como leido</div>
+
+										<div id="mail-pagination-top"  class="mail-pagination" colspan="2">
+											<strong>1-30</strong> <span>of 789</span>
+
+											<div class="btn-group">
+												<a href="#" class="btn btn-sm btn-white"><i class="entypo-left-open"></i></a>
+												<a href="#" class="btn btn-sm btn-white"><i class="entypo-right-open"></i></a>
+											</div>
+										</div>
+									</th>
+								</tr>
+							</thead>
+
+							<!-- email list -->
+							<tbody id="list-messages">
+								<!-- MESSAGES -->
+
+								<!-- END MESSAGES -->
+							</tbody>
+
+							<!-- mail table footer -->
+							<tfoot>
+								<tr>
+									<th width="5%">
+										<div class="checkbox checkbox-replace">
+											<input type="checkbox" />
+										</div>
+									</th>
+									<th colspan="4">
+
+										<div id="mail-pagination-bottom" class="mail-pagination" colspan="2">
+											<strong>1-30</strong> <span>of 789</span>
+
+											<div class="btn-group">
+												<a href="#" class="btn btn-sm btn-white"><i class="entypo-left-open"></i></a>
+												<a href="#" class="btn btn-sm btn-white"><i class="entypo-right-open"></i></a>
+											</div>
+										</div>
+									</th>
+								</tr>
+							</tfoot>
+						</table>
+					</div>
+
+					<!-- Sidebar -->
+					<div class="mail-sidebar">
+
+						<!-- compose new email button -->
+						<div class="mail-sidebar-row hidden-xs">
+							<a href="{{url('emailNew')}}" class="btn btn-success btn-icon btn-block">
+								Redactar correo
+								<i class="entypo-pencil"></i>
+							</a>
+						</div>
+
+						<!-- menu -->
+						<ul id="list-folders" class="mail-menu">
+							<!-- FOLDERS -->
+
+							<!-- END FOLDERS -->
+						</ul>
+
+						<div class="mail-distancer"></div>
+
+						<h4>Etiquetas</h4>
+
+						<!-- menu -->
+						<ul class="mail-menu">
+							<!-- TAGS -->
+
+							<!-- END TAGS -->
+						</ul>
+
+					</div>
+
+				</div>
+
+		<!-- END MAIN CONTENT -->
+		{{ include('footer.html.twig') }}
+	</div>
+	{{ include('chat.html.twig') }}
+	<!-- Chat Histories -->
+	{{ include('chat_histories.html.twig') }}
+</div>
+	<!-- MODALS  -->
+	<!-- END MODALS -->
+{% block footer %}
+
+	<link rel="stylesheet" href="{{ url('index') }}js/datatables/datatables.css">
+	<link rel="stylesheet" href="{{ url('index') }}js/select2/select2-bootstrap.css">
+	<link rel="stylesheet" href="{{ url('index') }}js/select2/select2.css">
+	<!-- Imported scripts on this page -->
+ 	<script src="{{ url('index') }}js/datatables/datatables.js"></script>
+	<script src="{{ url('index') }}js/select2/select2.min.js"></script>
+	 {{ include('bottom.html.twig') }}
+{% endblock %}
+</body>

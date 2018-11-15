@@ -1,0 +1,195 @@
+{% set params = app.request.attributes.get('_route_params')|merge(app.request.query.all()) %}
+{% block header %}
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<meta name="description" content="Neon Admin Panel" />
+	<meta name="author" content="" />
+	<link rel="icon" href="images/favicon.ico">
+	{{ include('header.html.twig') }}
+
+
+{% endblock %}
+<title>{% block title %}{{ interfaceName }}{% endblock %}</title>
+<body class="page-body" data-url="{{ url('indexAdmin') }}">
+<div class="page-container"><!-- add class "sidebar-collapsed" to close sidebar by default, "chat-visible" to make chat appear always -->
+	{{ include('sidebar_menu.html.twig') }}
+	<div class="main-content">
+		{{ include('head.html.twig') }}
+		<hr />
+		{{ include('breadcrumb.html.twig') }}
+		<h2>{{ interfaceName }}</h2>
+		</br>
+		<!-- MAIN CONTENT -->
+    <script>
+
+      $(document).ready(function(){
+
+        // init,configure dropzone
+        Dropzone.autoDiscover = false;
+				var jsonFiles = [];
+        var dropzone_default = new Dropzone(".dropzone", {
+            url: '{{url('uploadTemp')}}',
+            maxFilesize: 20,  // in Mb
+            addRemoveLinks: true,
+            init: function () {
+                this.on("maxfilesexceeded", function(file) {
+                    this.removeFile(file);
+                });
+                this.on("sending", function(file, xhr, formData) {
+                    // send additional data with the file as POST data if needed.
+                    // formData.append("key", "value");
+                });
+                this.on("success", function(file, response) {
+                    if (response.uploaded)
+											jsonFiles.push(response.fileName);
+                });
+            }
+        });
+
+
+
+        $.getJSON('{{ url('foldersList') }}', function( data ){
+          $.each( data, function( keyAccount, valAccount ){
+              $.each( valAccount, function( key, val ){
+                var folder='<li attr-name="'+val.name+'" attr-url="{{ url('emailsFolderList', {'folder': '_____'}) }}" id="folder-email-list-'+val.name+'" '+((val.default==true)? 'class="active"' : '')+'><a href="{{url('email')}}?folder='+val.name+'"><span class="badge badge-gray pull-right">'+val.unseen+'</span>'+val.name+'</a></li>';
+                $("#list-folders").append(folder);
+              });
+          });
+        }).always(function() {
+        });
+        $('body').on('click', "[id^='folder-email-list-']", function() {
+          url=$(this).attr('attr-url');
+          url=url.replace('_____',$(this).attr('attr-name'));
+          $("[id^='folder-email-list-']").removeClass('active');
+          $(this).addClass('active');
+        });
+
+				$( "#form-send-mail" ).on( "submit", function( event ) {
+				  event.preventDefault();
+					console.log(jsonFiles);
+				  data= $( this ).serialize()+"&files="+encodeURIComponent(JSON.stringify(jsonFiles)) ;
+					$.getJSON('{{ url('emailSend') }}',data, function( data ){
+
+					});
+				});
+
+
+      });
+    </script>
+    <div class="mail-env">
+
+  			<!-- compose new email button -->
+  			<div class="mail-sidebar-row visible-xs">
+  				<a href="mailbox-compose.html" class="btn btn-success btn-icon btn-block">
+  					Redactar correo
+  					<i class="entypo-pencil"></i>
+  				</a>
+  			</div>
+  			<!-- Mail Body -->
+  			<div class="mail-body">
+					<form id="form-send-mail" name="form-send-mail" method="post" role="form">
+  				<div class="mail-header">
+  					<!-- title -->
+  					<div class="mail-title">
+  						Redactar correo <i class="entypo-pencil"></i>
+  					</div>
+  					<!-- links -->
+  					<div class="mail-links">
+  						<a href="#" class="btn btn-default">
+  							<i class="entypo-cancel"></i>
+  						</a>
+  						<a href="#" class="btn btn-default btn-icon">
+  							Borrador
+  							<i class="entypo-tag"></i>
+  						</a>
+  						<button type="submit" id="btn-send-mail" class="btn btn-success btn-icon">
+  							Enviar
+  							<i class="entypo-mail"></i>
+								</button>
+  					</div>
+  				</div>
+
+
+  				<div class="mail-compose">
+
+  						<div class="form-group">
+  							<label for="to">To:</label>
+  							<input type="input" class="form-control" id="to" name="to" tabindex="1" />
+  							<div class="field-options">
+  								<a href="javascript:;" onclick="$(this).hide(); $('#cc').parent().removeClass('hidden'); $('#cc').focus();">CC</a>
+  								<a href="javascript:;" onclick="$(this).hide(); $('#bcc').parent().removeClass('hidden'); $('#bcc').focus();">BCC</a>
+  							</div>
+  						</div>
+  						<div class="form-group hidden">
+  							<label for="cc">CC:</label>
+  							<input type="text" class="form-control" id="cc" name="cc" tabindex="2" />
+  						</div>
+  						<div class="form-group hidden">
+  							<label for="bcc">BCC:</label>
+  							<input type="text" class="form-control" id="bcc" name="bcc" tabindex="2" />
+  						</div>
+  						<div class="form-group">
+  							<label for="subject">Asunto:</label>
+  							<input type="text" class="form-control" id="subject" name="subject" tabindex="1" />
+  						</div>
+  						<div class="compose-message-editor">
+  							<textarea class="form-control wysihtml5" data-stylesheet-url="assets/css/wysihtml5-color.css" name="content" id="content"></textarea>
+  						</div>
+
+  				</div>
+					<div class="form-group">
+						<div class="col-sm-12">
+									<div class="dropzone"><div class="dz-message" data-dz-message><span>Ficheros Adjuntos</span></div></div>
+							</div>
+					</div>
+
+					</form>
+  			</div>
+					<!-- Sidebar -->
+					<div class="mail-sidebar">
+						<!-- compose new email button -->
+						<div class="mail-sidebar-row hidden-xs">
+							<a href="{{url('emailNew')}}" class="btn btn-success btn-icon btn-block">
+								Redactar correo
+								<i class="entypo-pencil"></i>
+							</a>
+						</div>
+						<!-- menu -->
+						<ul id="list-folders" class="mail-menu">
+							<!-- FOLDERS -->
+							<!-- END FOLDERS -->
+						</ul>
+						<div class="mail-distancer"></div>
+						<h4>Etiquetas</h4>
+						<!-- menu -->
+						<ul class="mail-menu">
+							<!-- TAGS -->
+							<!-- END TAGS -->
+						</ul>
+					</div>
+				</div>
+		<!-- END MAIN CONTENT -->
+		{{ include('footer.html.twig') }}
+	</div>
+	{{ include('chat.html.twig') }}
+	<!-- Chat Histories -->
+	{{ include('chat_histories.html.twig') }}
+</div>
+	<!-- MODALS  -->
+	<!-- END MODALS -->
+{% block footer %}
+
+	<link rel="stylesheet" href="{{ url('index') }}js/dropzone/dropzone.css">
+	<link rel="stylesheet" href="{{ url('index') }}js/datatables/datatables.css">
+	<link rel="stylesheet" href="{{ url('index') }}js/select2/select2-bootstrap.css">
+	<link rel="stylesheet" href="{{ url('index') }}js/select2/select2.css">
+	<!-- Imported scripts on this page -->
+
+	<script src="{{ url('index') }}js/datatables/datatables.js"></script>
+	<script src="{{ url('index') }}js/select2/select2.min.js"></script>
+	 {{ include('bottom.html.twig') }}
+	 <script src="{{ url('index') }}js/fileinput.js"></script>
+	 <script src="{{ url('index') }}js/dropzone/dropzone.js"></script>
+{% endblock %}
+</body>

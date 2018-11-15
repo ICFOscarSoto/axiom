@@ -1,0 +1,29 @@
+	{% set params = app.request.attributes.get('_route_params')|merge(app.request.query.all()) %}
+	{% set enParams = params|merge({'_locale': 'en'}) %}
+	{% set esParams = params|merge({'_locale': 'es'}) %}
+	<!-- Language Selector -->
+	<li class="dropdown language-selector">
+
+		Idioma: &nbsp;
+		<a href="#" class="dropdown-toggle" data-toggle="dropdown" data-close-others="true">
+			<img src="{{ url('index') }}/images/flags/flag-{{ app.request.locale }}.png" width="16" height="16" />
+		</a>
+
+		<ul class="dropdown-menu pull-right">
+		{%if app.request.locale == "en"%}
+			<li>
+				<a href="{{ path(app.request.attributes.get('_route'), esParams) }}">
+					<img src="{{ url('index') }}/images/flags/flag-es.png" width="16" height="16" />
+					<span>Castellano</span>
+				</a>
+			</li>
+		{% else %}
+			<li class="active">
+				<a href="{{ path(app.request.attributes.get('_route'), enParams) }}">
+					<img src="{{ url('index') }}/images/flags/flag-en.png" width="16" height="16" />
+					<span>Inglés</span>
+				</a>
+			</li>
+		{% endif %}
+		</ul>
+	</li>
