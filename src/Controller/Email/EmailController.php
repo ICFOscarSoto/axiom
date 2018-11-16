@@ -129,6 +129,7 @@ class EmailController extends Controller
 				$mime->addAttachment($tempPath.$attach, $mimetype);
 			}
 			$body = $mime->get();
+			dump($mime->headers());
 			$headers = $mime->headers($headers);
 			$smtp = Mail::factory('smtp',
    		array ('host' => $emailAccount->getSmtpServer(),
@@ -139,6 +140,43 @@ class EmailController extends Controller
 		  if($ccString!=null)	$headers['Cc'] = $ccString;
 			if($bccString!=null)	$headers['Bcc'] = $bccString;
 			$result = $smtp->send($request->query->get('to'), $headers, $body);
+			if($result){
+				$connectionString='{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'}Elementos enviados';
+				$inbox = imap_open($connectionString,$emailAccount->getUsername() ,$emailAccount->getPassword());
+
+				$mailBox = "{".$emailAccount->getServer().":".$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol()."}Elementos enviados";
+        $dmy = date("d-M-Y H:i:s");
+        $boundary = "------=".md5(uniqid(rand()));
+        $msgid = 'adasdasdasdq3we32adsd3wrerf';
+        $msg = "From: ".$emailAccount->getSmtpUsername()."\r\n";
+        $msg .= "To:".$request->query->get('to')."\r\n";
+        $msg .= "Date: $dmy\r\n";
+        $msg .= "message_id: adasdasdasdq3we32adsd3wrerf\r\n";
+        //$msg .= "in_reply_to: $replyto\r\n";
+        $msg .= "Subject: ".$request->query->get('subject')."\r\n";
+        $msg .= "MIME-Version: 1.0\r\n";
+        $msg .= "Content-Type: multipart/mixed; boundary=\"$boundary\"\r\n";
+        $msg .= "\r\n\r\n";
+        $msg .= "--$boundary\r\n";
+        $msg .= "Content-Type: text/html;\r\n\tcharset=\"UTF-8\"\r\n";
+        $msg .= "Content-Transfer-Encoding: 8bit \r\n";
+        $msg .= "\r\n\r\n";
+        $msg .= $html."\r\n";
+        if(!empty($attachments)) {
+            $msg .= "\r\n\r\n";
+            $msg .= "--$boundary\r\n";
+            foreach ($attachments as $filename) {
+                $attachment = chunk_split(base64_encode(file_get_contents($tempPath.$filename)));
+                $msg .= "Content-Transfer-Encoding: base64\r\n";
+                $msg .= "Content-Disposition: attachment; filename=\"$filename\"\r\n";
+                $msg .= "\r\n" . $attachment . "\r\n\r\n";
+            }
+        }
+        $msg .= "\r\n\r\n\r\n";
+        $msg .= "--$boundary--\r\n\r\n";
+        $result2=imap_append($inbox,$mailBox,$msg,"\\Seen");
+				dump($result2);
+			}
 			dump($result);
 			return new Response();
 		}else return new RedirectResponse($this->router->generate('app_login'));
