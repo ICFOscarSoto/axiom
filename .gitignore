@@ -1,5 +1,6 @@
 
 ###> symfony/framework-bundle ###
+/public/temp
 /.env
 /public/bundles/
 /var/

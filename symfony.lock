@@ -101,6 +101,30 @@
     "ocramius/proxy-manager": {
         "version": "2.0.4"
     },
+    "pear/auth_sasl": {
+        "version": "v1.1.0"
+    },
+    "pear/console_getopt": {
+        "version": "v1.4.1"
+    },
+    "pear/mail": {
+        "version": "v1.4.1"
+    },
+    "pear/mail_mime": {
+        "version": "1.10.2"
+    },
+    "pear/net_smtp": {
+        "version": "1.8.1"
+    },
+    "pear/net_socket": {
+        "version": "v1.2.2"
+    },
+    "pear/pear-core-minimal": {
+        "version": "v1.10.6"
+    },
+    "pear/pear_exception": {
+        "version": "v1.0.0"
+    },
     "phpdocumentor/reflection-common": {
         "version": "1.0.1"
     },

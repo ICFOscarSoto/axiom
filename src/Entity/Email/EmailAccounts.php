@@ -60,6 +60,26 @@ class EmailAccounts
      */
     private $emailFolders;
 
+    /**
+     * @ORM\Column(type="string", length=150, nullable=true)
+     */
+    private $smtpServer;
+
+    /**
+     * @ORM\Column(type="string", length=4, nullable=true)
+     */
+    private $smtpPort;
+
+    /**
+     * @ORM\Column(type="string", length=150, nullable=true)
+     */
+    private $smtpUsername;
+
+    /**
+     * @ORM\Column(type="string", length=50, nullable=true)
+     */
+    private $smtpPassword;
+
     public function __construct()
     {
         $this->emailFolders = new ArrayCollection();
@@ -181,6 +201,54 @@ class EmailAccounts
                 $emailFolder->setEmailAccount(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getSmtpServer(): ?string
+    {
+        return $this->smtpServer;
+    }
+
+    public function setSmtpServer(?string $smtpServer): self
+    {
+        $this->smtpServer = $smtpServer;
+
+        return $this;
+    }
+
+    public function getSmtpPort(): ?string
+    {
+        return $this->smtpPort;
+    }
+
+    public function setSmtpPort(?string $smtpPort): self
+    {
+        $this->smtpPort = $smtpPort;
+
+        return $this;
+    }
+
+    public function getSmtpUsername(): ?string
+    {
+        return $this->smtpUsername;
+    }
+
+    public function setSmtpUsername(?string $smtpUsername): self
+    {
+        $this->smtpUsername = $smtpUsername;
+
+        return $this;
+    }
+
+    public function getSmtpPassword(): ?string
+    {
+        return $this->smtpPassword;
+    }
+
+    public function setSmtpPassword(?string $smtpPassword): self
+    {
+        $this->smtpPassword = $smtpPassword;
 
         return $this;
     }

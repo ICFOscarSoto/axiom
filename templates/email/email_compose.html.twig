@@ -134,7 +134,7 @@
   							<input type="text" class="form-control" id="subject" name="subject" tabindex="1" />
   						</div>
   						<div class="compose-message-editor">
-  							<textarea class="form-control wysihtml5" data-stylesheet-url="assets/css/wysihtml5-color.css" name="content" id="content"></textarea>
+  							<textarea class="form-control wysihtml5" data-stylesheet-url="{{ url('index') }}css/wysihtml5-color.css" name="content" id="content"></textarea>
   						</div>
 
   				</div>
@@ -184,12 +184,15 @@
 	<link rel="stylesheet" href="{{ url('index') }}js/datatables/datatables.css">
 	<link rel="stylesheet" href="{{ url('index') }}js/select2/select2-bootstrap.css">
 	<link rel="stylesheet" href="{{ url('index') }}js/select2/select2.css">
+	<link rel="stylesheet" href="{{ url('index') }}js/wysihtml5/bootstrap-wysihtml5.css">
 	<!-- Imported scripts on this page -->
 
 	<script src="{{ url('index') }}js/datatables/datatables.js"></script>
 	<script src="{{ url('index') }}js/select2/select2.min.js"></script>
-	 {{ include('bottom.html.twig') }}
-	 <script src="{{ url('index') }}js/fileinput.js"></script>
-	 <script src="{{ url('index') }}js/dropzone/dropzone.js"></script>
+ {{ include('bottom.html.twig') }}
+ <script src="{{ url('index') }}js/fileinput.js"></script>
+ <script src="{{ url('index') }}js/dropzone/dropzone.js"></script>
+ <script src="{{ url('index') }}js/wysihtml5/wysihtml5-0.4.0pre.min.js"></script>
+ <script src="{{ url('index') }}js/wysihtml5/bootstrap-wysihtml5.js"></script>
 {% endblock %}
 </body>

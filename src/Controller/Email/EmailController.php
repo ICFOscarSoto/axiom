@@ -9,17 +9,19 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use App\Entity\Globale\Notifications;
 use App\Entity\Globale\MenuOptions;
 use App\Entity\Globale\Users;
 use App\Entity\Email\EmailAccounts;
 use App\Entity\Email\EmailFolders;
 use App\Entity\Email\EmailSubjects;
 use App\Utils\Email\EmailUtils;
-//use App\Utils\Globale\EntityUtils;
 use Symfony\Component\Validator\Constraints\DateTime;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
-
+use Symfony\Component\HttpFoundation\File\MimeType\FileinfoMimeTypeGuesser;
+require_once __DIR__.'\..\..\..\vendor\pear\mail\Mail.php';
+require_once __DIR__.'\..\..\..\vendor\pear\mail_mime\Mail\mime.php';
+use Mail;
+use Mail_mime;
 class EmailController extends Controller
 {
 	private $class=EmailsSubjects::class;
@@ -100,65 +102,45 @@ class EmailController extends Controller
 	public function emailSend(RouterInterface $router,Request $request){
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+			$toString=$request->query->get('to');
+			$ccString=$request->query->get('cc');
+			$bccString=$request->query->get('bcc');
+
+
 			$entityManager = $this->getDoctrine()->getManager();
 			$emailRepository = $this->getDoctrine()->getRepository(EmailAccounts::class);
 			$emailFolderRepository = $this->getDoctrine()->getRepository(EmailFolders::class);
 	    $emailAccounts=$this->getUser()->getEmailAccounts();
 			$emailAccount=$emailAccounts[0];
-
-			$locale							= $request->getLocale();
-			$this->router				= $router;
-			$envelope["date"]		=	date('r');
-			$envelope["to"]			= $request->query->get('to');
-			$envelope["from"]		= $emailAccount->getUsername();
-			$envelope["subject"]	= $request->query->get('subject');
-			$content	= $request->query->get('content');
 			$attachments				= json_decode($request->query->get('files'));
-			if($request->query->get('cc')!=null) $envelop["cc"]	= $request->query->get('cc');
-			if($request->query->get('bcc')!=null) $envelop["bcc"]	= $request->query->get('bcc');
-			if (count($attachments)) {
-        $multipart["type"] = TYPEMULTIPART;
-        $multipart["subtype"] = "alternative";
-        $body[] = $multipart;
-    	}
-			if (count($attachments)) {
-        foreach ($attachments as $attach) {
-            $part = array();
-            $filename = $uploadDir=$this->get('kernel')->getRootDir() . '/../public/temp/'.$this->getUser()->getId().'/'.$attach;
-            if (filesize($filename) > 0) {
-                $fp = fopen($filename, "rb");
-                $file_size = filesize($attach);
-                $part["type"] = 'APPLICATION';
-                $part["encoding"] = ENCBASE64;
-                $part["subtype"] = "octet-stream";
-                $part["description"] = basename($filename);
-                $part['disposition.type'] = 'attachment';
-                $part['disposition'] = array('filename' => basename($filename));
-                $part['type.parameters'] = array('name' => basename($filename));
-                $part["description"] = '';
-                $part["contents.data"] = base64_encode(fread($fp, $file_size));
-                $body[] = $part;
-                fclose($fp);
-            }
-        }
-    }
-    if ($content!=null) {
-        $part = array();
-        $part["type"] = "TEXT";
-        $part["subtype"] = "html";
-        $part["description"] = '';
-        $part["contents.data"] = $content;
-        $body[] = $part;
-    }
-			//$return=json_encode($attachments);
-			$connectionString='{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'}';
-			$inbox = imap_open($connectionString,$emailAccount->getUsername() ,$emailAccount->getPassword());
-			$msg = imap_mail_compose($envelope, $body);
-			dump($msg);
-			$result=imap_mail ( $envelope["to"] , $envelope["subject"] , $msg);
+			$text = $request->query->get('content');
+			$html = $request->query->get('content');
+			$headers = array(
+			              'From'    => $emailAccount->getUsername(),
+			              'Subject' => $request->query->get('subject')
+			              );
+			$mime = new Mail_mime(array('eol' => "\n"));
+			$mime->setTXTBody($text);
+			$mime->setHTMLBody($html);
+			$tempPath=$this->get('kernel')->getRootDir() . '/../public/temp/'.$this->getUser()->getId().'/';
+		  foreach ($attachments as $attach) {
+				$mimeTypeGuesser = new FileinfoMimeTypeGuesser();
+				if($mimeTypeGuesser->isSupported()) $mimetype=$mimeTypeGuesser->guess($tempPath.$attach); else $mimetype='text/plain';
+				$mime->addAttachment($tempPath.$attach, $mimetype);
+			}
+			$body = $mime->get();
+			$headers = $mime->headers($headers);
+			$smtp = Mail::factory('smtp',
+   		array ('host' => $emailAccount->getSmtpServer(),
+     'auth' => true,
+     'username' => $emailAccount->getSmtpUsername(),
+		 'port'=>$emailAccount->getSmtpPort(),
+     'password' => $emailAccount->getSmtpPassword()));
+		  if($ccString!=null)	$headers['Cc'] = $ccString;
+			if($bccString!=null)	$headers['Bcc'] = $bccString;
+			$result = $smtp->send($request->query->get('to'), $headers, $body);
 			dump($result);
-			return new Response('');
-			//prueba
+			return new Response();
 		}else return new RedirectResponse($this->router->generate('app_login'));
 	}
 
