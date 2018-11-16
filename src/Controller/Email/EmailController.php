@@ -158,7 +158,7 @@ class EmailController extends Controller
 			$result=imap_mail ( $envelope["to"] , $envelope["subject"] , $msg);
 			dump($result);
 			return new Response('');
-
+			//prueba
 		}else return new RedirectResponse($this->router->generate('app_login'));
 	}
 
