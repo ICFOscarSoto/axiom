@@ -36,6 +36,7 @@ class EmailController extends Controller
 			$this->router = $router;
 			$userdata=$this->getUser()->getTemplateData();
 			$menurepository=$this->getDoctrine()->getRepository(MenuOptions::class);
+			$emailAccounts=$this->getUser()->getEmailAccounts();
 			//$this->emailsFoldersGet($router, $request);
 			//$this->emailsSubjectsGet($router, $request);
 			return $this->render('email\email.html.twig', [
@@ -45,7 +46,7 @@ class EmailController extends Controller
 				'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
 				'breadcrumb' =>  $menurepository->formatBreadcrumb($request->get('_route')),
 				'userData' => $userdata,
-				'folder' => ($request->query->get('folder')!==null)?$request->query->get('folder'):'inbox'
+				'folder' => ($request->query->get('folder')!==null)?$request->query->get('folder'):$emailAccounts[0]->getInboxFolder()->getId()
 				]);
 
 		}else return new RedirectResponse($this->router->generate('app_login'));
@@ -66,7 +67,7 @@ class EmailController extends Controller
 				'interfaceName' => 'Correo electrónico',
 				'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
 				'optionSelected' => 'email',
-				'breadcrumb' =>  $menurepository->formatBreadcrumb('email'),
+				'breadcrumb' =>  $menurepository->formatBreadcrumb('emailView'),
 				'userData' => $userdata,
 				'id' => $id
 				]);
@@ -89,7 +90,7 @@ class EmailController extends Controller
 				'interfaceName' => 'Correo electrónico',
 				'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
 				'optionSelected' => 'email',
-				'breadcrumb' =>  $menurepository->formatBreadcrumb('email'),
+				'breadcrumb' =>  $menurepository->formatBreadcrumb('emailNew'),
 				'userData' => $userdata
 				]);
 
@@ -102,17 +103,20 @@ class EmailController extends Controller
 	public function emailSend(RouterInterface $router,Request $request){
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+			$fromId=$request->query->get('from');
 			$toString=$request->query->get('to');
 			$ccString=$request->query->get('cc');
 			$bccString=$request->query->get('bcc');
-
-
 			$entityManager = $this->getDoctrine()->getManager();
 			$emailRepository = $this->getDoctrine()->getRepository(EmailAccounts::class);
 			$emailFolderRepository = $this->getDoctrine()->getRepository(EmailFolders::class);
-	    $emailAccounts=$this->getUser()->getEmailAccounts();
-			$emailAccount=$emailAccounts[0];
-			$attachments				= json_decode($request->query->get('files'));
+
+			//Buscamos la cuenta seleccionada
+			$emailAccount=$emailRepository->findOneBy([
+				"id"=> $fromId,
+				"user" => $this->getUser()->getId()
+			]);
+			$attachments = json_decode($request->query->get('files'));
 			$text = $request->query->get('content');
 			$html = $request->query->get('content');
 
@@ -179,10 +183,10 @@ class EmailController extends Controller
         $msg .= "--$boundary--\r\n\r\n";
         $result2=imap_append($inbox,$mailBox,$msg,"\\Seen");
 			}
-			return new Response();
+			if($result && $result2) return new JsonResponse(array("result" => 1));
+				else return new JsonResponse(array("result" => -1));
 		}else return new RedirectResponse($this->router->generate('app_login'));
 	}
-
 
 	/**
 	* @Route("/api/emails/list/{folder}", name="emailsFolderList")
@@ -192,7 +196,7 @@ class EmailController extends Controller
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 			$emailFolderRepository = $this->getDoctrine()->getRepository(EmailFolders::class);
 			$emailSubjectRepository = $this->getDoctrine()->getRepository(EmailSubjects::class);
-			$limit=$request->query->getInt('length', 10);
+			$limit=$request->query->getInt('length', 15);
 			$start=$request->query->getInt('start', 0);
 			$return=array();
 			$user=$this->getUser();

@@ -23,6 +23,7 @@
 		<script>
 					$(document).ready(function(){
 						function getEmails(url, params){
+							$("#load-spinner").fadeIn();
 							$("#list-messages").html('');
 							$.getJSON(url+params, function( data ) {
 								if ('messages' in data){
@@ -38,30 +39,30 @@
 										message+='<td class="col-name"><a attr-url-flagged="'+valAccount.urlFlagged+'" attr-url-unflagged="'+valAccount.urlUnFlagged+'" id="flagged-star-'+valAccount.id+'" href="javascript:void(0);" class="star'+((valAccount.flagged)?' stared':'')+'"><i class="entypo-star"></i></a>';
 										message+='<a href="'+valAccount.url+'" class="col-name">'+valAccount.from+'</a></td>';
 										message+='<td class="col-subject"><a href="'+valAccount.url+'">'+valAccount.subject+'</a></td>';
-										message+='<td class="col-options"></td><td class="col-time">'+valAccount.date.date+'</td></tr>';
+										message+='<td class="col-options"></td><td class="col-time">'+moment(valAccount.date.date).from()+'</td></tr>';
 										console.log(valAccount.date);
 										$("#list-messages").append(message);
 									});
 								}
 							}).always(function() {
+								$("#load-spinner").fadeOut();
 							});
 						}
 
 						$.getJSON('{{ url('foldersList') }}', function( data ) {
 							var account ="";
 							$.each( data, function( keyAccount, valAccount ) {
-									 account +='<li>'+valAccount.name;
-									$("#list-folders").append(account);
-									$.each( valAccount.folders, function( key, val ) {
-										account+='<li attr-name="'+val.name+'" attr-id="'+val.id+'" attr-url="{{ url('emailsFolderList', {'folder': '_____'}) }}" id="folder-email-list-'+val.name+'" '+((val.default==true)? 'class="active"' : '')+'><a href="javascript:void(0);"><span class="badge badge-gray pull-right">'+val.unseen+'</span>'+val.name+'</a></li>';
-										//$("#list-folders").append(folder);
-									});
-									account += '</li>';
 
-							});
-								$("#list-folders").html(account);
+									$("#list-folders").append('<li class="mail-account" id="email-account-'+keyAccount+'" data-toggle="collapse" aria-expanded="true" data-target="#email-account-folders-'+keyAccount+'"><div class="mail-account-title">'+valAccount.name+'</div></li><li class="collapse in" id="email-account-folders-'+keyAccount+'"></li>');
+									 $.each( valAccount.folders, function( key, val ) {
+										 $('#email-account-folders-'+keyAccount).append('<li attr-name="'+val.name+'" attr-id="'+val.id+'" attr-url="{{ url('emailsFolderList', {'folder': '_____'}) }}" id="folder-email-list-'+valAccount.name+'-'+val.id+'" '+((val.default==true)? 'class="active"' : '')+'><a href="javascript:void(0);"><span class="badge badge-gray pull-right">'+val.unseen+'</span>'+val.name+'</a></li>');
+									 });
+							 });
+								$('.mail-account').collapse('hide');
 						}).always(function() {
+
 						});
+
 
 						$('body').on('click', "[id^='folder-email-list-']", function() {
 							url=$(this).attr('attr-url');
@@ -83,7 +84,7 @@
 									else element.addClass('stared');
 							});
 						});
-						getEmails('{{ url('emailsFolderList', {'folder': 'INBOX'}) }}','');
+						getEmails('{{ url('emailsFolderList', {'folder': folder}) }}','');
 
 					});
 		</script>
@@ -228,6 +229,8 @@
 	<!-- Imported scripts on this page -->
  	<script src="{{ url('index') }}js/datatables/datatables.js"></script>
 	<script src="{{ url('index') }}js/select2/select2.min.js"></script>
+	<script src="{{ url('index') }}js/moment.min.js"></script>
+	<script src="{{ url('index') }}js/moment-es.js"></script>
 	 {{ include('bottom.html.twig') }}
 {% endblock %}
 </body>

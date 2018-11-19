@@ -47,17 +47,26 @@
             }
         });
 
+					$.getJSON('{{ url('foldersList') }}', function( data ) {
+						var account ="";
+						$.each( data, function( keyAccount, valAccount ) {
 
+								$("#list-folders").append('<li class="mail-account" id="email-account-'+keyAccount+'" data-toggle="collapse" aria-expanded="true" data-target="#email-account-folders-'+keyAccount+'"><div class="mail-account-title">'+valAccount.name+'</div></li><li class="collapse in" id="email-account-folders-'+keyAccount+'"></li>');
+								$("#mail-accounts").data("selectBox-selectBoxIt").add({ value: keyAccount, text: valAccount.name });
+								 $.each( valAccount.folders, function( key, val ) {
+									 $('#email-account-folders-'+keyAccount).append('<li attr-name="'+val.name+'" attr-id="'+val.id+'" attr-url="{{ url('emailsFolderList', {'folder': '_____'}) }}" '+((val.default==true)? 'class="active"' : '')+'><a href="{{url('email')}}?folder='+val.id+'"><span class="badge badge-gray pull-right">'+val.unseen+'</span>'+val.name+'</a></li>');
+								 });
+						 });
+							$('.mail-account').collapse('hide');
+					}).always(function() {
 
-        $.getJSON('{{ url('foldersList') }}', function( data ){
-          $.each( data, function( keyAccount, valAccount ){
-              $.each( valAccount, function( key, val ){
-                var folder='<li attr-name="'+val.name+'" attr-url="{{ url('emailsFolderList', {'folder': '_____'}) }}" id="folder-email-list-'+val.name+'" '+((val.default==true)? 'class="active"' : '')+'><a href="{{url('email')}}?folder='+val.name+'"><span class="badge badge-gray pull-right">'+val.unseen+'</span>'+val.name+'</a></li>';
-                $("#list-folders").append(folder);
-              });
-          });
-        }).always(function() {
-        });
+					});
+
+				$('#btn-discard-mail').click(function(){
+					dropzone_default.removeAllFiles( true );
+					$('#form-send-mail').trigger("reset");
+				});
+
         $('body').on('click', "[id^='folder-email-list-']", function() {
           url=$(this).attr('attr-url');
           url=url.replace('_____',$(this).attr('attr-name'));
@@ -67,16 +76,20 @@
 
 				$( "#form-send-mail" ).on( "submit", function( event ) {
 				  event.preventDefault();
-					console.log(jsonFiles);
+					$("#load-spinner").fadeIn();
 				  data= $( this ).serialize()+"&files="+encodeURIComponent(JSON.stringify(jsonFiles)) ;
 					$.getJSON('{{ url('emailSend') }}',data, function( data ){
-
+						dropzone_default.removeAllFiles( true );
+						$('#form-send-mail').trigger("reset");
+					}).always(function() {
+							$("#load-spinner").fadeOut();
 					});
 				});
 
 
       });
     </script>
+
     <div class="mail-env">
 
   			<!-- compose new email button -->
@@ -96,7 +109,7 @@
   					</div>
   					<!-- links -->
   					<div class="mail-links">
-  						<a href="#" class="btn btn-default">
+  						<a id="btn-discard-mail" href="#" class="btn btn-default">
   							<i class="entypo-cancel"></i>
   						</a>
   						<a href="#" class="btn btn-default btn-icon">
@@ -110,11 +123,20 @@
   					</div>
   				</div>
 
-
+					<div class="panel-body">
+						<div class="form-group">
+								<label class="col-sm-1 control-label" for="from">Desde:</label>
+								<div class="col-sm-11">
+									<select name="from" id="mail-accounts" class="selectboxit">
+										<optgroup label="Cuentas de correo">
+										</optgroup>
+									</select>
+								</div>
+						</div>
+					</div>
   				<div class="mail-compose">
-
   						<div class="form-group">
-  							<label for="to">To:</label>
+  							<label for="to">Para:</label>
   							<input type="input" class="form-control" id="to" name="to" tabindex="1" />
   							<div class="field-options">
   								<a href="javascript:;" onclick="$(this).hide(); $('#cc').parent().removeClass('hidden'); $('#cc').focus();">CC</a>
@@ -138,6 +160,7 @@
   						</div>
 
   				</div>
+
 					<div class="form-group">
 						<div class="col-sm-12">
 									<div class="dropzone"><div class="dz-message" data-dz-message><span>Ficheros Adjuntos</span></div></div>
@@ -185,14 +208,19 @@
 	<link rel="stylesheet" href="{{ url('index') }}js/select2/select2-bootstrap.css">
 	<link rel="stylesheet" href="{{ url('index') }}js/select2/select2.css">
 	<link rel="stylesheet" href="{{ url('index') }}js/wysihtml5/bootstrap-wysihtml5.css">
+	<link rel="stylesheet" href="{{ url('index') }}js/selectboxit/jquery.selectBoxIt.css">
 	<!-- Imported scripts on this page -->
 
 	<script src="{{ url('index') }}js/datatables/datatables.js"></script>
 	<script src="{{ url('index') }}js/select2/select2.min.js"></script>
+	<script src="{{ url('index') }}js/moment.min.js"></script>
+	<script src="{{ url('index') }}js/moment-es.js"></script>
+
  {{ include('bottom.html.twig') }}
  <script src="{{ url('index') }}js/fileinput.js"></script>
  <script src="{{ url('index') }}js/dropzone/dropzone.js"></script>
  <script src="{{ url('index') }}js/wysihtml5/wysihtml5-0.4.0pre.min.js"></script>
+ <script src="{{ url('index') }}js/selectboxit/jquery.selectBoxIt.min.js"></script>
  <script src="{{ url('index') }}js/wysihtml5/bootstrap-wysihtml5.js"></script>
 {% endblock %}
 </body>
