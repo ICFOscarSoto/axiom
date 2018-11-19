@@ -80,6 +80,21 @@ class EmailAccounts
      */
     private $smtpPassword;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Email\EmailFolders", inversedBy="emailAccountsInbox")
+     */
+    private $inboxFolder;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Email\EmailFolders")
+     */
+    private $sentFolder;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Email\EmailFolders")
+     */
+    private $trashFolder;
+
     public function __construct()
     {
         $this->emailFolders = new ArrayCollection();
@@ -249,6 +264,42 @@ class EmailAccounts
     public function setSmtpPassword(?string $smtpPassword): self
     {
         $this->smtpPassword = $smtpPassword;
+
+        return $this;
+    }
+
+    public function getInboxFolder(): ?EmailFolders
+    {
+        return $this->inboxFolder;
+    }
+
+    public function setInboxFolder(?EmailFolders $inboxFolder): self
+    {
+        $this->inboxFolder = $inboxFolder;
+
+        return $this;
+    }
+
+    public function getSentFolder(): ?EmailFolders
+    {
+        return $this->sentFolder;
+    }
+
+    public function setSentFolder(?EmailFolders $sentFolder): self
+    {
+        $this->sentFolder = $sentFolder;
+
+        return $this;
+    }
+
+    public function getTrashFolder(): ?EmailFolders
+    {
+        return $this->trashFolder;
+    }
+
+    public function setTrashFolder(?EmailFolders $trashFolder): self
+    {
+        $this->trashFolder = $trashFolder;
 
         return $this;
     }

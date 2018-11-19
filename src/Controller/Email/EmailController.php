@@ -36,8 +36,8 @@ class EmailController extends Controller
 			$this->router = $router;
 			$userdata=$this->getUser()->getTemplateData();
 			$menurepository=$this->getDoctrine()->getRepository(MenuOptions::class);
-			$this->emailsFoldersGet($router, $request);
-			$this->emailsSubjectsGet($router, $request);
+			//$this->emailsFoldersGet($router, $request);
+			//$this->emailsSubjectsGet($router, $request);
 			return $this->render('email\email.html.twig', [
 				'controllerName' => 'EmailController',
 				'interfaceName' => 'Correo electrónico',
@@ -115,6 +115,8 @@ class EmailController extends Controller
 			$attachments				= json_decode($request->query->get('files'));
 			$text = $request->query->get('content');
 			$html = $request->query->get('content');
+
+			//Generamos el mail para el envio SMTP
 			$headers = array(
 			              'From'    => $emailAccount->getUsername(),
 			              'Subject' => $request->query->get('subject')
@@ -141,10 +143,11 @@ class EmailController extends Controller
 			if($bccString!=null)	$headers['Bcc'] = $bccString;
 			$result = $smtp->send($request->query->get('to'), $headers, $body);
 			if($result){
-				$connectionString='{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'}Elementos enviados';
+				//Si se ha enviado correctamente el mail SMTP procedemos a crear el mail IMAP para almacenarlo en la carpeta
+				//de enviados
+				$connectionString='{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'}'.$emailAccount->getInboxFolder()->getName();
 				$inbox = imap_open($connectionString,$emailAccount->getUsername() ,$emailAccount->getPassword());
-
-				$mailBox = "{".$emailAccount->getServer().":".$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol()."}Elementos enviados";
+				$mailBox = "{".$emailAccount->getServer().":".$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol()."}".$emailAccount->getInboxFolder()->getName();
         $dmy = date("d-M-Y H:i:s");
         $boundary = "------=".md5(uniqid(rand()));
         $msgid = 'adasdasdasdq3we32adsd3wrerf';
@@ -175,9 +178,7 @@ class EmailController extends Controller
         $msg .= "\r\n\r\n\r\n";
         $msg .= "--$boundary--\r\n\r\n";
         $result2=imap_append($inbox,$mailBox,$msg,"\\Seen");
-				dump($result2);
 			}
-			dump($result);
 			return new Response();
 		}else return new RedirectResponse($this->router->generate('app_login'));
 	}
@@ -197,7 +198,7 @@ class EmailController extends Controller
 			$user=$this->getUser();
 			foreach($user->getEmailAccounts() as $emailAccount){
 					$emailFolders=$emailFolderRepository->findBy([
-							'name' => $folder,
+							'id' => $folder,
 							'emailAccount' => $emailAccount->getId()
 					]);
 					foreach($emailFolders as $emailFolder){
@@ -280,13 +281,15 @@ class EmailController extends Controller
 							->andWhere('t.seen = :val_seen')
 							->setParameter('val_folder', $emailFolder->getId())
 							->setParameter('val_seen', false);
+					$subject["id"]=$emailFolder->getId();
 					$subject["name"]=$emailFolder->getName();
 					$subject["count"]=count($emailFolder->getEmailSubjects());
 					if($request->query->get('folder')!==null)
 						$subject["default"]=(strtoupper($emailFolder->getName())==strtoupper($request->query->get('folder'))?true:false);
-					else $subject["default"]=(strtoupper($emailFolder->getName()=='INBOX')?true:false);
+					else $subject["default"]=(strtoupper($emailFolder->getId()==$emailAccount->getInboxFolder()->getId())?true:false);
 					$subject["unseen"]=$queryUnseen->getQuery()->getSingleScalarResult();
-					$return[$emailAccount->getId()][]=$subject;
+					$return[$emailAccount->getId()]["name"]=$emailAccount->getName();
+					$return[$emailAccount->getId()]["folders"][]=$subject;
 					//$return[$emailAccount->getId()][$emailFolder->getName()]=$emailFolder->getEmailSubjects();
 				}
 			}
@@ -352,7 +355,8 @@ class EmailController extends Controller
 					$nums=imap_num_msg($inbox);
 					for ($i=1;$i<=$nums;$i++){
 						$subject = imap_fetch_overview($inbox, $i, 0);
-						$emailSubject = $emailSubjects->findOneBy([
+						dump($subject);
+						/*$emailSubject = $emailSubjects->findOneBy([
 						    'folder' => $folder->getId(),
 								'messageId' => $subject[0]->message_id
 						]);
@@ -376,7 +380,7 @@ class EmailController extends Controller
 							$emailSubject->setFolder($folder);
 							$entityManager->persist($emailSubject);
 		        	$entityManager->flush();
-						}
+						}*/
 					}
 			}
 		}
@@ -513,6 +517,7 @@ class EmailController extends Controller
 		}
 		return new Response('');
 	}
+
 
 
 }

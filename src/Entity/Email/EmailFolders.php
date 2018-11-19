@@ -35,9 +35,15 @@ class EmailFolders
      */
     private $emailSubjects;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Email\EmailAccounts", mappedBy="inboxFolder")
+     */
+    private $emailAccountsInbox;
+
     public function __construct()
     {
         $this->emailSubjects = new ArrayCollection();
+        $this->emailAccountsInbox = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -94,6 +100,37 @@ class EmailFolders
             // set the owning side to null (unless already changed)
             if ($emailSubject->getFolder() === $this) {
                 $emailSubject->setFolder(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|EmailAccounts[]
+     */
+    public function getEmailAccountsInbox(): Collection
+    {
+        return $this->emailAccountsInbox;
+    }
+
+    public function addEmailAccountsInbox(EmailAccounts $emailAccountsInbox): self
+    {
+        if (!$this->emailAccountsInbox->contains($emailAccountsInbox)) {
+            $this->emailAccountsInbox[] = $emailAccountsInbox;
+            $emailAccountsInbox->setInboxFolder($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEmailAccountsInbox(EmailAccounts $emailAccountsInbox): self
+    {
+        if ($this->emailAccountsInbox->contains($emailAccountsInbox)) {
+            $this->emailAccountsInbox->removeElement($emailAccountsInbox);
+            // set the owning side to null (unless already changed)
+            if ($emailAccountsInbox->getInboxFolder() === $this) {
+                $emailAccountsInbox->setInboxFolder(null);
             }
         }
 

@@ -29,6 +29,8 @@ class ImapSync extends ContainerAwareCommand
     $emailFolderRepository = $doctrine->getRepository(EmailFolders::class);
     $emailSubjects = $doctrine->getRepository(EmailSubjects::class);
     $emailAccounts=$emailRepository->findAll();
+
+    //Obtenemos la lista de carpetas de cada cuenta del servidor
     foreach($emailAccounts as $emailAccount){
         $connectionString='{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'}';
         $inbox = imap_open($connectionString,$emailAccount->getUsername() ,$emailAccount->getPassword());
@@ -49,24 +51,33 @@ class ImapSync extends ContainerAwareCommand
         }
       }
 
+    //Obtenemos la lista de correos de cada cuenta y cada carpeta del servidor
     $emailAccounts=$emailRepository->findAll();
 		foreach($emailAccounts as $emailAccount){
+      //Si no esta totalmente configurada la cuenta pasamos a la siguiente
+      if($emailAccount->getInboxFolder()===null || $emailAccount->getSentFolder()===null || $emailAccount->getTrashFolder()===null) continue;
 			$folders=$emailAccount->getEmailFolders();
-			foreach($folders as $folder){
-					$inbox = imap_open('{'.$emailAccounts[0]->getServer().':'.$emailAccounts[0]->getPort().'/imap/'.$emailAccounts[0]->getProtocol().'}'.$folder->getName(),$emailAccounts[0]->getUsername() ,$emailAccounts[0]->getPassword());
-					$nums=imap_num_msg($inbox);
+		  foreach($folders as $folder){
+          $inbox = imap_open('{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'}'.$folder->getName(),$emailAccount->getUsername(),$emailAccount->getPassword());
+          if($inbox===FALSE) continue;
+          $nums=imap_num_msg($inbox);
 					for ($i=1;$i<=$nums;$i++){
 						$subject = imap_fetch_overview($inbox, $i, 0);
-						$emailSubject = $emailSubjects->findOneBy([
-						    'folder' => $folder->getId(),
-								'messageId' => $subject[0]->message_id
-						]);
+            dump($subject);
+
+            //Buscamos el mensaje por Uid o por message_id
+            if(isset($subject[0]->message_id))
+              $emailSubject_message_id=$emailSubjects->findByAccountAndMessageId($emailAccount->getId(), $subject[0]->message_id);
+              else $emailSubject_message_id=null;
+            $emailSubject_uid=$emailSubjects->findByAccountAndUid($emailAccount->getId(), $subject[0]->uid);
+            $emailSubject=$emailSubject_message_id==null?$emailSubject_uid:$emailSubject_message_id;
+            //Si no hemos encontrado el mensaje lo creamos
 						if($emailSubject===null){
 							mb_internal_encoding('UTF-8');
 							$emailSubject=new EmailSubjects();
-							$emailSubject->setSubject(str_replace("_"," ", mb_decode_mimeheader($subject[0]->subject)));
-							$emailSubject->setFromEmail(str_replace("_"," ", mb_decode_mimeheader($subject[0]->from)));
-							$emailSubject->setToEmail(str_replace("_"," ", mb_decode_mimeheader($subject[0]->to)));
+							$emailSubject->setSubject(str_replace("_"," ", mb_decode_mimeheader(isset($subject[0]->subject) ? $subject[0]->subject:'')));
+							$emailSubject->setFromEmail(str_replace("_"," ", mb_decode_mimeheader(isset($subject[0]->from) ? $subject[0]->from:'')));
+							$emailSubject->setToEmail(str_replace("_"," ", mb_decode_mimeheader(isset($subject[0]->to) ? $subject[0]->to:'')));
 							$emailSubject->setMessageId($subject[0]->message_id);
 							$emailSubject->setSize($subject[0]->size);
 							$emailSubject->setUid($subject[0]->uid);
@@ -83,6 +94,7 @@ class ImapSync extends ContainerAwareCommand
 		        	$entityManager->flush();
 						}
 					}
+          imap_close($inbox);
 			}
 		}
 

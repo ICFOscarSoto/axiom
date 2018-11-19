@@ -48,18 +48,24 @@
 						}
 
 						$.getJSON('{{ url('foldersList') }}', function( data ) {
+							var account ="";
 							$.each( data, function( keyAccount, valAccount ) {
-									$.each( valAccount, function( key, val ) {
-										var folder='<li attr-name="'+val.name+'" attr-url="{{ url('emailsFolderList', {'folder': '_____'}) }}" id="folder-email-list-'+val.name+'" '+((val.default==true)? 'class="active"' : '')+'><a href="javascript:void(0);"><span class="badge badge-gray pull-right">'+val.unseen+'</span>'+val.name+'</a></li>';
-										$("#list-folders").append(folder);
+									 account +='<li>'+valAccount.name;
+									$("#list-folders").append(account);
+									$.each( valAccount.folders, function( key, val ) {
+										account+='<li attr-name="'+val.name+'" attr-id="'+val.id+'" attr-url="{{ url('emailsFolderList', {'folder': '_____'}) }}" id="folder-email-list-'+val.name+'" '+((val.default==true)? 'class="active"' : '')+'><a href="javascript:void(0);"><span class="badge badge-gray pull-right">'+val.unseen+'</span>'+val.name+'</a></li>';
+										//$("#list-folders").append(folder);
 									});
+									account += '</li>';
+
 							});
+								$("#list-folders").html(account);
 						}).always(function() {
 						});
 
 						$('body').on('click', "[id^='folder-email-list-']", function() {
 							url=$(this).attr('attr-url');
-							url=url.replace('_____',$(this).attr('attr-name'));
+							url=url.replace('_____',$(this).attr('attr-id'));
 							$("[id^='folder-email-list-']").removeClass('active');
 							$(this).addClass('active');
 							getEmails(url,'');

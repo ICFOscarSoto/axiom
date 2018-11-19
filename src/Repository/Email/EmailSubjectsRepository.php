@@ -18,6 +18,35 @@ class EmailSubjectsRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, EmailSubjects::class);
     }
+    public function findByAccountAndUid($account, $uid)
+    {
+        $query=$this->createQueryBuilder('s')
+            ->join('s.folder', 'f')
+            ->join('f.emailAccount', 'a')
+            ->andWhere('s.uid = :val')
+            ->andWhere('a.id = :valAccount')
+            ->setParameter('val', $uid)
+            ->setParameter('valAccount', $account)
+            ->setMaxResults(1)
+            ->getQuery()
+        ;
+        return $query->getOneOrNullResult();
+    }
+
+    public function findByAccountAndMessageId($account, $messageId)
+    {
+        $query=$this->createQueryBuilder('s')
+            ->join('s.folder', 'f')
+            ->join('f.emailAccount', 'a')
+            ->andWhere('s.messageId = :val')
+            ->andWhere('a.id = :valAccount')
+            ->setParameter('val', $messageId)
+            ->setParameter('valAccount', $account)
+            ->setMaxResults(1)
+            ->getQuery()
+        ;
+        return $query->getOneOrNullResult();
+    }
 
     // /**
     //  * @return EmailSubjects[] Returns an array of EmailSubjects objects
