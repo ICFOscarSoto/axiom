@@ -18,8 +18,8 @@ use App\Utils\Email\EmailUtils;
 use Symfony\Component\Validator\Constraints\DateTime;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\MimeType\FileinfoMimeTypeGuesser;
-require_once __DIR__.'\..\..\..\vendor\pear\mail\Mail.php';
-require_once __DIR__.'\..\..\..\vendor\pear\mail_mime\Mail\mime.php';
+require_once __DIR__.'/../../../vendor/pear/mail/Mail.php';
+require_once __DIR__.'/../../../vendor/pear/mail_mime/Mail/mime.php';
 use Mail;
 use Mail_mime;
 class EmailController extends Controller
@@ -135,10 +135,10 @@ class EmailController extends Controller
 			$headers = $mime->headers($headers);
 			$smtp = Mail::factory('smtp',
    		array ('host' => $emailAccount->getSmtpServer(),
-     'auth' => true,
-     'username' => $emailAccount->getSmtpUsername(),
-		 'port'=>$emailAccount->getSmtpPort(),
-     'password' => $emailAccount->getSmtpPassword()));
+			     'auth' => true,
+			     'username' => $emailAccount->getSmtpUsername(),
+					 'port'=>$emailAccount->getSmtpPort(),
+			     'password' => $emailAccount->getSmtpPassword()));
 		  if($ccString!=null)	$headers['Cc'] = $ccString;
 			if($bccString!=null)	$headers['Bcc'] = $bccString;
 			$result = $smtp->send($request->query->get('to'), $headers, $body);
@@ -150,7 +150,7 @@ class EmailController extends Controller
 				$mailBox = "{".$emailAccount->getServer().":".$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol()."}".$emailAccount->getInboxFolder()->getName();
         $dmy = date("d-M-Y H:i:s");
         $boundary = "------=".md5(uniqid(rand()));
-        $msgid = 'adasdasdasdq3we32adsd3wrerf';
+        $msgid = '{axiom_'.time().'_'.$emailAccount->getId().'}';
         $msg = "From: ".$emailAccount->getSmtpUsername()."\r\n";
         $msg .= "To:".$request->query->get('to')."\r\n";
         $msg .= "Date: $dmy\r\n";
@@ -358,7 +358,7 @@ class EmailController extends Controller
 						dump($subject);
 						/*$emailSubject = $emailSubjects->findOneBy([
 						    'folder' => $folder->getId(),
-								'messageId' => $subject[0]->message_id
+								'msgno' => $subject[0]->msgno
 						]);
 						if($emailSubject===null){
 							mb_internal_encoding('UTF-8');
@@ -366,7 +366,7 @@ class EmailController extends Controller
 							$emailSubject->setSubject(str_replace("_"," ", mb_decode_mimeheader($subject[0]->subject)));
 							$emailSubject->setFromEmail(str_replace("_"," ", mb_decode_mimeheader($subject[0]->from)));
 							$emailSubject->setToEmail(str_replace("_"," ", mb_decode_mimeheader($subject[0]->to)));
-							$emailSubject->setMessageId($subject[0]->message_id);
+							$emailSubject->setMessageId(isset($subject[0]->message_id)?$subject[0]->message_id:'');
 							$emailSubject->setSize($subject[0]->size);
 							$emailSubject->setUid($subject[0]->uid);
 							$emailSubject->setMsgno($subject[0]->msgno);
