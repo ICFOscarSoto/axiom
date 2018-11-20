@@ -81,6 +81,8 @@
 					$.getJSON('{{ url('emailSend') }}',data, function( data ){
 						dropzone_default.removeAllFiles( true );
 						$('#form-send-mail').trigger("reset");
+						if(data.result)	toastr.success("El correo se ha enviado correctamente", "Confirmación", confirmation);
+							else toastr.error("No se pudo enviar el correo", "Confirmación", confirmation);
 					}).always(function() {
 							$("#load-spinner").fadeOut();
 					});
