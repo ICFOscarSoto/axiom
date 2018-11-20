@@ -87,8 +87,18 @@
 							$("#load-spinner").fadeOut();
 					});
 				});
+				 var wysihtml5Editor = $('#content').wysihtml5().data("wysihtml5").editor;
 
-
+				{% if id>0 %}
+					$.getJSON('{{ url('emailGet', {'id': id}) }}', function( data ){
+						  $('#subject').val('RE: '+data.subject);
+ 							$("#mail-accounts").data("selectBox-selectBoxIt").selectOption(data.account+"");
+							//$("#mail-accounts").data("selectBox-selectBoxIt").disable();
+							wysihtml5Editor.setValue('</br></br>El '+moment(data.timestamp).format('LLLL')+', '+data.from+' escribio: </br></br>'+data.content, false);
+					}).always(function() {
+							$("#load-spinner").fadeOut();
+					});
+				{% endif %}
       });
     </script>
 
@@ -158,7 +168,7 @@
   							<input type="text" class="form-control" id="subject" name="subject" tabindex="1" />
   						</div>
   						<div class="compose-message-editor">
-  							<textarea class="form-control wysihtml5" data-stylesheet-url="{{ url('index') }}css/wysihtml5-color.css" name="content" id="content"></textarea>
+  							<textarea class="form-control" data-stylesheet-url="{{ url('index') }}css/wysihtml5-color.css" name="content" id="content"></textarea>
   						</div>
 
   				</div>
