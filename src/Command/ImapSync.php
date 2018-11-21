@@ -78,7 +78,7 @@ class ImapSync extends ContainerAwareCommand
 							$emailSubject->setSubject(str_replace("_"," ", mb_decode_mimeheader(isset($subject[0]->subject) ? $subject[0]->subject:'')));
 							$emailSubject->setFromEmail(str_replace("_"," ", mb_decode_mimeheader(isset($subject[0]->from) ? $subject[0]->from:'')));
 							$emailSubject->setToEmail(str_replace("_"," ", mb_decode_mimeheader(isset($subject[0]->to) ? $subject[0]->to:'')));
-							$emailSubject->setMessageId($subject[0]->message_id);
+							$emailSubject->setMessageId(isset($subject[0]->message_id)?$subject[0]->message_id:'');
 							$emailSubject->setSize($subject[0]->size);
 							$emailSubject->setUid($subject[0]->uid);
 							$emailSubject->setMsgno($subject[0]->msgno);

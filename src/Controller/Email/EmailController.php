@@ -137,7 +137,8 @@ class EmailController extends Controller
 			$entityManager = $this->getDoctrine()->getManager();
 			$emailRepository = $this->getDoctrine()->getRepository(EmailAccounts::class);
 			$emailFolderRepository = $this->getDoctrine()->getRepository(EmailFolders::class);
-
+			$emailUtils = new EmailUtils();
+			$emailUtils->container=$this->container;
 			//Buscamos la cuenta seleccionada
 			$emailAccount=$emailRepository->findOneBy([
 				"id"=> $fromId,
@@ -183,10 +184,10 @@ class EmailController extends Controller
         $boundary = "------=".md5(uniqid(rand()));
         $msgid = '{axiom_'.time().'_'.$emailAccount->getId().'}';
         $msg = "From: ".$emailAccount->getSmtpUsername()."\r\n";
-        $msg .= "To:".$request->query->get('to')."\r\n";
+        $msg .= "To: ".implode(',',$emailUtils->extractEmailsFromString($request->query->get('to')))."\r\n";
         $msg .= "Date: $dmy\r\n";
         $msg .= "message_id: adasdasdasdq3we32adsd3wrerf\r\n";
-        //$msg .= "in_reply_to: $replyto\r\n";
+        $msg .= ($request->query->get('message_id'))?"References: ".$request->query->get('message_id')."\r\nIn-Reply-To: ".$request->query->get('message_id')."\r\n":"";
         $msg .= "Subject: ".$request->query->get('subject')."\r\n";
         $msg .= "MIME-Version: 1.0\r\n";
         $msg .= "Content-Type: multipart/mixed; boundary=\"$boundary\"\r\n";
@@ -208,6 +209,7 @@ class EmailController extends Controller
         }
         $msg .= "\r\n\r\n\r\n";
         $msg .= "--$boundary--\r\n\r\n";
+				dump($msg);
         $result2=imap_append($inbox,$mailBox,$msg,"\\Seen");
 			}
 			if($result && $result2) return new JsonResponse(array("result" => 1));
@@ -467,6 +469,7 @@ class EmailController extends Controller
 						$message["id"]					=$subject->getId();
 						$message["subject"]			=$subject->getSubject();
 						$message["from"]				=$subject->getFromEmail();
+						$message["message_id"]		=$subject->getMessageId();
 						$message["imgFrom"]			=substr($this->generateUrl('getUserImage', array('id' => 0)),1); //TODO Buscar foto del contacto en la agenda
 						$message["content"]			=($emailUtils->htmlmsg!=null)?$emailUtils->htmlmsg:$emailUtils->plainmsg;
 						$message["attachments"]	=$emailUtils->attachments;

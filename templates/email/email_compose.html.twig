@@ -87,12 +87,14 @@
 							$("#load-spinner").fadeOut();
 					});
 				});
-				 var wysihtml5Editor = $('#content').wysihtml5().data("wysihtml5").editor;
+				var wysihtml5Editor = $('#content').wysihtml5().data("wysihtml5").editor;
 
 				{% if id>0 %}
 					$.getJSON('{{ url('emailGet', {'id': id}) }}', function( data ){
 						  $('#subject').val('RE: '+data.subject);
  							$("#mail-accounts").data("selectBox-selectBoxIt").selectOption(data.account+"");
+							$("#to").val(data.from);
+							$("#in_reply_to").val(data.message_id);
 							//$("#mail-accounts").data("selectBox-selectBoxIt").disable();
 							wysihtml5Editor.setValue('</br></br>El '+moment(data.timestamp).format('LLLL')+', '+data.from+' escribio: </br></br>'+data.content, false);
 					}).always(function() {
@@ -150,6 +152,7 @@
   						<div class="form-group">
   							<label for="to">Para:</label>
   							<input type="input" class="form-control" id="to" name="to" tabindex="1" />
+								<input type="hidden" class="form-control" id="in_reply_to" name="in_reply_to" tabindex="1" />
   							<div class="field-options">
   								<a href="javascript:;" onclick="$(this).hide(); $('#cc').parent().removeClass('hidden'); $('#cc').focus();">CC</a>
   								<a href="javascript:;" onclick="$(this).hide(); $('#bcc').parent().removeClass('hidden'); $('#bcc').focus();">BCC</a>

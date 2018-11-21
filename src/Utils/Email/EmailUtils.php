@@ -103,4 +103,12 @@ class EmailUtils{
 
   }
 
+  function extractEmailsFromString($string){
+    $matches = array();
+    $pattern = '/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}/i';
+    preg_match_all($pattern, $string, $matches);
+    $neaterArray = (array_values(array_unique($matches[0])));
+    return $neaterArray;
+  }
+
 }
