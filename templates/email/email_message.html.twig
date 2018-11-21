@@ -28,7 +28,9 @@
 							$.getJSON(data.urlRead, function( data ){});
 							$("#mail-content").html(data.content);
 							$("#mail-subject").html(data.subject);
-							$("#mail-from").html('<img src="{{ url('index') }}'+data.imgFrom+'" class="img-circle" width="30" /><span>'+data.from+'</span>');
+							$("#mail-from").html('<img src="{{ url('index') }}'+data.imgFrom+'" class="img-circle" width="30" /><span></span>');
+							$("#mail-from > span").text(data.from);
+
 							$("#mail-attachments-count").text(data.attachments.length);
 								$.each( data.attachments, function(key,val){
 									url=$("#mail-attachments").attr('attr-url');
@@ -38,23 +40,33 @@
 								});
 						});
 
-						$.getJSON('{{ url('foldersList') }}', function( data ){
-							$.each( data, function( keyAccount, valAccount ){
-									$.each( valAccount, function( key, val ){
-										var folder='<li attr-name="'+val.name+'" attr-url="{{ url('emailsFolderList', {'folder': '_____'}) }}" id="folder-email-list-'+val.name+'" '+((val.default==true)? 'class="active"' : '')+'><a href="{{url('email')}}?folder='+val.name+'"><span class="badge badge-gray pull-right">'+val.unseen+'</span>'+val.name+'</a></li>';
-										$("#list-folders").append(folder);
-									});
-							});
+						$.getJSON('{{ url('foldersList') }}', function( data ) {
+							var account ="";
+							$.each( data, function( keyAccount, valAccount ) {
+
+									$("#list-folders").append('<li class="mail-account" id="email-account-'+keyAccount+'" data-toggle="collapse" aria-expanded="true" data-target="#email-account-folders-'+keyAccount+'"><div class="mail-account-title">'+valAccount.name+'</div></li><li class="collapse in" id="email-account-folders-'+keyAccount+'"></li>');
+									 $.each( valAccount.folders, function( key, val ) {
+										  $('#email-account-folders-'+keyAccount).append('<li attr-name="'+val.name+'" attr-id="'+val.id+'" attr-url="{{ url('emailsFolderList', {'folder': '_____'}) }}" '+((val.default==true)? 'class="active"' : '')+'><a href="{{url('email')}}?folder='+val.id+'"><span class="badge badge-gray pull-right">'+val.unseen+'</span>'+val.name+'</a></li>');
+									 });
+							 });
+								$('.mail-account').collapse('hide');
 						}).always(function() {
+
 						});
 
-						$('body').on('click', "[id^='folder-email-list-']", function() {
+						/*$('body').on('click', "[id^='folder-email-list-']", function() {
 							url=$(this).attr('attr-url');
 							url=url.replace('_____',$(this).attr('attr-name'));
 							$("[id^='folder-email-list-']").removeClass('active');
 							$(this).addClass('active');
 							//getEmails(url,'');
-						});
+						});*/
+						$('body').on('click', "[id^='folder-email-list-']", function() {
+		          url=$(this).attr('attr-url');
+		          url=url.replace('_____',$(this).attr('attr-name'));
+		          $("[id^='folder-email-list-']").removeClass('active');
+		          $(this).addClass('active');
+		        });
 					});
 		</script>
 		<div class="mail-env">
