@@ -3,8 +3,9 @@ namespace App\Utils\Email;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 class EmailUtils{
-  public $charset,$htmlmsg,$plainmsg,$attachments;
-  public $container;
+  public $charset,$htmlmsg,$plainmsg;
+  public $attachments=array();
+  public $container=null;
 
   function getMsg($mbox,$mid) {
       // input $mbox = IMAP stream, $mid = message id
@@ -64,10 +65,10 @@ class EmailUtils{
       // so an attached text file (type 0) is not mistaken as the message.
       if ((isset($params['filename']) && $params['filename']) || (isset($params['name']) && $params['name'])) {
           // filename may be given as 'Filename' or 'Name' or both
-          $filename = ($params['filename'])? $params['filename'] : $params['name'];
+          $filename = (isset($params['filename']))? $params['filename'] : $params['name'];
           // filename may be encoded, so see imap_mime_header_decode()
           $attachment=array("filename" => $filename, "msgno" => $mid, "encoding" => $p->encoding, "partno" => $partno,
-                            "icon" => $this->container->get('router')->generate('getFilesImage', array('ext' => pathinfo($filename, PATHINFO_EXTENSION))));
+                            "icon" => $this->container?$this->container->get('router')->generate('getFilesImage', array('ext' => pathinfo($filename, PATHINFO_EXTENSION))):'');
           $this->attachments[]=$attachment;
           //$this->attachments[$filename] = $data;  // this is a problem if two files have same name
 
@@ -82,7 +83,8 @@ class EmailUtils{
                 $this->plainmsg.= trim($data) ."\n\n";
             else
                 $this->htmlmsg.= $data ."<br><br>";
-            $charset = $params['charset'];  // assume all parts are same charset
+
+            $charset = isset($params['charset'])?$params['charset']:'UTF8';  // assume all parts are same charset
         }
 
         // EMBEDDED MESSAGE
@@ -109,6 +111,30 @@ class EmailUtils{
     preg_match_all($pattern, $string, $matches);
     $neaterArray = (array_values(array_unique($matches[0])));
     return $neaterArray;
+  }
+
+  function countAttachments($connection, $message_number) {
+
+    $attachments = 0;
+    $structure = imap_fetchstructure($connection, $message_number);
+    if(isset($structure->parts) && count($structure->parts)) {
+        for($i = 0; $i < count($structure->parts); $i++) {
+            if($structure->parts[$i]->ifdparameters) {
+                foreach($structure->parts[$i]->dparameters as $object) {
+                    if(strtolower($object->attribute) == 'filename') {
+                        $attachments++;
+                    }
+                }
+            }else if($structure->parts[$i]->ifparameters) {
+                foreach($structure->parts[$i]->parameters as $object) {
+                    if(strtolower($object->attribute) == 'name') {
+                        $attachments++;
+                    }
+                }
+            }
+        }
+    }
+    return $attachments;
   }
 
 }

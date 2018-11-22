@@ -22,15 +22,15 @@
 		<!-- MAIN CONTENT -->
 		<script>
 					$(document).ready(function(){
-
-
+						var load_wait=0;
+						if((++load_wait)==1) $("#load-spinner").fadeIn();
 						$.getJSON('{{ url('emailGet', {'id': id}) }}', function( data ){
 							$.getJSON(data.urlRead, function( data ){});
 							$("#mail-content").html(data.content);
 							$("#mail-subject").html(data.subject);
 							$("#mail-from").html('<img src="{{ url('index') }}'+data.imgFrom+'" class="img-circle" width="30" /><span></span>');
 							$("#mail-from > span").text(data.from);
-
+							$("#mail-date").text(moment(data.timestamp*1000).format('llll'));
 							$("#mail-attachments-count").text(data.attachments.length);
 								$.each( data.attachments, function(key,val){
 									url=$("#mail-attachments").attr('attr-url');
@@ -38,12 +38,13 @@
 									$("#mail-attachments").append('<li><a href="'+url+'" class="thumb"><img width="75px" src="'+val.icon+'" class="img-rounded" /></a>'+
 										'<a href="'+url+'" class="name">'+val.filename+'</a></li>');
 								});
+						}).always(function() {
+							if((--load_wait)==0) $("#load-spinner").fadeOut();
 						});
-
+						if((++load_wait)==1) $("#load-spinner").fadeIn();
 						$.getJSON('{{ url('foldersList') }}', function( data ) {
 							var account ="";
 							$.each( data, function( keyAccount, valAccount ) {
-
 									$("#list-folders").append('<li class="mail-account" id="email-account-'+keyAccount+'" data-toggle="collapse" aria-expanded="true" data-target="#email-account-folders-'+keyAccount+'"><div class="mail-account-title">'+valAccount.name+'</div></li><li class="collapse in" id="email-account-folders-'+keyAccount+'"></li>');
 									 $.each( valAccount.folders, function( key, val ) {
 										  $('#email-account-folders-'+keyAccount).append('<li attr-name="'+val.name+'" attr-id="'+val.id+'" attr-url="{{ url('emailsFolderList', {'folder': '_____'}) }}" '+((val.default==true)? 'class="active"' : '')+'><a href="{{url('email')}}?folder='+val.id+'"><span class="badge badge-gray pull-right">'+val.unseen+'</span>'+val.name+'</a></li>');
@@ -51,7 +52,7 @@
 							 });
 								$('.mail-account').collapse('hide');
 						}).always(function() {
-
+							if((--load_wait)==0) $("#load-spinner").fadeOut();
 						});
 
 						/*$('body').on('click', "[id^='folder-email-list-']", function() {
@@ -97,11 +98,14 @@
 									<i class="entypo-trash"></i>
 								</a>
 
-								<a class="btn btn-primary btn-icon">
-									Reply
+								<a href="{{ url('emailReply', {'id': id}) }}" class="btn btn-primary btn-icon">
+									Responder
 									<i class="entypo-reply"></i>
 								</a>
-
+								<a href="{{ url('emailForward', {'id': id}) }}" class="btn btn-success btn-icon">
+									Reenviar
+									<i class="entypo-forward"></i>
+								</a>
 							</div>
 						</div>
 
@@ -147,39 +151,25 @@
 										</a>
 									</li>
 								</ul>
-
 							</div>
-
-							<div class="mail-date">
-								07:51 AM - 15 December
-							</div>
-
+							<div id="mail-date" class="mail-date"></div>
 						</div>
-
 						<div id="mail-content" class="mail-text">
-
-
 						</div>
-
 						<div class="mail-attachments">
 							<h4>
 								<i class="entypo-attach"></i> Ficheros adjuntos <span id="mail-attachments-count"></span>
 							</h4>
 							<ul id="mail-attachments" attr-url="{{url('emailGetAttachment',{'id': '_____'})}}">
 							</ul>
-
 						</div>
-
 						<div class="mail-reply">
-
 							<div class="fake-form">
 								<div>
-									<a href="{{ url('emailReply', {'id': id}) }}">Responder</a> or <a href="mailbox-compose.html">Reenviar</a> este mensaje...
+									<a href="{{ url('emailReply', {'id': id}) }}">Responder</a> or <a href="{{ url('emailForward', {'id': id}) }}">Reenviar</a> este mensaje...
 								</div>
 							</div>
-
 						</div>
-
 					</div>
 
 					<!-- Sidebar -->
@@ -232,6 +222,8 @@
 	<!-- Imported scripts on this page -->
  	<script src="{{ url('index') }}js/datatables/datatables.js"></script>
 	<script src="{{ url('index') }}js/select2/select2.min.js"></script>
+	<script src="{{ url('index') }}js/moment.min.js"></script>
+	<script src="{{ url('index') }}js/moment-es.js"></script>
 	 {{ include('bottom.html.twig') }}
 {% endblock %}
 </body>

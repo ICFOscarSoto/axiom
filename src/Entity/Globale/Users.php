@@ -97,6 +97,11 @@ class Users implements UserInterface
      */
     private $emailAccounts;
 
+    /**
+     * @ORM\OneToOne(targetEntity="App\Entity\Email\EmailAccounts", cascade={"persist", "remove"})
+     */
+    private $emailDefaultAccount;
+
 
 
     public function __construct()
@@ -225,13 +230,13 @@ class Users implements UserInterface
 
 
 	public function getTemplateData(){
-      $data["id"]=$this->getId();
-  		$data["email"]=$this->getEmail();
-  		$data["name"]=$this->getName();
-  		$data["firstname"]=$this->getFirstname();
-  		$data["roles"]=$this->getRoles();
-  		return $data;
-  	}
+               $data["id"]=$this->getId();
+           		$data["email"]=$this->getEmail();
+           		$data["name"]=$this->getName();
+           		$data["firstname"]=$this->getFirstname();
+           		$data["roles"]=$this->getRoles();
+           		return $data;
+           	}
 
     /**
      * @return Collection|UserGroups[]
@@ -365,6 +370,18 @@ class Users implements UserInterface
                 $emailAccount->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getEmailDefaultAccount(): ?EmailAccounts
+    {
+        return $this->emailDefaultAccount;
+    }
+
+    public function setEmailDefaultAccount(?EmailAccounts $emailDefaultAccount): self
+    {
+        $this->emailDefaultAccount = $emailDefaultAccount;
 
         return $this;
     }

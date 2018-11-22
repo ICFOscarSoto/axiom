@@ -92,6 +92,11 @@ class EmailSubjects
      */
     private $folder;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $attachments;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -273,6 +278,18 @@ class EmailSubjects
     public function setFolder(?EmailFolders $folder): self
     {
         $this->folder = $folder;
+
+        return $this;
+    }
+
+    public function getAttachments(): ?int
+    {
+        return $this->attachments;
+    }
+
+    public function setAttachments(?int $attachments): self
+    {
+        $this->attachments = $attachments;
 
         return $this;
     }

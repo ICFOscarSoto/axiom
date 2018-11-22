@@ -63,6 +63,8 @@ class ImapSync extends ContainerAwareCommand
           $nums=imap_num_msg($inbox);
 					for ($i=1;$i<=$nums;$i++){
 						$subject = imap_fetch_overview($inbox, $i, 0);
+            $emailUtils = new EmailUtils();
+
             dump($subject);
 
             //Buscamos el mensaje por Uid o por message_id
@@ -90,6 +92,7 @@ class ImapSync extends ContainerAwareCommand
 							$emailSubject->setDraft($subject[0]->draft == 0 ? false : true);
 							$emailSubject->setDate( new \DateTime(date('Y-m-d H:i:s',$subject[0]->udate)));
 							$emailSubject->setFolder($folder);
+              $emailSubject->setAttachments($emailUtils->countAttachments($inbox, $subject[0]->msgno));
 							$entityManager->persist($emailSubject);
 		        	$entityManager->flush();
 						}

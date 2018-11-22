@@ -46,8 +46,10 @@
                 });
             }
         });
-
+				var load_wait=0;
+				if((++load_wait)==1) $("#load-spinner").fadeIn();
 					$.getJSON('{{ url('foldersList') }}', function( data ) {
+
 						var account ="";
 						$.each( data, function( keyAccount, valAccount ) {
 
@@ -59,7 +61,7 @@
 						 });
 							$('.mail-account').collapse('hide');
 					}).always(function() {
-
+						if((--load_wait)==0) $("#load-spinner").fadeOut();
 					});
 
 				$('#btn-discard-mail').click(function(){
@@ -76,7 +78,7 @@
 
 				$( "#form-send-mail" ).on( "submit", function( event ) {
 				  event.preventDefault();
-					$("#load-spinner").fadeIn();
+					if((++load_wait)==1) $("#load-spinner").fadeIn();
 				  data= $( this ).serialize()+"&files="+encodeURIComponent(JSON.stringify(jsonFiles)) ;
 					$.getJSON('{{ url('emailSend') }}',data, function( data ){
 						dropzone_default.removeAllFiles( true );
@@ -84,21 +86,22 @@
 						if(data.result)	toastr.success("El correo se ha enviado correctamente", "Confirmación", confirmation);
 							else toastr.error("No se pudo enviar el correo", "Confirmación", confirmation);
 					}).always(function() {
-							$("#load-spinner").fadeOut();
+							if((--load_wait)==0) $("#load-spinner").fadeOut();
 					});
 				});
 				var wysihtml5Editor = $('#content').wysihtml5().data("wysihtml5").editor;
 
 				{% if id>0 %}
+					if((++load_wait)==1) $("#load-spinner").fadeIn();
 					$.getJSON('{{ url('emailGet', {'id': id}) }}', function( data ){
 						  $('#subject').val('RE: '+data.subject);
  							$("#mail-accounts").data("selectBox-selectBoxIt").selectOption(data.account+"");
 							$("#to").val(data.from);
 							$("#in_reply_to").val(data.message_id);
 							//$("#mail-accounts").data("selectBox-selectBoxIt").disable();
-							wysihtml5Editor.setValue('</br></br>El '+moment(data.timestamp).format('LLLL')+', '+data.from+' escribio: </br></br>'+data.content, false);
+							wysihtml5Editor.setValue('</br></br>El '+moment(data.timestamp*1000).format('LLLL')+', '+data.from+' escribio: </br></br>'+data.content, false);
 					}).always(function() {
-							$("#load-spinner").fadeOut();
+							if((--load_wait)==0) $("#load-spinner").fadeOut();
 					});
 				{% endif %}
       });

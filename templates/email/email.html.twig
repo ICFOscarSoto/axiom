@@ -22,8 +22,10 @@
 		<!-- MAIN CONTENT -->
 		<script>
 					$(document).ready(function(){
+						var load_wait=0;
+
 						function getEmails(url, params){
-							$("#load-spinner").fadeIn();
+							if((++load_wait)==1) $("#load-spinner").fadeIn();
 							$("#list-messages").html('');
 							$.getJSON(url+params, function( data ) {
 								if ('messages' in data){
@@ -35,20 +37,21 @@
 									$.each( data.messages, function( keyAccount, valAccount ) {
 										console.log(valAccount);
 										var message='';
-										message+='<tr class="'+((valAccount.seen)?'':'unread')+'"><td><div class="checkbox checkbox-replace"><input type="checkbox" /></div></td>';
-										message+='<td class="col-name"><a attr-url-flagged="'+valAccount.urlFlagged+'" attr-url-unflagged="'+valAccount.urlUnFlagged+'" id="flagged-star-'+valAccount.id+'" href="javascript:void(0);" class="star'+((valAccount.flagged)?' stared':'')+'"><i class="entypo-star"></i></a>';
-										message+='<a href="'+valAccount.url+'" class="col-name">'+valAccount.from+'</a></td>';
-										message+='<td class="col-subject"><a href="'+valAccount.url+'">'+valAccount.subject+'</a></td>';
-										message+='<td class="col-options"></td><td class="col-time">'+moment(valAccount.date.date).from()+'</td></tr>';
+										message+='<tr class="'+((valAccount.seen)?'':'unread')+'"><td style="width:5%;><div class="checkbox checkbox-replace"><input type="checkbox" /></div></td>';
+										message+='<td class="col-name" style="width:1%;"><a attr-url-flagged="'+valAccount.urlFlagged+'" attr-url-unflagged="'+valAccount.urlUnFlagged+'" id="flagged-star-'+valAccount.id+'" href="javascript:void(0);" class="star'+((valAccount.flagged)?' stared':'')+'"><i class="entypo-star"></i></a>';
+										message+='<td class="col-name" style="width:1%;"><a href="javascript:void(0);">'+((valAccount.attachments>0)?'<i class="entypo-attach"></i>':'')+'</a>';
+										message+='<td style="width:20%;"><a href="'+valAccount.url+'" class="col-name">'+valAccount.from+'</a></td>';
+										message+='<td class="col-subject" style="width:40%;"><a href="'+valAccount.url+'">'+valAccount.subject+'</a></td>';
+										message+='<td class="col-options" style="width:23%;"></td><td class="col-time">'+moment(valAccount.date.date).from()+'</td></tr>';
 										console.log(valAccount.date);
 										$("#list-messages").append(message);
 									});
 								}
 							}).always(function() {
-								$("#load-spinner").fadeOut();
+								if((--load_wait)==0) $("#load-spinner").fadeOut();
 							});
 						}
-
+						if((++load_wait)==1) $("#load-spinner").fadeIn();
 						$.getJSON('{{ url('foldersList') }}', function( data ) {
 							var account ="";
 							$.each( data, function( keyAccount, valAccount ) {
@@ -60,7 +63,7 @@
 							 });
 								$('.mail-account').collapse('hide');
 						}).always(function() {
-
+							if((--load_wait)==0) $("#load-spinner").fadeOut();
 						});
 
 
@@ -132,7 +135,7 @@
 											<input type="checkbox" />
 										</div>
 									</th>
-									<th colspan="4">
+									<th colspan="6">
 
 										<div class="mail-select-options">Marcar como leido</div>
 
@@ -163,7 +166,7 @@
 											<input type="checkbox" />
 										</div>
 									</th>
-									<th colspan="4">
+									<th colspan="6">
 
 										<div id="mail-pagination-bottom" class="mail-pagination" colspan="2">
 											<strong>1-30</strong> <span>of 789</span>

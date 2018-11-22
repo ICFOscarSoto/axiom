@@ -121,6 +121,29 @@ class EmailController extends Controller
 		}else return new RedirectResponse($this->router->generate('app_login'));
 	}
 
+	/**
+	 * @Route("/api/emails/{id}/forward", name="emailForward")
+	 */
+	public function emailForward($id, RouterInterface $router,Request $request){
+		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+			$locale = $request->getLocale();
+			$this->router = $router;
+			$userdata=$this->getUser()->getTemplateData();
+			$menurepository=$this->getDoctrine()->getRepository(MenuOptions::class);
+			return $this->render('email\email_compose.html.twig', [
+				'controllerName' => 'EmailController',
+				'interfaceName' => 'Correo electrónico',
+				'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
+				'optionSelected' => 'emailNew',
+				'breadcrumb' =>  $menurepository->formatBreadcrumb('emailNew'),
+				'userData' => $userdata,
+				'id' => $id,
+				]);
+
+		}else return new RedirectResponse($this->router->generate('app_login'));
+	}
+
 
 
 
@@ -151,8 +174,12 @@ class EmailController extends Controller
 			//Generamos el mail para el envio SMTP
 			$headers = array(
 			              'From'    => $emailAccount->getUsername(),
-			              'Subject' => $request->query->get('subject')
+			              'Subject' => $request->query->get('subject'),
+										'To' => implode(',',$emailUtils->extractEmailsFromString($toString)),
 			              );
+			if($ccString!=null)	$headers['Cc'] = implode(',',$emailUtils->extractEmailsFromString($ccString));
+			if($bccString!=null)	$headers['Bcc'] = implode(',',$emailUtils->extractEmailsFromString($bccString));
+
 			$mime = new Mail_mime(array('eol' => "\n"));
 			$mime->setTXTBody($text);
 			$mime->setHTMLBody($html);
@@ -171,9 +198,8 @@ class EmailController extends Controller
 			     'username' => $emailAccount->getSmtpUsername(),
 					 'port'=>$emailAccount->getSmtpPort(),
 			     'password' => $emailAccount->getSmtpPassword()));
-		  if($ccString!=null)	$headers['Cc'] = $ccString;
-			if($bccString!=null)	$headers['Bcc'] = $bccString;
-			$result = $smtp->send($request->query->get('to'), $headers, $body);
+
+			$result = $smtp->send(implode(',',$emailUtils->extractEmailsFromString($toString)), $headers, $body);
 			if($result){
 				//Si se ha enviado correctamente el mail SMTP procedemos a crear el mail IMAP para almacenarlo en la carpeta
 				//de enviados
@@ -209,7 +235,6 @@ class EmailController extends Controller
         }
         $msg .= "\r\n\r\n\r\n";
         $msg .= "--$boundary--\r\n\r\n";
-				dump($msg);
         $result2=imap_append($inbox,$mailBox,$msg,"\\Seen");
 			}
 			if($result && $result2) return new JsonResponse(array("result" => 1));
@@ -279,6 +304,7 @@ class EmailController extends Controller
 							$subject["seen"]					=$emailSubject->getSeen();
 							$subject["draft"]					=$emailSubject->getDraft();
 							$subject["date"]					=$emailSubject->getDate();
+							$subject["attachments"]		=$emailSubject->getAttachments();
 							$subject["url"]						=$this->generateUrl('emailView', array('id' => $emailSubject->getId()));
 							$subject["urlRead"]				=$this->generateUrl('emailSetFlag', array('id' => $emailSubject->getId(), 'flag' => 'Seen', 'value' => 1));
 							$subject["urlFlagged"]		=$this->generateUrl('emailSetFlag', array('id' => $emailSubject->getId(), 'flag' => 'Flagged', 'value' => 1));
