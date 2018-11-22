@@ -22,9 +22,6 @@ final class Version20181119072959 extends AbstractMigration
         $this->addSql('CREATE INDEX IDX_C1AE81E56C6BD431 ON email_accounts (inbox_folder_id)');
         $this->addSql('CREATE INDEX IDX_C1AE81E563CB685A ON email_accounts (sent_folder_id)');
         $this->addSql('CREATE INDEX IDX_C1AE81E5826E9C4B ON email_accounts (trash_folder_id)');
-        $this->addSql('ALTER TABLE global_menuoptions CHANGE rute rute VARCHAR(150) DEFAULT \'NULL\', CHANGE icon icon VARCHAR(150) DEFAULT \'NULL\', CHANGE parent parent INT DEFAULT NULL');
-        $this->addSql('ALTER TABLE user_groups CHANGE roles roles JSON DEFAULT NULL');
-        $this->addSql('ALTER TABLE users CHANGE roles roles JSON NOT NULL');
     }
 
     public function down(Schema $schema) : void
