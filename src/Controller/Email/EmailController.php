@@ -92,7 +92,8 @@ class EmailController extends Controller
 				'optionSelected' => 'emailNew',
 				'breadcrumb' =>  $menurepository->formatBreadcrumb('emailNew'),
 				'userData' => $userdata,
-				'id' => 0
+				'id' => 0,
+				'mode' => 0
 				]);
 
 		}else return new RedirectResponse($this->router->generate('app_login'));
@@ -116,6 +117,7 @@ class EmailController extends Controller
 				'breadcrumb' =>  $menurepository->formatBreadcrumb('emailNew'),
 				'userData' => $userdata,
 				'id' => $id,
+				'mode' => 1
 				]);
 
 		}else return new RedirectResponse($this->router->generate('app_login'));
@@ -139,6 +141,7 @@ class EmailController extends Controller
 				'breadcrumb' =>  $menurepository->formatBreadcrumb('emailNew'),
 				'userData' => $userdata,
 				'id' => $id,
+				'mode' => 2
 				]);
 
 		}else return new RedirectResponse($this->router->generate('app_login'));
@@ -176,13 +179,15 @@ class EmailController extends Controller
 			              'From'    => $emailAccount->getUsername(),
 			              'Subject' => $request->query->get('subject'),
 										'To' => implode(',',$emailUtils->extractEmailsFromString($toString)),
+										"Content-Type" => "text/html",
+										'charset' => "UTF-8",
 			              );
 			if($ccString!=null)	$headers['Cc'] = implode(',',$emailUtils->extractEmailsFromString($ccString));
 			if($bccString!=null)	$headers['Bcc'] = implode(',',$emailUtils->extractEmailsFromString($bccString));
 
 			$mime = new Mail_mime(array('eol' => "\n"));
-			$mime->setTXTBody($text);
-			$mime->setHTMLBody($html);
+			$mime->setTXTBody(utf8_decode($text));
+			$mime->setHTMLBody(utf8_decode($html));
 			$tempPath=$this->get('kernel')->getRootDir() . '/../public/temp/'.$this->getUser()->getId().'/';
 		  foreach ($attachments as $attach) {
 				$mimeTypeGuesser = new FileinfoMimeTypeGuesser();
@@ -203,16 +208,16 @@ class EmailController extends Controller
 			if($result){
 				//Si se ha enviado correctamente el mail SMTP procedemos a crear el mail IMAP para almacenarlo en la carpeta
 				//de enviados
-				$connectionString='{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'}'.$emailAccount->getInboxFolder()->getName();
+				$connectionString='{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'}'.$emailAccount->getSentFolder()->getName();
 				$inbox = imap_open($connectionString,$emailAccount->getUsername() ,$emailAccount->getPassword());
-				$mailBox = "{".$emailAccount->getServer().":".$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol()."}".$emailAccount->getInboxFolder()->getName();
+				$mailBox = "{".$emailAccount->getServer().":".$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol()."}".$emailAccount->getSentFolder()->getName();
         $dmy = date("d-M-Y H:i:s");
         $boundary = "------=".md5(uniqid(rand()));
         $msgid = '{axiom_'.time().'_'.$emailAccount->getId().'}';
         $msg = "From: ".$emailAccount->getSmtpUsername()."\r\n";
         $msg .= "To: ".implode(',',$emailUtils->extractEmailsFromString($request->query->get('to')))."\r\n";
         $msg .= "Date: $dmy\r\n";
-        $msg .= "message_id: adasdasdasdq3we32adsd3wrerf\r\n";
+        $msg .= "message_id: <".uniqid ()."@aplicode.com>\r\n";
         $msg .= ($request->query->get('message_id'))?"References: ".$request->query->get('message_id')."\r\nIn-Reply-To: ".$request->query->get('message_id')."\r\n":"";
         $msg .= "Subject: ".$request->query->get('subject')."\r\n";
         $msg .= "MIME-Version: 1.0\r\n";
@@ -495,6 +500,7 @@ class EmailController extends Controller
 						$message["id"]					=$subject->getId();
 						$message["subject"]			=$subject->getSubject();
 						$message["from"]				=$subject->getFromEmail();
+						$message["to"]				=$subject->getToEmail();
 						$message["message_id"]		=$subject->getMessageId();
 						$message["imgFrom"]			=substr($this->generateUrl('getUserImage', array('id' => 0)),1); //TODO Buscar foto del contacto en la agenda
 						$message["content"]			=($emailUtils->htmlmsg!=null)?$emailUtils->htmlmsg:$emailUtils->plainmsg;

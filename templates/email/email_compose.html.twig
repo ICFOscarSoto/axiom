@@ -94,12 +94,23 @@
 				{% if id>0 %}
 					if((++load_wait)==1) $("#load-spinner").fadeIn();
 					$.getJSON('{{ url('emailGet', {'id': id}) }}', function( data ){
-						  $('#subject').val('RE: '+data.subject);
- 							$("#mail-accounts").data("selectBox-selectBoxIt").selectOption(data.account+"");
-							$("#to").val(data.from);
-							$("#in_reply_to").val(data.message_id);
+
 							//$("#mail-accounts").data("selectBox-selectBoxIt").disable();
-							wysihtml5Editor.setValue('</br></br>El '+moment(data.timestamp*1000).format('LLLL')+', '+data.from+' escribio: </br></br>'+data.content, false);
+							{% if mode==1 %}
+								$('#subject').val('RE: '+data.subject);
+								$("#mail-accounts").data("selectBox-selectBoxIt").selectOption(data.account+"");
+								$("#to").val(data.from);
+								$("#in_reply_to").val(data.message_id);
+								wysihtml5Editor.setValue('</br></br>El '+moment(data.timestamp*1000).format('LLLL')+', '+data.from+' escribio: </br></br>'+data.content, false);
+							{% else %}
+								$('#subject').val('FWD: '+data.subject);
+								$("#mail-accounts").data("selectBox-selectBoxIt").selectOption(data.account+"");
+								wysihtml5Editor.setValue('</br></br>---------- Forwarded message ---------'+
+																				 '</br>From: '+data.from+
+																				 '</br>Date: '+moment(data.timestamp*1000).format('LLLL')+
+																				 '</br>Subject: '+data.subject+
+																				 '</br>To: '+data.to+'</br></br>'+data.content, false);
+							{% endif %}
 					}).always(function() {
 							if((--load_wait)==0) $("#load-spinner").fadeOut();
 					});

@@ -24,7 +24,7 @@ class EmailSubjectsRepository extends ServiceEntityRepository
             ->join('s.folder', 'f')
             ->join('f.emailAccount', 'a')
             ->andWhere('s.uid = :val')
-            ->andWhere('a.id = :valAccount')
+            ->andWhere('f.id = :valAccount')
             ->setParameter('val', $uid)
             ->setParameter('valAccount', $account)
             ->setMaxResults(1)

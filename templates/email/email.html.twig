@@ -35,7 +35,6 @@
 																											 '<a id="mail-pagination-button-next" href="javascript:void(0);" attr-url="'+url+'" attr-limit="'+data.limit+'" attr-start="'+(data.start+data.limit)+'" class="'+(((data.recordsFiltered-data.start)<data.limit)?'disabled ':'')+'btn btn-sm btn-white"><i class="entypo-right-open"></i></a></div>')
 									$("#mail-folder-name").text(data.folderName+' ('+data.unseen+')');
 									$.each( data.messages, function( keyAccount, valAccount ) {
-										console.log(valAccount);
 										var message='';
 										message+='<tr class="'+((valAccount.seen)?'':'unread')+'"><td style="width:5%;><div class="checkbox checkbox-replace"><input type="checkbox" /></div></td>';
 										message+='<td class="col-name" style="width:1%;"><a attr-url-flagged="'+valAccount.urlFlagged+'" attr-url-unflagged="'+valAccount.urlUnFlagged+'" id="flagged-star-'+valAccount.id+'" href="javascript:void(0);" class="star'+((valAccount.flagged)?' stared':'')+'"><i class="entypo-star"></i></a>';
@@ -43,7 +42,6 @@
 										message+='<td style="width:20%;"><a href="'+valAccount.url+'" class="col-name">'+valAccount.from+'</a></td>';
 										message+='<td class="col-subject" style="width:40%;"><a href="'+valAccount.url+'">'+valAccount.subject+'</a></td>';
 										message+='<td class="col-options" style="width:23%;"></td><td class="col-time">'+moment(valAccount.date.date).from()+'</td></tr>';
-										console.log(valAccount.date);
 										$("#list-messages").append(message);
 									});
 								}

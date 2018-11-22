@@ -68,11 +68,11 @@ class ImapSync extends ContainerAwareCommand
             dump($subject);
 
             //Buscamos el mensaje por Uid o por message_id
-            if(isset($subject[0]->message_id))
+            /*if(isset($subject[0]->message_id))
               $emailSubject_message_id=$emailSubjects->findByAccountAndMessageId($emailAccount->getId(), $subject[0]->message_id);
-              else $emailSubject_message_id=null;
-            $emailSubject_uid=$emailSubjects->findByAccountAndUid($emailAccount->getId(), $subject[0]->uid);
-            $emailSubject=$emailSubject_message_id==null?$emailSubject_uid:$emailSubject_message_id;
+              else $emailSubject_message_id=null;*/
+            $emailSubject=$emailSubjects->findByAccountAndUid($folder->getId(), $subject[0]->uid);
+            //$emailSubject=$emailSubject_message_id==null?$emailSubject_uid:$emailSubject_message_id;
             //Si no hemos encontrado el mensaje lo creamos
 						if($emailSubject===null){
 							mb_internal_encoding('UTF-8');
