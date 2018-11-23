@@ -35,6 +35,7 @@ class ImapSync extends ContainerAwareCommand
         $connectionString='{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'}';
         $inbox = imap_open($connectionString,$emailAccount->getUsername() ,$emailAccount->getPassword());
         $folders = imap_list($inbox,$connectionString,'*');
+        dump($folders);
         foreach($folders as $folder){
           $folderName=str_replace($connectionString, '', $folder);
           $emailAccountFolders=$emailFolderRepository->findOneBy([
@@ -57,7 +58,7 @@ class ImapSync extends ContainerAwareCommand
       //Si no esta totalmente configurada la cuenta pasamos a la siguiente
       if($emailAccount->getInboxFolder()===null || $emailAccount->getSentFolder()===null || $emailAccount->getTrashFolder()===null) continue;
 			$folders=$emailAccount->getEmailFolders();
-		  foreach($folders as $folder){
+		  /*foreach($folders as $folder){
           $inbox = imap_open('{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'}'.$folder->getName(),$emailAccount->getUsername(),$emailAccount->getPassword());
           if($inbox===FALSE) continue;
           $nums=imap_num_msg($inbox);
@@ -68,9 +69,9 @@ class ImapSync extends ContainerAwareCommand
             dump($subject);
 
             //Buscamos el mensaje por Uid o por message_id
-            /*if(isset($subject[0]->message_id))
-              $emailSubject_message_id=$emailSubjects->findByAccountAndMessageId($emailAccount->getId(), $subject[0]->message_id);
-              else $emailSubject_message_id=null;*/
+            //if(isset($subject[0]->message_id))
+            //  $emailSubject_message_id=$emailSubjects->findByAccountAndMessageId($emailAccount->getId(), $subject[0]->message_id);
+            //  else $emailSubject_message_id=null;
             $emailSubject=$emailSubjects->findByAccountAndUid($folder->getId(), $subject[0]->uid);
             //$emailSubject=$emailSubject_message_id==null?$emailSubject_uid:$emailSubject_message_id;
             //Si no hemos encontrado el mensaje lo creamos
@@ -98,7 +99,7 @@ class ImapSync extends ContainerAwareCommand
 						}
 					}
           imap_close($inbox);
-			}
+			}*/
 		}
 
   }

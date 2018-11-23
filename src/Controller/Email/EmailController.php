@@ -253,7 +253,63 @@ class EmailController extends Controller
 	public function emailsFoldersList($folder, RouterInterface $router,Request $request){
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+			$emailRepository = $this->getDoctrine()->getRepository(EmailAccounts::class);
 			$emailFolderRepository = $this->getDoctrine()->getRepository(EmailFolders::class);
+			$emailSubjectRepository = $this->getDoctrine()->getRepository(EmailSubjects::class);
+			$limit=$request->query->getInt('length', 15);
+			$start=$request->query->getInt('start', 1);
+			$return=array();
+			$user=$this->getUser();
+			$emailFolder=$emailFolderRepository->find([
+					'id' => $folder
+			]);
+			if(!$emailFolder) return new JsonResponse(array("result"=> -1));
+			$emailAccount=$emailFolder->getEmailAccount();
+			if(!$emailAccount) return new JsonResponse(array("result"=> -1));
+			$inbox = imap_open('{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'}'.$emailFolder->getName(),$emailAccount->getUsername(),$emailAccount->getPassword());
+			if($inbox===FALSE) return new JsonResponse(array("result"=> -1));
+			$status = imap_status ( $inbox , '{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'}'.$emailFolder->getName(), SA_ALL);
+			$return['folderName']=$emailFolder->getName();
+			$return['limit']=$limit;
+			$return['start']=$start;
+			$return['unseen']=$status->unseen;
+			$return['recordsTotal']=$status->messages;
+			$return['recordsFiltered']=$status->messages;
+
+			$pages=ceil($status->messages/$limit);
+			$page=ceil($start/$limit);
+			$page_inverse=abs($page-$pages-1);
+			$min=($status->messages-($page*$limit))+1; ($min<1)?$min=1:$min=$min;
+			$max=(($status->messages-($page*$limit))+$limit); ($max>$status->messages)?$max=$status->messages:$max=$max;
+			$range=$min.":".$max;
+			$emailSubjects=imap_fetch_overview ($inbox, "$range",0);
+						foreach($emailSubjects as $emailSubject){
+							$subject=array();
+							$subject["id"]						=$emailSubject->uid;
+							$subject["subject"]				=isset($emailSubject->subject)?imap_utf8($emailSubject->subject):'';
+						  $subject["from"]					=isset($emailSubject->from)?imap_utf8($emailSubject->from):'';
+							$subject["to"]						=isset($emailSubject->to)?imap_utf8($emailSubject->to):'';
+							$subject["message_id"]		=isset($emailSubject->message_id)?$emailSubject->message_id:'';
+							$subject["size"]					=$emailSubject->size;
+							$subject["uid"]						=$emailSubject->uid;
+							$subject["msgno"]					=$emailSubject->msgno;
+							$subject["recent"]				=$emailSubject->recent;
+							$subject["flagged"]				=$emailSubject->flagged;
+							$subject["answered"]			=$emailSubject->answered;
+							$subject["deleted"]				=$emailSubject->deleted;
+							$subject["seen"]					=$emailSubject->seen;
+							$subject["draft"]					=$emailSubject->draft;
+							$subject["date"]					=new \DateTime(date('Y-m-d H:i:s',$emailSubject->udate));
+							$subject["url"]						=$this->generateUrl('emailView', array('id' => $emailSubject->uid));
+							$subject["urlRead"]				=$this->generateUrl('emailSetFlag', array('id' => $emailSubject->uid, 'flag' => 'Seen', 'value' => 1));
+							$subject["urlFlagged"]		=$this->generateUrl('emailSetFlag', array('id' => $emailSubject->uid, 'flag' => 'Flagged', 'value' => 1));
+							$subject["urlUnRead"]			=$this->generateUrl('emailSetFlag', array('id' => $emailSubject->uid, 'flag' => 'Seen', 'value' => 0));
+							$subject["urlUnFlagged"]	=$this->generateUrl('emailSetFlag', array('id' => $emailSubject->uid, 'flag' => 'Flagged', 'value' => 0));
+							$return["messages"][] 		=$subject;
+						}
+						$return["messages"]=isset($return["messages"])?array_reverse($return["messages"]):array();
+			return new JsonResponse($return);
+			/*$emailFolderRepository = $this->getDoctrine()->getRepository(EmailFolders::class);
 			$emailSubjectRepository = $this->getDoctrine()->getRepository(EmailSubjects::class);
 			$limit=$request->query->getInt('length', 15);
 			$start=$request->query->getInt('start', 0);
@@ -321,7 +377,7 @@ class EmailController extends Controller
 					//$return[$emailAccount->getId()][$emailFolder->getName()]=$emailFolder->getEmailSubjects();
 				}
 
-			return new JsonResponse($return);
+			return new JsonResponse($return);*/
 		}
 		return new Response();
 	}
