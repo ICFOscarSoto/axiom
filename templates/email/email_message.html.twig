@@ -24,7 +24,7 @@
 					$(document).ready(function(){
 						var load_wait=0;
 						if((++load_wait)==1) $("#load-spinner").fadeIn();
-						$.getJSON('{{ url('emailGet', {'id': id}) }}', function( data ){
+						$.getJSON('{{ url('emailGet', {'id': id, 'folder': folder}) }}', function( data ){
 							$.getJSON(data.urlRead, function( data ){});
 							$("#mail-content").html(data.content);
 							$("#mail-subject").html(data.subject);
@@ -55,20 +55,20 @@
 							if((--load_wait)==0) $("#load-spinner").fadeOut();
 						});
 
-						/*$('body').on('click', "[id^='folder-email-list-']", function() {
-							url=$(this).attr('attr-url');
-							url=url.replace('_____',$(this).attr('attr-name'));
-							$("[id^='folder-email-list-']").removeClass('active');
-							$(this).addClass('active');
-							//getEmails(url,'');
-						});*/
 						$('body').on('click', "[id^='folder-email-list-']", function() {
 		          url=$(this).attr('attr-url');
 		          url=url.replace('_____',$(this).attr('attr-name'));
 		          $("[id^='folder-email-list-']").removeClass('active');
 		          $(this).addClass('active');
 		        });
+
+						//print
+						$('body').on('click', "#mail-print", function() {
+							window.print();
+						});
 					});
+
+
 		</script>
 		<div class="mail-env">
 					<!-- compose new email button -->
@@ -90,7 +90,7 @@
 							<!-- links -->
 							<div class="mail-links">
 
-								<a href="#" class="btn btn-default">
+								<a href="#" id="mail-print" class="btn btn-default">
 									<i class="entypo-print"></i>
 								</a>
 
@@ -98,11 +98,11 @@
 									<i class="entypo-trash"></i>
 								</a>
 
-								<a href="{{ url('emailReply', {'id': id}) }}" class="btn btn-primary btn-icon">
+								<a href="{{ url('emailReply', {'folder': folder, 'id': id}) }}" class="btn btn-primary btn-icon">
 									Responder
 									<i class="entypo-reply"></i>
 								</a>
-								<a href="{{ url('emailForward', {'id': id}) }}" class="btn btn-success btn-icon">
+								<a href="{{ url('emailForward', {'folder': folder, 'id': id}) }}" class="btn btn-success btn-icon">
 									Reenviar
 									<i class="entypo-forward"></i>
 								</a>
@@ -113,7 +113,7 @@
 
 							<div class="mail-sender dropdown">
 
-								<a id="mail-from" href="#" class="dropdown-toggle" data-toggle="dropdown">
+								<a id="mail-from" href="#" class="print-area dropdown-toggle" data-toggle="dropdown">
 
 								</a>
 
@@ -152,9 +152,9 @@
 									</li>
 								</ul>
 							</div>
-							<div id="mail-date" class="mail-date"></div>
+							<div id="mail-date" class="mail-date print-area"></div>
 						</div>
-						<div id="mail-content" class="mail-text">
+						<div id="mail-content" class="mail-text print-area">
 						</div>
 						<div class="mail-attachments">
 							<h4>
@@ -166,7 +166,7 @@
 						<div class="mail-reply">
 							<div class="fake-form">
 								<div>
-									<a href="{{ url('emailReply', {'id': id}) }}">Responder</a> or <a href="{{ url('emailForward', {'id': id}) }}">Reenviar</a> este mensaje...
+									<a href="{{ url('emailReply', {'folder': folder, 'id': id}) }}">Responder</a> or <a href="{{ url('emailForward', {'folder': folder,'id': id}) }}">Reenviar</a> este mensaje...
 								</div>
 							</div>
 						</div>
@@ -213,6 +213,21 @@
 	{{ include('chat_histories.html.twig') }}
 </div>
 	<!-- MODALS  -->
+	<div class="modal fade" id="email-modal-confirm" data-backdrop="static" style="display: none;">
+		<div class="modal-dialog">
+			<div class="modal-content" style="transform: matrix(1, 0, 0, 1, 0, 0);">
+				<div class="modal-header">
+					<h4 class="modal-title">Confirmación</h4>
+				</div>
+				<div id="email-modal-body" class="modal-body">
+				</div>
+				<div id="email-modal-footer" class="modal-footer">
+					<button type="button" class="btn btn-primary" data-dismiss="modal">Cancelar</button>
+					<button attr-action="" id="email-modal-button-continue" type="button" class="btn btn-red">Continuar</button>
+				</div>
+			</div>
+		</div>
+	</div>
 	<!-- END MODALS -->
 {% block footer %}
 

@@ -62,6 +62,7 @@ class UsersController extends Controller
 				'controllerName' => 'usersController',
 				'interfaceName' => 'Usuarios',
 				'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
+				'optionSelected' => 'users',
 				'breadcrumb' =>  $menurepository->formatBreadcrumb($request->get('_route')),
 				'userData' => $userdata,
 				'lists' => $templateLists

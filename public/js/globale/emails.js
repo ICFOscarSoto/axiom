@@ -10,10 +10,8 @@ var flagEmails=true;
 		  $("#email-header-list").text('');
 		  $.each( data, function( key, val ) {
 					var notificationTimeAgo=getTimeAgo(timestamp-val.timestamp);
-								url=$("#mails-url").val();
-								url=url.replace('_____',val.id);
 		            email='  <li class="active">'+
-		        					'			<a href="'+url+'">'+
+		        					'			<a href="'+val.url+'">'+
 		        					'				<span class="line">'+
 		        					'				<strong>'+val.from+'</strong>- '+notificationTimeAgo+'</span>'+
 		                  '				<span class="line desc small">'+val.subject+'</span>'+
@@ -21,9 +19,9 @@ var flagEmails=true;
 
 
 					$("#email-header-list").prepend(email);
-					if((val.id>$("#email-last").val()) && ($("#email-last").val()!='')) newEmails++;
+					if((val.timestamp>$("#email-last").val()) && ($("#email-last").val()!='')) newEmails++;
 					emailsCount++;
-					majorId=val.id;
+					majorId=val.timestamp;
 		  });
 		  $("#email-last").val(majorId);
 		  $("[id^='header-mail-count']").text(emailsCount);

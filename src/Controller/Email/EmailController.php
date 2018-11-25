@@ -25,7 +25,7 @@ use Mail_mime;
 class EmailController extends Controller
 {
 	private $class=EmailsSubjects::class;
-
+	static function cmpTimestamp($a, $b){ return strcmp($a["timestamp"], $b["timestamp"]);}
 	/**
 	 * @Route("/{_locale}/admin/email", name="email")
 	 */
@@ -37,8 +37,6 @@ class EmailController extends Controller
 			$userdata=$this->getUser()->getTemplateData();
 			$menurepository=$this->getDoctrine()->getRepository(MenuOptions::class);
 			$emailAccounts=$this->getUser()->getEmailAccounts();
-			//$this->emailsFoldersGet($router, $request);
-			//$this->emailsSubjectsGet($router, $request);
 			return $this->render('email\email.html.twig', [
 				'controllerName' => 'EmailController',
 				'interfaceName' => 'Correo electrónico',
@@ -53,9 +51,9 @@ class EmailController extends Controller
 	}
 
 	/**
-	 * @Route("/{_locale}/admin/email/{id}/view", name="emailView")
+	 * @Route("/{_locale}/admin/email/{folder}/{id}/view", name="emailView")
 	 */
-	public function emailView($id,RouterInterface $router,Request $request){
+	public function emailView($folder, $id, RouterInterface $router, Request $request){
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 			$locale = $request->getLocale();
@@ -69,7 +67,8 @@ class EmailController extends Controller
 				'optionSelected' => 'email',
 				'breadcrumb' =>  $menurepository->formatBreadcrumb('emailView'),
 				'userData' => $userdata,
-				'id' => $id
+				'id' => $id,
+				'folder' => $folder
 				]);
 
 		}else return new RedirectResponse($this->router->generate('app_login'));
@@ -85,6 +84,8 @@ class EmailController extends Controller
 			$this->router = $router;
 			$userdata=$this->getUser()->getTemplateData();
 			$menurepository=$this->getDoctrine()->getRepository(MenuOptions::class);
+			$emailAccount=$this->getUser()->getEmailDefaultAccount();
+			$folder=$emailAccount->getInboxFolder();
 			return $this->render('email\email_compose.html.twig', [
 				'controllerName' => 'EmailController',
 				'interfaceName' => 'Correo electrónico',
@@ -93,16 +94,17 @@ class EmailController extends Controller
 				'breadcrumb' =>  $menurepository->formatBreadcrumb('emailNew'),
 				'userData' => $userdata,
 				'id' => 0,
-				'mode' => 0
+				'mode' => 0,
+				'folder' => $folder->getId()
 				]);
 
 		}else return new RedirectResponse($this->router->generate('app_login'));
 	}
 
 	/**
-	 * @Route("/api/emails/{id}/reply", name="emailReply")
+	 * @Route("/api/emails/{folder}/{id}/reply", name="emailReply")
 	 */
-	public function emailReply($id, RouterInterface $router,Request $request){
+	public function emailReply($folder, $id, RouterInterface $router,Request $request){
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 			$locale = $request->getLocale();
@@ -117,6 +119,7 @@ class EmailController extends Controller
 				'breadcrumb' =>  $menurepository->formatBreadcrumb('emailNew'),
 				'userData' => $userdata,
 				'id' => $id,
+				'folder' => $folder,
 				'mode' => 1
 				]);
 
@@ -124,9 +127,9 @@ class EmailController extends Controller
 	}
 
 	/**
-	 * @Route("/api/emails/{id}/forward", name="emailForward")
+	 * @Route("/api/emails/{folder}/{id}/forward", name="emailForward")
 	 */
-	public function emailForward($id, RouterInterface $router,Request $request){
+	public function emailForward($folder, $id, RouterInterface $router,Request $request){
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 			$locale = $request->getLocale();
@@ -141,14 +144,12 @@ class EmailController extends Controller
 				'breadcrumb' =>  $menurepository->formatBreadcrumb('emailNew'),
 				'userData' => $userdata,
 				'id' => $id,
+				'folder' => $folder,
 				'mode' => 2
 				]);
 
 		}else return new RedirectResponse($this->router->generate('app_login'));
 	}
-
-
-
 
 	/**
 	 * @Route("/api/emails/send", name="emailSend")
@@ -300,7 +301,7 @@ class EmailController extends Controller
 							$subject["seen"]					=$emailSubject->seen;
 							$subject["draft"]					=$emailSubject->draft;
 							$subject["date"]					=new \DateTime(date('Y-m-d H:i:s',$emailSubject->udate));
-							$subject["url"]						=$this->generateUrl('emailView', array('id' => $emailSubject->uid));
+							$subject["url"]						=$this->generateUrl('emailView', array('folder'=>$emailFolder->getId(), 'id' => $emailSubject->msgno));
 							$subject["urlRead"]				=$this->generateUrl('emailSetFlag', array('id' => $emailSubject->uid, 'flag' => 'Seen', 'value' => 1));
 							$subject["urlFlagged"]		=$this->generateUrl('emailSetFlag', array('id' => $emailSubject->uid, 'flag' => 'Flagged', 'value' => 1));
 							$subject["urlUnRead"]			=$this->generateUrl('emailSetFlag', array('id' => $emailSubject->uid, 'flag' => 'Seen', 'value' => 0));
@@ -309,75 +310,6 @@ class EmailController extends Controller
 						}
 						$return["messages"]=isset($return["messages"])?array_reverse($return["messages"]):array();
 			return new JsonResponse($return);
-			/*$emailFolderRepository = $this->getDoctrine()->getRepository(EmailFolders::class);
-			$emailSubjectRepository = $this->getDoctrine()->getRepository(EmailSubjects::class);
-			$limit=$request->query->getInt('length', 15);
-			$start=$request->query->getInt('start', 0);
-			$return=array();
-			$user=$this->getUser();
-			foreach($user->getEmailAccounts() as $emailAccount){
-					$emailFolders=$emailFolderRepository->findBy([
-							'id' => $folder,
-							'emailAccount' => $emailAccount->getId()
-					]);
-					foreach($emailFolders as $emailFolder){
-					//	dump($emailFolder);
-						$emailSubjects=$emailFolder->getEmailSubjects();
-						$emailSubjects=$emailSubjectRepository->findBy(
-							array('folder' => $emailFolder->getId()),
-							array('date' => 'DESC', 'uid' => 'DESC'),
-							$limit, $start
-						);
-						$queryTotal = $emailSubjectRepository->createQueryBuilder('t')
-							->select('count(t.id)')
-							->andWhere('t.folder = :val_folder')
-							->setParameter('val_folder', $emailFolder->getId());
-						$queryUnseen = $emailSubjectRepository->createQueryBuilder('t')
-								->select('count(t.id)')
-								->andWhere('t.folder = :val_folder')
-								->andWhere('t.seen = :val_seen')
-								->setParameter('val_folder', $emailFolder->getId())
-								->setParameter('val_seen', false);
-
-						$return['folderName']=$emailFolder->getName();
-						$return['limit']=$limit;
-						$return['start']=$start;
-						$return['unseen']=$queryUnseen->getQuery()->getSingleScalarResult();
-						$return['recordsTotal']=$queryTotal->getQuery()->getSingleScalarResult();
-						$return['recordsFiltered']=$queryTotal->getQuery()->getSingleScalarResult();
-
-
-						foreach($emailSubjects as $emailSubject){
-						//	dump($emailSubject);
-							$subject=array();
-							$subject["id"]						=$emailSubject->getId();
-							$subject["subject"]				=$emailSubject->getSubject();
-						  $subject["from"]					=$emailSubject->getFromEmail();
-							$subject["to"]						=$emailSubject->getToEmail();
-							$subject["message_id"]		=$emailSubject->getMessageId();
-							$subject["size"]					=$emailSubject->getSize();
-							$subject["uid"]						=$emailSubject->getUid();
-							$subject["msgno"]					=$emailSubject->getMsgno();
-							$subject["recent"]				=$emailSubject->getRecent();
-							$subject["flagged"]				=$emailSubject->getFlagged();
-							$subject["answered"]			=$emailSubject->getAnswered();
-							$subject["deleted"]				=$emailSubject->getDeleted();
-							$subject["seen"]					=$emailSubject->getSeen();
-							$subject["draft"]					=$emailSubject->getDraft();
-							$subject["date"]					=$emailSubject->getDate();
-							$subject["attachments"]		=$emailSubject->getAttachments();
-							$subject["url"]						=$this->generateUrl('emailView', array('id' => $emailSubject->getId()));
-							$subject["urlRead"]				=$this->generateUrl('emailSetFlag', array('id' => $emailSubject->getId(), 'flag' => 'Seen', 'value' => 1));
-							$subject["urlFlagged"]		=$this->generateUrl('emailSetFlag', array('id' => $emailSubject->getId(), 'flag' => 'Flagged', 'value' => 1));
-							$subject["urlUnRead"]			=$this->generateUrl('emailSetFlag', array('id' => $emailSubject->getId(), 'flag' => 'Seen', 'value' => 0));
-							$subject["urlUnFlagged"]	=$this->generateUrl('emailSetFlag', array('id' => $emailSubject->getId(), 'flag' => 'Flagged', 'value' => 0));
-							$return["messages"][] 		=$subject;
-						}
-					}
-					//$return[$emailAccount->getId()][$emailFolder->getName()]=$emailFolder->getEmailSubjects();
-				}
-
-			return new JsonResponse($return);*/
 		}
 		return new Response();
 	}
@@ -424,152 +356,101 @@ class EmailController extends Controller
 	public function emailsUnreadedList(RouterInterface $router,Request $request){
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
-			$emailFolderRepository = $this->getDoctrine()->getRepository(EmailFolders::class);
-			$emailSubjectRepository = $this->getDoctrine()->getRepository(EmailSubjects::class);
 			$limit=$request->query->getInt('length', 10);
 			$start=$request->query->getInt('start', 0);
+			$emailFolderRepository = $this->getDoctrine()->getRepository(EmailFolders::class);
+			$emailSubjectRepository = $this->getDoctrine()->getRepository(EmailSubjects::class);
+			$emailRepository = $this->getDoctrine()->getRepository(EmailAccounts::class);
+			// Buscamos todas las cuentas del usuario
+			$emailAccounts=$emailRepository->findBy([
+				"user" => $this->getUser()->getId()
+			]);
 			$return=array();
-			$user=$this->getUser();
-			foreach($user->getEmailAccounts() as $emailAccount){
-					$emailFolders=$emailFolderRepository->findBy([
-							'emailAccount' => $emailAccount->getId()
-					]);
-					foreach($emailFolders as $emailFolder){
-					//	dump($emailFolder);
-						$emailSubjects=$emailFolder->getEmailSubjects();
-						$emailSubjects=$emailSubjectRepository->findBy(
-							array('folder' => $emailFolder->getId(),
-										'seen' => false
-										)
-						);
-						foreach($emailSubjects as $emailSubject){
-						//	dump($emailSubject);
-							$subject=array();
-							$subject["id"]				=$emailSubject->getId();
-							$subject["subject"]		=$emailSubject->getSubject();
-							$subject["from"]			=$emailSubject->getFromEmail();
-							$subject["timestamp"]	=$emailSubject->getDate()->getTimestamp();
-							$return[] = $subject;
-						}
+			//Comprobamos solo las carpetas Inbox
+			foreach($emailAccounts as $emailAccount){
+				if($emailAccount->getInboxFolder()){
+					//Comprobamos si hay correo sin leer
+					$connectionString='{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'}'.$emailAccount->getInboxFolder()->getName();
+					$inbox = imap_open($connectionString,$emailAccount->getUsername() ,$emailAccount->getPassword());
+					$emailsUnseen=imap_search($inbox, 'UNSEEN');
+					if(!$emailsUnseen) continue;
+					$emailSubjects=imap_fetch_overview ($inbox, implode(',',$emailsUnseen), 0);
+					foreach($emailSubjects as $emailSubject){
+						$subject=array();
+						$subject["id"]				=$emailSubject->uid;
+						$subject["msgno"]			=$emailSubject->msgno;
+						$subject["subject"]		=isset($emailSubject->subject)?imap_utf8($emailSubject->subject):'';
+						$subject["from"]			=isset($emailSubject->from)?imap_utf8($emailSubject->from):'';
+						$date=new \DateTime(date('Y-m-d H:i:s',$emailSubject->udate));
+						$subject["timestamp"]	=$date->getTimestamp();
+						$subject["url"]				=$this->generateUrl('emailView', array('folder'=>$emailAccount->getInboxFolder()->getId(), 'id' => $emailSubject->msgno));
+						$return[] = $subject;
 					}
-										//$return[$emailAccount->getId()][$emailFolder->getName()]=$emailFolder->getEmailSubjects();
+					//Ordenamos el array por getTimestamp
+					usort($return, array(__NAMESPACE__."\EmailController", "cmpTimestamp"));
 				}
+			}
 			return new JsonResponse($return);
 		}
 		return new Response();
 	}
 
-
-
-	public function emailsSubjectsGet(RouterInterface $router,Request $request){
-		//No devolvemos nada asi que permitimos que se ejecute libremente para añadirlo al crontab de la maquina cada X minutos
-		$entityManager = $this->getDoctrine()->getManager();
-		$emailRepository = $this->getDoctrine()->getRepository(EmailAccounts::class);
-		$emailFolderRepository = $this->getDoctrine()->getRepository(EmailFolders::class);
-		$emailSubjects = $this->getDoctrine()->getRepository(EmailSubjects::class);
-		$emailAccounts=$this->getUser()->getEmailAccounts();
-		foreach($emailAccounts as $emailAccount){
-			$folders=$emailAccount->getEmailFolders();
-			foreach($folders as $folder){
-					$inbox = imap_open('{'.$emailAccounts[0]->getServer().':'.$emailAccounts[0]->getPort().'/imap/'.$emailAccounts[0]->getProtocol().'}'.$folder->getName(),$emailAccounts[0]->getUsername() ,$emailAccounts[0]->getPassword());
-					$nums=imap_num_msg($inbox);
-					for ($i=1;$i<=$nums;$i++){
-						$subject = imap_fetch_overview($inbox, $i, 0);
-						dump($subject);
-						/*$emailSubject = $emailSubjects->findOneBy([
-						    'folder' => $folder->getId(),
-								'msgno' => $subject[0]->msgno
-						]);
-						if($emailSubject===null){
-							mb_internal_encoding('UTF-8');
-							$emailSubject=new EmailSubjects();
-							$emailSubject->setSubject(str_replace("_"," ", mb_decode_mimeheader($subject[0]->subject)));
-							$emailSubject->setFromEmail(str_replace("_"," ", mb_decode_mimeheader($subject[0]->from)));
-							$emailSubject->setToEmail(str_replace("_"," ", mb_decode_mimeheader($subject[0]->to)));
-							$emailSubject->setMessageId(isset($subject[0]->message_id)?$subject[0]->message_id:'');
-							$emailSubject->setSize($subject[0]->size);
-							$emailSubject->setUid($subject[0]->uid);
-							$emailSubject->setMsgno($subject[0]->msgno);
-							$emailSubject->setRecent($subject[0]->recent == 0 ? false : true);
-							$emailSubject->setFlagged($subject[0]->flagged == 0 ? false : true);
-							$emailSubject->setAnswered($subject[0]->answered == 0 ? false : true);
-							$emailSubject->setDeleted($subject[0]->deleted == 0 ? false : true);
-							$emailSubject->setSeen($subject[0]->seen == 0 ? false : true);
-							$emailSubject->setDraft($subject[0]->draft == 0 ? false : true);
-							$emailSubject->setDate( new \DateTime(date('Y-m-d H:i:s',$subject[0]->udate)));
-							$emailSubject->setFolder($folder);
-							$entityManager->persist($emailSubject);
-		        	$entityManager->flush();
-						}*/
-					}
-			}
-		}
-	}
-
-	public function emailsFoldersGet(RouterInterface $router,Request $request){
-
-		$entityManager = $this->getDoctrine()->getManager();
-		$emailRepository = $this->getDoctrine()->getRepository(EmailAccounts::class);
-		$emailFolderRepository = $this->getDoctrine()->getRepository(EmailFolders::class);
-    $emailAccounts=$this->getUser()->getEmailAccounts();
-		foreach($emailAccounts as $emailAccount){
-				$connectionString='{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'}';
-				$inbox = imap_open($connectionString,$emailAccount->getUsername() ,$emailAccount->getPassword());
-				$folders = imap_list($inbox,$connectionString,'*');
-				foreach($folders as $folder){
-					$folderName=str_replace($connectionString, '', $folder);
-					$emailAccountFolders=$emailFolderRepository->findOneBy([
-					    'emailAccount' => $emailAccount->getId(),
-							'name' => $folderName
-					]);
-					if($emailAccountFolders===null){
-							$emailFolder=new EmailFolders();
-							$emailFolder->setName($folderName);
-							$emailFolder->setEmailAccount($emailAccount);
-		        	$entityManager->persist($emailFolder);
-		        	$entityManager->flush();
-					}
-				}
-		}
-	}
-
 	/**
-	 * @Route("/api/emails/{id}/get", name="emailGet")
+	 * @Route("/api/emails/{folder}/{id}/get", name="emailGet")
 	 */
-	public function emailsMailGet($id,RouterInterface $router,Request $request){
+	public function emailGet($folder, $id, RouterInterface $router, Request $request){
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 			$entityManager = $this->getDoctrine()->getManager();
 			$emailRepository = $this->getDoctrine()->getRepository(EmailAccounts::class);
 			$emailFolderRepository = $this->getDoctrine()->getRepository(EmailFolders::class);
 			$emailSubjectRepository = $this->getDoctrine()->getRepository(EmailSubjects::class);
-			$subject=$emailSubjectRepository->find($id);
-			if($subject){
-					$emailAccount=$subject->getFolder()->getEmailAccount();
-					if($emailAccount->getUser()->getId()==$this->getUser()->getId()){
-						$connectionString='{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'}'.$subject->getFolder()->getName();
-						$inbox = imap_open($connectionString,$emailAccount->getUsername() ,$emailAccount->getPassword());
-						$emailUtils = new EmailUtils();
-						$emailUtils->container=$this->container;
-						$emailUtils->getmsg($inbox,$subject->getMsgno());
-						$message=array();
-						$message["id"]					=$subject->getId();
-						$message["subject"]			=$subject->getSubject();
-						$message["from"]				=$subject->getFromEmail();
-						$message["to"]				=$subject->getToEmail();
-						$message["message_id"]		=$subject->getMessageId();
-						$message["imgFrom"]			=substr($this->generateUrl('getUserImage', array('id' => 0)),1); //TODO Buscar foto del contacto en la agenda
-						$message["content"]			=($emailUtils->htmlmsg!=null)?$emailUtils->htmlmsg:$emailUtils->plainmsg;
-						$message["attachments"]	=$emailUtils->attachments;
-						$message["urlRead"]			=$this->generateUrl('emailSetFlag', array('id' => $subject->getId(), 'flag' => 'Seen', 'value' => 1));
-						$message["urlFlagged"]	=$this->generateUrl('emailSetFlag', array('id' => $subject->getId(), 'flag' => 'Flagged', 'value' => 1));
-						$message["urlUnRead"]			=$this->generateUrl('emailSetFlag', array('id' => $subject->getId(), 'flag' => 'Seen', 'value' => 0));
-						$message["urlUnFlagged"]	=$this->generateUrl('emailSetFlag', array('id' => $subject->getId(), 'flag' => 'Flagged', 'value' => 0));
-						$message["timestamp"]		=$subject->getDate()->getTimestamp();
-						$message["account"] = $emailAccount->getId();
-						return new JsonResponse($message);
-					}
-			}
+			$emailFolder=$emailFolderRepository->findOneBy([
+				"id" => $folder
+				]);
+			if(!$emailFolder) return new JsonResponse(array("result"=> -1));
+			$emailAccount=$emailRepository->findOneBy([
+				"id" => $emailFolder->getEmailAccount()->getId(),
+				"user" => $this->getUser()->getId()
+			]);
+			if(!$emailAccount) return new JsonResponse(array("result"=> -1));
+			$connectionString='{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'}'.$emailFolder->getName();
+			$inbox = imap_open($connectionString,$emailAccount->getUsername() ,$emailAccount->getPassword());
+			if(!$inbox) return new JsonResponse(array("result"=> 0));
+			$subject=imap_fetch_overview ($inbox, $id, 0);
+			if(!count($subject)) return new JsonResponse(array("result"=> 0));
+			$emailSubject=$subject[0];
+			$emailUtils = new EmailUtils();
+			$emailUtils->container=$this->container;
+			$emailUtils->getmsg($inbox,$emailSubject->msgno);
+
+			$message["id"]						=$emailSubject->uid;
+			$message["folder"]				=$folder;
+			$message["subject"]				=isset($emailSubject->subject)?imap_utf8($emailSubject->subject):'';
+			$message["from"]					=isset($emailSubject->from)?imap_utf8($emailSubject->from):'';
+			$message["to"]						=isset($emailSubject->to)?imap_utf8($emailSubject->to):'';
+			$message["message_id"]		=isset($emailSubject->message_id)?$emailSubject->message_id:'';
+			$message["imgFrom"]			  =substr($this->generateUrl('getUserImage', array('id' => 0)),1); //TODO Buscar foto del contacto en la agenda
+			$message["content"]		  	=($emailUtils->htmlmsg!=null)?(preg_match('!!u', $emailUtils->htmlmsg)?$emailUtils->htmlmsg:utf8_encode($emailUtils->htmlmsg)):$emailUtils->plainmsg;
+			$message["attachments"]		=$emailUtils->attachments;
+			$message["size"]					=$emailSubject->size;
+			$message["uid"]						=$emailSubject->uid;
+			$message["msgno"]					=$emailSubject->msgno;
+			$message["recent"]				=$emailSubject->recent;
+			$message["flagged"]				=$emailSubject->flagged;
+			$message["answered"]			=$emailSubject->answered;
+			$message["deleted"]				=$emailSubject->deleted;
+			$message["seen"]					=$emailSubject->seen;
+			$message["draft"]					=$emailSubject->draft;
+			$message["date"]					=new \DateTime(date('Y-m-d H:i:s',$emailSubject->udate));
+			$message["timestamp"]			=$message["date"]->getTimestamp();
+			$message["url"]						=$this->generateUrl('emailView', array('folder'=>$emailFolder->getId(), 'id' => $emailSubject->msgno));
+			$message["urlRead"]				=$this->generateUrl('emailSetFlag', array('id' => $emailSubject->uid, 'flag' => 'Seen', 'value' => 1));
+			$message["urlFlagged"]		=$this->generateUrl('emailSetFlag', array('id' => $emailSubject->uid, 'flag' => 'Flagged', 'value' => 1));
+			$message["urlUnRead"]			=$this->generateUrl('emailSetFlag', array('id' => $emailSubject->uid, 'flag' => 'Seen', 'value' => 0));
+			$message["urlUnFlagged"]	=$this->generateUrl('emailSetFlag', array('id' => $emailSubject->uid, 'flag' => 'Flagged', 'value' => 0));
+
+			return new JsonResponse($message);
 		}
 		return new Response('');
 		//return new JsonResponse();

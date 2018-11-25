@@ -49,17 +49,26 @@
 				var load_wait=0;
 				if((++load_wait)==1) $("#load-spinner").fadeIn();
 					$.getJSON('{{ url('foldersList') }}', function( data ) {
-
+						var selectedIndex=0;
+						var i=0;
 						var account ="";
 						$.each( data, function( keyAccount, valAccount ) {
-
 								$("#list-folders").append('<li class="mail-account" id="email-account-'+keyAccount+'" data-toggle="collapse" aria-expanded="true" data-target="#email-account-folders-'+keyAccount+'"><div class="mail-account-title">'+valAccount.name+'</div></li><li class="collapse in" id="email-account-folders-'+keyAccount+'"></li>');
 								$("#mail-accounts").data("selectBox-selectBoxIt").add({ value: keyAccount, text: valAccount.name });
-								 $.each( valAccount.folders, function( key, val ) {
+//
+
+								$.each( valAccount.folders, function( key, val ) {
 									 $('#email-account-folders-'+keyAccount).append('<li attr-name="'+val.name+'" attr-id="'+val.id+'" attr-url="{{ url('emailsFolderList', {'folder': '_____'}) }}" '+((val.default==true)? 'class="active"' : '')+'><a href="{{url('email')}}?folder='+val.id+'"><span class="badge badge-gray pull-right">'+val.unseen+'</span>'+val.name+'</a></li>');
+									 {% if folder is not null %} if(val.id=={{ folder }}) selectedIndex=i; {%endif%}
+
 								 });
+								 i++;
+
+
+
 						 });
 							$('.mail-account').collapse('hide');
+							$("#mail-accounts").data("selectBox-selectBoxIt").selectOption(selectedIndex);
 					}).always(function() {
 						if((--load_wait)==0) $("#load-spinner").fadeOut();
 					});
@@ -93,10 +102,11 @@
 
 				{% if id>0 %}
 					if((++load_wait)==1) $("#load-spinner").fadeIn();
-					$.getJSON('{{ url('emailGet', {'id': id}) }}', function( data ){
+					$.getJSON('{{ url('emailGet', {'folder': folder, 'id': id}) }}', function( data ){
 
 							//$("#mail-accounts").data("selectBox-selectBoxIt").disable();
 							{% if mode==1 %}
+								$("#mail-accounts").data("selectBox-selectBoxIt").disable();
 								$('#subject').val('RE: '+data.subject);
 								$("#mail-accounts").data("selectBox-selectBoxIt").selectOption(data.account+"");
 								$("#to").val(data.from);
