@@ -37,6 +37,7 @@ class EmailController extends Controller
 			$userdata=$this->getUser()->getTemplateData();
 			$menurepository=$this->getDoctrine()->getRepository(MenuOptions::class);
 			$emailAccounts=$this->getUser()->getEmailAccounts();
+			$folder=($request->query->get('folder')!==null)?$request->query->get('folder'):$emailAccounts[0]->getInboxFolder()->getId();
 			return $this->render('email\email.html.twig', [
 				'controllerName' => 'EmailController',
 				'interfaceName' => 'Correo electrónico',
@@ -44,7 +45,7 @@ class EmailController extends Controller
 				'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
 				'breadcrumb' =>  $menurepository->formatBreadcrumb($request->get('_route')),
 				'userData' => $userdata,
-				'folder' => ($request->query->get('folder')!==null)?$request->query->get('folder'):$emailAccounts[0]->getInboxFolder()->getId()
+				'folder' => $folder
 				]);
 
 		}else return new RedirectResponse($this->router->generate('app_login'));
@@ -276,7 +277,7 @@ class EmailController extends Controller
 			$return['unseen']=$status->unseen;
 			$return['recordsTotal']=$status->messages;
 			$return['recordsFiltered']=$status->messages;
-
+			$return['empty']=($emailFolder->getId()==$emailAccount->getTrashFolder()->getId())?true:false;			
 			$pages=ceil($status->messages/$limit);
 			$page=ceil($start/$limit);
 			$page_inverse=abs($page-$pages-1);
@@ -302,6 +303,7 @@ class EmailController extends Controller
 							$subject["draft"]					=$emailSubject->draft;
 							$subject["date"]					=new \DateTime(date('Y-m-d H:i:s',$emailSubject->udate));
 							$subject["url"]						=$this->generateUrl('emailView', array('folder'=>$emailFolder->getId(), 'id' => $emailSubject->msgno));
+							$message["urlDelete"]			=$this->generateUrl('emailMove', array('id' => $emailSubject->msgno, "origin"=> $emailFolder->getId(), "destination"=>$emailAccount->getTrashFolder()->getId()));
 							$subject["urlRead"]				=$this->generateUrl('emailSetFlag', array('id' => $emailSubject->uid, 'flag' => 'Seen', 'value' => 1));
 							$subject["urlFlagged"]		=$this->generateUrl('emailSetFlag', array('id' => $emailSubject->uid, 'flag' => 'Flagged', 'value' => 1));
 							$subject["urlUnRead"]			=$this->generateUrl('emailSetFlag', array('id' => $emailSubject->uid, 'flag' => 'Seen', 'value' => 0));
@@ -445,6 +447,7 @@ class EmailController extends Controller
 			$message["date"]					=new \DateTime(date('Y-m-d H:i:s',$emailSubject->udate));
 			$message["timestamp"]			=$message["date"]->getTimestamp();
 			$message["url"]						=$this->generateUrl('emailView', array('folder'=>$emailFolder->getId(), 'id' => $emailSubject->msgno));
+			$message["urlDelete"]			=$this->generateUrl('emailMove', array('id' => $emailSubject->msgno, "origin"=> $emailFolder->getId(), "destination"=>$emailAccount->getTrashFolder()->getId()));
 			$message["urlRead"]				=$this->generateUrl('emailSetFlag', array('id' => $emailSubject->uid, 'flag' => 'Seen', 'value' => 1));
 			$message["urlFlagged"]		=$this->generateUrl('emailSetFlag', array('id' => $emailSubject->uid, 'flag' => 'Flagged', 'value' => 1));
 			$message["urlUnRead"]			=$this->generateUrl('emailSetFlag', array('id' => $emailSubject->uid, 'flag' => 'Seen', 'value' => 0));
@@ -486,7 +489,61 @@ class EmailController extends Controller
 		return new JsonResponse(array("result" => -1));
 	}
 
-		/**
+	/**
+	 * @Route("/api/emails/{id}/move/{origin}/{destination}", name="emailMove")
+	 */
+	public function emailMove($id, $origin, $destination, RouterInterface $router,Request $request){
+		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+			$entityManager = $this->getDoctrine()->getManager();
+			$emailRepository = $this->getDoctrine()->getRepository(EmailAccounts::class);
+			$emailFolderRepository = $this->getDoctrine()->getRepository(EmailFolders::class);
+			$emailSubjectRepository = $this->getDoctrine()->getRepository(EmailSubjects::class);
+			$emailFolderOrigin=$emailFolderRepository->find($origin);
+			$emailFolderDestination=$emailFolderRepository->find($destination);
+			//Comprobamos que el usuario actual sea el propietario de la carpeta
+			$emailAccount=$emailRepository->findOneBy([
+				"id" => $emailFolderOrigin->getEmailAccount()->getId(),
+				"user" => $this->getUser()->getId()
+			]);
+			if(!$emailAccount) return new JsonResponse(array("result" => -1));
+			$connectionString='{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'}'.$emailFolderOrigin->getName();
+			$inbox = imap_open($connectionString,$emailAccount->getUsername() ,$emailAccount->getPassword());
+			$result = imap_mail_move($inbox, $id, $emailFolderDestination->getName());
+			return new JsonResponse(array("result" => $result?1:0));
+		}return new JsonResponse(array("result" => -1));
+	}
+
+	/**
+	 * @Route("/api/emails/empty/{folder}", name="emptyFolder")
+	 */
+	public function emptyFolder($folder, RouterInterface $router,Request $request){
+		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+			$entityManager = $this->getDoctrine()->getManager();
+			$emailRepository = $this->getDoctrine()->getRepository(EmailAccounts::class);
+			$emailFolderRepository = $this->getDoctrine()->getRepository(EmailFolders::class);
+			$emailSubjectRepository = $this->getDoctrine()->getRepository(EmailSubjects::class);
+			$emailFolder=$emailFolderRepository->find($folder);
+			//Comprobamos que el usuario actual sea el propietario de la carpeta
+			$emailAccount=$emailRepository->findOneBy([
+				"id" => $emailFolder->getEmailAccount()->getId(),
+				"user" => $this->getUser()->getId()
+			]);
+			if(!$emailAccount) return new JsonResponse(array("result" => -1));
+			$connectionString='{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'}'.$emailFolder->getName();
+			$inbox = imap_open($connectionString,$emailAccount->getUsername() ,$emailAccount->getPassword());
+			$emails = imap_search($inbox,'ALL');
+			$result=true;
+			foreach($emails as $email){
+				 $result&=imap_delete($inbox,$email);
+			}
+			imap_expunge($inbox);
+			return new JsonResponse(array("result" => $result));
+		}return new JsonResponse(array("result" => -1));
+	}
+
+	/**
 	 * @Route("/api/emails/attachment/{id}/get", name="emailGetAttachment")
 	 */
 	public function emailGetAttachment($id,RouterInterface $router,Request $request){

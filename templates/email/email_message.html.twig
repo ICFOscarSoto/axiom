@@ -31,6 +31,7 @@
 							$("#mail-from").html('<img src="{{ url('index') }}'+data.imgFrom+'" class="img-circle" width="30" /><span></span>');
 							$("#mail-from > span").text(data.from);
 							$("#mail-date").text(moment(data.timestamp*1000).format('llll'));
+							$("#email-modal-button-continue").attr("attr-action",data.urlDelete);
 							$("#mail-attachments-count").text(data.attachments.length);
 								$.each( data.attachments, function(key,val){
 									url=$("#mail-attachments").attr('attr-url');
@@ -66,6 +67,26 @@
 						$('body').on('click', "#mail-print", function() {
 							window.print();
 						});
+
+						//delete
+						$('body').on('click', "#mail-delete", function() {
+							$('#email-modal-confirm').modal('show', {backdrop: 'static'});
+						});
+
+						$('body').on('click', "#email-modal-button-continue", function() {
+							$('#email-modal-confirm').modal('hide');
+							if((++load_wait)==1) $("#load-spinner").fadeIn();
+							var action= $(this).attr('attr-action');
+							$.getJSON(action, function( data ) {
+								if((--load_wait)==0) $("#load-spinner").fadeOut();
+								toastr.success("Correo enviado a la papelera correctamente", "Confirmación", confirmation);
+								window.location.href = '{{url('email')}}';
+							}).always(function() {
+
+								if((--load_wait)==0) $("#load-spinner").fadeOut();
+							});
+						});
+
 					});
 
 
@@ -94,7 +115,7 @@
 									<i class="entypo-print"></i>
 								</a>
 
-								<a href="#" class="btn btn-default">
+								<a href="#" id="mail-delete" class="btn btn-default">
 									<i class="entypo-trash"></i>
 								</a>
 
@@ -220,6 +241,7 @@
 					<h4 class="modal-title">Confirmación</h4>
 				</div>
 				<div id="email-modal-body" class="modal-body">
+					¿Seguro que desea borrar este mensaje?
 				</div>
 				<div id="email-modal-footer" class="modal-footer">
 					<button type="button" class="btn btn-primary" data-dismiss="modal">Cancelar</button>
