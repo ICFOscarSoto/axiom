@@ -34,11 +34,15 @@
 									$("[id^='mail-pagination-']").append('<div class="btn-group"><a id="mail-pagination-button-previous" attr-url="'+url+'" attr-limit="'+data.limit+'" attr-start="'+(data.start-data.limit)+'" href="javascript:void(0);" class="'+((data.start<=data.limit)?'disabled ':'')+'btn btn-sm btn-white"><i class="entypo-left-open"></i></a>'+
 																											 '<a id="mail-pagination-button-next" href="javascript:void(0);" attr-url="'+url+'" attr-limit="'+data.limit+'" attr-start="'+(data.start+data.limit)+'" class="'+(((data.recordsFiltered-data.start)<=data.limit)?'disabled ':'')+'btn btn-sm btn-white"><i class="entypo-right-open"></i></a></div>')
 									$("#mail-folder-name").text(data.folderName+' ('+data.unseen+')');
-									if(data.empty) $("#mail-links").html("<a href='javascript:void(0);' class='btn btn-primary btn-icon'>Vaciar<i class='entypo-trash'></i></a>");
-										else $("#mail-links").html("");
+									$("#email-modal-button-continue").attr("attr-action",data.urlEmpty);
+									$("#email-modal-button-continue").attr("attr-success",data.url);
+									$("#email-modal-delete-button-continue").attr("attr-success",data.url);
+									var links = "<a href='javascript:void(0);' id='email-delete' class='btn btn-danger btn-icon'>Borrar<i class='entypo-trash'></i></a>"
+									if(data.empty) $("#mail-links").html(links+"<a href='javascript:void(0);' id='email-empty' class='btn btn-primary btn-icon'>Vaciar<i class='entypo-cup'></i></a>");
+										else $("#mail-links").html(links);
 									$.each( data.messages, function( keyAccount, valAccount ) {
 										var message='';
-										message+='<tr class="'+((valAccount.seen)?'':'unread')+'"><td style="width:5%;><div class="checkbox checkbox-replace"><input type="checkbox" /></div></td>';
+										message+='<tr class="'+((valAccount.seen)?'':'unread')+'"><td style="width:5%;><div class="checkbox checkbox-replace"><input id="email-selection-'+valAccount.id+'" attr-id="'+valAccount.id+'" type="checkbox" /></div></td>';
 										message+='<td class="col-name" style="width:1%;"><a attr-url-flagged="'+valAccount.urlFlagged+'" attr-url-unflagged="'+valAccount.urlUnFlagged+'" id="flagged-star-'+valAccount.id+'" href="javascript:void(0);" class="star'+((valAccount.flagged)?' stared':'')+'"><i class="entypo-star"></i></a>';
 										message+='<td class="col-name" style="width:1%;"><a href="javascript:void(0);">'+((valAccount.attachments>0)?'<i class="entypo-attach"></i>':'')+'</a>';
 										message+='<td style="width:20%;"><a href="'+valAccount.url+'" class="col-name">'+valAccount.from+'</a></td>';
@@ -87,8 +91,50 @@
 									else element.addClass('stared');
 							});
 						});
-						getEmails('{{ url('emailsFolderList', {'folder': folder}) }}','');
+						//delete
+						$('body').on('click', "#email-delete", function() {
+							var selected = [];
+							$('input:checkbox[id^="email-selection-"]:checked').each(function() {
+	    					selected.push($(this).attr('attr-id'));
+							})
+							$('#email-modal-delete-button-continue').attr("attr-id", selected);
+							$('#email-modal-delete-confirm').modal('show', {backdrop: 'static'});
+						});
 
+						$('body').on('click', "#email-modal-delete-button-continue", function() {
+							$('#email-modal-confirm').modal('hide');
+							if((++load_wait)==1) $("#load-spinner").fadeIn();
+							var action=$(this).attr('attr-action');
+							var success=$(this).attr('attr-success');
+							$.getJSON(action, function( data ) {
+								if((--load_wait)==0) $("#load-spinner").fadeOut();
+								toastr.success("Papelera vaciada correctamente", "Confirmación", confirmation);
+								getEmails(success, '');
+							}).always(function() {
+								if((--load_wait)==0) $("#load-spinner").fadeOut();
+							});
+						});
+
+						//empty
+						$('body').on('click', "#email-empty", function() {
+							$('#email-modal-confirm').modal('show', {backdrop: 'static'});
+						});
+
+						$('body').on('click', "#email-modal-button-continue", function() {
+							$('#email-modal-confirm').modal('hide');
+							if((++load_wait)==1) $("#load-spinner").fadeIn();
+							var action=$(this).attr('attr-action');
+							var success=$(this).attr('attr-success');
+							$.getJSON(action, function( data ) {
+								if((--load_wait)==0) $("#load-spinner").fadeOut();
+								toastr.success("Papelera vaciada correctamente", "Confirmación", confirmation);
+								getEmails(success, '');
+							}).always(function() {
+								if((--load_wait)==0) $("#load-spinner").fadeOut();
+							});
+						});
+
+						getEmails('{{ url('emailsFolderList', {'folder': folder}) }}','');
 					});
 		</script>
 		<div class="mail-env">
@@ -227,6 +273,38 @@
 	{{ include('chat_histories.html.twig') }}
 </div>
 	<!-- MODALS  -->
+	<div class="modal fade" id="email-modal-confirm" data-backdrop="static" style="display: none;">
+		<div class="modal-dialog">
+			<div class="modal-content" style="transform: matrix(1, 0, 0, 1, 0, 0);">
+				<div class="modal-header">
+					<h4 class="modal-title">Confirmación</h4>
+				</div>
+				<div id="email-modal-body" class="modal-body">
+					¿Seguro que desea vaciar la papelera? Esta operación no se podrá deshacer.
+				</div>
+				<div id="email-modal-footer" class="modal-footer">
+					<button type="button" class="btn btn-primary" data-dismiss="modal">Cancelar</button>
+					<button attr-action="" id="email-modal-button-continue" type="button" class="btn btn-red">Continuar</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal fade" id="email-modal-delete-confirm" data-backdrop="static" style="display: none;">
+		<div class="modal-dialog">
+			<div class="modal-content" style="transform: matrix(1, 0, 0, 1, 0, 0);">
+				<div class="modal-header">
+					<h4 class="modal-title">Confirmación</h4>
+				</div>
+				<div id="email-modal-body" class="modal-body">
+					¿Seguro que desea mover a la papelera los emails seleccionados?.
+				</div>
+				<div id="email-modal-footer" class="modal-footer">
+					<button type="button" class="btn btn-primary" data-dismiss="modal">Cancelar</button>
+					<button attr-id="" attr-action="" id="email-modal-delete-button-continue" type="button" class="btn btn-red">Continuar</button>
+				</div>
+			</div>
+		</div>
+	</div>
 	<!-- END MODALS -->
 {% block footer %}
 

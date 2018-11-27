@@ -65,6 +65,17 @@ table.dataTable.compact tbody th, table.dataTable.compact tbody td {
   width: 50% !important;
 }
 
+.mail-env .mail-body .mail-table tbody tr.unread > td {
+    font-weight: bold;
+    color: #505050 !important;
+    background-color: #f0f0f1 !important;
+}
+
+.mail-env .mail-body .mail-table tbody tr.unread a {
+    color: #505050 !important;
+}
+
+
 .mail-env .mail-sidebar {
   width: 21% !important;
   margin-right: 1% !important;
@@ -95,7 +106,32 @@ table.dataTable.compact tbody th, table.dataTable.compact tbody td {
   padding: 10px !important;
 }
 
+.spinner-container {
+   position: absolute;
+   height:100%;
+   width:100%;
+   margin:0px auto;
+   background-color:rgba(255, 255, 255, 0.7);
+   z-index: 9999;
+   display: none;
+}
 
+.spinner {
+  position: absolute;
+  left: 50%;
+  top: 35%;
+  height: fit-content;
+  width: fit-content;
+  margin: 0px auto;
+  background: #fff;
+  border: 1px #eee solid;
+  border-radius: 10px;
+  transform: translate(-50%, -35%);
+  padding: 0px 30px;
+
+}
+
+/*
 .spinner-container {
    position: absolute;
    height:100%;
@@ -140,3 +176,4 @@ table.dataTable.compact tbody th, table.dataTable.compact tbody td {
    from {transform: rotate(0deg);}
    to {transform: rotate(359deg);}
 }
+*/

@@ -277,7 +277,9 @@ class EmailController extends Controller
 			$return['unseen']=$status->unseen;
 			$return['recordsTotal']=$status->messages;
 			$return['recordsFiltered']=$status->messages;
-			$return['empty']=($emailFolder->getId()==$emailAccount->getTrashFolder()->getId())?true:false;			
+			$return['empty']=($emailFolder->getId()==$emailAccount->getTrashFolder()->getId())?true:false;
+			$return['url']=$this->generateUrl('emailsFolderList', array('folder'=>$folder));
+			$return["urlEmpty"]	=$this->generateUrl('emptyFolder', array('folder'=>$folder));
 			$pages=ceil($status->messages/$limit);
 			$page=ceil($start/$limit);
 			$page_inverse=abs($page-$pages-1);
@@ -510,6 +512,7 @@ class EmailController extends Controller
 			$connectionString='{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'}'.$emailFolderOrigin->getName();
 			$inbox = imap_open($connectionString,$emailAccount->getUsername() ,$emailAccount->getPassword());
 			$result = imap_mail_move($inbox, $id, $emailFolderDestination->getName());
+			imap_expunge($inbox);
 			return new JsonResponse(array("result" => $result?1:0));
 		}return new JsonResponse(array("result" => -1));
 	}
