@@ -70,16 +70,17 @@ table.dataTable.compact tbody th, table.dataTable.compact tbody td {
     color: #505050 !important;
     background-color: #f0f0f1 !important;
 }
-
 .mail-env .mail-body .mail-table tbody tr.unread a {
     color: #505050 !important;
 }
-
-
 .mail-env .mail-sidebar {
   width: 21% !important;
   margin-right: 1% !important;
 }
+.mail-env .mail-body .mail-table tbody tr td {
+  height: 35px !important;
+}
+
 
 .dropzone {
   min-height: 175px !important;
@@ -111,7 +112,7 @@ table.dataTable.compact tbody th, table.dataTable.compact tbody td {
    height:100%;
    width:100%;
    margin:0px auto;
-   background-color:rgba(255, 255, 255, 0.7);
+   /*background-color:rgba(255, 255, 255, 0.7);*/
    z-index: 9999;
    display: none;
 }

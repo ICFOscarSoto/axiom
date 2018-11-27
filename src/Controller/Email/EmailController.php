@@ -260,6 +260,7 @@ class EmailController extends Controller
 			$emailSubjectRepository = $this->getDoctrine()->getRepository(EmailSubjects::class);
 			$limit=$request->query->getInt('length', 15);
 			$start=$request->query->getInt('start', 1);
+			$query=$request->query->get('query');
 			$return=array();
 			$user=$this->getUser();
 			$emailFolder=$emailFolderRepository->find([
@@ -270,6 +271,7 @@ class EmailController extends Controller
 			if(!$emailAccount) return new JsonResponse(array("result"=> -1));
 			$inbox = imap_open('{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'}'.$emailFolder->getName(),$emailAccount->getUsername(),$emailAccount->getPassword());
 			if($inbox===FALSE) return new JsonResponse(array("result"=> -1));
+
 			$status = imap_status ( $inbox , '{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'}'.$emailFolder->getName(), SA_ALL);
 			$return['folderName']=$emailFolder->getName();
 			$return['limit']=$limit;
@@ -280,13 +282,26 @@ class EmailController extends Controller
 			$return['empty']=($emailFolder->getId()==$emailAccount->getTrashFolder()->getId())?true:false;
 			$return['url']=$this->generateUrl('emailsFolderList', array('folder'=>$folder));
 			$return["urlEmpty"]	=$this->generateUrl('emptyFolder', array('folder'=>$folder));
-			$pages=ceil($status->messages/$limit);
+
+			//Si hay alguna busqueda
+			$search_results=array();
+			if($query!=null){
+				$search_results=imap_search($inbox, 'TEXT "'.$query.'"');
+				if($search_results===FALSE) $search_results=array();
+				$return['recordsFiltered']=count($search_results);
+			}
+			//Calculamos los datos de paginacion
+			$pages=ceil($return['recordsFiltered']/$limit);
 			$page=ceil($start/$limit);
 			$page_inverse=abs($page-$pages-1);
-			$min=($status->messages-($page*$limit))+1; ($min<1)?$min=1:$min=$min;
-			$max=(($status->messages-($page*$limit))+$limit); ($max>$status->messages)?$max=$status->messages:$max=$max;
+			$min=($return['recordsFiltered']-($page*$limit))+1; ($min<1)?$min=1:$min=$min;
+			$max=(($return['recordsFiltered']-($page*$limit))+$limit); ($max>$return['recordsFiltered'])?$max=$return['recordsFiltered']:$max=$max;
 			$range=$min.":".$max;
-			$emailSubjects=imap_fetch_overview ($inbox, "$range",0);
+			if($query!=null){
+				$emailSubjects=imap_fetch_overview ($inbox, implode(',',$search_results),0);
+			}else{
+				$emailSubjects=imap_fetch_overview ($inbox, "$range",0);
+			}
 						foreach($emailSubjects as $emailSubject){
 							$subject=array();
 							$subject["id"]						=$emailSubject->uid;
@@ -305,7 +320,7 @@ class EmailController extends Controller
 							$subject["draft"]					=$emailSubject->draft;
 							$subject["date"]					=new \DateTime(date('Y-m-d H:i:s',$emailSubject->udate));
 							$subject["url"]						=$this->generateUrl('emailView', array('folder'=>$emailFolder->getId(), 'id' => $emailSubject->msgno));
-							$subject["urlDelete"]			=$this->generateUrl('emailMove', array('id' => $emailSubject->msgno, "origin"=> $emailFolder->getId(), "destination"=>$emailAccount->getTrashFolder()->getId()));
+							$subject["urlDelete"]			=$this->generateUrl('emailMove', array('id' => $emailSubject->uid, "origin"=> $emailFolder->getId(), "destination"=>$emailAccount->getTrashFolder()->getId()));
 							$subject["urlRead"]				=$this->generateUrl('emailSetFlag', array('id' => $emailSubject->uid, 'flag' => 'Seen', 'value' => 1));
 							$subject["urlFlagged"]		=$this->generateUrl('emailSetFlag', array('id' => $emailSubject->uid, 'flag' => 'Flagged', 'value' => 1));
 							$subject["urlUnRead"]			=$this->generateUrl('emailSetFlag', array('id' => $emailSubject->uid, 'flag' => 'Seen', 'value' => 0));
@@ -449,7 +464,7 @@ class EmailController extends Controller
 			$message["date"]					=new \DateTime(date('Y-m-d H:i:s',$emailSubject->udate));
 			$message["timestamp"]			=$message["date"]->getTimestamp();
 			$message["url"]						=$this->generateUrl('emailView', array('folder'=>$emailFolder->getId(), 'id' => $emailSubject->msgno));
-			$message["urlDelete"]			=$this->generateUrl('emailMove', array('id' => $emailSubject->msgno, "origin"=> $emailFolder->getId(), "destination"=>$emailAccount->getTrashFolder()->getId()));
+			$message["urlDelete"]			=$this->generateUrl('emailMove', array('id' => $emailSubject->uid, "origin"=> $emailFolder->getId(), "destination"=>$emailAccount->getTrashFolder()->getId()));
 			$message["urlRead"]				=$this->generateUrl('emailSetFlag', array('id' => $emailSubject->uid, 'flag' => 'Seen', 'value' => 1));
 			$message["urlFlagged"]		=$this->generateUrl('emailSetFlag', array('id' => $emailSubject->uid, 'flag' => 'Flagged', 'value' => 1));
 			$message["urlUnRead"]			=$this->generateUrl('emailSetFlag', array('id' => $emailSubject->uid, 'flag' => 'Seen', 'value' => 0));
@@ -511,7 +526,7 @@ class EmailController extends Controller
 			if(!$emailAccount) return new JsonResponse(array("result" => -1));
 			$connectionString='{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'}'.$emailFolderOrigin->getName();
 			$inbox = imap_open($connectionString,$emailAccount->getUsername() ,$emailAccount->getPassword());
-			$result = imap_mail_move($inbox, $id, $emailFolderDestination->getName());
+			$result = imap_mail_move($inbox, $id, $emailFolderDestination->getName(), CP_UID);
 			imap_expunge($inbox);
 			return new JsonResponse(array("result" => $result?1:0));
 		}return new JsonResponse(array("result" => -1));

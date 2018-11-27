@@ -32,7 +32,7 @@
 									$("[id^='mail-pagination-']").html('<strong>'+(data.start)+'-'+(((data.start+data.limit)<=data.recordsFiltered)?(data.start+data.limit-1):data.recordsFiltered)+'</strong> <span>de '+data.recordsFiltered+'</span>');
 									((data.start<data.limit)?'disabled':'')
 									$("[id^='mail-pagination-']").append('<div class="btn-group"><a id="mail-pagination-button-previous" attr-url="'+url+'" attr-limit="'+data.limit+'" attr-start="'+(data.start-data.limit)+'" href="javascript:void(0);" class="'+((data.start<=data.limit)?'disabled ':'')+'btn btn-sm btn-white"><i class="entypo-left-open"></i></a>'+
-																											 '<a id="mail-pagination-button-next" href="javascript:void(0);" attr-url="'+url+'" attr-limit="'+data.limit+'" attr-start="'+(data.start+data.limit)+'" class="'+(((data.recordsFiltered-data.start)<=data.limit)?'disabled ':'')+'btn btn-sm btn-white"><i class="entypo-right-open"></i></a></div>')
+																											 '<a id="mail-pagination-button-next" href="javascript:void(0);" attr-url="'+url+'" attr-limit="'+data.limit+'" attr-start="'+(data.start+data.limit)+'" class="'+(((data.recordsFiltered-data.start)<=data.limit-1)?'disabled ':'')+'btn btn-sm btn-white"><i class="entypo-right-open"></i></a></div>')
 									$("#mail-folder-name").text(data.folderName+' ('+data.unseen+')');
 									$("#email-modal-button-continue").attr("attr-action",data.urlEmpty);
 									$("#email-modal-button-continue").attr("attr-success",data.url);
@@ -104,7 +104,7 @@
 						$('body').on('click', "#email-modal-delete-button-continue", function() {
 							$('#email-modal-delete-confirm').modal('hide');
 							var success=$(this).attr('attr-success');
-							$.each( $(this).attr("attr-id").split(','), function( key, id ) {	
+							$.each( $(this).attr("attr-id").split(','), function( key, id ) {
 									if((++load_wait)==1) $("#load-spinner").fadeIn();
 									$.getJSON($("#email-selection-"+id).attr("attr-delete"), function( data ) {
 									}).always(function() {
@@ -135,6 +135,12 @@
 							});
 						});
 
+						//search
+						$( "#mail-search" ).on( "submit", function( event ) {
+							event.preventDefault();
+							getEmails('{{ url('emailsFolderList', {'folder': folder}) }}','?query='+$("#mail-search-query").val());
+						});
+
 						getEmails('{{ url('emailsFolderList', {'folder': folder}) }}','');
 					});
 		</script>
@@ -160,9 +166,9 @@
 							</h3>
 
 							<!-- search -->
-							<form method="get" role="form" class="mail-search">
+							<form id="mail-search" class="mail-search">
 								<div class="input-group">
-									<input type="text" class="form-control" name="s" placeholder="Buscar" />
+									<input type="text" class="form-control" id="mail-search-query" name="s" placeholder="Buscar" />
 
 									<div class="input-group-addon">
 										<i class="entypo-search"></i>
