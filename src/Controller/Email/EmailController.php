@@ -305,7 +305,7 @@ class EmailController extends Controller
 							$subject["draft"]					=$emailSubject->draft;
 							$subject["date"]					=new \DateTime(date('Y-m-d H:i:s',$emailSubject->udate));
 							$subject["url"]						=$this->generateUrl('emailView', array('folder'=>$emailFolder->getId(), 'id' => $emailSubject->msgno));
-							$message["urlDelete"]			=$this->generateUrl('emailMove', array('id' => $emailSubject->msgno, "origin"=> $emailFolder->getId(), "destination"=>$emailAccount->getTrashFolder()->getId()));
+							$subject["urlDelete"]			=$this->generateUrl('emailMove', array('id' => $emailSubject->msgno, "origin"=> $emailFolder->getId(), "destination"=>$emailAccount->getTrashFolder()->getId()));
 							$subject["urlRead"]				=$this->generateUrl('emailSetFlag', array('id' => $emailSubject->uid, 'flag' => 'Seen', 'value' => 1));
 							$subject["urlFlagged"]		=$this->generateUrl('emailSetFlag', array('id' => $emailSubject->uid, 'flag' => 'Flagged', 'value' => 1));
 							$subject["urlUnRead"]			=$this->generateUrl('emailSetFlag', array('id' => $emailSubject->uid, 'flag' => 'Seen', 'value' => 0));

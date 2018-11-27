@@ -37,12 +37,12 @@
 									$("#email-modal-button-continue").attr("attr-action",data.urlEmpty);
 									$("#email-modal-button-continue").attr("attr-success",data.url);
 									$("#email-modal-delete-button-continue").attr("attr-success",data.url);
-									var links = "<a href='javascript:void(0);' id='email-delete' class='btn btn-danger btn-icon'>Borrar<i class='entypo-trash'></i></a>"
-									if(data.empty) $("#mail-links").html(links+"<a href='javascript:void(0);' id='email-empty' class='btn btn-primary btn-icon'>Vaciar<i class='entypo-cup'></i></a>");
-										else $("#mail-links").html(links);
+									var links = "<div class='btn-group'>";
+									if(data.empty) $("#mail-links").html(links+"<a href='javascript:void(0);' id='email-empty' class='btn btn-primary btn-icon'>Vaciar<i class='entypo-cup'></i></a>"+"</div>");
+										else $("#mail-links").html(links+"<a href='javascript:void(0);' id='email-delete' class='btn btn-danger btn-icon'>Borrar<i class='entypo-trash'></i></a>"+"</div>");
 									$.each( data.messages, function( keyAccount, valAccount ) {
 										var message='';
-										message+='<tr class="'+((valAccount.seen)?'':'unread')+'"><td style="width:5%;><div class="checkbox checkbox-replace"><input id="email-selection-'+valAccount.id+'" attr-id="'+valAccount.id+'" type="checkbox" /></div></td>';
+										message+='<tr class="'+((valAccount.seen)?'':'unread')+'"><td style="width:5%;><div class="checkbox checkbox-replace"><input attr-delete="'+valAccount.urlDelete+'" id="email-selection-'+valAccount.id+'" attr-id="'+valAccount.id+'" type="checkbox" /></div></td>';
 										message+='<td class="col-name" style="width:1%;"><a attr-url-flagged="'+valAccount.urlFlagged+'" attr-url-unflagged="'+valAccount.urlUnFlagged+'" id="flagged-star-'+valAccount.id+'" href="javascript:void(0);" class="star'+((valAccount.flagged)?' stared':'')+'"><i class="entypo-star"></i></a>';
 										message+='<td class="col-name" style="width:1%;"><a href="javascript:void(0);">'+((valAccount.attachments>0)?'<i class="entypo-attach"></i>':'')+'</a>';
 										message+='<td style="width:20%;"><a href="'+valAccount.url+'" class="col-name">'+valAccount.from+'</a></td>';
@@ -102,17 +102,18 @@
 						});
 
 						$('body').on('click', "#email-modal-delete-button-continue", function() {
-							$('#email-modal-confirm').modal('hide');
-							if((++load_wait)==1) $("#load-spinner").fadeIn();
-							var action=$(this).attr('attr-action');
+							$('#email-modal-delete-confirm').modal('hide');
 							var success=$(this).attr('attr-success');
-							$.getJSON(action, function( data ) {
-								if((--load_wait)==0) $("#load-spinner").fadeOut();
-								toastr.success("Papelera vaciada correctamente", "Confirmación", confirmation);
-								getEmails(success, '');
-							}).always(function() {
-								if((--load_wait)==0) $("#load-spinner").fadeOut();
-							});
+							$.each( $(this).attr("attr-id").split(','), function( key, id ) {	
+									if((++load_wait)==1) $("#load-spinner").fadeIn();
+									$.getJSON($("#email-selection-"+id).attr("attr-delete"), function( data ) {
+									}).always(function() {
+										if((--load_wait)==0){
+											$("#load-spinner").fadeOut();
+											getEmails(success, '');
+										}
+									});
+							 });
 						});
 
 						//empty
@@ -307,7 +308,6 @@
 	</div>
 	<!-- END MODALS -->
 {% block footer %}
-
 	<link rel="stylesheet" href="{{ url('index') }}js/datatables/datatables.css">
 	<link rel="stylesheet" href="{{ url('index') }}js/select2/select2-bootstrap.css">
 	<link rel="stylesheet" href="{{ url('index') }}js/select2/select2.css">
