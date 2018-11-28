@@ -132,6 +132,10 @@ table.dataTable.compact tbody th, table.dataTable.compact tbody td {
 
 }
 
+.mce-panel {
+    border: 0 solid #f3f3f3 !important;
+}
+
 /*
 .spinner-container {
    position: absolute;

@@ -95,6 +95,11 @@ class EmailAccounts
      */
     private $trashFolder;
 
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $signature;
+
     public function __construct()
     {
         $this->emailFolders = new ArrayCollection();
@@ -300,6 +305,18 @@ class EmailAccounts
     public function setTrashFolder(?EmailFolders $trashFolder): self
     {
         $this->trashFolder = $trashFolder;
+
+        return $this;
+    }
+
+    public function getSignature(): ?string
+    {
+        return $this->signature;
+    }
+
+    public function setSignature(?string $signature): self
+    {
+        $this->signature = $signature;
 
         return $this;
     }

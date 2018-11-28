@@ -173,9 +173,9 @@ class EmailController extends Controller
 				"user" => $this->getUser()->getId()
 			]);
 			$attachments = json_decode($request->query->get('files'));
-			$text = $request->query->get('content');
-			$html = $request->query->get('content');
-
+			$text = $request->query->get('text_content');
+			$html = $request->query->get('html_content');
+			dump($html);
 			//Generamos el mail para el envio SMTP
 			$headers = array(
 			              'From'    => $emailAccount->getUsername(),
@@ -451,6 +451,7 @@ class EmailController extends Controller
 			$message["message_id"]		=isset($emailSubject->message_id)?$emailSubject->message_id:'';
 			$message["imgFrom"]			  =substr($this->generateUrl('getUserImage', array('id' => 0)),1); //TODO Buscar foto del contacto en la agenda
 			$message["content"]		  	=($emailUtils->htmlmsg!=null)?(preg_match('!!u', $emailUtils->htmlmsg)?$emailUtils->htmlmsg:utf8_encode($emailUtils->htmlmsg)):$emailUtils->plainmsg;
+			$message["signature"]			=$emailAccount->getSignature();
 			$message["attachments"]		=$emailUtils->attachments;
 			$message["size"]					=$emailSubject->size;
 			$message["uid"]						=$emailSubject->uid;
