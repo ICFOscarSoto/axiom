@@ -28,6 +28,7 @@
         // init,configure dropzone
         Dropzone.autoDiscover = false;
 				var jsonFiles = [];
+				var token="{{token}}";
         var dropzone_default = new Dropzone(".dropzone", {
             url: '{{url('uploadTemp')}}',
             maxFilesize: 20,  // in Mb
@@ -54,7 +55,7 @@
 						var account ="";
 						$.each( data, function( keyAccount, valAccount ) {
 								$("#list-folders").append('<li class="mail-account" id="email-account-'+keyAccount+'" data-toggle="collapse" aria-expanded="true" data-target="#email-account-folders-'+keyAccount+'"><div class="mail-account-title">'+valAccount.name+'</div></li><li class="collapse in" id="email-account-folders-'+keyAccount+'"></li>');
-								$("#mail-accounts").data("selectBox-selectBoxIt").add({ value: keyAccount, text: valAccount.name });
+								$("#mail-accounts").data("selectBox-selectBoxIt").add({ value: keyAccount, text: valAccount.name , id:'email-account-option-'+keyAccount ,signature: valAccount.signatureUrl});
 //
 
 								$.each( valAccount.folders, function( key, val ) {
@@ -63,16 +64,36 @@
 
 								 });
 								 i++;
-
-
-
 						 });
 							$('.mail-account').collapse('hide');
 							$("#mail-accounts").data("selectBox-selectBoxIt").selectOption(selectedIndex);
 					}).always(function() {
 						if((--load_wait)==0) $("#load-spinner").fadeOut();
 					});
-
+				
+					$("#mail-accounts").bind({
+						"change": function(ev, obj) {
+							if((++load_wait)==1) $("#load-spinner").fadeIn();
+							$.getJSON($("#email-account-option-"+$("#mail-accounts").val()).attr('signature'),function( data ){						
+								var content=tinyMCE.get('content').getContent();
+								var startToken='<!-- start:'+token+' -->';
+								var endToken='<!-- end:'+token+' -->';
+								var signStart=content.indexOf(startToken);							
+								var signEnd=content.indexOf(endToken);
+								console.log(signStart);
+								console.log(signEnd);
+								content_first=content.substr(0,signStart+startToken.length);
+								content_last=content.substr(signEnd);
+								content=content_first+content_last;
+								console.log(content);
+								content=content_first+data.signature+content_last;
+								tinymce.get('content').setContent(content,{format: 'raw'});
+							}).always(function() {
+									if((--load_wait)==0) $("#load-spinner").fadeOut();
+							});
+						}
+					});
+					
 				$('#btn-discard-mail').click(function(){
 					dropzone_default.removeAllFiles( true );
 					$('#form-send-mail').trigger("reset");
@@ -126,26 +147,20 @@
 								$("#mail-accounts").data("selectBox-selectBoxIt").selectOption(data.account+"");
 								$("#to").val(data.from);
 								$("#in_reply_to").val(data.message_id);
-								{#wysihtml5Editor.setValue('</br></br>El '+moment(data.timestamp*1000).format('LLLL')+', '+data.from+' escribio: </br></br>'+data.content, false);#}
-								tinymce.get('content').setContent(data.signature+'</br></br>El '+moment(data.timestamp*1000).format('LLLL')+', '+data.from+' escribio: </br></br>'+data.content, {format: 'raw'});
+								tinymce.get('content').setContent('<!-- start:'+token+' -->'+'<!-- end:'+token+' -->'+'</br></br>El '+moment(data.timestamp*1000).format('LLLL')+', '+data.from+' escribio: </br></br>'+data.content, {format: 'raw'});
 							{% else %}
 								$('#subject').val('FWD: '+data.subject);
 								$("#mail-accounts").data("selectBox-selectBoxIt").selectOption(data.account+"");
-								{#wysihtml5Editor.setValue('</br></br>---------- Forwarded message ---------'+
-																				 '</br>From: '+data.from+
-																				 '</br>Date: '+moment(data.timestamp*1000).format('LLLL')+
-																				 '</br>Subject: '+data.subject+
-																				 '</br>To: '+data.to+'</br></br>'+data.content, false);#}
 								tinymce.get('content').setContent('</br></br>---------- Forwarded message ---------'+
 																				 '</br>From: '+data.from+
 																				 '</br>Date: '+moment(data.timestamp*1000).format('LLLL')+
 																				 '</br>Subject: '+data.subject+
-																				 '</br>To: '+data.to+'</br></br>'+data.content+data.signature, {format: 'raw'});
+																				 '</br>To: '+data.to+'</br></br>'+data.content+'<!-- start:'+token+' -->'+'<!-- end:'+token+' -->', {format: 'raw'});
 							{% endif %}
 					}).always(function() {
 							if((--load_wait)==0) $("#load-spinner").fadeOut();
 					});
-				{% endif %}
+					{%endif%}
       });
     </script>
 

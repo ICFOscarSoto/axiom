@@ -96,7 +96,9 @@ class EmailController extends Controller
 				'userData' => $userdata,
 				'id' => 0,
 				'mode' => 0,
-				'folder' => $folder->getId()
+				'folder' => $folder->getId(),
+				'signature' => $emailAccount->getSignature(),
+				'token' => uniqid('sign_').time()
 				]);
 
 		}else return new RedirectResponse($this->router->generate('app_login'));
@@ -121,7 +123,8 @@ class EmailController extends Controller
 				'userData' => $userdata,
 				'id' => $id,
 				'folder' => $folder,
-				'mode' => 1
+				'mode' => 1,
+				'token' => uniqid('sign_').time()
 				]);
 
 		}else return new RedirectResponse($this->router->generate('app_login'));
@@ -146,7 +149,8 @@ class EmailController extends Controller
 				'userData' => $userdata,
 				'id' => $id,
 				'folder' => $folder,
-				'mode' => 2
+				'mode' => 2,
+				'token' => uniqid('sign_').time()
 				]);
 
 		}else return new RedirectResponse($this->router->generate('app_login'));
@@ -360,6 +364,7 @@ class EmailController extends Controller
 					else $subject["default"]=(strtoupper($emailFolder->getId()==$emailAccount->getInboxFolder()->getId())?true:false);
 					$subject["unseen"]=$queryUnseen->getQuery()->getSingleScalarResult();
 					$return[$emailAccount->getId()]["name"]=$emailAccount->getName();
+					$return[$emailAccount->getId()]["signatureUrl"]=$this->generateUrl('emailGetSignature', array('id'=>$emailAccount->getId()));
 					$return[$emailAccount->getId()]["folders"][]=$subject;
 					//$return[$emailAccount->getId()][$emailFolder->getName()]=$emailFolder->getEmailSubjects();
 				}
@@ -598,6 +603,21 @@ class EmailController extends Controller
 		return new Response('');
 	}
 
+	/**
+	 * @Route("/api/emails/{id}/getSignature", name="emailGetSignature")
+	 */
+	public function emailGetSignature($id,RouterInterface $router,Request $request){
+		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+			$entityManager = $this->getDoctrine()->getManager();
+			$emailRepository = $this->getDoctrine()->getRepository(EmailAccounts::class);
+			$emailAccount=$emailRepository->find($id);
+				if($emailAccount->getUser()->getId()==$this->getUser()->getId()){
+					return new JsonResponse(array("signature" => $emailAccount->getSignature()!=null?$emailAccount->getSignature():""));
+				}
+		}
+		return new Response('');
+	}
 
 
 }
