@@ -162,10 +162,10 @@ class EmailController extends Controller
 	public function emailSend(RouterInterface $router,Request $request){
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
-			$fromId=$request->query->get('from');
-			$toString=$request->query->get('to');
-			$ccString=$request->query->get('cc');
-			$bccString=$request->query->get('bcc');
+			$fromId=$request->query->post('from');
+			$toString=$request->query->post('to');
+			$ccString=$request->query->post('cc');
+			$bccString=$request->query->post('bcc');
 			$entityManager = $this->getDoctrine()->getManager();
 			$emailRepository = $this->getDoctrine()->getRepository(EmailAccounts::class);
 			$emailFolderRepository = $this->getDoctrine()->getRepository(EmailFolders::class);
@@ -176,14 +176,14 @@ class EmailController extends Controller
 				"id"=> $fromId,
 				"user" => $this->getUser()->getId()
 			]);
-			$attachments = json_decode($request->query->get('files'));
-			$text = $request->query->get('text_content');
-			$html = $request->query->get('html_content');
+			$attachments = json_decode($request->query->post('files'));
+			$text = $request->query->post('text_content');
+			$html = $request->query->post('html_content');
 			dump($html);
 			//Generamos el mail para el envio SMTP
 			$headers = array(
 			              'From'    => $emailAccount->getUsername(),
-			              'Subject' => $request->query->get('subject'),
+			              'Subject' => $request->query->post('subject'),
 										'To' => implode(',',$emailUtils->extractEmailsFromString($toString)),
 										"Content-Type" => "text/html",
 										'charset' => "UTF-8",
