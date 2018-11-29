@@ -80,12 +80,9 @@
 								var endToken='<!-- end:'+token+' -->';
 								var signStart=content.indexOf(startToken);							
 								var signEnd=content.indexOf(endToken);
-								console.log(signStart);
-								console.log(signEnd);
 								content_first=content.substr(0,signStart+startToken.length);
 								content_last=content.substr(signEnd);
 								content=content_first+content_last;
-								console.log(content);
 								content=content_first+data.signature+content_last;
 								tinymce.get('content').setContent(content,{format: 'raw'});
 							}).always(function() {
