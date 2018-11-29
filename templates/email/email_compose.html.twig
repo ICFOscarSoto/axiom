@@ -112,14 +112,16 @@
 				  event.preventDefault();
 					if((++load_wait)==1) $("#load-spinner").fadeIn();
 				  data= $( this ).serialize()+"&text_content="+encodeURIComponent(tinyMCE.get('content').getBody().textContent)+"&html_content="+encodeURIComponent(tinyMCE.get('content').getContent())+"&files="+encodeURIComponent(JSON.stringify(jsonFiles)) ;
-					$.getJSON('{{ url('emailSend') }}',data, function( data ){
+					$.post('{{ url('emailSend') }}',data, function( data ){
 						dropzone_default.removeAllFiles( true );
 						$('#form-send-mail').trigger("reset");
 						if(data.result)	toastr.success("El correo se ha enviado correctamente", "Confirmación", confirmation);
 							else toastr.error("No se pudo enviar el correo", "Confirmación", confirmation);
-					}).always(function() {
+					},'json').always(function() {
 							if((--load_wait)==0) $("#load-spinner").fadeOut();
 					});
+
+
 				});
 				{#var wysihtml5Editor = $('#content').wysihtml5().data("wysihtml5").editor;#}
 				var wysihtml5Editor = tinymce.init({
