@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Entity\Email;
+namespace App\Modules\Email\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\Email\EmailFoldersRepository")
+ * @ORM\Entity(repositoryClass="App\Modules\Email\Repository\EmailFoldersRepository")
  */
 class EmailFolders
 {
@@ -24,19 +24,19 @@ class EmailFolders
     private $name;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Email\EmailAccounts", inversedBy="emailFolders")
+     * @ORM\ManyToOne(targetEntity="App\Modules\Email\Entity\EmailAccounts", inversedBy="emailFolders")
      * @ORM\JoinColumn(nullable=false)
      */
     private $emailAccount;
 
      /**
      * @ORM\OrderBy({"date" = "DESC", "uid" = "DESC"})
-     * @ORM\OneToMany(targetEntity="App\Entity\Email\EmailSubjects", mappedBy="folder", fetch="EAGER")
+     * @ORM\OneToMany(targetEntity="App\Modules\Email\Entity\EmailSubjects", mappedBy="folder", fetch="EAGER")
      */
     private $emailSubjects;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Email\EmailAccounts", mappedBy="inboxFolder")
+     * @ORM\OneToMany(targetEntity="App\Modules\Email\Entity\EmailAccounts", mappedBy="inboxFolder")
      */
     private $emailAccountsInbox;
 

@@ -2,4 +2,8 @@ twig:
     default_path: '%kernel.project_dir%/templates'
     debug: '%kernel.debug%'
     strict_variables: '%kernel.debug%'
+    paths:
+        '%kernel.project_dir%/templates/twig': Twig
+        '%kernel.project_dir%/src/Modules/Email/Templates': Email
+
     

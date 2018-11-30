@@ -1,6 +1,7 @@
 <?php
 
-namespace App\Controller\Email;
+//namespace App\Controller\Email;
+namespace App\Modules\Email\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Routing\Annotation\Route;
@@ -11,15 +12,15 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Entity\Globale\MenuOptions;
 use App\Entity\Globale\Users;
-use App\Entity\Email\EmailAccounts;
-use App\Entity\Email\EmailFolders;
-use App\Entity\Email\EmailSubjects;
-use App\Utils\Email\EmailUtils;
+use App\Modules\Email\Entity\EmailAccounts;
+use App\Modules\Email\Entity\EmailFolders;
+use App\Modules\Email\Entity\EmailSubjects;
+use App\Modules\Email\Utils\EmailUtils; 
 use Symfony\Component\Validator\Constraints\DateTime;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\MimeType\FileinfoMimeTypeGuesser;
-require_once __DIR__.'/../../../vendor/pear/mail/Mail.php';
-require_once __DIR__.'/../../../vendor/pear/mail_mime/Mail/mime.php';
+require_once __DIR__.'/../../../../vendor/pear/mail/Mail.php';
+require_once __DIR__.'/../../../../vendor/pear/mail_mime/Mail/mime.php';
 use Mail;
 use Mail_mime;
 class EmailController extends Controller
@@ -38,7 +39,7 @@ class EmailController extends Controller
 			$menurepository=$this->getDoctrine()->getRepository(MenuOptions::class);
 			$emailAccounts=$this->getUser()->getEmailAccounts();
 			$folder=($request->query->get('folder')!==null)?$request->query->get('folder'):$emailAccounts[0]->getInboxFolder()->getId();
-			return $this->render('email\email.html.twig', [
+			return $this->render('@Email/email_list.html.twig', [
 				'controllerName' => 'EmailController',
 				'interfaceName' => 'Correo electrónico',
 				'optionSelected' => 'email',
@@ -61,7 +62,7 @@ class EmailController extends Controller
 			$this->router = $router;
 			$userdata=$this->getUser()->getTemplateData();
 			$menurepository=$this->getDoctrine()->getRepository(MenuOptions::class);
-			return $this->render('email\email_message.html.twig', [
+			return $this->render('@Email/email_message.html.twig', [
 				'controllerName' => 'EmailController',
 				'interfaceName' => 'Correo electrónico',
 				'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
@@ -87,7 +88,7 @@ class EmailController extends Controller
 			$menurepository=$this->getDoctrine()->getRepository(MenuOptions::class);
 			$emailAccount=$this->getUser()->getEmailDefaultAccount();
 			$folder=$emailAccount->getInboxFolder();
-			return $this->render('email\email_compose.html.twig', [
+			return $this->render('@Email/email_compose.html.twig', [
 				'controllerName' => 'EmailController',
 				'interfaceName' => 'Correo electrónico',
 				'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
@@ -114,7 +115,7 @@ class EmailController extends Controller
 			$this->router = $router;
 			$userdata=$this->getUser()->getTemplateData();
 			$menurepository=$this->getDoctrine()->getRepository(MenuOptions::class);
-			return $this->render('email\email_compose.html.twig', [
+			return $this->render('@Email/email_compose.html.twig', [
 				'controllerName' => 'EmailController',
 				'interfaceName' => 'Correo electrónico',
 				'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
@@ -140,7 +141,7 @@ class EmailController extends Controller
 			$this->router = $router;
 			$userdata=$this->getUser()->getTemplateData();
 			$menurepository=$this->getDoctrine()->getRepository(MenuOptions::class);
-			return $this->render('email\email_compose.html.twig', [
+			return $this->render('@Email/email_compose.html.twig', [
 				'controllerName' => 'EmailController',
 				'interfaceName' => 'Correo electrónico',
 				'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),

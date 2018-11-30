@@ -1,11 +1,10 @@
 <?php
-
-namespace App\Entity\Email;
+namespace App\Modules\Email\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\Email\EmailSubjectsRepository")
+ * @ORM\Entity(repositoryClass="App\Modules\Email\Repository\EmailSubjectsRepository")
  */
 class EmailSubjects
 {
@@ -87,7 +86,7 @@ class EmailSubjects
     private $date;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Email\EmailFolders", inversedBy="emailSubjects")
+     * @ORM\ManyToOne(targetEntity="App\Modules\Email\Entity\EmailFolders", inversedBy="emailSubjects")
      * @ORM\JoinColumn(nullable=false)
      */
     private $folder;

@@ -1,6 +1,6 @@
 <?php
-
-namespace App\Entity\Email;
+//namespace App\Entity\Email;
+namespace App\Modules\Email\Entity;
 
 use App\Entity\Globale\Users;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -8,7 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\Email\EmailAccountsRepository")
+ * @ORM\Entity(repositoryClass="App\Modules\Email\Repository\EmailAccountsRepository")
  */
 class EmailAccounts
 {
@@ -56,7 +56,7 @@ class EmailAccounts
     private $user;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Email\EmailFolders", mappedBy="emailAccount", orphanRemoval=true, fetch="EAGER")
+     * @ORM\OneToMany(targetEntity="App\Modules\Email\Entity\EmailFolders", mappedBy="emailAccount", orphanRemoval=true, fetch="EAGER")
      */
     private $emailFolders;
 
@@ -81,17 +81,17 @@ class EmailAccounts
     private $smtpPassword;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Email\EmailFolders", inversedBy="emailAccountsInbox")
+     * @ORM\ManyToOne(targetEntity="App\Modules\Email\Entity\EmailFolders", inversedBy="emailAccountsInbox")
      */
     private $inboxFolder;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Email\EmailFolders")
+     * @ORM\ManyToOne(targetEntity="App\Modules\Email\Entity\EmailFolders")
      */
     private $sentFolder;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Email\EmailFolders")
+     * @ORM\ManyToOne(targetEntity="App\Modules\Email\Entity\EmailFolders")
      */
     private $trashFolder;
 

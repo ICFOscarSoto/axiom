@@ -1,5 +1,5 @@
 <?php
-namespace App\Utils\Email;
+namespace App\Modules\Email\Utils;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 class EmailUtils{

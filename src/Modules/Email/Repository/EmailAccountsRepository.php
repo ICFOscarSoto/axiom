@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Repository\Email;
+namespace App\Modules\Email\Repository;
 
-use App\Entity\Email\EmailAccounts;
+use App\Modules\Email\Entity\EmailAccounts;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 

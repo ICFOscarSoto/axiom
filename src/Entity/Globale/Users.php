@@ -2,7 +2,7 @@
 
 namespace App\Entity\Globale;
 
-use App\Entity\Email\EmailAccounts;
+use App\Modules\Email\Entity\EmailAccounts;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -93,12 +93,12 @@ class Users implements UserInterface
 	  public $updatedSeconds=1296000;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Email\EmailAccounts", mappedBy="user", orphanRemoval=true, fetch="EAGER")
+     * @ORM\OneToMany(targetEntity="App\Modules\Email\Entity\EmailAccounts", mappedBy="user", orphanRemoval=true, fetch="EAGER")
      */
     private $emailAccounts;
 
     /**
-     * @ORM\OneToOne(targetEntity="App\Entity\Email\EmailAccounts", cascade={"persist", "remove"})
+     * @ORM\OneToOne(targetEntity="App\Modules\Email\Entity\EmailAccounts", cascade={"persist", "remove"})
      */
     private $emailDefaultAccount;
 
