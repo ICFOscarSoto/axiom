@@ -16,7 +16,7 @@ class CalendarEventsRepository extends ServiceEntityRepository
 {
     public function __construct(RegistryInterface $registry)
     {
-        parent::__construct($registry, Events::class);
+        parent::__construct($registry, CalendarEvents::class);
     }
 
     // /**

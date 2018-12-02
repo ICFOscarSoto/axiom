@@ -43,7 +43,7 @@ class CalendarController extends Controller{
   public function calendarsList(RouterInterface $router,Request $request){
     $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
     if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
-      $calendarRepository = $this->getDoctrine()->getRepository(Calendars::class);
+      $calendarRepository = $this->getDoctrine()->getRepository(CalendarCalendars::class);
       $return=array();
       $user=$this->getUser();
       foreach($user->getCalendars() as $calendar){

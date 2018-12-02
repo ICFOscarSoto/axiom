@@ -49,6 +49,11 @@
     					</li>
 
     				</ul>
+						<div class="btn-group">
+							<a attr-url="" href="javascript:void(0);" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#calendar-modal-new-calendar">
+								<i class="fa fa-plus"></i><span>Nuevo Calendario</span>
+							</a>
+						</div>
     			</div>
     	</div>
 
@@ -61,6 +66,22 @@
 	{{ include('chat_histories.html.twig') }}
 </div>
 	<!-- MODALS  -->
+	<div class="modal fade" id="calendar-modal-new-calendar" data-backdrop="static" style="display: none;">
+		<div class="modal-dialog">
+			<div class="modal-content" style="transform: matrix(1, 0, 0, 1, 0, 0);">
+				<div class="modal-header">
+					<h4 class="modal-title">Nuevo calendario</h4>
+				</div>
+				<div id="calendar-modal-new-calendar-body" class="modal-body">
+
+				</div>
+				<div id="calendar-modal-new-calendar-footer" class="modal-footer">
+					<button type="button" class="btn btn-primary" data-dismiss="modal">Cancelar</button>
+					<button attr-id="" attr-action="" id="calendar-modal-new-calendar-button-continue" type="button" class="btn btn-red">Crear</button>
+				</div>
+			</div>
+		</div>
+	</div>
 
 	<!-- END MODALS -->
 {% block footer %}
