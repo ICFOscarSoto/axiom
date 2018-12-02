@@ -7,11 +7,10 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
- * @method MenuOptions[]    formatOptions($roles)
- * @method MenuOptions[]    getParents($role)
- * @method MenuOptions[]    getChilds($role)
- * @method MenuOptions[]    findByRole($role)
-findByRole
+ * @method MenuOptions|null find($id, $lockMode = null, $lockVersion = null)
+ * @method MenuOptions|null findOneBy(array $criteria, array $orderBy = null)
+ * @method MenuOptions[]    findAll()
+ * @method MenuOptions[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class MenuOptionsRepository extends ServiceEntityRepository
 {
@@ -20,9 +19,9 @@ class MenuOptionsRepository extends ServiceEntityRepository
         parent::__construct($registry, MenuOptions::class);
     }
 
-	public function formatBreadcrumb($route){
+    public function formatBreadcrumb($route){
 		$path=array();
-	
+
 		$row=$this->findByRoute($route);
 		if($row!=null){
 			$item=array();
@@ -31,7 +30,7 @@ class MenuOptionsRepository extends ServiceEntityRepository
 			$item["icon"]=$row->getIcon();
 			$path[]=$item;
 			while($row->getParent()!=NULL ){
-				
+
 				$row=$this->findById($row->getParent());
 				if($row!=null){
 					$item=array();
@@ -49,8 +48,8 @@ class MenuOptionsRepository extends ServiceEntityRepository
 		$path=array_reverse($path);
 		return $path;
 	}
-	
-	
+
+
 	public function formatOptions($roles){
 		$options=array();
 		$item = new MenuOptions();
@@ -61,19 +60,19 @@ class MenuOptionsRepository extends ServiceEntityRepository
 		foreach($roles as $role){
 			$parents=$this->getParents($role);
 			foreach($parents as $key_parent=>$parent){
-				
+
 				$childs=$this->getChilds($role, $parent->getId());
 				foreach($childs as $key_child=>$child){
-					$childs[$key_child]->childs=$this->getChilds($role, $child->getId());			
-				}		
+					$childs[$key_child]->childs=$this->getChilds($role, $child->getId());
+				}
 				$parents[$key_parent]->childs=$childs;
 			}
 			$options=array_merge($options,$parents);
 		}
-		
+
 		return $options;
 	}
-	
+
 	 /**
      * @return GlobalMenuOptions[] Returns an array of GlobalMenuOptions objects
     */
@@ -86,7 +85,7 @@ class MenuOptionsRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult()
         ;
-		
+
 	}
 	public function findById($id){
 		return $this->createQueryBuilder('f')
@@ -95,10 +94,10 @@ class MenuOptionsRepository extends ServiceEntityRepository
             ->getQuery()
             ->getOneOrNullResult()
         ;
-		
+
 	}
-	
-	
+
+
 	public function findByRoute($route){
 		return $this->createQueryBuilder('f')
             ->andWhere('f.rute = :val_route')
@@ -106,9 +105,9 @@ class MenuOptionsRepository extends ServiceEntityRepository
             ->getQuery()
             ->getOneOrNullResult()
         ;
-		
+
 	}
-	
+
 
 	/**
      * @return GlobalMenuOptions[] Returns an array of GlobalMenuOptions objects
@@ -123,9 +122,9 @@ class MenuOptionsRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult()
         ;
-		
+
 	}
-	
+
     /**
      * @return GlobalMenuOptions[] Returns an array of GlobalMenuOptions objects
     */
@@ -139,7 +138,7 @@ class MenuOptionsRepository extends ServiceEntityRepository
             ->getResult()
         ;
     }
- 
+
 
     /*
     public function findOneBySomeField($value): ?Famenuoptions

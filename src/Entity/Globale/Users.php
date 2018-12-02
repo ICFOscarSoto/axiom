@@ -2,6 +2,7 @@
 
 namespace App\Entity\Globale;
 
+use App\Modules\Calendar\Entity\CalendarCalendars;
 use App\Modules\Email\Entity\EmailAccounts;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -102,6 +103,11 @@ class Users implements UserInterface
      */
     private $emailDefaultAccount;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Modules\Calendar\Entity\CalendarCalendars", mappedBy="user" )
+     */
+    private $calendars;
+
 
 
     public function __construct()
@@ -118,6 +124,7 @@ class Users implements UserInterface
     $emailRepository = $em->getRepository(EmailAccounts::class);
     $emailAccounts=$emailRepository->findByUserId($this->id);
     foreach($emailAccounts as $emailAccount) $this->addEmailAccount($emailAccount);
+    $this->calendars = new ArrayCollection();
 
     }
 
@@ -230,13 +237,13 @@ class Users implements UserInterface
 
 
 	public function getTemplateData(){
-               $data["id"]=$this->getId();
-           		$data["email"]=$this->getEmail();
-           		$data["name"]=$this->getName();
-           		$data["firstname"]=$this->getFirstname();
-           		$data["roles"]=$this->getRoles();
-           		return $data;
-           	}
+                                 $data["id"]=$this->getId();
+                             		$data["email"]=$this->getEmail();
+                             		$data["name"]=$this->getName();
+                             		$data["firstname"]=$this->getFirstname();
+                             		$data["roles"]=$this->getRoles();
+                             		return $data;
+                             	}
 
     /**
      * @return Collection|UserGroups[]
@@ -382,6 +389,37 @@ class Users implements UserInterface
     public function setEmailDefaultAccount(?EmailAccounts $emailDefaultAccount): self
     {
         $this->emailDefaultAccount = $emailDefaultAccount;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|CalendarCalendars[]
+     */
+    public function getCalendars(): Collection
+    {
+        return $this->calendars;
+    }
+
+    public function addCalendar(Calendars $calendar): self
+    {
+        if (!$this->calendars->contains($calendar)) {
+            $this->calendars[] = $calendar;
+            $calendar->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCalendar(Calendars $calendar): self
+    {
+        if ($this->calendars->contains($calendar)) {
+            $this->calendars->removeElement($calendar);
+            // set the owning side to null (unless already changed)
+            if ($calendar->getUser() === $this) {
+                $calendar->setUser(null);
+            }
+        }
 
         return $this;
     }

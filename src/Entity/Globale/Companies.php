@@ -106,11 +106,17 @@ class Companies
      * @ORM\JoinColumn(nullable=false)
      */
     private $currency;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Globale\MenuOptions", mappedBy="company")
+     */
+    private $menuOptions;
 	public function __construct()
-                                           {
-                                               $this->userGroups = new ArrayCollection();
-                                               $this->users = new ArrayCollection();
-                                           }
+                                                          {
+                                                              $this->userGroups = new ArrayCollection();
+                                                              $this->users = new ArrayCollection();
+                                                              $this->menuOptions = new ArrayCollection();
+                                                          }
 
     public function getId(): ?int
     {
@@ -329,6 +335,37 @@ class Companies
     public function setCurrency(?Currencies $currency): self
     {
         $this->currency = $currency;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|MenuOptions[]
+     */
+    public function getMenuOptions(): Collection
+    {
+        return $this->menuOptions;
+    }
+
+    public function addMenuOption(MenuOptions $menuOption): self
+    {
+        if (!$this->menuOptions->contains($menuOption)) {
+            $this->menuOptions[] = $menuOption;
+            $menuOption->setCompany($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMenuOption(MenuOptions $menuOption): self
+    {
+        if ($this->menuOptions->contains($menuOption)) {
+            $this->menuOptions->removeElement($menuOption);
+            // set the owning side to null (unless already changed)
+            if ($menuOption->getCompany() === $this) {
+                $menuOption->setCompany(null);
+            }
+        }
 
         return $this;
     }

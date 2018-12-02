@@ -5,68 +5,49 @@ namespace App\Entity\Globale;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * GlobalMenuoptions
- *
- * @ORM\Table(name="global_menuoptions", indexes={@ORM\Index(name="FK_MENUOPTIONS_COMPANIES", columns={"id_company"})})
  * @ORM\Entity(repositoryClass="App\Repository\Globale\MenuOptionsRepository")
  */
 class MenuOptions
 {
     /**
-     * @var int
-     *
-     * @ORM\Column(name="id", type="integer", nullable=false)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
+     * @ORM\Id()
+     * @ORM\GeneratedValue()
+     * @ORM\Column(type="integer")
      */
     private $id;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="name", type="string", length=100, nullable=false)
+     * @ORM\Column(type="string", length=100)
      */
     private $name;
 
     /**
-     * @var string|null
-     *
-     * @ORM\Column(name="rute", type="string", length=150, nullable=true, options={"default"="NULL"})
+     * @ORM\Column(type="string", length=150, nullable=true)
      */
-    private $rute = 'NULL';
+    private $rute;
 
     /**
-     * @var string|null
-     *
-     * @ORM\Column(name="roles", type="text", length=0, nullable=true, options={"default"="NULL"})
+     * @ORM\Column(type="json_array", nullable=true)
      */
-    private $roles = 'NULL';
+    private $roles;
 
     /**
-     * @var string|null
-     *
-     * @ORM\Column(name="icon", type="string", length=150, nullable=true, options={"default"="NULL"})
+     * @ORM\Column(type="string", length=150, nullable=true)
      */
-    private $icon = 'NULL';
+    private $icon;
 
     /**
-     * @var int|null
-     *
-     * @ORM\Column(name="parent", type="integer", nullable=true, options={"default"="NULL"})
+     * @ORM\Column(type="integer", nullable=true)
      */
-    private $parent = 'NULL';
+    private $parent;
+
+    public $childs;
+    public $url;
 
     /**
-     * @var \GlobalCompanies
-     *
-     * @ORM\ManyToOne(targetEntity="Companies")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="id_company", referencedColumnName="id")
-     * })
+     * @ORM\ManyToOne(targetEntity="App\Entity\Globale\Companies", inversedBy="menuOptions")
      */
-    private $idCompany;
-	public $childs;
-	public $url;
+    private $company;
 
     public function getId(): ?int
     {
@@ -97,12 +78,12 @@ class MenuOptions
         return $this;
     }
 
-    public function getRoles(): ?string
+    public function getRoles()
     {
         return $this->roles;
     }
 
-    public function setRoles(?string $roles): self
+    public function setRoles($roles): self
     {
         $this->roles = $roles;
 
@@ -133,17 +114,15 @@ class MenuOptions
         return $this;
     }
 
-    public function getIdCompany(): ?Companies
+    public function getCompany(): ?Companies
     {
-        return $this->idCompany;
+        return $this->company;
     }
 
-    public function setIdCompany(?Companies $idCompany): self
+    public function setCompany(?Companies $company): self
     {
-        $this->idCompany = $idCompany;
+        $this->company = $company;
 
         return $this;
     }
-
-
 }
