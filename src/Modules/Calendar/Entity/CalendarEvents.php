@@ -95,12 +95,12 @@ class CalendarEvents
         return $this;
     }
 
-    public function getCalendar(): ?Calendars
+    public function getCalendar(): ?CalendarCalendars
     {
         return $this->calendar;
     }
 
-    public function setCalendar(?Calendars $calendar): self
+    public function setCalendar(?CalendarCalendars $calendar): self
     {
         $this->calendar = $calendar;
 

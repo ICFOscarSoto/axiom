@@ -114,7 +114,7 @@ class CalendarCalendars
         return $this->events;
     }
 
-    public function addEvent(Events $event): self
+    public function addEvent(CalendarEvents $event): self
     {
         if (!$this->events->contains($event)) {
             $this->events[] = $event;
@@ -124,7 +124,7 @@ class CalendarCalendars
         return $this;
     }
 
-    public function removeEvent(Events $event): self
+    public function removeEvent(CalendarEvents $event): self
     {
         if ($this->events->contains($event)) {
             $this->events->removeElement($event);

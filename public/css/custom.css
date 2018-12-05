@@ -132,10 +132,48 @@ table.dataTable.compact tbody th, table.dataTable.compact tbody td {
 
 }
 
+.modal-header {
+    background-color: #191b20 !important;
+}
+
+.modal-title{
+  color: #fff !important;
+  font-size: 18px !important;
+}
+
+.fc-toolbar .fc-left{
+  text-transform: capitalize;
+}
+
 .mce-panel {
     border: 0 solid #f3f3f3 !important;
 }
 
+
+.calendar-env .calendar-sidebar .events-list li a {
+    padding: 2px 7px !important;
+    margin-bottom: 4px !important;
+    margin-right: 2px !important;
+}
+
+.calendar-env .calendar-sidebar .events-list .btn-white {
+    padding: 8px 14px !important;
+}
+
+.calendar-env .calendar-sidebar .events-list .checkbox-replace, .radio-replace {
+    padding-top: 4px !important;
+}
+.colorpicker-bs-popover{
+  z-index: 999999 !important;
+}
+
+.dropdown-menu{
+  z-index: 999999 !important;
+}
+
+.datepicker{
+  z-index: 10011 !important;
+}
 /*
 .spinner-container {
    position: absolute;

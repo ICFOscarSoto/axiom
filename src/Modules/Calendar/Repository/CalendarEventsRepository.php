@@ -19,22 +19,21 @@ class CalendarEventsRepository extends ServiceEntityRepository
         parent::__construct($registry, CalendarEvents::class);
     }
 
-    // /**
-    //  * @return Events[] Returns an array of Events objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function findByRange($id, $start, $end)
     {
         return $this->createQueryBuilder('e')
-            ->andWhere('e.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('e.id', 'ASC')
-            ->setMaxResults(10)
+            ->andWhere('e.start >= :start')
+            ->andWhere('e.end <= :end')
+            ->andWhere('e.calendar = :calendar')
+            ->setParameter('start', $start)
+            ->setParameter('end', $end)
+            ->setParameter('calendar', $id)
+            ->orderBy('e.start', 'ASC')
             ->getQuery()
             ->getResult()
         ;
     }
-    */
+
 
     /*
     public function findOneBySomeField($value): ?Events
