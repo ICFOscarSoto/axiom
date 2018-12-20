@@ -2,7 +2,7 @@
 //namespace App\Entity\Email;
 namespace App\Modules\Email\Entity;
 
-use App\Entity\Globale\Users;
+use App\Modules\Globale\Entity\Users;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -50,7 +50,7 @@ class EmailAccounts
     private $password;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Globale\Users", inversedBy="emailAccounts")
+     * @ORM\ManyToOne(targetEntity="App\Modules\Globale\Entity\Users", inversedBy="emailAccounts")
      * @ORM\JoinColumn(nullable=false)
      */
     private $user;

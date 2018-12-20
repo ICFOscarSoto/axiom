@@ -19,14 +19,19 @@ doctrine:
     orm:
         auto_generate_proxy_classes: '%kernel.debug%'
         naming_strategy: doctrine.orm.naming_strategy.underscore
-        auto_mapping: true
+        auto_mapping: false
         mappings:
-            App:
+            #App:
+            #    is_bundle: false
+            #    type: annotation
+            #    dir: '%kernel.project_dir%/src/Entity'
+            #    prefix: 'App\Entity'
+            #    alias: App
+            Globale:
                 is_bundle: false
                 type: annotation
-                dir: '%kernel.project_dir%/src/Entity'
-                prefix: 'App\Entity'
-                alias: App
+                dir: '%kernel.project_dir%/src/Modules/Globale/Entity'
+                prefix: 'App\Modules\Globale\Entity'
             Share:
                 is_bundle: false
                 type: annotation

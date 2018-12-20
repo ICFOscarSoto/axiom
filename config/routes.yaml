@@ -18,3 +18,47 @@ Email:
 Calendar:
     resource: 'App\Modules\Calendar\Controller\CalendarController'
     type:     annotation
+
+Company:
+    resource: 'App\Modules\Globale\Controller\CompaniesController'
+    type:     annotation
+
+Country:
+    resource: 'App\Modules\Globale\Controller\CountriesController'
+    type:     annotation
+
+Currency:
+    resource: 'App\Modules\Globale\Controller\CurrenciesController'
+    type:     annotation
+
+Dashboard:
+    resource: 'App\Modules\Globale\Controller\DashboardController'
+    type:     annotation
+
+Default:
+    resource: 'App\Modules\Globale\Controller\DefaultController'
+    type:     annotation
+
+File:
+    resource: 'App\Modules\Globale\Controller\FilesController'
+    type:     annotation
+
+Image:
+    resource: 'App\Modules\Globale\Controller\ImagesController'
+    type:     annotation
+
+Notification:
+    resource: 'App\Modules\Globale\Controller\NotificationsController'
+    type:     annotation
+
+Security:
+    resource: 'App\Modules\Globale\Controller\SecurityController'
+    type:     annotation
+
+User:
+    resource: 'App\Modules\Globale\Controller\UsersController'
+    type:     annotation
+
+Form:
+    resource: 'App\Modules\Form\Controller\FormController'
+    type:     annotation

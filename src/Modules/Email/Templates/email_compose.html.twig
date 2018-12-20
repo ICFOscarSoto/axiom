@@ -6,18 +6,18 @@
 	<meta name="description" content="Neon Admin Panel" />
 	<meta name="author" content="" />
 	<link rel="icon" href="images/favicon.ico">
-	{{ include('header.html.twig') }}
+	{{ include('@Globale/header.html.twig') }}
 
 
 {% endblock %}
 <title>{% block title %}{{ interfaceName }}{% endblock %}</title>
 <body class="page-body" data-url="{{ url('indexAdmin') }}">
 <div class="page-container"><!-- add class "sidebar-collapsed" to close sidebar by default, "chat-visible" to make chat appear always -->
-	{{ include('sidebar_menu.html.twig') }}
+	{{ include('@Globale/sidebar_menu.html.twig') }}
 	<div class="main-content">
-		{{ include('head.html.twig') }}
+		{{ include('@Globale/head.html.twig') }}
 		<hr />
-		{{ include('breadcrumb.html.twig') }}
+		{{ include('@Globale/breadcrumb.html.twig') }}
 		<h2>{{ interfaceName }}</h2>
 		</br>
 		<!-- MAIN CONTENT -->
@@ -280,11 +280,11 @@
 					</div>
 				</div>
 		<!-- END MAIN CONTENT -->
-		{{ include('footer.html.twig') }}
+		{{ include('@Globale/footer.html.twig') }}
 	</div>
-	{{ include('chat.html.twig') }}
+	{{ include('@Globale/chat.html.twig') }}
 	<!-- Chat Histories -->
-	{{ include('chat_histories.html.twig') }}
+	{{ include('@Globale/chat_histories.html.twig') }}
 </div>
 	<!-- MODALS  -->
 	<!-- END MODALS -->
@@ -303,7 +303,7 @@
 	<script src="{{ url('index') }}js/moment.min.js"></script>
 	<script src="{{ url('index') }}js/moment-es.js"></script>
 
- {{ include('bottom.html.twig') }}
+ {{ include('@Globale/bottom.html.twig') }}
  <script src="{{ url('index') }}js/fileinput.js"></script>
  <script src="{{ url('index') }}js/dropzone/dropzone.js"></script>
  {#<script src="{{ url('index') }}js/wysihtml5/wysihtml5-0.4.0pre.min.js"></script>#}

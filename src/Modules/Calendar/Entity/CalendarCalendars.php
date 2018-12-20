@@ -2,7 +2,7 @@
 
 namespace App\Modules\Calendar\Entity;
 
-use App\Entity\Globale\Users;
+use App\Modules\Globale\Entity\Users;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -30,7 +30,7 @@ class CalendarCalendars
     private $color;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Globale\Users", inversedBy="calendars")
+     * @ORM\ManyToOne(targetEntity="App\Modules\Globale\Entity\Users", inversedBy="calendars")
      * @ORM\JoinColumn(nullable=false)
      */
     private $user;
