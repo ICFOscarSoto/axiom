@@ -1,0 +1,94 @@
+<!-- Share -->
+<div class="modal fade" tabindex="-1" id="calendar-modal-share" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content" style="transform: matrix(1, 0, 0, 1, 0, 0);">
+				<div class="modal-header">
+					<h4 class="modal-title">Compartir</h4>
+				</div>
+				<div id="calendar-modal-share-body" class="modal-body">
+					<div class="panel-body">
+					<form id="calendar-modal-share-form">
+						<div class="row">
+								<div class="col-md-12">
+									<div class="col-sm-12">
+										{#<input type="text" name="shareUserInput" id="shareUserInput" class="form-control typeahead" data-remote="{{ url('getUsersShareables') }}?q=%QUERY" data-template="<div class='thumb-entry'><span class='image'><img class='img-circle' src={{ '{{image}}' }} width=40 height=40 /></span><span class='text'><strong>{{ '{{name}}' }} {{ '{{firstname}}' }}</strong><em>{{ '{{email}}' }}</em></span></div>" placeholder="Usuario o grupo" />#}
+                    <input type="text" class="form-control" name="shareUserInput" id="shareUserInput" placeholder="Usuario o grupo" />
+                  </div>
+								</div>
+							</div>
+					</form>
+				</div>
+				</br></br>
+				</div>
+				<div id="calendar-modal-share-footer" class="modal-footer">
+					<button type="button" class="btn btn-primary" data-dismiss="modal">Cancelar</button>
+					<button attr-id="" attr-action="" id="calendar-modal-share-continue" type="button" class="btn btn-red">Guardar</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+<script>
+$(document).ready(function(){
+
+  var shareableUsers = new Bloodhound({
+    datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+    queryTokenizer: Bloodhound.tokenizers.whitespace,
+    remote: {
+      url: "{{ url('getUsersShareables') }}?q=%QUERY",
+      wildcard: '%QUERY'
+    }
+  });
+
+  var shareableGroups = new Bloodhound({
+    datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+    queryTokenizer: Bloodhound.tokenizers.whitespace,
+    remote: {
+      url: "{{ url('getUsersShareables') }}?q=%QUERY",
+      wildcard: '%QUERY'
+    }
+  });
+
+
+  $("#shareUserInput").typeahead({
+      //name: 'best-pictures',
+      //display: 'value',
+        highlight: true
+      },
+      {
+        name: 'shareable-users-list',
+        //display: 'team',
+        source: shareableGroups,
+        templates: {
+          header: '<h4 class="league-name">Grupos</h4>',
+          empty: [
+              '<div class="thumb-entry">',
+                'No se han encontrado usuarios ni grupos con los datos introducidos',
+              '</div>'
+            ].join('\n'),
+            suggestion: function(data) {
+              return "<div id='share-item-"+data.id+"' class='thumb-entry'><span class='image'><img class='img-circle' src='"+data.image+"' width=40 height=40 /></span><span class='text'><strong>"+data.name+" "+data.firstname+"</strong><em>"+data.email+"</em></span></div>";
+            }
+          }
+      },
+      {
+        name: 'shareable-groups-list',
+        //display: 'team',
+        source: shareableUsers,
+        templates: {
+          header: '<h4 class="league-name">Usuarios</h4>',
+          empty: [
+              '<div class="thumb-entry">',
+                'No se han encontrado usuarios ni grupos con los datos introducidos',
+              '</div>'
+            ].join('\n'),
+            suggestion: function(data) {
+              return "<div id='share-item-"+data.id+"' class='thumb-entry'><span class='image'><img class='img-circle' src='"+data.image+"' width=40 height=40 /></span><span class='text'><strong>"+data.name+" "+data.firstname+"</strong><em>"+data.email+"</em></span></div>";
+            }
+          }
+        });
+
+});
+
+
+</script>

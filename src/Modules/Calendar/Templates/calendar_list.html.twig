@@ -199,6 +199,8 @@
 			</div>
 		</div>
 	<!-- END MODALS -->
+  {{ include('@Share/shareForm.twig') }}
+
 {% block footer %}
 
 	<link rel="stylesheet" href="{{ url('index') }}js/datatables/datatables.css">
@@ -359,6 +361,7 @@
         });
       }
 
+
 			//Calendars load
 			function getCalendars(url, params){
 				if((++load_wait)==1) $("#load-spinner").fadeIn();
@@ -515,5 +518,6 @@
   </script>
   {{ include('bottom.html.twig') }}
 	<script src="{{ url('index') }}js/selectboxit/jquery.selectBoxIt.min.js"></script>
+	<script src="{{ url('index') }}js/typeahead.min.js"></script>
 {% endblock %}
 </body>

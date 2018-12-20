@@ -27,6 +27,11 @@ doctrine:
                 dir: '%kernel.project_dir%/src/Entity'
                 prefix: 'App\Entity'
                 alias: App
+            Share:
+                is_bundle: false
+                type: annotation
+                dir: '%kernel.project_dir%/src/Modules/Share/Entity'
+                prefix: 'App\Modules\Share\Entity'
             Email:
                 is_bundle: false
                 type: annotation

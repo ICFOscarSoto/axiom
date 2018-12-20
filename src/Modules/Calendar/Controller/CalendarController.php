@@ -111,10 +111,7 @@ class CalendarController extends Controller{
       $item["endDate"] = $event->getEnd()->format('d/m/Y');
       $item["endTime"] = $event->getEnd()->format('H:i');
       $item["description"] = $event->getDescription();
-
-
       return new JsonResponse($item);
-
     }
     return new Response();
   }

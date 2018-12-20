@@ -107,4 +107,31 @@ class UsersController extends Controller
 		$result=$entityUtils->enableObject($id, $this->class, $this->getDoctrine());
 		return new JsonResponse(array('result' => $result));
 	}
+
+
+	/**
+	* @Route("/api/users/getShareables", name="getUsersShareables")
+	*/
+	public function getUsersShareables(RouterInterface $router,Request $request){
+		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+			$userRepository = $this->getDoctrine()->getRepository(Users::class);
+			$return=array();
+			$user=$this->getUser();
+			$query=$request->query->get('q','');
+			$users=$userRepository->getShareables($user, $query);
+			foreach($users as $shareable){
+					$item["id"] = $shareable->getId();
+					$item["value"] = $shareable->getEmail();
+					$item["name"] = $shareable->getName();
+					$item["firstname"] = $shareable->getFirstname();
+					$item["email"] = $shareable->getEmail();
+					$item["image"] = $this->generateUrl('getUserImage', array('id'=>$shareable->getId()));
+					$item["tokens"] = Array(null, "");
+					$return[]=$item;
+			}
+			return new JsonResponse($return);
+		}return new Response();
+	}
+
 }

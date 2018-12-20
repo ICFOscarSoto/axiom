@@ -7,6 +7,10 @@
 logout:
     path: /logout
 
+Share:
+    resource: 'App\Modules\Share\Controller\ShareController'
+    type:     annotation
+
 Email:
     resource: 'App\Modules\Email\Controller\EmailController'
     type:     annotation

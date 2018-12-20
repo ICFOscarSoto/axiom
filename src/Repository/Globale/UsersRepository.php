@@ -19,6 +19,25 @@ class UsersRepository extends ServiceEntityRepository
         parent::__construct($registry, Users::class);
     }
 
+    public function getShareables($user, $query=""){
+      return $this->createQueryBuilder('u')
+          ->andWhere('u.company = :company')
+          ->andWhere('u.active = :active')
+          ->andWhere('u.deleted = :deleted')
+          ->andWhere('u.id <> :user')
+          ->andWhere('u.id <> :user')
+          ->andWhere('u.name LIKE :query OR u.firstname LIKE :query OR u.email LIKE :query')
+          ->setParameter('company', $user->getCompany())
+          ->setParameter('active', true)
+          ->setParameter('deleted', false)
+          ->setParameter('user', $user->getId())
+          ->setParameter('query', '%'.$query.'%')
+          ->orderBy('u.id', 'ASC')
+          ->getQuery()
+          ->getResult()
+      ;
+    }
+
     // /**
     //  * @return Users[] Returns an array of Users objects
     //  */
