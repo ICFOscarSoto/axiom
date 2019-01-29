@@ -1,6 +1,6 @@
 [{
 		"name": "company",
-    "submit":"/api/global/companies/new",
+    "submit":"/api/global/currencies/new",
 		"step": [{
 			"panels": [{
 				"label": "Datos Moneda",

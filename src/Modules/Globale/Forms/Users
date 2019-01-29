@@ -1,6 +1,6 @@
 [{
 		"name": "user",
-    "submit":"/api/global/user/new",
+    "submit":"/api/global/users/new",
 		"step": [{
 			"panels": [{
 				"label": "Datos Usuario",
