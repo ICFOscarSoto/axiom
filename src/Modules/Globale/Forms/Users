@@ -1,0 +1,258 @@
+[{
+		"name": "user",
+    "submit":"/api/global/users/new",
+		"step": [{
+			"panels": [{
+				"label": "Datos Usuario",
+				"group": [{
+					"fields": [{
+						"type": "text",
+            "label": "id",
+						"name": "id",
+            "nullable": "false",
+            "length":"11",
+						"value": "",
+						"placeholder": "",
+						"size": 4,
+						"order": 1,
+						"visibility": "hidden",
+						"urlautosugest": "",
+						"validationrules": ""
+
+					},
+          {
+						"type": "text",
+            "label": "Company",
+						"name": "vat",
+            "nullable": "false",
+            "length":"14",
+						"value": "",
+						"placeholder": "NIF/CIF",
+						"size": 3,
+						"order": 4,
+						"visibility": "visible",
+						"urlautosugest": "",
+						"validationrules": ""
+
+					},
+          {
+						"type": "text",
+            "label": "Email",
+						"name": "email",
+            "nullable": "true",
+            "length":"180",
+						"value": "",
+						"placeholder": "User email",
+						"size": 5,
+						"order": 2,
+						"visibility": "visible",
+						"urlautosugest": "",
+						"validationrules": ""
+
+					},
+          {
+						"type": "text",
+            "label": "Roles",
+						"name": "roles",
+            "nullable": "false",
+            "length":"100",
+						"value": "",
+						"placeholder": "Roles",
+						"size": 4,
+						"order": 3,
+						"visibility": "visible",
+						"urlautosugest": "",
+						"validationrules": ""
+
+					},
+          {
+						"type": "select",
+            "label": "Country",
+						"name": "country",
+            "nullable": "true",
+            "length":"70",
+						"value": ["España"],
+						"placeholder": "",
+						"size": 4,
+						"order": 5,
+						"visibility": "",
+						"urlautosugest": "",
+						"validationrules": "",
+						"originclass":"Country",
+						"origin":"/api/countries/select"
+					},
+          {
+						"type": "text",
+            "label": "Address",
+						"name": "address",
+            "nullable": "true",
+            "length":"150",
+						"value": "",
+						"placeholder": "",
+						"size": 10,
+						"order": 9,
+						"visibility": "",
+						"urlautosugest": "",
+						"validationrules": ""
+
+					},
+          {
+						"type": "text",
+            "label": "City",
+						"name": "city",
+            "nullable": "true",
+            "length":"70",
+						"value": "",
+						"placeholder": "",
+						"size": 4,
+						"order": 7,
+						"visibility": "",
+						"urlautosugest": "",
+						"validationrules": ""
+
+					},
+          {
+						"type": "text",
+            "label": "State",
+						"name": "state",
+            "nullable": "true",
+            "length":"125",
+						"value": "",
+						"placeholder": "",
+						"size": 4,
+						"order": 6,
+						"visibility": "",
+						"urlautosugest": "",
+						"validationrules": ""
+
+					},
+          {
+						"type": "text",
+            "label": "Postcode",
+						"name": "postcode",
+            "nullable": "true",
+            "length":"12",
+						"value": "",
+						"placeholder": "",
+						"size": 2,
+						"order": 8,
+						"visibility": "",
+						"urlautosugest": "",
+						"validationrules": ""
+
+					},
+          {
+						"type": "text",
+            "label": "Phone",
+						"name": "phone",
+            "nullable": "true",
+            "length":"12",
+						"value": "",
+						"placeholder": "",
+						"size": 5,
+						"order": 10,
+						"visibility": "",
+						"urlautosugest": "",
+						"validationrules": ""
+
+					},
+          {
+						"type": "text",
+            "label": "Mobile",
+						"name": "mobile",
+            "nullable": "true",
+            "length":"11",
+						"value": "",
+						"placeholder": "",
+						"size": 5,
+						"order": 11,
+						"visibility": "",
+						"urlautosugest": "",
+						"validationrules": ""
+
+					},
+					{
+						"type": "select",
+            "label": "Currency",
+						"name": "currency",
+            "nullable": "false",
+            "length":"11",
+						"value": ["Euro"],
+						"placeholder": "",
+						"size": 2,
+						"order": 12,
+						"visibility": "",
+						"urlautosugest": "",
+						"validationrules": "",
+						"originclass":"Currencies",
+						"origin":"/api/currencies/select"
+
+					},
+
+          {
+						"type": "checkbox",
+            "label": "Active",
+						"name": "active",
+            "nullable": "false",
+            "length":"70",
+						"value": "",
+						"placeholder": "",
+						"size": 5,
+						"order": 14,
+						"visibility": "",
+						"urlautosugest": "",
+						"validationrules": ""
+
+					},
+          {
+						"type": "checkbox",
+            "label": "Deleted",
+						"name": "deleted",
+            "nullable": "false",
+            "length":"70",
+						"value": "",
+						"placeholder": "",
+						"size": 5,
+						"order": 15,
+						"visibility": "",
+						"urlautosugest": "",
+						"validationrules": ""
+
+					},
+					{
+						"type": "datetime",
+            "label": "Date Add",
+						"name": "dateadd",
+            "nullable": "false",
+            "length":"70",
+						"value": "",
+						"placeholder": "",
+						"size": 5,
+						"order": 15,
+						"visibility": "",
+						"enabled":true,
+						"urlautosugest": "",
+						"validationrules": ""
+
+					},
+					{
+						"type": "datetime",
+            "label": "Last Update",
+						"name": "dateupd",
+            "nullable": "false",
+            "length":"70",
+						"value": "",
+						"placeholder": "",
+						"size": 5,
+						"order": 15,
+						"visibility": "",
+						"enabled":true,
+						"urlautosugest": "",
+						"validationrules": ""
+
+					}]
+				}]
+			}]
+		}]
+	}
+]

@@ -112,21 +112,10 @@ class Users implements UserInterface
 
     public function __construct()
     {
-    $this->usergroups = new ArrayCollection();
-    $this->notifications = new ArrayCollection();
-    $this->emailAccounts = new ArrayCollection();
-    $em = $this->getDoctrine()->getManager();
-
-    $notificationsRepository = $em->getRepository(Notifications::class);
-    $notifications=$notificationsRepository->findNoReaded($this->id);
-    foreach($notifications as $notification) $this->addNotification($notification);
-
-    $emailRepository = $em->getRepository(EmailAccounts::class);
-    $emailAccounts=$emailRepository->findByUserId($this->id);
-    foreach($emailAccounts as $emailAccount) $this->addEmailAccount($emailAccount);
-    $this->calendars = new ArrayCollection();
-
-    }
+      $this->usergroups = new ArrayCollection();
+      $this->notifications = new ArrayCollection();
+      $this->emailAccounts = new ArrayCollection();
+      }
 
     public function getId(): ?int
     {
@@ -424,4 +413,23 @@ class Users implements UserInterface
         return $this;
     }
 
+    public function encodeJson (){
+      $tempArray = array();
+      $vars = get_object_vars ( $this );
+      foreach( $vars as $key=>$var){
+          if(is_object($var)){
+            if(get_class($var)=="DateTime"){
+                $tempArray[$key."-date"] = $var->format('d/m/Y');
+                $tempArray[$key."-time"] = $var->format('H:i:s');;
+            }else{
+              if(method_exists($var,"getId")){
+                $tempArray[$key] = $var->getId();
+              }
+            }
+          }else{
+            $tempArray[$key] = $var;
+          }
+      }
+      return $tempArray;
+    }
 }

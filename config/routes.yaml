@@ -66,3 +66,6 @@ Form:
 IoT:
     resource: 'App\Modules\IoT\Controller\IoTController'
     type:     annotation
+
+Ticketing:
+   resource: 'App\Modules\Ticketing\Controller\TicketingController'

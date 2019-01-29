@@ -230,7 +230,7 @@
 						"size": 5,
 						"order": 15,
 						"visibility": "",
-						"enabled":true,
+						"enabled":false,
 						"urlautosugest": "",
 						"validationrules": ""
 
@@ -246,7 +246,7 @@
 						"size": 5,
 						"order": 15,
 						"visibility": "",
-						"enabled":true,
+						"enabled":false,
 						"urlautosugest": "",
 						"validationrules": ""
 
