@@ -62,3 +62,7 @@ User:
 Form:
     resource: 'App\Modules\Form\Controller\FormController'
     type:     annotation
+
+IoT:
+    resource: 'App\Modules\IoT\Controller\IoTController'
+    type:     annotation
