@@ -3,7 +3,7 @@
     "submit":"/api/global/companies/new",
 		"step": [{
 			"panels": [{
-				"label": "Datos Empresa",
+				"label": "Datos Moneda",
 				"group": [{
 					"fields": [{
 						"type": "text",
@@ -37,12 +37,12 @@
 					},
           {
 						"type": "text",
-            "label": "Iso Name",
-						"name": "isoname",
+            "label": "Iso Code",
+						"name": "isocode",
             "nullable": "true",
-            "length":"150",
+            "length":"3",
 						"value": "",
-						"placeholder": "Iso name",
+						"placeholder": "Iso code",
 						"size": 5,
 						"order": 3,
 						"visibility": "visible",
@@ -52,12 +52,12 @@
 					},
           {
 						"type": "text",
-            "label": "Alfa 2",
-						"name": "alfa2",
-            "nullable": "false",
-            "length":"2",
+            "label": "Char Code",
+						"name": "charcode",
+            "nullable": "true",
+            "length":"3",
 						"value": "",
-						"placeholder": "Alfa 2",
+						"placeholder": "Char code",
 						"size": 4,
 						"order": 4,
 						"visibility": "visible",
@@ -67,45 +67,15 @@
 					},
           {
 						"type": "text",
-            "label": "Alfa 3",
-						"name": "alfa3",
+            "label": "Decimal",
+						"name": "decimal",
             "nullable": "false",
-            "length":"3",
+            "length":"11",
 						"value": "",
 						"placeholder": "Alfa 2",
 						"size": 4,
 						"order": 5,
 						"visibility": "visible",
-						"urlautosugest": "",
-						"validationrules": ""
-
-					},
-          {
-						"type": "text",
-            "label": "Iso Number",
-						"name": "isonumber",
-            "nullable": "false",
-            "length":"11",
-						"value": "",
-						"placeholder": "",
-						"size": 10,
-						"order": 6,
-						"visibility": "",
-						"urlautosugest": "",
-						"validationrules": ""
-
-					},
-          {
-						"type": "checkbox",
-            "label": "Deleted",
-						"name": "deleted",
-            "nullable": "false",
-            "length":"70",
-						"value": "",
-						"placeholder": "",
-						"size": 5,
-						"order": 7,
-						"visibility": "",
 						"urlautosugest": "",
 						"validationrules": ""
 

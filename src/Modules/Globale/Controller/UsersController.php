@@ -12,7 +12,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Globale\Entity\MenuOptions;
 use App\Modules\Globale\Entity\Users;
 use App\Modules\Globale\Utils\ListUtils;
-use AApp\Modules\Globale\Utils\EntityUtils;
+use App\Modules\Globale\Utils\EntityUtils;
+use App\Modules\Form\Controller\FormController;
 
 class UsersController extends Controller
 {
@@ -47,7 +48,7 @@ class UsersController extends Controller
 		$listCompanies['orderDirection'] = 'DESC';
 		$listCompanies['tagColumn'] = 5;
 		$listCompanies['fieldButtons'] = array(
-			array("id" => "edit", "type" => "default", "icon" => "fa fa-edit", "name" => "editar", "route"=>"", "confirm" =>false, "actionType" => "foreground"),
+			array("id" => "edit", "type" => "default", "icon" => "fa fa-edit", "name" => "editar", "route"=>"editUser", "confirm" =>false, "actionType" => "foreground"),
 			array("id" => "desactivate", "type" => "info", "condition"=> "active", "conditionValue" =>true , "icon" => "fa fa-eye-slash","name" => "desactivar", "route"=>"disableUser", "confirm" =>true, "actionType" => "background" ),
 			array("id" => "activate", "type" => "info", "condition"=> "active", "conditionValue" =>false, "icon" => "fa fa-eye","name" => "activar", "route"=>"enableUser", "confirm" =>true, "actionType" => "background" ),
 			array("id" => "delete", "type" => "danger", "icon" => "fa fa-trash","name" => "borrar", "route"=>"", "confirm" =>true, "undo" =>false, "tooltip"=>"Borrar empresa", "actionType" => "background")
@@ -88,8 +89,95 @@ class UsersController extends Controller
 		return new JsonResponse($return);
 	}
 
+	/**
+	* @Route("/{_locale}/admin/global/users/{id}/edit", name="editUser")
+	*/
+	public function editUser($id,Request $request)
+		{
+			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			//$this->denyAccessUnlessGranted('ROLE_ADMIN');
+			$userdata=$this->getUser()->getTemplateData();
 
+			$locale = $request->getLocale();
+			$menurepository=$this->getDoctrine()->getRepository(MenuOptions::class);
+			$user = new Users();
 
+			//Create a Form
+			$formjs = new FormController();
+			$formDir =dirname(__FILE__)."/../Forms/Users";
+			$formjs->readJSON($formDir);
+			$formjs->printForm();
+
+			$new_breadcrumb["rute"]=null;
+			$new_breadcrumb["name"]="Nueva";
+			$new_breadcrumb["icon"]="fa fa-plus";
+			$breadcrumb=$menurepository->formatBreadcrumb('users');
+
+			array_push($breadcrumb, $new_breadcrumb);
+					return $this->render('@Globale/newcompany.html.twig', array(
+							'controllerName' => 'UsersController',
+							'interfaceName' => 'Empresas',
+							'optionSelected' => 'newCountry',
+							'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
+							'breadcrumb' =>  $breadcrumb,
+							'userData' => $userdata,
+							'formDatap' => $formjs->fullForm($this->generateUrl('getUser', array('id'=>$id)))
+
+					));
+	}
+
+	/**
+	* @Route("/{_locale}/admin/global/users/new", name="formUser")
+	*/
+
+	public function formUser(Request $request)
+	{
+		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		//$this->denyAccessUnlessGranted('ROLE_ADMIN');
+		$userdata=$this->getUser()->getTemplateData();
+
+		$locale = $request->getLocale();
+		$menurepository=$this->getDoctrine()->getRepository(MenuOptions::class);
+		$user = new Users();
+
+		//Create a Form
+		$formjs = new FormController();
+		$formDir =dirname(__FILE__)."/../Forms/Users";
+		$formjs->readJSON($formDir);
+		$formjs->printForm();
+
+		$new_breadcrumb["rute"]=null;
+		$new_breadcrumb["name"]="Nueva";
+		$new_breadcrumb["icon"]="fa fa-plus";
+		$breadcrumb=$menurepository->formatBreadcrumb('users');
+		array_push($breadcrumb, $new_breadcrumb);
+				return $this->render('@Globale/newcompany.html.twig', array(
+						'controllerName' => 'CompaniesController',
+						'interfaceName' => 'Empresas',
+						'optionSelected' => $request->attributes->get('_route'),
+						'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
+						'breadcrumb' =>  $breadcrumb,
+						'userData' => $userdata,
+						'formDatap' => $formjs->fullForm()
+				));
+	}
+	/**
+	* @Route("/api/global/companies/new", name="newUser")
+	*/
+	public function newUser(Request $request){}
+
+	/**
+  * @Route("/api/global/user/{id}/get", name="getUser")
+	*/
+	public function getCompany($id){
+		$user = $this->getDoctrine()->getRepository($this->class)->findOneById($id);
+		if (!$user) {
+	        throw $this->createNotFoundException('No user found for id '.$id );
+				}
+				//dump($user);
+				//return new JsonResponse();
+				return new JsonResponse($user->encodeJson());
+	}
 
 	/**
 	* @Route("/{_locale}/admin/global/users/{id}/disable", name="disableUser")

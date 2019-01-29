@@ -47,3 +47,8 @@ doctrine:
                 type: annotation
                 dir: '%kernel.project_dir%/src/Modules/Calendar/Entity'
                 prefix: 'App\Modules\Calendar\Entity'
+            Ticketing:
+                is_bundle: false
+                type: annotation
+                dir: '%kernel.project_dir%/src/Modules/Ticketing/Entity'
+                prefix: 'App\Modules\Ticketing\Entity'

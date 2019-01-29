@@ -62,3 +62,6 @@ User:
 Form:
     resource: 'App\Modules\Form\Controller\FormController'
     type:     annotation
+Ticketing:
+    resource: 'App\Modules\Ticketing\Controller\TicketingController'
+    type:     annotation

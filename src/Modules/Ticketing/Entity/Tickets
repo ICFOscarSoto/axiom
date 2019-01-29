@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Modules\Globale\Entity;
+namespace App\Modules\Ticketing\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass="App\Modules\Globale\Repository\CompaniesRepository")
+ * @ORM\Entity(repositoryClass="App\Modules\Ticketing\Repository\TicketsRepository")
  */
 class Companies
 {
@@ -21,57 +21,57 @@ class Companies
     /**
      * @ORM\Column(type="string", length=14)
      */
-    private $vat;
+    private $title;
 
     /**
-     * @ORM\Column(type="string", length=120, nullable=true)
+     * @ORM\Column(type="string", length=120, nullable=false)
      */
-    private $name;
+    private $content;
 
     /**
      * @ORM\Column(type="string", length=100)
      */
-    private $socialname;
+    private $language;
 
     /**
      * @ORM\Column(type="string", length=150, nullable=true)
      */
-    private $address;
+    private $department;
 
     /**
      * @ORM\Column(type="string", length=70, nullable=true)
      */
-    private $city;
+    private $file;
 
     /**
      * @ORM\Column(type="string", length=125, nullable=true)
      */
-    private $state;
+    private $date;
 
     /**
      * @ORM\Column(type="string", length=12, nullable=true)
      */
-    private $postcode;
+    private $unread;
 
     /**
      * @ORM\Column(type="string", length=32, nullable=true)
      */
-    private $phone;
+    private $closed;
 
     /**
      * @ORM\Column(type="string", length=32, nullable=true)
      */
-    private $mobile;
+    private $priority;
 
     /**
      * @ORM\Column(type="datetime")
      */
-    private $dateadd;
+    private $author;
 
     /**
      * @ORM\Column(type="datetime")
      */
-    private $dateupd;
+    private $owner;
 
     /**
      * @ORM\Column(type="boolean")

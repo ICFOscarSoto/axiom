@@ -153,6 +153,8 @@ class CompaniesController extends Controller
 			if (!$company) {
         throw $this->createNotFoundException('No company found for id '.$id );
 			}
+			dump ($company);
+			return new JsonResponse();
 			return new JsonResponse($company->encodeJson());
 		}
 
@@ -170,7 +172,7 @@ class CompaniesController extends Controller
 			$company = new Companies();
 
 			//Create a Form
-			$formjs = new Form();
+			$formjs = new FormController();
 			$formDir =dirname(__FILE__)."/../Forms/Companies";
 			$formjs->readJSON($formDir);
 			$formjs->printForm();
