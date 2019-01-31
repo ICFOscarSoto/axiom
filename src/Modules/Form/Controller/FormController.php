@@ -7,6 +7,7 @@ use App\Modules\Globale\Entity\Companies;
 */
 class FormController extends Controller{
   var $fullform ="<script>var load_wait=0;</script>";
+  var $submitRoute;
   var $formid;
   var $name;
   var $action;
@@ -55,64 +56,6 @@ class FormController extends Controller{
     return ($a["order"]<=$b["order"] ? -1:1);
   }
 
-
-
-  /*======================================
-  ==           Prepare Form             ==
-  ========================================*/
-  /*
-  function addForm($name,$submit){
-  $tempform = array("name" => $name, "submit"=>$submit, "step" => array());
-  array_push($this->form,$tempform);
-}
-function removeForm($name){
-
-$key = array_search($name, array_column($this->form, "name"));
-if($key !== FALSE){
-array_splice($this->form,$key,1);
-}
-}
-
-function addStep($nameform){
-$key = array_search($nameform, array_column($this->form, "name"));
-
-if($key !== FALSE){
-$tempstep = array ("panels"=>array());
-$this->form[$key]["step"][]=$tempstep;
-}
-}
-function removeStep($nameform,$step){
-$key = array_search($nameform, array_column($this->form, "name"));
-
-if($key !== FALSE){
-array_splice($this->form[$key]["step"],$step,1);
-}
-
-}
-function addPanel($nameform,$step,$namepanel){
-$key = array_search($nameform, array_column($this->form, "name"));
-
-if($key !== FALSE){
-$temppanel = array ("name"=>$namepanel, "groups"=>array());
-$this->form[$key]["step"][$step]=$temppanel;
-}
-}
-
-function removePanel($nameform,$step,$namepanel){
-$key = array_search($nameform, array_column($this->form, "name"));
-
-if($key !== FALSE){
-$keypanel = array_search($namepanel, array_column($this->form[$key]["step"][$step], "name"));
-if($keypanel !== FALSE){
-array_splice($this->form[$key]["step"]["step"],$keypanel,1);
-}
-}
-}
-function addGroup($nameForm,$step,$namepanel){}
-function removeGroup($nameForm,$step,$namepanel){}
-function addfield($nameForm,$step,$namepanel){}
-function removefield($nameForm,$step,$namepanel){}*/
-
 /**
 * datareceived processing of form data and save it
 *
@@ -160,11 +103,12 @@ function datareceived($container,Request $request, $object){
     }
   }
   try{
+    dump($object);
     $entityManager->persist($object);
     $entityManager->flush();
   }
   catch(Exception $e){
-    return null;
+    return $this->createNotFoundException('Can\'t populate object');;
   }
   return $object;
 }
@@ -214,6 +158,7 @@ function printForm(){
   foreach ($this->form as $form){
 
     $this->openForm($form["name"]);//Open forms
+    $this->submitRoute=$form["submit"]; //Submit route
     foreach ($form["step"] as $step){
       if(count($form["step"])>1){
         $this->addStep("");
@@ -527,7 +472,7 @@ function addDateTime( $name, $label,$visibility, $value='',$enabled=true,$valida
   function closePanel(){
     $closePanel = "</div>"; //Close PanelBody
     $closePanel .="<div class='panel-footer text-right'>";
-    $closePanel .= "<button class='btn btn-sm btn-red' type='submit' form='".$this->formid."' onclick='this.disabled='>
+    $closePanel .= "<button class='btn btn-sm btn-red' type='submit' form='".$this->formid."' onclick='this.disabled'>
     <span class='glyphicon glyphicon-floppy-disk'></span> Guardar  </button>";
     $closePanel .= "</div></div>"; //Close Panel footer and full panel
     $this->fullform .= $closePanel;
@@ -546,7 +491,6 @@ function addDateTime( $name, $label,$visibility, $value='',$enabled=true,$valida
     }
 
     public function fullForm($routeData=null){
-      $this->onsubmit="/api/global/companies/new"; //Test route
       $this->fullform .= "<script type='text/javascript'>";
       if($routeData!=null){
         $this->fullform .="
@@ -554,6 +498,7 @@ function addDateTime( $name, $label,$visibility, $value='',$enabled=true,$valida
         $.getJSON('".$routeData."', function( data ) {
           $.each( data, function( key, val ) {
             $(\"#\"+key).val(val);
+            console.log(key +':'+val);
           });
           replaceCheckboxes();
         }).always(function() {
@@ -568,7 +513,7 @@ function addDateTime( $name, $label,$visibility, $value='',$enabled=true,$valida
           e.preventDefault();
           var form = $(this);
           if(! form.valid()) return false;
-          var action = window.location.origin + '".$this->onsubmit."';
+          var action = window.location.origin + '".$this->submitRoute."';
           var dataString = $('#".$this->formid."').serialize()".$this->serializeSwitches.";
           $.ajax({
             type: 'GET',

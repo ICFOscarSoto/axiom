@@ -99,8 +99,6 @@ class CompaniesController extends Controller
 	*/
 	public function form(Request $request)
     {
-
-
     	$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 			//$this->denyAccessUnlessGranted('ROLE_ADMIN');
 			$userdata=$this->getUser()->getTemplateData();
@@ -111,7 +109,7 @@ class CompaniesController extends Controller
 
 			//Create a Form
 			$formjs = new FormController();
-			$formDir =dirname(__FILE__)."/../Forms/Companies";
+			$formDir = dirname(__FILE__)."/../Forms/Companies";
 			$formjs->readJSON($formDir);
 			$formjs->printForm();
 
@@ -139,7 +137,6 @@ class CompaniesController extends Controller
 				 $company = new Companies();
 				 $form = new FormController();
 				 $formDir =dirname(__FILE__)."/../Forms/Companies";
-				 dump($formDir);
 				 $form->readJSON($formDir);
 				 $company=$form->datareceived($this,$request,$company);
 				 if($company == null) return new JsonResponse(array("result"=>-1));
@@ -153,8 +150,6 @@ class CompaniesController extends Controller
 			if (!$company) {
         throw $this->createNotFoundException('No company found for id '.$id );
 			}
-			dump ($company);
-			return new JsonResponse();
 			return new JsonResponse($company->encodeJson());
 		}
 

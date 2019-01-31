@@ -39,7 +39,7 @@ class CountriesController extends Controller
 		$listCompanies['orderDirection'] = 'DESC';
 		$listCompanies['tagColumn'] = 3;
 		$listCompanies['fieldButtons'] = array(
-			array("id" => "edit", "type" => "default", "icon" => "fa fa-edit", "name" => "editar", "route"=>"", "confirm" =>false, "actionType" => "foreground"),
+			array("id" => "edit", "type" => "default", "icon" => "fa fa-edit", "name" => "editar", "route"=>"editCountry", "confirm" =>false, "actionType" => "foreground"),
 			array("id" => "desactivate", "type" => "info", "icon" => "fa fa-eye-slash","name" => "desactivar", "route"=>"", "confirm" =>true, "actionType" => "background" ),
 			array("id" => "delete", "type" => "danger", "icon" => "fa fa-trash","name" => "borrar", "route"=>"", "confirm" =>true, "undo" =>false, "tooltip"=>"Borrar pa�s", "actionType" => "background")
 		);
@@ -64,7 +64,7 @@ class CountriesController extends Controller
 		return new RedirectResponse($this->router->generate('app_login'));
     }
 		/**
-		* @Route("/{_locale}/admin/global/currencies/new", name="formCurrency")
+		* @Route("/{_locale}/admin/global/countries/new", name="formCountries")
 		*/
 
 		public function formUser(Request $request)
@@ -78,7 +78,7 @@ class CountriesController extends Controller
 			$country = new Countries();
 			//Create a Form
 			$formjs = new FormController();
-			$formDir =dirname(__FILE__)."/../Forms/Country";
+			$formDir =dirname(__FILE__)."/../Forms/Countries";
 			$formjs->readJSON($formDir);
 			$formjs->printForm();
 
@@ -147,7 +147,7 @@ class CountriesController extends Controller
 	* @Route("/api/global/countries/new", name="newCountry")
 	*/
 	public function newCurrency(Request $request){
-		$country = new Country();
+		$country = new Countries();
 		$form = new FormController();
 		$formDir =dirname(__FILE__)."/../Forms/Countries";
 		$form->readJSON($formDir);
