@@ -390,6 +390,7 @@ class Users implements UserInterface
         return $this->calendars;
     }
 
+/*
     public function addCalendar(Calendars $calendar): self
     {
         if (!$this->calendars->contains($calendar)) {
@@ -411,7 +412,7 @@ class Users implements UserInterface
         }
 
         return $this;
-    }
+    }*/
 
     public function encodeJson (){
       $tempArray = array();

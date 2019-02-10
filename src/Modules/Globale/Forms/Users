@@ -1,166 +1,23 @@
 [{
-		"name": "user",
-    "submit":"/api/global/users/new",
-		"step": [{
-			"panels": [{
-				"label": "Datos Usuario",
-				"group": [{
-					"fields": [{
-						"type": "text",
-            "label": "id",
-						"name": "id",
-            "nullable": "false",
-            "length":"11",
-						"value": "",
-						"placeholder": "",
-						"size": 4,
-						"order": 1,
-						"visibility": "hidden",
-						"urlautosugest": "",
-						"validationrules": ""
-
-					},
-          {
-						"type": "text",
-            "label": "Name",
-						"name": "name",
-            "nullable": "false",
-            "length":"50",
-						"value": "",
-						"placeholder": "Name",
-						"size": 4,
-						"order": 2,
-						"visibility": "visible",
-						"urlautosugest": "",
-						"validationrules": ""
-
-					},
-          {
-						"type": "text",
-            "label": "First Name",
-						"name": "firstname",
-            "nullable": "true",
-            "length":"180",
-						"value": "",
-						"placeholder": "User email",
-						"size": 4,
-						"order": 3,
-						"visibility": "visible",
-						"urlautosugest": "",
-						"validationrules": ""
-
-					},
-          {
-						"type": "select",
-            "label": "Company",
-						"name": "company",
-            "nullable": "false",
-            "length":"100",
-						"value": "",
-						"placeholder": "Roles",
-						"size": 4,
-						"order": 5,
-						"visibility": "visible",
-						"urlautosugest": "",
-						"validationrules": "",
-						"originclass":"Companies",
-						"origin":"/api/companies/select"
-
-					},
-          {
-						"type": "text",
-            "label": "Email",
-						"name": "email",
-            "nullable": "true",
-            "length":"150",
-						"value": "",
-						"placeholder": "",
-						"size": 4,
-						"order": 4,
-						"visibility": "",
-						"urlautosugest": "",
-						"validationrules": ""
-
-					},
-          {
-						"type": "password",
-            "label": "Password",
-						"name": "plainpassword",
-            "nullable": "true",
-            "length":"70",
-						"value": "",
-						"placeholder": "",
-						"size": 4,
-						"order": 7,
-						"visibility": "",
-						"urlautosugest": "",
-						"validationrules": ""
-
-					},
-          {
-						"type": "checkbox",
-            "label": "Active",
-						"name": "active",
-            "nullable": "false",
-            "length":"70",
-						"value": "",
-						"placeholder": "",
-						"size": 5,
-						"order": 14,
-						"visibility": "",
-						"urlautosugest": "",
-						"validationrules": ""
-
-					},
-          {
-						"type": "checkbox",
-            "label": "Deleted",
-						"name": "deleted",
-            "nullable": "false",
-            "length":"70",
-						"value": "",
-						"placeholder": "",
-						"size": 5,
-						"order": 15,
-						"visibility": "",
-						"urlautosugest": "",
-						"validationrules": ""
-
-					},
-					{
-						"type": "datetime",
-            "label": "Date Add",
-						"name": "dateadd",
-            "nullable": "false",
-            "length":"70",
-						"value": "",
-						"placeholder": "",
-						"size": 5,
-						"order": 15,
-						"visibility": "",
-						"enabled":true,
-						"urlautosugest": "",
-						"validationrules": ""
-
-					},
-					{
-						"type": "datetime",
-            "label": "Last Update",
-						"name": "dateupd",
-            "nullable": "false",
-            "length":"70",
-						"value": "",
-						"placeholder": "",
-						"size": 5,
-						"order": 15,
-						"visibility": "",
-						"enabled":true,
-						"urlautosugest": "",
-						"validationrules": ""
-
-					}]
-				}]
-			}]
-		}]
-	}
-]
+	"fields": [{
+			"field": "name",
+			"cols": 5
+		},
+		{
+			"field": "firstname",
+			"cols": 7
+		},
+		{
+			"field": "email",
+			"cols": 4
+		},
+		{
+			"field": "company",
+			"cols": 4
+		},
+		{
+			"field": "roles",
+			"cols": 4
+		}
+	]
+}]

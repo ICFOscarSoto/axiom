@@ -11,13 +11,17 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Globale\Entity\MenuOptions;
 use App\Modules\Globale\Entity\Countries;
+use App\Modules\Globale\Utils\EntityUtils;
 use App\Modules\Globale\Utils\ListUtils;
 use App\Modules\Globale\Utils\FormUtils;
 
 
 class CountriesController extends Controller
 {
-	private $listFields=array(array("name" => "id", "caption"=>""),array("name" => "name", "caption"=>"Nombre", "width" => "50"), array("name" =>"alfa2","caption"=>"ISO Code 2"), array("name" =>"alfa3","caption"=>"ISO Code 3"));
+	private $class=Countries::class;
+	private $listFields=array(array("name" => "id", "caption"=>""),array("name" => "name", "caption"=>"Nombre", "width" => "50"), array("name" =>"alfa2","caption"=>"ISO Code 2"), array("name" =>"alfa3","caption"=>"ISO Code 3"),
+														array("name" => "active", "caption"=>"Estado", "width"=>"10%" ,"class" => "dt-center", "replace"=>array("1"=>"<div style=\"min-width: 75px;\" class=\"label label-success\">Activo</div>",
+																																																																		"0" => "<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado</div>")));
 
     /**
      * @Route("/{_locale}/admin/global/countries", name="countries")
@@ -41,11 +45,12 @@ class CountriesController extends Controller
 		$listCompanies['tagColumn'] = 3;
 		$listCompanies['fieldButtons'] = array(
 			array("id" => "edit", "type" => "default", "icon" => "fa fa-edit", "name" => "editar", "route"=>"editCountry", "confirm" =>false, "actionType" => "foreground"),
-			array("id" => "desactivate", "type" => "info", "icon" => "fa fa-eye-slash","name" => "desactivar", "route"=>"", "confirm" =>true, "actionType" => "background" ),
+			array("id" => "desactivate", "type" => "info", "condition"=> "active", "conditionValue" =>true , "icon" => "fa fa-eye-slash","name" => "desactivar", "route"=>"disableCountry", "confirm" =>true, "actionType" => "background" ),
+			array("id" => "activate", "type" => "info", "condition"=> "active", "conditionValue" =>false, "icon" => "fa fa-eye","name" => "activar", "route"=>"enableCountry", "confirm" =>true, "actionType" => "background" ),
 			array("id" => "delete", "type" => "danger", "icon" => "fa fa-trash","name" => "borrar", "route"=>"", "confirm" =>true, "undo" =>false, "tooltip"=>"Borrar país", "actionType" => "background")
 		);
 		$listCompanies['topButtons'] = array(
-			array("id" => "addTop", "type" => "btn-primary", "icon" => "fa fa-plus", "name" => "", "route"=>"", "confirm" =>false, "tooltip" => "Crear nuevo país"),
+			array("id" => "addTop", "type" => "btn-primary", "icon" => "fa fa-plus", "name" => "", "route"=>"newCountry", "confirm" =>false, "tooltip" => "Crear nuevo país"),
 			array("id" => "deleteTop", "type" => "btn-red", "icon" => "fa fa-trash","name" => "", "route"=>"", "confirm" =>true),
 			array("id" => "printTop", "type" => "", "icon" => "fa fa-print","name" => "", "route"=>"", "confirm" =>false),
 			array("id" => "exportTop", "type" => "", "icon" => "fa fa-file-excel-o","name" => "", "route"=>"", "confirm" =>false)
@@ -77,25 +82,26 @@ class CountriesController extends Controller
 			$locale = $request->getLocale();
 			$menurepository=$this->getDoctrine()->getRepository(MenuOptions::class);
 			$country = new Countries();
-			//Create a Form
-			$formjs = new FormController();
-			$formDir =dirname(__FILE__)."/../Forms/Country";
-			$formjs->readJSON($formDir);
-			$formjs->printForm();
 
 			$new_breadcrumb["rute"]=null;
-			$new_breadcrumb["name"]="Nueva";
+			$new_breadcrumb["name"]="Nuevo";
 			$new_breadcrumb["icon"]="fa fa-plus";
-			$breadcrumb=$menurepository->formatBreadcrumb('users');
+			$breadcrumb=$menurepository->formatBreadcrumb('countries');
+
+			$formUtils=new FormUtils();
+			$formUtils->init($this->getDoctrine(),$request);
+			$form=$formUtils->createFromEntity($country, $this)->getForm();
+			$formUtils->proccess($form,$country);
+
 			array_push($breadcrumb, $new_breadcrumb);
-					return $this->render('@Globale/newcompany.html.twig', array(
+					return $this->render('@Globale/genericform.html.twig', array(
 							'controllerName' => 'CountriesController',
-							'interfaceName' => 'Empresas',
-							'optionSelected' => $request->attributes->get('_route'),
+							'interfaceName' => 'Paises',
+							'optionSelected' => 'countries',
 							'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
 							'breadcrumb' =>  $breadcrumb,
 							'userData' => $userdata,
-							'formDatap' => $formjs->fullForm()
+							'form' => ["form" => $form->createView(),"template" => json_decode(file_get_contents (dirname(__FILE__)."/../Forms/Countries"),true)]
 					));
 		}
 		/**
@@ -126,33 +132,21 @@ class CountriesController extends Controller
 				$breadcrumb=$menurepository->formatBreadcrumb('countries');
 				array_push($breadcrumb, $new_breadcrumb);
 
-				$country = new Countries();
-				$entityManager = $this->getDoctrine()->getManager();
 				$countryRepository = $this->getDoctrine()->getRepository(Countries::class);
 				$country=$countryRepository->find($id);
-				$form = $this->createFormBuilder($country)
-										->add('name')
-										->add('isoname')
-										->add('alfa2')
-										->add('alfa3')
-										->add('isonumber')
-				            ->add('save', SubmitType::class, array('label' => 'Guardar'))
-				            ->getForm();
-				$form->handleRequest($request);
-	      if ($form->isSubmitted() && $form->isValid()) {
-	         $country = $form->getData();
-					 $entityManager->persist($country);
-					 $entityManager->flush();
-        }
+				$formUtils=new FormUtils();
+				$formUtils->init($this->getDoctrine(),$request);
+				$form=$formUtils->createFromEntity($country,$this)->getForm();
+				$formUtils->proccess($form,$country);
 
-				return $this->render('@Globale/formcountry.html.twig', array(
+				return $this->render('@Globale/genericform.html.twig', array(
 								'controllerName' => 'CountriesController',
 								'interfaceName' => 'Paises',
 								'optionSelected' => 'countries',
 								'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
 								'breadcrumb' =>  $breadcrumb,
 								'userData' => $userdata,
-								'form' => $form->createView()
+								'form' => ["form" => $form->createView(),"template" => json_decode(file_get_contents (dirname(__FILE__)."/../Forms/Countries"),true)]
 				));
 		}
 
@@ -172,21 +166,23 @@ class CountriesController extends Controller
 		return new JsonResponse($return);
 	}
 
-	 /**
-	 * @Route("/api/countries/select", name="countriesSelect")
-	 */
-	public function countriesSelect(RouterInterface $router,Request $request){
-		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-		$user = $this->getUser();
-		$locale = $request->getLocale();
-		$this->router = $router;
-		$manager = $this->getDoctrine()->getManager();
-		$repository = $manager->getRepository(Countries::class);
-		$result=array();
-		$countries= $repository->findBy(["deleted"=>false]);
-		foreach($countries as $country){
-			$result[]=array("id" => $country->getId(), "name" => $country->getName());
-		}
-		return new JsonResponse($result);
+	/**
+	* @Route("/{_locale}/admin/global/countries/{id}/disable", name="disableCountry")
+	*/
+	public function disable($id)
+    {
+		$entityUtils=new EntityUtils();
+		$result=$entityUtils->disableObject($id, $this->class, $this->getDoctrine());
+		return new JsonResponse(array('result' => $result));
+	}
+
+	/**
+	* @Route("/{_locale}/admin/global/countries/{id}/enable", name="enableCountry")
+	*/
+	public function enable($id)
+    {
+		$entityUtils=new EntityUtils();
+		$result=$entityUtils->enableObject($id, $this->class, $this->getDoctrine());
+		return new JsonResponse(array('result' => $result));
 	}
 }

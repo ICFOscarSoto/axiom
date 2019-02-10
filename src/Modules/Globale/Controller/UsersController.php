@@ -12,8 +12,9 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Globale\Entity\MenuOptions;
 use App\Modules\Globale\Entity\Users;
 use App\Modules\Globale\Utils\ListUtils;
+use App\Modules\Globale\Utils\FormUtils;
 use App\Modules\Globale\Utils\EntityUtils;
-use App\Modules\Form\Controller\FormController;
+
 
 class UsersController extends Controller
 {
@@ -54,7 +55,7 @@ class UsersController extends Controller
 			array("id" => "delete", "type" => "danger", "icon" => "fa fa-trash","name" => "borrar", "route"=>"", "confirm" =>true, "undo" =>false, "tooltip"=>"Borrar empresa", "actionType" => "background")
 		);
 		$listCompanies['topButtons'] = array(
-			array("id" => "addTop", "type" => "btn-primary", "icon" => "fa fa-plus", "name" => "", "route"=>"", "confirm" =>false, "tooltip" => "Crear nuevo pa�s"),
+			array("id" => "addTop", "type" => "btn-primary", "icon" => "fa fa-plus", "name" => "", "route"=>"newUser", "confirm" =>false, "tooltip" => "Crear nuevo usuario"),
 			array("id" => "deleteTop", "type" => "btn-red", "icon" => "fa fa-trash","name" => "", "route"=>"", "confirm" =>true),
 			array("id" => "printTop", "type" => "", "icon" => "fa fa-print","name" => "", "route"=>"", "confirm" =>false),
 			array("id" => "exportTop", "type" => "", "icon" => "fa fa-file-excel-o","name" => "", "route"=>"", "confirm" =>false)
@@ -90,6 +91,41 @@ class UsersController extends Controller
 	}
 
 	/**
+	* @Route("/{_locale}/admin/global/users/new", name="newUser")
+	*/
+	public function newUser(Request $request)
+	{
+		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		//$this->denyAccessUnlessGranted('ROLE_ADMIN');
+		$userdata=$this->getUser()->getTemplateData();
+
+		$locale = $request->getLocale();
+		$menurepository=$this->getDoctrine()->getRepository(MenuOptions::class);
+		$user = new Users();
+
+		$new_breadcrumb["rute"]=null;
+		$new_breadcrumb["name"]="Nuevo";
+		$new_breadcrumb["icon"]="fa fa-plus";
+		$breadcrumb=$menurepository->formatBreadcrumb('users');
+
+		$formUtils=new FormUtils();
+		$formUtils->init($this->getDoctrine(),$request);
+		$form=$formUtils->createFromEntity($user, $this, array())->getForm();
+		$formUtils->proccess($form,$user);
+
+		array_push($breadcrumb, $new_breadcrumb);
+				return $this->render('@Globale/genericform.html.twig', array(
+						'controllerName' => 'UsersController',
+						'interfaceName' => 'Usuarios',
+						'optionSelected' => 'users',
+						'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
+						'breadcrumb' =>  $breadcrumb,
+						'userData' => $userdata,
+						'form' => ["form" => $form->createView(),"template" => json_decode(file_get_contents (dirname(__FILE__)."/../Forms/Users"),true)]
+				));
+	}
+
+	/**
 	* @Route("/{_locale}/admin/global/users/{id}/edit", name="editUser")
 	*/
 	public function editUser($id,Request $request)
@@ -101,70 +137,31 @@ class UsersController extends Controller
 			$locale = $request->getLocale();
 			$menurepository=$this->getDoctrine()->getRepository(MenuOptions::class);
 			$user = new Users();
-
-			//Create a Form
-			$formjs = new FormController();
-			$formDir =dirname(__FILE__)."/../Forms/Users";
-			$formjs->readJSON($formDir);
-			$formjs->printForm();
-
 			$new_breadcrumb["rute"]=null;
-			$new_breadcrumb["name"]="Nueva";
-			$new_breadcrumb["icon"]="fa fa-plus";
+			$new_breadcrumb["name"]="Editar";
+			$new_breadcrumb["icon"]="fa fa-edit";
 			$breadcrumb=$menurepository->formatBreadcrumb('users');
 
+			$userRepository = $this->getDoctrine()->getRepository(Users::class);
+			$user=$userRepository->find($id);
+			$formUtils=new FormUtils();
+			$formUtils->init($this->getDoctrine(),$request);
+			$form=$formUtils->createFromEntity($user,$this)->getForm();
+			$formUtils->proccess($form,$user);
+
+
 			array_push($breadcrumb, $new_breadcrumb);
-					return $this->render('@Globale/newcompany.html.twig', array(
+					return $this->render('@Globale/genericform.html.twig', array(
 							'controllerName' => 'UsersController',
-							'interfaceName' => 'Empresas',
-							'optionSelected' => 'newUser',
+							'interfaceName' => 'Usuarios',
+							'optionSelected' => 'users',
 							'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
 							'breadcrumb' =>  $breadcrumb,
 							'userData' => $userdata,
-							'formDatap' => $formjs->fullForm($this->generateUrl('getUser', array('id'=>$id)))
+							'form' => ["form" => $form->createView(),"template" => json_decode(file_get_contents (dirname(__FILE__)."/../Forms/Users"),true)]
 
 					));
 	}
-
-	/**
-	* @Route("/{_locale}/admin/global/users/new", name="formUser")
-	*/
-
-	public function formUser(Request $request)
-	{
-		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-		//$this->denyAccessUnlessGranted('ROLE_ADMIN');
-		$userdata=$this->getUser()->getTemplateData();
-
-		$locale = $request->getLocale();
-		$menurepository=$this->getDoctrine()->getRepository(MenuOptions::class);
-		$user = new Users();
-
-		//Create a Form
-		$formjs = new FormController();
-		$formDir =dirname(__FILE__)."/../Forms/Users";
-		$formjs->readJSON($formDir);
-		$formjs->printForm();
-
-		$new_breadcrumb["rute"]=null;
-		$new_breadcrumb["name"]="Nueva";
-		$new_breadcrumb["icon"]="fa fa-plus";
-		$breadcrumb=$menurepository->formatBreadcrumb('users');
-		array_push($breadcrumb, $new_breadcrumb);
-				return $this->render('@Globale/newcompany.html.twig', array(
-						'controllerName' => 'CompaniesController',
-						'interfaceName' => 'Empresas',
-						'optionSelected' => $request->attributes->get('_route'),
-						'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
-						'breadcrumb' =>  $breadcrumb,
-						'userData' => $userdata,
-						'formDatap' => $formjs->fullForm()
-				));
-	}
-	/**
-	* @Route("/api/global/companies/new", name="newUser")
-	*/
-	public function newUser(Request $request){}
 
 	/**
   * @Route("/api/global/user/{id}/get", name="getUser")
@@ -182,7 +179,7 @@ class UsersController extends Controller
 	/**
 	* @Route("/{_locale}/admin/global/users/{id}/disable", name="disableUser")
 	*/
-	public function disableUser($id)
+	public function disable($id)
     {
 		$entityUtils=new EntityUtils();
 		$result=$entityUtils->disableObject($id, $this->class, $this->getDoctrine());
@@ -191,7 +188,7 @@ class UsersController extends Controller
 	/**
 	* @Route("/{_locale}/admin/global/users/{id}/enable", name="enableUser")
 	*/
-	public function enableUser($id)
+	public function enable($id)
     {
 		$entityUtils=new EntityUtils();
 		$result=$entityUtils->enableObject($id, $this->class, $this->getDoctrine());

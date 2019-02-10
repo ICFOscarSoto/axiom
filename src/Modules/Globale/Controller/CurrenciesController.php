@@ -11,13 +11,16 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Globale\Entity\MenuOptions;
 use App\Modules\Globale\Entity\Currencies;
+use App\Modules\Globale\Utils\EntityUtils;
 use App\Modules\Globale\Utils\ListUtils;
 use App\Modules\Globale\Utils\FormUtils;
 
 class CurrenciesController extends Controller
 {
 	private $class=Currencies::class;
-	private $listFields=array(array("name" => "id", "caption"=>""),array("name" => "name", "caption"=>"Nombre", "width" => "50"), array("name" =>"isocode","caption"=>"ISO Code"), array("name" =>"charcode","caption"=>"Símbolo"), array("name" =>"decimals","caption"=>"Decimales"));
+	private $listFields=array(array("name" => "id", "caption"=>""),array("name" => "name", "caption"=>"Nombre", "width" => "50"), array("name" =>"isocode","caption"=>"ISO Code"), array("name" =>"charcode","caption"=>"Símbolo"), array("name" =>"decimals","caption"=>"Decimales"),
+														array("name" => "active", "caption"=>"Estado", "width"=>"10%" ,"class" => "dt-center", "replace"=>array("1"=>"<div style=\"min-width: 75px;\" class=\"label label-success\">Activo</div>",
+																																																																		"0" => "<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado</div>")));
 
     /**
      * @Route("/{_locale}/admin/global/currencies", name="currencies")
