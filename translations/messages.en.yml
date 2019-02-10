@@ -1,3 +1,5 @@
+#LOGIN
+#----------------------------------------------------------------------------------------------------------------------
 'Correo electrónico': Email
 Contraseña: Password
 'Inicio de sesión': Login
@@ -5,3 +7,22 @@ Contraseña: Password
 'con su cuenta': 'with your account'
 '¿Olvidó su contraseña?': 'Forgot password?'
 Registrese: 'Sign up'
+
+
+#COMPANY
+#----------------------------------------------------------------------------------------------------------------------
+Name: Name
+Vat: Vat
+Socialname: Socialname
+Country: Country
+State: State
+City: City
+Address: Address
+Postcode: Postcode
+Phone: Phone
+Mobile: Mobile
+Active: Active
+
+#COUNTRIES
+#----------------------------------------------------------------------------------------------------------------------
+#TODO: COUNTRIES

@@ -28,5 +28,4 @@ class EntityUtils
 		return true;
 	}
 
-
 }

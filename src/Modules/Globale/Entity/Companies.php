@@ -87,8 +87,8 @@ class Companies
      * @ORM\OneToMany(targetEntity="App\Modules\Globale\Entity\UserGroups", mappedBy="company")
      */
     private $userGroups;
-	public $newSeconds=1296000;
-	public $updatedSeconds=1296000;
+  	public $newSeconds=1296000;
+  	public $updatedSeconds=1296000;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Modules\Globale\Entity\Countries", inversedBy="companies")

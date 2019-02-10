@@ -1,5 +1,5 @@
 <script>
-			$(document).ready(function() {	
+			$(document).ready(function() {
 				var ${{ listConstructor.id }} = jQuery("#{{ listConstructor.id }}");
 				var {{ listConstructor.id }} = ${{ listConstructor.id }}.DataTable( {
 					"aLengthMenu": [[10, 25, 50, 250], [10, 25, 50, 250]],
@@ -21,13 +21,13 @@
 							"next":       "Siguiente",
 							"last":       "Último"
 						},
-						
+
 					},
- 
+
 					"order": [[ {{  listConstructor.orderColumn }}, "{{  listConstructor.orderDirection }}" ]],
 					"columns": [
                         { "name": "checkboxes" ,"data": null, defaultContent: '' },
-						{% for field in  listConstructor.fields %}						
+						{% for field in  listConstructor.fields %}
 							{ "name": "{{ field.name }}" ,"data": "{{ field.name }}" },
 						{% endfor %}
                         { "data": null, defaultContent: '' }
@@ -43,7 +43,7 @@
 							"render": function(data, type, row, meta){
 									return '<div class="checkbox checkbox-replace">'+
 											  '<input type="checkbox" class="{{ listConstructor.id }}-chk-list" id="{{ listConstructor.id }}-chk-'+row['id']+'">'+
-											  '</div>';  
+											  '</div>';
 								}
 						},
 						{% set counter = 1 %}
@@ -53,30 +53,30 @@
 									{% if field.class is defined %} "className": "{{ field.class }}", {% endif %}
 									{% if field.width is defined %} "width": "{{ field.width }}", {% endif %}
 
-										"render": function(data, type, row, meta){	
+										"render": function(data, type, row, meta){
 												if(Array.isArray(data))
 													return data[1];
-													else return data;	
+													else return data;
 										},
 								},
 						{% set counter = counter +1 %}
 						{% endfor %}
 						{
 							"targets": {{  listConstructor.tagColumn }},
-							"render": function(data, type, row, meta){							
+							"render": function(data, type, row, meta){
 									var text=data+"&nbsp;&nbsp;&nbsp;";
 										row['_tags'].forEach(function(valor, indice, array) {
 													text+='<div class="label label-'+valor.type+'">'+valor.name+'</div>';
-										});																	
+										});
 									return text;
 								}
-						},						
+						},
 						{
 							"targets": {{ listConstructor.fields|length+1 }},
 							"orderable": false,
 							"width": "10%",
 							"className": "text-right",
-							"render": function(data, type, row, meta){							
+							"render": function(data, type, row, meta){
 									var buttons='';
 									{% for field in  listConstructor.fieldButtons %}
 										{% if field.condition is defined %}
@@ -84,7 +84,7 @@
 												buttons+='<div class="btn-group {% if field.condition is defined %}'+((row["{{ field.condition }}"][0]*1 != "{{ field.conditionValue }}"*1) ? 'hide' : '')+'{% endif %}">	<button attr-id="'+row['id']+'" id="{{ listConstructor.id }}-field-button-{{ field.id }}-'+row['id']+'" type="button" class="btn btn-{{ field.type }} tooltip-primary"';
 										{% else %}
 										buttons+='<div class="btn-group {% if field.condition is defined %}'+((row["{{ field.condition }}"]*1 != "{{ field.conditionValue }}"*1) ? 'hide' : '')+'{% endif %}">	<button attr-id="'+row['id']+'" id="{{ listConstructor.id }}-field-button-{{ field.id }}-'+row['id']+'" type="button" class="btn btn-{{ field.type }} tooltip-primary"';
-										{% endif %}							
+										{% endif %}
 										buttons+='{% if field.tooltip is defined %} data-toggle="tooltip" data-placement="bottom" title="" data-original-title=" {{ field.tooltip }} {% endif %}"';
 										buttons+='{% if field.confirm is defined %}{% if field.confirm == true %}  onclick="jQuery(\'#{{ listConstructor.id }}-modal-confirm\').modal(\'show\', {backdrop: \'static\'});" {% endif %}{% endif %}>';
 										buttons+='<i class="{{ field.icon }}"></i></button></div>	';
@@ -99,9 +99,9 @@
 				${{ listConstructor.id }}.closest( '.dataTables_wrapper' ).find( 'select' ).select2( {
 					minimumResultsForSearch: -1
 				});
-			
+
 				// Highlighted rows
-				$('body').on('click', '.{{ listConstructor.id }}-chk-list', function() {				
+				$('body').on('click', '.{{ listConstructor.id }}-chk-list', function() {
 					$p =  $(this).closest('tr');
 					var is_checked = $(this).is(':checked');
 					$p[is_checked ? 'addClass' : 'removeClass']( 'highlight' );
@@ -111,24 +111,24 @@
 					$('body').on('keyup', '#s_{{ field.name }}', function() {
 						{{ listConstructor.id }}.columns('{{ field.name }}:name').search( this.value ).draw();
 					});
-					
-				
-					
+
+
+
 				{% endfor %}
-				
+
 				// Button select all checkboxes
-				$("#{{ listConstructor.id }}-chkall").click(function(){			
+				$("#{{ listConstructor.id }}-chkall").click(function(){
 					var is_checked = $(this).is(':checked');
 					$p =  $("[id^='{{ listConstructor.id }}-chk-']").closest('tr');
 					if(is_checked){
 						$("[id^='{{ listConstructor.id }}-chk-']").attr('checked', true);
-						$("[id^='{{ listConstructor.id }}-chk-']").parent().parent().addClass('checked');					
+						$("[id^='{{ listConstructor.id }}-chk-']").parent().parent().addClass('checked');
 						$p.addClass( 'highlight' );
 					}else{
 						$("[id^='{{ listConstructor.id }}-chk-']").attr('checked', false);
 						$("[id^='{{ listConstructor.id }}-chk-']").parent().parent().removeClass('checked');
 						$p.removeClass( 'highlight' );
-					 }					 
+					 }
 				});
 				// Button fields
 				{% for field in listConstructor.fieldButtons %}
@@ -148,12 +148,12 @@
 								url=url.replace('_____',$(this).attr('attr-id'));
 								$.getJSON(url, function( data ) {
 									$.each( data, function( key, val ) {
-									
+
 									});
 								}).always(function() {
 									{{ listConstructor.id }}.ajax.reload();
-								});		
-							}); 
+								});
+							});
 						{% else %}
 							$('body').on('click', "[id^='{{ listConstructor.id }}-field-button-{{ field.id }}']", function() {
 							url=$("#{{ listConstructor.id }}-field-button-{{ field.id }}-url").val();
@@ -161,40 +161,40 @@
 							$('#{{ listConstructor.id }}-modal-button-continue').attr('attr-action',url);
 							$('#{{ listConstructor.id }}-modal-button-continue').attr('attr-action-type','{{ field.actionType }}');
 							$('#{{ listConstructor.id }}-modal-body').html('¿Está seguro que desea {{field.name}} este registro? {% if field.undo is defined and field.undo==false %} </br><b>¡ATENCIÓN!</b> Esta operación no podrá deshacerse.{% endif %}');
-						}); 
+						});
 						{% endif %}
 					{% endif %}
 				{% endfor %}
 				//Button Modal Confirm
-				$('body').on('click', "#{{ listConstructor.id }}-modal-button-continue", function() {					
+				$('body').on('click', "#{{ listConstructor.id }}-modal-button-continue", function() {
 						if($(this).attr('attr-action-type')=="foreground"){
 							window.location.href=$(this).attr('attr-action');
 						}else{
 							$.getJSON($(this).attr('attr-action'), function( data ) {
 								$.each( data, function( key, val ) {
-								
+
 								});
 							}).always(function() {
 								{{ listConstructor.id }}.ajax.reload();
-							});			
+							});
 						}
-						$("#{{ listConstructor.id }}-modal-confirm").modal('hide');						
-				}); 
-			} );		
+						$("#{{ listConstructor.id }}-modal-confirm").modal('hide');
+				});
+			} );
 	</script>
-	
+
 	<!-- BUTTON ZONE -->
 	<p>
 	{% for field in listConstructor.topButtons %}
 			<div class="btn-group">
-				<button style="font-size: 20px" id="{{ field.id }}" type="button" class="btn tooltip-primary {{ field.type }}" {% if field.tooltip is defined %} data-toggle="tooltip" data-placement="bottom" title="" data-original-title=" {{ field.tooltip }} {% endif %} ">	
-					<i class="{{ field.icon }}"></i>{{ field.name }}			
-				</button>
-			</div>					
+				<a href="{% if field.route|length %}{{ url(field.route) }}{% endif %}" style="font-size: 20px" id="{{ field.id }}" type="button" class="btn tooltip-primary {{ field.type }}" {% if field.tooltip is defined %} data-toggle="tooltip" data-placement="bottom" title="" data-original-title=" {{ field.tooltip }} {% endif %} ">
+					<i class="{{ field.icon }}"></i>{{ field.name }}
+				</a>
+			</div>
 	{% endfor %}
 	</p>
 	</br>
-	<!-- END BUTTONZONE -->	
+	<!-- END BUTTONZONE -->
 	{% for field in listConstructor.fieldButtons %}
 		<input id="{{ listConstructor.id }}-field-button-{{ field.id }}-url" type="hidden" value="{% if field.route|length %}{{ url(field.route,{'id': '_____'}) }}{% endif %}" />
 	{% endfor %}
@@ -202,7 +202,7 @@
 			<thead>
 				<tr>
 					<th class="table-header-search">
-					</th>				
+					</th>
 					{% for field in listConstructor.fields %}
 						<th class="table-header-search"><input  id="s_{{ field.name }}" type="text" class="form-control" placeholder="Buscar {{ field.caption }}" /></th>
 					{% endfor %}
@@ -212,19 +212,19 @@
 						<div class="checkbox checkbox-replace">
 							<input type="checkbox" id="{{ listConstructor.id }}-chkall">
 						</div>
-					</th>				
+					</th>
 					{% for field in listConstructor.fields %}
 						<th>{{ field.caption }}</th>
 					{% endfor %}
 					<th></th>
-			</thead>			
+			</thead>
 	</table>
 	<div class="modal fade" id="{{ listConstructor.id }}-modal-confirm" data-backdrop="static" style="display: none;">
 		<div class="modal-dialog">
-			<div class="modal-content" style="transform: matrix(1, 0, 0, 1, 0, 0);">				
+			<div class="modal-content" style="transform: matrix(1, 0, 0, 1, 0, 0);">
 				<div class="modal-header">
 					<h4 class="modal-title">Confirmación</h4>
-				</div>		
+				</div>
 				<div id="{{ listConstructor.id }}-modal-body" class="modal-body">
 				</div>
 				<div id="{{ listConstructor.id }}-modal-footer" class="modal-footer">
@@ -233,5 +233,4 @@
 				</div>
 			</div>
 		</div>
-	</div>	
-		
+	</div>

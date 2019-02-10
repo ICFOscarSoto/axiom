@@ -1,0 +1,11 @@
+{{ form_start(formConstructor.form) }}
+<div class="row">
+  {% set counter = 1 %}
+  {% for field in formConstructor.template.0.fields %}
+    <div class="col-md-{{ field.cols }}">
+         {{ form_row(formConstructor.form[field.field]) }}
+    </div>
+  {% set counter = counter +1 %}
+  {% endfor %}
+</div>
+{{ form_end(formConstructor.form) }}

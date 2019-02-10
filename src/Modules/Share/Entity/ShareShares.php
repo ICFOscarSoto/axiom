@@ -29,12 +29,12 @@ class ShareShares
     private $idObject;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Globale\Users")
+     * @ORM\ManyToOne(targetEntity="App\Modules\Globale\Entity\Users")
      */
     private $user;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Globale\UserGroups")
+     * @ORM\ManyToOne(targetEntity="App\Modules\Globale\Entity\UserGroups")
      */
     private $userGroup;
 

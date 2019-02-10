@@ -1,87 +1,23 @@
 [{
-		"name": "company",
-    "submit":"/api/global/currencies/new",
-		"step": [{
-			"panels": [{
-				"label": "Datos Moneda",
-				"group": [{
-					"fields": [{
-						"type": "text",
-            "label": "id",
-						"name": "id",
-            "nullable": "false",
-            "length":"11",
-						"value": "",
-						"placeholder": "",
-						"size": 4,
-						"order": 1,
-						"visibility": "hidden",
-						"urlautosugest": "",
-						"validationrules": ""
-
-					},
-          {
-						"type": "text",
-            "label": "Name",
-						"name": "name",
-            "nullable": "false",
-            "length":"150",
-						"value": "",
-						"placeholder": "Name",
-						"size": 3,
-						"order": 2,
-						"visibility": "visible",
-						"urlautosugest": "",
-						"validationrules": ""
-
-					},
-          {
-						"type": "text",
-            "label": "Iso Code",
-						"name": "isocode",
-            "nullable": "true",
-            "length":"3",
-						"value": "",
-						"placeholder": "Iso code",
-						"size": 5,
-						"order": 3,
-						"visibility": "visible",
-						"urlautosugest": "",
-						"validationrules": ""
-
-					},
-          {
-						"type": "text",
-            "label": "Char Code",
-						"name": "charcode",
-            "nullable": "true",
-            "length":"3",
-						"value": "",
-						"placeholder": "Char code",
-						"size": 4,
-						"order": 4,
-						"visibility": "visible",
-						"urlautosugest": "",
-						"validationrules": ""
-
-					},
-          {
-						"type": "text",
-            "label": "Decimal",
-						"name": "decimal",
-            "nullable": "false",
-            "length":"11",
-						"value": "",
-						"placeholder": "Alfa 2",
-						"size": 4,
-						"order": 5,
-						"visibility": "visible",
-						"urlautosugest": "",
-						"validationrules": ""
-
-					}]
-				}]
-			}]
-		}]
-	}
-]
+	"fields": [{
+			"field": "name",
+			"cols": 8
+		},
+		{
+			"field": "isocode",
+			"cols": 4
+		},
+		{
+			"field": "numcode",
+			"cols": 4
+		},
+		{
+			"field": "charcode",
+			"cols": 4
+		},
+		{
+			"field": "decimals",
+			"cols": 4
+		}
+	]
+}]

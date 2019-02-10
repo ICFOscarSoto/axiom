@@ -48,6 +48,29 @@ class Currencies
      */
     private $companies;
 
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $dateadd;
+
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $dateupd;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $active;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $deleted;
+
+    public $newSeconds=1296000;
+    public $updatedSeconds=1296000;
+
     public function __construct()
     {
         $this->companies = new ArrayCollection();
@@ -166,5 +189,53 @@ class Currencies
           }
       }
       return $tempArray;
+    }
+
+    public function getDateadd(): ?\DateTimeInterface
+    {
+        return $this->dateadd;
+    }
+
+    public function setDateadd(\DateTimeInterface $dateadd): self
+    {
+        $this->dateadd = $dateadd;
+
+        return $this;
+    }
+
+    public function getDateupd(): ?\DateTimeInterface
+    {
+        return $this->dateupd;
+    }
+
+    public function setDateupd(\DateTimeInterface $dateupd): self
+    {
+        $this->dateupd = $dateupd;
+
+        return $this;
+    }
+
+    public function getActive(): ?bool
+    {
+        return $this->active;
+    }
+
+    public function setActive(bool $active): self
+    {
+        $this->active = $active;
+
+        return $this;
+    }
+
+    public function getDeleted(): ?bool
+    {
+        return $this->deleted;
+    }
+
+    public function setDeleted(bool $deleted): self
+    {
+        $this->deleted = $deleted;
+
+        return $this;
     }
 }
