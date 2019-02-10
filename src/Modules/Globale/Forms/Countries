@@ -37,8 +37,8 @@
 					},
           {
 						"type": "text",
-            "label": "Iso Name",
-						"name": "isoname",
+            "label": "Iso Code",
+						"name": "isocode",
             "nullable": "true",
             "length":"150",
 						"value": "",
@@ -52,8 +52,8 @@
 					},
           {
 						"type": "text",
-            "label": "Alfa 2",
-						"name": "alfa2",
+            "label": "Decimal",
+						"name": "decimals",
             "nullable": "false",
             "length":"2",
 						"value": "",
@@ -67,8 +67,8 @@
 					},
           {
 						"type": "text",
-            "label": "Alfa 3",
-						"name": "alfa3",
+            "label": "Char Code",
+						"name": "charcode",
             "nullable": "false",
             "length":"3",
 						"value": "",
@@ -83,7 +83,7 @@
           {
 						"type": "text",
             "label": "Iso Number",
-						"name": "isonumber",
+						"name": "numcode",
             "nullable": "false",
             "length":"11",
 						"value": "",

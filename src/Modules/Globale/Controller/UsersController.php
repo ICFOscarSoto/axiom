@@ -117,7 +117,7 @@ class UsersController extends Controller
 					return $this->render('@Globale/newcompany.html.twig', array(
 							'controllerName' => 'UsersController',
 							'interfaceName' => 'Empresas',
-							'optionSelected' => 'newCountry',
+							'optionSelected' => 'newUser',
 							'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
 							'breadcrumb' =>  $breadcrumb,
 							'userData' => $userdata,

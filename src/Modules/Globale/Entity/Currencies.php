@@ -69,7 +69,7 @@ class Currencies
     private $deleted;
 
     public $newSeconds=1296000;
-    public $updatedSeconds=1296000;
+    public $updatedSeconds=1296000; 
 
     public function __construct()
     {
