@@ -14,7 +14,11 @@ use App\Modules\Globale\Entity\Users;
 use App\Modules\Globale\Utils\ListUtils;
 use App\Modules\Globale\Utils\FormUtils;
 use App\Modules\Globale\Utils\EntityUtils;
-
+use App\Modules\Email\Entity\EmailAccounts;
+use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class UsersController extends Controller
 {
@@ -110,7 +114,7 @@ class UsersController extends Controller
 
 		$formUtils=new FormUtils();
 		$formUtils->init($this->getDoctrine(),$request);
-		$form=$formUtils->createFromEntity($user, $this, array())->getForm();
+		$form=$formUtils->createFromEntity($user, $this, array('password'), array())->getForm();
 		$formUtils->proccess($form,$user);
 
 		array_push($breadcrumb, $new_breadcrumb);
@@ -128,7 +132,7 @@ class UsersController extends Controller
 	/**
 	* @Route("/{_locale}/admin/global/users/{id}/edit", name="editUser")
 	*/
-	public function editUser($id,Request $request)
+	public function editUser($id,Request $request, UserPasswordEncoderInterface $encoder)
 		{
 			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 			//$this->denyAccessUnlessGranted('ROLE_ADMIN');
@@ -136,6 +140,8 @@ class UsersController extends Controller
 
 			$locale = $request->getLocale();
 			$menurepository=$this->getDoctrine()->getRepository(MenuOptions::class);
+			$emailAccountsRepository=$this->getDoctrine()->getRepository(EmailAccounts::class);
+
 			$user = new Users();
 			$new_breadcrumb["rute"]=null;
 			$new_breadcrumb["name"]="Editar";
@@ -146,9 +152,34 @@ class UsersController extends Controller
 			$user=$userRepository->find($id);
 			$formUtils=new FormUtils();
 			$formUtils->init($this->getDoctrine(),$request);
-			$form=$formUtils->createFromEntity($user,$this)->getForm();
-			$formUtils->proccess($form,$user);
-
+			$form=$formUtils->createFromEntity($user,$this, array('password','emailDefaultAccount'), array(
+					['password', RepeatedType::class, [
+			    	'type' => PasswordType::class,
+			    	'required' => false,
+						'mapped' => false,
+			    	'first_options'  => ['label' => 'Password'],
+			    	'second_options' => ['label' => 'Repeat Password']
+					]],
+					['emailDefaultAccount', ChoiceType::class, [
+						'required' => false,
+            'choices' => $emailAccountsRepository->findBy(["user"=>$this->getUser(),]),
+            'placeholder' => 'Select an email account...',
+            'choice_label' => 'name',
+						'choice_value' => 'id'
+					]]
+				))->getForm();
+			//$formUtils->proccess($form,$user);
+			//change Password
+			$form->handleRequest($request);
+			if ($form->isSubmitted() && $form->isValid() ) {
+				$obj = $form->getData();
+				if($form["password"]->getData()!="")
+					$obj->setPassword($encoder->encodePassword($obj, $form["password"]->getData()));
+				if($obj->getId() == null) $obj->setDateadd(new \DateTime());
+				$obj->setDateupd(new \DateTime());
+				$this->getDoctrine()->getManager()->persist($obj);
+				$this->getDoctrine()->getManager()->flush();
+			}
 
 			array_push($breadcrumb, $new_breadcrumb);
 					return $this->render('@Globale/genericform.html.twig', array(

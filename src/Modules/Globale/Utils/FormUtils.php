@@ -6,6 +6,8 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\CallbackTransformer;
 
 class FormUtils extends Controller
@@ -22,13 +24,12 @@ class FormUtils extends Controller
     $this->entityManager=$this->doctrine->getManager();
   }
 
-  public function createFromEntity($obj,$controller,$excludedAttributes=array(),$overrideAttributes=array()){
+  public function createFromEntity($obj,$controller,$excludedAttributes=array(),$includedAttributes=array()){
     $this->ignoredAttributes=array_merge($this->ignoredAttributes, $excludedAttributes);
     $class=get_class($obj);
     $form = $controller->createFormBuilder($obj);
     //Get class attributes
     foreach($this->entityManager->getClassMetadata($class)->fieldMappings as $key=>$value){
-      dump($value);
       if(!in_array($value['fieldName'],$this->ignoredAttributes)){
         switch($value['type']){
           case 'json':
@@ -44,7 +45,10 @@ class FormUtils extends Controller
           break;
         }
       }
-
+    }
+    //Add included attributes
+    foreach ($includedAttributes as $key => $value) {
+      $form->add($value[0], $value[1], $value[2]);
     }
     //Get class relations
     foreach($this->entityManager->getClassMetadata($class)->associationMappings as $key=>$value){
@@ -59,8 +63,8 @@ class FormUtils extends Controller
 
   public function choiceRelation($class, $data){
     $result =  [
-                  //'choices' => $this->doctrine->getRepository($class)->findBy(['active'=>true, 'deleted'=>false]),
-                  'choices' => $this->doctrine->getRepository($class)->findAll(),
+                  'choices' => $this->doctrine->getRepository($class)->findBy(['active'=>true, 'deleted'=>false]),
+                  //'choices' => $this->doctrine->getRepository($class)->findAll(),
                   'choice_label' => function($obj, $key, $index) {
                       return $obj->getName();
                   },

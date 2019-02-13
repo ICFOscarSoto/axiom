@@ -65,12 +65,6 @@ class Users implements UserInterface
      */
     private $notifications;
 
-	/**
-     * @Assert\NotBlank()
-     * @Assert\Length(max=4096)
-     */
-    private $plainPassword;
-
     /**
      * @ORM\Column(type="datetime", nullable=false)
      */

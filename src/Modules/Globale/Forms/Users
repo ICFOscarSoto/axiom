@@ -18,6 +18,14 @@
 		{
 			"field": "roles",
 			"cols": 4
+		},
+		{
+			"field": "password",
+			"cols": 4
+		},
+		{
+			"field": "emailDefaultAccount",
+			"cols": 4
 		}
 	]
 }]
