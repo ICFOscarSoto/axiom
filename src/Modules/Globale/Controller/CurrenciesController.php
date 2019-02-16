@@ -18,9 +18,6 @@ use App\Modules\Globale\Utils\FormUtils;
 class CurrenciesController extends Controller
 {
 	private $class=Currencies::class;
-	private $listFields=array(array("name" => "id", "caption"=>""),array("name" => "name", "caption"=>"Nombre", "width" => "50"), array("name" =>"isocode","caption"=>"ISO Code"), array("name" =>"charcode","caption"=>"Símbolo"), array("name" =>"decimals","caption"=>"Decimales"),
-														array("name" => "active", "caption"=>"Estado", "width"=>"10%" ,"class" => "dt-center", "replace"=>array("1"=>"<div style=\"min-width: 75px;\" class=\"label label-success\">Activo</div>",
-																																																																		"0" => "<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado</div>")));
 
     /**
      * @Route("/{_locale}/admin/global/currencies", name="currencies")
@@ -34,27 +31,7 @@ class CurrenciesController extends Controller
 		$this->router = $router;
 		$menurepository=$this->getDoctrine()->getRepository(MenuOptions::class);
 
-		$templateLists=array();
-		$listCompanies=array();
-		$listCompanies['id'] = 'listCurrencies';
-		$listCompanies['fields'] = $this->listFields;
-		$listCompanies['route'] = 'currencieslist';
-		$listCompanies['orderColumn'] = 2;
-		$listCompanies['orderDirection'] = 'DESC';
-		$listCompanies['tagColumn'] = 3;
-		$listCompanies['fieldButtons'] = array(
-			array("id" => "edit", "type" => "default", "icon" => "fa fa-edit", "name" => "editar", "route"=>"editCurrency", "confirm" =>false, "actionType" => "foreground"),
-			array("id" => "desactivate", "type" => "info", "condition"=> "active", "conditionValue" =>true , "icon" => "fa fa-eye-slash","name" => "desactivar", "route"=>"disableCurrency", "confirm" =>true, "actionType" => "background" ),
-			array("id" => "activate", "type" => "info", "condition"=> "active", "conditionValue" =>false, "icon" => "fa fa-eye","name" => "activar", "route"=>"enableCurrency", "confirm" =>true, "actionType" => "background" ),
-			array("id" => "delete", "type" => "danger", "icon" => "fa fa-trash","name" => "borrar", "route"=>"", "confirm" =>true, "undo" =>false, "tooltip"=>"Borrar moneda", "actionType" => "background")
-		);
-		$listCompanies['topButtons'] = array(
-			array("id" => "addTop", "type" => "btn-primary", "icon" => "fa fa-plus", "name" => "", "route"=>"newCurrency", "confirm" =>false, "tooltip" => "Nueva moneda"),
-			array("id" => "deleteTop", "type" => "btn-red", "icon" => "fa fa-trash","name" => "", "route"=>"", "confirm" =>true),
-			array("id" => "printTop", "type" => "", "icon" => "fa fa-print","name" => "", "route"=>"", "confirm" =>false),
-			array("id" => "exportTop", "type" => "", "icon" => "fa fa-file-excel-o","name" => "", "route"=>"", "confirm" =>false)
-		);
-		$templateLists[]=$listCompanies;
+		$templateLists[]=$this->formatList($this->getUser());
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 			return $this->render('@Globale/genericlist.html.twig', [
 				'controllerName' => 'currenciesController',
@@ -161,32 +138,30 @@ class CurrenciesController extends Controller
 		$manager = $this->getDoctrine()->getManager();
 		$repository = $manager->getRepository(Currencies::class);
 		$listUtils=new ListUtils();
-		$return=$listUtils->getRecords($repository,$request,$manager,$this->listFields, Currencies::class);
+		$listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Currencies.json"),true);
+		$return=$listUtils->getRecords($repository,$request,$manager,$listFields, Currencies::class);
 		return new JsonResponse($return);
 	}
-
+	public function formatList($user){
+		$list=[
+			'id' => 'listCurrencies',
+			'route' => 'currencieslist',
+			'routeParams' => ["id" => $user->getId()],
+			'orderColumn' => 2,
+			'orderDirection' => 'ASC',
+			'tagColumn' => 3,
+			'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Currencies.json"),true),
+			'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/CurrenciesFieldButtons.json"),true),
+			'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/CurrenciesTopButtons.json"),true)
+		];
+		return $list;
+	}
 	/**
-	* @Route("/api/currencies/select", name="currenciesSelect")
+	* @Route("/{_locale}/admin/global/currencies/{id}/disable", name="disableCurrency")
 	*/
-/* public function currenciesSelect(RouterInterface $router,Request $request){
-	 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-	 $user = $this->getUser();
-	 $locale = $request->getLocale();
-	 $this->router = $router;
-	 $manager = $this->getDoctrine()->getManager();
-	 $repository = $manager->getRepository(Currencies::class);
-	 $result=array();
-	 $currencies= $repository->findAll();
-	 foreach($currencies as $currency){
-		 $result[]=array("id" => $currency->getId(), "name" => $currency->getName());
-	 }
-	 return new JsonResponse($result);
- }*/
- /**
- * @Route("/{_locale}/admin/global/currencies/{id}/disable", name="disableCurrency")
- */
  public function disable($id)
 	 {
+	 $this->denyAccessUnlessGranted('ROLE_GLOBAL');
 	 $entityUtils=new EntityUtils();
 	 $result=$entityUtils->disableObject($id, $this->class, $this->getDoctrine());
 	 return new JsonResponse(array('result' => $result));
@@ -196,8 +171,19 @@ class CurrenciesController extends Controller
  */
  public function enable($id)
 	 {
+	 $this->denyAccessUnlessGranted('ROLE_GLOBAL');
 	 $entityUtils=new EntityUtils();
 	 $result=$entityUtils->enableObject($id, $this->class, $this->getDoctrine());
 	 return new JsonResponse(array('result' => $result));
  }
+ /**
+ * @Route("/{_locale}/admin/global/currencies/{id}/delete", name="deleteCurrency")
+ */
+ public function delete($id){
+	 $this->denyAccessUnlessGranted('ROLE_GLOBAL');
+	 $entityUtils=new EntityUtils();
+	 $result=$entityUtils->deleteObject($id, $this->class, $this->getDoctrine());
+	 return new JsonResponse(array('result' => $result));
+ }
+
 }

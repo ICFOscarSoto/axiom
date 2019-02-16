@@ -254,6 +254,7 @@ class UsersController extends Controller
 	*/
 	public function disable($id)
     {
+    $this->denyAccessUnlessGranted('ROLE_ADMIN');
 		$entityUtils=new EntityUtils();
 		$result=$entityUtils->disableObject($id, $this->class, $this->getDoctrine());
 		return new JsonResponse(array('result' => $result));
@@ -263,8 +264,18 @@ class UsersController extends Controller
 	*/
 	public function enable($id)
     {
+    $this->denyAccessUnlessGranted('ROLE_ADMIN');
 		$entityUtils=new EntityUtils();
 		$result=$entityUtils->enableObject($id, $this->class, $this->getDoctrine());
+		return new JsonResponse(array('result' => $result));
+	}
+  /**
+	* @Route("/{_locale}/admin/global/users/{id}/delete", name="deleteUser")
+	*/
+	public function delete($id){
+		$this->denyAccessUnlessGranted('ROLE_ADMIN');
+		$entityUtils=new EntityUtils();
+		$result=$entityUtils->deleteObject($id, $this->class, $this->getDoctrine());
 		return new JsonResponse(array('result' => $result));
 	}
 

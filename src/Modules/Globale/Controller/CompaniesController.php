@@ -169,8 +169,8 @@ class CompaniesController extends Controller
 	/**
 	* @Route("/{_locale}/admin/global/companies/{id}/disable", name="disableCompany")
 	*/
-	public function disable($id)
-    {
+	public function disable($id){
+		$this->denyAccessUnlessGranted('ROLE_ADMIN');
 		$entityUtils=new EntityUtils();
 		$result=$entityUtils->disableObject($id, $this->class, $this->getDoctrine());
 		return new JsonResponse(array('result' => $result));
@@ -178,18 +178,17 @@ class CompaniesController extends Controller
 	/**
 	* @Route("/{_locale}/admin/global/companies/{id}/enable", name="enableCompany")
 	*/
-	public function enable($id)
-    {
+	public function enable($id){
+		$this->denyAccessUnlessGranted('ROLE_ADMIN');
 		$entityUtils=new EntityUtils();
 		$result=$entityUtils->enableObject($id, $this->class, $this->getDoctrine());
 		return new JsonResponse(array('result' => $result));
 	}
 	/**
-	* @Route("/{_locale}/admin/global/companies/{id}/disable", name="disableCompany")
+	* @Route("/{_locale}/admin/global/companies/{id}/delete", name="deleteCompany")
 	*/
-	public function delete($id)
-    {
-
+	public function delete($id){
+		$this->denyAccessUnlessGranted('ROLE_ADMIN');
 		$entityUtils=new EntityUtils();
 		$result=$entityUtils->deleteObject($id, $this->class, $this->getDoctrine());
 		return new JsonResponse(array('result' => $result));

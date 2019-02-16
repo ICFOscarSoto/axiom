@@ -163,6 +163,7 @@ class CountriesController extends Controller
 	*/
 	public function disable($id)
     {
+		$this->denyAccessUnlessGranted('ROLE_GLOBAL');
 		$entityUtils=new EntityUtils();
 		$result=$entityUtils->disableObject($id, $this->class, $this->getDoctrine());
 		return new JsonResponse(array('result' => $result));
@@ -173,8 +174,18 @@ class CountriesController extends Controller
 	*/
 	public function enable($id)
     {
+		$this->denyAccessUnlessGranted('ROLE_GLOBAL');
 		$entityUtils=new EntityUtils();
 		$result=$entityUtils->enableObject($id, $this->class, $this->getDoctrine());
+		return new JsonResponse(array('result' => $result));
+	}
+	/**
+	* @Route("/{_locale}/admin/global/countries/{id}/delete", name="deleteCountry")
+	*/
+	public function delete($id){
+		$this->denyAccessUnlessGranted('ROLE_GLOBAL');
+		$entityUtils=new EntityUtils();
+		$result=$entityUtils->deleteObject($id, $this->class, $this->getDoctrine());
 		return new JsonResponse(array('result' => $result));
 	}
 }

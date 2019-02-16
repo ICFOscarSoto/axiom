@@ -1,0 +1,8 @@
+[
+  {"id": "edit", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"editCurrency", "confirm" :false, "actionType" : "foreground"},
+  {"id": "activation", "type": "option", "options": [
+      {"id": "desactivate", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"disableCurrency", "confirm" :true, "actionType" : "background" },
+      {"id": "activate", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "route":"enableCurrency", "confirm" :true, "actionType" : "background" }
+  ]},
+  {"id": "delete", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"deleteCurrency", "confirm" :true, "undo" :false, "tooltip":"Borrar moneda", "actionType" : "background"}
+]
