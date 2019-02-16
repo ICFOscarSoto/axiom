@@ -1,0 +1,6 @@
+[ {"name": "id", "caption":""},
+  {"name": "user__email", "caption": "Usuario", "width" : "50"},
+  {"name": "name", "caption": "Nombre", "width" : "50"},
+  {"name":"username","caption": "Usuario"},
+  {"name": "active", "caption": "Estado", "width": "10%" ,"class": "dt-center", "replace":{"1": "<div style=\"min-width: 75px;\" class=\"label label-success\">Activo</div>", "0" : "<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado</div>"}}
+]

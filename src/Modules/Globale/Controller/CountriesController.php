@@ -19,9 +19,6 @@ use App\Modules\Globale\Utils\FormUtils;
 class CountriesController extends Controller
 {
 	private $class=Countries::class;
-	private $listFields=array(array("name" => "id", "caption"=>""),array("name" => "name", "caption"=>"Nombre", "width" => "50"), array("name" =>"alfa2","caption"=>"ISO Code 2"), array("name" =>"alfa3","caption"=>"ISO Code 3"),
-														array("name" => "active", "caption"=>"Estado", "width"=>"10%" ,"class" => "dt-center", "replace"=>array("1"=>"<div style=\"min-width: 75px;\" class=\"label label-success\">Activo</div>",
-																																																																		"0" => "<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado</div>")));
 
     /**
      * @Route("/{_locale}/admin/global/countries", name="countries")
@@ -34,28 +31,7 @@ class CountriesController extends Controller
 		$locale = $request->getLocale();
 		$this->router = $router;
 		$menurepository=$this->getDoctrine()->getRepository(MenuOptions::class);
-
-		$templateLists=array();
-		$listCompanies=array();
-		$listCompanies['id'] = 'listCountries';
-		$listCompanies['fields'] = $this->listFields;
-		$listCompanies['route'] = 'countrieslist';
-		$listCompanies['orderColumn'] = 2;
-		$listCompanies['orderDirection'] = 'ASC';
-		$listCompanies['tagColumn'] = 3;
-		$listCompanies['fieldButtons'] = array(
-			array("id" => "edit", "type" => "default", "icon" => "fa fa-edit", "name" => "editar", "route"=>"editCountry", "confirm" =>false, "actionType" => "foreground"),
-			array("id" => "desactivate", "type" => "info", "condition"=> "active", "conditionValue" =>true , "icon" => "fa fa-eye-slash","name" => "desactivar", "route"=>"disableCountry", "confirm" =>true, "actionType" => "background" ),
-			array("id" => "activate", "type" => "info", "condition"=> "active", "conditionValue" =>false, "icon" => "fa fa-eye","name" => "activar", "route"=>"enableCountry", "confirm" =>true, "actionType" => "background" ),
-			array("id" => "delete", "type" => "danger", "icon" => "fa fa-trash","name" => "borrar", "route"=>"", "confirm" =>true, "undo" =>false, "tooltip"=>"Borrar país", "actionType" => "background")
-		);
-		$listCompanies['topButtons'] = array(
-			array("id" => "addTop", "type" => "btn-primary", "icon" => "fa fa-plus", "name" => "", "route"=>"newCountry", "confirm" =>false, "tooltip" => "Crear nuevo país"),
-			array("id" => "deleteTop", "type" => "btn-red", "icon" => "fa fa-trash","name" => "", "route"=>"", "confirm" =>true),
-			array("id" => "printTop", "type" => "", "icon" => "fa fa-print","name" => "", "route"=>"", "confirm" =>false),
-			array("id" => "exportTop", "type" => "", "icon" => "fa fa-file-excel-o","name" => "", "route"=>"", "confirm" =>false)
-		);
-		$templateLists[]=$listCompanies;
+		$templateLists[]=$this->formatList($this->getUser());
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 			return $this->render('@Globale/genericlist.html.twig', [
 				'controllerName' => 'CountriesController',
@@ -101,7 +77,7 @@ class CountriesController extends Controller
 							'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
 							'breadcrumb' =>  $breadcrumb,
 							'userData' => $userdata,
-							'form' => ["form" => $form->createView(),"template" => json_decode(file_get_contents (dirname(__FILE__)."/../Forms/Countries"),true)]
+							'form' => ["form" => $form->createView(),"template" => json_decode(file_get_contents (dirname(__FILE__)."/../Forms/Countries.json"),true)]
 					));
 		}
 		/**
@@ -146,7 +122,7 @@ class CountriesController extends Controller
 								'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
 								'breadcrumb' =>  $breadcrumb,
 								'userData' => $userdata,
-								'form' => ["form" => $form->createView(),"template" => json_decode(file_get_contents (dirname(__FILE__)."/../Forms/Countries"),true)]
+								'form' => ["form" => $form->createView(),"template" => json_decode(file_get_contents (dirname(__FILE__)."/../Forms/Countries.json"),true)]
 				));
 		}
 
@@ -162,8 +138,24 @@ class CountriesController extends Controller
 		$manager = $this->getDoctrine()->getManager();
 		$repository = $manager->getRepository(Countries::class);
 		$listUtils=new ListUtils();
-		$return=$listUtils->getRecords($repository,$request,$manager,$this->listFields, Countries::class);
+		$listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Countries.json"),true);
+		$return=$listUtils->getRecords($repository,$request,$manager,$listFields, Countries::class);
 		return new JsonResponse($return);
+	}
+
+	public function formatList($user){
+		$list=[
+			'id' => 'listCountries',
+			'route' => 'countrieslist',
+			'routeParams' => ["id" => $user->getId()],
+			'orderColumn' => 2,
+			'orderDirection' => 'ASC',
+			'tagColumn' => 3,
+			'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Countries.json"),true),
+			'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/CountriesFieldButtons.json"),true),
+			'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/CountriesTopButtons.json"),true)
+		];
+		return $list;
 	}
 
 	/**

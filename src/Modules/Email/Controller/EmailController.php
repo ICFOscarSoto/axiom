@@ -1,8 +1,5 @@
 <?php
-
-//namespace App\Controller\Email;
 namespace App\Modules\Email\Controller;
-
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,6 +13,8 @@ use App\Modules\Email\Entity\EmailAccounts;
 use App\Modules\Email\Entity\EmailFolders;
 use App\Modules\Email\Entity\EmailSubjects;
 use App\Modules\Email\Utils\EmailUtils;
+use App\Modules\Globale\Utils\ListUtils;
+use App\Modules\Globale\Utils\FormUtils;
 use Symfony\Component\Validator\Constraints\DateTime;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\MimeType\FileinfoMimeTypeGuesser;
@@ -27,6 +26,78 @@ class EmailController extends Controller
 {
 	private $class=EmailsSubjects::class;
 	static function cmpTimestamp($a, $b){ return strcmp($a["timestamp"], $b["timestamp"]);}
+
+	/**
+	 * @Route("/{_locale}/email/accounts", name="accounts")
+	 */
+	public function accounts(RouterInterface $router,Request $request)
+	{
+		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+
+		$userdata=$this->getUser()->getTemplateData();
+		$locale = $request->getLocale();
+		$this->router = $router;
+		$menurepository=$this->getDoctrine()->getRepository(MenuOptions::class);
+
+		$templateLists[]=$this->formatList($this->getUser());
+		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+			return $this->render('@Globale/genericlist.html.twig', [
+				'controllerName' => 'emailController',
+				'interfaceName' => 'Cuentas correo',
+				'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
+				'optionSelected' => 'users',
+				'breadcrumb' =>  $menurepository->formatBreadcrumb($request->get('_route')),
+				'userData' => $userdata,
+				'lists' => $templateLists
+				]);
+		}
+		return new RedirectResponse($this->router->generate('app_login'));
+
+	}
+
+
+	/**
+	 * @Route("/api/email/accounts/{id}/list", name="accountslist")
+	 */
+	public function accountslist($id, RouterInterface $router,Request $request){
+		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		$userrepository=$this->getDoctrine()->getRepository(Users::class);
+		$user = $this->getUser();
+
+		//Permisions check ROLE_GLOBAL -> Any ID, ROLE_ADMIN -> only company fields, ROLE_USER -> only own ID
+		if($id!=$user->getId()){
+			$user_request = $userrepository->find($id);
+			//Check if user has Admin role and is from his company or has Global roles
+			if( ((array_search('ROLE_ADMIN',$user->getTemplateData()["roles"])!==FALSE && ($user->getCompany()==$user_request->getCompany())) || array_search('ROLE_GLOBAL',$user->getTemplateData()["roles"])!==FALSE) ){
+				//Grant access to requested user
+				$user = $user_request;
+			}
+		}
+
+		$manager = $this->getDoctrine()->getManager();
+		$repository = $manager->getRepository(EmailAccounts::class);
+		$listUtils=new ListUtils();
+		//$return=$listUtils->getRecords($repository,$request,$manager,$this->listFields, EmailAccounts::class,[["type"=>"and", "column"=>"user.company", "value"=>$this->getUser()->getCompany()]]);
+		$listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Accounts.json"),true);
+		$return=$listUtils->getRecords($repository,$request,$manager,$listFields, EmailAccounts::class,[["type"=>"and", "column"=>"user", "value"=>$user]]);
+		return new JsonResponse($return);
+	}
+
+	public function formatList($user){
+		$list=[
+			'id' => 'listAccounts',
+			'route' => 'accountslist',
+			'routeParams' => ["id" => $user->getId()],
+			'orderColumn' => 2,
+			'orderDirection' => 'ASC',
+			'tagColumn' => 3,
+			'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Accounts.json"),true),
+			'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/AccountsFieldButtons.json"),true),
+			'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/AccountsTopButtons.json"),true)
+		];
+		return $list;
+	}
+
 	/**
 	 * @Route("/{_locale}/admin/email", name="email")
 	 */

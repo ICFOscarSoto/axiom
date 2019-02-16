@@ -1,0 +1,6 @@
+[ {"name": "id", "caption":""},
+  {"name": "name", "caption":"Nombre", "width" : "50"},
+  {"name": "alfa2","caption":"ISO Code 2"},
+  {"name": "alfa3","caption":"ISO Code 3"},
+  {"name": "active", "caption":"Estado", "width":"10%" ,"class" : "dt-center", "replace":{"1":"<div style=\"min-width: 75px;\" class=\"label label-success\">Activo</div>", "0" : "<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado</div>"}}
+]

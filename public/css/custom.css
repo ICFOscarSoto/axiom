@@ -28,6 +28,10 @@ table {
     font-size: 12px;
 }
 
+.principal-content{
+  min-height: 700px;
+}
+
 .table-header-search{
 	background-color: #FFFFFF !important;
 	border: none !important;
@@ -47,6 +51,17 @@ table.dataTable.compact tbody th, table.dataTable.compact tbody td {
 	vertical-align: middle;
 }
 
+table.dataTable.compact tbody th, table.dataTable.compact tbody td:hover{
+    cursor: default !important;
+}
+
+
+table.dataTable.compact tbody th, table.dataTable.compact tbody td {
+    padding: 1px;
+}
+.dataTables_wrapper {
+    border: none;
+}
 .mail-env .mail-body .mail-table tbody tr.unread > td {
 	font-weight: bold;
   background-color: #CCC;
@@ -173,6 +188,20 @@ table.dataTable.compact tbody th, table.dataTable.compact tbody td {
 
 .datepicker{
   z-index: 10011 !important;
+}
+.page-body .select2-container .select2-choice {
+  height: 28px !important;
+  line-height: 28px !important;
+}
+.select2-container .select2-choice {
+  border: none !important;
+}
+.select2-search input {
+  height: 28px !important;
+  min-height: 28px !important;
+}
+.page-body .select2-drop .select2-search:after {
+  top: 8px !important;
 }
 /*
 .spinner-container {

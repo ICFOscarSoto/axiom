@@ -2,10 +2,15 @@
 			$(document).ready(function() {
 				var ${{ listConstructor.id }} = jQuery("#{{ listConstructor.id }}");
 				var {{ listConstructor.id }} = ${{ listConstructor.id }}.DataTable( {
-					"aLengthMenu": [[10, 25, 50, 250], [10, 25, 50, 250]],
+					"aLengthMenu": [[10, 20, 50, 250], [10, 20, 50, 250]],
+					"pageLength": 20,
 					"processing": true,
 					"serverSide": true,
-					"ajax": "{{ url( listConstructor.route) }}",
+					{% if listConstructor.routeParams is defined %}
+					"ajax": "{{ url( listConstructor.route, listConstructor.routeParams) }}",
+					{% else %}
+					"ajax": "{{ url( listConstructor.route ) }}",
+					{% endif %}
 					"processing": true,
 					"language": {
 						"processing": '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Cargando...</span> ',
@@ -71,27 +76,38 @@
 									return text;
 								}
 						},
+						{% set counter = 1 %}
+						{% for field in listConstructor.fieldButtons %}
 						{
-							"targets": {{ listConstructor.fields|length+1 }},
+							"targets": {{ listConstructor.fields|length+counter }},
 							"orderable": false,
-							"width": "10%",
+							"width": "0.5%",
 							"className": "text-right",
 							"render": function(data, type, row, meta){
 									var buttons='';
-									{% for field in  listConstructor.fieldButtons %}
-										{% if field.condition is defined %}
-											if(Array.isArray(row["{{ field.condition }}"]))
-												buttons+='<div class="btn-group {% if field.condition is defined %}'+((row["{{ field.condition }}"][0]*1 != "{{ field.conditionValue }}"*1) ? 'hide' : '')+'{% endif %}">	<button attr-id="'+row['id']+'" id="{{ listConstructor.id }}-field-button-{{ field.id }}-'+row['id']+'" type="button" class="btn btn-{{ field.type }} tooltip-primary"';
-										{% else %}
-										buttons+='<div class="btn-group {% if field.condition is defined %}'+((row["{{ field.condition }}"]*1 != "{{ field.conditionValue }}"*1) ? 'hide' : '')+'{% endif %}">	<button attr-id="'+row['id']+'" id="{{ listConstructor.id }}-field-button-{{ field.id }}-'+row['id']+'" type="button" class="btn btn-{{ field.type }} tooltip-primary"';
-										{% endif %}
-										buttons+='{% if field.tooltip is defined %} data-toggle="tooltip" data-placement="bottom" title="" data-original-title=" {{ field.tooltip }} {% endif %}"';
-										buttons+='{% if field.confirm is defined %}{% if field.confirm == true %}  onclick="jQuery(\'#{{ listConstructor.id }}-modal-confirm\').modal(\'show\', {backdrop: \'static\'});" {% endif %}{% endif %}>';
-										buttons+='<i class="{{ field.icon }}"></i></button></div>	';
+									{% if field.type is defined and field.type=="option" %}
+										{% for fieldOption in field.options %}
+											if(Array.isArray(row["{{ fieldOption.condition }}"]))
+											buttons+='<div class="btn-group {% if fieldOption.condition is defined %}'+((row["{{ fieldOption.condition }}"][0]*1 != "{{ fieldOption.conditionValue }}"*1) ? 'hide' : '')+'{% endif %}">	<button attr-id="'+row['id']+'" id="{{ listConstructor.id }}-field-button-{{ fieldOption.id }}-'+row['id']+'" type="button" class="btn btn-{{ fieldOption.type }} tooltip-primary"';
+											else
+											buttons+='<div class="btn-group {% if fieldOption.condition is defined %}'+((row["{{ fieldOption.condition }}"]*1 != "{{ fieldOption.conditionValue }}"*1) ? 'hide' : '')+'{% endif %}">	<button attr-id="'+row['id']+'" id="{{ listConstructor.id }}-field-button-{{ fieldOption.id }}-'+row['id']+'" type="button" class="btn btn-{{ fieldOption.type }} tooltip-primary"';
+											buttons+='{% if fieldOption.tooltip is defined %} data-toggle="tooltip" data-placement="bottom" title="" data-original-title=" {{ fieldOption.tooltip }} {% endif %}"';
+											buttons+='{% if fieldOption.confirm is defined %}{% if fieldOption.confirm == true %}  onclick="jQuery(\'#{{ listConstructor.id }}-modal-confirm\').modal(\'show\', {backdrop: \'static\'});" {% endif %}{% endif %}>';
+											buttons+='<i class="{{ fieldOption.icon }}"></i></button></div>	';
 									{% endfor %}
-									 return buttons;
+									{% else %}
+									buttons+='<div class="btn-group {% if field.condition is defined %}'+((row["{{ field.condition }}"]*1 != "{{ field.conditionValue }}"*1) ? 'hide' : '')+'{% endif %}">	<button attr-id="'+row['id']+'" id="{{ listConstructor.id }}-field-button-{{ field.id }}-'+row['id']+'" type="button" class="btn btn-{{ field.type }} tooltip-primary"';
+									buttons+='{% if field.tooltip is defined %} data-toggle="tooltip" data-placement="bottom" title="" data-original-title=" {{ field.tooltip }} {% endif %}"';
+									buttons+='{% if field.confirm is defined %}{% if field.confirm == true %}  onclick="jQuery(\'#{{ listConstructor.id }}-modal-confirm\').modal(\'show\', {backdrop: \'static\'});" {% endif %}{% endif %}>';
+									buttons+='<i class="{{ field.icon }}"></i></button></div>	';
+									{% endif %}
+  							 return buttons;
 								}
 						},
+						{% set counter = counter +1 %}
+						{% endfor %}
+
+
 						{ "visible": false, "targets": 1 }
 					]
 				});
@@ -132,38 +148,80 @@
 				});
 				// Button fields
 				{% for field in listConstructor.fieldButtons %}
-					{% if field.actionType == "foreground" %}
-						{% if field.confirm is not defined or field.confirm == false %}
-						$('body').on('click', "[id^='{{ listConstructor.id }}-field-button-{{ field.id }}']", function() {
-							url=$("#{{ listConstructor.id }}-field-button-{{ field.id }}-url").val();
-							url=url.replace('_____',$(this).attr('attr-id'));
-							window.location.href=url;
-						});
-						{% else %}
-						{% endif %}
-					{% else %}
-						{% if field.confirm is not defined or field.confirm == false %}
-							$('body').on('click', "[id^='{{ listConstructor.id }}-field-button-{{ field.id }}']", function() {
-								url=$("#{{ listConstructor.id }}-field-button-{{ field.id }}-url").val();
-								url=url.replace('_____',$(this).attr('attr-id'));
-								$.getJSON(url, function( data ) {
-									$.each( data, function( key, val ) {
+					{% if field.type == "option" %}
+						{% for fieldOption in field.options %}
 
-									});
-								}).always(function() {
-									{{ listConstructor.id }}.ajax.reload();
-								});
-							});
-						{% else %}
-							$('body').on('click', "[id^='{{ listConstructor.id }}-field-button-{{ field.id }}']", function() {
-							url=$("#{{ listConstructor.id }}-field-button-{{ field.id }}-url").val();
-							url=url.replace('_____',$(this).attr('attr-id'));
-							$('#{{ listConstructor.id }}-modal-button-continue').attr('attr-action',url);
-							$('#{{ listConstructor.id }}-modal-button-continue').attr('attr-action-type','{{ field.actionType }}');
-							$('#{{ listConstructor.id }}-modal-body').html('¿Está seguro que desea {{field.name}} este registro? {% if field.undo is defined and field.undo==false %} </br><b>¡ATENCIÓN!</b> Esta operación no podrá deshacerse.{% endif %}');
-						});
-						{% endif %}
+									{% if fieldOption.actionType == "foreground" %}
+										{% if fieldOption.confirm is not defined or fieldOption.confirm == false %}
+										$('body').on('click', "[id^='{{ listConstructor.id }}-field-button-{{ fieldOption.id }}']", function() {
+											url=$("#{{ listConstructor.id }}-field-button-{{ fieldOption.id }}-url").val();
+											url=url.replace('_____',$(this).attr('attr-id'));
+											window.location.href=url;
+										});
+										{% else %}
+										{% endif %}
+									{% else %}
+										{% if fieldOption.confirm is not defined or fieldOption.confirm == false %}
+											$('body').on('click', "[id^='{{ listConstructor.id }}-field-button-{{ fieldOption.id }}']", function() {
+												url=$("#{{ listConstructor.id }}-field-button-{{ fieldOption.id }}-url").val();
+												url=url.replace('_____',$(this).attr('attr-id'));
+												$.getJSON(url, function( data ) {
+													$.each( data, function( key, val ) {
+
+													});
+												}).always(function() {
+													{{ listConstructor.id }}.ajax.reload();
+												});
+											});
+										{% else %}
+											$('body').on('click', "[id^='{{ listConstructor.id }}-field-button-{{ fieldOption.id }}']", function() {
+											url=$("#{{ listConstructor.id }}-field-button-{{ fieldOption.id }}-url").val();
+											url=url.replace('_____',$(this).attr('attr-id'));
+											$('#{{ listConstructor.id }}-modal-button-continue').attr('attr-action',url);
+											$('#{{ listConstructor.id }}-modal-button-continue').attr('attr-action-type','{{ fieldOption.actionType }}');
+											$('#{{ listConstructor.id }}-modal-body').html('¿Está seguro que desea {{fieldOption.name}} este registro? {% if fieldOption.undo is defined and fieldOption.undo==false %} </br><b>¡ATENCIÓN!</b> Esta operación no podrá deshacerse.{% endif %}');
+										});
+										{% endif %}
+									{% endif %}
+
+						{% endfor %}
+					{% else %}
+
+									{% if field.actionType == "foreground" %}
+										{% if field.confirm is not defined or field.confirm == false %}
+										$('body').on('click', "[id^='{{ listConstructor.id }}-field-button-{{ field.id }}']", function() {
+											url=$("#{{ listConstructor.id }}-field-button-{{ field.id }}-url").val();
+											url=url.replace('_____',$(this).attr('attr-id'));
+											window.location.href=url;
+										});
+										{% else %}
+										{% endif %}
+									{% else %}
+										{% if field.confirm is not defined or field.confirm == false %}
+											$('body').on('click', "[id^='{{ listConstructor.id }}-field-button-{{ field.id }}']", function() {
+												url=$("#{{ listConstructor.id }}-field-button-{{ field.id }}-url").val();
+												url=url.replace('_____',$(this).attr('attr-id'));
+												$.getJSON(url, function( data ) {
+													$.each( data, function( key, val ) {
+
+													});
+												}).always(function() {
+													{{ listConstructor.id }}.ajax.reload();
+												});
+											});
+										{% else %}
+											$('body').on('click', "[id^='{{ listConstructor.id }}-field-button-{{ field.id }}']", function() {
+											url=$("#{{ listConstructor.id }}-field-button-{{ field.id }}-url").val();
+											url=url.replace('_____',$(this).attr('attr-id'));
+											$('#{{ listConstructor.id }}-modal-button-continue').attr('attr-action',url);
+											$('#{{ listConstructor.id }}-modal-button-continue').attr('attr-action-type','{{ field.actionType }}');
+											$('#{{ listConstructor.id }}-modal-body').html('¿Está seguro que desea {{field.name}} este registro? {% if field.undo is defined and field.undo==false %} </br><b>¡ATENCIÓN!</b> Esta operación no podrá deshacerse.{% endif %}');
+										});
+										{% endif %}
+									{% endif %}
+
 					{% endif %}
+
 				{% endfor %}
 				//Button Modal Confirm
 				$('body').on('click', "#{{ listConstructor.id }}-modal-button-continue", function() {
@@ -196,7 +254,13 @@
 	</br>
 	<!-- END BUTTONZONE -->
 	{% for field in listConstructor.fieldButtons %}
+	{% if field.type == "option" %}
+		{% for fieldOption in field.options %}
+			<input id="{{ listConstructor.id }}-field-button-{{ fieldOption.id }}-url" type="hidden" value="{% if fieldOption.route|length %}{{ url(fieldOption.route,{'id': '_____'}) }}{% endif %}" />
+		{% endfor %}
+	{% else %}
 		<input id="{{ listConstructor.id }}-field-button-{{ field.id }}-url" type="hidden" value="{% if field.route|length %}{{ url(field.route,{'id': '_____'}) }}{% endif %}" />
+	{% endif %}
 	{% endfor %}
 	<table id="{{ listConstructor.id }}" class="table table-bordered hover stripe compact datatable" style="width: 100%">
 			<thead>
@@ -206,7 +270,11 @@
 					{% for field in listConstructor.fields %}
 						<th class="table-header-search"><input  id="s_{{ field.name }}" type="text" class="form-control" placeholder="Buscar {{ field.caption }}" /></th>
 					{% endfor %}
-					<th class="table-header-search"></th>
+
+					{% for field in listConstructor.fieldButtons %}
+						<th class="table-header-search"></th>
+					{% endfor %}
+
 				</tr>
 				<th>
 						<div class="checkbox checkbox-replace">
@@ -216,7 +284,11 @@
 					{% for field in listConstructor.fields %}
 						<th>{{ field.caption }}</th>
 					{% endfor %}
-					<th></th>
+
+					{% for field in listConstructor.fieldButtons %}
+						<th></th>
+					{% endfor %}
+
 			</thead>
 	</table>
 	<div class="modal fade" id="{{ listConstructor.id }}-modal-confirm" data-backdrop="static" style="display: none;">

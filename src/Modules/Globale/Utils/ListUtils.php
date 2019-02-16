@@ -4,14 +4,17 @@ use App\Modules\Globale\Entity\Companies;
 
 class ListUtils
 {
-    public function getRecords($repository,$request,$manager,$listFields,$classname): array
+    public function getRecords($repository,$request,$manager,$listFields,$classname,$filters = array()): array
     {
 		$return=array();
 
 		$query = $repository->createQueryBuilder('p')
 			->setFirstResult($request->query->getInt('start', 0))
 			->setMaxResults($request->query->getInt('length', 10));
-		$queryFiltered = $repository->createQueryBuilder('t')->select('count(t.id)');
+		$queryFiltered = $repository->createQueryBuilder('p')->select('count(p.id)');
+    $queryTotal = $repository->createQueryBuilder('p')->select('count(p.id)');
+
+
 		//Formamos el filtro de busqueda global
 		$searchValue=$request->query->get('search');
 		$searchValue=$searchValue["value"];
@@ -19,7 +22,7 @@ class ListUtils
 			foreach($manager->getClassMetadata($classname)->getColumnNames() as $column){
 					$query->orWhere('p.'.strtolower($column).' LIKE :val_'.strtolower($column));
 					$query->setParameter('val_'.strtolower($column), '%'.$searchValue.'%');
-					$queryFiltered->andWhere('t.'.strtolower($column).' LIKE :val_'.strtolower($column));
+					$queryFiltered->andWhere('p.'.strtolower($column).' LIKE :val_'.strtolower($column));
 					$queryFiltered->setParameter('val_'.strtolower($column), '%'.$searchValue.'%');
 			}
 			//Añadimos los campos de las relaciones
@@ -48,7 +51,7 @@ class ListUtils
 					}else{
 						$query->andWhere('p.'.$field["name"].' LIKE :val_'.$field["name"]);
 						$query->setParameter('val_'.$field["name"], '%'.$searchValue.'%');
-						$queryFiltered->andWhere('t.'.$field["name"].' LIKE :val_'.$field["name"]);
+						$queryFiltered->andWhere('p.'.$field["name"].' LIKE :val_'.$field["name"]);
 						$queryFiltered->setParameter('val_'.$field["name"], '%'.$searchValue.'%');
 					}
 				}
@@ -56,7 +59,7 @@ class ListUtils
 		//Excluimos los elementos borrados
 			$query->andWhere('p.deleted = :valDeleted');
             $query->setParameter('valDeleted', 0);
-			$queryFiltered->andWhere('t.deleted = :valDeleted');
+			$queryFiltered->andWhere('p.deleted = :valDeleted');
             $queryFiltered->setParameter('valDeleted', 0);
 
 		//Formamos el orden de los datos
@@ -75,15 +78,43 @@ class ListUtils
 		$path=explode('__', $field["name"]);
 		if(count($path)>1){
 				$query->leftJoin('p.'.$path[0], $path[0]);
-				$queryFiltered->leftJoin('t.'.$path[0], $path[0]);
+				$queryFiltered->leftJoin('p.'.$path[0], $path[0]);
 			}
 		}
 
+    //Añadimos los filtros pasados por parametros desde los controladores
+    foreach($filters as $filter){
+      //Creamos los leftJoin de las relaciones
+      $path=explode('.', $filter["column"]);
+      $column='';
+      if(count($path)>1){
+          $query->leftJoin('p.'.$path[0], $path[1], 'WITH', $path[1].'.'.$path[1].' = :val_'.$path[0].'0');
+          $queryFiltered->leftJoin('p.'.$path[0], $path[1], 'WITH', $path[1].'.'.$path[1].' = :val_'.$path[0].'0');
+          $queryTotal->leftJoin('p.'.$path[0], $path[1], 'WITH', $path[1].'.'.$path[1].' = :val_'.$path[0].'0');
+          $column=$path[1].'.'.$path[1];
+      }else{
+          $column="p.".$filter["column"];
+      }
+
+      /*
+      $query->leftJoin('p.user', 'c', 'WITH', 'c.company = :val_company');
+      $query->andWhere('c.company = :val_company');
+      $query->setParameter('val_company',$filter["value"]);
+      */
+      if($filter["type"]="and"){
+        $query->andWhere($column.' = :val_'.$path[0].'0');
+        $query->setParameter('val_'.$path[0].'0', $filter["value"]);
+        $queryFiltered->andWhere($column.' = :val_'.$path[0].'0');
+        $queryFiltered->setParameter('val_'.$path[0].'0', $filter["value"]);
+        $queryTotal->andWhere($column.' = :val_'.$path[0].'0');
+        $queryTotal->setParameter('val_'.$path[0].'0', $filter["value"]);
+      }
+    }
+    //dump($query->getQuery()->getSql());
 		$queryPaginator = $query->getQuery();
 		//dump($queryPaginator->getSql());
 		$records=$queryPaginator->getResult();
-		$queryTotal = $repository->createQueryBuilder('t')
-			->select('count(t.id)');
+
 		$records=$queryPaginator->getResult();
 		$return=array();
 		$return["recordsTotal"]=$queryTotal->getQuery()->getSingleScalarResult();
@@ -109,6 +140,7 @@ class ListUtils
 					//Aplicamos los replaces
 				if(isset($field["replace"])){
 						foreach($field["replace"] as $key=>$replace){
+
 							if($data_ob[$field["name"]]==$key){
 								$data_ob[$field["name"]]=array($data_ob[$field["name"]] ,$replace);
 							break;

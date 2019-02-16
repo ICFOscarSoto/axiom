@@ -32,14 +32,23 @@ class FormUtils extends Controller
     foreach($this->entityManager->getClassMetadata($class)->fieldMappings as $key=>$value){
       if(!in_array($value['fieldName'],$this->ignoredAttributes)){
         switch($value['type']){
-          case 'json':
+          /*case 'json':
             $form->add($value['fieldName'], TextType::class);
             $form->get($value['fieldName'])
                 ->addModelTransformer(new CallbackTransformer(
                     function ($tagsAsArray) { return implode(',', $tagsAsArray);},
                     function ($tagsAsString) {return explode(',', $tagsAsString);}
                 ));
+          break;*/
+          case 'json':
+            $form->add($value['fieldName'], TextType::class, ['attr'=>['class' => 'tagsinput']]);
+            $form->get($value['fieldName'])
+                ->addModelTransformer(new CallbackTransformer(
+                    function ($tagsAsArray) { return implode(',', $tagsAsArray);},
+                    function ($tagsAsString) {return explode(',', $tagsAsString);}
+                ));
           break;
+
           default:
             $form->add($value['fieldName']);
           break;
@@ -63,6 +72,7 @@ class FormUtils extends Controller
 
   public function choiceRelation($class, $data){
     $result =  [
+                  'attr' => ['class' => 'select2'],
                   'choices' => $this->doctrine->getRepository($class)->findBy(['active'=>true, 'deleted'=>false]),
                   //'choices' => $this->doctrine->getRepository($class)->findAll(),
                   'choice_label' => function($obj, $key, $index) {

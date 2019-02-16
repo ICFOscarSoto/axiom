@@ -21,10 +21,7 @@ use App\Modules\Globale\Utils\FormUtils;
 
 class CompaniesController extends Controller
 {
-	 private $listFields=array(array("name" => "id", "caption"=>""), array("name" => "vat", "caption"=>"CIF/NIF", "width" => "10%"), array("name" =>"name","caption"=>"Razón Social"),
-								 array("name" => "active", "caption"=>"Estado", "width"=>"10%" ,"class" => "dt-center", "replace"=>array("1"=>"<div style=\"min-width: 75px;\" class=\"label label-success\">Activo</div>",
-																																																												 "0" => "<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado</div>"))
-								);
+
 	 private $class=Companies::class;
 
     /**
@@ -38,28 +35,7 @@ class CompaniesController extends Controller
 		$locale = $request->getLocale();
 		$this->router = $router;
 		$menurepository=$this->getDoctrine()->getRepository(MenuOptions::class);
-
-		$templateLists=array();
-		$listCompanies=array();
-		$listCompanies['id'] = 'listCompanies';
-		$listCompanies['fields'] = $this->listFields;
-		$listCompanies['route'] = 'companieslist';
-		$listCompanies['orderColumn'] = 2;
-		$listCompanies['orderDirection'] = 'DESC';
-		$listCompanies['tagColumn'] = 3;
-		$listCompanies['fieldButtons'] = array(
-			array("id" => "edit", "type" => "default", "icon" => "fa fa-edit", "name" => "editar", "route"=>"editCompany", "confirm" =>false, "actionType" => "foreground"),
-			array("id" => "desactivate", "type" => "info", "condition"=> "active", "conditionValue" =>true , "icon" => "fa fa-eye-slash","name" => "desactivar", "route"=>"disableCompany", "confirm" =>true, "actionType" => "background" ),
-			array("id" => "activate", "type" => "info", "condition"=> "active", "conditionValue" =>false, "icon" => "fa fa-eye","name" => "activar", "route"=>"enableCompany", "confirm" =>true, "actionType" => "background" ),
-			array("id" => "delete", "type" => "danger", "icon" => "fa fa-trash","name" => "borrar", "route"=>"editCompany", "confirm" =>true, "undo" =>false, "tooltip"=>"Borrar empresa", "actionType" => "background")
-		);
-		$listCompanies['topButtons'] = array(
-			array("id" => "addTop", "type" => "btn-primary", "icon" => "fa fa-plus", "name" => "", "route"=>"newCompany", "confirm" =>false, "tooltip" => "Nueva empresa"),
-			array("id" => "deleteTop", "type" => "btn-red", "icon" => "fa fa-trash","name" => "", "route"=>"", "confirm" =>true),
-			array("id" => "printTop", "type" => "", "icon" => "fa fa-print","name" => "", "route"=>"", "confirm" =>false),
-			array("id" => "exportTop", "type" => "", "icon" => "fa fa-file-excel-o","name" => "", "route"=>"", "confirm" =>false)
-		);
-		$templateLists[]=$listCompanies;
+		$templateLists[]=$this->formatList($this->getUser());
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 			return $this->render('@Globale/genericlist.html.twig', [
 				'controllerName' => 'CompaniesController',
@@ -85,10 +61,24 @@ class CompaniesController extends Controller
 		$manager = $this->getDoctrine()->getManager();
 		$repository = $manager->getRepository($this->class);
 		$listUtils=new ListUtils();
-		$return=$listUtils->getRecords($repository,$request,$manager,$this->listFields, $this->class);
+		$listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Companies.json"),true);
+		$return=$listUtils->getRecords($repository,$request,$manager,$listFields, $this->class);
 		return new JsonResponse($return);
 	}
-
+	public function formatList($user){
+		$list=[
+			'id' => 'listCompanies',
+			'route' => 'companieslist',
+			'routeParams' => ["id" => $user->getId()],
+			'orderColumn' => 2,
+			'orderDirection' => 'ASC',
+			'tagColumn' => 3,
+			'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Companies.json"),true),
+			'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/CompaniesFieldButtons.json"),true),
+			'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/CompaniesTopButtons.json"),true)
+		];
+		return $list;
+	}
 
 		/**
 		 * @Route("/api/global/companies/{id}/get", name="getCompany")
@@ -133,7 +123,7 @@ class CompaniesController extends Controller
 						'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
 						'breadcrumb' =>  $breadcrumb,
 						'userData' => $userdata,
-						'form' => ["form" => $form->createView(),"template" => json_decode(file_get_contents (dirname(__FILE__)."/../Forms/Companies"),true)]
+						'form' => ["form" => $form->createView(),"template" => json_decode(file_get_contents (dirname(__FILE__)."/../Forms/Companies.json"),true)]
 				));
 	}
 
@@ -171,7 +161,7 @@ class CompaniesController extends Controller
 					'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
 					'breadcrumb' =>  $breadcrumb,
 					'userData' => $userdata,
-					'form' => ["form" => $form->createView(),"template" => json_decode(file_get_contents (dirname(__FILE__)."/../Forms/Companies"),true)]
+					'form' => ["form" => $form->createView(),"template" => json_decode(file_get_contents (dirname(__FILE__)."/../Forms/Companies.json"),true)]
 			));
 		}
 
@@ -192,6 +182,16 @@ class CompaniesController extends Controller
     {
 		$entityUtils=new EntityUtils();
 		$result=$entityUtils->enableObject($id, $this->class, $this->getDoctrine());
+		return new JsonResponse(array('result' => $result));
+	}
+	/**
+	* @Route("/{_locale}/admin/global/companies/{id}/disable", name="disableCompany")
+	*/
+	public function delete($id)
+    {
+
+		$entityUtils=new EntityUtils();
+		$result=$entityUtils->deleteObject($id, $this->class, $this->getDoctrine());
 		return new JsonResponse(array('result' => $result));
 	}
 }

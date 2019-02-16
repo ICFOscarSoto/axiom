@@ -1,0 +1,7 @@
+[ {"name": "id", "caption":""},
+  {"name": "company__name", "caption":"Empresa", "width" : "50"},
+  {"name": "name", "caption":"Nombre", "width" : "50"},
+  {"name": "firstname","caption":"Apellidos"},
+  {"name": "email","caption":"Email"},
+  {"name": "active", "caption":"Estado", "width":"10%" ,"class" : "dt-center", "replace":{"1":"<div style=\"min-width: 75px;\" class=\"label label-success\">Activo</div>", "0" : "<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado</div>"}}
+]

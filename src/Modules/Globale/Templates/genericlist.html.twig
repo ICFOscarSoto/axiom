@@ -19,11 +19,11 @@
 		<hr />
 		{{ include('@Globale/breadcrumb.html.twig') }}
 		<h2>{{ interfaceName }}</h2>
-		</br>
 		<!-- MAIN CONTENT -->
-
-		{% set listConstructor = lists[0] %}
-		{{ include('@Globale/list.html.twig') }}
+		<div class="principal-content">
+			{% set listConstructor = lists[0] %}
+			{{ include('@Globale/list.html.twig') }}
+		</div>
 		<!-- END MAIN CONTENT -->
 		{{ include('@Globale/footer.html.twig') }}
 	</div>
@@ -38,6 +38,7 @@
 	<link rel="stylesheet" href="{{ url('index') }}js/datatables/datatables.css">
 	<link rel="stylesheet" href="{{ url('index') }}js/select2/select2-bootstrap.css">
 	<link rel="stylesheet" href="{{ url('index') }}js/select2/select2.css">
+	<link rel="stylesheet" href="{{ url('index') }}css/custom.css">
 	<!-- Imported scripts on this page -->
 	<script src="{{ url('index') }}js/datatables/datatables.js"></script>
 	<script src="{{ url('index') }}js/select2/select2.min.js"></script>

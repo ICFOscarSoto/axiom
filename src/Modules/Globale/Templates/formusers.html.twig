@@ -19,10 +19,10 @@
 		<h2>{{ interfaceName }}</h2>
 		</br>
 		<!-- MAIN CONTENT -->
-		<div class="principal-content">
-			{% set formConstructor = form %}
-			{{ include('@Globale/form.html.twig') }}
-		</div>
+
+		{% set formConstructor = form %}
+		{{ include('@Globale/form.html.twig') }}
+
 		<!-- END MAIN CONTENT -->
 	{{ include('@Globale/footer.html.twig') }}
 	</div>

@@ -100,7 +100,7 @@ class CurrenciesController extends Controller
 							'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
 							'breadcrumb' =>  $breadcrumb,
 							'userData' => $userdata,
-							'form' => ["form" => $form->createView(),"template" => json_decode(file_get_contents (dirname(__FILE__)."/../Forms/Currencies"),true)]
+							'form' => ["form" => $form->createView(),"template" => json_decode(file_get_contents (dirname(__FILE__)."/../Forms/Currencies.json"),true)]
 					));
 		}
 		/**
@@ -146,7 +146,7 @@ class CurrenciesController extends Controller
 								'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
 								'breadcrumb' =>  $breadcrumb,
 								'userData' => $userdata,
-								'form' => ["form" => $form->createView(),"template" => json_decode(file_get_contents (dirname(__FILE__)."/../Forms/Currencies"),true)]
+								'form' => ["form" => $form->createView(),"template" => json_decode(file_get_contents (dirname(__FILE__)."/../Forms/Currencies.json"),true)]
 				));
 		}
 

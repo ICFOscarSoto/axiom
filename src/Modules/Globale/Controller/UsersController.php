@@ -18,19 +18,12 @@ use App\Modules\Email\Entity\EmailAccounts;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
-
+use App\Modules\Email\Controller\EmailController;
 class UsersController extends Controller
 {
-	private $listFields=array(array("name" => "id", "caption"=>""),
-								 array("name" => "company__name", "caption"=>"Empresa", "width" => "50"),
-								 array("name" => "name", "caption"=>"Nombre", "width" => "50"),
-								 array("name" =>"firstname","caption"=>"Apellidos"),
-								 array("name" =>"email","caption"=>"Email"),
-								 array("name" => "active", "caption"=>"Estado", "width"=>"10%" ,"class" => "dt-center", "replace"=>array("1"=>"<div style=\"min-width: 75px;\" class=\"label label-success\">Activo</div>",
-																																		 "0" => "<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado</div>"))
-								);
-	private $class=Users::class;
+   	private $class=Users::class;
 
     /**
      * @Route("/{_locale}/admin/global/users", name="users")
@@ -43,28 +36,7 @@ class UsersController extends Controller
 		$locale = $request->getLocale();
 		$this->router = $router;
 		$menurepository=$this->getDoctrine()->getRepository(MenuOptions::class);
-
-		$templateLists=array();
-		$listCompanies=array();
-		$listCompanies['id'] = 'listUsers';
-		$listCompanies['fields'] = $this->listFields;
-		$listCompanies['route'] = 'userslist';
-		$listCompanies['orderColumn'] = 2;
-		$listCompanies['orderDirection'] = 'DESC';
-		$listCompanies['tagColumn'] = 5;
-		$listCompanies['fieldButtons'] = array(
-			array("id" => "edit", "type" => "default", "icon" => "fa fa-edit", "name" => "editar", "route"=>"editUser", "confirm" =>false, "actionType" => "foreground"),
-			array("id" => "desactivate", "type" => "info", "condition"=> "active", "conditionValue" =>true , "icon" => "fa fa-eye-slash","name" => "desactivar", "route"=>"disableUser", "confirm" =>true, "actionType" => "background" ),
-			array("id" => "activate", "type" => "info", "condition"=> "active", "conditionValue" =>false, "icon" => "fa fa-eye","name" => "activar", "route"=>"enableUser", "confirm" =>true, "actionType" => "background" ),
-			array("id" => "delete", "type" => "danger", "icon" => "fa fa-trash","name" => "borrar", "route"=>"", "confirm" =>true, "undo" =>false, "tooltip"=>"Borrar empresa", "actionType" => "background")
-		);
-		$listCompanies['topButtons'] = array(
-			array("id" => "addTop", "type" => "btn-primary", "icon" => "fa fa-plus", "name" => "", "route"=>"newUser", "confirm" =>false, "tooltip" => "Crear nuevo usuario"),
-			array("id" => "deleteTop", "type" => "btn-red", "icon" => "fa fa-trash","name" => "", "route"=>"", "confirm" =>true),
-			array("id" => "printTop", "type" => "", "icon" => "fa fa-print","name" => "", "route"=>"", "confirm" =>false),
-			array("id" => "exportTop", "type" => "", "icon" => "fa fa-file-excel-o","name" => "", "route"=>"", "confirm" =>false)
-		);
-		$templateLists[]=$listCompanies;
+		$templateLists[]=$this->formatList($this->getUser());
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 			return $this->render('@Globale/genericlist.html.twig', [
 				'controllerName' => 'usersController',
@@ -79,6 +51,58 @@ class UsersController extends Controller
 		return new RedirectResponse($this->router->generate('app_login'));
     }
 
+		/**
+		 * @Route("/{_locale}/global/profile", name="profile")
+		 */
+		public function profile(RouterInterface $router,Request $request)
+		{
+		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		$userdata=$this->getUser()->getTemplateData();
+
+		$locale = $request->getLocale();
+		$menurepository=$this->getDoctrine()->getRepository(MenuOptions::class);
+		$user = $this->getUser();
+
+		$new_breadcrumb["rute"]=null;
+		$new_breadcrumb["name"]="Profile";
+		$new_breadcrumb["icon"]="fa fa-edit";
+
+		$formUtils=new FormUtils();
+		$formUtils->init($this->getDoctrine(),$request);
+		$emailAccountsRepository=$this->getDoctrine()->getRepository(EmailAccounts::class);
+
+		$form=$formUtils->createFromEntity($user,$this, array('password','roles','company','active'), array(
+				['password', RepeatedType::class, [
+					'type' => PasswordType::class,
+					'required' => false,
+					'mapped' => false,
+					'first_options'  => ['label' => 'Password'],
+					'second_options' => ['label' => 'Repeat Password']
+				]],['emailDefaultAccount', ChoiceType::class, [
+						'required' => false,
+						'attr' => ['class' => 'select2'],
+            'choices' => $emailAccountsRepository->findBy(["user"=>$this->getUser()]),
+            'placeholder' => 'Select an email account...',
+            'choice_label' => 'name',
+						'choice_value' => 'id'
+					]]
+			))->getForm();
+
+		$emailAccountsLists[]=EmailController::formatList($this->getUser());
+		return $this->render('@Globale/formprofile.html.twig', array(
+						'controllerName' => 'UsersController',
+						'interfaceName' => 'Perfil',
+						'optionSelected' => null,
+						'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
+						'breadcrumb' =>  array($new_breadcrumb),
+						'userData' => $userdata,
+						'userImage' => $this->generateUrl('getUserImage', array('id'=>$user->getId())),
+						'formProfile' => ["form" => $form->createView(),"template" => json_decode(file_get_contents (dirname(__FILE__)."/../Forms/Profile.json"),true)],
+						'lists' => $emailAccountsLists
+		));
+
+		}
+
 	/**
 	 * @Route("/api/users/list", name="userslist")
 	 */
@@ -90,9 +114,25 @@ class UsersController extends Controller
 		$manager = $this->getDoctrine()->getManager();
 		$repository = $manager->getRepository(Users::class);
 		$listUtils=new ListUtils();
-		$return=$listUtils->getRecords($repository,$request,$manager,$this->listFields, Users::class);
+		$listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Users.json"),true);
+		$return=$listUtils->getRecords($repository,$request,$manager,$listFields, Users::class);
 		return new JsonResponse($return);
 	}
+	public function formatList($user){
+		$list=[
+			'id' => 'listUsers',
+			'route' => 'userslist',
+			'routeParams' => ["id" => $user->getId()],
+			'orderColumn' => 2,
+			'orderDirection' => 'DESC',
+			'tagColumn' => 5,
+			'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Users.json"),true),
+			'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/UsersFieldButtons.json"),true),
+			'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/UsersTopButtons.json"),true)
+		];
+		return $list;
+	}
+
 
 	/**
 	* @Route("/{_locale}/admin/global/users/new", name="newUser")
@@ -125,7 +165,7 @@ class UsersController extends Controller
 						'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
 						'breadcrumb' =>  $breadcrumb,
 						'userData' => $userdata,
-						'form' => ["form" => $form->createView(),"template" => json_decode(file_get_contents (dirname(__FILE__)."/../Forms/Users"),true)]
+						'form' => ["form" => $form->createView(),"template" => json_decode(file_get_contents (dirname(__FILE__)."/../Forms/Users.json"),true)]
 				));
 	}
 
@@ -140,7 +180,7 @@ class UsersController extends Controller
 
 			$locale = $request->getLocale();
 			$menurepository=$this->getDoctrine()->getRepository(MenuOptions::class);
-			$emailAccountsRepository=$this->getDoctrine()->getRepository(EmailAccounts::class);
+
 
 			$user = new Users();
 			$new_breadcrumb["rute"]=null;
@@ -149,6 +189,7 @@ class UsersController extends Controller
 			$breadcrumb=$menurepository->formatBreadcrumb('users');
 
 			$userRepository = $this->getDoctrine()->getRepository(Users::class);
+			$emailAccountsRepository=$this->getDoctrine()->getRepository(EmailAccounts::class);
 			$user=$userRepository->find($id);
 			$formUtils=new FormUtils();
 			$formUtils->init($this->getDoctrine(),$request);
@@ -162,6 +203,7 @@ class UsersController extends Controller
 					]],
 					['emailDefaultAccount', ChoiceType::class, [
 						'required' => false,
+						'attr' => ['class' => 'select2'],
             'choices' => $emailAccountsRepository->findBy(["user"=>$this->getUser(),]),
             'placeholder' => 'Select an email account...',
             'choice_label' => 'name',
@@ -189,7 +231,7 @@ class UsersController extends Controller
 							'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
 							'breadcrumb' =>  $breadcrumb,
 							'userData' => $userdata,
-							'form' => ["form" => $form->createView(),"template" => json_decode(file_get_contents (dirname(__FILE__)."/../Forms/Users"),true)]
+							'form' => ["form" => $form->createView(),"template" => json_decode(file_get_contents (dirname(__FILE__)."/../Forms/Users.json"),true)]
 
 					));
 	}

@@ -4,6 +4,7 @@ Name: Nombre
 Vat: CIF/NIF
 Socialname: Denominación Social
 Country: País
+Currency: Moneda
 State: Provincia
 City: Ciudad
 Address: Dirección
