@@ -1,14 +1,90 @@
-Save: Guardar
+#MENU OPTIONS
+#----------------------------------------------------------------------------------------------------------------------
+Companies: Empresas
+Countries: Paises
+Currencies: Monedas
+Administrator: Administrador
+Users: Usuarios
+Devices: Dispositivos
+Human resources: Recursos humanos
+Workers: Trabajadores
+Shifts and schedules: Turnos y horarios
 
+#LANGUAGES
+#----------------------------------------------------------------------------------------------------------------------
+Spanish: Español
+English: Inglés
+
+#GLOBAL
+#----------------------------------------------------------------------------------------------------------------------
+Save: Guardar
+Edit: Editar
+New: Nuevo
+Log Out: Cerrar sesión
+Language: Idioma
+
+#USERS
+#----------------------------------------------------------------------------------------------------------------------
+User data: Datos de usuario
+Lastname: Apellidos
+Password: Password
+Repeat Password: Repetir Password
+Email: Email
+Edit profile: Editar perfil
+
+#LOGIN
+#----------------------------------------------------------------------------------------------------------------------
+Correo electrónico: Email
+Contraseña: Password
+Inicio de sesión: Login
+Inicie sesión: Login
+con su cuenta: with your account
+¿Olvidó su contraseña?: Forgot password?
+Registrese: Sign up
+
+#COMPANY
+#----------------------------------------------------------------------------------------------------------------------
 Name: Nombre
 Vat: CIF/NIF
 Socialname: Denominación Social
 Country: País
-Currency: Moneda
 State: Provincia
 City: Ciudad
 Address: Dirección
-Postcode: Código Postal
+Postcode: Cod. Postal
 Phone: Teléfono
-Mobile: Móvil
+Mobile: Movil
 Active: Activo
+
+# EMAIL MODULE
+#----------------------------------------------------------------------------------------------------------------------
+Email Accounts: Cuentas de Correo
+Email default account: Cuenta de correo por defecto
+Select an email account: Seleccione una cuenta de correo
+Inbox: Bandeja de entrada
+Compose: Redactar correo
+Search emails: Buscar correo electrónico
+All emails: Todos los correos
+
+# CALENDAR MODULE
+#----------------------------------------------------------------------------------------------------------------------
+Calendar: Calendario
+
+# TASKS MODULE
+#----------------------------------------------------------------------------------------------------------------------
+Mark all as readed: Marcar todas como leidas
+Tasks: Tareas
+View all notifications: Ver todas las notificaciones
+View all tasks: Ver todas las tareas
+
+# HUMAN RESOURCES
+#----------------------------------------------------------------------------------------------------------------------
+Personal data: Datos personales
+Bank data: Datos bancarios
+Idcard: DNI
+Ss: Número Seg. Social
+Worker data: Datos del trabajador
+Payroll: Nóminas
+Sick leave: Bajas y permisos
+Holidays: Vacaciones
+Contracts: Contratos

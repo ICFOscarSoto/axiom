@@ -2773,7 +2773,7 @@ fieldset[disabled] .btn-danger.focus {
 .page-body .select2-drop .select2-results .select2-result-selectable:hover,
 .page-body .select2-drop .select2-search .select2-result-selectable.select2-highlighted,
 .page-body .select2-drop .select2-results .select2-result-selectable.select2-highlighted {
-  background: #f3f3f3;
+  background: #fcfcfc;
   color: #303641;
 }
 .page-body .select2-drop .select2-search .select2-result-sub li,
@@ -2804,7 +2804,7 @@ fieldset[disabled] .btn-danger.focus {
   padding: 12px 15px;
 }
 .page-body .select2-drop .select2-search input {
-  background: #f3f3f3 !important;
+  background: #fcfcfc !important;
   border: 0;
   -webkit-background-clip: padding-box;
   -moz-background-clip: padding;
@@ -2812,9 +2812,9 @@ fieldset[disabled] .btn-danger.focus {
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   border-radius: 3px;
-  -moz-box-shadow: inset 0 1px 0 rgba(0,0,0,.03);
+  /*-moz-box-shadow: inset 0 1px 0 rgba(0,0,0,.03);
   -webkit-box-shadow: inset 0 1px 0 rgba(0,0,0,.03);
-  box-shadow: inset 0 1px 0 rgba(0,0,0,.03);
+  box-shadow: inset 0 1px 0 rgba(0,0,0,.03);*/
   padding: 10px 12px;
   padding-right: 30px;
   font-family: "Helvetica Neue", Helvetica, "Noto Sans", sans-serif;

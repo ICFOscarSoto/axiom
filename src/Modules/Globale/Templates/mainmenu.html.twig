@@ -3,7 +3,7 @@
 					<li  attr-id="{{ menuOption.id }}" class="{% if menuOption.rute is not null and optionSelected is not null %} {% if path(optionSelected) == path(menuOption.rute) %}active{% endif %}{% endif %}">
 					<a href="{% if menuOption.rute is not null %}{{ path(menuOption.rute) }}{% endif %}">
 						<i class="{{ menuOption.icon }}"></i>
-						<span class="title">{{ menuOption.name }}</span>
+						<span class="title">{{ (menuOption.name)|trans }}</span>
 					</a>
 					{% if menuOption.childs|length > 0 %}
 					<ul>
@@ -12,7 +12,7 @@
 							<li attr-id="{{ menuOption_child.id }}" attr-parent="{{ menuOption.id }}" class="{% if menuOption_child.rute is not null and optionSelected is not null %} {% if path(optionSelected) == path(menuOption_child.rute) %}active{% endif %}{% endif %}">
 							<a href="{% if menuOption_child.rute is not null %}{{ path(menuOption_child.rute) }}{% endif %}">
 								<i class="{{ menuOption_child.icon }}"></i>
-								<span class="title">{{ menuOption_child.name }}</span>
+								<span class="title">{{ (menuOption_child.name)|trans }}</span>
 							</a>
 						{% if menuOption_child.childs|length > 0 %}
 						<ul>
@@ -20,7 +20,7 @@
 									<li attr-id="{{ menuOption_subchild.id }}" attr-parent="{{ menuOption_child.id }}" class="{% if menuOption_subchild.rute is not null and optionSelected is not null%} {% if path(optionSelected) == path(menuOption_subchild.rute) %}active{% endif %}{% endif %}">
 									<a href="{% if menuOption_subchild.rute is not null %}{{ path(menuOption_subchild.rute) }}{% endif %}">
 										<i class="{{ menuOption_subchild.icon }}"></i>
-										<span class="title">{{ menuOption_subchild.name }}</span>
+										<span class="title">{{ (menuOption_subchild.name)|trans }}</span>
 									</a>
 								</li>
 						{% endfor %}

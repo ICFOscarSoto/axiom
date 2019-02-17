@@ -92,7 +92,10 @@ class FormUtils extends Controller
     $form->handleRequest($this->request);
 		if ($form->isSubmitted() && $form->isValid()) {
 			 $obj = $form->getData();
-       if($obj->getId() == null) $obj->setDateadd(new \DateTime());
+       if($obj->getId() == null){
+         $obj->setDateadd(new \DateTime());
+         $obj->setDeleted(false);
+       }
 			 $obj->setDateupd(new \DateTime());
 			 $this->entityManager->persist($obj);
 			 $this->entityManager->flush();

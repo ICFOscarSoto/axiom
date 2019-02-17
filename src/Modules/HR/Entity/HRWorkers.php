@@ -5,11 +5,12 @@ namespace App\Modules\HR\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\Globale\Entity\Users;
 use \App\Modules\Globale\Entity\Countries;
+use \App\Modules\Globale\Entity\Companies;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\HR\Repository\HRWorkerRepository")
  */
-class HRWorker
+class HRWorkers
 {
     /**
      * @ORM\Id()
@@ -19,9 +20,15 @@ class HRWorker
     private $id;
 
     /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\Companies")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $company;
+
+    /**
      * @ORM\Column(type="string", length=14)
      */
-    private $idCard;
+    private $idcard;
 
     /**
      * @ORM\Column(type="string", length=20, nullable=true)
@@ -82,7 +89,7 @@ class HRWorker
      * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\Countries")
      */
     private $country;
-    
+
     /**
      * @ORM\Column(type="string", length=32, nullable=true)
      */
@@ -133,19 +140,22 @@ class HRWorker
      */
     private $deleted;
 
+    public $newSeconds=1296000;
+  	public $updatedSeconds=1296000;
+
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getIdCard(): ?string
+    public function getIdcard(): ?string
     {
-        return $this->idCard;
+        return $this->idcard;
     }
 
-    public function setIdCard(string $idCard): self
+    public function setIdcard(string $idcard): self
     {
-        $this->idCard = $idCard;
+        $this->idcard = $idcard;
 
         return $this;
     }
@@ -410,6 +420,18 @@ class HRWorker
     public function setIban(?string $iban): self
     {
         $this->iban = $iban;
+
+        return $this;
+    }
+
+    public function getCompany(): ?Companies
+    {
+        return $this->company;
+    }
+
+    public function setCompany(?Companies $company): self
+    {
+        $this->company = $company;
 
         return $this;
     }

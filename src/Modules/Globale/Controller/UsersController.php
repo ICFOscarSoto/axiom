@@ -71,21 +71,22 @@ class UsersController extends Controller
 		$formUtils->init($this->getDoctrine(),$request);
 		$emailAccountsRepository=$this->getDoctrine()->getRepository(EmailAccounts::class);
 
-		$form=$formUtils->createFromEntity($user,$this, array('password','roles','company','active'), array(
+		$form=$formUtils->createFromEntity($user,$this, array('password','roles','emailDefaultAccount','company','active'), array(
 				['password', RepeatedType::class, [
 					'type' => PasswordType::class,
 					'required' => false,
 					'mapped' => false,
 					'first_options'  => ['label' => 'Password'],
 					'second_options' => ['label' => 'Repeat Password']
-				]],['emailDefaultAccount', ChoiceType::class, [
-						'required' => false,
-						'attr' => ['class' => 'select2'],
-            'choices' => $emailAccountsRepository->findBy(["user"=>$this->getUser()]),
-            'placeholder' => 'Select an email account...',
-            'choice_label' => 'name',
-						'choice_value' => 'id'
-					]]
+				]],
+        ['emailDefaultAccount', ChoiceType::class, [
+          'required' => false,
+          'attr' => ['class' => 'select2'],
+          'choices' => $emailAccountsRepository->findBy(["user"=>$user]),
+          'placeholder' => 'Select an email account',
+          'choice_label' => 'name',
+          'choice_value' => 'id'
+        ]]
 			))->getForm();
 
 		$emailAccountsLists[]=EmailController::formatList($this->getUser());
@@ -204,7 +205,7 @@ class UsersController extends Controller
 					['emailDefaultAccount', ChoiceType::class, [
 						'required' => false,
 						'attr' => ['class' => 'select2'],
-            'choices' => $emailAccountsRepository->findBy(["user"=>$this->getUser(),]),
+            'choices' => $emailAccountsRepository->findBy(["user"=>$user]),
             'placeholder' => 'Select an email account...',
             'choice_label' => 'name',
 						'choice_value' => 'id'

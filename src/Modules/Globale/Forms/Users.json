@@ -1,31 +1,11 @@
 [{
-	"fields": [{
-			"field": "name",
-			"cols": 5
-		},
-		{
-			"field": "firstname",
-			"cols": 7
-		},
-		{
-			"field": "email",
-			"cols": 4
-		},
-		{
-			"field": "company",
-			"cols": 4
-		},
-		{
-			"field": "roles",
-			"cols": 4
-		},
-		{
-			"field": "password",
-			"cols": 4
-		},
-		{
-			"field": "emailDefaultAccount",
-			"cols": 4
-		}
+	"fields": [
+		{ "name": "name", "cols": 5},
+		{	"name": "lastname", "cols": 7},
+		{	"name": "email", "cols": 4},
+		{	"name": "company", "cols": 4},
+		{	"name": "roles", "cols": 4},
+		{	"name": "password",	"cols": 4},
+		{	"name": "emailDefaultAccount", "cols": 4}
 	]
 }]

@@ -1,13 +1,46 @@
+#MENU OPTIONS
+#----------------------------------------------------------------------------------------------------------------------
+Companies: Companies
+Countries: Countries
+Currencies: Currencies
+Administrator: Administrator
+Users: Users
+Devices: Devices
+Human resources: Human resources
+Workers: Workers
+Shifts and schedules: Shifts and schedules
+
+#LANGUAGES
+#----------------------------------------------------------------------------------------------------------------------
+Spanish: Spanish
+English: English
+
+#GLOBAL
+#----------------------------------------------------------------------------------------------------------------------
+Save: Save
+Edit: Edit
+New: New
+Log Out: Log Out
+Language: Language
+
+#USERS
+#----------------------------------------------------------------------------------------------------------------------
+User data: User data
+Lastname: Lastname
+Password: Password
+Repeat Password: Repeat Password
+Email: Email
+Edit profile: Edit profile
+
 #LOGIN
 #----------------------------------------------------------------------------------------------------------------------
-'Correo electrónico': Email
+Correo electrónico: Email
 Contraseña: Password
-'Inicio de sesión': Login
-'Inicie sesión': Login
-'con su cuenta': 'with your account'
-'¿Olvidó su contraseña?': 'Forgot password?'
+Inicio de sesión: Login
+Inicie sesión: Login
+con su cuenta: 'with your account'
+¿Olvidó su contraseña?: 'Forgot password?'
 Registrese: 'Sign up'
-
 
 #COMPANY
 #----------------------------------------------------------------------------------------------------------------------
@@ -23,6 +56,35 @@ Phone: Phone
 Mobile: Mobile
 Active: Active
 
-#COUNTRIES
+# EMAIL MODULE
 #----------------------------------------------------------------------------------------------------------------------
-#TODO: COUNTRIES
+Email Accounts: Email Accounts
+Email default account: Email default account
+Select an email account: Select an email account
+Inbox: Inbox
+Compose: Compose
+Search emails: Search emails
+All emails: All emails
+
+# CALENDAR MODULE
+#----------------------------------------------------------------------------------------------------------------------
+Calendar: Calendar
+
+# TASKS AND NOTIFICATIOS MODULE
+#----------------------------------------------------------------------------------------------------------------------
+Mark all as readed: Mark all as readed
+Tasks: Tasks
+View all notifications: View all notifications
+View all tasks: View all tasks
+
+# HUMAN RESOURCES
+#----------------------------------------------------------------------------------------------------------------------
+Personal data: Personal data
+Bank data: Bank data
+Idcard: Identitification card
+Ss: Social number
+Worker data: Worker data
+Payroll: Payroll
+Sick leave: Sick leave
+Holidays: Holidays
+Contracts: Contracts

@@ -1,34 +1,43 @@
 {{ form_start(formConstructor.form) }}
-<div class="row">
+
   {% set counter = 1 %}
-  {% for field in formConstructor.template.0.fields %}
-    <div class="col-md-{{ field.cols }}">
-
-        {% if field.type is defined and field.type == 'image' %}
-          {# Field type Image #}
-            <div class="fileinput fileinput-new" data-provides="fileinput">
-							<div class="fileinput-new thumbnail" style="width: {{ field.width }}; height: {{ field.height }};" data-trigger="fileinput">
-								<img src="{{ _context[field.value] }}" alt="">
-							</div>
-							<div class="fileinput-preview fileinput-exists thumbnail" style="max-width: {{ field.width }}; max-height: {{ field.height }}"></div>
-							<div>
-								<span class="btn btn-white btn-file">
-									<span class="fileinput-new">Select image</span>
-									<span class="fileinput-exists">Change</span>
-									<input type="file" id="form_{{field.field}}" name="form[{{field.field}}]" accept="image/*" class="form-control-file">
-								</span>
-								<a href="#" class="btn btn-orange fileinput-exists" data-dismiss="fileinput">Cancel</a>
-							</div>
-						</div>
-        {% elseif field.type is defined and field.type == 'file' %}
-          values 2
-        {% else %}
-          {# Default component of the form #}
-          {{ form_row(formConstructor.form[field.field]) }}
-        {% endif %}
-
+  {% for section in formConstructor.template.0.sections %}
+  <div class="panel minimal">
+    <div class="panel-heading">
+      <div class="panel-title">{{ (section.name)|trans }}</div>
     </div>
-  {% set counter = counter +1 %}
+    <div class="panel-body">
+      <div class="row">
+      {% for field in section.fields %}
+        <div class="col-md-{{ field.cols }}">
+            {% if field.type is defined and field.type == 'image' %}
+              {# Field type Image #}
+                <div class="fileinput fileinput-new" data-provides="fileinput">
+    							<div class="fileinput-new thumbnail" style="width: {{ field.width }}; height: {{ field.height }};" data-trigger="fileinput">
+    								<img src="{{ _context[field.value] }}" alt="">
+    							</div>
+    							<div class="fileinput-preview fileinput-exists thumbnail" style="max-width: {{ field.width }}; max-height: {{ field.height }}"></div>
+    							<div>
+    								<span class="btn btn-white btn-file">
+    									<span class="fileinput-new">Select image</span>
+    									<span class="fileinput-exists">Change</span>
+    									<input type="file" id="form_{{field.name}}" name="form[{{field.name}}]" accept="image/*" class="form-control-file">
+    								</span>
+    								<a href="#" class="btn btn-orange fileinput-exists" data-dismiss="fileinput">Cancel</a>
+    							</div>
+    						</div>
+            {% elseif field.type is defined and field.type == 'file' %}
+              values 2
+            {% else %}
+              {# Default component of the form #}
+              {{ form_row(formConstructor.form[field.name]) }}
+            {% endif %}
+        </div>
+        {% set counter = counter +1 %}
+      {% endfor %}
+      </div>
+    </div>
+  </div>
   {% endfor %}
-</div>
+
 {{ form_end(formConstructor.form) }}

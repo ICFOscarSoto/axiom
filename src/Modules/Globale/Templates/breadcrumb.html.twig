@@ -1,7 +1,7 @@
 <ol class="breadcrumb bc-3">
 	{% for item in breadcrumb %}
 	<li>
-		<a href="{% if item.rute is not null %}{{ path(item.rute) }}{% endif %}"><i class="{{ item.icon }}"></i>{{ item.name }}</a>
+		<a href="{% if item.rute is not null %}{{ path(item.rute) }}{% endif %}"><i class="{{ item.icon }}"></i>{{ (item.name)|trans }}</a>
 	</li>
 	{% endfor %}
 </ol>

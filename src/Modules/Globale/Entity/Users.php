@@ -47,7 +47,7 @@ class Users implements UserInterface
     /**
      * @ORM\Column(type="string", length=150, nullable=true)
      */
-    private $firstname;
+    private $lastname;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Modules\Globale\Entity\Companies", inversedBy="users")
@@ -168,14 +168,14 @@ class Users implements UserInterface
         return $this;
     }
 
-    public function getFirstname(): ?string
+    public function getLastname(): ?string
     {
-        return $this->firstname;
+        return $this->lastname;
     }
 
-    public function setFirstname(?string $firstname): self
+    public function setLastname(?string $lastname): self
     {
-        $this->firstname = $firstname;
+        $this->lastname = $lastname;
 
         return $this;
     }
@@ -223,7 +223,7 @@ class Users implements UserInterface
                                  $data["id"]=$this->getId();
                              		$data["email"]=$this->getEmail();
                              		$data["name"]=$this->getName();
-                             		$data["firstname"]=$this->getFirstname();
+                             		$data["firstname"]=$this->getLastname();
                              		$data["roles"]=$this->getRoles();
                              		return $data;
                              	}

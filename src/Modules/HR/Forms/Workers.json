@@ -1,0 +1,39 @@
+[{
+	"sections": [
+		{
+			"name": "Personal data",
+			"fields": [
+				{ "name": "idcard", "cols": 3},
+				{	"name": "ss", "cols": 3},
+				{	"name": "name", "cols": 4},
+				{	"name": "lastname", "cols": 5},
+				{	"name": "external", "cols": 2},
+				{	"name": "status", "cols": 2},
+				{	"name": "user", "cols": 3},
+				{	"name": "dateofemploy", "cols": 4},
+				{	"name": "active", "cols": 3}
+			]
+		},
+		{
+			"name": "Address",
+			"fields": [
+				{	"name": "address",	"cols": 4},
+				{	"name": "city", "cols": 3},
+		    {	"name": "state",	"cols": 3},
+		    {	"name": "postcode", "cols": 3},
+		    {	"name": "country",	"cols": 3},
+		    {	"name": "phone",	"cols": 3},
+				{	"name": "mobile", "cols": 3},
+		    {	"name": "email", "cols": 5}
+			]
+		},
+		{
+			"name": "Bank data",
+			"fields": [
+				{	"name": "bank", "cols": 5},
+		    {	"name": "ccc",	"cols": 5},
+		    {	"name": "iban", "cols": 5}
+			]
+		}
+	]
+}]

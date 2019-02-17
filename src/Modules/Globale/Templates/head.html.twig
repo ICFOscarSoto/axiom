@@ -192,28 +192,28 @@
 					<li>
 						<a href="{{ url('profile') }}">
 							<i class="entypo-user"></i>
-							Editar perfil
+							{% trans %}Edit profile{% endtrans %}
 						</a>
 					</li>
 
 					<li>
 						<a href="{{ url('email') }}">
 							<i class="entypo-mail"></i>
-							Bandeja de Entrada
+							{% trans %}Inbox{% endtrans %}
 						</a>
 					</li>
 
 					<li>
 						<a href="{{ url('calendar') }}">
 							<i class="entypo-calendar"></i>
-							Calendario
+							{% trans %}Calendar{% endtrans %}
 						</a>
 					</li>
 
 					<li>
 						<a href="#">
 							<i class="entypo-clipboard"></i>
-							Tareas
+							{% trans %}Tasks{% endtrans %}
 						</a>
 					</li>
 				</ul>
@@ -234,7 +234,7 @@
 				<ul class="dropdown-menu">
 					<li class="top">
 						<p class="small">
-							<a id="notifications-readall" href="#" class="pull-right">Marcar todas como leidas</a>
+							<a id="notifications-readall" href="#" class="pull-right">{% trans %}Mark all as readed{% endtrans %}</a>
 							Tienes <strong id="notifications-count-long">0</strong> notificaciones nuevas.
 						</p>
 					</li>
@@ -244,7 +244,7 @@
 						</ul>
 					</li>
 					<li class="external">
-						<a href="{{ url('notifications') }}">Ver todas las notificaciones</a>
+						<a href="{{ url('notifications') }}">{% trans %}View all notifications{% endtrans %}</a>
 					</li>
 				</ul>
 			</li>
@@ -262,7 +262,7 @@
 						<form class="top-dropdown-search">
 
 							<div class="form-group">
-								<input type="text" class="form-control" placeholder="Buscar correo electrónico" name="s" />
+								<input type="text" class="form-control" placeholder="{% trans %}Search emails{% endtrans %}" name="s" />
 							</div>
 
 						</form>
@@ -273,7 +273,7 @@
 					</li>
 
 					<li class="external">
-						<a href="{{url('email')}}">Todos los mensajes</a>
+						<a href="{{url('email')}}">{% trans %}All emails{% endtrans %}</a>
 					</li>
 				</ul>
 
@@ -299,7 +299,7 @@
 					</li>
 
 					<li class="external">
-						<a href="#">Ver todas las tareas</a>
+						<a href="#">{% trans %}View all tasks{% endtrans %}</a>
 					</li>
 				</ul>
 
@@ -333,7 +333,7 @@
 
 			<li>
 				<a href="{{ url('index') }}logout">
-					Log Out <i class="entypo-logout right"></i>
+					{% trans %}Log Out{% endtrans %} <i class="entypo-logout right"></i>
 				</a>
 			</li>
 		</ul>

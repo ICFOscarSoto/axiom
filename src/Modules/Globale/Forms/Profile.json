@@ -1,32 +1,10 @@
 [{
 	"fields": [
-		{
-			"field": "userImage",
-			"cols": 4,
-			"type": "image",
-			"value": "userImage",
-			"width": "100%",
-			"height": "250px"
-		},
-		{
-			"field": "name",
-			"cols": 5
-		},
-		{
-			"field": "firstname",
-			"cols": 7
-		},
-		{
-			"field": "password",
-			"cols": 4
-		},
-		{
-			"field": "email",
-			"cols": 8
-		},
-		{
-			"field": "emailDefaultAccount",
-			"cols": 4
-		}
+		{ "name": "userImage", "cols": 4,	"type": "image", "value": "userImage", "width": "100%",	"height": "250px"},
+		{	"name": "name",	"cols": 5},
+		{ "name": "lastname",	"cols": 7},
+		{	"name": "password",	"cols": 4},
+		{	"name": "email", "cols": 8},
+		{	"name": "emailDefaultAccount", "cols": 4}
 	]
 }]

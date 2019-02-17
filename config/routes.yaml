@@ -65,3 +65,8 @@ IoT:
 
 Ticketing:
    resource: 'App\Modules\Ticketing\Controller\TicketingController'
+   type:     annotation
+
+HR:
+   resource: 'App\Modules\HR\Controller\HRController'
+   type:     annotation

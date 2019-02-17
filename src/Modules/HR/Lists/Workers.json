@@ -1,0 +1,7 @@
+[{"name": "id", "caption":""},
+ {"name": "idCard", "caption":"CIF", "width" : "10%"},
+ {"name": "ss", "caption":"Nº Seg. Social"},
+ {"name": "name","caption":"Nombre"},
+ {"name": "lastname","caption":"Apellidos"},
+ {"name": "active", "caption":"Estado", "width":"10%" ,"class" : "dt-center", "replace":{"1":"<div style=\"min-width: 75px;\" class=\"label label-success\">Activo</div>", "0" : "<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado</div>"}}
+]

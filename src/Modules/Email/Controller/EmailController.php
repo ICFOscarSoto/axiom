@@ -692,4 +692,34 @@ class EmailController extends Controller
 	}
 
 
+	/**
+	* @Route("/{_locale}/email/accounts/{id}/disable", name="disableEmailAccount")
+	*/
+	public function disable($id)
+		{
+		$this->denyAccessUnlessGranted('ROLE_ADMIN');
+		$entityUtils=new EntityUtils();
+		$result=$entityUtils->disableObject($id, $this->class, $this->getDoctrine());
+		return new JsonResponse(array('result' => $result));
+	}
+	/**
+	* @Route("/{_locale}/email/accounts/{id}/enable", name="enableEmailAccount")
+	*/
+	public function enable($id)
+		{
+		$this->denyAccessUnlessGranted('ROLE_ADMIN');
+		$entityUtils=new EntityUtils();
+		$result=$entityUtils->enableObject($id, $this->class, $this->getDoctrine());
+		return new JsonResponse(array('result' => $result));
+	}
+	/**
+	* @Route("/{_locale}/email/accounts/{id}/delete", name="deleteEmailAccount")
+	*/
+	public function delete($id){
+		$this->denyAccessUnlessGranted('ROLE_ADMIN');
+		$entityUtils=new EntityUtils();
+		$result=$entityUtils->deleteObject($id, $this->class, $this->getDoctrine());
+		return new JsonResponse(array('result' => $result));
+	}
+
 }

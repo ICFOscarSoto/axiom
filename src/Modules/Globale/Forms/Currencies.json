@@ -1,23 +1,9 @@
 [{
-	"fields": [{
-			"field": "name",
-			"cols": 8
-		},
-		{
-			"field": "isocode",
-			"cols": 4
-		},
-		{
-			"field": "numcode",
-			"cols": 4
-		},
-		{
-			"field": "charcode",
-			"cols": 4
-		},
-		{
-			"field": "decimals",
-			"cols": 4
-		}
+	"fields": [
+		{ "name": "name",	"cols": 8},
+		{	"name": "isocode", "cols": 4},
+		{	"name": "numcode", "cols": 4},
+		{	"name": "charcode",	"cols": 4},
+		{	"name": "decimals",	"cols": 4}
 	]
 }]

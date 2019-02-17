@@ -5,6 +5,7 @@ twig:
     form_themes: ['form/boostrap.html.twig']
     paths:
         '%kernel.project_dir%/templates/twig': Twig
+        '%kernel.project_dir%/src/Modules/HR/Templates': HR
         '%kernel.project_dir%/src/Modules/Share/Templates': Share
         '%kernel.project_dir%/src/Modules/Email/Templates': Email
         '%kernel.project_dir%/src/Modules/Calendar/Templates': Calendar

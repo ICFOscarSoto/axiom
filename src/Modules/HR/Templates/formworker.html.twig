@@ -16,34 +16,68 @@
 		{{ include('@Globale/head.html.twig') }}
 		<hr />
 		{{ include('@Globale/breadcrumb.html.twig') }}
-		<h2>{{ interfaceName }}</h2>
-		</br>
+
 		<!-- MAIN CONTENT -->
-		<div class="principal-content">
+    <div class="principal-content">
     <div class="row">
 			<div class="col-md-12">
 	      <ul class="nav nav-tabs bordered"><!-- available classes "bordered", "right-aligned" -->
 						<li class="active">
 							<a href="#data" data-toggle="tab">
 								<span class="visible-xs"><i class="entypo-home"></i></span>
-								<span class="hidden-xs">{% trans %}User data{% endtrans %}</span>
+								<span class="hidden-xs">{% trans %}Worker data{% endtrans %}</span>
 							</a>
 						</li>
 						<li>
-							<a href="#email" data-toggle="tab">
+							<a href="#contracts" data-toggle="tab">
 								<span class="visible-xs"><i class="entypo-user"></i></span>
-								<span class="hidden-xs">{% trans %}Email Accounts{% endtrans %}</span>
+								<span class="hidden-xs">{% trans %}Contracts{% endtrans %}</span>
+							</a>
+						</li>
+						<li>
+							<a href="#payroll" data-toggle="tab">
+								<span class="visible-xs"><i class="entypo-user"></i></span>
+								<span class="hidden-xs">{% trans %}Payroll{% endtrans %}</span>
+							</a>
+						</li>
+            <li>
+							<a href="#shifts" data-toggle="tab">
+								<span class="visible-xs"><i class="entypo-user"></i></span>
+								<span class="hidden-xs">{% trans %}Shifts and schedules{% endtrans %}</span>
+							</a>
+						</li>
+            <li>
+							<a href="#sick" data-toggle="tab">
+								<span class="visible-xs"><i class="entypo-user"></i></span>
+								<span class="hidden-xs">{% trans %}Sick leave{% endtrans %}</span>
+							</a>
+						</li>
+            <li>
+							<a href="#holidays" data-toggle="tab">
+								<span class="visible-xs"><i class="entypo-user"></i></span>
+								<span class="hidden-xs">{% trans %}Holidays{% endtrans %}</span>
 							</a>
 						</li>
 				</ul>
 					<div class="tab-content">
 						<div class="tab-pane active" id="data">
-	            {% set formConstructor = formProfile %}
+	            {% set formConstructor = formworker %}
 	        		{{ include('@Globale/form.html.twig') }}
 	          </div>
-	          <div class="tab-pane" id="email">
-							{% set listConstructor = lists[0] %}
-							{{ include('@Globale/list.html.twig') }}
+						<div class="tab-pane" id="contracts">
+
+	          </div>
+	          <div class="tab-pane" id="payroll">
+
+	          </div>
+            <div class="tab-pane" id="shifts">
+
+	          </div>
+            <div class="tab-pane" id="sick">
+
+	          </div>
+            <div class="tab-pane" id="holidays">
+
 	          </div>
 	        </div>
 			</div>
@@ -69,7 +103,6 @@
 	<script src="{{ url('index') }}js/select2/select2.min.js"></script>
 	<script src="{{ url('index') }}js/moment.min.js"></script>
 	<script src="{{ url('index') }}js/moment-es.js"></script>
-	<script src="{{ url('index') }}js/fileinput.js"></script>
 	 {{ include('@Globale/bottom.html.twig') }}
 {% endblock %}
 </body>
