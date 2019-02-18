@@ -62,3 +62,8 @@ doctrine:
                 type: annotation
                 dir: '%kernel.project_dir%/src/Modules/HR/Entity'
                 prefix: 'App\Modules\HR\Entity'
+            Cloud:
+                is_bundle: false
+                type: annotation
+                dir: '%kernel.project_dir%/src/Modules/Cloud/Entity'
+                prefix: 'App\Modules\Cloud\Entity'

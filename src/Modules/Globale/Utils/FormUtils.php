@@ -40,6 +40,10 @@ class FormUtils extends Controller
                     function ($tagsAsString) {return explode(',', $tagsAsString);}
                 ));
           break;*/
+          case 'datetime':
+            $form->add($value['fieldName'], DateTimeType::class, array('widget' => 'single_text', 'date_format' => 'dd-MM-yyyy HH:mm'));
+          break;
+
           case 'json':
             $form->add($value['fieldName'], TextType::class, ['attr'=>['class' => 'tagsinput']]);
             $form->get($value['fieldName'])
@@ -71,18 +75,22 @@ class FormUtils extends Controller
   }
 
   public function choiceRelation($class, $data){
+    $classname=explode('\\', $class);
     $result =  [
                   'attr' => ['class' => 'select2'],
                   'choices' => $this->doctrine->getRepository($class)->findBy(['active'=>true, 'deleted'=>false]),
                   //'choices' => $this->doctrine->getRepository($class)->findAll(),
                   'choice_label' => function($obj, $key, $index) {
-                      return $obj->getName();
+                      if(method_exists($obj, "getLastname"))
+                        return $obj->getLastname().", ".$obj->getName();
+                      else return $obj->getName();
                   },
                   'choice_attr' => function($obj, $key, $index) {
                       return ['class' => $obj->getId()];
                   },
                   'expanded' => false,
-                  'data' =>$data
+                  'data' =>$data,
+                  'placeholder' => 'Select '.strtolower(end($classname))
               ];
 
     return $result;

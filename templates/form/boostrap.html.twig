@@ -30,6 +30,7 @@
         {% set valid = true %}
     {%- endif -%}
     {{- parent() -}}
+
 {%- endblock datetime_widget %}
 
 {% block date_widget -%}
@@ -49,7 +50,7 @@
 {%- endblock time_widget %}
 
 {% block dateinterval_widget -%}
-    {%- if widget != 'single_text' and not valid -%}
+    {#{%- if widget != 'single_text' and not valid -%}
         {% set attr = attr|merge({class: (attr.class|default('') ~ ' form-control is-invalid')|trim}) -%}
         {% set valid = true %}
     {%- endif -%}
@@ -102,7 +103,7 @@
             {%- endif -%}
             {%- if with_invert %}{{ form_widget(form.invert) }}{% endif -%}
         </div>
-    {%- endif -%}
+    {%- endif -%}#}
 {%- endblock dateinterval_widget %}
 
 {% block percent_widget -%}
@@ -188,7 +189,7 @@
 {% block form_label -%}
     {% if label is not same as(false) -%}
         {%- if compound is defined and compound -%}
-            {%- set element = 'legend' -%}
+            {#{%- set element = 'legend' -%}#}
             {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' col-form-label')|trim}) -%}
         {%- else -%}
             {%- set label_attr = label_attr|merge({for: id}) -%}

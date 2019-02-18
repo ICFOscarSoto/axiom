@@ -1,0 +1,6 @@
+[{"name": "id", "caption":""},
+ {"name": "icon", "caption":"", "type":"image", "width":"45px"},
+ {"name": "name","caption":"Nombre","width":"90%"},
+ {"name": "size","caption":"Tamaño"},
+ {"name": "active", "caption":"Estado", "width":"10%" ,"class" : "dt-center", "replace":{"1":"<div style=\"min-width: 75px;\" class=\"label label-success\">Activo</div>", "0" : "<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado</div>"}}
+]

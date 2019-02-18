@@ -25,12 +25,14 @@ Language: Idioma
 
 #USERS
 #----------------------------------------------------------------------------------------------------------------------
+User: Usuario
 User data: Datos de usuario
 Lastname: Apellidos
 Password: Password
 Repeat Password: Repetir Password
 Email: Email
 Edit profile: Editar perfil
+Select users: Seleccione un usuario
 
 #LOGIN
 #----------------------------------------------------------------------------------------------------------------------
@@ -41,6 +43,10 @@ Inicie sesión: Login
 con su cuenta: with your account
 ¿Olvidó su contraseña?: Forgot password?
 Registrese: Sign up
+
+#COUNTRIES
+#----------------------------------------------------------------------------------------------------------------------
+Select countries: Seleccione un país
 
 #COMPANY
 #----------------------------------------------------------------------------------------------------------------------
@@ -85,6 +91,14 @@ Idcard: DNI
 Ss: Número Seg. Social
 Worker data: Datos del trabajador
 Payroll: Nóminas
+Training: Formación
+Dateofemploy: Fecha de contratación
 Sick leave: Bajas y permisos
+External: Externo
 Holidays: Vacaciones
 Contracts: Contratos
+Documents: Documentos
+Status: Estado
+Bank: Entidad Bancaria
+Ccc: Número de cuenta (CCC)
+Iban: IBAN

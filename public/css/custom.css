@@ -99,6 +99,8 @@ table.dataTable.compact tbody th, table.dataTable.compact tbody td {
 
 .dropzone {
   min-height: 175px !important;
+  border: 2px dotted #e8e8e8 !important;
+  background: #fff !important; 
 }
 
 .dropzone .dz-preview, .dropzone-previews .dz-preview {
@@ -203,6 +205,16 @@ table.dataTable.compact tbody th, table.dataTable.compact tbody td {
 .page-body .select2-drop .select2-search:after {
   top: 8px !important;
 }
+
+.form-check{
+  height: 55px;
+  padding-top: 26px;
+}
+
+.nav-tabs.bordered + .tab-content {
+min-height: 600px;
+}
+
 /*
 .spinner-container {
    position: absolute;

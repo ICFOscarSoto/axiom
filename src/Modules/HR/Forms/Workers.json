@@ -7,11 +7,11 @@
 				{	"name": "ss", "cols": 3},
 				{	"name": "name", "cols": 4},
 				{	"name": "lastname", "cols": 5},
-				{	"name": "external", "cols": 2},
 				{	"name": "status", "cols": 2},
-				{	"name": "user", "cols": 3},
-				{	"name": "dateofemploy", "cols": 4},
-				{	"name": "active", "cols": 3}
+				{	"name": "user", "cols": 2},
+				{	"name": "dateofemploy", "cols": 3},
+				{	"name": "external", "cols": 1},
+				{	"name": "active", "cols": 1}
 			]
 		},
 		{

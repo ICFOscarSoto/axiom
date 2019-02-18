@@ -70,3 +70,7 @@ Ticketing:
 HR:
    resource: 'App\Modules\HR\Controller\HRController'
    type:     annotation
+
+Cloud:
+   resource: 'App\Modules\Cloud\Controller\CloudController'
+   type:     annotation

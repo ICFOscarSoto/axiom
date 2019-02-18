@@ -1,0 +1,27 @@
+<div class="dropzone"><div class="dz-message" data-dz-message>
+  {% set listConstructor = cloudConstructor.list[0] %}
+  {{ include('@Globale/list.html.twig') }}
+  <script>
+    $(document).ready(function(){
+      Dropzone.autoDiscover = false;
+      var jsonFiles = [];
+      var dropzone_default = new Dropzone(".dropzone", {
+          url: '{{cloudConstructor.path}}',
+          maxFilesize: 20,  // in Mb
+          addRemoveLinks: false,
+          clickable: false,
+          init: function () {
+              this.on("maxfilesexceeded", function(file) {
+                  this.removeFile(file);
+              });
+              this.on("success", function(file, response) {
+                  if (response.uploaded){
+                    this.removeFile(file);
+                    $("#{{ listConstructor.id }}").DataTable().ajax.reload();
+                  }
+              });
+          }
+      });
+    });
+    </script>
+</div></div>

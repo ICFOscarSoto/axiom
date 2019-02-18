@@ -40,6 +40,12 @@
 								<span class="hidden-xs">{% trans %}Payroll{% endtrans %}</span>
 							</a>
 						</li>
+						<li>
+							<a href="#training" data-toggle="tab">
+								<span class="visible-xs"><i class="entypo-user"></i></span>
+								<span class="hidden-xs">{% trans %}Training{% endtrans %}</span>
+							</a>
+						</li>
             <li>
 							<a href="#shifts" data-toggle="tab">
 								<span class="visible-xs"><i class="entypo-user"></i></span>
@@ -58,6 +64,12 @@
 								<span class="hidden-xs">{% trans %}Holidays{% endtrans %}</span>
 							</a>
 						</li>
+						<li>
+							<a href="#documents" data-toggle="tab">
+								<span class="visible-xs"><i class="entypo-user"></i></span>
+								<span class="hidden-xs">{% trans %}Documents{% endtrans %}</span>
+							</a>
+						</li>
 				</ul>
 					<div class="tab-content">
 						<div class="tab-pane active" id="data">
@@ -70,6 +82,9 @@
 	          <div class="tab-pane" id="payroll">
 
 	          </div>
+						<div class="tab-pane" id="training">
+
+	          </div>
             <div class="tab-pane" id="shifts">
 
 	          </div>
@@ -79,6 +94,10 @@
             <div class="tab-pane" id="holidays">
 
 	          </div>
+						<div class="tab-pane" id="documents">
+								{% set cloudConstructor = listDocuments %}
+							  {{ include('@Cloud/genericlistfiles.html.twig') }}
+						</div>
 	        </div>
 			</div>
     </div>
@@ -94,6 +113,7 @@
 
 	<!-- END MODALS -->
 {% block footer %}
+	<link rel="stylesheet" href="{{ url('index') }}js/dropzone/dropzone.css">
 	<link rel="stylesheet" href="{{ url('index') }}js/datatables/datatables.css">
 	<link rel="stylesheet" href="{{ url('index') }}js/select2/select2-bootstrap.css">
 	<link rel="stylesheet" href="{{ url('index') }}js/select2/select2.css">
@@ -103,6 +123,7 @@
 	<script src="{{ url('index') }}js/select2/select2.min.js"></script>
 	<script src="{{ url('index') }}js/moment.min.js"></script>
 	<script src="{{ url('index') }}js/moment-es.js"></script>
-	 {{ include('@Globale/bottom.html.twig') }}
+	{{ include('@Globale/bottom.html.twig') }}
+	<script src="{{ url('index') }}js/dropzone/dropzone.js"></script>
 {% endblock %}
 </body>

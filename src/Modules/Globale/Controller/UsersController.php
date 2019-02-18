@@ -71,7 +71,7 @@ class UsersController extends Controller
 		$formUtils->init($this->getDoctrine(),$request);
 		$emailAccountsRepository=$this->getDoctrine()->getRepository(EmailAccounts::class);
 
-		$form=$formUtils->createFromEntity($user,$this, array('password','roles','emailDefaultAccount','company','active'), array(
+		$form=$formUtils->createFromEntity($user,$this, ['password','roles','emailDefaultAccount','company','active'], [
 				['password', RepeatedType::class, [
 					'type' => PasswordType::class,
 					'required' => false,
@@ -87,7 +87,7 @@ class UsersController extends Controller
           'choice_label' => 'name',
           'choice_value' => 'id'
         ]]
-			))->getForm();
+			])->getForm();
 
 		$emailAccountsLists[]=EmailController::formatList($this->getUser());
 		return $this->render('@Globale/formprofile.html.twig', array(

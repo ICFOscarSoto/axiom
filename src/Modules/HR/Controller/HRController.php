@@ -17,6 +17,9 @@ use App\Modules\Globale\Utils\EntityUtils;
 use App\Modules\Globale\Utils\ListUtils;
 use App\Modules\Globale\Utils\FormUtils;
 use App\Modules\HR\Entity\HRWorkers;
+use App\Modules\Cloud\Controller\CloudController;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+
 
 class HRController extends Controller
 {
@@ -148,10 +151,19 @@ class HRController extends Controller
 			$obj=$companyRepository->find($id);
 			$formUtils=new FormUtils();
 			$formUtils->init($this->getDoctrine(),$request);
-			$form=$formUtils->createFromEntity($obj,$this)->getForm();
+			$form=$formUtils->createFromEntity($obj,$this,['status'],[
+				['status', ChoiceType::class, [
+          'required' => false,
+          'attr' => ['class' => 'select2'],
+          'choices' => ["Inactive"=>0,"Active"=>1,"Sick leave"=>2],
+          'placeholder' => 'Select an status',
+        ]]
+
+			])->getForm();
 			$formUtils->proccess($form,$obj);
 
 			array_push($breadcrumb, $new_breadcrumb);
+			$cloudLists[]=CloudController::formatList($this->getUser());
 			return $this->render('@HR/formworker.html.twig', array(
 					'controllerName' => 'WorkersController',
 					'interfaceName' => 'Trabajadores',
@@ -159,7 +171,8 @@ class HRController extends Controller
 					'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
 					'breadcrumb' =>  $breadcrumb,
 					'userData' => $userdata,
-					'formworker' => ["form" => $form->createView(),"template" => json_decode(file_get_contents (dirname(__FILE__)."/../Forms/Workers.json"),true)]
+					'formworker' => ["form" => $form->createView(),"template" => json_decode(file_get_contents (dirname(__FILE__)."/../Forms/Workers.json"),true)],
+					'listDocuments' => ["list" => $cloudLists, "path" => $this->generateUrl('cloudUpload', array('path'=>'workers', 'id'=>$id))]
 			));
 		}
 

@@ -25,12 +25,14 @@ Language: Language
 
 #USERS
 #----------------------------------------------------------------------------------------------------------------------
+User: User
 User data: User data
 Lastname: Lastname
 Password: Password
 Repeat Password: Repeat Password
 Email: Email
 Edit profile: Edit profile
+Select users: Select an users
 
 #LOGIN
 #----------------------------------------------------------------------------------------------------------------------
@@ -41,6 +43,10 @@ Inicie sesión: Login
 con su cuenta: 'with your account'
 ¿Olvidó su contraseña?: 'Forgot password?'
 Registrese: 'Sign up'
+
+#COUNTRIES
+#----------------------------------------------------------------------------------------------------------------------
+Select countries: Select a country
 
 #COMPANY
 #----------------------------------------------------------------------------------------------------------------------
@@ -85,6 +91,14 @@ Idcard: Identitification card
 Ss: Social number
 Worker data: Worker data
 Payroll: Payroll
+Training: Job training
+Dateofemploy: Date of employ
 Sick leave: Sick leave
 Holidays: Holidays
 Contracts: Contracts
+External: External
+Documents: Documents
+Status: Status
+Bank: Bank
+Ccc: Account number (CCN)
+Iban: IBAN
