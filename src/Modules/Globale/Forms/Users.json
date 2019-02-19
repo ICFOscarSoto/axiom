@@ -1,11 +1,15 @@
 [{
-	"fields": [
-		{ "name": "name", "cols": 5},
-		{	"name": "lastname", "cols": 7},
-		{	"name": "email", "cols": 4},
-		{	"name": "company", "cols": 4},
-		{	"name": "roles", "cols": 4},
-		{	"name": "password",	"cols": 4},
-		{	"name": "emailDefaultAccount", "cols": 4}
-	]
+	"sections": [
+		{
+			"name": "User data",
+			"fields": [
+				{ "name": "name", "cols": 5},
+				{	"name": "lastname", "cols": 7},
+				{	"name": "email", "cols": 4},
+				{	"name": "company", "cols": 4},
+				{	"name": "roles", "cols": 4},
+				{	"name": "password",	"cols": 4},
+				{	"name": "emailDefaultAccount", "cols": 4}
+			]
+		}]
 }]

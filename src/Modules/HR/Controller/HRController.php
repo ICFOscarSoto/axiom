@@ -19,6 +19,7 @@ use App\Modules\Globale\Utils\FormUtils;
 use App\Modules\HR\Entity\HRWorkers;
 use App\Modules\Cloud\Controller\CloudController;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use App\Modules\HR\Utils\HRWorkersUtils;
 
 
 class HRController extends Controller
@@ -37,7 +38,8 @@ class HRController extends Controller
 		$locale = $request->getLocale();
 		$this->router = $router;
 		$menurepository=$this->getDoctrine()->getRepository(MenuOptions::class);
-		$templateLists[]=$this->formatList($this->getUser());
+		$utils = new HRWorkersUtils();
+		$templateLists[]=$utils->formatList($this->getUser());
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 			return $this->render('@Globale/genericlist.html.twig', [
 				'controllerName' => 'HRController',
@@ -66,20 +68,6 @@ class HRController extends Controller
 		$listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Workers.json"),true);
 		$return=$listUtils->getRecords($repository,$request,$manager,$listFields, $this->class);
 		return new JsonResponse($return);
-	}
-	public function formatList($user){
-		$list=[
-			'id' => 'listWorkers',
-			'route' => 'workerslist',
-			'routeParams' => ["id" => $user->getId()],
-			'orderColumn' => 1,
-			'orderDirection' => 'ASC',
-			'tagColumn' => 1,
-			'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Workers.json"),true),
-			'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/WorkersFieldButtons.json"),true),
-			'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/WorkersTopButtons.json"),true)
-		];
-		return $list;
 	}
 
 		/**
@@ -136,44 +124,11 @@ class HRController extends Controller
     {
 			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 			$this->denyAccessUnlessGranted('ROLE_ADMIN');
-			$userdata=$this->getUser()->getTemplateData();
-
-			$locale = $request->getLocale();
-			$menurepository=$this->getDoctrine()->getRepository(MenuOptions::class);
-			$obj = new HRWorkers();
-
-			$new_breadcrumb["rute"]=null;
-			$new_breadcrumb["name"]="Edit";
-			$new_breadcrumb["icon"]="fa fa-edit";
-			$breadcrumb=$menurepository->formatBreadcrumb('workers');
-
-			$companyRepository = $this->getDoctrine()->getRepository(HRWorkers::class);
-			$obj=$companyRepository->find($id);
-			$formUtils=new FormUtils();
-			$formUtils->init($this->getDoctrine(),$request);
-			$form=$formUtils->createFromEntity($obj,$this,['status'],[
-				['status', ChoiceType::class, [
-          'required' => false,
-          'attr' => ['class' => 'select2'],
-          'choices' => ["Inactive"=>0,"Active"=>1,"Sick leave"=>2],
-          'placeholder' => 'Select an status',
-        ]]
-
-			])->getForm();
-			$formUtils->proccess($form,$obj);
-
-			array_push($breadcrumb, $new_breadcrumb);
-			$cloudLists[]=CloudController::formatList($this->getUser());
-			return $this->render('@HR/formworker.html.twig', array(
-					'controllerName' => 'WorkersController',
-					'interfaceName' => 'Trabajadores',
-					'optionSelected' => 'workers',
-					'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
-					'breadcrumb' =>  $breadcrumb,
-					'userData' => $userdata,
-					'formworker' => ["form" => $form->createView(),"template" => json_decode(file_get_contents (dirname(__FILE__)."/../Forms/Workers.json"),true)],
-					'listDocuments' => ["list" => $cloudLists, "path" => $this->generateUrl('cloudUpload', array('path'=>'workers', 'id'=>$id))]
-			));
+			$repository = $this->getDoctrine()->getRepository($this->class);
+			$obj=$repository->find($id);
+			$utils = new HRWorkersUtils();
+			$editor=$utils->formatEditor($this->getUser(),$obj, $request, $this, $this->getDoctrine(), $this->get('router'), "Edit", "fa fa-edit");
+			return $this->render($editor["template"], $editor["vars"]);
 		}
 
 

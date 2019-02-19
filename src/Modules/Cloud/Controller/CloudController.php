@@ -49,21 +49,7 @@ class CloudController extends Controller
     }
 		return new JsonResponse($return);
 	}
-	public function formatList($user){
-		$list=[
-			'id' => 'listFiles',
-			'route' => 'fileslist',
-			'routeParams' => ["id" => $user->getId()],
-			'orderColumn' => 1,
-			'orderDirection' => 'ASC',
-			'tagColumn' => 1,
-			'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Files.json"),true),
-			'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/FilesFieldButtons.json"),true),
-			'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/FilesTopButtons.json"),true)
-		];
-		return $list;
-	}
-
+	
     /**
      * @Route("/api/files/{path}/{id}/upload", name="cloudUpload")
      */

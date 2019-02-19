@@ -1,15 +1,19 @@
 [{
-	"fields": [
-		{	"name": "name",	"cols": 8},
-		{	"name": "vat", "cols": 4},
-		{	"name": "socialname",	"cols": 8},
-		{	"name": "country", "cols": 4},
-		{	"name": "currency",	"cols": 4},
-		{	"name": "state", "cols": 4},
-		{	"name": "city",	"cols": 4},
-		{	"name": "address", "cols": 8},
-		{	"name": "postcode",	"cols": 4},
-		{	"name": "phone", "cols": 3},
-		{	"name": "mobile",	"cols": 3}
-	]
+	"sections": [
+		{
+			"name": "Company data",
+			"fields": [
+				{	"name": "name",	"cols": 8},
+				{	"name": "vat", "cols": 4},
+				{	"name": "socialname",	"cols": 8},
+				{	"name": "country", "cols": 4},
+				{	"name": "currency",	"cols": 4},
+				{	"name": "state", "cols": 4},
+				{	"name": "city",	"cols": 4},
+				{	"name": "address", "cols": 8},
+				{	"name": "postcode",	"cols": 4},
+				{	"name": "phone", "cols": 3},
+				{	"name": "mobile",	"cols": 3}
+			]
+		}]
 }]

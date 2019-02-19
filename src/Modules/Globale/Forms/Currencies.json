@@ -1,9 +1,13 @@
 [{
-	"fields": [
-		{ "name": "name",	"cols": 8},
-		{	"name": "isocode", "cols": 4},
-		{	"name": "numcode", "cols": 4},
-		{	"name": "charcode",	"cols": 4},
-		{	"name": "decimals",	"cols": 4}
-	]
+	"sections": [
+		{
+			"name": "Currency data",
+			"fields": [
+				{ "name": "name",	"cols": 8},
+				{	"name": "isocode", "cols": 4},
+				{	"name": "numcode", "cols": 4},
+				{	"name": "charcode",	"cols": 4},
+				{	"name": "decimals",	"cols": 4}
+			]
+		}]
 }]

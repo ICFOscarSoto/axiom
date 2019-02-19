@@ -14,6 +14,7 @@ use App\Modules\Globale\Entity\Countries;
 use App\Modules\Globale\Utils\EntityUtils;
 use App\Modules\Globale\Utils\ListUtils;
 use App\Modules\Globale\Utils\FormUtils;
+use App\Modules\Globale\Utils\CountriesUtils;
 
 
 class CountriesController extends Controller
@@ -31,7 +32,8 @@ class CountriesController extends Controller
 		$locale = $request->getLocale();
 		$this->router = $router;
 		$menurepository=$this->getDoctrine()->getRepository(MenuOptions::class);
-		$templateLists[]=$this->formatList($this->getUser());
+		$utils = new CountriesUtils();
+		$templateLists[]=$utils->formatList($this->getUser());
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 			return $this->render('@Globale/genericlist.html.twig', [
 				'controllerName' => 'CountriesController',
@@ -52,80 +54,37 @@ class CountriesController extends Controller
 		public function newCountry(Request $request)
 		{
 			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-			//$this->denyAccessUnlessGranted('ROLE_ADMIN');
-			$userdata=$this->getUser()->getTemplateData();
-
-			$locale = $request->getLocale();
-			$menurepository=$this->getDoctrine()->getRepository(MenuOptions::class);
-			$country = new Countries();
-
-			$new_breadcrumb["rute"]=null;
-			$new_breadcrumb["name"]="Nuevo";
-			$new_breadcrumb["icon"]="fa fa-plus";
-			$breadcrumb=$menurepository->formatBreadcrumb('countries');
-
-			$formUtils=new FormUtils();
-			$formUtils->init($this->getDoctrine(),$request);
-			$form=$formUtils->createFromEntity($country, $this)->getForm();
-			$formUtils->proccess($form,$country);
-
-			array_push($breadcrumb, $new_breadcrumb);
-					return $this->render('@Globale/genericform.html.twig', array(
-							'controllerName' => 'CountriesController',
-							'interfaceName' => 'Paises',
-							'optionSelected' => 'countries',
-							'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
-							'breadcrumb' =>  $breadcrumb,
-							'userData' => $userdata,
-							'form' => ["form" => $form->createView(),"template" => json_decode(file_get_contents (dirname(__FILE__)."/../Forms/Countries.json"),true)]
-					));
+			$this->denyAccessUnlessGranted('ROLE_ADMIN');
+			$obj=new Countries();
+			$utils = new CountriesUtils();
+			$editor=$utils->formatEditor($this->getUser(),$obj, $request, $this, $this->getDoctrine(), "New", "fa fa-plus");
+			return $this->render($editor["template"], $editor["vars"]);
 		}
-		/**
-	  * @Route("/api/global/countries/{id}/get", name="getCountry")
-		*/
-		public function getCountry($id){
-			$country = $this->getDoctrine()->getRepository($this->class)->findOneById($id);
-			if (!$country) {
-		        throw $this->createNotFoundException('No currency found for id '.$id );
-					}
-					return new JsonResponse($country->encodeJson());
-		}
+
 		/**
 		* @Route("/{_locale}/admin/global/countries/{id}/edit", name="editCountry")
 		*/
 		public function editCountry($id,Request $request)
-			{
-				//$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-				$this->denyAccessUnlessGranted('ROLE_ADMIN');
-				$userdata=$this->getUser()->getTemplateData();
-
-				$locale = $request->getLocale();
-				$menurepository=$this->getDoctrine()->getRepository(MenuOptions::class);
-
-				$new_breadcrumb["rute"]=null;
-				$new_breadcrumb["name"]="Editar";
-				$new_breadcrumb["icon"]="fa fa-edit";
-				$breadcrumb=$menurepository->formatBreadcrumb('countries');
-				array_push($breadcrumb, $new_breadcrumb);
-
-				$countryRepository = $this->getDoctrine()->getRepository(Countries::class);
-				$country=$countryRepository->find($id);
-				$formUtils=new FormUtils();
-				$formUtils->init($this->getDoctrine(),$request);
-				$form=$formUtils->createFromEntity($country,$this)->getForm();
-				$formUtils->proccess($form,$country);
-
-				return $this->render('@Globale/genericform.html.twig', array(
-								'controllerName' => 'CountriesController',
-								'interfaceName' => 'Paises',
-								'optionSelected' => 'countries',
-								'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
-								'breadcrumb' =>  $breadcrumb,
-								'userData' => $userdata,
-								'form' => ["form" => $form->createView(),"template" => json_decode(file_get_contents (dirname(__FILE__)."/../Forms/Countries.json"),true)]
-				));
+		{
+			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			$this->denyAccessUnlessGranted('ROLE_ADMIN');
+			$repository = $this->getDoctrine()->getRepository($this->class);
+			$obj=$repository->find($id);
+			$utils = new CountriesUtils();
+			$editor=$utils->formatEditor($this->getUser(),$obj, $request, $this, $this->getDoctrine(), "Edit", "fa fa-edit");
+			return $this->render($editor["template"], $editor["vars"]);
 		}
 
+		/**
+		* @Route("/api/global/countries/{id}/get", name="getCountry")
+		*/
+		public function getCountry($id){
+			$country = $this->getDoctrine()->getRepository($this->class)->findOneById($id);
+			if (!$country) {
+						throw $this->createNotFoundException('No currency found for id '.$id );
+					}
+					return new JsonResponse($country->encodeJson());
+		}
 
 	/**
 	 * @Route("/api/countries/list", name="countrieslist")
@@ -141,21 +100,6 @@ class CountriesController extends Controller
 		$listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Countries.json"),true);
 		$return=$listUtils->getRecords($repository,$request,$manager,$listFields, Countries::class);
 		return new JsonResponse($return);
-	}
-
-	public function formatList($user){
-		$list=[
-			'id' => 'listCountries',
-			'route' => 'countrieslist',
-			'routeParams' => ["id" => $user->getId()],
-			'orderColumn' => 2,
-			'orderDirection' => 'ASC',
-			'tagColumn' => 3,
-			'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Countries.json"),true),
-			'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/CountriesFieldButtons.json"),true),
-			'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/CountriesTopButtons.json"),true)
-		];
-		return $list;
 	}
 
 	/**

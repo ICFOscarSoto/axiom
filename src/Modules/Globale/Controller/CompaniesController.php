@@ -16,6 +16,7 @@ use App\Modules\Globale\Entity\Currencies;
 use App\Modules\Globale\Utils\EntityUtils;
 use App\Modules\Globale\Utils\ListUtils;
 use App\Modules\Globale\Utils\FormUtils;
+use App\Modules\Globale\Utils\CompaniesUtils;
 //use App\Modules\Globale\UtilsEntityUtils;
 //use App\Modules\Form\Controller\FormController;
 
@@ -35,7 +36,9 @@ class CompaniesController extends Controller
 		$locale = $request->getLocale();
 		$this->router = $router;
 		$menurepository=$this->getDoctrine()->getRepository(MenuOptions::class);
-		$templateLists[]=$this->formatList($this->getUser());
+
+		$utils = new CompaniesUtils();
+		$templateLists[]=$utils->formatList($this->getUser());
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 			return $this->render('@Globale/genericlist.html.twig', [
 				'controllerName' => 'CompaniesController',
@@ -65,20 +68,7 @@ class CompaniesController extends Controller
 		$return=$listUtils->getRecords($repository,$request,$manager,$listFields, $this->class);
 		return new JsonResponse($return);
 	}
-	public function formatList($user){
-		$list=[
-			'id' => 'listCompanies',
-			'route' => 'companieslist',
-			'routeParams' => ["id" => $user->getId()],
-			'orderColumn' => 2,
-			'orderDirection' => 'ASC',
-			'tagColumn' => 3,
-			'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Companies.json"),true),
-			'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/CompaniesFieldButtons.json"),true),
-			'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/CompaniesTopButtons.json"),true)
-		];
-		return $list;
-	}
+
 
 		/**
 		 * @Route("/api/global/companies/{id}/get", name="getCompany")
@@ -99,32 +89,10 @@ class CompaniesController extends Controller
 	public function newCompany(Request $request){
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		$this->denyAccessUnlessGranted('ROLE_ADMIN');
-		$userdata=$this->getUser()->getTemplateData();
-
-		$locale = $request->getLocale();
-		$menurepository=$this->getDoctrine()->getRepository(MenuOptions::class);
-		$company = new Companies();
-
-		$new_breadcrumb["rute"]=null;
-		$new_breadcrumb["name"]="Nueva";
-		$new_breadcrumb["icon"]="fa fa-new";
-		$breadcrumb=$menurepository->formatBreadcrumb('companies');
-
-		$formUtils=new FormUtils();
-		$formUtils->init($this->getDoctrine(),$request);
-		$form=$formUtils->createFromEntity($company, $this)->getForm();
-		$formUtils->proccess($form,$company);
-
-		array_push($breadcrumb, $new_breadcrumb);
-				return $this->render('@Globale/genericform.html.twig', array(
-						'controllerName' => 'CompaniesController',
-						'interfaceName' => 'Empresas',
-						'optionSelected' => 'companies',
-						'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
-						'breadcrumb' =>  $breadcrumb,
-						'userData' => $userdata,
-						'form' => ["form" => $form->createView(),"template" => json_decode(file_get_contents (dirname(__FILE__)."/../Forms/Companies.json"),true)]
-				));
+		$obj=new Company();
+		$utils = new CompaniesUtils();
+		$editor=$utils->formatEditor($this->getUser(),$obj, $request, $this, $this->getDoctrine(), "New", "fa fa-plus");
+		return $this->render($editor["template"], $editor["vars"]);
 	}
 
 
@@ -135,36 +103,14 @@ class CompaniesController extends Controller
     {
 			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 			$this->denyAccessUnlessGranted('ROLE_ADMIN');
-			$userdata=$this->getUser()->getTemplateData();
-
-			$locale = $request->getLocale();
-			$menurepository=$this->getDoctrine()->getRepository(MenuOptions::class);
-			$company = new Companies();
-
-			$new_breadcrumb["rute"]=null;
-			$new_breadcrumb["name"]="Editar";
-			$new_breadcrumb["icon"]="fa fa-edit";
-			$breadcrumb=$menurepository->formatBreadcrumb('companies');
-
 			$companyRepository = $this->getDoctrine()->getRepository(Companies::class);
-			$company=$companyRepository->find($id);
-			$formUtils=new FormUtils();
-			$formUtils->init($this->getDoctrine(),$request);
-			$form=$formUtils->createFromEntity($company,$this)->getForm();
-			$formUtils->proccess($form,$company);
-
-			array_push($breadcrumb, $new_breadcrumb);
-			return $this->render('@Globale/genericform.html.twig', array(
-					'controllerName' => 'CompaniesController',
-					'interfaceName' => 'Empresas',
-					'optionSelected' => 'companies',
-					'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
-					'breadcrumb' =>  $breadcrumb,
-					'userData' => $userdata,
-					'form' => ["form" => $form->createView(),"template" => json_decode(file_get_contents (dirname(__FILE__)."/../Forms/Companies.json"),true)]
-			));
+			$obj=$companyRepository->find($id);
+			$utils = new CompaniesUtils();
+	    $editor=$utils->formatEditor($this->getUser(),$obj, $request, $this, $this->getDoctrine(), "Edit", "fa fa-edit");
+	    return $this->render($editor["template"], $editor["vars"]);
 		}
 
+		//public function formatForm()
 
 	/**
 	* @Route("/{_locale}/admin/global/companies/{id}/disable", name="disableCompany")

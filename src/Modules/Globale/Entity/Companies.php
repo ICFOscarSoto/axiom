@@ -111,14 +111,19 @@ class Companies
      * @ORM\OneToMany(targetEntity="App\Modules\Globale\Entity\MenuOptions", mappedBy="company")
      */
     private $menuOptions;
+
+    /**
+     * @ORM\Column(type="string", length=150)
+     */
+    private $domain;
 	public function __construct()
-      {
-          $this->userGroups = new ArrayCollection();
-          $this->users = new ArrayCollection();
-          $this->menuOptions = new ArrayCollection();
-          $this->dateadd = new \Datetime();
-          $this->dateupd =  new \Datetime();
-      }
+               {
+                   $this->userGroups = new ArrayCollection();
+                   $this->users = new ArrayCollection();
+                   $this->menuOptions = new ArrayCollection();
+                   $this->dateadd = new \Datetime();
+                   $this->dateupd =  new \Datetime();
+               }
 
     public function getId(): ?int
     {
@@ -390,6 +395,18 @@ class Companies
           }
       }
       return $tempArray;
+    }
+
+    public function getDomain(): ?string
+    {
+        return $this->domain;
+    }
+
+    public function setDomain(string $domain): self
+    {
+        $this->domain = $domain;
+
+        return $this;
     }
 
 }
