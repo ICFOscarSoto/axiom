@@ -89,7 +89,7 @@ class CompaniesController extends Controller
 	public function newCompany(Request $request){
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		$this->denyAccessUnlessGranted('ROLE_ADMIN');
-		$obj=new Company();
+		$obj=new Companies();
 		$utils = new CompaniesUtils();
 		$editor=$utils->formatEditor($this->getUser(),$obj, $request, $this, $this->getDoctrine(), "New", "fa fa-plus");
 		return $this->render($editor["template"], $editor["vars"]);
