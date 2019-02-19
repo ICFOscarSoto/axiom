@@ -6,7 +6,6 @@
 /var/
 /bin/
 /vendor/
-/cloud/
 /src/Migrations/
 .env*
 ###< symfony/framework-bundle ###
