@@ -8,10 +8,21 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-
+use App\Modules\Globale\Entity\Companies;
 
 class SecurityController extends Controller
 {
+
+	function getDomain($url)
+	{
+	  $pieces = parse_url($url);
+	  $domain = isset($pieces['host']) ? $pieces['host'] : '';
+	  if (preg_match('/(?P<domain>[a-z0-9][a-z0-9\-]{1,63}\.[a-z\.]{2,6})$/i', $domain, $regs)) {
+	    return $regs['domain'];
+	  }
+	  return false;
+	}
+
 	/**
      * @Route("/{_locale}/login", name="app_login")
      */
@@ -21,7 +32,12 @@ class SecurityController extends Controller
         // last username entered by the user
         $lastUsername = $authenticationUtils->getLastUsername();
 		$locale = $request->getLocale();
-		return $this->render('@Globale/login.html.twig', ['last_username' => $lastUsername, 'error' => $error]);
+		$domain = $this->getDomain($request->getUri());
+		$companyRepository=$this->getDoctrine()->getRepository(Companies::class);
+		$company = $companyRepository->findOneBy(["domain" => $domain]);
+		if($company!=null)
+			return $this->render('@Globale/login.html.twig', ['last_username' => $lastUsername, 'domain'=>$domain, 'type'=> 'hidden', 'error' => $error]);
+		else return $this->render('@Globale/login.html.twig', ['last_username' => $lastUsername, 'domain'=>$domain, 'type'=> 'text', 'error' => $error]);
 	}
 
 

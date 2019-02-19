@@ -38,7 +38,6 @@ class ImagesController extends Controller
 				ResponseHeaderBag::DISPOSITION_INLINE,
 				$filename
 			);
-
 			return $response;
 		}
 		return new RedirectResponse($this->router->generate('app_login'));
