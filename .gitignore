@@ -8,6 +8,7 @@
 /vendor/
 /cloud/
 /src/Migrations/
+/config/packages/dev/web_profiler.yaml
 .env*
 ###< symfony/framework-bundle ###
 
