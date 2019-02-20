@@ -23,7 +23,7 @@
 
     <div class="calendar-env">
     			<!-- Calendar Body -->
-    			<div class="calendar-body">
+    			<div class="">
     				<div id="calendar"></div>
     			</div>
   	</div>
@@ -37,140 +37,7 @@
 </div>
 	<!-- MODALS  -->
 
-<!-- New Calendar -->
-<div class="modal fade" tabindex="-1" id="calendar-modal-new-calendar" aria-hidden="true">
-		<div class="modal-dialog">
-			<div class="modal-content" style="transform: matrix(1, 0, 0, 1, 0, 0);">
-				<div class="modal-header">
-					<h4 class="modal-title">Nuevo calendario</h4>
-				</div>
-				<div id="calendar-modal-new-calendar-body" class="modal-body">
-					<div class="panel-body">
-					<form id="calendar-modal-new-calendar-form">
-						<input type="hidden" class="form-control" id="calendarId" name="calendarId">
-						<div class="row">
-								<div class="col-md-6">
-									<div class="form-group">
-										<label for="name" class="control-label">Nombre</label>
-										<input type="text" class="form-control" id="calendarName" name="calendarName" placeholder="Nombre">
-									</div>
-								</div>
-								<div class="col-md-6">
-									<div class="form-group">
-										<label for="color" class="control-label">Color</label>
-										<input type="text" class="form-control" id="calendarColor" name="calendarColor" value="#0000FF">
-									</div>
-								</div>
-						</div>
-					</form>
-				</div>
-				</br></br>
-				</div>
-				<div id="calendar-modal-new-calendar-footer" class="modal-footer">
-					<button type="button" class="btn btn-primary" data-dismiss="modal">Cancelar</button>
-					<button attr-id="" attr-action="" id="calendar-modal-new-calendar-button-continue" type="button" class="btn btn-red">Guardar</button>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<!-- New Event -->
-	<div class="modal fade" tabindex="-1" id="calendar-modal-new-event" aria-hidden="true">
-			<div class="modal-dialog">
-				<div class="modal-content" style="transform: matrix(1, 0, 0, 1, 0, 0);">
-					<div class="modal-header">
-						<h4 class="modal-title">Evento</h4>
-					</div>
-					<div id="calendar-modal-new-event-body" class="modal-body">
-						<div class="panel-body">
-						<form id="calendar-modal-new-event-form">
-							<input type="hidden" class="form-control" id="eventId" name="eventId">
-							<div class="row">
-									<div class="col-md-12">
-										<div class="form-group">
-											<label for="eventTitle" class="control-label">Titulo</label>
-											<input type="text" class="form-control" id="eventTitle" name="eventTitle" placeholder="Nombre">
-										</div>
-									</div>
-							</div>
-							<div class="row">
-									<div class="col-md-2">
-										<div class="form-group">
-											<label for="eventAllDay" class="control-label">Todo el día</label>
-											<div class="checkbox checkbox-replace">
-												<input type="checkbox" class="form-control" id="eventAllDay" name="eventAllDay">
-											</div>
-										</div>
-									</div>
-									<div class="col-md-10">
-										<div class="form-group">
-											<label for="eventLocation" class="control-label">Ubicación</label>
-											<input type="text" class="form-control" id="eventLocation" name="eventLocation" placeholder="Ubicación">
-										</div>
-									</div>
-							</div>
-							<div class="row">
-								<div class="col-md-6">
-									<div class="form-group">
-										<label class="control-label" for="eventCalendar">Calendario:</label>
-
-											<select name="eventCalendar" id="eventCalendar" class="selectboxit">
-												<optgroup label="Cuentas de correo">
-												</optgroup>
-											</select>
-
-									</div>
-								</div>
-								<div class="col-md-6">
-									<div class="form-group">
-										<label for="color" class="control-label">Color</label>
-										<input type="text" class="form-control" id="eventColor" name="eventColor" value="">
-									</div>
-								</div>
-							</div>
-							<div class="row">
-									<div class="col-md-6">
-										<div class="form-group">
-											<label class="col-sm-3 control-label">Inicio</label>
-											<div class="col-sm-12" style="padding: 0px 0px !important; margin-bottom:15px">
-												<div class="date-and-time">
-													<input type="text" id="eventStartDate" name="eventStartDate" class="form-control datepicker" data-format="dd/mm/yyyy">
-													<input type="text" id="eventStartTime" name="eventStartTime"  class="form-control timepicker" data-template="dropdown" data-show-seconds="false" data-default-time="23:00" data-show-meridian="false" data-minute-step="5" data-second-step="5" />
-												</div>
-											</div>
-										</div>
-									</div>
-									<div class="col-md-6">
-										<div class="form-group">
-											<label class="col-sm-3 control-label">Fin</label>
-											<div class="col-sm-12" style="padding: 0px 0px !important; margin-bottom:15px">
-												<div class="date-and-time">
-													<input type="text" id="eventEndDate" name="eventEndDate" class="form-control datepicker" data-format="dd/mm/yyyy">
-													<input type="text" id="eventEndTime" name="eventEndTime" class="form-control timepicker" data-template="dropdown" data-show-seconds="false" data-default-time="23:00" data-show-meridian="false" data-minute-step="5" data-second-step="5" />
-												</div>
-											</div>
-										</div>
-									</div>
-							</div>
-							<div class="row">
-									<div class="col-md-12">
-										<textarea style="margin: 0px; height: 200px; width: 100%;" id="eventDescription" name="eventDescription"></textarea>
-									</div>
-							</div>
-
-						</form>
-					</div>
-					</br></br>
-					</div>
-					<div id="calendar-modal-new-event-footer" class="modal-footer">
-						<button type="button" class="btn btn-primary" data-dismiss="modal">Cancelar</button>
-						<button attr-id="" attr-action="" id="calendar-modal-new-event-button-continue" type="button" class="btn btn-red">Guardar</button>
-					</div>
-				</div>
-			</div>
-		</div>
 	<!-- END MODALS -->
-  {{ include('@Share/shareForm.twig') }}
 
 {% block footer %}
 
@@ -234,12 +101,12 @@
 						eventSources: [],
             header: {
               left: 'title',
-              right: 'month,agendaWeek,agendaDay today prev,next'
+              right: 'prevYear,nextYear'
             },
-            //defaultView: 'basicWeek',
+            defaultView: 'year',
             editable: true,
             firstDay: 1,
-            height: 600,
+            height: "auto",
             droppable: true,
             drop: function(date, allDay) {
               var $this = $(this),
@@ -253,63 +120,12 @@
               $this.remove();
             },
 						eventClick: function(calEvent, jsEvent, view) {
-							event.preventDefault();
-							if((++load_wait)==1) $("#load-spinner").fadeIn();
-							$.get(calEvent.url,'', function( data ){
-								console.log(data)
-								$("#eventId").val(data.id);
-								$("#eventTitle").val(data.title);
-								$("#eventAllDay").val(data.allDay);
-								$("#eventLocation").val(data.location);
-								$("#eventCalendar").data("selectBox-selectBoxIt").selectOption(data.calendar+"");
-							  $("#eventColor").colpickSetColor(data.color!=null?data.color:'');
-							 	$("#eventColor").val(data.color!=null?data.color:'');
-								$("#eventStartDate").val(data.startDate);
-								$("#eventStartTime").val(data.startTime);
-								$("#eventEndDate").val(data.endDate);
-								$("#eventEndTime").val(data.endTime);
-								tinymce.get('eventDescription').setContent(data.description);
-
-							},'json').always(function() {
-									if((--load_wait)==0) $("#load-spinner").fadeOut();
-									$('#calendar-modal-new-event').modal('toggle');
-							});
 					  },
 						loading: function( isLoading, view ) {
-	            if(isLoading) {//
-	               if((++load_wait)==1) $("#load-spinner").fadeIn();
-	            } else {
-	               if((--load_wait)==0) $("#load-spinner").fadeOut();
-	            }
         		},
 					  eventDrop:function( event, delta, revertFunc, jsEvent, ui, view ){
-							console.log(event);
-							var start=event.start.format();
-							var end=(event.end!=null)?event.end.format():'';
-							if((++load_wait)==1) $("#load-spinner").fadeIn();
-							console.log(start);
-							console.log(end);
-							$.get('{{ url('eventChangeDate') }}','eventId='+event.id+'&eventStart='+start+((event.end!=null)?'&eventEnd='+end:''), function( data ){
-								if(data.result){
-										toastr.success("Evento guardado correctamente", "Confirmación", confirmation);
-									}else toastr.error("No se pudo guardar el evento", "Confirmación", confirmation);
-							},'json').always(function() {
-									if((--load_wait)==0) $("#load-spinner").fadeOut();
-							});
 						},
-
 						eventResize:function( event, delta, revertFunc, jsEvent, ui, view ) {
-							console.log(event.end.format());
-							var end=event.end.format();
-							if((++load_wait)==1) $("#load-spinner").fadeIn();
-							$.get('{{ url('eventChangeDate') }}','eventId='+event.id+'&eventEnd='+end, function( data ){
-								if(data.result){
-										toastr.success("Evento guardado correctamente", "Confirmación", confirmation);
-									}else toastr.error("No se pudo guardar el evento", "Confirmación", confirmation);
-							},'json').always(function() {
-									if((--load_wait)==0) $("#load-spinner").fadeOut();
-							});
-
 						}
 
           });
@@ -333,133 +149,7 @@
       }
 
 
-			//Calendars load
-			function getCalendars(url, params){
-				if((++load_wait)==1) $("#load-spinner").fadeIn();
-					$("#list-messages").html('');
-					$.getJSON(url+params, function( data ) {
-						$("#calendar-list").html('<li><p>Mis Calendarios</p></li>');
-						$.each( data, function( key, val ) {
-							 $("#eventCalendar").data("selectBox-selectBoxIt").add({ value: val.id, text: val.name});
-							 $("#calendar-list").append('<li style="display: block"><a attr-url="'+val.url+'" id="calendar-list-'+val.id+'" style="width: 60%; display: inline-block; background: '+val.color+' !important;" href="javascript:;">'+
- 																				 '<div class="display: inline-block; checkbox checkbox-replace color-white">'+
- 																				 '<input type="checkbox" attr-eventUrl="'+val.eventUrl+'" attr-id="" class="'+val.id+'-chk-list" id="chk-calendar-'+val.id+'"'+((val.active)?' checked':'')+'>'+
- 																				 '<label>'+val.name+'</label></div></a><div class="btn-group" style="display: inline-block; vertical-align: top;"><button attr-url="'+val.url+'" class="btn" id="calendar-list-edit-'+val.id+'" style="padding: 8px 12px;"><i class="fa fa-ellipsis-v"></i></button>'+
-																				 '<button class="btn" id="calendar-list-remove-'+val.id+'" style="padding: 8px 8px;"><i class="fa fa-remove" style="color: #e26a6a;"></i></button></div></li>');
-						});
-
-						replaceCheckboxes();
-					}).always(function() {
-						if((--load_wait)==0) $("#load-spinner").fadeOut();
-					});
-			}
-
-			//Calendar Enable/Disable
-			$('body').on('change', "[id^='chk-calendar-']", function() {
-			    if(this.checked) {
-			        $('#calendar').fullCalendar('addEventSource', $(this).attr("attr-eventUrl"));
-			    }else{
-							$('#calendar').fullCalendar('removeEventSource', $(this).attr("attr-eventUrl"));
-					}
 			});
-
-			//Color picker
-			$('#calendar-modal-new-calendar').on('shown.bs.modal', function() {
-				$('#calendarColor').colpick({
-            colorScheme:'dark',
-            onChange:function(hsb,hex,rgb,el,bySetColor) {
-                $(el).val('#'+hex);
-            },
-						onSubmit:function(hsb,hex,rgb,el,bySetColor) {
-							 $(el).colpickHide();
-					 }
-        });
-			});
-			$('#calendar-modal-new-event').on('shown.bs.modal', function() {
-				$('#eventColor').colpick({
-            colorScheme:'dark',
-            onChange:function(hsb,hex,rgb,el,bySetColor) {
-                $(el).val('#'+hex);
-            },
-						onSubmit:function(hsb,hex,rgb,el,bySetColor) {
-							 $(el).colpickHide();
-					 }
-        });
-			});
-
-			$('#calendar-modal-new-event').on('shown.bs.modal', function() {
-				replaceCheckboxes();
-			});
-
-			//New Calendar button
-			$('body').on('click', "#calendar-modal-new-calendar-button-continue", function() {
-				$('#calendar-modal-new-calendar').modal('toggle');
-				if((++load_wait)==1) $("#load-spinner").fadeIn();
-				$.get('{{ url('calendarSave') }}',$("#calendar-modal-new-calendar-form").serialize(), function( data ){
-					if(data.result){
-							getCalendars('{{url('calendarsList')}}', '');
-							toastr.success("Calendario guardado correctamente", "Confirmación", confirmation);
-						}else toastr.error("No se pudo guardar el calendario", "Confirmación", confirmation);
-				},'json').always(function() {
-						if((--load_wait)==0) $("#load-spinner").fadeOut();
-				});
-			});
-			//Edit Calendar
-			$('body').on('click', "[id^='calendar-list-edit-']", function() {
-				$.get($(this).attr("attr-url"),'', function( data ){
-					$("#calendarId").val(data.id);
-					$("#calendarName").val(data.name);
-					$("#calendarColor").colpickSetColor(data.color);
-				},'json').always(function() {
-						if((--load_wait)==0) $("#load-spinner").fadeOut();
-						$('#calendar-modal-new-calendar').modal('toggle');
-				});
-			});
-
-
-			//Save Event button
-			$('body').on('click', "#calendar-modal-new-event-button-continue", function() {
-				$('#calendar-modal-new-event').modal('toggle');
-				if((++load_wait)==1) $("#load-spinner").fadeIn();
-				$.get('{{ url('eventSave') }}',$("#calendar-modal-new-event-form").serialize()+"&description="+encodeURIComponent(tinymce.get('eventDescription').getBody().textContent), function( data ){
-					if(data.result){
-							$('#calendar').fullCalendar('refetchEvents');
-							toastr.success("Evento guardado correctamente", "Confirmación", confirmation);
-						}else toastr.error("No se pudo guardar el evento", "Confirmación", confirmation);
-				},'json').always(function() {
-						if((--load_wait)==0) $("#load-spinner").fadeOut();
-				});
-			});
-
-			//Event description
-			var wysihtml5Editor = tinymce.init({
-				selector: '#eventDescription',
-				branding: false,
-				height: 225,
-				theme: 'modern',
-				menubar:false,
-    		statusbar: false,
-				/*plugins: 'print preview fullpage powerpaste searchreplace autolink directionality advcode visualblocks visualchars fullscreen image link media template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists textcolor wordcount tinymcespellchecker a11ychecker imagetools mediaembed  linkchecker contextmenu colorpicker textpattern help',*/
-				toolbar1: 'formatselect | bold italic strikethrough forecolor backcolor | link | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent  | removeformat',
-				language_url : '/js/tiny_mce/langs/es.js',  // site absolute URL
-				image_advtab: false,
-				setup: function (editor) {
-					/*editor.on('init', function (e) {
-						getSignature();
-						editor_init=true;
-					});*/
-				},
-				content_css: [
-					'//fonts.googleapis.com/css?family=Lato:300,300i,400,400i',
-					'//www.tinymce.com/css/codepen.min.css'
-				]
-			 });
-
-			//Initial Load
-			getCalendars('{{url('calendarsList')}}', '');
-
-
-		});
   })(jQuery);
 
   function fit_calendar_container_height(){

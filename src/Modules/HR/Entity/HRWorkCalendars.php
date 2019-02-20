@@ -65,6 +65,9 @@ class HRWorkCalendars
      */
     private $company;
 
+    public $newSeconds=1296000;
+    public $updatedSeconds=1296000;
+
     public function __construct()
     {
         $this->hollidays = new ArrayCollection();
