@@ -49,6 +49,38 @@ class ImagesController extends Controller
 	}
 
 	/**
+     * @Route("/api/company/{id}/getimage", name="getCompanyImage")
+     */
+	public function getCompanyImage($id, Request $request)
+	{
+			$image_path = $this->get('kernel')->getRootDir() . '/../public/images/companies/';
+			if(file_exists($image_path.$id.'.png'))
+				$filename = $id.'.png';
+			else if(file_exists($image_path.$id.'.jpg'))
+				$filename = $id.'.jpg';
+			else $filename = '1.png';
+
+			$response = new BinaryFileResponse($image_path.$filename);
+			$mimeTypeGuesser = new FileinfoMimeTypeGuesser();
+			if($mimeTypeGuesser->isSupported()){
+				$seconds_to_cache = 7200;
+				$ts = gmdate("D, d M Y H:i:s", time() + $seconds_to_cache) . " GMT";
+				$response->headers->set("Expires", $ts);
+				$response->headers->set("Pragma", "cache");
+				$response->headers->set("Cache-Control", "max-age=$seconds_to_cache");
+				$response->headers->set('Content-Type', $mimeTypeGuesser->guess($image_path.$filename));
+			}else{
+				$response->headers->set('Content-Type', 'text/plain');
+			}
+			$response->setContentDisposition(
+				ResponseHeaderBag::DISPOSITION_INLINE,
+				$filename
+			);
+			return $response;
+
+	}
+
+	/**
 	* @Route("/api/user/{id}/getimage", name="getUserImage")
 	*/
 	public function get_user_imageId($id, Request $request)

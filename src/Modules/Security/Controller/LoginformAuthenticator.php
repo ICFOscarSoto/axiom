@@ -46,6 +46,7 @@ class LoginformAuthenticator extends AbstractFormLoginAuthenticator
 
     public function getCredentials(Request $request)
     {
+        
         $credentials = [
             'domain' => $request->request->get('domain'),
             'email' => $request->request->get('email'),

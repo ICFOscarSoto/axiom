@@ -31,7 +31,7 @@ class CurrenciesController extends Controller
 		$locale = $request->getLocale();
 		$this->router = $router;
 		$menurepository=$this->getDoctrine()->getRepository(MenuOptions::class);
-  	$utils = new CompaniesUtils();
+  	$utils = new CurrenciesUtils();
 		$templateLists[]=$utils->formatList($this->getUser());
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 			return $this->render('@Globale/genericlist.html.twig', [

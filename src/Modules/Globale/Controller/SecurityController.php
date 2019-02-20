@@ -36,8 +36,8 @@ class SecurityController extends Controller
 		$companyRepository=$this->getDoctrine()->getRepository(Companies::class);
 		$company = $companyRepository->findOneBy(["domain" => $domain]);
 		if($company!=null)
-			return $this->render('@Globale/login.html.twig', ['last_username' => $lastUsername, 'domain'=>$domain, 'type'=> 'hidden', 'error' => $error]);
-		else return $this->render('@Globale/login.html.twig', ['last_username' => $lastUsername, 'domain'=>$domain, 'type'=> 'text', 'error' => $error]);
+			return $this->render('@Globale/login.html.twig', ['last_username' => $lastUsername, 'domain'=>$domain, 'type'=> 'hidden', 'error' => $error, 'logo' => $this->generateUrl('getCompanyImage', array('id'=>$company->getId()))]);
+		else return $this->render('@Globale/login.html.twig', ['last_username' => $lastUsername, 'domain'=>$domain, 'type'=> 'text', 'error' => $error,  'logo' => $this->generateUrl('getCompanyImage', array('id'=>1))]);
 	}
 
 
