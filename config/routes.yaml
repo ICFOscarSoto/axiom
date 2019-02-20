@@ -27,6 +27,10 @@ Department:
     resource: 'App\Modules\Globale\Controller\DepartmentsController'
     type:     annotation
 
+Activity:
+    resource: 'App\Modules\Globale\Controller\ActivitiesController'
+    type:     annotation
+
 Country:
     resource: 'App\Modules\Globale\Controller\CountriesController'
     type:     annotation
