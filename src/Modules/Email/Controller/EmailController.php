@@ -467,23 +467,24 @@ class EmailController extends Controller
 				if($emailAccount->getInboxFolder()){
 					//Comprobamos si hay correo sin leer
 					$connectionString='{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'}'.$emailAccount->getInboxFolder()->getName();
-					$inbox = imap_open($connectionString,$emailAccount->getUsername() ,$emailAccount->getPassword());
-					$emailsUnseen=imap_search($inbox, 'UNSEEN');
-					if(!$emailsUnseen) continue;
-					$emailSubjects=imap_fetch_overview ($inbox, implode(',',$emailsUnseen), 0);
-					foreach($emailSubjects as $emailSubject){
-						$subject=array();
-						$subject["id"]				=$emailSubject->uid;
-						$subject["msgno"]			=$emailSubject->msgno;
-						$subject["subject"]		=isset($emailSubject->subject)?imap_utf8($emailSubject->subject):'';
-						$subject["from"]			=isset($emailSubject->from)?imap_utf8($emailSubject->from):'';
-						$date=new \DateTime(date('Y-m-d H:i:s',$emailSubject->udate));
-						$subject["timestamp"]	=$date->getTimestamp();
-						$subject["url"]				=$this->generateUrl('emailView', array('folder'=>$emailAccount->getInboxFolder()->getId(), 'id' => $emailSubject->msgno));
-						$return[] = $subject;
-					}
-					//Ordenamos el array por getTimestamp
-					usort($return, array(__NAMESPACE__."\EmailController", "cmpTimestamp"));
+					@$inbox = imap_open($connectionString,$emailAccount->getUsername(),$emailAccount->getPassword());
+					if($inbox!==FALSE)$emailsUnseen=imap_search($inbox, 'UNSEEN'); else	$emailsUnseen=FALSE;
+						if(!$emailsUnseen) continue;
+						$emailSubjects=imap_fetch_overview ($inbox, implode(',',$emailsUnseen), 0);
+						foreach($emailSubjects as $emailSubject){
+							$subject=array();
+							$subject["id"]				=$emailSubject->uid;
+							$subject["msgno"]			=$emailSubject->msgno;
+							$subject["subject"]		=isset($emailSubject->subject)?imap_utf8($emailSubject->subject):'';
+							$subject["from"]			=isset($emailSubject->from)?imap_utf8($emailSubject->from):'';
+							$date=new \DateTime(date('Y-m-d H:i:s',$emailSubject->udate));
+							$subject["timestamp"]	=$date->getTimestamp();
+							$subject["url"]				=$this->generateUrl('emailView', array('folder'=>$emailAccount->getInboxFolder()->getId(), 'id' => $emailSubject->msgno));
+							$return[] = $subject;
+						}
+						//Ordenamos el array por getTimestamp
+						usort($return, array(__NAMESPACE__."\EmailController", "cmpTimestamp"));
+
 				}
 			}
 			return new JsonResponse($return);
