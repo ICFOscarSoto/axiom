@@ -44,7 +44,7 @@ class ActivitiesController extends Controller
   				'lists' => $templateLists
   				]);
   		}
-  		return new Response('Hola');
+  		return new RedirectResponse($this->router->generate('app_login'));
     }
 
 
