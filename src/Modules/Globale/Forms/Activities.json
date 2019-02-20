@@ -1,0 +1,13 @@
+[{
+	"sections": [
+		{
+			"name": "Activities data",
+			"fields": [
+				{ "name": "name","cols": 4},
+				{	"name": "activitygroup", "cols": 2},
+				{	"name": "section", "cols": 2},
+				{	"name": "agrupation", "cols": 2},
+				{	"name": "type", "cols": 2}
+			]
+		}]
+}]
