@@ -23,6 +23,10 @@ Company:
     resource: 'App\Modules\Globale\Controller\CompaniesController'
     type:     annotation
 
+Contacts:
+    resource: 'App\Modules\Globale\Controller\ContactsController'
+    type:     annotation
+
 Department:
     resource: 'App\Modules\Globale\Controller\DepartmentsController'
     type:     annotation
