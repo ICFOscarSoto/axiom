@@ -33,6 +33,16 @@ class HRWorkCalendarsUtils extends Controller
     )];
   }
 
+  public function formatEditorAjax($user, $obj, $request, $controller, $doctrine, $router, $name, $icon){
+    $formUtils=new FormUtils();
+    $formUtils->init($doctrine,$request);
+    $form=$formUtils->createFromEntity($obj,$controller);
+    foreach($form as $item){
+      unset($item->parent);
+    }
+    return ["id"=>"workcalendar", "form" => $form, "template" => json_decode(file_get_contents (dirname(__FILE__)."/../Forms/WorkCalendars.json"),true)];
+  }
+
   public function formatForm($user, $obj, $request, $controller, $doctrine){
     $formUtils=new FormUtils();
     $formUtils->init($doctrine,$request);

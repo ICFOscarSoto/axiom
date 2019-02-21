@@ -56,6 +56,7 @@ class HRController extends Controller
 		return new RedirectResponse($this->router->generate('app_login'));
     }
 
+
 		/**
 		 * @Route("/{_locale}/HR/workcalendars", name="workcalendars")
 		 */
@@ -69,6 +70,7 @@ class HRController extends Controller
 		$menurepository=$this->getDoctrine()->getRepository(MenuOptions::class);
 		$utils = new HRWorkCalendarsUtils();
 		$templateLists[]=$utils->formatList($this->getUser());
+		$templateForms[]=$utils->formatEditorAjax($this->getUser(),new HRWorkCalendars(), $request, $this, $this->getDoctrine(), $this->get('router'), "Edit", "fa fa-edit");
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 			return $this->render('@Globale/genericlist.html.twig', [
 				'controllerName' => 'HRController',
@@ -77,10 +79,23 @@ class HRController extends Controller
 				'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
 				'breadcrumb' =>  $menurepository->formatBreadcrumb($request->get('_route')),
 				'userData' => $userdata,
-				'lists' => $templateLists
+				'lists' => $templateLists,
+				'forms' => $templateForms
 				]);
 		}
 		return new RedirectResponse($this->router->generate('app_login'));
+		}
+
+		/**
+		 * @Route("/api/HR/workcalendars/{id}/getform", name="getWorkerCalendarsForm")
+		 */
+		public function getWorkerCalendarsForm($id, Request $request){
+			$utils = new HRWorkCalendarsUtils();
+			$workcalendarsrepository=$this->getDoctrine()->getRepository(HRWorkCalendars::class);
+			$workcalendar=$workcalendarsrepository->find($id);
+			$former=$utils->formatEditorAjax($this->getUser(),$workcalendar, $request, $this, $this->getDoctrine(), $this->get('router'), "Edit", "fa fa-edit");
+			//dump($former);
+			return new JsonResponse($former);
 		}
 
 		/**

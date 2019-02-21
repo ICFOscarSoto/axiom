@@ -32,6 +32,13 @@
 	{{ include('@Globale/chat_histories.html.twig') }}
 </div>
 	<!-- MODALS  -->
+	{% if forms is defined %}
+		{% for form in forms %}
+		  {% set formConstructor = form %}
+			{{ include('@Globale/genericajaxform.html.twig') }}
+		{% endfor %}
+	{% endif %}
+
 	<!-- END MODALS -->
 {% block footer %}
 
