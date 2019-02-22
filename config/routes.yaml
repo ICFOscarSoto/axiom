@@ -35,6 +35,10 @@ Activity:
     resource: 'App\Modules\Globale\Controller\ActivitiesController'
     type:     annotation
 
+Carrier:
+        resource: 'App\Modules\Globale\Controller\CarriersController'
+        type:     annotation
+
 Country:
     resource: 'App\Modules\Globale\Controller\CountriesController'
     type:     annotation
