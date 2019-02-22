@@ -1,19 +1,16 @@
 <div class="modal fade" tabindex="-1" id="{{ form.id }}-modal-form" aria-hidden="true">
-		<div class="modal-dialog">
+		<div class="modal-dialog modal-lg">
 			<div class="modal-content" style="transform: matrix(1, 0, 0, 1, 0, 0);">
 				<div class="modal-header">
 					<h4 class="modal-title">Nuevo calendario</h4>
 				</div>
-        <div id="{{ form.id }}-modal-form-body-empty" style="visibility: hidden;">
-          {{ include('@Globale/form.html.twig') }}
+        <div id="{{ form.id }}-modal-form-body">
+          	{{ include('@Globale/form.html.twig') }}
         </div>
-        <div id="{{ form.id }}-modal-form-body" class="panel-body">
-
-				</div>
 				</br></br>
 				<div id="calendar-modal-new-calendar-footer" class="modal-footer">
 					<button type="button" class="btn btn-primary" data-dismiss="modal">Cancelar</button>
-					<button attr-id="" attr-action="" id="calendar-modal-new-calendar-button-continue" type="button" class="btn btn-red">Guardar</button>
+					<button attr-id="" attr-action="" id="{{ form.id }}-button-continue" type="button" class="btn btn-red">Guardar</button>
 				</div>
 			</div>
 		</div>

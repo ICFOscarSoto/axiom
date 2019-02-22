@@ -24,7 +24,7 @@ class FormUtils extends Controller
     $this->entityManager=$this->doctrine->getManager();
   }
 
-  public function createFromEntity($obj,$controller,$excludedAttributes=array(),$includedAttributes=array()){
+  public function createFromEntity($obj,$controller,$excludedAttributes=array(),$includedAttributes=array(),$includeSave=true){
     $this->ignoredAttributes=array_merge($this->ignoredAttributes, $excludedAttributes);
     $class=get_class($obj);
     $form = $controller->createFormBuilder($obj);
@@ -32,14 +32,6 @@ class FormUtils extends Controller
     foreach($this->entityManager->getClassMetadata($class)->fieldMappings as $key=>$value){
       if(!in_array($value['fieldName'],$this->ignoredAttributes)){
         switch($value['type']){
-          /*case 'json':
-            $form->add($value['fieldName'], TextType::class);
-            $form->get($value['fieldName'])
-                ->addModelTransformer(new CallbackTransformer(
-                    function ($tagsAsArray) { return implode(',', $tagsAsArray);},
-                    function ($tagsAsString) {return explode(',', $tagsAsString);}
-                ));
-          break;*/
           case 'datetime':
             $form->add($value['fieldName'], DateTimeType::class, array('widget' => 'single_text', 'date_format' => 'dd-MM-yyyy HH:mm'));
           break;
@@ -69,7 +61,7 @@ class FormUtils extends Controller
       if(!in_array($value['fieldName'],$this->ignoredAttributes))
         $form->add($value['fieldName'], ChoiceType::class, $this->choiceRelation($value["targetEntity"], $obj->{'get'.ucfirst($value["fieldName"])}()));
     }
-    $form->add('save', SubmitType::class, ['attr' => ['class' => 'save'],]);
+    if($includeSave) $form->add('save', SubmitType::class, ['attr' => ['class' => 'save'],]);
     $this->form=$form;
     return $form;
   }
@@ -98,6 +90,7 @@ class FormUtils extends Controller
 
   public function proccess($form,$obj){
     $form->handleRequest($this->request);
+    if(!$form->isSubmitted()) return false;
 		if ($form->isSubmitted() && $form->isValid()) {
 			 $obj = $form->getData();
        if($obj->getId() == null){
@@ -107,6 +100,7 @@ class FormUtils extends Controller
 			 $obj->setDateupd(new \DateTime());
 			 $this->entityManager->persist($obj);
 			 $this->entityManager->flush();
+       return true;
 		}
   }
 

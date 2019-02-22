@@ -1,7 +1,7 @@
 <script>
 			$(document).ready(function() {
-				var ${{ listConstructor.id }} = jQuery("#{{ listConstructor.id }}");
-				var {{ listConstructor.id }} = ${{ listConstructor.id }}.DataTable( {
+				var ${{ listConstructor.id }}_var = jQuery("#{{ listConstructor.id }}");
+				var {{ listConstructor.id }} = ${{ listConstructor.id }}_var.DataTable( {
 					"aLengthMenu": [[10, 20, 50, 250], [10, 20, 50, 250]],
 					"pageLength": 20,
 					"processing": true,
@@ -112,7 +112,7 @@
 					]
 				});
 				// Initalize Select Dropdown after DataTables is created
-				${{ listConstructor.id }}.closest( '.dataTables_wrapper' ).find( 'select' ).select2( {
+				${{ listConstructor.id }}_var.closest( '.dataTables_wrapper' ).find( 'select' ).select2( {
 					minimumResultsForSearch: -1
 				});
 
@@ -239,15 +239,54 @@
 						$("#{{ listConstructor.id }}-modal-confirm").modal('hide');
 				});
 			} );
+
+			//TOP BUTTONS BACKGROUND ACTION
+			{% for field in listConstructor.topButtons %}
+
+				{% if field.actionType is defined and field.actionType=="background" %}
+					//OPEN MODAL
+					$('body').on('click', "#{{ field.id }}-top-button", function() {
+							$("#{{field.modal}}-modal-form-body").find('form').trigger("reset");
+							$("#{{field.modal}}-modal-form").modal();
+							$("#{{field.modal}}-modal-form-body").find('form').validate().resetForm();
+					});
+
+					//CONTINUE BUTTON
+					$('body').on('click', "#{{ field.modal }}-button-continue", function() {
+								if($("#{{field.modal}}-modal-form-body").find('form').valid()){
+									if((++load_wait)==1) $("#load-spinner").fadeIn();
+									$.post('{{ url(field.route) }}', $("#{{field.modal}}-modal-form-body").find('form').serialize(),
+											function(data, status, xhr){
+												if((--load_wait)==0) $("#load-spinner").fadeOut();
+												if(data.result){
+													$("#{{ listConstructor.id }}").DataTable().ajax.reload();
+													toastr.success("Datos guardados correctamente", "Confirmación", confirmation);
+													$("#{{ field.modal }}-modal-form").modal('hide');
+													$("#{{field.modal}}-modal-form-body").find('form').trigger("reset");
+													$("#{{field.modal}}-modal-form-body").find('form').validate().resetForm();
+												}
+													else toastr.error("Ocurrió un error al guardar los datos", "Confirmación", confirmation);
+										}, "json");
+									}
+					});
+
+				{% endif %}
+			{% endfor %}
 	</script>
 
 	<!-- BUTTON ZONE -->
 	<p>
 	{% for field in listConstructor.topButtons %}
 			<div class="btn-group">
-				<a href="{% if field.route|length %}{{ url(field.route) }}{% endif %}" style="font-size: 20px" id="{{ field.id }}" type="button" class="btn tooltip-primary {{ field.type }}" {% if field.tooltip is defined %} data-toggle="tooltip" data-placement="bottom" title="" data-original-title=" {{ field.tooltip }} {% endif %} ">
+				{% if field.actionType is defined and field.actionType=="background" %}
+				<a style="font-size: 20px" id="{{ field.id }}-top-button" type="button" class="btn tooltip-primary {{ field.type }}" {% if field.tooltip is defined %} data-toggle="tooltip" data-placement="bottom" title="" data-original-title=" {{ field.tooltip }} {% endif %} ">
 					<i class="{{ field.icon }}"></i>{{ field.name }}
 				</a>
+				{% else %}
+				<a href="{% if field.route|length %}{{ url(field.route) }}{% endif %}" style="font-size: 20px" id="{{ field.id }}-top-button" type="button" class="btn tooltip-primary {{ field.type }}" {% if field.tooltip is defined %} data-toggle="tooltip" data-placement="bottom" title="" data-original-title=" {{ field.tooltip }} {% endif %} ">
+					<i class="{{ field.icon }}"></i>{{ field.name }}
+				</a>
+				{% endif %}
 			</div>
 	{% endfor %}
 	</p>
@@ -276,13 +315,13 @@
 					{% endfor %}
 
 				</tr>
-				<th>
+					<th class="table-header-name">
 						<div class="checkbox checkbox-replace">
 							<input type="checkbox" id="{{ listConstructor.id }}-chkall">
 						</div>
 					</th>
 					{% for field in listConstructor.fields %}
-						<th>{{ field.caption }}</th>
+						<th class="table-header-name">{{ field.caption }}</th>
 					{% endfor %}
 
 					{% for field in listConstructor.fieldButtons %}

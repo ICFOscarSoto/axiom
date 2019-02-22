@@ -32,23 +32,26 @@ class HRWorkCalendarsUtils extends Controller
         'form' => ["form" => $form->createView(),"template" => json_decode(file_get_contents (dirname(__FILE__)."/../Forms/WorkCalendars.json"),true)]
     )];
   }
-
-  public function formatEditorAjax($user, $obj, $request, $controller, $doctrine, $router, $name, $icon){
+/*
+  public function formatEditorAjax($user, $obj, $request, $controller, $doctrine, $ajax=){
     $formUtils=new FormUtils();
     $formUtils->init($doctrine,$request);
-    $form=$formUtils->createFromEntity($obj,$controller);
-    foreach($form as $item){
-      unset($item->parent);
-    }
-    return ["id"=>"workcalendar", "form" => $form, "template" => json_decode(file_get_contents (dirname(__FILE__)."/../Forms/WorkCalendars.json"),true)];
+    $form=$formUtils->createFromEntity($obj,$controller,[],[],false)->getForm();
+    $proccess=$formUtils->proccess($form,$obj);
+    if($proccess===FALSE) return ["id"=>"workcalendar", "form" => $form->createView(), "template" => json_decode(file_get_contents (dirname(__FILE__)."/../Forms/WorkCalendars.json"),true)];
+      else return true;
   }
+*/
 
-  public function formatForm($user, $obj, $request, $controller, $doctrine){
+  public function formatForm($user, $obj, $request, $controller, $doctrine, $ajax=false){
     $formUtils=new FormUtils();
     $formUtils->init($doctrine,$request);
-    $form=$formUtils->createFromEntity($obj,$controller)->getForm();
-    $formUtils->proccess($form,$obj);
-    return $form;
+    $form=$formUtils->createFromEntity($obj,$controller,[],[],!$ajax)->getForm();
+    $proccess=$formUtils->proccess($form,$obj);
+    if($ajax){
+      if($proccess===FALSE) return ["id"=>"workcalendar", "form" => $form->createView(), "template" => json_decode(file_get_contents (dirname(__FILE__)."/../Forms/WorkCalendars.json"),true)];
+        else return $proccess;
+    }else return $form;
   }
 
   public function formatList($user){
