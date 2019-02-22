@@ -39,6 +39,10 @@ Carrier:
     resource: 'App\Modules\Globale\Controller\CarriersController'
     type:     annotation
 
+ShippingCost:
+    resource: 'App\Modules\Globale\Controller\ShippingCostsController'
+    type:     annotation
+
 Country:
     resource: 'App\Modules\Globale\Controller\CountriesController'
     type:     annotation
