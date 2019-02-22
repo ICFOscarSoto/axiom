@@ -36,8 +36,8 @@ Activity:
     type:     annotation
 
 Carrier:
-        resource: 'App\Modules\Globale\Controller\CarriersController'
-        type:     annotation
+    resource: 'App\Modules\Globale\Controller\CarriersController'
+    type:     annotation
 
 Country:
     resource: 'App\Modules\Globale\Controller\CountriesController'
@@ -45,6 +45,10 @@ Country:
 
 Zone:
     resource: 'App\Modules\Globale\Controller\ZonesController'
+    type:     annotation
+
+State:
+    resource: 'App\Modules\Globale\Controller\StatesController'
     type:     annotation
 
 Currency:
