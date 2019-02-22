@@ -39,6 +39,10 @@ Country:
     resource: 'App\Modules\Globale\Controller\CountriesController'
     type:     annotation
 
+Zone:
+    resource: 'App\Modules\Globale\Controller\ZonesController'
+    type:     annotation
+
 Currency:
     resource: 'App\Modules\Globale\Controller\CurrenciesController'
     type:     annotation

@@ -1,0 +1,10 @@
+[{
+	"sections": [
+		{
+			"name": "Zone data",
+			"fields": [
+				{ "name": "name","cols": 8},
+				{	"name": "active", "cols": 4}
+			]
+		}]
+}]
