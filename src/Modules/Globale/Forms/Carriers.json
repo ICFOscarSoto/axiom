@@ -1,0 +1,10 @@
+[{
+	"sections": [
+		{
+			"name": "Carrier data",
+			"fields": [
+				{ "name": "name","cols": 8},
+				{	"name": "phone", "cols": 4}
+			]
+		}]
+}]
