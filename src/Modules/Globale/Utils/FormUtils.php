@@ -47,12 +47,12 @@ class FormUtils extends Controller
   public function formatForm($name, $ajax=false){
     $form=$this->createFromEntity2(!$ajax)->getForm();
     //return $form;
-    //return ["id"=>$name, "form" => $form->createView(), "template" => json_decode(file_get_contents ($this->template))];
-    $proccess=$this->proccess($form,$this->obj);
+    return ["id"=>$name, "form" => $form->createView(), "template" => json_decode(file_get_contents ($this->template))];
+    /*$proccess=$this->proccess($form,$this->obj);
     if($ajax){
       if($proccess===FALSE) return ["id"=>$name, "form" => $form->createView(), "template" => json_decode(file_get_contents ($this->template),true)];
         else return $proccess;
-    }else return $form;
+    }else return $form;*/
   }
 
   public function createFromEntity2($includeSave=true){

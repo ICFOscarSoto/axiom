@@ -92,20 +92,19 @@ class HRWorkCalendarsController extends Controller
        }
      $utils = new FormUtils();
      $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine());
+		 $form=$utils->createFromEntity2(false)->getForm();
      switch($action){
         case 'save':
-          $result=$utils->formatForm('workcalendars', true);
+          $result=$utils->proccess($form,$obj);
           return new JsonResponse(array('result' => $result));
         break;
         case 'read':
-          $form=$utils->createFromEntity2(false)->getForm();
           return $this->render('@Globale/form.html.twig', [
             'formConstructor' =>["form" => $form->createView(), "post"=>$this->generateUrl($request->get('_route'),["id"=>$id, "action"=>"save"]) ,"template" => json_decode(file_get_contents ($template),true)]
             ]);
         break;
      }
    }
-
 
  	/**
  	* @Route("/{_locale}/HR/workcalendar/{id}/disable", name="disableWorkCalendar")
