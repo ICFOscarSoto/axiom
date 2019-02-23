@@ -99,6 +99,10 @@ HR:
    resource: 'App\Modules\HR\Controller\HRController'
    type:     annotation
 
+HRWorkCalendars:
+   resource: 'App\Modules\HR\Controller\HRWorkCalendarsController'
+   type:     annotation
+
 Cloud:
    resource: 'App\Modules\Cloud\Controller\CloudController'
    type:     annotation

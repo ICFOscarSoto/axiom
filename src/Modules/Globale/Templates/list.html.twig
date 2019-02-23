@@ -197,6 +197,7 @@
 										{% else %}
 										{% endif %}
 									{% else %}
+										//Get data and open modal form
 										{% if field.confirm is not defined or field.confirm == false %}
 											$('body').on('click', "[id^='{{ listConstructor.id }}-field-button-{{ field.id }}']", function() {
 												url=$("#{{ listConstructor.id }}-field-button-{{ field.id }}-url").val();
@@ -244,21 +245,21 @@
 				{% if field.actionType is defined and field.actionType=="background" %}
 					//OPEN MODAL
 					$('body').on('click', "#{{ field.id }}-top-button", function() {
-							/*$("#{{field.modal}}-modal-form-body").find('form').trigger("reset");
-							$("#{{field.modal}}-modal-form").modal();
-							$("#{{field.modal}}-modal-form-body").find('form').validate().resetForm();*/
 							$.post('{{ url(field.route) }}', null,
 								function(data, status, xhr){
+									console.log(xhr);
+									console.log(data);
+									console.log(status);
 										$("#{{field.modal}}-modal-form-body").html(data);
 										$("#{{field.modal}}-modal-form").modal();
 							});
 					});
 
-					//CONTINUE BUTTON
+					//CONTINUE BUTTON FOR MODAL FORMS
 					$('body').on('click', "#{{ field.modal }}-button-continue", function() {
 								if($("#{{field.modal}}-modal-form-body").find('form').valid()){
 									if((++load_wait)==1) $("#load-spinner").fadeIn();
-									$.post('{{ url(field.route) }}', $("#{{field.modal}}-modal-form-body").find('form').serialize(),
+									$.post($("#{{field.modal}}-modal-form-body").find('form').find('#post-url').val(), $("#{{field.modal}}-modal-form-body").find('form').serialize(),
 											function(data, status, xhr){
 												if((--load_wait)==0) $("#load-spinner").fadeOut();
 												if(data.result){

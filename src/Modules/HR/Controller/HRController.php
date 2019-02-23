@@ -57,37 +57,6 @@ class HRController extends Controller
     }
 
 
-		/**
-		 * @Route("/{_locale}/HR/workcalendars", name="workcalendars")
-		 */
-		public function workcalendars(RouterInterface $router,Request $request)
-		{
-		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-		//$this->denyAccessUnlessGranted('ROLE_ADMIN');
-		$userdata=$this->getUser()->getTemplateData();
-		$locale = $request->getLocale();
-		$this->router = $router;
-		$menurepository=$this->getDoctrine()->getRepository(MenuOptions::class);
-		$utils = new HRWorkCalendarsUtils();
-		$templateLists[]=$utils->formatList($this->getUser());
-		$templateForms[]=$utils->formatForm($this->getUser(),new HRWorkCalendars(), $request, $this, $this->getDoctrine(), true);
-		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
-			return $this->render('@Globale/genericlist.html.twig', [
-				'controllerName' => 'HRController',
-				'interfaceName' => 'Calendarios laborales',
-				'optionSelected' => $request->attributes->get('_route'),
-				'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
-				'breadcrumb' =>  $menurepository->formatBreadcrumb($request->get('_route')),
-				'userData' => $userdata,
-				'lists' => $templateLists,
-				'forms' => $templateForms
-				]);
-		}
-		return new RedirectResponse($this->router->generate('app_login'));
-		}
-
-
-
 
 		/**
      * @Route("/{_locale}/HR/{id}/holidays", name="holidays")
@@ -133,23 +102,7 @@ class HRController extends Controller
 		return new JsonResponse($return);
 	}
 
-	/**
-	 * @Route("/api/HR/workcalendars/list", name="workcalendarslist")
-	 */
-	public function workcalendarslist(RouterInterface $router,Request $request){
-		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-		$user = $this->getUser();
-		$locale = $request->getLocale();
-		$this->router = $router;
-		$manager = $this->getDoctrine()->getManager();
-		$repository = $manager->getRepository(HRWorkCalendars::class);
-		$listUtils=new ListUtils();
-		$listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/WorkCalendars.json"),true);
-		$return=$listUtils->getRecords($repository,$request,$manager,$listFields, HRWorkCalendars::class);
-		return new JsonResponse($return);
-	}
-
-		/**
+			/**
 		 * @Route("/api/HR/workers/{id}/get", name="getWorker")
 		 */
 		public function getWorker($id){
@@ -209,33 +162,7 @@ class HRController extends Controller
 			$editor=$utils->formatEditor($this->getUser(),$obj, $request, $this, $this->getDoctrine(), $this->get('router'), "Edit", "fa fa-edit");
 			return $this->render($editor["template"], $editor["vars"]);
 		}
-		/**
-		* @Route("/{_locale}/HR/workcalendar/new", name="newWorkCalendar")
-		*/
 
-		public function newWorkCalendar(Request $request)
-		{
-			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-			$this->denyAccessUnlessGranted('ROLE_ADMIN');
-			$obj=new HRWorkCalendars();
-			$utils = new HRWorkCalendarsUtils();
-			$editor=$utils->formatEditor($this->getUser(),$obj, $request, $this, $this->getDoctrine(), $this->get('router'), "New", "fa fa-plus");
-			return $this->render($editor["template"], $editor["vars"]);
-		}
-
-		/**
-		* @Route("/{_locale}/HR/workcalendar/{id}/edit", name="editWorkCalendar")
-		*/
-		public function editWorkCalendar($id,Request $request)
-		{
-			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-			$this->denyAccessUnlessGranted('ROLE_ADMIN');
-			$repository = $this->getDoctrine()->getRepository($this->class);
-			$obj=$repository->find($id);
-			$utils = new HRWorkCalendarsUtils();
-			$editor=$utils->formatEditor($this->getUser(),$obj, $request, $this, $this->getDoctrine(), $this->get('router'), "Edit", "fa fa-edit");
-			return $this->render($editor["template"], $editor["vars"]);
-		}
 
 	/**
 	* @Route("/{_locale}/admin/global/workers/{id}/disable", name="disableWorker")
@@ -265,66 +192,5 @@ class HRController extends Controller
 		return new JsonResponse(array('result' => $result));
 	}
 
-	/**
-	* @Route("/{_locale}/HR/workcalendar/{id}/save", name="saveWorkCalendar", defaults={"id"=0})
-	*/
-	public function saveWorkCalendar($id, Request $request){
-		$this->denyAccessUnlessGranted('ROLE_ADMIN');
-		$utils = new HRWorkCalendarsUtils();
-		if(!$id) $obj=new HRWorkCalendars();
-			else{
-				$repository = $this->getDoctrine()->getRepository(HRWorkCalendars::class);
-				$obj=$repository->find($id);
-				if($obj===NULL) $obj=new HRWorkCalendars();
-			}
-		$result=$utils->formatForm($this->getUser(),$obj, $request, $this, $this->getDoctrine(), true);
-		return new JsonResponse(array('result' => $result));
-	}
 
-	/**
-	* @Route("/{_locale}/HR/workcalendar/{id}/getform", name="getWorkCalendarform", defaults={"id"=0})
-	*/
-	public function getWorkCalendarform($id, Request $request){
-	if(!$id) $obj=new HRWorkCalendars();
-		else{
-			$repository = $this->getDoctrine()->getRepository(HRWorkCalendars::class);
-			$obj=$repository->find($id);
-			if($obj===NULL) $obj=new HRWorkCalendars();
-		}
-		$formUtils=new FormUtils();
-		$formUtils->init($this->getDoctrine(),$request);
-		$form=$formUtils->createFromEntity($obj, $this, [], [], false)->getForm();
-		$formUtils->proccess($form,$obj);
-		return $this->render('@Globale/form.html.twig', [
-			'formConstructor' =>["form" => $form->createView(), "post"=>$this->generateUrl("saveWorkCalendar",["id"=>$id]) ,"template" => json_decode(file_get_contents (dirname(__FILE__)."/../Forms/WorkCalendars.json"),true)]
-			]);
-
-	}
-	/**
-	* @Route("/{_locale}/HR/workcalendar/{id}/disable", name="disableWorkCalendar")
-	*/
-	public function disableWorkCalendar($id){
-		$this->denyAccessUnlessGranted('ROLE_ADMIN');
-		$entityUtils=new EntityUtils();
-		$result=$entityUtils->disableObject($id, HRWorkCalendars::class, $this->getDoctrine());
-		return new JsonResponse(array('result' => $result));
-	}
-	/**
-	* @Route("/{_locale}/HR/workcalendar/{id}/enable", name="enableWorkCalendar")
-	*/
-	public function enableWorkCalendar($id){
-		$this->denyAccessUnlessGranted('ROLE_ADMIN');
-		$entityUtils=new EntityUtils();
-		$result=$entityUtils->enableObject($id, HRWorkCalendars::class, $this->getDoctrine());
-		return new JsonResponse(array('result' => $result));
-	}
-	/**
-	* @Route("/{_locale}/HR/workcalendar/{id}/delete", name="deleteWorkCalendar")
-	*/
-	public function deleteWorkCalendar($id){
-		$this->denyAccessUnlessGranted('ROLE_ADMIN');
-		$entityUtils=new EntityUtils();
-		$result=$entityUtils->deleteObject($id, HRWorkCalendars::class, $this->getDoctrine());
-		return new JsonResponse(array('result' => $result));
-	}
 }

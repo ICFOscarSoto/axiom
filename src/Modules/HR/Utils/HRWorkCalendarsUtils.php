@@ -12,48 +12,6 @@ use App\Modules\Globale\Utils\ListUtils;
 
 class HRWorkCalendarsUtils extends Controller
 {
-  public function formatEditor($user, $obj, $request, $controller, $doctrine, $router, $name, $icon){
-    $userdata=$user->getTemplateData();
-    $new_breadcrumb["rute"]=null;
-    $new_breadcrumb["name"]=$name;
-    $new_breadcrumb["icon"]=$icon;
-    $menurepository=$doctrine->getRepository(MenuOptions::class);
-    $breadcrumb=$menurepository->formatBreadcrumb('workcalendars');
-    $form=$this->formatForm($user, $obj, $request, $controller, $doctrine);
-
-    array_push($breadcrumb, $new_breadcrumb);
-    return ['template'=>'@Globale/genericform.html.twig', 'vars'=>array(
-        'controllerName' => 'WorkCalendarsController',
-        'interfaceName' => 'Calendarios laborales',
-        'optionSelected' => 'workcalendars',
-        'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
-        'breadcrumb' =>  $breadcrumb,
-        'userData' => $userdata,
-        'form' => ["form" => $form->createView(),"template" => json_decode(file_get_contents (dirname(__FILE__)."/../Forms/WorkCalendars.json"),true)]
-    )];
-  }
-/*
-  public function formatEditorAjax($user, $obj, $request, $controller, $doctrine, $ajax=){
-    $formUtils=new FormUtils();
-    $formUtils->init($doctrine,$request);
-    $form=$formUtils->createFromEntity($obj,$controller,[],[],false)->getForm();
-    $proccess=$formUtils->proccess($form,$obj);
-    if($proccess===FALSE) return ["id"=>"workcalendar", "form" => $form->createView(), "template" => json_decode(file_get_contents (dirname(__FILE__)."/../Forms/WorkCalendars.json"),true)];
-      else return true;
-  }
-*/
-
-  public function formatForm($user, $obj, $request, $controller, $doctrine, $ajax=false){
-    $formUtils=new FormUtils();
-    $formUtils->init($doctrine,$request);
-    $form=$formUtils->createFromEntity($obj,$controller,[],[],!$ajax)->getForm();
-    $proccess=$formUtils->proccess($form,$obj);
-    if($ajax){
-      if($proccess===FALSE) return ["id"=>"workcalendar", "form" => $form->createView(), "template" => json_decode(file_get_contents (dirname(__FILE__)."/../Forms/WorkCalendars.json"),true)];
-        else return $proccess;
-    }else return $form;
-  }
-
   public function formatList($user){
     $list=[
       'id' => 'listWorkCalendars',
