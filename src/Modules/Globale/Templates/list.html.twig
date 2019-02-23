@@ -201,12 +201,10 @@
 											$('body').on('click', "[id^='{{ listConstructor.id }}-field-button-{{ field.id }}']", function() {
 												url=$("#{{ listConstructor.id }}-field-button-{{ field.id }}-url").val();
 												url=url.replace('_____',$(this).attr('attr-id'));
-												$.getJSON(url, function( data ) {
-													$.each( data, function( key, val ) {
-
-													});
-												}).always(function() {
-													{{ listConstructor.id }}.ajax.reload();
+												$.post(url, null,
+													function(data, status, xhr){
+															$("#{{field.modal}}-modal-form-body").html(data);
+															$("#{{field.modal}}-modal-form").modal();
 												});
 											});
 										{% else %}
@@ -246,9 +244,14 @@
 				{% if field.actionType is defined and field.actionType=="background" %}
 					//OPEN MODAL
 					$('body').on('click', "#{{ field.id }}-top-button", function() {
-							$("#{{field.modal}}-modal-form-body").find('form').trigger("reset");
+							/*$("#{{field.modal}}-modal-form-body").find('form').trigger("reset");
 							$("#{{field.modal}}-modal-form").modal();
-							$("#{{field.modal}}-modal-form-body").find('form').validate().resetForm();
+							$("#{{field.modal}}-modal-form-body").find('form').validate().resetForm();*/
+							$.post('{{ url(field.route) }}', null,
+								function(data, status, xhr){
+										$("#{{field.modal}}-modal-form-body").html(data);
+										$("#{{field.modal}}-modal-form").modal();
+							});
 					});
 
 					//CONTINUE BUTTON

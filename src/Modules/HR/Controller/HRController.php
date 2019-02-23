@@ -87,6 +87,8 @@ class HRController extends Controller
 		}
 
 
+
+
 		/**
      * @Route("/{_locale}/HR/{id}/holidays", name="holidays")
      */
@@ -264,16 +266,40 @@ class HRController extends Controller
 	}
 
 	/**
-	* @Route("/{_locale}/HR/workcalendar/save", name="saveWorkCalendar")
+	* @Route("/{_locale}/HR/workcalendar/{id}/save", name="saveWorkCalendar", defaults={"id"=0})
 	*/
-	public function saveWorkCalendar(Request $request){
+	public function saveWorkCalendar($id, Request $request){
 		$this->denyAccessUnlessGranted('ROLE_ADMIN');
-		$repository = $this->getDoctrine()->getRepository(HRWorkCalendars::class);
 		$utils = new HRWorkCalendarsUtils();
-		$result=$utils->formatForm($this->getUser(),new HRWorkCalendars(), $request, $this, $this->getDoctrine(), true);
+		if(!$id) $obj=new HRWorkCalendars();
+			else{
+				$repository = $this->getDoctrine()->getRepository(HRWorkCalendars::class);
+				$obj=$repository->find($id);
+				if($obj===NULL) $obj=new HRWorkCalendars();
+			}
+		$result=$utils->formatForm($this->getUser(),$obj, $request, $this, $this->getDoctrine(), true);
 		return new JsonResponse(array('result' => $result));
 	}
 
+	/**
+	* @Route("/{_locale}/HR/workcalendar/{id}/getform", name="getWorkCalendarform", defaults={"id"=0})
+	*/
+	public function getWorkCalendarform($id, Request $request){
+	if(!$id) $obj=new HRWorkCalendars();
+		else{
+			$repository = $this->getDoctrine()->getRepository(HRWorkCalendars::class);
+			$obj=$repository->find($id);
+			if($obj===NULL) $obj=new HRWorkCalendars();
+		}
+		$formUtils=new FormUtils();
+		$formUtils->init($this->getDoctrine(),$request);
+		$form=$formUtils->createFromEntity($obj, $this, [], [], false)->getForm();
+		$formUtils->proccess($form,$obj);
+		return $this->render('@Globale/form.html.twig', [
+			'formConstructor' =>["form" => $form->createView(), "post"=>$this->generateUrl("saveWorkCalendar",["id"=>$id]) ,"template" => json_decode(file_get_contents (dirname(__FILE__)."/../Forms/WorkCalendars.json"),true)]
+			]);
+
+	}
 	/**
 	* @Route("/{_locale}/HR/workcalendar/{id}/disable", name="disableWorkCalendar")
 	*/
