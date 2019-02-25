@@ -9,46 +9,6 @@ use App\Modules\Globale\Entity\MenuOptions;
 
 class StatesUtils
 {
-  public function formatEditor($user, $obj, $request, $controller, $doctrine, $name, $icon){
-    $userdata=$user->getTemplateData();
-    $new_breadcrumb["rute"]=null;
-    $new_breadcrumb["name"]=$name;
-    $new_breadcrumb["icon"]=$icon;
-    $menurepository=$doctrine->getRepository(MenuOptions::class);
-    $breadcrumb=$menurepository->formatBreadcrumb('states');
-    $form=$this->formatForm($user, $obj, $request, $controller, $doctrine);
-
-    array_push($breadcrumb, $new_breadcrumb);
-    return ['template'=>'@Globale/genericform.html.twig', 'vars'=>array(
-        'controllerName' => 'StatesController',
-        'interfaceName' => 'States',
-        'optionSelected' => 'states',
-        'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
-        'breadcrumb' =>  $breadcrumb,
-        'userData' => $userdata,
-        'form' => ["form" => $form->createView(),"template" => json_decode(file_get_contents (dirname(__FILE__)."/../Forms/States.json"),true)]
-    )];
-  }
-
-  public function formatForm($user, $obj, $request, $controller, $doctrine){
-    $formUtils=new FormUtils();
-    $formUtils->init($doctrine,$request);
-    $form=$formUtils->createFromEntity($obj,$controller)->getForm();
-    $form->handleRequest($request);
-    if ($form->isSubmitted() && $form->isValid()) {
-       $obj = $form->getData();
-       if($obj->getId() == null){
-         $obj->setDateadd(new \DateTime());
-         $obj->setDeleted(false);
-       }
-       $obj->setDateupd(new \DateTime());
-       //$obj->setCompany($user->getCompany());
-       $doctrine->getManager()->persist($obj);
-       $doctrine->getManager()->flush();
-    }
-    return $form;
-  }
-
   public function formatList($user){
     $list=[
       'id' => 'listStates',

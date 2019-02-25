@@ -8,7 +8,8 @@
 				{ "name": "lastname",	"cols": 7},
 				{	"name": "password",	"cols": 4},
 				{	"name": "email", "cols": 8},
-				{	"name": "emailDefaultAccount", "cols": 4}
+				{	"name": "emailDefaultAccount", "cols": 4},
+				{	"name": "active", "cols": 2}
 			]
 		}]
 }]

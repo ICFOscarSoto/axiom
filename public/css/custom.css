@@ -145,13 +145,15 @@ table.dataTable.compact tbody th, table.dataTable.compact tbody td {
 }
 
 .spinner-container {
-   position: absolute;
+   /*position: absolute;*/
+   position: fixed;
    height:100%;
    width:100%;
    margin:0px auto;
-   /*background-color:rgba(255, 255, 255, 0.7);*/
+   /*background-color:rgba(255, 255, 255, 0.5);*/
    z-index: 9999;
    display: none;
+   pointer-events:none;
 }
 
 .spinner {
@@ -161,11 +163,12 @@ table.dataTable.compact tbody th, table.dataTable.compact tbody td {
   height: fit-content;
   width: fit-content;
   margin: 0px auto;
-  background: #fff;
-  border: 1px #eee solid;
-  border-radius: 10px;
+  /*background-color:rgba(255, 255, 255, 0.5);*/
+  /*background-color:rgba(255, 255, 255, 0.5);*/
+  /*border: 1px #eee solid;
+  border-radius: 10px;*/
   transform: translate(-50%, -35%);
-  padding: 0px 30px;
+  padding: 50px 80px;
 }
 
 label.form-check-label {
@@ -178,7 +181,8 @@ label.form-check-label {
 }
 
 .modal-header {
-    background-color: #191b20 !important;
+    background-color: #303640 !important;
+    padding: 7px 15px !important;
 }
 
 .modal-title{

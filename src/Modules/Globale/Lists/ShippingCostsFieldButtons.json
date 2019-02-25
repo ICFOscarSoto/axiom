@@ -1,5 +1,5 @@
 [
-  {"id": "edit", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"editShippingCost", "confirm" :false, "actionType" : "foreground"},
+  {"id": "edit", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"dataShippingCosts", "modal":"shippingcosts", "actionType" : "background", "confirm" :false},
   {"id": "activation", "type": "option", "options": [
       {"id": "desactivate", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"disableShippingCost", "confirm" :true, "actionType" : "background" },
       {"id": "activate", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "route":"enableShippingCost", "confirm" :true, "actionType" : "background" }

@@ -30,14 +30,14 @@ var flagEmails=true;
 			flagEmails=true;
 		});
 	}
-	emailsRefresh();
+/*	emailsRefresh();
 	window.setInterval(function(){
 		if(flagEmails){
 			flagEmails=false;
 			emailsRefresh();
 		}
 	}, 15000);
-
+*/
 	$('body').on('click', '.notification-view', function() {
 
 	});

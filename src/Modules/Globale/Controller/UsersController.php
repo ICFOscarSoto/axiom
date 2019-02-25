@@ -25,6 +25,7 @@ use App\Modules\Email\Controller\EmailController;
 class UsersController extends Controller
 {
    	private $class=Users::class;
+    private $utilsClass=UsersUtils::class;
 
     /**
      * @Route("/{_locale}/admin/global/users", name="users")
@@ -80,6 +81,53 @@ class UsersController extends Controller
 		return new JsonResponse($return);
 	}
 
+  /**
+   * @Route("/{_locale}/user/data/{id}/{action}", name="dataUser", defaults={"id"=0, "action"="read"})
+   */
+   public function data($id, $action, Request $request, UserPasswordEncoderInterface $encoder){
+    $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+    $this->denyAccessUnlessGranted('ROLE_ADMIN');
+    $template=dirname(__FILE__)."/../Forms/Users.json";
+    $utils = new FormUtils();
+    $utilsObj=new $this->utilsClass();
+    $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser()];
+    $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[],$encoder);
+    return $utils->make($id, $this->class, $action, "formuser", "full", "@Globale/form.html.twig", 'formUser', $this->utilsClass);
+  }
+
+  /**
+   * @Route("/{_locale}/user/form/{id}", name="formUser", defaults={"id"=0})
+   */
+   public function form($id, Request $request, UserPasswordEncoderInterface $encoder){
+    $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+    $this->denyAccessUnlessGranted('ROLE_ADMIN');
+    $new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-new"];
+    $template=dirname(__FILE__)."/../Forms/Users.json";
+    $userdata=$this->getUser()->getTemplateData();
+    $menurepository=$this->getDoctrine()->getRepository(MenuOptions::class);
+    $breadcrumb=$menurepository->formatBreadcrumb('users');
+    array_push($breadcrumb, $new_breadcrumb);
+    $utils = new FormUtils();
+    $utilsObj=new $this->utilsClass();
+    $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser()];
+    $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[],$encoder);
+    return $this->render('@Globale/genericform.html.twig', array(
+            'controllerName' => 'UsersController',
+            'interfaceName' => 'Usuarios',
+            'optionSelected' => 'users',
+            'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
+            'breadcrumb' => $breadcrumb,
+            'userData' => $userdata,
+            'id' => $id,
+            'route' => $this->generateUrl("dataUser",["id"=>$id]),
+            'form' => $utils->formatForm('formuser', true, $id, $this->class, 'dataUser')
+
+    ));
+  }
+
+
+
+
 	/**
 	* @Route("/{_locale}/admin/global/users/new", name="newUser")
 	*/
@@ -105,6 +153,9 @@ class UsersController extends Controller
       return $this->render($editor["template"], $editor["vars"]);
 
 	}
+
+
+
 
 	/**
   * @Route("/api/global/user/{id}/get", name="getUser")

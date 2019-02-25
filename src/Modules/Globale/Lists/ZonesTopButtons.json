@@ -1,5 +1,5 @@
 [
-  {"id" : "addTop", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"newZone", "confirm" :false, "tooltip" : "Crear nueva zona"},
+  {"id" : "addTop", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"dataZones", "modal":"zones", "actionType" : "background", "confirm" :false, "tooltip" : "Crear nueva zona"},
   {"id" : "deleteTop", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true},
   {"id" : "printTop", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false},
   {"id" : "exportTop", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"", "confirm" :false}

@@ -14,44 +14,6 @@ use App\Modules\Cloud\Utils\CloudFilesUtils;
 
 class HRWorkersUtils extends Controller
 {
-  public function formatEditor($user, $obj, $request, $controller, $doctrine, $router, $name, $icon){
-    $userdata=$user->getTemplateData();
-    $new_breadcrumb["rute"]=null;
-    $new_breadcrumb["name"]=$name;
-    $new_breadcrumb["icon"]=$icon;
-    $menurepository=$doctrine->getRepository(MenuOptions::class);
-    $breadcrumb=$menurepository->formatBreadcrumb('workers');
-    $form=$this->formatForm($user, $obj, $request, $controller, $doctrine);
-
-    array_push($breadcrumb, $new_breadcrumb);
-    $cloudLists[]=CloudFilesUtils::formatList($user);
-    return ['template'=>'@HR/formworker.html.twig', 'vars'=>array(
-        'controllerName' => 'WorkersController',
-        'interfaceName' => 'Trabajadores',
-        'optionSelected' => 'workers',
-        'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
-        'breadcrumb' =>  $breadcrumb,
-        'userData' => $userdata,
-        'formworker' => ["form" => $form->createView(),"template" => json_decode(file_get_contents (dirname(__FILE__)."/../Forms/Workers.json"),true)],
-        'listDocuments' => ["list" => $cloudLists, "path" => $router->generate('cloudUpload', array('path'=>'workers', 'id'=>$obj->getId()))]
-    )];
-  }
-
-  public function formatForm($user, $obj, $request, $controller, $doctrine){
-    $formUtils=new FormUtils();
-    $formUtils->init($doctrine,$request);
-    $form=$formUtils->createFromEntity($obj,$controller,['status'],[
-      ['status', ChoiceType::class, [
-        'required' => false,
-        'attr' => ['class' => 'select2'],
-        'choices' => ["Inactive"=>0,"Active"=>1,"Sick leave"=>2],
-        'placeholder' => 'Select an status',
-      ]]
-
-    ])->getForm();
-    return $form;
-  }
-
   public function formatList($user){
 		$list=[
 			'id' => 'listWorkers',

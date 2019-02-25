@@ -7,7 +7,8 @@
 				{	"name": "isoname", "cols": 4},
 				{	"name": "alfa2", "cols": 4},
 				{	"name": "alfa3", "cols": 4},
-				{	"name": "isonumber", "cols": 4}
+				{	"name": "isonumber", "cols": 4},
+				{	"name": "active", "cols": 2}
 			]
 		}]
 }]

@@ -10,35 +10,6 @@ use App\Modules\Email\Entity\EmailAccounts;
 
 class CurrenciesUtils
 {
-  public function formatEditor($user, $obj, $request, $controller, $doctrine, $name, $icon){
-    $userdata=$user->getTemplateData();
-    $new_breadcrumb["rute"]=null;
-    $new_breadcrumb["name"]=$name;
-    $new_breadcrumb["icon"]=$icon;
-    $menurepository=$doctrine->getRepository(MenuOptions::class);
-    $breadcrumb=$menurepository->formatBreadcrumb('currencies');
-    $form=$this->formatForm($user, $obj, $request, $controller, $doctrine);
-
-    array_push($breadcrumb, $new_breadcrumb);
-    return ['template'=>'@Globale/genericform.html.twig', 'vars'=>array(
-        'controllerName' => 'CurrenciesController',
-        'interfaceName' => 'Monedas',
-        'optionSelected' => 'currencies',
-        'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
-        'breadcrumb' =>  $breadcrumb,
-        'userData' => $userdata,
-        'form' => ["form" => $form->createView(),"template" => json_decode(file_get_contents (dirname(__FILE__)."/../Forms/Currencies.json"),true)]
-    )];
-  }
-
-  public function formatForm($user, $obj, $request, $controller, $doctrine){
-    $formUtils=new FormUtils();
-    $formUtils->init($doctrine,$request);
-    $form=$formUtils->createFromEntity($obj,$controller)->getForm();
-    $formUtils->proccess($form,$obj);
-    return $form;
-  }
-
   public function formatList($user){
     $list=[
       'id' => 'listCurrencies',

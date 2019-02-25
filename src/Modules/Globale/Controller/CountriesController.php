@@ -20,6 +20,7 @@ use App\Modules\Globale\Utils\CountriesUtils;
 class CountriesController extends Controller
 {
 	private $class=Countries::class;
+	private $utilsClass=CountriesUtils::class;
 
     /**
      * @Route("/{_locale}/admin/global/countries", name="countries")
@@ -32,8 +33,11 @@ class CountriesController extends Controller
 		$locale = $request->getLocale();
 		$this->router = $router;
 		$menurepository=$this->getDoctrine()->getRepository(MenuOptions::class);
-		$utils = new CountriesUtils();
+		$utils = new $this->utilsClass();
 		$templateLists[]=$utils->formatList($this->getUser());
+		$formUtils=new FormUtils();
+		$formUtils->initialize($this->getUser(), new $this->class(), dirname(__FILE__)."/../Forms/Countries.json", $request, $this, $this->getDoctrine());
+		$templateForms[]=$formUtils->formatForm('countries', true, null, $this->class);
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 			return $this->render('@Globale/genericlist.html.twig', [
 				'controllerName' => 'CountriesController',
@@ -42,37 +46,23 @@ class CountriesController extends Controller
 				'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
 				'breadcrumb' =>  $menurepository->formatBreadcrumb($request->get('_route')),
 				'userData' => $userdata,
-				'lists' => $templateLists
+				'lists' => $templateLists,
+        'forms' => $templateForms
 				]);
 		}
 		return new RedirectResponse($this->router->generate('app_login'));
     }
-		/**
-		* @Route("/{_locale}/admin/global/countries/new", name="newCountry")
-		*/
-
-		public function newCountry(Request $request)
-		{
-			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-			$this->denyAccessUnlessGranted('ROLE_ADMIN');
-			$obj=new Countries();
-			$utils = new CountriesUtils();
-			$editor=$utils->formatEditor($this->getUser(),$obj, $request, $this, $this->getDoctrine(), "New", "fa fa-plus");
-			return $this->render($editor["template"], $editor["vars"]);
-		}
 
 		/**
-		* @Route("/{_locale}/admin/global/countries/{id}/edit", name="editCountry")
-		*/
-		public function editCountry($id,Request $request)
-		{
-			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-			$this->denyAccessUnlessGranted('ROLE_ADMIN');
-			$repository = $this->getDoctrine()->getRepository($this->class);
-			$obj=$repository->find($id);
-			$utils = new CountriesUtils();
-			$editor=$utils->formatEditor($this->getUser(),$obj, $request, $this, $this->getDoctrine(), "Edit", "fa fa-edit");
-			return $this->render($editor["template"], $editor["vars"]);
+		 * @Route("/{_locale}/countries/data/{id}/{action}", name="dataCountries", defaults={"id"=0, "action"="read"})
+		 */
+		 public function data($id, $action, Request $request){
+		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		 $this->denyAccessUnlessGranted('ROLE_ADMIN');
+		 $template=dirname(__FILE__)."/../Forms/Countries.json";
+		 $utils = new FormUtils();
+		 $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine());
+		 return $utils->make($id, $this->class, $action, "formCountries", "modal");
 		}
 
 		/**

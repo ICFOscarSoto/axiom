@@ -33,6 +33,9 @@ class CarriersController extends Controller
   		$menurepository=$this->getDoctrine()->getRepository(MenuOptions::class);
     	$utils = new CarriersUtils();
   		$templateLists[]=$utils->formatList($this->getUser());
+			$formUtils=new FormUtils();
+			$formUtils->initialize($this->getUser(), new $this->class(), dirname(__FILE__)."/../Forms/Carriers.json", $request, $this, $this->getDoctrine());
+			$templateForms[]=$formUtils->formatForm('carriers', true, null, $this->class);
   		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
   			return $this->render('@Globale/genericlist.html.twig', [
   				'controllerName' => 'carriersController',
@@ -41,43 +44,25 @@ class CarriersController extends Controller
   				'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
   				'breadcrumb' =>  $menurepository->formatBreadcrumb($request->get('_route')),
   				'userData' => $userdata,
-  				'lists' => $templateLists
+  				'lists' => $templateLists,
+	        'forms' => $templateForms
   				]);
   		}
   		return new RedirectResponse($this->router->generate('app_login'));
     }
 
-
-
 		/**
-		* @Route("/{_locale}/admin/global/carrier/new", name="newCarrier")
-		*/
-
-		public function newCarrier(Request $request)
-		{
-			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-			$obj=new Carriers();
-			$utils = new CarriersUtils();
-			$editor=$utils->formatEditor($this->getUser(),$obj, $request, $this, $this->getDoctrine(), "New", "fa fa-plus");
-			//print_r($obj);
-			//return new Response("SI AQUI");
-			return $this->render($editor["template"], $editor["vars"]);
-
+		 * @Route("/{_locale}/carriers/data/{id}/{action}", name="dataCarriers", defaults={"id"=0, "action"="read"})
+		 */
+		 public function data($id, $action, Request $request){
+		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		 $this->denyAccessUnlessGranted('ROLE_ADMIN');
+		 $template=dirname(__FILE__)."/../Forms/Carriers.json";
+		 $utils = new FormUtils();
+		 $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine());
+		 return $utils->make($id, $this->class, $action, "formCarriers", "modal");
 		}
 
-		/**
-		* @Route("/{_locale}/admin/global/carrier/{id}/edit", name="editCarrier")
-		*/
-		public function editCarrier($id,Request $request)
-			{
-				$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-				$this->denyAccessUnlessGranted('ROLE_ADMIN');
-				$repository = $this->getDoctrine()->getRepository($this->class);
-				$obj=$repository->find($id);
-				$utils = new CarriersUtils();
-				$editor=$utils->formatEditor($this->getUser(),$obj, $request, $this, $this->getDoctrine(), "Edit", "fa fa-edit");
-				return $this->render($editor["template"], $editor["vars"]);
-		}
 
 		/**
 		* @Route("/api/global/carrier/{id}/get", name="getCarrier")

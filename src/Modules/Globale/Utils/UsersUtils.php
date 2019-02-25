@@ -10,65 +10,55 @@ use App\Modules\Email\Entity\EmailAccounts;
 
 class UsersUtils
 {
-  public function formatEditor($user, $obj, $request, $controller, $doctrine, $encoder, $name, $icon){
-    $userdata=$user->getTemplateData();
-    $new_breadcrumb["rute"]=null;
-    $new_breadcrumb["name"]=$name;
-    $new_breadcrumb["icon"]=$icon;
-    $menurepository=$doctrine->getRepository(MenuOptions::class);
-    $breadcrumb=$menurepository->formatBreadcrumb('users');
-    $form=$this->formatForm($user, $obj, $request, $controller, $doctrine, $encoder);
 
-    array_push($breadcrumb, $new_breadcrumb);
-    return ['template'=>'@Globale/genericform.html.twig', 'vars' => array(
-        'controllerName' => 'UsersController',
-        'interfaceName' => 'Usuarios',
-        'optionSelected' => 'users',
-        'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
-        'breadcrumb' =>  $breadcrumb,
-        'userData' => $userdata,
-        'form' => ["form" => $form->createView(),"template" => json_decode(file_get_contents (dirname(__FILE__)."/../Forms/Users.json"),true)]
-    )];
-  }
-
-  public function formatForm($user, $obj, $request, $controller, $doctrine, $encoder){
-    $formUtils=new FormUtils();
-    $formUtils->init($doctrine,$request);
-    $emailAccountsRepository=$doctrine->getRepository(EmailAccounts::class);
-    $form=$formUtils->createFromEntity($obj,$controller, array('password','emailDefaultAccount'), array(
-        ['password', RepeatedType::class, [
-          'type' => PasswordType::class,
-          'required' => false,
-          'mapped' => false,
-          'first_options'  => ['label' => 'Password'],
-          'second_options' => ['label' => 'Repeat Password']
-        ]],
-        ['emailDefaultAccount', ChoiceType::class, [
-          'required' => false,
-          'attr' => ['class' => 'select2'],
-          'choices' => $emailAccountsRepository->findBy(["user"=>$obj]),
-          'placeholder' => 'Select an email account...',
-          'choice_label' => 'name',
-          'choice_value' => 'id'
-        ]]
-      ))->getForm();
-
+  public function proccess($form,$obj,$request,$entityManager,$encoder){
     //if changed Password
     $form->handleRequest($request);
+    if(!$form->isSubmitted()) return false;
     if ($form->isSubmitted() && $form->isValid() ) {
-      $object = $form->getData();
+      $obj = $form->getData();
       if($form["password"]->getData()!="")
-        $object->setPassword($encoder->encodePassword($object, $form["password"]->getData()));
-      if($object->getId() == null) {
-        $object->setDateadd(new \DateTime());
-        $object->setDeleted(false);
+        $obj->setPassword($encoder->encodePassword($obj, $form["password"]->getData()));
+      if($obj->getId() == null) {
+        $obj->setDateadd(new \DateTime());
+        $obj->setDeleted(false);
       }
-      $object->setDateupd(new \DateTime());
-      $doctrine->getManager()->persist($object);
-      $doctrine->getManager()->flush();
+      $obj->setDateupd(new \DateTime());
+      try{
+        $entityManager->persist($obj);
+        $entityManager->flush();
+        return $obj;
+      }catch (Exception $e) {
+        return false;
+      }
     }
-    return $form;
   }
+  public function getExcludedForm($params){
+    return ['password','emailDefaultAccount'];
+  }
+
+  public function getIncludedForm($params){
+    $doctrine=$params["doctrine"];
+    $id=$params["id"];
+    $user=$params["user"];
+    $emailAccountsRepository=$doctrine->getRepository(EmailAccounts::class);
+    return [['password', RepeatedType::class, [
+      'type' => PasswordType::class,
+      'required' => false,
+      'mapped' => false,
+      'first_options'  => ['label' => 'Password'],
+      'second_options' => ['label' => 'Repeat Password']
+    ]],
+    ['emailDefaultAccount', ChoiceType::class, [
+      'required' => false,
+      'attr' => ['class' => 'select2'],
+      'choices' => $emailAccountsRepository->findBy(["user"=>$id]),
+      'placeholder' => 'Select an email account...',
+      'choice_label' => 'name',
+      'choice_value' => 'id'
+    ]]];
+  }
+
 
   public function formatList($user){
 		$list=[

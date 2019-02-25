@@ -24,6 +24,7 @@ class CompaniesController extends Controller
 {
 
 	 private $class=Companies::class;
+	 private $utilsClass=CompaniesUtils::class;
 
     /**
      * @Route("/{_locale}/admin/global/companies", name="companies")
@@ -83,34 +84,50 @@ class CompaniesController extends Controller
 			return new JsonResponse($company->encodeJson());
 		}
 
-	/**
-	* @Route("/api/global/companies/new", name="newCompany")
-	*/
-	public function newCompany(Request $request){
-		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-		$this->denyAccessUnlessGranted('ROLE_ADMIN');
-		$obj=new Companies();
-		$utils = new CompaniesUtils();
-		$editor=$utils->formatEditor($this->getUser(),$obj, $request, $this, $this->getDoctrine(), "New", "fa fa-plus");
-		return $this->render($editor["template"], $editor["vars"]);
-	}
 
+		/**
+	   * @Route("/{_locale}/company/data/{id}/{action}", name="dataCompany", defaults={"id"=0, "action"="read"})
+	   */
+	   public function data($id, $action, Request $request){
+	    $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+	    $this->denyAccessUnlessGranted('ROLE_ADMIN');
+	    $template=dirname(__FILE__)."/../Forms/Companies.json";
+	    $utils = new FormUtils();
+	    $utilsObj=new $this->utilsClass();
+	    $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser()];
+	    $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
+	    return $utils->make($id, $this->class, $action, "formCompany", "full", "@Globale/form.html.twig", 'formCompany', $this->utilsClass);
+	  }
 
-	/**
-	* @Route("/{_locale}/admin/global/companies/{id}/edit", name="editCompany")
-	*/
-	public function editCompany($id,Request $request)
-    {
-			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-			$this->denyAccessUnlessGranted('ROLE_ADMIN');
-			$companyRepository = $this->getDoctrine()->getRepository(Companies::class);
-			$obj=$companyRepository->find($id);
-			$utils = new CompaniesUtils();
-	    $editor=$utils->formatEditor($this->getUser(),$obj, $request, $this, $this->getDoctrine(), "Edit", "fa fa-edit");
-	    return $this->render($editor["template"], $editor["vars"]);
-		}
+	  /**
+	   * @Route("/{_locale}/company/form/{id}", name="formCompany", defaults={"id"=0})
+	   */
+	   public function form($id, Request $request){
+	    $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+	    $this->denyAccessUnlessGranted('ROLE_ADMIN');
+	    $new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-new"];
+	    $template=dirname(__FILE__)."/../Forms/Companies.json";
+	    $userdata=$this->getUser()->getTemplateData();
+	    $menurepository=$this->getDoctrine()->getRepository(MenuOptions::class);
+	    $breadcrumb=$menurepository->formatBreadcrumb('companies');
+	    array_push($breadcrumb, $new_breadcrumb);
+	    $utils = new FormUtils();
+	    $utilsObj=new $this->utilsClass();
+	    $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser()];
+	    $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
+	    return $this->render('@Globale/genericform.html.twig', array(
+	            'controllerName' => 'UsersController',
+	            'interfaceName' => 'Empresas',
+	            'optionSelected' => 'companies',
+	            'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
+	            'breadcrumb' => $breadcrumb,
+	            'userData' => $userdata,
+	            'id' => $id,
+	            'route' => $this->generateUrl("dataCompany",["id"=>$id]),
+	            'form' => $utils->formatForm('formcompany', true, $id, $this->class, 'dataCompany')
 
-		//public function formatForm()
+	    ));
+	  }
 
 	/**
 	* @Route("/{_locale}/admin/global/companies/{id}/disable", name="disableCompany")
@@ -121,6 +138,7 @@ class CompaniesController extends Controller
 		$result=$entityUtils->disableObject($id, $this->class, $this->getDoctrine());
 		return new JsonResponse(array('result' => $result));
 	}
+
 	/**
 	* @Route("/{_locale}/admin/global/companies/{id}/enable", name="enableCompany")
 	*/
@@ -130,6 +148,7 @@ class CompaniesController extends Controller
 		$result=$entityUtils->enableObject($id, $this->class, $this->getDoctrine());
 		return new JsonResponse(array('result' => $result));
 	}
+	
 	/**
 	* @Route("/{_locale}/admin/global/companies/{id}/delete", name="deleteCompany")
 	*/

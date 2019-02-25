@@ -5,7 +5,8 @@
 			"fields": [
 				{ "name": "weight","cols": 8},
 				{	"name": "price", "cols": 4},
-				{	"name": "zone", "cols": 4}
+				{	"name": "zone", "cols": 4},
+				{	"name": "active", "cols": 2}
 			]
 		}]
 }]

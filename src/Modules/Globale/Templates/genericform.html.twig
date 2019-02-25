@@ -18,9 +18,11 @@
 		{{ include('@Globale/breadcrumb.html.twig') }}
 
 		<!-- MAIN CONTENT -->
-		<div class="principal-content">
-			{% set formConstructor = form %}
-			{{ include('@Globale/form.html.twig') }}
+		<div class="principal-content" id="principal-content">
+			{% if form is defined %}
+				{% set formConstructor = form %}
+				{{ include('@Globale/form.html.twig') }}
+			{% endif %}
 		</div>
 		<!-- END MAIN CONTENT -->
 	{{ include('@Globale/footer.html.twig') }}
@@ -30,7 +32,34 @@
 	{{ include('@Globale/chat_histories.html.twig') }}
 </div>
 	<!-- MODALS  -->
-
+<script>
+		$(document).ready(function() {
+			function readContent(){
+				url="{{ route }}";
+				if(url!=""){
+					if((++load_wait)==1) $("#load-spinner").fadeIn();
+					$.post(url, null,
+						function(data, status, xhr){
+							$("#principal-content").html(data);
+							$("#principal-content").iCheck({checkboxClass: 'icheckbox_flat-blue', radioClass: 'iradio_flat-blue'});
+							$("#principal-content select").select2();
+							if((--load_wait)==0) $("#load-spinner").fadeOut();
+					});
+				}
+			}
+			{% if form is not defined %}
+				readContent();
+			{% endif %}
+		});
+		/*function showTabs(){
+			$("#tabs-list li").each(function() {
+				if($(this).attr("attr-id")>0){
+					$(this).show();
+					$("#tab-body-"+$(this).attr("attr-name")).show();
+				}
+			});
+		}*/
+	</script>
 	<!-- END MODALS -->
 {% block footer %}
 	<link rel="stylesheet" href="{{ url('index') }}js/datatables/datatables.css">

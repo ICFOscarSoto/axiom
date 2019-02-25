@@ -1,6 +1,16 @@
+<div {% if formConstructor.name is defined %} id="{{formConstructor.name}}-form-body" {% endif %}>
 {{ form_start(formConstructor.form) }}
   {% set counter = 1 %}
+  {% if formConstructor.type is not defined or formConstructor.type != "modal" %}
+  <div class="row">
+    <div style="text-align: right;" class="col-md-12">
+      <button attr-id="" attr-action="" id="{{formConstructor.name}}-button-cancel" type="button" class="btn btn">{{ ("Cancelar")|trans }}</button>
+      <button attr-id="" attr-action="" id="{{formConstructor.name}}-button-continue" type="button" class="btn btn-green">{{ ("Guardar")|trans }}</button>
+    </div>
+  </div>
+  {% endif %}
   {% for section in formConstructor.template.0.sections %}
+
   <div class="panel minimal">
     <div class="panel-heading">
       <div class="panel-title">{{ (section.name)|trans }}</div>
@@ -39,5 +49,37 @@
     </div>
   </div>
   {% endfor %}
-
+  {% if formConstructor.type is not defined or formConstructor.type != "modal" %}
+  <div class="row">
+    <div style="text-align: right;" class="col-md-12">
+      <button attr-id="" attr-action="" id="{{formConstructor.name}}-button-cancel" type="button" class="btn btn">{{ ("Cancelar")|trans }}</button>
+      <button attr-id="" attr-action="" id="{{formConstructor.name}}-button-continue" type="button" class="btn btn-green">{{ ("Guardar")|trans }}</button>
+    </div>
+  </div>
+  {% endif %}
 {{ form_end(formConstructor.form) }}
+</div>
+<script>
+	$(document).ready(function() {
+    $('body').on('click', "#{{formConstructor.name}}-button-continue", function() {
+          if($("#{{formConstructor.name}}-form-body").find('form').valid()){
+            if((++load_wait)==1) $("#load-spinner").fadeIn();
+            console.log($("#{{formConstructor.name}}-form-body").find('form').find('#post-url').val()+"\\"+$("#{{formConstructor.name}}-form-body").find('form').serialize())
+            $.post($("#{{formConstructor.name}}-form-body").find('form').find('#post-url').val(), $("#{{formConstructor.name}}-form-body").find('form').serialize(),
+                function(data, status, xhr){
+                  if((--load_wait)==0) $("#load-spinner").fadeOut();
+                  if(data.result){
+                    //$("#tabs-list li").attr("attr-id",data.id);
+                    toastr.success("Datos guardados correctamente", "Confirmación", confirmation);
+                    if(data.reload) location.href=data.href;
+                    $("#{{formConstructor.name}}-form-body").find('form').validate().resetForm();
+                  }
+                    else toastr.error("Ocurrió un error al guardar los datos", "Confirmación", confirmation);
+              }, "json");
+            }
+    });
+    $('body').on('click', "#{{formConstructor.name}}-button-cancel", function() {
+      window.history.back();
+    });
+  });
+</script>

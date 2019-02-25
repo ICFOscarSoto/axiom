@@ -33,6 +33,9 @@ class StatesController extends Controller
   		$menurepository=$this->getDoctrine()->getRepository(MenuOptions::class);
     	$utils = new StatesUtils();
   		$templateLists[]=$utils->formatList($this->getUser());
+			$formUtils=new FormUtils();
+			$formUtils->initialize($this->getUser(), new $this->class(), dirname(__FILE__)."/../Forms/States.json", $request, $this, $this->getDoctrine());
+			$templateForms[]=$formUtils->formatForm('states', true, null, $this->class);
   		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
   			return $this->render('@Globale/genericlist.html.twig', [
   				'controllerName' => 'statesController',
@@ -41,38 +44,26 @@ class StatesController extends Controller
   				'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
   				'breadcrumb' =>  $menurepository->formatBreadcrumb($request->get('_route')),
   				'userData' => $userdata,
-  				'lists' => $templateLists
+  				'lists' => $templateLists,
+	        'forms' => $templateForms
   				]);
   		}
   		return new RedirectResponse($this->router->generate('app_login'));
     }
 
-    /**
-    * @Route("/{_locale}/admin/global/states/new", name="newState")
-    */
 
-    public function newState(Request $request)
-    {
-      $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-      $obj=new States();
-      $utils = new StatesUtils();
-      $editor=$utils->formatEditor($this->getUser(),$obj, $request, $this, $this->getDoctrine(), "New", "fa fa-plus");
-      return $this->render($editor["template"], $editor["vars"]);
-    }
+		/**
+		 * @Route("/{_locale}/states/data/{id}/{action}", name="dataStates", defaults={"id"=0, "action"="read"})
+		 */
+		 public function data($id, $action, Request $request){
+		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		 $this->denyAccessUnlessGranted('ROLE_ADMIN');
+		 $template=dirname(__FILE__)."/../Forms/States.json";
+		 $utils = new FormUtils();
+		 $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine());
+		 return $utils->make($id, $this->class, $action, "formStates", "modal");
+		}
 
-    /**
-    * @Route("/{_locale}/admin/global/states/{id}/edit", name="editState")
-    */
-    public function editState($id,Request $request)
-      {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
-        $repository = $this->getDoctrine()->getRepository($this->class);
-        $obj=$repository->find($id);
-        $utils = new StatesUtils();
-        $editor=$utils->formatEditor($this->getUser(),$obj, $request, $this, $this->getDoctrine(), "Edit", "fa fa-edit");
-        return $this->render($editor["template"], $editor["vars"]);
-    }
 
     /**
     * @Route("/api/global/states/{id}/get", name="getStates")

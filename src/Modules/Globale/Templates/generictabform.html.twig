@@ -1,0 +1,98 @@
+{% set params = app.request.attributes.get('_route_params')|merge(app.request.query.all()) %}
+{% block header %}
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<meta name="description" content="Neon Admin Panel" />
+	<meta name="author" content="" />
+	<link rel="icon" href="images/favicon.ico">
+	{{ include('@Globale/header.html.twig') }}
+{% endblock %}
+<title>{% block title %}{{ interfaceName }}{% endblock %}</title>
+<body class="page-body" data-url="{{ url('indexAdmin') }}">
+<div class="page-container"><!-- add class "sidebar-collapsed" to close sidebar by default, "chat-visible" to make chat appear always -->
+	{{ include('@Globale/sidebar_menu.html.twig') }}
+	<div class="main-content">
+		{{ include('@Globale/head.html.twig') }}
+		<hr />
+		{{ include('@Globale/breadcrumb.html.twig') }}
+
+		<!-- MAIN CONTENT -->
+    <div class="principal-content">
+    <div class="row">
+			<div id="tabs" class="col-md-12">
+        {% if tabs is defined %}
+	      <ul id="tabs-list" class="nav nav-tabs bordered"><!-- available classes "bordered", "right-aligned" -->
+          {% for tab in tabs %}
+						<li class="{% if tab.active is defined and tab.active == true %}active{% endif %}" id="tab-head-{{ tab.name }}" style="{% if not (tab.active is defined and tab.active == true) and id == 0 %}display:none;{% endif %}" attr-id="{{ id }}" attr-name="{{ tab.name }}" attr-route="{% if tab.route is defined %}{{ tab.route }}{% endif %}">
+							<a href="#tab-body-{{ tab.name }}" data-toggle="tab">
+								<span class="visible-xs"><i class="entypo-home"></i></span>
+								<span class="hidden-xs">{{ tab.caption }}</span>
+							</a>
+						</li>
+          {% endfor %}
+				</ul>
+					<div class="tab-content">
+            {% for tab in tabs %}
+  						<div class="tab-pane {% if tab.active is defined and tab.active == true %}active{% endif %}" style="{% if not (tab.active is defined and tab.active == true) and id == 0 %}display:none;{% endif %}" id="tab-body-{{ tab.name }}">
+  	          </div>
+            {% endfor %}
+	        </div>
+        {% endif %}
+			</div>
+    </div>
+	</div>
+
+  <script>
+    $(document).ready(function() {
+      function readTabContent(){
+        url=$('#tabs-list li.active').attr("attr-route");
+        if(url!=""){
+          if((++load_wait)==1) $("#load-spinner").fadeIn();
+          $.post(url, null,
+            function(data, status, xhr){
+              $("#tab-body-"+$('#tabs-list li.active').attr("attr-name")).html(data);
+              $("#tab-body-"+$('#tabs-list li.active').attr("attr-name")).iCheck({checkboxClass: 'icheckbox_flat-blue', radioClass: 'iradio_flat-blue'});
+              $("#tab-body-"+$('#tabs-list li.active').attr("attr-name")+" select").select2();
+              if((--load_wait)==0) $("#load-spinner").fadeOut();
+          });
+        }
+      }
+      $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+        readTabContent();
+      });
+
+      readTabContent();
+    });
+    /*function showTabs(){
+      $("#tabs-list li").each(function() {
+        if($(this).attr("attr-id")>0){
+          $(this).show();
+          $("#tab-body-"+$(this).attr("attr-name")).show();
+        }
+      });
+    }*/
+  </script>
+		<!-- END MAIN CONTENT -->
+	{{ include('@Globale/footer.html.twig') }}
+	</div>
+	{{ include('@Globale/chat.html.twig') }}
+	<!-- Chat Histories -->
+	{{ include('@Globale/chat_histories.html.twig') }}
+</div>
+	<!-- MODALS  -->
+
+	<!-- END MODALS -->
+{% block footer %}
+	<link rel="stylesheet" href="{{ url('index') }}js/datatables/datatables.css">
+	<link rel="stylesheet" href="{{ url('index') }}js/select2/select2-bootstrap.css">
+	<link rel="stylesheet" href="{{ url('index') }}js/select2/select2.css">
+	<link rel="stylesheet" href="{{ url('index') }}css/custom.css">
+	<!-- Imported scripts on this page -->
+ 	<script src="{{ url('index') }}js/datatables/datatables.js"></script>
+	<script src="{{ url('index') }}js/select2/select2.min.js"></script>
+	<script src="{{ url('index') }}js/moment.min.js"></script>
+	<script src="{{ url('index') }}js/moment-es.js"></script>
+	 {{ include('@Globale/bottom.html.twig') }}
+{% endblock %}
+</body>

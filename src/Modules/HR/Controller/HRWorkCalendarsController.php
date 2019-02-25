@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Modules\HR\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -23,12 +22,11 @@ use App\Modules\HR\Utils\HRWorkersUtils;
 use App\Modules\HR\Utils\HRWorkCalendarsUtils;
 use App\Modules\HR\Entity\HRWorkCalendars;
 
-
 class HRWorkCalendarsController extends Controller
 {
 
 	 private $class=HRWorkCalendars::class;
-   private $UtilsClass=HRWorkCalendarsUtils::class;
+   private $utilsClass=HRWorkCalendarsUtils::class;
 
    /**
     * @Route("/{_locale}/HR/workcalendars", name="workcalendars")
@@ -41,12 +39,12 @@ class HRWorkCalendarsController extends Controller
    $locale = $request->getLocale();
    $this->router = $router;
    $menurepository=$this->getDoctrine()->getRepository(MenuOptions::class);
-   $utils = new HRWorkCalendarsUtils();
+   $utils = new $this->utilsClass();
    $formUtils=new FormUtils();
-   $formUtils->initialize($this->getUser(), new HRWorkCalendars(), dirname(__FILE__)."/../Lists/WorkCalendars.json", $request, $this, $this->getDoctrine());
+   $formUtils->initialize($this->getUser(), new HRWorkCalendars(), dirname(__FILE__)."/../Forms/WorkCalendars.json", $request, $this, $this->getDoctrine());
    $templateLists[]=$utils->formatList($this->getUser());
    //$templateForms[]=$formUtils->formatForm('workcalendars', true);
-   $templateForms[]=$formUtils->formatForm('workcalendars', true);
+   $templateForms[]=$formUtils->formatForm('workcalendars', true, null, $this->class);
    if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
      return $this->render('@Globale/genericlist.html.twig', [
        'controllerName' => 'HRController',
@@ -78,35 +76,19 @@ class HRWorkCalendarsController extends Controller
      return new JsonResponse($return);
    }
 
-   /**
-   * @Route("/{_locale}/HR/workcalendars/data/{id}/{action}", name="workCalendarsForm", defaults={"id"=0, "action"="read"})
-   */
-   public function workCalendarsForm($id, $action, Request $request){
-     $this->denyAccessUnlessGranted('ROLE_ADMIN');
-     $template=dirname(__FILE__)."/../Forms/WorkCalendars.json";
-     if(!$id) $obj=new $this->class();
-       else{
-         $repository = $this->getDoctrine()->getRepository($this->class);
-         $obj=$repository->find($id);
-         if($obj===NULL) $obj=new $this->class();
-       }
-     $utils = new FormUtils();
-     $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine());
-		 $form=$utils->createFromEntity2(false)->getForm();
-     switch($action){
-        case 'save':
-          $result=$utils->proccess($form,$obj);
-          return new JsonResponse(array('result' => $result));
-        break;
-        case 'read':
-          return $this->render('@Globale/form.html.twig', [
-            'formConstructor' =>["form" => $form->createView(), "post"=>$this->generateUrl($request->get('_route'),["id"=>$id, "action"=>"save"]) ,"template" => json_decode(file_get_contents ($template),true)]
-            ]);
-        break;
-     }
-   }
+	 /**
+	  * @Route("/{_locale}/HR/workcalendars/data/{id}/{action}", name="dataWorkCalendars", defaults={"id"=0, "action"="read"})
+	  */
+	  public function data($id, $action, Request $request){
+	 	$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+	 	$this->denyAccessUnlessGranted('ROLE_ADMIN');
+	 	$template=dirname(__FILE__)."/../Forms/WorkCalendars.json";
+	 	$utils = new FormUtils();
+	 	$utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine());
+	 	return $utils->make($id, $this->class, $action, "formWorkCalendar", "modal");
+	 }
 
- 	/**
+  /**
  	* @Route("/{_locale}/HR/workcalendar/{id}/disable", name="disableWorkCalendar")
  	*/
  	public function disableWorkCalendar($id){

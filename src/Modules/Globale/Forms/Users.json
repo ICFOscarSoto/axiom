@@ -9,7 +9,8 @@
 				{	"name": "company", "cols": 4},
 				{	"name": "roles", "cols": 4},
 				{	"name": "password",	"cols": 4},
-				{	"name": "emailDefaultAccount", "cols": 4}
+				{	"name": "emailDefaultAccount", "cols": 4},
+				{	"name": "active", "cols": 2}
 			]
 		}]
 }]

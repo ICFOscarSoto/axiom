@@ -33,6 +33,9 @@ class ShippingCostsController extends Controller
   		$menurepository=$this->getDoctrine()->getRepository(MenuOptions::class);
     	$utils = new ShippingCostsUtils();
   		$templateLists[]=$utils->formatList($this->getUser());
+			$formUtils=new FormUtils();
+			$formUtils->initialize($this->getUser(), new $this->class(), dirname(__FILE__)."/../Forms/ShippingCosts.json", $request, $this, $this->getDoctrine());
+			$templateForms[]=$formUtils->formatForm('shippingcosts', true, null, $this->class);
   		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
   			return $this->render('@Globale/genericlist.html.twig', [
   				'controllerName' => 'ShippingCostsController',
@@ -41,7 +44,8 @@ class ShippingCostsController extends Controller
   				'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
   				'breadcrumb' =>  $menurepository->formatBreadcrumb($request->get('_route')),
   				'userData' => $userdata,
-  				'lists' => $templateLists
+  				'lists' => $templateLists,
+	        'forms' => $templateForms
   				]);
   		}
   	return new RedirectResponse($this->router->generate('app_login'));
@@ -49,36 +53,18 @@ class ShippingCostsController extends Controller
 
 		}
 
-
 		/**
-		* @Route("/{_locale}/admin/global/shippingcost/new", name="newShippingCost")
-		*/
-
-		public function newShippingCost(Request $request)
-		{
-			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-			$obj=new ShippingCosts();
-			$utils = new ShippingCostsUtils();
-			$editor=$utils->formatEditor($this->getUser(),$obj, $request, $this, $this->getDoctrine(), "New", "fa fa-plus");
-			//print_r($obj);
-			//return new Response("SI AQUI");
-			return $this->render($editor["template"], $editor["vars"]);
-
+		 * @Route("/{_locale}/shippingcosts/data/{id}/{action}", name="dataShippingCosts", defaults={"id"=0, "action"="read"})
+		 */
+		 public function data($id, $action, Request $request){
+		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		 $this->denyAccessUnlessGranted('ROLE_ADMIN');
+		 $template=dirname(__FILE__)."/../Forms/ShippingCosts.json";
+		 $utils = new FormUtils();
+		 $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine());
+		 return $utils->make($id, $this->class, $action, "formShippingCosts", "modal");
 		}
 
-		/**
-		* @Route("/{_locale}/admin/global/shippingcost/{id}/edit", name="editShippingCost")
-		*/
-		public function editShippingCost($id,Request $request)
-			{
-				$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-				$this->denyAccessUnlessGranted('ROLE_ADMIN');
-				$repository = $this->getDoctrine()->getRepository($this->class);
-				$obj=$repository->find($id);
-				$utils = new ShippingCostsUtils();
-				$editor=$utils->formatEditor($this->getUser(),$obj, $request, $this, $this->getDoctrine(), "Edit", "fa fa-edit");
-				return $this->render($editor["template"], $editor["vars"]);
-		}
 
 		/**
 		* @Route("/api/global/shippingcost/{id}/get", name="getShippingCost")
@@ -90,7 +76,6 @@ class ShippingCostsController extends Controller
 					}
 					return new JsonResponse($shippingcost->encodeJson());
 		}
-
 
 		/**
 		* @Route("/api/shippingcost/list", name="shippingcostlist")

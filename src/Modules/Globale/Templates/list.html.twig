@@ -4,16 +4,15 @@
 				var {{ listConstructor.id }} = ${{ listConstructor.id }}_var.DataTable( {
 					"aLengthMenu": [[10, 20, 50, 250], [10, 20, 50, 250]],
 					"pageLength": 20,
-					"processing": true,
+					//"processing": true,
 					"serverSide": true,
 					{% if listConstructor.routeParams is defined %}
 					"ajax": "{{ url( listConstructor.route, listConstructor.routeParams) }}",
 					{% else %}
 					"ajax": "{{ url( listConstructor.route ) }}",
 					{% endif %}
-					"processing": true,
 					"language": {
-						"processing": '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Cargando...</span> ',
+						//"processing": '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Cargando...</span> ',
 						"lengthMenu": "Mostrar _MENU_ registros por página",
 						"zeroRecords": "No se encontraron registros",
 						"info": "Mostrando página _PAGE_ de _PAGES_",
@@ -110,7 +109,18 @@
 
 						{ "visible": false, "targets": 1 }
 					]
-				});
+				}).on( 'processing.dt', function ( e, settings, processing ) {
+					if(processing){
+						if((++load_wait)==1) $("#load-spinner").fadeIn();
+					 }else{
+						if((load_wait)>0){ load_wait--; if(load_wait==0) $("#load-spinner").fadeOut();}
+					}
+    		}).on('preDraw', function () {
+        	if((load_wait)==0){ $("#load-spinner").fadeIn(); load_wait++;}
+		    })
+		    .on( 'draw.dt', function () {
+		      if((load_wait)>0){ load_wait--; if(load_wait==0) $("#load-spinner").fadeOut();}
+		    });
 				// Initalize Select Dropdown after DataTables is created
 				${{ listConstructor.id }}_var.closest( '.dataTables_wrapper' ).find( 'select' ).select2( {
 					minimumResultsForSearch: -1
@@ -248,11 +258,9 @@
 					$('body').on('click', "#{{ field.id }}-top-button", function() {
 							$.post('{{ url(field.route) }}', null,
 								function(data, status, xhr){
-									console.log(xhr);
-									console.log(data);
-									console.log(status);
-										$("#{{field.modal}}-modal-form-body").html(data);
-										$("#{{field.modal}}-modal-form").modal();
+									$("#{{field.modal}}-modal-form-body").html(data);
+									$('#{{field.modal}}-modal-form input').iCheck({checkboxClass: 'icheckbox_flat-blue',radioClass: 'iradio_flat-blue'});
+									$("#{{field.modal}}-modal-form").modal();
 							});
 					});
 
