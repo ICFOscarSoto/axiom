@@ -9,12 +9,12 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use App\Modules\Globale\Entity\MenuOptions;
-use App\Modules\Globale\Entity\Users;
-use App\Modules\Globale\Utils\EntityUtils;
-use App\Modules\Globale\Utils\ListUtils;
-use App\Modules\Globale\Utils\FormUtils;
-use App\Modules\Cloud\Entity\CloudFiles;
+use App\Modules\Globale\Entity\GlobaleMenuOptions;
+use App\Modules\Globale\Entity\GlobaleUsers;
+use App\Modules\Globale\Utils\GlobaleEntityUtils;
+use App\Modules\Globale\Utils\GlobaleListUtils;
+use App\Modules\Globale\Utils\GlobaleFormUtils;
+use App\Modules\Cloud\Entity\GlobaleCloudFiles;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
@@ -35,7 +35,7 @@ class CloudController extends Controller
 		$this->router = $router;
 		$manager = $this->getDoctrine()->getManager();
   	$repository = $manager->getRepository($this->class);
-		$listUtils=new ListUtils();
+		$listUtils=new GlobaleListUtils();
 		$listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Files.json"),true);
 		$return=$listUtils->getRecords($repository,$request,$manager,$listFields, $this->class);
 
@@ -49,7 +49,7 @@ class CloudController extends Controller
     }
 		return new JsonResponse($return);
 	}
-	
+
     /**
      * @Route("/api/files/{path}/{id}/upload", name="cloudUpload")
      */
@@ -137,7 +137,7 @@ class CloudController extends Controller
   	*/
   	public function disable($id){
   		$this->denyAccessUnlessGranted('ROLE_ADMIN');
-  		$entityUtils=new EntityUtils();
+  		$entityUtils=new GlobaleEntityUtils();
   		$result=$entityUtils->disableObject($id, $this->class, $this->getDoctrine());
   		return new JsonResponse(array('result' => $result));
   	}
@@ -146,7 +146,7 @@ class CloudController extends Controller
   	*/
   	public function enable($id){
   		$this->denyAccessUnlessGranted('ROLE_ADMIN');
-  		$entityUtils=new EntityUtils();
+  		$entityUtils=new GlobaleEntityUtils();
   		$result=$entityUtils->enableObject($id, $this->class, $this->getDoctrine());
   		return new JsonResponse(array('result' => $result));
   	}
@@ -155,7 +155,7 @@ class CloudController extends Controller
   	*/
   	public function delete($id){
   		$this->denyAccessUnlessGranted('ROLE_ADMIN');
-  		$entityUtils=new EntityUtils();
+  		$entityUtils=new GlobaleEntityUtils();
   		$result=$entityUtils->deleteObject($id, $this->class, $this->getDoctrine());
   		return new JsonResponse(array('result' => $result));
   	}

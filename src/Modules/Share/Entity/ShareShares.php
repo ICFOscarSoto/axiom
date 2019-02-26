@@ -2,8 +2,8 @@
 
 namespace App\Modules\Share\Entity;
 
-use App\Entity\Globale\UserGroups;
-use App\Entity\Globale\Users;
+use App\Entity\Globale\GlobaleUserGroups;
+use App\Entity\Globale\GlobaleUsers;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -29,12 +29,12 @@ class ShareShares
     private $idObject;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Modules\Globale\Entity\Users")
+     * @ORM\ManyToOne(targetEntity="App\Modules\Globale\Entity\GlobaleUsers")
      */
     private $user;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Modules\Globale\Entity\UserGroups")
+     * @ORM\ManyToOne(targetEntity="App\Modules\Globale\Entity\GlobaleUserGroups")
      */
     private $userGroup;
 
@@ -86,24 +86,24 @@ class ShareShares
         return $this;
     }
 
-    public function getUser(): ?Users
+    public function getUser(): ?GlobaleUsers
     {
         return $this->user;
     }
 
-    public function setUser(?Users $user): self
+    public function setUser(?GlobaleUsers $user): self
     {
         $this->user = $user;
 
         return $this;
     }
 
-    public function getUserGroup(): ?UserGroups
+    public function getUserGroup(): ?GlobaleUserGroups
     {
         return $this->userGroup;
     }
 
-    public function setUserGroup(?UserGroups $userGroup): self
+    public function setUserGroup(?GlobaleUserGroups $userGroup): self
     {
         $this->userGroup = $userGroup;
 

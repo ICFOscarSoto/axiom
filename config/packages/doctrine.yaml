@@ -52,11 +52,6 @@ doctrine:
                 type: annotation
                 dir: '%kernel.project_dir%/src/Modules/IoT/Entity'
                 prefix: 'App\Modules\IoT\Entity'
-            Ticketing:
-                is_bundle: false
-                type: annotation
-                dir: '%kernel.project_dir%/src/Modules/Ticketing/Entity'
-                prefix: 'App\Modules\Ticketing\Entity'
             HR:
                 is_bundle: false
                 type: annotation

@@ -91,10 +91,6 @@ IoT:
     resource: 'App\Modules\IoT\Controller\IoTController'
     type:     annotation
 
-Ticketing:
-   resource: 'App\Modules\Ticketing\Controller\TicketingController'
-   type:     annotation
-
 HR:
    resource: 'App\Modules\HR\Controller\HRController'
    type:     annotation

@@ -5,7 +5,7 @@ namespace App\Modules\IoT\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use \App\Modules\Globale\Entity\Companies;
+use \App\Modules\Globale\Entity\GlobaleCompanies;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\IoT\Repository\IoTDeviceRepository")
@@ -20,7 +20,7 @@ class IoTDevices
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\Companies")
+     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCompanies")
      */
     private $company;
 
@@ -79,12 +79,12 @@ class IoTDevices
         return $this->id;
     }
 
-    public function getCompany(): ?Companies
+    public function getCompany(): ?GlobaleCompanies
     {
         return $this->company;
     }
 
-    public function setCompany(?Companies $company): self
+    public function setCompany(?GlobaleCompanies $company): self
     {
         $this->company = $company;
 

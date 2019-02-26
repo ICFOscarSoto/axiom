@@ -3,8 +3,8 @@
 namespace App\Modules\Cloud\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use \App\Modules\Globale\Entity\Companies;
-use \App\Modules\Globale\Entity\Users;
+use \App\Modules\Globale\Entity\GlobaleCompanies;
+use \App\Modules\Globale\Entity\GlobaleUsers;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\Cloud\Repository\CloudFilesRepository")
@@ -19,13 +19,13 @@ class CloudFiles
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\Companies")
+     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCompanies")
      * @ORM\JoinColumn(nullable=false)
      */
     private $company;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\Users")
+     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleUsers")
      */
     private $user;
 
@@ -92,24 +92,24 @@ class CloudFiles
         return $this->id;
     }
 
-    public function getCompany(): ?Companies
+    public function getCompany(): ?GlobaleCompanies
     {
         return $this->company;
     }
 
-    public function setCompany(?Companies $company): self
+    public function setCompany(?GlobaleCompanies $company): self
     {
         $this->company = $company;
 
         return $this;
     }
 
-    public function getUser(): ?Users
+    public function getUser(): ?GlobaleUsers
     {
         return $this->user;
     }
 
-    public function setUser(?Users $user): self
+    public function setUser(?GlobaleUsers $user): self
     {
         $this->user = $user;
 
