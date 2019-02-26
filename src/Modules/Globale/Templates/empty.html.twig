@@ -5,7 +5,6 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<meta name="description" content="Neon Admin Panel" />
 	<meta name="author" content="" />
-	<link rel="icon" href="images/favicon.ico">
 	{{ include('header.html.twig') }}
 	<!-- Imported styles on this page -->
 	<link rel="stylesheet" href="{{ url('index') }}/js/jvectormap/jquery-jvectormap-1.2.2.css">
@@ -16,15 +15,15 @@
 <body class="page-body" data-url="{{ url('indexAdmin') }}">
 <div class="page-container"><!-- add class "sidebar-collapsed" to close sidebar by default, "chat-visible" to make chat appear always -->
 	{{ include('sidebar_menu.html.twig') }}
-	<div class="main-content">	
-		{{ include('head.html.twig') }}	
+	<div class="main-content">
+		{{ include('head.html.twig') }}
 		<hr />
 		{{ include('breadcrumb.html.twig') }}
-		<!-- MAIN CONTENT -->	
-		
-		
-	
-		<!-- END MAIN CONTENT -->	
+		<!-- MAIN CONTENT -->
+
+
+
+		<!-- END MAIN CONTENT -->
 		{{ include('footer.html.twig') }}
 	</div>
 	{{ include('chat.html.twig') }}

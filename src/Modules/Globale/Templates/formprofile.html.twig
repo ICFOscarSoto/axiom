@@ -5,8 +5,10 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<meta name="description" content="Neon Admin Panel" />
 	<meta name="author" content="" />
-	<link rel="icon" href="images/favicon.ico">
 	{{ include('@Globale/header.html.twig') }}
+	<!-- Imported styles on this page -->
+	<link rel="stylesheet" href="{{ url('index') }}/js/jvectormap/jquery-jvectormap-1.2.2.css">
+	<link rel="stylesheet" href="{{ url('index') }}/js/rickshaw/rickshaw.min.css">
 {% endblock %}
 <title>{% block title %}{{ interfaceName }}{% endblock %}</title>
 <body class="page-body" data-url="{{ url('indexAdmin') }}">
