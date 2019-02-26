@@ -4,7 +4,7 @@
 			"name": "Zone data",
 			"fields": [
 				{ "name": "name","cols": 4},
-				{ "name": "zone","cols": 4},
+				{ "name": "isocode","cols": 4},
 				{ "name": "country","cols": 4},
 				{	"name": "active", "cols": 4}
 			]

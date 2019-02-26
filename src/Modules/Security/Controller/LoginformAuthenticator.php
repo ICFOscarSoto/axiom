@@ -2,8 +2,8 @@
 
 namespace App\Modules\Security\Controller;
 
-use App\Modules\Globale\Entity\Users;
-use App\Modules\Globale\Entity\Companies;
+use App\Modules\Globale\Entity\GlobaleUsers;
+use App\Modules\Globale\Entity\GlobaleCompanies;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -46,7 +46,7 @@ class LoginformAuthenticator extends AbstractFormLoginAuthenticator
 
     public function getCredentials(Request $request)
     {
-        
+
         $credentials = [
             'domain' => $request->request->get('domain'),
             'email' => $request->request->get('email'),
@@ -67,9 +67,9 @@ class LoginformAuthenticator extends AbstractFormLoginAuthenticator
         if (!$this->csrfTokenManager->isTokenValid($token)) {
             throw new InvalidCsrfTokenException();
         }
-        $company = $this->entityManager->getRepository(Companies::class)->findOneBy(['domain' => $credentials['domain'], 'active'=>1, 'deleted'=>0]);
+        $company = $this->entityManager->getRepository(GlobaleCompanies::class)->findOneBy(['domain' => $credentials['domain'], 'active'=>1, 'deleted'=>0]);
         if($company!=null)
-          $user = $this->entityManager->getRepository(Users::class)->findOneBy(['company'=>$company, 'email' => $credentials['email'], 'active'=>1, 'deleted'=>0]);
+          $user = $this->entityManager->getRepository(GlobaleUsers::class)->findOneBy(['company'=>$company, 'email' => $credentials['email'], 'active'=>1, 'deleted'=>0]);
         else $user=null;
 
         if (!$user) {

@@ -7,14 +7,14 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use App\Modules\Globale\Entity\MenuOptions;
-use App\Modules\Globale\Entity\Users;
+use App\Modules\Globale\Entity\GlobaleMenuOptions;
+use App\Modules\Globale\Entity\GlobaleUsers;
 use App\Modules\Email\Entity\EmailAccounts;
 use App\Modules\Email\Entity\EmailFolders;
 use App\Modules\Email\Entity\EmailSubjects;
 use App\Modules\Email\Utils\EmailUtils;
-use App\Modules\Globale\Utils\ListUtils;
-use App\Modules\Globale\Utils\FormUtils;
+use App\Modules\Globale\Utils\GlobaleListUtils;
+use App\Modules\Globale\Utils\GlobaleFormUtils;
 use Symfony\Component\Validator\Constraints\DateTime;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\MimeType\FileinfoMimeTypeGuesser;
@@ -37,7 +37,7 @@ class EmailController extends Controller
 		$userdata=$this->getUser()->getTemplateData();
 		$locale = $request->getLocale();
 		$this->router = $router;
-		$menurepository=$this->getDoctrine()->getRepository(MenuOptions::class);
+		$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
 
 		$templateLists[]=$this->formatList($this->getUser());
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
@@ -61,7 +61,7 @@ class EmailController extends Controller
 	 */
 	public function accountslist($id, RouterInterface $router,Request $request){
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-		$userrepository=$this->getDoctrine()->getRepository(Users::class);
+		$userrepository=$this->getDoctrine()->getRepository(GlobaleUsers::class);
 		$user = $this->getUser();
 
 		//Permisions check ROLE_GLOBAL -> Any ID, ROLE_ADMIN -> only company fields, ROLE_USER -> only own ID
@@ -76,7 +76,7 @@ class EmailController extends Controller
 
 		$manager = $this->getDoctrine()->getManager();
 		$repository = $manager->getRepository(EmailAccounts::class);
-		$listUtils=new ListUtils();
+		$listUtils=new GlobaleListUtils();
 		//$return=$listUtils->getRecords($repository,$request,$manager,$this->listFields, EmailAccounts::class,[["type"=>"and", "column"=>"user.company", "value"=>$this->getUser()->getCompany()]]);
 		$listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Accounts.json"),true);
 		$return=$listUtils->getRecords($repository,$request,$manager,$listFields, EmailAccounts::class,[["type"=>"and", "column"=>"user", "value"=>$user]]);
@@ -107,7 +107,7 @@ class EmailController extends Controller
 			$locale = $request->getLocale();
 			$this->router = $router;
 			$userdata=$this->getUser()->getTemplateData();
-			$menurepository=$this->getDoctrine()->getRepository(MenuOptions::class);
+			$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
 			$emailAccounts=$this->getUser()->getEmailAccounts();
 			$folder=($request->query->get('folder')!==null)?$request->query->get('folder'):$emailAccounts[0]->getInboxFolder()->getId();
 			return $this->render('@Email/email_list.html.twig', [
@@ -132,7 +132,7 @@ class EmailController extends Controller
 			$locale = $request->getLocale();
 			$this->router = $router;
 			$userdata=$this->getUser()->getTemplateData();
-			$menurepository=$this->getDoctrine()->getRepository(MenuOptions::class);
+			$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
 			return $this->render('@Email/email_message.html.twig', [
 				'controllerName' => 'EmailController',
 				'interfaceName' => 'Correo electrónico',
@@ -156,7 +156,7 @@ class EmailController extends Controller
 			$locale = $request->getLocale();
 			$this->router = $router;
 			$userdata=$this->getUser()->getTemplateData();
-			$menurepository=$this->getDoctrine()->getRepository(MenuOptions::class);
+			$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
 			$emailAccount=$this->getUser()->getEmailDefaultAccount();
 			$folder=$emailAccount->getInboxFolder();
 			return $this->render('@Email/email_compose.html.twig', [
@@ -185,7 +185,7 @@ class EmailController extends Controller
 			$locale = $request->getLocale();
 			$this->router = $router;
 			$userdata=$this->getUser()->getTemplateData();
-			$menurepository=$this->getDoctrine()->getRepository(MenuOptions::class);
+			$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
 			return $this->render('@Email/email_compose.html.twig', [
 				'controllerName' => 'EmailController',
 				'interfaceName' => 'Correo electrónico',
@@ -211,7 +211,7 @@ class EmailController extends Controller
 			$locale = $request->getLocale();
 			$this->router = $router;
 			$userdata=$this->getUser()->getTemplateData();
-			$menurepository=$this->getDoctrine()->getRepository(MenuOptions::class);
+			$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
 			return $this->render('@Email/email_compose.html.twig', [
 				'controllerName' => 'EmailController',
 				'interfaceName' => 'Correo electrónico',
@@ -699,7 +699,7 @@ class EmailController extends Controller
 	public function disable($id)
 		{
 		$this->denyAccessUnlessGranted('ROLE_ADMIN');
-		$entityUtils=new EntityUtils();
+		$entityUtils=new GlobaleEntityUtils();
 		$result=$entityUtils->disableObject($id, $this->class, $this->getDoctrine());
 		return new JsonResponse(array('result' => $result));
 	}
@@ -709,7 +709,7 @@ class EmailController extends Controller
 	public function enable($id)
 		{
 		$this->denyAccessUnlessGranted('ROLE_ADMIN');
-		$entityUtils=new EntityUtils();
+		$entityUtils=new GlobaleEntityUtils();
 		$result=$entityUtils->enableObject($id, $this->class, $this->getDoctrine());
 		return new JsonResponse(array('result' => $result));
 	}
@@ -718,7 +718,7 @@ class EmailController extends Controller
 	*/
 	public function delete($id){
 		$this->denyAccessUnlessGranted('ROLE_ADMIN');
-		$entityUtils=new EntityUtils();
+		$entityUtils=new GlobaleEntityUtils();
 		$result=$entityUtils->deleteObject($id, $this->class, $this->getDoctrine());
 		return new JsonResponse(array('result' => $result));
 	}

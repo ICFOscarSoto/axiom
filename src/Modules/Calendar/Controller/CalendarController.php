@@ -8,8 +8,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use App\Modules\Globale\Entity\MenuOptions;
-use App\Modules\Globale\Entity\Users;
+use App\Modules\Globale\Entity\GlobaleMenuOptions;
+use App\Modules\Globale\Entity\GlobaleUsers;
 use App\Modules\Calendar\Entity\CalendarCalendars;
 use App\Modules\Calendar\Entity\CalendarEvents;
 use Symfony\Component\Validator\Constraints\DateTime;
@@ -26,7 +26,7 @@ class CalendarController extends Controller{
 			$locale = $request->getLocale();
 			$this->router = $router;
 			$userdata=$this->getUser()->getTemplateData();
-			$menurepository=$this->getDoctrine()->getRepository(MenuOptions::class);
+			$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
 			return $this->render('@Calendar/calendar_list.html.twig', [
 				'controllerName' => 'CalendarController',
 				'interfaceName' => 'Calendario',

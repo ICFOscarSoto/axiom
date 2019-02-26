@@ -20,71 +20,71 @@ Calendar:
     type:     annotation
 
 Company:
-    resource: 'App\Modules\Globale\Controller\CompaniesController'
+    resource: 'App\Modules\Globale\Controller\GlobaleCompaniesController'
     type:     annotation
 
 Contacts:
-    resource: 'App\Modules\Globale\Controller\ContactsController'
+    resource: 'App\Modules\ERP\Controller\ERPContactsController'
     type:     annotation
 
 Department:
-    resource: 'App\Modules\Globale\Controller\DepartmentsController'
+    resource: 'App\Modules\ERP\Controller\ERPDepartmentsController'
     type:     annotation
 
 Activity:
-    resource: 'App\Modules\Globale\Controller\ActivitiesController'
+    resource: 'App\Modules\Globale\Controller\GlobaleActivitiesController'
     type:     annotation
 
 Carrier:
-    resource: 'App\Modules\Globale\Controller\CarriersController'
+    resource: 'App\Modules\Carrier\Controller\CarrierCarriersController'
     type:     annotation
 
 ShippingCost:
-    resource: 'App\Modules\Globale\Controller\ShippingCostsController'
+    resource: 'App\Modules\Carrier\Controller\CarrierShippingCostsController'
     type:     annotation
 
 Country:
-    resource: 'App\Modules\Globale\Controller\CountriesController'
+    resource: 'App\Modules\Globale\Controller\GlobaleCountriesController'
     type:     annotation
 
 Zone:
-    resource: 'App\Modules\Globale\Controller\ZonesController'
+    resource: 'App\Modules\Carrier\Controller\CarrierZonesController'
     type:     annotation
 
 State:
-    resource: 'App\Modules\Globale\Controller\StatesController'
+    resource: 'App\Modules\Globale\Controller\GlobaleStatesController'
     type:     annotation
 
 Currency:
-    resource: 'App\Modules\Globale\Controller\CurrenciesController'
+    resource: 'App\Modules\Globale\Controller\GlobaleCurrenciesController'
     type:     annotation
 
 Dashboard:
-    resource: 'App\Modules\Globale\Controller\DashboardController'
+    resource: 'App\Modules\Globale\Controller\GlobaleDashboardController'
     type:     annotation
 
 Default:
-    resource: 'App\Modules\Globale\Controller\DefaultController'
+    resource: 'App\Modules\Globale\Controller\GlobaleDefaultController'
     type:     annotation
 
 File:
-    resource: 'App\Modules\Globale\Controller\FilesController'
+    resource: 'App\Modules\Globale\Controller\GlobaleFilesController'
     type:     annotation
 
 Image:
-    resource: 'App\Modules\Globale\Controller\ImagesController'
+    resource: 'App\Modules\Globale\Controller\GlobaleImagesController'
     type:     annotation
 
 Notification:
-    resource: 'App\Modules\Globale\Controller\NotificationsController'
+    resource: 'App\Modules\Globale\Controller\GlobaleNotificationsController'
     type:     annotation
 
 Security:
-    resource: 'App\Modules\Globale\Controller\SecurityController'
+    resource: 'App\Modules\Globale\Controller\GlobaleSecurityController'
     type:     annotation
 
 User:
-    resource: 'App\Modules\Globale\Controller\UsersController'
+    resource: 'App\Modules\Globale\Controller\GlobaleUsersController'
     type:     annotation
 
 IoT:

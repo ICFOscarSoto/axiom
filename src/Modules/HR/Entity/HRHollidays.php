@@ -3,7 +3,7 @@
 namespace App\Modules\HR\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use \App\Modules\Globale\Entity\Companies;
+use \App\Modules\Globale\Entity\GlobaleCompanies;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\HR\Repository\HRHollidaysRepository")
@@ -18,7 +18,7 @@ class HRHollidays
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\Companies")
+     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCompanies")
      */
     private $company;
 
@@ -146,12 +146,12 @@ class HRHollidays
         return $this;
     }
 
-    public function getCompany(): ?Companies
+    public function getCompany(): ?GlobaleCompanies
     {
         return $this->company;
     }
 
-    public function setCompany(?Companies $company): self
+    public function setCompany(?GlobaleCompanies $company): self
     {
         $this->company = $company;
 

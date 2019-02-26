@@ -1,6 +1,6 @@
 security:
     encoders:
-        App\Modules\Globale\Entity\Users:
+        App\Modules\Globale\Entity\GlobaleUsers:
             algorithm: bcrypt
 
     # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
@@ -8,7 +8,7 @@ security:
         # used to reload user from session & other features (e.g. switch_user)
         app_user_provider:
             entity:
-                class: App\Modules\Globale\Entity\Users
+                class: App\Modules\Globale\Entity\GlobaleUsers
                 property: email
     firewalls:
         dev:

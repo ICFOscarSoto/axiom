@@ -6,7 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\HR\Entity\HRHollidays;
-use \App\Modules\Globale\Entity\Companies;
+use \App\Modules\Globale\Entity\GlobaleCompanies;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\HR\Repository\HRWorkCalendarsRepository")
@@ -61,7 +61,7 @@ class HRWorkCalendars
     private $deleted;
 
     /**
-     * @ORM\ManyToMany(targetEntity="\App\Modules\Globale\Entity\Companies")
+     * @ORM\ManyToMany(targetEntity="\App\Modules\Globale\Entity\GlobaleCompanies")
      */
     private $company;
 
@@ -197,7 +197,7 @@ class HRWorkCalendars
         return $this->company;
     }
 
-    public function addCompany(Companies $company): self
+    public function addCompany(GlobaleCompanies $company): self
     {
         if (!$this->company->contains($company)) {
             $this->company[] = $company;
@@ -206,7 +206,7 @@ class HRWorkCalendars
         return $this;
     }
 
-    public function removeCompany(Companies $company): self
+    public function removeCompany(GlobaleCompanies $company): self
     {
         if ($this->company->contains($company)) {
             $this->company->removeElement($company);

@@ -9,13 +9,13 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use App\Modules\Globale\Entity\MenuOptions;
-use App\Modules\Globale\Entity\Currencies;
-use App\Modules\Globale\Entity\Companies;
-use App\Modules\Globale\Entity\Users;
-use App\Modules\Globale\Utils\EntityUtils;
-use App\Modules\Globale\Utils\ListUtils;
-use App\Modules\Globale\Utils\FormUtils;
+use App\Modules\Globale\Entity\GlobaleMenuOptions;
+use App\Modules\Globale\Entity\GlobaleCurrencies;
+use App\Modules\Globale\Entity\GlobaleCompanies;
+use App\Modules\Globale\Entity\GlobaleUsers;
+use App\Modules\Globale\Utils\GlobaleEntityUtils;
+use App\Modules\Globale\Utils\GlobaleListUtils;
+use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\HR\Entity\HRWorkers;
 use App\Modules\Cloud\Controller\CloudController;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -40,7 +40,7 @@ class HRController extends Controller
 		$userdata=$this->getUser()->getTemplateData();
 		$locale = $request->getLocale();
 		$this->router = $router;
-		$menurepository=$this->getDoctrine()->getRepository(MenuOptions::class);
+		$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
 		$utils = new HRWorkersUtils();
 		$templateLists[]=$utils->formatList($this->getUser());
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
@@ -64,7 +64,7 @@ class HRController extends Controller
 			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 			$this->denyAccessUnlessGranted('ROLE_ADMIN');
 			$template=dirname(__FILE__)."/../Forms/Workers.json";
-			$utils = new FormUtils();
+			$utils = new GlobaleFormUtils();
 			$utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine());
 			return $utils->make($id, $this->class, $action, "formworker");
 		}
@@ -78,7 +78,7 @@ class HRController extends Controller
 			$new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-new"];
 			$template=dirname(__FILE__)."/../Forms/Workers.json";
 			$userdata=$this->getUser()->getTemplateData();
-			$menurepository=$this->getDoctrine()->getRepository(MenuOptions::class);
+			$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
 			$breadcrumb=$menurepository->formatBreadcrumb('workers');
 			array_push($breadcrumb, $new_breadcrumb);
 			return $this->render('@Globale/generictabform.html.twig', array(
@@ -106,7 +106,7 @@ class HRController extends Controller
 		$userdata=$this->getUser()->getTemplateData();
 		$locale = $request->getLocale();
 		$this->router = $router;
-		$menurepository=$this->getDoctrine()->getRepository(MenuOptions::class);
+		$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
 		$workCalendarRepository=$this->getDoctrine()->getRepository(HRWorkCalendars::class);
 		$workCalendar=$workCalendarRepository->find($id);
 		if($workCalendar!=NULL) $holidays=$workCalendar->getHollidays(); else $holidays=[];
@@ -134,7 +134,7 @@ class HRController extends Controller
 		$this->router = $router;
 		$manager = $this->getDoctrine()->getManager();
 		$repository = $manager->getRepository($this->class);
-		$listUtils=new ListUtils();
+		$listUtils=new GlobaleListUtils();
 		$listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Workers.json"),true);
 		$return=$listUtils->getRecords($repository,$request,$manager,$listFields, $this->class);
 		return new JsonResponse($return);
@@ -150,7 +150,7 @@ class HRController extends Controller
 		$this->router = $router;
 		$manager = $this->getDoctrine()->getManager();
 		$repository = $manager->getRepository(HRWorkCalendars::class);
-		$listUtils=new ListUtils();
+		$listUtils=new GlobaleListUtils();
 		$listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/WorkCalendars.json"),true);
 		$return=$listUtils->getRecords($repository,$request,$manager,$listFields, HRWorkCalendars::class);
 		return new JsonResponse($return);
@@ -175,7 +175,7 @@ class HRController extends Controller
 	*/
 	public function disable($id){
 		$this->denyAccessUnlessGranted('ROLE_ADMIN');
-		$entityUtils=new EntityUtils();
+		$entityUtils=new GlobaleEntityUtils();
 		$result=$entityUtils->disableObject($id, $this->class, $this->getDoctrine());
 		return new JsonResponse(array('result' => $result));
 	}
@@ -184,7 +184,7 @@ class HRController extends Controller
 	*/
 	public function enable($id){
 		$this->denyAccessUnlessGranted('ROLE_ADMIN');
-		$entityUtils=new EntityUtils();
+		$entityUtils=new GlobaleEntityUtils();
 		$result=$entityUtils->enableObject($id, $this->class, $this->getDoctrine());
 		return new JsonResponse(array('result' => $result));
 	}
@@ -193,7 +193,7 @@ class HRController extends Controller
 	*/
 	public function delete($id){
 		$this->denyAccessUnlessGranted('ROLE_ADMIN');
-		$entityUtils=new EntityUtils();
+		$entityUtils=new GlobaleEntityUtils();
 		$result=$entityUtils->deleteObject($id, $this->class, $this->getDoctrine());
 		return new JsonResponse(array('result' => $result));
 	}
@@ -224,7 +224,7 @@ class HRController extends Controller
 			$obj=$repository->find($id);
 			if($obj===NULL) $obj=new HRWorkCalendars();
 		}
-		$formUtils=new FormUtils();
+		$formUtils=new GlobaleFormUtils();
 		$formUtils->init($this->getDoctrine(),$request);
 		$form=$formUtils->createFromEntity($obj, $this, [], [], false)->getForm();
 		$formUtils->proccess($form,$obj);
@@ -238,7 +238,7 @@ class HRController extends Controller
 	*/
 	public function disableWorkCalendar($id){
 		$this->denyAccessUnlessGranted('ROLE_ADMIN');
-		$entityUtils=new EntityUtils();
+		$entityUtils=new GlobaleEntityUtils();
 		$result=$entityUtils->disableObject($id, HRWorkCalendars::class, $this->getDoctrine());
 		return new JsonResponse(array('result' => $result));
 	}
@@ -247,7 +247,7 @@ class HRController extends Controller
 	*/
 	public function enableWorkCalendar($id){
 		$this->denyAccessUnlessGranted('ROLE_ADMIN');
-		$entityUtils=new EntityUtils();
+		$entityUtils=new GlobaleEntityUtils();
 		$result=$entityUtils->enableObject($id, HRWorkCalendars::class, $this->getDoctrine());
 		return new JsonResponse(array('result' => $result));
 	}
@@ -256,7 +256,7 @@ class HRController extends Controller
 	*/
 	public function deleteWorkCalendar($id){
 		$this->denyAccessUnlessGranted('ROLE_ADMIN');
-		$entityUtils=new EntityUtils();
+		$entityUtils=new GlobaleEntityUtils();
 		$result=$entityUtils->deleteObject($id, HRWorkCalendars::class, $this->getDoctrine());
 		return new JsonResponse(array('result' => $result));
 	}

@@ -3,9 +3,9 @@
 namespace App\Modules\HR\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use \App\Modules\Globale\Entity\Users;
-use \App\Modules\Globale\Entity\Countries;
-use \App\Modules\Globale\Entity\Companies;
+use \App\Modules\Globale\Entity\GlobaleUsers;
+use \App\Modules\Globale\Entity\GlobaleCountries;
+use \App\Modules\Globale\Entity\GlobaleCompanies;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\HR\Repository\HRWorkerRepository")
@@ -20,7 +20,7 @@ class HRWorkers
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\Companies")
+     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCompanies")
      * @ORM\JoinColumn(nullable=false)
      */
     private $company;
@@ -51,7 +51,7 @@ class HRWorkers
     private $external;
 
     /**
-     * @ORM\OneToOne(targetEntity="\App\Modules\Globale\Entity\Users", cascade={"persist", "remove"})
+     * @ORM\OneToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleUsers", cascade={"persist", "remove"})
      */
     private $user;
 
@@ -86,7 +86,7 @@ class HRWorkers
     private $postcode;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\Countries")
+     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCountries")
      */
     private $country;
 
@@ -208,12 +208,12 @@ class HRWorkers
         return $this;
     }
 
-    public function getUser(): ?Users
+    public function getUser(): ?GlobaleUsers
     {
         return $this->user;
     }
 
-    public function setUser(?Users $user): self
+    public function setUser(?GlobaleUsers $user): self
     {
         $this->user = $user;
 
@@ -328,12 +328,12 @@ class HRWorkers
         return $this;
     }
 
-    public function getCountry(): ?Countries
+    public function getCountry(): ?GlobaleCountries
     {
         return $this->country;
     }
 
-    public function setCountry(?Countries $country): self
+    public function setCountry(?GlobaleCountries $country): self
     {
         $this->country = $country;
 
@@ -424,12 +424,12 @@ class HRWorkers
         return $this;
     }
 
-    public function getCompany(): ?Companies
+    public function getCompany(): ?GlobaleCompanies
     {
         return $this->company;
     }
 
-    public function setCompany(?Companies $company): self
+    public function setCompany(?GlobaleCompanies $company): self
     {
         $this->company = $company;
 
