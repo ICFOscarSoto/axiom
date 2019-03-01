@@ -23,6 +23,10 @@ Company:
     resource: 'App\Modules\Globale\Controller\GlobaleCompaniesController'
     type:     annotation
 
+Entity:
+    resource: 'App\Modules\ERP\Controller\ERPEntitiesController'
+    type:     annotation
+
 Contacts:
     resource: 'App\Modules\ERP\Controller\ERPContactsController'
     type:     annotation

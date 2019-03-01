@@ -1,0 +1,23 @@
+[{
+	"sections": [
+		{
+			"name": "Entity data",
+			"fields": [
+				{ "name": "name","cols": 8},
+				{	"name": "socialname", "cols": 4},
+				{	"name": "address", "cols": 4},
+				{	"name": "city", "cols": 4},
+				{	"name": "state", "cols": 2},
+				{ "name": "postcode","cols": 4},
+				{	"name": "phone", "cols": 4},
+				{	"name": "email", "cols": 4},
+				{	"name": "web", "cols": 4},
+				{ "name": "activity","cols": 4},
+				{	"name": "country", "cols": 4},
+				{	"name": "currency", "cols": 4},
+				{	"name": "taxexection", "cols": 4},
+				{ "name": "comments","cols": 8},
+				{	"name": "contact", "cols": 4}
+			]
+		}]
+}]

@@ -10,18 +10,18 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
-use App\Modules\ERP\Entity\ERPDepartments;
+use App\Modules\ERP\Entity\ERPEntities;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
-use App\Modules\ERP\Utils\ERPDepartmentsUtils;
+use App\Modules\ERP\Utils\ERPEntitiesUtils;
 
-class ERPDepartmentsController extends Controller
+class ERPEntitiesController extends Controller
 {
-	private $class=ERPDepartments::class;
-	private $utilsClass=ERPDepartmentsUtils::class;
+	private $class=ERPEntities::class;
+	private $utilsClass=ERPEntitiesUtils::class;
     /**
-     * @Route("/{_locale}/admin/global/departments", name="departments")
+     * @Route("/{_locale}/admin/global/entities", name="entities")
      */
     public function index(RouterInterface $router,Request $request)
     {
@@ -34,11 +34,11 @@ class ERPDepartmentsController extends Controller
     	$utils = new $this->utilsClass();
   		$templateLists[]=$utils->formatList($this->getUser());
 			$formUtils=new GlobaleFormUtils();
-			$formUtils->initialize($this->getUser(), new $this->class(), dirname(__FILE__)."/../Forms/Departments.json", $request, $this, $this->getDoctrine());
-			$templateForms[]=$formUtils->formatForm('departments', true, null, $this->class);
+			$formUtils->initialize($this->getUser(), new $this->class(), dirname(__FILE__)."/../Forms/Entities.json", $request, $this, $this->getDoctrine());
+			$templateForms[]=$formUtils->formatForm('entities', true, null, $this->class);
   		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
   			return $this->render('@Globale/genericlist.html.twig', [
-  				'controllerName' => 'departmentsController',
+  				'controllerName' => 'entitiesController',
   				'interfaceName' => 'Departamentos',
   				'optionSelected' => $request->attributes->get('_route'),
   				'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
@@ -52,30 +52,30 @@ class ERPDepartmentsController extends Controller
     }
 
 		/**
-		 * @Route("/{_locale}/departments/data/{id}/{action}", name="dataDepartments", defaults={"id"=0, "action"="read"})
+		 * @Route("/{_locale}/entities/data/{id}/{action}", name="dataEntities", defaults={"id"=0, "action"="read"})
 		 */
 		 public function data($id, $action, Request $request){
 		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		 $this->denyAccessUnlessGranted('ROLE_ADMIN');
-		 $template=dirname(__FILE__)."/../Forms/Departments.json";
+		 $template=dirname(__FILE__)."/../Forms/Entities.json";
 		 $utils = new GlobaleFormUtils();
 		 $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine());
-		 return $utils->make($id, $this->class, $action, "formDepartments", "modal");
+		 return $utils->make($id, $this->class, $action, "formEntities", "modal");
 		}
 
     /**
-    * @Route("/api/global/department/{id}/get", name="getDepartment")
+    * @Route("/api/global/entity/{id}/get", name="getEntity")
     */
-    public function getDepartment($id){
-      $department = $this->getDoctrine()->getRepository($this->class)->findOneById($id);
-      if (!$department) {
+    public function getEntity($id){
+      $entity = $this->getDoctrine()->getRepository($this->class)->findOneById($id);
+      if (!$entity) {
             throw $this->createNotFoundException('No currency found for id '.$id );
           }
-          return new JsonResponse($department->encodeJson());
+          return new JsonResponse($entity->encodeJson());
     }
 
   /**
-   * @Route("/api/department/list", name="departmentlist")
+   * @Route("/api/entity/list", name="entitylist")
    */
   public function indexlist(RouterInterface $router,Request $request){
     $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
@@ -83,17 +83,17 @@ class ERPDepartmentsController extends Controller
     $locale = $request->getLocale();
     $this->router = $router;
     $manager = $this->getDoctrine()->getManager();
-    $repository = $manager->getRepository(Departments::class);
+    $repository = $manager->getRepository(Entities::class);
     $listUtils=new GlobaleListUtils();
-    $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Departments.json"),true);
-    $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, Departments::class,[["type"=>"and", "column"=>"company", "value"=>$user->getCompany()]]);
+    $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Entities.json"),true);
+    $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, Entities::class,[["type"=>"and", "column"=>"company", "value"=>$user->getCompany()]]);
     return new JsonResponse($return);
   }
 
 
 
 	/**
-	* @Route("/{_locale}/admin/global/department/{id}/disable", name="disableDepartment")
+	* @Route("/{_locale}/admin/global/entity/{id}/disable", name="disableEntity")
 	*/
  public function disable($id)
 	 {
@@ -103,7 +103,7 @@ class ERPDepartmentsController extends Controller
 	 return new JsonResponse(array('result' => $result));
  }
  /**
- * @Route("/{_locale}/admin/global/department/{id}/enable", name="enableDepartment")
+ * @Route("/{_locale}/admin/global/entity/{id}/enable", name="enableEntity")
  */
  public function enable($id)
 	 {
@@ -113,7 +113,7 @@ class ERPDepartmentsController extends Controller
 	 return new JsonResponse(array('result' => $result));
  }
  /**
- * @Route("/{_locale}/admin/global/department/{id}/delete", name="deleteDepartment")
+ * @Route("/{_locale}/admin/global/entity/{id}/delete", name="deleteEntity")
  */
  public function delete($id){
 	 $this->denyAccessUnlessGranted('ROLE_GLOBAL');
