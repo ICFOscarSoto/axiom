@@ -143,6 +143,11 @@ class HRWorkers
     public $newSeconds=1296000;
   	public $updatedSeconds=1296000;
 
+   /**
+    * @ORM\Column(type="string", length=120, nullable=true)
+    */
+   private $clockCode;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -432,6 +437,18 @@ class HRWorkers
     public function setCompany(?GlobaleCompanies $company): self
     {
         $this->company = $company;
+
+        return $this;
+    }
+
+    public function getClockCode(): ?string
+    {
+        return $this->clockCode;
+    }
+
+    public function setClockCode(?string $clockCode): self
+    {
+        $this->clockCode = $clockCode;
 
         return $this;
     }
