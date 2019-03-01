@@ -11,7 +11,7 @@ use App\Modules\Email\Entity\EmailAccounts;
 class GlobaleUsersUtils
 {
 
-  public function proccess($form,$obj,$request,$entityManager,$encoder){
+  public function proccess($form,$user,$obj,$request,$entityManager,$encoder){
     //if changed Password
     $form->handleRequest($request);
     if(!$form->isSubmitted()) return false;
@@ -22,6 +22,8 @@ class GlobaleUsersUtils
       if($obj->getId() == null) {
         $obj->setDateadd(new \DateTime());
         $obj->setDeleted(false);
+        //If object has Company save with de user Company
+        if(method_exists($obj,'setCompany')) $obj->setCompany($user->getCompany());
       }
       $obj->setDateupd(new \DateTime());
       try{

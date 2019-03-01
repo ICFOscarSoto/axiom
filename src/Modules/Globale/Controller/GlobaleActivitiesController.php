@@ -88,7 +88,7 @@ class GlobaleActivitiesController extends Controller
 		$repository = $manager->getRepository(GlobaleActivities::class);
 		$listUtils=new GlobaleListUtils();
 		$listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Activities.json"),true);
-		$return=$listUtils->getRecords($repository,$request,$manager,$listFields, GlobaleActivities::class);
+		$return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, GlobaleActivities::class);
 		return new JsonResponse($return);
 		}
 

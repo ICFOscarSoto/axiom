@@ -72,7 +72,7 @@ class HRWorkCalendarsController extends Controller
      $repository = $manager->getRepository(HRWorkCalendars::class);
      $listUtils=new GlobaleListUtils();
      $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/WorkCalendars.json"),true);
-     $return=$listUtils->getRecords($repository,$request,$manager,$listFields, HRWorkCalendars::class);
+     $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, HRWorkCalendars::class);
      return new JsonResponse($return);
    }
 

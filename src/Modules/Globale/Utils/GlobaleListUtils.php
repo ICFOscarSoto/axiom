@@ -4,16 +4,24 @@ use App\Modules\Globale\Entity\GlobaleCompanies;
 
 class GlobaleListUtils
 {
-    public function getRecords($repository,$request,$manager,$listFields,$classname,$filters = array()): array
+    public function getRecords($user,$repository,$request,$manager,$listFields,$classname,$filters = array()): array
     {
 		$return=array();
-
 		$query = $repository->createQueryBuilder('p')
 			->setFirstResult($request->query->getInt('start', 0))
 			->setMaxResults($request->query->getInt('length', 10));
 		$queryFiltered = $repository->createQueryBuilder('p')->select('count(p.id)');
     $queryTotal = $repository->createQueryBuilder('p')->select('count(p.id)');
 
+    //Detect if class has attribute companyId
+    if(method_exists($classname, "getCompany")){
+      $query->andWhere('p.company = :val_company');
+      $query->setParameter('val_company', $user->getCompany());
+      $queryFiltered->andWhere('p.company = :val_company');
+      $queryFiltered->setParameter('val_company', $user->getCompany());
+      $queryTotal->andWhere('p.company = :val_company');
+      $queryTotal->setParameter('val_company', $user->getCompany());
+    }else dump("No entro");
 
 		//Formamos el filtro de busqueda global
 		$searchValue=$request->query->get('search');
@@ -95,6 +103,7 @@ class GlobaleListUtils
       }else{
           $column="p.".$filter["column"];
       }
+
 
       /*
       $query->leftJoin('p.user', 'c', 'WITH', 'c.company = :val_company');

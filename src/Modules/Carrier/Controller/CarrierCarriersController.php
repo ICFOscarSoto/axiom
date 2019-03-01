@@ -89,7 +89,7 @@ class CarrierCarriersController extends Controller
 		$repository = $manager->getRepository(CarrierCarriers::class);
 		$listUtils=new GlobaleListUtils();
 		$listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Carriers.json"),true);
-		$return=$listUtils->getRecords($repository,$request,$manager,$listFields, carrierCarriers::class);
+		$return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, carrierCarriers::class);
 		return new JsonResponse($return);
 		}
 

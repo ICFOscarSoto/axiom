@@ -77,9 +77,9 @@ class EmailController extends Controller
 		$manager = $this->getDoctrine()->getManager();
 		$repository = $manager->getRepository(EmailAccounts::class);
 		$listUtils=new GlobaleListUtils();
-		//$return=$listUtils->getRecords($repository,$request,$manager,$this->listFields, EmailAccounts::class,[["type"=>"and", "column"=>"user.company", "value"=>$this->getUser()->getCompany()]]);
+		//$return=$listUtils->getRecords($user,$repository,$request,$manager,$this->listFields, EmailAccounts::class,[["type"=>"and", "column"=>"user.company", "value"=>$this->getUser()->getCompany()]]);
 		$listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Accounts.json"),true);
-		$return=$listUtils->getRecords($repository,$request,$manager,$listFields, EmailAccounts::class,[["type"=>"and", "column"=>"user", "value"=>$user]]);
+		$return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, EmailAccounts::class,[["type"=>"and", "column"=>"user", "value"=>$user]]);
 		return new JsonResponse($return);
 	}
 

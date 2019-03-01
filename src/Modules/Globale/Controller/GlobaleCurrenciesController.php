@@ -78,7 +78,7 @@ class GlobaleCurrenciesController extends Controller
 		$repository = $manager->getRepository(GlobaleCurrencies::class);
 		$listUtils=new GlobaleListUtils();
 		$listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Currencies.json"),true);
-		$return=$listUtils->getRecords($repository,$request,$manager,$listFields, Currencies::class);
+		$return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, Currencies::class);
 		return new JsonResponse($return);
 	}
 

@@ -3,6 +3,7 @@
 namespace App\Modules\Globale\Entity;
 
 use App\Modules\Calendar\Entity\CalendarCalendars;
+use App\Modules\Globale\Entity\GlobaleCompanies;
 use App\Modules\Email\Entity\EmailAccounts;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -50,7 +51,7 @@ class GlobaleUsers implements UserInterface
     private $lastname;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Modules\Globale\Entity\GlobaleCompanies", inversedBy="users")
+     * @ORM\ManyToOne(targetEntity="App\Modules\Globale\Entity\GlobaleCompanies", inversedBy="users", fetch="EAGER")
      * @ORM\JoinColumn(nullable=false)
      */
     private $company;
