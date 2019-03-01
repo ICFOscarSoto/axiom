@@ -27,6 +27,10 @@ Contacts:
     resource: 'App\Modules\ERP\Controller\ERPContactsController'
     type:     annotation
 
+Addresses:
+    resource: 'App\Modules\ERP\Controller\ERPAddressesController'
+    type:     annotation
+
 Department:
     resource: 'App\Modules\ERP\Controller\ERPDepartmentsController'
     type:     annotation

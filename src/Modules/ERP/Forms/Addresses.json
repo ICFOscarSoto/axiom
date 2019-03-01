@@ -1,0 +1,18 @@
+[{
+	"sections": [
+		{
+			"name": "Address data",
+			"fields": [
+				{ "name": "name","cols": 4},
+				{ "name": "address","cols": 4},
+				{ "name": "city","cols": 4},
+				{ "name": "postcode","cols": 4},
+				{ "name": "state","cols": 4},
+				{	"name": "phone", "cols": 4},
+				{	"name": "carrier", "cols": 4},
+				{	"name": "country", "cols": 4},
+				{	"name": "contact", "cols": 4},
+				{	"name": "active", "cols": 2}
+			]
+		}]
+}]
