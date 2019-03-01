@@ -11,11 +11,13 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\CallbackTransformer;
+use App\Modules\Globale\Entity\GlobaleCompanies;
 
 class GlobaleFormUtils extends Controller
 {
   private $ignoredAttributes=array('id','deleted','dateadd','dateupd');
   private $user;
+  private $company;
   private $obj;
   private $request;
   private $controller;
@@ -39,7 +41,9 @@ class GlobaleFormUtils extends Controller
     $this->request=$request;
     $this->controller=$controller;
     $this->doctrine=$doctrine;
-    $this->excludedAttributes=$excludedAttributes;
+    $this->excludedAttributes=array('company'); //by default remove company field from views
+    $this->excludedAttributes=array_merge($this->excludedAttributes,$excludedAttributes);
+    //$this->excludedAttributes=$excludedAttributes;
     $this->includedAttributes=$includedAttributes;
     $this->template=$template;
     $this->entityManager=$this->doctrine->getManager();
@@ -77,7 +81,6 @@ class GlobaleFormUtils extends Controller
           case 'datetime':
             $form->add($value['fieldName'], DateTimeType::class, array('widget' => 'single_text', 'date_format' => 'dd-MM-yyyy HH:mm'));
           break;
-
           case 'json':
             $form->add($value['fieldName'], TextType::class, ['attr'=>['class' => 'tagsinput']]);
             $form->get($value['fieldName'])
@@ -123,7 +126,7 @@ class GlobaleFormUtils extends Controller
            //Buscar si existe un proccess dentro del utils de la clase
            if($utilsClass!=null && method_exists($utilsClass, 'proccess')){
              $utils=new $utilsClass();
-					   $this->obj=$utils->proccess($form,$this->obj,$this->request,$this->entityManager,$this->encoder);
+					   $this->obj=$utils->proccess($form,$this->user,$this->obj,$this->request,$this->entityManager,$this->encoder);
            }else{
            //Si no, ejecutamos el process estandar del formutils
 					   $this->obj=$this->proccess2($form,$this->obj);
@@ -142,8 +145,7 @@ class GlobaleFormUtils extends Controller
 			}
   }
 
-
-  public function proccess2($form,$obj){
+ public function proccess2($form,$obj){
     $form->handleRequest($this->request);
     if(!$form->isSubmitted()) return false;
     if ($form->isSubmitted() && $form->isValid()) {
@@ -151,6 +153,8 @@ class GlobaleFormUtils extends Controller
        if($obj->getId() == null){
          $obj->setDateadd(new \DateTime());
          $obj->setDeleted(false);
+         //If object has Company save with de user Company
+         if(method_exists($obj,'setCompany')) $obj->setCompany($this->user->getCompany());
        }
        $obj->setDateupd(new \DateTime());
        try{
@@ -164,14 +168,8 @@ class GlobaleFormUtils extends Controller
   }
 
 
-
-
-
-
-
-
 /*   -----------------------------------------------------   */
-
+/*
   public function createFromEntity($obj,$controller,$excludedAttributes=array(),$includedAttributes=array(),$includeSave=true){
     $this->ignoredAttributes=array_merge($this->ignoredAttributes, $excludedAttributes);
     $class=get_class($obj);
@@ -213,7 +211,7 @@ class GlobaleFormUtils extends Controller
     $this->form=$form;
     return $form;
   }
-
+*/
   public function choiceRelation($class, $data){
     $classname=explode('\\', $class);
     $result =  [
@@ -235,7 +233,7 @@ class GlobaleFormUtils extends Controller
 
     return $result;
   }
-
+/*
   public function proccess($form,&$obj){
     $form->handleRequest($this->request);
     if(!$form->isSubmitted()) return false;
@@ -252,6 +250,6 @@ class GlobaleFormUtils extends Controller
 		}
   }
 
-
+*/
 
 }

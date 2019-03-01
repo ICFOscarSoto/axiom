@@ -88,7 +88,7 @@ class GlobaleStatesController extends Controller
     $repository = $manager->getRepository(GlobaleStates::class);
     $listUtils=new GlobaleListUtils();
     $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/States.json"),true);
-    $return=$listUtils->getRecords($repository,$request,$manager,$listFields, GlobaleStates::class);
+    $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, GlobaleStates::class);
     return new JsonResponse($return);
   }
 

@@ -88,7 +88,7 @@ class GlobaleCountriesController extends Controller
 		$repository = $manager->getRepository(GlobaleCountries::class);
 		$listUtils=new GlobaleListUtils();
 		$listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Countries.json"),true);
-		$return=$listUtils->getRecords($repository,$request,$manager,$listFields, GlobaleCountries::class);
+		$return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, GlobaleCountries::class);
 		return new JsonResponse($return);
 	}
 

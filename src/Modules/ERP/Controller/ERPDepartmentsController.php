@@ -86,7 +86,7 @@ class ERPDepartmentsController extends Controller
     $repository = $manager->getRepository(Departments::class);
     $listUtils=new GlobaleListUtils();
     $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Departments.json"),true);
-    $return=$listUtils->getRecords($repository,$request,$manager,$listFields, Departments::class,[["type"=>"and", "column"=>"company", "value"=>$user->getCompany()]]);
+    $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, Departments::class,[["type"=>"and", "column"=>"company", "value"=>$user->getCompany()]]);
     return new JsonResponse($return);
   }
 

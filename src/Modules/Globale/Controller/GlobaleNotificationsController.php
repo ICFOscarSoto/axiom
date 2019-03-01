@@ -75,7 +75,7 @@ class GlobaleNotificationsController extends Controller
 		$manager = $this->getDoctrine()->getManager();
 		$repository = $manager->getRepository($this->class);
 		$listUtils=new GlobaleListUtils();
-		$return=$listUtils->getRecords($repository,$request,$manager,$this->listFields, $this->class);
+		$return=$listUtils->getRecords($user,$repository,$request,$manager,$this->listFields, $this->class);
 		return new JsonResponse($return);
 	}
 

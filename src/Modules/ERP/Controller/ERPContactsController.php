@@ -87,7 +87,7 @@ class ERPContactsController extends Controller
     $repository = $manager->getRepository(ERPContacts::class);
     $listUtils=new GlobaleListUtils();
     $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Contacts.json"),true);
-    $return=$listUtils->getRecords($repository,$request,$manager,$listFields, ERPContacts::class,[["type"=>"and", "column"=>"company", "value"=>$user->getCompany()]]);
+    $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, ERPContacts::class,[["type"=>"and", "column"=>"company", "value"=>$user->getCompany()]]);
     return new JsonResponse($return);
   }
 
