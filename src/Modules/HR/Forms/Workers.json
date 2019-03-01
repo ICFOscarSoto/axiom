@@ -34,6 +34,12 @@
 		    {	"name": "ccc",	"cols": 5},
 		    {	"name": "iban", "cols": 5}
 			]
+		},
+		{
+			"name": "Clock",
+			"fields": [
+				{	"name": "clockCode", "cols": 5}
+			]
 		}
 	]
 }]

@@ -21,7 +21,7 @@ class GlobaleListUtils
       $queryFiltered->setParameter('val_company', $user->getCompany());
       $queryTotal->andWhere('p.company = :val_company');
       $queryTotal->setParameter('val_company', $user->getCompany());
-    }else dump("No entro");
+    }
 
 		//Formamos el filtro de busqueda global
 		$searchValue=$request->query->get('search');
