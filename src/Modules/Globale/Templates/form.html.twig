@@ -25,14 +25,14 @@
     							<div class="fileinput-new thumbnail" style="width: {{ field.width }}; height: {{ field.height }};" data-trigger="fileinput">
     								<img src="{#{{ _context[field.value] }}#} {{ url(field.value,{'id': '1'}) }}" alt="">
     							</div>
-    							<div class="fileinput-preview fileinput-exists thumbnail" style="max-width: {{ field.width }}; max-height: {{ field.height }}"></div>
+    							<div class="fileinput-preview fileinput-exists thumbnail" style="width: {{ field.width }}; height: {{ field.height }}"></div>
     							<div>
     								<span class="btn btn-white btn-file">
     									<span class="fileinput-new">Seleccionar</span>
-    									<span class="fileinput-exists">Cambiar</span>
     									<input type="file" id="form_{{field.name}}" name="form[{{field.name}}]" accept="image/*" class="form-control-file">
     								</span>
-    								<a href="#" class="btn btn-orange fileinput-exists" data-dismiss="fileinput">Cancel</a>
+                    <a href="#" class="btn btn-red fileinput-exists" data-dismiss="fileinput">Cancel</a>
+                    <a href="#" class="btn btn-green fileinput-exists" data-dismiss="fileinput">Cambiar</a>
     							</div>
     						</div>
             {% elseif field.type is defined and field.type == 'file' %}

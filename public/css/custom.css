@@ -101,6 +101,10 @@ table.dataTable.compact tbody th, table.dataTable.compact tbody td {
     z-index: 99;
 }
 
+.fileinput{
+  width: 100%;
+}
+
 .mail-env .mail-body .mail-table tbody tr.unread > td {
 	font-weight: bold;
   background-color: #CCC;
