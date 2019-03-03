@@ -59,6 +59,36 @@ class HRClocksController extends Controller
      }
 
 		 /**
+      * @Route("/{_locale}/HR/clocks/status", name="clocksStatus")
+      */
+      public function status(RouterInterface $router,Request $request)
+      {
+      $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+      //$this->denyAccessUnlessGranted('ROLE_ADMIN');
+      $userdata=$this->getUser()->getTemplateData();
+      $locale = $request->getLocale();
+      $this->router = $router;
+      $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
+      $utils = new $this->utilsClass();
+      /*$formUtils=new GlobaleFormUtils();
+      $formUtils->initialize($this->getUser(), new $this->class(), dirname(__FILE__)."/../Forms/Clocks.json", $request, $this, $this->getDoctrine());
+      $templateLists[]=$utils->formatList($this->getUser());
+      $templateForms[]=$formUtils->formatForm('clocks', true, null, $this->class);*/
+			$repository = $this->getDoctrine()->getManager()->getRepository($this->class);
+      if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+        return $this->render('@HR/workersclocks.html.twig', [
+          'controllerName' => 'HRClocksController',
+          'interfaceName' => 'Estado Fichaje',
+          'optionSelected' => "workers",
+          'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
+          'breadcrumb' =>  "workers",
+          'userData' => $userdata,
+					'clocksList' => $repository->findWorkersClocks($this->getUser()->getCompany())
+          ]);
+      } return new RedirectResponse($this->router->generate('app_login'));
+      }
+
+		 /**
  		 * @Route("/api/HR/doclock/{company}/{id}", name="doClocks")
  		 */
  		 public function doClocks($company,$id, Request $request){
@@ -122,6 +152,19 @@ class HRClocksController extends Controller
 		$listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Clocks.json"),true);
 		$return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $this->class);
 		return new JsonResponse($return);
+	}
+
+	/**
+	 * @Route("/api/HR/clocks/status/list", name="clocksstatuslist")
+	 */
+	public function statuslistEntity(RouterInterface $router,Request $request){
+		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		$user = $this->getUser();
+		$locale = $request->getLocale();
+		$this->router = $router;
+		$manager = $this->getDoctrine()->getManager();
+		$repository = $manager->getRepository($this->class);
+		return new JsonResponse($repository->findWorkersClocks($user->getCompany()));
 	}
 
 		/**

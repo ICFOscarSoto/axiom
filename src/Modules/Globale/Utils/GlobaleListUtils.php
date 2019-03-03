@@ -82,11 +82,15 @@ class GlobaleListUtils
 		}
 
 		//Generamos los LEFT JOIN de la consulta
+    $definedLeftJoin=[];
 		foreach($listFields as $field){
 		$path=explode('__', $field["name"]);
 		if(count($path)>1){
-				$query->leftJoin('p.'.$path[0], $path[0]);
-				$queryFiltered->leftJoin('p.'.$path[0], $path[0]);
+        if(array_search($path[0], $definedLeftJoin)===FALSE){
+				      $query->leftJoin('p.'.$path[0], $path[0]);
+				      $queryFiltered->leftJoin('p.'.$path[0], $path[0]);
+              $definedLeftJoin[]=$path[0];
+        }
 			}
 		}
 
@@ -130,49 +134,85 @@ class GlobaleListUtils
 		$return["recordsFiltered"]=$queryFiltered->getQuery()->getSingleScalarResult();
 		$return["data"]=array();
 
+    //dump($listFields);
+    //dump($records);
 		//Obtenemos los datos desde la persistencia
 		foreach($records as $record){
 			$data_ob=Array();
 			foreach($listFields as $field){
+          //Si el campo es una propiedad de un objeto hijo buscamos su valor
+          $name=$field["name"];
+          //if(!isset($field["origins"]) || $field["origins"]=="") $origin=$field["name"];
+          $origin=$field["name"];
 
 
-				$path=explode('__', $field["name"]);
-				$obj=$record;
-				foreach($path as $step){
-					if(method_exists($obj, "get".ucfirst($step))){
-						$obj=$obj->{"get".ucfirst($step)}();
-					}
-				}
-				if(!is_object($obj)) $data_ob[$field["name"]]= $obj;
-					else $data_ob[$field["name"]]='';
+          $value='';
+          $path=explode('__', $origin);
+  				$obj=$record;
+  				foreach($path as $step){
+  					if(method_exists($obj, "get".ucfirst($step))){
+  						$obj=$obj->{"get".ucfirst($step)}();
+  					}
+  				}
+  				if(!is_object($obj)) {$value= $obj;}
+  					else {
+              if(get_class($obj)=="DateTime"){
+                $value=$obj->format('Y-m-d H:i:s');
+              }else $value='';
+          }
+          $data_ob[$name]=$value;
 
-					//Aplicamos los replaces
-				if(isset($field["replace"])){
-						foreach($field["replace"] as $key=>$replace){
 
-							if($data_ob[$field["name"]]==$key){
-								$data_ob[$field["name"]]=array($data_ob[$field["name"]] ,$replace);
-							break;
-								}
-						}
-				}
+  				//Aplicamos los replaces
+  				if(isset($field["replace"])){
+  						foreach($field["replace"] as $key=>$replace){
+  							if($data_ob[$name]==$key){
+  								$data_ob[$name]=array($data_ob[$name],$replace);
+  							break;
+  								}
+  						}
+  				}
 
+  				/*$path=explode('__', $field["name"]);
+  				$obj=$record;
+  				foreach($path as $step){
+  					if(method_exists($obj, "get".ucfirst($step))){
+  						$obj=$obj->{"get".ucfirst($step)}();
+  					}
+  				}
+
+  				if(!is_object($obj)) {$data_ob[$field["name"]]= $obj;}
+  					else {
+              if(get_class($obj)=="DateTime"){
+                $data_ob[$field["name"]]=$obj->format('Y-m-d H:i:s');
+              }else $data_ob[$field["name"]]='';
+            }
+  				//Aplicamos los replaces
+  				if(isset($field["replace"])){
+  						foreach($field["replace"] as $key=>$replace){
+  							if($data_ob[$field["name"]]==$key){
+  								$data_ob[$field["name"]]=array($data_ob[$field["name"]] ,$replace);
+  							break;
+  								}
+  						}
+  				}*/
 
 			}
 
 			//Tags
 			$tags=array();
-				if(method_exists($record, "getDateadd"))
-					if((time()-$record->getDateadd()->getTimestamp())<$record->newSeconds){
-						$tag_ob=array("type" => "success", "name" => "Nuevo");
-						$tags[]=$tag_ob;
-					}else{
-						if(method_exists($record, "getDateupd"))
-							if((time()-$record->getDateupd()->getTimestamp())<$record->updatedSeconds){
-								$tag_ob=array("type" => "warning", "name" => "Modificado");
-								$tags[]=$tag_ob;
-							}
-					}
+      if(method_exists($record, "getDateupd")){
+        if((time()-$record->getDateupd()->getTimestamp())<$record->updatedSeconds && $record->getDateupd()!=$record->getDateadd()){
+          $tag_ob=array("type" => "warning", "name" => "Modificado");
+          $tags[]=$tag_ob;
+        }else{
+          if(method_exists($record, "getDateadd"))
+  					if((time()-$record->getDateadd()->getTimestamp())<$record->newSeconds){
+  						$tag_ob=array("type" => "success", "name" => "Nuevo");
+  						$tags[]=$tag_ob;
+					  }
+        }
+      }
 			$data_ob["_tags"]=$tags;
 			$return["data"][]=$data_ob;
 		}

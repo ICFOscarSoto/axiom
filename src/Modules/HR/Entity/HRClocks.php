@@ -53,8 +53,8 @@ class HRClocks
      */
     private $deleted;
 
-    public $newSeconds=1296000;
-  	public $updatedSeconds=1296000;
+    public $newSeconds=3600;
+  	public $updatedSeconds=3600;
 
     public function getId(): ?int
     {

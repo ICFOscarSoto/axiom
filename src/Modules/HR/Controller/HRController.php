@@ -88,6 +88,7 @@ class HRController extends Controller
 							'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
 							'breadcrumb' => $breadcrumb,
 							'userData' => $userdata,
+							'workerImage' => $this->generateUrl("getWorkerImage",["id"=>$id]),
 							'id' => $id,
 							'tabs' => [["name" => "data", "caption"=>"Datos trabajador", "active"=>true, "route"=>$this->generateUrl("dataWorker",["id"=>$id])],
 												 ["name" => "paymentroll", "caption"=>"Nóminas"]

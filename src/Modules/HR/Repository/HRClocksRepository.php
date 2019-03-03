@@ -19,22 +19,16 @@ class HRClocksRepository extends ServiceEntityRepository
         parent::__construct($registry, HRClocks::class);
     }
 
-    // /**
-    //  * @return HRClocks[] Returns an array of HRClocks objects
-    //  */
-    /*
-    public function findByExampleField($value)
-    {
-        return $this->createQueryBuilder('h')
-            ->andWhere('h.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('h.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
+    public function findWorkersClocks($company){
+      $query="select hrc.id, hrw.id workerid, hrw.name, hrw.lastname, hrc.start, hrc.end FROM hrclocks hrc
+                                LEFT JOIN hrworkers hrw ON hrc.worker_id=hrw.id
+                                WHERE hrc.id=(SELECT max(id) from hrclocks WHERE deleted=0 AND worker_id=hrc.worker_id)
+                                AND hrw.company_id = :company AND hrc.deleted=0 AND hrw.deleted=0
+                                group by (hrc.worker_id) ORDER BY name, lastname ASC";
+      $params=['company' => $company->getId()];
+      return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();;
     }
-    */
+
 
     /*
     public function findOneBySomeField($value): ?HRClocks

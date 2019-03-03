@@ -1,5 +1,6 @@
 [{"name": "id", "caption":""},
- {"name": "worker__name", "caption":"Trabajador", "width" : "10%"},
+ {"name": "worker__lastname", "caption":"Apellidos"},
+ {"name": "worker__name", "caption":"Nombre"},
  {"name": "start", "caption":"Entrada"},
  {"name": "end","caption":"Salida"},
  {"name": "active", "caption":"Estado", "width":"10%" ,"class" : "dt-center", "replace":{"1":"<div style=\"min-width: 75px;\" class=\"label label-success\">Activo</div>", "0" : "<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado</div>"}}

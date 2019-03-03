@@ -45,6 +45,7 @@
 							"orderable": false,
 							"className": "text-center",
 							"render": function(data, type, row, meta){
+
 									return '<div class="checkbox checkbox-replace">'+
 											  '<input type="checkbox" class="{{ listConstructor.id }}-chk-list" id="{{ listConstructor.id }}-chk-'+row['id']+'">'+
 											  '</div>';
@@ -58,23 +59,35 @@
 									{% if field.width is defined %} "width": "{{ field.width }}", {% endif %}
 
 										"render": function(data, type, row, meta){
+
+											var text='';
 												if(Array.isArray(data))
-													return data[1];
-													else return data;
+													text=data[1];
+													else text=data;
+												if({{counter}}=={{listConstructor.tagColumn}}){
+													text+="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+													row['_tags'].forEach(function(valor, indice, array) {
+															text+='<div class="label label-'+valor.type+'">'+valor.name+'</div>';
+															console.log(text);
+													});
+												}
+												return text;
 										},
 								},
 						{% set counter = counter +1 %}
 						{% endfor %}
-						{
+						{#{
 							"targets": {{  listConstructor.tagColumn }},
 							"render": function(data, type, row, meta){
 									var text=data+"&nbsp;&nbsp;&nbsp;";
+									console.log("Entro");
 										row['_tags'].forEach(function(valor, indice, array) {
-													text+='<div class="label label-'+valor.type+'">'+valor.name+'</div>';
+
+													text+='<div class="label abcdario label-'+valor.type+'">'+valor.name+'</div>';
 										});
 									return text;
 								}
-						},
+						},#}
 						{% set counter = 1 %}
 						{% for field in listConstructor.fieldButtons %}
 						{

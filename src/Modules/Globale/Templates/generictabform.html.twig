@@ -56,6 +56,7 @@
               $("#tab-body-"+$('#tabs-list li.active').attr("attr-name")).html(data);
               $("#tab-body-"+$('#tabs-list li.active').attr("attr-name")).iCheck({checkboxClass: 'icheckbox_flat-blue', radioClass: 'iradio_flat-blue'});
               $("#tab-body-"+$('#tabs-list li.active').attr("attr-name")+" select").select2();
+							$("#tab-body-"+$('#tabs-list li.active').attr("attr-name")+" .fileinput").fileinput();
               if((--load_wait)==0) $("#load-spinner").fadeOut();
           });
         }
@@ -95,6 +96,7 @@
 	<script src="{{ url('index') }}js/select2/select2.min.js"></script>
 	<script src="{{ url('index') }}js/moment.min.js"></script>
 	<script src="{{ url('index') }}js/moment-es.js"></script>
+	<script src="{{ url('index') }}js/fileinput.js"></script>
 	 {{ include('@Globale/bottom.html.twig') }}
 {% endblock %}
 </body>

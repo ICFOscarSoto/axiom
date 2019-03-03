@@ -74,6 +74,25 @@ table.dataTable.compact tbody th, table.dataTable.compact tbody td:hover{
 table.dataTable.compact tbody th, table.dataTable.compact tbody td {
     padding: 1px;
 }
+.clock-user-card{
+  cursor: pointer;
+}
+.clock-user-card .icon{
+  bottom: 40px !important;
+}
+.clock-user-card img{
+  border: 3px solid #e6e6e6;
+}
+.clock-user-card .num{
+  text-align: center !important;
+}
+.clock-user-card h3{
+  text-align: center !important;
+}
+.clock-user-card p{
+  text-align: center !important;
+}
+
 .dataTables_wrapper {
     border: none;
 }
