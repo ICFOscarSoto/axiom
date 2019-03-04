@@ -59,7 +59,7 @@ class ERPEntitiesController extends Controller
 		 $this->denyAccessUnlessGranted('ROLE_ADMIN');
 		 $template=dirname(__FILE__)."/../Forms/Entities.json";
 		 $utils = new GlobaleFormUtils();
-		 $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine());
+		 $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),['activity']);
 		 return $utils->make($id, $this->class, $action, "formEntities", "modal");
 		}
 
@@ -83,7 +83,7 @@ class ERPEntitiesController extends Controller
     $locale = $request->getLocale();
     $this->router = $router;
     $manager = $this->getDoctrine()->getManager();
-    $repository = $manager->getRepository(Entities::class);
+    $repository = $manager->getRepository($this->class);
     $listUtils=new GlobaleListUtils();
     $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Entities.json"),true);
     $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, Entities::class,[["type"=>"and", "column"=>"company", "value"=>$user->getCompany()]]);

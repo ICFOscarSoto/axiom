@@ -83,7 +83,7 @@ class ERPDepartmentsController extends Controller
     $locale = $request->getLocale();
     $this->router = $router;
     $manager = $this->getDoctrine()->getManager();
-    $repository = $manager->getRepository(Departments::class);
+    $repository = $manager->getRepository($this->class);
     $listUtils=new GlobaleListUtils();
     $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Departments.json"),true);
     $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, Departments::class,[["type"=>"and", "column"=>"company", "value"=>$user->getCompany()]]);

@@ -12,12 +12,10 @@
 				{	"name": "phone", "cols": 4},
 				{	"name": "email", "cols": 4},
 				{	"name": "web", "cols": 4},
-				{ "name": "activity","cols": 4},
 				{	"name": "country", "cols": 4},
 				{	"name": "currency", "cols": 4},
 				{	"name": "taxexection", "cols": 4},
-				{ "name": "comments","cols": 8},
-				{	"name": "contact", "cols": 4}
+				{ "name": "comments","cols": 8}
 			]
 		}]
 }]
