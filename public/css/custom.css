@@ -88,9 +88,16 @@ table.dataTable.compact tbody th, table.dataTable.compact tbody td {
 }
 .clock-user-card h3{
   text-align: center !important;
+  white-space: nowrap;
+  overflow: inherit;
+  font-size: 14px;
+  font-weight: bold;
 }
 .clock-user-card p{
   text-align: center !important;
+}
+.clock-user-card .tile-stats {
+  padding: 10px !important;
 }
 
 .dataTables_wrapper {
