@@ -94,6 +94,12 @@ class ERPAddresses
      */
     private $contact;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Modules\ERP\Entity\ERPCustomers", inversedBy="shippingaddress")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $customers;
+
 
 
     public function getId(): ?int
@@ -265,6 +271,18 @@ class ERPAddresses
     public function setContact(?ERPContacts $contact): self
     {
         $this->contact = $contact;
+
+        return $this;
+    }
+
+    public function getCustomers(): ?ERPCustomers
+    {
+        return $this->customers;
+    }
+
+    public function setCustomers(?ERPCustomers $customers): self
+    {
+        $this->customers = $customers;
 
         return $this;
     }
