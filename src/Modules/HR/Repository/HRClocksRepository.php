@@ -20,13 +20,22 @@ class HRClocksRepository extends ServiceEntityRepository
     }
 
     public function findWorkersClocks($company){
-      $query="select hrc.id, hrw.id workerid, hrw.name, hrw.lastname, hrc.start, hrc.end FROM hrclocks hrc
+      /*$query="select hrc.id, hrw.id workerid, hrw.name, hrw.lastname, hrc.start, hrc.end FROM hrclocks hrc
                                 LEFT JOIN hrworkers hrw ON hrc.worker_id=hrw.id
                                 WHERE hrc.id=(SELECT max(id) from hrclocks WHERE deleted=0 AND worker_id=hrc.worker_id)
                                 AND hrw.company_id = :company AND hrc.deleted=0 AND hrw.deleted=0
-                                group by (hrc.worker_id) ORDER BY name, lastname ASC";
+                                group by (hrc.worker_id) ORDER BY name, lastname ASC";*/
+
+      $query="SELECT hrc.id, hrw.id workerid, hrw.name, hrw.lastname, hrc.start, hrc.end from hrworkers hrw
+              LEFT JOIN (
+              	SELECT m1.*
+              	FROM hrclocks m1 LEFT JOIN hrclocks m2
+               	ON (m1.worker_id = m2.worker_id AND m1.id < m2.id)
+              	WHERE m2.id IS NULL) hrc ON hrc.worker_id=hrw.id
+              WHERE hrw.company_id = :company AND hrw.deleted=0 AND hrw.active=1 ORDER BY name, lastname ASC";
+
       $params=['company' => $company->getId()];
-      return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();;
+      return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
     }
 
 
