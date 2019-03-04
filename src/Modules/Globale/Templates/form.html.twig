@@ -23,7 +23,7 @@
               {# Field type Image #}
                 <div class="fileinput fileinput-new" data-provides="fileinput">
     							<div class="fileinput-new thumbnail" style="width: {{ field.width }}; height: {{ field.height }};" data-trigger="fileinput">
-    								<img src="{#{{ _context[field.value] }}#} {{ url(field.value,{'id': '1'}) }}" alt="">
+    								<img src="{{ url(field.value,{'id': 0}) }}" alt="">
     							</div>
     							<div class="fileinput-preview fileinput-exists thumbnail" style="width: {{ field.width }}; height: {{ field.height }}"></div>
     							<div>
