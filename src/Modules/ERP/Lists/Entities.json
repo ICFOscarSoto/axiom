@@ -7,7 +7,6 @@
   {"name": "postcode","caption":"Código postal", "width" : "50"},
   {"name": "phone", "caption":"Teléfono", "width" : "50"},
   {"name": "email", "caption":"Correo electronico", "width" : "50"},
-  {"name": "activity__name", "caption":"Actividad", "width" : "50"},
   {"name": "country__name","caption":"Pais", "width" : "50"},
   {"name": "currency__name","caption":"Moneda", "width" : "50"},
   {"name": "taxexection","caption":"Exento de impuestos", "width" : "50"},
