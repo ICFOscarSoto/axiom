@@ -50,7 +50,7 @@
 						 if(val.start==null || val.end!=null){ $("#clock-"+val.workerid).addClass('tile-gray'); $("#clock-"+val.workerid).removeClass('tile-green');}
 						 	else {$("#clock-"+val.workerid).addClass('tile-green'); $("#clock-"+val.workerid).removeClass('tile-gray');}
 							$("#worker-start-"+val.workerid).text((val.start!=null)?val.start:'Sin entrada registrada');
-							$("#worker-end-"+val.workerid).text((val.end!=null)?val.end:'Sin entrada registrada');
+							$("#worker-end-"+val.workerid).text((val.end!=null)?val.end:'Sin salida registrada');
 					 });
 				}).always(function() {
 					flagRefresh=true;
