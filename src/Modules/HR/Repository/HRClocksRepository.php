@@ -32,7 +32,7 @@ class HRClocksRepository extends ServiceEntityRepository
               	FROM hrclocks m1 LEFT JOIN hrclocks m2
                	ON (m1.worker_id = m2.worker_id AND m1.id < m2.id)
               	WHERE m2.id IS NULL) hrc ON hrc.worker_id=hrw.id
-              WHERE hrw.company_id = :company AND hrw.deleted=0 AND hrw.active=1 ORDER BY name, lastname ASC";
+              WHERE hrw.company_id = :company AND hrw.deleted=0 AND hrw.active=1 ORDER BY lastname, name ASC";
 
       $params=['company' => $company->getId()];
       return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
