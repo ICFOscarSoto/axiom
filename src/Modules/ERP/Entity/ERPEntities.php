@@ -127,6 +127,9 @@ class ERPEntities
      */
     private $comments;
 
+    public $newSeconds=1296000;
+    public $updatedSeconds=1296000;
+
     public function __construct()
     {
         $this->activity = new ArrayCollection();

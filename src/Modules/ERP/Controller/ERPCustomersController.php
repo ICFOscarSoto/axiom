@@ -9,24 +9,23 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use App\Modules\Globale\Entity\GlobaleMenuOptions;
-use App\Modules\ERP\Entity\ERPAddresses;
-use App\Modules\Globale\Utils\GlobaleEntityUtils;
+use App\Modules\Globale\Customer\GlobaleMenuOptions;
+use App\Modules\ERP\Customer\ERPCustomers;
+use App\Modules\Globale\Utils\GlobaleCustomerUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
-use App\Modules\ERP\Utils\ERPAddressesUtils;
+use App\Modules\ERP\Utils\ERPCustomersUtils;
 
-class ERPAddressesController extends Controller
+class ERPCustomersController extends Controller
 {
-	private $class=ERPAddresses::class;
-	private $utilsClass=ERPAddressesUtils::class;
-
+	private $class=ERPCustomers::class;
+	private $utilsClass=ERPCustomersUtils::class;
     /**
-     * @Route("/{_locale}/admin/global/addresses", name="addresses")
+     * @Route("/{_locale}/admin/global/customers", name="customers")
      */
     public function index(RouterInterface $router,Request $request)
     {
-       $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+      $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
   		//$this->denyAccessUnlessGranted('ROLE_ADMIN');
   		$userdata=$this->getUser()->getTemplateData();
   		$locale = $request->getLocale();
@@ -35,12 +34,12 @@ class ERPAddressesController extends Controller
     	$utils = new $this->utilsClass();
   		$templateLists[]=$utils->formatList($this->getUser());
 			$formUtils=new GlobaleFormUtils();
-			$formUtils->initialize($this->getUser(), new $this->class(), dirname(__FILE__)."/../Forms/Addresses.json", $request, $this, $this->getDoctrine());
-			$templateForms[]=$formUtils->formatForm('addresses', true, null, $this->class);
+			$formUtils->initialize($this->getUser(), new $this->class(), dirname(__FILE__)."/../Forms/Customers.json", $request, $this, $this->getDoctrine());
+			$templateForms[]=$formUtils->formatForm('customers', true, null, $this->class);
   		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
   			return $this->render('@Globale/genericlist.html.twig', [
-  				'controllerName' => 'addressesController',
-  				'interfaceName' => 'Addresses',
+  				'controllerName' => 'customersController',
+  				'interfaceName' => 'Departamentos',
   				'optionSelected' => $request->attributes->get('_route'),
   				'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
   				'breadcrumb' =>  $menurepository->formatBreadcrumb($request->get('_route')),
@@ -53,30 +52,30 @@ class ERPAddressesController extends Controller
     }
 
 		/**
-		 * @Route("/{_locale}/addresses/data/{id}/{action}", name="dataAddresses", defaults={"id"=0, "action"="read"})
+		 * @Route("/{_locale}/customers/data/{id}/{action}", name="dataCustomers", defaults={"id"=0, "action"="read"})
 		 */
 		 public function data($id, $action, Request $request){
 		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		 $this->denyAccessUnlessGranted('ROLE_ADMIN');
-		 $template=dirname(__FILE__)."/../Forms/Addresses.json";
+		 $template=dirname(__FILE__)."/../Forms/Customers.json";
 		 $utils = new GlobaleFormUtils();
-		 $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine());
-		 return $utils->make($id, $this->class, $action, "formAddresses", "modal");
+		 $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),['activity']);
+		 return $utils->make($id, $this->class, $action, "formCustomers", "modal");
 		}
 
     /**
-    * @Route("/api/global/address/{id}/get", name="getAddress")
+    * @Route("/api/global/customer/{id}/get", name="getCustomer")
     */
-    public function getAddress($id){
-     $address = $this->getDoctrine()->getRepository($this->class)->findOneById($id);
-      if (!$address) {
+    public function getCustomer($id){
+      $customer = $this->getDoctrine()->getRepository($this->class)->findOneById($id);
+      if (!$customer) {
             throw $this->createNotFoundException('No currency found for id '.$id );
           }
-          return new JsonResponse($address->encodeJson());
+          return new JsonResponse($customer->encodeJson());
     }
 
   /**
-   * @Route("/api/address/list", name="addresslist")
+   * @Route("/api/customer/list", name="customerlist")
    */
   public function indexlist(RouterInterface $router,Request $request){
     $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
@@ -84,40 +83,42 @@ class ERPAddressesController extends Controller
     $locale = $request->getLocale();
     $this->router = $router;
     $manager = $this->getDoctrine()->getManager();
-    $repository = $manager->getRepository(ERPAddresses::class);
+    $repository = $manager->getRepository($this->class);
     $listUtils=new GlobaleListUtils();
-    $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Addresses.json"),true);
-    $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, ERPAddresses::class,[["type"=>"and", "column"=>"company", "value"=>$user->getCompany()]]);
+    $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Customers.json"),true);
+    $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, Customers::class,[["type"=>"and", "column"=>"company", "value"=>$user->getCompany()]]);
     return new JsonResponse($return);
   }
 
+
+
 	/**
-	* @Route("/{_locale}/admin/global/address/{id}/disable", name="disableAddress")
+	* @Route("/{_locale}/admin/global/customer/{id}/disable", name="disableCustomer")
 	*/
  public function disable($id)
 	 {
 	 $this->denyAccessUnlessGranted('ROLE_GLOBAL');
-	 $entityUtils=new GlobaleEntityUtils();
-	 $result=$entityUtils->disableObject($id, $this->class, $this->getDoctrine());
+	 $customerUtils=new GlobaleCustomerUtils();
+	 $result=$customerUtils->disableObject($id, $this->class, $this->getDoctrine());
 	 return new JsonResponse(array('result' => $result));
  }
  /**
- * @Route("/{_locale}/admin/global/address/{id}/enable", name="enableAddress")
+ * @Route("/{_locale}/admin/global/customer/{id}/enable", name="enableCustomer")
  */
  public function enable($id)
 	 {
 	 $this->denyAccessUnlessGranted('ROLE_GLOBAL');
-	 $entityUtils=new GlobaleEntityUtils();
-	 $result=$entityUtils->enableObject($id, $this->class, $this->getDoctrine());
+	 $customerUtils=new GlobaleCustomerUtils();
+	 $result=$customerUtils->enableObject($id, $this->class, $this->getDoctrine());
 	 return new JsonResponse(array('result' => $result));
  }
  /**
- * @Route("/{_locale}/admin/global/address/{id}/delete", name="deleteAddress")
+ * @Route("/{_locale}/admin/global/customer/{id}/delete", name="deleteCustomer")
  */
  public function delete($id){
 	 $this->denyAccessUnlessGranted('ROLE_GLOBAL');
-	 $entityUtils=new GlobaleEntityUtils();
-	 $result=$entityUtils->deleteObject($id, $this->class, $this->getDoctrine());
+	 $customerUtils=new GlobaleCustomerUtils();
+	 $result=$customerUtils->deleteObject($id, $this->class, $this->getDoctrine());
 	 return new JsonResponse(array('result' => $result));
  }
 
