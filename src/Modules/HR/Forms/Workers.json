@@ -3,7 +3,7 @@
 		{
 			"name": "Personal data",
 			"fields": [
-				{ "name": "workerImage", "cols": 4,	"type": "image", "value": "getWorkerImage", "width": "100%",	"height": "250px"},
+				{ "name": "workerImage", "cols": 4,	"type": "image", "imageType":"workers", "value": "getWorkerImage", "width": "100%",	"height": "250px"},
 				{ "name": "idcard", "cols": 3},
 				{	"name": "ss", "cols": 3},
 				{	"name": "name", "cols": 4},

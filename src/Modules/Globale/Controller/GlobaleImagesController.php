@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\File\MimeType\FileinfoMimeTypeGuesser;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use App\Modules\Globale\Entity\GlobaleUsers;
 use App\Modules\HR\Entity\HRWorkers;
+use Intervention\Image\ImageManager;
 
 class GlobaleImagesController extends Controller
 {
@@ -80,6 +81,29 @@ class GlobaleImagesController extends Controller
 			return $response;
 
 	}
+
+
+	/**
+	* @Route("/api/{type}/{id}/uploadimage", name="uploadImage")
+	*/
+	public function uploadImage($id, $type, Request $request)
+	{
+		$file = $request->files->get('picture');
+		$user=$this->getUser();
+		$fileName = $id.'.'.$file->guessExtension();
+		//TODO Mover a carpeta temporal de la empresa /temp
+		$imagePath = $this->get('kernel')->getRootDir().'/../cloud/'.$user->getCompany()->getId().'//images/'.$type.'/';
+		$file->move($imagePath, $fileName);
+		//TODO Generar 3 tamaños de imagenes
+		//50 256 640 1024
+		$img = Image::make($imagePath.$fileName);
+
+		//TODO Eliminar imagen de carpeta temporal
+
+
+		return new JsonResponse(["result"=>1]);
+	}
+
 
 	/**
 	* @Route("/api/user/{id}/getimage", name="getUserImage")

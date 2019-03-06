@@ -66,7 +66,7 @@ class HRController extends Controller
 			$template=dirname(__FILE__)."/../Forms/Workers.json";
 			$utils = new GlobaleFormUtils();
 			$utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine());
-			return $utils->make($id, $this->class, $action, "formworker");
+			return $utils->make($id, $this->class, $action, "formworker", "full", "@Globale/form.html.twig", "formWorker");
 		}
 
 		/**
