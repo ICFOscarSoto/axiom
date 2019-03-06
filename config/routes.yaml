@@ -31,12 +31,20 @@ Customer:
     resource: 'App\Modules\ERP\Controller\ERPCustomersController'
     type:     annotation
 
+Supplier:
+    resource: 'App\Modules\ERP\Controller\ERPSuppliersController'
+    type:     annotation
+
 Contacts:
     resource: 'App\Modules\ERP\Controller\ERPContactsController'
     type:     annotation
 
 Addresses:
     resource: 'App\Modules\ERP\Controller\ERPAddressesController'
+    type:     annotation
+
+PaymentMethods:
+    resource: 'App\Modules\ERP\Controller\ERPPaymentMethodsController'
     type:     annotation
 
 Department:

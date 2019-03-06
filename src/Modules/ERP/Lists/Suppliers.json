@@ -1,0 +1,12 @@
+[ {"name": "id", "caption":""},
+  {"name": "minorder", "caption":"Pedido Mínimo", "width" : "50"},
+  {"name": "freeshipping", "caption":"Portes pagados", "width" : "90"},
+  {"name": "estimateddelivery", "caption":"Plazo estimado de entrega", "width" : "50"},
+  {"name": "averagedelivery","caption":"Plazo medio de entrega", "width" : "50"},
+  {"name": "cancelremains","caption":"Anular restos", "width" : "50"},
+  {"name": "dropshipping","caption":"Dropshipping", "width" : "50"},
+  {"name": "allowpicking","caption":"Permite recogida", "width" : "50"},
+  {"name": "creditor","caption":"Acreedor", "width" : "50"},
+  {"name": "paymentmethod","caption":"Forma de pago", "width" : "50"},
+  {"name": "active", "caption":"Estado", "width":"10%" ,"class" : "dt-center", "replace":{"1":"<div style=\"min-width: 75px;\" class=\"label label-success\">Activo</div>", "0" : "<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado</div>"}}
+]
