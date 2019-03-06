@@ -70,10 +70,6 @@ class HRClocksController extends Controller
       $this->router = $router;
       $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
       $utils = new $this->utilsClass();
-      /*$formUtils=new GlobaleFormUtils();
-      $formUtils->initialize($this->getUser(), new $this->class(), dirname(__FILE__)."/../Forms/Clocks.json", $request, $this, $this->getDoctrine());
-      $templateLists[]=$utils->formatList($this->getUser());
-      $templateForms[]=$formUtils->formatForm('clocks', true, null, $this->class);*/
 			$repository = $this->getDoctrine()->getManager()->getRepository($this->class);
       if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
         return $this->render('@HR/workersclocks.html.twig', [
@@ -87,6 +83,29 @@ class HRClocksController extends Controller
           ]);
       } return new RedirectResponse($this->router->generate('app_login'));
       }
+
+			/**
+			 * @Route("/{_locale}/HR/{id}/clocks", name="workerClocks")
+			 */
+			public function index($id,RouterInterface $router,Request $request)
+			{
+			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			//$this->denyAccessUnlessGranted('ROLE_ADMIN');
+			$userdata=$this->getUser()->getTemplateData();
+			$locale = $request->getLocale();
+			$this->router = $router;
+			$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
+			$utils = new HRClocksUtils();
+			$templateLists=$utils->formatListbyWorker($id);
+			if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+				return $this->render('@Globale/list.html.twig', [
+					'listConstructor' => $templateLists
+					]);
+			}
+			return new RedirectResponse($this->router->generate('app_login'));
+			}
+
+
 
 		 /**
  		 * @Route("/api/HR/doclock/{company}/{id}", name="doClocks")
@@ -119,9 +138,7 @@ class HRClocksController extends Controller
           $this->getDoctrine()->getManager()->flush();
 					return new JsonResponse(["result"=>1]);
 				}
-
 			}else return new JsonResponse(["result"=>-2]);
-
  		}
 
 
@@ -136,6 +153,24 @@ class HRClocksController extends Controller
 			$utils = new GlobaleFormUtils();
 			$utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine());
 			return $utils->make($id, $this->class, $action, "formworker");
+		}
+
+		/**
+		 * @Route("/api/HR/clocks/worker/{id}/list", name="clockslistworker")
+		 */
+		public function clockslistworker($id,RouterInterface $router,Request $request){
+			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			$user = $this->getUser();
+			$workerRepository=$this->getDoctrine()->getRepository(HRWorkers::class);
+			$worker = $workerRepository->find($id);
+			$locale = $request->getLocale();
+			$this->router = $router;
+			$manager = $this->getDoctrine()->getManager();
+			$repository = $manager->getRepository($this->class);
+			$listUtils=new GlobaleListUtils();
+			$listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Clocks.json"),true);
+			$return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $this->class,[["type"=>"and", "column"=>"worker", "value"=>$worker]]);
+			return new JsonResponse($return);
 		}
 
 	/**

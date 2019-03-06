@@ -27,6 +27,20 @@ class HRClocksUtils
     return $list;
   }
 
+  public function formatListbyWorker($worker){
+    $list=[
+      'id' => 'listClocks',
+      'route' => 'clockslistworker',
+      'routeParams' => ["id" => $worker],
+      'orderColumn' => 4,
+      'orderDirection' => 'DESC',
+      'tagColumn' => 4,
+      'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Clocks.json"),true),
+      'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/ClocksFieldButtons.json"),true),
+      'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/ClocksTopButtons.json"),true)
+    ];
+    return $list;
+  }
 
 
 }

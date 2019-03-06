@@ -76,18 +76,6 @@
 								},
 						{% set counter = counter +1 %}
 						{% endfor %}
-						{#{
-							"targets": {{  listConstructor.tagColumn }},
-							"render": function(data, type, row, meta){
-									var text=data+"&nbsp;&nbsp;&nbsp;";
-									console.log("Entro");
-										row['_tags'].forEach(function(valor, indice, array) {
-
-													text+='<div class="label abcdario label-'+valor.type+'">'+valor.name+'</div>';
-										});
-									return text;
-								}
-						},#}
 						{% set counter = 1 %}
 						{% for field in listConstructor.fieldButtons %}
 						{
@@ -134,6 +122,13 @@
 		    .on( 'draw.dt', function () {
 		      if((load_wait)>0){ load_wait--; if(load_wait==0) $("#load-spinner").fadeOut();}
 		    });
+
+				//Double click row action if is not defined in listConstructor use edit by default
+				$('#{{ listConstructor.id }} tbody').on('dblclick', 'tr', function () {
+					var data = {{ listConstructor.id }}.row( this ).data();
+					$('#{{ listConstructor.id }}-field-button-{% if listConstructor.rowAction is defined %}{{ listConstructor.rowAction }}{% else %}edit{% endif %}-'+data.id).trigger('click');
+				});
+
 				// Initalize Select Dropdown after DataTables is created
 				${{ listConstructor.id }}_var.closest( '.dataTables_wrapper' ).find( 'select' ).select2( {
 					minimumResultsForSearch: -1

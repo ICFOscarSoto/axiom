@@ -88,11 +88,16 @@ class HRController extends Controller
 							'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
 							'breadcrumb' => $breadcrumb,
 							'userData' => $userdata,
-							'workerImage' => $this->generateUrl("getWorkerImage",["id"=>$id]),
 							'id' => $id,
+							'tab' => $request->query->get('tab','data'), //Show initial tab, by default data tab
 							'tabs' => [["name" => "data", "caption"=>"Datos trabajador", "active"=>true, "route"=>$this->generateUrl("dataWorker",["id"=>$id])],
-												 ["name" => "paymentroll", "caption"=>"Nóminas"]
+												 ["name" => "paymentroll", "caption"=>"Nóminas"],
+												 ["name" => "contracts", "caption"=>"Contratos"],
+												 ["name" => "clocks", "caption"=>"Fichajes", "route"=>$this->generateUrl("workerClocks",["id"=>$id])]
 												]
+							/*'tabs' => [["name" => "data", "caption"=>"Datos trabajador", "active"=>$tab=='data'?true:false, "route"=>$this->generateUrl("dataWorker",["id"=>$id])],
+												 ["name" => "paymentroll", "active"=>($tab=='paymentroll' && $id)?true:false, "caption"=>"Nóminas"]
+												]*/
 			));
 		}
 

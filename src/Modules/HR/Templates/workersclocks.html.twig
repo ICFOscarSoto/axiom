@@ -23,15 +23,17 @@
 		<div class="principal-content">
 			<div class="row">
 				{% for clock in clocksList %}
-				<div class=".col-xl-2 col-lg-3 col-md-3 col-sm-4 col-xs-12 col-12">
-					<div id="clock-{{clock.workerid}}" class="tile-stats {% if clock.start is null or clock.end is not null %}tile-gray{% else %}tile-green{% endif %} clock-user-card">
-						<div class="icon"><i class="entypo-user"></i></div>
-						<div class="num" id="worker-img-{{clock.workerid}}"><img src="{{url('getWorkerImage',{'id': clock.workerid})}}" alt="" class="img-circle" width="80" /></div>
-						<h3 id="worker-name-{{clock.workerid}}">{{clock.lastname}}, {{clock.name}}</h3>
-						<p>Entrada: <b><span id="worker-start-{{clock.workerid}}">{{clock.start}}</span></b></p>
-						<p>Salida: <b><span id="worker-end-{{clock.workerid}}">{{clock.end}}</span></b> </p>
+				<a href="{{ url('formWorker', {'id':clock.workerid}) }}?tab=clocks">
+					<div class=".col-xl-2 col-lg-3 col-md-3 col-sm-4 col-xs-12 col-12">
+						<div id="clock-{{clock.workerid}}" class="tile-stats {% if clock.start is null or clock.end is not null %}tile-gray{% else %}tile-green{% endif %} clock-user-card">
+							<div class="icon"><i class="entypo-user"></i></div>
+							<div class="num" id="worker-img-{{clock.workerid}}"><img src="{{url('getImage',{'id': clock.workerid, 'type': 'workers', 'size': 'thumb'}) }}" alt="" class="img-circle" width="80" /></div>
+							<h3 id="worker-name-{{clock.workerid}}">{{clock.lastname}}, {{clock.name}}</h3>
+							<p>Entrada: <b><span id="worker-start-{{clock.workerid}}">{{clock.start}}</span></b></p>
+							<p>Salida: <b><span id="worker-end-{{clock.workerid}}">{{clock.end}}</span></b> </p>
+						</div>
 					</div>
-				</div>
+				</a>
 				{% endfor %}
       </div>
 		</div>

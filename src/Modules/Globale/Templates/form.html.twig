@@ -21,18 +21,18 @@
         <div class="col-md-{{ field.cols }}">
             {% if field.type is defined and field.type == 'image' %}
               {# Field type Image #}
-                <div class="fileinput fileinput-new" data-provides="fileinput">
+                <div id="fileinput-{{field.name}}" class="fileinput fileinput-new" data-provides="fileinput">
     							<div class="fileinput-new thumbnail" style="width: {{ field.width }}; height: {{ field.height }};" data-trigger="fileinput">
-    								<img src="{{ url(field.value,{'id': 0}) }}" alt="">
+    								<img id="fileinput-img-{{field.name}}" src="{{ url(field.value,{'id': formConstructor.id, 'type': field.imageType, 'size': 'medium'}) }}" alt="">
     							</div>
     							<div id="image-preview-{{field.name}}" class="fileinput-preview fileinput-exists thumbnail" style="width: {{ field.width }}; height: {{ field.height }}"></div>
     							<div>
     								<span class="btn btn-white btn-file">
-    									<span class="fileinput-new">Seleccionar</span>
+    									<span class="">Seleccionar</span>
     									<input type="file" id="form_{{field.name}}" name="form[{{field.name}}]" accept="image/*" class="form-control-file">
     								</span>
-                    <a href="#" class="btn btn-red fileinput-exists" data-dismiss="fileinput">Cancel</a>
-                    <a href="#" id="btn-image-{{field.name}}" attr-imageType="{{field.imageType}}" class="btn btn-green fileinput-exists">Guardar Imagen</a>
+                    <a href="#" id="btn-image-cancel-{{field.name}}" class="btn btn-red fileinput-exists" data-dismiss="fileinput">Cancel</a>
+                    <a href="#" id="btn-image-save-{{field.name}}" attr-imageType="{{field.imageType}}" class="btn btn-green fileinput-exists">Guardar</a>
     							</div>
     						</div>
 
@@ -55,26 +55,23 @@
             return blob;
           }
 
-
             $(document).ready(function() {
-              $('body').on('click', '[id^="btn-image-"]', function(){
-                console.log("hola");
-                var url = "{{url("uploadImage",{"type":field.imageType, "id": 1})}}";
-                var image = $('#image-preview-{{field.name}}').find('img').attr('src');
-                console.log(image);
-                //var base64ImageContent = image.replace(/^data:image\/(png|jpg);base64,/, "");
-                //var blob = base64toBlob(base64ImageContent, 'image/png');
-                var block = image.split(";");
-                // Get the content type of the image
-                var contentType = block[0].split(":")[1];// In this case "image/gif"
-                // get the real base64 content of the file
-                var realData = block[1].split(",")[1];// In this case "R0lGODlhPQBEAPeoAJosM...."
+              $( '#fileinput-img-{{field.name}}' ).load(function() {
+                $('#fileinput-img-{{field.name}}').fadeIn();
+              });
 
-                // Convert it to a blob to upload
+              $('body').on('click', '[id^="btn-image-save"]', function(){
+                $('#fileinput-img-{{field.name}}').fadeOut();
+                var url = "{{url("uploadImage",{"type":field.imageType, "id": formConstructor.id})}}";
+                var image = $('#image-preview-{{field.name}}').find('img').attr('src');
+                var block = image.split(";");
+                var contentType = block[0].split(":")[1];
+                var realData = block[1].split(",")[1];
                 var blob = b64toBlob(realData, contentType);
                 var formData = new FormData();
                 formData.append('picture', blob);
 
+                if((++load_wait)==1) $("#load-spinner").fadeIn();
                 $.ajax({
                     url: url,
                     type: "POST",
@@ -83,13 +80,16 @@
                     processData: false,
                     data: formData,
                     error:function(err){
-                        console.error(err);
+                        $('#fileinput-img-{{field.name}}').fadeIn();
+                        toastr.error("No se pudo subir la imagen", "Confirmación", confirmation);
                     },
                     success:function(data){
-                        console.log(data);
+                        $('#fileinput-img-{{field.name}}').attr('src','{{ url(field.value,{'id': formConstructor.id, 'type': field.imageType, 'size': 'medium'}) }}?'+Date.now());
+                        $('#fileinput-{{field.name}}').fileinput("clear");
+                        if(data.result) toastr.success("Imagen cambiada correctamente", "Confirmación", confirmation);
                     },
                     complete:function(){
-                        console.log("Request finished.");
+                        if((--load_wait)==0) $("#load-spinner").fadeOut();
                     }
                   });
             });
@@ -125,7 +125,6 @@
     $('body').on('click', "#{{formConstructor.name}}-button-continue", function() {
           if($("#{{formConstructor.name}}-form-body").find('form').valid()){
             if((++load_wait)==1) $("#load-spinner").fadeIn();
-            console.log($("#{{formConstructor.name}}-form-body").find('form').find('#post-url').val()+"\\"+$("#{{formConstructor.name}}-form-body").find('form').serialize())
             $.post($("#{{formConstructor.name}}-form-body").find('form').find('#post-url').val(), $("#{{formConstructor.name}}-form-body").find('form').serialize(),
                 function(data, status, xhr){
                   if((--load_wait)==0) $("#load-spinner").fadeOut();

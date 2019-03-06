@@ -139,7 +139,7 @@ class GlobaleFormUtils extends Controller
 				 break;
 				 case 'read':
 						 return $this->controller->render($render, array(
-							'formConstructor' => ["name"=>$name, "form" => $form->createView(), "type" => $type, "post"=>$this->controller->generateUrl($this->request->get('_route'),["id"=>$id, "action"=>"save"]), "template" => json_decode(file_get_contents ($this->template),true)]
+							'formConstructor' => ["id"=>$id, "name"=>$name, "form" => $form->createView(), "type" => $type, "post"=>$this->controller->generateUrl($this->request->get('_route'),["id"=>$id, "action"=>"save"]), "template" => json_decode(file_get_contents ($this->template),true)]
 					    ));
 				break;
 			}

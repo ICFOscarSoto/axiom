@@ -25,18 +25,18 @@
 			<div id="tabs" class="col-md-12">
         {% if tabs is defined %}
 	      <ul id="tabs-list" class="nav nav-tabs bordered"><!-- available classes "bordered", "right-aligned" -->
-          {% for tab in tabs %}
-						<li class="{% if tab.active is defined and tab.active == true %}active{% endif %}" id="tab-head-{{ tab.name }}" style="{% if not (tab.active is defined and tab.active == true) and id == 0 %}display:none;{% endif %}" attr-id="{{ id }}" attr-name="{{ tab.name }}" attr-route="{% if tab.route is defined %}{{ tab.route }}{% endif %}">
-							<a href="#tab-body-{{ tab.name }}" data-toggle="tab">
+          {% for tabitem in tabs %}
+						<li class="{% if tab is defined and tabitem.name == tab %}active{% endif %}" id="tab-head-{{ tabitem.name }}" style="{% if not (tabitem.active is defined and tabitem.active == true) and id == 0 %}display:none;{% endif %}" attr-id="{{ id }}" attr-name="{{ tabitem.name }}" attr-route="{% if tabitem.route is defined %}{{ tabitem.route }}{% endif %}">
+							<a href="#tab-body-{{ tabitem.name }}" data-toggle="tab">
 								<span class="visible-xs"><i class="entypo-home"></i></span>
-								<span class="hidden-xs">{{ tab.caption }}</span>
+								<span class="hidden-xs">{{ tabitem.caption }}</span>
 							</a>
 						</li>
           {% endfor %}
 				</ul>
 					<div class="tab-content">
-            {% for tab in tabs %}
-  						<div class="tab-pane {% if tab.active is defined and tab.active == true %}active{% endif %}" style="{% if not (tab.active is defined and tab.active == true) and id == 0 %}display:none;{% endif %}" id="tab-body-{{ tab.name }}">
+            {% for tabitem in tabs %}
+  						<div class="tab-pane {% if tab is defined and tabitem.name == tab %}active{% endif %}" style="{% if not (tabitem.active is defined and tabitem.active == true) and id == 0 %}display:none;{% endif %}" id="tab-body-{{ tabitem.name }}">
   	          </div>
             {% endfor %}
 	        </div>

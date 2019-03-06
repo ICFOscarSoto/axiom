@@ -22,6 +22,7 @@ class HRWorkersUtils extends Controller
 			'orderColumn' => 1,
 			'orderDirection' => 'ASC',
 			'tagColumn' => 5,
+      'rowAction' => 'edit',
 			'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Workers.json"),true),
 			'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/WorkersFieldButtons.json"),true),
 			'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/WorkersTopButtons.json"),true)

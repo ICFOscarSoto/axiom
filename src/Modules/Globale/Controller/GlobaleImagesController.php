@@ -13,10 +13,15 @@ use Symfony\Component\HttpFoundation\File\MimeType\FileinfoMimeTypeGuesser;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use App\Modules\Globale\Entity\GlobaleUsers;
 use App\Modules\HR\Entity\HRWorkers;
-use Intervention\Image\ImageManager;
+use Impulze\Bundle\InterventionImageBundle\ImageManager;
 
-class GlobaleImagesController extends Controller
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+
+class GlobaleImagesController extends Controller implements ContainerAwareInterface
 {
+
+	use ContainerAwareTrait;
 
 	/**
      * @Route("/api/files/{ext}/getimage", name="getFilesImage")
@@ -90,16 +95,43 @@ class GlobaleImagesController extends Controller
 	{
 		$file = $request->files->get('picture');
 		$user=$this->getUser();
-		$fileName = $id.'.'.$file->guessExtension();
-		//TODO Mover a carpeta temporal de la empresa /temp
-		$imagePath = $this->get('kernel')->getRootDir().'/../cloud/'.$user->getCompany()->getId().'//images/'.$type.'/';
-		$file->move($imagePath, $fileName);
-		//TODO Generar 3 tamaños de imagenes
+		$basePath = $this->get('kernel')->getRootDir().'/../cloud/'.$user->getCompany()->getId().'/';
+		$tempName = md5(uniqid()).'.'.$file->guessExtension();
+		$tempPath = $basePath.'temp/'.$tempName;
+
+		$file->move($basePath.'temp/', $tempName);
+
 		//50 256 640 1024
-		$img = Image::make($imagePath.$fileName);
+		$manager = new ImageManager($this->container);
 
-		//TODO Eliminar imagen de carpeta temporal
+		$image = $manager->make($tempPath);
+		$image->fit(100, null, function ($constraint) {
+		    $constraint->upsize();
+		});
+		$image->save($basePath.'images/'.$type.'/'.$id.'-thumb.jpg');
 
+		$image = $manager->make($tempPath);
+		$image->resize(256, null, function ($constraint) {
+		    $constraint->aspectRatio();
+		    $constraint->upsize();
+		});
+		$image->save($basePath.'images/'.$type.'/'.$id.'-small.jpg');
+
+		$image = $manager->make($tempPath);
+		$image->resize(640, null, function ($constraint) {
+				$constraint->aspectRatio();
+				$constraint->upsize();
+		});
+		$image->save($basePath.'images/'.$type.'/'.$id.'-medium.jpg');
+
+		$image = $manager->make($tempPath);
+		$image->resize(1024, null, function ($constraint) {
+				$constraint->aspectRatio();
+				$constraint->upsize();
+		});
+		$image->save($basePath.'images/'.$type.'/'.$id.'-large.jpg');
+
+		if (isset($tempPath)) { unlink($tempPath); }
 
 		return new JsonResponse(["result"=>1]);
 	}
@@ -146,20 +178,20 @@ class GlobaleImagesController extends Controller
 	}
 
 	/**
-	* @Route("/api/worker/{id}/getimage", name="getWorkerImage")
+	* @Route("/api/{type}/{id}/{size}/getimage", name="getImage", defaults={"type"="medium"})
 	*/
-	public function getWorkerImage($id, Request $request)
+	public function getWorkerImage($type, $id, $size, Request $request)
 	{
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
-			$currentUser=$this->getUser();
-			$workerRepository = $this->getDoctrine()->getRepository(HRWorkers::class);
 
-				$image_path = $this->get('kernel')->getRootDir() . '/../public/images/workers/';
-				if(file_exists($image_path.$id.'-thumb.png'))
-					$filename = $id.'-thumb.png';
-				else if(file_exists($image_path.$id.'-thumb.jpg'))
-					$filename = $id.'-thumb.jpg';
+			$user=$this->getUser();
+			$image_path = $this->get('kernel')->getRootDir().'/../cloud/'.$user->getCompany()->getId().'/images//'.$type.'/';
+			//$image_path = $this->get('kernel')->getRootDir() . '/../public/images/workers/';
+			if(file_exists($image_path.$id.'-'.$size.'.jpg'))
+				$filename = $id.'-'.$size.'.jpg';
+				//else if(file_exists($image_path.$id.'-thumb.jpg'))
+				//	$filename = $id.'-thumb.jpg';
 				else $filename = 'no-thumb.jpg';
 			//}else $filename = 'no-thumb.jpg';
 			$response = new BinaryFileResponse($image_path.$filename);
