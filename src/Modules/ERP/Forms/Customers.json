@@ -1,0 +1,17 @@
+[{
+	"sections": [
+		{
+			"name": "Customer data",
+			"fields": [
+				{ "name": "maxcredit","cols": 4},
+				{ "name": "blockcredit","cols": 4},
+				{ "name": "customergroup","cols": 4},
+				{ "name": "paymentmethod","cols": 4},
+				{ "name": "mininvoice","cols": 4},
+				{	"name": "allowlinediscount", "cols": 4},
+				{	"name": "additionaldiscount", "cols": 4},
+				{	"name": "requireordernumber", "cols": 4},
+				{	"name": "active", "cols": 2}
+			]
+		}]
+}]

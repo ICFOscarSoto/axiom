@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\Carrier\Entity\CarrierCarriers;
 use \App\Modules\ERP\Entity\ERPAddresses;
+use \App\Modules\ERP\Entity\ERPEntity;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPCustomersRepository")
@@ -309,14 +310,14 @@ class ERPCustomers
         return $this;
     }
 
-    public function getInoiceday(): ?int
+    public function getInvoiceday(): ?int
     {
-        return $this->inoiceday;
+        return $this->invoiceday;
     }
 
-    public function setInoiceday(?int $invoiceday): self
+    public function setInvoiceday(?int $invoiceday): self
     {
-        $this->inoiceday = $invoiceday;
+        $this->invoiceday = $invoiceday;
 
         return $this;
     }

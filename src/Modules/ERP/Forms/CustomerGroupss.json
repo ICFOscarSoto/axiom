@@ -1,0 +1,10 @@
+[{
+	"sections": [
+		{
+			"name": "Customer Group data",
+			"fields": [
+				{ "name": "name","cols": 4},
+				{	"name": "active", "cols": 2}
+			]
+		}]
+}]
