@@ -60,7 +60,7 @@ class ERPCustomerGroupsController extends Controller
 		 $template=dirname(__FILE__)."/../Forms/CustomerGroupss.json";
 		 $utils = new GlobaleFormUtils();
 		 $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),['activity']);
-		 return $utils->make($id, $this->class, $action, "formCustomers", "modal");
+		 return $utils->make($id, $this->class, $action, "formCustomerGroups", "modal");
 		}
 
     /**
@@ -86,7 +86,7 @@ class ERPCustomerGroupsController extends Controller
     $repository = $manager->getRepository($this->class);
     $listUtils=new GlobaleListUtils();
     $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/CustomerGroups.json"),true);
-    $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, Customers::class,[["type"=>"and", "column"=>"company", "value"=>$user->getCompany()]]);
+    $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, ERPCustomerGroups::class,[["type"=>"and", "column"=>"company", "value"=>$user->getCompany()]]);
     return new JsonResponse($return);
   }
 

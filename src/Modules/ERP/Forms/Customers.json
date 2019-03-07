@@ -3,14 +3,17 @@
 		{
 			"name": "Customer data",
 			"fields": [
-				{ "name": "maxcredit","cols": 4},
-				{ "name": "blockcredit","cols": 4},
-				{ "name": "customergroup","cols": 4},
-				{ "name": "paymentmethod","cols": 4},
-				{ "name": "mininvoice","cols": 4},
-				{	"name": "allowlinediscount", "cols": 4},
-				{	"name": "additionaldiscount", "cols": 4},
-				{	"name": "requireordernumber", "cols": 4},
+				{	"name": "maxcredit", "cols": 2},
+				{	"name": "blockcredit", "cols": 2},
+				{	"name": "mininvoice", "cols": 2},
+				{	"name": "allowlinediscount", "cols": 2},
+				{	"name": "additionaldiscount", "cols": 2},
+				{	"name": "requireordernumber", "cols": 2},
+				{	"name": "invoicefordeliverynote", "cols": 2},
+				{	"name": "pricesdeliverynote", "cols": 2},
+				{	"name": "partialshipping", "cols": 2},
+				{	"name": "invoiceday", "cols": 2},
+				{	"name": "partialshipping", "cols": 2},
 				{	"name": "active", "cols": 2}
 			]
 		}]
