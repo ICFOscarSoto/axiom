@@ -1,0 +1,18 @@
+[{
+	"sections": [
+		{
+			"name": "Location data",
+			"fields": [
+				{"name": "tracker", "cols":12},
+				{"name": "latitude", "cols":6},
+			  {"name": "longitude","cols":6},
+			  {"name": "altitude","cols":4},
+			  {"name": "course","cols":4},
+				{"name": "hdop","cols":4},
+				{"name": "sats","cols":4},
+				{"name": "age","cols":4},
+				{"name": "kmph","cols":4},
+				{"name": "active", "cols": 2}
+			]
+		}]
+}]

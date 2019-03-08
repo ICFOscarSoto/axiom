@@ -1,6 +1,8 @@
 [ {"name": "id", "caption":""},
-  {"name": "name", "caption":"Nombre", "width" : "50"},
-  {"name": "company__name","caption":"Company"},
-  {"name": "token","caption":"Token"},
+  {"name": "latitude", "caption":"Latitud"},
+  {"name": "longitude","caption":"Longitud"},
+  {"name": "kmph","caption":"Velocidad"},
+  {"name": "altitude","caption":"Altitud"},
+  {"name": "course","caption":"Rumbo"},
   {"name": "active", "caption":"Estado", "width":"10%" ,"class" : "dt-center", "replace":{"1":"<div style=\"min-width: 75px;\" class=\"label label-success\">Activo</div>", "0" : "<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado</div>"}}
 ]
