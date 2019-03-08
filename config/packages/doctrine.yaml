@@ -72,3 +72,8 @@ doctrine:
                 type: annotation
                 dir: '%kernel.project_dir%/src/Modules/Cloud/Entity'
                 prefix: 'App\Modules\Cloud\Entity'
+            Tracker:
+                is_bundle: false
+                type: annotation
+                dir: '%kernel.project_dir%/src/Modules/Tracker/Entity'
+                prefix: 'App\Modules\Tracker\Entity'

@@ -18,7 +18,7 @@ use App\Modules\Globale\Utils\GlobaleCurrenciesUtils;
 
 class GlobaleCurrenciesController extends Controller
 {
-	private $class=GlobaleCurrencies::class;
+		private $class=GlobaleCurrencies::class;
 		private $utilsClass=GlobaleCurrenciesUtils::class;
 
     /**

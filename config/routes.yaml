@@ -130,3 +130,11 @@ HRClocks:
 Cloud:
    resource: 'App\Modules\Cloud\Controller\CloudController'
    type:     annotation
+
+Tracker:
+   resource: 'App\Modules\Tracker\Controller\TrackerTrackersController'
+   type:     annotation
+
+TrackerLocations:
+   resource: 'App\Modules\Tracker\Controller\TrackerLocationsController'
+   type:     annotation

@@ -1,3 +1,3 @@
 [
-
+  {"id" : "uploadTop", "type" : "btn-primary", "icon" : "fa fa-cloud-upload", "name" : "", "actionType" : "foreground", "confirm" :false, "tooltip" : "Subir archivos"}
 ]

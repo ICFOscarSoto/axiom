@@ -9,7 +9,7 @@
           url: '{{cloudConstructor.path}}',
           maxFilesize: 20,  // in Mb
           addRemoveLinks: false,
-          clickable: false,
+          clickable: '#uploadTop-top-button',
           init: function () {
               this.on("maxfilesexceeded", function(file) {
                   this.removeFile(file);
@@ -22,6 +22,7 @@
               });
           }
       });
+
     });
     </script>
 </div></div>

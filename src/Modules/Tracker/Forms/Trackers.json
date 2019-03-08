@@ -1,0 +1,11 @@
+[{
+	"sections": [
+		{
+			"name": "Tracker data",
+			"fields": [
+				{ "name": "name","cols": 8},
+				{	"name": "token", "cols": 12},
+				{	"name": "active", "cols": 2}
+			]
+		}]
+}]
