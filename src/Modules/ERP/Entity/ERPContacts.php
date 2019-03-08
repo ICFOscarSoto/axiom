@@ -5,6 +5,8 @@ namespace App\Modules\ERP\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
 use \App\Modules\ERP\Entity\ERPDepartments;
+use \App\Modules\ERP\Entity\ERPSuppliers;
+use \App\Modules\ERP\Entity\ERPCustomers;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPContactsRepository")
@@ -86,6 +88,16 @@ class ERPContacts
 
     public $newSeconds=1296000;
     public $updatedSeconds=1296000;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPSuppliers")
+     */
+    private $supplier;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPCustomers")
+     */
+    private $customer;
 
     public function getId(): ?int
     {
@@ -244,6 +256,30 @@ class ERPContacts
     public function setInvoice(bool $invoice): self
     {
         $this->invoice = $invoice;
+
+        return $this;
+    }
+
+    public function getSupplier(): ?ERPSuppliers
+    {
+        return $this->supplier;
+    }
+
+    public function setSupplier(?ERPSuppliers $supplier): self
+    {
+        $this->supplier = $supplier;
+
+        return $this;
+    }
+
+    public function getCustomer(): ?ERPCustomers
+    {
+        return $this->customer;
+    }
+
+    public function setCustomer(?ERPCustomers $customer): self
+    {
+        $this->customer = $customer;
 
         return $this;
     }

@@ -1,0 +1,13 @@
+[{
+	"sections": [
+		{
+			"name": "Payment Methods data",
+			"fields": [
+				{ "name": "name","cols": 4},
+				{ "name": "paymentcode","cols": 4},
+				{ "name": "expiration","cols": 4},
+				{ "name": "typeofexpiration","cols": 4},
+				{	"name": "active", "cols": 2}
+			]
+		}]
+}]

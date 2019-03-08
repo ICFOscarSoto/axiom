@@ -1,0 +1,18 @@
+[{
+	"sections": [
+		{
+			"name": "Address data",
+			"fields": [
+				{ "name": "minorder","cols": 4},
+				{ "name": "freeshipping","cols": 4},
+				{ "name": "estimateddelivery","cols": 4},
+				{ "name": "averagedelivery","cols": 4},
+				{ "name": "cancelremains","cols": 4},
+				{	"name": "dropshipping", "cols": 4},
+				{	"name": "getAllowpicking", "cols": 4},
+				{	"name": "paymentmethod", "cols": 4},
+				{	"name": "invoiceday", "cols": 4},
+				{	"name": "active", "cols": 2}
+			]
+		}]
+}]

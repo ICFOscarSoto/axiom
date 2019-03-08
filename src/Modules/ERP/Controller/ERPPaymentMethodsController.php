@@ -10,22 +10,23 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
-use App\Modules\ERP\Entity\ERPCustomers;
+use App\Modules\ERP\Entity\ERPPaymentMethods;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
-use App\Modules\ERP\Utils\ERPCustomersUtils;
+use App\Modules\ERP\Utils\ERPPaymentMethodsUtils;
 
-class ERPCustomersController extends Controller
+class ERPPaymentMethodsController extends Controller
 {
-	private $class=ERPCustomers::class;
-	private $utilsClass=ERPCustomersUtils::class;
+	private $class=ERPPaymentMethods::class;
+	private $utilsClass=ERPPaymentMethodsUtils::class;
+
     /**
-     * @Route("/{_locale}/admin/global/customers", name="customers")
+     * @Route("/{_locale}/admin/global/paymentmethods", name="paymentmethods")
      */
     public function index(RouterInterface $router,Request $request)
     {
-      $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+       $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
   		//$this->denyAccessUnlessGranted('ROLE_ADMIN');
   		$userdata=$this->getUser()->getTemplateData();
   		$locale = $request->getLocale();
@@ -34,12 +35,12 @@ class ERPCustomersController extends Controller
     	$utils = new $this->utilsClass();
   		$templateLists[]=$utils->formatList($this->getUser());
 			$formUtils=new GlobaleFormUtils();
-			$formUtils->initialize($this->getUser(), new $this->class(), dirname(__FILE__)."/../Forms/Customers.json", $request, $this, $this->getDoctrine());
-			$templateForms[]=$formUtils->formatForm('customers', true, null, $this->class);
+			$formUtils->initialize($this->getUser(), new $this->class(), dirname(__FILE__)."/../Forms/PaymentMethods.json", $request, $this, $this->getDoctrine());
+			$templateForms[]=$formUtils->formatForm('paymentmethods', true, null, $this->class);
   		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
   			return $this->render('@Globale/genericlist.html.twig', [
-  				'controllerName' => 'customersController',
-  				'interfaceName' => 'Clientes',
+  				'controllerName' => 'paymentmethodsController',
+  				'interfaceName' => 'PaymentMethods',
   				'optionSelected' => $request->attributes->get('_route'),
   				'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
   				'breadcrumb' =>  $menurepository->formatBreadcrumb($request->get('_route')),
@@ -52,30 +53,31 @@ class ERPCustomersController extends Controller
     }
 
 		/**
-		 * @Route("/{_locale}/customers/data/{id}/{action}", name="dataCustomers", defaults={"id"=0, "action"="read"})
+		 * @Route("/{_locale}/paymentmethods/data/{id}/{action}", name="dataPaymentMethods", defaults={"id"=0, "action"="read"})
 		 */
-		 public function data($id, $action, Request $request){
+		 public function data($id, $action, Request $request)
+		 {
 		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		 $this->denyAccessUnlessGranted('ROLE_ADMIN');
-		 $template=dirname(__FILE__)."/../Forms/Customers.json";
+		 $template=dirname(__FILE__)."/../Forms/PaymentMethods.json";
 		 $utils = new GlobaleFormUtils();
-		 $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),['activity']);
-		 return $utils->make($id, $this->class, $action, "formCustomers", "modal");
+		 $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine());
+		 return $utils->make($id, $this->class, $action, "formPaymentMethods", "modal");
 		}
 
     /**
-    * @Route("/api/global/customer/{id}/get", name="getCustomer")
+    * @Route("/api/global/paymentmethod/{id}/get", name="getPaymentMethod")
     */
-    public function getCustomer($id){
-      $customer = $this->getDoctrine()->getRepository($this->class)->findOneById($id);
-      if (!$customer) {
+    public function getPaymentMethod($id){
+     $paymentmethod = $this->getDoctrine()->getRepository($this->class)->findOneById($id);
+      if (!$paymentmethod) {
             throw $this->createNotFoundException('No currency found for id '.$id );
           }
-          return new JsonResponse($customer->encodeJson());
+          return new JsonResponse($paymentmethod->encodeJson());
     }
 
   /**
-   * @Route("/api/customer/list", name="customerlist")
+   * @Route("/api/paymentmethod/list", name="paymentmethodlist")
    */
   public function indexlist(RouterInterface $router,Request $request){
     $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
@@ -83,42 +85,40 @@ class ERPCustomersController extends Controller
     $locale = $request->getLocale();
     $this->router = $router;
     $manager = $this->getDoctrine()->getManager();
-    $repository = $manager->getRepository($this->class);
+    $repository = $manager->getRepository(ERPPaymentMethods::class);
     $listUtils=new GlobaleListUtils();
-    $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Customers.json"),true);
-    $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, ERPCustomers::class);
+    $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/PaymentMethods.json"),true);
+    $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, ERPPaymentMethods::class,[["type"=>"and", "column"=>"company", "value"=>$user->getCompany()]]);
     return new JsonResponse($return);
   }
 
-
-
 	/**
-	* @Route("/{_locale}/admin/global/customer/{id}/disable", name="disableCustomer")
+	* @Route("/{_locale}/admin/global/paymentmethod/{id}/disable", name="disablePaymentMethod")
 	*/
  public function disable($id)
 	 {
 	 $this->denyAccessUnlessGranted('ROLE_GLOBAL');
-	 $customerUtils=new GlobaleCustomerUtils();
-	 $result=$customerUtils->disableObject($id, $this->class, $this->getDoctrine());
+	 $entityUtils=new GlobaleEntityUtils();
+	 $result=$entityUtils->disableObject($id, $this->class, $this->getDoctrine());
 	 return new JsonResponse(array('result' => $result));
  }
  /**
- * @Route("/{_locale}/admin/global/customer/{id}/enable", name="enableCustomer")
+ * @Route("/{_locale}/admin/global/paymentmethod/{id}/enable", name="enablePaymentMethod")
  */
  public function enable($id)
 	 {
 	 $this->denyAccessUnlessGranted('ROLE_GLOBAL');
-	 $customerUtils=new GlobaleCustomerUtils();
-	 $result=$customerUtils->enableObject($id, $this->class, $this->getDoctrine());
+	 $entityUtils=new GlobaleEntityUtils();
+	 $result=$entityUtils->enableObject($id, $this->class, $this->getDoctrine());
 	 return new JsonResponse(array('result' => $result));
  }
  /**
- * @Route("/{_locale}/admin/global/customer/{id}/delete", name="deleteCustomer")
+ * @Route("/{_locale}/admin/global/paymentmethod/{id}/delete", name="deletePaymentMethod")
  */
  public function delete($id){
 	 $this->denyAccessUnlessGranted('ROLE_GLOBAL');
-	 $customerUtils=new GlobaleCustomerUtils();
-	 $result=$customerUtils->deleteObject($id, $this->class, $this->getDoctrine());
+	 $entityUtils=new GlobaleEntityUtils();
+	 $result=$entityUtils->deleteObject($id, $this->class, $this->getDoctrine());
 	 return new JsonResponse(array('result' => $result));
  }
 

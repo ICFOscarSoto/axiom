@@ -10,18 +10,18 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
-use App\Modules\ERP\Entity\ERPCustomers;
+use App\Modules\ERP\Entity\ERPCustomerGroups;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
-use App\Modules\ERP\Utils\ERPCustomersUtils;
+use App\Modules\ERP\Utils\ERPCustomerGroupsUtils;
 
-class ERPCustomersController extends Controller
+class ERPCustomerGroupsController extends Controller
 {
-	private $class=ERPCustomers::class;
-	private $utilsClass=ERPCustomersUtils::class;
+	private $class=ERPCustomerGroups::class;
+	private $utilsClass=ERPCustomerGroupsUtils::class;
     /**
-     * @Route("/{_locale}/admin/global/customers", name="customers")
+     * @Route("/{_locale}/admin/global/customergroups", name="customergroups")
      */
     public function index(RouterInterface $router,Request $request)
     {
@@ -34,12 +34,12 @@ class ERPCustomersController extends Controller
     	$utils = new $this->utilsClass();
   		$templateLists[]=$utils->formatList($this->getUser());
 			$formUtils=new GlobaleFormUtils();
-			$formUtils->initialize($this->getUser(), new $this->class(), dirname(__FILE__)."/../Forms/Customers.json", $request, $this, $this->getDoctrine());
-			$templateForms[]=$formUtils->formatForm('customers', true, null, $this->class);
+			$formUtils->initialize($this->getUser(), new $this->class(), dirname(__FILE__)."/../Forms/CustomerGroups.json", $request, $this, $this->getDoctrine());
+			$templateForms[]=$formUtils->formatForm('customergroups', true, null, $this->class);
   		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
   			return $this->render('@Globale/genericlist.html.twig', [
-  				'controllerName' => 'customersController',
-  				'interfaceName' => 'Clientes',
+  				'controllerName' => 'customergroupssController',
+  				'interfaceName' => 'Grupo de Clientes',
   				'optionSelected' => $request->attributes->get('_route'),
   				'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
   				'breadcrumb' =>  $menurepository->formatBreadcrumb($request->get('_route')),
@@ -52,19 +52,19 @@ class ERPCustomersController extends Controller
     }
 
 		/**
-		 * @Route("/{_locale}/customers/data/{id}/{action}", name="dataCustomers", defaults={"id"=0, "action"="read"})
+		 * @Route("/{_locale}/customergroups/data/{id}/{action}", name="dataCustomerGroups", defaults={"id"=0, "action"="read"})
 		 */
 		 public function data($id, $action, Request $request){
 		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		 $this->denyAccessUnlessGranted('ROLE_ADMIN');
-		 $template=dirname(__FILE__)."/../Forms/Customers.json";
+		 $template=dirname(__FILE__)."/../Forms/CustomerGroupss.json";
 		 $utils = new GlobaleFormUtils();
 		 $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),['activity']);
-		 return $utils->make($id, $this->class, $action, "formCustomers", "modal");
+		 return $utils->make($id, $this->class, $action, "formCustomerGroups", "modal");
 		}
 
     /**
-    * @Route("/api/global/customer/{id}/get", name="getCustomer")
+    * @Route("/api/global/customergroup/{id}/get", name="getCustomerGroup")
     */
     public function getCustomer($id){
       $customer = $this->getDoctrine()->getRepository($this->class)->findOneById($id);
@@ -75,7 +75,7 @@ class ERPCustomersController extends Controller
     }
 
   /**
-   * @Route("/api/customer/list", name="customerlist")
+   * @Route("/api/customergroup/list", name="customergrouplist")
    */
   public function indexlist(RouterInterface $router,Request $request){
     $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
@@ -85,15 +85,15 @@ class ERPCustomersController extends Controller
     $manager = $this->getDoctrine()->getManager();
     $repository = $manager->getRepository($this->class);
     $listUtils=new GlobaleListUtils();
-    $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Customers.json"),true);
-    $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, ERPCustomers::class);
+    $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/CustomerGroups.json"),true);
+    $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, ERPCustomerGroups::class,[["type"=>"and", "column"=>"company", "value"=>$user->getCompany()]]);
     return new JsonResponse($return);
   }
 
 
 
 	/**
-	* @Route("/{_locale}/admin/global/customer/{id}/disable", name="disableCustomer")
+	* @Route("/{_locale}/admin/global/customergroup/{id}/disable", name="disableCustomerGroup")
 	*/
  public function disable($id)
 	 {
@@ -103,7 +103,7 @@ class ERPCustomersController extends Controller
 	 return new JsonResponse(array('result' => $result));
  }
  /**
- * @Route("/{_locale}/admin/global/customer/{id}/enable", name="enableCustomer")
+ * @Route("/{_locale}/admin/global/customergroup/{id}/enable", name="enableCustomerGroup")
  */
  public function enable($id)
 	 {
@@ -113,7 +113,7 @@ class ERPCustomersController extends Controller
 	 return new JsonResponse(array('result' => $result));
  }
  /**
- * @Route("/{_locale}/admin/global/customer/{id}/delete", name="deleteCustomer")
+ * @Route("/{_locale}/admin/global/customergroup/{id}/delete", name="deleteCustomerGroup")
  */
  public function delete($id){
 	 $this->denyAccessUnlessGranted('ROLE_GLOBAL');
