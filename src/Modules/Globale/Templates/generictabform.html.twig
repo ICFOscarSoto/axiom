@@ -57,6 +57,8 @@
               $("#tab-body-"+$('#tabs-list li.active').attr("attr-name")).iCheck({checkboxClass: 'icheckbox_flat-blue', radioClass: 'iradio_flat-blue'});
               $("#tab-body-"+$('#tabs-list li.active').attr("attr-name")+" select").select2();
 							$("#tab-body-"+$('#tabs-list li.active').attr("attr-name")+" .fileinput").fileinput();
+
+
               if((--load_wait)==0) $("#load-spinner").fadeOut();
           });
         }
@@ -64,7 +66,27 @@
       $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
         readTabContent();
       });
-
+			$( ".dropzone" ).each(function( index ) {
+				Dropzone.autoDiscover = false;
+				var jsonFiles = [];
+				var dropzone_default = new Dropzone(".dropzone", {
+						url: $(this).attr("attr-path"),
+						maxFilesize: 20,  // in Mb
+						addRemoveLinks: false,
+						clickable: false,
+						init: function () {
+								this.on("maxfilesexceeded", function(file) {
+										this.removeFile(file);
+								});
+								this.on("success", function(file, response) {
+										if (response.uploaded){
+											this.removeFile(file);
+											$("#"+$(this).attr("attr-id")).DataTable().ajax.reload();
+										}
+								});
+						}
+				});
+			});
       readTabContent();
     });
     /*function showTabs(){
@@ -91,12 +113,15 @@
 	<link rel="stylesheet" href="{{ url('index') }}js/select2/select2-bootstrap.css">
 	<link rel="stylesheet" href="{{ url('index') }}js/select2/select2.css">
 	<link rel="stylesheet" href="{{ url('index') }}css/custom.css">
+	<link rel="stylesheet" href="{{ url('index') }}js/dropzone/dropzone.css">
 	<!-- Imported scripts on this page -->
  	<script src="{{ url('index') }}js/datatables/datatables.js"></script>
 	<script src="{{ url('index') }}js/select2/select2.min.js"></script>
 	<script src="{{ url('index') }}js/moment.min.js"></script>
 	<script src="{{ url('index') }}js/moment-es.js"></script>
 	<script src="{{ url('index') }}js/fileinput.js"></script>
+	<script src="{{ url('index') }}js/dropzone/dropzone.js"></script>
+
 	 {{ include('@Globale/bottom.html.twig') }}
 {% endblock %}
 </body>

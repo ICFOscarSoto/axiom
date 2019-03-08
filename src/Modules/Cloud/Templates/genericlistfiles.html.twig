@@ -1,5 +1,5 @@
-<div class="dropzone"><div class="dz-message" data-dz-message>
-  {% set listConstructor = cloudConstructor.list[0] %}
+{% set listConstructor = cloudConstructor.list[0] %}
+<div class="dropzone" attr-id="{{ listConstructor.id }}" attr-path="{{cloudConstructor.path}}"><div class="dz-message" data-dz-message>
   {{ include('@Globale/list.html.twig') }}
   <script>
     $(document).ready(function(){

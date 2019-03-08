@@ -93,7 +93,8 @@ class HRController extends Controller
 							'tabs' => [["name" => "data", "caption"=>"Datos trabajador", "active"=>true, "route"=>$this->generateUrl("dataWorker",["id"=>$id])],
 												 ["name" => "paymentroll", "caption"=>"Nóminas"],
 												 ["name" => "contracts", "caption"=>"Contratos"],
-												 ["name" => "clocks", "caption"=>"Fichajes", "route"=>$this->generateUrl("workerClocks",["id"=>$id])]
+												 ["name" => "clocks", "caption"=>"Fichajes", "route"=>$this->generateUrl("workerClocks",["id"=>$id])],
+												 ["name" => "files", "caption"=>"Archivos", "route"=>$this->generateUrl("cloudfiles",["id"=>$id, "path"=>"workers"])]
 												]
 							/*'tabs' => [["name" => "data", "caption"=>"Datos trabajador", "active"=>$tab=='data'?true:false, "route"=>$this->generateUrl("dataWorker",["id"=>$id])],
 												 ["name" => "paymentroll", "active"=>($tab=='paymentroll' && $id)?true:false, "caption"=>"Nóminas"]

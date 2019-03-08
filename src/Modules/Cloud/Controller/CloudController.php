@@ -14,7 +14,8 @@ use App\Modules\Globale\Entity\GlobaleUsers;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
-use App\Modules\Cloud\Entity\GlobaleCloudFiles;
+use App\Modules\Cloud\Entity\CloudFiles;
+use App\Modules\Cloud\Utils\CloudFilesUtils;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
@@ -24,11 +25,12 @@ class CloudController extends Controller
 {
 
 	 private $class=CloudFiles::class;
+	 private $utilsClass=CloudFilesUtils::class;
 
 	/**
-	 * @Route("/api/cloud/files/list", name="fileslist")
+	 * @Route("/api/cloud/files/{path}/{id}/list", name="fileslist")
 	 */
-	public function fileslist(RouterInterface $router,Request $request){
+	public function fileslist($path, $id, RouterInterface $router,Request $request){
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		$user = $this->getUser();
 		$locale = $request->getLocale();
@@ -37,7 +39,7 @@ class CloudController extends Controller
   	$repository = $manager->getRepository($this->class);
 		$listUtils=new GlobaleListUtils();
 		$listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Files.json"),true);
-		$return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $this->class);
+		$return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $this->class,[["type"=>"and", "column"=>"idclass", "value"=>$id],["type"=>"and", "column"=>"path", "value"=>$path]]);
 
     //Add icons to the rows
     foreach($return["data"] as $key=>$file){
@@ -50,8 +52,26 @@ class CloudController extends Controller
 		return new JsonResponse($return);
 	}
 
+	/**
+	 * @Route("/api/cloud/files/{path}/{id}/form", name="cloudfiles")
+	 */
+	public function cloudfiles($path, $id, RouterInterface $router,Request $request){
+		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		$this->router = $router;
+		$user=$this->getUser();
+		$utils = new $this->utilsClass();
+		$templateLists=["list"=>[$utils->formatList($user,$path,$id)],"path"=>$this->generateUrl("cloudUpload",["id"=>$id, "path"=>$path])];
+		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+			return $this->render('@Cloud/genericlistfiles.html.twig', [
+				'cloudConstructor' => $templateLists
+				]);
+			}
+		return new RedirectResponse($this->router->generate('app_login'));
+		}
+
+
     /**
-     * @Route("/api/files/{path}/{id}/upload", name="cloudUpload")
+     * @Route("/api/cloud/files/{path}/{id}/upload", name="cloudUpload")
      */
     public function cloudUpload($id,$path, RouterInterface $router, Request $request){
       $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
