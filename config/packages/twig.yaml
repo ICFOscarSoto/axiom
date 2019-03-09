@@ -11,3 +11,4 @@ twig:
         '%kernel.project_dir%/src/Modules/Email/Templates': Email
         '%kernel.project_dir%/src/Modules/Calendar/Templates': Calendar
         '%kernel.project_dir%/src/Modules/Globale/Templates': Globale
+        '%kernel.project_dir%/src/Modules/Tracker/Templates': Tracker
