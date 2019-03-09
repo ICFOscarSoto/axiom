@@ -55,23 +55,51 @@ class TrackerLocationsController extends Controller
   }
 
   /**
-  * @Route("/api/tracker/doclocation/{company}/{id}", name="doLocations")
+  * @Route("/api/tracker/dolocation/{company}/{id}/{token}", name="doLocations")
   */
-  public function doLocations($company,$id, Request $request){
-
+  public function doLocations($company, $id, $token, Request $request){
+    $trackerRepository=$this->getDoctrine()->getRepository(TrackerTrackers::class);
+    $tracker=$trackerRepository->find($id);
+    if($tracker==NULL) return new JsonResponse(["result"=>-1]);
+    if($tracker->getCompany()->getId()!=$company) return new JsonResponse(["result"=>-2]);
+    if($tracker->getToken()!=$token) return new JsonResponse(["result"=>-3]); //Tokens sin almohadilllas
+    $json=[];
+    $content = $request->getContent();
+    if (!empty($content)){
+       $json = json_decode($content, true);
+    }else return new JsonResponse(["result"=>0]);
+    foreach($json as $item){
+      $location=new TrackerLocations();
+      $location->setTracker($tracker);
+      $location->setLatitude($item["lat"]);
+      $location->setLongitude($item["lon"]);
+      $location->setHdop($item["hdop"]);
+      $location->setSats($item["sat"]);
+      $location->setAge($item["age"]);
+      $location->setAltitude($item["alt"]);
+      $location->setCourse($item["course"]);
+      $location->setKmph($item["kmph"]);
+      $location->setDateupd(new \DateTime());
+      $location->setDateadd(new \DateTime());
+      $location->setActive(1);
+      $location->setDeleted(0);
+      $this->getDoctrine()->getManager()->persist($location);
+      $this->getDoctrine()->getManager()->flush();
+    }
+    return new JsonResponse(["result"=>1,"json"=>$json]);
   }
 
   /**
    * @Route("/{_locale}/trackers/locations/data/{id}/{action}", name="dataLocations", defaults={"id"=0, "action"="read"})
    */
    public function data($id, $action, Request $request){
-   $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-   $this->denyAccessUnlessGranted('ROLE_ADMIN');
-   $template=dirname(__FILE__)."/../Forms/Locations.json";
-   $utils = new GlobaleFormUtils();
-   $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine());
-   return $utils->make($id, $this->class, $action, "formLocations", "modal");
-  }
+     $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+     $this->denyAccessUnlessGranted('ROLE_ADMIN');
+     $template=dirname(__FILE__)."/../Forms/Locations.json";
+     $utils = new GlobaleFormUtils();
+     $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine());
+     return $utils->make($id, $this->class, $action, "formLocations", "modal");
+   }
 
   /**
    * @Route("/api/trackers/locations/{id}/list", name="locationslist")
