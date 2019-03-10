@@ -69,24 +69,55 @@ class TrackerLocationsController extends Controller
        $json = json_decode($content, true);
     }else return new JsonResponse(["result"=>0]);
     foreach($json as $item){
-      $location=new TrackerLocations();
-      $location->setTracker($tracker);
-      $location->setLatitude($item["lat"]);
-      $location->setLongitude($item["lon"]);
-      $location->setHdop($item["hdop"]);
-      $location->setSats($item["sat"]);
-      $location->setAge($item["age"]);
-      $location->setAltitude($item["alt"]);
-      $location->setCourse($item["course"]);
-      $location->setKmph($item["kmph"]);
-      $location->setDateupd(new \DateTime());
-      $location->setDateadd(new \DateTime());
-      $location->setActive(1);
-      $location->setDeleted(0);
-      $this->getDoctrine()->getManager()->persist($location);
-      $this->getDoctrine()->getManager()->flush();
+      if($item["lat"]!=0.0 && $item["lon"]!=0.0){
+        $location=new TrackerLocations();
+        $location->setTracker($tracker);
+        $location->setLatitude($item["lat"]);
+        $location->setLongitude($item["lon"]);
+        $location->setHdop($item["hdop"]);
+        $location->setSats($item["sat"]);
+        $location->setAge($item["age"]);
+        $location->setAltitude($item["alt"]);
+        $location->setCourse($item["course"]);
+        $location->setKmph($item["kmph"]);
+        $location->setDateupd(new \DateTime());
+        $location->setDateadd(new \DateTime());
+        $location->setActive(1);
+        $location->setDeleted(0);
+        $this->getDoctrine()->getManager()->persist($location);
+        $this->getDoctrine()->getManager()->flush();
+      }
     }
     return new JsonResponse(["result"=>1,"json"=>$json]);
+  }
+
+  /**
+   * @Route("/api/trackers/locations/{id}/getPoints", name="getPoints")
+   */
+  public function getPoints($id,RouterInterface $router,Request $request){
+    $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+    $user = $this->getUser();
+    $trackerRepository=$this->getDoctrine()->getRepository(TrackerTrackers::class);
+    $locationsRepository=$this->getDoctrine()->getRepository(TrackerLocations::class);
+    $tracker=$trackerRepository->find($id);
+    $start=$request->query->get('start','2000-01-01 00:00:00');
+    $end=$request->query->get('end','2999-01-01 00:00:00');
+    $locations = $locationsRepository->findPoints($tracker,$start,$end);
+    $result=[];
+    foreach($locations as $location){
+      $point["id"]=$location->getId();
+      $point["latitude"]=$location->getLatitude();
+      $point["longitude"]=$location->getLongitude();
+      $point["hdop"]=$location->getHdop();
+      $point["sats"]=$location->getSats();
+      $point["age"]=$location->getAge();
+      $point["altitude"]=$location->getAltitude();
+      $point["course"]=$location->getCourse();
+      $point["kmph"]=$location->getKmph();
+      $result[]=$point;
+    }
+    //dump($locations);
+    return new JsonResponse($result);
   }
 
   /**
