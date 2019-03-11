@@ -52,26 +52,26 @@
 			}, 5000);
 			pointsRefresh();
 
-			function pointsRefresh(){
-				$.getJSON("{{url('getPoints',{'id':1})}}", function( data ) {
-					var previus=null;
-					$.each(data,function( key, val ){
-						if(previus!=null && val.id>lastPoint){
-							map.addLayer(createLine(previus.latitude*1, previus.longitude*1, val.latitude*1, val.longitude*1));
-						}
-						previus=val;
+				function pointsRefresh(){
+					$.getJSON("{{url('getPoints',{'id':1})}}", function( data ) {
+						var previus=null;
+						$.each(data,function( key, val ){
+							if(previus!=null && val.id>lastPoint){
+								map.addLayer(createLine(previus.latitude*1, previus.longitude*1, val.latitude*1, val.longitude*1));
+							}
+							previus=val;
+						});
+						flagPoint=0;
+						$.each( data, function( key, val ) {
+							if(val.id>lastPoint)
+								map.addLayer(createPoint(val.latitude*1,val.longitude*1));
+							flagPoint=val.id;
+						});
+						lastPoint=flagPoint;
+					}).always(function() {
+						flagRefresh=true;
 					});
-					flagPoint=0;
-					$.each( data, function( key, val ) {
-						if(val.id>lastPoint)
-							map.addLayer(createPoint(val.latitude*1,val.longitude*1));
-						flagPoint=val.id;
-					});
-					lastPoint=flagPoint;
-				}).always(function() {
-					flagRefresh=true;
-				});
-			}
+				}
       });
 
       //Para mover el marcador

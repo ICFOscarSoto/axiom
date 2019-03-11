@@ -69,7 +69,7 @@ class TrackerLocationsController extends Controller
        $json = json_decode($content, true);
     }else return new JsonResponse(["result"=>0]);
     foreach($json as $item){
-      if($item["lat"]!=0.0 && $item["lon"]!=0.0){
+      if($item["lat"]!=0.0 && $item["lon"]!=0.0){ //Comprobamos si las coordenadas son validas
         $location=new TrackerLocations();
         $location->setTracker($tracker);
         $location->setLatitude($item["lat"]);
@@ -80,6 +80,7 @@ class TrackerLocationsController extends Controller
         $location->setAltitude($item["alt"]);
         $location->setCourse($item["course"]);
         $location->setKmph($item["kmph"]);
+        $location->setDate(new \DateTime($item["datetime"]));
         $location->setDateupd(new \DateTime());
         $location->setDateadd(new \DateTime());
         $location->setActive(1);
@@ -114,6 +115,7 @@ class TrackerLocationsController extends Controller
       $point["altitude"]=$location->getAltitude();
       $point["course"]=$location->getCourse();
       $point["kmph"]=$location->getKmph();
+      $point["date"]=$location->getDate();
       $result[]=$point;
     }
     //dump($locations);

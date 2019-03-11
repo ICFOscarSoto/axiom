@@ -28,7 +28,7 @@ class TrackerLocationsRepository extends ServiceEntityRepository
           ->setParameter('val_tracker', $tracker)
           ->setParameter('val_start', $start)
           ->setParameter('val_end', $end)
-          ->orderBy('q.dateadd', 'ASC')
+          ->orderBy('q.date', 'ASC')
           ->getQuery()
           ->getResult()
       ;
