@@ -1,0 +1,13 @@
+[{
+	"sections": [
+		{
+			"name": "Bank Account data",
+			"fields": [
+				{ "name": "bankname","cols": 8},
+				{	"name": "iban", "cols": 4},
+				{	"name": "swiftcode", "cols": 4},
+				{	"name": "entity", "cols": 4},
+				{	"name": "active", "cols": 2}
+			]
+		}]
+}]

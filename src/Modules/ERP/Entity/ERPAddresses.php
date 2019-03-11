@@ -100,7 +100,8 @@ class ERPAddresses
      */
     private $customers;
 
-
+    public $newSeconds=1296000;
+    public $updatedSeconds=1296000;
 
     public function getId(): ?int
     {

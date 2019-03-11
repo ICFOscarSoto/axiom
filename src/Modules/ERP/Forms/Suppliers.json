@@ -9,7 +9,7 @@
 				{ "name": "averagedelivery","cols": 4},
 				{ "name": "cancelremains","cols": 4},
 				{	"name": "dropshipping", "cols": 4},
-				{	"name": "getAllowpicking", "cols": 4},
+				{	"name": "allowpicking", "cols": 4},
 				{	"name": "paymentmethod", "cols": 4},
 				{	"name": "invoiceday", "cols": 4},
 				{	"name": "active", "cols": 2}

@@ -55,6 +55,10 @@ Department:
     resource: 'App\Modules\ERP\Controller\ERPDepartmentsController'
     type:     annotation
 
+BankAccount:
+    resource: 'App\Modules\ERP\Controller\ERPBankAccountsController'
+    type:     annotation
+
 Activity:
     resource: 'App\Modules\Globale\Controller\GlobaleActivitiesController'
     type:     annotation
