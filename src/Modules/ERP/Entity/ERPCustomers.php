@@ -2,12 +2,12 @@
 
 namespace App\Modules\ERP\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+//use Doctrine\Common\Collections\ArrayCollection;
+//use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use \App\Modules\Carrier\Entity\CarrierCarriers;
-use \App\Modules\ERP\Entity\ERPAddresses;
-use \App\Modules\ERP\Entity\ERPEntity;
+//use \App\Modules\Carrier\Entity\CarrierCarriers;
+//use \App\Modules\ERP\Entity\ERPAddresses;
+//use \App\Modules\ERP\Entity\ERPEntity;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPCustomersRepository")
@@ -74,7 +74,7 @@ class ERPCustomers
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\Carrier\Entity\CarrierCarriers")
      */
-    private $carrier;
+    //private $carrier;
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
@@ -94,17 +94,20 @@ class ERPCustomers
     /**
      * @ORM\OneToMany(targetEntity="\App\Modules\ERP\Entity\ERPAddresses", mappedBy="customers", orphanRemoval=true)
      */
-    private $shippingaddress;
+    //private $shippingaddress;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
      */
     private $invoiceday;
 
-    public function __construct()
+    public $newSeconds=1296000;
+    public $updatedSeconds=1296000;
+
+    /*public function __construct()
     {
         $this->shippingaddress = new ArrayCollection();
-    }
+    } */
 
     public function getId(): ?int
     {
@@ -231,7 +234,7 @@ class ERPCustomers
         return $this;
     }
 
-    public function getCarrier(): ?CarrierCarriers
+  /*  public function getCarrier(): ?CarrierCarriers
     {
         return $this->carrier;
     }
@@ -242,7 +245,7 @@ class ERPCustomers
 
         return $this;
     }
-
+ */
     public function getInvoicefordeliverynote(): ?bool
     {
         return $this->invoicefordeliverynote;
@@ -282,7 +285,7 @@ class ERPCustomers
     /**
      * @return Collection|ERPAddresses[]
      */
-    public function getShippingaddress(): Collection
+    /*public function getShippingaddress(): Collection
     {
         return $this->shippingaddress;
     }
@@ -309,6 +312,7 @@ class ERPCustomers
 
         return $this;
     }
+    */
 
     public function getInvoiceday(): ?int
     {

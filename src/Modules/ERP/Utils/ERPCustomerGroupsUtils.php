@@ -5,7 +5,7 @@ use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
-use App\Modules\Globale\Entity\GlobaleMenuOptions;
+use App\Modules\Globale\Entity\MenuOptions;
 
 class ERPCustomerGroupsUtils
 {

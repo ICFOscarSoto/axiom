@@ -53,6 +53,10 @@ class ERPCustomerGroups
      */
     private $rate;
 
+
+    public $newSeconds=1296000;
+    public $updatedSeconds=1296000;
+
     public function getId(): ?int
     {
         return $this->id;

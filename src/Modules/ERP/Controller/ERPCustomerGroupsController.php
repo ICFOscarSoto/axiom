@@ -11,7 +11,6 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\ERP\Entity\ERPCustomerGroups;
-use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\ERP\Utils\ERPCustomerGroupsUtils;
@@ -57,7 +56,7 @@ class ERPCustomerGroupsController extends Controller
 		 public function data($id, $action, Request $request){
 		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		 $this->denyAccessUnlessGranted('ROLE_ADMIN');
-		 $template=dirname(__FILE__)."/../Forms/CustomerGroupss.json";
+		 $template=dirname(__FILE__)."/../Forms/CustomerGroups.json";
 		 $utils = new GlobaleFormUtils();
 		 $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),['activity']);
 		 return $utils->make($id, $this->class, $action, "formCustomerGroups", "modal");

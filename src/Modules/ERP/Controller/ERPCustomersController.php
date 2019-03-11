@@ -11,7 +11,6 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\ERP\Entity\ERPCustomers;
-use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\ERP\Utils\ERPCustomersUtils;
@@ -64,9 +63,9 @@ class ERPCustomersController extends Controller
 		}
 
     /**
-    * @Route("/api/global/customer/{id}/get", name="getCustomer")
+    * @Route("/api/global/customer/{id}/get", name="getCustomers")
     */
-    public function getCustomer($id){
+    public function getCustomers($id){
       $customer = $this->getDoctrine()->getRepository($this->class)->findOneById($id);
       if (!$customer) {
             throw $this->createNotFoundException('No currency found for id '.$id );
@@ -86,7 +85,7 @@ class ERPCustomersController extends Controller
     $repository = $manager->getRepository($this->class);
     $listUtils=new GlobaleListUtils();
     $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Customers.json"),true);
-    $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, ERPCustomers::class);
+    $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, Customers::class);
     return new JsonResponse($return);
   }
 
@@ -98,7 +97,7 @@ class ERPCustomersController extends Controller
  public function disable($id)
 	 {
 	 $this->denyAccessUnlessGranted('ROLE_GLOBAL');
-	 $customerUtils=new GlobaleCustomerUtils();
+	 $customerUtils=new ERPCustomerUtils();
 	 $result=$customerUtils->disableObject($id, $this->class, $this->getDoctrine());
 	 return new JsonResponse(array('result' => $result));
  }
@@ -108,7 +107,7 @@ class ERPCustomersController extends Controller
  public function enable($id)
 	 {
 	 $this->denyAccessUnlessGranted('ROLE_GLOBAL');
-	 $customerUtils=new GlobaleCustomerUtils();
+	 $customerUtils=new ERPCustomerUtils();
 	 $result=$customerUtils->enableObject($id, $this->class, $this->getDoctrine());
 	 return new JsonResponse(array('result' => $result));
  }
@@ -117,7 +116,7 @@ class ERPCustomersController extends Controller
  */
  public function delete($id){
 	 $this->denyAccessUnlessGranted('ROLE_GLOBAL');
-	 $customerUtils=new GlobaleCustomerUtils();
+	 $customerUtils=new ERPCustomerUtils();
 	 $result=$customerUtils->deleteObject($id, $this->class, $this->getDoctrine());
 	 return new JsonResponse(array('result' => $result));
  }
