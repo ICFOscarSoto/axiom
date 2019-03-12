@@ -19,12 +19,13 @@ class TrackerLocationsRepository extends ServiceEntityRepository
         parent::__construct($registry, TrackerLocations::class);
     }
 
-
     public function findPoints($tracker, $start, $end){
       return $this->createQueryBuilder('q')
           ->andWhere('q.tracker = :val_tracker')
           ->andWhere('q.dateadd >= :val_start')
           ->andWhere('q.dateupd <= :val_end')
+          ->andWhere('q.active = 1')
+          ->andWhere('q.deleted = 0')
           ->setParameter('val_tracker', $tracker)
           ->setParameter('val_start', $start)
           ->setParameter('val_end', $end)

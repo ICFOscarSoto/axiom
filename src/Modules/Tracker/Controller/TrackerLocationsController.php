@@ -60,6 +60,7 @@ class TrackerLocationsController extends Controller
   public function doLocations($company, $id, $token, Request $request){
     $trackerRepository=$this->getDoctrine()->getRepository(TrackerTrackers::class);
     $tracker=$trackerRepository->find($id);
+    $locationRepository=$this->getDoctrine()->getRepository(TrackerLocations::class);
     if($tracker==NULL) return new JsonResponse(["result"=>-1]);
     if($tracker->getCompany()->getId()!=$company) return new JsonResponse(["result"=>-2]);
     if($tracker->getToken()!=$token) return new JsonResponse(["result"=>-3]); //Tokens sin almohadilllas
@@ -69,24 +70,27 @@ class TrackerLocationsController extends Controller
        $json = json_decode($content, true);
     }else return new JsonResponse(["result"=>0]);
     foreach($json as $item){
-      if($item["lat"]!=0.0 && $item["lon"]!=0.0){ //Comprobamos si las coordenadas son validas
-        $location=new TrackerLocations();
-        $location->setTracker($tracker);
-        $location->setLatitude($item["lat"]);
-        $location->setLongitude($item["lon"]);
-        $location->setHdop($item["hdop"]);
-        $location->setSats($item["sat"]);
-        $location->setAge($item["age"]);
-        $location->setAltitude($item["alt"]);
-        $location->setCourse($item["course"]);
-        $location->setKmph($item["kmph"]);
-        $location->setDate(new \DateTime($item["datetime"]));
-        $location->setDateupd(new \DateTime());
-        $location->setDateadd(new \DateTime());
-        $location->setActive(1);
-        $location->setDeleted(0);
-        $this->getDoctrine()->getManager()->persist($location);
-        $this->getDoctrine()->getManager()->flush();
+      $lastLocation=$locationRepository->findBy(["tracker" => $tracker, "date" => new \DateTime($item["datetime"])]);
+      if($lastLocation==NULL){ //Prevenir dos localizaciones del mismo tracker con el mismo timestamp
+        if($item["lat"]!=0.0 && $item["lon"]!=0.0){ //Comprobamos si las coordenadas son validas
+          $location=new TrackerLocations();
+          $location->setTracker($tracker);
+          $location->setLatitude($item["lat"]);
+          $location->setLongitude($item["lon"]);
+          $location->setHdop($item["hdop"]);
+          $location->setSats($item["sat"]);
+          $location->setAge($item["age"]);
+          $location->setAltitude($item["alt"]);
+          $location->setCourse($item["course"]);
+          $location->setKmph($item["kmph"]);
+          $location->setDate(new \DateTime($item["datetime"]));
+          $location->setDateupd(new \DateTime());
+          $location->setDateadd(new \DateTime());
+          $location->setActive(1);
+          $location->setDeleted(0);
+          $this->getDoctrine()->getManager()->persist($location);
+          $this->getDoctrine()->getManager()->flush();
+        }
       }
     }
     return new JsonResponse(["result"=>1,"json"=>$json]);
