@@ -1,9 +1,12 @@
 [{
 	"sections": [
 		{
-			"name": "Personal data",
+			"name": "Holliday data",
 			"fields": [
-			
+				{ "name": "name", "cols": 12},
+				{	"name": "type", "cols": 6},
+				{	"name": "date", "cols": 6},
+				{	"name": "active", "cols": 3},
 			]
 		}
   ]

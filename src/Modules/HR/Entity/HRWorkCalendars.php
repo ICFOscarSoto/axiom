@@ -5,7 +5,6 @@ namespace App\Modules\HR\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use \App\Modules\HR\Entity\HRHollidays;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
 
 /**
@@ -21,6 +20,12 @@ class HRWorkCalendars
     private $id;
 
     /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCompanies")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $company;
+
+    /**
      * @ORM\Column(type="string", length=150)
      */
     private $name;
@@ -34,11 +39,6 @@ class HRWorkCalendars
      * @ORM\Column(type="string", length=4)
      */
     private $year;
-
-    /**
-     * @ORM\ManyToMany(targetEntity="\App\Modules\HR\Entity\HRHollidays")
-     */
-    private $hollidays;
 
     /**
      * @ORM\Column(type="datetime")
@@ -60,23 +60,25 @@ class HRWorkCalendars
      */
     private $deleted;
 
-    /**
-     * @ORM\ManyToMany(targetEntity="\App\Modules\Globale\Entity\GlobaleCompanies")
-     */
-    private $company;
 
     public $newSeconds=1296000;
     public $updatedSeconds=1296000;
 
-    public function __construct()
-    {
-        $this->hollidays = new ArrayCollection();
-        $this->company = new ArrayCollection();
-    }
-
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getCompany(): ?GlobaleCompanies
+    {
+        return $this->company;
+    }
+
+    public function setCompany(?GlobaleCompanies $company): self
+    {
+        $this->company = $company;
+
+        return $this;
     }
 
     public function getName(): ?string
@@ -115,33 +117,7 @@ class HRWorkCalendars
         return $this;
     }
 
-    /**
-     * @return Collection|HRHollidays[]
-     */
-    public function getHollidays(): Collection
-    {
-        return $this->hollidays;
-    }
-
-    public function addHolliday(HRHollidays $holliday): self
-    {
-        if (!$this->hollidays->contains($holliday)) {
-            $this->hollidays[] = $holliday;
-        }
-
-        return $this;
-    }
-
-    public function removeHolliday(HRHollidays $holliday): self
-    {
-        if ($this->hollidays->contains($holliday)) {
-            $this->hollidays->removeElement($holliday);
-        }
-
-        return $this;
-    }
-
-    public function getDateadd(): ?\DateTimeInterface
+        public function getDateadd(): ?\DateTimeInterface
     {
         return $this->dateadd;
     }
@@ -185,32 +161,6 @@ class HRWorkCalendars
     public function setDeleted(bool $deleted): self
     {
         $this->deleted = $deleted;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|Companies[]
-     */
-    public function getCompany(): Collection
-    {
-        return $this->company;
-    }
-
-    public function addCompany(GlobaleCompanies $company): self
-    {
-        if (!$this->company->contains($company)) {
-            $this->company[] = $company;
-        }
-
-        return $this;
-    }
-
-    public function removeCompany(GlobaleCompanies $company): self
-    {
-        if ($this->company->contains($company)) {
-            $this->company->removeElement($company);
-        }
 
         return $this;
     }

@@ -123,6 +123,10 @@ HR:
    resource: 'App\Modules\HR\Controller\HRController'
    type:     annotation
 
+HRHollidays:
+   resource: 'App\Modules\HR\Controller\HRHollidaysController'
+   type:     annotation
+
 HRWorkCalendars:
    resource: 'App\Modules\HR\Controller\HRWorkCalendarsController'
    type:     annotation

@@ -4,6 +4,7 @@ namespace App\Modules\HR\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
+use \App\Modules\HR\Entity\HRWorkCalendars;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\HR\Repository\HRHollidaysRepository")
@@ -17,10 +18,6 @@ class HRHollidays
      */
     private $id;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCompanies")
-     */
-    private $company;
 
     /**
      * @ORM\Column(type="string", length=150)
@@ -56,6 +53,12 @@ class HRHollidays
      * @ORM\Column(type="boolean")
      */
     private $deleted;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\HR\Entity\HRWorkCalendars")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $calendar;
 
     public function getId(): ?int
     {
@@ -154,6 +157,18 @@ class HRHollidays
     public function setCompany(?GlobaleCompanies $company): self
     {
         $this->company = $company;
+
+        return $this;
+    }
+
+    public function getCalendar(): ?HRWorkCalendars
+    {
+        return $this->calendar;
+    }
+
+    public function setCalendar(?HRWorkCalendars $calendar): self
+    {
+        $this->calendar = $calendar;
 
         return $this;
     }

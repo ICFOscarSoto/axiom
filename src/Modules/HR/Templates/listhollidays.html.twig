@@ -37,6 +37,8 @@
 </div>
 	<!-- MODALS  -->
 
+	{% set formConstructor = form %}
+  {{ include('@Globale/genericajaxform.html.twig') }}
 	<!-- END MODALS -->
 
 {% block footer %}
@@ -96,16 +98,16 @@
         if($.isFunction($.fn.fullCalendar)){
           var calendar = $('#calendar');
           calendar.fullCalendar({
-						eventSources: [],
+						eventSources: ['{{url('hollidaysGet',{'id':id})}}'],
             header: {
               left: 'title',
-              right: 'prevYear,nextYear'
+              right: ''
             },
             defaultView: 'year',
             editable: true,
             firstDay: 1,
             height: "auto",
-            droppable: true,
+            droppable: false,
             drop: function(date, allDay) {
               var $this = $(this),
                 eventObject = {
@@ -118,6 +120,13 @@
               $this.remove();
             },
 						eventClick: function(calEvent, jsEvent, view) {
+							var dataUrl='{{url('dataHollidays',{'id':'_____'})}}';
+							var url=dataUrl.replace('_____',calEvent.id);
+							$.post(url, null,	function(data, status, xhr){
+										$("#hollidays-modal-form-body").html(data);
+										$('#hollidays-modal-form input').iCheck({checkboxClass: 'icheckbox_flat-blue',radioClass: 'iradio_flat-blue'});
+										$("#hollidays-modal-form-form").modal();
+							});
 					  },
 						loading: function( isLoading, view ) {
         		},
@@ -128,13 +137,6 @@
 
           });
 
-          $("#draggable_events li a").draggable({
-            zIndex: 999,
-            revert: true,
-            revertDuration: 0
-          }).on('click', function(){
-            return false;
-          });
         }
         else{
           alert("Please include full-calendar script!");
@@ -145,6 +147,14 @@
           return false;
         });
       }
+
+			{#$('body').on('click', "[id^='{{ listConstructor.id }}-field-button-{{ field.id }}']", function() {
+				$.post(url, null,	function(data, status, xhr){
+							$("#{{field.modal}}-modal-form-body").html(data);
+							$('#{{field.modal}}-modal-form input').iCheck({checkboxClass: 'icheckbox_flat-blue',radioClass: 'iradio_flat-blue'});
+							$("#{{field.modal}}-modal-form").modal();
+				});
+			});#}
 
 
 			});
