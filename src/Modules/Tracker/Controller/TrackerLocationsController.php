@@ -126,6 +126,37 @@ class TrackerLocationsController extends Controller
     return new JsonResponse($result);
   }
 
+  /**
+   * @Route("/api/trackers/locations/getpositions", name="getPositions")
+   */
+  public function getPositions(RouterInterface $router,Request $request){
+    $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+    $user = $this->getUser();
+    $trackerRepository=$this->getDoctrine()->getRepository(TrackerTrackers::class);
+    $locationsRepository=$this->getDoctrine()->getRepository(TrackerLocations::class);
+    $tracker=$trackerRepository->find(1);
+    //$tracker=$trackerRepository->findBy();
+    //$start=$request->query->get('start','2000-01-01 00:00:00');
+    //$end=$request->query->get('end','2999-01-01 00:00:00');
+    //$locations = $locationsRepository->findPoints($tracker,$start,$end);
+    $location = $locationsRepository->findOneBy(['tracker'=>$tracker,'active'=>1,'deleted'=>0],['date' => 'DESC']);
+    $result=[];
+  //    foreach($locations as $location){
+      $point["id"]=$location->getTracker()->getId();
+      $point["latitude"]=$location->getLatitude();
+      $point["longitude"]=$location->getLongitude();
+      $point["hdop"]=$location->getHdop();
+      $point["sats"]=$location->getSats();
+      $point["age"]=$location->getAge();
+      $point["altitude"]=$location->getAltitude();
+      $point["course"]=$location->getCourse();
+      $point["kmph"]=$location->getKmph();
+      $point["date"]=$location->getDate();
+      $result[]=$point;
+  //  }
+    //dump($locations);
+    return new JsonResponse($result);
+  }
 
 
   /**
