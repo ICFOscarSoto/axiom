@@ -129,7 +129,7 @@ class TrackerLocationsController extends Controller
 
   /**
    * @Route("/api/trackers/locations/getpositions", name="getPositions")
-   */
+   */ 
   public function getPositions(RouterInterface $router,Request $request){
     $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
     $user = $this->getUser();
