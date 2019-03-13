@@ -140,7 +140,7 @@ class TrackerLocationsController extends Controller
     //$start=$request->query->get('start','2000-01-01 00:00:00');
     //$end=$request->query->get('end','2999-01-01 00:00:00');
     //$locations = $locationsRepository->findPoints($tracker,$start,$end);
-    $location = $locationsRepository->findOneBy(['tracker'=>$tracker],['id' => 'DESC']);
+    $location = $locationsRepository->findOneBy(['tracker'=>$tracker,'active'=>1,'deleted'=>0],['date' => 'DESC']);
     $result=[];
   //    foreach($locations as $location){
       $point["id"]=$location->getTracker()->getId();

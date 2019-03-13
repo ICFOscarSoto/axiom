@@ -9,6 +9,50 @@
 	<!-- Imported styles on this page -->
 	<link rel="stylesheet" href="{{ url('index') }}/js/jvectormap/jquery-jvectormap-1.2.2.css">
 	<link rel="stylesheet" href="{{ url('index') }}/js/rickshaw/rickshaw.min.css">
+	<style>
+      .ol-popup {
+        position: absolute;
+        background-color: white;
+        -webkit-filter: drop-shadow(0 1px 4px rgba(0,0,0,0.2));
+        filter: drop-shadow(0 1px 4px rgba(0,0,0,0.2));
+        padding: 15px;
+        border-radius: 10px;
+        border: 1px solid #cccccc;
+        bottom: 12px;
+        left: -50px;
+        min-width: 280px;
+      }
+      .ol-popup:after, .ol-popup:before {
+        top: 100%;
+        border: solid transparent;
+        content: " ";
+        height: 0;
+        width: 0;
+        position: absolute;
+        pointer-events: none;
+      }
+      .ol-popup:after {
+        border-top-color: white;
+        border-width: 10px;
+        left: 48px;
+        margin-left: -10px;
+      }
+      .ol-popup:before {
+        border-top-color: #cccccc;
+        border-width: 11px;
+        left: 48px;
+        margin-left: -11px;
+      }
+      .ol-popup-closer {
+        text-decoration: none;
+        position: absolute;
+        top: 2px;
+        right: 8px;
+      }
+      .ol-popup-closer:after {
+        content: "✖";
+      }
+    </style>
 {% endblock %}
 <title>{% block title %}{{ interfaceName }}{% endblock %}</title>
 <body class="page-body" data-url="{{ url('indexAdmin') }}">
@@ -23,23 +67,55 @@
 		<div class="principal-content" id="principal-content">
       <div id="map" style="height:600px" class="map"></div>
 		</div>
+		<div id="popup" class="ol-popup">
+      <a href="#" id="popup-closer" class="ol-popup-closer"></a>
+      <div id="popup-content"></div>
+    </div>
     <script type="text/javascript">
     var iconFeature;
+		var overlay
 		var layer;
 		var view;
 		var map;
+		var markers=[];
+		var container = document.getElementById('popup');
+    var content = document.getElementById('popup-content');
+    var closer = document.getElementById('popup-closer');
+
+
+
+
+		 /**
+			* Add a click handler to hide the popup.
+			* @return {boolean} Don't follow the href.
+			*/
+		 closer.onclick = function() {
+			 overlay.setPosition(undefined);
+			 closer.blur();
+			 return false;
+		 };
+
     $(document).ready(function() {
+
+				overlay = new ol.Overlay({
+					 element: container,
+					 autoPan: true,
+					 autoPanAnimation: {
+						 duration: 250
+					 }
+				});
 
 				layer = new ol.layer.Tile({
 	        source: new ol.source.OSM()
 	      });
 				view = new ol.View({
 					center: ol.proj.fromLonLat([-1.8806247,39.0038623]),
-					zoom: 18
+					zoom: 17
 			  });
 	      map = new ol.Map({
 	        target: 'map',
 	        layers: [layer],
+					overlays: [overlay],
 	        view: view
 	      });
 
@@ -47,6 +123,30 @@
 			var points=null;
 			var lastPoint=0;
 			var flagRefresh=false;
+
+			map.on('click', function(e) {
+			  var iconFeatureA = map.getFeaturesAtPixel(e.pixel);
+			  if (iconFeatureA !== null) {
+			    var dataTracker = iconFeatureA[0].get("dataTracker");
+					var coordinate = e.coordinate;
+					var timestamp=new Date() / 1000;
+					var notificationTimeAgo=getTimeAgo(timestamp-(new Date(dataTracker.date.date)/1000));
+					console.log(dataTracker);
+					content.innerHTML = '<p>' + notificationTimeAgo +'</p>';
+					content.innerHTML += '<p>Velocidad: ' + dataTracker.kmph  +' kmph</p>';
+					content.innerHTML += '<p>Altitud: ' + dataTracker.altitude  +' m</p>';
+					content.innerHTML += '<p>Rumbo: ' + dataTracker.course  +'</p>';
+					content.innerHTML += '<p>Satelites: ' + dataTracker.sats  +'</p>';
+					content.innerHTML += '<input id="popupId" type=\'hidden\' value=\''+dataTracker.id+'\'/>';
+					content.innerHTML += '<input id="popupDate" type=\'hidden\' value=\''+dataTracker.date.date+'\'/>';
+        	//content.innerHTML = '<p>Recibido hace</p><code>' + dataTracker.id +'</code>';
+        	overlay.setPosition(coordinate);
+			    e.preventDefault(); // avoid bubbling
+			  }else{
+					overlay.setPosition(undefined);
+	 			  closer.blur();
+				}
+			});
 
 			window.setInterval(function(){
 				if(flagRefresh){
@@ -57,18 +157,38 @@
 			pointsRefresh();
 
 				function pointsRefresh(){
-					$.getJSON("{{url('getPoints',{'id':1})}}", function( data ) {
+					$.getJSON("{{url('getPositions')}}", function( data ) {
+						$.each(data,function( key, val ){
+							if(markers[val.id]!=undefined){
+								//TODO detectar si el popup es del marcador que hay que mover
+								if(($("#popupId").val()*1==val.id*1) && ($("#popupDate").val()!=val.date.date)){
+									overlay.setPosition(undefined);
+									closer.blur();
+								}
+								markers[val.id].setGeometry(new ol.geom.Point(ol.proj.transform([val.longitude*1, val.latitude*1], 'EPSG:4326','EPSG:3857')));
+								markers[val.id].setProperties({'dataTracker':val});
+							}else{
+								map.addLayer(createMarker(val,val.latitude*1, val.longitude*1));
+							}
+							//markers[0].setGeometry(new ol.geom.Point(ol.proj.transform([-1.87293, 37.00558], 'EPSG:4326','EPSG:3857')));
+							doPan(val.latitude*1, val.longitude*1);
+						});
+					}).always(function() {
+						flagRefresh=true;
+					});
+
+				/*	$.getJSON("{{url('getPoints',{'id':1})}}", function( data ) {
 						var previus=null;
 						$.each(data,function( key, val ){
 							if(previus!=null && val.id>lastPoint){
-								map.addLayer(createLine(previus.latitude*1, previus.longitude*1, val.latitude*1, val.longitude*1));
+								//map.addLayer(createLine(previus.latitude*1, previus.longitude*1, val.latitude*1, val.longitude*1));
 							}
 							previus=val;
 						});
 						flagPoint=0;
 						$.each( data, function( key, val ) {
 							if(val.id>lastPoint)
-								map.addLayer(createPoint(val.latitude*1,val.longitude*1));
+								//map.addLayer(createPoint(val.latitude*1,val.longitude*1));
 
 							flagPoint=val.id;
 						});
@@ -76,6 +196,7 @@
 					}).always(function() {
 						flagRefresh=true;
 					});
+					*/
 				}
       });
 
@@ -95,6 +216,7 @@
 			function createPoint(latitude, longitude){
 				var features = [];
 				var iconFeature;
+
 				iconFeature = new ol.Feature({
 						geometry: new ol.geom.Point(ol.proj.transform([longitude, latitude], 'EPSG:4326','EPSG:3857'))
 				});
@@ -118,25 +240,29 @@
 				return vectorLayer;
 			}
 
-			function createMarker(latitude, longitude){
+			function createMarker(data,latitude, longitude){
 				//Labels
+				//var data=id;
 				var features = [];
 				var iconFeature;
+				//var dataArray=data;
 				iconFeature = new ol.Feature({
-						geometry: new ol.geom.Point(ol.proj.transform([longitude, latitude], 'EPSG:4326','EPSG:3857'))
+						geometry: new ol.geom.Point(ol.proj.transform([longitude, latitude], 'EPSG:4326','EPSG:3857')),
+						dataTracker: data
 				});
 
 				var iconStyle = [
 					new ol.style.Style({
 							image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
-							anchor: [0.5, 64],
+							anchor: [0.5, 90],
 							anchorXUnits: 'fraction',
 							anchorYUnits: 'pixels',
 							opacity: 1,
-							src: '{{ url('index') }}images/placeholder.png'
+							scale: 1,
+							src: '{{ url('index') }}images/gpsmarker.png'
 							}))
 					}),
-					new ol.style.Style({
+					/*new ol.style.Style({
 							text: new ol.style.Text({
 									text: "FURGÓN 1",
 									font: "bold 14px Helvetica",
@@ -149,17 +275,22 @@
 											color: '#1081e0'
 									})
 							})
-					})
+					})*/
 				];
 				iconFeature.setStyle(iconStyle);
+
 				features.push(iconFeature);
 		    var vectorSource = new ol.source.Vector({
 		        features: features      //add an array of features
 		        //,style: iconStyle     //to set the style for all your features...
 		    });
 		    var vectorLayer = new ol.layer.Vector({
-		        source: vectorSource
+		        source: vectorSource,
+						dataId: data.id,
+						dataLat: data.latitude,
+						dataLon: data.longitude
 		    });
+				markers[data.id]=iconFeature;
 				return vectorLayer;
 			}
 
@@ -210,6 +341,7 @@
 	<link rel="stylesheet" href="{{ url('index') }}css/custom.css">
    <link rel="stylesheet" href="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/css/ol.css" type="text/css">
 	<!-- Imported scripts on this page -->
+	<script src="{{ url('index') }}js/globale/dates.js"></script>
  	<script src="{{ url('index') }}js/datatables/datatables.js"></script>
 	<script src="{{ url('index') }}js/select2/select2.min.js"></script>
 	<script src="{{ url('index') }}js/moment.min.js"></script>
