@@ -59,6 +59,10 @@ BankAccount:
     resource: 'App\Modules\ERP\Controller\ERPBankAccountsController'
     type:     annotation
 
+Manufacturer:
+    resource: 'App\Modules\ERP\Controller\ERPManufacturersController'
+    type:     annotation
+
 Activity:
     resource: 'App\Modules\Globale\Controller\GlobaleActivitiesController'
     type:     annotation

@@ -8,5 +8,6 @@
   {"name": "allowpicking","caption":"Permite recogida", "width" : "50"},
   {"name": "creditor","caption":"Acreedor", "width" : "50"},
   {"name": "paymentmethod","caption":"Forma de pago", "width" : "50"},
+  {"name": "invoiceday","caption":"Día de facturación", "width" : "50"},
   {"name": "active", "caption":"Estado", "width":"10%" ,"class" : "dt-center", "replace":{"1":"<div style=\"min-width: 75px;\" class=\"label label-success\">Activo</div>", "0" : "<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado</div>"}}
 ]

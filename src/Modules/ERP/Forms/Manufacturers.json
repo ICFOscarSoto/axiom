@@ -1,0 +1,10 @@
+[{
+	"sections": [
+		{
+			"name": "Manufacturers data",
+			"fields": [
+				{ "name": "name","cols": 8},
+				{	"name": "active", "cols": 2}
+			]
+		}]
+}]
