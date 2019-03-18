@@ -151,7 +151,11 @@ class TrackerLocationsController extends Controller
       $point["altitude"]=$location->getAltitude();
       $point["course"]=$location->getCourse();
       $point["kmph"]=$location->getKmph();
-      $point["date"]=$location->getDate();
+      $gmtTimezone = new \DateTimeZone('GMT');
+      $dt = new \DateTime($location->getDate()->format('Y-m-d H:i:s'), $gmtTimezone);
+      $tz = new \DateTimeZone('Europe/Madrid'); // or whatever zone you're after
+      $dt->setTimezone($tz);
+      $point["date"]=$dt->format('Y-m-d H:i:s');
       $result[]=$point;
   //  }
     //dump($locations);
