@@ -130,7 +130,8 @@ class TrackerLocationsController extends Controller
     $trackerRepository=$this->getDoctrine()->getRepository(TrackerTrackers::class);
     $locationsRepository=$this->getDoctrine()->getRepository(TrackerLocations::class);
     $tracker=$trackerRepository->find($id);
-    $start=$request->query->get('start','2000-01-01 00:00:00');
+
+    $start=$request->query->get('start',(new \DateTime())->modify('-8 hours'));
     $end=$request->query->get('end','2999-01-01 00:00:00');
     $locations = $locationsRepository->findPoints($tracker,$start,$end);
     $result=[];
