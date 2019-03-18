@@ -55,6 +55,31 @@ class TrackerLocationsController extends Controller
   }
 
   /**
+   * @Route("/{_locale}/trackers/locations/tracking/{id}", name="tracking", defaults={"id"=0})
+   */
+  public function tracking($id,RouterInterface $router,Request $request)
+  {
+    $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+    //$this->denyAccessUnlessGranted('ROLE_ADMIN');
+    $userdata=$this->getUser()->getTemplateData();
+    $locale = $request->getLocale();
+    $this->router = $router;
+    $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
+
+    if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+      return $this->render('@Tracker/tracking.html.twig', [
+        'controllerName' => 'trackersController',
+        'interfaceName' => 'Trackers',
+        'optionSelected' => 'trackers',
+        'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
+        'breadcrumb' =>  'trackers',
+        'userData' => $userdata
+        ]);
+    }
+    return new RedirectResponse($this->router->generate('app_login'));
+  }
+
+  /**
   * @Route("/api/tracker/dolocation/{company}/{id}/{token}", name="doLocations")
   */
   public function doLocations($company, $id, $token, Request $request){
