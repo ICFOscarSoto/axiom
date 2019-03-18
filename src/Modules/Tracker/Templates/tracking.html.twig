@@ -154,14 +154,15 @@
 						var previus=null;
 						$.each(data,function( key, val ){
 							if(previus!=null && val.id>lastPoint){
-								map.addLayer(createLine(previus.latitude*1, previus.longitude*1, val.latitude*1, val.longitude*1));
+								map.addLayer(createLine(previus.latitude*1, previus.longitude*1, val.latitude*1, val.longitude*1, val.id%3));
 							}
 							previus=val;
 						});
+						doPan(previus.latitude*1, previus.longitude*1);
 						flagPoint=0;
 						$.each( data, function( key, val ) {
 							if(val.id>lastPoint)
-								map.addLayer(createPoint(val.latitude*1,val.longitude*1));
+								//map.addLayer(createPoint(val.latitude*1,val.longitude*1));
 								flagPoint=val.id;
 						});
 						lastPoint=flagPoint;
@@ -266,8 +267,26 @@
 				return vectorLayer;
 			}
 
+			function increase_brightness(hex, percent){
+			    // strip the leading # if it's there
+			    hex = hex.replace(/^\s*#|\s*$/g, '');
 
-			function createLine(startLat, startLon, endLat, endLon){
+			    // convert 3 char codes --> 6, e.g. `E0F` --> `EE00FF`
+			    if(hex.length == 3){
+			        hex = hex.replace(/(.)/g, '$1$1');
+			    }
+
+			    var r = parseInt(hex.substr(0, 2), 16),
+			        g = parseInt(hex.substr(2, 2), 16),
+			        b = parseInt(hex.substr(4, 2), 16);
+
+			    return '#' +
+			       ((0|(1<<8) + r + (256 - r) * percent / 100).toString(16)).substr(1) +
+			       ((0|(1<<8) + g + (256 - g) * percent / 100).toString(16)).substr(1) +
+			       ((0|(1<<8) + b + (256 - b) * percent / 100).toString(16)).substr(1);
+			}
+
+			function createLine(startLat, startLon, endLat, endLon, type){
 				//Lineas
 				var coords = [
 		  		[startLon, startLat],
@@ -282,7 +301,7 @@
 				});
 				var lineStyle = new ol.style.Style({
 				  stroke: new ol.style.Stroke({
-				    color: '#1081e0',
+				    color: increase_brightness('#1081e0',type*25),
 				    width: 5
 				  })
 				});
