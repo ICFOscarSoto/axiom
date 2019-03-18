@@ -73,7 +73,9 @@ class TrackerLocationsController extends Controller
         'optionSelected' => 'trackers',
         'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
         'breadcrumb' =>  'trackers',
-        'userData' => $userdata
+        'userData' => $userdata,
+        'start' => (new \DateTime())->modify('-1 hours')->format('Y-m-d H:i:s'),
+        'end' => (new \DateTime())->format('Y-m-d H:i:s')
         ]);
     }
     return new RedirectResponse($this->router->generate('app_login'));
@@ -132,7 +134,14 @@ class TrackerLocationsController extends Controller
     $tracker=$trackerRepository->find($id);
 
     $start=$request->query->get('start',(new \DateTime())->modify('-8 hours'));
-    $end=$request->query->get('end','2999-01-01 00:00:00');
+    $end=$request->query->get('end',(new \DateTime())->modify('+8 hours'));
+
+    $gmtTimezone = new \DateTimeZone('GMT');
+    $start=new \DateTime($start);
+    $end=new \DateTime($end);
+    $start=$start->setTimezone($gmtTimezone);
+    $end=$end->setTimezone($gmtTimezone);
+
     $locations = $locationsRepository->findPoints($tracker,$start,$end);
     $result=[];
     foreach($locations as $location){

@@ -22,8 +22,8 @@ class TrackerLocationsRepository extends ServiceEntityRepository
     public function findPoints($tracker, $start, $end){
       return $this->createQueryBuilder('q')
           ->andWhere('q.tracker = :val_tracker')
-          ->andWhere('q.dateadd >= :val_start')
-          ->andWhere('q.dateupd <= :val_end')
+          ->andWhere('q.date >= :val_start')
+          ->andWhere('q.date <= :val_end')
           ->andWhere('q.active = 1')
           ->andWhere('q.deleted = 0')
           ->setParameter('val_tracker', $tracker)

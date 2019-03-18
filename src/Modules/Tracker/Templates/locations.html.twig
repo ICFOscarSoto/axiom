@@ -189,34 +189,8 @@
 					}).always(function() {
 						flagRefresh=true;
 					});
-
-				/*	$.getJSON("{{url('getPoints',{'id':1})}}", function( data ) {
-						var previus=null;
-						$.each(data,function( key, val ){
-							if(previus!=null && val.id>lastPoint){
-								//map.addLayer(createLine(previus.latitude*1, previus.longitude*1, val.latitude*1, val.longitude*1));
-							}
-							previus=val;
-						});
-						flagPoint=0;
-						$.each( data, function( key, val ) {
-							if(val.id>lastPoint)
-								//map.addLayer(createPoint(val.latitude*1,val.longitude*1));
-
-							flagPoint=val.id;
-						});
-						lastPoint=flagPoint;
-					}).always(function() {
-						flagRefresh=true;
-					});
-					*/
 				}
       });
-
-      //Para mover el marcador
-      //iconFeature.setGeometry(new ol.geom.Point(ol.proj.transform([-1.87293, 37.00558], 'EPSG:4326','EPSG:3857')));
-      //
-      //
 
 			function doPan(latitude, longitude) {
 				view.animate({
@@ -225,40 +199,9 @@
 				});
 			}
 
-
-			function createPoint(latitude, longitude){
-				var features = [];
-				var iconFeature;
-
-				iconFeature = new ol.Feature({
-						geometry: new ol.geom.Point(ol.proj.transform([longitude, latitude], 'EPSG:4326','EPSG:3857'))
-				});
-				var imageStyle = new ol.style.Style({
-	        	image: new ol.style.Circle({
-		          radius: 4,
-		          fill: new ol.style.Fill({color: '#ffffff'}),
-		          stroke: new ol.style.Stroke({color: '#1081e0', width: 1})
-		        })
-      	});
-				iconFeature.setStyle(imageStyle);
-				features.push(iconFeature);
-		    var vectorSource = new ol.source.Vector({
-		        features: features      //add an array of features
-		        //,style: iconStyle     //to set the style for all your features...
-		    });
-		    var vectorLayer = new ol.layer.Vector({
-		        source: vectorSource
-		    });
-				doPan(latitude, longitude);
-				return vectorLayer;
-			}
-
 			function createMarker(data,latitude, longitude){
-				//Labels
-				//var data=id;
 				var features = [];
 				var iconFeature;
-				//var dataArray=data;
 				iconFeature = new ol.Feature({
 						geometry: new ol.geom.Point(ol.proj.transform([longitude, latitude], 'EPSG:4326','EPSG:3857')),
 						dataTracker: data
@@ -275,20 +218,6 @@
 							src: '{{ url('index') }}images/gpsmarker.png'
 							}))
 					}),
-					/*new ol.style.Style({
-							text: new ol.style.Text({
-									text: "FURGÓN 1",
-									font: "bold 14px Helvetica",
-									offsetY: 25,
-									backgroundFill: new ol.style.Fill({
-											color: '#fff'
-									}),
-									padding: [5,10,5,10],
-									fill: new ol.style.Fill({
-											color: '#1081e0'
-									})
-							})
-					})*/
 				];
 				iconFeature.setStyle(iconStyle);
 
@@ -305,36 +234,6 @@
 		    });
 				markers[data.id]=iconFeature;
 				return vectorLayer;
-			}
-
-
-			function createLine(startLat, startLon, endLat, endLon){
-				//Lineas
-				var coords = [
-		  		[startLon, startLat],
-		  		[endLon, endLat]
-				];
-				var lineString = new ol.geom.LineString(coords);
-				// transform to EPSG:3857
-				lineString.transform('EPSG:4326', 'EPSG:3857');
-				var labelFeature = new ol.Feature({
-		  	geometry: lineString,
-		  	name: 'Line'
-				});
-				var lineStyle = new ol.style.Style({
-				  stroke: new ol.style.Stroke({
-				    color: '#1081e0',
-				    width: 5
-				  })
-				});
-				var source = new ol.source.Vector({
-				  features: [labelFeature]
-				});
-				var vector = new ol.layer.Vector({
-				  source: source,
-				  style: [lineStyle]
-				});
-				return vector;
 			}
       </script>
 		<!-- END MAIN CONTENT -->
