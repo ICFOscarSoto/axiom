@@ -230,10 +230,13 @@
 					previousSelPointZindex=map.getLayers().getArray()[points[value]].getZIndex();
 					map.getLayers().getArray()[points[value]].getSource().getFeatures()[0].setStyle(imageSelectedStyle);
 					map.getLayers().getArray()[points[value]].setZIndex(9999);
-					view.animate({
-						center: ol.proj.fromLonLat([map.getLayers().getArray()[points[value]].getSource().getFeatures()[0].get("dataTracker").longitude*1,map.getLayers().getArray()[points[value]].getSource().getFeatures()[0].get("dataTracker").latitude*1]),
-						duration: 0
-					});
+					if(ol.extent.containsCoordinate(view.calculateExtent(),map.getLayers().getArray()[points[value]].getSource().getFeatures()[0].getGeometry().getCoordinates())){
+					}else{
+						view.animate({
+							center: ol.proj.fromLonLat([map.getLayers().getArray()[points[value]].getSource().getFeatures()[0].get("dataTracker").longitude*1,map.getLayers().getArray()[points[value]].getSource().getFeatures()[0].get("dataTracker").latitude*1]),
+							duration: 0
+						});
+					}
 					showInfo(map.getLayers().getArray()[points[value]].getSource().getFeatures());
 				});
 
