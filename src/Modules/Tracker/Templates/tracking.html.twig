@@ -248,6 +248,7 @@
 			function pointsRefresh(){
 				clearLines();
 				clearPoints();
+				clearMarkers();
 				$.getJSON("{{url('getPoints',{'id':1})}}?start="+$("#start").data('DateTimePicker').date().format("YYYY-MM-DD HH:mm:ss")+"&end="+$("#end").data('DateTimePicker').date().format("YYYY-MM-DD HH:mm:ss"), function( data ) {
 					var previus=null;
 					$.each(data,function( key, val ){
@@ -266,10 +267,11 @@
 					$.each( data, function( key, val ) {
 							var point;
 						  if(flag_first){
-								point=createMarker(val,val.latitude*1,val.longitude*1,'start_flag.png',[0.1,128], 0.3);
+								marker=createMarker(val,val.latitude*1,val.longitude*1,'start_flag.png',[0.1,128], 0.3);
+								markers.push(marker);
 								flag_first=false;
 								layersFlag=map.getLayers().getArray().length+1;
-								map.addLayer(point);
+								map.addLayer(marker);
 							}
 							point=createPoint(val,val.latitude*1,val.longitude*1);
 							map.addLayer(point);
@@ -279,8 +281,11 @@
 							previus=val;
 					});
 					if(points.length>1){
-						if(previus) map.addLayer(createMarker(previus,previus.latitude*1,previus.longitude*1,'end_flag.png',[0.1,128], 0.3));
-
+						if(previus){
+							marker=createMarker(previus,previus.latitude*1,previus.longitude*1,'end_flag.png',[0.1,128], 0.3);
+							markers.push(marker);
+							map.addLayer(marker);
+						}
 						slider.removeAttribute('disabled');
 						slider.noUiSlider.updateOptions({ range: {'min': 0, 'max': points.length-1}});
 
@@ -337,6 +342,13 @@
 
 			function clearPoints(){
 				points.forEach(function (val) {
+						map.removeLayer(val);
+				});
+				points=[];
+			}
+
+			function clearMarkers(){
+				markers.forEach(function (val) {
 						map.removeLayer(val);
 				});
 				points=[];
