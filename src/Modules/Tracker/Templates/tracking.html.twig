@@ -92,7 +92,8 @@
            </div>
         </div>
 			</div>
-			<div id="point_slider"><div class="slider" data-basic="1" data-min="0" data-max="-1" data-value="0" data-step="1"></div></div>
+			<div id="point_slider"></div>
+		</br>
       <div id="map" style="height:600px" class="map"></div>
 		</div>
 		<div id="popup" class="ol-popup">
@@ -115,7 +116,8 @@
 		var lastPoint=0;
 		var imageStyle;
 		var imageStyleSelected;
-
+		var previousSelPoint=null;
+		var previousSelPointZindex=0;
 
 		 /**
 			* Add a click handler to hide the popup.
@@ -159,56 +161,52 @@
 
 				imageStyle = new ol.style.Style({
 	        	image: new ol.style.Circle({
-		          radius: 4,
-		          fill: new ol.style.Fill({color: '#ffffff'}),
-		          stroke: new ol.style.Stroke({color: '#1081e0', width: 1})
+		          radius: 0,
+		          fill: new ol.style.Fill({color: '#1081e0'}),
+		          //stroke: new ol.style.Stroke({color: '#1081e0', width: 1})
 		        })
       	});
 
 				imageSelectedStyle = new ol.style.Style({
 	        	image: new ol.style.Circle({
-		          radius: 6,
+		          radius: 5,
 		          fill: new ol.style.Fill({color: '#ffffff'}),
-		          stroke: new ol.style.Stroke({color: '#ff0000', width: 2})
+		          stroke: new ol.style.Stroke({color: '#1081e0', width: 2})
 		        })
       	});
 
 			var previus=null;
-
-
 			var flagRefresh=false;
 
 			map.on('click', function(e) {
-			  var iconFeatureA = map.getFeaturesAtPixel(e.pixel);
-			  if (iconFeatureA !== null) {
-			    var dataTracker = iconFeatureA[0].get("dataTracker");
-					var coordinate = e.coordinate;
-					var timestamp=new Date() / 1000;
-					var notificationTimeAgo=getTimeAgo(timestamp-(new Date(dataTracker.date.date)/1000));
-					content.innerHTML = '<p>' + notificationTimeAgo +'</p>';
-					content.innerHTML += '<p>Velocidad: ' + dataTracker.kmph  +' kmph</p>';
-					content.innerHTML += '<p>Altitud: ' + dataTracker.altitude  +' m</p>';
-					content.innerHTML += '<p>Rumbo: ' + dataTracker.course  +'</p>';
-					content.innerHTML += '<p>Satelites: ' + dataTracker.sats  +'</p>';
-					content.innerHTML += '<input id="popupId" type=\'hidden\' value=\''+dataTracker.id+'\'/>';
-					content.innerHTML += '<input id="popupDate" type=\'hidden\' value=\''+dataTracker.date.date+'\'/>';
-        	//content.innerHTML = '<p>Recibido hace</p><code>' + dataTracker.id +'</code>';
-        	overlay.setPosition(coordinate);
-			    e.preventDefault(); // avoid bubbling
-			  }else{
+				var iconFeatureA = map.getFeaturesAtPixel(e.pixel);
+				showInfo(iconFeatureA);
+			});
+			$("#point_slider").slider({
+				slide: function (event, ui) {
 					overlay.setPosition(undefined);
-	 			  closer.blur();
+					closer.blur();
+
+					value=$(this).slider('value');
+					console.log(value);
+					if(previousSelPoint){
+						 map.getLayers().getArray()[previousSelPoint].getSource().getFeatures()[0].setStyle(imageStyle);
+						 map.getLayers().getArray()[previousSelPoint].setZIndex(previousSelPointZindex);
+					}
+					previousSelPoint=points[value];
+					previousSelPointZindex=map.getLayers().getArray()[points[value]].getZIndex();
+					map.getLayers().getArray()[points[value]].getSource().getFeatures()[0].setStyle(imageSelectedStyle);
+					map.getLayers().getArray()[points[value]].setZIndex(9999);
+					view.animate({
+						center: ol.proj.fromLonLat([map.getLayers().getArray()[points[value]].getSource().getFeatures()[0].get("dataTracker").longitude*1,map.getLayers().getArray()[points[value]].getSource().getFeatures()[0].get("dataTracker").latitude*1]),
+						duration: 0
+					});
+					showInfo(map.getLayers().getArray()[points[value]].getSource().getFeatures());
+
 				}
 			});
-
 			pointsRefresh();
-
       });
-
-      //Para mover el marcador
-      //iconFeature.setGeometry(new ol.geom.Point(ol.proj.transform([-1.87293, 37.00558], 'EPSG:4326','EPSG:3857')));
-      //
-      //
 
 			function pointsRefresh(){
 				clearLines();
@@ -224,16 +222,53 @@
 						previus=val;
 					});
 					if(previus) doPan(previus.latitude*1, previus.longitude*1);
+					var layersFlag=map.getLayers().getArray().length;
+					var i=0;
 					$.each( data, function( key, val ) {
 							var point=createPoint(val,val.latitude*1,val.longitude*1);
-							points.push(point);
 							map.addLayer(point);
+							points[i]=layersFlag;
+							i++;
+							layersFlag++;
 					});
-					$("#point_slider").html('<div class="slider" data-basic="1" data-min="0" data-max="'+(points.length-1)+'" data-value="0" data-step="1"></div>');
+					$("#point_slider").slider("option", "max", (points.length-1));
 				}).always(function() {
 					flagRefresh=true;
 				});
 
+			}
+
+			function showInfo(iconFeatureA){
+				if (iconFeatureA !== null) {
+			    var dataTracker = iconFeatureA[0].get("dataTracker");
+					var coordinate = iconFeatureA[0].getGeometry().getCoordinates();
+					var timestamp=new Date() / 1000;
+					var notificationTimeAgo=getTimeAgo(timestamp-(new Date(dataTracker.date)/1000));
+					var url="{{ url('tracking',{'id': '_____'}) }}";
+					url=url.replace('_____',dataTracker.id);
+					content.innerHTML = '<div class="row">';
+					content.innerHTML +='<div class="col-sm-12"><span class="fa fa-clock-o fa-lg"></span>&nbsp;' + notificationTimeAgo +'</div>';
+					content.innerHTML +='<div class="row"><div class="col-sm-12">&nbsp;</div></div>';
+					content.innerHTML +='<div class="col-xs-4 col-sm-4 col-md-4" style="text-align:center"><span class="fa fa-tachometer fa-2x"></div>';
+					content.innerHTML +='<div class="col-xs-4 col-sm-4 col-md-4" style="text-align:center"><span class="fa fa-compass fa-2x"></div>';
+					content.innerHTML +='<div class="col-xs-4 col-sm-4 col-md-4" style="text-align:center"><span class="fa fa-caret-square-o-up fa-2x"></div>';
+					content.innerHTML +='<div class="col-xs-4 col-sm-4 col-md-4" style="text-align:center"><b>' + dataTracker.kmph  +' kmph</b></div>';
+					content.innerHTML +='<div class="col-xs-4 col-sm-4 col-md-4" style="text-align:center"><b>' + dataTracker.course  +' º</b></div>';
+					content.innerHTML +='<div class="col-xs-4 col-sm-4 col-md-4" style="text-align:center"><b>' + dataTracker.altitude  +' m</b></div>';
+					content.innerHTML +='<div class="row"><div class="col-sm-12">&nbsp;</div></div>';
+					content.innerHTML +='<div class="col-xs-8 col-sm-8 col-md-8" style="text-align:center"><span class="fa fa-globe fa-2x"></div>';
+					content.innerHTML +='<div class="col-xs-4 col-sm-4 col-md-4" style="text-align:center"><span class="fa fa-signal fa-2x"></div>';
+					content.innerHTML +='<div class="col-xs-8 col-sm-8 col-md-8" style="text-align:center"><b>' + dataTracker.latitude  +', '+dataTracker.longitude+'</b></div>';
+					content.innerHTML +='<div class="col-xs-4 col-sm-4 col-md-4" style="text-align:center"><b>' + dataTracker.sats  +'</b></div>';
+					content.innerHTML +='<input id="popupId" type=\'hidden\' value=\''+dataTracker.id+'\'/>';
+					content.innerHTML +='<input id="popupDate" type=\'hidden\' value=\''+dataTracker.date+'\'/>';
+					content.innerHTML +='</div>';
+        	overlay.setPosition(coordinate);
+			    //e.preventDefault(); // avoid bubbling
+			  }else{
+					overlay.setPosition(undefined);
+	 			  closer.blur();
+				}
 			}
 
 			function clearLines(){
@@ -256,7 +291,6 @@
 					duration: 1000
 				});
 			}
-
 
 			function createPoint(data, latitude, longitude){
 				var features = [];
@@ -400,6 +434,7 @@
 	<link rel="stylesheet" href="{{ url('index') }}css/custom.css">
    <link rel="stylesheet" href="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/css/ol.css" type="text/css">
 	 <link rel="stylesheet" href="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker.min.css">
+	 <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 	<!-- Imported scripts on this page -->
 	<script src="{{ url('index') }}js/globale/dates.js"></script>
  	<script src="{{ url('index') }}js/datatables/datatables.js"></script>
