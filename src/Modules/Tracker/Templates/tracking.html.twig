@@ -259,16 +259,28 @@
 						previus=val;
 					});
 					if(previus) doPan(previus.latitude*1, previus.longitude*1);
-					var layersFlag=map.getLayers().getArray().length;
+					var layersFlag;
 					var i=0;
+					var flag_first=true;
+
 					$.each( data, function( key, val ) {
-							var point=createPoint(val,val.latitude*1,val.longitude*1);
+							var point;
+						  if(flag_first){
+								point=createMarker(val,val.latitude*1,val.longitude*1,'start_flag.png',[0.1,128], 0.3);
+								flag_first=false;
+								layersFlag=map.getLayers().getArray().length+1;
+								map.addLayer(point);
+							}
+							point=createPoint(val,val.latitude*1,val.longitude*1);
 							map.addLayer(point);
 							points[i]=layersFlag;
 							i++;
 							layersFlag++;
+							previus=val;
 					});
 					if(points.length>1){
+						if(previus) map.addLayer(createMarker(previus,previus.latitude*1,previus.longitude*1,'end_flag.png',[0.1,128], 0.3));
+
 						slider.removeAttribute('disabled');
 						slider.noUiSlider.updateOptions({ range: {'min': 0, 'max': points.length-1}});
 
@@ -360,12 +372,10 @@
 				return vectorLayer;
 			}
 
-			function createMarker(data,latitude, longitude){
-				//Labels
-				//var data=id;
+			function createMarker(data, latitude, longitude, icon='gpsmarker.png', anchor=[0.5,90], scale=1){
 				var features = [];
 				var iconFeature;
-				//var dataArray=data;
+
 				iconFeature = new ol.Feature({
 						geometry: new ol.geom.Point(ol.proj.transform([longitude, latitude], 'EPSG:4326','EPSG:3857')),
 						dataTracker: data
@@ -374,12 +384,12 @@
 				var iconStyle = [
 					new ol.style.Style({
 							image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
-							anchor: [0.5, 90],
+							anchor: anchor,
 							anchorXUnits: 'fraction',
 							anchorYUnits: 'pixels',
 							opacity: 1,
-							scale: 1,
-							src: '{{ url('index') }}images/gpsmarker.png'
+							scale: scale,
+							src: '{{ url('index') }}images/'+icon
 							}))
 					}),
 					/*new ol.style.Style({

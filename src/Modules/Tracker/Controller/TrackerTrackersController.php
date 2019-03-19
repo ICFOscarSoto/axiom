@@ -71,9 +71,9 @@ class TrackerTrackersController extends Controller
     return $this->render('@Tracker/locations.html.twig', [
       'controllerName' => 'trackersController',
       'interfaceName' => 'Trackers',
-      'optionSelected' => 'trackers',
+      'optionSelected' => 'trackersLocations',
       'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
-      'breadcrumb' =>  'trackers',
+      'breadcrumb' =>  'trackersLocations',
       'userData' => $userdata
       ]);
   }
