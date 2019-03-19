@@ -116,6 +116,8 @@
 		var lastPoint=0;
 		var imageStyle;
 		var imageStyleSelected;
+		var point_slider;
+		var slider;
 		var previousSelPoint=null;
 		var previousSelPointZindex=0;
 
@@ -182,7 +184,7 @@
 				var iconFeatureA = map.getFeaturesAtPixel(e.pixel);
 				showInfo(iconFeatureA);
 			});
-			$("#point_slider").slider({
+			/*$("#point_slider").slider({
 				slide: function (event, ui) {
 					overlay.setPosition(undefined);
 					closer.blur();
@@ -204,9 +206,41 @@
 					showInfo(map.getLayers().getArray()[points[value]].getSource().getFeatures());
 
 				}
+			});*/
+			slider = document.getElementById('point_slider');
+			noUiSlider.create(slider, {
+		    start: 0,
+				step: 1,
+		    range: {
+		        'min': 0,
+		        'max': 1
+		    	}
 			});
+			slider.setAttribute('disabled', true);
+
+				slider.noUiSlider.on('slide', function () {
+					overlay.setPosition(undefined);
+					closer.blur();
+					value=parseInt(slider.noUiSlider.get());
+					if(previousSelPoint){
+						 map.getLayers().getArray()[previousSelPoint].getSource().getFeatures()[0].setStyle(imageStyle);
+						 map.getLayers().getArray()[previousSelPoint].setZIndex(previousSelPointZindex);
+					}
+					previousSelPoint=points[value];
+					previousSelPointZindex=map.getLayers().getArray()[points[value]].getZIndex();
+					map.getLayers().getArray()[points[value]].getSource().getFeatures()[0].setStyle(imageSelectedStyle);
+					map.getLayers().getArray()[points[value]].setZIndex(9999);
+					view.animate({
+						center: ol.proj.fromLonLat([map.getLayers().getArray()[points[value]].getSource().getFeatures()[0].get("dataTracker").longitude*1,map.getLayers().getArray()[points[value]].getSource().getFeatures()[0].get("dataTracker").latitude*1]),
+						duration: 0
+					});
+					showInfo(map.getLayers().getArray()[points[value]].getSource().getFeatures());
+				});
+
 			pointsRefresh();
-      });
+		});
+
+
 
 			function pointsRefresh(){
 				clearLines();
@@ -231,7 +265,15 @@
 							i++;
 							layersFlag++;
 					});
-					$("#point_slider").slider("option", "max", (points.length-1));
+					if(points.length>1){
+						slider.removeAttribute('disabled');
+						slider.noUiSlider.updateOptions({ range: {'min': 0, 'max': points.length-1}});
+
+					}else{
+						slider.noUiSlider.updateOptions({ range: {'min': 0, 'max': 1}});
+						slider.setAttribute('disabled', true);
+					}
+					//$("#point_slider").slider("option", "max", (points.length-1));
 				}).always(function() {
 					flagRefresh=true;
 				});
@@ -432,9 +474,10 @@
 	<link rel="stylesheet" href="{{ url('index') }}js/select2/select2-bootstrap.css">
 	<link rel="stylesheet" href="{{ url('index') }}js/select2/select2.css">
 	<link rel="stylesheet" href="{{ url('index') }}css/custom.css">
-   <link rel="stylesheet" href="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/css/ol.css" type="text/css">
-	 <link rel="stylesheet" href="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker.min.css">
-	 <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/css/ol.css" type="text/css">
+  <link rel="stylesheet" href="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker.min.css">
+	<link rel="stylesheet" href="{{ url('index') }}js/nouislider/nouislider.min.css">
+
 	<!-- Imported scripts on this page -->
 	<script src="{{ url('index') }}js/globale/dates.js"></script>
  	<script src="{{ url('index') }}js/datatables/datatables.js"></script>
@@ -443,6 +486,7 @@
 	<script src="{{ url('index') }}js/moment-es.js"></script>
   <script src="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/build/ol.js"></script>
 	<script src="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker.min.js"></script>
+	<script src="{{ url('index') }}js/nouislider/nouislider.min.js"></script>
 
 
 	 {{ include('@Globale/bottom.html.twig') }}
