@@ -21,7 +21,7 @@ class ERPEntitiesController extends Controller
 	private $class=ERPEntities::class;
 	private $utilsClass=ERPEntitiesUtils::class;
     /**
-     * @Route("/{_locale}/admin/global/entities", name="entities")
+     * @Route("/{_locale}/admin/ERP/entities", name="entities")
      */
     public function index(RouterInterface $router,Request $request)
     {
@@ -52,6 +52,41 @@ class ERPEntitiesController extends Controller
     }
 
 		/**
+		 * @Route("/{_locale}/admin/ERP/entities/form/{id}", name="formEntity", defaults={"id"=0})
+		 */
+		public function formEntity($id,Request $request)
+		{
+			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			$this->denyAccessUnlessGranted('ROLE_ADMIN');
+			$new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-new"];
+			$template=dirname(__FILE__)."/../Forms/Entities.json";
+			dump($this->getUser()->getCompany());
+			$userdata=$this->getUser()->getTemplateData();
+			$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
+			$breadcrumb=$menurepository->formatBreadcrumb('entities');
+			array_push($breadcrumb, $new_breadcrumb);
+			return $this->render('@Globale/generictabform.html.twig', array(
+							'controllerName' => 'EntitiesController',
+							'interfaceName' => 'Empresas',
+							'optionSelected' => 'entities',
+							'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
+							'breadcrumb' => $breadcrumb,
+							'userData' => $userdata,
+							'id' => $id,
+							'tab' => $request->query->get('tab','data'), //Show initial tab, by default data tab
+							'tabs' => [["name" => "data", "caption"=>"Datos empresa", "active"=>true, "route"=>$this->generateUrl("dataEntities",["id"=>$id])],
+												 ["name" => "paymentroll", "caption"=>"Nóminas"],
+												 ["name" => "contracts", "caption"=>"Contratos"]
+												 //["name" => "clocks", "caption"=>"Fichajes", "route"=>$this->generateUrl("workerClocks",["id"=>$id])],
+												 //["name" => "files", "caption"=>"Archivos", "route"=>$this->generateUrl("cloudfiles",["id"=>$id, "path"=>"workers"])]
+												]
+			));
+
+
+		}
+
+
+		/**
 		 * @Route("/{_locale}/entities/data/{id}/{action}", name="dataEntities", defaults={"id"=0, "action"="read"})
 		 */
 		 public function data($id, $action, Request $request){
@@ -59,9 +94,13 @@ class ERPEntitiesController extends Controller
 		 $this->denyAccessUnlessGranted('ROLE_ADMIN');
 		 $template=dirname(__FILE__)."/../Forms/Entities.json";
 		 $utils = new GlobaleFormUtils();
-		 $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),['activity']);
-		 return $utils->make($id, $this->class, $action, "formEntities", "modal");
-		}
+     $utilsObj=new $this->utilsClass();
+     $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser()];
+     $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine());
+     return $utils->make($id, $this->class, $action, "formEntity", "full", "@Globale/form.html.twig", 'formEntity', $this->utilsClass);
+   }
+
+
 
     /**
     * @Route("/api/global/entity/{id}/get", name="getEntity")
@@ -86,7 +125,7 @@ class ERPEntitiesController extends Controller
     $repository = $manager->getRepository($this->class);
     $listUtils=new GlobaleListUtils();
     $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Entities.json"),true);
-    $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, Entities::class,[["type"=>"and", "column"=>"company", "value"=>$user->getCompany()]]);
+    $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $this->class,[["type"=>"and", "column"=>"company", "value"=>$user->getCompany()]]);
     return new JsonResponse($return);
   }
 

@@ -5,6 +5,7 @@ namespace App\Modules\ERP\Entity;
 //use Doctrine\Common\Collections\ArrayCollection;
 //use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use \App\Modules\ERP\Entity\ERPEntities;
 //use \App\Modules\Carrier\Entity\CarrierCarriers;
 //use \App\Modules\ERP\Entity\ERPAddresses;
 //use \App\Modules\ERP\Entity\ERPEntity;
@@ -103,6 +104,12 @@ class ERPCustomers
 
     public $newSeconds=1296000;
     public $updatedSeconds=1296000;
+
+    /**
+     * @ORM\OneToOne(targetEntity="\App\Modules\ERP\Entity\ERPEntities", cascade={"persist", "remove"})
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $entity;
 
     /*public function __construct()
     {
@@ -322,6 +329,18 @@ class ERPCustomers
     public function setInvoiceday(?int $invoiceday): self
     {
         $this->invoiceday = $invoiceday;
+
+        return $this;
+    }
+
+    public function getEntity(): ?ERPEntities
+    {
+        return $this->entity;
+    }
+
+    public function setEntity(ERPEntities $entity): self
+    {
+        $this->entity = $entity;
 
         return $this;
     }
