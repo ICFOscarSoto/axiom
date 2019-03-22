@@ -1,0 +1,146 @@
+<div {% if formConstructor.name is defined %} id="{{formConstructor.name}}-form-body" {% endif %}>
+{{ form_start(formConstructor.form) }}
+  {% set counter = 1 %}
+  {% if formConstructor.type is not defined or formConstructor.type != "modal" %}
+  <div class="row">
+    <div style="text-align: right;" class="col-md-12">
+      <button attr-id="" attr-action="" id="{{formConstructor.name}}-button-cancel" type="button" class="btn btn">{{ ("Cancelar")|trans }}</button>
+      <button attr-id="" attr-action="" id="{{formConstructor.name}}-button-continue" type="button" class="btn btn-green">{{ ("Guardar")|trans }}</button>
+    </div>
+  </div>
+  {% endif %}
+  {% for section in formConstructor.template.0.sections %}
+
+  <div class="panel minimal">
+    <div class="panel-heading">
+      <div class="panel-title">{{ (section.name)|trans }}</div>
+    </div>
+    <div class="panel-body">
+      <div class="row">
+      {% for field in section.fields %}
+        <div class="col-md-{{ field.cols }}">
+            {% if field.type is defined and field.type == 'image' %}
+              {# Field type Image #}
+<!--
+                <div id="fileinput-{{field.name}}" class="fileinput fileinput-new" data-provides="fileinput">
+    							<div class="fileinput-new thumbnail" style="width: {{ field.width }}; height: {{ field.height }};" data-trigger="fileinput">
+    								<img id="fileinput-img-{{field.name}}" src="{{ url(field.value,{'id': formConstructor.id, 'type': field.imageType, 'size': 'medium'}) }}" alt="">
+    							</div>
+    							<div id="image-preview-{{field.name}}" class="fileinput-preview fileinput-exists thumbnail" style="width: {{ field.width }}; height: {{ field.height }}"></div>
+    							<div>
+    								<span class="btn btn-white btn-file">
+    									<span class="">Seleccionar</span>
+    									<input type="file" id="form_{{field.name}}" name="form[{{field.name}}]" accept="image/*" class="form-control-file">
+    								</span>
+                    <a href="#" id="btn-image-cancel-{{field.name}}" class="btn btn-red fileinput-exists" data-dismiss="fileinput">Cancel</a>
+                    <a href="#" id="btn-image-save-{{field.name}}" attr-imageType="{{field.imageType}}" class="btn btn-green fileinput-exists">Guardar</a>
+    							</div>
+    						</div>
+-->
+            <script>
+            function b64toBlob(b64Data, contentType, sliceSize) {
+              contentType = contentType || '';
+              sliceSize = sliceSize || 512;
+              var byteCharacters = atob(b64Data);
+              var byteArrays = [];
+              for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+                  var slice = byteCharacters.slice(offset, offset + sliceSize);
+                  var byteNumbers = new Array(slice.length);
+                  for (var i = 0; i < slice.length; i++) {
+                      byteNumbers[i] = slice.charCodeAt(i);
+                  }
+                  var byteArray = new Uint8Array(byteNumbers);
+                  byteArrays.push(byteArray);
+              }
+            var blob = new Blob(byteArrays, {type: contentType});
+            return blob;
+          }
+
+            $(document).ready(function() {
+              $( '#fileinput-img-{{field.name}}' ).load(function() {
+                $('#fileinput-img-{{field.name}}').fadeIn();
+              });
+
+              $('body').on('click', '[id^="btn-image-save"]', function(){
+                $('#fileinput-img-{{field.name}}').fadeOut();
+                var url = "{{url("uploadImage",{"type":field.imageType, "id": formConstructor.id})}}";
+                var image = $('#image-preview-{{field.name}}').find('img').attr('src');
+                var block = image.split(";");
+                var contentType = block[0].split(":")[1];
+                var realData = block[1].split(",")[1];
+                var blob = b64toBlob(realData, contentType);
+                var formData = new FormData();
+                formData.append('picture', blob);
+
+                if((++load_wait)==1) $("#load-spinner").fadeIn();
+                $.ajax({
+                    url: url,
+                    type: "POST",
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    data: formData,
+                    error:function(err){
+                        $('#fileinput-img-{{field.name}}').fadeIn();
+                        toastr.error("No se pudo subir la imagen", "Confirmación", confirmation);
+                    },
+                    success:function(data){
+                        $('#fileinput-img-{{field.name}}').attr('src','{{ url(field.value,{'id': formConstructor.id, 'type': field.imageType, 'size': 'medium'}) }}?'+Date.now());
+                        $('#fileinput-{{field.name}}').fileinput("clear");
+                        if(data.result) toastr.success("Imagen cambiada correctamente", "Confirmación", confirmation);
+                    },
+                    complete:function(){
+                        if((--load_wait)==0) $("#load-spinner").fadeOut();
+                    }
+                  });
+            });
+          });
+            </script>
+
+            {% elseif field.type is defined and field.type == 'file' %}
+              values 2
+            {% else %}
+              {# Default component of the form #}
+              {{ form_row(formConstructor.form[field.name]) }}
+            {% endif %}
+        </div>
+        {% set counter = counter +1 %}
+      {% endfor %}
+      {% if formConstructor.post is defined %} <input type="hidden" id="post-url" name="post-url" value="{{ formConstructor.post }}"> {% endif %}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+  {% if formConstructor.type is not defined or formConstructor.type != "modal" %}
+  <div class="row">
+    <div style="text-align: right;" class="col-md-12">
+      <button attr-id="" attr-action="" id="{{formConstructor.name}}-button-cancel" type="button" class="btn btn">{{ ("Cancelar")|trans }}</button>
+      <button attr-id="" attr-action="" id="{{formConstructor.name}}-button-continue" type="button" class="btn btn-green">{{ ("Guardar")|trans }}</button>
+    </div>
+  </div>
+  {% endif %}
+{{ form_end(formConstructor.form) }}
+</div>
+<script>
+	$(document).ready(function() {
+    $('body').on('click', "#{{formConstructor.name}}-button-continue", function() {
+          if($("#{{formConstructor.name}}-form-body").find('form').valid()){
+            if((++load_wait)==1) $("#load-spinner").fadeIn();
+            $.post($("#{{formConstructor.name}}-form-body").find('form').find('#post-url').val(), $("#{{formConstructor.name}}-form-body").find('form').serialize(),
+                function(data, status, xhr){
+                  if((--load_wait)==0) $("#load-spinner").fadeOut();
+                  if(data.result){
+                    //$("#tabs-list li").attr("attr-id",data.id);
+                    toastr.success("Datos guardados correctamente", "Confirmación", confirmation);
+                    if(data.reload) location.href=data.href;
+                    $("#{{formConstructor.name}}-form-body").find('form').validate().resetForm();
+                  }
+                    else toastr.error("Ocurrió un error al guardar los datos", "Confirmación", confirmation);
+              }, "json");
+            }
+    });
+    $('body').on('click', "#{{formConstructor.name}}-button-cancel", function() {
+      window.history.back();
+    });
+  });
+</script>

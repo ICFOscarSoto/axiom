@@ -1,0 +1,10 @@
+[{
+	"sections": [
+		{
+			"name": "Product Variant data",
+			"fields": [
+				{	"name": "ean13", "cols": 4},
+				{	"name": "active", "cols": 2}
+			]
+		}]
+}]

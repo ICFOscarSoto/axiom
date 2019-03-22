@@ -1,0 +1,25 @@
+[{
+	"sections": [
+		{
+			"name": "Product data",
+			"fields": [
+				{ "name": "code","cols": 8},
+				{ "name": "name","cols": 8},
+				{ "name": "description","cols": 8},
+				{	"name": "onsale", "cols": 4},
+				{	"name": "onbuy", "cols": 4},
+				{	"name": "weight", "cols": 4},
+				{	"name": "traceability", "cols": 4},
+				{	"name": "grouped", "cols": 4},
+				{	"name": "expiration", "cols": 4},
+				{	"name": "discontinued", "cols": 4},
+				{	"name": "margincontrol", "cols": 4},
+				{	"name": "stockcontrol", "cols": 4},
+				{	"name": "saleindecimals", "cols": 4},
+				{	"name": "exclusiveonline", "cols": 4},
+				{	"name": "bigsize", "cols": 4},
+				{	"name": "minimumquantityofsale", "cols": 4},
+				{	"name": "active", "cols": 2}
+			]
+		}]
+}]

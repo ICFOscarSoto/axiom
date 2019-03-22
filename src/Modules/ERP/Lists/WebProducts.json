@@ -1,0 +1,9 @@
+[ {"name": "id", "caption":""},
+  {"name": "product", "caption":"Producto", "width" : "50"},
+  {"name": "metatitle", "caption":"Metatítulo", "width" : "50"},
+  {"name": "metadescription", "caption":"Metadescripción", "width" : "50"},
+  {"name": "additionalcost", "caption":"Costes extra", "width" : "50"},
+  {"name": "minquantityofsaleweb", "caption":"Cantidad mínima de venta web", "width" : "50"},
+  {"name": "checkweb","caption":"Revisar web"},
+  {"name": "active", "caption":"Estado", "width":"10%" ,"class" : "dt-center", "replace":{"1":"<div style=\"min-width: 75px;\" class=\"label label-success\">Activo</div>", "0" : "<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado</div>"}}
+]

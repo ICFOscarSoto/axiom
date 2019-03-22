@@ -1,0 +1,15 @@
+[{
+	"sections": [
+		{
+			"name": "Web Product data",
+			"fields": [
+				{ "name": "product","cols": 8},
+				{ "name": "metatitle","cols": 8},
+				{ "name": "metadescription","cols": 8},
+				{ "name": "additionalcost","cols": 8},
+				{ "name": "minquantityofsaleweb","cols": 8},
+				{	"name": "checkweb", "cols": 4},
+				{	"name": "active", "cols": 2}
+			]
+		}]
+}]
