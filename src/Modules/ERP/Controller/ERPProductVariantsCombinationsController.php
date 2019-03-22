@@ -10,18 +10,18 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
-use App\Modules\ERP\Entity\ERPWebProducts;
+use App\Modules\ERP\Entity\ERPProductVariantsCombinations;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
-use App\Modules\ERP\Utils\ERPWebProductsUtils;
+use App\Modules\ERP\Utils\ERPProductVariantsCombinationsUtils;
 
-class ERPWebProductsController extends Controller
+class ERPProductVariantsCombinationsController extends Controller
 {
-	private $class=ERPWebProducts::class;
-	private $utilsClass=ERPWebProductsUtils::class;
+	private $class=ERPProductVariantsCombinations::class;
+	private $utilsClass=ERPProductVariantsCombinationsUtils::class;
     /**
-     * @Route("/{_locale}/admin/global/webproducts", name="webproducts")
+     * @Route("/{_locale}/admin/global/productvariantscombinations", name="productvariantscombinations")
      */
     public function index(RouterInterface $router,Request $request)
     {
@@ -34,12 +34,12 @@ class ERPWebProductsController extends Controller
     	$utils = new $this->utilsClass();
   		$templateLists[]=$utils->formatList($this->getUser());
 			$formUtils=new GlobaleFormUtils();
-			$formUtils->initialize($this->getUser(), new $this->class(), dirname(__FILE__)."/../Forms/WebProducts.json", $request, $this, $this->getDoctrine());
-			$templateForms[]=$formUtils->formatForm('webproducts', true, null, $this->class);
+			$formUtils->initialize($this->getUser(), new $this->class(), dirname(__FILE__)."/../Forms/ProductVariantsCombinations.json", $request, $this, $this->getDoctrine());
+			$templateForms[]=$formUtils->formatForm('productvariantscombinations', true, null, $this->class);
   		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
   			return $this->render('@Globale/genericlist.html.twig', [
-  				'controllerName' => 'webproductsController',
-  				'interfaceName' => 'Productos web',
+  				'controllerName' => 'productvariantscombinationsController',
+  				'interfaceName' => 'Combinaciones de variantes en el producto',
   				'optionSelected' => $request->attributes->get('_route'),
   				'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
   				'breadcrumb' =>  $menurepository->formatBreadcrumb($request->get('_route')),
@@ -52,31 +52,30 @@ class ERPWebProductsController extends Controller
     }
 
 		/**
-		 * @Route("/{_locale}/webproducts/data/{id}/{action}", name="dataWebProducts", defaults={"id"=0, "action"="read"})
+		 * @Route("/{_locale}/productpariantspombinations/data/{id}/{action}", name="dataProductVariantsCombinations", defaults={"id"=0, "action"="read"})
 		 */
 		 public function data($id, $action, Request $request){
 		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		 $this->denyAccessUnlessGranted('ROLE_ADMIN');
-		 $template=dirname(__FILE__)."/../Forms/WebProducts.json";
+		 $template=dirname(__FILE__)."/../Forms/ProductVariantsCombinations.json";
 		 $utils = new GlobaleFormUtils();
 		 $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine());
-		 return $utils->make($id, $this->class, $action, "formWebProducts", "full", "@Globale/form.html.twig", 'formEntity', $this->utilsClass);
-   
+		 return $utils->make($id, $this->class, $action, "formProductVariantsCombinations", "modal");
 		}
 
     /**
-    * @Route("/api/global/webproduct/{id}/get", name="getWebProduct")
+    * @Route("/api/global/productvariantscombination/{id}/get", name="getProductVariantsCombination")
     */
-    public function getWebProduct($id){
-      $webproduct = $this->getDoctrine()->getRepository($this->class)->findOneById($id);
-      if (!$webproduct) {
+    public function getProductVariantsCombination($id){
+      $productvariantscombination = $this->getDoctrine()->getRepository($this->class)->findOneById($id);
+      if (!$productvariantscombination) {
             throw $this->createNotFoundException('No currency found for id '.$id );
           }
-          return new JsonResponse($webproduct->encodeJson());
+          return new JsonResponse($productvariantscombination->encodeJson());
     }
 
   /**
-   * @Route("/api/webproduct/list", name="webproductlist")
+   * @Route("/api/$productvariantscombination/list", name="$productvariantscombinationlist")
    */
   public function indexlist(RouterInterface $router,Request $request){
     $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
@@ -86,15 +85,15 @@ class ERPWebProductsController extends Controller
     $manager = $this->getDoctrine()->getManager();
     $repository = $manager->getRepository($this->class);
     $listUtils=new GlobaleListUtils();
-    $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/WebProducts.json"),true);
-    $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, BankAccounts::class,[["type"=>"and", "column"=>"company", "value"=>$user->getCompany()]]);
+    $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/ProductVariantsCombinations.json"),true);
+    $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, ProductVariantsCombinations::class,[["type"=>"and", "column"=>"company", "value"=>$user->getCompany()]]);
     return new JsonResponse($return);
   }
 
 
 
 	/**
-	* @Route("/{_locale}/admin/global/webproduct/{id}/disable", name="disableWebProduct")
+	* @Route("/{_locale}/admin/global/$productvariantscombination/{id}/disable", name="disableProductVariantsCombination")
 	*/
  public function disable($id)
 	 {
@@ -104,7 +103,7 @@ class ERPWebProductsController extends Controller
 	 return new JsonResponse(array('result' => $result));
  }
  /**
- * @Route("/{_locale}/admin/global/webproduct/{id}/enable", name="enableWebProduct")
+ * @Route("/{_locale}/admin/global/productvariantscombination/{id}/enable", name="enableProductVariantsCombination")
  */
  public function enable($id)
 	 {
@@ -114,7 +113,7 @@ class ERPWebProductsController extends Controller
 	 return new JsonResponse(array('result' => $result));
  }
  /**
- * @Route("/{_locale}/admin/global/webproduct/{id}/delete", name="deleteWebProduct")
+ * @Route("/{_locale}/admin/global/productvariantscombination/{id}/delete", name="deleteProductVariantsCombination")
  */
  public function delete($id){
 	 $this->denyAccessUnlessGranted('ROLE_GLOBAL');

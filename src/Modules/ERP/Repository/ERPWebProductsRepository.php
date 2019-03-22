@@ -47,4 +47,14 @@ class ERPWebProductsRepository extends ServiceEntityRepository
         ;
     }
     */
+
+    public function findOneByProductId($value): ?ERPWebProducts
+    {
+        return $this->createQueryBuilder('e')
+            ->andWhere('e.product_id = :val')
+            ->setParameter('val', $value)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
 }

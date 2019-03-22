@@ -11,6 +11,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\ERP\Entity\ERPProducts;
+use App\Modules\ERP\Entity\ERPWebProducts;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
@@ -75,6 +76,12 @@ class ERPProductsController extends Controller
 			$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
 			$breadcrumb=$menurepository->formatBreadcrumb('products');
 			array_push($breadcrumb, $new_breadcrumb);
+			$webproduct = new ERPWebProducts();
+			$wp=$webproduct->getDoctrine()->getRepository($webproduct->class)->findOneByProductId($id);
+			/*
+			$customer=new ERPCustomers();
+			$customer=$this->getDoctrine()->getRepository($this->class)->findOneById($id);			
+			 */
 			return $this->render('@Globale/generictabform.html.twig', array(
 							'controllerName' => 'ProductsController',
 							'interfaceName' => 'Productos',
@@ -86,7 +93,7 @@ class ERPProductsController extends Controller
 							'tab' => $request->query->get('tab','data'), //Show initial tab, by default data tab
 							'tabs' => [
 								["name" => "data", "caption"=>"Datos producto", "active"=>true, "route"=>$this->generateUrl("dataProduct",["id"=>$id])],
-								 ["name" => "productvariants", "caption"=>"Variantes", "route"=>$this->generateUrl("indexProductVariants",["id"=>$id])]
+								["name" => "webproduct", "caption"=>"Web", "active"=>true, "route"=>$this->generateUrl("dataWebProducts",["id"=>$wp->getEntity()->getId()])]
 								]
 			));
 		}
