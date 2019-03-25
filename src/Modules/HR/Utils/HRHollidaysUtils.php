@@ -10,10 +10,8 @@ use App\Modules\Email\Entity\EmailAccounts;
 use App\Modules\Globale\Utils\FormUtils;
 use App\Modules\Globale\Utils\ListUtils;
 
+
 class HRHollidaysUtils extends Controller
 {
-
-
-
-
+  
 }

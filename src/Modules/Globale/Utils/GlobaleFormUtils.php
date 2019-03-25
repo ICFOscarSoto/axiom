@@ -26,7 +26,10 @@ class GlobaleFormUtils extends Controller
   private $excludedAttributes;
   private $includedAttributes;
   private $template;
+  private $templateArray;
+  private $transforms=array();
   private $form;
+  private $values=array();
 
   //OLD INIT, ONLY FOR COMPATIBILITY
   public function init($doctrine, $request){
@@ -46,6 +49,7 @@ class GlobaleFormUtils extends Controller
     //$this->excludedAttributes=$excludedAttributes;
     $this->includedAttributes=$includedAttributes;
     $this->template=$template;
+    $this->templateArray=json_decode(file_get_contents ($this->template),true);
     $this->entityManager=$this->doctrine->getManager();
     $this->encoder=$encoder;
   }
@@ -90,8 +94,34 @@ class GlobaleFormUtils extends Controller
                 ));
           break;
 
-          default:
-            $form->add($value['fieldName']);
+          default://Default types ints, varchars, etc.
+            //First of all check if exist a transform
+          if($field=$this->searchTemplateField($value['fieldName'])){
+            if(isset($field["transform"])){
+              switch ($field["transform"]['type']){
+                case 'option':
+                  $form->add($value['fieldName'], ChoiceType::class, [
+                      'choices'  => $field["transform"]['options'],
+                  ]);
+                break;
+                case 'button':
+                  $form->add($field['name'], ButtonType::class, [
+                      'attr' => ['class' => $field["transform"]['class']],
+                  ]);
+                break;
+              }
+            }else $form->add($value['fieldName']);
+          }else $form->add($value['fieldName']);
+            /*if(isset($template['fields']['trans'])){
+              switch ($this->transforms['fieldName']['type']){
+                case 'option':
+                  $form->add($value['fieldName'], ChoiceType::class, [
+                      'choices'  => $this->transforms['choices'],
+                  ]);
+                break;
+              }
+            }else $form->add($value['fieldName']);*/
+
           break;
         }
       }
@@ -110,6 +140,21 @@ class GlobaleFormUtils extends Controller
 
     $this->form=$form;
     return $form;
+  }
+
+  public function searchTemplateField($field){
+    foreach ($this->templateArray[0]['sections'] as $keySection => $valueSection) {
+      foreach ($valueSection['fields'] as $keyField => $valueField) {
+        if($valueField['name']==$field){
+          return $valueField;
+        }
+      }
+    }
+    return false;
+  }
+
+  public function values($values=array()){
+    $this->values=$values;
   }
 
   public function make($id, $class, $action, $name, $type="full", $render="@Globale/form.html.twig", $returnRoute=null, $utilsClass=null){
@@ -150,6 +195,12 @@ class GlobaleFormUtils extends Controller
     if(!$form->isSubmitted()) return false;
     if ($form->isSubmitted() && $form->isValid()) {
        $obj = $form->getData();
+
+       //definimos los valores predefinidos
+       foreach($this->values as $key => $val){
+         if(method_exists($obj,'set'.lcfirst($key))) $obj->{'set'.lcfirst($key)}($val);
+       }
+
        if($obj->getId() == null){
          $obj->setDateadd(new \DateTime());
          $obj->setDeleted(false);

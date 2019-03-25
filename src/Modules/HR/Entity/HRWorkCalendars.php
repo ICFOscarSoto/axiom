@@ -64,6 +64,29 @@ class HRWorkCalendars
     public $newSeconds=1296000;
     public $updatedSeconds=1296000;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Modules\HR\Entity\HRHollidays", mappedBy="calendar")
+     */
+    private $holidays;
+
+    public function __construct()
+    {
+        $this->holidays = new ArrayCollection();
+    }
+
+    public function isLeapYear(){
+      $leap = date('L', mktime(0, 0, 0, 1, 1, $this->year));
+      return !$leap;
+    }
+
+    public function getYearDays(){
+      return ($this->isLeapYear())?365:364;
+    }
+
+    public function getWorkDays(){
+      return $this->getYearDays()-count($this->holidays);
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -161,6 +184,37 @@ class HRWorkCalendars
     public function setDeleted(bool $deleted): self
     {
         $this->deleted = $deleted;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|HRHollidays[]
+     */
+    public function getHolidays(): Collection
+    {
+        return $this->holidays;
+    }
+
+    public function addHoliday(HRHollidays $holiday): self
+    {
+        if (!$this->holidays->contains($holiday)) {
+            $this->holidays[] = $holiday;
+            $holiday->setCalendar($this);
+        }
+
+        return $this;
+    }
+
+    public function removeHoliday(HRHollidays $holiday): self
+    {
+        if ($this->holidays->contains($holiday)) {
+            $this->holidays->removeElement($holiday);
+            // set the owning side to null (unless already changed)
+            if ($holiday->getCalendar() === $this) {
+                $holiday->setCalendar(null);
+            }
+        }
 
         return $this;
     }

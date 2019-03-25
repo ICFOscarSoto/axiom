@@ -20,14 +20,15 @@
 		<h2>{{ interfaceName }}</h2>
 		</br>
 		<!-- MAIN CONTENT -->
-
-    <div class="calendar-env">
-    			<!-- Calendar Body -->
-    			<div class="">
-    				<div id="calendar"></div>
-    			</div>
-  	</div>
-
+		<div class="principal-content">
+			{{ include('@Globale/topbuttons.html.twig') }}
+			<div class="calendar-env">
+	    			<!-- Calendar Body -->
+	    			<div class="">
+	    				<div id="calendar"></div>
+	    			</div>
+	  	</div>
+		</div>
 		<!-- END MAIN CONTENT -->
 		{{ include('@Globale/footer.html.twig') }}
 	</div>
@@ -65,7 +66,12 @@
 
 
   <script>
+
   var fullCalendar = fullCalendar || {};
+
+	function elements_reload(){
+		$('#calendar').fullCalendar('refetchEvents');
+	}
 
   ;(function($, window, undefined)
   {
@@ -123,9 +129,9 @@
 							var dataUrl='{{url('dataHollidays',{'id':'_____'})}}';
 							var url=dataUrl.replace('_____',calEvent.id);
 							$.post(url, null,	function(data, status, xhr){
-										$("#hollidays-modal-form-body").html(data);
-										$('#hollidays-modal-form input').iCheck({checkboxClass: 'icheckbox_flat-blue',radioClass: 'iradio_flat-blue'});
-										$("#hollidays-modal-form-form").modal();
+										$("#holidays-modal-form-body").html(data);
+										$('#holidays-modal-form input').iCheck({checkboxClass: 'icheckbox_flat-blue',radioClass: 'iradio_flat-blue'});
+										$("#holidays-modal-form").modal();
 							});
 					  },
 						loading: function( isLoading, view ) {
@@ -139,7 +145,7 @@
 
         }
         else{
-          alert("Please include full-calendar script!");
+
         }
 
         $("body").on('submit', '#add_event_form', function(ev){

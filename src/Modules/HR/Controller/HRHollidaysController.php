@@ -23,12 +23,14 @@ use App\Modules\HR\Utils\HRWorkCalendarsUtils;
 use App\Modules\Cloud\Utils\CloudFilesUtils;
 use App\Modules\HR\Entity\HRWorkCalendars;
 use App\Modules\HR\Entity\HRHollidays;
+use App\Modules\HR\Utils\HRHollidaysUtils;
 
 
 class HRHollidaysController extends Controller
 {
 
 private $class=HRHollidays::class;
+private $utilsClass=HRHollidaysUtils::class;
 
 /**
  * @Route("/{_locale}/HR/{id}/holidays", name="holidays")
@@ -44,10 +46,12 @@ $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
 $workCalendarRepository=$this->getDoctrine()->getRepository(HRWorkCalendars::class);
 $hollidaysRepository=$this->getDoctrine()->getRepository(HRHollidays::class);
 $workCalendar=$workCalendarRepository->find($id);
-
+dump($workCalendar->getWorkDays());
+$utils = new $this->utilsClass();
 $formUtils=new GlobaleFormUtils();
 $formUtils->initialize($this->getUser(), new HRHollidays(), dirname(__FILE__)."/../Forms/Hollidays.json", $request, $this, $this->getDoctrine());
-$templateForm=$formUtils->formatForm('hollidays', true, 0, HRHollidays::class,'dataHollidays');
+$templateForm=$formUtils->formatForm('holidays', true, $id, $this->class);
+$this->get('session')->set('calendarId', $id);
 if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
   return $this->render('@HR/listhollidays.html.twig', [
     'controllerName' => 'HRController',
@@ -57,6 +61,7 @@ if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
     'breadcrumb' => 'workcalendars',
     'userData' => $userdata,
     'id' => $id,
+    'listConstructor' => ['topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/HolidaysTopButtons.json"),true)],
     'form' => $templateForm
     ]);
 }
@@ -65,14 +70,17 @@ return new RedirectResponse($this->router->generate('app_login'));
 
 
 /**
- * @Route("/{_locale}/HR/hollidays/aaaaa/data/{id}/{action}", name="dataHollidays", defaults={"id"=0, "action"="read"})
+ * @Route("/{_locale}/HR/holidays/data/{id}/{action}", name="dataHollidays", defaults={"id"=0, "action"="read"})
  */
  public function dataHollidays($id, $action, Request $request){
  $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
  $this->denyAccessUnlessGranted('ROLE_ADMIN');
  $template=dirname(__FILE__)."/../Forms/Hollidays.json";
+ $workCalendarRepository=$this->getDoctrine()->getRepository(HRWorkCalendars::class);
+ $workCalendar=$workCalendarRepository->find($this->get('session')->get('calendarId'));
  $utils = new GlobaleFormUtils();
- $utils->initialize($this->getUser(), new HRHollidays(), $template, $request, $this, $this->getDoctrine());
+ $utils->initialize($this->getUser(), new HRHollidays(), $template, $request, $this, $this->getDoctrine(),["calendar"]);
+ $utils->values(["calendar"=>$workCalendar]);
  return $utils->make($id, HRHollidays::class, $action, "formHollidays", "modal");
 }
 

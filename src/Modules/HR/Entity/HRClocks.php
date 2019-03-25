@@ -56,6 +56,11 @@ class HRClocks
     public $newSeconds=3600;
   	public $updatedSeconds=3600;
 
+   /**
+    * @ORM\Column(type="boolean", nullable=true)
+    */
+   private $invalid;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -141,6 +146,18 @@ class HRClocks
     public function setDeleted(bool $deleted): self
     {
         $this->deleted = $deleted;
+
+        return $this;
+    }
+
+    public function getInvalid(): ?bool
+    {
+        return $this->invalid;
+    }
+
+    public function setInvalid(?bool $invalid): self
+    {
+        $this->invalid = $invalid;
 
         return $this;
     }

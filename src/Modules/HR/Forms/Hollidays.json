@@ -4,9 +4,14 @@
 			"name": "Holliday data",
 			"fields": [
 				{ "name": "name", "cols": 12},
-				{	"name": "type", "cols": 6},
+				{	"name": "type", "cols": 6,
+					"transform": {
+							"type":"option",
+							"options": {"Nacional": "1", "Regional": "2", "Local": "3"}
+					}
+				},
 				{	"name": "date", "cols": 6},
-				{	"name": "active", "cols": 3},
+				{	"name": "active", "cols": 3}
 			]
 		}
   ]
