@@ -1,0 +1,11 @@
+[{
+	"sections": [
+		{
+			"name": "Product Variants Combinations data",
+			"fields": [
+				{ "name": "productvariant","cols": 8},
+				{	"name": "variant", "cols": 4},
+				{	"name": "active", "cols": 2}
+			]
+		}]
+}]

@@ -1,0 +1,8 @@
+[
+  {"id": "edit", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"formProduct", "confirm" :false, "actionType" : "foreground" },
+  {"id": "activation", "type": "option", "options": [
+      {"id": "desactivate", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"disableProduct", "confirm" :true, "actionType" : "background" },
+      {"id": "activate", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "route":"enableProduct", "confirm" :true, "actionType" : "background" }
+  ]},
+  {"id": "delete", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"deleteProduct", "confirm" :true, "undo" :false, "tooltip":"Borrar producto", "actionType" : "background"}
+]

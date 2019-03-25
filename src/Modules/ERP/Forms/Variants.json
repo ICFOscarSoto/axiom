@@ -1,0 +1,11 @@
+[{
+	"sections": [
+		{
+			"name": "Variant data",
+			"fields": [
+				{ "name": "name","cols": 8},
+				{	"name": "variantsgroup", "cols": 4},
+				{	"name": "active", "cols": 2}
+			]
+		}]
+}]

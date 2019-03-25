@@ -25,7 +25,7 @@ class ERPCustomersController extends Controller
     public function index(RouterInterface $router,Request $request)
     {
       $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-  		//$this->denyAccessUnlessGranted('ROLE_ADMIN');
+  		$this->denyAccessUnlessGranted('ROLE_ADMIN');
   		$userdata=$this->getUser()->getTemplateData();
   		$locale = $request->getLocale();
   		$this->router = $router;
@@ -50,6 +50,42 @@ class ERPCustomersController extends Controller
   		return new RedirectResponse($this->router->generate('app_login'));
     }
 
+
+		/**
+		 * @Route("/{_locale}/admin/ERP/customers/form/{id}", name="formCustomer", defaults={"id"=0})
+		 */
+		public function formCustomer($id,Request $request)
+		{
+			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			$this->denyAccessUnlessGranted('ROLE_ADMIN');
+			$new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-new"];
+			$template=dirname(__FILE__)."/../Forms/Customers.json";
+			dump($this->getUser()->getCompany());
+			$userdata=$this->getUser()->getTemplateData();
+			$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
+			$breadcrumb=$menurepository->formatBreadcrumb('customers');
+			array_push($breadcrumb, $new_breadcrumb);
+			$customer=new ERPCustomers();
+			$customer=$this->getDoctrine()->getRepository($this->class)->findOneById($id);
+			return $this->render('@Globale/generictabform.html.twig', array(
+							'controllerName' => 'CustomersController',
+							'interfaceName' => 'Clientes',
+							'optionSelected' => 'customers',
+							'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
+							'breadcrumb' => $breadcrumb,
+							'userData' => $userdata,
+							'id' => $id,
+							'tab' => $request->query->get('tab','data'), //Show initial tab, by default data tab
+							'tabs' => [["name" => "data", "caption"=>"Datos empresa", "active"=>true, "route"=>$this->generateUrl("dataCustomers",["id"=>$id])],
+												 ["name" => "moredata", "caption"=>"Mas datos", "active"=>true, "route"=>$this->generateUrl("dataEntities",["id"=>$customer->getEntity()->getId()])],
+												 ["name" => "contracts", "caption"=>"Contratos"]
+												 //["name" => "clocks", "caption"=>"Fichajes", "route"=>$this->generateUrl("workerClocks",["id"=>$id])],
+												 //["name" => "files", "caption"=>"Archivos", "route"=>$this->generateUrl("cloudfiles",["id"=>$id, "path"=>"workers"])]
+												]
+			));
+
+
+		}
 		/**
 		 * @Route("/{_locale}/customers/data/{id}/{action}", name="dataCustomers", defaults={"id"=0, "action"="read"})
 		 */
