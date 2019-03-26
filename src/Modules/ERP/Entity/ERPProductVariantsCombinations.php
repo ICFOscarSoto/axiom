@@ -4,7 +4,7 @@ namespace App\Modules\ERP\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\ERP\Entity\ERPProductVariants;
-use \APP\Modules\ERP\Entity\ERPVariants;
+use \App\Modules\ERP\Entity\ERPVariants;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
 
 /**
@@ -26,16 +26,10 @@ class ERPProductVariantsCombinations
     private $productvariant;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\APP\Modules\ERP\Entity\ERPVariants")
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPVariants")
      * @ORM\JoinColumn(nullable=false)
      */
     private $variant;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCompanies")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $company;
 
     /**
      * @ORM\Column(type="datetime")
@@ -56,6 +50,12 @@ class ERPProductVariantsCombinations
      * @ORM\Column(type="boolean")
      */
     private $deleted;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCompanies")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $company;
 
     public $newSeconds=1296000;
     public $updatedSeconds=1296000;
@@ -85,18 +85,6 @@ class ERPProductVariantsCombinations
     public function setVariant(?ERPVariants $variant): self
     {
         $this->variant = $variant;
-
-        return $this;
-    }
-
-    public function getCompany(): ?GlobaleCompanies
-    {
-        return $this->company;
-    }
-
-    public function setCompany(?GlobaleCompanies $company): self
-    {
-        $this->company = $company;
 
         return $this;
     }
@@ -145,6 +133,18 @@ class ERPProductVariantsCombinations
     public function setDeleted(bool $deleted): self
     {
         $this->deleted = $deleted;
+
+        return $this;
+    }
+
+    public function getCompany(): ?GlobaleCompanies
+    {
+        return $this->company;
+    }
+
+    public function setCompany(?GlobaleCompanies $company): self
+    {
+        $this->company = $company;
 
         return $this;
     }

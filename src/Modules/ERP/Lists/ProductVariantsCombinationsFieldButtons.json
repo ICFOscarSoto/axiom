@@ -4,5 +4,5 @@
       {"id": "desactivate", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"disableProductVariantsCombination", "confirm" :true, "actionType" : "background" },
       {"id": "activate", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "route":"enableProductVariantsCombination", "confirm" :true, "actionType" : "background" }
   ]},
-  {"id": "delete", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"deleteProductVariantsCombinations", "confirm" :true, "undo" :false, "tooltip":"Borrar combinacion variante producto", "actionType" : "background"}
+  {"id": "delete", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"deleteProductVariantsCombination", "confirm" :true, "undo" :false, "tooltip":"Borrar combinacion", "actionType" : "background"}
 ]

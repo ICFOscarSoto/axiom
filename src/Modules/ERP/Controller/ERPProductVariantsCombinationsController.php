@@ -20,12 +20,13 @@ class ERPProductVariantsCombinationsController extends Controller
 {
 	private $class=ERPProductVariantsCombinations::class;
 	private $utilsClass=ERPProductVariantsCombinationsUtils::class;
+
     /**
      * @Route("/{_locale}/admin/global/productvariantscombinations", name="productvariantscombinations")
      */
     public function index(RouterInterface $router,Request $request)
     {
-      $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+       $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
   		//$this->denyAccessUnlessGranted('ROLE_ADMIN');
   		$userdata=$this->getUser()->getTemplateData();
   		$locale = $request->getLocale();
@@ -39,7 +40,7 @@ class ERPProductVariantsCombinationsController extends Controller
   		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
   			return $this->render('@Globale/genericlist.html.twig', [
   				'controllerName' => 'productvariantscombinationsController',
-  				'interfaceName' => 'Combinaciones de variantes en el producto',
+  				'interfaceName' => 'ProductVariantsCombinations',
   				'optionSelected' => $request->attributes->get('_route'),
   				'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
   				'breadcrumb' =>  $menurepository->formatBreadcrumb($request->get('_route')),
@@ -52,7 +53,7 @@ class ERPProductVariantsCombinationsController extends Controller
     }
 
 		/**
-		 * @Route("/{_locale}/productpariantspombinations/data/{id}/{action}", name="dataProductVariantsCombinations", defaults={"id"=0, "action"="read"})
+		 * @Route("/{_locale}/productvariantscombinations/data/{id}/{action}", name="dataProductVariantsCombinations", defaults={"id"=0, "action"="read"})
 		 */
 		 public function data($id, $action, Request $request){
 		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
@@ -67,7 +68,7 @@ class ERPProductVariantsCombinationsController extends Controller
     * @Route("/api/global/productvariantscombination/{id}/get", name="getProductVariantsCombination")
     */
     public function getProductVariantsCombination($id){
-      $productvariantscombination = $this->getDoctrine()->getRepository($this->class)->findOneById($id);
+     $productvariantscombination = $this->getDoctrine()->getRepository($this->class)->findOneById($id);
       if (!$productvariantscombination) {
             throw $this->createNotFoundException('No currency found for id '.$id );
           }
@@ -75,7 +76,7 @@ class ERPProductVariantsCombinationsController extends Controller
     }
 
   /**
-   * @Route("/api/$productvariantscombination/list", name="$productvariantscombinationlist")
+   * @Route("/api/productvariantscombination/list", name="productvariantscombinationlist")
    */
   public function indexlist(RouterInterface $router,Request $request){
     $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
@@ -83,17 +84,15 @@ class ERPProductVariantsCombinationsController extends Controller
     $locale = $request->getLocale();
     $this->router = $router;
     $manager = $this->getDoctrine()->getManager();
-    $repository = $manager->getRepository($this->class);
+    $repository = $manager->getRepository(ERPProductVariantsCombinations::class);
     $listUtils=new GlobaleListUtils();
     $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/ProductVariantsCombinations.json"),true);
-    $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, ProductVariantsCombinations::class,[["type"=>"and", "column"=>"company", "value"=>$user->getCompany()]]);
+    $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, ERPProductVariantsCombinations::class,[["type"=>"and", "column"=>"company", "value"=>$user->getCompany()]]);
     return new JsonResponse($return);
   }
 
-
-
 	/**
-	* @Route("/{_locale}/admin/global/$productvariantscombination/{id}/disable", name="disableProductVariantsCombination")
+	* @Route("/{_locale}/admin/global/productvariantscombination/{id}/disable", name="disableProductVariantsCombination")
 	*/
  public function disable($id)
 	 {

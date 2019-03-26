@@ -58,6 +58,11 @@ class ERPProductVariants
     public $newSeconds=1296000;
     public $updatedSeconds=1296000;
 
+    /**
+     * @ORM\Column(type="string", length=120, nullable=true)
+     */
+    private $name;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -143,6 +148,18 @@ class ERPProductVariants
     public function setCompany(?GlobaleCompanies $company): self
     {
         $this->company = $company;
+
+        return $this;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(?string $name): self
+    {
+        $this->name = $name;
 
         return $this;
     }

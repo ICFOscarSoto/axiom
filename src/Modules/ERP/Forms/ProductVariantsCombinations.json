@@ -1,10 +1,10 @@
 [{
 	"sections": [
 		{
-			"name": "Product Variants Combinations data",
+			"name": "Combinations data",
 			"fields": [
-				{ "name": "productvariant","cols": 8},
-				{	"name": "variant", "cols": 4},
+				{ "name": "productvariant__ean13","cols": 4},
+				{ "name": "variant__name","cols": 4},
 				{	"name": "active", "cols": 2}
 			]
 		}]

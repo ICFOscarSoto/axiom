@@ -5,14 +5,14 @@ use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
-use App\Modules\Globale\Entity\GlobaleMenuOptions;
-use App\Modules\Email\Entity\EmailAccounts;
+use App\Modules\Globale\Entity\MenuOptions;
 
 class ERPProductVariantsCombinationsUtils
 {
+
   public function formatList($user){
     $list=[
-      'id' => 'lisProductVariantsCombinations',
+      'id' => 'listProductVariantsCombinations',
       'route' => 'productvariantscombinationlist',
       'routeParams' => ["id" => $user->getId()],
       'orderColumn' => 2,
