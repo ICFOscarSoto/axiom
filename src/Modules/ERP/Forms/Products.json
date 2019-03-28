@@ -6,7 +6,6 @@
 				{ "name": "code","cols": 8},
 				{ "name": "name","cols": 8},
 				{ "name": "description","cols": 8},
-				{	"name": "web", "cols": 4},
 				{	"name": "onsale", "cols": 4},
 				{	"name": "onbuy", "cols": 4},
 				{	"name": "weight", "cols": 4},

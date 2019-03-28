@@ -111,7 +111,7 @@ class ERPProductsController extends Controller
 								'tab' => $request->query->get('tab','data'), //Show initial tab, by default data tab
 								'tabs' => [
 									["name" => "data", "caption"=>"Datos producto", "active"=>true, "route"=>$this->generateUrl("dataProduct",["id"=>$id])],
-										["name" => "web", "caption"=>"Datos producto web", "active"=>true, "route"=>$this->generateUrl("dataNewWebProducts")]
+										["name" => "web", "caption"=>"Web", "active"=>true, "route"=>$this->generateUrl("dataNewWebProducts")]
 									]
 				));
 			}
