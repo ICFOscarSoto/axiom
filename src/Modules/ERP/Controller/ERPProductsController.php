@@ -82,7 +82,7 @@ class ERPProductsController extends Controller
 			$product=$p_repository->findOneById($id);
 			$webproduct = $wp_repository->findOneByProductId($id);
 
-			if ($product->getWeb() and isset($webproduct)){
+			if (isset($webproduct)){
 				return $this->render('@Globale/generictabform.html.twig', array(
 								'controllerName' => 'ProductsController',
 								'interfaceName' => 'Productos',
