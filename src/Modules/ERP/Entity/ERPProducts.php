@@ -133,10 +133,7 @@ class ERPProducts
     public $newSeconds=1296000;
     public $updatedSeconds=1296000;
 
-    /**
-     * @ORM\Column(type="boolean", nullable=false)
-     */
-    private $web;
+
 
     public function getId(): ?int
     {
@@ -407,15 +404,4 @@ class ERPProducts
         return $this;
     }
 
-    public function getWeb(): ?bool
-    {
-        return $this->web;
-    }
-
-    public function setWeb(?bool $web): self
-    {
-        $this->web = $web;
-
-        return $this;
-    }
 }

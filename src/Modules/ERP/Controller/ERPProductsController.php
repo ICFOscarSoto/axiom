@@ -76,7 +76,7 @@ class ERPProductsController extends Controller
 			$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
 			$breadcrumb=$menurepository->formatBreadcrumb('products');
 			array_push($breadcrumb, $new_breadcrumb);
-		
+
 			$p_repository = $this->getDoctrine()->getRepository('ERP:ERPProducts');
 			$wp_repository=$this->getDoctrine()->getRepository('ERP:ERPWebProducts');
 			$product=$p_repository->findOneById($id);
@@ -94,7 +94,7 @@ class ERPProductsController extends Controller
 								'tab' => $request->query->get('tab','data'), //Show initial tab, by default data tab
 								'tabs' => [
 									["name" => "data", "caption"=>"Datos producto", "active"=>true, "route"=>$this->generateUrl("dataProduct",["id"=>$id])],
-								["name" => "webproduct", "caption"=>"Web", "active"=>true, "route"=>$this->generateUrl("dataWebProducts",["id"=>$webproduct->getEntity()->getId()])]
+								  ["name" => "webproduct", "caption"=>"Web", "active"=>true, "route"=>$this->generateUrl("dataWebProducts",["id"=>$webproduct->getId()])]
 									]
 				));
 
@@ -110,7 +110,8 @@ class ERPProductsController extends Controller
 								'id' => $id,
 								'tab' => $request->query->get('tab','data'), //Show initial tab, by default data tab
 								'tabs' => [
-									["name" => "data", "caption"=>"Datos producto", "active"=>true, "route"=>$this->generateUrl("dataProduct",["id"=>$id])]
+									["name" => "data", "caption"=>"Datos producto", "active"=>true, "route"=>$this->generateUrl("dataProduct",["id"=>$id])],
+										["name" => "web", "caption"=>"Datos producto web", "active"=>true, "route"=>$this->generateUrl("dataNewWebProducts")]
 									]
 				));
 			}

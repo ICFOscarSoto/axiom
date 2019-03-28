@@ -58,10 +58,27 @@ class ERPWebProductsController extends Controller
 		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		 $this->denyAccessUnlessGranted('ROLE_ADMIN');
 		 $template=dirname(__FILE__)."/../Forms/WebProducts.json";
+		 $params=["doctrine"=>$this->getDoctrine(),"id"=>$id];
+		 $utils = new GlobaleFormUtils();
+		 //$utilsObj=new $this->utilsClass();
+		 //,method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]
+		 $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),['product']);
+		 return $utils->make($id, $this->class, $action, "formWebProducts", "full", "@Globale/form.html.twig", 'formProducts', $this->utilsClass);
+
+		}
+
+
+		/**
+		 * @Route("/{_locale}/webproducts/data/{action}", name="dataNewWebProducts", defaults={"id"=0, "action"="read"})
+		 */
+		 public function dataNew($id, $action, Request $request){
+		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		 $this->denyAccessUnlessGranted('ROLE_ADMIN');
+		 $template=dirname(__FILE__)."/../Forms/WebProducts.json";
 		 $utils = new GlobaleFormUtils();
 		 $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine());
-		 return $utils->make($id, $this->class, $action, "formWebProducts", "full", "@Globale/form.html.twig", 'formEntity', $this->utilsClass);
-   
+		 return $utils->make(0, $this->class, $action, "formWebProducts", "full", "@Globale/form.html.twig", 'formProducts', $this->utilsClass);
+
 		}
 
     /**
