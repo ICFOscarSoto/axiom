@@ -152,6 +152,12 @@
           fit_calendar_container_height();
           return false;
         });
+
+
+				$('[id^="modal-confirm-"]').on('hidden.bs.modal', function () {
+				  elements_reload();
+				});
+
       }
 
 			{#$('body').on('click', "[id^='{{ listConstructor.id }}-field-button-{{ field.id }}']", function() {

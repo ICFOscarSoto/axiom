@@ -97,7 +97,7 @@ public function hollidaysGet($id,RouterInterface $router,Request $request){
     $user=$this->getUser();
     $start=$request->query->get('start');
     $end=$request->query->get('end');
-    $events=$hollidaysRepository->findBy(["calendar"=>$workCalendar]);
+    $events=$hollidaysRepository->findBy(["calendar"=>$workCalendar, "deleted"=>0, "active"=>1]);
     if($user->getCompany()!=$workCalendar->getCompany()){
       return new Response();
     }
@@ -120,6 +120,34 @@ public function hollidaysGet($id,RouterInterface $router,Request $request){
     return new JsonResponse($return);
   }
   return new Response();
+}
+
+/**
+* @Route("/{_locale}/admin/global/holidays/{id}/disable", name="disableHoliday")
+*/
+public function disable($id){
+  $this->denyAccessUnlessGranted('ROLE_ADMIN');
+  $entityUtils=new GlobaleEntityUtils();
+  $result=$entityUtils->disableObject($id, $this->class, $this->getDoctrine());
+  return new JsonResponse(array('result' => $result));
+}
+/**
+* @Route("/{_locale}/admin/global/holidays/{id}/enable", name="enableHoliday")
+*/
+public function enable($id){
+  $this->denyAccessUnlessGranted('ROLE_ADMIN');
+  $entityUtils=new GlobaleEntityUtils();
+  $result=$entityUtils->enableObject($id, $this->class, $this->getDoctrine());
+  return new JsonResponse(array('result' => $result));
+}
+/**
+* @Route("/{_locale}/admin/global/holidays/{id}/delete", name="deleteHoliday")
+*/
+public function delete($id){
+  $this->denyAccessUnlessGranted('ROLE_ADMIN');
+  $entityUtils=new GlobaleEntityUtils();
+  $result=$entityUtils->deleteObject($id, $this->class, $this->getDoctrine());
+  return new JsonResponse(array('result' => $result));
 }
 
 }

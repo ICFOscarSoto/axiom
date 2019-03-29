@@ -9,9 +9,52 @@
         </div>
 				</br></br>
 				<div id="calendar-modal-new-calendar-footer" class="modal-footer">
+					{% for button in form.template[0].buttons %}
+						<button type="button" id="modal-action-button-{{ button.name }}" class="btn btn-primary" data-toggle="modal" data-target="#modal-confirm-{{ button.name }}" data-dismiss="modal" attr-url="{{ url(button.route,{"id":'_____'}) }}">Borrar</button>
+					{% endfor %}
 					<button type="button" class="btn btn-primary" data-dismiss="modal">{{ ("Cancelar")|trans }}</button>
 					<button attr-id="" attr-action="" id="{{ form.id }}-button-continue" type="button" class="btn btn-red">{{ ("Guardar")|trans }}</button>
 				</div>
 			</div>
 		</div>
 	</div>
+
+{% for button in form.template[0].buttons %}
+	<div class="modal fade" tabindex="-1" id="modal-confirm-{{ button.name }}" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content" style="transform: matrix(1, 0, 0, 1, 0, 0);">
+				<div class="modal-header">
+					<h4 class="modal-title">Confirmación</h4>
+				</div>
+				<div id="{{ button.name }}-modal-confirm-body" class="modal-body">
+					{{ button.message }}
+				</div>
+				<div id="{{ button.name }}-modal-confirm-footer" class="modal-footer">
+					<button type="button" class="btn btn-primary" data-dismiss="modal">Cancelar</button>
+					<button attr-action="" id="{{ button.name }}-modal-button-continue" type="button" class="btn btn-red">Continuar</button>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endfor %}
+<script>
+	$(document).ready(function() {
+		{% for button in form.template[0].buttons %}
+			$('body').on('click', "#{{ button.name }}-modal-button-continue", function() {
+				if((++load_wait)==1) $("#load-spinner").fadeIn();
+				url=$("#modal-action-button-{{ button.name }}").attr('attr-url');
+				url=url.replace('_____',$('#id-object').val());
+				$.post(url,
+						function(data, status, xhr){
+							if((--load_wait)==0) $("#load-spinner").fadeOut();
+							if(data.result){
+								toastr.success("Datos guardados correctamente", "Confirmación", confirmation);
+								$("#modal-confirm-{{ button.name }}").modal('hide');
+							}
+								else toastr.error("Ocurrió un error al guardar los datos", "Confirmación", confirmation);
+					}, "json");
+					
+			});
+		{% endfor %}
+	});
+</script>

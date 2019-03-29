@@ -8445,7 +8445,8 @@ body {
   box-shadow: none;
 }
 .modal-backdrop {
-  z-index: 10000;
+  /*z-index: 10000;*/
+  z-index: 999;
 }
 .modal-open .modal {
   z-index: 10001;

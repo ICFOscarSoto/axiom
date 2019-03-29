@@ -106,6 +106,8 @@
         {% set counter = counter +1 %}
       {% endfor %}
       {% if formConstructor.post is defined %} <input type="hidden" id="post-url" name="post-url" value="{{ formConstructor.post }}"> {% endif %}
+      <input type="hidden" id="id-object" name="id-object" value="{{ formConstructor.id }}">
+
       </div>
     </div>
   </div>
