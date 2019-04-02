@@ -9,16 +9,18 @@
         </div>
 				</br></br>
 				<div id="calendar-modal-new-calendar-footer" class="modal-footer">
+					{% if form.template[0].buttons is defined %}
 					{% for button in form.template[0].buttons %}
 						<button type="button" id="modal-action-button-{{ button.name }}" class="btn btn-primary" data-toggle="modal" data-target="#modal-confirm-{{ button.name }}" data-dismiss="modal" attr-url="{{ url(button.route,{"id":'_____'}) }}">Borrar</button>
 					{% endfor %}
+					{% endif %}
 					<button type="button" class="btn btn-primary" data-dismiss="modal">{{ ("Cancelar")|trans }}</button>
 					<button attr-id="" attr-action="" id="{{ form.id }}-button-continue" type="button" class="btn btn-red">{{ ("Guardar")|trans }}</button>
 				</div>
 			</div>
 		</div>
 	</div>
-
+{% if form.template[0].buttons is defined %}
 {% for button in form.template[0].buttons %}
 	<div class="modal fade" tabindex="-1" id="modal-confirm-{{ button.name }}" aria-hidden="true">
 		<div class="modal-dialog">
@@ -37,8 +39,10 @@
 		</div>
 	</div>
 {% endfor %}
+{% endif %}
 <script>
 	$(document).ready(function() {
+		{% if form.template[0].buttons is defined %}
 		{% for button in form.template[0].buttons %}
 			$('body').on('click', "#{{ button.name }}-modal-button-continue", function() {
 				if((++load_wait)==1) $("#load-spinner").fadeIn();
@@ -53,8 +57,9 @@
 							}
 								else toastr.error("Ocurrió un error al guardar los datos", "Confirmación", confirmation);
 					}, "json");
-					
+
 			});
 		{% endfor %}
+		{% endif %}
 	});
 </script>
