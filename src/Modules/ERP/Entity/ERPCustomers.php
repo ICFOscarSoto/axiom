@@ -106,7 +106,7 @@ class ERPCustomers
     public $updatedSeconds=1296000;
 
     /**
-     * @ORM\OneToOne(targetEntity="\App\Modules\ERP\Entity\ERPEntities", cascade={"persist", "remove"})
+     * @ORM\OneToOne(targetEntity="\App\Modules\ERP\Entity\ERPEntities", fetch="EAGER", cascade={"persist", "remove"})
      * @ORM\JoinColumn(nullable=false)
      */
     private $entity;

@@ -6,6 +6,7 @@
 				{	"name": "maxcredit", "cols": 2},
 				{	"name": "blockcredit", "cols": 2},
 				{	"name": "mininvoice", "cols": 2},
+				{	"name": "entityName", "cols": 2},
 				{	"name": "allowlinediscount", "cols": 2},
 				{	"name": "additionaldiscount", "cols": 2},
 				{	"name": "requireordernumber", "cols": 2},

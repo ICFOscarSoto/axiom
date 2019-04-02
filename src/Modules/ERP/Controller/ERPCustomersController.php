@@ -20,7 +20,7 @@ class ERPCustomersController extends Controller
 	private $class=ERPCustomers::class;
 	private $utilsClass=ERPCustomersUtils::class;
     /**
-     * @Route("/{_locale}/admin/global/customers", name="customers")
+     * @Route("/{_locale}/admin/ERP/customers", name="customers")
      */
     public function index(RouterInterface $router,Request $request)
     {
@@ -79,8 +79,6 @@ class ERPCustomersController extends Controller
 							'tabs' => [["name" => "data", "caption"=>"Datos empresa", "active"=>true, "route"=>$this->generateUrl("dataCustomers",["id"=>$id])],
 												 ["name" => "moredata", "caption"=>"Mas datos", "active"=>true, "route"=>$this->generateUrl("dataEntities",["id"=>$customer->getEntity()->getId()])],
 												 ["name" => "contracts", "caption"=>"Contratos"]
-												 //["name" => "clocks", "caption"=>"Fichajes", "route"=>$this->generateUrl("workerClocks",["id"=>$id])],
-												 //["name" => "files", "caption"=>"Archivos", "route"=>$this->generateUrl("cloudfiles",["id"=>$id, "path"=>"workers"])]
 												]
 			));
 
@@ -94,8 +92,12 @@ class ERPCustomersController extends Controller
 		 $this->denyAccessUnlessGranted('ROLE_ADMIN');
 		 $template=dirname(__FILE__)."/../Forms/Customers.json";
 		 $utils = new GlobaleFormUtils();
-		 $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),['activity']);
-		 return $utils->make($id, $this->class, $action, "formCustomers", "modal");
+		 $utilsObj=new $this->utilsClass();
+		 $customer=new ERPCustomers();
+		 $customer=$this->getDoctrine()->getRepository($this->class)->findOneById($id);
+		 $params=$customer->getEntity();
+	   $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),['entity'],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
+		 return $utils->make($id, $this->class, $action, "formCustomers", "full", "@Globale/form.html.twig", 'formCustomers', $this->utilsClass);
 		}
 
     /**
