@@ -75,7 +75,6 @@ ProductVariantsCombination:
     resource: 'App\Modules\ERP\Controller\ERPProductVariantsCombinationsController'
     type:     annotation
 
-
 ProductVariant:
     resource: 'App\Modules\ERP\Controller\ERPProductVariantsController'
     type:     annotation
@@ -88,6 +87,17 @@ WebProduct:
     resource: 'App\Modules\ERP\Controller\ERPWebProductsController'
     type:     annotation
 
+Store:
+    resource: 'App\Modules\ERP\Controller\ERPStoresController'
+    type:     annotation
+
+StoreLocation:
+    resource: 'App\Modules\ERP\Controller\ERPStoreLocationsController'
+    type:     annotation
+
+Stock:
+    resource: 'App\Modules\ERP\Controller\ERPStocksController'
+    type:     annotation
 
 Activity:
     resource: 'App\Modules\Globale\Controller\GlobaleActivitiesController'

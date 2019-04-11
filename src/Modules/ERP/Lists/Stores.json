@@ -1,0 +1,10 @@
+[ {"name": "id", "caption":""},
+  {"name": "code", "caption":"Código", "width" : "50"},
+  {"name": "name", "caption":"Nombre", "width" : "90"},
+  {"name": "address", "caption":"Dirección", "width" : "50"},
+  {"name": "postcode","caption":"Código Postal", "width" : "50"},
+  {"name": "state__name","caption":"Provincia", "width" : "50"},
+  {"name": "phone","caption":"Teléfono", "width" : "50"},
+  {"name": "country__name","caption":"País", "width" : "50"},
+  {"name": "active", "caption":"Estado", "width":"10%" ,"class" : "dt-center", "replace":{"1":"<div style=\"min-width: 75px;\" class=\"label label-success\">Activo</div>", "0" : "<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado</div>"}}
+]

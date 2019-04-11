@@ -1,0 +1,16 @@
+[{
+	"sections": [
+		{
+			"name": "Stocks data",
+			"fields": [
+				{ "name": "product","cols": 4},
+				{ "name": "storelocation","cols": 4},
+				{ "name": "lastinventorydate","cols": 4},
+				{ "name": "quantity","cols": 4},
+				{ "name": "minstock","cols": 4},
+				{ "name": "pendingserve","cols": 4},
+				{	"name": "pendingreceive", "cols": 4},
+				{	"name": "active", "cols": 2}
+			]
+		}]
+}]
