@@ -181,5 +181,36 @@ class HRController extends Controller
 		return new JsonResponse(array('result' => $result));
 	}
 
-	
+
+	/**
+	 * @Route("/{_locale}/firebase/send/{token}", name="sendFirebase")
+	 */
+	 public function sendFirebase($token, Request $request){
+		 	$url = "https://fcm.googleapis.com/fcm/send";
+			$token = $token;
+			$serverKey = 'AAAAf9MGJoU:APA91bE6KicZ68wYAnLBfZcawG1vkO3DBdO24CeVFIW0ctkDGiYMJ7AuDq3I7k6nlqsIGIM-0hkpS9YigFWFAreX2CSlWj1YFHNdu5lFfzqxR1mBJ3FS2gOGJfLRnSfYvSOrgZ6cRgI0';
+			$title = "Notification title";
+			$body = "Hello I am from Your php server";
+			$notification = array('title' =>$title , 'body' => $body, 'data' => 'TEST DATA');
+			$arrayToSend = array('to' => $token, 'data' => ['body'=> ['op'=>'logout']], 'priority'=>'high');
+			$json = json_encode($arrayToSend);
+			$headers = array();
+			$headers[] = 'Content-Type: application/json';
+			$headers[] = 'Authorization: key='. $serverKey;
+			$ch = curl_init();
+			curl_setopt($ch, CURLOPT_URL, $url);
+			curl_setopt($ch, CURLOPT_CUSTOMREQUEST,"POST");
+			curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
+			curl_setopt($ch, CURLOPT_HTTPHEADER,$headers);
+			//Send the request
+			$response = curl_exec($ch);
+			//Close request
+			if ($response === FALSE) {
+			die('FCM Send Error: ' . curl_error($ch));
+			}
+			curl_close($ch);
+
+		return new Response('Sended.');
+	}
+
 }

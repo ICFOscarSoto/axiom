@@ -20,8 +20,11 @@ security:
                 path:   /logout
                 target: /
             guard:
+                entry_point: App\Modules\Security\Controller\LoginformAuthenticator
                 authenticators:
                     - App\Modules\Security\Controller\LoginformAuthenticator
+                    - App\Modules\Security\Controller\TokenAuthenticator
+
             # activate different ways to authenticate
 
             # http_basic: true

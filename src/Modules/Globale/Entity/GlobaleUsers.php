@@ -103,6 +103,11 @@ class GlobaleUsers implements UserInterface
      */
     private $calendars;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $apiToken;
+
 
 
     public function __construct()
@@ -221,14 +226,14 @@ class GlobaleUsers implements UserInterface
 
 
 	public function getTemplateData(){
-                                $data["id"]=$this->getId();
-                             		$data["email"]=$this->getEmail();
-                             		$data["name"]=$this->getName();
-                             		$data["firstname"]=$this->getLastname();
-                             		$data["roles"]=$this->getRoles();
-                                $data["companyId"]=$this->getCompany()->getId();
-                             		return $data;
-                             	}
+                                         $data["id"]=$this->getId();
+                                      		$data["email"]=$this->getEmail();
+                                      		$data["name"]=$this->getName();
+                                      		$data["firstname"]=$this->getLastname();
+                                      		$data["roles"]=$this->getRoles();
+                                         $data["companyId"]=$this->getCompany()->getId();
+                                      		return $data;
+                                      	}
 
     /**
      * @return Collection|UserGroups[]
@@ -428,5 +433,17 @@ class GlobaleUsers implements UserInterface
           }
       }
       return $tempArray;
+    }
+
+    public function getApiToken(): ?string
+    {
+        return $this->apiToken;
+    }
+
+    public function setApiToken(?string $apiToken): self
+    {
+        $this->apiToken = $apiToken;
+
+        return $this;
     }
 }

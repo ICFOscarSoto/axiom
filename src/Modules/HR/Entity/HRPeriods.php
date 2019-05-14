@@ -118,7 +118,6 @@ class HRPeriods
     public function setTuesday(bool $tuesday): self
     {
         $this->tuesday = $tuesday;
-
         return $this;
     }
 
@@ -130,7 +129,6 @@ class HRPeriods
     public function setWednesday(bool $wednesday): self
     {
         $this->wednesday = $wednesday;
-
         return $this;
     }
 
@@ -154,7 +152,6 @@ class HRPeriods
     public function setFriday(bool $friday): self
     {
         $this->friday = $friday;
-
         return $this;
     }
 
@@ -166,7 +163,6 @@ class HRPeriods
     public function setSaturday(bool $saturday): self
     {
         $this->saturday = $saturday;
-
         return $this;
     }
 
@@ -178,7 +174,6 @@ class HRPeriods
     public function setSunday(bool $sunday): self
     {
         $this->sunday = $sunday;
-
         return $this;
     }
 
@@ -190,7 +185,6 @@ class HRPeriods
     public function setShift(?HRShifts $shift): self
     {
         $this->shift = $shift;
-
         return $this;
     }
 }

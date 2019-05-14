@@ -44,7 +44,6 @@ class GlobaleSecurityController extends Controller
 	public function onKernelRequest(GetResponseEvent $event)
 	{
 		$request = $event->getRequest();
-
 		// some logic to determine the $locale
 		$request->setLocale($locale);
 	}
