@@ -8,7 +8,11 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use App\Modules\Globale\Entity\GlobaleCompanies;
+use App\Modules\Globale\Entity\GlobaleUsers;
+use App\Modules\Globale\Controller\UserInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class GlobaleSecurityController extends Controller
 {
@@ -39,6 +43,40 @@ class GlobaleSecurityController extends Controller
 			return $this->render('@Globale/login.html.twig', ['last_username' => $lastUsername, 'domain'=>$domain, 'type'=> 'hidden', 'error' => $error, 'logo' => $this->generateUrl('getCompanyImage', array('id'=>$company->getId()))]);
 		else return $this->render('@Globale/login.html.twig', ['last_username' => $lastUsername, 'domain'=>$domain, 'type'=> 'text', 'error' => $error,  'logo' => $this->generateUrl('getCompanyImage', array('id'=>1))]);
 	}
+
+	/**
+		 * @Route("/api/token/get", name="getToken")
+		 */
+	public function getToken(Request $request)
+	{
+		$domain = $this->getDomain($request->getUri());
+		$username = $request->request->get("username");
+		$companyRepository=$this->getDoctrine()->getRepository(GlobaleCompanies::class);
+	 	$company = $companyRepository->findOneBy(["domain" => $domain]);
+		$userRepository=$this->getDoctrine()->getRepository(GlobaleUsers::class);
+	 	$user = $userRepository->findOneBy(["email" => $username, "company" => $company]);
+		if($user){
+			$password = $request->request->get("password");
+			$passwordEncoder = $this->container->get('security.password_encoder');
+			if($passwordEncoder->isPasswordValid($user, $password)){
+				if($user->getApiToken()!=NULL)
+					return new JsonResponse(['token'=>$user->getApiToken()]);
+					else{
+						$token = openssl_random_pseudo_bytes(200);
+						$token = bin2hex($token);
+						$token .= md5(uniqid(time(), true));
+						$user->setApiToken($token);
+						$em = $this->getDoctrine()->getManager();
+						$em->persist($user);
+						$em->flush();
+						return new JsonResponse(['token'=>$token]);
+					}
+			}
+		}else{
+			return new JsonResponse(['token'=>'']);
+		}
+	}
+
 
 
 	public function onKernelRequest(GetResponseEvent $event)
