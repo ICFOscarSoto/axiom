@@ -49,7 +49,9 @@ class GlobaleSecurityController extends Controller
 		 */
 	public function getToken(Request $request)
 	{
-		$domain = $this->getDomain($request->getUri());
+		$domain = $request->request->get("domain");
+		if($domain==NULL)
+			$domain = $this->getDomain($request->getUri());
 		$username = $request->request->get("username");
 		$companyRepository=$this->getDoctrine()->getRepository(GlobaleCompanies::class);
 	 	$company = $companyRepository->findOneBy(["domain" => $domain]);
