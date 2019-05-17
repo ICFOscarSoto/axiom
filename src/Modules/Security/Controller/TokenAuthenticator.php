@@ -13,7 +13,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
 
-class TokenAuthenticator extends AbstractGuardAuthenticator 
+class TokenAuthenticator extends AbstractGuardAuthenticator
 {
     private $em;
 
@@ -50,7 +50,7 @@ class TokenAuthenticator extends AbstractGuardAuthenticator
     {
         return [
             'token' => $request->headers->get('X-AUTH-TOKEN'),
-            'domain' => $this->getDomain($request->getUri())
+            'domain' => $request->headers->get('X-AUTH-DOMAIN')
         ];
     }
 
