@@ -4,6 +4,7 @@ namespace App\Modules\Globale\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
@@ -171,10 +172,9 @@ class GlobaleImagesController extends Controller implements ContainerAwareInterf
 				ResponseHeaderBag::DISPOSITION_INLINE,
 				$filename
 			);
-
 			return $response;
 		}
-		return new RedirectResponse($this->router->generate('app_login'));
+	  return new RedirectResponse($this->router->generate('app_login'));
 	}
 
 	/**

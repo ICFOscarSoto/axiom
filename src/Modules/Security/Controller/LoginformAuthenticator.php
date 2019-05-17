@@ -40,8 +40,10 @@ class LoginformAuthenticator extends AbstractFormLoginAuthenticator
 
     public function supports(Request $request)
     {
-        return 'app_login' === $request->attributes->get('_route')
-            && $request->isMethod('POST');
+        if($request->headers->has('X-AUTH-TOKEN')) return false;
+        
+        return ('app_login' === $request->attributes->get('_route') && $request->isMethod('POST'));
+            //return $request->headers->has('_csrf_token');
     }
 
     public function getCredentials(Request $request)
