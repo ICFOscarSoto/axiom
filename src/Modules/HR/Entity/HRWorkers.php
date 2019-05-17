@@ -148,6 +148,11 @@ class HRWorkers
     */
    private $clockCode;
 
+   /**
+    * @ORM\Column(type="boolean", nullable=true)
+    */
+   private $allowremoteclock;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -449,6 +454,18 @@ class HRWorkers
     public function setClockCode(?string $clockCode): self
     {
         $this->clockCode = $clockCode;
+
+        return $this;
+    }
+
+    public function getAllowremoteclock(): ?bool
+    {
+        return $this->allowremoteclock;
+    }
+
+    public function setAllowremoteclock(?bool $allowremoteclock): self
+    {
+        $this->allowremoteclock = $allowremoteclock;
 
         return $this;
     }

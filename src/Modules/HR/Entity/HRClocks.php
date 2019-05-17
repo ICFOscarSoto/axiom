@@ -61,6 +61,16 @@ class HRClocks
     */
    private $invalid;
 
+   /**
+    * @ORM\Column(type="string", length=25, nullable=true)
+    */
+   private $latitude;
+
+   /**
+    * @ORM\Column(type="string", length=25, nullable=true)
+    */
+   private $longitude;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -158,6 +168,30 @@ class HRClocks
     public function setInvalid(?bool $invalid): self
     {
         $this->invalid = $invalid;
+
+        return $this;
+    }
+
+    public function getLatitude(): ?string
+    {
+        return $this->latitude;
+    }
+
+    public function setLatitude(?string $latitude): self
+    {
+        $this->latitude = $latitude;
+
+        return $this;
+    }
+
+    public function getLongitude(): ?string
+    {
+        return $this->longitude;
+    }
+
+    public function setLongitude(?string $longitude): self
+    {
+        $this->longitude = $longitude;
 
         return $this;
     }
