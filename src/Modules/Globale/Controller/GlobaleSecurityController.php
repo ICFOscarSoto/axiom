@@ -62,7 +62,7 @@ class GlobaleSecurityController extends Controller
 			$passwordEncoder = $this->container->get('security.password_encoder');
 			if($passwordEncoder->isPasswordValid($user, $password)){
 				if($user->getApiToken()!=NULL)
-					return new JsonResponse(['id'=>$user->getId(),'token'=>$user->getApiToken()]);
+					return new JsonResponse(['id'=>$user->getId(),'name'=>$user->getName(),'lastname'=>$user->getLastname(),'token'=>$user->getApiToken()]);
 					else{
 						$token = openssl_random_pseudo_bytes(200);
 						$token = bin2hex($token);
