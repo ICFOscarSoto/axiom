@@ -65,8 +65,8 @@ class GlobaleSecurityController extends Controller
 				if($user->getApiToken()!=NULL){
 					$workersrepository=$this->getDoctrine()->getRepository(HRWorkers::class);
 					$worker=$workersrepository->findOneBy(["user"=>$user]);
-					if($worker!==NULL) $worker=$worker->getId();
-					return new JsonResponse(['id'=>$user->getId(),'workerId'=>$worker,'companyId'=>$company->getId(),'name'=>$user->getName(),'lastname'=>$user->getLastname(),'token'=>$user->getApiToken()]);
+
+					return new JsonResponse(['id'=>$user->getId(),'workerId'=>$worker->getId(),'clockId'=>$worker->getClockCode(),'companyId'=>$company->getId(),'name'=>$user->getName(),'lastname'=>$user->getLastname(),'token'=>$user->getApiToken()]);
 				}else{
 						$token = openssl_random_pseudo_bytes(200);
 						$token = bin2hex($token);
