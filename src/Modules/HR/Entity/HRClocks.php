@@ -64,12 +64,22 @@ class HRClocks
    /**
     * @ORM\Column(type="string", length=25, nullable=true)
     */
-   private $latitude;
+   private $startLatitude;
 
    /**
     * @ORM\Column(type="string", length=25, nullable=true)
     */
-   private $longitude;
+   private $startLongitude;
+
+   /**
+    * @ORM\Column(type="string", length=25, nullable=true)
+    */
+   private $endLatitude;
+
+   /**
+    * @ORM\Column(type="string", length=25, nullable=true)
+    */
+   private $endLongitude;
 
     public function getId(): ?int
     {
@@ -172,27 +182,52 @@ class HRClocks
         return $this;
     }
 
-    public function getLatitude(): ?string
+    public function getStartLatitude(): ?string
     {
-        return $this->latitude;
+        return $this->startLatitude;
     }
 
-    public function setLatitude(?string $latitude): self
+    public function setStartLatitude(?string $startLatitude): self
     {
-        $this->latitude = $latitude;
+        $this->startLatitude = $startLatitude;
 
         return $this;
     }
 
-    public function getLongitude(): ?string
+    public function getStartLongitude(): ?string
     {
-        return $this->longitude;
+        return $this->startLongitude;
     }
 
-    public function setLongitude(?string $longitude): self
+    public function setStartLongitude(?string $startLongitude): self
     {
-        $this->longitude = $longitude;
+        $this->startLongitude = $startLongitude;
 
         return $this;
     }
+
+    public function getEndLatitude(): ?string
+    {
+        return $this->endLatitude;
+    }
+
+    public function setEndLatitude(?string $endLatitude): self
+    {
+        $this->endLatitude = $endLatitude;
+
+        return $this;
+    }
+
+    public function getEndLongitude(): ?string
+    {
+        return $this->endLongitude;
+    }
+
+    public function setEndLongitude(?string $endLongitude): self
+    {
+        $this->endLongitude = $endLongitude;
+
+        return $this;
+    }
+
 }

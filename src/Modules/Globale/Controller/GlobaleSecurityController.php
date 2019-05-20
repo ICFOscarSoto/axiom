@@ -11,6 +11,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use App\Modules\Globale\Entity\GlobaleCompanies;
 use App\Modules\Globale\Entity\GlobaleUsers;
+use App\Modules\HR\Entity\HRWorkers;
 use App\Modules\Globale\Controller\UserInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
@@ -61,9 +62,12 @@ class GlobaleSecurityController extends Controller
 			$password = $request->request->get("password");
 			$passwordEncoder = $this->container->get('security.password_encoder');
 			if($passwordEncoder->isPasswordValid($user, $password)){
-				if($user->getApiToken()!=NULL)
-					return new JsonResponse(['id'=>$user->getId(),'name'=>$user->getName(),'lastname'=>$user->getLastname(),'token'=>$user->getApiToken()]);
-					else{
+				if($user->getApiToken()!=NULL){
+					$workersrepository=$this->getDoctrine()->getRepository(HRWorkers::class);
+					$worker=$workersrepository->findOneBy(["user"=>$user]);
+					if($worker!==NULL) $worker=$worker->getId();
+					return new JsonResponse(['id'=>$user->getId(),'workerId'=>$worker,'companyId'=>$company->getId(),'name'=>$user->getName(),'lastname'=>$user->getLastname(),'token'=>$user->getApiToken()]);
+				}else{
 						$token = openssl_random_pseudo_bytes(200);
 						$token = bin2hex($token);
 						$token .= md5(uniqid(time(), true));
@@ -73,6 +77,7 @@ class GlobaleSecurityController extends Controller
 						$em->flush();
 						return new JsonResponse(['token'=>$token]);
 					}
+
 			}
 		}else{
 			return new JsonResponse(['token'=>'']);

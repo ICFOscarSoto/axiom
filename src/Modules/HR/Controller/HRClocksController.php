@@ -119,10 +119,14 @@ class HRClocksController extends Controller
 			if($worker->getCompany()->getId()==$company){
 				//Comprobamos si hay un fichaje SeekableIterator
 				$lastClock=$clocksrepository->findOneBy(["worker"=>$worker,"end"=>NULL], ['id'=>'DESC']);
+				$latitude = $request->request->get("latitude");
+				$longitude = $request->request->get("longitude");
 				if($lastClock===NULL){
 					//Abrimos el fichaje
 					$lastClock=new HRClocks();
 					$lastClock->setWorker($worker);
+					$lastClock->setStartLatitude($latitude);
+					$lastClock->setStartLongitude($longitude);
 					$lastClock->setStart(new \DateTime());
 					$lastClock->setDateupd(new \DateTime());
 					$lastClock->setDateadd(new \DateTime());
@@ -132,6 +136,8 @@ class HRClocksController extends Controller
           $this->getDoctrine()->getManager()->flush();
 					return new JsonResponse(["result"=>1]);
 				}else{
+					$lastClock->setEndLatitude($latitude);
+					$lastClock->setEndLongitude($longitude);
 					$lastClock->setEnd(new \DateTime());
 					$lastClock->setDateupd(new \DateTime());
 					$this->getDoctrine()->getManager()->persist($lastClock);
@@ -214,6 +220,25 @@ class HRClocksController extends Controller
 			return new JsonResponse();
 			return new JsonResponse($company->encodeJson());
 		}
+
+		/**
+		 * @Route("/api/HR/clocks/worker/{company}/{id}/status", name="getClockWorkerStatus")
+		 */
+		public function getClockWorkerStatus($company,$id){
+			$workersrepository=$this->getDoctrine()->getRepository(HRWorkers::class);
+			$clocksrepository=$this->getDoctrine()->getRepository(HRClocks::class);
+			//Comprobamos si el empleado pertenece a la empresa
+			$worker=$workersrepository->findOneBy(["clockCode"=>$id]);
+			if($worker===NULL) return new JsonResponse(["result"=>-1]);
+			if($worker->getCompany()->getId()==$company){
+				//Comprobamos si hay un fichaje SeekableIterator
+				$lastClock=$clocksrepository->findOneBy(["worker"=>$worker,"end"=>NULL], ['id'=>'DESC']);
+				if($lastClock===NULL){
+					return new JsonResponse(["result"=>0]);
+				}else return new JsonResponse(["result"=>1]);
+			} else return new JsonResponse(["result"=>-1]);
+		}
+
 
 
 	/**
