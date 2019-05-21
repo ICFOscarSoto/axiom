@@ -235,7 +235,7 @@ class HRClocksController extends Controller
 				$lastClock=$clocksrepository->findOneBy(["worker"=>$worker,"end"=>NULL], ['id'=>'DESC']);
 				if($lastClock===NULL){
 					return new JsonResponse(["result"=>0]);
-				}else return new JsonResponse(["result"=>1]);
+				}else return new JsonResponse(["result"=>1, "started"=>$lastClock->getStart()]);
 			} else return new JsonResponse(["result"=>-1]);
 		}
 
