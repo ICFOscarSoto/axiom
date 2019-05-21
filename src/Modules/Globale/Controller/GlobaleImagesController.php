@@ -61,10 +61,11 @@ class GlobaleImagesController extends Controller implements ContainerAwareInterf
      */
 	public function getCompanyImage($id, Request $request)
 	{
+			$type = $request->request->get("type",'');
 			$image_path = $this->get('kernel')->getRootDir() . '/../public/images/companies/';
-			if(file_exists($image_path.$id.'.png'))
+			if(file_exists($image_path.$id.$type.'.png'))
 				$filename = $id.'.png';
-			else if(file_exists($image_path.$id.'.jpg'))
+			else if(file_exists($image_path.$id.$type.'.jpg'))
 				$filename = $id.'.jpg';
 			else $filename = '1.png';
 
@@ -85,7 +86,6 @@ class GlobaleImagesController extends Controller implements ContainerAwareInterf
 				$filename
 			);
 			return $response;
-
 	}
 
 
