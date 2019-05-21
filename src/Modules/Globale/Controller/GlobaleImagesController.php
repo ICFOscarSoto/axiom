@@ -64,9 +64,9 @@ class GlobaleImagesController extends Controller implements ContainerAwareInterf
 			$type = $request->request->get("type",'');
 			$image_path = $this->get('kernel')->getRootDir() . '/../public/images/companies/';
 			if(file_exists($image_path.$id.$type.'.png'))
-				$filename = $id.'.png';
+				$filename = $id.$type.'.png';
 			else if(file_exists($image_path.$id.$type.'.jpg'))
-				$filename = $id.'.jpg';
+				$filename = $id.$type.'.jpg';
 			else $filename = '1.png';
 
 			$response = new BinaryFileResponse($image_path.$filename);
