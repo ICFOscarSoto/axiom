@@ -22,6 +22,8 @@
 		<!-- MAIN CONTENT -->
 		<div class="principal-content">
 			{% set listConstructor = lists[0] %}
+			{% set listOrigin = "genericlist" %}
+			{# for know if list.html is invoked directly from controller and we need to make modals inside list#}
 			{{ include('@Globale/list.html.twig') }}
 		</div>
 		<!-- END MAIN CONTENT -->

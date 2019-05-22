@@ -104,3 +104,13 @@ Bank: Bank
 Ccc: Account number (CCN)
 Iban: IBAN
 Work calendar: Work calendar
+Worker: Worker
+# CLOCKS
+#----------------------------------------------------------------------------------------------------------------------
+Start: Start date
+Start latitude: Start latitude
+Start longitude: Start longitude
+End: End date
+End latitude: End latitude
+End longitude: End longitude
+Invalid: Invalid

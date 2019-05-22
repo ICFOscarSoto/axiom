@@ -5,8 +5,13 @@
 			"fields": [
 				{ "name": "worker", "cols": 4},
 				{	"name": "start", "cols": 3},
+				{	"name": "startLatitude", "cols": 3},
+				{	"name": "startLongitude", "cols": 3},
 				{	"name": "end", "cols": 3},
-				{	"name": "active", "cols": 1}
+				{	"name": "endLatitude", "cols": 3},
+				{	"name": "endLongitude", "cols": 3},
+				{	"name": "active", "cols": 1},
+				{	"name": "invalid", "cols": 1}
 			]
 		}
 	]

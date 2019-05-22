@@ -97,9 +97,19 @@ class HRClocksController extends Controller
 			$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
 			$utils = new HRClocksUtils();
 			$templateLists=$utils->formatListbyWorker($id);
+			$formUtils=new GlobaleFormUtils();
+			$formUtils->initialize($this->getUser(), new $this->class(), dirname(__FILE__)."/../Forms/Clocks.json", $request, $this, $this->getDoctrine());
+			$templateForms[]=$formUtils->formatForm('clocks', true, $id, $this->class);
+
+			/*$utils = new GlobaleFormUtils();
+ 		 $utils->initialize($this->getUser(), new $this->class(), dirname(__FILE__)."/../Forms/Clocks.json", $request, $this, $this->getDoctrine());
+ 		 $templateForms[]= $utils->make($id, $this->class, "read", "formClocks", "modal");
+*/
+
 			if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 				return $this->render('@Globale/list.html.twig', [
-					'listConstructor' => $templateLists
+					'listConstructor' => $templateLists,
+					'forms' => $templateForms
 					]);
 			}
 			return new RedirectResponse($this->router->generate('app_login'));
@@ -158,7 +168,7 @@ class HRClocksController extends Controller
 			$template=dirname(__FILE__)."/../Forms/Clocks.json";
 			$utils = new GlobaleFormUtils();
 			$utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine());
-			return $utils->make($id, $this->class, $action, "formworker");
+			return $utils->make($id, $this->class, $action, "formworker", "modal");
 		}
 
 		/**

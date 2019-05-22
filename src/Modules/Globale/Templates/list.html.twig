@@ -366,3 +366,15 @@
 			</div>
 		</div>
 	</div>
+
+{% if listOrigin is not defined %}
+<!-- MODALS  -->
+	{% if forms is defined %}
+		{% for form in forms %}
+			{% set formConstructor = form %}
+			{{ include('@Globale/genericajaxform.html.twig') }}
+		{% endfor %}
+	{% endif %}
+	<!-- END MODALS -->
+	
+{% endif %}
