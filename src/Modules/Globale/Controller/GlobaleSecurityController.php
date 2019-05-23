@@ -82,9 +82,15 @@ class GlobaleSecurityController extends Controller
 						$em = $this->getDoctrine()->getManager();
 						$em->persist($user);
 						$em->flush();
-						return new JsonResponse(['token'=>$token]);
+						return new JsonResponse(['id'=>$user->getId(),
+																		 'workerId'=>$worker->getId(),
+																		 'clockId'=>$worker->getClockCode(),
+																		 'companyId'=>$company->getId(),
+																		 'name'=>$user->getName(),
+																		 'lastname'=>$user->getLastname(),
+																		 'allowRemoteClock'=>$worker->getAllowremoteclock(),
+																		 'token'=>$token]);
 					}
-
 			}
 		}else{
 			return new JsonResponse(['token'=>'']);
