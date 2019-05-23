@@ -108,6 +108,8 @@ Worker: Trabajador
 # CLOCKS
 #----------------------------------------------------------------------------------------------------------------------
 Clocks: Fichajes
+Clock code: Código Fichaje
+Allowremoteclock: Fichaje Remoto
 Start: Hora Inicio
 Start latitude: Latitud Inicio
 Start longitude: Longitud Inicio

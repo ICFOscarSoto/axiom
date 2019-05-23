@@ -238,6 +238,7 @@ class HRClocksController extends Controller
 			$workersrepository=$this->getDoctrine()->getRepository(HRWorkers::class);
 			$clocksrepository=$this->getDoctrine()->getRepository(HRClocks::class);
 			//Comprobamos si el empleado pertenece a la empresa
+
 			$worker=$workersrepository->findOneBy(["clockCode"=>$id]);
 			if($worker===NULL) return new JsonResponse(["result"=>-1]);
 			if($worker->getCompany()->getId()==$company){

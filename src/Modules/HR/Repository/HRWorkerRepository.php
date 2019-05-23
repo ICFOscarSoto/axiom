@@ -14,37 +14,16 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
  */
 class HRWorkerRepository extends ServiceEntityRepository
 {
-    public function __construct(RegistryInterface $registry)
-    {
+    public function __construct(RegistryInterface $registry){
         parent::__construct($registry, HRWorkers::class);
     }
 
-    // /**
-    //  * @return HRWorker[] Returns an array of HRWorker objects
-    //  */
-    /*
-    public function findByExampleField($value)
-    {
-        return $this->createQueryBuilder('h')
-            ->andWhere('h.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('h.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
+    function getNoUsers($user){
+      return $this->createQueryBuilder('w')
+          ->leftJoin('w.user', 'u')
+          ->where('w.user = :userId')
+          ->setParameters(array(':userId' => null))
+          ->getQuery()
+          ->getResult();
     }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?HRWorker
-    {
-        return $this->createQueryBuilder('h')
-            ->andWhere('h.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }

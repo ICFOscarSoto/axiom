@@ -30,6 +30,7 @@ class HRController extends Controller
 {
 
 	 private $class=HRWorkers::class;
+	 private $utilsClass=HRWorkersUtils::class;
 
     /**
      * @Route("/{_locale}/HR/workers", name="workers")
@@ -66,7 +67,10 @@ class HRController extends Controller
 			$this->denyAccessUnlessGranted('ROLE_ADMIN');
 			$template=dirname(__FILE__)."/../Forms/Workers.json";
 			$utils = new GlobaleFormUtils();
-			$utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine());
+			$utils = new GlobaleFormUtils();
+	    $utilsObj=new $this->utilsClass();
+	    $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser()];
+			$utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
 			return $utils->make($id, $this->class, $action, "formworker", "full", "@Globale/form.html.twig", "formWorker");
 		}
 

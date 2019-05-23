@@ -91,7 +91,9 @@ class GlobaleUsersController extends Controller
     $utils = new GlobaleFormUtils();
     $utilsObj=new $this->utilsClass();
     $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser()];
-    $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[],$encoder,$this->getUser()->getCompany());
+    $utils->initialize($this->getUser(), new $this->class(), $template, $request,
+                       $this, $this->getDoctrine(),method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],
+                       method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[],$encoder,$this->getUser()->getCompany());
     return $utils->make($id, $this->class, $action, "formuser", "full", "@Globale/form.html.twig", 'formUser', $this->utilsClass);
   }
 
@@ -103,7 +105,6 @@ class GlobaleUsersController extends Controller
     $this->denyAccessUnlessGranted('ROLE_ADMIN');
     $new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-new"];
     $template=dirname(__FILE__)."/../Forms/Users.json";
-    dump($this->getUser()->getCompany());
     $userdata=$this->getUser()->getTemplateData();
     $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
     $breadcrumb=$menurepository->formatBreadcrumb('users');

@@ -9,8 +9,8 @@
 				{	"name": "name", "cols": 4},
 				{	"name": "lastname", "cols": 5},
 				{	"name": "status", "cols": 2},
-				{	"name": "user", "cols": 2},
-				{	"name": "dateofemploy", "cols": 3},
+				{	"name": "user", "cols": 4},
+				{	"name": "dateofemploy", "cols": 2},
 				{	"name": "external", "cols": 1},
 				{	"name": "active", "cols": 1}
 			]
@@ -37,9 +37,10 @@
 			]
 		},
 		{
-			"name": "Clock",
+			"name": "Clocks",
 			"fields": [
-				{	"name": "clockCode", "cols": 5}
+				{	"name": "clockCode", "cols": 5},
+				{	"name": "allowremoteclock", "cols": 2}
 			]
 		}
 	]
