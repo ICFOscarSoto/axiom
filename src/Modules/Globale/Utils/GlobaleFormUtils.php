@@ -80,13 +80,14 @@ class GlobaleFormUtils extends Controller
     $form = $this->controller->createFormBuilder($this->obj);
     //Get class attributes
     foreach($this->entityManager->getClassMetadata($class)->fieldMappings as $key=>$value){
+      dump($value);
       if(!in_array($value['fieldName'],$this->ignoredAttributes)){
         switch($value['type']){
           case 'datetime':
-            $form->add($value['fieldName'], DateTimeType::class, array('widget' => 'single_text', 'date_format' => 'dd-MM-yyyy HH:mm'));
+            $form->add($value['fieldName'], DateTimeType::class, ['required' => !$value["nullable"], 'widget' => 'single_text', 'date_format' => 'dd-MM-yyyy HH:mm']);
           break;
           case 'json':
-            $form->add($value['fieldName'], TextType::class, ['attr'=>['class' => 'tagsinput']]);
+            $form->add($value['fieldName'], TextType::class, ['required' => !$value["nullable"], 'attr'=>['class' => 'tagsinput']]);
             $form->get($value['fieldName'])
                 ->addModelTransformer(new CallbackTransformer(
                     function ($tagsAsArray) { return implode(',', $tagsAsArray);},
@@ -123,8 +124,10 @@ class GlobaleFormUtils extends Controller
     //Get class relations
     foreach($this->entityManager->getClassMetadata($class)->associationMappings as $key=>$value){
       if(!isset($value["joinColumns"])) continue;
+      //check if is required field
+      if(isset($value["joinColumns"][0]["nullable"]) && $value["joinColumns"][0]["nullable"] == false) $nullable=false; else $nullable=true;
       if(!in_array($value['fieldName'],$this->ignoredAttributes))
-        $form->add($value['fieldName'], ChoiceType::class, $this->choiceRelation($value["targetEntity"], $this->obj->{'get'.ucfirst($value["fieldName"])}()));
+        $form->add($value['fieldName'], ChoiceType::class, $this->choiceRelation($value["targetEntity"], $this->obj->{'get'.ucfirst($value["fieldName"])}(),$nullable));
     }
     if($includeSave) $form->add('save', SubmitType::class, ['attr' => ['class' => 'save'],]);
 
@@ -208,10 +211,11 @@ class GlobaleFormUtils extends Controller
     }
   }
 
-  public function choiceRelation($class, $data){
+  public function choiceRelation($class, $data, $nullable){
     $classname=explode('\\', $class);
     $result =  [
                   'attr' => ['class' => 'select2'],
+                  'required' => !$nullable,
                   'choices' => $this->doctrine->getRepository($class)->findBy(['active'=>true, 'deleted'=>false]),
                   //'choices' => $this->doctrine->getRepository($class)->findAll(),
                   'choice_label' => function($obj, $key, $index) {
