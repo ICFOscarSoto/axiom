@@ -69,7 +69,9 @@ class HRController extends Controller
 			$utils = new GlobaleFormUtils();
 			$utils = new GlobaleFormUtils();
 	    $utilsObj=new $this->utilsClass();
-	    $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser()];
+			$workerRepository=$this->getDoctrine()->getRepository(HRWorkers::class);
+			$obj = $workerRepository->find($id);
+	    $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "worker"=>$obj];
 			$utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
 			return $utils->make($id, $this->class, $action, "formworker", "full", "@Globale/form.html.twig", "formWorker");
 		}

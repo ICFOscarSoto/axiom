@@ -40,15 +40,16 @@ class HRWorkersUtils extends Controller
   public function getIncludedForm($params){
     $doctrine=$params["doctrine"];
     $user=$params["user"];
+    $worker=$params["worker"];
 
     $em=$doctrine->getManager();
     $results=$em->createQueryBuilder()->select('u')
       ->from('App\Modules\Globale\Entity\GlobaleUsers', 'u')
       ->leftJoin('App\Modules\HR\Entity\HRWorkers', 'w', 'WITH', 'u.id = w.user')
       ->where('w.id IS NULL')
-      ->orWhere('u.id = :val_id')
+      ->orWhere('w.id = :val_worker')
       ->andWhere('u.company = :val_company')
-      ->setParameter('val_id', $user)
+      ->setParameter('val_worker', $worker)
       ->setParameter('val_company', $user->getCompany())
       ->getQuery()
       ->getResult();
