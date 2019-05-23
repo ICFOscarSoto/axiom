@@ -46,7 +46,9 @@ class HRWorkersUtils extends Controller
       ->from('App\Modules\Globale\Entity\GlobaleUsers', 'u')
       ->leftJoin('App\Modules\HR\Entity\HRWorkers', 'w', 'WITH', 'u.id = w.user')
       ->where('w.id IS NULL')
+      ->orWhere('u.id = :val_id')
       ->andWhere('u.company = :val_company')
+      ->setParameter('val_id', $user)
       ->setParameter('val_company', $user->getCompany())
       ->getQuery()
       ->getResult();
