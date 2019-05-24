@@ -27,4 +27,14 @@
 	<script src="{{ url('index') }}js/neon-custom.js"></script>
 	<script src="{{ url('index') }}js/icheck/icheck.min.js"></script>
 	<script src="{{ url('index') }}js/bootstrap-tagsinput.min.js"></script>
+	{% if include_footer is defined %}
+		{% for item in include_footer %}
+			{% if item.type=="css" %}
+				<link rel="stylesheet" href="{{ url('index') }}{{ item.path }}">
+			{% endif %}
+			{% if item.type=="js" %}
+				<script src="{{ url('index') }}{{ item.path }}"></script>
+			{% endif %}
+		{% endfor %}
+	{% endif %}
 {% endblock %}

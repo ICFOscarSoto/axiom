@@ -17,9 +17,9 @@ class HRClocksUtils
       'id' => 'listClocks',
       'route' => 'clockslist',
       'routeParams' => ["id" => $user->getId()],
-      'orderColumn' => 4,
+      'orderColumn' => 1,
       'orderDirection' => 'DESC',
-      'tagColumn' => 4,
+      'tagColumn' => 2,
       'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Clocks.json"),true),
       'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/ClocksFieldButtons.json"),true),
       'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/ClocksTopButtons.json"),true)
@@ -32,9 +32,9 @@ class HRClocksUtils
       'id' => 'listClocks',
       'route' => 'clockslistworker',
       'routeParams' => ["id" => $worker],
-      'orderColumn' => 4,
+      'orderColumn' => 1,
       'orderDirection' => 'DESC',
-      'tagColumn' => 4,
+      'tagColumn' => 2,
       'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Clocks.json"),true),
       'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/ClocksFieldButtons.json"),true),
       'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/ClocksTopButtons.json"),true)

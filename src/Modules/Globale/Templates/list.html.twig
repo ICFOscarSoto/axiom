@@ -55,6 +55,13 @@
 						{% for field in listConstructor.fields %}
 								{
 									"targets": {{ counter }},
+									{# only show order field in data type fields#}
+									{% if field.type is not defined or field.type == "data" %}
+									"orderable": true,
+									{% else %}
+									"orderable": false,
+									{% endif %}
+
 									{% if field.class is defined %} "className": "{{ field.class }}", {% endif %}
 									{% if field.width is defined %} "width": "{{ field.width }}", {% endif %}
 
@@ -68,7 +75,6 @@
 													text+="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 													row['_tags'].forEach(function(valor, indice, array) {
 															text+='<div class="label label-'+valor.type+'">'+valor.name+'</div>';
-															console.log(text);
 													});
 												}
 												return text;
@@ -327,8 +333,13 @@
 				<tr>
 					<th class="table-header-search">
 					</th>
+					{# only show search fields in data type fields#}
 					{% for field in listConstructor.fields %}
-						<th class="table-header-search"><input  id="s_{{ field.name }}" type="text" class="form-control" placeholder="Buscar {{ field.caption }}" /></th>
+						{% if field.type is not defined or field.type == "data" %}
+							<th class="table-header-search"><input  id="s_{{ field.name }}" type="text" class="form-control" placeholder="Buscar {{ field.caption }}" /></th>
+						{% else %}
+							<th></th>
+						{% endif %}
 					{% endfor %}
 
 					{% for field in listConstructor.fieldButtons %}
@@ -367,6 +378,13 @@
 		</div>
 	</div>
 
+
+{% if include_templates is defined %}
+	{% for template in include_templates %}
+		{{ include(template) }}
+	{% endfor %}
+{% endif %}
+
 {% if listOrigin is not defined %}
 <!-- MODALS  -->
 	{% if forms is defined %}
@@ -376,5 +394,6 @@
 		{% endfor %}
 	{% endif %}
 	<!-- END MODALS -->
-	
+
+
 {% endif %}

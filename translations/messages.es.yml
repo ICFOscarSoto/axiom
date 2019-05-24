@@ -106,6 +106,7 @@ Ccc: Número de cuenta (CCC)
 Iban: IBAN
 Work calendar: Calendario laboral
 Worker: Trabajador
+
 # CLOCKS
 #----------------------------------------------------------------------------------------------------------------------
 Clocks: Fichajes
@@ -118,3 +119,4 @@ End: Hora Fin
 End latitude: Latitud Fin
 End longitude: Longitud Fin
 Invalid: Invalido
+Location: Ubicación

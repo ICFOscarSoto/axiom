@@ -1,0 +1,156 @@
+<style>
+		.ol-popup {
+			position: absolute;
+			background-color: white;
+			-webkit-filter: drop-shadow(0 1px 4px rgba(0,0,0,0.2));
+			filter: drop-shadow(0 1px 4px rgba(0,0,0,0.2));
+			padding: 15px;
+			border-radius: 10px;
+			border: 1px solid #cccccc;
+			bottom: 12px;
+			left: -50px;
+			min-width: 280px;
+		}
+		.ol-popup:after, .ol-popup:before {
+			top: 100%;
+			border: solid transparent;
+			content: " ";
+			height: 0;
+			width: 0;
+			position: absolute;
+			pointer-events: none;
+		}
+		.ol-popup:after {
+			border-top-color: white;
+			border-width: 10px;
+			left: 48px;
+			margin-left: -10px;
+		}
+		.ol-popup:before {
+			border-top-color: #cccccc;
+			border-width: 11px;
+			left: 48px;
+			margin-left: -11px;
+		}
+		.ol-popup-closer {
+			text-decoration: none;
+			position: absolute;
+			top: 2px;
+			right: 8px;
+		}
+		.ol-popup-closer:after {
+			content: "✖";
+		}
+	</style>
+
+<div class="modal fade" tabindex="-1" id="location-modal-form" aria-hidden="true">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content" style="transform: matrix(1, 0, 0, 1, 0, 0);">
+				<div class="modal-header">
+					<h4 class="modal-title">{{ ("Location")|trans }}</h4>
+				</div>
+        <div id="location-modal-form-body">
+						 <div id="map" style="height:450px" class="map"></div>
+        </div>
+        </br></br>
+        <div id="calendar-modal-new-calendar-footer" class="modal-footer">
+          <button type="button" class="btn btn-primary" data-dismiss="modal">{{ ("Aceptar")|trans }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+	var overlay
+	var layer;
+	var view;
+	var map;
+	var marker;
+	var container = document.getElementById('popup');
+	var content = document.getElementById('popup-content');
+	var closer = document.getElementById('popup-closer');
+
+  	$(document).ready(function() {
+      $('body').on('click', "[id^=button-location]", function() {
+          $("#location-modal-form").modal('show');
+					$("#location-modal-form").attr("attr-latitude",$(this).attr("attr-latitude"));
+					$("#location-modal-form").attr("attr-longitude",$(this).attr("attr-longitude"));
+      });
+
+			$( "#location-modal-form" ).on('shown.bs.modal', function(){
+					createMap($(this).attr("attr-latitude"), $(this).attr("attr-longitude"));
+			});
+
+			function createMarker(latitude, longitude){
+				var features = [];
+				var iconFeature;
+				iconFeature = new ol.Feature({
+						geometry: new ol.geom.Point(ol.proj.transform([longitude*1, latitude*1], 'EPSG:4326','EPSG:3857')),
+				});
+
+				var iconStyle = [
+					new ol.style.Style({
+							image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
+							anchor: [0.5, 90],
+							anchorXUnits: 'fraction',
+							anchorYUnits: 'pixels',
+							opacity: 1,
+							scale: 1,
+							src: '{{ url('index') }}images/gpsmarker.png'
+							}))
+					}),
+				];
+				iconFeature.setStyle(iconStyle);
+
+				features.push(iconFeature);
+				var vectorSource = new ol.source.Vector({
+						features: features      //add an array of features
+						//,style: iconStyle     //to set the style for all your features...
+				});
+				var vectorLayer = new ol.layer.Vector({
+						source: vectorSource,
+				});
+
+				return vectorLayer;
+			}
+
+			function createMap(latitude, longitude){
+				try {
+					view.animate({
+						center: ol.proj.fromLonLat([longitude*1,latitude*1]),
+						duration: 1000
+					});
+					map.removeLayer(marker);
+					marker=createMarker(latitude, longitude);
+					map.addLayer(marker);
+				}
+				catch(error) {
+					overlay = new ol.Overlay({
+						 element: container,
+						 autoPan: true,
+						 autoPanAnimation: {
+							 duration: 250
+						 }
+					});
+					layer = new ol.layer.Tile({
+						source: new ol.source.OSM()
+					});
+					view = new ol.View({
+						center: ol.proj.fromLonLat([longitude*1, latitude*1]),
+						zoom: 17
+					});
+					map = new ol.Map({
+						target: 'map',
+						layers: [layer],
+						overlays: [overlay],
+						view: view
+					});
+					marker=createMarker(latitude, longitude);
+					map.addLayer(marker);
+				}
+			}
+
+
+
+    });
+  </script>

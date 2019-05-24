@@ -102,7 +102,11 @@ class HRController extends Controller
 												 ["name" => "contracts", "caption"=>"Contratos"],
 												 ["name" => "clocks", "caption"=>"Fichajes", "route"=>$this->generateUrl("workerClocks",["id"=>$id])],
 												 ["name" => "files", "caption"=>"Archivos", "route"=>$this->generateUrl("cloudfiles",["id"=>$id, "path"=>"workers"])]
-												]
+												],
+							'include_header' => [["type"=>"css", "path"=>"/js/jvectormap/jquery-jvectormap-1.2.2.css"],
+																	 ["type"=>"css", "path"=>"/js/rickshaw/rickshaw.min.css"]],
+							'include_footer' => [["type"=>"css", "path"=>"/js/ol/ol.css"],
+		 															 ["type"=>"js",  "path"=>"/js/ol/ol.js"]]
 							/*'tabs' => [["name" => "data", "caption"=>"Datos trabajador", "active"=>$tab=='data'?true:false, "route"=>$this->generateUrl("dataWorker",["id"=>$id])],
 												 ["name" => "paymentroll", "active"=>($tab=='paymentroll' && $id)?true:false, "caption"=>"Nóminas"]
 												]*/

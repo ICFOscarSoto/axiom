@@ -13,62 +13,67 @@ class GlobaleListUtils
 		$queryFiltered = $repository->createQueryBuilder('p')->select('count(p.id)');
     $queryTotal = $repository->createQueryBuilder('p')->select('count(p.id)');
 
-    //Detect if class has attribute companyId
-    if(method_exists($classname, "getCompany")){
-      $query->andWhere('p.company = :val_company');
-      $query->setParameter('val_company', $user->getCompany());
-      $queryFiltered->andWhere('p.company = :val_company');
-      $queryFiltered->setParameter('val_company', $user->getCompany());
-      $queryTotal->andWhere('p.company = :val_company');
-      $queryTotal->setParameter('val_company', $user->getCompany());
-    }
-
 		//Formamos el filtro de busqueda global
 		$searchValue=$request->query->get('search');
 		$searchValue=$searchValue["value"];
 		if($searchValue!=""){
-			foreach($manager->getClassMetadata($classname)->getColumnNames() as $column){
-					$query->orWhere('p.'.strtolower($column).' LIKE :val_'.strtolower($column));
-					$query->setParameter('val_'.strtolower($column), '%'.$searchValue.'%');
-					$queryFiltered->andWhere('p.'.strtolower($column).' LIKE :val_'.strtolower($column));
-					$queryFiltered->setParameter('val_'.strtolower($column), '%'.$searchValue.'%');
-			}
-			//Añadimos los campos de las relaciones
-			foreach($listFields as $field){
-				$path=explode('__', $field["name"]);
-				if(count($path)>1){
-					$query->orWhere($path[0].'.'.$path[1].' LIKE :val_'.$path[0].'_'.$path[1]);
-					$query->setParameter('val_'.$path[0].'_'.$path[1], '%'.$searchValue.'%');
-					$query->orWhere($path[0].'.'.$path[1].' LIKE :val_'.$path[0].'_'.$path[1]);
-					$query->setParameter('val_'.$path[0].'_'.$path[1], '%'.$searchValue.'%');
-				}
-			}
+        $metadata=$manager->getClassMetadata($classname);
+		  	foreach($metadata->getColumnNames() as $column){
+					$query->orWhere('p.'.$metadata->getFieldName($column).' LIKE :val_'.$metadata->getFieldName($column));
+					$query->setParameter('val_'.$metadata->getFieldName($column), '%'.$searchValue.'%');
+					$queryFiltered->andWhere('p.'.$metadata->getFieldName($column).' LIKE :val_'.$metadata->getFieldName($column));
+					$queryFiltered->setParameter('val_'.$metadata->getFieldName($column), '%'.$searchValue.'%');
+			     }
+  			//Añadimos los campos de las relaciones
+  			foreach($listFields as $field){
+  				$path=explode('__', $field["name"]);
+  				if(count($path)>1){
+  					$query->orWhere($path[0].'.'.$path[1].' LIKE :val_'.$path[0].'_'.$path[1]);
+  					$query->setParameter('val_'.$path[0].'_'.$path[1], '%'.$searchValue.'%');
+  					$query->orWhere($path[0].'.'.$path[1].' LIKE :val_'.$path[0].'_'.$path[1]);
+  					$query->setParameter('val_'.$path[0].'_'.$path[1], '%'.$searchValue.'%');
+  				}
+  			}
 		}
 
 		//Formamos los filtros de busqueda por columna
 		foreach($listFields as $key => $field){
-				$searchValue=$request->query->get('columns');
-				$searchValue=$searchValue[$key+1]['search']['value'];
-				if($searchValue!=""){
-					$path=explode('__', $field["name"]);
-					if(count($path)>1){
-						$query->andWhere($path[0].'.'.$path[1].' LIKE :val_'.$path[0].'_'.$path[1]);
-						$query->setParameter('val_'.$path[0].'_'.$path[1], '%'.$searchValue.'%');
-						$query->andWhere($path[0].'.'.$path[1].' LIKE :val_'.$path[0].'_'.$path[1]);
-						$query->setParameter('val_'.$path[0].'_'.$path[1], '%'.$searchValue.'%');
-					}else{
-						$query->andWhere('p.'.$field["name"].' LIKE :val_'.$field["name"]);
-						$query->setParameter('val_'.$field["name"], '%'.$searchValue.'%');
-						$queryFiltered->andWhere('p.'.$field["name"].' LIKE :val_'.$field["name"]);
-						$queryFiltered->setParameter('val_'.$field["name"], '%'.$searchValue.'%');
-					}
-				}
+        //Solo añadimos los campos de tipo data
+       if(!isset($field["type"])||$field["type"]=="data"){
+  				$searchValue=$request->query->get('columns');
+  				$searchValue=$searchValue[$key+1]['search']['value'];
+  				if($searchValue!=""){
+  					$path=explode('__', $field["name"]);
+  					if(count($path)>1){
+  						$query->andWhere($path[0].'.'.$path[1].' LIKE :val_'.$path[0].'_'.$path[1]);
+  						$query->setParameter('val_'.$path[0].'_'.$path[1], '%'.$searchValue.'%');
+  						$query->andWhere($path[0].'.'.$path[1].' LIKE :val_'.$path[0].'_'.$path[1]);
+  						$query->setParameter('val_'.$path[0].'_'.$path[1], '%'.$searchValue.'%');
+  					}else{
+  						$query->andWhere('p.'.$field["name"].' LIKE :val_'.$field["name"]);
+  						$query->setParameter('val_'.$field["name"], '%'.$searchValue.'%');
+  						$queryFiltered->andWhere('p.'.$field["name"].' LIKE :val_'.$field["name"]);
+  						$queryFiltered->setParameter('val_'.$field["name"], '%'.$searchValue.'%');
+  					}
+  				}
+        }
 		}
 		//Excluimos los elementos borrados
 			$query->andWhere('p.deleted = :valDeleted');
             $query->setParameter('valDeleted', 0);
 			$queryFiltered->andWhere('p.deleted = :valDeleted');
             $queryFiltered->setParameter('valDeleted', 0);
+
+      //Detect if class has attribute companyId
+      if(method_exists($classname, "getCompany")){
+        $query->andWhere('p.company = :val_company');
+        $query->setParameter('val_company', $user->getCompany());
+        $queryFiltered->andWhere('p.company = :val_company');
+        $queryFiltered->setParameter('val_company', $user->getCompany());
+        $queryTotal->andWhere('p.company = :val_company');
+        $queryTotal->setParameter('val_company', $user->getCompany());
+      }
+
 
 		//Formamos el orden de los datos
 		if($request->query->has('order')){
@@ -153,18 +158,22 @@ class GlobaleListUtils
                     break;
                     case "location":
                               //Si existe el parametro data_latitude y data_longitude
-
+                              $valid_location=true;
                               if(isset($field["data"]["latitude"]) && isset($field["data"]["longitude"])) {
-                                $val="<button id=\"".$record->getId()."\" type=\"button\" class=\"btn btn-default\"";
+                                $val="<button id=\"button-location-".$record->getId()."\" type=\"button\" class=\"btn btn-default\"";
                                 if(method_exists($record, "get".ucfirst($field["data"]["latitude"]))){
-                                  $val.=" attr-latitude=\"".$record->{"get".ucfirst($field["data"]["latitude"])}()."\"";
+                                  if ($record->{"get".ucfirst($field["data"]["latitude"])}()==null) {
+                                    $valid_location=false;
+                                  }else $val.="attr-id=\"".$record->getId()."\" attr-latitude=\"".$record->{"get".ucfirst($field["data"]["latitude"])}()."\"";
                                 }
                                 $val.=", ";
                                 if(method_exists($record, "get".ucfirst($field["data"]["longitude"]))){
-                                  $val.=" attr-longitude=\"".$record->{"get".ucfirst($field["data"]["longitude"])}()."\"";
+                                  if ($record->{"get".ucfirst($field["data"]["longitude"])}()==null) {
+                                    $valid_location=false;
+                                  }else $val.=" attr-longitude=\"".$record->{"get".ucfirst($field["data"]["longitude"])}()."\"";
                                 }
-                                $val.="<i class=\"fa fa-map-o\"></i></button>";
-                                $data_ob[$field["name"]]=$val;
+                                $val.="><i class=\"fa fa-map-o\"></i></button>";
+                                $data_ob[$field["name"]]=($valid_location)?$val:"";
                               }else $data_ob[$field["name"]]="";
                     break;
                     default:  //tipo data y otros no establecidos

@@ -24,6 +24,17 @@
 	<link rel="stylesheet" href="{{ url('index') }}css/custom.css">
 	<link rel="stylesheet" href="{{ url('index') }}/js/icheck/skins/flat/_all.css">
 	<link rel="stylesheet" href="{{ url('index') }}css/font-icons/font-awesome/css/font-awesome.min.css">
+	{% if include_header is defined %}
+		{% for item in include_header %}
+			{% if item.type=="css" %}
+				<link rel="stylesheet" href="{{ url('index') }}{{ item.path }}">
+			{% endif %}
+			{% if item.type=="js" %}
+				<script src="{{ url('index') }}{{ item.path }}"></script>
+			{% endif %}
+		{% endfor %}
+	{% endif %}
+
 {% endblock %}
 
 <script>

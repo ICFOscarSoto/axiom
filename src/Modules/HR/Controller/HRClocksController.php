@@ -109,7 +109,8 @@ class HRClocksController extends Controller
 			if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 				return $this->render('@Globale/list.html.twig', [
 					'listConstructor' => $templateLists,
-					'forms' => $templateForms
+					'forms' => $templateForms,
+					'include_templates' => ['@HR/location.html.twig']
 					]);
 			}
 			return new RedirectResponse($this->router->generate('app_login'));
