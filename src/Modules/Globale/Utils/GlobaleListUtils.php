@@ -4,7 +4,7 @@ use App\Modules\Globale\Entity\GlobaleCompanies;
 
 class GlobaleListUtils
 {
-    public function getRecords($user,$repository,$request,$manager,$listFields,$classname,$filters = array()): array
+    public function getRecords($user,$repository,$request,$manager,$listFields,$classname,$filters=[],$raw=[]): array
     {
 		$return=array();
 		$query = $repository->createQueryBuilder('p')
@@ -140,62 +140,66 @@ class GlobaleListUtils
 		foreach($records as $record){
 			$data_ob=Array();
 			foreach($listFields as $field){
-          //Si el campo es una propiedad de un objeto hijo buscamos su valor
-          $name=$field["name"];
-          //if(!isset($field["origins"]) || $field["origins"]=="") $origin=$field["name"];
-          $origin=$field["name"];
 
+          //si no esta establecido el tipo de dato los procesamos genericamente
+          if(!isset($field["type"])) $field["type"] = "data";
 
-          $value='';
-          $path=explode('__', $origin);
-  				$obj=$record;
-  				foreach($path as $step){
-  					if(method_exists($obj, "get".ucfirst($step))){
-  						$obj=$obj->{"get".ucfirst($step)}();
-  					}
-  				}
-  				if(!is_object($obj)) {$value= $obj;}
-  					else {
-              if(get_class($obj)=="DateTime"){
-                $value=$obj->format('Y-m-d H:i:s');
-              }else $value='';
+          switch($field["type"]){
+                    case "raw":
+                              //Si existe el campo en el parametro raw lo cargamos
+                              if(isset($raw[$field["name"]]))
+                                $data_ob[$field["name"]]=$raw[$field["name"]];
+                                else $data_ob[$field["name"]]="";
+                    break;
+                    case "location":
+                              //Si existe el parametro data_latitude y data_longitude
+
+                              if(isset($field["data"]["latitude"]) && isset($field["data"]["longitude"])) {
+                                $val="<button id=\"".$record->getId()."\" type=\"button\" class=\"btn btn-default\"";
+                                if(method_exists($record, "get".ucfirst($field["data"]["latitude"]))){
+                                  $val.=" attr-latitude=\"".$record->{"get".ucfirst($field["data"]["latitude"])}()."\"";
+                                }
+                                $val.=", ";
+                                if(method_exists($record, "get".ucfirst($field["data"]["longitude"]))){
+                                  $val.=" attr-longitude=\"".$record->{"get".ucfirst($field["data"]["longitude"])}()."\"";
+                                }
+                                $val.="<i class=\"fa fa-map-o\"></i></button>";
+                                $data_ob[$field["name"]]=$val;
+                              }else $data_ob[$field["name"]]="";
+                    break;
+                    default:  //tipo data y otros no establecidos
+                              //Si el campo es una propiedad de un objeto hijo buscamos su valor
+                              $name=$field["name"];
+                              //if(!isset($field["origins"]) || $field["origins"]=="") $origin=$field["name"];
+                              $origin=$field["name"];
+                              $value='';
+                              $path=explode('__', $origin);
+                              $obj=$record;
+                              foreach($path as $step){
+                                if(method_exists($obj, "get".ucfirst($step))){
+                                  $obj=$obj->{"get".ucfirst($step)}();
+                                }
+                              }
+                              if(!is_object($obj)) {$value= $obj;}
+                                else {
+                                  if(get_class($obj)=="DateTime"){
+                                    $value=$obj->format('Y-m-d H:i:s');
+                                  }else $value='';
+                              }
+                              $data_ob[$name]=$value;
+                              //Aplicamos los replaces
+                              if(isset($field["replace"])){
+                                  foreach($field["replace"] as $key=>$replace){
+                                    if($data_ob[$name]==$key){
+                                      $data_ob[$name]=array($data_ob[$name],$replace);
+                                    break;
+                                      }
+                                  }
+                              }
+
+                    break;
           }
-          $data_ob[$name]=$value;
 
-
-  				//Aplicamos los replaces
-  				if(isset($field["replace"])){
-  						foreach($field["replace"] as $key=>$replace){
-  							if($data_ob[$name]==$key){
-  								$data_ob[$name]=array($data_ob[$name],$replace);
-  							break;
-  								}
-  						}
-  				}
-
-  				/*$path=explode('__', $field["name"]);
-  				$obj=$record;
-  				foreach($path as $step){
-  					if(method_exists($obj, "get".ucfirst($step))){
-  						$obj=$obj->{"get".ucfirst($step)}();
-  					}
-  				}
-
-  				if(!is_object($obj)) {$data_ob[$field["name"]]= $obj;}
-  					else {
-              if(get_class($obj)=="DateTime"){
-                $data_ob[$field["name"]]=$obj->format('Y-m-d H:i:s');
-              }else $data_ob[$field["name"]]='';
-            }
-  				//Aplicamos los replaces
-  				if(isset($field["replace"])){
-  						foreach($field["replace"] as $key=>$replace){
-  							if($data_ob[$field["name"]]==$key){
-  								$data_ob[$field["name"]]=array($data_ob[$field["name"]] ,$replace);
-  							break;
-  								}
-  						}
-  				}*/
 
 			}
 

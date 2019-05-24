@@ -80,7 +80,6 @@ class GlobaleFormUtils extends Controller
     $form = $this->controller->createFormBuilder($this->obj);
     //Get class attributes
     foreach($this->entityManager->getClassMetadata($class)->fieldMappings as $key=>$value){
-      dump($value);
       if(!in_array($value['fieldName'],$this->ignoredAttributes)){
         switch($value['type']){
           case 'datetime':

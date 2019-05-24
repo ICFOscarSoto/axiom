@@ -2,7 +2,9 @@
  {"name": "worker__lastname", "caption":"Apellidos"},
  {"name": "worker__name", "caption":"Nombre"},
  {"name": "start", "caption":"Entrada"},
- {"name": "end", "caption":"Entrada"},
+ {"name": "start_location", "caption":"", "type": "location", "data": {"latitude": "startLatitude", "longitude": "startLongitude"}},
+ {"name": "end", "caption":"Salida"},
+ {"name": "end_location", "caption":"", "type": "location"},
  {"name": "invalid", "caption":"Valido", "width":"10%" ,"class" : "dt-center", "replace":{"0":"<div style=\"min-width: 75px;\" class=\"label label-success\">Valido</div>", "1" : "<div style=\"min-width: 75px;\" class=\"label label-danger\">Invalido</div>"}},
  {"name": "active", "caption":"Estado", "width":"10%" ,"class" : "dt-center", "replace":{"1":"<div style=\"min-width: 75px;\" class=\"label label-success\">Activo</div>", "0" : "<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado</div>"}}
 ]

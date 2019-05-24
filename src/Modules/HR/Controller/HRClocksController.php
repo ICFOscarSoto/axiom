@@ -128,7 +128,7 @@ class HRClocksController extends Controller
 			if($worker===NULL) return new JsonResponse(["result"=>-1]);
 			if($worker->getCompany()->getId()==$company){
 				//Comprobamos si hay un fichaje SeekableIterator
-				$lastClock=$clocksrepository->findOneBy(["worker"=>$worker,"end"=>NULL], ['id'=>'DESC']);
+				$lastClock=$clocksrepository->findOneBy(["worker"=>$worker, "end"=>NULL, "deleted"=>0, "active"=>1], ['id'=>'DESC']);
 				$latitude = $request->request->get("latitude");
 				$longitude = $request->request->get("longitude");
 				if($lastClock===NULL){
@@ -185,7 +185,7 @@ class HRClocksController extends Controller
 			$repository = $manager->getRepository($this->class);
 			$listUtils=new GlobaleListUtils();
 			$listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Clocks.json"),true);
-			$return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $this->class,[["type"=>"and", "column"=>"worker", "value"=>$worker]]);
+			$return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields,$this->class,[["type"=>"and", "column"=>"worker", "value"=>$worker]]);
 			return new JsonResponse($return);
 		}
 
@@ -243,7 +243,7 @@ class HRClocksController extends Controller
 			if($worker===NULL) return new JsonResponse(["result"=>-1]);
 			if($worker->getCompany()->getId()==$company){
 				//Comprobamos si hay un fichaje SeekableIterator
-				$lastClock=$clocksrepository->findOneBy(["worker"=>$worker,"end"=>NULL], ['id'=>'DESC']);
+				$lastClock=$clocksrepository->findOneBy(["worker"=>$worker,"end"=>NULL,"deleted"=>0,"active"=>1], ['id'=>'DESC']);
 				if($lastClock===NULL){
 					return new JsonResponse(["result"=>0]);
 				}else return new JsonResponse(["result"=>1, "started"=>$lastClock->getStart()]);

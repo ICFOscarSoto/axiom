@@ -34,7 +34,7 @@ class HRWorkersUtils extends Controller
 	}
 
   public function getExcludedForm($params){
-    return ['user'];
+    return ['user','status'];
   }
 
   public function getIncludedForm($params){
@@ -66,7 +66,14 @@ class HRWorkersUtils extends Controller
           else return $obj->getName();
       },
       'choice_value' => 'id'
-    ]]];
+    ]],
+    ['status', ChoiceType::class, [
+      'required' => false,
+      'attr' => ['class' => 'select2'],
+      'choices' => ['Active'=>1, 'Leave'=>0],
+      'placeholder' => 'Select a status...',
+    ]],
+  ];
   }
 
 }

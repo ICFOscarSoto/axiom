@@ -11,8 +11,7 @@
 				{	"name": "status", "cols": 2},
 				{	"name": "user", "cols": 4},
 				{	"name": "dateofemploy", "cols": 2},
-				{	"name": "external", "cols": 1},
-				{	"name": "active", "cols": 1}
+				{	"name": "external", "cols": 1}
 			]
 		},
 		{
@@ -42,6 +41,13 @@
 				{	"name": "clockCode", "cols": 5},
 				{	"name": "allowremoteclock", "cols": 2}
 			]
+		},
+		{
+			"name": "",
+			"fields": [
+				{	"name": "active", "cols": 1}
+			]
 		}
+
 	]
 }]
