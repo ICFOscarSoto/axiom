@@ -39,6 +39,25 @@
 					"drawCallback": function( settings ) {
 							replaceCheckboxes();
 					},
+
+					{# Sumamos columnas con sum=true#}
+					"footerCallback": function(row, data, start, end, display) {
+						var api = this.api();
+
+						api.columns('.sum', {
+							page: 'current'
+						}).every(function() {
+							var sum = this
+								.data()
+								.reduce(function(a, b) {
+									var x = parseFloat(a) || 0;
+									var y = parseFloat(b) || 0;
+									return x + y;
+								}, 0);
+							console.log(sum); //alert(sum);
+							$(this.footer()).html(sum);
+						});
+					},
 					"columnDefs": [
 						{
 							"targets": 0,
@@ -51,6 +70,7 @@
 											  '</div>';
 								}
 						},
+
 						{% set counter = 1 %}
 						{% for field in listConstructor.fields %}
 								{
@@ -128,6 +148,8 @@
 		    .on( 'draw.dt', function () {
 		      if((load_wait)>0){ load_wait--; if(load_wait==0) $("#load-spinner").fadeOut();}
 		    });
+
+
 
 				//Double click row action if is not defined in listConstructor use edit by default
 				$('#{{ listConstructor.id }} tbody').on('dblclick', 'tr', function () {
@@ -353,11 +375,11 @@
 						</div>
 					</th>
 					{% for field in listConstructor.fields %}
-						<th class="table-header-name">{{ field.caption }}</th>
+						<th class="table-header-name {% if field.sum is defined and field.sum == true %} sum {% endif %}">{{ field.caption }}</th>
 					{% endfor %}
 
 					{% for field in listConstructor.fieldButtons %}
-						<th></th>
+						<th class=""></th>
 					{% endfor %}
 
 			</thead>
