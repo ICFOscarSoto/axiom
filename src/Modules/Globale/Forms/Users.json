@@ -9,6 +9,7 @@
 				{	"name": "roles", "cols": 4},
 				{	"name": "password",	"cols": 4},
 				{	"name": "emailDefaultAccount", "cols": 4},
+				{	"name": "apiToken", "cols": 12},
 				{	"name": "active", "cols": 2}
 			]
 		}]

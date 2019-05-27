@@ -26,10 +26,17 @@ Language: Idioma
 #COUNTRIES
 #----------------------------------------------------------------------------------------------------------------------
 Select globalecountries: Seleccionar país
+Select countries: Seleccione un país
+Country: País
+Countries: Paises
+Country data: Datos del país
 
 #CURRENCIES
 #----------------------------------------------------------------------------------------------------------------------
 Select globalecurrencies: Seleccionar moneda
+Currency: Moneda
+Currencies: Monedas
+Currency data: Datos de la moneda
 
 #USERS
 #----------------------------------------------------------------------------------------------------------------------
@@ -42,6 +49,14 @@ Email: Email
 Edit profile: Editar perfil
 Select users: Seleccione un usuario
 
+#ACTIVITIES
+#----------------------------------------------------------------------------------------------------------------------
+Activities: Actividades
+
+#CONTACTS
+#----------------------------------------------------------------------------------------------------------------------
+Contacts: Contactos
+
 #LOGIN
 #----------------------------------------------------------------------------------------------------------------------
 Correo electrónico: Email
@@ -51,10 +66,6 @@ Inicie sesión: Login
 con su cuenta: with your account
 ¿Olvidó su contraseña?: Forgot password?
 Registrese: Sign up
-
-#COUNTRIES
-#----------------------------------------------------------------------------------------------------------------------
-Select countries: Seleccione un país
 
 #COMPANY
 #----------------------------------------------------------------------------------------------------------------------
@@ -70,6 +81,7 @@ Phone: Teléfono
 Mobile: Movil
 Active: Activo
 Domain: Dominio
+Company data: Datos de la empresa
 
 # EMAIL MODULE
 #----------------------------------------------------------------------------------------------------------------------
@@ -129,3 +141,12 @@ End latitude: Latitud Fin
 End longitude: Longitud Fin
 Invalid: Invalido
 Location: Ubicación
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++
+# ++++++++++++++++   ERP   +++++++++++++++++++++++++++
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+# CUSTOMERS
+#----------------------------------------------------------------------------------------------------------------------
+Customers: Clientes
+Suppliers: Proveedores
