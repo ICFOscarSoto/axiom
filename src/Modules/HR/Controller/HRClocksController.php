@@ -168,7 +168,12 @@ class HRClocksController extends Controller
 			$this->denyAccessUnlessGranted('ROLE_ADMIN');
 			$template=dirname(__FILE__)."/../Forms/Clocks.json";
 			$utils = new GlobaleFormUtils();
-			$utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine());
+			$utilsObj=new $this->utilsClass();
+			$clockRepository=$this->getDoctrine()->getRepository($this->class);
+			$obj = $clockRepository->find($id);
+			$params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "worker"=>$obj->getWorker()];
+			$utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),
+												 method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
 			return $utils->make($id, $this->class, $action, "formworker", "modal");
 		}
 

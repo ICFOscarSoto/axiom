@@ -212,11 +212,18 @@ class GlobaleFormUtils extends Controller
 
   public function choiceRelation($class, $data, $nullable){
     $classname=explode('\\', $class);
+    //If class has attribute company aply filter
+    if(property_exists($class,'company')){
+      $choices= $this->doctrine->getRepository($class)->findBy(['company'=>$this->user->getCompany(),'active'=>true, 'deleted'=>false]);
+    }else{
+      $choices= $this->doctrine->getRepository($class)->findBy(['active'=>true, 'deleted'=>false]);
+    }
+
     $result =  [
                   'attr' => ['class' => 'select2'],
                   'required' => !$nullable,
-                  'choices' => $this->doctrine->getRepository($class)->findBy(['active'=>true, 'deleted'=>false]),
-                  //'choices' => $this->doctrine->getRepository($class)->findAll(),
+                  'choices' => $choices,
+                  //if class has attribute lastName concat it with name  
                   'choice_label' => function($obj, $key, $index) {
                       if(method_exists($obj, "getLastname"))
                         return $obj->getLastname().", ".$obj->getName();

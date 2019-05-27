@@ -42,5 +42,24 @@ class HRClocksUtils
     return $list;
   }
 
+  public function getExcludedForm($params){
+    return ['worker'];
+  }
 
+  public function getIncludedForm($params){
+    $doctrine=$params["doctrine"];
+    $user=$params["user"];
+    $worker=$params["worker"];
+
+    return [
+    ['worker', ChoiceType::class, [
+      'required' => true,
+      'disabled' => true,
+      'attr' => ['class' => 'select2'],
+      'choices' => [$worker->getLastName().", ".$worker->getName() =>$worker->getId()],
+      'placeholder' => 'Select a user...',
+      'choice_value' => 'id'
+    ]]
+  ];
+  }
 }
