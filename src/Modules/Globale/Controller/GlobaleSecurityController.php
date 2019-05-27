@@ -38,11 +38,12 @@ class GlobaleSecurityController extends Controller
         $lastUsername = $authenticationUtils->getLastUsername();
 		$locale = $request->getLocale();
 		$domain = $this->getDomain($request->getUri());
+
 		$companyRepository=$this->getDoctrine()->getRepository(GlobaleCompanies::class);
 		$company = $companyRepository->findOneBy(["domain" => $domain]);
-		if($company!=null)
+		if($company!=null && $domain!="aplicode.com"){
 			return $this->render('@Globale/login.html.twig', ['last_username' => $lastUsername, 'domain'=>$domain, 'type'=> 'hidden', 'error' => $error, 'logo' => $this->generateUrl('getCompanyImage', array('id'=>$company->getId()))]);
-		else return $this->render('@Globale/login.html.twig', ['last_username' => $lastUsername, 'domain'=>$domain, 'type'=> 'text', 'error' => $error,  'logo' => $this->generateUrl('getCompanyImage', array('id'=>1))]);
+		}else return $this->render('@Globale/login.html.twig', ['last_username' => $lastUsername, 'domain'=>($domain!="aplicode.com")?$domain:"", 'type'=> 'text', 'error' => $error,  'logo' => $this->generateUrl('getCompanyImage', array('id'=>1))]);
 	}
 
 	/**
