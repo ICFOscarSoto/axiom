@@ -16,6 +16,7 @@ class ERPWebProductsUtils
       if(!$form->isSubmitted()) return false;
       if ($form->isSubmitted() && $form->isValid() ) {
         $obj = $form->getData();
+
         if($obj->getId() == null) {
           $obj->setDateadd(new \DateTime());
           $obj->setDeleted(false);
@@ -24,6 +25,7 @@ class ERPWebProductsUtils
         }
         $obj->setDateupd(new \DateTime());
         try{
+          if(method_exists($obj,'preProccess')) $obj->{'preProccess'}();
           $entityManager->persist($obj);
           $entityManager->flush();
           return $obj;

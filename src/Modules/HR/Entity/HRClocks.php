@@ -81,6 +81,11 @@ class HRClocks
     */
    private $endLongitude;
 
+   /**
+    * @ORM\Column(type="integer", nullable=true)
+    */
+   private $time;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -118,6 +123,7 @@ class HRClocks
     public function setEnd(?\DateTimeInterface $end): self
     {
         $this->end = $end;
+        //$this->time = $this->calculateTime();
 
         return $this;
     }
@@ -226,8 +232,33 @@ class HRClocks
     public function setEndLongitude(?string $endLongitude): self
     {
         $this->endLongitude = $endLongitude;
-
         return $this;
+    }
+
+    public function getTime(): ?int{
+        return $this->time;
+    }
+
+    private function calculateTime(){
+      return date_timestamp_get($this->end)-date_timestamp_get($this->start);
+    }
+
+    private function dateIntervalToSeconds($dateInterval){
+      $reference = new \DateTimeImmutable;
+      $endTime = $reference->add($dateInterval);
+      return $endTime->getTimestamp() - $reference->getTimestamp();
+    }
+
+    public function setTime(int $time): self
+    {
+        $this->time = $time;
+        return $this;
+    }
+
+    public function preProccess(){
+      //$this->time = $this->calculateTime();
+      $this->time = $this->calculateTime();
+
     }
 
 }

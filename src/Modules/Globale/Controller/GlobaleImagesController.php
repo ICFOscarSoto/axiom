@@ -139,16 +139,17 @@ class GlobaleImagesController extends Controller implements ContainerAwareInterf
 
 
 	/**
-	* @Route("/api/user/{id}/getimage", name="getUserImage")
+	* @Route("/api/user/{id}/getimage", name="getUserImage", defaults={"id"=0})
 	*/
 	public function getUserImage($id, Request $request)
 	{
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
-			$currentUser=$this->getUser();
+			if($id==0) $id=$this->getUser()->getId();
 			$userRepository = $this->getDoctrine()->getRepository(GlobaleUsers::class);
-
-				$image_path = $this->get('kernel')->getRootDir() . '/../public/images/users/';
+				$user=$userRepository->find($id);
+				//$image_path = $this->get('kernel')->getRootDir() . '/../public/images/users/';
+				$image_path = $this->get('kernel')->getRootDir().'/../cloud/'.$user->getCompany()->getId().'/images/users/';
 				if(file_exists($image_path.$id.'-thumb.png'))
 					$filename = $id.'-thumb.png';
 				else if(file_exists($image_path.$id.'-thumb.jpg'))

@@ -19,6 +19,7 @@ class GlobaleUsersUtils
       $obj = $form->getData();
       if($form["password"]->getData()!="")
         $obj->setPassword($encoder->encodePassword($obj, $form["password"]->getData()));
+
       if($obj->getId() == null) {
         $obj->setDateadd(new \DateTime());
         $obj->setDeleted(false);
@@ -27,6 +28,7 @@ class GlobaleUsersUtils
       }
       $obj->setDateupd(new \DateTime());
       try{
+        if(method_exists($obj,'preProccess')) $obj->{'preProccess'}();
         $entityManager->persist($obj);
         $entityManager->flush();
         return $obj;

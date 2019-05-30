@@ -5,6 +5,7 @@
         "php": "^7.0.8",
         "ext-ctype": "*",
         "ext-iconv": "*",
+        "beberlei/DoctrineExtensions": "^1.2",
         "impulze/intervention-image-bundle": "^1.2",
         "knplabs/knp-paginator-bundle": "2.5.*",
         "pear/auth_sasl": "^1.1",

@@ -15,6 +15,7 @@ use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\Globale\Utils\GlobaleUsersUtils;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
+use App\Modules\Globale\Utils\GlobaleProfilesUtils;
 use App\Modules\Email\Entity\EmailAccounts;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
@@ -60,9 +61,34 @@ class GlobaleUsersController extends Controller
 	public function profile(RouterInterface $router,Request $request, UserPasswordEncoderInterface $encoder)
 	{
     $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-    $usersUtils = new GlobaleUsersUtils();
-    $editor=$usersUtils->formatEditor($this->getUser(), $this->getUser(), $request, $this, $this->getDoctrine(), $encoder, "Edit", "fa fa-edit");
-    return $this->render($editor["template"], $editor["vars"]);
+    $this->denyAccessUnlessGranted('ROLE_ADMIN');
+    $new_breadcrumb=["rute"=>null, "name"=>"Editar perfil", "icon"=>"fa fa-edit"];
+    $template=dirname(__FILE__)."/../Forms/Profile.json";
+    $userdata=$this->getUser()->getTemplateData();
+    $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
+    $breadcrumb=$menurepository->formatBreadcrumb('profile');
+    array_push($breadcrumb, $new_breadcrumb);
+    $utils = new GlobaleFormUtils();
+    $utilsObj=new GlobaleProfilesUtils();
+    $params=["doctrine"=>$this->getDoctrine(), "id"=>$this->getUser()->getId(), "user"=>$this->getUser()];
+    $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
+    return $this->render('@Globale/genericform.html.twig', array(
+            'controllerName' => 'GlobaleUsersController',
+            'interfaceName' => 'Perfil de usuario',
+            'optionSelected' => 'profile',
+            'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
+            'breadcrumb' => $breadcrumb,
+            'userData' => $userdata,
+            'id' => $this->getUser()->getId(),
+            'route' => $this->generateUrl("dataUser",["id"=>$this->getUser()->getId()]),
+            'form' => $utils->formatForm("formprofile", true, $this->getUser()->getId(), $this->class, 'dataUser')
+
+    ));
+
+
+
+    //$editor=$usersUtils->formatEditor($this->getUser(), $this->getUser(), $request, $this, $this->getDoctrine(), $encoder, "Edit", "fa fa-edit");
+    //return $this->render($editor["template"], $editor["vars"]);
 	}
 
 	/**

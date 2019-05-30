@@ -10,6 +10,62 @@ use App\Modules\Email\Entity\EmailAccounts;
 
 class GlobaleProfilesUtils
 {
+
+  public function proccess($form,$user,$obj,$request,$entityManager,$encoder){
+    //if changed Password
+    $form->handleRequest($request);
+    if(!$form->isSubmitted()) return false;
+    if ($form->isSubmitted() && $form->isValid() ) {
+      $obj = $form->getData();
+      if($form["password"]->getData()!="")
+        $obj->setPassword($encoder->encodePassword($obj, $form["password"]->getData()));
+
+      if($obj->getId() == null) {
+        $obj->setDateadd(new \DateTime());
+        $obj->setDeleted(false);
+        //If object has Company save with de user Company
+        if(method_exists($obj,'setCompany')) $obj->setCompany($user->getCompany());
+      }
+      $obj->setDateupd(new \DateTime());
+      try{
+        if(method_exists($obj,'preProccess')) $obj->{'preProccess'}();
+        $entityManager->persist($obj);
+        $entityManager->flush();
+        return $obj;
+      }catch (Exception $e) {
+        return false;
+      }
+    }
+  }
+
+  public function getExcludedForm(){
+    return ["password","emailDefaultAccount", "email", "roles", "apiToken"];
+  }
+
+  public function getIncludedForm($params){
+    $doctrine=$params["doctrine"];
+    $id=$params["id"];
+    $user=$params["user"];
+    $emailAccountsRepository=$doctrine->getRepository(EmailAccounts::class);
+    return [['password', RepeatedType::class, [
+      'type' => PasswordType::class,
+      'required' => false,
+      'mapped' => false,
+      'first_options'  => ['label' => 'Password'],
+      'second_options' => ['label' => 'Repeat Password']
+    ]],
+    ['emailDefaultAccount', ChoiceType::class, [
+      'required' => false,
+      'attr' => ['class' => 'select2'],
+      'choices' => $emailAccountsRepository->findBy(["user"=>$id]),
+      'placeholder' => 'Select an email account...',
+      'choice_label' => 'name',
+      'choice_value' => 'id'
+    ]]];
+  }
+
+/*
+
   public function formatEditor($user, $obj, $request, $controller, $doctrine, $encoder, $name, $icon){
     $userdata=$user->getTemplateData();
     $new_breadcrumb["rute"]=null;
@@ -72,7 +128,7 @@ class GlobaleProfilesUtils
       $doctrine->getManager()->flush();
     }
     return $form;
-  }
+  }*/
 }
 
 

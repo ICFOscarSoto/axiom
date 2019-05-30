@@ -23,7 +23,7 @@
               {# Field type Image #}
                 <div id="fileinput-{{field.name}}" class="fileinput fileinput-new" data-provides="fileinput">
     							<div class="fileinput-new thumbnail" style="width: {{ field.width }}; height: {{ field.height }};" data-trigger="fileinput">
-    								<img id="fileinput-img-{{field.name}}" src="{{ url(field.value,{'id': formConstructor.id, 'type': field.imageType, 'size': 'medium'}) }}" alt="">
+    								<img id="fileinput-img-{{field.name}}" src="{{ url(field.value,{'id': formConstructor.id_object, 'type': field.imageType, 'size': 'medium'}) }}" alt="">
     							</div>
     							<div id="image-preview-{{field.name}}" class="fileinput-preview fileinput-exists thumbnail" style="width: {{ field.width }}; height: {{ field.height }}"></div>
     							<div>
@@ -62,7 +62,7 @@
 
               $('body').on('click', '[id^="btn-image-save"]', function(){
                 $('#fileinput-img-{{field.name}}').fadeOut();
-                var url = "{{url("uploadImage",{"type":field.imageType, "id": formConstructor.id})}}";
+                var url = "{{url("uploadImage",{"type":field.imageType, "id": formConstructor.id_object})}}";
                 var image = $('#image-preview-{{field.name}}').find('img').attr('src');
                 var block = image.split(";");
                 var contentType = block[0].split(":")[1];
@@ -84,7 +84,7 @@
                         toastr.error("No se pudo subir la imagen", "Confirmación", confirmation);
                     },
                     success:function(data){
-                        $('#fileinput-img-{{field.name}}').attr('src','{{ url(field.value,{'id': formConstructor.id, 'type': field.imageType, 'size': 'medium'}) }}?'+Date.now());
+                        $('#fileinput-img-{{field.name}}').attr('src','{{ url(field.value,{'id': formConstructor.id_object, 'type': field.imageType, 'size': 'medium'}) }}?'+Date.now());
                         $('#fileinput-{{field.name}}').fileinput("clear");
                         if(data.result) toastr.success("Imagen cambiada correctamente", "Confirmación", confirmation);
                     },
@@ -106,7 +106,7 @@
         {% set counter = counter +1 %}
       {% endfor %}
       {% if formConstructor.post is defined %} <input type="hidden" id="post-url" name="post-url" value="{{ formConstructor.post }}"> {% endif %}
-      <input type="hidden" id="id-object" name="id-object" value="{{ formConstructor.id }}">
+      <input type="hidden" id="id-object" name="id-object" value="{{ formConstructor.id_object }}">
 
       </div>
     </div>
@@ -115,8 +115,8 @@
   {% if formConstructor.type is not defined or formConstructor.type != "modal" %}
   <div class="row">
     <div style="text-align: right;" class="col-md-12">
-      <button attr-id="" attr-action="" id="{{formConstructor.name}}-button-cancel" type="button" class="btn btn">{{ ("Cancelar")|trans }}</button>
-      <button attr-id="" attr-action="" id="{{formConstructor.name}}-button-continue" type="button" class="btn btn-green">{{ ("Guardar")|trans }}</button>
+      <button attr-id="" attr-action="" id="{{formConstructor.name}}-button-cancel-bottom" type="button" class="btn btn">{{ ("Cancelar")|trans }}</button>
+      <button attr-id="" attr-action="" id="{{formConstructor.name}}-button-continue-bottom" type="button" class="btn btn-green">{{ ("Guardar")|trans }}</button>
     </div>
   </div>
   {% endif %}
@@ -124,7 +124,7 @@
 </div>
 <script>
 	$(document).ready(function() {
-    $('body').on('click', "#{{formConstructor.name}}-button-continue", function() {
+    $('body').on('click', "[id^='{{formConstructor.name}}-button-continue']", function() {
           if($("#{{formConstructor.name}}-form-body").find('form').valid()){
             if((++load_wait)==1) $("#load-spinner").fadeIn();
             $.post($("#{{formConstructor.name}}-form-body").find('form').find('#post-url').val(), $("#{{formConstructor.name}}-form-body").find('form').serialize(),
@@ -140,7 +140,7 @@
               }, "json");
             }
     });
-    $('body').on('click', "#{{formConstructor.name}}-button-cancel", function() {
+    $('body').on('click', "[id^='{{formConstructor.name}}-button-cancel']", function() {
       window.history.back();
     });
   });

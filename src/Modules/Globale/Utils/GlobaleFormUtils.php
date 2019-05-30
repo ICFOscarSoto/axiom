@@ -10,6 +10,7 @@ use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\CallbackTransformer;
 use App\Modules\Globale\Entity\GlobaleCompanies;
 
@@ -71,7 +72,7 @@ class GlobaleFormUtils extends Controller
 
     $form=$this->createFromEntity2(!$ajax)->getForm();
     $caption=ucfirst($name);
-    return ["id"=>$name, "name"=>$caption, "form" => $form->createView(), "post"=>$this->controller->generateUrl(($route!=null)?$route:$this->request->get('_route'),["id"=>$id, "action"=>"save"]), "template" => json_decode(file_get_contents ($this->template))];
+    return ["id"=>$name, "id_object"=>$this->obj->getId(), "name"=>$caption, "form" => $form->createView(), "post"=>$this->controller->generateUrl(($route!=null)?$route:$this->request->get('_route'),["id"=>$id, "action"=>"save"]), "template" => json_decode(file_get_contents ($this->template))];
   }
 
   public function createFromEntity2($includeSave=true){
@@ -176,7 +177,7 @@ class GlobaleFormUtils extends Controller
 				 break;
 				 case 'read':
 						 return $this->controller->render($render, array(
-							'formConstructor' => ["id"=>$id, "name"=>$name, "form" => $form->createView(), "type" => $type, "post"=>$this->controller->generateUrl($this->request->get('_route'),["id"=>$id, "action"=>"save"]), "template" => json_decode(file_get_contents ($this->template),true)]
+							'formConstructor' => ["id"=>$id, "id_object"=>$id, "name"=>$name, "form" => $form->createView(), "type" => $type, "post"=>$this->controller->generateUrl($this->request->get('_route'),["id"=>$id, "action"=>"save"]), "template" => json_decode(file_get_contents ($this->template),true)]
 					    ));
 				break;
 			}
@@ -192,7 +193,6 @@ class GlobaleFormUtils extends Controller
        foreach($this->values as $key => $val){
          if(method_exists($obj,'set'.lcfirst($key))) $obj->{'set'.lcfirst($key)}($val);
        }
-
        if($obj->getId() == null){
          $obj->setDateadd(new \DateTime());
          $obj->setDeleted(false);
@@ -201,6 +201,7 @@ class GlobaleFormUtils extends Controller
        }
        $obj->setDateupd(new \DateTime());
        try{
+         if(method_exists($obj,'preProccess')) $obj->{'preProccess'}();
          $this->entityManager->persist($obj);
          $this->entityManager->flush();
          return $obj;
@@ -223,7 +224,7 @@ class GlobaleFormUtils extends Controller
                   'attr' => ['class' => 'select2'],
                   'required' => !$nullable,
                   'choices' => $choices,
-                  //if class has attribute lastName concat it with name  
+                  //if class has attribute lastName concat it with name
                   'choice_label' => function($obj, $key, $index) {
                       if(method_exists($obj, "getLastname"))
                         return $obj->getLastname().", ".$obj->getName();

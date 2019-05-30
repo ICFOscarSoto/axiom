@@ -82,9 +82,19 @@
 									"orderable": false,
 									{% endif %}
 
+
+
 									{% if field.class is defined %} "className": "{{ field.class }}", {% endif %}
 									{% if field.width is defined %} "width": "{{ field.width }}", {% endif %}
 
+									{% if field.format is defined %}
+										{% if field.format == "time" %}
+											"render": function(data, type, row, meta){
+													var date = new Date(data*1000);
+													return ("0" + date.getHours()).slice(-2)+':'+("0" + date.getMinutes()).slice(-2)+':'+("0" + date.getSeconds()).slice(-2);;
+											}
+										{% endif %}
+									{% else %}
 										"render": function(data, type, row, meta){
 
 											var text='';
@@ -99,6 +109,7 @@
 												}
 												return text;
 										},
+										{% endif %}
 								},
 						{% set counter = counter +1 %}
 						{% endfor %}
