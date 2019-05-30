@@ -173,6 +173,7 @@ class HRClocksController extends Controller
 			$clockRepository=$this->getDoctrine()->getRepository($this->class);
 			$workerRepository=$this->getDoctrine()->getRepository(HRWorkers::class);
 			if($id==0){
+				if($idworker==0) $idworker=$request->query->get('worker');
 				$worker = $workerRepository->find($idworker);
 			}	else $obj = $clockRepository->find($id);
 
