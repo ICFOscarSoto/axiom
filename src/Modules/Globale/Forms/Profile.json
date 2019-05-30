@@ -6,6 +6,7 @@
 				{ "name": "userImage", "cols": 4,	"type": "image", "imageType":"users", "value": "getImage", "width": "100%",	"height": "250px"},
 				{	"name": "name",	"cols": 5},
 				{ "name": "lastname",	"cols": 7},
+				{ "name": "email",	"cols": 8},
 				{	"name": "password",	"cols": 4},
 				{	"name": "emailDefaultAccount", "cols": 4},
 				{	"name": "active", "cols": 2}
