@@ -61,7 +61,6 @@ class GlobaleUsersController extends Controller
 	public function profile(RouterInterface $router,Request $request, UserPasswordEncoderInterface $encoder)
 	{
     $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-    $this->denyAccessUnlessGranted('ROLE_ADMIN');
     $new_breadcrumb=["rute"=>null, "name"=>"Editar perfil", "icon"=>"fa fa-edit"];
     $template=dirname(__FILE__)."/../Forms/Profile.json";
     $userdata=$this->getUser()->getTemplateData();
