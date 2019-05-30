@@ -54,8 +54,6 @@ class LoginformAuthenticator extends AbstractFormLoginAuthenticator
         //if no a email, concat company email
         if(strpos($email, "@")==strlen($email)-1) $email = $email.$domain;
         if(strpos($email, "@")===false) $email = $email."@".$domain;
-        //if(strpos($email, "@")===NULL) $email = $email."@".$domain;
-        //$email = $email."@".$domain;
 
         $credentials = [
             'domain' => $domain,
