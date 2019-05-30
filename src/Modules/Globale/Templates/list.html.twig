@@ -303,7 +303,6 @@
 				{% if field.actionType is defined and field.actionType=="background" %}
 					//OPEN MODAL
 					$('body').on('click', "#{{ field.id }}-top-button", function() {
-						  console.log({{ worker_id }});
 							//if route has params...
 							{% set routeParams = [] %}
 							{% if field.routeParams is defined %}
