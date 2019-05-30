@@ -110,6 +110,7 @@ class HRClocksController extends Controller
 				return $this->render('@Globale/list.html.twig', [
 					'listConstructor' => $templateLists,
 					'forms' => $templateForms,
+					'worker_id' => $id,
 					'include_templates' => ['@HR/location.html.twig']
 					]);
 			}
@@ -161,17 +162,21 @@ class HRClocksController extends Controller
 
 
 		/**
-		 * @Route("/{_locale}/HR/clocks/data/{id}/{action}", name="dataClocks", defaults={"id"=0, "action"="read"})
+		 * @Route("/{_locale}/HR/clocks/data/{id}/{action}/{worker}", name="dataClocks", defaults={"id"=0, "action"="read", "worker"="0"})
 		 */
-		 public function data($id, $action, Request $request){
+		 public function data($id, $action, $worker, Request $request){
 			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 			$this->denyAccessUnlessGranted('ROLE_ADMIN');
 			$template=dirname(__FILE__)."/../Forms/Clocks.json";
 			$utils = new GlobaleFormUtils();
 			$utilsObj=new $this->utilsClass();
 			$clockRepository=$this->getDoctrine()->getRepository($this->class);
-			$obj = $clockRepository->find($id);
-			$params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "worker"=>$obj->getWorker()];
+			$workerRepository=$this->getDoctrine()->getRepository(HRWorkers::class);
+			if($id==0){
+				$worker = $workerRepository->find($worker);
+			}	else $obj = $clockRepository->find($id);
+
+			$params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "worker"=>$id==0?$worker:$obj->getWorker()];
 			$utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),
 												 method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
 			return $utils->make($id, $this->class, $action, "formworker", "modal");

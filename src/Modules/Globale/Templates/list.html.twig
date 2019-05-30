@@ -303,7 +303,16 @@
 				{% if field.actionType is defined and field.actionType=="background" %}
 					//OPEN MODAL
 					$('body').on('click', "#{{ field.id }}-top-button", function() {
-							$.post('{{ url(field.route) }}', null,
+						  console.log({{ worker_id }});
+							//if route has params...
+							{% set routeParams = [] %}
+							{% if field.routeParams is defined %}
+
+								{% for key,param in field.routeParams %}
+									{% set routeParams = routeParams|merge({(key): _context[param]}) %}
+								{% endfor %}
+							{% endif %}
+							$.post('{{ url(field.route, routeParams) }}', null,
 								function(data, status, xhr){
 									$("#{{field.modal}}-modal-form-body").html(data);
 									$('#{{field.modal}}-modal-form input').iCheck({checkboxClass: 'icheckbox_flat-blue',radioClass: 'iradio_flat-blue'});
