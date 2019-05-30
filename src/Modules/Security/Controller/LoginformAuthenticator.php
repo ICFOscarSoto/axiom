@@ -41,20 +41,30 @@ class LoginformAuthenticator extends AbstractFormLoginAuthenticator
     public function supports(Request $request)
     {
         if($request->headers->has('X-AUTH-TOKEN')) return false;
-        
+
         return ('app_login' === $request->attributes->get('_route') && $request->isMethod('POST'));
             //return $request->headers->has('_csrf_token');
     }
 
     public function getCredentials(Request $request)
     {
+        $email=$request->request->get('email');
+        $domain=$request->request->get('domain');
+        if(strlen($domain)==0 || $domain=='') $domain='aplicode.com';
+        //if no a email, concat company email
+        if(strpos($email, "@")==strlen($email)-1) $email = $email.$domain;
+        if(strpos($email, "@")===false) $email = $email."@".$domain;
+        //if(strpos($email, "@")===NULL) $email = $email."@".$domain;
+        //$email = $email."@".$domain;
 
         $credentials = [
-            'domain' => $request->request->get('domain'),
-            'email' => $request->request->get('email'),
+            'domain' => $domain,
+            'email' => $email,
             'password' => $request->request->get('password'),
             'csrf_token' => $request->request->get('_csrf_token'),
         ];
+
+
         $request->getSession()->set(
             Security::LAST_USERNAME,
             $credentials['email']
@@ -85,6 +95,7 @@ class LoginformAuthenticator extends AbstractFormLoginAuthenticator
     public function checkCredentials($credentials, UserInterface $user)
     {
         return $this->passwordEncoder->isPasswordValid($user, $credentials['password']);
+
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
@@ -94,7 +105,7 @@ class LoginformAuthenticator extends AbstractFormLoginAuthenticator
         }
 
         // For example : return new RedirectResponse($this->router->generate('some_route'));
-		return new RedirectResponse($this->router->generate('dashboard'));
+		      return new RedirectResponse($this->router->generate('dashboard'));
         //throw new \Exception('TODO: provide a valid redirect inside '.__FILE__);
     }
 
