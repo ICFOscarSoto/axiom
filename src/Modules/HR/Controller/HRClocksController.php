@@ -162,9 +162,9 @@ class HRClocksController extends Controller
 
 
 		/**
-		 * @Route("/{_locale}/HR/clocks/data/{id}/{action}/{worker}", name="dataClocks", defaults={"id"=0, "action"="read", "worker"="0"})
+		 * @Route("/{_locale}/HR/clocks/data/{id}/{action}/{idworker}", name="dataClocks", defaults={"id"=0, "action"="read", "idworker"="0"})
 		 */
-		 public function data($id, $action, $worker, Request $request){
+		 public function data($id, $action, $idworker, Request $request){
 			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 			$this->denyAccessUnlessGranted('ROLE_ADMIN');
 			$template=dirname(__FILE__)."/../Forms/Clocks.json";
@@ -173,7 +173,7 @@ class HRClocksController extends Controller
 			$clockRepository=$this->getDoctrine()->getRepository($this->class);
 			$workerRepository=$this->getDoctrine()->getRepository(HRWorkers::class);
 			if($id==0){
-				$worker = $workerRepository->find($worker);
+				$worker = $workerRepository->find($idworker);
 			}	else $obj = $clockRepository->find($id);
 
 			$params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "worker"=>$id==0?$worker:$obj->getWorker()];
