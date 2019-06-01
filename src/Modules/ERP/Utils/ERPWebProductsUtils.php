@@ -28,6 +28,7 @@ class ERPWebProductsUtils
           if(method_exists($obj,'preProccess')) $obj->{'preProccess'}();
           $entityManager->persist($obj);
           $entityManager->flush();
+          if(method_exists($obj,'postProccess')) $obj->{'postProccess'}();
           return $obj;
         }catch (Exception $e) {
           return false;

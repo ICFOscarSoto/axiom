@@ -409,4 +409,22 @@ class GlobaleCompanies
         return $this;
     }
 
+    public function postProccess(){
+      //Prepare folder structure
+      $source = $this->get('kernel')->getRootDir().'/../cloud/0';
+      $dest= $this->get('kernel')->getRootDir().'/../cloud/'.$this->id;
+      mkdir($dest, 0775);
+      foreach (
+       $iterator = new \RecursiveIteratorIterator(
+        new \RecursiveDirectoryIterator($source, \RecursiveDirectoryIterator::SKIP_DOTS),
+        \RecursiveIteratorIterator::SELF_FIRST) as $item
+        ) {
+          if ($item->isDir()) {
+            mkdir($dest . DIRECTORY_SEPARATOR . $iterator->getSubPathName());
+          } else {
+            copy($item, $dest . DIRECTORY_SEPARATOR . $iterator->getSubPathName());
+          }
+        }
+    }
+
 }
