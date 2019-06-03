@@ -101,8 +101,10 @@
 													if(data!=null){
 														var duration = moment.duration(data, 'seconds');
 														var formatted = duration.format("hh:mm:ss");
+														if(formatted.length==2) formatted="00:00:"+formatted;
+														if(formatted.length==5) formatted="00:"+formatted;
 														return formatted;
-													}else return '00:00:00'
+													}else return '00:00:00';
 											}
 										{% endif %}
 									{% else %}
