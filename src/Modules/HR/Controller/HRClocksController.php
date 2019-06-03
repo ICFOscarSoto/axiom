@@ -139,8 +139,10 @@ class HRClocksController extends Controller
  		 public function doClocks($company,$id, Request $request){
 			$workersrepository=$this->getDoctrine()->getRepository(HRWorkers::class);
 			$clocksrepository=$this->getDoctrine()->getRepository(HRClocks::class);
+			$companiesrepository=$this->getDoctrine()->getRepository(GlobaleCompanies::class);
+			$companiesrepository->find($company);
 			//Comprobamos si el empleado pertenece a la empresa
-			$worker=$workersrepository->findOneBy(["clockCode"=>$id]);
+			$worker=$workersrepository->findOneBy(["company"=>$company,"clockCode"=>$id]);
 			if($worker===NULL) return new JsonResponse(["result"=>-1]);
 			if($worker->getCompany()->getId()==$company){
 				//Comprobamos si hay un fichaje SeekableIterator
