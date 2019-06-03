@@ -236,8 +236,9 @@ class HRClocks
     }
 
     public function getTime(): ?int{
-        if ($this->time==null) return date_timestamp_get(new \DateTime())-date_timestamp_get($this->start);
-        else return $this->time;
+        if ($this->time==null){
+           return date_timestamp_get(new \DateTime())-date_timestamp_get(($this->start!=null)?$this->start: new \DateTime());
+         }else return $this->time;
     }
 
     private function dateIntervalToSeconds($dateInterval){
