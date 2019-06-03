@@ -9,6 +9,8 @@ use App\Modules\Globale\Entity\MenuOptions;
 use App\Modules\Email\Entity\EmailAccounts;
 use App\Modules\Globale\Utils\FormUtils;
 use App\Modules\Globale\Utils\ListUtils;
+use App\Modules\HR\Entity\HRWorkers;
+
 
 class HRClocksUtils
 {
@@ -50,15 +52,22 @@ class HRClocksUtils
     $doctrine=$params["doctrine"];
     $user=$params["user"];
     $worker=$params["worker"];
-
+    $workersRepository=$doctrine->getRepository(HRWorkers::class);
     return [
     ['worker', ChoiceType::class, [
-      'required' => true,
-      'disabled' => true,
-      'attr' => ['class' => 'select2'],
-      'choices' => [$worker->getLastName().", ".$worker->getName() =>$worker->getId()],
-      'placeholder' => 'Select a user...',
-      'choice_value' => 'id'
+      'required' => false,
+      'disabled' => false,
+      'attr' => ['class' => 'select2', 'readonly' => true],
+      'choices' => $workersRepository->findBy(["id"=>$worker->getId()]),
+      'placeholder' => 'Select a worker',
+      'choice_label' => function($obj, $key, $index) {
+          if(method_exists($obj, "getLastname"))
+            return $obj->getLastname().", ".$obj->getName();
+          else return $obj->getName();
+      },
+      'choice_value' => 'id',
+      'data' => $worker
+
     ]]
   ];
   }

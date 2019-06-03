@@ -323,7 +323,11 @@
 					$('body').on('click', "#{{ field.modal }}-button-continue", function() {
 								if($("#{{field.modal}}-modal-form-body").find('form').valid()){
 									if((++load_wait)==1) $("#load-spinner").fadeIn();
-									$.post($("#{{field.modal}}-modal-form-body").find('form').find('#post-url').val(), $("#{{field.modal}}-modal-form-body").find('form').serialize(),
+									var id_parent='';
+									if (typeof $('#id-parent').val() !== 'undefined') {
+										id_parent=encodeURI('&id-parent='+$('#id-parent').val());
+									}
+									$.post($("#{{field.modal}}-modal-form-body").find('form').find('#post-url').val(), $("#{{field.modal}}-modal-form-body").find('form').serialize()+id_parent,
 											function(data, status, xhr){
 												if((--load_wait)==0) $("#load-spinner").fadeOut();
 												if(data.result){

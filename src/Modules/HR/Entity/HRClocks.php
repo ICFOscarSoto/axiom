@@ -257,7 +257,7 @@ class HRClocks
 
     public function preProccess(){
       //$this->time = $this->calculateTime();
-      $this->time = $this->calculateTime();
+      if($this->end!=null) $this->time = $this->calculateTime();
 
     }
 

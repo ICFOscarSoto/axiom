@@ -23,6 +23,7 @@
     <div class="principal-content">
     <div class="row">
 			<div id="tabs" class="col-md-12">
+				<input type="hidden" id="id-parent" value="{{ id }}" />
         {% if tabs is defined %}
 	      <ul id="tabs-list" class="nav nav-tabs bordered"><!-- available classes "bordered", "right-aligned" -->
           {% for tabitem in tabs %}

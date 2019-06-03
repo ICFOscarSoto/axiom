@@ -152,6 +152,7 @@ class HRClocksController extends Controller
 					$lastClock->setEndLongitude($longitude);
 					$lastClock->setEnd(new \DateTime());
 					$lastClock->setDateupd(new \DateTime());
+					$lastClock->setTime($lastClock->calculateTime());
 					$this->getDoctrine()->getManager()->persist($lastClock);
           $this->getDoctrine()->getManager()->flush();
 					return new JsonResponse(["result"=>1]);
@@ -173,7 +174,8 @@ class HRClocksController extends Controller
 			$clockRepository=$this->getDoctrine()->getRepository($this->class);
 			$workerRepository=$this->getDoctrine()->getRepository(HRWorkers::class);
 			if($id==0){
-				if($idworker==0) $idworker=$request->query->get('worker');
+				if($idworker==0 ) $idworker=$request->query->get('worker');
+				if($idworker==0 || $idworker==null) $idworker=$request->request->get('id-parent',0);
 				$worker = $workerRepository->find($idworker);
 			}	else $obj = $clockRepository->find($id);
 
