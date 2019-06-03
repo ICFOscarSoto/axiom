@@ -141,7 +141,14 @@ End latitude: Latitud Fin
 End longitude: Longitud Fin
 Invalid: Invalido
 Location: Ubicación
-
+Today: Hoy
+Yesterday: Ayer
+This week: Esta semana
+Last week: Semana pasada
+This month: Este mes
+Last month: Mes pasado
+This year: Este año
+Last year: Año pasado
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++
 # ++++++++++++++++   ERP   +++++++++++++++++++++++++++
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++

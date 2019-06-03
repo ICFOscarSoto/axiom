@@ -117,7 +117,7 @@ class HRClocks
 
     public function getEnd(): ?\DateTimeInterface
     {
-        return $this->end;
+      return $this->end;
     }
 
     public function setEnd(?\DateTimeInterface $end): self
@@ -236,11 +236,8 @@ class HRClocks
     }
 
     public function getTime(): ?int{
-        return $this->time;
-    }
-
-    private function calculateTime(){
-      return date_timestamp_get($this->end)-date_timestamp_get($this->start);
+        if ($this->time==null) return date_timestamp_get(new \DateTime())-date_timestamp_get($this->start);
+        else return $this->time;
     }
 
     private function dateIntervalToSeconds($dateInterval){
@@ -257,7 +254,7 @@ class HRClocks
 
     public function preProccess(){
       //$this->time = $this->calculateTime();
-      if($this->end!=null) $this->time = $this->calculateTime();
+      if($this->end!=null) $this->time = date_timestamp_get($this->end)-date_timestamp_get($this->start);
 
     }
 

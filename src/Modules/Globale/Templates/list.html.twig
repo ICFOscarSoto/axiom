@@ -1,3 +1,9 @@
+{% if include_pre_templates is defined %}
+	{% for template in include_pre_templates %}
+		{{ include(template) }}
+	{% endfor %}
+{% endif %}
+
 <script>
 			$(document).ready(function() {
 				var ${{ listConstructor.id }}_var = jQuery("#{{ listConstructor.id }}");
@@ -92,9 +98,11 @@
 											"render": function(data, type, row, meta){
 													//var date = new Date(data*1000);
 													//return ("0" + date.getHours()).slice(-2)+':'+("0" + date.getMinutes()).slice(-2)+':'+("0" + date.getSeconds()).slice(-2);;
-													var duration = moment.duration(data, 'seconds');
-													var formatted = duration.format("hh:mm:ss");
-													return formatted;
+													if(data!=null){
+														var duration = moment.duration(data, 'seconds');
+														var formatted = duration.format("hh:mm:ss");
+														return formatted;
+													}else return '00:00:00'
 											}
 										{% endif %}
 									{% else %}
@@ -427,8 +435,8 @@
 	</div>
 
 
-{% if include_templates is defined %}
-	{% for template in include_templates %}
+{% if include_post_templates is defined %}
+	{% for template in include_post_templates %}
 		{{ include(template) }}
 	{% endfor %}
 {% endif %}

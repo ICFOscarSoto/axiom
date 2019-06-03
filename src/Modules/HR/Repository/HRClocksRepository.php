@@ -39,6 +39,83 @@ class HRClocksRepository extends ServiceEntityRepository
     }
 
 
+    public function todayClocks($worker){
+      $conn = $this->getEntityManager()->getConnection();
+      $sql = "SELECT IFNULL(SUM(UNIX_TIMESTAMP(IFNULL(END,CURTIME()))-UNIX_TIMESTAMP(START)),0) raw, IFNULL(SEC_TO_TIME(SUM(UNIX_TIMESTAMP(IFNULL(END,CURTIME()))-UNIX_TIMESTAMP(START))),'00:00:00') formated FROM hrclocks
+              WHERE worker_id=? AND START >= CURDATE() AND START < CURDATE() + INTERVAL 1 DAY";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindValue(1, $worker->getId());
+      $stmt->execute();
+      return $stmt->fetch();
+    }
+
+    public function yesterdayClocks($worker){
+      $conn = $this->getEntityManager()->getConnection();
+      $sql = "SELECT IFNULL(SUM(UNIX_TIMESTAMP(IFNULL(END,CURTIME()))-UNIX_TIMESTAMP(START)),0) raw, IFNULL(SEC_TO_TIME(SUM(UNIX_TIMESTAMP(IFNULL(END,CURTIME()))-UNIX_TIMESTAMP(START))),'00:00:00') formated  FROM hrclocks
+              WHERE worker_id=? AND START >= CURDATE()-1 AND START < CURDATE()-1 + INTERVAL 1 DAY";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindValue(1, $worker->getId());
+      $stmt->execute();
+      return $stmt->fetch();
+    }
+
+    public function thisWeekClocks($worker){
+      $conn = $this->getEntityManager()->getConnection();
+      $sql = "SELECT IFNULL(SUM(UNIX_TIMESTAMP(IFNULL(END,CURTIME()))-UNIX_TIMESTAMP(START)),0) raw, IFNULL(SEC_TO_TIME(SUM(UNIX_TIMESTAMP(IFNULL(END,CURTIME()))-UNIX_TIMESTAMP(START))),'00:00:00') formated FROM hrclocks
+              WHERE worker_id=? AND WEEK(START) = WEEK(CURDATE())";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindValue(1, $worker->getId());
+      $stmt->execute();
+      return $stmt->fetch();
+    }
+
+    public function lastWeekClocks($worker){
+      $conn = $this->getEntityManager()->getConnection();
+      $sql = "SELECT IFNULL(SUM(UNIX_TIMESTAMP(IFNULL(END,CURTIME()))-UNIX_TIMESTAMP(START)),0) raw, IFNULL(SEC_TO_TIME(SUM(UNIX_TIMESTAMP(IFNULL(END,CURTIME()))-UNIX_TIMESTAMP(START))),'00:00:00') formated FROM hrclocks
+              WHERE worker_id=? AND WEEK(START) = WEEK(CURDATE() - INTERVAL 1 WEEK) ";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindValue(1, $worker->getId());
+      $stmt->execute();
+      return $stmt->fetch();
+    }
+
+    public function thisMonthClocks($worker){
+      $conn = $this->getEntityManager()->getConnection();
+      $sql = "SELECT IFNULL(SUM(UNIX_TIMESTAMP(IFNULL(END,CURTIME()))-UNIX_TIMESTAMP(START)),0) raw, IFNULL(SEC_TO_TIME(SUM(UNIX_TIMESTAMP(IFNULL(END,CURTIME()))-UNIX_TIMESTAMP(START))),'00:00:00') formated FROM hrclocks
+              WHERE worker_id=? AND MONTH(START) = MONTH(CURDATE())";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindValue(1, $worker->getId());
+      $stmt->execute();
+      return $stmt->fetch();
+    }
+    public function lastMonthClocks($worker){
+      $conn = $this->getEntityManager()->getConnection();
+      $sql = "SELECT IFNULL(SUM(UNIX_TIMESTAMP(IFNULL(END,CURTIME()))-UNIX_TIMESTAMP(START)),0) raw, IFNULL(SEC_TO_TIME(SUM(UNIX_TIMESTAMP(IFNULL(END,CURTIME()))-UNIX_TIMESTAMP(START))),'00:00:00') formated FROM hrclocks
+              WHERE worker_id=? AND MONTH(START) = MONTH(CURDATE() - INTERVAL 1 MONTH) ";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindValue(1, $worker->getId());
+      $stmt->execute();
+      return $stmt->fetch();
+    }
+
+    public function thisYearClocks($worker){
+      $conn = $this->getEntityManager()->getConnection();
+      $sql = "SELECT IFNULL(SUM(UNIX_TIMESTAMP(IFNULL(END,CURTIME()))-UNIX_TIMESTAMP(START)),0) raw, IFNULL(SEC_TO_TIME(SUM(UNIX_TIMESTAMP(IFNULL(END,CURTIME()))-UNIX_TIMESTAMP(START))),'00:00:00') formated FROM hrclocks
+              WHERE worker_id=? AND YEAR(START) = YEAR(CURDATE())";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindValue(1, $worker->getId());
+      $stmt->execute();
+      return $stmt->fetch();
+    }
+    public function lastYearClocks($worker){
+      $conn = $this->getEntityManager()->getConnection();
+      $sql = "SELECT IFNULL(SUM(UNIX_TIMESTAMP(IFNULL(END,CURTIME()))-UNIX_TIMESTAMP(START)),0) raw, IFNULL(SEC_TO_TIME(SUM(UNIX_TIMESTAMP(IFNULL(END,CURTIME()))-UNIX_TIMESTAMP(START))),'00:00:00') formated FROM hrclocks
+              WHERE worker_id=? AND YEAR(START) = YEAR(CURDATE() - INTERVAL 1 YEAR) ";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindValue(1, $worker->getId());
+      $stmt->execute();
+      return $stmt->fetch();
+    }
     /*
     public function findOneBySomeField($value): ?HRClocks
     {

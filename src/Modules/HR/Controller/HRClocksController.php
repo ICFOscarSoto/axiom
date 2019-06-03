@@ -102,16 +102,30 @@ class HRClocksController extends Controller
 			$templateForms[]=$formUtils->formatForm('clocks', true, $id, $this->class);
 
 			/*$utils = new GlobaleFormUtils();
- 		 $utils->initialize($this->getUser(), new $this->class(), dirname(__FILE__)."/../Forms/Clocks.json", $request, $this, $this->getDoctrine());
- 		 $templateForms[]= $utils->make($id, $this->class, "read", "formClocks", "modal");
-*/
+ 		  $utils->initialize($this->getUser(), new $this->class(), dirname(__FILE__)."/../Forms/Clocks.json", $request, $this, $this->getDoctrine());
+ 		  $templateForms[]= $utils->make($id, $this->class, "read", "formClocks", "modal");
+		 	*/
+			$workersrepository=$this->getDoctrine()->getRepository(HRWorkers::class);
+			$clocksrepository=$this->getDoctrine()->getRepository(HRClocks::class);
+			$worker=$workersrepository->find($id);
+			//Comprobamos si el empleado pertenece a la empresa
 
 			if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 				return $this->render('@Globale/list.html.twig', [
+
 					'listConstructor' => $templateLists,
 					'forms' => $templateForms,
 					'worker_id' => $id,
-					'include_templates' => ['@HR/location.html.twig']
+					'data_clocks' => ["Today"=>["data"=>$clocksrepository->todayClocks($worker), "class"=>"tile-blue"],
+														"Yesterday"=>["data"=>$clocksrepository->yesterdayClocks($worker), "class"=>"tile-primary"],
+													  "This week"=>["data"=>$clocksrepository->thisWeekClocks($worker), "class"=>"tile-blue"],
+													  "Last week"=>["data"=>$clocksrepository->lastWeekClocks($worker), "class"=>"tile-primary"],
+													  "This month"=>["data"=>$clocksrepository->thisMonthClocks($worker), "class"=>"tile-blue"],
+													  "Last month"=>["data"=>$clocksrepository->lastMonthClocks($worker), "class"=>"tile-primary"],
+													  "This year"=>["data"=>$clocksrepository->thisYearClocks($worker), "class"=>"tile-blue"],
+														"Last year"=>["data"=>$clocksrepository->lastYearClocks($worker), "class"=>"tile-primary"]],
+					'include_post_templates' => ['@HR/location.html.twig'],
+					'include_pre_templates' => ['@HR/clockssummary.html.twig']
 					]);
 			}
 			return new RedirectResponse($this->router->generate('app_login'));
