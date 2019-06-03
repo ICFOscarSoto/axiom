@@ -70,7 +70,7 @@ class HRController extends Controller
 			$utils = new GlobaleFormUtils();
 	    $utilsObj=new $this->utilsClass();
 			$workerRepository=$this->getDoctrine()->getRepository(HRWorkers::class);
-			
+
 			$obj = $workerRepository->findOneBy(['id'=>$id, 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
 	    $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "worker"=>$obj];
 			$utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
@@ -89,7 +89,10 @@ class HRController extends Controller
 			$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
 			$breadcrumb=$menurepository->formatBreadcrumb('workers');
 			array_push($breadcrumb, $new_breadcrumb);
+			$workerRepository=$this->getDoctrine()->getRepository(HRWorkers::class);
+			$obj = $workerRepository->findOneBy(['id'=>$id, 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
 			return $this->render('@Globale/generictabform.html.twig', array(
+							'entity_name' => $obj->getLastName().', '.$obj->getName().' ('.$obj->getIdcard().')',
 							'controllerName' => 'WorkersController',
 							'interfaceName' => 'Trabajadores',
 							'optionSelected' => 'workers',
@@ -98,11 +101,14 @@ class HRController extends Controller
 							'userData' => $userdata,
 							'id' => $id,
 							'tab' => $request->query->get('tab','data'), //Show initial tab, by default data tab
-							'tabs' => [["name" => "data", "caption"=>"Datos trabajador", "active"=>true, "route"=>$this->generateUrl("dataWorker",["id"=>$id])],
-												 ["name" => "paymentroll", "caption"=>"Nóminas"],
-												 ["name" => "contracts", "caption"=>"Contratos"],
-												 ["name" => "clocks", "caption"=>"Fichajes", "route"=>$this->generateUrl("workerClocks",["id"=>$id])],
-												 ["name" => "files", "caption"=>"Archivos", "route"=>$this->generateUrl("cloudfiles",["id"=>$id, "path"=>"workers"])]
+							'tabs' => [["name" => "data", "caption"=>"Datos trabajador", "icon"=>"entypo-book-open","active"=>true, "route"=>$this->generateUrl("dataWorker",["id"=>$id])],
+												 ["name" => "clothes", "icon"=>"fa fa-headphones", "caption"=>"Ropa y EPI"],
+												 ["name" => "paymentroll", "icon"=>"fa fa-eur", "caption"=>"Nóminas"],
+												 ["name" => "contracts", "icon"=>"fa fa-briefcase", "caption"=>"Contratos"],
+												 ["name" => "sickleave", "icon"=>"fa fa-hospital-o", "caption"=>"Bajas"],
+												 ["name" => "hollidays", "icon"=>"fa fa-paper-plane", "caption"=>"Vacaciones"],
+												 ["name" => "clocks", "icon"=>"fa fa-clock-o", "caption"=>"Fichajes", "route"=>$this->generateUrl("workerClocks",["id"=>$id])],
+												 ["name" => "files", "icon"=>"fa fa-cloud", "caption"=>"Archivos", "route"=>$this->generateUrl("cloudfiles",["id"=>$id, "path"=>"workers"])]
 												],
 							'include_header' => [["type"=>"css", "path"=>"/js/jvectormap/jquery-jvectormap-1.2.2.css"],
 																	 ["type"=>"css", "path"=>"/js/rickshaw/rickshaw.min.css"]],
