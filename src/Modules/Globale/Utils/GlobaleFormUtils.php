@@ -81,39 +81,41 @@ class GlobaleFormUtils extends Controller
     $form = $this->controller->createFormBuilder($this->obj);
     //Get class attributes
     foreach($this->entityManager->getClassMetadata($class)->fieldMappings as $key=>$value){
-      if(!in_array($value['fieldName'],$this->ignoredAttributes)){
-        switch($value['type']){
-          case 'datetime':
-            $form->add($value['fieldName'], DateTimeType::class, ['required' => !$value["nullable"], 'widget' => 'single_text', 'date_format' => 'dd-MM-yyyy HH:mm']);
-          break;
-          case 'json':
-            $form->add($value['fieldName'], TextType::class, ['required' => !$value["nullable"], 'attr'=>['class' => 'tagsinput']]);
-            $form->get($value['fieldName'])
-                ->addModelTransformer(new CallbackTransformer(
-                    function ($tagsAsArray) { return implode(',', $tagsAsArray);},
-                    function ($tagsAsString) {return explode(',', $tagsAsString);}
-                ));
-          break;
+      if(!in_array($value['fieldName'],$this->ignoredAttributes)){ //Check if field is not excluded and not ignored
+        if($this->searchTemplateField($value['fieldName'])!==false){ //Check if field is in template, otherwise skip it
+          switch($value['type']){
+            case 'datetime':
+              $form->add($value['fieldName'], DateTimeType::class, ['required' => !$value["nullable"], 'widget' => 'single_text', 'date_format' => 'dd-MM-yyyy HH:mm']);
+            break;
+            case 'json':
+              $form->add($value['fieldName'], TextType::class, ['required' => !$value["nullable"], 'attr'=>['class' => 'tagsinput']]);
+              $form->get($value['fieldName'])
+                  ->addModelTransformer(new CallbackTransformer(
+                      function ($tagsAsArray) { return implode(',', $tagsAsArray);},
+                      function ($tagsAsString) {return explode(',', $tagsAsString);}
+                  ));
+            break;
 
-          default://Default types ints, varchars, etc.
-            //First of all check if exist a transform
-          if($field=$this->searchTemplateField($value['fieldName'])){
-            if(isset($field["transform"])){
-              switch ($field["transform"]['type']){
-                case 'option':
-                  $form->add($value['fieldName'], ChoiceType::class, [
-                      'choices'  => $field["transform"]['options'],
-                  ]);
-                break;
-                case 'button':
-                  $form->add($field['name'], ButtonType::class, [
-                      'attr' => ['class' => $field["transform"]['class']],
-                  ]);
-                break;
-              }
+            default://Default types ints, varchars, etc.
+              //First of all check if exist a transform
+            if($field=$this->searchTemplateField($value['fieldName'])){
+              if(isset($field["transform"])){
+                switch ($field["transform"]['type']){
+                  case 'option':
+                    $form->add($value['fieldName'], ChoiceType::class, [
+                        'choices'  => $field["transform"]['options'],
+                    ]);
+                  break;
+                  case 'button':
+                    $form->add($field['name'], ButtonType::class, [
+                        'attr' => ['class' => $field["transform"]['class']],
+                    ]);
+                  break;
+                }
+              }else $form->add($value['fieldName']);
             }else $form->add($value['fieldName']);
-          }else $form->add($value['fieldName']);
-          break;
+            break;
+          }
         }
       }
     }
