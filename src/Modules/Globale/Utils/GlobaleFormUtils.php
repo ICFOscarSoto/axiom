@@ -155,7 +155,12 @@ class GlobaleFormUtils extends Controller
 				$this->obj=new $class();
 			} else{
 					$repository = $this->doctrine->getRepository($class);
-					$this->obj=$repository->find($id);
+          //Security separation of companies
+          if(property_exists($class,'company')){
+            $this->obj=$repository->findOneBy(['id'=>$id, 'company'=>$this->user->getCompany(), 'deleted'=>0]);
+          }else{
+            $this->obj=$repository->findOneBy(['id'=>$id, 'deleted'=>0]);
+          }
 					if($this->obj===NULL) $this->obj=new $class();
 			}
 			$form=$this->createFromEntity2(false)->getForm();
