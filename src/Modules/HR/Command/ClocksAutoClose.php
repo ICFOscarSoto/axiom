@@ -29,6 +29,7 @@ class ClocksAutoClose extends ContainerAwareCommand
             '',
     ]);
     foreach($clocks as $key=>$val){
+     if($val->getWorker()->getCompany()->getId()!=2) continue;
      $output->writeln(['- '.$val->getWorker()->getName().' '.$val->getWorker()->getLastname()]);
      $val->setEnd(new \DateTime());
      $val->setInvalid(1);
