@@ -34,6 +34,7 @@ class ClocksAutoClose extends ContainerAwareCommand
      $val->setEnd(new \DateTime());
      $val->setInvalid(1);
      $val->setDateupd(new \DateTime());
+     $val->setTime(date_timestamp_get($val->getEnd())-date_timestamp_get($val->getStart()));
      $entityManager->persist($val);
      $entityManager->flush();
     }
