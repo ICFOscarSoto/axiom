@@ -409,10 +409,10 @@ class GlobaleCompanies
         return $this;
     }
 
-    public function postProccess(){
+    public function postProccess($kernel){
       //Prepare folder structure
-      $source = $this->get('kernel')->getRootDir().'/../cloud/0';
-      $dest= $this->get('kernel')->getRootDir().'/../cloud/'.$this->id;
+      $source = $kernel->getRootDir().'/../cloud/0';
+      $dest= $kernel->getRootDir().'/../cloud/'.$this->id;
       mkdir($dest, 0775);
       foreach (
        $iterator = new \RecursiveIteratorIterator(
