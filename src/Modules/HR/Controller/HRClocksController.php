@@ -168,7 +168,7 @@ class HRClocksController extends Controller
 					$lastClock->setEndLongitude($longitude);
 					$lastClock->setEnd(new \DateTime());
 					$lastClock->setDateupd(new \DateTime());
-					$lastClock->setTime($lastClock->calculateTime());
+					$lastClock->setTime(date_timestamp_get($lastClock->getEnd())-date_timestamp_get($lastClock->getStart()));
 					$this->getDoctrine()->getManager()->persist($lastClock);
           $this->getDoctrine()->getManager()->flush();
 					return new JsonResponse(["result"=>1]);
