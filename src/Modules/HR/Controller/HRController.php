@@ -91,8 +91,9 @@ class HRController extends Controller
 			array_push($breadcrumb, $new_breadcrumb);
 			$workerRepository=$this->getDoctrine()->getRepository(HRWorkers::class);
 			$obj = $workerRepository->findOneBy(['id'=>$id, 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
+			$entity_name=$obj?$obj->getLastName().', '.$obj->getName().' ('.$obj->getIdcard().')':'';
 			return $this->render('@Globale/generictabform.html.twig', array(
-							'entity_name' => $obj->getLastName().', '.$obj->getName().' ('.$obj->getIdcard().')',
+							'entity_name' => $entity_name,
 							'controllerName' => 'WorkersController',
 							'interfaceName' => 'Trabajadores',
 							'optionSelected' => 'workers',
