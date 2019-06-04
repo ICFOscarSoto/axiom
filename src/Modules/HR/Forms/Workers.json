@@ -5,6 +5,7 @@
 			"fields": [
 				{ "name": "workerImage", "cols": 4,	"type": "image", "imageType":"workers", "value": "getImage", "width": "100%",	"height": "250px"},
 				{ "name": "idcard", "cols": 3},
+				{ "name": "birthdate", "cols": 2, "type": "date"},
 				{	"name": "ss", "cols": 3},
 				{	"name": "name", "cols": 4},
 				{	"name": "lastname", "cols": 5},

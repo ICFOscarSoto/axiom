@@ -153,6 +153,11 @@ class HRWorkers
     */
    private $allowremoteclock;
 
+   /**
+    * @ORM\Column(type="datetime", nullable=true)
+    */
+   private $birthdate;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -466,6 +471,18 @@ class HRWorkers
     public function setAllowremoteclock(?bool $allowremoteclock): self
     {
         $this->allowremoteclock = $allowremoteclock;
+
+        return $this;
+    }
+
+    public function getBirthdate(): ?\DateTimeInterface
+    {
+        return $this->birthdate;
+    }
+
+    public function setBirthdate(?\DateTimeInterface $birthdate): self
+    {
+        $this->birthdate = $birthdate;
 
         return $this;
     }
