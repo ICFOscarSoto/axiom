@@ -10,7 +10,7 @@
 				{	"name": "lastname", "cols": 5},
 				{	"name": "status", "cols": 2},
 				{	"name": "user", "cols": 4},
-				{	"name": "dateofemploy", "cols": 2},
+				{	"name": "dateofemploy", "cols": 2, "type": "date"},
 				{	"name": "external", "cols": 1}
 			]
 		},

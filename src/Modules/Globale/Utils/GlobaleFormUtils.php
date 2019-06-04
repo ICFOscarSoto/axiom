@@ -7,6 +7,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
@@ -85,13 +86,20 @@ class GlobaleFormUtils extends Controller
         if($this->searchTemplateField($value['fieldName'])!==false){ //Check if field is in template, otherwise skip it
           switch($value['type']){
             case 'datetime':
-              $form->add($value['fieldName'], DateTimeType::class, ['required' => !$value["nullable"], 'widget' => 'single_text', 'date_format' => 'dd-MM-yyyy HH:mm']);
+              //Check if has a template types
+              $field=$this->searchTemplateField($value['fieldName']);
+              if(isset($field["type"])){
+                if($field["type"]=="date")
+                  $form->add($value['fieldName'], DateType::class, ['required' => !$value["nullable"], 'widget' => 'single_text', 'format' => 'dd/MM/yyyy', 'attr' => ['class' => 'datepicker']]);
+                if($field["type"]=="time")
+                  $form->add($value['fieldName'], DateType::class, ['required' => !$value["nullable"], 'widget' => 'single_text', 'format' => 'HH:mm:ss', 'attr' => ['class' => 'timepicker']]);
+              }else $form->add($value['fieldName'], DateTimeType::class, ['required' => !$value["nullable"], 'widget' => 'single_text', 'date_format' => 'dd/MM/yyyy HH:mm:ss', 'attr' => ['class' => 'datetimepicker']]);
             break;
             case 'json':
               $form->add($value['fieldName'], TextType::class, ['required' => !$value["nullable"], 'attr'=>['class' => 'tagsinput']]);
               $form->get($value['fieldName'])
                   ->addModelTransformer(new CallbackTransformer(
-                      function ($tagsAsArray) { return implode(',', $tagsAsArray);},
+                      function ($tagsAsArray) {return implode(',', $tagsAsArray);},
                       function ($tagsAsString) {return explode(',', $tagsAsString);}
                   ));
             break;

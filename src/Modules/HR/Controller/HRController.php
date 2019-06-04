@@ -114,7 +114,9 @@ class HRController extends Controller
 							'include_header' => [["type"=>"css", "path"=>"/js/jvectormap/jquery-jvectormap-1.2.2.css"],
 																	 ["type"=>"css", "path"=>"/js/rickshaw/rickshaw.min.css"]],
 							'include_footer' => [["type"=>"css", "path"=>"/js/ol/ol.css"],
-		 															 ["type"=>"js",  "path"=>"/js/ol/ol.js"]]
+		 															 ["type"=>"js",  "path"=>"/js/ol/ol.js"],
+																	 ["type"=>"css", "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.css"],
+										 		 					 ["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.js"]]
 							/*'tabs' => [["name" => "data", "caption"=>"Datos trabajador", "active"=>$tab=='data'?true:false, "route"=>$this->generateUrl("dataWorker",["id"=>$id])],
 												 ["name" => "paymentroll", "active"=>($tab=='paymentroll' && $id)?true:false, "caption"=>"Nóminas"]
 												]*/

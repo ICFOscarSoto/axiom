@@ -126,6 +126,36 @@
 </div>
 <script>
 	$(document).ready(function() {
+    {# Date time fields #}
+
+    $('.datetimepicker').each(function(index) {
+      var valueField=$(this).val();
+      var dateField=moment(valueField, "YYYY-MM-DDTHH:mm:ss");
+        $(this).datetimepicker({
+    		format: 'DD/MM/YYYY HH:mm:ss',
+    		date: (dateField.isValid())?dateField:null
+    	});
+    });
+
+    $('.datepicker').each(function(index) {
+      var valueField=$(this).val();
+      var dateField=moment(valueField, "DD-MM-YYYY");
+        $(this).datetimepicker({
+    		format: 'DD/MM/YYYY',
+    		date: (dateField.isValid())?dateField:null
+    	});
+    });
+
+    $('.timepicker').each(function(index) {
+      var valueField=$(this).val();
+      var dateField=moment(valueField, "HH:mm:ss");
+        $(this).datetimepicker({
+        format: 'HH:mm:ss',
+        date: (dateField.isValid())?dateField:null
+      });
+    });
+
+
     $('body').on('click', "[id^='{{formConstructor.name}}-button-continue']", function() {
           if($("#{{formConstructor.name}}-form-body").find('form').valid()){
             if((++load_wait)==1) $("#load-spinner").fadeIn();
