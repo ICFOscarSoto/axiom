@@ -112,7 +112,8 @@ class HRController extends Controller
 												 ["name" => "files", "icon"=>"fa fa-cloud", "caption"=>"Archivos", "route"=>$this->generateUrl("cloudfiles",["id"=>$id, "path"=>"workers"])]
 												],
 							'include_header' => [["type"=>"css", "path"=>"/js/jvectormap/jquery-jvectormap-1.2.2.css"],
-																	 ["type"=>"css", "path"=>"/js/rickshaw/rickshaw.min.css"]],
+																	 ["type"=>"css", "path"=>"/js/rickshaw/rickshaw.min.css"],
+																	 ["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker-es.js"]],
 							'include_footer' => [["type"=>"css", "path"=>"/js/ol/ol.css"],
 		 															 ["type"=>"js",  "path"=>"/js/ol/ol.js"],
 																	 ["type"=>"css", "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.css"],

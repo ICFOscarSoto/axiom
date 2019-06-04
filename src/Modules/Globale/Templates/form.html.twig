@@ -132,7 +132,10 @@
       var valueField=$(this).val();
       var dateField=moment(valueField, "YYYY-MM-DDTHH:mm:ss");
         $(this).datetimepicker({
+        showTodayButton: true,
     		format: 'DD/MM/YYYY HH:mm:ss',
+        locale:'es',
+        tooltips: spanish_tooltips_datetimepicker,
     		date: (dateField.isValid())?dateField:null
     	});
     });
@@ -141,7 +144,10 @@
       var valueField=$(this).val();
       var dateField=moment(valueField, "DD-MM-YYYY");
         $(this).datetimepicker({
+        showTodayButton: true,
     		format: 'DD/MM/YYYY',
+        locale:'es',
+        tooltips: spanish_tooltips_datetimepicker,
     		date: (dateField.isValid())?dateField:null
     	});
     });
@@ -150,7 +156,10 @@
       var valueField=$(this).val();
       var dateField=moment(valueField, "HH:mm:ss");
         $(this).datetimepicker({
+        showTodayButton: true,
         format: 'HH:mm:ss',
+        locale:'es',
+        tooltips: spanish_tooltips_datetimepicker,
         date: (dateField.isValid())?dateField:null
       });
     });

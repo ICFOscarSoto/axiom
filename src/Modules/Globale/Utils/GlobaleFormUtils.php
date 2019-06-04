@@ -93,7 +93,7 @@ class GlobaleFormUtils extends Controller
                   $form->add($value['fieldName'], DateType::class, ['required' => !$value["nullable"], 'widget' => 'single_text', 'format' => 'dd/MM/yyyy', 'attr' => ['class' => 'datepicker']]);
                 if($field["type"]=="time")
                   $form->add($value['fieldName'], DateType::class, ['required' => !$value["nullable"], 'widget' => 'single_text', 'format' => 'HH:mm:ss', 'attr' => ['class' => 'timepicker']]);
-              }else $form->add($value['fieldName'], DateTimeType::class, ['required' => !$value["nullable"], 'widget' => 'single_text', 'date_format' => 'dd/MM/yyyy HH:mm:ss', 'attr' => ['class' => 'datetimepicker']]);
+              }else $form->add($value['fieldName'], DateTimeType::class, ['required' => !$value["nullable"], 'widget' => 'single_text', 'format' => 'dd/MM/yyyy kk:mm:ss', 'attr' => ['class' => 'datetimepicker']]);
             break;
             case 'json':
               $form->add($value['fieldName'], TextType::class, ['required' => !$value["nullable"], 'attr'=>['class' => 'tagsinput']]);
