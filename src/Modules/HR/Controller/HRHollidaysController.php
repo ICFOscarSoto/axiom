@@ -46,7 +46,7 @@ $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
 $workCalendarRepository=$this->getDoctrine()->getRepository(HRWorkCalendars::class);
 $hollidaysRepository=$this->getDoctrine()->getRepository(HRHollidays::class);
 $workCalendar=$workCalendarRepository->find($id);
-dump($workCalendar->getWorkDays());
+//dump($workCalendar->getWorkDays());
 $utils = new $this->utilsClass();
 $formUtils=new GlobaleFormUtils();
 $formUtils->initialize($this->getUser(), new HRHollidays(), dirname(__FILE__)."/../Forms/Hollidays.json", $request, $this, $this->getDoctrine());
@@ -62,7 +62,10 @@ if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
     'userData' => $userdata,
     'id' => $id,
     'listConstructor' => ['topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/HolidaysTopButtons.json"),true)],
-    'form' => $templateForm
+    'form' => $templateForm,
+    'include_header' => [["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker-es.js"]],
+    'include_footer' => [["type"=>"css", "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.css"],
+                         ["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.js"]]
     ]);
 }
 return new RedirectResponse($this->router->generate('app_login'));

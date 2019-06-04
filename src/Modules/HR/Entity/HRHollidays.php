@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\HR\Entity\HRWorkCalendars;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\Modules\HR\Entity\HRHollidaysRepository")
+ * @ORM\Entity(repositoryClass="App\Modules\HR\Repository\HRHollidaysRepository")
  */
 class HRHollidays
 {
@@ -159,7 +159,7 @@ class HRHollidays
         return $this;
     }
 
-    public function getCompany(): ?GlobaleCompanies
+    /*public function getCompany(): ?GlobaleCompanies
     {
         return $this->company;
     }
@@ -169,5 +169,5 @@ class HRHollidays
         $this->company = $company;
 
         return $this;
-    }
+    }*/
 }

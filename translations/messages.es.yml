@@ -127,6 +127,12 @@ Ccc: Número de cuenta (CCC)
 Iban: IBAN
 Work calendar: Calendario laboral
 Worker: Trabajador
+# HOLLIDAYS
+#----------------------------------------------------------------------------------------------------------------------
+Holliday data: "Datos festivo"
+Type: Tipo
+Date: Fecha
+
 
 # CLOCKS
 #----------------------------------------------------------------------------------------------------------------------

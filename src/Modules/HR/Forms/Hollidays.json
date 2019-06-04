@@ -10,7 +10,7 @@
 							"options": {"Nacional": "1", "Regional": "2", "Local": "3"}
 					}
 				},
-				{	"name": "date", "cols": 6},
+				{	"name": "date", "cols": 6, "type": "date"},
 				{	"name": "active", "cols": 3}
 			]
 		}
