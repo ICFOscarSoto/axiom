@@ -130,7 +130,7 @@
 
     $('.datetimepicker').each(function(index) {
       var valueField=$(this).val();
-      var dateField=moment(valueField, "YYYY-MM-DD HH:mm:ss");
+      var dateField=moment(valueField, "DD/MM/YYYY HH:mm:ss");
         $(this).datetimepicker({
         showTodayButton: true,
     		format: 'DD/MM/YYYY HH:mm:ss',
@@ -142,7 +142,7 @@
 
     $('.datepicker').each(function(index) {
       var valueField=$(this).val();
-      var dateField=moment(valueField, "DD-MM-YYYY");
+      var dateField=moment(valueField, "DD/MM/YYYY");
         $(this).datetimepicker({
         showTodayButton: true,
     		format: 'DD/MM/YYYY',
