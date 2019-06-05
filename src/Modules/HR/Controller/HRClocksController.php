@@ -107,8 +107,8 @@ class HRClocksController extends Controller
 		 	*/
 			$workersrepository=$this->getDoctrine()->getRepository(HRWorkers::class);
 			$clocksrepository=$this->getDoctrine()->getRepository(HRClocks::class);
-			$worker=$workersrepository->find($id);
-			//Comprobamos si el empleado pertenece a la empresa
+			$worker=$workersrepository->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany(), "deleted"=>0]);
+			
 
 			if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 				return $this->render('@Globale/list.html.twig', [
