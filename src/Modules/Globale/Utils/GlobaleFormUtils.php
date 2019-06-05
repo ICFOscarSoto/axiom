@@ -161,15 +161,17 @@ class GlobaleFormUtils extends Controller
   }
 
   public function make($id, $class, $action, $name, $type="full", $render="@Globale/form.html.twig", $returnRoute=null, $utilsClass=null){
-    if(!$id){
+     if(!($this->obj instanceof $class)){
 				$this->obj=new $class();
 			} else{
 					$repository = $this->doctrine->getRepository($class);
           //Security separation of companies
-          if(property_exists($class,'company')){
-            $this->obj=$repository->findOneBy(['id'=>$id, 'company'=>$this->user->getCompany(), 'deleted'=>0]);
-          }else{
-            $this->obj=$repository->findOneBy(['id'=>$id, 'deleted'=>0]);
+          if($this->obj->getId()!==null){ //If obj hasn't ID we asume that the obj is initzializated by us in the controller for set default values
+            if(property_exists($class,'company')){
+              $this->obj=$repository->findOneBy(['id'=>$id, 'company'=>$this->user->getCompany(), 'deleted'=>0]);
+            }else{
+              $this->obj=$repository->findOneBy(['id'=>$id, 'deleted'=>0]);
+            }
           }
 					if($this->obj===NULL) $this->obj=new $class();
 			}
