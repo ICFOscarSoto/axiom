@@ -368,7 +368,13 @@
 					<i class="{{ field.icon }}"></i>{{ field.name }}
 				</a>
 				{% else %}
-						<a href="{% if field.route is defined and field.route|length %}{{ url(field.route) }}{% else %}javascript:void(0);{% endif %}" style="font-size: 20px" id="{{ field.id }}-top-button" type="button" class="btn tooltip-primary {{ field.type }}" {% if field.tooltip is defined %} data-toggle="tooltip" data-placement="bottom" title="" data-original-title=" {{ field.tooltip }} {% endif %} ">
+						{% set routeParams = [] %}
+						{% if field.routeParams is defined %}
+							{% for key,param in field.routeParams %}
+								{% set routeParams = routeParams|merge({(key): _context[param]}) %}
+							{% endfor %}
+						{% endif %}
+						<a href="{% if field.route is defined and field.route|length %}{{ url(field.route, routeParams) }}{% else %}javascript:void(0);{% endif %}" style="font-size: 20px" id="{{ field.id }}-top-button" type="button" class="btn tooltip-primary {{ field.type }}" {% if field.tooltip is defined %} data-toggle="tooltip" data-placement="bottom" title="" data-original-title=" {{ field.tooltip }} {% endif %} ">
 							<i class="{{ field.icon }}"></i>{{ field.name }}
 						</a>
 				{% endif %}

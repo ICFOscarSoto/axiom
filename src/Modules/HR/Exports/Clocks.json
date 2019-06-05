@@ -1,0 +1,11 @@
+[{"name": "id", "caption":""},
+ {"name": "start", "caption":"Entrada"},
+ {"name": "startLatitude", "caption":""},
+ {"name": "startLongitude", "caption":""},
+ {"name": "end", "caption":"Salida"},
+ {"name": "endLatitude", "caption":""},
+ {"name": "endLongitude", "caption":""},
+ {"name": "time", "caption":"Duración", "sum": true, "format": "time"},
+ {"name": "invalid", "caption":"Valido"},
+ {"name": "active", "caption":"Estado"}
+]
