@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\Globale\Entity\GlobaleUsers;
 use \App\Modules\Globale\Entity\GlobaleCountries;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
+use \App\Modules\HR\Entity\HRDepartments;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\HR\Repository\HRWorkerRepository")
@@ -157,6 +158,11 @@ class HRWorkers
     * @ORM\Column(type="datetime", nullable=true)
     */
    private $birthdate;
+
+   /**
+    * @ORM\ManyToOne(targetEntity="\App\Modules\HR\Entity\HRDepartments")
+    */
+   private $department;
 
     public function getId(): ?int
     {
@@ -483,6 +489,18 @@ class HRWorkers
     public function setBirthdate(?\DateTimeInterface $birthdate): self
     {
         $this->birthdate = $birthdate;
+
+        return $this;
+    }
+
+    public function getDepartment(): ?HRDepartments
+    {
+        return $this->department;
+    }
+
+    public function setDepartment(?HRDepartments $department): self
+    {
+        $this->department = $department;
 
         return $this;
     }

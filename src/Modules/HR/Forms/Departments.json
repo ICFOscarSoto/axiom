@@ -1,0 +1,11 @@
+[{
+	"sections": [
+		{
+			"name": "Departamento",
+			"fields": [
+				{ "name": "name", "cols": 4},
+				{	"name": "active", "cols": 1}
+			]
+		}
+	]
+}]
