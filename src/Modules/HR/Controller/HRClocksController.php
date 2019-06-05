@@ -15,6 +15,7 @@ use App\Modules\Globale\Entity\GlobaleCompanies;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
+use App\Modules\Globale\Utils\GlobaleExportUtils;
 use App\Modules\Cloud\Controller\CloudController;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use App\Modules\HR\Utils\HRClocksUtils;
@@ -108,7 +109,6 @@ class HRClocksController extends Controller
 			$workersrepository=$this->getDoctrine()->getRepository(HRWorkers::class);
 			$clocksrepository=$this->getDoctrine()->getRepository(HRClocks::class);
 			$worker=$workersrepository->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany(), "deleted"=>0]);
-			
 
 			if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 				return $this->render('@Globale/list.html.twig', [
@@ -176,7 +176,26 @@ class HRClocksController extends Controller
 			}else return new JsonResponse(["result"=>-2]);
  		}
 
-
+		/**
+		 * @Route("/{_locale}/HR/{id}/clocks/export", name="exportWorkerClocks")
+		 */
+		 public function exportWorkerClocks($id, Request $request){
+			 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+ 			 $this->denyAccessUnlessGranted('ROLE_ADMIN');
+			 $utilsExport = new GlobaleExportUtils();
+			 $workerRepository=$this->getDoctrine()->getRepository(HRWorkers::class);
+			 $worker = $workerRepository->find($id);
+			 $user = $this->getUser();
+	 		 $manager = $this->getDoctrine()->getManager();
+	 		 $repository = $manager->getRepository($this->class);
+	 		 $listUtils=new GlobaleListUtils();
+	 		 $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Exports/Clocks.json"),true);
+	 		 $list=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $this->class,[["type"=>"and", "column"=>"worker", "value"=>$worker]],[],-1);
+			 //dump($list["data"]);
+			 $result = $utilsExport->export($list,$listFields);
+			 //return new Response('');
+			 return $result;
+		 }
 
 		/**
 		 * @Route("/{_locale}/HR/clocks/data/{id}/{action}/{idworker}", name="dataClocks", defaults={"id"=0, "action"="read", "idworker"="0"})

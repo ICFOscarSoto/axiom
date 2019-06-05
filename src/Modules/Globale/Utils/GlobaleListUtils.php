@@ -4,13 +4,18 @@ use App\Modules\Globale\Entity\GlobaleCompanies;
 
 class GlobaleListUtils
 {
-    public function getRecords($user,$repository,$request,$manager,$listFields,$classname,$filters=[],$raw=[]): array
+    public function getRecords($user,$repository,$request,$manager,$listFields,$classname,$filters=[],$raw=[],$maxResults=20): array
     {
 		$return=array();
 		$query = $repository->createQueryBuilder('p')
-			->setFirstResult($request->query->getInt('start', 0))
-			->setMaxResults($request->query->getInt('length', 10));
-		$queryFiltered = $repository->createQueryBuilder('p')->select('count(p.id)');
+			->setFirstResult($request->query->getInt('start', 0));
+    if($maxResults===NULL)
+        $query->setMaxResults($request->query->getInt('length', 20));
+    else if($maxResults>=0)
+			$query->setMaxResults($maxResults);
+
+
+    $queryFiltered = $repository->createQueryBuilder('p')->select('count(p.id)');
     $queryTotal = $repository->createQueryBuilder('p')->select('count(p.id)');
 
 		//Formamos el filtro de busqueda global
