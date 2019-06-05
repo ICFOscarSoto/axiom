@@ -97,7 +97,7 @@ class HRDepartmentsController extends Controller
      $repository = $manager->getRepository($this->class);
      $listUtils=new GlobaleListUtils();
      $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Exports/Departments.json"),true);
-     $list=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $this->class,[["type"=>"and", "columns"=>"company", "value"=>$user->getCompany()]],[],-1);
+     $list=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $this->class,[["type"=>"and", "column"=>"company", "value"=>$user->getCompany()]],[],-1);
      $result = $utilsExport->export($list,$listFields);
      return $result;
    }
