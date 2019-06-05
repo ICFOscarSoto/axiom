@@ -166,7 +166,7 @@ class GlobaleFormUtils extends Controller
 			} else{
 					$repository = $this->doctrine->getRepository($class);
           //Security separation of companies
-          if($this->obj->getId()!==null){ //If obj hasn't ID we asume that the obj is initzializated by us in the controller for set default values
+          if($id!==null && $id!==0){ //If obj hasn't ID we asume that the obj is initzializated by us in the controller for set default values
             if(property_exists($class,'company')){
               $this->obj=$repository->findOneBy(['id'=>$id, 'company'=>$this->user->getCompany(), 'deleted'=>0]);
             }else{
