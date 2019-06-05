@@ -25,7 +25,7 @@ class IoTController extends Controller
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 
-
+			return new Response('');
 		}else return new RedirectResponse($this->router->generate('app_login'));
 	}
 }
