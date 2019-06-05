@@ -99,8 +99,15 @@ class GlobaleImagesController extends Controller implements ContainerAwareInterf
 		$basePath = $this->get('kernel')->getRootDir().'/../cloud/'.$user->getCompany()->getId().'/';
 		$tempName = md5(uniqid()).'.'.$file->guessExtension();
 		$tempPath = $basePath.'temp/'.$tempName;
-
+		//Create basepath if it not exists
+		if (!file_exists($basePath.'temp')) {
+		    mkdir($basePath.'temp', 0777, true);
+		}
 		$file->move($basePath.'temp/', $tempName);
+		//Create type path if it not exists
+		if (!file_exists($basePath.'images/'.$type)) {
+		    mkdir($basePath.'images/'.$type, 0777, true);
+		}
 
 		//50 256 640 1024
 		$manager = new ImageManager($this->container);

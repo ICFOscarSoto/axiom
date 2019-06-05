@@ -1,5 +1,6 @@
-[{"name": "id", "caption":""},
- {"name": "start", "caption":"Entrada"},
+[
+  {"name": "id", "caption":""},
+  {"name": "start", "caption":"Entrada"},
  {"name": "startLatitude", "caption":""},
  {"name": "startLongitude", "caption":""},
  {"name": "end", "caption":"Salida"},

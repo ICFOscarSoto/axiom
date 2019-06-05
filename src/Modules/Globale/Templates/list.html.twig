@@ -3,7 +3,7 @@
 		{{ include(template) }}
 	{% endfor %}
 {% endif %}
-
+<input type="hidden" id="search_param"/>
 <script>
 			$(document).ready(function() {
 				var ${{ listConstructor.id }}_var = jQuery("#{{ listConstructor.id }}");
@@ -43,6 +43,7 @@
                         { "data": null, defaultContent: '' }
 					],
 					"drawCallback": function( settings ) {
+
 							replaceCheckboxes();
 					},
 
@@ -196,6 +197,10 @@
 				{% for field in listConstructor.fields %}
 					$('body').on('keyup', '#s_{{ field.name }}', function() {
 						{{ listConstructor.id }}.columns('{{ field.name }}:name').search( this.value ).draw();
+						arrayParams={{ listConstructor.id }}.ajax.params();
+						$("#search_param").val(jQuery.param(arrayParams));
+						//console.log(jQuery.param(arrayParams));
+
 					});
 
 
@@ -374,9 +379,21 @@
 								{% set routeParams = routeParams|merge({(key): _context[param]}) %}
 							{% endfor %}
 						{% endif %}
-						<a href="{% if field.route is defined and field.route|length %}{{ url(field.route, routeParams) }}{% else %}javascript:void(0);{% endif %}" style="font-size: 20px" id="{{ field.id }}-top-button" type="button" class="btn tooltip-primary {{ field.type }}" {% if field.tooltip is defined %} data-toggle="tooltip" data-placement="bottom" title="" data-original-title=" {{ field.tooltip }} {% endif %} ">
+
+						<a id="topButton-{{ field.name }}" attr-search="{% if field.addSearch is defined %}{{field.addSearch}}{% else %} false {% endif %}" attr-href="{% if field.route is defined and field.route|length %}{{ url(field.route, routeParams) }}{% endif %}" href="javascript:void(0);"
+						style="font-size: 20px" id="{{ field.id }}-top-button" type="button" class="btn tooltip-primary {{ field.type }}" {% if field.tooltip is defined %} data-toggle="tooltip" data-placement="bottom" title="" data-original-title=" {{ field.tooltip }} {% endif %} ">
 							<i class="{{ field.icon }}"></i>{{ field.name }}
 						</a>
+						<script>
+							$('body').on('click', "[id^='topButton-']", function() {
+								var url=$(this).attr('attr-href');
+								if($(this).attr('attr-search')==1){
+									url+='?'+$("#search_param").val();
+								}
+								console.log(url);
+								location.href=url;
+							});
+						</script>
 				{% endif %}
 			</div>
 	{% endfor %}

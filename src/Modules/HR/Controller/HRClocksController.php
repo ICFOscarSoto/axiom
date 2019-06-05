@@ -191,10 +191,9 @@ class HRClocksController extends Controller
 	 		 $listUtils=new GlobaleListUtils();
 	 		 $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Exports/Clocks.json"),true);
 	 		 $list=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $this->class,[["type"=>"and", "column"=>"worker", "value"=>$worker]],[],-1);
-			 //dump($list["data"]);
 			 $result = $utilsExport->export($list,$listFields);
-			 //return new Response('');
 			 return $result;
+			 //return new Response('');
 		 }
 
 		/**

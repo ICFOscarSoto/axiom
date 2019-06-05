@@ -4,16 +4,28 @@ use App\Modules\Globale\Entity\GlobaleCompanies;
 
 class GlobaleListUtils
 {
+    private function searchColumns($array, $search){
+      if(is_array($array))
+        foreach ($array as $key => $val) {
+         if ($val['name'] === $search) {
+             return $key;
+         }
+        }
+      return null;
+    }
+
     public function getRecords($user,$repository,$request,$manager,$listFields,$classname,$filters=[],$raw=[],$maxResults=20): array
     {
 		$return=array();
-		$query = $repository->createQueryBuilder('p')
-			->setFirstResult($request->query->getInt('start', 0));
-    if($maxResults===NULL)
-        $query->setMaxResults($request->query->getInt('length', 20));
-    else if($maxResults>=0)
-			$query->setMaxResults($maxResults);
+		$query = $repository->createQueryBuilder('p');
 
+    if($maxResults===NULL){
+        $query->setFirstResult($request->query->getInt('start', 0));
+        $query->setMaxResults($request->query->getInt('length', 20));
+    }else if($maxResults>=0){
+      $query->setFirstResult($request->query->getInt('start', 0));
+      $query->setMaxResults($maxResults);
+    }
 
     $queryFiltered = $repository->createQueryBuilder('p')->select('count(p.id)');
     $queryTotal = $repository->createQueryBuilder('p')->select('count(p.id)');
@@ -44,9 +56,15 @@ class GlobaleListUtils
 		//Formamos los filtros de busqueda por columna
 		foreach($listFields as $key => $field){
         //Solo añadimos los campos de tipo data
+
        if(!isset($field["type"])||$field["type"]=="data"){
   				$searchValue=$request->query->get('columns');
-  				$searchValue=$searchValue[$key+1]['search']['value'];
+          //Buscar el key del field["name"0] en las columnas pasados por parametro
+          $keyColumn=$this->searchColumns($searchValue, $field["name"]);
+          if(!$keyColumn) continue;
+          //TODO Campos mapeados como las coordenadas y demas petan aqui
+
+  				$searchValue=$searchValue[$keyColumn]['search']['value'];
   				if($searchValue!=""){
   					$path=explode('__', $field["name"]);
   					if(count($path)>1){
@@ -135,7 +153,7 @@ class GlobaleListUtils
     }
     //dump($query->getQuery()->getSql());
 		$queryPaginator = $query->getQuery();
-		//dump($queryPaginator->getSql());
+
 		$records=$queryPaginator->getResult();
 
 		$records=$queryPaginator->getResult();
