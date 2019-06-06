@@ -238,12 +238,14 @@ class GlobaleListUtils
 			//Tags
 			$tags=array();
       if(method_exists($record, "getDateupd")){
-        if((time()-$record->getDateupd()->getTimestamp())<$record->updatedSeconds && $record->getDateupd()!=$record->getDateadd()){
+        $updatedSeconds=property_exists($record,'updatedSeconds')?$record->updatedSeconds:21600;
+        $newSeconds=property_exists($record,'newSeconds')?$record->newSeconds:21600;
+        if((time()-$record->getDateupd()->getTimestamp())<$updatedSeconds && $record->getDateupd()!=$record->getDateadd()){
           $tag_ob=array("type" => "warning", "name" => "Modificado");
           $tags[]=$tag_ob;
         }else{
           if(method_exists($record, "getDateadd"))
-  					if((time()-$record->getDateadd()->getTimestamp())<$record->newSeconds){
+  					if((time()-$record->getDateadd()->getTimestamp())<$newSeconds){
   						$tag_ob=array("type" => "success", "name" => "Nuevo");
   						$tags[]=$tag_ob;
 					  }
