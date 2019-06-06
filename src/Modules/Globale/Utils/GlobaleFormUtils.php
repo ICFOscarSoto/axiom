@@ -54,6 +54,10 @@ class GlobaleFormUtils extends Controller
     $this->templateArray=json_decode(file_get_contents ($this->template),true);
     $this->entityManager=$this->doctrine->getManager();
     $this->encoder=$encoder;
+    //Set active by default in new objects
+    if($obj->getId()===null && method_exists($obj, 'setActive')){
+      $obj->setActive(true);
+    }
   }
 
 /*NEW METHODS*/

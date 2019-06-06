@@ -47,7 +47,7 @@
 		{
 			"name": "",
 			"fields": [
-				{	"name": "active", "cols": 1}
+				{	"name": "active", "cols": 2}
 			]
 		}
 
