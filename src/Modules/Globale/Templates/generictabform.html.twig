@@ -58,10 +58,10 @@
           $.post(url, null,
             function(data, status, xhr){
               $("#tab-body-"+$('#tabs-list li.active').attr("attr-name")).html(data);
-              $("#tab-body-"+$('#tabs-list li.active').attr("attr-name")).iCheck({checkboxClass: 'icheckbox_flat-blue', radioClass: 'iradio_flat-blue'});
-              $("#tab-body-"+$('#tabs-list li.active').attr("attr-name")+" select").select2();
+							$("#tab-body-"+$('#tabs-list li.active').attr("attr-name")).find(':checkbox').not($('[id$=-chkall]')).iCheck({checkboxClass: 'icheckbox_flat-blue', radioClass: 'iradio_flat-blue'});
+							$("#tab-body-"+$('#tabs-list li.active').attr("attr-name")+" select").select2();
 							$("#tab-body-"+$('#tabs-list li.active').attr("attr-name")+" .fileinput").fileinput();
-
+							console.log("cargo");
 
               if((--load_wait)==0) $("#load-spinner").fadeOut();
           });
