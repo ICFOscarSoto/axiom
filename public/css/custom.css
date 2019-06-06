@@ -51,8 +51,18 @@ th.table-header-search input{
 	border: none !important;
 }
 
-.table-bordered > thead > tr > th, .table-bordered > tbody > tr > th, .table-bordered > tfoot > tr > th, .table-bordered > thead > tr > td, .table-bordered > tbody > tr > td, .table-bordered > tfoot > tr > td{
+.table-bordered > thead > tr > th, .table-bordered > tbody > tr > th, .table-bordered > thead > tr > td, .table-bordered > tbody > tr > td{
 	border: none !important;
+}
+
+.table-bordered > tfoot > tr > td{
+  font-size: 14px !important;
+  font-weight: bold !important;
+  color: #8a8a8a !important;
+  border-top: 2px solid #dddddd !important;
+  border-left: none !important;
+  border-right: none !important;
+  background-color: #fff;
 }
 
 table.dataTable thead th, table.dataTable thead td {
@@ -302,6 +312,7 @@ label.error {
 .error.form-control {
     background-color: #fffbfb !important;
 }
+
 
 /*
 .spinner-container {

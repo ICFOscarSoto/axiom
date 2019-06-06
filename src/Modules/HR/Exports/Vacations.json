@@ -1,0 +1,9 @@
+[{"name": "id", "caption":""},
+ {"name": "type", "caption":"Tipo"},
+ {"name": "start", "caption":"Inicio"},
+ {"name": "end", "caption":"Fin"},
+ {"name": "days", "caption":"Días"},
+ {"name": "requestdate", "caption":"Fecha peticion"},
+ {"name": "approved", "caption":"Aprobado"},
+ {"name": "active", "caption":"Estado"}
+]

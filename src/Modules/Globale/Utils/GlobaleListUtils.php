@@ -14,7 +14,7 @@ class GlobaleListUtils
       return null;
     }
 
-    public function getRecords($user,$repository,$request,$manager,$listFields,$classname,$filters=[],$raw=[],$maxResults=20): array
+    public function getRecords($user,$repository,$request,$manager,$listFields,$classname,$filters=[],$raw=[],$maxResults=null): array
     {
 		$return=array();
 		$query = $repository->createQueryBuilder('p');

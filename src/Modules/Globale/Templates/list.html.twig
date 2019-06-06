@@ -54,15 +54,25 @@
 						api.columns('.sum', {
 							page: 'current'
 						}).every(function() {
-							var sum = this
+							var data = this
 								.data()
 								.reduce(function(a, b) {
 									var x = parseFloat(a) || 0;
 									var y = parseFloat(b) || 0;
 									return x + y;
 								}, 0);
-							console.log(sum); //alert(sum);
-							$(this.footer()).html(sum);
+							 this.columns('.time', {page: 'current'}).every(function() {
+								 //if has format we format it
+	 	 							if(data!=null){
+	 								var duration = moment.duration(data, 'seconds');
+	 								var formatted = duration.format("hh:mm:ss");
+	 								if(formatted.length==2) formatted="00:00:"+formatted;
+	 								if(formatted.length==5) formatted="00:"+formatted;
+	 							}else formatted = '00:00:00';
+								data=formatted;
+							 },0);
+							 $("#{{ listConstructor.id }}-footer").show();
+							$(this.footer()).html(data);
 						});
 					},
 					"columnDefs": [
@@ -434,7 +444,7 @@
 						</div>
 					</th>
 					{% for field in listConstructor.fields %}
-						<th class="table-header-name {% if field.sum is defined and field.sum == true %} sum {% endif %}">{{ field.caption }}</th>
+						<th class="table-header-name {% if field.sum is defined and field.sum == true %} sum {% endif %} {% if field.format is defined %} {{field.format}} {% endif %}">{{ field.caption }} </th>
 					{% endfor %}
 
 					{% for field in listConstructor.fieldButtons %}
@@ -442,6 +452,26 @@
 					{% endfor %}
 
 			</thead>
+		<tfoot id="{{ listConstructor.id }}-footer" style="display:none">
+			<tr>
+				<td class="table-footer">
+					<b>TOTALES</b>
+				</td>
+				{# only show search fields in data type fields#}
+				{% for field in listConstructor.fields %}
+					{% if field.type is not defined or field.type == "data" %}
+						<td class="table-footer"></td>
+					{% else %}
+						<td></td>
+					{% endif %}
+				{% endfor %}
+
+				{% for field in listConstructor.fieldButtons %}
+					<td class="table-footer"></td>
+				{% endfor %}
+
+			</tr>
+		</tfoot>
 	</table>
 	<div class="modal fade" id="{{ listConstructor.id }}-modal-confirm" data-backdrop="static" style="display: none;">
 		<div class="modal-dialog">

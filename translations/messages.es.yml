@@ -143,10 +143,10 @@ Date: Fecha
 Clocks: Fichajes
 Clock code: Código Fichaje
 Allowremoteclock: Fichaje Remoto
-Start: Hora Inicio
+Start: Inicio
 Start latitude: Latitud Inicio
 Start longitude: Longitud Inicio
-End: Hora Fin
+End: Fin
 End latitude: Latitud Fin
 End longitude: Longitud Fin
 Invalid: Invalido
@@ -159,6 +159,16 @@ This month: Este mes
 Last month: Mes pasado
 This year: Este año
 Last year: Año pasado
+
+# VACATIONS
+#----------------------------------------------------------------------------------------------------------------------
+Vacations: Vacaciones
+Approved: Aprobado
+Workerobservations: Observaciones Trabajador
+Companyobservations: Observaciones Empresa
+Requestdate: Fecha Solicitud
+Select a type...: Seleccionar un tipo...
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++
 # ++++++++++++++++   ERP   +++++++++++++++++++++++++++
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++

@@ -1,0 +1,18 @@
+[{
+	"sections": [
+		{
+			"name": "Vacaciones",
+			"fields": [
+				{ "name": "worker", "cols": 5},
+				{	"name": "type", "cols": 4},
+				{	"name": "start", "cols": 4, "type": "date", "linked": {"field":"end", "by":"minDate"}},
+				{	"name": "end", "cols": 4, "type": "date", "linked": {"field":"start", "by":"maxDate"}},
+				{	"name": "approved", "cols": 3},
+				{	"name": "workerobservations", "cols": 6},
+				{	"name": "companyobservations", "cols": 6},
+        {	"name": "requestdate", "cols": 3, "type": "date"},
+				{	"name": "active", "cols": 2}
+			]
+		}
+	]
+}]
