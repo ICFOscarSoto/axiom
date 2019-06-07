@@ -1,31 +1,41 @@
 {% set listConstructor = cloudConstructor.list[0] %}
 {% set listOrigin = "genericlist" %}
 {# for know if list.html is invoked directly from controller and we need to make modals inside list#}
+  <div class="panel minimal">
+  <div class="panel-heading">
+    <div class="panel-title">Archivos adjuntos</div>
+  </div>
+    <div class="{{ cloudConstructor.id }}" attr-id="{{ listConstructor.id }}" attr-path="{{cloudConstructor.path}}"><div class="dz-message" data-dz-message>
+      {{ include('@Globale/list.html.twig') }}
 
-<div class="dropzone" attr-id="{{ listConstructor.id }}" attr-path="{{cloudConstructor.path}}"><div class="dz-message" data-dz-message>
-  {{ include('@Globale/list.html.twig') }}
-  <script>
-    $(document).ready(function(){
-      Dropzone.autoDiscover = false;
-      var jsonFiles = [];
-      var dropzone_default = new Dropzone(".dropzone", {
-          url: '{{cloudConstructor.path}}',
-          maxFilesize: 20,  // in Mb
-          addRemoveLinks: false,
-          clickable: '#uploadWorker-top-button',
-          init: function () {
-              this.on("maxfilesexceeded", function(file) {
-                  this.removeFile(file);
-              });
-              this.on("success", function(file, response) {
-                  if (response.uploaded){
-                    this.removeFile(file);
-                    $("#{{ listConstructor.id }}").DataTable().ajax.reload();
-                  }
-              });
-          }
-      });
+      <div class="btn-group">
 
-    });
-    </script>
-</div></div>
+    						<a attr-search=" false " attr-href="" href="javascript:void(0);" style="font-size: 20px" id="{{ cloudConstructor.id }}-top-button" type="button" class="btn tooltip-primary btn-primary dz-clickable" data-toggle="tooltip" data-placement="bottom" title="" data-original-title=" Subir archivos  ">
+    							<i class="fa fa-cloud-upload"></i></a>
+                </div>
+      <script>
+        $(document).ready(function(){
+          Dropzone.autoDiscover = false;
+          var jsonFiles = [];
+          var dropzone_default = new Dropzone(".{{ cloudConstructor.id }}", {
+              url: '{{cloudConstructor.path}}',
+              maxFilesize: 20,  // in Mb
+              addRemoveLinks: false,
+              clickable: '#{{ cloudConstructor.id }}-top-button',
+              init: function () {
+                  this.on("maxfilesexceeded", function(file) {
+                      this.removeFile(file);
+                  });
+                  this.on("success", function(file, response) {
+                      if (response.uploaded){
+                        this.removeFile(file);
+                        $("#{{ listConstructor.id }}").DataTable().ajax.reload();
+                      }
+                  });
+              }
+          });
+
+        });
+        </script>
+    </div></div>
+</div>

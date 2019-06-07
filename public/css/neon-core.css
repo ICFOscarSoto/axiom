@@ -8845,14 +8845,14 @@ blockquote.blockquote-danger small strong {
 .dataTables_wrapper > div label {
   margin-bottom: 0;
   font-weight: normal;
-  color: #949494;
+  color: #6f6f6f;
 }
 .dataTables_wrapper > div.dataTables_length,
 .dataTables_wrapper > div.dataTables_filter,
 .dataTables_wrapper > div.dataTables_info,
 .dataTables_wrapper > div.dataTables_processing,
 .dataTables_wrapper > div.dataTables_paginate {
-  color: #949494;
+  color: #6f6f6f;
 }
 .dataTables_wrapper > div input[type="text"],
 .dataTables_wrapper > div input[type="search"],
@@ -8917,7 +8917,7 @@ blockquote.blockquote-danger small strong {
   background-color: #fff;
   border: 0 !important;
   margin: 0 !important;
-  color: #949494 !important;
+  color: #6f6f6f !important;
   outline: 0;
   -webkit-border-radius: 0 !important;
   -webkit-background-clip: padding-box !important;

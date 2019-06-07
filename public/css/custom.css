@@ -216,8 +216,20 @@ label.form-check-label {
 }
 
 .panel.minimal > .panel-heading > .panel-title {
-    font-family: "Helvetica Neue", Helvetica, "Noto Sans", sans-serif;
-    color: #949494;
+  font-family: "Helvetica Neue", Helvetica, "Noto Sans", sans-serif;
+  color: #6f6f6f;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.panel.minimal{
+  padding-bottom: 0px !important;
+  margin-bottom: 0px !important;
+  padding-top: 2px;
+}
+
+.panel-body {
+  padding-bottom: 0px !important;
 }
 
 .modal-header {
@@ -228,6 +240,10 @@ label.form-check-label {
 .modal-title{
   color: #fff !important;
   font-size: 18px !important;
+}
+
+.modal .modal-content {
+  border: 1px solid #404040;
 }
 
 .fc-toolbar .fc-left{

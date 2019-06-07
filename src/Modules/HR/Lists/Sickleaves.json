@@ -1,0 +1,12 @@
+[{"name": "id", "caption":""},
+ {"name": "type", "caption":"Tipo", "replace":{
+    "1":"C. Común",
+    "2":"C. Profesional"
+   }},
+ {"name": "name", "caption":"Descripción"},
+ {"name": "start", "caption":"Inicio"},
+ {"name": "end", "caption":"Fin"},
+ {"name": "days", "caption":"Días", "width":"10%", "sum": true},
+ {"name": "justified", "caption":"Justificado", "width":"10%" ,"class" : "dt-center", "replace":{"0":"<div style=\"min-width: 75px;\" class=\"label label-danger\">Injustificado</div>", "1" : "<div style=\"min-width: 75px;\" class=\"label label-success\">Justificado</div>"}},
+ {"name": "active", "caption":"Estado", "width":"10%" ,"class" : "dt-center", "replace":{"1":"<div style=\"min-width: 75px;\" class=\"label label-success\">Activo</div>", "0" : "<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado</div>"}}
+]

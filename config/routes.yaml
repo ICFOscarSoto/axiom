@@ -183,6 +183,10 @@ HRVacations:
    resource: 'App\Modules\HR\Controller\HRVacationsController'
    type:     annotation
 
+HRSickleaves:
+   resource: 'App\Modules\HR\Controller\HRSickleavesController'
+   type:     annotation
+
 Cloud:
    resource: 'App\Modules\Cloud\Controller\CloudController'
    type:     annotation

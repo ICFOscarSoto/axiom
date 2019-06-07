@@ -164,7 +164,7 @@ class GlobaleFormUtils extends Controller
     $this->values=$values;
   }
 
-  public function make($id, $class, $action, $name, $type="full", $render="@Globale/form.html.twig", $returnRoute=null, $utilsClass=null){
+  public function make($id, $class, $action, $name, $type="full", $render="@Globale/form.html.twig", $returnRoute=null, $utilsClass=null, $includesArray=[]){
      if(!($this->obj instanceof $class)){
 				$this->obj=new $class();
 			} else{
@@ -198,7 +198,8 @@ class GlobaleFormUtils extends Controller
 				 break;
 				 case 'read':
 						 return $this->controller->render($render, array(
-							'formConstructor' => ["id"=>$id, "id_object"=>$id, "name"=>$name, "form" => $form->createView(), "type" => $type, "post"=>$this->controller->generateUrl($this->request->get('_route'),["id"=>$id, "action"=>"save"]), "template" => json_decode(file_get_contents ($this->template),true)]
+              'includes' => $includesArray,
+              'formConstructor' => ["id"=>$id, "id_object"=>$id, "name"=>$name, "form" => $form->createView(), "type" => $type, "post"=>$this->controller->generateUrl($this->request->get('_route'),["id"=>$id, "action"=>"save"]), "template" => json_decode(file_get_contents ($this->template),true)]
 					    ));
 				break;
 			}
@@ -222,10 +223,10 @@ class GlobaleFormUtils extends Controller
        }
        $obj->setDateupd(new \DateTime());
        try{
-         if(method_exists($obj,'preProccess')) $obj->{'preProccess'}();
+         if(method_exists($obj,'preProccess')) $obj->{'preProccess'}($this->controller->get('kernel'), $this->doctrine, $this->user);
          $this->entityManager->persist($obj);
          $this->entityManager->flush();
-         if(method_exists($obj,'postProccess')) $obj->{'postProccess'}($this->controller->get('kernel'));
+         if(method_exists($obj,'postProccess')) $obj->{'postProccess'}($this->controller->get('kernel'), $this->doctrine, $this->user);
          return $obj;
        }catch (Exception $e) {
          return false;

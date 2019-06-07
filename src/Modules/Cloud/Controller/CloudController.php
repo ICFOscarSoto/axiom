@@ -60,7 +60,7 @@ class CloudController extends Controller
 		$this->router = $router;
 		$user=$this->getUser();
 		$utils = new $this->utilsClass();
-		$templateLists=["list"=>[$utils->formatList($user,$path,$id)],"path"=>$this->generateUrl("cloudUpload",["id"=>$id, "path"=>$path])];
+		$templateLists=["id"=>"cloudZone".$path, "list"=>[$utils->formatList($user,$path,$id)],"path"=>$this->generateUrl("cloudUpload",["id"=>$id, "path"=>$path])];
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 			return $this->render('@Cloud/genericlistfiles.html.twig', [
 				'cloudConstructor' => $templateLists
@@ -79,7 +79,8 @@ class CloudController extends Controller
         $manager = $this->getDoctrine()->getManager();
         $output = array('uploaded' => false);
         if($path!=NULL){
-          $uploadDir=$this->get('kernel')->getRootDir() . '/../cloud/'.$this->getUser()->getCompany()->getId().'/'.$path.'/'.$id.'/';
+						 if($id==0) $uploadDir=$this->get('kernel')->getRootDir() . '/../cloud/'.$this->getUser()->getCompany()->getId().'/temp/'.$this->getUser()->getId().'/'.$path.'/';
+						 else $uploadDir=$this->get('kernel')->getRootDir() . '/../cloud/'.$this->getUser()->getCompany()->getId().'/'.$path.'/'.$id.'/';
              $file = $request->files->get('file');
              //$fileName = md5(uniqid()).'.'.$file->guessExtension();
              $fileName = date("YmdHis").'_'.md5(uniqid());
@@ -144,7 +145,9 @@ class CloudController extends Controller
         $cloudFileRepository = $this->getDoctrine()->getRepository(CloudFiles::class);
         $cloudFile=$this->getDoctrine()->getRepository(CloudFiles::class)->find($id);
         if($cloudFile!=NULL){
-          $filename=$uploadDir=$this->get('kernel')->getRootDir() . '/../cloud/'.$cloudFile->getCompany()->getId().'/'.$cloudFile->getPath().'/'.$cloudFile->getIdclass().'/'.$cloudFile->getHashname();
+					if($cloudFile->getIdclass()==0)
+					  $filename=$uploadDir=$this->get('kernel')->getRootDir() . '/../cloud/'.$cloudFile->getCompany()->getId().'/temp/'.$cloudFile->getUser()->getId().'/'.$cloudFile->getPath().'/'.$cloudFile->getHashname();
+          	else $filename=$uploadDir=$this->get('kernel')->getRootDir() . '/../cloud/'.$cloudFile->getCompany()->getId().'/'.$cloudFile->getPath().'/'.$cloudFile->getIdclass().'/'.$cloudFile->getHashname();
           $response = new BinaryFileResponse($filename);
           $response->setContentDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT,$cloudFile->getName());
           return $response;

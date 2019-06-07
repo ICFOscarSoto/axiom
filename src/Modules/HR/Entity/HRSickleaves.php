@@ -4,11 +4,12 @@ namespace App\Modules\HR\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\HR\Entity\HRWorkers;
+use App\Modules\Cloud\Utils\CloudFilesUtils;
 
 /**
- * @ORM\Entity(repositoryClass="App\Modules\HR\Repository\HRVacationsRepository")
+ * @ORM\Entity(repositoryClass="App\Modules\HR\Repository\HRSickleavesRepository")
  */
-class HRVacations
+class HRSickleaves
 {
     /**
      * @ORM\Id()
@@ -34,14 +35,19 @@ class HRVacations
     private $start;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="datetime", nullable=true)
      */
     private $end;
 
     /**
+     * @ORM\Column(type="string", length=200)
+     */
+    private $name;
+
+    /**
      * @ORM\Column(type="boolean", nullable=true)
      */
-    private $approved;
+    private $justified;
 
     /**
      * @ORM\Column(type="text", nullable=true)
@@ -129,21 +135,33 @@ class HRVacations
         return $this->end;
     }
 
-    public function setEnd(\DateTimeInterface $end): self
+    public function setEnd(?\DateTimeInterface $end): self
     {
         $this->end = $end;
 
         return $this;
     }
 
-    public function getApproved(): ?bool
+    public function getName(): ?string
     {
-        return $this->approved;
+        return $this->name;
     }
 
-    public function setApproved(?bool $approved): self
+    public function setName(string $name): self
     {
-        $this->approved = $approved;
+        $this->name = $name;
+
+        return $this;
+    }
+
+    public function getJustified(): ?bool
+    {
+        return $this->justified;
+    }
+
+    public function setJustified(?bool $justified): self
+    {
+        $this->justified = $justified;
 
         return $this;
     }
@@ -223,9 +241,9 @@ class HRVacations
     public function getDays(): ?int
     {
       if ($this->days==null){
-        $today=new \DateTime();
-        return ($today->add(new \DateInterval('PT24H')))->diff($this->start)->format('%a');
-       }else return $this->days;
+       $today=new \DateTime();
+       return ($today->add(new \DateInterval('PT24H')))->diff($this->start)->format('%a');
+      }else return $this->days;
     }
 
     public function setDays(?int $days): self
@@ -246,9 +264,17 @@ class HRVacations
 
         return $this;
     }
-
     public function preProccess($kernel, $doctrine, $user){
       if($this->end!=null) $this->days = ($this->end->add(new \DateInterval('PT24H')))->diff($this->start)->format('%a');
+    }
 
+    public function postProccess($kernel, $doctrine, $user){
+        $params["rootDir"]=$kernel->getRootDir();
+        $params["doctrine"]=$doctrine;
+        $params["user"]=$user;
+        $params["path"]="HRSickleaves";
+        $params["id"]=$this->id;
+        $cloudUtils=new CloudFilesUtils();
+        $cloudUtils->convertToFiles($params);
     }
 }

@@ -106,12 +106,10 @@
             {% endif %}
         </div>
         {% set counter = counter +1 %}
-
-
-
-
-
       {% endfor %}
+
+
+
       {% if formConstructor.post is defined %} <input type="hidden" id="post-url" name="post-url" value="{{ formConstructor.post }}"> {% endif %}
       <input type="hidden" id="id-object" name="id-object" value="{{ formConstructor.id_object }}">
 
@@ -119,6 +117,22 @@
     </div>
   </div>
   {% endfor %}
+  {# -------------  INCLUDES TEMPLATES -----------------#}
+  {% set cloudConstructor = null %}
+  {% if includes is defined %}
+    {% for includeitem in includes %}
+      {% if includeitem.vars is defined %}
+        {% for keyitem,varitem in includeitem.vars %}
+          {% if keyitem =="cloudConstructor" %}
+              {% set cloudConstructor = varitem %}
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+        {{ include(includeitem.template) }}
+    {% endfor %}
+
+  {% endif %}
+  {# ----------------------------------------#}
   {% if formConstructor.type is not defined or formConstructor.type != "modal" %}
   <div class="row">
     <div style="text-align: right;" class="col-md-12">

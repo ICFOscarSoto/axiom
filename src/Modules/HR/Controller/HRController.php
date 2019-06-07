@@ -106,7 +106,7 @@ class HRController extends Controller
 												 ["name" => "clothes", "icon"=>"fa fa-headphones", "caption"=>"Ropa y EPI"],
 												 ["name" => "paymentroll", "icon"=>"fa fa-eur", "caption"=>"Nóminas"],
 												 ["name" => "contracts", "icon"=>"fa fa-briefcase", "caption"=>"Contratos"],
-												 ["name" => "sickleave", "icon"=>"fa fa-hospital-o", "caption"=>"Bajas"],
+												 ["name" => "sickleave", "icon"=>"fa fa-hospital-o", "caption"=>"Bajas", "route"=>$this->generateUrl("sickleaves",["id"=>$id])],
 												 ["name" => "vacations", "icon"=>"fa fa-paper-plane", "caption"=>"Vacaciones", "route"=>$this->generateUrl("vacations",["id"=>$id])],
 												 ["name" => "clocks", "icon"=>"fa fa-clock-o", "caption"=>"Fichajes", "route"=>$this->generateUrl("workerClocks",["id"=>$id])],
 												 ["name" => "files", "icon"=>"fa fa-cloud", "caption"=>"Archivos", "route"=>$this->generateUrl("cloudfiles",["id"=>$id, "path"=>"workers"])]

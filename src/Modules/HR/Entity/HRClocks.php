@@ -253,7 +253,7 @@ class HRClocks
         return $this;
     }
 
-    public function preProccess(){
+    public function preProccess($kernel, $doctrine, $user){
       //$this->time = $this->calculateTime();
       if($this->end!=null) $this->time = date_timestamp_get($this->end)-date_timestamp_get($this->start);
 

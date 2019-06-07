@@ -44,7 +44,7 @@ User: Usuario
 User data: Datos de usuario
 Lastname: Apellidos
 Password: Password
-Repeat Password: Repetir Password
+Repeat Password: Repetir password
 Email: Email
 Edit profile: Editar perfil
 Select users: Seleccione un usuario
@@ -71,12 +71,12 @@ Registrese: Sign up
 #----------------------------------------------------------------------------------------------------------------------
 Name: Nombre
 Vat: CIF/NIF
-Socialname: Denominación Social
+Socialname: Denominación social
 Country: País
 State: Provincia
 City: Ciudad
 Address: Dirección
-Postcode: Cod. Postal
+Postcode: Cod. postal
 Phone: Teléfono
 Mobile: Movil
 Active: Activo
@@ -85,7 +85,7 @@ Company data: Datos de la empresa
 
 # EMAIL MODULE
 #----------------------------------------------------------------------------------------------------------------------
-Email Accounts: Cuentas de Correo
+Email Accounts: Cuentas de correo
 Email default account: Cuenta de correo por defecto
 Select an email account: Seleccione una cuenta de correo
 Inbox: Bandeja de entrada
@@ -116,14 +116,14 @@ Payroll: Nóminas
 Training: Formación
 Dateofemploy: Fecha de contratación
 Sick leave: Bajas y permisos
-Labor agreement: Convenios Laborales
+Labor agreement: Convenios laborales
 External: Externo
 Holidays: Vacaciones
 Contracts: Contratos
 Documents: Documentos
 Status: Estado
 Leave: Baja
-Bank: Entidad Bancaria
+Bank: Entidad bancaria
 Ccc: Número de cuenta (CCC)
 Iban: IBAN
 Work calendar: Calendario laboral
@@ -141,14 +141,14 @@ Date: Fecha
 # CLOCKS
 #----------------------------------------------------------------------------------------------------------------------
 Clocks: Fichajes
-Clock code: Código Fichaje
-Allowremoteclock: Fichaje Remoto
-Start: Inicio
-Start latitude: Latitud Inicio
-Start longitude: Longitud Inicio
-End: Fin
-End latitude: Latitud Fin
-End longitude: Longitud Fin
+Clock code: Código fichaje
+Allowremoteclock: Fichaje remoto
+Start: Fecha inicio
+Start latitude: Latitud inicio
+Start longitude: Longitud inicio
+End: Fecha fin
+End latitude: Latitud fin
+End longitude: Longitud fin
 Invalid: Invalido
 Location: Ubicación
 Today: Hoy
@@ -164,10 +164,15 @@ Last year: Año pasado
 #----------------------------------------------------------------------------------------------------------------------
 Vacations: Vacaciones
 Approved: Aprobado
-Workerobservations: Observaciones Trabajador
-Companyobservations: Observaciones Empresa
-Requestdate: Fecha Solicitud
+Workerobservations: Observaciones trabajador
+Companyobservations: Observaciones empresa
+Requestdate: Fecha solicitud
 Select a type...: Seleccionar un tipo...
+
+# SICK LEAVES
+#----------------------------------------------------------------------------------------------------------------------
+Sickleaves: Bajas
+Justified: Justificado
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++
 # ++++++++++++++++   ERP   +++++++++++++++++++++++++++

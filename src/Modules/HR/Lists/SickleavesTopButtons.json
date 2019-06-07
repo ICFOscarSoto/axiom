@@ -1,0 +1,6 @@
+[
+  {"id" : "addSickleaveTop", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"dataSickleaves", "routeParams":{"worker":"worker_id"}, "modal":"sickleaves", "actionType" : "background", "confirm" :false, "tooltip" : "Crear nueva baja"},
+  {"id" : "deleteSickleaveTop", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true},
+  {"id" : "printSickleaveTop", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false},
+  {"id" : "exportSickleaveTop", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"exportSickleaves", "routeParams":{"id":"worker_id"}, "addSearch":true, "confirm" :false}
+]

@@ -12,19 +12,19 @@ use App\Modules\Globale\Utils\ListUtils;
 use App\Modules\HR\Entity\HRWorkers;
 
 
-class HRVacationsUtils
+class HRSickleavesUtils
 {
   public function formatListbyWorker($worker){
     $list=[
-      'id' => 'listVacations',
-      'route' => 'vacationslistworker',
+      'id' => 'listSickleaves',
+      'route' => 'sickleaveslistworker',
       'routeParams' => ["id" => $worker],
       'orderColumn' => 1,
       'orderDirection' => 'DESC',
       'tagColumn' => 2,
-      'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Vacations.json"),true),
-      'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/VacationsFieldButtons.json"),true),
-      'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/VacationsTopButtons.json"),true)
+      'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Sickleaves.json"),true),
+      'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/SickleavesFieldButtons.json"),true),
+      'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/SickleavesTopButtons.json"),true)
     ];
     return $list;
   }
@@ -56,7 +56,7 @@ class HRVacationsUtils
     ['type', ChoiceType::class, [
       'required' => true,
       'attr' => ['class' => 'select2'],
-      'choices' => ['Vacaciones'=>1, 'Permiso'=>2, 'Asuntos propios'=>3, 'Excedencia'=>3],
+      'choices' => ['Contingencia Común'=>1, 'Contingencia Profesional'=>2],
       'placeholder' => 'Select a type...',
     ]]
 
