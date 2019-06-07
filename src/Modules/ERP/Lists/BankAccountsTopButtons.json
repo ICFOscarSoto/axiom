@@ -1,6 +1,6 @@
 [
-  {"id" : "addTop", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"dataBankAccounts", "modal":"bankaccounts", "actionType" : "background", "confirm" :false, "tooltip" : "Crear nueva cuenta bancaria"},
-  {"id" : "deleteTop", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true},
-  {"id" : "printTop", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false},
-  {"id" : "exportTop", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"", "confirm" :false}
+  {"id" : "addBankAccountTop", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"dataBankAccounts", "routeParams":{"entity":"entity_id"}, "modal":"bankaccounts", "actionType" : "background", "confirm" :false, "tooltip" : "Crear nuevo cuenta bancaria"},
+  {"id" : "deleteBankAccountTop", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true},
+  {"id" : "printBankAccountTop", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false},
+  {"id" : "exportBankAccountTop", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"", "confirm" :false}
 ]

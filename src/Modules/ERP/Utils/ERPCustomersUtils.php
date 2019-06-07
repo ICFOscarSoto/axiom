@@ -5,16 +5,11 @@ use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use App\Modules\Globale\Entity\MenuOptions;
+use App\Modules\Globale\Entity\GlobaleMenuOptions;
+use App\Modules\Email\Entity\EmailAccounts;
 
 class ERPCustomersUtils
 {
-
-  public function getIncludedForm($params){
-    return [['entityName', TextType::class, ['data'=>$params->getName(),'mapped'=>false,'attr'=>['class' => 'tagsinput']]]];
-  }
-
   public function formatList($user){
     $list=[
       'id' => 'listCustomers',

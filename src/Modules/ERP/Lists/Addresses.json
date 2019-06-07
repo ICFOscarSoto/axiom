@@ -1,12 +1,4 @@
 [ {"name": "id", "caption":""},
   {"name": "name", "caption":"Nombre", "width" : "50"},
-  {"name": "address", "caption":"Dirección", "width" : "90"},
-  {"name": "city", "caption":"Ciudad", "width" : "50"},
-  {"name": "postcode","caption":"Código Postal", "width" : "50"},
-  {"name": "state","caption":"Provincia", "width" : "50"},
-  {"name": "phone","caption":"Teléfono", "width" : "50"},
-  {"name": "carrier","caption":"Transportista", "width" : "50"},
-  {"name": "country","caption":"País", "width" : "50"},
-  {"name": "contact","caption":"Contacto", "width" : "50"},
   {"name": "active", "caption":"Estado", "width":"10%" ,"class" : "dt-center", "replace":{"1":"<div style=\"min-width: 75px;\" class=\"label label-success\">Activo</div>", "0" : "<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado</div>"}}
 ]

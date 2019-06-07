@@ -1,13 +1,13 @@
 [{
 	"sections": [
 		{
-			"name": "Bank Account data",
+			"name": "Banckaccounts data",
 			"fields": [
-				{ "name": "bankname","cols": 8},
-				{	"name": "iban", "cols": 4},
-				{	"name": "swiftcode", "cols": 4},
-				{	"name": "entity", "cols": 4},
-				{	"name": "active", "cols": 2}
+				{ "name": "bankname","cols": 2},
+				{ "name": "iban","cols": 2},
+				{ "name": "swiftcode","cols": 2},
+				{ "name": "supplier","cols": 2},
+				{ "name": "active","cols": 2}
 			]
 		}]
 }]

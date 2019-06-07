@@ -11,63 +11,77 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\ERP\Entity\ERPBankAccounts;
+use App\Modules\ERP\Entity\ERPSuppliers;
+use App\Modules\Globale\Entity\GlobaleCountries;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\ERP\Utils\ERPBankAccountsUtils;
 
+
 class ERPBankAccountsController extends Controller
 {
 	private $class=ERPBankAccounts::class;
 	private $utilsClass=ERPBankAccountsUtils::class;
+
     /**
-     * @Route("/{_locale}/admin/global/bankaccounts", name="bankaccounts")
+     * @Route("/{_locale}/ERP/{id}/bankaccounts", name="bankaccounts")
      */
-    public function index(RouterInterface $router,Request $request)
+    public function index($id, RouterInterface $router,Request $request)
     {
-      $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+       $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
   		//$this->denyAccessUnlessGranted('ROLE_ADMIN');
   		$userdata=$this->getUser()->getTemplateData();
   		$locale = $request->getLocale();
   		$this->router = $router;
   		$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
-    	$utils = new $this->utilsClass();
-  		$templateLists[]=$utils->formatList($this->getUser());
+    	$utils = new ERPBankAccountsUtils;
+  		$templateLists=$utils->formatListbyEntity($id);
 			$formUtils=new GlobaleFormUtils();
 			$formUtils->initialize($this->getUser(), new $this->class(), dirname(__FILE__)."/../Forms/BankAccounts.json", $request, $this, $this->getDoctrine());
-			$templateForms[]=$formUtils->formatForm('bankaccounts', true, null, $this->class);
-  		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
-  			return $this->render('@Globale/genericlist.html.twig', [
-  				'controllerName' => 'bankaccountsController',
-  				'interfaceName' => 'Cuentas Bancarias',
-  				'optionSelected' => $request->attributes->get('_route'),
-  				'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
-  				'breadcrumb' =>  $menurepository->formatBreadcrumb($request->get('_route')),
-  				'userData' => $userdata,
-  				'lists' => $templateLists,
-	        'forms' => $templateForms
+			$templateForms[]=$formUtils->formatForm('bankaccounts', true, $id, $this->class, "dataBankAccounts",["id"=>$id, "action"=>"save"]);
+			$entitiesrepository=$this->getDoctrine()->getRepository(ERPSuppliers::class);
+			$entity=$entitiesrepository->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany(), "deleted"=>0]);
+			if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+  			return $this->render('@Globale/list.html.twig', [
+					'listConstructor' => $templateLists,
+					'forms' => $templateForms,
+					'entity_id' => $id
   				]);
   		}
   		return new RedirectResponse($this->router->generate('app_login'));
     }
 
 		/**
-		 * @Route("/{_locale}/bankaccounts/data/{id}/{action}", name="dataBankAccounts", defaults={"id"=0, "action"="read"})
+		 * @Route("/{_locale}/bankaccount/data/{id}/{action}/{identity}", name="dataBankAccounts", defaults={"id"=0, "action"="read", "identity"=0})
 		 */
-		 public function data($id, $action, Request $request){
+		 public function data($id, $action, $identity, Request $request)
+		 {
 		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		 $this->denyAccessUnlessGranted('ROLE_ADMIN');
 		 $template=dirname(__FILE__)."/../Forms/BankAccounts.json";
 		 $utils = new GlobaleFormUtils();
-		 $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine());
-		 return $utils->make($id, $this->class, $action, "formBankAccounts", "modal");
+		 $utilsObj=new $this->utilsClass();
+		 if($identity==0) $identity=$request->query->get('entity');
+		 $defaultSupplier=$this->getDoctrine()->getRepository(ERPSuppliers::class);
+		 $bankaccountRepository=$this->getDoctrine()->getRepository(ERPBankAccounts::class);
+		 $obj=new $this->class();
+		 if($id==0){
+		 	if($identity==0 ) $identity=$request->query->get('entity');
+		 	if($identity==0 || $identity==null) $identity=$request->request->get('id-parent',0);
+		 	$supplier = $defaultSupplier->find($identity);
+		}else $obj = $bankaccountRepository->find($id);
+		 $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "supplier"=>$id==0?$supplier:$obj->getSupplier()];
+		 $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),
+		 												method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
+		 return $utils->make($id, $this->class, $action, "formIdentities", "modal");
 		}
 
     /**
     * @Route("/api/global/bankaccount/{id}/get", name="getBankAccount")
     */
     public function getBankAccount($id){
-      $bankaccount = $this->getDoctrine()->getRepository($this->class)->findOneById($id);
+     $bankaccount = $this->getDoctrine()->getRepository($this->class)->findOneById($id);
       if (!$bankaccount) {
             throw $this->createNotFoundException('No currency found for id '.$id );
           }
@@ -75,22 +89,23 @@ class ERPBankAccountsController extends Controller
     }
 
   /**
-   * @Route("/api/bankaccount/list", name="bankaccountlist")
+   * @Route("/api/bankaccount/{id}/list", name="bankaccountlist")
    */
-  public function indexlist(RouterInterface $router,Request $request){
+  public function indexlist($id,RouterInterface $router,Request $request){
     $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
     $user = $this->getUser();
+		$supplierRepository=$this->getDoctrine()->getRepository(ERPSuppliers::class);
+		$supplier = $supplierRepository->find($id);
     $locale = $request->getLocale();
     $this->router = $router;
     $manager = $this->getDoctrine()->getManager();
-    $repository = $manager->getRepository($this->class);
+    $repository = $manager->getRepository(ERPBankAccounts::class);
     $listUtils=new GlobaleListUtils();
     $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/BankAccounts.json"),true);
-    $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, BankAccounts::class,[["type"=>"and", "column"=>"company", "value"=>$user->getCompany()]]);
+    $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, ERPBankAccounts::class,[["column"=>"supplier", "value"=>$supplier]]);
     return new JsonResponse($return);
+
   }
-
-
 
 	/**
 	* @Route("/{_locale}/admin/global/bankaccount/{id}/disable", name="disableBankAccount")

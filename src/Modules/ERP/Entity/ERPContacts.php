@@ -3,10 +3,8 @@
 namespace App\Modules\ERP\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use \App\Modules\Globale\Entity\GlobaleCompanies;
 use \App\Modules\ERP\Entity\ERPDepartments;
 use \App\Modules\ERP\Entity\ERPSuppliers;
-use \App\Modules\ERP\Entity\ERPCustomers;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPContactsRepository")
@@ -19,12 +17,6 @@ class ERPContacts
      * @ORM\Column(type="integer")
      */
     private $id;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCompanies")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $company;
 
     /**
      * @ORM\Column(type="string", length=120)
@@ -72,48 +64,32 @@ class ERPContacts
     private $deleted;
 
     /**
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(type="boolean", nullable=true)
      */
     private $purchaseorder;
 
     /**
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(type="boolean", nullable=true)
      */
     private $saleorder;
 
     /**
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(type="boolean", nullable=true)
      */
     private $invoice;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPSuppliers")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $supplier;
 
     public $newSeconds=1296000;
     public $updatedSeconds=1296000;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPSuppliers")
-     */
-    private $supplier;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPCustomers")
-     */
-    private $customer;
-
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getCompany(): ?GlobaleCompanies
-    {
-        return $this->company;
-    }
-
-    public function setCompany(?GlobaleCompanies $company): self
-    {
-        $this->company = $company;
-
-        return $this;
     }
 
     public function getName(): ?string
@@ -229,7 +205,7 @@ class ERPContacts
         return $this->purchaseorder;
     }
 
-    public function setPurchaseorder(bool $purchaseorder): self
+    public function setPurchaseorder(?bool $purchaseorder): self
     {
         $this->purchaseorder = $purchaseorder;
 
@@ -241,7 +217,7 @@ class ERPContacts
         return $this->saleorder;
     }
 
-    public function setSaleorder(bool $saleorder): self
+    public function setSaleorder(?bool $saleorder): self
     {
         $this->saleorder = $saleorder;
 
@@ -253,7 +229,7 @@ class ERPContacts
         return $this->invoice;
     }
 
-    public function setInvoice(bool $invoice): self
+    public function setInvoice(?bool $invoice): self
     {
         $this->invoice = $invoice;
 
@@ -268,18 +244,6 @@ class ERPContacts
     public function setSupplier(?ERPSuppliers $supplier): self
     {
         $this->supplier = $supplier;
-
-        return $this;
-    }
-
-    public function getCustomer(): ?ERPCustomers
-    {
-        return $this->customer;
-    }
-
-    public function setCustomer(?ERPCustomers $customer): self
-    {
-        $this->customer = $customer;
 
         return $this;
     }

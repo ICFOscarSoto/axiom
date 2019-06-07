@@ -1,8 +1,8 @@
 [
-  {"id": "edit", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"dataSuppliers", "modal":"suppliers", "actionType" : "background", "confirm" :false},
+  {"id": "edit", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"formSupplier", "confirm" :false, "actionType" : "foreground" },
   {"id": "activation", "type": "option", "options": [
       {"id": "desactivate", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"disableSupplier", "confirm" :true, "actionType" : "background" },
       {"id": "activate", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "route":"enableSupplier", "confirm" :true, "actionType" : "background" }
   ]},
-  {"id": "delete", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"deleteSupplier", "confirm" :true, "undo" :false, "tooltip":"Borrar Proveedor", "actionType" : "background"}
+  {"id": "delete", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"deleteSupplier", "confirm" :true, "undo" :false, "tooltip":"Borrar proveedor", "actionType" : "background"}
 ]

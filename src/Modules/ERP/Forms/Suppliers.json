@@ -1,18 +1,52 @@
 [{
 	"sections": [
 		{
-			"name": "Address data",
+			"name": "Supplier data",
 			"fields": [
-				{ "name": "minorder","cols": 4},
-				{ "name": "freeshipping","cols": 4},
-				{ "name": "estimateddelivery","cols": 4},
-				{ "name": "averagedelivery","cols": 4},
-				{ "name": "cancelremains","cols": 4},
-				{	"name": "dropshipping", "cols": 4},
-				{	"name": "allowpicking", "cols": 4},
-				{	"name": "paymentmethod", "cols": 4},
-				{	"name": "invoiceday", "cols": 4},
-				{	"name": "active", "cols": 2}
+				{ "name": "supplierImage", "cols": 2,	"type": "image", "imageType":"suppliers", "value": "getImage", "width": "100%",	"height": "100px"},
+				{ "name": "code", "cols": 2},
+				{ "name": "socialname","cols": 4},
+				{ "name": "vat","cols": 2},
+				{ "name": "name","cols": 4},
+				{ "name": "email","cols": 3},
+				{ "name": "web","cols": 2},
+				{ "name": "phone","cols": 2},
+				{ "name": "activity","cols": 4}
 			]
-		}]
+		}
+		,
+	{
+		"name": "Address",
+		"fields": [
+			{ "name": "address", "cols": 6},
+			{ "name": "city","cols": 2},
+			{ "name": "state","cols": 2},
+			{ "name": "country","cols": 2},
+			{ "name": "postcode","cols": 3}
+		]
+	},
+	{
+		"name": "Conditions",
+		"fields": [
+			{ "name": "minorder", "cols": 2},
+			{ "name": "freeshipping","cols": 2},
+			{ "name": "estimateddelivery","cols": 2},
+			{ "name": "averagedelivery","cols": 2},
+			{ "name": "cancelremains","cols": 2},
+			{ "name": "dropshipping","cols": 2},
+			{ "name": "creditor","cols": 2},
+			{ "name": "invoiceday","cols": 2},
+			{ "name": "currency","cols": 3},
+			{ "name": "paymentmethod","cols": 3}
+		]
+	},
+	{
+		"name": "Active",
+		"fields": [
+			{ "name": "active", "cols": 2}
+		]
+	}
+
+
+	]
 }]

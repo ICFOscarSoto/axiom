@@ -3,8 +3,7 @@
 namespace App\Modules\ERP\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use \App\Modules\Globale\Entity\GlobaleCompanies;
-use \App\Modules\ERP\Entity\ERPEntities;
+use \App\Modules\ERP\Entity\ERPSuppliers;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPBankAccountsRepository")
@@ -19,15 +18,9 @@ class ERPBankAccounts
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCompanies")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $company;
-
-    /**
      * @ORM\Column(type="string", length=120)
      */
-    private $bankname;
+    private $name;
 
     /**
      * @ORM\Column(type="string", length=24)
@@ -35,15 +28,9 @@ class ERPBankAccounts
     private $iban;
 
     /**
-     * @ORM\Column(type="string", length=11, nullable=true)
+     * @ORM\Column(type="string", length=11)
      */
     private $swiftcode;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPEntities")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $entity;
 
     /**
      * @ORM\Column(type="datetime")
@@ -65,31 +52,25 @@ class ERPBankAccounts
      */
     private $deleted;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPSuppliers")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $supplier;
+
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getCompany(): ?GlobaleCompanies
+    public function getName(): ?string
     {
-        return $this->company;
+        return $this->name;
     }
 
-    public function setCompany(?GlobaleCompanies $company): self
+    public function setName(string $name): self
     {
-        $this->company = $company;
-
-        return $this;
-    }
-
-    public function getBankname(): ?string
-    {
-        return $this->bankname;
-    }
-
-    public function setBankname(string $bankname): self
-    {
-        $this->bankname = $bankname;
+        $this->name = $name;
 
         return $this;
     }
@@ -111,21 +92,9 @@ class ERPBankAccounts
         return $this->swiftcode;
     }
 
-    public function setSwiftcode(?string $swiftcode): self
+    public function setSwiftcode(string $swiftcode): self
     {
         $this->swiftcode = $swiftcode;
-
-        return $this;
-    }
-
-    public function getEntity(): ?ERPEntities
-    {
-        return $this->entity;
-    }
-
-    public function setEntity(?ERPEntities $entity): self
-    {
-        $this->entity = $entity;
 
         return $this;
     }
@@ -174,6 +143,18 @@ class ERPBankAccounts
     public function setDeleted(bool $deleted): self
     {
         $this->deleted = $deleted;
+
+        return $this;
+    }
+
+    public function getSupplier(): ?ERPSuppliers
+    {
+        return $this->supplier;
+    }
+
+    public function setSupplier(?ERPSuppliers $supplier): self
+    {
+        $this->supplier = $supplier;
 
         return $this;
     }

@@ -2,13 +2,13 @@
 
 namespace App\Modules\ERP\Entity;
 
-//use Doctrine\Common\Collections\ArrayCollection;
-//use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use \App\Modules\ERP\Entity\ERPEntities;
-//use \App\Modules\Carrier\Entity\CarrierCarriers;
-//use \App\Modules\ERP\Entity\ERPAddresses;
-//use \App\Modules\ERP\Entity\ERPEntity;
+use \App\Modules\Globale\Entity\GlobaleStates;
+use \App\Modules\Globale\Entity\GlobaleCountries;
+use \App\Modules\ERP\Entity\ERPCustomerGroups;
+use \App\Modules\ERP\Entity\ERPPaymentMethods;
+use \App\Modules\Globale\Entity\GlobaleCompanies;
+use \App\Modules\ERP\Entity\ERPBankAccounts;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPCustomersRepository")
@@ -23,14 +23,41 @@ class ERPCustomers
     private $id;
 
     /**
-     * @ORM\Column(type="float", nullable=true)
+     * @ORM\Column(type="string", length=100)
      */
-    private $maxcredit;
+    private $name;
 
     /**
-     * @ORM\Column(type="boolean", nullable=true)
+     * @ORM\Column(type="string", length=120, nullable=true)
      */
-    private $blockcredit;
+    private $socialname;
+
+    /**
+     * @ORM\Column(type="string", length=150)
+     */
+    private $address;
+
+    /**
+     * @ORM\Column(type="string", length=70)
+     */
+    private $city;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleStates")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $state;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCountries")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $country;
+
+    /**
+     * @ORM\Column(type="string", length=12)
+     */
+    private $postcode;
 
     /**
      * @ORM\Column(type="datetime")
@@ -53,6 +80,43 @@ class ERPCustomers
     private $deleted;
 
     /**
+     * @ORM\Column(type="string", length=30, nullable=true)
+     */
+    private $vat;
+
+    /**
+     * @ORM\Column(type="string", length=32, nullable=true)
+     */
+    private $phone;
+
+    /**
+     * @ORM\Column(type="string", length=180, nullable=true)
+     */
+    private $email;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    private $maxcredit;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $blockcredit;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPCustomerGroups")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $customergroup;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPPaymentMethods")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $paymentmethod;
+
+    /**
      * @ORM\Column(type="float", nullable=true)
      */
     private $mininvoice;
@@ -63,19 +127,14 @@ class ERPCustomers
     private $allowlinediscount;
 
     /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $requiredordernumber;
+
+    /**
      * @ORM\Column(type="float", nullable=true)
      */
     private $additionaldiscount;
-
-    /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
-    private $requireordernumber;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\Carrier\Entity\CarrierCarriers")
-     */
-    //private $carrier;
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
@@ -93,54 +152,106 @@ class ERPCustomers
     private $partialshipping;
 
     /**
-     * @ORM\OneToMany(targetEntity="\App\Modules\ERP\Entity\ERPAddresses", mappedBy="customers", orphanRemoval=true)
-     */
-    //private $shippingaddress;
-
-    /**
      * @ORM\Column(type="integer", nullable=true)
      */
     private $invoiceday;
 
-    public $newSeconds=1296000;
-    public $updatedSeconds=1296000;
-
     /**
-     * @ORM\OneToOne(targetEntity="\App\Modules\ERP\Entity\ERPEntities", fetch="EAGER", cascade={"persist", "remove"})
+     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCompanies")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $entity;
+    private $company;
 
-    /*public function __construct()
-    {
-        $this->shippingaddress = new ArrayCollection();
-    } */
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPBankAccounts")
+     */
+    private $bankaccount;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getMaxcredit(): ?float
+    public function getName(): ?string
     {
-        return $this->maxcredit;
+        return $this->name;
     }
 
-    public function setMaxcredit(?float $maxcredit): self
+    public function setName(string $name): self
     {
-        $this->maxcredit = $maxcredit;
+        $this->name = $name;
 
         return $this;
     }
 
-    public function getBlockcredit(): ?bool
+    public function getSocialname(): ?string
     {
-        return $this->blockcredit;
+        return $this->socialname;
     }
 
-    public function setBlockcredit(?bool $blockcredit): self
+    public function setSocialname(?string $socialname): self
     {
-        $this->blockcredit = $blockcredit;
+        $this->socialname = $socialname;
+
+        return $this;
+    }
+
+    public function getAddress(): ?string
+    {
+        return $this->address;
+    }
+
+    public function setAddress(string $address): self
+    {
+        $this->address = $address;
+
+        return $this;
+    }
+
+    public function getCity(): ?string
+    {
+        return $this->city;
+    }
+
+    public function setCity(string $city): self
+    {
+        $this->city = $city;
+
+        return $this;
+    }
+
+    public function getState(): ?GlobaleStates
+    {
+        return $this->state;
+    }
+
+    public function setState(?GlobaleStates $state): self
+    {
+        $this->state = $state;
+
+        return $this;
+    }
+
+    public function getCountry(): ?GlobaleCountries
+    {
+        return $this->country;
+    }
+
+    public function setCountry(?GlobaleCountries $country): self
+    {
+        $this->country = $country;
+
+        return $this;
+    }
+
+    public function getPostcode(): ?string
+    {
+        return $this->postcode;
+    }
+
+    public function setPostcode(string $postcode): self
+    {
+        $this->postcode = $postcode;
 
         return $this;
     }
@@ -193,6 +304,90 @@ class ERPCustomers
         return $this;
     }
 
+    public function getVat(): ?string
+    {
+        return $this->vat;
+    }
+
+    public function setVat(?string $vat): self
+    {
+        $this->vat = $vat;
+
+        return $this;
+    }
+
+    public function getPhone(): ?string
+    {
+        return $this->phone;
+    }
+
+    public function setPhone(?string $phone): self
+    {
+        $this->phone = $phone;
+
+        return $this;
+    }
+
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(?string $email): self
+    {
+        $this->email = $email;
+
+        return $this;
+    }
+
+    public function getMaxcredit(): ?float
+    {
+        return $this->maxcredit;
+    }
+
+    public function setMaxcredit(?float $maxcredit): self
+    {
+        $this->maxcredit = $maxcredit;
+
+        return $this;
+    }
+
+    public function getBlockcredit(): ?bool
+    {
+        return $this->blockcredit;
+    }
+
+    public function setBlockcredit(?bool $blockcredit): self
+    {
+        $this->blockcredit = $blockcredit;
+
+        return $this;
+    }
+
+    public function getCustomergroup(): ?ERPCustomerGroups
+    {
+        return $this->customergroup;
+    }
+
+    public function setCustomergroup(?ERPCustomerGroups $customergroup): self
+    {
+        $this->customergroup = $customergroup;
+
+        return $this;
+    }
+
+    public function getPaymentmethod(): ?ERPPaymentMethods
+    {
+        return $this->paymentmethod;
+    }
+
+    public function setPaymentmethod(?ERPPaymentMethods $paymentmethod): self
+    {
+        $this->paymentmethod = $paymentmethod;
+
+        return $this;
+    }
+
     public function getMininvoice(): ?float
     {
         return $this->mininvoice;
@@ -217,6 +412,18 @@ class ERPCustomers
         return $this;
     }
 
+    public function getRequiredordernumber(): ?bool
+    {
+        return $this->requiredordernumber;
+    }
+
+    public function setRequiredordernumber(?bool $requiredordernumber): self
+    {
+        $this->requiredordernumber = $requiredordernumber;
+
+        return $this;
+    }
+
     public function getAdditionaldiscount(): ?float
     {
         return $this->additionaldiscount;
@@ -229,30 +436,6 @@ class ERPCustomers
         return $this;
     }
 
-    public function getRequireordernumber(): ?bool
-    {
-        return $this->requireordernumber;
-    }
-
-    public function setRequireordernumber(?bool $requireordernumber): self
-    {
-        $this->requireordernumber = $requireordernumber;
-
-        return $this;
-    }
-
-  /*  public function getCarrier(): ?CarrierCarriers
-    {
-        return $this->carrier;
-    }
-
-    public function setCarrier(?CarrierCarriers $carrier): self
-    {
-        $this->carrier = $carrier;
-
-        return $this;
-    }
- */
     public function getInvoicefordeliverynote(): ?bool
     {
         return $this->invoicefordeliverynote;
@@ -289,38 +472,6 @@ class ERPCustomers
         return $this;
     }
 
-    /**
-     * @return Collection|ERPAddresses[]
-     */
-    /*public function getShippingaddress(): Collection
-    {
-        return $this->shippingaddress;
-    }
-
-    public function addShippingaddress(ERPAddresses $shippingaddress): self
-    {
-        if (!$this->shippingaddress->contains($shippingaddress)) {
-            $this->shippingaddress[] = $shippingaddress;
-            $shippingaddress->setCustomers($this);
-        }
-
-        return $this;
-    }
-
-    public function removeShippingaddress(ERPAddresses $shippingaddress): self
-    {
-        if ($this->shippingaddress->contains($shippingaddress)) {
-            $this->shippingaddress->removeElement($shippingaddress);
-            // set the owning side to null (unless already changed)
-            if ($shippingaddress->getCustomers() === $this) {
-                $shippingaddress->setCustomers(null);
-            }
-        }
-
-        return $this;
-    }
-    */
-
     public function getInvoiceday(): ?int
     {
         return $this->invoiceday;
@@ -333,14 +484,26 @@ class ERPCustomers
         return $this;
     }
 
-    public function getEntity(): ?ERPEntities
+    public function getCompany(): ?GlobaleCompanies
     {
-        return $this->entity;
+        return $this->company;
     }
 
-    public function setEntity(ERPEntities $entity): self
+    public function setCompany(?GlobaleCompanies $company): self
     {
-        $this->entity = $entity;
+        $this->company = $company;
+
+        return $this;
+    }
+
+    public function getBankaccount(): ?ERPBankAccounts
+    {
+        return $this->bankaccount;
+    }
+
+    public function setBankaccount(?ERPBankAccounts $bankaccount): self
+    {
+        $this->bankaccount = $bankaccount;
 
         return $this;
     }

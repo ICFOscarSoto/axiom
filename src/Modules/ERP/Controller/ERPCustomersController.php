@@ -11,6 +11,8 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\ERP\Entity\ERPCustomers;
+use App\Modules\Globale\Entity\GlobaleCountries;
+use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\ERP\Utils\ERPCustomersUtils;
@@ -20,12 +22,12 @@ class ERPCustomersController extends Controller
 	private $class=ERPCustomers::class;
 	private $utilsClass=ERPCustomersUtils::class;
     /**
-     * @Route("/{_locale}/admin/ERP/customers", name="customers")
+     * @Route("/{_locale}/admin/global/customers", name="customers")
      */
     public function index(RouterInterface $router,Request $request)
     {
       $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-  		$this->denyAccessUnlessGranted('ROLE_ADMIN');
+  		//$this->denyAccessUnlessGranted('ROLE_ADMIN');
   		$userdata=$this->getUser()->getTemplateData();
   		$locale = $request->getLocale();
   		$this->router = $router;
@@ -34,11 +36,11 @@ class ERPCustomersController extends Controller
   		$templateLists[]=$utils->formatList($this->getUser());
 			$formUtils=new GlobaleFormUtils();
 			$formUtils->initialize($this->getUser(), new $this->class(), dirname(__FILE__)."/../Forms/Customers.json", $request, $this, $this->getDoctrine());
-			$templateForms[]=$formUtils->formatForm('customers', true, null, $this->class);
+			$templateForms[]=$formUtils->formatForm('contacts', true, null, $this->class);
   		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
   			return $this->render('@Globale/genericlist.html.twig', [
   				'controllerName' => 'customersController',
-  				'interfaceName' => 'Clientes',
+  				'interfaceName' => 'Departamentos',
   				'optionSelected' => $request->attributes->get('_route'),
   				'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
   				'breadcrumb' =>  $menurepository->formatBreadcrumb($request->get('_route')),
@@ -50,40 +52,6 @@ class ERPCustomersController extends Controller
   		return new RedirectResponse($this->router->generate('app_login'));
     }
 
-
-		/**
-		 * @Route("/{_locale}/admin/ERP/customers/form/{id}", name="formCustomer", defaults={"id"=0})
-		 */
-		public function formCustomer($id,Request $request)
-		{
-			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-			$this->denyAccessUnlessGranted('ROLE_ADMIN');
-			$new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-new"];
-			$template=dirname(__FILE__)."/../Forms/Customers.json";
-			dump($this->getUser()->getCompany());
-			$userdata=$this->getUser()->getTemplateData();
-			$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
-			$breadcrumb=$menurepository->formatBreadcrumb('customers');
-			array_push($breadcrumb, $new_breadcrumb);
-			$customer=new ERPCustomers();
-			$customer=$this->getDoctrine()->getRepository($this->class)->findOneById($id);
-			return $this->render('@Globale/generictabform.html.twig', array(
-							'controllerName' => 'CustomersController',
-							'interfaceName' => 'Clientes',
-							'optionSelected' => 'customers',
-							'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
-							'breadcrumb' => $breadcrumb,
-							'userData' => $userdata,
-							'id' => $id,
-							'tab' => $request->query->get('tab','data'), //Show initial tab, by default data tab
-							'tabs' => [["name" => "data", "caption"=>"Datos empresa", "active"=>true, "route"=>$this->generateUrl("dataCustomers",["id"=>$id])],
-												 ["name" => "moredata", "caption"=>"Mas datos", "active"=>true, "route"=>$this->generateUrl("dataEntities",["id"=>$customer->getEntity()->getId()])],
-												 ["name" => "contracts", "caption"=>"Contratos"]
-												]
-			));
-
-
-		}
 		/**
 		 * @Route("/{_locale}/customers/data/{id}/{action}", name="dataCustomers", defaults={"id"=0, "action"="read"})
 		 */
@@ -92,23 +60,61 @@ class ERPCustomersController extends Controller
 		 $this->denyAccessUnlessGranted('ROLE_ADMIN');
 		 $template=dirname(__FILE__)."/../Forms/Customers.json";
 		 $utils = new GlobaleFormUtils();
-		 $utilsObj=new $this->utilsClass();
-		 $customer=new ERPCustomers();
-		 $customer=$this->getDoctrine()->getRepository($this->class)->findOneById($id);
-		 $params=$customer->getEntity();
-	   $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),['entity'],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
-		 return $utils->make($id, $this->class, $action, "formCustomers", "full", "@Globale/form.html.twig", 'formCustomers', $this->utilsClass);
+		 $obj = new $this->class();
+		 //$default= new GlobaleCountries();
+		 //$default=$default->findById(64);
+		 $defaultCountry=$this->getDoctrine()->getRepository(GlobaleCountries::class);
+		 $default=$defaultCountry->findOneBy(['name'=>"España"]);
+		 $obj->setCountry($default);
+		 $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine());
+		 $make= $utils->make($id, $this->class, $action, "formCustomers", "full", "@Globale/form.html.twig", "formCustomer");
+		 //dump($make);
+		 return $make;
 		}
 
+		/**
+     * @Route("/{_locale}/ERP/customer/form/{id}", name="formCustomer", defaults={"id"=0})
+     */
+    public function formCustomer($id,Request $request)
+    {
+      $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+  		$this->denyAccessUnlessGranted('ROLE_ADMIN');
+  		$userdata=$this->getUser()->getTemplateData();
+  		$locale = $request->getLocale();
+  		$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
+			$breadcrumb=$menurepository->formatBreadcrumb('customers');
+    	$contactrRepository=$this->getDoctrine()->getRepository($this->class);
+			$obj = $contactrRepository->findOneBy(['id'=>$id, 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
+			$entity_name=$obj?$obj->getSocialName():'';
+			return $this->render('@Globale/generictabform.html.twig', array(
+							'entity_name' => $entity_name,
+							'controllerName' => 'CustomersController',
+							'interfaceName' => 'Clientes',
+							'optionSelected' => 'customers',
+							'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
+							'breadcrumb' => $breadcrumb,
+							'userData' => $userdata,
+							'id' => $id,
+							'tab' => $request->query->get('tab','data'), //Show initial tab, by default data tab
+							'tabs' => [["name" => "data", "icon"=>"fa fa-headphones", "caption"=>"Datos cliente", "active"=>true, "route"=>$this->generateUrl("dataCustomers",["id"=>$id])]
+												//["name" => "addresses", "icon"=>"fa fa-headphones", "caption"=>"direcciones", "route"=>$this->generateUrl("addresses",["id"=>$id, "type"=>"contact"])],
+												//["name" => "contacts", "icon"=>"fa fa-headphones", "caption"=>"contactos" , "route"=>$this->generateUrl("contacts",["id"=>$id])],
+												//["name" => "bankaccounts", "icon"=>"fa fa-headphones", "caption"=>"Cuentas bancarias", "route"=>$this->generateUrl("bankaccounts",["id"=>$id])]
+											],
+									));
+			}
+
+
+
     /**
-    * @Route("/api/global/customer/{id}/get", name="getCustomers")
+    * @Route("/api/global/customer/{id}/get", name="getCustomer")
     */
-    public function getCustomers($id){
-      $customer = $this->getDoctrine()->getRepository($this->class)->findOneById($id);
-      if (!$customer) {
+    public function getCustomer($id){
+      $contact = $this->getDoctrine()->getRepository($this->class)->findOneById($id);
+      if (!$contact) {
             throw $this->createNotFoundException('No currency found for id '.$id );
           }
-          return new JsonResponse($customer->encodeJson());
+          return new JsonResponse($contact->encodeJson());
     }
 
   /**
@@ -123,7 +129,7 @@ class ERPCustomersController extends Controller
     $repository = $manager->getRepository($this->class);
     $listUtils=new GlobaleListUtils();
     $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Customers.json"),true);
-    $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, Customers::class);
+    $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, Customers::class,[["type"=>"and", "column"=>"company", "value"=>$user->getCompany()]]);
     return new JsonResponse($return);
   }
 
@@ -135,8 +141,8 @@ class ERPCustomersController extends Controller
  public function disable($id)
 	 {
 	 $this->denyAccessUnlessGranted('ROLE_GLOBAL');
-	 $customerUtils=new ERPCustomerUtils();
-	 $result=$customerUtils->disableObject($id, $this->class, $this->getDoctrine());
+	 $entityUtils=new GlobaleEntityUtils();
+	 $result=$entityUtils->disableObject($id, $this->class, $this->getDoctrine());
 	 return new JsonResponse(array('result' => $result));
  }
  /**
@@ -145,8 +151,8 @@ class ERPCustomersController extends Controller
  public function enable($id)
 	 {
 	 $this->denyAccessUnlessGranted('ROLE_GLOBAL');
-	 $customerUtils=new ERPCustomerUtils();
-	 $result=$customerUtils->enableObject($id, $this->class, $this->getDoctrine());
+	 $entityUtils=new GlobaleEntityUtils();
+	 $result=$entityUtils->enableObject($id, $this->class, $this->getDoctrine());
 	 return new JsonResponse(array('result' => $result));
  }
  /**
@@ -154,8 +160,8 @@ class ERPCustomersController extends Controller
  */
  public function delete($id){
 	 $this->denyAccessUnlessGranted('ROLE_GLOBAL');
-	 $customerUtils=new ERPCustomerUtils();
-	 $result=$customerUtils->deleteObject($id, $this->class, $this->getDoctrine());
+	 $entityUtils=new GlobaleEntityUtils();
+	 $result=$entityUtils->deleteObject($id, $this->class, $this->getDoctrine());
 	 return new JsonResponse(array('result' => $result));
  }
 

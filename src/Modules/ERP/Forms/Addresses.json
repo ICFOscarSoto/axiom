@@ -3,16 +3,16 @@
 		{
 			"name": "Address data",
 			"fields": [
-				{ "name": "name","cols": 4},
-				{ "name": "address","cols": 4},
-				{ "name": "city","cols": 4},
-				{ "name": "postcode","cols": 4},
-				{ "name": "state","cols": 4},
-				{	"name": "phone", "cols": 4},
-				{	"name": "carrier", "cols": 4},
-				{	"name": "country", "cols": 4},
-				{	"name": "contact", "cols": 4},
-				{	"name": "active", "cols": 2}
+				{ "name": "name","cols": 2},
+				{ "name": "address","cols": 6},
+				{ "name": "city","cols": 2},
+				{ "name": "state","cols": 2},
+				{ "name": "postcode","cols": 2},
+				{ "name": "country","cols": 3},
+				{ "name": "postcode","cols": 2},
+				{ "name": "supplier","cols": 4},
+				{	"name": "active", "cols": 2},
+				{ "name": "phone", "cols": 2}
 			]
 		}]
 }]

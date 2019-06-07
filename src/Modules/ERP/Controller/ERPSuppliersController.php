@@ -11,6 +11,8 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\ERP\Entity\ERPSuppliers;
+use App\Modules\Globale\Entity\GlobaleCountries;
+use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\ERP\Utils\ERPSuppliersUtils;
@@ -38,7 +40,7 @@ class ERPSuppliersController extends Controller
   		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
   			return $this->render('@Globale/genericlist.html.twig', [
   				'controllerName' => 'suppliersController',
-  				'interfaceName' => 'Proveedores',
+  				'interfaceName' => 'Departamentos',
   				'optionSelected' => $request->attributes->get('_route'),
   				'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
   				'breadcrumb' =>  $menurepository->formatBreadcrumb($request->get('_route')),
@@ -58,14 +60,56 @@ class ERPSuppliersController extends Controller
 		 $this->denyAccessUnlessGranted('ROLE_ADMIN');
 		 $template=dirname(__FILE__)."/../Forms/Suppliers.json";
 		 $utils = new GlobaleFormUtils();
-		 $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),['activity']);
-		 return $utils->make($id, $this->class, $action, "formSuppliers", "modal");
+		 $obj = new $this->class();
+		 //$default= new GlobaleCountries();
+		 //$default=$default->findById(64);
+		 $defaultCountry=$this->getDoctrine()->getRepository(GlobaleCountries::class);
+		 $default=$defaultCountry->findOneBy(['name'=>"España"]);
+		 $obj->setCountry($default);
+		 $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine());
+		 $make= $utils->make($id, $this->class, $action, "formSuppliers", "full", "@Globale/form.html.twig", "formSupplier");
+		 //dump($make);
+		 return $make;
 		}
 
+		/**
+     * @Route("/{_locale}/ERP/suppliers/form/{id}", name="formSupplier", defaults={"id"=0})
+     */
+    public function formSupplier($id,Request $request)
+    {
+      $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+  		$this->denyAccessUnlessGranted('ROLE_ADMIN');
+  		$userdata=$this->getUser()->getTemplateData();
+  		$locale = $request->getLocale();
+  		$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
+			$breadcrumb=$menurepository->formatBreadcrumb('suppliers');
+    	$supplierrRepository=$this->getDoctrine()->getRepository($this->class);
+			$obj = $supplierrRepository->findOneBy(['id'=>$id, 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
+			$entity_name=$obj?$obj->getSocialName():'';
+			return $this->render('@Globale/generictabform.html.twig', array(
+							'entity_name' => $entity_name,
+							'controllerName' => 'SuppliersController',
+							'interfaceName' => 'Proveedores',
+							'optionSelected' => 'suppliers',
+							'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
+							'breadcrumb' => $breadcrumb,
+							'userData' => $userdata,
+							'id' => $id,
+							'tab' => $request->query->get('tab','data'), //Show initial tab, by default data tab
+							'tabs' => [["name" => "data", "icon"=>"fa fa-headphones", "caption"=>"Datos proveedor", "active"=>true, "route"=>$this->generateUrl("dataSuppliers",["id"=>$id])],
+												["name" => "addresses", "icon"=>"fa fa-headphones", "caption"=>"direcciones", "route"=>$this->generateUrl("addresses",["id"=>$id, "type"=>"supplier"])],
+												["name" => "contacts", "icon"=>"fa fa-headphones", "caption"=>"contactos" , "route"=>$this->generateUrl("contacts",["id"=>$id])],
+												["name" => "bankaccounts", "icon"=>"fa fa-headphones", "caption"=>"Cuentas bancarias", "route"=>$this->generateUrl("bankaccounts",["id"=>$id])]
+											],
+									));
+			}
+
+
+
     /**
-    * @Route("/api/global/supplier/{id}/get", name="getSuppliers")
+    * @Route("/api/global/supplier/{id}/get", name="getSupplier")
     */
-    public function getSuppliers($id){
+    public function getSupplier($id){
       $supplier = $this->getDoctrine()->getRepository($this->class)->findOneById($id);
       if (!$supplier) {
             throw $this->createNotFoundException('No currency found for id '.$id );
@@ -85,7 +129,7 @@ class ERPSuppliersController extends Controller
     $repository = $manager->getRepository($this->class);
     $listUtils=new GlobaleListUtils();
     $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Suppliers.json"),true);
-    $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, Suppliers::class);
+    $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, Suppliers::class,[["type"=>"and", "column"=>"company", "value"=>$user->getCompany()]]);
     return new JsonResponse($return);
   }
 
@@ -97,8 +141,8 @@ class ERPSuppliersController extends Controller
  public function disable($id)
 	 {
 	 $this->denyAccessUnlessGranted('ROLE_GLOBAL');
-	 $supplierUtils=new ERPSupplierUtils();
-	 $result=$supplierUtils->disableObject($id, $this->class, $this->getDoctrine());
+	 $entityUtils=new GlobaleEntityUtils();
+	 $result=$entityUtils->disableObject($id, $this->class, $this->getDoctrine());
 	 return new JsonResponse(array('result' => $result));
  }
  /**
@@ -107,8 +151,8 @@ class ERPSuppliersController extends Controller
  public function enable($id)
 	 {
 	 $this->denyAccessUnlessGranted('ROLE_GLOBAL');
-	 $supplierUtils=new ERPSupplierUtils();
-	 $result=$supplierUtils->enableObject($id, $this->class, $this->getDoctrine());
+	 $entityUtils=new GlobaleEntityUtils();
+	 $result=$entityUtils->enableObject($id, $this->class, $this->getDoctrine());
 	 return new JsonResponse(array('result' => $result));
  }
  /**
@@ -116,8 +160,8 @@ class ERPSuppliersController extends Controller
  */
  public function delete($id){
 	 $this->denyAccessUnlessGranted('ROLE_GLOBAL');
-	 $supplierUtils=new ERPSupplierUtils();
-	 $result=$supplierUtils->deleteObject($id, $this->class, $this->getDoctrine());
+	 $entityUtils=new GlobaleEntityUtils();
+	 $result=$entityUtils->deleteObject($id, $this->class, $this->getDoctrine());
 	 return new JsonResponse(array('result' => $result));
  }
 

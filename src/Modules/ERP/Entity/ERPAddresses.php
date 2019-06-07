@@ -5,9 +5,8 @@ namespace App\Modules\ERP\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
 use \App\Modules\Globale\Entity\GlobaleStates;
-use \App\Modules\Carrier\Entity\CarrierCarriers;
 use \App\Modules\Globale\Entity\GlobaleCountries;
-use \App\Modules\ERP\Entity\ERPContacts;
+use \App\Modules\ERP\Entity\ERPSuppliers;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPAddressesRepository")
@@ -64,12 +63,12 @@ class ERPAddresses
     private $dateupd;
 
     /**
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(type="boolean", nullable=true)
      */
     private $active;
 
     /**
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(type="boolean", nullable=true)
      */
     private $deleted;
 
@@ -79,26 +78,15 @@ class ERPAddresses
     private $phone;
 
     /**
-     * @ORM\OneToOne(targetEntity="\App\Modules\Carrier\Entity\CarrierCarriers", cascade={"persist", "remove"})
-     */
-    private $carrier;
-
-    /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCountries")
      * @ORM\JoinColumn(nullable=false)
      */
     private $country;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPContacts")
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPSuppliers")
      */
-    private $contact;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Modules\ERP\Entity\ERPCustomers", inversedBy="shippingaddress")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $customers;
+    private $supplier;
 
     public $newSeconds=1296000;
     public $updatedSeconds=1296000;
@@ -209,7 +197,7 @@ class ERPAddresses
         return $this->active;
     }
 
-    public function setActive(bool $active): self
+    public function setActive(?bool $active): self
     {
         $this->active = $active;
 
@@ -221,7 +209,7 @@ class ERPAddresses
         return $this->deleted;
     }
 
-    public function setDeleted(bool $deleted): self
+    public function setDeleted(?bool $deleted): self
     {
         $this->deleted = $deleted;
 
@@ -240,18 +228,6 @@ class ERPAddresses
         return $this;
     }
 
-    public function getCarrier(): ?CarrierCarriers
-    {
-        return $this->carrier;
-    }
-
-    public function setCarrier(?CarrierCarriers $carrier): self
-    {
-        $this->carrier = $carrier;
-
-        return $this;
-    }
-
     public function getCountry(): ?GlobaleCountries
     {
         return $this->country;
@@ -264,29 +240,15 @@ class ERPAddresses
         return $this;
     }
 
-    public function getContact(): ?ERPContacts
+    public function getSupplier(): ?ERPSuppliers
     {
-        return $this->contact;
+        return $this->supplier;
     }
 
-    public function setContact(?ERPContacts $contact): self
+    public function setSupplier(?ERPSuppliers $supplier): self
     {
-        $this->contact = $contact;
+        $this->supplier = $supplier;
 
         return $this;
     }
-
-    public function getCustomers(): ?ERPCustomers
-    {
-        return $this->customers;
-    }
-
-    public function setCustomers(?ERPCustomers $customers): self
-    {
-        $this->customers = $customers;
-
-        return $this;
-    }
-
-
 }

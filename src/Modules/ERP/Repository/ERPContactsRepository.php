@@ -7,10 +7,10 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
- * @method Contacts|null find($id, $lockMode = null, $lockVersion = null)
- * @method Contacts|null findOneBy(array $criteria, array $orderBy = null)
- * @method Contacts[]    findAll()
- * @method Contacts[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method ERPContacts|null find($id, $lockMode = null, $lockVersion = null)
+ * @method ERPContacts|null findOneBy(array $criteria, array $orderBy = null)
+ * @method ERPContacts[]    findAll()
+ * @method ERPContacts[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class ERPContactsRepository extends ServiceEntityRepository
 {
@@ -20,15 +20,15 @@ class ERPContactsRepository extends ServiceEntityRepository
     }
 
     // /**
-    //  * @return Contacts[] Returns an array of Contacts objects
+    //  * @return ERPContacts[] Returns an array of ERPContacts objects
     //  */
     /*
     public function findByExampleField($value)
     {
-        return $this->createQueryBuilder('c')
-            ->andWhere('c.exampleField = :val')
+        return $this->createQueryBuilder('e')
+            ->andWhere('e.exampleField = :val')
             ->setParameter('val', $value)
-            ->orderBy('c.id', 'ASC')
+            ->orderBy('e.id', 'ASC')
             ->setMaxResults(10)
             ->getQuery()
             ->getResult()
@@ -37,10 +37,10 @@ class ERPContactsRepository extends ServiceEntityRepository
     */
 
     /*
-    public function findOneBySomeField($value): ?Contacts
+    public function findOneBySomeField($value): ?ERPContacts
     {
-        return $this->createQueryBuilder('c')
-            ->andWhere('c.exampleField = :val')
+        return $this->createQueryBuilder('e')
+            ->andWhere('e.exampleField = :val')
             ->setParameter('val', $value)
             ->getQuery()
             ->getOneOrNullResult()

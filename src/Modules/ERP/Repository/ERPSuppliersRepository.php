@@ -19,6 +19,19 @@ class ERPSuppliersRepository extends ServiceEntityRepository
         parent::__construct($registry, ERPSuppliers::class);
     }
 
+    
+    public function findById($value)
+    {
+        return $this->createQueryBuilder('c')
+            ->andWhere('c.id = :val')
+            ->setParameter('val', $value)
+            ->orderBy('c.id', 'ASC')
+            ->setMaxResults(10)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
+
     // /**
     //  * @return ERPSuppliers[] Returns an array of ERPSuppliers objects
     //  */
