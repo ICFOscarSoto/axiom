@@ -15,7 +15,7 @@ class CloudFilesUtils
 {
   public function formatList($user,$path,$id){
 		$list=[
-			'id' => 'listFiles',
+			'id' => 'listFiles'.$path,
 			'route' => 'fileslist',
 			'routeParams' => ["userid" => $user->getId(), "path"=>$path, "id"=>$id],
 			'orderColumn' => 1,
