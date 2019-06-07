@@ -1,4 +1,7 @@
 {% set listConstructor = cloudConstructor.list[0] %}
+{% set listOrigin = "genericlist" %}
+{# for know if list.html is invoked directly from controller and we need to make modals inside list#}
+
 <div class="dropzone" attr-id="{{ listConstructor.id }}" attr-path="{{cloudConstructor.path}}"><div class="dz-message" data-dz-message>
   {{ include('@Globale/list.html.twig') }}
   <script>
@@ -9,7 +12,7 @@
           url: '{{cloudConstructor.path}}',
           maxFilesize: 20,  // in Mb
           addRemoveLinks: false,
-          clickable: '#uploadTop-top-button',
+          clickable: '#uploadWorker-top-button',
           init: function () {
               this.on("maxfilesexceeded", function(file) {
                   this.removeFile(file);
