@@ -288,7 +288,7 @@
 												$.post(url, null,
 													function(data, status, xhr){
 															$("#{{field.modal}}-modal-form-body").html(data);
-															$('#{{field.modal}}-modal-form input').iCheck({checkboxClass: 'icheckbox_flat-blue',radioClass: 'iradio_flat-blue'});
+															$("#{{field.modal}}-modal-form input").find(':checkbox').not($('[id$=-chkall]')).iCheck({checkboxClass: 'icheckbox_flat-blue', radioClass: 'iradio_flat-blue'});
 															$("#{{field.modal}}-modal-form").modal();
 												});
 											});
@@ -325,6 +325,7 @@
 
 			//TOP BUTTONS BACKGROUND ACTION
 			{% for field in listConstructor.topButtons %}
+
 				{% if field.actionType is defined and field.actionType=="background" %}
 					//OPEN MODAL
 					$('body').on('click', "#{{ field.id }}-top-button", function() {
@@ -339,7 +340,8 @@
 							$.post('{{ url(field.route, routeParams) }}', null,
 								function(data, status, xhr){
 									$("#{{field.modal}}-modal-form-body").html(data);
-									$('#{{field.modal}}-modal-form input').iCheck({checkboxClass: 'icheckbox_flat-blue',radioClass: 'iradio_flat-blue'});
+									//$('#{{field.modal}}-modal-form input').iCheck({checkboxClass: 'icheckbox_flat-blue',radioClass: 'iradio_flat-blue'});
+									$("#{{field.modal}}-modal-form input").find(':checkbox').not($('[id$=-chkall]')).iCheck({checkboxClass: 'icheckbox_flat-blue', radioClass: 'iradio_flat-blue'});
 									$("#{{field.modal}}-modal-form").modal();
 							});
 					});
