@@ -1,0 +1,20 @@
+[{
+	"sections": [
+		{
+			"name": "Datos",
+			"fields": [
+				{ "name": "name", "cols": 4},
+				{	"name": "annualhours", "cols": 3},
+				{	"name": "weekhours", "cols": 3},
+				{	"name": "weekresthours", "cols": 3},
+				{	"name": "vacationdays", "cols": 3},
+				{	"name": "vacationtype", "cols": 3},
+				{	"name": "personalaffairdays", "cols": 3},
+				{	"name": "maxextrahours", "cols": 3},
+				{	"name": "kmprice", "cols": 3},
+				{	"name": "dietprice", "cols": 3},	
+				{	"name": "active", "cols": 2}
+			]
+		}
+	]
+}]
