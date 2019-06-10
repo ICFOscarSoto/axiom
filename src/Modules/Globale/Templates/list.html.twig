@@ -288,8 +288,9 @@
 												$.post(url, null,
 													function(data, status, xhr){
 															$("#{{field.modal}}-modal-form-body").html(data);
-															$("#{{field.modal}}-modal-form input").find(':checkbox').not($('[id$=-chkall]')).iCheck({checkboxClass: 'icheckbox_flat-blue', radioClass: 'iradio_flat-blue'});
+															$("#{{field.modal}}-modal-form-body").find(':checkbox').not($('[id$=-chkall]')).iCheck({checkboxClass: 'icheckbox_flat-blue', radioClass: 'iradio_flat-blue'});
 															$("#{{field.modal}}-modal-form").modal();
+															console.log("Aqui");
 												});
 											});
 										{% else %}
@@ -345,7 +346,7 @@
 								function(data, status, xhr){
 									$("#{{field.modal}}-modal-form-body").html(data);
 									//$('#{{field.modal}}-modal-form input').iCheck({checkboxClass: 'icheckbox_flat-blue',radioClass: 'iradio_flat-blue'});
-									$("#{{field.modal}}-modal-form input").find(':checkbox').not($('[id$=-chkall]')).iCheck({checkboxClass: 'icheckbox_flat-blue', radioClass: 'iradio_flat-blue'});
+									$("#{{field.modal}}-modal-form-body").find(':checkbox').not($('[id$=-chkall]')).iCheck({checkboxClass: 'icheckbox_flat-blue', radioClass: 'iradio_flat-blue'});
 									$("#{{field.modal}}-modal-form").modal();
 							});
 					});
@@ -417,36 +418,36 @@
 	<!-- END BUTTONZONE -->
 	{% for field in listConstructor.fieldButtons %}
 
-	{% set routeParams = [] %}
-	{% set routeParams = routeParams|merge({('id'): '_____'}) %}
-	{% if field.routeParams is defined %}
-		{% dump(routeParams) %}
-		{% for key,param in field.routeParams %}
-			{% if _context[param] is defined %} {# Detect if parameter is a reference to a var or is a value #}
-				{% set routeParams = routeParams|merge({(key): _context[param]}) %}
-			{% else %}
-				{% set routeParams = routeParams|merge({(key): param}) %}
-			{% endif %}
-		{% endfor %}
-	{% endif %}
+		{% set routeParams = [] %}
+		{% set routeParams = routeParams|merge({('id'): '_____'}) %}
+		{% if field.routeParams is defined %}
+			{% dump(routeParams) %}
+			{% for key,param in field.routeParams %}
+				{% if _context[param] is defined %} {# Detect if parameter is a reference to a var or is a value #}
+					{% set routeParams = routeParams|merge({(key): _context[param]}) %}
+				{% else %}
+					{% set routeParams = routeParams|merge({(key): param}) %}
+				{% endif %}
+			{% endfor %}
+		{% endif %}
 
-	{% if field.type == "option" %}
-		{% for fieldOption in field.options %}
-			{% set optionParams = routeParams %}
-			{% if fieldOption.routeParams is defined %}
-				{% for key,param in fieldOption.routeParams %}
-					{% if _context[param] is defined %} {# Detect if parameter is a reference to a var or is a value #}
-						{% set optionParams = optionParams|merge({(key): _context[param]}) %}
-					{% else %}
-						{% set optionParams = optionParams|merge({(key): param}) %}
-					{% endif %}
-				{% endfor %}
-			{% endif %}
-			<input id="{{ listConstructor.id }}-field-button-{{ fieldOption.id }}-url" type="hidden" value="{% if fieldOption.route|length %}{{ url(fieldOption.route,optionParams) }}{% endif %}" />
-		{% endfor %}
-	{% else %}
-		<input id="{{ listConstructor.id }}-field-button-{{ field.id }}-url" type="hidden" value="{% if field.route|length %}{{ url(field.route,routeParams) }}{% endif %}" />
-	{% endif %}
+		{% if field.type == "option" %}
+			{% for fieldOption in field.options %}
+				{% set optionParams = routeParams %}
+				{% if fieldOption.routeParams is defined %}
+					{% for key,param in fieldOption.routeParams %}
+						{% if _context[param] is defined %} {# Detect if parameter is a reference to a var or is a value #}
+							{% set optionParams = optionParams|merge({(key): _context[param]}) %}
+						{% else %}
+							{% set optionParams = optionParams|merge({(key): param}) %}
+						{% endif %}
+					{% endfor %}
+				{% endif %}
+				<input id="{{ listConstructor.id }}-field-button-{{ fieldOption.id }}-url" type="hidden" value="{% if fieldOption.route|length %}{{ url(fieldOption.route,optionParams) }}{% endif %}" />
+			{% endfor %}
+		{% else %}
+			<input id="{{ listConstructor.id }}-field-button-{{ field.id }}-url" type="hidden" value="{% if field.route|length %}{{ url(field.route,routeParams) }}{% endif %}" />
+		{% endif %}
 	{% endfor %}
 	<table id="{{ listConstructor.id }}" class="table table-bordered hover stripe compact datatable" style="width: 100%">
 			<thead>

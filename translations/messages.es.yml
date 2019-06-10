@@ -9,6 +9,7 @@ Devices: Dispositivos
 Human resources: Recursos humanos
 Workers: Trabajadores
 Shifts and schedules: Turnos y horarios
+Others: Otros
 
 #LANGUAGES
 #----------------------------------------------------------------------------------------------------------------------
@@ -168,6 +169,15 @@ Workerobservations: Observaciones trabajador
 Companyobservations: Observaciones empresa
 Requestdate: Fecha solicitud
 Select a type...: Seleccionar un tipo...
+
+# QUOTATION GROUPS
+#----------------------------------------------------------------------------------------------------------------------
+Quotation Groups: Grupos cotización
+QuotationGroups: Grupos cotización
+Codgroup: Código
+Minsalary: Base mínima
+Maxsalary: Base máxima
+Periodsalary: Periodo base
 
 # SICK LEAVES
 #----------------------------------------------------------------------------------------------------------------------

@@ -33,7 +33,7 @@
 						<li class="{% if tab is defined and tabitem.name == tab %}active{% endif %}" id="tab-head-{{ tabitem.name }}" style="{% if not (tabitem.active is defined and tabitem.active == true) and id == 0 %}display:none;{% endif %}" attr-id="{{ id }}" attr-name="{{ tabitem.name }}" attr-route="{% if tabitem.route is defined %}{{ tabitem.route }}{% endif %}">
 							<a href="#tab-body-{{ tabitem.name }}" data-toggle="tab">
 								<span class="visible-xs"><i class="{{ tabitem.icon }}"></i></span>
-								<span class="hidden-xs">{{ tabitem.caption }}</span>
+								<span class="hidden-xs">{{ (tabitem.caption)|trans }}</span>
 							</a>
 						</li>
           {% endfor %}

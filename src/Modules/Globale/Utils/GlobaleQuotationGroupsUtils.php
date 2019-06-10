@@ -10,6 +10,25 @@ use App\Modules\Email\Entity\GlobaleEmailAccounts;
 
 class GlobaleQuotationGroupsUtils
 {
+  public function getExcludedForm($params){
+    return ['periodsalary'];
+  }
+
+  public function getIncludedForm($params){
+    $doctrine=$params["doctrine"];
+    $id=$params["id"];
+    $user=$params["user"];
+
+    return [
+      ['periodsalary', ChoiceType::class, [
+        'required' => true,
+        'attr' => ['class' => 'select2'],
+        'choices' => ['Mensual'=>'month', 'Diario'=>"day"],
+        'placeholder' => 'Select a type...'
+      ]]
+    ];
+  }
+
   public function formatList($user){
     $list=[
       'id' => 'listQuotationGroups',

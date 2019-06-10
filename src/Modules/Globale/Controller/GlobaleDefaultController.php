@@ -82,7 +82,6 @@ class GlobaleDefaultController extends Controller
 		return new RedirectResponse($this->router->generate('app_login'));
     }
 
-
    /**
     * @Route("/{_locale}/{module}/{name}/generic/data/{id}/{action}", name="genericdata", defaults={"id"=0, "action"="read"})
     */
@@ -96,7 +95,7 @@ class GlobaleDefaultController extends Controller
       if(class_exists($classUtils)){
         $utilsObj=new $classUtils();
       }else $utilsObj=new $class(); // define the main class to ensure that a valid object is created and not has getIncludedForm and getExcludedForm
-
+      $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser()];
       $utils->initialize($this->getUser(), new $class(), $template, $request, $this, $this->getDoctrine(),
         method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[],null,["module"=>$module, "name"=>$name]
       );
