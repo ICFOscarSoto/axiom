@@ -20,6 +20,10 @@ class GlobaleUsersUtils
       if($form["password"]->getData()!="")
         $obj->setPassword($encoder->encodePassword($obj, $form["password"]->getData()));
 
+      if($form["roles"]->getData()==null || $form["roles"]->getData()==""){
+        $obj->setRoles($obj->getRoles());
+      }
+
       if($obj->getId() == null) {
         $obj->setDateadd(new \DateTime());
         $obj->setDeleted(false);
@@ -29,8 +33,8 @@ class GlobaleUsersUtils
       $obj->setDateupd(new \DateTime());
       try{
         if(method_exists($obj,'preProccess')) $obj->{'preProccess'}($this->controller->get('kernel'), null, $this->user);
-        $entityManager->persist($obj);
-        $entityManager->flush();
+        //$entityManager->persist($obj);
+        //$entityManager->flush();
         if(method_exists($obj,'postProccess')) $obj->{'postProccess'}($this->controller->get('kernel'));
         return $obj;
       }catch (Exception $e) {

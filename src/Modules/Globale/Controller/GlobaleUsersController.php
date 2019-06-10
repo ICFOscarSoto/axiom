@@ -118,7 +118,7 @@ class GlobaleUsersController extends Controller
     $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser()];
     $utils->initialize($this->getUser(), new $this->class(), $template, $request,
                        $this, $this->getDoctrine(),method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],
-                       method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[],$encoder,$this->getUser()->getCompany());
+                       method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[],$encoder);
     return $utils->make($id, $this->class, $action, "formuser", "full", "@Globale/form.html.twig", 'formUser', $this->utilsClass);
   }
 
