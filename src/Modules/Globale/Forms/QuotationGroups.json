@@ -1,0 +1,14 @@
+[{
+	"sections": [
+		{
+			"name": "Datos",
+			"fields": [
+				{ "name": "codgroup","cols": 4},
+				{	"name": "name", "cols": 4},
+				{	"name": "minsalary", "cols": 4},
+				{	"name": "maxsalary", "cols": 4},
+				{	"name": "periodsalary", "cols": 4},
+				{	"name": "active", "cols": 2}
+			]
+		}]
+}]

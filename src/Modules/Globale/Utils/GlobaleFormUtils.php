@@ -32,6 +32,8 @@ class GlobaleFormUtils extends Controller
   private $transforms=array();
   private $form;
   private $values=array();
+  private $routeParams=array();
+
 
   //OLD INIT, ONLY FOR COMPATIBILITY
   public function init($doctrine, $request){
@@ -40,7 +42,7 @@ class GlobaleFormUtils extends Controller
     $this->entityManager=$this->doctrine->getManager();
   }
 
-  public function initialize($user, $obj, $template, $request, $controller, $doctrine, $excludedAttributes=array(), $includedAttributes=array(), $encoder=null){
+  public function initialize($user, $obj, $template, $request, $controller, $doctrine, $excludedAttributes=array(), $includedAttributes=array(), $encoder=null, $routeParams=[]){
     $this->user=$user;
     $this->obj=$obj;
     $this->request=$request;
@@ -54,6 +56,8 @@ class GlobaleFormUtils extends Controller
     $this->templateArray=json_decode(file_get_contents ($this->template),true);
     $this->entityManager=$this->doctrine->getManager();
     $this->encoder=$encoder;
+    $this->routeParams=$routeParams;
+
     //Set active by default in new objects
     if($obj->getId()===null && method_exists($obj, 'setActive')){
       $obj->setActive(true);
@@ -66,7 +70,7 @@ class GlobaleFormUtils extends Controller
  //id       = id of the entity element
  //class    = class of the entity element
  //route    = route of the save/read method in controller, generally dataEntity
-  public function formatForm($name, $ajax=false, $id=null, $class=null, $route=null){
+  public function formatForm($name, $ajax=false, $id=null, $class=null, $route=null, $routeParams=[]){
     if(!$id){
 				$this->obj=new $class();
 			} else{
@@ -77,7 +81,8 @@ class GlobaleFormUtils extends Controller
 
     $form=$this->createFromEntity2(!$ajax)->getForm();
     $caption=ucfirst($name);
-    return ["id"=>$name, "id_object"=>$this->obj->getId(), "name"=>$caption, "form" => $form->createView(), "post"=>$this->controller->generateUrl(($route!=null)?$route:$this->request->get('_route'),["id"=>$id, "action"=>"save"]), "template" => json_decode(file_get_contents ($this->template))];
+    $routeParams=array_merge($routeParams, ["id"=>$id, "action"=>"save"]);
+    return ["id"=>$name, "id_object"=>$this->obj->getId(), "name"=>$caption, "form" => $form->createView(), "post"=>$this->controller->generateUrl(($route!=null)?$route:$this->request->get('_route'),$routeParams), "template" => json_decode(file_get_contents ($this->template))];
   }
 
   public function createFromEntity2($includeSave=true){
@@ -194,12 +199,16 @@ class GlobaleFormUtils extends Controller
             else if ($this->obj->getId()!==FALSE) $result=true;
 					 //$result=((!is_bool($this->obj) && $this->obj->getId()!==FALSE)?true:false);
            if($returnRoute==null)$returnRoute=$this->request->get('_route');
-					 return new JsonResponse(array('result' => $result, 'href' =>$result?(($id!=$this->obj->getId())?$this->controller->generateUrl($returnRoute,["id"=>$this->obj->getId()]):''):'', 'reload' =>$result?(($id!=$this->obj->getId())?true:false):'', 'id' => $result?$this->obj->getId():''));
+           $routeParams=array_merge($this->routeParams, ["id"=>$this->obj->getId()]);
+           $route=$result?(($id!=$this->obj->getId())?$this->controller->generateUrl($returnRoute,$routeParams):''):'';
+					 return new JsonResponse(array('result' => $result, 'href' =>$route, 'reload' =>$result?(($id!=$this->obj->getId())?true:false):'', 'id' => $result?$this->obj->getId():''));
 				 break;
 				 case 'read':
+             $routeParams=array_merge($this->routeParams, ["id"=>$id, "action"=>"save"]);
+             $route=$this->controller->generateUrl($this->request->get('_route'),$routeParams);
 						 return $this->controller->render($render, array(
               'includes' => $includesArray,
-              'formConstructor' => ["id"=>$id, "id_object"=>$id, "name"=>$name, "form" => $form->createView(), "type" => $type, "post"=>$this->controller->generateUrl($this->request->get('_route'),["id"=>$id, "action"=>"save"]), "template" => json_decode(file_get_contents ($this->template),true)]
+              'formConstructor' => ["id"=>$id, "id_object"=>$id, "name"=>$name, "form" => $form->createView(), "type" => $type, "post"=>$route, "template" => json_decode(file_get_contents ($this->template),true)]
 					    ));
 				break;
 			}

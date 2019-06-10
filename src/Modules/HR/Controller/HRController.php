@@ -67,10 +67,8 @@ class HRController extends Controller
 			$this->denyAccessUnlessGranted('ROLE_ADMIN');
 			$template=dirname(__FILE__)."/../Forms/Workers.json";
 			$utils = new GlobaleFormUtils();
-			$utils = new GlobaleFormUtils();
 	    $utilsObj=new $this->utilsClass();
 			$workerRepository=$this->getDoctrine()->getRepository(HRWorkers::class);
-
 			$obj = $workerRepository->findOneBy(['id'=>$id, 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
 	    $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "worker"=>$obj];
 			$utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);

@@ -26,6 +26,7 @@ class GlobaleMenuOptionsRepository extends ServiceEntityRepository
 		if($row!=null){
 			$item=array();
 			$item["rute"]=$row->getRute();
+      $item["routeParams"]=json_decode($row->getRouteparams(),true);
 			$item["name"]=$row->getName();
 			$item["icon"]=$row->getIcon();
 			$path[]=$item;
@@ -35,6 +36,7 @@ class GlobaleMenuOptionsRepository extends ServiceEntityRepository
 				if($row!=null){
 					$item=array();
 					$item["rute"]=$row->getRute();
+          $item["routeParams"]=json_decode($row->getRouteparams(),true);
 					$item["name"]=$row->getName();
 					$item["icon"]=$row->getIcon();
 					$path[]=$item;
@@ -42,6 +44,7 @@ class GlobaleMenuOptionsRepository extends ServiceEntityRepository
 			}
 		}
 		$item["rute"]='dashboard';
+    $item["routeParams"]=[];
 		$item["name"]='Dashboard';
 		$item["icon"]='fa fa-dashboard';
 		$path[]=$item;
@@ -64,6 +67,11 @@ class GlobaleMenuOptionsRepository extends ServiceEntityRepository
 				$childs=$this->getChilds($role, $parent->getId());
 				foreach($childs as $key_child=>$child){
 					$childs[$key_child]->childs=$this->getChilds($role, $child->getId());
+          foreach($childs[$key_child]->childs as $sub_key_child=>$sub_child){
+              //dump(json_decode($childs[$key_child]->childs[$sub_key_child]->getRouteparams()));
+              $childs[$key_child]->childs[$sub_key_child]->params=json_decode($childs[$key_child]->childs[$sub_key_child]->getRouteparams(),true);
+          }
+          $childs[$key_child]->params=json_decode($childs[$key_child]->getRouteparams(),true);
 				}
 				$parents[$key_parent]->childs=$childs;
 			}

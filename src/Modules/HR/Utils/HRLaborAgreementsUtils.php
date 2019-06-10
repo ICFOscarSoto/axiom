@@ -15,7 +15,7 @@ class HRLaborAgreementsUtils extends Controller
   public function formatList($user){
     $list=[
       'id' => 'listLaborAgreement',
-      'route' => 'laboragreementlist',
+      'route' => 'laboragreementslist',
       'routeParams' => ["id" => $user->getId()],
       'orderColumn' => 1,
       'orderDirection' => 'ASC',

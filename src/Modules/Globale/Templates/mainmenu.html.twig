@@ -1,7 +1,11 @@
 <ul id="main-menu" class="main-menu">
 	 {% for menuOption in menuOptions %}
-					<li  attr-id="{{ menuOption.id }}" class="{% if menuOption.rute is not null and optionSelected is not null %} {% if path(optionSelected) == path(menuOption.rute) %}active{% endif %}{% endif %}">
-					<a href="{% if menuOption.rute is not null %}{{ path(menuOption.rute) }}{% endif %}">
+	 				{% set routeparams=[] %}
+	 				{% if menuOption.params!=null %} {% set routeparams = routeparams|merge(menuOption.params) %}{% endif %}
+					{% set routeparamsSelected=[] %}
+	 				{% if optionSelectedParams is defined and optionSelectedParams!=null %} {% set routeparamsSelected = routeparamsSelected|merge(optionSelectedParams) %}{% endif %}
+					<li  attr-id="{{ menuOption.id }}" class="{% if menuOption.rute is not null and optionSelected is not null %} {% if path(optionSelected, routeparamsSelected) == path(menuOption.rute, routeparams) %}active{% endif %}{% endif %}">
+					<a href="{% if menuOption.rute is not null %}{{ path(menuOption.rute, routeparams) }}{% endif %}">
 						<i class="{{ menuOption.icon }}"></i>
 						<span class="title">{{ (menuOption.name)|trans }}</span>
 					</a>
@@ -9,16 +13,24 @@
 					<ul>
 					{% endif %}
 				{% for menuOption_child in menuOption.childs %}
-							<li attr-id="{{ menuOption_child.id }}" attr-parent="{{ menuOption.id }}" class="{% if menuOption_child.rute is not null and optionSelected is not null %} {% if path(optionSelected) == path(menuOption_child.rute) %}active{% endif %}{% endif %}">
-							<a href="{% if menuOption_child.rute is not null %}{{ path(menuOption_child.rute) }}{% endif %}">
+							{% set routeparams=[] %}
+							{% if menuOption_child.params!=null %} {% set routeparams = routeparams|merge(menuOption_child.params) %}{% endif %}
+							{% set routeparamsSelected=[] %}
+			 				{% if optionSelectedParams is defined and optionSelectedParams!=null %} {% set routeparamsSelected = routeparamsSelected|merge(optionSelectedParams) %}{% endif %}
+							<li attr-id="{{ menuOption_child.id }}" attr-parent="{{ menuOption.id }}" class="{% if menuOption_child.rute is not null and optionSelected is not null %} {% if path(optionSelected, routeparamsSelected) == path(menuOption_child.rute, routeparams) %}active{% endif %}{% endif %}">
+							<a href="{% if menuOption_child.rute is not null %}{{ path(menuOption_child.rute, routeparams) }}{% endif %}">
 								<i class="{{ menuOption_child.icon }}"></i>
 								<span class="title">{{ (menuOption_child.name)|trans }}</span>
 							</a>
 						{% if menuOption_child.childs|length > 0 %}
 						<ul>
 						{% for menuOption_subchild in menuOption_child.childs %}
-									<li attr-id="{{ menuOption_subchild.id }}" attr-parent="{{ menuOption_child.id }}" class="{% if menuOption_subchild.rute is not null and optionSelected is not null%} {% if path(optionSelected) == path(menuOption_subchild.rute) %}active{% endif %}{% endif %}">
-									<a href="{% if menuOption_subchild.rute is not null %}{{ path(menuOption_subchild.rute) }}{% endif %}">
+									{% set routeparams=[] %}
+									{% if menuOption_subchild.params!=null %} {% set routeparams = routeparams|merge(menuOption_subchild.params) %}{% endif %}
+									{% set routeparamsSelected=[] %}
+					 				{% if optionSelectedParams is defined and optionSelectedParams!=null %} {% set routeparamsSelected = routeparamsSelected|merge(optionSelectedParams) %}{% endif %}
+									<li attr-id="{{ menuOption_subchild.id }}" attr-parent="{{ menuOption_child.id }}" class="{% if menuOption_subchild.rute is not null and optionSelected is not null%} {% if path(optionSelected, routeparamsSelected) == path(menuOption_subchild.rute, routeparams) %}active{% endif %}{% endif %}">
+									<a href="{% if menuOption_subchild.rute is not null %}{{ path(menuOption_subchild.rute, routeparams) }}{% endif %}">
 										<i class="{{ menuOption_subchild.icon }}"></i>
 										<span class="title">{{ (menuOption_subchild.name)|trans }}</span>
 									</a>

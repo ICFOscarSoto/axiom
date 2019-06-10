@@ -43,11 +43,17 @@ class GlobaleMenuOptions
 
     public $childs;
     public $url;
+    public $params;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Modules\Globale\Entity\GlobaleCompanies", inversedBy="menuOptions")
      */
     private $company;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $routeparams;
 
     public function getId(): ?int
     {
@@ -122,6 +128,18 @@ class GlobaleMenuOptions
     public function setCompany(?GlobaleCompanies $company): self
     {
         $this->company = $company;
+
+        return $this;
+    }
+
+    public function getRouteparams(): ?string
+    {
+        return $this->routeparams;
+    }
+
+    public function setRouteparams(?string $routeparams): self
+    {
+        $this->routeparams = $routeparams;
 
         return $this;
     }

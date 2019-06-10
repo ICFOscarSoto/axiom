@@ -1,8 +1,8 @@
 [
-  {"id": "edit", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"dataLaboragreement", "modal":"laboragreement", "actionType" : "background", "confirm" :false},
+  {"id": "edit", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"dataLaborAgreements", "modal":"laboragreements", "actionType" : "background", "confirm" :false},
   {"id": "activation", "type": "option", "options": [
-      {"id": "desactivate", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"disableLaboragreement", "confirm" :true, "actionType" : "background" },
-      {"id": "activate", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "route":"enableLaboragreement", "confirm" :true, "actionType" : "background" }
+      {"id": "desactivate", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"disableLaborAgreements", "confirm" :true, "actionType" : "background" },
+      {"id": "activate", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "route":"enableLaborAgreements", "confirm" :true, "actionType" : "background" }
   ]},
-  {"id": "delete", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"deleteLaboragreement", "confirm" :true, "undo" :false, "tooltip":"Borrar convenio", "actionType" : "background"}
+  {"id": "delete", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"deleteLaborAgreements", "confirm" :true, "undo" :false, "tooltip":"Borrar convenio", "actionType" : "background"}
 ]

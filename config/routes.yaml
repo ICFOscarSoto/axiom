@@ -179,6 +179,10 @@ HRVacations:
    resource: 'App\Modules\HR\Controller\HRVacationsController'
    type:     annotation
 
+HRLaborAgreements:
+   resource: 'App\Modules\HR\Controller\HRLaborAgreementsController'
+   type:     annotation
+
 HRSickleaves:
    resource: 'App\Modules\HR\Controller\HRSickleavesController'
    type:     annotation
