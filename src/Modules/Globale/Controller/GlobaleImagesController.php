@@ -186,7 +186,7 @@ class GlobaleImagesController extends Controller implements ContainerAwareInterf
 	}
 
 	/**
-	* @Route("/api/{type}/{id}/{size}/getimage", name="getImage", defaults={"type"="medium"})
+	* @Route("/api/{type}/{id}/{size}/getimage", name="getImage", defaults={"type"="users", "size"="medium", "id"=0 })
 	*/
 	public function getWorkerImage($type, $id, $size, Request $request)
 	{
