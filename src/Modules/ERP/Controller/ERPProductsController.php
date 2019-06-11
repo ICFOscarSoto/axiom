@@ -76,15 +76,10 @@ class ERPProductsController extends Controller
 			$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
 			$breadcrumb=$menurepository->formatBreadcrumb('products');
 			array_push($breadcrumb, $new_breadcrumb);
-
-			$p_repository = $this->getDoctrine()->getRepository('ERP:ERPProducts');
-			$wp_repository=$this->getDoctrine()->getRepository('ERP:ERPWebProducts');
-			$product=$p_repository->findOneById($id);
-			$product_name=$product->getName();
-			$webproduct = $wp_repository->findOneByProductId($id);
-
-			if (isset($webproduct)){
-				return $this->render('@Globale/generictabform.html.twig', array(
+			$productRepository=$this->getDoctrine()->getRepository($this->class);
+			$obj = $productRepository->findOneBy(['id'=>$id, 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
+			$product_name=$obj?$obj->getName():'';
+			return $this->render('@ERP/producttabform.html.twig', array(
 								'controllerName' => 'ProductsController',
 								'interfaceName' => 'Productos',
 								'optionSelected' => 'products',
@@ -94,34 +89,12 @@ class ERPProductsController extends Controller
 								'id' => $id,
 								'tab' => $request->query->get('tab','data'), //Show initial tab, by default data tab
 								'tabs' => [
-									["name" => "data", "caption"=>$product_name, "active"=>true, "route"=>$this->generateUrl("dataProduct",["id"=>$id])],
-								  ["name" => "webproduct", "caption"=>"Web", "active"=>true, "route"=>$this->generateUrl("dataWebProducts",["id"=>$webproduct->getId()])],
-									["name" => "stocks", "caption"=>"Stocks", "active"=>true, "route"=>$this->generateUrl("stocks",["id"=>$id])]
+									["name" => "data", "icon"=>"fa fa-id-card", "caption"=>"productsdata", "active"=>true, "route"=>$this->generateUrl("dataProduct",["id"=>$id])],
+									["name" => "webproduct", "icon"=>"fa fa-id-card", "caption"=>"Web", "route"=>$this->generateUrl("dataWebProducts",["id"=>$id])],
+									["name" => "stocks", "icon"=>"fa fa-id-card", "caption"=>"Stocks", "route"=>$this->generateUrl("stocks",["id"=>$id])]
 									]
 				));
-
-			}
-			else{
-				return $this->render('@Globale/generictabform.html.twig', array(
-								'controllerName' => 'ProductsController',
-								'interfaceName' => 'Productos',
-								'optionSelected' => 'products',
-								'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
-								'breadcrumb' => $breadcrumb,
-								'userData' => $userdata,
-								'id' => $id,
-								'tab' => $request->query->get('tab','data'), //Show initial tab, by default data tab
-								'tabs' => [
-									["name" => "data", "caption"=>$product['name'], "active"=>true, "route"=>$this->generateUrl("dataProduct",["id"=>$id])],
-										["name" => "web", "caption"=>"Web", "active"=>true, "route"=>$this->generateUrl("dataNewWebProducts")]
-									]
-				));
-			}
 		}
-
-
-
-
 
     /**
     * @Route("/api/global/product/{id}/get", name="getProduct")

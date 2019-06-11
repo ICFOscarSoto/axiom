@@ -1,0 +1,7 @@
+[ {"name": "id", "caption":""},
+  {"name": "name", "caption":"name", "width" : "50"},
+  {"name": "supplier", "caption":"supplier", "width" : "50"},
+  {"name": "customer", "caption":"customer", "width" : "50"},
+  {"name": "product", "caption":"product", "width" : "50"},
+  {"name": "active", "caption":"estate", "width":"10%" ,"class" : "dt-center", "replace":{"1":"<div style=\"min-width: 75px;\" class=\"label label-success\">Activo</div>", "0" : "<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado</div>"}}
+]

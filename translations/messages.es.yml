@@ -192,3 +192,21 @@ Justified: Justificado
 #----------------------------------------------------------------------------------------------------------------------
 Customers: Clientes
 Suppliers: Proveedores
+
+# SUPPLIERS
+#----------------------------------------------------------------------------------------------------------------------
+Supplier: Proveedor
+Supplier data: Datos del proveedor
+Code: Código
+Activity: Actividad
+Conditions: Condiciones
+Minorder: Pedido minimo
+Freeshipping: Envío gratis desde
+Estimateddelivery: Plazo de entrega estimado
+Averagedelivery: Plazo de entrega medio
+Cancelremains: Permite cancelar restos
+Dropshipping: Hace envíos directos
+Creditor: Credito
+Invoiceday: Dia de pago
+Paymentmethod: Forma de pago
+Swiftcode: Código SWIFT

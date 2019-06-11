@@ -1,0 +1,11 @@
+[{
+	"sections": [
+		{
+			"name": "Category data",
+			"fields": [
+				{ "name": "name","cols": 2},
+				{ "name": "parentid","cols": 2},
+				{ "name": "active","cols": 2}
+			]
+		}]
+}]

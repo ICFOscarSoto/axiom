@@ -7,7 +7,9 @@
 				{ "name": "lastname","cols": 2},
 				{ "name": "phone","cols": 2},
 				{ "name": "email","cols": 2},
-				{ "name": "active","cols": 2}
+				{ "name": "active","cols": 2},
+				{ "name": "supplier","cols": 2},
+				{ "name": "department","cols": 3}
 			]
 		}]
 }]

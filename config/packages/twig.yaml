@@ -12,3 +12,4 @@ twig:
         '%kernel.project_dir%/src/Modules/Calendar/Templates': Calendar
         '%kernel.project_dir%/src/Modules/Globale/Templates': Globale
         '%kernel.project_dir%/src/Modules/Tracker/Templates': Tracker
+        '%kernel.project_dir%/src/Modules/ERP/Templates': ERP

@@ -1,12 +1,12 @@
 [{
 	"sections": [
 		{
-			"name": "Banckaccounts data",
+			"name": "Reference data",
 			"fields": [
 				{ "name": "name","cols": 2},
-				{ "name": "iban","cols": 2},
-				{ "name": "swiftcode","cols": 2},
 				{ "name": "supplier","cols": 2},
+				{ "name": "product","cols": 2},
+				{ "name": "customer","cols": 2},
 				{ "name": "active","cols": 2}
 			]
 		}]
