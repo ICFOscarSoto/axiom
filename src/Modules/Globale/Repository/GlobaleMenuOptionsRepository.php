@@ -19,10 +19,10 @@ class GlobaleMenuOptionsRepository extends ServiceEntityRepository
         parent::__construct($registry, GlobaleMenuOptions::class);
     }
 
-    public function formatBreadcrumb($route){
+    public function formatBreadcrumb($route, $module=null, $name=null){
 		$path=array();
 
-		$row=$this->findByRoute($route);
+		$row=$this->findByRoute($route, $module, $name);
 		if($row!=null){
 			$item=array();
 			$item["rute"]=$row->getRute();
@@ -106,14 +106,27 @@ class GlobaleMenuOptionsRepository extends ServiceEntityRepository
 	}
 
 
-	public function findByRoute($route){
-		return $this->createQueryBuilder('f')
+	public function findByRoute($route, $module=null, $name=null){
+
+    if(!$module && !$name)
+  		return $this->createQueryBuilder('f')
+              ->andWhere('f.rute = :val_route')
+              ->setParameter('val_route', $route)
+              ->getQuery()
+              ->getOneOrNullResult()
+          ;
+    else{
+       $routeParams="{\"module\":\"".$module."\",\"name\":\"".$name."\"}";
+       dump($routeParams);
+       return $this->createQueryBuilder('f')
             ->andWhere('f.rute = :val_route')
+            ->andWhere("replace(f.routeparams, ' ', '') = :val_routeParams")
             ->setParameter('val_route', $route)
+            ->setParameter('val_routeParams', $routeParams)
             ->getQuery()
             ->getOneOrNullResult()
         ;
-
+      }
 	}
 
 

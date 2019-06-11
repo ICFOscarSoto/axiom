@@ -73,7 +73,7 @@ class GlobaleDefaultController extends Controller
 				'optionSelected' => $request->attributes->get('_route'),
         'optionSelectedParams' => ["module"=>$module, "name"=>$name],
 				'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
-				'breadcrumb' =>  $menurepository->formatBreadcrumb($request->get('_route')),
+				'breadcrumb' =>  $menurepository->formatBreadcrumb($request->get('_route'), $module, $name),
 				'userData' => $userdata,
 				'lists' => $templateLists,
         'forms' => $templateForms
