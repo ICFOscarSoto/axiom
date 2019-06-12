@@ -138,7 +138,7 @@ class GlobaleDefaultController extends Controller
       }
 
      /**
-     * @Route("/{_locale}/{module}/{name}/{id}/disable", name="genericdisable")
+     * @Route("/{_locale}/{module}/{name}/generic/{id}/disable", name="genericdisable")
      */
      public function disable($module, $name, Request $request, $id){
       $this->denyAccessUnlessGranted('ROLE_ADMIN');
@@ -148,7 +148,7 @@ class GlobaleDefaultController extends Controller
       return new JsonResponse(array('result' => $result));
      }
      /**
-     * @Route("/{_locale}/{module}/{name}/{id}/enable", name="genericenable")
+     * @Route("/{_locale}/{module}/{name}/generic/{id}/enable", name="genericenable")
      */
      public function enable($module, $name, Request $request, $id){
       $this->denyAccessUnlessGranted('ROLE_ADMIN');
@@ -158,7 +158,7 @@ class GlobaleDefaultController extends Controller
       return new JsonResponse(array('result' => $result));
      }
      /**
-     * @Route("/{_locale}/{module}/{name}/{id}/delete", name="genericdelete")
+     * @Route("/{_locale}/{module}/{name}/generic/{id}/delete", name="genericdelete")
      */
      public function delete($module, $name, Request $request, $id){
       $this->denyAccessUnlessGranted('ROLE_ADMIN');
