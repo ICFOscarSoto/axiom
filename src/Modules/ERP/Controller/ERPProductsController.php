@@ -16,6 +16,8 @@ use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\ERP\Utils\ERPProductsUtils;
+use App\Modules\ERP\Utils\ERPEAN13Utils;
+use App\Modules\ERP\Utils\ERPReferencesUtils;
 
 class ERPProductsController extends Controller
 {
@@ -79,7 +81,7 @@ class ERPProductsController extends Controller
 			$productRepository=$this->getDoctrine()->getRepository($this->class);
 			$obj = $productRepository->findOneBy(['id'=>$id, 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
 			$product_name=$obj?$obj->getName():'';
-			return $this->render('@ERP/producttabform.html.twig', array(
+			return $this->render('@Globale/generictabform.html.twig', array(
 								'controllerName' => 'ProductsController',
 								'interfaceName' => 'Productos',
 								'optionSelected' => 'products',
@@ -89,11 +91,42 @@ class ERPProductsController extends Controller
 								'id' => $id,
 								'tab' => $request->query->get('tab','data'), //Show initial tab, by default data tab
 								'tabs' => [
-									["name" => "data", "icon"=>"fa fa-id-card", "caption"=>"productsdata", "active"=>true, "route"=>$this->generateUrl("dataProduct",["id"=>$id])],
+									["name" => "data", "icon"=>"fa fa-id-card", "caption"=>"productsdata", "active"=>true, "route"=>$this->generateUrl("formInfoProduct",["id"=>$id])],
 									["name" => "webproduct", "icon"=>"fa fa-id-card", "caption"=>"Web", "route"=>$this->generateUrl("dataWebProducts",["id"=>$id])],
 									["name" => "stocks", "icon"=>"fa fa-id-card", "caption"=>"Stocks", "route"=>$this->generateUrl("stocks",["id"=>$id])]
 									]
 				));
+		}
+
+
+		/**
+		 * @Route("/{_locale}/products/info/{id}", name="formInfoProduct", defaults={"id"=0})
+		 */
+		public function formInfoProduct($id, Request $request){
+			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			$this->denyAccessUnlessGranted('ROLE_ADMIN');
+			$userdata=$this->getUser()->getTemplateData();
+			$new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-new"];
+			$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
+			$breadcrumb=$menurepository->formatBreadcrumb('products');
+			array_push($breadcrumb, $new_breadcrumb);
+			$template=dirname(__FILE__)."/../Forms/Products.json";
+			$formUtils = new GlobaleFormUtils();
+			$formUtils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine());
+			$listUtils = new ERPEAN13Utils();
+			$listUtils2 = new ERPReferencesUtils();
+			return $this->render('@ERP/productform.html.twig', array(
+				'controllerName' => 'productsController',
+				'interfaceName' => 'Productos',
+				'optionSelected' => 'products',
+				'userData' => $userdata,
+				'id' => $id,
+				'id_object' => $id,
+				'route' => $this->generateUrl("dataProduct",["id"=>$id]),
+				'form' => $formUtils->formatForm('products', true, $id, $this->class),
+				'list' => $listUtils->formatList($this->getUser()),
+				'list2' => $listUtils2->formatList($this->getUser())
+			));
 		}
 
     /**

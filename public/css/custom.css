@@ -230,6 +230,12 @@ label.form-check-label {
 
 .panel-body {
   padding-bottom: 0px !important;
+
+}
+.panel-title-list{
+  font-weight: bold;
+  border-bottom: 1px #ebebeb solid;
+  font-size: 14px;
 }
 
 .modal-header {

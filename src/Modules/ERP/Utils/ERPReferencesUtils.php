@@ -8,22 +8,23 @@ use Symfony\Component\Form\Extension\Core\Type\FileType;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\Email\Entity\EmailAccounts;
 
-class ERPEAN13Utils
+class ERPReferencesUtils
 {
 
   public function formatList($user){
     $list=[
-      'id' => 'listEAN13',
+      'id' => 'listReferences',
       'route' => 'genericlist',
       'routeParams' => ["module" => "ERP",
-                        "name" => "EAN13"],
+                        "name" => "References"],
       'orderColumn' => 2,
       'orderDirection' => 'ASC',
       'tagColumn' => 3,
-      'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/EAN13.json"),true),
-      'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/EAN13FieldButtons.json"),true),
-      'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/EAN13TopButtons.json"),true)
+      'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/References.json"),true),
+      'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/ReferencesFieldButtons.json"),true),
+      'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/ReferencesTopButtons.json"),true)
     ];
     return $list;
   }
+
 }

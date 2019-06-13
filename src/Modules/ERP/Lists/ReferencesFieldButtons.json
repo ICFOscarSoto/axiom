@@ -1,8 +1,8 @@
 [
-  {"id": "edit", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"dataReferences", "modal":"references", "actionType" : "background", "confirm" :false},
+  {"id": "edit", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"genericdata", "routeParams":{"module":"ERP", "name":"References", "type":"modal" }, "modal":"References", "actionType" : "background", "confirm" :false},
   {"id": "activation", "type": "option", "options": [
-      {"id": "desactivate", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"disableReference", "confirm" :true, "actionType" : "background" },
-      {"id": "activate", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "route":"enableReference", "confirm" :true, "actionType" : "background" }
+      {"id": "desactivate", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"genericdisable", "routeParams":{"module":"ERP", "name":"References"}, "confirm" :true, "actionType" : "background" },
+      {"id": "activate", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "route":"genericenable", "routeParams":{"module":"ERP", "name":"References"},"confirm" :true, "actionType" : "background" }
   ]},
-  {"id": "delete", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"deleteReference", "confirm" :true, "undo" :false, "tooltip":"Borrar categoria", "actionType" : "background"}
+  {"id": "delete", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"genericdelete", "routeParams":{"module":"ERP", "name":"References", "type":"modal" }, "confirm" :true, "undo" :false, "tooltip":"Borrar categoria", "actionType" : "background"}
 ]

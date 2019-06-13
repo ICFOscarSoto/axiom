@@ -1,0 +1,26 @@
+
+		<!-- MAIN CONTENT -->
+		<div class="principal-content" id="principal-content">
+			{% if form is defined %}
+				{% set formConstructor = form %}
+				{{ include('@Globale/form.html.twig') }}
+			{% endif %}
+
+			<div class="row">
+				<div class="col-md-6">
+						<div class="panel-title-list">Codigos EAN13</div>
+						{% if list is defined %}
+							{% set listConstructor = list %}
+							{{ include('@Globale/list.html.twig') }}
+						{% endif %}
+				</div>
+				<div class="col-md-6">
+					<div class="panel-title-list">Referencias cruzadas</div>
+					{% if list2 is defined %}
+						{% set listConstructor = list2 %}
+						{{ include('@Globale/list.html.twig') }}
+					{% endif %}
+				</div>
+			</div>
+		</div>
+		<!-- END MAIN CONTENT -->
