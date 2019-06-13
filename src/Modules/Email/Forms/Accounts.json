@@ -1,0 +1,39 @@
+[{
+	"sections": [
+      {
+  			"name": "Datos",
+  			"fields": [
+  				{ "name": "user","cols": 4},
+					{ "name": "name","cols": 4},
+          { "name": "active","cols": 2}
+  			]
+  		},
+      {
+  			"name": "IMAP",
+  			"fields": [
+  				{	"name": "server", "cols": 8},
+  				{	"name": "port", "cols": 4},
+  				{	"name": "protocol", "cols": 4},
+  				{	"name": "username", "cols": 4},
+  				{	"name": "password", "cols": 4}
+			]
+		},
+    {
+        "name": "SMTP",
+        "fields": [
+          { "name": "smtpServer","cols": 8},
+          {	"name": "smtpPort", "cols": 4},
+          {	"name": "smtpUsername", "cols": 4},
+          {	"name": "smtpPassword", "cols": 4}
+      ]
+    },
+		{
+        "name": "Carpetas",
+        "fields": [
+          { "name": "inboxFolder","cols": 6},
+          {	"name": "sentFolder", "cols": 6},
+          {	"name": "trashFolder", "cols": 6}
+      ]
+    }
+  ]
+}]

@@ -289,8 +289,10 @@
 													function(data, status, xhr){
 															$("#{{field.modal}}-modal-form-body").html(data);
 															$("#{{field.modal}}-modal-form-body").find(':checkbox').not($('[id$=-chkall]')).iCheck({checkboxClass: 'icheckbox_flat-blue', radioClass: 'iradio_flat-blue'});
+															$("#{{field.modal}}-modal-form-body select").select2();
+															console.log("#{{field.modal}}-modal-form-body select");
 															$("#{{field.modal}}-modal-form").modal();
-															console.log("Aqui");
+
 												});
 											});
 										{% else %}
@@ -347,6 +349,8 @@
 									$("#{{field.modal}}-modal-form-body").html(data);
 									//$('#{{field.modal}}-modal-form input').iCheck({checkboxClass: 'icheckbox_flat-blue',radioClass: 'iradio_flat-blue'});
 									$("#{{field.modal}}-modal-form-body").find(':checkbox').not($('[id$=-chkall]')).iCheck({checkboxClass: 'icheckbox_flat-blue', radioClass: 'iradio_flat-blue'});
+									$("#{{field.modal}}-modal-form-body select").select2();
+									console.log("#{{field.modal}}-modal-form-body select");
 									$("#{{field.modal}}-modal-form").modal();
 							});
 					});

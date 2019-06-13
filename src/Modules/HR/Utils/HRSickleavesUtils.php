@@ -30,7 +30,7 @@ class HRSickleavesUtils
   }
 
   public function getExcludedForm($params){
-    return ['worker','type'];
+    return ['worker'];
   }
 
   public function getIncludedForm($params){
@@ -51,15 +51,7 @@ class HRSickleavesUtils
       },
       'choice_value' => 'id',
       'data' => $worker
-
-    ]],
-    ['type', ChoiceType::class, [
-      'required' => true,
-      'attr' => ['class' => 'select2'],
-      'choices' => ['Contingencia Común'=>1, 'Contingencia Profesional'=>2],
-      'placeholder' => 'Select a type...',
     ]]
-
   ];
   }
 }

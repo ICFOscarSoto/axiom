@@ -1,0 +1,8 @@
+[
+  {"id": "edit", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"jobsindex", "actionType" : "foreground", "confirm" :false},
+  {"id": "activation", "type": "option", "options": [
+      {"id": "desactivate", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"genericdisable", "routeParams":{"module":"HR", "name":"Jobs", "type":"modal"}, "confirm" :true, "actionType" : "background" },
+      {"id": "activate", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "route":"genericenable", "routeParams":{"module":"HR", "name":"Jobs", "type":"modal" }, "confirm" :true, "actionType" : "background" }
+  ]},
+  {"id": "delete", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"genericdelete", "routeParams":{"module":"HR", "name":"Jobs", "type":"modal" }, "confirm" :true, "undo" :false, "tooltip":"Borrar bajas", "actionType" : "background"}
+]

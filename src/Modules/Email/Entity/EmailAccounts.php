@@ -3,6 +3,7 @@
 namespace App\Modules\Email\Entity;
 
 use App\Modules\Globale\Entity\GlobaleUsers;
+use App\Modules\Email\Entity\EmailFolders;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -390,5 +391,37 @@ class EmailAccounts
         $this->deleted = $deleted;
 
         return $this;
+    }
+
+    public function postProccess($kernel, $doctrine, $user){
+      //Check if exist folders
+      /*$em=$doctrine->getManager();
+      if($this->getInboxFolder()==null){
+        $folder=new EmailFolders();
+        $folder->setName("INBOX");
+        $folder->setEmailAccount($this);
+        $em->persist($folder);
+        $em->flush();
+        $this->setInboxFolder($folder);
+      }
+      if($this->getSentFolder()==null){
+        $folder=new EmailFolders();
+        $folder->setName("Elementos enviados");
+        $folder->setEmailAccount($this);
+        $em->persist($folder);
+        $em->flush();
+        $this->setSentFolder($folder);
+      }
+      if($this->getTrashFolder()==null){
+        $folder=new EmailFolders();
+        $folder->setName("Papelera");
+        $folder->setEmailAccount($this);
+        $em->persist($folder);
+        $em->flush();
+        $this->setTrashFolder($folder);
+      }
+      $em->persist($this);
+      $em->flush();*/
+
     }
 }

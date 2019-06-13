@@ -5,11 +5,16 @@
 			"fields": [
 				{ "name": "worker", "cols": 5},
 				{	"name": "name", "cols": 7},
-				{	"name": "type", "cols": 4},
+				{	"name": "type", "cols": 4, "transform":
+					{
+						"type":"option",
+						"options": {"Contingencia Común": "1", "Contingencia Profesional": "2"}
+					}
+				},
 				{	"name": "start", "cols": 4, "type": "date", "linked": {"field":"end", "by":"minDate"}},
 				{	"name": "end", "cols": 4, "type": "date", "linked": {"field":"start", "by":"maxDate"}},
-				{	"name": "workerobservations", "cols": 6},
-				{	"name": "companyobservations", "cols": 6},
+				{	"name": "workerobservations", "cols": 6, "class": "text-area-form"},
+				{	"name": "companyobservations", "cols": 6, "class": "text-area-form"},
 				{	"name": "requestdate", "cols": 3, "type": "date"},
 				{	"name": "justified", "cols": 3},
         {	"name": "active", "cols": 2}

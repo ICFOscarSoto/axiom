@@ -8449,7 +8449,8 @@ body {
   z-index: 999;
 }
 .modal-open .modal {
-  z-index: 10001;
+  /*z-index: 10001;*/
+  z-index: 9999;
 }
 .page-body .select2-container .select2-choice .select2-arrow b {
   background: transparent !important;

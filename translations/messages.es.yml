@@ -210,3 +210,15 @@ Creditor: Credito
 Invoiceday: Dia de pago
 Paymentmethod: Forma de pago
 Swiftcode: Código SWIFT
+
+#COURSES
+#----------------------------------------------------------------------------------------------------------------------
+Courses: Cursos
+Description: Descripción
+Duration: Duración
+Homologated: Homologado
+Expires: Expira
+
+#JOBS
+#----------------------------------------------------------------------------------------------------------------------
+Jobs: Puestos trabajo

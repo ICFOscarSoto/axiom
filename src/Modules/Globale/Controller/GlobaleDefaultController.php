@@ -115,7 +115,9 @@ class GlobaleDefaultController extends Controller
        $repository = $manager->getRepository($class);
        $listUtils=new GlobaleListUtils();
        $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../../".$module."/Lists/".$name.".json"),true);
-       $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $class);
+       if(property_exists($class, "user")) $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $class, [["type"=>"and", "column"=>"user", "value"=>$user]]);
+        else if(property_exists($class, "company")) $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $class, [["type"=>"and", "column"=>"company", "value"=>$user->getCompany()]]);
+          else $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $class);
        return new JsonResponse($return);
      }
 
@@ -132,7 +134,9 @@ class GlobaleDefaultController extends Controller
         $repository = $manager->getRepository($class);
         $listUtils=new GlobaleListUtils();
         $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../../".$module."/Exports/".$name.".json"),true);
-        $list=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $class,[],[],-1);
+        if(property_exists($class, "user")) $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $class, [["type"=>"and", "column"=>"user", "value"=>$user]],[],-1);
+        else if(property_exists($class, "company")) $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $class, [["type"=>"and", "column"=>"company", "value"=>$user->getCompany()]],[],-1);
+          else $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $class,[],[],-1);
         $result = $utilsExport->export($list,$listFields);
         return $result;
       }

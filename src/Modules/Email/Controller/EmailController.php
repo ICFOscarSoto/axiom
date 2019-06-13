@@ -109,16 +109,30 @@ class EmailController extends Controller
 			$userdata=$this->getUser()->getTemplateData();
 			$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
 			$emailAccounts=$this->getUser()->getEmailAccounts();
-			$folder=($request->query->get('folder')!==null)?$request->query->get('folder'):$emailAccounts[0]->getInboxFolder()->getId();
-			return $this->render('@Email/email_list.html.twig', [
-				'controllerName' => 'EmailController',
-				'interfaceName' => 'Correo electrónico',
-				'optionSelected' => 'email',
-				'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
-				'breadcrumb' =>  $menurepository->formatBreadcrumb($request->get('_route')),
-				'userData' => $userdata,
-				'folder' => $folder
-				]);
+			if($request->query->get('folder')!=null || $emailAccounts[0]->getInboxFolder()!=null){
+				$folder=($request->query->get('folder')!==null)?$request->query->get('folder'):$emailAccounts[0]->getInboxFolder()->getId();
+				return $this->render('@Email/email_list.html.twig', [
+					'controllerName' => 'EmailController',
+					'interfaceName' => 'Correo electrónico',
+					'optionSelected' => 'email',
+					'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
+					'breadcrumb' =>  $menurepository->formatBreadcrumb($request->get('_route')),
+					'userData' => $userdata,
+					'folder' => $folder
+					]);
+			}else{
+				return $this->render('@Globale/genericerror.html.twig', [
+					  'interfaceName' => 'Correo electrónico',
+						'userData' => $userdata,
+						'optionSelected' => 'email',
+						'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
+						'breadcrumb' =>  $menurepository->formatBreadcrumb($request->get('_route')),
+						"error"=>["symbol"=> "entypo-attention",
+											"title" => "Correo no configurado",
+											"description"=>"Debe configurar al menos una cuenta de correo para poder acceder a esta sección"
+										]
+					]);
+			}
 
 		}else return new RedirectResponse($this->router->generate('app_login'));
 	}
@@ -692,6 +706,42 @@ class EmailController extends Controller
 		return new Response('');
 	}
 
+	/**
+	* @Route("/api/email/accounts/{id}/getFolders", name="getEmailFolders")
+	*/
+	public function getEmailFolders($id){
+		$emailRepository = $this->getDoctrine()->getRepository(EmailAccounts::class);
+		$emailFoldersRepository = $this->getDoctrine()->getRepository(EmailFolders::class);
+		$emailAccount=$emailRepository->findOneBy([
+			"id"=> $id,
+			"user" => $this->getUser()->getId()
+		]);
+	$inbox = imap_open('{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'}',$emailAccount->getUsername() ,$emailAccount->getPassword(),OP_HALFOPEN)
+      or die("no se puede conectar: " . imap_last_error());
+			$list = imap_list($inbox, '{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'}', "*");
+			if (is_array($list)) {
+			    foreach ($list as $val) {
+							//Search if folder already exists
+							$emailFolder=$emailFoldersRepository->findOneBy([
+								"emailAccount"=> $emailAccount,
+								"name" => imap_utf7_decode($val)
+							]);
+							if($emailFolder==null){
+								//Create folder
+								$em=$this->getDoctrine()->getManager();
+								$folder=new EmailFolders();
+				        $folder->setName(ltrim(imap_utf7_decode($val),'{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'}'));
+				        $folder->setEmailAccount($emailAccount);
+				        $em->persist($folder);
+				        $em->flush();
+							}
+			    }
+			} else {
+			    echo "imap_list failed: " . imap_last_error() . "\n";
+			}
+			imap_close($inbox);
+			return new Response('');
+	}
 
 	/**
 	* @Route("/{_locale}/email/accounts/{id}/disable", name="disableEmailAccount")

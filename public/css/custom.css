@@ -308,6 +308,10 @@ label.form-check-label {
   padding-top: 26px;
 }
 
+.text-area-form{
+  min-height: 120px !important;
+}
+
 .nav-tabs.bordered + .tab-content {
 min-height: 600px;
 }

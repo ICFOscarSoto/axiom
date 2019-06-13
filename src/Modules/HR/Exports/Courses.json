@@ -1,0 +1,8 @@
+[
+  { "name": "name", "cols": 12},
+  { "name": "description", "cols": 12},
+  { "name": "duration", "cols": 3},
+  { "name": "homologated", "cols": 3},
+  { "name": "expires", "cols": 3},
+  { "name": "deleted", "cols": 2}
+]

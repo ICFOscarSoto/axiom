@@ -125,12 +125,12 @@ class GlobaleFormUtils extends Controller
                   break;
                   case 'button':
                     $form->add($field['name'], ButtonType::class, [
-                        'attr' => ['class' => $field["transform"]['class']],
+                        'attr' => ['class' => $field["transform"]['class'].' '.isset($field["class"])?$field["class"]:''],
                     ]);
                   break;
                 }
-              }else $form->add($value['fieldName']);
-            }else $form->add($value['fieldName']);
+              }else $form->add($value['fieldName'],null,['attr'=>['class'=>isset($field["class"])?$field["class"]:'']]);
+            }else $form->add($value['fieldName'],null,['attr'=>['class'=>isset($field["class"])?$field["class"]:'']]);
             break;
           }
         }
@@ -249,7 +249,9 @@ class GlobaleFormUtils extends Controller
     if(property_exists($class,'company')){
       $choices= $this->doctrine->getRepository($class)->findBy(['company'=>$this->user->getCompany(),'active'=>true, 'deleted'=>false]);
     }else{
-      $choices= $this->doctrine->getRepository($class)->findBy(['active'=>true, 'deleted'=>false]);
+      if(property_exists($class,'active')){
+        $choices= $this->doctrine->getRepository($class)->findBy(['active'=>true, 'deleted'=>false]);
+      }else $choices= $this->doctrine->getRepository($class)->findAll();
     }
 
     $result =  [

@@ -1,0 +1,17 @@
+[{
+  "sections": [
+		{
+			"name": "Datos",
+			"fields": [
+        { "name": "name", "cols": 12},
+        { "name": "active", "cols": 2}
+      ]
+    },
+    {
+			"name": "Formación obligatoria",
+			"fields": [
+        { "name": "courses", "cols": 12}
+      ]
+    }
+  ]
+}]
