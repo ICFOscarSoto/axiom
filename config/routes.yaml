@@ -35,6 +35,14 @@ Supplier:
     resource: 'App\Modules\ERP\Controller\ERPSuppliersController'
     type:     annotation
 
+EAN13:
+    resource: 'App\Modules\ERP\Controller\ERPEAN13Controller'
+    type:     annotation
+
+References:
+    resource: 'App\Modules\ERP\Controller\ERPReferencesController'
+    type:     annotation
+
 Contacts:
     resource: 'App\Modules\ERP\Controller\ERPContactsController'
     type:     annotation

@@ -11,12 +11,12 @@ use App\Modules\Email\Entity\EmailAccounts;
 class ERPEAN13Utils
 {
 
-  public function formatList($user){
+
+  public function formatListByProduct($product){
     $list=[
       'id' => 'listEAN13',
-      'route' => 'genericlist',
-      'routeParams' => ["module" => "ERP",
-                        "name" => "EAN13"],
+      'route' => 'EAN13list',
+      'routeParams' => ["id" => $product],
       'orderColumn' => 2,
       'orderDirection' => 'ASC',
       'tagColumn' => 3,

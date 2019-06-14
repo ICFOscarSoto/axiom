@@ -1,5 +1,5 @@
 [
-  {"id": "edit", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"genericdata", "routeParams":{"module":"ERP", "name":"Categories", "type":"modal" }, "modal":"categories", "actionType" : "background", "confirm" :false},
+  {"id": "edit", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"genericdata", "routeParams":{"module":"ERP", "name":"Categories", "type":"modal" }, "modal":"Categories", "actionType" : "background", "confirm" :false},
   {"id": "activation", "type": "option", "options": [
       {"id": "desactivate", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"genericdisable", "routeParams":{"module":"ERP", "name":"Categories"}, "confirm" :true, "actionType" : "background" },
       {"id": "activate", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "route":"genericenable", "routeParams":{"module":"ERP", "name":"Categories"}, "confirm" :true, "actionType" : "background" }

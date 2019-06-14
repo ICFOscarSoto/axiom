@@ -12,6 +12,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\ERP\Entity\ERPProducts;
 use App\Modules\ERP\Entity\ERPWebProducts;
+use App\Modules\ERP\Entity\ERPEAN13;
+use App\Modules\ERP\Entity\ERPReferences;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
@@ -102,7 +104,7 @@ class ERPProductsController extends Controller
 		/**
 		 * @Route("/{_locale}/products/info/{id}", name="formInfoProduct", defaults={"id"=0})
 		 */
-		public function formInfoProduct($id, Request $request){
+		public function formInfoProduct($id,  Request $request){
 			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 			$this->denyAccessUnlessGranted('ROLE_ADMIN');
 			$userdata=$this->getUser()->getTemplateData();
@@ -115,6 +117,12 @@ class ERPProductsController extends Controller
 			$formUtils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine());
 			$listUtils = new ERPEAN13Utils();
 			$listUtils2 = new ERPReferencesUtils();
+			$formUtilsEAN = new GlobaleFormUtils();
+			$formUtilsEAN->initialize($this->getUser(), new ERPEAN13(), dirname(__FILE__)."/../Forms/EAN13.json", $request, $this, $this->getDoctrine());
+			$formUtilsReferences = new GlobaleFormUtils();
+			$formUtilsReferences->initialize($this->getUser(), new ERPReferences(), dirname(__FILE__)."/../Forms/References.json", $request, $this, $this->getDoctrine());
+			$forms[]=$formUtilsEAN->formatForm('EAN13', true, null, ERPEAN13::class);
+			$forms[]=$formUtilsReferences->formatForm('References', true, null, ERPReferences::class);
 			return $this->render('@ERP/productform.html.twig', array(
 				'controllerName' => 'productsController',
 				'interfaceName' => 'Productos',
@@ -122,11 +130,12 @@ class ERPProductsController extends Controller
 				'userData' => $userdata,
 				'id' => $id,
 				'id_object' => $id,
-				'route' => $this->generateUrl("dataProduct",["id"=>$id]),
-				'form' => $formUtils->formatForm('products', true, $id, $this->class),
-				'list' => $listUtils->formatList($this->getUser()),
-				'list2' => $listUtils2->formatList($this->getUser())
+				'form' => $formUtils->formatForm('products', true, $id, $this->class, "dataProduct"),
+				'listEAN13' => $listUtils->formatListByProduct($id),
+				'listReferences' => $listUtils2->formatListByProduct($id),
+				'forms' => $forms
 			));
+
 		}
 
     /**

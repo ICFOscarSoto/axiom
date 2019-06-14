@@ -11,12 +11,13 @@ use App\Modules\Email\Entity\EmailAccounts;
 class ERPReferencesUtils
 {
 
-  public function formatList($user){
+
+
+  public function formatListByProduct($product){
     $list=[
       'id' => 'listReferences',
-      'route' => 'genericlist',
-      'routeParams' => ["module" => "ERP",
-                        "name" => "References"],
+      'route' => 'referenceslist',
+      'routeParams' => ["id"=>$product],
       'orderColumn' => 2,
       'orderDirection' => 'ASC',
       'tagColumn' => 3,
