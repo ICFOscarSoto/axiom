@@ -1,0 +1,20 @@
+[{
+	"sections": [
+		{
+			"name": "Datos",
+			"fields": [
+        { "name": "company","cols": 4},
+				{ "name": "identifier","cols": 8},
+				{	"name": "serialnumber", "cols": 6},
+				{	"name": "model", "cols": 4},
+				{	"name": "firmware", "cols": 4},
+				{	"name": "protocol", "cols": 4},
+				{	"name": "token", "cols": 4},
+        {	"name": "expirestime", "cols": 4},
+        {	"name": "createdtime", "cols": 4},
+        {	"name": "lasttime", "cols": 4},
+        {	"name": "islogin", "cols": 2},
+        {	"name": "active", "cols": 2}
+			]
+		}]
+}]

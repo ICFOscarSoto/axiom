@@ -10,7 +10,7 @@
     {
 			"name": "Formación obligatoria",
 			"fields": [
-        { "name": "courses", "cols": 12}
+      
       ]
     }
   ]

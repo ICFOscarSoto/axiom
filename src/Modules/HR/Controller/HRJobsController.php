@@ -14,6 +14,7 @@ use App\Modules\Globale\Entity\GlobaleCompanies;
 use App\Modules\Globale\Entity\GlobaleUsers;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
+use App\Modules\Globale\Utils\GlobaleListRelationUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\HR\Utils\HRJobsUtils;
 use App\Modules\HR\Entity\HRJobs;
@@ -42,6 +43,8 @@ class HRJobsController extends Controller
     $utilsObj=new $this->utilsClass();
     $params=["doctrine"=>$this->getDoctrine(), "id"=>$this->getUser()->getId(), "user"=>$this->getUser()];
     $utils->initialize($this->getUser(), new $this->class(), dirname(__FILE__)."/../Forms/Jobs.json", $request, $this, $this->getDoctrine(),method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
+
+
     return $this->render('@Globale/genericform.html.twig', array(
             'controllerName' => 'HRJobs',
             'interfaceName' => 'Puesto trabajo',
@@ -70,6 +73,22 @@ class HRJobsController extends Controller
                        $this, $this->getDoctrine(),method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],
                        method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
     return $utils->make($id, $this->class, $action, "formJobs", "full", "@Globale/form.html.twig", 'dataJobs', $this->utilsClass);
+  }
+
+  /**
+   * @Route("/api/job/{id}/courses/list", name="jobcourseslist")
+   */
+  public function list($id, RouterInterface $router,Request $request){
+    $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+    $user = $this->getUser();
+    $locale = $request->getLocale();
+    $this->router = $router;
+    $manager = $this->getDoctrine()->getManager();
+    $listUtils=new GlobaleListRelationUtils();
+    $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/JobsCourses.json"),true);
+    $return=$listUtils->getRecords($user,$this->getDoctrine(),$request,$manager,$listFields,"hrjobs_hrcourses",["hrjobs", "hrcourses"],1,[["type"=>"and", "column"=>"user", "value"=>$user]]);
+
+    return new JsonResponse($return);
   }
 
 }
