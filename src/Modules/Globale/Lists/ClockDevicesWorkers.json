@@ -1,7 +1,6 @@
 [ {"name": "id", "caption":""},
-  {"name": "company__name", "caption":"Empresa"},
-  {"name": "name", "caption":"Descripción"},
-  {"name": "serialnumber", "caption":"Numero Serie"},
-  {"name": "model", "caption":"Modelo"},
+  {"name": "worker__name", "caption":"Nombre"},
+  {"name": "worker__lastname", "caption":"Apellidos"},
+  {"name": "idd", "caption":"idd"},
   {"name": "active", "caption":"Estado", "width":"10%" ,"class" : "dt-center", "replace":{"1":"<div style=\"min-width: 75px;\" class=\"label label-success\">Activo</div>", "0" : "<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado</div>"}}
 ]

@@ -1,26 +1,26 @@
 <?php
 
-namespace App\Repository\Modules\Globale\Entity;
+namespace App\Modules\Globale\Repository;
 
-use App\Modules\Globale\Entity\GlobaleClockDevices;
+use App\Modules\Globale\Entity\GlobaleClockDevicesWorkers;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
- * @method GlobaleClockDevices|null find($id, $lockMode = null, $lockVersion = null)
- * @method GlobaleClockDevices|null findOneBy(array $criteria, array $orderBy = null)
- * @method GlobaleClockDevices[]    findAll()
- * @method GlobaleClockDevices[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method GlobaleClockDevicesWorkers|null find($id, $lockMode = null, $lockVersion = null)
+ * @method GlobaleClockDevicesWorkers|null findOneBy(array $criteria, array $orderBy = null)
+ * @method GlobaleClockDevicesWorkers[]    findAll()
+ * @method GlobaleClockDevicesWorkers[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class GlobaleClockDevicesRepository extends ServiceEntityRepository
+class GlobaleClockDevicesWorkersRepository extends ServiceEntityRepository
 {
     public function __construct(RegistryInterface $registry)
     {
-        parent::__construct($registry, GlobaleClockDevices::class);
+        parent::__construct($registry, GlobaleClockDevicesWorkers::class);
     }
 
     // /**
-    //  * @return GlobaleClockDevices[] Returns an array of GlobaleClockDevices objects
+    //  * @return GlobaleClockDevicesWorkers[] Returns an array of GlobaleClockDevicesWorkers objects
     //  */
     /*
     public function findByExampleField($value)
@@ -37,7 +37,7 @@ class GlobaleClockDevicesRepository extends ServiceEntityRepository
     */
 
     /*
-    public function findOneBySomeField($value): ?GlobaleClockDevices
+    public function findOneBySomeField($value): ?GlobaleClockDevicesWorkers
     {
         return $this->createQueryBuilder('g')
             ->andWhere('g.exampleField = :val')

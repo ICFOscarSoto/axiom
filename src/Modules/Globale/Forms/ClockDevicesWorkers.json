@@ -1,0 +1,12 @@
+[{
+	"sections": [
+		{
+			"name": "Datos",
+			"fields": [
+        { "name": "clockdevice","cols": 5},
+				{ "name": "worker","cols": 5},
+				{ "name": "idd","cols": 2},
+				{ "name": "active","cols": 2}
+			]
+		}]
+}]

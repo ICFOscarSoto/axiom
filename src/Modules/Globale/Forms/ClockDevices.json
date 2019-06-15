@@ -4,6 +4,7 @@
 			"name": "Datos",
 			"fields": [
         { "name": "company","cols": 4},
+				{ "name": "name","cols": 8},
 				{ "name": "identifier","cols": 8},
 				{	"name": "serialnumber", "cols": 6},
 				{	"name": "model", "cols": 4},

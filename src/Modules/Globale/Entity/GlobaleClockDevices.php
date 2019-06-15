@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\Modules\Globale\Entity\GlobaleClockDevicesRepository")
+ * @ORM\Entity(repositoryClass="App\Modules\Globale\Repository\GlobaleClockDevicesRepository")
  */
 class GlobaleClockDevices
 {
@@ -91,6 +91,11 @@ class GlobaleClockDevices
      * @ORM\Column(type="boolean")
      */
     private $deleted;
+
+    /**
+     * @ORM\Column(type="string", length=150, nullable=true)
+     */
+    private $name;
 
     public function getId(): ?int
     {
@@ -217,12 +222,12 @@ class GlobaleClockDevices
         return $this;
     }
 
-    public function getIslogin(): ?int
+    public function getIslogin(): ?bool
     {
         return $this->islogin;
     }
 
-    public function setIsLogin(?int $islogin): self
+    public function setIsLogin(?bool $islogin): self
     {
         $this->islogin = $islogin;
 
@@ -273,6 +278,18 @@ class GlobaleClockDevices
     public function setDeleted(bool $deleted): self
     {
         $this->deleted = $deleted;
+
+        return $this;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(?string $name): self
+    {
+        $this->name = $name;
 
         return $this;
     }

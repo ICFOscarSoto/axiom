@@ -23,6 +23,14 @@ Company:
     resource: 'App\Modules\Globale\Controller\GlobaleCompaniesController'
     type:     annotation
 
+ClockDevices:
+    resource: 'App\Modules\Globale\Controller\GlobaleClockDevicesController'
+    type:     annotation
+
+ClockDevicesWorkers:
+    resource: 'App\Modules\Globale\Controller\GlobaleClockDevicesWorkersController'
+    type:     annotation
+
 Customer:
     resource: 'App\Modules\ERP\Controller\ERPCustomersController'
     type:     annotation

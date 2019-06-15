@@ -4,6 +4,7 @@ namespace App\Modules\HR\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\HR\Entity\HRWorkers;
+use \App\Modules\Globale\Entity\GlobaleClockDevices;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\HR\Repository\HRClocksRepository")
@@ -85,6 +86,16 @@ class HRClocks
     * @ORM\Column(type="integer", nullable=true)
     */
    private $time;
+
+   /**
+    * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleClockDevices")
+    */
+   private $startdevice;
+
+   /**
+    * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleClockDevices")
+    */
+   private $enddevice;
 
     public function getId(): ?int
     {
@@ -257,6 +268,30 @@ class HRClocks
       //$this->time = $this->calculateTime();
       if($this->end!=null) $this->time = date_timestamp_get($this->end)-date_timestamp_get($this->start);
 
+    }
+
+    public function getStartdevice(): ?GlobaleClockDevices
+    {
+        return $this->startdevice;
+    }
+
+    public function setStartdevice(?GlobaleClockDevices $startdevice): self
+    {
+        $this->startdevice = $startdevice;
+
+        return $this;
+    }
+
+    public function getEnddevice(): ?GlobaleClockDevices
+    {
+        return $this->enddevice;
+    }
+
+    public function setEnddevice(?GlobaleClockDevices $enddevice): self
+    {
+        $this->enddevice = $enddevice;
+
+        return $this;
     }
 
 }
