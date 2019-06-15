@@ -17,5 +17,12 @@
 				{	"name": "mobile",	"cols": 3},
 				{	"name": "active", "cols": 2}
 			]
+		},
+		{
+			"name": "Devices",
+			"fields": [
+				{	"name": "deviceuser",	"cols": 6, "caption": "User"},
+				{	"name": "devicepassword", "cols": 6, "caption": "Password"}
+			]
 		}]
 }]

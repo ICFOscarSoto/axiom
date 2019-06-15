@@ -116,14 +116,24 @@ class GlobaleCompanies
      * @ORM\Column(type="string", length=150)
      */
     private $domain;
+
+    /**
+     * @ORM\Column(type="string", length=16, nullable=true)
+     */
+    private $deviceuser;
+
+    /**
+     * @ORM\Column(type="string", length=16, nullable=true)
+     */
+    private $devicepassword;
 	public function __construct()
-               {
-                   $this->userGroups = new ArrayCollection();
-                   $this->users = new ArrayCollection();
-                   $this->menuOptions = new ArrayCollection();
-                   $this->dateadd = new \Datetime();
-                   $this->dateupd =  new \Datetime();
-               }
+                                 {
+                                     $this->userGroups = new ArrayCollection();
+                                     $this->users = new ArrayCollection();
+                                     $this->menuOptions = new ArrayCollection();
+                                     $this->dateadd = new \Datetime();
+                                     $this->dateupd =  new \Datetime();
+                                 }
 
     public function getId(): ?int
     {
@@ -425,6 +435,30 @@ class GlobaleCompanies
             copy($item, $dest . DIRECTORY_SEPARATOR . $iterator->getSubPathName());
           }
         }
+    }
+
+    public function getDeviceuser(): ?string
+    {
+        return $this->deviceuser;
+    }
+
+    public function setDeviceuser(?string $deviceuser): self
+    {
+        $this->deviceuser = $deviceuser;
+
+        return $this;
+    }
+
+    public function getDevicepassword(): ?string
+    {
+        return $this->devicepassword;
+    }
+
+    public function setDevicepassword(?string $devicepassword): self
+    {
+        $this->devicepassword = $devicepassword;
+
+        return $this;
     }
 
 }
