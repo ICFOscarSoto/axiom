@@ -21,19 +21,7 @@ class GlobaleClockDevicesUtils
     $id=$params["id"];
     $user=$params["user"];
     $companyRepository=$doctrine->getRepository(GlobaleCompanies::class);
-    return [['company', ChoiceType::class, [
-      'required' => true,
-      'disabled' => false,
-      'attr' => ['class' => 'select2', 'readonly' => false],
-      'choices' => $companyRepository->findBy(["active"=>1, "deleted"=>0]),
-      'choice_label' => function($obj, $key, $index) {
-          if(method_exists($obj, "getLastname"))
-            return $obj->getLastname().", ".$obj->getName();
-          else return $obj->getName();
-      },
-      'choice_value' => 'id'
-    ]]
-  ];
+    return [];
   }
 
   public function formatList($user){

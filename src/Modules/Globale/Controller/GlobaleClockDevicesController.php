@@ -47,7 +47,7 @@ class GlobaleClockDevicesController extends Controller
             'userData' => $userdata,
             'id' => $id,
             'tab' => $request->query->get('tab','data'), //Show initial tab, by default data tab
-            'tabs' => [["name" => "data", "caption"=>"Datos dispositivo", "icon"=>"entypo-book-open","active"=>true, "route"=>$this->generateUrl("genericdata",["module"=>"Globale","name"=>"ClockDevices","id"=>$id])],
+            'tabs' => [["name" => "data", "caption"=>"Datos dispositivo", "icon"=>"entypo-book-open","active"=>true, "route"=>$this->generateUrl("genericdata",["type"=>"full","module"=>"Globale","name"=>"ClockDevices","id"=>$id])],
                        ["name" => "deviceworkers", "icon"=>"fa fa-headphones", "caption"=>"Relación usuario", "route"=>$this->generateUrl("clockdevicesworker",["id"=>$id])]
                       ],
             'include_header' => [["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker-es.js"]],

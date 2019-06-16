@@ -83,9 +83,9 @@ class GlobaleDefaultController extends Controller
     }
 
    /**
-    * @Route("/{_locale}/{module}/{name}/generic/data/{id}/{action}", name="genericdata", defaults={"id"=0, "action"="read"})
+    * @Route("/{_locale}/{module}/{name}/generic/data/{id}/{action}/{type}", name="genericdata", defaults={"id"=0, "action"="read", "type"="modal"})
     */
-    public function data($id, $module, $name, $action, Request $request){
+    public function data($id, $module, $name, $action, $type, Request $request){
       $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
       $this->denyAccessUnlessGranted('ROLE_ADMIN');
       $template=dirname(__FILE__)."/../../".$module."/Forms/".$name.".json";
@@ -99,7 +99,7 @@ class GlobaleDefaultController extends Controller
       $utils->initialize($this->getUser(), new $class(), $template, $request, $this, $this->getDoctrine(),
         method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[],null,["module"=>$module, "name"=>$name]
       );
-      return $utils->make($id, $class, $action, "form".$name, "modal");
+      return $utils->make($id, $class, $action, "form".$name, $type);
    }
 
      /**

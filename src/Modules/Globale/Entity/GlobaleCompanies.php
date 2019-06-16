@@ -421,16 +421,16 @@ class GlobaleCompanies
 
     public function postProccess($kernel){
       //Prepare folder structure
-      $source = $kernel->getRootDir().'/../cloud/0';
-      $dest= $kernel->getRootDir().'/../cloud/'.$this->id;
-      mkdir($dest, 0775);
+      $source = $kernel->getRootDir().DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.'0';
+      $dest= $kernel->getRootDir().DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$this->id;
+      if(!file_exists($dest)) mkdir($dest, 0775);
       foreach (
        $iterator = new \RecursiveIteratorIterator(
         new \RecursiveDirectoryIterator($source, \RecursiveDirectoryIterator::SKIP_DOTS),
         \RecursiveIteratorIterator::SELF_FIRST) as $item
         ) {
           if ($item->isDir()) {
-            mkdir($dest . DIRECTORY_SEPARATOR . $iterator->getSubPathName());
+            if(!file_exists($dest)) mkdir($dest . DIRECTORY_SEPARATOR . $iterator->getSubPathName());
           } else {
             copy($item, $dest . DIRECTORY_SEPARATOR . $iterator->getSubPathName());
           }

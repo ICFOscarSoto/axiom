@@ -117,7 +117,6 @@ class GlobaleMenuOptionsRepository extends ServiceEntityRepository
           ;
     else{
        $routeParams="{\"module\":\"".$module."\",\"name\":\"".$name."\"}";
-       dump($routeParams);
        return $this->createQueryBuilder('f')
             ->andWhere('f.rute = :val_route')
             ->andWhere("replace(f.routeparams, ' ', '') = :val_routeParams")

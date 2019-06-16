@@ -129,8 +129,8 @@ class GlobaleFormUtils extends Controller
                     ]);
                   break;
                 }
-              }else $form->add($value['fieldName'],null,['attr'=>['class'=>isset($field["class"])?$field["class"]:'']]);
-            }else $form->add($value['fieldName'],null,['attr'=>['class'=>isset($field["class"])?$field["class"]:'']]);
+              }else $form->add($value['fieldName'],null,['attr'=>['readonly' => isset($field["readonly"])?$field["readonly"]:false,'class'=>isset($field["class"])?$field["class"]:'']]);
+            }else $form->add($value['fieldName'],null,['attr'=>['readonly' => isset($field["readonly"])?$field["readonly"]:false,'class'=>isset($field["class"])?$field["class"]:'']]);
             break;
           }
         }
