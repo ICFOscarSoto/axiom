@@ -49,7 +49,8 @@ class GlobaleClockDevicesWorkersController extends Controller
     return $this->render('@Globale/list.html.twig', [
       'listConstructor' => $templateLists,
       'forms' => $templateForms,
-      'clockdevices_id' => $id
+      'clockdevices_id' => $id,
+      'include_modal_footer' => ['@Globale/clockdevicesfingers.html.twig']
       ]);
   }
   return new RedirectResponse($this->router->generate('app_login'));

@@ -7,6 +7,13 @@
         <div id="{{ form.id }}-modal-form-body">
           	{#{{ include('@Globale/form.html.twig') }}#}
         </div>
+				<div>
+					{% if include_modal_footer is defined %}
+						{% for include_template in include_modal_footer %}
+							{{ include(include_template) }}
+						{% endfor %}
+					{% endif %}
+				</div>
 				</br></br>
 				<div id="calendar-modal-new-calendar-footer" class="modal-footer">
 					{% if form.template[0].buttons is defined %}
