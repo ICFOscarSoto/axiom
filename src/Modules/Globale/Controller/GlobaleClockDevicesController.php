@@ -32,10 +32,11 @@ class GlobaleClockDevicesController extends Controller
     $template=dirname(__FILE__)."/../Forms/ClockDevices.json";
     $userdata=$this->getUser()->getTemplateData();
     $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
-
+    $breadcrumb=$menurepository->formatBreadcrumb('genericindex', "Globale", "ClockDevices");
+    array_push($breadcrumb, $new_breadcrumb);
     $clockDevicesRepository=$this->getDoctrine()->getRepository(GlobaleClockDevices::class);
     $obj = $clockDevicesRepository->findOneBy(['id'=>$id, 'company'=>$this->getUser()->getCompany(), 'active'=>1, 'deleted'=>0]);
-    $entity_name=$obj?$obj->getIdentifier():'';
+    $entity_name=$obj?($obj->getName()!=null?$obj->getName():$obj->getModel().' (sn: '.$obj->getSerialnumber().')'):'';
     return $this->render('@Globale/generictabform.html.twig', array(
             'entity_name' => $entity_name,
             'controllerName' => 'ClockDevicesController',
@@ -43,7 +44,7 @@ class GlobaleClockDevicesController extends Controller
             'optionSelected' => 'genericindex',
             'optionSelectedParams' => ["module"=>"Globale", "name"=>"ClockDevices"],
             'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
-            'breadcrumb' => $menurepository->formatBreadcrumb('genericindex', "Globale", "ClockDevices"),
+            'breadcrumb' => $breadcrumb,
             'userData' => $userdata,
             'id' => $id,
             'tab' => $request->query->get('tab','data'), //Show initial tab, by default data tab

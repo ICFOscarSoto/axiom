@@ -10,9 +10,8 @@
 				{	"name": "firmware", "cols": 4, "readonly":true},
 				{	"name": "protocol", "cols": 4, "readonly":true},
 				{	"name": "token", "cols": 4, "readonly":true},
-        {	"name": "expirestime", "cols": 4, "readonly":true},
-        {	"name": "createdtime", "cols": 4, "readonly":true},
         {	"name": "lasttime", "cols": 4, "readonly":true},
+				{	"name": "usefunction", "cols": 2},
         {	"name": "active", "cols": 2}
 			]
 		}]

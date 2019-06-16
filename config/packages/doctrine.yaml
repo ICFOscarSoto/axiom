@@ -16,6 +16,7 @@ doctrine:
             collate: utf8mb4_unicode_ci
 
         url: '%env(resolve:DATABASE_URL)%'
+        schema_filter: ~^(?!globale_clock_devices_command)~
     orm:
         dql:
           datetime_functions:
@@ -129,7 +130,7 @@ doctrine:
               substring_index: DoctrineExtensions\Query\Mysql\SubstringIndex
               unhex: DoctrineExtensions\Query\Mysql\Unhex
               uuid_short: DoctrineExtensions\Query\Mysql\UuidShort
-              
+
         auto_generate_proxy_classes: '%kernel.debug%'
         naming_strategy: doctrine.orm.naming_strategy.underscore
         auto_mapping: false

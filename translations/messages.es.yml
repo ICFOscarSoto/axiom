@@ -224,3 +224,12 @@ Expires: Expira
 #JOBS
 #----------------------------------------------------------------------------------------------------------------------
 Jobs: Puestos trabajo
+
+#DEVICES
+#----------------------------------------------------------------------------------------------------------------------
+Identifier: Identificador
+Serialnumber: Número de serie
+Model: Modelo
+Protocol: Protocolo
+Lasttime: Última consulta
+Usefunction: Teclas función

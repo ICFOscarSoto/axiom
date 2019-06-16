@@ -97,6 +97,11 @@ class GlobaleClockDevices
      */
     private $name;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $usefunction;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -290,6 +295,18 @@ class GlobaleClockDevices
     public function setName(?string $name): self
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function getUsefunction(): ?bool
+    {
+        return $this->usefunction;
+    }
+
+    public function setUsefunction(bool $usefunction): self
+    {
+        $this->usefunction = $usefunction;
 
         return $this;
     }
