@@ -43,7 +43,7 @@ class GlobaleClockDevices
     private $protocol;
 
     /**
-     * @ORM\Column(type="smallint", nullable=true)
+     * @ORM\Column(type="integer", nullable=true)
      */
     private $token;
 
