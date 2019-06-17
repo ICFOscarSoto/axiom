@@ -45,7 +45,7 @@ class HRClocksUtils
   }
 
   public function getExcludedForm($params){
-    return ['worker'];
+    return ['worker','enddevice','startdevice'];
   }
 
   public function getIncludedForm($params){
