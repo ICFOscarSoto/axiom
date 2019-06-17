@@ -99,7 +99,7 @@ class HRClocksController extends Controller
 			$utils = new HRClocksUtils();
 			$templateLists=$utils->formatListbyWorker($id);
 			$formUtils=new GlobaleFormUtils();
-			$formUtils->initialize($this->getUser(), new $this->class(), dirname(__FILE__)."/../Forms/Clocks.json", $request, $this, $this->getDoctrine());
+			$formUtils->initialize($this->getUser(), new $this->class(), dirname(__FILE__)."/../Forms/Clocks.json", $request, $this, $this->getDoctrine(),['enddevice','startdevice']);
 			$templateForms[]=$formUtils->formatForm('clocks', true, $id, $this->class);
 
 			/*$utils = new GlobaleFormUtils();
