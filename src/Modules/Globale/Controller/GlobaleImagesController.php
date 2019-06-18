@@ -194,7 +194,7 @@ class GlobaleImagesController extends Controller implements ContainerAwareInterf
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 
 			$user=$this->getUser();
-			$image_path = $this->get('kernel')->getRootDir().'/../cloud/'.$user->getCompany()->getId().'/images//'.$type.'/';
+			$image_path = $this->get('kernel')->getRootDir().'/../cloud/'.$user->getCompany()->getId().'/images/'.$type.'/';
 			//$image_path = $this->get('kernel')->getRootDir() . '/../public/images/workers/';
 			if(file_exists($image_path.$id.'-'.$size.'.jpg'))
 				$filename = $id.'-'.$size.'.jpg';
