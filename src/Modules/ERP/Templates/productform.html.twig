@@ -3,9 +3,21 @@
 		<div class="principal-content" id="principal-content">
 			{% if form is defined %}
 				{% set formConstructor = form %}
-				{{ include('@Globale/form.html.twig') }}
-			{% endif %}
+				{#{{ include('@Globale/form.html.twig') }}#}
+				{{ form_row(formConstructor.form['code']) }}
+				{{ form_row(formConstructor.form['name']) }}
+				{{ form_row(formConstructor.form['description']) }}
 
+			{% endif %}
+			<div class="row">
+				<div class="col-md-12">
+					<div class="panel-title-list">Stocks</div>
+						{% if listStocks is defined %}
+							{% set listConstructor = listStocks %}
+							{{ include('@Globale/list.html.twig') }}
+						{% endif %}
+				</div>
+			</div>
 			<div class="row">
 				<div class="col-md-6">
 						<div class="panel-title-list">Codigos EAN13</div>

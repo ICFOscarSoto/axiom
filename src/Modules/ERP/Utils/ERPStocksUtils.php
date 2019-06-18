@@ -10,11 +10,11 @@ use App\Modules\Globale\Entity\MenuOptions;
 class ERPStocksUtils
 {
 
-  public function formatList($user){
+  public function formatList($product){
     $list=[
       'id' => 'listStocks',
       'route' => 'stocklist',
-      'routeParams' => ["id" => $user->getId()],
+      'routeParams' => ["id" => $product],
       'orderColumn' => 2,
       'orderDirection' => 'ASC',
       'tagColumn' => 3,

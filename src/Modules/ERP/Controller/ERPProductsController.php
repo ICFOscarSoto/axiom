@@ -14,12 +14,14 @@ use App\Modules\ERP\Entity\ERPProducts;
 use App\Modules\ERP\Entity\ERPWebProducts;
 use App\Modules\ERP\Entity\ERPEAN13;
 use App\Modules\ERP\Entity\ERPReferences;
+use App\Modules\ERP\Entity\ERPStocks;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\ERP\Utils\ERPProductsUtils;
 use App\Modules\ERP\Utils\ERPEAN13Utils;
 use App\Modules\ERP\Utils\ERPReferencesUtils;
+use App\Modules\ERP\Utils\ERPStocksUtils;
 
 class ERPProductsController extends Controller
 {
@@ -84,6 +86,7 @@ class ERPProductsController extends Controller
 			$obj = $productRepository->findOneBy(['id'=>$id, 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
 			$product_name=$obj?$obj->getName():'';
 			return $this->render('@Globale/generictabform.html.twig', array(
+								'entity_name' => $product_name,
 								'controllerName' => 'ProductsController',
 								'interfaceName' => 'Productos',
 								'optionSelected' => 'products',
@@ -93,10 +96,15 @@ class ERPProductsController extends Controller
 								'id' => $id,
 								'tab' => $request->query->get('tab','data'), //Show initial tab, by default data tab
 								'tabs' => [
-									["name" => "data", "icon"=>"fa fa-id-card", "caption"=>"productsdata", "active"=>true, "route"=>$this->generateUrl("formInfoProduct",["id"=>$id])],
+									["name" => "data", "icon"=>"fa fa-id-card", "caption"=>"Products data", "active"=>true, "route"=>$this->generateUrl("formInfoProduct",["id"=>$id])],
 									["name" => "webproduct", "icon"=>"fa fa-id-card", "caption"=>"Web", "route"=>$this->generateUrl("dataWebProducts",["id"=>$id])],
-									["name" => "stocks", "icon"=>"fa fa-id-card", "caption"=>"Stocks", "route"=>$this->generateUrl("stocks",["id"=>$id])]
-									]
+									["name" => "stocks", "icon"=>"fa fa-id-card", "caption"=>"Stocks", "route"=>$this->generateUrl("stocks",["id"=>$id])]],
+
+									'include_header' => [["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker-es.js"],
+																			["type"=>"css", "path"=>"/js/rickshaw/rickshaw.min.css"]],
+									'include_footer' => [["type"=>"css", "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.css"],
+												 		 					 ["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.js"]]
+
 				));
 		}
 
@@ -115,14 +123,19 @@ class ERPProductsController extends Controller
 			$template=dirname(__FILE__)."/../Forms/Products.json";
 			$formUtils = new GlobaleFormUtils();
 			$formUtils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine());
-			$listUtils = new ERPEAN13Utils();
-			$listUtils2 = new ERPReferencesUtils();
+			$listEAN13 = new ERPEAN13Utils();
 			$formUtilsEAN = new GlobaleFormUtils();
 			$formUtilsEAN->initialize($this->getUser(), new ERPEAN13(), dirname(__FILE__)."/../Forms/EAN13.json", $request, $this, $this->getDoctrine());
+			$forms[]=$formUtilsEAN->formatForm('EAN13', true, null, ERPEAN13::class);
+			$listReferences = new ERPReferencesUtils();
 			$formUtilsReferences = new GlobaleFormUtils();
 			$formUtilsReferences->initialize($this->getUser(), new ERPReferences(), dirname(__FILE__)."/../Forms/References.json", $request, $this, $this->getDoctrine());
-			$forms[]=$formUtilsEAN->formatForm('EAN13', true, null, ERPEAN13::class);
 			$forms[]=$formUtilsReferences->formatForm('References', true, null, ERPReferences::class);
+			$listStocks = new ERPStocksUtils();
+			$formUtilsStocks = new GlobaleFormUtils();
+			$formUtilsStocks->initialize($this->getUser(), new ERPStocks(), dirname(__FILE__)."/../Forms/Stocks.json", $request, $this, $this->getDoctrine());
+			$forms[]=$formUtilsStocks->formatForm('Stocks', true, null, ERPStocks::class);
+
 			return $this->render('@ERP/productform.html.twig', array(
 				'controllerName' => 'productsController',
 				'interfaceName' => 'Productos',
@@ -131,8 +144,9 @@ class ERPProductsController extends Controller
 				'id' => $id,
 				'id_object' => $id,
 				'form' => $formUtils->formatForm('products', true, $id, $this->class, "dataProduct"),
-				'listEAN13' => $listUtils->formatListByProduct($id),
-				'listReferences' => $listUtils2->formatListByProduct($id),
+				'listEAN13' => $listEAN13->formatListByProduct($id),
+				'listReferences' => $listReferences->formatListByProduct($id),
+				'listStocks' => $listStocks->formatList($id),
 				'forms' => $forms
 			));
 

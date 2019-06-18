@@ -1,5 +1,5 @@
 [
-  {"id" : "addEAN13Top", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"genericdata", "routeParams":{"module":"ERP", "name":"EAN13", "type":"modal" }, "modal":"EAN13", "actionType" : "background", "confirm" :false, "tooltip" : "Crear nueva referencia"},
+  {"id" : "addEAN13Top", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"dataEAN13", "routeParams":{"idproduct":"id_object"}, "modal":"EAN13", "actionType" : "background", "confirm" :false, "tooltip" : "Crear nueva referencia"},
   {"id" : "deleteEAN13Top", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true},
   {"id" : "printEAN13Top", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false},
   {"id" : "exportEAN13Top", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"", "confirm" :false}

@@ -1,5 +1,5 @@
 [
-  {"id" : "addReferenceTop", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"genericdata", "routeParams":{"module":"ERP", "name":"References", "type":"modal"}, "modal":"References", "actionType" : "background", "confirm" :false, "tooltip" : "Crear nueva referencia"},
+  {"id" : "addReferenceTop", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"datareferences", "routeParams":{"idproduct":"id_object"}, "modal":"References", "actionType" : "background", "confirm" :false, "tooltip" : "Crear nueva referencia"},
   {"id" : "deleteReferenceTop", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true},
   {"id" : "printReferenceTop", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false},
   {"id" : "exportReferenceTop", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"", "confirm" :false}

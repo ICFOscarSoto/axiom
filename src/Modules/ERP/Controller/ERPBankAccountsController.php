@@ -35,7 +35,7 @@ class ERPBankAccountsController extends Controller
   		$locale = $request->getLocale();
   		$this->router = $router;
   		$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
-    	$utils = new ERPBankAccountsUtils;
+    	$utils = new ERPBankAccountsUtils();
   		$templateLists=$utils->formatListbyEntity($id);
 			$formUtils=new GlobaleFormUtils();
 			$formUtils->initialize($this->getUser(), new $this->class(), dirname(__FILE__)."/../Forms/BankAccounts.json", $request, $this, $this->getDoctrine());

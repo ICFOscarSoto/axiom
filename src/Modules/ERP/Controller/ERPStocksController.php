@@ -11,6 +11,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\ERP\Entity\ERPStocks;
+use App\Modules\ERP\Entity\ERPProducts;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
@@ -22,30 +23,23 @@ class ERPStocksController extends Controller
 	private $utilsClass=ERPStocksUtils::class;
 
     /**
-     * @Route("/{_locale}/admin/global/stocks", name="stocks")
+     * @Route("/{_locale}/ERP/{id}/stocks", name="stocks")
      */
-    public function index(RouterInterface $router,Request $request)
+    public function index($id, RouterInterface $router, Request $request)
     {
        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
   		//$this->denyAccessUnlessGranted('ROLE_ADMIN');
   		$userdata=$this->getUser()->getTemplateData();
   		$locale = $request->getLocale();
   		$this->router = $router;
-  		$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
-    	$utils = new $this->utilsClass();
-  		$templateLists[]=$utils->formatList($this->getUser());
+    	$utils = new ERPStocksUtils;
+  		$templateLists=$utils->formatList($id);
 			$formUtils=new GlobaleFormUtils();
 			$formUtils->initialize($this->getUser(), new $this->class(), dirname(__FILE__)."/../Forms/Stocks.json", $request, $this, $this->getDoctrine());
-			$templateForms[]=$formUtils->formatForm('stocks', true, null, $this->class);
+			$templateForms[]=$formUtils->formatForm('stocks', true, $id, $this->class, "dataStocks", ["id"=>$id, "action"=>"save"]);
   		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
-  			return $this->render('@Globale/labelslist.html.twig', [
-  				'controllerName' => 'stocksController',
-  				'interfaceName' => 'Stocks',
-  				'optionSelected' => $request->attributes->get('_route'),
-  				'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
-  				'breadcrumb' =>  $menurepository->formatBreadcrumb($request->get('_route')),
-  				'userData' => $userdata,
-  				'lists' => $templateLists,
+  			return $this->render('@Globale/list.html.twig', [
+					'listConstructor' => $templateLists,
 	        'forms' => $templateForms
   				]);
   		}

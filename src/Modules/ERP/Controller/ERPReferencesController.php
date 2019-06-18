@@ -40,6 +40,34 @@ class ERPReferencesController extends Controller
     $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/References.json"),true);
     $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $class, [["type"=>"and","column"=>"product", "value"=>$product]]);
     return new JsonResponse($return);
-
   }
+
+
+    /**
+     * @Route("/{_locale}/references/data/{id}/{action}/{idproduct}", name="datareferences", defaults={"id"=0, "action"="read", "idproduct"=0})
+     */
+     public function data($id, $action, $idproduct, Request $request)
+     {
+     $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+     $this->denyAccessUnlessGranted('ROLE_ADMIN');
+     $template=dirname(__FILE__)."/../Forms/References.json";
+     $utils = new GlobaleFormUtils();
+     $utilsObj=new ERPReferencesUtils();
+     $defaultProduct=$this->getDoctrine()->getRepository(ERPProducts::class);
+     $EAN13Repository=$this->getDoctrine()->getRepository(ERPReferences::class);
+     $obj=new ERPReferences();
+     if($id==0){
+      if($idproduct==0 ) $idproduct=$request->query->get('idproduct');
+      if($idproduct==0 || $idproduct==null) $idproduct=$request->request->get('id-parent',0);
+      $product = $defaultProduct->find($idproduct);
+    }else $obj = $EAN13Repository->find($id);
+
+     $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "product"=>$id==0?$product:$obj->getProduct()];
+     $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),
+                            method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
+     return $utils->make($id, ERPReferences::class, $action, "formProducts", "modal");
+    }
+
+
+
 }
