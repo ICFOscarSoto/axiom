@@ -16,6 +16,7 @@ use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\Globale\Utils\GlobaleExportUtils;
+use App\Modules\Globale\Utils\GlobaleListApiUtils;
 use App\Modules\Cloud\Controller\CloudController;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use App\Modules\HR\Utils\HRClocksUtils;
@@ -177,7 +178,7 @@ class HRClocksController extends Controller
  		}
 
 		/**
-		 * @Route("/{_locale}/HR/{id}/clocks/export", name="exportWorkerClocks")
+		 * @Route("/api/HR/{id}/clocks/export", name="exportWorkerClocks")
 		 */
 		 public function exportWorkerClocks($id, Request $request){
 			 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
@@ -195,6 +196,36 @@ class HRClocksController extends Controller
 			 return $result;
 			 //return new Response('');
 		 }
+
+
+
+		 /**
+			* @Route("/api/HR/{id}/clocks/collection", name="genericapicollection")
+			*/
+			public function genericapicollection($id, Request $request){
+				$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+				$manager = $this->getDoctrine()->getManager();
+				$repository = $manager->getRepository($this->class);
+				$workerRepository=$this->getDoctrine()->getRepository(HRWorkers::class);
+ 			 	$worker = $workerRepository->findOneBy(["id"=>$id, "user"=>$this->getUser()]);
+				$parameters=$request->query->all();
+				$filter=[];
+				foreach($parameters as $key => $parameter){
+					if(in_array("set".ucfirst($parameter),get_class_methods($this->class)))
+						$filter[]=["type"=>"and", "column"=>$key, "value"=>$parameter];
+				}
+
+				$listUtils=new GlobaleListApiUtils();
+				//if(property_exists($class, "user") && !in_array("ROLE_GLOBAL", $user->getRoles()) && !in_array("ROLE_SUPERADMIN", $user->getRoles()) && !in_array("ROLE_ADMIN", $user->getRoles()))
+				//  $return=$listUtils->getRecords($user,$repository,$request,$manager,$class, array_merge([["type"=>"and", "column"=>"user", "value"=>$user]],$filter),[],-1);
+				//else if(property_exists($class, "company"))
+				//    $return=$listUtils->getRecords($user,$repository,$request,$manager,$class, array_merge([["type"=>"and", "column"=>"company", "value"=>$user->getCompany()]],$filter),[],-1);
+				//   else $return=$listUtils->getRecords($user,$repository,$request,$manager, $class,array_merge([],$filter),[],-1);
+				$return=$listUtils->getRecords($this->getUser(),$repository,$request,$manager, $this->class,array_merge([["type"=>"and", "column"=>"worker", "value"=>$worker]],$filter),[],-1);
+				return new JsonResponse($return);
+			}
+
+
 
 		/**
 		 * @Route("/{_locale}/HR/clocks/data/{id}/{action}/{idworker}", name="dataClocks", defaults={"id"=0, "action"="read", "idworker"="0"})
