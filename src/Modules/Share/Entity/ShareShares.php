@@ -86,7 +86,7 @@ class ShareShares
         return $this;
     }
 
-    public function getUser(): ?GlobaleUsers
+    /*public function getUser(): ?GlobaleUsers
     {
         return $this->user;
     }
@@ -96,7 +96,7 @@ class ShareShares
         $this->user = $user;
 
         return $this;
-    }
+    }*/
 
     public function getUserGroup(): ?GlobaleUserGroups
     {
