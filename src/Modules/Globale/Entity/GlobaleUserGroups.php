@@ -162,7 +162,7 @@ class GlobaleUserGroups
         return $this;
     }
 
-    public function removeNotificationGlobale(Notifications $notification): self
+    public function removeNotificationGlobale(GlobaleNotifications $notification): self
     {
         if ($this->notifications->contains($notification)) {
             $this->notifications->removeElement($notification);
