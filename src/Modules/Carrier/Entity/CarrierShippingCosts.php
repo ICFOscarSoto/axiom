@@ -153,7 +153,7 @@ class CarrierShippingCosts
         return $this;
     }
 
-    public function getCompany(): ?GlobaleCompanies
+  /*  public function getCompany(): ?GlobaleCompanies
     {
         return $this->company;
     }
@@ -164,5 +164,5 @@ class CarrierShippingCosts
 
         return $this;
     }
-
+*/
 }
