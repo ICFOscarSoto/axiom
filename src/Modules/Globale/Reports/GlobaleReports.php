@@ -12,8 +12,9 @@ class GlobaleReports extends \FPDF
   function Header()
   {
       // Select Arial bold 15
-      //$image_path =
-      $this->Image($this->image_path.'2-medium.png',10,10, null,15,'PNG');
+      $image_path = $this->image_path.$this->user->getCompany()->getId().'-medium.png';
+      if(file_exists($image_path))
+        $this->Image($image_path,10,10, null,15,'PNG');
       $this->SetFont('Arial','B',15);
       // Move to the right
       //$this->Cell(100);
