@@ -14,11 +14,11 @@
 
 <body class="page-body" data-url="{{ url('indexAdmin') }}">
 <div class="page-container"><!-- add class "sidebar-collapsed" to close sidebar by default, "chat-visible" to make chat appear always -->
-	{{ include('@Globale/sidebar_menu.html.twig') }}
+{#	{{ include('@Globale/sidebar_menu.html.twig') }} #}
 	<div class="main-content">
 		{{ include('@Globale/head.html.twig') }}
 		<hr />
-		{{ include('@Globale/breadcrumb.html.twig') }}
+
 		<!-- MAIN CONTENT -->
     <h1>Oops! An Error Occurred</h1>
     <h2>The server returned a "{{ status_code }} {{ status_text }}".</h2>
@@ -30,9 +30,7 @@
 		<!-- END MAIN CONTENT -->
 		{{ include('@Globale/footer.html.twig') }}
 	</div>
-	{{ include('@Globale/chat.html.twig') }}
-	<!-- Chat Histories -->
-	{{ include('@Globale/chat_histories.html.twig') }}
+	
 </div>
 	<!-- MODALS  -->
 	<!-- END MODALS -->
