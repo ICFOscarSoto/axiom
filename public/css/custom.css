@@ -122,6 +122,10 @@ table.dataTable.compact tbody th, table.dataTable.compact tbody td {
   width: 100%;
 }
 
+#fileinput-companyImageDark > .thumbnail{
+  background: #2b303a;
+}
+
 .mail-env .mail-body .mail-table tbody tr.unread > td {
 	font-weight: bold;
   background-color: #CCC;

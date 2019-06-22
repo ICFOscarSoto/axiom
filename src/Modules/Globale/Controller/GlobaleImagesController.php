@@ -99,60 +99,73 @@ class GlobaleImagesController extends Controller implements ContainerAwareInterf
 	{
 		$file = $request->files->get('picture');
 		$user=$this->getUser();
-		$basePath = $this->get('kernel')->getRootDir().DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$user->getCompany()->getId().DIRECTORY_SEPARATOR;
-		$tempName = md5(uniqid()).'.'.$file->guessExtension();
-		$tempPath = $basePath.'temp'.DIRECTORY_SEPARATOR.$tempName;
-		//Create basepath if it not exists
-		if (!file_exists($basePath.'temp')) {
-		    mkdir($basePath.'temp', 0777, true);
+		switch($type){  //For check permissions
+
+			case "company":
+			case "companydark":
+					//Check if role_globale
+					if(array_search('ROLE_GLOBAL',$user->getRoles())!==FALSE){
+						$basePath = $this->get('kernel')->getRootDir().DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$id.DIRECTORY_SEPARATOR;
+					}else $basePath = $this->get('kernel')->getRootDir().DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$this->getUser()->getCompany()->getId().DIRECTORY_SEPARATOR;
+				break;
+			default:
+				$basePath = $this->get('kernel')->getRootDir().DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$this->getUser()->getCompany()->getId().DIRECTORY_SEPARATOR;
+
 		}
-		$file->move($basePath.'temp'.DIRECTORY_SEPARATOR, $tempName);
-		//Create type path if it not exists
-		if (!file_exists($basePath.'images'.DIRECTORY_SEPARATOR.$type)) {
-		    mkdir($basePath.'images'.DIRECTORY_SEPARATOR.$type, 0777, true);
-		}else{
-			//If dir exist clear interface
-			$files = glob($basePath.'images'.DIRECTORY_SEPARATOR.$type.DIRECTORY_SEPARATOR.'*'); // get all file names
-			foreach($files as $file){ // iterate files
-			  if(is_file($file))
-			    unlink($file); // delete file
+			$tempName = md5(uniqid()).'.'.$file->guessExtension();
+			$tempPath = $basePath.'temp'.DIRECTORY_SEPARATOR.$tempName;
+			//Create basepath if it not exists
+			if (!file_exists($basePath.'temp')) {
+			    mkdir($basePath.'temp', 0777, true);
 			}
-		}
+			$file->move($basePath.'temp'.DIRECTORY_SEPARATOR, $tempName);
+			//Create type path if it not exists
+			if (!file_exists($basePath.'images'.DIRECTORY_SEPARATOR.$type)) {
+			    mkdir($basePath.'images'.DIRECTORY_SEPARATOR.$type, 0777, true);
+			}else{
+				//If dir exist clear interface
+				$files = glob($basePath.'images'.DIRECTORY_SEPARATOR.$type.DIRECTORY_SEPARATOR.'*'); // get all file names
+				foreach($files as $file){ // iterate files
+				  if(is_file($file))
+				    unlink($file); // delete file
+				}
+			}
 
-		//50 256 640 1024
-		$manager = new ImageManager($this->container);
+			//50 256 640 1024
+			$manager = new ImageManager($this->container);
 
-		$image = $manager->make($tempPath);
-		$image->resize(100, null, function ($constraint) {
-		    $constraint->aspectRatio();
-		    $constraint->upsize();
-		});
-		$image->save($basePath.'images'.DIRECTORY_SEPARATOR.$type.DIRECTORY_SEPARATOR.$id.'-thumb.png');
+			$image = $manager->make($tempPath);
+			$image->resize(100, null, function ($constraint) {
+			    $constraint->aspectRatio();
+			    $constraint->upsize();
+			});
+			$image->save($basePath.'images'.DIRECTORY_SEPARATOR.$type.DIRECTORY_SEPARATOR.$id.'-thumb.png');
 
-		$image = $manager->make($tempPath);
-		$image->resize(256, null, function ($constraint) {
-		    $constraint->aspectRatio();
-		    $constraint->upsize();
-		});
-		$image->save($basePath.'images'.DIRECTORY_SEPARATOR.$type.DIRECTORY_SEPARATOR.$id.'-small.png');
+			$image = $manager->make($tempPath);
+			$image->resize(256, null, function ($constraint) {
+			    $constraint->aspectRatio();
+			    $constraint->upsize();
+			});
+			$image->save($basePath.'images'.DIRECTORY_SEPARATOR.$type.DIRECTORY_SEPARATOR.$id.'-small.png');
 
-		$image = $manager->make($tempPath);
-		$image->resize(640, null, function ($constraint) {
-				$constraint->aspectRatio();
-				$constraint->upsize();
-		});
-		$image->save($basePath.'images'.DIRECTORY_SEPARATOR.$type.DIRECTORY_SEPARATOR.$id.'-medium.png');
+			$image = $manager->make($tempPath);
+			$image->resize(640, null, function ($constraint) {
+					$constraint->aspectRatio();
+					$constraint->upsize();
+			});
+			$image->save($basePath.'images'.DIRECTORY_SEPARATOR.$type.DIRECTORY_SEPARATOR.$id.'-medium.png');
 
-		$image = $manager->make($tempPath);
-		$image->resize(1024, null, function ($constraint) {
-				$constraint->aspectRatio();
-				$constraint->upsize();
-		});
-		$image->save($basePath.'images'.DIRECTORY_SEPARATOR.$type.DIRECTORY_SEPARATOR.$id.'-large.png');
+			$image = $manager->make($tempPath);
+			$image->resize(1024, null, function ($constraint) {
+					$constraint->aspectRatio();
+					$constraint->upsize();
+			});
+			$image->save($basePath.'images'.DIRECTORY_SEPARATOR.$type.DIRECTORY_SEPARATOR.$id.'-large.png');
 
-		if (isset($tempPath)) { unlink($tempPath); }
+			if (isset($tempPath)) { unlink($tempPath); }
 
-		return new JsonResponse(["result"=>1]);
+			return new JsonResponse(["result"=>1]);
+
 	}
 
 
@@ -205,7 +218,8 @@ class GlobaleImagesController extends Controller implements ContainerAwareInterf
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 
 			$user=$this->getUser();
-			$image_path = $this->get('kernel')->getRootDir().'/../cloud/'.$user->getCompany()->getId().'/images/'.$type.'/';
+			if($type=="company" || $type=="companydark") $image_path = $this->get('kernel')->getRootDir().'/../cloud/'.$id.'/images/'.$type.'/';
+			else $image_path = $this->get('kernel')->getRootDir().'/../cloud/'.$user->getCompany()->getId().'/images/'.$type.'/';
 			//$image_path = $this->get('kernel')->getRootDir() . '/../public/images/workers/';
 			if(file_exists($image_path.$id.'-'.$size.'.png'))
 				$filename = $id.'-'.$size.'.png';
