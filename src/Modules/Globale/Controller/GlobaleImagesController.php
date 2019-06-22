@@ -214,32 +214,42 @@ class GlobaleImagesController extends Controller implements ContainerAwareInterf
 	*/
 	public function getWorkerImage($type, $id, $size, Request $request)
 	{
-		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+		if($type!="company" && $type!="companydark"){
+			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			if (!$this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+				return new RedirectResponse($this->router->generate('app_login'));
+			}
+		}
 
 			$user=$this->getUser();
-			if($type=="company" || $type=="companydark") $image_path = $this->get('kernel')->getRootDir().'/../cloud/'.$id.'/images/'.$type.'/';
-			else $image_path = $this->get('kernel')->getRootDir().'/../cloud/'.$user->getCompany()->getId().'/images/'.$type.'/';
+			if($type=="company" || $type=="companydark") $image_path = $this->get('kernel')->getRootDir().'/../cloud/'.$id.'/images/';
+			else $image_path = $this->get('kernel')->getRootDir().'/../cloud/'.$user->getCompany()->getId().'/images/';
 			//$image_path = $this->get('kernel')->getRootDir() . '/../public/images/workers/';
-			if(file_exists($image_path.$id.'-'.$size.'.png'))
+			if(file_exists($image_path.$type.'/'.$id.'-'.$size.'.png'))
 				$filename = $id.'-'.$size.'.png';
 				else
-				if(file_exists($image_path.$id.'-'.$size.'.jpg'))
+				if(file_exists($image_path.$type.'/'.$id.'-'.$size.'.jpg'))
 					$filename = $id.'-'.$size.'.jpg';
-					//else if(file_exists($image_path.$id.'-thumb.jpg'))
-					//	$filename = $id.'-thumb.jpg';
-					else $filename = 'no-thumb.jpg';
+					else if($type=="companydark" && file_exists($image_path.$type.'/'.$id.'-'.$size.'.png')){
+
+						$filename = $id.'-'.$size.'.png'; $type="company";
+					} else if($type=="companydark" && file_exists($image_path.$type.'/'.$id.'-'.$size.'.jpg')){
+							$filename = $id.'-'.$size.'.jpg'; $type="company";
+					}else {
+							$image_path = $this->get('kernel')->getRootDir().'/../cloud/0/images/';
+							$filename = 'no-thumb.jpg';
+					}
 			//}else $filename = 'no-thumb.jpg';
-			$response = new BinaryFileResponse($image_path.$filename);
+			$response = new BinaryFileResponse($image_path.$type.'/'.$filename);
 			$mimeTypeGuesser = new FileinfoMimeTypeGuesser();
 			if($mimeTypeGuesser->isSupported()){
 				$seconds_to_cache = 7200;
 				$ts = gmdate("D, d M Y H:i:s", time() + $seconds_to_cache) . " GMT";
-				$response->headers->set('Content-Type', $mimeTypeGuesser->guess($image_path.$filename));
+				$response->headers->set('Content-Type', $mimeTypeGuesser->guess($image_path.$type.'/'.$filename));
 				$response->headers->set("Expires", $ts);
 				$response->headers->set("Pragma", "cache");
 				$response->headers->set("Cache-Control", "max-age=$seconds_to_cache");
-				$response->headers->set('Content-Type', $mimeTypeGuesser->guess($image_path.$filename));
+				$response->headers->set('Content-Type', $mimeTypeGuesser->guess($image_path.$type.'/'.$filename));
 			}else{
 				$response->headers->set('Content-Type', 'text/plain');
 			}
@@ -249,7 +259,6 @@ class GlobaleImagesController extends Controller implements ContainerAwareInterf
 			);
 
 			return $response;
-		}
-		return new RedirectResponse($this->router->generate('app_login'));
+
 	}
 }

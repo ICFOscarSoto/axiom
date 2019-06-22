@@ -42,8 +42,12 @@ class GlobaleSecurityController extends Controller
 		$companyRepository=$this->getDoctrine()->getRepository(GlobaleCompanies::class);
 		$company = $companyRepository->findOneBy(["domain" => $domain]);
 		if($company!=null && $domain!="aplicode.com"){
-			return $this->render('@Globale/login.html.twig', ['last_username' => $lastUsername, 'domain'=>$domain, 'type'=> 'hidden', 'error' => $error, 'logo' => $this->generateUrl('getCompanyImage', array('id'=>$company->getId()))]);
-		}else return $this->render('@Globale/login.html.twig', ['last_username' => $lastUsername, 'domain'=>($domain!="aplicode.com")?$domain:"", 'type'=> 'text', 'error' => $error,  'logo' => $this->generateUrl('getCompanyImage', array('id'=>1))]);
+			$logo=$this->generateUrl('getImage', array('type'=>'companydark' ,'size'=>'medium','id'=>$company->getId()));
+			return $this->render('@Globale/login.html.twig', ['last_username' => $lastUsername, 'domain'=>$domain, 'type'=> 'hidden', 'error' => $error, 'logo' => $logo]);
+		}else{
+			$logo=$this->generateUrl('getImage', array('type'=>'companydark' ,'size'=>'medium','id'=>1));
+			return $this->render('@Globale/login.html.twig', ['last_username' => $lastUsername, 'domain'=>($domain!="aplicode.com")?$domain:"", 'type'=> 'text', 'error' => $error,  'logo' => $logo]);
+		}
 	}
 
 	/**
