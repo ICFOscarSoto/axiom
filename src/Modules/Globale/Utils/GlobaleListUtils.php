@@ -151,7 +151,6 @@ class GlobaleListUtils
         $queryTotal->setParameter('val_'.$path[0].'0', $filter["value"]);
       }
     }
-    //dump($query->getQuery()->getSql());
 		$queryPaginator = $query->getQuery();
 
 		$records=$queryPaginator->getResult();
@@ -162,8 +161,6 @@ class GlobaleListUtils
 		$return["recordsFiltered"]=$queryFiltered->getQuery()->getSingleScalarResult();
 		$return["data"]=array();
 
-    //dump($listFields);
-    //dump($records);
 		//Obtenemos los datos desde la persistencia
 		foreach($records as $record){
 			$data_ob=Array();

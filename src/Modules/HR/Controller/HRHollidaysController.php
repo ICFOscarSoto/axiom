@@ -46,7 +46,6 @@ $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
 $workCalendarRepository=$this->getDoctrine()->getRepository(HRWorkCalendars::class);
 $hollidaysRepository=$this->getDoctrine()->getRepository(HRHollidays::class);
 $workCalendar=$workCalendarRepository->find($id);
-//dump($workCalendar->getWorkDays());
 $utils = new $this->utilsClass();
 $formUtils=new GlobaleFormUtils();
 $formUtils->initialize($this->getUser(), new HRHollidays(), dirname(__FILE__)."/../Forms/Hollidays.json", $request, $this, $this->getDoctrine());

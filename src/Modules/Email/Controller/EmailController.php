@@ -265,7 +265,6 @@ class EmailController extends Controller
 			$attachments = json_decode($request->request->get('files'));
 			$text = $request->request->get('text_content');
 			$html = $request->request->get('html_content');
-			dump($html);
 			//Generamos el mail para el envio SMTP
 			$headers = array(
 			              'From'    => $emailAccount->getUsername(),
@@ -287,7 +286,6 @@ class EmailController extends Controller
 				$mime->addAttachment($tempPath.$attach, $mimetype);
 			}
 			$body = $mime->get();
-			dump($mime->headers());
 			$headers = $mime->headers($headers);
 			$smtp = Mail::factory('smtp',
    		array ('host' => $emailAccount->getSmtpServer(),

@@ -438,8 +438,7 @@ class GlobaleCompanies
             if(!file_exists($dest)) mkdir($dest . DIRECTORY_SEPARATOR . $iterator->getSubPathName());
           } else {
               if(!file_exists(dirname($dest.DIRECTORY_SEPARATOR.$iterator->getSubPathName()))) mkdir(dirname($dest.DIRECTORY_SEPARATOR.$iterator->getSubPathName()), 0775);
-              dump($item);
-              dump(dirname($dest.DIRECTORY_SEPARATOR.$iterator->getSubPathName()));
+              
               if(!file_exists($dest.DIRECTORY_SEPARATOR.$iterator->getSubPathName())) copy($item, $dest . DIRECTORY_SEPARATOR . $iterator->getSubPathName());
 
           }

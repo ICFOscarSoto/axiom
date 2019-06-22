@@ -195,7 +195,6 @@ class GlobaleUsersController extends Controller
 		if (!$user) {
 	        throw $this->createNotFoundException('No user found for id '.$id );
 				}
-				//dump($user);
 				//return new JsonResponse();
 				return new JsonResponse($user->encodeJson());
 	}

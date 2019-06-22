@@ -336,7 +336,7 @@
 							//if route has params...
 							{% set routeParams = [] %}
 							{% if field.routeParams is defined %}
-								{% dump(routeParams) %}
+
 								{% for key,param in field.routeParams %}
     						  {% if _context[param] is defined %} {# Detect if parameter is a reference to a var or is a value #}
 										{% set routeParams = routeParams|merge({(key): _context[param]}) %}
@@ -428,7 +428,6 @@
 		{% set routeParams = [] %}
 		{% set routeParams = routeParams|merge({('id'): '_____'}) %}
 		{% if field.routeParams is defined %}
-			{% dump(routeParams) %}
 			{% for key,param in field.routeParams %}
 				{% if _context[param] is defined %} {# Detect if parameter is a reference to a var or is a value #}
 					{% set routeParams = routeParams|merge({(key): _context[param]}) %}

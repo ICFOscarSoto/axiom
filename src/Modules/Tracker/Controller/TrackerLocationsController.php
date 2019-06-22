@@ -157,7 +157,6 @@ class TrackerLocationsController extends Controller
       $point["date"]=$location->getDate();
       $result[]=$point;
     }
-    //dump($locations);
     return new JsonResponse($result);
   }
 
@@ -193,7 +192,6 @@ class TrackerLocationsController extends Controller
       $point["date"]=$dt->format('Y-m-d H:i:s');
       $result[]=$point;
   //  }
-    //dump($locations);
     return new JsonResponse($result);
   }
 

@@ -68,7 +68,6 @@ class ERPCustomersController extends Controller
 		 $obj->setCountry($default);
 		 $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine());
 		 $make= $utils->make($id, $this->class, $action, "formCustomers", "full", "@Globale/form.html.twig", "formCustomer");
-		 //dump($make);
 		 return $make;
 		}
 

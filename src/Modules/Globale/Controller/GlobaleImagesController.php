@@ -65,7 +65,6 @@ class GlobaleImagesController extends Controller implements ContainerAwareInterf
 			$id=$id==0?$this->getUser()->getCompany()->getId():$id;
 			$image_path = $this->get('kernel')->getRootDir().DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$id.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'company'.DIRECTORY_SEPARATOR;
 			//$image_path = $this->get('kernel')->getRootDir() . '/../public/images/companies/';
-			//dump($image_path.$id."-".($type!=''?$type:"medium").'.jpg');
 			if(file_exists($image_path.$id."-".($type!=''?$type:"medium").'.png'))
 				$filename = $id."-".($type!=''?$type:"medium").'.png';
 			else if(file_exists($image_path.$id."-".($type!=''?$type:"medium").'.jpg'))
@@ -231,7 +230,6 @@ class GlobaleImagesController extends Controller implements ContainerAwareInterf
 				if(file_exists($image_path.$type.'/'.$id.'-'.$size.'.jpg'))
 					$filename = $id.'-'.$size.'.jpg';
 					else if($type=="companydark" && file_exists($image_path.$type.'/'.$id.'-'.$size.'.png')){
-
 						$filename = $id.'-'.$size.'.png'; $type="company";
 					} else if($type=="companydark" && file_exists($image_path.$type.'/'.$id.'-'.$size.'.jpg')){
 							$filename = $id.'-'.$size.'.jpg'; $type="company";

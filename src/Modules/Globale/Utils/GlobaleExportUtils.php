@@ -20,7 +20,6 @@ class GlobaleExportUtils
        fputcsv($df, array_keys(reset($array)));
        foreach ($array as $row) {
           fputcsv($df, array_values ($row));
-          //dump(array_values ($row));
        }
        fclose($df);
        return ob_get_clean();

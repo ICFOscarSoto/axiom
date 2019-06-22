@@ -36,7 +36,7 @@ class GlobaleListRelationUtils
     }
 
     $query.=$numResults;
-    dump($query);
+
 /*
 		//Formamos el filtro de busqueda global
 		$searchValue=$request->query->get('search');
@@ -154,7 +154,6 @@ class GlobaleListRelationUtils
         $queryTotal->setParameter('val_'.$path[0].'0', $filter["value"]);
       }
     }
-    //dump($query->getQuery()->getSql());
 		$queryPaginator = $query->getQuery();
 
 		$records=$queryPaginator->getResult();
@@ -165,8 +164,6 @@ class GlobaleListRelationUtils
 		$return["recordsFiltered"]=$queryFiltered->getQuery()->getSingleScalarResult();
 		$return["data"]=array();
 
-    //dump($listFields);
-    //dump($records);
 		//Obtenemos los datos desde la persistencia*/
 
 

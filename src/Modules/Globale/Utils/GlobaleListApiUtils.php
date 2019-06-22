@@ -155,16 +155,12 @@ class GlobaleListApiUtils
 		$queryPaginator = $query->getQuery();
 		$records=$queryPaginator->getResult();
 		$records=$queryPaginator->getResult();
-    //dump($queryPaginator->getSql());
 		$return=array();
 		$return["recordsTotal"]=$queryTotal->getQuery()->getSingleScalarResult();
 		$return["recordsFiltered"]=$queryFiltered->getQuery()->getSingleScalarResult();
 		$return["data"]=array();
-
-    //dump($listFields);
-    //dump($records);
+;
 		//Obtenemos los datos desde la persistencia
-    //dump(get_class_methods($classname));
 		foreach($records as $record){
 			$data_ob=[];
 			foreach(get_class_methods($classname) as $method){

@@ -68,7 +68,6 @@ class ERPSuppliersController extends Controller
 		 $obj->setCountry($default);
 		 $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine());
 		 $make= $utils->make($id, $this->class, $action, "formSuppliers", "full", "@Globale/form.html.twig", "formSupplier");
-		 //dump($make);
 		 return $make;
 		}
 
