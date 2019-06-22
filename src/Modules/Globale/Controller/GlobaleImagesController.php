@@ -57,16 +57,19 @@ class GlobaleImagesController extends Controller implements ContainerAwareInterf
 	}
 
 	/**
-     * @Route("/api/company/{id}/getimage", name="getCompanyImage")
+     * @Route("/api/company/{id}/getimage", name="getCompanyImage", defaults={"id"=0})
      */
 	public function getCompanyImage($id, Request $request)
 	{
 			$type = $request->request->get("type",'');
-			$image_path = $this->get('kernel')->getRootDir() . '/../public/images/companies/';
-			if(file_exists($image_path.$id.$type.'.png'))
-				$filename = $id.$type.'.png';
-			else if(file_exists($image_path.$id.$type.'.jpg'))
-				$filename = $id.$type.'.jpg';
+			$id=$id==0?$this->getUser()->getCompany()->getId():$id;
+			$image_path = $this->get('kernel')->getRootDir().DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$id.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'company'.DIRECTORY_SEPARATOR;
+			//$image_path = $this->get('kernel')->getRootDir() . '/../public/images/companies/';
+			//dump($image_path.$id."-".($type!=''?$type:"medium").'.jpg');
+			if(file_exists($image_path.$id."-".($type!=''?$type:"medium").'.png'))
+				$filename = $id."-".($type!=''?$type:"medium").'.png';
+			else if(file_exists($image_path.$id."-".($type!=''?$type:"medium").'.jpg'))
+				$filename = $id."-".($type!=''?$type:"medium").'.jpg';
 			else $filename = '1.png';
 
 			$response = new BinaryFileResponse($image_path.$filename);
@@ -96,48 +99,56 @@ class GlobaleImagesController extends Controller implements ContainerAwareInterf
 	{
 		$file = $request->files->get('picture');
 		$user=$this->getUser();
-		$basePath = $this->get('kernel')->getRootDir().'/../cloud/'.$user->getCompany()->getId().'/';
+		$basePath = $this->get('kernel')->getRootDir().DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$user->getCompany()->getId().DIRECTORY_SEPARATOR;
 		$tempName = md5(uniqid()).'.'.$file->guessExtension();
-		$tempPath = $basePath.'temp/'.$tempName;
+		$tempPath = $basePath.'temp'.DIRECTORY_SEPARATOR.$tempName;
 		//Create basepath if it not exists
 		if (!file_exists($basePath.'temp')) {
 		    mkdir($basePath.'temp', 0777, true);
 		}
-		$file->move($basePath.'temp/', $tempName);
+		$file->move($basePath.'temp'.DIRECTORY_SEPARATOR, $tempName);
 		//Create type path if it not exists
-		if (!file_exists($basePath.'images/'.$type)) {
-		    mkdir($basePath.'images/'.$type, 0777, true);
+		if (!file_exists($basePath.'images'.DIRECTORY_SEPARATOR.$type)) {
+		    mkdir($basePath.'images'.DIRECTORY_SEPARATOR.$type, 0777, true);
+		}else{
+			//If dir exist clear interface
+			$files = glob($basePath.'images'.DIRECTORY_SEPARATOR.$type.DIRECTORY_SEPARATOR.'*'); // get all file names
+			foreach($files as $file){ // iterate files
+			  if(is_file($file))
+			    unlink($file); // delete file
+			}
 		}
 
 		//50 256 640 1024
 		$manager = new ImageManager($this->container);
 
 		$image = $manager->make($tempPath);
-		$image->fit(100, null, function ($constraint) {
+		$image->resize(100, null, function ($constraint) {
+		    $constraint->aspectRatio();
 		    $constraint->upsize();
 		});
-		$image->save($basePath.'images/'.$type.'/'.$id.'-thumb.jpg');
+		$image->save($basePath.'images'.DIRECTORY_SEPARATOR.$type.DIRECTORY_SEPARATOR.$id.'-thumb.png');
 
 		$image = $manager->make($tempPath);
 		$image->resize(256, null, function ($constraint) {
 		    $constraint->aspectRatio();
 		    $constraint->upsize();
 		});
-		$image->save($basePath.'images/'.$type.'/'.$id.'-small.jpg');
+		$image->save($basePath.'images'.DIRECTORY_SEPARATOR.$type.DIRECTORY_SEPARATOR.$id.'-small.png');
 
 		$image = $manager->make($tempPath);
 		$image->resize(640, null, function ($constraint) {
 				$constraint->aspectRatio();
 				$constraint->upsize();
 		});
-		$image->save($basePath.'images/'.$type.'/'.$id.'-medium.jpg');
+		$image->save($basePath.'images'.DIRECTORY_SEPARATOR.$type.DIRECTORY_SEPARATOR.$id.'-medium.png');
 
 		$image = $manager->make($tempPath);
 		$image->resize(1024, null, function ($constraint) {
 				$constraint->aspectRatio();
 				$constraint->upsize();
 		});
-		$image->save($basePath.'images/'.$type.'/'.$id.'-large.jpg');
+		$image->save($basePath.'images'.DIRECTORY_SEPARATOR.$type.DIRECTORY_SEPARATOR.$id.'-large.png');
 
 		if (isset($tempPath)) { unlink($tempPath); }
 
@@ -196,11 +207,14 @@ class GlobaleImagesController extends Controller implements ContainerAwareInterf
 			$user=$this->getUser();
 			$image_path = $this->get('kernel')->getRootDir().'/../cloud/'.$user->getCompany()->getId().'/images/'.$type.'/';
 			//$image_path = $this->get('kernel')->getRootDir() . '/../public/images/workers/';
-			if(file_exists($image_path.$id.'-'.$size.'.jpg'))
-				$filename = $id.'-'.$size.'.jpg';
-				//else if(file_exists($image_path.$id.'-thumb.jpg'))
-				//	$filename = $id.'-thumb.jpg';
-				else $filename = 'no-thumb.jpg';
+			if(file_exists($image_path.$id.'-'.$size.'.png'))
+				$filename = $id.'-'.$size.'.png';
+				else
+				if(file_exists($image_path.$id.'-'.$size.'.jpg'))
+					$filename = $id.'-'.$size.'.jpg';
+					//else if(file_exists($image_path.$id.'-thumb.jpg'))
+					//	$filename = $id.'-thumb.jpg';
+					else $filename = 'no-thumb.jpg';
 			//}else $filename = 'no-thumb.jpg';
 			$response = new BinaryFileResponse($image_path.$filename);
 			$mimeTypeGuesser = new FileinfoMimeTypeGuesser();

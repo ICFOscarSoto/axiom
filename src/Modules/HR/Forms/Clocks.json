@@ -10,6 +10,7 @@
 				{	"name": "end", "cols": 3},
 				{	"name": "endLatitude", "cols": 3},
 				{	"name": "endLongitude", "cols": 3},
+				{	"name": "observations", "cols": 12},
 				{	"name": "active", "cols": 2},
 				{	"name": "invalid", "cols": 2}
 			]

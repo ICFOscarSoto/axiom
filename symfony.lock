@@ -167,6 +167,9 @@
     "ralouphie/getallheaders": {
         "version": "2.0.5"
     },
+    "royopa/fpdf-symfony2": {
+        "version": "3.0"
+    },
     "sensio/framework-extra-bundle": {
         "version": "5.2",
         "recipe": {
@@ -175,6 +178,15 @@
             "version": "5.2",
             "ref": "fb7e19da7f013d0d422fa9bce16f5c510e27609b"
         }
+    },
+    "setasign/fpdf": {
+        "version": "1.8.1"
+    },
+    "setasign/fpdi": {
+        "version": "1.6.2"
+    },
+    "setasign/fpdi-fpdf": {
+        "version": "1.6.2"
     },
     "swiftmailer/swiftmailer": {
         "version": "v6.1.3"

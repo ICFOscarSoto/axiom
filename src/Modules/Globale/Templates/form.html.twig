@@ -39,33 +39,18 @@
     						</div>
 
             <script>
-            function b64toBlob(b64Data, contentType, sliceSize) {
-              contentType = contentType || '';
-              sliceSize = sliceSize || 512;
-              var byteCharacters = atob(b64Data);
-              var byteArrays = [];
-              for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
-                  var slice = byteCharacters.slice(offset, offset + sliceSize);
-                  var byteNumbers = new Array(slice.length);
-                  for (var i = 0; i < slice.length; i++) {
-                      byteNumbers[i] = slice.charCodeAt(i);
-                  }
-                  var byteArray = new Uint8Array(byteNumbers);
-                  byteArrays.push(byteArray);
-              }
-            var blob = new Blob(byteArrays, {type: contentType});
-            return blob;
-          }
+
 
             $(document).ready(function() {
               $( '#fileinput-img-{{field.name}}' ).load(function() {
                 $('#fileinput-img-{{field.name}}').fadeIn();
               });
 
-              $('body').on('click', '[id^="btn-image-save"]', function(){
+              $('body').on('click', '#btn-image-save-{{field.name}}', function(){
                 $('#fileinput-img-{{field.name}}').fadeOut();
                 var url = "{{url("uploadImage",{"type":field.imageType, "id": formConstructor.id_object})}}";
                 var image = $('#image-preview-{{field.name}}').find('img').attr('src');
+                console.log(image);
                 var block = image.split(";");
                 var contentType = block[0].split(":")[1];
                 var realData = block[1].split(",")[1];
@@ -144,6 +129,24 @@
 {{ form_end(formConstructor.form) }}
 </div>
 <script>
+
+function b64toBlob(b64Data, contentType, sliceSize) {
+  contentType = contentType || '';
+  sliceSize = sliceSize || 512;
+  var byteCharacters = atob(b64Data);
+  var byteArrays = [];
+  for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+      var slice = byteCharacters.slice(offset, offset + sliceSize);
+      var byteNumbers = new Array(slice.length);
+      for (var i = 0; i < slice.length; i++) {
+          byteNumbers[i] = slice.charCodeAt(i);
+      }
+      var byteArray = new Uint8Array(byteNumbers);
+      byteArrays.push(byteArray);
+  }
+var blob = new Blob(byteArrays, {type: contentType});
+return blob;
+}
 	$(document).ready(function() {
     {# Date time fields #}
 

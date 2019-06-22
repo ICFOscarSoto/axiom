@@ -97,6 +97,11 @@ class HRClocks
     */
    private $enddevice;
 
+   /**
+    * @ORM\Column(type="string", length=150, nullable=true)
+    */
+   private $observations;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -290,6 +295,18 @@ class HRClocks
     public function setEnddevice(?GlobaleClockDevices $enddevice): self
     {
         $this->enddevice = $enddevice;
+
+        return $this;
+    }
+
+    public function getObservations(): ?string
+    {
+        return $this->observations;
+    }
+
+    public function setObservations(?string $observations): self
+    {
+        $this->observations = $observations;
 
         return $this;
     }

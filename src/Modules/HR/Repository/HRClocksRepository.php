@@ -117,6 +117,17 @@ class HRClocksRepository extends ServiceEntityRepository
       $stmt->execute();
       return $stmt->fetch();
     }
+
+    public function dayClocks($worker, $day){
+
+      $query="SELECT TIME(start) start, TIME(end) end, time, observations from hrclocks
+              WHERE worker_id = :worker AND DATE(start) = :start AND deleted=0 AND active=1
+              ORDER BY start ASC";
+
+      $params=['worker' => $worker->getId(), 'start' => $day];
+      return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+    }
+
     /*
     public function findOneBySomeField($value): ?HRClocks
     {

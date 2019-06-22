@@ -1,6 +1,5 @@
 [
   {"id" : "addClockTop", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"dataClocks", "routeParams":{"worker":"worker_id"}, "modal":"clocks", "actionType" : "background", "confirm" :false, "tooltip" : "Crear nuevo fichaje"},
-  {"id" : "deleteClockTop", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true},
-  {"id" : "printClockTop", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false},
+  {"id" : "printClockTop", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :true},
   {"id" : "exportClockTop", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"exportWorkerClocks", "routeParams":{"id":"worker_id"}, "addSearch":true, "confirm" :false}
 ]

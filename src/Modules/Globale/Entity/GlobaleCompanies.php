@@ -126,14 +126,19 @@ class GlobaleCompanies
      * @ORM\Column(type="string", length=16, nullable=true)
      */
     private $devicepassword;
+
+    /**
+     * @ORM\Column(type="string", length=20, nullable=true)
+     */
+    private $ss;
 	public function __construct()
-                                 {
-                                     $this->userGroups = new ArrayCollection();
-                                     $this->users = new ArrayCollection();
-                                     $this->menuOptions = new ArrayCollection();
-                                     $this->dateadd = new \Datetime();
-                                     $this->dateupd =  new \Datetime();
-                                 }
+                                          {
+                                              $this->userGroups = new ArrayCollection();
+                                              $this->users = new ArrayCollection();
+                                              $this->menuOptions = new ArrayCollection();
+                                              $this->dateadd = new \Datetime();
+                                              $this->dateupd =  new \Datetime();
+                                          }
 
     public function getId(): ?int
     {
@@ -457,6 +462,18 @@ class GlobaleCompanies
     public function setDevicepassword(?string $devicepassword): self
     {
         $this->devicepassword = $devicepassword;
+
+        return $this;
+    }
+
+    public function getSs(): ?string
+    {
+        return $this->ss;
+    }
+
+    public function setSs(?string $ss): self
+    {
+        $this->ss = $ss;
 
         return $this;
     }

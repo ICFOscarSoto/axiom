@@ -1,0 +1,63 @@
+<div class="modal fade" tabindex="-1" id="clockprint-modal-form" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content" style="transform: matrix(1, 0, 0, 1, 0, 0);">
+				<div class="modal-header">
+					<h4 class="modal-title">{{ ("Generate report")|trans }}</h4>
+				</div>
+          <div id="clockprint-modal-form-body">
+            <div class="panel minimal">
+              <div class="panel-heading">
+                <div class="panel-title">{{ ("Date")|trans }}</div>
+              </div>
+              <div class="panel-body">
+              <div class="row">
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label for="form_startLongitude">{{ ("Year")|trans }}</label>
+                    <input type="number" id="clockprint-year" class="form-control" value="{{ "now"|date("Y") }}">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label for="form_startLongitude">{{ ("Month")|trans }}</label>
+                    <select class="form-control" id="clockprint-month">
+                      <option value="1">{{ ("January")|trans }}</option>
+                      <option value="2">{{ ("February")|trans }}</option>
+                      <option value="3">{{ ("March")|trans }}</option>
+                      <option value="4">{{ ("April")|trans }}</option>
+                      <option value="5">{{ ("May")|trans }}</option>
+                      <option value="6">{{ ("June")|trans }}</option>
+                      <option value="7">{{ ("July")|trans }}</option>
+                      <option value="8">{{ ("August")|trans }}</option>
+                      <option value="9">{{ ("September")|trans }}</option>
+                      <option value="10">{{ ("October")|trans }}</option>
+                      <option value="11">{{ ("November")|trans }}</option>
+                      <option value="12">{{ ("December")|trans }}</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+          </br></br>
+        </div>
+        </div>
+          <div id="clockprint-modal-new-calendar-footer" class="modal-footer">
+            <button type="button" class="btn btn-primary" id="clockprint-modal-view-button" data-dismiss="modal">{{ ("View")|trans }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  $(document).ready(function() {
+    $('body').on('click', "#printClockTop-top-button-foreground", function(event) {
+        event.preventDefault();
+        $("#clockprint-modal-form").modal('show');
+    });
+    $('body').on('click', "#clockprint-modal-view-button", function(event) {
+        event.preventDefault();
+        window.open('/api/HR/'+$('#id-parent').val()+'/'+$('#clockprint-year').val()+'/'+$('#clockprint-month').val()+'/clocks/print', '_blank');
+    });
+
+  });
+  </script>

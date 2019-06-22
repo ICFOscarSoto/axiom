@@ -22,6 +22,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use App\Modules\HR\Utils\HRClocksUtils;
 use App\Modules\HR\Entity\HRClocks;
 use App\Modules\HR\Entity\HRWorkers;
+use App\Modules\HR\Reports\HRClocksReports;
 
 
 class HRClocksController extends Controller
@@ -125,7 +126,7 @@ class HRClocksController extends Controller
 													  "Last month"=>["data"=>$clocksrepository->lastMonthClocks($worker), "class"=>"tile-primary"],
 													  "This year"=>["data"=>$clocksrepository->thisYearClocks($worker), "class"=>"tile-blue"],
 														"Last year"=>["data"=>$clocksrepository->lastYearClocks($worker), "class"=>"tile-primary"]],
-					'include_post_templates' => ['@HR/location.html.twig'],
+					'include_post_templates' => ['@HR/location.html.twig', '@HR/clocksprintselect.html.twig'],
 					'include_pre_templates' => ['@HR/clockssummary.html.twig']
 					]);
 			}
@@ -196,6 +197,23 @@ class HRClocksController extends Controller
 			 return $result;
 			 //return new Response('');
 		 }
+
+		 /**
+ 		 * @Route("/api/HR/{id}/{year}/{month}/clocks/print", name="printWorkerClocks")
+ 		 */
+ 		 public function print($id,$year,$month, Request $request){
+ 			 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+  		 $this->denyAccessUnlessGranted('ROLE_ADMIN');
+			 $workerRepository=$this->getDoctrine()->getRepository(HRWorkers::class);
+			 $worker = $workerRepository->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany()]);
+			 if($worker){
+				 $params=["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "id"=>$id, "user"=>$this->getUser(), "year"=>$year, "month"=>$month];
+				 $reportsUtils = new HRClocksReports();
+				 $pdf=$reportsUtils->create($params);
+				 return new Response($pdf, 200, array('Content-Type' => 'application/pdf'));
+		 	 }else return new Response('');
+ 			 //return new Response('');
+ 		 }
 
 
 
