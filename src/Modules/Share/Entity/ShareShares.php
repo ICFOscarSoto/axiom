@@ -97,7 +97,7 @@ class ShareShares
 
         return $this;
     }*/
-
+/*
     public function getUserGroup(): ?GlobaleUserGroups
     {
         return $this->userGroup;
@@ -109,7 +109,7 @@ class ShareShares
 
         return $this;
     }
-
+*/
     public function getReadOnly(): ?bool
     {
         return $this->readOnly;
