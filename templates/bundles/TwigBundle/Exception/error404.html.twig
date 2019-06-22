@@ -16,7 +16,7 @@
 <div class="page-container"><!-- add class "sidebar-collapsed" to close sidebar by default, "chat-visible" to make chat appear always -->
 
 	<div class="main-content">
-		{{ include('@Globale/head.html.twig') }}
+
 		<hr />
 
 		<!-- MAIN CONTENT -->
@@ -28,14 +28,13 @@
         We will fix it as soon as possible. Sorry for any inconvenience caused.
     </div>
 		<!-- END MAIN CONTENT -->
-		{{ include('@Globale/footer.html.twig') }}
+
 	</div>
 
 </div>
 	<!-- MODALS  -->
 	<!-- END MODALS -->
 {% block footer %}
-    {{ include('@Globale/bottom.html.twig') }}
 	<link rel="stylesheet" href="{{ url('index') }}css/font-icons/font-awesome/css/font-awesome.min.css">
 	<!-- Imported scripts on this page -->
 		<script src="{{ url('index') }}js/bootstrap-switch.min.js"></script>
