@@ -123,11 +123,12 @@ class GlobaleImagesController extends Controller implements ContainerAwareInterf
 			    mkdir($basePath.'images'.DIRECTORY_SEPARATOR.$type, 0777, true);
 			}else{
 				//If dir exist clear interface
-				$files = glob($basePath.'images'.DIRECTORY_SEPARATOR.$type.DIRECTORY_SEPARATOR.'*'); // get all file names
+				//No estoy seguro de que esto haga falta
+				/*$files = glob($basePath.'images'.DIRECTORY_SEPARATOR.$type.DIRECTORY_SEPARATOR.'*'); // get all file names
 				foreach($files as $file){ // iterate files
 				  if(is_file($file))
 				    unlink($file); // delete file
-				}
+				}*/
 			}
 
 			//50 256 640 1024
