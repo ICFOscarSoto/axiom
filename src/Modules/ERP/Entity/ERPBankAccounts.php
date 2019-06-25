@@ -4,6 +4,7 @@ namespace App\Modules\ERP\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\ERP\Entity\ERPSuppliers;
+use \App\Modules\Globale\Entity\GlobaleCompanies;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPBankAccountsRepository")
@@ -53,10 +54,30 @@ class ERPBankAccounts
     private $deleted;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPSuppliers")
+     * @ORM\Column(type="string", length=150, nullable=true)
+     */
+    private $socialname;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $sepacore;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $sepab2b;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCompanies")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $supplier;
+    private $company;
+
+    /**
+     * @ORM\Column(type="string", length=150, nullable=true)
+     */
+    private $creditoridentifier;
 
     public function getId(): ?int
     {
@@ -147,14 +168,62 @@ class ERPBankAccounts
         return $this;
     }
 
-    public function getSupplier(): ?ERPSuppliers
+    public function getSocialname(): ?string
     {
-        return $this->supplier;
+        return $this->socialname;
     }
 
-    public function setSupplier(?ERPSuppliers $supplier): self
+    public function setSocialname(?string $socialname): self
     {
-        $this->supplier = $supplier;
+        $this->socialname = $socialname;
+
+        return $this;
+    }
+
+    public function getSepacore(): ?bool
+    {
+        return $this->sepacore;
+    }
+
+    public function setSepacore(?bool $sepacore): self
+    {
+        $this->sepacore = $sepacore;
+
+        return $this;
+    }
+
+    public function getSepab2b(): ?bool
+    {
+        return $this->sepab2b;
+    }
+
+    public function setSepab2b(?bool $sepab2b): self
+    {
+        $this->sepab2b = $sepab2b;
+
+        return $this;
+    }
+
+    public function getCompany(): ?GlobaleCompanies
+    {
+        return $this->company;
+    }
+
+    public function setCompany(?GlobaleCompanies $company): self
+    {
+        $this->company = $company;
+
+        return $this;
+    }
+
+    public function getCreditoridentifier(): ?string
+    {
+        return $this->creditoridentifier;
+    }
+
+    public function setCreditoridentifier(?string $creditoridentifier): self
+    {
+        $this->creditoridentifier = $creditoridentifier;
 
         return $this;
     }

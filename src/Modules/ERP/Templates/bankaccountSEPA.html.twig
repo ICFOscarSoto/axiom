@@ -1,0 +1,25 @@
+<div class="panel minimal">
+  <div class="panel-body">
+    <div class="btn-group">
+      <a attr-search=" false " attr-href="" href="javascript:void(0);" style="font-size: 12px" id="addTop-top-button-print-sepacore" type="button" class="btn tooltip-primary btn-default" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Imprimir mandato SEPA">
+      	<i class="fa fa-print"></i>&nbsp;&nbsp;SEPA CORE
+      </a>
+      </div>
+      <div class="btn-group">
+      <a attr-search=" false " attr-href="" href="javascript:void(0);" style="font-size: 12px" id="addTop-top-button-print-sepab2b" type="button" class="btn tooltip-primary btn-default" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Imprimir mandato SEPA">
+      	<i class="fa fa-print"></i>&nbsp;&nbsp;SEPA B2B
+      </a>
+  </div>
+</div>
+</div>
+</br></br></br>
+<script>
+$(document).ready(function(){
+  $('body').on('click', '#addTop-top-button-print-sepacore', function(){
+    window.open('/api/globale/'+$("#id-parent").val()+'/sepa/core/print', '_blank');
+  });
+  $('body').on('click', '#addTop-top-button-print-sepacore', function(){
+    window.open('/api/globale/'+$("#id-parent").val()+'/sepa/core/print', '_blank');
+  });
+});
+</script>

@@ -1,7 +1,7 @@
 <?php
 namespace App\Modules\Globale\Utils;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use App\Modules\Globale\Utils\GlobaleJsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -33,7 +33,8 @@ class GlobaleFormUtils extends Controller
   private $form;
   private $values=array();
   private $routeParams=array();
-
+  private $includePreTemplate=array();
+  private $includePostTemplate=array();
 
   //OLD INIT, ONLY FOR COMPATIBILITY
   public function init($doctrine, $request){
@@ -42,7 +43,7 @@ class GlobaleFormUtils extends Controller
     $this->entityManager=$this->doctrine->getManager();
   }
 
-  public function initialize($user, $obj, $template, $request, $controller, $doctrine, $excludedAttributes=array(), $includedAttributes=array(), $encoder=null, $routeParams=[]){
+  public function initialize($user, $obj, $template, $request, $controller, $doctrine, $excludedAttributes=array(), $includedAttributes=array(), $encoder=null, $routeParams=[], $includePreTemplate=[], $includePostTemplate=[]){
     $this->user=$user;
     $this->obj=$obj;
     $this->request=$request;
@@ -57,6 +58,8 @@ class GlobaleFormUtils extends Controller
     $this->entityManager=$this->doctrine->getManager();
     $this->encoder=$encoder;
     $this->routeParams=$routeParams;
+    $this->includePostTemplate=$includePostTemplate;
+    $this->includePreTemplate=$includePreTemplate;
 
     //Set active by default in new objects
     if($obj->getId()===null && method_exists($obj, 'setActive')){
@@ -200,14 +203,17 @@ class GlobaleFormUtils extends Controller
 					 //$result=((!is_bool($this->obj) && $this->obj->getId()!==FALSE)?true:false);
            if($returnRoute==null)$returnRoute=$this->request->get('_route');
            $routeParams=array_merge($this->routeParams, ["id"=>$this->obj->getId()]);
-           $route=$result?(($id!=$this->obj->getId())?$this->controller->generateUrl($returnRoute,$routeParams):''):'';
-					 return new JsonResponse(array('result' => $result, 'href' =>$route, 'reload' =>$result?(($id!=$this->obj->getId())?true:false):'', 'id' => $result?$this->obj->getId():''));
+           $route=$result?(($id!=$this->obj->getId())? $returnRoute=='none'?'':$this->controller->generateUrl($returnRoute,$routeParams) :''):'';
+					 return new GlobaleJsonResponse(array('result' => $result, 'href' =>$route, 'reload' =>$result?(($id!=$this->obj->getId())?($returnRoute=='none'?false:true):false):'', 'id' => $result?$this->obj->getId():''));
+           //return array('result' => $result, 'href' =>$route, 'reload' =>$result?(($id!=$this->obj->getId())?($returnRoute=='none'?false:true):false):'', 'id' => $result?$this->obj->getId():'');
 				 break;
 				 case 'read':
              $routeParams=array_merge($this->routeParams, ["id"=>$id, "action"=>"save"]);
              $route=$this->controller->generateUrl($this->request->get('_route'),$routeParams);
 						 return $this->controller->render($render, array(
               'includes' => $includesArray,
+              'include_pre_templates' => $this->includePreTemplate,
+              'include_post_templates' => $this->includePostTemplate,
               'formConstructor' => ["id"=>$id, "id_object"=>$id, "name"=>$name, "form" => $form->createView(), "type" => $type, "post"=>$route, "template" => json_decode(file_get_contents ($this->template),true)]
 					    ));
 				break;

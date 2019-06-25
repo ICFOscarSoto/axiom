@@ -125,9 +125,7 @@ class HRClocksController extends Controller
 													  "This month"=>["data"=>$clocksrepository->thisMonthClocks($worker), "class"=>"tile-blue"],
 													  "Last month"=>["data"=>$clocksrepository->lastMonthClocks($worker), "class"=>"tile-primary"],
 													  "This year"=>["data"=>$clocksrepository->thisYearClocks($worker), "class"=>"tile-blue"],
-														"Last year"=>["data"=>$clocksrepository->lastYearClocks($worker), "class"=>"tile-primary"]],
-					'include_post_templates' => ['@HR/location.html.twig', '@HR/clocksprintselect.html.twig'],
-					'include_pre_templates' => ['@HR/clockssummary.html.twig']
+														"Last year"=>["data"=>$clocksrepository->lastYearClocks($worker), "class"=>"tile-primary"]]
 					]);
 			}
 			return new RedirectResponse($this->router->generate('app_login'));

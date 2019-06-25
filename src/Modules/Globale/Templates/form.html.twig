@@ -1,3 +1,4 @@
+
 <div {% if formConstructor.name is defined %} id="{{formConstructor.name}}-form-body" {% endif %}>
 {{ form_start(formConstructor.form) }}
   {% set counter = 1 %}
@@ -9,6 +10,13 @@
     </div>
   </div>
   {% endif %}
+
+  {% if include_pre_templates is defined %}
+  	{% for template in include_pre_templates %}
+  		{{ include(template) }}
+  	{% endfor %}
+  {% endif %}
+
   {% for section in formConstructor.template.0.sections %}
 
   <div class="panel minimal">
@@ -102,6 +110,11 @@
     </div>
   </div>
   {% endfor %}
+  {% if include_post_templates is defined %}
+  	{% for template in include_post_templates %}
+  		{{ include(template) }}
+  	{% endfor %}
+  {% endif %}
   {# -------------  INCLUDES TEMPLATES -----------------#}
   {% set cloudConstructor = null %}
   {% if includes is defined %}
@@ -227,8 +240,5 @@ return blob;
         {% endif %}
       {% endfor %}
     {% endfor %}
-
-
-
   });
 </script>

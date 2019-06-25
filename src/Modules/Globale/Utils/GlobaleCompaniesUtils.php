@@ -10,6 +10,10 @@ use App\Modules\Email\Entity\GlobaleEmailAccounts;
 
 class GlobaleCompaniesUtils
 {
+public function getExcludedForm(){
+  return ['bankaccount'];
+}
+
   public function formatList($user){
     $list=[
       'id' => 'listCompanies',

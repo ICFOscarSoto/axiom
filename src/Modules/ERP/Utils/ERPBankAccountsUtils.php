@@ -20,35 +20,20 @@ class ERPBankAccountsUtils
       'orderColumn' => 1,
       'orderDirection' => 'DESC',
       'tagColumn' => 2,
-      'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/BankAccounts.json"),true),
-      'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/BankAccountsFieldButtons.json"),true),
-      'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/BankAccountsTopButtons.json"),true)
+      'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../../ERP/Lists/BankAccounts.json"),true),
+      'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../../ERP/Lists/BankAccountsFieldButtons.json"),true),
+      'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../../ERP/Lists/BankAccountsTopButtons.json"),true)
     ];
     return $list;
   }
 
   public function getExcludedForm($params){
-    return ['supplier'];
+    return [];
   }
 
   public function getIncludedForm($params){
     $doctrine=$params["doctrine"];
     $user=$params["user"];
-    $supplier=$params["supplier"];
-    $suppliersRepository=$doctrine->getRepository(ERPSuppliers::class);
-    return [
-    ['supplier', ChoiceType::class, [
-      'required' => false,
-      'disabled' => false,
-      'attr' => ['class' => 'select2', 'readonly' => true],
-      'choices' => $suppliersRepository->findBy(["id"=>$supplier->getId()]),
-      'placeholder' => 'Select a supplier',
-      'choice_label' => function($obj, $key, $index) {
-          return $obj->getSocialname();
-      },
-      'choice_value' => 'id',
-      'data' => $supplier
-    ]]
-  ];
+    return [];
   }
 }

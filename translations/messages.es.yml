@@ -39,8 +39,10 @@ November: Noviembre
 December: Diciembre
 Generate report: Generar informe
 View: Ver
-
-
+Creditoridentifier: Identificador acreedor SEPA
+Banckaccounts data: Datos bancarios
+Sepacore: SEPA Core firmado
+Sepab2b: SEPA B2B firmado
 
 #COUNTRIES
 #----------------------------------------------------------------------------------------------------------------------

@@ -17,6 +17,10 @@ use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\Globale\Utils\GlobaleCompaniesUtils;
+use App\Modules\Globale\Reports\GlobaleSEPAReports;
+use App\Modules\ERP\Utils\ERPBankAccountsUtils;
+use App\Modules\ERP\Entity\ERPBankAccounts;
+use App\Modules\Cloud\Utils\CloudFilesUtils;
 //use App\Modules\Globale\UtilsEntityUtils;
 //use App\Modules\Form\Controller\FormController;
 
@@ -25,6 +29,104 @@ class GlobaleCompaniesController extends Controller
 
 	 private $class=GlobaleCompanies::class;
 	 private $utilsClass=GlobaleCompaniesUtils::class;
+
+
+
+	 /**
+	  * @Route("/{_locale}/globale/company/form/{id}", name="formCompany", defaults={"id"=0})
+	  */
+	  public function formCompany($id, Request $request){
+	 	$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+	 	$this->denyAccessUnlessGranted('ROLE_GLOBAL');
+	 	$new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-new"];
+	 	$template=dirname(__FILE__)."/../Forms/Companies.json";
+	 	$userdata=$this->getUser()->getTemplateData();
+	 	$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
+	 	$breadcrumb=$menurepository->formatBreadcrumb('companies');
+	 	array_push($breadcrumb, $new_breadcrumb);
+	 	$repository=$this->getDoctrine()->getRepository($this->class);
+	 	$obj = $repository->findOneBy(['id'=>$id, 'deleted'=>0]);
+	 	$entity_name=$obj?$obj->getSocialname().' ('.$obj->getVat().')':'';
+	 	return $this->render('@Globale/generictabform.html.twig', array(
+	 					'entity_name' => $entity_name,
+	 					'controllerName' => 'CompaniesController',
+	 					'interfaceName' => 'Empresas',
+	 					'optionSelected' => 'companies',
+	 					'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
+	 					'breadcrumb' => $breadcrumb,
+	 					'userData' => $userdata,
+	 					'id' => $id,
+	 					'tab' => $request->query->get('tab','data'), //Show initial tab, by default data tab
+	 					'tabs' => [["name" => "data", "caption"=>"Datos empresa", "icon"=>"entypo-book-open","active"=>true, "route"=>$this->generateUrl("dataCompany",["id"=>$id])],
+	 										 ["name" => "bank", "icon"=>"fa fa-headphones", "caption"=>"Datos bancarios", "route"=>$this->generateUrl("dataCompanyBankAccounts",["identity"=>$id,"id"=>$obj?($obj->getBankaccount()?$obj->getBankaccount()->getId():0):0])],
+	 										 ["name" => "files", "icon"=>"fa fa-cloud", "caption"=>"Archivos", "route"=>$this->generateUrl("cloudfiles",["id"=>$id, "path"=>"companies"])]
+	 										],
+	 					'include_header' => [["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker-es.js"]],
+	 					'include_footer' => [["type"=>"css", "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.css"],
+	 															 ["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.js"]]
+	 					/*'tabs' => [["name" => "data", "caption"=>"Datos trabajador", "active"=>$tab=='data'?true:false, "route"=>$this->generateUrl("dataWorker",["id"=>$id])],
+	 										 ["name" => "paymentroll", "active"=>($tab=='paymentroll' && $id)?true:false, "caption"=>"Nóminas"]
+	 										]*/
+	 	));
+	 }
+	 /**
+	  * @Route("/{_locale}/company/bankaccount/data/{id}/{action}/{identity}", name="dataCompanyBankAccounts", defaults={"id"=0, "action"="read", "identity"=0})
+	  */
+	  public function dataCompanyBankAccounts($id, $action, $identity, Request $request)
+	  {
+	  $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+	  $this->denyAccessUnlessGranted('ROLE_ADMIN');
+	  $template=dirname(__FILE__)."/../../ERP/Forms/BankAccounts.json";
+	  $utils = new GlobaleFormUtils();
+	  $utilsObj=new ERPBankAccountsUtils();
+	  if($identity==0) $identity=$request->query->get('entity');
+	  $bankaccountRepository=$this->getDoctrine()->getRepository(ERPBankAccounts::class);
+	  $obj=new ERPBankAccounts();
+	  if($id==0){
+	 	if($identity==0 ) $identity=$request->query->get('entity');
+	 	if($identity==0 || $identity==null) $identity=$request->request->get('id-parent',0);
+	 }else $obj = $bankaccountRepository->find($id);
+	  $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), ];
+	  $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),
+	 												method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[],null, ["identity"=>$identity],
+													[],['@ERP/bankaccountSEPA.html.twig']
+												);
+
+	 	//-----------------   CLOUD ----------------------
+	 	$utilsCloud = new CloudFilesUtils();
+	 	$path="bankaccounts";
+	 	$templateLists=["id"=>$path,"list"=>[$utilsCloud->formatList($this->getUser(),$path,$id)],"path"=>$this->generateUrl("cloudUpload",["id"=>$id, "path"=>$path])];
+	 	//------------------------------------------------
+
+		$return=$utils->make($id, ERPBankAccounts::class, $action, "formIdentities", "full", "@Globale/form.html.twig", 'none', null, ["filesERPBankAccounts"=>["template"=>"@Cloud/genericlistfiles.html.twig", "vars"=>["cloudConstructor"=>$templateLists]]]);
+		dump(get_class($return));
+		if(is_a($return,'App\Modules\Globale\Utils\GlobaleJsonResponse')){
+			$returnArray=json_decode($return->getData(), true);
+			dump($returnArray);
+			if($returnArray["result"]==true){
+				$repository=$this->getDoctrine()->getRepository($this->class);
+			 	$company = $repository->findOneBy(['id'=>$identity]);
+				dump($request);
+				dump($company);
+				$bankAccount=$bankaccountRepository->find($returnArray["id"]);
+					dump($bankAccount);
+				$company->setBankaccount($bankAccount);
+				$this->getDoctrine()->getManager()->persist($company);
+				$this->getDoctrine()->getManager()->flush();
+			}
+		}
+		return $return;
+
+
+
+
+	  //return $utils->make($id, $this->class, $action, "formIdentities", "modal");
+	 }
+
+
+
+
+
 
     /**
      * @Route("/{_locale}/admin/global/companies", name="companies")
@@ -99,35 +201,24 @@ class GlobaleCompaniesController extends Controller
 	    return $utils->make($id, $this->class, $action, "formCompany", "full", "@Globale/form.html.twig", 'formCompany', $this->utilsClass);
 	  }
 
-	  /**
-	   * @Route("/{_locale}/company/form/{id}", name="formCompany", defaults={"id"=0})
-	   */
-	   public function form($id, Request $request){
-	    $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-	    $this->denyAccessUnlessGranted('ROLE_ADMIN');
-	    $new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-new"];
-	    $template=dirname(__FILE__)."/../Forms/Companies.json";
-	    $userdata=$this->getUser()->getTemplateData();
-	    $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
-	    $breadcrumb=$menurepository->formatBreadcrumb('companies');
-	    array_push($breadcrumb, $new_breadcrumb);
-	    $utils = new GlobaleFormUtils();
-	    $utilsObj=new $this->utilsClass();
-	    $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser()];
-	    $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
-	    return $this->render('@Globale/genericform.html.twig', array(
-	            'controllerName' => 'UsersController',
-	            'interfaceName' => 'Empresas',
-	            'optionSelected' => 'companies',
-	            'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
-	            'breadcrumb' => $breadcrumb,
-	            'userData' => $userdata,
-	            'id' => $id,
-	            'route' => $this->generateUrl("dataCompany",["id"=>$id]),
-	            'form' => $utils->formatForm('formcompany', true, $id, $this->class, 'dataCompany')
 
-	    ));
-	  }
+		/**
+		* @Route("/api/globale/{id}/sepa/{type}/print", name="printSEPA")
+		*/
+		public function print($id, $type, Request $request){
+			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			$this->denyAccessUnlessGranted('ROLE_GLOBAL');
+			$companyRepository=$this->getDoctrine()->getRepository($this->class);
+			$company = $companyRepository->findOneBy(["id"=>$id]);
+			if($company){
+				$params=["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "user"=>$this->getUser(), "id"=>$id, "company"=>$company, "type"=>$type];
+				$reports = new GlobaleSEPAReports();
+				$pdf=$reports->create($params);
+				return new Response($pdf, 200, array('Content-Type' => 'application/pdf'));
+			}else return new Response('');
+			//return new Response('');
+		}
+
 
 	/**
 	* @Route("/{_locale}/admin/global/companies/{id}/disable", name="disableCompany")

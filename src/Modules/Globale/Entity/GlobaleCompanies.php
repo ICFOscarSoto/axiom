@@ -5,6 +5,7 @@ namespace App\Modules\Globale\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use \App\Modules\ERP\Entity\ERPBankAccounts;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\Globale\Repository\GlobaleCompaniesRepository")
@@ -131,14 +132,19 @@ class GlobaleCompanies
      * @ORM\Column(type="string", length=20, nullable=true)
      */
     private $ss;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPBankAccounts" , fetch="EAGER")
+     */
+    private $bankaccount;
 	public function __construct()
-                                          {
-                                              $this->userGroups = new ArrayCollection();
-                                              $this->users = new ArrayCollection();
-                                              $this->menuOptions = new ArrayCollection();
-                                              $this->dateadd = new \Datetime();
-                                              $this->dateupd =  new \Datetime();
-                                          }
+                                                      {
+                                                          $this->userGroups = new ArrayCollection();
+                                                          $this->users = new ArrayCollection();
+                                                          $this->menuOptions = new ArrayCollection();
+                                                          $this->dateadd = new \Datetime();
+                                                          $this->dateupd =  new \Datetime();
+                                                      }
 
     public function getId(): ?int
     {
@@ -438,7 +444,7 @@ class GlobaleCompanies
             if(!file_exists($dest)) mkdir($dest . DIRECTORY_SEPARATOR . $iterator->getSubPathName());
           } else {
               if(!file_exists(dirname($dest.DIRECTORY_SEPARATOR.$iterator->getSubPathName()))) mkdir(dirname($dest.DIRECTORY_SEPARATOR.$iterator->getSubPathName()), 0775);
-              
+
               if(!file_exists($dest.DIRECTORY_SEPARATOR.$iterator->getSubPathName())) copy($item, $dest . DIRECTORY_SEPARATOR . $iterator->getSubPathName());
 
           }
@@ -477,6 +483,18 @@ class GlobaleCompanies
     public function setSs(?string $ss): self
     {
         $this->ss = $ss;
+
+        return $this;
+    }
+
+    public function getBankaccount(): ?ERPBankAccounts
+    {
+        return $this->bankaccount;
+    }
+
+    public function setBankaccount(?ERPBankAccounts $bankaccount): self
+    {
+        $this->bankaccount = $bankaccount;
 
         return $this;
     }

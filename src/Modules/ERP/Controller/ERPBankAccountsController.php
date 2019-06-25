@@ -46,7 +46,9 @@ class ERPBankAccountsController extends Controller
   			return $this->render('@Globale/list.html.twig', [
 					'listConstructor' => $templateLists,
 					'forms' => $templateForms,
-					'entity_id' => $id
+					'entity_id' => $id,
+					'include_post_templates' => [],
+					'include_pre_templates' => ['@ERP/banckaccountSEPA.html.twig']
   				]);
   		}
   		return new RedirectResponse($this->router->generate('app_login'));
