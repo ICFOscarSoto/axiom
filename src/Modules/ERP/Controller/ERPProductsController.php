@@ -160,7 +160,6 @@ class ERPProductsController extends Controller
 			if (!$obj) {
         throw $this->createNotFoundException('No product found for id '.$id );
 			}
-			dump ($obj);
 			return new JsonResponse();
 			return new JsonResponse($company->encodeJson());
     }

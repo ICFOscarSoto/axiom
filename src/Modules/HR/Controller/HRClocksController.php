@@ -321,7 +321,6 @@ class HRClocksController extends Controller
 			if (!$obj) {
         throw $this->createNotFoundException('No worker found for id '.$id );
 			}
-			dump ($obj);
 			return new JsonResponse();
 			return new JsonResponse($company->encodeJson());
 		}

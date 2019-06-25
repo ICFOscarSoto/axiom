@@ -99,17 +99,12 @@ class GlobaleCompaniesController extends Controller
 	 	//------------------------------------------------
 
 		$return=$utils->make($id, ERPBankAccounts::class, $action, "formIdentities", "full", "@Globale/form.html.twig", 'none', null, ["filesERPBankAccounts"=>["template"=>"@Cloud/genericlistfiles.html.twig", "vars"=>["cloudConstructor"=>$templateLists]]]);
-		dump(get_class($return));
 		if(is_a($return,'App\Modules\Globale\Utils\GlobaleJsonResponse')){
 			$returnArray=json_decode($return->getData(), true);
-			dump($returnArray);
 			if($returnArray["result"]==true){
 				$repository=$this->getDoctrine()->getRepository($this->class);
 			 	$company = $repository->findOneBy(['id'=>$identity]);
-				dump($request);
-				dump($company);
 				$bankAccount=$bankaccountRepository->find($returnArray["id"]);
-					dump($bankAccount);
 				$company->setBankaccount($bankAccount);
 				$this->getDoctrine()->getManager()->persist($company);
 				$this->getDoctrine()->getManager()->flush();
@@ -181,7 +176,7 @@ class GlobaleCompaniesController extends Controller
 			if (!$company) {
         throw $this->createNotFoundException('No company found for id '.$id );
 			}
-			dump ($company);
+
 			return new JsonResponse();
 			return new JsonResponse($company->encodeJson());
 		}
