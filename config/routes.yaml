@@ -31,6 +31,10 @@ ClockDevicesWorkers:
     resource: 'App\Modules\Globale\Controller\GlobaleClockDevicesWorkersController'
     type:     annotation
 
+FirebaseDevices:
+    resource: 'App\Modules\Globale\Controller\GlobaleFirebaseDevicesController'
+    type:     annotation
+
 Customer:
     resource: 'App\Modules\ERP\Controller\ERPCustomersController'
     type:     annotation
