@@ -27,7 +27,7 @@ class GlobaleFirebaseDevicesController extends Controller
   public function setFirebaseToken($deviceid, Request $request){
    $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
    $devicesrepository=$this->getDoctrine()->getRepository($this->class);
-   $token=$request->query->get('token');
+   $token=$request->request->get('TOKEN');
 
      $device=$devicesrepository->findOneBy(["deviceid"=>$deviceid, "deleted"=>0, "active"=>1], ['id'=>'DESC']);
      if($device===NULL){
