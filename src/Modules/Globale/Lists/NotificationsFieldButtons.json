@@ -1,0 +1,5 @@
+[
+  {"id": "status", "type": "option", "options": [
+            {"id": "unreaded", "type" : "info", "condition": "readed", "conditionValue" :false, "icon" : "fa fa-eye","name" : "leer", "route":"notificationsRead", "confirm" :true, "actionType" : "background" }
+  ]}
+]

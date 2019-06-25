@@ -41,13 +41,10 @@ class GlobaleNotificationsController extends Controller
 		$listNotifications['orderColumn'] = 2;
 		$listNotifications['orderDirection'] = 'DESC';
 		$listNotifications['tagColumn'] = 0;
-		$listNotifications['fieldButtons'] = array(
-			array("id" => "read", "type" => "info", "condition"=> "readed", "conditionValue" =>false , "icon" => "fa fa-eye-slash","name" => "leer", "route"=>"notificationsRead", "confirm" =>false, "actionType" => "background" )
-
-		);
+		$listNotifications['fieldButtons'] = json_decode(file_get_contents (dirname(__FILE__)."/../Lists/NotificationsFieldButtons.json"),true);
 		$listNotifications['topButtons'] = array(
-			array("id" => "printTop", "type" => "", "icon" => "fa fa-print","name" => "", "route"=>"editCompany", "confirm" =>false),
-			array("id" => "exportTop", "type" => "", "icon" => "fa fa-file-excel-o","name" => "", "route"=>"editCompany", "confirm" =>false)
+			array("id" => "printTop", "type" => "", "icon" => "fa fa-print","name" => "", "route"=>"", "confirm" =>false),
+			array("id" => "exportTop", "type" => "", "icon" => "fa fa-file-excel-o","name" => "", "route"=>"", "confirm" =>false)
 		);
 		$templateLists[]=$listNotifications;
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
