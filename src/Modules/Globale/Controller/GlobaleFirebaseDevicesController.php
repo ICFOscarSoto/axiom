@@ -65,7 +65,7 @@ class GlobaleFirebaseDevicesController extends Controller
 			$devicesrepository=$this->getDoctrine()->getRepository($this->class);
 			//Get all devices of user
 			$user=$usersrepository->findOneBy(["id"=>$id, "deleted"=>0, "active"=>1]);
-			$devices=$usersrepository->findBy(["user"=>$user, "deleted"=>0, "active"=>1]);
+			$devices=$devicesrepository->findBy(["user"=>$user, "deleted"=>0, "active"=>1]);
 
 			$token = $token;
 			$serverKey = 'AAAAf9MGJoU:APA91bE6KicZ68wYAnLBfZcawG1vkO3DBdO24CeVFIW0ctkDGiYMJ7AuDq3I7k6nlqsIGIM-0hkpS9YigFWFAreX2CSlWj1YFHNdu5lFfzqxR1mBJ3FS2gOGJfLRnSfYvSOrgZ6cRgI0';
