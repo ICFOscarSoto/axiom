@@ -165,7 +165,7 @@ class HRClocksController extends Controller
           $this->getDoctrine()->getManager()->flush();
 					$notification=new GlobaleNotifications();
 					$notification->setUser($worker->getUser());
-					setlocale(LC_ALL,"es_ES");
+					setlocale(LC_ALL,"es_ES.utf8");
 					$date = new \DateTime();
 					$notification->setText("Jornada laboral iniciada el ".strftime('%A %e de %B a las %H:%M:%S',$date->getTimestamp()));
 					$notification->setDateadd(new \DateTime());
@@ -196,7 +196,7 @@ class HRClocksController extends Controller
           $this->getDoctrine()->getManager()->flush();
 					$notification=new GlobaleNotifications();
 					$notification->setUser($worker->getUser());
-					setlocale(LC_ALL,"es_ES");
+					setlocale(LC_ALL,"es_ES.utf8");
 					$date = new \DateTime();
 					$notification->setText("Jornada laboral finalizada el ".strftime('%A %e de %B a las %H:%M:%S',$date->getTimestamp()));
 					$notification->setDateadd(new \DateTime());
