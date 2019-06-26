@@ -85,7 +85,7 @@ class GlobaleFormUtils extends Controller
     $form=$this->createFromEntity2(!$ajax)->getForm();
     $caption=ucfirst($name);
     $routeParams=array_merge($routeParams, ["id"=>$id, "action"=>"save"]);
-    return ["id"=>$name, "id_object"=>$this->obj->getId(), "name"=>$caption, "form" => $form->createView(), "post"=>$this->controller->generateUrl(($route!=null)?$route:$this->request->get('_route'),$routeParams), "template" => json_decode(file_get_contents ($this->template))];
+    return ["id"=>$name, "id_object"=>!$this->obj->getId()?0:$this->obj->getId(), "name"=>$caption, "form" => $form->createView(), "post"=>$this->controller->generateUrl(($route!=null)?$route:$this->request->get('_route'),$routeParams), "template" => json_decode(file_get_contents ($this->template))];
   }
 
   public function createFromEntity2($includeSave=true){
