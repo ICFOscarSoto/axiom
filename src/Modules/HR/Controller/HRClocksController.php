@@ -173,13 +173,14 @@ class HRClocksController extends Controller
 					$notification->setDeleted(0);
 					$this->getDoctrine()->getManager()->persist($notification);
           $this->getDoctrine()->getManager()->flush();
+					$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
 					 $url = $this->generateUrl(
 	            'sendFirebase',
 	            ['id'  => $worker->getUser()->getId(),
  						 'notificationid' => $notification->getId()]
 	        );
 				  $ch = curl_init();
-					curl_setopt($ch, CURLOPT_URL,$_SERVER['SERVER_NAME'].$url);
+					curl_setopt($ch, CURLOPT_URL,$protocol.$_SERVER['SERVER_NAME'].$url);
 					curl_setopt($ch, CURLOPT_POST, 1);
 					curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 					$result= curl_exec ($ch);
@@ -208,8 +209,9 @@ class HRClocksController extends Controller
 						 ['id'  => $worker->getUser()->getId(),
 						'notificationid' => $notification->getId()]
 				 );
+				 $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
 				 $ch = curl_init();
-				 curl_setopt($ch, CURLOPT_URL,$_SERVER['SERVER_NAME'].$url);
+				 curl_setopt($ch, CURLOPT_URL,$protocol.$_SERVER['SERVER_NAME'].$url);
 				 curl_setopt($ch, CURLOPT_POST, 1);
 				 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 				 $result= curl_exec ($ch);
