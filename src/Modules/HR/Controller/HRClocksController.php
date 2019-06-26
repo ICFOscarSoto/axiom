@@ -182,12 +182,12 @@ class HRClocksController extends Controller
  						 'notificationid' => $notification->getId()]
 	        );
 				  $ch = curl_init();
-					curl_setopt($ch, CURLOPT_URL,$protocol.$_SERVER['SERVER_NAME'].$url);
+					curl_setopt($ch, CURLOPT_URL,"https://axiom.aplicode.com".$url);
 					curl_setopt($ch, CURLOPT_POST, 1);
 					curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 					$result= curl_exec ($ch);
 					//curl_close ($ch);
-					return new JsonResponse(["result"=>1, "url"=>$_SERVER['SERVER_NAME'].$url,"result2"=>$result, "error"=>curl_error($ch)]);
+					return new JsonResponse(["result"=>1]);
 				}else{
 					$lastClock->setEndLatitude($latitude);
 					$lastClock->setEndLongitude($longitude);
@@ -213,12 +213,12 @@ class HRClocksController extends Controller
 				 );
 				 $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
 				 $ch = curl_init();
-				 curl_setopt($ch, CURLOPT_URL,$protocol.$_SERVER['SERVER_NAME'].$url);
+				 curl_setopt($ch, CURLOPT_URL,"https://axiom.aplicode.com".$url);
 				 curl_setopt($ch, CURLOPT_POST, 1);
 				 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 				 $result= curl_exec ($ch);
 				 //curl_close ($ch);
-					return new JsonResponse(["result"=>1,"url"=>$_SERVER['SERVER_NAME'].$url, "result2"=>$result, "error"=>curl_error($ch)]);
+					return new JsonResponse(["result"=>1]);
 				}
 			}else return new JsonResponse(["result"=>-2]);
  		}
