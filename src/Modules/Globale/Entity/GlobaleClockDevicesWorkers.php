@@ -142,4 +142,16 @@ class GlobaleClockDevicesWorkers
 
         return $this;
     }
+
+    public function postProccess($kernel, $doctrine, $user){
+      if($this->getActive() && !$this->getDeleted()){
+        $utils = new GlobaleClockDevicesUtils();
+
+        $params=["id"=>$this->getClockdevice()->getIdentifier(),
+                 "idd"=>$this->getIdd(),
+                 "worker"=>$this->getWorker()
+        ];
+        $utils->setuserdata($params);
+      }
+    }
 }

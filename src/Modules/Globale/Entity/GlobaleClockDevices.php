@@ -4,6 +4,7 @@ namespace App\Modules\Globale\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
+use \App\Modules\Globale\Utils\GlobaleClockDevicesUtils;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\Globale\Repository\GlobaleClockDevicesRepository")
@@ -309,5 +310,13 @@ class GlobaleClockDevices
         $this->usefunction = $usefunction;
 
         return $this;
+    }
+
+    public function postProccess($kernel, $doctrine, $user){
+      if($this->getActive() && !$this->getDeleted()){
+        $utils = new GlobaleClockDevicesUtils();
+        $params=["id"=>$this->getIdentifier()];
+        $utils->setdatetime($params);
+      }
     }
 }

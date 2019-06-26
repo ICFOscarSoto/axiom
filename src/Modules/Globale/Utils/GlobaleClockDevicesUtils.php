@@ -39,4 +39,44 @@ class GlobaleClockDevicesUtils
     ];
     return $list;
   }
+
+  public function setdatetime($params){
+    $ch = curl_init();
+    $post = [
+        'command' => 'setDateTime',
+        'id' => $params["id"]
+    ];
+    curl_setopt($ch, CURLOPT_URL,"http://cde.aplicode.com/command.php");
+    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+    $result= curl_exec ($ch);
+    curl_close ($ch);
+  }
+
+  public function setuserdata($params){
+    $ch = curl_init();
+    $worker=$params["worker"];
+    $name=$worker->getName().' '.$worker->getLastname();
+    $name=explode(" ", $name);
+    $username=$name[0].' ';
+    array_shift($name);
+    foreach ($name as $w) {
+     $username .= strtoupper($w[0]);
+    }
+    $post = [
+        'command' => 'setUser',
+        'id' => $params["id"],
+        'idd' =>$params["idd"],
+        'username' =>$username
+    ];
+    curl_setopt($ch, CURLOPT_URL,"http://cde.aplicode.com/command.php");
+    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+    $result= curl_exec ($ch);
+    curl_close ($ch);
+  }
+
+
 }

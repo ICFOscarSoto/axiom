@@ -98,7 +98,14 @@ class GlobaleClockDevicesWorkersController extends Controller
   }
 
 
-
+  /**
+   * @Route("/api/globale/clockdevicesworker/{id}/datetime", name="clockdevicesdatetime")
+   */
+   public function clockdevicesdatetime($id, Request $request){
+    $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+    $this->denyAccessUnlessGranted('ROLE_ADMIN');
+    
+  }
 
 
 
