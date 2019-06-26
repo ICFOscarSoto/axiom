@@ -98,7 +98,7 @@ class GlobaleNotificationsController extends Controller
 	}
 
 	 /**
-	 * @Route("/{_locale}/admin/api/notifications/{id}/read", name="notificationsRead")
+	 * @Route("/api/globale/notifications/{id}/read", name="notificationsRead")
 	 */
 	public function notificationsRead($id){
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');

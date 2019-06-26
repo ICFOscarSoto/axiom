@@ -23,7 +23,8 @@ use App\Modules\HR\Utils\HRClocksUtils;
 use App\Modules\HR\Entity\HRClocks;
 use App\Modules\HR\Entity\HRWorkers;
 use App\Modules\HR\Reports\HRClocksReports;
-
+use App\Modules\Globale\Entity\GlobaleNotifications;
+use App\Modules\Globale\Controller\GlobaleFirebaseDevicesController;
 
 class HRClocksController extends Controller
 {
@@ -162,6 +163,27 @@ class HRClocksController extends Controller
 					$lastClock->setDeleted(0);
 					$this->getDoctrine()->getManager()->persist($lastClock);
           $this->getDoctrine()->getManager()->flush();
+					$notification=new GlobaleNotifications();
+					$notification->setUser($worker->getUser());
+					setlocale(LC_ALL,"es_ES");
+					$date = new \DateTime();
+					$notification->setText("Jornada laboral iniciada el ".strftime('%A %e de %B a las %H:%M:%S',$date->getTimestamp()));
+					$notification->setDateadd(new \DateTime());
+					$notification->setReaded(0);
+					$notification->setDeleted(0);
+					$this->getDoctrine()->getManager()->persist($notification);
+          $this->getDoctrine()->getManager()->flush();
+					 $url = $this->generateUrl(
+	            'sendFirebase',
+	            ['id'  => $worker->getUser()->getId(),
+ 						 'notificationid' => $notification->getId()]
+	        );
+				  $ch = curl_init();
+					curl_setopt($ch, CURLOPT_URL,$_SERVER['SERVER_NAME'].$url);
+					curl_setopt($ch, CURLOPT_POST, 1);
+					curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+					$result= curl_exec ($ch);
+					curl_close ($ch);
 					return new JsonResponse(["result"=>1]);
 				}else{
 					$lastClock->setEndLatitude($latitude);
@@ -171,6 +193,27 @@ class HRClocksController extends Controller
 					$lastClock->setTime(date_timestamp_get($lastClock->getEnd())-date_timestamp_get($lastClock->getStart()));
 					$this->getDoctrine()->getManager()->persist($lastClock);
           $this->getDoctrine()->getManager()->flush();
+					$notification=new GlobaleNotifications();
+					$notification->setUser($worker->getUser());
+					setlocale(LC_ALL,"es_ES");
+					$date = new \DateTime();
+					$notification->setText("Jornada laboral finalizada el ".strftime('%A %e de %B a las %H:%M:%S',$date->getTimestamp()));
+					$notification->setDateadd(new \DateTime());
+					$notification->setReaded(0);
+					$notification->setDeleted(0);
+					$this->getDoctrine()->getManager()->persist($notification);
+          $this->getDoctrine()->getManager()->flush();
+					$url = $this->generateUrl(
+						 'sendFirebase',
+						 ['id'  => $worker->getUser()->getId(),
+						'notificationid' => $notification->getId()]
+				 );
+				 $ch = curl_init();
+				 curl_setopt($ch, CURLOPT_URL,$_SERVER['SERVER_NAME'].$url);
+				 curl_setopt($ch, CURLOPT_POST, 1);
+				 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+				 $result= curl_exec ($ch);
+				 curl_close ($ch);
 					return new JsonResponse(["result"=>1]);
 				}
 			}else return new JsonResponse(["result"=>-2]);
