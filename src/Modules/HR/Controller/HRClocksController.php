@@ -184,7 +184,7 @@ class HRClocksController extends Controller
 					curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 					$result= curl_exec ($ch);
 					curl_close ($ch);
-					return new JsonResponse(["result"=>1, "url"=>$_SERVER['SERVER_NAME'].$url]);
+					return new JsonResponse(["result"=>1, "url"=>$_SERVER['SERVER_NAME'].$url,"result"=>$result]);
 				}else{
 					$lastClock->setEndLatitude($latitude);
 					$lastClock->setEndLongitude($longitude);
@@ -214,7 +214,7 @@ class HRClocksController extends Controller
 				 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 				 $result= curl_exec ($ch);
 				 curl_close ($ch);
-					return new JsonResponse(["result"=>1,"url"=>$_SERVER['SERVER_NAME'].$url]);
+					return new JsonResponse(["result"=>1,"url"=>$_SERVER['SERVER_NAME'].$url, "result"=>$result]);
 				}
 			}else return new JsonResponse(["result"=>-2]);
  		}
