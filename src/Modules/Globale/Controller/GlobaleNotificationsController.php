@@ -137,7 +137,7 @@ class GlobaleNotificationsController extends Controller
 			 	$notification->setText("Jornada laboral iniciada el ".strftime('%A %e de %B a las %H:%M:%S',$date->getTimestamp()));
 			 break;
 			 case "clockEND":
-			 	$notification->setText("Jornada laboral iniciada el ".strftime('%A %e de %B a las %H:%M:%S',$date->getTimestamp()));
+			 	$notification->setText("Jornada laboral finalizada el ".strftime('%A %e de %B a las %H:%M:%S',$date->getTimestamp()));
 			 break;
 		 }
 		 $notification->setDateadd(new \DateTime());
