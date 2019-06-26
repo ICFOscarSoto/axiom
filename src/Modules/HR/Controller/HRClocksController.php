@@ -179,7 +179,7 @@ class HRClocksController extends Controller
  						 'notificationid' => $notification->getId()]
 	        );
 				  $ch = curl_init();
-					curl_setopt($ch, CURLOPT_URL,$_SERVER['SERVER_NAME'].$url);
+					curl_setopt($ch, CURLOPT_URL,"https://axiom.aplicode.com".$url);
 					curl_setopt($ch, CURLOPT_POST, 1);
 					curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 					$result= curl_exec ($ch);
@@ -209,7 +209,7 @@ class HRClocksController extends Controller
 						'notificationid' => $notification->getId()]
 				 );
 				 $ch = curl_init();
-				 curl_setopt($ch, CURLOPT_URL,$_SERVER['SERVER_NAME'].$url);
+				 curl_setopt($ch, CURLOPT_URL,"https://axiom.aplicode.com".$url);
 				 curl_setopt($ch, CURLOPT_POST, 1);
 				 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 				 $result= curl_exec ($ch);
