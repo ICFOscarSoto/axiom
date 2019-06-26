@@ -13,6 +13,7 @@ use App\Modules\Globale\Entity\GlobaleNotifications;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
+use App\Modules\HR\Entity\HRWorkers;
 
 class GlobaleNotificationsController extends Controller
 {
@@ -117,6 +118,49 @@ class GlobaleNotificationsController extends Controller
 		}
 		return new JsonResponse(array('result' => 'false'));
 	}
+
+
+	/**
+	* @Route("/api/notifications/worker/{id}/create/{type}", name="createNotificationWorker")
+	*/
+ public function createNotificationWorker($id, $type){
+	 $notification=new GlobaleNotifications();
+	 $workersrepository=$this->getDoctrine()->getRepository(HRWorkers::class);
+	 $worker=$workersrepository->findOneBy(["id"=>$id]);
+	 $user=$worker->getUser();
+	 if($user){
+		 $notification->setUser($user);
+		 setlocale(LC_ALL,"es_ES.utf8");
+		 $date = new \DateTime();
+		 switch($type){
+			 case "clockSTART":
+			 	$notification->setText("Jornada laboral iniciada el ".strftime('%A %e de %B a las %H:%M:%S',$date->getTimestamp()));
+			 break;
+			 case "clockEND":
+			 	$notification->setText("Jornada laboral iniciada el ".strftime('%A %e de %B a las %H:%M:%S',$date->getTimestamp()));
+			 break;
+		 }
+		 $notification->setDateadd(new \DateTime());
+		 $notification->setReaded(0);
+		 $notification->setDeleted(0);
+		 $this->getDoctrine()->getManager()->persist($notification);
+		 $this->getDoctrine()->getManager()->flush();
+		 $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+		  $url = $this->generateUrl(
+		 		'sendFirebase',
+		 		['id'  => $worker->getUser()->getId(),
+		 	 'notificationid' => $notification->getId()]
+		 );
+		 $ch = curl_init();
+		 curl_setopt($ch, CURLOPT_URL,$protocol.$_SERVER['SERVER_NAME'].$url);
+		 curl_setopt($ch, CURLOPT_POST, 1);
+		 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		 $result= curl_exec ($ch);
+		 return new JsonResponse(array('result' => 'true'));
+	 }else return new JsonResponse(array('result' => 'false'));
+
+
+ }
 
 	/**
 	 * @Route("/{_locale}/admin/api/notifications/readall", name="notificationsReadAll")
