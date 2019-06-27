@@ -65,8 +65,14 @@ class ERPProductsController extends Controller
 		 $this->denyAccessUnlessGranted('ROLE_ADMIN');
 		 $template=dirname(__FILE__)."/../Forms/Products.json";
 		 $utils = new GlobaleFormUtils();
-		 $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine());
-		 return $utils->make($id, $this->class, $action, "formproducts","full", "@Globale/formproducts.html.twig", "formProduct");
+		 $utilsObj=new ERPProductsUtils();
+		 $obj=new ERPProducts();
+		 $productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
+		 $obj=$productRepository->find($id);
+		 $params=["active"=>$obj->getActive()];
+		 $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[]);
+		 return $utils->make($id, $this->class, $action, "formproducts","full", "@ERP/productform.html.twig", "formProduct");
+
 		}
 
 
@@ -97,8 +103,8 @@ class ERPProductsController extends Controller
 								'tab' => $request->query->get('tab','data'), //Show initial tab, by default data tab
 								'tabs' => [
 									["name" => "data", "icon"=>"fa fa-id-card", "caption"=>"Products data", "active"=>true, "route"=>$this->generateUrl("formInfoProduct",["id"=>$id])],
-									["name" => "webproduct", "icon"=>"fa fa-id-card", "caption"=>"Web", "route"=>$this->generateUrl("dataWebProducts",["id"=>$id])],
-									["name" => "stocks", "icon"=>"fa fa-id-card", "caption"=>"Stocks", "route"=>$this->generateUrl("stocks",["id"=>$id])]],
+									["name" => "webproduct", "icon"=>"fa fa-id-card", "caption"=>"Web", "route"=>$this->generateUrl("dataWebProducts",["id"=>$id])]],
+								//	["name" => "stocks", "icon"=>"fa fa-id-card", "caption"=>"Stocks", "route"=>$this->generateUrl("stocks",["id"=>$id])]],
 
 									'include_header' => [["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker-es.js"],
 																			["type"=>"css", "path"=>"/js/rickshaw/rickshaw.min.css"]],

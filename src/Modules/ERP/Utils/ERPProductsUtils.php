@@ -10,6 +10,10 @@ use App\Modules\Email\Entity\EmailAccounts;
 
 class ERPProductsUtils
 {
+  public function getExcludedForm($params){
+    return ['product'];
+  }
+
   public function formatList($user){
     $list=[
       'id' => 'listProducts',
