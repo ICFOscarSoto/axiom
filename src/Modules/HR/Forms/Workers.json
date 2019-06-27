@@ -38,15 +38,9 @@
 			]
 		},
 		{
-			"name": "Clocks",
-			"fields": [
-				{	"name": "clockCode", "cols": 5},
-				{	"name": "allowremoteclock", "cols": 2}
-			]
-		},
-		{
 			"name": "",
 			"fields": [
+				{	"name": "allowremoteclock", "cols": 2},
 				{	"name": "active", "cols": 2}
 			]
 		}
