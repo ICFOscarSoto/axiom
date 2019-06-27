@@ -94,7 +94,10 @@ class HRController extends Controller
 			$workerRepository=$this->getDoctrine()->getRepository(HRWorkers::class);
 			$obj = $workerRepository->findOneBy(['id'=>$id, 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
 			if($id!=0 && $obj==null){
-					return $this->render('@Globale/notfound.html.twig',[]);
+					return $this->render('@Globale/notfound.html.twig',[
+						"status_code"=>404,
+						"status_text"=>"Objeto no encontrado"
+					]);
 			}
 			$entity_name=$obj?$obj->getLastName().', '.$obj->getName().' ('.$obj->getIdcard().')':'';
 			return $this->render('@Globale/generictabform.html.twig', array(

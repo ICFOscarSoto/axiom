@@ -32,9 +32,9 @@ class GlobaleUsersUtils
           $roles=[];
           //Avoid user grant upper privileges
           foreach ($form["roles"]->getData() as $key => $rol) {
-                  if(array_search($rol, $user->getRoles())!==FALSE){
-                    $roles[]=$rol;
-                  }
+            if(array_search($rol, $user->getRoles())!==FALSE){
+              $roles[]=$rol;
+            }
           }
           $obj->setRoles($roles);
         }else $obj->setRoles($userRoles);

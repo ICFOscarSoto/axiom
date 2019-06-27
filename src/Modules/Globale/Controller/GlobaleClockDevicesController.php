@@ -36,6 +36,12 @@ class GlobaleClockDevicesController extends Controller
     array_push($breadcrumb, $new_breadcrumb);
     $clockDevicesRepository=$this->getDoctrine()->getRepository(GlobaleClockDevices::class);
     $obj = $clockDevicesRepository->findOneBy(['id'=>$id, 'company'=>$this->getUser()->getCompany(), 'active'=>1, 'deleted'=>0]);
+    if($id!=0 && $obj==null){
+        return $this->render('@Globale/notfound.html.twig',[
+          "status_code"=>404,
+          "status_text"=>"Objeto no encontrado"
+        ]);
+    }
     $entity_name=$obj?($obj->getName()!=null?$obj->getName():$obj->getModel().' (sn: '.$obj->getSerialnumber().')'):'';
     return $this->render('@Globale/generictabform.html.twig', array(
             'entity_name' => $entity_name,
