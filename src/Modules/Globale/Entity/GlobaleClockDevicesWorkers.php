@@ -5,6 +5,7 @@ namespace App\Modules\Globale\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\Globale\Entity\GlobaleClockDevices;
 use \App\Modules\HR\Entity\HRWorkers;
+use \App\Modules\Globale\Utils\GlobaleClockDevicesUtils;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\Globale\Repository\GlobaleClockDevicesWorkersRepository")
