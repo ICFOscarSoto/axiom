@@ -7,21 +7,37 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\Email\Entity\EmailAccounts;
+use App\Modules\Globale\Config\GlobaleConfigVars;
 
 class GlobaleUsersUtils
 {
 
   public function proccess($form,$user,$obj,$request,$entityManager,$encoder){
     //if changed Password
+    $userRoles = $obj->getRoles();
     $form->handleRequest($request);
     if(!$form->isSubmitted()) return false;
     if ($form->isSubmitted() && $form->isValid() ) {
+
       $obj = $form->getData();
       if($form["password"]->getData()!="")
         $obj->setPassword($encoder->encodePassword($obj, $form["password"]->getData()));
 
       if($form["roles"]->getData()==null || $form["roles"]->getData()==""){
         $obj->setRoles($obj->getRoles());
+      }else{
+        //if the user has less rol than profile avoid the modification
+        if($this->compareRoles($user->getRoles(),$userRoles)<2){
+          //Check if user has permissions to assign this roles, and unset if neccesary
+          $roles=[];
+          //Avoid user grant upper privileges
+          foreach ($form["roles"]->getData() as $key => $rol) {
+                  if(array_search($rol, $user->getRoles())!==FALSE){
+                    $roles[]=$rol;
+                  }
+          }
+          $obj->setRoles($roles);
+        }else $obj->setRoles($userRoles);
       }
 
       if($obj->getId() == null) {
@@ -68,7 +84,6 @@ class GlobaleUsersUtils
     ]]];
   }
 
-
   public function formatList($user){
 		$list=[
 			'id' => 'listUsers',
@@ -83,4 +98,27 @@ class GlobaleUsersUtils
 		];
 		return $list;
 	}
+
+  //Get the the roles with less value (less is better, more privileges)
+  public function compareRoles($roles1, $roles2){
+    $val1=$this->getMinRolValue($roles1);
+    $val2=$this->getMinRolValue($roles2);
+    if($val1==$val2) return 0;
+      else return $val1<$val2?1:2;
+  }
+
+  //Get the min value of the roles (less value is better, more privileges)
+  public function getMinRolValue($roles){
+      $config=new GlobaleConfigVars();
+      $min=count($config->roles)-1;
+      foreach ($roles as $key => $rol) {
+        $val=array_search($rol, $config->roles);
+        if($val<$min){
+          $min=$val;
+        }
+      }
+      return $min;
+  }
+
+
 }

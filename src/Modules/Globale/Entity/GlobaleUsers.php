@@ -225,15 +225,15 @@ class GlobaleUsers implements UserInterface
     }
 
 
-	public function getTemplateData(){
-                                         $data["id"]=$this->getId();
-                                      		$data["email"]=$this->getEmail();
-                                      		$data["name"]=$this->getName();
-                                      		$data["firstname"]=$this->getLastname();
-                                      		$data["roles"]=$this->getRoles();
-                                         $data["companyId"]=$this->getCompany()->getId();
-                                      		return $data;
-                                      	}
+	 public function getTemplateData(){
+      $data["id"]=$this->getId();
+  		$data["email"]=$this->getEmail();
+  		$data["name"]=$this->getName();
+  		$data["firstname"]=$this->getLastname();
+  		$data["roles"]=$this->getRoles();
+      $data["companyId"]=$this->getCompany()->getId();
+  		return $data;
+  	}
 
     /**
      * @return Collection|UserGroups[]
