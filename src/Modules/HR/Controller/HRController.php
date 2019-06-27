@@ -72,8 +72,7 @@ class HRController extends Controller
 			$workerRepository=$this->getDoctrine()->getRepository(HRWorkers::class);
 			$obj = $workerRepository->findOneBy(['id'=>$id, 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
 			if($id!=0 && $obj==null){
-				return new RedirectResponse('/');
-				//throw $this->createNotFoundException('Object no exists');
+					return $this->render('@Globale/notfound.html.twig',[]);
 			}
 	    $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "worker"=>$obj];
 			$utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
