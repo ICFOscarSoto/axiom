@@ -447,21 +447,20 @@ class GlobaleCompanies
       //Prepare folder structure
       $source = $kernel->getRootDir().DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.'0';
       $dest= $kernel->getRootDir().DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$this->id;
-      if(!file_exists($dest)) mkdir($dest, 0775);
-      foreach (
-       $iterator = new \RecursiveIteratorIterator(
-        new \RecursiveDirectoryIterator($source, \RecursiveDirectoryIterator::SKIP_DOTS),
-        \RecursiveIteratorIterator::SELF_FIRST) as $item
-        ) {
-         if ($item->isDir()) {
-            if(!file_exists($dest)) mkdir($dest . DIRECTORY_SEPARATOR . $iterator->getSubPathName());
-          } else {
-              if(!file_exists(dirname($dest.DIRECTORY_SEPARATOR.$iterator->getSubPathName()))) mkdir(dirname($dest.DIRECTORY_SEPARATOR.$iterator->getSubPathName()), 0775);
-
-              if(!file_exists($dest.DIRECTORY_SEPARATOR.$iterator->getSubPathName())) copy($item, $dest . DIRECTORY_SEPARATOR . $iterator->getSubPathName());
-
+      if(!file_exists($dest)){
+        mkdir($dest, 0774);
+        foreach (
+         $iterator = new \RecursiveIteratorIterator(
+          new \RecursiveDirectoryIterator($source, \RecursiveDirectoryIterator::SKIP_DOTS),
+          \RecursiveIteratorIterator::SELF_FIRST) as $item
+          ) {
+           if ($item->isDir()) {
+              mkdir($dest . DIRECTORY_SEPARATOR . $iterator->getSubPathName());
+            } else {
+                copy($item, $dest . DIRECTORY_SEPARATOR . $iterator->getSubPathName());
+            }
           }
-        }
+      }
       //Create user admin of the company if it doesn't exist
      $usersrepository=$doctrine->getRepository(GlobaleUsers::class);
      $users=$usersrepository->findBy(["company"=>$this]);
