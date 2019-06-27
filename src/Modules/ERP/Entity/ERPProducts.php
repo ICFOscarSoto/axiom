@@ -5,6 +5,7 @@ namespace App\Modules\ERP\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\ERP\Entity\ERPManufacturers;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
+use \App\Modules\ERP\Entity\ERPCategories;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPProductsRepository")
@@ -132,6 +133,12 @@ class ERPProducts
 
     public $newSeconds=1296000;
     public $updatedSeconds=1296000;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPCategories")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $category;
 
 
 
@@ -400,6 +407,18 @@ class ERPProducts
     public function setCompany(?GlobaleCompanies $company): self
     {
         $this->company = $company;
+
+        return $this;
+    }
+
+    public function getCategory(): ?ERPCategories
+    {
+        return $this->category;
+    }
+
+    public function setCategory(?ERPCategories $category): self
+    {
+        $this->category = $category;
 
         return $this;
     }

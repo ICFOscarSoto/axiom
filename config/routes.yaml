@@ -51,6 +51,10 @@ EAN13:
     resource: 'App\Modules\ERP\Controller\ERPEAN13Controller'
     type:     annotation
 
+Categories:
+    resource: 'App\Modules\ERP\Controller\ERPCategoriesController'
+    type:     annotation
+
 References:
     resource: 'App\Modules\ERP\Controller\ERPReferencesController'
     type:     annotation
