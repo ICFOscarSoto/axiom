@@ -201,6 +201,7 @@ class HRClocksController extends Controller
 					$date = new \DateTime();
 					$notification->setText("Jornada laboral finalizada el ".strftime('%A %e de %B a las %H:%M:%S',$date->getTimestamp()));
 					$notification->setDateadd(new \DateTime());
+					$notification->setDateupd(new \DateTime());
 					$notification->setReaded(0);
 					$notification->setDeleted(0);
 					$this->getDoctrine()->getManager()->persist($notification);
