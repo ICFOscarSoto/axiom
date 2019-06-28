@@ -134,8 +134,6 @@ class HRClocksController extends Controller
 			return new RedirectResponse($this->router->generate('app_login'));
 			}
 
-
-
 		 /**
  		 * @Route("/api/HR/doclock/{company}/{id}", name="doClocks")
  		 */

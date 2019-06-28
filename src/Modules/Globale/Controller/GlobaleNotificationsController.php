@@ -111,6 +111,7 @@ class GlobaleNotificationsController extends Controller
 			$notification=$repository->findById($id, $user->getId());
 			if(count($notification)>0){
 				$notification[0]->setReaded(true);
+				$notification[0]->setDateupd(new \DateTime());
 				$em->persist($notification[0]);
 				$em->flush();
 				return new JsonResponse(array('result' => 'true'));
@@ -178,6 +179,7 @@ class GlobaleNotificationsController extends Controller
 			foreach($notifications as $notification){
 				if($notification != false){
 					$notification->setReaded(true);
+					$notification->setDateupd(new \DateTime());
 					$em->persist($notification);
 					$em->flush();
 				}else return new JsonResponse(array('result' => 'false'));
