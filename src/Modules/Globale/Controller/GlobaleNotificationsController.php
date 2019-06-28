@@ -14,6 +14,7 @@ use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\HR\Entity\HRWorkers;
+use App\Modules\Globale\Utils\GlobaleListApiUtils;
 
 class GlobaleNotificationsController extends Controller
 {
@@ -141,6 +142,7 @@ class GlobaleNotificationsController extends Controller
 			 break;
 		 }
 		 $notification->setDateadd(new \DateTime());
+		 $notification->setDateupd(new \DateTime());
 		 $notification->setReaded(0);
 		 $notification->setDeleted(0);
 		 $this->getDoctrine()->getManager()->persist($notification);
@@ -184,4 +186,25 @@ class GlobaleNotificationsController extends Controller
 		}
 		return new JsonResponse(array('result' => 'false'));
 	}
+
+
+
+	/**
+	 * @Route("/api/globale/clocks/collection", name="genericNotificationscollection")
+	 */
+	 public function genericNotificationscollection(Request $request){
+		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		 $manager = $this->getDoctrine()->getManager();
+		 $repository = $manager->getRepository($this->class);
+		 $parameters=$request->query->all();
+		 $filter[]=["type"=>"and", "column"=>"user", "value"=>$this->getUser()];
+		 foreach($parameters as $key => $parameter){
+			 if(in_array("set".ucfirst($parameter),get_class_methods($this->class)))
+				 $filter[]=["type"=>"and", "column"=>$key, "value"=>$parameter];
+		 }
+		 $listUtils=new GlobaleListApiUtils();
+		 $return=$listUtils->getRecords($this->getUser(),$repository,$request,$manager, $this->class,$filter,[],-1);
+		 return new JsonResponse($return);
+	 }
+
 }

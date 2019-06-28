@@ -54,6 +54,11 @@ class GlobaleNotifications
 	public $newSeconds=3600;
 	public $updatedSeconds=3600;
 
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $dateupd;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -139,6 +144,18 @@ class GlobaleNotifications
     public function setDeleted(bool $deleted): self
     {
         $this->deleted = $deleted;
+
+        return $this;
+    }
+
+    public function getDateupd(): ?\DateTimeInterface
+    {
+        return $this->dateupd;
+    }
+
+    public function setDateupd(\DateTimeInterface $dateupd): self
+    {
+        $this->dateupd = $dateupd;
 
         return $this;
     }
