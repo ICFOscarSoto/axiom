@@ -192,7 +192,7 @@ class GlobaleNotificationsController extends Controller
 
 
 	/**
-	 * @Route("/api/globale/clocks/collection", name="genericNotificationscollection")
+	 * @Route("/api/globale/notifications/collection", name="genericNotificationscollection")
 	 */
 	 public function genericNotificationscollection(Request $request){
 		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
