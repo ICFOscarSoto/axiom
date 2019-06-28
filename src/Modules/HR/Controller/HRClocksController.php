@@ -306,6 +306,10 @@ class HRClocksController extends Controller
 				if($idworker==0 || $idworker==null) $idworker=$request->request->get('id-parent',0);
 				$worker = $workerRepository->find($idworker);
 			}	else $obj = $clockRepository->find($id);
+			if($id!=0 && $obj==null){
+					return $this->render('@Globale/notfound.html.twig',[]);
+			}
+
 
 			$params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "worker"=>$id==0?$worker:$obj->getWorker()];
 			$utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),
