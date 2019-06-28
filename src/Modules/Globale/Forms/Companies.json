@@ -24,8 +24,8 @@
 		{
 			"name": "Devices",
 			"fields": [
-				{	"name": "deviceuser",	"cols": 6, "caption": "User"},
-				{	"name": "devicepassword", "cols": 6, "caption": "Password"}
+				{	"name": "deviceuser",	"cols": 6, "caption": "User", "readonly": true},
+				{	"name": "devicepassword", "cols": 6, "caption": "Password", "readonly": true}
 			]
 		}]
 }]

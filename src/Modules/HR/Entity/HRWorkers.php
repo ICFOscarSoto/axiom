@@ -504,4 +504,13 @@ class HRWorkers
 
         return $this;
     }
+
+    public function postProccess($kernel, $doctrine, $user){
+      //$this->time = $this->calculateTime();
+      $this->clockCode='CC'.$this->getId();
+      $em=$doctrine->getManager();
+      $em->persist($this);
+      $em->flush();
+
+    }
 }
