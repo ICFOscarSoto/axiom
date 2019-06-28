@@ -1117,7 +1117,7 @@ th {
 .calendar-env .calendar-sidebar {
   float: right;
   border-right: 0;
-  border-left: 1px solid #bbbbbb;
+  border-left: 1px solid #ebebeb;
 }
 .calendar-env .calendar-body {
   float: left;
@@ -1129,7 +1129,7 @@ th {
   -moz-background-clip: padding;
   border-radius: 0 4px 4px 0;
   background-clip: padding-box;
-  border-left: 1px solid #bbbbbb;
+  border-left: 1px solid #ebebeb;
 }
 .calendar-env .calendar-body .fc-header .fc-button.fc-corner-right {
   -webkit-border-radius: 4px 0 0 4px;
@@ -1142,16 +1142,16 @@ th {
 }
 .calendar-env .calendar-body .fc-header .fc-button.fc-corner-left {
   border-left: 0;
-  border-right: 1px solid #bbbbbb;
+  border-right: 1px solid #ebebeb;
 }
 .calendar-env .calendar-body .fc-header .fc-button.fc-button-next {
-  border-right: 1px solid #bbbbbb;
+  border-right: 1px solid #ebebeb;
 }
 .calendar-env .calendar-body .fc-header .fc-button.fc-button-today {
-  border-left: 1px solid #bbbbbb;
+  border-left: 1px solid #ebebeb;
 }
 .calendar-env .calendar-sidebar #add_event_form .input-group .form-control {
-  border-right: 1px solid #bbbbbb;
+  border-right: 1px solid #ebebeb;
 }
 .notes-env .notes-header > .right {
   text-align: left;
@@ -1189,7 +1189,7 @@ th {
   padding-right: 8px;
 }
 .input-group.minimal > .input-group-addon:first-child + .form-control {
-  border-left: 1px solid #bbbbbb;
+  border-left: 1px solid #ebebeb;
 }
 .nav-tabs > li {
   float: right;
@@ -1302,7 +1302,7 @@ blockquote.blockquote-danger {
 }
 .mail-env .mail-sidebar {
   border-right: 0;
-  border-left: 1px solid #bbbbbb;
+  border-left: 1px solid #ebebeb;
 }
 .mail-env .mail-body .mail-table thead tr th .mail-select-options,
 .mail-env .mail-body .mail-table tfoot tr th .mail-select-options {

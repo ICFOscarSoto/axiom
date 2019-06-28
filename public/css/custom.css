@@ -68,7 +68,7 @@ th.table-header-search input{
 table.dataTable thead th, table.dataTable thead td {
 	/*padding: 10px 18px !important;*/
   padding: 10px 18px;
-  border-bottom: 1px solid #bbbbbb!important;
+  border-bottom: 1px solid #ebebeb!important;
   background-color: #fff;
 }
 
@@ -238,7 +238,7 @@ label.form-check-label {
 }
 .panel-title-list{
   font-weight: bold;
-  border-bottom: 1px #bbbbbb solid;
+  border-bottom: 1px #ebebeb solid;
   font-size: 14px;
 }
 

@@ -111,9 +111,9 @@ class HRController extends Controller
 							'id' => $id,
 							'tab' => $request->query->get('tab','data'), //Show initial tab, by default data tab
 							'tabs' => [["name" => "data", "caption"=>"Datos trabajador", "icon"=>"entypo-book-open","active"=>true, "route"=>$this->generateUrl("dataWorker",["id"=>$id])],
-												 ["name" => "clothes", "icon"=>"fa fa-headphones", "caption"=>"Ropa y EPI"],
+												 /*["name" => "clothes", "icon"=>"fa fa-headphones", "caption"=>"Ropa y EPI"],
 												 ["name" => "paymentroll", "icon"=>"fa fa-eur", "caption"=>"Nóminas"],
-												 ["name" => "contracts", "icon"=>"fa fa-briefcase", "caption"=>"Contratos"],
+												 ["name" => "contracts", "icon"=>"fa fa-briefcase", "caption"=>"Contratos"],*/
 												 ["name" => "sickleave", "icon"=>"fa fa-hospital-o", "caption"=>"Bajas", "route"=>$this->generateUrl("sickleaves",["id"=>$id])],
 												 ["name" => "vacations", "icon"=>"fa fa-paper-plane", "caption"=>"Vacaciones", "route"=>$this->generateUrl("vacations",["id"=>$id])],
 												 ["name" => "clocks", "icon"=>"fa fa-clock-o", "caption"=>"Fichajes", "route"=>$this->generateUrl("workerClocks",["id"=>$id])],
