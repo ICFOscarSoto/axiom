@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\ERP\Entity\ERPBankAccounts;
+use \App\Modules\Globale\Entity\GlobaleUsers;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\Globale\Repository\GlobaleCompaniesRepository")
@@ -430,25 +431,60 @@ class GlobaleCompanies
         return $this;
     }
 
-    public function postProccess($kernel){
+    public function preProccess($kernel, $doctrine, $user){
+      //Set device user and device Password
+      $password = '';
+
+          for($i = 0; $i < 10; $i++) {
+              $password .= mt_rand(0, 9);
+          }
+      if($this->deviceuser==null) $this->deviceuser=time();
+      if($this->devicepassword==null) $this->devicepassword=$password;
+
+    }
+
+    public function postProccess($kernel, $doctrine, $user){
       //Prepare folder structure
       $source = $kernel->getRootDir().DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.'0';
       $dest= $kernel->getRootDir().DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$this->id;
-      if(!file_exists($dest)) mkdir($dest, 0775);
-      foreach (
-       $iterator = new \RecursiveIteratorIterator(
-        new \RecursiveDirectoryIterator($source, \RecursiveDirectoryIterator::SKIP_DOTS),
-        \RecursiveIteratorIterator::SELF_FIRST) as $item
-        ) {
-          if ($item->isDir()) {
-            if(!file_exists($dest)) mkdir($dest . DIRECTORY_SEPARATOR . $iterator->getSubPathName());
-          } else {
-              if(!file_exists(dirname($dest.DIRECTORY_SEPARATOR.$iterator->getSubPathName()))) mkdir(dirname($dest.DIRECTORY_SEPARATOR.$iterator->getSubPathName()), 0775);
-
-              if(!file_exists($dest.DIRECTORY_SEPARATOR.$iterator->getSubPathName())) copy($item, $dest . DIRECTORY_SEPARATOR . $iterator->getSubPathName());
-
+      if(!file_exists($dest)){
+        mkdir($dest, 0774);
+        foreach (
+         $iterator = new \RecursiveIteratorIterator(
+          new \RecursiveDirectoryIterator($source, \RecursiveDirectoryIterator::SKIP_DOTS),
+          \RecursiveIteratorIterator::SELF_FIRST) as $item
+          ) {
+           if ($item->isDir()) {
+              mkdir($dest . DIRECTORY_SEPARATOR . $iterator->getSubPathName());
+            } else {
+                copy($item, $dest . DIRECTORY_SEPARATOR . $iterator->getSubPathName());
+            }
           }
-        }
+      }
+      //Create user admin of the company if it doesn't exist
+     $usersrepository=$doctrine->getRepository(GlobaleUsers::class);
+     $users=$usersrepository->findBy(["company"=>$this]);
+     $create=true;
+     foreach($users as $user){
+       if(array_search("ROLE_ADMIN",$user->getRoles())!==FALSE){
+        $create=false;
+        break;
+       }
+     }
+     if($create){
+       $user=new GlobaleUsers();
+       $user->setName("Administrador");
+       $user->setEmail("admin@".$this->getDomain());
+       $user->setCompany($this);
+       $user->setRoles(["ROLE_USER", "ROLE_ADMIN"]);
+       $user->setPassword('$2y$13$g06ZTdo4bZ6UT3uybO3zjuyB2WPiM.Zxiut3dKU9HGn2A7xC4AdKK');
+       $user->setActive(1);
+       $user->setDeleted(0);
+       $user->setDateadd(new \DateTime());
+       $user->setDateupd(new \DateTime());
+       $doctrine->getManager()->persist($user);
+       $doctrine->getManager()->flush();
+     }
     }
 
     public function getDeviceuser(): ?string
