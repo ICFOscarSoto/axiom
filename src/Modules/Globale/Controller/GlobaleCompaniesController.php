@@ -57,7 +57,7 @@ class GlobaleCompaniesController extends Controller
 	 					'userData' => $userdata,
 	 					'id' => $id,
 	 					'tab' => $request->query->get('tab','data'), //Show initial tab, by default data tab
-	 					'tabs' => [["name" => "data", "caption"=>"Datos empresa", "icon"=>"entypo-book-open","active"=>true, "route"=>$this->generateUrl("dataCompany",["id"=>$id])],
+	 					'tabs' => [["name" => "data", "caption"=>"Datos empresa", "icon"=>"entypo-book-open","active"=>true, "route"=>$this->generateUrl("dataCompanyAdmin",["id"=>$id])],
 	 										 ["name" => "bank", "icon"=>"fa fa-headphones", "caption"=>"Datos bancarios", "route"=>$this->generateUrl("dataCompanyBankAccounts",["identity"=>$id,"id"=>$obj?($obj->getBankaccount()?$obj->getBankaccount()->getId():0):0])],
 	 										 ["name" => "files", "icon"=>"fa fa-cloud", "caption"=>"Archivos", "route"=>$this->generateUrl("cloudfiles",["id"=>$id, "path"=>"companies"])]
 	 										],
@@ -69,6 +69,46 @@ class GlobaleCompaniesController extends Controller
 	 										]*/
 	 	));
 	 }
+
+	 /**
+	  * @Route("/{_locale}/globale/admin/mycompany", name="mycompany")
+	  */
+	  public function mycompany(Request $request){
+	  $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+	  $this->denyAccessUnlessGranted('ROLE_ADMIN');
+		$id=$this->getUser()->getCompany()->getId();
+	  $new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-new"];
+	  $template=dirname(__FILE__)."/../Forms/CompaniesAdmin.json";
+	  $userdata=$this->getUser()->getTemplateData();
+	  $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
+	  $breadcrumb=$menurepository->formatBreadcrumb('mycompany');
+	  array_push($breadcrumb, $new_breadcrumb);
+	  $repository=$this->getDoctrine()->getRepository($this->class);
+	  $obj = $repository->findOneBy(['id'=>$id, 'deleted'=>0]);
+	  $entity_name=$obj?$obj->getSocialname().' ('.$obj->getVat().')':'';
+	  return $this->render('@Globale/generictabform.html.twig', array(
+	 				 'entity_name' => $entity_name,
+	 				 'controllerName' => 'CompaniesController',
+	 				 'interfaceName' => 'Mi Empresa',
+	 				 'optionSelected' => 'mycompany',
+	 				 'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
+	 				 'breadcrumb' => $breadcrumb,
+	 				 'userData' => $userdata,
+	 				 'id' => $id,
+	 				 'tab' => $request->query->get('tab','data'), //Show initial tab, by default data tab
+	 				 'tabs' => [["name" => "data", "caption"=>"Datos empresa", "icon"=>"entypo-book-open","active"=>true, "route"=>$this->generateUrl("dataCompanyAdmin",["id"=>$id])],
+					 						["name" => "bank", "icon"=>"fa fa-headphones", "caption"=>"Datos bancarios", "route"=>$this->generateUrl("dataMyCompanyBankAccounts",["identity"=>$id,"id"=>$obj?($obj->getBankaccount()?$obj->getBankaccount()->getId():0):0])]
+	 									 ],
+	 				 'include_header' => [["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker-es.js"]],
+	 				 'include_footer' => [["type"=>"css", "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.css"],
+	 															["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.js"]]
+	 				 /*'tabs' => [["name" => "data", "caption"=>"Datos trabajador", "active"=>$tab=='data'?true:false, "route"=>$this->generateUrl("dataWorker",["id"=>$id])],
+	 										["name" => "paymentroll", "active"=>($tab=='paymentroll' && $id)?true:false, "caption"=>"Nóminas"]
+	 									 ]*/
+	  ));
+	 }
+
+
 	 /**
 	  * @Route("/{_locale}/company/bankaccount/data/{id}/{action}/{identity}", name="dataCompanyBankAccounts", defaults={"id"=0, "action"="read", "identity"=0})
 	  */
@@ -111,13 +151,38 @@ class GlobaleCompaniesController extends Controller
 			}
 		}
 		return $return;
+	  //return $utils->make($id, $this->class, $action, "formIdentities", "modal");
+	 }
 
 
+	 /**
+	  * @Route("/{_locale}/mycompany/bankaccount/data/{id}/{action}/{identity}", name="dataMyCompanyBankAccounts", defaults={"id"=0, "action"="read", "identity"=0})
+	  */
+	  public function dataMyCompanyBankAccounts($id, $action, $identity, Request $request)
+	  {
+	  $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+	  $this->denyAccessUnlessGranted('ROLE_ADMIN');
+	  $template=dirname(__FILE__)."/../../ERP/Forms/MyCompanyBankAccounts.json";
+	  $utils = new GlobaleFormUtils();
+	  $utilsObj=new ERPBankAccountsUtils();
+	  if($identity==0) $identity=$request->query->get('entity');
+	  $bankaccountRepository=$this->getDoctrine()->getRepository(ERPBankAccounts::class);
+	  $obj=new ERPBankAccounts();
+	  if($id==0){
+	  if($identity==0 ) $identity=$request->query->get('entity');
+	  if($identity==0 || $identity==null) $identity=$request->request->get('id-parent',0);
+	 }else $obj = $bankaccountRepository->find($id);
+	  $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), ];
+	  $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),
+	 											 method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[],null, ["identity"=>$identity],
+	 											 [],['@ERP/bankaccountSEPA.html.twig']
+	 										 );
+
+	   return $utils->make($id, ERPBankAccounts::class, $action, "formIdentities", "full", "@Globale/form.html.twig", 'none', null);
 
 
 	  //return $utils->make($id, $this->class, $action, "formIdentities", "modal");
 	 }
-
 
 
 
@@ -189,6 +254,31 @@ class GlobaleCompaniesController extends Controller
 	    $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 	    $this->denyAccessUnlessGranted('ROLE_ADMIN');
 	    $template=dirname(__FILE__)."/../Forms/Companies.json";
+	    $utils = new GlobaleFormUtils();
+	    $utilsObj=new $this->utilsClass();
+			$obj = new $this->class();
+			if($id==0){
+			 $defaultCountry=$this->getDoctrine()->getRepository(GlobaleCountries::class);
+	 		 $default=$defaultCountry->findOneBy(['name'=>"España"]);
+	 		 $obj->setCountry($default);
+			 $defaultCurrency=$this->getDoctrine()->getRepository(GlobaleCurrencies::class);
+	 		 $default=$defaultCurrency->findOneBy(['name'=>"Euro"]);
+	 		 $obj->setCurrency($default);
+			}
+
+	    $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser()];
+	    $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
+	    return $utils->make($id, $this->class, $action, "formCompany", "full", "@Globale/form.html.twig", 'formCompany', $this->utilsClass);
+	  }
+
+		/**
+	   * @Route("/{_locale}/mycompany/data/{action}", name="dataCompanyAdmin", defaults={"action"="read"})
+	   */
+	   public function dataCompanyAdmin($action, Request $request){
+	    $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+	    $this->denyAccessUnlessGranted('ROLE_ADMIN');
+	    $template=dirname(__FILE__)."/../Forms/CompaniesAdmin.json";
+			$id=$this->getUser()->getCompany()->getId();
 	    $utils = new GlobaleFormUtils();
 	    $utilsObj=new $this->utilsClass();
 			$obj = new $this->class();
