@@ -49,15 +49,35 @@
   </div>
 
   <script>
+
+	//Clocks list
   $(document).ready(function() {
-    $('body').on('click', "#printClockTop-top-button-foreground", function(event) {
-        event.preventDefault();
+		var ids=[];
+		$('body').on('click', "#printClockTop-top-button-foreground", function(event) {
+				ids=[];
+				event.preventDefault();
+				$("#clockprint-modal-form").modal('show');
+				ids.push($('#id-parent').val());
+		});
+
+		//Workers lists
+		$('body').on('click', "#printClocks-top-button-foreground", function(event) {
+				ids=[];
+				event.preventDefault();
+				var selectedItems = $("input[class*='-chk-list']:checked").map(function(){
+  					return $(this).attr("item-id");
+				}).toArray();
+				ids=selectedItems;
         $("#clockprint-modal-form").modal('show');
     });
-    $('body').on('click', "#clockprint-modal-view-button", function(event) {
-        event.preventDefault();
-        window.open('/api/HR/'+$('#id-parent').val()+'/'+$('#clockprint-year').val()+'/'+$('#clockprint-month').val()+'/clocks/print', '_blank');
-    });
+
+
+		$('body').on('click', "#clockprint-modal-view-button", function(event) {
+				event.preventDefault();
+				var query = $.param(ids);
+				window.open('/api/HR/'+$('#clockprint-year').val()+'/'+$('#clockprint-month').val()+'/clocks/print?ids='+JSON.stringify(ids), '_blank');
+		});
+
 
   });
   </script>

@@ -244,20 +244,18 @@ class HRClocksController extends Controller
 		 }
 
 		 /**
- 		 * @Route("/api/HR/{id}/{year}/{month}/clocks/print", name="printWorkerClocks")
+ 		 * @Route("/api/HR/{year}/{month}/clocks/print", name="printWorkerClocks")
  		 */
- 		 public function print($id,$year,$month, Request $request){
+ 		 public function print($year,$month, Request $request){
  			 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
   		 $this->denyAccessUnlessGranted('ROLE_ADMIN');
 			 $workerRepository=$this->getDoctrine()->getRepository(HRWorkers::class);
-			 $worker = $workerRepository->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany()]);
-			 if($worker){
-				 $params=["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "id"=>$id, "user"=>$this->getUser(), "year"=>$year, "month"=>$month];
-				 $reportsUtils = new HRClocksReports();
-				 $pdf=$reportsUtils->create($params);
-				 return new Response($pdf, 200, array('Content-Type' => 'application/pdf'));
-		 	 }else return new Response('');
- 			 //return new Response('');
+			 $ids=$request->query->get('ids');
+			 $ids=json_decode($ids);
+			 $params=["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "ids"=>$ids, "user"=>$this->getUser(), "year"=>$year, "month"=>$month];
+			 $reportsUtils = new HRClocksReports();
+			 $pdf=$reportsUtils->create($params);
+			 return new Response($merge->output(), 200, array('Content-Type' => 'application/pdf'));
  		 }
 
 

@@ -54,7 +54,8 @@ class HRController extends Controller
 				'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
 				'breadcrumb' =>  $menurepository->formatBreadcrumb($request->get('_route')),
 				'userData' => $userdata,
-				'lists' => $templateLists
+				'lists' => $templateLists,
+				'include_post_templates' => ['@HR/clocksprintselect.html.twig'],
 				]);
 		}
 		return new RedirectResponse($this->router->generate('app_login'));

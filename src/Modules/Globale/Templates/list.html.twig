@@ -83,7 +83,7 @@
 							"render": function(data, type, row, meta){
 
 									return '<div class="checkbox checkbox-replace">'+
-											  '<input type="checkbox" class="{{ listConstructor.id }}-chk-list" id="{{ listConstructor.id }}-chk-'+row['id']+'">'+
+											  '<input type="checkbox" item-id="'+row['id']+'" class="{{ listConstructor.id }}-chk-list" id="'+row['id']+'-{{ listConstructor.id }}-chk-list">'+
 											  '</div>';
 								}
 						},
@@ -218,14 +218,16 @@
 				// Button select all checkboxes
 				$("#{{ listConstructor.id }}-chkall").click(function(){
 					var is_checked = $(this).is(':checked');
-					$p =  $("[id^='{{ listConstructor.id }}-chk-']").closest('tr');
+					$p =  $("[id^='{{ listConstructor.id }}-chk-list']").closest('tr');
 					if(is_checked){
-						$("[id^='{{ listConstructor.id }}-chk-']").attr('checked', true);
-						$("[id^='{{ listConstructor.id }}-chk-']").parent().parent().addClass('checked');
+						$("[id*='{{ listConstructor.id }}-chk-list']").iCheck('check');
+						$("[id*='{{ listConstructor.id }}-chk-list']").attr('checked', true);
+						$("[id*='{{ listConstructor.id }}-chk-list']").parent().parent().addClass('checked');
 						$p.addClass( 'highlight' );
 					}else{
-						$("[id^='{{ listConstructor.id }}-chk-']").attr('checked', false);
-						$("[id^='{{ listConstructor.id }}-chk-']").parent().parent().removeClass('checked');
+						$("[id*='{{ listConstructor.id }}-chk-list']").iCheck('uncheck');
+						$("[id*='{{ listConstructor.id }}-chk-list']").attr('checked', false);
+						$("[id*='{{ listConstructor.id }}-chk-list']").parent().parent().removeClass('checked');
 						$p.removeClass( 'highlight' );
 					 }
 				});
@@ -385,8 +387,9 @@
 
 	<!-- BUTTON ZONE -->
 	<p>
+	<div class="btn-group">
 	{% for field in listConstructor.topButtons %}
-			<div class="btn-group">
+
 				{% if field.actionType is defined and field.actionType=="background" %}
 				<a style="font-size: 20px" id="{{ field.id }}-top-button" type="button" class="btn tooltip-primary {{ field.type }}" {% if field.tooltip is defined %} data-toggle="tooltip" data-placement="bottom" title="" data-original-title=" {{ field.tooltip }} {% endif %} ">
 					<i class="{{ field.icon }}"></i>{{ field.name }}
@@ -404,7 +407,7 @@
 						{% endif %}
 
 						<a attr-search="{% if field.addSearch is defined %}{{field.addSearch}}{% else %} false {% endif %}" attr-href="{% if field.route is defined and field.route|length %}{{ url(field.route, routeParams) }}{% endif %}" href="javascript:void(0);"
-						style="font-size: 20px" id="{{ field.id }}-top-button-foreground" type="button" class="btn tooltip-primary {{ field.type }}" {% if field.tooltip is defined %} data-toggle="tooltip" data-placement="bottom" title="" data-original-title=" {{ field.tooltip }} {% endif %} ">
+						style="font-size: 20px" id="{{ field.id }}-top-button-foreground" type="button" class="btn tooltip-primary {% if field.type is defined and field.type|length %}{{ field.type }}{% else %} btn-default {% endif %}" {% if field.tooltip is defined %} data-toggle="tooltip" data-placement="bottom" title="" data-original-title=" {{ field.tooltip }} {% endif %} ">
 							<i class="{{ field.icon }}"></i>{{ field.name }}
 						</a>
 						<script>
@@ -419,8 +422,9 @@
 							});
 						</script>
 				{% endif %}
-			</div>
+
 	{% endfor %}
+	</div>
 	</p>
 	<!-- END BUTTONZONE -->
 	{% for field in listConstructor.fieldButtons %}
