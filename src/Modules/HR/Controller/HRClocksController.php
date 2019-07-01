@@ -251,9 +251,7 @@ class HRClocksController extends Controller
   		 $this->denyAccessUnlessGranted('ROLE_ADMIN');
 			 $workerRepository=$this->getDoctrine()->getRepository(HRWorkers::class);
 			 $ids=$request->request->get('ids');
-			 dump($ids);
 			 $ids=explode(",",$ids);
-			 //dump($ids);
 			 $params=["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "ids"=>$ids, "user"=>$this->getUser(), "year"=>$year, "month"=>$month];
 			 $reportsUtils = new HRClocksReports();
 			 $pdf=$reportsUtils->create($params);
