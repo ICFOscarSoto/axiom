@@ -102,6 +102,36 @@ class HRDepartmentsController extends Controller
      return $result;
    }
 
+   /**
+    * @Route("/{_locale}/HR/department/{id}/workers", name="departmentworkers")
+    */
+   public function departmentworkers($id,RouterInterface $router,Request $request)
+   {
+   $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+   $this->denyAccessUnlessGranted('ROLE_ADMIN');
+   $userdata=$this->getUser()->getTemplateData();
+   $locale = $request->getLocale();
+   $this->router = $router;
+   $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
+   $utils = new HRDepartmentsUtils();
+   $templateLists[]=$utils->formatListWorkers($this->getUser(), $id);
+   if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+     return $this->render('@Globale/genericlist.html.twig', [
+       'controllerName' => 'HRController',
+       'interfaceName' => 'Trabajadores',
+       'optionSelected' => "departments",
+       'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
+       'breadcrumb' =>  $menurepository->formatBreadcrumb("departments"),
+       'userData' => $userdata,
+       'lists' => $templateLists,
+       'include_post_templates' => ['@HR/clocksprintselect.html.twig'],
+       ]);
+   }
+   return new RedirectResponse($this->router->generate('app_login'));
+   }
+
+
+
   /**
   * @Route("/{_locale}/HR/department/{id}/disable", name="disableDepartment")
   */

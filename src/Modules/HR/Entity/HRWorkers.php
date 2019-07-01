@@ -7,6 +7,7 @@ use \App\Modules\Globale\Entity\GlobaleUsers;
 use \App\Modules\Globale\Entity\GlobaleCountries;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
 use \App\Modules\HR\Entity\HRDepartments;
+use \App\Modules\HR\Entity\HRWorkCenters;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\HR\Repository\HRWorkerRepository")
@@ -163,6 +164,11 @@ class HRWorkers
     * @ORM\ManyToOne(targetEntity="\App\Modules\HR\Entity\HRDepartments")
     */
    private $department;
+
+   /**
+    * @ORM\ManyToOne(targetEntity="\App\Modules\HR\Entity\HRWorkCenters")
+    */
+   private $workcenters;
 
     public function getId(): ?int
     {
@@ -512,5 +518,17 @@ class HRWorkers
       $em->persist($this);
       $em->flush();
 
+    }
+
+    public function getWorkcenters(): ?HRWorkCenters
+    {
+        return $this->workcenters;
+    }
+
+    public function setWorkcenters(?HRWorkCenters $workcenters): self
+    {
+        $this->workcenters = $workcenters;
+
+        return $this;
     }
 }

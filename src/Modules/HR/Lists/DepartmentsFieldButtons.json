@@ -1,5 +1,6 @@
 [
   {"id": "edit", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"dataDepartments", "modal":"departments", "actionType" : "background", "confirm" :false},
+  {"id": "data", "type" : "default", "icon" : "fa fa-bars", "name" : "datos", "route":"departmentworkers", "confirm" :false, "actionType" : "foreground"},
   {"id": "activation", "type": "option", "options": [
       {"id": "desactivate", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"disableDepartment", "confirm" :true, "actionType" : "background" },
       {"id": "activate", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "route":"enableDepartment", "confirm" :true, "actionType" : "background" }

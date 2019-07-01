@@ -18,6 +18,8 @@ use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\HR\Entity\HRWorkers;
+use App\Modules\HR\Entity\HRDepartments;
+use App\Modules\HR\Entity\HRWorkCenters;
 use App\Modules\Cloud\Controller\CloudController;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use App\Modules\HR\Utils\HRWorkersUtils;
@@ -138,9 +140,9 @@ class HRController extends Controller
 
 
 	/**
-	 * @Route("/api/HR/workers/list", name="workerslist")
+	 * @Route("/api/HR/workers/list/{type}/{id}", name="workerslist", defaults={"type"="all", "id"=0})
 	 */
-	public function indexlist(RouterInterface $router,Request $request){
+	public function indexlist($type,$id, RouterInterface $router,Request $request){
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		$user = $this->getUser();
 		$locale = $request->getLocale();
@@ -149,7 +151,22 @@ class HRController extends Controller
 		$repository = $manager->getRepository($this->class);
 		$listUtils=new GlobaleListUtils();
 		$listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Workers.json"),true);
-		$return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $this->class);
+		switch($type){
+			case "all":
+				$return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $this->class);
+			break;
+			case "department":
+				$repositoryDeparments = $manager->getRepository(HRDepartments::class);
+				$department=$repositoryDeparments->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany()]);
+				$return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $this->class,[["type"=>"and", "column"=>"department", "value"=>$department]]);
+			break;
+			case "workcenter":
+				$repositoryWorkCenter = $manager->getRepository(HRWorkCenters::class);
+				$workcenter=$repositoryWorkCenter->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany()]);
+				$return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $this->class,[["type"=>"and", "column"=>"workcenters", "value"=>$workcenter]]);
+			break;
+		}
+
 		return new JsonResponse($return);
 	}
 

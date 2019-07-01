@@ -1,0 +1,16 @@
+[{
+	"sections": [
+		{
+			"name": "Personal data",
+			"fields": [
+				{	"name": "name", "cols": 4},
+				{	"name": "address",	"cols": 4},
+				{	"name": "city", "cols": 3},
+		    {	"name": "state",	"cols": 3},
+		    {	"name": "postcode", "cols": 3},
+		    {	"name": "phone",	"cols": 3},
+				{	"name": "active",	"cols": 2}
+			]
+		}
+	]
+}]

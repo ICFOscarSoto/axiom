@@ -258,9 +258,7 @@ class HRClocksController extends Controller
 			 return new Response($merge->output(), 200, array('Content-Type' => 'application/pdf'));
  		 }
 
-
-
-		 /**
+		  /**
 			* @Route("/api/HR/{id}/clocks/collection", name="genericapicollection")
 			*/
 			public function genericapicollection($id, Request $request){

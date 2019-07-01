@@ -12,6 +12,7 @@
 				{	"name": "status", "cols": 2},
 				{	"name": "user", "cols": 4},
 				{	"name": "dateofemploy", "cols": 2, "type": "date"},
+				{	"name": "workcenters", "cols": 3},
 				{	"name": "department", "cols": 3},
 				{	"name": "external", "cols": 1}
 			]

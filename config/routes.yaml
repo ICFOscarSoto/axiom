@@ -215,6 +215,9 @@ HRJobs:
    resource: 'App\Modules\HR\Controller\HRJobsController'
    type:     annotation
 
+HRWorkCenter:
+   resource: 'App\Modules\HR\Controller\HRWorkCentersController'
+   type:     annotation
 
 Cloud:
    resource: 'App\Modules\Cloud\Controller\CloudController'

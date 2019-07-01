@@ -154,6 +154,10 @@ Worker: Trabajador
 Departments: Departamentos
 Department: Departamento
 Select hrdepartments: Seleccionar departamento
+Work Centers: Centros de trabajo
+Workcenters: Centro de trabajo
+Select hrworkcenters: Seleccionar centro trabajo
+Select a user...: Seleccionar usuario
 # HOLLIDAYS
 #----------------------------------------------------------------------------------------------------------------------
 Holliday data: "Datos festivo"
