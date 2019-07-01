@@ -74,8 +74,19 @@
 
 		$('body').on('click', "#clockprint-modal-view-button", function(event) {
 				event.preventDefault();
-				var query = $.param(ids);
-				window.open('/api/HR/'+$('#clockprint-year').val()+'/'+$('#clockprint-month').val()+'/clocks/print?ids='+JSON.stringify(ids), '_blank');
+				if(ids.length){
+					var form = document.createElement("form");
+			    var element1 = document.createElement("input");
+			    form.method = "POST";
+					form.target = "_blank";
+			    form.action = '/api/HR/'+$('#clockprint-year').val()+'/'+$('#clockprint-month').val()+'/clocks/print';
+			    element1.value=ids;
+			    element1.name="ids";
+			    form.appendChild(element1);
+			    document.body.appendChild(form);
+			    form.submit();
+				}
+				//window.open('/api/HR/'+$('#clockprint-year').val()+'/'+$('#clockprint-month').val()+'/clocks/print?ids='+JSON.stringify(ids), '_blank');
 		});
 
 
