@@ -43,7 +43,7 @@ class HRClocksRepository extends ServiceEntityRepository
     public function todayClocks($worker){
       $conn = $this->getEntityManager()->getConnection();
       $sql = "SELECT IFNULL(SUM(UNIX_TIMESTAMP(IFNULL(END,CURTIME()))-UNIX_TIMESTAMP(START)),0) raw, IFNULL(SEC_TO_TIME(SUM(UNIX_TIMESTAMP(IFNULL(END,CURTIME()))-UNIX_TIMESTAMP(START))),'00:00:00') formated FROM hrclocks
-              WHERE worker_id=? AND deleted=0 AND active=1 AND START >= CURDATE() AND START < CURDATE() + INTERVAL 1 DAY";
+              WHERE worker_id=? AND deleted=0 AND active=1 AND DATE(START) >= CURDATE() AND DATE(START) < CURDATE() + INTERVAL 1 DAY";
       $stmt = $conn->prepare($sql);
       $stmt->bindValue(1, $worker->getId());
       $stmt->execute();
@@ -53,7 +53,7 @@ class HRClocksRepository extends ServiceEntityRepository
     public function yesterdayClocks($worker){
       $conn = $this->getEntityManager()->getConnection();
       $sql = "SELECT IFNULL(SUM(UNIX_TIMESTAMP(IFNULL(END,CURTIME()))-UNIX_TIMESTAMP(START)),0) raw, IFNULL(SEC_TO_TIME(SUM(UNIX_TIMESTAMP(IFNULL(END,CURTIME()))-UNIX_TIMESTAMP(START))),'00:00:00') formated  FROM hrclocks
-              WHERE worker_id=? AND deleted=0 AND active=1 AND START >= CURDATE()-1 AND START < CURDATE()-1 + INTERVAL 1 DAY";
+              WHERE worker_id=? AND deleted=0 AND active=1 AND DATE(START) >= (CURDATE()-INTERVAL 1 DAY) AND DATE(START) < CURDATE()";
       $stmt = $conn->prepare($sql);
       $stmt->bindValue(1, $worker->getId());
       $stmt->execute();
