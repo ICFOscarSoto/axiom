@@ -113,15 +113,21 @@ class HRDepartmentsController extends Controller
    $locale = $request->getLocale();
    $this->router = $router;
    $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
+   $repository = $this->getDoctrine()->getRepository($this->class);
+   $obj=$repository->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany()]);
+   $entityName=$obj?$obj->getName():'';
+   $breadcrumb=$menurepository->formatBreadcrumb("departments");
+	 array_push($breadcrumb, ["rute"=>null, "name"=>$entityName, "icon"=>"fa fa-address-book-o"]);
    $utils = new HRDepartmentsUtils();
    $templateLists[]=$utils->formatListWorkers($this->getUser(), $id);
    if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
      return $this->render('@Globale/genericlist.html.twig', [
+       'entity_name' => $entityName,
        'controllerName' => 'HRController',
        'interfaceName' => 'Trabajadores',
        'optionSelected' => "departments",
        'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
-       'breadcrumb' =>  $menurepository->formatBreadcrumb("departments"),
+       'breadcrumb' =>  $breadcrumb,
        'userData' => $userdata,
        'lists' => $templateLists,
        'include_post_templates' => ['@HR/clocksprintselect.html.twig'],

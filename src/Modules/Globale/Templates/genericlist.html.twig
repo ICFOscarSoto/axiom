@@ -21,6 +21,9 @@
 		{#}<h2>{{ interfaceName }}</h2>#}
 		<!-- MAIN CONTENT -->
 		<div class="principal-content">
+			{% if entity_name is defined %}
+				<h2>{{ entity_name }}</h2>
+			{% endif %}
 			{% set listConstructor = lists[0] %}
 			{% set listOrigin = "genericlist" %}
 			{# for know if list.html is invoked directly from controller and we need to make modals inside list#}
