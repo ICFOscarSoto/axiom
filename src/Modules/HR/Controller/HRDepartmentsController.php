@@ -150,19 +150,26 @@ class HRDepartmentsController extends Controller
   /**
   * @Route("/{_locale}/HR/department/{id}/enable", name="enableDepartment")
   */
-  public function enableWorkCalendar($id){
+  public function enableDepartment($id){
    $this->denyAccessUnlessGranted('ROLE_ADMIN');
    $entityUtils=new GlobaleEntityUtils();
    $result=$entityUtils->enableObject($id, $this->class, $this->getDoctrine());
    return new JsonResponse(array('result' => $result));
   }
   /**
-  * @Route("/{_locale}/HR/department/{id}/delete", name="deleteDepartment")
+  * @Route("/{_locale}/HR/department/{id}/delete", name="deleteDepartment", defaults={"id"=0})
   */
-  public function deleteWorkCalendar($id){
+  public function deleteDepartment($id,Request $request){
    $this->denyAccessUnlessGranted('ROLE_ADMIN');
    $entityUtils=new GlobaleEntityUtils();
-   $result=$entityUtils->deleteObject($id, $this->class, $this->getDoctrine());
+   if($id!=0) $result=$entityUtils->deleteObject($id, $this->class, $this->getDoctrine());
+    else {
+      $ids=$request->request->get('ids');
+      $ids=explode(",",$ids);
+      foreach($ids as $item){
+        $result=$entityUtils->deleteObject($item, $this->class, $this->getDoctrine());
+      }
+    }
    return new JsonResponse(array('result' => $result));
   }
 }
