@@ -113,13 +113,21 @@ class GlobaleActivitiesController extends Controller
 	 $result=$entityUtils->enableObject($id, $this->class, $this->getDoctrine());
 	 return new JsonResponse(array('result' => $result));
  }
+
  /**
- * @Route("/{_locale}/admin/global/activity/{id}/delete", name="deleteActivity")
+ * @Route("/{_locale}/admin/global/activity/{id}/delete", name="deleteActivity", defaults={"id"=0})
  */
- public function delete($id){
-	 $this->denyAccessUnlessGranted('ROLE_GLOBAL');
+ public function delete($id, Request $request){
+	 $this->denyAccessUnlessGranted('ROLE_ADMIN');
 	 $entityUtils=new GlobaleEntityUtils();
-	 $result=$entityUtils->deleteObject($id, $this->class, $this->getDoctrine());
+	 if($id!=0) $result=$entityUtils->deleteObject($id, $this->class, $this->getDoctrine());
+		else {
+			$ids=$request->request->get('ids');
+			$ids=explode(",",$ids);
+			foreach($ids as $item){
+				$result=$entityUtils->deleteObject($item, $this->class, $this->getDoctrine());
+			}
+		}
 	 return new JsonResponse(array('result' => $result));
  }
 

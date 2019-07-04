@@ -22,6 +22,7 @@ use App\Modules\Globale\Utils\GlobaleCompaniesUtils;
 
 class GlobaleClockDevicesController extends Controller
 {
+  private $class=GlobaleClockDevices::class;
   /**
    * @Route("/{_locale}/globale/clockdevices/form/{id}", name="clockdevices", defaults={"id"=0})
    */
@@ -66,6 +67,22 @@ class GlobaleClockDevicesController extends Controller
     ));
   }
 
+  /**
+  * @Route("/{_locale}/admin/global/clockdevices/{id}/delete", name="deleteClockDevice", defaults={"id"=0})
+  */
+  public function delete($id, Request $request){
+    $this->denyAccessUnlessGranted('ROLE_ADMIN');
+    $entityUtils=new GlobaleEntityUtils();
+    if($id!=0) $result=$entityUtils->deleteObject($id, $this->class, $this->getDoctrine());
+     else {
+       $ids=$request->request->get('ids');
+       $ids=explode(",",$ids);
+       foreach($ids as $item){
+         $result=$entityUtils->deleteObject($item, $this->class, $this->getDoctrine());
+       }
+     }
+    return new JsonResponse(array('result' => $result));
+  }
 
 
 }

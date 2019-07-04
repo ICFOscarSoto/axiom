@@ -162,15 +162,20 @@ class GlobaleDefaultController extends Controller
       return new JsonResponse(array('result' => $result));
      }
      /**
-     * @Route("/{_locale}/{module}/{name}/generic/{id}/delete", name="genericdelete")
+     * @Route("/{_locale}/{module}/{name}/generic/{id}/delete", name="genericdelete", defaults={"id"=0})
      */
      public function delete($module, $name, Request $request, $id){
       $this->denyAccessUnlessGranted('ROLE_ADMIN');
       $entityUtils=new GlobaleEntityUtils();
       $class="\App\Modules\\".$module."\Entity\\".$module.$name;
-      $result=$entityUtils->deleteObject($id, $class, $this->getDoctrine());
+      if($id!=0) $result=$entityUtils->deleteObject($id, $class, $this->getDoctrine());
+       else {
+         $ids=$request->request->get('ids');
+         $ids=explode(",",$ids);
+         foreach($ids as $item){
+           $result=$entityUtils->deleteObject($item, $class, $this->getDoctrine());
+         }
+       }
       return new JsonResponse(array('result' => $result));
      }
-
-
 }

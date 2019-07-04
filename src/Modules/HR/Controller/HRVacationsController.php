@@ -135,14 +135,22 @@ class HRVacationsController extends Controller
  		$result=$entityUtils->enableObject($id, $this->class, $this->getDoctrine());
  		return new JsonResponse(array('result' => $result));
  	}
- 	/**
- 	* @Route("/{_locale}/HR/vacations/{id}/delete", name="deleteVacations")
- 	*/
- 	public function delete($id){
- 		$this->denyAccessUnlessGranted('ROLE_ADMIN');
- 		$entityUtils=new GlobaleEntityUtils();
- 		$result=$entityUtils->deleteObject($id, $this->class, $this->getDoctrine());
- 		return new JsonResponse(array('result' => $result));
- 	}
+
+  /**
+  * @Route("/{_locale}/HR/vacations/{id}/delete", name="deleteVacations", defaults={"id"=0})
+  */
+  public function delete($id,Request $request){
+   $this->denyAccessUnlessGranted('ROLE_ADMIN');
+   $entityUtils=new GlobaleEntityUtils();
+   if($id!=0) $result=$entityUtils->deleteObject($id, $this->class, $this->getDoctrine());
+    else {
+      $ids=$request->request->get('ids');
+      $ids=explode(",",$ids);
+      foreach($ids as $item){
+        $result=$entityUtils->deleteObject($item, $this->class, $this->getDoctrine());
+      }
+    }
+   return new JsonResponse(array('result' => $result));
+  }
 
 }
