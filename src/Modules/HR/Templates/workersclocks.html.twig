@@ -21,6 +21,31 @@
 		{#}<h2>{{ interfaceName }}</h2>#}
 		<!-- MAIN CONTENT -->
 		<div class="principal-content">
+
+			<div class="row">
+				<div class="col-md-4">
+					<div class="form-group">
+							<label class="" for="form_workcenters">Centro de trabajo</label>
+							<select name="form_workcenters" id="form_workcenters">
+								<option value="0">Todos</option>
+								{% for center in workcenters %}
+									<option value="{{ center.id }}" {% if center.id == selectedWorkCenter %} selected {% endif %}>{{ center.name }}</option>
+								{% endfor %}
+							</select>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="form-group">
+							<label class="" for="form_departments">Departamento</label>
+							<select name="form_departments" id="form_departments">
+								<option value="0">Todos</option>
+								{% for department in departments %}
+									<option value="{{ department.id }}" {% if department.id == selectedDepartment %} selected {% endif %}>{{ department.name }}</option>
+								{% endfor %}
+							</select>
+					</div>
+				</div>
+			</div>
 			<div class="row">
 				{% for clock in clocksList %}
 				<a href="{{ url('formWorker', {'id':clock.workerid}) }}?tab=clocks">
@@ -40,6 +65,16 @@
 		<script>
 		$(document).ready(function() {
 			var flagRefresh=true;
+			$("select").select2();
+
+			$('#form_workcenters').on('change', function() {
+				location.href=location.pathname+"?workcenter="+this.value+"&department="+$("#form_departments").val();
+			});
+			$('#form_departments').on('change', function() {
+				location.href=location.pathname+"?workcenter="+$("#form_workcenters").val()+"&department="+this.value;
+			});
+
+
 			window.setInterval(function(){
 				if(flagRefresh){
 					flagRefresh=false;

@@ -22,6 +22,8 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use App\Modules\HR\Utils\HRClocksUtils;
 use App\Modules\HR\Entity\HRClocks;
 use App\Modules\HR\Entity\HRWorkers;
+use App\Modules\HR\Entity\HRWorkCenters;
+use App\Modules\HR\Entity\HRDepartments;
 use App\Modules\HR\Reports\HRClocksReports;
 use App\Modules\Globale\Entity\GlobaleNotifications;
 use App\Modules\Globale\Controller\GlobaleFirebaseDevicesController;
@@ -47,6 +49,7 @@ class HRClocksController extends Controller
      $formUtils=new GlobaleFormUtils();
      $formUtils->initialize($this->getUser(), new $this->class(), dirname(__FILE__)."/../Forms/Clocks.json", $request, $this, $this->getDoctrine());
      $templateLists[]=$utils->formatList($this->getUser());
+
      $templateForms[]=$formUtils->formatForm('clocks', true, null, $this->class);
      if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
        return $this->render('@Globale/genericlist.html.twig', [
@@ -72,8 +75,14 @@ class HRClocksController extends Controller
       $userdata=$this->getUser()->getTemplateData();
       $locale = $request->getLocale();
       $this->router = $router;
+			$department=$request->query->get("department",0);
+			$workcenter=$request->query->get("workcenter",0);
       $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
       $utils = new $this->utilsClass();
+			$repositoryDepartment = $this->getDoctrine()->getRepository(HRDepartments::class);
+ 		  $departments = $repositoryDepartment->findBy(["company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
+ 		  $repositoryWorkCenters = $this->getDoctrine()->getRepository(HRWorkCenters::class);
+ 		  $workCenters = $repositoryWorkCenters->findBy(["company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
 			$repository = $this->getDoctrine()->getManager()->getRepository($this->class);
       if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
         return $this->render('@HR/workersclocks.html.twig', [
@@ -83,7 +92,11 @@ class HRClocksController extends Controller
           'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
           'breadcrumb' =>  "workers",
           'userData' => $userdata,
-					'clocksList' => $repository->findWorkersClocks($this->getUser()->getCompany())
+					'clocksList' => $repository->findWorkersClocks($this->getUser()->getCompany(),$department,$workcenter),
+ 				  'departments' => $departments,
+					'selectedDepartment' => $department,
+ 				  'workcenters' => $workCenters,
+					'selectedWorkCenter' => $workcenter
           ]);
       } return new RedirectResponse($this->router->generate('app_login'));
       }

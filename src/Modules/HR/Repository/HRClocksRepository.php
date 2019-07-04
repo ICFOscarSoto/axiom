@@ -19,21 +19,17 @@ class HRClocksRepository extends ServiceEntityRepository
         parent::__construct($registry, HRClocks::class);
     }
 
-    public function findWorkersClocks($company){
-      /*$query="select hrc.id, hrw.id workerid, hrw.name, hrw.lastname, hrc.start, hrc.end FROM hrclocks hrc
-                                LEFT JOIN hrworkers hrw ON hrc.worker_id=hrw.id
-                                WHERE hrc.id=(SELECT max(id) from hrclocks WHERE deleted=0 AND worker_id=hrc.worker_id)
-                                AND hrw.company_id = :company AND hrc.deleted=0 AND hrw.deleted=0
-                                group by (hrc.worker_id) ORDER BY name, lastname ASC";*/
-
+    public function findWorkersClocks($company, $department=0, $workcenter=0){
       $query="SELECT hrc.id, hrw.id workerid, hrw.name, hrw.lastname, hrc.start, hrc.end from hrworkers hrw
               LEFT JOIN (
               	SELECT m1.*
               	FROM hrclocks m1 LEFT JOIN hrclocks m2
                	ON (m1.worker_id = m2.worker_id AND m1.id < m2.id)
               	WHERE m2.id IS NULL AND m1.deleted=0 AND m1.active=1) hrc ON hrc.worker_id=hrw.id
-              WHERE hrw.company_id = :company AND hrw.deleted=0 AND hrw.active=1
-              ORDER BY lastname, name ASC";
+              WHERE hrw.company_id = :company AND hrw.deleted=0 AND hrw.active=1 ";
+      if($department!=0) $query.=" AND hrw.department_id=".$department;
+      if($workcenter!=0) $query.=" AND hrw.workcenters_id=".$workcenter;
+      $query.=" ORDER BY lastname, name ASC";
 
       $params=['company' => $company->getId()];
       return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
