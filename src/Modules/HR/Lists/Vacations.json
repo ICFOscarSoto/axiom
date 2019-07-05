@@ -1,13 +1,22 @@
 [{"name": "id", "caption":""},
  {"name": "type", "caption":"Tipo", "replace":{
-    "1":"Vacaciones",
-    "2":"Permiso",
-    "3":"Asuntos propios",
-    "4":"Excedencia"
+    "1":{"text":"Vacaciones","html":"Vacaciones"},
+    "2":{"text":"Permiso","html":"Permiso"},
+    "3":{"text":"Asuntos propios","html":"Asuntos propios"},
+    "4":{"text":"Excedencia","html":"Excedencia"}
    }},
  {"name": "start", "caption":"Inicio"},
  {"name": "end", "caption":"Fin"},
  {"name": "days", "caption":"Días", "width":"10%", "sum": true},
- {"name": "approved", "caption":"Valido", "width":"10%" ,"class" : "dt-center", "replace":{"0":"<div style=\"min-width: 75px;\" class=\"label label-danger\">Pendiente</div>", "1" : "<div style=\"min-width: 75px;\" class=\"label label-success\">Aprobadas</div>"}},
- {"name": "active", "caption":"Estado", "width":"10%" ,"class" : "dt-center", "replace":{"1":"<div style=\"min-width: 75px;\" class=\"label label-success\">Activo</div>", "0" : "<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado</div>"}}
+ {"name": "approved", "caption":"Aprobadas", "width":"10%" ,"class" : "dt-center", "replace":{
+                            "2":{"text":"Rechazadas","html":"<div style=\"min-width: 75px;\" class=\"label label-danger\">Rechazadas</div>"},
+                            "1":{"text":"Aprobadas","html":"<div style=\"min-width: 75px;\" class=\"label label-success\">Aprobadas</div>"},
+                            "0":{"text":"Pendientes","html":"<div style=\"min-width: 75px;\" class=\"label label-warning\">Pendientes</div>"}
+                          }
+  },
+ {"name": "active", "caption":"Estado", "width":"10%" ,"class" : "dt-center", "replace":{
+                            "1":{"text":"Activo","html":"<div style=\"min-width: 75px;\" class=\"label label-success\">Activo</div>"},
+                            "0":{"text":"Desactivado","html":"<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado</div>"}
+                          }
+  }
 ]

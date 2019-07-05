@@ -204,9 +204,12 @@ class GlobaleListUtils
                               $value='';
                               $path=explode('__', $origin);
                               $obj=$record;
+                              $obj_id=0;
                               foreach($path as $step){
                                 if(method_exists($obj, "get".ucfirst($step))){
+                                  $obj_id=$obj->getId();
                                   $obj=$obj->{"get".ucfirst($step)}();
+
                                 }
                               }
                               if(!is_object($obj)) {$value= $obj;}
@@ -216,13 +219,14 @@ class GlobaleListUtils
                                   }else $value='';
                               }
                               $data_ob[$name]=$value;
+                              if(strpos($name,'__')!==FALSE) $data_ob[$name."_id"]=$obj_id;
                               //Aplicamos los replaces
                               if(isset($field["replace"])){
                                   foreach($field["replace"] as $key=>$replace){
                                     if($data_ob[$name]==$key){
-                                      $data_ob[$name]=array($data_ob[$name],$replace);
-                                    break;
-                                      }
+                                      $data_ob[$name]=array($data_ob[$name],$replace["html"]);
+                                      break;
+                                    }
                                   }
                               }
 

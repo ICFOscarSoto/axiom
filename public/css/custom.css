@@ -41,6 +41,26 @@ th.table-header-search input{
   border: 0 !important;
   padding: 0px 0px !important;
 }
+.table-header-search .select2-container{
+      width: 100% !important;
+}
+
+.table-header-search .select2-container .select2-chosen {
+    font-size: 11px !important;
+  /*  color: #d5d5d5 !important;*/
+  }
+
+.table-header-search .select2-container .select2-choice .select2-arrow {
+  width: 16px !important;
+}
+
+.table-header-search .select2-container .select2-choice .select2-arrow b:before {
+  /*color:#d5d5d5;*/
+}
+
+.select2-bigdrop {
+  width: 200px !important;
+}
 
 .principal-content{
   min-height: 700px;

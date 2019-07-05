@@ -1,5 +1,9 @@
 [ {"name": "id", "caption":""},
   {"name": "productvariant__ean13", "caption":"Product Variant", "width" : "50"},
   {"name": "variant__name", "caption":"Variant", "width" : "90"},
-  {"name": "active", "caption":"Estado", "width":"10%" ,"class" : "dt-center", "replace":{"1":"<div style=\"min-width: 75px;\" class=\"label label-success\">Activo</div>", "0" : "<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado</div>"}}
+  {"name": "active", "caption":"Estado", "width":"10%" ,"class" : "dt-center", "replace":{
+                             "1":{"text":"Activo","html":"<div style=\"min-width: 75px;\" class=\"label label-success\">Activo</div>"},
+                             "0":{"text":"Desactivado","html":"<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado</div>"}
+                           }
+   }
 ]

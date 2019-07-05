@@ -122,8 +122,11 @@
 										"render": function(data, type, row, meta){
 
 											var text='';
-												if(Array.isArray(data))
+											var id=0;
+												if(Array.isArray(data)){
 													text=data[1];
+													id=data[0];
+													}
 													else text=data;
 												if({{counter}}=={{listConstructor.tagColumn}}){
 													text+="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
@@ -131,6 +134,19 @@
 															text+='<div class="label label-'+valor.type+'">'+valor.name+'</div>';
 													});
 												}
+												{# Check if has a select associated and fill it #}
+													{% if '__' in field.name %}
+														{# check if exist the element in select #}
+														if ($('#s_{{ field.name}}').find("option[value='" + row["{{ field.name}}"] + "']").length) {
+														   // $('#s_{{ field.name}}').val(row["{{ field.name}}"]).trigger('change');
+														} else {
+																{# element not exist add it #}
+														    var newOption = new Option(row["{{ field.name}}"], row["{{ field.name}}"], true, true);
+														    $('#s_{{ field.name}}').append(newOption);
+														}
+
+													{% endif %}
+
 												return text;
 										},
 										{% endif %}
@@ -178,7 +194,11 @@
 						if((load_wait)>0){ load_wait--; if(load_wait==0) $("#load-spinner").fadeOut();}
 					}
     		}).on('preDraw', function () {
-        	if((load_wait)==0){ $("#load-spinner").fadeIn(); load_wait++;}
+        	if((load_wait)==0){
+						$("#load-spinner").fadeIn();
+						load_wait++;
+
+					}
 		    })
 		    .on( 'draw.dt', function () {
 		      if((load_wait)>0){ load_wait--; if(load_wait==0) $("#load-spinner").fadeOut();}
@@ -205,11 +225,31 @@
 				});
 
 				{% for field in listConstructor.fields %}
-					$('body').on('keyup', '#s_{{ field.name }}', function() {
-						{{ listConstructor.id }}.columns('{{ field.name }}:name').search( this.value ).draw();
-						arrayParams={{ listConstructor.id }}.ajax.params();
-						$("#search_param").val(jQuery.param(arrayParams));
-					});
+
+					{% if field.replace is defined %}
+						$('body').on('change', '#s_{{ field.name }}', function() {
+							{{ listConstructor.id }}.columns('{{ field.name }}:name').search( this.value ).draw();
+							arrayParams={{ listConstructor.id }}.ajax.params();
+							$("#search_param").val(jQuery.param(arrayParams));
+						});
+					{% else %}
+						{% if '__' in field.name %}
+
+						$('body').on('change', '#s_{{ field.name }}', function() {
+							{{ listConstructor.id }}.columns('{{ field.name }}:name').search( this.value ).draw();
+							arrayParams={{ listConstructor.id }}.ajax.params();
+							$("#search_param").val(jQuery.param(arrayParams));
+						});
+
+
+						{% else %}
+							$('body').on('keyup', '#s_{{ field.name }}', function() {
+								{{ listConstructor.id }}.columns('{{ field.name }}:name').search( this.value ).draw();
+								arrayParams={{ listConstructor.id }}.ajax.params();
+								$("#search_param").val(jQuery.param(arrayParams));
+							});
+						{% endif %}
+					{% endif %}
 
 
 
@@ -504,7 +544,37 @@
 					{# only show search fields in data type fields#}
 					{% for field in listConstructor.fields %}
 						{% if field.type is not defined or field.type == "data" %}
-							<th class="table-header-search"><input  id="s_{{ field.name }}" type="text" class="form-control" placeholder="Buscar {{ field.caption }}" /></th>
+							<th class="table-header-search">
+								{% if field.replace is defined %}
+								  {# Show combo box on replaces #}
+									<select id="s_{{ field.name }}" class="select2-use">
+										<option value="">Todos</option>
+										{% for key,option in field.replace %}
+											<option value="{{ key }}">{{ option.text }}</option>
+										{% endfor %}
+									</select>
+									<script>
+										$(document).ready(function() {
+											$("#s_{{ field.name }}").select2({dropdownCssClass : 'select2-bigdrop'});
+										});
+									</script>
+								{% else %}
+									{% if '__' in field.name %}
+										{# Relations #}
+											<select id="s_{{ field.name }}" class="select2-use">
+												<option value="" selected>Todos</option>
+											</select>
+											<script>
+												$(document).ready(function() {
+													$("#s_{{ field.name }}").select2({dropdownCssClass : 'select2-bigdrop'});
+												});
+											</script>
+									{% else %}
+								   	{# Other fields show inputs #}
+										<input  id="s_{{ field.name }}" type="text" class="form-control" placeholder="Buscar {{ field.caption }}" />
+									{% endif %}
+								{% endif %}
+							</th>
 						{% else %}
 							<th></th>
 						{% endif %}
