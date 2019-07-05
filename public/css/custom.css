@@ -38,7 +38,7 @@ th.table-header-search {
 }
 
 th.table-header-search input{
-  border: 0;
+  border: 0 !important;
   padding: 0px 0px !important;
 }
 
@@ -65,10 +65,14 @@ th.table-header-search input{
   background-color: #fff;
 }
 
+.table-header-search input::placeholder {
+  color: #d5d5d5;
+}
+
 table.dataTable thead th, table.dataTable thead td {
 	/*padding: 10px 18px !important;*/
   padding: 10px 18px;
-  border-bottom: 1px solid #ebebeb!important;
+  border-bottom: 1px solid #cecece !important;
   background-color: #fff;
 }
 
@@ -184,6 +188,10 @@ table.dataTable.compact tbody th, table.dataTable.compact tbody td {
   color: #333;
 }
 
+.login-content input {
+    border: 0 !important;
+}
+
 .mail-env .mail-sidebar .mail-menu > li a {
   padding: 10px !important;
 }
@@ -218,6 +226,12 @@ table.dataTable.compact tbody th, table.dataTable.compact tbody td {
 label.form-check-label {
     margin-left: 5px;
 }
+
+.page-body .select2-drop {
+    border: 1px solid #ababab !important;
+}
+
+
 
 .panel.minimal > .panel-heading > .panel-title {
   font-family: "Helvetica Neue", Helvetica, "Noto Sans", sans-serif;
@@ -310,6 +324,9 @@ label.form-check-label {
 .form-check{
   height: 55px;
   padding-top: 26px;
+}
+.form-control {
+  border: 1px solid #cecece !important;
 }
 
 .text-area-form{

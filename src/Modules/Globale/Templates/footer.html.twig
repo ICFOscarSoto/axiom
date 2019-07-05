@@ -2,6 +2,6 @@
 <footer class="main">
 <div align="center">
 	<!--<p><img src="{{ url('index') }}/images/logo-transparent.png" width="180" alt="" /></p></br>-->
-	&copy; {{ "now"|date("Y") }} <strong>Aplicode Engineered Technologies S.L.</strong>
+	&copy; {{ "now"|date("Y") }} <strong>{% if userData is defined and userData.companyId != 2 %}Aplicode Engineered Technologies S.L.{% else %}Ferretería Campollano{% endif %}</strong>
 </div>
 </footer>
