@@ -144,9 +144,14 @@
 														    var newOption = new Option(row["{{ field.name}}"], row["{{ field.name}}"], true, true);
 														    $('#s_{{ field.name}}').append(newOption);
 														}
-
 													{% endif %}
-
+												{# if field is datetime convert it to spanish date format #}
+												{% if field.type is defined %}
+													{% if field.type == "datetime" %}
+														var date=moment(text, "YYYY-MM-DD HH:mm:ss");
+														text=date.format('DD/MM/YYYY HH:mm:ss');
+													{% endif %}
+												{% endif %}
 												return text;
 										},
 										{% endif %}
@@ -537,17 +542,18 @@
 		{% endif %}
 	{% endfor %}
 	<table id="{{ listConstructor.id }}" class="table table-bordered hover stripe compact datatable" style="width: 100%">
-			<thead>
+			<thead class="table-thead">
 				<tr>
-					<th class="table-header-search">
+					<th class="table-header-search" style="border-bottom: 1px solid #cecece !important;vertical-align: middle;text-align: center;font-size: 22px;color: #cececece;">
+						<i class="fa fa-search"></i>
 					</th>
 					{# only show search fields in data type fields#}
 					{% for field in listConstructor.fields %}
 						{% if field.type is not defined or field.type == "data" %}
-							<th class="table-header-search">
+							<th class="table-header-search" style="border-bottom: 1px solid #cecece !important;">
 								{% if field.replace is defined %}
 								  {# Show combo box on replaces #}
-									<select id="s_{{ field.name }}" class="select2-use">
+									<select id="s_{{ field.name }}" class="form-control table-header-search-input select2-use">
 										<option value="">Todos</option>
 										{% for key,option in field.replace %}
 											<option value="{{ key }}">{{ option.text }}</option>
@@ -561,7 +567,7 @@
 								{% else %}
 									{% if '__' in field.name %}
 										{# Relations #}
-											<select id="s_{{ field.name }}" class="select2-use">
+											<select id="s_{{ field.name }}" class="form-control table-header-search-input select2-use">
 												<option value="" selected>Todos</option>
 											</select>
 											<script>
@@ -571,31 +577,56 @@
 											</script>
 									{% else %}
 								   	{# Other fields show inputs #}
-										<input  id="s_{{ field.name }}" type="text" class="form-control" placeholder="Buscar {{ field.caption }}" />
+
+										<input id="s_{{ field.name }}" type="text" class="table-header-search-input form-control" placeholder="Buscar {{ field.caption }}"  autocomplete="off"/>
+
 									{% endif %}
 								{% endif %}
 							</th>
 						{% else %}
-							<th></th>
+							<th class="table-header-search" style="border-bottom: 1px solid #cecece !important;">
+								{% if field.type == "datetime" %}
+									<div><div class='input-group date'>
+												<input id="s_{{ field.name }}_from" attr-group="{{ field.name }}" attr-max="s_{{ field.name }}_to" type="text" class="datetimepicker table-header-search-input form-control" placeholder="{{ field.caption }} desde"  autocomplete="off"/>
+												<span class="input-group-addon">
+                        	<span class="glyphicon glyphicon-calendar"></span>
+                    		</span>
+										</div></div>
+									<div style="height: 5px;"></div>
+									<div><div class='input-group date'>
+										<input id="s_{{ field.name }}_to" attr-group="{{ field.name }}" attr-min="s_{{ field.name }}_from" type="text" class="datetimepicker table-header-search-input form-control" placeholder="{{ field.caption }} hasta"  autocomplete="off"/>
+										<span class="input-group-addon">
+											<span class="glyphicon glyphicon-calendar"></span>
+										</span>
+									</div></div>
+								{% endif %}
+							</th>
 						{% endif %}
 					{% endfor %}
 
-					{% for field in listConstructor.fieldButtons %}
-						<th class="table-header-search"></th>
-					{% endfor %}
+					{#{% for field in listConstructor.fieldButtons %}#}
+					{% set buttons = listConstructor.fieldButtons|length %}
+						<th class="table-thead-search" colspan="{{ buttons }}" style="border-bottom: 1px solid #cecece !important;">
+								<div class="btn-group ">
+									<button id="clear-filters" type="button" class="btn btn-default tooltip-primary" style="border-color: #8a8a8a !important;height: 26px;line-height: 13px;">
+										<i class="fa fa-eraser"></i>&nbsp;Limpiar filtros
+									</button>
+								</div>
+						</th>
+					{#{% endfor %}#}
 
 				</tr>
-					<th class="table-header-name">
+					<th class="table-header-name table-thead" style="border-bottom: 1px solid #cecece !important;">
 						<div class="checkbox checkbox-replace">
 							<input type="checkbox" id="{{ listConstructor.id }}-chkall">
 						</div>
 					</th>
 					{% for field in listConstructor.fields %}
-						<th class="table-header-name {% if field.sum is defined and field.sum == true %} sum {% endif %} {% if field.format is defined %} {{field.format}} {% endif %}">{{ field.caption }} </th>
+						<th style="border-bottom: 1px solid #cecece !important;" class="table-header-name table-thead {% if field.sum is defined and field.sum == true %} sum {% endif %} {% if field.format is defined %} {{field.format}} {% endif %}">{{ field.caption }} </th>
 					{% endfor %}
 
 					{% for field in listConstructor.fieldButtons %}
-						<th class=""></th>
+						<th class="table-thead" style="border-bottom: 1px solid #cecece !important;"></th>
 					{% endfor %}
 
 			</thead>
@@ -620,6 +651,7 @@
 			</tr>
 		</tfoot>
 	</table>
+
 	<div class="modal fade" id="{{ listConstructor.id }}-modal-confirm" data-backdrop="static" style="display: none;">
 		<div class="modal-dialog">
 			<div class="modal-content" style="transform: matrix(1, 0, 0, 1, 0, 0);">
@@ -636,6 +668,89 @@
 		</div>
 	</div>
 
+	<script>
+	$(document).ready(function() {
+		$('.datetimepicker').each(function(index) {
+			var valueField=$(this).val();
+			var dateField=moment(valueField, "DD/MM/YYYY HH:mm:ss");
+				$(this).datetimepicker({
+				showTodayButton: true,
+				format: 'DD/MM/YYYY HH:mm:ss',
+				locale:'es',
+				useCurrent: false,
+				tooltips: spanish_tooltips_datetimepicker,
+				date: (dateField.isValid())?dateField:null
+			});
+		});
+		$('.datepicker').each(function(index) {
+			var valueField=$(this).val();
+			var dateField=moment(valueField, "DD/MM/YYYY");
+				$(this).datetimepicker({
+				showTodayButton: true,
+				format: 'DD/MM/YYYY',
+				locale:'es',
+				useCurrent: false,
+				tooltips: spanish_tooltips_datetimepicker,
+				date: (dateField.isValid())?dateField:null
+			});
+		});
+
+		$('.timepicker').each(function(index) {
+			var valueField=$(this).val();
+			var dateField=moment(valueField, "HH:mm:ss");
+				$(this).datetimepicker({
+				showTodayButton: true,
+				format: 'HH:mm:ss',
+				locale:'es',
+				useCurrent: false,
+				tooltips: spanish_tooltips_datetimepicker,
+				date: (dateField.isValid())?dateField:null
+			});
+
+		});
+		$("[id$='_from']").on("dp.change", function (e) {
+				var from_date=e.date;
+				var to_date=$('#'+$(this).attr('attr-max')).data("DateTimePicker").date();
+				from_date=from_date!=null?from_date.format("YYYY-MM-DD HH:mm:ss"):"";
+				to_date=to_date!=null?to_date.format("YYYY-MM-DD HH:mm:ss"):"";
+				$('#'+$(this).attr('attr-max')).data("DateTimePicker").minDate(e.date);
+				$("#{{ listConstructor.id }}").DataTable().columns($(this).attr('attr-group')+':name').search( from_date+'#'+to_date ).draw();
+				arrayParams=$("#{{ listConstructor.id }}").DataTable().ajax.params();
+				$("#search_param").val(jQuery.param(arrayParams));
+		});
+		$("[id$='_to']").on("dp.change", function (e) {
+				var to_date=e.date;
+				var from_date=$('#'+$(this).attr('attr-min')).data("DateTimePicker").date();
+				if(e.oldDate==null){
+					e.date.set({h:23,m:59,s:59});
+					$('#'+$(this).attr('id')).data("DateTimePicker").date(e.date);
+				}
+				from_date=from_date!=null?from_date.format("YYYY-MM-DD HH:mm:ss"):"";
+				to_date=to_date!=null?to_date.format("YYYY-MM-DD HH:mm:ss"):"";
+				$('#'+$(this).attr('attr-min')).data("DateTimePicker").maxDate(e.date);
+				$("#{{ listConstructor.id }}").DataTable().columns($(this).attr('attr-group')+':name').search( from_date+'#'+to_date ).draw();
+				arrayParams=$("#{{ listConstructor.id }}").DataTable().ajax.params();
+				$("#search_param").val(jQuery.param(arrayParams));
+		});
+
+		$('body').on('click', "#clear-filters", function() {
+				$("#clear-filters").parent().parent().parent().find('input').val('');
+				$("#clear-filters").parent().parent().parent().find('select').select2('val', $(this).find(">:first-child").val());
+				//$('#s_invalid').select2('val', $('#s_invalid option:first-child').val());
+				$("#{{ listConstructor.id }}").DataTable().columns().search("").draw();
+				//$("#{{ listConstructor.id }}").DataTable().ajax.reload();
+
+		});
+
+
+
+
+		/*$("[id$='_to']").on("dp.change", function (e) {
+				$('#'+$(this).attr('attr-min')).data("DateTimePicker").maxDate(e.date);
+				console.log("Cambio");
+		});*/
+	});
+	</script>
 
 {% if include_post_templates is defined %}
 	{% for template in include_post_templates %}

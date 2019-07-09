@@ -32,34 +32,45 @@ th.table-header-name{
   padding: 7px 2px !important;
 }
 
-th.table-header-search {
+.table-header-search {
   margin: 0px !important;
-  padding: 0 !important;
+  /*padding: 0 !important;*/
+  padding-top: 5px !important;
+  padding-bottom: 5px !important;
 }
 
-th.table-header-search input{
-  border: 0 !important;
+.table-header-search-input{
+  /*border: 0 !important;*/
   padding: 0px 0px !important;
+  height: 25px;
+
 }
-.table-header-search .select2-container{
+.table-header-search > .select2-container{
       width: 100% !important;
 }
 
-.table-header-search .select2-container .select2-chosen {
+.table-header-search > .select2-container .select2-chosen {
     font-size: 11px !important;
   /*  color: #d5d5d5 !important;*/
   }
 
-.table-header-search .select2-container .select2-choice .select2-arrow {
+.table-header-search > .select2-container .select2-choice .select2-arrow {
   width: 16px !important;
 }
 
-.table-header-search .select2-container .select2-choice .select2-arrow b:before {
+.table-header-search > .select2-container .select2-choice .select2-arrow b:before {
   /*color:#d5d5d5;*/
+}
+
+
+.table-header-search .select2-container .select2-choice {
+  height: 23px !important;
+  line-height: 25px !important;
 }
 
 .select2-bigdrop {
   width: 200px !important;
+  height: 25px !important;
 }
 
 .principal-content{
@@ -67,8 +78,11 @@ th.table-header-search input{
 }
 
 .table-header-search{
-	background-color: #FFFFFF !important;
+	/*background-color: #FFFFFF !important;*/
+  background-color: #f8f8f8 !important;
 	border: none !important;
+
+
 }
 
 .table-bordered > thead > tr > th, .table-bordered > tbody > tr > th, .table-bordered > thead > tr > td, .table-bordered > tbody > tr > td{
@@ -89,11 +103,17 @@ th.table-header-search input{
   color: #d5d5d5;
 }
 
-table.dataTable thead th, table.dataTable thead td {
+.bootstrap-datetimepicker-widget thead th, .bootstrap-datetimepicker-widget thead td {
 	/*padding: 10px 18px !important;*/
-  padding: 10px 18px;
-  border-bottom: 1px solid #cecece !important;
+  padding: initial !important;
+  border-bottom: 0px solid #ffffff !important;
   background-color: #fff;
+}
+.table-thead{
+/*table.dataTable thead th, table.dataTable thead td {*/
+	/*padding: 10px 18px !important;*/
+  padding: 10px 18px !important;
+  background-color: #fff !important;
 }
 
 table.dataTable.compact tbody th, table.dataTable.compact tbody td {
@@ -103,7 +123,6 @@ table.dataTable.compact tbody th, table.dataTable.compact tbody td {
 table.dataTable.compact tbody th, table.dataTable.compact tbody td:hover{
     cursor: default !important;
 }
-
 
 table.dataTable.compact tbody th, table.dataTable.compact tbody td {
     padding: 1px;
@@ -327,8 +346,8 @@ label.form-check-label {
   z-index: 10011 !important;
 }
 .page-body .select2-container .select2-choice {
-  height: 28px !important;
-  line-height: 28px !important;
+  height: 28px;
+  line-height: 28px;
 }
 .select2-container .select2-choice {
   border: none !important;

@@ -172,6 +172,7 @@ class HRClocksController extends Controller
 					$lastClock->setStart(new \DateTime());
 					$lastClock->setDateupd(new \DateTime());
 					$lastClock->setDateadd(new \DateTime());
+					$lastClock->setInvalid(0);
 					$lastClock->setActive(1);
 					$lastClock->setDeleted(0);
 					$this->getDoctrine()->getManager()->persist($lastClock);

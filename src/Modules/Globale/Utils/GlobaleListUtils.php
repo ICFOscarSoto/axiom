@@ -79,6 +79,32 @@ class GlobaleListUtils
   						$queryFiltered->setParameter('val_'.$field["name"], '%'.$searchValue.'%');
   					}
   				}
+        }else{
+          //If field is datetime type
+          if($field["type"]=="datetime"){
+            $searchValue=$request->query->get('columns');
+            $keyColumn=$this->searchColumns($searchValue, $field["name"]);
+            if(!$keyColumn) continue;
+            $searchValue=$searchValue[$keyColumn]['search']['value'];
+            if($searchValue!=""){
+              $searchValue=explode("#", $searchValue);
+              $date_from=$searchValue[0];
+              $date_to=isset($searchValue[1])?$searchValue[1]:"2999-12-30 23:59:59";
+              if($date_from!=''){
+                $query->andWhere('p.'.$field["name"].' >= :val_'.$field["name"].'_from');
+    						$query->setParameter('val_'.$field["name"].'_from', $date_from);
+    						$queryFiltered->andWhere('p.'.$field["name"].' >= :val_'.$field["name"].'_from');
+    						$queryFiltered->setParameter('val_'.$field["name"].'_from', $date_from);
+              }
+              if($date_to!=''){
+                $query->andWhere('p.'.$field["name"].' <= :val_'.$field["name"].'_to');
+    						$query->setParameter('val_'.$field["name"].'_to', $date_to);
+    						$queryFiltered->andWhere('p.'.$field["name"].' <= :val_'.$field["name"].'_to');
+    						$queryFiltered->setParameter('val_'.$field["name"].'_to', $date_to);
+              }
+
+            }
+          }
         }
 		}
 		//Excluimos los elementos borrados
