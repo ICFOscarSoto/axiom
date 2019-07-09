@@ -148,8 +148,10 @@
 												{# if field is datetime convert it to spanish date format #}
 												{% if field.type is defined %}
 													{% if field.type == "datetime" %}
-														var date=moment(text, "YYYY-MM-DD HH:mm:ss");
-														text=date.format('DD/MM/YYYY HH:mm:ss');
+														if(text!=""){
+															var date=moment(text, "YYYY-MM-DD HH:mm:ss");
+															text=date.format('DD/MM/YYYY HH:mm:ss');
+														}
 													{% endif %}
 												{% endif %}
 												return text;
