@@ -2804,7 +2804,6 @@ fieldset[disabled] .btn-danger.focus {
   padding: 12px 15px;
 }
 .page-body .select2-drop .select2-search input {
-  background: #fcfcfc !important;
   border: 0;
   -webkit-background-clip: padding-box;
   -moz-background-clip: padding;
