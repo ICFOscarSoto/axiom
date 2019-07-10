@@ -292,7 +292,7 @@ class GlobaleCompaniesController extends Controller
 			}
 
 	    $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser()];
-	    $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
+	    $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),["agent", "bankaccount"]);
 	    return $utils->make($id, $this->class, $action, "formCompany", "full", "@Globale/form.html.twig", 'formCompany', $this->utilsClass);
 	  }
 
