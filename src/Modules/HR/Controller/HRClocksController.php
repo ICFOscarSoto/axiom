@@ -26,6 +26,7 @@ use App\Modules\HR\Entity\HRWorkCenters;
 use App\Modules\HR\Entity\HRDepartments;
 use App\Modules\HR\Reports\HRClocksReports;
 use App\Modules\Globale\Entity\GlobaleNotifications;
+use App\Modules\Globale\Config\GlobaleConfigVars;
 use App\Modules\Globale\Controller\GlobaleFirebaseDevicesController;
 
 class HRClocksController extends Controller
@@ -154,6 +155,7 @@ class HRClocksController extends Controller
 			$workersrepository=$this->getDoctrine()->getRepository(HRWorkers::class);
 			$clocksrepository=$this->getDoctrine()->getRepository(HRClocks::class);
 			$companiesrepository=$this->getDoctrine()->getRepository(GlobaleCompanies::class);
+			$config=new GlobaleConfigVars();
 			$companiesrepository->find($company);
 			//Comprobamos si el empleado pertenece a la empresa
 			$worker=$workersrepository->findOneBy(["company"=>$company,"clockCode"=>$id]);
@@ -195,7 +197,7 @@ class HRClocksController extends Controller
  						 'notificationid' => $notification->getId()]
 	        );
 				  $ch = curl_init();
-					curl_setopt($ch, CURLOPT_URL,"https://axiom.aplicode.com".$url);
+					curl_setopt($ch, CURLOPT_URL,$config->host.$url);
 					curl_setopt($ch, CURLOPT_POST, 1);
 					curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 					$result= curl_exec ($ch);
@@ -227,7 +229,7 @@ class HRClocksController extends Controller
 				 );
 				 $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
 				 $ch = curl_init();
-				 curl_setopt($ch, CURLOPT_URL,"https://axiom.aplicode.com".$url);
+				 curl_setopt($ch, CURLOPT_URL,$config->host.$url);
 				 curl_setopt($ch, CURLOPT_POST, 1);
 				 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 				 $result= curl_exec ($ch);

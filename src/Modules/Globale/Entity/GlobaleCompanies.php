@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\ERP\Entity\ERPBankAccounts;
 use \App\Modules\Globale\Entity\GlobaleUsers;
+use \App\Modules\Globale\Entity\GlobaleAgents;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\Globale\Repository\GlobaleCompaniesRepository")
@@ -138,14 +139,19 @@ class GlobaleCompanies
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPBankAccounts" , fetch="EAGER")
      */
     private $bankaccount;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleAgents")
+     */
+    private $agent;
 	public function __construct()
-                                                      {
-                                                          $this->userGroups = new ArrayCollection();
-                                                          $this->users = new ArrayCollection();
-                                                          $this->menuOptions = new ArrayCollection();
-                                                          $this->dateadd = new \Datetime();
-                                                          $this->dateupd =  new \Datetime();
-                                                      }
+                                                                  {
+                                                                      $this->userGroups = new ArrayCollection();
+                                                                      $this->users = new ArrayCollection();
+                                                                      $this->menuOptions = new ArrayCollection();
+                                                                      $this->dateadd = new \Datetime();
+                                                                      $this->dateupd =  new \Datetime();
+                                                                  }
 
     public function getId(): ?int
     {
@@ -531,6 +537,18 @@ class GlobaleCompanies
     public function setBankaccount(?ERPBankAccounts $bankaccount): self
     {
         $this->bankaccount = $bankaccount;
+
+        return $this;
+    }
+
+    public function getAgent(): ?GlobaleAgents
+    {
+        return $this->agent;
+    }
+
+    public function setAgent(?GlobaleAgents $agent): self
+    {
+        $this->agent = $agent;
 
         return $this;
     }

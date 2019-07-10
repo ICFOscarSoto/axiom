@@ -7,6 +7,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\Globale\Entity\GlobaleCompanies;
+use App\Modules\Globale\Config\GlobaleConfigVars;
 
 class GlobaleClockDevicesUtils
 {
@@ -41,12 +42,13 @@ class GlobaleClockDevicesUtils
   }
 
   public function setdatetime($params){
+    $config=new GlobaleConfigVars();
     $ch = curl_init();
     $post = [
         'command' => 'setDateTime',
         'id' => $params["id"]
     ];
-    curl_setopt($ch, CURLOPT_URL,"http://cde.aplicode.com/command.php");
+    curl_setopt($ch, CURLOPT_URL,$config->cdeCommand);
     curl_setopt($ch, CURLOPT_POST, 1);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
@@ -55,6 +57,7 @@ class GlobaleClockDevicesUtils
   }
 
   public function setuserdata($params){
+    $config=new GlobaleConfigVars();
     $ch = curl_init();
     $worker=$params["worker"];
     $name=$worker->getName().' '.$worker->getLastname();
@@ -70,7 +73,7 @@ class GlobaleClockDevicesUtils
         'idd' =>$params["idd"],
         'username' =>$username
     ];
-    curl_setopt($ch, CURLOPT_URL,"http://cde.aplicode.com/command.php");
+    curl_setopt($ch, CURLOPT_URL,$config->cdeCommand);
     curl_setopt($ch, CURLOPT_POST, 1);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, $post);

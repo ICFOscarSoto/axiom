@@ -11,6 +11,7 @@
 				{	"name": "socialname",	"cols": 8},
 				{	"name": "country", "cols": 4},
 				{	"name": "domain", "cols": 4},
+				{	"name": "agent", "cols": 4},
 				{	"name": "currency",	"cols": 4},
 				{	"name": "state", "cols": 4},
 				{	"name": "city",	"cols": 4},

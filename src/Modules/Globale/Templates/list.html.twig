@@ -137,13 +137,14 @@
 												{# Check if has a select associated and fill it #}
 													{% if '__' in field.name %}
 														{# check if exist the element in select #}
-														if ($('#s_{{ field.name}}').find("option[value='" + row["{{ field.name}}"] + "']").length) {
-														   // $('#s_{{ field.name}}').val(row["{{ field.name}}"]).trigger('change');
-														} else {
-																{# element not exist add it #}
-														    var newOption = new Option(row["{{ field.name}}"], row["{{ field.name}}"], true, true);
-														    $('#s_{{ field.name}}').append(newOption);
-														}
+														if(row["{{ field.name}}"]!=null)
+															if ($('#s_{{ field.name}}').find("option[value='" + row["{{ field.name}}"] + "']").length) {
+															   // $('#s_{{ field.name}}').val(row["{{ field.name}}"]).trigger('change');
+															} else {
+																	{# element not exist add it #}
+															    var newOption = new Option(row["{{ field.name}}"], row["{{ field.name}}"], true, true);
+															    $('#s_{{ field.name}}').append(newOption);
+															}
 													{% endif %}
 												{# if field is datetime convert it to spanish date format #}
 												{% if field.type is defined %}
@@ -569,6 +570,7 @@
 								{% else %}
 									{% if '__' in field.name %}
 										{# Relations #}
+
 											<select id="s_{{ field.name }}" class="form-control table-header-search-input select2-use">
 												<option value="" selected>Todos</option>
 											</select>

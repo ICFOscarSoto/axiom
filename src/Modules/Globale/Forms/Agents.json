@@ -1,0 +1,14 @@
+[{
+	"sections": [
+		{
+			"name": "Agent data",
+			"fields": [
+				{ "name": "name", "cols": 5},
+				{	"name": "lastname", "cols": 7},
+				{	"name": "vat", "cols": 7},
+				{	"name": "email", "cols": 4},
+				{	"name": "phone", "cols": 4},
+				{	"name": "active", "cols": 2}
+			]
+		}]
+}]
