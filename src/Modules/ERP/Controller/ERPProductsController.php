@@ -40,6 +40,7 @@ class ERPProductsController extends Controller
   		$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
     	$utils = new ERPProductsUtils();
   		$templateLists[]=$utils->formatList($this->getUser());
+			dump($this->getUser());
 			//$formUtils=new GlobaleFormUtils();
 			//$formUtils->initialize($this->getUser(), new $this->class(), dirname(__FILE__)."/../Forms/Products.json", $request, $this, $this->getDoctrine());
 			//$templateForms[]=$formUtils->formatForm('products', true, null, $this->class);
@@ -69,8 +70,7 @@ class ERPProductsController extends Controller
 		 $obj=new ERPProducts();
 		 $productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
 		 $obj=$productRepository->find($id);
-		 $params=["active"=>$obj->getActive()];
-		 $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[]);
+		 $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine());
 		 return $utils->make($id, $this->class, $action, "formproducts","full", "@ERP/productform.html.twig", "formProduct");
 
 		}

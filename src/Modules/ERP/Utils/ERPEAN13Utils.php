@@ -8,6 +8,7 @@ use Symfony\Component\Form\Extension\Core\Type\FileType;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\Email\Entity\EmailAccounts;
 use App\Modules\ERP\Entity\ERPProducts;
+use App\Modules\ERP\Entity\ERPSuppliers;
 
 
 class ERPEAN13Utils
@@ -39,6 +40,7 @@ class ERPEAN13Utils
     $user=$params["user"];
     $product=$params["product"];
     $productsRepository=$doctrine->getRepository(ERPProducts::class);
+    $suppliersRepository=$doctrine->getRepository(ERPSuppliers::class);
     return [
     ['product', ChoiceType::class, [
       'required' => false,

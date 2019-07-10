@@ -12,6 +12,7 @@
 			{{ form_row(formConstructor.form['name']) }}
 			{{ form_row(formConstructor.form['description']) }}
 			{{ form_row(formConstructor.form['manufacturer']) }}
+			{{ form_row(formConstructor.form['supplier']) }}
 			{{ form_row(formConstructor.form['category']) }}
 		</div>
 		{% for section in formConstructor.template.0.sections %}
@@ -140,6 +141,12 @@
 		</div>
 		<div class="col-md-2">
 			{{ form_row(formConstructor.form['onsale']) }}
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-2">
+			{{ form_row(formConstructor.form['active']) }}
+		</div>
 		</div>
 	</div>
 </form>

@@ -19,6 +19,47 @@ class ERPCategoriesRepository extends ServiceEntityRepository
         parent::__construct($registry, ERPCategories::class);
     }
 
+    public function getChildrens($id_category, $temp_childs)
+    {
+
+      $qb= $this->createQueryBuilder('e')
+      ->andWhere('e.parentid=:val')
+      ->setParameter('val', $id_category)
+      ->getQuery()
+      ->getResult()
+      ;
+      foreach($qb as $parent) {
+
+        $child=["id"=>$parent->getId(),"name"=>$parent->getName(), "childrens"=>$this->getChildrens($parent->getId(),[])];
+        array_push($temp_childs,$child);
+      }
+      //dump($childrens);
+      return $temp_childs;
+
+    }
+
+    public function getTree()
+    {
+      $qb= $this->createQueryBuilder('e')
+      ->andWhere('e.parentid is null')
+      ->getQuery()
+      ->getResult()
+      ;
+
+      $childrens=[];
+      foreach($qb as $parent) {
+      $child=[];
+      $child=["id"=>$parent->getId(),"name"=>$parent->getName(), "childrens"=>$this->getChildrens($parent->getId(), $child)];
+      array_push($childrens,$child);
+      }
+
+      return $childrens;
+
+    }
+
+
+
+
     // /**
     //  * @return ERPCategories[] Returns an array of ERPCategories objects
     //  */

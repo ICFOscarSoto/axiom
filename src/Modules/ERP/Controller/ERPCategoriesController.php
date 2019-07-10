@@ -32,13 +32,16 @@ class ERPCategoriesController extends Controller
   		$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
     	$utils = new ERPCategoriesUtils();
   		$templateLists[]=$utils->formatList($this->getUser());
+			$obj = $this->getDoctrine()->getRepository($this->class)->getTree();
+			dump($obj);
+
   		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
   			return $this->render('@ERP/categories.html.twig', [
   				'controllerName' => 'categoriesController',
   				'interfaceName' => 'Categories',
-  				'optionSelected' => $request->attributes->get('_route'),
+  				'optionSelected' => 'dashboard',
   				'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
-  				'breadcrumb' =>  $menurepository->formatBreadcrumb($request->get('_route')),
+  				'breadcrumb' =>  $menurepository->formatBreadcrumb('dashboard'),
   				'userData' => $userdata,
   				'lists' => $templateLists
   				]);

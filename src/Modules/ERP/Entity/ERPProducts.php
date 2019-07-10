@@ -6,6 +6,8 @@ use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\ERP\Entity\ERPManufacturers;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
 use \App\Modules\ERP\Entity\ERPCategories;
+use \App\Modules\ERP\Entity\ERPSuppliers;
+use \App\Modules\HR\Entity\HRWorkers;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPProductsRepository")
@@ -140,6 +142,11 @@ class ERPProducts
      */
     private $category;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPSuppliers")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $supplier;
 
 
     public function getId(): ?int
@@ -419,6 +426,18 @@ class ERPProducts
     public function setCategory(?ERPCategories $category): self
     {
         $this->category = $category;
+
+        return $this;
+    }
+
+    public function getSupplier(): ?ERPSuppliers
+    {
+        return $this->supplier;
+    }
+
+    public function setSupplier(?ERPSuppliers $supplier): self
+    {
+        $this->supplier = $supplier;
 
         return $this;
     }

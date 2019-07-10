@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\ERP\Entity\ERPEAN13;
 use App\Modules\ERP\Entity\ERPProducts;
+use App\Modules\ERP\Entity\ERPSuppliers;
 use App\Modules\Globale\Entity\GlobaleCountries;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
@@ -60,12 +61,20 @@ class ERPEAN13Controller extends Controller
     if($idproduct==0 ) $idproduct=$request->query->get('idproduct');
     if($idproduct==0 || $idproduct==null) $idproduct=$request->request->get('id-parent',0);
     $product = $defaultProduct->find($idproduct);
-  }else $obj = $EAN13Repository->find($id);
-
+   }else $obj = $EAN13Repository->find($id);
+   $supplier=$id==0?$product->getSupplier():$obj->getProduct()->getSupplier();
+   $defaultSupplier=$this->getDoctrine()->getRepository(ERPSuppliers::class);
+   $default=$defaultSupplier->findOneBy(['id'=>2]);
+   dump($supplier);
+   dump($default);
+   $obj->setSupplier($default);
+   dump($obj);
    $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "product"=>$id==0?$product:$obj->getProduct()];
    $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),
                           method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
-   return $utils->make($id, ERPEAN13::class, $action, "formProducts", "modal");
+   $make=$utils->make($id, ERPEAN13::class, $action, "formProducts", "modal");
+
+   return $make;
   }
 
 
