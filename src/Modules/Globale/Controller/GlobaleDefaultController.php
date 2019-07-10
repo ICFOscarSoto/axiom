@@ -69,7 +69,7 @@ class GlobaleDefaultController extends Controller
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 			return $this->render('@Globale/genericlist.html.twig', [
 				'controllerName' => $name.'Controller',
-				'interfaceName' => $name,
+				'interfaceName' => $this->get('translator')->trans($name),
 				'optionSelected' => $request->attributes->get('_route'),
         'optionSelectedParams' => ["module"=>$module, "name"=>$name],
 				'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),

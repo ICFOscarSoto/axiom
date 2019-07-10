@@ -1,7 +1,7 @@
 [{
 	"sections": [
 		{
-			"name": "Personal data",
+			"name": "Work center data",
 			"fields": [
 				{	"name": "name", "cols": 4},
 				{	"name": "address",	"cols": 4},
