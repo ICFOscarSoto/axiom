@@ -52,6 +52,12 @@ Country: País
 Countries: Paises
 Country data: Datos del país
 
+#AGENTS
+#----------------------------------------------------------------------------------------------------------------------
+Agents: Agentes
+Agent data: Datos del agente
+Select an agent: Seleccione un agente
+
 #CURRENCIES
 #----------------------------------------------------------------------------------------------------------------------
 Select globalecurrencies: Seleccionar moneda
