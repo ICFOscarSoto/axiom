@@ -1,8 +1,7 @@
 [{"name": "id", "caption":""},
  {"name": "idcard", "caption":"CIF"},
  {"name": "ss", "caption":"Nº Seg. Social"},
- {"name": "name","caption":"Nombre"},
- {"name": "lastname","caption":"Apellidos", "width":"20%"},
+ {"name": "name_o_lastname","caption":"Nombre","width":"35%"},
  {"name": "workcenters__name","caption":"Centro"},
  {"name": "department__name","caption":"Departamento"},
  {"name": "active", "caption":"Estado", "width":"10%" ,"class" : "dt-center", "replace":{

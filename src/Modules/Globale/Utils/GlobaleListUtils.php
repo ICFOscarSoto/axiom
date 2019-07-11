@@ -76,7 +76,7 @@ class GlobaleListUtils
                     if(count($path)>1){
                       $database_field.=$path[0].'.'.$path[1].',';  // si viene de otra tabla
                     }else{
-                      $database_field.='p.'.$field["name"].','; // si viene de la misma tabla
+                      $database_field.='p.'.$path[0].','; // si viene de la misma tabla
                     }
                 }
                 $database_field=rtrim($database_field,',');
@@ -276,7 +276,7 @@ class GlobaleListUtils
                                 $data_ob[$name]=isset($data_ob[$name])?$data_ob[$name]." ".$temp_val:$temp_val;
                               }
                     break;
-          } 
+          }
 			}
 
 			//Tags
