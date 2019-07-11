@@ -1,0 +1,14 @@
+[{"name": "id", "caption":""},
+ {"name": "name", "caption":"Nombre"},
+ {"name": "type", "caption":"Tipo", "width":"10%" ,"class" : "dt-center", "replace":{
+                            "1":{"text":"Libre","html":"Libre"},
+                            "2":{"text":"Fijo","html":"Fijo"},
+                            "3":{"text":"Rotativo","html":"Rotativo"}
+                          }
+  },
+ {"name": "active", "caption":"Estado", "width":"10%" ,"class" : "dt-center", "replace":{
+                            "1":{"text":"Activo","html":"<div style=\"min-width: 75px;\" class=\"label label-success\">Activo</div>"},
+                            "0":{"text":"Desactivado","html":"<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado</div>"}
+                          }
+  }
+]

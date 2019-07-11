@@ -88,6 +88,7 @@
                     }
                   });
             });
+
           });
             </script>
 
@@ -238,6 +239,38 @@ return blob;
                $("#form_{{ field.name }}").data("DateTimePicker").date(var_form_{{ field.name }});
           {% endif %}
         {% endif %}
+
+
+        {# Depends fields #}
+            {% if field.depends is defined %}
+              $('body').on('change', '#form_{{ field.depends.from }}', function() {
+                {% if field.depends.vals == "any" %}
+                  if($(this).val()!=""){
+                    $("#form_{{ field.name }}").parent().show();
+                  }else $("#form_{{ field.name }}").parent().hide();
+                {% else %}
+                  var vals="{{ field.depends.vals }}";
+                  vals=JSON.parse(vals.replace(/&quot;/g,'"'));
+                  if(vals.indexOf(($(this).val())*1)>-1){
+                    $("#form_{{ field.name }}").parent().show();
+                  }else $("#form_{{ field.name }}").parent().hide();
+                {% endif %}
+              });
+              {% if field.depends.vals == "any" %}
+                if($('#form_{{ field.depends.from }}').val()!=""){
+                  $("#form_{{ field.name }}").parent().show();
+                }else $("#form_{{ field.name }}").parent().hide();
+              {% else %}
+                var vals="{{ field.depends.vals }}";
+                vals=JSON.parse(vals.replace(/&quot;/g,'"'));
+                if(vals.indexOf(($('#form_{{ field.depends.from }}').val())*1)>-1){
+                  $("#form_{{ field.name }}").parent().show();
+                }else $("#form_{{ field.name }}").parent().hide();
+              {% endif %}
+            {% endif %}
+        {# END of depends fields #}
+
+
       {% endfor %}
     {% endfor %}
   });

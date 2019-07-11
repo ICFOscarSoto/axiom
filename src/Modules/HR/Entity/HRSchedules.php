@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\HR\Entity\HRShifts;
+use \App\Modules\Globale\Entity\GlobaleCompanies;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\HR\Repository\HRSchedulesRepository")
@@ -27,17 +28,38 @@ class HRSchedules
     /**
      * @ORM\Column(type="smallint")
      */
-    private $rotation;
+    private $period;
 
     /**
      * @ORM\Column(type="smallint")
      */
-    private $period;
+    private $type;
 
     /**
-     * @ORM\OneToMany(targetEntity="\App\Modules\HR\Entity\HRShifts", mappedBy="schedules")
+     * @ORM\Column(type="boolean")
      */
-    private $shifts;
+    private $active;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $deleted;
+
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $dateadd;
+
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $dateupd;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCompanies")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $company;
 
     public function __construct()
     {
@@ -61,18 +83,6 @@ class HRSchedules
         return $this;
     }
 
-    public function getRotation(): ?int
-    {
-        return $this->rotation;
-    }
-
-    public function setRotation(int $rotation): self
-    {
-        $this->rotation = $rotation;
-
-        return $this;
-    }
-
     public function getPeriod(): ?int
     {
         return $this->period;
@@ -85,34 +95,76 @@ class HRSchedules
         return $this;
     }
 
-    /**
-     * @return Collection|HRShifts[]
-     */
-    public function getShifts(): Collection
+    public function getType(): ?int
     {
-        return $this->shifts;
+        return $this->type;
     }
 
-    public function addShift(HRShifts $shift): self
+    public function setType(int $type): self
     {
-        if (!$this->shifts->contains($shift)) {
-            $this->shifts[] = $shift;
-            $shift->setSchedules($this);
-        }
+        $this->type = $type;
 
         return $this;
     }
 
-    public function removeShift(HRShifts $shift): self
+    public function getActive(): ?bool
     {
-        if ($this->shifts->contains($shift)) {
-            $this->shifts->removeElement($shift);
-            // set the owning side to null (unless already changed)
-            if ($shift->getSchedules() === $this) {
-                $shift->setSchedules(null);
-            }
-        }
+        return $this->active;
+    }
+
+    public function setActive(bool $active): self
+    {
+        $this->active = $active;
 
         return $this;
     }
+
+    public function getDeleted(): ?bool
+    {
+        return $this->deleted;
+    }
+
+    public function setDeleted(bool $deleted): self
+    {
+        $this->deleted = $deleted;
+
+        return $this;
+    }
+
+    public function getDateadd(): ?\DateTimeInterface
+    {
+        return $this->dateadd;
+    }
+
+    public function setDateadd(\DateTimeInterface $dateadd): self
+    {
+        $this->dateadd = $dateadd;
+
+        return $this;
+    }
+
+    public function getDateupd(): ?\DateTimeInterface
+    {
+        return $this->dateupd;
+    }
+
+    public function setDateupd(\DateTimeInterface $dateupd): self
+    {
+        $this->dateupd = $dateupd;
+
+        return $this;
+    }
+
+    public function getCompany(): ?GlobaleCompanies
+    {
+        return $this->company;
+    }
+
+    public function setCompany(?GlobaleCompanies $company): self
+    {
+        $this->company = $company;
+
+        return $this;
+    }
+
 }
