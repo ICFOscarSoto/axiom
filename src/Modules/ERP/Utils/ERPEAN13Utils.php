@@ -32,13 +32,14 @@ class ERPEAN13Utils
 
 
   public function getExcludedForm($params){
-    return ['product'];
+    return ['product','supplier'];
   }
 
   public function getIncludedForm($params){
     $doctrine=$params["doctrine"];
     $user=$params["user"];
     $product=$params["product"];
+    $supplier=$params["supplier"];
     $productsRepository=$doctrine->getRepository(ERPProducts::class);
     $suppliersRepository=$doctrine->getRepository(ERPSuppliers::class);
     return [
@@ -53,6 +54,18 @@ class ERPEAN13Utils
       },
       'choice_value' => 'id',
       'data' => $product
+    ]],
+    ['supplier', ChoiceType::class, [
+      'required' => false,
+      'disabled' => false,
+      'attr' => ['class' => 'select2', 'readonly' => true],
+      'choices' => $suppliersRepository->findBy(["company"=>$user->getCompany()]),
+      'placeholder' => 'Select a product',
+      'choice_label' => function($obj, $key, $index) {
+          return $obj->getName();
+      },
+      'choice_value' => 'id',
+      'data' => $supplier
     ]]
   ];
   }

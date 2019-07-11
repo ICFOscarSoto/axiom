@@ -33,7 +33,7 @@ class ERPCategoriesController extends Controller
     	$utils = new ERPCategoriesUtils();
   		$templateLists[]=$utils->formatList($this->getUser());
 			$obj = $this->getDoctrine()->getRepository($this->class)->getTree();
-			dump($obj);
+			//dump($obj);
 
   		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
   			return $this->render('@ERP/categories.html.twig', [
@@ -43,6 +43,7 @@ class ERPCategoriesController extends Controller
   				'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
   				'breadcrumb' =>  $menurepository->formatBreadcrumb('dashboard'),
   				'userData' => $userdata,
+					'categories' => json_encode($obj),
   				'lists' => $templateLists
   				]);
   		}
