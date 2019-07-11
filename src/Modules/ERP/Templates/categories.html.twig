@@ -21,141 +21,51 @@
 		{#}<h2>{{ interfaceName }}</h2>#}
 		<!-- MAIN CONTENT -->
 		<div id="list-2" class="nested-list dd with-margins custom-drag-button"><!-- adding class "custom-drag-button" will create specific handler for dragging list items -->
+		<script>
 
-		    							<ul class="dd-list">
+		$(document).ready(function() {
+			function parseCategory(element){
+				var data='';
+				data+='<ul class="dd-list">';
+				element.forEach( function(valor, indice, array) {
 
-		    								<li class="dd-item">
-		    									<div class="dd-handle">
-		    										<span>.</span>
-		    										<span>.</span>
-		    										<span>.</span>
-		    									</div>
-
-		    									<div class="dd-content">
-		    										List element 1
-		    									</div>
-
-		    									<ul class="dd-list">
-
-		    										<li class="dd-item">
-		    											<div class="dd-handle">
-		    												<span>.</span>
-		    												<span>.</span>
-		    												<span>.</span>
-		    											</div>
-
-		    											<div class="dd-content">
-		    												Sub list element 1
-		    											</div>
-		    										</li>
-
-		    										<li class="dd-item">
-		    											<div class="dd-handle">
-		    												<span>.</span>
-		    												<span>.</span>
-		    												<span>.</span>
-		    											</div>
-
-		    											<div class="dd-content">
-		    												Sub list element 2
-		    											</div>
-
-		    											<ul class="dd-list">
-
-		    												<li class="dd-item">
-		    													<div class="dd-handle">
-		    														<span>.</span>
-		    														<span>.</span>
-		    														<span>.</span>
-		    													</div>
-
-		    													<div class="dd-content">
-		    														Sub list element 2.1
-		    													</div>
-		    												</li>
-
-		    												<li class="dd-item">
-		    													<div class="dd-handle">
-		    														<span>.</span>
-		    														<span>.</span>
-		    														<span>.</span>
-		    													</div>
-
-		    													<div class="dd-content">
-		    														Sub list element 2.2
-		    													</div>
-		    												</li>
-
-		    											</ul>
-
-		    										</li>
-
-		    										<li class="dd-item">
-		    											<div class="dd-handle">
-		    												<span>.</span>
-		    												<span>.</span>
-		    												<span>.</span>
-		    											</div>
-
-		    											<div class="dd-content">
-		    												Sub list element 3
-		    											</div>
-		    										</li>
-
-		    									</ul>
-		    								</li>
-
-		    								<li class="dd-item">
-		    									<div class="dd-handle">
-		    										<span>.</span>
-		    										<span>.</span>
-		    										<span>.</span>
-		    									</div>
-
-		    									<div class="dd-content">
-		    										List element 2
-		    									</div>
-		    								</li>
-
-		    								<li class="dd-item">
-		    									<div class="dd-handle">
-		    										<span>.</span>
-		    										<span>.</span>
-		    										<span>.</span>
-		    									</div>
-
-		    									<div class="dd-content">
-		    										List element 3
-		    									</div>
-		    								</li>
-
-		    								<li class="dd-item">
-		    									<div class="dd-handle">
-		    										<span>.</span>
-		    										<span>.</span>
-		    										<span>.</span>
-		    									</div>
-
-		    									<div class="dd-content">
-		    										List element 4
-		    									</div>
-		    								</li>
-
-		    								<li class="dd-item">
-		    									<div class="dd-handle">
-		    										<span>.</span>
-		    										<span>.</span>
-		    										<span>.</span>
-		    									</div>
-
-		    									<div class="dd-content">
-		    										List element 5
-		    									</div>
-		    								</li>
-		    							</ul>
-
-		    						</div>
-
+												data+='<li class="dd-item">'+
+													'<div class="dd-handle">'+
+														'<span>.</span>'+
+														'<span>.</span>'+
+														'<span>.</span>'+
+													'</div>'+
+													'<div class="dd-content">'+
+														valor.name+
+													'</div>'+
+													((valor.childrens.length>0)?parseCategory(valor.childrens):'')+
+												'</li>';
+				});
+				data+='</ul>';
+				return data;
+			}
+			var categories='{{ categories }}';
+			categories=categories.replace(/&quot;/g,'"');
+			categories = $.parseJSON(categories);
+			categories.forEach( function(valor, indice, array) {
+				$("#categories").append('<ul class="dd-list">'+
+											'<li class="dd-item">'+
+												'<div class="dd-handle">'+
+													'<span>.</span>'+
+													'<span>.</span>'+
+													'<span>.</span>'+
+												'</div>'+
+												'<div class="dd-content">'+
+													valor.name+
+												'</div>'+
+													((valor.childrens.length>0)?parseCategory(valor.childrens):'')+
+											'</li>'+
+										'</ul>');
+			});
+		});
+		</script>
+		<div id="categories"></div>
+		
 		                <script type="text/javascript">
 		                		jQuery(document).ready(function($)
 		                		{
