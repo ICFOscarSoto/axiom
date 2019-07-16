@@ -89,7 +89,7 @@ class GlobaleFirebaseDevicesController extends Controller
 					        "badge" => 1,
 					    );
 							$arrayToSend = array(
-	             'registration_ids' => $device->getToken(),
+	             'registration_ids' => json_encode([$device->getToken()]),
 	             'notification' => $message,
 	             'priority' => 'high'
 	            );
