@@ -23,6 +23,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use App\Modules\Email\Controller\EmailController;
+use App\Modules\Globale\Utils\GlobaleListApiUtils;
 class GlobaleUsersController extends Controller
 {
    	private $class=GlobaleUsers::class;
@@ -219,7 +220,7 @@ class GlobaleUsersController extends Controller
 		$result=$entityUtils->enableObject($id, $this->class, $this->getDoctrine());
 		return new JsonResponse(array('result' => $result));
 	}
-  
+
   /**
 	* @Route("/{_locale}/admin/global/users/{id}/delete", name="deleteUser", defaults={"id"=0})
 	*/
@@ -263,4 +264,24 @@ class GlobaleUsersController extends Controller
 		}return new Response();
 	}
 
+
+
+  /**
+  * @Route("/api/global/users/collection", name="genericapiUsercollection")
+  */
+  public function genericapicollection(Request $request){
+    $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+    $this->denyAccessUnlessGranted('ROLE_ADMIN');
+    $manager = $this->getDoctrine()->getManager();
+    $repository = $manager->getRepository($this->class);
+    $parameters=$request->query->all();
+    $filter[]=["type"=>"and", "column"=>"company", "value"=>$this->getUser()->getCompany()];
+    foreach($parameters as $key => $parameter){
+      if(in_array("set".ucfirst($parameter),get_class_methods($this->class)))
+        $filter[]=["type"=>"and", "column"=>$key, "value"=>$parameter];
+    }
+    $listUtils=new GlobaleListApiUtils();
+    $return=$listUtils->getRecords($this->getUser(),$repository,$request,$manager, $this->class,$filter,-1,["roles","password","salt","templatedata","usergroups","emailaccounts","emaildefaultaccount","calendars"]);
+    return new JsonResponse($return);
+  }
 }

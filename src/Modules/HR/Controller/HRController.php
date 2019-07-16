@@ -27,6 +27,7 @@ use App\Modules\HR\Utils\HRWorkCalendarsUtils;
 use App\Modules\Cloud\Utils\CloudFilesUtils;
 use App\Modules\HR\Entity\HRWorkCalendars;
 use App\Modules\HR\Entity\HRHollidays;
+use App\Modules\Globale\Utils\GlobaleListApiUtils;
 
 
 class HRController extends Controller
@@ -233,6 +234,25 @@ class HRController extends Controller
       }
     }
    return new JsonResponse(array('result' => $result));
+  }
+
+	/**
+  * @Route("/api/HR/workers/collection", name="genericapiWorkerscollection")
+  */
+  public function genericapiWorkerscollection(Request $request){
+    $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+    $this->denyAccessUnlessGranted('ROLE_ADMIN');
+    $manager = $this->getDoctrine()->getManager();
+    $repository = $manager->getRepository($this->class);
+    $parameters=$request->query->all();
+    $filter[]=["type"=>"and", "column"=>"company", "value"=>$this->getUser()->getCompany()];
+    foreach($parameters as $key => $parameter){
+      if(in_array("set".ucfirst($parameter),get_class_methods($this->class)))
+        $filter[]=["type"=>"and", "column"=>$key, "value"=>$parameter];
+    }
+    $listUtils=new GlobaleListApiUtils();
+    $return=$listUtils->getRecords($this->getUser(),$repository,$request,$manager, $this->class,$filter,-1,["clockcode"]);
+    return new JsonResponse($return);
   }
 
 }

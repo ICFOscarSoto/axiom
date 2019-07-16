@@ -132,8 +132,8 @@ class GlobaleFormUtils extends Controller
                     ]);
                   break;
                 }
-              }else $form->add($value['fieldName'],null,['attr'=>['readonly' => isset($field["readonly"])?$field["readonly"]:false,'class'=>isset($field["class"])?$field["class"]:'']]);
-            }else $form->add($value['fieldName'],null,['attr'=>['readonly' => isset($field["readonly"])?$field["readonly"]:false,'class'=>isset($field["class"])?$field["class"]:'']]);
+              }else $form->add($value['fieldName'],null,['disabled' => isset($field["readonly"])?$field["readonly"]:false, 'attr'=>['readonly' => isset($field["readonly"])?$field["readonly"]:false,'class'=>isset($field["class"])?$field["class"]:'']]);
+            }else $form->add($value['fieldName'],null,['disabled' => isset($field["readonly"])?$field["readonly"]:false,'attr'=>['readonly' => isset($field["readonly"])?$field["readonly"]:false,'class'=>isset($field["class"])?$field["class"]:'']]);
             break;
           }
         }
@@ -225,6 +225,8 @@ class GlobaleFormUtils extends Controller
     if(!$form->isSubmitted()) return false;
     if ($form->isSubmitted() && $form->isValid()) {
        $obj = $form->getData();
+
+
 
        //definimos los valores predefinidos
        foreach($this->values as $key => $val){

@@ -14,7 +14,7 @@ class GlobaleListApiUtils
       return null;
     }
 
-    public function getRecords($user,$repository,$request,$manager,$classname,$filters=[],$raw=[]): array
+    public function getRecords($user,$repository,$request,$manager,$classname,$filters=[],$raw=[],$excludedFields=[]): array
     {
 		$return=array();
 		$query = $repository->createQueryBuilder('p');
@@ -31,46 +31,9 @@ class GlobaleListApiUtils
 					$queryFiltered->andWhere('p.'.$metadata->getFieldName($column).' LIKE :val_'.$metadata->getFieldName($column));
 					$queryFiltered->setParameter('val_'.$metadata->getFieldName($column), '%'.$searchValue.'%');
 			     }
-  			//Añadimos los campos de las relaciones
-  			/*foreach($listFields as $field){
-  				$path=explode('__', $field["name"]);
-  				if(count($path)>1){
-  					$query->orWhere($path[0].'.'.$path[1].' LIKE :val_'.$path[0].'_'.$path[1]);
-  					$query->setParameter('val_'.$path[0].'_'.$path[1], '%'.$searchValue.'%');
-  					$query->orWhere($path[0].'.'.$path[1].' LIKE :val_'.$path[0].'_'.$path[1]);
-  					$query->setParameter('val_'.$path[0].'_'.$path[1], '%'.$searchValue.'%');
-  				}
-  			}*/
 		}
 
-		//Formamos los filtros de busqueda por columna
-		/*foreach(get_object_vars(new $classname()) as $key => $field){
-        //Solo añadimos los campos de tipo data
 
-       if(!isset($field["type"])||$field["type"]=="data"){
-  				$searchValue=$request->query->get('columns');
-          //Buscar el key del field["name"0] en las columnas pasados por parametro
-          $keyColumn=$this->searchColumns($searchValue, $field["name"]);
-          if(!$keyColumn) continue;
-          //TODO Campos mapeados como las coordenadas y demas petan aqui
-
-  				$searchValue=$searchValue[$keyColumn]['search']['value'];
-  				if($searchValue!=""){
-  					$path=explode('__', $field["name"]);
-  					if(count($path)>1){
-  						$query->andWhere($path[0].'.'.$path[1].' LIKE :val_'.$path[0].'_'.$path[1]);
-  						$query->setParameter('val_'.$path[0].'_'.$path[1], '%'.$searchValue.'%');
-  						$query->andWhere($path[0].'.'.$path[1].' LIKE :val_'.$path[0].'_'.$path[1]);
-  						$query->setParameter('val_'.$path[0].'_'.$path[1], '%'.$searchValue.'%');
-  					}else{
-  						$query->andWhere('p.'.$field["name"].' LIKE :val_'.$field["name"]);
-  						$query->setParameter('val_'.$field["name"], '%'.$searchValue.'%');
-  						$queryFiltered->andWhere('p.'.$field["name"].' LIKE :val_'.$field["name"]);
-  						$queryFiltered->setParameter('val_'.$field["name"], '%'.$searchValue.'%');
-  					}
-  				}
-        }
-		}*/
     //Incluimos el parametro from para sincronizacion de dispositivos moviles
     //Ojo el parametro from debe ser un unixtimestamp
     $fromParam=$request->query->get('fromdate');
@@ -80,14 +43,7 @@ class GlobaleListApiUtils
     }
 
 
-		//Dejamos los elementos borrados para informar a los dispositivos moviles
-
-
-			/*$query->andWhere('p.deleted = :valDeleted');
-            $query->setParameter('valDeleted', 0);
-			$queryFiltered->andWhere('p.deleted = :valDeleted');
-            $queryFiltered->setParameter('valDeleted', 0);*/
-
+		  //Dejamos los elementos borrados para informar a los dispositivos moviles
       //Detect if class has attribute companyId
       if(method_exists($classname, "getCompany")){
         $query->andWhere('p.company = :val_company');
@@ -109,19 +65,6 @@ class GlobaleListApiUtils
 				$query->addOrderBy('p.'.strtolower($listFields[(($order[0]['column'])-1)*1]["name"]), $order[0]['dir']);
 			}*/
 		}
-
-		//Generamos los LEFT JOIN de la consulta
-    /*$definedLeftJoin=[];
-		foreach($listFields as $field){
-		$path=explode('__', $field["name"]);
-		if(count($path)>1){
-        if(array_search($path[0], $definedLeftJoin)===FALSE){
-				      $query->leftJoin('p.'.$path[0], $path[0]);
-				      $queryFiltered->leftJoin('p.'.$path[0], $path[0]);
-              $definedLeftJoin[]=$path[0];
-        }
-			}
-		}*/
 
     //Añadimos los filtros pasados por parametros desde los controladores
     foreach($filters as $filter){
@@ -173,6 +116,11 @@ class GlobaleListApiUtils
         }
 
 			}
+      //DELETE EXCLUDED FIELDS
+      $excludedFields=array_merge($excludedFields,["company", "deleted"]);
+      foreach($excludedFields as $excluded){
+        if(isset($row[$excluded])) unset($row[$excluded]);
+      }
 			$return["data"][]=$row;
 		}
 		return $return;
