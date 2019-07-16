@@ -53,6 +53,11 @@ class GlobaleFirebaseDevices
      */
     private $dateupd;
 
+    /**
+     * @ORM\Column(type="string", length=25)
+     */
+    private $platform;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -138,6 +143,18 @@ class GlobaleFirebaseDevices
     public function setDateupd(\DateTimeInterface $dateupd): self
     {
         $this->dateupd = $dateupd;
+
+        return $this;
+    }
+
+    public function getPlatform(): ?string
+    {
+        return $this->platform;
+    }
+
+    public function setPlatform(string $platform): self
+    {
+        $this->platform = $platform;
 
         return $this;
     }

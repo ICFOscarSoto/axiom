@@ -14,6 +14,7 @@ use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\Globale\Entity\GlobaleCurrencies;
 use App\Modules\Globale\Entity\GlobaleCompanies;
 use App\Modules\Globale\Entity\GlobaleUsers;
+use App\Modules\Globale\Entity\GlobaleCountries;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
@@ -28,7 +29,7 @@ use App\Modules\Cloud\Utils\CloudFilesUtils;
 use App\Modules\HR\Entity\HRWorkCalendars;
 use App\Modules\HR\Entity\HRHollidays;
 use App\Modules\Globale\Utils\GlobaleListApiUtils;
-
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class HRController extends Controller
 {
@@ -254,5 +255,99 @@ class HRController extends Controller
     $return=$listUtils->getRecords($this->getUser(),$repository,$request,$manager, $this->class,$filter,-1,["clockcode"]);
     return new JsonResponse($return);
   }
+
+
+	/**
+	 * @Route("/api/HR/workers/add", name="addUserWorker")
+	 */
+	public function addUserWorker(Request $request, UserPasswordEncoderInterface $encoder){
+		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+			$id=$request->request->get('id');
+			$status=$request->request->get('status')!=null?$request->request->get('status'):1;
+			$obj=null;
+			$user=null;
+			if($id==null){
+				//New worker
+				if($request->request->get('email')!=null && $request->request->get('password')!=null && $request->request->get('idcard')!=null && $request->request->get('name')!=null && $request->request->get('lastname')!=null){
+						$obj = new $this->class();
+						$user = new GlobaleUsers();
+						if($status==null) $status=1;
+						$obj->setDateadd(new \DateTime());
+	          $obj->setDeleted(false);
+						$obj->setActive(true);
+
+						$user->setDateadd(new \DateTime());
+	          $user->setDeleted(false);
+						$user->setActive(true);
+						$user->setRoles(["ROLE_USER"]);
+	          //If object has Company save with de user Company
+	          if(method_exists($obj,'setCompany')) $obj->setCompany($this->getUser()->getCompany());
+						if(method_exists($user,'setCompany')) $user->setCompany($this->getUser()->getCompany());
+
+				}else return new JsonResponse(["result"=>-2]);
+
+			}else{
+				//Edit workers
+				$obj = $this->getDoctrine()->getRepository($this->class)->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany()]);
+				$user=$obj->getUser();
+				//Check if company owns this worker
+				if(!$obj) return new JsonResponse(["result"=>-1]);
+			}
+			$obj->setIdcard($request->request->get('idcard')!=null?$request->request->get('idcard'):$obj->getIdcard());
+			$obj->setSs($request->request->get('ss')!=null?$request->request->get('ss'):$obj->getSs());
+			$obj->setName($request->request->get('name')!=null?$request->request->get('name'):$obj->getName());
+			$obj->setLastname($request->request->get('lastname')!=null?$request->request->get('lastname'):$obj->getLastname());
+			$obj->setExternal($request->request->get('external')!=null?$request->request->get('external'):$obj->getExternal());
+			$obj->setStatus($status!=null?$status:$obj->getStatus());
+			setlocale(LC_ALL,"es_ES.utf8");
+			$obj->setDateofemploy($request->request->get('dateofemploy')!=null?new \DateTime("@".$request->request->get('dateofemploy')):$obj->getDateofemploy());
+			$obj->setAddress($request->request->get('address')!=null?$request->request->get('address'):$obj->getAddress());
+			$obj->setCity($request->request->get('city')!=null?$request->request->get('city'):$obj->getCity());
+			$obj->setState($request->request->get('state')!=null?$request->request->get('state'):$obj->getState());
+			$obj->setPostcode($request->request->get('postcode')!=null?$request->request->get('postcode'):$obj->getPostcode());
+			$obj->setPhone($request->request->get('phone')!=null?$request->request->get('phone'):$obj->getPhone());
+			$obj->setMobile($request->request->get('mobile')!=null?$request->request->get('mobile'):$obj->getMobile());
+			$obj->setEmail($request->request->get('email')!=null?$request->request->get('email'):$obj->getEmail());
+			$obj->setCountry($request->request->get('country')!=null?$this->getDoctrine()->getRepository(GlobaleCountries::class)->findOneBy(["id"=>$request->request->get('country')]):$obj->getCountry());
+			$obj->setBank($request->request->get('bank')!=null?$request->request->get('bank'):$obj->getBank());
+			$obj->setCcc($request->request->get('ccc')!=null?$request->request->get('ccc'):$obj->getCcc());
+			$obj->setIban($request->request->get('iban')!=null?$request->request->get('iban'):$obj->getIban());
+			$obj->setBirthdate($request->request->get('birthdate')!=null?new \DateTime("@".$request->request->get('birthdate')):$obj->getBirthdate());
+			$obj->setAllowremoteclock($request->request->get('allowremoteclock')!=null?$request->request->get('allowremoteclock'):$obj->getAllowremoteclock());
+			$obj->setDepartment($request->request->get('department')!=null?$this->getDoctrine()->getRepository(HRDepartments::class)->findOneBy(["id"=>$request->request->get('department'), "company"=>$this->getUser()->getCompany()]):$obj->getDepartment());
+			$obj->setWorkcenters($request->request->get('workcenters')!=null?$this->getDoctrine()->getRepository(HRWorkcenters::class)->findOneBy(["id"=>$request->request->get('workcenters'), "company"=>$this->getUser()->getCompany()]):$obj->getWorkcenters());
+			$obj->setDateupd(new \DateTime());
+			$user->setDateupd(new \DateTime());
+			$user->setEmail($request->request->get('email')!=null?$request->request->get('email'):$user->getEmail());
+			if($request->request->get('password')!=null)
+				$user->setPassword($encoder->encodePassword($user, $request->request->get('password')));
+			$user->setName($request->request->get('name')!=null?$request->request->get('name'):$user->getName());
+			$user->setLastname($request->request->get('lastname')!=null?$request->request->get('lastname'):$user->getLastname());
+
+			if(method_exists($user,'preProccess')) $user->{'preProccess'}($this->get('kernel'), $this->getDoctrine(), $this->getUser());
+			$this->getDoctrine()->getManager()->persist($user);
+			$this->getDoctrine()->getManager()->flush();
+			if(method_exists($user,'postProccess')) $user->{'postProccess'}($this->get('kernel'), $this->getDoctrine(), $this->getUser());
+			$obj->setUser($user);
+
+			if(method_exists($obj,'preProccess')) $obj->{'preProccess'}($this->get('kernel'), $this->getDoctrine(), $this->getUser());
+			$this->getDoctrine()->getManager()->persist($obj);
+			$this->getDoctrine()->getManager()->flush();
+			if(method_exists($obj,'postProccess')) $obj->{'postProccess'}($this->get('kernel'), $this->getDoctrine(), $this->getUser());
+
+			//return new Response();
+			return new JsonResponse(["result"=>1,"worker"=>$obj->getId(), "user"=>$user->getId()]);
+		}else{
+			return new JsonResponse(["result"=>-1]);
+		}
+		/*$obj = $this->getDoctrine()->getRepository($this->class)->findById($id);
+		if (!$obj) {
+			throw $this->createNotFoundException('No worker found for id '.$id );
+		}
+		return new JsonResponse();
+		return new JsonResponse($company->encodeJson());*/
+	}
+
+
 
 }

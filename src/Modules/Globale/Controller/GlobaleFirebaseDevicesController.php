@@ -30,12 +30,13 @@ class GlobaleFirebaseDevicesController extends Controller
    $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
    $devicesrepository=$this->getDoctrine()->getRepository($this->class);
    $token=$request->request->get('TOKEN');
-
+	 $platform=$request->request->get('platform','android');
      $device=$devicesrepository->findOneBy(["deviceid"=>$deviceid, "deleted"=>0, "active"=>1], ['id'=>'DESC']);
      if($device===NULL){
        $device=new $this->class();
        $device->setDeviceid($deviceid);
        $device->setUser($this->getUser());
+			 $device->setPlatform($platform);
        $device->setToken($token);
        $device->setDateupd(new \DateTime());
        $device->setDateadd(new \DateTime());
