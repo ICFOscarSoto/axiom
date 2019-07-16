@@ -86,8 +86,7 @@ class GlobaleFirebaseDevicesController extends Controller
 					        "title" => "Axiom",
 					        "sound" => 1,
 					        "vibrate" => 1,
-					        "badge" => 1,
-									'data' => ['op'=>'notification']
+					        "badge" => 1
 					    );
 							$arrayToSend = array(
 	             'registration_ids' => [$device->getToken()],
