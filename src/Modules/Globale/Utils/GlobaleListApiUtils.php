@@ -102,16 +102,22 @@ class GlobaleListApiUtils
 		$return["recordsTotal"]=$queryTotal->getQuery()->getSingleScalarResult();
 		$return["recordsFiltered"]=$queryFiltered->getQuery()->getSingleScalarResult();
 		$return["data"]=array();
-;
+
 		//Obtenemos los datos desde la persistencia
 		foreach($records as $record){
 			$data_ob=[];
 			foreach(get_class_methods($classname) as $method){
         if(substr($method,0,3)=="get"){
+
           $value=$record->$method();
           if(is_a($value, "\DateTimeInterface")){
               $row[strtolower(substr($method,3))]=["date"=>date_timestamp_get($value),"offset"=>date_offset_get($value)];
-          }else $row[strtolower(substr($method,3))]=$value;
+          }else{
+            if(is_object($value)){
+                $row[strtolower(substr($method,3))]=$value->getId();
+            }else $row[strtolower(substr($method,3))]=$value;
+
+          }
           //}
         }
 
