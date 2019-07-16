@@ -90,7 +90,6 @@ class GlobaleFirebaseDevicesController extends Controller
 					    );
 							$arrayToSend = array(
 	             'registration_ids' => [$device->getToken()],
-	             'notification' => $message,
 	             'priority' => 'high',
 							 'data' => ['op'=>'notification']
 	            );
