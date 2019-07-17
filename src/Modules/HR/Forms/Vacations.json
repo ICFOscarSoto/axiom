@@ -7,7 +7,13 @@
 				{	"name": "type", "cols": 4},
 				{	"name": "start", "cols": 4, "type": "date", "linked": {"field":"end", "by":"minDate"}},
 				{	"name": "end", "cols": 4, "type": "date", "linked": {"field":"start", "by":"maxDate"}},
-				{	"name": "approved", "cols": 3},
+				{	"name": "approved", "cols": 3,
+					"transform":
+						{
+							"type":"option",
+							"options": {"Pendientes": "0", "Aprobadas": "1", "Rechazadas": "2"}
+						}
+				},
 				{	"name": "workerobservations", "cols": 6},
 				{	"name": "companyobservations", "cols": 6},
         {	"name": "requestdate", "cols": 3, "type": "date"},

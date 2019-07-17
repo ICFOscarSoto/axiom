@@ -9,8 +9,8 @@
  {"name": "end", "caption":"Fin"},
  {"name": "days", "caption":"Días", "width":"10%", "sum": true},
  {"name": "approved", "caption":"Aprobadas", "width":"10%" ,"class" : "dt-center", "replace":{
-                            "2":{"text":"Rechazadas","html":"<div style=\"min-width: 75px;\" class=\"label label-danger\">Rechazadas</div>"},
                             "1":{"text":"Aprobadas","html":"<div style=\"min-width: 75px;\" class=\"label label-success\">Aprobadas</div>"},
+                            "2":{"text":"Rechazadas","html":"<div style=\"min-width: 75px;\" class=\"label label-danger\">Rechazadas</div>"},                
                             "0":{"text":"Pendientes","html":"<div style=\"min-width: 75px;\" class=\"label label-warning\">Pendientes</div>"}
                           }
   },
