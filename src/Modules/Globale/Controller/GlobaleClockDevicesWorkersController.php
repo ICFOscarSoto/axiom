@@ -42,7 +42,7 @@ class GlobaleClockDevicesWorkersController extends Controller
   $utils = new $this->utilsClass();
   $templateLists=$utils->formatList($id);
   $formUtils=new GlobaleFormUtils();
-  $formUtils->initialize($this->getUser(), new $this->class(), dirname(__FILE__)."/../Forms/ClockDevicesWorkers.json", $request, $this, $this->getDoctrine());
+  $formUtils->initialize($this->getUser(), new $this->class(), dirname(__FILE__)."/../Forms/ClockDevicesWorkers.json", $request, $this, $this->getDoctrine(),['worker']);
   $templateForms[]=$formUtils->formatForm('ClockDevicesWorker', true, $id, $this->class);
   //$repository=$this->getDoctrine()->getRepository($this->class);
   //$clockdevicesworker=$repository->findOneBy(["id"=>$id, "deleted"=>0]);
