@@ -252,7 +252,7 @@ class HRController extends Controller
         $filter[]=["type"=>"and", "column"=>$key, "value"=>$parameter];
     }
     $listUtils=new GlobaleListApiUtils();
-    $return=$listUtils->getRecords($this->getUser(),$repository,$request,$manager, $this->class,$filter,-1,["clockcode"]);
+    $return=$listUtils->getRecords($this->getUser(),$repository,$request,$manager, $this->class,$filter,-1,[]);
     return new JsonResponse($return);
   }
 
@@ -275,7 +275,6 @@ class HRController extends Controller
 						$obj->setDateadd(new \DateTime());
 	          $obj->setDeleted(false);
 						$obj->setActive(true);
-
 						$user->setDateadd(new \DateTime());
 	          $user->setDeleted(false);
 						$user->setActive(true);
@@ -283,9 +282,7 @@ class HRController extends Controller
 	          //If object has Company save with de user Company
 	          if(method_exists($obj,'setCompany')) $obj->setCompany($this->getUser()->getCompany());
 						if(method_exists($user,'setCompany')) $user->setCompany($this->getUser()->getCompany());
-
 				}else return new JsonResponse(["result"=>-2]);
-
 			}else{
 				//Edit workers
 				$obj = $this->getDoctrine()->getRepository($this->class)->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany()]);
@@ -293,6 +290,7 @@ class HRController extends Controller
 				//Check if company owns this worker
 				if(!$obj) return new JsonResponse(["result"=>-1]);
 			}
+			//Get available fields
 			$obj->setIdcard($request->request->get('idcard')!=null?$request->request->get('idcard'):$obj->getIdcard());
 			$obj->setSs($request->request->get('ss')!=null?$request->request->get('ss'):$obj->getSs());
 			$obj->setName($request->request->get('name')!=null?$request->request->get('name'):$obj->getName());
@@ -323,29 +321,22 @@ class HRController extends Controller
 				$user->setPassword($encoder->encodePassword($user, $request->request->get('password')));
 			$user->setName($request->request->get('name')!=null?$request->request->get('name'):$user->getName());
 			$user->setLastname($request->request->get('lastname')!=null?$request->request->get('lastname'):$user->getLastname());
-
+			//Save user
 			if(method_exists($user,'preProccess')) $user->{'preProccess'}($this->get('kernel'), $this->getDoctrine(), $this->getUser());
 			$this->getDoctrine()->getManager()->persist($user);
 			$this->getDoctrine()->getManager()->flush();
 			if(method_exists($user,'postProccess')) $user->{'postProccess'}($this->get('kernel'), $this->getDoctrine(), $this->getUser());
 			$obj->setUser($user);
-
+			//Save worker
 			if(method_exists($obj,'preProccess')) $obj->{'preProccess'}($this->get('kernel'), $this->getDoctrine(), $this->getUser());
 			$this->getDoctrine()->getManager()->persist($obj);
 			$this->getDoctrine()->getManager()->flush();
 			if(method_exists($obj,'postProccess')) $obj->{'postProccess'}($this->get('kernel'), $this->getDoctrine(), $this->getUser());
-
-			//return new Response();
 			return new JsonResponse(["result"=>1,"worker"=>$obj->getId(), "user"=>$user->getId()]);
 		}else{
+			//No login
 			return new JsonResponse(["result"=>-1]);
 		}
-		/*$obj = $this->getDoctrine()->getRepository($this->class)->findById($id);
-		if (!$obj) {
-			throw $this->createNotFoundException('No worker found for id '.$id );
-		}
-		return new JsonResponse();
-		return new JsonResponse($company->encodeJson());*/
 	}
 
 

@@ -4,14 +4,10 @@
 			"name": "Datos",
 			"fields": [
 				{ "name": "name","cols": 6},
-				{ "name": "identifier","cols": 6, "readonly":true},
 				{	"name": "serialnumber", "cols": 6, "readonly":true},
 				{	"name": "model", "cols": 4, "readonly":true},
 				{	"name": "firmware", "cols": 4, "readonly":true},
-				{	"name": "protocol", "cols": 4, "readonly":true},
-				{	"name": "token", "cols": 4, "readonly":true},
-        {	"name": "lasttime", "cols": 4, "readonly":true},
-				{	"name": "usefunction", "cols": 2},
+        {	"name": "usefunction", "cols": 2},
         {	"name": "active", "cols": 2}
 			]
 		}]

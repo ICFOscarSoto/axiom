@@ -19,6 +19,8 @@ use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\Globale\Utils\GlobaleCompaniesUtils;
 use App\Modules\Globale\Utils\GlobaleClockDevicesWorkersUtils;
+use App\Modules\Globale\Utils\GlobaleListApiUtils;
+use App\Modules\HR\Entity\HRWorkers;
 //use App\Modules\Globale\UtilsEntityUtils;
 //use App\Modules\Form\Controller\FormController;
 
@@ -104,9 +106,63 @@ class GlobaleClockDevicesWorkersController extends Controller
    public function clockdevicesdatetime($id, Request $request){
     $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
     $this->denyAccessUnlessGranted('ROLE_ADMIN');
-    
+
   }
 
 
+  /**
+  * @Route("/api/globale/clockdeviceswroker/{id}/collection", name="genericapiClockDevicesWorkercollection")
+  */
+  public function genericapiClockDevicescollection($id, Request $request){
+    if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+      $manager = $this->getDoctrine()->getManager();
+      $repository = $manager->getRepository($this->class);
+      $parameters=$request->query->all();
+      $clockdevice=$this->getDoctrine()->getRepository(GlobaleClockDevices::class)->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany()]);
+      if($clockdevice){
+        $filter[]=["type"=>"and", "column"=>"clockdevice", "value"=>$clockdevice];
+        foreach($parameters as $key => $parameter){
+          if(in_array("set".ucfirst($parameter),get_class_methods($this->class)))
+            $filter[]=["type"=>"and", "column"=>$key, "value"=>$parameter];
+        }
+        $listUtils=new GlobaleListApiUtils();
+        $return=$listUtils->getRecords($this->getUser(),$repository,$request,$manager, $this->class,$filter,-1,["clockdevice","id"]);
+        return new JsonResponse($return);
+      }else return new JsonResponse(["result"=>-2]);
+    }else return new JsonResponse(["result"=>-1]);
+  }
+
+  /**
+   * @Route("/api/globale/clockdeviceswroker/add", name="addClockDevicesWorker")
+   */
+  public function addClockDevicesWorker(Request $request){
+    if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+      $obj=null;
+        if($request->request->get('worker')!=null && $request->request->get('clockdevice')!=null && $request->request->get('idd')!=null){
+            $obj = new $this->class();
+            $worker=$this->getDoctrine()->getRepository(HRWorkers::class)->findOneBy(["id"=>$request->request->get('worker'), "company"=>$this->getUser()->getCompany()]);
+            $clockdevice=$this->getDoctrine()->getRepository(GlobaleClockDevices::class)->findOneBy(["id"=>$request->request->get('clockdevice'), "company"=>$this->getUser()->getCompany()]);
+            if($worker!=null && $clockdevice!=null){
+              $clockdevicesworker=$this->getDoctrine()->getRepository($this->class)->findOneBy(["worker"=>$worker, "idd"=>$request->request->get('idd')]);
+              if($clockdevicesworker==null){
+                $obj->setWorker($worker);
+                $obj->setClockdevice($clockdevice);
+                $obj->setIdd($request->request->get('idd'));
+                $obj->setDateupd(new \DateTime());
+                $obj->setDateadd(new \DateTime());
+                $obj->setDeleted(false);
+                $obj->setActive(true);
+                //If object has Company save with de user Company
+                if(method_exists($obj,'setCompany')) $obj->setCompany($this->getUser()->getCompany());
+                if(method_exists($obj,'preProccess')) $obj->{'preProccess'}($this->get('kernel'), $this->getDoctrine(), $this->getUser());
+                $this->getDoctrine()->getManager()->persist($obj);
+                $this->getDoctrine()->getManager()->flush();
+                if(method_exists($obj,'postProccess')) $obj->{'postProccess'}($this->get('kernel'), $this->getDoctrine(), $this->getUser());
+                return new JsonResponse(["result"=>1]);
+              }else return new JsonResponse(["result"=>-3]);
+            }else return new JsonResponse(["result"=>-4]);
+        }else return new JsonResponse(["result"=>-5]);
+    }else return new JsonResponse(["result"=>-1]);
+  }
 
 }

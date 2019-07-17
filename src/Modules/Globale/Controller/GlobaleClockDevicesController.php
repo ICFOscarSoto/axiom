@@ -17,6 +17,7 @@ use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\Globale\Utils\GlobaleCompaniesUtils;
+use App\Modules\Globale\Utils\GlobaleListApiUtils;
 //use App\Modules\Globale\UtilsEntityUtils;
 //use App\Modules\Form\Controller\FormController;
 
@@ -82,6 +83,25 @@ class GlobaleClockDevicesController extends Controller
        }
      }
     return new JsonResponse(array('result' => $result));
+  }
+
+  /**
+  * @Route("/api/globale/clockdevices/collection", name="genericapiClockDevicescollection")
+  */
+  public function genericapiClockDevicescollection(Request $request){
+    if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+      $manager = $this->getDoctrine()->getManager();
+      $repository = $manager->getRepository($this->class);
+      $parameters=$request->query->all();
+      $filter[]=["type"=>"and", "column"=>"company", "value"=>$this->getUser()->getCompany()];
+      foreach($parameters as $key => $parameter){
+        if(in_array("set".ucfirst($parameter),get_class_methods($this->class)))
+          $filter[]=["type"=>"and", "column"=>$key, "value"=>$parameter];
+      }
+      $listUtils=new GlobaleListApiUtils();
+      $return=$listUtils->getRecords($this->getUser(),$repository,$request,$manager, $this->class,$filter,-1,["identifier","protocol","token","createdtime", "expirestime", "islogin"]);
+      return new JsonResponse($return);
+    }else return new JsonResponse(["result"=>-1]);
   }
 
 
