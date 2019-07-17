@@ -8,6 +8,7 @@ class GlobaleReports extends \FPDF
   public $user;
   public $image_path;
   public $monthNames=["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Setiembre", "Octubre", "Noviembre", "Diciembre"];
+  public $workcenters=null;
 
   function Header()
   {
@@ -22,15 +23,15 @@ class GlobaleReports extends \FPDF
       $this->SetTextColor(50,50,50);
       $this->SetFont('Arial','B',10);
       $company=$this->user->getCompany();
-      $this->Cell(190,6,utf8_decode($company->getSocialname()),0,'R','R');
+      $this->Cell(190,6,utf8_decode($this->workcenters==null?$company->getSocialname():$this->workcenters->getSocialname()),0,'R','R');
       $this->Ln(4);
       $this->SetFont('Arial','',8);
       //$this->Cell(100);
-      $this->Cell(190,6,utf8_decode($company->getAddress()),0,'R','R');
+      $this->Cell(190,6,utf8_decode($this->workcenters==null?$company->getAddress():$this->workcenters->getAddress()),0,'R','R');
       $this->Ln(4);
-      $this->Cell(190,6,utf8_decode($company->getPostcode()." - ".$company->getCity()." - ".$company->getState()),0,'R','R');
+      $this->Cell(190,6,utf8_decode(($this->workcenters==null?$company->getPostcode():$this->workcenters->getPostcode())." - ".($this->workcenters==null?$company->getCity():$this->workcenters->getCity())." - ".($this->workcenters==null?$company->getState():$this->workcenters->getState())),0,'R','R');
       $this->Ln(4);
-      $this->Cell(190,6,utf8_decode("CIF: ".$company->getVat()." - TFNO: ".$company->getPhone()),0,'R','R');
+      $this->Cell(190,6,utf8_decode("CIF: ".($this->workcenters==null?$company->getVat():$this->workcenters->getVat())." - TFNO: ".($this->workcenters==null?$company->getPhone():$this->workcenters->getPhone())),0,'R','R');
       $this->Ln(10);
   }
   function Footer()

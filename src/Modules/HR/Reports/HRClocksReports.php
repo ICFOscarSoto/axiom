@@ -41,9 +41,9 @@ class HRClocksReports
     $this->pdf->Cell(190,6,utf8_decode("En cumplimiento a la obligación establecida en los art 12.5h y 35.5 del Estatuto de los Trabajadores"),'BLR','R','L');
     $this->pdf->Ln(6);
     $this->pdf->Cell(20,6,utf8_decode("Empresa: "),1,0,'L',true);
-    $this->pdf->Cell(70,6,utf8_decode($company->getSocialname()),1,0,'C',false);
+    $this->pdf->Cell(70,6,utf8_decode($this->worker->getWorkCenters()!=null?$this->worker->getWorkCenters()->getSocialname():$company->getSocialname()),1,0,'C',false);
     $this->pdf->Cell(20,6,utf8_decode("CIF: "),1,0,'L',true);
-    $this->pdf->Cell(30,6,utf8_decode($company->getVAT()),1,0,'C',false);
+    $this->pdf->Cell(30,6,utf8_decode($this->worker->getWorkCenters()!=null?$this->worker->getWorkCenters()->getVAT():$company->getVAT()),1,0,'C',false);
     $this->pdf->Cell(20,6,utf8_decode("CCC: "),1,0,'L',true);
     $this->pdf->Cell(30,6,utf8_decode($company->getSs()),1,0,'C',false);
     $this->pdf->Ln(6);
@@ -63,6 +63,7 @@ class HRClocksReports
 
   function create($params){
     $this->pdf  = new GlobaleReports();
+
     $this->pdf->AliasNbPages();
     $doctrine=$params["doctrine"];
     $this->user=$params["user"];
@@ -94,10 +95,12 @@ class HRClocksReports
       }
       $this->pdf->image_path=$params["rootdir"].DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$params["user"]->getCompany()->getId().DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'company'.DIRECTORY_SEPARATOR;
       $this->pdf->user=$params["user"];
+      $this->pdf->workcenters=$this->worker->getWorkcenters();
       $this->pdf->AddPage();
 
       $result=0;
       while(count($data)){
+
         $this->docHeader();
         $data=$this->pdf->Table($data,$columns);
       }

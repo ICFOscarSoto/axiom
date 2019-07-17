@@ -73,6 +73,16 @@ class HRWorkCenters
      */
     private $deleted;
 
+    /**
+     * @ORM\Column(type="string", length=14, nullable=true)
+     */
+    private $vat;
+
+    /**
+     * @ORM\Column(type="string", length=100)
+     */
+    private $socialname;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -206,6 +216,30 @@ class HRWorkCenters
     public function setDeleted(bool $deleted): self
     {
         $this->deleted = $deleted;
+
+        return $this;
+    }
+
+    public function getVat(): ?string
+    {
+        return $this->vat;
+    }
+
+    public function setVat(?string $vat): self
+    {
+        $this->vat = $vat;
+
+        return $this;
+    }
+
+    public function getSocialname(): ?string
+    {
+        return $this->socialname;
+    }
+
+    public function setSocialname(?string $socialname): self
+    {
+        $this->socialname = $socialname;
 
         return $this;
     }

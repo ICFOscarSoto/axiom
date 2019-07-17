@@ -4,7 +4,9 @@
 			"name": "Work center data",
 			"fields": [
 				{	"name": "name", "cols": 4},
-				{	"name": "address",	"cols": 4},
+				{	"name": "socialname", "cols": 8},
+				{	"name": "vat",	"cols": 4},
+				{	"name": "address",	"cols": 8},
 				{	"name": "city", "cols": 3},
 		    {	"name": "state",	"cols": 3},
 		    {	"name": "postcode", "cols": 3},
