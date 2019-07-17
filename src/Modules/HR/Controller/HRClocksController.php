@@ -116,7 +116,13 @@ class HRClocksController extends Controller
 			$utils = new HRClocksUtils();
 			$templateLists=$utils->formatListbyWorker($id);
 			$formUtils=new GlobaleFormUtils();
-			$formUtils->initialize($this->getUser(), new $this->class(), dirname(__FILE__)."/../Forms/Clocks.json", $request, $this, $this->getDoctrine(),['enddevice','startdevice']);
+			if ($this->get('security.authorization_checker')->isGranted('ROLE_SUPERVISOR')) {
+				$formUtils->initialize($this->getUser(), new $this->class(), dirname(__FILE__)."/../Forms/Clocks.json", $request, $this, $this->getDoctrine(),['enddevice','startdevice']);
+				$templateLists=$utils->formatListbyWorker($id);
+			}else{
+				$formUtils->initialize($this->getUser(), new $this->class(), dirname(__FILE__)."/../Forms/ClocksAdmin.json", $request, $this, $this->getDoctrine(),['enddevice','startdevice']);
+				$templateLists=$utils->formatListbyWorkerAdmin($id);
+			}
 			$templateForms[]=$formUtils->formatForm('clocks', true, $id, $this->class);
 
 			/*$utils = new GlobaleFormUtils();
@@ -308,7 +314,11 @@ class HRClocksController extends Controller
 		 public function data($id, $action, $idworker, Request $request){
 			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 			$this->denyAccessUnlessGranted('ROLE_ADMIN');
-			$template=dirname(__FILE__)."/../Forms/Clocks.json";
+			if ($this->get('security.authorization_checker')->isGranted('ROLE_SUPERVISOR')) {
+				$template=dirname(__FILE__)."/../Forms/Clocks.json";
+			}else{
+				$template=dirname(__FILE__)."/../Forms/ClocksAdmin.json";
+			}
 			$utils = new GlobaleFormUtils();
 			$utilsObj=new $this->utilsClass();
 			$clockRepository=$this->getDoctrine()->getRepository($this->class);

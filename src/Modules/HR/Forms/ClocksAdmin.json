@@ -1,0 +1,11 @@
+[{
+	"sections": [
+		{
+			"name": "Fichaje",
+			"fields": [
+				{ "name": "worker", "cols": 4},
+				{	"name": "observations", "cols": 12}
+			]
+		}
+	]
+}]

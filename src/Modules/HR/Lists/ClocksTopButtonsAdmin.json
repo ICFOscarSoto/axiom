@@ -1,0 +1,4 @@
+[
+  {"id" : "printClockTop", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :true},
+  {"id" : "exportClockTop", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"exportWorkerClocks", "routeParams":{"id":"worker_id"}, "addSearch":true, "confirm" :false}
+]
