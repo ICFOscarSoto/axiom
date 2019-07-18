@@ -36,11 +36,13 @@
 
 					"order": [[ {{  listConstructor.orderColumn }}, "{{  listConstructor.orderDirection }}" ]],
 					"columns": [
-                        { "name": "checkboxes" ,"data": null, defaultContent: '' },
+            { "name": "checkboxes" ,"data": null, defaultContent: '' },
 						{% for field in  listConstructor.fields %}
 							{ "name": "{{ field.name }}" ,"data": "{{ field.name }}" },
 						{% endfor %}
-                        { "data": null, defaultContent: '' }
+						{% if listConstructor.fieldButtons|length > 0 %}
+            	{ "data": null, defaultContent: '' }
+						{% endif %}
 					],
 					"drawCallback": function( settings ) {
 
@@ -609,6 +611,7 @@
 					{% endfor %}
 
 					{#{% for field in listConstructor.fieldButtons %}#}
+					{% if listConstructor.fieldButtons|length > 0 %}
 					{% set buttons = listConstructor.fieldButtons|length %}
 						<th class="table-thead-search" colspan="{{ buttons }}" style="border-bottom: 1px solid #cecece !important;">
 								<div class="btn-group ">
@@ -618,6 +621,7 @@
 								</div>
 						</th>
 					{#{% endfor %}#}
+					{% endif %}
 
 				</tr>
 					<th class="table-header-name table-thead" style="border-bottom: 1px solid #cecece !important;">

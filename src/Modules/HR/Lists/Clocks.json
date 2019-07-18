@@ -1,10 +1,10 @@
 [{"name": "id", "caption":""},
- {"name": "start", "caption":"Entrada", "type": "datetime"},
+ {"name": "start", "caption":"Entrada", "type": "datetime", "width":"15%"},
  {"name": "start_location", "caption":"", "type": "location", "data": {"latitude": "startLatitude", "longitude": "startLongitude"}},
- {"name": "end", "caption":"Salida", "type": "datetime", "width":"10%"},
+ {"name": "end", "caption":"Salida", "type": "datetime", "width":"10%", "width":"15%"},
  {"name": "end_location", "caption":"", "type": "location", "data": {"latitude": "endLatitude", "longitude": "endLongitude"}},
  {"name": "time", "caption":"Duración", "sum": true, "format": "time"},
- {"name": "observations", "caption":"Observaciones"},
+ {"name": "observations", "caption":"Observaciones", "width":"25%"},
  {"name": "invalid", "caption":"Valido", "width":"10%" ,"class" : "dt-center", "replace":{
                             "1":{"text":"Inválido","html":"<div style=\"min-width: 75px;\" class=\"label label-danger\">Inválido</div>"},
                             "0":{"text":"Válido","html":"<div style=\"min-width: 75px;\" class=\"label label-success\">Válido</div>"}

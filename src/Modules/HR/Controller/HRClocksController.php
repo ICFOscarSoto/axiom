@@ -46,12 +46,19 @@ class HRClocksController extends Controller
      $locale = $request->getLocale();
      $this->router = $router;
      $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
-     $utils = new $this->utilsClass();
-     $formUtils=new GlobaleFormUtils();
-     $formUtils->initialize($this->getUser(), new $this->class(), dirname(__FILE__)."/../Forms/Clocks.json", $request, $this, $this->getDoctrine());
-     $templateLists[]=$utils->formatList($this->getUser());
-
-     $templateForms[]=$formUtils->formatForm('clocks', true, null, $this->class);
+		 $templateLists[]=[
+       'id' => 'listClocks',
+       'route' => 'clockslist',
+       'routeParams' => ["id" => $this->getUser()->getId()],
+       'orderColumn' => 1,
+       'orderDirection' => 'DESC',
+       'tagColumn' => 2,
+       'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Clocks.json"),true),
+       //'fieldButtons' => [["id"=>"", "type" => "default", "icon" => "default", "actionType" => "foreground", "route"=>""]],
+			 'fieldButtons' => [],
+       'topButtons' => []
+     ];
+ 		 //$templateLists[]=$utils->formatList($this->getUser());
      if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
        return $this->render('@Globale/genericlist.html.twig', [
          'controllerName' => 'HRClocksController',
@@ -61,7 +68,10 @@ class HRClocksController extends Controller
          'breadcrumb' =>  "workers",
          'userData' => $userdata,
          'lists' => $templateLists,
-         'forms' => $templateForms
+				 'include_header' => [["type"=>"css", "path"=>"/js/rickshaw/rickshaw.min.css"],
+															["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker-es.js"]],
+				 'include_footer' => [["type"=>"css", "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.css"],
+															["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.js"]]
          ]);
      } return new RedirectResponse($this->router->generate('app_login'));
      }
@@ -108,7 +118,7 @@ class HRClocksController extends Controller
 			public function index($id,RouterInterface $router,Request $request)
 			{
 			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-			//$this->denyAccessUnlessGranted('ROLE_ADMIN');
+			$this->denyAccessUnlessGranted('ROLE_ADMIN');
 			$userdata=$this->getUser()->getTemplateData();
 			$locale = $request->getLocale();
 			$this->router = $router;
