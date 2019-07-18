@@ -39,7 +39,7 @@ class HRVacations
     private $end;
 
     /**
-     * @ORM\Column(type="boolean", nullable=true)
+     * @ORM\Column(type="smallint", nullable=true)
      */
     private $approved;
 
@@ -136,12 +136,12 @@ class HRVacations
         return $this;
     }
 
-    public function getApproved(): ?bool
+    public function getApproved(): ?int
     {
         return $this->approved;
     }
 
-    public function setApproved(?bool $approved): self
+    public function setApproved(?int $approved): self
     {
         $this->approved = $approved;
 
