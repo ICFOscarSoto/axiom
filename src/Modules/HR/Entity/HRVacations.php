@@ -248,8 +248,8 @@ class HRVacations
     }
 
     public function preProccess($kernel, $doctrine, $user){
-      $date_end=$this->end;
-      if($this->end!=null) $this->days = ($date_end->add(new \DateInterval('PT24H')))->diff($this->start)->format('%a');
-
+      $date_end=clone $this->getEnd();
+      $date_start=clone $this->getStart();
+      if($this->end!=null) $this->days = ($date_end->add(new \DateInterval('PT24H')))->diff($date_start)->format('%a');
     }
 }
