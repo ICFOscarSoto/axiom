@@ -59,7 +59,7 @@ class HRClocksRepository extends ServiceEntityRepository
     public function thisWeekClocks($worker){
       $conn = $this->getEntityManager()->getConnection();
       $sql = "SELECT IFNULL(SUM(UNIX_TIMESTAMP(IFNULL(END,CURTIME()))-UNIX_TIMESTAMP(START)),0) raw, IFNULL(SEC_TO_TIME(SUM(UNIX_TIMESTAMP(IFNULL(END,CURTIME()))-UNIX_TIMESTAMP(START))),'00:00:00') formated FROM hrclocks
-              WHERE worker_id=? AND deleted=0 AND active=1 AND WEEK(START) = WEEK(CURDATE())";
+              WHERE worker_id=? AND deleted=0 AND active=1 AND WEEK(START,1) = WEEK(CURDATE(),1)";
       $stmt = $conn->prepare($sql);
       $stmt->bindValue(1, $worker->getId());
       $stmt->execute();
@@ -69,7 +69,7 @@ class HRClocksRepository extends ServiceEntityRepository
     public function lastWeekClocks($worker){
       $conn = $this->getEntityManager()->getConnection();
       $sql = "SELECT IFNULL(SUM(UNIX_TIMESTAMP(IFNULL(END,CURTIME()))-UNIX_TIMESTAMP(START)),0) raw, IFNULL(SEC_TO_TIME(SUM(UNIX_TIMESTAMP(IFNULL(END,CURTIME()))-UNIX_TIMESTAMP(START))),'00:00:00') formated FROM hrclocks
-              WHERE worker_id=? AND deleted=0 AND active=1 AND WEEK(START) = WEEK(CURDATE() - INTERVAL 1 WEEK) ";
+              WHERE worker_id=? AND deleted=0 AND active=1 AND WEEK(START,1) = WEEK(CURDATE() - INTERVAL 1 WEEK,1) ";
       $stmt = $conn->prepare($sql);
       $stmt->bindValue(1, $worker->getId());
       $stmt->execute();
