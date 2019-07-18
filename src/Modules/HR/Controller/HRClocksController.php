@@ -45,11 +45,13 @@ class HRClocksController extends Controller
      $userdata=$this->getUser()->getTemplateData();
      $locale = $request->getLocale();
      $this->router = $router;
+		 $workerRepository=$this->getDoctrine()->getRepository(HRWorkers::class);
+		 $worker = $workerRepository->findOneBy(["user"=>$this->getUser(), "company"=>$this->getUser()->getCompany()]);
      $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
 		 $templateLists[]=[
        'id' => 'listClocks',
        'route' => 'clockslistworker',
-       'routeParams' => ["id" => $this->getUser()->getId()],
+       'routeParams' => ["id" => $worker->getId()],
        'orderColumn' => 1,
        'orderDirection' => 'DESC',
        'tagColumn' => 2,
