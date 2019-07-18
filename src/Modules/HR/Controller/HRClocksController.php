@@ -48,7 +48,7 @@ class HRClocksController extends Controller
      $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
 		 $templateLists[]=[
        'id' => 'listClocks',
-       'route' => 'clockslist',
+       'route' => 'clockslistworker',
        'routeParams' => ["id" => $this->getUser()->getId()],
        'orderColumn' => 1,
        'orderDirection' => 'DESC',
@@ -355,8 +355,9 @@ class HRClocksController extends Controller
 		public function clockslistworker($id,RouterInterface $router,Request $request){
 			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 			$user = $this->getUser();
+			if (!$this->get('security.authorization_checker')->isGranted('ROLE_ADMIN')) $id=$this->getUser()->getId();
 			$workerRepository=$this->getDoctrine()->getRepository(HRWorkers::class);
-			$worker = $workerRepository->find($id);
+			$worker = $workerRepository->findOneBy(["id"=>$id, "company"=>$user->getCompany()]);
 			$locale = $request->getLocale();
 			$this->router = $router;
 			$manager = $this->getDoctrine()->getManager();
