@@ -355,9 +355,10 @@ class HRClocksController extends Controller
 		public function clockslistworker($id,RouterInterface $router,Request $request){
 			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 			$user = $this->getUser();
-			if (!$this->get('security.authorization_checker')->isGranted('ROLE_ADMIN')) $id=$this->getUser()->getId();
 			$workerRepository=$this->getDoctrine()->getRepository(HRWorkers::class);
-			$worker = $workerRepository->findOneBy(["id"=>$id, "company"=>$user->getCompany()]);
+			if (!$this->get('security.authorization_checker')->isGranted('ROLE_ADMIN')){
+				$worker = $workerRepository->findOneBy(["user"=>$user, "company"=>$user->getCompany()]);
+			}else	$worker = $workerRepository->findOneBy(["id"=>$id, "company"=>$user->getCompany()]);
 			$locale = $request->getLocale();
 			$this->router = $router;
 			$manager = $this->getDoctrine()->getManager();
