@@ -1,7 +1,6 @@
 [ {"name": "id", "caption":""},
-  {"name": "worker__name", "caption":"Nombre"},
-  {"name": "worker__lastname", "caption":"Apellidos"},
   {"name": "idd", "caption":"idd"},
+  {"name": "worker__name_o_worker__lastname", "caption":"Nombre", "width":"60%" },
   {"name": "active", "caption":"Estado", "width":"10%" ,"class" : "dt-center", "replace":{
                              "1":{"text":"Activo","html":"<div style=\"min-width: 75px;\" class=\"label label-success\">Activo</div>"},
                              "0":{"text":"Desactivado","html":"<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado</div>"}

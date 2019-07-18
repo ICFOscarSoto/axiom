@@ -130,12 +130,12 @@
 													id=data[0];
 													}
 													else text=data;
-												if({{counter}}=={{listConstructor.tagColumn}}){
+											{#	if({{counter}}=={{listConstructor.tagColumn}}){
 													text+="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 													row['_tags'].forEach(function(valor, indice, array) {
 															text+='<div class="label label-'+valor.type+'">'+valor.name+'</div>';
 													});
-												}
+												}#}
 												{# Check if has a select associated and fill it #}
 													{% if '__' in field.name %}
 														{# check if exist the element in select #}
@@ -168,7 +168,7 @@
 						{
 							"targets": {{ listConstructor.fields|length+counter }},
 							"orderable": false,
-							"width": "0.5%",
+							"width": "10px",
 							"className": "text-right",
 							"render": function(data, type, row, meta){
 									var buttons='';
@@ -613,7 +613,7 @@
 					{#{% for field in listConstructor.fieldButtons %}#}
 					{% if listConstructor.fieldButtons|length > 0 %}
 					{% set buttons = listConstructor.fieldButtons|length %}
-						<th class="table-thead-search" colspan="{{ buttons }}" style="border-bottom: 1px solid #cecece !important;">
+						<th class="table-thead-search text-right" colspan="{{ buttons }}" style="border-bottom: 1px solid #cecece !important;">
 								<div class="btn-group ">
 									<button id="clear-filters" type="button" class="btn btn-default tooltip-primary" style="border-color: #8a8a8a !important;height: 26px;line-height: 13px;">
 										<i class="fa fa-eraser"></i>&nbsp;Limpiar filtros
@@ -634,7 +634,7 @@
 					{% endfor %}
 
 					{% for field in listConstructor.fieldButtons %}
-						<th class="table-thead" style="border-bottom: 1px solid #cecece !important;"></th>
+						<th class="table-thead" width="10px" style="border-bottom: 1px solid #cecece !important;"></th>
 					{% endfor %}
 
 			</thead>

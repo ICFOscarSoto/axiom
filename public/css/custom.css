@@ -183,6 +183,10 @@ table.dataTable.compact tbody th, table.dataTable.compact tbody td {
 	font-weight: bold;
   background-color: #CCC;
 }
+.dataTable .btn{
+  padding: 6px 8px !important;
+  font-size: 10px !important;
+}
 
 .btn-success, .btn-green {
     color: #fff !important;

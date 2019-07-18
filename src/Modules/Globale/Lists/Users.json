@@ -1,8 +1,7 @@
 [ {"name": "id", "caption":""},
-  {"name": "company__name", "caption":"Empresa", "width" : "50"},
-  {"name": "name", "caption":"Nombre", "width" : "50"},
-  {"name": "lastname","caption":"Apellidos"},
   {"name": "email","caption":"Email"},
+  {"name": "name_o_lastname", "caption":"Nombre", "width" : "40%"},
+
   {"name": "active", "caption":"Estado", "width":"10%" ,"class" : "dt-center", "replace":{
                              "1":{"text":"Activo","html":"<div style=\"min-width: 75px;\" class=\"label label-success\">Activo</div>"},
                              "0":{"text":"Desactivado","html":"<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado</div>"}

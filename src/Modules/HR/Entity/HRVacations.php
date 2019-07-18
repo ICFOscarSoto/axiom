@@ -231,7 +231,6 @@ class HRVacations
     public function setDays(?int $days): self
     {
         $this->days = $days;
-
         return $this;
     }
 
@@ -243,7 +242,6 @@ class HRVacations
     public function setRequestdate(?\DateTimeInterface $requestdate): self
     {
         $this->requestdate = $requestdate;
-
         return $this;
     }
 
