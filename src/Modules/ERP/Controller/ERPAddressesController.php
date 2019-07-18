@@ -81,6 +81,7 @@ class ERPAddressesController extends Controller
 		 $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "supplier"=>$id==0?$supplier:$obj->getSupplier()];
 		 $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),
 		 												method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
+		 $utils->preParams=["type"=>$type, "obj"=>$id==0?$supplier:$obj->getSupplier()];												
 		 return $utils->make($id, $this->class, $action, "formIdentities", "modal");
 		}
 

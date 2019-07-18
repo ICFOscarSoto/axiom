@@ -251,4 +251,11 @@ class ERPAddresses
 
         return $this;
     }
+
+    public function preProccess($kernel, $doctrine, $user,$params){
+      if($params["type"]=="supplier"){
+        $this->supplier=$params["obj"];
+      }
+
+    }
 }

@@ -35,6 +35,8 @@ class GlobaleFormUtils extends Controller
   private $routeParams=array();
   private $includePreTemplate=array();
   private $includePostTemplate=array();
+  public $preParams=array();
+  public $postParams=array();
 
   //OLD INIT, ONLY FOR COMPATIBILITY
   public function init($doctrine, $request){
@@ -240,10 +242,10 @@ class GlobaleFormUtils extends Controller
        }
        $obj->setDateupd(new \DateTime());
        try{
-         if(method_exists($obj,'preProccess')) $obj->{'preProccess'}($this->controller->get('kernel'), $this->doctrine, $this->user);
+         if(method_exists($obj,'preProccess')) $obj->{'preProccess'}($this->controller->get('kernel'), $this->doctrine, $this->user, $this->preParams);
          $this->entityManager->persist($obj);
          $this->entityManager->flush();
-         if(method_exists($obj,'postProccess')) $obj->{'postProccess'}($this->controller->get('kernel'), $this->doctrine, $this->user);
+         if(method_exists($obj,'postProccess')) $obj->{'postProccess'}($this->controller->get('kernel'), $this->doctrine, $this->user, $this->postParams);
          return $obj;
        }catch (Exception $e) {
          return false;
