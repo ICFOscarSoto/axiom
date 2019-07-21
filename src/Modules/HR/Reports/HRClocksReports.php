@@ -65,6 +65,7 @@ class HRClocksReports
     $this->pdf  = new GlobaleReports();
 
     $this->pdf->AliasNbPages();
+    //$this->pdf->SetAutoPageBreak(false);
     $doctrine=$params["doctrine"];
     $this->user=$params["user"];
     $this->month=$params["month"];
@@ -97,20 +98,22 @@ class HRClocksReports
       $this->pdf->user=$params["user"];
       $this->pdf->workcenters=$this->worker->getWorkcenters();
       $this->pdf->AddPage();
-
       $result=0;
       while(count($data)){
-
         $this->docHeader();
         $data=$this->pdf->Table($data,$columns);
       }
-
       $this->pdf->Cell(20,6,"",1,0,'L',true);
       $this->pdf->Cell(60,6,utf8_decode("Total horas trabajadas: "),1,0,'R',true);
       $this->pdf->Cell(30,6,utf8_decode($this->secToH($totalTime)),1,0,'R',false);
       $this->pdf->Cell(80,6,"",'T');
-
-
+      $this->pdf->Ln(26);
+      $this->pdf->Cell(95,6,utf8_decode("Firmado la Empresa"),0,0,'C',false);
+      $this->pdf->Cell(95,6,utf8_decode("Firmado el Trabajador"),0,0,'C',false);
+      $this->pdf->Ln();
+      $this->pdf->Cell(10,6,"");
+      $this->pdf->MultiCell(170,3,utf8_decode("La firma de este documento por parte de ámbas partes es imprescindible en caso de existir cualquier tipo de incidencia en el perido contemplado en este informe."),0,'C');
+      $this->pdf->Cell(10,6,"");
     }
     return $this->pdf->Output();
 

@@ -56,7 +56,7 @@ class GlobaleReports extends \FPDF
           $this->Cell($columns[$i]["width"],5,$columns[$i]["name"],1,0,'C',true);
       $this->Ln();
       // Data
-      $this->SetFont('Arial','',9);
+      $this->SetFont('Arial','',8);
       foreach($data as $key=>$row)
       {
         for($i=0;$i<count($columns);$i++){
@@ -73,7 +73,7 @@ class GlobaleReports extends \FPDF
         if($this->GetY()>=268){
           $this->AddPage();
           return $data;
-        }else $this->Ln();
+        }else $this->Ln(4);
       }
       // Closing line
       //$this->Cell(array_sum($w),0,'','T');
