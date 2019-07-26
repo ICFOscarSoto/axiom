@@ -11,6 +11,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\Globale\Entity\GlobaleUsers;
+use App\Modules\Globale\Entity\GlobaleCompanies;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\Globale\Utils\GlobaleUsersUtils;
@@ -24,6 +25,8 @@ use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use App\Modules\Email\Controller\EmailController;
 use App\Modules\Globale\Utils\GlobaleListApiUtils;
+use Symfony\Component\HttpFoundation\Session\Session;
+
 class GlobaleUsersController extends Controller
 {
    	private $class=GlobaleUsers::class;
@@ -284,4 +287,24 @@ class GlobaleUsersController extends Controller
     $return=$listUtils->getRecords($this->getUser(),$repository,$request,$manager, $this->class,$filter,-1,["roles","password","salt","templatedata","usergroups","emailaccounts","emaildefaultaccount","calendars"]);
     return new JsonResponse($return);
   }
+
+  /**
+  * @Route("/{_locale}/global/users/connectas/{id}", name="conectascompany")
+  */
+  public function conectascompany($id,Request $request){
+      if ($this->get('security.authorization_checker')->isGranted('ROLE_GLOBAL')) {
+        $repository=$this->getDoctrine()->getRepository(GlobaleCompanies::class);
+    		$obj = $repository->findOneBy(['id'=>$id, 'deleted'=>0]);
+    		if($obj!=null){
+          $session = new Session();
+          $session->set('as_company', $obj);
+          return new JsonResponse(["result"=>1]);
+        }else{
+          return new JsonResponse(["result"=>-2]);
+        }
+      }else{
+        return new JsonResponse(["result"=>-1]);
+      }
+  }
+
 }
