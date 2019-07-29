@@ -507,7 +507,11 @@
 				if($(this).attr('attr-search')==1){
 					url+='?'+$("#search_param").val();
 				}
-				location.href=url;
+				window.open(
+				  url,
+				  '_blank'
+				);
+
 			}
 		});
 	</script>

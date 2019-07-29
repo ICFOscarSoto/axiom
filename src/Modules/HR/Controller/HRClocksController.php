@@ -274,7 +274,6 @@ class HRClocksController extends Controller
 	 		 $list=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $this->class,[["type"=>"and", "column"=>"worker", "value"=>$worker]],[],-1);
 			 $result = $utilsExport->export($list,$listFields);
 			 return $result;
-			 //return new Response('');
 		 }
 
 		 /**

@@ -16,6 +16,7 @@ class GlobaleListUtils
 
     public function getRecords($user,$repository,$request,$manager,$listFields,$classname,$filters=[],$raw=[],$maxResults=null): array
     {
+
 		$return=array();
 		$query = $repository->createQueryBuilder('p');
 
@@ -191,8 +192,10 @@ class GlobaleListUtils
         $queryTotal->setParameter('val_'.$path[0].'0', $filter["value"]);
       }
     }
+    $sql=$query->getQuery()->getSql();
+    $params=$query->getQuery()->getParameters();
 		$queryPaginator = $query->getQuery();
-
+    //dump($params);
 		$records=$queryPaginator->getResult();
 
 		$records=$queryPaginator->getResult();
