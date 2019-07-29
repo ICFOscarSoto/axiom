@@ -64,7 +64,7 @@
 			</li>
 
 			<!-- Message Notifications -->
-			<li class="notifications dropdown">
+			{#	<li class="notifications dropdown">
 
 				<a href="#" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
 					<i class="entypo-mail"></i>
@@ -92,8 +92,9 @@
 				</ul>
 
 			</li>
-
+			#}
 			<!-- Task Notifications -->
+			{#
 			<li class="notifications dropdown">
 
 				<a href="#" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
@@ -118,6 +119,7 @@
 				</ul>
 
 			</li>
+			#}
 			{% if "ROLE_GLOBAL" in userData.roles %}
 				<li style="width:250px">
 					<div style="padding: 4px 20px; display: inline-flex">
