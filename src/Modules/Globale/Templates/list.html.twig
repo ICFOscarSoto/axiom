@@ -144,7 +144,7 @@
 															   // $('#s_{{ field.name}}').val(row["{{ field.name}}"]).trigger('change');
 															} else {
 																	{# element not exist add it #}
-															    var newOption = new Option(row["{{ field.name}}"], row["{{ field.name}}"], true, true);
+															    var newOption = new Option(row["{{ field.name}}"], row["{{ field.name}}"], false, false);
 															    $('#s_{{ field.name}}').append(newOption);
 															}
 													{% endif %}
