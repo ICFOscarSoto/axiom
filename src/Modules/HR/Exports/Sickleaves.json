@@ -5,6 +5,6 @@
  {"name": "end", "caption":"Fin", "type": "datetime"},
  {"name": "days", "caption":"Días"},
  {"name": "requestdate", "caption":"Fecha peticion"},
- {"name": "approved", "caption":"Aprobado"},
+ {"name": "justified", "caption":"Justificado"},
  {"name": "active", "caption":"Estado"}
 ]
