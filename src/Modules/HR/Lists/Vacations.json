@@ -5,12 +5,12 @@
     "3":{"text":"Asuntos propios","html":"Asuntos propios"},
     "4":{"text":"Excedencia","html":"Excedencia"}
    }},
- {"name": "start", "caption":"Inicio"},
- {"name": "end", "caption":"Fin"},
+ {"name": "start", "type": "datetime", "caption":"Inicio"},
+ {"name": "end", "type": "datetime", "caption":"Fin"},
  {"name": "days", "caption":"Días", "width":"10%", "sum": true},
  {"name": "approved", "caption":"Aprobadas", "width":"10%" ,"class" : "dt-center", "replace":{
                             "1":{"text":"Aprobadas","html":"<div style=\"min-width: 75px;\" class=\"label label-success\">Aprobadas</div>"},
-                            "2":{"text":"Rechazadas","html":"<div style=\"min-width: 75px;\" class=\"label label-danger\">Rechazadas</div>"},                
+                            "2":{"text":"Rechazadas","html":"<div style=\"min-width: 75px;\" class=\"label label-danger\">Rechazadas</div>"},
                             "0":{"text":"Pendientes","html":"<div style=\"min-width: 75px;\" class=\"label label-warning\">Pendientes</div>"}
                           }
   },
