@@ -1,0 +1,8 @@
+[{"name": "type", "caption":"Tipo", "width":30, "align":"R"},
+ {"name": "start", "caption":"Inicio", "type": "datetime","width":30, "align":"R"},
+ {"name": "end", "caption":"Fin", "type": "datetime","width":30, "align":"R"},
+ {"name": "days", "caption":"Días","width":30, "align":"R"},
+ {"name": "requestdate", "caption":"Fecha peticion", "type": "datetime","width":30, "align":"R"},
+ {"name": "approved", "caption":"Aprobado","width":20, "align":"R"},
+ {"name": "active", "caption":"Estado","width":20, "align":"R"}
+]
