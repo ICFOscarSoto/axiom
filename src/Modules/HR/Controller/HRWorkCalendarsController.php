@@ -15,6 +15,8 @@ use App\Modules\Globale\Entity\GlobaleUsers;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
+use App\Modules\Globale\Utils\GlobalePrintUtils;
+use App\Modules\Globale\Utils\GlobaleExportUtils;
 use App\Modules\HR\Entity\HRWorkers;
 use App\Modules\Cloud\Controller\CloudController;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -106,6 +108,43 @@ class HRWorkCalendarsController extends Controller
  		$result=$entityUtils->enableObject($id, $this->class, $this->getDoctrine());
  		return new JsonResponse(array('result' => $result));
  	}
+
+	/**
+	 * @Route("/api/HR/workcalendars/export", name="exportWorkCalendars")
+	 */
+	 public function exportWorkCalendars(Request $request){
+		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		 $this->denyAccessUnlessGranted('ROLE_ADMIN');
+		 $utilsExport = new GlobaleExportUtils();
+		 $user = $this->getUser();
+		 $manager = $this->getDoctrine()->getManager();
+		 $repository = $manager->getRepository($this->class);
+		 $listUtils=new GlobaleListUtils();
+		 $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Exports/WorkCalendars.json"),true);
+		 $list=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $this->class,[],[],-1);
+		 $result = $utilsExport->export($list,$listFields);
+		 return $result;
+	 }
+
+	 /**
+ 	 * @Route("/api/HR/workcalendars/print", name="printWorkCalendars")
+ 	 */
+ 	 public function printWorkers(Request $request){
+ 		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+ 		 $this->denyAccessUnlessGranted('ROLE_ADMIN');
+ 		 $utilsPrint = new GlobalePrintUtils();
+ 		 $user = $this->getUser();
+ 		 $manager = $this->getDoctrine()->getManager();
+ 		 $repository = $manager->getRepository($this->class);
+ 		 $listUtils=new GlobaleListUtils();
+ 		 $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Prints/WorkCalendars.json"),true);
+ 		 $list=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $this->class,[],[],-1);
+		 $utilsPrint->title="LISTADO DE CALENDARIOS LABORALES";
+ 		 $pdf = $utilsPrint->print($list,$listFields,["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "user"=>$this->getUser()]);
+		 return new Response($pdf, 200, array('Content-Type' => 'application/pdf'));
+ 	 }
+
+
 
 	/**
   * @Route("/{_locale}/HR/workcalendar/{id}/delete", name="deleteWorkCalendar", defaults={"id"=0})

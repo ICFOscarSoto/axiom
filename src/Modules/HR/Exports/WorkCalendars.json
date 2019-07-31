@@ -1,0 +1,5 @@
+[{"name": "name", "caption":"Nombre"},
+ {"name": "city", "caption":"Ciudad"},
+ {"name": "year","caption":"Año"},
+ {"name": "active", "caption":"Estado"}
+]

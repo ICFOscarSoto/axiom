@@ -14,7 +14,7 @@ class GlobaleListUtils
       return null;
     }
 
-    public function getRecords($user,$repository,$request,$manager,$listFields,$classname,$filters=[],$raw=[],$maxResults=null): array
+    public function getRecords($user,$repository,$request,$manager,$listFields,$classname,$filters=[],$raw=[],$maxResults=null,$orderBy="id"): array
     {
 
 		$return=array();
@@ -148,7 +148,9 @@ class GlobaleListUtils
 			 }else{
 				$query->addOrderBy('p.'.strtolower($listFields[(($order[0]['column'])-1)*1]["name"]), $order[0]['dir']);
 			}
-		}
+		}else{
+      $query->addOrderBy('p.'.$orderBy);
+    }
 
 		//Generamos los LEFT JOIN de la consulta
     $definedLeftJoin=[];
