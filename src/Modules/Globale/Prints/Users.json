@@ -1,0 +1,5 @@
+[{"name": "name", "caption":"Nombre","width":40,"align":"L"},
+ {"name": "lastname", "caption":"Apellidos","width":60,"align":"L"},
+ {"name": "email","caption":"Email","width":60,"align":"L"},
+ {"name": "active","caption":"Estado","width":30,"align":"L"}
+]

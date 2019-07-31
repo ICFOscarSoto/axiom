@@ -17,6 +17,8 @@ use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\Globale\Utils\GlobaleUsersUtils;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleProfilesUtils;
+use App\Modules\Globale\Utils\GlobaleExportUtils;
+use App\Modules\Globale\Utils\GlobalePrintUtils;
 use App\Modules\Email\Entity\EmailAccounts;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
@@ -287,6 +289,43 @@ class GlobaleUsersController extends Controller
     $return=$listUtils->getRecords($this->getUser(),$repository,$request,$manager, $this->class,$filter,-1,["roles","password","salt","templatedata","usergroups","emailaccounts","emaildefaultaccount","calendars"]);
     return new JsonResponse($return);
   }
+
+  /**
+   * @Route("/{_locale}/global/users/export", name="exportUsers")
+   */
+   public function exportDepartment(Request $request){
+     $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+     $this->denyAccessUnlessGranted('ROLE_ADMIN');
+     $utilsExport = new GlobaleExportUtils();
+     $user = $this->getUser();
+     $manager = $this->getDoctrine()->getManager();
+     $repository = $manager->getRepository($this->class);
+     $listUtils=new GlobaleListUtils();
+     $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Exports/Users.json"),true);
+     $list=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $this->class,[],[],-1);
+     $result = $utilsExport->export($list,$listFields);
+     return $result;
+   }
+
+   /**
+ 	 * @Route("/api/global/users/print", name="printUsers")
+ 	 */
+ 	 public function printDepartments(Request $request){
+ 		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+ 		 $this->denyAccessUnlessGranted('ROLE_ADMIN');
+ 		 $utilsPrint = new GlobalePrintUtils();
+ 		 $user = $this->getUser();
+ 		 $manager = $this->getDoctrine()->getManager();
+ 		 $repository = $manager->getRepository($this->class);
+ 		 $listUtils=new GlobaleListUtils();
+ 		 $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Prints/Users.json"),true);
+ 		 $list=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $this->class,[],[],-1);
+		 $utilsPrint->title="LISTADO DE USUARIOS";
+ 		 $pdf = $utilsPrint->print($list,$listFields,["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "user"=>$this->getUser()]);
+		 return new Response($pdf, 200, array('Content-Type' => 'application/pdf'));
+ 	 }
+
+
 
   /**
   * @Route("/{_locale}/global/users/connectas/{id}", name="conectascompany")

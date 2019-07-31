@@ -1,6 +1,6 @@
 [
   {"id" : "addTop", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"formUser", "confirm" :false, "tooltip" : "Crear nuevo usuario"},
   {"id" : "deleteTop", "type" : "btn-red", "icon" : "fa fa-trash","name" : "borrar", "route":"deleteUser", "actionType" : "background", "confirm" :true},
-  {"id" : "printTop", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false},
-  {"id" : "exportTop", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"", "confirm" :false}
+  {"id" : "printTop", "type" : "", "icon" : "fa fa-print","name" : "", "route":"printUsers", "addSearch":true, "confirm" :false},
+  {"id" : "exportTop", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"exportUsers", "addSearch":true, "confirm" :false}
 ]

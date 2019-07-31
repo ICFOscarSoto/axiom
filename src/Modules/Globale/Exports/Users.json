@@ -1,0 +1,5 @@
+[{"name": "name", "caption":"Nombre"},
+ {"name": "lastname", "caption":"Apellidos"},
+ {"name": "email","caption":"Email"},
+ {"name": "active","caption":"Estado"}
+]
