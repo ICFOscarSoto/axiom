@@ -30,6 +30,7 @@ class ShareShares
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Modules\Globale\Entity\GlobaleUsers")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     private $user;
 

@@ -21,6 +21,7 @@ class IoTDevices
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCompanies")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     private $company;
 

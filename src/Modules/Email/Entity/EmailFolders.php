@@ -25,7 +25,7 @@ class EmailFolders
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Modules\Email\Entity\EmailAccounts", inversedBy="emailFolders")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     private $emailAccount;
 

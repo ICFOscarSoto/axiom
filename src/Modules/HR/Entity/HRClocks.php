@@ -20,7 +20,7 @@ class HRClocks
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\HR\Entity\HRWorkers")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     private $worker;
 
@@ -89,11 +89,13 @@ class HRClocks
 
    /**
     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleClockDevices")
+    * @ORM\JoinColumn(onDelete="SET NULL")
     */
    private $startdevice;
 
    /**
     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleClockDevices")
+    * @ORM\JoinColumn(onDelete="SET NULL")    
     */
    private $enddevice;
 

@@ -19,7 +19,7 @@ class IoTData
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\IoT\Entity\IoTSensors")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     private $sensor;
 

@@ -21,12 +21,13 @@ class GlobaleClockDevicesWorkers
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleClockDevices")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     private $clockdevice;
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\HR\Entity\HRWorkers")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     private $worker;
 

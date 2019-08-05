@@ -87,7 +87,6 @@ class GlobaleUsersController extends Controller
             'id' => $this->getUser()->getId(),
             'route' => $this->generateUrl("dataUser",["id"=>$this->getUser()->getId()]),
             'form' => $utils->formatForm("formprofile", true, $this->getUser()->getId(), $this->class, 'dataUser')
-
     ));
 
 
@@ -161,9 +160,6 @@ class GlobaleUsersController extends Controller
     ));
   }
 
-
-
-
 	/**
 	* @Route("/{_locale}/admin/global/users/new", name="newUser")
 	*/
@@ -189,8 +185,6 @@ class GlobaleUsersController extends Controller
       return $this->render($editor["template"], $editor["vars"]);
 
 	}
-
-
 
 
 	/**
@@ -269,8 +263,6 @@ class GlobaleUsersController extends Controller
 		}return new Response();
 	}
 
-
-
   /**
   * @Route("/api/global/users/collection", name="genericapiUsercollection")
   */
@@ -324,8 +316,6 @@ class GlobaleUsersController extends Controller
  		 $pdf = $utilsPrint->print($list,$listFields,["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "user"=>$this->getUser()]);
 		 return new Response($pdf, 200, array('Content-Type' => 'application/pdf'));
  	 }
-
-
 
   /**
   * @Route("/{_locale}/global/users/connectas/{id}", name="conectascompany")

@@ -19,7 +19,7 @@ class IoTSensors
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\IoT\Entity\IoTDevices", inversedBy="IoTSensors")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     private $device;
 

@@ -24,7 +24,7 @@ class CalendarEvents
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\Calendar\Entity\CalendarCalendars", inversedBy="events")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     private $calendar;
 

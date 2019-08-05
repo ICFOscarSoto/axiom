@@ -19,7 +19,7 @@ class HRVacations
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\HR\Entity\HRWorkers")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     private $worker;
 

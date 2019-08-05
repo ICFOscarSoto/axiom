@@ -25,6 +25,7 @@ class HRShifts
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Modules\HR\Entity\HRSchedules", inversedBy="shifts")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     private $schedules;
 
