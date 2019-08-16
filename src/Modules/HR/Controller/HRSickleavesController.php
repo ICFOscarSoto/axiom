@@ -14,6 +14,7 @@ use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\Globale\Utils\GlobaleExportUtils;
+use App\Modules\Globale\Utils\GlobalePrintUtils;
 use App\Modules\HR\Entity\HRWorkers;
 use App\Modules\HR\Entity\HRSickleaves;
 use App\Modules\HR\Utils\HRSickleavesUtils;
@@ -74,6 +75,26 @@ class HRSickleavesController extends Controller
      $result = $utilsExport->export($list,$listFields);
      return $result;
      //return new Response('');
+   }
+
+   /**
+   * @Route("/api/HR/{id}/sickleaves/print", name="printSickleaves")
+   */
+   public function printSickleaves($id, Request $request){
+     $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+     $this->denyAccessUnlessGranted('ROLE_ADMIN');
+     $utilsPrint = new GlobalePrintUtils();
+     $workerRepository=$this->getDoctrine()->getRepository(HRWorkers::class);
+     $worker = $workerRepository->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany()]);
+     $user = $this->getUser();
+     $manager = $this->getDoctrine()->getManager();
+     $repository = $manager->getRepository($this->class);
+     $listUtils=new GlobaleListUtils();
+     $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Prints/Sickleaves.json"),true);
+     $list=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $this->class,[["type"=>"and", "column"=>"worker", "value"=>$worker]],[],-1);
+     $utilsPrint->title="LISTADO DE BAJAS: ".$worker->getLastname().", ".$worker->getName()." (".$worker->getIdcard().")";
+     $pdf = $utilsPrint->print($list,$listFields,["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "user"=>$this->getUser()]);
+     return new Response($pdf, 200, array('Content-Type' => 'application/pdf'));
    }
 
    /**

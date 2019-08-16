@@ -1,0 +1,6 @@
+[{"name": "name", "caption":"Nombre", "width":40, "align":"L"},
+ {"name": "socialname", "caption":"D. Social", "width":50, "align":"L"},
+ {"name": "address", "caption":"Dirección", "width":60, "align":"L"},
+ {"name": "city", "caption":"Localidad", "width":20, "align":"L"},
+ {"name": "state", "caption":"Provincia", "width":20, "align":"L"}
+]

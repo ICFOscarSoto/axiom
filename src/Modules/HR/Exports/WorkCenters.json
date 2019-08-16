@@ -1,0 +1,8 @@
+[{"name": "name", "caption":"Nombre"},
+ {"name": "socialname", "caption":"Denominación Social"},
+ {"name": "address", "caption":"Dirección"},
+ {"name": "city", "caption":"Localidad"},
+ {"name": "state", "caption":"Provincia"},
+ {"name": "phone", "caption":"Teléfono"},
+ {"name": "active", "caption":"Estado"}
+]

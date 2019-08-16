@@ -64,7 +64,7 @@ class HRPeriods
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\HR\Entity\HRShifts", inversedBy="periods")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     private $shift;
 

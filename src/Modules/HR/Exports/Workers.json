@@ -1,0 +1,7 @@
+[{"name": "idcard", "caption":"CIF", "width":30, "align":"C"},
+ {"name": "ss", "caption":"Nº Seg. Social","width":30,"align":"L"},
+ {"name": "name_o_lastname","caption":"Nombre","width":40,"align":"L"},
+ {"name": "workcenters__name","caption":"Centro","width":35,"align":"L"},
+ {"name": "department__name","caption":"Departamento","width":35,"align":"L"},
+ {"name": "active", "caption":"Estado","width":20,"align":"C"}
+]

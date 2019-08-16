@@ -14,6 +14,7 @@ use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\Globale\Utils\GlobaleExportUtils;
+use App\Modules\Globale\Utils\GlobalePrintUtils;
 use App\Modules\HR\Entity\HRWorkers;
 use App\Modules\HR\Entity\HRVacations;
 use App\Modules\HR\Utils\HRVacationsUtils;
@@ -58,12 +59,12 @@ class HRVacationsController extends Controller
   /**
    * @Route("/{_locale}/HR/{id}/vacations/export", name="exportVacations")
    */
-   public function exportWorkerClocks($id, Request $request){
+   public function exportVacations($id, Request $request){
      $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
      $this->denyAccessUnlessGranted('ROLE_ADMIN');
      $utilsExport = new GlobaleExportUtils();
-     $workerRepository=$this->getDoctrine()->getRepository(HRVacations::class);
-     $worker = $workerRepository->find($id);
+     $workerRepository=$this->getDoctrine()->getRepository(HRWorkers::class);
+     $worker = $workerRepository->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany()]);
      $user = $this->getUser();
      $manager = $this->getDoctrine()->getManager();
      $repository = $manager->getRepository($this->class);
@@ -72,8 +73,28 @@ class HRVacationsController extends Controller
      $list=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $this->class,[["type"=>"and", "column"=>"worker", "value"=>$worker]],[],-1);
      $result = $utilsExport->export($list,$listFields);
      return $result;
-     //return new Response('');
    }
+
+   /**
+   * @Route("/api/HR/{id}/vacations/print", name="printVacations")
+   */
+   public function printVacations($id, Request $request){
+     $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+     $this->denyAccessUnlessGranted('ROLE_ADMIN');
+     $utilsPrint = new GlobalePrintUtils();
+     $workerRepository=$this->getDoctrine()->getRepository(HRWorkers::class);
+     $worker = $workerRepository->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany()]);
+     $user = $this->getUser();
+     $manager = $this->getDoctrine()->getManager();
+     $repository = $manager->getRepository($this->class);
+     $listUtils=new GlobaleListUtils();
+     $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Prints/Vacations.json"),true);
+     $list=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $this->class,[["type"=>"and", "column"=>"worker", "value"=>$worker]],[],-1);
+     $utilsPrint->title="LISTADO DE VACACIONES: ".$worker->getLastname().", ".$worker->getName()." (".$worker->getIdcard().")";
+     $pdf = $utilsPrint->print($list,$listFields,["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "user"=>$this->getUser()]);
+     return new Response($pdf, 200, array('Content-Type' => 'application/pdf'));
+   }
+
 
    /**
     * @Route("/{_locale}/HR/vacations/data/{id}/{action}/{idworker}", name="dataVacations", defaults={"id"=0, "action"="read", "idworker"="0"})

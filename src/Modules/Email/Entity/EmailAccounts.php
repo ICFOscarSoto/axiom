@@ -52,7 +52,7 @@ class EmailAccounts
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Modules\Globale\Entity\GlobaleUsers", inversedBy="emailAccounts")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     private $user;
 

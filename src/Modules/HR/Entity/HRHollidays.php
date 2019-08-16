@@ -19,7 +19,7 @@ class HRHollidays
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\HR\Entity\HRWorkCalendars", inversedBy="holidays", fetch="EAGER")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     private $calendar;
 

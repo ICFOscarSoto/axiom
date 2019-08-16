@@ -18,6 +18,8 @@ use App\Modules\Globale\Entity\GlobaleCountries;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
+use App\Modules\Globale\Utils\GlobaleExportUtils;
+use App\Modules\Globale\Utils\GlobalePrintUtils;
 use App\Modules\HR\Entity\HRWorkers;
 use App\Modules\HR\Entity\HRDepartments;
 use App\Modules\HR\Entity\HRWorkCenters;
@@ -236,6 +238,45 @@ class HRController extends Controller
     }
    return new JsonResponse(array('result' => $result));
   }
+
+	/**
+	 * @Route("/api/HR/workers/export", name="exportWorkers")
+	 */
+	 public function exportWorkers(Request $request){
+		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		 $this->denyAccessUnlessGranted('ROLE_ADMIN');
+		 $utilsExport = new GlobaleExportUtils();
+		 //$workerRepository=$this->getDoctrine()->getRepository(HRWorkers::class);
+		 //$worker = $workerRepository->find($id);
+		 $user = $this->getUser();
+		 $manager = $this->getDoctrine()->getManager();
+		 $repository = $manager->getRepository($this->class);
+		 $listUtils=new GlobaleListUtils();
+		 $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Exports/Workers.json"),true);
+		 $list=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $this->class,[],[],-1);
+		 $result = $utilsExport->export($list,$listFields);
+		 return $result;
+	 }
+
+	 /**
+ 	 * @Route("/api/HR/workers/print", name="printWorkers")
+ 	 */
+ 	 public function printWorkers(Request $request){
+ 		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+ 		 $this->denyAccessUnlessGranted('ROLE_ADMIN');
+ 		 $utilsPrint = new GlobalePrintUtils();
+ 		 $user = $this->getUser();
+ 		 $manager = $this->getDoctrine()->getManager();
+ 		 $repository = $manager->getRepository($this->class);
+ 		 $listUtils=new GlobaleListUtils();
+ 		 $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Exports/Workers.json"),true);
+ 		 $list=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $this->class,[],[],-1);
+		 $utilsPrint->title="LISTADO DE TRABAJADORES";
+ 		 $pdf = $utilsPrint->print($list,$listFields,["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "user"=>$this->getUser()]);
+		 return new Response($pdf, 200, array('Content-Type' => 'application/pdf'));
+ 	 }
+
+
 
 	/**
   * @Route("/api/HR/workers/collection", name="genericapiWorkerscollection")

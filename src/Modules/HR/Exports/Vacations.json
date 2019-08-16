@@ -1,9 +1,9 @@
 [{"name": "id", "caption":""},
  {"name": "type", "caption":"Tipo"},
- {"name": "start", "caption":"Inicio"},
- {"name": "end", "caption":"Fin"},
+ {"name": "start", "caption":"Inicio", "type": "datetime"},
+ {"name": "end", "caption":"Fin", "type": "datetime"},
  {"name": "days", "caption":"Días"},
- {"name": "requestdate", "caption":"Fecha peticion"},
+ {"name": "requestdate", "caption":"Fecha peticion", "type": "datetime"},
  {"name": "approved", "caption":"Aprobado"},
  {"name": "active", "caption":"Estado"}
 ]

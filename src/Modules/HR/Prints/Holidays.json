@@ -1,0 +1,5 @@
+[{"name": "name", "caption":"Nombre", "width":90, "align":"L"},
+ {"name": "type", "caption":"Tipo", "width":30, "align":"R"},
+ {"name": "date", "caption":"Fecha", "type": "datetime", "width":40, "align":"L"},
+ {"name": "active", "caption":"Estado", "width":30, "align":"R"}
+]

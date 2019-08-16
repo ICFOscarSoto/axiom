@@ -35,6 +35,7 @@ class GlobaleUserGroups
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Modules\Globale\Entity\GlobaleCompanies", inversedBy="userGroups")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     private $company;
 

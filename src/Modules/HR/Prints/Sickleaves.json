@@ -1,0 +1,9 @@
+[{"name": "type", "caption":"Tipo", "width":12, "align":"R"},
+ {"name": "name", "caption":"Descripción", "width":50, "align":"L"},
+ {"name": "start", "caption":"Inicio", "type": "datetime", "width":28, "align":"R"},
+ {"name": "end", "caption":"Fin", "type": "datetime", "width":28, "align":"R"},
+ {"name": "days", "caption":"Días", "width":10, "align":"R"},
+ {"name": "requestdate", "caption":"Fecha peticion", "width":28, "align":"R"},
+ {"name": "justified", "caption":"Justificado", "width":18, "align":"R"},
+ {"name": "active", "caption":"Estado", "width":16, "align":"R"}
+]

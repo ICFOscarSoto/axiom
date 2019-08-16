@@ -344,4 +344,21 @@ class GlobaleCompaniesController extends Controller
 		$result=$entityUtils->deleteObject($id, $this->class, $this->getDoctrine());
 		return new JsonResponse(array('result' => $result));
 	}
+
+	/**
+	* @Route("/{_locale}/global/companies/options/connectas", name="optionsConnectas")
+	*/
+	public function optionsConnectas(Request $request){
+		if ($this->get('security.authorization_checker')->isGranted('ROLE_GLOBAL')) {
+			$repository=$this->getDoctrine()->getRepository(GlobaleCompanies::class);
+			$objs = $repository->findBy(['deleted'=>0]);
+			$options=[];
+			foreach($objs as $obj){
+				$options[]=["id"=>$obj->getId(), "text"=>$obj->getName(), "selected"=>$this->getUser()->getCompany()->getId()==$obj->getId()?true:false];
+			}
+			//return new JsonResponse(["results"=>$options,"pagination"=>["more"=>true]]);
+			return new JsonResponse($options);
+	  }else return new JsonResponse(["results"=>[],"pagination"=>["more"=>true]]);
+
+	}
 }

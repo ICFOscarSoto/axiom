@@ -11,6 +11,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\HttpFoundation\Session\Session;
+
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\Globale\Repository\GlobaleUsersRepository")
@@ -52,7 +54,7 @@ class GlobaleUsers implements UserInterface
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Modules\Globale\Entity\GlobaleCompanies", inversedBy="users", fetch="EAGER")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     private $company;
 
@@ -188,7 +190,12 @@ class GlobaleUsers implements UserInterface
 
     public function getCompany(): ?GlobaleCompanies
     {
-        return $this->company;
+      $session = new Session();
+       if(in_array('ROLE_GLOBAL', $this->getRoles()))
+        if($session->get('as_company')!=NULL){
+          return $session->get('as_company');
+        }else return $this->company;
+       else return $this->company;
     }
 
     public function setCompany(?GlobaleCompanies $company): self

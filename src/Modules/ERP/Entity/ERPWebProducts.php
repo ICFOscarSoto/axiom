@@ -20,7 +20,7 @@ class ERPWebProducts
 
     /**
      * @ORM\OneToOne(targetEntity="\App\Modules\ERP\Entity\ERPProducts", cascade={"persist", "remove"})
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     private $product;
 
@@ -31,7 +31,7 @@ class ERPWebProducts
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCompanies")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     private $company;
 

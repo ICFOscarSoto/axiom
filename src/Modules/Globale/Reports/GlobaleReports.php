@@ -44,7 +44,7 @@ class GlobaleReports extends \FPDF
       $this->Cell(0,10,utf8_decode('Página ').$this->PageNo().'/{nb}',0,0,'C');
   }
 
-  function Table($data, $columns)
+  function Table($data, $columns, $associative=false)
   {
       // Header
       $this->SetFont('Arial','B',10);
@@ -53,21 +53,18 @@ class GlobaleReports extends \FPDF
       $this->SetDrawColor(210, 210, 210);
       $this->SetTextColor(50,50,50);
       for($i=0;$i<count($columns);$i++)
-          $this->Cell($columns[$i]["width"],5,$columns[$i]["name"],1,0,'C',true);
+          $this->Cell($columns[$i]["width"],5,utf8_decode(isset($columns[$i]["caption"])?$columns[$i]["caption"]:$columns[$i]["name"]),1,0,'C',true);
       $this->Ln();
       // Data
       $this->SetFont('Arial','',8);
       foreach($data as $key=>$row)
       {
         for($i=0;$i<count($columns);$i++){
-
           if($this->GetY()>=268){
-            $this->Cell($columns[$i]["width"],5,  $row[$i],isset($columns[$i]["border"])?$columns[$i]["border"]:'LRB',0,isset($columns[$i]["align"])?$columns[$i]["align"]:'L');
+            $this->Cell($columns[$i]["width"],5, utf8_decode($associative?$row[$columns[$i]["name"]]:$row[$i]),isset($columns[$i]["border"])?$columns[$i]["border"]:'LRB',0,isset($columns[$i]["align"])?$columns[$i]["align"]:'L');
           }else{
-            $this->Cell($columns[$i]["width"],5,   $row[$i],isset($columns[$i]["border"])?$columns[$i]["border"]:'LR',0,isset($columns[$i]["align"])?$columns[$i]["align"]:'L');
-
+            $this->Cell($columns[$i]["width"],5, utf8_decode($associative?$row[$columns[$i]["name"]]:$row[$i]),isset($columns[$i]["border"])?$columns[$i]["border"]:'LR',0,isset($columns[$i]["align"])?$columns[$i]["align"]:'L');
           }
-
         }
         array_shift ($data);
         if($this->GetY()>=268){

@@ -17,9 +17,9 @@ class GlobaleExportUtils
        }
        ob_start();
        $df = fopen("php://output", 'w');
-       fputcsv($df, array_keys(reset($array)));
+       fputcsv($df, array_map("utf8_decode",array_keys(reset($array))));
        foreach ($array as $row) {
-          fputcsv($df, array_values ($row));
+          fputcsv($df, array_values (array_map("utf8_decode", $row )));
        }
        fclose($df);
        return ob_get_clean();

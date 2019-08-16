@@ -1,7 +1,7 @@
 [
   {"id" : "addTop", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"formWorker", "confirm" :false, "tooltip" : "Crear nuevo trabajador"},
     {"id" : "deleteTop", "type" : "btn-red", "icon" : "fa fa-trash","name" : "borrar", "route":"deleteWorker", "actionType" : "background", "confirm" :true},
-  {"id" : "printTop", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false},
+  {"id" : "printTop", "type" : "", "icon" : "fa fa-print","name" : "", "route":"printWorkers",  "addSearch":true, "confirm" :false},
   {"id" : "printClocks", "type" : "", "icon" : "fa fa-clock-o","name" : "", "route":"", "confirm" :false},
-  {"id" : "exportTop", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"", "confirm" :false}
+  {"id" : "exportTop", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"exportWorkers",  "addSearch":true, "confirm" :false}
 ]

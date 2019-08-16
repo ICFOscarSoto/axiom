@@ -18,11 +18,13 @@ class GlobaleNotifications
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Modules\Globale\Entity\GlobaleUsers", inversedBy="notifications")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     private $user;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Modules\Globale\Entity\GlobaleUserGroups", inversedBy="notifications")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     private $usergroup;
 

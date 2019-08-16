@@ -1,0 +1,5 @@
+[{"name": "name", "caption":"Nombre", "width":70, "align":"L"},
+ {"name": "city", "caption":"Ciudad", "width":60, "align":"L"},
+ {"name": "year","caption":"Año", "width":30, "align":"L"},
+ {"name": "active", "caption":"Estado", "width":30, "align":"R"}
+]

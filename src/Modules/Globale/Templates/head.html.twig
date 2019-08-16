@@ -64,7 +64,7 @@
 			</li>
 
 			<!-- Message Notifications -->
-			<li class="notifications dropdown">
+			{#	<li class="notifications dropdown">
 
 				<a href="#" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
 					<i class="entypo-mail"></i>
@@ -92,8 +92,9 @@
 				</ul>
 
 			</li>
-
+			#}
 			<!-- Task Notifications -->
+			{#
 			<li class="notifications dropdown">
 
 				<a href="#" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
@@ -118,14 +119,43 @@
 				</ul>
 
 			</li>
+			#}
+			{% if "ROLE_GLOBAL" in userData.roles %}
+				<li style="width:250px">
+					<div style="padding: 4px 20px; display: inline-flex">
+						<div style="width: 86px;padding-top: 6px;">Conectar como:</div>
+						<div><input  id="connectas" style="width:200px" class="js-data-example-ajax"/></div>
+					 </div>
+				</li>
+				<script>
+				 $(document).ready(function() {
+					 $("#connectas").select2({
+						 ajax: {
+						 url: '{{ path('optionsConnectas') }}',
+						 dataType: 'json',
+						 results: function (data) {
+							 return {results: data};
+						 }
+						 // Additional AJAX parameters go here; see the end of this chapter for the full code of this example
+						 }
+					 });
+					 $('body').on('change', '#connectas', function() {
+						 $.getJSON('/es/global/users/connectas/'+$(this).val(), function( data ) {
+						 }).always(function() {
+							 location.reload();
+						 });
+					 });
 
+				 });
+				</script>
+			{% endif %}
 		</ul>
 
 	</div>
 
 
 	<!-- Raw Links -->
-	<div class="col-md-6 col-sm-4 clearfix hidden-xs">
+	<div class="col-md-6 col-sm-4 clearfix">
 
 		<ul class="list-inline links-list pull-right">
 

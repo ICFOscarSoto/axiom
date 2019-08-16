@@ -15,6 +15,8 @@ use App\Modules\Globale\Entity\GlobaleUsers;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
+use App\Modules\Globale\Utils\GlobaleExportUtils;
+use App\Modules\Globale\Utils\GlobalePrintUtils;
 use App\Modules\HR\Entity\HRWorkers;
 use App\Modules\Cloud\Controller\CloudController;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -159,5 +161,47 @@ public function delete($id,Request $request){
   }
  return new JsonResponse(array('result' => $result));
 }
+
+
+/**
+ * @Route("/{_locale}/HR/workcalendars/{id}/holidays/export", name="exportHolidays")
+ */
+ public function exportHolidays($id, Request $request){
+   $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+   $this->denyAccessUnlessGranted('ROLE_ADMIN');
+   $utilsExport = new GlobaleExportUtils();
+   $workCalendarsRepository=$this->getDoctrine()->getRepository(HRWorkCalendars::class);
+   $workcalendar = $workCalendarsRepository->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany()]);
+   $user = $this->getUser();
+   $manager = $this->getDoctrine()->getManager();
+   $repository = $manager->getRepository($this->class);
+   $listUtils=new GlobaleListUtils();
+   $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Exports/Holidays.json"),true);
+   $list=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $this->class,[["type"=>"and", "column"=>"calendar", "value"=>$workcalendar]],[],-1, "date");
+   $result = $utilsExport->export($list,$listFields);
+   return $result;
+ }
+
+ /**
+ * @Route("/api/HR/workcalendars/{id}/holidays/print", name="printHolidays")
+ */
+ public function printHolidays($id, Request $request){
+   $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+   $this->denyAccessUnlessGranted('ROLE_ADMIN');
+   $utilsPrint = new GlobalePrintUtils();
+   $workCalendarsRepository=$this->getDoctrine()->getRepository(HRWorkCalendars::class);
+   $workcalendar = $workCalendarsRepository->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany()]);
+   $user = $this->getUser();
+   $manager = $this->getDoctrine()->getManager();
+   $repository = $manager->getRepository($this->class);
+   $listUtils=new GlobaleListUtils();
+   $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Prints/Holidays.json"),true);
+   $list=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $this->class,[["type"=>"and", "column"=>"calendar", "value"=>$workcalendar]],[],-1, "date");
+   $utilsPrint->title="LISTADO DE FESTIVOS: ".$workcalendar->getName();
+   $pdf = $utilsPrint->print($list,$listFields,["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "user"=>$this->getUser()]);
+   return new Response($pdf, 200, array('Content-Type' => 'application/pdf'));
+ }
+
+
 
 }

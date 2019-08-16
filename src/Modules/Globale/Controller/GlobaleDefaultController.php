@@ -141,6 +141,25 @@ class GlobaleDefaultController extends Controller
         return $result;
       }
 
+      /**
+       * @Route("/{_locale}/{module}/{name}/generic/print", name="genericprint")
+       */
+       public function print($module, $name, Request $request){
+         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+         $utilsPrint = new GlobalePrintUtils();
+         $user = $this->getUser();
+         $manager = $this->getDoctrine()->getManager();
+         $class="\App\Modules\\".$module."\Entity\\".$module.$name;
+         $repository = $manager->getRepository($class);
+         $listUtils=new GlobaleListUtils();
+         $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../../".$module."/Exports/".$name.".json"),true);
+         if(property_exists($class, "user") && !in_array("ROLE_GLOBAL", $user->getRoles()) && !in_array("ROLE_SUPERADMIN", $user->getRoles()) && !in_array("ROLE_ADMIN", $user->getRoles())) $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $class, [["type"=>"and", "column"=>"user", "value"=>$user]],[],-1);
+         else if(property_exists($class, "company")) $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $class, [["type"=>"and", "column"=>"company", "value"=>$user->getCompany()]],[],-1);
+           else $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $class,[],[],-1);
+         $result = $utilsPrint->print($list,$listFields);
+         return $result;
+       }
+
      /**
      * @Route("/{_locale}/{module}/{name}/generic/{id}/disable", name="genericdisable")
      */

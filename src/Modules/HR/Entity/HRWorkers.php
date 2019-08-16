@@ -23,7 +23,7 @@ class HRWorkers
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCompanies")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     private $company;
 
@@ -54,6 +54,7 @@ class HRWorkers
 
     /**
      * @ORM\OneToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleUsers", cascade={"persist", "remove"})
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     private $user;
 
@@ -162,11 +163,13 @@ class HRWorkers
 
    /**
     * @ORM\ManyToOne(targetEntity="\App\Modules\HR\Entity\HRDepartments")
+    * @ORM\JoinColumn(onDelete="SET NULL")
     */
    private $department;
 
    /**
     * @ORM\ManyToOne(targetEntity="\App\Modules\HR\Entity\HRWorkCenters")
+    * @ORM\JoinColumn(onDelete="SET NULL")
     */
    private $workcenters;
 

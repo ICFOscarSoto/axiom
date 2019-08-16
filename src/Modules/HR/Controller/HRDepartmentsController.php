@@ -18,6 +18,7 @@ use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\HR\Utils\HRDepartmentsUtils;
 use App\Modules\HR\Entity\HRDepartments;
 use App\Modules\Globale\Utils\GlobaleExportUtils;
+use App\Modules\Globale\Utils\GlobalePrintUtils;
 use App\Modules\Cloud\Controller\CloudController;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
@@ -97,10 +98,28 @@ class HRDepartmentsController extends Controller
      $repository = $manager->getRepository($this->class);
      $listUtils=new GlobaleListUtils();
      $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Exports/Departments.json"),true);
-     $list=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $this->class,[["type"=>"and", "column"=>"company", "value"=>$user->getCompany()]],[],-1);
+     $list=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $this->class,[],[],-1);
      $result = $utilsExport->export($list,$listFields);
      return $result;
    }
+
+   /**
+ 	 * @Route("/api/HR/department/print", name="printDepartments")
+ 	 */
+ 	 public function printDepartments(Request $request){
+ 		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+ 		 $this->denyAccessUnlessGranted('ROLE_ADMIN');
+ 		 $utilsPrint = new GlobalePrintUtils();
+ 		 $user = $this->getUser();
+ 		 $manager = $this->getDoctrine()->getManager();
+ 		 $repository = $manager->getRepository($this->class);
+ 		 $listUtils=new GlobaleListUtils();
+ 		 $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Prints/Departments.json"),true);
+ 		 $list=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $this->class,[],[],-1);
+		 $utilsPrint->title="LISTADO DE DEPARTAMENTOS";
+ 		 $pdf = $utilsPrint->print($list,$listFields,["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "user"=>$this->getUser()]);
+		 return new Response($pdf, 200, array('Content-Type' => 'application/pdf'));
+ 	 }
 
    /**
     * @Route("/{_locale}/HR/department/{id}/workers", name="departmentworkers")

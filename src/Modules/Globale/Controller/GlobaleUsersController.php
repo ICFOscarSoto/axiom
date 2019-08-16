@@ -11,11 +11,14 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\Globale\Entity\GlobaleUsers;
+use App\Modules\Globale\Entity\GlobaleCompanies;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\Globale\Utils\GlobaleUsersUtils;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleProfilesUtils;
+use App\Modules\Globale\Utils\GlobaleExportUtils;
+use App\Modules\Globale\Utils\GlobalePrintUtils;
 use App\Modules\Email\Entity\EmailAccounts;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
@@ -24,6 +27,8 @@ use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use App\Modules\Email\Controller\EmailController;
 use App\Modules\Globale\Utils\GlobaleListApiUtils;
+use Symfony\Component\HttpFoundation\Session\Session;
+
 class GlobaleUsersController extends Controller
 {
    	private $class=GlobaleUsers::class;
@@ -82,7 +87,6 @@ class GlobaleUsersController extends Controller
             'id' => $this->getUser()->getId(),
             'route' => $this->generateUrl("dataUser",["id"=>$this->getUser()->getId()]),
             'form' => $utils->formatForm("formprofile", true, $this->getUser()->getId(), $this->class, 'dataUser')
-
     ));
 
 
@@ -156,9 +160,6 @@ class GlobaleUsersController extends Controller
     ));
   }
 
-
-
-
 	/**
 	* @Route("/{_locale}/admin/global/users/new", name="newUser")
 	*/
@@ -184,8 +185,6 @@ class GlobaleUsersController extends Controller
       return $this->render($editor["template"], $editor["vars"]);
 
 	}
-
-
 
 
 	/**
@@ -264,8 +263,6 @@ class GlobaleUsersController extends Controller
 		}return new Response();
 	}
 
-
-
   /**
   * @Route("/api/global/users/collection", name="genericapiUsercollection")
   */
@@ -284,4 +281,59 @@ class GlobaleUsersController extends Controller
     $return=$listUtils->getRecords($this->getUser(),$repository,$request,$manager, $this->class,$filter,-1,["roles","password","salt","templatedata","usergroups","emailaccounts","emaildefaultaccount","calendars"]);
     return new JsonResponse($return);
   }
+
+  /**
+   * @Route("/{_locale}/global/users/export", name="exportUsers")
+   */
+   public function exportDepartment(Request $request){
+     $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+     $this->denyAccessUnlessGranted('ROLE_ADMIN');
+     $utilsExport = new GlobaleExportUtils();
+     $user = $this->getUser();
+     $manager = $this->getDoctrine()->getManager();
+     $repository = $manager->getRepository($this->class);
+     $listUtils=new GlobaleListUtils();
+     $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Exports/Users.json"),true);
+     $list=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $this->class,[],[],-1);
+     $result = $utilsExport->export($list,$listFields);
+     return $result;
+   }
+
+   /**
+ 	 * @Route("/api/global/users/print", name="printUsers")
+ 	 */
+ 	 public function printDepartments(Request $request){
+ 		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+ 		 $this->denyAccessUnlessGranted('ROLE_ADMIN');
+ 		 $utilsPrint = new GlobalePrintUtils();
+ 		 $user = $this->getUser();
+ 		 $manager = $this->getDoctrine()->getManager();
+ 		 $repository = $manager->getRepository($this->class);
+ 		 $listUtils=new GlobaleListUtils();
+ 		 $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Prints/Users.json"),true);
+ 		 $list=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $this->class,[],[],-1);
+		 $utilsPrint->title="LISTADO DE USUARIOS";
+ 		 $pdf = $utilsPrint->print($list,$listFields,["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "user"=>$this->getUser()]);
+		 return new Response($pdf, 200, array('Content-Type' => 'application/pdf'));
+ 	 }
+
+  /**
+  * @Route("/{_locale}/global/users/connectas/{id}", name="conectascompany")
+  */
+  public function conectascompany($id,Request $request){
+      if ($this->get('security.authorization_checker')->isGranted('ROLE_GLOBAL')) {
+        $repository=$this->getDoctrine()->getRepository(GlobaleCompanies::class);
+    		$obj = $repository->findOneBy(['id'=>$id, 'deleted'=>0]);
+    		if($obj!=null){
+          $session = new Session();
+          $session->set('as_company', $obj);
+          return new JsonResponse(["result"=>1]);
+        }else{
+          return new JsonResponse(["result"=>-2]);
+        }
+      }else{
+        return new JsonResponse(["result"=>-1]);
+      }
+  }
+
 }

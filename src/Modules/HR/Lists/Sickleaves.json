@@ -4,8 +4,8 @@
     "2":{"text":"C. Profesional","html":"C. Profesional"}
    }},
  {"name": "name", "caption":"Descripción"},
- {"name": "start", "caption":"Inicio"},
- {"name": "end", "caption":"Fin"},
+ {"name": "start", "type": "datetime", "caption":"Inicio"},
+ {"name": "end", "type": "datetime", "caption":"Fin"},
  {"name": "days", "caption":"Días", "width":"10%", "sum": true},
  {"name": "justified", "caption":"Justificado", "width":"10%" ,"class" : "dt-center", "replace":{
                             "1":{"text":"Justificado","html":"<div style=\"min-width: 75px;\" class=\"label label-success\">Justificado</div>"},

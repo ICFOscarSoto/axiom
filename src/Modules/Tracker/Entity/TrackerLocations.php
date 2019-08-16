@@ -19,7 +19,7 @@ class TrackerLocations
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\Tracker\Entity\TrackerTrackers")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     private $tracker;
 

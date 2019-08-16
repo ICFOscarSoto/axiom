@@ -1,10 +1,10 @@
 [{"name": "id", "caption":""},
  {"name": "type", "caption":"Tipo"},
  {"name": "name", "caption":"Descripción"},
- {"name": "start", "caption":"Inicio"},
- {"name": "end", "caption":"Fin"},
+ {"name": "start", "caption":"Inicio", "type": "datetime"},
+ {"name": "end", "caption":"Fin", "type": "datetime"},
  {"name": "days", "caption":"Días"},
  {"name": "requestdate", "caption":"Fecha peticion"},
- {"name": "approved", "caption":"Aprobado"},
+ {"name": "justified", "caption":"Justificado"},
  {"name": "active", "caption":"Estado"}
 ]
