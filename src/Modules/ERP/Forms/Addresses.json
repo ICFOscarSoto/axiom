@@ -10,7 +10,6 @@
 				{ "name": "postcode","cols": 2},
 				{ "name": "country","cols": 3},
 				{ "name": "postcode","cols": 2},
-				{ "name": "supplier","cols": 4},
 				{	"name": "active", "cols": 2},
 				{ "name": "phone", "cols": 2}
 			]

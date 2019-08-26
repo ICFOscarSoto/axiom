@@ -26,7 +26,10 @@ class ERPEAN13
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPSuppliers")
+<<<<<<< HEAD
+=======
      * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
+>>>>>>> 2ae454a841ef1d53490a932c7e60d2b4fb5ff734
      */
     private $supplier;
 
@@ -60,6 +63,11 @@ class ERPEAN13
      * @ORM\Column(type="boolean")
      */
     private $deleted;
+
+    /**
+     * @ORM\Column(type="smallint", nullable=true)
+     */
+    private $type;
 
     public function getId(): ?int
     {
@@ -158,6 +166,18 @@ class ERPEAN13
     public function setDeleted(bool $deleted): self
     {
         $this->deleted = $deleted;
+
+        return $this;
+    }
+
+    public function getType(): ?int
+    {
+        return $this->type;
+    }
+
+    public function setType(?int $type): self
+    {
+        $this->type = $type;
 
         return $this;
     }

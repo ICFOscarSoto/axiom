@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\ERP\Entity\ERPAddresses;
 use App\Modules\ERP\Entity\ERPSuppliers;
+use App\Modules\ERP\Entity\ERPCustomers;
 use App\Modules\Globale\Entity\GlobaleCountries;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
@@ -63,25 +64,28 @@ class ERPAddressesController extends Controller
 		 $template=dirname(__FILE__)."/../Forms/Addresses.json";
 		 $utils = new GlobaleFormUtils();
 		 $utilsObj=new $this->utilsClass();
-		 if($identity==0) $identity=$request->query->get('entity');
 		 $defaultSupplier=$this->getDoctrine()->getRepository(ERPSuppliers::class);
+		 $defaultCustomer=$this->getDoctrine()->getRepository(ERPCustomers::class);
 		 $addressRepository=$this->getDoctrine()->getRepository(ERPAddresses::class);
 		 $obj=new $this->class();
 		 if($id==0){
 		 	if($identity==0 ) $identity=$request->query->get('entity');
 		 	if($identity==0 || $identity==null) $identity=$request->request->get('id-parent',0);
-		 	$supplier = $defaultSupplier->find($identity);
+		 	if($type=="supplier") $object = $defaultSupplier->find($identity);
+			if($type=="customer") $object = $defaultCustomer->find($identity);
 		}else $obj = $addressRepository->find($id);
 
+			dump($object);
 			$defaultCountry=$this->getDoctrine()->getRepository(GlobaleCountries::class);
 			$country=$defaultCountry->findOneBy(['name'=>"España"]);
-
 			$obj->setCountry($country);
 
-		 $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "supplier"=>$id==0?$supplier:$obj->getSupplier()];
-		 $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),
-		 												method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
-		 $utils->preParams=["type"=>$type, "obj"=>$id==0?$supplier:$obj->getSupplier()];												
+		 /*$params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "supplier"=>$id==0?$supplier:$obj->getSupplier()];
+		 ,method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]
+		 */
+
+		 $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),["supplier", "customer"]);
+		 $utils->preParams=["type"=>$type, "obj"=>$object];
 		 return $utils->make($id, $this->class, $action, "formIdentities", "modal");
 		}
 

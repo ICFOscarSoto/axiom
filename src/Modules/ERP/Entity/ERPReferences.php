@@ -60,6 +60,11 @@ class ERPReferences
      */
     private $deleted;
 
+    /**
+     * @ORM\Column(type="smallint", nullable=true)
+     */
+    private $type;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -157,6 +162,18 @@ class ERPReferences
     public function setDeleted(bool $deleted): self
     {
         $this->deleted = $deleted;
+
+        return $this;
+    }
+
+    public function getType(): ?int
+    {
+        return $this->type;
+    }
+
+    public function setType(?int $type): self
+    {
+        $this->type = $type;
 
         return $this;
     }

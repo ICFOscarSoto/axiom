@@ -7,6 +7,7 @@ use \App\Modules\Globale\Entity\GlobaleCompanies;
 use \App\Modules\Globale\Entity\GlobaleStates;
 use \App\Modules\Globale\Entity\GlobaleCountries;
 use \App\Modules\ERP\Entity\ERPSuppliers;
+use \App\Modules\ERP\Entity\ERPCustomers;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPAddressesRepository")
@@ -90,6 +91,11 @@ class ERPAddresses
 
     public $newSeconds=1296000;
     public $updatedSeconds=1296000;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPCustomers")
+     */
+    private $customer;
 
     public function getId(): ?int
     {
@@ -257,5 +263,17 @@ class ERPAddresses
         $this->supplier=$params["obj"];
       }
 
+    }
+
+    public function getCustomer(): ?ERPCustomers
+    {
+        return $this->customer;
+    }
+
+    public function setCustomer(?ERPCustomers $customer): self
+    {
+        $this->customer = $customer;
+
+        return $this;
     }
 }
