@@ -467,6 +467,15 @@ class GlobaleCompanies
             }
           }
       }
+      //Rename default company imagen
+      rename($dest.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'company'.DIRECTORY_SEPARATOR.'large.png',$dest.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'company'.DIRECTORY_SEPARATOR.$this->id.'-large.png');
+      rename($dest.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'company'.DIRECTORY_SEPARATOR.'medium.png',$dest.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'company'.DIRECTORY_SEPARATOR.$this->id.'-medium.png');
+      rename($dest.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'company'.DIRECTORY_SEPARATOR.'small.png',$dest.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'company'.DIRECTORY_SEPARATOR.$this->id.'-small.png');
+      rename($dest.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'company'.DIRECTORY_SEPARATOR.'thumb.png',$dest.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'company'.DIRECTORY_SEPARATOR.$this->id.'-thumb.png');
+      rename($dest.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'companydark'.DIRECTORY_SEPARATOR.'large.png',$dest.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'companydark'.DIRECTORY_SEPARATOR.$this->id.'-large.png');
+      rename($dest.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'companydark'.DIRECTORY_SEPARATOR.'medium.png',$dest.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'companydark'.DIRECTORY_SEPARATOR.$this->id.'-medium.png');
+      rename($dest.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'companydark'.DIRECTORY_SEPARATOR.'small.png',$dest.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'companydark'.DIRECTORY_SEPARATOR.$this->id.'-small.png');
+      rename($dest.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'companydark'.DIRECTORY_SEPARATOR.'thumb.png',$dest.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'companydark'.DIRECTORY_SEPARATOR.$this->id.'-thumb.png');      
       //Create user admin of the company if it doesn't exist
      $usersrepository=$doctrine->getRepository(GlobaleUsers::class);
      $users=$usersrepository->findBy(["company"=>$this]);
