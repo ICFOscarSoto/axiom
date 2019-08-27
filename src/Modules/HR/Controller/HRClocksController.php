@@ -323,14 +323,17 @@ class HRClocksController extends Controller
 					if(in_array("set".ucfirst($parameter),get_class_methods($this->class)))
 						$filter[]=["type"=>"and", "column"=>$key, "value"=>$parameter];
 				}
-
 				$listUtils=new GlobaleListApiUtils();
 				//if(property_exists($class, "user") && !in_array("ROLE_GLOBAL", $user->getRoles()) && !in_array("ROLE_SUPERADMIN", $user->getRoles()) && !in_array("ROLE_ADMIN", $user->getRoles()))
 				//  $return=$listUtils->getRecords($user,$repository,$request,$manager,$class, array_merge([["type"=>"and", "column"=>"user", "value"=>$user]],$filter),[],-1);
 				//else if(property_exists($class, "company"))
 				//    $return=$listUtils->getRecords($user,$repository,$request,$manager,$class, array_merge([["type"=>"and", "column"=>"company", "value"=>$user->getCompany()]],$filter),[],-1);
 				//   else $return=$listUtils->getRecords($user,$repository,$request,$manager, $class,array_merge([],$filter),[],-1);
-				$return=$listUtils->getRecords($this->getUser(),$repository,$request,$manager, $this->class,array_merge([["type"=>"and", "column"=>"worker", "value"=>$worker]],$filter),[],-1);
+				$return=$listUtils->getRecords($this->getUser(),$repository,$request,$manager, $this->class,array_merge([["type"=>"and", "column"=>"worker", "value"=>$worker]],$filter),-1,[]);
+				foreach($return["data"] as $key=>$value){
+					//Pass corrected clocks as valid to APPS
+					if($value["invalid"]==2) $return["data"][$key]["invalid"]=0;
+				}
 				return new JsonResponse($return);
 			}
 
