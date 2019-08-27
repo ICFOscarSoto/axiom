@@ -155,8 +155,15 @@
 															var date=moment(text, "YYYY-MM-DD HH:mm:ss");
 															text=date.format('DD/MM/YYYY HH:mm:ss');
 														}
+													{% else %}
+														{% if field.type == "date" %}
+															if(text!=null){
+																var date=moment(text, "YYYY-MM-DD");
+																text=date.format('DD/MM/YYYY');
+															}
+														{% endif %}
 													{% endif %}
-												{% endif %}
+													{% endif %}
 												return text;
 										},
 										{% endif %}
@@ -419,6 +426,22 @@
 											<span class="glyphicon glyphicon-calendar"></span>
 										</span>
 									</div></div>
+									{% else %}
+									{% if field.type == "date" %}
+										<div><div class='input-group date'>
+													<input id="s_{{ field.name }}_from" attr-group="{{ field.name }}" attr-max="s_{{ field.name }}_to" type="text" class="datepicker table-header-search-input form-control" placeholder="{{ field.caption }} desde"  autocomplete="off"/>
+													<span class="input-group-addon">
+														<span class="glyphicon glyphicon-calendar"></span>
+													</span>
+											</div></div>
+										<div style="height: 5px;"></div>
+										<div><div class='input-group date'>
+											<input id="s_{{ field.name }}_to" attr-group="{{ field.name }}" attr-min="s_{{ field.name }}_from" type="text" class="datepicker table-header-search-input form-control" placeholder="{{ field.caption }} hasta"  autocomplete="off"/>
+											<span class="input-group-addon">
+												<span class="glyphicon glyphicon-calendar"></span>
+											</span>
+										</div></div>
+									{% endif %}
 								{% endif %}
 							</th>
 						{% endif %}

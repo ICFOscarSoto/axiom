@@ -96,8 +96,8 @@ class GlobaleListUtils
               $queryFiltered->setParameter('val_'.$field["name"], '%'.$searchValue.'%');
     				}
         }else{
-          //If field is datetime type
-          if($field["type"]=="datetime"){
+          //If field is datetime type or date
+          if($field["type"]=="datetime" || $field["type"]=="date"){
             $searchValue=$request->query->get('columns');
             $keyColumn=$this->searchColumns($searchValue, $field["name"]);
             if(!$keyColumn) continue;

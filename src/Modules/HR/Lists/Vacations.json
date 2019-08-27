@@ -5,8 +5,8 @@
     "3":{"text":"Asuntos propios","html":"Asuntos propios"},
     "4":{"text":"Excedencia","html":"Excedencia"}
    }},
- {"name": "start", "type": "datetime", "caption":"Inicio"},
- {"name": "end", "type": "datetime", "caption":"Fin"},
+ {"name": "start", "type": "date", "caption":"Inicio"},
+ {"name": "end", "type": "date", "caption":"Fin"},
  {"name": "days", "caption":"Días", "width":"10%", "sum": true},
  {"name": "approved", "caption":"Aprobadas", "width":"10%" ,"class" : "dt-center", "replace":{
                             "1":{"text":"Aprobadas","html":"<div style=\"min-width: 75px;\" class=\"label label-success\">Aprobadas</div>"},
