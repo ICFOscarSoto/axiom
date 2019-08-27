@@ -5,19 +5,13 @@
 			"fields": [
 				{ "name": "worker", "cols": 4},
 				{	"name": "start", "cols": 3},
-				{	"name": "startLatitude", "cols": 3},
-				{	"name": "startLongitude", "cols": 3},
 				{	"name": "end", "cols": 3},
-				{	"name": "endLatitude", "cols": 3},
-				{	"name": "endLongitude", "cols": 3},
 				{	"name": "observations", "cols": 12},
-				{	"name": "active", "cols": 2},
 				{	"name": "invalid", "cols": 4,
 					"transform": {
 							"type":"option",
-							"options": {"Válido": "0", "Incidencia": "1", "Corregido": "2"}
+							"options": {"Incidencia": "1", "Corregido": "2"}
 					}
-
 				}
 			]
 		}

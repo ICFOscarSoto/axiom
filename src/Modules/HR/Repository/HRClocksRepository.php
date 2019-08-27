@@ -25,7 +25,7 @@ class HRClocksRepository extends ServiceEntityRepository
               	SELECT m1.*
               	FROM hrclocks m1 LEFT JOIN hrclocks m2
                	ON (m1.worker_id = m2.worker_id AND m1.id < m2.id)
-              	WHERE m2.id IS NULL AND m1.deleted=0 AND m1.active=1) hrc ON hrc.worker_id=hrw.id
+              	WHERE m2.id IS NULL AND m1.deleted=0 AND m1.active=1 AND m1.invalid<>1) hrc ON hrc.worker_id=hrw.id
               WHERE hrw.company_id = :company AND hrw.deleted=0 AND hrw.active=1 ";
       if($department!=0) $query.=" AND hrw.department_id=".$department;
       if($workcenter!=0) $query.=" AND hrw.workcenters_id=".$workcenter;
@@ -39,7 +39,7 @@ class HRClocksRepository extends ServiceEntityRepository
     public function todayClocks($worker){
       $conn = $this->getEntityManager()->getConnection();
       $sql = "SELECT IFNULL(SUM(UNIX_TIMESTAMP(IFNULL(END,CURTIME()))-UNIX_TIMESTAMP(START)),0) raw, IFNULL(SEC_TO_TIME(SUM(UNIX_TIMESTAMP(IFNULL(END,CURTIME()))-UNIX_TIMESTAMP(START))),'00:00:00') formated FROM hrclocks
-              WHERE worker_id=? AND deleted=0 AND active=1 AND DATE(START) >= CURDATE() AND DATE(START) < CURDATE() + INTERVAL 1 DAY";
+              WHERE worker_id=? AND deleted=0 AND active=1 AND invalid<>1 AND DATE(START) >= CURDATE() AND DATE(START) < CURDATE() + INTERVAL 1 DAY";
       $stmt = $conn->prepare($sql);
       $stmt->bindValue(1, $worker->getId());
       $stmt->execute();
@@ -49,7 +49,7 @@ class HRClocksRepository extends ServiceEntityRepository
     public function yesterdayClocks($worker){
       $conn = $this->getEntityManager()->getConnection();
       $sql = "SELECT IFNULL(SUM(UNIX_TIMESTAMP(IFNULL(END,CURTIME()))-UNIX_TIMESTAMP(START)),0) raw, IFNULL(SEC_TO_TIME(SUM(UNIX_TIMESTAMP(IFNULL(END,CURTIME()))-UNIX_TIMESTAMP(START))),'00:00:00') formated  FROM hrclocks
-              WHERE worker_id=? AND deleted=0 AND active=1 AND DATE(START) >= (CURDATE()-INTERVAL 1 DAY) AND DATE(START) < CURDATE()";
+              WHERE worker_id=? AND deleted=0 AND active=1 AND invalid<>1 AND DATE(START) >= (CURDATE()-INTERVAL 1 DAY) AND DATE(START) < CURDATE()";
       $stmt = $conn->prepare($sql);
       $stmt->bindValue(1, $worker->getId());
       $stmt->execute();
@@ -59,7 +59,7 @@ class HRClocksRepository extends ServiceEntityRepository
     public function thisWeekClocks($worker){
       $conn = $this->getEntityManager()->getConnection();
       $sql = "SELECT IFNULL(SUM(UNIX_TIMESTAMP(IFNULL(END,CURTIME()))-UNIX_TIMESTAMP(START)),0) raw, IFNULL(SEC_TO_TIME(SUM(UNIX_TIMESTAMP(IFNULL(END,CURTIME()))-UNIX_TIMESTAMP(START))),'00:00:00') formated FROM hrclocks
-              WHERE worker_id=? AND deleted=0 AND active=1 AND WEEK(START,1) = WEEK(CURDATE(),1)";
+              WHERE worker_id=? AND deleted=0 AND active=1 AND invalid<>1 AND WEEK(START,1) = WEEK(CURDATE(),1)";
       $stmt = $conn->prepare($sql);
       $stmt->bindValue(1, $worker->getId());
       $stmt->execute();
@@ -69,7 +69,7 @@ class HRClocksRepository extends ServiceEntityRepository
     public function lastWeekClocks($worker){
       $conn = $this->getEntityManager()->getConnection();
       $sql = "SELECT IFNULL(SUM(UNIX_TIMESTAMP(IFNULL(END,CURTIME()))-UNIX_TIMESTAMP(START)),0) raw, IFNULL(SEC_TO_TIME(SUM(UNIX_TIMESTAMP(IFNULL(END,CURTIME()))-UNIX_TIMESTAMP(START))),'00:00:00') formated FROM hrclocks
-              WHERE worker_id=? AND deleted=0 AND active=1 AND WEEK(START,1) = WEEK(CURDATE() - INTERVAL 1 WEEK,1) ";
+              WHERE worker_id=? AND deleted=0 AND active=1 AND invalid<>1 AND WEEK(START,1) = WEEK(CURDATE() - INTERVAL 1 WEEK,1) ";
       $stmt = $conn->prepare($sql);
       $stmt->bindValue(1, $worker->getId());
       $stmt->execute();
@@ -79,7 +79,7 @@ class HRClocksRepository extends ServiceEntityRepository
     public function thisMonthClocks($worker){
       $conn = $this->getEntityManager()->getConnection();
       $sql = "SELECT IFNULL(SUM(UNIX_TIMESTAMP(IFNULL(END,CURTIME()))-UNIX_TIMESTAMP(START)),0) raw, IFNULL(SEC_TO_TIME(SUM(UNIX_TIMESTAMP(IFNULL(END,CURTIME()))-UNIX_TIMESTAMP(START))),'00:00:00') formated FROM hrclocks
-              WHERE worker_id=? AND deleted=0 AND active=1 AND MONTH(START) = MONTH(CURDATE())";
+              WHERE worker_id=? AND deleted=0 AND active=1 AND invalid<>1 AND MONTH(START) = MONTH(CURDATE())";
       $stmt = $conn->prepare($sql);
       $stmt->bindValue(1, $worker->getId());
       $stmt->execute();
@@ -88,7 +88,7 @@ class HRClocksRepository extends ServiceEntityRepository
     public function lastMonthClocks($worker){
       $conn = $this->getEntityManager()->getConnection();
       $sql = "SELECT IFNULL(SUM(UNIX_TIMESTAMP(IFNULL(END,CURTIME()))-UNIX_TIMESTAMP(START)),0) raw, IFNULL(SEC_TO_TIME(SUM(UNIX_TIMESTAMP(IFNULL(END,CURTIME()))-UNIX_TIMESTAMP(START))),'00:00:00') formated FROM hrclocks
-              WHERE worker_id=? AND deleted=0 AND active=1 AND MONTH(START) = MONTH(CURDATE() - INTERVAL 1 MONTH) ";
+              WHERE worker_id=? AND deleted=0 AND active=1 AND invalid<>1 AND MONTH(START) = MONTH(CURDATE() - INTERVAL 1 MONTH) ";
       $stmt = $conn->prepare($sql);
       $stmt->bindValue(1, $worker->getId());
       $stmt->execute();
@@ -98,7 +98,7 @@ class HRClocksRepository extends ServiceEntityRepository
     public function thisYearClocks($worker){
       $conn = $this->getEntityManager()->getConnection();
       $sql = "SELECT IFNULL(SUM(UNIX_TIMESTAMP(IFNULL(END,CURTIME()))-UNIX_TIMESTAMP(START)),0) raw, IFNULL(SEC_TO_TIME(SUM(UNIX_TIMESTAMP(IFNULL(END,CURTIME()))-UNIX_TIMESTAMP(START))),'00:00:00') formated FROM hrclocks
-              WHERE worker_id=? AND deleted=0 AND active=1 AND YEAR(START) = YEAR(CURDATE())";
+              WHERE worker_id=? AND deleted=0 AND active=1 AND invalid<>1 AND YEAR(START) = YEAR(CURDATE())";
       $stmt = $conn->prepare($sql);
       $stmt->bindValue(1, $worker->getId());
       $stmt->execute();
@@ -107,17 +107,17 @@ class HRClocksRepository extends ServiceEntityRepository
     public function lastYearClocks($worker){
       $conn = $this->getEntityManager()->getConnection();
       $sql = "SELECT IFNULL(SUM(UNIX_TIMESTAMP(IFNULL(END,CURTIME()))-UNIX_TIMESTAMP(START)),0) raw, IFNULL(SEC_TO_TIME(SUM(UNIX_TIMESTAMP(IFNULL(END,CURTIME()))-UNIX_TIMESTAMP(START))),'00:00:00') formated FROM hrclocks
-              WHERE worker_id=? AND deleted=0 AND active=1 AND YEAR(START) = YEAR(CURDATE() - INTERVAL 1 YEAR) ";
+              WHERE worker_id=? AND deleted=0 AND active=1 AND invalid<>1 AND YEAR(START) = YEAR(CURDATE() - INTERVAL 1 YEAR) ";
       $stmt = $conn->prepare($sql);
       $stmt->bindValue(1, $worker->getId());
       $stmt->execute();
-      return $stmt->fetch();
+      return $stmt->fetch(); 
     }
 
     public function dayClocks($worker, $day){
 
-      $query="SELECT TIME(start) start, TIME(end) end, time, observations from hrclocks
-              WHERE worker_id = :worker AND DATE(start) = :start AND deleted=0 AND active=1
+      $query="SELECT TIME(start) start, TIME(end) end, time, observations, invalid from hrclocks
+              WHERE worker_id = :worker AND DATE(start) = :start AND deleted=0 AND active=1 AND invalid<>1
               ORDER BY start ASC";
 
       $params=['worker' => $worker->getId(), 'start' => $day];

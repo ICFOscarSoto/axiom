@@ -1,6 +1,7 @@
 [
-  {"id" : "addTop", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"genericdata", "routeParams":{"module":"HR", "name":"Schedules", "type":"modal" }, "modal":"Schedules", "actionType" : "background", "confirm" :false, "tooltip" : "Crear nuevo centro trabajo"},
-  {"id" : "deleteTop", "type" : "btn-red", "icon" : "fa fa-trash","name" : "borrar", "route":"genericdelete", "routeParams":{"module":"HR", "name":"Schedules", "type":"modal" }, "actionType" : "background", "confirm" :true},
-  {"id" : "printTop", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false},
-  {"id" : "exportTop", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"genericexport", "routeParams":{"module":"HR", "name":"Schedules"}, "confirm" :false}
+  {"id" : "addTop", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"dataSchedules", "modal":"schedules", "actionType" : "background", "confirm" :false, "tooltip" : "Nuevo horario"},
+  {"id" : "deleteTop", "type" : "btn-red", "icon" : "fa fa-trash","name" : "borrar", "route":"genericdelete", "routeParams":{"module":"HR", "name":"Schedules", "type":"modal" }, "actionType" : "background", "confirm" :true, "tooltip" : "Borrar seleccionados"},
+  {"id" : "printTop", "type" : "", "icon" : "fa fa-print","name" : "", "route":"printSchedules", "addSearch":true, "confirm" :false, "tooltip" : "Imprimir registros"},
+  {"id" : "exportTop", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"exportSchedules", "addSearch":true, "confirm" :false, "tooltip" : "Exportar registros"}
+
 ]

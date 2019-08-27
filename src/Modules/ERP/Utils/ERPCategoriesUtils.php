@@ -16,7 +16,7 @@ class ERPCategoriesUtils
       'id' => 'listCategories',
       'route' => 'genericlist',
       'routeParams' => ["module" => "ERP",
-                        "name" => "Categories"],
+                        "name" => "categories"],
       'orderColumn' => 2,
       'orderDirection' => 'ASC',
       'tagColumn' => 3,

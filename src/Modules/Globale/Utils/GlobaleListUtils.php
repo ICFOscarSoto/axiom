@@ -271,8 +271,10 @@ class GlobaleListUtils
                                 if(strpos($name,'__')!==FALSE) $data_ob[$name."_id"]=$obj_id;
                                 //Aplicamos los replaces
                                 if(isset($field["replace"])){
+
                                     foreach($field["replace"] as $key=>$replace){
-                                      if($temp_val==$key){
+                                      if($temp_val==NULL) $temp_val=0;
+                                      if(strval($temp_val)==strval($key)){
                                         $temp_val=array($temp_val,$replace["html"]);
                                         break;
                                       }

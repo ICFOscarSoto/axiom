@@ -19,6 +19,16 @@ class HRSickleavesRepository extends ServiceEntityRepository
         parent::__construct($registry, HRSickleaves::class);
     }
 
+    public function daySickleave($worker, $day){
+      $query="SELECT type,name from hrsickleaves
+      WHERE worker_id = :worker AND (DATE(:start) BETWEEN DATE(START) AND DATE(END)) AND deleted=0 AND active=1
+      AND justified=1
+      ORDER BY start ASC LIMIT 1";
+
+      $params=['worker' => $worker->getId(), 'start' => $day];
+      return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetch();
+    }
+
     // /**
     //  * @return HRSickleaves[] Returns an array of HRSickleaves objects
     //  */

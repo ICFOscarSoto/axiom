@@ -281,86 +281,9 @@
 						$p.removeClass( 'highlight' );
 					 }
 				});
-				// Button fields
-				{% for field in listConstructor.fieldButtons %}
-					{% if field.type == "option" %}
-						{% for fieldOption in field.options %}
 
-									{% if fieldOption.actionType == "foreground" %}
-										{% if fieldOption.confirm is not defined or fieldOption.confirm == false %}
-										$('body').on('click', "[id^='{{ listConstructor.id }}-field-button-{{ fieldOption.id }}']", function() {
-											url=$("#{{ listConstructor.id }}-field-button-{{ fieldOption.id }}-url").val();
-											url=url.replace('_____',$(this).attr('attr-id'));
-											window.location.href=url;
-										});
-										{% else %}
-										{% endif %}
-									{% else %}
-										{% if fieldOption.confirm is not defined or fieldOption.confirm == false %}
-											$('body').on('click', "[id^='{{ listConstructor.id }}-field-button-{{ fieldOption.id }}']", function() {
-												url=$("#{{ listConstructor.id }}-field-button-{{ fieldOption.id }}-url").val();
-												url=url.replace('_____',$(this).attr('attr-id'));
-												$.getJSON(url, function( data ) {
-													$.each( data, function( key, val ) {
 
-													});
-												}).always(function() {
-													{{ listConstructor.id }}.ajax.reload();
-												});
-											});
-										{% else %}
-											$('body').on('click', "[id^='{{ listConstructor.id }}-field-button-{{ fieldOption.id }}']", function() {
-											url=$("#{{ listConstructor.id }}-field-button-{{ fieldOption.id }}-url").val();
-											url=url.replace('_____',$(this).attr('attr-id'));
-											$('#{{ listConstructor.id }}-modal-button-continue').attr('attr-action',url);
-											$('#{{ listConstructor.id }}-modal-button-continue').attr('attr-action-type','{{ fieldOption.actionType }}');
-											$('#{{ listConstructor.id }}-modal-body').html('¿Está seguro que desea {{fieldOption.name}} este registro? {% if fieldOption.undo is defined and fieldOption.undo==false %} </br><b>¡ATENCIÓN!</b> Esta operación no podrá deshacerse.{% endif %}');
-										});
-										{% endif %}
-									{% endif %}
 
-						{% endfor %}
-					{% else %}
-
-									{% if field.actionType == "foreground" %}
-										{% if field.confirm is not defined or field.confirm == false %}
-										$('body').on('click', "[id^='{{ listConstructor.id }}-field-button-{{ field.id }}']", function() {
-											url=$("#{{ listConstructor.id }}-field-button-{{ field.id }}-url").val();
-											url=url.replace('_____',$(this).attr('attr-id'));
-											window.location.href=url;
-										});
-										{% else %}
-										{% endif %}
-									{% else %}
-										//Get data and open modal form
-										{% if field.confirm is not defined or field.confirm == false %}
-											$('body').on('click', "[id^='{{ listConstructor.id }}-field-button-{{ field.id }}']", function() {
-												url=$("#{{ listConstructor.id }}-field-button-{{ field.id }}-url").val();
-												url=url.replace('_____',$(this).attr('attr-id'));
-												$.post(url, null,
-													function(data, status, xhr){
-
-															$("#{{field.modal}}-modal-form-body").html(data);
-															$("#{{field.modal}}-modal-form-body").find(':checkbox').not($('[id$=-chkall]')).iCheck({checkboxClass: 'icheckbox_flat-blue', radioClass: 'iradio_flat-blue'});
-															$("#{{field.modal}}-modal-form-body select").select2();
-															$("#{{field.modal}}-modal-form").modal();
-
-												});
-											});
-										{% else %}
-											$('body').on('click', "[id^='{{ listConstructor.id }}-field-button-{{ field.id }}']", function() {
-											url=$("#{{ listConstructor.id }}-field-button-{{ field.id }}-url").val();
-											url=url.replace('_____',$(this).attr('attr-id'));
-											$('#{{ listConstructor.id }}-modal-button-continue').attr('attr-action',url);
-											$('#{{ listConstructor.id }}-modal-button-continue').attr('attr-action-type','{{ field.actionType }}');
-											$('#{{ listConstructor.id }}-modal-body').html('¿Está seguro que desea {{field.name}} este registro? {% if field.undo is defined and field.undo==false %} </br><b>¡ATENCIÓN!</b> Esta operación no podrá deshacerse.{% endif %}');
-										});
-										{% endif %}
-									{% endif %}
-
-					{% endif %}
-
-				{% endfor %}
 				//Button Modal Confirm
 				$('body').on('click', "#{{ listConstructor.id }}-modal-button-continue", function() {
 						ids=[];
@@ -395,81 +318,14 @@
 				});
 			} );
 
-			//TOP BUTTONS BACKGROUND ACTION
-			{% for field in listConstructor.topButtons %}
-
-				{% if field.actionType is defined and field.actionType=="background" %}
-					//OPEN MODAL
-					$('body').on('click', "#{{ field.id }}-top-button", function() {
-						{% set routeParams = [] %}
-						{% if field.routeParams is defined %}
-
-							{% for key,param in field.routeParams %}
-								{% if _context[param] is defined %} {# Detect if parameter is a reference to a var or is a value #}
-									{% set routeParams = routeParams|merge({(key): _context[param]}) %}
-								{% else %}
-									{% set routeParams = routeParams|merge({(key): param}) %}
-								{% endif %}
-							{% endfor %}
-						{% endif %}
-						{% if field.modal is defined and field.modal|length  %}
-								//if route has params...
-
-								$.post('{{ url(field.route, routeParams) }}', null,
-									function(data, status, xhr){
-										$("#{{field.modal}}-modal-form-body").html(data);
-										//$('#{{field.modal}}-modal-form input').iCheck({checkboxClass: 'icheckbox_flat-blue',radioClass: 'iradio_flat-blue'});
-										$("#{{field.modal}}-modal-form-body").find(':checkbox').not($('[id$=-chkall]')).iCheck({checkboxClass: 'icheckbox_flat-blue', radioClass: 'iradio_flat-blue'});
-										$("#{{field.modal}}-modal-form-body select").select2();
-										$("#{{field.modal}}-modal-form").modal();
-								});
-							{% else %}
-									{% if field.confirm is defined and field.confirm==true  %}
-										{# SEND IDS #}
-										$('#{{ listConstructor.id }}-modal-button-continue').attr('attr-action','{{ url(field.route, routeParams) }}');
-										$('#{{ listConstructor.id }}-modal-button-continue').attr('attr-send-list','1');
-										$('#{{ listConstructor.id }}-modal-button-continue').attr('attr-action-type','{{ field.actionType }}');
-										$('#{{ listConstructor.id }}-modal-body').html('¿Está seguro que desea {{field.name}} los registro seleccionados? {% if field.undo is defined and field.undo==false %} </br><b>¡ATENCIÓN!</b> Esta operación no podrá deshacerse.{% endif %}');
-										$("#{{ listConstructor.id }}-modal-confirm").modal();
-									{% else %}
-
-									{% endif %}
-
-							{% endif %}
-
-					});
-
-
-					{% if field.modal is defined and field.modal|length  %}
-								//CONTINUE BUTTON FOR MODAL FORMS
-								$('body').on('click', "#{{ field.modal }}-button-continue", function() {
-											if($("#{{field.modal}}-modal-form-body").find('form').valid()){
-												if((++load_wait)==1) $("#load-spinner").fadeIn();
-												var id_parent='';
-												if (typeof $('#id-parent').val() !== 'undefined') {
-													id_parent=encodeURI('&id-parent='+$('#id-parent').val());
-												}
-												$.post($("#{{field.modal}}-modal-form-body").find('form').find('#post-url').val(), $("#{{field.modal}}-modal-form-body").find('form').serialize()+id_parent,
-														function(data, status, xhr){
-															if((--load_wait)==0) $("#load-spinner").fadeOut();
-															if(data.result){
-																$("#{{ listConstructor.id }}").DataTable().ajax.reload();
-																toastr.success("Datos guardados correctamente", "Confirmación", confirmation);
-																$("#{{ field.modal }}-modal-form").modal('hide');
-																$("#{{field.modal}}-modal-form-body").find('form').trigger("reset");
-																$("#{{field.modal}}-modal-form-body").find('form').validate().resetForm();
-															}
-																else toastr.error("Ocurrió un error al guardar los datos", "Confirmación", confirmation);
-													}, "json");
-												}
-								});
-						{% else %}
-
-						{% endif %}
-
-				{% endif %}
-			{% endfor %}
+			//Top buttons Background or modal
 	</script>
+
+	{{ include('@Globale/list_button_fields.html.twig') }}
+	{{ include('@Globale/list_button_top.html.twig') }}
+
+
+
 
 	<!-- BUTTON ZONE -->
 	<p>
@@ -496,60 +352,14 @@
 						style="font-size: 20px" id="{{ field.id }}-top-button-foreground" type="button" class="btn tooltip-primary {% if field.type is defined and field.type|length %}{{ field.type }}{% else %} btn-default {% endif %}" {% if field.tooltip is defined %} data-toggle="tooltip" data-placement="bottom" title="" data-original-title=" {{ field.tooltip }} {% endif %} ">
 							<i class="{{ field.icon }}"></i>{{ field.name }}
 						</a>
-
 				{% endif %}
-
 	{% endfor %}
 	<script>
-		$('body').on('click', "[id$='-top-button-foreground']", function() {
-			if($(this).attr('attr-href')!=""){
-				var url=$(this).attr('attr-href');
-				if($(this).attr('attr-search')==1){
-					url+='?'+$("#search_param").val();
-				}
-				window.open(
-				  url,
-				  '_blank'
-				);
 
-			}
-		});
 	</script>
 	</div>
 	</p>
-	<!-- END BUTTONZONE -->
-	{% for field in listConstructor.fieldButtons %}
 
-		{% set routeParams = [] %}
-		{% set routeParams = routeParams|merge({('id'): '_____'}) %}
-		{% if field.routeParams is defined %}
-			{% for key,param in field.routeParams %}
-				{% if _context[param] is defined %} {# Detect if parameter is a reference to a var or is a value #}
-					{% set routeParams = routeParams|merge({(key): _context[param]}) %}
-				{% else %}
-					{% set routeParams = routeParams|merge({(key): param}) %}
-				{% endif %}
-			{% endfor %}
-		{% endif %}
-
-		{% if field.type == "option" %}
-			{% for fieldOption in field.options %}
-				{% set optionParams = routeParams %}
-				{% if fieldOption.routeParams is defined %}
-					{% for key,param in fieldOption.routeParams %}
-						{% if _context[param] is defined %} {# Detect if parameter is a reference to a var or is a value #}
-							{% set optionParams = optionParams|merge({(key): _context[param]}) %}
-						{% else %}
-							{% set optionParams = optionParams|merge({(key): param}) %}
-						{% endif %}
-					{% endfor %}
-				{% endif %}
-				<input id="{{ listConstructor.id }}-field-button-{{ fieldOption.id }}-url" type="hidden" value="{% if fieldOption.route|length %}{{ url(fieldOption.route,optionParams) }}{% endif %}" />
-			{% endfor %}
-		{% else %}
-			<input id="{{ listConstructor.id }}-field-button-{{ field.id }}-url" type="hidden" value="{% if field.route|length %}{{ url(field.route,routeParams) }}{% endif %}" />
-		{% endif %}
-	{% endfor %}
 	<table id="{{ listConstructor.id }}" class="table table-bordered hover stripe compact datatable" style="width: 100%">
 			<thead class="table-thead">
 				<tr>

@@ -7039,7 +7039,8 @@ dd-content,
   line-height: 1;
   text-align: center;
   font-weight: bold;
-  margin-right: 10px;
+  /*margin-right: 10px;*/
+  margin-right: -1px;
   outline: 0;
 }
 .dd-item > button:after {
@@ -7120,7 +7121,7 @@ dd-content,
   padding-left: 25px;
 }
 .nested-list.custom-drag-button button + .dd-handle {
-  left: 24px;
+  /*left: 24px;*/
 }
 .nested-list.custom-drag-button button + .dd-handle + .dd-content {
   padding-left: 50px;

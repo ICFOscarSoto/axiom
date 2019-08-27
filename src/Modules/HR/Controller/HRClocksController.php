@@ -124,6 +124,23 @@ class HRClocksController extends Controller
 			$userdata=$this->getUser()->getTemplateData();
 			$locale = $request->getLocale();
 			$this->router = $router;
+
+
+
+
+
+
+
+
+
+
+
+
+			$clocksrepository=$this->getDoctrine()->getRepository(HRClocks::class);
+			$obj=$clocksrepository->findOneBy(["id"=>$id]);
+
+
+
 			$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
 			$utils = new HRClocksUtils();
 			$templateLists=$utils->formatListbyWorker($id);
@@ -132,7 +149,7 @@ class HRClocksController extends Controller
 				$formUtils->initialize($this->getUser(), new $this->class(), dirname(__FILE__)."/../Forms/Clocks.json", $request, $this, $this->getDoctrine(),['enddevice','startdevice']);
 				$templateLists=$utils->formatListbyWorker($id);
 			}else{
-				$formUtils->initialize($this->getUser(), new $this->class(), dirname(__FILE__)."/../Forms/ClocksAdmin.json", $request, $this, $this->getDoctrine(),['enddevice','startdevice']);
+				$formUtils->initialize($this->getUser(), new $this->class(), dirname(__FILE__)."/../Forms/ClocksAdmin.json", $request, $this, $this->getDoctrine());
 				$templateLists=$utils->formatListbyWorkerAdmin($id);
 			}
 			$templateForms[]=$formUtils->formatForm('clocks', true, $id, $this->class);
@@ -317,18 +334,23 @@ class HRClocksController extends Controller
 				return new JsonResponse($return);
 			}
 
-
-
 		/**
 		 * @Route("/{_locale}/HR/clocks/data/{id}/{action}/{idworker}", name="dataClocks", defaults={"id"=0, "action"="read", "idworker"="0"})
 		 */
 		 public function data($id, $action, $idworker, Request $request){
 			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 			$this->denyAccessUnlessGranted('ROLE_ADMIN');
+			$clocksrepository=$this->getDoctrine()->getRepository(HRClocks::class);
+			$obj=$clocksrepository->findOneBy(["id"=>$id]);
 			if ($this->get('security.authorization_checker')->isGranted('ROLE_SUPERVISOR')) {
 				$template=dirname(__FILE__)."/../Forms/Clocks.json";
 			}else{
-				$template=dirname(__FILE__)."/../Forms/ClocksAdmin.json";
+				if($obj!=NULL)
+					if($obj->getInvalid()!=0){
+								$template=dirname(__FILE__)."/../Forms/ClocksAdminIncidence.json";
+					}else{
+							$template=dirname(__FILE__)."/../Forms/ClocksAdmin.json";
+					}else $template=dirname(__FILE__)."/../Forms/ClocksAdminIncidence.json";
 			}
 			$utils = new GlobaleFormUtils();
 			$utilsObj=new $this->utilsClass();
@@ -342,7 +364,6 @@ class HRClocksController extends Controller
 			if($id!=0 && $obj==null){
 					return $this->render('@Globale/notfound.html.twig',[]);
 			}
-
 
 			$params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "worker"=>$id==0?$worker:$obj->getWorker()];
 			$utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),
@@ -430,6 +451,21 @@ class HRClocksController extends Controller
 			} else return new JsonResponse(["result"=>-1]);
 		}
 
+
+
+
+/**
+* @Route("/{_locale}/HR/clocks/{id}/incidence", name="declareIncidence")
+*/
+public function declareIncidence($id){
+	$this->denyAccessUnlessGranted('ROLE_ADMIN');
+	$clocksrepository=$this->getDoctrine()->getRepository(HRClocks::class);
+	$obj=$clocksrepository->findOneBy(["id"=>$id]);
+  $obj->setInvalid(1);
+	$this->getDoctrine()->getManager()->persist($obj);
+	$this->getDoctrine()->getManager()->flush();
+	return new JsonResponse(array('result' => $result));
+}
 
 
 	/**

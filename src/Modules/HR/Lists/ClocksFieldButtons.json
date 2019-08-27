@@ -1,4 +1,8 @@
 [
+  {"id": "incidence", "type": "option", "options": [
+      {"id": "declare_incidence", "type" : "default", "condition": "invalid", "conditionValue" :0 , "icon" : "fa fa-exclamation","name" : "marcar como incidencia", "route":"declareIncidence", "confirm" :true, "actionType" : "background" },
+      {"id": "activate", "type" : "default", "condition": "active", "conditionValue" :5, "icon" : "fa fa-eye","name" : "activar", "route":"enableClock", "confirm" :true, "actionType" : "background" }
+  ]},
   {"id": "edit", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"dataClocks", "modal":"clocks", "actionType" : "background", "confirm" :false},
   {"id": "activation", "type": "option", "options": [
       {"id": "desactivate", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"disableClock", "confirm" :true, "actionType" : "background" },

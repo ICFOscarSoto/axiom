@@ -5,14 +5,11 @@
  {"name": "end_location", "caption":"", "type": "location", "data": {"latitude": "endLatitude", "longitude": "endLongitude"}},
  {"name": "time", "caption":"Duración", "sum": true, "format": "time"},
  {"name": "observations", "caption":"Observaciones", "width":"25%"},
- {"name": "invalid", "caption":"Valido", "width":"10%" ,"class" : "dt-center", "replace":{
-                            "1":{"text":"Inválido","html":"<div style=\"min-width: 75px;\" class=\"label label-danger\">Inválido</div>"},
+ {"name": "invalid", "caption":"Incidencia", "width":"10%" ,"class" : "dt-center", "replace":{
+                            "2":{"text":"Corregido","html":"<div style=\"min-width: 75px;\" class=\"label label-info\">Corregido</div>"},
+                            "1":{"text":"Incidencia","html":"<div style=\"min-width: 75px;\" class=\"label label-danger\">Incidencia</div>"},
                             "0":{"text":"Válido","html":"<div style=\"min-width: 75px;\" class=\"label label-success\">Válido</div>"}
                           }
-  },
- {"name": "active", "caption":"Estado", "width":"10%" ,"class" : "dt-center", "replace":{
-                            "1":{"text":"Activo","html":"<div style=\"min-width: 75px;\" class=\"label label-success\">Activo</div>"},
-                            "0":{"text":"Desactivado","html":"<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado</div>"}
-                          }
   }
+  
 ]

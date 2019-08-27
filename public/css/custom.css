@@ -27,6 +27,60 @@ body {
 table {
     font-size: 12px;
 }
+
+.dd-edit{
+  margin: 0 !important;
+  width: 30px;
+  height: 32px;
+  padding-left: 8px;
+  padding-right: 4px;
+  cursor: pointer;
+  padding-top: 7px;
+  -moz-box-shadow: none;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+  /*left: 48px;*/
+  float: left;
+  background: #fafafa;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    border: 1px solid #ebebeb;
+    -moz-transition: all 300ms ease-in-out;
+    -webkit-transition: all 300ms ease-in-out;
+    -o-transition: all 300ms ease-in-out;
+    transition: all 300ms ease-in-out;
+
+}
+.dd-noExpand{
+  display: block;
+    position: relative;
+    float: left;
+    width: 25px;
+    height: 20px;
+    margin: 5px 0;
+    padding: 0;
+    text-indent: -9999px;
+    white-space: nowrap;
+    overflow: visible;
+    border: 0;
+    background: transparent;
+    font-size: 12px;
+    line-height: 1;
+    text-align: center;
+    font-weight: bold;
+    /* margin-right: 10px; */
+    margin-right: -1px;
+    outline: 0;
+}
+
+.nested-list.custom-drag-button .dd-handle {
+  width: 30px !important;
+  padding-left: 7px !important;
+  float: left !important;
+  position: relative !important;
+}
+
 th.table-header-name{
   margin: 0px !important;
   padding: 7px 2px !important;

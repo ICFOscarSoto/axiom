@@ -19,6 +19,16 @@ class HRVacationsRepository extends ServiceEntityRepository
         parent::__construct($registry, HRVacations::class);
     }
 
+    public function dayVacations($worker, $day){
+      $query="SELECT type from hrvacations
+      WHERE worker_id = :worker AND (DATE(:start) BETWEEN DATE(START) AND DATE(END)) AND deleted=0 AND active=1
+      AND approved=1
+      ORDER BY start ASC LIMIT 1";
+
+      $params=['worker' => $worker->getId(), 'start' => $day];
+      return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetch();
+    }
+
     // /**
     //  * @return HRVacations[] Returns an array of HRVacations objects
     //  */

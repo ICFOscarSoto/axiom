@@ -19,37 +19,45 @@ class ERPCategoriesRepository extends ServiceEntityRepository
         parent::__construct($registry, ERPCategories::class);
     }
 
-    public function getChildrens($id_category, $temp_childs)
+    public function getChildrens($id_category, $temp_childs, $user)
     {
 
       $qb= $this->createQueryBuilder('e')
-      ->andWhere('e.parentid=:val')
-      ->setParameter('val', $id_category)
+      ->andWhere('e.parentid=:val_category')
+      ->andWhere('e.active=:val_active')
+      ->andWhere('e.deleted=:val_deleted')
+      ->andWhere('e.company=:val_company')
+      ->setParameter('val_category', $id_category)
+      ->setParameter('val_active', TRUE)
+      ->setParameter('val_deleted', FALSE)
+      ->setParameter('val_company', $user->getCompany())
       ->getQuery()
-      ->getResult()
-      ;
+      ->getResult();
       foreach($qb as $parent) {
-
-        $child=["id"=>$parent->getId(),"name"=>$parent->getName(), "childrens"=>$this->getChildrens($parent->getId(),[])];
+        $child=["id"=>$parent->getId(),"name"=>$parent->getName(), "childrens"=>$this->getChildrens($parent->getId(),[], $user)];
         array_push($temp_childs,$child);
       }
-      //dump($childrens);
       return $temp_childs;
 
     }
 
-    public function getTree()
+    public function getTree($user)
     {
       $qb= $this->createQueryBuilder('e')
       ->andWhere('e.parentid is null')
+      ->andWhere('e.active=:val_active')
+      ->andWhere('e.deleted=:val_deleted')
+      ->andWhere('e.company=:val_company')
+      ->setParameter('val_active', TRUE)
+      ->setParameter('val_deleted', FALSE)
+      ->setParameter('val_company', $user->getCompany())
       ->getQuery()
-      ->getResult()
-      ;
+      ->getResult();
 
       $childrens=[];
       foreach($qb as $parent) {
       $child=[];
-      $child=["id"=>$parent->getId(),"name"=>$parent->getName(), "childrens"=>$this->getChildrens($parent->getId(), $child)];
+      $child=["id"=>$parent->getId(),"name"=>$parent->getName(), "childrens"=>$this->getChildrens($parent->getId(), $child, $user)];
       array_push($childrens,$child);
       }
 

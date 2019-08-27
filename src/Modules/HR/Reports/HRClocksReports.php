@@ -11,6 +11,8 @@ use App\Modules\Globale\Utils\FormUtils;
 use App\Modules\Globale\Utils\ListUtils;
 use App\Modules\HR\Entity\HRWorkers;
 use App\Modules\HR\Entity\HRClocks;
+use App\Modules\HR\Entity\HRVacations;
+use App\Modules\HR\Entity\HRSickleaves;
 use App\Modules\Globale\Reports\GlobaleReports;
 
 
@@ -72,7 +74,8 @@ class HRClocksReports
     $this->year=$params["year"];
     $workersRepository=$doctrine->getRepository(HRWorkers::class);
     $clocksRepository=$doctrine->getRepository(HRClocks::class);
-
+    $vacationsRepository=$doctrine->getRepository(HRVacations::class);
+    $sickleaveRepository=$doctrine->getRepository(HRSickleaves::class);
     foreach($params["ids"] as $id){
       $this->worker=$workersRepository->findOneBy(["id"=>$id, "company"=>$this->user->getCompany()]);
       if(!$this->worker) continue;
@@ -88,11 +91,34 @@ class HRClocksReports
       $totalTime=0;
       for($i=1;$i<=$daysMonth;$i++){
         $rows=$clocksRepository->dayClocks($this->worker, $params['year'].'-'.sprintf("%02d", $params["month"]).'-'.sprintf("%02d", $i));
+        $vacation=$vacationsRepository->dayVacations($this->worker, $params['year'].'-'.sprintf("%02d", $params["month"]).'-'.sprintf("%02d", $i));
+        $vacation_literals=array("", "Vacaciones", "Permiso", "Asuntos propios", "Excedencia");
+        $sickleave=$sickleaveRepository->daySickleave($this->worker, $params['year'].'-'.sprintf("%02d", $params["month"]).'-'.sprintf("%02d", $i));
+        $sickleave_literals=array("", "BAJA C.COMÚN", "BAJA C.PROFESIONAL");
+
         foreach($rows as $row){
           $totalTime+=$row["time"];
-          $data[]=[sprintf("%02d", $i)."/".sprintf("%02d", $params["month"])."/".$params["year"],$row["start"],$row["end"],gmdate("H:i:s", $row["time"]),$row["observations"]];
+          $data[]=[sprintf("%02d", $i)."/".sprintf("%02d", $params["month"])."/".$params["year"],$row["start"],$row["end"],gmdate("H:i:s", $row["time"]),$row["invalid"]!=0?"*INCIDENCIA. ".$row["observations"]:$row["observations"]];
+
         }
-        if(count($rows)==0) $data[]=[sprintf("%02d", $i)."/".sprintf("%02d", $params["month"])."/".$params["year"]," - "," - ","0",""];
+        $start=" - ";
+        $end=" - ";
+        $hours=0;
+        $observations="";
+        if($vacation){
+          $start=" ------------------------ ";
+          $observations=strtoupper($vacation_literals[$vacation["type"]]);
+          $end=" ------------------------ ";
+          $hours=" --------------------------- ";
+        }else{
+          if($sickleave){
+            $start=" ------------------------ ";
+            $observations=strtoupper($sickleave_literals[$sickleave["type"]].": ".$sickleave["name"]);
+            $end=" ------------------------ ";
+            $hours=" --------------------------- ";
+          }
+        }
+        if(count($rows)==0) $data[]=[sprintf("%02d", $i)."/".sprintf("%02d", $params["month"])."/".$params["year"],$start,$end,$hours,$observations];
       }
       $this->pdf->image_path=$params["rootdir"].DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$params["user"]->getCompany()->getId().DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'company'.DIRECTORY_SEPARATOR;
       $this->pdf->user=$params["user"];

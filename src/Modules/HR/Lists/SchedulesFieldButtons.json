@@ -1,5 +1,5 @@
 [
-  {"id": "edit", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"genericdata", "routeParams":{"module":"HR", "name":"Schedules", "type":"modal" }, "modal":"Schedules", "actionType" : "background", "confirm" :false},
+  {"id": "edit", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"dataSchedules", "modal":"schedules", "actionType" : "background", "confirm" :false, "tooltip":"Editar horario"},
   {"id": "data", "type" : "default", "icon" : "fa fa-bars", "name" : "datos", "route":"", "confirm" :false, "actionType" : "foreground"},
   {"id": "activation", "type": "option", "options": [
       {"id": "desactivate", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"genericdisable", "routeParams":{"module":"HR", "name":"Schedules", "type":"modal"}, "confirm" :true, "actionType" : "background" },

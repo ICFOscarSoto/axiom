@@ -3,8 +3,8 @@
 		{
 			"name": "Category data",
 			"fields": [
-				{ "name": "name","cols": 2},
-				{ "name": "parentid","cols": 2},
+				{ "name": "name","cols": 5},
+				{ "name": "parentid", "cols": 5, "readonly":true},
 				{ "name": "active","cols": 2}
 			]
 		}]

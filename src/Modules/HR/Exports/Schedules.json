@@ -1,0 +1,6 @@
+[{"name": "id", "caption":""},
+ {"name": "name", "caption":"Nombre"},
+ {"name": "period", "caption":"Periodo"},
+ {"name": "type", "caption":"Tipo"},
+ {"name": "active", "caption":"Estado"}
+]

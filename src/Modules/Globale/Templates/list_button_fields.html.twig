@@ -1,0 +1,116 @@
+{#    Button fields   #}
+<script>
+
+{% for field in listConstructor.fieldButtons %}
+  {% if field.type == "option" %}
+    {% for fieldOption in field.options %}
+
+          {% if fieldOption.actionType == "foreground" %}
+            {% if fieldOption.confirm is not defined or fieldOption.confirm == false %}
+            $('body').on('click', "[id^='{{ listConstructor.id }}-field-button-{{ fieldOption.id }}']", function() {
+              url=$("#{{ listConstructor.id }}-field-button-{{ fieldOption.id }}-url").val();
+              url=url.replace('_____',$(this).attr('attr-id'));
+              window.location.href=url;
+            });
+            {% else %}
+            {% endif %}
+          {% else %}
+            {% if fieldOption.confirm is not defined or fieldOption.confirm == false %}
+              $('body').on('click', "[id^='{{ listConstructor.id }}-field-button-{{ fieldOption.id }}']", function() {
+                url=$("#{{ listConstructor.id }}-field-button-{{ fieldOption.id }}-url").val();
+                url=url.replace('_____',$(this).attr('attr-id'));
+                $.getJSON(url, function( data ) {
+                  $.each( data, function( key, val ) {
+
+                  });
+                }).always(function() {
+                  {{ listConstructor.id }}.ajax.reload();
+                });
+              });
+            {% else %}
+              $('body').on('click', "[id^='{{ listConstructor.id }}-field-button-{{ fieldOption.id }}']", function() {
+              url=$("#{{ listConstructor.id }}-field-button-{{ fieldOption.id }}-url").val();
+              url=url.replace('_____',$(this).attr('attr-id'));
+              $('#{{ listConstructor.id }}-modal-button-continue').attr('attr-action',url);
+              $('#{{ listConstructor.id }}-modal-button-continue').attr('attr-action-type','{{ fieldOption.actionType }}');
+              $('#{{ listConstructor.id }}-modal-body').html('¿Está seguro que desea {{fieldOption.name}} este registro? {% if fieldOption.undo is defined and fieldOption.undo==false %} </br><b>¡ATENCIÓN!</b> Esta operación no podrá deshacerse.{% endif %}');
+            });
+            {% endif %}
+          {% endif %}
+
+    {% endfor %}
+  {% else %}
+
+          {% if field.actionType == "foreground" %}
+            {% if field.confirm is not defined or field.confirm == false %}
+            $('body').on('click', "[id^='{{ listConstructor.id }}-field-button-{{ field.id }}']", function() {
+              url=$("#{{ listConstructor.id }}-field-button-{{ field.id }}-url").val();
+              url=url.replace('_____',$(this).attr('attr-id'));
+              window.location.href=url;
+            });
+            {% else %}
+            {% endif %}
+          {% else %}
+            //Get data and open modal form
+            {% if field.confirm is not defined or field.confirm == false %}
+              $('body').on('click', "[id^='{{ listConstructor.id }}-field-button-{{ field.id }}']", function() {
+                url=$("#{{ listConstructor.id }}-field-button-{{ field.id }}-url").val();
+                url=url.replace('_____',$(this).attr('attr-id'));
+                $.post(url, null,
+                  function(data, status, xhr){
+
+                      $("#{{field.modal}}-modal-form-body").html(data);
+                      $("#{{field.modal}}-modal-form-body").find(':checkbox').not($('[id$=-chkall]')).iCheck({checkboxClass: 'icheckbox_flat-blue', radioClass: 'iradio_flat-blue'});
+                      $("#{{field.modal}}-modal-form-body select").select2();
+                      $("#{{field.modal}}-modal-form").modal();
+
+                });
+              });
+            {% else %}
+              $('body').on('click', "[id^='{{ listConstructor.id }}-field-button-{{ field.id }}']", function() {
+              url=$("#{{ listConstructor.id }}-field-button-{{ field.id }}-url").val();
+              url=url.replace('_____',$(this).attr('attr-id'));
+              $('#{{ listConstructor.id }}-modal-button-continue').attr('attr-action',url);
+              $('#{{ listConstructor.id }}-modal-button-continue').attr('attr-action-type','{{ field.actionType }}');
+              $('#{{ listConstructor.id }}-modal-body').html('¿Está seguro que desea {{field.name}} este registro? {% if field.undo is defined and field.undo==false %} </br><b>¡ATENCIÓN!</b> Esta operación no podrá deshacerse.{% endif %}');
+            });
+            {% endif %}
+          {% endif %}
+
+  {% endif %}
+
+{% endfor %}
+</script>
+<!-- END BUTTONZONE -->
+{% for field in listConstructor.fieldButtons %}
+
+  {% set routeParams = [] %}
+  {% set routeParams = routeParams|merge({('id'): '_____'}) %}
+  {% if field.routeParams is defined %}
+    {% for key,param in field.routeParams %}
+      {% if _context[param] is defined %} {# Detect if parameter is a reference to a var or is a value #}
+        {% set routeParams = routeParams|merge({(key): _context[param]}) %}
+      {% else %}
+        {% set routeParams = routeParams|merge({(key): param}) %}
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+
+  {% if field.type == "option" %}
+    {% for fieldOption in field.options %}
+      {% set optionParams = routeParams %}
+      {% if fieldOption.routeParams is defined %}
+        {% for key,param in fieldOption.routeParams %}
+          {% if _context[param] is defined %} {# Detect if parameter is a reference to a var or is a value #}
+            {% set optionParams = optionParams|merge({(key): _context[param]}) %}
+          {% else %}
+            {% set optionParams = optionParams|merge({(key): param}) %}
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+      <input id="{{ listConstructor.id }}-field-button-{{ fieldOption.id }}-url" type="hidden" value="{% if fieldOption.route|length %}{{ url(fieldOption.route,optionParams) }}{% endif %}" />
+    {% endfor %}
+  {% else %}
+    <input id="{{ listConstructor.id }}-field-button-{{ field.id }}-url" type="hidden" value="{% if field.route|length %}{{ url(field.route,routeParams) }}{% endif %}" />
+  {% endif %}
+{% endfor %}

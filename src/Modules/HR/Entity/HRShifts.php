@@ -5,6 +5,7 @@ namespace App\Modules\HR\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use \App\Modules\HR\Entity\HRSchedules;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\HR\Repository\HRShiftsRepository")
@@ -24,21 +25,46 @@ class HRShifts
     private $name;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Modules\HR\Entity\HRSchedules", inversedBy="shifts")
-     * @ORM\JoinColumn(onDelete="CASCADE")
+     * @ORM\Column(type="datetime")
      */
-    private $schedules;
+    private $start;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Modules\HR\Entity\HRPeriods", mappedBy="shift")
+     * @ORM\Column(type="datetime")
      */
-    private $periods;
+    private $end;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $active;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $deleted;
+
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $dateadd;
+
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $dateupd;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\HR\Entity\HRSchedules")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $schedule;
+
 
     public function __construct()
     {
-        $this->periods = new ArrayCollection();
-    }
 
+    }
 
     public function getId(): ?int
     {
@@ -57,45 +83,86 @@ class HRShifts
         return $this;
     }
 
-    public function getSchedules(): ?HRSchedules
+    public function getStart(): ?\DateTimeInterface
     {
-        return $this->schedules;
+        return $this->start;
     }
 
-    public function setSchedules(?HRSchedules $schedules): self
+    public function setStart(\DateTimeInterface $start): self
     {
-        $this->schedules = $schedules;
+        $this->start = $start;
 
         return $this;
     }
 
-    /**
-     * @return Collection|HRPeriods[]
-     */
-    public function getPeriods(): Collection
+    public function getEnd(): ?\DateTimeInterface
     {
-        return $this->periods;
+        return $this->end;
     }
 
-    public function addPeriod(HRPeriods $period): self
+    public function setEnd(\DateTimeInterface $end): self
     {
-        if (!$this->periods->contains($period)) {
-            $this->periods[] = $period;
-            $period->setShift($this);
-        }
+        $this->end = $end;
 
         return $this;
     }
 
-    public function removePeriod(HRPeriods $period): self
+    public function getActive(): ?bool
     {
-        if ($this->periods->contains($period)) {
-            $this->periods->removeElement($period);
-            // set the owning side to null (unless already changed)
-            if ($period->getShift() === $this) {
-                $period->setShift(null);
-            }
-        }
+        return $this->active;
+    }
+
+    public function setActive(bool $active): self
+    {
+        $this->active = $active;
+
+        return $this;
+    }
+
+    public function getDeleted(): ?bool
+    {
+        return $this->deleted;
+    }
+
+    public function setDeleted(bool $deleted): self
+    {
+        $this->deleted = $deleted;
+
+        return $this;
+    }
+
+    public function getDateadd(): ?\DateTimeInterface
+    {
+        return $this->dateadd;
+    }
+
+    public function setDateadd(\DateTimeInterface $dateadd): self
+    {
+        $this->dateadd = $dateadd;
+
+        return $this;
+    }
+
+    public function getDateupd(): ?\DateTimeInterface
+    {
+        return $this->dateupd;
+    }
+
+    public function setDateupd(\DateTimeInterface $dateupd): self
+    {
+        $this->dateupd = $dateupd;
+
+        return $this;
+    }
+
+    public function getSchedule(): ?HRSchedules
+    {
+        return $this->schedule;
+    }
+
+    public function setSchedule(?HRSchedules $schedule): self
+    {
+        $this->schedule = $schedule;
 
         return $this;
     }

@@ -47,18 +47,18 @@ class HRClocks
     /**
      * @ORM\Column(type="boolean")
      */
-    private $active;
+    private $active=1;
 
     /**
      * @ORM\Column(type="boolean")
      */
-    private $deleted;
+    private $deleted=0;
 
     public $newSeconds=3600;
   	public $updatedSeconds=3600;
 
    /**
-    * @ORM\Column(type="boolean", nullable=true)
+    * @ORM\Column(type="smallint", nullable=true)
     */
    private $invalid;
 
@@ -95,7 +95,7 @@ class HRClocks
 
    /**
     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleClockDevices")
-    * @ORM\JoinColumn(onDelete="SET NULL")    
+    * @ORM\JoinColumn(onDelete="SET NULL")
     */
    private $enddevice;
 
@@ -194,12 +194,12 @@ class HRClocks
         return $this;
     }
 
-    public function getInvalid(): ?bool
+    public function getInvalid(): ?int
     {
         return $this->invalid;
     }
 
-    public function setInvalid(?bool $invalid): self
+    public function setInvalid(?int $invalid): self
     {
         $this->invalid = $invalid;
 
