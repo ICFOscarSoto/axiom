@@ -35,6 +35,10 @@ FirebaseDevices:
     resource: 'App\Modules\Globale\Controller\GlobaleFirebaseDevicesController'
     type:     annotation
 
+Histories:
+    resource: 'App\Modules\Globale\Controller\GlobaleHistoriesController'
+    type:     annotation
+
 Customer:
     resource: 'App\Modules\ERP\Controller\ERPCustomersController'
     type:     annotation

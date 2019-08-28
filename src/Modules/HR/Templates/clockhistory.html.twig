@@ -1,0 +1,63 @@
+<div class="row">
+<ul class="cbp_tmtimeline">
+			<li id="initial_item" >
+				<time class="cbp_tmtime" datetime=""><span class="hidden"></span> <span class="large">{{ ("Now")|trans }}</span></time>
+				<div class="cbp_tmicon">
+					<i class="entypo-user"></i>
+				</div>
+				<div class="cbp_tmlabel empty">
+					<span>{{ ("No Activity")|trans }}</span>
+				</div>
+			</li>
+      <li id="last_item">
+        <time class="cbp_tmtime" id="create-datetime" datetime=""><span id="create-time-text"></span><span id="create-time-literal"></span></time>
+            <div class="cbp_tmicon bg-success">
+              <i class="entypo-star"></i>
+            </div>
+            <div class="cbp_tmlabel">
+          <h2 id="create-by">Creado por</h2>
+          <p id="create-info"></p>
+        </div>
+      </li>
+		</ul>
+
+</div>
+    <script>
+      $(document).ready(function(){
+        //First element
+        var obj_create=moment('{{obj.dateadd|date('Y-m-d H:i:s')}}');
+        $("#create-time-literal").text(obj_create.from());
+        $("#create-time-text").text(obj_create.format('HH:mm:ss'));
+        {% if(device!=null) %}
+            $("#create-by").text('Creado por dispositivo el '+obj_create.format('D [de] MMMM [de] YYYY'));
+            $("#create-info").text('S/N: {{ device.serialnumber }} - Descripción:{{ device.name }}');
+        {% else %}
+          {% if(obj.startLatitude!=null) %}
+            $("#create-by").text('Creado por APP móvil el '+obj_create.format('D [de] MMMM [de] YYYY'));
+          {% else %}
+            $("#create-by").text('Creado por Administrador el '+obj_create.format('D [de] MMMM [de] YYYY'));
+          {% endif %}
+        {% endif %}
+        var items="";
+        {% for history in histories %}
+          var obj_create=moment('{{history.dateadd|date('Y-m-d H:i:s')}}');
+          var item='<li>'
+              +'<time class="cbp_tmtime" datetime=""><span>'+obj_create.format('HH:mm:ss')+'</span> <span>'+obj_create.from()+'</span></time>'
+              +'  <div class="cbp_tmicon bg-info">'
+              +'  <i class="entypo-pencil"></i>'
+              +'</div>'
+              +'<div class="cbp_tmlabel">'
+              +'  <h2>Editado por {{ history.user.name }} {{ history.user.lastname }}</h2>'
+              +'  <p>Cambios realizados: </br>';
+              {% for change in history.array_changes %}
+                item+=' - {{ (change.attribute|capitalize)|trans }}: <b>De</b> <i>{{change.oldvalue}}</i> <b>A:</b> <i>{{change.newvalue}}</i></br>';
+              {% endfor %}
+              item+='</p></div>'
+            +'</li>';
+          items+=item;
+
+        {% endfor %}
+        $("#initial_item").after(items);
+        {% dump(histories) %}
+      });
+    </script>

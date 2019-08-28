@@ -13,6 +13,8 @@ use App\Modules\HR\Entity\HRWorkers;
 use App\Modules\HR\Entity\HRClocks;
 use App\Modules\HR\Entity\HRVacations;
 use App\Modules\HR\Entity\HRSickleaves;
+use App\Modules\HR\Entity\HRHollidays;
+
 use App\Modules\Globale\Reports\GlobaleReports;
 
 

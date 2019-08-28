@@ -14,6 +14,7 @@ use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\CallbackTransformer;
 use App\Modules\Globale\Entity\GlobaleCompanies;
+use App\Modules\Globale\Entity\GlobaleHistories;
 
 class GlobaleFormUtils extends Controller
 {
@@ -21,6 +22,7 @@ class GlobaleFormUtils extends Controller
   private $user;
   private $company;
   private $obj;
+  private $obj_old;
   private $request;
   private $controller;
   private $doctrine;
@@ -35,6 +37,7 @@ class GlobaleFormUtils extends Controller
   private $routeParams=array();
   private $includePreTemplate=array();
   private $includePostTemplate=array();
+  private $history;
   public $preParams=array();
   public $postParams=array();
 
@@ -45,9 +48,10 @@ class GlobaleFormUtils extends Controller
     $this->entityManager=$this->doctrine->getManager();
   }
 
-  public function initialize($user, $obj, $template, $request, $controller, $doctrine, $excludedAttributes=array(), $includedAttributes=array(), $encoder=null, $routeParams=[], $includePreTemplate=[], $includePostTemplate=[]){
+  public function initialize($user, $obj, $template, $request, $controller, $doctrine, $excludedAttributes=array(), $includedAttributes=array(), $encoder=null, $routeParams=[], $includePreTemplate=[], $includePostTemplate=[], $history=false){
     $this->user=$user;
     $this->obj=$obj;
+    $this->obj_old=$obj;
     $this->request=$request;
     $this->controller=$controller;
     $this->doctrine=$doctrine;
@@ -62,7 +66,7 @@ class GlobaleFormUtils extends Controller
     $this->routeParams=$routeParams;
     $this->includePostTemplate=$includePostTemplate;
     $this->includePreTemplate=$includePreTemplate;
-
+    $this->history=$history;
     //Set active by default in new objects
     if($obj->getId()===null && method_exists($obj, 'setActive')){
       $obj->setActive(true);
@@ -82,8 +86,9 @@ class GlobaleFormUtils extends Controller
 					$repository = $this->doctrine->getRepository($class);
 					$this->obj=$repository->find($id);
 					if($this->obj===NULL) $this->obj=new $class();
-			}
 
+			}
+    $this->obj_old=clone $this->obj;
     $form=$this->createFromEntity2(!$ajax)->getForm();
     $caption=ucfirst($name);
     $routeParams=array_merge($routeParams, ["id"=>$id, "action"=>"save"]);
@@ -183,12 +188,14 @@ class GlobaleFormUtils extends Controller
           if($id!==null && $id!==0){ //If obj hasn't ID we asume that the obj is initzializated by us in the controller for set default values
             if(property_exists($class,'company')){
               $this->obj=$repository->findOneBy(['id'=>$id, 'company'=>$this->user->getCompany(), 'deleted'=>0]);
+
             }else{
               $this->obj=$repository->findOneBy(['id'=>$id, 'deleted'=>0]);
             }
           }
 					if($this->obj===NULL) $this->obj=new $class();
 			}
+      $this->obj_old=clone $this->obj;
 			$form=$this->createFromEntity2(false)->getForm();
 			switch($action){
 				 case 'save':
@@ -227,9 +234,6 @@ class GlobaleFormUtils extends Controller
     if(!$form->isSubmitted()) return false;
     if ($form->isSubmitted() && $form->isValid()) {
        $obj = $form->getData();
-
-
-
        //definimos los valores predefinidos
        foreach($this->values as $key => $val){
          if(method_exists($obj,'set'.lcfirst($key))) $obj->{'set'.lcfirst($key)}($val);
@@ -243,9 +247,12 @@ class GlobaleFormUtils extends Controller
        $obj->setDateupd(new \DateTime());
        try{
          if(method_exists($obj,'preProccess')) $obj->{'preProccess'}($this->controller->get('kernel'), $this->doctrine, $this->user, $this->preParams);
+
+
          $this->entityManager->persist($obj);
          $this->entityManager->flush();
          if(method_exists($obj,'postProccess')) $obj->{'postProccess'}($this->controller->get('kernel'), $this->doctrine, $this->user, $this->postParams);
+         $this->detectObjChanges($this->obj_old, $obj);
          return $obj;
        }catch (Exception $e) {
          return false;
@@ -253,9 +260,59 @@ class GlobaleFormUtils extends Controller
     }
   }
 
+  public function detectObjChanges($old, $new){
+    if(!$this->history) return;
+    //Compare obj new with old and save history
+    $this->ignoredAttributes=array_merge($this->ignoredAttributes, $this->excludedAttributes);
+    $class=get_class($old);
+    $changes=[];
+    foreach($this->entityManager->getClassMetadata($class)->fieldMappings as $key=>$value){ //Get simple attrubutes
+      if(!in_array($value['fieldName'],$this->ignoredAttributes)){ //Check if field is not excluded and not ignored
+        if($this->searchTemplateField($value['fieldName'])!==false){ //Check if field is in template, only compare visible fields
+          switch($value['type']){
+            case 'datetime':
+            if(method_exists($old,'get'.lcfirst($value['fieldName']))){
+              if(($old->{'get'.lcfirst($value['fieldName'])}()!=NULL?$old->{'get'.lcfirst($value['fieldName'])}()->format('Y-m-d H:i:s'):NULL) != ($new->{'get'.lcfirst($value['fieldName'])}()!=NULL?$new->{'get'.lcfirst($value['fieldName'])}()->format('Y-m-d H:i:s'):NULL)){
+                //Attribute changed store it
+                $changes[]=["attribute"=>$value['fieldName'],"oldvalue"=>($old->{'get'.lcfirst($value['fieldName'])}()!=NULL?$old->{'get'.lcfirst($value['fieldName'])}()->format('Y-m-d H:i:s'):NULL),"newvalue"=>($new->{'get'.lcfirst($value['fieldName'])}()!=NULL?$new->{'get'.lcfirst($value['fieldName'])}()->format('Y-m-d H:i:s'):NULL)];
+              }
+            }
+            break;
+            default:
+              if(method_exists($old,'get'.lcfirst($value['fieldName']))){
+                if($old->{'get'.lcfirst($value['fieldName'])}() != $new->{'get'.lcfirst($value['fieldName'])}()){
+                  //Attribute changed store it
+                  $changes[]=["attribute"=>$value['fieldName'],"oldvalue"=>$old->{'get'.lcfirst($value['fieldName'])}(), "newvalue"=>$new->{'get'.lcfirst($value['fieldName'])}()];
+                }
+              }
+            break;
+          }
+        }
+      }
+    }
+    foreach($this->entityManager->getClassMetadata($class)->associationMappings as $key=>$value){ //Get relations
+        //TODO: Exclude not showed relations and define how detect changes with relations
+    }
+    //TODO: Detect if the same user change other field in this object in last 10 minutes, if yes, merge it
+    $history=new GlobaleHistories();
+    $history->setEntity($class);
+    $history->setEntityId($old->getId());
+    $history->setCompany($this->user->getCompany());
+    $history->setUser($this->user);
+    $history->setDateadd(new \DateTime());
+    $history->setDateupd(new \DateTime());
+    $history->setChanges(json_encode($changes));
+    $history->setActive(TRUE);
+    $history->setDeleted(FALSE);
+
+    $this->entityManager->persist($history);
+    $this->entityManager->flush();
+
+  }
+
   public function choiceRelation($class, $data, $nullable){
     $classname=explode('\\', $class);
-    //If class has attribute company aply filter
+    //If class has attribute company apply filter
     if(property_exists($class,'company')){
       $choices= $this->doctrine->getRepository($class)->findBy(['company'=>$this->user->getCompany(),'active'=>true, 'deleted'=>false]);
     }else{

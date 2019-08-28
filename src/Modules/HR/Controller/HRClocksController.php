@@ -28,7 +28,7 @@ use App\Modules\HR\Reports\HRClocksReports;
 use App\Modules\Globale\Entity\GlobaleNotifications;
 use App\Modules\Globale\Config\GlobaleConfigVars;
 use App\Modules\Globale\Controller\GlobaleFirebaseDevicesController;
-
+use App\Modules\Globale\Entity\GlobaleHistories;
 class HRClocksController extends Controller
 {
 
@@ -177,11 +177,31 @@ class HRClocksController extends Controller
 													  "This year"=>["data"=>$clocksrepository->thisYearClocks($worker), "class"=>"tile-blue"],
 														"Last year"=>["data"=>$clocksrepository->lastYearClocks($worker), "class"=>"tile-primary"]],
 					'include_post_templates' => ['@HR/location.html.twig', '@HR/clocksprintselect.html.twig'],
-					'include_pre_templates' => ['@HR/clockssummary.html.twig']
+					'include_pre_templates' => ['@HR/clockssummary.html.twig', '@HR/clockhistory_modal.html.twig']
 					]);
 			}
 			return new RedirectResponse($this->router->generate('app_login'));
 			}
+
+			/**
+			* @Route("/api/HR/clock/history/{id}", name="historyClocks")
+			*/
+			public function historyClocks($id, Request $request){
+				$clocksrepository=$this->getDoctrine()->getRepository(HRClocks::class);
+				$obj=$clocksrepository->findOneBy(["id"=>$id]);
+				$historiesRepository=$this->getDoctrine()->getRepository(GlobaleHistories::class);
+		    $user = $this->getUser();
+		    $histories =	$historiesRepository->findBy(["entity"=>get_class($obj), "entity_id"=>$id, "company"=>$user->getCompany(), "active"=>true, "deleted"=>false],["dateadd"=>'DESC']);
+				foreach($histories as $key=>$item){
+					$histories[$key]->array_changes=json_decode($item->getChanges(),true);
+				}
+					return $this->render('@HR/clockhistory.html.twig',[
+						'obj'=>$obj,
+						'device'=>$obj->getStartdevice(),
+						'histories'=>$histories
+					]);
+			}
+
 
 		 /**
  		 * @Route("/api/HR/doclock/{company}/{id}", name="doClocks")
@@ -370,7 +390,7 @@ class HRClocksController extends Controller
 
 			$params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "worker"=>$id==0?$worker:$obj->getWorker()];
 			$utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),
-												 method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
+												 method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[], null, [], [], [], true);
 			return $utils->make($id, $this->class, $action, "formworker", "modal");
 		}
 
