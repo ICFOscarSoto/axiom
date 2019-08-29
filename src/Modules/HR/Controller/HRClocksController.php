@@ -389,8 +389,13 @@ class HRClocksController extends Controller
 			}
 
 			$params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "worker"=>$id==0?$worker:$obj->getWorker()];
-			$utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),
-												 method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[], null, [], [], [], true);
+
+			//IF NO INCIDENDE AND SUPERVISOR... NO HISTORY :-)
+			if($obj->getInvalid()==0 && $this->get('security.authorization_checker')->isGranted('ROLE_SUPERVISOR'))
+						$utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(), method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[], null, [], [], [], false);
+			else $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(), method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[], null, [], [], [], true);
+
+
 			return $utils->make($id, $this->class, $action, "formworker", "modal");
 		}
 
