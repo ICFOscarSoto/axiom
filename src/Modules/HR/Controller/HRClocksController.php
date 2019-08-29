@@ -487,7 +487,22 @@ public function declareIncidence($id){
   $obj->setInvalid(1);
 	$this->getDoctrine()->getManager()->persist($obj);
 	$this->getDoctrine()->getManager()->flush();
-	return new JsonResponse(array('result' => $result));
+
+	$history=new GlobaleHistories();
+	$history->setEntity(get_class($obj));
+	$history->setEntityId($id);
+	$history->setCompany($this->getUser()->getCompany());
+	$history->setUser($this->getUser());
+	$history->setDateadd(new \DateTime());
+	$history->setDateupd(new \DateTime());
+	$history->setChanges(json_encode([["attribute"=>"invalid", "oldvalue"=>0, "newvalue"=>1]]));
+	$history->setActive(TRUE);
+	$history->setDeleted(FALSE);
+
+	$this->getDoctrine()->getManager()->persist($history);
+	$this->getDoctrine()->getManager()->flush();
+
+	return new JsonResponse(array('result' => 1));
 }
 
 

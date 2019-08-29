@@ -262,6 +262,7 @@ class GlobaleFormUtils extends Controller
 
   public function detectObjChanges($old, $new){
     if(!$this->history) return;
+    if(!$old->getId()) return;
     //Compare obj new with old and save history
     $this->ignoredAttributes=array_merge($this->ignoredAttributes, $this->excludedAttributes);
     $class=get_class($old);

@@ -3,6 +3,6 @@
       {"id": "declare_incidence", "type" : "default", "condition": "invalid", "conditionValue" :0 , "icon" : "fa fa-exclamation","name" : "marcar como incidencia", "route":"declareIncidence", "confirm" :true, "actionType" : "background" },
       {"id": "activate", "type" : "default", "condition": "active", "conditionValue" :5, "icon" : "fa fa-eye","name" : "activar", "route":"", "confirm" :true, "actionType" : "background" }
   ]},
-  {"id": "history", "type" : "default", "icon" : "fa fa-history", "name" : "history", "route":"historyClocks", "modal":"historyclocks", "actionType" : "background", "confirm" :false},
-  {"id": "edit", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"dataClocks", "modal":"clocks", "actionType" : "background", "confirm" :false}
+    {"id": "edit", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"dataClocks", "modal":"clocks", "actionType" : "background", "confirm" :false},
+    {"id": "history", "type" : "default", "icon" : "fa fa-history", "name" : "history", "route":"historyClocks", "modal":"historyclocks", "actionType" : "background", "confirm" :false}
 ]
