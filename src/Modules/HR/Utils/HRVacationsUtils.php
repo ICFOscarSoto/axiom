@@ -19,7 +19,7 @@ class HRVacationsUtils
       'id' => 'listVacations',
       'route' => 'vacationslistworker',
       'routeParams' => ["id" => $worker],
-      'orderColumn' => 1,
+      'orderColumn' => 2,
       'orderDirection' => 'DESC',
       'tagColumn' => 2,
       'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Vacations.json"),true),

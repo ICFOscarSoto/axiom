@@ -19,7 +19,7 @@ class HRSickleavesUtils
       'id' => 'listSickleaves',
       'route' => 'sickleaveslistworker',
       'routeParams' => ["id" => $worker],
-      'orderColumn' => 1,
+      'orderColumn' => 3,
       'orderDirection' => 'DESC',
       'tagColumn' => 2,
       'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Sickleaves.json"),true),
