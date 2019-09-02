@@ -363,7 +363,7 @@ class GlobaleCompaniesController extends Controller
 	}
 
 	/**
-	* @Route("/api/global/shop/module", name="shopModule")
+	* @Route("/api/global/shop/module/", name="shopModule")
 	*/
 	public function shopModule(Request $request){
 			$data = json_decode($request->getContent(), true);
