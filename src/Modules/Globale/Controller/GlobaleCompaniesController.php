@@ -361,4 +361,78 @@ class GlobaleCompaniesController extends Controller
 	  }else return new JsonResponse(["results"=>[],"pagination"=>["more"=>true]]);
 
 	}
+
+	/**
+	* @Route("/api/global/shop/module", name="shopModule")
+	*/
+	public function shopModule(Request $request){
+			$data = json_decode($request->getContent(), true);
+
+			//Generate signature
+			$signature = base64_encode(hash_hmac('sha256', $request->getContent(), 'sT/hta:RoaR~9<SM|F|*{S;22b,2@~r7n$RUJV-di6l|Tb[6:y', true));
+			$headers = $request->headers->all();
+			if(!isset($headers["x-wc-webhook-signature"])) return new JsonResponse(["result"=>-1]);
+			if($signature!=$headers["x-wc-webhook-signature"][0]) return new JsonResponse(["result"=>-1]);
+
+			$repository=$this->getDoctrine()->getRepository(GlobaleCompanies::class);
+			$countriesRepository=$this->getDoctrine()->getRepository(GlobaleCountries::class);
+			$currenciesRepository=$this->getDoctrine()->getRepository(GlobaleCurrencies::class);
+			$companyCif=null;
+			$companyDomain=null;
+			$companyName=null;
+			$orderId=$data["id"];
+			//Search company's domain
+			if(isset($data["meta_data"])){
+				foreach($data["meta_data"] as $item){
+					if($item["key"]=="billing_cif") $companyCif=$item["value"];
+						elseif ($item["key"]=="billing_domain") $companyDomain=$item["value"];
+							elseif ($item["key"]=="billing_company") $companyName=$item["value"];
+				}
+			}
+			if($companyDomain==null) return new JsonResponse(["result"=>0]);
+			$company=$repository->findOneBy(["domain"=>$companyDomain]);
+			if($company){ //Company already exists
+				//TODO: At the moment do nothing in this point. In the future activate or deactivate modules to the company
+			}else{ //New company
+				$company=new GlobaleCompanies();
+				$company->setVat($companyCif);
+				$company->setDomain($companyDomain);
+				$company->setName($companyName);
+				$company->setSocialname($companyName);
+				$company->setAddress($data["billing"]["address_1"]);
+				$company->setCity($data["billing"]["city"]);
+				//$company->setState();
+				$company->setPostcode($data["billing"]["postcode"]);
+				$company->setPhone($data["billing"]["phone"]);
+				$country=$countriesRepository->findOneBy(["name"=>"España"]);
+				$company->setCountry($country); //TODO: Detect de country, at the moment only Spain
+				$currency=$currenciesRepository->findOneBy(["name"=>"Euro"]);
+				$company->setCurrency($currency); //TODO: Detect de currency, at the moment only EUR
+				$company->setDateupd(new \DateTime());
+				$company->setDateadd(new \DateTime());
+				$company->setActive(1);
+				$company->setDeleted(0);
+				$company->preProccess($this, $this->getDoctrine(), null);
+				$this->getDoctrine()->getManager()->persist($company);
+				$this->getDoctrine()->getManager()->flush();
+				$company->postProccess($this->get('kernel'), $this->getDoctrine(), null);
+			}
+			//TODO: Call api method to change state of the order
+			//Change order status to completed
+			$ch = curl_init("https://www.aplicode.com/wp-json/wc/v3/orders/".$orderId);
+			curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+			curl_setopt($ch, CURLOPT_HEADER, 1);
+			curl_setopt($ch, CURLOPT_USERPWD, 'ck_8648d848ad674ea24154a1b446e19780086bd79e' . ":" . 'cs_2a3ed8eeb5bd1c55c9f9cf9b59f9877c04f47c37');
+			curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+			curl_setopt($ch, CURLOPT_POST, 1);
+			curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(["status"=>"completed"]));
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+			$return = curl_exec($ch);
+			curl_close($ch);
+
+			return new JsonResponse(["result"=>$return]);
+			//return new JsonResponse($request->headers->all());
+			//$request->headers->all();
+	}
+
 }
