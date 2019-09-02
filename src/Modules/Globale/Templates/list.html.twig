@@ -74,7 +74,7 @@
 								data=formatted;
 							 },0);
 							 $("#{{ listConstructor.id }}-footer").show();
-							$(this.footer()).html(data);
+							$(this.footer()).html((typeof data!='string'?(Math.round(data*100)/100):data));
 						});
 					},
 					"columnDefs": [

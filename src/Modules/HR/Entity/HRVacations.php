@@ -74,7 +74,7 @@ class HRVacations
     private $deleted;
 
     /**
-     * @ORM\Column(type="integer", nullable=true)
+     * @ORM\Column(type="float", nullable=true)
      */
     private $days;
 
@@ -82,6 +82,11 @@ class HRVacations
      * @ORM\Column(type="datetime", nullable=true)
      */
     private $requestdate;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    private $hourslastday=0;
 
     public function getId(): ?int
     {
@@ -220,7 +225,7 @@ class HRVacations
         return $this;
     }
 
-    public function getDays(): ?int
+    public function getDays(): ?float
     {
       if ($this->days==null){
         $today=new \DateTime();
@@ -228,7 +233,7 @@ class HRVacations
        }else return $this->days;
     }
 
-    public function setDays(?int $days): self
+    public function setDays(?float $days): self
     {
         $this->days = $days;
         return $this;
@@ -248,6 +253,28 @@ class HRVacations
     public function preProccess($kernel, $doctrine, $user){
       $date_end=clone $this->getEnd();
       $date_start=clone $this->getStart();
-      if($this->end!=null) $this->days = ($date_end->add(new \DateInterval('PT24H')))->diff($date_start)->format('%a');
+      if($this->end!=null){
+        $this->days = ($date_end->add(new \DateInterval('PT24H')))->diff($date_start)->format('%a');
+
+        //Hours
+        if($this->hourslastday!=null || $this->hourslastday){
+          //TODO: calculate daily hours of workers
+          $journey=8.5;
+          $partial_journey=1-round($this->hourslastday/$journey,2);
+          $this->days -= $partial_journey;
+        }
+      }
+    }
+
+    public function getHourslastday(): ?float
+    {
+        return $this->hourslastday;
+    }
+
+    public function setHourslastday(?float $hourslastday): self
+    {
+        $this->hourslastday = $hourslastday;
+
+        return $this;
     }
 }
