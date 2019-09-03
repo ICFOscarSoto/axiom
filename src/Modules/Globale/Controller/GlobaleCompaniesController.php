@@ -389,14 +389,14 @@ class GlobaleCompaniesController extends Controller
 							elseif ($item["key"]=="billing_company") $companyName=$item["value"];
 				}
 			}
-			if($companyDomain==null) return new JsonResponse(["result"=>0]);
+			//if($companyDomain==null) return new JsonResponse(["result"=>0]);
 			$company=$repository->findOneBy(["domain"=>$companyDomain]);
 			if($company){ //Company already exists
 				//TODO: At the moment do nothing in this point. In the future activate or deactivate modules to the company
 			}else{ //New company
 				$company=new GlobaleCompanies();
 				$company->setVat($companyCif);
-				$company->setDomain($companyDomain);
+				$company->setDomain(($companyDomain==null || $companyDomain=="")?preg_replace('/[^a-zA-Z0-9]/', '', $companyName):$companyDomain);
 				$company->setName($companyName);
 				$company->setSocialname($companyName);
 				$company->setAddress($data["billing"]["address_1"]);
