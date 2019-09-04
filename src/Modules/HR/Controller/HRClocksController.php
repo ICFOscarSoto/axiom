@@ -24,11 +24,17 @@ use App\Modules\HR\Entity\HRClocks;
 use App\Modules\HR\Entity\HRWorkers;
 use App\Modules\HR\Entity\HRWorkCenters;
 use App\Modules\HR\Entity\HRDepartments;
+use App\Modules\HR\Entity\HRVacations;
+use App\Modules\HR\Entity\HRSickleaves;
+use App\Modules\HR\Entity\HRHollidays;
+
 use App\Modules\HR\Reports\HRClocksReports;
 use App\Modules\Globale\Entity\GlobaleNotifications;
 use App\Modules\Globale\Config\GlobaleConfigVars;
 use App\Modules\Globale\Controller\GlobaleFirebaseDevicesController;
 use App\Modules\Globale\Entity\GlobaleHistories;
+
+
 class HRClocksController extends Controller
 {
 
@@ -444,8 +450,22 @@ class HRClocksController extends Controller
 		$locale = $request->getLocale();
 		$this->router = $router;
 		$manager = $this->getDoctrine()->getManager();
+		$vacationsRepository=$manager->getRepository(HRVacations::class);
+    $sickleaveRepository=$manager->getRepository(HRSickleaves::class);
+    $hollidaysRepository=$manager->getRepository(HRHollidays::class);
+    $workerRepository=$manager->getRepository(HRWorkers::class);
 		$repository = $manager->getRepository($this->class);
-		return new JsonResponse($repository->findWorkersClocks($user->getCompany()));
+		$workersClocks=$repository->findWorkersClocks($user->getCompany());
+		foreach($workersClocks as $key=>$item){
+			$vacation=$vacationsRepository->dayVacations($workerRepository->find($item["workerid"]), date ("Y-m-d"));
+			$workersClocks[$key]["vacation"]=$vacation?$vacation["type"]:0;
+			$sickleave=$sickleaveRepository->daySickleave($workerRepository->find($item["workerid"]), date ("Y-m-d"));
+			$workersClocks[$key]["sickleave"]=$sickleave?$sickleave["type"]:0;
+			$holliday=$hollidaysRepository->dayHolliday($workerRepository->find($item["workerid"]), date ("Y"), date ("Y-m-d"));
+			$workersClocks[$key]["holliday"]=$holliday?$holliday["type"]:0;
+			$workersClocks[$key]["holliday_name"]=$holliday?$holliday["name"]:null;
+		}
+		return new JsonResponse($workersClocks);
 	}
 
 		/**

@@ -54,8 +54,8 @@
 							<div class="icon"><i class="entypo-user"></i></div>
 							<div class="num" id="worker-img-{{clock.workerid}}"><img src="{{url('getImage',{'id': clock.workerid, 'type': 'workers', 'size': 'thumb'}) }}" alt="" class="img-circle" width="80" height="80"/></div>
 							<h3 id="worker-name-{{clock.workerid}}">{{clock.lastname}}, {{clock.name}}</h3>
-							<p>Entrada: <b><span id="worker-start-{{clock.workerid}}">{{clock.start}}</span></b></p>
-							<p>Salida: <b><span id="worker-end-{{clock.workerid}}">{{clock.end}}</span></b> </p>
+							<p><span id="worker-start-label-{{clock.workerid}}">Entrada: </span><b><span id="worker-start-{{clock.workerid}}">{{clock.start}}</span></b></p>
+							<p><span id="worker-end-label-{{clock.workerid}}">Salida: </span><b><span id="worker-end-{{clock.workerid}}">{{clock.end}}</span></b> </p>
 						</div>
 					</div>
 				</a>
@@ -73,7 +73,7 @@
 			$('#form_departments').on('change', function() {
 				location.href=location.pathname+"?workcenter="+$("#form_workcenters").val()+"&department="+this.value;
 			});
-
+			clocksRefresh();
 
 			window.setInterval(function(){
 				if(flagRefresh){
@@ -84,10 +84,43 @@
 			function clocksRefresh(){
 				$.getJSON("{{url('clocksstatuslist')}}", function( data ) {
 					 $.each( data, function( key, val ) {
-						 if(val.start==null || val.end!=null){ $("#clock-"+val.workerid).addClass('tile-gray'); $("#clock-"+val.workerid).removeClass('tile-green');}
-						 	else {$("#clock-"+val.workerid).addClass('tile-green'); $("#clock-"+val.workerid).removeClass('tile-gray');}
-							$("#worker-start-"+val.workerid).text((val.start!=null)?val.start:'Sin entrada registrada');
-							$("#worker-end-"+val.workerid).text((val.end!=null)?val.end:'Sin salida registrada');
+						 if(val.start==null || val.end!=null){
+							 if(val.vacation || val.sickleave || val.holliday){
+								$("#worker-start-label-"+val.workerid).text('');
+								$("#worker-end-label-"+val.workerid).text('');
+								if(val.vacation){
+									$("#clock-"+val.workerid).addClass('tile-aqua'); $("#clock-"+val.workerid).removeClass('tile-green'); $("#clock-"+val.workerid).removeClass('tile-gray'); $("#clock-"+val.workerid).removeClass('tile-primary');
+									$("#worker-start-"+val.workerid).text('Vacaciones');
+									$("#worker-end-"+val.workerid).html('&nbsp;');
+
+								}else{
+									if(val.sickleave){
+										$("#clock-"+val.workerid).addClass('tile-tile-primary'); $("#clock-"+val.workerid).removeClass('tile-green'); $("#clock-"+val.workerid).removeClass('tile-gray'); $("#clock-"+val.workerid).removeClass('tile-aqua');
+										$("#worker-start-"+val.workerid).text('Baja laboral');
+										$("#worker-end-"+val.workerid).html('&nbsp;');
+									}else{
+										if(val.holliday){
+											$("#clock-"+val.workerid).addClass('tile-aqua'); $("#clock-"+val.workerid).removeClass('tile-green'); $("#clock-"+val.workerid).removeClass('tile-gray');$("#clock-"+val.workerid).removeClass('tile-primary');
+											$("#worker-start-"+val.workerid).text('Festivo:');
+											$("#worker-end-"+val.workerid).text(val.holliday_name);
+										}
+									}
+								}
+							 }else{
+								$("#clock-"+val.workerid).addClass('tile-gray'); $("#clock-"+val.workerid).removeClass('tile-green'); $("#clock-"+val.workerid).removeClass('tile-aqua');$("#clock-"+val.workerid).removeClass('tile-primary');
+								$("#worker-start-"+val.workerid).text((val.start!=null)?val.start:'Sin entrada registrada');
+								$("#worker-end-"+val.workerid).text((val.end!=null)?val.end:'Sin salida registrada');
+								$("#worker-start-label-"+val.workerid).text('');
+								$("#worker-end-label-"+val.workerid).text('');
+							 }
+						 	}else{
+								$("#worker-start-label-"+val.workerid).text('Entrada: ');
+								$("#worker-end-label-"+val.workerid).text('Salida: ');
+								$("#clock-"+val.workerid).addClass('tile-green'); $("#clock-"+val.workerid).removeClass('tile-gray'); $("#clock-"+val.workerid).removeClass('tile-aqua');
+								$("#worker-start-"+val.workerid).text((val.start!=null)?val.start:'Sin entrada registrada');
+								$("#worker-end-"+val.workerid).text((val.end!=null)?val.end:'Sin salida registrada');
+							}
+
 					 });
 				}).always(function() {
 					flagRefresh=true;

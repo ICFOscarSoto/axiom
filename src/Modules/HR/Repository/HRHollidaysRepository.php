@@ -23,7 +23,7 @@ class HRHollidaysRepository extends ServiceEntityRepository
       $query="SELECT h.name, h.type FROM hrhollidays h
             	LEFT JOIN hrwork_calendars c ON h.calendar_id=c.id
             	LEFT JOIN hrwork_calendar_groups g ON c.workcalendargroup_id=g.id
-            	WHERE c.YEAR=:year AND DATE(h.DATE)=:date AND g.id=:calendar";
+            	WHERE c.YEAR=:year AND DATE(h.DATE)=:date AND g.id=:calendar AND h.deleted=0 AND h.active=1";
       if($worker->getWorkcalendarGroup()==null) return null;
       $params=['year' => $year,'calendar' => $worker->getWorkcalendarGroup()->getId(), 'date' => $day];
       return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetch();
