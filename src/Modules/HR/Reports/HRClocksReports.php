@@ -78,6 +78,8 @@ class HRClocksReports
     $clocksRepository=$doctrine->getRepository(HRClocks::class);
     $vacationsRepository=$doctrine->getRepository(HRVacations::class);
     $sickleaveRepository=$doctrine->getRepository(HRSickleaves::class);
+    $hollidaysRepository=$doctrine->getRepository(HRHollidays::class);
+
     foreach($params["ids"] as $id){
       $this->worker=$workersRepository->findOneBy(["id"=>$id, "company"=>$this->user->getCompany()]);
       if(!$this->worker) continue;
@@ -97,29 +99,33 @@ class HRClocksReports
         $vacation_literals=array("", "Vacaciones", "Permiso", "Asuntos propios", "Excedencia");
         $sickleave=$sickleaveRepository->daySickleave($this->worker, $params['year'].'-'.sprintf("%02d", $params["month"]).'-'.sprintf("%02d", $i));
         $sickleave_literals=array("", "BAJA C.COMÚN", "BAJA C.PROFESIONAL");
-
+        $holliday=$hollidaysRepository->dayHolliday($this->worker, $params['year'], $params['year'].'-'.sprintf("%02d", $params["month"]).'-'.sprintf("%02d", $i));
+        $holliday_literals=array("", "NACIONAL", "AUTONÓMICO", "LOCAL");
         foreach($rows as $row){
           $totalTime+=$row["time"];
           $data[]=[sprintf("%02d", $i)."/".sprintf("%02d", $params["month"])."/".$params["year"],$row["start"],$row["end"],gmdate("H:i:s", $row["time"]),$row["invalid"]!=0?"*INCIDENCIA. ".$row["observations"]:$row["observations"]];
-
         }
         $start=" - ";
         $end=" - ";
         $hours=0;
         $observations="";
-        if($vacation){
+        if($holliday){
+          $start=" ------------------------ ";
+          $observations=strtoupper("F. ".$holliday_literals[$holliday["type"]].": ".$holliday["name"]);
+          $end=" ------------------------ ";
+          $hours=" --------------------------- ";
+        }elseif($vacation){
           $start=" ------------------------ ";
           $observations=strtoupper($vacation_literals[$vacation["type"]]);
           $end=" ------------------------ ";
           $hours=" --------------------------- ";
-        }else{
-          if($sickleave){
+        }elseif($sickleave){
             $start=" ------------------------ ";
             $observations=strtoupper($sickleave_literals[$sickleave["type"]].": ".$sickleave["name"]);
             $end=" ------------------------ ";
             $hours=" --------------------------- ";
-          }
         }
+
         if(count($rows)==0) $data[]=[sprintf("%02d", $i)."/".sprintf("%02d", $params["month"])."/".$params["year"],$start,$end,$hours,$observations];
       }
       $this->pdf->image_path=$params["rootdir"].DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$params["user"]->getCompany()->getId().DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'company'.DIRECTORY_SEPARATOR;
