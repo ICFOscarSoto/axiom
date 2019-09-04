@@ -1,11 +1,17 @@
 <?php
 
 namespace App\Modules\HR\Entity;
+/*
+IMPORTANT: THIS CLASS ORIGINALY WAS THE HEAD OF THE RELATION.
+           THE FIELDS NAME, CITY WAS MOVED TO HEAD HRWorkCalendarGroups BUT IT WAS LEAVED HERE FOR COMPATIBILITY
+           THE FIELD WorkCalendarGroup was added.
 
+*/
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
+use \App\Modules\HR\Entity\HRWorkCalendarGroups;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\HR\Repository\HRWorkCalendarsRepository")
@@ -26,17 +32,17 @@ class HRWorkCalendars
     private $company;
 
     /**
-     * @ORM\Column(type="string", length=150)
+     * @ORM\Column(type="string", length=150, nullable=true)
      */
     private $name;
 
     /**
-     * @ORM\Column(type="string", length=70)
+     * @ORM\Column(type="string", length=70, nullable=true)
      */
     private $city;
 
     /**
-     * @ORM\Column(type="string", length=4)
+     * @ORM\Column(type="integer")
      */
     private $year;
 
@@ -68,6 +74,11 @@ class HRWorkCalendars
      * @ORM\OneToMany(targetEntity="App\Modules\HR\Entity\HRHollidays", mappedBy="calendar")
      */
     private $holidays;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\HR\Entity\HRWorkCalendarGroups")
+     */
+    private $workcalendargroup;
 
     public function __construct()
     {
@@ -128,12 +139,12 @@ class HRWorkCalendars
         return $this;
     }
 
-    public function getYear(): ?string
+    public function getYear(): ?int
     {
         return $this->year;
     }
 
-    public function setYear(string $year): self
+    public function setYear(int $year): self
     {
         $this->year = $year;
 
@@ -215,6 +226,18 @@ class HRWorkCalendars
                 $holiday->setCalendar(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getWorkcalendargroup(): ?HRWorkCalendarGroups
+    {
+        return $this->workcalendargroup;
+    }
+
+    public function setWorkcalendargroup(?HRWorkCalendarGroups $workcalendargroup): self
+    {
+        $this->workcalendargroup = $workcalendargroup;
 
         return $this;
     }

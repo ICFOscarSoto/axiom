@@ -23,6 +23,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use App\Modules\HR\Utils\HRWorkersUtils;
 use App\Modules\HR\Utils\HRWorkCalendarsUtils;
 use App\Modules\HR\Entity\HRWorkCalendars;
+use App\Modules\HR\Entity\HRWorkCalendarGroups;
 
 class HRWorkCalendarsController extends Controller
 {
@@ -31,9 +32,9 @@ class HRWorkCalendarsController extends Controller
    private $utilsClass=HRWorkCalendarsUtils::class;
 
    /**
-    * @Route("/{_locale}/HR/workcalendars", name="workcalendars")
+    * @Route("/{_locale}/HR/{id}/workcalendars", name="workcalendars", defaults={"id"=0})
     */
-   public function workcalendars(RouterInterface $router,Request $request)
+   public function workcalendars($id, RouterInterface $router,Request $request)
    {
    $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
    //$this->denyAccessUnlessGranted('ROLE_ADMIN');
@@ -43,20 +44,22 @@ class HRWorkCalendarsController extends Controller
    $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
    $utils = new $this->utilsClass();
    $formUtils=new GlobaleFormUtils();
-   $formUtils->initialize($this->getUser(), new HRWorkCalendars(), dirname(__FILE__)."/../Forms/WorkCalendars.json", $request, $this, $this->getDoctrine());
-   $templateLists[]=$utils->formatList($this->getUser());
+   $formUtils->initialize($this->getUser(), new HRWorkCalendars(), dirname(__FILE__)."/../Forms/WorkCalendars.json", $request, $this, $this->getDoctrine(),["workcalendargroup"]);
+   $templateLists[]=$utils->formatList($this->getUser(), $id);
    //$templateForms[]=$formUtils->formatForm('workcalendars', true);
-   $templateForms[]=$formUtils->formatForm('workcalendars', true, null, $this->class);
+   $templateForms[]=$formUtils->formatForm('workcalendars', true, $id, $this->class, null);
    if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
      return $this->render('@Globale/genericlist.html.twig', [
        'controllerName' => 'HRController',
        'interfaceName' => 'Calendarios laborales',
-       'optionSelected' => $request->attributes->get('_route'),
+       'optionSelected' => 'genericindex',
+			 'optionSelectedParams' => ["module"=>"HR", "name"=>"WorkCalendarGroups"],
        'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
-       'breadcrumb' =>  $menurepository->formatBreadcrumb($request->get('_route')),
+       'breadcrumb' =>  $menurepository->formatBreadcrumb('genericindex','HR','WorkCalendarGroups'),
        'userData' => $userdata,
        'lists' => $templateLists,
-       'forms' => $templateForms
+       'forms' => $templateForms,
+			 'entity_id' => $id,
        ]);
    }
    return new RedirectResponse($this->router->generate('app_login'));
@@ -64,7 +67,7 @@ class HRWorkCalendarsController extends Controller
 
    /**
     * @Route("/api/HR/workcalendars/list", name="workcalendarslist")
-    */
+   */
    public function workcalendarslist(RouterInterface $router,Request $request){
      $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
      $user = $this->getUser();
@@ -79,15 +82,19 @@ class HRWorkCalendarsController extends Controller
    }
 
 	 /**
-	  * @Route("/{_locale}/HR/workcalendars/data/{id}/{action}", name="dataWorkCalendars", defaults={"id"=0, "action"="read"})
+	  * @Route("/{_locale}/HR/workcalendars/{entity}/data/{id}/{action}", name="dataWorkCalendars", defaults={"id"=0, "action"="read"})
 	  */
-	  public function data($id, $action, Request $request){
+	  public function data($entity,$id, $action, Request $request){
 	 	$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 	 	$this->denyAccessUnlessGranted('ROLE_ADMIN');
 	 	$template=dirname(__FILE__)."/../Forms/WorkCalendars.json";
 	 	$utils = new GlobaleFormUtils();
-	 	$utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine());
-	 	return $utils->make($id, $this->class, $action, "formWorkCalendar", "modal");
+		$obj=new $this->class();
+		$calendarGroupsRepository = $this->getDoctrine()->getManager()->getRepository(HRWorkCalendarGroups::class);
+		$calendargroup=$calendarGroupsRepository->findOneBy(["id"=>$entity, "company"=>$this->getUser()->getCompany()]);
+	 	$utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),[],[],null,["entity"=>$entity]);
+		$utils->values(["workcalendargroup"=>$calendargroup]);
+		return $utils->make($id, $this->class, $action, "formWorkCalendar", "modal");
 	 }
 
   /**

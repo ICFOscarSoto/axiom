@@ -166,6 +166,9 @@ WorkCenters: Centros de trabajo
 Work center data: Datos del centro de trabajo
 Select hrworkcenters: Seleccionar centro trabajo
 Select a user...: Seleccionar usuario
+Select a status...: Seleccionar estado laboral
+Workcalendargroup: Calendario Laboral
+Select hrworkcalendargroups: Seleccionar calendario laboral
 # HOLLIDAYS
 #----------------------------------------------------------------------------------------------------------------------
 Holliday data: "Datos festivo"

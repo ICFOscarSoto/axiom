@@ -8,6 +8,7 @@ use \App\Modules\Globale\Entity\GlobaleCountries;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
 use \App\Modules\HR\Entity\HRDepartments;
 use \App\Modules\HR\Entity\HRWorkCenters;
+use \App\Modules\HR\Entity\HRWorkCalendarGroups;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\HR\Repository\HRWorkerRepository")
@@ -172,6 +173,11 @@ class HRWorkers
     * @ORM\JoinColumn(onDelete="SET NULL")
     */
    private $workcenters;
+
+   /**
+    * @ORM\ManyToOne(targetEntity="\App\Modules\HR\Entity\HRWorkCalendarGroups")
+    */
+   private $workcalendargroup;
 
     public function getId(): ?int
     {
@@ -531,6 +537,18 @@ class HRWorkers
     public function setWorkcenters(?HRWorkCenters $workcenters): self
     {
         $this->workcenters = $workcenters;
+
+        return $this;
+    }
+
+    public function getWorkcalendargroup(): ?HRWorkCalendarGroups
+    {
+        return $this->workcalendargroup;
+    }
+
+    public function setWorkcalendargroup(?HRWorkCalendarGroups $workcalendargroup): self
+    {
+        $this->workcalendargroup = $workcalendargroup;
 
         return $this;
     }

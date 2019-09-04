@@ -325,7 +325,7 @@ class HRClocksController extends Controller
 			 $params=["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "ids"=>$ids, "user"=>$this->getUser(), "year"=>$year, "month"=>$month];
 			 $reportsUtils = new HRClocksReports();
 			 $pdf=$reportsUtils->create($params);
-			 return new Response($merge->output(), 200, array('Content-Type' => 'application/pdf'));
+			 return new Response("", 200, array('Content-Type' => 'application/pdf'));
  		 }
 
 		  /**

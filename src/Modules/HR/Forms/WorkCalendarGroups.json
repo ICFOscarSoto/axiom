@@ -1,0 +1,11 @@
+[{"name":"Calendario laboral",
+	"sections": [
+		{
+			"name": "Datos calendario laboral",
+			"fields": [
+  				{ "name": "name", "cols": 12},
+  				{	"name": "city", "cols": 7},
+  				{	"name": "active", "cols": 2}
+			]
+		}]
+}]

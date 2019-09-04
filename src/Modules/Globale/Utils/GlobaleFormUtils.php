@@ -30,7 +30,7 @@ class GlobaleFormUtils extends Controller
   private $excludedAttributes;
   private $includedAttributes;
   private $template;
-  private $templateArray;
+  public $templateArray;
   private $transforms=array();
   private $form;
   private $values=array();
@@ -107,12 +107,16 @@ class GlobaleFormUtils extends Controller
             case 'datetime':
               //Check if has a template types
               $field=$this->searchTemplateField($value['fieldName']);
+              $attr=[];
+              if(isset($field["minDate"])) $attr["minDate"]=$field["minDate"];
+              if(isset($field["maxDate"])) $attr["maxDate"]=$field["maxDate"];
+
               if(isset($field["type"])){
                 if($field["type"]=="date")
-                  $form->add($value['fieldName'], DateType::class, ['required' => !$value["nullable"], 'widget' => 'single_text', 'format' => 'dd/MM/yyyy', 'attr' => ['class' => 'datepicker']]);
+                  $form->add($value['fieldName'], DateType::class, ['required' => !$value["nullable"], 'widget' => 'single_text', 'format' => 'dd/MM/yyyy', 'attr' => array_merge(['class' => 'datepicker'],$attr)]);
                 if($field["type"]=="time")
-                  $form->add($value['fieldName'], DateType::class, ['required' => !$value["nullable"], 'widget' => 'single_text', 'format' => 'HH:mm:ss', 'attr' => ['class' => 'timepicker']]);
-              }else $form->add($value['fieldName'], DateTimeType::class, ['required' => !$value["nullable"], 'widget' => 'single_text', 'format' => 'dd/MM/yyyy kk:mm:ss', 'attr' => ['class' => 'datetimepicker']]);
+                  $form->add($value['fieldName'], DateType::class, ['required' => !$value["nullable"], 'widget' => 'single_text', 'format' => 'HH:mm:ss', 'attr' => array_merge(['class' => 'timepicker'],$attr)]);
+              }else $form->add($value['fieldName'], DateTimeType::class, ['required' => !$value["nullable"], 'widget' => 'single_text', 'format' => 'dd/MM/yyyy kk:mm:ss', 'attr' => array_merge(['class' => 'datetimepicker'],$attr)]);
             break;
             case 'json':
               $form->add($value['fieldName'], TextType::class, ['required' => !$value["nullable"], 'attr'=>['class' => 'tagsinput']]);

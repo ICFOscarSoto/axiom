@@ -1,5 +1,5 @@
 [
-  {"id" : "addTop", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"dataWorkCalendars", "modal":"workcalendars", "actionType" : "background", "confirm" :false, "tooltip" : "Crear nuevo calendario"},
+  {"id" : "addTop", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"dataWorkCalendars", "routeParams":{"entity":"entity_id"}, "modal":"workcalendars", "actionType" : "background", "confirm" :false, "tooltip" : "Crear nuevo calendario"},
   {"id" : "deleteTop", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"deleteWorkCalendar", "actionType" : "background", "confirm" :true},
   {"id" : "printTop", "type" : "", "icon" : "fa fa-print","name" : "", "route":"printWorkCalendars",  "addSearch":true, "confirm" :false},
   {"id" : "exportTop", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"exportWorkCalendars",  "addSearch":true, "confirm" :false}

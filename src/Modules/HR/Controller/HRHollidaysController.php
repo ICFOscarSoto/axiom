@@ -57,11 +57,13 @@ if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
   return $this->render('@HR/listhollidays.html.twig', [
     'controllerName' => 'HRController',
     'interfaceName' => 'Calendario laboral '.$workCalendar->getName(),
-    'optionSelected' => 'workcalendars',
+    'optionSelected' => 'genericindex',
+    'optionSelectedParams' => ["module"=>"HR", "name"=>"WorkCalendarGroups"],
     'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
-    'breadcrumb' => 'workcalendars',
+    'breadcrumb' =>  $menurepository->formatBreadcrumb('genericindex','HR','WorkCalendarGroups'),
     'userData' => $userdata,
     'id' => $id,
+    'year' => $workCalendar->getYear(),
     'listConstructor' => ['topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/HolidaysTopButtons.json"),true)],
     'form' => $templateForm,
     'include_header' => [["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker-es.js"]],
@@ -83,7 +85,14 @@ return new RedirectResponse($this->router->generate('app_login'));
  $workCalendarRepository=$this->getDoctrine()->getRepository(HRWorkCalendars::class);
  $workCalendar=$workCalendarRepository->find($this->get('session')->get('calendarId'));
  $utils = new GlobaleFormUtils();
+ $templateArray=json_decode(file_get_contents($template),true);
+ //dump($templateArray);
+ dump($templateArray[0]["sections"][0]["fields"][2]);
+ $templateArray[0]["sections"][0]["fields"][2]["minDate"]=$workCalendar->getYear()."-01-01";
+ $templateArray[0]["sections"][0]["fields"][2]["maxDate"]=$workCalendar->getYear()."-12-31";
+ //$template=json_encode($template);
  $utils->initialize($this->getUser(), new HRHollidays(), $template, $request, $this, $this->getDoctrine(),["calendar"]);
+ $utils->templateArray=$templateArray;
  $utils->values(["calendar"=>$workCalendar]);
  return $utils->make($id, HRHollidays::class, $action, "formHollidays", "modal");
 }
