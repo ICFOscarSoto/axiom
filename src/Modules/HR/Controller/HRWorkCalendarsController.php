@@ -92,7 +92,7 @@ class HRWorkCalendarsController extends Controller
 		$obj=new $this->class();
 		$calendarGroupsRepository = $this->getDoctrine()->getManager()->getRepository(HRWorkCalendarGroups::class);
 		$calendargroup=$calendarGroupsRepository->findOneBy(["id"=>$entity, "company"=>$this->getUser()->getCompany()]);
-	 	$utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),[],[],null,["entity"=>$entity]);
+	 	$utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),["workcalendargroup"],[],null,["entity"=>$entity]);
 		$utils->values(["workcalendargroup"=>$calendargroup]);
 		return $utils->make($id, $this->class, $action, "formWorkCalendar", "modal");
 	 }

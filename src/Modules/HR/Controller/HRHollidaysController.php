@@ -86,8 +86,6 @@ return new RedirectResponse($this->router->generate('app_login'));
  $workCalendar=$workCalendarRepository->find($this->get('session')->get('calendarId'));
  $utils = new GlobaleFormUtils();
  $templateArray=json_decode(file_get_contents($template),true);
- //dump($templateArray);
- dump($templateArray[0]["sections"][0]["fields"][2]);
  $templateArray[0]["sections"][0]["fields"][2]["minDate"]=$workCalendar->getYear()."-01-01";
  $templateArray[0]["sections"][0]["fields"][2]["maxDate"]=$workCalendar->getYear()."-12-31";
  //$template=json_encode($template);
