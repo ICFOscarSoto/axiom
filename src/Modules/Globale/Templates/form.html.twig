@@ -175,8 +175,8 @@ return blob;
         tooltips: spanish_tooltips_datetimepicker,
     		date: (dateField.isValid())?dateField:null
     	});
-      if($(this).attr("minDate")!="") $(this).data("DateTimePicker").minDate(moment($(this).attr("minDate"), "YYYY-MM-DD"));
-      if($(this).attr("maxDate")!="") $(this).data("DateTimePicker").maxDate(moment($(this).attr("maxDate"), "YYYY-MM-DD"));
+      if($(this).attr("minDate")!="" && typeof $(this).attr("minDate")!==typeof undefined) $(this).data("DateTimePicker").minDate(moment($(this).attr("minDate"), "YYYY-MM-DD"));
+      if($(this).attr("maxDate")!="" && typeof $(this).attr("maxDate")!==typeof undefined) $(this).data("DateTimePicker").maxDate(moment($(this).attr("maxDate"), "YYYY-MM-DD"));
     });
 
     $('.datepicker').each(function(index) {
@@ -190,8 +190,8 @@ return blob;
         tooltips: spanish_tooltips_datetimepicker,
     		date: (dateField.isValid())?dateField:null
     	});
-      if($(this).attr("minDate")!="") $(this).data("DateTimePicker").minDate(moment($(this).attr("minDate"), "YYYY-MM-DD"));
-      if($(this).attr("maxDate")!="") $(this).data("DateTimePicker").maxDate(moment($(this).attr("maxDate"), "YYYY-MM-DD"));
+      if($(this).attr("minDate")!="" && typeof $(this).attr("minDate")!==typeof undefined) $(this).data("DateTimePicker").minDate(moment($(this).attr("minDate"), "YYYY-MM-DD"));
+      if($(this).attr("maxDate")!="" && typeof $(this).attr("maxDate")!==typeof undefined) $(this).data("DateTimePicker").maxDate(moment($(this).attr("maxDate"), "YYYY-MM-DD"));
     });
 
     $('.timepicker').each(function(index) {
