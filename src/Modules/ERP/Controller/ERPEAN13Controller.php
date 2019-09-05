@@ -67,7 +67,6 @@ class ERPEAN13Controller extends Controller
    //$default=$defaultSupplier->findOneBy(['id'=>$supplier->getId()]);
    if($obj->getSupplier()==null) $default=$defaultSupplier->findOneBy(['id'=>$supplier->getId()]);
     else $default=$obj->getSupplier();
-   dump($obj);
    $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "supplier"=>$default, "product"=>$id==0?$product:$obj->getProduct()];
    $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),
                           method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);

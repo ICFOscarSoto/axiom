@@ -219,15 +219,12 @@ class GlobaleFormUtils extends Controller
 			switch($action){
 				 case 'save':
            //Buscar si existe un proccess dentro del utils de la clase
-           dump($this->obj);
            if($utilsClass!=null && method_exists($utilsClass, 'proccess')){
              $utils=new $utilsClass();
 					   $this->obj=$utils->proccess($form,$this->user,$this->obj,$this->request,$this->entityManager,$this->encoder);
-             dump($this->obj);
            }else{
            //Si no, ejecutamos el process estandar del formutils
 					   $this->obj=$this->proccess2($form,$this->obj);
-             dump($this->obj);
            }
            if(is_bool($this->obj)) $result=false;
             else if ($this->obj->getId()!==FALSE) $result=true;

@@ -74,8 +74,6 @@ class ERPAddressesController extends Controller
 		 	if($type=="supplier") $object = $defaultSupplier->find($identity);
 			if($type=="customer") $object = $defaultCustomer->find($identity);
 		}else $obj = $addressRepository->find($id);
-
-			dump($object);
 			$defaultCountry=$this->getDoctrine()->getRepository(GlobaleCountries::class);
 			$country=$defaultCountry->findOneBy(['name'=>"España"]);
 			$obj->setCountry($country);

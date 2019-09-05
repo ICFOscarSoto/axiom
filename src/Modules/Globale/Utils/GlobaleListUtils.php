@@ -197,7 +197,6 @@ class GlobaleListUtils
     $sql=$query->getQuery()->getSql();
     $params=$query->getQuery()->getParameters();
 		$queryPaginator = $query->getQuery();
-    //dump($params);
 		$records=$queryPaginator->getResult();
 
 		$records=$queryPaginator->getResult();

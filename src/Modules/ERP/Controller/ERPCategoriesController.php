@@ -33,7 +33,6 @@ class ERPCategoriesController extends Controller
     	$utils = new ERPCategoriesUtils();
   		$templateLists[]=$utils->formatList($this->getUser());
 			$obj = $this->getDoctrine()->getRepository($this->class)->getTree($this->getUser());
-			//dump($obj);
 			$formUtils=new GlobaleFormUtils();
 			$formUtils->initialize($this->getUser(), new $this->class(), dirname(__FILE__)."/../Forms/Categories.json", $request, $this, $this->getDoctrine(),["parentid"]);
 			$templateForms[]=$formUtils->formatForm('categories', true, null, $this->class);

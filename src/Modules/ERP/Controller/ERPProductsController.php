@@ -40,7 +40,6 @@ class ERPProductsController extends Controller
   		$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
     	$utils = new ERPProductsUtils();
   		$templateLists[]=$utils->formatList($this->getUser());
-			dump($this->getUser());
 			//$formUtils=new GlobaleFormUtils();
 			//$formUtils->initialize($this->getUser(), new $this->class(), dirname(__FILE__)."/../Forms/Products.json", $request, $this, $this->getDoctrine());
 			//$templateForms[]=$formUtils->formatForm('products', true, null, $this->class);
