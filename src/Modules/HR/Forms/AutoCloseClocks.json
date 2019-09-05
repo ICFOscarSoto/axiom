@@ -1,0 +1,13 @@
+[{
+	"sections": [
+		{
+			"name": "Cierre Automático",
+			"fields": [
+				{	"name": "workcenter", "cols": 4},
+				{	"name": "department", "cols": 8},
+				{	"name": "time",	"type": "time", "cols": 4},
+				{	"name": "active",	"cols": 2}
+			]
+		}
+	]
+}]

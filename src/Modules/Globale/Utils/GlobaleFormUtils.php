@@ -8,6 +8,7 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\TimeType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
@@ -105,6 +106,8 @@ class GlobaleFormUtils extends Controller
         if($this->searchTemplateField($value['fieldName'])!==false){ //Check if field is in template, otherwise skip it
           switch($value['type']){
             case 'datetime':
+            case 'date':
+            case 'time':
               //Check if has a template types
               $field=$this->searchTemplateField($value['fieldName']);
               $attr=[];
@@ -115,7 +118,7 @@ class GlobaleFormUtils extends Controller
                 if($field["type"]=="date")
                   $form->add($value['fieldName'], DateType::class, ['required' => !$value["nullable"], 'widget' => 'single_text', 'format' => 'dd/MM/yyyy', 'attr' => array_merge(['class' => 'datepicker'],$attr)]);
                 if($field["type"]=="time")
-                  $form->add($value['fieldName'], DateType::class, ['required' => !$value["nullable"], 'widget' => 'single_text', 'format' => 'HH:mm:ss', 'attr' => array_merge(['class' => 'timepicker'],$attr)]);
+                  $form->add($value['fieldName'], TimeType::class, ['required' => !$value["nullable"], 'widget' => 'single_text', 'attr' => array_merge(['class' => 'timepicker'],$attr)]);
               }else $form->add($value['fieldName'], DateTimeType::class, ['required' => !$value["nullable"], 'widget' => 'single_text', 'format' => 'dd/MM/yyyy kk:mm:ss', 'attr' => array_merge(['class' => 'datetimepicker'],$attr)]);
             break;
             case 'json':

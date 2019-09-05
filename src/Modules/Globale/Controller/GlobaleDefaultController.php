@@ -121,6 +121,35 @@ class GlobaleDefaultController extends Controller
        return new JsonResponse($return);
      }
 
+
+     /**
+      * @Route("/api/{module}/{name}/generic/{$id}/tablist", name="generictablist", defaults={"id"=0})
+      */
+     public function tablist($module, $name, $id, RouterInterface $router,Request $request){
+       $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+       //$this->denyAccessUnlessGranted('ROLE_ADMIN');
+       $userdata=$this->getUser()->getTemplateData();
+       $locale = $request->getLocale();
+       $this->router = $router;
+       $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
+       $class="\App\Modules\\".$module."\Entity\\".$module.$name;
+       $classUtils="\App\Modules\\".$module."\Utils\\".$module.$name.'Utils';
+       $utils = new $classUtils();
+       $templateLists=$utils->formatList($this->getUser());
+       $formUtils=new GlobaleFormUtils();
+       $formUtils->initialize($this->getUser(), new $class(), dirname(__FILE__)."/../../".$module."/Forms/".$name.".json", $request, $this, $this->getDoctrine());
+       $templateForms[]=$formUtils->formatForm($name, true, null, $class,null,["module"=>$module, "name"=>$name]);
+       if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+         return $this->render('@Globale/list.html.twig', [
+           'listConstructor' => $templateLists,
+           'forms' => $templateForms,
+           'id' => $id
+           ]);
+       }
+       return new RedirectResponse($this->router->generate('app_login'));
+     }
+
+
      /**
       * @Route("/{_locale}/{module}/{name}/generic/export", name="genericexport")
       */
@@ -140,6 +169,9 @@ class GlobaleDefaultController extends Controller
         $result = $utilsExport->export($list,$listFields);
         return $result;
       }
+
+
+
 
       /**
        * @Route("/{_locale}/{module}/{name}/generic/print", name="genericprint")
