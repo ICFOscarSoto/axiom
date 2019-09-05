@@ -5,6 +5,7 @@ namespace App\Modules\HR\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\HR\Entity\HRWorkCenters;
 use \App\Modules\HR\Entity\HRDepartments;
+use \App\Modules\Globale\Entity\GlobaleCompanies;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\HR\Repository\HRAutoCloseClocksRepository")
@@ -35,7 +36,7 @@ class HRAutoCloseClocks
     private $department;
 
     /**
-     * @ORM\Column(type="time")
+     * @ORM\Column(type="string", length=8)
      */
     private $time;
 
@@ -58,6 +59,12 @@ class HRAutoCloseClocks
      * @ORM\Column(type="boolean")
      */
     private $deleted;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCompanies")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $companyown;
 
     public function getId(): ?int
     {
@@ -100,12 +107,12 @@ class HRAutoCloseClocks
         return $this;
     }
 
-    public function getTime(): ?\DateTimeInterface
+    public function getTime(): ?string
     {
         return $this->time;
     }
 
-    public function setTime(\DateTimeInterface $time): self
+    public function setTime(?string $time): self
     {
         $this->time = $time;
 
@@ -156,6 +163,18 @@ class HRAutoCloseClocks
     public function setDeleted(bool $deleted): self
     {
         $this->deleted = $deleted;
+
+        return $this;
+    }
+
+    public function getCompanyown(): ?GlobaleCompanies
+    {
+        return $this->companyown;
+    }
+
+    public function setCompanyown(?GlobaleCompanies $companyown): self
+    {
+        $this->companyown = $companyown;
 
         return $this;
     }

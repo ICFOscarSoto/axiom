@@ -11,8 +11,11 @@ class HRAutoCloseClocksUtils
 {
   private $module="HR";
   private $name="AutoCloseClocks";
+  public $parentClass="\App\Modules\Globale\Entity\GlobaleCompanies";
+  public $parentField="companyown";
+
   public function getExcludedForm($params){
-    return [];
+    return [$this->parentField];
   }
 
   public function getIncludedForm($params){

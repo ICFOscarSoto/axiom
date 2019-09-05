@@ -47,7 +47,7 @@
               +'  <i class="entypo-pencil"></i>'
               +'</div>'
               +'<div class="cbp_tmlabel">'
-              +'  <h2>Editado por {{ history.user.name }} {{ history.user.lastname }}</h2>'
+              +'  <h2>Editado por {% if history.user != null %}{{ history.user.name }} {{ history.user.lastname }}{% else %} el sistema {% endif %}</h2>'
               +'  <p>Cambios realizados: </br>';
               {% for change in history.array_changes %}
                 item+=' - {{ (change.attribute|capitalize)|trans }}: {% if change.oldvalue is not null %}<b>De</b> <i>{{change.oldvalue}}</i>{% endif %} {% if change.newvalue is not null %}<b>A:</b> <i>{{change.newvalue}}</i>{% endif %}</br>';

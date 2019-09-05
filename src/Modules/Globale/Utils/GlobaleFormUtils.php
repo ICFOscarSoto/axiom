@@ -135,6 +135,7 @@ class GlobaleFormUtils extends Controller
             if($field=$this->searchTemplateField($value['fieldName'])){
               if(isset($field["transform"])){
                 switch ($field["transform"]['type']){
+
                   case 'option':
                     $form->add($value['fieldName'], ChoiceType::class, [
                         'choices'  => $field["transform"]['options'],
@@ -146,7 +147,17 @@ class GlobaleFormUtils extends Controller
                     ]);
                   break;
                 }
-              }else $form->add($value['fieldName'],null,['disabled' => isset($field["readonly"])?$field["readonly"]:false, 'attr'=>['readonly' => isset($field["readonly"])?$field["readonly"]:false,'class'=>isset($field["class"])?$field["class"]:'']]);
+              }else{
+                 //There isnt transformation, check types
+                 if(isset($field["type"])){
+                   switch ($field['type']){
+                     case 'time':
+                       $form->add($value['fieldName'], TextType::class, ['required' => !$value["nullable"], 'attr' => ['class' => 'timepicker']]);
+                     break;
+                   }
+                 }else
+                 $form->add($value['fieldName'],null,['disabled' => isset($field["readonly"])?$field["readonly"]:false, 'attr'=>['readonly' => isset($field["readonly"])?$field["readonly"]:false,'class'=>isset($field["class"])?$field["class"]:'']]);
+              }
             }else $form->add($value['fieldName'],null,['disabled' => isset($field["readonly"])?$field["readonly"]:false,'attr'=>['readonly' => isset($field["readonly"])?$field["readonly"]:false,'class'=>isset($field["class"])?$field["class"]:'']]);
             break;
           }
@@ -200,6 +211,7 @@ class GlobaleFormUtils extends Controller
               $this->obj=$repository->findOneBy(['id'=>$id, 'deleted'=>0]);
             }
           }
+
 					if($this->obj===NULL) $this->obj=new $class();
 			}
       $this->obj_old=clone $this->obj;
@@ -207,12 +219,15 @@ class GlobaleFormUtils extends Controller
 			switch($action){
 				 case 'save':
            //Buscar si existe un proccess dentro del utils de la clase
+           dump($this->obj);
            if($utilsClass!=null && method_exists($utilsClass, 'proccess')){
              $utils=new $utilsClass();
 					   $this->obj=$utils->proccess($form,$this->user,$this->obj,$this->request,$this->entityManager,$this->encoder);
+             dump($this->obj);
            }else{
            //Si no, ejecutamos el process estandar del formutils
 					   $this->obj=$this->proccess2($form,$this->obj);
+             dump($this->obj);
            }
            if(is_bool($this->obj)) $result=false;
             else if ($this->obj->getId()!==FALSE) $result=true;

@@ -36,7 +36,6 @@ class GlobaleHistories
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleUsers")
-     * @ORM\JoinColumn(nullable=false)
      */
     private $user;
 

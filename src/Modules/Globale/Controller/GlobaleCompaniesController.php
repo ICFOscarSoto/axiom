@@ -98,7 +98,7 @@ class GlobaleCompaniesController extends Controller
 	 				 'tab' => $request->query->get('tab','data'), //Show initial tab, by default data tab
 	 				 'tabs' => [["name" => "data", "caption"=>"Datos empresa", "icon"=>"entypo-book-open","active"=>true, "route"=>$this->generateUrl("dataCompanyAdmin",["id"=>$id])],
 					 						["name" => "bank", "icon"=>"fa fa-headphones", "caption"=>"Datos bancarios", "route"=>$this->generateUrl("dataMyCompanyBankAccounts",["identity"=>$id,"id"=>$obj?($obj->getBankaccount()?$obj->getBankaccount()->getId():0):0])],
-											["name" => "bank", "icon"=>"fa fa-clocks", "caption"=>"Cierre Jornada", "route"=>$this->generateUrl("generictablist",["module"=>"HR", "name"=>"AutoCloseClocks","id"=>$id])]
+											["name" => "bank", "icon"=>"fa fa-clocks", "caption"=>"Cierre Jornada", "route"=>$this->generateUrl("generictablist",["module"=>"HR", "name"=>"AutoCloseClocks", "id"=>$id])]
 	 									 ],
 	 				 'include_header' => [["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker-es.js"]],
 	 				 'include_footer' => [["type"=>"css", "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.css"],

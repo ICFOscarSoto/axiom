@@ -102,6 +102,34 @@ class GlobaleDefaultController extends Controller
       return $utils->make($id, $class, $action, "form".$name, $type);
    }
 
+   /**
+    * @Route("/{_locale}/{module}/{name}/generic/datatab/{id}/{action}/{idparent}/{type}", name="genericdatatab", defaults={"id"=0, "idparent"="0", "type"="modal", "action"="read"})
+    */
+    public function genericdatatab($id, $idparent, $module, $name, $type, $action, Request $request){
+      $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+      $this->denyAccessUnlessGranted('ROLE_ADMIN');
+      $template=dirname(__FILE__)."/../../".$module."/Forms/".$name.".json";
+      $class="\App\Modules\\".$module."\Entity\\".$module.$name;
+      $utils = new GlobaleFormUtils();
+      $classUtils="\App\Modules\\".$module."\Utils\\".$module.$name.'Utils';
+      $classRepository=$this->getDoctrine()->getRepository($class);
+      if(class_exists($classUtils)){
+        $utilsObj=new $classUtils();
+      }else $utilsObj=new $class(); // define the main class to ensure that a valid object is created and not has getIncludedForm and getExcludedForm
+      $parentRepository=$this->getDoctrine()->getRepository($utilsObj->parentClass);
+      $obj=new $class();
+      if($id==0){
+        if($idparent==0 ) $idparent=$request->query->get('idparent');
+        if($idparent==0 || $idparent==null) $idparent=$request->request->get('id-parent',0);
+        $parent = $parentRepository->find($idparent);
+      }	else $obj = $classRepository->find($id);
+      $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "parent"=>$id==0?$parent:$obj->{"get".ucfirst($utilsObj->parentField)}()];
+      $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),
+        method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[$utilsObj->parentField],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[],null,["module"=>$module, "name"=>$name]);
+      if(isset($parent)) $utils->values([$utilsObj->parentField=>$parent]);
+      return $utils->make($id, $class, $action, "form".$name, $type);
+   }
+
      /**
       * @Route("/api/{module}/{name}/generic/list", name="genericlist")
       */
@@ -123,7 +151,7 @@ class GlobaleDefaultController extends Controller
 
 
      /**
-      * @Route("/api/{module}/{name}/generic/{$id}/tablist", name="generictablist", defaults={"id"=0})
+      * @Route("/api/{module}/{name}/generic/tablist/{id}", name="generictablist", defaults={"id"=0})
       */
      public function tablist($module, $name, $id, RouterInterface $router,Request $request){
        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');

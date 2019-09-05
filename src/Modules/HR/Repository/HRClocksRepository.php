@@ -42,6 +42,17 @@ class HRClocksRepository extends ServiceEntityRepository
       return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
     }
 
+    public function findOpenByCompany($company_id, $workcenter_id=null, $department_id=null){
+        $query="SELECT c.*, w.name, w.lastname FROM hrclocks c
+	               LEFT JOIN hrworkers w ON c.worker_id=w.id
+	               WHERE c.end IS NULL AND (c.invalid <> 1 ) AND c.deleted=0 AND w.company_id=:company_id";
+
+        if($workcenter_id!=null) $query.=" AND w.workcenters_id=:workcenters_id";
+        if($department_id!=null) $query.=" AND w.department_id=:department_id";
+        $params=['company_id' => $company_id, 'workcenters_id' => $workcenter_id, "department_id"=> $department_id];
+        return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+    }
+
 
     public function todayClocks($worker){
       $conn = $this->getEntityManager()->getConnection();
