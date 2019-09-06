@@ -52,3 +52,28 @@
 		$( ".active" ).parents("li").addClass("opened");
 	});
  </script>
+
+{# DISK QUOTA #}
+{% if userData.diskusage is defined %}
+<div style="width: 99%;">
+	<div class="tile-progress tile-default" style="bottom: 0px;">
+		<div class="title menu-expanded" style="padding-bottom: 10px; padding-left:10px">
+				<i class="fa fa-database"></i>
+				<span class="title">Cloud ({{ userData.diskusage.space }} MB)</span>
+		</div>
+		<div class="title menu-collapsed" style="display:none; padding-bottom: 10px; padding-left: 21px;">
+				<i class="fa fa-database"></i>
+		</div>
+		<div class="tile-progressbar">
+		  		<span data-fill="{{ userData.diskusage.free_perc }}%" style="width: {{ userData.diskusage.free_perc }}%;"></span>
+		</div>
+		<div class="tile-footer" style="padding: 10px;">
+			<h4>
+				<span class="menu-expanded">{{ userData.diskusage.free_perc }}% ocupado</span>
+			</h4>
+			<span class="menu-expanded">{{ userData.diskusage.free }}MB Libres</span>
+			<span class="title menu-collapsed" style="display:none; text-align: center;">50MB</span>
+		</div>
+	</div>
+</div>
+{% endif %}

@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\ERP\Entity\ERPBankAccounts;
 use \App\Modules\Globale\Entity\GlobaleUsers;
+use \App\Modules\Globale\Entity\GlobaleDiskUsages;
 use \App\Modules\Globale\Entity\GlobaleAgents;
 
 /**
@@ -116,6 +117,11 @@ class GlobaleCompanies
     private $menuOptions;
 
     /**
+     * @ORM\OneToMany(targetEntity="App\Modules\Globale\Entity\GlobaleDiskUsages", mappedBy="company")
+     */
+    private $diskUsages;
+
+    /**
      * @ORM\Column(type="string", length=150)
      */
     private $domain;
@@ -144,14 +150,16 @@ class GlobaleCompanies
      * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleAgents")
      */
     private $agent;
+
+
 	public function __construct()
-                                                                  {
-                                                                      $this->userGroups = new ArrayCollection();
-                                                                      $this->users = new ArrayCollection();
-                                                                      $this->menuOptions = new ArrayCollection();
-                                                                      $this->dateadd = new \Datetime();
-                                                                      $this->dateupd =  new \Datetime();
-                                                                  }
+    {
+        $this->userGroups = new ArrayCollection();
+        $this->users = new ArrayCollection();
+        $this->menuOptions = new ArrayCollection();
+        $this->dateadd = new \Datetime();
+        $this->dateupd =  new \Datetime();
+    }
 
     public function getId(): ?int
     {
@@ -382,6 +390,14 @@ class GlobaleCompanies
         return $this->menuOptions;
     }
 
+    /**
+     * @return Collection|MenuOptions[]
+     */
+    public function getDiskUsages(): Collection
+    {
+        return $this->diskUsages;
+    }
+
     public function addMenuOption(GlobaleMenuOptions $menuOption): self
     {
         if (!$this->menuOptions->contains($menuOption)) {
@@ -475,7 +491,7 @@ class GlobaleCompanies
       rename($dest.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'companydark'.DIRECTORY_SEPARATOR.'large.png',$dest.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'companydark'.DIRECTORY_SEPARATOR.$this->id.'-large.png');
       rename($dest.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'companydark'.DIRECTORY_SEPARATOR.'medium.png',$dest.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'companydark'.DIRECTORY_SEPARATOR.$this->id.'-medium.png');
       rename($dest.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'companydark'.DIRECTORY_SEPARATOR.'small.png',$dest.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'companydark'.DIRECTORY_SEPARATOR.$this->id.'-small.png');
-      rename($dest.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'companydark'.DIRECTORY_SEPARATOR.'thumb.png',$dest.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'companydark'.DIRECTORY_SEPARATOR.$this->id.'-thumb.png');      
+      rename($dest.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'companydark'.DIRECTORY_SEPARATOR.'thumb.png',$dest.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'companydark'.DIRECTORY_SEPARATOR.$this->id.'-thumb.png');
       //Create user admin of the company if it doesn't exist
      $usersrepository=$doctrine->getRepository(GlobaleUsers::class);
      $users=$usersrepository->findBy(["company"=>$this]);
@@ -487,6 +503,8 @@ class GlobaleCompanies
        }
      }
      if($create){
+
+       //Create Admin User
        $user=new GlobaleUsers();
        $user->setName("Administrador");
        $user->setEmail("admin@".$this->getDomain());
@@ -499,6 +517,20 @@ class GlobaleCompanies
        $user->setDateupd(new \DateTime());
        $doctrine->getManager()->persist($user);
        $doctrine->getManager()->flush();
+
+       //Create disk quota
+       $quota=new GlobaleDiskUsages();
+       $quota->setCompany($this);
+       $quota->setDiskspace(50);
+       $quota->setDiskusage(0);
+       $quota->setDistribution("[]");
+       $quota->setActive(1);
+       $quota->setDeleted(0);
+       $quota->setDateadd(new \DateTime());
+       $quota->setDateupd(new \DateTime());
+       $doctrine->getManager()->persist($quota);
+       $doctrine->getManager()->flush();
+
      }
     }
 

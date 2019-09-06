@@ -213,11 +213,16 @@ function toggle_sidebar_menu(with_animation)
 
 	if(open)
 	{
+		//
+		$(".menu-expanded").show();
+		$(".menu-collapsed").hide();
 		show_sidebar_menu(with_animation);
 		ps_init();
 	}
 	else
 	{
+		$(".menu-expanded").hide();
+		$(".menu-collapsed").show();
 		hide_sidebar_menu(with_animation);
 		ps_destroy();
 	}

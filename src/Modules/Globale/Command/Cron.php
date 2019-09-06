@@ -32,7 +32,10 @@ class Cron extends ContainerAwareCommand
     //Execute different tasks
     $this->HRAutoCloseClocks($output);
   }
+  function GlobaleCalculateDiskUsage(){
 
+
+  }
 
   function HRAutoCloseClocks($output){
     $autoCloseclocksRepository = $this->doctrine->getRepository(HRAutoCloseClocks::class);
@@ -77,27 +80,10 @@ class Cron extends ContainerAwareCommand
 
 
 
-        
+
       }
     }
 
-
-    /*$clocks=$clocksRepository->findBy(["end"=>null]);
-    $output->writeln([
-            'Clocks auto close',
-            '=================',
-            '',
-    ]);*/
-    /*foreach($clocks as $key=>$val){
-     if($val->getWorker()->getCompany()->getId()!=2) continue;
-     $output->writeln(['- '.$val->getWorker()->getName().' '.$val->getWorker()->getLastname()]);
-     $val->setEnd(new \DateTime());
-     $val->setInvalid(1);
-     $val->setDateupd(new \DateTime());
-     $val->setTime(date_timestamp_get($val->getEnd())-date_timestamp_get($val->getStart()));
-     $entityManager->persist($val);
-     $entityManager->flush();
-   }*/
   }
 }
 ?>

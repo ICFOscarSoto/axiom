@@ -12,6 +12,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\HttpFoundation\Session\Session;
+use \App\Modules\Globale\Entity\GlobaleDiskUsages;
 
 
 /**
@@ -239,6 +240,14 @@ class GlobaleUsers implements UserInterface
   		$data["firstname"]=$this->getLastname();
   		$data["roles"]=$this->getRoles();
       $data["companyId"]=$this->getCompany()->getId();
+      if(in_array("ROLE_GLOBAL",$this->getRoles())){
+        $diskusage=$this->getCompany()->getDiskUsages();
+        $data["diskusage"]["space"]=$diskusage[0]->getDiskspace();
+        $data["diskusage"]["free"]=$diskusage[0]->getDiskspace()-$diskusage[0]->getDiskusage();
+        $data["diskusage"]["free_perc"]=round($diskusage[0]->getDiskusage()*100/$data["diskusage"]["space"],1);
+        $data["diskusage"]["distribution"]=$diskusage[0]->getDistribution();
+      }
+
   		return $data;
   	}
 
