@@ -93,6 +93,7 @@ class GlobaleCompaniesController extends Controller
 			$company=$companiesRepository->find($id);
 
 			$diskusage=$company->getDiskUsages();
+			$data["roles"]=$this->getUser()->getRoles();
 			$data["diskusage"]["space"]=$filesHelper->formatBytes($diskusage[0]->getDiskspace());
 			$data["diskusage"]["free"]=$filesHelper->formatBytes($diskusage[0]->getDiskspace()-$diskusage[0]->getDiskusage());
 			$data["diskusage"]["free_perc"]=round($diskusage[0]->getDiskusage()*100/$diskusage[0]->getDiskspace(),1);

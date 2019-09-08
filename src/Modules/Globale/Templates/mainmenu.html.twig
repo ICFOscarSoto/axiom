@@ -55,7 +55,7 @@
 
 {# DISK QUOTA #}
 {% if userData.diskusage is defined %}
-<div style="width: 99%;">
+<div id="disk-quota-summary" style="cursor: pointer; width: 99%;">
 	<div class="tile-progress tile-default" style="bottom: 0px;">
 		<div class="title menu-expanded" style="padding-bottom: 10px; padding-left:22px">
 				<i class="fa fa-database"></i>
@@ -76,4 +76,5 @@
 		</div>
 	</div>
 </div>
+
 {% endif %}

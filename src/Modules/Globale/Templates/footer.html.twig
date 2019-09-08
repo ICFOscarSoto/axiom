@@ -1,3 +1,31 @@
+{# DISK QUOTA #}
+{% if userData.diskusage is defined %}
+<div class="modal fade" id="disk-quota-modal" data-backdrop="static" style="display: none;">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content" style="transform: matrix(1, 0, 0, 1, 0, 0);">
+			<div class="modal-header">
+				<h4 class="modal-title">Uso de disco</h4>
+			</div>
+			<div id="disk-quota-modal-body" class="modal-body">
+			    {{ include('@Globale/diskusage.html.twig') }}
+			</div>
+			<div id="disk-quota-modal-footer" class="modal-footer">
+				<button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+{% endif %}
+<script>
+ $(document).ready(function() {
+	 $('body').on('click', '#disk-quota-summary', function(){
+		 $("#disk-quota-modal").modal();
+	 });
+ });
+</script>
+
 <!-- Footer -->
 <footer class="main">
 <div align="center">
