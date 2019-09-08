@@ -1,0 +1,119 @@
+<div class="row">
+    <div style="text-align: right;" class="col-md-12">
+      <button attr-id="" attr-action="" id="FormDiskusages-button-cancel" type="button" class="btn btn">Cancelar</button>
+      <button attr-id="" attr-action="" id="FormDiskusages-button-continue" type="button" class="btn btn-green">Guardar</button>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-6">
+      {% if form is defined %}
+        {% set formConstructor = form %}
+        {{ include('@Globale/form.html.twig') }}
+      {% endif %}
+    </div>
+    <div class="col-lg-6">
+      <div id="canvas-holder">
+    		<canvas id="canvas_disk_free"></canvas>
+    	</div>
+    </div>
+</div>
+  <div class="row">
+    <div class="col-lg-6">
+      <h4>Uso de disco</h4>
+      <table class="table table-bordered">
+                <thead>
+                  <tr>
+                    <th>Elemento</th>
+                    <th>Tamaño</th>
+                    <th>Porcentaje</th>
+                  </tr>
+                </thead>
+                {% for key, distribution in userData.diskusage.distribution %}
+                <tbody>
+                  <tr>
+                    <td>{{ (key)|trans }}</td>
+                    <td>{{ distribution.formated.value }} {{ distribution.formated.unit }}</td>
+                    <td>{{ distribution.percent }} %</td>
+                  </tr>
+                {% endfor %}
+
+                </tbody>
+      </table>
+    </div>
+    <div class="col-lg-6">
+      <div id="canvas-holder2">
+    		<canvas id="canvas_disk"></canvas>
+    	</div>
+    </div>
+  </div>
+  <div class="row">
+      <div style="text-align: right;" class="col-md-12">
+        <button attr-id="" attr-action="" id="FormDiskusages-button-cancel" type="button" class="btn btn">Cancelar</button>
+        <button attr-id="" attr-action="" id="FormDiskusages-button-continue" type="button" class="btn btn-green">Guardar</button>
+      </div>
+    </div>
+
+<script>
+
+$(document).ready(function(){
+
+          var config_diskfree = {
+      			type: 'pie',
+      			data: {
+      				datasets: [{
+      					data: [
+      						{{ userData.diskusage.free_perc }},
+                  {{ 100-userData.diskusage.free_perc }},
+      					],
+      					backgroundColor: [
+      						'rgb(255, 99, 132)',
+      						'rgb(75, 192, 192)',
+      					],
+      					label: 'Espacio Disco'
+      				}],
+      				labels: [
+      					'Usado',
+      					'Libre'
+      				]
+      			},
+      			options: {
+      				responsive: true
+      			}
+      		};
+          var canvas_disk_free = document.getElementById('canvas_disk_free').getContext('2d');
+          window.myPie = new Chart(canvas_disk_free, config_diskfree);
+
+          var config_disk = {
+      			type: 'pie',
+      			data: {
+      				datasets: [{
+      					data: [
+                  {% for key, distribution in userData.diskusage.distribution %}
+          				    {{ distribution.percent }},
+                  {% endfor %}
+      					],
+                backgroundColor: [
+                  'rgb(255, 99, 132)',
+            	    'rgb(255, 159, 64)',
+	                'rgb(255, 205, 86)',
+	                'rgb(75, 192, 192)',
+	                'rgb(54, 162, 235)',
+	                'rgb(153, 102, 255)',
+	                'rgb(201, 203, 207)'
+      					],
+      					label: 'Espacio Disco'
+      				}],
+      				labels: [
+                {% for key, distribution in userData.diskusage.distribution %}
+                  '{{ (key)|trans }}',
+                {% endfor %}
+      				]
+      			},
+      			options: {
+      				responsive: true
+      			}
+      		};
+          var canvas_disk = document.getElementById('canvas_disk').getContext('2d');
+          window.myPie = new Chart(canvas_disk, config_disk);
+
+  });

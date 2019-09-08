@@ -11,6 +11,12 @@ Workers: Trabajadores
 Shifts and schedules: Turnos y horarios
 Others: Otros
 
+
+images: Imágenes
+companies: Empresas
+diskspace: Espacio disco
+diskusage: Espacio usado
+
 #LANGUAGES
 #----------------------------------------------------------------------------------------------------------------------
 Spanish: Español
@@ -41,6 +47,7 @@ Generate report: Generar informe
 View: Ver
 Creditoridentifier: Identificador acreedor SEPA
 Banckaccounts data: Datos bancarios
+bankaccounts: Cuentas bancarias
 Sepacore: SEPA Core firmado
 Sepab2b: SEPA B2B firmado
 
@@ -157,6 +164,7 @@ Ccc: Número de cuenta (CCC)
 Iban: IBAN
 Work calendar: Calendario laboral
 Worker: Trabajador
+workers: Trabajadores
 Departments: Departamentos
 Department: Departamento
 Select hrdepartments: Seleccionar departamento

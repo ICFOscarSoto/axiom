@@ -21,6 +21,8 @@ use App\Modules\Globale\Reports\GlobaleSEPAReports;
 use App\Modules\ERP\Utils\ERPBankAccountsUtils;
 use App\Modules\ERP\Entity\ERPBankAccounts;
 use App\Modules\Cloud\Utils\CloudFilesUtils;
+use App\Modules\Globale\Entity\GlobaleDiskUsages;
+use \App\Helpers\HelperFiles;
 //use App\Modules\Globale\UtilsEntityUtils;
 //use App\Modules\Form\Controller\FormController;
 
@@ -59,16 +61,68 @@ class GlobaleCompaniesController extends Controller
 	 					'tab' => $request->query->get('tab','data'), //Show initial tab, by default data tab
 	 					'tabs' => [["name" => "data", "caption"=>"Datos empresa", "icon"=>"entypo-book-open","active"=>true, "route"=>$this->generateUrl("dataCompany",["id"=>$id])],
 	 										 ["name" => "bank", "icon"=>"fa fa-headphones", "caption"=>"Datos bancarios", "route"=>$this->generateUrl("dataCompanyBankAccounts",["identity"=>$id,"id"=>$obj?($obj->getBankaccount()?$obj->getBankaccount()->getId():0):0])],
-	 										 ["name" => "files", "icon"=>"fa fa-cloud", "caption"=>"Archivos", "route"=>$this->generateUrl("cloudfiles",["id"=>$id, "path"=>"companies"])]
+	 										 ["name" => "files", "icon"=>"fa fa-cloud", "caption"=>"Archivos", "route"=>$this->generateUrl("cloudfiles",["id"=>$id, "path"=>"companies"])],
+											 ["name" => "files", "icon"=>"fa fa-database", "caption"=>"Uso disco", "route"=>$this->generateUrl("diskusage",["id"=>$id])]
 	 										],
 	 					'include_header' => [["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker-es.js"]],
 	 					'include_footer' => [["type"=>"css", "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.css"],
-	 															 ["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.js"]]
+	 															 ["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.js"],
+																 ["type"=>"js",  "path"=>"/js/raphael-min.js"],
+																 ["type"=>"js",  "path"=>"/js/morris.min.js"],
+																 ["type"=>"js",  "path"=>"/js/chartjs/Chart.min.js"]
+																]
 	 					/*'tabs' => [["name" => "data", "caption"=>"Datos trabajador", "active"=>$tab=='data'?true:false, "route"=>$this->generateUrl("dataWorker",["id"=>$id])],
 	 										 ["name" => "paymentroll", "active"=>($tab=='paymentroll' && $id)?true:false, "caption"=>"Nóminas"]
 	 										]*/
 	 	));
 	 }
+
+	 /**
+	  * @Route("/{_locale}/globale/admin/company/{id}/discusage", name="diskusage")
+	  */
+	  public function discusage($id,Request $request){
+			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		  $this->denyAccessUnlessGranted('ROLE_GLOBAL');
+			$userdata=$this->getUser()->getTemplateData();
+
+			$filesHelper=new HelperFiles();
+
+			$formUtils=new GlobaleFormUtils();
+			$companiesRepository = $this->getDoctrine()->getRepository(GlobaleCompanies::class);
+	    $diskusagesRepository = $this->getDoctrine()->getRepository(GlobaleDiskUsages::class);
+			$company=$companiesRepository->find($id);
+
+			$diskusage=$company->getDiskUsages();
+			$data["diskusage"]["space"]=$filesHelper->formatBytes($diskusage[0]->getDiskspace());
+			$data["diskusage"]["free"]=$filesHelper->formatBytes($diskusage[0]->getDiskspace()-$diskusage[0]->getDiskusage());
+			$data["diskusage"]["free_perc"]=round($diskusage[0]->getDiskusage()*100/$diskusage[0]->getDiskspace(),1);
+			$data["diskusage"]["distribution"]=json_decode($diskusage[0]->getDistribution(),true);
+
+			$diskusage=$diskusagesRepository->findOneBy(["companyown"=>$company]);
+			$formUtils->initialize($this->getUser(), new GlobaleDiskUsages(), dirname(__FILE__)."/../Forms/DiskUsages.json", $request, $this, $this->getDoctrine(),["companyown"]);
+			$templateForm=$formUtils->formatForm('formDiskusages', true, $diskusage->getId(), GlobaleDiskUsages::class,'dataDiskusages');
+			$templateForm["type"]="modal"; //Hide Save buttons
+			return $this->render('@Globale/diskusage.html.twig', array(
+				'userData' => $data,
+				'id' => $id,
+				'form' => $templateForm
+			));
+		}
+
+		/**
+		 * @Route("/{_locale}/diskusages/data/{id}/{action}", name="dataDiskusages", defaults={"id"=0, "action"="read"})
+		 */
+		 public function dataDiskusages($id, $action, Request $request){
+		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		 $this->denyAccessUnlessGranted('ROLE_GLOBAL');
+		 $template=dirname(__FILE__)."/../Forms/DiskUsages.json";
+		 $utils = new GlobaleFormUtils();
+		 //$diskusagesRepository = $this->getDoctrine()->getRepository(GlobaleDiskUsages::class);
+		 //$diskusage=$diskusagesRepository->find($id);
+		 $utils->initialize($this->getUser(), new GlobaleDiskUsages(), $template, $request, $this, $this->getDoctrine(),["companyown"]);
+		 return $utils->make($id, GlobaleDiskUsages::class, $action, "formDiskusages", "full");
+		}
+
 
 	 /**
 	  * @Route("/{_locale}/globale/admin/mycompany", name="mycompany")

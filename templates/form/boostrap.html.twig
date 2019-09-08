@@ -124,6 +124,7 @@
         {%- set required = false -%}
     {% endif %}
     {{- parent() -}}
+  {% if help is defined %} {{ help }} {% endif %}
 {%- endblock form_widget_simple %}
 
 {%- block widget_attributes -%}

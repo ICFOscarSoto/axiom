@@ -1,0 +1,11 @@
+[{
+	"sections": [
+		{
+			"name": "Cuota de disco",
+			"fields": [
+        { "name": "diskspace",	"cols": 12, "unit": "MB", "conversion":{"view":"bytesToMB", "controller":"MBToBytes"}},
+				{	"name": "diskusage", "cols": 12, "unit": "MB", "conversion":{"view":"bytesToMB", "controller":"MBToBytes"}, "readonly":true},
+        {	"name": "active", "cols": 4}
+			]
+		}]
+}]

@@ -98,6 +98,13 @@ class GlobaleImagesController extends Controller implements ContainerAwareInterf
 	{
 		$file = $request->files->get('picture');
 		$user=$this->getUser();
+
+		//Check if filespace in disk quota
+		$company=$this->getUser()->getCompany();
+		$diskUsage=$company->getDiskUsages();
+		if($diskUsage[0]->getDiskspace()-$diskUsage[0]->getDiskusage()<=0)  return new JsonResponse(["result"=>-10]);
+
+
 		switch($type){  //For check permissions
 
 			case "company":

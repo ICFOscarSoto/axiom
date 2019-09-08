@@ -20,6 +20,11 @@ class GlobaleFilesController extends Controller
    */
   public function uploadTemp(RouterInterface $router,Request $request){
     $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+    //Check if filespace in disk quota
+    $company=$this->getUser()->getCompany();
+    $diskUsage=$company->getDiskUsages();
+    if($diskUsage[0]->getDiskspace()-$diskUsage[0]->getDiskusage()<=0)  return new JsonResponse(["result"=>-10]);
+
     if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
       $uploadDir=$this->get('kernel')->getRootDir() . '/../public/temp/'.$this->getUser()->getId().'/';
       $output = array('uploaded' => false);

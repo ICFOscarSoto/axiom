@@ -1,8 +1,8 @@
 [
-  {"id": "edit", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"formCompany", "confirm" :false, "actionType" : "foreground"},
+  {"id": "edit", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"formCompany", "confirm" :false, "actionType" : "foreground", "tooltip" : "Editar"},
   {"id": "activation", "type": "option", "options": [
-      {"id": "desactivate", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"disableCompany", "confirm" :true, "actionType" : "background" },
-      {"id": "activate", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "route":"enableCompany", "confirm" :true, "actionType" : "background" }
+      {"id": "desactivate", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"disableCompany", "confirm" :true, "actionType" : "background", "tooltip" : "Deshabilitar" },
+      {"id": "activate", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "route":"enableCompany", "confirm" :true, "actionType" : "background", "tooltip" : "Habilitar" }
   ]},
-  {"id": "delete", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"deleteCompany", "confirm" :true, "undo" :false, "tooltip":"Borrar empresa", "actionType" : "background"}
+  {"id": "delete", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"deleteCompany", "confirm" :true, "undo" :false, "tooltip":"Borrar empresa", "actionType" : "background", "tooltip" : "Borrar"}
 ]

@@ -57,9 +57,9 @@
 {% if userData.diskusage is defined %}
 <div style="width: 99%;">
 	<div class="tile-progress tile-default" style="bottom: 0px;">
-		<div class="title menu-expanded" style="padding-bottom: 10px; padding-left:10px">
+		<div class="title menu-expanded" style="padding-bottom: 10px; padding-left:22px">
 				<i class="fa fa-database"></i>
-				<span class="title">Cloud ({{ userData.diskusage.space }} MB)</span>
+				<span class="title">Cloud ({{ userData.diskusage.space.value }} {{ userData.diskusage.space.unit }})</span>
 		</div>
 		<div class="title menu-collapsed" style="display:none; padding-bottom: 10px; padding-left: 21px;">
 				<i class="fa fa-database"></i>
@@ -71,8 +71,8 @@
 			<h4>
 				<span class="menu-expanded">{{ userData.diskusage.free_perc }}% ocupado</span>
 			</h4>
-			<span class="menu-expanded">{{ userData.diskusage.free }}MB Libres</span>
-			<span class="title menu-collapsed" style="display:none; text-align: center;">50MB</span>
+			<span class="menu-expanded">{{ userData.diskusage.free.value }} {{ userData.diskusage.free.unit }} Libres</span>
+			<span class="title menu-collapsed" style="display:none; text-align: center;">{{ userData.diskusage.space.value }} {{ userData.diskusage.space.unit }}</span>
 		</div>
 	</div>
 </div>

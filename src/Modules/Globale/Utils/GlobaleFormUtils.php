@@ -93,7 +93,10 @@ class GlobaleFormUtils extends Controller
     $form=$this->createFromEntity2(!$ajax)->getForm();
     $caption=ucfirst($name);
     $routeParams=array_merge($routeParams, ["id"=>$id, "action"=>"save"]);
-    return ["id"=>$name, "id_object"=>!$this->obj->getId()?0:$this->obj->getId(), "name"=>$caption, "form" => $form->createView(), "post"=>$this->controller->generateUrl(($route!=null)?$route:$this->request->get('_route'),$routeParams), "template" => json_decode(file_get_contents ($this->template))];
+    $formView=$form->createView();
+    //Aply convesion functions from controller to view
+    $formView=$this->conversionView($formView);
+    return ["id"=>$name, "id_object"=>!$this->obj->getId()?0:$this->obj->getId(), "name"=>$caption, "form" => $formView, "post"=>$this->controller->generateUrl(($route!=null)?$route:$this->request->get('_route'),$routeParams), "template" => json_decode(file_get_contents ($this->template))];
   }
 
   public function createFromEntity2($includeSave=true){
@@ -133,11 +136,12 @@ class GlobaleFormUtils extends Controller
             default://Default types ints, varchars, etc.
               //First of all check if exist a transform
             if($field=$this->searchTemplateField($value['fieldName'])){
+              $label=ucfirst((isset($field["caption"])?$field["caption"]:$value['fieldName']).(isset($field['unit'])?' ('.$field['unit'].')':''));
               if(isset($field["transform"])){
                 switch ($field["transform"]['type']){
 
                   case 'option':
-                    $form->add($value['fieldName'], ChoiceType::class, [
+                    $form->add($value['fieldName'], ChoiceType::class, ['label'=>$label,
                         'choices'  => $field["transform"]['options'],
                     ]);
                   break;
@@ -152,11 +156,12 @@ class GlobaleFormUtils extends Controller
                  if(isset($field["type"])){
                    switch ($field['type']){
                      case 'time':
-                       $form->add($value['fieldName'], TextType::class, ['required' => !$value["nullable"], 'attr' => ['class' => 'timepicker']]);
+                       $form->add($value['fieldName'], TextType::class, ['label'=>$label, 'required' => !$value["nullable"], 'attr' => ['class' => 'timepicker']]);
                      break;
                    }
-                 }else
-                 $form->add($value['fieldName'],null,['disabled' => isset($field["readonly"])?$field["readonly"]:false, 'attr'=>['readonly' => isset($field["readonly"])?$field["readonly"]:false,'class'=>isset($field["class"])?$field["class"]:'']]);
+                 }else{
+                   $form->add($value['fieldName'],null,['label'=>$label, 'disabled' => isset($field["readonly"])?$field["readonly"]:false, 'attr'=>['help'=>"prueba",'readonly' => isset($field["readonly"])?$field["readonly"]:false,'class'=>isset($field["class"])?$field["class"]:'']]);
+                 }
               }
             }else $form->add($value['fieldName'],null,['disabled' => isset($field["readonly"])?$field["readonly"]:false,'attr'=>['readonly' => isset($field["readonly"])?$field["readonly"]:false,'class'=>isset($field["class"])?$field["class"]:'']]);
             break;
@@ -238,21 +243,54 @@ class GlobaleFormUtils extends Controller
 				 case 'read':
              $routeParams=array_merge($this->routeParams, ["id"=>$id, "action"=>"save"]);
              $route=$this->controller->generateUrl($this->request->get('_route'),$routeParams);
+             $formView=$form->createView();
+             //Aply convesion functions from controller to view
+             $formView=$this->conversionView($formView);
 						 return $this->controller->render($render, array(
               'includes' => $includesArray,
               'include_pre_templates' => $this->includePreTemplate,
               'include_post_templates' => $this->includePostTemplate,
-              'formConstructor' => ["id"=>$id, "id_object"=>$id, "name"=>$name, "form" => $form->createView(), "type" => $type, "post"=>$route, "template" => json_decode(file_get_contents ($this->template),true)]
-					    ));
+              'formConstructor' => ["id"=>$id, "id_object"=>$id, "name"=>$name, "form" => $formView, "type" => $type, "post"=>$route, "template" => json_decode(file_get_contents ($this->template),true)]
+              ));
 				break;
 			}
   }
+
+  private function conversionView($formView){
+    foreach ($this->templateArray[0]['sections'] as $keySection => $valueSection) {
+      foreach ($valueSection['fields'] as $keyField => $valueField) {
+        if(isset($valueField['conversion']["view"])){
+          if(method_exists(get_class($formView->vars["value"]), $valueField['conversion']["view"])){
+            $formView->children[$valueField["name"]]->vars["value"]=$formView->vars["value"]->{$valueField['conversion']["view"]}($formView->vars["value"]->{'get'.lcfirst($valueField["name"])}());
+            $formView->vars["value"]->{'set'.lcfirst($valueField["name"])}($formView->vars["value"]->{$valueField['conversion']["view"]}($formView->vars["value"]->{'get'.lcfirst($valueField["name"])}()));
+          }
+        }
+      }
+    }
+    return $formView;
+  }
+
+ private function conversionController($obj){
+   foreach ($this->templateArray[0]['sections'] as $keySection => $valueSection) {
+     foreach ($valueSection['fields'] as $keyField => $valueField) {
+       if(isset($valueField['conversion']["controller"]) && (!isset($valueField['readonly']) || $valueField['readonly']==false )){
+         if(method_exists(get_class($obj), $valueField['conversion']["controller"])){
+           $obj->{'set'.lcfirst($valueField["name"])}($obj->{$valueField['conversion']["controller"]}($obj->{'get'.lcfirst($valueField["name"])}()));
+         }
+       }
+     }
+   }
+   return $obj;
+
+ }
 
  public function proccess2($form,$obj){
     $form->handleRequest($this->request);
     if(!$form->isSubmitted()) return false;
     if ($form->isSubmitted() && $form->isValid()) {
        $obj = $form->getData();
+       //Aply convesion functions from view to controller
+       $obj = $this->conversionController($obj);
        //definimos los valores predefinidos
        foreach($this->values as $key => $val){
          if(method_exists($obj,'set'.lcfirst($key))) $obj->{'set'.lcfirst($key)}($val);

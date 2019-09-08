@@ -13,6 +13,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\HttpFoundation\Session\Session;
 use \App\Modules\Globale\Entity\GlobaleDiskUsages;
+use \App\Helpers\HelperFiles;
 
 
 /**
@@ -234,18 +235,19 @@ class GlobaleUsers implements UserInterface
 
 
 	 public function getTemplateData(){
+      $filesHelper=new HelperFiles();
       $data["id"]=$this->getId();
   		$data["email"]=$this->getEmail();
   		$data["name"]=$this->getName();
   		$data["firstname"]=$this->getLastname();
   		$data["roles"]=$this->getRoles();
       $data["companyId"]=$this->getCompany()->getId();
-      if(in_array("ROLE_GLOBAL",$this->getRoles())){
+      if(in_array("ROLE_ADMIN",$this->getRoles())){
         $diskusage=$this->getCompany()->getDiskUsages();
-        $data["diskusage"]["space"]=$diskusage[0]->getDiskspace();
-        $data["diskusage"]["free"]=$diskusage[0]->getDiskspace()-$diskusage[0]->getDiskusage();
-        $data["diskusage"]["free_perc"]=round($diskusage[0]->getDiskusage()*100/$data["diskusage"]["space"],1);
-        $data["diskusage"]["distribution"]=$diskusage[0]->getDistribution();
+        $data["diskusage"]["space"]=$filesHelper->formatBytes($diskusage[0]->getDiskspace());
+        $data["diskusage"]["free"]=$filesHelper->formatBytes($diskusage[0]->getDiskspace()-$diskusage[0]->getDiskusage());
+        $data["diskusage"]["free_perc"]=round($diskusage[0]->getDiskusage()*100/$diskusage[0]->getDiskspace(),1);
+        $data["diskusage"]["distribution"]=json_decode($diskusage[0]->getDistribution(),true);
       }
 
   		return $data;

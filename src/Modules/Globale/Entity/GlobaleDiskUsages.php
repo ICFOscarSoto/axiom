@@ -17,11 +17,13 @@ class GlobaleDiskUsages
      */
     private $id;
 
+
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCompanies")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $company;
+    private $companyown;
+
 
     /**
      * @ORM\Column(type="float")
@@ -63,14 +65,14 @@ class GlobaleDiskUsages
         return $this->id;
     }
 
-    public function getCompany(): ?GlobaleCompanies
+    public function getCompanyown(): ?GlobaleCompanies
     {
-        return $this->company;
+        return $this->companyown;
     }
 
-    public function setCompany(?GlobaleCompanies $company): self
+    public function setCompanyown(?GlobaleCompanies $companyown): self
     {
-        $this->company = $company;
+        $this->companyown = $companyown;
 
         return $this;
     }
@@ -158,4 +160,16 @@ class GlobaleDiskUsages
 
         return $this;
     }
+
+    public function bytesToMB($value){
+      $value=round($value/1024/1024,2);
+      return $value;
+    }
+
+    public function MBToBytes($value){
+      $value=$value*1024*1024;
+      return $value;
+    }
+
+
 }

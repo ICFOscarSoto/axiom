@@ -182,7 +182,7 @@
 									{% if field.type is defined and field.type=="option" %}
 										{% for fieldOption in field.options %}
 											if(Array.isArray(row["{{ fieldOption.condition }}"]))
-											buttons+='<div class="btn-group {% if fieldOption.condition is defined %}'+((row["{{ fieldOption.condition }}"][0]*1 != "{{ fieldOption.conditionValue }}"*1) ? 'hide' : '')+'{% endif %}">	<button attr-id="'+row['id']+'" id="{{ listConstructor.id }}-field-button-{{ fieldOption.id }}-'+row['id']+'" type="button" class="btn btn-{{ fieldOption.type }} tooltip-primary"';
+											buttons+='<div class="btn-group {% if fieldOption.condition is defined %}'+((row["{{ fieldOption.condition }}"][0]*1 != "{{ fieldOption.conditionValue }}"*1) ? 'hide' : '')+'{% endif %}">	<button attr-id="'+row['id']+'" id="{{ listConstructor.id }}-field-button-{{ fieldOption.id }}-'+row['id']+'" type="button" class="btn btn-{{ fieldOption.type }} tooltip-primary" {% if field.tooltip is defined %} data-toggle="tooltip" data-placement="bottom" title="" data-original-title=" {{ field.tooltip }} {% endif %}';
 											else
 											buttons+='<div class="btn-group {% if fieldOption.condition is defined %}'+((row["{{ fieldOption.condition }}"]*1 != "{{ fieldOption.conditionValue }}"*1) ? 'hide' : '')+'{% endif %}">	<button attr-id="'+row['id']+'" id="{{ listConstructor.id }}-field-button-{{ fieldOption.id }}-'+row['id']+'" type="button" class="btn btn-{{ fieldOption.type }} tooltip-primary"';
 											buttons+='{% if fieldOption.tooltip is defined %} data-toggle="tooltip" data-placement="bottom" title="" data-original-title=" {{ fieldOption.tooltip }} {% endif %}"';
@@ -515,6 +515,7 @@
 
 	<script>
 	$(document).ready(function() {
+		$('body').tooltip({ selector: '[data-toggle="tooltip"]' });
 		$('.datetimepicker').each(function(index) {
 			var valueField=$(this).val();
 			var dateField=moment(valueField, "DD/MM/YYYY HH:mm:ss");

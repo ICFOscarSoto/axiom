@@ -13,6 +13,8 @@ use App\Modules\HR\Entity\HRWorkCenters;
 use App\Modules\Globale\Entity\GlobaleCompanies;
 use App\Modules\Globale\Entity\GlobaleDiskUsages;
 use App\Modules\Globale\Entity\GlobaleHistories;
+use \App\Helpers\HelperFiles;
+
 
 class CalculateDiskUsage extends ContainerAwareCommand
 {
@@ -36,21 +38,29 @@ class CalculateDiskUsage extends ContainerAwareCommand
   }
 
   function GlobaleCalculateDiskUsage($output){
+    $filesHelper=new HelperFiles();
+    $colors=["#0b62a4", "#f93e3e", "#2dd022", "#ca2ddc","#f2f513","#0ccceb","#ff00e0","#ff5e00","#00c093"];
     $companiesRepository = $this->doctrine->getRepository(GlobaleCompanies::class);
     $diskusagesRepository = $this->doctrine->getRepository(GlobaleDiskUsages::class);
     $companies=$companiesRepository->findAll();
     foreach($companies as $key=>$item){
         $source = __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$item->getId();
         $size=$this->GetDirectorySize($source);
-        $size=round($size/1048576,4);  //Convert to MB
-        $output->writeln(['   - '.$item->getName()." -> ".$size. " MB"]);
-        $diskusage=$diskusagesRepository->findOneBy(["company"=>$item]);
+        //$size=round($size/1048576,4);  //Convert to MB
+        $output->writeln(['   - '.$item->getName()." -> ".$size]);
+        $diskusage=$diskusagesRepository->findOneBy(["companyown"=>$item]);
         $parts = array_diff(scandir($source), array('..', '.', 'temp'));
         $distribution=[];
+        $flagColors=0;
         foreach($parts as $part){
           $size_sub=$this->GetDirectorySize($source.DIRECTORY_SEPARATOR.$part);
-          $size_sub=round($size_sub/1048576,4);
-          $distribution[$part]=$size_sub;
+          //$size_sub=round($size_sub/1048576,4);
+          $distribution[$part]["bytes"]=$size_sub;
+          $distribution[$part]["percent"]=round($size_sub*100/$size,1);
+          $distribution[$part]["formated"]=$filesHelper->formatBytes($size_sub);
+          $distribution[$part]["color"]=$colors[$flagColors];
+          if($flagColors>=count($colors)) $flagColors=0; else $flagColors++;
+
         }
 
         if($diskusage!=null){
@@ -59,8 +69,9 @@ class CalculateDiskUsage extends ContainerAwareCommand
           $diskusage->setDateupd(new \DateTime());
         }else{
           $diskusage=new GlobaleDiskUsages();
-          $diskusage->setCompany($item);
-          $diskusage->setDiskspace(50);
+          //$diskusage->setCompany($item);
+          $diskusage->setCompanyown($item);
+          $diskusage->setDiskspace(50*1024*1024);
           $diskusage->setDiskusage($size);
           $diskusage->setDistribution(json_encode($distribution));
           $diskusage->setActive(1);
