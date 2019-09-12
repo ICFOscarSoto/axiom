@@ -117,7 +117,7 @@ class GlobaleCompanies
     private $menuOptions;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Modules\Globale\Entity\GlobaleDiskUsages", mappedBy="companyown")
+     * @ORM\OneToMany(targetEntity="App\Modules\Globale\Entity\GlobaleDiskUsages", mappedBy="companyown", fetch="EAGER")
      */
     private $diskUsages;
 
