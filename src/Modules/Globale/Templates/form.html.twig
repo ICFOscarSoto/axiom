@@ -6,7 +6,7 @@
   <div class="row">
     <div style="text-align: right;" class="col-md-12">
       <button attr-id="" attr-action="" id="{{formConstructor.name}}-button-cancel" type="button" class="btn btn">{{ ("Cancelar")|trans }}</button>
-      <button attr-id="" attr-action="" id="{{formConstructor.name}}-button-continue" type="button" class="btn btn-green">{{ ("Guardar")|trans }}</button>
+      <button attr-id="" attr-action="" id="{{formConstructor.name}}-button-save" type="button" class="btn btn-green">{{ ("Guardar")|trans }}</button>
     </div>
   </div>
   {% endif %}
@@ -95,14 +95,83 @@
             {% elseif field.type is defined and field.type == 'file' %}
               values 2
             {% else %}
-              {# Default component of the form #}
-              {{ form_row(formConstructor.form[field.name]) }}
+            {# Default component of the form #}
+            {{ form_row(formConstructor.form[field.name]) }}
+              {# Check if field has trigger #}
+              {% if field.trigger is defined and field.route is defined %}
+
+              <script>
+                $(document).ready(function() {
+                    $("#form_{{ field.trigger }}").select2();
+                    $("#form_{{ field.name }}").select2();
+
+                   $("#form_{{ field.trigger }}").on("change", function (e) {
+                     if($("#form_{{ field.trigger }}").select2('data').length>0){
+                       //var value=(($("#form_{{ field.trigger }}").select2('data')!="")?($("#form_{{ field.trigger }}").select2('data')):0);
+                       //if(value!=0) value=value.css;
+                       var value=$("#form_{{ field.trigger }}").select2('data')[0]["element"]["className"];
+                       $("#form_{{ field.name }}").html('');
+                       $.ajax({
+                          dataType: "json",
+                          url: '/api/HR/workers/selectschedule/'+$("#form_{{ field.name }}").attr("attr-module")+'/'+$("#form_{{ field.name }}").attr("attr-name")+'/'+value,
+                          //data: data,
+                          success:  function( data ) {
+                            console.log(data);
+                            var html='<option value>Seleccionar </option>';
+                            $.each( data, function( key, val ) {
+                              html+='<option value="'+val.id+'" class="'+val.id+'">'+val.text+'</option>';
+                            });
+                             $("#form_{{ field.name }}").html(html);
+                          }
+                        });
+                       /*$("#form_{{ field.name }}").select2({
+                         ajax: {
+                           url: '/api/HR/workers/selectschedule/'+$("#form_{{ field.name }}").attr("attr-module")+'/'+$("#form_{{ field.name }}").attr("attr-name")+'/'+value,
+                           dataType: 'json',
+                           results: function (data) {
+                             return {results: data};
+                           }
+                         }
+                       });*/
+                     }
+                   });
+
+
+                   if($("#form_{{ field.trigger }}").select2('data').length>0){
+                     //var value=(($("#form_{{ field.trigger }}").select2('data')!="")?($("#form_{{ field.trigger }}").select2('data')):0);
+                     //if(value!=0) value=value.css;
+                     var value=$("#form_{{ field.trigger }}").select2('data')[0]["element"]["className"];
+
+                     /*$("#form_{{ field.name }}").select2({
+                       ajax: {
+                         url: '/api/HR/workers/selectschedule/'+$("#form_{{ field.name }}").attr("attr-module")+'/'+$("#form_{{ field.name }}").attr("attr-name")+'/'+value,
+                         dataType: 'json',
+                         results: function (data) {
+                           return {results: data};
+                         }
+                       }
+                     });*/
+                   }
+
+                   /*var value=(($("#form_{{ field.trigger }}").select2('data')!="")?($("#form_{{ field.trigger }}").select2('data')):0);
+                   if(value!=0) value=value.css;
+                  $("#form_{{ field.name }}").select2({
+                     ajax: {
+                       url: '/api/HR/workers/selectschedule/'+$("#form_{{ field.name }}").attr("attr-module")+'/'+$("#form_{{ field.name }}").attr("attr-name")+'/'+value,
+                       dataType: 'json',
+                       results: function (data) {
+                         return {results: data};
+                       }
+                     }
+                   });*/
+
+                });
+              </script>
+              {% endif %}
             {% endif %}
         </div>
         {% set counter = counter +1 %}
       {% endfor %}
-
-
 
       {% if formConstructor.post is defined %} <input type="hidden" id="post-url" name="post-url" value="{{ formConstructor.post }}"> {% endif %}
       <input type="hidden" id="id-object" name="id-object" value="{{ formConstructor.id_object }}">
@@ -136,7 +205,7 @@
   <div class="row">
     <div style="text-align: right;" class="col-md-12">
       <button attr-id="" attr-action="" id="{{formConstructor.name}}-button-cancel-bottom" type="button" class="btn btn">{{ ("Cancelar")|trans }}</button>
-      <button attr-id="" attr-action="" id="{{formConstructor.name}}-button-continue-bottom" type="button" class="btn btn-green">{{ ("Guardar")|trans }}</button>
+      <button attr-id="" attr-action="" id="{{formConstructor.name}}-button-save-bottom" type="button" class="btn btn-green">{{ ("Guardar")|trans }}</button>
     </div>
   </div>
   {% endif %}
@@ -208,7 +277,7 @@ return blob;
     });
 
 
-    $('body').on('click', "[id^='{{formConstructor.name}}-button-continue']", function() {
+    $('body').on('click', "[id^='{{formConstructor.name}}-button-save']", function() {
           if($("#{{formConstructor.name}}-form-body").find('form').valid()){
             if((++load_wait)==1) $("#load-spinner").fadeIn();
             $.post($("#{{formConstructor.name}}-form-body").find('form').find('#post-url').val(), $("#{{formConstructor.name}}-form-body").find('form').serialize(),

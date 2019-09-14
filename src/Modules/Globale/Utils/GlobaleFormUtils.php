@@ -119,10 +119,10 @@ class GlobaleFormUtils extends Controller
 
               if(isset($field["type"])){
                 if($field["type"]=="date")
-                  $form->add($value['fieldName'], DateType::class, ['required' => !$value["nullable"], 'widget' => 'single_text', 'format' => 'dd/MM/yyyy', 'attr' => array_merge(['class' => 'datepicker'],$attr)]);
+                  $form->add($value['fieldName'], DateType::class, ['required' => !$value["nullable"], 'empty_data' => '', 'widget' => 'single_text', 'format' => 'dd/MM/yyyy', 'attr' => array_merge(['class' => 'datepicker'],$attr)]);
                 if($field["type"]=="time")
-                  $form->add($value['fieldName'], TimeType::class, ['required' => !$value["nullable"], 'widget' => 'single_text', 'attr' => array_merge(['class' => 'timepicker'],$attr)]);
-              }else $form->add($value['fieldName'], DateTimeType::class, ['required' => !$value["nullable"], 'widget' => 'single_text', 'format' => 'dd/MM/yyyy kk:mm:ss', 'attr' => array_merge(['class' => 'datetimepicker'],$attr)]);
+                  $form->add($value['fieldName'], TimeType::class, ['required' => !$value["nullable"], 'empty_data' => '', 'widget' => 'single_text', 'attr' => array_merge(['class' => 'timepicker'],$attr)]);
+              }else $form->add($value['fieldName'], DateTimeType::class, ['required' => !$value["nullable"], 'empty_data' => '', 'widget' => 'single_text', 'format' => 'dd/MM/yyyy kk:mm:ss', 'attr' => array_merge(['class' => 'datetimepicker'],$attr)]);
             break;
             case 'json':
               $form->add($value['fieldName'], TextType::class, ['required' => !$value["nullable"], 'attr'=>['class' => 'tagsinput']]);
@@ -178,8 +178,15 @@ class GlobaleFormUtils extends Controller
       if(!isset($value["joinColumns"])) continue;
       //check if is required field
       if(isset($value["joinColumns"][0]["nullable"]) && $value["joinColumns"][0]["nullable"] == false) $nullable=false; else $nullable=true;
-      if(!in_array($value['fieldName'],$this->ignoredAttributes))
-        $form->add($value['fieldName'], ChoiceType::class, $this->choiceRelation($value["targetEntity"], $this->obj->{'get'.ucfirst($value["fieldName"])}(),$nullable));
+      if(!in_array($value['fieldName'],$this->ignoredAttributes)){
+        $field=$this->searchTemplateField($value['fieldName']);
+        if(!isset($field["trigger"])) {//If no trigger element, fill it
+          $form->add($value['fieldName'], ChoiceType::class, $this->choiceRelation($value["targetEntity"], $this->obj->{'get'.ucfirst($value["fieldName"])}(),$nullable));
+        }else{
+          //$form->add($value['fieldName'], TextType::class, ["attr"=>["attr-module"=>$field["module"],"attr-name"=>$field["nameClass"]]]);
+          $form->add($value['fieldName'], ChoiceType::class, $this->choiceRelationTrigger($field,$nullable));
+        }
+      }
     }
     if($includeSave) $form->add('save', SubmitType::class, ['attr' => ['class' => 'save'],]);
 
@@ -285,15 +292,25 @@ class GlobaleFormUtils extends Controller
  }
 
  public function proccess2($form,$obj){
+
+
+
+
     $form->handleRequest($this->request);
+
+    dump($this->request);
+
+
     if(!$form->isSubmitted()) return false;
     if ($form->isSubmitted() && $form->isValid()) {
+
        $obj = $form->getData();
+       dump($obj);
        //Aply convesion functions from view to controller
        $obj = $this->conversionController($obj);
        //definimos los valores predefinidos
        foreach($this->values as $key => $val){
-         if(method_exists($obj,'set'.lcfirst($key))) $obj->{'set'.lcfirst($key)}($val);
+          if(method_exists($obj,'set'.lcfirst($key))) $obj->{'set'.lcfirst($key)}($val);
        }
        if($obj->getId() == null){
          $obj->setDateadd(new \DateTime());
@@ -314,7 +331,7 @@ class GlobaleFormUtils extends Controller
        }catch (Exception $e) {
          return false;
        }
-    }
+    }else return false;
   }
 
   public function detectObjChanges($old, $new){
@@ -392,6 +409,9 @@ class GlobaleFormUtils extends Controller
                   'choice_attr' => function($obj, $key, $index) {
                       return ['class' => $obj->getId()];
                   },
+                  'choice_value' => function ($obj) {
+                      return $obj ? $obj->getId() : '';
+                  },
                   'expanded' => false,
                   'data' =>$data,
                   'placeholder' => 'Select '.strtolower(end($classname))
@@ -399,4 +419,54 @@ class GlobaleFormUtils extends Controller
 
     return $result;
   }
+
+
+public function choiceRelationTrigger($field,$nullable){
+  $class="\App\Modules\\".$field["module"]."\\Entity\\".$field["nameClass"];
+  $classTrigger="\App\Modules\\".$field["moduleTrigger"]."\\Entity\\".$field["nameClassTrigger"];
+  $form=$this->request->request->get('form', null);
+  $filter=[];
+  if($form!=null){
+    //select options of the trigger value selected
+    //Check options for trigger FIELDS
+    $triggerValue=$this->doctrine->getRepository($classTrigger)->findOneBy(['id'=>$form[$field["trigger"]]]);
+    $filter=[$field["triggerParameter"]=>$triggerValue];
+  }else{
+    //get selected option or null options if not set
+    if($this->obj!=null) {
+      $triggerValue=$this->doctrine->getRepository($classTrigger)->findOneBy(['id'=>$this->obj->{'get'.ucfirst($field["triggerParameter"])}()]);
+      $filter=[$field["triggerParameter"]=>$triggerValue];
+    }else{
+      $filter=["id"=>0];
+    }
+  }
+  if(property_exists($class,'company')){ //If class has attribute company apply filter
+    $choices=$this->doctrine->getRepository($class)->findBy(array_merge($filter,['company'=>$this->user->getCompany(),'active'=>true, 'deleted'=>false]));
+  }else{
+    if(property_exists($class,'active')){
+      $choices= $this->doctrine->getRepository($class)->findBy(array_merge($filter,['active'=>true, 'deleted'=>false]));
+    }else $choices= $this->doctrine->getRepository($class)->findAll();
+  }
+  $result =  [
+                'attr' => ['class' => 'select2'],
+                'required' => !$nullable,
+                'choices' => $choices,
+                //if class has attribute lastName concat it with name
+                'choice_label' => function($obj, $key, $index) {
+                    if(method_exists($obj, "getLastname"))
+                      return $obj->getLastname().", ".$obj->getName();
+                    else return $obj->getName();
+                },
+                'choice_attr' => function($obj, $key, $index) {
+                    return ['class' => $obj->getId()];
+                },
+                'choice_value' => function ($obj) {
+                    return $obj ? $obj->getId() : '';
+                },
+                'expanded' => false,
+                'placeholder' => 'Select '.$field["nameClass"]
+            ];
+
+  return $result;
+}
 }
