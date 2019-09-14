@@ -107,9 +107,9 @@ class HRClocksController extends Controller
         return $this->render('@HR/workersclocks.html.twig', [
           'controllerName' => 'HRClocksController',
           'interfaceName' => 'Estado Fichaje',
-          'optionSelected' => "workers",
+          'optionSelected' => "clocksStatus",
           'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
-          'breadcrumb' =>  "workers",
+          'breadcrumb' =>  $menurepository->formatBreadcrumb('clocksStatus'),
           'userData' => $userdata,
 					'clocksList' => $repository->findWorkersClocks($this->getUser()->getCompany(),$department,$workcenter),
  				  'departments' => $departments,

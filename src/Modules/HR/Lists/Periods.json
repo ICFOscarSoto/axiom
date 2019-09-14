@@ -1,0 +1,44 @@
+[{"name": "id", "caption":""},
+{"name": "monday", "filter": false, "orderable": false, "caption":"L", "width":"1%px" ,"class" : "dt-center", "replace":{
+                         "1":{"text":"X","html":"X"},
+                         "0":{"text":"-","html":"-"}
+                       }
+},
+{"name": "tuesday", "filter": false, "orderable": false, "caption":"M", "width":"1%" ,"class" : "dt-center", "replace":{
+                          "1":{"text":"X","html":"X"},
+                          "0":{"text":"-","html":"-"}
+                        }
+},
+{"name": "wednesday", "filter": false, "orderable": false, "caption":"X", "width":"1%" ,"class" : "dt-center", "replace":{
+                         "1":{"text":"X","html":"X"},
+                          "0":{"text":"-","html":"-"}
+                       }
+},
+{"name": "thursday", "filter": false, "orderable": false, "caption":"J", "width":"1%" ,"class" : "dt-center", "replace":{
+                          "1":{"text":"X","html":"X"},
+                         "0":{"text":"-","html":"-"}
+                        }
+},
+{"name": "friday", "filter": false, "orderable": false, "caption":"V", "width":"1%" ,"class" : "dt-center", "replace":{
+                         "1":{"text":"X","html":"X"},
+                         "0":{"text":"-","html":"-"}
+                       }
+},
+{"name": "saturday", "filter": false, "orderable": false, "caption":"S", "width":"1%" ,"class" : "dt-center", "replace":{
+                          "1":{"text":"X","html":"X"},
+                         "0":{"text":"-","html":"-"}
+                        }
+},
+{"name": "sunday", "filter": false, "orderable": false, "caption":"D", "width":"1%" ,"class" : "dt-center", "replace":{
+                           "1":{"text":"X","html":"X"},
+                            "0":{"text":"-","html":"-"}
+                         }
+ },
+ {"name": "start","width":"35%","caption":"Inicio"},
+ {"name": "end","width":"35%","caption":"Fin"},
+ {"name": "active", "caption":"Estado", "width":"10%" ,"class" : "dt-center", "replace":{
+                            "1":{"text":"Activo","html":"<div style=\"min-width: 75px;\" class=\"label label-success\">Activo</div>"},
+                            "0":{"text":"Desactivado","html":"<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado</div>"}
+                          }
+  }
+]

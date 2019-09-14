@@ -1,0 +1,20 @@
+[{
+	"sections": [
+		{
+			"name": "Datos",
+			"fields": [
+        {	"name": "shift", "cols": 4, "caption": "Turnos"},
+				{	"name": "start", "cols": 4, "type": "time", "caption": "Hora Inicio"},
+				{	"name": "end", "cols": 4, "type": "time", "caption": "Hora Fin"},
+				{	"name": "monday", "cols": 3},
+				{	"name": "tuesday", "cols": 3},
+				{	"name": "wednesday", "cols": 3},
+				{	"name": "thursday", "cols": 3},
+				{	"name": "friday", "cols": 3},
+				{	"name": "saturday", "cols": 3},
+				{	"name": "sunday", "cols": 3},
+        {	"name": "active", "cols": 12}
+			]
+		}
+	]
+}]

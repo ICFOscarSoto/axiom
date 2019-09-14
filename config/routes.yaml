@@ -227,6 +227,14 @@ HRSchedules:
    resource: 'App\Modules\HR\Controller\HRSchedulesController'
    type:     annotation
 
+HRShifts:
+   resource: 'App\Modules\HR\Controller\HRShiftsController'
+   type:     annotation
+
+HRPeriods:
+   resource: 'App\Modules\HR\Controller\HRPeriodsController'
+   type:     annotation
+
 Cloud:
    resource: 'App\Modules\Cloud\Controller\CloudController'
    type:     annotation

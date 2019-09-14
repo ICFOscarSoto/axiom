@@ -248,6 +248,10 @@ table.dataTable.compact tbody th, table.dataTable.compact tbody td {
     border-color: #008d45 !important;
 }
 
+.btn-group .btn + .btn, .btn-group .btn + .btn-group, .btn-group .btn-group + .btn, .btn-group .btn-group + .btn-group {
+    margin-left: 0px !important;
+}
+
 .mail-env .mail-body .mail-header .mail-search, .mail-env .mail-body .mail-header .mail-links {
   width: 50% !important;
 }

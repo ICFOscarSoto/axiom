@@ -6,6 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -409,8 +410,11 @@ class GlobaleCompaniesController extends Controller
 			$repository=$this->getDoctrine()->getRepository(GlobaleCompanies::class);
 			$objs = $repository->findBy(['deleted'=>0]);
 			$options=[];
+			$session = new Session();
+      $connectas=$session->get('as_company',$this->getUser()->getCompany());
 			foreach($objs as $obj){
-				$options[]=["id"=>$obj->getId(), "text"=>$obj->getName(), "selected"=>$this->getUser()->getCompany()->getId()==$obj->getId()?true:false];
+
+				$options[]=["id"=>$obj->getId(), "text"=>$obj->getName(), "selected"=>$connectas->getId()==$obj->getId()?true:false];
 			}
 			//return new JsonResponse(["results"=>$options,"pagination"=>["more"=>true]]);
 			return new JsonResponse($options);

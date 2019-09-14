@@ -9,6 +9,8 @@ use \App\Modules\Globale\Entity\GlobaleCompanies;
 use \App\Modules\HR\Entity\HRDepartments;
 use \App\Modules\HR\Entity\HRWorkCenters;
 use \App\Modules\HR\Entity\HRWorkCalendarGroups;
+use \App\Modules\HR\Entity\HRSchedules;
+use \App\Modules\HR\Entity\HRShifts;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\HR\Repository\HRWorkerRepository")
@@ -178,6 +180,16 @@ class HRWorkers
     * @ORM\ManyToOne(targetEntity="\App\Modules\HR\Entity\HRWorkCalendarGroups")
     */
    private $workcalendargroup;
+
+   /**
+    * @ORM\ManyToOne(targetEntity="\App\Modules\HR\Entity\HRSchedules")
+    */
+   private $schedule;
+
+   /**
+    * @ORM\ManyToOne(targetEntity="\App\Modules\HR\Entity\HRShifts")
+    */
+   private $shift;
 
     public function getId(): ?int
     {
@@ -549,6 +561,30 @@ class HRWorkers
     public function setWorkcalendargroup(?HRWorkCalendarGroups $workcalendargroup): self
     {
         $this->workcalendargroup = $workcalendargroup;
+
+        return $this;
+    }
+
+    public function getSchedule(): ?HRSchedules
+    {
+        return $this->schedule;
+    }
+
+    public function setSchedule(?HRSchedules $schedule): self
+    {
+        $this->schedule = $schedule;
+
+        return $this;
+    }
+
+    public function getShift(): ?HRShifts
+    {
+        return $this->shift;
+    }
+
+    public function setShift(?HRShifts $shift): self
+    {
+        $this->shift = $shift;
 
         return $this;
     }

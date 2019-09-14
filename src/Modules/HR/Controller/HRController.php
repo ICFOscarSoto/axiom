@@ -30,6 +30,8 @@ use App\Modules\HR\Utils\HRWorkCalendarsUtils;
 use App\Modules\Cloud\Utils\CloudFilesUtils;
 use App\Modules\HR\Entity\HRWorkCalendars;
 use App\Modules\HR\Entity\HRHollidays;
+use App\Modules\HR\Entity\HRSchedules;
+use App\Modules\HR\Entity\HRShifts;
 use App\Modules\Globale\Utils\GlobaleListApiUtils;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
@@ -381,6 +383,25 @@ class HRController extends Controller
 		}
 	}
 
-
+	/**
+	 * @Route("/api/HR/workers/selectschedule/{module}/{name}/{id}", name="workerSelectSchedule", defaults={"id"=0})
+	 */
+	 public function workerSelectSchedule($module, $name, $id, Request $request){
+		 if ($this->get('security.authorization_checker')->isGranted('ROLE_ADMIN')) {
+		 	$schedulesRepository = $this->getDoctrine()->getRepository(HRSchedules::class);
+			$shiftsRepository = $this->getDoctrine()->getRepository(HRShifts::class);
+			$schedule=$schedulesRepository->findOneBy(["id"=>$id, "active"=>1,"deleted"=>0, "company"=>$this->getUser()->getCompany()]);
+			$shifts=$shiftsRepository->findBy(["schedule"=>$schedule,"active"=>1,"deleted"=>0]);
+			$return=[];
+			foreach($shifts as $item){
+				$option["id"]=$item->getId();
+				$option["text"]=$item->getName();
+				$return[]=$option;
+			}
+			return new JsonResponse($return);
+	 	}else{
+			return new JsonResponse([]);
+		}
+ 	}
 
 }

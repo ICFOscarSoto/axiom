@@ -21,6 +21,8 @@
 				{	"name": "workcenters", "cols": 4},
 				{	"name": "department", "cols": 4},
 				{	"name": "workcalendargroup", "cols": 4},
+				{	"name": "schedule", "cols": 4},
+				{	"name": "shift", "cols": 4, "trigger": "schedule", "triggerParameter":"schedule","route":"workerSelectSchedule", "moduleTrigger":"HR", "nameClassTrigger":"HRSchedules", "module":"HR", "nameClass":"HRShifts"},
 				{	"name": "external", "cols": 3}
 			]
 		},

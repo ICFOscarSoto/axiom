@@ -24,6 +24,9 @@
 			{% if entity_name is defined %}
 				<h2>{{ entity_name }}</h2>
 			{% endif %}
+			{% if id_parent is defined %}
+				<input type="hidden" id="id-parent" value="{{ id_parent }}" />
+			{% endif %}
 			{% set listConstructor = lists[0] %}
 			{% set listOrigin = "genericlist" %}
 			{# for know if list.html is invoked directly from controller and we need to make modals inside list#}

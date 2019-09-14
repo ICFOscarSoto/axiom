@@ -1,0 +1,14 @@
+[{
+	"sections": [
+		{
+			"name": "Datos",
+			"fields": [
+        {	"name": "schedule", "cols": 6, "caption": "Horario"},
+        {	"name": "name", "cols": 6, "caption": "Grupo"},
+				{	"name": "start", "cols": 4, "type": "date", "linked": {"field":"end", "by":"minDate"}},
+				{	"name": "end", "cols": 4, "type": "date", "linked": {"field":"start", "by":"maxDate"}},
+        {	"name": "active", "cols": 2}
+			]
+		}
+	]
+}]

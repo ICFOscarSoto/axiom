@@ -1,0 +1,6 @@
+[
+  {"id" : "addShiftsTop", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"dataShifts", "routeParams":{"schedule":"id_parent"}, "modal":"shifts", "actionType" : "background", "confirm" :false, "tooltip" : "Nuevo"},
+  {"id" : "deleteShiftsTop", "type" : "btn-red", "icon" : "fa fa-trash","name" : "borrar", "route":"deleteShift", "actionType" : "background", "confirm" :true, "tooltip" : "Borrar seleccionados"},
+  {"id" : "printShiftsTop", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "addSearch":true, "confirm" :false},
+  {"id" : "exportShiftsTop", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"", "addSearch":true, "confirm" :false}
+]

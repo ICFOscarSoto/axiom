@@ -95,7 +95,7 @@
 								{
 									"targets": {{ counter }},
 									{# only show order field in data type fields#}
-									{% if field.type is not defined or field.type == "data" %}
+									{% if (field.type is not defined or field.type == "data") and (field.orderable is not defined or field.orderable == true) %}
 									"orderable": true,
 									{% else %}
 									"orderable": false,
@@ -377,36 +377,38 @@
 					{% for field in listConstructor.fields %}
 						{% if field.type is not defined or field.type == "data" %}
 							<th class="table-header-search" style="border-bottom: 1px solid #cecece !important;">
-								{% if field.replace is defined %}
-								  {# Show combo box on replaces #}
-									<select id="s_{{ field.name }}" class="form-control table-header-search-input select2-use">
-										<option value="">Todos</option>
-										{% for key,option in field.replace %}
-											<option value="{{ key }}">{{ option.text }}</option>
-										{% endfor %}
-									</select>
-									<script>
-										$(document).ready(function() {
-											$("#s_{{ field.name }}").select2({dropdownCssClass : 'select2-bigdrop'});
-										});
-									</script>
-								{% else %}
-									{% if '__' in field.name %}
-										{# Relations #}
-
-											<select id="s_{{ field.name }}" class="form-control table-header-search-input select2-use">
-												<option value="" selected>Todos</option>
-											</select>
-											<script>
-												$(document).ready(function() {
-													$("#s_{{ field.name }}").select2({dropdownCssClass : 'select2-bigdrop'});
-												});
-											</script>
+								{% if field.filter is not defined or field.filter == true %}
+									{% if field.replace is defined %}
+									  {# Show combo box on replaces #}
+										<select id="s_{{ field.name }}" class="form-control table-header-search-input select2-use">
+											<option value="">Todos</option>
+											{% for key,option in field.replace %}
+												<option value="{{ key }}">{{ option.text }}</option>
+											{% endfor %}
+										</select>
+										<script>
+											$(document).ready(function() {
+												$("#s_{{ field.name }}").select2({dropdownCssClass : 'select2-bigdrop'});
+											});
+										</script>
 									{% else %}
-								   	{# Other fields show inputs #}
+										{% if '__' in field.name %}
+											{# Relations #}
 
-										<input id="s_{{ field.name }}" type="text" class="table-header-search-input form-control" placeholder="Buscar {{ field.caption }}"  autocomplete="off"/>
+												<select id="s_{{ field.name }}" class="form-control table-header-search-input select2-use">
+													<option value="" selected>Todos</option>
+												</select>
+												<script>
+													$(document).ready(function() {
+														$("#s_{{ field.name }}").select2({dropdownCssClass : 'select2-bigdrop'});
+													});
+												</script>
+										{% else %}
+									   	{# Other fields show inputs #}
 
+											<input id="s_{{ field.name }}" type="text" class="table-header-search-input form-control" placeholder="Buscar {{ field.caption }}"  autocomplete="off"/>
+
+										{% endif %}
 									{% endif %}
 								{% endif %}
 							</th>

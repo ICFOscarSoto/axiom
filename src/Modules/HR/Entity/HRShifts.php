@@ -30,7 +30,7 @@ class HRShifts
     private $start;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="datetime", nullable=true)
      */
     private $end;
 
@@ -100,11 +100,15 @@ class HRShifts
         return $this->end;
     }
 
-    public function setEnd(\DateTimeInterface $end): self
+    public function setEnd(\DateTimeInterface $end = null): self
     {
+      try {
         $this->end = $end;
-
-        return $this;
+      }
+      catch(\Exception $e) {
+       //Do Nothing
+     }
+      return $this;
     }
 
     public function getActive(): ?bool

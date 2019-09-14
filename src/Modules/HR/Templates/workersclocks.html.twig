@@ -26,7 +26,7 @@
 				<div class="col-md-4">
 					<div class="form-group">
 							<label class="" for="form_workcenters">Centro de trabajo</label>
-							<select class="form-control" name="form_workcenters" id="form_workcenters">
+							<select class="form-control" name="form_workcenters" id="form_workcenters" class="select2">
 								<option value="0">Todos</option>
 								{% for center in workcenters %}
 									<option value="{{ center.id }}" {% if center.id == selectedWorkCenter %} selected {% endif %}>{{ center.name }}</option>
@@ -37,7 +37,7 @@
 				<div class="col-md-4">
 					<div class="form-group">
 							<label class="" for="form_departments">Departamento</label>
-							<select class="form-control" name="form_departments" id="form_departments">
+							<select class="form-control" name="form_departments" id="form_departments" class="select2">
 								<option value="0">Todos</option>
 								{% for department in departments %}
 									<option value="{{ department.id }}" {% if department.id == selectedDepartment %} selected {% endif %}>{{ department.name }}</option>

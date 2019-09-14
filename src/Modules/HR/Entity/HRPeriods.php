@@ -18,12 +18,12 @@ class HRPeriods
     private $id;
 
     /**
-     * @ORM\Column(type="time")
+     * @ORM\Column(type="string", length=8)
      */
     private $start;
 
     /**
-     * @ORM\Column(type="time")
+     * @ORM\Column(type="string", length=8)
      */
     private $end;
 
@@ -94,23 +94,23 @@ class HRPeriods
         return $this->id;
     }
 
-    public function getStart(): ?\DateTimeInterface
+    public function getStart(): ?string
     {
         return $this->start;
     }
 
-    public function setStart(\DateTimeInterface $start): self
+    public function setStart(string $start): self
     {
         $this->start = $start;
         return $this;
     }
 
-    public function getEnd(): ?\DateTimeInterface
+    public function getEnd(): ?string
     {
         return $this->end;
     }
 
-    public function setEnd(\DateTimeInterface $end): self
+    public function setEnd(string $end): self
     {
         $this->end = $end;
         return $this;

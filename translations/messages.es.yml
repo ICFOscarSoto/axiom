@@ -285,3 +285,19 @@ Protocol: Protocolo
 Lasttime: Última consulta
 Usefunction: Teclas función
 Clock Devices: Relojes Fichado
+
+#SCHEDULES
+#----------------------------------------------------------------------------------------------------------------------
+Schedule: Horario
+Schedules: Horarios
+Shift: Turno
+Shifts: Turnos
+Period: Periodo
+Periods: Periodos
+Monday: Lunes
+Tuesday: Martes
+Wednesday: Miercoles
+Thursday: Jueves
+Friday: Viernes
+Saturday: Sabado
+Sunday: Domingo
