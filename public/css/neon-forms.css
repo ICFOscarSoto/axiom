@@ -2611,6 +2611,7 @@ fieldset[disabled] .btn-danger.focus {
 }
 .page-body .select2-container {
   display: block;
+  width: 100% !important;
 }
 .page-body .select2-container.select2-dropdown-open .select2-choice,
 .page-body .select2-container.select2-dropdown-open .select2-choices {

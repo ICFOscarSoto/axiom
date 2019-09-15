@@ -149,6 +149,10 @@ th.table-header-name{
   border-width: 1px 1px 0px 1px;
 }
 
+.select2-container--open{
+  z-index:9999 !important;
+}
+
 .table-bordered > thead > tr > th, .table-bordered > tbody > tr > th, .table-bordered > thead > tr > td, .table-bordered > tbody > tr > td{
 	border: none !important;
 }
