@@ -14,7 +14,7 @@ class GlobaleListApiUtils
       return null;
     }
 
-    public function getRecords($user,$repository,$request,$manager,$classname,$filters=[],$raw=[],$excludedFields=[]): array
+    public function getRecords($user,$repository,$request,$manager,$classname,$filters=[],$raw=[],$excludedFields=[],$includedFields=[]): array
     {
 		$return=array();
 		$query = $repository->createQueryBuilder('p');
@@ -123,7 +123,9 @@ class GlobaleListApiUtils
 
 			}
       //DELETE EXCLUDED FIELDS
-      $excludedFields=array_merge($excludedFields,["company", "deleted"]);
+      if(in_array("deleted", $includedFields)){
+        $excludedFields=array_merge($excludedFields,["company"]);
+      }else $excludedFields=array_merge($excludedFields,["company","deleted"]);
       foreach($excludedFields as $excluded){
         if(isset($row[$excluded])) unset($row[$excluded]);
       }

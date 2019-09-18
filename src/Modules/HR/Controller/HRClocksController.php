@@ -355,7 +355,7 @@ class HRClocksController extends Controller
 				//else if(property_exists($class, "company"))
 				//    $return=$listUtils->getRecords($user,$repository,$request,$manager,$class, array_merge([["type"=>"and", "column"=>"company", "value"=>$user->getCompany()]],$filter),[],-1);
 				//   else $return=$listUtils->getRecords($user,$repository,$request,$manager, $class,array_merge([],$filter),[],-1);
-				$return=$listUtils->getRecords($this->getUser(),$repository,$request,$manager, $this->class,array_merge([["type"=>"and", "column"=>"worker", "value"=>$worker]],$filter),-1,[]);
+				$return=$listUtils->getRecords($this->getUser(),$repository,$request,$manager, $this->class,array_merge([["type"=>"and", "column"=>"worker", "value"=>$worker]],$filter),-1,[],["deleted"]);
 				foreach($return["data"] as $key=>$value){
 					//Pass corrected clocks as valid to APPS
 					if($value["invalid"]==2) $return["data"][$key]["invalid"]=0;
