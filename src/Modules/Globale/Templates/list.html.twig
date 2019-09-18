@@ -161,6 +161,13 @@
 																var date=moment(text, "YYYY-MM-DD");
 																text=date.format('DD/MM/YYYY');
 															}
+															{% else %}
+																{% if field.type == "dateshort" %}
+																	if(text!=null){
+																		var date=moment(text+'/1970', "DD/MM/YYYY");
+																		text=date.format('DD/MM');
+																	}
+																{% endif %}
 														{% endif %}
 													{% endif %}
 													{% endif %}

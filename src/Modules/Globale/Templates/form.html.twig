@@ -231,7 +231,7 @@ var blob = new Blob(byteArrays, {type: contentType});
 return blob;
 }
 	$(document).ready(function() {
-    {# Date time fields #}
+    {# DATE AND TIME FIELDS #}
 
     $('.datetimepicker').each(function(index) {
       var valueField=$(this).val();
@@ -259,6 +259,25 @@ return blob;
         tooltips: spanish_tooltips_datetimepicker,
     		date: (dateField.isValid())?dateField:null
     	});
+      if($(this).attr("minDate")!="" && typeof $(this).attr("minDate")!==typeof undefined) $(this).data("DateTimePicker").minDate(moment($(this).attr("minDate"), "MM-DD"));
+      if($(this).attr("maxDate")!="" && typeof $(this).attr("maxDate")!==typeof undefined) $(this).data("DateTimePicker").maxDate(moment($(this).attr("maxDate"), "MM-DD"));
+    });
+
+    $('.dateshortpicker').each(function(index) {
+      var valueField=$(this).val();
+      var dateField=moment(valueField+'/1970', "DD/MM/YYYY");
+        $(this).datetimepicker({
+        showTodayButton: false,
+    		format: 'DD/MM',
+        dayViewHeaderFormat: 'MMMM',
+        maxDate: moment("31-12-1970","DD-MM-YYYY"),
+        minDate: moment("01-01-1970","DD-MM-YYYY"),
+        viewMode: 'days',
+        locale:'es',
+        tooltips: spanish_tooltips_datetimepicker,
+    		date: (dateField.isValid())?dateField:null
+    	});
+      if($(this).attr("defaultDate")!="" && typeof $(this).attr("defaultDate")!==typeof undefined && $(this).data("DateTimePicker").date()==null) $(this).data("DateTimePicker").defaultDate(moment($(this).attr("defaultDate"), "YYYY-MM-DD"));
       if($(this).attr("minDate")!="" && typeof $(this).attr("minDate")!==typeof undefined) $(this).data("DateTimePicker").minDate(moment($(this).attr("minDate"), "YYYY-MM-DD"));
       if($(this).attr("maxDate")!="" && typeof $(this).attr("maxDate")!==typeof undefined) $(this).data("DateTimePicker").maxDate(moment($(this).attr("maxDate"), "YYYY-MM-DD"));
     });
@@ -302,7 +321,7 @@ return blob;
       {% for field in section.fields %}
         {# LINKED FIELDS LIKE DATETIMES, ETC #}
         {% if field.linked is defined %}
-          {% if field.type is defined and (field.type=="date" or field.type=="time") %}
+          {% if field.type is defined and (field.type=="date" or field.type=="time"  or field.type=="dateshort") %}
                $("#form_{{ field.name }}").on("dp.change", function (e) {
                  $('#form_{{ field.linked.field }}').data("DateTimePicker").{{ field.linked.by }}(e.date);
                });
@@ -314,7 +333,7 @@ return blob;
         {% endif %}
 
 
-        {# Depends fields #}
+        {# DEPENDS FIELDS #}
             {% if field.depends is defined %}
               $('body').on('change', '#form_{{ field.depends.from }}', function() {
                 {% if field.depends.vals == "any" %}
@@ -342,8 +361,6 @@ return blob;
               {% endif %}
             {% endif %}
         {# END of depends fields #}
-
-
       {% endfor %}
     {% endfor %}
   });
