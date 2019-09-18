@@ -11,8 +11,8 @@
 							"options": {"Elige uno":"0", "Supplier": "1", "Customer": "2"}
 					}
 				},
-				{ "name": "customer", "cols": 3, "depends":{"from": "type","vals":"[1]"}},
-				{ "name": "supplier", "cols": 3, "depends":{"from": "type","vals":"[2]"}}
+				{ "name": "supplier", "cols": 3, "depends":{"from": "type","vals":"[1]"}},
+				{ "name": "customer", "cols": 3, "depends":{"from": "type","vals":"[2]"}}
 			]
 		}]
 }]

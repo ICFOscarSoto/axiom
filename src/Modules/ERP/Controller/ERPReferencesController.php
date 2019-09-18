@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\ERP\Entity\ERPReferences;
 use App\Modules\ERP\Entity\ERPProducts;
+use App\Modules\ERP\Entity\ERPSuppliers;
 use App\Modules\Globale\Entity\GlobaleCountries;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
@@ -61,8 +62,11 @@ class ERPReferencesController extends Controller
       if($idproduct==0 || $idproduct==null) $idproduct=$request->request->get('id-parent',0);
       $product = $defaultProduct->find($idproduct);
     }else $obj = $EAN13Repository->find($id);
-
-     $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "product"=>$id==0?$product:$obj->getProduct()];
+     $supplier=$id==0?$product->getSupplier():$obj->getProduct()->getSupplier();
+     $defaultSupplier=$this->getDoctrine()->getRepository(ERPSuppliers::class);
+     if($obj->getSupplier()==null) $default=$defaultSupplier->findOneBy(['id'=>$supplier->getId()]);
+      else $default=$obj->getSupplier();
+     $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "supplier"=>$default, "product"=>$id==0?$product:$obj->getProduct()];
      $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),
                             method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
      return $utils->make($id, ERPReferences::class, $action, "formProducts", "modal");

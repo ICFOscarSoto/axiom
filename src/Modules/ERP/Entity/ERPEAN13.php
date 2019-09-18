@@ -26,16 +26,13 @@ class ERPEAN13
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPSuppliers")
-<<<<<<< HEAD
-=======
      * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
->>>>>>> 2ae454a841ef1d53490a932c7e60d2b4fb5ff734
      */
     private $supplier;
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPProducts")
-     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     private $product;
 

@@ -8,6 +8,7 @@ use Symfony\Component\Form\Extension\Core\Type\FileType;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\Email\Entity\EmailAccounts;
 use App\Modules\ERP\Entity\ERPProducts;
+use App\Modules\ERP\Entity\ERPSuppliers;
 
 class ERPReferencesUtils
 {
@@ -31,14 +32,16 @@ class ERPReferencesUtils
 
 
   public function getExcludedForm($params){
-    return ['product'];
+    return ['product', 'supplier'];
   }
 
   public function getIncludedForm($params){
     $doctrine=$params["doctrine"];
     $user=$params["user"];
     $product=$params["product"];
+    $supplier=$params["supplier"];
     $productsRepository=$doctrine->getRepository(ERPProducts::class);
+    $suppliersRepository=$doctrine->getRepository(ERPSuppliers::class);
     return [
     ['product', ChoiceType::class, [
       'required' => false,
@@ -51,6 +54,18 @@ class ERPReferencesUtils
       },
       'choice_value' => 'id',
       'data' => $product
+    ]],
+    ['supplier', ChoiceType::class, [
+      'required' => false,
+      'disabled' => false,
+      'attr' => ['class' => 'select2', 'readonly' => true],
+      'choices' => $suppliersRepository->findBy(["company"=>$user->getCompany()]),
+      'placeholder' => 'Select a product',
+      'choice_label' => function($obj, $key, $index) {
+          return $obj->getName();
+      },
+      'choice_value' => 'id',
+      'data' => $supplier
     ]]
   ];
   }

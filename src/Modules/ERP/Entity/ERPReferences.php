@@ -3,9 +3,9 @@
 namespace App\Modules\ERP\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use \App\Modules\ERP\Entity\ERPSuppliers;
 use \App\Modules\ERP\Entity\ERPCustomers;
 use \App\Modules\ERP\Entity\ERPProducts;
+use \App\Modules\ERP\Entity\ERPSuppliers;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPReferencesRepository")
@@ -23,11 +23,6 @@ class ERPReferences
      * @ORM\Column(type="string", length=20)
      */
     private $name;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPSuppliers")
-     */
-    private $supplier;
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPCustomers")
@@ -65,6 +60,11 @@ class ERPReferences
      */
     private $type;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPSuppliers")
+     */
+    private $supplier;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -82,17 +82,6 @@ class ERPReferences
         return $this;
     }
 
-    public function getSupplier(): ?ERPSuppliers
-    {
-        return $this->supplier;
-    }
-
-    public function setSupplier(?ERPSuppliers $supplier): self
-    {
-        $this->supplier = $supplier;
-
-        return $this;
-    }
 
     public function getCustomer(): ?ERPCustomers
     {
@@ -174,6 +163,18 @@ class ERPReferences
     public function setType(?int $type): self
     {
         $this->type = $type;
+
+        return $this;
+    }
+
+    public function getSupplier(): ?ERPSuppliers
+    {
+        return $this->supplier;
+    }
+
+    public function setSupplier(?ERPSuppliers $supplier): self
+    {
+        $this->supplier = $supplier;
 
         return $this;
     }
