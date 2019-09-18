@@ -111,6 +111,7 @@ class GlobaleFormUtils extends Controller
             case 'datetime':
             case 'date':
             case 'time':
+            case 'dateshort':
               //Check if has a template types
               $field=$this->searchTemplateField($value['fieldName']);
               $attr=[];
@@ -119,10 +120,10 @@ class GlobaleFormUtils extends Controller
 
               if(isset($field["type"])){
                 if($field["type"]=="date")
-                  $form->add($value['fieldName'], DateType::class, ['required' => !$value["nullable"], 'empty_data' => '', 'widget' => 'single_text', 'format' => 'dd/MM/yyyy', 'attr' => array_merge(['class' => 'datepicker'],$attr)]);
+                  $form->add($value['fieldName'], DateType::class, ['required' => !$value["nullable"], 'empty_data' => '', 'widget' => 'single_text', 'format' => 'dd/MM/yyyy', 'attr' => array_merge(['class' => 'datepicker' , 'defaultDate' => isset($field["defaultDate"])?$field["defaultDate"]:'' ],$attr)]);
                 if($field["type"]=="time")
                   $form->add($value['fieldName'], TimeType::class, ['required' => !$value["nullable"], 'empty_data' => '', 'widget' => 'single_text', 'attr' => array_merge(['class' => 'timepicker'],$attr)]);
-              }else $form->add($value['fieldName'], DateTimeType::class, ['required' => !$value["nullable"], 'empty_data' => '', 'widget' => 'single_text', 'format' => 'dd/MM/yyyy kk:mm:ss', 'attr' => array_merge(['class' => 'datetimepicker'],$attr)]);
+              }else $form->add($value['fieldName'], DateTimeType::class, ['required' => !$value["nullable"], 'empty_data' => '', 'widget' => 'single_text', 'format' => 'dd/MM/yyyy kk:mm:ss', 'attr' => array_merge(['class' => 'datetimepicker', 'defaultDate' => isset($field["defaultDate"])?$field["defaultDate"]:'' ],$attr)]);
             break;
             case 'json':
               $form->add($value['fieldName'], TextType::class, ['required' => !$value["nullable"], 'attr'=>['class' => 'tagsinput']]);
@@ -157,6 +158,9 @@ class GlobaleFormUtils extends Controller
                    switch ($field['type']){
                      case 'time':
                        $form->add($value['fieldName'], TextType::class, ['label'=>$label, 'required' => !$value["nullable"], 'attr' => ['class' => 'timepicker']]);
+                     break;
+                     case "dateshort":
+                         $form->add($value['fieldName'], TextType::class, ['required' => !$value["nullable"], 'empty_data' => '', 'attr' => ['class' => 'dateshortpicker', 'defaultDate' => isset($field["defaultDate"])?$field["defaultDate"]:'' ]]);
                      break;
                    }
                  }else{
@@ -292,18 +296,9 @@ class GlobaleFormUtils extends Controller
  }
 
  public function proccess2($form,$obj){
-
-
-
-
     $form->handleRequest($this->request);
-
-    dump($this->request);
-
-
     if(!$form->isSubmitted()) return false;
     if ($form->isSubmitted() && $form->isValid()) {
-
        $obj = $form->getData();
        dump($obj);
        //Aply convesion functions from view to controller
