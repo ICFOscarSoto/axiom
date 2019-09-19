@@ -307,7 +307,6 @@ class GlobaleFormUtils extends Controller
     if(!$form->isSubmitted()) return false;
     if ($form->isSubmitted() && $form->isValid()) {
        $obj = $form->getData();
-       dump($obj);
        //Aply convesion functions from view to controller
        $obj = $this->conversionController($obj);
        //definimos los valores predefinidos
