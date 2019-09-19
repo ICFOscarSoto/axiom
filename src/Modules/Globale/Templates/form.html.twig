@@ -11,6 +11,20 @@
   </div>
   {% endif %}
 
+  <div class="panel minimal">
+    <div class="panel-body">
+      <div class="row">
+        <div class="col-md-12">
+          <div id="{{formConstructor.name}}-validation-error" class="alert alert-danger form-validation-error" style="display: none">
+            <strong>Ocurrieron los siguientes errores:</strong></br></br><ul id="validation-errors-list"></ul>
+          </div>
+          <div id="{{formConstructor.name}}-validation-warning" class="alert alert-warning form-validation-error" style="display: none">
+            <strong>Revise las siguientes advertencias:</strong></br></br><ul id="validation-warnings-list"></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
   {% if include_pre_templates is defined %}
   	{% for template in include_pre_templates %}
   		{{ include(template) }}
@@ -23,6 +37,7 @@
     <div class="panel-heading">
       <div class="panel-title">{{ (section.name)|trans }}</div>
     </div>
+
     <div class="panel-body">
       <div class="row">
       {% for field in section.fields %}
@@ -177,6 +192,7 @@
       <input type="hidden" id="id-object" name="id-object" value="{{ formConstructor.id_object }}">
 
       </div>
+
     </div>
   </div>
   {% endfor %}
@@ -307,8 +323,14 @@ return blob;
                     toastr.success("Datos guardados correctamente", "Confirmación", confirmation);
                     if(data.reload) location.href=data.href;
                     $("#{{formConstructor.name}}-form-body").find('form').validate().resetForm();
-                  }
-                    else toastr.error("Ocurrió un error al guardar los datos", "Confirmación", confirmation);
+                  } else toastr.error("Ocurrió un error al guardar los datos", "Confirmación", confirmation);
+                  {# VALIDATION ON PROCCESS #}
+                  console.log("aqui");
+                  var validation=JSON.parse(data.validation.field_errors)
+                  validation.foreach(function(item, index, arr){
+                    $("#{{formConstructor.name}}-form-body #form_"+index).parent().append("<label id='form_period-error' class='error' for='form_period'>"+item+"</label>");
+                  });
+
               }, "json");
             }
     });

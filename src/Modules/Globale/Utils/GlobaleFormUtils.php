@@ -235,20 +235,26 @@ class GlobaleFormUtils extends Controller
 			switch($action){
 				 case 'save':
            //Buscar si existe un proccess dentro del utils de la clase
+           $validation=[];
            if($utilsClass!=null && method_exists($utilsClass, 'proccess')){
              $utils=new $utilsClass();
 					   $this->obj=$utils->proccess($form,$this->user,$this->obj,$this->request,$this->entityManager,$this->encoder);
            }else{
            //Si no, ejecutamos el process estandar del formutils
-					   $this->obj=$this->proccess2($form,$this->obj);
+             $proccess=$this->proccess2($form,$this->obj);
+             $validation=$proccess["validation"];
+					   $this->obj=$proccess["obj"];
            }
            if(is_bool($this->obj)) $result=false;
-            else if ($this->obj->getId()!==FALSE) $result=true;
+            else{
+              if ($this->obj->getId()!==FALSE) $result=true;
+              $routeParams=array_merge($this->routeParams, ["id"=>$this->obj->getId()]);
+            }
 					 //$result=((!is_bool($this->obj) && $this->obj->getId()!==FALSE)?true:false);
            if($returnRoute==null)$returnRoute=$this->request->get('_route');
-           $routeParams=array_merge($this->routeParams, ["id"=>$this->obj->getId()]);
+           //$routeParams=array_merge($this->routeParams, ["id"=>$this->obj->getId()]);
            $route=$result?(($id!=$this->obj->getId())? $returnRoute=='none'?'':$this->controller->generateUrl($returnRoute,$routeParams) :''):'';
-					 return new GlobaleJsonResponse(array('result' => $result, 'href' =>$route, 'reload' =>$result?(($id!=$this->obj->getId())?($returnRoute=='none'?false:true):false):'', 'id' => $result?$this->obj->getId():''));
+					 return new GlobaleJsonResponse(array('result' => $result, 'validation'=>$validation, 'href' =>$route, 'reload' =>$result?(($id!=$this->obj->getId())?($returnRoute=='none'?false:true):false):'', 'id' => $result?$this->obj->getId():''));
            //return array('result' => $result, 'href' =>$route, 'reload' =>$result?(($id!=$this->obj->getId())?($returnRoute=='none'?false:true):false):'', 'id' => $result?$this->obj->getId():'');
 				 break;
 				 case 'read':
@@ -297,6 +303,7 @@ class GlobaleFormUtils extends Controller
 
  public function proccess2($form,$obj){
     $form->handleRequest($this->request);
+    $validation=["valid"=>true];
     if(!$form->isSubmitted()) return false;
     if ($form->isSubmitted() && $form->isValid()) {
        $obj = $form->getData();
@@ -315,18 +322,22 @@ class GlobaleFormUtils extends Controller
        }
        $obj->setDateupd(new \DateTime());
        try{
+         //if object has a validation check it
+         if(method_exists($obj,'formValidation')) $validation=$obj->{'formValidation'}($this->controller->get('kernel'), $this->doctrine, $this->user, $this->preParams);
+         if($validation["valid"]==false) //Abort proccess
+          return ["obj"=>false, "validation"=>$validation];
+         //if object has a preproccess run it
          if(method_exists($obj,'preProccess')) $obj->{'preProccess'}($this->controller->get('kernel'), $this->doctrine, $this->user, $this->preParams);
-
 
          $this->entityManager->persist($obj);
          $this->entityManager->flush();
          if(method_exists($obj,'postProccess')) $obj->{'postProccess'}($this->controller->get('kernel'), $this->doctrine, $this->user, $this->postParams);
          $this->detectObjChanges($this->obj_old, $obj);
-         return $obj;
+         return ["obj"=>$obj, "validation"=>$validation];
        }catch (Exception $e) {
-         return false;
+         return ["obj"=>false, "validation"=>$validation];
        }
-    }else return false;
+    }else return ["obj"=>false, "validation"=>$validation];
   }
 
   public function detectObjChanges($old, $new){

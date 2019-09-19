@@ -56,14 +56,43 @@
                   $.post($("#{{field.modal}}-modal-form-body").find('form').find('#post-url').val(), $("#{{field.modal}}-modal-form-body").find('form').serialize()+id_parent,
                       function(data, status, xhr){
                         if((--load_wait)==0) $("#load-spinner").fadeOut();
+                        {# VALIDATION ON PROCCESS #}
+                        {# FIELD_ERRORS #}
+                        if(typeof data.validation !== 'undefined' && data.validation.valid==false){
+                          Object.keys(data.validation.field_errors).forEach(function(index){
+                            $("#{{field.modal}}-modal-form-body #form_"+index).parent().append("<label id='form_period-error' class='error' for='form_period'>"+data.validation.field_errors[index]+"</label>");
+                          });
+                        }
+                        {# GLOBAL_ERRORS #}
+                        if(typeof data.validation !== 'undefined' && data.validation.valid==false){
+                          var errors="";
+                          Object.keys(data.validation.global_errors).forEach(function(index){
+                            errors+="<li>"+data.validation.global_errors[index]+"</li>";
+                          });
+                          $("#{{field.modal}}-modal-form-body #validation-errors-list").html(errors);
+                          $("#{{field.modal}}-modal-form-body [id$='-validation-error']").slideDown();
+                        }
+                        {# GLOBAL_WARNINGS #}
+                        var warnings="";
+                        if(typeof data.validation !== 'undefined' && typeof data.validation.global_warnings !== 'undefined'){
+                          Object.keys(data.validation.global_warnings).forEach(function(index){
+                            warnings+="<li>"+data.validation.global_warnings[index]+"</li>";
+                          });
+                          $("#{{field.modal}}-modal-form-body #validation-warnings-list").html(warnings);
+                          $("#{{field.modal}}-modal-form-body [id$='-validation-warning']").slideDown();
+                        }
                         if(data.result){
                           $("#{{ listConstructor.id }}").DataTable().ajax.reload();
                           toastr.success("Datos guardados correctamente", "Confirmación", confirmation);
-                          $("#{{ field.modal }}-modal-form").modal('hide');
+
+
+                          if(warnings=="") $("#{{ field.modal }}-modal-form").modal('hide');
                           $("#{{field.modal}}-modal-form-body").find('form').trigger("reset");
                           $("#{{field.modal}}-modal-form-body").find('form').validate().resetForm();
                         }
                           else toastr.error("Ocurrió un error al guardar los datos", "Confirmación", confirmation);
+
+
                     }, "json");
                   }
           });
