@@ -10,7 +10,7 @@ use App\Modules\Globale\Entity\MenuOptions;
 class ERPStocksUtils
 {
 
-  public function formatList($product){
+  public function formatListByProduct($product){
     $list=[
       'id' => 'listStocks',
       'route' => 'stocklist',

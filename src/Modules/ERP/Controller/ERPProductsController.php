@@ -154,7 +154,7 @@ class ERPProductsController extends Controller
 				'form' => $formUtils->formatForm('products', true, $id, $this->class, "dataProduct"),
 				'listEAN13' => $listEAN13->formatListByProduct($id),
 				'listReferences' => $listReferences->formatListByProduct($id),
-				'listStocks' => $listStocks->formatList($id),
+				'listStocks' => $listStocks->formatListByProduct($id),
 				'forms' => $forms
 			));
 

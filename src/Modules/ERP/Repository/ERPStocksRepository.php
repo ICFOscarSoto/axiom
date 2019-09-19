@@ -19,32 +19,15 @@ class ERPStocksRepository extends ServiceEntityRepository
         parent::__construct($registry, ERPStocks::class);
     }
 
-    // /**
-    //  * @return ERPStocks[] Returns an array of ERPStocks objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function findByProduct($value)
     {
-        return $this->createQueryBuilder('e')
-            ->andWhere('e.exampleField = :val')
+        return $this->createQueryBuilder('c')
+            ->andWhere('c.product_id = :val')
             ->setParameter('val', $value)
-            ->orderBy('e.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?ERPStocks
-    {
-        return $this->createQueryBuilder('e')
-            ->andWhere('e.exampleField = :val')
-            ->setParameter('val', $value)
+            ->orderBy('c.id', 'ASC')
+            ->setMaxResults(20)
             ->getQuery()
             ->getOneOrNullResult()
         ;
     }
-    */
 }

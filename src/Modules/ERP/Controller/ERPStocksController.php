@@ -70,19 +70,21 @@ class ERPStocksController extends Controller
     }
 
   /**
-   * @Route("/api/stock/list", name="stocklist")
+   * @Route("/api/stock/{id}/list", name="stocklist")
    */
-  public function indexlist(RouterInterface $router,Request $request){
+  public function indexlist($id,RouterInterface $router,Request $request){
     $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
     $user = $this->getUser();
-    $locale = $request->getLocale();
+		$productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
+    $product = $productRepository->find($id);
+		$locale = $request->getLocale();
     $this->router = $router;
     $manager = $this->getDoctrine()->getManager();
     $repository = $manager->getRepository(ERPStocks::class);
     $listUtils=new GlobaleListUtils();
     $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Stocks.json"),true);
-    $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, ERPStocks::class,[["type"=>"and", "column"=>"company", "value"=>$user->getCompany()]]);
-    return new JsonResponse($return);
+    $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, ERPStocks::class,[["type"=>"and", "column"=>"company", "value"=>$user->getCompany()],["type"=>"and","column"=>"product", "value"=>$product]]);
+		return new JsonResponse($return);
   }
 
 
