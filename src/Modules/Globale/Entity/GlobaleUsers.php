@@ -249,6 +249,7 @@ class GlobaleUsers implements UserInterface
         $diskusage=($connectas==null)?$this->getCompany()->getDiskUsages():$connectas->getDiskUsages();
         $data["diskusage"]["space"]=$filesHelper->formatBytes($diskusage[0]->getDiskspace());
         $data["diskusage"]["free"]=$filesHelper->formatBytes($diskusage[0]->getDiskspace()-$diskusage[0]->getDiskusage());
+        $data["diskusage"]["used"]=$filesHelper->formatBytes($diskusage[0]->getDiskusage());
         $data["diskusage"]["free_perc"]=round($diskusage[0]->getDiskusage()*100/$diskusage[0]->getDiskspace(),1);
         $data["diskusage"]["distribution"]=json_decode($diskusage[0]->getDistribution(),true);
       }
