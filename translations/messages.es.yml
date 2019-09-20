@@ -290,7 +290,9 @@ Clock Devices: Relojes Fichado
 #----------------------------------------------------------------------------------------------------------------------
 Schedule: Horario
 Schedules: Horarios
-Shift: Turno
+Fromdate: Fecha Desde
+Todate: Fecha Hasta
+Shift: Grupo Horario
 Shifts: Turnos
 Period: Periodo
 Periods: Periodos
@@ -301,3 +303,5 @@ Thursday: Jueves
 Friday: Viernes
 Saturday: Sabado
 Sunday: Domingo
+Select hrschedules: Seleccionar horario
+Select HRShifts: Seleccionar grupo horario

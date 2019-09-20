@@ -28,6 +28,13 @@ table {
     font-size: 12px;
 }
 
+.form-validation-error {
+  margin: 0px 0px 5px 0px !important;
+  padding: 5px 15px 5px 15px;
+  margin-bottom: 0px;
+
+}
+
 .dd-edit{
   margin: 0 !important;
   width: 30px;

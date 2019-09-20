@@ -26,7 +26,7 @@ class HRSchedules
     private $name;
 
     /**
-     * @ORM\Column(type="smallint")
+     * @ORM\Column(type="smallint", nullable=true)
      */
     private $period;
 

@@ -25,16 +25,6 @@ class HRShifts
     private $name;
 
     /**
-     * @ORM\Column(type="datetime")
-     */
-    private $start;
-
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
-    private $end;
-
-    /**
      * @ORM\Column(type="boolean")
      */
     private $active;
@@ -83,7 +73,7 @@ class HRShifts
         return $this;
     }
 
-    public function getStart(): ?\DateTimeInterface
+    /*public function getStart(): ?\DateTimeInterface
     {
         return $this->start;
     }
@@ -110,7 +100,8 @@ class HRShifts
      }
       return $this;
     }
-
+    */
+    
     public function getActive(): ?bool
     {
         return $this->active;

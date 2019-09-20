@@ -102,9 +102,9 @@ class HRPeriodsController extends Controller
 	      if($idshift==0 ) $idshift=$request->query->get('shift');
 				if($idshift==0 || $idshift==null) $idshift=$request->request->get('form',[])["shift"];
 	      $shift = $shiftsRepository->find($idshift);
-	    }	else $obj = $shiftsRepository->find($id);
+	    }	else $obj = $periodsRepository->find($id);
 
-	    $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "shift"=>$id==0?$shift:$obj->getSchedule()];
+	    $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "shift"=>$id==0?$shift:$obj->getShift()];
 	    $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),
 	                       method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
 	    if($id==0) $utils->values(["shift"=>$shift]);

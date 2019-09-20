@@ -7,7 +7,7 @@
         { "name": "type", "cols": 3,
           "transform": {
               "type":"option",
-              "options": {"Libre": "1", "Fijo": "2", "Rotativo": "3"}
+              "options": {"Fijo": "2", "Rotativo": "3"}
           }
         },
         { "name": "period", "cols": 3, "depends":{"from": "type","vals":"[3]"}},

@@ -3,9 +3,22 @@
 		{
 			"name": "Datos",
 			"fields": [
-        {	"name": "shift", "cols": 4, "caption": "Turnos"},
+        {	"name": "shift", "cols": 4, "caption": "Turnos"}
+
+			]
+		},
+		{
+			"name": "Periodo que aplica",
+			"fields": [
+				{	"name": "fromdate", "cols": 4, "caption": "Desde","type": "dateshort", "defaultDate":"1970-01-01", "linked": {"field":"todate", "by":"minDate"}},
+				{	"name": "todate", "cols": 4, "caption": "Hasta", "type": "dateshort", "defaultDate":"1970-12-31", "linked": {"field":"fromdate", "by":"maxDate"}},
 				{	"name": "start", "cols": 4, "type": "time", "caption": "Hora Inicio"},
-				{	"name": "end", "cols": 4, "type": "time", "caption": "Hora Fin"},
+				{	"name": "end", "cols": 4, "type": "time", "caption": "Hora Fin"}
+			]
+		},
+		{
+			"name": "Días semana que aplica",
+			"fields": [
 				{	"name": "monday", "cols": 3},
 				{	"name": "tuesday", "cols": 3},
 				{	"name": "wednesday", "cols": 3},
@@ -13,8 +26,9 @@
 				{	"name": "friday", "cols": 3},
 				{	"name": "saturday", "cols": 3},
 				{	"name": "sunday", "cols": 3},
-        {	"name": "active", "cols": 12}
+				{	"name": "active", "cols": 12}
 			]
 		}
 	]
+
 }]

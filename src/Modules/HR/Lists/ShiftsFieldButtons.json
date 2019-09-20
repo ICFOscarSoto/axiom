@@ -1,9 +1,9 @@
 [
-  {"id": "data", "type" : "default", "icon" : "fa fa-bars", "name" : "datos", "route":"periods", "confirm" :false, "actionType" : "foreground"},
-  {"id": "edit", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"dataShifts",  "modal":"shifts", "actionType" : "background", "confirm" :false},
+  {"id": "data", "type" : "default", "icon" : "fa fa-bars", "name" : "datos", "route":"periods", "tooltip":"Programación horas grupo", "confirm" :false, "actionType" : "foreground"},
+  {"id": "edit", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"dataShifts", "tooltip":"Editar grupo", "modal":"shifts", "actionType" : "background", "confirm" :false},
   {"id": "activation", "type": "option", "options": [
-      {"id": "desactivate", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"", "confirm" :true, "actionType" : "background" },
-      {"id": "activate", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "route":"", "confirm" :true, "actionType" : "background" }
+      {"id": "desactivate", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "tooltip":"Desactivar grupo", "route":"disableShift", "confirm" :true, "actionType" : "background" },
+      {"id": "activate", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "tooltip":"Activar grupo", "route":"enableShift", "confirm" :true, "actionType" : "background" }
   ]},
-  {"id": "delete", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"", "confirm" :true, "undo" :false, "tooltip":"Borrar vacaciones", "actionType" : "background"}
+  {"id": "delete", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"deleteShift", "confirm" :true, "undo" :false, "tooltip":"Borrar grupo", "actionType" : "background"}
 ]

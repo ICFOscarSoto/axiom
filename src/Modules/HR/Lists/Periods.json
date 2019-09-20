@@ -34,8 +34,10 @@
                             "0":{"text":"-","html":"-"}
                          }
  },
- {"name": "start","width":"35%","caption":"Inicio"},
- {"name": "end","width":"35%","caption":"Fin"},
+ {"name": "fromdate", "width":"20%","caption":"Desde", "type": "dateshort"},
+ {"name": "todate", "width":"20%","caption":"Hasta", "type": "dateshort"},
+ {"name": "start","width":"15%","caption":"Inicio"},
+ {"name": "end","width":"15%","caption":"Fin"},
  {"name": "active", "caption":"Estado", "width":"10%" ,"class" : "dt-center", "replace":{
                             "1":{"text":"Activo","html":"<div style=\"min-width: 75px;\" class=\"label label-success\">Activo</div>"},
                             "0":{"text":"Desactivado","html":"<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado</div>"}

@@ -58,13 +58,13 @@
                         if((--load_wait)==0) $("#load-spinner").fadeOut();
                         {# VALIDATION ON PROCCESS #}
                         {# FIELD_ERRORS #}
-                        if(typeof data.validation !== 'undefined' && data.validation.valid==false){
+                        if(typeof data.validation !== 'undefined' && data.validation.valid==false && typeof data.validation.field_errors !== 'undefined'){
                           Object.keys(data.validation.field_errors).forEach(function(index){
                             $("#{{field.modal}}-modal-form-body #form_"+index).parent().append("<label id='form_period-error' class='error' for='form_period'>"+data.validation.field_errors[index]+"</label>");
                           });
                         }
                         {# GLOBAL_ERRORS #}
-                        if(typeof data.validation !== 'undefined' && data.validation.valid==false){
+                        if(typeof data.validation !== 'undefined' && data.validation.valid==false && typeof data.validation.global_errors){
                           var errors="";
                           Object.keys(data.validation.global_errors).forEach(function(index){
                             errors+="<li>"+data.validation.global_errors[index]+"</li>";

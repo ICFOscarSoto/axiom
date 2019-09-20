@@ -1,7 +1,5 @@
 [{"name": "id", "caption":""},
  {"name": "name", "caption":"Nombre"},
- {"name": "start", "caption":"Inicio", "type": "date", "width":"15%"},
- {"name": "end", "caption":"Fin", "type": "date", "width":"15%"},
  {"name": "active", "caption":"Estado", "width":"10%" ,"class" : "dt-center", "replace":{
                             "1":{"text":"Activo","html":"<div style=\"min-width: 75px;\" class=\"label label-success\">Activo</div>"},
                             "0":{"text":"Desactivado","html":"<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado</div>"}

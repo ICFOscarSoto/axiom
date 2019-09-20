@@ -19,7 +19,7 @@ class HRShiftsUtils
       'id' => 'listShifts',
       'route' => 'shiftslist',
       'routeParams' => ["id" => $schedule],
-      'orderColumn' => 4,
+      'orderColumn' => 2,
       'orderDirection' => 'DESC',
       'tagColumn' => 2,
       'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Shifts.json"),true),

@@ -71,7 +71,7 @@ class HRPeriods
     /**
      * @ORM\Column(type="boolean")
      */
-    private $active;
+    private $active=true;
 
     /**
      * @ORM\Column(type="boolean")
@@ -87,6 +87,16 @@ class HRPeriods
      * @ORM\Column(type="datetime")
      */
     private $dateupd;
+
+    /**
+     * @ORM\Column(type="string", length=5)
+     */
+    private $fromdate;
+
+    /**
+     * @ORM\Column(type="string", length=5)
+     */
+    private $todate;
 
 
     public function getId(): ?int
@@ -251,5 +261,39 @@ class HRPeriods
         $this->dateupd = $dateupd;
 
         return $this;
+    }
+
+    public function getFromdate(): ?string
+    {
+        return $this->fromdate;
+    }
+
+    public function setFromdate(string $fromdate): self
+    {
+        $this->fromdate = $fromdate;
+
+        return $this;
+    }
+
+    public function getTodate(): ?string
+    {
+        return $this->todate;
+    }
+
+    public function setTodate(string $todate): self
+    {
+        $this->todate = $todate;
+
+        return $this;
+    }
+
+    public function formValidation($kernel, $doctrine, $user, $validationParams){
+      //Check for overlapped periods
+      $repository=$doctrine->getRepository(HRPeriods::class);
+      //Get registers where fromdate>=this fromdate and todate<= this todate and start>=this start and end<= this and ((monday=1 and this monday=1) or (tuesday=1 and this tuesday=1) or ...)
+      $periods=$repository->findByPeriod($this);
+      if($periods!=null)
+        return ["valid"=>false, "global_errors"=>["El periodo definido se solapa con otro periodo de este grupo", "Revise las fechas y horas definidas en este periodo"]];
+      else return ["valid"=>true];
     }
 }
