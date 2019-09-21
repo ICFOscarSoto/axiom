@@ -19,7 +19,6 @@ class HRPeriodsRepository extends ServiceEntityRepository
         parent::__construct($registry, HRPeriods::class);
     }
 
-
     public function findByPeriod($period){
       $query="SELECT * FROM hrperiods p WHERE
             	((STR_TO_DATE(CONCAT(:FROMDATE,'/', YEAR(CURDATE())), '%d/%m/%Y') BETWEEN STR_TO_DATE(CONCAT(p.fromdate,'/', YEAR(CURDATE())), '%d/%m/%Y') AND STR_TO_DATE(CONCAT(p.todate,'/', YEAR(CURDATE())), '%d/%m/%Y')) OR
@@ -38,7 +37,7 @@ class HRPeriodsRepository extends ServiceEntityRepository
               )
               AND p.active=1 AND p.deleted=0 AND shift_id=:SHIFT AND id<>:ID";
 
-      $params=['ID' => $period->getId(),
+      $params=['ID' => $period->getId()!=null?$period->getId():0,
                'FROMDATE' => $period->getFromdate(),
                'TODATE' => $period->getTodate(),
                'START' => $period->getStart(),
@@ -51,7 +50,7 @@ class HRPeriodsRepository extends ServiceEntityRepository
                'SATURDAY' => $period->getSaturday(),
                'SUNDAY' => $period->getSunday(),
                'SHIFT' => $period->getShift()->getId() ];
-               
+
       return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetch();
 
     }

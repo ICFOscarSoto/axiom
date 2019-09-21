@@ -111,10 +111,6 @@ WebProduct:
     resource: 'App\Modules\ERP\Controller\ERPWebProductsController'
     type:     annotation
 
-ProductPriceMeasurementUnits:
-    resource: 'App\Modules\ERP\Controller\ERPProductPriceMeasurementUnitsController'
-    type:     annotation
-
 DiscountGroups:
     resource: 'App\Modules\ERP\Controller\ERPDiscountGroupsController'
     type:     annotation
