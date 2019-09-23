@@ -106,14 +106,15 @@
 $('body').on('click', "[id$='-top-button-foreground']", function() {
   if($(this).attr('attr-href')!=""){
     var url=$(this).attr('attr-href');
+    var target=$(this).attr('attr-target');
+    if (typeof target !== typeof undefined && target !== false) target='_self';
     if($(this).attr('attr-search')==1){
       url+='?'+$("#search_param").val();
     }
     window.open(
       url,
-      '_blank'
+      target
     );
-
   }
 });
 </script>
