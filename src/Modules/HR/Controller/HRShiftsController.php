@@ -44,6 +44,13 @@ class HRShiftsController extends Controller
   $schedulesRepository=$this->getDoctrine()->getRepository(HRSchedules::class);
   $schedule=$schedulesRepository->findOneBy(["id"=>$id]);
 
+  //Redirect to periods if schedule type is 'fijo'
+  if($schedule->getType()==2){
+    $shiftsRepository=$this->getDoctrine()->getRepository(HRShifts::class);
+    $shift=$shiftsRepository->findOneBy(["schedule"=>$schedule]);
+    return $this->redirectToRoute('periods', ['id' => $shift->getId()]);
+  }
+
   $utils = new $this->utilsClass();
   $templateLists[]=$utils->formatListbySchedule($id);
   $formUtils=new GlobaleFormUtils();

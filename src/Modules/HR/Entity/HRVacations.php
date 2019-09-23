@@ -227,7 +227,7 @@ class HRVacations
 
     public function getDays(): ?float
     {
-      if ($this->days==null){
+      if ($this->days===null){
         $today=new \DateTime();
         return ($today->add(new \DateInterval('PT24H')))->diff($this->start)->format('%a');
        }else return $this->days;
@@ -250,6 +250,14 @@ class HRVacations
         return $this;
     }
 
+    public function formValidation($kernel, $doctrine, $user, $validationParams){
+      if($this->worker->getSchedule()==null && $this->hourslastday>0)
+        return ["valid"=>false, "global_errors"=>["Para definir una jornada parcial el trabajador debe tener un horario asociado."]];
+      else if ($this->hourslastday>0 && $this->end!=$this->start)
+        return ["valid"=>false, "global_errors"=>["Para definir una jornada parcial la fecha de inicio y final debe ser la misma"]];
+          else return ["valid"=>true];
+    }
+
     public function preProccess($kernel, $doctrine, $user){
       $date_end=clone $this->getEnd();
       $date_start=clone $this->getStart();
@@ -259,9 +267,15 @@ class HRVacations
         //Hours
         if($this->hourslastday!=null || $this->hourslastday){
           //TODO: calculate daily hours of workers
-          $journey=8.5;
-          $partial_journey=1-round($this->hourslastday/$journey,2);
-          $this->days -= $partial_journey;
+          $scheduleRepository=$doctrine->getRepository(HRSchedules::class);
+          $period=$scheduleRepository->hoursDayWork($this->worker, $this->getEnd()->format("Y-m-d"));
+          if($period>0){
+            $journey=$period;
+            $partial_journey=1-round($this->hourslastday/$journey,2);
+            $this->days -= $partial_journey;
+          }else{
+              $this->days=$this->days-1;
+          }
         }
       }
     }

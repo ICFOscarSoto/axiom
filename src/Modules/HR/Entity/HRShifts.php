@@ -101,7 +101,7 @@ class HRShifts
       return $this;
     }
     */
-    
+
     public function getActive(): ?bool
     {
         return $this->active;
@@ -161,4 +161,5 @@ class HRShifts
 
         return $this;
     }
+
 }

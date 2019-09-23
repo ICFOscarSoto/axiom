@@ -167,4 +167,21 @@ class HRSchedules
         return $this;
     }
 
+    public function postProccess($kernel, $doctrine, $user){
+      // if Schedule type is 'fijo' create the only Shift allowed
+      $shiftRepository=$doctrine->getRepository(HRShifts::class);
+      $shifts=$shiftRepository->findOneBy(["schedule"=>$this]);
+      if($this->type==2 && $shifts==null){
+        $shift = new HRShifts();
+        $shift->setName(strtoupper(substr($this->name, 0, 3)).'01');
+        $shift->setSchedule($this);
+        $shift->setActive(1);
+        $shift->setDeleted(0);
+        $shift->setDateupd(new \DateTime());
+        $shift->setDateadd(new \DateTime());
+        $doctrine->getManager()->persist($shift);
+        $doctrine->getManager()->flush();
+      }
+    }
+
 }
