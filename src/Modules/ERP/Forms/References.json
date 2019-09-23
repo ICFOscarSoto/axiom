@@ -12,7 +12,9 @@
 					}
 				},
 				{ "name": "supplier", "cols": 3, "depends":{"from": "type","vals":"[1]"}},
-				{ "name": "customer", "cols": 3, "depends":{"from": "type","vals":"[2]"}}
+				{ "name": "customer", "cols": 3, "depends":{"from": "type","vals":"[2]"}},
+				{ "name": "active","cols": 2}
 			]
-		}]
+		}
+	]
 }]

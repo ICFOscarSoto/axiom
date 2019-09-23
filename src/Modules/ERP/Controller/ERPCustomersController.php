@@ -11,6 +11,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\ERP\Entity\ERPCustomers;
+use App\Modules\ERP\Entity\ERPCustomerGroups;
 use App\Modules\Globale\Entity\GlobaleCountries;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
@@ -65,7 +66,10 @@ class ERPCustomersController extends Controller
 		 //$default=$default->findById(64);
 		 $defaultCountry=$this->getDoctrine()->getRepository(GlobaleCountries::class);
 		 $default=$defaultCountry->findOneBy(['name'=>"España"]);
+		 $defaultCountry2=$this->getDoctrine()->getRepository(ERPCustomerGroups::class);
+		 $default2=$defaultCountry2->findOneBy(['name'=>"Grupo1"]);
 		 $obj->setCountry($default);
+		 $obj->setCustomergroup($default2);
 		 $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine());
 		 $make= $utils->make($id, $this->class, $action, "formCustomers", "full", "@Globale/form.html.twig", "formCustomer");
 		 return $make;

@@ -10,7 +10,7 @@
               {% for item in basiclist %}
                 <tr>
                   {% for keyrow,value in item %}
-                    <td>{{ value }}</td>
+                    <td>{{ value|raw }}</td>
                   {% endfor %}
                 </tr>
               {% endfor %}

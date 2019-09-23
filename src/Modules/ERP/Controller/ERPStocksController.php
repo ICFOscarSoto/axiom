@@ -58,6 +58,20 @@ class ERPStocksController extends Controller
 		 return $utils->make($id, $this->class, $action, "formStocks", "modal");
 		}
 
+		/**
+		 * @Route("/{_locale}/stocks/infoStocks/{id}", name="infoStocks", defaults={"id"=0})
+		 */
+		public function infoStocks($id, Request $request){
+			$stocksReposiitory= $this->getDoctrine()->getRepository($this->class);
+			$stocks=$stocksReposiitory->stocksByStores($id);
+			foreach($stocks as $key=>$item){
+				$stocks[$key]["Acciones"]="<button>Ir</button>";
+			}
+			return $this->render('@ERP/infoStocks.html.twig', array(
+				'stocklist'=>$stocks
+			));
+		}
+
     /**
     * @Route("/api/global/stock/{id}/get", name="getStock")
     */

@@ -30,4 +30,15 @@ class ERPStocksRepository extends ServiceEntityRepository
             ->getOneOrNullResult()
         ;
     }
+
+    public function stocksByStores($product){
+      $query="SELECT a.name Store, IFNULL (SUM(s.quantity),0) Quantity
+              FROM erpstores a LEFT JOIN erpstore_locations u ON a.id=u.store_id LEFT JOIN erpstocks s ON u.id=s.storelocation_id AND s.product_id= :product
+              WHERE a.active=TRUE and a.deleted=0
+              GROUP BY a.name";
+
+      $params=['product' => $product];
+      return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+
+    }
 }

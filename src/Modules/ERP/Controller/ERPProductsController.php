@@ -14,6 +14,7 @@ use App\Modules\ERP\Entity\ERPProducts;
 use App\Modules\ERP\Entity\ERPWebProducts;
 use App\Modules\ERP\Entity\ERPEAN13;
 use App\Modules\ERP\Entity\ERPReferences;
+use App\Modules\ERP\Entity\ERPManufacturers;
 use App\Modules\ERP\Entity\ERPStocks;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
@@ -66,10 +67,12 @@ class ERPProductsController extends Controller
 		 $template=dirname(__FILE__)."/../Forms/Products.json";
 		 $utils = new GlobaleFormUtils();
 		 $utilsObj=new ERPProductsUtils();
-		 $obj=new ERPProducts();
-		 $productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
-		 $obj=$productRepository->find($id);
+		 $manufacturerRepository= $this->getDoctrine()->getRepository(ERPManufacturers::class);
+		 $manufacturer=$manufacturerRepository->findOneBy(["name"=>"Prueba"]);
+		 dump($manufacturer);
 		 $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine());
+
+		 $utils->values(["manufacturer"=>$manufacturer]);
 		 return $utils->make($id, $this->class, $action, "formproducts","full", "@ERP/productform.html.twig", "formProduct");
 
 		}
@@ -102,6 +105,7 @@ class ERPProductsController extends Controller
 								'tab' => $request->query->get('tab','data'), //Show initial tab, by default data tab
 								'tabs' => [
 									["name" => "data", "icon"=>"fa fa-id-card", "caption"=>"Products data", "active"=>true, "route"=>$this->generateUrl("formInfoProduct",["id"=>$id])],
+									["name" => "stocks", "icon"=>"fa fa-id-card", "caption"=>"Stocks", "route"=>$this->generateUrl("infoStocks",["id"=>$id])],
 									["name" => "webproduct", "icon"=>"fa fa-id-card", "caption"=>"Web", "route"=>$this->generateUrl("dataWebProducts",["id"=>$id])],
 									["name" => "files", "icon"=>"fa fa-cloud", "caption"=>"Files", "route"=>$this->generateUrl("cloudfiles",["id"=>$id, "path"=>"products"])]
 									],
@@ -142,6 +146,8 @@ class ERPProductsController extends Controller
 			$listStocks = new ERPStocksUtils();
 			$formUtilsStocks = new GlobaleFormUtils();
 			$formUtilsStocks->initialize($this->getUser(), new ERPStocks(), dirname(__FILE__)."/../Forms/Stocks.json", $request, $this, $this->getDoctrine());
+
+
 			$forms[]=$formUtilsStocks->formatForm('Stocks', true, null, ERPStocks::class);
 
 			return $this->render('@ERP/productform.html.twig', array(
