@@ -90,6 +90,9 @@ class GlobaleFormUtils extends Controller
 
 			}
     $this->obj_old=clone $this->obj;
+    foreach($this->values as $key => $val){
+       if(method_exists($this->obj,'set'.lcfirst($key))) $this->obj->{'set'.lcfirst($key)}($val);
+    }
     $form=$this->createFromEntity2(!$ajax)->getForm();
     $caption=ucfirst($name);
     $routeParams=array_merge($routeParams, ["id"=>$id, "action"=>"save"]);
