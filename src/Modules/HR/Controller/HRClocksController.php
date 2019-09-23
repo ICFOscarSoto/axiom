@@ -27,6 +27,7 @@ use App\Modules\HR\Entity\HRDepartments;
 use App\Modules\HR\Entity\HRVacations;
 use App\Modules\HR\Entity\HRSickleaves;
 use App\Modules\HR\Entity\HRHollidays;
+use App\Modules\HR\Entity\HRSchedules;
 
 use App\Modules\HR\Reports\HRClocksReports;
 use App\Modules\Globale\Entity\GlobaleNotifications;
@@ -453,6 +454,7 @@ class HRClocksController extends Controller
 		$vacationsRepository=$manager->getRepository(HRVacations::class);
     $sickleaveRepository=$manager->getRepository(HRSickleaves::class);
     $hollidaysRepository=$manager->getRepository(HRHollidays::class);
+		$schedulesRepository=$manager->getRepository(HRSchedules::class);
     $workerRepository=$manager->getRepository(HRWorkers::class);
 		$repository = $manager->getRepository($this->class);
 		$workersClocks=$repository->findWorkersClocks($user->getCompany());
@@ -464,6 +466,11 @@ class HRClocksController extends Controller
 			$holliday=$hollidaysRepository->dayHolliday($workerRepository->find($item["workerid"]), date ("Y"), date ("Y-m-d"));
 			$workersClocks[$key]["holliday"]=$holliday?$holliday["type"]:0;
 			$workersClocks[$key]["holliday_name"]=$holliday?$holliday["name"]:null;
+			$mustWork=$schedulesRepository->mustWork($workerRepository->find($item["workerid"]), date("Y-m-d"), date("H:i:s"));
+			$workersClocks[$key]["must_work"]=$mustWork?1:0;
+			$workersClocks[$key]["must_work_start"]=$mustWork?$mustWork["start"]:null;
+			$workersClocks[$key]["must_work_end"]=$mustWork?$mustWork["end"]:null;
+
 		}
 		return new JsonResponse($workersClocks);
 	}

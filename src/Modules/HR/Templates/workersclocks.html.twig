@@ -33,7 +33,7 @@
 								{% endfor %}
 							</select>
 					</div>
-				
+
 
 					</script>
 				</div>
@@ -88,24 +88,30 @@
 				$.getJSON("{{url('clocksstatuslist')}}", function( data ) {
 					 $.each( data, function( key, val ) {
 						 if(val.start==null || val.end!=null){
-							 if(val.vacation || val.sickleave || val.holliday){
+							 if(val.vacation || val.sickleave || val.holliday || val.must_work){
 								$("#worker-start-label-"+val.workerid).text('');
 								$("#worker-end-label-"+val.workerid).text('');
 								if(val.vacation){
-									$("#clock-"+val.workerid).addClass('tile-aqua'); $("#clock-"+val.workerid).removeClass('tile-green'); $("#clock-"+val.workerid).removeClass('tile-gray'); $("#clock-"+val.workerid).removeClass('tile-primary');
+									$("#clock-"+val.workerid).addClass('tile-aqua'); $("#clock-"+val.workerid).removeClass('tile-red'); $("#clock-"+val.workerid).removeClass('tile-green'); $("#clock-"+val.workerid).removeClass('tile-gray'); $("#clock-"+val.workerid).removeClass('tile-primary');
 									$("#worker-start-"+val.workerid).text('Vacaciones');
 									$("#worker-end-"+val.workerid).html('&nbsp;');
 
 								}else{
 									if(val.sickleave){
-										$("#clock-"+val.workerid).addClass('tile-tile-primary'); $("#clock-"+val.workerid).removeClass('tile-green'); $("#clock-"+val.workerid).removeClass('tile-gray'); $("#clock-"+val.workerid).removeClass('tile-aqua');
+										$("#clock-"+val.workerid).addClass('tile-tile-primary'); $("#clock-"+val.workerid).removeClass('tile-red'); $("#clock-"+val.workerid).removeClass('tile-green'); $("#clock-"+val.workerid).removeClass('tile-gray'); $("#clock-"+val.workerid).removeClass('tile-aqua');
 										$("#worker-start-"+val.workerid).text('Baja laboral');
 										$("#worker-end-"+val.workerid).html('&nbsp;');
 									}else{
 										if(val.holliday){
-											$("#clock-"+val.workerid).addClass('tile-aqua'); $("#clock-"+val.workerid).removeClass('tile-green'); $("#clock-"+val.workerid).removeClass('tile-gray');$("#clock-"+val.workerid).removeClass('tile-primary');
+											$("#clock-"+val.workerid).addClass('tile-aqua'); $("#clock-"+val.workerid).removeClass('tile-red'); $("#clock-"+val.workerid).removeClass('tile-green'); $("#clock-"+val.workerid).removeClass('tile-gray');$("#clock-"+val.workerid).removeClass('tile-primary');
 											$("#worker-start-"+val.workerid).text('Festivo:');
 											$("#worker-end-"+val.workerid).text(val.holliday_name);
+										}else{
+											if(val.must_work){
+												$("#clock-"+val.workerid).addClass('tile-red'); $("#clock-"+val.workerid).removeClass('tile-aqua'); $("#clock-"+val.workerid).removeClass('tile-green'); $("#clock-"+val.workerid).removeClass('tile-gray');$("#clock-"+val.workerid).removeClass('tile-primary');
+												$("#worker-start-"+val.workerid).text('Horario previsto:');
+												$("#worker-end-"+val.workerid).text(val.must_work_start+" - "+val.must_work_end);
+											}
 										}
 									}
 								}
