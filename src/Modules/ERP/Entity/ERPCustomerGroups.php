@@ -79,7 +79,7 @@ class ERPCustomerGroups
         return $this->dateadd;
     }
 
-    public function setDateadd(bool $dateadd): self
+    public function setDateadd(\DateTimeInterface $dateadd): self
     {
         $this->dateadd = $dateadd;
 
@@ -145,4 +145,19 @@ class ERPCustomerGroups
 
         return $this;
     }
+    
+    public function formValidation($kernel, $doctrine, $user, $validationParams){
+      //Check for overlapped periods
+      $repository=$doctrine->getRepository(ERPCustomerGroups::class);
+      $groups=$repository->findBy(["name"=>$this->name,"company"=>$this->company,"active"=>1,"deleted"=>0]);
+      if($groups!=null)
+        return ["valid"=>false, "global_errors"=>["Ya existe un grupo de clientes con ese nombre"]];
+      else return ["valid"=>true];
+    }
+    
+    public function preProccess($kernel, $doctrine, $user){
+        $this->name=strtoupper($this->name);
+      
+      }
+
 }

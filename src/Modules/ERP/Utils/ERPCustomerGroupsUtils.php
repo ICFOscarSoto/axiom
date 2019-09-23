@@ -12,8 +12,8 @@ class ERPCustomerGroupsUtils
 
   public function formatList($user){
     $list=[
-      'id' => 'listCustomers',
-      'route' => 'customerlist',
+      'id' => 'listCustomerGroups',
+      'route' => 'customergrouplist',
       'routeParams' => ["id" => $user->getId()],
       'orderColumn' => 2,
       'orderDirection' => 'ASC',
