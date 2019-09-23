@@ -1,0 +1,18 @@
+<table class="table table-bordered">
+          <thead>
+            <tr>
+              {% for key in basiclist|first|keys %}
+              <th>{{ key }}</th>
+              {% endfor %}
+            </tr>
+          </thead>
+          <tbody>
+              {% for item in basiclist %}
+                <tr>
+                  {% for keyrow,value in item %}
+                    <td>{{ value }}</td>
+                  {% endfor %}
+                </tr>
+              {% endfor %}
+          </tbody>
+</table>
