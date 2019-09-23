@@ -1,8 +1,0 @@
-[
-  {"id": "edit", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"dataDiscountGroups", "modal":"discountgroups", "actionType" : "background", "confirm" :false},
-  {"id": "activation", "type": "option", "options": [
-      {"id": "desactivate", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"disableDiscountGroup", "confirm" :true, "actionType" : "background" },
-      {"id": "activate", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "route":"enableDiscountGroup", "confirm" :true, "actionType" : "background" }
-  ]},
-  {"id": "delete", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"deleteDiscountGroup", "confirm" :true, "undo" :false, "tooltip":"Borrar grupo de descuento", "actionType" : "background"}
-]
