@@ -2,7 +2,7 @@
           <thead>
             <tr>
               {% for key in basiclist|first|keys %}
-              <th>{{ key }}</th>
+              <th>{{ (key)|trans }}</th>
               {% endfor %}
             </tr>
           </thead>
