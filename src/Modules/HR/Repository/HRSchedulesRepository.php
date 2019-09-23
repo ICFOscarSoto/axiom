@@ -25,8 +25,6 @@ class HRSchedulesRepository extends ServiceEntityRepository
       if($schedule==null) return false;
       //Get day of week
       $dayWeek=date("l", strtotime($date));
-      dump($dayWeek);
-      dump($worker);
       //Depend of schedule type
       switch($schedule->getType()){
         case 1: //Libre

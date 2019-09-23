@@ -105,7 +105,6 @@ class HRShiftsController extends Controller
       if($idschedule==0 || $idschedule==null) $idschedule=$request->request->get('id-parent',0);
       if($idschedule==0 || $idschedule==null) $idschedule=$request->request->get('form',[])["schedule"];
       $schedule = $scheduleRepository->find($idschedule);
-//      dump($idschedule);
     }	else $obj = $shiftsRepository->find($id);
 
     $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "schedule"=>$id==0?$schedule:$obj->getSchedule()];
