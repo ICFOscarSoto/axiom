@@ -56,7 +56,7 @@
 						<div id="clock-{{clock.workerid}}" class="tile-stats {% if clock.start is null or clock.end is not null %}tile-gray{% else %}tile-green{% endif %} clock-user-card" style="height: 220px;">
 							<div class="icon"><i class="entypo-user"></i></div>
 							<div class="num" id="worker-img-{{clock.workerid}}"><img src="{{url('getImage',{'id': clock.workerid, 'type': 'workers', 'size': 'thumb'}) }}" alt="" class="img-circle" width="80" height="80"/></div>
-							<h3 id="worker-name-{{clock.workerid}}">{{clock.lastname}}, {{clock.name}}</h3>
+							<div style="font-weight: bold;font-size: 12px;color: #797979; text-align: center" id="worker-name-{{clock.workerid}}">{{clock.lastname}}, {{clock.name}}</div>
 							<p><span id="worker-start-label-{{clock.workerid}}"></span><b><span id="worker-start-{{clock.workerid}}">{{clock.start}}</span></b></p>
 							<p><span id="worker-end-label-{{clock.workerid}}"></span><b><span id="worker-end-{{clock.workerid}}">{{clock.end}}</span></b> </p>
 						</div>
@@ -92,26 +92,26 @@
 								$("#worker-start-label-"+val.workerid).text('');
 								$("#worker-end-label-"+val.workerid).text('');
 								if(val.vacation){
-									if(!$("#clock-"+val.workerid).hasClass('tile-aqua')) $("#clock-"+val.workerid).addClass('blink');
+									if(!$("#clock-"+val.workerid).hasClass('tile-aqua')){$("#clock-"+val.workerid).removeClass('blink'); $("#clock-"+val.workerid).addClass('blink');}
 									$("#clock-"+val.workerid).addClass('tile-aqua'); $("#clock-"+val.workerid).removeClass('tile-red'); $("#clock-"+val.workerid).removeClass('tile-green'); $("#clock-"+val.workerid).removeClass('tile-gray'); $("#clock-"+val.workerid).removeClass('tile-primary');
 									$("#worker-start-"+val.workerid).text('Vacaciones');
 									$("#worker-end-"+val.workerid).html('&nbsp;');
 
 								}else{
 									if(val.sickleave){
-										if(!$("#clock-"+val.workerid).hasClass('tile-tile-primary')) $("#clock-"+val.workerid).addClass('blink');
+										if(!$("#clock-"+val.workerid).hasClass('tile-tile-primary')){$("#clock-"+val.workerid).removeClass('blink'); $("#clock-"+val.workerid).addClass('blink');}
 										$("#clock-"+val.workerid).addClass('tile-tile-primary'); $("#clock-"+val.workerid).removeClass('tile-red'); $("#clock-"+val.workerid).removeClass('tile-green'); $("#clock-"+val.workerid).removeClass('tile-gray'); $("#clock-"+val.workerid).removeClass('tile-aqua');
 										$("#worker-start-"+val.workerid).text('Baja laboral');
 										$("#worker-end-"+val.workerid).html('&nbsp;');
 									}else{
 										if(val.holliday){
-											if(!$("#clock-"+val.workerid).hasClass('tile-aqua')) $("#clock-"+val.workerid).addClass('blink');
+											if(!$("#clock-"+val.workerid).hasClass('tile-aqua')) {$("#clock-"+val.workerid).removeClass('blink'); $("#clock-"+val.workerid).addClass('blink');}
 											$("#clock-"+val.workerid).addClass('tile-aqua'); $("#clock-"+val.workerid).removeClass('tile-red'); $("#clock-"+val.workerid).removeClass('tile-green'); $("#clock-"+val.workerid).removeClass('tile-gray');$("#clock-"+val.workerid).removeClass('tile-primary');
 											$("#worker-start-"+val.workerid).text('Festivo:');
 											$("#worker-end-"+val.workerid).text(val.holliday_name);
 										}else{
 											if(val.must_work){
-												if(!$("#clock-"+val.workerid).hasClass('tile-red')) $("#clock-"+val.workerid).addClass('blink');
+												if(!$("#clock-"+val.workerid).hasClass('tile-red')){$("#clock-"+val.workerid).removeClass('blink'); $("#clock-"+val.workerid).addClass('blink');}
 												$("#clock-"+val.workerid).addClass('tile-red'); $("#clock-"+val.workerid).removeClass('tile-aqua'); $("#clock-"+val.workerid).removeClass('tile-green'); $("#clock-"+val.workerid).removeClass('tile-gray');$("#clock-"+val.workerid).removeClass('tile-primary');
 												$("#worker-start-"+val.workerid).text('Horario previsto:');
 												$("#worker-end-"+val.workerid).text(val.must_work_start+" - "+val.must_work_end);
@@ -120,7 +120,7 @@
 									}
 								}
 							 }else{
-								if(!$("#clock-"+val.workerid).hasClass('tile-gray')) $("#clock-"+val.workerid).addClass('blink');
+								if(!$("#clock-"+val.workerid).hasClass('tile-gray')) {$("#clock-"+val.workerid).removeClass('blink'); $("#clock-"+val.workerid).addClass('blink');}
 								$("#clock-"+val.workerid).addClass('tile-gray'); $("#clock-"+val.workerid).removeClass('tile-green'); $("#clock-"+val.workerid).removeClass('tile-aqua');$("#clock-"+val.workerid).removeClass('tile-primary');
 								$("#worker-start-"+val.workerid).text((val.start!=null)?val.start:'Sin entrada registrada');
 								$("#worker-end-"+val.workerid).text((val.end!=null)?val.end:'Sin salida registrada');
@@ -130,7 +130,7 @@
 						 	}else{
 								$("#worker-start-label-"+val.workerid).text('Entrada: ');
 								$("#worker-end-label-"+val.workerid).text('Salida: ');
-								if(!$("#clock-"+val.workerid).hasClass('tile-green')) $("#clock-"+val.workerid).addClass('blink');
+								if(!$("#clock-"+val.workerid).hasClass('tile-green')) {$("#clock-"+val.workerid).removeClass('blink'); $("#clock-"+val.workerid).addClass('blink');}
 								$("#clock-"+val.workerid).addClass('tile-green'); $("#clock-"+val.workerid).removeClass('tile-gray'); $("#clock-"+val.workerid).removeClass('tile-aqua');
 								$("#worker-start-"+val.workerid).text((val.start!=null)?val.start:'Sin entrada registrada');
 								$("#worker-end-"+val.workerid).text((val.end!=null)?val.end:'Sin salida registrada');
