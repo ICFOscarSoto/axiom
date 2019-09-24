@@ -1,0 +1,12 @@
+[{
+	"sections": [
+		{
+			"name": "Tax data",
+			"fields": [
+				{ "name": "name","cols": 6},
+				{	"name": "tax", "cols": 3, "caption":"Tax (%)"},
+				{	"name": "surcharge", "cols": 3, "caption":"Surcharge (%)"},
+				{	"name": "active", "cols": 2}
+			]
+		}]
+}]
