@@ -52,7 +52,7 @@
 			<div class="row">
 				{% for clock in clocksList %}
 				<a href="{{ url('formWorker', {'id':clock.workerid}) }}?tab=clocks">
-					<div class=".col-xl-2 col-lg-3 col-md-3 col-sm-4 col-xs-12 col-12">
+					<div class=".col-xl-2 col-lg-2 col-md-3 col-sm-4 col-xs-12 col-12">
 						<div id="clock-{{clock.workerid}}" class="tile-stats {% if clock.start is null or clock.end is not null %}tile-gray{% else %}tile-green{% endif %} clock-user-card">
 							<div class="icon"><i class="entypo-user"></i></div>
 							<div class="num" id="worker-img-{{clock.workerid}}"><img src="{{url('getImage',{'id': clock.workerid, 'type': 'workers', 'size': 'thumb'}) }}" alt="" class="img-circle" width="80" height="80"/></div>
