@@ -56,7 +56,7 @@
 						<div id="clock-{{clock.workerid}}" class="tile-stats {% if clock.start is null or clock.end is not null %}tile-gray{% else %}tile-green{% endif %} clock-user-card" style="height: 220px;">
 							<div class="icon"><i class="entypo-user"></i></div>
 							<div class="num" id="worker-img-{{clock.workerid}}"><img src="{{url('getImage',{'id': clock.workerid, 'type': 'workers', 'size': 'thumb'}) }}" alt="" class="img-circle" width="80" height="80"/></div>
-							<div style="font-weight: bold;font-size: 12px; text-align: center" id="worker-name-{{clock.workerid}}">{{clock.lastname}}, {{clock.name}}</div>
+							<h3 style="font-size: 12px !important; text-align: center" id="worker-name-{{clock.workerid}}">{{clock.lastname}}, {{clock.name}}</h3>
 							<p><span id="worker-start-label-{{clock.workerid}}"></span><b><span id="worker-start-{{clock.workerid}}">{{clock.start}}</span></b></p>
 							<p><span id="worker-end-label-{{clock.workerid}}"></span><b><span id="worker-end-{{clock.workerid}}">{{clock.end}}</span></b> </p>
 						</div>
