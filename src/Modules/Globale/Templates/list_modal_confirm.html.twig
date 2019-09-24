@@ -1,0 +1,52 @@
+<div class="modal fade" id="{{ listConstructor.id }}-modal-confirm" data-backdrop="static" style="display: none;">
+  <div class="modal-dialog">
+    <div class="modal-content" style="transform: matrix(1, 0, 0, 1, 0, 0);">
+      <div class="modal-header">
+        <h4 class="modal-title">Confirmación</h4>
+      </div>
+      <div id="{{ listConstructor.id }}-modal-body" class="modal-body">
+      </div>
+      <div id="{{ listConstructor.id }}-modal-footer" class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Cancelar</button>
+        <button attr-action="" id="{{ listConstructor.id }}-modal-button-continue" type="button" class="btn btn-red">Continuar</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+$(document).ready(function() {
+  //Button Modal Confirm
+  $('body').on('click', "#{{ listConstructor.id }}-modal-button-continue", function() {
+      ids=[];
+      var selectedItems = $("input[class*='-chk-list']:checked").map(function(){
+          return $(this).attr("item-id");
+      }).toArray();
+      ids=selectedItems;
+
+      if($(this).attr('attr-action-type')=="foreground"){
+        var form = document.createElement("form");
+        var element1 = document.createElement("input");
+        form.method = "POST";
+        form.target = "_blank";
+        form.action = $(this).attr('attr-action');
+        element1.value=ids;
+        element1.name="ids";
+        form.appendChild(element1);
+        document.body.appendChild(form);
+        form.submit();
+      }else{
+        $.post($(this).attr('attr-action'), "ids="+ids, function(data, textStatus) {
+          $.each( data, function( key, val ) {
+          });
+        }).always(function() {
+          {# if exist DataTable list reload it else reload page #}
+          if($("#{{ listConstructor.id }}").length)
+            $('#{{ listConstructor.id }}').DataTable().ajax.reload();
+            else location.reload();
+        }, "json");
+
+      }
+      $("#{{ listConstructor.id }}-modal-confirm").modal('hide');
+  });
+});
+</script>
