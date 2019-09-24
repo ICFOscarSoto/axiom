@@ -22,11 +22,9 @@
 		<!-- MAIN CONTENT -->
 		{% set listConstructor = lists[0] %}
 		{% set listOrigin = "genericlist" %}
-		
-		<div id="list-2" class="nested-list dd with-margins custom-drag-button"><ol id="categories" class="dd-list"></ol></div><!-- adding class "custom-drag-button" will create specific handler for dragging list items -->
+		{{ include('@Globale/list_button_top_paint.html.twig') }}
 
-		{{ include('@Globale/list_button_fields.html.twig') }}
-		{{ include('@Globale/list_button_top.html.twig') }}
+		<div id="list-2" class="nested-list dd with-margins custom-drag-button"><ol id="categories" class="dd-list"></ol></div><!-- adding class "custom-drag-button" will create specific handler for dragging list items -->
 
 		<script>
 		$(document).ready(function() {
@@ -42,7 +40,7 @@
 													'<div attr-id="'+valor.id+'" id="listCategories-field-button-edit-'+valor.id+'" class="dd-edit">'+
 														'<i class="fa fa-edit" aria-hidden="true"></i>'+
 													'</div>'+
-													'<div class="dd-edit">'+
+													'<div attr-id="'+valor.id+'" id="listCategories-field-button-delete-'+valor.id+'" class="dd-edit" onclick="jQuery(\'#{{ listConstructor.id }}-modal-confirm\').modal(\'show\', {backdrop: \'static\'});">'+
 														'<i class="fa fa-trash-o" aria-hidden="true"></i>'+
 													'</div>'+
 													'<div class="dd-content">'+
@@ -68,7 +66,7 @@
 												'<div attr-id="'+valor.id+'" id="listCategories-field-button-edit-'+valor.id+'" class="dd-edit">'+
 													'<i class="fa fa-edit" aria-hidden="true"></i>'+
 												'</div>'+
-												'<div class="dd-edit">'+
+												'<div attr-id="'+valor.id+'" id="listCategories-field-button-delete-'+valor.id+'" class="dd-edit">'+
 													'<i class="fa fa-trash-o" aria-hidden="true"></i>'+
 												'</div>'+
 												'<div class="dd-content">'+
@@ -82,8 +80,6 @@
 		});
 		</script>
 
-
-
 		                <script type="text/javascript">
 										jQuery(document).ready(function($){
 											$('.dd').nestable({
@@ -92,13 +88,29 @@
 												}
 											})
 											.on('dragEnd', function(event, item, source, destination, position) {
-													console.log('Item: '+ item.attr("data-id"));
-												  console.log('Parent: '+item.parents('li').attr("data-id"));
-													console.log('Position: '+position);
+												$.ajax({
+													 dataType: "json",
+													 url: '{{ url('categoriesDragChange') }}',
+													 type: 'POST',
+													 data: {id: item.attr("data-id"), parent: item.parents('li').attr("data-id"), position: position},
+													 success:  function( data ) {
+														 if(data.result){
+					                     toastr.success("Datos guardados correctamente", "Confirmación", confirmation);
+					                   } else toastr.error("Ocurrió un error al guardar los datos", "Confirmación", confirmation);
+													 }
+												 });
+
 											});
 										})
-		                		</script>
+										$('body').on('hide.bs.modal', "#categories-modal-form", function() {
+											console.log("cerrado");
+										});
+		                </script>
 
+
+		{{ include('@Globale/list_button_fields.html.twig') }}
+		{{ include('@Globale/list_button_top.html.twig') }}
+		{{ include('@Globale/list_modal_confirm.html.twig') }}
 <!-- MODALS  -->
 {% if forms is defined %}
 	{% for form in forms %}

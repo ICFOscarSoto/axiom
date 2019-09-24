@@ -53,9 +53,31 @@ class ERPCategoriesController extends Controller
     }
 
 		/**
-     * @Route("/api/ERP/categories/{id}/change", name="change")
+     * @Route("/api/ERP/categories/dragchange", name="categoriesDragChange")
      */
-    public function change(RouterInterface $router,Request $request){
+    public function categoriesDragChange(RouterInterface $router,Request $request){
+
+			$id = $request->request->get("id");
+			$parent = $request->request->get("parent");
+			$position = $request->request->get("position");
+
+			$repository=$this->getDoctrine()->getRepository($this->class);
+			$category=$repository->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany()]);
+			if($category){
+				$parent=$repository->findOneBy(["id"=>$parent, "company"=>$this->getUser()->getCompany()]);
+			//	if($parent){
+					$category->setParentid($parent);
+					$category->setPosition($position);
+					$category->setDateupd(new \DateTime());
+					$manager=$this->getDoctrine()->getManager();
+					$manager->persist($category);
+			    $manager->flush();
+
+					return new JsonResponse(["result"=>1]);
+			//	}else return new JsonResponse(["result"=>-1]);
+			}else return new JsonResponse(["result"=>-1]);
+
+
 
 		}
 
@@ -67,7 +89,7 @@ class ERPCategoriesController extends Controller
 	   $this->denyAccessUnlessGranted('ROLE_ADMIN');
 	   $template=dirname(__FILE__)."/../Forms/Categories.json";
 	   $utils = new GlobaleFormUtils();
-	   $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine());
+	   $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),["parentid"]);
 	   return $utils->make($id, $this->class, $action, "formCategories", "modal");
 	  }
 

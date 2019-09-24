@@ -1,6 +1,3 @@
 [
-  {"id" : "addTop", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"genericdata", "routeParams":{"module":"ERP", "name":"Categories", "type":"modal" }, "modal":"Categories", "actionType" : "background", "confirm" :false, "tooltip" : "Crear nuevo categoria"},
-  {"id" : "deleteCategoryTop", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true},
-  {"id" : "printCategoryTop", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false},
-  {"id" : "exportCategoryTop", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"genericexport", "routeParams":{"module":"ERP", "name":"Categories"}, "confirm" :false}
+  {"id" : "addTop", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"dataCategories", "modal":"categories", "actionType" : "background", "confirm" :false, "tooltip" : "Crear nueva categoria"}
 ]

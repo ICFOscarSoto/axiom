@@ -41,7 +41,7 @@ class ERPCategories
     /**
      * @ORM\Column(type="boolean", nullable=true)
      */
-    private $active;
+    private $active=true;
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
@@ -56,6 +56,11 @@ class ERPCategories
      * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     private $company;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $position;
 
     public function getId(): ?int
     {
@@ -142,6 +147,18 @@ class ERPCategories
     public function setCompany(?GlobaleCompanies $company): self
     {
         $this->company = $company;
+
+        return $this;
+    }
+
+    public function getPosition(): ?int
+    {
+        return $this->position;
+    }
+
+    public function setPosition(?int $position): self
+    {
+        $this->position = $position;
 
         return $this;
     }
