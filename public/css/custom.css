@@ -28,6 +28,19 @@ table {
     font-size: 12px;
 }
 
+.blink{
+    animation:blink 400ms 20 alternate;
+}
+
+@keyframes blink {
+    from { box-shadow: none; }
+    to {
+        -webkit-box-shadow: 0px 0px 15px 5px #1dc6df;
+        -moz-box-shadow: 0px 0px 15px 5px #1dc6df;
+        box-shadow: 0px 0px 15px 5px #1dc6df;
+      }
+};
+
 .form-validation-error {
   margin: 0px 0px 5px 0px !important;
   padding: 5px 15px 5px 15px;
@@ -218,6 +231,7 @@ table.dataTable.compact tbody th, table.dataTable.compact tbody td {
 }
 .clock-user-card{
   cursor: pointer;
+  border: 2px solid #ffffff;
 }
 .clock-user-card .icon{
   bottom: 40px !important;
