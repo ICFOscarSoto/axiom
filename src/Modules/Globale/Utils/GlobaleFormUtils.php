@@ -430,20 +430,20 @@ class GlobaleFormUtils extends Controller
 
 
 public function choiceRelationTrigger($field,$nullable){
-  $class="\App\Modules\\".$field["module"]."\\Entity\\".$field["nameClass"];
-  $classTrigger="\App\Modules\\".$field["moduleTrigger"]."\\Entity\\".$field["nameClassTrigger"];
+  $class="\App\Modules\\".$field["trigger"]["module"]."\\Entity\\".$field["trigger"]["class"];
+  $classTrigger="\App\Modules\\".$field["trigger"]["moduleTrigger"]."\\Entity\\".$field["trigger"]["classTrigger"];
   $form=$this->request->request->get('form', null);
   $filter=[];
   if($form!=null){
     //select options of the trigger value selected
     //Check options for trigger FIELDS
-    $triggerValue=$this->doctrine->getRepository($classTrigger)->findOneBy(['id'=>$form[$field["trigger"]]]);
-    $filter=[$field["triggerParameter"]=>$triggerValue];
+    $triggerValue=$this->doctrine->getRepository($classTrigger)->findOneBy(['id'=>$form[$field["trigger"]["field"]]]);
+    $filter=[$field["trigger"]["relationParameter"]=>$triggerValue];
   }else{
     //get selected option or null options if not set
     if($this->obj!=null) {
-      $triggerValue=$this->doctrine->getRepository($classTrigger)->findOneBy(['id'=>$this->obj->{'get'.ucfirst($field["triggerParameter"])}()]);
-      $filter=[$field["triggerParameter"]=>$triggerValue];
+      $triggerValue=$this->doctrine->getRepository($classTrigger)->findOneBy(['id'=>$this->obj->{'get'.ucfirst($field["trigger"]["relationParameter"])}()]);
+      $filter=[$field["trigger"]["relationParameter"]=>$triggerValue];
     }else{
       $filter=["id"=>0];
     }
@@ -472,7 +472,7 @@ public function choiceRelationTrigger($field,$nullable){
                     return $obj ? $obj->getId() : '';
                 },
                 'expanded' => false,
-                'placeholder' => 'Select '.$field["nameClass"]
+                'placeholder' => 'Select '.$field["trigger"]["class"]
             ];
 
   return $result;

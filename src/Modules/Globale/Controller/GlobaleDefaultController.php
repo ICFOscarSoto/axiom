@@ -257,4 +257,31 @@ class GlobaleDefaultController extends Controller
        }
       return new JsonResponse(array('result' => $result));
      }
+
+     /**
+   	 * @Route("/api/globale/generictrigger", name="generictrigger", defaults={"id"=0})
+   	 */
+   	 public function generictrigger(Request $request){
+   		 if ($this->get('security.authorization_checker')->isGranted('ROLE_ADMIN')) {
+        $id = $request->request->get("id");
+        $module = $request->request->get("mod");
+        $class = $request->request->get("name");
+        $triggermodule = $request->request->get("modtrg");
+        $triggername = $request->request->get("nametrg");
+        $relationParameter = $request->request->get("prm");
+   		 	$triggerRepository = $this->getDoctrine()->getRepository("\App\Modules\\".$triggermodule."\Entity\\".$triggername);
+   			$repository = $this->getDoctrine()->getRepository("\App\Modules\\".$module."\Entity\\".$class);
+   			$triggerObj=$triggerRepository->findOneBy(["id"=>$id, "active"=>1,"deleted"=>0, "company"=>$this->getUser()->getCompany()]);
+   			$objects=$repository->findBy([$relationParameter=>$triggerObj,"active"=>1,"deleted"=>0]);
+   			$return=[];
+   			foreach($objects as $item){
+   				$option["id"]=$item->getId();
+   				$option["text"]=$item->getName();
+   				$return[]=$option;
+   			}
+   			return new JsonResponse($return);
+   	 	}else{
+   			return new JsonResponse([]);
+   		}
+    	}
 }

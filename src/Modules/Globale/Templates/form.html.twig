@@ -113,23 +113,22 @@
             {# Default component of the form #}
             {{ form_row(formConstructor.form[field.name]) }}
               {# Check if field has trigger #}
-              {% if field.trigger is defined and field.route is defined %}
+              {% if field.trigger.field is defined and field.trigger.route is defined %}
 
               <script>
                 $(document).ready(function() {
-                    $("#form_{{ field.trigger }}").select2();
+                    $("#form_{{ field.trigger.field }}").select2();
                     $("#form_{{ field.name }}").select2();
 
-                   $("#form_{{ field.trigger }}").on("change", function (e) {
-                     if($("#form_{{ field.trigger }}").select2('data').length>0){
-                       //var value=(($("#form_{{ field.trigger }}").select2('data')!="")?($("#form_{{ field.trigger }}").select2('data')):0);
-                       //if(value!=0) value=value.css;
-                       var value=$("#form_{{ field.trigger }}").select2('data')[0]["element"]["className"];
+                   $("#form_{{ field.trigger.field }}").on("change", function (e) {
+                     if($("#form_{{ field.trigger.field }}").select2('data').length>0){
+                       var value=$("#form_{{ field.trigger.field }}").select2('data')[0]["element"]["className"];
                        $("#form_{{ field.name }}").html('');
                        $.ajax({
                           dataType: "json",
-                          url: '/api/HR/workers/selectschedule/'+$("#form_{{ field.name }}").attr("attr-module")+'/'+$("#form_{{ field.name }}").attr("attr-name")+'/'+value,
-                          //data: data,
+                          url: '{{ url(field.trigger.route) }}',
+                          type: 'POST',
+                          data: {id: value, mod: '{{field.trigger.module}}', name: '{{field.trigger.class}}', modtrg:'{{field.trigger.moduleTrigger}}', nametrg:'{{field.trigger.classTrigger}}', prm:'{{field.trigger.relationParameter}}'},
                           success:  function( data ) {
                             console.log(data);
                             var html='<option value>Seleccionar </option>';
@@ -139,47 +138,12 @@
                              $("#form_{{ field.name }}").html(html);
                           }
                         });
-                       /*$("#form_{{ field.name }}").select2({
-                         ajax: {
-                           url: '/api/HR/workers/selectschedule/'+$("#form_{{ field.name }}").attr("attr-module")+'/'+$("#form_{{ field.name }}").attr("attr-name")+'/'+value,
-                           dataType: 'json',
-                           results: function (data) {
-                             return {results: data};
-                           }
-                         }
-                       });*/
                      }
                    });
 
-
-                   if($("#form_{{ field.trigger }}").select2('data').length>0){
-                     //var value=(($("#form_{{ field.trigger }}").select2('data')!="")?($("#form_{{ field.trigger }}").select2('data')):0);
-                     //if(value!=0) value=value.css;
-                     var value=$("#form_{{ field.trigger }}").select2('data')[0]["element"]["className"];
-
-                     /*$("#form_{{ field.name }}").select2({
-                       ajax: {
-                         url: '/api/HR/workers/selectschedule/'+$("#form_{{ field.name }}").attr("attr-module")+'/'+$("#form_{{ field.name }}").attr("attr-name")+'/'+value,
-                         dataType: 'json',
-                         results: function (data) {
-                           return {results: data};
-                         }
-                       }
-                     });*/
+                   if($("#form_{{ field.trigger.field }}").select2('data').length>0){
+                     var value=$("#form_{{ field.trigger.field }}").select2('data')[0]["element"]["className"];
                    }
-
-                   /*var value=(($("#form_{{ field.trigger }}").select2('data')!="")?($("#form_{{ field.trigger }}").select2('data')):0);
-                   if(value!=0) value=value.css;
-                  $("#form_{{ field.name }}").select2({
-                     ajax: {
-                       url: '/api/HR/workers/selectschedule/'+$("#form_{{ field.name }}").attr("attr-module")+'/'+$("#form_{{ field.name }}").attr("attr-name")+'/'+value,
-                       dataType: 'json',
-                       results: function (data) {
-                         return {results: data};
-                       }
-                     }
-                   });*/
-
                 });
               </script>
               {% endif %}
