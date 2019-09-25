@@ -1,0 +1,11 @@
+[{
+	"sections": [
+		{
+			"name": "MeasurementUnits data",
+			"fields": [
+				{ "name": "name","cols": 8},
+				{	"name": "quantity", "cols": 4},
+				{	"name": "active", "cols": 2}
+			]
+		}]
+}]

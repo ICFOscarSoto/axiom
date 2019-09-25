@@ -106,6 +106,10 @@ ProductVariant:
 Product:
     resource: 'App\Modules\ERP\Controller\ERPProductsController'
     type:     annotation
+    
+MeasurementUnits:
+    resource: 'App\Modules\ERP\Controller\ERPMeasurementUnitsController'
+    type:     annotation
 
 WebProduct:
     resource: 'App\Modules\ERP\Controller\ERPWebProductsController'
