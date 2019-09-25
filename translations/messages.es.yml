@@ -327,6 +327,7 @@ Stocks: Cantidades
 
 #PRODUCTS
 #----------------------------------------------------------------------------------------------------------------------
+Products: Productos
 Products data: Informacion del producto
 Manufacturer: Marca
 Category: Categoría
@@ -342,5 +343,8 @@ Expiration: Caducidad
 Minimumquantityofsale: Cantidad minima de venta
 Weight: Peso
 Onsale: En venta
-Saleacking: Embalaje de venta
+Salepacking: Embalaje de venta
 Taxes: Impuestos
+Multiplicity: Múltiplo de pedidos
+Promotion: Promoción
+Rotation: Rotación

@@ -100,7 +100,7 @@ class ERPProducts
     /**
      * @ORM\Column(type="boolean")
      */
-    private $active;
+    private $active=1;
 
     /**
      * @ORM\Column(type="boolean")
@@ -159,6 +159,21 @@ class ERPProducts
      * @ORM\Column(type="integer", nullable=true)
      */
     private $salepacking;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $multiplicity;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $promotion;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $rotation;
 
 
     public function getId(): ?int
@@ -455,11 +470,9 @@ class ERPProducts
     }
 
     public function formValidation($kernel, $doctrine, $user, $validationParams){
-      //Check for overlapped periods
       $repository=$doctrine->getRepository(ERPProducts::class);
-      //Get registers where fromdate>=this fromdate and todate<= this todate and start>=this start and end<= this and ((monday=1 and this monday=1) or (tuesday=1 and this tuesday=1) or ...)
       $product=$repository->findOneBy(["code"=>$this->code,"company"=>$user->getCompany(),"active"=>1,"deleted"=>0]);
-      if($product!=null)
+      if($product!=null and $product->id!=$this->id)
         return ["valid"=>false, "global_errors"=>["El producto ya existe"]];
       else return ["valid"=>true];
     }
@@ -484,6 +497,42 @@ class ERPProducts
     public function setSalepacking(?int $salepacking): self
     {
         $this->salepacking = $salepacking;
+
+        return $this;
+    }
+
+    public function getMultiplicity(): ?int
+    {
+        return $this->multiplicity;
+    }
+
+    public function setMultiplicity(?int $multiplicity): self
+    {
+        $this->multiplicity = $multiplicity;
+
+        return $this;
+    }
+
+    public function getPromotion(): ?bool
+    {
+        return $this->promotion;
+    }
+
+    public function setPromotion(?bool $promotion): self
+    {
+        $this->promotion = $promotion;
+
+        return $this;
+    }
+
+    public function getRotation(): ?bool
+    {
+        return $this->rotation;
+    }
+
+    public function setRotation(?bool $rotation): self
+    {
+        $this->rotation = $rotation;
 
         return $this;
     }

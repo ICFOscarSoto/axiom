@@ -25,6 +25,9 @@
 				{	"name": "minimumquantityofsale", "cols": 2},
 				{	"name": "salepacking", "cols": 2},
 				{	"name": "taxes", "cols": 2},
+				{	"name": "multiplicity", "cols": 2},
+				{	"name": "promotion", "cols": 2},
+				{	"name": "rotation", "cols": 2},
 				{ "name": "description","cols": 12}
 			]
 		}]
