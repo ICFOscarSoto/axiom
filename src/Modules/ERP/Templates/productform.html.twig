@@ -142,6 +142,12 @@
 		<div class="col-md-2">
 			{{ form_row(formConstructor.form['onsale']) }}
 		</div>
+		<div class="col-md-2">
+			{{ form_row(formConstructor.form['salepacking']) }}
+		</div>
+		<div class="col-md-2">
+			{{ form_row(formConstructor.form['taxes']) }}
+		</div>
 	</div>
 	<div class="row">
 		<div class="col-md-2">
@@ -157,15 +163,6 @@
 			<button attr-id="" attr-action="" id="{{formConstructor.name}}-button-continue" type="button" class="btn btn-green">{{ ("Guardar")|trans }}</button>
 		</div>
 
-	</div>
-	<div class="row">
-		<div class="col-md-12">
-			<div class="panel-title-list">Stocks</div>
-			{% if listStocks is defined %}
-			{% set listConstructor = listStocks %}
-			{{ include('@Globale/list.html.twig') }}
-			{% endif %}
-		</div>
 	</div>
 	<div class="row">
 		<div class="col-md-6">

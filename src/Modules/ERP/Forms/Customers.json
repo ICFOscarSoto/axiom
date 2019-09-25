@@ -34,6 +34,7 @@
 			{ "name": "invoicefordeliverynote","cols": 2},
 			{ "name": "partialshipping","cols": 2},
 			{ "name": "pricesdeliverynote","cols": 2},
+			{ "name": "surcharge","cols": 2},
 			{ "name": "invoiceday","cols": 2}
 		]
 	},

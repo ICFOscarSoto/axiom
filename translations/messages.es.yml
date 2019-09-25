@@ -243,8 +243,20 @@ Justified: Justificado
 
 # CUSTOMERS
 #----------------------------------------------------------------------------------------------------------------------
+Customer data: Informacion del cliente
 Customers: Clientes
 Suppliers: Proveedores
+Customergroup: Grupo de clientes
+Maxcredit: Credito máximo
+Mininvoice: Pedido mínimo
+Allowlinediscount: Permitir descuento en linea
+Requiredordernumber: Necesita numero de pedido
+Additionaldiscount: Descuento adicional
+Invoicefordeliverynote: Entrega factura por pedido
+Partialshipping: Envío parcial
+Pricesdeliverynote: Mostrar precios
+Surcharge: Recargo de equivalencia
+Bankaccount: Cuenta bancaria
 
 # SUPPLIERS
 #----------------------------------------------------------------------------------------------------------------------
@@ -307,7 +319,28 @@ Select hrschedules: Seleccionar horario
 Select HRShifts: Seleccionar grupo horario
 
 
-#Stocks
+#STOCKS
 #----------------------------------------------------------------------------------------------------------------------
 Quantity: Cantidad
 Store: Almacen
+Stocks: Cantidades
+
+#PRODUCTS
+#----------------------------------------------------------------------------------------------------------------------
+Products data: Informacion del producto
+Manufacturer: Marca
+Category: Categoría
+Discontinued: Discontinuado
+Margincontrol: Control de margen
+Stockcontrol: Control de stock
+Saleindecimals: Vender en decimales
+Exclusiveonline: Exclusivo Web
+Bigsize: Voluminoso
+Traceability: Trazabilidad
+Grouped: Agrupado
+Expiration: Caducidad
+Minimumquantityofsale: Cantidad minima de venta
+Weight: Peso
+Onsale: En venta
+Saleacking: Embalaje de venta
+Taxes: Impuestos

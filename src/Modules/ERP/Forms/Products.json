@@ -23,6 +23,8 @@
 				{	"name": "exclusiveonline", "cols": 2},
 				{	"name": "bigsize", "cols": 2},
 				{	"name": "minimumquantityofsale", "cols": 2},
+				{	"name": "salepacking", "cols": 2},
+				{	"name": "taxes", "cols": 2},
 				{ "name": "description","cols": 12}
 			]
 		}]

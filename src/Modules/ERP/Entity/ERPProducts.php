@@ -8,6 +8,7 @@ use \App\Modules\Globale\Entity\GlobaleCompanies;
 use \App\Modules\ERP\Entity\ERPCategories;
 use \App\Modules\ERP\Entity\ERPSuppliers;
 use \App\Modules\HR\Entity\HRWorkers;
+use \App\Modules\Globale\Entity\GlobaleTaxes;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPProductsRepository")
@@ -147,6 +148,17 @@ class ERPProducts
      * @ORM\JoinColumn(nullable=false)
      */
     private $supplier;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleTaxes")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $taxes;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $salepacking;
 
 
     public function getId(): ?int
@@ -442,4 +454,37 @@ class ERPProducts
         return $this;
     }
 
+    public function formValidation($kernel, $doctrine, $user, $validationParams){
+      //Check for overlapped periods
+      $repository=$doctrine->getRepository(ERPProducts::class);
+      //Get registers where fromdate>=this fromdate and todate<= this todate and start>=this start and end<= this and ((monday=1 and this monday=1) or (tuesday=1 and this tuesday=1) or ...)
+      $product=$repository->findOneBy(["code"=>$this->code,"company"=>$user->getCompany(),"active"=>1,"deleted"=>0]);
+      if($product!=null)
+        return ["valid"=>false, "global_errors"=>["El producto ya existe"]];
+      else return ["valid"=>true];
+    }
+
+    public function getTaxes(): ?GlobaleTaxes
+    {
+        return $this->taxes;
+    }
+
+    public function setTaxes(?GlobaleTaxes $taxes): self
+    {
+        $this->taxes = $taxes;
+
+        return $this;
+    }
+
+    public function getSalepacking(): ?int
+    {
+        return $this->salepacking;
+    }
+
+    public function setSalepacking(?int $salepacking): self
+    {
+        $this->salepacking = $salepacking;
+
+        return $this;
+    }
 }

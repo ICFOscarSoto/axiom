@@ -167,6 +167,11 @@ class ERPCustomers
      */
     private $bankaccount;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $surcharge;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -504,6 +509,18 @@ class ERPCustomers
     public function setBankaccount(?ERPBankAccounts $bankaccount): self
     {
         $this->bankaccount = $bankaccount;
+
+        return $this;
+    }
+
+    public function getSurcharge(): ?bool
+    {
+        return $this->surcharge;
+    }
+
+    public function setSurcharge(?bool $surcharge): self
+    {
+        $this->surcharge = $surcharge;
 
         return $this;
     }

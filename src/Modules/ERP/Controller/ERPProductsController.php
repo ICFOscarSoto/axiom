@@ -143,12 +143,6 @@ class ERPProductsController extends Controller
 			$formUtilsReferences = new GlobaleFormUtils();
 			$formUtilsReferences->initialize($this->getUser(), new ERPReferences(), dirname(__FILE__)."/../Forms/References.json", $request, $this, $this->getDoctrine());
 			$forms[]=$formUtilsReferences->formatForm('References', true, null, ERPReferences::class);
-			$listStocks = new ERPStocksUtils();
-			$formUtilsStocks = new GlobaleFormUtils();
-			$formUtilsStocks->initialize($this->getUser(), new ERPStocks(), dirname(__FILE__)."/../Forms/Stocks.json", $request, $this, $this->getDoctrine());
-
-
-			$forms[]=$formUtilsStocks->formatForm('Stocks', true, null, ERPStocks::class);
 
 			return $this->render('@ERP/productform.html.twig', array(
 				'controllerName' => 'productsController',
@@ -160,7 +154,6 @@ class ERPProductsController extends Controller
 				'form' => $formUtils->formatForm('products', true, $id, $this->class, "dataProduct"),
 				'listEAN13' => $listEAN13->formatListByProduct($id),
 				'listReferences' => $listReferences->formatListByProduct($id),
-				'listStocks' => $listStocks->formatListByProduct($id),
 				'forms' => $forms
 			));
 
