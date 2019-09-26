@@ -5,6 +5,7 @@ namespace App\Modules\ERP\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\ERP\Entity\ERPProducts;
 use \App\Modules\ERP\Entity\ERPCustomerGroups;
+use \App\Modules\Globale\Entity\GlobaleCompanies;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPCustomerGroupsPricesRepository")
@@ -57,6 +58,12 @@ class ERPCustomerGroupsPrices
      * @ORM\Column(type="boolean")
      */
     private $active;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCompanies")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $company;
 
   
     public function getId(): ?int
@@ -145,6 +152,28 @@ class ERPCustomerGroupsPrices
     public function setActive(bool $active): self
     {
         $this->active = $active;
+
+        return $this;
+    }
+    
+    public function formValidation($kernel, $doctrine, $user, $validationParams){
+      //Check for overlapped periods
+      $repository=$doctrine->getRepository(ERPCustomerGroupsPrices::class);
+      $repeat=$repository->findBy(["product"=>$this->product,"customergroup"=>$this->customergroup,"company"=>$this->company,"active"=>1,"deleted"=>0]);
+      if($repeat!=null)
+        return ["valid"=>false, "global_errors"=>["Ya existe un precio para ese producto y ese grupo de clientes"]];
+      else return ["valid"=>true];
+    }
+    
+
+    public function getCompany(): ?GlobaleCompanies
+    {
+        return $this->company;
+    }
+
+    public function setCompany(?GlobaleCompanies $company): self
+    {
+        $this->company = $company;
 
         return $this;
     }
