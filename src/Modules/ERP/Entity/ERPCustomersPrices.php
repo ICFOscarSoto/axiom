@@ -86,6 +86,9 @@ class ERPCustomersPrices
      * @ORM\Column(type="float", nullable=true)
      */
     private $amount;
+    
+    public $newSeconds=1296000;
+    public $updatedSeconds=1296000;
 
     public function getId(): ?int
     {
@@ -247,4 +250,24 @@ class ERPCustomersPrices
 
         return $this;
     }
+    
+    public function formValidation($kernel, $doctrine, $user, $validationParams){
+      $select=$this->reduction_type;
+      $date=date('Y-m-d');
+      $repository=$doctrine->getRepository(ERPCustomersPrices::class);
+      $valido=$repository->findValid($this->product, $this->customer,$this->company,$date);
+      if($this->reduction_type==1 AND $this->reduction==NULL)
+        return ["valid"=>false, "global_errors"=>["Por favor, introduce un descuento"]];
+      else if($this->reduction_type==2 AND $this->amount==NULL)
+          return ["valid"=>false, "global_errors"=>["Por favor, introduce precio neto"]];
+      else if($valido!=NULL)
+        return ["valid"=>false, "global_errors"=>["Ya existe un precio vigente para este cliente"]];
+      else if($select==0)
+        return ["valid"=>false, "global_errors"=>["Por favor, selecciona un tipo"]];
+      else if($this->end<$this->start)
+        return ["valid"=>false, "global_errors"=>["La fecha final es anterior a la fecha de inicio."]];
+      else return ["valid"=>true];
+    
+    }
+    
 }

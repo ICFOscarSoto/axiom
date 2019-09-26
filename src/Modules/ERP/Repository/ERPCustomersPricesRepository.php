@@ -18,33 +18,16 @@ class ERPCustomersPricesRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, ERPCustomersPrices::class);
     }
+    
+    public function findValid($product,$customer,$company,$date){
+    
+    $query="SELECT * FROM erpcustomers_prices e WHERE e.product_id=:PROD AND e.customer_id=:CUST AND e.company_id=:COMP AND (STR_TO_DATE(e.end, '%Y-%m-%d')>STR_TO_DATE(:DATE, '%Y-%m-%d') OR e.end=NULL) AND e.active=1 AND e.deleted=0";
+    $params=['PROD' => $product->getId(),
+             'CUST' => $customer->getId(),
+             'COMP' => $company->getId(),
+             'DATE' => $date];
+    $result=$this->getEntityManager()->getConnection()->executeQuery($query,$params)->fetch();
+    return $result;
 
-    // /**
-    //  * @return ERPCustomersPrices[] Returns an array of ERPCustomersPrices objects
-    //  */
-    /*
-    public function findByExampleField($value)
-    {
-        return $this->createQueryBuilder('e')
-            ->andWhere('e.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('e.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
     }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?ERPCustomersPrices
-    {
-        return $this->createQueryBuilder('e')
-            ->andWhere('e.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }

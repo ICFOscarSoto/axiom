@@ -3,7 +3,7 @@
         {
             "name": "data",
             "fields": [
-              {	"name": "reduction_type", "cols": 12,
+              {	"name": "reduction_type", "cols": 2,
                 "transform": {
                     "type":"option",
                     "options": {"Elige tipo":"0","Porcentaje": "1", "Neto": "2"}
@@ -12,25 +12,27 @@
                 
                 {
                     "name": "reduction",
-                    "cols": 4,
+                    "cols": 2,
                     "depends":{"from": "reduction_type","vals":"[1]"}
                 },
                 {
                     "name": "amount",
-                    "cols": 4,
+                    "cols": 2,
                     "depends":{"from": "reduction_type","vals":"[2]"}
                 },
                 {
                     "name": "price",
-                    "cols": 4
+                    "cols": 2
                 },
                 {
                     "name": "start",
-                    "cols": 4
+                    "cols": 4,
+                    "type": "date"
                 },
                 {
                     "name": "end",
-                    "cols": 4
+                    "cols": 4,
+                    "type": "date"
                 },
                 {
                     "name": "active",
