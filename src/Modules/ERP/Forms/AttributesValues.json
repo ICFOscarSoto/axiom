@@ -1,0 +1,16 @@
+[{
+    "sections": [
+        {
+            "name": "data",
+            "fields": [
+              {"name": "attributename","cols": 4,
+                  "transform": {
+                      "type":"option",
+                      "options": {"Elige uno":"0", "Atributo": "1"}}},
+              {"name": "name","cols": 4, "depends":{"from": "attributename","vals":"[1]"}},
+              {"name": "active","cols": 4}
+
+            ]
+        }
+    ]
+}]
