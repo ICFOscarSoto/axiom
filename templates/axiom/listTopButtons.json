@@ -1,6 +1,6 @@
 [
-  {"id" : "addTop@@CLASSNAME@@", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"genericdata", "routeParams":{"module":"@@MODULE@@", "name":"@@CLASSNAME@@", "type":"modal" }, "modal":"@@CLASSNAME@@", "actionType" : "background", "confirm" :false, "tooltip" : "Crear nuevo impuesto"},
-  {"id" : "deleteTop@@CLASSNAME@@", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true},
-  {"id" : "printTop@@CLASSNAME@@", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false},
-  {"id" : "exportTop@@CLASSNAME@@", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"genericexport", "routeParams":{"module":"@@MODULE@@", "name":"@@CLASSNAME@@"}, "confirm" :false}
+  {"id" : "addTop@@CLASSNAME@@", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"genericdata", "routeParams":{"module":"@@MODULE@@", "name":"@@CLASSNAME@@", "type":"modal" }, "modal":"@@CLASSNAME@@", "actionType" : "background", "confirm" :false, "tooltip" : ""},
+  {"id" : "deleteTop@@CLASSNAME@@", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true, "tooltip":""},
+  {"id" : "printTop@@CLASSNAME@@", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false, "tooltip":""},
+  {"id" : "exportTop@@CLASSNAME@@", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"genericexport", "routeParams":{"module":"@@MODULE@@", "name":"@@CLASSNAME@@"}, "confirm" :false, "tooltip":""}
 ]
