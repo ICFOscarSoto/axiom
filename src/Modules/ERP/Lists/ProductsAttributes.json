@@ -4,17 +4,14 @@
         "caption": "id"
     },
     {
-        "name": "product__name",
-        "caption": "product"
+        "name": "attributename__name",
+        "caption": "attributename"
     },
     {
         "name": "attributevalue__name",
         "caption": "attributevalue"
     },
-    {
-        "name": "attributename__name",
-        "caption": "attributename"
-    },
+
     {
         "name": "active",
         "caption": "Estado",
