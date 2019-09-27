@@ -175,6 +175,11 @@ class ERPProducts
      */
     private $rotation;
 
+    /**
+     * @ORM\Column(type="float")
+     */
+    private $PVP;
+
 
     public function getId(): ?int
     {
@@ -533,6 +538,18 @@ class ERPProducts
     public function setRotation(?bool $rotation): self
     {
         $this->rotation = $rotation;
+
+        return $this;
+    }
+
+    public function getPVP(): ?float
+    {
+        return $this->PVP;
+    }
+
+    public function setPVP(float $PVP): self
+    {
+        $this->PVP = $PVP;
 
         return $this;
     }

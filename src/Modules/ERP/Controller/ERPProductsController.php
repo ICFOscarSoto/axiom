@@ -14,6 +14,7 @@ use App\Modules\ERP\Entity\ERPProducts;
 use App\Modules\ERP\Entity\ERPWebProducts;
 use App\Modules\ERP\Entity\ERPEAN13;
 use App\Modules\ERP\Entity\ERPReferences;
+use App\Modules\ERP\Entity\ERPProductsAttributes;
 use App\Modules\ERP\Entity\ERPManufacturers;
 use App\Modules\ERP\Entity\ERPStocks;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
@@ -23,6 +24,7 @@ use App\Modules\ERP\Utils\ERPProductsUtils;
 use App\Modules\ERP\Utils\ERPEAN13Utils;
 use App\Modules\ERP\Utils\ERPReferencesUtils;
 use App\Modules\ERP\Utils\ERPStocksUtils;
+use App\Modules\ERP\Utils\ERPProductsAttributesUtils;
 
 class ERPProductsController extends Controller
 {
@@ -143,6 +145,14 @@ class ERPProductsController extends Controller
 			$formUtilsReferences = new GlobaleFormUtils();
 			$formUtilsReferences->initialize($this->getUser(), new ERPReferences(), dirname(__FILE__)."/../Forms/References.json", $request, $this, $this->getDoctrine());
 			$forms[]=$formUtilsReferences->formatForm('References', true, null, ERPReferences::class);
+			$listAttributes = new ERPProductsAttributesUtils();
+
+			$productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
+			$product=$productRepository->findOneBy(["id"=>$id, "active"=>1, "deleted"=>0, "company"=>$this->getUser()->getCompany()]);
+
+			$formUtilsAttributes = new GlobaleFormUtils();
+			$formUtilsAttributes->initialize($this->getUser(), new ERPProductsAttributes(), dirname(__FILE__)."/../Forms/References.json", $request, $this, $this->getDoctrine(),$listAttributes->getExcludedForm(null),$listAttributes->getIncludedForm(["parent"=>$product, "doctrine"=>$this->getDoctrine(), "user"=>$this->getUser()]));
+			$forms[]=$formUtilsAttributes->formatForm('ProductsAttributes', true, null, ERPProductsAttributes::class);
 
 			return $this->render('@ERP/productform.html.twig', array(
 				'controllerName' => 'productsController',
@@ -154,6 +164,7 @@ class ERPProductsController extends Controller
 				'form' => $formUtils->formatForm('products', true, $id, $this->class, "dataProduct"),
 				'listEAN13' => $listEAN13->formatListByProduct($id),
 				'listReferences' => $listReferences->formatListByProduct($id),
+				'listAttributes' => $listAttributes->formatListByProduct($id),
 				'forms' => $forms
 			));
 

@@ -4,14 +4,37 @@
         "caption": "id"
     },
     {
-        "name": "attributename__name",
-        "caption": "attributename"
+        "name": "price",
+        "caption": "price"
     },
     {
-        "name": "attributevalue__name",
-        "caption": "attributevalue"
+        "name": "reduction_type",
+        "caption": "reduction_type"
     },
-
+    {
+        "name": "reduction",
+        "caption": "reduction"
+    },
+    {
+        "name": "amount",
+        "caption": "amount"
+    },
+    {
+        "name": "start",
+        "caption": "start"
+    },
+    {
+        "name": "end",
+        "caption": "end"
+    },
+    {
+        "name": "quantity",
+        "caption": "quantity"
+    },
+    {
+        "name": "product__name",
+        "caption": "product"
+    },
     {
         "name": "active",
         "caption": "Estado",

@@ -4,13 +4,12 @@ namespace App\Modules\ERP\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\ERP\Entity\ERPProducts;
-use \App\Modules\ERP\Entity\ERPCustomers;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
 
 /**
- * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPCustomersPricesRepository")
+ * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPOffersPricesRepository")
  */
-class ERPCustomersPrices
+class ERPOffersPrices
 {
     /**
      * @ORM\Id()
@@ -26,15 +25,14 @@ class ERPCustomersPrices
     private $product;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPCustomers")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $customer;
-
-    /**
      * @ORM\Column(type="float")
      */
     private $price;
+
+    /**
+     * @ORM\Column(type="smallint")
+     */
+    private $reduction_type;
 
     /**
      * @ORM\Column(type="float", nullable=true)
@@ -42,9 +40,9 @@ class ERPCustomersPrices
     private $reduction;
 
     /**
-     * @ORM\Column(type="smallint")
+     * @ORM\Column(type="float", nullable=true)
      */
-    private $reduction_type;
+    private $amount;
 
     /**
      * @ORM\Column(type="datetime")
@@ -83,12 +81,9 @@ class ERPCustomersPrices
     private $company;
 
     /**
-     * @ORM\Column(type="float", nullable=true)
+     * @ORM\Column(type="integer")
      */
-    private $amount;
-    
-    public $newSeconds=1296000;
-    public $updatedSeconds=1296000;
+    private $quantity=1;
 
     public function getId(): ?int
     {
@@ -107,18 +102,6 @@ class ERPCustomersPrices
         return $this;
     }
 
-    public function getCustomer(): ?ERPCustomers
-    {
-        return $this->customer;
-    }
-
-    public function setCustomer(?ERPCustomers $customer): self
-    {
-        $this->customer = $customer;
-
-        return $this;
-    }
-
     public function getPrice(): ?float
     {
         return $this->price;
@@ -127,6 +110,18 @@ class ERPCustomersPrices
     public function setPrice(float $price): self
     {
         $this->price = $price;
+
+        return $this;
+    }
+
+    public function getReductionType(): ?int
+    {
+        return $this->reduction_type;
+    }
+
+    public function setReductionType(int $reduction_type): self
+    {
+        $this->reduction_type = $reduction_type;
 
         return $this;
     }
@@ -143,14 +138,14 @@ class ERPCustomersPrices
         return $this;
     }
 
-    public function getReductionType(): ?int
+    public function getAmount(): ?float
     {
-        return $this->reduction_type;
+        return $this->amount;
     }
 
-    public function setReductionType(int $reduction_type): self
+    public function setAmount(?float $amount): self
     {
-        $this->reduction_type = $reduction_type;
+        $this->amount = $amount;
 
         return $this;
     }
@@ -239,14 +234,14 @@ class ERPCustomersPrices
         return $this;
     }
 
-    public function getAmount(): ?float
+    public function getQuantity(): ?int
     {
-        return $this->amount;
+        return $this->quantity;
     }
 
-    public function setAmount(?float $amount): self
+    public function setQuantity(int $quantity): self
     {
-        $this->amount = $amount;
+        $this->quantity = $quantity;
 
         return $this;
     }
@@ -254,16 +249,19 @@ class ERPCustomersPrices
     public function formValidation($kernel, $doctrine, $user, $validationParams){
       $select=$this->reduction_type;
       $date=date('Y-m-d');
-      $repository=$doctrine->getRepository(ERPCustomersPrices::class);
-      $valido=$repository->findValid($this->product, $this->customer,$this->company,$date);
-      if($this->reduction_type==1 AND $this->reduction==NULL)
-        return ["valid"=>false, "global_errors"=>["Por favor, introduce un descuento"]];      
-      else if($this->reduction_type==1 AND $this->reduction<=0 OR $this->reduction>100)
+      $repository=$doctrine->getRepository(ERPOffersPrices::class);
+      $valido=$repository->findValid($this->product, $this->quantity,$this->company,$date);
+      if($this->reduction_type==1)
+        {
+          if($this->reduction==NULL)
+            return ["valid"=>false, "global_errors"=>["Por favor, introduce un descuento"]];
+          else if($this->reduction<=0 OR $this->reduction>100)
             return ["valid"=>false, "global_errors"=>["Por favor, introduce un descuento correcto."]];
+        }
       else if($this->reduction_type==2 AND $this->amount==NULL)
           return ["valid"=>false, "global_errors"=>["Por favor, introduce precio neto"]];
       else if($valido!=NULL)
-        return ["valid"=>false, "global_errors"=>["Ya existe un precio vigente para este cliente"]];
+        return ["valid"=>false, "global_errors"=>["Ya existe un precio vigente para este producto y esta cantidad"]];
       else if($select==0)
         return ["valid"=>false, "global_errors"=>["Por favor, selecciona un tipo"]];
       else if($this->end<$this->start)
@@ -271,5 +269,4 @@ class ERPCustomersPrices
       else return ["valid"=>true];
     
     }
-    
 }
