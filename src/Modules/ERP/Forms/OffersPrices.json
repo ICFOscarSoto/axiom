@@ -21,6 +21,10 @@
                     "depends":{"from": "reduction_type","vals":"[2]"}
                 },
                 {
+                    "name": "quantity",
+                    "cols": 2
+                },
+                {
                     "name": "price",
                     "cols": 2
                 },
@@ -42,10 +46,6 @@
                 },
                 {
                     "name": "product",
-                    "cols": 4
-                },
-                {
-                    "name": "customer",
                     "cols": 4
                 }
             ]
