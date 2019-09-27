@@ -282,18 +282,14 @@ return blob;
             $.post($("#{{formConstructor.name}}-form-body").find('form').find('#post-url').val(), $("#{{formConstructor.name}}-form-body").find('form').serialize(),
                 function(data, status, xhr){
                   if((--load_wait)==0) $("#load-spinner").fadeOut();
+                  {{ include("@Globale/formvalidation.html.twig") }}
                   if(data.result){
                     //$("#tabs-list li").attr("attr-id",data.id);
                     toastr.success("Datos guardados correctamente", "Confirmación", confirmation);
                     if(data.reload) location.href=data.href;
                     $("#{{formConstructor.name}}-form-body").find('form').validate().resetForm();
                   } else toastr.error("Ocurrió un error al guardar los datos", "Confirmación", confirmation);
-                  {# VALIDATION ON PROCCESS #}
-                  console.log("aqui");
-                  var validation=JSON.parse(data.validation.field_errors)
-                  validation.foreach(function(item, index, arr){
-                    $("#{{formConstructor.name}}-form-body #form_"+index).parent().append("<label id='form_period-error' class='error' for='form_period'>"+item+"</label>");
-                  });
+
 
               }, "json");
             }

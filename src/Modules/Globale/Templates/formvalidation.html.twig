@@ -1,0 +1,27 @@
+{# VALIDATION ON PROCCESS #}
+{# FIELD_ERRORS #}
+if(typeof data.validation !== 'undefined' && data.validation.valid==false && typeof data.validation.field_errors !== 'undefined'){
+  Object.keys(data.validation.field_errors).forEach(function(index){
+    $("#{{formConstructor.name}}-form-body #form_"+index).parent().append("<label id='form_period-error' class='error' for='form_period'>"+data.validation.field_errors[index]+"</label>");
+  });
+}
+{# GLOBAL_ERRORS #}
+if(typeof data.validation !== 'undefined' && data.validation.valid==false && typeof data.validation.global_errors){
+  var errors="";
+  Object.keys(data.validation.global_errors).forEach(function(index){
+    errors+="<li>"+data.validation.global_errors[index]+"</li>";
+  });
+  $("html, body").animate({ scrollTop: 0 }, "fast");
+  $("#{{formConstructor.name}}-form-body #validation-errors-list").html(errors);
+  $("#{{formConstructor.name}}-form-body [id$='-validation-error']").slideDown();
+}
+{# GLOBAL_WARNINGS #}
+var warnings="";
+if(typeof data.validation !== 'undefined' && typeof data.validation.global_warnings !== 'undefined'){
+  Object.keys(data.validation.global_warnings).forEach(function(index){
+    warnings+="<li>"+data.validation.global_warnings[index]+"</li>";
+  });
+  $("html, body").animate({ scrollTop: 0 }, "fast");
+  $("#{{formConstructor.name}}-form-body #validation-warnings-list").html(warnings);
+  $("#{{formConstructor.name}}-form-body [id$='-validation-warning']").slideDown();
+}
