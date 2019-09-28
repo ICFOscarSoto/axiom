@@ -1,0 +1,12 @@
+<div class="grid-stack-item" id="widget-item-{{ widget.id }}" data-gs-no-resize="yes" data-id="{{ widget.id }}" data-gs-x="{{ widget.x }}" data-gs-y="{{ widget.y }}" data-gs-width="{{ widget.w }}" data-gs-height="{{ widget.h }}">
+  <div class="grid-stack-item-content" style="display:flex;flex-direction:column; overflow: hidden;">
+    <div class="panel panel-default" style="padding:0px; flex:1">
+      <div class="panel-heading">
+        <div class="panel-title">{{ widget.widget.description }}</div>
+        <div class="panel-options">
+          <a href="#" id="config-widget-{{ widget.id }}" attr-id="{{ widget.id }}" attr-widget="{{ widget.widget.name }}"><i class="entypo-cog"></i></a>
+          <a href="#" id="move-widget-{{ widget.id }}" attr-id="{{ widget.id }}" class="widget-move"><i class="fa fa-arrows"></i></a>
+          <a href="#" id="remove-widget-{{ widget.id }}" attr-id="{{ widget.id }}"><i class="entypo-cancel"></i></a>
+        </div>
+      </div>
+      <div class="panel-body">

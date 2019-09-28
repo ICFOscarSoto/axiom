@@ -46,7 +46,7 @@ Customer:
 CustomerGroups:
     resource: 'App\Modules\ERP\Controller\ERPCustomerGroupsController'
     type:     annotation
-    
+
 Supplier:
     resource: 'App\Modules\ERP\Controller\ERPSuppliersController'
     type:     annotation
@@ -106,7 +106,7 @@ ProductVariant:
 Product:
     resource: 'App\Modules\ERP\Controller\ERPProductsController'
     type:     annotation
-    
+
 MeasurementUnits:
     resource: 'App\Modules\ERP\Controller\ERPMeasurementUnitsController'
     type:     annotation
@@ -250,3 +250,7 @@ Tracker:
 TrackerLocations:
    resource: 'App\Modules\Tracker\Controller\TrackerLocationsController'
    type:     annotation
+
+Widgets:
+  resource: 'App\Modules\Globale\Controller\GlobaleWidgetsController'
+  type:     annotation

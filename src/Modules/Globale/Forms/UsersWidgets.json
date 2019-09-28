@@ -1,0 +1,37 @@
+[{
+    "sections": [
+        {
+            "name": "data",
+            "fields": [
+                {
+                    "name": "x",
+                    "cols": 4
+                },
+                {
+                    "name": "y",
+                    "cols": 4
+                },
+                {
+                    "name": "w",
+                    "cols": 4
+                },
+                {
+                    "name": "h",
+                    "cols": 4
+                },
+                {
+                    "name": "active",
+                    "cols": 4
+                },
+                {
+                    "name": "user",
+                    "cols": 4
+                },
+                {
+                    "name": "widget",
+                    "cols": 4
+                }
+            ]
+        }
+    ]
+}]

@@ -1,0 +1,42 @@
+<div class="modal fade" tabindex="-1" id="{{ widget.id }}-modal-form" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content" style="transform: matrix(1, 0, 0, 1, 0, 0);">
+				<div class="modal-header">
+					<h4 class="modal-title">{{ ('Settings')|trans }}</h4>
+				</div>
+        <div id="{{ widget.id }}-modal-form-body">
+          	{#{{ include('@Globale/form.html.twig') }}#}
+        </div>
+				<div>
+				</div>
+				</br></br>
+				<div id="calendar-modal-new-calendar-footer" class="modal-footer">
+					<button type="button" class="btn btn-primary" data-dismiss="modal">{{ ("Cancelar")|trans }}</button>
+					<button attr-id="{{ widget.id }}" attr-widget="{{ widget.widget.name }}" attr-action="" id="{{ widget.id }}-button-continue" type="button" class="btn btn-red">{{ ("Guardar")|trans }}</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+<script>
+$(function () {
+  $('body').on('click', "#{{ widget.id }}-button-continue", function() {
+        if($("#{{ widget.id }}-modal-form-body").find('form').valid()){
+          if((++load_wait)==1) $("#load-spinner").fadeIn();
+          $.post($("#{{ widget.id }}-modal-form-body").find('form').find('#post-url').val(), $("#{{ widget.id }}-modal-form-body").find('form').serialize(),
+              function(data, status, xhr){
+                if((--load_wait)==0) $("#load-spinner").fadeOut();
+                if(data.result){
+                  if(typeof elements_reload === "function") elements_reload();
+                  toastr.success("Datos guardados correctamente", "Confirmación", confirmation);
+                  $("#{{ widget.id }}-modal-form").modal('hide');
+                  $("#{{ widget.id }}-modal-form-body").find('form').trigger("reset");
+                  $("#{{ widget.id }}-modal-form-body").find('form').validate().resetForm();
+									location.reload();
+                }
+                  else toastr.error("Ocurrió un error al guardar los datos", "Confirmación", confirmation);
+            }, "json");
+          }
+  });
+});
+</script>

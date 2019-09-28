@@ -1,0 +1,41 @@
+[{
+    "sections": [
+        {
+            "name": "data",
+            "fields": [
+                {
+                    "name": "name",
+                    "cols": 4
+                },
+                {
+                    "name": "description",
+                    "cols": 4
+                },
+                {
+                    "name": "active",
+                    "cols": 4
+                },
+                {
+                    "name": "icon",
+                    "cols": 4
+                },
+                {
+                    "name": "color",
+                    "cols": 4
+                },
+                {
+                    "name": "w",
+                    "cols": 4
+                },
+                {
+                    "name": "h",
+                    "cols": 4
+                },
+                {
+                    "name": "module",
+                    "cols": 4
+                }
+            ]
+        }
+    ]
+}]

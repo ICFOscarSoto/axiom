@@ -20,21 +20,82 @@
 		<hr />
 		{{ include('@Globale/breadcrumb.html.twig') }}
 		<!-- MAIN CONTENT -->
-
-		<!--<div class="panel panel-primary" data-collapsed="0">
-		<div class="panel-body">
-		<form role="form" class="form-horizontal form-groups-bordered">
-			<div class="form-group">
-					<div class="col-sm-offset-3 col-sm-5">
-						<div class="make-switch switch-large">
-										    <input type="checkbox">
-										</div>
-					</div>
+		<div style="min-height: 75%">
+			<div class="grid-stack">
+				{% for widget in widgets %}
+		  		{{ include('@Widgets/' ~ widget.widget.name ~ '.html.twig') }}
+		  	{% endfor %}
+	 		</div>
+			<div class="grid-stack">
+				{{ include('@Widgets/widget_add.html.twig') }}
 			</div>
-		</form>
 		</div>
+		<script type="text/javascript">
+		$(function () {
+			var options = {
+				animate: true,
+				draggable: {
+						handle: '.widget-move',
+				}
+			};
+	    $('.grid-stack').gridstack(options);
+			$('.grid-stack').on('dragstop', function (event, ui) {
+				var layout=GetLayout();
+				$.ajax({
+				   type: "POST",
+				   data: {layout:layout},
+				   url: "{{ url('updatelayout') }}",
+				});
+			});
 
-		</div>-->
+			function GetLayout() {
+				var positions = [];
+				$('.grid-stack-item.ui-draggable').each(function () {
+    			var $this = $(this);
+					var node = $this.data('_gridstack_node');
+			    positions.push({
+							id: $this.attr('data-id'),
+							x:  node.x,
+							y:  node.y,
+							w:  node.w,
+							h:  node.h
+			    });
+				});
+				return positions;
+			}
+
+			$('body').on('click', '[id^="remove-widget-"]', function(){
+				var id_item=$(this).attr("attr-id");
+				$.ajax({
+				   type: "POST",
+				   data: {id:id_item},
+				   url: "{{ url('deletewidget') }}",
+					 success:function(data) {
+							$('.grid-stack').data('gridstack').remove_widget($("#widget-item-"+id_item));
+      				//$("#widget-item-"+id_item).remove();
+    			 }
+				});
+			});
+
+			$('body').on('click', '[id^=config-widget-]', function(){
+				var id_item=$(this).attr("attr-id");
+				var widget=$(this).attr("attr-widget");
+				url="{{ url('widgetdata',{'id':'_____', 'widget':'__2__'}) }}";
+				url=url.replace('_____',id_item);
+				url=url.replace('__2__',widget);
+				$.post(url, null,
+					function(data, status, xhr){
+							$("#"+id_item+"-modal-form-body").html(data);
+							$("#"+id_item+"-modal-form-body").find(':checkbox').not($('[id$=-chkall]')).iCheck({checkboxClass: 'icheckbox_flat-blue', radioClass: 'iradio_flat-blue'});
+							$("#"+id_item+"-modal-form-body select").select2();
+							$("#"+id_item+"-modal-form").modal();
+					});
+				$('#'+id_item+'-modal-form').modal();
+			});
+
+		});
+		</script>
+
 		<!-- END MAIN CONTENT -->
 		{{ include('@Globale/footer.html.twig') }}
 	</div>
@@ -57,5 +118,12 @@
 		<script src="{{ url('index') }}/js/morris.min.js"></script>
 		<script src="{{ url('index') }}/js/toastr.js"></script>
 		<script src="{{ url('index') }}/js/neon-chat.js"></script>
+
+		<script type="text/javascript" src='{{ url('index') }}js/gridstack/lodash.js'></script>
+		<link rel="stylesheet" href="{{ url('index') }}js/gridstack/gridstack.min.css" />
+		<script type="text/javascript" src='{{ url('index') }}js/jquery.ui.touch-punch.min.js'></script>
+		<script type="text/javascript" src='{{ url('index') }}js/gridstack/gridstack.min.js'></script>
+		<script type="text/javascript" src='{{ url('index') }}js/gridstack/gridstack.jQueryUI.min.js'></script>
+
 {% endblock %}
 </body>

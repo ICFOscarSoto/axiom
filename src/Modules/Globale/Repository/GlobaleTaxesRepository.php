@@ -19,32 +19,4 @@ class GlobaleTaxesRepository extends ServiceEntityRepository
         parent::__construct($registry, GlobaleTaxes::class);
     }
 
-    // /**
-    //  * @return GlobaleTaxes[] Returns an array of GlobaleTaxes objects
-    //  */
-    /*
-    public function findByExampleField($value)
-    {
-        return $this->createQueryBuilder('g')
-            ->andWhere('g.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('g.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?GlobaleTaxes
-    {
-        return $this->createQueryBuilder('g')
-            ->andWhere('g.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }

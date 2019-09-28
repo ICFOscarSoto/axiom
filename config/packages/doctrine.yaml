@@ -141,6 +141,11 @@ doctrine:
             #    dir: '%kernel.project_dir%/src/Entity'
             #    prefix: 'App\Entity'
             #    alias: App
+            Widgets:
+                is_bundle: false
+                type: annotation
+                dir: '%kernel.project_dir%/src/Widgets/Entity'
+                prefix: 'App\Widgets\Entity'
             Globale:
                 is_bundle: false
                 type: annotation
@@ -191,3 +196,8 @@ doctrine:
                 type: annotation
                 dir: '%kernel.project_dir%/src/Modules/Tracker/Entity'
                 prefix: 'App\Modules\Tracker\Entity'
+            AERP:
+                is_bundle: false
+                type: annotation
+                dir: '%kernel.project_dir%/src/Modules/AERP/Entity'
+                prefix: 'App\Modules\AERP\Entity'

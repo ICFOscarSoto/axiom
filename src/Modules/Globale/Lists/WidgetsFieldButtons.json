@@ -1,0 +1,8 @@
+[
+  {"id": "editWidgets", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"genericdata", "routeParams":{"module":"Globale", "name":"Widgets", "type":"modal" }, "modal":"Widgets", "actionType" : "background", "confirm" :false, "tooltip":""},
+  {"id": "activation", "type": "option", "options": [
+      {"id": "desactivateWidgets", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"genericdisable", "routeParams":{"module":"Globale", "name":"Widgets"}, "confirm" :true, "actionType" : "background", "tooltip":"" },
+      {"id": "activateWidgets", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "route":"genericenable", "routeParams":{"module":"Globale", "name":"Widgets"}, "confirm" :true, "actionType" : "background", "tooltip":"" }
+  ]},
+  {"id": "deleteWidgets", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"genericdelete", "routeParams":{"module":"Globale", "name":"Widgets"}, "confirm" :true, "undo" :false, "actionType" : "background", "tooltip":""}
+]

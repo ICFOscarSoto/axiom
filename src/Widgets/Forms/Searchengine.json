@@ -1,0 +1,15 @@
+[{
+	"sections": [
+		{
+			"name": "data",
+			"fields": [
+        {	"name": "engine", "cols": 12,
+					"transform":
+						{
+							"type":"option",
+							"options": {"Google": "0", "Bing": "1", "DuckDuck Go": "2"}
+						}
+				}
+			]
+		}]
+}]

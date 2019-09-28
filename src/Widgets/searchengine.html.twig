@@ -1,0 +1,25 @@
+{{ include('@Widgets/widget_head.html.twig') }}
+
+<div class="col-md-4">
+{% dump(widget.settings) %}
+{# Google #}{% if widget.settings.engine == 0%}{% set search_logo="/images/widgets/searchengines/google.png" %}{% set search_url="https://www.google.com/search?q=" %}{% endif %}
+{# Bing #}{% if widget.settings.engine == 1%}{% set search_logo="/images/widgets/searchengines/bing.png" %}{% set search_url="https://www.bing.com/search?q=" %}{% endif %}
+{# DuckDuckgo #}{% if widget.settings.engine == 2%}{% set search_logo="/images/widgets/searchengines/duckduckgo.png" %}{% set search_url="https://duckduckgo.com/?q=" %}{% endif %}
+<center><img src="{{ url('index') }}{{ search_logo }}" height="36"/></center></div>
+<div class="col-md-8"><div class="form-group"><input type="text" id="q-search-{{ widget.id }}"  required="required" class="form-control" value=""></div></div>
+
+{{ include('@Widgets/widget_footer.html.twig') }}
+{{ include('@Widgets/widget_settings.html.twig') }}
+
+<script>
+$(function () {
+  $('#q-search-{{ widget.id }}').keyup(function(e){
+    if(e.keyCode == 13){
+
+      var url="{{ search_url }}"+$(this).val();
+      window.open(url,'_blank');
+      $(this).val('');
+    }
+  });
+});
+</script>

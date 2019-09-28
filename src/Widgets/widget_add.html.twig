@@ -1,0 +1,63 @@
+<div class="grid-stack-item" id="widget-item-add-widget" data-gs-no-resize="yes" data-gs-x="0" data-gs-y="0" data-gs-no-resize data-gs-width="2" data-gs-height="2">
+  <div class="grid-stack-item-content" style="display:flex;flex-direction:column; overflow: hidden;">
+    <div class="tile-title tile-gray" id="add-widget-button" style="flex: 1; cursor: pointer;">
+			<div class="icon" style="height: 100%; position: relative;">
+				<i class="glyphicon glyphicon-plus" style="top: 15px;"></i>
+			</div>
+		</div>
+  </div>
+</div>
+<div class="modal fade" tabindex="-1" id="add-widget-modal-form" aria-hidden="true">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content" style="transform: matrix(1, 0, 0, 1, 0, 0);">
+				<div class="modal-header">
+					<h4 class="modal-title">{{ ('Add widget')|trans }}</h4>
+				</div>
+        <div id="add-widget-modal-form-body" style="padding: 20px;">
+          <div class="row">
+            {% for catalog in widgetsCatalog %}
+              <div class="col-md-3">
+                <div class="tile-title tile-gray" id="add-widget-catalog-button" attr-id="{{ catalog.id }}" style="cursor: pointer;">
+            			<div class="icon">
+            				<i class="{{ catalog.icon }}" style="top: 15px;"></i>
+            			</div>
+                  <div class="title">
+        						<h3>{{ (catalog.name)|trans }}</h3>
+        						<p>{{ (catalog.description)|trans }}</p>
+        					</div>
+            		</div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+				<div>
+				</div>
+				</br></br>
+				<div id="calendar-modal-new-calendar-footer" class="modal-footer">
+					<button type="button" class="btn btn-primary" data-dismiss="modal">{{ ("Cancelar")|trans }}</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+  <script>
+  $(function () {
+    $('body').on('click', "#add-widget-button", function() {
+      $("#add-widget-modal-form").modal();
+    });
+    });
+    $('body').on('click', "#add-widget-catalog-button", function() {
+      var id=$(this).attr("attr-id");
+      $.ajax({
+         type: "POST",
+         data: {id:id},
+         url: "{{ url('addwidget') }}",
+         success:function(data) {
+            $("#add-widget-modal-form").modal('hide');
+            location.reload();
+         }
+      });
+    });
+
+
+  </script>

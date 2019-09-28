@@ -111,6 +111,22 @@ class GlobaleDefaultController extends Controller
    }
 
    /**
+    * @Route("/{_locale}/{widget}/widgetgeneric/data/{id}/{action}", name="widgetdata", defaults={"id"=0, "action"="read"})
+    */
+    public function widgetdata($id, $widget, $action, Request $request){
+      $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+      $this->denyAccessUnlessGranted('ROLE_ADMIN');
+      $template=dirname(__FILE__)."/../../../Widgets/Forms/".$widget.".json";
+      $class="\App\Widgets\Entity\Widgets".$widget;
+      $utils = new GlobaleFormUtils();
+      $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser()];
+      $utils->initialize($this->getUser(), new $class(), $template, $request, $this, $this->getDoctrine(),
+                         ["userwidget"],[],null,["widget"=>$widget]);
+      return $utils->make($id, $class, $action, "form".$widget, "modal");
+
+   }
+
+   /**
     * @Route("/{_locale}/{module}/{name}/generic/datatab/{id}/{action}/{idparent}/{type}", name="genericdatatab", defaults={"id"=0, "idparent"="0", "type"="modal", "action"="read"})
     */
     public function genericdatatab($id, $idparent, $module, $name, $type, $action, Request $request){

@@ -1,0 +1,8 @@
+[
+  {"id": "editModules", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"genericdata", "routeParams":{"module":"Globale", "name":"Modules", "type":"modal" }, "modal":"Modules", "actionType" : "background", "confirm" :false},
+  {"id": "activation", "type": "option", "options": [
+      {"id": "desactivateModules", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"genericdisable", "routeParams":{"module":"Globale", "name":"Modules"}, "confirm" :true, "actionType" : "background" },
+      {"id": "activateModules", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "route":"genericenable", "routeParams":{"module":"Globale", "name":"Modules"}, "confirm" :true, "actionType" : "background" }
+  ]},
+  {"id": "deleteModules", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"genericdelete", "routeParams":{"module":"Globale", "name":"Modules"}, "confirm" :true, "undo" :false, "tooltip":"Borrar impuesto", "actionType" : "background"}
+]

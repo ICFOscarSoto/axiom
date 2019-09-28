@@ -48,6 +48,11 @@ table {
 
 }
 
+.grid-stack>.grid-stack-item>.ui-resizable-se {
+    right: 4px !important;
+    bottom: 8px !important;
+  }
+
 .dd-edit{
   margin: 0 !important;
   width: 30px;

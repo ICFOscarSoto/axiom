@@ -1,0 +1,6 @@
+[
+  {"id" : "addTopUsersWidgets", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"genericdata", "routeParams":{"module":"Globale", "name":"UsersWidgets", "type":"modal" }, "modal":"UsersWidgets", "actionType" : "background", "confirm" :false, "tooltip" : ""},
+  {"id" : "deleteTopUsersWidgets", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true, "tooltip":""},
+  {"id" : "printTopUsersWidgets", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false, "tooltip":""},
+  {"id" : "exportTopUsersWidgets", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"genericexport", "routeParams":{"module":"Globale", "name":"UsersWidgets"}, "confirm" :false, "tooltip":""}
+]

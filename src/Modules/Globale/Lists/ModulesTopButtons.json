@@ -1,0 +1,6 @@
+[
+  {"id" : "addTopModules", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"genericdata", "routeParams":{"module":"Globale", "name":"Modules", "type":"modal" }, "modal":"Modules", "actionType" : "background", "confirm" :false, "tooltip" : "Crear nuevo impuesto"},
+  {"id" : "deleteTopModules", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true},
+  {"id" : "printTopModules", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false},
+  {"id" : "exportTopModules", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"genericexport", "routeParams":{"module":"Globale", "name":"Modules"}, "confirm" :false}
+]

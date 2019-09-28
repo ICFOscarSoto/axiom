@@ -1,0 +1,8 @@
+[
+  {"id": "editUsersWidgets", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"genericdata", "routeParams":{"module":"Globale", "name":"UsersWidgets", "type":"modal" }, "modal":"UsersWidgets", "actionType" : "background", "confirm" :false, "tooltip":""},
+  {"id": "activation", "type": "option", "options": [
+      {"id": "desactivateUsersWidgets", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"genericdisable", "routeParams":{"module":"Globale", "name":"UsersWidgets"}, "confirm" :true, "actionType" : "background", "tooltip":"" },
+      {"id": "activateUsersWidgets", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "route":"genericenable", "routeParams":{"module":"Globale", "name":"UsersWidgets"}, "confirm" :true, "actionType" : "background", "tooltip":"" }
+  ]},
+  {"id": "deleteUsersWidgets", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"genericdelete", "routeParams":{"module":"Globale", "name":"UsersWidgets"}, "confirm" :true, "undo" :false, "actionType" : "background", "tooltip":""}
+]
