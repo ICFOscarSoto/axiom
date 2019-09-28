@@ -1,0 +1,12 @@
+[{
+	"sections": [
+		{
+			"name": "Sales Budgets data",
+			"fields": [
+				{ "name": "customer", "cols": 4}
+			]
+		}
+
+
+	]
+}]

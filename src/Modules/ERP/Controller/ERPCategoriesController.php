@@ -65,19 +65,14 @@ class ERPCategoriesController extends Controller
 			$category=$repository->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany()]);
 			if($category){
 				$parent=$repository->findOneBy(["id"=>$parent, "company"=>$this->getUser()->getCompany()]);
-			//	if($parent){
 					$category->setParentid($parent);
 					$category->setPosition($position);
 					$category->setDateupd(new \DateTime());
 					$manager=$this->getDoctrine()->getManager();
 					$manager->persist($category);
 			    $manager->flush();
-
 					return new JsonResponse(["result"=>1]);
-			//	}else return new JsonResponse(["result"=>-1]);
 			}else return new JsonResponse(["result"=>-1]);
-
-
 
 		}
 
