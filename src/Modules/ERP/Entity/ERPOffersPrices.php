@@ -257,6 +257,7 @@ class ERPOffersPrices
             return ["valid"=>false, "global_errors"=>["Por favor, introduce un descuento"]];
           else if($this->reduction<=0 OR $this->reduction>100)
             return ["valid"=>false, "global_errors"=>["Por favor, introduce un descuento correcto."]];
+          else return ["valid"=>true];
         }
       else if($this->reduction_type==2 AND $this->amount==NULL)
           return ["valid"=>false, "global_errors"=>["Por favor, introduce precio neto"]];
