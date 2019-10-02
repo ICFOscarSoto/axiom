@@ -1,8 +1,0 @@
-[
-  {"id": "editOffersPrices", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"genericdata", "routeParams":{"module":"ERP", "name":"OffersPrices", "type":"modal" }, "modal":"OffersPrices", "actionType" : "background", "confirm" :false, "tooltip":""},
-  {"id": "activation", "type": "option", "options": [
-      {"id": "desactivateOffersPrices", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"genericdisable", "routeParams":{"module":"ERP", "name":"OffersPrices"}, "confirm" :true, "actionType" : "background", "tooltip":"" },
-      {"id": "activateOffersPrices", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "route":"genericenable", "routeParams":{"module":"ERP", "name":"OffersPrices"}, "confirm" :true, "actionType" : "background", "tooltip":"" }
-  ]},
-  {"id": "deleteOffersPrices", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"genericdelete", "routeParams":{"module":"ERP", "name":"OffersPrices"}, "confirm" :true, "undo" :false, "actionType" : "background", "tooltip":""}
-]

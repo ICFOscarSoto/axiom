@@ -1,6 +1,0 @@
-[
-  {"id" : "addTopCustomersPrices", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"genericdata", "routeParams":{"module":"ERP", "name":"CustomersPrices", "type":"modal" }, "modal":"CustomersPrices", "actionType" : "background", "confirm" :false, "tooltip" : ""},
-  {"id" : "deleteTopCustomersPrices", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true, "tooltip":""},
-  {"id" : "printTopCustomersPrices", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false, "tooltip":""},
-  {"id" : "exportTopCustomersPrices", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"genericexport", "routeParams":{"module":"ERP", "name":"CustomersPrices"}, "confirm" :false, "tooltip":""}
-]
