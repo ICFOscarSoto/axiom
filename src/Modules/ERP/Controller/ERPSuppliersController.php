@@ -11,11 +11,13 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\ERP\Entity\ERPSuppliers;
+use App\Modules\ERP\Entity\ERPShoppingDiscounts;
 use App\Modules\Globale\Entity\GlobaleCountries;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\ERP\Utils\ERPSuppliersUtils;
+use App\Modules\ERP\Utils\ERPShoppingDiscountsUtils;
 
 class ERPSuppliersController extends Controller
 {
@@ -72,6 +74,32 @@ class ERPSuppliersController extends Controller
 		}
 
 		/**
+		 * @Route("/{_locale}/suppliers/shoppingDiscounts/{id}", name="shoppingDiscounts", defaults={"id"=0})
+		 */
+		public function shoppingDiscounts($id, Request $request)	{
+
+			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		 //$this->denyAccessUnlessGranted('ROLE_ADMIN');
+		 $userdata=$this->getUser()->getTemplateData();
+		 $classDiscounts=ERPShoppingDiscounts::class;
+		 $locale = $request->getLocale();
+		 $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
+		 $utils = new ERPShoppingDiscountsUtils;
+		 $templateLists=$utils->formatListbySupplier($id);
+		 dump($templateLists);
+		 $formUtils=new GlobaleFormUtils();
+		 $formUtils->initialize($this->getUser(), new $this->class(), dirname(__FILE__)."/../Forms/ShoppingDiscounts.json", $request, $this, $this->getDoctrine());
+		 //$templateForms[]=$formUtils->formatForm('shoppingDiscounts', true, $id, $classDiscounts, "dataShoppingDiscounts",["id"=>$id, "action"=>"save"]);
+		 if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+			 return $this->render('@Globale/list.html.twig', [
+				 'listConstructor' => $templateLists,
+				 //'forms' => $templateForms,
+				 'entity_id' => $id
+				 ]);
+		 }
+	}
+
+		/**
      * @Route("/{_locale}/ERP/suppliers/form/{id}", name="formSupplier", defaults={"id"=0})
      */
     public function formSupplier($id,Request $request)
@@ -98,7 +126,8 @@ class ERPSuppliersController extends Controller
 							'tabs' => [["name" => "data", "icon"=>"fa fa-id-card", "caption"=>"Supplier data", "active"=>true, "route"=>$this->generateUrl("dataSuppliers",["id"=>$id])],
 												["name" => "addresses", "icon"=>"fa fa-location-arrow", "caption"=>"Shipping addresses", "route"=>$this->generateUrl("addresses",["id"=>$id, "type"=>"supplier"])],
 												["name" => "contacts", "icon"=>"fa fa-users", "caption"=>"Contacts" , "route"=>$this->generateUrl("contacts",["id"=>$id])],
-												["name" => "bankaccounts", "icon"=>"fa fa-money", "caption"=>"Bank Accounts", "route"=>$this->generateUrl("bankaccounts",["id"=>$id])]
+												["name" => "bankaccounts", "icon"=>"fa fa-money", "caption"=>"Bank Accounts", "route"=>$this->generateUrl("bankaccounts",["id"=>$id])],
+												["name"=>"prices", "icon"=>"fa fa-money", "caption"=>"Shopping Discounts", "route"=>$this->generateUrl("shoppingDiscounts",["id"=>$id])]
 											],
 									));
 			}

@@ -41,7 +41,7 @@ class ERPProductsAttributes
     /**
      * @ORM\Column(type="boolean")
      */
-    private $active;
+    private $active=1;
 
     /**
      * @ORM\Column(type="boolean")

@@ -3,7 +3,6 @@
         {
             "name": "data",
             "fields": [
-                {"name": "active","cols": 4},
                 {"name": "attributename","cols": 4},
                 {"name": "attributevalue","cols": 4, "trigger":{"field":"attributename", "route":"generictrigger",
                   "moduleTrigger":"ERP", "classTrigger":"ERPAttributeNames",

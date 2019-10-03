@@ -180,6 +180,11 @@ class ERPProducts
      */
     private $PVP;
 
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    private $pvpp;
+
 
     public function getId(): ?int
     {
@@ -550,6 +555,18 @@ class ERPProducts
     public function setPVP(float $PVP): self
     {
         $this->PVP = $PVP;
+
+        return $this;
+    }
+
+    public function getPvpp(): ?float
+    {
+        return $this->pvpp;
+    }
+
+    public function setPvpp(?float $pvpp): self
+    {
+        $this->pvpp = $pvpp;
 
         return $this;
     }
