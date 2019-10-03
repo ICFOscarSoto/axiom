@@ -1,0 +1,29 @@
+[{
+    "sections": [
+        {
+            "name": "data",
+            "fields": [
+              {
+                  "name": "customergroup",
+                  "cols": 4
+              },                
+                {
+                    "name": "supplier",
+                    "cols": 4
+                },
+                {
+                    "name": "category",
+                    "cols": 4
+                },
+                {
+                    "name": "increment",
+                    "cols": 4
+                },
+                {
+                    "name": "active",
+                    "cols": 4
+                }
+            ]
+        }
+    ]
+}]
