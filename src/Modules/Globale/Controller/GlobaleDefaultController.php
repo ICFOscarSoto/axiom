@@ -174,9 +174,9 @@ class GlobaleDefaultController extends Controller
        }
        $listUtils=new GlobaleListUtils();
        $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../../".$module."/Lists/".$name.".json"),true);
-       if(property_exists($class, "user") && !in_array("ROLE_GLOBAL", $user->getRoles()) && !in_array("ROLE_SUPERADMIN", $user->getRoles()) && !in_array("ROLE_ADMIN", $user->getRoles())) $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $class, [["type"=>"and", "column"=>"user", "value"=>$user]]);
+       if(property_exists($class, "user") && !in_array("ROLE_GLOBAL", $user->getRoles()) && !in_array("ROLE_SUPERADMIN", $user->getRoles()) && !in_array("ROLE_ADMIN", $user->getRoles())) $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $class, $filter);
         else if(property_exists($class, "company")) $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $class, $filter);
-          else $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $class);
+          else $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $class, count($filter)>1?[$filter[1]]:[]);
        return new JsonResponse($return);
      }
 
@@ -194,7 +194,9 @@ class GlobaleDefaultController extends Controller
        $class="\App\Modules\\".$module."\Entity\\".$module.$name;
        $classUtils="\App\Modules\\".$module."\Utils\\".$module.$name.'Utils';
        $utils = new $classUtils();
-       $templateLists=$utils->formatList($this->getUser());
+       //TODO Check Errors change on 2019-10-04
+       //$templateLists=$utils->formatList($this->getUser());
+       $templateLists=$utils->formatList($this->getUser(), $id);
        $formUtils=new GlobaleFormUtils();
        $formUtils->initialize($this->getUser(), new $class(), dirname(__FILE__)."/../../".$module."/Forms/".$name.".json", $request, $this, $this->getDoctrine());
        $templateForms[]=$formUtils->formatForm($name, true, null, $class,null,["module"=>$module, "name"=>$name]);
