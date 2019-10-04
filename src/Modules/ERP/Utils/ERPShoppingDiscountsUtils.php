@@ -11,8 +11,10 @@ class ERPShoppingDiscountsUtils
 {
   private $module="ERP";
   private $name="ShoppingDiscounts";
+  public $parentClass="\App\Modules\ERP\Entity\ERPSuppliers";
+  public $parentField="supplier";
   public function getExcludedForm($params){
-    return [];
+    return ["supplier"];
   }
 
   public function getIncludedForm($params){
@@ -22,32 +24,21 @@ class ERPShoppingDiscountsUtils
     return [];
   }
 
-  public function formatList($user){
-    $list=[
-      'id' => 'list'.$this->name,
-      'route' => 'genericlist',
-      'routeParams' => ["module" => $this->module,
-                        "name" => $this->name],
-      'orderColumn' => 2,
-      'orderDirection' => 'ASC',
-      'tagColumn' => 2,
-      'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/".$this->name.".json"),true),
-      'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/".$this->name."FieldButtons.json"),true),
-      'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/".$this->name."TopButtons.json"),true)
-    ];
-    return $list;
-  }
-
-  public function formatListBySupplier($supplier){
+  public function formatList($user, $supplier){
     $list=[
       'id' => 'list'.$this->name,
       'route' => 'genericlist',
       'routeParams' => ["module" => $this->module,
                         "name" => $this->name,
-                        "id" => $supplier],
+                        "parent" => $supplier,
+                        "id" => $supplier,
+                        "field" => "supplier",
+                        "parentModule" => "ERP",
+                        "parentName" => "Suppliers"
+                      ],
       'orderColumn' => 2,
       'orderDirection' => 'ASC',
-      'tagColumn' => 3,
+      'tagColumn' => 2,
       'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/".$this->name.".json"),true),
       'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/".$this->name."FieldButtons.json"),true),
       'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/".$this->name."TopButtons.json"),true)

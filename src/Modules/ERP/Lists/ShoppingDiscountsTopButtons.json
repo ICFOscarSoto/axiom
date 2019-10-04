@@ -1,5 +1,5 @@
 [
-  {"id" : "addTopShoppingDiscounts", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"genericdata", "routeParams":{"module":"ERP", "name":"ShoppingDiscounts", "type":"modal" }, "modal":"ShoppingDiscounts", "actionType" : "background", "confirm" :false, "tooltip" : ""},
+  {"id" : "addTopShoppingDiscounts", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"genericdatatab", "routeParams":{"module":"ERP", "name":"ShoppingDiscounts", "type":"modal" , "idparent":"id"}, "modal":"ShoppingDiscounts", "actionType" : "background", "confirm" :false, "tooltip" : ""},
   {"id" : "deleteTopShoppingDiscounts", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true, "tooltip":""},
   {"id" : "printTopShoppingDiscounts", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false, "tooltip":""},
   {"id" : "exportTopShoppingDiscounts", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"genericexport", "routeParams":{"module":"ERP", "name":"ShoppingDiscounts"}, "confirm" :false, "tooltip":""}

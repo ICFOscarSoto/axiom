@@ -28,7 +28,10 @@
 				{	"name": "multiplicity", "cols": 2},
 				{	"name": "promotion", "cols": 2},
 				{	"name": "rotation", "cols": 2},
-				{ "name": "description","cols": 12}
+				{ "name": "description","cols": 12},
+				{ "name": "PVPR","cols": 2},
+				{ "name": "PVP","cols": 2},
+				{ "name": "shoppingPrice","cols": 2}
 			]
 		}]
 }]
