@@ -581,6 +581,12 @@ class ERPProducts
         return $this;
     }
 
+    public function priceCalculated($doctrine){
+        $repository=$doctrine->getRepository(ERPShoppingDiscounts::class);
+        $shoppingDiscounts=$repository->findOneBy(["supplier"=>$this->supplier,"active"=>1,"deleted"=>0]);
+        $this->setShoppingPrice($this->PVPR*(1-$shoppingDiscounts->getDiscount()/100));
+    }
+
     public function preProccess($kernel, $doctrine, $user, $params, $oldobj){
       $repository=$doctrine->getRepository(ERPShoppingDiscounts::class);
       //Search in the treeCategories which is the most specific with ShoppingDiscounts

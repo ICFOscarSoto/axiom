@@ -4,7 +4,7 @@
             "name": "data",
             "fields": [
                 {
-                    "name": "name",
+                    "name": "discount",
                     "cols": 4
                 },
                 {

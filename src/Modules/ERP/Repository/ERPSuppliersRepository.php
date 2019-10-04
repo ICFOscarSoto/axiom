@@ -19,7 +19,7 @@ class ERPSuppliersRepository extends ServiceEntityRepository
         parent::__construct($registry, ERPSuppliers::class);
     }
 
-    
+
     public function findById($value)
     {
         return $this->createQueryBuilder('c')
@@ -32,32 +32,11 @@ class ERPSuppliersRepository extends ServiceEntityRepository
         ;
     }
 
-    // /**
-    //  * @return ERPSuppliers[] Returns an array of ERPSuppliers objects
-    //  */
-    /*
-    public function findByExampleField($value)
-    {
-        return $this->createQueryBuilder('e')
-            ->andWhere('e.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('e.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
+    public function productsBySupplier($supplier){
+      $query="SELECT id from erpproducts
+      where supplier_id=:supplier";
+      $params=['supplier' => $supplier];
+      return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
 
-    /*
-    public function findOneBySomeField($value): ?ERPSuppliers
-    {
-        return $this->createQueryBuilder('e')
-            ->andWhere('e.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
     }
-    */
 }

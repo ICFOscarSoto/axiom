@@ -30,9 +30,9 @@ class ERPShoppingDiscounts
     private $category;
 
     /**
-     * @ORM\Column(type="string", length=10)
+     * @ORM\Column(type="float")
      */
-    private $name;
+    private $discount;
 
     /**
      * @ORM\Column(type="boolean")
@@ -83,14 +83,14 @@ class ERPShoppingDiscounts
         return $this;
     }
 
-    public function getName(): ?string
+    public function getDiscount(): ?string
     {
-        return $this->name;
+        return $this->discount;
     }
 
-    public function setName(string $name): self
+    public function setDiscount(string $discount): self
     {
-        $this->name = $name;
+        $this->discount = $discount;
 
         return $this;
     }
@@ -142,4 +142,16 @@ class ERPShoppingDiscounts
 
         return $this;
     }
+
+    public function preProccess($kernel, $doctrine, $user){
+      $repositoryProduct=$doctrine->getRepository(ERPProducts::class);
+      $repository=$doctrine->getRepository(ERPSuppliers::class);
+      $products=$repository->productsBySupplier($this->id);
+      foreach($products as $product){
+        $productEntity=$repositoryProduct->findOneBy(["id"=>$product]);
+        $productEntity->priceCalculated($doctrine);
+      }
+
+    }
+
 }
