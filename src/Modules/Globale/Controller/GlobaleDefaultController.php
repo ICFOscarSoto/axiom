@@ -155,9 +155,9 @@ class GlobaleDefaultController extends Controller
    }
 
      /**
-      * @Route("/api/{module}/{name}/generic/list", name="genericlist")
+      * @Route("/api/{module}/{name}/generic/list/{parent}/{field}/{parentModule}/{parentName}", name="genericlist", defaults={"parent"=0, "field"=null, "parentModule"="", "parentName"=""})
       */
-     public function list($module, $name, RouterInterface $router,Request $request){
+     public function list($module, $name, $parent, $field, $parentModule, $parentName, RouterInterface $router,Request $request){
        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
        $user = $this->getUser();
        $locale = $request->getLocale();
@@ -165,10 +165,17 @@ class GlobaleDefaultController extends Controller
        $manager = $this->getDoctrine()->getManager();
        $class="\App\Modules\\".$module."\Entity\\".$module.$name;
        $repository = $manager->getRepository($class);
+       $filter=[["type"=>"and", "column"=>"company", "value"=>$user->getCompany()]];
+       if($parent!=0 && $field!=null){
+         $classParent="\App\Modules\\".$parentModule."\Entity\\".$parentModule.$parentName;
+         $repositoryParent = $manager->getRepository($classParent);
+         $parentObj=$repositoryParent->findOneBy(["id"=>$parent]);
+         $filter[]=["type"=>"and", "column"=>$field, "value"=>$parentObj];
+       }
        $listUtils=new GlobaleListUtils();
        $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../../".$module."/Lists/".$name.".json"),true);
        if(property_exists($class, "user") && !in_array("ROLE_GLOBAL", $user->getRoles()) && !in_array("ROLE_SUPERADMIN", $user->getRoles()) && !in_array("ROLE_ADMIN", $user->getRoles())) $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $class, [["type"=>"and", "column"=>"user", "value"=>$user]]);
-        else if(property_exists($class, "company")) $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $class, [["type"=>"and", "column"=>"company", "value"=>$user->getCompany()]]);
+        else if(property_exists($class, "company")) $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $class, $filter);
           else $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $class);
        return new JsonResponse($return);
      }
