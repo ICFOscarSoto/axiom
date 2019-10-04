@@ -14,13 +14,14 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
  */
 class ERPIncrementsRepository extends ServiceEntityRepository
 {
-    public function __construct(RegistryInterface $registry)
-    {
+  public function __construct(RegistryInterface $registry)
+  {
         parent::__construct($registry, ERPIncrements::class);
-    }
+  }
     
-    public function checkSupplierOnCategory($supplier,$category,$company){
-      if($category!=NULL AND $supplier!=NULL)
+  public function checkSupplierOnCategory($supplier,$category,$company){
+  
+    if($category!=NULL AND $supplier!=NULL)
       {
        $query="SELECT * FROM erpproducts e WHERE e.category_id=:CAT AND e.active=1 AND e.deleted=0 AND (e.supplier_id=:SUP OR e.id IN (SELECT r.product_id FROM erpreferences r WHERE r.supplier_id=:SUP))";
        $params=['CAT' => $category->getId(),

@@ -595,7 +595,7 @@ class ERPProducts
       if ($shoppingDiscounts==null)
           $shoppingDiscounts=$repository->findOneBy(["supplier"=>$oldobj->supplier,"active"=>1,"deleted"=>0]);
       //If PVPR, Category or Suppliers is updated then ShoppingPrice is calculated
-      if($this->PVPR!=$oldobj->getPVPR() or $this->category!=$oldobj->getCategory() or $this->supplier!=$oldobj->getSupplier())
+      if(($this->PVPR!=$oldobj->getPVPR() or $this->category!=$oldobj->getCategory() or $this->supplier!=$oldobj->getSupplier()) and $shoppingDiscounts!=null)
           $this->setShoppingPrice($this->PVPR*(1-$shoppingDiscounts->getName()/100));
 
     }
