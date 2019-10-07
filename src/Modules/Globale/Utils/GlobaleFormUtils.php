@@ -56,7 +56,7 @@ class GlobaleFormUtils extends Controller
     $this->request=$request;
     $this->controller=$controller;
     $this->doctrine=$doctrine;
-    $this->excludedAttributes=array('company'); //by default remove company field from views
+    $this->excludedAttributes=array('company','author'); //by default remove company and author field from views
     $this->excludedAttributes=array_merge($this->excludedAttributes,$excludedAttributes);
     //$this->excludedAttributes=$excludedAttributes;
     $this->includedAttributes=$includedAttributes;
@@ -321,6 +321,7 @@ class GlobaleFormUtils extends Controller
          $obj->setDeleted(false);
          //If object has Company save with de user Company
          if(method_exists($obj,'setCompany')) $obj->setCompany($this->user->getCompany());
+         if(method_exists($obj,'setAuthor')) $obj->setCompany($this->user);
        }
        $obj->setDateupd(new \DateTime());
        try{
