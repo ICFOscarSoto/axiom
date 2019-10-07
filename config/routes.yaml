@@ -46,7 +46,7 @@ Customer:
 CustomerGroups:
     resource: 'App\Modules\ERP\Controller\ERPCustomerGroupsController'
     type:     annotation
-    
+
 Increments:
     resource: 'App\Modules\ERP\Controller\ERPIncrementsController'
     type:     annotation
@@ -257,10 +257,6 @@ TrackerLocations:
 
 Widgets:
   resource: 'App\Modules\Globale\Controller\GlobaleWidgetsController'
-  type:     annotation
-
-AERPCustomers:
-  resource: 'App\Modules\AERP\Controller\AERPCustomersController'
   type:     annotation
 
 Navision:
