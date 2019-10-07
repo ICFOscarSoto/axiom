@@ -62,7 +62,7 @@ class HRShiftsController extends Controller
       'controllerName' => 'HRShiftsController',
       'interfaceName' => 'Turnos horario '.$schedule->getName(),
       'optionSelected' => 'schedules',
-      'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
+      'menuOptions' =>  $menurepository->formatOptions($userdata),
       'breadcrumb' => $menurepository->formatBreadcrumb('schedules'),
       'userData' => $userdata,
       'schedule_id' => $id,

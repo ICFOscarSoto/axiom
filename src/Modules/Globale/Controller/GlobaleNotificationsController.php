@@ -54,7 +54,7 @@ class GlobaleNotificationsController extends Controller
 				'controllerName' => 'NotificationsController',
 				'interfaceName' => 'Notificaciones',
 				'optionSelected' => $request->attributes->get('_route'),
-				'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
+				'menuOptions' =>  $menurepository->formatOptions($userdata),
 				'breadcrumb' =>  $menurepository->formatBreadcrumb($request->get('_route')),
 				'userData' => $userdata,
 				'lists' => $templateLists

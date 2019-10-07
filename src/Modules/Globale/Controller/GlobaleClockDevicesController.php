@@ -51,7 +51,7 @@ class GlobaleClockDevicesController extends Controller
             'interfaceName' => 'Dispositivos',
             'optionSelected' => 'genericindex',
             'optionSelectedParams' => ["module"=>"Globale", "name"=>"ClockDevices"],
-            'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
+            'menuOptions' =>  $menurepository->formatOptions($userdata),
             'breadcrumb' => $breadcrumb,
             'userData' => $userdata,
             'id' => $id,

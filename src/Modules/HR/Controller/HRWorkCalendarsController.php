@@ -54,7 +54,7 @@ class HRWorkCalendarsController extends Controller
        'interfaceName' => 'Calendarios laborales',
        'optionSelected' => 'genericindex',
 			 'optionSelectedParams' => ["module"=>"HR", "name"=>"WorkCalendarGroups"],
-       'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
+       'menuOptions' =>  $menurepository->formatOptions($userdata),
        'breadcrumb' =>  $menurepository->formatBreadcrumb('genericindex','HR','WorkCalendarGroups'),
        'userData' => $userdata,
        'lists' => $templateLists,

@@ -55,15 +55,16 @@ class GlobaleCompaniesController extends Controller
 	 					'controllerName' => 'CompaniesController',
 	 					'interfaceName' => 'Empresas',
 	 					'optionSelected' => 'companies',
-	 					'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
+	 					'menuOptions' =>  $menurepository->formatOptions($userdata),
 	 					'breadcrumb' => $breadcrumb,
 	 					'userData' => $userdata,
 	 					'id' => $id,
 	 					'tab' => $request->query->get('tab','data'), //Show initial tab, by default data tab
 	 					'tabs' => [["name" => "data", "caption"=>"Datos empresa", "icon"=>"entypo-book-open","active"=>true, "route"=>$this->generateUrl("dataCompany",["id"=>$id])],
 	 										 ["name" => "bank", "icon"=>"fa fa-headphones", "caption"=>"Datos bancarios", "route"=>$this->generateUrl("dataCompanyBankAccounts",["identity"=>$id,"id"=>$obj?($obj->getBankaccount()?$obj->getBankaccount()->getId():0):0])],
-	 										 ["name" => "files", "icon"=>"fa fa-cloud", "caption"=>"Archivos", "route"=>$this->generateUrl("cloudfiles",["id"=>$id, "path"=>"companies"])],
-											 ["name" => "files", "icon"=>"fa fa-database", "caption"=>"Uso disco", "route"=>$this->generateUrl("diskusage",["id"=>$id])]
+											 ["name" => "modules", "caption"=>"Módulos", "icon"=>"fa fa-users", "route"=>$this->generateUrl("generictablist",["module"=>"Globale", "name"=>"CompaniesModules", "id"=>$id])],
+											 ["name" => "files", "icon"=>"fa fa-cloud", "caption"=>"Archivos", "route"=>$this->generateUrl("cloudfiles",["id"=>$id, "path"=>"companies"])],
+											 ["name" => "diskusage", "icon"=>"fa fa-database", "caption"=>"Uso disco", "route"=>$this->generateUrl("diskusage",["id"=>$id])]
 	 										],
 	 					'include_header' => [["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker-es.js"]],
 	 					'include_footer' => [["type"=>"css", "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.css"],
@@ -147,7 +148,7 @@ class GlobaleCompaniesController extends Controller
 	 				 'controllerName' => 'CompaniesController',
 	 				 'interfaceName' => 'Mi Empresa',
 	 				 'optionSelected' => 'mycompany',
-	 				 'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
+	 				 'menuOptions' =>  $menurepository->formatOptions($userdata),
 	 				 'breadcrumb' => $breadcrumb,
 	 				 'userData' => $userdata,
 	 				 'id' => $id,
@@ -264,7 +265,7 @@ class GlobaleCompaniesController extends Controller
 				'controllerName' => 'CompaniesController',
 				'interfaceName' => 'Empresas',
 				'optionSelected' => $request->attributes->get('_route'),
-				'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
+				'menuOptions' =>  $menurepository->formatOptions($userdata),
 				'breadcrumb' =>  $menurepository->formatBreadcrumb($request->get('_route')),
 				'userData' => $userdata,
 				'lists' => $templateLists

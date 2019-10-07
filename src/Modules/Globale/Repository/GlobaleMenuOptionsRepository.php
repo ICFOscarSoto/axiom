@@ -53,13 +53,16 @@ class GlobaleMenuOptionsRepository extends ServiceEntityRepository
 	}
 
 
-	public function formatOptions($roles){
+	public function formatOptions($userdata){
 		$options=array();
 		$item = new GlobaleMenuOptions();
 		$item->setRute('dashboard');
 		$item->setName('Dashboard');
 		$item->setIcon('fa fa-dashboard');
 		$options[]=$item;
+
+    $modules=$this->getModules($userdata["companyId"]);
+    $roles=$userdata["roles"];
 		foreach($roles as $role){
 			$parents=$this->getParents($role);
 			foreach($parents as $key_parent=>$parent){
@@ -80,13 +83,19 @@ class GlobaleMenuOptionsRepository extends ServiceEntityRepository
 		return $options;
 	}
 
+  public function getModules($company){
+    $query="SELECT module_id FROM globale_companies_modules g WHERE companyown_id =:COMPANYID AND	g.active=1 AND g.deleted=0";
+              $params=['COMPANYID' => $company];
+    $result=$this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetch();
+  }
+
 	 /**
      * @return GlobalMenuOptions[] Returns an array of GlobalMenuOptions objects
     */
 	public function getParents($role){
 		return $this->createQueryBuilder('f')
             ->andWhere('f.roles LIKE :val_role')
-			->andWhere('f.parent IS NULL')
+			      ->andWhere('f.parent IS NULL')
             ->setParameter('val_role', '%'.$role.'%')
             ->orderBy('f.id', 'ASC')
             ->getQuery()
@@ -134,9 +143,9 @@ class GlobaleMenuOptionsRepository extends ServiceEntityRepository
 	public function getChilds($role, $parent){
 		return $this->createQueryBuilder('f')
             ->andWhere('f.roles LIKE :val_role')
-			->andWhere('f.parent = :val_parent')
+			      ->andWhere('f.parent = :val_parent')
             ->setParameter('val_role', '%'.$role.'%')
-			->setParameter('val_parent', $parent)
+			      ->setParameter('val_parent', $parent)
             ->orderBy('f.id', 'ASC')
             ->getQuery()
             ->getResult()
@@ -159,15 +168,4 @@ class GlobaleMenuOptionsRepository extends ServiceEntityRepository
     }
 
 
-    /*
-    public function findOneBySomeField($value): ?Famenuoptions
-    {
-        return $this->createQueryBuilder('f')
-            ->andWhere('f.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }

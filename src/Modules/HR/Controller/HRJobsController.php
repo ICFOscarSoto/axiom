@@ -49,7 +49,7 @@ class HRJobsController extends Controller
             'controllerName' => 'HRJobs',
             'interfaceName' => 'Puesto trabajo',
             'optionSelected' => $request->attributes->get('_route'),
-            'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
+            'menuOptions' =>  $menurepository->formatOptions($userdata),
             'breadcrumb' => $breadcrumb,
             'userData' => $userdata,
             'id' => $this->getUser()->getId(),

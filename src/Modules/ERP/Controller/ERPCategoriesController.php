@@ -41,7 +41,7 @@ class ERPCategoriesController extends Controller
   				'controllerName' => 'categoriesController',
   				'interfaceName' => 'Categories',
   				'optionSelected' => 'dashboard',
-  				'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
+  				'menuOptions' =>  $menurepository->formatOptions($userdata),
   				'breadcrumb' =>  $menurepository->formatBreadcrumb('dashboard'),
   				'userData' => $userdata,
 					'categories' => json_encode($obj),

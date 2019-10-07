@@ -44,7 +44,7 @@ class EmailController extends Controller
 			return $this->render('@Globale/genericlist.html.twig', [
 				'controllerName' => 'emailController',
 				'interfaceName' => 'Cuentas correo',
-				'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
+				'menuOptions' =>  $menurepository->formatOptions($userdata),
 				'optionSelected' => 'users',
 				'breadcrumb' =>  $menurepository->formatBreadcrumb($request->get('_route')),
 				'userData' => $userdata,
@@ -115,7 +115,7 @@ class EmailController extends Controller
 					'controllerName' => 'EmailController',
 					'interfaceName' => 'Correo electrónico',
 					'optionSelected' => 'email',
-					'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
+					'menuOptions' =>  $menurepository->formatOptions($userdata),
 					'breadcrumb' =>  $menurepository->formatBreadcrumb($request->get('_route')),
 					'userData' => $userdata,
 					'folder' => $folder
@@ -125,7 +125,7 @@ class EmailController extends Controller
 					  'interfaceName' => 'Correo electrónico',
 						'userData' => $userdata,
 						'optionSelected' => 'email',
-						'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
+						'menuOptions' =>  $menurepository->formatOptions($userdata),
 						'breadcrumb' =>  $menurepository->formatBreadcrumb($request->get('_route')),
 						"error"=>["symbol"=> "entypo-attention",
 											"title" => "Correo no configurado",
@@ -150,7 +150,7 @@ class EmailController extends Controller
 			return $this->render('@Email/email_message.html.twig', [
 				'controllerName' => 'EmailController',
 				'interfaceName' => 'Correo electrónico',
-				'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
+				'menuOptions' =>  $menurepository->formatOptions($userdata),
 				'optionSelected' => 'email',
 				'breadcrumb' =>  $menurepository->formatBreadcrumb('emailView'),
 				'userData' => $userdata,
@@ -176,7 +176,7 @@ class EmailController extends Controller
 			return $this->render('@Email/email_compose.html.twig', [
 				'controllerName' => 'EmailController',
 				'interfaceName' => 'Correo electrónico',
-				'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
+				'menuOptions' =>  $menurepository->formatOptions($userdata),
 				'optionSelected' => 'emailNew',
 				'breadcrumb' =>  $menurepository->formatBreadcrumb('emailNew'),
 				'userData' => $userdata,
@@ -203,7 +203,7 @@ class EmailController extends Controller
 			return $this->render('@Email/email_compose.html.twig', [
 				'controllerName' => 'EmailController',
 				'interfaceName' => 'Correo electrónico',
-				'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
+				'menuOptions' =>  $menurepository->formatOptions($userdata),
 				'optionSelected' => 'emailNew',
 				'breadcrumb' =>  $menurepository->formatBreadcrumb('emailNew'),
 				'userData' => $userdata,
@@ -229,7 +229,7 @@ class EmailController extends Controller
 			return $this->render('@Email/email_compose.html.twig', [
 				'controllerName' => 'EmailController',
 				'interfaceName' => 'Correo electrónico',
-				'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
+				'menuOptions' =>  $menurepository->formatOptions($userdata),
 				'optionSelected' => 'emailNew',
 				'breadcrumb' =>  $menurepository->formatBreadcrumb('emailNew'),
 				'userData' => $userdata,

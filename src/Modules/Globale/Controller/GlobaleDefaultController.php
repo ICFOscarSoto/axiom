@@ -72,7 +72,7 @@ class GlobaleDefaultController extends Controller
 				'interfaceName' => $this->get('translator')->trans($name),
 				'optionSelected' => $request->attributes->get('_route'),
         'optionSelectedParams' => ["module"=>$module, "name"=>$name],
-				'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
+				'menuOptions' =>  $menurepository->formatOptions($userdata),
 				'breadcrumb' =>  $menurepository->formatBreadcrumb($request->get('_route'), $module, $name),
 				'userData' => $userdata,
 				'lists' => $templateLists,

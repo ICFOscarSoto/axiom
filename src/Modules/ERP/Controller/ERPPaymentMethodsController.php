@@ -42,7 +42,7 @@ class ERPPaymentMethodsController extends Controller
   				'controllerName' => 'paymentmethodsController',
   				'interfaceName' => 'PaymentMethods',
   				'optionSelected' => $request->attributes->get('_route'),
-  				'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
+  				'menuOptions' =>  $menurepository->formatOptions($userdata),
   				'breadcrumb' =>  $menurepository->formatBreadcrumb($request->get('_route')),
   				'userData' => $userdata,
   				'lists' => $templateLists,

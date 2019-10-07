@@ -53,7 +53,7 @@ class HRWorkCentersController extends Controller
       'interfaceName' => 'Trabajadores',
       'optionSelected' => "genericindex",
       'optionSelectedParams' => ["module"=>"HR", "name"=>"workCenters"],
-      'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
+      'menuOptions' =>  $menurepository->formatOptions($userdata),
       'breadcrumb' =>  $breadcrumb,
       'userData' => $userdata,
       'lists' => $templateLists,

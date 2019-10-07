@@ -7,14 +7,14 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 
-class GlobaleUsersUserGroupsUtils
+class GlobaleCompaniesModulesUtils
 {
   private $module="Globale";
-  private $name="UsersUserGroups";
-  public $parentClass="\App\Modules\Globale\Entity\GlobaleUsers";
-  public $parentField="user";
+  private $name="CompaniesModules";
+  public $parentClass="\App\Modules\Globale\Entity\GlobaleCompanies";
+  public $parentField="companyown";
   public function getExcludedForm($params){
-    return ["user", "usergroup"];
+    return ['companyown','module'];
   }
 
   public function getIncludedForm($params){
@@ -23,23 +23,21 @@ class GlobaleUsersUserGroupsUtils
     $user=$params["user"];
     $em=$doctrine->getManager();
     $results=$em->createQueryBuilder()->select('u')
-      ->from('App\Modules\Globale\Entity\GlobaleUserGroups', 'u')
-      ->leftJoin('App\Modules\Globale\Entity\GlobaleUsersUserGroups', 'g', 'WITH', 'u.id = g.usergroup')
+      ->from('App\Modules\Globale\Entity\GlobaleModules', 'u')
+      ->leftJoin('App\Modules\Globale\Entity\GlobaleCompaniesModules', 'g', 'WITH', 'u.id = g.module')
       ->where('g.id IS NULL')
       ->orWhere('g.deleted = 1')
-      ->orWhere('g.id = :val_user')
-      ->andWhere('u.company = :val_company')
-      ->setParameter('val_user', $id)
-      ->setParameter('val_company', $user->getCompany())
+      ->orWhere('g.id = :val_id')
+      ->setParameter('val_id', $id)
       ->getQuery()
       ->getResult();
 
     return [
-    ['usergroup', ChoiceType::class, [
+    ['module', ChoiceType::class, [
       'required' => false,
       'attr' => ['class' => 'select2'],
       'choices' => $results,
-      'placeholder' => 'Select a usergroup',
+      'placeholder' => 'Select a module',
       'choice_label' => function($obj, $key, $index) {
           if(method_exists($obj, "getLastname"))
             return $obj->getLastname().", ".$obj->getName();
@@ -49,7 +47,6 @@ class GlobaleUsersUserGroupsUtils
     ]]
     ];
   }
-
 
   public function formatList($user){
     $list=[

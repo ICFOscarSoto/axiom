@@ -51,7 +51,7 @@ class ERPProductsController extends Controller
   				'controllerName' => 'productsController',
   				'interfaceName' => 'Productos',
   				'optionSelected' => $request->attributes->get('_route'),
-  				'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
+  				'menuOptions' =>  $menurepository->formatOptions($userdata),
   				'breadcrumb' =>  $menurepository->formatBreadcrumb($request->get('_route')),
   				'userData' => $userdata,
   				'lists' => $templateLists
@@ -99,7 +99,7 @@ class ERPProductsController extends Controller
 								'controllerName' => 'ProductsController',
 								'interfaceName' => 'Productos',
 								'optionSelected' => 'products',
-								'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
+								'menuOptions' =>  $menurepository->formatOptions($userdata),
 								'breadcrumb' => $breadcrumb,
 								'userData' => $userdata,
 								'id' => $id,

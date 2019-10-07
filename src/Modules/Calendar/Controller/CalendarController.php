@@ -31,7 +31,7 @@ class CalendarController extends Controller{
 				'controllerName' => 'CalendarController',
 				'interfaceName' => 'Calendario',
 				'optionSelected' => 'calendar',
-				'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
+				'menuOptions' =>  $menurepository->formatOptions($userdata),
 				'breadcrumb' =>  $menurepository->formatBreadcrumb($request->get('_route')),
 				'userData' => $userdata
 				]);

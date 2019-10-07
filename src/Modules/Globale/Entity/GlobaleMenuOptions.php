@@ -3,6 +3,7 @@
 namespace App\Modules\Globale\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use \App\Modules\Globale\Entity\GlobaleModules;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\Globale\Repository\GlobaleMenuOptionsRepository")
@@ -54,6 +55,11 @@ class GlobaleMenuOptions
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $routeparams;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleModules")
+     */
+    private $module;
 
     public function getId(): ?int
     {
@@ -140,6 +146,18 @@ class GlobaleMenuOptions
     public function setRouteparams(?string $routeparams): self
     {
         $this->routeparams = $routeparams;
+
+        return $this;
+    }
+
+    public function getModule(): ?GlobaleModules
+    {
+        return $this->module;
+    }
+
+    public function setModule(?GlobaleModules $module): self
+    {
+        $this->module = $module;
 
         return $this;
     }

@@ -59,7 +59,7 @@ if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
     'interfaceName' => 'Calendario laboral '.$workCalendar->getName(),
     'optionSelected' => 'genericindex',
     'optionSelectedParams' => ["module"=>"HR", "name"=>"WorkCalendarGroups"],
-    'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
+    'menuOptions' =>  $menurepository->formatOptions($userdata),
     'breadcrumb' =>  $menurepository->formatBreadcrumb('genericindex','HR','WorkCalendarGroups'),
     'userData' => $userdata,
     'id' => $id,

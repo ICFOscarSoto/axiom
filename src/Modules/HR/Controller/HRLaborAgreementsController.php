@@ -47,7 +47,7 @@ class HRLaborAgreementsController extends Controller
       'controllerName' => 'HRLaborAgreementsController',
       'interfaceName' => 'Convenios Laborales',
       'optionSelected' => $request->attributes->get('_route'),
-      'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
+      'menuOptions' =>  $menurepository->formatOptions($userdata),
       'breadcrumb' =>  $menurepository->formatBreadcrumb($request->get('_route')),
       'userData' => $userdata,
       'lists' => $templateLists,

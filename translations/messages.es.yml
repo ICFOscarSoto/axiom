@@ -53,6 +53,10 @@ Banckaccounts data: Datos bancarios
 bankaccounts: Cuentas bancarias
 Sepacore: SEPA Core firmado
 Sepab2b: SEPA B2B firmado
+name: Nombre
+description: Descripción
+module: Módulo
+Módule: Módulo
 
 #COUNTRIES
 #----------------------------------------------------------------------------------------------------------------------

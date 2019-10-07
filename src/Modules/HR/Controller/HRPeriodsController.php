@@ -53,7 +53,7 @@ class HRPeriodsController extends Controller
        'controllerName' => 'HRController',
        'interfaceName' => 'Calendarios laborales',
        'optionSelected' => 'schedules',
-       'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
+       'menuOptions' =>  $menurepository->formatOptions($userdata),
        'breadcrumb' =>  $menurepository->formatBreadcrumb('schedules'),
        'userData' => $userdata,
        'lists' => $templateLists,
