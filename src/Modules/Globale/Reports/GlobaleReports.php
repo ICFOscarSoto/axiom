@@ -12,40 +12,60 @@ class GlobaleReports extends \FPDF
 
   function Header()
   {
+      $this->SetMargins(5,10,5);
       // Select Arial bold 15
-      $image_path = $this->image_path.$this->user->getCompany()->getId().'-medium.png';
-      if(file_exists($image_path))
-        $this->Image($image_path,10,10, null,15,'PNG');
-      $this->SetFont('Arial','B',15);
-      // Move to the right
-      //$this->Cell(100);
-      // Framed title
-      $this->SetTextColor(50,50,50);
-      $this->SetFont('Arial','B',10);
-      $company=$this->user->getCompany();
-      $this->Cell(190,6,utf8_decode($this->workcenters==null?$company->getSocialname():$this->workcenters->getSocialname()),0,'R','R');
-      $this->Ln(4);
-      $this->SetFont('Arial','',8);
-      //$this->Cell(100);
-      $this->Cell(190,6,utf8_decode($this->workcenters==null?$company->getAddress():$this->workcenters->getAddress()),0,'R','R');
-      $this->Ln(4);
-      $this->Cell(190,6,utf8_decode(($this->workcenters==null?$company->getPostcode():$this->workcenters->getPostcode())." - ".($this->workcenters==null?$company->getCity():$this->workcenters->getCity())." - ".($this->workcenters==null?$company->getState():$this->workcenters->getState())),0,'R','R');
-      $this->Ln(4);
-      $this->Cell(190,6,utf8_decode("CIF: ".($this->workcenters==null?$company->getVat():$this->workcenters->getVat())." - TFNO: ".($this->workcenters==null?$company->getPhone():$this->workcenters->getPhone())),0,'R','R');
-      $this->Ln(10);
+      if(class_exists('App\Modules\Globale\Reports\CustomReports\CustomReports_'.$this->user->getCompany()->getId())){
+        $customReportClass='App\Modules\Globale\Reports\CustomReports\CustomReports_'.$this->user->getCompany()->getId();
+        $customReport=new $customReportClass();
+        $customReport->Header($this);
+      }else{
+        $image_path = $this->image_path.$this->user->getCompany()->getId().'-medium.png';
+        if(file_exists($image_path))
+          $this->Image($image_path,10,10, null,15,'PNG');
+        $this->SetFont('Arial','B',15);
+        // Move to the right
+        //$this->Cell(100);
+        // Framed title
+        $this->SetTextColor(50,50,50);
+        $this->SetFont('Arial','B',10);
+        $company=$this->user->getCompany();
+        $this->Cell(190,6,utf8_decode($this->workcenters==null?$company->getSocialname():$this->workcenters->getSocialname()),0,'R','R');
+        $this->Ln(4);
+        $this->SetFont('Arial','',8);
+        //$this->Cell(100);
+        $this->Cell(190,6,utf8_decode($this->workcenters==null?$company->getAddress():$this->workcenters->getAddress()),0,'R','R');
+        $this->Ln(4);
+        $this->Cell(190,6,utf8_decode(($this->workcenters==null?$company->getPostcode():$this->workcenters->getPostcode())." - ".($this->workcenters==null?$company->getCity():$this->workcenters->getCity())." - ".($this->workcenters==null?$company->getState():$this->workcenters->getState())),0,'R','R');
+        $this->Ln(4);
+        $this->Cell(190,6,utf8_decode("CIF: ".($this->workcenters==null?$company->getVat():$this->workcenters->getVat())." - TFNO: ".($this->workcenters==null?$company->getPhone():$this->workcenters->getPhone())),0,'R','R');
+        $this->Ln(10);
+      }
   }
+
+
   function Footer()
   {
+    if(class_exists('App\Modules\Globale\Reports\CustomReports\CustomReports_'.$this->user->getCompany()->getId())){
+      $customReportClass='App\Modules\Globale\Reports\CustomReports\CustomReports_'.$this->user->getCompany()->getId();
+      $customReport=new $customReportClass();
+      $customReport->Footer($this);
+    }else{
       // Position at 1.5 cm from bottom
       $this->SetY(-10);
       // Arial italic 8
       $this->SetFont('Arial','I',8);
       // Page number
       $this->Cell(0,10,utf8_decode('Página ').$this->PageNo().'/{nb}',0,0,'C');
+    }
   }
 
   function Table($data, $columns, $associative=false)
   {
+    if(class_exists('App\Modules\Globale\Reports\CustomReports\CustomReports_'.$this->user->getCompany()->getId())){
+      $customReportClass='App\Modules\Globale\Reports\CustomReports\CustomReports_'.$this->user->getCompany()->getId();
+      $customReport=new $customReportClass();
+      return $customReport->Table($this, $data, $columns, $associative=false);
+    }else{
       // Header
       $this->SetFont('Arial','B',10);
       //SetDrawColor(int r [, int g, int b]);
@@ -75,6 +95,7 @@ class GlobaleReports extends \FPDF
       // Closing line
       //$this->Cell(array_sum($w),0,'','T');
       return $data;
+    }
   }
 
   function TextWithDirection($x, $y, $txt, $direction='R')
