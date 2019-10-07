@@ -1,26 +1,26 @@
 <?php
 
-namespace App\Repository\Modules\ERP\Entity;
+namespace App\Modules\ERP\Repository;
 
-use App\Modules\ERP\Entity\ERPAttributeNames;
+use App\Modules\ERP\Entity\ERPAttributesValues;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
- * @method ERPAttributeNames|null find($id, $lockMode = null, $lockVersion = null)
- * @method ERPAttributeNames|null findOneBy(array $criteria, array $orderBy = null)
- * @method ERPAttributeNames[]    findAll()
- * @method ERPAttributeNames[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method ERPAttributesValues|null find($id, $lockMode = null, $lockVersion = null)
+ * @method ERPAttributesValues|null findOneBy(array $criteria, array $orderBy = null)
+ * @method ERPAttributesValues[]    findAll()
+ * @method ERPAttributesValues[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class ERPAttributeNamesRepository extends ServiceEntityRepository
+class ERPAttributesValuesRepository extends ServiceEntityRepository
 {
     public function __construct(RegistryInterface $registry)
     {
-        parent::__construct($registry, ERPAttributeNames::class);
+        parent::__construct($registry, ERPAttributesValues::class);
     }
 
     // /**
-    //  * @return ERPAttributeNames[] Returns an array of ERPAttributeNames objects
+    //  * @return ERPAttributesValues[] Returns an array of ERPAttributesValues objects
     //  */
     /*
     public function findByExampleField($value)
@@ -37,7 +37,7 @@ class ERPAttributeNamesRepository extends ServiceEntityRepository
     */
 
     /*
-    public function findOneBySomeField($value): ?ERPAttributeNames
+    public function findOneBySomeField($value): ?ERPAttributesValues
     {
         return $this->createQueryBuilder('e')
             ->andWhere('e.exampleField = :val')

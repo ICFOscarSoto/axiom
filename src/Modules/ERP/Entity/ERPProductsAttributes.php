@@ -9,7 +9,7 @@ use \App\Modules\ERP\Entity\ERPAttributeNames;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\Modules\ERP\Entity\ERPProductsAttributesRepository")
+ * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPProductsAttributesRepository")
  */
 class ERPProductsAttributes
 {

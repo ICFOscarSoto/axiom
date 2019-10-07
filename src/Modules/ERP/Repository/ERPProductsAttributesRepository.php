@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repository\Modules\ERP\Entity;
+namespace App\Modules\ERP\Repository;
 
 use App\Modules\ERP\Entity\ERPProductsAttributes;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;

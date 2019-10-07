@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\Modules\ERP\Entity\ERPAttributeNamesRepository")
+ * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPAttributeNamesRepository")
  */
 class ERPAttributeNames
 {

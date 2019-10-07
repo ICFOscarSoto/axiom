@@ -7,7 +7,7 @@ use \App\Modules\ERP\Entity\ERPSuppliers;
 use \App\Modules\ERP\Entity\ERPCategories;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\Modules\ERP\Entity\ERPShoppingDiscountsRepository")
+ * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPShoppingDiscountsRepository")
  */
 class ERPShoppingDiscounts
 {
