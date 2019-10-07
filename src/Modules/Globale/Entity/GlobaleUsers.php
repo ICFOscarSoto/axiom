@@ -61,11 +61,6 @@ class GlobaleUsers implements UserInterface
     private $company;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Modules\Globale\Entity\GlobaleUserGroups", inversedBy="usersborrar")
-     */
-    private $usergroups;
-
-    /**
      * @ORM\OneToMany(targetEntity="App\Modules\Globale\Entity\GlobaleNotifications", mappedBy="users")
      */
     private $notifications;
@@ -256,32 +251,6 @@ class GlobaleUsers implements UserInterface
 
   		return $data;
   	}
-
-    /**
-     * @return Collection|UserGroups[]
-     */
-    public function getUsergroups(): Collection
-    {
-        return $this->usergroups;
-    }
-
-    public function addUsergroup(GlobaleUserGroups $usergroup): self
-    {
-        if (!$this->usergroups->contains($usergroup)) {
-            $this->usergroups[] = $usergroup;
-        }
-
-        return $this;
-    }
-
-    public function removeUsergroup(GlobaleUserGroups $usergroup): self
-    {
-        if ($this->usergroups->contains($usergroup)) {
-            $this->usergroups->removeElement($usergroup);
-        }
-
-        return $this;
-    }
 
     /**
      * @return Collection|Notifications[]

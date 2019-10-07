@@ -1,0 +1,6 @@
+[
+  {"id" : "addTopUserGroups", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"genericdata", "routeParams":{"module":"Globale", "name":"UserGroups", "type":"modal" }, "modal":"UserGroups", "actionType" : "background", "confirm" :false, "tooltip" : ""},
+  {"id" : "deleteTopUserGroups", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true, "tooltip":""},
+  {"id" : "printTopUserGroups", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false, "tooltip":""},
+  {"id" : "exportTopUserGroups", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"genericexport", "routeParams":{"module":"Globale", "name":"UserGroups"}, "confirm" :false, "tooltip":""}
+]

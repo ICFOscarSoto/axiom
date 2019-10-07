@@ -23,30 +23,12 @@ class GlobaleUserGroups
      */
     private $name;
 
-    /**
-     * @ORM\Column(type="json", nullable=true)
-     */
-    private $roles = [];
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Modules\Globale\Entity\GlobaleUsers", mappedBy="usergroups")
-     */
-    private $users;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Modules\Globale\Entity\GlobaleCompanies", inversedBy="userGroups")
+     * @ORM\ManyToOne(targetEntity="App\Modules\Globale\Entity\GlobaleCompanies")
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     private $company;
-
-    /**
-     * @ORM\OneToMany(targetEntity="App\Modules\Globale\Entity\GlobaleNotifications", mappedBy="usergroup")
-     */
-    private $notifications;
-
-    /**
-     * @ORM\ManyToMany(targetEntity="App\Modules\Globale\Entity\GlobaleUsers", mappedBy="usergroups")
-     */
-    private $usersborrar;
 
     /**
      * @ORM\Column(type="datetime")
@@ -68,12 +50,6 @@ class GlobaleUserGroups
      */
     private $deleted;
 
-    public function __construct()
-    {
-        $this->users = new ArrayCollection();
-        $this->notifications = new ArrayCollection();
-        $this->usersborrar = new ArrayCollection();
-    }
 
     public function getId(): ?int
     {
@@ -92,46 +68,6 @@ class GlobaleUserGroups
         return $this;
     }
 
-    public function getRoles(): ?array
-    {
-        return $this->roles;
-    }
-
-    public function setRoles(?array $roles): self
-    {
-        $this->roles = $roles;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|Users[]
-     */
-    public function getUsers(): Collection
-    {
-        return $this->users;
-    }
-
-    public function addUser(GlobaleUsers $user): self
-    {
-        if (!$this->users->contains($user)) {
-            $this->users[] = $user;
-            $user->addUsergroup($this);
-        }
-
-        return $this;
-    }
-
-    public function removeUser(GlobaleUsers $user): self
-    {
-        if ($this->users->contains($user)) {
-            $this->users->removeElement($user);
-            $user->removeUsergroup($this);
-        }
-
-        return $this;
-    }
-
     public function getCompany(): ?GlobaleCompanies
     {
         return $this->company;
@@ -140,65 +76,6 @@ class GlobaleUserGroups
     public function setCompany(?GlobaleCompanies $company): self
     {
         $this->company = $company;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|Notifications[]
-     */
-    public function getNotifications(): Collection
-    {
-        return $this->notifications;
-    }
-
-    public function addNotification(GlobaleNotifications $notification): self
-    {
-        if (!$this->notifications->contains($notification)) {
-            $this->notifications[] = $notification;
-            $notification->setUsergroup($this);
-        }
-
-        return $this;
-    }
-
-    public function removeNotificationGlobale(GlobaleNotifications $notification): self
-    {
-        if ($this->notifications->contains($notification)) {
-            $this->notifications->removeElement($notification);
-            // set the owning side to null (unless already changed)
-            if ($notification->getUsergroup() === $this) {
-                $notification->setUsergroup(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|Users[]
-     */
-    public function getUsersborrar(): Collection
-    {
-        return $this->usersborrar;
-    }
-
-    public function addUsersborrar(GlobaleUsers $usersborrar): self
-    {
-        if (!$this->usersborrar->contains($usersborrar)) {
-            $this->usersborrar[] = $usersborrar;
-            $usersborrar->addUsergroup($this);
-        }
-
-        return $this;
-    }
-
-    public function removeUsersborrar(GlobaleUsers $usersborrar): self
-    {
-        if ($this->usersborrar->contains($usersborrar)) {
-            $this->usersborrar->removeElement($usersborrar);
-            $usersborrar->removeUsergroup($this);
-        }
 
         return $this;
     }

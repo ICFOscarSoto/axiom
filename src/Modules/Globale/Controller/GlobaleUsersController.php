@@ -139,24 +139,35 @@ class GlobaleUsersController extends Controller
     $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
     $breadcrumb=$menurepository->formatBreadcrumb('users');
     array_push($breadcrumb, $new_breadcrumb);
-    $utils = new GlobaleFormUtils();
-    $utilsObj=new $this->utilsClass();
-    $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser()];
-    $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[],$encoder);
-    $form=$utils->formatForm('formuser', true, $id, $this->class, 'dataUser');
-    $form["id_object"]=$id;
-    return $this->render('@Globale/genericform.html.twig', array(
-            'controllerName' => 'UsersController',
+    $userRepository=$this->getDoctrine()->getRepository(GlobaleUsers::class);
+    $obj = $userRepository->findOneBy(['id'=>$id, 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
+    if($id!=0 && $obj==null){
+        return $this->render('@Globale/notfound.html.twig',[
+          "status_code"=>404,
+          "status_text"=>"Objeto no encontrado"
+        ]);
+    }
+    $entity_name=$obj?$obj->getLastName().', '.$obj->getName():'';
+
+    return $this->render('@Globale/generictabform.html.twig', array(
+            'entity_name' => $entity_name,
+            'controllerName' => 'WorkersController',
             'interfaceName' => 'Usuarios',
             'optionSelected' => 'users',
             'menuOptions' =>  $menurepository->formatOptions($userdata["roles"]),
             'breadcrumb' => $breadcrumb,
             'userData' => $userdata,
             'id' => $id,
-            'id_object' => $id,
-            'route' => $this->generateUrl("dataUser",["id"=>$id]),
-            'form' => $form
+            'tab' => $request->query->get('tab','data'), //Show initial tab, by default data tab
+            'tabs' => [["name" => "data", "caption"=>"Datos usuario", "icon"=>"fa fa-user","active"=>true, "route"=>$this->generateUrl("dataUser",["id"=>$id])],
+                       ["name" => "groups", "caption"=>"Grupos", "icon"=>"fa fa-users", "route"=>$this->generateUrl("generictablist",["module"=>"Globale", "name"=>"UsersUserGroups", "id"=>$id])]
 
+                      ],
+            'include_header' => [["type"=>"css", "path"=>"/js/rickshaw/rickshaw.min.css"],
+                                 ["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker-es.js"]],
+            'include_footer' => [["type"=>"css", "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.css"],
+                                 ["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.js"],
+                                 ["type"=>"css", "path"=>"/css/timeline.css"]]
     ));
   }
 
