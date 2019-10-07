@@ -351,7 +351,7 @@
 										{% else %}
 									   	{# Other fields show inputs #}
 
-											<input id="s_{{ field.name }}" type="text" class="table-header-search-input form-control" placeholder="Buscar {{ field.caption }}"  autocomplete="off"/>
+											<input id="s_{{ field.name }}" type="text" class="table-header-search-input form-control" placeholder="Buscar {{ (field.caption)|trans }}"  autocomplete="off"/>
 
 										{% endif %}
 									{% endif %}
@@ -361,14 +361,14 @@
 							<th class="table-header-search" style="border-bottom: 1px solid #cecece !important;">
 								{% if field.type == "datetime" %}
 									<div><div style="z-index: 5 !important;" class='input-group date'>
-												<input id="s_{{ field.name }}_from" attr-group="{{ field.name }}" attr-max="s_{{ field.name }}_to" type="text" class="datetimepicker table-header-search-input form-control" placeholder="{{ field.caption }} desde"  autocomplete="off"/>
+												<input id="s_{{ field.name }}_from" attr-group="{{ field.name }}" attr-max="s_{{ field.name }}_to" type="text" class="datetimepicker table-header-search-input form-control" placeholder="{{ (field.caption)|trans }} desde"  autocomplete="off"/>
 												<span class="input-group-addon">
                         	<span class="glyphicon glyphicon-calendar"></span>
                     		</span>
 										</div></div>
 									<div style="height: 5px;"></div>
 									<div><div style="z-index: 2 !important;" class='input-group date'>
-										<input id="s_{{ field.name }}_to" attr-group="{{ field.name }}" attr-min="s_{{ field.name }}_from" type="text" class="datetimepicker table-header-search-input form-control" placeholder="{{ field.caption }} hasta"  autocomplete="off"/>
+										<input id="s_{{ field.name }}_to" attr-group="{{ field.name }}" attr-min="s_{{ field.name }}_from" type="text" class="datetimepicker table-header-search-input form-control" placeholder="{{ (field.caption)|trans }} hasta"  autocomplete="off"/>
 										<span class="input-group-addon">
 											<span class="glyphicon glyphicon-calendar"></span>
 										</span>
@@ -376,14 +376,14 @@
 									{% else %}
 									{% if field.type == "date" %}
 										<div><div style="z-index: 5 !important;" class='input-group date'>
-													<input id="s_{{ field.name }}_from" attr-group="{{ field.name }}" attr-max="s_{{ field.name }}_to" type="text" class="datepicker table-header-search-input form-control" placeholder="{{ field.caption }} desde"  autocomplete="off"/>
+													<input id="s_{{ field.name }}_from" attr-group="{{ field.name }}" attr-max="s_{{ field.name }}_to" type="text" class="datepicker table-header-search-input form-control" placeholder="{{ (field.caption)|trans }} desde"  autocomplete="off"/>
 													<span class="input-group-addon">
 														<span class="glyphicon glyphicon-calendar"></span>
 													</span>
 											</div></div>
 										<div style="height: 5px;"></div>
 										<div><div style="z-index: 2 !important;" class='input-group date'>
-											<input id="s_{{ field.name }}_to" attr-group="{{ field.name }}" attr-min="s_{{ field.name }}_from" type="text" class="datepicker table-header-search-input form-control" placeholder="{{ field.caption }} hasta"  autocomplete="off"/>
+											<input id="s_{{ field.name }}_to" attr-group="{{ field.name }}" attr-min="s_{{ field.name }}_from" type="text" class="datepicker table-header-search-input form-control" placeholder="{{ (field.caption)|trans }} hasta"  autocomplete="off"/>
 											<span class="input-group-addon">
 												<span class="glyphicon glyphicon-calendar"></span>
 											</span>
@@ -414,7 +414,7 @@
 						</div>
 					</th>
 					{% for field in listConstructor.fields %}
-						<th style="border-bottom: 1px solid #cecece !important;" class="table-header-name table-thead {% if field.sum is defined and field.sum == true %} sum {% endif %} {% if field.format is defined %} {{field.format}} {% endif %}">{{ field.caption }} </th>
+						<th style="border-bottom: 1px solid #cecece !important;" class="table-header-name table-thead {% if field.sum is defined and field.sum == true %} sum {% endif %} {% if field.format is defined %} {{field.format}} {% endif %}">{{ (field.caption)|trans }} </th>
 					{% endfor %}
 
 					{% for field in listConstructor.fieldButtons %}
