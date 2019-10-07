@@ -28,6 +28,7 @@ class GlobaleCompaniesModulesUtils
       ->where('g.id IS NULL')
       ->orWhere('g.deleted = 1')
       ->orWhere('g.id = :val_id')
+      ->andWhere('u.id <> 1')
       ->setParameter('val_id', $id)
       ->getQuery()
       ->getResult();

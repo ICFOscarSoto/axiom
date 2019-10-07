@@ -60,17 +60,18 @@ class GlobaleMenuOptionsRepository extends ServiceEntityRepository
 		$item->setName('Dashboard');
 		$item->setIcon('fa fa-dashboard');
 		$options[]=$item;
-
-    $modules=$this->getModules($userdata["companyId"]);
+    $modules=array_unique(array_merge($this->getModules($userdata["companyId"]), [1])); //ensure module global allways active
     $roles=$userdata["roles"];
 		foreach($roles as $role){
 			$parents=$this->getParents($role);
 			foreach($parents as $key_parent=>$parent){
-
+        if($parent->getModule()!=null && !in_array($parent->getModule()->getId(), $modules)) {unset($parents[$key_parent]); continue;} //if module no active continue
 				$childs=$this->getChilds($role, $parent->getId());
 				foreach($childs as $key_child=>$child){
-					$childs[$key_child]->childs=$this->getChilds($role, $child->getId());
+          if($child->getModule()!=null && !in_array($child->getModule()->getId(), $modules)) {unset($childs[$key_child]); continue;} //if module no active continue
+        	$childs[$key_child]->childs=$this->getChilds($role, $child->getId());
           foreach($childs[$key_child]->childs as $sub_key_child=>$sub_child){
+              if($sub_child->getModule()!=null && !in_array($sub_child->getModule()->getId(), $modules)) {unset($childs[$key_child]->childs[$sub_key_child]); continue;} //if module no active continue
               $childs[$key_child]->childs[$sub_key_child]->params=json_decode($childs[$key_child]->childs[$sub_key_child]->getRouteparams(),true);
           }
           $childs[$key_child]->params=json_decode($childs[$key_child]->getRouteparams(),true);
@@ -84,9 +85,10 @@ class GlobaleMenuOptionsRepository extends ServiceEntityRepository
 	}
 
   public function getModules($company){
+
     $query="SELECT module_id FROM globale_companies_modules g WHERE companyown_id =:COMPANYID AND	g.active=1 AND g.deleted=0";
               $params=['COMPANYID' => $company];
-    $result=$this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetch();
+    return array_column($this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll(),'module_id');
   }
 
 	 /**
