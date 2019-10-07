@@ -4,36 +4,20 @@
         "caption": "id"
     },
     {
-        "name": "price",
-        "caption": "price"
+        "name": "customergroup__name",
+        "caption": "customergroup"
     },
     {
-        "name": "reduction_type",
-        "caption": "reduction_type"
+        "name": "supplier__name",
+        "caption": "supplier"
     },
     {
-        "name": "reduction",
-        "caption": "reduction"
+        "name": "category__name",
+        "caption": "category"
     },
     {
-        "name": "amount",
-        "caption": "amount"
-    },
-    {
-        "name": "start",
-        "caption": "start"
-    },
-    {
-        "name": "end",
-        "caption": "end"
-    },
-    {
-        "name": "quantity",
-        "caption": "quantity"
-    },
-    {
-        "name": "product__name",
-        "caption": "product"
+        "name": "increment",
+        "caption": "increment"
     },
     {
         "name": "active",

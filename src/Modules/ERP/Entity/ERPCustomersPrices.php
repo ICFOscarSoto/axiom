@@ -3,8 +3,10 @@
 namespace App\Modules\ERP\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use \App\Modules\ERP\Entity\ERPProducts;
 use \App\Modules\ERP\Entity\ERPCustomers;
+use \App\Modules\ERP\Entity\ERPCustomerGroups;
+use \App\Modules\ERP\Entity\ERPCategories;
+use \App\Modules\ERP\Entity\ERPSuppliers;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
 
 /**
@@ -20,41 +22,26 @@ class ERPCustomersPrices
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPProducts")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $product;
-
-    /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPCustomers")
      * @ORM\JoinColumn(nullable=false)
      */
     private $customer;
 
     /**
-     * @ORM\Column(type="float")
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPCustomerGroups")
+     * @ORM\JoinColumn(nullable=false)
      */
-    private $price;
+    private $customergroup;
 
     /**
-     * @ORM\Column(type="float", nullable=true)
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPCategories")
      */
-    private $reduction;
+    private $category;
 
     /**
-     * @ORM\Column(type="smallint")
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPSuppliers")
      */
-    private $reduction_type;
-
-    /**
-     * @ORM\Column(type="datetime")
-     */
-    private $start;
-
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
-    private $end;
+    private $supplier;
 
     /**
      * @ORM\Column(type="datetime")
@@ -82,29 +69,9 @@ class ERPCustomersPrices
      */
     private $company;
 
-    /**
-     * @ORM\Column(type="float", nullable=true)
-     */
-    private $amount;
-    
-    public $newSeconds=1296000;
-    public $updatedSeconds=1296000;
-
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getProduct(): ?ERPProducts
-    {
-        return $this->product;
-    }
-
-    public function setProduct(?ERPProducts $product): self
-    {
-        $this->product = $product;
-
-        return $this;
     }
 
     public function getCustomer(): ?ERPCustomers
@@ -119,62 +86,38 @@ class ERPCustomersPrices
         return $this;
     }
 
-    public function getPrice(): ?float
+    public function getCustomergroup(): ?ERPCustomerGroups
     {
-        return $this->price;
+        return $this->customergroup;
     }
 
-    public function setPrice(float $price): self
+    public function setCustomergroup(?ERPCustomerGroups $customergroup): self
     {
-        $this->price = $price;
+        $this->customergroup = $customergroup;
 
         return $this;
     }
 
-    public function getReduction(): ?float
+    public function getCategory(): ?ERPCategories
     {
-        return $this->reduction;
+        return $this->category;
     }
 
-    public function setReduction(?float $reduction): self
+    public function setCategory(?ERPCategories $category): self
     {
-        $this->reduction = $reduction;
+        $this->category = $category;
 
         return $this;
     }
 
-    public function getReductionType(): ?int
+    public function getSupplier(): ?ERPSuppliers
     {
-        return $this->reduction_type;
+        return $this->supplier;
     }
 
-    public function setReductionType(int $reduction_type): self
+    public function setSupplier(?ERPSuppliers $supplier): self
     {
-        $this->reduction_type = $reduction_type;
-
-        return $this;
-    }
-
-    public function getStart(): ?\DateTimeInterface
-    {
-        return $this->start;
-    }
-
-    public function setStart(\DateTimeInterface $start): self
-    {
-        $this->start = $start;
-
-        return $this;
-    }
-
-    public function getEnd(): ?\DateTimeInterface
-    {
-        return $this->end;
-    }
-
-    public function setEnd(?\DateTimeInterface $end): self
-    {
-        $this->end = $end;
+        $this->supplier = $supplier;
 
         return $this;
     }
@@ -238,38 +181,16 @@ class ERPCustomersPrices
 
         return $this;
     }
-
-    public function getAmount(): ?float
-    {
-        return $this->amount;
-    }
-
-    public function setAmount(?float $amount): self
-    {
-        $this->amount = $amount;
-
-        return $this;
-    }
-    
+    /*
     public function formValidation($kernel, $doctrine, $user, $validationParams){
-      $select=$this->reduction_type;
-      $date=date('Y-m-d');
-      $repository=$doctrine->getRepository(ERPCustomersPrices::class);
-      $valido=$repository->findValid($this->product, $this->customer,$this->company,$date);
-      if($this->reduction_type==1 AND $this->reduction==NULL)
-        return ["valid"=>false, "global_errors"=>["Por favor, introduce un descuento"]];      
-      else if($this->reduction_type==1 AND $this->reduction<=0 OR $this->reduction>100)
-            return ["valid"=>false, "global_errors"=>["Por favor, introduce un descuento correcto."]];
-      else if($this->reduction_type==2 AND $this->amount==NULL)
-          return ["valid"=>false, "global_errors"=>["Por favor, introduce precio neto"]];
-      else if($valido!=NULL)
-        return ["valid"=>false, "global_errors"=>["Ya existe un precio vigente para este cliente"]];
-      else if($select==0)
-        return ["valid"=>false, "global_errors"=>["Por favor, selecciona un tipo"]];
-      else if($this->end<$this->start)
-        return ["valid"=>false, "global_errors"=>["La fecha final es anterior a la fecha de inicio."]];
-      else return ["valid"=>true];
-    
-    }
-    
+          $repository=$doctrine->getRepository(ERPCustomersPrices::class);
+
+          $repetido=$repository->checkRepeated($this->supplier, $this->category,$this->customergroup,$this->company);
+          if($valido==NULL)
+            return ["valid"=>false, "global_errors"=>["No existe ningún producto para ese proveedor en esa categoría."]];
+          else if($repetido!=NULL)
+            return ["valid"=>false, "global_errors"=>["Ya existe un registro repetido para esos parámetros."]];
+          else return ["valid"=>true];
+      }*/
+      
 }

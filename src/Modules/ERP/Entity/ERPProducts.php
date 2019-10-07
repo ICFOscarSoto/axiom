@@ -180,6 +180,16 @@ class ERPProducts
      */
     private $PVP;
 
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    private $PVPR;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    private $shoppingPrice;
+
 
     public function getId(): ?int
     {
@@ -474,13 +484,6 @@ class ERPProducts
         return $this;
     }
 
-    public function formValidation($kernel, $doctrine, $user, $validationParams){
-      $repository=$doctrine->getRepository(ERPProducts::class);
-      $product=$repository->findOneBy(["code"=>$this->code,"company"=>$user->getCompany(),"active"=>1,"deleted"=>0]);
-      if($product!=null and $product->id!=$this->id)
-        return ["valid"=>false, "global_errors"=>["El producto ya existe"]];
-      else return ["valid"=>true];
-    }
 
     public function getTaxes(): ?GlobaleTaxes
     {
@@ -553,4 +556,63 @@ class ERPProducts
 
         return $this;
     }
+
+    public function getPVPR(): ?float
+    {
+        return $this->PVPR;
+    }
+
+    public function setPVPR(?float $PVPR): self
+    {
+        $this->PVPR = $PVPR;
+
+        return $this;
+    }
+
+    public function getShoppingPrice(): ?float
+    {
+        return $this->shoppingPrice;
+    }
+
+    public function setShoppingPrice(?float $shoppingPrice): self
+    {
+        $this->shoppingPrice = $shoppingPrice;
+
+        return $this;
+    }
+
+    public function priceCalculated($doctrine){
+        $repository=$doctrine->getRepository(ERPShoppingDiscounts::class);
+        $shoppingDiscounts=$repository->findOneBy(["supplier"=>$this->supplier,"active"=>1,"deleted"=>0]);
+        $this->setShoppingPrice($this->PVPR*(1-$shoppingDiscounts->getDiscount()/100));
+    }
+
+    public function preProccess($kernel, $doctrine, $user, $params, $oldobj){
+      $repository=$doctrine->getRepository(ERPShoppingDiscounts::class);
+      //Search in the treeCategories which is the most specific with ShoppingDiscounts
+      $repositoryCategory=$doctrine->getRepository(ERPCategories::class);
+      $category=$this->category;
+      $shoppingDiscounts=$repository->findOneBy(["supplier"=>$oldobj->supplier,"category"=>$category,"active"=>1,"deleted"=>0]);
+      while ($category->getParentid()!=null){
+          if ($shoppingDiscounts!=null) break;
+          $category=$category->getParentid();
+          $shoppingDiscounts=$repository->findOneBy(["supplier"=>$oldobj->supplier,"category"=>$category,"active"=>1,"deleted"=>0]);
+      }
+      if ($shoppingDiscounts==null)
+          $shoppingDiscounts=$repository->findOneBy(["supplier"=>$oldobj->supplier,"active"=>1,"deleted"=>0]);
+      //If PVPR, Category or Suppliers is updated then ShoppingPrice is calculated
+      if(($this->PVPR!=$oldobj->getPVPR() or $this->category!=$oldobj->getCategory() or $this->supplier!=$oldobj->getSupplier()) and $shoppingDiscounts!=null)
+          $this->setShoppingPrice($this->PVPR*(1-$shoppingDiscounts->getName()/100));
+
+    }
+
+     public function formValidation($kernel, $doctrine, $user, $validationParams){
+       $repository=$doctrine->getRepository(ERPProducts::class);
+       $product=$repository->findOneBy(["code"=>$this->code,"company"=>$user->getCompany(),"active"=>1,"deleted"=>0]);
+       if($product!=null and $product->id!=$this->id)
+         return ["valid"=>false, "global_errors"=>["El producto ya existe"]];
+       else return ["valid"=>true];
+     }
+
+
 }

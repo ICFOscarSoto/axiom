@@ -4,21 +4,13 @@
         "caption": "id"
     },
     {
-        "name": "customer__name",
-        "caption": "customer"
-    },
-    {
-        "name": "customergroup__name",
-        "caption": "customergroup"
-    },
-    {
         "name": "category__name",
         "caption": "category"
     },
     {
-        "name": "supplier__name",
-        "caption": "supplier"
-    },
+        "name": "discount",
+        "caption": "discount"
+    },    
     {
         "name": "active",
         "caption": "Estado",

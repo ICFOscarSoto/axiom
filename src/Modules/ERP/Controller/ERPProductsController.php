@@ -71,7 +71,6 @@ class ERPProductsController extends Controller
 		 $utilsObj=new ERPProductsUtils();
 		 $manufacturerRepository= $this->getDoctrine()->getRepository(ERPManufacturers::class);
 		 $manufacturer=$manufacturerRepository->findOneBy(["name"=>"Prueba"]);
-		 dump($manufacturer);
 		 $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine());
 
 		 $utils->values(["manufacturer"=>$manufacturer]);

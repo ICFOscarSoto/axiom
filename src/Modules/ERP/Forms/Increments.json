@@ -1,0 +1,33 @@
+[{
+    "sections": [
+        {
+            "name": "data",
+            "fields": [
+              {
+                  "name": "customergroup",
+                  "cols": 4
+              },                
+                {
+                    "name": "supplier", 
+                    "cols": 4
+                    
+                },
+                {
+                    "name": "category",
+                    "trigger":{"field":"supplier", "route":"suppliercategoriestrigger",
+                      "moduleTrigger":"ERP", "classTrigger":"ERPSuppliers",
+                      "module":"Globale","class":"GlobaleCompanies", "relationParameter":"id"},
+                    "cols": 4
+                },
+                {
+                    "name": "increment",
+                    "cols": 4
+                },
+                {
+                    "name": "active",
+                    "cols": 4
+                }
+            ]
+        }
+    ]
+}]
