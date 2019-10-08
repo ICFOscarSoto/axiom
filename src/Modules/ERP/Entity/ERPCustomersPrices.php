@@ -56,7 +56,7 @@ class ERPCustomersPrices
     /**
      * @ORM\Column(type="boolean")
      */
-    private $active;
+    private $active=1;
 
     /**
      * @ORM\Column(type="boolean")

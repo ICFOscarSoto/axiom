@@ -41,9 +41,9 @@ class ERPIncrementsUtils
       'orderColumn' => 2,
       'orderDirection' => 'ASC',
       'tagColumn' => 2,
-      'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/".$this->name.".json"),true),
-      'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/".$this->name."FieldButtons.json"),true),
-      'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/".$this->name."TopButtons.json"),true)
+      'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/IncrementsSupplier.json"),true),
+      'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/IncrementsSupplierFieldButtons.json"),true),
+      'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/IncrementsSupplierTopButtons.json"),true)
     ];
     return $list;
   }
