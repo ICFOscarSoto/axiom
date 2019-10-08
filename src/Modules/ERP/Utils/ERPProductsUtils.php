@@ -5,13 +5,33 @@ use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\Email\Entity\EmailAccounts;
+use App\Modules\ERP\Entity\ERPShoppingDiscounts;
+use App\Modules\ERP\Entity\ERPProducts;
 
 class ERPProductsUtils
 {
   public function getExcludedForm($params){
     return ['product'];
+  }
+
+  public function getIncludedForm($params){
+    $doctrine=$params["doctrine"];
+    $user=$params["user"];
+    $id=$params["id"];
+    $productRepository=$doctrine->getRepository(ERPProducts::class);
+    $products=$productRepository->findOneBy(["id"=>$id]);
+    return [
+    ['shoppingdiscounts', TextType::class, [
+      'required' => false,
+      'disabled' => true,
+      'attr'=> ["readonly"=>true],
+      'mapped' => false,
+      'data' => $products->getShoppingDiscount($doctrine)
+    ]]
+  ];
   }
 
   public function formatList($user){

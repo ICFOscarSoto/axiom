@@ -12,21 +12,8 @@ class ERPIncrementsUtils
 {
   private $module="ERP";
   private $name="Increments";
-  
-  public function formatListbyEntity($entity){
-    $list=[
-      'id' => 'listIncrements',
-      'route' => 'supplierincrementlist',
-      'routeParams' => ["id" => $entity],
-      'orderColumn' => 2,
-      'orderDirection' => 'ASC',
-      'tagColumn' => 2,
-      'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/IncrementsSupplier.json"),true),
-      'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/IncrementsSupplierFieldButtons.json"),true),
-      'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/IncrementsSupplierTopButtons.json"),true)
-    ];
-    return $list;
-  }
+  public $parentClass="\App\Modules\ERP\Entity\ERPSuppliers";
+  public $parentField="supplier";
   
   public function getExcludedForm($params){
     return ['supplier'];
@@ -35,36 +22,28 @@ class ERPIncrementsUtils
   public function getIncludedForm($params){
     $doctrine=$params["doctrine"];
     $user=$params["user"];
-    $supplier=$params["supplier"];
-    $suppliersRepository=$doctrine->getRepository(ERPSuppliers::class);
-    return [
-    ['supplier', ChoiceType::class, [
-      'required' => false,
-      'disabled' => false,
-      'attr' => ['class' => 'select2', 'readonly' => true],
-      'choices' => $suppliersRepository->findBy(["id"=>$supplier->getId()]),
-      'placeholder' => 'Select a supplier',
-      'choice_label' => function($obj, $key, $index) {
-          return $obj->getSocialname();
-      },
-      'choice_value' => 'id',
-      'data' => $supplier
-    ]]
-  ];
+    $id=$params["id"];
+    return [];
   }
 
-  public function formatList($user){
+  public function formatList($user, $supplier){
     $list=[
       'id' => 'list'.$this->name,
       'route' => 'genericlist',
       'routeParams' => ["module" => $this->module,
-                        "name" => $this->name],
+                        "name" => $this->name,
+                        "parent" => $supplier,
+                        "id" => $supplier,
+                        "field" => "supplier",
+                        "parentModule" => "ERP",
+                        "parentName" => "Suppliers"
+                      ],
       'orderColumn' => 2,
       'orderDirection' => 'ASC',
       'tagColumn' => 2,
-      'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Increments.json"),true),
-      'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/IncrementsFieldButtons.json"),true),
-      'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/IncrementsTopButtons.json"),true)
+      'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/IncrementsSupplier.json"),true),
+      'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/IncrementsSupplierFieldButtons.json"),true),
+      'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/IncrementsSupplierTopButtons.json"),true)
     ];
     return $list;
   }

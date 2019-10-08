@@ -7,11 +7,7 @@
         "name": "customergroup__name",
         "caption": "customergroup"
     },
-    {
-        "name": "supplier__name",
-        "caption": "supplier"
-    },
-    {
+      {
         "name": "category__name",
         "caption": "category"
     },

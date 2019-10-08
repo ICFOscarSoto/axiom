@@ -12,11 +12,13 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\ERP\Entity\ERPCustomers;
 use App\Modules\ERP\Entity\ERPCustomerGroups;
+use App\Modules\ERP\Entity\ERPCustomersPrices;
 use App\Modules\Globale\Entity\GlobaleCountries;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\ERP\Utils\ERPCustomersUtils;
+use App\Modules\ERP\Utils\ERPCustomersPricesUtils;
 
 class ERPCustomersController extends Controller
 {
@@ -99,7 +101,8 @@ class ERPCustomersController extends Controller
 							'userData' => $userdata,
 							'id' => $id,
 							'tab' => $request->query->get('tab','data'), //Show initial tab, by default data tab
-							'tabs' => [["name" => "data", "icon"=>"fa fa-headphones", "caption"=>"Datos cliente", "active"=>true, "route"=>$this->generateUrl("dataCustomers",["id"=>$id])]
+							'tabs' => [["name" => "data", "icon"=>"fa fa-headphones", "caption"=>"Datos cliente", "active"=>true, "route"=>$this->generateUrl("dataCustomers",["id"=>$id])],
+											 	["name"=>"customersprices", "icon"=>"fa fa-money", "caption"=>"Incrementos específicos","route"=>$this->generateUrl("generictablist",["module"=>"ERP", "name"=>"CustomersPrices", "id"=>$id])]
 												//["name" => "addresses", "icon"=>"fa fa-headphones", "caption"=>"direcciones", "route"=>$this->generateUrl("addresses",["id"=>$id, "type"=>"contact"])],
 												//["name" => "contacts", "icon"=>"fa fa-headphones", "caption"=>"contactos" , "route"=>$this->generateUrl("contacts",["id"=>$id])],
 												//["name" => "bankaccounts", "icon"=>"fa fa-headphones", "caption"=>"Cuentas bancarias", "route"=>$this->generateUrl("bankaccounts",["id"=>$id])]

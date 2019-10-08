@@ -49,7 +49,7 @@ class ERPIncrements
     /**
      * @ORM\Column(type="boolean")
      */
-    private $active;
+    private $active=1;
 
     /**
      * @ORM\Column(type="datetime")
@@ -188,9 +188,11 @@ public function formValidation($kernel, $doctrine, $user, $validationParams){
       
       $valido=$repository->checkSupplierOnCategory($this->supplier, $this->category,$this->company);
       $repetido=$repository->checkRepeated($this->supplier, $this->category,$this->customergroup,$this->company);
+/*      
       if($valido==NULL)
         return ["valid"=>false, "global_errors"=>["No existe ningún producto para ese proveedor en esa categoría."]];
-      else if($repetido!=NULL)
+      else*/
+      if($repetido!=NULL)
         return ["valid"=>false, "global_errors"=>["Ya existe un registro repetido para esos parámetros."]];
       else return ["valid"=>true];
       /*

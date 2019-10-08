@@ -1,5 +1,5 @@
 [
-  {"id" : "addTopIncrements", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"genericdata", "routeParams":{"module":"ERP", "name":"Increments", "type":"modal" }, "modal":"Increments", "actionType" : "background", "confirm" :false, "tooltip" : ""},
+  {"id" : "addTopIncrements", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"genericdatatab", "routeParams":{"module":"ERP", "name":"Increments", "type":"modal", "idparent":"id" }, "modal":"Increments", "actionType" : "background", "confirm" :false, "tooltip" : ""},
   {"id" : "deleteTopIncrements", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true, "tooltip":""},
   {"id" : "printTopIncrements", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false, "tooltip":""},
   {"id" : "exportTopIncrements", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"genericexport", "routeParams":{"module":"ERP", "name":"Increments"}, "confirm" :false, "tooltip":""}

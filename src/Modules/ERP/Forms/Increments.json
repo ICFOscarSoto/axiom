@@ -8,15 +8,7 @@
                   "cols": 4
               },                
                 {
-                    "name": "supplier", 
-                    "cols": 4
-                    
-                },
-                {
                     "name": "category",
-                    "trigger":{"field":"supplier", "route":"suppliercategoriestrigger",
-                      "moduleTrigger":"ERP", "classTrigger":"ERPSuppliers",
-                      "module":"Globale","class":"GlobaleCompanies", "relationParameter":"id"},
                     "cols": 4
                 },
                 {
