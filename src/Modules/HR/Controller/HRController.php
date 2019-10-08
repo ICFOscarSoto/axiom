@@ -34,11 +34,14 @@ use App\Modules\HR\Entity\HRSchedules;
 use App\Modules\HR\Entity\HRShifts;
 use App\Modules\Globale\Utils\GlobaleListApiUtils;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use App\Modules\Security\Utils\SecurityUtils;
+
 
 class HRController extends Controller
 {
 
 	 private $class=HRWorkers::class;
+	 private $module='HR';
 	 private $utilsClass=HRWorkersUtils::class;
 
     /**
@@ -47,6 +50,8 @@ class HRController extends Controller
     public function index(RouterInterface $router,Request $request)
     {
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
+
 		//$this->denyAccessUnlessGranted('ROLE_ADMIN');
 		$userdata=$this->getUser()->getTemplateData();
 		$locale = $request->getLocale();
@@ -93,6 +98,7 @@ class HRController extends Controller
 		 */
 		 public function formWorker($id, Request $request){
 			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
 			$this->denyAccessUnlessGranted('ROLE_ADMIN');
 			$new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-new"];
 			$template=dirname(__FILE__)."/../Forms/Workers.json";

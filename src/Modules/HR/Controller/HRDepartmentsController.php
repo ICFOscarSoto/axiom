@@ -21,10 +21,11 @@ use App\Modules\Globale\Utils\GlobaleExportUtils;
 use App\Modules\Globale\Utils\GlobalePrintUtils;
 use App\Modules\Cloud\Controller\CloudController;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use App\Modules\Security\Utils\SecurityUtils;
 
 class HRDepartmentsController extends Controller
 {
-
+  private $module='HR';
   private $class=HRDepartments::class;
   private $utilsClass=HRDepartmentsUtils::class;
 
@@ -34,6 +35,7 @@ class HRDepartmentsController extends Controller
   public function departments(RouterInterface $router,Request $request)
   {
   $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+  if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
   $this->denyAccessUnlessGranted('ROLE_ADMIN');
   $userdata=$this->getUser()->getTemplateData();
   $this->router = $router;
@@ -127,6 +129,7 @@ class HRDepartmentsController extends Controller
    public function departmentworkers($id,RouterInterface $router,Request $request)
    {
    $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+   if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
    $this->denyAccessUnlessGranted('ROLE_ADMIN');
    $userdata=$this->getUser()->getTemplateData();
    $locale = $request->getLocale();

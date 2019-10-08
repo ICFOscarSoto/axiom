@@ -28,26 +28,26 @@ use App\Modules\HR\Entity\HRVacations;
 use App\Modules\HR\Entity\HRSickleaves;
 use App\Modules\HR\Entity\HRHollidays;
 use App\Modules\HR\Entity\HRSchedules;
-
 use App\Modules\HR\Reports\HRClocksReports;
 use App\Modules\Globale\Entity\GlobaleNotifications;
 use App\Modules\Globale\Config\GlobaleConfigVars;
 use App\Modules\Globale\Controller\GlobaleFirebaseDevicesController;
 use App\Modules\Globale\Entity\GlobaleHistories;
-
+use App\Modules\Security\Utils\SecurityUtils;
 
 class HRClocksController extends Controller
 {
-
+	 private $module='HR';
 	 private $class=HRClocks::class;
-   private $utilsClass=HRClocksUtils::class;
+	 private $utilsClass=HRClocksUtils::class;
 
     /**
      * @Route("/{_locale}/HR/clocks", name="clocks")
      */
-     public function clocks(RouterInterface $router,Request $request)
-     {
+     public function clocks(RouterInterface $router,Request $request){
      $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		 if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
+
      //$this->denyAccessUnlessGranted('ROLE_ADMIN');
      $userdata=$this->getUser()->getTemplateData();
      $locale = $request->getLocale();
@@ -91,6 +91,7 @@ class HRClocksController extends Controller
       public function status(RouterInterface $router,Request $request)
       {
       $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
       //$this->denyAccessUnlessGranted('ROLE_ADMIN');
       $userdata=$this->getUser()->getTemplateData();
       $locale = $request->getLocale();
@@ -131,22 +132,8 @@ class HRClocksController extends Controller
 			$userdata=$this->getUser()->getTemplateData();
 			$locale = $request->getLocale();
 			$this->router = $router;
-
-
-
-
-
-
-
-
-
-
-
-
 			$clocksrepository=$this->getDoctrine()->getRepository(HRClocks::class);
 			$obj=$clocksrepository->findOneBy(["id"=>$id]);
-
-
 
 			$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
 			$utils = new HRClocksUtils();
