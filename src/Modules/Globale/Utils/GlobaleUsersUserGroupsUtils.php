@@ -20,19 +20,20 @@ class GlobaleUsersUserGroupsUtils
   public function getIncludedForm($params){
     $doctrine=$params["doctrine"];
     $id=$params["id"];
+    $parent=$params["parent"];
+
     $user=$params["user"];
     $em=$doctrine->getManager();
-    $results=$em->createQueryBuilder()->select('u')
-      ->from('App\Modules\Globale\Entity\GlobaleUserGroups', 'u')
-      ->leftJoin('App\Modules\Globale\Entity\GlobaleUsersUserGroups', 'g', 'WITH', 'u.id = g.usergroup')
-      ->where('g.id IS NULL')
-      ->orWhere('g.deleted = 1')
-      ->orWhere('g.id = :val_user')
-      ->andWhere('u.company = :val_company')
-      ->setParameter('val_user', $id)
-      ->setParameter('val_company', $user->getCompany())
-      ->getQuery()
-      ->getResult();
+    $qb = $em->createQueryBuilder();
+    $query="SELECT usergroup_id	FROM  globale_users_user_groups WHERE user_id=:val_user AND active=1 AND deleted=0";
+    $params=['val_user' => $parent->getId()];
+    $selected=$doctrine->getConnection()->executeQuery($query, $params)->fetchAll();
+    $results = $qb->select('rl')
+                 ->from('App\Modules\Globale\Entity\GlobaleUserGroups', 'rl')
+                 ->where($qb->expr()->notIn('rl.id', array_column($selected,'usergroup_id')))
+                 ->andWhere('rl.active=1 AND rl.deleted=0')
+                 ->getQuery()
+                 ->getResult();
 
     return [
     ['usergroup', ChoiceType::class, [

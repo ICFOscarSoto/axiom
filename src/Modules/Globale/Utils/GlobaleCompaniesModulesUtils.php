@@ -21,17 +21,21 @@ class GlobaleCompaniesModulesUtils
     $doctrine=$params["doctrine"];
     $id=$params["id"];
     $user=$params["user"];
+    $parent=$params["parent"];
+
     $em=$doctrine->getManager();
-    $results=$em->createQueryBuilder()->select('u')
-      ->from('App\Modules\Globale\Entity\GlobaleModules', 'u')
-      ->leftJoin('App\Modules\Globale\Entity\GlobaleCompaniesModules', 'g', 'WITH', 'u.id = g.module')
-      ->where('g.id IS NULL')
-      ->orWhere('g.deleted = 1')
-      ->orWhere('g.id = :val_id')
-      ->andWhere('u.id <> 1')
-      ->setParameter('val_id', $id)
-      ->getQuery()
-      ->getResult();
+    $qb = $em->createQueryBuilder();
+    $query="SELECT module_id	FROM  globale_companies_modules WHERE companyown_id=:val_company AND active=1 AND deleted=0";
+    $params=['val_company' => $parent->getId()];
+    $selected=$doctrine->getConnection()->executeQuery($query, $params)->fetchAll();
+
+    $results = $qb->select('rl')
+                 ->from('App\Modules\Globale\Entity\GlobaleModules', 'rl')
+                 ->where($qb->expr()->notIn('rl.id', array_column($selected,'module_id')))
+                 ->andWhere('rl.active=1 AND rl.deleted=0')
+                 ->andWhere('rl.id <> 1')
+                 ->getQuery()
+                 ->getResult();
 
     return [
     ['module', ChoiceType::class, [
