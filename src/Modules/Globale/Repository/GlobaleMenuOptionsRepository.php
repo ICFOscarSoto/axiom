@@ -62,16 +62,19 @@ class GlobaleMenuOptionsRepository extends ServiceEntityRepository
 		$options[]=$item;
     $modules=array_unique(array_merge($this->getModules($userdata["companyId"]), [1])); //ensure module global allways active
     $roles=$userdata["roles"];
-		foreach($roles as $role){
-			$parents=$this->getParents($role);
+		//foreach($roles as $role){
+			$parents=$this->getParents();
 			foreach($parents as $key_parent=>$parent){
-        if($parent->getModule()!=null && !in_array($parent->getModule()->getId(), $modules)) {unset($parents[$key_parent]); continue;} //if module no active continue
-				$childs=$this->getChilds($role, $parent->getId());
+        if(!count(array_intersect ($parent->getRoles(), $roles))){ unset($parents[$key_parent]); continue;} //if user hasn't enough role for this module
+        if($parent->getModule()!=null && !in_array($parent->getModule()->getId(), $modules)) {unset($parents[$key_parent]); continue;} //if module no active  for this company continue
+				$childs=$this->getChilds($parent->getId());
 				foreach($childs as $key_child=>$child){
-          if($child->getModule()!=null && !in_array($child->getModule()->getId(), $modules)) {unset($childs[$key_child]); continue;} //if module no active continue
-        	$childs[$key_child]->childs=$this->getChilds($role, $child->getId());
+          if(!count(array_intersect ($child->getRoles(), $roles))){ unset($childs[$key_child]); continue;} //if user hasn't enough role for this module
+          if($child->getModule()!=null && !in_array($child->getModule()->getId(), $modules)) {unset($childs[$key_child]); continue;} //if module no active  for this company continue
+        	$childs[$key_child]->childs=$this->getChilds($child->getId());
           foreach($childs[$key_child]->childs as $sub_key_child=>$sub_child){
-              if($sub_child->getModule()!=null && !in_array($sub_child->getModule()->getId(), $modules)) {unset($childs[$key_child]->childs[$sub_key_child]); continue;} //if module no active continue
+              if(!count(array_intersect ($sub_child->getRoles(), $roles))){ unset($childs[$key_child]->childs[$sub_key_child]); continue;} //if user hasn't enough role for this module
+              if($sub_child->getModule()!=null && !in_array($sub_child->getModule()->getId(), $modules)) {unset($childs[$key_child]->childs[$sub_key_child]); continue;} //if module no active  for this company continue
               $childs[$key_child]->childs[$sub_key_child]->params=json_decode($childs[$key_child]->childs[$sub_key_child]->getRouteparams(),true);
           }
           $childs[$key_child]->params=json_decode($childs[$key_child]->getRouteparams(),true);
@@ -79,7 +82,7 @@ class GlobaleMenuOptionsRepository extends ServiceEntityRepository
 				$parents[$key_parent]->childs=$childs;
 			}
 			$options=array_merge($options,$parents);
-		}
+		//}
 
 		return $options;
 	}
@@ -94,17 +97,28 @@ class GlobaleMenuOptionsRepository extends ServiceEntityRepository
 	 /**
      * @return GlobalMenuOptions[] Returns an array of GlobalMenuOptions objects
     */
-	public function getParents($role){
+    public function getParents(){
+  		return $this->createQueryBuilder('f')
+  			      ->andWhere('f.parent IS NULL')
+              ->orderBy('f.position', 'ASC')
+              ->getQuery()
+              ->getResult()
+          ;
+
+  	}
+	/*public function getParents($role){
 		return $this->createQueryBuilder('f')
             ->andWhere('f.roles LIKE :val_role')
 			      ->andWhere('f.parent IS NULL')
             ->setParameter('val_role', '%'.$role.'%')
-            ->orderBy('f.id', 'ASC')
+            ->orderBy('f.position', 'ASC')
             ->getQuery()
             ->getResult()
         ;
 
-	}
+	}*/
+
+
 	public function findById($id){
 		return $this->createQueryBuilder('f')
             ->andWhere('f.id = :val_id')
@@ -142,13 +156,13 @@ class GlobaleMenuOptionsRepository extends ServiceEntityRepository
 	/**
      * @return GlobalMenuOptions[] Returns an array of GlobalMenuOptions objects
     */
-	public function getChilds($role, $parent){
+	public function getChilds($parent){
 		return $this->createQueryBuilder('f')
-            ->andWhere('f.roles LIKE :val_role')
+            //->andWhere('f.roles LIKE :val_role')
 			      ->andWhere('f.parent = :val_parent')
-            ->setParameter('val_role', '%'.$role.'%')
+            //->setParameter('val_role', '%'.$role.'%')
 			      ->setParameter('val_parent', $parent)
-            ->orderBy('f.id', 'ASC')
+            ->orderBy('f.position', 'ASC')
             ->getQuery()
             ->getResult()
         ;
