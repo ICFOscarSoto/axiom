@@ -317,4 +317,15 @@ class GlobaleDefaultController extends Controller
    			return new JsonResponse([]);
    		}
     	}
+
+
+      /**
+      * @Route("/{_locale}/globale/unauthorized", name="unauthorized")
+      */
+       public function unauthorized(Request $request){
+         return $this->render('@Globale/notfound.html.twig',[
+          "status_code"=>401,
+          "status_text"=>"No tiene permisos para acceder a esta sección"
+        ]);
+      }
 }

@@ -5,11 +5,11 @@
             "fields": [
                 {
                     "name": "usergroup",
-                    "cols": 4
+                    "cols": 10
                 },
                 {
                     "name": "active",
-                    "cols": 4
+                    "cols": 2
                 }
             ]
         }

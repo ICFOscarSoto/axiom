@@ -1,0 +1,6 @@
+[
+  {"id" : "addTopPermissionsZones", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"genericdata", "routeParams":{"module":"Globale", "name":"PermissionsZones", "type":"modal" }, "modal":"PermissionsZones", "actionType" : "background", "confirm" :false, "tooltip" : ""},
+  {"id" : "deleteTopPermissionsZones", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true, "tooltip":""},
+  {"id" : "printTopPermissionsZones", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false, "tooltip":""},
+  {"id" : "exportTopPermissionsZones", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"genericexport", "routeParams":{"module":"Globale", "name":"PermissionsZones"}, "confirm" :false, "tooltip":""}
+]

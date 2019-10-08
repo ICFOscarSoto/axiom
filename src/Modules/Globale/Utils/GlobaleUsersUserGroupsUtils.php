@@ -25,15 +25,17 @@ class GlobaleUsersUserGroupsUtils
     $user=$params["user"];
     $em=$doctrine->getManager();
     $qb = $em->createQueryBuilder();
-    $query="SELECT usergroup_id	FROM  globale_users_user_groups WHERE user_id=:val_user AND active=1 AND deleted=0";
+    $query="SELECT usergroup_id	FROM  globale_users_user_groups WHERE user_id=:val_user AND deleted=0";
     $params=['val_user' => $parent->getId()];
     $selected=$doctrine->getConnection()->executeQuery($query, $params)->fetchAll();
-    $results = $qb->select('rl')
+    //array_merge($selected,["usergroup_id"=>0]);
+    $query = $qb->select('rl')
                  ->from('App\Modules\Globale\Entity\GlobaleUserGroups', 'rl')
-                 ->where($qb->expr()->notIn('rl.id', array_column($selected,'usergroup_id')))
-                 ->andWhere('rl.active=1 AND rl.deleted=0')
-                 ->getQuery()
-                 ->getResult();
+                 ->andWhere('rl.active=1 AND rl.deleted=0');
+
+    if(count($selected)) $query->andWhere($qb->expr()->notIn('rl.id', array_column($selected,'usergroup_id')));
+    $results=$query->getQuery()
+                   ->getResult();
 
     return [
     ['usergroup', ChoiceType::class, [

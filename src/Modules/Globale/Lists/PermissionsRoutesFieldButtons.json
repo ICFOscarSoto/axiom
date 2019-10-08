@@ -1,0 +1,8 @@
+[
+  {"id": "editPermissionsRoutes", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"genericdata", "routeParams":{"module":"Globale", "name":"PermissionsRoutes", "type":"modal" }, "modal":"PermissionsRoutes", "actionType" : "background", "confirm" :false, "tooltip":""},
+  {"id": "activation", "type": "option", "options": [
+      {"id": "desactivatePermissionsRoutes", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"genericdisable", "routeParams":{"module":"Globale", "name":"PermissionsRoutes"}, "confirm" :true, "actionType" : "background", "tooltip":"" },
+      {"id": "activatePermissionsRoutes", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "route":"genericenable", "routeParams":{"module":"Globale", "name":"PermissionsRoutes"}, "confirm" :true, "actionType" : "background", "tooltip":"" }
+  ]},
+  {"id": "deletePermissionsRoutes", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"genericdelete", "routeParams":{"module":"Globale", "name":"PermissionsRoutes"}, "confirm" :true, "undo" :false, "actionType" : "background", "tooltip":""}
+]

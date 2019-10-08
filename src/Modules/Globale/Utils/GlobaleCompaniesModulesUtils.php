@@ -25,17 +25,17 @@ class GlobaleCompaniesModulesUtils
 
     $em=$doctrine->getManager();
     $qb = $em->createQueryBuilder();
-    $query="SELECT module_id	FROM  globale_companies_modules WHERE companyown_id=:val_company AND active=1 AND deleted=0";
+    $query="SELECT module_id	FROM  globale_companies_modules WHERE companyown_id=:val_company AND deleted=0";
     $params=['val_company' => $parent->getId()];
     $selected=$doctrine->getConnection()->executeQuery($query, $params)->fetchAll();
-
-    $results = $qb->select('rl')
+    $query = $qb->select('rl')
                  ->from('App\Modules\Globale\Entity\GlobaleModules', 'rl')
-                 ->where($qb->expr()->notIn('rl.id', array_column($selected,'module_id')))
                  ->andWhere('rl.active=1 AND rl.deleted=0')
-                 ->andWhere('rl.id <> 1')
-                 ->getQuery()
-                 ->getResult();
+                 ->andWhere('rl.id <> 1');
+
+     if(count($selected)) $query->andWhere($qb->expr()->notIn('rl.id', array_column($selected,'module_id')));
+     $results=$query->getQuery()
+                    ->getResult();
 
     return [
     ['module', ChoiceType::class, [
