@@ -40,12 +40,12 @@ class ERPProducts
     /**
      * @ORM\Column(type="boolean")
      */
-    private $onsale;
+    private $onsale=1;
 
     /**
      * @ORM\Column(type="boolean")
      */
-    private $onbuy;
+    private $onbuy=1;
 
     /**
      * @ORM\Column(type="float", nullable=true)
@@ -75,12 +75,12 @@ class ERPProducts
     /**
      * @ORM\Column(type="boolean")
      */
-    private $margincontrol;
+    private $margincontrol=1;
 
     /**
      * @ORM\Column(type="boolean")
      */
-    private $stockcontrol;
+    private $stockcontrol=1;
 
     /**
      * @ORM\Column(type="boolean")
@@ -176,7 +176,7 @@ class ERPProducts
     private $rotation;
 
     /**
-     * @ORM\Column(type="float")
+     * @ORM\Column(type="float", nullable=true)
      */
     private $PVP;
 
@@ -189,6 +189,11 @@ class ERPProducts
      * @ORM\Column(type="float", nullable=true)
      */
     private $shoppingPrice;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $netprice;
 
 
     public function getId(): ?int
@@ -582,27 +587,26 @@ class ERPProducts
     }
 
     public function priceCalculated($doctrine){
-        $repository=$doctrine->getRepository(ERPShoppingDiscounts::class);
-        $shoppingDiscounts=$repository->findOneBy(["supplier"=>$this->supplier,"active"=>1,"deleted"=>0]);
-        $this->setShoppingPrice($this->PVPR*(1-$shoppingDiscounts->getDiscount()/100));
-    }
-
-    public function preProccess($kernel, $doctrine, $user, $params, $oldobj){
       $repository=$doctrine->getRepository(ERPShoppingDiscounts::class);
       //Search in the treeCategories which is the most specific with ShoppingDiscounts
       $repositoryCategory=$doctrine->getRepository(ERPCategories::class);
       $category=$this->category;
-      $shoppingDiscounts=$repository->findOneBy(["supplier"=>$oldobj->supplier,"category"=>$category,"active"=>1,"deleted"=>0]);
-      while ($category->getParentid()!=null){
-          if ($shoppingDiscounts!=null) break;
+      $shoppingDiscounts=$repository->findOneBy(["supplier"=>$this->supplier,"category"=>$category,"active"=>1,"deleted"=>0]);
+      while ($category->getParentid()!=null && $shoppingDiscounts==null){
           $category=$category->getParentid();
-          $shoppingDiscounts=$repository->findOneBy(["supplier"=>$oldobj->supplier,"category"=>$category,"active"=>1,"deleted"=>0]);
+          $shoppingDiscounts=$repository->findOneBy(["supplier"=>$this->supplier,"category"=>$category,"active"=>1,"deleted"=>0]);
       }
       if ($shoppingDiscounts==null)
-          $shoppingDiscounts=$repository->findOneBy(["supplier"=>$oldobj->supplier,"active"=>1,"deleted"=>0]);
+          $shoppingDiscounts=$repository->findOneBy(["supplier"=>$this->supplier,"active"=>1,"deleted"=>0]);
+
+      $this->setShoppingPrice($this->PVPR*(1-$shoppingDiscounts->getDiscount()/100));
+    }
+
+    public function preProccess($kernel, $doctrine, $user, $params, $oldobj){
+
       //If PVPR, Category or Suppliers is updated then ShoppingPrice is calculated
-      if(($this->PVPR!=$oldobj->getPVPR() or $this->category!=$oldobj->getCategory() or $this->supplier!=$oldobj->getSupplier()) and $shoppingDiscounts!=null)
-          $this->setShoppingPrice($this->PVPR*(1-$shoppingDiscounts->getName()/100));
+      if(($this->PVPR!=$oldobj->getPVPR() or $this->category!=$oldobj->getCategory() or $this->supplier!=$oldobj->getSupplier()))
+          $this->priceCalculated($doctrine);
 
     }
 
@@ -612,6 +616,18 @@ class ERPProducts
        if($product!=null and $product->id!=$this->id)
          return ["valid"=>false, "global_errors"=>["El producto ya existe"]];
        else return ["valid"=>true];
+     }
+
+     public function getNetprice(): ?bool
+     {
+         return $this->netprice;
+     }
+
+     public function setNetprice(bool $netprice): self
+     {
+         $this->netprice = $netprice;
+
+         return $this;
      }
 
 

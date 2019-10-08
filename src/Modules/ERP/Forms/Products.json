@@ -30,7 +30,9 @@
 				{	"name": "rotation", "cols": 2},
 				{ "name": "description","cols": 12},
 				{ "name": "PVPR","cols": 2},
-				{ "name": "PVP","cols": 2},
+				{ "name": "PVP","cols": 2, "readonly":true},
+				{ "name": "shoppingdiscounts", "cols": 2},
+				{ "name": "netprice","cols": 2},
 				{ "name": "shoppingPrice","cols": 2}
 			]
 		}]

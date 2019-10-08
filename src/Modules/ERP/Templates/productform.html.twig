@@ -118,6 +118,25 @@
 		{% endfor %}
 	</div>
 
+<div class="row">
+	<div class="col-md-2">
+		{{ form_row(formConstructor.form['netprice']) }}
+	</div>
+</div>
+	<div class="row">
+		<div class="col-md-2">
+			{{ form_row(formConstructor.form['PVPR']) }}
+		</div>
+		<div class="col-md-2">
+			{{ form_row(formConstructor.form['shoppingdiscounts']) }}
+		</div>
+		<div class="col-md-2">
+			{{ form_row(formConstructor.form['shoppingPrice']) }}
+		</div>
+		<div class="col-md-2">
+			{{ form_row(formConstructor.form['PVP']) }}
+		</div>
+</div>
 	<div class="row">
 		<div class="col-md-2">
 			{{ form_row(formConstructor.form['discontinued']) }}
@@ -171,17 +190,6 @@
 		</div>
 		<div class="col-md-2">
 			{{ form_row(formConstructor.form['rotation']) }}
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-md-2">
-			{{ form_row(formConstructor.form['PVPR']) }}
-		</div>
-		<div class="col-md-2">
-			{{ form_row(formConstructor.form['PVP']) }}
-		</div>
-		<div class="col-md-2">
-			{{ form_row(formConstructor.form['shoppingPrice']) }}
 		</div>
 	</div>
 	<div class="row">

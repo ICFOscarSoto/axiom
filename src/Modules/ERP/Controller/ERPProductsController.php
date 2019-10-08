@@ -135,7 +135,8 @@ class ERPProductsController extends Controller
 			array_push($breadcrumb, $new_breadcrumb);
 			$template=dirname(__FILE__)."/../Forms/Products.json";
 			$formUtils = new GlobaleFormUtils();
-			$formUtils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine());
+			$formUtilsProducts = new ERPProductsUtils();
+			$formUtils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),$formUtilsProducts->getExcludedForm([]),$formUtilsProducts->getIncludedForm(["doctrine"=>$this->getDoctrine(), "user"=>$this->getUser(), "id"=>$id]));
 			$listEAN13 = new ERPEAN13Utils();
 			$formUtilsEAN = new GlobaleFormUtils();
 			$formUtilsEAN->initialize($this->getUser(), new ERPEAN13(), dirname(__FILE__)."/../Forms/EAN13.json", $request, $this, $this->getDoctrine());

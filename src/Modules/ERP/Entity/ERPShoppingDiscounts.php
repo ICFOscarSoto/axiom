@@ -143,13 +143,16 @@ class ERPShoppingDiscounts
         return $this;
     }
 
-    public function preProccess($kernel, $doctrine, $user){
+    public function postProccess($kernel, $doctrine, $user){
+      $em = $doctrine->getManager();
       $repositoryProduct=$doctrine->getRepository(ERPProducts::class);
       $repository=$doctrine->getRepository(ERPSuppliers::class);
-      $products=$repository->productsBySupplier($this->id);
+      $products=$repository->productsBySupplier($this->supplier->getId());
       foreach($products as $product){
         $productEntity=$repositoryProduct->findOneBy(["id"=>$product]);
         $productEntity->priceCalculated($doctrine);
+        $em->persist($productEntity);
+        $em->flush();
       }
 
     }
