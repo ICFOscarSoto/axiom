@@ -9,6 +9,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\Email\Entity\EmailAccounts;
 use App\Modules\ERP\Entity\ERPShoppingDiscounts;
+use App\Modules\ERP\Entity\ERPProducts;
 
 class ERPProductsUtils
 {
@@ -20,13 +21,15 @@ class ERPProductsUtils
     $doctrine=$params["doctrine"];
     $user=$params["user"];
     $id=$params["id"];
-    $shoppingdiscountsRepository=$doctrine->getRepository(ERPShoppingDiscounts::class);
+    $productRepository=$doctrine->getRepository(ERPProducts::class);
+    $products=$productRepository->findOneBy(["id"=>$id]);
     return [
     ['shoppingdiscounts', TextType::class, [
       'required' => false,
-      'disabled' => false,
+      'disabled' => true,
+      'attr'=> ["readonly"=>true],
       'mapped' => false,
-      'data' => 'PRUEBA'
+      'data' => $products->getShoppingDiscount($doctrine)
     ]]
   ];
   }

@@ -586,7 +586,8 @@ class ERPProducts
         return $this;
     }
 
-    public function priceCalculated($doctrine){
+
+    public function getShoppingDiscount($doctrine) {
       $repository=$doctrine->getRepository(ERPShoppingDiscounts::class);
       //Search in the treeCategories which is the most specific with ShoppingDiscounts
       $repositoryCategory=$doctrine->getRepository(ERPCategories::class);
@@ -598,12 +599,14 @@ class ERPProducts
       }
       if ($shoppingDiscounts==null)
           $shoppingDiscounts=$repository->findOneBy(["supplier"=>$this->supplier,"active"=>1,"deleted"=>0]);
+      return $shoppingDiscounts->getDiscount();
+    }
 
-      $this->setShoppingPrice($this->PVPR*(1-$shoppingDiscounts->getDiscount()/100));
+    public function priceCalculated($doctrine){
+      $this->setShoppingPrice($this->PVPR*(1-$this->getShoppingDiscount($doctrine)/100));
     }
 
     public function preProccess($kernel, $doctrine, $user, $params, $oldobj){
-
       //If PVPR, Category or Suppliers is updated then ShoppingPrice is calculated
       if(($this->PVPR!=$oldobj->getPVPR() or $this->category!=$oldobj->getCategory() or $this->supplier!=$oldobj->getSupplier()))
           $this->priceCalculated($doctrine);
