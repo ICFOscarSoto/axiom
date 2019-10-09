@@ -11,7 +11,6 @@ use App\Modules\Globale\Entity\GlobalePermissionsRoutesUserGroups;
 class SecurityUtils
 {
   public function checkRoutePermissions($module, $name, $user, $doctrine){
-    if(in_array('ROLE_GLOBAL',$user->getRoles())) return true;
     $modulesRepository=$doctrine->getRepository(GlobaleModules::class);
     $userUsersGroupsRepository=$doctrine->getRepository(GlobaleUsersUserGroups::class);
     $zonesRepository=$doctrine->getRepository(GlobalePermissionsZones::class);
@@ -33,6 +32,7 @@ class SecurityUtils
       $doctrine->getManager()->persist($permissionRoute);
       $doctrine->getManager()->flush();
     }
+    if(in_array('ROLE_GLOBAL',$user->getRoles())) return true;
 
     //Check if user has explicit policies
     $routeUser=$routesUserRepository->findOneBy(["permissionroute"=>$permissionRoute, "user"=>$user, "active"=>1, "deleted"=>0]);
