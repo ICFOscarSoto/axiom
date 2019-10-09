@@ -20,7 +20,7 @@ class GlobalePermissionsRoutesUsersRepository extends ServiceEntityRepository
     }
 
     public function findByUserModule($user, $module){
-      $query="SELECT m.NAME module, r.name, r.description, r.module_id, IFNULL(ru.allowaccess,3) allowaccess FROM globale_permissions_routes_users ru
+      $query="SELECT m.NAME module, r.name, r.id route_id, r.description, r.module_id, IFNULL(ru.allowaccess,3) allowaccess FROM globale_permissions_routes_users ru
               RIGHT JOIN globale_permissions_routes r ON r.id=ru.permissionroute_id AND ru.user_id=:val_user
               LEFT JOIN globale_modules m ON m.id=r.module_id
               WHERE r.module_id=:val_module

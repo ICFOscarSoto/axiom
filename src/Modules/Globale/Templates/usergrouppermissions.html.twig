@@ -26,8 +26,7 @@
             <div class="col-sm-5">
 							<select id="select-route-{{ route.route_id }}" attr-id="{{ route.route_id }}" class="form-control">
 								<option value="1" {% if(route.allowaccess == 1) %} selected='selected' {% endif %}>{{ ('Allow access')|trans }}</option>
-								<option value="0" {% if(route.allowaccess == 0) %} selected='selected' {% endif %}>{{ ('Deny access')|trans }}</option>
-                <option value="3" {% if(route.allowaccess == 3) %} selected='selected' {% endif %}>{{ ('Groups inherit')|trans }}</option>
+								<option value="0" {% if(route.allowaccess == 0) %} selected='selected' {% endif %}>{{ ('Deny access')|trans }}</option>                
 							</select>
 							</div>
           </div>
@@ -56,11 +55,14 @@
         permissions.push(permission);
 
       });
-        console.log(JSON.stringify(permissions));
+      if((++load_wait)==1) $("#load-spinner").fadeIn();
       $.ajax({
-         url: '{{ url('userSetPermissions',{'id':id}) }}',
+         url: '{{ url('groupSetPermissions',{'id':id}) }}',
          type: 'POST',
          data: JSON.stringify(permissions),
+         complete: function(){
+           if((--load_wait)==0) $("#load-spinner").fadeOut();
+         },
          success:  function( data ) {
            if(data.result){
              toastr.success("Datos guardados correctamente", "Confirmación", confirmation);

@@ -1,5 +1,6 @@
 [
   {"id": "editUserGroups", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"genericdata", "routeParams":{"module":"Globale", "name":"UserGroups", "type":"modal" }, "modal":"UserGroups", "actionType" : "background", "confirm" :false, "tooltip":""},
+  {"id": "editUserGroupsSecurity", "type" : "default", "icon" : "fa fa-shield", "name" : "permissions", "route":"formUserGroup", "actionType" : "foreground", "confirm" :false, "tooltip":"Configurar permisos"},
   {"id": "activation", "type": "option", "options": [
       {"id": "desactivateUserGroups", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"genericdisable", "routeParams":{"module":"Globale", "name":"UserGroups"}, "confirm" :true, "actionType" : "background", "tooltip":"" },
       {"id": "activateUserGroups", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "route":"genericenable", "routeParams":{"module":"Globale", "name":"UserGroups"}, "confirm" :true, "actionType" : "background", "tooltip":"" }

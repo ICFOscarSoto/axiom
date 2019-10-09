@@ -363,3 +363,9 @@ Rotation: Rotación
 #Widgets
 #----------------------------------------------------------------------------------------------------------------------
 Searchengine: Buscador Internet
+
+#Security
+#----------------------------------------------------------------------------------------------------------------------
+Allow access: Permitir acceso
+Deny access: Denegar acceso
+Groups inherit: Heredar de grupos 

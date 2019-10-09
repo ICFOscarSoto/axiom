@@ -11,6 +11,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\Globale\Entity\GlobaleUsers;
+use App\Modules\Globale\Entity\GlobaleUserGroups;
 use App\Modules\Globale\Entity\GlobaleCompanies;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
@@ -28,10 +29,12 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use App\Modules\Email\Controller\EmailController;
 use App\Modules\Globale\Utils\GlobaleListApiUtils;
 use Symfony\Component\HttpFoundation\Session\Session;
+use App\Modules\Security\Utils\SecurityUtils;
 
 class GlobaleUsersController extends Controller
 {
    	private $class=GlobaleUsers::class;
+    private $module="Globale";
     private $utilsClass=GlobaleUsersUtils::class;
 
     /**
@@ -132,7 +135,7 @@ class GlobaleUsersController extends Controller
    */
    public function form($id, Request $request, UserPasswordEncoderInterface $encoder){
     $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-    $this->denyAccessUnlessGranted('ROLE_ADMIN');
+    if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
     $new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-new"];
     $template=dirname(__FILE__)."/../Forms/Users.json";
     $userdata=$this->getUser()->getTemplateData();
@@ -162,6 +165,50 @@ class GlobaleUsersController extends Controller
             'tabs' => [["name" => "data", "caption"=>"Datos usuario", "icon"=>"fa fa-user","active"=>true, "route"=>$this->generateUrl("dataUser",["id"=>$id])],
                        ["name" => "groups", "caption"=>"Grupos", "icon"=>"fa fa-users", "route"=>$this->generateUrl("generictablist",["module"=>"Globale", "name"=>"UsersUserGroups", "id"=>$id])],
                        ["name" => "permissions", "caption"=>"Permisos", "icon"=>"fa fa-shield", "route"=>$this->generateUrl("userPermissions",["id"=>$id])]
+                      ],
+            'include_header' => [["type"=>"css", "path"=>"/js/rickshaw/rickshaw.min.css"],
+                                 ["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker-es.js"]],
+            'include_footer' => [["type"=>"css", "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.css"],
+                                 ["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.js"],
+                                 ["type"=>"css", "path"=>"/css/timeline.css"]]
+    ));
+  }
+
+  /**
+   * @Route("/{_locale}/usergroup/form/{id}", name="formUserGroup", defaults={"id"=0})
+   */
+   public function formUserGroup($id, Request $request, UserPasswordEncoderInterface $encoder){
+    $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+    if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
+    $new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-new"];
+    $template=dirname(__FILE__)."/../Forms/UserGroups.json";
+    $userdata=$this->getUser()->getTemplateData();
+    $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
+    $breadcrumb=$menurepository->formatBreadcrumb('usergroups');
+    array_push($breadcrumb, $new_breadcrumb);
+    $userGroupRepository=$this->getDoctrine()->getRepository(GlobaleUserGroups::class);
+    $obj = $userGroupRepository->findOneBy(['id'=>$id, 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
+    if($id!=0 && $obj==null){
+        return $this->render('@Globale/notfound.html.twig',[
+          "status_code"=>404,
+          "status_text"=>"Objeto no encontrado"
+        ]);
+    }
+    $entity_name=$obj->getName();
+
+    return $this->render('@Globale/generictabform.html.twig', array(
+            'entity_name' => $entity_name,
+            'controllerName' => 'UsersController',
+            'interfaceName' => 'Grpos de Usuarios',
+            'optionSelected' => 'genericindex',
+            'optionSelectedParams' => ["module"=>"Globale", "name"=>"UserGroups"],
+            'menuOptions' =>  $menurepository->formatOptions($userdata),
+            'breadcrumb' => $breadcrumb,
+            'userData' => $userdata,
+            'id' => $id,
+            'tab' => $request->query->get('tab','permissions'), //Show initial tab, by default data tab
+            'tabs' => [
+                       ["name" => "permissions", "caption"=>"Permisos Rutas", "active"=>true, "icon"=>"fa fa-shield", "route"=>$this->generateUrl("userGroupPermissions",["id"=>$id])]
                       ],
             'include_header' => [["type"=>"css", "path"=>"/js/rickshaw/rickshaw.min.css"],
                                  ["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker-es.js"]],

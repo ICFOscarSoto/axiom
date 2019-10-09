@@ -11,6 +11,7 @@ class GlobaleUserGroupsUtils
 {
   private $module="Globale";
   private $name="UserGroups";
+
   public function getExcludedForm($params){
     return [];
   }

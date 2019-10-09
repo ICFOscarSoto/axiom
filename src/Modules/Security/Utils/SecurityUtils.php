@@ -25,7 +25,7 @@ class SecurityUtils
       $doctrine->getManager()->flush();
     }
     //Check if user has explicit policies
-    
+
     //If not, check groups policies
     return true;
   }
