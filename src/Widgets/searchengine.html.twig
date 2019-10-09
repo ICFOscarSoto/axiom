@@ -1,7 +1,6 @@
 {{ include('@Widgets/widget_head.html.twig') }}
 
 <div class="col-md-4">
-{% dump(widget.settings) %}
 {# Google #}{% if widget.settings.engine == 0%}{% set search_logo="/images/widgets/searchengines/google.png" %}{% set search_url="https://www.google.com/search?q=" %}{% endif %}
 {# Bing #}{% if widget.settings.engine == 1%}{% set search_logo="/images/widgets/searchengines/bing.png" %}{% set search_url="https://www.bing.com/search?q=" %}{% endif %}
 {# DuckDuckgo #}{% if widget.settings.engine == 2%}{% set search_logo="/images/widgets/searchengines/duckduckgo.png" %}{% set search_url="https://duckduckgo.com/?q=" %}{% endif %}

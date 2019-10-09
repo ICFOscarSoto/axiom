@@ -1,4 +1,3 @@
-{% dump(permissions) %}
 <div class="row">
     <div style="text-align: right;" class="col-md-12">
       <button attr-id="" attr-action="" id="formuser-button-cancel" type="button" class="btn btn">Cancelar</button>
@@ -26,7 +25,7 @@
             <div class="col-sm-5">
 							<select id="select-route-{{ route.route_id }}" attr-id="{{ route.route_id }}" class="form-control">
 								<option value="1" {% if(route.allowaccess == 1) %} selected='selected' {% endif %}>{{ ('Allow access')|trans }}</option>
-								<option value="0" {% if(route.allowaccess == 0) %} selected='selected' {% endif %}>{{ ('Deny access')|trans }}</option>                
+								<option value="0" {% if(route.allowaccess == 0) %} selected='selected' {% endif %}>{{ ('Deny access')|trans }}</option>
 							</select>
 							</div>
           </div>

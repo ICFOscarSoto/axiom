@@ -18,17 +18,16 @@ class ERPReferencesRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, ERPReferences::class);
     }
-    
-    
+
+
     public function ProductsBySupplier($id_supplier){
-      dump($id_supplier);
         $query="SELECT product_id FROM erpreferences e WHERE e.supplier_id=:SUP AND e.active=1 AND e.deleted=0";
          $params=['SUP' => $id_supplier];
-         $result=$this->getEntityManager()->getConnection()->executeQuery($query,$params)->fetchAll();       
+         $result=$this->getEntityManager()->getConnection()->executeQuery($query,$params)->fetchAll();
          return $result;
-       
+
      }
-    
+
 
     // /**
     //  * @return ERPReferences[] Returns an array of ERPReferences objects
