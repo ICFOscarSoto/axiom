@@ -1,0 +1,6 @@
+[
+  {"id" : "addTopCustomers", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"formAERPCustomer", "actionType" : "foreground", "confirm" :false, "tooltip" : ""},
+  {"id" : "deleteTopCustomers", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true, "tooltip":""},
+  {"id" : "printTopCustomers", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false, "tooltip":""},
+  {"id" : "exportTopCustomers", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"genericexport", "routeParams":{"module":"AERP", "name":"Customers"}, "confirm" :false, "tooltip":""}
+]

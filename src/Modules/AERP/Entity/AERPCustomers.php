@@ -3,12 +3,16 @@
 namespace App\Modules\AERP\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use \App\Modules\AERP\Entity\AERPContacts;
+use \App\Modules\Globale\Entity\GlobaleCompanies;
 use \App\Modules\Globale\Entity\GlobaleUsers;
+use \App\Modules\Globale\Entity\GlobaleCountries;
+use \App\Modules\AERP\Entity\AERPCustomerGroups;
 
 /**
- * @ORM\Entity(repositoryClass="App\Modules\AERP\Repository\AERPContactRepository")
+ * @ORM\Entity(repositoryClass="App\Modules\AERP\Repository\AERPCustomersRepository")
  */
-class AERPContact
+class AERPCustomers
 {
     /**
      * @ORM\Id()
@@ -18,20 +22,10 @@ class AERPContact
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=100)
-     */
-    private $name;
-
-    /**
-     * @ORM\Column(type="string", length=150)
-     */
-    private $lastname;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleUsers")
+     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCompanies")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $author;
+    private $company;
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleUsers")
@@ -40,14 +34,24 @@ class AERPContact
     private $agent;
 
     /**
-     * @ORM\Column(type="string", length=75, nullable=true)
+     * @ORM\Column(type="string", length=200)
      */
-    private $position;
+    private $name;
+
+    /**
+     * @ORM\Column(type="string", length=14)
+     */
+    private $vat;
 
     /**
      * @ORM\Column(type="string", length=150, nullable=true)
      */
     private $address;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCountries")
+     */
+    private $country;
 
     /**
      * @ORM\Column(type="string", length=70, nullable=true)
@@ -70,14 +74,45 @@ class AERPContact
     private $postbox;
 
     /**
-     * @ORM\Column(type="boolean")
+     * @ORM\ManyToOne(targetEntity="\App\Modules\AERP\Entity\AERPContacts")
      */
-    private $privacyaccepted;
+    private $shippcontact;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\AERP\Entity\AERPCustomerGroups")
+     */
+    private $customergroup;
+    
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    private $maxrisk;
+
+    /**
+     * @ORM\Column(type="float")
+     */
+    private $risk;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleUsers")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $author;
 
     /**
      * @ORM\Column(type="boolean")
      */
-    private $allowmarketing;
+    private $taxexempt;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $surcharge;
+
+    /**
+     * @ORM\Column(type="string", length=175)
+     */
+    private $web;
 
     /**
      * @ORM\Column(type="boolean")
@@ -117,14 +152,74 @@ class AERPContact
         return $this;
     }
 
-    public function getLastname(): ?string
+    public function getAgent(): ?GlobaleUsers
     {
-        return $this->lastname;
+        return $this->agent;
     }
 
-    public function setLastname(string $lastname): self
+    public function setAgent(?GlobaleUsers $agent): self
     {
-        $this->lastname = $lastname;
+        $this->agent = $agent;
+
+        return $this;
+    }
+
+    public function getVat(): ?string
+    {
+        return $this->vat;
+    }
+
+    public function setVat(string $vat): self
+    {
+        $this->vat = $vat;
+
+        return $this;
+    }
+
+    public function getShippcontact(): ?AERPContacts
+    {
+        return $this->shippcontact;
+    }
+
+    public function setShippcontact(?AERPContacts $shippcontact): self
+    {
+        $this->shippcontact = $shippcontact;
+
+        return $this;
+    }
+
+    public function getMaxrisk(): ?float
+    {
+        return $this->maxrisk;
+    }
+
+    public function setMaxrisk(?float $maxrisk): self
+    {
+        $this->maxrisk = $maxrisk;
+
+        return $this;
+    }
+
+    public function getRisk(): ?float
+    {
+        return $this->risk;
+    }
+
+    public function setRisk(float $risk): self
+    {
+        $this->risk = $risk;
+
+        return $this;
+    }
+
+    public function getCompany(): ?GlobaleCompanies
+    {
+        return $this->company;
+    }
+
+    public function setCompany(?GlobaleCompanies $company): self
+    {
+        $this->company = $company;
 
         return $this;
     }
@@ -141,26 +236,38 @@ class AERPContact
         return $this;
     }
 
-    public function getAgent(): ?GlobaleUsers
+    public function getTaxexempt(): ?bool
     {
-        return $this->agent;
+        return $this->taxexempt;
     }
 
-    public function setAgent(?GlobaleUsers $agent): self
+    public function setTaxexempt(bool $taxexempt): self
     {
-        $this->agent = $agent;
+        $this->taxexempt = $taxexempt;
 
         return $this;
     }
 
-    public function getPosition(): ?string
+    public function getSurcharge(): ?bool
     {
-        return $this->position;
+        return $this->surcharge;
     }
 
-    public function setPosition(?string $position): self
+    public function setSurcharge(bool $surcharge): self
     {
-        $this->position = $position;
+        $this->surcharge = $surcharge;
+
+        return $this;
+    }
+
+    public function getWeb(): ?string
+    {
+        return $this->web;
+    }
+
+    public function setWeb(string $web): self
+    {
+        $this->web = $web;
 
         return $this;
     }
@@ -173,6 +280,18 @@ class AERPContact
     public function setAddress(?string $address): self
     {
         $this->address = $address;
+
+        return $this;
+    }
+
+    public function getCountry(): ?GlobaleCountries
+    {
+        return $this->country;
+    }
+
+    public function setCountry(?GlobaleCountries $country): self
+    {
+        $this->country = $country;
 
         return $this;
     }
@@ -225,30 +344,6 @@ class AERPContact
         return $this;
     }
 
-    public function getPrivacyaccepted(): ?bool
-    {
-        return $this->privacyaccepted;
-    }
-
-    public function setPrivacyaccepted(bool $privacyaccepted): self
-    {
-        $this->privacyaccepted = $privacyaccepted;
-
-        return $this;
-    }
-
-    public function getAllowmarketing(): ?bool
-    {
-        return $this->allowmarketing;
-    }
-
-    public function setAllowmarketing(bool $allowmarketing): self
-    {
-        $this->allowmarketing = $allowmarketing;
-
-        return $this;
-    }
-
     public function getActive(): ?bool
     {
         return $this->active;
@@ -296,4 +391,18 @@ class AERPContact
 
         return $this;
     }
+
+    public function getCustomergroup(): ?AERPCustomerGroups
+    {
+        return $this->customergroup;
+    }
+
+    public function setCustomergroup(?AERPCustomerGroups $customergroup): self
+    {
+        $this->customergroup = $customergroup;
+
+        return $this;
+    }
+
+
 }
