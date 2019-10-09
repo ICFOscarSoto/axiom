@@ -23,13 +23,13 @@ class ERPCustomersPrices
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPCustomers")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     private $customer;
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPCustomerGroups")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     private $customergroup;
 
@@ -65,7 +65,7 @@ class ERPCustomersPrices
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCompanies")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     private $company;
 
@@ -181,7 +181,7 @@ class ERPCustomersPrices
 
         return $this;
     }
-    
+
     public function formValidation($kernel, $doctrine, $user, $validationParams){
           $repository=$doctrine->getRepository(ERPCustomersPrices::class);
           $grupodefecto=$repository->checkDefaultGroup($this->customer, $this->customergroup, $this->company);
@@ -199,5 +199,5 @@ class ERPCustomersPrices
             return ["valid"=>false, "global_errors"=>["Ya existe un registro repetido para esos parámetros."]];
           else return ["valid"=>true];
       }
-      
+
 }

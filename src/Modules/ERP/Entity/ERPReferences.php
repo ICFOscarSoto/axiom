@@ -26,6 +26,7 @@ class ERPReferences
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPCustomers")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     private $customer;
 
@@ -62,6 +63,7 @@ class ERPReferences
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPSuppliers")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     private $supplier;
 

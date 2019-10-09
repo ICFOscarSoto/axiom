@@ -8,7 +8,6 @@ use \App\Modules\Globale\Entity\GlobaleCountries;
 use \App\Modules\ERP\Entity\ERPCustomerGroups;
 use \App\Modules\ERP\Entity\ERPPaymentMethods;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
-use \App\Modules\ERP\Entity\ERPBankAccounts;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPCustomersRepository")
@@ -44,13 +43,13 @@ class ERPCustomers
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleStates")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false, onDelete="Cascade")
      */
     private $state;
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCountries")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false, onDelete="Cascade")
      */
     private $country;
 
@@ -106,13 +105,13 @@ class ERPCustomers
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPCustomerGroups")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false, onDelete="Cascade")
      */
     private $customergroup;
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPPaymentMethods")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false, onDelete="Cascade")
      */
     private $paymentmethod;
 
@@ -162,12 +161,7 @@ class ERPCustomers
      */
     private $company;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPBankAccounts")
-     */
-    private $bankaccount;
-
-    /**
+        /**
      * @ORM\Column(type="boolean", nullable=true)
      */
     private $surcharge;
@@ -497,18 +491,6 @@ class ERPCustomers
     public function setCompany(?GlobaleCompanies $company): self
     {
         $this->company = $company;
-
-        return $this;
-    }
-
-    public function getBankaccount(): ?ERPBankAccounts
-    {
-        return $this->bankaccount;
-    }
-
-    public function setBankaccount(?ERPBankAccounts $bankaccount): self
-    {
-        $this->bankaccount = $bankaccount;
 
         return $this;
     }

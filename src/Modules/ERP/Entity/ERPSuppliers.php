@@ -49,7 +49,7 @@ class ERPSuppliers
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCountries")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     private $country;
 
@@ -95,6 +95,7 @@ class ERPSuppliers
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleActivities")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     private $activity;
 
@@ -106,6 +107,7 @@ class ERPSuppliers
 
     /**
      * @ORM\Column(type="string", length=16, nullable=true)
+     *
      */
     private $taxexection;
 
@@ -180,7 +182,7 @@ class ERPSuppliers
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleStates")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     private $state;
 

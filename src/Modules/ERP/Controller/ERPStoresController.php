@@ -15,10 +15,12 @@ use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\ERP\Utils\ERPStoresUtils;
+use App\Modules\Security\Utils\SecurityUtils;
 
 class ERPStoresController extends Controller
 {
 	private $class=ERPStores::class;
+	private $module='ERP';
 	private $utilsClass=ERPStoresUtils::class;
 
     /**
@@ -26,7 +28,9 @@ class ERPStoresController extends Controller
      */
     public function index(RouterInterface $router,Request $request)
     {
-       $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+      $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
+
   		//$this->denyAccessUnlessGranted('ROLE_ADMIN');
   		$userdata=$this->getUser()->getTemplateData();
   		$locale = $request->getLocale();

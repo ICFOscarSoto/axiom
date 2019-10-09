@@ -22,17 +22,19 @@ class ERPIncrements
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPSuppliers")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     private $supplier;
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPCategories")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     private $category;
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPCustomerGroups")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false,onDelete="CASCADE")
      */
     private $customergroup;
 
@@ -58,7 +60,7 @@ class ERPIncrements
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCompanies")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     private $company;
 
@@ -180,15 +182,15 @@ class ERPIncrements
 
         return $this;
     }
-    
-    
+
+
 
 public function formValidation($kernel, $doctrine, $user, $validationParams){
       $repository=$doctrine->getRepository(ERPIncrements::class);
-      
+
       $valido=$repository->checkSupplierOnCategory($this->supplier, $this->category,$this->company);
       $repetido=$repository->checkRepeated($this->id,$this->supplier, $this->category,$this->customergroup,$this->company);
-/*      
+/*
       if($valido==NULL)
         return ["valid"=>false, "global_errors"=>["No existe ningún producto para ese proveedor en esa categoría."]];
       else*/
@@ -215,7 +217,7 @@ public function formValidation($kernel, $doctrine, $user, $validationParams){
       else return ["valid"=>true];
     */
     }
-    
+
     public function postProccess($kernel, $doctrine, $user){
       $em = $doctrine->getManager();
       $repositoryProduct=$doctrine->getRepository(ERPProducts::class);

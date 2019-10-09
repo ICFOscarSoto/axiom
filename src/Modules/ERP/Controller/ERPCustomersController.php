@@ -19,10 +19,12 @@ use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\ERP\Utils\ERPCustomersUtils;
 use App\Modules\ERP\Utils\ERPCustomersPricesUtils;
+use App\Modules\Security\Utils\SecurityUtils;
 
 class ERPCustomersController extends Controller
 {
 	private $class=ERPCustomers::class;
+	private $module='ERP';
 	private $utilsClass=ERPCustomersUtils::class;
     /**
      * @Route("/{_locale}/admin/global/customers", name="customers")
@@ -30,6 +32,8 @@ class ERPCustomersController extends Controller
     public function index(RouterInterface $router,Request $request)
     {
       $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
+
   		//$this->denyAccessUnlessGranted('ROLE_ADMIN');
   		$userdata=$this->getUser()->getTemplateData();
   		$locale = $request->getLocale();

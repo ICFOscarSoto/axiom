@@ -38,6 +38,7 @@ class ERPEAN13
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPCustomers")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     private $customer;
 

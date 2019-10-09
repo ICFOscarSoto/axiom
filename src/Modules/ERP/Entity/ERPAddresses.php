@@ -44,7 +44,7 @@ class ERPAddresses
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleStates")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false, onDelete="Cascade")
      */
     private $state;
 
@@ -80,12 +80,13 @@ class ERPAddresses
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCountries")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false, onDelete="Cascade")
      */
     private $country;
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPSuppliers")
+     * @ORM\JoinColumn(onDelete="Cascade")
      */
     private $supplier;
 
@@ -94,6 +95,7 @@ class ERPAddresses
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPCustomers")
+     * @ORM\JoinColumn(onDelete="Cascade")
      */
     private $customer;
 
