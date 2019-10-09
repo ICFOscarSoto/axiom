@@ -187,7 +187,7 @@ public function formValidation($kernel, $doctrine, $user, $validationParams){
       $repository=$doctrine->getRepository(ERPIncrements::class);
       
       $valido=$repository->checkSupplierOnCategory($this->supplier, $this->category,$this->company);
-      $repetido=$repository->checkRepeated($this->supplier, $this->category,$this->customergroup,$this->company);
+      $repetido=$repository->checkRepeated($this->id,$this->supplier, $this->category,$this->customergroup,$this->company);
 /*      
       if($valido==NULL)
         return ["valid"=>false, "global_errors"=>["No existe ningún producto para ese proveedor en esa categoría."]];
@@ -214,5 +214,18 @@ public function formValidation($kernel, $doctrine, $user, $validationParams){
         return ["valid"=>false, "global_errors"=>["La fecha final es anterior a la fecha de inicio."]];
       else return ["valid"=>true];
     */
+    }
+    
+    public function postProccess($kernel, $doctrine, $user){
+      $em = $doctrine->getManager();
+      $repositoryProduct=$doctrine->getRepository(ERPProducts::class);
+      $repository=$doctrine->getRepository(ERPSuppliers::class);
+      $products=$repository->productsBySupplier($this->supplier->getId());
+      foreach($products as $product){
+        $productEntity=$repositoryProduct->findOneBy(["id"=>$product]);
+        $productEntity->PVPCalculated($doctrine);
+        $em->persist($productEntity);
+        $em->flush();
+      }
     }
 }

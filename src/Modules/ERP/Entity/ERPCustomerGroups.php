@@ -149,8 +149,8 @@ class ERPCustomerGroups
     public function formValidation($kernel, $doctrine, $user, $validationParams){
       //Check for overlapped periods
       $repository=$doctrine->getRepository(ERPCustomerGroups::class);
-      $groups=$repository->findBy(["name"=>$this->name,"company"=>$this->company,"active"=>1,"deleted"=>0]);
-      if($groups!=null)
+      $exists=$repository->checkRepeated($this->id,$this->name);
+      if($exists!=null)
         return ["valid"=>false, "global_errors"=>["Ya existe un grupo de clientes con ese nombre"]];
       else return ["valid"=>true];
     }
@@ -158,6 +158,19 @@ class ERPCustomerGroups
     public function preProccess($kernel, $doctrine, $user){
         $this->name=strtoupper($this->name);
       
+      }
+      
+      public function postProccess($kernel, $doctrine, $user){
+        $em = $doctrine->getManager();
+        $repositoryProduct=$doctrine->getRepository(ERPProducts::class);
+        $repository=$doctrine->getRepository(ERPSuppliers::class);
+        $products=$repository->findBy(["active"=>1,"deleted"=>0]);
+        foreach($products as $product){
+          $productEntity=$repositoryProduct->findOneBy(["id"=>$product]);
+          $productEntity->PVPCalculated($doctrine);
+          $em->persist($productEntity);
+          $em->flush();
+        }
       }
 
 }

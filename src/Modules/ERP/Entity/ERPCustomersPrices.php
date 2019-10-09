@@ -181,16 +181,23 @@ class ERPCustomersPrices
 
         return $this;
     }
-    /*
+    
     public function formValidation($kernel, $doctrine, $user, $validationParams){
           $repository=$doctrine->getRepository(ERPCustomersPrices::class);
-
-          $repetido=$repository->checkRepeated($this->supplier, $this->category,$this->customergroup,$this->company);
-          if($valido==NULL)
+          $grupodefecto=$repository->checkDefaultGroup($this->customer, $this->customergroup, $this->company);
+          $repetido=$repository->checkRepeated($this->customer, $this->supplier, $this->category, $this->customergroup, $this->company);
+          if($grupodefecto!=NULL){
+            return ["valid"=>false, "global_errors"=>["Has seleccionado el grupo de cliente por defecto para este cliente. Por favor elige otro."]];
+          }
+          else if($this->supplier==NULL AND $this->category==NULL)
+            return ["valid"=>false, "global_errors"=>["Por favor, selecciona un proveedor y/o una  categoría."]];
+          /*
+          else if($valido==NULL)
             return ["valid"=>false, "global_errors"=>["No existe ningún producto para ese proveedor en esa categoría."]];
+          */
           else if($repetido!=NULL)
             return ["valid"=>false, "global_errors"=>["Ya existe un registro repetido para esos parámetros."]];
           else return ["valid"=>true];
-      }*/
+      }
       
 }

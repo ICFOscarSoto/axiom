@@ -7,6 +7,7 @@ use \App\Modules\ERP\Entity\ERPManufacturers;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
 use \App\Modules\ERP\Entity\ERPCategories;
 use \App\Modules\ERP\Entity\ERPSuppliers;
+use \App\Modules\ERP\Entity\ERPCustomerGroups;
 use \App\Modules\HR\Entity\HRWorkers;
 use \App\Modules\Globale\Entity\GlobaleTaxes;
 
@@ -602,8 +603,53 @@ class ERPProducts
       return $shoppingDiscounts->getDiscount();
     }
 
+
+
     public function priceCalculated($doctrine){
       $this->setShoppingPrice($this->PVPR*(1-$this->getShoppingDiscount($doctrine)/100));
+    }
+
+    public function getMaxIncrement($doctrine){
+
+      $repository=$doctrine->getRepository(ERPIncrements::class);
+      $category=$this->category;
+      //cogemos el máximo incremento para su proveedor y su categoria
+      $maxincrement=$repository->getMaxIncrement($this->supplier,$category);
+      //si no tiene, buscamos incremento para ese proveedor y sus categorias padre
+      while ($category->getParentid()!=null && $maxincrement==null){
+          $category=$category->getParentid();
+          $maxincrement=$repository->getMaxIncrement($this->supplier,$category);
+      }
+      //si no hemos encontrado ningun incremento para ese proveedor y sus categorias padre,
+      //buscamos incremento específico para ese proveedor
+      if ($maxincrement==null)
+          $maxincrement=$repository->getMaxIncrement($this->supplier,null);
+      //si no hay incremento específico para ese proveedor, buscamos incremento solo por categoria
+      if ($maxincrement==null){
+        $category=$this->category;
+        $maxincrement=$repository->getMaxIncrement(null,$category);
+
+        //Si no hay incremento únicamente para su categoría. se busca incrementos para las categorías padre
+        while ($category->getParentid()!=null && $maxincrement==null){
+            $category=$category->getParentid();
+            $maxincrement=$repository->getMaxIncrement(null,$category);
+          }
+       }
+       //llegados a este punto, no hemos encontrado incrementos, por lo que habrá que buscar el incremento general
+       //en los grupos de clientes
+      if ($maxincrement==null){
+        $repository=$doctrine->getRepository(ERPCustomerGroups::class);
+        $maxincrement=$repository->getMaxIncrement();
+      }
+        return $maxincrement;
+
+    }
+
+    public function PVPCalculated($doctrine){
+        $IncrementsRepository=$doctrine->getRepository(ERPIncrements::class);
+        $this->setPVP($this->shoppingPrice*(1+($this->getMaxIncrement($doctrine)/100)));
+
+
     }
 
     public function preProccess($kernel, $doctrine, $user, $params, $oldobj){
