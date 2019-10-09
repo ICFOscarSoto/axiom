@@ -54,12 +54,18 @@ class GlobaleUsersUserGroupsUtils
   }
 
 
-  public function formatList($user){
+  public function formatList($user, $id){
     $list=[
       'id' => 'list'.$this->name,
       'route' => 'genericlist',
       'routeParams' => ["module" => $this->module,
-                        "name" => $this->name],
+                        "name" => $this->name,
+                        "parent" => $id,
+                        "id" => $id,
+                        "field" => "user",
+                        "parentModule" => "Globale",
+                        "parentName" => "Users"
+                      ],
       'orderColumn' => 2,
       'orderDirection' => 'ASC',
       'tagColumn' => 2,

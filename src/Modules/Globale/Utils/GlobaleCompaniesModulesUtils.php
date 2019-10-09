@@ -53,12 +53,18 @@ class GlobaleCompaniesModulesUtils
     ];
   }
 
-  public function formatList($user){
+  public function formatList($user, $company){
     $list=[
       'id' => 'list'.$this->name,
       'route' => 'genericlist',
       'routeParams' => ["module" => $this->module,
-                        "name" => $this->name],
+                        "name" => $this->name,
+                        "parent" => $company,
+                        "id" => $company,
+                        "field" => "companyown",
+                        "parentModule" => "Globale",
+                        "parentName" => "Companies"
+                      ],
       'orderColumn' => 2,
       'orderDirection' => 'ASC',
       'tagColumn' => 2,
