@@ -19,6 +19,10 @@ Calendar:
     resource: 'App\Modules\Calendar\Controller\CalendarController'
     type:     annotation
 
+Permissions:
+    resource: 'App\Modules\Globale\Controller\GlobalePermissionsController'
+    type:     annotation
+
 Company:
     resource: 'App\Modules\Globale\Controller\GlobaleCompaniesController'
     type:     annotation
@@ -262,3 +266,7 @@ Widgets:
 Navision:
   resource: 'App\Modules\Navision\Controller\NavisionController'
   type:     annotation
+
+AERPCustomer:
+  resource: 'App\Modules\AERP\Controller\AERPCustomersController'
+  type:      annotation

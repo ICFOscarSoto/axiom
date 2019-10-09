@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\Globale\Entity\GlobaleUsersWidgets;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\Widgets\Entity\WidgetsSearchengineRepository")
+ * @ORM\Entity(repositoryClass="App\Widgets\Repository\WidgetsSearchengineRepository")
  */
 class WidgetsSearchengine
 {

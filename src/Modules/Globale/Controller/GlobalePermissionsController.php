@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Security\Utils\SecurityUtils;
 use App\Modules\Globale\Entity\GlobaleUsers;
 use App\Modules\Globale\Entity\GlobaleUserGroups;
+use App\Modules\Globale\Entity\GlobaleModules;
 use App\Modules\Globale\Entity\GlobalePermissionsRoutes;
 use App\Modules\Globale\Entity\GlobalePermissionsRoutesUsers;
 use App\Modules\Globale\Entity\GlobaleCompaniesModules;
@@ -33,11 +34,16 @@ class GlobalePermissionsController extends Controller
     public function userPermissions($id, RouterInterface $router,Request $request){
       //Get company user modules enabled
       $companiesModulesRepository=$this->getDoctrine()->getRepository(GlobaleCompaniesModules::class);
+      $modulesRepository=$this->getDoctrine()->getRepository(GlobaleModules::class);
+      $permissionsRoutesUsersRepository=$this->getDoctrine()->getRepository(GlobalePermissionsRoutesUsers::class);
+      $moduleGlobal=$modulesRepository->findOneBy(["name"=>"Globale"]);
       $modules=$companiesModulesRepository->findBy(["companyown"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
+
       //Get routers for each module
       $permisions=[];
+      $permissions[$moduleGlobal->getName()]["description"]=$moduleGlobal->getDescription();
+      $permissions[$moduleGlobal->getName()]["routes"]=$permissionsRoutesUsersRepository->findByUserModule($id, $moduleGlobal->getId());
       foreach($modules as $key=>$module){
-        $permissionsRoutesUsersRepository=$this->getDoctrine()->getRepository(GlobalePermissionsRoutesUsers::class);
         $permissions[$module->getModule()->getName()]["description"]=$module->getModule()->getDescription();
         $permissions[$module->getModule()->getName()]["routes"]=$permissionsRoutesUsersRepository->findByUserModule($id, $module->getModule()->getId());
       }
@@ -89,12 +95,16 @@ class GlobalePermissionsController extends Controller
         */
        public function userGroupPermissions($id, RouterInterface $router,Request $request){
          //Get company user modules enabled
+         $modulesRepository=$this->getDoctrine()->getRepository(GlobaleModules::class);
          $companiesModulesRepository=$this->getDoctrine()->getRepository(GlobaleCompaniesModules::class);
+         $permissionsRoutesUsersRepository=$this->getDoctrine()->getRepository(GlobalePermissionsRoutesUserGroups::class);
+         $moduleGlobal=$modulesRepository->findOneBy(["name"=>"Globale"]);
          $modules=$companiesModulesRepository->findBy(["companyown"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
          //Get routers for each module
          $permisions=[];
+         $permissions[$moduleGlobal->getName()]["description"]=$moduleGlobal->getDescription();
+         $permissions[$moduleGlobal->getName()]["routes"]=$permissionsRoutesUsersRepository->findByUserGroupModule($id, $moduleGlobal->getId());
          foreach($modules as $key=>$module){
-           $permissionsRoutesUsersRepository=$this->getDoctrine()->getRepository(GlobalePermissionsRoutesUserGroups::class);
            $permissions[$module->getModule()->getName()]["description"]=$module->getModule()->getDescription();
            $permissions[$module->getModule()->getName()]["routes"]=$permissionsRoutesUsersRepository->findByUserGroupModule($id, $module->getModule()->getId());
          }
