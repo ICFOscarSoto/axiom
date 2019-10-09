@@ -16,7 +16,9 @@
 		"fields": [
 			{ "name": "address", "cols": 6},
 			{ "name": "city","cols": 2},
-			{ "name": "state","cols": 2},
+			{ "name": "state","cols": 2,"trigger":{"field":"country", "route":"generictrigger",
+				"moduleTrigger":"Globale", "classTrigger":"GlobaleCountries",
+				"module":"Globale", "class":"GlobaleStates", "relationParameter":"country"}},
 			{ "name": "country","cols": 2},
 			{ "name": "postcode","cols": 3}
 		]
