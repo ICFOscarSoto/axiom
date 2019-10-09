@@ -1,0 +1,35 @@
+{% dump(permissions) %}
+<div class="row">
+{% for key, permission in permissions %}
+
+		<div class="col-md-12">
+			<div class="panel panel-default panel-shadow" data-collapsed="0" style="-webkit-box-shadow: none; box-shadow:none; padding:0px"><!-- to apply shadow add class "panel-shadow" -->
+				<!-- panel head -->
+				<div class="panel-heading" style="height: 34px;">
+					<div class="panel-title"><bold>{{ key }}</bold> - {{ permission.description }}</div>
+					<div class="panel-options" style="padding: 0px 10px; margin-top: -7px;">
+						<a href="#" data-rel="collapse"><i class="entypo-down-open"></i></a>
+					</div>
+				</div>
+				<!-- panel body -->
+				<div class="panel-body">
+					{% for routes in permission.routes %}
+          <div class="form-group">
+            <label for="field-3" class="col-sm-5 control-label">{{ routes.description }}</label>
+            <div class="col-sm-5">
+							<select class="form-control">
+								<option>Permitir acceso</option>
+								<option>Denegar acceso</option>
+                <option>Heredar de grupo</option>
+							</select>
+							</div>
+          </div>
+          <br/><br/>
+
+          {% endfor %}
+				</div>
+			</div>
+		</div>
+
+{% endfor %}
+	</div>

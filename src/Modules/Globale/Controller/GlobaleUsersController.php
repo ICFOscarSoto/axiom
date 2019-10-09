@@ -160,8 +160,8 @@ class GlobaleUsersController extends Controller
             'id' => $id,
             'tab' => $request->query->get('tab','data'), //Show initial tab, by default data tab
             'tabs' => [["name" => "data", "caption"=>"Datos usuario", "icon"=>"fa fa-user","active"=>true, "route"=>$this->generateUrl("dataUser",["id"=>$id])],
-                       ["name" => "groups", "caption"=>"Grupos", "icon"=>"fa fa-users", "route"=>$this->generateUrl("generictablist",["module"=>"Globale", "name"=>"UsersUserGroups", "id"=>$id])]
-
+                       ["name" => "groups", "caption"=>"Grupos", "icon"=>"fa fa-users", "route"=>$this->generateUrl("generictablist",["module"=>"Globale", "name"=>"UsersUserGroups", "id"=>$id])],
+                       ["name" => "permissions", "caption"=>"Permisos", "icon"=>"fa fa-shield", "route"=>$this->generateUrl("userPermissions",["id"=>$id])]
                       ],
             'include_header' => [["type"=>"css", "path"=>"/js/rickshaw/rickshaw.min.css"],
                                  ["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker-es.js"]],

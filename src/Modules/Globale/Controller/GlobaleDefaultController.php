@@ -15,6 +15,7 @@ use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleExportUtils;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use App\Modules\Security\Utils\SecurityUtils;
 
 /**
  * @Route("/")
@@ -54,6 +55,7 @@ class GlobaleDefaultController extends Controller
     public function genericindex($module, $name, RouterInterface $router,Request $request)
     {
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+    if(!SecurityUtils::checkRoutePermissions($module,$name.'_genericindex',$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
 		//$this->denyAccessUnlessGranted('ROLE_ADMIN');
 		$userdata=$this->getUser()->getTemplateData();
 		$locale = $request->getLocale();
