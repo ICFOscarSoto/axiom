@@ -11,7 +11,6 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\ERP\Entity\ERPBankAccounts;
-use App\Modules\ERP\Entity\ERPSuppliers;
 use App\Modules\Globale\Entity\GlobaleCountries;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
@@ -40,8 +39,6 @@ class ERPBankAccountsController extends Controller
 			$formUtils=new GlobaleFormUtils();
 			$formUtils->initialize($this->getUser(), new $this->class(), dirname(__FILE__)."/../Forms/BankAccounts.json", $request, $this, $this->getDoctrine());
 			$templateForms[]=$formUtils->formatForm('bankaccounts', true, $id, $this->class, "dataBankAccounts",["id"=>$id, "action"=>"save"]);
-			$entitiesrepository=$this->getDoctrine()->getRepository(ERPSuppliers::class);
-			$entity=$entitiesrepository->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany(), "deleted"=>0]);
 			if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
   			return $this->render('@Globale/list.html.twig', [
 					'listConstructor' => $templateLists,
@@ -65,15 +62,13 @@ class ERPBankAccountsController extends Controller
 		 $utils = new GlobaleFormUtils();
 		 $utilsObj=new $this->utilsClass();
 		 if($identity==0) $identity=$request->query->get('entity');
-		 $defaultSupplier=$this->getDoctrine()->getRepository(ERPSuppliers::class);
 		 $bankaccountRepository=$this->getDoctrine()->getRepository(ERPBankAccounts::class);
 		 $obj=new $this->class();
 		 if($id==0){
 		 	if($identity==0 ) $identity=$request->query->get('entity');
 		 	if($identity==0 || $identity==null) $identity=$request->request->get('id-parent',0);
-		 	$supplier = $defaultSupplier->find($identity);
 		}else $obj = $bankaccountRepository->find($id);
-		 $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "supplier"=>$id==0?$supplier:$obj->getSupplier()];
+		 $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser()];
 		 $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),
 		 												method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
 		 return $utils->make($id, $this->class, $action, "formIdentities", "modal");
@@ -96,15 +91,13 @@ class ERPBankAccountsController extends Controller
   public function indexlist($id,RouterInterface $router,Request $request){
     $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
     $user = $this->getUser();
-		$supplierRepository=$this->getDoctrine()->getRepository(ERPSuppliers::class);
-		$supplier = $supplierRepository->find($id);
     $locale = $request->getLocale();
     $this->router = $router;
     $manager = $this->getDoctrine()->getManager();
     $repository = $manager->getRepository(ERPBankAccounts::class);
     $listUtils=new GlobaleListUtils();
     $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/BankAccounts.json"),true);
-    $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, ERPBankAccounts::class,[["column"=>"supplier", "value"=>$supplier]]);
+    $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, ERPBankAccounts::class);
     return new JsonResponse($return);
 
   }

@@ -306,7 +306,9 @@ class GlobaleDefaultController extends Controller
         $relationParameter = $request->request->get("prm");
    		 	$triggerRepository = $this->getDoctrine()->getRepository("\App\Modules\\".$triggermodule."\Entity\\".$triggername);
    			$repository = $this->getDoctrine()->getRepository("\App\Modules\\".$module."\Entity\\".$class);
+        if(property_exists($class,'company'))
    			$triggerObj=$triggerRepository->findOneBy(["id"=>$id, "active"=>1,"deleted"=>0, "company"=>$this->getUser()->getCompany()]);
+        else 	$triggerObj=$triggerRepository->findOneBy(["id"=>$id, "active"=>1,"deleted"=>0]);
    			$objects=$repository->findBy([$relationParameter=>$triggerObj,"active"=>1,"deleted"=>0]);
    			$return=[];
    			foreach($objects as $item){
