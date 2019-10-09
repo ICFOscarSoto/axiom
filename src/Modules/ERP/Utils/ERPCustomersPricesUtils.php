@@ -13,7 +13,7 @@ class ERPCustomersPricesUtils
   private $module="ERP";
   private $name="CustomersPrices";
   public $parentClass="\App\Modules\ERP\Entity\ERPCustomers";
-  public $parentField="customers";
+  public $parentField="customer";
 
   
   public function getExcludedForm($params){

@@ -18,6 +18,72 @@ class ERPCustomersPricesRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, ERPCustomersPrices::class);
     }
+    
+    
+  public function checkDefaultGroup($customer,$customergroup, $company){
+    
+    $query="SELECT * FROM erpcustomers c WHERE c.id=:CUST AND c.customergroup_id=:GRP AND c.active=1 AND c.deleted=0 AND c.company_id=:COMP";
+    $params=['CUST' => $customer->getId(),
+             'GRP' => $customergroup->getId(),
+             'COMP' => $company->getId()
+             ];
+    $result=$this->getEntityManager()->getConnection()->executeQuery($query,$params)->fetch();
+    return $result;
+  
+  }
+  
+  public function checkRepeated($customer, $supplier,$category,$customergroup,$company){
+    
+    if($category!=NULL AND $supplier!=NULL AND $customergroup!=NULL)
+    {
+      $query="SELECT * FROM erpincrements e WHERE e.id=:CUST AND e.category_id=:CAT AND e.supplier_id=:SUP AND e.customergroup_id=:GRP AND e.active=1 AND e.deleted=0";
+      $params=['CUST' => $customer->getId(),
+               'CAT' => $category->getId(),
+               'SUP' => $supplier->getId(),
+               'GRP' => $customergroup->getId(),
+               'COMP' => $company->getId()
+               ];
+
+    }
+    else if($category!=NULL AND $customergroup!=NULL)
+    {
+    
+      $query="SELECT * FROM erpincrements e WHERE e.id=:CUST AND e.category_id=:CAT AND e.customergroup_id=:GRP AND e.supplier_id IS NULL AND e.active=1 AND e.deleted=0";
+      $params=['CUST' => $customer->getId(),
+               'CAT' => $category->getId(),
+               'GRP' => $customergroup->getId(),
+               'COMP' => $company->getId()
+               ];
+    
+    }
+    
+    else if($supplier!=NULL AND $customergroup!=NULL)
+    {
+    
+      $query="SELECT * FROM erpincrements e WHERE e.id=:CUST AND e.supplier_id=:SUP AND e.customergroup_id=:GRP AND e.category_id IS NULL AND e.active=1 AND e.deleted=0";
+      $params=['CUST' => $customer->getId(),
+               'SUP' => $supplier->getId(),
+               'GRP' => $customergroup->getId(),
+               'COMP' => $company->getId()
+               ];
+    
+    }
+    
+    else 
+    {
+      $query="SELECT * FROM erpincrements e WHERE e.id=:CUST AND e.customergroup_id=:GRP AND e.category_id=NULL AND e.supplier_id IS NULL AND e.active=1 AND e.deleted=0";
+      $params=[ 'CUST' => $customer->getId(),
+                'GRP' => $customergroup->getId(),
+                'COMP' => $company->getId()
+               ];
+    }
+   
+   
+            
+   $result=$this->getEntityManager()->getConnection()->executeQuery($query,$params)->fetch();
+   return $result;
+
+ }
 
     // /**
     //  * @return ERPCustomersPrices[] Returns an array of ERPCustomersPrices objects

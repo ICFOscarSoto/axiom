@@ -37,9 +37,9 @@ class ERPIncrementsRepository extends ServiceEntityRepository
 
    }
    
-   public function checkRepeated($supplier,$category,$customergroup,$company){
+   public function checkRepeated($id,$supplier,$category,$customergroup,$company){
      
-     if($category!=NULL AND $supplier!=NULL AND $customergroup!=NULL)
+     if($category!=NULL AND $supplier!=NULL AND $customergroup!=NULL AND $id==NULL)
      {
        $query="SELECT * FROM erpincrements e WHERE e.category_id=:CAT AND e.supplier_id=:SUP AND e.customergroup_id=:CUST AND e.active=1 AND e.deleted=0";
        $params=['CAT' => $category->getId(),
@@ -49,7 +49,7 @@ class ERPIncrementsRepository extends ServiceEntityRepository
                 ];
 
      }
-     else if($category!=NULL AND $customergroup!=NULL)
+     else if($category!=NULL AND $customergroup!=NULL AND $id==NULL)
      {
      
        $query="SELECT * FROM erpincrements e WHERE e.category_id=:CAT AND e.customergroup_id=:CUST AND e.supplier_id IS NULL AND e.active=1 AND e.deleted=0";
@@ -60,7 +60,7 @@ class ERPIncrementsRepository extends ServiceEntityRepository
      
      }
      
-     else if($supplier!=NULL AND $customergroup!=NULL)
+     else if($supplier!=NULL AND $customergroup!=NULL AND $id==NULL)
      {
      
        $query="SELECT * FROM erpincrements e WHERE e.supplier_id=:SUP AND e.customergroup_id=:CUST AND e.category_id IS NULL AND e.active=1 AND e.deleted=0";
@@ -71,19 +71,56 @@ class ERPIncrementsRepository extends ServiceEntityRepository
      
      }
      
-     else 
+     else if($id==NULL)
      {
        $query="SELECT * FROM erpincrements e WHERE e.customergroup_id=:CUST AND e.category_id=NULL AND e.supplier_id IS NULL AND e.active=1 AND e.deleted=0";
        $params=[ 'CUST' => $customergroup->getId(),
                 'COMP' => $company->getId()
                 ];
+        $result=$this->getEntityManager()->getConnection()->executeQuery($query,$params)->fetch();
+        return $result;
      }
+     else return false;
     
+  }
+  
+  public function getMaxIncrement($supplier,$category){
     
-             
-    $result=$this->getEntityManager()->getConnection()->executeQuery($query,$params)->fetch();
-    return $result;
-
+      if($supplier!=NULL AND $category!=NULL){
+        
+        $query="SELECT max(i.increment) as increment FROM erpincrements i WHERE i.supplier_id=:SUP AND i.category_id=:CAT AND i.active=1 AND i.deleted=0";
+        $params=[ 'SUP' => $supplier->getId(),
+                 'CAT' => $category->getId()
+                 ];
+                 
+        $result=$this->getEntityManager()->getConnection()->executeQuery($query,$params)->fetch();
+        return $result['increment']*1;
+        
+      }
+      
+      else if($supplier!=NULL){
+        $query="SELECT max(i.increment) as increment FROM erpincrements i WHERE i.supplier_id=:SUP AND i.category_id IS NULL AND i.active=1 AND i.deleted=0";
+        $params=[ 'SUP' => $supplier->getId()
+                 ];
+                 
+        $result=$this->getEntityManager()->getConnection()->executeQuery($query,$params)->fetch();
+        return $result['increment']*1;
+      
+      }
+      
+      else if($category!=NULL){
+        
+        $query="SELECT max(i.increment) as increment FROM erpincrements i WHERE i.supplier_id IS NULL AND i.category_id=:CAT AND i.active=1 AND i.deleted=0";
+        $params=['CAT' => $category->getId()
+                 ];
+                 
+        $result=$this->getEntityManager()->getConnection()->executeQuery($query,$params)->fetch();
+        return $result['increment']*1;
+        
+      }
+      
+      else return false;
+  
   }
 
     // /**

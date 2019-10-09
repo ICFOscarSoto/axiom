@@ -18,6 +18,28 @@ class ERPCustomerGroupsRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, ERPCustomerGroups::class);
     }
+    
+    public function getMaxIncrement()
+    {
+      $query="SELECT max(c.rate) as increment FROM erpcustomer_groups c WHERE c.active=1 AND c.deleted=0";               
+      $result=$this->getEntityManager()->getConnection()->executeQuery($query)->fetch();
+      return $result['increment'];
+    
+    }
+    
+    
+    public function checkRepeated($id,$name){
+      
+        if($id==NULL)
+        {
+          $query="SELECT * FROM erpcustomer_groups c WHERE c.name=:NAME AND c.active=1 AND c.deleted=0";
+          $params=['NAME' => $name];
+          $result=$this->getEntityManager()->getConnection()->executeQuery($query,$params)->fetch();
+          return $result;
+        }
+        else return false;
+     
+   }
 
     // /**
     //  * @return ERPCustomerGroups[] Returns an array of ERPCustomerGroups objects
