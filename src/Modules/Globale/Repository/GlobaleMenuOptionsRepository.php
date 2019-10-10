@@ -90,14 +90,9 @@ class GlobaleMenuOptionsRepository extends ServiceEntityRepository
     //Remove empty elements without route
     if(!in_array("ROLE_GLOBAL", $roles)){
       foreach($options as $key=>$option){
-          $childs=$option->childs;
-          if((!$childs || count($childs)==0) && $option->getRute()==null){ unset($options[$key]); continue; }
-          if(!$childs) continue;
+          if(empty($option->childs) && $option->getRute()==null){ unset($options[$key]); continue; }
           foreach($childs as $keychild=>$suboption){
-            $subchilds=$suboption->childs;
-            if((!$subchilds || count($subchilds)==0) && $suboption->getRute()==null){ unset($childs[$keychild]); continue; }
-            if(!$subchilds) continue;
-
+            if(empty($suboption->childs) && $suboption->getRute()==null){ unset($childs[$keychild]); continue; }
           }
       }
     }
