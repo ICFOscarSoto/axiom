@@ -62,7 +62,6 @@ class GlobaleMenuOptionsRepository extends ServiceEntityRepository
 		$options[]=$item;
     $modules=array_unique(array_merge($this->getModules($userdata["companyId"]), [1])); //ensure module global allways active
     $allowedRoutes=$this->getAllowedRoutes($userdata["id"]);
-    dump($allowedRoutes);
     $roles=$userdata["roles"];
 			$parents=$this->getParents();
 			foreach($parents as $key_parent=>$parent){
@@ -87,7 +86,6 @@ class GlobaleMenuOptionsRepository extends ServiceEntityRepository
 				$parents[$key_parent]->childs=$childs;
 			}
 			$options=array_merge($options,$parents);
-      dump($options);
     //Remove empty modules without route
     if(!in_array("ROLE_GLOBAL", $roles)){
       foreach($options as $key=>$option){
