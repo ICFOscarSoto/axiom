@@ -62,6 +62,7 @@ class GlobaleMenuOptionsRepository extends ServiceEntityRepository
 		$options[]=$item;
     $modules=array_unique(array_merge($this->getModules($userdata["companyId"]), [1])); //ensure module global allways active
     $allowedRoutes=$this->getAllowedRoutes($userdata["id"]);
+    dump($allowedRoutes);
     $roles=$userdata["roles"];
 			$parents=$this->getParents();
 			foreach($parents as $key_parent=>$parent){
@@ -86,14 +87,11 @@ class GlobaleMenuOptionsRepository extends ServiceEntityRepository
 				$parents[$key_parent]->childs=$childs;
 			}
 			$options=array_merge($options,$parents);
-
-    //Remove empty elements without route
+      dump($options);
+    //Remove empty modules without route
     if(!in_array("ROLE_GLOBAL", $roles)){
       foreach($options as $key=>$option){
           if(empty($option->childs) && $option->getRute()==null){ unset($options[$key]); continue; }
-          foreach($childs as $keychild=>$suboption){
-            if(empty($suboption->childs) && $suboption->getRute()==null){ unset($childs[$keychild]); continue; }
-          }
       }
     }
 
@@ -196,7 +194,7 @@ class GlobaleMenuOptionsRepository extends ServiceEntityRepository
      * @return GlobalMenuOptions[] Returns an array of GlobalMenuOptions objects
     */
 	public function getChilds($parent){
-		return $this->createQueryBuilder('f')
+		$childs= $this->createQueryBuilder('f')
             //->andWhere('f.roles LIKE :val_role')
 			      ->andWhere('f.parent = :val_parent')
             //->setParameter('val_role', '%'.$role.'%')
@@ -205,6 +203,12 @@ class GlobaleMenuOptionsRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult()
         ;
+      foreach($childs as $key=>$child){
+        if(empty($child->childs) && $child->getRute()==null) unset($childs[$key]);
+
+      }
+
+      return $childs;
 
 	}
 
