@@ -125,7 +125,7 @@ class ERPProducts
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPManufacturers")
-     * @ORM\JoinColumn(nullable=true, onDelete="CASCADE")
+     * @ORM\JoinColumn(onDelete="SET NULL")
      */
     private $manufacturer;
 
@@ -140,19 +140,19 @@ class ERPProducts
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPCategories")
-     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
+     * @ORM\JoinColumn(onDelete="SET NULL")
      */
     private $category;
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPSuppliers")
-     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
+     * @ORM\JoinColumn(onDelete="SET NULL")
      */
     private $supplier;
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleTaxes")
-     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
+     * @ORM\JoinColumn(onDelete="SET NULL")
      */
     private $taxes;
 
@@ -664,7 +664,28 @@ class ERPProducts
        $product=$repository->findOneBy(["code"=>$this->code,"company"=>$user->getCompany(),"active"=>1,"deleted"=>0]);
        if($product!=null and $product->id!=$this->id)
          return ["valid"=>false, "global_errors"=>["El producto ya existe"]];
-       else return ["valid"=>true];
+       else {
+       $fieldErrors=[];
+         if($this->supplier==null){
+           $fieldErrors["supplier"]="This field is required.";
+         }
+         if($this->manufacturer==null){
+           $fieldErrors["manufacturer"]="This field is required.";
+         }
+         if($this->category==null){
+           $fieldErrors["category"]="This field is required.";
+         }
+         if($this->taxes==null){
+           $fieldErrors["taxes"]="This field is required.";
+         }
+         if($this->shoppingPrice==0){
+           $fieldErrors["shoppingPrice"]="This field is required.";
+         }
+
+         if (empty($fieldErrors)) return ["valid"=>true];
+           else return ["valid"=>false, "field_errors"=>$fieldErrors];
+       }
+
      }
 
      public function getNetprice(): ?bool

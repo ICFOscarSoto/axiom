@@ -43,13 +43,13 @@ class ERPCustomers
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleStates")
-     * @ORM\JoinColumn(nullable=false, onDelete="Cascade")
+     * @ORM\JoinColumn(onDelete="SET NULL")
      */
     private $state;
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCountries")
-     * @ORM\JoinColumn(nullable=false, onDelete="Cascade")
+     * @ORM\JoinColumn(onDelete="SET NULL")
      */
     private $country;
 
@@ -71,7 +71,7 @@ class ERPCustomers
     /**
      * @ORM\Column(type="boolean")
      */
-    private $active;
+    private $active=1;
 
     /**
      * @ORM\Column(type="boolean")
@@ -105,13 +105,13 @@ class ERPCustomers
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPCustomerGroups")
-     * @ORM\JoinColumn(nullable=false, onDelete="Cascade")
+     * @ORM\JoinColumn(onDelete="SET NULL")
      */
     private $customergroup;
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPPaymentMethods")
-     * @ORM\JoinColumn(nullable=false, onDelete="Cascade")
+     * @ORM\JoinColumn(onDelete="SET NULL")
      */
     private $paymentmethod;
 
@@ -505,5 +505,24 @@ class ERPCustomers
         $this->surcharge = $surcharge;
 
         return $this;
+    }
+
+    public function formValidation($kernel, $doctrine, $user, $validationParams){
+      $fieldErrors=[];
+      if($this->country==null){
+        $fieldErrors["country"]="This field is required.";
+      }
+      if($this->state==null){
+        $fieldErrors["state"]="This field is required.";
+      }
+      if($this->customergroup==null){
+        $fieldErrors["customergroup"]="This field is required.";
+      }
+      if($this->paymentmethod==null){
+        $fieldErrors["paymentmethod"]="This field is required.";
+      }
+
+      if (empty($fieldErrors)) return ["valid"=>true];
+        else return ["valid"=>false, "field_errors"=>$fieldErrors];
     }
 }
