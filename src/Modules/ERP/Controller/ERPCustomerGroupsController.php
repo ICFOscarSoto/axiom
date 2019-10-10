@@ -15,18 +15,21 @@ use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\ERP\Utils\ERPCustomerGroupsUtils;
+use App\Modules\Security\Utils\SecurityUtils;
 
 class ERPCustomerGroupsController extends Controller
 {
-	private $class=ERPCustomerGroups::class;
-	private $utilsClass=ERPCustomerGroupsUtils::class;
+		private $class=ERPCustomerGroups::class;
+		private $utilsClass=ERPCustomerGroupsUtils::class;
+		private $module='ERP';
     /**
      * @Route("/{_locale}/admin/global/customergroups", name="customergroups")
      */
     public function index(RouterInterface $router,Request $request)
     {
       $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-  		//$this->denyAccessUnlessGranted('ROLE_ADMIN');
+			if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
+			//$this->denyAccessUnlessGranted('ROLE_ADMIN');
   		$userdata=$this->getUser()->getTemplateData();
   		$locale = $request->getLocale();
   		$this->router = $router;

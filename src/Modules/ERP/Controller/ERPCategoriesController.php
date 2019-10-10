@@ -15,16 +15,21 @@ use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\ERP\Utils\ERPCategoriesUtils;
+use App\Modules\Security\Utils\SecurityUtils;
+
 
 class ERPCategoriesController extends Controller
 {
-	private $class=ERPCategories::class;
+	  private $class=ERPCategories::class;
+	  private $module='ERP';
+ 
     /**
      * @Route("/{_locale}/ERP/categories", name="categories")
      */
     public function index(RouterInterface $router,Request $request)
     {
       $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
   		//$this->denyAccessUnlessGranted('ROLE_ADMIN');
   		$userdata=$this->getUser()->getTemplateData();
   		$locale = $request->getLocale();
