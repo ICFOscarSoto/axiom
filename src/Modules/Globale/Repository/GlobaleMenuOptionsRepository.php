@@ -78,6 +78,7 @@ class GlobaleMenuOptionsRepository extends ServiceEntityRepository
               if(!count(array_intersect ($sub_child->getRoles(), $roles))){ unset($childs[$key_child]->childs[$sub_key_child]); continue;} //if user hasn't enough role for this module
               if($sub_child->getModule()!=null && !in_array($sub_child->getModule()->getId(), $modules)) {unset($childs[$key_child]->childs[$sub_key_child]); continue;} //if module no active  for this company continue
               if(!in_array("ROLE_GLOBAL", $roles) && $sub_child->getRute()!=null && !in_array($sub_child->getRute(), $allowedRoutes)) {unset($childs[$key_child]->childs[$sub_key_child]); continue;}
+              if($sub_child->getRute()==null) {unset($childs[$key_child]->childs[$sub_key_child]); continue;}
               $childs[$key_child]->childs[$sub_key_child]->params=json_decode($childs[$key_child]->childs[$sub_key_child]->getRouteparams(),true);
           }
           $childs[$key_child]->params=json_decode($childs[$key_child]->getRouteparams(),true);
@@ -96,6 +97,7 @@ class GlobaleMenuOptionsRepository extends ServiceEntityRepository
             $subchilds=$suboption->childs;
             if((!$subchilds || count($subchilds)==0) && $suboption->getRute()==null){ unset($childs[$keychild]); continue; }
             if(!$subchilds) continue;
+            foreach
           }
       }
     }
