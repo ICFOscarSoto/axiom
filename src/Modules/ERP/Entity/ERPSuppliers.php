@@ -49,7 +49,7 @@ class ERPSuppliers
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCountries")
-     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
+     * @ORM\JoinColumn(onDelete="SET NULL")
      */
     private $country;
 
@@ -71,7 +71,7 @@ class ERPSuppliers
     /**
      * @ORM\Column(type="boolean")
      */
-    private $active;
+    private $active=1;
 
     /**
      * @ORM\Column(type="boolean")
@@ -95,13 +95,13 @@ class ERPSuppliers
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleActivities")
-     * @ORM\JoinColumn(onDelete="CASCADE")
+     * @ORM\JoinColumn(onDelete="SET NULL")
      */
     private $activity;
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCurrencies")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(onDelete="SET NULL")
      */
     private $currency;
 
@@ -110,11 +110,6 @@ class ERPSuppliers
      *
      */
     private $taxexection;
-
-    /**
-     * @ORM\Column(type="string", length=16, nullable=true)
-     */
-    private $bankaccount;
 
     /**
      * @ORM\Column(type="string", length=16, nullable=true)
@@ -129,6 +124,7 @@ class ERPSuppliers
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPPaymentMethods")
+     * @ORM\JoinColumn(onDelete="SET NULL")
      */
     private $paymentmethod;
 
@@ -182,7 +178,7 @@ class ERPSuppliers
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleStates")
-     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
+     * @ORM\JoinColumn(onDelete="SET NULL")
      */
     private $state;
 
@@ -396,18 +392,6 @@ class ERPSuppliers
         return $this;
     }
 
-    public function getBankaccount(): ?string
-    {
-        return $this->bankaccount;
-    }
-
-    public function setBankaccount(?string $bankaccount): self
-    {
-        $this->bankaccount = $bankaccount;
-
-        return $this;
-    }
-
     public function getCode(): ?string
     {
         return $this->code;
@@ -562,5 +546,28 @@ class ERPSuppliers
         $this->state = $state;
 
         return $this;
+    }
+
+
+    public function formValidation($kernel, $doctrine, $user, $validationParams){
+      $fieldErrors=[];
+      if($this->activity==null){
+        $fieldErrors["activity"]="This field is required.";
+      }
+      if($this->country==null){
+        $fieldErrors["country"]="This field is required.";
+      }
+      if($this->state==null){
+        $fieldErrors["state"]="This field is required.";
+      }
+      if($this->currency==null){
+        $fieldErrors["currency"]="This field is required.";
+      }
+      if($this->paymentmethod==null){
+        $fieldErrors["paymentmethod"]="This field is required.";
+      }
+
+      if (empty($fieldErrors)) return ["valid"=>true];
+        else return ["valid"=>false, "field_errors"=>$fieldErrors];
     }
 }
