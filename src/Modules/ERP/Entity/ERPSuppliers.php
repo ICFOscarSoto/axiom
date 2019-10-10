@@ -8,6 +8,7 @@ use \App\Modules\Globale\Entity\GlobaleActivities;
 use \App\Modules\Globale\Entity\GlobaleCurrencies;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
 use \App\Modules\ERP\Entity\ERPPaymentMethods;
+use \App\Modules\Globale\Entity\GlobaleStates;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPSuppliersRepository")
@@ -48,14 +49,9 @@ class ERPSuppliers
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCountries")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     private $country;
-
-    /**
-     * @ORM\Column(type="string", length=125)
-     */
-    private $state;
 
     /**
      * @ORM\Column(type="string", length=12)
@@ -99,6 +95,7 @@ class ERPSuppliers
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleActivities")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     private $activity;
 
@@ -110,6 +107,7 @@ class ERPSuppliers
 
     /**
      * @ORM\Column(type="string", length=16, nullable=true)
+     *
      */
     private $taxexection;
 
@@ -181,6 +179,12 @@ class ERPSuppliers
 
     public $newSeconds=1296000;
     public $updatedSeconds=1296000;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleStates")
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
+     */
+    private $state;
 
 
     public function getId(): ?int
@@ -256,18 +260,6 @@ class ERPSuppliers
     public function setCountry(?GlobaleCountries $country): self
     {
         $this->country = $country;
-
-        return $this;
-    }
-
-    public function getState(): ?string
-    {
-        return $this->state;
-    }
-
-    public function setState(string $state): self
-    {
-        $this->state = $state;
 
         return $this;
     }
@@ -556,6 +548,18 @@ class ERPSuppliers
     public function setInvoiceday(?int $invoiceday): self
     {
         $this->invoiceday = $invoiceday;
+
+        return $this;
+    }
+
+    public function getState(): ?GlobaleStates
+    {
+        return $this->state;
+    }
+
+    public function setState(?GlobaleStates $state): self
+    {
+        $this->state = $state;
 
         return $this;
     }

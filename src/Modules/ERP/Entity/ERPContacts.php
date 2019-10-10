@@ -40,6 +40,7 @@ class ERPContacts
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPDepartments")
+     * @ORM\JoinColumn(onDelete="Cascade")
      */
     private $department;
 

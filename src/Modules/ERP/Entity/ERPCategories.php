@@ -25,6 +25,7 @@ class ERPCategories
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPCategories")
+     * @ORM\JoinColumn(onDelete="Cascade")
      */
     private $parentid;
 

@@ -25,10 +25,12 @@ use App\Modules\ERP\Utils\ERPEAN13Utils;
 use App\Modules\ERP\Utils\ERPReferencesUtils;
 use App\Modules\ERP\Utils\ERPStocksUtils;
 use App\Modules\ERP\Utils\ERPProductsAttributesUtils;
+use App\Modules\Security\Utils\SecurityUtils;
 
 class ERPProductsController extends Controller
 {
 	private $class=ERPProducts::class;
+	private $module='ERP';
 	//private $utilsClass=ERPProductsUtils::class;
     /**
      * @Route("/{_locale}/admin/global/products", name="products")
@@ -36,6 +38,7 @@ class ERPProductsController extends Controller
     public function index(RouterInterface $router,Request $request)
     {
       $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
   		//$this->denyAccessUnlessGranted('ROLE_ADMIN');
   		$userdata=$this->getUser()->getTemplateData();
   		$locale = $request->getLocale();

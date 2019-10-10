@@ -7,7 +7,6 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\Email\Entity\EmailAccounts;
-use App\Modules\ERP\Entity\ERPSuppliers;
 
 class ERPBankAccountsUtils
 {

@@ -1,0 +1,77 @@
+[{
+    "sections": [
+        {
+            "name": "Datos Cliente",
+            "fields": [
+                {
+                    "name": "name",
+                    "cols": 8
+                },
+                {
+                    "name": "vat",
+                    "cols": 4
+                },
+                {
+                    "name": "address",
+                    "cols": 8
+                },
+                {
+                    "name": "country",
+                    "cols": 4
+                },
+                {
+                    "name": "city",
+                    "cols": 4
+                },
+                {
+                    "name": "state",
+                    "cols": 4
+                },
+                {
+                    "name": "postcode",
+                    "cols": 2
+                },
+                {
+                    "name": "postbox",
+                    "cols": 2
+                },
+                {
+                    "name": "web",
+                    "cols": 6
+                },
+                {
+                    "name": "maxrisk",
+                    "cols": 3
+                },
+                {
+                    "name": "risk",
+                    "cols": 3
+                },
+                {
+                    "name": "shippcontact",
+                    "cols": 4
+                },
+                {
+                    "name": "customergroup",
+                    "cols": 4
+                },
+                {
+                    "name": "agent",
+                    "cols": 4
+                },
+                {
+                    "name": "taxexempt",
+                    "cols": 4
+                },
+                {
+                    "name": "surcharge",
+                    "cols": 4
+                },
+                {
+                    "name": "active",
+                    "cols": 4
+                }
+            ]
+        }
+    ]
+}]

@@ -25,7 +25,7 @@ class ERPAttributesValues
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPAttributeNames")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false, onDelete="Cascade")
      */
     private $attributename;
 
@@ -51,7 +51,7 @@ class ERPAttributesValues
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCompanies")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false, onDelete="Cascade")
      */
     private $company;
 
