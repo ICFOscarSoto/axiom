@@ -65,17 +65,17 @@ class GlobaleMenuOptionsRepository extends ServiceEntityRepository
     $roles=$userdata["roles"];
 			$parents=$this->getParents();
 			foreach($parents as $key_parent=>$parent){
-        if(!count(array_intersect ($parent->getRoles(), $roles))){ unset($parents[$key_parent]); continue;} //if user hasn't enough role for this module
+        //if(!count(array_intersect ($parent->getRoles(), $roles))){ unset($parents[$key_parent]); continue;} //if user hasn't enough role for this module
         if($parent->getModule()!=null && !in_array($parent->getModule()->getId(), $modules)) {unset($parents[$key_parent]); continue;} //if module no active  for this company continue
         if(!in_array("ROLE_GLOBAL", $roles) && $parent->getRute() && !in_array($parent->getRute(), $allowedRoutes)) {unset($parents[$key_parent]); continue;}
         $childs=$this->getChilds($parent->getId());
 				foreach($childs as $key_child=>$child){
-          if(!count(array_intersect ($child->getRoles(), $roles))){ unset($childs[$key_child]); continue;} //if user hasn't enough role for this module
+          //if(!count(array_intersect ($child->getRoles(), $roles))){ unset($childs[$key_child]); continue;} //if user hasn't enough role for this module
           if($child->getModule()!=null && !in_array($child->getModule()->getId(), $modules)) {unset($childs[$key_child]); continue;} //if module no active  for this company continue
           if(!in_array("ROLE_GLOBAL", $roles) && $child->getRute()!=null && !in_array($child->getRute(), $allowedRoutes)) {unset($childs[$key_child]); continue;}
           $childs[$key_child]->childs=$this->getChilds($child->getId());
           foreach($childs[$key_child]->childs as $sub_key_child=>$sub_child){
-              if(!count(array_intersect ($sub_child->getRoles(), $roles))){ unset($childs[$key_child]->childs[$sub_key_child]); continue;} //if user hasn't enough role for this module
+              //if(!count(array_intersect ($sub_child->getRoles(), $roles))){ unset($childs[$key_child]->childs[$sub_key_child]); continue;} //if user hasn't enough role for this module
               if($sub_child->getModule()!=null && !in_array($sub_child->getModule()->getId(), $modules)) {unset($childs[$key_child]->childs[$sub_key_child]); continue;} //if module no active  for this company continue
               if(!in_array("ROLE_GLOBAL", $roles) && $sub_child->getRute()!=null && !in_array($sub_child->getRute(), $allowedRoutes)) {unset($childs[$key_child]->childs[$sub_key_child]); continue;}
               $childs[$key_child]->childs[$sub_key_child]->params=json_decode($childs[$key_child]->childs[$sub_key_child]->getRouteparams(),true);
