@@ -18,12 +18,14 @@ use App\Modules\Globale\Utils\GlobaleFormUtils;
 use Symfony\Component\Validator\Constraints\DateTime;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\MimeType\FileinfoMimeTypeGuesser;
+use App\Modules\Security\Utils\SecurityUtils;
 require_once __DIR__.'/../../../../vendor/pear/mail/Mail.php';
 require_once __DIR__.'/../../../../vendor/pear/mail_mime/Mail/mime.php';
 use Mail;
 use Mail_mime;
 class EmailController extends Controller
 {
+	private $module='Email';
 	private $class=EmailsSubjects::class;
 	static function cmpTimestamp($a, $b){ return strcmp($a["timestamp"], $b["timestamp"]);}
 
@@ -33,7 +35,7 @@ class EmailController extends Controller
 	public function accounts(RouterInterface $router,Request $request)
 	{
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-
+		if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
 		$userdata=$this->getUser()->getTemplateData();
 		$locale = $request->getLocale();
 		$this->router = $router;
@@ -103,6 +105,7 @@ class EmailController extends Controller
 	 */
 	public function email(RouterInterface $router,Request $request){
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 			$locale = $request->getLocale();
 			$this->router = $router;
@@ -142,6 +145,7 @@ class EmailController extends Controller
 	 */
 	public function emailView($folder, $id, RouterInterface $router, Request $request){
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 			$locale = $request->getLocale();
 			$this->router = $router;
@@ -166,6 +170,7 @@ class EmailController extends Controller
 	 */
 	public function emailNew(RouterInterface $router,Request $request){
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 			$locale = $request->getLocale();
 			$this->router = $router;
@@ -195,6 +200,7 @@ class EmailController extends Controller
 	 */
 	public function emailReply($folder, $id, RouterInterface $router,Request $request){
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 			$locale = $request->getLocale();
 			$this->router = $router;
@@ -221,6 +227,7 @@ class EmailController extends Controller
 	 */
 	public function emailForward($folder, $id, RouterInterface $router,Request $request){
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 			$locale = $request->getLocale();
 			$this->router = $router;

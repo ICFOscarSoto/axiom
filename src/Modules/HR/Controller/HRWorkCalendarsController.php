@@ -24,10 +24,11 @@ use App\Modules\HR\Utils\HRWorkersUtils;
 use App\Modules\HR\Utils\HRWorkCalendarsUtils;
 use App\Modules\HR\Entity\HRWorkCalendars;
 use App\Modules\HR\Entity\HRWorkCalendarGroups;
+use App\Modules\Security\Utils\SecurityUtils;
 
 class HRWorkCalendarsController extends Controller
 {
-
+	 private $module='HR';
 	 private $class=HRWorkCalendars::class;
    private $utilsClass=HRWorkCalendarsUtils::class;
 
@@ -37,7 +38,7 @@ class HRWorkCalendarsController extends Controller
    public function workcalendars($id, RouterInterface $router,Request $request)
    {
    $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-   //$this->denyAccessUnlessGranted('ROLE_ADMIN');
+	 if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
    $userdata=$this->getUser()->getTemplateData();
    $locale = $request->getLocale();
    $this->router = $router;

@@ -26,11 +26,11 @@ use App\Modules\Cloud\Utils\CloudFilesUtils;
 use App\Modules\HR\Entity\HRWorkCalendars;
 use App\Modules\HR\Entity\HRHollidays;
 use App\Modules\HR\Utils\HRHollidaysUtils;
-
+use App\Modules\Security\Utils\SecurityUtils;
 
 class HRHollidaysController extends Controller
 {
-
+private $module='HR';
 private $class=HRHollidays::class;
 private $utilsClass=HRHollidaysUtils::class;
 
@@ -40,6 +40,7 @@ private $utilsClass=HRHollidaysUtils::class;
 public function holidays($id, RouterInterface $router, Request $request)
 {
 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
 //$this->denyAccessUnlessGranted('ROLE_ADMIN');
 $userdata=$this->getUser()->getTemplateData();
 $locale = $request->getLocale();

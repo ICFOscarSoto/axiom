@@ -99,7 +99,6 @@ class HRController extends Controller
 		 public function formWorker($id, Request $request){
 			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 			if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
-			$this->denyAccessUnlessGranted('ROLE_ADMIN');
 			$new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-new"];
 			$template=dirname(__FILE__)."/../Forms/Workers.json";
 			$userdata=$this->getUser()->getTemplateData();

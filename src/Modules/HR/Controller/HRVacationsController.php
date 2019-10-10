@@ -21,6 +21,7 @@ use App\Modules\HR\Utils\HRVacationsUtils;
 
 class HRVacationsController extends Controller
 {
+  private $module='HR';
   private $class=HRVacations::class;
   private $utilsClass=HRVacationsUtils::class;
 

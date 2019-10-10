@@ -21,9 +21,11 @@ use App\Modules\Globale\Utils\GlobaleExportUtils;
 use App\Modules\Globale\Utils\GlobalePrintUtils;
 use App\Modules\Cloud\Controller\CloudController;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use App\Modules\Security\Utils\SecurityUtils;
 
 class HRWorkCentersController extends Controller
 {
+  private $module='HR';
   private $class=HRWorkCenters::class;
   private $utilsClass=HRWorkCentersUtils::class;
 
@@ -33,7 +35,7 @@ class HRWorkCentersController extends Controller
   public function workcenterworkers($id,RouterInterface $router,Request $request)
   {
   $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-  $this->denyAccessUnlessGranted('ROLE_ADMIN');
+  if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
   $userdata=$this->getUser()->getTemplateData();
   $locale = $request->getLocale();
   $this->router = $router;

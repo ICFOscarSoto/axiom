@@ -19,9 +19,11 @@ use App\Modules\HR\Entity\HRWorkers;
 use App\Modules\HR\Entity\HRSickleaves;
 use App\Modules\HR\Utils\HRSickleavesUtils;
 use App\Modules\Cloud\Utils\CloudFilesUtils;
+use App\Modules\Security\Utils\SecurityUtils;
 
 class HRSickleavesController extends Controller
 {
+  private $module='HR';
   private $class=HRSickleaves::class;
   private $utilsClass=HRSickleavesUtils::class;
 

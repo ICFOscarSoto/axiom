@@ -21,10 +21,11 @@ use App\Modules\HR\Entity\HRJobs;
 use App\Modules\Globale\Utils\GlobaleExportUtils;
 use App\Modules\Cloud\Controller\CloudController;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use App\Modules\Security\Utils\SecurityUtils;
 
 class HRJobsController extends Controller
 {
-
+  private $module='HR';
   private $class=HRJobs::class;
   private $utilsClass=HRJobsUtils::class;
   /**

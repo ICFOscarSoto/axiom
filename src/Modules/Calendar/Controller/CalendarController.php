@@ -15,13 +15,18 @@ use App\Modules\Calendar\Entity\CalendarEvents;
 use Symfony\Component\Validator\Constraints\DateTime;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\MimeType\FileinfoMimeTypeGuesser;
+use App\Modules\Security\Utils\SecurityUtils;
 
 class CalendarController extends Controller{
+
+	private $module='Calendar';
+
   /**
 	 * @Route("/{_locale}/admin/calendar", name="calendar")
 	 */
 	public function calendar(RouterInterface $router,Request $request){
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 			$locale = $request->getLocale();
 			$this->router = $router;

@@ -21,10 +21,11 @@ use App\Modules\Globale\Utils\GlobaleExportUtils;
 use App\Modules\Globale\Utils\GlobalePrintUtils;
 use App\Modules\Cloud\Controller\CloudController;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use App\Modules\Security\Utils\SecurityUtils;
 
 class HRSchedulesController extends Controller
 {
-
+  private $module='HR';
   private $class=HRSchedules::class;
   private $utilsClass=HRSchedulesUtils::class;
 
@@ -34,7 +35,7 @@ class HRSchedulesController extends Controller
   public function schedules(RouterInterface $router,Request $request)
   {
   $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-  $this->denyAccessUnlessGranted('ROLE_ADMIN');
+  if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
   $userdata=$this->getUser()->getTemplateData();
   $this->router = $router;
   $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);

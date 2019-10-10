@@ -23,10 +23,11 @@ use App\Modules\Globale\Utils\GlobalePrintUtils;
 use App\Modules\Cloud\Controller\CloudController;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use App\Modules\Security\Utils\SecurityUtils;
 
 class HRShiftsController extends Controller
 {
-
+  private $module='HR';
   private $class=HRShifts::class;
   private $utilsClass=HRShiftsUtils::class;
 
@@ -36,7 +37,7 @@ class HRShiftsController extends Controller
   public function shifts($id, RouterInterface $router,Request $request)
   {
   $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-  $this->denyAccessUnlessGranted('ROLE_ADMIN');
+  if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
   $userdata=$this->getUser()->getTemplateData();
   $locale = $request->getLocale();
   $this->router = $router;

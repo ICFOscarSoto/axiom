@@ -114,10 +114,6 @@ ProductVariant:
 Product:
     resource: 'App\Modules\ERP\Controller\ERPProductsController'
     type:     annotation
-    
-ProductPrices:
-    resource: 'App\Modules\ERP\Controller\ERPProductPricesController'
-    type:     annotation
 
 MeasurementUnits:
     resource: 'App\Modules\ERP\Controller\ERPMeasurementUnitsController'

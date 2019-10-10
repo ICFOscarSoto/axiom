@@ -20,10 +20,11 @@ use App\Modules\HR\Entity\HRLaborAgreements;
 use App\Modules\Globale\Utils\GlobaleExportUtils;
 use App\Modules\Cloud\Controller\CloudController;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use App\Modules\Security\Utils\SecurityUtils;
 
 class HRLaborAgreementsController extends Controller
 {
-
+  private $module='HR';
   private $class=HRLaborAgreements::class;
   private $utilsClass=HRLaborAgreementsUtils::class;
 

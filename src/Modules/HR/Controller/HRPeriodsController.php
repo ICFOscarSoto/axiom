@@ -23,11 +23,11 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use App\Modules\HR\Utils\HRPeriodsUtils;
 use App\Modules\HR\Entity\HRPeriods;
 use App\Modules\HR\Entity\HRShifts;
-
+use App\Modules\Security\Utils\SecurityUtils;
 
 class HRPeriodsController extends Controller
 {
-
+	 private $module='HR';
 	 private $class=HRPeriods::class;
    private $utilsClass=HRPeriodsUtils::class;
 
@@ -37,6 +37,7 @@ class HRPeriodsController extends Controller
    public function periods($id, RouterInterface $router,Request $request)
    {
    $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+	 if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
    //$this->denyAccessUnlessGranted('ROLE_ADMIN');
    $userdata=$this->getUser()->getTemplateData();
    $locale = $request->getLocale();
