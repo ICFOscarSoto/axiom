@@ -187,6 +187,7 @@ class ERPIncrements
 
 public function formValidation($kernel, $doctrine, $user, $validationParams){
       $repository=$doctrine->getRepository(ERPIncrements::class);
+      //dump($this->supplier);
 
       $valido=$repository->checkSupplierOnCategory($this->supplier, $this->category,$this->company);
       $repetido=$repository->checkRepeated($this->id,$this->supplier, $this->category,$this->customergroup,$this->company);
@@ -221,13 +222,108 @@ public function formValidation($kernel, $doctrine, $user, $validationParams){
     public function postProccess($kernel, $doctrine, $user){
       $em = $doctrine->getManager();
       $repositoryProduct=$doctrine->getRepository(ERPProducts::class);
-      $repository=$doctrine->getRepository(ERPSuppliers::class);
-      $products=$repository->productsBySupplier($this->supplier->getId());
+      $repositoryProductPrices=$doctrine->getRepository(ERPProductPrices::class);
+      $repositoryCustomerGroups=$doctrine->getRepository(ERPCustomerGroups::class);
+      $repositorySuppliers=$doctrine->getRepository(ERPSuppliers::class);
+      $repositoryIncrements=$doctrine->getRepository(ERPIncrements::class);
+      $products=$repositorySuppliers->productsBySupplier($this->supplier->getId());
       foreach($products as $product){
+    //    dump("Revisamos un producto");
         $productEntity=$repositoryProduct->findOneBy(["id"=>$product]);
-        $productEntity->PVPCalculated($doctrine);
+        $productEntity->calculatePVP($doctrine);
+        $customergroups=$repositoryCustomerGroups->findAll(["active"=>1,"deleted"=>0]);
+      //  dump($customergroups);
+        foreach($customergroups as $customergroup){
+            dump("Analizando el grupo ".$customergroup->getName());
+
+            $increment=$this->getIncrementByGroup($doctrine,$this->supplier,$productEntity->getCategory(),$customergroup);
+            dump($this->getIncrementByGroup($doctrine,$this->supplier,$productEntity->getCategory(),$customergroup));
+            if($increment!=NULL)
+            {
+
+              if($repositoryProductPrices->exists($productEntity,$customergroup))
+              {  dump("Ha encontrado una linea de incremento para el producto. La actualizamos.");
+                $productpricesEntity=$repositoryProductPrices->findOneBy(["product"=>$productEntity,"customergroup"=>$customergroup]);
+                dump($productpricesEntity);
+                $productpricesEntity->setIncrement($increment);
+                $productpricesEntity->setPrice($productEntity->getShoppingPrice()*(1+($increment/100)));
+              }
+              else {
+                dump("No ha encontrado una linea. La creamos");
+                $productpricesEntity= new ERPProductPrices();
+                $productpricesEntity->setProduct($productEntity);
+                $productpricesEntity->setCustomergroup($customergroup);
+                $productpricesEntity->setIncrement($increment*1);
+                $productpricesEntity->setPrice($productEntity->getShoppingPrice()*(1+($increment/100)));
+                $productpricesEntity->setActive(1);
+                $productpricesEntity->setDeleted(0);
+                $productpricesEntity->setDateupd(new \DateTime());
+                $productpricesEntity->setDateadd(new \DateTime());
+
+              }
+              $em->persist($productpricesEntity);
+          }
+
+        }
+
         $em->persist($productEntity);
         $em->flush();
       }
+    }
+
+
+    public function getIncrementByGroup($doctrine,$supplier,$productcategory,$customergroup){
+  //  dump("ENTITY:Empezamos a buscar los incrementos");
+      $repository=$doctrine->getRepository(ERPIncrements::class);
+      $category=$productcategory;
+
+
+      if($supplier!=NULL AND $category!=NULL)
+      {
+
+        //cogemos el incremento para su proveedor y su categoria
+        $incrementbygroup=$repository->getIncrementByGroup($supplier,$category,$customergroup);
+        //si no tiene, buscamos incremento para ese proveedor y sus categorias padre
+        while ($category->getParentid()!=null && $incrementbygroup==null){
+        //   dump("ENTITY:no hay un incremento para ese proveedoy esa categoría. Miramos en padre.");
+            $category=$category->getParentid();
+            $incrementbygroup=$repository->getIncrementByGroup($supplier,$category,$customergroup);
+        }
+      }
+
+      //si no hemos encontrado ningun incremento para ese proveedor y sus categorias padre,
+      //buscamos incremento específico para ese proveedor
+      else if($supplier!=NULL)
+      {
+        //    dump("ENTITY:Tampoco. Miramos si hay para proveedor");
+              $incrementbygroup=$repository->getIncrementByGroup($supplier,null,$customergroup);
+      }
+
+      else if($category!=NULL){
+        //  dump("ENTITY:Tampoco. Miramos si hay para categoria");
+          $category=$this->category;
+          $incrementbygroup=$repository->getIncrementByGroup(null,$category,$customergroup);
+
+          //si no hay incremento específico para ese proveedor, buscamos incremento solo por categoria
+          if ($incrementbygroup==null){
+
+
+            //Si no hay incremento únicamente para su categoría. se busca incrementos para las categorías padre
+            while ($category->getParentid()!=null && $incrementbygroup==null){
+        //      dump("ENTITY:Tampoco. Miramos si hay para cada categoria padre");
+                $category=$category->getParentid();
+                $incrementbygroup=$repository->getIncrementByGroup(null,$category,$customergroup);
+              }
+           }
+
+      }
+
+      else{
+
+        $repository=$doctrine->getRepository(ERPCustomerGroups::class);
+        $incrementbygroup=$repository->getIncrement($customergroup);
+        return $incrementbygroup;
+      }
+
     }
 }

@@ -27,6 +27,15 @@ class ERPCustomerGroupsRepository extends ServiceEntityRepository
     
     }
     
+    public function getIncrement($group)
+    {
+      $query="SELECT c.rate as increment FROM erpcustomer_groups c WHERE c.id=:GRP AND c.active=1 AND c.deleted=0";  
+      $params=['GRP' => $group->getId()];               
+      $result=$this->getEntityManager()->getConnection()->executeQuery($query,$params)->fetch();
+      return $result['increment'];
+    
+    }
+    
     
     public function checkRepeated($id,$name){
       

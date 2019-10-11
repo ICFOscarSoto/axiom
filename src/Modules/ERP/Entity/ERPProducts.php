@@ -645,7 +645,7 @@ class ERPProducts
 
     }
 
-    public function PVPCalculated($doctrine){
+    public function calculatePVP($doctrine){
         $IncrementsRepository=$doctrine->getRepository(ERPIncrements::class);
         $this->setPVP($this->shoppingPrice*(1+($this->getMaxIncrement($doctrine)/100)));
 
@@ -668,10 +668,11 @@ class ERPProducts
        $fieldErrors=[];
          if($this->supplier==null){
            $fieldErrors["supplier"]="This field is required.";
-         }
+         }/*
          if($this->manufacturer==null){
            $fieldErrors["manufacturer"]="This field is required.";
-         }
+         }*/
+         
          if($this->category==null){
            $fieldErrors["category"]="This field is required.";
          }
