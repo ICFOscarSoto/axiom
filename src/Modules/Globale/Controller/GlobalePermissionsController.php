@@ -36,6 +36,10 @@ class GlobalePermissionsController extends Controller
       $companiesModulesRepository=$this->getDoctrine()->getRepository(GlobaleCompaniesModules::class);
       $modulesRepository=$this->getDoctrine()->getRepository(GlobaleModules::class);
       $permissionsRoutesUsersRepository=$this->getDoctrine()->getRepository(GlobalePermissionsRoutesUsers::class);
+      $userRepository=$this->getDoctrine()->getRepository(GlobaleUsers::class);
+      $user=$userRepository->findOneBy(["company"=>$this->getUser()->getCompany(),"id"=>$id, "active"=>1, "deleted"=>0]);
+      if(!$user) return $this->render('@Globale/notfound.html.twig',["status_code"=>404, "status_text"=>"Objeto no encontrado"]);
+
       $moduleGlobal=$modulesRepository->findOneBy(["name"=>"Globale"]);
       $modules=$companiesModulesRepository->findBy(["companyown"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
 
@@ -96,10 +100,15 @@ class GlobalePermissionsController extends Controller
        public function userGroupPermissions($id, RouterInterface $router,Request $request){
          //Get company user modules enabled
          $modulesRepository=$this->getDoctrine()->getRepository(GlobaleModules::class);
+         $usergroupRepository=$this->getDoctrine()->getRepository(GlobaleUserGroups::class);
          $companiesModulesRepository=$this->getDoctrine()->getRepository(GlobaleCompaniesModules::class);
          $permissionsRoutesUsersRepository=$this->getDoctrine()->getRepository(GlobalePermissionsRoutesUserGroups::class);
+         $usergroup=$usergroupRepository->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
+         if(!$usergroup) return $this->render('@Globale/notfound.html.twig',["status_code"=>404, "status_text"=>"Objeto no encontrado"]);
+
          $moduleGlobal=$modulesRepository->findOneBy(["name"=>"Globale"]);
          $modules=$companiesModulesRepository->findBy(["companyown"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
+
          //Get routers for each module
          $permisions=[];
          $permissions[$moduleGlobal->getName()]["description"]=$moduleGlobal->getDescription();
@@ -110,7 +119,8 @@ class GlobalePermissionsController extends Controller
          }
          return $this->render('@Globale/usergrouppermissions.html.twig',[
            "permissions"=>$permissions,
-           "id"=>$id
+           "id"=>$id,
+           "isadmin"=>$usergroup->getIsadmin()?true:false
          ]);
        }
 

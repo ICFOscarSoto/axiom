@@ -6,11 +6,17 @@
             "fields": [
                 {
                     "name": "name",
-                    "cols": 4
+                    "cols": 8
+                },
+                {
+                    "name": "isadmin",
+                    "cols": 4,
+                    "caption": "Grupo administradores"
                 },
                 {
                     "name": "active",
-                    "cols": 4
+
+                    "cols": 2
                 }
             ]
         }

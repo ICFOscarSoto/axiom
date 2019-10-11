@@ -48,4 +48,13 @@ class GlobaleUsersRepository extends ServiceEntityRepository
           ->getResult();
     }
 
+    public function isAdmin($user){
+      $query="SELECT IF(COUNT(*)=0,0,1) admin FROM globale_user_groups g
+              LEFT JOIN globale_users_user_groups ug ON ug.usergroup_id=g.id
+              LEFT JOIN globale_users u ON u.id=ug.user_id
+              WHERE u.id=:val_user AND g.isadmin=1 AND g.active=1 AND g.deleted=0 AND ug.active=1 AND ug.deleted=0";
+      $params=['val_user' => $user];
+      return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchColumn(0);
+    }
+
 }

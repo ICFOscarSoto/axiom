@@ -24,12 +24,13 @@ use App\Modules\ERP\Entity\ERPBankAccounts;
 use App\Modules\Cloud\Utils\CloudFilesUtils;
 use App\Modules\Globale\Entity\GlobaleDiskUsages;
 use \App\Helpers\HelperFiles;
+use App\Modules\Security\Utils\SecurityUtils;
 //use App\Modules\Globale\UtilsEntityUtils;
 //use App\Modules\Form\Controller\FormController;
 
 class GlobaleCompaniesController extends Controller
 {
-
+	 private $module='Globale';
 	 private $class=GlobaleCompanies::class;
 	 private $utilsClass=GlobaleCompaniesUtils::class;
 
@@ -40,8 +41,9 @@ class GlobaleCompaniesController extends Controller
 	  */
 	  public function formCompany($id, Request $request){
 	 	$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-	 	$this->denyAccessUnlessGranted('ROLE_GLOBAL');
-	 	$new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-new"];
+	 	if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
+
+		$new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-new"];
 	 	$template=dirname(__FILE__)."/../Forms/Companies.json";
 	 	$userdata=$this->getUser()->getTemplateData();
 	 	$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
@@ -132,7 +134,7 @@ class GlobaleCompaniesController extends Controller
 	  */
 	  public function mycompany(Request $request){
 	  $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-	  $this->denyAccessUnlessGranted('ROLE_ADMIN');
+	  if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
 		$id=$this->getUser()->getCompany()->getId();
 	  $new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-new"];
 	  $template=dirname(__FILE__)."/../Forms/CompaniesAdmin.json";
@@ -251,6 +253,7 @@ class GlobaleCompaniesController extends Controller
      */
     public function index(RouterInterface $router,Request $request)
     {
+		if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		//$this->denyAccessUnlessGranted('ROLE_ADMIN');
 		$userdata=$this->getUser()->getTemplateData();

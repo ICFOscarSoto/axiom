@@ -3,6 +3,7 @@
 namespace App\Modules\Globale\Repository;
 
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
+use App\Modules\Globale\Entity\GlobaleUsers;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
@@ -69,15 +70,21 @@ class GlobaleMenuOptionsRepository extends ServiceEntityRepository
         if($parent->getModule()!=null && !in_array($parent->getModule()->getId(), $modules)) {unset($parents[$key_parent]); continue;} //if module no active  for this company continue
         if(!in_array("ROLE_GLOBAL", $roles) && $parent->getRute() && !in_array($parent->getRute(), $allowedRoutes)) {unset($parents[$key_parent]); continue;}
         $childs=$this->getChilds($parent->getId());
-				foreach($childs as $key_child=>$child){
+
+        foreach($childs as $key_child=>$child){
           if(!count(array_intersect ($child->getRoles(), $roles))){ unset($childs[$key_child]); continue;} //if user hasn't enough role for this module
           if($child->getModule()!=null && !in_array($child->getModule()->getId(), $modules)) {unset($childs[$key_child]); continue;} //if module no active  for this company continue
-          if(!in_array("ROLE_GLOBAL", $roles) && $child->getRute()!=null && !in_array($child->getRute(), $allowedRoutes)) {unset($childs[$key_child]); continue;}
+          $routeparams=$child->getRouteparams();
+          $routeparams=$routeparams!=null?json_decode($routeparams,true):$routeparams;
+          if(!in_array("ROLE_GLOBAL", $roles) && $child->getRute()!=null && (!in_array($child->getRute(), $allowedRoutes)&&(!in_array($routeparams["name"].'_genericindex', $allowedRoutes))) ) {unset($childs[$key_child]); continue;}
           $childs[$key_child]->childs=$this->getChilds($child->getId());
+
           foreach($childs[$key_child]->childs as $sub_key_child=>$sub_child){
               if(!count(array_intersect ($sub_child->getRoles(), $roles))){ unset($childs[$key_child]->childs[$sub_key_child]); continue;} //if user hasn't enough role for this module
               if($sub_child->getModule()!=null && !in_array($sub_child->getModule()->getId(), $modules)) {unset($childs[$key_child]->childs[$sub_key_child]); continue;} //if module no active  for this company continue
-              if(!in_array("ROLE_GLOBAL", $roles) && $sub_child->getRute()!=null && !in_array($sub_child->getRute(), $allowedRoutes)) {unset($childs[$key_child]->childs[$sub_key_child]); continue;}
+              $routeparams=$sub_child->getRouteparams();
+              $routeparams=$routeparams!=null?json_decode($routeparams,true):$routeparams;
+              if(!in_array("ROLE_GLOBAL", $roles) && $sub_child->getRute()!=null && (!in_array($sub_child->getRute(), $allowedRoutes)&&(!in_array($routeparams["name"].'_genericindex', $allowedRoutes)))) {unset($childs[$key_child]->childs[$sub_key_child]); continue;}
               if($sub_child->getRute()==null) {unset($childs[$key_child]->childs[$sub_key_child]); continue; }
               $childs[$key_child]->childs[$sub_key_child]->params=json_decode($childs[$key_child]->childs[$sub_key_child]->getRouteparams(),true);
           }
@@ -86,7 +93,16 @@ class GlobaleMenuOptionsRepository extends ServiceEntityRepository
 				$parents[$key_parent]->childs=$childs;
 			}
 			$options=array_merge($options,$parents);
-    //Remove empty modules without route
+    //Remove subchilds empty without route
+    if(!in_array("ROLE_GLOBAL", $roles)){
+      foreach($options as $key=>$option){
+        if(!empty($option->childs))
+            foreach($option->childs as $key_child=>$child){
+              if(empty($child->childs) && $child->getRute()==null){ unset($options[$key]->childs[$key_child]); continue; }
+        }
+      }
+    }
+    //Remove modules empty without route
     if(!in_array("ROLE_GLOBAL", $roles)){
       foreach($options as $key=>$option){
           if(empty($option->childs) && $option->getRute()==null){ unset($options[$key]); continue; }
@@ -97,36 +113,51 @@ class GlobaleMenuOptionsRepository extends ServiceEntityRepository
 	}
 
 
-
-
   public function getModules($company){
-
     $query="SELECT module_id FROM globale_companies_modules g WHERE companyown_id =:COMPANYID AND	g.active=1 AND g.deleted=0";
               $params=['COMPANYID' => $company];
     return array_column($this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll(),'module_id');
   }
 
   public function getAllowedRoutes($user){
-    $query="SELECT r.name FROM globale_permissions_routes_users ru
-              LEFT JOIN globale_permissions_routes r ON r.id=ru.permissionroute_id
-              WHERE ru.allowaccess=1 AND ru.user_id=:val_user AND ru.active=1 AND ru.deleted=0 AND r.active=1 AND r.deleted=0
-            UNION
-            SELECT r.name FROM globale_permissions_routes_user_groups rg
-              LEFT JOIN globale_permissions_routes r ON r.id=rg.permissionroute_id
-              WHERE rg.allowaccess=1 AND rg.active=1 AND rg.deleted=0 AND r.active=1 AND r.deleted=0
-                    AND r.id NOT IN (SELECT r.id FROM globale_permissions_routes_users ru
-                                     LEFT JOIN globale_permissions_routes r ON r.id=ru.permissionroute_id
-                                     WHERE ru.allowaccess=0 AND ru.user_id=:val_user)
-                    AND rg.usergroup_id IN (SELECT g.id FROM globale_users_user_groups ug
-                                            LEFT JOIN globale_user_groups g ON g.id=ug.usergroup_id
-                                            WHERE ug.user_id=:val_user AND g.active=1 AND g.deleted=0 AND ug.active=1 AND ug.deleted=0)
-
-
-
-    ";
+    //Detect if user belongs to any admin group
+    $userRepository = $this->getEntityManager()->getRepository(GlobaleUsers::class);
+    $isadmin=$userRepository->isAdmin($user);
+    if($isadmin){
+      //Admin user, get all routes
+      $query="SELECT r.name FROM globale_permissions_routes r
+              LEFT JOIN globale_modules m ON m.id=r.module_id
+              LEFT JOIN globale_companies_modules cm ON cm.module_id=m.id
+              LEFT JOIN globale_companies c ON c.id=cm.companyown_id
+              LEFT JOIN globale_users u ON u.company_id=c.id
+              WHERE u.id=:val_user
+              AND r.active=1 AND r.deleted=0
+              AND m.active=1 AND m.deleted=0
+              AND cm.active=1 AND cm.deleted=0
+              AND c.active=1 AND c.deleted=0
+              AND u.active=1 AND u.deleted=0
+              UNION
+              SELECT r.NAME FROM globale_permissions_routes r
+              LEFT JOIN globale_modules m ON m.id=r.module_id
+              WHERE m.NAME=\"Globale\"";
+    }else{
+      //if no user admin get allowed routes
+      $query="SELECT r.name FROM globale_permissions_routes_users ru
+                LEFT JOIN globale_permissions_routes r ON r.id=ru.permissionroute_id
+                WHERE ru.allowaccess=1 AND ru.user_id=:val_user AND ru.active=1 AND ru.deleted=0 AND r.active=1 AND r.deleted=0
+              UNION
+              SELECT r.name FROM globale_permissions_routes_user_groups rg
+                LEFT JOIN globale_permissions_routes r ON r.id=rg.permissionroute_id
+                WHERE rg.allowaccess=1 AND rg.active=1 AND rg.deleted=0 AND r.active=1 AND r.deleted=0
+                      AND r.id NOT IN (SELECT r.id FROM globale_permissions_routes_users ru
+                                       LEFT JOIN globale_permissions_routes r ON r.id=ru.permissionroute_id
+                                       WHERE ru.allowaccess=0 AND ru.user_id=:val_user)
+                      AND rg.usergroup_id IN (SELECT g.id FROM globale_users_user_groups ug
+                                              LEFT JOIN globale_user_groups g ON g.id=ug.usergroup_id
+                                              WHERE ug.user_id=:val_user AND g.active=1 AND g.deleted=0 AND ug.active=1 AND ug.deleted=0)";
+    }
     $params=['val_user' => $user];
     return array_column($this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll(),'name');
-
   }
 
 	 /**
@@ -201,11 +232,19 @@ class GlobaleMenuOptionsRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult()
         ;
-      foreach($childs as $key=>$child){
-        if(empty($child->childs) && $child->getRute()==null) unset($childs[$key]);
+      //if route is null check if has childs
+      /*foreach($childs as $key=>$child){
+        if($child->getRute()==null){
+            $query="SELECT COUNT(*) childs FROM globale_menu_options m WHERE parent=:val_parent";
+            $params=['val_parent' => $child->getId()];
+              dump($child);
+            dump($this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchColumn(0));
+            if($this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchColumn(0)==0){
 
-      }
-
+               unset($childs[$key]);
+            }
+        }
+      }*/
       return $childs;
 
 	}

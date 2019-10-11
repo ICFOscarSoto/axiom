@@ -16,6 +16,20 @@
         "caption": "description"
     },
     {
+        "name": "globale",
+        "caption": "Protegido",
+        "replace": {
+            "1": {
+                "text": "Sí",
+                "html": "<div style=\"min-width: 75px;\" class=\"label label-danger\">Sí<\/div>"
+            },
+            "0": {
+                "text": "No",
+                "html": "<div style=\"min-width: 75px;\" class=\"label label-success\">No<\/div>"
+            }
+        }
+    },
+    {
         "name": "active",
         "caption": "Estado",
         "width": "10%",

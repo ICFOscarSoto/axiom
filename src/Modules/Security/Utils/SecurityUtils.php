@@ -2,6 +2,7 @@
 namespace App\Modules\Security\Utils;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use App\Modules\Globale\Entity\GlobaleModules;
+use App\Modules\Globale\Entity\GlobaleUsers;
 use App\Modules\Globale\Entity\GlobaleUsersUserGroups;
 use App\Modules\Globale\Entity\GlobalePermissionsZones;
 use App\Modules\Globale\Entity\GlobalePermissionsRoutes;
@@ -12,6 +13,7 @@ class SecurityUtils
 {
   public function checkRoutePermissions($module, $name, $user, $doctrine){
     $modulesRepository=$doctrine->getRepository(GlobaleModules::class);
+    $userRepository=$doctrine->getRepository(GlobaleUsers::class);
     $userUsersGroupsRepository=$doctrine->getRepository(GlobaleUsersUserGroups::class);
     $zonesRepository=$doctrine->getRepository(GlobalePermissionsZones::class);
     $routesRepository=$doctrine->getRepository(GlobalePermissionsRoutes::class);
@@ -32,7 +34,10 @@ class SecurityUtils
       $doctrine->getManager()->persist($permissionRoute);
       $doctrine->getManager()->flush();
     }
+
+    $isAdmin=$userRepository->isAdmin($user->getId());
     if(in_array('ROLE_GLOBAL',$user->getRoles())) return true;
+    if($isAdmin) return true;
 
     //Check if user has explicit policies
     $routeUser=$routesUserRepository->findOneBy(["permissionroute"=>$permissionRoute, "user"=>$user, "active"=>1, "deleted"=>0]);

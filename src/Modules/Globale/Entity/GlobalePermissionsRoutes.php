@@ -52,6 +52,11 @@ class GlobalePermissionsRoutes
      */
     private $dateupd;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $globale;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -137,6 +142,18 @@ class GlobalePermissionsRoutes
     public function setDateupd(\DateTimeInterface $dateupd): self
     {
         $this->dateupd = $dateupd;
+
+        return $this;
+    }
+
+    public function getGlobale(): ?bool
+    {
+        return $this->globale;
+    }
+
+    public function setGlobale(?bool $globale): self
+    {
+        $this->globale = $globale;
 
         return $this;
     }

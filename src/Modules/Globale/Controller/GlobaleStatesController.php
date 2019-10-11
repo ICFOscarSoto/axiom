@@ -15,9 +15,11 @@ use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\Globale\Utils\GlobaleStatesUtils;
+use App\Modules\Security\Utils\SecurityUtils;
 
 class GlobaleStatesController extends Controller
 {
+	private $module='Globale';
 	private $class=GlobaleStates::class;
 
     /**
@@ -25,8 +27,9 @@ class GlobaleStatesController extends Controller
      */
     public function index(RouterInterface $router,Request $request)
     {
-       $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-  		//$this->denyAccessUnlessGranted('ROLE_ADMIN');
+      $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+  		if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
+
   		$userdata=$this->getUser()->getTemplateData();
   		$locale = $request->getLocale();
   		$this->router = $router;

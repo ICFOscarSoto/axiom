@@ -9,7 +9,12 @@
                 },
                 {
                     "name": "name",
-                    "cols": 4
+                    "cols": 6
+                },
+                {
+                    "name": "globale",
+                    "caption": "Protegido global",
+                    "cols": 2
                 },
                 {
                     "name": "description",

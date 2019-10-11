@@ -18,18 +18,21 @@ use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\Globale\Utils\GlobaleCompaniesUtils;
 use App\Modules\Globale\Utils\GlobaleListApiUtils;
+use App\Modules\Security\Utils\SecurityUtils;
 //use App\Modules\Globale\UtilsEntityUtils;
 //use App\Modules\Form\Controller\FormController;
 
 class GlobaleClockDevicesController extends Controller
 {
+  private $module='Globale';
   private $class=GlobaleClockDevices::class;
   /**
    * @Route("/{_locale}/globale/clockdevices/form/{id}", name="clockdevices", defaults={"id"=0})
    */
    public function clockdevices($id, Request $request){
     $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-    $this->denyAccessUnlessGranted('ROLE_ADMIN');
+    if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
+
     $new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-new"];
     $template=dirname(__FILE__)."/../Forms/ClockDevices.json";
     $userdata=$this->getUser()->getTemplateData();

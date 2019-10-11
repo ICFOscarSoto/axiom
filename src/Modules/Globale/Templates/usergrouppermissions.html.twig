@@ -1,7 +1,7 @@
 <div class="row">
     <div style="text-align: right;" class="col-md-12">
       <button attr-id="" attr-action="" id="formuser-button-cancel" type="button" class="btn btn">Cancelar</button>
-      <button attr-id="" attr-action="" id="formpermissions-button-save" type="button" class="btn btn-green">Guardar</button>
+      <button attr-id="" attr-action="" id="formpermissions-button-save" type="button" class="btn btn-green" {% if(isadmin == 1) %}disabled{% endif %}>Guardar</button>
     </div>
 </div>
 <br/>
@@ -23,9 +23,9 @@
           <div class="form-group">
             <label for="field-4" class="col-sm-5 control-label">{{ route.description }}</label>
             <div class="col-sm-5">
-							<select id="select-route-{{ route.route_id }}" attr-id="{{ route.route_id }}" class="form-control">
-								<option value="1" {% if(route.allowaccess == 1) %} selected='selected' {% endif %}>{{ ('Allow access')|trans }}</option>
-								<option value="0" {% if(route.allowaccess == 0) %} selected='selected' {% endif %}>{{ ('Deny access')|trans }}</option>
+							<select id="select-route-{{ route.route_id }}" attr-id="{{ route.route_id }}" class="form-control" {% if(isadmin == 1) %}disabled{% endif %}>
+								<option value="1" {% if(isadmin == 1) %} selected='selected' {% else %}{% if(route.allowaccess == 1) %} selected='selected' {% endif %}{% endif %}>{{ ('Allow access')|trans }}</option>
+								<option value="0" {% if(isadmin == 0) %}{% if(route.allowaccess == 0) %} selected='selected' {% endif %}{% endif %}>{{ ('Deny access')|trans }}</option>
 							</select>
 							</div>
           </div>
@@ -41,7 +41,7 @@
   <div class="row">
       <div style="text-align: right;" class="col-md-12">
         <button attr-id="" attr-action="" id="formuser-button-cancel" type="button" class="btn btn">Cancelar</button>
-        <button attr-id="" attr-action="" id="formpermissions-button-save" type="button" class="btn btn-green">Guardar</button>
+        <button attr-id="" attr-action="" id="formpermissions-button-save" type="button" class="btn btn-green" {% if(isadmin == 1) %}disabled{% endif %}>Guardar</button>
       </div>
   </div>
 

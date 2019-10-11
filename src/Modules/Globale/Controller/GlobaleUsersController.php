@@ -43,7 +43,8 @@ class GlobaleUsersController extends Controller
     public function index(RouterInterface $router,Request $request)
     {
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-		//$this->denyAccessUnlessGranted('ROLE_ADMIN');
+		if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
+    
 		$userdata=$this->getUser()->getTemplateData();
 		$locale = $request->getLocale();
 		$this->router = $router;
