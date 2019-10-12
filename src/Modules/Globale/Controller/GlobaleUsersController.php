@@ -44,7 +44,7 @@ class GlobaleUsersController extends Controller
     {
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
-    
+
 		$userdata=$this->getUser()->getTemplateData();
 		$locale = $request->getLocale();
 		$this->router = $router;
@@ -200,7 +200,7 @@ class GlobaleUsersController extends Controller
     return $this->render('@Globale/generictabform.html.twig', array(
             'entity_name' => $entity_name,
             'controllerName' => 'UsersController',
-            'interfaceName' => 'Grpos de Usuarios',
+            'interfaceName' => 'Grupos de Usuarios',
             'optionSelected' => 'genericindex',
             'optionSelectedParams' => ["module"=>"Globale", "name"=>"UserGroups"],
             'menuOptions' =>  $menurepository->formatOptions($userdata),

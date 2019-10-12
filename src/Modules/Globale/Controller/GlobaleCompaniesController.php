@@ -189,7 +189,7 @@ class GlobaleCompaniesController extends Controller
 	  $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), ];
 	  $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),
 	 												method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[],null, ["identity"=>$identity],
-													[],['@ERP/bankaccountSEPA.html.twig']
+													[],['@Globale/bankaccountSEPA.html.twig']
 												);
 
 	 	//-----------------   CLOUD ----------------------
@@ -235,7 +235,7 @@ class GlobaleCompaniesController extends Controller
 	  $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), ];
 	  $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),
 	 											 method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[],null, ["identity"=>$identity],
-	 											 [],['@ERP/bankaccountSEPA.html.twig']
+	 											 [],['@Globale/bankaccountSEPA.html.twig']
 	 										 );
 
 	   return $utils->make($id, ERPBankAccounts::class, $action, "formIdentities", "full", "@Globale/form.html.twig", 'none', null);

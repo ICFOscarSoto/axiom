@@ -33,6 +33,11 @@ class GlobalePermissionsRoutes
     private $description;
 
     /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $globale=0;
+
+    /**
      * @ORM\Column(type="boolean")
      */
     private $active;
@@ -52,10 +57,6 @@ class GlobalePermissionsRoutes
      */
     private $dateupd;
 
-    /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
-    private $globale;
 
     public function getId(): ?int
     {
