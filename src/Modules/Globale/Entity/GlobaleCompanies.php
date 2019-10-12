@@ -545,7 +545,7 @@ class GlobaleCompanies
        //Create disk quota
        $quota=new GlobaleDiskUsages();
        $quota->setCompanyown($this);
-       $quota->setDiskspace(50);
+       $quota->setDiskspace(52428800); //50MB
        $quota->setDiskusage(0);
        $quota->setDistribution("[]");
        $quota->setActive(1);
