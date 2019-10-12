@@ -13,6 +13,16 @@
 	<![endif]-->
 {% endblock %}
 
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-148057025-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'UA-148057025-1');
+</script>
+
+
 {% block stylesheets %}
 	<link rel="stylesheet" href="{{ url('index') }}js/jquery-ui/css/no-theme/jquery-ui-1.10.3.custom.min.css">
 	<link rel="stylesheet" href="{{ url('index') }}css/font-icons/entypo/css/entypo.css">
