@@ -31,8 +31,8 @@ class GlobaleUsersUserGroupsUtils
     //array_merge($selected,["usergroup_id"=>0]);
     $query = $qb->select('rl')
                  ->from('App\Modules\Globale\Entity\GlobaleUserGroups', 'rl')
-                 ->andWhere('rl.active=1 AND rl.deleted=0');
-
+                 ->andWhere('rl.active=1 AND rl.deleted=0 AND rl.company=:val_company')
+                 ->setParameter('val_company', $user->getCompany());
     if(count($selected)) $query->andWhere($qb->expr()->notIn('rl.id', array_column($selected,'usergroup_id')));
     $results=$query->getQuery()
                    ->getResult();
