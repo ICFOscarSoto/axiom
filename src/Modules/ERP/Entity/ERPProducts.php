@@ -625,43 +625,43 @@ class ERPProducts
       //buscamos incremento específico para ese proveedor
       if ($maxincrement==null)
           $maxincrement=$repository->getMaxIncrement($this->supplier,null,$customergroup);
-      dump("Incremento proveedor:".$maxincrement);
+  //    dump("Incremento proveedor:".$maxincrement);
       //si no hay incremento específico para ese proveedor, buscamos incremento solo por categoria
       if ($maxincrement==null){
         $category=$this->category;
         $maxincrement=$repository->getMaxIncrement(null,$category,$customergroup);
-        dump("Incremento categoria:".$maxincrement);
+    //    dump("Incremento categoria:".$maxincrement);
         //Si no hay incremento únicamente para su categoría. se busca incrementos para las categorías padre
         while ($category->getParentid()!=null && $maxincrement==null){
             $category=$category->getParentid();
             $maxincrement=$repository->getMaxIncrement(null,$category,$customergroup);
           }
        }
-       dump("Incremento categoria padre:".$maxincrement);
+    //   dump("Incremento categoria padre:".$maxincrement);
        //llegados a este punto, no hemos encontrado incrementos, por lo que habrá que buscar el incremento general
        //en los grupos de clientes
       if ($maxincrement==null){
         $repository=$doctrine->getRepository(ERPCustomerGroups::class);
         $maxincrement=$repository->getIncrement($customergroup);
       }
-        dump("Incremento categoria, proveedor:".$maxincrement);
+      //  dump("Incremento categoria, proveedor:".$maxincrement);
         return $maxincrement;
 
     }
 
     public function calculatePVP($doctrine){
-        dump("Revisamos el PVP del producto ".$this->name);
+    //    dump("Revisamos el PVP del producto ".$this->name);
         //$IncrementsRepository=$doctrine->getRepository(ERPIncrements::class);
         $CustomerGroupsRepository=$doctrine->getRepository(ERPCustomerGroups::class);
         $customergroups=$CustomerGroupsRepository->findAll(["active"=>1,"deleted"=>0]);
         $maxincrement=0;
         foreach($customergroups as $customergroup){
-          dump("Revisamos el incremento para el grupo ".$customergroup->getName());
+      //    dump("Revisamos el incremento para el grupo ".$customergroup->getName());
           $increment=$this->getMaxIncrement($doctrine,$customergroup);
           if($increment>$maxincrement) $maxincrement=$increment;
         }
         $this->setPVP($this->shoppingPrice*(1+($maxincrement/100)));
-        dump("ya hemos asignado el PVP");
+      //  dump("ya hemos asignado el PVP");
 
     }
 
