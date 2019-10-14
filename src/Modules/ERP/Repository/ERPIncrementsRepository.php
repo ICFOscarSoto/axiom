@@ -163,6 +163,7 @@ class ERPIncrementsRepository extends ServiceEntityRepository
         dump("Vamos a devolver: ".$result['increment']*1);
         return $result['increment']*1;
       }
+
       else return NULL;
 
 
