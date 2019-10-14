@@ -84,13 +84,14 @@ class ERPIncrementsRepository extends ServiceEntityRepository
 
   }
 
-  public function getMaxIncrement($supplier,$category){
+  public function getMaxIncrement($supplier,$category,$customergroup){
 
       if($supplier!=NULL AND $category!=NULL){
 
-        $query="SELECT max(i.increment) as increment FROM erpincrements i WHERE i.supplier_id=:SUP AND i.category_id=:CAT AND i.active=1 AND i.deleted=0";
+        $query="SELECT max(i.increment) as increment FROM erpincrements i WHERE i.supplier_id=:SUP AND i.category_id=:CAT AND i.customergroup_id=:GRP AND i.active=1 AND i.deleted=0";
         $params=[ 'SUP' => $supplier->getId(),
-                 'CAT' => $category->getId()
+                 'CAT' => $category->getId(),
+                 'GRP' => $customergroup->getId()
                  ];
 
         $result=$this->getEntityManager()->getConnection()->executeQuery($query,$params)->fetch();
@@ -99,8 +100,9 @@ class ERPIncrementsRepository extends ServiceEntityRepository
       }
 
       else if($supplier!=NULL){
-        $query="SELECT max(i.increment) as increment FROM erpincrements i WHERE i.supplier_id=:SUP AND i.category_id IS NULL AND i.active=1 AND i.deleted=0";
-        $params=[ 'SUP' => $supplier->getId()
+        $query="SELECT max(i.increment) as increment FROM erpincrements i WHERE i.supplier_id=:SUP AND i.category_id IS NULL  AND i.customergroup_id=:GRP AND i.active=1 AND i.deleted=0";
+        $params=[ 'SUP' => $supplier->getId(),
+                  'GRP' => $customergroup->getId()
                  ];
 
         $result=$this->getEntityManager()->getConnection()->executeQuery($query,$params)->fetch();
@@ -110,8 +112,9 @@ class ERPIncrementsRepository extends ServiceEntityRepository
 
       else if($category!=NULL){
 
-        $query="SELECT max(i.increment) as increment FROM erpincrements i WHERE i.supplier_id IS NULL AND i.category_id=:CAT AND i.active=1 AND i.deleted=0";
-        $params=['CAT' => $category->getId()
+        $query="SELECT max(i.increment) as increment FROM erpincrements i WHERE i.supplier_id IS NULL AND i.category_id=:CAT  AND i.customergroup_id=:GRP AND i.active=1 AND i.deleted=0";
+        $params=['CAT' => $category->getId(),
+                'GRP' => $customergroup->getId()
                  ];
 
         $result=$this->getEntityManager()->getConnection()->executeQuery($query,$params)->fetch();
@@ -160,7 +163,7 @@ class ERPIncrementsRepository extends ServiceEntityRepository
 
       if($result!=NULL)
       {
-        dump("Vamos a devolver: ".$result['increment']*1);
+    //    dump("Vamos a devolver: ".$result['increment']*1);
         return $result['increment']*1;
       }
 

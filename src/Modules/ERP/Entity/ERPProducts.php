@@ -609,48 +609,65 @@ class ERPProducts
       $this->setShoppingPrice($this->PVPR*(1-$this->getShoppingDiscount($doctrine)/100));
     }
 
-    public function getMaxIncrement($doctrine){
-
+    public function getMaxIncrement($doctrine,$customergroup){
       $repository=$doctrine->getRepository(ERPIncrements::class);
       $category=$this->category;
       //cogemos el máximo incremento para su proveedor y su categoria
-      $maxincrement=$repository->getMaxIncrement($this->supplier,$category);
+      $maxincrement=$repository->getMaxIncrement($this->supplier,$category,$customergroup);
+    //  dump("Incremento categoria, proveedor:".$maxincrement);
       //si no tiene, buscamos incremento para ese proveedor y sus categorias padre
       while ($category->getParentid()!=null && $maxincrement==null){
           $category=$category->getParentid();
-          $maxincrement=$repository->getMaxIncrement($this->supplier,$category);
+          $maxincrement=$repository->getMaxIncrement($this->supplier,$category,$customergroup);
       }
+    // dump("Incremento categoria padre, proveedor:".$maxincrement);
       //si no hemos encontrado ningun incremento para ese proveedor y sus categorias padre,
       //buscamos incremento específico para ese proveedor
       if ($maxincrement==null)
-          $maxincrement=$repository->getMaxIncrement($this->supplier,null);
+          $maxincrement=$repository->getMaxIncrement($this->supplier,null,$customergroup);
+      dump("Incremento proveedor:".$maxincrement);
       //si no hay incremento específico para ese proveedor, buscamos incremento solo por categoria
       if ($maxincrement==null){
         $category=$this->category;
-        $maxincrement=$repository->getMaxIncrement(null,$category);
-
+        $maxincrement=$repository->getMaxIncrement(null,$category,$customergroup);
+        dump("Incremento categoria:".$maxincrement);
         //Si no hay incremento únicamente para su categoría. se busca incrementos para las categorías padre
         while ($category->getParentid()!=null && $maxincrement==null){
             $category=$category->getParentid();
-            $maxincrement=$repository->getMaxIncrement(null,$category);
+            $maxincrement=$repository->getMaxIncrement(null,$category,$customergroup);
           }
        }
+       dump("Incremento categoria padre:".$maxincrement);
        //llegados a este punto, no hemos encontrado incrementos, por lo que habrá que buscar el incremento general
        //en los grupos de clientes
       if ($maxincrement==null){
         $repository=$doctrine->getRepository(ERPCustomerGroups::class);
-        $maxincrement=$repository->getMaxIncrement();
+        $maxincrement=$repository->getIncrement($customergroup);
       }
+        dump("Incremento categoria, proveedor:".$maxincrement);
         return $maxincrement;
 
     }
 
     public function calculatePVP($doctrine){
-        $IncrementsRepository=$doctrine->getRepository(ERPIncrements::class);
-        $this->setPVP($this->shoppingPrice*(1+($this->getMaxIncrement($doctrine)/100)));
-
+        dump("Revisamos el PVP del producto ".$this->name);
+        //$IncrementsRepository=$doctrine->getRepository(ERPIncrements::class);
+        $CustomerGroupsRepository=$doctrine->getRepository(ERPCustomerGroups::class);
+        $customergroups=$CustomerGroupsRepository->findAll(["active"=>1,"deleted"=>0]);
+        $maxincrement=0;
+        foreach($customergroups as $customergroup){
+          dump("Revisamos el incremento para el grupo ".$customergroup->getName());
+          $increment=$this->getMaxIncrement($doctrine,$customergroup);
+          if($increment>$maxincrement) $maxincrement=$increment;
+        }
+        $this->setPVP($this->shoppingPrice*(1+($maxincrement/100)));
+        dump("ya hemos asignado el PVP");
 
     }
+
+
+
+
 
     public function preProccess($kernel, $doctrine, $user, $params, $oldobj){
       //If PVPR, Category or Suppliers is updated then ShoppingPrice is calculated
@@ -672,7 +689,7 @@ class ERPProducts
          if($this->manufacturer==null){
            $fieldErrors["manufacturer"]="This field is required.";
          }*/
-         
+
          if($this->category==null){
            $fieldErrors["category"]="This field is required.";
          }
