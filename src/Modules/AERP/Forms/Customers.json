@@ -55,11 +55,13 @@
                 {
                     "name": "customergroup",
                     "cols": 4,
-                    "relation": {"route": "customergroup"}
+                    "relation": {"route": "genericdata", "routeparams":{"module":"AERP","name":"CustomerGroups"}, "type":"modal"}
                 },
                 {
                     "name": "agent",
-                    "cols": 4
+                    "cols": 4,
+                    "relation": {"route": "formUser", "type":"full"}
+
                 },
                 {
                     "name": "taxexempt",

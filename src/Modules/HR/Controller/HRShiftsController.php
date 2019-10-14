@@ -58,13 +58,28 @@ class HRShiftsController extends Controller
   $formUtils->initialize($this->getUser(), new HRShifts(), dirname(__FILE__)."/../Forms/Shifts.json", $request, $this, $this->getDoctrine());
   $templateForms[]=$formUtils->formatForm('shifts', true, $id, $this->class);
 
+  $new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-new"];
+  $breadcrumb=$menurepository->formatBreadcrumb('schedules');
+  array_push($breadcrumb, ["rute"=>null, "name"=>"Shifts", "icon"=>"fa fa-calendar-check-o"], $new_breadcrumb);
+
+  $repository=$this->getDoctrine()->getRepository(HRSchedules::class);
+  $obj = $repository->findOneBy(['id'=>$id, 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
+  if($id!=0 && $obj==null){
+      return $this->render('@Globale/notfound.html.twig',[
+        "status_code"=>404,
+        "status_text"=>"Objeto no encontrado"
+      ]);
+  }
+  $entity_name=$obj?$obj->getName():'';
+
   if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
     return $this->render('@Globale/genericlist.html.twig', [
+      'entity_name' => $entity_name,
       'controllerName' => 'HRShiftsController',
       'interfaceName' => 'Turnos horario '.$schedule->getName(),
       'optionSelected' => 'schedules',
       'menuOptions' =>  $menurepository->formatOptions($userdata),
-      'breadcrumb' => $menurepository->formatBreadcrumb('schedules'),
+      'breadcrumb' => $breadcrumb,
       'userData' => $userdata,
       'schedule_id' => $id,
       'id_parent' =>$id,

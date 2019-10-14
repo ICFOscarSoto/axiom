@@ -47,15 +47,31 @@ class HRPeriodsController extends Controller
    $formUtils=new GlobaleFormUtils();
    $formUtils->initialize($this->getUser(), new HRPeriods(), dirname(__FILE__)."/../Forms/Periods.json", $request, $this, $this->getDoctrine());
    $templateLists[]=$utils->formatListbyShift($id);
+
+	 $new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-new"];
+	 $breadcrumb=$menurepository->formatBreadcrumb('schedules');
+	 array_push($breadcrumb, ["rute"=>null, "name"=>"Shifts", "icon"=>"fa fa-calendar-check-o"],["rute"=>null, "name"=>"Periods", "icon"=>"fa fa-calendar-check-o"], $new_breadcrumb);
+
+	 $repository=$this->getDoctrine()->getRepository(HRShifts::class);
+	 $obj = $repository->findOneBy(['id'=>$id, 'deleted'=>0]);
+	 if($id!=0 && $obj==null){
+			 return $this->render('@Globale/notfound.html.twig',[
+				 "status_code"=>404,
+				 "status_text"=>"Objeto no encontrado"
+			 ]);
+	 }
+	 $entity_name=$obj?$obj->getName():'';
+
    //$templateForms[]=$formUtils->formatForm('workcalendars', true);
    $templateForms[]=$formUtils->formatForm('periods', true, $id, $this->class, null);
    if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
      return $this->render('@Globale/genericlist.html.twig', [
+			 'entity_name' => $entity_name,
        'controllerName' => 'HRController',
        'interfaceName' => 'Calendarios laborales',
        'optionSelected' => 'schedules',
        'menuOptions' =>  $menurepository->formatOptions($userdata),
-       'breadcrumb' =>  $menurepository->formatBreadcrumb('schedules'),
+       'breadcrumb' =>  $breadcrumb,
        'userData' => $userdata,
        'lists' => $templateLists,
        'forms' => $templateForms,

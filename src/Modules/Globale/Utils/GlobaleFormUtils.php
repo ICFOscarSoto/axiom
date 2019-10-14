@@ -16,6 +16,7 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\CallbackTransformer;
 use App\Modules\Globale\Entity\GlobaleCompanies;
 use App\Modules\Globale\Entity\GlobaleHistories;
+use App\Modules\Globale\Entity\GlobaleUsers;
 
 class GlobaleFormUtils extends Controller
 {
@@ -187,11 +188,22 @@ class GlobaleFormUtils extends Controller
       if(isset($value["joinColumns"][0]["nullable"]) && $value["joinColumns"][0]["nullable"] == false) $nullable=false; else $nullable=true;
       if(!in_array($value['fieldName'],$this->ignoredAttributes)){
         $field=$this->searchTemplateField($value['fieldName']);
+        //Check if view Entity (relation) is present
+        $route=null;
+        $routeType=null;
+        if(isset($field["relation"]["route"])){
+            //Check if user has permissions for this route
+            $userRepository=$this->doctrine->getRepository(GlobaleUsers::class);
+            if($userRepository->hasPermission($this->user->getId(),$field["relation"]["route"])){
+              $route=true;
+              $routeType=isset($field["relation"]["type"])?$field["relation"]["type"]:'full';
+            }
+        }
         if(!isset($field["trigger"])) {//If no trigger element, fill it
-          $form->add($value['fieldName'], ChoiceType::class, $this->choiceRelation($value["targetEntity"], $this->obj->{'get'.ucfirst($value["fieldName"])}(),$nullable));
+          $form->add($value['fieldName'], ChoiceType::class, $this->choiceRelation($value["targetEntity"], $this->obj->{'get'.ucfirst($value["fieldName"])}(),$nullable, $route, $routeType));
         }else{
           //$form->add($value['fieldName'], TextType::class, ["attr"=>["attr-module"=>$field["module"],"attr-name"=>$field["nameClass"]]]);
-          $form->add($value['fieldName'], ChoiceType::class, $this->choiceRelationTrigger($field,$nullable));
+          $form->add($value['fieldName'], ChoiceType::class, $this->choiceRelationTrigger($field,$nullable, $route, $routeType));
         }
       }
     }
@@ -394,7 +406,7 @@ class GlobaleFormUtils extends Controller
 
   }
 
-  public function choiceRelation($class, $data, $nullable){
+  public function choiceRelation($class, $data, $nullable, $route=null, $routeType=null){
     $classname=explode('\\', $class);
     //If class has attribute company apply filter
     if(property_exists($class,'company')){
@@ -406,7 +418,7 @@ class GlobaleFormUtils extends Controller
     }
 
     $result =  [
-                  'attr' => ['class' => 'select2'],
+                  'attr' => ['class' => 'select2', 'attr-target' => $route, 'attr-target-type' => $routeType],
                   'required' => !$nullable,
                   'choices' => $choices,
                   //if class has attribute lastName concat it with name
@@ -430,7 +442,7 @@ class GlobaleFormUtils extends Controller
   }
 
 
-public function choiceRelationTrigger($field,$nullable){
+public function choiceRelationTrigger($field,$nullable, $route=null, $routeType=null){
   $class="\App\Modules\\".$field["trigger"]["module"]."\\Entity\\".$field["trigger"]["class"];
   $classTrigger="\App\Modules\\".$field["trigger"]["moduleTrigger"]."\\Entity\\".$field["trigger"]["classTrigger"];
   $form=$this->request->request->get('form', null);
@@ -457,7 +469,7 @@ public function choiceRelationTrigger($field,$nullable){
     }else $choices= $this->doctrine->getRepository($class)->findAll();
   }
   $result =  [
-                'attr' => ['class' => 'select2'],
+                'attr' => ['class' => 'select2', 'attr-target' => $route, 'attr-target-type' => $routeType],
                 'required' => !$nullable,
                 'choices' => $choices,
                 //if class has attribute lastName concat it with name

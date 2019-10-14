@@ -43,6 +43,20 @@ class HRWorkCalendarsController extends Controller
    $locale = $request->getLocale();
    $this->router = $router;
    $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
+
+	 $new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-new"];
+	 $breadcrumb=$menurepository->formatBreadcrumb('genericindex','HR','WorkCalendarGroups');
+	 array_push($breadcrumb, $new_breadcrumb);
+	 $repository=$this->getDoctrine()->getRepository(HRWorkCalendarGroups::class);
+	 $obj = $repository->findOneBy(['id'=>$id, 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
+	 if($id!=0 && $obj==null){
+			 return $this->render('@Globale/notfound.html.twig',[
+				 "status_code"=>404,
+				 "status_text"=>"Objeto no encontrado"
+			 ]);
+	 }
+	 $entity_name=$obj?$obj->getName():'';
+
    $utils = new $this->utilsClass();
    $formUtils=new GlobaleFormUtils();
    $formUtils->initialize($this->getUser(), new HRWorkCalendars(), dirname(__FILE__)."/../Forms/WorkCalendars.json", $request, $this, $this->getDoctrine(),["workcalendargroup"]);
@@ -51,12 +65,13 @@ class HRWorkCalendarsController extends Controller
    $templateForms[]=$formUtils->formatForm('workcalendars', true, $id, $this->class, null);
    if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
      return $this->render('@Globale/genericlist.html.twig', [
+			 'entity_name' => $entity_name,
        'controllerName' => 'HRController',
        'interfaceName' => 'Calendarios laborales',
        'optionSelected' => 'genericindex',
 			 'optionSelectedParams' => ["module"=>"HR", "name"=>"WorkCalendarGroups"],
        'menuOptions' =>  $menurepository->formatOptions($userdata),
-       'breadcrumb' =>  $menurepository->formatBreadcrumb('genericindex','HR','WorkCalendarGroups'),
+       'breadcrumb' =>  $breadcrumb,
        'userData' => $userdata,
        'lists' => $templateLists,
        'forms' => $templateForms,

@@ -11,7 +11,7 @@ use \App\Modules\HR\Entity\HRWorkCenters;
 use \App\Modules\HR\Entity\HRWorkCalendarGroups;
 use \App\Modules\HR\Entity\HRSchedules;
 use \App\Modules\HR\Entity\HRShifts;
-
+use \App\Helpers\HelperValidators;
 /**
  * @ORM\Entity(repositoryClass="App\Modules\HR\Repository\HRWorkerRepository")
  */
@@ -587,5 +587,22 @@ class HRWorkers
         $this->shift = $shift;
 
         return $this;
+    }
+
+    public function formValidation($kernel, $doctrine, $user, $validationParams){
+      $repository=$doctrine->getRepository(HRWorkers::class);
+      $obj=$repository->findOneBy(["idcard"=>$this->idcard,"company"=>$user->getCompany(),"deleted"=>0]);
+      if($obj!=null and $obj->id!=$this->id)
+        return ["valid"=>false, "global_errors"=>["El trabajador ya existe"]];
+      else {
+
+        //Check CIF/NIF/NIE
+        $fieldErrors=[];
+        $validator=new HelperValidators();
+        if(!$validator->isValidIdNumber($this->idcard)) {$fieldErrors=["idcard"=>"CIF/NIF/NIE no válido"]; }
+        if($this->email!=null && !$validator->isValidEmail($this->email)) {$fieldErrors=["email"=>"Dirección de email no válida"]; }
+        if($this->iban!=null && !$validator->isValidIban($this->iban)) {$fieldErrors=["iban"=>"Formato de IBAN incorrecto"]; }
+        return ["valid"=>empty($fieldErrors), "field_errors"=>$fieldErrors];
+      }
     }
 }

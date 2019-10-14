@@ -178,7 +178,7 @@ th.table-header-name{
       line-height: 24px !important;
       text-align: center;
       cursor: pointer;
-      z-index: 9999999;
+      z-index: 999;
 }
 .select2-selection__view:hover{
   background: #f1f1f1;

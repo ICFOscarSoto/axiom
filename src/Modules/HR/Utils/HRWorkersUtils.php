@@ -57,13 +57,16 @@ class HRWorkersUtils extends Controller
     return [
     ['user', ChoiceType::class, [
       'required' => false,
-      'attr' => ['class' => 'select2'],
+      'attr' => ['class' => 'select2', 'attr-target' => 'formUser', 'attr-target-type' => 'full'],
       'choices' => $results,
       'placeholder' => 'Select a user...',
       'choice_label' => function($obj, $key, $index) {
           if(method_exists($obj, "getLastname"))
             return $obj->getLastname().", ".$obj->getName();
           else return $obj->getName();
+      },
+      'choice_attr' => function($obj, $key, $index) {
+        return ['class' => $obj->getId()];
       },
       'choice_value' => 'id'
     ]],
