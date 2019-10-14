@@ -143,6 +143,18 @@ class AERPProviders
         return $this;
     }
 
+    public function getAddress(): ?string
+    {
+        return $this->address;
+    }
+
+    public function setAddress(?string $address): self
+    {
+        $this->address = $address;
+
+        return $this;
+    }
+
     public function getService(): ?bool
     {
         return $this->service;
@@ -175,6 +187,66 @@ class AERPProviders
     public function setAuthor(?GlobaleUsers $author): self
     {
         $this->author = $author;
+
+        return $this;
+    }
+
+    public function getCountry(): ?GlobaleCountries
+    {
+        return $this->country;
+    }
+
+    public function setCountry(?GlobaleCountries $country): self
+    {
+        $this->country = $country;
+
+        return $this;
+    }
+
+    public function getCity(): ?string
+    {
+        return $this->city;
+    }
+
+    public function setCity(?string $city): self
+    {
+        $this->city = $city;
+
+        return $this;
+    }
+
+    public function getState(): ?string
+    {
+        return $this->state;
+    }
+
+    public function setState(?string $state): self
+    {
+        $this->state = $state;
+
+        return $this;
+    }
+
+    public function getPostcode(): ?string
+    {
+        return $this->postcode;
+    }
+
+    public function setPostcode(?string $postcode): self
+    {
+        $this->postcode = $postcode;
+
+        return $this;
+    }
+
+    public function getPostbox(): ?string
+    {
+        return $this->postbox;
+    }
+
+    public function setPostbox(?string $postbox): self
+    {
+        $this->postbox = $postbox;
 
         return $this;
     }

@@ -1,0 +1,8 @@
+[
+  {"id": "editProviders", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"genericdata", "routeParams":{"module":"AERP", "name":"Providers", "type":"modal" }, "modal":"Providers", "actionType" : "background", "confirm" :false, "tooltip":""},
+  {"id": "activation", "type": "option", "options": [
+      {"id": "desactivateProviders", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"genericdisable", "routeParams":{"module":"AERP", "name":"Providers"}, "confirm" :true, "actionType" : "background", "tooltip":"" },
+      {"id": "activateProviders", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "route":"genericenable", "routeParams":{"module":"AERP", "name":"Providers"}, "confirm" :true, "actionType" : "background", "tooltip":"" }
+  ]},
+  {"id": "deleteProviders", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"genericdelete", "routeParams":{"module":"AERP", "name":"Providers"}, "confirm" :true, "undo" :false, "actionType" : "background", "tooltip":""}
+]

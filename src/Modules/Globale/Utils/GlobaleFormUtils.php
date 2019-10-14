@@ -321,7 +321,7 @@ class GlobaleFormUtils extends Controller
          $obj->setDeleted(false);
          //If object has Company save with de user Company
          if(method_exists($obj,'setCompany')) $obj->setCompany($this->user->getCompany());
-         if(method_exists($obj,'setAuthor')) $obj->setCompany($this->user);
+         if(method_exists($obj,'setAuthor')) $obj->setAuthor($this->user);
        }
        $obj->setDateupd(new \DateTime());
        try{

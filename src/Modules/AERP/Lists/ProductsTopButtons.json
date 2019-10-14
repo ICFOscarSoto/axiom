@@ -1,0 +1,6 @@
+[
+  {"id" : "addTopProducts", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"genericdata", "routeParams":{"module":"AERP", "name":"Products", "type":"modal" }, "modal":"Products", "actionType" : "background", "confirm" :false, "tooltip" : ""},
+  {"id" : "deleteTopProducts", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true, "tooltip":""},
+  {"id" : "printTopProducts", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false, "tooltip":""},
+  {"id" : "exportTopProducts", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"genericexport", "routeParams":{"module":"AERP", "name":"Products"}, "confirm" :false, "tooltip":""}
+]

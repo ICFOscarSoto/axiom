@@ -1,0 +1,45 @@
+[{
+    "sections": [
+        {
+            "name": "data",
+            "fields": [
+                {
+                    "name": "code",
+                    "cols": 4
+                },
+                {
+                    "name": "name",
+                    "cols": 4
+                },
+                {
+                    "name": "description",
+                    "cols": 4
+                },
+                {
+                    "name": "onsale",
+                    "cols": 4
+                },
+                {
+                    "name": "onpurchase",
+                    "cols": 4
+                },
+                {
+                    "name": "price",
+                    "cols": 4
+                },
+                {
+                    "name": "active",
+                    "cols": 4
+                },
+                {
+                    "name": "provider",
+                    "cols": 4
+                },
+                {
+                    "name": "tax",
+                    "cols": 4
+                }
+            ]
+        }
+    ]
+}]

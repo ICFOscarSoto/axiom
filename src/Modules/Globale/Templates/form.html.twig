@@ -112,9 +112,38 @@
             {% else %}
             {# Default component of the form #}
             {{ form_row(formConstructor.form[field.name]) }}
+              {# Check if field is a relation and must show the view button #}
+              {% if field.relation.route is defined %}
+                <script>
+
+                $("#selection-view-{{ field.name }}").on("click", function (e) {
+                  console.log("AAAAA");
+                  e.stopImmediatePropagation();
+                });
+
+
+                  $(document).ready(function() {
+                    $("#form_{{ field.name }}").select2();
+                    $("#form_{{ field.name }}").on("change", function (e) {
+                      var value=$(this).select2('data')[0]["element"]["className"];
+                      if(value!="") $(this).before("<span id='selection-view-{{ field.name }}' class='select2-selection__view' style=''><div>Ver Ficha</div></span>");
+                        else $(this).parent().find(".select2-selection__view").remove();
+                    });
+
+                    setTimeout(
+                    function(){
+                      var value=$("#form_{{ field.name }}").select2('data')[0]["element"]["className"];
+                      if(value!="")
+                        $("#form_{{ field.name }}").before("<span id='selection-view-{{ field.name }}' class='select2-selection__view' style=''><div>Ver Ficha</div></span>");
+                        else $("#form_{{ field.name }}").parent().find(".select2-selection__view").remove();
+                    }, 100);
+
+                  });
+                </script>
+              {% endif %}
+
               {# Check if field has trigger #}
               {% if field.trigger.field is defined and field.trigger.route is defined %}
-
               <script>
                 $(document).ready(function() {
                     $("#form_{{ field.trigger.field }}").select2();

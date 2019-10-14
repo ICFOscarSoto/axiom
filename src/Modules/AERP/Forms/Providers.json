@@ -1,0 +1,53 @@
+[{
+    "sections": [
+        {
+            "name": "data",
+            "fields": [
+                {
+                    "name": "name",
+                    "cols": 4
+                },
+                {
+                    "name": "service",
+                    "cols": 4
+                },
+                {
+                    "name": "vat",
+                    "cols": 4
+                },
+                {
+                    "name": "address",
+                    "cols": 4
+                },
+                {
+                    "name": "city",
+                    "cols": 4
+                },
+                {
+                    "name": "state",
+                    "cols": 4
+                },
+                {
+                    "name": "postcode",
+                    "cols": 4
+                },
+                {
+                    "name": "postbox",
+                    "cols": 4
+                },
+                {
+                    "name": "active",
+                    "cols": 4
+                },
+                {
+                    "name": "agent",
+                    "cols": 4
+                },
+                {
+                    "name": "country",
+                    "cols": 4
+                }
+            ]
+        }
+    ]
+}]

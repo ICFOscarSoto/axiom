@@ -166,6 +166,24 @@ th.table-header-name{
   height: 25px !important;
 }
 
+.select2-selection__view {
+      height: 25px;
+      position: absolute;
+      top: 25px;
+      right: 45px;
+      width: 75px;
+      border: 1px solid #e8e8e8;
+      border-radius: 3px;
+      background: #ffffff;
+      line-height: 24px !important;
+      text-align: center;
+      cursor: pointer;
+      z-index: 9999999;
+}
+.select2-selection__view:hover{
+  background: #f1f1f1;
+}
+
 .principal-content{
   min-height: 700px;
 }

@@ -8,7 +8,7 @@ use \App\Modules\Globale\Entity\GlobaleCompanies;
 use \App\Modules\Globale\Entity\GlobaleUsers;
 use \App\Modules\Globale\Entity\GlobaleCountries;
 use \App\Modules\AERP\Entity\AERPCustomerGroups;
-
+use \App\Helpers\HelperValidators;
 /**
  * @ORM\Entity(repositoryClass="App\Modules\AERP\Repository\AERPCustomersRepository")
  */
@@ -82,7 +82,7 @@ class AERPCustomers
      * @ORM\ManyToOne(targetEntity="\App\Modules\AERP\Entity\AERPCustomerGroups")
      */
     private $customergroup;
-    
+
     /**
      * @ORM\Column(type="float", nullable=true)
      */
@@ -91,7 +91,7 @@ class AERPCustomers
     /**
      * @ORM\Column(type="float")
      */
-    private $risk;
+    private $risk=0;
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleUsers")
@@ -404,5 +404,19 @@ class AERPCustomers
         return $this;
     }
 
+    public function formValidation($kernel, $doctrine, $user, $validationParams){
+      $repository=$doctrine->getRepository(AERPCustomers::class);
+      $obj=$repository->findOneBy(["vat"=>$this->vat,"company"=>$user->getCompany(),"deleted"=>0]);
+      if($obj!=null and $obj->id!=$this->id)
+        return ["valid"=>false, "global_errors"=>["El cliente ya existe"]];
+      else {
+        //Check CIF/NIF/NIE
+        $fieldErrors=[];
+        $validator=new HelperValidators();
+        if(!$validator->isValidIdNumber($this->vat)) {$fieldErrors=["vat"=>"CIF/NIF/NIE no válido"]; }
+
+        return ["valid"=>empty($fieldErrors), "field_errors"=>$fieldErrors];
+      }
+    }
 
 }

@@ -45,7 +45,8 @@
                 },
                 {
                     "name": "risk",
-                    "cols": 3
+                    "cols": 3,
+                    "readonly": true
                 },
                 {
                     "name": "shippcontact",
@@ -53,7 +54,8 @@
                 },
                 {
                     "name": "customergroup",
-                    "cols": 4
+                    "cols": 4,
+                    "relation": {"route": "customergroup"}
                 },
                 {
                     "name": "agent",

@@ -17,9 +17,11 @@ use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\AERP\Utils\AERPCustomersUtils;
+use App\Modules\Security\Utils\SecurityUtils;
 
 class AERPCustomersController extends Controller
 {
+	private $module='AERP';
 	private $class=AERPCustomers::class;
 	private $utilsClass=AERPCustomersUtils::class;
 
@@ -29,19 +31,22 @@ class AERPCustomersController extends Controller
 public function formAERPCustomer($id,Request $request)
 {
   $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-  $this->denyAccessUnlessGranted('ROLE_ADMIN');
+  if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
   $userdata=$this->getUser()->getTemplateData();
   $locale = $request->getLocale();
   $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
-  $breadcrumb=$menurepository->formatBreadcrumb('clientes');
-  $contactrRepository=$this->getDoctrine()->getRepository($this->class);
-  $obj = $contactrRepository->findOneBy(['id'=>$id, 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
-  $entity_name=$obj?$obj->getSocialName():'';
+  $contactRepository=$this->getDoctrine()->getRepository($this->class);
+  $obj = $contactRepository->findOneBy(['id'=>$id, 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
+  $entity_name=$obj?$obj->getName():'';
+	$new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-plus"];
+	$breadcrumb=$menurepository->formatBreadcrumb('genericindex','AERP','Customers');
+	array_push($breadcrumb,$new_breadcrumb);
   return $this->render('@Globale/generictabform.html.twig', array(
           'entity_name' => $entity_name,
           'controllerName' => 'CustomersController',
           'interfaceName' => 'Clientes',
-          'optionSelected' => $request->attributes->get('_route'),
+					'optionSelected' => 'genericindex',
+			    'optionSelectedParams' => ["module"=>"AERP", "name"=>"Customers"],
           'menuOptions' =>  $menurepository->formatOptions($userdata),
           'breadcrumb' => $breadcrumb,
           'userData' => $userdata,

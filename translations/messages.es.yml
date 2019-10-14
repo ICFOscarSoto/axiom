@@ -368,4 +368,18 @@ Searchengine: Buscador Internet
 #----------------------------------------------------------------------------------------------------------------------
 Allow access: Permitir acceso
 Deny access: Denegar acceso
-Groups inherit: Heredar de grupos 
+Groups inherit: Heredar de grupos
+
+#AERP
+#----------------------------------------------------------------------------------------------------------------------
+vat: CIF
+service: Servicios
+customergroup: Grupo cliente
+Agent: Agente
+Postbox: Apartado correos
+Maxrisk: Riesgo máximo
+Risk: Riesgo
+Taxexempt: Exención de IVA
+Shippcontact: Dirección envío
+Select aerpcontacts: Seleccionar dirección
+Select aerpcustomergroups: Seleccionar grupo cliente
