@@ -1,0 +1,3 @@
+[
+  {"id" : "addTop", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"AERPdataCategories", "modal":"categories", "actionType" : "background", "confirm" :false, "tooltip" : "Crear nueva categoria"}
+]

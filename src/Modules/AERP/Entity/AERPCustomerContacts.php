@@ -7,9 +7,9 @@ use \App\Modules\Globale\Entity\GlobaleUsers;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
 
 /**
- * @ORM\Entity(repositoryClass="App\Modules\AERP\Repository\AERPContactsRepository")
+ * @ORM\Entity(repositoryClass="App\Modules\AERP\Repository\AERPCustomerContactsRepository")
  */
-class AERPContacts
+class AERPCustomerContacts
 {
     /**
      * @ORM\Id()
@@ -27,6 +27,12 @@ class AERPContacts
      * @ORM\Column(type="string", length=150)
      */
     private $lastname;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\AERP\Entity\AERPCustomers")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $customer;
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleUsers")

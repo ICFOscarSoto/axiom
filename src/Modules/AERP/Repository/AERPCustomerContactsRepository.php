@@ -2,7 +2,7 @@
 
 namespace App\Modules\AERP\Repository;
 
-use App\Modules\AERP\Entity\AERPContacts;
+use App\Modules\AERP\Entity\AERPCustomerContacts;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
@@ -12,10 +12,10 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
  * @method AERPContact[]    findAll()
  * @method AERPContact[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class AERPContactsRepository extends ServiceEntityRepository
+class AERPCustomerContactsRepository extends ServiceEntityRepository
 {
     public function __construct(RegistryInterface $registry)
     {
-        parent::__construct($registry, AERPContacts::class);
+        parent::__construct($registry, AERPCustomerContacts::class);
     }
 }

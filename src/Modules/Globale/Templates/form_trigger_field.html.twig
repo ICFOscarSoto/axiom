@@ -1,0 +1,34 @@
+{# Check if field has trigger #}
+{% if field.trigger.field is defined and field.trigger.route is defined %}
+<script>
+  $(document).ready(function() {
+      $("#form_{{ field.trigger.field }}").select2();
+      $("#form_{{ field.name }}").select2();
+
+     $("#form_{{ field.trigger.field }}").on("change", function (e) {
+       if($("#form_{{ field.trigger.field }}").select2('data').length>0){
+         var value=$("#form_{{ field.trigger.field }}").select2('data')[0]["element"]["className"];
+         $("#form_{{ field.name }}").html('');
+         $.ajax({
+            dataType: "json",
+            url: '{{ url(field.trigger.route) }}',
+            type: 'POST',
+            data: {id: value, mod: '{{field.trigger.module}}', name: '{{field.trigger.class}}', modtrg:'{{field.trigger.moduleTrigger}}', nametrg:'{{field.trigger.classTrigger}}', prm:'{{field.trigger.relationParameter}}'},
+            success:  function( data ) {
+              console.log(data);
+              var html='<option value>Seleccionar </option>';
+              $.each( data, function( key, val ) {
+                html+='<option value="'+val.id+'" class="'+val.id+'">'+val.text+'</option>';
+              });
+               $("#form_{{ field.name }}").html(html);
+            }
+          });
+       }
+     });
+
+     if($("#form_{{ field.trigger.field }}").select2('data').length>0){
+       var value=$("#form_{{ field.trigger.field }}").select2('data')[0]["element"]["className"];
+     }
+  });
+</script>
+{% endif %}
