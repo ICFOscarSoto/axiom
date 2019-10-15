@@ -1,0 +1,25 @@
+{% if field.location is defined %}
+<script>
+  $(document).ready(function() {
+    $("#form_{{ field.name }}").before("<span id='map-view-{{ field.name }}' class='select2-selection__view' style='right: 18px;'><i class='fa fa-map-o' aria-hidden='true'></i><span>&nbsp;Ver Mapa</span></span>");
+
+    $('body').on('click',"#map-view-{{ field.name }}", function (e) {
+      var q=""; var city=""; var cp=""; var country="";
+      if($("#form_{{ field.location.country }} option:selected").text()!="") country+=', '+$("#form_{{ field.location.country }} option:selected").text();
+      if($("#form_{{ field.location.city }}").val()!="") city+=', '+$("#form_{{ field.location.city }}").val();
+      if($("#form_{{ field.location.postcode }}").val()!="") cp+=', '+$("#form_{{ field.location.postcode }}").val();
+      if($("#form_{{ field.name }}").val()!="") q+=', '+$("#form_{{ field.name }}").val();
+      $.post('{{ url('geocoding') }}', {q: q, country: country, city: city, cp: cp }, function(data, status, xhr) {
+        if(data.importance>0.6){
+  			        $("#location-modal-form").attr("attr-latitude",data.lat);
+  			        $("#location-modal-form").attr("attr-longitude",data.lon);
+                $("#location-modal-form").modal('show');
+        }else toastr.warning("Dirección no encontrada, revise los datos y vuelva a intentarlo", null, confirmation);
+        console.log(q);
+        console.log(data);
+      }, "json");
+
+    });
+  });
+</script>
+{% endif %}

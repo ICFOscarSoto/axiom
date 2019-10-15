@@ -1,0 +1,138 @@
+{% set params = app.request.attributes.get('_route_params')|merge(app.request.query.all()) %}
+{% block header %}
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<meta name="description" content="Neon Admin Panel" />
+	<meta name="author" content="" />
+	{{ include('@Globale/header.html.twig') }}
+	<!-- Imported styles on this page -->
+	<link rel="stylesheet" href="{{ url('index') }}/js/jvectormap/jquery-jvectormap-1.2.2.css">
+	<link rel="stylesheet" href="{{ url('index') }}/js/rickshaw/rickshaw.min.css">
+{% endblock %}
+<title>{% block title %}{{ interfaceName }}{% endblock %}</title>
+<body class="page-body" data-url="{{ url('indexAdmin') }}">
+<div class="page-container"><!-- add class "sidebar-collapsed" to close sidebar by default, "chat-visible" to make chat appear always -->
+	{{ include('@Globale/sidebar_menu.html.twig') }}
+	<div class="main-content">
+		{{ include('@Globale/head.html.twig') }}
+		<hr />
+		{{ include('@Globale/breadcrumb.html.twig') }}
+		{#}<h2>{{ interfaceName }}</h2>#}
+		<!-- MAIN CONTENT -->
+		{% set listConstructor = lists[0] %}
+		{% set listOrigin = "genericlist" %}
+		{{ include('@Globale/list_button_top_paint.html.twig') }}
+
+		<div id="list-2" class="nested-list dd with-margins custom-drag-button"><ol id="categories" class="dd-list"></ol></div><!-- adding class "custom-drag-button" will create specific handler for dragging list items -->
+
+		<script>
+		$(document).ready(function() {
+			function parseCategory(element){
+				var data='';
+				data+='';
+				element.forEach( function(valor, indice, array) {
+
+												data+='<li class="dd-item" data-id="'+valor.id+'">'+
+													'<div class="dd-handle">'+
+														'<i class="fa fa-arrows" aria-hidden="true"></i>'+
+													'</div>'+
+													'<div attr-id="'+valor.id+'" id="listCategories-field-button-edit-'+valor.id+'" class="dd-edit">'+
+														'<i class="fa fa-edit" aria-hidden="true"></i>'+
+													'</div>'+
+													'<div attr-id="'+valor.id+'" id="listCategories-field-button-delete-'+valor.id+'" class="dd-edit" onclick="jQuery(\'#{{ listConstructor.id }}-modal-confirm\').modal(\'show\', {backdrop: \'static\'});">'+
+														'<i class="fa fa-trash-o" aria-hidden="true"></i>'+
+													'</div>'+
+													'<div class="dd-content">'+
+														valor.name+
+													'</div>'+
+													((valor.childrens.length>0)?'<ol class="dd-list">':'')+
+													((valor.childrens.length>0)?parseCategory(valor.childrens):'')+
+													((valor.childrens.length>0)?'</ol>':'')+
+												'</li>';
+				});
+				data+='';
+				return data;
+			}
+			var categories='{{ categories }}';
+			categories=categories.replace(/&quot;/g,'"');
+			categories = $.parseJSON(categories);
+			categories.forEach( function(valor, indice, array) {
+				$("#categories").append(
+											'<li class="dd-item" data-id="'+valor.id+'">'+
+												'<div class="dd-handle">'+
+													'<i class="fa fa-arrows" aria-hidden="true"></i>'+
+												'</div>'+
+												'<div attr-id="'+valor.id+'" id="listCategories-field-button-edit-'+valor.id+'" class="dd-edit">'+
+													'<i class="fa fa-edit" aria-hidden="true"></i>'+
+												'</div>'+
+												'<div attr-id="'+valor.id+'" id="listCategories-field-button-delete-'+valor.id+'" class="dd-edit">'+
+													'<i class="fa fa-trash-o" aria-hidden="true"></i>'+
+												'</div>'+
+												'<div class="dd-content">'+
+													valor.name+
+												'</div>'+
+													((valor.childrens.length>0)?'<ol class="dd-list">':'')+
+													((valor.childrens.length>0)?parseCategory(valor.childrens):'')+
+													((valor.childrens.length>0)?'</ol>':'')+
+											'</li>');
+			});
+		});
+		</script>
+
+		                <script type="text/javascript">
+										jQuery(document).ready(function($){
+											$('.dd').nestable({
+												afterInit: function ( event ) {
+
+												}
+											})
+											.on('dragEnd', function(event, item, source, destination, position) {
+												$.ajax({
+													 dataType: "json",
+													 url: '{{ url('AERPcategoriesDragChange') }}',
+													 type: 'POST',
+													 data: {id: item.attr("data-id"), parent: item.parents('li').attr("data-id"), position: position},
+													 success:  function( data ) {
+														 if(data.result){
+					                     toastr.success("Datos guardados correctamente", "Confirmación", confirmation);
+					                   } else toastr.error("Ocurrió un error al guardar los datos", "Confirmación", confirmation);
+													 }
+												 });
+
+											});
+										})
+										$('body').on('hide.bs.modal', "#categories-modal-form", function() {
+											console.log("cerrado");
+										});
+		                </script>
+
+
+		{{ include('@Globale/list_button_fields.html.twig') }}
+		{{ include('@Globale/list_button_top.html.twig') }}
+		{{ include('@Globale/list_modal_confirm.html.twig') }}
+<!-- MODALS  -->
+{% if forms is defined %}
+	{% for form in forms %}
+	  {% set formConstructor = form %}
+		{{ include('@Globale/genericajaxform.html.twig') }}
+	{% endfor %}
+{% endif %}
+
+<!-- END MODALS -->
+{% block footer %}
+
+	<link rel="stylesheet" href="{{ url('index') }}js/datatables/datatables.css">
+	<link rel="stylesheet" href="{{ url('index') }}js/select2/select2-bootstrap.css">
+	<link rel="stylesheet" href="{{ url('index') }}js/select2/select2.css">
+	<link rel="stylesheet" href="{{ url('index') }}css/custom.css">
+
+	<!-- Imported scripts on this page -->
+	<script src="{{ url('index') }}js/jquery.nestable.js"></script>
+	<script src="{{ url('index') }}js/datatables/datatables.js"></script>
+	<script src="{{ url('index') }}js/select2/select2.min.js"></script>
+	<script src="{{ url('index') }}js/moment.min.js"></script>
+	<script src="{{ url('index') }}js/moment-duration-format.min.js"></script>
+	 {{ include('@Globale/bottom.html.twig') }}
+{% endblock %}
+</body>

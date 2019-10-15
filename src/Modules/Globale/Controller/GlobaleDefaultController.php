@@ -332,4 +332,27 @@ class GlobaleDefaultController extends Controller
           "status_text"=>"No tiene permisos para acceder a esta sección"
         ]);
       }
+
+      /**
+      * @Route("/api/globale/geocoding", name="geocoding")
+      */
+       public function geocoding(Request $request){
+         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+         $query=$request->request->get('q');
+         $country=$request->request->get('country');
+         $cp=$request->request->get('cp');
+         $city=$request->request->get('city');
+         dump($query);
+         //$query="Paseo de la Libertad,Albacete";
+         $url="https://nominatim.openstreetmap.org/search.php?street=".urlencode($query)."&country=".urlencode($country)."&city=".urlencode($city)."&cp=".urlencode($cp)."&format=json";
+         $ch = curl_init();
+         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+         curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13');
+         curl_setopt($ch, CURLOPT_URL,$url);
+         $file=curl_exec($ch);
+         curl_close($ch);
+         $json=json_decode($file);
+         if(count($json)>0) $json=$json[0];
+         return new JsonResponse($json);
+      }
 }

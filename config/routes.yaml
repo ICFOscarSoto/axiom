@@ -114,7 +114,7 @@ ProductVariant:
 Product:
     resource: 'App\Modules\ERP\Controller\ERPProductsController'
     type:     annotation
-    
+
 ProductPrices:
     resource: 'App\Modules\ERP\Controller\ERPProductPricesController'
     type:     annotation
@@ -273,4 +273,8 @@ Navision:
 
 AERPCustomer:
   resource: 'App\Modules\AERP\Controller\AERPCustomersController'
+  type:      annotation
+
+AERPCategories:
+  resource: 'App\Modules\AERP\Controller\AERPCategoriesController'
   type:      annotation

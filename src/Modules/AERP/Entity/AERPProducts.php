@@ -61,6 +61,11 @@ class AERPProducts
     private $price;
 
     /**
+     * @ORM\Column(type="boolean")
+     */
+    private $stockControl;
+
+    /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCompanies")
      * @ORM\JoinColumn(nullable=false)
      */
@@ -186,6 +191,19 @@ class AERPProducts
 
         return $this;
     }
+
+    public function getStockcontrol(): ?bool
+    {
+        return $this->stockControl;
+    }
+
+    public function setStockcontrol(bool $stockControl): self
+    {
+        $this->stockControl = $stockControl;
+
+        return $this;
+    }
+
 
     public function getCompany(): ?GlobaleCompanies
     {

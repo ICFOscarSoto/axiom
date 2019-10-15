@@ -71,6 +71,12 @@
 	var closer = document.getElementById('popup-closer');
 
   	$(document).ready(function() {
+      $('body').on('click', "[id^=button-location]", function() {
+          $("#location-modal-form").modal('show');
+					$("#location-modal-form").attr("attr-latitude",$(this).attr("attr-latitude"));
+					$("#location-modal-form").attr("attr-longitude",$(this).attr("attr-longitude"));
+      });
+
 			$( "#location-modal-form" ).on('shown.bs.modal', function(){
 					createMap($(this).attr("attr-latitude"), $(this).attr("attr-longitude"));
 			});

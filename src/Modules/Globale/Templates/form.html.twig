@@ -113,83 +113,12 @@
             {# Default component of the form #}
             {{ form_row(formConstructor.form[field.name]) }}
               {# Check if field is a relation and must show the view button #}
-              {% if field.relation.route is defined %}
-                <script>
-                  $(document).ready(function() {
-                    $("#form_{{ field.name }}").select2();
-                    $("#form_{{ field.name }}").on("change", function (e) {
-                      var value=$(this).select2('data')[0]["element"]["className"];
-                      {% if field.relation.routeparams is not defined %}{% set routeparams = [] %}{% else %}{% set routeparams = field.relation.routeparams %}{% endif %}
-                      if(value!="") $(this).before("<span id='selection-view-{{ field.name }}' class='select2-selection__view' style='' attr-url='{{ url(field.relation.route, routeparams|merge({"id":'_____'})) }}'><i class='fa fa-file-text-o' aria-hidden='true'></i><span>&nbsp;Ver Ficha</span></span>");
-                        else $(this).parent().find(".select2-selection__view").remove();
-                    });
-
-                    $('body').on('click',"#selection-view-{{ field.name }}", function (e) {
-                      var value=$("#form_{{ field.name }}").select2('data')[0]["element"]["className"];
-                      url=$(this).attr("attr-url");
-                      url=url.replace('_____',value);
-                        {% if field.relation.type=="full" %}
-                          var win = window.open(url, '_blank');
-                          win.focus();
-                        {% else %}
-                        $.post(url, null,
-                          function(data, status, xhr){
-                              $("#relation-modal-form-body").html(data);
-                              $("#relation-modal-form-body").find(':checkbox').not($('[id$=-chkall]')).iCheck({checkboxClass: 'icheckbox_flat-blue', radioClass: 'iradio_flat-blue'});
-                              $("#relation-modal-form-body select").select2();
-                              $("#relation-modal-form-body :input").attr("disabled", true);
-                              $("#relation-modal-form").modal();
-                          });
-                        {% endif %}
-                    });
-
-                    setTimeout(
-                    function(){
-                      var value=$("#form_{{ field.name }}").select2('data')[0]["element"]["className"];
-                      if(value!="")
-                        {% if field.relation.routeparams is not defined %}{% set routeparams = [] %}{% else %}{% set routeparams = field.relation.routeparams %}{% endif %}
-                        $("#form_{{ field.name }}").before("<span id='selection-view-{{ field.name }}' class='select2-selection__view' style='' attr-url='{{ url(field.relation.route, routeparams|merge({"id":'_____'})) }}'><i class='fa fa-file-text-o' aria-hidden='true'></i><span>&nbsp;Ver Ficha</span></span>");
-                        else $("#form_{{ field.name }}").parent().find(".select2-selection__view").remove();
-                    }, 100);
-
-                  });
-                </script>
-              {% endif %}
-
+              {{ include("@Globale/form_relation_button.html.twig") }}
+              {# Check if field is an address and map is enabled #}
+              {{ include("@Globale/form_address_button.html.twig") }}
               {# Check if field has trigger #}
-              {% if field.trigger.field is defined and field.trigger.route is defined %}
-              <script>
-                $(document).ready(function() {
-                    $("#form_{{ field.trigger.field }}").select2();
-                    $("#form_{{ field.name }}").select2();
+              {{ include("@Globale/form_trigger_field.html.twig") }}
 
-                   $("#form_{{ field.trigger.field }}").on("change", function (e) {
-                     if($("#form_{{ field.trigger.field }}").select2('data').length>0){
-                       var value=$("#form_{{ field.trigger.field }}").select2('data')[0]["element"]["className"];
-                       $("#form_{{ field.name }}").html('');
-                       $.ajax({
-                          dataType: "json",
-                          url: '{{ url(field.trigger.route) }}',
-                          type: 'POST',
-                          data: {id: value, mod: '{{field.trigger.module}}', name: '{{field.trigger.class}}', modtrg:'{{field.trigger.moduleTrigger}}', nametrg:'{{field.trigger.classTrigger}}', prm:'{{field.trigger.relationParameter}}'},
-                          success:  function( data ) {
-                            console.log(data);
-                            var html='<option value>Seleccionar </option>';
-                            $.each( data, function( key, val ) {
-                              html+='<option value="'+val.id+'" class="'+val.id+'">'+val.text+'</option>';
-                            });
-                             $("#form_{{ field.name }}").html(html);
-                          }
-                        });
-                     }
-                   });
-
-                   if($("#form_{{ field.trigger.field }}").select2('data').length>0){
-                     var value=$("#form_{{ field.trigger.field }}").select2('data')[0]["element"]["className"];
-                   }
-                });
-              </script>
-              {% endif %}
             {% endif %}
         </div>
         {% set counter = counter +1 %}
@@ -390,7 +319,8 @@ return blob;
     {% endfor %}
   });
 </script>
-
+{# MODAL LOCATIONS #}
+{{ include("@Globale/location.html.twig") }}
 {# MODAL RELATIONS #}
 <div class="modal fade" tabindex="-1" id="relation-modal-form" aria-hidden="true">
 		<div class="modal-dialog modal-lg">

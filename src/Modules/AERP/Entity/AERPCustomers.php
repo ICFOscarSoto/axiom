@@ -74,7 +74,7 @@ class AERPCustomers
     private $postbox;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\AERP\Entity\AERPContacts")
+     * @ORM\ManyToOne(targetEntity="\App\Modules\AERP\Entity\AERPCustomerContacts")
      */
     private $shippcontact;
 
@@ -176,12 +176,12 @@ class AERPCustomers
         return $this;
     }
 
-    public function getShippcontact(): ?AERPContacts
+    public function getShippcontact(): ?AERPCustomerContacts
     {
         return $this->shippcontact;
     }
 
-    public function setShippcontact(?AERPContacts $shippcontact): self
+    public function setShippcontact(?AERPCustomerContacts $shippcontact): self
     {
         $this->shippcontact = $shippcontact;
 

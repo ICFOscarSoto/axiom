@@ -1,0 +1,9 @@
+[{
+	"sections": [
+		{
+			"name": "Category data",
+			"fields": [
+				{ "name": "name","cols": 12}
+			]
+		}]
+}]

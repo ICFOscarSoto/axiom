@@ -4,6 +4,7 @@ namespace App\Modules\AERP\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
+use \App\Modules\Globale\Entity\GlobaleCountries;
 use \App\Modules\Globale\Entity\GlobaleUsers;
 use \App\Modules\AERP\Entity\AERPCustomers;
 
