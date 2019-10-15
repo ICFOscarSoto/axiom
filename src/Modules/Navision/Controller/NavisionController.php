@@ -94,7 +94,9 @@ class NavisionController extends Controller
       $pm=$this->getDoctrine()->getManager();
       $pm->persist($productEntity);
       $pm->flush();
-      if (in_array("EAN13",$product)) {
+
+
+      if (isset($product["EAN13"])) {
         $EAN13=$product["EAN13"];
         foreach ($EAN13 as $key=>$value){
           if (strlen($key)==13) {
