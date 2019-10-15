@@ -46,6 +46,21 @@ class NavisionController extends Controller
 
 
    /**
+    * @Route("/api/navision/product/importInaer", name="navisionImportInaer")
+    */
+    public function navisionImportInaer(Request $request){
+      $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+      $invoice=file_get_contents($this->url.'navisionExport/do-NAVISION-getProdcutsInaer.php');
+      $products=json_decode($invoice, true);
+      $products=$products[0];
+      //dump($products["products"]);
+      foreach ($products["products"] as $key){
+        $this->navisionImportProduct($key["code"], $request);
+      }
+      return new Response(null);
+    }
+
+   /**
     * @Route("/api/navision/product/import/{id}", name="navisionImportProduct", defaults={"id"=0})
     */
     public function navisionImportProduct($id, Request $request){
@@ -53,6 +68,9 @@ class NavisionController extends Controller
       $invoice=file_get_contents($this->url.'navisionExport/do-NAVISION-product.php?products=["'.$id.'"]');
       $product=json_decode($invoice, true);
       $product=$product[$id];
+      $repository=$this->getDoctrine()->getRepository(ERPProducts::class);
+      $productExists=$repository->findOneBy(["code"=>$id]);
+      if ($productExists==null) {
       //Creamos el producto en la base de datos
       $productEntity= new ERPProducts();
       $productEntity->setCode($id);
@@ -76,24 +94,25 @@ class NavisionController extends Controller
       $pm=$this->getDoctrine()->getManager();
       $pm->persist($productEntity);
       $pm->flush();
-
-      $EAN13=$product["EAN13"];
-      foreach ($EAN13 as $key=>$value){
-        if (strlen($key)==13) {
-          $EAN13Entity=new ERPEAN13();
-          $EAN13Entity->setProduct($productEntity);
-          $EAN13Entity->setName($key);
-          $EAN13Entity->setType(1);
-          $EAN13Entity->setDateupd(new \DateTime());
-          $EAN13Entity->setDateadd(new \DateTime());
-          $EAN13Entity->setSupplier($supplierEntity);
-          $pm=$this->getDoctrine()->getManager();
-          $pm->persist($EAN13Entity);
-          $pm->flush();
+      if (in_array("EAN13",$product)) {
+        $EAN13=$product["EAN13"];
+        foreach ($EAN13 as $key=>$value){
+          if (strlen($key)==13) {
+            $EAN13Entity=new ERPEAN13();
+            $EAN13Entity->setProduct($productEntity);
+            $EAN13Entity->setName($key);
+            $EAN13Entity->setType(1);
+            $EAN13Entity->setDateupd(new \DateTime());
+            $EAN13Entity->setDateadd(new \DateTime());
+            $EAN13Entity->setSupplier($supplierEntity);
+            $pm=$this->getDoctrine()->getManager();
+            $pm->persist($EAN13Entity);
+            $pm->flush();
+          }
         }
-      }
+    }
+}
 
-
-      return new Response($invoice);
+      return new Response(null);
     }
 }
