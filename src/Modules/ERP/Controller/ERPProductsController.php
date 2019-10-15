@@ -26,6 +26,7 @@ use App\Modules\ERP\Utils\ERPReferencesUtils;
 use App\Modules\ERP\Utils\ERPStocksUtils;
 use App\Modules\ERP\Utils\ERPProductsAttributesUtils;
 use App\Modules\Security\Utils\SecurityUtils;
+use App\Modules\ERP\Reports\ERPEan13Reports;
 
 class ERPProductsController extends Controller
 {
@@ -232,6 +233,19 @@ class ERPProductsController extends Controller
 	 $entityUtils=new GlobaleEntityUtils();
 	 $result=$entityUtils->deleteObject($id, $this->class, $this->getDoctrine());
 	 return new JsonResponse(array('result' => $result));
+ }
+
+ /**
+ * @Route("/{_locale}/admin/ERP/product/printLabel/{id}", name="printeanlabel")
+ */
+ public function printeanlabel($id){
+	 $code="20501";
+	 $barcode="0511385437478";
+	 $name="Retenedor filtros S5900 501 (2 unidades)";
+	 $params=["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "code"=>$code, "barcode"=>$barcode, "name"=>$name, "user"=>$this->getUser()];
+	 $reportsUtils = new ERPEan13Reports();
+	 $pdf=$reportsUtils->create($params);
+	 return new Response("", 200, array('Content-Type' => 'application/pdf'));
  }
 
 }
