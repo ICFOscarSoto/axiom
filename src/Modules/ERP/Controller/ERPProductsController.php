@@ -88,7 +88,7 @@ class ERPProductsController extends Controller
 		 */
 		 public function formProduct($id, Request $request){
 			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-			$this->denyAccessUnlessGranted('ROLE_ADMIN');
+			
 			$new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-new"];
 			$template=dirname(__FILE__)."/../Forms/Products.json";
 			$userdata=$this->getUser()->getTemplateData();
