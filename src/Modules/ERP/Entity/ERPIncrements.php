@@ -291,6 +291,20 @@ public function formValidation($kernel, $doctrine, $user, $validationParams){
         }
 
     if($incrementbygroup==null){
+      $incrementbygroup=$repository->getIncrementByGroup($supplier,null,$customergroup);
+    }
+
+    if ($incrementbygroup==null){
+      $category=$productcategory;
+      $incrementbygroup=$repository->getIncrementByGroup(null,$category,$customergroup);
+      //Si no hay incremento únicamente para su categoría. se busca incrementos para las categorías padre
+      while ($category->getParentid()!=null && $incrementbygroup==null){
+          $category=$category->getParentid();
+          $incrementbygroup=$repository->getIncrementByGroup(null,$category,$customergroup);
+        }
+     }
+
+    if($incrementbygroup==null){
       $repository=$doctrine->getRepository(ERPCustomerGroups::class);
       $incrementbygroup=$repository->getIncrement($customergroup);
       return $incrementbygroup;

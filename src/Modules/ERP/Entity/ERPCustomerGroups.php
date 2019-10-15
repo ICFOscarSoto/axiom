@@ -166,7 +166,7 @@ class ERPCustomerGroups
       //  $repository=$doctrine->getRepository(ERPSuppliers::class);
         $repositoryProductPrices=$doctrine->getRepository(ERPProductPrices::class);
         $products=$repositoryProduct->findBy(["active"=>1,"deleted"=>0]);
-        dump($products);
+    //  dump($products);
         foreach($products as $product){
           $productEntity=$repositoryProduct->findOneBy(["id"=>$product]);
           $productEntity->calculatePVP($doctrine);
