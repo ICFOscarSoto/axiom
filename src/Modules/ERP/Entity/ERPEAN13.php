@@ -60,7 +60,7 @@ class ERPEAN13
     /**
      * @ORM\Column(type="boolean")
      */
-    private $deleted;
+    private $deleted=0;
 
     /**
      * @ORM\Column(type="smallint", nullable=true)

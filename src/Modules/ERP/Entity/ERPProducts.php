@@ -56,22 +56,22 @@ class ERPProducts
     /**
      * @ORM\Column(type="boolean")
      */
-    private $traceability;
+    private $traceability=0;
 
     /**
      * @ORM\Column(type="boolean")
      */
-    private $grouped;
+    private $grouped=0;
 
     /**
      * @ORM\Column(type="boolean")
      */
-    private $expiration;
+    private $expiration=0;
 
     /**
      * @ORM\Column(type="boolean")
      */
-    private $discontinued;
+    private $discontinued=0;
 
     /**
      * @ORM\Column(type="boolean")
@@ -86,17 +86,17 @@ class ERPProducts
     /**
      * @ORM\Column(type="boolean")
      */
-    private $saleindecimals;
+    private $saleindecimals=0;
 
     /**
      * @ORM\Column(type="boolean")
      */
-    private $exclusiveonline;
+    private $exclusiveonline=0;
 
     /**
      * @ORM\Column(type="boolean")
      */
-    private $bigsize;
+    private $bigsize=0;
 
     /**
      * @ORM\Column(type="boolean")
@@ -106,7 +106,7 @@ class ERPProducts
     /**
      * @ORM\Column(type="boolean")
      */
-    private $deleted;
+    private $deleted=0;
 
     /**
      * @ORM\Column(type="datetime")
@@ -194,7 +194,7 @@ class ERPProducts
     /**
      * @ORM\Column(type="boolean")
      */
-    private $netprice;
+    private $netprice=0;
 
 
     public function getId(): ?int
