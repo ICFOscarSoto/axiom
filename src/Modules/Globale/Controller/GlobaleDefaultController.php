@@ -342,8 +342,6 @@ class GlobaleDefaultController extends Controller
          $country=$request->request->get('country');
          $cp=$request->request->get('cp');
          $city=$request->request->get('city');
-         dump($query);
-         //$query="Paseo de la Libertad,Albacete";
          $url="https://nominatim.openstreetmap.org/search.php?street=".urlencode($query)."&country=".urlencode($country)."&city=".urlencode($city)."&cp=".urlencode($cp)."&format=json";
          $ch = curl_init();
          curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);

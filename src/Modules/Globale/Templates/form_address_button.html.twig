@@ -15,8 +15,6 @@
   			        $("#location-modal-form").attr("attr-longitude",data.lon);
                 $("#location-modal-form").modal('show');
         }else toastr.warning("Dirección no encontrada, revise los datos y vuelva a intentarlo", null, confirmation);
-        console.log(q);
-        console.log(data);
       }, "json");
 
     });
