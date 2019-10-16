@@ -6,48 +6,38 @@ use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
-use App\Modules\AERP\Entity\AERPCustomerContacts;
+use App\Modules\Globale\Entity\GlobaleUsers;
 
-class AERPCustomersUtils
+class AERPCustomerContactsUtils
 {
   private $module="AERP";
-  private $name="Customers";
+  private $name="CustomerContacts";
+  public $parentClass="\App\Modules\AERP\Entity\AERPCustomers";
+  public $parentField="customer";
+
   public function getExcludedForm($params){
-    return ['shippcontact'];
+    return ['customer'];
   }
 
   public function getIncludedForm($params){
     $doctrine=$params["doctrine"];
     $id=$params["id"];
     $user=$params["user"];
-    $obj=$params["obj"];
-    $repository=$doctrine->getRepository(AERPCustomerContacts::class);
-    return [
-      ['shippcontact', ChoiceType::class, [
-        'required' => false,
-        'disabled' => false,
-        'attr' => ['class' => 'select2', 'readonly' => true],
-        'choices' => $repository->findBy(["customer"=>$obj]),
-        'placeholder' => 'Select aerpcustomercontacts',
-        'choice_label' => function($obj, $key, $index) {
-            if(method_exists($obj, "getLastname") && $obj->getLastname()!=null)
-              return $obj->getLastname().", ".$obj->getName();
-            else return $obj->getName();
-        },
-        'choice_attr' => function($obj, $key, $index) {
-          return ['class' => $obj->getId()];
-        },
-        'choice_value' => 'id'
-      ]]
-    ];
+    return [];
   }
 
-  public function formatList($user){
+  public function formatList($user, $parent){
     $list=[
       'id' => 'list'.$this->name,
       'route' => 'genericlist',
       'routeParams' => ["module" => $this->module,
-                        "name" => $this->name],
+                        "name" => $this->name,
+                        "parent" => $parent,
+                        "id" => $parent,
+                        "field" => "customer",
+                        "parentModule" => "AERP",
+                        "parentName" => "Customers"
+                      ],
       'orderColumn' => 2,
       'orderDirection' => 'ASC',
       'tagColumn' => 2,

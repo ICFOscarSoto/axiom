@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
 use \App\Modules\Globale\Entity\GlobaleCountries;
 use \App\Modules\Globale\Entity\GlobaleUsers;
-use \App\Modules\AERP\Entity\AERPCustomers;
+use \App\Helpers\HelperValidators;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\AERP\Repository\AERPProvidersRepository")
@@ -30,17 +30,12 @@ class AERPProviders
      * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleUsers")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $agent;
+    private $agentassign;
 
     /**
      * @ORM\Column(type="string", length=200)
      */
     private $name;
-
-    /**
-     * @ORM\Column(type="boolean")
-     */
-    private $service;
 
     /**
      * @ORM\Column(type="string", length=14)
@@ -83,15 +78,26 @@ class AERPProviders
      */
     private $author;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
-    private $dateadd;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="string", length=175, nullable=true)
      */
-    private $dateupd;
+    private $email;
+
+    /**
+     * @ORM\Column(type="string", length=32, nullable=true)
+     */
+    private $phone;
+
+    /**
+     * @ORM\Column(type="string", length=32, nullable=true)
+     */
+    private $mobile;
+
+    /**
+     * @ORM\Column(type="string", length=175, nullable=true)
+     */
+    private $web;
 
     /**
      * @ORM\Column(type="boolean")
@@ -103,33 +109,30 @@ class AERPProviders
      */
     private $deleted;
 
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $dateadd;
+
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $dateupd;
+
+    /**
+     * @ORM\Column(type="string", length=40, nullable=true)
+     */
+    private $iban;
+
+    /**
+     * @ORM\Column(type="string", length=15, nullable=true)
+     */
+    private $swift;
+
+
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getCompany(): ?GlobaleCompanies
-    {
-        return $this->company;
-    }
-
-    public function setCompany(?GlobaleCompanies $company): self
-    {
-        $this->company = $company;
-
-        return $this;
-    }
-
-    public function getAgent(): ?GlobaleUsers
-    {
-        return $this->agent;
-    }
-
-    public function setAgent(?GlobaleUsers $agent): self
-    {
-        $this->agent = $agent;
-
-        return $this;
     }
 
     public function getName(): ?string
@@ -144,26 +147,14 @@ class AERPProviders
         return $this;
     }
 
-    public function getAddress(): ?string
+    public function getAgentassign(): ?GlobaleUsers
     {
-        return $this->address;
+        return $this->agentassign;
     }
 
-    public function setAddress(?string $address): self
+    public function setAgentassign(?GlobaleUsers $agentassign): self
     {
-        $this->address = $address;
-
-        return $this;
-    }
-
-    public function getService(): ?bool
-    {
-        return $this->service;
-    }
-
-    public function setService(bool $service): self
-    {
-        $this->service = $service;
+        $this->agentassign = $agentassign;
 
         return $this;
     }
@@ -180,6 +171,18 @@ class AERPProviders
         return $this;
     }
 
+    public function getCompany(): ?GlobaleCompanies
+    {
+        return $this->company;
+    }
+
+    public function setCompany(?GlobaleCompanies $company): self
+    {
+        $this->company = $company;
+
+        return $this;
+    }
+
     public function getAuthor(): ?GlobaleUsers
     {
         return $this->author;
@@ -188,6 +191,30 @@ class AERPProviders
     public function setAuthor(?GlobaleUsers $author): self
     {
         $this->author = $author;
+
+        return $this;
+    }
+
+    public function getWeb(): ?string
+    {
+        return $this->web;
+    }
+
+    public function setWeb(string $web): self
+    {
+        $this->web = $web;
+
+        return $this;
+    }
+
+    public function getAddress(): ?string
+    {
+        return $this->address;
+    }
+
+    public function setAddress(?string $address): self
+    {
+        $this->address = $address;
 
         return $this;
     }
@@ -252,6 +279,30 @@ class AERPProviders
         return $this;
     }
 
+    public function getActive(): ?bool
+    {
+        return $this->active;
+    }
+
+    public function setActive(bool $active): self
+    {
+        $this->active = $active;
+
+        return $this;
+    }
+
+    public function getDeleted(): ?bool
+    {
+        return $this->deleted;
+    }
+
+    public function setDeleted(bool $deleted): self
+    {
+        $this->deleted = $deleted;
+
+        return $this;
+    }
+
     public function getDateadd(): ?\DateTimeInterface
     {
         return $this->dateadd;
@@ -276,26 +327,81 @@ class AERPProviders
         return $this;
     }
 
-    public function getActive(): ?bool
-    {
-        return $this->active;
+    public function formValidation($kernel, $doctrine, $user, $validationParams){
+      $repository=$doctrine->getRepository(AERPProviders::class);
+      $this->vat=preg_replace('/[^\w]/', '', $this->vat);
+      $obj=$repository->findOneBy(["vat"=>$this->vat,"company"=>$user->getCompany(),"deleted"=>0]);
+      if($obj!=null and $obj->id!=$this->id)
+        return ["valid"=>false, "global_errors"=>["El proveedor ya existe"]];
+      else {
+
+        $fieldErrors=[];
+        $validator=new HelperValidators();
+        //if($this->vat!=null && !$validator->isValidVAT($this->vat)) {$fieldErrors=["vat"=>"CIF/NIF/NIE no válido"]; }
+        if($this->email!=null && !$validator->isValidEmail($this->email)) {$fieldErrors=["email"=>"Email no válido"]; }
+        if($this->web!=null && !$validator->isValidURL($this->web)) {$fieldErrors=["web"=>"URL no válida"]; }
+        if($this->iban!=null && !$validator->isValidIban($this->iban)) {$fieldErrors=["iban"=>"URL no válida"]; }
+        if($this->swift!=null && !$validator->isValidSwift($this->swift)) {$fieldErrors=["swift"=>"URL no válida"]; }
+        return ["valid"=>empty($fieldErrors), "field_errors"=>$fieldErrors];
+      }
     }
 
-    public function setActive(bool $active): self
+    public function getEmail(): ?string
     {
-        $this->active = $active;
+        return $this->email;
+    }
+
+    public function setEmail(?string $email): self
+    {
+        $this->email = $email;
 
         return $this;
     }
 
-    public function getDeleted(): ?bool
+    public function getPhone(): ?string
     {
-        return $this->deleted;
+        return $this->phone;
     }
 
-    public function setDeleted(bool $deleted): self
+    public function setPhone(?string $phone): self
     {
-        $this->deleted = $deleted;
+        $this->phone = $phone;
+
+        return $this;
+    }
+
+    public function getMobile(): ?string
+    {
+        return $this->mobile;
+    }
+
+    public function setMobile(?string $mobile): self
+    {
+        $this->mobile = $mobile;
+
+        return $this;
+    }
+
+    public function getIban(): ?string
+    {
+        return $this->iban;
+    }
+
+    public function setIban(?string $iban): self
+    {
+        $this->iban = $iban;
+
+        return $this;
+    }
+
+    public function getSwift(): ?string
+    {
+        return $this->swift;
+    }
+
+    public function setSwift(?string $swift): self
+    {
+        $this->swift = $swift;
 
         return $this;
     }

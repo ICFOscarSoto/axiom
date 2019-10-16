@@ -275,6 +275,10 @@ AERPCustomer:
   resource: 'App\Modules\AERP\Controller\AERPCustomersController'
   type:      annotation
 
+AERPProvider:
+  resource: 'App\Modules\AERP\Controller\AERPProvidersController'
+  type:      annotation
+
 AERPCategories:
   resource: 'App\Modules\AERP\Controller\AERPCategoriesController'
   type:      annotation

@@ -3,7 +3,6 @@
 namespace App\Modules\AERP\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use \App\Modules\AERP\Entity\AERPContacts;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
 use \App\Modules\Globale\Entity\GlobaleUsers;
 use \App\Modules\Globale\Entity\GlobaleCountries;
@@ -31,7 +30,7 @@ class AERPCustomers
      * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleUsers")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $agent;
+    private $agentassign;
 
     /**
      * @ORM\Column(type="string", length=200)
@@ -84,9 +83,9 @@ class AERPCustomers
     private $customergroup;
 
     /**
-     * @ORM\Column(type="float", nullable=true)
+     * @ORM\Column(type="float")
      */
-    private $maxrisk;
+    private $maxrisk=0;
 
     /**
      * @ORM\Column(type="float")
@@ -110,7 +109,22 @@ class AERPCustomers
     private $surcharge;
 
     /**
-     * @ORM\Column(type="string", length=175)
+     * @ORM\Column(type="string", length=175, nullable=true)
+     */
+    private $email;
+
+    /**
+     * @ORM\Column(type="string", length=32, nullable=true)
+     */
+    private $phone;
+
+    /**
+     * @ORM\Column(type="string", length=32, nullable=true)
+     */
+    private $mobile;
+
+    /**
+     * @ORM\Column(type="string", length=175, nullable=true)
      */
     private $web;
 
@@ -134,6 +148,16 @@ class AERPCustomers
      */
     private $dateupd;
 
+    /**
+     * @ORM\Column(type="string", length=40, nullable=true)
+     */
+    private $iban;
+
+    /**
+     * @ORM\Column(type="string", length=15, nullable=true)
+     */
+    private $swift;
+
 
     public function getId(): ?int
     {
@@ -152,14 +176,14 @@ class AERPCustomers
         return $this;
     }
 
-    public function getAgent(): ?GlobaleUsers
+    public function getAgentassign(): ?GlobaleUsers
     {
-        return $this->agent;
+        return $this->agentassign;
     }
 
-    public function setAgent(?GlobaleUsers $agent): self
+    public function setAgentassign(?GlobaleUsers $agentassign): self
     {
-        $this->agent = $agent;
+        $this->agentassign = $agentassign;
 
         return $this;
     }
@@ -406,17 +430,81 @@ class AERPCustomers
 
     public function formValidation($kernel, $doctrine, $user, $validationParams){
       $repository=$doctrine->getRepository(AERPCustomers::class);
+      $this->vat=preg_replace('/[^\w]/', '', $this->vat);
       $obj=$repository->findOneBy(["vat"=>$this->vat,"company"=>$user->getCompany(),"deleted"=>0]);
       if($obj!=null and $obj->id!=$this->id)
         return ["valid"=>false, "global_errors"=>["El cliente ya existe"]];
       else {
-        //Check CIF/NIF/NIE
+
         $fieldErrors=[];
         $validator=new HelperValidators();
-        if(!$validator->isValidIdNumber($this->vat)) {$fieldErrors=["vat"=>"CIF/NIF/NIE no válido"]; }
-
+        //if($this->vat!=null && !$validator->isValidIdNumber($this->vat)) {$fieldErrors=["vat"=>"CIF/NIF/NIE no válido"]; }
+        if($this->email!=null && !$validator->isValidEmail($this->email)) {$fieldErrors=["email"=>"Email no válido"]; }
+        if($this->web!=null && !$validator->isValidURL($this->web)) {$fieldErrors=["web"=>"URL no válida"]; }
+        if($this->iban!=null && !$validator->isValidIban($this->iban)) {$fieldErrors=["iban"=>"URL no válida"]; }
+        if($this->swift!=null && !$validator->isValidSwift($this->swift)) {$fieldErrors=["swift"=>"URL no válida"]; }
         return ["valid"=>empty($fieldErrors), "field_errors"=>$fieldErrors];
       }
+    }
+
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(?string $email): self
+    {
+        $this->email = $email;
+
+        return $this;
+    }
+
+    public function getPhone(): ?string
+    {
+        return $this->phone;
+    }
+
+    public function setPhone(?string $phone): self
+    {
+        $this->phone = $phone;
+
+        return $this;
+    }
+
+    public function getMobile(): ?string
+    {
+        return $this->mobile;
+    }
+
+    public function setMobile(?string $mobile): self
+    {
+        $this->mobile = $mobile;
+
+        return $this;
+    }
+
+    public function getIban(): ?string
+    {
+        return $this->iban;
+    }
+
+    public function setIban(?string $iban): self
+    {
+        $this->iban = $iban;
+
+        return $this;
+    }
+
+    public function getSwift(): ?string
+    {
+        return $this->swift;
+    }
+
+    public function setSwift(?string $swift): self
+    {
+        $this->swift = $swift;
+
+        return $this;
     }
 
 }

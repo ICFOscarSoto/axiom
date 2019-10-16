@@ -1,25 +1,28 @@
 [{
     "sections": [
         {
-            "name": "Datos Cliente",
+            "name": "data",
             "fields": [
                 {
-                    "name": "vat",
-                    "cols": 4,
-                    "format": "vat"
+                    "name": "name",
+                    "cols": 4
                 },
                 {
-                    "name": "name",
+                    "name": "lastname",
                     "cols": 8
                 },
                 {
-                    "name": "address",
-                    "cols": 8,
-                    "location": {"address": "address", "city":"city", "postcode":"postcode", "country": "country"}
+                    "name": "position",
+                    "cols": 3
                 },
                 {
                     "name": "country",
-                    "cols": 4
+                    "cols": 3
+                },
+                {
+                    "name": "address",
+                    "cols": 6,
+                    "location": {"address": "address", "city":"city", "postcode":"postcode", "country": "country"}
                 },
                 {
                     "name": "city",
@@ -39,18 +42,11 @@
                 },
                 {
                     "name": "phone",
-                    "cols": 3,
-                    "format": "tel"
+                    "cols": 3
                 },
                 {
                     "name": "mobile",
-                    "cols": 3,
-                    "format": "tel"
-                },
-                {
-                    "name": "web",
-                    "cols": 6,
-                    "format": "url"
+                    "cols": 3
                 },
                 {
                     "name": "email",
@@ -61,19 +57,13 @@
                     "name": "agentassign",
                     "cols": 4,
                     "relation": {"route": "formUser", "type":"full"}
-
-                }
-            ]
-        },
-        {
-            "name": "Datos Bancarios",
-            "fields": [
-                {
-                    "name": "iban",
-                    "cols": 5
                 },
                 {
-                    "name": "swift",
+                    "name": "privacyaccepted",
+                    "cols": 4
+                },
+                {
+                    "name": "allowmarketing",
                     "cols": 4
                 },
                 {
@@ -81,6 +71,6 @@
                     "cols": 4
                 }
             ]
-          }
-        ]
+        }
+    ]
 }]

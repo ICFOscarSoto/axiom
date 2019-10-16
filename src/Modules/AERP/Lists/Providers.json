@@ -5,15 +5,24 @@
     },
     {
         "name": "vat",
-        "caption": "vat"
+        "caption": "vat",
+        "width": "10%"
     },
     {
         "name": "name",
         "caption": "name"
     },
     {
-        "name": "service",
-        "caption": "service"
+        "name": "address",
+        "caption": "address"
+    },
+    {
+        "name": "city",
+        "caption": "city"
+    },
+    {
+        "name": "phone",
+        "caption": "phone"
     },
     {
         "name": "active",

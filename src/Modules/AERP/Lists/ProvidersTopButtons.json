@@ -1,5 +1,5 @@
 [
-  {"id" : "addTopProviders", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"genericdata", "routeParams":{"module":"AERP", "name":"Providers", "type":"modal" }, "modal":"Providers", "actionType" : "background", "confirm" :false, "tooltip" : ""},
+  {"id" : "addTopProviders", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"formAERPProvider", "actionType" : "foreground", "confirm" :false, "tooltip" : ""},
   {"id" : "deleteTopProviders", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true, "tooltip":""},
   {"id" : "printTopProviders", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false, "tooltip":""},
   {"id" : "exportTopProviders", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"genericexport", "routeParams":{"module":"AERP", "name":"Providers"}, "confirm" :false, "tooltip":""}

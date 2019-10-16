@@ -495,9 +495,21 @@ class HelperValidators{
           }return false;
       }
 
+      function isValidSwift($swift){
+        $regexp = '/^[A-Z]{6,6}[A-Z2-9][A-NP-Z0-9]([A-Z0-9]{3,3}){0,1}$/i';
+        return (bool) preg_match($regexp, $swift);
+      }
+
       public function isValidEmail($email){
         return filter_var($email, FILTER_VALIDATE_EMAIL);
       }
+
+      public function isValidURL($url){
+        if(filter_var($url, FILTER_VALIDATE_URL)) return true;
+        if(filter_var('http://'.$url, FILTER_VALIDATE_URL)) return true;
+        return false;
+      }
+
   }
 
 ?>

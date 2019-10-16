@@ -4,25 +4,24 @@
         "caption": "id"
     },
     {
-        "name": "vat",
-        "caption": "vat",
-        "width": "10%"
-    },
-    {
         "name": "name",
         "caption": "name"
     },
     {
-        "name": "address",
-        "caption": "address"
-    },
-    {
-        "name": "city",
-        "caption": "city"
+        "name": "lastname",
+        "caption": "lastname"
     },
     {
         "name": "phone",
         "caption": "phone"
+    },
+    {
+        "name": "mobile",
+        "caption": "mobile"
+    },
+    {
+        "name": "position",
+        "caption": "position"
     },
     {
         "name": "active",

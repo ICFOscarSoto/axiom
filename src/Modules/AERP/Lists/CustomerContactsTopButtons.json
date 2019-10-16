@@ -1,0 +1,6 @@
+[
+  {"id" : "addTopCustomerContacts", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"genericdatatab", "routeParams":{"module":"AERP", "name":"CustomerContacts", "type":"modal","idparent":"id" }, "modal":"CustomerContacts", "actionType" : "background", "confirm" :false, "tooltip" : ""},
+  {"id" : "deleteTopCustomerContacts", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true, "tooltip":""},
+  {"id" : "printTopCustomerContacts", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false, "tooltip":""},
+  {"id" : "exportTopCustomerContacts", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"genericexport", "routeParams":{"module":"AERP", "name":"CustomerContacts"}, "confirm" :false, "tooltip":""}
+]

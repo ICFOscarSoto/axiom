@@ -8,9 +8,9 @@ use \App\Modules\Globale\Entity\GlobaleCompanies;
 use \App\Modules\Globale\Entity\GlobaleCountries;
 
 /**
- * @ORM\Entity(repositoryClass="App\Modules\AERP\Repository\AERPCustomerContactsRepository")
+ * @ORM\Entity(repositoryClass="App\Modules\AERP\Repository\AERPProviderContactsRepository")
  */
-class AERPCustomerContacts
+class AERPProviderContacts
 {
     /**
      * @ORM\Id()
@@ -30,10 +30,10 @@ class AERPCustomerContacts
     private $lastname;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\AERP\Entity\AERPCustomers")
+     * @ORM\ManyToOne(targetEntity="\App\Modules\AERP\Entity\AERPProviders")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $customer;
+    private $provider;
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleUsers")
@@ -80,12 +80,7 @@ class AERPCustomerContacts
     /**
      * @ORM\Column(type="boolean")
      */
-    private $privacyaccepted;
-
-    /**
-     * @ORM\Column(type="boolean")
-     */
-    private $allowmarketing;
+    private $services;
 
     /**
      * @ORM\Column(type="boolean")
@@ -175,14 +170,14 @@ class AERPCustomerContacts
         return $this;
     }
 
-    public function getCustomer(): ?AERPCustomers
+    public function getProvider(): ?AERPProviders
     {
-        return $this->customer;
+        return $this->provider;
     }
 
-    public function setCustomer(?AERPCustomers $customer): self
+    public function setProvider(?AERPProviders $provider): self
     {
-        $this->customer = $customer;
+        $this->provider = $provider;
 
         return $this;
     }
@@ -271,26 +266,14 @@ class AERPCustomerContacts
         return $this;
     }
 
-    public function getPrivacyaccepted(): ?bool
+    public function getService(): ?bool
     {
-        return $this->privacyaccepted;
+        return $this->service;
     }
 
-    public function setPrivacyaccepted(bool $privacyaccepted): self
+    public function setService(bool $service): self
     {
-        $this->privacyaccepted = $privacyaccepted;
-
-        return $this;
-    }
-
-    public function getAllowmarketing(): ?bool
-    {
-        return $this->allowmarketing;
-    }
-
-    public function setAllowmarketing(bool $allowmarketing): self
-    {
-        $this->allowmarketing = $allowmarketing;
+        $this->service = $service;
 
         return $this;
     }
