@@ -1,5 +1,5 @@
 [
-  {"id": "printEAN13", "type" : "default", "icon" : "fa fa-print", "name" : "imprimir", "route":"printeanlabel","actionType" : "foreground", "confirm" :false},
+  {"id": "printEAN13", "type" : "default", "icon" : "fa fa-print", "name" : "imprimir", "route":"printeanlabel","actionType" : "foreground", "target":"_blank", "confirm" :false},
   {"id": "edit", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"dataEAN13", "modal":"EAN13", "actionType" : "background", "confirm" :false},
   {"id": "delete", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"genericdelete", "routeParams":{"module":"ERP", "name":"EAN13", "type":"modal" }, "confirm" :true, "undo" :false, "tooltip":"Borrar código de barras", "actionType" : "background"}
 ]

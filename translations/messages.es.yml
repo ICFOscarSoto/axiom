@@ -359,6 +359,7 @@ Taxes: Impuestos
 Multiplicity: Múltiplo de pedidos
 Promotion: Promoción
 Rotation: Rotación
+Category data: Datos Categoría
 
 #Widgets
 #----------------------------------------------------------------------------------------------------------------------
@@ -381,5 +382,18 @@ Maxrisk: Riesgo máximo
 Risk: Riesgo
 Taxexempt: Exención de IVA
 Shippcontact: Dirección envío
-Select aerpcontacts: Seleccionar dirección
 Select aerpcustomergroups: Seleccionar grupo cliente
+Select aerpcustomercontacts: Seleccionar contacto
+Select globaleusers: Seleccionar usuario
+Position: Cargo
+Privacyaccepted: Aceptada Privacidad
+Allowmarketing: Permite Marketing
+lastname: Apellidos
+position: Cargo
+phone: Teléfono
+mobile: Móvil
+address: Dirección
+city: Localidad
+Categories: Categorias
+Agentassign: Agente
+Providers: Proveedores

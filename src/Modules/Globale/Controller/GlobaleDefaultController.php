@@ -16,6 +16,8 @@ use App\Modules\Globale\Utils\GlobaleExportUtils;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Security\Utils\SecurityUtils;
+use App\Modules\Globale\Entity\GlobaleCountries;
+use App\Modules\Globale\Entity\GlobaleCurrencies;
 
 /**
  * @Route("/")
@@ -106,7 +108,9 @@ class GlobaleDefaultController extends Controller
         $utilsObj=new $classUtils();
       }else $utilsObj=new $class(); // define the main class to ensure that a valid object is created and not has getIncludedForm and getExcludedForm
       $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser()];
-      $utils->initialize($this->getUser(), new $class(), $template, $request, $this, $this->getDoctrine(),
+      $obj=new $class();
+
+      $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),
         method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[],null,["module"=>$module, "name"=>$name]
       );
       return $utils->make($id, $class, $action, "form".$name, $type);
@@ -122,7 +126,8 @@ class GlobaleDefaultController extends Controller
       $class="\App\Widgets\Entity\Widgets".$widget;
       $utils = new GlobaleFormUtils();
       $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser()];
-      $utils->initialize($this->getUser(), new $class(), $template, $request, $this, $this->getDoctrine(),
+      $obj=new $class();
+      $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),
                          ["userwidget"],[],null,["widget"=>$widget]);
       return $utils->make($id, $class, $action, "form".$widget, "modal");
 

@@ -50,7 +50,6 @@ class ERPReferencesController extends Controller
      public function data($id, $action, $idproduct, Request $request)
      {
      $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-     $this->denyAccessUnlessGranted('ROLE_ADMIN');
      $template=dirname(__FILE__)."/../Forms/References.json";
      $utils = new GlobaleFormUtils();
      $utilsObj=new ERPReferencesUtils();

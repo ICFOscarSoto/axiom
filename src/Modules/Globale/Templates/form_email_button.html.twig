@@ -1,0 +1,11 @@
+{% if field.format is defined and field.format == "email" %}
+<script>
+  $(document).ready(function() {
+    $("#{{formConstructor.name}}-form-body").find("#form_{{ field.name }}").before("<span id='email-view-{{formConstructor.name}}-{{ field.name }}' class='select2-selection__view' style='right: 18px;'><i class='fa fa-envelope-o' aria-hidden='true'></i><span>&nbsp;Enviar</span></span>");
+    $('body').on('click',"#email-view-{{formConstructor.name}}-{{ field.name }}", function (e) {
+      var url=$("#{{formConstructor.name}}-form-body").find("#form_{{ field.name }}").val();
+      if(url.length) window.location.href = 'mailto:'+url;
+    });
+  });
+</script>
+{% endif %}

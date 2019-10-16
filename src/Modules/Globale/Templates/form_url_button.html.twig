@@ -1,0 +1,17 @@
+{% if field.format is defined and field.format == "url" %}
+<script>
+  $(document).ready(function() {
+    $("#form_{{ field.name }}").before("<span id='url-view-{{ field.name }}' class='select2-selection__view' style='right: 18px;'><i class='fa fa-globe' aria-hidden='true'></i><span>&nbsp;Navegar</span></span>");
+    $('body').on('click',"#url-view-{{ field.name }}", function (e) {
+      var pattern = /^((http|https|ftp):\/\/)/;
+      var url=$("#form_{{ field.name }}").val();
+      if(url.length){
+        if(!pattern.test(url)) {
+            url = "http://" + url;
+        }
+        window.open(url);
+      }
+    });
+  });
+</script>
+{% endif %}

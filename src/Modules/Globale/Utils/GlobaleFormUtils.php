@@ -70,8 +70,24 @@ class GlobaleFormUtils extends Controller
     $this->includePreTemplate=$includePreTemplate;
     $this->history=$history;
     //Set active by default in new objects
-    if($obj->getId()===null && method_exists($obj, 'setActive')){
-      $obj->setActive(true);
+    //$this->setDefaults();
+
+  }
+
+  public function setDefaults(){
+    if($this->obj->getId()===null ){
+      if(method_exists($this->obj, 'setActive')) $this->obj->setActive(true);
+      if(method_exists($this->obj, "setCountry")){
+        $repository=$this->doctrine->getRepository("\App\Modules\Globale\Entity\GlobaleCountries");
+        $default=$repository->findOneBy(['name'=>"España"]);
+        $this->obj->setCountry($default);
+      }
+      if(method_exists($this->obj, "setCurrency")){
+        $repository=$this->doctrine->getRepository("\App\Modules\Globale\Entity\GlobaleCurrencies");
+        $default=$repository->findOneBy(['name'=>"Euro"]);
+        $this->obj->setCurrency($default);
+      }
+      if(method_exists($this->obj, "setAgentassign")) $this->obj->setAgentassign($this->user);
     }
   }
 
@@ -245,8 +261,11 @@ class GlobaleFormUtils extends Controller
 
 					if($this->obj===NULL) $this->obj=new $class();
 			}
+      $this->setDefaults();
       $this->obj_old=clone $this->obj;
+
 			$form=$this->createFromEntity2(false)->getForm();
+
 			switch($action){
 				 case 'save':
            //Buscar si existe un proccess dentro del utils de la clase

@@ -124,7 +124,7 @@ class HRController extends Controller
 							'userData' => $userdata,
 							'id' => $id,
 							'tab' => $request->query->get('tab','data'), //Show initial tab, by default data tab
-							'tabs' => [["name" => "data", "caption"=>"Datos trabajador", "icon"=>"entypo-book-open","active"=>true, "route"=>$this->generateUrl("dataWorker",["id"=>$id])],
+							'tabs' => [["name" => "data", "caption"=>"Datos trabajador", "icon"=>"fa-address-card-o","active"=>true, "route"=>$this->generateUrl("dataWorker",["id"=>$id])],
 												 /*["name" => "clothes", "icon"=>"fa fa-headphones", "caption"=>"Ropa y EPI"],
 												 ["name" => "paymentroll", "icon"=>"fa fa-eur", "caption"=>"Nóminas"],
 												 ["name" => "contracts", "icon"=>"fa fa-briefcase", "caption"=>"Contratos"],*/
@@ -136,9 +136,7 @@ class HRController extends Controller
 							'include_header' => [["type"=>"css", "path"=>"/js/jvectormap/jquery-jvectormap-1.2.2.css"],
 																	 ["type"=>"css", "path"=>"/js/rickshaw/rickshaw.min.css"],
 																	 ["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker-es.js"]],
-							'include_footer' => [["type"=>"css", "path"=>"/js/ol/ol.css"],
-		 															 ["type"=>"js",  "path"=>"/js/ol/ol.js"],
-																	 ["type"=>"css", "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.css"],
+							'include_footer' => [["type"=>"css", "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.css"],
 										 		 					 ["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.js"],
 		 															 ["type"=>"css", "path"=>"/css/timeline.css"]]
 							/*'tabs' => [["name" => "data", "caption"=>"Datos trabajador", "active"=>$tab=='data'?true:false, "route"=>$this->generateUrl("dataWorker",["id"=>$id])],

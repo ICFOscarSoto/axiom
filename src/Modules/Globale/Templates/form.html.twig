@@ -116,6 +116,12 @@
               {{ include("@Globale/form_relation_button.html.twig") }}
               {# Check if field is an address and map is enabled #}
               {{ include("@Globale/form_address_button.html.twig") }}
+              {# Check if field is an url #}
+              {{ include("@Globale/form_url_button.html.twig") }}
+              {# Check if field is an tel #}
+              {{ include("@Globale/form_tel_button.html.twig") }}
+              {# Check if field is an email #}
+              {{ include("@Globale/form_email_button.html.twig") }}
               {# Check if field has trigger #}
               {{ include("@Globale/form_trigger_field.html.twig") }}
 
@@ -319,8 +325,7 @@ return blob;
     {% endfor %}
   });
 </script>
-{# MODAL LOCATIONS #}
-{{ include("@Globale/location.html.twig") }}
+
 {# MODAL RELATIONS #}
 <div class="modal fade" tabindex="-1" id="relation-modal-form" aria-hidden="true">
 		<div class="modal-dialog modal-lg">

@@ -62,18 +62,23 @@
 			});
 		}*/
 	</script>
+	{# MODAL LOCATIONS #}
+	{{ include("@Globale/location.html.twig") }}
 	<!-- END MODALS -->
 {% block footer %}
 	<link rel="stylesheet" href="{{ url('index') }}js/datatables/datatables.css">
 	<link rel="stylesheet" href="{{ url('index') }}js/select2/select2-bootstrap.css">
 	<link rel="stylesheet" href="{{ url('index') }}js/select2/select2.css">
 	<link rel="stylesheet" href="{{ url('index') }}css/custom.css">
+	<link rel="stylesheet" href="{{ url('index') }}js/ol/ol.css">
 	<!-- Imported scripts on this page -->
  	<script src="{{ url('index') }}js/datatables/datatables.js"></script>
 	<script src="{{ url('index') }}js/select2/select2.min.js"></script>
 	<script src="{{ url('index') }}js/moment.min.js"></script>
 	<script src="{{ url('index') }}js/moment-es.js"></script>
 	<script src="{{ url('index') }}js/fileinput.js"></script>
+	<script src="{{ url('index') }}js/ol/ol.js"></script>
+
 	 {{ include('@Globale/bottom.html.twig') }}
 {% endblock %}
 </body>

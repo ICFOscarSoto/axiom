@@ -1,0 +1,22 @@
+{% if field.format is defined and field.format == "tel" %}
+<script>
+  $(document).ready(function() {
+    $("#form_{{ field.name }}").before("<span id='tel-view-{{ field.name }}' class='select2-selection__view' style='right: 50px;width: 30px;'><i class='fa fa-phone' aria-hidden='true'></i><span>&nbsp;</span></span><span id='whatsapp-view-{{ field.name }}' class='select2-selection__view' style='right: 18px;width: 30px;'><i class='fa fa-whatsapp' aria-hidden='true'></i><span>&nbsp;</span></span>");
+    $('body').on('click',"#tel-view-{{ field.name }}", function (e) {
+      var url=$("#form_{{ field.name }}").val();
+      if(url.length){
+        url = "tel: " + url;
+        window.open(url);
+      }
+    });
+    $('body').on('click',"#whatsapp-view-{{ field.name }}", function (e) {
+      var url=$("#form_{{ field.name }}").val();
+      if(url.length){
+        if(url.length<=9) url="34"+url;
+        url = "https://wa.me/" + url;
+        window.open(url);
+      }
+    });
+  });
+</script>
+{% endif %}

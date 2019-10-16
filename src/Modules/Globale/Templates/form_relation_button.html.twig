@@ -2,16 +2,16 @@
 {% if field.relation.route is defined %}
   <script>
     $(document).ready(function() {
-      $("#form_{{ field.name }}").select2();
-      $("#form_{{ field.name }}").on("change", function (e) {
+      $("#{{formConstructor.name}}-form-body").find("#form_{{ field.name }}").select2();
+      $("#{{formConstructor.name}}-form-body").find("#form_{{ field.name }}").on("change", function (e) {
         var value=$(this).select2('data')[0]["element"]["className"];
         {% if field.relation.routeparams is not defined %}{% set routeparams = [] %}{% else %}{% set routeparams = field.relation.routeparams %}{% endif %}
-        if(value!="") $(this).before("<span id='selection-view-{{ field.name }}' class='select2-selection__view' style='' attr-url='{{ url(field.relation.route, routeparams|merge({"id":'_____'})) }}'><i class='fa fa-file-text-o' aria-hidden='true'></i><span>&nbsp;Ver Ficha</span></span>");
+        if(value!="") $(this).before("<span id='selection-view-{{formConstructor.name}}-{{ field.name }}' class='select2-selection__view' style='' attr-url='{{ url(field.relation.route, routeparams|merge({"id":'_____'})) }}'><i class='fa fa-file-text-o' aria-hidden='true'></i><span>&nbsp;Ver Ficha</span></span>");
           else $(this).parent().find(".select2-selection__view").remove();
       });
 
-      $('body').on('click',"#selection-view-{{ field.name }}", function (e) {
-        var value=$("#form_{{ field.name }}").select2('data')[0]["element"]["className"];
+      $('body').on('click',"#selection-view-{{formConstructor.name}}-{{ field.name }}", function (e) {
+        var value=$("#{{formConstructor.name}}-form-body").find("#form_{{ field.name }}").select2('data')[0]["element"]["className"];
         url=$(this).attr("attr-url");
         url=url.replace('_____',value);
           {% if field.relation.type=="full" %}
@@ -31,11 +31,11 @@
 
       setTimeout(
       function(){
-        var value=$("#form_{{ field.name }}").select2('data')[0]["element"]["className"];
+        var value=$("#{{formConstructor.name}}-form-body").find("#form_{{ field.name }}").select2('data')[0]["element"]["className"];
         if(value!="")
           {% if field.relation.routeparams is not defined %}{% set routeparams = [] %}{% else %}{% set routeparams = field.relation.routeparams %}{% endif %}
-          $("#form_{{ field.name }}").before("<span id='selection-view-{{ field.name }}' class='select2-selection__view' style='' attr-url='{{ url(field.relation.route, routeparams|merge({"id":'_____'})) }}'><i class='fa fa-file-text-o' aria-hidden='true'></i><span>&nbsp;Ver Ficha</span></span>");
-          else $("#form_{{ field.name }}").parent().find(".select2-selection__view").remove();
+          $("#{{formConstructor.name}}-form-body").find("#form_{{ field.name }}").before("<span id='selection-view-{{formConstructor.name}}-{{ field.name }}' class='select2-selection__view' style='' attr-url='{{ url(field.relation.route, routeparams|merge({"id":'_____'})) }}'><i class='fa fa-file-text-o' aria-hidden='true'></i><span>&nbsp;Ver Ficha</span></span>");
+          else $("#{{formConstructor.name}}-form-body").find("#form_{{ field.name }}").parent().find(".select2-selection__view").remove();
       }, 100);
 
     });
