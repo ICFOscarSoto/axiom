@@ -49,8 +49,7 @@ class ERPEAN13Controller extends Controller
    */
    public function data($id, $action, $idproduct, Request $request)
    {
-   $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-   $this->denyAccessUnlessGranted('ROLE_ADMIN');
+   $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');   
    $template=dirname(__FILE__)."/../Forms/EAN13.json";
    $utils = new GlobaleFormUtils();
    $utilsObj=new ERPEAN13Utils();
