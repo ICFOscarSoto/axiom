@@ -71,13 +71,13 @@ public function formAERPCustomer($id,Request $request)
 	 if($id!=0 && $obj==null){
 			 return $this->render('@Globale/notfound.html.twig',[]);
 	 }
-	 if($obj==null){
+	 /*if($obj==null){
 		 $obj=new $this->class();
 		 $defaultCountry=$this->getDoctrine()->getRepository(GlobaleCountries::class);
 	   $default=$defaultCountry->findOneBy(['name'=>"España"]);
 	   $obj->setCountry($default);
-		 $obj->setAgent($this->getUser());
-	 }
+		 $obj->setAgentassign($this->getUser());
+	 }*/
 	 $classUtils=new AERPCustomersUtils();
 	 $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "obj"=>$obj];
    $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),$classUtils->getExcludedForm($params),$classUtils->getIncludedForm($params));
