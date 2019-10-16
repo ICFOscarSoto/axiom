@@ -102,6 +102,11 @@ class AERPProviders
     /**
      * @ORM\Column(type="boolean")
      */
+    private $service;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
     private $active;
 
     /**
@@ -275,6 +280,18 @@ class AERPProviders
     public function setPostbox(?string $postbox): self
     {
         $this->postbox = $postbox;
+
+        return $this;
+    }
+
+    public function getService(): ?bool
+    {
+        return $this->service;
+    }
+
+    public function setService(bool $service): self
+    {
+        $this->service = $service;
 
         return $this;
     }

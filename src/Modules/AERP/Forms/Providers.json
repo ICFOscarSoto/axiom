@@ -77,6 +77,10 @@
                     "cols": 4
                 },
                 {
+                    "name": "service",
+                    "cols": 4
+                },
+                {
                     "name": "active",
                     "cols": 4
                 }
