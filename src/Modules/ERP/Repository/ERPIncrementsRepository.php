@@ -37,7 +37,7 @@ class ERPIncrementsRepository extends ServiceEntityRepository
 
    }
 
-   public function checkRepeated($id,$supplier,$category,$customergroup,$company
+   public function checkRepeated($id,$supplier,$category,$customergroup,$company)
    {
 
      if($category!=NULL AND $supplier!=NULL AND $customergroup!=NULL AND $id==NULL)
