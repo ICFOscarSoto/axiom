@@ -30,7 +30,7 @@ class ERPProductPricesController extends Controller
 		$productsRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
 		$product=$productsRepository->findOneBy(["id"=>$id]);
     $productPricesRepository=$this->getDoctrine()->getRepository($this->class);
-		dump($product);
+		//dump($product);
     $productPrices=$productPricesRepository->pricesByProduct($product);
     /*
     foreach($productPrices as $key=>$item){
