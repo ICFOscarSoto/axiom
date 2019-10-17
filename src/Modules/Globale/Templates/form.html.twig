@@ -11,20 +11,8 @@
   </div>
   {% endif %}
 
-  <div class="panel minimal">
-    <div class="panel-body">
-      <div class="row">
-        <div class="col-md-12">
-          <div id="{{formConstructor.name}}-validation-error" class="alert alert-danger form-validation-error" style="display: none">
-            <strong>Ocurrieron los siguientes errores:</strong></br></br><ul id="validation-errors-list"></ul>
-          </div>
-          <div id="{{formConstructor.name}}-validation-warning" class="alert alert-warning form-validation-error" style="display: none">
-            <strong>Revise las siguientes advertencias:</strong></br></br><ul id="validation-warnings-list"></ul>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+  {{ include("@Globale/form_validation.html.twig") }}
+
   {% if include_pre_templates is defined %}
   	{% for template in include_pre_templates %}
   		{{ include(template) }}
@@ -43,70 +31,8 @@
       {% for field in section.fields %}
         <div class="col-md-{{ field.cols }}">
             {% if field.type is defined and field.type == 'image' %}
-              {# Field type Image #}
-                <div id="fileinput-{{field.name}}" class="fileinput fileinput-new" data-provides="fileinput">
-    							<div class="fileinput-new thumbnail" style="width: {{ field.width }}; height: {{ field.height }};" data-trigger="fileinput">
-    								<img id="fileinput-img-{{field.name}}" src="{{ url(field.value,{'id': formConstructor.id_object, 'type': field.imageType, 'size': 'medium'}) }}" alt="">
-    							</div>
-    							<div id="image-preview-{{field.name}}" class="fileinput-preview fileinput-exists thumbnail" style="width: {{ field.width }}; height: {{ field.height }}"></div>
-    							<div>
-                    {% if formConstructor.id_object !=0 %}
-    								<span class="btn btn-white btn-file">
-    									<span class="">Seleccionar</span>
-    									<input type="file" id="form_{{field.name}}" name="form[{{field.name}}]" accept="image/*" class="form-control-file">
-    								</span>
-                    <a href="#" id="btn-image-cancel-{{field.name}}" class="btn btn-red fileinput-exists" data-dismiss="fileinput">Cancel</a>
-                    <a href="#" id="btn-image-save-{{field.name}}" attr-imageType="{{field.imageType}}" class="btn btn-green fileinput-exists">Guardar</a>
-                    {% endif %}
-    							</div>
-    						</div>
-
-            <script>
-
-
-            $(document).ready(function() {
-              $( '#fileinput-img-{{field.name}}' ).load(function() {
-                $('#fileinput-img-{{field.name}}').fadeIn();
-              });
-
-              $('body').on('click', '#btn-image-save-{{field.name}}', function(){
-                $('#fileinput-img-{{field.name}}').fadeOut();
-                var url = "{{url("uploadImage",{"type":field.imageType, "id": formConstructor.id_object})}}";
-                var image = $('#image-preview-{{field.name}}').find('img').attr('src');
-                console.log(image);
-                var block = image.split(";");
-                var contentType = block[0].split(":")[1];
-                var realData = block[1].split(",")[1];
-                var blob = b64toBlob(realData, contentType);
-                var formData = new FormData();
-                formData.append('picture', blob);
-
-                if((++load_wait)==1) $("#load-spinner").fadeIn();
-                $.ajax({
-                    url: url,
-                    type: "POST",
-                    cache: false,
-                    contentType: false,
-                    processData: false,
-                    data: formData,
-                    error:function(err){
-                        $('#fileinput-img-{{field.name}}').fadeIn();
-                        toastr.error("No se pudo subir la imagen", "Confirmación", confirmation);
-                    },
-                    success:function(data){
-                        $('#fileinput-img-{{field.name}}').attr('src','{{ url(field.value,{'id': formConstructor.id_object, 'type': field.imageType, 'size': 'medium'}) }}?'+Date.now());
-                        $('#fileinput-{{field.name}}').fileinput("clear");
-                        if(data.result) toastr.success("Imagen cambiada correctamente", "Confirmación", confirmation);
-                    },
-                    complete:function(){
-                        if((--load_wait)==0) $("#load-spinner").fadeOut();
-                    }
-                  });
-            });
-
-          });
-            </script>
-
+              {# Image component of the form #}
+              {{ include("@Globale/form_fields_image.html.twig") }}
             {% elseif field.type is defined and field.type == 'file' %}
               values 2
             {% else %}
@@ -124,7 +50,12 @@
               {{ include("@Globale/form_email_button.html.twig") }}
               {# Check if field has trigger #}
               {{ include("@Globale/form_trigger_field.html.twig") }}
-
+              {# Check if field has a linked field #}
+              {{ include("@Globale/form_fields_linked.html.twig") }}
+              {# Check if field has a dependency of other field #}
+              {{ include("@Globale/form_fields_depend.html.twig") }}
+              {# Check if field has a to change another field #}
+              {{ include("@Globale/form_fields_change.html.twig") }}
             {% endif %}
         </div>
         {% set counter = counter +1 %}
@@ -171,88 +102,8 @@
 </div>
 <script>
 
-function b64toBlob(b64Data, contentType, sliceSize) {
-  contentType = contentType || '';
-  sliceSize = sliceSize || 512;
-  var byteCharacters = atob(b64Data);
-  var byteArrays = [];
-  for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
-      var slice = byteCharacters.slice(offset, offset + sliceSize);
-      var byteNumbers = new Array(slice.length);
-      for (var i = 0; i < slice.length; i++) {
-          byteNumbers[i] = slice.charCodeAt(i);
-      }
-      var byteArray = new Uint8Array(byteNumbers);
-      byteArrays.push(byteArray);
-  }
-var blob = new Blob(byteArrays, {type: contentType});
-return blob;
-}
 	$(document).ready(function() {
-    {# DATE AND TIME FIELDS #}
-
-    $('.datetimepicker').each(function(index) {
-      var valueField=$(this).val();
-      var dateField=moment(valueField, "DD/MM/YYYY HH:mm:ss");
-        $(this).datetimepicker({
-        showTodayButton: true,
-    		format: 'DD/MM/YYYY HH:mm:ss',
-        locale:'es',
-        useCurrent: false,
-        tooltips: spanish_tooltips_datetimepicker,
-    		date: (dateField.isValid())?dateField:null
-    	});
-      if($(this).attr("minDate")!="" && typeof $(this).attr("minDate")!==typeof undefined) $(this).data("DateTimePicker").minDate(moment($(this).attr("minDate"), "YYYY-MM-DD"));
-      if($(this).attr("maxDate")!="" && typeof $(this).attr("maxDate")!==typeof undefined) $(this).data("DateTimePicker").maxDate(moment($(this).attr("maxDate"), "YYYY-MM-DD"));
-    });
-
-    $('.datepicker').each(function(index) {
-      var valueField=$(this).val();
-      var dateField=moment(valueField, "DD/MM/YYYY");
-        $(this).datetimepicker({
-        showTodayButton: true,
-    		format: 'DD/MM/YYYY',
-        locale:'es',
-        useCurrent: false,
-        tooltips: spanish_tooltips_datetimepicker,
-    		date: (dateField.isValid())?dateField:null
-    	});
-      if($(this).attr("minDate")!="" && typeof $(this).attr("minDate")!==typeof undefined) $(this).data("DateTimePicker").minDate(moment($(this).attr("minDate"), "MM-DD"));
-      if($(this).attr("maxDate")!="" && typeof $(this).attr("maxDate")!==typeof undefined) $(this).data("DateTimePicker").maxDate(moment($(this).attr("maxDate"), "MM-DD"));
-    });
-
-    $('.dateshortpicker').each(function(index) {
-      var valueField=$(this).val();
-      var dateField=moment(valueField+'/1970', "DD/MM/YYYY");
-        $(this).datetimepicker({
-        showTodayButton: false,
-    		format: 'DD/MM',
-        dayViewHeaderFormat: 'MMMM',
-        maxDate: moment("31-12-1970","DD-MM-YYYY"),
-        minDate: moment("01-01-1970","DD-MM-YYYY"),
-        viewMode: 'days',
-        locale:'es',
-        tooltips: spanish_tooltips_datetimepicker,
-    		date: (dateField.isValid())?dateField:null
-    	});
-      if($(this).attr("defaultDate")!="" && typeof $(this).attr("defaultDate")!==typeof undefined && $(this).data("DateTimePicker").date()==null) $(this).data("DateTimePicker").defaultDate(moment($(this).attr("defaultDate"), "YYYY-MM-DD"));
-      if($(this).attr("minDate")!="" && typeof $(this).attr("minDate")!==typeof undefined) $(this).data("DateTimePicker").minDate(moment($(this).attr("minDate"), "YYYY-MM-DD"));
-      if($(this).attr("maxDate")!="" && typeof $(this).attr("maxDate")!==typeof undefined) $(this).data("DateTimePicker").maxDate(moment($(this).attr("maxDate"), "YYYY-MM-DD"));
-    });
-
-    $('.timepicker').each(function(index) {
-      var valueField=$(this).val();
-      var dateField=moment(valueField, "HH:mm:ss");
-        $(this).datetimepicker({
-        showTodayButton: true,
-        format: 'HH:mm:ss',
-        locale:'es',
-        useCurrent: false,
-        tooltips: spanish_tooltips_datetimepicker,
-        date: (dateField.isValid())?dateField:null
-      });
-    });
-
+    {{ include("@Globale/form_fields_datetime.html.twig") }}
 
     $('body').on('click', "[id^='{{formConstructor.name}}-button-save']", function() {
           if($("#{{formConstructor.name}}-form-body").find('form').valid()){
@@ -267,8 +118,6 @@ return blob;
                     if(data.reload) location.href=data.href;
                     $("#{{formConstructor.name}}-form-body").find('form').validate().resetForm();
                   } else toastr.error("Ocurrió un error al guardar los datos", "Confirmación", confirmation);
-
-
               }, "json");
             }
     });
@@ -276,53 +125,6 @@ return blob;
       window.history.back();
     });
 
-
-    {% for section in formConstructor.template.0.sections %}
-      {% for field in section.fields %}
-        {# LINKED FIELDS LIKE DATETIMES, ETC #}
-        {% if field.linked is defined %}
-          {% if field.type is defined and (field.type=="date" or field.type=="time"  or field.type=="dateshort") %}
-               $("#form_{{ field.name }}").on("dp.change", function (e) {
-                 $('#form_{{ field.linked.field }}').data("DateTimePicker").{{ field.linked.by }}(e.date);
-               });
-               var var_form_{{ field.name }}=$("#form_{{ field.name }}").data("DateTimePicker").date();
-               //Change de values to force on change event
-               $("#form_{{ field.name }}").data("DateTimePicker").date(null);
-               $("#form_{{ field.name }}").data("DateTimePicker").date(var_form_{{ field.name }});
-          {% endif %}
-        {% endif %}
-
-
-        {# DEPENDS FIELDS #}
-            {% if field.depends is defined %}
-              $('body').on('change', '#form_{{ field.depends.from }}', function() {
-                {% if field.depends.vals == "any" %}
-                  if($(this).val()!=""){
-                    $("#{{formConstructor.name}}-form-body #form_{{ field.name }}").parent().show();
-                  }else $("#{{formConstructor.name}}-form-body #form_{{ field.name }}").parent().hide();
-                {% else %}
-                  var vals="{{ field.depends.vals }}";
-                  vals=JSON.parse(vals.replace(/&quot;/g,'"'));
-                  if(vals.indexOf(($(this).val())*1)>-1){
-                    $("#{{formConstructor.name}}-form-body #form_{{ field.name }}").parent().show();
-                  }else $("#{{formConstructor.name}}-form-body #form_{{ field.name }}").parent().hide();
-                {% endif %}
-              });
-              {% if field.depends.vals == "any" %}
-                if($('#{{formConstructor.name}}-form-body #form_{{ field.depends.from }}').val()!=""){
-                  $("#{{formConstructor.name}}-form-body #form_{{ field.name }}").parent().show();
-                }else $("#{{formConstructor.name}}-form-body #form_{{ field.name }}").parent().hide();
-              {% else %}
-                var vals="{{ field.depends.vals }}";
-                vals=JSON.parse(vals.replace(/&quot;/g,'"'));
-                if(vals.indexOf(($('#{{formConstructor.name}}-form-body #form_{{ field.depends.from }}').val())*1)>-1){
-                  $("#{{formConstructor.name}}-form-body #form_{{ field.name }}").parent().show();
-                }else $("#{{formConstructor.name}}-form-body #form_{{ field.name }}").parent().hide();
-              {% endif %}
-            {% endif %}
-        {# END of depends fields #}
-      {% endfor %}
-    {% endfor %}
   });
 </script>
 
@@ -338,7 +140,6 @@ return blob;
 				</br></br>
 				<div id="calendar-modal-new-calendar-footer" class="modal-footer">
 					<button type="button" class="btn btn-primary" data-dismiss="modal">{{ ("Close")|trans }}</button>
-					{# <button attr-id="" attr-action="" id="{{ form.id }}-button-continue" type="button" class="btn btn-red">{{ ("Guardar")|trans }}</button> #}
 				</div>
 			</div>
 		</div>

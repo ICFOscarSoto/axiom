@@ -1,0 +1,21 @@
+{# CHANGE FIELDS #}
+<script>
+  {% if field.change is defined %}
+      {% for change in field.change %}
+        $('body').on('change ifChanged', "#{{formConstructor.name}}-form-body #form_{{ field.name }}", function() {
+          var val=null;
+          if($(this).attr('type')=="checkbox") val=$(this).is(":checked")?1:0;
+          else val=$(this).val();
+          if(val=='{{ change.thisval }}'){
+            if($("#{{formConstructor.name}}-form-body #form_{{ change.field }}").attr('type')=="checkbox"){
+              var newval={{ change.targetval }}==1?'check':'uncheck';
+              $("#{{formConstructor.name}}-form-body #form_{{ change.field }}").iCheck(newval);
+            }else{
+              var newval='{{ change.targetval }}';
+              $("#{{formConstructor.name}}-form-body #form_{{ change.field }}").val(newval);
+            }
+          }
+        });
+      {% endfor %}
+  {% endif %}
+</script>

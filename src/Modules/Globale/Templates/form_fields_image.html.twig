@@ -1,0 +1,79 @@
+{# Field type Image #}
+  <div id="fileinput-{{field.name}}" class="fileinput fileinput-new" data-provides="fileinput">
+    <div class="fileinput-new thumbnail" style="width: {{ field.width }}; height: {{ field.height }};" data-trigger="fileinput">
+      <img id="fileinput-img-{{field.name}}" src="{{ url(field.value,{'id': formConstructor.id_object, 'type': field.imageType, 'size': 'medium'}) }}" alt="">
+    </div>
+    <div id="image-preview-{{field.name}}" class="fileinput-preview fileinput-exists thumbnail" style="width: {{ field.width }}; height: {{ field.height }}"></div>
+    <div>
+      {% if formConstructor.id_object !=0 %}
+      <span class="btn btn-white btn-file">
+        <span class="">Seleccionar</span>
+        <input type="file" id="form_{{field.name}}" name="form[{{field.name}}]" accept="image/*" class="form-control-file">
+      </span>
+      <a href="#" id="btn-image-cancel-{{field.name}}" class="btn btn-red fileinput-exists" data-dismiss="fileinput">Cancel</a>
+      <a href="#" id="btn-image-save-{{field.name}}" attr-imageType="{{field.imageType}}" class="btn btn-green fileinput-exists">Guardar</a>
+      {% endif %}
+    </div>
+  </div>
+<script>
+
+function b64toBlob(b64Data, contentType, sliceSize) {
+  contentType = contentType || '';
+  sliceSize = sliceSize || 512;
+  var byteCharacters = atob(b64Data);
+  var byteArrays = [];
+  for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+      var slice = byteCharacters.slice(offset, offset + sliceSize);
+      var byteNumbers = new Array(slice.length);
+      for (var i = 0; i < slice.length; i++) {
+          byteNumbers[i] = slice.charCodeAt(i);
+      }
+      var byteArray = new Uint8Array(byteNumbers);
+      byteArrays.push(byteArray);
+  }
+var blob = new Blob(byteArrays, {type: contentType});
+return blob;
+}
+
+$(document).ready(function() {
+$( '#fileinput-img-{{field.name}}' ).load(function() {
+  $('#fileinput-img-{{field.name}}').fadeIn();
+});
+
+$('body').on('click', '#btn-image-save-{{field.name}}', function(){
+  $('#fileinput-img-{{field.name}}').fadeOut();
+  var url = "{{url("uploadImage",{"type":field.imageType, "id": formConstructor.id_object})}}";
+  var image = $('#image-preview-{{field.name}}').find('img').attr('src');
+  console.log(image);
+  var block = image.split(";");
+  var contentType = block[0].split(":")[1];
+  var realData = block[1].split(",")[1];
+  var blob = b64toBlob(realData, contentType);
+  var formData = new FormData();
+  formData.append('picture', blob);
+
+  if((++load_wait)==1) $("#load-spinner").fadeIn();
+  $.ajax({
+      url: url,
+      type: "POST",
+      cache: false,
+      contentType: false,
+      processData: false,
+      data: formData,
+      error:function(err){
+          $('#fileinput-img-{{field.name}}').fadeIn();
+          toastr.error("No se pudo subir la imagen", "Confirmación", confirmation);
+      },
+      success:function(data){
+          $('#fileinput-img-{{field.name}}').attr('src','{{ url(field.value,{'id': formConstructor.id_object, 'type': field.imageType, 'size': 'medium'}) }}?'+Date.now());
+          $('#fileinput-{{field.name}}').fileinput("clear");
+          if(data.result) toastr.success("Imagen cambiada correctamente", "Confirmación", confirmation);
+      },
+      complete:function(){
+          if((--load_wait)==0) $("#load-spinner").fadeOut();
+      }
+    });
+});
+
+});
+</script>

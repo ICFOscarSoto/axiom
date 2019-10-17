@@ -385,10 +385,13 @@ Shippcontact: Dirección envío
 Select aerpcustomergroups: Seleccionar grupo cliente
 Select aerpcustomercontacts: Seleccionar contacto
 Select globaleusers: Seleccionar usuario
+Select aerpwarehouses: Seleccionar almacén
+Select AERPWarehouseLocations: Seleccionar ubicación
 Position: Cargo
 Privacyaccepted: Aceptada Privacidad
 Allowmarketing: Permite Marketing
-Service: Proveedor de servicios
+Service: Es servicio
+Sericeprovider:
 lastname: Apellidos
 position: Cargo
 phone: Teléfono
@@ -398,3 +401,15 @@ city: Localidad
 Categories: Categorias
 Agentassign: Agente
 Providers: Proveedores
+Provider: Proveedor
+Select aerpproviders: Seleccionar proveedor
+Tax: Impuesto
+Select globaletaxes: Seleccionar impuesto
+Price: Precio
+Purchaseprice: Precio compra
+code: Código
+StockControl: Control stock
+Warehouses: Almacénes
+Warehouse: Almacén
+WarehouseLocations: Ubicación
+WarehouseLocation: Ubicación

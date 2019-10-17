@@ -251,6 +251,20 @@
 					$p[is_checked ? 'addClass' : 'removeClass']( 'highlight' );
 				});
 
+				var typingTimer;                //timer identifier
+				var doneTypingInterval = 1000;  //time in ms, 5 second for example
+				var searchColumn;
+				function clearSearchTimeOut(){
+					clearTimeout(typingTimer);
+  				typingTimer = setTimeout(doSearch, doneTypingInterval);
+				}
+
+				function doSearch () {
+					{{ listConstructor.id }}.columns(searchColumn+':name').search( $("#s_"+searchColumn).val() ).draw();
+					arrayParams={{ listConstructor.id }}.ajax.params();
+					$("#search_param").val(jQuery.param(arrayParams));
+				}
+
 				{% for field in listConstructor.fields %}
 
 					{% if field.replace is defined %}
@@ -260,22 +274,17 @@
 							$("#search_param").val(jQuery.param(arrayParams));
 						});
 					{% else %}
-						{% if '__' in field.name %}
-
-						$('body').on('change', '#s_{{ field.name }}', function() {
-							{{ listConstructor.id }}.columns('{{ field.name }}:name').search( this.value ).draw();
-							arrayParams={{ listConstructor.id }}.ajax.params();
-							$("#search_param").val(jQuery.param(arrayParams));
+						if($("#s_{{ field.name }}").is('select')) event="change"; else event="keyup";
+						$('body').on(event, '#s_{{ field.name }}', function() {
+							searchColumn='{{ field.name }}';
+							if($(this).is('select')) doSearch ();
+								else{
+									clearSearchTimeOut();
+								}
 						});
-
-
-						{% else %}
-							$('body').on('keyup', '#s_{{ field.name }}', function() {
-								{{ listConstructor.id }}.columns('{{ field.name }}:name').search( this.value ).draw();
-								arrayParams={{ listConstructor.id }}.ajax.params();
-								$("#search_param").val(jQuery.param(arrayParams));
-							});
-						{% endif %}
+						$('body').on('keydown', '#s_{{ field.name }}', function() {
+							 clearTimeout(typingTimer);
+						});
 					{% endif %}
 
 

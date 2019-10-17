@@ -6,9 +6,12 @@ use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\AERP\Entity\AERPProviders;
 use \App\Modules\Globale\Entity\GlobaleTaxes;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
+use \App\Modules\AERP\Entity\AERPWarehouseLocations;
+use \App\Modules\Globale\Entity\GlobaleUsers;
+use \App\Modules\AERP\Entity\AERPWarehouses;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\Modules\AERP\Entity\AERPProductsRepository")
+ * @ORM\Entity(repositoryClass="App\Modules\AERP\Repository\AERPProductsRepository")
  */
 class AERPProducts
 {
@@ -43,12 +46,12 @@ class AERPProducts
     /**
      * @ORM\Column(type="boolean")
      */
-    private $onsale;
+    private $onsale=1;
 
     /**
      * @ORM\Column(type="boolean")
      */
-    private $onpurchase;
+    private $onpurchase=1;
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleTaxes")
@@ -58,18 +61,28 @@ class AERPProducts
     /**
      * @ORM\Column(type="float")
      */
-    private $price;
+    private $purchaseprice=0;
+
+    /**
+     * @ORM\Column(type="float")
+     */
+    private $price=0;
 
     /**
      * @ORM\Column(type="boolean")
      */
-    private $stockControl;
+    private $stockControl=1;
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCompanies")
      * @ORM\JoinColumn(nullable=false)
      */
     private $company;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $service;
 
     /**
      * @ORM\Column(type="boolean")
@@ -90,6 +103,22 @@ class AERPProducts
      * @ORM\Column(type="datetime")
      */
     private $dateupd;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\AERP\Entity\AERPWarehouseLocations")
+     */
+    private $location;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleUsers")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $author;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\AERP\Entity\AERPWarehouses")
+     */
+    private $warehouse;
 
     public function getId(): ?int
     {
@@ -180,6 +209,18 @@ class AERPProducts
         return $this;
     }
 
+    public function getPurchaseprice(): ?float
+    {
+        return $this->purchaseprice;
+    }
+
+    public function setPurchaseprice(float $purchaseprice): self
+    {
+        $this->purchaseprice = $purchaseprice;
+
+        return $this;
+    }
+
     public function getPrice(): ?float
     {
         return $this->price;
@@ -213,6 +254,18 @@ class AERPProducts
     public function setCompany(?GlobaleCompanies $company): self
     {
         $this->company = $company;
+
+        return $this;
+    }
+
+    public function getService(): ?bool
+    {
+        return $this->service;
+    }
+
+    public function setService(bool $service): self
+    {
+        $this->service = $service;
 
         return $this;
     }
@@ -275,5 +328,41 @@ class AERPProducts
 
       }
 
+    }
+
+    public function getLocation(): ?AERPWarehouseLocations
+    {
+        return $this->location;
+    }
+
+    public function setLocation(?AERPWarehouseLocations $location): self
+    {
+        $this->location = $location;
+
+        return $this;
+    }
+
+    public function getAuthor(): ?GlobaleUsers
+    {
+        return $this->author;
+    }
+
+    public function setAuthor(?GlobaleUsers $author): self
+    {
+        $this->author = $author;
+
+        return $this;
+    }
+
+    public function getWarehouse(): ?AERPWarehouses
+    {
+        return $this->warehouse;
+    }
+
+    public function setWarehouse(?AERPWarehouses $warehouse): self
+    {
+        $this->warehouse = $warehouse;
+
+        return $this;
     }
 }

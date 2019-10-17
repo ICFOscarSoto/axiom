@@ -78,7 +78,8 @@
                 },
                 {
                     "name": "service",
-                    "cols": 4
+                    "cols": 4,
+                    "caption": "Sericeprovider"
                 },
                 {
                     "name": "active",

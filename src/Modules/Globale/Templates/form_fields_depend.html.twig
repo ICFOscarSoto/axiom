@@ -1,0 +1,36 @@
+{# DEPENDS FIELDS #}
+<script>
+    {% if field.depends is defined %}
+      $('body').on('change ifChanged', '#form_{{ field.depends.from }}', function() {
+        var val=null;
+        if($(this).attr('type')=="checkbox") val=$(this).is(":checked")?1:0;
+        else val=$(this).val();
+        {% if field.depends.vals == "any" %}
+          if(val!=""){
+            $("#{{formConstructor.name}}-form-body #form_{{ field.name }}").parent().parent().css("display","block");
+          }else $("#{{formConstructor.name}}-form-body #form_{{ field.name }}").parent().parent().css("display", "none")
+        {% else %}
+          var vals="{{ field.depends.vals }}";
+          vals=JSON.parse(vals.replace(/&quot;/g,'"'));
+          if(vals.indexOf((val)*1)>-1){
+            $("#{{formConstructor.name}}-form-body #form_{{ field.name }}").parent().parent().css("display","block");
+          }else $("#{{formConstructor.name}}-form-body #form_{{ field.name }}").parent().parent().css("display", "none")
+        {% endif %}
+      });
+      var val=null;
+      if($('#{{formConstructor.name}}-form-body #form_{{ field.depends.from }}').attr('type')=="checkbox") val=$('#{{formConstructor.name}}-form-body #form_{{ field.depends.from }}').is(":checked")?1:0;
+      else val=$('#{{formConstructor.name}}-form-body #form_{{ field.depends.from }}').val()
+      {% if field.depends.vals == "any" %}
+        if(val!=""){
+          $("#{{formConstructor.name}}-form-body #form_{{ field.name }}").parent().parent().css("display","block");
+        }else $("#{{formConstructor.name}}-form-body #form_{{ field.name }}").parent().parent().css("display", "none")
+      {% else %}
+        var vals="{{ field.depends.vals }}";
+        vals=JSON.parse(vals.replace(/&quot;/g,'"'));
+        if(vals.indexOf((val)*1)>-1){
+          $("#{{formConstructor.name}}-form-body #form_{{ field.name }}").parent().parent().css("display","block");
+        }else $("#{{formConstructor.name}}-form-body #form_{{ field.name }}").parent().parent().css("display", "none")
+      {% endif %}
+    {% endif %}
+</script>
+{# END of depends fields #}

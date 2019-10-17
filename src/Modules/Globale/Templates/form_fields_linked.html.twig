@@ -1,0 +1,14 @@
+{# LINKED FIELDS LIKE DATETIMES, ETC #}
+<script>
+{% if field.linked is defined %}
+  {% if field.type is defined and (field.type=="date" or field.type=="time"  or field.type=="dateshort") %}
+       $("#form_{{ field.name }}").on("dp.change", function (e) {
+         $('#form_{{ field.linked.field }}').data("DateTimePicker").{{ field.linked.by }}(e.date);
+       });
+       var var_form_{{ field.name }}=$("#form_{{ field.name }}").data("DateTimePicker").date();
+       //Change de values to force on change event
+       $("#form_{{ field.name }}").data("DateTimePicker").date(null);
+       $("#form_{{ field.name }}").data("DateTimePicker").date(var_form_{{ field.name }});
+  {% endif %}
+{% endif %}
+</script>

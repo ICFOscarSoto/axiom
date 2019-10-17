@@ -282,3 +282,7 @@ AERPProvider:
 AERPCategories:
   resource: 'App\Modules\AERP\Controller\AERPCategoriesController'
   type:      annotation
+
+AERPProducts:
+  resource: 'App\Modules\AERP\Controller\AERPProductsController'
+  type:      annotation

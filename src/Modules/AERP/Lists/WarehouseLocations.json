@@ -5,15 +5,15 @@
     },
     {
         "name": "code",
-        "caption": "code"
+        "caption": "Code"
+    },
+    {
+        "name": "warehouse__name",
+        "caption": "Warehouse"
     },
     {
         "name": "name",
-        "caption": "name"
-    },
-    {
-        "name": "price",
-        "caption": "price"
+        "caption": "Name"
     },
     {
         "name": "active",

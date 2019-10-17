@@ -3,41 +3,82 @@
         {
             "name": "data",
             "fields": [
+                { "name": "productImage", "cols": 3,	"type": "image", "imageType":"products", "value": "getImage", "width": "100%",	"height": "250px"},
                 {
                     "name": "code",
-                    "cols": 4
+                    "cols": 3
                 },
                 {
                     "name": "name",
-                    "cols": 4
+                    "cols": 6
                 },
                 {
                     "name": "description",
-                    "cols": 4
-                },
-                {
-                    "name": "onsale",
-                    "cols": 4
-                },
-                {
-                    "name": "onpurchase",
-                    "cols": 4
-                },
-                {
-                    "name": "price",
-                    "cols": 4
-                },
-                {
-                    "name": "active",
-                    "cols": 4
+                    "cols": 9,
+                    "class": "text-area-form"
                 },
                 {
                     "name": "provider",
-                    "cols": 4
+                    "cols": 4,
+                    "relation": {"route": "genericdata", "routeparams":{"module":"AERP","name":"Providers"}, "type":"full"}
                 },
                 {
+                    "name": "service",
+                    "cols": 4,
+                    "change": [{"field": "stockControl", "thisval": 1, "targetval":0}, {"field": "stockControl", "thisval": 0, "targetval":1}]
+                }
+              ]
+            },
+            {
+              "name": "Comercial",
+              "fields": [
+                {
                     "name": "tax",
-                    "cols": 4
+                    "cols": 4,
+                    "relation": {"route": "genericdata", "routeparams":{"module":"Globale","name":"Taxes"}, "type":"modal"}
+                },
+                {
+                    "name": "onsale",
+                    "cols": 2
+                },
+                {
+                    "name": "price",
+                    "cols": 2,
+                    "depends":{"from": "onsale","vals":"[1]"}
+                },
+                {
+                    "name": "onpurchase",
+                    "cols": 2
+                },
+                {
+                    "name": "purchaseprice",
+                    "cols": 2,
+                    "depends":{"from": "onpurchase","vals":"[1]"}
+                }
+              ]
+            },
+            {
+              "name": "Inventario",
+              "fields": [
+                {
+                    "name": "stockControl",
+                    "cols": 4,
+                    "depends":{"from": "service","vals":"[0]"}
+                },
+                {
+                    "name": "warehouse",
+                    "cols": 4,
+                    "depends":{"from": "stockControl","vals":"[1]"}
+                },
+                {
+                    "name": "location",
+                    "cols": 4,
+                    "depends":{"from": "stockControl","vals":"[1]"},
+                    "trigger": {"field":"warehouse", "route":"generictrigger", "moduleTrigger":"AERP", "classTrigger":"AERPWarehouses", "module":"AERP", "class":"AERPWarehouseLocations", "relationParameter":"warehouse"}
+                },
+                {
+                    "name": "active",
+                    "cols": 12
                 }
             ]
         }

@@ -12,10 +12,6 @@
         "caption": "name"
     },
     {
-        "name": "price",
-        "caption": "price"
-    },
-    {
         "name": "active",
         "caption": "Estado",
         "width": "10%",

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repository\Modules\AERP\Entity;
+namespace App\Modules\AERP\Repository;
 
 use App\Modules\AERP\Entity\AERPProducts;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;

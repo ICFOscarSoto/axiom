@@ -1,0 +1,8 @@
+[
+  {"id": "editWarehouseLocations", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"genericdata", "routeParams":{"module":"AERP", "name":"WarehouseLocations", "type":"modal" }, "modal":"WarehouseLocations", "actionType" : "background", "confirm" :false, "tooltip":""},
+  {"id": "activation", "type": "option", "options": [
+      {"id": "desactivateWarehouseLocations", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"genericdisable", "routeParams":{"module":"AERP", "name":"WarehouseLocations"}, "confirm" :true, "actionType" : "background", "tooltip":"" },
+      {"id": "activateWarehouseLocations", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "route":"genericenable", "routeParams":{"module":"AERP", "name":"WarehouseLocations"}, "confirm" :true, "actionType" : "background", "tooltip":"" }
+  ]},
+  {"id": "deleteWarehouseLocations", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"genericdelete", "routeParams":{"module":"AERP", "name":"WarehouseLocations"}, "confirm" :true, "undo" :false, "actionType" : "background", "tooltip":""}
+]
