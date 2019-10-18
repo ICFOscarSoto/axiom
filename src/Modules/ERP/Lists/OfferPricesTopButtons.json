@@ -1,0 +1,6 @@
+[
+  {"id" : "addTopOfferPrices", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"genericdatatab", "routeParams":{"module":"ERP", "name":"OfferPrices", "type":"modal", "idparent":"id" }, "modal":"OfferPrices", "actionType" : "background", "confirm" :false, "tooltip" : ""},
+  {"id" : "deleteTopOfferPrices", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true, "tooltip":""},
+  {"id" : "printTopOfferPrices", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false, "tooltip":""},
+  {"id" : "exportTopOfferPrices", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"genericexport", "routeParams":{"module":"ERP", "name":"OfferPrices"}, "confirm" :false, "tooltip":""}
+]

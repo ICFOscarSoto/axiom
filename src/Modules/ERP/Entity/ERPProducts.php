@@ -7,9 +7,11 @@ use \App\Modules\ERP\Entity\ERPManufacturers;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
 use \App\Modules\ERP\Entity\ERPCategories;
 use \App\Modules\ERP\Entity\ERPSuppliers;
+use \App\Modules\ERP\Entity\ERPProductPrices;
 use \App\Modules\ERP\Entity\ERPCustomerGroups;
 use \App\Modules\HR\Entity\HRWorkers;
 use \App\Modules\Globale\Entity\GlobaleTaxes;
+
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPProductsRepository")
@@ -195,6 +197,11 @@ class ERPProducts
      * @ORM\Column(type="boolean")
      */
     private $netprice=0;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    private $pvpincrement;
 
 
     public function getId(): ?int
@@ -605,8 +612,73 @@ class ERPProducts
 
 
 
-    public function priceCalculated($doctrine){
-      $this->setShoppingPrice($this->PVPR*(1-$this->getShoppingDiscount($doctrine)/100));
+    public function priceCalculated($doctrine)
+    {
+      $em = $doctrine->getManager();
+      $newShoppingPrice=$this->PVPR*(1-$this->getShoppingDiscount($doctrine)/100);
+      $this->setShoppingPrice($newShoppingPrice);
+      if($this->getPvpincrement()==NULL)
+      {
+        $CustomerGroupsRepository=$doctrine->getRepository(ERPCustomerGroups::class);
+        $customergroups=$CustomerGroupsRepository->findAll(["active"=>1,"deleted"=>0]);
+        $maxincrement=0;
+        foreach($customergroups as $customergroup){
+          $increment=$this->getMaxIncrement($doctrine,$customergroup);
+          if($increment>$maxincrement) $maxincrement=$increment;
+        }
+    
+        $this->setPvpincrement($maxincrement);
+        $this->setPVP($newShoppingPrice*(1+($maxincrement/100)));
+      
+      }
+      
+      else $this->setPVP($newShoppingPrice*(1+($this->getPvpincrement()/100)));
+      
+        //recalculamos el precio para cada incremento de grupo que exista
+        $repositoryProduct=$doctrine->getRepository(ERPProducts::class);
+        $repositoryProductPrices=$doctrine->getRepository(ERPProductPrices::class);
+        $productprices=$repositoryProductPrices->pricesByProductId($this->getId());
+        foreach($productprices as $productprice)
+        {    
+          $productpriceEntity=$repositoryProductPrices->findOneBy(["id"=>$productprice]);
+          $productpriceEntity->setPrice($newShoppingPrice*(1+($productpriceEntity->getIncrement()/100)));
+        }
+      
+      
+      $CustomerGroupsRepository=$doctrine->getRepository(ERPCustomerGroups::class);
+      $customergroups=$CustomerGroupsRepository->findAll(["active"=>1,"deleted"=>0]);
+      $productEntity=$repositoryProduct->findOneBy(["id"=>$this->getId()]);
+      //dump($customergroups);
+      $customergroup_without_price=[];
+      foreach($customergroups as $customergroup){
+        if($repositoryProductPrices->existPrice($this,$customergroup)==FALSE)     array_push($customergroup_without_price,$customergroup);                
+      }
+      
+    
+      foreach($customergroup_without_price as $customergroup){
+        $increment=$this->getMaxIncrement($doctrine,$customergroup);
+        dump("Creamos el incremento para el producto ".$this->getName()." y el grupo ".$customergroup->getName());
+        $productpricesEntity= new ERPProductPrices();
+        $productpricesEntity->setProduct($this);
+        $productpricesEntity->setCustomergroup($customergroup);
+        $productpricesEntity->setIncrement($increment*1);
+        $productpricesEntity->setPrice(round_up($newShoppingPrice*(1+($increment/100)),2));
+        $productpricesEntity->setActive(1);
+        $productpricesEntity->setDeleted(0);
+        $productpricesEntity->setDateupd(new \DateTime());
+        $productpricesEntity->setDateadd(new \DateTime());
+        dump($productpricesEntity);
+        $em->persist($productpricesEntity);
+        $em->flush();  
+        dump("ya hemos hecho el flush");
+        
+    
+      }
+      
+  
+      //else dump("Si existe el incremento para el producto ".$this->getName()." y el grupo ".$customergroup->getName());
+      
+      
     }
 
     public function calculatePVP($doctrine){
@@ -615,9 +687,11 @@ class ERPProducts
          $maxincrement=0;
          foreach($customergroups as $customergroup){
            $increment=$this->getMaxIncrement($doctrine,$customergroup);
+           //dump("Incremento ".$increment." para el grupo ".$customergroup->getName());
            if($increment>$maxincrement) $maxincrement=$increment;
          }
          $this->setPVP($this->shoppingPrice*(1+($maxincrement/100)));
+         $this->setPvpincrement($maxincrement);
      }
      
     public function getMaxIncrement($doctrine,$customergroup){
@@ -695,6 +769,18 @@ class ERPProducts
      public function setNetprice(bool $netprice): self
      {
          $this->netprice = $netprice;
+
+         return $this;
+     }
+
+     public function getPvpincrement(): ?float
+     {
+         return $this->pvpincrement;
+     }
+
+     public function setPvpincrement(?float $pvpincrement): self
+     {
+         $this->pvpincrement = $pvpincrement;
 
          return $this;
      }

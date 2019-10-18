@@ -232,7 +232,7 @@ public function formValidation($kernel, $doctrine, $user, $validationParams){
             if($increment!=NULL)
             {
 
-              if($repositoryProductPrices->exists($productEntity,$this->customergroup))
+              if($repositoryProductPrices->existPrice($productEntity,$this->customergroup))
               {
                 $productpricesEntity=$repositoryProductPrices->findOneBy(["product"=>$productEntity,"customergroup"=>$this->customergroup]);
                 $productpricesEntity->setIncrement($increment);

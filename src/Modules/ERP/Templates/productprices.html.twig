@@ -4,3 +4,13 @@
     {{ include('@Globale/basiclist.html.twig') }}
   </div>
 </div>
+<div class="row">
+  <div class="col-md-12">
+    <div class="panel-title-list">Ofertas</div>
+    {% if offerpriceslist is defined %}
+    {% set listConstructor = offerpriceslist %}
+    {{ include('@Globale/list.html.twig') }}
+    {% endif %}
+  </div>
+</div>
+

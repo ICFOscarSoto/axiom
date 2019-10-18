@@ -24,17 +24,25 @@ class ERPProductPricesRepository extends ServiceEntityRepository
               FROM erpproduct_prices p LEFT JOIN erpcustomer_groups c ON c.id=p.customergroup_id 
               WHERE p.product_id=:PROD AND p.active=TRUE and p.deleted=0";
       $params=['PROD' => $product->getId()];
-      dump($query);
       return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
 
     }
     
-    public function exists($product,$customergroup){
+    public function pricesByProductId($product){
+      $query="SELECT id from erpproduct_prices
+      where product_id=:product";
+      $params=['product' => $product];
+      return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+
+    }
+    
+    public function existPrice($product,$customergroup){
       $query="SELECT * FROM erpproduct_prices p WHERE p.product_id=:PROD AND p.customergroup_id=:GRP AND p.active=TRUE and p.deleted=0";
       $params=['PROD' => $product->getId(),
                'GRP' => $customergroup->getId(),
         ];
       $result=$this->getEntityManager()->getConnection()->executeQuery($query,$params)->fetch();
+    //  dump($result);
       if($result!=NULL) return true;
       else return false;
     }

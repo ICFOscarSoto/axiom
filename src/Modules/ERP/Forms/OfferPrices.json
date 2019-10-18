@@ -1,0 +1,37 @@
+[{
+    "sections": [
+        {
+            "name": "data",
+            "fields": [
+              {
+                  "name": "customer",
+                  "cols": 4
+              },
+                {
+                    "name": "type",
+                    "cols": 4
+                },
+                {
+                    "name": "increment",
+                    "cols": 4
+                },
+                {
+                    "name": "price",
+                    "cols": 4
+                },
+                {
+                    "name": "start",
+                    "cols": 4
+                },
+                {
+                    "name": "end",
+                    "cols": 4
+                },
+                {
+                    "name": "active",
+                    "cols": 4
+                }
+            ]
+        }
+    ]
+}]
