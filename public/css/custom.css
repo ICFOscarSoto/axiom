@@ -41,6 +41,7 @@ table {
       }
 };
 
+
 .form-validation-error {
   margin: 0px 0px 5px 0px !important;
   padding: 5px 15px 5px 15px;
@@ -183,6 +184,29 @@ th.table-header-name{
 .select2-selection__view:hover{
   background: #f1f1f1;
 }
+
+.number-type{
+  text-align: right !important;
+}
+
+.input_parent__unity{
+  padding-right: 36px !important;
+}
+
+.input__unity {
+    height: 31px;
+    position: absolute;
+    top: 22px;
+    right: 15px;
+    width: 32px;
+    border: 1px solid #cecece;
+    border-radius: 3px;
+    background: #ffffff;
+    line-height: 28px !important;
+    text-align: center;
+    font-weight: bold;
+
+  }
 
 .principal-content{
   min-height: 700px;

@@ -1,0 +1,9 @@
+{% if field.unity is defined %}
+<script>
+  $(document).ready(function() {
+    $("#{{formConstructor.name}}-form-body").find("#form_{{ field.name }}").before("<span id='unity-view-{{formConstructor.name}}-{{ field.name }}' class='input__unity'><span>{{ field.unity }}</span></span>");
+    $("#{{formConstructor.name}}-form-body").find("#form_{{ field.name }}").addClass('input_parent__unity');
+  });
+
+</script>
+{% endif %}

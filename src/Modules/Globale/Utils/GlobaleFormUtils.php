@@ -4,6 +4,7 @@ use Symfony\Component\HttpFoundation\Response;
 use App\Modules\Globale\Utils\GlobaleJsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
@@ -182,9 +183,11 @@ class GlobaleFormUtils extends Controller
                      case "dateshort":
                          $form->add($value['fieldName'], TextType::class, ['required' => !$value["nullable"], 'empty_data' => '', 'attr' => ['class' => 'dateshortpicker', 'defaultDate' => isset($field["defaultDate"])?$field["defaultDate"]:'' ]]);
                      break;
+                     default:
+                      $form->add($value['fieldName'],null,['label'=>$label, 'disabled' => isset($field["readonly"])?$field["readonly"]:false, 'attr'=>['readonly' => isset($field["readonly"])?$field["readonly"]:false,'class'=>isset($field["class"])?$field["class"]:'']]);
                    }
                  }else{
-                   $form->add($value['fieldName'],null,['label'=>$label, 'disabled' => isset($field["readonly"])?$field["readonly"]:false, 'attr'=>['help'=>"prueba",'readonly' => isset($field["readonly"])?$field["readonly"]:false,'class'=>isset($field["class"])?$field["class"]:'']]);
+                   $form->add($value['fieldName'],null,['label'=>$label, 'disabled' => isset($field["readonly"])?$field["readonly"]:false, 'attr'=>['readonly' => isset($field["readonly"])?$field["readonly"]:false,'class'=>isset($field["class"])?$field["class"]:'']]);
                  }
               }
             }else $form->add($value['fieldName'],null,['disabled' => isset($field["readonly"])?$field["readonly"]:false,'attr'=>['readonly' => isset($field["readonly"])?$field["readonly"]:false,'class'=>isset($field["class"])?$field["class"]:'']]);

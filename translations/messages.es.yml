@@ -407,6 +407,7 @@ Tax: Impuesto
 Select globaletaxes: Seleccionar impuesto
 Price: Precio
 Purchaseprice: Precio compra
+Onpurchase: Se compra
 code: Código
 StockControl: Control stock
 Warehouses: Almacénes

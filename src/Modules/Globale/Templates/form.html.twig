@@ -56,6 +56,10 @@
               {{ include("@Globale/form_fields_depend.html.twig") }}
               {# Check if field has a to change another field #}
               {{ include("@Globale/form_fields_change.html.twig") }}
+              {# Check if field has unity field #}
+              {{ include("@Globale/form_fields_unity.html.twig") }}
+              {# Check if field has a field type number #}
+              {{ include("@Globale/form_fields_type_number.html.twig") }}
             {% endif %}
         </div>
         {% set counter = counter +1 %}
