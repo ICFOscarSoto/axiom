@@ -551,9 +551,6 @@ class ERPSuppliers
 
     public function formValidation($kernel, $doctrine, $user, $validationParams){
       $fieldErrors=[];
-      if($this->activity==null){
-        $fieldErrors["activity"]="This field is required.";
-      }
       if($this->country==null){
         $fieldErrors["country"]="This field is required.";
       }

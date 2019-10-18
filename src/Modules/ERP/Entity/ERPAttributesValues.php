@@ -32,12 +32,12 @@ class ERPAttributesValues
     /**
      * @ORM\Column(type="boolean")
      */
-    private $active;
+    private $active=1;
 
     /**
      * @ORM\Column(type="boolean")
      */
-    private $deleted;
+    private $deleted=0;
 
     /**
      * @ORM\Column(type="datetime")

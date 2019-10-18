@@ -46,7 +46,7 @@ class ERPProductsAttributes
     /**
      * @ORM\Column(type="boolean")
      */
-    private $deleted;
+    private $deleted=0;
 
     /**
      * @ORM\Column(type="datetime")
