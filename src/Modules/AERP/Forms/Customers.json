@@ -59,12 +59,16 @@
                 },
                 {
                     "name": "maxrisk",
-                    "cols": 3
+                    "cols": 3,
+                    "unity": "€",
+                    "class": "number-type"
                 },
                 {
                     "name": "risk",
                     "cols": 3,
-                    "readonly": true
+                    "readonly": true,
+                    "unity": "€",
+                    "class": "number-type"
                 },
                 {
                     "name": "shippcontact",

@@ -16,6 +16,8 @@ use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\AERP\Utils\AERPProductsUtils;
+use App\Modules\AERP\Entity\AERPCustomerGroups;
+use App\Modules\AERP\Entity\AERPCustomerGroupsPrices;
 use App\Modules\Security\Utils\SecurityUtils;
 
 class AERPProductsController extends Controller
@@ -52,6 +54,7 @@ public function formAERPProduct($id,Request $request)
           'id' => $id,
           'tab' => $request->query->get('tab','data'), //Show initial tab, by default data tab
           'tabs' => [	["name" => "data", "icon"=>"fa-address-card-o", "caption"=>"Datos productos", "active"=>true, "route"=>$this->generateUrl("dataAERPProducts",["id"=>$id])],
+											["name" => "files", "icon"=>"fa fa-money", "caption"=>"Precios grupos", "route"=>$this->generateUrl("AERPProductsPrices",["id"=>$id])],
 											["name" => "files", "icon"=>"fa fa-cloud", "caption"=>"Archivos", "route"=>$this->generateUrl("cloudfiles",["id"=>$id, "path"=>"products"])]
                   	],
               ));
@@ -61,20 +64,90 @@ public function formAERPProduct($id,Request $request)
    * @Route("/{_locale}/AERP/products/data/{id}/{action}", name="dataAERPProducts", defaults={"id"=0, "action"="read"})
    */
    public function data($id, $action, Request $request){
-   $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-   $template=dirname(__FILE__)."/../Forms/Products.json";
-   $utils = new GlobaleFormUtils();
-	 $repository=$this->getDoctrine()->getRepository($this->class);
-	 $obj = $repository->findOneBy(['id'=>$id, 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
-	 if($id!=0 && $obj==null){
-			 return $this->render('@Globale/notfound.html.twig',[]);
-	 }
-	 $classUtils=new AERPProductsUtils();
-	 $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "obj"=>$obj];
-   $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),$classUtils->getExcludedForm($params),$classUtils->getIncludedForm($params));
-   $make = $utils->make($id, $this->class, $action, "formProducts", "full", "@Globale/form.html.twig", "formAERPProduct");
-   return $make;
+	   $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+	   $template=dirname(__FILE__)."/../Forms/Products.json";
+	   $utils = new GlobaleFormUtils();
+		 $repository=$this->getDoctrine()->getRepository($this->class);
+		 $obj = $repository->findOneBy(['id'=>$id, 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
+		 if($id!=0 && $obj==null){
+				 return $this->render('@Globale/notfound.html.twig',[]);
+		 }
+		 $classUtils=new AERPProductsUtils();
+		 $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "obj"=>$obj];
+	   $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),$classUtils->getExcludedForm($params),$classUtils->getIncludedForm($params));
+	   $make = $utils->make($id, $this->class, $action, "formProducts", "full", "@Globale/form.html.twig", "formAERPProduct");
+	   return $make;
   }
+
+	/**
+   * @Route("/{_locale}/AERP/products/{id}/prices", name="AERPProductsPrices")
+   */
+   public function AERPProductsPrices($id, Request $request){
+	   $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		 $repository=$this->getDoctrine()->getRepository(AERPProducts::class);
+		 $repositoryGroups=$this->getDoctrine()->getRepository(AERPCustomerGroups::class);
+		 $repositoryCustomerGroupsPrices=$this->getDoctrine()->getRepository(AERPCustomerGroupsPrices::class);
+		 $groups=$repositoryGroups->findBy(["company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
+		 $product=$repository->findOneBy(["id"=>$id,"company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
+
+		 if(!$product) return $this->render('@Globale/notfound.html.twig',[]);
+		 $groupsArray=[];
+		 foreach($groups as $group){
+			 $price=$repositoryCustomerGroupsPrices->findOneBy(["company"=>$this->getUser()->getCompany(), "product"=>$product, "customergroup"=>$group, "active"=>1, "deleted"=>0]);
+			 if($price) $groupsArray[$group->getName()]=["id"=>$group->getId(), "discount"=>$price->getDisccount(), "profit"=>$price->getProfit(), "fixed"=>$price->getFixed(), "total"=>$price->getTotal()];
+			 else $groupsArray[$group->getName()]=["id"=>$group->getId(), "discount"=>"", "profit"=>"", "fixed"=>"", "total"=>$product->getPrice()];
+		 }
+	   return $this->render('@AERP/product_prices.html.twig',[
+			 'id'=>$id,
+			 'groups'=>$groupsArray,
+			 'product'=>$product
+		 ]);
+  }
+
+	/**
+   * @Route("/{_locale}/AERP/products/{id}/setGroupPrices", name="productSetGroupPrices")
+   */
+   public function productSetGroupPrices($id, Request $request){
+	   $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		 $repository=$this->getDoctrine()->getRepository(AERPProducts::class);
+		 $repositoryGroups=$this->getDoctrine()->getRepository(AERPCustomerGroups::class);
+		 $repositoryCustomerGroupsPrices=$this->getDoctrine()->getRepository(AERPCustomerGroupsPrices::class);
+		 $product=$repository->findOneBy(["id"=>$id,"company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
+		 if(!$product) new JsonResponse(["result"=>-1]);
+		 $prices=json_decode($request->getContent());
+		 foreach($prices as $price){
+			 $group=$repositoryGroups->findOneBy(["id"=>$price->group, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
+			 if(!$group) continue;
+			 $groupprice=$repositoryCustomerGroupsPrices->findOneBy(["company"=>$this->getUser()->getCompany(), "product"=>$product, "customergroup"=>$group, "active"=>1, "deleted"=>0]);
+			 $total=null;
+			 if($price->fixed!="") $total=$price->fixed;
+			 	else if($price->discount!=""){
+					$total=$product->getPrice()-($product->getPrice()*$price->discount/100);
+				}else if($price->profit!=""){
+					$total=$product->getPurchasePrice()+($product->getPurchasePrice()*$price->profit/100);
+				}
+				if($total===null) continue;
+				if($price!=null){
+					 $groupprice = new AERPCustomerGroupsPrices();
+					 $groupprice->setCompany($this->getUser()->getCompany());
+					 $groupprice->setCustomergroup($group);
+					 $groupprice->setProduct($product);
+					 $groupprice->setActive(1);
+					 $groupprice->setDeleted(0);
+					 $groupprice->setDateadd(new \DateTime());
+				}
+				$groupprice->setDisccount($price->discount);
+				$groupprice->setProfit($price->profit);
+				$groupprice->setFixed($price->fixed);
+				$groupprice->setTotal(round($total,2));
+				$groupprice->setDateupd(new \DateTime());
+				$this->getDoctrine()->getManager()->persist($groupprice);
+				$this->getDoctrine()->getManager()->flush();
+		 }
+	   return new JsonResponse(["result"=>1]);
+  }
+
+
 
 
 }

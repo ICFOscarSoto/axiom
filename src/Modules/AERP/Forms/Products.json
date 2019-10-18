@@ -20,7 +20,7 @@
                 {
                     "name": "provider",
                     "cols": 4,
-                    "relation": {"route": "genericdata", "routeparams":{"module":"AERP","name":"Providers"}, "type":"full"}
+                    "relation": {"route": "formAERPProvider", "type":"full"}
                 },
                 {
                     "name": "service",
@@ -44,7 +44,9 @@
                 {
                     "name": "price",
                     "cols": 2,
-                    "depends":{"from": "onsale","vals":"[1]"}
+                    "depends":{"from": "onsale","vals":"[1]"},
+                    "unity": "€",
+                    "class": "number-type"
                 },
                 {
                     "name": "onpurchase",
@@ -53,7 +55,9 @@
                 {
                     "name": "purchaseprice",
                     "cols": 2,
-                    "depends":{"from": "onpurchase","vals":"[1]"}
+                    "depends":{"from": "onpurchase","vals":"[1]"},
+                    "unity": "€",
+                    "class": "number-type"
                 }
               ]
             },
@@ -62,7 +66,7 @@
               "fields": [
                 {
                     "name": "stockControl",
-                    "cols": 4,
+                    "cols": 3,
                     "depends":{"from": "service","vals":"[0]"}
                 },
                 {

@@ -325,7 +325,7 @@ class AERPProducts
         return ["valid"=>false, "global_errors"=>["El producto ya existe"]];
       else {
 
-
+        return ["valid"=>true];
       }
 
     }
