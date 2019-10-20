@@ -492,6 +492,11 @@ label.form-check-label {
 .calendar-env .calendar-sidebar .events-list .checkbox-replace, .radio-replace {
     padding-top: 4px !important;
 }
+
+.fc-view-container *, .fc-view-container :after, .fc-view-container :before {
+    font-size: 12px !important;
+}
+
 .colorpicker-bs-popover{
   z-index: 999999 !important;
 }

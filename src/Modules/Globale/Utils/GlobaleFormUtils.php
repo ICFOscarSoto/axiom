@@ -175,22 +175,32 @@ class GlobaleFormUtils extends Controller
                 }
               }else{
                  //There isnt transformation, check types
+                 $readonly=false;
+                 if(isset($field["readonly"])){
+                   if($field["readonly"]===true || $field["readonly"]===false) $readonly=$field["readonly"];
+                    else if($field["readonly"]=="noChange"){
+                      if($this->obj->{'get'.ucfirst($field["name"])}()==null){
+                        $readonly=false;
+                      }else $readonly=true;
+                    }
+                 }
+
                  if(isset($field["type"])){
                    switch ($field['type']){
                      case 'time':
-                       $form->add($value['fieldName'], TextType::class, ['label'=>$label, 'required' => !$value["nullable"], 'attr' => ['class' => 'timepicker']]);
+                       $form->add($value['fieldName'], TextType::class, ['label'=>$label, 'disabled' => $readonly, 'required' => !$value["nullable"], 'attr' => ['readonly' => $readonly, 'class' => 'timepicker']]);
                      break;
                      case "dateshort":
-                         $form->add($value['fieldName'], TextType::class, ['required' => !$value["nullable"], 'empty_data' => '', 'attr' => ['class' => 'dateshortpicker', 'defaultDate' => isset($field["defaultDate"])?$field["defaultDate"]:'' ]]);
+                         $form->add($value['fieldName'], TextType::class, ['disabled' => $readonly, 'required' => !$value["nullable"], 'empty_data' => '', 'attr' => ['readonly' => $readonly, 'class' => 'dateshortpicker', 'defaultDate' => isset($field["defaultDate"])?$field["defaultDate"]:'' ]]);
                      break;
                      default:
-                      $form->add($value['fieldName'],null,['label'=>$label, 'disabled' => isset($field["readonly"])?$field["readonly"]:false, 'attr'=>['readonly' => isset($field["readonly"])?$field["readonly"]:false,'class'=>isset($field["class"])?$field["class"]:'']]);
+                      $form->add($value['fieldName'],null,['label'=>$label, 'disabled' => $readonly, 'attr'=>['readonly' => $readonly,'class'=>isset($field["class"])?$field["class"]:'']]);
                    }
                  }else{
-                   $form->add($value['fieldName'],null,['label'=>$label, 'disabled' => isset($field["readonly"])?$field["readonly"]:false, 'attr'=>['readonly' => isset($field["readonly"])?$field["readonly"]:false,'class'=>isset($field["class"])?$field["class"]:'']]);
+                   $form->add($value['fieldName'],null,['label'=>$label, 'disabled' => $readonly, 'attr'=>['readonly' => $readonly,'class'=>isset($field["class"])?$field["class"]:'']]);
                  }
               }
-            }else $form->add($value['fieldName'],null,['disabled' => isset($field["readonly"])?$field["readonly"]:false,'attr'=>['readonly' => isset($field["readonly"])?$field["readonly"]:false,'class'=>isset($field["class"])?$field["class"]:'']]);
+            }else $form->add($value['fieldName'],null,['disabled' => $readonly,'attr'=>['readonly' => $readonly,'class'=>isset($field["class"])?$field["class"]:'']]);
             break;
           }
         }

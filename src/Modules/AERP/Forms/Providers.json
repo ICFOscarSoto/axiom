@@ -5,8 +5,13 @@
             "fields": [
                 {
                     "name": "vat",
-                    "cols": 4,
+                    "cols": 2,
                     "format": "vat"
+                },
+                {
+                    "name": "accountingaccount",
+                    "cols": 2,
+                    "readonly": "noChange"
                 },
                 {
                     "name": "name",
@@ -68,6 +73,7 @@
         {
             "name": "Datos Bancarios",
             "fields": [
+
                 {
                     "name": "iban",
                     "cols": 5

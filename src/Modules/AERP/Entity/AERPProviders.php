@@ -134,6 +134,11 @@ class AERPProviders
      */
     private $swift;
 
+    /**
+     * @ORM\Column(type="string", length=8, nullable=true)
+     */
+    private $accountingaccount;
+
 
     public function getId(): ?int
     {
@@ -346,19 +351,30 @@ class AERPProviders
 
     public function formValidation($kernel, $doctrine, $user, $validationParams){
       $repository=$doctrine->getRepository(AERPProviders::class);
+      $fieldErrors=[];
+      $validator=new HelperValidators();
       $this->vat=preg_replace('/[^\w]/', '', $this->vat);
       $obj=$repository->findOneBy(["vat"=>$this->vat,"company"=>$user->getCompany(),"deleted"=>0]);
-      if($obj!=null and $obj->id!=$this->id)
+      if($this->id==null){
+        if($this->accountingaccount==null){
+          //If accountingaccount is null and object is new, create the next accounting account
+          $this->accountingaccount=$repository->getNextAccounting($user->getCompany()->getId());
+        }else{
+          //Check if accountingaccount is unique
+          $objAccounting=$repository->findOneBy(["accountingaccount"=>$this->accountingaccount,"company"=>$user->getCompany(),"deleted"=>0]);
+          if($objAccounting!=null) {$fieldErrors=["accountingaccount"=>"Cuenta contable ya asignada a ".$objAccounting->getName()]; }
+        }
+      }
+
+      if($obj!=null && $obj->id!=$this->id)
         return ["valid"=>false, "global_errors"=>["El proveedor ya existe"]];
       else {
-
-        $fieldErrors=[];
-        $validator=new HelperValidators();
         //if($this->vat!=null && !$validator->isValidVAT($this->vat)) {$fieldErrors=["vat"=>"CIF/NIF/NIE no válido"]; }
         if($this->email!=null && !$validator->isValidEmail($this->email)) {$fieldErrors=["email"=>"Email no válido"]; }
         if($this->web!=null && !$validator->isValidURL($this->web)) {$fieldErrors=["web"=>"URL no válida"]; }
         if($this->iban!=null && !$validator->isValidIban($this->iban)) {$fieldErrors=["iban"=>"URL no válida"]; }
         if($this->swift!=null && !$validator->isValidSwift($this->swift)) {$fieldErrors=["swift"=>"URL no válida"]; }
+
         return ["valid"=>empty($fieldErrors), "field_errors"=>$fieldErrors];
       }
     }
@@ -419,6 +435,18 @@ class AERPProviders
     public function setSwift(?string $swift): self
     {
         $this->swift = $swift;
+
+        return $this;
+    }
+
+    public function getAccountingaccount(): ?string
+    {
+        return $this->accountingaccount;
+    }
+
+    public function setAccountingaccount(string $accountingaccount): self
+    {
+        $this->accountingaccount = $accountingaccount;
 
         return $this;
     }

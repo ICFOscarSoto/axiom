@@ -120,6 +120,21 @@ class AERPProducts
      */
     private $warehouse;
 
+    /**
+     * @ORM\Column(type="string", length=8, nullable=true)
+     */
+    private $accountingaccount;
+
+    /**
+     * @ORM\Column(type="string", length=150, nullable=true)
+     */
+    private $barcode;
+
+    /**
+     * @ORM\Column(type="string", length=150, nullable=true)
+     */
+    private $brand;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -321,6 +336,17 @@ class AERPProducts
     public function formValidation($kernel, $doctrine, $user, $validationParams){
       $repository=$doctrine->getRepository(AERPProducts::class);
       $product=$repository->findOneBy(["code"=>$this->code,"company"=>$user->getCompany(),"deleted"=>0]);
+      if($this->id==null){
+        if($this->accountingaccount==null){
+          //If accountingaccount is null and object is new
+          $this->accountingaccount=700;
+        }else{
+          //Check if accountingaccount is unique
+          $objAccounting=$repository->findOneBy(["accountingaccount"=>$this->accountingaccount,"company"=>$user->getCompany(),"deleted"=>0]);
+          if($objAccounting!=null) {$fieldErrors=["accountingaccount"=>"Cuenta contable ya asignada a ".$objAccounting->getName()]; }
+        }
+      }
+
       if($product!=null and $product->id!=$this->id)
         return ["valid"=>false, "global_errors"=>["El producto ya existe"]];
       else {
@@ -362,6 +388,42 @@ class AERPProducts
     public function setWarehouse(?AERPWarehouses $warehouse): self
     {
         $this->warehouse = $warehouse;
+
+        return $this;
+    }
+
+    public function getAccountingaccount(): ?string
+    {
+        return $this->accountingaccount;
+    }
+
+    public function setAccountingaccount(?string $accountingaccount): self
+    {
+        $this->accountingaccount = $accountingaccount;
+
+        return $this;
+    }
+
+    public function getBarcode(): ?string
+    {
+        return $this->barcode;
+    }
+
+    public function setBarcode(?string $barcode): self
+    {
+        $this->barcode = $barcode;
+
+        return $this;
+    }
+
+    public function getBrand(): ?string
+    {
+        return $this->brand;
+    }
+
+    public function setBrand(?string $brand): self
+    {
+        $this->brand = $brand;
 
         return $this;
     }

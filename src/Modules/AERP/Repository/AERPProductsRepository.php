@@ -19,6 +19,13 @@ class AERPProductsRepository extends ServiceEntityRepository
         parent::__construct($registry, AERPProducts::class);
     }
 
+    public function getNextAccounting($company)
+    {
+      $query="SELECT IFNULL(MAX(accountingaccount)+1,30000001)accountingaccount FROM aerpproducts WHERE company_id=:company";
+      $params=['company' => $company];
+      return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchColumn(0);
+    }
+
     // /**
     //  * @return AERPProducts[] Returns an array of AERPProducts objects
     //  */

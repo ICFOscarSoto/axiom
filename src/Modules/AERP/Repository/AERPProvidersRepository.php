@@ -18,4 +18,11 @@ class AERPProvidersRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, AERPProviders::class);
     }
+
+    public function getNextAccounting($company)
+    {
+      $query="SELECT IFNULL(MAX(accountingaccount)+1,40000001)accountingaccount FROM aerpproviders WHERE company_id=:company";
+      $params=['company' => $company];
+      return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchColumn(0);
+    }
 }
