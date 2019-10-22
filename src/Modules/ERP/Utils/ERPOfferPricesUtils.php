@@ -48,10 +48,6 @@ class ERPOfferPricesUtils
     $doctrine=$params["doctrine"];
     $id=$params["id"];
     $user=$params["user"];
-  //  $productRepository=$doctrine->getRepository(ERPProducts::class);
-//    $product=$productRepository->findOneBy(["id"=>$params["parent"]]);
-      //return [];
-    
     return [
     ['shoppingprice', TextType::class, [
       'required' => false,

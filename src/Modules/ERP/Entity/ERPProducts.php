@@ -657,21 +657,17 @@ class ERPProducts
     
       foreach($customergroup_without_price as $customergroup){
         $increment=$this->getMaxIncrement($doctrine,$customergroup);
-        dump("Creamos el incremento para el producto ".$this->getName()." y el grupo ".$customergroup->getName());
         $productpricesEntity= new ERPProductPrices();
         $productpricesEntity->setProduct($this);
         $productpricesEntity->setCustomergroup($customergroup);
         $productpricesEntity->setIncrement($increment*1);
-        $productpricesEntity->setPrice(round_up($newShoppingPrice*(1+($increment/100)),2));
+        $productpricesEntity->setPrice(round($newShoppingPrice*(1+($increment/100)),2));
         $productpricesEntity->setActive(1);
         $productpricesEntity->setDeleted(0);
         $productpricesEntity->setDateupd(new \DateTime());
         $productpricesEntity->setDateadd(new \DateTime());
-        dump($productpricesEntity);
         $em->persist($productpricesEntity);
-        $em->flush();  
-        dump("ya hemos hecho el flush");
-        
+        $em->flush();       
     
       }
       
