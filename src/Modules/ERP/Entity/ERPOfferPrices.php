@@ -81,6 +81,11 @@ class ERPOfferPrices
      */
     private $company;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $quantity;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -226,6 +231,38 @@ class ERPOfferPrices
     public function setCompany(?GlobaleCompanies $company): self
     {
         $this->company = $company;
+
+        return $this;
+    }
+    
+    public function formValidation($kernel, $doctrine, $user, $validationParams){
+    $repository=$doctrine->getRepository(ERPOfferPrices::class);
+    $exists=$repository->validOffer($this->id,$this->customer, $this->quantity,$this->start);
+    if($exists)
+      return ["valid"=>false, "global_errors"=>["Ya existe una oferta vigente para esos parámetros."]];
+    if($this->end<$this->start AND $this->end!=NULL) 
+      return ["valid"=>false, "global_errors"=>["La fecha de fin debe ser posterior a la fecha de inicio."]];
+    else return ["valid"=>true];
+    
+    
+    }
+    
+    public function preProccess($kernel, $doctrine, $user, $params, $oldobj)
+    {
+      $repository=$doctrine->getRepository(ERPProducts::class);
+      $product=$repository->findOneBy(["id"=>$this->product->getId(),"company"=>$user->getCompany(),"active"=>1,"deleted"=>0]);
+      $this->price=round($product->getShoppingPrice()*(1+$this->increment/100),2);
+      if($this->quantity==NULL) $this->quantity=1; 
+    }
+
+    public function getQuantity(): ?int
+    {
+        return $this->quantity;
+    }
+
+    public function setQuantity(?int $quantity): self
+    {
+        $this->quantity = $quantity;
 
         return $this;
     }

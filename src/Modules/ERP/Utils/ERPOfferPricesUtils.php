@@ -5,8 +5,10 @@ use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\ERP\Entity\ERPProducts;
+use App\Modules\ERP\Entity\ERPShoppingDiscounts;
 
 class ERPOfferPricesUtils
 {
@@ -14,8 +16,8 @@ class ERPOfferPricesUtils
   private $name="OfferPrices";
   public $parentClass="\App\Modules\ERP\Entity\ERPProducts";
   public $parentField="product";
-  
-  
+
+
   public function formatListByProduct($product){
     $list=[
       'id' => 'list'.$this->name,
@@ -36,16 +38,29 @@ class ERPOfferPricesUtils
     ];
     return $list;
   }
-  
+
   public function getExcludedForm($params){
       return ['product'];
   }
 
   public function getIncludedForm($params){
+    
     $doctrine=$params["doctrine"];
     $id=$params["id"];
     $user=$params["user"];
-    return [];
+  //  $productRepository=$doctrine->getRepository(ERPProducts::class);
+//    $product=$productRepository->findOneBy(["id"=>$params["parent"]]);
+      //return [];
+    
+    return [
+    ['shoppingprice', TextType::class, [
+      'required' => false,
+      'disabled' => true,
+      'attr'=> ["readonly"=>true],
+      'mapped' => false,
+      'data' => $params["parent"]->getShoppingPrice($doctrine)
+    ]]
+    ];
   }
 
   public function formatList($user, $product){

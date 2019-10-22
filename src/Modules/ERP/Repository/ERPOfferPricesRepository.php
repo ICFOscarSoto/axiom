@@ -27,6 +27,59 @@ class ERPOfferPricesRepository extends ServiceEntityRepository
       return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
 
     }
+    
+    public function validOffer($id,$customer, $quantity, $start){
+        dump($id);
+        if($quantity==NULL) $qty=1;
+        else $qty=$quantity;
+        $date=$start->format("Y-m-d");
+        if($id==NULL)
+        {
+          if($customer!=NULL)
+          {
+            $query="SELECT * FROM erpoffer_prices o WHERE o.customer_id=:CUST AND o.quantity=:QTY AND (o.end>STR_TO_DATE(:date, '%Y-%m-%d') OR o.end IS NULL) AND o.start<STR_TO_DATE(:date, '%Y-%m-%d') AND o.active=1 AND o.deleted=0";
+            $params=['CUST' => $customer->getId(),
+                      'QTY' => $qty,
+                     'date' => $date];
+            $result=$this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+            if($result!=NULL) return true;
+            else return false;
+          }
+          else{
+            $query="SELECT * FROM erpoffer_prices o WHERE o.customer_id IS NULL AND o.quantity=:QTY AND (o.end>STR_TO_DATE(:date, '%Y-%m-%d') OR o.end IS NULL) AND o.start<STR_TO_DATE(:date, '%Y-%m-%d')  AND o.active=1 AND o.deleted=0";
+            $params=['QTY' => $qty,
+                     'date' => $date];
+            $result=$this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+            if($result!=NULL) return true;
+            else return false;
+          }
+        }
+        else{
+          if($customer!=NULL)
+          {
+            $query="SELECT * FROM erpoffer_prices o WHERE o.id!=:ID AND o.customer_id=:CUST AND o.quantity=:QTY AND (o.end>STR_TO_DATE(:date, '%Y-%m-%d') OR o.end IS NULL) AND o.start<STR_TO_DATE(:date, '%Y-%m-%d')  AND o.active=1 AND o.deleted=0";
+            $params=['ID' => $id,
+                      'CUST' => $customer->getId(),
+                      'QTY' => $qty,
+                     'date' => $date];
+            $result=$this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+            if($result!=NULL) return true;
+            else return false;
+          }
+          else{
+            $query="SELECT * FROM erpoffer_prices o WHERE o.id!=:ID AND o.customer_id IS NULL AND o.quantity=:QTY AND (o.end>STR_TO_DATE(:date, '%Y-%m-%d') OR o.end IS NULL) AND o.start<STR_TO_DATE(:date, '%Y-%m-%d') AND o.active=1 AND o.deleted=0";
+            $params=['ID' => $id,
+                     'QTY' => $qty,
+                     'date' => $date];
+            $result=$this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+            if($result!=NULL) return true;
+            else return false;
+          }
+        
+        
+        
+        }
+    }
 
     // /**
     //  * @return ERPOfferPrices[] Returns an array of ERPOfferPrices objects

@@ -204,9 +204,11 @@ Clocks: Fichajes
 Clock code: Código fichaje
 Allowremoteclock: Fichaje remoto
 Start: Fecha inicio
+start: Fecha inicio
 Start latitude: Latitud inicio
 Start longitude: Longitud inicio
 End: Fecha fin
+end: Fecha fin
 End latitude: Latitud fin
 End longitude: Longitud fin
 Invalid: Invalido
@@ -256,8 +258,10 @@ Justified: Justificado
 #----------------------------------------------------------------------------------------------------------------------
 Customer data: Informacion del cliente
 Customers: Clientes
+customer: Cliente
 Suppliers: Proveedores
 Customergroup: Grupo de clientes
+CustomerGroup: Grupo de clientes
 Maxcredit: Credito máximo
 Mininvoice: Pedido mínimo
 Allowlinediscount: Permitir descuento en linea
@@ -360,6 +364,16 @@ Multiplicity: Múltiplo de pedidos
 Promotion: Promoción
 Rotation: Rotación
 Category data: Datos Categoría
+
+#PRICES
+#----------------------------------------------------------------------------------------------------------------------
+Prices: Precios
+Increment: Incremento (%)
+Increments: Incrementos (%)
+increment: Incremento (%)
+price: Precio
+quantity: Unidades
+OfferPrices: Ofertas
 
 #Widgets
 #----------------------------------------------------------------------------------------------------------------------

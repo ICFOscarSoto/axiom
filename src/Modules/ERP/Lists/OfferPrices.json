@@ -8,8 +8,8 @@
         "caption": "customer"
     },
     {
-        "name": "type",
-        "caption": "type"
+        "name": "quantity",
+        "caption": "quantity"
     },
     {
         "name": "increment",
