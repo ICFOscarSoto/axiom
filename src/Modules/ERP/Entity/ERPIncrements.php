@@ -218,6 +218,15 @@ public function formValidation($kernel, $doctrine, $user, $validationParams){
     }
 
     public function postProccess($kernel, $doctrine, $user){
+      $this->calculateIncrements($doctrine);
+    }
+    
+    public function delete($doctrine){
+      $this->calculateIncrements($doctrine);
+    }
+    
+    public function calculateIncrements($doctrine){
+    
       $em = $doctrine->getManager();
       $repositoryProduct=$doctrine->getRepository(ERPProducts::class);
       $repositoryProductPrices=$doctrine->getRepository(ERPProductPrices::class);
@@ -256,10 +265,12 @@ public function formValidation($kernel, $doctrine, $user, $validationParams){
         $em->persist($productEntity);
         $em->flush();
       }
+    
     }
 
 
-    public function getIncrementByGroup($doctrine,$supplier,$productcategory,$customergroup){
+    public function getIncrementByGroup($doctrine,$supplier,$productcategory,$customergroup)
+    {
       $repository=$doctrine->getRepository(ERPIncrements::class);
       $category=$productcategory;
       $incrementbygroup=$repository->getIncrementByGroup($supplier,$category,$customergroup);
@@ -269,25 +280,29 @@ public function formValidation($kernel, $doctrine, $user, $validationParams){
             $incrementbygroup=$repository->getIncrementByGroup($supplier,$category,$customergroup);
         }
 
-    if($incrementbygroup==null){
-      $incrementbygroup=$repository->getIncrementByGroup($supplier,null,$customergroup);
-    }
-
-    if ($incrementbygroup==null){
-      $category=$productcategory;
-      $incrementbygroup=$repository->getIncrementByGroup(null,$category,$customergroup);
-      while ($category->getParentid()!=null && $incrementbygroup==null){
-          $category=$category->getParentid();
-          $incrementbygroup=$repository->getIncrementByGroup(null,$category,$customergroup);
+        if($incrementbygroup==null){
+            $incrementbygroup=$repository->getIncrementByGroup($supplier,null,$customergroup);
         }
-     }
 
-    if($incrementbygroup==null){
-      $repository=$doctrine->getRepository(ERPCustomerGroups::class);
-      $incrementbygroup=$repository->getIncrement($customergroup);
+        if ($incrementbygroup==null){
+        $category=$productcategory;
+        $incrementbygroup=$repository->getIncrementByGroup(null,$category,$customergroup);
+        while ($category->getParentid()!=null && $incrementbygroup==null){
+            $category=$category->getParentid();
+            $incrementbygroup=$repository->getIncrementByGroup(null,$category,$customergroup);
+          }
+        }
+
+      if($incrementbygroup==null){
+        $repository=$doctrine->getRepository(ERPCustomerGroups::class);
+        $incrementbygroup=$repository->getIncrement($customergroup);
+        return $incrementbygroup;
+
+      }
+      
       return $incrementbygroup;
-
     }
-    return $incrementbygroup;
-    }
+    
+  
+    
 }

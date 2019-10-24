@@ -99,7 +99,7 @@ class ERPOfferPricesUtils
         'disabled' => true,
         'attr'=> ["readonly"=>true],
         'mapped' => false,
-        'data' => $product->getShoppingPrice($doctrine)
+        'data' => round($product->getShoppingPrice($doctrine),2)
       ]]
       ];
       
@@ -112,7 +112,7 @@ class ERPOfferPricesUtils
         'disabled' => true,
         'attr'=> ["readonly"=>true],
         'mapped' => false,
-        'data' => $params["parent"]->getShoppingPrice($doctrine)
+        'data' => round($params["parent"]->getShoppingPrice($doctrine),2)
       ]]
       ];
     }
