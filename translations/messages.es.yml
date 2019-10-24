@@ -291,6 +291,11 @@ Invoiceday: Dia de pago
 Paymentmethod: Forma de pago
 Swiftcode: Código SWIFT
 
+# SALESBUDGETS
+#----------------------------------------------------------------------------------------------------------------------
+SalesBudgets: Presupuestos
+
+
 #COURSES
 #----------------------------------------------------------------------------------------------------------------------
 Courses: Cursos

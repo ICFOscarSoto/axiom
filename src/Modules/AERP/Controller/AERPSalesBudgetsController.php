@@ -10,6 +10,7 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
+use App\Modules\Globale\Entity\GlobaleTaxes;
 use App\Modules\AERP\Entity\AERPProviders;
 use App\Modules\AERP\Entity\AERPCustomers;
 use App\Modules\Globale\Entity\GlobaleCountries;
@@ -20,6 +21,8 @@ use App\Modules\AERP\Utils\AERPSalesBudgetsUtils;
 use App\Modules\AERP\Entity\AERPPaymentMethods;
 use App\Modules\AERP\Entity\AERPSeries;
 use App\Modules\AERP\Entity\AERPCustomerGroups;
+use App\Modules\AERP\Entity\AERPSalesBudgets;
+use App\Modules\AERP\Entity\AERPSalesBudgetsLines;
 use App\Modules\Security\Utils\SecurityUtils;
 
 class AERPSalesBudgetsController extends Controller
@@ -118,6 +121,58 @@ class AERPSalesBudgetsController extends Controller
 				]);
 		}
 		return new RedirectResponse($this->router->generate('app_login'));
+	}
+
+
+	/**
+	 * @Route("/{_locale}/AERP/salesbudgets/data/{id}", name="dataAERPSalesBudgets", defaults={"id"=0}))
+	 */
+	public function data($id, RouterInterface $router,Request $request){
+		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		$documentRepository=$this->getDoctrine()->getRepository(AERPSalesBudgets::class);
+		$customersRepository=$this->getDoctrine()->getRepository(AERPCustomers::class);
+		$paymentMethodsRepository=$this->getDoctrine()->getRepository(AERPPaymentMethods::class);
+		$seriesRepository=$this->getDoctrine()->getRepository(AERPSeries::class);
+		$taxesRepository=$this->getDoctrine()->getRepository(GlobaleTaxes::class);
+
+		$fields=json_decode($request->getContent());
+		$customer=$customersRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$fields->customerid]);
+		if(!$customer) JsonResponse(["result"=>0]);
+
+		$paymentmethod=$paymentMethodsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$fields->paymentmethod]);
+		$serie=$seriesRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$fields->serie]);
+
+		$document=new AERPSalesBudgets();
+		$document->setCompany($this->getUser()->getCompany());
+		$document->setAuthor($this->getUser());
+		$document->setAgent($this->getUser());
+		$document->setNumber($documentRepository->getNextNum($this->getUser()->getCompany()->getId()));
+		$document->setCurrency(null);
+		$document->setCode($code='PRE-'.'-'.str_pad($document->getNumber(), 8, '0', STR_PAD_LEFT));
+		$document->setPaymentmethod($paymentmethod);
+		$document->setSerie($serie);
+		$document->setCustomer($customer);
+		$document->setVat($customer->getVat());
+		$document->setCustomername($customer->getName());
+		$document->setCustomeraddress($customer->getAddress());
+		$document->setCustomercountry($customer->getCountry());
+		$document->setCustomercity($customer->getCity());
+		$document->setCustomerstate($customer->getState());
+		$document->setCustomerpostcode($customer->getPostcode());
+		$document->setCustomerpostbox($customer->getPostbox());
+		$document->setCustomercode($customer->getCode());
+
+		$document->setDate($fields->date?date_create_from_format("d/m/Y",$fields->date):null);
+		$document->setDateofferend($fields->dateofferend?date_create_from_format("d/m/Y",$fields->dateofferend):null);
+
+		//if($paymentmethod)
+
+
+		foreach ($fields->lines as $key => $value) {
+
+		}
+		dump($document);
+		return new JsonResponse(["result"=>1]);
 	}
 
 }

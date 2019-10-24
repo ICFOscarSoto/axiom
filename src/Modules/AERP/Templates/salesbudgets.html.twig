@@ -20,6 +20,13 @@
 		{{ include('@Globale/breadcrumb.html.twig') }}
 		{#}<h2>{{ interfaceName }}</h2>#}
 		<!-- MAIN CONTENT -->
+		<div class="row">
+		    <div style="text-align: right;" class="col-md-12">
+		      <button attr-id="" attr-action="" id="document-button-cancel" type="button" class="btn btn">Cancelar</button>
+		      <button attr-id="" attr-action="" id="document-button-save" type="button" class="btn btn-green">Guardar</button>
+		    </div>
+		</div>
+		<br/>
 			<div class="panel panel-primary panel-shadow" data-collapsed="0" style="-webkit-box-shadow: none; box-shadow:none; padding:0px; margin-bottom: -1px;"><!-- to apply shadow add class "panel-shadow" -->
 				<div class="panel-body">
 					<div class="row">
@@ -33,8 +40,8 @@
 							</div>
 						</div>
 						<input type="hidden" id="customer-form-id" class="form-control">
-						<input type="hidden" id="customer-form-vatexent" value=0 class="form-control">
-						<input type="hidden" id="customer-form-surcharge" value=0 class="form-control">
+						<input type="hidden" id="customer-form-taxexempt" value="false" class="form-control">
+						<input type="hidden" id="customer-form-surcharge" value="false" class="form-control">
 						<div class="col-md-6"> <div class="form-group">
 							<span id="customer-form-view" class="select2-selection__view_nolabel" style="" attr-id=0 attr-url="{{ url('formAERPCustomer',{'id':'_____'}) }}"><i class="fa fa-file-text-o" aria-hidden="true"></i><span>&nbsp;Ver Ficha</span></span>
 							<script>
@@ -49,8 +56,8 @@
 							});
 							</script>
 							<input type="text" id="customer-form-name" class="form-control" placeholder="Nombre cliente" disabled> </div> </div>
-						<div class="col-md-2"> <div class="form-group"> <input type="text" id="customer-form-vat" class="form-control" placeholder="CIF" disabled> </div> </div>
-						<div class="col-md-2"> <div class="form-group">
+						<div class="col-6 col-md-2"> <div class="form-group"> <input type="text" id="customer-form-vat" class="form-control" placeholder="CIF" disabled> </div> </div>
+						<div class="col-6 col-md-2"> <div class="form-group">
 						<input type="hidden" id="customer-form-customergroup" class="form-control">
 						<select type="text" id="customer-form-customergroup-select"  class="form-control select2">
 
@@ -67,18 +74,18 @@
 			<div class="panel panel-primary panel-shadow" data-collapsed="0" style="-webkit-box-shadow: none; box-shadow:none; padding:0px; margin-bottom: -1px;"><!-- to apply shadow add class "panel-shadow" -->
 				<div class="panel-body">
 					<div class="row">
-						<div class="col-md-2"> <div class="input-group"> <span class="input-group-addon"><i class="fa fa-hashtag"></i></span> <input type="text" class="form-control" placeholder="N. Documento" disabled> </div></div>
-						<div class="col-md-2"> <div class="input-group"> <span class="input-group-addon"><i class="fa fa-calendar"></i></span> <input type="text" class="form-control datepicker" style="z-index:99 !important;" placeholder="Fecha" value="{{ date }}"></div></div>
-						<div class="col-md-2"> <div class="input-group"> <span class="input-group-addon"><i class="fa fa-calendar"></i></span> <input type="text" class="form-control datepicker" style="z-index:99 !important;" placeholder="Fin oferta" value="{{ enddate }}"></div></div>
-						<div class="col-md-2"> <div class="input-group"> <span class="input-group-addon"><i class="fa fa-hashtag"></i></span> <input type="text" class="form-control" placeholder="Su referencia"> </div> </div>
-						<div class="col-md-2"> <div class="form-group">
-							<select type="text" class="form-control select2">
+						<div class="col-6 col-sm-2"> <div class="input-group"> <span class="input-group-addon"><i class="fa fa-hashtag"></i></span><input type="hidden" id="document-form-id" class="form-control"><input type="text" id="document-form-code" class="form-control" placeholder="N. Documento" disabled> </div></div>
+						<div class="col-6 col-sm-2"> <div class="input-group"> <span class="input-group-addon"><i class="fa fa-calendar"></i></span> <input type="text" id="document-form-date" class="form-control datepicker" style="z-index:99 !important;" placeholder="Fecha" value="{{ date }}"></div></div>
+						<div class="col-6 col-sm-2"> <div class="input-group"> <span class="input-group-addon"><i class="fa fa-calendar"></i></span> <input type="text" id="document-form-dateofferend" class="form-control datepicker" style="z-index:99 !important;" placeholder="Fin oferta" value="{{ enddate }}"></div></div>
+						<div class="col-6 col-sm-2"> <div class="input-group"> <span class="input-group-addon"><i class="fa fa-hashtag"></i></span> <input type="text" id="document-form-customercode" class="form-control" placeholder="Su referencia"> </div> </div>
+						<div class="col-6 col-sm-2"> <div class="form-group">
+							<select type="text"  id="document-form-series-select" class="form-control select2">
 								{% for option in series %}
 									<option value="{{ option.id }}">{{ option.text }}</option>
 								{% endfor %}
 							</select>
 						</div> </div>
-						<div class="col-md-2"> <div class="form-group">
+						<div class="col-6 col-sm-2"> <div class="form-group">
 							<input type="hidden" id="customer-form-paymentmethod" class="form-control">
 							<select type="text" id="customer-form-paymentmethod-select" class="form-control select2">
 								{% for option in paymentMethods %}
@@ -95,18 +102,19 @@
 				<div class="panel-body" style="padding: 0px !important;" id="document-lines" attr-numlines="1">
 
 					<div class="row no-gutters documents-products-header">
-						<div class="col-md-2">Cod. Producto</div>
-						<div class="col-md-3">Descripción</div>
-						<div class="col-md-1">Precio</div>
-						<div class="col-md-1">Cantidad</div>
-						<div class="col-md-1">Dto.</div>
-						<div class="col-md-1">IVA</div>
-						<div class="col-md-1">R.E.</div>
-						<div class="col-md-2">Subtotal</div>
+						<div class="col-sm-2 d-none d-sm-block">Cod. Producto</div>
+						<div class="col-sm-3 d-none d-sm-block">Descripción</div>
+						<div class="col-sm-1 d-none d-sm-block">Precio</div>
+						<div class="col-sm-1 d-none d-sm-block">Cantidad</div>
+						<div class="col-sm-1 d-none d-sm-block">Dto.</div>
+						<div class="col-sm-1 d-none d-sm-block">IVA</div>
+						<div class="col-sm-1 d-none d-sm-block">R.E.</div>
+						<div class="col-sm-2 d-none d-sm-block">Subtotal</div>
 					</div>
 
 					<div class="row no-gutters" attr-id="1" id="document-line-1">
-						<div class="col-md-2">
+						<div class="col-2 d-block d-sm-none" style="top: 8px;">Cod. Prod.</div>
+						<div class="col-10 col-sm-2">
 							<div class="form-group" style="margin-bottom: 0px;">
 								<div class="input-group" >
 									<a class="btn btn-white" attr-id="1" id="product-form-remove-1" style="position: absolute;height: 31px;left: 0px;padding: 9px 7px;z-index: 10;" href="#"> <i class="fa fa-remove"></i></a>
@@ -115,55 +123,62 @@
 								</div>
 							</div>
 						</div>
-						<div class="col-md-3"> <div class="form-group" style="margin-bottom: 0px;"> <input type="text" id="product-form-name-1" class="form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Nombre"> </div> </div>
-						<div class="col-md-1"> <div class="form-group" style="margin-bottom: 0px;"> <span class="input__unity_nolabel "><span>€</span></span><input type="text" attr-id="1" id="product-form-price-1" class="recalculate form-control number-type input_parent__unity" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Precio"> </div> </div>
-						<div class="col-md-1"> <div class="form-group" style="margin-bottom: 0px;"> <input type="hidden" attr-id="1" value=0 id="product-form-base-total-1"><input type="text" attr-id="1" id="product-form-quantity-1" class="recalculate form-control number-type" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Cantidad" value=1> </div> </div>
-						<div class="col-md-1"> <div class="form-group" style="margin-bottom: 0px;"> <span class="input__unity_nolabel "><span>%</span></span><input type="hidden" attr-id="1" id="product-form-disccount-total-1"><input type="text" attr-id="1" id="product-form-disccount-1" class="recalculate form-control number-type input_parent__unity" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Dto" value=0> </div> </div>
-						<div class="col-md-1"> <div class="form-group" style="margin-bottom: 0px;"> <span class="input__unity_nolabel "><span>%</span></span><input type="hidden" attr-id="1" id="product-form-tax-total-1"><input type="text" attr-id="1" id="product-form-tax-1" class="recalculate form-control number-type input_parent__unity" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="IVA"> </div> </div>
-						<div class="col-md-1"> <div class="form-group" style="margin-bottom: 0px;"> <span class="input__unity_nolabel "><span>%</span></span><input type="hidden" attr-id="1" id="product-form-surcharge-total-1"><input type="text" attr-id="1" id="product-form-surcharge-1" class="recalculate form-control number-type input_parent__unity" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Recargo" value=0> </div> </div>
-						<div class="col-md-2"> <div class="form-group" style="margin-bottom: 0px;"> <span class="input__unity_nolabel "><span>€</span></span><input type="text" attr-id="1" id="product-form-amount-1" class="form-control number-type input_parent__unity" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="TOTAL" disabled value=0></div> </div>
+						<div class="col-2 d-block d-sm-none" style="top: 8px;">Nombre</div>
+						<div class="col-10 col-sm-3"> <div class="form-group" style="margin-bottom: 0px;"> <input type="text" id="product-form-name-1" class="form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Nombre"> </div> </div>
+						<div class="col-2 d-block d-sm-none" style="top: 8px;">Precio</div>
+						<div class="col-4 col-sm-1"> <div class="form-group" style="margin-bottom: 0px;"> <span class="input__unity_nolabel "><span>€</span></span><input type="text" attr-id="1" id="product-form-price-1" class="recalculate form-control number-type input_parent__unity" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Precio"> </div> </div>
+						<div class="col-2 d-block d-sm-none" style="top: 8px;left: 5px;">Cantidad</div>
+						<div class="col-4 col-sm-1"> <div class="form-group" style="margin-bottom: 0px;"> <input type="hidden" attr-id="1" value=0 id="product-form-base-total-1"><input type="text" attr-id="1" id="product-form-quantity-1" class="recalculate form-control number-type" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Cantidad" value=1> </div> </div>
+						<div class="col-2 d-block d-sm-none" style="top: 8px;">Dto.</div>
+						<div class="col-4 col-sm-1"> <div class="form-group" style="margin-bottom: 0px;"> <span class="input__unity_nolabel "><span>%</span></span><input type="hidden" attr-id="1" id="product-form-disccount-total-1"><input type="text" attr-id="1" id="product-form-disccount-1" class="recalculate form-control number-type input_parent__unity" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Dto" value=0> </div> </div>
+						<div class="col-2 d-block d-sm-none" style="top: 8px;left: 5px;">IVA</div>
+						<div class="col-4 col-sm-1"> <div class="form-group" style="margin-bottom: 0px;"> <span class="input__unity_nolabel "><span>%</span></span><input type="hidden" attr-id="1" id="product-form-tax-total-1"><input type="text" attr-id="1" id="product-form-tax-1" class="recalculate form-control number-type input_parent__unity" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="IVA"> </div> </div>
+						<div class="col-2 d-block d-sm-none" style="top: 8px;">R.E.</div>
+						<div class="col-4 col-sm-1"> <div class="form-group" style="margin-bottom: 0px;"> <span class="input__unity_nolabel "><span>%</span></span><input type="hidden" attr-id="1" value=0  id="product-form-surcharge-perc-1"><input type="hidden" attr-id="1" id="product-form-surcharge-total-1"><input type="text" attr-id="1" id="product-form-surcharge-1" class="recalculate form-control number-type input_parent__unity" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Recargo" value=0> </div> </div>
+						<div class="col-2 d-block d-sm-none" style="top: 8px;left: 5px;">Subtotal</div>
+						<div class="col-4 col-sm-2"> <div class="form-group" style="margin-bottom: 0px;"> <span class="input__unity_nolabel "><span>€</span></span><input type="text" attr-id="1" id="product-form-amount-1" class="form-control number-type input_parent__unity" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="TOTAL" disabled value=0></div> </div>
 					</div>
 				</div>
 			</div>
 			<div class="panel panel-primary panel-shadow" data-collapsed="0" style="-webkit-box-shadow: none; box-shadow:none;"><!-- to apply shadow add class "panel-shadow" -->
 				<div class="panel-body" style="padding: 0px !important;" id="document-totals" attr-numlines="1">
 					<div class="row">
-						<div class="col-md-2">
+						<div class="col-4 col-sm-2">
 							<div class="form-group">
 								<label for="totals_form_amount">Importe</label>
 								<span id="unity-view-formProducts-price" class="input__unity"><span>€</span></span>
 								<input type="text" id="totals_form_amount" maxlength="150" class="number-type input_parent__unity form-control" value=0 disabled>
 							</div>
 						</div>
-						<div class="col-md-2">
+						<div class="col-4 col-sm-2">
 							<div class="form-group">
 								<label for="totals_form_dto">Descuento</label>
 								<span id="unity-view-formProducts-price" class="input__unity"><span>€</span></span>
 								<input type="text" id="totals_form_dto" maxlength="150" class="number-type input_parent__unity form-control" value=0 disabled>
 							</div>
 						</div>
-						<div class="col-md-2">
+						<div class="col-4 col-sm-2">
 							<div class="form-group">
 								<label for="totals_form_tax">Total IVA</label>
 								<span id="unity-view-formProducts-price" class="input__unity"><span>€</span></span>
 								<input type="text" id="totals_form_tax" maxlength="150" class="number-type input_parent__unity form-control" value=0 disabled>
 							</div>
 						</div>
-						<div class="col-md-2">
+						<div class="col-4 col-sm-2">
 							<div class="form-group">
 								<label for="totals_form_surcharge">Total R.E.</label>
 								<span id="unity-view-formProducts-price" class="input__unity"><span>€</span></span>
 								<input type="text" id="totals_form_surcharge" maxlength="150" class="number-type input_parent__unity form-control" value=0 disabled>
 							</div>
 						</div>
-						<div class="col-md-2">
+						<div class="col-4 col-sm-2">
 							<div class="form-group">
 								<label for="totals_form_irpf">IRPF</label>
 								<span id="unity-view-formProducts-price" class="input__unity"><span>€</span></span>
 								<input type="text" id="totals_form_irpf" maxlength="150" class="number-type input_parent__unity form-control" value=0 disabled>
 							</div>
 						</div>
-						<div class="col-md-2">
+						<div class="col-4 col-sm-2">
 							<div class="form-group">
 								<label for="totals_form_total">TOTAL</label>
 								<span id="unity-view-formProducts-price" class="input__unity"><span>€</span></span>
@@ -224,7 +239,9 @@
 				var numLines=parseInt(documentLines.attr("attr-numlines"))+1;
 				documentLines.append(''+
 				'<div class="row no-gutters" attr-id="'+numLines+'" id="document-line-'+numLines+'">'+
-				'	<div class="col-md-2">'+
+				'<div class="col-12 d-block d-sm-none" style="height: 15px;">&nbsp;</div>'+
+				'<div class="col-2 d-block d-sm-none" style="top: 8px;">Cod. Prod.</div>'+
+				'	<div class="col-10 col-md-2">'+
 				'		<div class="form-group" style="margin-bottom: 0px;">'+
 				'			<div class="input-group" >'+
 				'				<a class="btn btn-white" attr-id="'+numLines+'" id="product-form-remove-'+numLines+'" style="position: absolute;height: 31px;left: 0px;padding: 9px 7px;z-index: 10;" href="#"> <i class="fa fa-remove"></i></a>'+
@@ -233,14 +250,20 @@
 				'			</div>'+
 				'		</div>'+
 				'	</div>'+
-				'	<div class="col-md-3"> <div class="form-group" style="margin-bottom: 0px;"> <input type="text" id="product-form-name-'+numLines+'" class="form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Nombre"> </div> </div>'+
-				'	<div class="col-md-1"> <div class="form-group" style="margin-bottom: 0px;"> <span id="unity-view-formProducts-price" class="input__unity_nolabel "><span>€</span></span><input type="text" attr-id="'+numLines+'" id="product-form-price-'+numLines+'" class="recalculate form-control number-type input_parent__unity" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Precio"> </div> </div>'+
-				'	<div class="col-md-1"> <div class="form-group" style="margin-bottom: 0px;"> <input type="hidden" attr-id="1" value=0 id="product-form-base-total-'+numLines+'"><input type="text" attr-id="'+numLines+'" value=1 id="product-form-quantity-'+numLines+'" class="recalculate form-control number-type" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Cantidad"> </div> </div>'+
-				'	<div class="col-md-1"> <div class="form-group" style="margin-bottom: 0px;"> <span id="unity-view-formProducts-price" class="input__unity_nolabel "><span>%</span></span><input type="hidden" attr-id="1" value=0 id="product-form-disccount-total-'+numLines+'"><input type="text" attr-id="'+numLines+'" id="product-form-disccount-'+numLines+'" value=0 class="recalculate form-control number-type input_parent__unity" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Dto"> </div> </div>'+
-				'	<div class="col-md-1"> <div class="form-group" style="margin-bottom: 0px;"> <span id="unity-view-formProducts-price" class="input__unity_nolabel "><span>%</span></span><input type="hidden" attr-id="1" value=0 id="product-form-tax-total-'+numLines+'"><input type="text" attr-id="'+numLines+'" id="product-form-tax-'+numLines+'" value=21 class="recalculate form-control number-type input_parent__unity" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="IVA"> </div> </div>'+
-				'	<div class="col-md-1"> <div class="form-group" style="margin-bottom: 0px;"> <span id="unity-view-formProducts-price" class="input__unity_nolabel "><span>%</span></span><input type="hidden" attr-id="1" value=0  id="product-form-surcharge-total-'+numLines+'"><input type="text" attr-id="'+numLines+'" id="product-form-surcharge-'+numLines+'" value=0 class="recalculate form-control number-type input_parent__unity" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Recargo"> </div> </div>'+
-				'	<div class="col-md-2"> <div class="form-group" style="margin-bottom: 0px;"> <span id="unity-view-formProducts-price" class="input__unity_nolabel "><span>€</span></span><input type="text" attr-id="'+numLines+'" id="product-form-amount-'+numLines+'" value=0 class="form-control number-type input_parent__unity" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="TOTAL" disabled> </div> </div>'+
-				'	<div class="col-md-1">  </div>'+
+				' <div class="col-2 d-block d-sm-none" style="top: 8px;">Nombre</div>'+
+				'	<div class="col-10 col-md-3"> <div class="form-group" style="margin-bottom: 0px;"> <input type="text" id="product-form-name-'+numLines+'" class="form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Nombre"> </div> </div>'+
+				' <div class="col-2 d-block d-sm-none" style="top: 8px;">Precio</div>'+
+				'	<div class="col-4 col-md-1"> <div class="form-group" style="margin-bottom: 0px;"> <span id="unity-view-formProducts-price" class="input__unity_nolabel "><span>€</span></span><input type="text" attr-id="'+numLines+'" id="product-form-price-'+numLines+'" class="recalculate form-control number-type input_parent__unity" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Precio"> </div> </div>'+
+				' <div class="col-2 d-block d-sm-none" style="top: 8px;left: 5px;">Cantidad</div>'+
+				'	<div class="col-4 col-md-1"> <div class="form-group" style="margin-bottom: 0px;"> <input type="hidden" attr-id="1" value=0 id="product-form-base-total-'+numLines+'"><input type="text" attr-id="'+numLines+'" value=1 id="product-form-quantity-'+numLines+'" class="recalculate form-control number-type" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Cantidad"> </div> </div>'+
+				' <div class="col-2 d-block d-sm-none" style="top: 8px;">Dto.</div>'+
+				'	<div class="col-4 col-md-1"> <div class="form-group" style="margin-bottom: 0px;"> <span id="unity-view-formProducts-price" class="input__unity_nolabel "><span>%</span></span><input type="hidden" attr-id="1" value=0 id="product-form-disccount-total-'+numLines+'"><input type="text" attr-id="'+numLines+'" id="product-form-disccount-'+numLines+'" value=0 class="recalculate form-control number-type input_parent__unity" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Dto"> </div> </div>'+
+				' <div class="col-2 d-block d-sm-none" style="top: 8px;left: 5px;">IVA</div>'+
+				'	<div class="col-4 col-md-1"> <div class="form-group" style="margin-bottom: 0px;"> <span id="unity-view-formProducts-price" class="input__unity_nolabel "><span>%</span></span><input type="hidden" attr-id="1" value=0 id="product-form-tax-total-'+numLines+'"><input type="text" attr-id="'+numLines+'" id="product-form-tax-'+numLines+'" value=21 class="recalculate form-control number-type input_parent__unity" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="IVA"> </div> </div>'+
+				' <div class="col-2 d-block d-sm-none" style="top: 8px;">R.E.</div>'+
+				'	<div class="col-4 col-md-1"> <div class="form-group" style="margin-bottom: 0px;"> <span id="unity-view-formProducts-price" class="input__unity_nolabel "><span>%</span></span><input type="hidden" attr-id="1" value=0  id="product-form-surcharge-perc-'+numLines+'"><input type="hidden" attr-id="1" value=0  id="product-form-surcharge-total-'+numLines+'"><input type="text" attr-id="'+numLines+'" id="product-form-surcharge-'+numLines+'" value=0 class="recalculate form-control number-type input_parent__unity" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Recargo"> </div> </div>'+
+				' <div class="col-2 d-block d-sm-none" style="top: 8px;left: 5px;">Subtotal</div>'+
+				'	<div class="col-4 col-md-2"> <div class="form-group" style="margin-bottom: 0px;"> <span id="unity-view-formProducts-price" class="input__unity_nolabel "><span>€</span></span><input type="text" attr-id="'+numLines+'" id="product-form-amount-'+numLines+'" value=0 class="form-control number-type input_parent__unity" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="TOTAL" disabled> </div> </div>'+
 				'</div>');
 				documentLines.attr("attr-numlines", numLines);
 			}
@@ -253,6 +276,14 @@
 					 documentLines.attr("attr-numlines",numLines);
 					 numerateLines();
 				}
+			}
+
+			function recalculateDocument(){
+				var i=0;
+				var documentLines=$("#document-lines");
+				$("[id^='document-line-']").each(function() {
+					productSearch($(this).attr("attr-id"), $("#product-form-code-"+$(this).attr("attr-id")).val(), productFields, productSearchfields);
+				});
 			}
 
 			function numerateLines(){
@@ -325,11 +356,11 @@
 
 			}
 
-			var customerFields=["customer-form-id","customer-form-code","customer-form-vat","customer-form-name", "customer-form-customergroup", "customer-form-paymentmethod"];
-			var customerSearchfields=["id","code","vat","name", "customergroup", "paymentmethod"];
+			var customerFields=["customer-form-id","customer-form-code","customer-form-vat","customer-form-name", "customer-form-customergroup", "customer-form-paymentmethod", "customer-form-taxexempt", "customer-form-surcharge"];
+			var customerSearchfields=["id","code","vat","name", "customergroup", "paymentmethod", "taxexempt", "surcharge"];
 
-			var productFields=["product-form-id","product-form-code","product-form-name","product-form-price","product-form-tax"];
-			var productSearchfields=["id","code","name","price","tax"];
+			var productFields=["product-form-id","product-form-code","product-form-name","product-form-price","product-form-tax", "product-form-surcharge-perc"];
+			var productSearchfields=["id","code","name","price","tax","surcharge"];
 
 			function clearFields(fields){
 				fields.forEach(function(element) {
@@ -343,6 +374,7 @@
 				$("#customer-form-paymentmethod-select").val($("#customer-form-paymentmethod").val());
 				$("#customer-form-paymentmethod-select").select2().trigger('change');
 				$("#customer-form-view").attr("attr-id", $("#customer-form-id").val());
+				recalculateDocument();
 			}
 
 			function customerSearch(fields, searchFields){
@@ -371,9 +403,7 @@
 			}
 
 			function postProductSearch(id){
-				$("#product-form-quantity-"+id).val(1);
-				$("#product-form-disccount-"+id).val(0);
-				$("#product-form-surcharge-"+id).val(0);
+				if($("#customer-form-surcharge").val()=="true") $("#product-form-surcharge-"+id).val($("#product-form-surcharge-perc-"+id).val()); else $("#product-form-surcharge-"+id).val(0);
 				calculateDocumentRow(id);
 			}
 
@@ -412,6 +442,7 @@
 							   customerSearch(customerFields, customerSearchfields);
 							 }
 						});
+
 					$('body').on('change', "#customer-form-code", function(e) {
 						   customerSearch(customerFields, customerSearchfields);
 					});
@@ -426,6 +457,10 @@
 						$("#customer-form-code").val($(this).children('td').eq(1).text());
 						$("#customer-form-code").trigger('change');
 						$("#customer-search-modal-form").modal('toggle');
+					});
+
+					$('body').on('change', "#customer-form-customergroup-select", function(e) {
+						recalculateDocument();
 					});
 
 					{# PRODUCT SEARCH #}
@@ -478,6 +513,56 @@
 					});
 
 
+					{# DOCUMENT SAVE #}
+					var documentFields = new Object();
+					var lines=[];
+					$('body').on('click', "#document-button-save", function(e) {
+
+						documentFields.id=$("#document-form-id").val();
+						documentFields.code=$("#document-form-code").val();
+						documentFields.date=$("#document-form-date").val();
+						documentFields.serie=$("#document-form-series-select").val();
+						documentFields.paymentmethod=$("#customer-form-paymentmethod-select").val();
+						documentFields.dateofferend=$("#document-form-dateofferend").val();
+						documentFields.customercode=$("#document-form-customercode").val();
+						documentFields.customerid=$("#customer-form-id").val();
+						documentFields.customergroup=$("#customer-form-customergroup-select").val();
+
+						$("[id^='document-line-']").each(function() {
+							var line = new Object();
+							line.id=$("#product-form-id-"+$(this).attr("attr-id")).val();
+							line.code=$("#product-form-code-"+$(this).attr("attr-id")).val();
+							line.unitprice=$("#product-form-price-"+$(this).attr("attr-id")).val();
+							line.quantity=$("#product-form-quantity-"+$(this).attr("attr-id")).val();
+							line.disccountperc=$("#product-form-disccount-"+$(this).attr("attr-id")).val();
+							line.disccountunit=$("#product-form-disccount-total-"+$(this).attr("attr-id")).val();
+							line.taxperc=$("#product-form-tax-"+$(this).attr("attr-id")).val();
+							line.taxunit=$("#product-form-tax-total-"+$(this).attr("attr-id")).val();
+							line.surchargeperc=$("#product-form-surcharge-"+$(this).attr("attr-id")).val();
+							line.surchargeunit=$("#product-form-surcharge-total-"+$(this).attr("attr-id")).val();
+							line.subtotal=$("#product-form-base-total-"+$(this).attr("attr-id")).val();
+							line.total=$("#product-form-amount-"+$(this).attr("attr-id")).val();
+							lines.push(line);
+						});
+						documentFields.lines=lines;
+						console.log(JSON.stringify(documentFields));
+
+						$.ajax({
+			         url: '{{ url('dataAERPSalesBudgets', {"id": id}) }}',
+			         type: 'POST',
+			         data: JSON.stringify(documentFields),
+			         success:  function( data ) {
+								 if((--load_wait)==0) $("#load-spinner").fadeOut();
+			           if(data.result){
+									 toastr.success("Documento guardado correctamente", "Confirmación", confirmation);
+
+			           } else {
+									 toastr.error("No se pudo guardar el documento", "Confirmación", confirmation);
+								 }
+			         }
+			       });
+
+					 });
 
 			});
 

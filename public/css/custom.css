@@ -205,7 +205,7 @@ th.table-header-name{
 }
 
 .form-control[disabled], .form-control[readonly], fieldset[disabled] .form-control {
-    background-color: #fbfbfb !important;
+    background-color: #f6f6f6 !important;
     opacity: 1;
 }
 

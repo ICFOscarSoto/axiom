@@ -14,4 +14,12 @@ class AERPSalesBudgetsRepository extends ServiceEntityRepository
         parent::__construct($registry, AERPSalesBudgets::class);
     }
 
+    public function getNextNum($company)
+    {
+      $query="SELECT IFNULL(MAX(number)+1,1) AS number FROM aerpsales_budgets WHERE company_id=:company";
+      $params=['company' => $company];
+      $code=$this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchColumn(0);
+      return $code;
+    }
+
 }
