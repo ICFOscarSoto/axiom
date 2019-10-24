@@ -329,6 +329,32 @@ class GlobaleDefaultController extends Controller
 
 
       /**
+       * @Route("/api/{module}/{name}/generic/search/{field}/{query}", name="genericsearch", defaults={"query"=""})
+       */
+       public function genericsearch($module, $name, $field, $query, Request $request){
+         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+         $utilsExport = new GlobaleExportUtils();
+         $fields=json_decode($request->getContent());
+         $user = $this->getUser();
+         $manager = $this->getDoctrine()->getManager();
+         $class="\App\Modules\\".$module."\Entity\\".$module.$name;
+         $repository = $manager->getRepository($class);
+         if(!property_exists($class, $field)) return new JsonResponse(["result"=>0]);
+         $obj=$repository->findOneBy(["company"=>$this->getUser()->getCompany(), $field => $query]);
+         if(!$obj) return new JsonResponse(["result"=>0]);
+         $result=[];
+         foreach($fields as $field){
+           //TODO: Check if user has permissions in this fields
+           if(method_exists($obj, "get".ucfirst($field))){
+             $result[$field]=$obj->{"get".ucfirst($field)}();
+             if(is_object($result[$field])) $result[$field]=$result[$field]->getId();
+           }
+         }
+         return new JsonResponse(["result"=>1, "data"=>$result]);
+       }
+
+
+      /**
       * @Route("/{_locale}/globale/unauthorized", name="unauthorized")
       */
        public function unauthorized(Request $request){

@@ -9,6 +9,7 @@ use \App\Modules\Globale\Entity\GlobaleCompanies;
 use \App\Modules\AERP\Entity\AERPWarehouseLocations;
 use \App\Modules\Globale\Entity\GlobaleUsers;
 use \App\Modules\AERP\Entity\AERPWarehouses;
+use \App\Modules\AERP\Entity\AERPManufacturers;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\AERP\Repository\AERPProductsRepository")
@@ -131,9 +132,11 @@ class AERPProducts
     private $barcode;
 
     /**
-     * @ORM\Column(type="string", length=150, nullable=true)
+     * @ORM\ManyToOne(targetEntity="\App\Modules\AERP\Entity\AERPManufacturers")
      */
-    private $brand;
+    private $manufacturer;
+
+
 
     public function getId(): ?int
     {
@@ -416,15 +419,16 @@ class AERPProducts
         return $this;
     }
 
-    public function getBrand(): ?string
+    public function getManufacturer(): ?AERPManufacturers
     {
-        return $this->brand;
+        return $this->manufacturer;
     }
 
-    public function setBrand(?string $brand): self
+    public function setManufacturer(?AERPManufacturers $manufacturer): self
     {
-        $this->brand = $brand;
+        $this->manufacturer = $manufacturer;
 
         return $this;
     }
+
 }

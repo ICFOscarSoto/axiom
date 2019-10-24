@@ -4,13 +4,11 @@ namespace App\Modules\AERP\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
-use \App\Modules\AERP\Entity\AERPCustomerGroups;
-use \App\Modules\AERP\Entity\AERPProducts;
 
 /**
- * @ORM\Entity(repositoryClass="App\Modules\AERP\Repository\AERPCustomerGroupsPricesRepository")
+ * @ORM\Entity(repositoryClass="App\Repository\Modules\AERP\Entity\AERPFinancialYearsRepository")
  */
-class AERPCustomerGroupsPrices
+class AERPFinancialYears
 {
     /**
      * @ORM\Id()
@@ -26,36 +24,29 @@ class AERPCustomerGroupsPrices
     private $company;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\AERP\Entity\AERPCustomerGroups")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\Column(type="string", length=4)
      */
-    private $customergroup;
+    private $code;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\AERP\Entity\AERPProducts")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\Column(type="string", length=125)
      */
-    private $product;
+    private $name;
 
     /**
-     * @ORM\Column(type="float", nullable=true)
+     * @ORM\Column(type="datetime")
      */
-    private $disccount;
+    private $start;
 
     /**
-     * @ORM\Column(type="float", nullable=true)
+     * @ORM\Column(type="datetime")
      */
-    private $profit;
+    private $end;
 
     /**
-     * @ORM\Column(type="float", nullable=true)
+     * @ORM\Column(type="smallint")
      */
-    private $fixed;
-
-    /**
-     * @ORM\Column(type="float", nullable=true)
-     */
-    private $total;
+    private $status=1;
 
     /**
      * @ORM\Column(type="datetime")
@@ -94,74 +85,62 @@ class AERPCustomerGroupsPrices
         return $this;
     }
 
-    public function getCustomergroup(): ?AERPCustomerGroups
+    public function getCode(): ?string
     {
-        return $this->customergroup;
+        return $this->code;
     }
 
-    public function setCustomergroup(?AERPCustomerGroups $customergroup): self
+    public function setCode(string $code): self
     {
-        $this->customergroup = $customergroup;
+        $this->code = $code;
 
         return $this;
     }
 
-    public function getProduct(): ?AERPProducts
+    public function getName(): ?string
     {
-        return $this->product;
+        return $this->name;
     }
 
-    public function setProduct(?AERPProducts $product): self
+    public function setName(string $name): self
     {
-        $this->product = $product;
+        $this->name = $name;
 
         return $this;
     }
 
-    public function getDisccount(): ?float
+    public function getStart(): ?\DateTimeInterface
     {
-        return $this->disccount;
+        return $this->start;
     }
 
-    public function setDisccount(?float $disccount): self
+    public function setStart(\DateTimeInterface $start): self
     {
-        $this->disccount = $disccount;
+        $this->start = $start;
 
         return $this;
     }
 
-    public function getProfit(): ?float
+    public function getEnd(): ?\DateTimeInterface
     {
-        return $this->profit;
+        return $this->end;
     }
 
-    public function setProfit(?float $profit): self
+    public function setEnd(\DateTimeInterface $end): self
     {
-        $this->profit = $profit;
+        $this->end = $end;
 
         return $this;
     }
 
-    public function getFixed(): ?float
+    public function getStatus(): ?int
     {
-        return $this->fixed;
+        return $this->status;
     }
 
-    public function setFixed(?float $fixed): self
+    public function setStatus(int $status): self
     {
-        $this->fixed = $fixed;
-
-        return $this;
-    }
-
-    public function getTotal(): ?float
-    {
-        return $this->total;
-    }
-
-    public function setTotal(?float $total): self
-    {
-        $this->total = $total;
+        $this->status = $status;
 
         return $this;
     }

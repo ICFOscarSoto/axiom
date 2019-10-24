@@ -5,29 +5,30 @@
     },
     {
         "name": "code",
-        "caption": "code",
-        "width": "10%"
-    },
-    {
-        "name": "vat",
-        "caption": "vat",
-        "width": "10%"
+        "caption": "code"
     },
     {
         "name": "name",
         "caption": "name"
     },
     {
-        "name": "address",
-        "caption": "address"
+        "name": "start",
+        "type": "date",
+        "caption": "Start"
     },
     {
-        "name": "city",
-        "caption": "city"
+        "name": "end",
+        "type": "date",
+        "caption": "End"
     },
     {
-        "name": "phone",
-        "caption": "phone"
+        "name": "status",
+        "caption": "Status",
+        "replace":{
+           "0":{"text":"Cerrado","html":"Cerrado"},
+           "1":{"text":"Abierto","html":"Abierto"}
+         }
+
     },
     {
         "name": "active",

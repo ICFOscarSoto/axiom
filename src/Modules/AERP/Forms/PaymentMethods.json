@@ -1,0 +1,35 @@
+[{
+    "sections": [
+        {
+            "name": "data",
+            "fields": [
+                {
+                    "name": "name",
+                    "cols": 6
+                },
+                {
+                    "name": "expiration",
+                    "cols": 3,
+                    "caption": "payment due"
+                },
+                {
+                    "name": "type",
+                    "cols": 3,
+                    "transform":
+          						{
+          							"type":"option",
+          							"options": {"Días": "0", "Semanas": "1", "Meses": "2", "Años": "3"}
+          						}
+                },
+                {
+                    "name": "domiciled",
+                    "cols": 4
+                },
+                {
+                    "name": "active",
+                    "cols": 4
+                }
+            ]
+        }
+    ]
+}]

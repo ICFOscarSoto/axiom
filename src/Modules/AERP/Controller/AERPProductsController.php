@@ -147,7 +147,31 @@ public function formAERPProduct($id,Request $request)
 	   return new JsonResponse(["result"=>1]);
   }
 
-
+	/**
+	 * @Route("/api/AERP/product/search/{field}/{query}/{group}", name="productsearch", defaults={"query"="", "group"=0})
+	 */
+	 public function genericsearch($field, $group, $query, Request $request){
+		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		 $fields=json_decode($request->getContent());
+		 $user = $this->getUser();
+		 $manager = $this->getDoctrine()->getManager();
+		 $repository = $manager->getRepository(AERPProducts::class);
+		 if(!property_exists($this->class, $field)) return new JsonResponse(["result"=>0]);
+		 $obj=$repository->findOneBy(["company"=>$this->getUser()->getCompany(), $field => $query]);
+		 if(!$obj) return new JsonResponse(["result"=>0]);
+		 $result=[];
+		 foreach($fields as $field){
+			 //TODO: Check if user has permissions in this fields
+			 if(method_exists($obj, "get".ucfirst($field))){
+				 $result[$field]=$obj->{"get".ucfirst($field)}();
+				 if(is_object($result[$field])) $result[$field]=$result[$field]->getId();
+			 }
+		 }
+		 //get product price
+		 $result["price"]=$repository->getProductPrice($obj->getId(), $group, $this->getUser()->getCompany()->getId());
+		 $result["tax"]=$obj->getTax()?$obj->getTax()->getTax():0;
+		 return new JsonResponse(["result"=>1, "data"=>$result]);
+	 }
 
 
 }

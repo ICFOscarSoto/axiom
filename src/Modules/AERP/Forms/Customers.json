@@ -4,6 +4,11 @@
             "name": "Datos Cliente",
             "fields": [
                 {
+                    "name": "code",
+                    "cols": 2,
+                    "readonly": true
+                },
+                {
                     "name": "vat",
                     "cols": 2,
                     "format": "vat"
@@ -15,7 +20,7 @@
                 },
                 {
                     "name": "name",
-                    "cols": 8
+                    "cols": 6
                 },
                 {
                     "name": "address",
@@ -74,6 +79,11 @@
                     "readonly": true,
                     "unity": "€",
                     "class": "number-type"
+                },
+                {
+                    "name": "paymentmethod",
+                    "cols": 4,
+                    "relation": {"route": "genericdata", "routeparams":{"module":"AERP","name":"PaymentMethods"}, "type":"modal"}
                 },
                 {
                     "name": "shippcontact",

@@ -405,6 +405,8 @@ Provider: Proveedor
 Select aerpproviders: Seleccionar proveedor
 Tax: Impuesto
 Select globaletaxes: Seleccionar impuesto
+Select aerpmanufacturers: Seleccionar fabricante
+Select aerpseries: Seleccionar serie
 Price: Precio
 Purchaseprice: Precio compra
 Onpurchase: Se compra
@@ -415,3 +417,13 @@ Warehouse: Almacén
 WarehouseLocations: Ubicación
 WarehouseLocation: Ubicación
 Accountingaccount: Cuenta Contable
+PaymentMethods: Formas de Pago
+Domiciled: Domiciliado
+Payment due: Vencimiento
+FinancialYears: Ejercicio Fiscal
+Barcode: Cod. Barras
+Budgets: Presupuestos
+Customer: Cliente
+Search: Buscar
+Manufacturers: Fabricantes
+Price: PVP

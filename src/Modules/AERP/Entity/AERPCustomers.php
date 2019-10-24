@@ -8,6 +8,7 @@ use \App\Modules\Globale\Entity\GlobaleUsers;
 use \App\Modules\Globale\Entity\GlobaleCountries;
 use \App\Modules\AERP\Entity\AERPCustomerGroups;
 use \App\Helpers\HelperValidators;
+use \App\Modules\AERP\Entity\AERPPaymentMethods;
 /**
  * @ORM\Entity(repositoryClass="App\Modules\AERP\Repository\AERPCustomersRepository")
  */
@@ -19,6 +20,11 @@ class AERPCustomers
      * @ORM\Column(type="integer")
      */
     private $id;
+
+    /**
+     * @ORM\Column(type="string", length=8)
+     */
+    private $code;
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCompanies")
@@ -162,6 +168,11 @@ class AERPCustomers
      * @ORM\Column(type="string", length=8, nullable=true)
      */
     private $accountingaccount;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\AERP\Entity\AERPPaymentMethods")
+     */
+    private $paymentmethod;
 
 
     public function getId(): ?int
@@ -440,6 +451,14 @@ class AERPCustomers
       $this->vat=preg_replace('/[^\w]/', '', $this->vat);
       $obj=$repository->findOneBy(["vat"=>$this->vat,"company"=>$user->getCompany(),"deleted"=>0]);
       if($this->id==null){
+        if($this->code==null){
+          //If accountingaccount is null and object is new, create the next accounting account
+          $this->code=$repository->getNextCode($user->getCompany()->getId());
+        }else{
+          //Check if accountingaccount is unique
+          $objCode=$repository->findOneBy(["code"=>$this->code,"company"=>$user->getCompany(),"deleted"=>0]);
+          if($objCode!=null) {$fieldErrors=["code"=>"Código ya asignado a ".$objCode->getName()]; }
+        }
         if($this->accountingaccount==null){
           //If accountingaccount is null and object is new, create the next accounting account
           $this->accountingaccount=$repository->getNextAccounting($user->getCompany()->getId());
@@ -531,6 +550,30 @@ class AERPCustomers
     public function setAccountingaccount(?string $accountingaccount): self
     {
         $this->accountingaccount = $accountingaccount;
+
+        return $this;
+    }
+
+    public function getCode(): ?string
+    {
+        return $this->code;
+    }
+
+    public function setCode(string $code): self
+    {
+        $this->code = $code;
+
+        return $this;
+    }
+
+    public function getPaymentmethod(): ?AERPPaymentMethods
+    {
+        return $this->paymentmethod;
+    }
+
+    public function setPaymentmethod(?AERPPaymentMethods $paymentmethod): self
+    {
+        $this->paymentmethod = $paymentmethod;
 
         return $this;
     }

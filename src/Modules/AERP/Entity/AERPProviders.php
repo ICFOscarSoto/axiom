@@ -21,6 +21,11 @@ class AERPProviders
     private $id;
 
     /**
+     * @ORM\Column(type="string", length=8)
+     */
+    private $code;
+
+    /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCompanies")
      * @ORM\JoinColumn(nullable=false)
      */
@@ -356,6 +361,14 @@ class AERPProviders
       $this->vat=preg_replace('/[^\w]/', '', $this->vat);
       $obj=$repository->findOneBy(["vat"=>$this->vat,"company"=>$user->getCompany(),"deleted"=>0]);
       if($this->id==null){
+        if($this->code==null){
+          //If accountingaccount is null and object is new, create the next accounting account
+          $this->code=$repository->getNextCode($user->getCompany()->getId());
+        }else{
+          //Check if accountingaccount is unique
+          $objCode=$repository->findOneBy(["code"=>$this->code,"company"=>$user->getCompany(),"deleted"=>0]);
+          if($objCode!=null) {$fieldErrors=["code"=>"Código ya asignado a ".$objCode->getName()]; }
+        }
         if($this->accountingaccount==null){
           //If accountingaccount is null and object is new, create the next accounting account
           $this->accountingaccount=$repository->getNextAccounting($user->getCompany()->getId());
@@ -447,6 +460,18 @@ class AERPProviders
     public function setAccountingaccount(string $accountingaccount): self
     {
         $this->accountingaccount = $accountingaccount;
+
+        return $this;
+    }
+
+    public function getCode(): ?string
+    {
+        return $this->code;
+    }
+
+    public function setCode(string $code): self
+    {
+        $this->code = $code;
 
         return $this;
     }

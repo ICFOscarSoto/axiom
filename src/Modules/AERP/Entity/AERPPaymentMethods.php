@@ -4,13 +4,11 @@ namespace App\Modules\AERP\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
-use \App\Modules\AERP\Entity\AERPCustomerGroups;
-use \App\Modules\AERP\Entity\AERPProducts;
 
 /**
- * @ORM\Entity(repositoryClass="App\Modules\AERP\Repository\AERPCustomerGroupsPricesRepository")
+ * @ORM\Entity(repositoryClass="App\Modules\AERP\Repository\AERPPaymentMethodsRepository")
  */
-class AERPCustomerGroupsPrices
+class AERPPaymentMethods
 {
     /**
      * @ORM\Id()
@@ -26,36 +24,24 @@ class AERPCustomerGroupsPrices
     private $company;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\AERP\Entity\AERPCustomerGroups")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\Column(type="string", length=120)
      */
-    private $customergroup;
+    private $name;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\AERP\Entity\AERPProducts")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\Column(type="integer")
      */
-    private $product;
+    private $expiration;
 
     /**
-     * @ORM\Column(type="float", nullable=true)
+     * @ORM\Column(type="smallint")
      */
-    private $disccount;
+    private $type;
 
     /**
-     * @ORM\Column(type="float", nullable=true)
+     * @ORM\Column(type="boolean")
      */
-    private $profit;
-
-    /**
-     * @ORM\Column(type="float", nullable=true)
-     */
-    private $fixed;
-
-    /**
-     * @ORM\Column(type="float", nullable=true)
-     */
-    private $total;
+    private $domiciled;
 
     /**
      * @ORM\Column(type="datetime")
@@ -94,74 +80,50 @@ class AERPCustomerGroupsPrices
         return $this;
     }
 
-    public function getCustomergroup(): ?AERPCustomerGroups
+    public function getName(): ?string
     {
-        return $this->customergroup;
+        return $this->name;
     }
 
-    public function setCustomergroup(?AERPCustomerGroups $customergroup): self
+    public function setName(string $name): self
     {
-        $this->customergroup = $customergroup;
+        $this->name = $name;
 
         return $this;
     }
 
-    public function getProduct(): ?AERPProducts
+    public function getExpiration(): ?int
     {
-        return $this->product;
+        return $this->expiration;
     }
 
-    public function setProduct(?AERPProducts $product): self
+    public function setExpiration(int $expiration): self
     {
-        $this->product = $product;
+        $this->expiration = $expiration;
 
         return $this;
     }
 
-    public function getDisccount(): ?float
+    public function getType(): ?int
     {
-        return $this->disccount;
+        return $this->type;
     }
 
-    public function setDisccount(?float $disccount): self
+    public function setType(int $type): self
     {
-        $this->disccount = $disccount;
+        $this->type = $type;
 
         return $this;
     }
 
-    public function getProfit(): ?float
+    public function getDomiciled(): ?bool
     {
-        return $this->profit;
+        return $this->domiciled;
     }
 
-    public function setProfit(?float $profit): self
+    public function setDomiciled(bool $domiciled): self
     {
-        $this->profit = $profit;
-
-        return $this;
-    }
-
-    public function getFixed(): ?float
-    {
-        return $this->fixed;
-    }
-
-    public function setFixed(?float $fixed): self
-    {
-        $this->fixed = $fixed;
-
-        return $this;
-    }
-
-    public function getTotal(): ?float
-    {
-        return $this->total;
-    }
-
-    public function setTotal(?float $total): self
-    {
-        $this->total = $total;
+        $this->domiciled = $domiciled;
 
         return $this;
     }

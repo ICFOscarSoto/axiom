@@ -1,0 +1,6 @@
+[
+  {"id" : "addTopManufacturers", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"genericdata", "routeParams":{"module":"AERP", "name":"Manufacturers", "type":"modal" }, "modal":"Manufacturers", "actionType" : "background", "confirm" :false, "tooltip" : ""},
+  {"id" : "deleteTopManufacturers", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true, "tooltip":""},
+  {"id" : "printTopManufacturers", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false, "tooltip":""},
+  {"id" : "exportTopManufacturers", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"genericexport", "routeParams":{"module":"AERP", "name":"Manufacturers"}, "confirm" :false, "tooltip":""}
+]

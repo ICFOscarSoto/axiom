@@ -25,4 +25,15 @@ class AERPCustomersRepository extends ServiceEntityRepository
       $params=['company' => $company];
       return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchColumn(0);
     }
+
+    public function getNextCode($company)
+    {
+      $query="SELECT IFNULL(MAX(CAST(SUBSTRING(CODE,2)AS SIGNED))+1,1) AS code FROM aerpcustomers WHERE company_id=:company";
+      $params=['company' => $company];
+      $code=$this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchColumn(0);
+      $code='C'.str_pad($code, 7, '0', STR_PAD_LEFT);
+      return $code;
+    }
+
+
 }

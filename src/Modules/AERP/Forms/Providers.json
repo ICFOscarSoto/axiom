@@ -1,8 +1,13 @@
 [{
     "sections": [
         {
-            "name": "Datos Cliente",
+            "name": "Datos Proveedor",
             "fields": [
+                {
+                    "name": "code",
+                    "cols": 2,
+                    "readonly": true
+                },
                 {
                     "name": "vat",
                     "cols": 2,

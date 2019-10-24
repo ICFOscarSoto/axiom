@@ -5,29 +5,20 @@
     },
     {
         "name": "code",
-        "caption": "code",
-        "width": "10%"
+        "caption": "code"
     },
     {
         "name": "vat",
-        "caption": "vat",
-        "width": "10%"
+        "caption": "vat"
     },
     {
-        "name": "name",
-        "caption": "name"
+        "name": "customername",
+        "caption": "Customer"
     },
+
     {
-        "name": "address",
-        "caption": "address"
-    },
-    {
-        "name": "city",
-        "caption": "city"
-    },
-    {
-        "name": "phone",
-        "caption": "phone"
+        "name": "total",
+        "caption": "Total"
     },
     {
         "name": "active",

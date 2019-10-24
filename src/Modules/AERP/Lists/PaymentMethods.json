@@ -4,30 +4,30 @@
         "caption": "id"
     },
     {
-        "name": "code",
-        "caption": "code",
-        "width": "10%"
-    },
-    {
-        "name": "vat",
-        "caption": "vat",
-        "width": "10%"
-    },
-    {
         "name": "name",
         "caption": "name"
     },
     {
-        "name": "address",
-        "caption": "address"
+        "name": "expiration",
+        "caption": "Payment due"
     },
     {
-        "name": "city",
-        "caption": "city"
+        "name": "type",
+        "caption": "Type",
+        "replace":{
+           "0":{"text":"Días","html":"Días"},
+           "1":{"text":"Semanas","html":"Semanas"},
+           "2":{"text":"Meses","html":"Meses"},
+           "3":{"text":"Años","html":"Años"}
+         }
     },
     {
-        "name": "phone",
-        "caption": "phone"
+        "name": "domiciled",
+        "caption": "Domiciled",
+        "replace":{
+           "0":{"text":"Sí","html":"Sí"},
+           "1":{"text":"No","html":"No"}
+         }
     },
     {
         "name": "active",

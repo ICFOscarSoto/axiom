@@ -286,3 +286,7 @@ AERPCategories:
 AERPProducts:
   resource: 'App\Modules\AERP\Controller\AERPProductsController'
   type:      annotation
+
+AERPSalesBudgets:
+  resource: 'App\Modules\AERP\Controller\AERPSalesBudgetsController'
+  type:      annotation

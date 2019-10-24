@@ -4,6 +4,11 @@
         "caption": "id"
     },
     {
+        "name": "code",
+        "caption": "code",
+        "width": "10%"
+    },
+    {
         "name": "vat",
         "caption": "vat",
         "width": "10%"

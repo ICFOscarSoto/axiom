@@ -23,6 +23,10 @@
                     "class": "text-area-form"
                 },
                 {
+                    "name": "manufacturer",
+                    "cols": 3
+                },
+                {
                     "name": "barcode",
                     "cols": 2
 
