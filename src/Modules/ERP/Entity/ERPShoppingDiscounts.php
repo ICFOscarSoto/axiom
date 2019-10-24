@@ -166,7 +166,7 @@ class ERPShoppingDiscounts
       foreach($products as $product){
         $productEntity=$repositoryProduct->findOneBy(["id"=>$product]);
         $productEntity->priceCalculated($doctrine);
-        dump($productEntity->getShoppingDiscount($doctrine));
+      //  dump($productEntity->getShoppingDiscount($doctrine));
         $em->persist($productEntity);
         $em->flush();
       }
