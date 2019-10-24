@@ -1,8 +1,8 @@
 [
-  {"id": "edit", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"dataVariants", "modal":"variants", "actionType" : "background", "confirm" :false},
+  {"id": "editVariants", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"genericdata", "routeParams":{"module":"ERP", "name":"Variants", "type":"modal" }, "modal":"Variants", "actionType" : "background", "confirm" :false, "tooltip":""},
   {"id": "activation", "type": "option", "options": [
-      {"id": "desactivate", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"disableVariant", "confirm" :true, "actionType" : "background" },
-      {"id": "activate", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "route":"enableVariant", "confirm" :true, "actionType" : "background" }
+      {"id": "desactivateVariants", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"genericdisable", "routeParams":{"module":"ERP", "name":"Variants"}, "confirm" :true, "actionType" : "background", "tooltip":"" },
+      {"id": "activateVariants", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "route":"genericenable", "routeParams":{"module":"ERP", "name":"Variants"}, "confirm" :true, "actionType" : "background", "tooltip":"" }
   ]},
-  {"id": "delete", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"deleteVariant", "confirm" :true, "undo" :false, "tooltip":"Borrar variante", "actionType" : "background"}
+  {"id": "deleteVariants", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"genericdelete", "routeParams":{"module":"ERP", "name":"Variants"}, "confirm" :true, "undo" :false, "actionType" : "background", "tooltip":""}
 ]

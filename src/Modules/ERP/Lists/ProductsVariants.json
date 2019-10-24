@@ -4,8 +4,16 @@
         "caption": "id"
     },
     {
-        "name": "name",
-        "caption": "name"
+        "name": "product__name",
+        "caption": "product"
+    },
+    {
+        "name": "variantvalue__name",
+        "caption": "variantvalue"
+    },
+    {
+        "name": "variantname__name",
+        "caption": "variantname"
     },
     {
         "name": "active",

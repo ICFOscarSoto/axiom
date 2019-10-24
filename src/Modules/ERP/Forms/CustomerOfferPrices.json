@@ -1,0 +1,50 @@
+[{
+    "sections": [
+        {
+            "name": "data",
+            "fields": [
+              {
+                  "name": "product",
+                  "cols": 12
+              },
+              {
+                  "name": "start",
+                  "cols": 6,
+                  "linked": {"field":"end", "by":"minDate"}
+              },
+              {
+                  "name": "end",
+                  "cols": 6,
+                  "linked": {"field":"start", "by":"maxDate"}
+              },
+              {
+                  "name": "quantity",
+                  "cols": 2
+              },
+                {
+                    "name": "type",
+                    "cols": 2,
+                    "transform":{
+                        "type":"option",
+                        "options":{"Tipo":"0","%":"1","Neto":"2"}                    
+                    }
+                },
+                {
+                    "name": "increment",
+                    "cols": 2,
+                    "depends":{"from":"type","vals":"[1]"}
+                },
+                {
+                    "name": "price",
+                    "cols": 2,
+                    "depends":{"from":"type","vals":"[2]"}
+                },
+
+                {
+                    "name": "active",
+                    "cols": 4
+                }
+            ]
+        }
+    ]
+}]

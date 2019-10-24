@@ -84,6 +84,18 @@ class ERPCustomersPricesRepository extends ServiceEntityRepository
    return $result;
 
  }
+ 
+ public function pricesByCustomer($customer){
+   $query="SELECT c.name as Category, s.name as Supplier, g.name as CustomerGroup
+           FROM erpcustomers_prices p 
+           LEFT JOIN erpcategories c ON c.id=p.category_id 
+           LEFT JOIN erpsuppliers s ON s.id=p.supplier_id
+           LEFT JOIN erpcustomer_groups g ON g.id=p.customergroup_id
+           WHERE p.customer_id=:CUST AND p.active=TRUE and p.deleted=0";
+   $params=['CUST' => $customer->getId()];
+   return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+
+ }
 
     // /**
     //  * @return ERPCustomersPrices[] Returns an array of ERPCustomersPrices objects

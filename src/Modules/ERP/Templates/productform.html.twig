@@ -32,6 +32,28 @@
 		</div>
 		{% for section in formConstructor.template.0.sections %}
 		{% for field in section.fields %}
+		{# Check if field is a relation and must show the view button #}
+		{{ include("@Globale/form_relation_button.html.twig") }}
+		{# Check if field is an address and map is enabled #}
+		{{ include("@Globale/form_address_button.html.twig") }}
+		{# Check if field is an url #}
+		{{ include("@Globale/form_url_button.html.twig") }}
+		{# Check if field is an tel #}
+		{{ include("@Globale/form_tel_button.html.twig") }}
+		{# Check if field is an email #}
+		{{ include("@Globale/form_email_button.html.twig") }}
+		{# Check if field has trigger #}
+		{{ include("@Globale/form_trigger_field.html.twig") }}
+		{# Check if field has a linked field #}
+		{{ include("@Globale/form_fields_linked.html.twig") }}
+		{# Check if field has a dependency of other field #}
+		{{ include("@Globale/form_fields_depend.html.twig") }}
+		{# Check if field has a to change another field #}
+		{{ include("@Globale/form_fields_change.html.twig") }}
+		{# Check if field has unity field #}
+		{{ include("@Globale/form_fields_unity.html.twig") }}
+		{# Check if field has a field type number #}
+		{{ include("@Globale/form_fields_type_number.html.twig") }}
 		{% if field.type is defined and field.type == 'image' %}
 		<div class="col-md-6">
 			{# Field type Image #}
@@ -51,6 +73,8 @@
 					{% endif %}
 				</div>
 			</div>
+
+
 
 			<script>
 			function b64toBlob(b64Data, contentType, sliceSize) {
@@ -115,6 +139,7 @@
 		{% endif %}
 
 		{% endfor %}
+
 		{% endfor %}
 	</div>
 

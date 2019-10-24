@@ -7,10 +7,10 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 
-class ERPVariantsUtils
+class ERPVariantsValuesUtils
 {
   private $module="ERP";
-  private $name="Variants";
+  private $name="VariantsValues";
   public function getExcludedForm($params){
     return [];
   }

@@ -626,35 +626,35 @@ class ERPProducts
           $increment=$this->getMaxIncrement($doctrine,$customergroup);
           if($increment>$maxincrement) $maxincrement=$increment;
         }
-    
+
         $this->setPvpincrement($maxincrement);
         $this->setPVP($newShoppingPrice*(1+($maxincrement/100)));
-      
+
       }
-      
+
       else $this->setPVP($newShoppingPrice*(1+($this->getPvpincrement()/100)));
-      
+
         //recalculamos el precio para cada incremento de grupo que exista
         $repositoryProduct=$doctrine->getRepository(ERPProducts::class);
         $repositoryProductPrices=$doctrine->getRepository(ERPProductPrices::class);
         $productprices=$repositoryProductPrices->pricesByProductId($this->getId());
         foreach($productprices as $productprice)
-        {    
+        {
           $productpriceEntity=$repositoryProductPrices->findOneBy(["id"=>$productprice]);
           $productpriceEntity->setPrice($newShoppingPrice*(1+($productpriceEntity->getIncrement()/100)));
         }
-      
-      
+
+
       $CustomerGroupsRepository=$doctrine->getRepository(ERPCustomerGroups::class);
       $customergroups=$CustomerGroupsRepository->findAll(["active"=>1,"deleted"=>0]);
       $productEntity=$repositoryProduct->findOneBy(["id"=>$this->getId()]);
       //dump($customergroups);
       $customergroup_without_price=[];
       foreach($customergroups as $customergroup){
-        if($repositoryProductPrices->existPrice($this,$customergroup)==FALSE)     array_push($customergroup_without_price,$customergroup);                
+        if($repositoryProductPrices->existPrice($this,$customergroup)==FALSE)     array_push($customergroup_without_price,$customergroup);
       }
-      
-    
+
+
       foreach($customergroup_without_price as $customergroup){
         $increment=$this->getMaxIncrement($doctrine,$customergroup);
         $productpricesEntity= new ERPProductPrices();
@@ -667,14 +667,14 @@ class ERPProducts
         $productpricesEntity->setDateupd(new \DateTime());
         $productpricesEntity->setDateadd(new \DateTime());
         $em->persist($productpricesEntity);
-        $em->flush();       
-    
+        $em->flush();
+
       }
-      
-  
+
+
       //else dump("Si existe el incremento para el producto ".$this->getName()." y el grupo ".$customergroup->getName());
-      
-      
+
+
     }
 
     public function calculatePVP($doctrine){
@@ -689,7 +689,7 @@ class ERPProducts
          $this->setPVP($this->shoppingPrice*(1+($maxincrement/100)));
          $this->setPvpincrement($maxincrement);
      }
-     
+
     public function getMaxIncrement($doctrine,$customergroup){
       $repository=$doctrine->getRepository(ERPIncrements::class);
       $category=$this->category;
@@ -699,19 +699,19 @@ class ERPProducts
           $category=$category->getParentid();
           $maxincrement=$repository->getMaxIncrement($this->supplier,$category,$customergroup);
       }
-  
+
       if ($maxincrement==null)
           $maxincrement=$repository->getMaxIncrement($this->supplier,null,$customergroup);
       if ($maxincrement==null){
           $category=$this->category;
           $maxincrement=$repository->getMaxIncrement(null,$category,$customergroup);
-      
+
           while ($category->getParentid()!=null && $maxincrement==null){
               $category=$category->getParentid();
               $maxincrement=$repository->getMaxIncrement(null,$category,$customergroup);
           }
        }
-  
+
       if ($maxincrement==null){
         $repository=$doctrine->getRepository(ERPCustomerGroups::class);
         $maxincrement=$repository->getIncrement($customergroup);
@@ -747,9 +747,9 @@ class ERPProducts
          if($this->taxes==null){
            $fieldErrors["taxes"]="This field is required.";
          }
-         if($this->shoppingPrice==0){
+         /*if($this->shoppingPrice==0){
            $fieldErrors["shoppingPrice"]="This field is required.";
-         }
+         }*/
 
          if (empty($fieldErrors)) return ["valid"=>true];
            else return ["valid"=>false, "field_errors"=>$fieldErrors];

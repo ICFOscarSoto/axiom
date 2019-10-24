@@ -2,25 +2,25 @@
 
 namespace App\Modules\ERP\Repository;
 
-use App\Modules\ERP\Entity\ERPProductVariants;
+use App\ERP\Entity\Modules\ERPVariantsValues;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
- * @method ERPProductVariants|null find($id, $lockMode = null, $lockVersion = null)
- * @method ERPProductVariants|null findOneBy(array $criteria, array $orderBy = null)
- * @method ERPProductVariants[]    findAll()
- * @method ERPProductVariants[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method ERPVariantsValues|null find($id, $lockMode = null, $lockVersion = null)
+ * @method ERPVariantsValues|null findOneBy(array $criteria, array $orderBy = null)
+ * @method ERPVariantsValues[]    findAll()
+ * @method ERPVariantsValues[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class ERPProductVariantsRepository extends ServiceEntityRepository
+class ERPVariantsValuesRepository extends ServiceEntityRepository
 {
     public function __construct(RegistryInterface $registry)
     {
-        parent::__construct($registry, ERPProductVariants::class);
+        parent::__construct($registry, ERPVariantsValues::class);
     }
 
     // /**
-    //  * @return ERPProductVariants[] Returns an array of ERPProductVariants objects
+    //  * @return ERPVariantsValues[] Returns an array of ERPVariantsValues objects
     //  */
     /*
     public function findByExampleField($value)
@@ -37,7 +37,7 @@ class ERPProductVariantsRepository extends ServiceEntityRepository
     */
 
     /*
-    public function findOneBySomeField($value): ?ERPProductVariants
+    public function findOneBySomeField($value): ?ERPVariantsValues
     {
         return $this->createQueryBuilder('e')
             ->andWhere('e.exampleField = :val')

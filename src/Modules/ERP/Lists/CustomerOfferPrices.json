@@ -4,8 +4,28 @@
         "caption": "id"
     },
     {
-        "name": "name",
-        "caption": "name"
+        "name": "product__name",
+        "caption": "product"
+    },
+    {
+        "name": "quantity",
+        "caption": "quantity"
+    },
+    {
+        "name": "increment",
+        "caption": "increment"
+    },
+    {
+        "name": "price",
+        "caption": "price"
+    },
+    {
+        "name": "start",
+        "caption": "start"
+    },
+    {
+        "name": "end",
+        "caption": "end"
     },
     {
         "name": "active",

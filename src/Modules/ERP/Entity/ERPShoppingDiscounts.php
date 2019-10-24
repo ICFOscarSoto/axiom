@@ -158,4 +158,18 @@ class ERPShoppingDiscounts
 
     }
 
+    public function delete($doctrine){
+      $em = $doctrine->getManager();
+      $repositoryProduct=$doctrine->getRepository(ERPProducts::class);
+      $repository=$doctrine->getRepository(ERPSuppliers::class);
+      $products=$repository->productsBySupplier($this->supplier->getId());
+      foreach($products as $product){
+        $productEntity=$repositoryProduct->findOneBy(["id"=>$product]);
+        $productEntity->priceCalculated($doctrine);
+      //  dump($productEntity->getShoppingDiscount($doctrine));
+        $em->persist($productEntity);
+        $em->flush();
+      }
+    }
+
 }

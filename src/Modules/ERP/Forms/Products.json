@@ -29,10 +29,11 @@
 				{	"name": "promotion", "cols": 2},
 				{	"name": "rotation", "cols": 2},
 				{ "name": "description","cols": 12},
-				{ "name": "PVPR","cols": 2},
+				{ "name": "PVPR","cols": 2, "depends":{"from": "netprice","vals":"[0]"}},
 				{ "name": "PVP","cols": 2, "readonly":true},
+				{ "name": "shoppingdiscounts","cols": 2, "readonly":true, "depends":{"from": "netprice","vals":"[0]"}},
 				{ "name": "netprice","cols": 2},
-				{ "name": "shoppingPrice","cols": 2}
+				{ "name": "shoppingPrice","cols": 2, "depends":{"from": "netprice","vals":"[1]"}}
 			]
 		}]
 }]
