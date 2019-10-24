@@ -95,22 +95,6 @@ Manufacturer:
     resource: 'App\Modules\ERP\Controller\ERPManufacturersController'
     type:     annotation
 
-VariantsGroup:
-    resource: 'App\Modules\ERP\Controller\ERPVariantsGroupsController'
-    type:     annotation
-
-Variant:
-    resource: 'App\Modules\ERP\Controller\ERPVariantsController'
-    type:     annotation
-
-ProductVariantsCombination:
-    resource: 'App\Modules\ERP\Controller\ERPProductVariantsCombinationsController'
-    type:     annotation
-
-ProductVariant:
-    resource: 'App\Modules\ERP\Controller\ERPProductVariantsController'
-    type:     annotation
-
 Product:
     resource: 'App\Modules\ERP\Controller\ERPProductsController'
     type:     annotation

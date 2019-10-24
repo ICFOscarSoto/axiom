@@ -1,0 +1,25 @@
+[{
+    "sections": [
+        {
+            "name": "data",
+            "fields": [
+                {
+                    "name": "active",
+                    "cols": 4
+                },
+                {
+                    "name": "product",
+                    "cols": 4
+                },
+                {
+                    "name": "variantvalue",
+                    "cols": 4
+                },
+                {
+                    "name": "variantname",
+                    "cols": 4
+                }
+            ]
+        }
+    ]
+}]

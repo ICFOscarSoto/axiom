@@ -8,6 +8,14 @@
         "caption": "name"
     },
     {
+        "name": "increment",
+        "caption": "increment"
+    },
+    {
+        "name": "variantname__name",
+        "caption": "variantname"
+    },
+    {
         "name": "active",
         "caption": "Estado",
         "width": "10%",
