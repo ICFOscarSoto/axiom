@@ -236,14 +236,14 @@ public function formValidation($kernel, $doctrine, $user, $validationParams){
               {
                 $productpricesEntity=$repositoryProductPrices->findOneBy(["product"=>$productEntity,"customergroup"=>$this->customergroup]);
                 $productpricesEntity->setIncrement($increment);
-                $productpricesEntity->setPrice($productEntity->getShoppingPrice()*(1+($increment/100)));
+                $productpricesEntity->setPrice(round($productEntity->getShoppingPrice()*(1+($increment/100)),2));
               }
               else {
                 $productpricesEntity= new ERPProductPrices();
                 $productpricesEntity->setProduct($productEntity);
                 $productpricesEntity->setCustomergroup($this->customergroup);
                 $productpricesEntity->setIncrement($increment*1);
-                $productpricesEntity->setPrice($productEntity->getShoppingPrice()*(1+($increment/100)));
+                $productpricesEntity->setPrice(round($productEntity->getShoppingPrice()*(1+($increment/100)),2));
                 $productpricesEntity->setActive(1);
                 $productpricesEntity->setDeleted(0);
                 $productpricesEntity->setDateupd(new \DateTime());

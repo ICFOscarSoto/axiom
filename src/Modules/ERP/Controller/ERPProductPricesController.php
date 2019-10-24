@@ -20,6 +20,7 @@ use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
 
 
+
 class ERPProductPricesController extends Controller
 {
 	private $class=ERPProductPrices::class;
@@ -31,20 +32,22 @@ class ERPProductPricesController extends Controller
   public function infoProductPrices($id, Request $request){
 		$productsRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
 		$product=$productsRepository->findOneBy(["id"=>$id]);
+		$product_id=$product->getId();
     $productPricesRepository=$this->getDoctrine()->getRepository($this->class);
-		//dump($product);
     $productPrices=$productPricesRepository->pricesByProduct($product);
 		$listOfferPrices = new ERPOfferPricesUtils();
 		$formUtilsOfferPrices = new GlobaleFormUtils();
-		$formUtilsOfferPrices->initialize($this->getUser(), new ERPOfferPricesUtils(), dirname(__FILE__)."/../Forms/OfferPrices.json", $request, $this, $this->getDoctrine());
+		$formUtilsOfferPrices->initialize($this->getUser(), new ERPOfferPricesUtils(), dirname(__FILE__)."/../Forms/OfferPrices.json", $request, $this, $this->getDoctrine(),$listOfferPrices->getExcludedForm([]),$listOfferPrices->getIncludedForm(["doctrine"=>$this->getDoctrine(), "user"=>$this->getUser(),"id"=>$id, "parent"=>$product]));
 		$forms[]=$formUtilsOfferPrices->formatForm('OfferPrices', true, null, ERPOfferPrices::class);
-    /*
+    
     foreach($productPrices as $key=>$item){
-      $stocks[$key]["Acciones"]="<button>Ir</button>";
-    }
-    */
+      //$productPrices[$key]["Visualizar"]="<a href='/{_locale}/productprices/infoProductPrices/".$id."'>Ir</a>";
+    		$productPrices[$key]["Visualizar"]="<a href='/{_locale}/es/generic/ERP/Increments/index'>Ir</a>";
+		}
+    
     return $this->render('@ERP/productprices.html.twig', array(
       'productpriceslist'=>$productPrices,
+			'id' => $id,
 			'offerpriceslist' => $listOfferPrices->formatListByProduct($id),
 			'forms' => $forms
     ));
