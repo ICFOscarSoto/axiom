@@ -170,6 +170,7 @@ public function formAERPProduct($id,Request $request)
 		 //get product price
 		 $result["price"]=$repository->getProductPrice($obj->getId(), $group, $this->getUser()->getCompany()->getId());
 		 $result["tax"]=$obj->getTax()?$obj->getTax()->getTax():0;
+		 $result["surcharge"]=$obj->getTax()?$obj->getTax()->getSurcharge():0;
 		 return new JsonResponse(["result"=>1, "data"=>$result]);
 	 }
 
