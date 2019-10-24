@@ -106,11 +106,18 @@ class ERPCustomersController extends Controller
 							'id' => $id,
 							'tab' => $request->query->get('tab','data'), //Show initial tab, by default data tab
 							'tabs' => [["name" => "data", "icon"=>"fa fa-headphones", "caption"=>"Datos cliente", "active"=>true, "route"=>$this->generateUrl("dataCustomers",["id"=>$id])],
-											 	["name"=>"customersprices", "icon"=>"fa fa-money", "caption"=>"Incrementos específicos","route"=>$this->generateUrl("generictablist",["module"=>"ERP", "name"=>"CustomersPrices", "id"=>$id])]
+											 	["name"=>"customersprices", "icon"=>"fa fa-money", "caption"=>"Incrementos específicos","route"=>$this->generateUrl("infoCustomersPrices",["module"=>"ERP", "name"=>"CustomersPrices", "id"=>$id])],
+											  ["name"=>"offerprices", "icon"=>"fa fa-money", "caption"=>"Precios Específicos","route"=>$this->generateUrl("infoCustomerOfferPrices",["module"=>"ERP", "name"=>"OfferPrices", "id"=>$id])]
 												//["name" => "addresses", "icon"=>"fa fa-headphones", "caption"=>"direcciones", "route"=>$this->generateUrl("addresses",["id"=>$id, "type"=>"contact"])],
 												//["name" => "contacts", "icon"=>"fa fa-headphones", "caption"=>"contactos" , "route"=>$this->generateUrl("contacts",["id"=>$id])],
 												//["name" => "bankaccounts", "icon"=>"fa fa-headphones", "caption"=>"Cuentas bancarias", "route"=>$this->generateUrl("bankaccounts",["id"=>$id])]
 											],
+								
+									
+									'include_header' => [["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker-es.js"],
+																			["type"=>"css", "path"=>"/js/rickshaw/rickshaw.min.css"]],
+									'include_footer' => [["type"=>"css", "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.css"],
+																			 ["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.js"]]
 									));
 			}
 

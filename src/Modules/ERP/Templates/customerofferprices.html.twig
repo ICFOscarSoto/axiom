@@ -1,0 +1,9 @@
+<div class="row">
+<div class="col-md-12">
+  <div class="panel-title-list">Ofertas</div>
+  {% if listOfferPrices is defined %}
+  {% set listConstructor = listOfferPrices %}
+  {{ include('@Globale/list.html.twig') }}
+  {% endif %}
+</div>
+</div>

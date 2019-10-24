@@ -19,17 +19,8 @@ class ERPOfferPricesRepository extends ServiceEntityRepository
         parent::__construct($registry, ERPOfferPrices::class);
     }
     
-    public function offerpricesByProduct($product){
-      $query="SELECT c.name as CustomerGroup, p.increment as Increment, p.price as Price, p.start as Start, p.end as Endd
-              FROM erpoffer_prices p LEFT JOIN erpcustomer_groups c ON c.id=p.customergroup_id 
-              WHERE p.product_id=:PROD AND p.active=TRUE and p.deleted=0";
-      $params=['PROD' => $product->getId()];
-      return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
-
-    }
-    
+  
     public function validOffer($id,$customer, $quantity, $start){
-        dump($id);
         if($quantity==NULL) $qty=1;
         else $qty=$quantity;
         $date=$start->format("Y-m-d");
@@ -79,6 +70,17 @@ class ERPOfferPricesRepository extends ServiceEntityRepository
         
         
         }
+    }
+    
+    public function offerPricesByCustomer($customer){
+      $query="SELECT c.code as Product, c.name as Name, p.increment as Increment, p.price as Price, p.start as Start, p.end as End
+              FROM erpoffer_prices p 
+              LEFT JOIN erpproducts c ON c.id=p.product_id 
+              WHERE p.customer_id=:CUST AND p.active=TRUE and p.deleted=0";
+      $params=['CUST' => $customer->getId()];
+      return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+
+    
     }
 
     // /**

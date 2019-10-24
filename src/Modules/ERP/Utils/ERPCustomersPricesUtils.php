@@ -15,6 +15,28 @@ class ERPCustomersPricesUtils
   public $parentClass="\App\Modules\ERP\Entity\ERPCustomers";
   public $parentField="customer";
 
+
+
+  public function formatListByCustomer($customer){
+    $list=[
+      'id' => 'list'.$this->name,
+      'route' => 'genericlist',
+      'routeParams' => ["module" => $this->module,
+                        "name" => $this->name,
+                        "parent" => $customer,
+                        "field" => "customer",
+                        "parentModule" => "ERP",
+                        "parentName" => "Customers"
+                      ],
+      'orderColumn' => 1,
+      'orderDirection' => 'ASC',
+      'tagColumn' => 1,
+      'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/".$this->name.".json"),true),
+      'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/".$this->name."FieldButtons.json"),true),
+      'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/".$this->name."TopButtons.json"),true)
+    ];
+    return $list;
+  }
   
   public function getExcludedForm($params){
     return ['customer'];
