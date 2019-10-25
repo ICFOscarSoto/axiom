@@ -469,6 +469,7 @@ class GlobaleCompanies
 
     public function postProccess($kernel, $doctrine, $user){
       //Prepare folder structure
+
       $source = $kernel->getRootDir().DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.'0';
       $dest= $kernel->getRootDir().DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$this->id;
       if(!file_exists($dest)){
@@ -484,78 +485,79 @@ class GlobaleCompanies
                 copy($item, $dest . DIRECTORY_SEPARATOR . $iterator->getSubPathName());
             }
           }
-      }
-      //Rename default company imagen
-      copy($source.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'company'.DIRECTORY_SEPARATOR.'large.png',$dest.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'company'.DIRECTORY_SEPARATOR.$this->id.'-large.png');
-      copy($source.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'company'.DIRECTORY_SEPARATOR.'medium.png',$dest.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'company'.DIRECTORY_SEPARATOR.$this->id.'-medium.png');
-      copy($source.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'company'.DIRECTORY_SEPARATOR.'small.png',$dest.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'company'.DIRECTORY_SEPARATOR.$this->id.'-small.png');
-      copy($source.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'company'.DIRECTORY_SEPARATOR.'thumb.png',$dest.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'company'.DIRECTORY_SEPARATOR.$this->id.'-thumb.png');
-      copy($source.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'companydark'.DIRECTORY_SEPARATOR.'large.png',$dest.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'companydark'.DIRECTORY_SEPARATOR.$this->id.'-large.png');
-      copy($source.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'companydark'.DIRECTORY_SEPARATOR.'medium.png',$dest.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'companydark'.DIRECTORY_SEPARATOR.$this->id.'-medium.png');
-      copy($source.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'companydark'.DIRECTORY_SEPARATOR.'small.png',$dest.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'companydark'.DIRECTORY_SEPARATOR.$this->id.'-small.png');
-      copy($source.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'companydark'.DIRECTORY_SEPARATOR.'thumb.png',$dest.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'companydark'.DIRECTORY_SEPARATOR.$this->id.'-thumb.png');
-      //Create user admin of the company if it doesn't exist
-     $usersrepository=$doctrine->getRepository(GlobaleUsers::class);
-     $users=$usersrepository->findBy(["company"=>$this]);
-     $create=true;
-     foreach($users as $user){
-       if(array_search("ROLE_ADMIN",$user->getRoles())!==FALSE){
-        $create=false;
-        break;
+
+          //Rename default company imagen
+          copy($source.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'company'.DIRECTORY_SEPARATOR.'large.png',$dest.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'company'.DIRECTORY_SEPARATOR.$this->id.'-large.png');
+          copy($source.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'company'.DIRECTORY_SEPARATOR.'medium.png',$dest.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'company'.DIRECTORY_SEPARATOR.$this->id.'-medium.png');
+          copy($source.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'company'.DIRECTORY_SEPARATOR.'small.png',$dest.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'company'.DIRECTORY_SEPARATOR.$this->id.'-small.png');
+          copy($source.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'company'.DIRECTORY_SEPARATOR.'thumb.png',$dest.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'company'.DIRECTORY_SEPARATOR.$this->id.'-thumb.png');
+          copy($source.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'companydark'.DIRECTORY_SEPARATOR.'large.png',$dest.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'companydark'.DIRECTORY_SEPARATOR.$this->id.'-large.png');
+          copy($source.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'companydark'.DIRECTORY_SEPARATOR.'medium.png',$dest.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'companydark'.DIRECTORY_SEPARATOR.$this->id.'-medium.png');
+          copy($source.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'companydark'.DIRECTORY_SEPARATOR.'small.png',$dest.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'companydark'.DIRECTORY_SEPARATOR.$this->id.'-small.png');
+          copy($source.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'companydark'.DIRECTORY_SEPARATOR.'thumb.png',$dest.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'companydark'.DIRECTORY_SEPARATOR.$this->id.'-thumb.png');
+          //Create user admin of the company if it doesn't exist
+         $usersrepository=$doctrine->getRepository(GlobaleUsers::class);
+         $users=$usersrepository->findBy(["company"=>$this]);
+         $create=true;
+         foreach($users as $user){
+           if(array_search("ROLE_ADMIN",$user->getRoles())!==FALSE){
+            $create=false;
+            break;
+           }
+         }
+         if($create){
+           //Create Admin group
+           $group=new GlobaleUserGroups();
+           $group->setName('Administradores');
+           $group->setCompany($this);
+           $group->setIsadmin(1);
+           $group->setActive(1);
+           $group->setDeleted(0);
+           $group->setDateadd(new \DateTime());
+           $group->setDateupd(new \DateTime());
+           $doctrine->getManager()->persist($group);
+           $doctrine->getManager()->flush();
+
+           //Create Admin User
+           $user=new GlobaleUsers();
+           $user->setName("Administrador");
+           $user->setEmail("admin@".$this->getDomain());
+           $user->setCompany($this);
+           $user->setRoles(["ROLE_USER", "ROLE_ADMIN"]);
+           $user->setPassword('$2y$13$g06ZTdo4bZ6UT3uybO3zjuyB2WPiM.Zxiut3dKU9HGn2A7xC4AdKK');
+           $user->setActive(1);
+           $user->setDeleted(0);
+           $user->setDateadd(new \DateTime());
+           $user->setDateupd(new \DateTime());
+           $doctrine->getManager()->persist($user);
+           $doctrine->getManager()->flush();
+
+           //Add user to admin group
+           $userGroup=new GlobaleUsersUserGroups();
+           $userGroup->setUsergroup($group);
+           $userGroup->setUser($user);
+           $userGroup->setActive(1);
+           $userGroup->setDeleted(0);
+           $userGroup->setDateadd(new \DateTime());
+           $userGroup->setDateupd(new \DateTime());
+           $doctrine->getManager()->persist($userGroup);
+           $doctrine->getManager()->flush();
+
+           //Create disk quota
+           $quota=new GlobaleDiskUsages();
+           $quota->setCompanyown($this);
+           $quota->setDiskspace(52428800); //50MB
+           $quota->setDiskusage(0);
+           $quota->setDistribution("[]");
+           $quota->setActive(1);
+           $quota->setDeleted(0);
+           $quota->setDateadd(new \DateTime());
+           $quota->setDateupd(new \DateTime());
+           $doctrine->getManager()->persist($quota);
+           $doctrine->getManager()->flush();
+
+         }
        }
-     }
-     if($create){
-       //Create Admin group
-       $group=new GlobaleUserGroups();
-       $group->setName('Administradores');
-       $group->setCompany($this);
-       $group->setIsadmin(1);
-       $group->setActive(1);
-       $group->setDeleted(0);
-       $group->setDateadd(new \DateTime());
-       $group->setDateupd(new \DateTime());
-       $doctrine->getManager()->persist($group);
-       $doctrine->getManager()->flush();
-
-       //Create Admin User
-       $user=new GlobaleUsers();
-       $user->setName("Administrador");
-       $user->setEmail("admin@".$this->getDomain());
-       $user->setCompany($this);
-       $user->setRoles(["ROLE_USER", "ROLE_ADMIN"]);
-       $user->setPassword('$2y$13$g06ZTdo4bZ6UT3uybO3zjuyB2WPiM.Zxiut3dKU9HGn2A7xC4AdKK');
-       $user->setActive(1);
-       $user->setDeleted(0);
-       $user->setDateadd(new \DateTime());
-       $user->setDateupd(new \DateTime());
-       $doctrine->getManager()->persist($user);
-       $doctrine->getManager()->flush();
-
-       //Add user to admin group
-       $userGroup=new GlobaleUsersUserGroups();
-       $userGroup->setUsergroup($group);
-       $userGroup->setUser($user);
-       $userGroup->setActive(1);
-       $userGroup->setDeleted(0);
-       $userGroup->setDateadd(new \DateTime());
-       $userGroup->setDateupd(new \DateTime());
-       $doctrine->getManager()->persist($userGroup);
-       $doctrine->getManager()->flush();
-
-       //Create disk quota
-       $quota=new GlobaleDiskUsages();
-       $quota->setCompanyown($this);
-       $quota->setDiskspace(52428800); //50MB
-       $quota->setDiskusage(0);
-       $quota->setDistribution("[]");
-       $quota->setActive(1);
-       $quota->setDeleted(0);
-       $quota->setDateadd(new \DateTime());
-       $quota->setDateupd(new \DateTime());
-       $doctrine->getManager()->persist($quota);
-       $doctrine->getManager()->flush();
-
-     }
     }
 
     public function getDeviceuser(): ?string
