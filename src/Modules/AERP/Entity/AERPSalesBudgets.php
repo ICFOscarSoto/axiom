@@ -11,6 +11,7 @@ use \App\Modules\AERP\Entity\AERPFinancialYears;
 use \App\Modules\AERP\Entity\AERPPaymentMethods;
 use \App\Modules\AERP\Entity\AERPSeries;
 use \App\Modules\Globale\Entity\GlobaleCountries;
+use \App\Modules\AERP\Entity\AERPCustomerGroups;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\AERP\Repository\AERPSalesBudgetsRepository")
@@ -55,7 +56,6 @@ class AERPSalesBudgets
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\AERP\Entity\AERPFinancialYears")
-     * @ORM\JoinColumn(nullable=false)
      */
     private $financialyear;
 
@@ -66,15 +66,18 @@ class AERPSalesBudgets
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\AERP\Entity\AERPPaymentMethods")
-     * @ORM\JoinColumn(nullable=false)
      */
     private $paymentmethod;
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\AERP\Entity\AERPSeries")
-     * @ORM\JoinColumn(nullable=false)
      */
     private $serie;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\AERP\Entity\AERPCustomerGroups")
+     */
+    private $customergroup;
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\AERP\Entity\AERPCustomers")
@@ -145,47 +148,52 @@ class AERPSalesBudgets
     /**
      * @ORM\Column(type="boolean")
      */
-    private $irpf;
+    private $irpf=0;
 
     /**
      * @ORM\Column(type="boolean")
      */
-    private $surcharge;
+    private $surcharge=0;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $taxexempt=0;
 
     /**
      * @ORM\Column(type="float")
      */
-    private $totalnet;
+    private $totalnet=0;
 
     /**
      * @ORM\Column(type="float")
      */
-    private $totaldto;
+    private $totaldto=0;
 
     /**
      * @ORM\Column(type="float")
      */
-    private $totalbase;
+    private $totalbase=0;
 
     /**
      * @ORM\Column(type="float")
      */
-    private $totaltax;
+    private $totaltax=0;
 
     /**
      * @ORM\Column(type="float")
      */
-    private $totalsurcharge;
+    private $totalsurcharge=0;
 
     /**
      * @ORM\Column(type="float")
      */
-    private $totalirpf;
+    private $totalirpf=0;
 
     /**
      * @ORM\Column(type="float")
      */
-    private $total;
+    private $total=0;
 
     /**
      * @ORM\Column(type="boolean")
@@ -206,6 +214,7 @@ class AERPSalesBudgets
      * @ORM\Column(type="datetime")
      */
     private $dateupd;
+
 
     public function getId(): ?int
     {
@@ -628,6 +637,30 @@ class AERPSalesBudgets
     public function setTotal(float $total): self
     {
         $this->total = $total;
+
+        return $this;
+    }
+
+    public function getCustomergroup(): ?AERPCustomerGroups
+    {
+        return $this->customergroup;
+    }
+
+    public function setCustomergroup(?AERPCustomerGroups $customergroup): self
+    {
+        $this->customergroup = $customergroup;
+
+        return $this;
+    }
+
+    public function getTaxexempt(): ?bool
+    {
+        return $this->taxexempt;
+    }
+
+    public function setTaxexempt(bool $taxexempt): self
+    {
+        $this->taxexempt = $taxexempt;
 
         return $this;
     }

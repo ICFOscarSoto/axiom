@@ -23,6 +23,8 @@ use App\Modules\AERP\Entity\AERPSeries;
 use App\Modules\AERP\Entity\AERPCustomerGroups;
 use App\Modules\AERP\Entity\AERPSalesBudgets;
 use App\Modules\AERP\Entity\AERPSalesBudgetsLines;
+use App\Modules\AERP\Entity\AERPProducts;
+use App\Modules\AERP\Entity\AERPFinancialYears;
 use App\Modules\Security\Utils\SecurityUtils;
 
 class AERPSalesBudgetsController extends Controller
@@ -43,6 +45,8 @@ class AERPSalesBudgetsController extends Controller
 		$customerGroupsrepository=$this->getDoctrine()->getRepository(AERPCustomerGroups::class);
 		$paymentMethodsrepository=$this->getDoctrine()->getRepository(AERPPaymentMethods::class);
 		$seriesRepository=$this->getDoctrine()->getRepository(AERPSeries::class);
+		$documentRepository=$this->getDoctrine()->getRepository(AERPSalesBudgets::class);
+		$documentLinesRepository=$this->getDoctrine()->getRepository(AERPSalesBudgetsLines::class);
 
 		$userdata=$this->getUser()->getTemplateData();
 		$locale = $request->getLocale();
@@ -97,6 +101,19 @@ class AERPSalesBudgetsController extends Controller
 			$option["text"]=$item->getName();
 			$series[]=$option;
 		}
+		//Recover document from persistence
+		$document=null;
+		$line=new AERPSalesBudgetsLines();
+		if($id!=0){
+			$document=$documentRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$id, "active"=>1,"deleted"=>0]);
+			$documentLines=$documentLinesRepository->findBy(["salesbudget"=>$document, "active"=>1,"deleted"=>0]);
+			$line->setLinenum(count($documentLines)+1);
+			array_push($documentLines, $line);
+		}
+		if($document==null){
+			$document=new AERPSalesBudgets();
+			$documentLines=[$line];
+		}
 
 		$new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-plus"];
 		$breadcrumb=$menurepository->formatBreadcrumb('genericindex','AERP','SalesBudgets');
@@ -104,7 +121,7 @@ class AERPSalesBudgetsController extends Controller
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 			return $this->render('@AERP/salesbudgets.html.twig', [
 				'controllerName' => 'categoriesController',
-				'interfaceName' => 'Sales Budgets',
+				'interfaceName' => 'SalesBudgets',
 				'optionSelected' => 'genericindex',
 				'optionSelectedParams' => ["module"=>"AERP", "name"=>"SalesBudgets"],
 				'menuOptions' =>  $menurepository->formatOptions($userdata),
@@ -115,9 +132,11 @@ class AERPSalesBudgetsController extends Controller
 				'customerGroups' => $customerGroups,
 				'paymentMethods' => $paymentMethods,
 				'series' => $series,
-				'date' => date('d-m-Y'),
-				'enddate' => date('d-m-Y', strtotime(date('d-m-Y'). ' + 30 days')),
-				'id' => $id
+				'date' => ($document->getId()==null)?date('d-m-Y'):$document->getDate()->format('d/m/Y'),
+				'enddate' => ($document->getId()==null)?date('d-m-Y', strtotime(date('d-m-Y'). ' + 30 days')):$document->getDateofferend()->format('d/m/Y'),
+				'id' => $id,
+				'document' => $document,
+				'documentLines' => $documentLines
 				]);
 		}
 		return new RedirectResponse($this->router->generate('app_login'));
@@ -130,27 +149,40 @@ class AERPSalesBudgetsController extends Controller
 	public function data($id, RouterInterface $router,Request $request){
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		$documentRepository=$this->getDoctrine()->getRepository(AERPSalesBudgets::class);
+		$documentLinesRepository=$this->getDoctrine()->getRepository(AERPSalesBudgetsLines::class);
 		$customersRepository=$this->getDoctrine()->getRepository(AERPCustomers::class);
+		$customerGroupsRepository=$this->getDoctrine()->getRepository(AERPCustomerGroups::class);
 		$paymentMethodsRepository=$this->getDoctrine()->getRepository(AERPPaymentMethods::class);
+		$productsRepository=$this->getDoctrine()->getRepository(AERPProducts::class);
 		$seriesRepository=$this->getDoctrine()->getRepository(AERPSeries::class);
 		$taxesRepository=$this->getDoctrine()->getRepository(GlobaleTaxes::class);
 
+		//Get content of the json reques
 		$fields=json_decode($request->getContent());
-		$customer=$customersRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$fields->customerid]);
-		if(!$customer) JsonResponse(["result"=>0]);
+		$customer=$customersRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$fields->customerid, "active"=>1, "deleted"=>0]);
+		if(!$customer) return new JsonResponse(["result"=>0]); //if no customer, do nothing
 
-		$paymentmethod=$paymentMethodsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$fields->paymentmethod]);
+		$paymentmethod=$paymentMethodsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$fields->paymentmethod, "active"=>1, "deleted"=>0]);
 		$serie=$seriesRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$fields->serie]);
+		$customergroup=$customerGroupsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$fields->customergroup, "active"=>1, "deleted"=>0]);
 
-		$document=new AERPSalesBudgets();
+		$document=$documentRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$fields->id, "deleted"=>0]);
+		$date=$fields->date?date_create_from_format("d/m/Y",$fields->date):new \DateTime();
+		if(!$document){
+			$document=new AERPSalesBudgets();
+			$document->setNumber($documentRepository->getNextNum($this->getUser()->getCompany()->getId()));
+			$document->setCode($code='PRE'.$date->format('y').'/'.str_pad($document->getNumber(), 6, '0', STR_PAD_LEFT));
+			$document->setAuthor($this->getUser());
+			$document->setAgent($this->getUser());
+			$document->setActive(1);
+			$document->setDeleted(0);
+			$document->setDateadd(new \DateTime());
+		}
 		$document->setCompany($this->getUser()->getCompany());
-		$document->setAuthor($this->getUser());
-		$document->setAgent($this->getUser());
-		$document->setNumber($documentRepository->getNextNum($this->getUser()->getCompany()->getId()));
-		$document->setCurrency(null);
-		$document->setCode($code='PRE-'.'-'.str_pad($document->getNumber(), 8, '0', STR_PAD_LEFT));
+		$document->setCurrency($this->getUser()->getCompany()->getCurrency());
 		$document->setPaymentmethod($paymentmethod);
 		$document->setSerie($serie);
+		$document->setCustomergroup($customergroup);
 		$document->setCustomer($customer);
 		$document->setVat($customer->getVat());
 		$document->setCustomername($customer->getName());
@@ -160,19 +192,59 @@ class AERPSalesBudgetsController extends Controller
 		$document->setCustomerstate($customer->getState());
 		$document->setCustomerpostcode($customer->getPostcode());
 		$document->setCustomerpostbox($customer->getPostbox());
-		$document->setCustomercode($customer->getCode());
-
-		$document->setDate($fields->date?date_create_from_format("d/m/Y",$fields->date):null);
+		$document->setCustomercode($fields->customercode);
+		$document->setDate($date);
 		$document->setDateofferend($fields->dateofferend?date_create_from_format("d/m/Y",$fields->dateofferend):null);
-
-		//if($paymentmethod)
-
-
+		$document->setTaxexempt(($fields->taxexempt!="")?filter_var($fields->taxexempt, FILTER_VALIDATE_BOOLEAN):0);
+		$document->setSurcharge(($fields->surcharge!="")?filter_var($fields->surcharge, FILTER_VALIDATE_BOOLEAN):0);
+		$document->setIrpf(($fields->irpf!="")?filter_var($fields->irpf, FILTER_VALIDATE_BOOLEAN):0);
+		$document->setTotalnet(floatval($fields->totalnet));
+		$document->setTotalbase(floatval($fields->totalnet-$fields->totaldto));
+		$document->setTotaldto(floatval($fields->totaldto));
+		$document->setTotaltax(floatval($fields->totaltax));
+		$document->setTotalsurcharge(floatval($fields->totalsurcharge));
+		$document->setTotalirpf(floatval($fields->totalirpf));
+		$document->setTotal(floatval($fields->total));
+		$document->setDateupd(new \DateTime());
+		$this->getDoctrine()->getManager()->persist($document);
+		$this->getDoctrine()->getManager()->flush();
+		$linenumIds=[];
+	
 		foreach ($fields->lines as $key => $value) {
-
+			$line=$documentLinesRepository->findOneBy(["salesbudget"=>$document, "id"=>$value->id, "active"=>1, "deleted"=>0]);
+			$product=$productsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$value->productid, "active"=>1, "deleted"=>0]);
+			//if(!$product) continue;
+			if($value->code=="") continue;
+			if(!$line){
+				$line=new AERPSalesBudgetsLines();
+				$line->setSalesbudget($document);
+				$line->setActive(1);
+				$line->setDeleted(0);
+				$line->setDateadd(new \DateTime());
+			}
+				$line->setLinenum($value->linenum);
+				$line->setProduct($product);
+				$line->setCode($value->code);
+				$line->setName($value->name);
+				$line->setUnitprice(floatval($value->unitprice));
+				$line->setQuantity(floatval($value->quantity));
+				$line->setDtoperc(floatval($value->disccountperc));
+				$line->setDtounit(floatval($value->disccountunit));
+				$line->setTaxperc(floatval($value->taxperc));
+				$line->setTaxunit(floatval($value->taxunit));
+				$line->setSurchargeperc(floatval($value->surchargeperc));
+				$line->setSurchargeunit(floatval($value->surchargeunit));
+				$line->setSubtotal(floatval($value->subtotal));
+				$line->setTotal(floatval($value->total));
+				$line->setDateupd(new \DateTime());
+				$this->getDoctrine()->getManager()->persist($line);
+				$this->getDoctrine()->getManager()->flush();
+				$linenumIds[]=["linenum"=>$value->linenum, "id"=>$line->getId()];
 		}
+
 		dump($document);
-		return new JsonResponse(["result"=>1]);
+		return new JsonResponse(["result"=>1,"data"=>["id"=>$document->getId(), "code"=>$document->getCode(), "date"=>$date->format('d/m/Y'), "lines"=>$linenumIds]]);
+		//return new JsonResponse(["result"=>1]);
 	}
 
 }

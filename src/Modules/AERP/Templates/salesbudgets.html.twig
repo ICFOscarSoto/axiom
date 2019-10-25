@@ -11,7 +11,7 @@
 	<link rel="stylesheet" href="{{ url('index') }}/js/jvectormap/jquery-jvectormap-1.2.2.css">
 	<link rel="stylesheet" href="{{ url('index') }}/js/rickshaw/rickshaw.min.css">
 {% endblock %}
-<title>{% block title %}{{ interfaceName }}{% endblock %}</title>
+<title>{% block title %}{{ interfaceName|trans }}{% endblock %}</title>
 <body class="page-body" data-url="{{ url('indexAdmin') }}">
 <div class="page-container"><!-- add class "sidebar-collapsed" to close sidebar by default, "chat-visible" to make chat appear always -->
 	{{ include('@Globale/sidebar_menu.html.twig') }}
@@ -33,16 +33,17 @@
 					<div class="row">
 						<div class="col-md-2">
 							<div class="input-group">
-								<input type="text" id="customer-form-code" class="form-control" placeholder="Cod. Cliente">
+								<input type="text" id="customer-form-code" value="{% if document.customer!=null %}{{ document.customer.code }}{% endif %}" class="form-control" placeholder="Cod. Cliente">
 									<div class="input-group-btn">
 										<button type="button" id="customer-search-button" class="btn btn-white" style="height: 31px;" data-toggle="modal" data-target="#customer-search-modal-form">
 											 	<i class="fa fa-search"></i> </button>
 									</div>
 							</div>
 						</div>
-						<input type="hidden" id="customer-form-id" class="form-control">
-						<input type="hidden" id="customer-form-taxexempt" value="false" class="form-control">
-						<input type="hidden" id="customer-form-surcharge" value="false" class="form-control">
+						<input type="hidden" id="customer-form-id" class="form-control" value="{% if document.customer!=null %}{{ document.customer.id }}{% endif %}">
+						<input type="hidden" id="customer-form-irpf" value="{% if document.irpf %}true{% else %}false{% endif %}" class="form-control">
+						<input type="hidden" id="customer-form-taxexempt" value="{% if document.taxexempt %}true{% else %}false{% endif %}" class="form-control">
+						<input type="hidden" id="customer-form-surcharge" value="{% if document.surcharge %}true{% else %}false{% endif %}" class="form-control">
 						<div class="col-md-6"> <div class="form-group">
 							<span id="customer-form-view" class="select2-selection__view_nolabel" style="" attr-id=0 attr-url="{{ url('formAERPCustomer',{'id':'_____'}) }}"><i class="fa fa-file-text-o" aria-hidden="true"></i><span>&nbsp;Ver Ficha</span></span>
 							<script>
@@ -56,16 +57,14 @@
 									}
 							});
 							</script>
-							<input type="text" id="customer-form-name" class="form-control" placeholder="Nombre cliente" disabled> </div> </div>
-						<div class="col-6 col-md-2"> <div class="form-group"> <input type="text" id="customer-form-vat" class="form-control" placeholder="CIF" disabled> </div> </div>
+							<input type="text" id="customer-form-name" class="form-control" placeholder="Nombre cliente" value="{{ document.customername }}" disabled> </div> </div>
+						<div class="col-6 col-md-2"> <div class="form-group"> <input type="text" id="customer-form-vat" value="{{ document.vat }}" class="form-control" placeholder="CIF" disabled> </div> </div>
 						<div class="col-6 col-md-2"> <div class="form-group">
-						<input type="hidden" id="customer-form-customergroup" class="form-control">
+						<input type="hidden" id="customer-form-customergroup" value="" class="form-control">
 						<select type="text" id="customer-form-customergroup-select"  class="form-control select2">
-
 							{% for option in customerGroups %}
-								<option value="{{ option.id }}">{{ option.text }}</option>
+								<option value="{{ option.id }}" {% if document.customergroup!=null and option.id==document.customergroup.id %} selected="selected" {% endif %}>{{ option.text }}</option>
 							{% endfor %}
-
 						</select>
 						</div> </div>
 					</div>
@@ -75,14 +74,14 @@
 			<div class="panel panel-primary panel-shadow" data-collapsed="0" style="-webkit-box-shadow: none; box-shadow:none; padding:0px; margin-bottom: -1px;"><!-- to apply shadow add class "panel-shadow" -->
 				<div class="panel-body">
 					<div class="row">
-						<div class="col-6 col-sm-2"> <div class="input-group"> <span class="input-group-addon"><i class="fa fa-hashtag"></i></span><input type="hidden" id="document-form-id" class="form-control"><input type="text" id="document-form-code" class="form-control" placeholder="N. Documento" disabled> </div></div>
+						<div class="col-6 col-sm-2"> <div class="input-group"> <span class="input-group-addon"><i class="fa fa-hashtag"></i></span><input type="hidden" id="document-form-id" value="{{ document.id }}" class="form-control"><input type="text" id="document-form-code" value="{{ document.code }}" class="form-control" placeholder="N. Documento" disabled> </div></div>
 						<div class="col-6 col-sm-2"> <div class="input-group"> <span class="input-group-addon"><i class="fa fa-calendar"></i></span> <input type="text" id="document-form-date" class="form-control datepicker" style="z-index:99 !important;" placeholder="Fecha" value="{{ date }}"></div></div>
 						<div class="col-6 col-sm-2"> <div class="input-group"> <span class="input-group-addon"><i class="fa fa-calendar"></i></span> <input type="text" id="document-form-dateofferend" class="form-control datepicker" style="z-index:99 !important;" placeholder="Fin oferta" value="{{ enddate }}"></div></div>
-						<div class="col-6 col-sm-2"> <div class="input-group"> <span class="input-group-addon"><i class="fa fa-hashtag"></i></span> <input type="text" id="document-form-customercode" class="form-control" placeholder="Su referencia"> </div> </div>
+						<div class="col-6 col-sm-2"> <div class="input-group"> <span class="input-group-addon"><i class="fa fa-hashtag"></i></span> <input type="text" id="document-form-customercode" class="form-control" placeholder="Su referencia" value="{{ document.customercode }}"> </div> </div>
 						<div class="col-6 col-sm-2"> <div class="form-group">
 							<select type="text"  id="document-form-series-select" class="form-control select2">
 								{% for option in series %}
-									<option value="{{ option.id }}">{{ option.text }}</option>
+									<option value="{{ option.id }}" {% if document.serie!=null and option.id==document.serie.id %} selected="selected" {% endif %}>{{ option.text }}</option>
 								{% endfor %}
 							</select>
 						</div> </div>
@@ -90,7 +89,7 @@
 							<input type="hidden" id="customer-form-paymentmethod" class="form-control">
 							<select type="text" id="customer-form-paymentmethod-select" class="form-control select2">
 								{% for option in paymentMethods %}
-									<option value="{{ option.id }}">{{ option.text }}</option>
+									<option value="{{ option.id }}" {% if document.paymentmethod!=null and option.id==document.paymentmethod.id %} selected="selected" {% endif %}>{{ option.text }}</option>
 								{% endfor %}
 							</select>
 						</div> </div>
@@ -100,7 +99,7 @@
 			</div>
 
 			<div class="panel panel-primary panel-shadow" data-collapsed="0" style="-webkit-box-shadow: none; box-shadow:none;min-height:200px"><!-- to apply shadow add class "panel-shadow" -->
-				<div class="panel-body" style="padding: 0px !important;" id="document-lines" attr-numlines="1">
+				<div class="panel-body" style="padding: 0px !important;" id="document-lines" attr-numlines="{{ documentLines|length }}">
 
 					<div class="row no-gutters documents-products-header">
 						<div class="col-sm-2 d-none d-sm-block">Cod. Producto</div>
@@ -113,32 +112,35 @@
 						<div class="col-sm-2 d-none d-sm-block">Subtotal</div>
 					</div>
 
-					<div class="row no-gutters" attr-id="1" id="document-line-1">
-						<div class="col-2 d-block d-sm-none" style="top: 8px;">Cod. Prod.</div>
-						<div class="col-10 col-sm-2">
-							<div class="form-group" style="margin-bottom: 0px;">
-								<div class="input-group" >
-									<a class="btn btn-white" attr-id="1" id="product-form-remove-1" style="position: absolute;height: 31px;left: 0px;padding: 9px 7px;z-index: 10;" href="#"> <i class="fa fa-remove"></i></a>
-									<input type="hidden" attr-id="1" id="product-form-id-1"><input type="text" attr-id="1" id="product-form-code-1" class="form-control" style="padding-left: 28px; border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Cod. Producto">
-									<div class="input-group-btn"><button type="button" attr-id="1" id="product-search-button-1" class="btn btn-white" style="height: 31px; border-radius: 0px;"><i class="fa fa-search"></i> </button></div>
+					{% for line in  documentLines %}
+						<div class="row no-gutters" attr-id="{{ line.linenum }}" id="document-line-{{ line.linenum }}">
+							<div class="col-2 d-block d-sm-none" style="top: 8px;">Cod. Prod.</div>
+							<div class="col-10 col-sm-2">
+								<div class="form-group" style="margin-bottom: 0px;">
+									<div class="input-group" >
+										<a class="btn btn-white" attr-id="{{ line.linenum }}" id="product-form-remove-{{ line.linenum }}" style="position: absolute;height: 31px;left: 0px;padding: 9px 7px;z-index: 10;" href="#"> <i class="fa fa-remove"></i></a>
+										<input type="hidden" attr-id="{{ line.linenum }}" id="product-form-line-id-{{ line.linenum }}" value={% if line!=null %}{{ line.id }}{% endif %}><input type="hidden" attr-id="{{ line.linenum }}" id="product-form-id-{{ line.linenum }}" value={% if line.product!=null %}{{ line.product.id }}{% endif %}><input type="text" attr-id="{{ line.linenum }}" id="product-form-code-{{ line.linenum }}" class="form-control" style="padding-left: 28px; border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Cod. Producto" value="{{ line.code }}">
+										<div class="input-group-btn"><button type="button" attr-id="{{ line.linenum }}" id="product-search-button-{{ line.linenum }}" class="btn btn-white" style="height: 31px; border-radius: 0px;"><i class="fa fa-search"></i> </button></div>
+									</div>
 								</div>
 							</div>
+							<div class="col-2 d-block d-sm-none" style="top: 8px;">Nombre</div>
+							<div class="col-10 col-sm-3"> <div class="form-group" style="margin-bottom: 0px;"> <input type="text" id="product-form-name-{{ line.linenum }}" class="form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Nombre" value="{{ line.name }}"> </div> </div>
+							<div class="col-2 d-block d-sm-none" style="top: 8px;">Precio</div>
+							<div class="col-4 col-sm-1"> <div class="form-group" style="margin-bottom: 0px;"> <span class="input__unity_nolabel "><span>€</span></span><input type="text" attr-id="{{ line.linenum }}" id="product-form-price-{{ line.linenum }}" class="recalculate form-control number-type input_parent__unity" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Precio" value={{ line.unitprice }}> </div> </div>
+							<div class="col-2 d-block d-sm-none" style="top: 8px;left: 5px;">Cantidad</div>
+							<div class="col-4 col-sm-1"> <div class="form-group" style="margin-bottom: 0px;"> <input type="hidden" attr-id="{{ line.linenum }}" value={{ line.unitprice * line.quantity }} id="product-form-base-total-{{ line.linenum }}"><input type="text" attr-id="{{ line.linenum }}" id="product-form-quantity-{{ line.linenum }}" class="recalculate form-control number-type" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Cantidad" value={{ line.quantity }}> </div> </div>
+							<div class="col-2 d-block d-sm-none" style="top: 8px;">Dto.</div>
+							<div class="col-4 col-sm-1"> <div class="form-group" style="margin-bottom: 0px;"> <span class="input__unity_nolabel "><span>%</span></span><input type="hidden" attr-id="{{ line.linenum }}" id="product-form-disccount-total-{{ line.linenum }}" value={{ line.dtounit }}><input type="text" attr-id="{{ line.linenum }}" id="product-form-disccount-{{ line.linenum }}" class="recalculate form-control number-type input_parent__unity" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Dto" value={{ line.dtoperc }}> </div> </div>
+							<div class="col-2 d-block d-sm-none" style="top: 8px;left: 5px;">IVA</div>
+							<div class="col-4 col-sm-1"> <div class="form-group" style="margin-bottom: 0px;"> <span class="input__unity_nolabel "><span>%</span></span><input type="hidden" attr-id="{{ line.linenum }}" id="product-form-tax-total-{{ line.linenum }}" value={{ line.taxunit }}><input type="text" attr-id="{{ line.linenum }}" id="product-form-tax-{{ line.linenum }}" class="recalculate form-control number-type input_parent__unity" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="IVA" value={{ line.taxperc }}> </div> </div>
+							<div class="col-2 d-block d-sm-none" style="top: 8px;">R.E.</div>
+							<div class="col-4 col-sm-1"> <div class="form-group" style="margin-bottom: 0px;"> <span class="input__unity_nolabel "><span>%</span></span><input type="hidden" attr-id="{{ line.linenum }}" value=0  id="product-form-surcharge-perc-{{ line.linenum }}"><input type="hidden" attr-id="{{ line.linenum }}" id="product-form-surcharge-total-{{ line.linenum }}" value={{ line.surchargeunit }}><input type="text" attr-id="{{ line.linenum }}" id="product-form-surcharge-{{ line.linenum }}" class="recalculate form-control number-type input_parent__unity" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Recargo" value={{ line.surchargeperc }}> </div> </div>
+							<div class="col-2 d-block d-sm-none" style="top: 8px;left: 5px;">Subtotal</div>
+							<div class="col-4 col-sm-2"> <div class="form-group" style="margin-bottom: 0px;"> <span class="input__unity_nolabel "><span>€</span></span><input type="text" attr-id="{{ line.linenum }}" id="product-form-amount-{{ line.linenum }}" class="form-control number-type input_parent__unity" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="TOTAL" disabled value={{ line.total }}></div> </div>
 						</div>
-						<div class="col-2 d-block d-sm-none" style="top: 8px;">Nombre</div>
-						<div class="col-10 col-sm-3"> <div class="form-group" style="margin-bottom: 0px;"> <input type="text" id="product-form-name-1" class="form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Nombre"> </div> </div>
-						<div class="col-2 d-block d-sm-none" style="top: 8px;">Precio</div>
-						<div class="col-4 col-sm-1"> <div class="form-group" style="margin-bottom: 0px;"> <span class="input__unity_nolabel "><span>€</span></span><input type="text" attr-id="1" id="product-form-price-1" class="recalculate form-control number-type input_parent__unity" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Precio"> </div> </div>
-						<div class="col-2 d-block d-sm-none" style="top: 8px;left: 5px;">Cantidad</div>
-						<div class="col-4 col-sm-1"> <div class="form-group" style="margin-bottom: 0px;"> <input type="hidden" attr-id="1" value=0 id="product-form-base-total-1"><input type="text" attr-id="1" id="product-form-quantity-1" class="recalculate form-control number-type" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Cantidad" value=1> </div> </div>
-						<div class="col-2 d-block d-sm-none" style="top: 8px;">Dto.</div>
-						<div class="col-4 col-sm-1"> <div class="form-group" style="margin-bottom: 0px;"> <span class="input__unity_nolabel "><span>%</span></span><input type="hidden" attr-id="1" id="product-form-disccount-total-1"><input type="text" attr-id="1" id="product-form-disccount-1" class="recalculate form-control number-type input_parent__unity" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Dto" value=0> </div> </div>
-						<div class="col-2 d-block d-sm-none" style="top: 8px;left: 5px;">IVA</div>
-						<div class="col-4 col-sm-1"> <div class="form-group" style="margin-bottom: 0px;"> <span class="input__unity_nolabel "><span>%</span></span><input type="hidden" attr-id="1" id="product-form-tax-total-1"><input type="text" attr-id="1" id="product-form-tax-1" class="recalculate form-control number-type input_parent__unity" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="IVA"> </div> </div>
-						<div class="col-2 d-block d-sm-none" style="top: 8px;">R.E.</div>
-						<div class="col-4 col-sm-1"> <div class="form-group" style="margin-bottom: 0px;"> <span class="input__unity_nolabel "><span>%</span></span><input type="hidden" attr-id="1" value=0  id="product-form-surcharge-perc-1"><input type="hidden" attr-id="1" id="product-form-surcharge-total-1"><input type="text" attr-id="1" id="product-form-surcharge-1" class="recalculate form-control number-type input_parent__unity" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Recargo" value=0> </div> </div>
-						<div class="col-2 d-block d-sm-none" style="top: 8px;left: 5px;">Subtotal</div>
-						<div class="col-4 col-sm-2"> <div class="form-group" style="margin-bottom: 0px;"> <span class="input__unity_nolabel "><span>€</span></span><input type="text" attr-id="1" id="product-form-amount-1" class="form-control number-type input_parent__unity" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="TOTAL" disabled value=0></div> </div>
-					</div>
+					{% endfor %}
+
 				</div>
 			</div>
 			<div class="panel panel-primary panel-shadow" data-collapsed="0" style="-webkit-box-shadow: none; box-shadow:none;"><!-- to apply shadow add class "panel-shadow" -->
@@ -146,44 +148,44 @@
 					<div class="row">
 						<div class="col-4 col-sm-2">
 							<div class="form-group">
-								<label for="totals_form_amount">Importe</label>
+								<label for="totals_form_net">Importe</label>
 								<span id="unity-view-formProducts-price" class="input__unity"><span>€</span></span>
-								<input type="text" id="totals_form_amount" maxlength="150" class="number-type input_parent__unity form-control" value=0 disabled>
+								<input type="text" id="totals_form_net" maxlength="150" class="number-type input_parent__unity form-control" value={{ document.totalnet }} disabled>
 							</div>
 						</div>
 						<div class="col-4 col-sm-2">
 							<div class="form-group">
 								<label for="totals_form_dto">Descuento</label>
 								<span id="unity-view-formProducts-price" class="input__unity"><span>€</span></span>
-								<input type="text" id="totals_form_dto" maxlength="150" class="number-type input_parent__unity form-control" value=0 disabled>
+								<input type="text" id="totals_form_dto" maxlength="150" class="number-type input_parent__unity form-control" value={{ document.totaldto }} disabled>
 							</div>
 						</div>
 						<div class="col-4 col-sm-2">
 							<div class="form-group">
 								<label for="totals_form_tax">Total IVA</label>
 								<span id="unity-view-formProducts-price" class="input__unity"><span>€</span></span>
-								<input type="text" id="totals_form_tax" maxlength="150" class="number-type input_parent__unity form-control" value=0 disabled>
+								<input type="text" id="totals_form_tax" maxlength="150" class="number-type input_parent__unity form-control" value={{ document.totaltax }} disabled>
 							</div>
 						</div>
 						<div class="col-4 col-sm-2">
 							<div class="form-group">
 								<label for="totals_form_surcharge">Total R.E.</label>
 								<span id="unity-view-formProducts-price" class="input__unity"><span>€</span></span>
-								<input type="text" id="totals_form_surcharge" maxlength="150" class="number-type input_parent__unity form-control" value=0 disabled>
+								<input type="text" id="totals_form_surcharge" maxlength="150" class="number-type input_parent__unity form-control" value={{ document.totalsurcharge }} disabled>
 							</div>
 						</div>
 						<div class="col-4 col-sm-2">
 							<div class="form-group">
 								<label for="totals_form_irpf">IRPF</label>
 								<span id="unity-view-formProducts-price" class="input__unity"><span>€</span></span>
-								<input type="text" id="totals_form_irpf" maxlength="150" class="number-type input_parent__unity form-control" value=0 disabled>
+								<input type="text" id="totals_form_irpf" maxlength="150" class="number-type input_parent__unity form-control" value={{ document.totalirpf }} disabled>
 							</div>
 						</div>
 						<div class="col-4 col-sm-2">
 							<div class="form-group">
 								<label for="totals_form_total">TOTAL</label>
 								<span id="unity-view-formProducts-price" class="input__unity"><span>€</span></span>
-								<input type="text" id="totals_form_total" maxlength="150" class="number-type input_parent__unity form-control" value=0 disabled>
+								<input type="text" id="totals_form_total" maxlength="150" class="number-type input_parent__unity form-control" value={{ document.total }} disabled>
 							</div>
 						</div>
 
@@ -246,7 +248,7 @@
 				'		<div class="form-group" style="margin-bottom: 0px;">'+
 				'			<div class="input-group" >'+
 				'				<a class="btn btn-white" attr-id="'+numLines+'" id="product-form-remove-'+numLines+'" style="position: absolute;height: 31px;left: 0px;padding: 9px 7px;z-index: 10;" href="#"> <i class="fa fa-remove"></i></a>'+
-				'				<input type="hidden" attr-id="'+numLines+'" id="product-form-id-'+numLines+'"><input type="text" attr-id="'+numLines+'" id="product-form-code-'+numLines+'" class="form-control" style="padding-left: 28px; border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Cod. Producto">'+
+				'				<input type="hidden" attr-id="'+numLines+'" id="product-form-line-id-'+numLines+'"><input type="hidden" attr-id="'+numLines+'" id="product-form-id-'+numLines+'"><input type="text" attr-id="'+numLines+'" id="product-form-code-'+numLines+'" class="form-control" style="padding-left: 28px; border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Cod. Producto">'+
 				'				<div class="input-group-btn"><button type="button" attr-id="'+numLines+'" id="product-search-button-'+numLines+'" class="btn btn-white" style="height: 31px; border-radius: 0px;"><i class="fa fa-search"></i> </button></div>'+
 				'			</div>'+
 				'		</div>'+
@@ -273,16 +275,20 @@
 				var documentLines=$("#document-lines");
 				var numLines=parseInt(documentLines.attr("attr-numlines"));
 				if(numLines!=numLine){
-					 $("#document-line-"+numLine).remove();
-					 documentLines.attr("attr-numlines",numLines);
+					 //$("#document-line-"+numLine).remove();
+					 $("#document-line-"+numLine).addClass("deleted");
+					 $("#document-line-"+numLine).fadeOut();
+					 $("#document-line-"+numLine).attr("id","document-line-3-deleted");
+					 //documentLines.attr("attr-numlines",numLines);
 					 numerateLines();
+					 recalculateDocument();
 				}
 			}
 
 			function recalculateDocument(){
 				var i=0;
 				var documentLines=$("#document-lines");
-				$("[id^='document-line-']").each(function() {
+				$("[id^='document-line-']:not(.deleted)").each(function() {
 					productSearch($(this).attr("attr-id"), $("#product-form-code-"+$(this).attr("attr-id")).val(), productFields, productSearchfields);
 				});
 			}
@@ -290,7 +296,7 @@
 			function numerateLines(){
 				var i=0;
 				var documentLines=$("#document-lines");
-				$("[id^='document-line-']").each(function() {
+				$("[id^='document-line-']:not(.deleted)").each(function() {
 						i++;
 						$("#product-form-id-"+$(this).attr("attr-id")).attr("attr-id",i);
 						$("#product-form-id-"+$(this).attr("attr-id")).attr("id","product-form-id-"+i);
@@ -349,7 +355,7 @@
 				$("[id^='product-form-tax-total-']").each(function() {	taxtotal+=parseFloat($(this).val()); });
 				$("[id^='product-form-surcharge-total-']").each(function() {	surchargetotal+=parseFloat($(this).val()); });
 				$("[id^='product-form-amount-']").each(function() {	total+=parseFloat($(this).val()); });
-				$("#totals_form_amount").val(base.toFixed(2));
+				$("#totals_form_net").val(base.toFixed(2));
 				$("#totals_form_dto").val(disccounttotal.toFixed(2));
 				$("#totals_form_tax").val(taxtotal.toFixed(2));
 				$("#totals_form_surcharge").val(surchargetotal.toFixed(2));
@@ -515,10 +521,10 @@
 
 
 					{# DOCUMENT SAVE #}
-					var documentFields = new Object();
-					var lines=[];
-					$('body').on('click', "#document-button-save", function(e) {
 
+					$('body').on('click', "#document-button-save", function(e) {
+						var documentFields = new Object();
+						var lines=[];
 						documentFields.id=$("#document-form-id").val();
 						documentFields.code=$("#document-form-code").val();
 						documentFields.date=$("#document-form-date").val();
@@ -528,11 +534,23 @@
 						documentFields.customercode=$("#document-form-customercode").val();
 						documentFields.customerid=$("#customer-form-id").val();
 						documentFields.customergroup=$("#customer-form-customergroup-select").val();
+						documentFields.irpf=$("#customer-form-irpf").val();
+						documentFields.surcharge=$("#customer-form-surcharge").val();
+						documentFields.taxexempt=$("#customer-form-taxexempt").val();
+						documentFields.totalnet=$("#totals_form_net").val();
+						documentFields.totaldto=$("#totals_form_dto").val();
+						documentFields.totaltax=$("#totals_form_tax").val();
+						documentFields.totalsurcharge=$("#totals_form_surcharge").val();
+						documentFields.totalirpf=$("#totals_form_irpf").val();
+						documentFields.total=$("#totals_form_total").val();
 
 						$("[id^='document-line-']").each(function() {
 							var line = new Object();
-							line.id=$("#product-form-id-"+$(this).attr("attr-id")).val();
+							line.id=$("#product-form-line-id-"+$(this).attr("attr-id")).val();
+							line.linenum=$(this).attr("attr-id");
+							line.productid=$("#product-form-id-"+$(this).attr("attr-id")).val();
 							line.code=$("#product-form-code-"+$(this).attr("attr-id")).val();
+							line.name=$("#product-form-name-"+$(this).attr("attr-id")).val();
 							line.unitprice=$("#product-form-price-"+$(this).attr("attr-id")).val();
 							line.quantity=$("#product-form-quantity-"+$(this).attr("attr-id")).val();
 							line.disccountperc=$("#product-form-disccount-"+$(this).attr("attr-id")).val();
@@ -555,8 +573,13 @@
 			         success:  function( data ) {
 								 if((--load_wait)==0) $("#load-spinner").fadeOut();
 			           if(data.result){
+									 $("#document-form-id").val(data.data.id);
+									 $("#document-form-code").val(data.data.code);
+									 $("#document-form-date").val(data.data.date);
+									 jQuery.each(data.data.lines, function(i, line) {
+										 $("#product-form-line-id-"+line.linenum).val(line.id);
+									 });
 									 toastr.success("Documento guardado correctamente", "Confirmación", confirmation);
-
 			           } else {
 									 toastr.error("No se pudo guardar el documento", "Confirmación", confirmation);
 								 }

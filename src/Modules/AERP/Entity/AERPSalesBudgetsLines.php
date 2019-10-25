@@ -26,9 +26,14 @@ class AERPSalesBudgetsLines
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\AERP\Entity\AERPProducts")
-     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
+     * @ORM\JoinColumn(nullable=true, onDelete="CASCADE")
      */
     private $product;
+
+    /**
+     * @ORM\Column(type="string", length=125, nullable=true)
+     */
+    private $name;
 
     /**
      * @ORM\Column(type="float")
@@ -38,7 +43,17 @@ class AERPSalesBudgetsLines
     /**
      * @ORM\Column(type="float")
      */
-    private $quantity;
+    private $quantity=1;
+
+    /**
+     * @ORM\Column(type="float")
+     */
+    private $dtoperc=0;
+
+    /**
+     * @ORM\Column(type="float")
+     */
+    private $dtounit=0;
 
     /**
      * @ORM\Column(type="float")
@@ -63,12 +78,12 @@ class AERPSalesBudgetsLines
     /**
      * @ORM\Column(type="float")
      */
-    private $subtotal;
+    private $subtotal=0;
 
     /**
      * @ORM\Column(type="float")
      */
-    private $total;
+    private $total=0;
 
     /**
      * @ORM\Column(type="boolean")
@@ -89,6 +104,17 @@ class AERPSalesBudgetsLines
      * @ORM\Column(type="datetime")
      */
     private $dateupd;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $linenum=1;
+
+    /**
+     * @ORM\Column(type="string", length=20)
+     */
+    private $code;
+
 
     public function getId(): ?int
     {
@@ -259,6 +285,66 @@ class AERPSalesBudgetsLines
     public function setDateupd(\DateTimeInterface $dateupd): self
     {
         $this->dateupd = $dateupd;
+
+        return $this;
+    }
+
+    public function getLinenum(): ?int
+    {
+        return $this->linenum;
+    }
+
+    public function setLinenum(int $linenum): self
+    {
+        $this->linenum = $linenum;
+
+        return $this;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(?string $name): self
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    public function getDtoperc(): ?float
+    {
+        return $this->dtoperc;
+    }
+
+    public function setDtoperc(float $dtoperc): self
+    {
+        $this->dtoperc = $dtoperc;
+
+        return $this;
+    }
+
+    public function getDtounit(): ?float
+    {
+        return $this->dtounit;
+    }
+
+    public function setDtounit(float $dtounit): self
+    {
+        $this->dtounit = $dtounit;
+
+        return $this;
+    }
+
+    public function getCode(): ?string
+    {
+        return $this->code;
+    }
+
+    public function setCode(string $code): self
+    {
+        $this->code = $code;
 
         return $this;
     }
