@@ -18,69 +18,164 @@ class ERPOfferPricesRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, ERPOfferPrices::class);
     }
-    
-  
-    public function validOffer($id,$customer, $quantity, $start){
-        if($quantity==NULL) $qty=1;
-        else $qty=$quantity;
-        $date=$start->format("Y-m-d");
-        if($id==NULL)
-        {
-          if($customer!=NULL)
-          {
-            $query="SELECT * FROM erpoffer_prices o WHERE o.customer_id=:CUST AND o.quantity=:QTY AND (o.end>STR_TO_DATE(:date, '%Y-%m-%d') OR o.end IS NULL) AND o.start<STR_TO_DATE(:date, '%Y-%m-%d') AND o.active=1 AND o.deleted=0";
-            $params=['CUST' => $customer->getId(),
-                      'QTY' => $qty,
-                     'date' => $date];
+
+
+    public function validOffer($id, $product, $customer, $quantity, $start, $end){
+      if($quantity==NULL) $qty=1;
+      else $qty=$quantity;
+      $date_start=$start->format("Y-m-d");
+      if($end!=NULL){
+        $date_end=$end->format("Y-m-d");
+        if($id==NULL){
+          if($customer!=NULL){
+            $query="SELECT * FROM erpoffer_prices o WHERE o.product_id=:PROD AND o.customer_id=:CUST AND o.quantity=:QTY AND
+            ((DATE(:DATE_START) BETWEEN DATE(START) AND DATE(END))
+            OR (DATE(:DATE_END) BETWEEN DATE(START) AND DATE(END))
+            OR (DATE(START)<DATE(:DATE_END) AND DATE(END) IS NULL)
+            OR (DATE(START)<DATE(:DATE_END) AND DATE(END)<DATE(:DATE_END)))
+            AND o.active=1 AND o.deleted=0";
+            $params=['PROD' => $product->getId(),
+            'CUST' => $customer->getId(),
+            'QTY' => $qty,
+            'DATE_START' => $date_start,
+            'DATE_END' => $date_end];
             $result=$this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
             if($result!=NULL) return true;
             else return false;
           }
           else{
-            $query="SELECT * FROM erpoffer_prices o WHERE o.customer_id IS NULL AND o.quantity=:QTY AND (o.end>STR_TO_DATE(:date, '%Y-%m-%d') OR o.end IS NULL) AND o.start<STR_TO_DATE(:date, '%Y-%m-%d')  AND o.active=1 AND o.deleted=0";
-            $params=['QTY' => $qty,
-                     'date' => $date];
+            $query="SELECT * FROM erpoffer_prices o WHERE o.product_id=:PROD AND o.customer_id IS NULL AND o.quantity=:QTY AND
+            ((DATE(:DATE_START) BETWEEN DATE(START) AND DATE(END))
+            OR (DATE(:DATE_END) BETWEEN DATE(START) AND DATE(END))
+            OR (DATE(START)<DATE(:DATE_END) AND DATE(END) IS NULL)
+            OR (DATE(START)<DATE(:DATE_END) AND DATE(END)<DATE(:DATE_END)))
+            AND o.active=1 AND o.deleted=0";
+            $params=[
+            'PROD' => $product->getId(),
+            'QTY' => $qty,
+            'DATE_START' => $date_start,
+            'DATE_END' => $date_end];
             $result=$this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
             if($result!=NULL) return true;
             else return false;
           }
         }
         else{
-          if($customer!=NULL)
-          {
-            $query="SELECT * FROM erpoffer_prices o WHERE o.id!=:ID AND o.customer_id=:CUST AND o.quantity=:QTY AND (o.end>STR_TO_DATE(:date, '%Y-%m-%d') OR o.end IS NULL) AND o.start<STR_TO_DATE(:date, '%Y-%m-%d')  AND o.active=1 AND o.deleted=0";
-            $params=['ID' => $id,
-                      'CUST' => $customer->getId(),
-                      'QTY' => $qty,
-                     'date' => $date];
+          if($customer!=NULL){
+            $query="SELECT * FROM erpoffer_prices o WHERE o.product_id=:PROD AND o.id!=:ID AND o.customer_id=:CUST AND o.quantity=:QTY AND
+            ((DATE(:DATE_START) BETWEEN DATE(START) AND DATE(END))
+            OR (DATE(:DATE_END) BETWEEN DATE(START) AND DATE(END))
+            OR (DATE(START)<DATE(:DATE_END) AND DATE(END) IS NULL)
+            OR (DATE(START)<DATE(:DATE_END) AND DATE(END)<DATE(:DATE_END)))
+            AND o.active=1 AND o.deleted=0";
+            $params=[
+            'PROD' => $product->getId(),
+            'ID' => $id,
+            'CUST' => $customer->getId(),
+            'QTY' => $qty,
+            'DATE_START' => $date_start,
+            'DATE_END' => $date_end];
             $result=$this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
             if($result!=NULL) return true;
             else return false;
           }
           else{
-            $query="SELECT * FROM erpoffer_prices o WHERE o.id!=:ID AND o.customer_id IS NULL AND o.quantity=:QTY AND (o.end>STR_TO_DATE(:date, '%Y-%m-%d') OR o.end IS NULL) AND o.start<STR_TO_DATE(:date, '%Y-%m-%d') AND o.active=1 AND o.deleted=0";
-            $params=['ID' => $id,
-                     'QTY' => $qty,
-                     'date' => $date];
+            $query="SELECT * FROM erpoffer_prices o WHERE o.product_id=:PROD AND o.id!=:ID AND o.customer_id IS NULL AND o.quantity=:QTY
+            ((DATE(:DATE_START) BETWEEN DATE(START) AND DATE(END))
+            OR (DATE(:DATE_END) BETWEEN DATE(START) AND DATE(END))
+            OR (DATE(START)<DATE(:DATE_END) AND DATE(END) IS NULL)
+            OR (DATE(START)<DATE(:DATE_END) AND DATE(END)<DATE(:DATE_END)))
+            AND o.active=1 AND o.deleted=0";
+            $params=[
+            'PROD' => $product->getId(),
+            'ID' => $id,
+            'QTY' => $qty,
+            'DATE_START' => $date_start,
+            'DATE_END' => $date_end];
             $result=$this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
             if($result!=NULL) return true;
             else return false;
           }
-        
-        
-        
         }
+      }
+
+      else{
+        if($id==NULL){
+            if($customer!=NULL){
+                  $query="SELECT * FROM erpoffer_prices o WHERE o.product_id=:PROD AND o.customer_id=:CUST AND o.quantity=:QTY AND
+                  ((DATE(:DATE_START) BETWEEN DATE(START) AND DATE(END) OR DATE(START)<DATE(:DATE_START) AND DATE(END) IS NULL)
+                    OR (DATE(START)>DATE(:DATE_START)))
+                  AND o.active=1 AND o.deleted=0";
+                  $params=[
+                  'PROD' => $product->getId(),
+                  'CUST' => $customer->getId(),
+                  'QTY' => $qty,
+                  'DATE_START' => $date_start
+                ];
+                $result=$this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+                if($result!=NULL) return true;
+                else return false;
+            }
+            else{
+                $query="SELECT * FROM erpoffer_prices o WHERE o.product_id=:PROD AND o.customer_id IS NULL AND o.quantity=:QTY AND
+                ((DATE(:DATE_START) BETWEEN DATE(START) AND DATE(END) OR DATE(START)<DATE(:DATE_START) AND DATE(END) IS NULL)
+                  OR (DATE(START)>DATE(:DATE_START)))
+                AND o.active=1 AND o.deleted=0";
+                $params=[
+                'PROD' => $product->getId(),
+                'QTY' => $qty,
+                'DATE_START' => $date_start
+              ];
+              $result=$this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+              if($result!=NULL) return true;
+              else return false;
+          }
+      }
+      else{
+            if($customer!=NULL){
+                $query="SELECT * FROM erpoffer_prices o WHERE o.product_id=:PROD AND o.id!=:ID AND o.customer_id=:CUST AND o.quantity=:QTY AND
+                ((DATE(:DATE_START) BETWEEN DATE(START) AND DATE(END) OR DATE(START)<DATE(:DATE_START) AND DATE(END) IS NULL)
+                  OR (DATE(START)>DATE(:DATE_START)))
+                AND o.active=1 AND o.deleted=0";
+                $params=[
+                'PROD' => $product->getId(),
+                'ID' => $id,
+                'CUST' => $customer->getId(),
+                'QTY' => $qty,
+                'DATE_START' => $date_start
+              ];
+              $result=$this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+              if($result!=NULL) return true;
+              else return false;
+          }
+          else{
+            $query="SELECT * FROM erpoffer_prices o WHERE o.product_id=:PROD AND o.id!=:ID AND o.customer_id IS NULL AND o.quantity=:QTY AND
+              ((DATE(:DATE_START) BETWEEN DATE(START) AND DATE(END) OR DATE(START)<DATE(:DATE_START) AND DATE(END) IS NULL)
+                OR (DATE(START)>DATE(:DATE_START)))
+              AND o.active=1 AND o.deleted=0";
+              $params=[
+              'PROD' => $product->getId(),
+              'ID' => $id,
+              'QTY' => $qty,
+              'DATE_START' => $date_start
+              ];
+              $result=$this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+              if($result!=NULL) return true;
+              else return false;
+          }
+        }
+      }
     }
-    
+
     public function offerPricesByCustomer($customer){
       $query="SELECT c.code as Product, c.name as Name, p.increment as Increment, p.price as Price, p.start as Start, p.end as End
-              FROM erpoffer_prices p 
-              LEFT JOIN erpproducts c ON c.id=p.product_id 
+              FROM erpoffer_prices p
+              LEFT JOIN erpproducts c ON c.id=p.product_id
               WHERE p.customer_id=:CUST AND p.active=TRUE and p.deleted=0";
       $params=['CUST' => $customer->getId()];
       return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
 
-    
+
     }
 
     // /**

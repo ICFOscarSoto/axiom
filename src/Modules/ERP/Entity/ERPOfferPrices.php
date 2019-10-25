@@ -234,25 +234,27 @@ class ERPOfferPrices
 
         return $this;
     }
-    
+
     public function formValidation($kernel, $doctrine, $user, $validationParams){
     $repository=$doctrine->getRepository(ERPOfferPrices::class);
-    $exists=$repository->validOffer($this->id,$this->customer, $this->quantity,$this->start);
+    $exists=$repository->validOffer($this->id,$this->product,$this->customer, $this->quantity,$this->start,$this->end);
     if($exists)
       return ["valid"=>false, "global_errors"=>["Ya existe una oferta vigente para esos parámetros."]];
-    if($this->end<$this->start AND $this->end!=NULL) 
+    if($this->end<$this->start AND $this->end!=NULL)
       return ["valid"=>false, "global_errors"=>["La fecha de fin debe ser posterior a la fecha de inicio."]];
+    if($this->type==NULL)
+      return ["valid"=>false, "global_errors"=>["Porfavor, elige un incremento o un precio neto."]];
     else return ["valid"=>true];
-    
-    
+
+
     }
-    
+
     public function preProccess($kernel, $doctrine, $user, $params, $oldobj)
     {
       $repository=$doctrine->getRepository(ERPProducts::class);
       $product=$repository->findOneBy(["id"=>$this->product->getId(),"company"=>$user->getCompany(),"active"=>1,"deleted"=>0]);
       $this->price=round($product->getShoppingPrice()*(1+$this->increment/100),2);
-      if($this->quantity==NULL) $this->quantity=1; 
+      if($this->quantity==NULL OR $this->quantity<1) $this->quantity=1;
     }
 
     public function getQuantity(): ?int

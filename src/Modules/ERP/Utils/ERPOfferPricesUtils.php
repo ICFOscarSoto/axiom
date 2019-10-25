@@ -16,7 +16,7 @@ class ERPOfferPricesUtils
   private $module="ERP";
   private $name="OfferPrices";
   public $parentClass="\App\Modules\ERP\Entity\ERPProducts";
-  public $parentField="customer";
+  public $parentField="product";
 
 
   public function formatListByProduct($product){
@@ -118,27 +118,44 @@ class ERPOfferPricesUtils
     }
   }
   
+  public function getExcludedFormOnCustomer($params){
+      return ['customer'];
+  }
+  
   public function getIncludedFormOnCustomer($params){
     
     $doctrine=$params["doctrine"];
     $id=$params["id"];
     $user=$params["user"];
-    return [
-    ['productcode', TextType::class, [
-      'required' => false,
-      'disabled' => true,
-      'attr'=> ["readonly"=>true],
-      'mapped' => false,
-      'data' => $params["parent"]->getCode($doctrine)
-    ]],
-    ['productname', TextType::class, [
-      'required' => false,
-      'disabled' => true,
-      'attr'=> ["readonly"=>true],
-      'mapped' => false,
-      'data' => $params["parent"]->getName($doctrine)
-    ]]
-    ];
+    $offerpricesRepository=$doctrine->getRepository(ERPOfferPrices::class);
+    $offerprice=$offerpricesRepository->findOneBy(["id"=>$id]);
+    
+    if($offerprice!=NULL)
+    {
+      $product=$offerprice->getProduct();
+      return [
+      ['shoppingprice', TextType::class, [
+        'required' => false,
+        'disabled' => true,
+        'attr'=> ["readonly"=>true],
+        'mapped' => false,
+        'data' => round($product->getShoppingPrice($doctrine),2)
+      ]]
+      ];
+      
+    }
+    else
+    {
+      return [
+      ['shoppingprice', TextType::class, [
+        'required' => false,
+        'disabled' => true,
+        'attr'=> ["readonly"=>true],
+        'mapped' => false,
+        'data' => round($params["parent"]->getShoppingPrice($doctrine),2)
+      ]]
+      ];
+    }
   }
 /*
   public function formatList($user, $product){

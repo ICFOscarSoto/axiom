@@ -73,6 +73,35 @@ class ERPOfferPricesController extends Controller
   }
 	
 	
+	/**
+	 * @Route("/{_locale}/offerprices/data/{id}/{action}", name="dataOfferPrices", defaults={"id"=0, "action"="read"})
+	 */
+		public function data($id, $action, Request $request){
+		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		$this->denyAccessUnlessGranted('ROLE_ADMIN');
+		$template=dirname(__FILE__)."/../Forms/CustomerOfferPrices.json";
+		$utils = new GlobaleFormUtils();
+		$utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine());
+		return $utils->make($id, $this->class, $action, "formOfferPrices", "modal");
+	 }
+	 /*
+	 public function data($id, $action, Request $request){
+	 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+	 $this->denyAccessUnlessGranted('ROLE_ADMIN');
+	 $template=dirname(__FILE__)."/../Forms/CustomerOfferPrices.json";
+	 $utilsObj=new $this->utilsClass();
+	 $utils = new GlobaleFormUtils();
+	 $offerpricesRepository=$this->getDoctrine()->getRepository(ERPOfferPrices::class);
+	 $obj = $offerpricesRepository->find($id);
+	 $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(),"customer"=>$obj->getCustomer()];
+	 $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),
+													method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedFormOnCustomer($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedFormOnCustomer($params):[]);
+	 return $utils->make($id, $this->class, $action, "formOfferPrices", "modal");
+	}
+	*/
+
+	
+	
 
   
 }
