@@ -199,6 +199,7 @@ class HRClocksController extends Controller
  		 * @Route("/api/HR/doclock/{company}/{id}", name="doClocks")
  		 */
  		 public function doClocks($company,$id, Request $request){
+			date_default_timezone_set('Europe/Madrid');
 			$workersrepository=$this->getDoctrine()->getRepository(HRWorkers::class);
 			$clocksrepository=$this->getDoctrine()->getRepository(HRClocks::class);
 			$companiesrepository=$this->getDoctrine()->getRepository(GlobaleCompanies::class);
