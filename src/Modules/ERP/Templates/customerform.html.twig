@@ -1,0 +1,197 @@
+
+<!-- MAIN CONTENT -->
+<div class="principal-content" id="principal-content">
+{% set formConstructor = form %}
+
+<div id="{{formConstructor.name}}-form-body"><form>
+<div class="panel minimal">
+	<div class="panel-body">
+		<div class="row">
+		<div class="col-md-12">
+			<div id="{{formConstructor.name}}-validation-error" class="alert alert-danger form-validation-error" style="display: none">
+			<strong>Ocurrieron los siguientes errores:</strong></br></br><ul id="validation-errors-list"></ul>
+			</div>
+			<div id="{{formConstructor.name}}-validation-warning" class="alert alert-warning form-validation-error" style="display: none">
+				<strong>Revise las siguientes advertencias:</strong></br></br><ul id="validation-warnings-list"></ul>
+			</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="panel minimal">
+	<div class="panel-body">
+		<div class="row">
+			<div style="text-align: right;" class="col-md-12">
+				<button attr-id="" attr-action="" id="{{formConstructor.name}}-button-cancel" type="button" class="btn btn">{{ ("Cancelar")|trans }}</button>
+				<button attr-id="" attr-action="" id="{{formConstructor.name}}-button-continue" type="button" class="btn btn-green">{{ ("Guardar")|trans }}</button>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="panel minimal">
+	<input type="hidden" id="post-url" name="post-url" value="{{ url('dataCustomers',{'id': formConstructor.id_object, 'action':'save'}) }}">
+	<input type="hidden" id="id-object" name="id-object" value="{{ formConstructor.id_object }}">
+	{{ form_row(formConstructor.form['_token']) }}
+	<div class="panel-heading">
+		<div class="panel-title">Informacion del cliente</div>
+	</div>
+	<div class="panel-body">
+		<div class="row">
+			<div class="col-md-3">
+			{{ form_row(formConstructor.form['name']) }}
+			</div>
+			<div class="col-md-3">
+			{{ form_row(formConstructor.form['socialname']) }}
+			</div>
+			<div class="col-md-2">
+			{{ form_row(formConstructor.form['vat']) }}
+			</div>
+			<div class="col-md-2">
+			{{ form_row(formConstructor.form['phone']) }}
+			</div>
+			<div class="col-md-2">
+			{{ form_row(formConstructor.form['email']) }}
+			</div>
+			</div>
+			<div class="row">
+			<div class="col-md-4">
+			{{ form_row(formConstructor.form['address']) }}
+			</div>
+			<div class="col-md-2">
+			{{ form_row(formConstructor.form['city']) }}
+			</div>
+			<div class="col-md-2">
+			{{ form_row(formConstructor.form['state']) }}
+			</div>
+			<div class="col-md-2">
+			{{ form_row(formConstructor.form['country']) }}
+			</div>
+			<div class="col-md-2">
+			{{ form_row(formConstructor.form['postcode']) }}
+			</div>	
+		</div>
+	</div>
+</div>
+<div class="panel minimal">
+	<div class="panel-heading">
+		<div class="panel-title">Condiciones</div>
+	</div>
+	<div class="panel-body">
+	<div class="row">
+		<div class="col-md-2">
+			{{ form_row(formConstructor.form['customergroup']) }}
+		</div>
+		<div class="col-md-2">
+				{{ form_row(formConstructor.form['paymentmethod']) }}
+		</div>
+		<div class="col-md-2">
+			{{ form_row(formConstructor.form['maxcredit']) }}
+		</div>
+		<div class="col-md-2">
+			{{ form_row(formConstructor.form['mininvoice']) }}
+		</div>
+		<div class="col-md-2">
+			{{ form_row(formConstructor.form['allowlinediscount']) }}
+		</div>
+		<div class="col-md-2">
+			{{ form_row(formConstructor.form['requiredordernumber']) }}
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-2">
+			{{ form_row(formConstructor.form['additionaldiscount']) }}
+		</div>
+		<div class="col-md-2">
+			{{ form_row(formConstructor.form['invoicefordeliverynote']) }}
+		</div>
+		<div class="col-md-2">
+			{{ form_row(formConstructor.form['partialshipping']) }}
+		</div>
+		<div class="col-md-2">
+			{{ form_row(formConstructor.form['pricesdeliverynote']) }}
+		</div>
+		<div class="col-md-2">
+			{{ form_row(formConstructor.form['surcharge']) }}
+		</div>
+		<div class="col-md-2">
+		{{ form_row(formConstructor.form['invoiceday']) }}
+		</div>
+	</div>
+	<div class="row">
+			<div class="col-md-2">
+			{{ form_row(formConstructor.form['active']) }}
+			</div>
+	</div>
+	</div>
+</div>
+
+<div class="panel minimal">
+	<div class="panel-body">
+		<div class="panel-title-list">Condiciones especiales</div>
+		{% if listCustomersPrices is defined %}
+		{% set listConstructor = listCustomersPrices %}
+		{{ include('@Globale/list.html.twig') }}
+		{% endif %}
+	</div>
+</div>
+
+{% for section in formConstructor.template.0.sections %}
+{% for field in section.fields %}
+{# Check if field is a relation and must show the view button #}
+{{ include("@Globale/form_relation_button.html.twig") }}
+{# Check if field is an address and map is enabled #}
+{{ include("@Globale/form_address_button.html.twig") }}
+{# Check if field is an url #}
+{{ include("@Globale/form_url_button.html.twig") }}
+{# Check if field is an tel #}
+{{ include("@Globale/form_tel_button.html.twig") }}
+{# Check if field is an email #}
+{{ include("@Globale/form_email_button.html.twig") }}
+{# Check if field has trigger #}
+{{ include("@Globale/form_trigger_field.html.twig") }}
+{# Check if field has a linked field #}
+{{ include("@Globale/form_fields_linked.html.twig") }}
+{# Check if field has a dependency of other field #}
+{{ include("@Globale/form_fields_depend.html.twig") }}
+{# Check if field has a to change another field #}
+{{ include("@Globale/form_fields_change.html.twig") }}
+{# Check if field has unity field #}
+{{ include("@Globale/form_fields_unity.html.twig") }}
+{# Check if field has a field type number #}
+{{ include("@Globale/form_fields_type_number.html.twig") }}
+{% endfor %}
+
+{% endfor %}
+</div>
+<div class="row">
+	<div style="text-align: right;" class="col-md-12">
+		<button attr-id="" attr-action="" id="{{formConstructor.name}}-button-cancel" type="button" class="btn btn">{{ ("Cancelar")|trans }}</button>
+		<button attr-id="" attr-action="" id="{{formConstructor.name}}-button-continue" type="button" class="btn btn-green">{{ ("Guardar")|trans }}</button>
+	</div>
+</div>
+</div>
+
+<script>
+$(document).ready(function() {
+$('body').on('click', "#{{formConstructor.name}}-button-continue", function() {
+if($("#{{formConstructor.name}}-form-body").find('form').valid()){
+if((++load_wait)==1) $("#load-spinner").fadeIn();
+$.post($("#{{formConstructor.name}}-form-body").find('form').find('#post-url').val(), $("#{{formConstructor.name}}-form-body").find('form').serialize(),
+function(data, status, xhr){
+if((--load_wait)==0) $("#load-spinner").fadeOut();
+{{ include("@Globale/formvalidation.html.twig") }}
+if(data.result){
+//$("#tabs-list li").attr("attr-id",data.id);
+toastr.success("Datos guardados correctamente", "Confirmación", confirmation);
+if(data.reload) location.href=data.href;
+$("#{{formConstructor.name}}-form-body").find('form').validate().resetForm();
+}
+else toastr.error("Ocurrió un error al guardar los datos", "Confirmación", confirmation);
+}, "json");
+}
+});
+$('body').on('click', "#{{formConstructor.name}}-button-cancel", function() {
+window.history.back();
+});
+});
+</script>

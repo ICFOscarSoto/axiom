@@ -8,6 +8,10 @@
         "caption": "product"
     },
     {
+        "name": "product__supplier__name",
+        "caption": "supplier"
+    },
+    {
         "name": "quantity",
         "caption": "quantity"
     },

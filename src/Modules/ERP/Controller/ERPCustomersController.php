@@ -77,7 +77,7 @@ class ERPCustomersController extends Controller
 		 $obj->setCountry($default);
 		 $obj->setCustomergroup($default2);
 		 $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine());
-		 $make= $utils->make($id, $this->class, $action, "formCustomers", "full", "@Globale/form.html.twig", "formCustomer");
+		 $make= $utils->make($id, $this->class, $action, "formCustomers", "full", "@ERP/customerform.html.twig", "formCustomer");
 		 return $make;
 		}
 
@@ -105,8 +105,7 @@ class ERPCustomersController extends Controller
 							'userData' => $userdata,
 							'id' => $id,
 							'tab' => $request->query->get('tab','data'), //Show initial tab, by default data tab
-							'tabs' => [["name" => "data", "icon"=>"fa fa-headphones", "caption"=>"Datos cliente", "active"=>true, "route"=>$this->generateUrl("dataCustomers",["id"=>$id])],
-											 	["name"=>"customersprices", "icon"=>"fa fa-money", "caption"=>"Incrementos específicos","route"=>$this->generateUrl("infoCustomersPrices",["module"=>"ERP", "name"=>"CustomersPrices", "id"=>$id])],
+							'tabs' => [["name" => "data", "icon"=>"fa fa-headphones", "caption"=>"Datos cliente", "active"=>true, "route"=>$this->generateUrl("formInfoCustomer",["id"=>$id])],
 											  ["name"=>"offerprices", "icon"=>"fa fa-money", "caption"=>"Precios Específicos","route"=>$this->generateUrl("infoCustomerOfferPrices",["module"=>"ERP", "name"=>"OfferPrices", "id"=>$id])]
 												//["name" => "addresses", "icon"=>"fa fa-headphones", "caption"=>"direcciones", "route"=>$this->generateUrl("addresses",["id"=>$id, "type"=>"contact"])],
 												//["name" => "contacts", "icon"=>"fa fa-headphones", "caption"=>"contactos" , "route"=>$this->generateUrl("contacts",["id"=>$id])],
@@ -121,6 +120,51 @@ class ERPCustomersController extends Controller
 									));
 			}
 
+			/**
+			 * @Route("/{_locale}/customers/info/{id}", name="formInfoCustomer", defaults={"id"=0})
+			 */
+			public function formInfoCustomer($id,  Request $request){
+				$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+				if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
+				$userdata=$this->getUser()->getTemplateData();
+				$new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-new"];
+				$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
+				$breadcrumb=$menurepository->formatBreadcrumb('customers');
+				array_push($breadcrumb, $new_breadcrumb);
+				$template=dirname(__FILE__)."/../Forms/Customers.json";
+				$formUtils = new GlobaleFormUtils();
+				$formUtilsCustomers = new ERPCustomersUtils();
+				$formUtils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),$formUtilsCustomers->getExcludedForm([]),$formUtilsCustomers->getIncludedForm(["doctrine"=>$this->getDoctrine(), "user"=>$this->getUser(), "id"=>$id]));
+				$listCustomersPrices = new ERPCustomersPricesUtils();
+			  $formUtilsCustomersPrices = new GlobaleFormUtils();
+			  $formUtilsCustomersPrices->initialize($this->getUser(), new ERPCustomersPrices(), dirname(__FILE__)."/../Forms/CustomersPrices.json", $request, $this, $this->getDoctrine());
+				$forms[]=$formUtilsCustomersPrices->formatForm('CustomersPrices', true, null, ERPCustomersPrices::class);
+			//	$listReferences = new ERPReferencesUtils();
+				//$formUtilsReferences = new GlobaleFormUtils();
+			//	$formUtilsReferences->initialize($this->getUser(), new ERPReferences(), dirname(__FILE__)."/../Forms/References.json", $request, $this, $this->getDoctrine());
+			// 	$forms[]=$formUtilsReferences->formatForm('References', true, null, ERPReferences::class);
+			//	$listAttributes = new ERPProductsAttributesUtils();
+		
+				$customerRepository=$this->getDoctrine()->getRepository(ERPCustomers::class);
+				$customer=$customerRepository->findOneBy(["id"=>$id, "active"=>1, "deleted"=>0, "company"=>$this->getUser()->getCompany()]);
+		/*
+		  	$formUtilsAttributes = new GlobaleFormUtils();
+				$formUtilsAttributes->initialize($this->getUser(), new ERPProductsAttributes(), dirname(__FILE__)."/../Forms/References.json", $request, $this, $this->getDoctrine(),$listAttributes->getExcludedForm(null),$listAttributes->getIncludedForm(["parent"=>$product, "doctrine"=>$this->getDoctrine(), "user"=>$this->getUser()]));
+				$forms[]=$formUtilsAttributes->formatForm('ProductsAttributes', true, null, ERPProductsAttributes::class);
+		*/
+				return $this->render('@ERP/customerform.html.twig', array(
+					'controllerName' => 'customersController',
+					'interfaceName' => 'Clientes',
+					'optionSelected' => 'customers',
+					'userData' => $userdata,
+					'id' => $id,
+					'id_object' => $id,
+					'form' => $formUtils->formatForm('customers', true, $id, $this->class, "dataCustomers"),
+					'listCustomersPrices' => $listCustomersPrices->formatListByCustomer($id),
+					'forms' => $forms
+				));
+		
+			}
 
 
     /**

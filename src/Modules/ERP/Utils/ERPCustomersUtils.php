@@ -24,4 +24,26 @@ class ERPCustomersUtils
     ];
     return $list;
   }
+
+  public function getExcludedForm($params){
+    return ['customer'];
+  }
+
+  public function getIncludedForm($params){
+  /*
+    $doctrine=$params["doctrine"];
+    $user=$params["user"];
+    $id=$params["id"];
+    $productRepository=$doctrine->getRepository(ERPProducts::class);
+    $products=$productRepository->findOneBy(["id"=>$id]);
+    */
+    return [];
+  }
+
+
+
+
+
+
+
 }
