@@ -183,38 +183,12 @@ class ERPIncrements
         return $this;
     }
 
-
-
-public function formValidation($kernel, $doctrine, $user, $validationParams){
+    public function formValidation($kernel, $doctrine, $user, $validationParams){
       $repository=$doctrine->getRepository(ERPIncrements::class);
-      $valido=$repository->checkSupplierOnCategory($this->supplier, $this->category,$this->company);
       $repetido=$repository->checkRepeated($this->id,$this->supplier, $this->category,$this->customergroup,$this->company);
-/*
-      if($valido==NULL)
-        return ["valid"=>false, "global_errors"=>["No existe ningún producto para ese proveedor en esa categoría."]];
-      else*/
       if($repetido!=NULL)
-        return ["valid"=>false, "global_errors"=>["Ya existe un registro repetido para esos parámetros."]];
+        return ["valid"=>false, "global_errors"=>["Ya existe un incremento establecido para esos parámetros."]];
       else return ["valid"=>true];
-      /*
-      if($this->reduction_type==1)
-        {
-          if($this->reduction==NULL)
-            return ["valid"=>false, "global_errors"=>["Por favor, introduce un descuento"]];
-          else if($this->reduction<=0 OR $this->reduction>100)
-            return ["valid"=>false, "global_errors"=>["Por favor, introduce un descuento correcto."]];
-          else return ["valid"=>true];
-        }
-      else if($this->reduction_type==2 AND $this->amount==NULL)
-          return ["valid"=>false, "global_errors"=>["Por favor, introduce precio neto"]];
-      else if($valido!=NULL)
-        return ["valid"=>false, "global_errors"=>["Ya existe un precio vigente para este producto y esta cantidad"]];
-      else if($select==0)
-        return ["valid"=>false, "global_errors"=>["Por favor, selecciona un tipo"]];
-      else if($this->end<$this->start)
-        return ["valid"=>false, "global_errors"=>["La fecha final es anterior a la fecha de inicio."]];
-      else return ["valid"=>true];
-    */
     }
 
     public function postProccess($kernel, $doctrine, $user){
@@ -226,28 +200,26 @@ public function formValidation($kernel, $doctrine, $user, $validationParams){
     }
     
     public function calculateIncrements($doctrine){
-    
       $em = $doctrine->getManager();
       $repositoryProduct=$doctrine->getRepository(ERPProducts::class);
       $repositoryProductPrices=$doctrine->getRepository(ERPProductPrices::class);
       $repositoryCustomerGroups=$doctrine->getRepository(ERPCustomerGroups::class);
       $repositorySuppliers=$doctrine->getRepository(ERPSuppliers::class);
       $repositoryIncrements=$doctrine->getRepository(ERPIncrements::class);
+      //de momento partimos de que el proveedor nunca es NULL, pero en el futuro tendremos 
+      //que permitir que pueda haber incrementos sólo por catogría, por lo que esto no funcionaría.
       $products=$repositorySuppliers->productsBySupplier($this->supplier->getId());
       foreach($products as $product){
         $productEntity=$repositoryProduct->findOneBy(["id"=>$product]);
         $productEntity->calculatePVP($doctrine);
         $increment=$this->getIncrementByGroup($doctrine,$this->supplier,$productEntity->getCategory(),$this->customergroup);
-            if($increment!=NULL)
-            {
-
-              if($repositoryProductPrices->existPrice($productEntity,$this->customergroup))
-              {
+        if($increment!=NULL){
+          if($repositoryProductPrices->existPrice($productEntity,$this->customergroup)){
                 $productpricesEntity=$repositoryProductPrices->findOneBy(["product"=>$productEntity,"customergroup"=>$this->customergroup]);
                 $productpricesEntity->setIncrement($increment);
                 $productpricesEntity->setPrice(round($productEntity->getShoppingPrice()*(1+($increment/100)),2));
-              }
-              else {
+            }
+          else {
                 $productpricesEntity= new ERPProductPrices();
                 $productpricesEntity->setProduct($productEntity);
                 $productpricesEntity->setCustomergroup($this->customergroup);
@@ -258,9 +230,9 @@ public function formValidation($kernel, $doctrine, $user, $validationParams){
                 $productpricesEntity->setDateupd(new \DateTime());
                 $productpricesEntity->setDateadd(new \DateTime());
 
-              }
-              $em->persist($productpricesEntity);
           }
+              $em->persist($productpricesEntity);
+        }
 
         $em->persist($productEntity);
         $em->flush();
@@ -299,10 +271,8 @@ public function formValidation($kernel, $doctrine, $user, $validationParams){
         return $incrementbygroup;
 
       }
-      
       return $incrementbygroup;
     }
     
-  
     
 }

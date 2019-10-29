@@ -45,7 +45,7 @@ class ERPSuppliersController extends Controller
   		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
   			return $this->render('@Globale/genericlist.html.twig', [
   				'controllerName' => 'suppliersController',
-  				'interfaceName' => 'Departamentos',
+  				'interfaceName' => 'Suppliers',
   				'optionSelected' => $request->attributes->get('_route'),
   				'menuOptions' =>  $menurepository->formatOptions($userdata),
   				'breadcrumb' =>  $menurepository->formatBreadcrumb($request->get('_route')),

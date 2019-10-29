@@ -611,12 +611,15 @@ class ERPProducts
     }
 
 
-
+    /*permite recalcular el precio de compra y el PVP*/
     public function priceCalculated($doctrine)
     {
       $em = $doctrine->getManager();
       $newShoppingPrice=$this->PVPR*(1-$this->getShoppingDiscount($doctrine)/100);
       $this->setShoppingPrice($newShoppingPrice);
+      /*ante un cambio en los precios, si no tenemos almacenado el valor del incremento máximo
+      para el producto, tendremos que recalcularlo. En cambio, si ya lo tenemos almacenado, simplemente se recalculará
+      el PVP con ese incremento y con el nuevo precio de compra*/
       if($this->getPvpincrement()==NULL)
       {
         $CustomerGroupsRepository=$doctrine->getRepository(ERPCustomerGroups::class);
@@ -634,24 +637,24 @@ class ERPProducts
 
       else $this->setPVP($newShoppingPrice*(1+($this->getPvpincrement()/100)));
 
-        //recalculamos el precio para cada incremento de grupo que exista
-        $repositoryProduct=$doctrine->getRepository(ERPProducts::class);
-        $repositoryProductPrices=$doctrine->getRepository(ERPProductPrices::class);
-        $productprices=$repositoryProductPrices->pricesByProductId($this->getId());
-        foreach($productprices as $productprice)
-        {
+      //Una vez recalculado el PVP, tenemos que recalcular el precio para cada incremento de grupo que exista
+      $repositoryProduct=$doctrine->getRepository(ERPProducts::class);
+      $repositoryProductPrices=$doctrine->getRepository(ERPProductPrices::class);
+      $productprices=$repositoryProductPrices->pricesByProductId($this->getId());
+      foreach($productprices as $productprice)
+      {
           $productpriceEntity=$repositoryProductPrices->findOneBy(["id"=>$productprice]);
           $productpriceEntity->setPrice($newShoppingPrice*(1+($productpriceEntity->getIncrement()/100)));
-        }
-
-
+      }
+      
+      //finalmente si no tenemos registrado un incremento para un grupo de cliente en particular, tendremos que generarlo. En primer
+      //lugar obtenemos los grupos de clientes que no tienen asociado un incremento y posteriormente se lo generamos.
       $CustomerGroupsRepository=$doctrine->getRepository(ERPCustomerGroups::class);
       $customergroups=$CustomerGroupsRepository->findAll(["active"=>1,"deleted"=>0]);
       $productEntity=$repositoryProduct->findOneBy(["id"=>$this->getId()]);
-      //dump($customergroups);
       $customergroup_without_price=[];
       foreach($customergroups as $customergroup){
-        if($repositoryProductPrices->existPrice($this,$customergroup)==FALSE)     array_push($customergroup_without_price,$customergroup);
+        if($repositoryProductPrices->existPrice($this,$customergroup)==FALSE) array_push($customergroup_without_price,$customergroup);
       }
 
 
@@ -670,10 +673,6 @@ class ERPProducts
         $em->flush();
 
       }
-
-
-      //else dump("Si existe el incremento para el producto ".$this->getName()." y el grupo ".$customergroup->getName());
-
 
     }
 

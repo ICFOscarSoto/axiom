@@ -48,6 +48,8 @@ class ERPIncrementsRepository extends ServiceEntityRepository
                 'CUST' => $customergroup->getId(),
                 'COMP' => $company->getId()
                 ];
+      $result=$this->getEntityManager()->getConnection()->executeQuery($query,$params)->fetch();
+      return $result;
      }
      else if($category!=NULL AND $customergroup!=NULL AND $id==NULL)
      {
@@ -56,6 +58,8 @@ class ERPIncrementsRepository extends ServiceEntityRepository
                 'CUST' => $customergroup->getId(),
                 'COMP' => $company->getId()
                 ];
+      $result=$this->getEntityManager()->getConnection()->executeQuery($query,$params)->fetch();
+      return $result;
      }
 
      else if($supplier!=NULL AND $customergroup!=NULL AND $id==NULL)
@@ -65,6 +69,8 @@ class ERPIncrementsRepository extends ServiceEntityRepository
                 'CUST' => $customergroup->getId(),
                 'COMP' => $company->getId()
                 ];
+        $result=$this->getEntityManager()->getConnection()->executeQuery($query,$params)->fetch();
+        return $result;
      }
 
      else if($id==NULL)
