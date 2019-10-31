@@ -1,30 +1,45 @@
 [
     {
         "name": "id",
-        "caption": "id"
+        "caption": "id",
+        "class": "hidden"
     },
     {
         "name": "code",
-        "caption": "code"
+        "caption": "code",
+        "width": "15%",
+        "class": "all"
+    },
+    {
+        "name": "date",
+        "caption": "Date",
+        "type": "date",
+        "width": "15%","class":"min-desktop"
     },
     {
         "name": "vat",
-        "caption": "vat"
+        "caption": "vat","class":"min-desktop"
+
     },
     {
         "name": "customername",
-        "caption": "Customer"
+        "caption": "Customer",
+        "width": "50%",
+        "class": "all"
     },
 
     {
         "name": "total",
-        "caption": "Total"
+        "caption": "Total",
+        "unity": "€",
+        "class" : "dt-right min-tablet",
+        "width": "50%"
     },
     {
         "name": "active",
         "caption": "Estado",
         "width": "10%",
-        "class": "dt-center",
+        "class": "dt-center min-desktop",
         "replace": {
             "1": {
                 "text": "Activo",

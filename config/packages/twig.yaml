@@ -15,3 +15,4 @@ twig:
         '%kernel.project_dir%/src/Modules/Globale/Templates': Globale
         '%kernel.project_dir%/src/Modules/Tracker/Templates': Tracker
         '%kernel.project_dir%/src/Modules/ERP/Templates': ERP
+        '%kernel.project_dir%/src/Modules/Navision/Templates': Navision

@@ -26,10 +26,47 @@ use App\Modules\ERP\Entity\ERPEAN13;
 use App\Modules\ERP\Entity\ERPAttributeNames;
 use App\Modules\ERP\Entity\ERPAttributesValues;
 use App\Modules\ERP\Entity\ERPProductsAttributes;
+use \DateTime;
 
 class NavisionController extends Controller
 {
   private $url="http://icf.edindns.es:9000/";
+
+  /**
+   * @Route("/api/navision/invoices", name="navisionInvoices")
+   */
+   public function navisionInvoices(Request $request){
+     $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+     $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
+     $userdata=$this->getUser()->getTemplateData();
+     $start=new DateTime('first day of this month');
+     $end=new DateTime('last day of this month');
+     $invoices=file_get_contents($this->url.'navisionExport/do-NAVISION-invoice-list.php?start='.$start->format("Y-m-d").'&end='.$end->format("Y-m-d"));
+     return $this->render('@Navision/invoices.html.twig', [
+       "interfaceName" => "Facturas",
+       'optionSelected' => "navisionInvoices",
+       'menuOptions' =>  $menurepository->formatOptions($userdata),
+       'breadcrumb' =>  "navisionInvoices",
+       'userData' => $userdata,
+       'start' => $start->format("d/m/Y"),
+       'end' => $end->format("d/m/Y"),
+       'basiclist' => json_decode ($invoices, true)
+     ]);
+   }
+
+   /**
+    * @Route("/api/navision/get/invoices", name="navisionGetInvoices")
+    */
+    public function navisionGetInvoices(Request $request){
+      $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+      $start=$request->request->get("start");
+      $end=$request->request->get("end");
+      $start=date_create_from_format('d/m/Y',$start);
+      $end=date_create_from_format('d/m/Y',$end);
+      $invoices=file_get_contents($this->url.'navisionExport/do-NAVISION-invoice-list.php?start='.$start->format("Y-m-d").'&end='.$end->format("Y-m-d"));
+      return new Response($invoices);
+    }
+
   /**
    * @Route("/api/navision/invoice/print/{id}", name="navisionPrintInvoice", defaults={"id"=0})
    */

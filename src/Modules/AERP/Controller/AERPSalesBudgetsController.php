@@ -18,6 +18,7 @@ use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\AERP\Utils\AERPSalesBudgetsUtils;
+use App\Modules\AERP\Entity\AERPConfiguration;
 use App\Modules\AERP\Entity\AERPPaymentMethods;
 use App\Modules\AERP\Entity\AERPSeries;
 use App\Modules\AERP\Entity\AERPCustomerGroups;
@@ -42,6 +43,7 @@ class AERPSalesBudgetsController extends Controller
 		if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
 
 		$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
+		$configrepository=$this->getDoctrine()->getRepository(AERPConfiguration::class);
 		$customerGroupsrepository=$this->getDoctrine()->getRepository(AERPCustomerGroups::class);
 		$paymentMethodsrepository=$this->getDoctrine()->getRepository(AERPPaymentMethods::class);
 		$seriesRepository=$this->getDoctrine()->getRepository(AERPSeries::class);
@@ -51,6 +53,8 @@ class AERPSalesBudgetsController extends Controller
 		$userdata=$this->getUser()->getTemplateData();
 		$locale = $request->getLocale();
 		$this->router = $router;
+
+		$config=$configrepository->findOneBy(["company"=>$this->getUser()->getCompany()]);
 
 		//Search Customers
 		$classCustomersUtils="\App\Modules\AERP\Utils\AERPCustomersUtils";
@@ -120,6 +124,7 @@ class AERPSalesBudgetsController extends Controller
 		array_push($breadcrumb,$new_breadcrumb);
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 			return $this->render('@AERP/salesbudgets.html.twig', [
+				'moduleConfig' => $config,
 				'controllerName' => 'categoriesController',
 				'interfaceName' => 'SalesBudgets',
 				'optionSelected' => 'genericindex',
@@ -157,6 +162,11 @@ class AERPSalesBudgetsController extends Controller
 		$seriesRepository=$this->getDoctrine()->getRepository(AERPSeries::class);
 		$taxesRepository=$this->getDoctrine()->getRepository(GlobaleTaxes::class);
 
+		$document=$documentRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$id, "deleted"=>0]);
+		//Check if document belongs to company
+		if($id!=0 && !$document) return new JsonResponse(["result"=>0]);
+
+
 		//Get content of the json reques
 		$fields=json_decode($request->getContent());
 		$customer=$customersRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$fields->customerid, "active"=>1, "deleted"=>0]);
@@ -166,7 +176,7 @@ class AERPSalesBudgetsController extends Controller
 		$serie=$seriesRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$fields->serie]);
 		$customergroup=$customerGroupsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$fields->customergroup, "active"=>1, "deleted"=>0]);
 
-		$document=$documentRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$fields->id, "deleted"=>0]);
+
 		$date=$fields->date?date_create_from_format("d/m/Y",$fields->date):new \DateTime();
 		if(!$document){
 			$document=new AERPSalesBudgets();
@@ -209,13 +219,14 @@ class AERPSalesBudgetsController extends Controller
 		$this->getDoctrine()->getManager()->persist($document);
 		$this->getDoctrine()->getManager()->flush();
 		$linenumIds=[];
-	
+
 		foreach ($fields->lines as $key => $value) {
-			$line=$documentLinesRepository->findOneBy(["salesbudget"=>$document, "id"=>$value->id, "active"=>1, "deleted"=>0]);
+			$line=$documentLinesRepository->findOneBy(["salesbudget"=>$document, "id"=>$value->id]);
 			$product=$productsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$value->productid, "active"=>1, "deleted"=>0]);
 			//if(!$product) continue;
 			if($value->code=="") continue;
-			if(!$line){
+			if(!$line && $value->deleted) continue;
+			if(!$line ){
 				$line=new AERPSalesBudgetsLines();
 				$line->setSalesbudget($document);
 				$line->setActive(1);
@@ -236,6 +247,11 @@ class AERPSalesBudgetsController extends Controller
 				$line->setSurchargeunit(floatval($value->surchargeunit));
 				$line->setSubtotal(floatval($value->subtotal));
 				$line->setTotal(floatval($value->total));
+				dump($value->deleted);
+				if($value->deleted){
+					$line->setActive(0);
+					$line->setDeleted(1);
+				}
 				$line->setDateupd(new \DateTime());
 				$this->getDoctrine()->getManager()->persist($line);
 				$this->getDoctrine()->getManager()->flush();

@@ -277,6 +277,12 @@
 				if(numLines!=numLine){
 					 //$("#document-line-"+numLine).remove();
 					 $("#document-line-"+numLine).addClass("deleted");
+					 $("#product-form-base-total-"+numLine).addClass("deleted");
+					 $("#product-form-disccount-total-"+numLine).addClass("deleted");
+					 $("#product-form-tax-total-"+numLine).addClass("deleted");
+					 $("#product-form-surcharge-total-"+numLine).addClass("deleted");
+					 $("#product-form-amount-"+numLine).addClass("deleted");
+
 					 $("#document-line-"+numLine).fadeOut();
 					 $("#document-line-"+numLine).attr("id","document-line-3-deleted");
 					 //documentLines.attr("attr-numlines",numLines);
@@ -288,7 +294,7 @@
 			function recalculateDocument(){
 				var i=0;
 				var documentLines=$("#document-lines");
-				$("[id^='document-line-']:not(.deleted)").each(function() {
+				$("[id^='document-line-']:not('.deleted')").each(function() {
 					productSearch($(this).attr("attr-id"), $("#product-form-code-"+$(this).attr("attr-id")).val(), productFields, productSearchfields);
 				});
 			}
@@ -298,25 +304,39 @@
 				var documentLines=$("#document-lines");
 				$("[id^='document-line-']:not(.deleted)").each(function() {
 						i++;
-						$("#product-form-id-"+$(this).attr("attr-id")).attr("attr-id",i);
-						$("#product-form-id-"+$(this).attr("attr-id")).attr("id","product-form-id-"+i);
-						$("#product-form-code-"+$(this).attr("attr-id")).attr("attr-id",i);
-						$("#product-form-code-"+$(this).attr("attr-id")).attr("id","product-form-code-"+i);
-						$("#customer-search-button-"+$(this).attr("attr-id")).attr("id","customer-search-button-"+i);
-						$("#product-form-name-"+$(this).attr("attr-id")).attr("id","product-form-name-"+i);
-						$("#customer-search-button-"+$(this).attr("attr-id")).attr("id","customer-search-button-"+i);
-						$("#product-form-price-"+$(this).attr("attr-id")).attr("id","product-form-price-"+i);
-						$("#product-form-quantity-"+$(this).attr("attr-id")).attr("id","product-form-quantity-"+i);
-						$("#product-form-base-total-"+$(this).attr("attr-id")).attr("id","product-form-base-total-"+i);
-						$("#product-form-disccount-"+$(this).attr("attr-id")).attr("id","product-form-disccount-"+i);
-						$("#product-form-disccount-total-"+$(this).attr("attr-id")).attr("id","product-form-disccount-total-"+i);
-						$("#product-form-tax-"+$(this).attr("attr-id")).attr("id","product-form-tax-"+i);
-						$("#product-form-tax-total-"+$(this).attr("attr-id")).attr("id","product-form-tax-total-"+i);
-						$("#product-form-surcharge-"+$(this).attr("attr-id")).attr("id","product-form-surcharge-"+i);
-						$("#product-form-surcharge-total-"+$(this).attr("attr-id")).attr("id","product-form-surcharge-total-"+i);
-						$("#product-form-amount-"+$(this).attr("attr-id")).attr("id","product-form-amount-"+i);
-						$("#product-form-remove-"+$(this).attr("attr-id")).attr("attr-id",i);
-						$("#product-form-remove-"+$(this).attr("attr-id")).attr("id","product-form-remove-"+i);
+						$(this).find("#product-form-id-"+$(this).attr("attr-id")).attr("attr-id",i);
+						$(this).find("#product-form-line-id-"+$(this).attr("attr-id")).attr("attr-id",i);
+						$(this).find("#product-form-line-id-"+$(this).attr("attr-id")).attr("id","product-form-line-id-"+i);
+						$(this).find("#product-form-id-"+$(this).attr("attr-id")).attr("id","product-form-id-"+i);
+						$(this).find("#product-form-code-"+$(this).attr("attr-id")).attr("attr-id",i);
+						$(this).find("#product-form-code-"+$(this).attr("attr-id")).attr("id","product-form-code-"+i);
+						$(this).find("#product-form-name-"+$(this).attr("attr-id")).attr("id","product-form-name-"+i);
+						$(this).find("#product-search-button-"+$(this).attr("attr-id")).attr("attr-id",i);
+						$(this).find("#product-search-button-"+$(this).attr("attr-id")).attr("id","product-search-button-"+i);
+						$(this).find("#product-form-price-"+$(this).attr("attr-id")).attr("attr-id",i);
+						$(this).find("#product-form-price-"+$(this).attr("attr-id")).attr("id","product-form-price-"+i);
+						$(this).find("#product-form-quantity-"+$(this).attr("attr-id")).attr("attr-id",i);
+						$(this).find("#product-form-quantity-"+$(this).attr("attr-id")).attr("id","product-form-quantity-"+i);
+						$(this).find("#product-form-base-total-"+$(this).attr("attr-id")).attr("attr-id",i);
+						$(this).find("#product-form-base-total-"+$(this).attr("attr-id")).attr("id","product-form-base-total-"+i);
+						$(this).find("#product-form-disccount-"+$(this).attr("attr-id")).attr("attr-id",i);
+						$(this).find("#product-form-disccount-"+$(this).attr("attr-id")).attr("id","product-form-disccount-"+i);
+						$(this).find("#product-form-disccount-total-"+$(this).attr("attr-id")).attr("attr-id",i);
+						$(this).find("#product-form-disccount-total-"+$(this).attr("attr-id")).attr("id","product-form-disccount-total-"+i);
+						$(this).find("#product-form-tax-"+$(this).attr("attr-id")).attr("attr-id",i);
+						$(this).find("#product-form-tax-"+$(this).attr("attr-id")).attr("id","product-form-tax-"+i);
+						$(this).find("#product-form-tax-total-"+$(this).attr("attr-id")).attr("attr-id",i);
+						$(this).find("#product-form-tax-total-"+$(this).attr("attr-id")).attr("id","product-form-tax-total-"+i);
+						$(this).find("#product-form-surcharge-"+$(this).attr("attr-id")).attr("attr-id",i);
+						$(this).find("#product-form-surcharge-"+$(this).attr("attr-id")).attr("id","product-form-surcharge-"+i);
+						$(this).find("#product-form-surcharge-perc-"+$(this).attr("attr-id")).attr("attr-id",i);
+						$(this).find("#product-form-surcharge-perc-"+$(this).attr("attr-id")).attr("id","product-form-surcharge-perc-"+i);
+						$(this).find("#product-form-surcharge-total-"+$(this).attr("attr-id")).attr("attr-id",i);
+						$(this).find("#product-form-surcharge-total-"+$(this).attr("attr-id")).attr("id","product-form-surcharge-total-"+i);
+						$(this).find("#product-form-amount-"+$(this).attr("attr-id")).attr("attr-id",i);
+						$(this).find("#product-form-amount-"+$(this).attr("attr-id")).attr("id","product-form-amount-"+i);
+						$(this).find("#product-form-remove-"+$(this).attr("attr-id")).attr("attr-id",i);
+						$(this).find("#product-form-remove-"+$(this).attr("attr-id")).attr("id","product-form-remove-"+i);
 						$(this).attr('attr-id',i);
 						$(this).attr('id','document-line-'+i);
 				});
@@ -329,7 +349,14 @@
 				var disccount=parseFloat($("#product-form-disccount-"+id).val());
 				var tax=parseFloat($("#product-form-tax-"+id).val());
 				var surcharge=parseFloat($("#product-form-surcharge-"+id).val());
+				price=(price=="")?0:price;
+				tax=(tax=="")?0:tax;
+				surcharge=(surcharge=="")?0:surcharge;
 				price=isNaN(price)?0:price;
+				quantity=isNaN(quantity)?0:quantity;
+				disccount=isNaN(disccount)?0:disccount;
+				tax=isNaN(tax)?0:tax;
+				surcharge=isNaN(surcharge)?0:surcharge;
 				var subtotal=price*quantity;
 				$("#product-form-base-total-"+id).val(subtotal);
 				var disccounttotal=subtotal*disccount/100;
@@ -350,11 +377,11 @@
 				var surchargetotal=0;
 				var disccounttotal=0;
 				var total=0;
-				$("[id^='product-form-base-total-']").each(function() {	base+=parseFloat($(this).val()); });
-				$("[id^='product-form-disccount-total-']").each(function() {	disccounttotal+=parseFloat($(this).val()); });
-				$("[id^='product-form-tax-total-']").each(function() {	taxtotal+=parseFloat($(this).val()); });
-				$("[id^='product-form-surcharge-total-']").each(function() {	surchargetotal+=parseFloat($(this).val()); });
-				$("[id^='product-form-amount-']").each(function() {	total+=parseFloat($(this).val()); });
+				$("[id^='product-form-base-total-']:not('.deleted')").each(function() {	base+=parseFloat(isNaN($(this).val())?0:$(this).val()); });
+				$("[id^='product-form-disccount-total-']:not('.deleted')").each(function() {	disccounttotal+=parseFloat(isNaN($(this).val())?0:$(this).val()); });
+				$("[id^='product-form-tax-total-']:not('.deleted')").each(function() {	taxtotal+=parseFloat(isNaN($(this).val())?0:$(this).val()); });
+				$("[id^='product-form-surcharge-total-']:not('.deleted')").each(function() {	surchargetotal+=parseFloat(isNaN($(this).val())?0:$(this).val()); });
+				$("[id^='product-form-amount-']:not('.deleted')").each(function() {	total+=parseFloat(isNaN($(this).val())?0:$(this).val()); });
 				$("#totals_form_net").val(base.toFixed(2));
 				$("#totals_form_dto").val(disccounttotal.toFixed(2));
 				$("#totals_form_tax").val(taxtotal.toFixed(2));
@@ -546,21 +573,22 @@
 
 						$("[id^='document-line-']").each(function() {
 							var line = new Object();
-							line.id=$("#product-form-line-id-"+$(this).attr("attr-id")).val();
+							line.id=$(this).find("#product-form-line-id-"+$(this).attr("attr-id")).val();
 							line.linenum=$(this).attr("attr-id");
-							line.productid=$("#product-form-id-"+$(this).attr("attr-id")).val();
-							line.code=$("#product-form-code-"+$(this).attr("attr-id")).val();
-							line.name=$("#product-form-name-"+$(this).attr("attr-id")).val();
-							line.unitprice=$("#product-form-price-"+$(this).attr("attr-id")).val();
-							line.quantity=$("#product-form-quantity-"+$(this).attr("attr-id")).val();
-							line.disccountperc=$("#product-form-disccount-"+$(this).attr("attr-id")).val();
-							line.disccountunit=$("#product-form-disccount-total-"+$(this).attr("attr-id")).val();
-							line.taxperc=$("#product-form-tax-"+$(this).attr("attr-id")).val();
-							line.taxunit=$("#product-form-tax-total-"+$(this).attr("attr-id")).val();
-							line.surchargeperc=$("#product-form-surcharge-"+$(this).attr("attr-id")).val();
-							line.surchargeunit=$("#product-form-surcharge-total-"+$(this).attr("attr-id")).val();
-							line.subtotal=$("#product-form-base-total-"+$(this).attr("attr-id")).val();
-							line.total=$("#product-form-amount-"+$(this).attr("attr-id")).val();
+							line.productid=$(this).find("#product-form-id-"+$(this).attr("attr-id")).val();
+							line.code=$(this).find("#product-form-code-"+$(this).attr("attr-id")).val();
+							line.name=$(this).find("#product-form-name-"+$(this).attr("attr-id")).val();
+							line.unitprice=$(this).find("#product-form-price-"+$(this).attr("attr-id")).val();
+							line.quantity=$(this).find("#product-form-quantity-"+$(this).attr("attr-id")).val();
+							line.disccountperc=$(this).find("#product-form-disccount-"+$(this).attr("attr-id")).val();
+							line.disccountunit=$(this).find("#product-form-disccount-total-"+$(this).attr("attr-id")).val();
+							line.taxperc=$(this).find("#product-form-tax-"+$(this).attr("attr-id")).val();
+							line.taxunit=$(this).find("#product-form-tax-total-"+$(this).attr("attr-id")).val();
+							line.surchargeperc=$(this).find("#product-form-surcharge-"+$(this).attr("attr-id")).val();
+							line.surchargeunit=$(this).find("#product-form-surcharge-total-"+$(this).attr("attr-id")).val();
+							line.subtotal=$(this).find("#product-form-base-total-"+$(this).attr("attr-id")).val();
+							line.total=$(this).find("#product-form-amount-"+$(this).attr("attr-id")).val();
+							line.deleted=$(this).hasClass('deleted');
 							lines.push(line);
 						});
 						documentFields.lines=lines;

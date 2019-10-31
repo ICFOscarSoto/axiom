@@ -189,9 +189,9 @@ class GlobaleDefaultController extends Controller
 
 
      /**
-      * @Route("/api/{module}/{name}/generic/tablist/{id}", name="generictablist", defaults={"id"=0})
+      * @Route("/api/{module}/{name}/generic/tablist/{id}/{function}", name="generictablist", defaults={"id"=0, "function"="formatList"})
       */
-     public function tablist($module, $name, $id, RouterInterface $router,Request $request){
+     public function tablist($module, $name, $id, $function, RouterInterface $router,Request $request){
        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
        //$this->denyAccessUnlessGranted('ROLE_ADMIN');
        $userdata=$this->getUser()->getTemplateData();
@@ -203,7 +203,7 @@ class GlobaleDefaultController extends Controller
        $utils = new $classUtils();
        //TODO Check Errors change on 2019-10-04
        //$templateLists=$utils->formatList($this->getUser());
-       $templateLists=$utils->formatList($this->getUser(), $id);
+       $templateLists=$utils->{$function}($this->getUser(), $id);
        $formUtils=new GlobaleFormUtils();
        $formUtils->initialize($this->getUser(), new $class(), dirname(__FILE__)."/../../".$module."/Forms/".$name.".json", $request, $this, $this->getDoctrine());
        $templateForms[]=$formUtils->formatForm($name, true, null, $class,null,["module"=>$module, "name"=>$name]);

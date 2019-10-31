@@ -28,12 +28,12 @@ class AERPConfiguration
     /**
      * @ORM\Column(type="boolean")
      */
-    private $margincontrol;
+    private $margincontrol=false;
 
     /**
      * @ORM\Column(type="float")
      */
-    private $margin;
+    private $margin=0;
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleTaxes")
@@ -44,12 +44,12 @@ class AERPConfiguration
     /**
      * @ORM\Column(type="boolean")
      */
-    private $irpf;
+    private $irpf=false;
 
     /**
      * @ORM\Column(type="float")
      */
-    private $defaultirpf;
+    private $defaultirpf=false;
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\AERP\Entity\AERPPaymentMethods")
@@ -59,12 +59,37 @@ class AERPConfiguration
     /**
      * @ORM\Column(type="integer")
      */
-    private $budgetexpiration;
+    private $budgetexpiration=30;
 
     /**
      * @ORM\Column(type="smallint")
      */
-    private $budgetexpirationtype;
+    private $budgetexpirationtype=1;
+
+    public function __construct($kernel, $doctrine, $user, $company)
+    {
+       $classTaxes="\App\Modules\Globale\Entity\GlobaleTaxes";
+       $repositoryTaxes=$doctrine->getRepository($classTaxes);
+       $this->defaulttax=$repositoryTaxes->find(1);
+
+       $classPaymentMethods="\App\Modules\AERP\Entity\AERPPaymentMethods";
+       $repositoryPaymentMethods=$doctrine->getRepository($classTaxes);
+       $paymentmethod=new $classPaymentMethods();
+       $paymentmethod->setCompany($company);
+       $paymentmethod->setName("CONTADO");
+       $paymentmethod->setExpiration(0);
+       $paymentmethod->setType(0);
+       $paymentmethod->setDomiciled(0);
+       $paymentmethod->setDateadd(new \Datetime());
+       $paymentmethod->setDateupd(new \Datetime());
+       $paymentmethod->setActive(1);
+       $paymentmethod->setDeleted(0);
+       $doctrine->getManager()->persist($paymentmethod);
+       $doctrine->getManager()->flush();
+
+       $this->defaultpaymentmethod=$paymentmethod;
+
+    }
 
     public function getId(): ?int
     {

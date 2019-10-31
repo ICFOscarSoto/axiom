@@ -38,7 +38,7 @@ class AERPSalesBudgetsLines
     /**
      * @ORM\Column(type="float")
      */
-    private $unitprice;
+    private $unitprice=0;
 
     /**
      * @ORM\Column(type="float")
@@ -58,22 +58,22 @@ class AERPSalesBudgetsLines
     /**
      * @ORM\Column(type="float")
      */
-    private $taxperc;
+    private $taxperc=0;
 
     /**
      * @ORM\Column(type="float")
      */
-    private $taxunit;
+    private $taxunit=0;
 
     /**
      * @ORM\Column(type="float", nullable=true)
      */
-    private $surchargeperc;
+    private $surchargeperc=0;
 
     /**
      * @ORM\Column(type="float", nullable=true)
      */
-    private $surchargeunit;
+    private $surchargeunit=0;
 
     /**
      * @ORM\Column(type="float")

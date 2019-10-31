@@ -126,4 +126,24 @@ class GlobaleCompaniesModules
 
         return $this;
     }
+
+    public function postProccess($kernel, $doctrine, $user){
+      //Create general configuration of the module
+      $class="\App\Modules\\".$this->module->getName()."\Entity\\".$this->module->getName()."Configuration";
+      if(class_exists($class)){
+        $repository=$doctrine->getRepository($class);
+        //Check if already exist a Configuration
+        $config=$repository->findOneBy(["company"=>$this->companyown]);
+        if(!$config){
+          //No exist the configuration, create interface
+          $config=new $class($kernel, $doctrine, $user, $this->companyown);
+          $config->setCompany($this->companyown);
+          $doctrine->getManager()->persist($config);
+          $doctrine->getManager()->flush();
+        }
+
+      }
+
+    }
+
 }
