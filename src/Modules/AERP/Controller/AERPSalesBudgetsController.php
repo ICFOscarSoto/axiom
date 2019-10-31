@@ -247,7 +247,6 @@ class AERPSalesBudgetsController extends Controller
 				$line->setSurchargeunit(floatval($value->surchargeunit));
 				$line->setSubtotal(floatval($value->subtotal));
 				$line->setTotal(floatval($value->total));
-				dump($value->deleted);
 				if($value->deleted){
 					$line->setActive(0);
 					$line->setDeleted(1);
@@ -257,8 +256,6 @@ class AERPSalesBudgetsController extends Controller
 				$this->getDoctrine()->getManager()->flush();
 				$linenumIds[]=["linenum"=>$value->linenum, "id"=>$line->getId()];
 		}
-
-		dump($document);
 		return new JsonResponse(["result"=>1,"data"=>["id"=>$document->getId(), "code"=>$document->getCode(), "date"=>$date->format('d/m/Y'), "lines"=>$linenumIds]]);
 		//return new JsonResponse(["result"=>1]);
 	}
