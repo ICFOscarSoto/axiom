@@ -41,7 +41,8 @@
 							</div>
 						</div>
 						<input type="hidden" id="customer-form-id" class="form-control" value="{% if document.customer!=null %}{{ document.customer.id }}{% endif %}">
-						<input type="hidden" id="customer-form-irpf" value="{% if document.irpf %}true{% else %}false{% endif %}" class="form-control">
+						<input type="hidden" id="customer-form-irpf" value="{% if id!=0 %}{% if document.irpf %}true{% else %}false{% endif %}{% else %}{{ moduleConfig.irpf ? 'true' : 'false' }}{% endif %}" class="form-control">
+						<input type="hidden" id="customer-form-irpf-perc" value="{% if id!=0 %}{% if document.irpfperc %}true{% else %}false{% endif %}{% else %}{{ moduleConfig.defaultirpf }}{% endif %}" class="form-control">
 						<input type="hidden" id="customer-form-taxexempt" value="{% if document.taxexempt %}true{% else %}false{% endif %}" class="form-control">
 						<input type="hidden" id="customer-form-surcharge" value="{% if document.surcharge %}true{% else %}false{% endif %}" class="form-control">
 						<div class="col-md-6"> <div class="form-group">
@@ -81,7 +82,7 @@
 						<div class="col-6 col-sm-2"> <div class="form-group">
 							<select type="text"  id="document-form-series-select" class="form-control select2">
 								{% for option in series %}
-									<option value="{{ option.id }}" {% if document.serie!=null and option.id==document.serie.id %} selected="selected" {% endif %}>{{ option.text }}</option>
+									<option value="{{ option.id }}"{% if document.serie!=null and option.id==document.serie.id %} selected="selected" {% endif %}>{{ option.text }}</option>
 								{% endfor %}
 							</select>
 						</div> </div>
@@ -89,7 +90,7 @@
 							<input type="hidden" id="customer-form-paymentmethod" class="form-control">
 							<select type="text" id="customer-form-paymentmethod-select" class="form-control select2">
 								{% for option in paymentMethods %}
-									<option value="{{ option.id }}" {% if document.paymentmethod!=null and option.id==document.paymentmethod.id %} selected="selected" {% endif %}>{{ option.text }}</option>
+									<option value="{{ option.id }}"{% if id!=0 %}{% if document.paymentmethod!=null and option.id==document.paymentmethod.id %} selected="selected" {% endif %}{% else %}{% if option.id==moduleConfig.defaultpaymentmethod.id %} selected="selected" {% endif %}{% endif %}>{{ option.text }}</option>
 								{% endfor %}
 							</select>
 						</div> </div>
@@ -133,7 +134,7 @@
 							<div class="col-2 d-block d-sm-none" style="top: 8px;">Dto.</div>
 							<div class="col-4 col-sm-1"> <div class="form-group" style="margin-bottom: 0px;"> <span class="input__unity_nolabel "><span>%</span></span><input type="hidden" attr-id="{{ line.linenum }}" id="product-form-disccount-total-{{ line.linenum }}" value={{ line.dtounit }}><input type="text" attr-id="{{ line.linenum }}" id="product-form-disccount-{{ line.linenum }}" class="recalculate form-control number-type input_parent__unity" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Dto" value={{ line.dtoperc }}> </div> </div>
 							<div class="col-2 d-block d-sm-none" style="top: 8px;left: 5px;">IVA</div>
-							<div class="col-4 col-sm-1"> <div class="form-group" style="margin-bottom: 0px;"> <span class="input__unity_nolabel "><span>%</span></span><input type="hidden" attr-id="{{ line.linenum }}" id="product-form-tax-total-{{ line.linenum }}" value={{ line.taxunit }}><input type="text" attr-id="{{ line.linenum }}" id="product-form-tax-{{ line.linenum }}" class="recalculate form-control number-type input_parent__unity" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="IVA" value={{ line.taxperc }}> </div> </div>
+							<div class="col-4 col-sm-1"> <div class="form-group" style="margin-bottom: 0px;"> <span class="input__unity_nolabel "><span>%</span></span><input type="hidden" attr-id="{{ line.linenum }}" id="product-form-irpf-total-{{ line.linenum }}" value={{ line.irpfunit }}><input type="hidden" attr-id="{{ line.linenum }}" id="product-form-tax-total-{{ line.linenum }}" value={{ line.taxunit }}><input type="text" attr-id="{{ line.linenum }}" id="product-form-tax-{{ line.linenum }}" class="recalculate form-control number-type input_parent__unity" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="IVA" value={{ line.taxperc }}> </div> </div>
 							<div class="col-2 d-block d-sm-none" style="top: 8px;">R.E.</div>
 							<div class="col-4 col-sm-1"> <div class="form-group" style="margin-bottom: 0px;"> <span class="input__unity_nolabel "><span>%</span></span><input type="hidden" attr-id="{{ line.linenum }}" value=0  id="product-form-surcharge-perc-{{ line.linenum }}"><input type="hidden" attr-id="{{ line.linenum }}" id="product-form-surcharge-total-{{ line.linenum }}" value={{ line.surchargeunit }}><input type="text" attr-id="{{ line.linenum }}" id="product-form-surcharge-{{ line.linenum }}" class="recalculate form-control number-type input_parent__unity" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Recargo" value={{ line.surchargeperc }}> </div> </div>
 							<div class="col-2 d-block d-sm-none" style="top: 8px;left: 5px;">Subtotal</div>
@@ -262,7 +263,7 @@
 				' <div class="col-2 d-block d-sm-none" style="top: 8px;">Dto.</div>'+
 				'	<div class="col-4 col-md-1"> <div class="form-group" style="margin-bottom: 0px;"> <span id="unity-view-formProducts-price" class="input__unity_nolabel "><span>%</span></span><input type="hidden" attr-id="1" value=0 id="product-form-disccount-total-'+numLines+'"><input type="text" attr-id="'+numLines+'" id="product-form-disccount-'+numLines+'" value=0 class="recalculate form-control number-type input_parent__unity" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Dto"> </div> </div>'+
 				' <div class="col-2 d-block d-sm-none" style="top: 8px;left: 5px;">IVA</div>'+
-				'	<div class="col-4 col-md-1"> <div class="form-group" style="margin-bottom: 0px;"> <span id="unity-view-formProducts-price" class="input__unity_nolabel "><span>%</span></span><input type="hidden" attr-id="1" value=0 id="product-form-tax-total-'+numLines+'"><input type="text" attr-id="'+numLines+'" id="product-form-tax-'+numLines+'" value=21 class="recalculate form-control number-type input_parent__unity" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="IVA"> </div> </div>'+
+				'	<div class="col-4 col-md-1"> <div class="form-group" style="margin-bottom: 0px;"> <span id="unity-view-formProducts-price" class="input__unity_nolabel "><span>%</span></span><input type="hidden" attr-id="1" value=0 id="product-form-irpf-total-'+numLines+'"><input type="hidden" attr-id="1" value=0 id="product-form-tax-total-'+numLines+'"><input type="text" attr-id="'+numLines+'" id="product-form-tax-'+numLines+'" value=21 class="recalculate form-control number-type input_parent__unity" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="IVA"> </div> </div>'+
 				' <div class="col-2 d-block d-sm-none" style="top: 8px;">R.E.</div>'+
 				'	<div class="col-4 col-md-1"> <div class="form-group" style="margin-bottom: 0px;"> <span id="unity-view-formProducts-price" class="input__unity_nolabel "><span>%</span></span><input type="hidden" attr-id="1" value=0  id="product-form-surcharge-perc-'+numLines+'"><input type="hidden" attr-id="1" value=0  id="product-form-surcharge-total-'+numLines+'"><input type="text" attr-id="'+numLines+'" id="product-form-surcharge-'+numLines+'" value=0 class="recalculate form-control number-type input_parent__unity" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Recargo"> </div> </div>'+
 				' <div class="col-2 d-block d-sm-none" style="top: 8px;left: 5px;">Subtotal</div>'+
@@ -280,6 +281,7 @@
 					 $("#product-form-base-total-"+numLine).addClass("deleted");
 					 $("#product-form-disccount-total-"+numLine).addClass("deleted");
 					 $("#product-form-tax-total-"+numLine).addClass("deleted");
+					 $("#product-form-irpf-total-"+numLine).addClass("deleted");
 					 $("#product-form-surcharge-total-"+numLine).addClass("deleted");
 					 $("#product-form-amount-"+numLine).addClass("deleted");
 
@@ -327,6 +329,8 @@
 						$(this).find("#product-form-tax-"+$(this).attr("attr-id")).attr("id","product-form-tax-"+i);
 						$(this).find("#product-form-tax-total-"+$(this).attr("attr-id")).attr("attr-id",i);
 						$(this).find("#product-form-tax-total-"+$(this).attr("attr-id")).attr("id","product-form-tax-total-"+i);
+						$(this).find("#product-form-irpf-total-"+$(this).attr("attr-id")).attr("attr-id",i);
+						$(this).find("#product-form-irpf-total-"+$(this).attr("attr-id")).attr("id","product-form-irpf-total-"+i);
 						$(this).find("#product-form-surcharge-"+$(this).attr("attr-id")).attr("attr-id",i);
 						$(this).find("#product-form-surcharge-"+$(this).attr("attr-id")).attr("id","product-form-surcharge-"+i);
 						$(this).find("#product-form-surcharge-perc-"+$(this).attr("attr-id")).attr("attr-id",i);
@@ -349,6 +353,8 @@
 				var disccount=parseFloat($("#product-form-disccount-"+id).val());
 				var tax=parseFloat($("#product-form-tax-"+id).val());
 				var surcharge=parseFloat($("#product-form-surcharge-"+id).val());
+				var irpf=parseFloat($("#product-form-irpf-"+id).val());
+				var irpfperc=$("#customer-form-irpf-perc").val();
 				price=(price=="")?0:price;
 				tax=(tax=="")?0:tax;
 				surcharge=(surcharge=="")?0:surcharge;
@@ -362,10 +368,12 @@
 				var disccounttotal=subtotal*disccount/100;
 				subtotal=(subtotal-disccounttotal).toFixed(2);
 				var taxtotal=(subtotal*tax/100).toFixed(2);
+				var irpftotal=(subtotal*irpfperc/100).toFixed(2);
 				var surchargetotal=(subtotal*surcharge/100).toFixed(2);
-				var total=parseFloat(subtotal)+parseFloat(taxtotal)+parseFloat(surchargetotal);
+				var total=parseFloat(subtotal)+parseFloat(taxtotal)+parseFloat(irpftotal)+parseFloat(surchargetotal);
 				$("#product-form-disccount-total-"+id).val(disccounttotal);
 				$("#product-form-tax-total-"+id).val(taxtotal);
+				$("#product-form-irpf-total-"+id).val(irpftotal);
 				$("#product-form-surcharge-total-"+id).val(surchargetotal);
 				$("#product-form-amount-"+id).val(total.toFixed(2));
 				calculateDocumentTotals();
@@ -374,17 +382,20 @@
 			function calculateDocumentTotals(){
 				var base=0;
 				var taxtotal=0;
+				var irpftotal=0;
 				var surchargetotal=0;
 				var disccounttotal=0;
 				var total=0;
 				$("[id^='product-form-base-total-']:not('.deleted')").each(function() {	base+=parseFloat(isNaN($(this).val())?0:$(this).val()); });
 				$("[id^='product-form-disccount-total-']:not('.deleted')").each(function() {	disccounttotal+=parseFloat(isNaN($(this).val())?0:$(this).val()); });
 				$("[id^='product-form-tax-total-']:not('.deleted')").each(function() {	taxtotal+=parseFloat(isNaN($(this).val())?0:$(this).val()); });
+				$("[id^='product-form-irpf-total-']:not('.deleted')").each(function() {	irpftotal+=parseFloat(isNaN($(this).val())?0:$(this).val()); });
 				$("[id^='product-form-surcharge-total-']:not('.deleted')").each(function() {	surchargetotal+=parseFloat(isNaN($(this).val())?0:$(this).val()); });
 				$("[id^='product-form-amount-']:not('.deleted')").each(function() {	total+=parseFloat(isNaN($(this).val())?0:$(this).val()); });
 				$("#totals_form_net").val(base.toFixed(2));
 				$("#totals_form_dto").val(disccounttotal.toFixed(2));
 				$("#totals_form_tax").val(taxtotal.toFixed(2));
+				$("#totals_form_irpf").val(irpftotal.toFixed(2));
 				$("#totals_form_surcharge").val(surchargetotal.toFixed(2));
 				$("#totals_form_total").val(total.toFixed(2));
 
@@ -562,6 +573,7 @@
 						documentFields.customerid=$("#customer-form-id").val();
 						documentFields.customergroup=$("#customer-form-customergroup-select").val();
 						documentFields.irpf=$("#customer-form-irpf").val();
+						documentFields.irpfperc=$("#customer-form-irpf-perc").val();
 						documentFields.surcharge=$("#customer-form-surcharge").val();
 						documentFields.taxexempt=$("#customer-form-taxexempt").val();
 						documentFields.totalnet=$("#totals_form_net").val();
@@ -584,6 +596,8 @@
 							line.disccountunit=$(this).find("#product-form-disccount-total-"+$(this).attr("attr-id")).val();
 							line.taxperc=$(this).find("#product-form-tax-"+$(this).attr("attr-id")).val();
 							line.taxunit=$(this).find("#product-form-tax-total-"+$(this).attr("attr-id")).val();
+							line.irpfperc=$(this).find("#customer-form-irpf-perc").val();
+							line.irpfunit=$(this).find("#product-form-irpf-total-"+$(this).attr("attr-id")).val();
 							line.surchargeperc=$(this).find("#product-form-surcharge-"+$(this).attr("attr-id")).val();
 							line.surchargeunit=$(this).find("#product-form-surcharge-total-"+$(this).attr("attr-id")).val();
 							line.subtotal=$(this).find("#product-form-base-total-"+$(this).attr("attr-id")).val();

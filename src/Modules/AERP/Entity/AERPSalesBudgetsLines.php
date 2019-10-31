@@ -66,6 +66,16 @@ class AERPSalesBudgetsLines
     private $taxunit=0;
 
     /**
+     * @ORM\Column(type="float")
+     */
+    private $irpfperc=0;
+
+    /**
+     * @ORM\Column(type="float")
+     */
+    private $irpfunit=0;
+
+    /**
      * @ORM\Column(type="float", nullable=true)
      */
     private $surchargeperc=0;
@@ -345,6 +355,30 @@ class AERPSalesBudgetsLines
     public function setCode(string $code): self
     {
         $this->code = $code;
+
+        return $this;
+    }
+
+    public function getIrpfperc(): ?float
+    {
+        return $this->irpfperc;
+    }
+
+    public function setIrpfperc(float $irpfperc): self
+    {
+        $this->irpfperc = $irpfperc;
+
+        return $this;
+    }
+
+    public function getIrpfunit(): ?float
+    {
+        return $this->irpfunit;
+    }
+
+    public function setIrpfunit(float $irpfunit): self
+    {
+        $this->irpfunit = $irpfunit;
 
         return $this;
     }

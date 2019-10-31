@@ -108,6 +108,8 @@ class AERPSalesBudgetsController extends Controller
 		//Recover document from persistence
 		$document=null;
 		$line=new AERPSalesBudgetsLines();
+		$line->setTaxperc($config->getDefaulttax()->getTax());
+
 		if($id!=0){
 			$document=$documentRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$id, "active"=>1,"deleted"=>0]);
 			$documentLines=$documentLinesRepository->findBy(["salesbudget"=>$document, "active"=>1,"deleted"=>0]);
@@ -208,6 +210,7 @@ class AERPSalesBudgetsController extends Controller
 		$document->setTaxexempt(($fields->taxexempt!="")?filter_var($fields->taxexempt, FILTER_VALIDATE_BOOLEAN):0);
 		$document->setSurcharge(($fields->surcharge!="")?filter_var($fields->surcharge, FILTER_VALIDATE_BOOLEAN):0);
 		$document->setIrpf(($fields->irpf!="")?filter_var($fields->irpf, FILTER_VALIDATE_BOOLEAN):0);
+		$document->setIrpfperc(floatval($fields->irpfperc));
 		$document->setTotalnet(floatval($fields->totalnet));
 		$document->setTotalbase(floatval($fields->totalnet-$fields->totaldto));
 		$document->setTotaldto(floatval($fields->totaldto));
@@ -243,6 +246,8 @@ class AERPSalesBudgetsController extends Controller
 				$line->setDtounit(floatval($value->disccountunit));
 				$line->setTaxperc(floatval($value->taxperc));
 				$line->setTaxunit(floatval($value->taxunit));
+				$line->setIrpfperc(floatval($value->irpfperc));
+				$line->setIrpfunit(floatval($value->irpfunit));
 				$line->setSurchargeperc(floatval($value->surchargeperc));
 				$line->setSurchargeunit(floatval($value->surchargeunit));
 				$line->setSubtotal(floatval($value->subtotal));

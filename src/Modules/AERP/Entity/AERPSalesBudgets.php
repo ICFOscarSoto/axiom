@@ -151,6 +151,11 @@ class AERPSalesBudgets
     private $irpf=0;
 
     /**
+     * @ORM\Column(type="float")
+     */
+    private $irpfperc=0;
+
+    /**
      * @ORM\Column(type="boolean")
      */
     private $surcharge=0;
@@ -661,6 +666,18 @@ class AERPSalesBudgets
     public function setTaxexempt(bool $taxexempt): self
     {
         $this->taxexempt = $taxexempt;
+
+        return $this;
+    }
+
+    public function getIrpfperc(): ?float
+    {
+        return $this->irpfperc;
+    }
+
+    public function setIrpfperc(float $irpfperc): self
+    {
+        $this->irpfperc = $irpfperc;
 
         return $this;
     }
