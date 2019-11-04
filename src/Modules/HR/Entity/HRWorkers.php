@@ -592,7 +592,7 @@ class HRWorkers
     public function formValidation($kernel, $doctrine, $user, $validationParams){
       $repository=$doctrine->getRepository(HRWorkers::class);
       $obj=$repository->findOneBy(["idcard"=>$this->idcard,"company"=>$user->getCompany(),"deleted"=>0]);
-      if($obj!=null and $obj->id!=$this->id)
+      if($obj!=null && $obj->id!=$this->id)
         return ["valid"=>false, "global_errors"=>["El trabajador ya existe"]];
       else {
 

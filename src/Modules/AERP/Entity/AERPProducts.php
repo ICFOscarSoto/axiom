@@ -350,7 +350,7 @@ class AERPProducts
         }
       }
 
-      if($product!=null and $product->id!=$this->id)
+      if($product!=null && $product->id!=$this->id)
         return ["valid"=>false, "global_errors"=>["El producto ya existe"]];
       else {
 
