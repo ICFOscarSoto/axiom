@@ -18,6 +18,7 @@ class AERPInvoiceReports
   private $pdf;
   private $user;
 
+  private $configuration;
   private $bgcolor_r, $bgcolor_g, $bgcolor_b;
   private $shadowcolor_r, $shadowcolor_g, $shadowcolor_b;
 
@@ -152,9 +153,9 @@ class AERPInvoiceReports
     $this->pdf->SetXY(10,244);
     $this->pdf->SetFont('Arial','',6);
     $this->pdf->SetTextColor(75,75,75);
-    $this->pdf->MultiCell(190, 3, utf8_decode('Los datos personales facilitados pasarán a formar parte de un fichero de clientes, para la gestión y facturación de sus pedidos. De acuerdo con la Ley Orgánica 15/1999 del 13 de diciembre, esta sociedad guarda las medidas de confidencialidad establecidas en dicha Ley. Usted podrá ejercer sus derechos de acceso, rectificación y cancelación en la dirección de esta Sociedad.'),0,'C', false);
+    $this->pdf->MultiCell(190, 3, utf8_decode($this->configuration->getLopd()),0,'C', false);
     $this->pdf->SetXY(0,0);
-    $this->pdf->TextWithRotation(8,258,utf8_decode('Industrial Campollano Ferretería S.L. inscrita en el Registro Mercantil de Albacete, Tomo 669, Libro 453, Folio 208, Sección 8ª, Hoja AB-9552, Inscripcción 1ª. CIF B02290443'), 90);
+    $this->pdf->TextWithRotation(8,258,utf8_decode($this->configuration->getRegister()), 90);
     $this->pdf->setXY($x, $y);
   }
 
@@ -213,9 +214,9 @@ class AERPInvoiceReports
     $this->user=$params["user"];
     $document=$params["document"];
     $lines=$params["lines"];
-    $configuration=$params["configuration"];
-    list($this->bgcolor_r, $this->bgcolor_g, $this->bgcolor_b) = sscanf($configuration->getBgcolor(), "#%02x%02x%02x");
-    list($this->shadowcolor_r, $this->shadowcolor_g, $this->shadowcolor_b) = sscanf($configuration->getShadowcolor(), "#%02x%02x%02x");
+    $this->configuration=$params["configuration"];
+    list($this->bgcolor_r, $this->bgcolor_g, $this->bgcolor_b) = sscanf($this->configuration->getBgcolor(), "#%02x%02x%02x");
+    list($this->shadowcolor_r, $this->shadowcolor_g, $this->shadowcolor_b) = sscanf($this->configuration->getShadowcolor(), "#%02x%02x%02x");
 
       $columns=[["name"=>"CÓDIGO","width"=>30, "align"=>"L"], //190
                 ["name"=>"DESCRIPCIÓN","width"=>77,"align"=>"L"],

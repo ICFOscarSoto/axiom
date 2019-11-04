@@ -1,0 +1,16 @@
+{% if field.format is defined and field.format == "colour" %}
+<script>
+  $(document).ready(function() {
+    $("#{{formConstructor.name}}-form-body").find("#form_{{ field.name }}").before("<span id='unity-view-{{formConstructor.name}}-{{ field.name }}' class='input__unity'><span><i class='fa fa-tint' style='padding-top: 9px;' aria-hidden='true'></i></span></span>");
+    $("#{{formConstructor.name}}-form-body").find("#form_{{ field.name }}").colpick({
+        colorScheme:'dark',
+        onChange:function(hsb,hex,rgb,el,bySetColor) {
+            $(el).val('#'+hex);
+        },
+        onSubmit:function(hsb,hex,rgb,el,bySetColor) {
+           $(el).colpickHide();
+       }
+    });
+  });
+</script>
+{% endif %}

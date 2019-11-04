@@ -31,7 +31,7 @@
         $(document).ready(function() {
           {{ include("@Globale/form_fields_datetime.html.twig") }}
         });
-        </script>  
+        </script>
       {% for field in section.fields %}
         <div class="col-md-{{ field.cols }}">
             {% if field.type is defined and field.type == 'image' %}
@@ -62,6 +62,8 @@
               {{ include("@Globale/form_fields_change.html.twig") }}
               {# Check if field has unity field #}
               {{ include("@Globale/form_fields_unity.html.twig") }}
+              {# Check if field is an colour #}
+              {{ include("@Globale/form_fields_colour.html.twig") }}
               {# Check if field has a field type number #}
               {{ include("@Globale/form_fields_type_number.html.twig") }}
             {% endif %}

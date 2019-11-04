@@ -54,6 +54,32 @@
           					}
               }
             ]
+        },
+        {
+            "name": "Documentos",
+            "fields": [
+              {
+                  "name": "register",
+                  "cols": 12,
+                  "caption": "Register letterhead"
+              },
+              {
+                  "name": "lopd",
+                  "cols": 12
+              },
+              {
+                  "name": "bgcolor",
+                  "cols": 3,
+                  "format": "colour",
+                  "caption": "Contrast color"
+              },
+              {
+                  "name": "shadowcolor",
+                  "cols": 3,
+                  "format": "colour",
+                  "caption": "Shadow color"
+              }
+            ]
         }
     ]
 }]

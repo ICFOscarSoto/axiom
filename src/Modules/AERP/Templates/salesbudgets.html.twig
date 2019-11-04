@@ -23,8 +23,8 @@
 		<!-- MAIN CONTENT -->
 		<div class="row">
 				<div style="text-align: left;" class="col-md-8">
-					<div id="document-action-buttons">
-						<button id="document-button-print" type="button" class="btn btn">Imprimir</button>
+					<div id="document-action-buttons" style="display:{% if id!=0 %}block;{% else %}none;{% endif %}">
+						<button id="document-button-print" type="button" class="btn btn" onclick="window.open('{{ url("AERPSalesBudgetsPrint",{"id":id}) }}')">Imprimir</button>
 						<button id="document-button-makeorder" type="button" class="btn btn">A Pedido</button>
 					</div>
 				</div>
@@ -504,12 +504,6 @@
 						$("#customer-search-modal-form").modal('toggle');
 					});
 
-					$('body').on('dblclick', "#listCustomers tr", function(e) {
-						$("#customer-form-code").val($(this).children('td').eq(1).text());
-						$("#customer-form-code").trigger('change');
-						$("#customer-search-modal-form").modal('toggle');
-					});
-
 					$('body').on('change', "#customer-form-customergroup-select", function(e) {
 						recalculateDocument();
 					});
@@ -532,12 +526,6 @@
 
 					$('body').on('click', "[id^='listProducts-field-button-select-']", function(e) {
 						$("#product-form-code-"+$("#product-search-modal-form").attr("attr-id")).val($(this).parent().parent().parent().children('td').eq(1).text());
-						$("#product-form-code-"+$("#product-search-modal-form").attr("attr-id")).trigger('change');
-						$("#product-search-modal-form").modal('toggle');
-					});
-
-					$('body').on('dblclick', "#listProducts tr", function(e) {
-						$("#product-form-code-"+$("#product-search-modal-form").attr("attr-id")).val($(this).children('td').eq(1).text());
 						$("#product-form-code-"+$("#product-search-modal-form").attr("attr-id")).trigger('change');
 						$("#product-search-modal-form").modal('toggle');
 					});
@@ -602,7 +590,7 @@
 							line.disccountunit=$(this).find("#product-form-disccount-total-"+$(this).attr("attr-id")).val();
 							line.taxperc=$(this).find("#product-form-tax-"+$(this).attr("attr-id")).val();
 							line.taxunit=$(this).find("#product-form-tax-total-"+$(this).attr("attr-id")).val();
-							line.irpfperc=$(this).find("#customer-form-irpf-perc").val();
+							line.irpfperc=$("#customer-form-irpf-perc").val();
 							line.irpfunit=$(this).find("#product-form-irpf-total-"+$(this).attr("attr-id")).val();
 							line.surchargeperc=$(this).find("#product-form-surcharge-"+$(this).attr("attr-id")).val();
 							line.surchargeunit=$(this).find("#product-form-surcharge-total-"+$(this).attr("attr-id")).val();
@@ -628,14 +616,13 @@
 										 $("#product-form-line-id-"+line.linenum).val(line.id);
 									 });
 									 toastr.success("Documento guardado correctamente", "Confirmación", confirmation);
+									 {% if id==0 %} location.href="/es/AERP/salesbudgets/form/"+data.data.id; {% endif %}
 			           } else {
 									 toastr.error("No se pudo guardar el documento", "Confirmación", confirmation);
 								 }
 			         }
 			       });
-
 					 });
-
 			});
 
 		</script>

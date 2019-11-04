@@ -61,14 +61,14 @@ class AERPSalesBudgetsController extends Controller
 		$classCustomersUtils="\App\Modules\AERP\Utils\AERPCustomersUtils";
 		$customersutils = new $classCustomersUtils();
 		$customerslist=$customersutils->formatList($this->getUser());
-		$customerslist["fieldButtons"]=[["id"=>"select", "type" => "default", "icon" => "fa fa-dot-circle-o", "name" => "editar", "route" => null, "actionType" => "background", "modal"=>"", "confirm" => false, "tooltip" =>""]];
+		$customerslist["fieldButtons"]=[["id"=>"select", "type" => "default", "default"=>true, "icon" => "fa fa-dot-circle-o", "name" => "editar", "route" => null, "actionType" => "background", "modal"=>"", "confirm" => false, "tooltip" =>""]];
 		$customerslist["topButtons"]=[];
 
 		//Search Products
 		$classProductsUtils="\App\Modules\AERP\Utils\AERPProductsUtils";
 		$productsutils = new $classProductsUtils();
 		$productslist=$productsutils->formatList($this->getUser());
-		$productslist["fieldButtons"]=[["id"=>"select", "type" => "default", "icon" => "fa fa-dot-circle-o", "name" => "editar", "route" => null, "actionType" => "background", "modal"=>"", "confirm" => false, "tooltip" =>""]];
+		$productslist["fieldButtons"]=[["id"=>"select", "type" => "default", "default"=>true, "icon" => "fa fa-dot-circle-o", "name" => "editar", "route" => null, "actionType" => "background", "modal"=>"", "confirm" => false, "tooltip" =>""]];
 		$productslist["topButtons"]=[];
 
 		//Customer groups combo
