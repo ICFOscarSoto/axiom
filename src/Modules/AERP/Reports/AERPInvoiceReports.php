@@ -18,12 +18,73 @@ class AERPInvoiceReports
   private $pdf;
   private $user;
 
+  private $bgcolor_r, $bgcolor_g, $bgcolor_b;
+  private $shadowcolor_r, $shadowcolor_g, $shadowcolor_b;
+
   private function secToH($seconds) {
     $hours = floor($seconds / 3600);
     $minutes = floor(($seconds / 60) % 60);
     $seconds = $seconds % 60;
     return sprintf("%02d", $hours).":".sprintf("%02d", $minutes).":".sprintf("%02d", $seconds);
   }
+
+  function Table($pdf, $data, $columns, $associative=false){
+      // Header
+      $pdf->SetFont('Arial','',7);
+      //SetDrawColor(int r [, int g, int b]);
+      $pdf->SetFillColor($this->bgcolor_r, $this->bgcolor_g, $this->bgcolor_b);
+      $pdf->SetDrawColor($this->bgcolor_r, $this->bgcolor_g, $this->bgcolor_b);
+      $pdf->SetTextColor(255,255,255);
+      $pdf->SetX(10);
+      for($i=0;$i<count($columns);$i++){
+
+          $pdf->Cell($columns[$i]["width"],4,utf8_decode(isset($columns[$i]["caption"])?$columns[$i]["caption"]:$columns[$i]["name"]),'TBRL',0,'C',true);
+      }
+      $pdf->Ln();
+      // Data
+      $pdf->SetTextColor(0,0,0);
+      foreach($data as $key=>$row)
+      {
+        $pdf->SetX(10);
+        for($i=0;$i<count($columns);$i++){
+          $pdf->SetDrawColor($this->shadowcolor_r, $this->shadowcolor_g, $this->shadowcolor_b);
+          if($i==count($columns)-1) $border='R'; else $border='';
+          $text=utf8_decode($associative?$row[$columns[$i]["name"]]:$row[$i]);
+          if(strpos($text,'#b#')===0){ $pdf->SetFont('Arial','b',8); $text=substr($text, 3);}else $pdf->SetFont('Arial','',8);
+          if($pdf->GetY()>=268){
+
+            if($i%2) $pdf->SetFillColor(255, 255, 255); else $pdf->SetFillColor($this->shadowcolor_r, $this->shadowcolor_g, $this->shadowcolor_b);//$pdf->SetFillColor(207, 225, 255); //$pdf->SetFillColor(234, 246, 255);
+            $pdf->Cell($columns[$i]["width"],5, $text, $border,0,isset($columns[$i]["align"])?$columns[$i]["align"]:'L',true);
+          }else{
+            if($i%2) $pdf->SetFillColor(255, 255, 255); else $pdf->SetFillColor($this->shadowcolor_r, $this->shadowcolor_g, $this->shadowcolor_b);
+            $pdf->Cell($columns[$i]["width"],5, $text, $border,0,isset($columns[$i]["align"])?$columns[$i]["align"]:'L',true);
+          }
+        }
+        array_shift ($data);
+        $pdf->SetFillColor($this->bgcolor_r, $this->bgcolor_g, $this->bgcolor_b);
+        if($pdf->GetY()>=235){
+          $pdf->SetX(10);
+          //$pdf->Cell($columns[$i]["width"],1,utf8_decode(isset($columns[$i]["caption"])?$columns[$i]["caption"]:$columns[$i]["name"]),'RL',0,'C',true);
+          $pdf->AddPage();
+          return $data;
+        }else $pdf->Ln(4);
+      }
+      while($pdf->GetY()<237){
+        $pdf->SetX(10);
+        for($i=0;$i<count($columns);$i++){
+          if($i%2) $pdf->SetFillColor(255, 255, 255); else $pdf->SetFillColor($this->shadowcolor_r, $this->shadowcolor_g, $this->shadowcolor_b);
+          $pdf->Cell($columns[$i]["width"],2, "", "",0,'L',true);
+
+        }
+        $pdf->Ln(2);
+      }
+
+      // Closing line
+      //$pdf->Cell(array_sum($w),0,'','T');
+      return $data;
+  }
+
+
   private function docFooter($document){
     $x=$this->pdf->getX();
     $y=$this->pdf->getY();
@@ -44,8 +105,8 @@ class AERPInvoiceReports
     $this->pdf->Ln(4.1);
     $this->pdf->SetX(10);
     //$pdf->SetFillColor(248, 250, 255);
-    $this->pdf->SetFillColor(248, 250, 255);
-    $this->pdf->SetDrawColor(248, 250, 255);
+    $this->pdf->SetFillColor($this->shadowcolor_r, $this->shadowcolor_g, $this->shadowcolor_b);
+    $this->pdf->SetDrawColor($this->shadowcolor_r, $this->shadowcolor_g, $this->shadowcolor_b);
     $this->pdf->setTextColor(0,0,0);
     $this->pdf->SetFont('Arial','b',9);
     $this->pdf->Cell(34,8,utf8_decode(number_format($document->getTotalnet(),2,',','.').json_decode('"\u0080"')),'TB',0,'C',true);
@@ -60,7 +121,7 @@ class AERPInvoiceReports
     $this->pdf->Ln(12);
     $this->pdf->SetX(10);
     $this->pdf->SetFont('Arial','',7);
-    $this->pdf->SetFillColor(248, 250, 255);
+    $this->pdf->SetFillColor($this->shadowcolor_r, $this->shadowcolor_g, $this->shadowcolor_b);
 
     $this->pdf->Cell(40,3,utf8_decode('Forma de pago'),'B',0,'L',true);
     $this->pdf->Cell(150,3,utf8_decode(""),'B',0,'L',true);
@@ -98,34 +159,33 @@ class AERPInvoiceReports
   }
 
   private function docHeader($document){
-    $this->pdf->SetDrawColor(44, 132, 194);
-    $this->pdf->SetFillColor(44, 132, 194);
-    $this->pdf->SetTextColor(44, 132, 194);
+    $this->pdf->SetDrawColor($this->bgcolor_r, $this->bgcolor_g, $this->bgcolor_b);
+    $this->pdf->SetFillColor($this->bgcolor_r, $this->bgcolor_g, $this->bgcolor_b);
+    $this->pdf->SetTextColor($this->bgcolor_r, $this->bgcolor_g, $this->bgcolor_b);
     $this->pdf->Rect(105, 41, 1.5, 29,'DF');
     $this->pdf->Rect(198, 41, 1.5, 29,'DF');
     $x=$this->pdf->getX();
     $y=$this->pdf->getY();
     $this->pdf->setXY(5, 39);
-    $this->pdf->SetDrawColor(248, 250, 255);
+    //$this->pdf->SetDrawColor(0, 0, 0);
     $this->pdf->Cell(20,9,utf8_decode('Nº Presupuesto'),'',0,'L',false);
     $this->pdf->SetTextColor(0, 0, 0);
     $this->pdf->Cell(60,9,utf8_decode($document->getCode()),'',0,'L',false);
-    $this->pdf->SetTextColor(44, 132, 194);
+    $this->pdf->SetTextColor($this->bgcolor_r, $this->bgcolor_g, $this->bgcolor_b);
     $this->pdf->Ln(4);
     $this->pdf->Cell(20,9,utf8_decode('Fecha'),'',0,'L',false);
     $this->pdf->SetTextColor(0, 0, 0);
     $this->pdf->Cell(60,9,utf8_decode($document->getDate()->format("d/m/Y")),'',0,'L',false);
     $this->pdf->Ln(4);
-    $this->pdf->SetTextColor(44, 132, 194);
+    $this->pdf->SetTextColor($this->bgcolor_r, $this->bgcolor_g, $this->bgcolor_b);
     $this->pdf->Cell(20,9,utf8_decode('Cliente'),'',0,'L',false);
     $this->pdf->SetTextColor(0, 0, 0);
     $this->pdf->Cell(60,9,utf8_decode(""),'',0,'L',false);
     $this->pdf->Ln(4);
-    $this->pdf->SetTextColor(44, 132, 194);
+    $this->pdf->SetTextColor($this->bgcolor_r, $this->bgcolor_g, $this->bgcolor_b);
     $this->pdf->Cell(20,9,utf8_decode('Página'),'',0,'L',false);
     $this->pdf->SetTextColor(0, 0, 0);
     $this->pdf->Cell(60,9,utf8_decode($this->pdf->PageNo().'/{nb}'),'',0,'L',false);
-
     $this->pdf->setXY(110, 40);
     $this->pdf->Cell(60,9,utf8_decode($document->getCustomername()),'',0,'L',false);
     $this->pdf->setXY(110, 44);
@@ -134,7 +194,7 @@ class AERPInvoiceReports
     $this->pdf->Cell(60,9,utf8_decode($document->getCustomercity()." - ".$document->getCustomerpostcode()." - ".$document->getCustomerstate()),'',0,'L',false);
     $this->pdf->setXY(110, 52);
     $this->pdf->Cell(60,9,utf8_decode("NIF/NIE ".$document->getVat()),'',0,'L',false);
-    $this->pdf->SetTextColor(44, 132, 194);
+    $this->pdf->SetTextColor($this->bgcolor_r, $this->bgcolor_g, $this->bgcolor_b);
     $this->pdf->setXY(5, 31);
     $this->pdf->SetDrawColor(248, 250, 255);
     $this->pdf->SetFont('Arial','',14);
@@ -153,6 +213,9 @@ class AERPInvoiceReports
     $this->user=$params["user"];
     $document=$params["document"];
     $lines=$params["lines"];
+    $configuration=$params["configuration"];
+    list($this->bgcolor_r, $this->bgcolor_g, $this->bgcolor_b) = sscanf($configuration->getBgcolor(), "#%02x%02x%02x");
+    list($this->shadowcolor_r, $this->shadowcolor_g, $this->shadowcolor_b) = sscanf($configuration->getShadowcolor(), "#%02x%02x%02x");
 
       $columns=[["name"=>"CÓDIGO","width"=>30, "align"=>"L"], //190
                 ["name"=>"DESCRIPCIÓN","width"=>77,"align"=>"L"],
@@ -191,7 +254,7 @@ class AERPInvoiceReports
         $this->docHeader($document);
         $this->docFooter($document);
         $this->pdf->SetY(80);
-        $data=$this->pdf->Table($data,$columns);
+        $data=$this->Table($this->pdf,$data,$columns);
       }
 
 

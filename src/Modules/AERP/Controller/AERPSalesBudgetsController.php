@@ -273,10 +273,15 @@ class AERPSalesBudgetsController extends Controller
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		$documentRepository=$this->getDoctrine()->getRepository(AERPSalesBudgets::class);
 		$documentLinesRepository=$this->getDoctrine()->getRepository(AERPSalesBudgetsLines::class);
+		$configrepository=$this->getDoctrine()->getRepository(AERPConfiguration::class);
+
 		$document=$documentRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$id, "deleted"=>0]);
+
 		if(!$document) return new Response("");
 		$lines=$documentLinesRepository->findBy(["salesbudget"=>$document, "deleted"=>0, "active"=>1]);
-		$params=["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "id"=>$id, "user"=>$this->getUser(), "document"=>$document, "lines"=>$lines];
+		$configuration=$configrepository->findOneBy(["company"=>$this->getUser()->getCompany()]);
+
+		$params=["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "id"=>$id, "user"=>$this->getUser(), "document"=>$document, "lines"=>$lines, "configuration"=>$configuration];
 		$reportsUtils = new AERPInvoiceReports();
 
 		$pdf=$reportsUtils->create($params);

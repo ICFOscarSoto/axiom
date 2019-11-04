@@ -86,6 +86,26 @@ class AERPConfiguration
      */
     private $dateupd;
 
+    /**
+     * @ORM\Column(type="string", length=7)
+     */
+    private $bgcolor;
+
+    /**
+     * @ORM\Column(type="string", length=7)
+     */
+    private $shadowcolor;
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $lopd;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $register;
+
     public function __construct($kernel=null, $doctrine=null, $user=null, $company=null)
     {
       if($kernel && $doctrine && $user && $company){
@@ -269,6 +289,54 @@ class AERPConfiguration
     public function setDateupd(\DateTimeInterface $dateupd): self
     {
         $this->dateupd = $dateupd;
+
+        return $this;
+    }
+
+    public function getBgcolor(): ?string
+    {
+        return $this->bgcolor;
+    }
+
+    public function setBgcolor(string $bgcolor): self
+    {
+        $this->bgcolor = $bgcolor;
+
+        return $this;
+    }
+
+    public function getShadowcolor(): ?string
+    {
+        return $this->shadowcolor;
+    }
+
+    public function setShadowcolor(string $shadowcolor): self
+    {
+        $this->shadowcolor = $shadowcolor;
+
+        return $this;
+    }
+
+    public function getLopd(): ?string
+    {
+        return $this->lopd;
+    }
+
+    public function setLopd(?string $lopd): self
+    {
+        $this->lopd = $lopd;
+
+        return $this;
+    }
+
+    public function getRegister(): ?string
+    {
+        return $this->register;
+    }
+
+    public function setRegister(?string $register): self
+    {
+        $this->register = $register;
 
         return $this;
     }
