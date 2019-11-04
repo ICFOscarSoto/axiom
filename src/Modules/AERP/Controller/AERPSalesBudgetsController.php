@@ -26,6 +26,7 @@ use App\Modules\AERP\Entity\AERPSalesBudgets;
 use App\Modules\AERP\Entity\AERPSalesBudgetsLines;
 use App\Modules\AERP\Entity\AERPProducts;
 use App\Modules\AERP\Entity\AERPFinancialYears;
+use App\Modules\AERP\Reports\AERPInvoiceReports;
 use App\Modules\Security\Utils\SecurityUtils;
 
 class AERPSalesBudgetsController extends Controller
@@ -263,6 +264,23 @@ class AERPSalesBudgetsController extends Controller
 		}
 		return new JsonResponse(["result"=>1,"data"=>["id"=>$document->getId(), "code"=>$document->getCode(), "date"=>$date->format('d/m/Y'), "lines"=>$linenumIds]]);
 		//return new JsonResponse(["result"=>1]);
+	}
+
+	/**
+	 * @Route("/{_locale}/AERP/salesbudgets/print/{id}", name="AERPSalesBudgetsPrint", defaults={"id"=0}))
+	 */
+	public function AERPSalesBudgetsPrint($id, RouterInterface $router,Request $request){
+		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		$documentRepository=$this->getDoctrine()->getRepository(AERPSalesBudgets::class);
+		$documentLinesRepository=$this->getDoctrine()->getRepository(AERPSalesBudgetsLines::class);
+		$document=$documentRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$id, "deleted"=>0]);
+		if(!$document) return new Response("");
+		$lines=$documentLinesRepository->findBy(["salesbudget"=>$document, "deleted"=>0, "active"=>1]);
+		$params=["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "id"=>$id, "user"=>$this->getUser(), "document"=>$document, "lines"=>$lines];
+		$reportsUtils = new AERPInvoiceReports();
+
+		$pdf=$reportsUtils->create($params);
+		return new Response("", 200, array('Content-Type' => 'application/pdf'));
 	}
 
 }

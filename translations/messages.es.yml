@@ -58,6 +58,7 @@ name: Nombre
 description: Descripción
 module: Módulo
 Módule: Módulo
+Percent: Porcentaje
 
 #COUNTRIES
 #----------------------------------------------------------------------------------------------------------------------
@@ -446,3 +447,9 @@ Customer: Cliente
 Search: Buscar
 Manufacturers: Fabricantes
 Price: PVP
+Margin: Control de margen
+Defaultirpf: Porcetaje retención IRPF
+Budgetexpiration: Duración presupuesto
+Budgetexpirationtype: Tipo duración
+Defaultpaymentmethod: Metodo pago por defecto
+Defaulttax: Impuesto por defecto

@@ -14,6 +14,7 @@ use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\Globale\Entity\GlobaleCompanies;
 use App\Modules\Globale\Entity\GlobaleCountries;
 use App\Modules\Globale\Entity\GlobaleCurrencies;
+use App\Modules\Globale\Entity\GlobaleCompaniesModules;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
@@ -145,6 +146,27 @@ class GlobaleCompaniesController extends Controller
 	  $repository=$this->getDoctrine()->getRepository($this->class);
 	  $obj = $repository->findOneBy(['id'=>$id, 'deleted'=>0]);
 	  $entity_name=$obj?$obj->getSocialname().' ('.$obj->getVat().')':'';
+		$tabs =  [["name" => "data", "caption"=>"Datos empresa", "icon"=>"entypo-book-open","active"=>true, "route"=>$this->generateUrl("dataCompanyAdmin",["id"=>$id])],
+							 ["name" => "bank", "icon"=>"fa fa-headphones", "caption"=>"Datos bancarios", "route"=>$this->generateUrl("dataMyCompanyBankAccounts",["identity"=>$id,"id"=>$obj?($obj->getBankaccount()?$obj->getBankaccount()->getId():0):0])],
+							 ["name" => "autocloseclocks", "icon"=>"fa fa-clocks", "caption"=>"Cierre Jornada", "route"=>$this->generateUrl("generictablist",["module"=>"HR", "name"=>"AutoCloseClocks", "id"=>$id])]
+						 ];
+
+
+		//Configuration tabs of modules enabled
+		$modulespository=$this->getDoctrine()->getRepository(GlobaleCompaniesModules::class);
+		$modules=$modulespository->findBy(["companyown"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
+		foreach($modules as $module){
+			$class="\App\Modules\\".$module->getModule()->getName()."\Entity\\".$module->getModule()->getName()."Configuration";
+			if(class_exists($class)){
+				//Get configuration Id
+				$configurationRepository=$this->getDoctrine()->getRepository($class);
+				$configuration=$configurationRepository->findOneBy(["company"=>$this->getUser()->getCompany()]);
+				if(!$configuration) continue;
+				$tab = ["name" => $module->getModule()->getName(), "icon"=>"fa fa-clocks", "caption"=>$module->getModule()->getName(), "route"=>$this->generateUrl("genericdata",["module"=>$module->getModule()->getName(), "name"=>"Configuration", "id"=>$configuration->getId(), "type"=>"full"])];
+				array_push($tabs, $tab);
+			}
+		}
+
 	  return $this->render('@Globale/generictabform.html.twig', array(
 	 				 'entity_name' => $entity_name,
 	 				 'controllerName' => 'CompaniesController',
@@ -155,16 +177,10 @@ class GlobaleCompaniesController extends Controller
 	 				 'userData' => $userdata,
 	 				 'id' => $id,
 	 				 'tab' => $request->query->get('tab','data'), //Show initial tab, by default data tab
-	 				 'tabs' => [["name" => "data", "caption"=>"Datos empresa", "icon"=>"entypo-book-open","active"=>true, "route"=>$this->generateUrl("dataCompanyAdmin",["id"=>$id])],
-					 						["name" => "bank", "icon"=>"fa fa-headphones", "caption"=>"Datos bancarios", "route"=>$this->generateUrl("dataMyCompanyBankAccounts",["identity"=>$id,"id"=>$obj?($obj->getBankaccount()?$obj->getBankaccount()->getId():0):0])],
-											["name" => "bank", "icon"=>"fa fa-clocks", "caption"=>"Cierre Jornada", "route"=>$this->generateUrl("generictablist",["module"=>"HR", "name"=>"AutoCloseClocks", "id"=>$id])]
-	 									 ],
+	 				 'tabs' => $tabs,
 	 				 'include_header' => [["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker-es.js"]],
 	 				 'include_footer' => [["type"=>"css", "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.css"],
 	 															["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.js"]]
-	 				 /*'tabs' => [["name" => "data", "caption"=>"Datos trabajador", "active"=>$tab=='data'?true:false, "route"=>$this->generateUrl("dataWorker",["id"=>$id])],
-	 										["name" => "paymentroll", "active"=>($tab=='paymentroll' && $id)?true:false, "caption"=>"Nóminas"]
-	 									 ]*/
 	  ));
 	 }
 

@@ -1,0 +1,59 @@
+[{
+    "sections": [
+        {
+            "name": "General",
+            "fields": [
+                {
+                    "name": "defaulttax",
+                    "cols": 6
+                },
+                {
+                    "name": "defaultpaymentmethod",
+                    "cols": 6
+                },
+                {
+                    "name": "margincontrol",
+                    "cols": 2,
+                    "change": [{"field": "margin", "thisval": 0, "targetval":0}]
+                },
+                {
+                    "name": "margin",
+                    "caption": "Percent",
+                    "unity": "%",
+                    "depends":{"from": "margincontrol","vals":"[1]"},
+                    "cols": 2
+                },
+                {
+                    "name": "irpf",
+                    "cols": 2,
+                    "change": [{"field": "defaultirpf", "thisval": 0, "targetval":0}]
+                },
+                {
+                    "name": "defaultirpf",
+                    "cols": 2,
+                    "caption": "Percent",
+                    "unity": "%",
+                    "depends":{"from": "irpf","vals":"[1]"}
+                }
+
+            ]
+        },
+        {
+            "name": "Presupuestos",
+            "fields": [
+              {
+                  "name": "budgetexpiration",
+                  "cols": 2
+              },
+              {
+                  "name": "budgetexpirationtype",
+                  "cols": 4, "transform":
+          					{
+          						"type":"option",
+          						"options": {"Días": "1", "Semanas": "2", "Meses": "3", "Años": "4"}
+          					}
+              }
+            ]
+        }
+    ]
+}]

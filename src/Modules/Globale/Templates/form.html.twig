@@ -25,9 +25,13 @@
     <div class="panel-heading">
       <div class="panel-title">{{ (section.name)|trans }}</div>
     </div>
-
     <div class="panel-body">
       <div class="row">
+        <script>
+        $(document).ready(function() {
+          {{ include("@Globale/form_fields_datetime.html.twig") }}
+        });
+        </script>  
       {% for field in section.fields %}
         <div class="col-md-{{ field.cols }}">
             {% if field.type is defined and field.type == 'image' %}
@@ -107,7 +111,6 @@
 <script>
 
 	$(document).ready(function() {
-    {{ include("@Globale/form_fields_datetime.html.twig") }}
 
     $('body').on('click', "[id^='{{formConstructor.name}}-button-save']", function() {
           if($("#{{formConstructor.name}}-form-body").find('form').valid()){

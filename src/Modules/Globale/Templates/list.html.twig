@@ -231,8 +231,6 @@
 		      if((load_wait)>0){ load_wait--; if(load_wait==0) $("#load-spinner").fadeOut();}
 		    });
 
-
-
 				//Double click row action
 				$('#{{ listConstructor.id }} tbody').on('dblclick', 'tr', function () {
 					var data = {{ listConstructor.id }}.row( this ).data();
