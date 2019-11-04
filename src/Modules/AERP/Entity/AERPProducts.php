@@ -40,7 +40,7 @@ class AERPProducts
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\AERP\Entity\AERPProviders")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=true)
      */
     private $provider;
 
