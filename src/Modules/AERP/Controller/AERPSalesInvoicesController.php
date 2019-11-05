@@ -197,7 +197,7 @@ class AERPSalesInvoicesController extends Controller
 		$document->setCurrency($this->getUser()->getCompany()->getCurrency());
 		$document->setPaymentmethod($paymentmethod);
 		$document->setSerie($serie);
-		$document->setFinacialyear($config->getFinancialyear());
+		$document->setFinancialyear($config->getFinancialyear());
 		$document->setCustomergroup($customergroup);
 		$document->setCustomer($customer);
 		$document->setVat($customer->getVat());
