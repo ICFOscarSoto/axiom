@@ -52,11 +52,6 @@ class GlobaleTaxes
      */
     private $dateupd;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCompanies")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $company;
 
     public function getId(): ?int
     {
@@ -147,15 +142,4 @@ class GlobaleTaxes
         return $this;
     }
 
-    public function getCompany(): ?GlobaleCompanies
-    {
-        return $this->company;
-    }
-
-    public function setCompany(?GlobaleCompanies $company): self
-    {
-        $this->company = $company;
-
-        return $this;
-    }
 }

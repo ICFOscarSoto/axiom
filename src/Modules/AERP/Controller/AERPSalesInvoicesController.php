@@ -165,11 +165,12 @@ class AERPSalesInvoicesController extends Controller
 		$productsRepository=$this->getDoctrine()->getRepository(AERPProducts::class);
 		$seriesRepository=$this->getDoctrine()->getRepository(AERPSeries::class);
 		$taxesRepository=$this->getDoctrine()->getRepository(GlobaleTaxes::class);
+		$configrepository=$this->getDoctrine()->getRepository(AERPConfiguration::class);
 
 		$document=$documentRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$id, "deleted"=>0]);
 		//Check if document belongs to company
 		if($id!=0 && !$document) return new JsonResponse(["result"=>0]);
-
+		$config=$configrepository->findOneBy(["company"=>$this->getUser()->getCompany()]);
 
 		//Get content of the json reques
 		$fields=json_decode($request->getContent());
@@ -184,8 +185,8 @@ class AERPSalesInvoicesController extends Controller
 		$date=$fields->date?date_create_from_format("d/m/Y",$fields->date):new \DateTime();
 		if(!$document){
 			$document=new $this->class();
-			$document->setNumber($documentRepository->getNextNum($this->getUser()->getCompany()->getId()));
-			$document->setCode($code='FRA'.$date->format('y').'/'.str_pad($document->getNumber(), 6, '0', STR_PAD_LEFT));
+			$document->setNumber($documentRepository->getNextNum($this->getUser()->getCompany()->getId(),$config->getFinancialyear()->getId(),$serie->getId()));
+			$document->setCode($config->getFinancialyear()->getCode().$serie->getCode().str_pad($document->getNumber(), 6, '0', STR_PAD_LEFT));
 			$document->setAuthor($this->getUser());
 			$document->setAgent($this->getUser());
 			$document->setActive(1);

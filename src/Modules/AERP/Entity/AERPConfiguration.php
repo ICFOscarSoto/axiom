@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
 use \App\Modules\Globale\Entity\GlobaleTaxes;
 use \App\Modules\AERP\Entity\AERPPaymentMethods;
+use \App\Modules\AERP\Entity\AERPFinancialYears;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\Modules\AERP\Entity\AERPConfigurationRepository")
@@ -69,12 +70,12 @@ class AERPConfiguration
     /**
      * @ORM\Column(type="boolean")
      */
-    private $active;
+    private $active=1;
 
     /**
      * @ORM\Column(type="boolean")
      */
-    private $deleted;
+    private $deleted=0;
 
     /**
      * @ORM\Column(type="datetime")
@@ -106,6 +107,11 @@ class AERPConfiguration
      */
     private $register;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\AERP\Entity\AERPFinancialYears")
+     */
+    private $financialyear;
+
 
     public function __construct($kernel=null, $doctrine=null, $user=null, $company=null)
     {
@@ -113,6 +119,10 @@ class AERPConfiguration
        $classTaxes="\App\Modules\Globale\Entity\GlobaleTaxes";
        $repositoryTaxes=$doctrine->getRepository($classTaxes);
        $this->defaulttax=$repositoryTaxes->find(1);
+       $this->bgcolor="#555555";
+       $this->shadowcolor="#DEDEDE";
+       $this->dateadd=new \Datetime();
+       $this->dateupd=new \Datetime();
 
        $classPaymentMethods="\App\Modules\AERP\Entity\AERPPaymentMethods";
        $repositoryPaymentMethods=$doctrine->getRepository($classTaxes);
@@ -338,6 +348,18 @@ class AERPConfiguration
     public function setRegister(?string $register): self
     {
         $this->register = $register;
+
+        return $this;
+    }
+
+    public function getFinancialyear(): ?AERPFinancialYears
+    {
+        return $this->financialyear;
+    }
+
+    public function setFinancialyear(?AERPFinancialYears $financialyear): self
+    {
+        $this->financialyear = $financialyear;
 
         return $this;
     }
