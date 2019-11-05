@@ -13,7 +13,7 @@ use App\Modules\Globale\Utils\ListUtils;
 use App\Modules\Globale\Reports\GlobaleReports;
 
 
-class AERPInvoiceReports
+class AERPSalesBudgetsReports
 {
   private $pdf;
   private $user;
@@ -21,6 +21,9 @@ class AERPInvoiceReports
   private $configuration;
   private $bgcolor_r, $bgcolor_g, $bgcolor_b;
   private $shadowcolor_r, $shadowcolor_g, $shadowcolor_b;
+
+  private $cursor;
+  private $positions=[];
 
   private function secToH($seconds) {
     $hours = floor($seconds / 3600);
@@ -37,39 +40,57 @@ class AERPInvoiceReports
       $pdf->SetDrawColor($this->bgcolor_r, $this->bgcolor_g, $this->bgcolor_b);
       $pdf->SetTextColor(255,255,255);
       $pdf->SetX(10);
+      $x=10;
+      $this->positions=[];
+      $wordwraps=[];
       for($i=0;$i<count($columns);$i++){
-
           $pdf->Cell($columns[$i]["width"],4,utf8_decode(isset($columns[$i]["caption"])?$columns[$i]["caption"]:$columns[$i]["name"]),'TBRL',0,'C',true);
+          $this->positions[$i]=$x;
+          $x=$x+$columns[$i]["width"];
       }
       $pdf->Ln();
       // Data
+
+      $y=$pdf->GetY();
       $pdf->SetTextColor(0,0,0);
+
       foreach($data as $key=>$row)
       {
-        $pdf->SetX(10);
+        $wordwraps=[];
         for($i=0;$i<count($columns);$i++){
+
+          $x=$i>0?$columns[$i-1]["width"]:0;
           $pdf->SetDrawColor($this->shadowcolor_r, $this->shadowcolor_g, $this->shadowcolor_b);
           if($i==count($columns)-1) $border='R'; else $border='';
           $text=utf8_decode($associative?$row[$columns[$i]["name"]]:$row[$i]);
           if(strpos($text,'#b#')===0){ $pdf->SetFont('Arial','b',8); $text=substr($text, 3);}else $pdf->SetFont('Arial','',8);
-          if($pdf->GetY()>=268){
+          $wordwraps[$i]=ceil($pdf->GetStringWidth($text)/$columns[$i]["width"]);
+          if($i%2) $pdf->SetFillColor(255, 255, 255); else $pdf->SetFillColor($this->shadowcolor_r, $this->shadowcolor_g, $this->shadowcolor_b);
+          $pdf->SetXY($this->positions[$i],$y);
+          $pdf->MultiCell($columns[$i]["width"],5, $text, $border,isset($columns[$i]["align"])?$columns[$i]["align"]:'L',true);
+        }
 
-            if($i%2) $pdf->SetFillColor(255, 255, 255); else $pdf->SetFillColor($this->shadowcolor_r, $this->shadowcolor_g, $this->shadowcolor_b);//$pdf->SetFillColor(207, 225, 255); //$pdf->SetFillColor(234, 246, 255);
-            $pdf->Cell($columns[$i]["width"],5, $text, $border,0,isset($columns[$i]["align"])?$columns[$i]["align"]:'L',true);
-          }else{
+        //Compensate wordwraps shadows
+        for($i=0;$i<count($columns);$i++){
+          for($j=$wordwraps[$i];$j<max($wordwraps);$j++){
             if($i%2) $pdf->SetFillColor(255, 255, 255); else $pdf->SetFillColor($this->shadowcolor_r, $this->shadowcolor_g, $this->shadowcolor_b);
-            $pdf->Cell($columns[$i]["width"],5, $text, $border,0,isset($columns[$i]["align"])?$columns[$i]["align"]:'L',true);
+            $pdf->SetX($this->positions[$i]);
+            $pdf->Cell($columns[$i]["width"],5, "", "",0,'L',true);
           }
         }
+
         array_shift ($data);
         $pdf->SetFillColor($this->bgcolor_r, $this->bgcolor_g, $this->bgcolor_b);
         if($pdf->GetY()>=235){
           $pdf->SetX(10);
-          //$pdf->Cell($columns[$i]["width"],1,utf8_decode(isset($columns[$i]["caption"])?$columns[$i]["caption"]:$columns[$i]["name"]),'RL',0,'C',true);
           $pdf->AddPage();
           return $data;
-        }else $pdf->Ln(4);
+        }
+        $y=$y+(5*max($wordwraps));
       }
+      $pdf->SetY($y);
+      $this->cursor=$y;
+      //paint shadows
       while($pdf->GetY()<237){
         $pdf->SetX(10);
         for($i=0;$i<count($columns);$i++){
@@ -79,9 +100,6 @@ class AERPInvoiceReports
         }
         $pdf->Ln(2);
       }
-
-      // Closing line
-      //$pdf->Cell(array_sum($w),0,'','T');
       return $data;
   }
 
@@ -96,34 +114,28 @@ class AERPInvoiceReports
     $this->pdf->SetY(-43);
     $this->pdf->SetX(10);
     $this->pdf->SetFont('Arial','',7);
-    $this->pdf->Cell(34,4,utf8_decode('IMPORTE'),'',0,'C',true);
-    $this->pdf->Cell(33,4,utf8_decode('DTO. P.P.'),'',0,'C',true);
-    $this->pdf->Cell(35,4,utf8_decode('BASE IMPONIBLE'),'',0,'C',true);
-    $this->pdf->Cell(18,4,utf8_decode('% IVA'),'',0,'C',true);
-    $this->pdf->Cell(37,4,utf8_decode('CTA. IVA'),'',0,'C',true);
-    /*$this->pdf->Cell(31,4,utf8_decode('REC. EQUIVALENCIA'),'',0,'C',true);*/
+    $this->pdf->Cell(30,4,utf8_decode('IMPORTE'),'',0,'C',true);
+    $this->pdf->Cell(30,4,utf8_decode('DTO. P.P.'),'',0,'C',true);
+    $this->pdf->Cell(30,4,utf8_decode('BASE IMPONIBLE'),'',0,'C',true);
+    $this->pdf->Cell(30,4,utf8_decode('RE'),'',0,'C',true);
+    $this->pdf->Cell(37,4,utf8_decode('IVA'),'',0,'C',true);
     $this->pdf->Cell(33,4,utf8_decode('TOTAL'),'',0,'C',true);
     $this->pdf->Ln(4.1);
     $this->pdf->SetX(10);
-    //$pdf->SetFillColor(248, 250, 255);
     $this->pdf->SetFillColor($this->shadowcolor_r, $this->shadowcolor_g, $this->shadowcolor_b);
     $this->pdf->SetDrawColor($this->shadowcolor_r, $this->shadowcolor_g, $this->shadowcolor_b);
     $this->pdf->setTextColor(0,0,0);
     $this->pdf->SetFont('Arial','b',9);
-    $this->pdf->Cell(34,8,utf8_decode(number_format($document->getTotalnet(),2,',','.').json_decode('"\u0080"')),'TB',0,'C',true);
-    $this->pdf->Cell(33,8,utf8_decode(number_format($document->getTotaldto(),2,',','.').json_decode('"\u0080"')),'TB',0,'C',false);
-    $this->pdf->Cell(35,8,utf8_decode(number_format($document->getTotalbase(),2,',','.').json_decode('"\u0080"')),'TB',0,'C',true);
-    $vat_string="";
-
-    $this->pdf->Cell(18,8,utf8_decode($vat_string),'TB',0,'C',false);
+    $this->pdf->Cell(30,8,utf8_decode(number_format($document->getTotalnet(),2,',','.').json_decode('"\u0080"')),'TB',0,'C',true);
+    $this->pdf->Cell(30,8,utf8_decode(number_format($document->getTotaldto(),2,',','.').json_decode('"\u0080"')),'TB',0,'C',false);
+    $this->pdf->Cell(30,8,utf8_decode(number_format($document->getTotalbase(),2,',','.').json_decode('"\u0080"')),'TB',0,'C',true);
+    $this->pdf->Cell(30,8,utf8_decode(number_format($document->getTotalSurcharge(),2,',','.').json_decode('"\u0080"')),'TB',0,'C',false);
     $this->pdf->Cell(37,8,utf8_decode(number_format($document->getTotaltax(),2,',','.').json_decode('"\u0080"')),'TB',0,'C',true);
-    /*$this->pdf->Cell(31,8,utf8_decode(''),'TB',0,'C',false);*/
     $this->pdf->Cell(33,8,utf8_decode(number_format($document->getTotal(),2,',','.').json_decode('"\u0080"')),'TB',0,'C',true);
     $this->pdf->Ln(12);
     $this->pdf->SetX(10);
     $this->pdf->SetFont('Arial','',7);
     $this->pdf->SetFillColor($this->shadowcolor_r, $this->shadowcolor_g, $this->shadowcolor_b);
-
     $this->pdf->Cell(40,3,utf8_decode('Forma de pago'),'B',0,'L',true);
     $this->pdf->Cell(150,3,utf8_decode(""),'B',0,'L',true);
     $this->pdf->Ln(3);
@@ -169,22 +181,27 @@ class AERPInvoiceReports
     $y=$this->pdf->getY();
     $this->pdf->setXY(5, 39);
     //$this->pdf->SetDrawColor(0, 0, 0);
-    $this->pdf->Cell(20,9,utf8_decode('Nº Presupuesto'),'',0,'L',false);
+    $this->pdf->Cell(22,9,utf8_decode('Nº Presupuesto'),'',0,'L',false);
     $this->pdf->SetTextColor(0, 0, 0);
     $this->pdf->Cell(60,9,utf8_decode($document->getCode()),'',0,'L',false);
     $this->pdf->SetTextColor($this->bgcolor_r, $this->bgcolor_g, $this->bgcolor_b);
     $this->pdf->Ln(4);
-    $this->pdf->Cell(20,9,utf8_decode('Fecha'),'',0,'L',false);
+    $this->pdf->Cell(22,9,utf8_decode('Fecha'),'',0,'L',false);
     $this->pdf->SetTextColor(0, 0, 0);
     $this->pdf->Cell(60,9,utf8_decode($document->getDate()->format("d/m/Y")),'',0,'L',false);
     $this->pdf->Ln(4);
     $this->pdf->SetTextColor($this->bgcolor_r, $this->bgcolor_g, $this->bgcolor_b);
-    $this->pdf->Cell(20,9,utf8_decode('Cliente'),'',0,'L',false);
+    $this->pdf->Cell(22,9,utf8_decode('Válido hasta:'),'',0,'L',false);
     $this->pdf->SetTextColor(0, 0, 0);
-    $this->pdf->Cell(60,9,utf8_decode(""),'',0,'L',false);
+    $this->pdf->Cell(60,9,utf8_decode($document->getDateofferend()->format("d/m/Y")),'',0,'L',false);
     $this->pdf->Ln(4);
     $this->pdf->SetTextColor($this->bgcolor_r, $this->bgcolor_g, $this->bgcolor_b);
-    $this->pdf->Cell(20,9,utf8_decode('Página'),'',0,'L',false);
+    $this->pdf->Cell(22,9,utf8_decode('Cliente'),'',0,'L',false);
+    $this->pdf->SetTextColor(0, 0, 0);
+    $this->pdf->Cell(60,9,utf8_decode($document->getCustomer()->getCode()),'',0,'L',false);
+    $this->pdf->Ln(4);
+    $this->pdf->SetTextColor($this->bgcolor_r, $this->bgcolor_g, $this->bgcolor_b);
+    $this->pdf->Cell(22,9,utf8_decode('Página'),'',0,'L',false);
     $this->pdf->SetTextColor(0, 0, 0);
     $this->pdf->Cell(60,9,utf8_decode($this->pdf->PageNo().'/{nb}'),'',0,'L',false);
     $this->pdf->setXY(110, 40);
@@ -201,8 +218,6 @@ class AERPInvoiceReports
     $this->pdf->SetFont('Arial','',14);
     $this->pdf->Cell(60,9,utf8_decode('PRESUPUESTO'),'',0,'L',false);
     $this->pdf->setXY($x, $y);
-
-
   }
 
   function create($params){
@@ -233,19 +248,6 @@ class AERPInvoiceReports
         $data[]=[$line->getCode(),$line->getName(),$line->getQuantity(),$line->getUnitprice().json_decode('"\u0080"'),$line->getDtoperc()."%",$line->getTaxperc()."%",$line->getTotal().json_decode('"\u0080"')];
       }
 
-      /*for($i=0;$i<count($lines);$i++){
-        if($lines[$i]["shipment"]!=$last_shipping){
-          if($i>0)$data[]=["","","","","",""];
-          $last_shipping=$invoice["lines"][$i]["shipment"];
-          $data[]=["","#b#Nº Albarán ".$invoice["lines"][$i]["shipment"],"","","",""];
-          $data[]=["","#b#".($invoice["lines"][$i]["contact"]!=""?$invoice["lines"][$i]["contact"]:$invoice["customer"]),"","","",""];
-          if($invoice["lines"][$i]["customerreference"]!="") $data[]=["","SU PEDIDO Nº ".$invoice["lines"][$i]["customerreference"],"","","",""];
-        }
-
-        $data[]=[$invoice["lines"][$i]["referencecross"]!=""?$invoice["lines"][$i]["referencecross"]:$invoice["lines"][$i]["reference"],$invoice["lines"][$i]["description"],$invoice["lines"][$i]["quantity"],number_format($invoice["lines"][$i]["price"],4,',','.').json_decode('"\u0080"'),$invoice["lines"][$i]["desicount"].'%',number_format($invoice["lines"][$i]["linetotal"],2,',','.').json_decode('"\u0080"')];
-      }*/
-
-
       $this->pdf->image_path=$params["rootdir"].DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$params["user"]->getCompany()->getId().DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'company'.DIRECTORY_SEPARATOR;
       $this->pdf->user=$params["user"];
       $this->pdf->AddPage();
@@ -258,8 +260,11 @@ class AERPInvoiceReports
         $data=$this->Table($this->pdf,$data,$columns);
       }
 
+      //Paint Comments
+      $this->pdf->setXY($this->positions[1],$this->cursor+5);
+      $this->pdf->MultiCell($columns[1]["width"],5, utf8_decode($document->getNotes()), 0,'L',false);
 
-    return $this->pdf->Output();
+    return $this->pdf->Output('I', $document->getCode().".pdf");
 
 }
 }

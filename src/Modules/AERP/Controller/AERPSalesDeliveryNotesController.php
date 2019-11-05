@@ -17,28 +17,29 @@ use App\Modules\Globale\Entity\GlobaleCountries;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
-use App\Modules\AERP\Utils\AERPSalesBudgetsUtils;
+use App\Modules\AERP\Utils\AERPSalesDeliveryNotesUtils;
 use App\Modules\AERP\Entity\AERPConfiguration;
 use App\Modules\AERP\Entity\AERPPaymentMethods;
 use App\Modules\AERP\Entity\AERPSeries;
 use App\Modules\AERP\Entity\AERPCustomerGroups;
-use App\Modules\AERP\Entity\AERPSalesBudgets;
-use App\Modules\AERP\Entity\AERPSalesBudgetsLines;
+use App\Modules\AERP\Entity\AERPSalesDeliveryNotes;
+use App\Modules\AERP\Entity\AERPSalesDeliveryNotesLines;
 use App\Modules\AERP\Entity\AERPProducts;
 use App\Modules\AERP\Entity\AERPFinancialYears;
-use App\Modules\AERP\Reports\AERPSalesBudgetsReports;
+use App\Modules\AERP\Reports\AERPSalesDeliveryNotesReports;
 use App\Modules\Security\Utils\SecurityUtils;
 
-class AERPSalesBudgetsController extends Controller
+class AERPSalesDeliveryNotesController extends Controller
 {
 	private $module='AERP';
-	private $class=AERPSalesBudgets::class;
-	private $utilsClass=AERPSalesBudgetsUtils::class;
+	private $class=AERPSalesDeliveryNotes::class;
+	private $classLines=AERPSalesDeliveryNotesLines::class;
+	private $utilsClass=AERPSalesDeliveryNotesUtils::class;
 
 	/**
-	 * @Route("/{_locale}/AERP/salesbudgets/form/{id}", name="AERPSalesBudgetsForm", defaults={"id"=0}))
+	 * @Route("/{_locale}/AERP/salesdeliverynotes/form/{id}", name="AERPSalesDeliveryNotesForm", defaults={"id"=0}))
 	 */
-	public function AERPSalesBudgetsForm($id, RouterInterface $router,Request $request)
+	public function AERPSalesDeliveryNoteForm($id, RouterInterface $router,Request $request)
 	{
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
@@ -48,8 +49,8 @@ class AERPSalesBudgetsController extends Controller
 		$customerGroupsrepository=$this->getDoctrine()->getRepository(AERPCustomerGroups::class);
 		$paymentMethodsrepository=$this->getDoctrine()->getRepository(AERPPaymentMethods::class);
 		$seriesRepository=$this->getDoctrine()->getRepository(AERPSeries::class);
-		$documentRepository=$this->getDoctrine()->getRepository(AERPSalesBudgets::class);
-		$documentLinesRepository=$this->getDoctrine()->getRepository(AERPSalesBudgetsLines::class);
+		$documentRepository=$this->getDoctrine()->getRepository($this->class);
+		$documentLinesRepository=$this->getDoctrine()->getRepository($this->classLines);
 
 		$userdata=$this->getUser()->getTemplateData();
 		$locale = $request->getLocale();
@@ -108,30 +109,30 @@ class AERPSalesBudgetsController extends Controller
 		}
 		//Recover document from persistence
 		$document=null;
-		$line=new AERPSalesBudgetsLines();
+		$line=new $this->classLines();
 		$line->setTaxperc($config->getDefaulttax()->getTax());
 
 		if($id!=0){
 			$document=$documentRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$id, "active"=>1,"deleted"=>0]);
-			$documentLines=$documentLinesRepository->findBy(["salesbudget"=>$document, "active"=>1,"deleted"=>0]);
+			$documentLines=$documentLinesRepository->findBy(["salesdeliverynote"=>$document, "active"=>1,"deleted"=>0]);
 			$line->setLinenum(count($documentLines)+1);
 			array_push($documentLines, $line);
 		}
 		if($document==null){
-			$document=new AERPSalesBudgets();
+			$document=new $this->class();
 			$documentLines=[$line];
 		}
 
 		$new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-plus"];
-		$breadcrumb=$menurepository->formatBreadcrumb('genericindex','AERP','SalesBudgets');
+		$breadcrumb=$menurepository->formatBreadcrumb('genericindex','AERP','SalesDeliveryNotes');
 		array_push($breadcrumb,$new_breadcrumb);
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
-			return $this->render('@AERP/salesbudgets.html.twig', [
+			return $this->render('@AERP/salesdeliverynotes.html.twig', [
 				'moduleConfig' => $config,
 				'controllerName' => 'categoriesController',
-				'interfaceName' => 'SalesBudgets',
+				'interfaceName' => 'SalesDeliveryNotes',
 				'optionSelected' => 'genericindex',
-				'optionSelectedParams' => ["module"=>"AERP", "name"=>"SalesBudgets"],
+				'optionSelectedParams' => ["module"=>"AERP", "name"=>"SalesDeliveryNotes"],
 				'menuOptions' =>  $menurepository->formatOptions($userdata),
 				'breadcrumb' =>  $breadcrumb,
 				'userData' => $userdata,
@@ -152,12 +153,12 @@ class AERPSalesBudgetsController extends Controller
 
 
 	/**
-	 * @Route("/{_locale}/AERP/salesbudgets/data/{id}", name="dataAERPSalesBudgets", defaults={"id"=0}))
+	 * @Route("/{_locale}/AERP/salesdeliverynote/data/{id}", name="dataAERPSalesDeliveryNotes", defaults={"id"=0}))
 	 */
 	public function data($id, RouterInterface $router,Request $request){
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-		$documentRepository=$this->getDoctrine()->getRepository(AERPSalesBudgets::class);
-		$documentLinesRepository=$this->getDoctrine()->getRepository(AERPSalesBudgetsLines::class);
+		$documentRepository=$this->getDoctrine()->getRepository($this->class);
+		$documentLinesRepository=$this->getDoctrine()->getRepository($this->classLines);
 		$customersRepository=$this->getDoctrine()->getRepository(AERPCustomers::class);
 		$customerGroupsRepository=$this->getDoctrine()->getRepository(AERPCustomerGroups::class);
 		$paymentMethodsRepository=$this->getDoctrine()->getRepository(AERPPaymentMethods::class);
@@ -182,9 +183,9 @@ class AERPSalesBudgetsController extends Controller
 
 		$date=$fields->date?date_create_from_format("d/m/Y",$fields->date):new \DateTime();
 		if(!$document){
-			$document=new AERPSalesBudgets();
+			$document=new $this->class();
 			$document->setNumber($documentRepository->getNextNum($this->getUser()->getCompany()->getId()));
-			$document->setCode($code='PRE'.$date->format('y').'/'.str_pad($document->getNumber(), 6, '0', STR_PAD_LEFT));
+			$document->setCode($code='ALB'.$date->format('y').'/'.str_pad($document->getNumber(), 6, '0', STR_PAD_LEFT));
 			$document->setAuthor($this->getUser());
 			$document->setAgent($this->getUser());
 			$document->setActive(1);
@@ -227,14 +228,14 @@ class AERPSalesBudgetsController extends Controller
 		$linenumIds=[];
 
 		foreach ($fields->lines as $key => $value) {
-			$line=$documentLinesRepository->findOneBy(["salesbudget"=>$document, "id"=>$value->id]);
+			$line=$documentLinesRepository->findOneBy(["salesdeliverynote"=>$document, "id"=>$value->id]);
 			$product=$productsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$value->productid, "active"=>1, "deleted"=>0]);
 			//if(!$product) continue;
 			if($value->code=="") continue;
 			if(!$line && $value->deleted) continue;
 			if(!$line ){
-				$line=new AERPSalesBudgetsLines();
-				$line->setSalesbudget($document);
+				$line=new $this->classLines();
+				$line->setSalesdeliverynote($document);
 				$line->setActive(1);
 				$line->setDeleted(0);
 				$line->setDateadd(new \DateTime());
@@ -269,22 +270,22 @@ class AERPSalesBudgetsController extends Controller
 	}
 
 	/**
-	 * @Route("/{_locale}/AERP/salesbudgets/print/{id}", name="AERPSalesBudgetsPrint", defaults={"id"=0}))
+	 * @Route("/{_locale}/AERP/salesdeliverynotes/print/{id}", name="AERPSalesDeliveryNotesPrint", defaults={"id"=0}))
 	 */
-	public function AERPSalesBudgetsPrint($id, RouterInterface $router,Request $request){
+	public function AERPSalesDeliveryNotePrint($id, RouterInterface $router,Request $request){
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-		$documentRepository=$this->getDoctrine()->getRepository(AERPSalesBudgets::class);
-		$documentLinesRepository=$this->getDoctrine()->getRepository(AERPSalesBudgetsLines::class);
+		$documentRepository=$this->getDoctrine()->getRepository($this->class);
+		$documentLinesRepository=$this->getDoctrine()->getRepository($this->classLines);
 		$configrepository=$this->getDoctrine()->getRepository(AERPConfiguration::class);
 
 		$document=$documentRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$id, "deleted"=>0]);
 
 		if(!$document) return new Response("");
-		$lines=$documentLinesRepository->findBy(["salesbudget"=>$document, "deleted"=>0, "active"=>1]);
+		$lines=$documentLinesRepository->findBy(["salesdeliverynote"=>$document, "deleted"=>0, "active"=>1]);
 		$configuration=$configrepository->findOneBy(["company"=>$this->getUser()->getCompany()]);
 
 		$params=["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "id"=>$id, "user"=>$this->getUser(), "document"=>$document, "lines"=>$lines, "configuration"=>$configuration];
-		$reportsUtils = new AERPSalesBudgetsReports();
+		$reportsUtils = new AERPSalesDeliveryNotesReports();
 
 		$pdf=$reportsUtils->create($params);
 		return new Response("", 200, array('Content-Type' => 'application/pdf'));

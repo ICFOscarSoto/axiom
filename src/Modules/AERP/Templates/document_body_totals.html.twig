@@ -1,0 +1,48 @@
+<div class="panel panel-primary panel-shadow" data-collapsed="0" style="-webkit-box-shadow: none; box-shadow:none;"><!-- to apply shadow add class "panel-shadow" -->
+  <div class="panel-body" style="padding: 0px !important;" id="document-totals" attr-numlines="1">
+    <div class="row">
+      <div class="col-4 col-sm-2">
+        <div class="form-group">
+          <label for="totals_form_net">Importe</label>
+          <span id="unity-view-formProducts-price" class="input__unity"><span>€</span></span>
+          <input type="text" id="totals_form_net" maxlength="150" class="number-type input_parent__unity form-control" value={{ document.totalnet }} disabled>
+        </div>
+      </div>
+      <div class="col-4 col-sm-2">
+        <div class="form-group">
+          <label for="totals_form_dto">Descuento</label>
+          <span id="unity-view-formProducts-price" class="input__unity"><span>€</span></span>
+          <input type="text" id="totals_form_dto" maxlength="150" class="number-type input_parent__unity form-control" value={{ document.totaldto }} disabled>
+        </div>
+      </div>
+      <div class="col-4 col-sm-2">
+        <div class="form-group">
+          <label for="totals_form_tax">Total IVA</label>
+          <span id="unity-view-formProducts-price" class="input__unity"><span>€</span></span>
+          <input type="text" id="totals_form_tax" maxlength="150" class="number-type input_parent__unity form-control" value={{ document.totaltax }} disabled>
+        </div>
+      </div>
+      <div class="col-4 col-sm-2">
+        <div class="form-group">
+          <label for="totals_form_surcharge">Total R.E.</label>
+          <span id="unity-view-formProducts-price" class="input__unity"><span>€</span></span>
+          <input type="text" id="totals_form_surcharge" maxlength="150" class="number-type input_parent__unity form-control" value={{ document.totalsurcharge }} disabled>
+        </div>
+      </div>
+      <div class="col-4 col-sm-2">
+        <div class="form-group">
+          <label for="totals_form_irpf">IRPF</label>
+          <span id="unity-view-formProducts-price" class="input__unity"><span>€</span></span>
+          <input type="text" id="totals_form_irpf" maxlength="150" class="number-type input_parent__unity form-control" value={{ document.totalirpf }} disabled>
+        </div>
+      </div>
+      <div class="col-4 col-sm-2">
+        <div class="form-group">
+          <label for="totals_form_total">TOTAL</label>
+          <span id="unity-view-formProducts-price" class="input__unity"><span>€</span></span>
+          <input type="text" id="totals_form_total" maxlength="150" class="number-type input_parent__unity form-control" value={{ document.total }} disabled>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

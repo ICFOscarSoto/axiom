@@ -442,7 +442,12 @@ Domiciled: Domiciliado
 Payment due: Vencimiento
 FinancialYears: Ejercicio Fiscal
 Barcode: Cod. Barras
+Sales: Ventas
+Purchases: Compras
 Budgets: Presupuestos
+Orders: Pedidos
+DeliveryNotes: Albaranes
+Invoices: Facturas
 Customer: Cliente
 Search: Buscar
 Manufacturers: Fabricantes

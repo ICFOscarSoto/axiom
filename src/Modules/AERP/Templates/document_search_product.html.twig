@@ -1,0 +1,75 @@
+<div class="modal fade" tabindex="-1" id="product-search-modal-form" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content" style="transform: matrix(1, 0, 0, 1, 0, 0);">
+        <div class="modal-header">
+          <h4 class="modal-title">{{ ('Search')|trans }}&nbsp;{{ ('productos')|trans }}</h4>
+        </div>
+        <div id="product-search-modal-form-body" style="height: 520px; padding: 0px 10px;">
+          {% set listConstructor = productslist %}
+          {% set listOrigin = "" %}
+          {# for know if list.html is invoked directly from controller and we need to make modals inside list#}
+          {{ include('@Globale/list.html.twig') }}
+        </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+var productFields=["product-form-id","product-form-code","product-form-name","product-form-price","product-form-tax", "product-form-surcharge-perc"];
+var productSearchfields=["id","code","name","price","tax","surcharge"];
+
+function postProductSearch(id){
+  if($("#customer-form-surcharge").val()=="true") $("#product-form-surcharge-"+id).val($("#product-form-surcharge-perc-"+id).val()); else $("#product-form-surcharge-"+id).val(0);
+  calculateDocumentRow(id);
+}
+
+function productSearch(id, val, fields, searchFields){
+  if(val!=""){
+    if((++load_wait)==1) $("#load-spinner").fadeIn();
+    $.ajax({
+       url: '{{ url('productsearch',{'field':'code'}) }}/'+val+'/'+$("#customer-form-customergroup-select").val(),
+       type: 'POST',
+       data: JSON.stringify(searchFields),
+       success:  function( data ) {
+         if((--load_wait)==0) $("#load-spinner").fadeOut();
+         if(data.result){
+           var i=0;
+           Object.entries(data.data).forEach(function(element) {
+             $("#"+fields[i]+"-"+id).val(element[1]);
+             i++;
+           });
+           postProductSearch(id);
+         } else {
+           clearFields(fields);
+           //toastr.warning("No se encontro el producto introducido", "Confirmación", confirmation);
+         }
+       }
+     });
+   }else clearFields(fields);
+}
+
+$(document).ready(function() {
+  {# PRODUCT SEARCH #}
+  $('body').on('click', "[id^='product-search-button-']", function(e) {
+    $("#product-search-modal-form").attr("attr-id",$(this).attr("attr-id"));
+    $("#product-search-modal-form").modal('show');
+  });
+
+  $('body').on('keypress', "[id^='product-form-code-']", function(e) {
+      var code = e.keyCode || e.which;
+       if(code == 13) {
+         productSearch($(this).attr("attr-id"), $(this).val(), productFields, productSearchfields);
+       }
+    });
+  $('body').on('change', "[id^='product-form-code-']", function(e) {
+       productSearch($(this).attr("attr-id"), $(this).val(), productFields, productSearchfields);
+  });
+
+  $('body').on('click', "[id^='listProducts-field-button-select-']", function(e) {
+    $("#product-form-code-"+$("#product-search-modal-form").attr("attr-id")).val($(this).parent().parent().parent().children('td').eq(1).text());
+    $("#product-form-code-"+$("#product-search-modal-form").attr("attr-id")).trigger('change');
+    $("#product-search-modal-form").modal('toggle');
+  });
+});
+</script>

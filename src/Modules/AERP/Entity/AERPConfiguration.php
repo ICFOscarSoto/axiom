@@ -106,6 +106,7 @@ class AERPConfiguration
      */
     private $register;
 
+
     public function __construct($kernel=null, $doctrine=null, $user=null, $company=null)
     {
       if($kernel && $doctrine && $user && $company){

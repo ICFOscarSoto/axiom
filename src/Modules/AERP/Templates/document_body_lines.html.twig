@@ -1,0 +1,45 @@
+<div class="panel panel-primary panel-shadow" data-collapsed="0" style="-webkit-box-shadow: none; box-shadow:none;min-height:200px"><!-- to apply shadow add class "panel-shadow" -->
+  <div class="panel-body" style="padding: 0px !important;" id="document-lines" attr-numlines="{{ documentLines|length }}">
+
+    <div class="row no-gutters documents-products-header">
+      <div class="col-sm-2 d-none d-sm-block">Cod. Producto</div>
+      <div class="col-sm-3 d-none d-sm-block">Descripción</div>
+      <div class="col-sm-1 d-none d-sm-block">Precio</div>
+      <div class="col-sm-1 d-none d-sm-block">Cantidad</div>
+      <div class="col-sm-1 d-none d-sm-block">Dto.</div>
+      <div class="col-sm-1 d-none d-sm-block">IVA</div>
+      <div class="col-sm-1 d-none d-sm-block">R.E.</div>
+      <div class="col-sm-2 d-none d-sm-block">Subtotal</div>
+    </div>
+
+    {% for line in  documentLines %}
+      <div class="row no-gutters" attr-id="{{ line.linenum }}" id="document-line-{{ line.linenum }}">
+        <div class="col-2 d-block d-sm-none" style="top: 8px;">Cod. Prod.</div>
+        <div class="col-10 col-sm-2">
+          <div class="form-group" style="margin-bottom: 0px;">
+            <div class="input-group" >
+              <a class="btn btn-white" attr-id="{{ line.linenum }}" id="product-form-remove-{{ line.linenum }}" style="position: absolute;height: 31px;left: 0px;padding: 9px 7px;z-index: 10;" href="#"> <i class="fa fa-remove"></i></a>
+              <input type="hidden" attr-id="{{ line.linenum }}" id="product-form-line-id-{{ line.linenum }}" value={% if line!=null %}{{ line.id }}{% endif %}><input type="hidden" attr-id="{{ line.linenum }}" id="product-form-id-{{ line.linenum }}" value={% if line.product!=null %}{{ line.product.id }}{% endif %}><input type="text" attr-id="{{ line.linenum }}" id="product-form-code-{{ line.linenum }}" class="form-control" style="padding-left: 28px; border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Cod. Producto" value="{{ line.code }}">
+              <div class="input-group-btn"><button type="button" attr-id="{{ line.linenum }}" id="product-search-button-{{ line.linenum }}" class="btn btn-white" style="height: 31px; border-radius: 0px;"><i class="fa fa-search"></i> </button></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-2 d-block d-sm-none" style="top: 8px;">Nombre</div>
+        <div class="col-10 col-sm-3"> <div class="form-group" style="margin-bottom: 0px;"> <input type="text" id="product-form-name-{{ line.linenum }}" class="form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Nombre" value="{{ line.name }}"> </div> </div>
+        <div class="col-2 d-block d-sm-none" style="top: 8px;">Precio</div>
+        <div class="col-4 col-sm-1"> <div class="form-group" style="margin-bottom: 0px;"> <span class="input__unity_nolabel "><span>€</span></span><input type="text" attr-id="{{ line.linenum }}" id="product-form-price-{{ line.linenum }}" class="recalculate form-control number-type input_parent__unity" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Precio" value={{ line.unitprice }}> </div> </div>
+        <div class="col-2 d-block d-sm-none" style="top: 8px;left: 5px;">Cantidad</div>
+        <div class="col-4 col-sm-1"> <div class="form-group" style="margin-bottom: 0px;"> <input type="hidden" attr-id="{{ line.linenum }}" value={{ line.unitprice * line.quantity }} id="product-form-base-total-{{ line.linenum }}"><input type="text" attr-id="{{ line.linenum }}" id="product-form-quantity-{{ line.linenum }}" class="recalculate form-control number-type" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Cantidad" value={{ line.quantity }}> </div> </div>
+        <div class="col-2 d-block d-sm-none" style="top: 8px;">Dto.</div>
+        <div class="col-4 col-sm-1"> <div class="form-group" style="margin-bottom: 0px;"> <span class="input__unity_nolabel "><span>%</span></span><input type="hidden" attr-id="{{ line.linenum }}" id="product-form-disccount-total-{{ line.linenum }}" value={{ line.dtounit }}><input type="text" attr-id="{{ line.linenum }}" id="product-form-disccount-{{ line.linenum }}" class="recalculate form-control number-type input_parent__unity" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Dto" value={{ line.dtoperc }}> </div> </div>
+        <div class="col-2 d-block d-sm-none" style="top: 8px;left: 5px;">IVA</div>
+        <div class="col-4 col-sm-1"> <div class="form-group" style="margin-bottom: 0px;"> <span class="input__unity_nolabel "><span>%</span></span><input type="hidden" attr-id="{{ line.linenum }}" id="product-form-irpf-total-{{ line.linenum }}" value={{ line.irpfunit }}><input type="hidden" attr-id="{{ line.linenum }}" id="product-form-tax-total-{{ line.linenum }}" value={{ line.taxunit }}><input type="text" attr-id="{{ line.linenum }}" id="product-form-tax-{{ line.linenum }}" class="recalculate form-control number-type input_parent__unity" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="IVA" value={{ line.taxperc }}> </div> </div>
+        <div class="col-2 d-block d-sm-none" style="top: 8px;">R.E.</div>
+        <div class="col-4 col-sm-1"> <div class="form-group" style="margin-bottom: 0px;"> <span class="input__unity_nolabel "><span>%</span></span><input type="hidden" attr-id="{{ line.linenum }}" value=0  id="product-form-surcharge-perc-{{ line.linenum }}"><input type="hidden" attr-id="{{ line.linenum }}" id="product-form-surcharge-total-{{ line.linenum }}" value={{ line.surchargeunit }}><input type="text" attr-id="{{ line.linenum }}" id="product-form-surcharge-{{ line.linenum }}" class="recalculate form-control number-type input_parent__unity" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Recargo" value={{ line.surchargeperc }}> </div> </div>
+        <div class="col-2 d-block d-sm-none" style="top: 8px;left: 5px;">Subtotal</div>
+        <div class="col-4 col-sm-2"> <div class="form-group" style="margin-bottom: 0px;"> <span class="input__unity_nolabel "><span>€</span></span><input type="text" attr-id="{{ line.linenum }}" id="product-form-amount-{{ line.linenum }}" class="form-control number-type input_parent__unity" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="TOTAL" disabled value={{ line.total }}></div> </div>
+      </div>
+    {% endfor %}
+
+  </div>
+</div>

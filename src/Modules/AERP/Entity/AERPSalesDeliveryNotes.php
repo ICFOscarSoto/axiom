@@ -14,9 +14,9 @@ use \App\Modules\Globale\Entity\GlobaleCountries;
 use \App\Modules\AERP\Entity\AERPCustomerGroups;
 
 /**
- * @ORM\Entity(repositoryClass="App\Modules\AERP\Repository\AERPSalesBudgetsRepository")
+ * @ORM\Entity(repositoryClass="App\Modules\AERP\Repository\AERPSalesDeliveryNotesRepository")
  */
-class AERPSalesBudgets
+class AERPSalesDeliveryNotes
 {
     /**
      * @ORM\Id()

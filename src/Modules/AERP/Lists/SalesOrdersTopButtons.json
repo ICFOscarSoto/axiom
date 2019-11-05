@@ -1,0 +1,6 @@
+[
+  {"id" : "addTopSalesOrders", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"AERPSalesOrdersForm", "actionType" : "foreground", "confirm" :false, "tooltip" : ""},
+  {"id" : "deleteTopSalesOrders", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true, "tooltip":""},
+  {"id" : "printTopSalesOrders", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false, "tooltip":""},
+  {"id" : "exportTopSalesOrders", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"genericexport", "routeParams":{"module":"AERP", "name":"SalesOrders"}, "confirm" :false, "tooltip":""}
+]

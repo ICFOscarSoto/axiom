@@ -1,0 +1,103 @@
+<script>
+    function addDocumentLine(){
+      var documentLines=$("#document-lines");
+      var numLines=parseInt(documentLines.attr("attr-numlines"))+1;
+      documentLines.append(''+
+      '<div class="row no-gutters" attr-id="'+numLines+'" id="document-line-'+numLines+'">'+
+      '<div class="col-12 d-block d-sm-none" style="height: 15px;">&nbsp;</div>'+
+      '<div class="col-2 d-block d-sm-none" style="top: 8px;">Cod. Prod.</div>'+
+      '	<div class="col-10 col-md-2">'+
+      '		<div class="form-group" style="margin-bottom: 0px;">'+
+      '			<div class="input-group" >'+
+      '				<a class="btn btn-white" attr-id="'+numLines+'" id="product-form-remove-'+numLines+'" style="position: absolute;height: 31px;left: 0px;padding: 9px 7px;z-index: 10;" href="#"> <i class="fa fa-remove"></i></a>'+
+      '				<input type="hidden" attr-id="'+numLines+'" id="product-form-line-id-'+numLines+'"><input type="hidden" attr-id="'+numLines+'" id="product-form-id-'+numLines+'"><input type="text" attr-id="'+numLines+'" id="product-form-code-'+numLines+'" class="form-control" style="padding-left: 28px; border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Cod. Producto">'+
+      '				<div class="input-group-btn"><button type="button" attr-id="'+numLines+'" id="product-search-button-'+numLines+'" class="btn btn-white" style="height: 31px; border-radius: 0px;"><i class="fa fa-search"></i> </button></div>'+
+      '			</div>'+
+      '		</div>'+
+      '	</div>'+
+      ' <div class="col-2 d-block d-sm-none" style="top: 8px;">Nombre</div>'+
+      '	<div class="col-10 col-md-3"> <div class="form-group" style="margin-bottom: 0px;"> <input type="text" id="product-form-name-'+numLines+'" class="form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Nombre"> </div> </div>'+
+      ' <div class="col-2 d-block d-sm-none" style="top: 8px;">Precio</div>'+
+      '	<div class="col-4 col-md-1"> <div class="form-group" style="margin-bottom: 0px;"> <span id="unity-view-formProducts-price" class="input__unity_nolabel "><span>€</span></span><input type="text" attr-id="'+numLines+'" id="product-form-price-'+numLines+'" class="recalculate form-control number-type input_parent__unity" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Precio"> </div> </div>'+
+      ' <div class="col-2 d-block d-sm-none" style="top: 8px;left: 5px;">Cantidad</div>'+
+      '	<div class="col-4 col-md-1"> <div class="form-group" style="margin-bottom: 0px;"> <input type="hidden" attr-id="1" value=0 id="product-form-base-total-'+numLines+'"><input type="text" attr-id="'+numLines+'" value=1 id="product-form-quantity-'+numLines+'" class="recalculate form-control number-type" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Cantidad"> </div> </div>'+
+      ' <div class="col-2 d-block d-sm-none" style="top: 8px;">Dto.</div>'+
+      '	<div class="col-4 col-md-1"> <div class="form-group" style="margin-bottom: 0px;"> <span id="unity-view-formProducts-price" class="input__unity_nolabel "><span>%</span></span><input type="hidden" attr-id="1" value=0 id="product-form-disccount-total-'+numLines+'"><input type="text" attr-id="'+numLines+'" id="product-form-disccount-'+numLines+'" value=0 class="recalculate form-control number-type input_parent__unity" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Dto"> </div> </div>'+
+      ' <div class="col-2 d-block d-sm-none" style="top: 8px;left: 5px;">IVA</div>'+
+      '	<div class="col-4 col-md-1"> <div class="form-group" style="margin-bottom: 0px;"> <span id="unity-view-formProducts-price" class="input__unity_nolabel "><span>%</span></span><input type="hidden" attr-id="1" value=0 id="product-form-irpf-total-'+numLines+'"><input type="hidden" attr-id="1" value=0 id="product-form-tax-total-'+numLines+'"><input type="text" attr-id="'+numLines+'" id="product-form-tax-'+numLines+'" value=21 class="recalculate form-control number-type input_parent__unity" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="IVA"> </div> </div>'+
+      ' <div class="col-2 d-block d-sm-none" style="top: 8px;">R.E.</div>'+
+      '	<div class="col-4 col-md-1"> <div class="form-group" style="margin-bottom: 0px;"> <span id="unity-view-formProducts-price" class="input__unity_nolabel "><span>%</span></span><input type="hidden" attr-id="1" value=0  id="product-form-surcharge-perc-'+numLines+'"><input type="hidden" attr-id="1" value=0  id="product-form-surcharge-total-'+numLines+'"><input type="text" attr-id="'+numLines+'" id="product-form-surcharge-'+numLines+'" value=0 class="recalculate form-control number-type input_parent__unity" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Recargo"> </div> </div>'+
+      ' <div class="col-2 d-block d-sm-none" style="top: 8px;left: 5px;">Subtotal</div>'+
+      '	<div class="col-4 col-md-2"> <div class="form-group" style="margin-bottom: 0px;"> <span id="unity-view-formProducts-price" class="input__unity_nolabel "><span>€</span></span><input type="text" attr-id="'+numLines+'" id="product-form-amount-'+numLines+'" value=0 class="form-control number-type input_parent__unity" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="TOTAL" disabled> </div> </div>'+
+      '</div>');
+      documentLines.attr("attr-numlines", numLines);
+    }
+
+    function removeDocumentLine(numLine){
+      var documentLines=$("#document-lines");
+      var numLines=parseInt(documentLines.attr("attr-numlines"));
+      if(numLines!=numLine){
+         //$("#document-line-"+numLine).remove();
+         $("#document-line-"+numLine).addClass("deleted");
+         $("#product-form-base-total-"+numLine).addClass("deleted");
+         $("#product-form-disccount-total-"+numLine).addClass("deleted");
+         $("#product-form-tax-total-"+numLine).addClass("deleted");
+         $("#product-form-irpf-total-"+numLine).addClass("deleted");
+         $("#product-form-surcharge-total-"+numLine).addClass("deleted");
+         $("#product-form-amount-"+numLine).addClass("deleted");
+
+         $("#document-line-"+numLine).fadeOut();
+         $("#document-line-"+numLine).attr("id","document-line-3-deleted");
+         //documentLines.attr("attr-numlines",numLines);
+         numerateLines();
+         recalculateDocument();
+      }
+    }
+
+
+    function numerateLines(){
+      var i=0;
+      var documentLines=$("#document-lines");
+      $("[id^='document-line-']:not(.deleted)").each(function() {
+          i++;
+          $(this).find("#product-form-id-"+$(this).attr("attr-id")).attr("attr-id",i);
+          $(this).find("#product-form-line-id-"+$(this).attr("attr-id")).attr("attr-id",i);
+          $(this).find("#product-form-line-id-"+$(this).attr("attr-id")).attr("id","product-form-line-id-"+i);
+          $(this).find("#product-form-id-"+$(this).attr("attr-id")).attr("id","product-form-id-"+i);
+          $(this).find("#product-form-code-"+$(this).attr("attr-id")).attr("attr-id",i);
+          $(this).find("#product-form-code-"+$(this).attr("attr-id")).attr("id","product-form-code-"+i);
+          $(this).find("#product-form-name-"+$(this).attr("attr-id")).attr("id","product-form-name-"+i);
+          $(this).find("#product-search-button-"+$(this).attr("attr-id")).attr("attr-id",i);
+          $(this).find("#product-search-button-"+$(this).attr("attr-id")).attr("id","product-search-button-"+i);
+          $(this).find("#product-form-price-"+$(this).attr("attr-id")).attr("attr-id",i);
+          $(this).find("#product-form-price-"+$(this).attr("attr-id")).attr("id","product-form-price-"+i);
+          $(this).find("#product-form-quantity-"+$(this).attr("attr-id")).attr("attr-id",i);
+          $(this).find("#product-form-quantity-"+$(this).attr("attr-id")).attr("id","product-form-quantity-"+i);
+          $(this).find("#product-form-base-total-"+$(this).attr("attr-id")).attr("attr-id",i);
+          $(this).find("#product-form-base-total-"+$(this).attr("attr-id")).attr("id","product-form-base-total-"+i);
+          $(this).find("#product-form-disccount-"+$(this).attr("attr-id")).attr("attr-id",i);
+          $(this).find("#product-form-disccount-"+$(this).attr("attr-id")).attr("id","product-form-disccount-"+i);
+          $(this).find("#product-form-disccount-total-"+$(this).attr("attr-id")).attr("attr-id",i);
+          $(this).find("#product-form-disccount-total-"+$(this).attr("attr-id")).attr("id","product-form-disccount-total-"+i);
+          $(this).find("#product-form-tax-"+$(this).attr("attr-id")).attr("attr-id",i);
+          $(this).find("#product-form-tax-"+$(this).attr("attr-id")).attr("id","product-form-tax-"+i);
+          $(this).find("#product-form-tax-total-"+$(this).attr("attr-id")).attr("attr-id",i);
+          $(this).find("#product-form-tax-total-"+$(this).attr("attr-id")).attr("id","product-form-tax-total-"+i);
+          $(this).find("#product-form-irpf-total-"+$(this).attr("attr-id")).attr("attr-id",i);
+          $(this).find("#product-form-irpf-total-"+$(this).attr("attr-id")).attr("id","product-form-irpf-total-"+i);
+          $(this).find("#product-form-surcharge-"+$(this).attr("attr-id")).attr("attr-id",i);
+          $(this).find("#product-form-surcharge-"+$(this).attr("attr-id")).attr("id","product-form-surcharge-"+i);
+          $(this).find("#product-form-surcharge-perc-"+$(this).attr("attr-id")).attr("attr-id",i);
+          $(this).find("#product-form-surcharge-perc-"+$(this).attr("attr-id")).attr("id","product-form-surcharge-perc-"+i);
+          $(this).find("#product-form-surcharge-total-"+$(this).attr("attr-id")).attr("attr-id",i);
+          $(this).find("#product-form-surcharge-total-"+$(this).attr("attr-id")).attr("id","product-form-surcharge-total-"+i);
+          $(this).find("#product-form-amount-"+$(this).attr("attr-id")).attr("attr-id",i);
+          $(this).find("#product-form-amount-"+$(this).attr("attr-id")).attr("id","product-form-amount-"+i);
+          $(this).find("#product-form-remove-"+$(this).attr("attr-id")).attr("attr-id",i);
+          $(this).find("#product-form-remove-"+$(this).attr("attr-id")).attr("id","product-form-remove-"+i);
+          $(this).attr('attr-id',i);
+          $(this).attr('id','document-line-'+i);
+      });
+      documentLines.attr("attr-numlines", i);
+    }
+</script>

@@ -1,0 +1,6 @@
+[
+  {"id" : "addTopSalesDeliveryNotes", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"AERPSalesDeliveryNotesForm", "actionType" : "foreground", "confirm" :false, "tooltip" : ""},
+  {"id" : "deleteTopSalesDeliveryNotes", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true, "tooltip":""},
+  {"id" : "printTopSalesDeliveryNotes", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false, "tooltip":""},
+  {"id" : "exportTopSalesDeliveryNotes", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"genericexport", "routeParams":{"module":"AERP", "name":"SalesDeliveryNotes"}, "confirm" :false, "tooltip":""}
+]

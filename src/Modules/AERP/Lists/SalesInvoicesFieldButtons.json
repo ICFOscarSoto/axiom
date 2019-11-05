@@ -1,0 +1,8 @@
+[
+  {"id": "editSalesInvoices", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"AERPSalesInvoicesForm", "actionType" : "foreground", "confirm" :false, "tooltip":""},
+  {"id": "activation", "type": "option", "options": [
+      {"id": "desactivateSalesInvoices", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"genericdisable", "routeParams":{"module":"AERP", "name":"SalesInvoices"}, "confirm" :true, "actionType" : "background", "tooltip":"" },
+      {"id": "activateSalesInvoices", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "route":"genericenable", "routeParams":{"module":"AERP", "name":"SalesInvoices"}, "confirm" :true, "actionType" : "background", "tooltip":"" }
+  ]},
+  {"id": "deleteSalesInvoices", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"genericdelete", "routeParams":{"module":"AERP", "name":"SalesInvoices"}, "confirm" :true, "undo" :false, "actionType" : "background", "tooltip":""}
+]

@@ -1,0 +1,26 @@
+<div class="panel panel-primary panel-shadow" data-collapsed="0" style="-webkit-box-shadow: none; box-shadow:none; padding:0px; margin-bottom: -1px;"><!-- to apply shadow add class "panel-shadow" -->
+  <div class="panel-body">
+    <div class="row">
+      <div class="col-6 col-sm-2"> <div class="input-group"> <span class="input-group-addon"><i class="fa fa-hashtag"></i></span><input type="hidden" id="document-form-id" value="{{ document.id }}" class="form-control"><input type="text" id="document-form-code" value="{{ document.code }}" class="form-control" placeholder="N. Documento" disabled> </div></div>
+      <div class="col-6 col-sm-2"> <div class="input-group"> <span class="input-group-addon"><i class="fa fa-calendar"></i></span> <input type="text" id="document-form-date" class="form-control datepicker" style="z-index:99 !important;" placeholder="Fecha" value="{{ date }}"></div></div>
+      <div class="col-6 col-sm-2"> <div class="input-group"> <span class="input-group-addon"><i class="fa fa-calendar"></i></span> <input type="text" id="document-form-dateofferend" class="form-control datepicker" style="z-index:99 !important;" placeholder="Fin oferta" value="{{ enddate }}"></div></div>
+      <div class="col-6 col-sm-2"> <div class="input-group"> <span class="input-group-addon"><i class="fa fa-hashtag"></i></span> <input type="text" id="document-form-customercode" class="form-control" placeholder="Su referencia" value="{{ document.customercode }}"> </div> </div>
+      <div class="col-6 col-sm-2"> <div class="form-group">
+        <select type="text"  id="document-form-series-select" class="form-control select2">
+          {% for option in series %}
+            <option value="{{ option.id }}"{% if document.serie!=null and option.id==document.serie.id %} selected="selected" {% endif %}>{{ option.text }}</option>
+          {% endfor %}
+        </select>
+      </div> </div>
+      <div class="col-6 col-sm-2"> <div class="form-group">
+        <input type="hidden" id="customer-form-paymentmethod" class="form-control">
+        <select type="text" id="customer-form-paymentmethod-select" class="form-control select2">
+          {% for option in paymentMethods %}
+            <option value="{{ option.id }}"{% if id!=0 %}{% if document.paymentmethod!=null and option.id==document.paymentmethod.id %} selected="selected" {% endif %}{% else %}{% if option.id==moduleConfig.defaultpaymentmethod.id %} selected="selected" {% endif %}{% endif %}>{{ option.text }}</option>
+          {% endfor %}
+        </select>
+      </div> </div>
+
+    </div>
+  </div>
+</div>

@@ -50,7 +50,7 @@ Customer:
 CustomerGroups:
     resource: 'App\Modules\ERP\Controller\ERPCustomerGroupsController'
     type:     annotation
-    
+
 CustomersPrices:
     resource: 'App\Modules\ERP\Controller\ERPCustomersPricesController'
     type:     annotation
@@ -106,7 +106,7 @@ Product:
 ProductPrices:
     resource: 'App\Modules\ERP\Controller\ERPProductPricesController'
     type:     annotation
-    
+
 OfferPrices:
     resource: 'App\Modules\ERP\Controller\ERPOfferPricesController'
     type:     annotation
@@ -281,4 +281,16 @@ AERPProducts:
 
 AERPSalesBudgets:
   resource: 'App\Modules\AERP\Controller\AERPSalesBudgetsController'
+  type:      annotation
+
+AERPSalesOrders:
+  resource: 'App\Modules\AERP\Controller\AERPSalesOrdersController'
+  type:      annotation
+
+AERPSalesDeliveryNotes:
+  resource: 'App\Modules\AERP\Controller\AERPSalesDeliveryNotesController'
+  type:      annotation
+
+AERPSalesInvoices:
+  resource: 'App\Modules\AERP\Controller\AERPSalesInvoicesController'
   type:      annotation

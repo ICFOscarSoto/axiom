@@ -1,0 +1,54 @@
+<script>
+  function prepare_document_json(){
+
+    var documentFields = new Object();
+    var lines=[];
+    documentFields.id=$("#document-form-id").val();
+    documentFields.code=$("#document-form-code").val();
+    documentFields.date=$("#document-form-date").val();
+    documentFields.serie=$("#document-form-series-select").val();
+    documentFields.paymentmethod=$("#customer-form-paymentmethod-select").val();
+    documentFields.dateofferend=$("#document-form-dateofferend").val();
+    documentFields.customercode=$("#document-form-customercode").val();
+    documentFields.customerid=$("#customer-form-id").val();
+    documentFields.customergroup=$("#customer-form-customergroup-select").val();
+    documentFields.irpf=$("#customer-form-irpf").val();
+    documentFields.irpfperc=$("#customer-form-irpf-perc").val();
+    documentFields.surcharge=$("#customer-form-surcharge").val();
+    documentFields.taxexempt=$("#customer-form-taxexempt").val();
+    documentFields.totalnet=$("#totals_form_net").val();
+    documentFields.totaldto=$("#totals_form_dto").val();
+    documentFields.totaltax=$("#totals_form_tax").val();
+    documentFields.totalsurcharge=$("#totals_form_surcharge").val();
+    documentFields.totalirpf=$("#totals_form_irpf").val();
+    documentFields.total=$("#totals_form_total").val();
+    documentFields.observations=$("#form_observations").val();
+    documentFields.notes=$("#form_notes").val();
+
+    $("[id^='document-line-']").each(function() {
+      var line = new Object();
+      line.id=$(this).find("#product-form-line-id-"+$(this).attr("attr-id")).val();
+      line.linenum=$(this).attr("attr-id");
+      line.productid=$(this).find("#product-form-id-"+$(this).attr("attr-id")).val();
+      line.code=$(this).find("#product-form-code-"+$(this).attr("attr-id")).val();
+      line.name=$(this).find("#product-form-name-"+$(this).attr("attr-id")).val();
+      line.unitprice=$(this).find("#product-form-price-"+$(this).attr("attr-id")).val();
+      line.quantity=$(this).find("#product-form-quantity-"+$(this).attr("attr-id")).val();
+      line.disccountperc=$(this).find("#product-form-disccount-"+$(this).attr("attr-id")).val();
+      line.disccountunit=$(this).find("#product-form-disccount-total-"+$(this).attr("attr-id")).val();
+      line.taxperc=$(this).find("#product-form-tax-"+$(this).attr("attr-id")).val();
+      line.taxunit=$(this).find("#product-form-tax-total-"+$(this).attr("attr-id")).val();
+      line.irpfperc=$("#customer-form-irpf-perc").val();
+      line.irpfunit=$(this).find("#product-form-irpf-total-"+$(this).attr("attr-id")).val();
+      line.surchargeperc=$(this).find("#product-form-surcharge-"+$(this).attr("attr-id")).val();
+      line.surchargeunit=$(this).find("#product-form-surcharge-total-"+$(this).attr("attr-id")).val();
+      line.subtotal=$(this).find("#product-form-base-total-"+$(this).attr("attr-id")).val();
+      line.total=$(this).find("#product-form-amount-"+$(this).attr("attr-id")).val();
+      line.deleted=$(this).hasClass('deleted');
+      lines.push(line);
+    });
+
+    documentFields.lines=lines;
+    return documentFields;
+  }
+</script>

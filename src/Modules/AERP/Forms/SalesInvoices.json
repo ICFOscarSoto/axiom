@@ -1,0 +1,33 @@
+[{
+    "sections": [
+        {
+            "name": "data",
+            "fields": [
+                {
+                    "name": "year",
+                    "cols": 4
+                },
+                {
+                    "name": "number",
+                    "cols": 4
+                },
+                {
+                    "name": "active",
+                    "cols": 4
+                },
+                {
+                    "name": "author",
+                    "cols": 4
+                },
+                {
+                    "name": "agent",
+                    "cols": 4
+                },
+                {
+                    "name": "customer",
+                    "cols": 4
+                }
+            ]
+        }
+    ]
+}]
