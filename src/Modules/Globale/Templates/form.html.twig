@@ -133,7 +133,7 @@
                     toastr.success("Datos guardados correctamente", "Confirmación", confirmation);
                     console.log(data);
                     if(data.reload) location.href=data.href;
-                    $("#{{formConstructor.name}}-form-body").find('form').validate().resetForm();
+                    $("#{{formConstructor.name}}-form-body").find('form').validate({ lang: 'es' }).resetForm();
                   } else toastr.error("Ocurrió un error al guardar los datos", "Confirmación", confirmation);
               }, "json");
             }

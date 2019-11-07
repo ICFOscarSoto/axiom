@@ -31,7 +31,7 @@ $(function () {
                   toastr.success("Datos guardados correctamente", "Confirmación", confirmation);
                   $("#{{ widget.id }}-modal-form").modal('hide');
                   $("#{{ widget.id }}-modal-form-body").find('form').trigger("reset");
-                  $("#{{ widget.id }}-modal-form-body").find('form').validate().resetForm();
+                  $("#{{ widget.id }}-modal-form-body").find('form').validate({ lang: 'es' }).resetForm();
 									location.reload();
                 }
                   else toastr.error("Ocurrió un error al guardar los datos", "Confirmación", confirmation);

@@ -72,7 +72,8 @@ class HRWorkersUtils extends Controller
     ]],
     ['status', ChoiceType::class, [
       'required' => false,
-      'attr' => ['class' => 'select2'],
+      'attr' => ['class' => 'select2', 'required'=>true, 'aria-required'=>"true"],
+      'label_attr' => ['class' => 'required'],
       'choices' => ['Active'=>1, 'Leave'=>0],
       'placeholder' => 'Select a status...',
     ]],
