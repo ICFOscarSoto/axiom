@@ -137,11 +137,11 @@ class GlobaleDefaultController extends Controller
         if($idparent==0 || $idparent==null) $idparent=$request->request->get('id-parent',0);
         $parent = $parentRepository->find($idparent);
       }	else $obj = $classRepository->find($id);
-      $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "parent"=>$id==0?$parent:$obj->{"get".ucfirst($utilsObj->parentField)}()];
+      $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "parent"=>$id==0?$parent:$obj->{"get".ucfirst(property_exists($utilsObj,"parentField".$json)?$utilsObj->{"parentField".$json}:$utilsObj->parentField)}()];
       dump('getExcludedForm'.$json);
       $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),
         method_exists($utilsObj,'getExcludedForm'.$json)?$utilsObj->{"getExcludedForm".$json}($params):[],method_exists($utilsObj,'getIncludedForm'.$json)?$utilsObj->{"getIncludedForm".$json}($params):[],null,["module"=>$module, "name"=>$name, "json"=>$json]);
-      if(isset($parent)) $utils->values([$utilsObj->parentField=>$parent]);
+      if(isset($parent)) $utils->values([property_exists($utilsObj,"parentField".$json)?$utilsObj->{"parentField".$json}:$utilsObj->parentField=>$parent]);
       return $utils->make($id, $class, $action, "form".$name, $type);
    }
 
