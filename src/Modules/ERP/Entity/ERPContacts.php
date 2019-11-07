@@ -284,4 +284,5 @@ class ERPContacts
 
         return $this;
     }
+
 }
