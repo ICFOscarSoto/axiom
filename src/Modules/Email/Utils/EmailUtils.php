@@ -1,6 +1,7 @@
 <?php
 namespace App\Modules\Email\Utils;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use App\Helpers\HelperMail;
 
 class EmailUtils{
   public $charset,$htmlmsg,$plainmsg;
@@ -67,7 +68,7 @@ class EmailUtils{
           // filename may be given as 'Filename' or 'Name' or both
           $filename = (isset($params['filename']))? $params['filename'] : $params['name'];
           // filename may be encoded, so see imap_mime_header_decode()
-          $attachment=array("filename" => $filename, "msgno" => $mid, "encoding" => $p->encoding, "partno" => $partno,
+          $attachment=array("filename" => HelperMail::decode_header($filename), "msgno" => $mid, "encoding" => $p->encoding, "partno" => $partno,
                             "icon" => $this->container?$this->container->get('router')->generate('getFilesImage', array('ext' => pathinfo($filename, PATHINFO_EXTENSION))):'');
           $this->attachments[]=$attachment;
           //$this->attachments[$filename] = $data;  // this is a problem if two files have same name

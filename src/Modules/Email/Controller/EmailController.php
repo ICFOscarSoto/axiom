@@ -160,6 +160,9 @@ class EmailController extends Controller
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+			$emailFolderRepository = $this->getDoctrine()->getRepository(EmailFolders::class);
+			$accountfolder=$emailFolderRepository->findOneBy(["id"=>$folder]);
+			$account=$accountfolder->getEmailAccount();
 			$locale = $request->getLocale();
 			$this->router = $router;
 			$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
@@ -172,7 +175,8 @@ class EmailController extends Controller
 				'breadcrumb' =>  $menurepository->formatBreadcrumb('emailView'),
 				'userData' => $userdata,
 				'id' => $id,
-				'folder' => $folder
+				'folder' => $folder,
+				'account' => $account->getId()
 				]);
 
 		}else return new RedirectResponse($this->router->generate('app_login'));
@@ -692,23 +696,23 @@ class EmailController extends Controller
 	}
 
 	/**
-	 * @Route("/api/emails/attachment/{id}/get", name="emailGetAttachment")
+	 * @Route("/api/email/getattachment/{account}/{folder}/{id}/get", name="emailGetAttachment")
 	 */
-	public function emailGetAttachment($id,RouterInterface $router,Request $request){
+	public function emailGetAttachment($id, $folder, $account, RouterInterface $router,Request $request){
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
-			$emailSubjectRepository = $this->getDoctrine()->getRepository(EmailSubjects::class);
-			$subject=$emailSubjectRepository->find($id);
+			$emailAccountRepository = $this->getDoctrine()->getRepository(EmailAccounts::class);
+			$emailFolderRepository = $this->getDoctrine()->getRepository(EmailFolders::class);
+			$emailAccount = $emailAccountRepository->findOneBy(["id"=>$account]);
+			$emailFolder = $emailFolderRepository->findOneBy(["id"=>$folder]);
 			$filename = $request->query->get('file');
-			if($subject && $filename!=null){
-				$emailAccount=$subject->getFolder()->getEmailAccount();
+			if($filename!=null){
 				if($emailAccount->getUser()->getId()==$this->getUser()->getId()){
 					$encoding=$request->query->getInt('encoding', 3);
 					$part=$request->query->getInt('part', 0);
-					$connectionString='{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'/novalidate-cert}'.$subject->getFolder()->getName();
+					$connectionString='{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'/novalidate-cert}'.$emailFolder->getName();
 					$inbox = imap_open($connectionString,$emailAccount->getUsername() ,$emailAccount->getPassword());
 					$emailUtils = new EmailUtils();
-					$data=$emailUtils->getAtachment($inbox,$subject->getMsgno(),$encoding,$part);
+					$data=$emailUtils->getAtachment($inbox,$id,$encoding,$part);
 					$fileinfo=finfo_open(FILEINFO_MIME_TYPE);
 					$contentType=finfo_buffer($fileinfo, $data);
 					$response = new Response();
@@ -723,7 +727,6 @@ class EmailController extends Controller
 					return $response;
 				}
 			}
-		}
 		return new Response('');
 	}
 
