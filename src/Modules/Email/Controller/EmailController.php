@@ -327,7 +327,7 @@ class EmailController extends Controller
 			$body = $mime->get();
 			$headers = $mime->headers($headers);
 			$smtp = Mail::factory('smtp',
-   		array ('host' => $emailAccount->getSmtpServer(),
+   		array ('host' => 'tls://'.$emailAccount->getSmtpServer(),
 			     'auth' => true,
 			     'username' => $emailAccount->getSmtpUsername(),
 					 'port'=>$emailAccount->getSmtpPort(),
