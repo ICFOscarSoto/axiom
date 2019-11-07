@@ -46,7 +46,7 @@ class GlobaleCompaniesController extends Controller
 
 		$new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-new"];
 	 	$template=dirname(__FILE__)."/../Forms/Companies.json";
-	 	$userdata=$this->getUser()->getTemplateData();
+	 	$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
 	 	$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
 	 	$breadcrumb=$menurepository->formatBreadcrumb('companies');
 	 	array_push($breadcrumb, $new_breadcrumb);
@@ -88,7 +88,7 @@ class GlobaleCompaniesController extends Controller
 	  public function discusage($id,Request $request){
 			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		  $this->denyAccessUnlessGranted('ROLE_GLOBAL');
-			$userdata=$this->getUser()->getTemplateData();
+			$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
 
 			$filesHelper=new HelperFiles();
 
@@ -139,7 +139,7 @@ class GlobaleCompaniesController extends Controller
 		$id=$this->getUser()->getCompany()->getId();
 	  $new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-new"];
 	  $template=dirname(__FILE__)."/../Forms/CompaniesAdmin.json";
-	  $userdata=$this->getUser()->getTemplateData();
+	  $userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
 	  $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
 	  $breadcrumb=$menurepository->formatBreadcrumb('mycompany');
 	  array_push($breadcrumb, $new_breadcrumb);
@@ -272,7 +272,7 @@ class GlobaleCompaniesController extends Controller
 		if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		//$this->denyAccessUnlessGranted('ROLE_ADMIN');
-		$userdata=$this->getUser()->getTemplateData();
+		$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
 		$locale = $request->getLocale();
 		$this->router = $router;
 		$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);

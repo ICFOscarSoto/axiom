@@ -7,6 +7,7 @@ use \App\Modules\Globale\Entity\GlobaleCompanies;
 use \App\Modules\Globale\Entity\GlobaleTaxes;
 use \App\Modules\AERP\Entity\AERPPaymentMethods;
 use \App\Modules\AERP\Entity\AERPFinancialYears;
+use \App\Modules\AERP\Entity\AERPSeries;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\Modules\AERP\Entity\AERPConfigurationRepository")
@@ -60,12 +61,12 @@ class AERPConfiguration
     /**
      * @ORM\Column(type="integer")
      */
-    private $budgetexpiration=30;
+    private $budgetexpiration=1;
 
     /**
-     * @ORM\Column(type="smallint")
+     * @ORM\Column(type="string", length=15)
      */
-    private $budgetexpirationtype=1;
+    private $budgetexpirationtype='months';
 
     /**
      * @ORM\Column(type="boolean")
@@ -112,6 +113,12 @@ class AERPConfiguration
      */
     private $financialyear;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\AERP\Entity\AERPSeries")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $defaultserie;
+
 
     public function __construct($kernel=null, $doctrine=null, $user=null, $company=null)
     {
@@ -125,20 +132,41 @@ class AERPConfiguration
        $this->dateupd=new \Datetime();
 
        $classPaymentMethods="\App\Modules\AERP\Entity\AERPPaymentMethods";
-       $repositoryPaymentMethods=$doctrine->getRepository($classTaxes);
-       $paymentmethod=new $classPaymentMethods();
-       $paymentmethod->setCompany($company);
-       $paymentmethod->setName("CONTADO");
-       $paymentmethod->setExpiration(0);
-       $paymentmethod->setType(0);
-       $paymentmethod->setDomiciled(0);
-       $paymentmethod->setDateadd(new \Datetime());
-       $paymentmethod->setDateupd(new \Datetime());
-       $paymentmethod->setActive(1);
-       $paymentmethod->setDeleted(0);
-       $doctrine->getManager()->persist($paymentmethod);
-       $doctrine->getManager()->flush();
-       $this->defaultpaymentmethod=$paymentmethod;
+       $repositoryPaymentMethods=$doctrine->getRepository($classPaymentMethods);
+       $paymentmethods=$repositoryPaymentMethods->findBy(["company"=>$company, "active"=>1, "deleted"=>0]);
+       if(empty($paymentmethods)){
+         $paymentmethod=new $classPaymentMethods();
+         $paymentmethod->setCompany($company);
+         $paymentmethod->setName("CONTADO");
+         $paymentmethod->setExpiration(0);
+         $paymentmethod->setType(0);
+         $paymentmethod->setDomiciled(0);
+         $paymentmethod->setDateadd(new \Datetime());
+         $paymentmethod->setDateupd(new \Datetime());
+         $paymentmethod->setActive(1);
+         $paymentmethod->setDeleted(0);
+         $doctrine->getManager()->persist($paymentmethod);
+         $doctrine->getManager()->flush();
+         $this->defaultpaymentmethod=$paymentmethod;
+       }else $this->defaultpaymentmethod=$paymentmethods[0];
+
+       $classSeries="\App\Modules\AERP\Entity\AERPSeries";
+       $repositorySeries=$doctrine->getRepository($classSeries);
+       $series=$repositorySeries->findBy(["company"=>$company, "active"=>1, "deleted"=>0]);
+       if(empty($paymentmethods)){
+         $serie=new $classSeries();
+         $serie->setCompany($company);
+         $serie->setCode("A");
+         $serie->setName("GENERAL VENTA");
+         $serie->setDateadd(new \Datetime());
+         $serie->setDateupd(new \Datetime());
+         $serie->setActive(1);
+         $serie->setDeleted(0);
+         $doctrine->getManager()->persist($serie);
+         $doctrine->getManager()->flush();
+         $this->defaultserie=$serie;
+       }else $this->defaultserie=$series[0];
+       
      }
 
     }
@@ -244,12 +272,12 @@ class AERPConfiguration
         return $this;
     }
 
-    public function getBudgetexpirationtype(): ?int
+    public function getBudgetexpirationtype(): ?string
     {
         return $this->budgetexpirationtype;
     }
 
-    public function setBudgetexpirationtype(int $budgetexpirationtype): self
+    public function setBudgetexpirationtype(string $budgetexpirationtype): self
     {
         $this->budgetexpirationtype = $budgetexpirationtype;
 
@@ -360,6 +388,18 @@ class AERPConfiguration
     public function setFinancialyear(?AERPFinancialYears $financialyear): self
     {
         $this->financialyear = $financialyear;
+
+        return $this;
+    }
+
+    public function getDefaultserie(): ?AERPSeries
+    {
+        return $this->defaultserie;
+    }
+
+    public function setDefaultserie(?AERPSeries $defaultserie): self
+    {
+        $this->defaultserie = $defaultserie;
 
         return $this;
     }

@@ -22,17 +22,22 @@
 		{#}<h2>{{ interfaceName }}</h2>#}
 		<!-- MAIN CONTENT -->
 		<div class="row">
+			{% if errors is not defined or errors|length == 0 %}
 				<div style="text-align: left;" class="col-md-8">
 					<div id="document-action-buttons" style="display:{% if id!=0 %}block;{% else %}none;{% endif %}">
-						<button id="document-button-print" type="button" class="btn btn" onclick="window.open('{{ url("AERPSalesBudgetsPrint",{"id":id}) }}')">Imprimir</button>
-						<button id="document-button-makeorder" type="button" class="btn btn">A Pedido</button>
+						<button id="document-button-print" type="button" class="btn btn-default btn-icon icon-left" onclick="window.open('{{ url("AERPSalesBudgetsPrint",{"id":id}) }}')">Imprimir<i class="fa fa-print"></i></button>
+						<button id="document-button-email" type="button" class="btn btn-default btn-icon icon-left">Enviar<i class="fa fa-envelope"></i></button>
+						<button id="document-button-makeorder" type="button" class="btn btn-default btn-icon icon-left">A Pedido<i class="fa fa-file"></i></button>
 					</div>
 				</div>
 		    <div style="text-align: right;" class="col-md-4">
 		      <button attr-id="" attr-action="" id="document-button-cancel" type="button" class="btn btn">Cancelar</button>
 		      <button attr-id="" attr-action="" id="document-button-save" type="button" class="btn btn-green">Guardar</button>
 		    </div>
+			{% endif %}
 		</div>
+		{% set formConstructor = {"name": documentType} %}
+		{{ include("@Globale/form_validation.html.twig") }}
 		<br/>
 		{{ include('@AERP/document_header_customer.html.twig') }}
 		{{ include('@AERP/document_header_data.html.twig') }}
@@ -47,6 +52,7 @@
 		{{ include('@AERP/document_calculate_totals.html.twig') }}
 		{{ include('@AERP/document_prepare_json.html.twig') }}
 
+		{{ include('@AERP/document_sales_validation.html.twig') }}
 
 		<script>
 			function clearFields(fields){
@@ -85,27 +91,27 @@
 
 					{# DOCUMENT SAVE #}
 					$('body').on('click', "#document-button-save", function(e) {
-						console.log(prepare_document_json());
-						$.ajax({
-			         url: '{{ url('dataAERPSalesBudgets', {"id": id}) }}',
-			         type: 'POST',
-			         data: JSON.stringify(prepare_document_json()),
-			         success:  function( data ) {
-								 if((--load_wait)==0) $("#load-spinner").fadeOut();
-			           if(data.result){
-									 $("#document-form-id").val(data.data.id);
-									 $("#document-form-code").val(data.data.code);
-									 $("#document-form-date").val(data.data.date);
-									 jQuery.each(data.data.lines, function(i, line) {
-										 $("#product-form-line-id-"+line.linenum).val(line.id);
-									 });
-									 toastr.success("Documento guardado correctamente", "Confirmación", confirmation);
-									 {% if id==0 %} location.href="/es/AERP/salesbudgets/form/"+data.data.id; {% endif %}
-			           } else {
-									 toastr.error("No se pudo guardar el documento", "Confirmación", confirmation);
-								 }
-			         }
-			       });
+						if(validate_sales_document())
+							$.ajax({
+				         url: '{{ url('dataAERPSalesBudgets', {"id": id}) }}',
+				         type: 'POST',
+				         data: JSON.stringify(prepare_document_json()),
+				         success:  function( data ) {
+									 if((--load_wait)==0) $("#load-spinner").fadeOut();
+				           if(data.result){
+										 $("#document-form-id").val(data.data.id);
+										 $("#document-form-code").val(data.data.code);
+										 $("#document-form-date").val(data.data.date);
+										 jQuery.each(data.data.lines, function(i, line) {
+											 $("#product-form-line-id-"+line.linenum).val(line.id);
+										 });
+										 toastr.success("Documento guardado correctamente", "Confirmación", confirmation);
+										 {% if id==0 %} location.href="/es/AERP/salesbudgets/form/"+data.data.id; {% endif %}
+				           } else {
+										 toastr.error("No se pudo guardar el documento", "Confirmación", confirmation);
+									 }
+				         }
+				       });
 					 });
 			});
 

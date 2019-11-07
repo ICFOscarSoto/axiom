@@ -35,7 +35,7 @@ class GlobaleClockDevicesController extends Controller
 
     $new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-new"];
     $template=dirname(__FILE__)."/../Forms/ClockDevices.json";
-    $userdata=$this->getUser()->getTemplateData();
+    $userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
     $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
     $breadcrumb=$menurepository->formatBreadcrumb('genericindex', "Globale", "ClockDevices");
     array_push($breadcrumb, $new_breadcrumb);

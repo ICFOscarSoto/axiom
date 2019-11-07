@@ -2,11 +2,23 @@
   <div class="panel-body">
     <div class="row">
       <div class="col-md-12">
-        <div id="{{formConstructor.name}}-validation-error" class="alert alert-danger form-validation-error" style="display: none">
-          <strong>Ocurrieron los siguientes errores:</strong></br></br><ul id="validation-errors-list"></ul>
+        <div id="{{formConstructor.name}}-validation-error" class="alert alert-danger form-validation-error" style="display: {% if errors is defined and errors|length > 0 %}block;{% else %}none;{% endif %}">
+          <strong>Ocurrieron los siguientes errores:</strong></br></br><ul id="validation-errors-list">
+            {% if errors is defined %}
+              {% for item in errors %}
+                <li>{{ item | raw }}</li>
+              {% endfor %}
+            {% endif %}
+          </ul>
         </div>
-        <div id="{{formConstructor.name}}-validation-warning" class="alert alert-warning form-validation-error" style="display: none">
-          <strong>Revise las siguientes advertencias:</strong></br></br><ul id="validation-warnings-list"></ul>
+        <div id="{{formConstructor.name}}-validation-warning" class="alert alert-warning form-validation-error" style="display: {% if warnings is defined and warnings|length > 0 %}block;{% else %}none;{% endif %}">
+          <strong>Revise las siguientes advertencias:</strong></br></br><ul id="validation-warnings-list">
+            {% if warnings is defined %}
+              {% for item in warnings %}
+                <li>{{ item | raw }}</li>
+              {% endfor %}
+            {% endif %}
+          </ul>
         </div>
       </div>
     </div>

@@ -8,7 +8,7 @@
     documentFields.date=$("#document-form-date").val();
     documentFields.serie=$("#document-form-series-select").val();
     documentFields.paymentmethod=$("#customer-form-paymentmethod-select").val();
-    documentFields.dateofferend=$("#document-form-dateofferend").val();
+    {% if documentType is defined and documentType == "sales_budget" %}documentFields.dateofferend=$("#document-form-dateofferend").val();{% endif %}
     documentFields.customercode=$("#document-form-customercode").val();
     documentFields.customerid=$("#customer-form-id").val();
     documentFields.customergroup=$("#customer-form-customergroup-select").val();

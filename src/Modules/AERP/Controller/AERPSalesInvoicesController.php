@@ -52,7 +52,7 @@ class AERPSalesInvoicesController extends Controller
 		$documentRepository=$this->getDoctrine()->getRepository($this->class);
 		$documentLinesRepository=$this->getDoctrine()->getRepository($this->classLines);
 
-		$userdata=$this->getUser()->getTemplateData();
+		$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
 		$locale = $request->getLocale();
 		$this->router = $router;
 
@@ -123,6 +123,13 @@ class AERPSalesInvoicesController extends Controller
 			$documentLines=[$line];
 		}
 
+		$errors=[];
+		//Check if the financialyear is open
+		if($id==0 && ($config->getFinancialyear()==null || $config->getFinancialyear()->getStatus()==0))
+			array_push($errors, "Debe existir un ejercicio fiscal abierto. Puede crear o abrir uno en el menu <a target='_blank' href='".$this->generateUrl("genericindex",["module"=>"AERP", "name"=>"FinancialYears"])."'>\"Ejercicios Fiscales\"</a>, también tiene que estar establecido como el ejercicio en uso en la <a target='_blank' href='".$this->generateUrl("mycompany")."?tab=AERP'>\"configuración del módulo\"</a>.");
+
+		$warnings=[];
+
 		$new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-plus"];
 		$breadcrumb=$menurepository->formatBreadcrumb('genericindex','AERP','SalesInvoices');
 		array_push($breadcrumb,$new_breadcrumb);
@@ -142,10 +149,12 @@ class AERPSalesInvoicesController extends Controller
 				'paymentMethods' => $paymentMethods,
 				'series' => $series,
 				'date' => ($document->getId()==null)?date('d-m-Y'):$document->getDate()->format('d/m/Y'),
-				'enddate' => ($document->getId()==null)?date('d-m-Y', strtotime(date('d-m-Y'). ' + 30 days')):$document->getDateofferend()->format('d/m/Y'),
 				'id' => $id,
+				'documentType' => 'sales_invoice',
 				'document' => $document,
-				'documentLines' => $documentLines
+				'documentLines' => $documentLines,
+				'errors' => $errors,
+				'warnings' => $warnings
 				]);
 		}
 		return new RedirectResponse($this->router->generate('app_login'));
@@ -181,7 +190,6 @@ class AERPSalesInvoicesController extends Controller
 		$serie=$seriesRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$fields->serie]);
 		$customergroup=$customerGroupsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$fields->customergroup, "active"=>1, "deleted"=>0]);
 
-
 		$date=$fields->date?date_create_from_format("d/m/Y",$fields->date):new \DateTime();
 		if(!$document){
 			$document=new $this->class();
@@ -210,7 +218,6 @@ class AERPSalesInvoicesController extends Controller
 		$document->setCustomerpostbox($customer->getPostbox());
 		$document->setCustomercode($fields->customercode);
 		$document->setDate($date);
-		$document->setDateofferend($fields->dateofferend?date_create_from_format("d/m/Y",$fields->dateofferend):null);
 		$document->setTaxexempt(($fields->taxexempt!="")?filter_var($fields->taxexempt, FILTER_VALIDATE_BOOLEAN):0);
 		$document->setSurcharge(($fields->surcharge!="")?filter_var($fields->surcharge, FILTER_VALIDATE_BOOLEAN):0);
 		$document->setIrpf(($fields->irpf!="")?filter_var($fields->irpf, FILTER_VALIDATE_BOOLEAN):0);

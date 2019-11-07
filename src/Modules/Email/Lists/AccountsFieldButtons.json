@@ -1,8 +1,5 @@
 [
-  {"id" : "edit", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"genericdata", "routeParams":{"module":"Email", "name":"Accounts", "type":"modal" }, "modal":"Accounts", "actionType" : "background", "confirm" :false},
-  {"id": "activation", "type": "option", "options": [
-      {"id": "desactivate", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"genericdisable", "routeParams":{"module":"Email", "name":"Accounts"}, "confirm" :true, "actionType" : "background" },
-      {"id": "activate", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "route":"genericenable", "routeParams":{"module":"Email", "name":"Accounts"}, "confirm" :true, "actionType" : "background" }
-  ]},
+  {"id" : "edit", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"genericdatatab", "routeParams":{"module":"Email", "name":"Accounts", "type":"modal", "idparent":"id"}, "modal":"Accounts", "actionType" : "background", "confirm" :false},
+  {"id" : "folders", "type" : "default", "icon" : "fa fa-folder", "name" : "folders", "route":"genericdatatab", "routeParams":{"module":"Email", "name":"Accounts", "type":"modal", "idparent":"id", "json": "AccountsFolders"}, "modal":"Accounts", "actionType" : "background", "confirm" :false},
   {"id" : "delete", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"genericdelete", "routeParams":{"module":"Email", "name":"Accounts"}, "confirm" :true, "undo" :false, "tooltip":"Borrar cuenta", "actionType" : "background"}
 ]

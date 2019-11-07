@@ -3,12 +3,12 @@
     <div class="row">
       <div class="col-6 col-sm-2"> <div class="input-group"> <span class="input-group-addon"><i class="fa fa-hashtag"></i></span><input type="hidden" id="document-form-id" value="{{ document.id }}" class="form-control"><input type="text" id="document-form-code" value="{{ document.code }}" class="form-control" placeholder="N. Documento" disabled> </div></div>
       <div class="col-6 col-sm-2"> <div class="input-group"> <span class="input-group-addon"><i class="fa fa-calendar"></i></span> <input type="text" id="document-form-date" class="form-control datepicker" style="z-index:99 !important;" placeholder="Fecha" value="{{ date }}"></div></div>
-      <div class="col-6 col-sm-2"> <div class="input-group"> <span class="input-group-addon"><i class="fa fa-calendar"></i></span> <input type="text" id="document-form-dateofferend" class="form-control datepicker" style="z-index:99 !important;" placeholder="Fin oferta" value="{{ enddate }}"></div></div>
+      {% if documentType is defined and documentType == "sales_budget" %}<div class="col-6 col-sm-2"> <div class="input-group"> <span class="input-group-addon"><i class="fa fa-calendar"></i></span> <input type="text" id="document-form-dateofferend" class="form-control datepicker" style="z-index:99 !important;" placeholder="Fin oferta" value="{{ enddate }}"></div></div> {% endif %}
       <div class="col-6 col-sm-2"> <div class="input-group"> <span class="input-group-addon"><i class="fa fa-hashtag"></i></span> <input type="text" id="document-form-customercode" class="form-control" placeholder="Su referencia" value="{{ document.customercode }}"> </div> </div>
       <div class="col-6 col-sm-2"> <div class="form-group">
         <select type="text"  id="document-form-series-select" class="form-control select2">
           {% for option in series %}
-            <option value="{{ option.id }}"{% if document.serie!=null and option.id==document.serie.id %} selected="selected" {% endif %}>{{ option.text }}</option>
+            <option value="{{ option.id }}"{% if id!=0 %}{% if document.serie!=null and option.id==document.serie.id %} selected="selected" {% endif %}{% else %}{% if option.id==moduleConfig.defaultserie.id %} selected="selected" {% endif %}{% endif %}>{{ option.text }}</option>
           {% endfor %}
         </select>
       </div> </div>

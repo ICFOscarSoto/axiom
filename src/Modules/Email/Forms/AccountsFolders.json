@@ -1,0 +1,13 @@
+[{
+
+	"sections": [
+      {
+  			"name": "Folders",
+  			"fields": [
+					{ "name": "inboxFolder","cols": 6},
+					{ "name": "sentFolder","cols": 6},
+					{ "name": "trashFolder","cols": 6}
+  			]
+  		}
+  ]
+}]

@@ -23,13 +23,22 @@
 							{% trans %}Edit profile{% endtrans %}
 						</a>
 					</li>
-
+					{% if userData.modules.Email is defined %}
+					<li>
+						<a href="{{ url('email') }}">
+							<i class="entypo-mail"></i>
+							{% trans %}Email{% endtrans %}
+						</a>
+					</li>
+					{% endif %}
+					{% if userData.modules.HR is defined %}
 					<li>
 						<a href="{{ url('clocks') }}">
 							<i class="entypo-clock"></i>
 							{% trans %}Clocks{% endtrans %}
 						</a>
 					</li>
+					{% endif %}
 				</ul>
 			</li>
 
@@ -63,8 +72,9 @@
 				</ul>
 			</li>
 
+			{% if userData.modules.Email is defined %}
 			<!-- Message Notifications -->
-			{#	<li class="notifications dropdown">
+			<li class="notifications dropdown">
 
 				<a href="#" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
 					<i class="entypo-mail"></i>
@@ -92,7 +102,9 @@
 				</ul>
 
 			</li>
-			#}
+			{% endif %}
+
+
 			<!-- Task Notifications -->
 			{#
 			<li class="notifications dropdown">
@@ -121,12 +133,12 @@
 			</li>
 			#}
 			{% if "ROLE_GLOBAL" in userData.roles %}
-				<li style="width:250px">
+				<div style="width: 100%;position: absolute;text-align: end;pointer-events: none;">
 					<div style="padding: 4px 20px; display: inline-flex">
 						<div style="width: 86px;padding-top: 6px;">Conectar como:</div>
 						<div><select id="connectas" name="connectas" style="width:200px" class="select2"></select>
 					 </div>
-				</li>
+				</div>
 				<script>
 				 $(document).ready(function() {
 					 var connectasdata=null;

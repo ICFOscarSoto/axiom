@@ -31,7 +31,7 @@ public function formAERPProvider($id,Request $request)
 {
   $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
   if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
-  $userdata=$this->getUser()->getTemplateData();
+  $userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
   $locale = $request->getLocale();
   $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
   $contactRepository=$this->getDoctrine()->getRepository($this->class);

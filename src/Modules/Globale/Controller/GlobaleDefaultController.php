@@ -59,7 +59,7 @@ class GlobaleDefaultController extends Controller
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
     if(!SecurityUtils::checkRoutePermissions($module,$name.'_genericindex',$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
 		//$this->denyAccessUnlessGranted('ROLE_ADMIN');
-		$userdata=$this->getUser()->getTemplateData();
+		$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
 		$locale = $request->getLocale();
 		$this->router = $router;
 		$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
@@ -95,12 +95,12 @@ class GlobaleDefaultController extends Controller
     }
 
    /**
-    * @Route("/{_locale}/{module}/{name}/generic/data/{id}/{action}/{type}", name="genericdata", defaults={"id"=0, "action"="read", "type"="modal"})
+    * @Route("/{_locale}/{module}/{name}/generic/data/{id}/{action}/{type}/{json}", name="genericdata", defaults={"id"=0, "action"="read", "type"="modal", "json"=""})
     */
-    public function data($id, $module, $name, $action, $type, Request $request){
+    public function data($id, $module, $name, $action, $type, $json, Request $request){
       $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
       $this->denyAccessUnlessGranted('ROLE_ADMIN');
-      $template=dirname(__FILE__)."/../../".$module."/Forms/".$name.".json";
+      $template=dirname(__FILE__)."/../../".$module."/Forms/".($json!=""?$json:$name).".json";
       $class="\App\Modules\\".$module."\Entity\\".$module.$name;
       $utils = new GlobaleFormUtils();
       $classUtils="\App\Modules\\".$module."\Utils\\".$module.$name.'Utils';
@@ -111,35 +111,18 @@ class GlobaleDefaultController extends Controller
       $obj=new $class();
 
       $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),
-        method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[],null,["module"=>$module, "name"=>$name]
+        method_exists($utilsObj,'getExcludedForm'.$json)?$utilsObj->{"getExcludedForm".$json}($params):[],method_exists($utilsObj,'getIncludedForm'.$json)?$utilsObj->{"getIncludedForm".$json}($params):[],null,["module"=>$module, "name"=>$name, "json"=>$json]
       );
       return $utils->make($id, $class, $action, "form".$name, $type);
    }
 
    /**
-    * @Route("/{_locale}/{widget}/widgetgeneric/data/{id}/{action}", name="widgetdata", defaults={"id"=0, "action"="read"})
+    * @Route("/{_locale}/{module}/{name}/generic/datatab/{id}/{action}/{idparent}/{type}/{json}", name="genericdatatab", defaults={"id"=0, "idparent"="0", "type"="modal", "action"="read", "json"=""})
     */
-    public function widgetdata($id, $widget, $action, Request $request){
+    public function genericdatatab($id, $idparent, $module, $name, $type, $action, $json, Request $request){
       $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
       $this->denyAccessUnlessGranted('ROLE_ADMIN');
-      $template=dirname(__FILE__)."/../../../Widgets/Forms/".$widget.".json";
-      $class="\App\Widgets\Entity\Widgets".$widget;
-      $utils = new GlobaleFormUtils();
-      $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser()];
-      $obj=new $class();
-      $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),
-                         ["userwidget"],[],null,["widget"=>$widget]);
-      return $utils->make($id, $class, $action, "form".$widget, "modal");
-
-   }
-
-   /**
-    * @Route("/{_locale}/{module}/{name}/generic/datatab/{id}/{action}/{idparent}/{type}", name="genericdatatab", defaults={"id"=0, "idparent"="0", "type"="modal", "action"="read"})
-    */
-    public function genericdatatab($id, $idparent, $module, $name, $type, $action, Request $request){
-      $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-      $this->denyAccessUnlessGranted('ROLE_ADMIN');
-      $template=dirname(__FILE__)."/../../".$module."/Forms/".$name.".json";
+      $template=dirname(__FILE__)."/../../".$module."/Forms/".($json!=""?$json:$name).".json";
       $class="\App\Modules\\".$module."\Entity\\".$module.$name;
       $utils = new GlobaleFormUtils();
       $classUtils="\App\Modules\\".$module."\Utils\\".$module.$name.'Utils';
@@ -147,7 +130,7 @@ class GlobaleDefaultController extends Controller
       if(class_exists($classUtils)){
         $utilsObj=new $classUtils();
       }else $utilsObj=new $class(); // define the main class to ensure that a valid object is created and not has getIncludedForm and getExcludedForm
-      $parentRepository=$this->getDoctrine()->getRepository($utilsObj->parentClass);
+      $parentRepository=$this->getDoctrine()->getRepository(property_exists($utilsObj,"parentClass".$json)?$utilsObj->{"parentClass".$json}:$utilsObj->parentClass);
       $obj=new $class();
       if($id==0){
         if($idparent==0 ) $idparent=$request->query->get('idparent');
@@ -155,11 +138,30 @@ class GlobaleDefaultController extends Controller
         $parent = $parentRepository->find($idparent);
       }	else $obj = $classRepository->find($id);
       $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "parent"=>$id==0?$parent:$obj->{"get".ucfirst($utilsObj->parentField)}()];
+      dump('getExcludedForm'.$json);
       $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),
-        method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[$utilsObj->parentField],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[],null,["module"=>$module, "name"=>$name]);
+        method_exists($utilsObj,'getExcludedForm'.$json)?$utilsObj->{"getExcludedForm".$json}($params):[],method_exists($utilsObj,'getIncludedForm'.$json)?$utilsObj->{"getIncludedForm".$json}($params):[],null,["module"=>$module, "name"=>$name, "json"=>$json]);
       if(isset($parent)) $utils->values([$utilsObj->parentField=>$parent]);
       return $utils->make($id, $class, $action, "form".$name, $type);
    }
+
+
+      /**
+       * @Route("/{_locale}/{widget}/widgetgeneric/data/{id}/{action}", name="widgetdata", defaults={"id"=0, "action"="read"})
+       */
+       public function widgetdata($id, $widget, $action, Request $request){
+         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+         $this->denyAccessUnlessGranted('ROLE_ADMIN');
+         $template=dirname(__FILE__)."/../../../Widgets/Forms/".$widget.".json";
+         $class="\App\Widgets\Entity\Widgets".$widget;
+         $utils = new GlobaleFormUtils();
+         $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser()];
+         $obj=new $class();
+         $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),
+                            ["userwidget"],[],null,["widget"=>$widget]);
+         return $utils->make($id, $class, $action, "form".$widget, "modal");
+
+      }
 
      /**
       * @Route("/api/{module}/{name}/generic/list/{parent}/{field}/{parentModule}/{parentName}/{json}", name="genericlist", defaults={"parent"=0, "field"=null, "parentModule"="", "parentName"="", "json"=""})
@@ -195,7 +197,7 @@ class GlobaleDefaultController extends Controller
      public function tablist($module, $name, $id, $function, RouterInterface $router,Request $request){
        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
        //$this->denyAccessUnlessGranted('ROLE_ADMIN');
-       $userdata=$this->getUser()->getTemplateData();
+       $userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
        $locale = $request->getLocale();
        $this->router = $router;
        $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);

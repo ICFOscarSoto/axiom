@@ -181,7 +181,7 @@ class AERPSalesInvoicesReports
     $y=$this->pdf->getY();
     $this->pdf->setXY(5, 39);
     //$this->pdf->SetDrawColor(0, 0, 0);
-    $this->pdf->Cell(22,9,utf8_decode('Nº Presupuesto'),'',0,'L',false);
+    $this->pdf->Cell(22,9,utf8_decode('Nº Factura'),'',0,'L',false);
     $this->pdf->SetTextColor(0, 0, 0);
     $this->pdf->Cell(60,9,utf8_decode($document->getCode()),'',0,'L',false);
     $this->pdf->SetTextColor($this->bgcolor_r, $this->bgcolor_g, $this->bgcolor_b);
@@ -189,11 +189,6 @@ class AERPSalesInvoicesReports
     $this->pdf->Cell(22,9,utf8_decode('Fecha'),'',0,'L',false);
     $this->pdf->SetTextColor(0, 0, 0);
     $this->pdf->Cell(60,9,utf8_decode($document->getDate()->format("d/m/Y")),'',0,'L',false);
-    $this->pdf->Ln(4);
-    $this->pdf->SetTextColor($this->bgcolor_r, $this->bgcolor_g, $this->bgcolor_b);
-    $this->pdf->Cell(22,9,utf8_decode('Válido hasta:'),'',0,'L',false);
-    $this->pdf->SetTextColor(0, 0, 0);
-    $this->pdf->Cell(60,9,utf8_decode($document->getDateofferend()->format("d/m/Y")),'',0,'L',false);
     $this->pdf->Ln(4);
     $this->pdf->SetTextColor($this->bgcolor_r, $this->bgcolor_g, $this->bgcolor_b);
     $this->pdf->Cell(22,9,utf8_decode('Cliente'),'',0,'L',false);

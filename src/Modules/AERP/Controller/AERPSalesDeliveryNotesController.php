@@ -52,7 +52,7 @@ class AERPSalesDeliveryNotesController extends Controller
 		$documentRepository=$this->getDoctrine()->getRepository($this->class);
 		$documentLinesRepository=$this->getDoctrine()->getRepository($this->classLines);
 
-		$userdata=$this->getUser()->getTemplateData();
+		$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
 		$locale = $request->getLocale();
 		$this->router = $router;
 
@@ -123,6 +123,13 @@ class AERPSalesDeliveryNotesController extends Controller
 			$documentLines=[$line];
 		}
 
+		$errors=[];
+		//Check if the financialyear is open
+		if($id==0 && ($config->getFinancialyear()==null || $config->getFinancialyear()->getStatus()==0))
+			array_push($errors, "Debe existir un ejercicio fiscal abierto. Puede crear o abrir uno en el menu <a target='_blank' href='".$this->generateUrl("genericindex",["module"=>"AERP", "name"=>"FinancialYears"])."'>\"Ejercicios Fiscales\"</a>, también tiene que estar establecido como el ejercicio en uso en la <a target='_blank' href='".$this->generateUrl("mycompany")."?tab=AERP'>\"configuración del módulo\"</a>.");
+
+		$warnings=[];
+
 		$new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-plus"];
 		$breadcrumb=$menurepository->formatBreadcrumb('genericindex','AERP','SalesDeliveryNotes');
 		array_push($breadcrumb,$new_breadcrumb);
@@ -142,10 +149,12 @@ class AERPSalesDeliveryNotesController extends Controller
 				'paymentMethods' => $paymentMethods,
 				'series' => $series,
 				'date' => ($document->getId()==null)?date('d-m-Y'):$document->getDate()->format('d/m/Y'),
-				'enddate' => ($document->getId()==null)?date('d-m-Y', strtotime(date('d-m-Y'). ' + 30 days')):$document->getDateofferend()->format('d/m/Y'),
 				'id' => $id,
+				'documentType' => 'sales_deliverynote',
 				'document' => $document,
-				'documentLines' => $documentLines
+				'documentLines' => $documentLines,
+				'errors' => $errors,
+				'warnings' => $warnings
 				]);
 		}
 		return new RedirectResponse($this->router->generate('app_login'));
@@ -165,11 +174,12 @@ class AERPSalesDeliveryNotesController extends Controller
 		$productsRepository=$this->getDoctrine()->getRepository(AERPProducts::class);
 		$seriesRepository=$this->getDoctrine()->getRepository(AERPSeries::class);
 		$taxesRepository=$this->getDoctrine()->getRepository(GlobaleTaxes::class);
+		$configrepository=$this->getDoctrine()->getRepository(AERPConfiguration::class);
 
 		$document=$documentRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$id, "deleted"=>0]);
 		//Check if document belongs to company
 		if($id!=0 && !$document) return new JsonResponse(["result"=>0]);
-
+		$config=$configrepository->findOneBy(["company"=>$this->getUser()->getCompany()]);
 
 		//Get content of the json reques
 		$fields=json_decode($request->getContent());
@@ -184,8 +194,8 @@ class AERPSalesDeliveryNotesController extends Controller
 		$date=$fields->date?date_create_from_format("d/m/Y",$fields->date):new \DateTime();
 		if(!$document){
 			$document=new $this->class();
-			$document->setNumber($documentRepository->getNextNum($this->getUser()->getCompany()->getId()));
-			$document->setCode($code='ALB'.$date->format('y').'/'.str_pad($document->getNumber(), 6, '0', STR_PAD_LEFT));
+			$document->setNumber($documentRepository->getNextNum($this->getUser()->getCompany()->getId(),$config->getFinancialyear()->getId(),$serie->getId()));
+			$document->setCode($config->getFinancialyear()->getCode().$serie->getCode().str_pad($document->getNumber(), 6, '0', STR_PAD_LEFT));
 			$document->setAuthor($this->getUser());
 			$document->setAgent($this->getUser());
 			$document->setActive(1);
@@ -208,7 +218,6 @@ class AERPSalesDeliveryNotesController extends Controller
 		$document->setCustomerpostbox($customer->getPostbox());
 		$document->setCustomercode($fields->customercode);
 		$document->setDate($date);
-		$document->setDateofferend($fields->dateofferend?date_create_from_format("d/m/Y",$fields->dateofferend):null);
 		$document->setTaxexempt(($fields->taxexempt!="")?filter_var($fields->taxexempt, FILTER_VALIDATE_BOOLEAN):0);
 		$document->setSurcharge(($fields->surcharge!="")?filter_var($fields->surcharge, FILTER_VALIDATE_BOOLEAN):0);
 		$document->setIrpf(($fields->irpf!="")?filter_var($fields->irpf, FILTER_VALIDATE_BOOLEAN):0);

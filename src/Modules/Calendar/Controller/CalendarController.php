@@ -30,7 +30,7 @@ class CalendarController extends Controller{
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 			$locale = $request->getLocale();
 			$this->router = $router;
-			$userdata=$this->getUser()->getTemplateData();
+			$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
 			$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
 			return $this->render('@Calendar/calendar_list.html.twig', [
 				'controllerName' => 'CalendarController',

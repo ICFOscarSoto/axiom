@@ -229,9 +229,17 @@ class GlobaleUsers implements UserInterface
     }
 
 
-	 public function getTemplateData(){
-     $session = new Session();
-     $connectas=$session->get('as_company',null);
+	 public function getTemplateData($kernel, $doctrine){
+      $session = new Session();
+      $connectas=$session->get('as_company',null);
+
+      $modules=[];
+      $repositoryModules=$doctrine->getRepository("\App\Modules\Globale\Entity\GlobaleCompaniesModules");
+      $activeModules=$repositoryModules->findBy(["companyown"=>$this->getCompany(), "active"=>1, "deleted"=>0]);
+      foreach($activeModules as $module){
+        $modules[$module->getModule()->getName()]=$module->getModule();
+      }
+
 
       $filesHelper=new HelperFiles();
       $data["id"]=$this->getId();
@@ -239,6 +247,7 @@ class GlobaleUsers implements UserInterface
   		$data["name"]=$this->getName();
   		$data["firstname"]=$this->getLastname();
   		$data["roles"]=$this->getRoles();
+      $data["modules"]=$modules;
       $data["companyId"]=$connectas==null?$this->getCompany()->getId():$connectas->getId();
       if(in_array("ROLE_ADMIN",$this->getRoles())){
         $diskusage=($connectas==null)?$this->getCompany()->getDiskUsages():$connectas->getDiskUsages();

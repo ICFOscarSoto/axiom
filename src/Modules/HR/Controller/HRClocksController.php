@@ -47,7 +47,7 @@ class HRClocksController extends Controller
      public function clocks(RouterInterface $router,Request $request){
      $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		 if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
-     $userdata=$this->getUser()->getTemplateData();
+     $userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
      $locale = $request->getLocale();
      $this->router = $router;
 		 $workerRepository=$this->getDoctrine()->getRepository(HRWorkers::class);
@@ -91,7 +91,7 @@ class HRClocksController extends Controller
       $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 			if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
       //$this->denyAccessUnlessGranted('ROLE_ADMIN');
-      $userdata=$this->getUser()->getTemplateData();
+      $userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
       $locale = $request->getLocale();
       $this->router = $router;
 			$department=$request->query->get("department",0);
@@ -127,7 +127,7 @@ class HRClocksController extends Controller
 			{
 			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 			$this->denyAccessUnlessGranted('ROLE_ADMIN');
-			$userdata=$this->getUser()->getTemplateData();
+			$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
 			$locale = $request->getLocale();
 			$this->router = $router;
 			$clocksrepository=$this->getDoctrine()->getRepository(HRClocks::class);
