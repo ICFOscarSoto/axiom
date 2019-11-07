@@ -755,13 +755,13 @@ class EmailController extends Controller
 		$newFolders=0;
 		$newAccount=count($folders)>0?false:true;
 		try {
-			$inbox = imap_open('{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'}',$emailAccount->getUsername() ,$emailAccount->getPassword(),OP_HALFOPEN);
+			$inbox = imap_open('{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'/novalidate-cert}',$emailAccount->getUsername() ,$emailAccount->getPassword(),OP_HALFOPEN);
 		} catch (\Symfony\Component\Debug\Exception\ContextErrorException $e) {
 			return new JsonResponse(["result"=>-1, "error"=>imap_last_error()]);
 		}
 
 		  if($inbox==false) return new JsonResponse(["result"=>-1, "error"=>"Empty inbox. ".imap_last_error()]);
-			$list = imap_list($inbox, '{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'}', "*");
+			$list = imap_list($inbox, '{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'/novalidate-cert}', "*");
 			if (is_array($list)) {
 			    foreach ($list as $val) {
 							//Search if folder already exists
