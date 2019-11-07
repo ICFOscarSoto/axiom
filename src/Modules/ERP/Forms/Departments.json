@@ -1,13 +1,29 @@
 [{
-	"sections": [
-		{
-			"name": "Department data",
-			"fields": [
-				{ "name": "name","cols": 8},
-				{	"name": "purchaseorder", "cols": 4},
-				{	"name": "saleorder", "cols": 4},
-				{	"name": "invoice", "cols": 4},
-				{	"name": "active", "cols": 2}
-			]
-		}]
+    "sections": [
+        {
+            "name": "data",
+            "fields": [
+                {
+                    "name": "name",
+                    "cols": 4
+                },
+                {
+                    "name": "purchaseorder",
+                    "cols": 4
+                },
+                {
+                    "name": "saleorder",
+                    "cols": 4
+                },
+                {
+                    "name": "invoice",
+                    "cols": 4
+                },
+                {
+                    "name": "active",
+                    "cols": 4
+                }
+            ]
+        }
+    ]
 }]

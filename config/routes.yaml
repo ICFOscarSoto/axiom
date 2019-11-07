@@ -87,10 +87,6 @@ PaymentMethods:
     resource: 'App\Modules\ERP\Controller\ERPPaymentMethodsController'
     type:     annotation
 
-Department:
-    resource: 'App\Modules\ERP\Controller\ERPDepartmentsController'
-    type:     annotation
-
 BankAccount:
     resource: 'App\Modules\ERP\Controller\ERPBankAccountsController'
     type:     annotation
