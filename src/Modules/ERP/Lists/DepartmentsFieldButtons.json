@@ -1,8 +1,8 @@
 [
-  {"id": "edit", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"dataDepartments", "modal":"departments", "actionType" : "background", "confirm" :false},
+  {"id": "editDepartments", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"genericdata", "routeParams":{"module":"ERP", "name":"Departments", "type":"modal" }, "modal":"Departments", "actionType" : "background", "confirm" :false, "tooltip":""},
   {"id": "activation", "type": "option", "options": [
-      {"id": "desactivate", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"disableDepartment", "confirm" :true, "actionType" : "background" },
-      {"id": "activate", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "route":"enableDepartment", "confirm" :true, "actionType" : "background" }
+      {"id": "desactivateDepartments", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"genericdisable", "routeParams":{"module":"ERP", "name":"Departments"}, "confirm" :true, "actionType" : "background", "tooltip":"" },
+      {"id": "activateDepartments", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "route":"genericenable", "routeParams":{"module":"ERP", "name":"Departments"}, "confirm" :true, "actionType" : "background", "tooltip":"" }
   ]},
-  {"id": "delete", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"deleteDepartment", "confirm" :true, "undo" :false, "tooltip":"Borrar departamento", "actionType" : "background"}
+  {"id": "deleteDepartments", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"genericdelete", "routeParams":{"module":"ERP", "name":"Departments"}, "confirm" :true, "undo" :false, "actionType" : "background", "tooltip":""}
 ]

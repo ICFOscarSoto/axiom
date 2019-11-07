@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\ERP\Entity\ERPContacts;
 use App\Modules\ERP\Entity\ERPSuppliers;
+use App\Modules\ERP\Entity\ERPCustomers;
 use App\Modules\Globale\Entity\GlobaleCountries;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
@@ -51,6 +52,8 @@ class ERPContactsController extends Controller
   		}
   		return new RedirectResponse($this->router->generate('app_login'));
     }
+		
+	
 
 		/**
 		 * @Route("/{_locale}/contact/data/{id}/{action}/{identity}", name="dataContacts", defaults={"id"=0, "action"="read", "identity"=0})
@@ -76,7 +79,7 @@ class ERPContactsController extends Controller
 		 												method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
 		 return $utils->make($id, $this->class, $action, "formIdentities", "modal");
 		}
-
+		
     /**
     * @Route("/api/global/contact/{id}/get", name="getContact")
     */
