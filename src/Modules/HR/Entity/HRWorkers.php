@@ -64,7 +64,7 @@ class HRWorkers
     /**
      * @ORM\Column(type="smallint")
      */
-    private $status;
+    private $status=1;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
