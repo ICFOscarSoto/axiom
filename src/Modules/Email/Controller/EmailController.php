@@ -781,7 +781,7 @@ class EmailController extends Controller
 							}
 			    }
 			} else {
-			    return new JsonResponse(["result"=>-1]);
+			    return new JsonResponse(["result"=>-1, "error"=>"Empty list. ".imap_last_error()]);
 			}
 			imap_close($inbox);
 			return new JsonResponse(["result"=>1, "newaccount"=>$newAccount, "newfolders"=>$newFolders]);
