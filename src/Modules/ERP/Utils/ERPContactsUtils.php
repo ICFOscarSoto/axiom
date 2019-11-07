@@ -15,7 +15,10 @@ class ERPContactsUtils
   private $module="ERP";
   private $name="Contacts";
   public $parentClass="\App\Modules\ERP\Entity\ERPSuppliers";
+  public $parentClassContactsCustomer="\App\Modules\ERP\Entity\ERPCustomers";
   public $parentField="supplier";
+  public $parentFieldContactsCustomer="customer";
+
 
   public function formatList($user, $supplier){
     $list=[
@@ -68,6 +71,17 @@ class ERPContactsUtils
   }
 
   public function getIncludedForm($params){
+    $doctrine=$params["doctrine"];
+    $user=$params["user"];
+    $id=$params["id"];
+    return [];
+  }
+  
+  public function getExcludedFormContactsCustomer($params){
+    return ['supplier','customer'];
+  }
+
+  public function getIncludedFormContactsCustomer($params){
     $doctrine=$params["doctrine"];
     $user=$params["user"];
     $id=$params["id"];

@@ -1,0 +1,15 @@
+[{
+	"sections": [
+		{
+			"name": "Contacts data",
+			"fields": [
+				{ "name": "name","cols": 4},
+				{ "name": "lastname","cols": 4},
+				{ "name": "phone","cols": 4},
+				{ "name": "email","cols": 4},
+				{ "name": "position","cols": 4},
+				{ "name": "department","cols": 4},
+				{ "name": "active","cols": 2}				
+			]
+		}]
+}]
