@@ -53,7 +53,7 @@ class HelperMail {
                     $data = quoted_printable_decode(str_replace("_", " ", $data));
                     break;
                 default:
-                    throw new Exception("preg_match_all is busted: didn't find B or Q in encoding $header");
+                    //throw new Exception("preg_match_all is busted: didn't find B or Q in encoding $header");
             }
             // This part needs to handle every charset
             switch (strtoupper($charset)) {
@@ -61,7 +61,7 @@ class HelperMail {
                     break;
                 default:
                     /* Here's where you should handle other character sets! */
-                    throw new Exception("Unknown charset in header - time to write some code.");
+                    //throw new Exception("Unknown charset in header - time to write some code.");
             }
             $header = str_replace($match, $data, $header);
         }
