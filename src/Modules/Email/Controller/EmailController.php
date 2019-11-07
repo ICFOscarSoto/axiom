@@ -337,9 +337,9 @@ class EmailController extends Controller
 			if($result){
 				//Si se ha enviado correctamente el mail SMTP procedemos a crear el mail IMAP para almacenarlo en la carpeta
 				//de enviados
-				$connectionString='{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'}'.$emailAccount->getSentFolder()->getName();
+				$connectionString='{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'/novalidate-cert}'.$emailAccount->getSentFolder()->getName();
 				$inbox = imap_open($connectionString,$emailAccount->getUsername() ,$emailAccount->getPassword());
-				$mailBox = "{".$emailAccount->getServer().":".$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol()."}".$emailAccount->getSentFolder()->getName();
+				$mailBox = "{".$emailAccount->getServer().":".$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol()."/novalidate-cert}".$emailAccount->getSentFolder()->getName();
         $dmy = date("d-M-Y H:i:s");
         $boundary = "------=".md5(uniqid(rand()));
         $msgid = '{axiom_'.time().'_'.$emailAccount->getId().'}';
@@ -396,10 +396,10 @@ class EmailController extends Controller
 			if(!$emailFolder) return new JsonResponse(array("result"=> -1));
 			$emailAccount=$emailFolder->getEmailAccount();
 			if(!$emailAccount) return new JsonResponse(array("result"=> -1));
-			$inbox = imap_open('{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'}'.$emailFolder->getName(),$emailAccount->getUsername(),$emailAccount->getPassword());
+			$inbox = imap_open('{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'/novalidate-cert}'.$emailFolder->getName(),$emailAccount->getUsername(),$emailAccount->getPassword());
 			if($inbox===FALSE) return new JsonResponse(array("result"=> -1));
 
-			$status = imap_status ( $inbox , '{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'}'.$emailFolder->getName(), SA_ALL);
+			$status = imap_status ( $inbox , '{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'/novalidate-cert}'.$emailFolder->getName(), SA_ALL);
 			$return['folderName']=$emailFolder->getName();
 			$return['limit']=$limit;
 			$return['start']=$start;
@@ -517,7 +517,7 @@ class EmailController extends Controller
 			foreach($emailAccounts as $emailAccount){
 				if($emailAccount->getInboxFolder()){
 					//Comprobamos si hay correo sin leer
-					$connectionString='{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'}'.$emailAccount->getInboxFolder()->getName();
+					$connectionString='{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'/novalidate-cert}'.$emailAccount->getInboxFolder()->getName();
 					@$inbox = imap_open($connectionString,$emailAccount->getUsername(),$emailAccount->getPassword());
 					if($inbox!==FALSE)$emailsUnseen=imap_search($inbox, 'UNSEEN'); else	$emailsUnseen=FALSE;
 						if(!$emailsUnseen) continue;
@@ -562,7 +562,7 @@ class EmailController extends Controller
 				"user" => $this->getUser()->getId()
 			]);
 			if(!$emailAccount) return new JsonResponse(array("result"=> -1));
-			$connectionString='{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'}'.$emailFolder->getName();
+			$connectionString='{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'/novalidate-cert}'.$emailFolder->getName();
 			$inbox = imap_open($connectionString,$emailAccount->getUsername() ,$emailAccount->getPassword());
 			if(!$inbox) return new JsonResponse(array("result"=> 0));
 			$subject=imap_fetch_overview ($inbox, $id, 0);
@@ -620,7 +620,7 @@ class EmailController extends Controller
 			if($subject){
 					$emailAccount=$subject->getFolder()->getEmailAccount();
 					if($emailAccount->getUser()->getId()==$this->getUser()->getId()){
-						$connectionString='{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'}'.$subject->getFolder()->getName();
+						$connectionString='{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'/novalidate-cert}'.$subject->getFolder()->getName();
 						$inbox = imap_open($connectionString,$emailAccount->getUsername() ,$emailAccount->getPassword());
 						if($value) $status = imap_setflag_full($inbox, $subject->getMsgno(), "\\".$flag);
 							else $status = imap_clearflag_full($inbox, $subject->getMsgno(), "\\".$flag);
@@ -654,7 +654,7 @@ class EmailController extends Controller
 				"user" => $this->getUser()->getId()
 			]);
 			if(!$emailAccount) return new JsonResponse(array("result" => -1));
-			$connectionString='{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'}'.$emailFolderOrigin->getName();
+			$connectionString='{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'/novalidate-cert}'.$emailFolderOrigin->getName();
 			$inbox = imap_open($connectionString,$emailAccount->getUsername() ,$emailAccount->getPassword());
 			$result = imap_mail_move($inbox, $id, $emailFolderDestination->getName(), CP_UID);
 			imap_expunge($inbox);
@@ -679,7 +679,7 @@ class EmailController extends Controller
 				"user" => $this->getUser()->getId()
 			]);
 			if(!$emailAccount) return new JsonResponse(array("result" => -1));
-			$connectionString='{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'}'.$emailFolder->getName();
+			$connectionString='{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'/novalidate-cert}'.$emailFolder->getName();
 			$inbox = imap_open($connectionString,$emailAccount->getUsername() ,$emailAccount->getPassword());
 			$emails = imap_search($inbox,'ALL');
 			$result=true;
@@ -705,7 +705,7 @@ class EmailController extends Controller
 				if($emailAccount->getUser()->getId()==$this->getUser()->getId()){
 					$encoding=$request->query->getInt('encoding', 3);
 					$part=$request->query->getInt('part', 0);
-					$connectionString='{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'}'.$subject->getFolder()->getName();
+					$connectionString='{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'/novalidate-cert}'.$subject->getFolder()->getName();
 					$inbox = imap_open($connectionString,$emailAccount->getUsername() ,$emailAccount->getPassword());
 					$emailUtils = new EmailUtils();
 					$data=$emailUtils->getAtachment($inbox,$subject->getMsgno(),$encoding,$part);
@@ -767,14 +767,14 @@ class EmailController extends Controller
 							//Search if folder already exists
 							$emailFolder=$emailFoldersRepository->findOneBy([
 								"emailAccount"=> $emailAccount,
-								"name" => ltrim(imap_utf7_decode($val),'{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'}')
+								"name" => ltrim(imap_utf7_decode($val),'{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'/novalidate-cert}')
 							]);
 							if($emailFolder==null){
 								$newFolders++;
 								//Create folder
 								$em=$this->getDoctrine()->getManager();
 								$folder=new EmailFolders();
-				        $folder->setName(ltrim(imap_utf7_decode($val),'{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'}'));
+				        $folder->setName(ltrim(imap_utf7_decode($val),'{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'/novalidate-cert}'));
 				        $folder->setEmailAccount($emailAccount);
 				        $em->persist($folder);
 				        $em->flush();
