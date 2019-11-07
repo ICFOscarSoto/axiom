@@ -19,7 +19,7 @@ class EmailAccountsUtils
     public $parentField="user";
 
     public function getExcludedForm($params){
-      return ['user','inboxFolder','sentFolder','trashFolder','protocol'];
+      return ['user','inboxFolder','sentFolder','trashFolder','protocol','smtpProtocol'];
     }
 
     public function getIncludedForm($params){
@@ -36,7 +36,13 @@ class EmailAccountsUtils
           'required' => true,
           'disabled' => false,
           'attr' => ['class' => 'select2', 'readonly' => true],
-          'choices' => ['Plain' => ' ', 'SSL' => 'ssl', 'TLS' => 'tls', 'TLS' => 'nntp'],
+          'choices' => ['Plain' => ' ', 'SSL' => 'ssl', 'TLS' => 'tls'],
+        ]],
+        ['smtpProtocol', ChoiceType::class, [
+          'required' => true,
+          'disabled' => false,
+          'attr' => ['class' => 'select2', 'readonly' => true],
+          'choices' => ['Plain' => ' ', 'SSL' => 'ssl', 'TLS' => 'tls'],
         ]]
 
     ];

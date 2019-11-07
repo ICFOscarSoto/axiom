@@ -127,6 +127,11 @@ class EmailAccounts
     public $newSeconds=1296000;
     public $updatedSeconds=1296000;
 
+    /**
+     * @ORM\Column(type="string", length=10, nullable=true)
+     */
+    private $smtpProtocol;
+
     public function __construct()
     {
         $this->emailFolders = new ArrayCollection();
@@ -426,5 +431,17 @@ class EmailAccounts
       $em->persist($this);
       $em->flush();*/
 
+    }
+
+    public function getSmtpProtocol(): ?string
+    {
+        return $this->smtpProtocol;
+    }
+
+    public function setSmtpProtocol(?string $smtpProtocol): self
+    {
+        $this->smtpProtocol = $smtpProtocol;
+
+        return $this;
     }
 }

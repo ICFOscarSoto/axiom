@@ -25,6 +25,7 @@
         "fields": [
           { "name": "smtpServer","cols": 8, "caption": "Server"},
           {	"name": "smtpPort", "cols": 4, "caption": "Port"},
+					{	"name": "smtpProtocol", "cols": 4, "caption": "Protocol"},
           {	"name": "smtpUsername", "cols": 4, "caption": "Username"},
           {	"name": "smtpPassword", "cols": 4, "caption": "Password"}
       ]
