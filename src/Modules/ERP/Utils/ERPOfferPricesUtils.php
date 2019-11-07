@@ -17,7 +17,9 @@ class ERPOfferPricesUtils
   private $name="OfferPrices";
   public $parentClass="\App\Modules\ERP\Entity\ERPProducts";
   public $parentField="product";
-
+  public $parentClassCustomerOfferPrices="\App\Modules\ERP\Entity\ERPCustomers";
+  public $parentFieldCustomerOfferPrices="customer";
+  
 
   public function formatListByProduct($product){
     $list=[
@@ -40,21 +42,22 @@ class ERPOfferPricesUtils
     return $list;
   }
 
-  public function formatListByCustomer($customer){
+  public function formatListByCustomer($user,$customer){
     $list=[
-      'id' => 'listOfferPrices',
-      'route' => 'offerpriceslist',
-      'routeParams' => ["id" => $customer,
-                        "module" => $this->module,
+      'id' => 'list'.$this->name,
+      'route' => 'genericlist',
+      'routeParams' => ["module" => $this->module,
+                        "json" => "CustomerOfferPrices",
                         "name" => $this->name,
                         "parent" => $customer,
+                        "id" => $customer,
                         "field" => "customer",
                         "parentModule" => "ERP",
                         "parentName" => "Customers"
                       ],
-      'orderColumn' => 1,
+      'orderColumn' => 2,
       'orderDirection' => 'ASC',
-      'tagColumn' => 1,
+      'tagColumn' => 2,
       'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/CustomerOfferPrices.json"),true),
       'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/CustomerOfferPricesFieldButtons.json"),true),
       'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/CustomerOfferPricesTopButtons.json"),true)
@@ -118,11 +121,11 @@ class ERPOfferPricesUtils
     }
   }
   
-  public function getExcludedFormOnCustomer($params){
+  public function getExcludedFormCustomerOfferPrices($params){
       return ['customer'];
   }
   
-  public function getIncludedFormOnCustomer($params){
+  public function getIncludedFormCustomerOfferPrices($params){
     
     $doctrine=$params["doctrine"];
     $id=$params["id"];
