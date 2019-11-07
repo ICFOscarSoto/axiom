@@ -671,6 +671,18 @@ label.error {
     background-color: #fffbfb !important;
 }
 
+.page-generic-error{
+  color: #303641;
+    text-align: center;
+}
+
+.page-generic-error .error-symbol {
+    font-size: 75px;
+}
+
+.page-generic-error .error-text p {
+    font-size: 15px;
+}
 
 /*
 .spinner-container {

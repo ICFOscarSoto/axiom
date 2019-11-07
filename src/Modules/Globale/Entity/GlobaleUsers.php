@@ -94,6 +94,7 @@ class GlobaleUsers implements UserInterface
 
     /**
      * @ORM\OneToOne(targetEntity="App\Modules\Email\Entity\EmailAccounts", cascade={"persist", "remove"})
+     * @ORM\JoinColumn(onDelete="SET NULL")
      */
     private $emailDefaultAccount;
 

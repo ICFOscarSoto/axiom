@@ -108,15 +108,23 @@ class EmailController extends Controller
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+
 			$locale = $request->getLocale();
 			$this->router = $router;
 			$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
 			$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
 			$folderRepository=$this->getDoctrine()->getRepository(EmailFolders::class);
 			$emailAccounts=$this->getUser()->getEmailAccounts();
-			$alternativeFolder=$folderRepository->findBy(["emailAccount"=>$emailAccounts[0]]);
-			$alternativeFolder=$alternativeFolder[0];
-			if(true){
+			$alternativeFolder=null;
+			$error=false;
+			if(empty($emailAccounts)) $error=true;
+				else{
+					$alternativeFolder=$folderRepository->findBy(["emailAccount"=>$emailAccounts[0]]);
+					if(empty($alternativeFolder)) $error=true;
+						else $alternativeFolder=$alternativeFolder[0];
+			}
+
+			if(!$error){
 			//if($request->query->get('folder')!=null || $emailAccounts[0]->getInboxFolder()!=null){
 				$folder=($request->query->get('folder')!==null)?$request->query->get('folder'):($emailAccounts[0]->getInboxFolder()!=null?$emailAccounts[0]->getInboxFolder()->getId():$alternativeFolder->getId());
 				return $this->render('@Email/email_list.html.twig', [
@@ -181,21 +189,40 @@ class EmailController extends Controller
 			$this->router = $router;
 			$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
 			$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
-			$emailAccount=$this->getUser()->getEmailDefaultAccount();
-			$folder=$emailAccount->getInboxFolder();
-			return $this->render('@Email/email_compose.html.twig', [
-				'controllerName' => 'EmailController',
-				'interfaceName' => 'Correo electrónico',
-				'menuOptions' =>  $menurepository->formatOptions($userdata),
-				'optionSelected' => 'emailNew',
-				'breadcrumb' =>  $menurepository->formatBreadcrumb('emailNew'),
-				'userData' => $userdata,
-				'id' => 0,
-				'mode' => 0,
-				'folder' => $folder->getId(),
-				'signature' => $emailAccount->getSignature(),
-				'token' => uniqid('sign_').time()
-				]);
+
+			$error=false;
+			if($this->getUser()->getEmailDefaultAccount()!=null){
+				$emailAccount=$this->getUser()->getEmailDefaultAccount();
+				$folder=$emailAccount->getInboxFolder();
+			}else $error=true;
+
+			if(!$error){
+				return $this->render('@Email/email_compose.html.twig', [
+					'controllerName' => 'EmailController',
+					'interfaceName' => 'Correo electrónico',
+					'menuOptions' =>  $menurepository->formatOptions($userdata),
+					'optionSelected' => 'emailNew',
+					'breadcrumb' =>  $menurepository->formatBreadcrumb('emailNew'),
+					'userData' => $userdata,
+					'id' => 0,
+					'mode' => 0,
+					'folder' => $folder->getId(),
+					'signature' => $emailAccount->getSignature(),
+					'token' => uniqid('sign_').time()
+					]);
+				}else{
+					return $this->render('@Globale/genericerror.html.twig', [
+						  'interfaceName' => 'Correo electrónico',
+							'userData' => $userdata,
+							'optionSelected' => 'email',
+							'menuOptions' =>  $menurepository->formatOptions($userdata),
+							'breadcrumb' =>  $menurepository->formatBreadcrumb($request->get('_route')),
+							"error"=>["symbol"=> "entypo-attention",
+												"title" => "Correo no configurado",
+												"description"=>"Debe configurar al menos una cuenta de correo para poder acceder a esta sección"
+											]
+						]);
+				}
 
 		}else return new RedirectResponse($this->router->generate('app_login'));
 	}
@@ -405,9 +432,9 @@ class EmailController extends Controller
 						foreach($emailSubjects as $emailSubject){
 							$subject=array();
 							$subject["id"]						=$emailSubject->uid;
-							$subject["subject"]				=isset($emailSubject->subject)?HelperMail::decode_header($emailSubject->subject):'';
-						  $subject["from"]					=isset($emailSubject->from)?HelperMail::decode_header($emailSubject->from):'';
-							$subject["to"]						=isset($emailSubject->to)?HelperMail::decode_header($emailSubject->to):'';
+							$subject["subject"]				=isset($emailSubject->subject)?HelperMail::decode_header(imap_utf8($emailSubject->subject)):'';
+						  $subject["from"]					=isset($emailSubject->from)?HelperMail::decode_header(imap_utf8($emailSubject->from)):'';
+							$subject["to"]						=isset($emailSubject->to)?HelperMail::decode_header(imap_utf8($emailSubject->to)):'';
 							$subject["message_id"]		=isset($emailSubject->message_id)?$emailSubject->message_id:'';
 							$subject["size"]					=$emailSubject->size;
 							$subject["uid"]						=$emailSubject->uid;
@@ -547,9 +574,9 @@ class EmailController extends Controller
 
 			$message["id"]						=$emailSubject->uid;
 			$message["folder"]				=$folder;
-			$message["subject"]				=isset($emailSubject->subject)?HelperMail::decode_header($emailSubject->subject):'';
-			$message["from"]					=isset($emailSubject->from)?HelperMail::decode_header($emailSubject->from):'';
-			$message["to"]						=isset($emailSubject->to)?HelperMail::decode_header($emailSubject->to):'';
+			$message["subject"]				=isset($emailSubject->subject)?HelperMail::decode_header(imap_utf8($emailSubject->subject)):'';
+			$message["from"]					=isset($emailSubject->from)?HelperMail::decode_header(imap_utf8($emailSubject->from)):'';
+			$message["to"]						=isset($emailSubject->to)?HelperMail::decode_header(imap_utf8($emailSubject->to)):'';
 			$message["message_id"]		=isset($emailSubject->message_id)?$emailSubject->message_id:'';
 			$message["imgFrom"]			  =substr($this->generateUrl('getUserImage', array('id' => 0)),1); //TODO Buscar foto del contacto en la agenda
 			$message["content"]		  	=($emailUtils->htmlmsg!=null)?(preg_match('!!u', $emailUtils->htmlmsg)?$emailUtils->htmlmsg:utf8_encode($emailUtils->htmlmsg)):$emailUtils->plainmsg;
