@@ -8,6 +8,10 @@
                     "cols": 6
                 },
                 {
+                    "name": "defaultserie",
+                    "cols": 6
+                },
+                {
                     "name": "defaulttax",
                     "cols": 6
                 },
@@ -54,7 +58,7 @@
                   "cols": 4, "transform":
           					{
           						"type":"option",
-          						"options": {"Días": "1", "Semanas": "2", "Meses": "3", "Años": "4"}
+          						"options": {"Días": "days", "Semanas": "weeks", "Meses": "months", "Años": "years"}
           					}
               }
             ]

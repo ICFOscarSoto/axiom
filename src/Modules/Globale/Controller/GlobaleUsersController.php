@@ -13,6 +13,7 @@ use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\Globale\Entity\GlobaleUsers;
 use App\Modules\Globale\Entity\GlobaleUserGroups;
 use App\Modules\Globale\Entity\GlobaleCompanies;
+use App\Modules\Globale\Entity\GlobaleCompaniesModules;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\Globale\Utils\GlobaleUsersUtils;
@@ -45,7 +46,7 @@ class GlobaleUsersController extends Controller
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
 
-		$userdata=$this->getUser()->getTemplateData();
+		$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
 		$locale = $request->getLocale();
 		$this->router = $router;
 		$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
@@ -73,7 +74,7 @@ class GlobaleUsersController extends Controller
     $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
     $new_breadcrumb=["rute"=>null, "name"=>"Editar perfil", "icon"=>"fa fa-edit"];
     $template=dirname(__FILE__)."/../Forms/Profile.json";
-    $userdata=$this->getUser()->getTemplateData();
+    $userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
     $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
     $breadcrumb=$menurepository->formatBreadcrumb('profile');
     array_push($breadcrumb, $new_breadcrumb);
@@ -81,7 +82,7 @@ class GlobaleUsersController extends Controller
     $utilsObj=new GlobaleProfilesUtils();
     $params=["doctrine"=>$this->getDoctrine(), "id"=>$this->getUser()->getId(), "user"=>$this->getUser()];
     $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
-    return $this->render('@Globale/genericform.html.twig', array(
+    /*return $this->render('@Globale/genericform.html.twig', array(
             'controllerName' => 'GlobaleUsersController',
             'interfaceName' => 'Perfil de usuario',
             'optionSelected' => 'profile',
@@ -91,9 +92,34 @@ class GlobaleUsersController extends Controller
             'id' => $this->getUser()->getId(),
             'route' => $this->generateUrl("dataUser",["id"=>$this->getUser()->getId()]),
             'form' => $utils->formatForm("formprofile", true, $this->getUser()->getId(), $this->class, 'dataUser')
-    ));
+    ));*/
+    $tabs =  [["name" => "data", "caption"=>"Datos usuario", "icon"=>"entypo-book-open","active"=>true, "route"=>$this->generateUrl("dataUser",["id"=>$this->getUser()->getId()])]];
+    //Configuration tabs of modules enabled
+		$modulespository=$this->getDoctrine()->getRepository(GlobaleCompaniesModules::class);
+    $modules=$modulespository->findBy(["companyown"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
+    foreach($modules as $module){
+      if($module->getModule()->getName()=="Email"){
+        $tab = ["name" => $module->getModule()->getName(), "icon"=>"fa fa-mail", "caption"=>"Cuentas Correo", "route"=>$this->generateUrl("generictablist",["module"=>"Email", "name"=>"Accounts", "id"=>$this->getUser()->getId()])];
+				array_push($tabs, $tab);
+      }
+    }
 
-
+    return $this->render('@Globale/generictabform.html.twig', array(
+            'controllerName' => 'GlobaleUsersController',
+            'interfaceName' => 'Perfil de usuario',
+            'optionSelected' => 'profile',
+            'menuOptions' =>  $menurepository->formatOptions($userdata),
+            'breadcrumb' => $breadcrumb,
+            'userData' => $userdata,
+            'id' => $this->getUser()->getId(),
+            'tab' => $request->query->get('tab','data'), //Show initial tab, by default data tab
+            'tabs' => $tabs,
+            'route' => $this->generateUrl("dataUser",["id"=>$this->getUser()->getId()]),
+            'include_header' => [["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker-es.js"]],
+            'include_footer' => [["type"=>"css", "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.css"],
+                                 ["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.js"]],
+            'include_tab_post_templates' => ['@Email/email_check.html.twig']
+      ));
 
     //$editor=$usersUtils->formatEditor($this->getUser(), $this->getUser(), $request, $this, $this->getDoctrine(), $encoder, "Edit", "fa fa-edit");
     //return $this->render($editor["template"], $editor["vars"]);
@@ -139,7 +165,7 @@ class GlobaleUsersController extends Controller
     if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
     $new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-new"];
     $template=dirname(__FILE__)."/../Forms/Users.json";
-    $userdata=$this->getUser()->getTemplateData();
+    $userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
     $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
     $breadcrumb=$menurepository->formatBreadcrumb('users');
     array_push($breadcrumb, $new_breadcrumb);
@@ -183,7 +209,7 @@ class GlobaleUsersController extends Controller
     if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
     $new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-new"];
     $template=dirname(__FILE__)."/../Forms/UserGroups.json";
-    $userdata=$this->getUser()->getTemplateData();
+    $userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
     $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
     $breadcrumb=$menurepository->formatBreadcrumb('usergroups');
     array_push($breadcrumb, $new_breadcrumb);

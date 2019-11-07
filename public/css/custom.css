@@ -46,8 +46,20 @@ table {
   margin: 0px 0px 5px 0px !important;
   padding: 5px 15px 5px 15px;
   margin-bottom: 0px;
-
 }
+
+.form-validation-error  a{
+  color: #ac1818;
+  font-weight: 900;
+  text-decoration: underline;
+}
+
+.alert-warning a{
+  color: #ac1818;
+  font-weight: 900;
+  text-decoration: underline;
+}
+
 
 .grid-stack>.grid-stack-item>.ui-resizable-se {
     right: 4px !important;

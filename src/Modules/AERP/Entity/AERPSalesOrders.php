@@ -138,11 +138,6 @@ class AERPSalesOrders
     /**
      * @ORM\Column(type="datetime", nullable=true)
      */
-    private $dateofferend;
-
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
     private $dateemail;
 
     /**
@@ -520,18 +515,6 @@ class AERPSalesOrders
     public function setDate(\DateTimeInterface $date): self
     {
         $this->date = $date;
-
-        return $this;
-    }
-
-    public function getDateofferend(): ?\DateTimeInterface
-    {
-        return $this->dateofferend;
-    }
-
-    public function setDateofferend(?\DateTimeInterface $dateofferend): self
-    {
-        $this->dateofferend = $dateofferend;
 
         return $this;
     }

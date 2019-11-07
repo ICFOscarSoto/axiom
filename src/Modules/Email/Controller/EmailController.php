@@ -23,6 +23,7 @@ require_once __DIR__.'/../../../../vendor/pear/mail/Mail.php';
 require_once __DIR__.'/../../../../vendor/pear/mail_mime/Mail/mime.php';
 use Mail;
 use Mail_mime;
+use App\Helpers\HelperMail;
 class EmailController extends Controller
 {
 	private $module='Email';
@@ -36,7 +37,7 @@ class EmailController extends Controller
 	{
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
-		$userdata=$this->getUser()->getTemplateData();
+		$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
 		$locale = $request->getLocale();
 		$this->router = $router;
 		$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
@@ -109,11 +110,15 @@ class EmailController extends Controller
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 			$locale = $request->getLocale();
 			$this->router = $router;
-			$userdata=$this->getUser()->getTemplateData();
+			$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
 			$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
+			$folderRepository=$this->getDoctrine()->getRepository(EmailFolders::class);
 			$emailAccounts=$this->getUser()->getEmailAccounts();
-			if($request->query->get('folder')!=null || $emailAccounts[0]->getInboxFolder()!=null){
-				$folder=($request->query->get('folder')!==null)?$request->query->get('folder'):$emailAccounts[0]->getInboxFolder()->getId();
+			$alternativeFolder=$folderRepository->findBy(["emailAccount"=>$emailAccounts[0]]);
+			$alternativeFolder=$alternativeFolder[0];
+			if(true){
+			//if($request->query->get('folder')!=null || $emailAccounts[0]->getInboxFolder()!=null){
+				$folder=($request->query->get('folder')!==null)?$request->query->get('folder'):($emailAccounts[0]->getInboxFolder()!=null?$emailAccounts[0]->getInboxFolder()->getId():$alternativeFolder->getId());
 				return $this->render('@Email/email_list.html.twig', [
 					'controllerName' => 'EmailController',
 					'interfaceName' => 'Correo electrónico',
@@ -149,7 +154,7 @@ class EmailController extends Controller
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 			$locale = $request->getLocale();
 			$this->router = $router;
-			$userdata=$this->getUser()->getTemplateData();
+			$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
 			$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
 			return $this->render('@Email/email_message.html.twig', [
 				'controllerName' => 'EmailController',
@@ -174,7 +179,7 @@ class EmailController extends Controller
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 			$locale = $request->getLocale();
 			$this->router = $router;
-			$userdata=$this->getUser()->getTemplateData();
+			$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
 			$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
 			$emailAccount=$this->getUser()->getEmailDefaultAccount();
 			$folder=$emailAccount->getInboxFolder();
@@ -204,7 +209,7 @@ class EmailController extends Controller
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 			$locale = $request->getLocale();
 			$this->router = $router;
-			$userdata=$this->getUser()->getTemplateData();
+			$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
 			$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
 			return $this->render('@Email/email_compose.html.twig', [
 				'controllerName' => 'EmailController',
@@ -231,7 +236,7 @@ class EmailController extends Controller
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 			$locale = $request->getLocale();
 			$this->router = $router;
-			$userdata=$this->getUser()->getTemplateData();
+			$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
 			$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
 			return $this->render('@Email/email_compose.html.twig', [
 				'controllerName' => 'EmailController',
@@ -400,9 +405,9 @@ class EmailController extends Controller
 						foreach($emailSubjects as $emailSubject){
 							$subject=array();
 							$subject["id"]						=$emailSubject->uid;
-							$subject["subject"]				=isset($emailSubject->subject)?imap_utf8($emailSubject->subject):'';
-						  $subject["from"]					=isset($emailSubject->from)?imap_utf8($emailSubject->from):'';
-							$subject["to"]						=isset($emailSubject->to)?imap_utf8($emailSubject->to):'';
+							$subject["subject"]				=isset($emailSubject->subject)?HelperMail::decode_header($emailSubject->subject):'';
+						  $subject["from"]					=isset($emailSubject->from)?HelperMail::decode_header($emailSubject->from):'';
+							$subject["to"]						=isset($emailSubject->to)?HelperMail::decode_header($emailSubject->to):'';
 							$subject["message_id"]		=isset($emailSubject->message_id)?$emailSubject->message_id:'';
 							$subject["size"]					=$emailSubject->size;
 							$subject["uid"]						=$emailSubject->uid;
@@ -542,9 +547,9 @@ class EmailController extends Controller
 
 			$message["id"]						=$emailSubject->uid;
 			$message["folder"]				=$folder;
-			$message["subject"]				=isset($emailSubject->subject)?imap_utf8($emailSubject->subject):'';
-			$message["from"]					=isset($emailSubject->from)?imap_utf8($emailSubject->from):'';
-			$message["to"]						=isset($emailSubject->to)?imap_utf8($emailSubject->to):'';
+			$message["subject"]				=isset($emailSubject->subject)?HelperMail::decode_header($emailSubject->subject):'';
+			$message["from"]					=isset($emailSubject->from)?HelperMail::decode_header($emailSubject->from):'';
+			$message["to"]						=isset($emailSubject->to)?HelperMail::decode_header($emailSubject->to):'';
 			$message["message_id"]		=isset($emailSubject->message_id)?$emailSubject->message_id:'';
 			$message["imgFrom"]			  =substr($this->generateUrl('getUserImage', array('id' => 0)),1); //TODO Buscar foto del contacto en la agenda
 			$message["content"]		  	=($emailUtils->htmlmsg!=null)?(preg_match('!!u', $emailUtils->htmlmsg)?$emailUtils->htmlmsg:utf8_encode($emailUtils->htmlmsg)):$emailUtils->plainmsg;
@@ -717,21 +722,28 @@ class EmailController extends Controller
 	public function getEmailFolders($id){
 		$emailRepository = $this->getDoctrine()->getRepository(EmailAccounts::class);
 		$emailFoldersRepository = $this->getDoctrine()->getRepository(EmailFolders::class);
-		$emailAccount=$emailRepository->findOneBy([
-			"id"=> $id,
-			"user" => $this->getUser()->getId()
-		]);
-	$inbox = imap_open('{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'}',$emailAccount->getUsername() ,$emailAccount->getPassword(),OP_HALFOPEN)
-      or die("no se puede conectar: " . imap_last_error());
+		$emailAccount=$emailRepository->findOneBy(["id"=> $id, "user" => $this->getUser()->getId()]);
+		$folders=$emailFolder=$emailFoldersRepository->findBy(["emailAccount"=> $emailAccount]);
+		$inbox=false;
+		$newFolders=0;
+		$newAccount=count($folders)>0?false:true;
+		try {
+			$inbox = imap_open('{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'}',$emailAccount->getUsername() ,$emailAccount->getPassword(),OP_HALFOPEN);
+		} catch (\Symfony\Component\Debug\Exception\ContextErrorException $e) {
+			return new JsonResponse(["result"=>-1]);
+		}
+
+		  if($inbox==false) return new JsonResponse(["result"=>-1]);
 			$list = imap_list($inbox, '{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'}', "*");
 			if (is_array($list)) {
 			    foreach ($list as $val) {
 							//Search if folder already exists
 							$emailFolder=$emailFoldersRepository->findOneBy([
 								"emailAccount"=> $emailAccount,
-								"name" => imap_utf7_decode($val)
+								"name" => ltrim(imap_utf7_decode($val),'{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'}')
 							]);
 							if($emailFolder==null){
+								$newFolders++;
 								//Create folder
 								$em=$this->getDoctrine()->getManager();
 								$folder=new EmailFolders();
@@ -742,10 +754,10 @@ class EmailController extends Controller
 							}
 			    }
 			} else {
-			    echo "imap_list failed: " . imap_last_error() . "\n";
+			    return new JsonResponse(["result"=>-1]);
 			}
 			imap_close($inbox);
-			return new Response('');
+			return new JsonResponse(["result"=>1, "newaccount"=>$newAccount, "newfolders"=>$newFolders]);
 	}
 
 	/**

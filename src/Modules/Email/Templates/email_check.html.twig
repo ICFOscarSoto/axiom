@@ -1,0 +1,23 @@
+<script>
+    function email_check(id){
+      if((++load_wait)==1) $("#load-spinner").fadeIn();
+      $.ajax({
+         url: '/api/email/accounts/'+id+'/getFolders',
+         type: 'POST',
+         success:  function( data ) {
+           if((--load_wait)==0) $("#load-spinner").fadeOut();
+           if(data.result==1){
+             if(data.newaccount==1){
+               $("#listAccounts-field-button-folders-"+id).trigger( "click" );
+             }else{
+               if(data.newfolders>0){
+                 toastr.error("Se ha conectado correctamente con el servidor. Nuevas carpetas encontradas", "Confirmación", confirmationLong);
+               }
+             }
+           } else {
+             toastr.error("No se pudo conectar con el servidor. Revise la configuración de la cuenta", "Confirmación", confirmationLong);
+           }
+         }
+       });
+    }
+</script>

@@ -38,7 +38,7 @@ class NavisionController extends Controller
    public function navisionInvoices(Request $request){
      $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
      $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
-     $userdata=$this->getUser()->getTemplateData();
+     $userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
      $start=new DateTime('first day of this month');
      $end=new DateTime('last day of this month');
      $invoices=file_get_contents($this->url.'navisionExport/do-NAVISION-invoice-list.php?start='.$start->format("Y-m-d").'&end='.$end->format("Y-m-d"));

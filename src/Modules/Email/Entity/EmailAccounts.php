@@ -83,16 +83,19 @@ class EmailAccounts
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Modules\Email\Entity\EmailFolders", inversedBy="emailAccountsInbox")
+     * @ORM\JoinColumn(onDelete="SET NULL")
      */
     private $inboxFolder;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Modules\Email\Entity\EmailFolders")
+     * @ORM\JoinColumn(onDelete="SET NULL")
      */
     private $sentFolder;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Modules\Email\Entity\EmailFolders")
+     * @ORM\JoinColumn(onDelete="SET NULL")
      */
     private $trashFolder;
 
@@ -114,7 +117,7 @@ class EmailAccounts
     /**
      * @ORM\Column(type="boolean")
      */
-    private $active;
+    private $active=1;
 
     /**
      * @ORM\Column(type="boolean")

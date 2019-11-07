@@ -19,6 +19,12 @@
 		<hr />
 		{{ include('@Globale/breadcrumb.html.twig') }}
 
+	  {% if include_tab_pre_templates is defined %}
+	  	{% for template in include_tab_pre_templates %}
+	  		{{ include(template) }}
+	  	{% endfor %}
+	  {% endif %}
+
 		<!-- MAIN CONTENT -->
     <div class="principal-content">
     <div class="row">
@@ -48,6 +54,12 @@
 			</div>
     </div>
 	</div>
+
+  {% if include_tab_post_templates is defined %}
+  	{% for template in include_tab_post_templates %}
+  		{{ include(template) }}
+  	{% endfor %}
+  {% endif %}
 
   <script>
     $(document).ready(function() {

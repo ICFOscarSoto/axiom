@@ -133,6 +133,7 @@ Domain: Dominio
 Company data: Datos de la empresa
 Deviceuser: Usuario
 Devicepassword: Contraseña
+Select an email account...: Seleccionar cuenta correo
 
 # EMAIL MODULE
 #----------------------------------------------------------------------------------------------------------------------
@@ -143,6 +144,14 @@ Inbox: Bandeja de entrada
 Compose: Redactar correo
 Search emails: Buscar correo electrónico
 All emails: Todos los correos
+Server: Servidor
+Port: Puerto
+Username: Nombre usuario
+Password: Contraseña
+Accounts: Cuentas
+Inbox folder: Bandeja de entrada
+Sent folder: Elementos enviados
+Trash folder: Borradores
 
 # CALENDAR MODULE
 #----------------------------------------------------------------------------------------------------------------------
@@ -427,6 +436,8 @@ Tax: Impuesto
 Select globaletaxes: Seleccionar impuesto
 Select aerpmanufacturers: Seleccionar fabricante
 Select aerpseries: Seleccionar serie
+Select aerpfinancialyears: Seleccionar ejercicio fiscal
+Select aerppaymentmethods: Seleccionar método pago
 Price: Precio
 Purchaseprice: Precio compra
 Onpurchase: Se compra
@@ -459,6 +470,7 @@ Budgetexpirationtype: Tipo duración
 Defaultpaymentmethod: Metodo pago por defecto
 Defaulttax: Impuesto por defecto
 Register letterhead: Membrete registro
+Financialyear: Ejercicio fiscal
 Lopd: Membrete LOPD
 Contrast color: Color resaltado
 Shadow color: Color sombreado

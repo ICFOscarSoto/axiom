@@ -41,7 +41,7 @@ class ERPProductsController extends Controller
       $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 			if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
   		//$this->denyAccessUnlessGranted('ROLE_ADMIN');
-  		$userdata=$this->getUser()->getTemplateData();
+  		$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
   		$locale = $request->getLocale();
   		$this->router = $router;
   		$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
@@ -91,7 +91,7 @@ class ERPProductsController extends Controller
 			if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
 			$new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-new"];
 			$template=dirname(__FILE__)."/../Forms/Products.json";
-			$userdata=$this->getUser()->getTemplateData();
+			$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
 			$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
 			$breadcrumb=$menurepository->formatBreadcrumb('products');
 			array_push($breadcrumb, $new_breadcrumb);
@@ -133,7 +133,7 @@ class ERPProductsController extends Controller
 		public function formInfoProduct($id,  Request $request){
 			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 			if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
-			$userdata=$this->getUser()->getTemplateData();
+			$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
 			$new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-new"];
 			$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
 			$breadcrumb=$menurepository->formatBreadcrumb('products');

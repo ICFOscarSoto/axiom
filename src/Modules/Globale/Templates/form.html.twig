@@ -121,9 +121,17 @@
                 function(data, status, xhr){
                   if((--load_wait)==0) $("#load-spinner").fadeOut();
                   {{ include("@Globale/formvalidation.html.twig") }}
+
                   if(data.result){
-                    //$("#tabs-list li").attr("attr-id",data.id);
+
+                    {% if formConstructor.template.0.events.save is defined %}
+                      {% for event in formConstructor.template.0.events.save %}
+                        {{ event | raw }}(data.id);
+                      {% endfor %}
+                    {% endif %}
+
                     toastr.success("Datos guardados correctamente", "Confirmación", confirmation);
+                    console.log(data);
                     if(data.reload) location.href=data.href;
                     $("#{{formConstructor.name}}-form-body").find('form').validate().resetForm();
                   } else toastr.error("Ocurrió un error al guardar los datos", "Confirmación", confirmation);

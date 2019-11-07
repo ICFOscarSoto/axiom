@@ -34,7 +34,7 @@ class HRJobsController extends Controller
   public function index($id,RouterInterface $router,Request $request)
   {
     $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-    $userdata=$this->getUser()->getTemplateData();
+    $userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
     $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
     $new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-new"];
     $breadcrumb=$menurepository->formatBreadcrumb('jobs');

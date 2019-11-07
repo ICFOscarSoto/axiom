@@ -82,6 +82,13 @@
                         }
                         if(data.result){
                           $("#{{ listConstructor.id }}").DataTable().ajax.reload();
+
+                          {% if listConstructor.events.save is defined %}
+                            {% for event in listConstructor.events.save %}
+                              {{ event | raw }}(data.id);
+                            {% endfor %}
+                          {% endif %}
+
                           toastr.success("Datos guardados correctamente", "Confirmación", confirmation);
 
 

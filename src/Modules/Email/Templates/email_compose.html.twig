@@ -22,7 +22,7 @@
 		</br>
 		<!-- MAIN CONTENT -->
     <script>
-
+			var wysihtml5Editor;
       $(document).ready(function(){
 
         // init,configure dropzone
@@ -51,7 +51,7 @@
 				function getSignature(){
 					if((++load_wait)==1) $("#load-spinner").fadeIn();
 					$.getJSON($("#email-account-option-"+$("#mail-accounts").val()).attr('signature'),function( data ){
-						var content=tinyMCE.get('content').getContent();
+						var content=wysihtml5Editor.value;
 						var startToken='<!-- start:'+token+' -->';
 						var endToken='<!-- end:'+token+' -->';
 						var signStart=content.indexOf(startToken);
@@ -60,7 +60,8 @@
 						var content_last=content.substr(signEnd);
 						content=content_first+content_last;
 						content=content_first+data.signature+content_last;
-						tinymce.get('content').setContent(content,{format: 'raw'});
+
+						wysihtml5Editor.value = content;
 					}).always(function() {
 							if((--load_wait)==0) $("#load-spinner").fadeOut();
 					});
@@ -111,7 +112,8 @@
 				$( "#form-send-mail" ).on( "submit", function( event ) {
 				  event.preventDefault();
 					if((++load_wait)==1) $("#load-spinner").fadeIn();
-				  data= $( this ).serialize()+"&text_content="+encodeURIComponent(tinyMCE.get('content').getBody().textContent)+"&html_content="+encodeURIComponent(tinyMCE.get('content').getContent())+"&files="+encodeURIComponent(JSON.stringify(jsonFiles)) ;
+				  data= $( this ).serialize()+"&text_content="+encodeURIComponent(wysihtml5Editor.value)+"&html_content="+encodeURIComponent(wysihtml5Editor.value)+"&files="+encodeURIComponent(JSON.stringify(jsonFiles)) ;
+					console.log(data);
 					$.post('{{ url('emailSend') }}',data, function( data ){
 						dropzone_default.removeAllFiles( true );
 						$('#form-send-mail').trigger("reset");
@@ -124,48 +126,36 @@
 
 				});
 				{#var wysihtml5Editor = $('#content').wysihtml5().data("wysihtml5").editor;#}
-				var wysihtml5Editor = tinymce.init({
-					selector: '#content',
-					branding: false,
-				  height: 500,
-				  theme: 'modern',
-				  plugins: 'print preview fullpage powerpaste searchreplace autolink directionality advcode visualblocks visualchars fullscreen image link media template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists textcolor wordcount tinymcespellchecker a11ychecker imagetools mediaembed  linkchecker contextmenu colorpicker textpattern help',
-				  toolbar1: 'formatselect | bold italic strikethrough forecolor backcolor | link | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent  | removeformat',
-				 	language_url : '/js/tiny_mce/langs/es.js',  // site absolute URL
-				  image_advtab: true,
-					setup: function (editor) {
-    				editor.on('init', function (e) {
-      				getSignature();
-							editor_init=true;
-    				});
-  				},
-				  content_css: [
-				    '//fonts.googleapis.com/css?family=Lato:300,300i,400,400i',
-				    '//www.tinymce.com/css/codepen.min.css'
-				  ]
-				 });
+				wysihtml5Editor = new Jodit("#content",{
+						"uploader": {
+	 						"insertImageAsBase64URI": true
+ 						}
+				});
+						wysihtml5Editor.events.on('afterInit', function (data) {
+				    getSignature();
+						editor_init=true;
+				});
 
 
 				{% if id>0 %}
 					if((++load_wait)==1) $("#load-spinner").fadeIn();
 					$.getJSON('{{ url('emailGet', {'folder': folder, 'id': id}) }}', function( data ){
 
-							//$("#mail-accounts").data("selectBox-selectBoxIt").disable();
 							{% if mode==1 %}
 								$("#mail-accounts").data("selectBox-selectBoxIt").disable();
 								$('#subject').val('RE: '+data.subject);
 								$("#mail-accounts").data("selectBox-selectBoxIt").selectOption(data.account+"");
 								$("#to").val(data.from);
 								$("#in_reply_to").val(data.message_id);
-								tinymce.get('content').setContent('<!-- start:'+token+' -->'+'<!-- end:'+token+' -->'+'</br></br>El '+moment(data.timestamp*1000).format('LLLL')+', '+data.from+' escribio: </br></br>'+data.content, {format: 'raw'});
+								wysihtml5Editor.value='<!-- start:'+token+' -->'+'<!-- end:'+token+' -->'+'</br></br>El '+moment(data.timestamp*1000).format('LLLL')+', '+data.from+' escribio: </br></br>';
 							{% else %}
 								$('#subject').val('FWD: '+data.subject);
 								$("#mail-accounts").data("selectBox-selectBoxIt").selectOption(data.account+"");
-								tinymce.get('content').setContent('</br></br>---------- Forwarded message ---------'+
+								wysihtml5Editor.value='</br></br>---------- Forwarded message ---------'+
 																				 '</br>From: '+data.from+
 																				 '</br>Date: '+moment(data.timestamp*1000).format('LLLL')+
 																				 '</br>Subject: '+data.subject+
-																				 '</br>To: '+data.to+'</br></br>'+data.content+'<!-- start:'+token+' -->'+'<!-- end:'+token+' -->', {format: 'raw'});
+																				 '</br>To: '+data.to+'</br></br>'+data.content+'<!-- start:'+token+' -->'+'<!-- end:'+token+' -->';
 							{% endif %}
 					}).always(function() {
 							if((--load_wait)==0) $("#load-spinner").fadeOut();
@@ -294,6 +284,7 @@
 	<link rel="stylesheet" href="{{ url('index') }}js/datatables/datatables.css">
 	<link rel="stylesheet" href="{{ url('index') }}js/select2/select2-bootstrap.css">
 	<link rel="stylesheet" href="{{ url('index') }}js/select2/select2.css">
+	<link rel="stylesheet" href="{{ url('index') }}js/jodit/jodit.min.css">
 	{#<link rel="stylesheet" href="{{ url('index') }}js/wysihtml5/bootstrap-wysihtml5.css">#}
 	<link rel="stylesheet" href="{{ url('index') }}js/selectboxit/jquery.selectBoxIt.css">
 	<!-- Imported scripts on this page -->
@@ -308,7 +299,7 @@
  <script src="{{ url('index') }}js/dropzone/dropzone.js"></script>
  {#<script src="{{ url('index') }}js/wysihtml5/wysihtml5-0.4.0pre.min.js"></script>#}
  <script src="{{ url('index') }}js/selectboxit/jquery.selectBoxIt.min.js"></script>
- <script src="https://cloud.tinymce.com/stable/tinymce.min.js?apiKey=qexr99c3p9zt8fk36ffsc5treo2qnx5vs791143vsty03xjx"></script>
+ <script src="{{ url('index') }}js/jodit/jodit.min.js"></script>
  {#<script src="{{ url('index') }}js/wysihtml5/bootstrap-wysihtml5.js"></script>#}
 {% endblock %}
 </body>

@@ -35,7 +35,7 @@ class ERPCustomersController extends Controller
 			if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
 
   		//$this->denyAccessUnlessGranted('ROLE_ADMIN');
-  		$userdata=$this->getUser()->getTemplateData();
+  		$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
   		$locale = $request->getLocale();
   		$this->router = $router;
   		$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
@@ -88,7 +88,7 @@ class ERPCustomersController extends Controller
     {
       $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
   		$this->denyAccessUnlessGranted('ROLE_ADMIN');
-  		$userdata=$this->getUser()->getTemplateData();
+  		$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
   		$locale = $request->getLocale();
   		$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
 			$breadcrumb=$menurepository->formatBreadcrumb('customers');
@@ -126,7 +126,7 @@ class ERPCustomersController extends Controller
 			public function formInfoCustomer($id,  Request $request){
 				$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 				if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
-				$userdata=$this->getUser()->getTemplateData();
+				$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
 				$new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-new"];
 				$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
 				$breadcrumb=$menurepository->formatBreadcrumb('customers');

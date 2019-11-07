@@ -30,7 +30,7 @@ class ERPCustomerGroupsController extends Controller
       $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 			if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
 			//$this->denyAccessUnlessGranted('ROLE_ADMIN');
-  		$userdata=$this->getUser()->getTemplateData();
+  		$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
   		$locale = $request->getLocale();
   		$this->router = $router;
   		$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);

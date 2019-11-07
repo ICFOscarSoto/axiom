@@ -1,11 +1,13 @@
 [{
+	"events":{
+		"save": ["email_check"]
+		}
+	,
 	"sections": [
       {
   			"name": "Datos",
   			"fields": [
-  				{ "name": "user","cols": 4},
-					{ "name": "name","cols": 4},
-          { "name": "active","cols": 2}
+					{ "name": "name","cols": 12}
   			]
   		},
       {
@@ -21,18 +23,10 @@
     {
         "name": "SMTP",
         "fields": [
-          { "name": "smtpServer","cols": 8},
-          {	"name": "smtpPort", "cols": 4},
-          {	"name": "smtpUsername", "cols": 4},
-          {	"name": "smtpPassword", "cols": 4}
-      ]
-    },
-		{
-        "name": "Carpetas",
-        "fields": [
-          { "name": "inboxFolder","cols": 6},
-          {	"name": "sentFolder", "cols": 6},
-          {	"name": "trashFolder", "cols": 6}
+          { "name": "smtpServer","cols": 8, "caption": "Server"},
+          {	"name": "smtpPort", "cols": 4, "caption": "Port"},
+          {	"name": "smtpUsername", "cols": 4, "caption": "Username"},
+          {	"name": "smtpPassword", "cols": 4, "caption": "Password"}
       ]
     }
   ]
