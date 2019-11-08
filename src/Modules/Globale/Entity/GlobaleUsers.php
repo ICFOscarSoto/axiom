@@ -241,6 +241,12 @@ class GlobaleUsers implements UserInterface
         $modules[$module->getModule()->getName()]=$module->getModule();
       }
 
+      $repositoryEmailAccounts=$doctrine->getRepository("\App\Modules\Email\Entity\EmailAccounts");
+      $emailAccounts=$repositoryEmailAccounts->findBy(["user" => $this->id]);
+      $unseenEmails=0;
+      foreach($emailAccounts as $email){
+        $unseenEmails+=$email->getUnseen();
+      }
 
       $filesHelper=new HelperFiles();
       $data["id"]=$this->getId();
@@ -250,6 +256,7 @@ class GlobaleUsers implements UserInterface
   		$data["roles"]=$this->getRoles();
       $data["modules"]=$modules;
       $data["companyId"]=$connectas==null?$this->getCompany()->getId():$connectas->getId();
+      $data["unseenEmails"]=$unseenEmails;
       if(in_array("ROLE_ADMIN",$this->getRoles())){
         $diskusage=($connectas==null)?$this->getCompany()->getDiskUsages():$connectas->getDiskUsages();
         $data["diskusage"]["space"]=$filesHelper->formatBytes($diskusage[0]->getDiskspace());

@@ -40,6 +40,11 @@ class EmailFolders
      */
     private $emailAccountsInbox;
 
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $unseen=0;
+
     public function __construct()
     {
         $this->emailSubjects = new ArrayCollection();
@@ -133,6 +138,18 @@ class EmailFolders
                 $emailAccountsInbox->setInboxFolder(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getUnseen(): ?int
+    {
+        return $this->unseen;
+    }
+
+    public function setUnseen(int $unseen): self
+    {
+        $this->unseen = $unseen;
 
         return $this;
     }

@@ -48,6 +48,15 @@ class EmailSubjectsRepository extends ServiceEntityRepository
         return $query->getOneOrNullResult();
     }
 
+    public function deleteByFolder($folder)
+    {
+      $query="DELETE FROM email_subjects WHERE folder_id=:folder";
+      $params=['folder' => $folder];
+      $this->getEntityManager()->getConnection()->executeQuery($query, $params);
+      return true;
+    }
+
+
     // /**
     //  * @return EmailSubjects[] Returns an array of EmailSubjects objects
     //  */

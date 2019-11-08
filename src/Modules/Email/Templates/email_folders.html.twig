@@ -1,0 +1,54 @@
+<!-- Sidebar -->
+<div class="mail-sidebar">
+  <!-- compose new email button -->
+  <div class="mail-sidebar-row hidden-xs">
+    <a href="{{url('emailNew')}}" class="btn btn-success btn-icon btn-block">
+      Redactar correo
+      <i class="entypo-pencil"></i>
+    </a>
+  </div>
+  <!-- menu -->
+  <ul id="list-folders" class="mail-menu">
+    <!-- FOLDERS -->
+    <!-- END FOLDERS -->
+  </ul>
+  <div class="mail-distancer"></div>
+  <h4>Etiquetas</h4>
+  <!-- menu -->
+  <ul class="mail-menu">
+    <!-- TAGS -->
+    <!-- END TAGS -->
+  </ul>
+</div>
+
+<script>
+$(document).ready(function(){
+  if((++load_wait)==1) $("#load-spinner").fadeIn();
+  $.getJSON('{{ url('foldersList') }}', function( data ) {
+    var selectedIndex=0;
+    var i=0;
+    var account ="";
+    $.each( data, function( keyAccount, valAccount ) {
+        $("#list-folders").append('<li class="mail-account" id="email-account-'+keyAccount+'" data-toggle="collapse" aria-expanded="true" data-target="#email-account-folders-'+keyAccount+'"><div class="mail-account-title">'+valAccount.name+'</div></li><li class="collapse in" id="email-account-folders-'+keyAccount+'"></li>');
+        $("#mail-accounts").data("selectBox-selectBoxIt").add({ value: keyAccount, text: valAccount.name , id:'email-account-option-'+keyAccount ,signature: valAccount.signatureUrl});
+
+        $.each( valAccount.folders, function( key, val ) {
+           $('#email-account-folders-'+keyAccount).append('<li attr-name="'+val.name+'" attr-id="'+val.id+'" attr-url="{{ url('emailsFolderList', {'folder': '_____'}) }}" '+((val.default==true)? 'class="active"' : '')+'><a href="{{url('email')}}?folder='+val.id+'"><span class="badge badge-gray pull-right">'+val.unseen+'</span>'+val.name+'</a></li>');
+           {% if folder is not null %} if(val.id=={{ folder }}) selectedIndex=i; {%endif%}
+         });
+         i++;
+     });
+      $('.mail-account').collapse('hide');
+      $("#mail-accounts").data("selectBox-selectBoxIt").selectOption(selectedIndex);
+  }).always(function() {
+    if((--load_wait)==0) $("#load-spinner").fadeOut();
+  });
+
+  $('body').on('click', "[id^='folder-email-list-']", function() {
+    url=$(this).attr('attr-url');
+    url=url.replace('_____',$(this).attr('attr-name'));
+    $("[id^='folder-email-list-']").removeClass('active');
+    $(this).addClass('active');
+  });
+});
+</script>

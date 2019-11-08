@@ -142,6 +142,10 @@
       window.history.back();
     });
 
+    $(".wysiwyg").each(function() {
+      new Jodit("#"+$(this).attr("id"),{});
+    });
+
   });
 </script>
 

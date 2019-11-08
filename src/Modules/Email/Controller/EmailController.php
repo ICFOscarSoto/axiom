@@ -295,6 +295,7 @@ class EmailController extends Controller
 			$toString=$request->request->get('to');
 			$ccString=$request->request->get('cc');
 			$bccString=$request->request->get('bcc');
+			$subject=utf8_decode($request->request->get('subject'));
 			$entityManager = $this->getDoctrine()->getManager();
 			$emailRepository = $this->getDoctrine()->getRepository(EmailAccounts::class);
 			$emailFolderRepository = $this->getDoctrine()->getRepository(EmailFolders::class);
@@ -310,8 +311,9 @@ class EmailController extends Controller
 			$html = $request->request->get('html_content');
 			//Generamos el mail para el envio SMTP
 			$headers = array(
-			              'From'    => $emailAccount->getUsername(),
-			              'Subject' => $request->request->get('subject'),
+			              'From'    => '"'.utf8_decode($this->getUser()->getName()).' '.utf8_decode($this->getUser()->getLastname()).'" <'.utf8_decode($emailAccount->getUsername()).'>',
+										/*'From'    => $this->getUser()->getName().' '.$this->getUser()->getLastname(),*/
+			              'Subject' => $subject,
 										'To' => implode(',',$emailUtils->extractEmailsFromString($toString)),
 										"Content-Type" => "text/html",
 										'charset' => "UTF-8",
@@ -320,7 +322,8 @@ class EmailController extends Controller
 			if($bccString!=null)	$headers['Bcc'] = implode(',',$emailUtils->extractEmailsFromString($bccString));
 
 			$mime = new Mail_mime(array('eol' => "\n"));
-			$mime->setTXTBody(utf8_decode($text));
+			//$mime->setTXTBody(utf8_decode($text));
+			$html="<html><head><meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\" /></head><body>".$html."</body></html>";
 			$mime->setHTMLBody(utf8_decode($html));
 			$tempPath=$this->get('kernel')->getRootDir() . '/../public/temp/'.$this->getUser()->getId().'/';
 		  foreach ($attachments as $attach) {
@@ -338,43 +341,46 @@ class EmailController extends Controller
 			     'password' => $emailAccount->getSmtpPassword()));
 
 			$result = $smtp->send(implode(',',$emailUtils->extractEmailsFromString($toString)), $headers, $body);
-			if($result){
-				//Si se ha enviado correctamente el mail SMTP procedemos a crear el mail IMAP para almacenarlo en la carpeta
-				//de enviados
-				$connectionString='{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'/novalidate-cert}'.$emailAccount->getSentFolder()->getName();
-				$inbox = imap_open($connectionString,$emailAccount->getUsername() ,$emailAccount->getPassword());
-				$mailBox = "{".$emailAccount->getServer().":".$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol()."/novalidate-cert}".$emailAccount->getSentFolder()->getName();
-        $dmy = date("d-M-Y H:i:s");
-        $boundary = "------=".md5(uniqid(rand()));
-        $msgid = '{axiom_'.time().'_'.$emailAccount->getId().'}';
-        $msg = "From: ".$emailAccount->getSmtpUsername()."\r\n";
-        $msg .= "To: ".implode(',',$emailUtils->extractEmailsFromString($request->query->get('to')))."\r\n";
-        $msg .= "Date: $dmy\r\n";
-        $msg .= "message_id: <".uniqid ()."@aplicode.com>\r\n";
-        $msg .= ($request->request->get('message_id'))?"References: ".$request->request->get('message_id')."\r\nIn-Reply-To: ".$request->request->get('message_id')."\r\n":"";
-        $msg .= "Subject: ".$request->query->get('subject')."\r\n";
-        $msg .= "MIME-Version: 1.0\r\n";
-        $msg .= "Content-Type: multipart/mixed; boundary=\"$boundary\"\r\n";
-        $msg .= "\r\n\r\n";
-        $msg .= "--$boundary\r\n";
-        $msg .= "Content-Type: text/html;\r\n\tcharset=\"UTF-8\"\r\n";
-        $msg .= "Content-Transfer-Encoding: 8bit \r\n";
-        $msg .= "\r\n\r\n";
-        $msg .= $html."\r\n";
-        if(!empty($attachments)) {
-            $msg .= "\r\n\r\n";
-            $msg .= "--$boundary\r\n";
-            foreach ($attachments as $filename) {
-                $attachment = chunk_split(base64_encode(file_get_contents($tempPath.$filename)));
-                $msg .= "Content-Transfer-Encoding: base64\r\n";
-                $msg .= "Content-Disposition: attachment; filename=\"$filename\"\r\n";
-                $msg .= "\r\n" . $attachment . "\r\n\r\n";
-            }
-        }
-        $msg .= "\r\n\r\n\r\n";
-        $msg .= "--$boundary--\r\n\r\n";
-        $result2=imap_append($inbox,$mailBox,$msg,"\\Seen");
-			}
+			if($emailAccount->getCreatesend()){
+				if($result){
+					//Si se ha enviado correctamente el mail SMTP procedemos a crear el mail IMAP para almacenarlo en la carpeta
+					//de enviados
+					$connectionString='{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'/novalidate-cert}'.$emailAccount->getSentFolder()->getName();
+					$inbox = imap_open($connectionString,$emailAccount->getUsername() ,$emailAccount->getPassword());
+					$mailBox = "{".$emailAccount->getServer().":".$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol()."/novalidate-cert}".$emailAccount->getSentFolder()->getName();
+	        $dmy = date("d-M-Y H:i:s");
+	        $boundary = "------=".md5(uniqid(rand()));
+	        $msgid = '{axiom_'.time().'_'.$emailAccount->getId().'}';
+	        $msg  = "From: ".'"'.utf8_decode($this->getUser()->getName()).' '.utf8_decode($this->getUser()->getLastname()).'" <'.utf8_decode($emailAccount->getUsername()).'>'."\r\n";
+	        $msg .= "To: ".implode(',',$emailUtils->extractEmailsFromString($toString))."\r\n";
+	        $msg .= "Subject: ".$subject."\r\n";
+	        $msg .= "Date: $dmy\r\n";
+	        $msg .= "message_id: <".uniqid ()."@aplicode.com>\r\n";
+	        $msg .= ($request->request->get('message_id'))?"References: ".$request->request->get('message_id')."\r\nIn-Reply-To: ".$request->request->get('message_id')."\r\n":"";
+	        $msg .= "MIME-Version: 1.0\r\n";
+	        $msg .= "Content-Type: multipart/mixed; boundary=\"$boundary\"\r\n";
+	        $msg .= "\r\n\r\n";
+	        $msg .= "--$boundary\r\n";
+	        $msg .= "Content-Type: text/html;\r\n\tcharset=\"UTF-8\"\r\n";
+	        $msg .= "Content-Transfer-Encoding: 8bit \r\n";
+	        $msg .= "\r\n\r\n";
+	        $msg .= $html."\r\n";
+	        if(!empty($attachments)) {
+	            $msg .= "\r\n\r\n";
+	            $msg .= "--$boundary\r\n";
+	            foreach ($attachments as $filename) {
+	                $attachment = chunk_split(base64_encode(file_get_contents($tempPath.$filename)));
+	                $msg .= "Content-Transfer-Encoding: base64\r\n";
+	                $msg .= "Content-Disposition: attachment; filename=\"$filename\"\r\n";
+	                $msg .= "\r\n" . $attachment . "\r\n\r\n";
+	            }
+	        }
+	        $msg .= "\r\n\r\n\r\n";
+	        $msg .= "--$boundary--\r\n\r\n";
+	        $result2=imap_append($inbox,$mailBox,$msg,"\\Seen");
+
+				}
+			}else $result2=true;
 			if($result && $result2) return new JsonResponse(array("result" => 1));
 				else return new JsonResponse(array("result" => -1));
 		}else return new RedirectResponse($this->router->generate('app_login'));
@@ -489,7 +495,7 @@ class EmailController extends Controller
 					if($request->query->get('folder')!==null)
 						$subject["default"]=(strtoupper($emailFolder->getName())==strtoupper($request->query->get('folder'))?true:false);
 					else $subject["default"]=(strtoupper($emailFolder->getId()==$emailAccount->getInboxFolder()->getId())?true:false);
-					$subject["unseen"]=$queryUnseen->getQuery()->getSingleScalarResult();
+					$subject["unseen"]=$emailFolder->getUnseen();
 					$return[$emailAccount->getId()]["name"]=$emailAccount->getName();
 					$return[$emailAccount->getId()]["signatureUrl"]=$this->generateUrl('emailGetSignature', array('id'=>$emailAccount->getId()));
 					$return[$emailAccount->getId()]["folders"][]=$subject;
@@ -519,7 +525,7 @@ class EmailController extends Controller
 			$return=array();
 			//Comprobamos solo las carpetas Inbox
 			foreach($emailAccounts as $emailAccount){
-				if($emailAccount->getInboxFolder()){
+				//if($emailAccount->getInboxFolder()){
 					//Comprobamos si hay correo sin leer
 					$connectionString='{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'/novalidate-cert}'.$emailAccount->getInboxFolder()->getName();
 					@$inbox = imap_open($connectionString,$emailAccount->getUsername(),$emailAccount->getPassword());
@@ -540,12 +546,54 @@ class EmailController extends Controller
 						//Ordenamos el array por getTimestamp
 						usort($return, array(__NAMESPACE__."\EmailController", "cmpTimestamp"));
 
-				}
+				//}
 			}
 			return new JsonResponse($return);
 		}
 		return new Response();
 	}
+
+
+	/**
+	* @Route("/api/emails/countunreadlist", name="countEmailsUnreadedList")
+	*/
+	public function countEmailsUnreadedList(RouterInterface $router,Request $request){
+		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+			$emailFolderRepository = $this->getDoctrine()->getRepository(EmailFolders::class);
+			$emailSubjectRepository = $this->getDoctrine()->getRepository(EmailSubjects::class);
+			$emailRepository = $this->getDoctrine()->getRepository(EmailAccounts::class);
+			// Buscamos todas las cuentas del usuario
+			$emailAccounts=$emailRepository->findBy([
+				"user" => $this->getUser()->getId()
+			]);
+			$return=array();
+			foreach($emailAccounts as $emailAccount){
+				$countUnseen=0;
+				$emailFolders=$emailFolderRepository->findBy(["emailAccount"=>$emailAccount]);
+				foreach($emailFolders as $folder){
+					//Comprobamos si hay correo sin leer
+					$connectionString='{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'/novalidate-cert}'.$folder->getName();
+					@$inbox = imap_open($connectionString,$emailAccount->getUsername(),$emailAccount->getPassword());
+					if($inbox!==FALSE)$emailsUnseen=imap_search($inbox, 'UNSEEN'); else	$emailsUnseen=FALSE;
+						$count=0;
+						if(!$emailsUnseen) $count=0; else $count=count($emailsUnseen);
+						$countUnseen+=$count;
+						$folder->setUnseen($count);
+						$em=$this->getDoctrine()->getManager();
+						$em->persist($folder);
+						$em->flush();
+				}
+				$emailAccount->setUnseen($countUnseen);
+				$em=$this->getDoctrine()->getManager();
+				$em->persist($emailAccount);
+				$em->flush();
+			}
+			return new JsonResponse($return);
+		}
+		return new Response();
+	}
+
 
 	/**
 	 * @Route("/api/emails/{folder}/{id}/get", name="emailGet")

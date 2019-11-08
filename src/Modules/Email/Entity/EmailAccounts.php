@@ -132,6 +132,21 @@ class EmailAccounts
      */
     private $smtpProtocol;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $createSend=1;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $unseen=0;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $lastcheck;
+
     public function __construct()
     {
         $this->emailFolders = new ArrayCollection();
@@ -441,6 +456,42 @@ class EmailAccounts
     public function setSmtpProtocol(?string $smtpProtocol): self
     {
         $this->smtpProtocol = $smtpProtocol;
+
+        return $this;
+    }
+
+    public function getCreateSend(): ?bool
+    {
+        return $this->createSend;
+    }
+
+    public function setCreateSend(bool $createSend): self
+    {
+        $this->createSend = $createSend;
+
+        return $this;
+    }
+
+    public function getUnseen(): ?int
+    {
+        return $this->unseen;
+    }
+
+    public function setUnseen(int $unseen): self
+    {
+        $this->unseen = $unseen;
+
+        return $this;
+    }
+
+    public function getLastcheck(): ?\DateTimeInterface
+    {
+        return $this->lastcheck;
+    }
+
+    public function setLastcheck(?\DateTimeInterface $lastcheck): self
+    {
+        $this->lastcheck = $lastcheck;
 
         return $this;
     }

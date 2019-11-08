@@ -17,7 +17,8 @@
   				{	"name": "port", "cols": 4},
   				{	"name": "protocol", "cols": 4},
   				{	"name": "username", "cols": 4},
-  				{	"name": "password", "cols": 4}
+  				{	"name": "password", "cols": 4},
+					{	"name": "createSend", "cols": 4, "caption":"Crear enviados en carpeta enviados"}
 			]
 		},
     {
@@ -28,6 +29,12 @@
 					{	"name": "smtpProtocol", "cols": 4, "caption": "Protocol"},
           {	"name": "smtpUsername", "cols": 4, "caption": "Username"},
           {	"name": "smtpPassword", "cols": 4, "caption": "Password"}
+      ]
+    },
+		{
+        "name": "Signature",
+        "fields": [
+          { "name": "signature","cols": 12, "class": "wysiwyg"}
       ]
     }
   ]

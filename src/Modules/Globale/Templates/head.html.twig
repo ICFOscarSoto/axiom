@@ -75,32 +75,25 @@
 			{% if userData.modules.Email is defined %}
 			<!-- Message Notifications -->
 			<li class="notifications dropdown">
-
 				<a href="#" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
 					<i class="entypo-mail"></i>
-					<span id="header-mail-count" class="badge badge-secondary">0</span>
+					<span id="header-mail-count" class="badge badge-secondary">{{ userData.unseenEmails }}</span>
 				</a>
 				<input type="hidden" id="email-last" name="email-last" value="">
 				<ul class="dropdown-menu">
 					<li>
 						<form class="top-dropdown-search">
-
 							<div class="form-group">
 								<input type="text" class="form-control" placeholder="{% trans %}Search emails{% endtrans %}" name="s" />
 							</div>
-
 						</form>
-
 						<ul id="email-header-list" class="dropdown-menu-list scroller">
-
 						</ul>
 					</li>
-
 					<li class="external">
 						<a href="{{url('email')}}">{% trans %}All emails{% endtrans %}</a>
 					</li>
 				</ul>
-
 			</li>
 			{% endif %}
 
