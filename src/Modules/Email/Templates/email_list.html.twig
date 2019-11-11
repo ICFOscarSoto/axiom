@@ -141,8 +141,12 @@
 							getEmails('{{ url('emailsFolderList', {'folder': folder}) }}','?query='+$("#mail-search-query").val());
 						});
 
-						getEmails('{{ url('emailsFolderList', {'folder': folder}) }}','');
+						if("{{ q }}"!=""){
+							getEmails('{{ url('emailsFolderList', {'folder': folder}) }}','?query='+$("#mail-search-query").val());
+						}else getEmails('{{ url('emailsFolderList', {'folder': folder}) }}','');
 					});
+
+
 		</script>
 		<div class="mail-env">
 
@@ -168,16 +172,13 @@
 							<!-- search -->
 							<form id="mail-search" class="mail-search">
 								<div class="input-group">
-									<input type="text" class="form-control" id="mail-search-query" name="s" placeholder="Buscar" />
-
+									<input type="text" class="form-control" id="mail-search-query" name="s" placeholder="Buscar" value="{{ q }}"/>
 									<div class="input-group-addon">
 										<i class="entypo-search"></i>
 									</div>
 									<div id="mail-links" style="float: right;" class="mail-links">
-
 									</div>
 								</div>
-
 							</form>
 						</div>
 

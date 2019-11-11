@@ -115,9 +115,10 @@
         var signStart=content.indexOf(startToken);
         var signEnd=content.indexOf(endToken);
         var content_first=content.substr(0,signStart+startToken.length);
-        var content_last=content.substr(signEnd);
-        content=content_first+content_last;
-        content=content_first+data.signature+content_last;
+        //var content_last=content.substr(signEnd, content.length-1);
+        //content=content_first+content_last;
+        //content=content_first+data.signature+content_last;
+        content=content_first+data.signature;
         signature=data.signature;
         wysihtml5Editor.value = content;
 

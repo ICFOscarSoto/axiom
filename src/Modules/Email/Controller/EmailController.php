@@ -134,7 +134,8 @@ class EmailController extends Controller
 					'menuOptions' =>  $menurepository->formatOptions($userdata),
 					'breadcrumb' =>  $menurepository->formatBreadcrumb($request->get('_route')),
 					'userData' => $userdata,
-					'folder' => $folder
+					'folder' => $folder,
+					'q' => $request->query->get("q")
 					]);
 			}else{
 				return $this->render('@Globale/genericerror.html.twig', [
@@ -161,12 +162,15 @@ class EmailController extends Controller
 		if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 			$emailFolderRepository = $this->getDoctrine()->getRepository(EmailFolders::class);
+			$emailSubjectsRepository = $this->getDoctrine()->getRepository(EmailSubjects::class);
 			$accountfolder=$emailFolderRepository->findOneBy(["id"=>$folder]);
 			$account=$accountfolder->getEmailAccount();
 			$locale = $request->getLocale();
 			$this->router = $router;
 			$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
 			$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
+
+
 			return $this->render('@Email/email_message.html.twig', [
 				'controllerName' => 'EmailController',
 				'interfaceName' => 'Correo electrónico',
@@ -518,6 +522,7 @@ class EmailController extends Controller
 			$emailFolderRepository = $this->getDoctrine()->getRepository(EmailFolders::class);
 			$emailSubjectRepository = $this->getDoctrine()->getRepository(EmailSubjects::class);
 			$emailRepository = $this->getDoctrine()->getRepository(EmailAccounts::class);
+			$entityManager = $this->getDoctrine()->getManager();
 			// Buscamos todas las cuentas del usuario
 			$emailAccounts=$emailRepository->findBy([
 				"user" => $this->getUser()->getId()
@@ -525,28 +530,35 @@ class EmailController extends Controller
 			$return=array();
 			//Comprobamos solo las carpetas Inbox
 			foreach($emailAccounts as $emailAccount){
-				//if($emailAccount->getInboxFolder()){
+				if($emailAccount->getInboxFolder()){
 					//Comprobamos si hay correo sin leer
-					$connectionString='{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'/novalidate-cert}'.$emailAccount->getInboxFolder()->getName();
-					@$inbox = imap_open($connectionString,$emailAccount->getUsername(),$emailAccount->getPassword());
-					if($inbox!==FALSE)$emailsUnseen=imap_search($inbox, 'UNSEEN'); else	$emailsUnseen=FALSE;
-						if(!$emailsUnseen) continue;
-						$emailSubjects=imap_fetch_overview ($inbox, implode(',',$emailsUnseen), 0);
+					//$connectionString='{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'/novalidate-cert}'.$emailAccount->getInboxFolder()->getName();
+					//@$inbox = imap_open($connectionString,$emailAccount->getUsername(),$emailAccount->getPassword());
+					//if($inbox!==FALSE)$emailsUnseen=imap_search($inbox, 'UNSEEN'); else	$emailsUnseen=FALSE;
+						//if(!$emailsUnseen) continue;
+						//$emailSubjects=imap_fetch_overview ($inbox, implode(',',$emailsUnseen), 0);
+						$emailSubjects=$emailSubjectRepository->findBy(["folder"=>$emailAccount->getInboxFolder()]);
 						foreach($emailSubjects as $emailSubject){
 							$subject=array();
-							$subject["id"]				=$emailSubject->uid;
-							$subject["msgno"]			=$emailSubject->msgno;
-							$subject["subject"]		=isset($emailSubject->subject)?imap_utf8($emailSubject->subject):'';
-							$subject["from"]			=isset($emailSubject->from)?imap_utf8($emailSubject->from):'';
-							$date=new \DateTime(date('Y-m-d H:i:s',$emailSubject->udate));
+							$subject["id"]				=$emailSubject->getUid();
+							$subject["msgno"]			=$emailSubject->getMsgno();
+							$subject["subject"]		=$emailSubject->getSubject();
+							$subject["from"]			=$emailSubject->getFromEmail();
+							$subject["recent"]			=$emailSubject->getRecent();
+							$date=$emailSubject->getDate();
 							$subject["timestamp"]	=$date->getTimestamp();
-							$subject["url"]				=$this->generateUrl('emailView', array('folder'=>$emailAccount->getInboxFolder()->getId(), 'id' => $emailSubject->msgno));
+							$subject["url"]				=$this->generateUrl('emailView', array('folder'=>$emailAccount->getInboxFolder()->getId(), 'id' => $emailSubject->getMsgno()));
 							$return[] = $subject;
+							if($emailSubject->getRecent()){
+									$emailSubject->setRecent(0);
+									$entityManager->persist($emailSubject);
+									$entityManager->flush();
+							}
 						}
 						//Ordenamos el array por getTimestamp
 						usort($return, array(__NAMESPACE__."\EmailController", "cmpTimestamp"));
 
-				//}
+				}
 			}
 			return new JsonResponse($return);
 		}
@@ -558,7 +570,7 @@ class EmailController extends Controller
 	* @Route("/api/emails/countunreadlist", name="countEmailsUnreadedList")
 	*/
 	public function countEmailsUnreadedList(RouterInterface $router,Request $request){
-		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+	/*	$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 			$emailFolderRepository = $this->getDoctrine()->getRepository(EmailFolders::class);
 			$emailSubjectRepository = $this->getDoctrine()->getRepository(EmailSubjects::class);
@@ -572,6 +584,8 @@ class EmailController extends Controller
 				$countUnseen=0;
 				$emailFolders=$emailFolderRepository->findBy(["emailAccount"=>$emailAccount]);
 				foreach($emailFolders as $folder){
+				//if($emailAccount->getInboxFolder()){
+					$folder=$emailAccount->getInboxFolder();
 					//Comprobamos si hay correo sin leer
 					$connectionString='{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'/novalidate-cert}'.$folder->getName();
 					@$inbox = imap_open($connectionString,$emailAccount->getUsername(),$emailAccount->getPassword());
@@ -591,7 +605,7 @@ class EmailController extends Controller
 			}
 			return new JsonResponse($return);
 		}
-		return new Response();
+		return new Response();*/
 	}
 
 
@@ -620,6 +634,8 @@ class EmailController extends Controller
 			$subject=imap_fetch_overview ($inbox, $id, 0);
 			if(!count($subject)) return new JsonResponse(array("result"=> 0));
 			$emailSubject=$subject[0];
+
+
 			$emailUtils = new EmailUtils();
 			$emailUtils->container=$this->container;
 			$emailUtils->getmsg($inbox,$emailSubject->msgno);
@@ -651,6 +667,13 @@ class EmailController extends Controller
 			$message["urlFlagged"]		=$this->generateUrl('emailSetFlag', array('id' => $emailSubject->uid, 'flag' => 'Flagged', 'value' => 1));
 			$message["urlUnRead"]			=$this->generateUrl('emailSetFlag', array('id' => $emailSubject->uid, 'flag' => 'Seen', 'value' => 0));
 			$message["urlUnFlagged"]	=$this->generateUrl('emailSetFlag', array('id' => $emailSubject->uid, 'flag' => 'Flagged', 'value' => 0));
+
+			//Check if is a new mail
+			$subject=$emailSubjectRepository->findOneBy(["uid"=>$emailSubject->uid, "folder"=>$emailFolder]);
+			if($subject!=null){
+				$entityManager->remove($subject);
+				$entityManager->flush();
+			}
 
 			return new JsonResponse($message);
 		}

@@ -5,6 +5,7 @@ namespace App\Modules\Email\Repository;
 use App\Modules\Email\Entity\EmailSubjects;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
+use \PDO;
 
 /**
  * @method EmailSubjects|null find($id, $lockMode = null, $lockVersion = null)
@@ -48,12 +49,17 @@ class EmailSubjectsRepository extends ServiceEntityRepository
         return $query->getOneOrNullResult();
     }
 
-    public function deleteByFolder($folder)
-    {
+    public function deleteByFolder($folder){
       $query="DELETE FROM email_subjects WHERE folder_id=:folder";
       $params=['folder' => $folder];
       $this->getEntityManager()->getConnection()->executeQuery($query, $params);
       return true;
+    }
+
+    public function getUids($folder){
+      $query="SELECT uid FROM email_subjects WHERE folder_id=:folder";
+      $params=['folder' => $folder];
+      return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll(PDO::FETCH_COLUMN,0);
     }
 
 

@@ -242,10 +242,16 @@ class GlobaleUsers implements UserInterface
       }
 
       $repositoryEmailAccounts=$doctrine->getRepository("\App\Modules\Email\Entity\EmailAccounts");
+      $repositorySubjects=$doctrine->getRepository("\App\Modules\Email\Entity\EmailSubjects");
       $emailAccounts=$repositoryEmailAccounts->findBy(["user" => $this->id]);
       $unseenEmails=0;
       foreach($emailAccounts as $email){
-        $unseenEmails+=$email->getUnseen();
+        if($email->getInboxFolder()){
+					$folder=$email->getInboxFolder();
+          $subjects=$repositorySubjects->findBy(["folder"=>$folder]);
+          $unseenEmails+=count($subjects);
+        }
+        //$unseenEmails+=$email->getUnseen();
       }
 
       $filesHelper=new HelperFiles();

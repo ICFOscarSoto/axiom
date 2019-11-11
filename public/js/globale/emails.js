@@ -19,7 +19,7 @@ var flagEmails=true;
 
 
 					$("#email-header-list").prepend(email);
-					if((val.timestamp>$("#email-last").val()) && ($("#email-last").val()!='')) newEmails++;
+					if(val.recent) newEmails++;
 					emailsCount++;
 					majorId=val.timestamp;
 		  });
@@ -30,14 +30,14 @@ var flagEmails=true;
 			flagEmails=true;
 		});
 	}
-/*	emailsRefresh();
+	emailsRefresh();
 	window.setInterval(function(){
 		if(flagEmails){
 			flagEmails=false;
 			emailsRefresh();
 		}
 	}, 15000);
-*/
+
 	$('body').on('click', '.notification-view', function() {
 
 	});

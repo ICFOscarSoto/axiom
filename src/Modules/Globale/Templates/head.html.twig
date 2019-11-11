@@ -82,9 +82,9 @@
 				<input type="hidden" id="email-last" name="email-last" value="">
 				<ul class="dropdown-menu">
 					<li>
-						<form class="top-dropdown-search">
+						<form class="top-dropdown-search" method="get" action="{{ url("email") }}">
 							<div class="form-group">
-								<input type="text" class="form-control" placeholder="{% trans %}Search emails{% endtrans %}" name="s" />
+								<input type="text" class="form-control" placeholder="{% trans %}Search emails{% endtrans %}" name="q" />
 							</div>
 						</form>
 						<ul id="email-header-list" class="dropdown-menu-list scroller">
