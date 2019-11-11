@@ -399,7 +399,7 @@ class EmailController extends Controller
 			$emailRepository = $this->getDoctrine()->getRepository(EmailAccounts::class);
 			$emailFolderRepository = $this->getDoctrine()->getRepository(EmailFolders::class);
 			$emailSubjectRepository = $this->getDoctrine()->getRepository(EmailSubjects::class);
-			$limit=$request->query->getInt('length', 15);
+			$limit=$request->query->getInt('length', 25);
 			$start=$request->query->getInt('start', 1);
 			$query=$request->query->get('query');
 			$return=array();
@@ -672,6 +672,8 @@ class EmailController extends Controller
 			$subject=$emailSubjectRepository->findOneBy(["uid"=>$emailSubject->uid, "folder"=>$emailFolder]);
 			if($subject!=null){
 				$entityManager->remove($subject);
+				$emailFolder->setUnseen($emailFolder->getUnseen()>0?$emailFolder->getUnseen()-1:0);
+				$entityManager->persist($emailFolder);
 				$entityManager->flush();
 			}
 
