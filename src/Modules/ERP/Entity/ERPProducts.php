@@ -623,7 +623,7 @@ class ERPProducts
       if($this->getPvpincrement()==NULL)
       {
         $CustomerGroupsRepository=$doctrine->getRepository(ERPCustomerGroups::class);
-        $customergroups=$CustomerGroupsRepository->findAll(["active"=>1,"deleted"=>0]);
+        $customergroups=$CustomerGroupsRepository->findBy(["active"=>1,"deleted"=>0]);
         $maxincrement=0;
         foreach($customergroups as $customergroup){
           $increment=$this->getMaxIncrement($doctrine,$customergroup);
@@ -644,13 +644,13 @@ class ERPProducts
       foreach($productprices as $productprice)
       {
           $productpriceEntity=$repositoryProductPrices->findOneBy(["id"=>$productprice]);
-          $productpriceEntity->setPrice($newShoppingPrice*(1+($productpriceEntity->getIncrement()/100)));
+          $productpriceEntity->setPrice(round($newShoppingPrice*(1+($productpriceEntity->getIncrement()/100)),2));
       }
-      
+
       //finalmente si no tenemos registrado un incremento para un grupo de cliente en particular, tendremos que generarlo. En primer
       //lugar obtenemos los grupos de clientes que no tienen asociado un incremento y posteriormente se lo generamos.
       $CustomerGroupsRepository=$doctrine->getRepository(ERPCustomerGroups::class);
-      $customergroups=$CustomerGroupsRepository->findAll(["active"=>1,"deleted"=>0]);
+      $customergroups=$CustomerGroupsRepository->findBy(["active"=>1,"deleted"=>0]);
       $productEntity=$repositoryProduct->findOneBy(["id"=>$this->getId()]);
       $customergroup_without_price=[];
       foreach($customergroups as $customergroup){
@@ -678,7 +678,7 @@ class ERPProducts
 
     public function calculatePVP($doctrine){
          $CustomerGroupsRepository=$doctrine->getRepository(ERPCustomerGroups::class);
-         $customergroups=$CustomerGroupsRepository->findAll(["active"=>1,"deleted"=>0]);
+         $customergroups=$CustomerGroupsRepository->findBy(["active"=>1,"deleted"=>0]);
          $maxincrement=0;
          foreach($customergroups as $customergroup){
            $increment=$this->getMaxIncrement($doctrine,$customergroup);
