@@ -145,7 +145,7 @@ class ERPCustomerGroups
 
         return $this;
     }
-    
+
     public function formValidation($kernel, $doctrine, $user, $validationParams){
       //Check for overlapped periods
       $repository=$doctrine->getRepository(ERPCustomerGroups::class);
@@ -154,12 +154,12 @@ class ERPCustomerGroups
         return ["valid"=>false, "global_errors"=>["Ya existe un grupo de clientes con ese nombre"]];
       else return ["valid"=>true];
     }
-    
+
     public function preProccess($kernel, $doctrine, $user){
         $this->name=strtoupper($this->name);
-      
+
       }
-      
+
       public function postProccess($kernel, $doctrine, $user){
         $em = $doctrine->getManager();
         $repositoryProduct=$doctrine->getRepository(ERPProducts::class);
@@ -170,12 +170,12 @@ class ERPCustomerGroups
         foreach($products as $product){
           $productEntity=$repositoryProduct->findOneBy(["id"=>$product]);
           $productEntity->calculatePVP($doctrine);
-        
+
           $increment=$this->getIncrementByGroup($doctrine,$productEntity->getSupplier(),$productEntity->getCategory());
           if($increment!=NULL)
           {
 
-            if($repositoryProductPrices->exists($productEntity,$this))
+            if($repositoryProductPrices->existPrice($productEntity,$this))
             {
               //dump("Ha encontrado una linea de incremento para el producto. La actualizamos.");
               $productpricesEntity=$repositoryProductPrices->findOneBy(["product"=>$productEntity,"customergroup"=>$this]);
@@ -198,31 +198,31 @@ class ERPCustomerGroups
             }
             $em->persist($productpricesEntity);
         }
-          
-          
+
+
           $em->persist($productEntity);
           $em->flush();
         }
       }
-      
-      
+
+
       public function getIncrementByGroup($doctrine,$supplier,$productcategory){
-  
+
         $repository=$doctrine->getRepository(ERPIncrements::class);
         $category=$productcategory;
-  
+
         $incrementbygroup=$repository->getIncrementByGroup($supplier,$category,$this);
-        
+
         while ($category->getParentid()!=null && $incrementbygroup==null){
               $category=$category->getParentid();
               $incrementbygroup=$repository->getIncrementByGroup($supplier,$category,$this);
           }
-  
+
       if($incrementbygroup==null){
         $repository=$doctrine->getRepository(ERPCustomerGroups::class);
         $incrementbygroup=$repository->getIncrement($this);
         return $incrementbygroup;
-  
+
       }
       return $incrementbygroup;
       }
