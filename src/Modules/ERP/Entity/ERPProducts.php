@@ -644,14 +644,13 @@ class ERPProducts
       foreach($productprices as $productprice)
       {
           $productpriceEntity=$repositoryProductPrices->findOneBy(["id"=>$productprice]);
-          $productpriceEntity->setPrice($newShoppingPrice*(1+($productpriceEntity->getIncrement()/100)));
+          $productpriceEntity->setPrice(round($newShoppingPrice*(1+($productpriceEntity->getIncrement()/100)),2));
       }
 
       //finalmente si no tenemos registrado un incremento para un grupo de cliente en particular, tendremos que generarlo. En primer
       //lugar obtenemos los grupos de clientes que no tienen asociado un incremento y posteriormente se lo generamos.
       $CustomerGroupsRepository=$doctrine->getRepository(ERPCustomerGroups::class);
       $customergroups=$CustomerGroupsRepository->findBy(["active"=>1,"deleted"=>0]);
-      dump($customergroups);
       $productEntity=$repositoryProduct->findOneBy(["id"=>$this->getId()]);
       $customergroup_without_price=[];
       foreach($customergroups as $customergroup){
