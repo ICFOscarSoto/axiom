@@ -109,7 +109,6 @@ class GlobaleDefaultController extends Controller
       }else $utilsObj=new $class(); // define the main class to ensure that a valid object is created and not has getIncludedForm and getExcludedForm
       $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser()];
       $obj=new $class();
-      dump($json);
       $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),
         method_exists($utilsObj,'getExcludedForm'.$json)?$utilsObj->{"getExcludedForm".$json}($params):[],method_exists($utilsObj,'getIncludedForm'.$json)?$utilsObj->{"getIncludedForm".$json}($params):[],null,["module"=>$module, "name"=>$name, "json"=>$json]
       );

@@ -57,7 +57,6 @@ class EmailGetSubjects extends ContainerAwareCommand
         if($emailAccount->getInboxFolder()->getId()==$folder->getId()){
           $olderMsgs=$emailSubjectsRepository->getUids($emailAccount->getInboxFolder()->getId());
           //$olderMsgs = array_reduce($olderMsgs, 'array_merge', array());
-          dump($olderMsgs);
           $emailSubjectsRepository->deleteByFolder($emailAccount->getInboxFolder()->getId());
           $connectionString='{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'/novalidate-cert}'.$emailAccount->getInboxFolder()->getName();
           @$inbox = imap_open($connectionString,$emailAccount->getUsername(),$emailAccount->getPassword());
