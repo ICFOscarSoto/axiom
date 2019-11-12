@@ -1,0 +1,141 @@
+<!-- Mail Body -->
+
+<div class="mail-env">
+
+<script>
+  var wysihtml5Editor;
+  var signature;
+  var token="{{ token }}";
+</script>
+<div class="mail-body" style="width:100% !important;">
+  <form id="form-send-mail" name="form-send-mail" method="post" role="form">
+  <div class="mail-header">
+    <!-- title -->
+    <div class="mail-title">
+      Redactar correo <i class="entypo-pencil"></i>
+    </div>
+    <!-- links -->
+    <div class="mail-links">
+      <a id="btn-discard-mail" href="#" class="btn btn-default">
+        <i class="entypo-cancel"></i>
+      </a>
+      <button type="submit" id="btn-send-mail" class="btn btn-success btn-icon">
+        Enviar
+        <i class="entypo-mail"></i>
+        </button>
+    </div>
+  </div>
+
+  <div class="panel-body">
+    <div class="form-group">
+        <label class="col-sm-1 control-label" for="from">Desde:</label>
+        <div class="col-sm-11">
+          <select name="from" id="mail-accounts" class="select2">
+            {% for emailAccount in userData.emailAccounts %}
+              <option value="{{ emailAccount.id }}" id="email-account-option-{{ emailAccount.id }}" signature="/api/emails/{{ emailAccount.id }}/getSignature">{{ emailAccount.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+    </div>
+  </div>
+  <div class="panel-body">
+    <div class="form-group">
+      <label class="col-sm-1 control-label" for="mail-addresses">Para:</label>
+      <div class="col-sm-11">
+        <select name="mail-addresses" id="mail-addresses" class="select2">
+            <option value="" id="mail-address-0">Introducir manualmente</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="mail-compose">
+      <div class="form-group">
+        <label for="to">Para:</label>
+        <input type="input" class="form-control" id="to" name="to" tabindex="1" />
+        <input type="hidden" class="form-control" id="in_reply_to" name="in_reply_to" tabindex="1" />
+        <div class="field-options">
+          <a href="javascript:;" id="cc-button" onclick="$(this).hide(); $('#cc').parent().removeClass('hidden'); $('#cc').focus();">CC</a>
+          <a href="javascript:;" id="bcc-button" onclick="$(this).hide(); $('#bcc').parent().removeClass('hidden'); $('#bcc').focus();">BCC</a>
+        </div>
+      </div>
+      <div class="form-group hidden">
+        <label for="cc">CC:</label>
+        <input type="text" class="form-control" id="cc" name="cc" tabindex="2" />
+      </div>
+      <div class="form-group hidden">
+        <label for="bcc">BCC:</label>
+        <input type="text" class="form-control" id="bcc" name="bcc" tabindex="2" />
+      </div>
+      <div class="form-group">
+        <label for="subject">Asunto:</label>
+        <input type="text" class="form-control" id="subject" name="subject" tabindex="1" />
+      </div>
+      <div class="compose-message-editor">
+      <textarea id="content" name="content" style="width: 300px;"></textarea>
+      </div>
+  </div>
+
+  </form>
+</div>
+</div>
+<script>
+
+function resetEmail(){
+   $('#cc').parent().addClass('hidden');
+   $('#cc-button').show();
+   $('#bcc').parent().addClass('hidden');
+   $('#bcc-button').show();
+   wysihtml5Editor.value = signature;
+ }
+
+ function getSignature(){
+   if((++load_wait)==1) $("#load-spinner").fadeIn();
+   $.getJSON($("#email-account-option-"+$("#mail-accounts").val()).attr('signature'),function( data ){
+     var content=wysihtml5Editor.value;
+     var startToken='<!-- start:'+token+' -->';
+     var endToken='<!-- end:'+token+' -->';
+     var signStart=content.indexOf(startToken);
+     var signEnd=content.indexOf(endToken);
+     var content_first=content.substr(0,signStart+startToken.length);
+     content=content_first+data.signature;
+     signature=data.signature;
+     wysihtml5Editor.value = content;
+   }).always(function() {
+       if((--load_wait)==0) $("#load-spinner").fadeOut();
+   });
+ }
+
+  $(document).ready(function(){
+
+    $( "#mail-accounts" ).on( "change", function( event ) {
+      getSignature();
+    });
+
+    $('#btn-discard-mail').click(function(){
+      resetEmail();
+    });
+
+    $( "#form-send-mail" ).on( "submit", function( event ) {
+      event.preventDefault();
+      if((++load_wait)==1) $("#load-spinner").fadeIn();
+      data= $( this ).serialize()+"&text_content="+encodeURIComponent(wysihtml5Editor.value)+"&html_content="+encodeURIComponent(wysihtml5Editor.value)+"&files="+encodeURIComponent(JSON.stringify(jsonFiles)) ;
+      $.post('{{ url('emailSend') }}',data, function( data ){
+        resetEmail();
+        if(data.result)	toastr.success("El correo se ha enviado correctamente", "Confirmación", confirmation);
+          else toastr.error("No se pudo enviar el correo", "Confirmación", confirmation);
+      },'json').always(function() {
+          if((--load_wait)==0) $("#load-spinner").fadeOut();
+
+      });
+    });
+
+    wysihtml5Editor = new Jodit("#content",{
+      height: 300
+    });
+    wysihtml5Editor.events.on('afterInit', function (data) {
+      getSignature();
+      editor_init=true;
+    });
+
+  });
+</script>

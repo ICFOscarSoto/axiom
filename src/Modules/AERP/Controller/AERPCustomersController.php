@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\AERP\Entity\AERPCustomers;
 use App\Modules\AERP\Entity\AERPCustomerGroups;
+use App\Modules\AERP\Entity\AERPCustomerContacts;
 use App\Modules\Globale\Entity\GlobaleCountries;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
@@ -63,27 +64,49 @@ public function formAERPCustomer($id,Request $request)
    * @Route("/{_locale}/AERP/customers/data/{id}/{action}", name="dataAERPCustomers", defaults={"id"=0, "action"="read"})
    */
    public function data($id, $action, Request $request){
-   $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-   $template=dirname(__FILE__)."/../Forms/Customers.json";
-   $utils = new GlobaleFormUtils();
-	 $repository=$this->getDoctrine()->getRepository($this->class);
-	 $obj = $repository->findOneBy(['id'=>$id, 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
-	 if($id!=0 && $obj==null){
-			 return $this->render('@Globale/notfound.html.twig',[]);
-	 }
-	 /*if($obj==null){
-		 $obj=new $this->class();
-		 $defaultCountry=$this->getDoctrine()->getRepository(GlobaleCountries::class);
-	   $default=$defaultCountry->findOneBy(['name'=>"España"]);
-	   $obj->setCountry($default);
-		 $obj->setAgentassign($this->getUser());
-	 }*/
-	 $classUtils=new AERPCustomersUtils();
-	 $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "obj"=>$obj];
-   $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),$classUtils->getExcludedForm($params),$classUtils->getIncludedForm($params));
-   $make = $utils->make($id, $this->class, $action, "formCustomers", "full", "@Globale/form.html.twig", "formAERPCustomer");
-   return $make;
+	   $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+	   $template=dirname(__FILE__)."/../Forms/Customers.json";
+	   $utils = new GlobaleFormUtils();
+		 $repository=$this->getDoctrine()->getRepository($this->class);
+		 $obj = $repository->findOneBy(['id'=>$id, 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
+		 if($id!=0 && $obj==null){
+				 return $this->render('@Globale/notfound.html.twig',[]);
+		 }
+		 /*if($obj==null){
+			 $obj=new $this->class();
+			 $defaultCountry=$this->getDoctrine()->getRepository(GlobaleCountries::class);
+		   $default=$defaultCountry->findOneBy(['name'=>"España"]);
+		   $obj->setCountry($default);
+			 $obj->setAgentassign($this->getUser());
+		 }*/
+		 $classUtils=new AERPCustomersUtils();
+		 $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "obj"=>$obj];
+	   $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),$classUtils->getExcludedForm($params),$classUtils->getIncludedForm($params));
+	   $make = $utils->make($id, $this->class, $action, "formCustomers", "full", "@Globale/form.html.twig", "formAERPCustomer");
+	   return $make;
   }
 
-
+	/**
+	 * @Route("/{_locale}/AERP/customers/get/emailaddres/{id}", name="getEmailAddress", defaults={"id"=0})
+	 */
+	 public function getEmailAddress($id, Request $request){
+	 	$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		$customerRepository=$this->getDoctrine()->getRepository($this->class);
+		$customerContactsRepository=$this->getDoctrine()->getRepository(AERPCustomerContacts::class);
+		$customer=$customerRepository->findOneBy(['id'=>$id, 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
+		$contacts=$customerContactsRepository->findBy(['customer'=>$customer, 'active'=>1, 'deleted'=>0]);
+		$mailadresses=[];
+		//First mail company
+		if($customer->getEmail()!=""){
+			$mailadress=$customer->getName()." <".$customer->getEmail().">";
+			$mailadresses[]=$mailadress;
+		}
+		foreach($contacts as $contact){
+			if($contact->getEmail()!=""){
+				$mailadress=$contact->getName()." ".$contact->getLastname()." <".$contact->getEmail().">";
+				$mailadresses[]=$mailadress;
+			}
+		}
+		return new JsonResponse(["adresses"=>$mailadresses]);
+ 	 }
 }

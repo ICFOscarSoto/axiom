@@ -1,0 +1,30 @@
+<div class="form-group">
+  <div class="col-sm-12">
+        <div class="dropzone"><div class="dz-message" data-dz-message><span>Ficheros Adjuntos</span></div></div>
+    </div>
+</div>
+<script>
+  var jsonFiles = [];
+  var editor_init=false;
+  var dropzone_default = null;
+  $(document).ready(function(){
+    // init,configure dropzone
+    Dropzone.autoDiscover = false;
+    dropzone_default = new Dropzone(".dropzone", {
+        url: '{{url('uploadTemp',{'type':'Email'})}}',
+        maxFilesize: 20,  // in Mb
+        addRemoveLinks: true,
+        init: function () {
+            this.on("maxfilesexceeded", function(file) {
+                this.removeFile(file);
+            });
+            this.on("sending", function(file, xhr, formData) {
+            });
+            this.on("success", function(file, response) {
+                if (response.uploaded)
+                  jsonFiles.push(response.fileName);
+            });
+        }
+    });
+  });
+</script>

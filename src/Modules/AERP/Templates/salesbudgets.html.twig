@@ -5,6 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<meta name="description" content="Axiom Business Management" />
 	<meta name="author" content="" />
+	<link rel="icon" href="images/favicon.ico">
 	{{ include('@Globale/header.html.twig') }}
 	<!-- Imported styles on this page -->
 	<link rel="stylesheet" href="{{ url('index') }}css/bootstrap-grid.css">
@@ -26,7 +27,9 @@
 				<div style="text-align: left;" class="col-md-8">
 					<div id="document-action-buttons" style="display:{% if id!=0 %}block;{% else %}none;{% endif %}">
 						<button id="document-button-print" type="button" class="btn btn-default btn-icon icon-left" onclick="window.open('{{ url("AERPSalesBudgetsPrint",{"id":id}) }}')">Imprimir<i class="fa fa-print"></i></button>
+						{% if userData.modules.Email is defined %}
 						<button id="document-button-email" type="button" class="btn btn-default btn-icon icon-left">Enviar<i class="fa fa-envelope"></i></button>
+						{% endif %}
 						<button id="document-button-makeorder" type="button" class="btn btn-default btn-icon icon-left">A Pedido<i class="fa fa-file"></i></button>
 					</div>
 				</div>
@@ -53,6 +56,8 @@
 		{{ include('@AERP/document_prepare_json.html.twig') }}
 
 		{{ include('@AERP/document_sales_validation.html.twig') }}
+		{{ include('@AERP/document_send.html.twig') }}
+
 
 		<script>
 			function clearFields(fields){
@@ -113,6 +118,7 @@
 				         }
 				       });
 					 });
+
 			});
 
 		</script>
@@ -126,6 +132,8 @@
 <link rel="stylesheet" href="{{ url('index') }}css/custom.css">
 <link rel="stylesheet" href="{{ url('index') }}js/ol/ol.css">
 <link rel="stylesheet" href="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker.min.css">
+<link rel="stylesheet" href="{{ url('index') }}js/jodit/jodit.min.css">
+
 <!-- Imported scripts on this page -->
 <script src="{{ url('index') }}js/datatables/datatables.js"></script>
 <script src="{{ url('index') }}js/select2/select2.min.js"></script>
@@ -135,6 +143,7 @@
 <script src="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker.min.js"></script>
 <script src="{{ url('index') }}js/fileinput.js"></script>
 <script src="{{ url('index') }}js/ol/ol.js"></script>
+ <script src="{{ url('index') }}js/jodit/jodit.min.js"></script>
 	 {{ include('@Globale/bottom.html.twig') }}
 {% endblock %}
 </body>

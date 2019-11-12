@@ -232,6 +232,14 @@ table.dataTable.dtr-inline.collapsed > tbody > tr > td:first-child:before, table
   background: #f1f1f1;
 }
 
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+    background-color: #bababa !important;
+}
+
+.select2-container--default .select2-search--dropdown .select2-search__field {
+    border: 1px solid #eaeaea !important;
+}
+
 .number-type{
   text-align: right !important;
 }
@@ -624,7 +632,7 @@ label.form-check-label {
   border: none !important;
 }
 .select2-search input {
-  background: #f6f6fe !important;
+  background: #f9f9f9 !important;
   height: 28px !important;
   min-height: 28px !important;
 }

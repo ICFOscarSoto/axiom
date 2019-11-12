@@ -329,7 +329,7 @@ class EmailController extends Controller
 			//$mime->setTXTBody(utf8_decode($text));
 			$html="<html><head><meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\" /></head><body>".$html."</body></html>";
 			$mime->setHTMLBody(utf8_decode($html));
-			$tempPath=$this->get('kernel')->getRootDir() . '/../public/temp/'.$this->getUser()->getId().'/';
+			$tempPath=$this->get('kernel')->getRootDir().'/../cloud/'.$this->getUser()->getCompany()->getId().'//temp/'.$this->getUser()->getId().'/Email//';
 		  foreach ($attachments as $attach) {
 				$mimeTypeGuesser = new FileinfoMimeTypeGuesser();
 				if($mimeTypeGuesser->isSupported()) $mimetype=$mimeTypeGuesser->guess($tempPath.$attach); else $mimetype='text/plain';

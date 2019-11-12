@@ -306,7 +306,10 @@ Swiftcode: Código SWIFT
 # SALESBUDGETS
 #----------------------------------------------------------------------------------------------------------------------
 SalesBudgets: Presupuestos
-
+sales_budget: presupuesto
+sales_order: pedido
+sales_deliverynote: albarán
+sales_invoice: factura
 
 #COURSES
 #----------------------------------------------------------------------------------------------------------------------

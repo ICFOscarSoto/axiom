@@ -32,6 +32,7 @@ use App\Modules\Security\Utils\SecurityUtils;
 class AERPSalesBudgetsController extends Controller
 {
 	private $module='AERP';
+	private $prefix='PED';
 	private $class=AERPSalesBudgets::class;
 	private $classLines=AERPSalesBudgetsLines::class;
 	private $utilsClass=AERPSalesBudgetsUtils::class;
@@ -156,10 +157,12 @@ class AERPSalesBudgetsController extends Controller
 				'enddate' => ($document->getId()==null)?date('d-m-Y', strtotime(date('d-m-Y'). ' + '.$config->getBudgetexpiration().' '.$config->getBudgetexpirationtype())):$document->getDateofferend()->format('d/m/Y'),
 				'id' => $id,
 				'documentType' => 'sales_budget',
+				'documentPrefix' => $this->prefix,
 				'document' => $document,
 				'documentLines' => $documentLines,
 				'errors' => $errors,
-				'warnings' => $warnings
+				'warnings' => $warnings,
+				'token' => uniqid('sign_').time()
 				]);
 		}
 		return new RedirectResponse($this->router->generate('app_login'));
@@ -303,6 +306,28 @@ class AERPSalesBudgetsController extends Controller
 		$reportsUtils = new AERPSalesBudgetsReports();
 
 		$pdf=$reportsUtils->create($params);
+		return new Response("", 200, array('Content-Type' => 'application/pdf'));
+	}
+
+	/**
+	 * @Route("/{_locale}/AERP/salesbudgets/send/{id}", name="AERPSalesBudgetsSend", defaults={"id"=0}))
+	 */
+	public function AERPSalesBudgetsSend($id, RouterInterface $router,Request $request){
+		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		$documentRepository=$this->getDoctrine()->getRepository(AERPSalesBudgets::class);
+		$documentLinesRepository=$this->getDoctrine()->getRepository(AERPSalesBudgetsLines::class);
+		$configrepository=$this->getDoctrine()->getRepository(AERPConfiguration::class);
+  	$document=$documentRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$id, "deleted"=>0]);
+		if(!$document) return new Response("");
+		$lines=$documentLinesRepository->findBy(["salesbudget"=>$document, "deleted"=>0, "active"=>1]);
+		$configuration=$configrepository->findOneBy(["company"=>$this->getUser()->getCompany()]);
+		$params=["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "id"=>$id, "user"=>$this->getUser(), "document"=>$document, "lines"=>$lines, "configuration"=>$configuration];
+		$reportsUtils = new AERPSalesBudgetsReports();
+		$tempPath=$this->get('kernel')->getRootDir().DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$this->getUser()->getCompany()->getId().DIRECTORY_SEPARATOR.'temp'.DIRECTORY_SEPARATOR.$this->getUser()->getId().DIRECTORY_SEPARATOR.'Email'.DIRECTORY_SEPARATOR;
+		if (!file_exists($tempPath) && !is_dir($tempPath)) {
+				mkdir($tempPath, 0775, true);
+		}
+		$pdf=$reportsUtils->create($params,'F',$tempPath.$this->prefix.$document->getCode().'.pdf');
 		return new Response("", 200, array('Content-Type' => 'application/pdf'));
 	}
 

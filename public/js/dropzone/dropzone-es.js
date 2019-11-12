@@ -1,0 +1,10 @@
+Dropzone.prototype.defaultOptions.dictDefaultMessage = "Arrastre aquí los ficheros";
+Dropzone.prototype.defaultOptions.dictFallbackMessage = "Este navegador no soporta subida de ficheros drag'n'drop.";
+Dropzone.prototype.defaultOptions.dictFallbackText = "Por favor use el formulario para subir los ficheros.";
+Dropzone.prototype.defaultOptions.dictFileTooBig = "Fichero demasiado grande ({{filesize}}MiB). Max tamaño: {{maxFilesize}}MiB.";
+Dropzone.prototype.defaultOptions.dictInvalidFileType = "No se admiten ficheros de este tipo";
+Dropzone.prototype.defaultOptions.dictResponseError = "El servidor respondió con código {{statusCode}}.";
+Dropzone.prototype.defaultOptions.dictCancelUpload = "Cancelar subida";
+Dropzone.prototype.defaultOptions.dictCancelUploadConfirmation = "¿Seguro que desea para la subida?";
+Dropzone.prototype.defaultOptions.dictRemoveFile = "Borrar fichero";
+Dropzone.prototype.defaultOptions.dictMaxFilesExceeded = "No puede subir más ficheros.";
