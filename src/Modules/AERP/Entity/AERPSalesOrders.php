@@ -2,6 +2,8 @@
 
 namespace App\Modules\AERP\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
 use \App\Modules\Globale\Entity\GlobaleUsers;
@@ -224,6 +226,16 @@ class AERPSalesOrders
      * @ORM\Column(type="text", nullable=true)
      */
     private $notes;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Modules\AERP\Entity\AERPSalesBudgets", mappedBy="inSalesOrder")
+     */
+    private $salesBudgets;
+
+    public function __construct()
+    {
+        $this->salesBudgets = new ArrayCollection();
+    }
 
 
     public function getId(): ?int
@@ -695,6 +707,37 @@ class AERPSalesOrders
     public function setNotes(?string $notes): self
     {
         $this->notes = $notes;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|AERPSalesBudgets[]
+     */
+    public function getSalesBudgets(): Collection
+    {
+        return $this->salesBudgets;
+    }
+
+    public function addSalesBudget(AERPSalesBudgets $salesBudget): self
+    {
+        if (!$this->salesBudgets->contains($salesBudget)) {
+            $this->salesBudgets[] = $salesBudget;
+            $salesBudget->setInSalesOrder($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSalesBudget(AERPSalesBudgets $salesBudget): self
+    {
+        if ($this->salesBudgets->contains($salesBudget)) {
+            $this->salesBudgets->removeElement($salesBudget);
+            // set the owning side to null (unless already changed)
+            if ($salesBudget->getInSalesOrder() === $this) {
+                $salesBudget->setInSalesOrder(null);
+            }
+        }
 
         return $this;
     }

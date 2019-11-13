@@ -607,7 +607,7 @@ class ERPProducts
       }
       if ($shoppingDiscounts==null)
           $shoppingDiscounts=$repository->findOneBy(["supplier"=>$this->supplier,"active"=>1,"deleted"=>0]);
-      return $shoppingDiscounts->getDiscount();
+      return $shoppingDiscounts!=null?$shoppingDiscounts->getDiscount():0;
     }
 
 

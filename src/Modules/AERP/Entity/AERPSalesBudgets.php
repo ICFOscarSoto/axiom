@@ -12,6 +12,7 @@ use \App\Modules\AERP\Entity\AERPPaymentMethods;
 use \App\Modules\AERP\Entity\AERPSeries;
 use \App\Modules\Globale\Entity\GlobaleCountries;
 use \App\Modules\AERP\Entity\AERPCustomerGroups;
+use \App\Modules\AERP\Entity\AERPSalesOrders;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\AERP\Repository\AERPSalesBudgetsRepository")
@@ -229,6 +230,11 @@ class AERPSalesBudgets
      * @ORM\Column(type="text", nullable=true)
      */
     private $notes;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\AERP\Entity\AERPSalesOrders", inversedBy="salesBudgets")
+     */
+    private $inSalesOrder;
 
 
     public function getId(): ?int
@@ -712,6 +718,18 @@ class AERPSalesBudgets
     public function setNotes(?string $notes): self
     {
         $this->notes = $notes;
+
+        return $this;
+    }
+
+    public function getInSalesOrder(): ?AERPSalesOrders
+    {
+        return $this->inSalesOrder;
+    }
+
+    public function setInSalesOrder(?AERPSalesOrders $inSalesOrder): self
+    {
+        $this->inSalesOrder = $inSalesOrder;
 
         return $this;
     }
