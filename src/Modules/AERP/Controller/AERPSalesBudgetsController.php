@@ -6,6 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -24,6 +25,8 @@ use App\Modules\AERP\Entity\AERPSeries;
 use App\Modules\AERP\Entity\AERPCustomerGroups;
 use App\Modules\AERP\Entity\AERPSalesBudgets;
 use App\Modules\AERP\Entity\AERPSalesBudgetsLines;
+use App\Modules\AERP\Entity\AERPSalesOrders;
+use App\Modules\AERP\Entity\AERPSalesOrdersLines;
 use App\Modules\AERP\Entity\AERPProducts;
 use App\Modules\AERP\Entity\AERPFinancialYears;
 use App\Modules\AERP\Reports\AERPSalesBudgetsReports;
@@ -32,7 +35,7 @@ use App\Modules\Security\Utils\SecurityUtils;
 class AERPSalesBudgetsController extends Controller
 {
 	private $module='AERP';
-	private $prefix='PED';
+	private $prefix='PRE';
 	private $class=AERPSalesBudgets::class;
 	private $classLines=AERPSalesBudgetsLines::class;
 	private $utilsClass=AERPSalesBudgetsUtils::class;
@@ -132,7 +135,9 @@ class AERPSalesBudgetsController extends Controller
 		$warnings=[];
 		//Check if the budget is expired
 		if($id!=0 && $document->getDateofferend()<new \Datetime())
-			array_push($warnings, "El periodo de validez del presupuesto ha expirado. Considere generar uno nuevo");
+			array_push($warnings, "El periodo de validez del presupuesto ha expirado. Considere generar uno nuevo.");
+		if($document->getInSalesOrder()!=null)
+			array_push($warnings, "Este presupuesto ya esta asociado al pedido número <a href='".$this->generateUrl("AERPSalesOrdersForm",["id"=>$document->getInSalesOrder()->getId()])."'>".$document->getInSalesOrder()->getCode()."</a>, puede editar este presupuesto haciendo click <a href=\"javascript:unlockFields();\">aquí</a> aunque se aconseja generar un nuevo presupuesto o editar directamente el pedido.");
 
 
 		$new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-plus"];
@@ -160,6 +165,7 @@ class AERPSalesBudgetsController extends Controller
 				'documentPrefix' => $this->prefix,
 				'document' => $document,
 				'documentLines' => $documentLines,
+				'documentReadonly' => $document->getInSalesOrder()!=null?true:false,
 				'errors' => $errors,
 				'warnings' => $warnings,
 				'token' => uniqid('sign_').time()
@@ -204,6 +210,7 @@ class AERPSalesBudgetsController extends Controller
 			$document=new AERPSalesBudgets();
 			$document->setNumber($documentRepository->getNextNum($this->getUser()->getCompany()->getId(),$config->getFinancialyear()->getId(),$serie->getId()));
 			$document->setCode($config->getFinancialyear()->getCode().$serie->getCode().str_pad($document->getNumber(), 6, '0', STR_PAD_LEFT));
+			$document->setFinancialyear($config->getFinancialyear());
 			$document->setAuthor($this->getUser());
 			$document->setAgent($this->getUser());
 			$document->setActive(1);
@@ -288,47 +295,143 @@ class AERPSalesBudgetsController extends Controller
 	}
 
 	/**
-	 * @Route("/{_locale}/AERP/salesbudgets/print/{id}", name="AERPSalesBudgetsPrint", defaults={"id"=0}))
+	 * @Route("/{_locale}/AERP/salesbudgets/document/{id}/{mode}", name="AERPSalesBudgetsPrint", defaults={"id"=0, "mode"="print"}))
 	 */
-	public function AERPSalesBudgetsPrint($id, RouterInterface $router,Request $request){
+	public function AERPSalesBudgetsPrint($id, $mode, RouterInterface $router,Request $request){
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-		$documentRepository=$this->getDoctrine()->getRepository(AERPSalesBudgets::class);
-		$documentLinesRepository=$this->getDoctrine()->getRepository(AERPSalesBudgetsLines::class);
+		$documentRepository=$this->getDoctrine()->getRepository($this->class);
+		$documentLinesRepository=$this->getDoctrine()->getRepository($this->classLines);
 		$configrepository=$this->getDoctrine()->getRepository(AERPConfiguration::class);
-
-		$document=$documentRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$id, "deleted"=>0]);
-
-		if(!$document) return new Response("");
+		$document=$documentRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "code"=>$id, "deleted"=>0]);
+		if(!$document) return new JsonResponse(["result"=>-1]);
 		$lines=$documentLinesRepository->findBy(["salesbudget"=>$document, "deleted"=>0, "active"=>1]);
 		$configuration=$configrepository->findOneBy(["company"=>$this->getUser()->getCompany()]);
-
-		$params=["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "id"=>$id, "user"=>$this->getUser(), "document"=>$document, "lines"=>$lines, "configuration"=>$configuration];
+		$params=["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "id"=>$document->getId(), "user"=>$this->getUser(), "document"=>$document, "lines"=>$lines, "configuration"=>$configuration];
 		$reportsUtils = new AERPSalesBudgetsReports();
-
-		$pdf=$reportsUtils->create($params);
-		return new Response("", 200, array('Content-Type' => 'application/pdf'));
+		switch($mode){
+			case "email":
+				$tempPath=$this->get('kernel')->getRootDir().DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$this->getUser()->getCompany()->getId().DIRECTORY_SEPARATOR.'temp'.DIRECTORY_SEPARATOR.$this->getUser()->getId().DIRECTORY_SEPARATOR.'Email'.DIRECTORY_SEPARATOR;
+				if (!file_exists($tempPath) && !is_dir($tempPath)) {
+						mkdir($tempPath, 0775, true);
+				}
+				$pdf=$reportsUtils->create($params,'F',$tempPath.$this->prefix.$document->getCode().'.pdf');
+				return new JsonResponse(["result"=>1]);
+			break;
+			case "temp":
+				$tempPath=$this->get('kernel')->getRootDir().DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$this->getUser()->getCompany()->getId().DIRECTORY_SEPARATOR.'temp'.DIRECTORY_SEPARATOR.$this->getUser()->getId().DIRECTORY_SEPARATOR.'Others'.DIRECTORY_SEPARATOR;
+				if (!file_exists($tempPath) && !is_dir($tempPath)) {
+						mkdir($tempPath, 0775, true);
+				}
+				$pdf=$reportsUtils->create($params,'F',$tempPath.$this->prefix.$document->getCode().'.pdf');
+				return new JsonResponse(["result"=>1]);
+			break;
+			case "download":
+				$pdf=$reportsUtils->create($params,'D',$this->prefix.$document->getCode().'.pdf');
+				return new JsonResponse(["result"=>1]);
+			break;
+			case "print":
+			case "default":
+				$pdf=$reportsUtils->create($params,'I',$this->prefix.$document->getCode().'.pdf');
+				return new JsonResponse(["result"=>1]);
+			break;
+		}
+		return new JsonResponse(["result"=>0]);
 	}
 
 	/**
-	 * @Route("/{_locale}/AERP/salesbudgets/send/{id}", name="AERPSalesBudgetsSend", defaults={"id"=0}))
+	 * @Route("/{_locale}/AERP/salesbudgets/createorder/{id}", name="AERPOrderFromSalesBudgets", defaults={"id"=0}))
 	 */
-	public function AERPSalesBudgetsSend($id, RouterInterface $router,Request $request){
+	public function AERPOrderFromSalesBudgets($id, RouterInterface $router,Request $request){
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		$documentRepository=$this->getDoctrine()->getRepository(AERPSalesBudgets::class);
 		$documentLinesRepository=$this->getDoctrine()->getRepository(AERPSalesBudgetsLines::class);
+		$orderRepository=$this->getDoctrine()->getRepository(AERPSalesOrders::class);
+		$orderLinesRepository=$this->getDoctrine()->getRepository(AERPSalesOrdersLines::class);
 		$configrepository=$this->getDoctrine()->getRepository(AERPConfiguration::class);
-  	$document=$documentRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$id, "deleted"=>0]);
+
+		$document=$documentRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$id, "deleted"=>0]);
 		if(!$document) return new Response("");
 		$lines=$documentLinesRepository->findBy(["salesbudget"=>$document, "deleted"=>0, "active"=>1]);
 		$configuration=$configrepository->findOneBy(["company"=>$this->getUser()->getCompany()]);
-		$params=["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "id"=>$id, "user"=>$this->getUser(), "document"=>$document, "lines"=>$lines, "configuration"=>$configuration];
-		$reportsUtils = new AERPSalesBudgetsReports();
-		$tempPath=$this->get('kernel')->getRootDir().DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$this->getUser()->getCompany()->getId().DIRECTORY_SEPARATOR.'temp'.DIRECTORY_SEPARATOR.$this->getUser()->getId().DIRECTORY_SEPARATOR.'Email'.DIRECTORY_SEPARATOR;
-		if (!file_exists($tempPath) && !is_dir($tempPath)) {
-				mkdir($tempPath, 0775, true);
+		if($document->getInSalesOrder()!=null) return new RedirectResponse($this->generateUrl('AERPSalesOrdersForm',["id"=>$document->getInSalesOrder()->getId()]));
+		//Create the order
+		$order=new AERPSalesOrders();
+		$order->setNumber($orderRepository->getNextNum($this->getUser()->getCompany()->getId(),$configuration->getFinancialyear()->getId(),$document->getSerie()->getId()));
+		$order->setCode($configuration->getFinancialyear()->getCode().$document->getSerie()->getCode().str_pad($order->getNumber(), 6, '0', STR_PAD_LEFT));
+		$order->setFinancialyear($configuration->getFinancialyear());
+		$order->setAuthor($this->getUser());
+		$order->setAgent($this->getUser());
+		$order->setActive(1);
+		$order->setDeleted(0);
+		$order->setDateadd(new \DateTime());
+		$order->setCompany($this->getUser()->getCompany());
+		$order->setCurrency($document->getCurrency());
+		$order->setPaymentmethod($document->getPaymentmethod());
+		$order->setSerie($document->getSerie());
+		$order->setCustomergroup($document->getCustomergroup());
+		$order->setCustomer($document->getCustomer());
+		$order->setVat($document->getVat());
+		$order->setCustomername($document->getCustomername());
+		$order->setCustomeraddress($document->getCustomeraddress());
+		$order->setCustomercountry($document->getCustomercountry());
+		$order->setCustomercity($document->getCustomercity());
+		$order->setCustomerstate($document->getCustomerstate());
+		$order->setCustomerpostcode($document->getCustomerpostcode());
+		$order->setCustomerpostbox($document->getCustomerpostbox());
+		$order->setCustomercode($document->getCustomerpostbox());
+		$order->setDate(new \DateTime());
+		$order->setTaxexempt($document->getTaxexempt());
+		$order->setSurcharge($document->getSurcharge());
+		$order->setIrpf($document->getIrpf());
+		$order->setIrpfperc($document->getIrpfperc());
+		$order->setTotalnet($document->getTotalnet());
+		$order->setTotalbase($document->getTotalbase());
+		$order->setTotaldto($document->getTotaldto());
+		$order->setTotaltax($document->getTotaltax());
+		$order->setTotalsurcharge($document->getTotalsurcharge());
+		$order->setTotalirpf($document->getTotalirpf());
+		$order->setTotal($document->getTotal());
+		$order->setObservations("");
+		$order->setNotes("");
+		$order->setDateupd(new \DateTime());
+		$this->getDoctrine()->getManager()->persist($order);
+		$this->getDoctrine()->getManager()->flush();
+
+		$document->setInSalesOrder($order);
+		$this->getDoctrine()->getManager()->persist($document);
+		$this->getDoctrine()->getManager()->flush();
+		//Create the lines
+		$linenum=1;
+		foreach ($lines as $key => $line) {
+			$orderLine=new AERPSalesOrdersLines();
+			$orderLine->setSalesorder($order);
+			$orderLine->setActive(1);
+			$orderLine->setDeleted(0);
+			$orderLine->setDateadd(new \DateTime());
+			$orderLine->setLinenum($linenum++);
+			$orderLine->setProduct($line->getProduct());
+			$orderLine->setCode($line->getCode());
+			$orderLine->setName($line->getName());
+			$orderLine->setUnitprice($line->getUnitprice());
+			$orderLine->setQuantity($line->getQuantity());
+			$orderLine->setDtoperc($line->getDtoperc());
+			$orderLine->setDtounit($line->getDtounit());
+			$orderLine->setTaxperc($line->getTaxperc());
+			$orderLine->setTaxunit($line->getTaxunit());
+			$orderLine->setIrpfperc($line->getIrpfperc());
+			$orderLine->setIrpfunit($line->getIrpfunit());
+			$orderLine->setSurchargeperc($line->getSurchargeperc());
+			$orderLine->setSurchargeunit($line->getSurchargeunit());
+			$orderLine->setSubtotal($line->getSubtotal());
+			$orderLine->setTotal($line->getTotal());
+			$orderLine->setActive(1);
+			$orderLine->setDeleted(0);
+			$orderLine->setDateupd(new \DateTime());
+			$this->getDoctrine()->getManager()->persist($orderLine);
+			$this->getDoctrine()->getManager()->flush();
 		}
-		$pdf=$reportsUtils->create($params,'F',$tempPath.$this->prefix.$document->getCode().'.pdf');
-		return new Response("", 200, array('Content-Type' => 'application/pdf'));
+
+		return new RedirectResponse($this->generateUrl('AERPSalesOrdersForm',["id"=>$order->getId()]));
 	}
 
 }

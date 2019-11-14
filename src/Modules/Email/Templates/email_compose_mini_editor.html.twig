@@ -118,14 +118,13 @@ function resetEmail(){
     $( "#form-send-mail" ).on( "submit", function( event ) {
       event.preventDefault();
       if((++load_wait)==1) $("#load-spinner").fadeIn();
-      data= $( this ).serialize()+"&text_content="+encodeURIComponent(wysihtml5Editor.value)+"&html_content="+encodeURIComponent(wysihtml5Editor.value)+"&files="+encodeURIComponent(JSON.stringify(jsonFiles)) ;
+      data=$( this ).serialize()+"&text_content="+encodeURIComponent(wysihtml5Editor.value)+"&html_content="+encodeURIComponent(wysihtml5Editor.value)+"&files="+encodeURIComponent(JSON.stringify(jsonFiles)) ;
       $.post('{{ url('emailSend') }}',data, function( data ){
         resetEmail();
         if(data.result)	toastr.success("El correo se ha enviado correctamente", "Confirmación", confirmation);
           else toastr.error("No se pudo enviar el correo", "Confirmación", confirmation);
       },'json').always(function() {
           if((--load_wait)==0) $("#load-spinner").fadeOut();
-
       });
     });
 

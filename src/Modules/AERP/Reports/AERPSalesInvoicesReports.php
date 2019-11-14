@@ -215,7 +215,7 @@ class AERPSalesInvoicesReports
     $this->pdf->setXY($x, $y);
   }
 
-  function create($params){
+  function create($params, $dest='I', $file=null){
     setlocale( LC_NUMERIC, 'es_ES' );
     $this->pdf  = new GlobaleReports();
     $this->pdf->AliasNbPages();
@@ -259,7 +259,7 @@ class AERPSalesInvoicesReports
       $this->pdf->setXY($this->positions[1],$this->cursor+5);
       $this->pdf->MultiCell($columns[1]["width"],5, utf8_decode($document->getNotes()), 0,'L',false);
 
-    return $this->pdf->Output('I', $document->getCode().".pdf");
+      return $this->pdf->Output($dest, $file==null?$document->getCode().".pdf":$file);
 
 }
 }
