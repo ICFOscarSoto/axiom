@@ -26,17 +26,20 @@ use App\Modules\ERP\Entity\ERPEAN13;
 use App\Modules\ERP\Entity\ERPAttributeNames;
 use App\Modules\ERP\Entity\ERPAttributesValues;
 use App\Modules\ERP\Entity\ERPProductsAttributes;
+use App\Modules\Security\Utils\SecurityUtils;
 use \DateTime;
 
 class NavisionController extends Controller
 {
   private $url="http://icf.edindns.es:9000/";
+  private $module="Navision";
 
   /**
    * @Route("/api/navision/invoices", name="navisionInvoices")
    */
    public function navisionInvoices(Request $request){
      $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+     if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
      $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
      $userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
      $start=new DateTime('first day of this month');
