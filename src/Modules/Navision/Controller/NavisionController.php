@@ -31,7 +31,7 @@ use \DateTime;
 
 class NavisionController extends Controller
 {
-  private $url="http://icf.edindns.es:9000/";
+  private $url="http://192.168.1.250:9000/";
   private $module="Navision";
 
   /**
