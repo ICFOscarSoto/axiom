@@ -182,7 +182,7 @@ class NavisionController extends Controller
       $pm->flush();
       } else $productEntity=$productExists;
 
-      if (isset($product["EAN13"])) {
+      if (isset($product["EAN13"]) and strlen($product["EAN13"][0]["EAN13"])<13) {
         $EAN13=$product["EAN13"];
         foreach ($EAN13 as $key){
             $repositoryEAN13=$this->getDoctrine()->getRepository(ERPEAN13::class);
@@ -202,7 +202,7 @@ class NavisionController extends Controller
         }
       }
 
-      if (isset($product["atributos"])) {
+    /*  if (isset($product["atributos"])) {
         $attributes=$product["atributos"];
         foreach ($attributes as $key){
             $repositoryAttribute=$this->getDoctrine()->getRepository(ERPProductsAttributes::class);
@@ -226,7 +226,7 @@ class NavisionController extends Controller
             $pm->flush();
           }
         }
-      }
+      } */
 
 
 
