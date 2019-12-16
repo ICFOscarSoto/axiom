@@ -141,6 +141,17 @@ class HRClocksReports
       $this->pdf->Cell(60,6,utf8_decode("Total horas trabajadas: "),1,0,'R',true);
       $this->pdf->Cell(30,6,utf8_decode($this->secToH($totalTime)),1,0,'R',false);
       $this->pdf->Cell(80,6,"",'T');
+      $this->pdf->Ln(6);
+      $this->pdf->Cell(20,6,"",1,0,'L',true);
+      $this->pdf->Cell(60,6,utf8_decode("Dias trabajados: "),1,0,'R',true);
+      $workedDays=$clocksRepository->daysWorked($this->worker, $params["month"], $params['year']);
+      ob_start();
+      var_dump($this->worker->getId());
+      $result = ob_get_clean();
+      //dump($workedDays);
+      $this->pdf->Cell(30,6,utf8_decode(count($workedDays)),1,0,'R',false);
+      $this->pdf->Cell(80,6,"",'T');
+
       $this->pdf->Ln(26);
       $this->pdf->Cell(95,6,utf8_decode("Firmado la Empresa"),0,0,'C',false);
       $this->pdf->Cell(95,6,utf8_decode("Firmado el Trabajador"),0,0,'C',false);

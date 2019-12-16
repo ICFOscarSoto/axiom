@@ -142,6 +142,13 @@ class HRClocksRepository extends ServiceEntityRepository
       return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
     }
 
+    public function daysWorked($worker, $month, $year){
+
+      $query="SELECT start FROM hrclocks WHERE worker_id = :worker AND MONTH(START)=:month AND YEAR(START)=:year AND deleted=0 AND active=1 AND invalid<>1 GROUP BY DAY(start)";
+      $params=['worker' => $worker->getId(), 'month' => $month, 'year' => $year];
+      return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+    }
+
     /*
     public function findOneBySomeField($value): ?HRClocks
     {

@@ -91,6 +91,7 @@ Repeat Password: Repetir password
 Email: Email
 Edit profile: Editar perfil
 Select users: Seleccione un usuario
+Select a usergroup: Seleccione un grupo
 Usergroup: Grupo
 usergroup: Grupo Usuarios
 user: Usuario
@@ -463,8 +464,10 @@ Sales: Ventas
 Purchases: Compras
 Budgets: Presupuestos
 Orders: Pedidos
+SalesOrders: Pedidos
 DeliveryNotes: Albaranes
 Invoices: Facturas
+SalesInvoices: Facturas
 Customer: Cliente
 Search: Buscar
 Manufacturers: Fabricantes
