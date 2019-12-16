@@ -12,11 +12,11 @@ use App\Modules\Globale\Utils\ListUtils;
 
 class HRWorkCalendarsUtils extends Controller
 {
-  public function formatList($user){
+  public function formatList($user, $id){
     $list=[
       'id' => 'listWorkCalendars',
       'route' => 'workcalendarslist',
-      'routeParams' => ["id" => $user->getId()],
+      'routeParams' => ["id" => $id],
       'orderColumn' => 1,
       'orderDirection' => 'ASC',
       'tagColumn' => 1,
