@@ -1,0 +1,29 @@
+[{
+    "sections": [
+        {
+            "name": "data",
+            "fields": [
+                {
+                    "name": "date",
+                    "cols": 4
+                },
+                {
+                    "name": "amount",
+                    "cols": 4
+                },
+                {
+                    "name": "remainingamount",
+                    "cols": 4
+                },
+                {
+                    "name": "active",
+                    "cols": 4
+                },
+                {
+                    "name": "invoice",
+                    "cols": 4
+                }
+            ]
+        }
+    ]
+}]

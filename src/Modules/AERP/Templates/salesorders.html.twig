@@ -32,8 +32,10 @@
 						{% if userData.modules.Email is defined %}
 						<button id="document-button-email" type="button" class="btn btn-default btn-icon icon-left">Enviar<i class="fa fa-envelope"></i></button>
 						{% endif %}
-						<button id="document-button-makedeliverynote" type="button" class="btn btn-default btn-icon icon-left">A Albarán<i class="fa fa-file"></i></button>
-						<button id="document-button-makeinvoice" type="button" class="btn btn-default btn-icon icon-left">A Factura<i class="fa fa-file"></i></button>
+						{% if document.inSalesInvoice is null %}
+							<button id="document-button-makedeliverynote" type="button" class="btn btn-default btn-icon icon-left">A Albarán<i class="fa fa-file"></i></button>
+							<button id="document-button-makeinvoice" type="button" class="btn btn-default btn-icon icon-left">A Factura<i class="fa fa-file"></i></button>
+						{% endif %}
 					</div>
 					{% endif %}
 				</div>
@@ -96,7 +98,7 @@
 						    title: 'Crear factura',
 						    content: '¿Esta seguro que desea facturar este pedido?',
 						    buttons: {
-									 confirm: { text: 'Confirmar', btnClass: 'btn-red', action: function(){ window.location.href='{{ url('AERPOrderFromSalesBudgets',{"id": document.id}) }}' ;} },
+									 confirm: { text: 'Confirmar', btnClass: 'btn-red', action: function(){ window.location.href='{{ url('AERPInvoiceFromSalesOrders',{"id": document.id}) }}' ;} },
 						       cancel: { text: 'Cancelar' }
 						    }
 						});

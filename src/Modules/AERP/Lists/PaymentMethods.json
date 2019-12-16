@@ -25,24 +25,9 @@
         "name": "domiciled",
         "caption": "Domiciled",
         "replace":{
-           "0":{"text":"Sí","html":"Sí"},
-           "1":{"text":"No","html":"No"}
+           "1":{"text":"Sí","html":"Sí"},
+           "0":{"text":"No","html":"No"}
          }
-    },
-    {
-        "name": "active",
-        "caption": "Estado",
-        "width": "10%",
-        "class": "dt-center",
-        "replace": {
-            "1": {
-                "text": "Activo",
-                "html": "<div style=\"min-width: 75px;\" class=\"label label-success\">Activo<\/div>"
-            },
-            "0": {
-                "text": "Desactivado",
-                "html": "<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado<\/div>"
-            }
-        }
     }
+
 ]

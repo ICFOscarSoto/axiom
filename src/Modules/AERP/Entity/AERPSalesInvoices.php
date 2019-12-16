@@ -2,6 +2,8 @@
 
 namespace App\Modules\AERP\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
 use \App\Modules\Globale\Entity\GlobaleUsers;
@@ -224,6 +226,22 @@ class AERPSalesInvoices
      * @ORM\Column(type="text", nullable=true)
      */
     private $notes;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Modules\AERP\Entity\AERPSalesOrders", mappedBy="inSalesInvoice")
+     */
+    private $salesInvoices;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Modules\AERP\Entity\AERPInvoiceDues", mappedBy="invoice")
+     */
+    private $invoiceDues;
+
+    public function __construct()
+    {
+        $this->salesInvoices = new ArrayCollection();
+        $this->invoiceDues = new ArrayCollection();
+    }
 
 
     public function getId(): ?int
@@ -695,6 +713,68 @@ class AERPSalesInvoices
     public function setNotes(?string $notes): self
     {
         $this->notes = $notes;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|AERPSalesOrders[]
+     */
+    public function getSalesInvoices(): Collection
+    {
+        return $this->salesInvoices;
+    }
+
+    public function addSalesInvoice(AERPSalesOrders $salesInvoice): self
+    {
+        if (!$this->salesInvoices->contains($salesInvoice)) {
+            $this->salesInvoices[] = $salesInvoice;
+            $salesInvoice->setInSalesInvoice($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSalesInvoice(AERPSalesOrders $salesInvoice): self
+    {
+        if ($this->salesInvoices->contains($salesInvoice)) {
+            $this->salesInvoices->removeElement($salesInvoice);
+            // set the owning side to null (unless already changed)
+            if ($salesInvoice->getInSalesInvoice() === $this) {
+                $salesInvoice->setInSalesInvoice(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|AERPInvoiceDues[]
+     */
+    public function getInvoiceDues(): Collection
+    {
+        return $this->invoiceDues;
+    }
+
+    public function addInvoiceDue(AERPInvoiceDues $invoiceDue): self
+    {
+        if (!$this->invoiceDues->contains($invoiceDue)) {
+            $this->invoiceDues[] = $invoiceDue;
+            $invoiceDue->setInvoice($this);
+        }
+
+        return $this;
+    }
+
+    public function removeInvoiceDue(AERPInvoiceDues $invoiceDue): self
+    {
+        if ($this->invoiceDues->contains($invoiceDue)) {
+            $this->invoiceDues->removeElement($invoiceDue);
+            // set the owning side to null (unless already changed)
+            if ($invoiceDue->getInvoice() === $this) {
+                $invoiceDue->setInvoice(null);
+            }
+        }
 
         return $this;
     }

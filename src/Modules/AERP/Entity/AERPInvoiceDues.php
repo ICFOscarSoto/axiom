@@ -4,11 +4,12 @@ namespace App\Modules\AERP\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
+use \App\Modules\AERP\Entity\AERPSalesInvoices;
 
 /**
- * @ORM\Entity(repositoryClass="App\Modules\AERP\Repository\AERPPaymentMethodsRepository")
+ * @ORM\Entity(repositoryClass="App\Repository\Modules\AERP\Entity\AERPInvoiceDuesRepository")
  */
-class AERPPaymentMethods
+class AERPInvoiceDues
 {
     /**
      * @ORM\Id()
@@ -24,24 +25,25 @@ class AERPPaymentMethods
     private $company;
 
     /**
-     * @ORM\Column(type="string", length=120)
+     * @ORM\ManyToOne(targetEntity="\App\Modules\AERP\Entity\AERPSalesInvoices", inversedBy="invoiceDues")
+     * @ORM\JoinColumn(nullable=false)
      */
-    private $name;
+    private $invoice;
 
     /**
-     * @ORM\Column(type="string", length=120)
+     * @ORM\Column(type="datetime")
      */
-    private $expiration;
+    private $date;
 
     /**
-     * @ORM\Column(type="smallint")
+     * @ORM\Column(type="float")
      */
-    private $type;
+    private $amount;
 
     /**
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(type="float")
      */
-    private $domiciled;
+    private $remainingamount;
 
     /**
      * @ORM\Column(type="datetime")
@@ -80,50 +82,50 @@ class AERPPaymentMethods
         return $this;
     }
 
-    public function getName(): ?string
+    public function getInvoice(): ?AERPSalesInvoices
     {
-        return $this->name;
+        return $this->invoice;
     }
 
-    public function setName(string $name): self
+    public function setInvoice(?AERPSalesInvoices $invoice): self
     {
-        $this->name = $name;
+        $this->invoice = $invoice;
 
         return $this;
     }
 
-    public function getExpiration(): ?string
+    public function getDate(): ?\DateTimeInterface
     {
-        return $this->expiration;
+        return $this->date;
     }
 
-    public function setExpiration(string $expiration): self
+    public function setDate(\DateTimeInterface $date): self
     {
-        $this->expiration = $expiration;
+        $this->date = $date;
 
         return $this;
     }
 
-    public function getType(): ?int
+    public function getAmount(): ?float
     {
-        return $this->type;
+        return $this->amount;
     }
 
-    public function setType(int $type): self
+    public function setAmount(float $amount): self
     {
-        $this->type = $type;
+        $this->amount = $amount;
 
         return $this;
     }
 
-    public function getDomiciled(): ?bool
+    public function getRemainingamount(): ?float
     {
-        return $this->domiciled;
+        return $this->remainingamount;
     }
 
-    public function setDomiciled(bool $domiciled): self
+    public function setRemainingamount(float $remainingamount): self
     {
-        $this->domiciled = $domiciled;
+        $this->remainingamount = $remainingamount;
 
         return $this;
     }
@@ -174,10 +176,5 @@ class AERPPaymentMethods
         $this->deleted = $deleted;
 
         return $this;
-    }
-
-    public function preProccess($kernel, $doctrine, $user){
-      //Allow only numbers and commas
-      $this->expiration=preg_replace('#[^0-9\,]#', '', $this->expiration);
     }
 }

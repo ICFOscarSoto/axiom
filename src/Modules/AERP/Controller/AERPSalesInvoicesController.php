@@ -202,15 +202,16 @@ class AERPSalesInvoicesController extends Controller
 			$document->setFinancialyear($config->getFinancialyear());
 			$document->setAuthor($this->getUser());
 			$document->setAgent($this->getUser());
+			$document->setSerie($serie);
+			$document->setDate($date);
+			$document->setPaymentmethod($paymentmethod);
+			$document->setFinancialyear($config->getFinancialyear());
 			$document->setActive(1);
 			$document->setDeleted(0);
 			$document->setDateadd(new \DateTime());
 		}
 		$document->setCompany($this->getUser()->getCompany());
 		$document->setCurrency($this->getUser()->getCompany()->getCurrency());
-		$document->setPaymentmethod($paymentmethod);
-		$document->setSerie($serie);
-		$document->setFinancialyear($config->getFinancialyear());
 		$document->setCustomergroup($customergroup);
 		$document->setCustomer($customer);
 		$document->setVat($customer->getVat());
@@ -222,7 +223,6 @@ class AERPSalesInvoicesController extends Controller
 		$document->setCustomerpostcode($customer->getPostcode());
 		$document->setCustomerpostbox($customer->getPostbox());
 		$document->setCustomercode($fields->customercode);
-		$document->setDate($date);
 		$document->setTaxexempt(($fields->taxexempt!="")?filter_var($fields->taxexempt, FILTER_VALIDATE_BOOLEAN):0);
 		$document->setSurcharge(($fields->surcharge!="")?filter_var($fields->surcharge, FILTER_VALIDATE_BOOLEAN):0);
 		$document->setIrpf(($fields->irpf!="")?filter_var($fields->irpf, FILTER_VALIDATE_BOOLEAN):0);

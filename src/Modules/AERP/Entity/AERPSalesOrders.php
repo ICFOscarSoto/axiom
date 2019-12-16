@@ -14,6 +14,7 @@ use \App\Modules\AERP\Entity\AERPPaymentMethods;
 use \App\Modules\AERP\Entity\AERPSeries;
 use \App\Modules\Globale\Entity\GlobaleCountries;
 use \App\Modules\AERP\Entity\AERPCustomerGroups;
+use \App\Modules\AERP\Entity\AERPSalesInvoices;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\AERP\Repository\AERPSalesOrdersRepository")
@@ -231,6 +232,11 @@ class AERPSalesOrders
      * @ORM\OneToMany(targetEntity="App\Modules\AERP\Entity\AERPSalesBudgets", mappedBy="inSalesOrder")
      */
     private $salesBudgets;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\AERP\Entity\AERPSalesInvoices", inversedBy="salesInvoices")
+     */
+    private $inSalesInvoice;
 
     public function __construct()
     {
@@ -738,6 +744,18 @@ class AERPSalesOrders
                 $salesBudget->setInSalesOrder(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getInSalesInvoice(): ?AERPSalesInvoices
+    {
+        return $this->inSalesInvoice;
+    }
+
+    public function setInSalesInvoice(?AERPSalesInvoices $inSalesInvoice): self
+    {
+        $this->inSalesInvoice = $inSalesInvoice;
 
         return $this;
     }

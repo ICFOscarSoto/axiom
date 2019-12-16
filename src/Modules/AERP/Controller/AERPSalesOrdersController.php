@@ -6,6 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -20,6 +21,9 @@ use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\AERP\Utils\AERPSalesOrdersUtils;
 use App\Modules\AERP\Entity\AERPConfiguration;
 use App\Modules\AERP\Entity\AERPPaymentMethods;
+use App\Modules\AERP\Entity\AERPSalesInvoices;
+use App\Modules\AERP\Entity\AERPSalesInvoicesLines;
+use App\Modules\AERP\Entity\AERPInvoiceDuesUtils;
 use App\Modules\AERP\Entity\AERPSeries;
 use App\Modules\AERP\Entity\AERPCustomerGroups;
 use App\Modules\AERP\Entity\AERPSalesOrders;
@@ -128,9 +132,9 @@ class AERPSalesOrdersController extends Controller
 		//Check if the financialyear is open
 		if($id==0 && ($config->getFinancialyear()==null || $config->getFinancialyear()->getStatus()==0))
 			array_push($errors, "Debe existir un ejercicio fiscal abierto. Puede crear o abrir uno en el menu <a target='_blank' href='".$this->generateUrl("genericindex",["module"=>"AERP", "name"=>"FinancialYears"])."'>\"Ejercicios Fiscales\"</a>, también tiene que estar establecido como el ejercicio en uso en la <a target='_blank' href='".$this->generateUrl("mycompany")."?tab=AERP'>\"configuración del módulo\"</a>.");
-
 		$warnings=[];
-
+		if($document->getInSalesInvoice()!=null)
+			array_push($warnings, "Este pedido se encuentra en factura número <a href='".$this->generateUrl("AERPSalesInvoicesForm",["id"=>$document->getInSalesInvoice()->getId()])."'>".$document->getInSalesInvoice()->getCode()."</a> y ya no puede ser editado.");
 
 		$new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-plus"];
 		$breadcrumb=$menurepository->formatBreadcrumb('genericindex','AERP','SalesOrders');
@@ -156,7 +160,7 @@ class AERPSalesOrdersController extends Controller
 				'documentPrefix' => $this->prefix,
 				'document' => $document,
 				'documentLines' => $documentLines,
-				'documentReadonly' => false,
+				'documentReadonly' => $document->getInSalesInvoice()!=null?true:false,
 				'errors' => $errors,
 				'warnings' => $warnings,
 				'token' => uniqid('sign_').time()
@@ -204,6 +208,7 @@ class AERPSalesOrdersController extends Controller
 			$document->setFinancialyear($config->getFinancialyear());
 			$document->setAuthor($this->getUser());
 			$document->setAgent($this->getUser());
+			$document->setSerie($serie);
 			$document->setActive(1);
 			$document->setDeleted(0);
 			$document->setDateadd(new \DateTime());
@@ -211,7 +216,6 @@ class AERPSalesOrdersController extends Controller
 		$document->setCompany($this->getUser()->getCompany());
 		$document->setCurrency($this->getUser()->getCompany()->getCurrency());
 		$document->setPaymentmethod($paymentmethod);
-		$document->setSerie($serie);
 		$document->setCustomergroup($customergroup);
 		$document->setCustomer($customer);
 		$document->setVat($customer->getVat());
@@ -326,6 +330,107 @@ class AERPSalesOrdersController extends Controller
 			break;
 		}
 		return new JsonResponse(["result"=>0]);
+	}
+
+	/**
+	 * @Route("/{_locale}/AERP/salesorders/createinvoice/{id}", name="AERPInvoiceFromSalesOrders", defaults={"id"=0}))
+	 */
+	public function AERPInvoiceFromSalesOrders($id, RouterInterface $router,Request $request){
+		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		$documentRepository=$this->getDoctrine()->getRepository($this->class);
+		$documentLinesRepository=$this->getDoctrine()->getRepository($this->classLines);
+		$newDocumentClass=AERPSalesInvoices::class;
+		$newDocumentLinesClass=AERPSalesInvoicesLines::class;
+		$newDocumentRepository=$this->getDoctrine()->getRepository($newDocumentClass);
+		$newDocumentLinesRepository=$this->getDoctrine()->getRepository($newDocumentLinesClass);
+		$configrepository=$this->getDoctrine()->getRepository(AERPConfiguration::class);
+
+		$document=$documentRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$id, "deleted"=>0]);
+		if(!$document) return new Response("");
+		$lines=$documentLinesRepository->findBy(["salesorder"=>$document, "deleted"=>0, "active"=>1]);
+		$configuration=$configrepository->findOneBy(["company"=>$this->getUser()->getCompany()]);
+		if($document->getInSalesInvoice()!=null) return new RedirectResponse($this->generateUrl('AERPSalesInvoicesForm',["id"=>$document->getInSalesInvoice()->getId()]));
+		//Create the order
+		$newDocument=new $newDocumentClass();
+		$newDocument->setNumber($newDocumentRepository->getNextNum($this->getUser()->getCompany()->getId(),$configuration->getFinancialyear()->getId(),$document->getSerie()->getId()));
+		$newDocument->setCode($configuration->getFinancialyear()->getCode().$document->getSerie()->getCode().str_pad($newDocument->getNumber(), 6, '0', STR_PAD_LEFT));
+		$newDocument->setFinancialyear($configuration->getFinancialyear());
+		$newDocument->setAuthor($this->getUser());
+		$newDocument->setAgent($this->getUser());
+		$newDocument->setActive(1);
+		$newDocument->setDeleted(0);
+		$newDocument->setDateadd(new \DateTime());
+		$newDocument->setCompany($this->getUser()->getCompany());
+		$newDocument->setCurrency($document->getCurrency());
+		$newDocument->setPaymentmethod($document->getPaymentmethod());
+		$newDocument->setSerie($document->getSerie());
+		$newDocument->setCustomergroup($document->getCustomergroup());
+		$newDocument->setCustomer($document->getCustomer());
+		$newDocument->setVat($document->getVat());
+		$newDocument->setCustomername($document->getCustomername());
+		$newDocument->setCustomeraddress($document->getCustomeraddress());
+		$newDocument->setCustomercountry($document->getCustomercountry());
+		$newDocument->setCustomercity($document->getCustomercity());
+		$newDocument->setCustomerstate($document->getCustomerstate());
+		$newDocument->setCustomerpostcode($document->getCustomerpostcode());
+		$newDocument->setCustomerpostbox($document->getCustomerpostbox());
+		$newDocument->setCustomercode($document->getCustomerpostbox());
+		$newDocument->setDate(new \DateTime());
+		$newDocument->setTaxexempt($document->getTaxexempt());
+		$newDocument->setSurcharge($document->getSurcharge());
+		$newDocument->setIrpf($document->getIrpf());
+		$newDocument->setIrpfperc($document->getIrpfperc());
+		$newDocument->setTotalnet($document->getTotalnet());
+		$newDocument->setTotalbase($document->getTotalbase());
+		$newDocument->setTotaldto($document->getTotaldto());
+		$newDocument->setTotaltax($document->getTotaltax());
+		$newDocument->setTotalsurcharge($document->getTotalsurcharge());
+		$newDocument->setTotalirpf($document->getTotalirpf());
+		$newDocument->setTotal($document->getTotal());
+		$newDocument->setObservations("");
+		$newDocument->setNotes("");
+		$newDocument->setDateupd(new \DateTime());
+		$this->getDoctrine()->getManager()->persist($newDocument);
+		$this->getDoctrine()->getManager()->flush();
+
+		$document->setInSalesInvoice($newDocument);
+		$this->getDoctrine()->getManager()->persist($document);
+		$this->getDoctrine()->getManager()->flush();
+		//Create the lines
+		$linenum=1;
+		foreach ($lines as $key => $line) {
+			$newDocumentLine=new $newDocumentLinesClass();
+			$newDocumentLine->setSalesinvoice($newDocument);
+			$newDocumentLine->setActive(1);
+			$newDocumentLine->setDeleted(0);
+			$newDocumentLine->setDateadd(new \DateTime());
+			$newDocumentLine->setLinenum($linenum++);
+			$newDocumentLine->setProduct($line->getProduct());
+			$newDocumentLine->setCode($line->getCode());
+			$newDocumentLine->setName($line->getName());
+			$newDocumentLine->setUnitprice($line->getUnitprice());
+			$newDocumentLine->setQuantity($line->getQuantity());
+			$newDocumentLine->setDtoperc($line->getDtoperc());
+			$newDocumentLine->setDtounit($line->getDtounit());
+			$newDocumentLine->setTaxperc($line->getTaxperc());
+			$newDocumentLine->setTaxunit($line->getTaxunit());
+			$newDocumentLine->setIrpfperc($line->getIrpfperc());
+			$newDocumentLine->setIrpfunit($line->getIrpfunit());
+			$newDocumentLine->setSurchargeperc($line->getSurchargeperc());
+			$newDocumentLine->setSurchargeunit($line->getSurchargeunit());
+			$newDocumentLine->setSubtotal($line->getSubtotal());
+			$newDocumentLine->setTotal($line->getTotal());
+			$newDocumentLine->setActive(1);
+			$newDocumentLine->setDeleted(0);
+			$newDocumentLine->setDateupd(new \DateTime());
+			$this->getDoctrine()->getManager()->persist($newDocumentLine);
+			$this->getDoctrine()->getManager()->flush();
+		}
+
+		//Generate payments dues
+		AERPInvoiceDuesUtils::calculateInvoiceDues($this->getUser(), $this->getDoctrine(), $newDocument);
+
+		return new RedirectResponse($this->generateUrl('AERPSalesInvoicesForm',["id"=>$newDocument->getId()]));
 	}
 
 }
