@@ -34,6 +34,7 @@ use App\Modules\Globale\Config\GlobaleConfigVars;
 use App\Modules\Globale\Controller\GlobaleFirebaseDevicesController;
 use App\Modules\Globale\Entity\GlobaleHistories;
 use App\Modules\Security\Utils\SecurityUtils;
+use App\Modules\Cloud\Utils\CloudFilesUtils;
 
 class HRClocksController extends Controller
 {
@@ -46,6 +47,7 @@ class HRClocksController extends Controller
      */
      public function clocks(RouterInterface $router,Request $request){
      $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		 if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
      $userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
      $locale = $request->getLocale();
      $this->router = $router;
@@ -387,8 +389,13 @@ class HRClocksController extends Controller
 						$utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(), method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[], null, [], [], [], false);
 			else $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(), method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[], null, [], [], [], true);
 
-
-			return $utils->make($id, $this->class, $action, "formworker", "modal");
+			//-----------------   CLOUD ----------------------
+			$utilsCloud = new CloudFilesUtils();
+			$path="HRClocks";
+			$templateLists=["id"=>$path,"list"=>[$utilsCloud->formatList($this->getUser(),$path,$id)],"path"=>$this->generateUrl("cloudUpload",["id"=>$id, "path"=>$path])];
+			//------------------------------------------------
+			return $utils->make($id, $this->class, $action, "formworker", "modal", "@Globale/form.html.twig", null, null, ["filesHRClocks"=>["template"=>"@Cloud/genericlistfiles.html.twig", "vars"=>["cloudConstructor"=>$templateLists]]]);
+			//return $utils->make($id, $this->class, $action, "formworker", "modal");
 		}
 
 		/**

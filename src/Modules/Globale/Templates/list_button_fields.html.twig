@@ -10,7 +10,12 @@
             $('body').on('click', "[id^='{{ listConstructor.id }}-field-button-{{ fieldOption.id }}']", function() {
               url=$("#{{ listConstructor.id }}-field-button-{{ fieldOption.id }}-url").val();
               url=url.replace('_____',$(this).attr('attr-id'));
-              window.location.href=url;
+              {% if field.target is not defined or field.target == "_self" %}
+                  window.location.href=url;
+              {% else %}
+                  var win = window.open(url, '{{ field.target }}');
+                  win.focus();
+              {% endif %}
             });
             {% else %}
             {% endif %}
@@ -46,7 +51,12 @@
             $('body').on('click', "[id^='{{ listConstructor.id }}-field-button-{{ field.id }}']", function() {
               url=$("#{{ listConstructor.id }}-field-button-{{ field.id }}-url").val();
               url=url.replace('_____',$(this).attr('attr-id'));
-              window.location.href=url;
+              {% if field.target is not defined or field.target == "_self" %}
+                  window.location.href=url;
+              {% else %}
+                  var win = window.open(url, '{{ field.target }}');
+                  win.focus();
+              {% endif %}
             });
             {% else %}
             {% endif %}
