@@ -13,6 +13,8 @@ use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\AERP\Entity\AERPCustomers;
 use App\Modules\AERP\Entity\AERPCustomerGroups;
 use App\Modules\Globale\Entity\GlobaleCountries;
+use App\Modules\Globale\Entity\GlobaleStates;
+use App\Modules\Globale\Entity\GlobaleCurrencies;
 use App\Modules\Globale\Entity\GlobaleCompanies;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
@@ -20,6 +22,7 @@ use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\AERP\Utils\AERPCustomersUtils;
 use App\Modules\ERP\Reports\ERPInvoiceReports;
 use App\Modules\ERP\Entity\ERPProducts;
+use App\Modules\ERP\Entity\ERPPaymentMethods;
 use App\Modules\ERP\Entity\ERPCategories;
 use App\Modules\ERP\Entity\ERPSuppliers;
 use App\Modules\ERP\Entity\ERPEAN13;
@@ -102,6 +105,9 @@ class NavisionController extends Controller
       }
       return new Response(null);
     }
+
+
+
 
 
     /**
@@ -232,4 +238,60 @@ class NavisionController extends Controller
 
       return new Response("El producto se ha importado correctamente");
     }
+
+
+
+    /**
+     * @Route("/api/navision/supplier/import", name="navisionImportSupplier")
+     */
+     public function navisionImportSupplier(Request $request){
+       $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+       $json=file_get_contents($this->url.'navisionExport/do-NAVISION-getSuppliers.php');
+       $objects=json_decode($json, true);
+       $objects=$objects[0];
+       //dump($products["products"]);
+       $repositoryCountries=$this->getDoctrine()->getRepository(GlobaleCountries::class);
+       $repositoryCurrencies=$this->getDoctrine()->getRepository(GlobaleCurrencies::class);
+       $repositoryPaymentMethod=$this->getDoctrine()->getRepository(ERPPaymentMethods::class);
+       $repositoryStates=$this->getDoctrine()->getRepository(GlobaleStates::class);
+       $repository=$this->getDoctrine()->getRepository(ERPSuppliers::class);
+       foreach ($objects["class"] as $key=>$object){
+
+         if($object["vat"]==null) continue;
+
+
+         $supplier=$repository->findOneBy(["code"=>$object["code"]]);
+         if ($supplier==null) {
+           $supplier=new ERPSuppliers();
+           $supplier->setCode($object["code"]);
+           $supplier->setCompany($this->getUser()->getCompany());
+           $supplier->setDateadd(new \Datetime());
+           $supplier->setDateupd(new \Datetime());
+           $supplier->setDeleted(0);
+           $supplier->setActive(1);
+         }
+          $country=$repositoryCountries->findOneBy(["alfa2"=>$object["country"]]);
+          $state=$repositoryStates->findOneBy(["name"=>$object["state"]]);
+          $currency=$repositoryCurrencies->findOneBy(["isocode"=>"EUR"]);
+          $paymentMethod=$repositoryPaymentMethod->findOneBy(["id"=>1]);
+          $supplier->setVat($object["vat"]);
+          $supplier->setName($object["name"]);
+          $supplier->setSocialname($object["socialname"]);
+          $supplier->setAddress(rtrim($object["address1"]." ".$object["address2"]));
+          $supplier->setCity($object["city"]);
+          $supplier->setPostcode($object["postcode"]);
+          $supplier->setPhone($object["phone"]);
+          $supplier->setWeb($object["web"]);
+          $supplier->setEmail($object["email"]);
+          $supplier->setCountry($country);
+          $supplier->setState($state);
+          $supplier->setCurrency($currency);
+          $supplier->setPaymentMethod($paymentMethod);
+          $this->getDoctrine()->getManager()->persist($supplier);
+          $this->getDoctrine()->getManager()->flush();
+
+
+       }
+       return new Response(null);
+     }
 }
