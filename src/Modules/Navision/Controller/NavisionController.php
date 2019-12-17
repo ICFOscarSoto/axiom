@@ -25,6 +25,7 @@ use App\Modules\ERP\Entity\ERPProducts;
 use App\Modules\ERP\Entity\ERPPaymentMethods;
 use App\Modules\ERP\Entity\ERPCategories;
 use App\Modules\ERP\Entity\ERPSuppliers;
+use App\Modules\ERP\Entity\ERPCustomers;
 use App\Modules\ERP\Entity\ERPEAN13;
 use App\Modules\ERP\Entity\ERPAttributeNames;
 use App\Modules\ERP\Entity\ERPAttributesValues;
@@ -245,7 +246,7 @@ class NavisionController extends Controller
      * @Route("/api/navision/supplier/import", name="navisionImportSupplier")
      */
      public function navisionImportSupplier(Request $request){
-       $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+       //$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
        $json=file_get_contents($this->url.'navisionExport/do-NAVISION-getSuppliers.php');
        $objects=json_decode($json, true);
        $objects=$objects[0];
@@ -260,38 +261,92 @@ class NavisionController extends Controller
          if($object["vat"]==null) continue;
 
 
-         $supplier=$repository->findOneBy(["code"=>$object["code"]]);
-         if ($supplier==null) {
-           $supplier=new ERPSuppliers();
-           $supplier->setCode($object["code"]);
-           $supplier->setCompany($this->getUser()->getCompany());
-           $supplier->setDateadd(new \Datetime());
-           $supplier->setDateupd(new \Datetime());
-           $supplier->setDeleted(0);
-           $supplier->setActive(1);
+         $obj=$repository->findOneBy(["code"=>$object["code"]]);
+         if ($obj==null) {
+           $obj=new ERPSuppliers();
+           $obj->setCode($object["code"]);
+           $obj->setCompany($this->getUser()->getCompany());
+           $obj->setDateadd(new \Datetime());
+           $obj->setDateupd(new \Datetime());
+           $obj->setDeleted(0);
+           $obj->setActive(1);
          }
           $country=$repositoryCountries->findOneBy(["alfa2"=>$object["country"]]);
           $state=$repositoryStates->findOneBy(["name"=>$object["state"]]);
           $currency=$repositoryCurrencies->findOneBy(["isocode"=>"EUR"]);
           $paymentMethod=$repositoryPaymentMethod->findOneBy(["id"=>1]);
-          $supplier->setVat($object["vat"]);
-          $supplier->setName($object["name"]);
-          $supplier->setSocialname($object["socialname"]);
-          $supplier->setAddress(rtrim($object["address1"]." ".$object["address2"]));
-          $supplier->setCity($object["city"]);
-          $supplier->setPostcode($object["postcode"]);
-          $supplier->setPhone($object["phone"]);
-          $supplier->setWeb($object["web"]);
-          $supplier->setEmail($object["email"]);
-          $supplier->setCountry($country);
-          $supplier->setState($state);
-          $supplier->setCurrency($currency);
-          $supplier->setPaymentMethod($paymentMethod);
-          $this->getDoctrine()->getManager()->persist($supplier);
+          $obj->setVat($object["vat"]);
+          $obj->setName($object["name"]);
+          $obj->setSocialname($object["socialname"]);
+          $obj->setAddress(rtrim($object["address1"]." ".$object["address2"]));
+          $obj->setCity($object["city"]);
+          $obj->setPostcode($object["postcode"]);
+          $obj->setPhone($object["phone"]);
+          $obj->setWeb($object["web"]);
+          $obj->setEmail($object["email"]);
+          $obj->setCountry($country);
+          $obj->setState($state);
+          $obj->setCurrency($currency);
+          $obj->setPaymentMethod($paymentMethod);
+          $this->getDoctrine()->getManager()->persist($obj);
           $this->getDoctrine()->getManager()->flush();
 
 
        }
        return new Response(null);
      }
+
+     /**
+      * @Route("/api/navision/customer/import", name="navisionImportCustomer")
+      */
+      public function navisionImportCustomer(Request $request){
+        //$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+        $json=file_get_contents($this->url.'navisionExport/do-NAVISION-getCustomers.php');
+        $objects=json_decode($json, true);
+        $objects=$objects[0];
+        //dump($products["products"]);
+        $repositoryCountries=$this->getDoctrine()->getRepository(GlobaleCountries::class);
+        $repositoryCurrencies=$this->getDoctrine()->getRepository(GlobaleCurrencies::class);
+        $repositoryPaymentMethod=$this->getDoctrine()->getRepository(ERPPaymentMethods::class);
+        $repositoryStates=$this->getDoctrine()->getRepository(GlobaleStates::class);
+        $repository=$this->getDoctrine()->getRepository(ERPCustomers::class);
+        foreach ($objects["class"] as $key=>$object){
+
+          if($object["vat"]==null) continue;
+
+
+          $obj=$repository->findOneBy(["code"=>$object["code"]]);
+          if ($obj==null) {
+            $obj=new ERPCustomers();
+            $obj->setCode($object["code"]);
+            $obj->setCompany($this->getUser()->getCompany());
+            $obj->setDateadd(new \Datetime());
+            $obj->setDateupd(new \Datetime());
+            $obj->setDeleted(0);
+            $obj->setActive(1);
+          }
+           $country=$repositoryCountries->findOneBy(["alfa2"=>$object["country"]]);
+           $state=$repositoryStates->findOneBy(["name"=>$object["state"]]);
+           $currency=$repositoryCurrencies->findOneBy(["isocode"=>"EUR"]);
+           $paymentMethod=$repositoryPaymentMethod->findOneBy(["id"=>1]);
+           $obj->setVat($object["vat"]);
+           $obj->setName($object["name"]);
+           $obj->setSocialname($object["socialname"]);
+           $obj->setAddress(rtrim($object["address1"]." ".$object["address2"]));
+           $obj->setCity($object["city"]);
+           $obj->setPostcode($object["postcode"]);
+           $obj->setPhone($object["phone"]);
+           $obj->setWeb($object["web"]);
+           $obj->setEmail($object["email"]);
+           $obj->setCountry($country);
+           $obj->setState($state);
+           //$obj->setCurrency($currency);
+           $obj->setPaymentMethod($paymentMethod);
+           $this->getDoctrine()->getManager()->persist($obj);
+           $this->getDoctrine()->getManager()->flush();
+
+
+        }
+        return new Response(null);
+      }
 }
