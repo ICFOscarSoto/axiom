@@ -194,11 +194,11 @@ class ERPIncrements
     public function postProccess($kernel, $doctrine, $user){
       $this->calculateIncrements($doctrine);
     }
-    
+
     public function delete($doctrine){
       $this->calculateIncrements($doctrine);
     }
-    
+
     public function calculateIncrements($doctrine){
       $em = $doctrine->getManager();
       $repositoryProduct=$doctrine->getRepository(ERPProducts::class);
@@ -206,16 +206,16 @@ class ERPIncrements
       $repositoryCustomerGroups=$doctrine->getRepository(ERPCustomerGroups::class);
       $repositorySuppliers=$doctrine->getRepository(ERPSuppliers::class);
       $repositoryIncrements=$doctrine->getRepository(ERPIncrements::class);
-      //de momento partimos de que el proveedor nunca es NULL, pero en el futuro tendremos 
-      //que permitir que pueda haber incrementos sólo por catogría, por lo que esto no funcionaría.
+      //de momento partimos de que el proveedor nunca es NULL, pero en el futuro tendremos
+      //que permitir que pueda haber incrementos sólo por categría, por lo que esto no funcionaría.
       $products=$repositorySuppliers->productsBySupplier($this->supplier->getId());
       foreach($products as $product){
         $productEntity=$repositoryProduct->findOneBy(["id"=>$product]);
         $productEntity->calculatePVP($doctrine);
         $increment=$this->getIncrementByGroup($doctrine,$this->supplier,$productEntity->getCategory(),$this->customergroup);
         if($increment!=NULL){
-          if($repositoryProductPrices->existPrice($productEntity,$this->customergroup)){
-                $productpricesEntity=$repositoryProductPrices->findOneBy(["product"=>$productEntity,"customergroup"=>$this->customergroup]);
+          if($repositoryProductPrices->existPrice($productEntity,$this->customergroup,$this->supplier)){
+                $productpricesEntity=$repositoryProductPrices->findOneBy(["product"=>$productEntity,"customergroup"=>$this->customergroup,"supplier"=>$this->supplier]);
                 $productpricesEntity->setIncrement($increment);
                 $productpricesEntity->setPrice(round($productEntity->getShoppingPrice()*(1+($increment/100)),2));
             }
@@ -223,6 +223,7 @@ class ERPIncrements
                 $productpricesEntity= new ERPProductPrices();
                 $productpricesEntity->setProduct($productEntity);
                 $productpricesEntity->setCustomergroup($this->customergroup);
+                $productpricesEntity->setSupplier($this->supplier);
                 $productpricesEntity->setIncrement($increment*1);
                 $productpricesEntity->setPrice(round($productEntity->getShoppingPrice()*(1+($increment/100)),2));
                 $productpricesEntity->setActive(1);
@@ -237,7 +238,7 @@ class ERPIncrements
         $em->persist($productEntity);
         $em->flush();
       }
-    
+
     }
 
 
@@ -246,7 +247,7 @@ class ERPIncrements
       $repository=$doctrine->getRepository(ERPIncrements::class);
       $category=$productcategory;
       $incrementbygroup=$repository->getIncrementByGroup($supplier,$category,$customergroup);
-      
+
       while ($category->getParentid()!=null && $incrementbygroup==null){
             $category=$category->getParentid();
             $incrementbygroup=$repository->getIncrementByGroup($supplier,$category,$customergroup);
@@ -273,6 +274,6 @@ class ERPIncrements
       }
       return $incrementbygroup;
     }
-    
-    
+
+
 }

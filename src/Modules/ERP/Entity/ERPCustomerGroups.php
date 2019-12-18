@@ -160,51 +160,6 @@ class ERPCustomerGroups
 
       }
 
-      public function postProccess($kernel, $doctrine, $user){
-        $em = $doctrine->getManager();
-        $repositoryProduct=$doctrine->getRepository(ERPProducts::class);
-      //  $repository=$doctrine->getRepository(ERPSuppliers::class);
-        $repositoryProductPrices=$doctrine->getRepository(ERPProductPrices::class);
-        $products=$repositoryProduct->findBy(["active"=>1,"deleted"=>0]);
-    //  dump($products);
-        foreach($products as $product){
-          $productEntity=$repositoryProduct->findOneBy(["id"=>$product]);
-          $productEntity->calculatePVP($doctrine);
-
-          $increment=$this->getIncrementByGroup($doctrine,$productEntity->getSupplier(),$productEntity->getCategory());
-          if($increment!=NULL)
-          {
-
-            if($repositoryProductPrices->existPrice($productEntity,$this))
-            {
-              //dump("Ha encontrado una linea de incremento para el producto. La actualizamos.");
-              $productpricesEntity=$repositoryProductPrices->findOneBy(["product"=>$productEntity,"customergroup"=>$this]);
-              //dump($productpricesEntity);
-              $productpricesEntity->setIncrement($increment);
-              $productpricesEntity->setPrice($productEntity->getShoppingPrice()*(1+($increment/100)));
-            }
-            else {
-            //  dump("No ha encontrado una linea. La creamos");
-              $productpricesEntity= new ERPProductPrices();
-              $productpricesEntity->setProduct($productEntity);
-              $productpricesEntity->setCustomergroup($this);
-              $productpricesEntity->setIncrement($increment*1);
-              $productpricesEntity->setPrice($productEntity->getShoppingPrice()*(1+($increment/100)));
-              $productpricesEntity->setActive(1);
-              $productpricesEntity->setDeleted(0);
-              $productpricesEntity->setDateupd(new \DateTime());
-              $productpricesEntity->setDateadd(new \DateTime());
-
-            }
-            $em->persist($productpricesEntity);
-        }
-
-
-          $em->persist($productEntity);
-          $em->flush();
-        }
-      }
-
 
       public function getIncrementByGroup($doctrine,$supplier,$productcategory){
 
