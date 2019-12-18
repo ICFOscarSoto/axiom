@@ -5,6 +5,7 @@ namespace App\Modules\ERP\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\ERP\Entity\ERPProducts;
 use \App\Modules\ERP\Entity\ERPCustomerGroups;
+use \App\Modules\ERP\Entity\ERPSuppliers;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPProductPricesRepository")
@@ -59,6 +60,12 @@ class ERPProductPrices
      * @ORM\Column(type="boolean")
      */
     private $deleted;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPSuppliers")
+     * @ORM\JoinColumn(nullable=true)
+     */
+    private $supplier;
 
     public function getId(): ?int
     {
@@ -157,6 +164,18 @@ class ERPProductPrices
     public function setDeleted(bool $deleted): self
     {
         $this->deleted = $deleted;
+
+        return $this;
+    }
+
+    public function getSupplier(): ?ERPSuppliers
+    {
+        return $this->supplier;
+    }
+
+    public function setSupplier(?ERPSuppliers $supplier): self
+    {
+        $this->supplier = $supplier;
 
         return $this;
     }

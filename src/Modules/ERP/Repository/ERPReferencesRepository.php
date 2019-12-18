@@ -28,6 +28,13 @@ class ERPReferencesRepository extends ServiceEntityRepository
 
      }
 
+     public function getSuppliersByProduct($product){
+          $query="SELECT supplier_id FROM erpreferences e WHERE e.product_id=:PROD AND e.active=1 AND e.deleted=0";
+          $params=['PROD' => $product->getId()];
+          $result=$this->getEntityManager()->getConnection()->executeQuery($query,$params)->fetchAll();
+          return $result;
+
+      }
 
     // /**
     //  * @return ERPReferences[] Returns an array of ERPReferences objects

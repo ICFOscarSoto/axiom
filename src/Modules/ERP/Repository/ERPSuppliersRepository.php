@@ -33,10 +33,17 @@ class ERPSuppliersRepository extends ServiceEntityRepository
     }
 
     public function productsBySupplier($supplier){
-      $query="SELECT id from erpproducts
+      $query="SELECT product_id from erpreferences
       where supplier_id=:supplier";
       $params=['supplier' => $supplier];
-      return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+      $result=$this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+      if($result!=NULL) return $result;
+      else{
+        $query="SELECT id from erpproducts where supplier_id=:supplier";
+        $params=['supplier' => $supplier];
+        return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+      }
+
 
     }
 }

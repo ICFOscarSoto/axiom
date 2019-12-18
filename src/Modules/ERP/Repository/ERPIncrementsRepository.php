@@ -82,7 +82,7 @@ class ERPIncrementsRepository extends ServiceEntityRepository
         $result=$this->getEntityManager()->getConnection()->executeQuery($query,$params)->fetch();
         return $result;
      }
-     
+
      else return false;
   }
 
@@ -97,16 +97,20 @@ class ERPIncrementsRepository extends ServiceEntityRepository
                  'GRP' => $customergroup->getId()
                  ];
         $result=$this->getEntityManager()->getConnection()->executeQuery($query,$params)->fetch();
+
         return $result['increment']*1;
       }
 
       else if($supplier!=NULL){
+        dump($supplier->getId());
+        dump($customergroup->getId());
         $query="SELECT max(i.increment) as increment FROM erpincrements i WHERE i.supplier_id=:SUP AND i.category_id IS NULL  AND i.customergroup_id=:GRP AND i.active=1 AND i.deleted=0";
         $params=[ 'SUP' => $supplier->getId(),
                   'GRP' => $customergroup->getId()
                  ];
 
         $result=$this->getEntityManager()->getConnection()->executeQuery($query,$params)->fetch();
+
         return $result['increment']*1;
 
       }

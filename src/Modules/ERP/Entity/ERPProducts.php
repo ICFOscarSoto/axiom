@@ -654,7 +654,7 @@ class ERPProducts
       $productEntity=$repositoryProduct->findOneBy(["id"=>$this->getId()]);
       $customergroup_without_price=[];
       foreach($customergroups as $customergroup){
-        if($repositoryProductPrices->existPrice($this,$customergroup)==FALSE) array_push($customergroup_without_price,$customergroup);
+        if($repositoryProductPrices->existPrice($this,$customergroup,$this->getSupplier())==FALSE) array_push($customergroup_without_price,$customergroup);
       }
 
 
@@ -663,6 +663,7 @@ class ERPProducts
         $productpricesEntity= new ERPProductPrices();
         $productpricesEntity->setProduct($this);
         $productpricesEntity->setCustomergroup($customergroup);
+        $productpricesEntity->setSupplier($this->getSupplier());
         $productpricesEntity->setIncrement($increment*1);
         $productpricesEntity->setPrice(round($newShoppingPrice*(1+($increment/100)),2));
         $productpricesEntity->setActive(1);
@@ -685,6 +686,8 @@ class ERPProducts
            //dump("Incremento ".$increment." para el grupo ".$customergroup->getName());
            if($increment>$maxincrement) $maxincrement=$increment;
          }
+         dump($this->shoppingPrice);
+         dump($maxincrement);
          $this->setPVP($this->shoppingPrice*(1+($maxincrement/100)));
          $this->setPvpincrement($maxincrement);
      }
@@ -699,8 +702,11 @@ class ERPProducts
           $maxincrement=$repository->getMaxIncrement($this->supplier,$category,$customergroup);
       }
 
-      if ($maxincrement==null)
+      if ($maxincrement==null){
+          dump("justo antes");
           $maxincrement=$repository->getMaxIncrement($this->supplier,null,$customergroup);
+          dump("Incremeto máximo de".$customergroup->getName()." ".$maxincrement);
+      }
       if ($maxincrement==null){
           $category=$this->category;
           $maxincrement=$repository->getMaxIncrement(null,$category,$customergroup);
