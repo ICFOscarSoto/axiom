@@ -1,5 +1,5 @@
 [
-  {"id": "view", "type" : "default", "icon" : "fa fa-external-link", "name" : "view", "route":"cloudGetFiles", "confirm" :false, "actionType" : "foreground"},
+  {"id": "view", "type" : "default", "icon" : "fa fa-external-link", "name" : "view", "route":"cloudGetFiles", "confirm" :false, "actionType" : "foreground", "target": "_blank"},
   {"id": "download", "type" : "default", "icon" : "fa fa-cloud-download", "name" : "download", "route":"cloudDownloadFiles", "confirm" :false, "actionType" : "foreground"},
   {"id": "activation", "type": "option", "options": [
       {"id": "desactivate", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"disableFile", "confirm" :true, "actionType" : "background" },

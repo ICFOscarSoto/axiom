@@ -166,6 +166,16 @@ class ERPCustomers
      */
     private $surcharge;
 
+    /**
+     * @ORM\Column(type="string", length=16, nullable=true)
+     */
+    private $code;
+
+    /**
+     * @ORM\Column(type="string", length=180, nullable=true)
+     */
+    private $web;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -524,5 +534,29 @@ class ERPCustomers
 
       if (empty($fieldErrors)) return ["valid"=>true];
         else return ["valid"=>false, "field_errors"=>$fieldErrors];
+    }
+
+    public function getCode(): ?string
+    {
+        return $this->code;
+    }
+
+    public function setCode(?string $code): self
+    {
+        $this->code = $code;
+
+        return $this;
+    }
+
+    public function getWeb(): ?string
+    {
+        return $this->web;
+    }
+
+    public function setWeb(?string $web): self
+    {
+        $this->web = $web;
+
+        return $this;
     }
 }

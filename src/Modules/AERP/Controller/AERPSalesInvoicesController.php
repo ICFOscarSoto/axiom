@@ -32,6 +32,7 @@ use App\Modules\Security\Utils\SecurityUtils;
 class AERPSalesInvoicesController extends Controller
 {
 	private $module='AERP';
+	private $prefix='FAC';
 	private $class=AERPSalesInvoices::class;
 	private $classLines=AERPSalesInvoicesLines::class;
 	private $utilsClass=AERPSalesInvoicesUtils::class;
@@ -151,10 +152,13 @@ class AERPSalesInvoicesController extends Controller
 				'date' => ($document->getId()==null)?date('d-m-Y'):$document->getDate()->format('d/m/Y'),
 				'id' => $id,
 				'documentType' => 'sales_invoice',
+				'documentPrefix' => $this->prefix,
 				'document' => $document,
 				'documentLines' => $documentLines,
+				'documentReadonly' => false,
 				'errors' => $errors,
-				'warnings' => $warnings
+				'warnings' => $warnings,
+				'token' => uniqid('sign_').time()
 				]);
 		}
 		return new RedirectResponse($this->router->generate('app_login'));
@@ -195,17 +199,19 @@ class AERPSalesInvoicesController extends Controller
 			$document=new $this->class();
 			$document->setNumber($documentRepository->getNextNum($this->getUser()->getCompany()->getId(),$config->getFinancialyear()->getId(),$serie->getId()));
 			$document->setCode($config->getFinancialyear()->getCode().$serie->getCode().str_pad($document->getNumber(), 6, '0', STR_PAD_LEFT));
+			$document->setFinancialyear($config->getFinancialyear());
 			$document->setAuthor($this->getUser());
 			$document->setAgent($this->getUser());
+			$document->setSerie($serie);
+			$document->setDate($date);
+			$document->setPaymentmethod($paymentmethod);
+			$document->setFinancialyear($config->getFinancialyear());
 			$document->setActive(1);
 			$document->setDeleted(0);
 			$document->setDateadd(new \DateTime());
 		}
 		$document->setCompany($this->getUser()->getCompany());
 		$document->setCurrency($this->getUser()->getCompany()->getCurrency());
-		$document->setPaymentmethod($paymentmethod);
-		$document->setSerie($serie);
-		$document->setFinancialyear($config->getFinancialyear());
 		$document->setCustomergroup($customergroup);
 		$document->setCustomer($customer);
 		$document->setVat($customer->getVat());
@@ -217,7 +223,6 @@ class AERPSalesInvoicesController extends Controller
 		$document->setCustomerpostcode($customer->getPostcode());
 		$document->setCustomerpostbox($customer->getPostbox());
 		$document->setCustomercode($fields->customercode);
-		$document->setDate($date);
 		$document->setTaxexempt(($fields->taxexempt!="")?filter_var($fields->taxexempt, FILTER_VALIDATE_BOOLEAN):0);
 		$document->setSurcharge(($fields->surcharge!="")?filter_var($fields->surcharge, FILTER_VALIDATE_BOOLEAN):0);
 		$document->setIrpf(($fields->irpf!="")?filter_var($fields->irpf, FILTER_VALIDATE_BOOLEAN):0);

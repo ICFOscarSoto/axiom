@@ -263,6 +263,7 @@ class GlobaleUsers implements UserInterface
       $data["modules"]=$modules;
       $data["companyId"]=$connectas==null?$this->getCompany()->getId():$connectas->getId();
       $data["unseenEmails"]=$unseenEmails;
+      $data["emailAccounts"]=$emailAccounts;
       if(in_array("ROLE_ADMIN",$this->getRoles())){
         $diskusage=($connectas==null)?$this->getCompany()->getDiskUsages():$connectas->getDiskUsages();
         $data["diskusage"]["space"]=$filesHelper->formatBytes($diskusage[0]->getDiskspace());

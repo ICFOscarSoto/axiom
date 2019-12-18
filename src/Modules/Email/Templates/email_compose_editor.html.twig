@@ -2,6 +2,7 @@
 <script>
   var wysihtml5Editor;
   var signature;
+  var token="{{ token }}";
 </script>
 <div class="mail-body">
   <form id="form-send-mail" name="form-send-mail" method="post" role="form">
@@ -63,40 +64,14 @@
       <textarea id="content" name="content"></textarea>
       </div>
   </div>
-  <div class="form-group">
-    <div class="col-sm-12">
-          <div class="dropzone"><div class="dz-message" data-dz-message><span>Ficheros Adjuntos</span></div></div>
-      </div>
-  </div>
+    {{ include('@Email/email_compose_editor_attachments.html.twig') }}
   </form>
 </div>
 
 <script>
   $(document).ready(function(){
 
-    // init,configure dropzone
-    Dropzone.autoDiscover = false;
-    var jsonFiles = [];
-    var token="{{token}}";
-    var editor_init=false;
-    var dropzone_default = new Dropzone(".dropzone", {
-        url: '{{url('uploadTemp')}}',
-        maxFilesize: 20,  // in Mb
-        addRemoveLinks: true,
-        init: function () {
-            this.on("maxfilesexceeded", function(file) {
-                this.removeFile(file);
-            });
-            this.on("sending", function(file, xhr, formData) {
-            });
-            this.on("success", function(file, response) {
-                if (response.uploaded)
-                  jsonFiles.push(response.fileName);
-            });
-        }
-    });
-
-    function resetEmail(){
+   function resetEmail(){
       $('#form-send-mail').trigger("reset");
       $('#cc').parent().addClass('hidden');
       $('#cc-button').show();

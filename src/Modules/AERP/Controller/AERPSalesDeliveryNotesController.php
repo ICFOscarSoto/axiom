@@ -32,6 +32,7 @@ use App\Modules\Security\Utils\SecurityUtils;
 class AERPSalesDeliveryNotesController extends Controller
 {
 	private $module='AERP';
+	private $prefix='ALB';
 	private $class=AERPSalesDeliveryNotes::class;
 	private $classLines=AERPSalesDeliveryNotesLines::class;
 	private $utilsClass=AERPSalesDeliveryNotesUtils::class;
@@ -152,9 +153,12 @@ class AERPSalesDeliveryNotesController extends Controller
 				'id' => $id,
 				'documentType' => 'sales_deliverynote',
 				'document' => $document,
+				'documentPrefix' => $this->prefix,
 				'documentLines' => $documentLines,
+				'documentReadonly' => false,
 				'errors' => $errors,
-				'warnings' => $warnings
+				'warnings' => $warnings,
+				'token' => uniqid('sign_').time()
 				]);
 		}
 		return new RedirectResponse($this->router->generate('app_login'));
@@ -196,6 +200,7 @@ class AERPSalesDeliveryNotesController extends Controller
 			$document=new $this->class();
 			$document->setNumber($documentRepository->getNextNum($this->getUser()->getCompany()->getId(),$config->getFinancialyear()->getId(),$serie->getId()));
 			$document->setCode($config->getFinancialyear()->getCode().$serie->getCode().str_pad($document->getNumber(), 6, '0', STR_PAD_LEFT));
+			$document->setFinancialyear($config->getFinancialyear());
 			$document->setAuthor($this->getUser());
 			$document->setAgent($this->getUser());
 			$document->setActive(1);

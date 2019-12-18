@@ -197,8 +197,6 @@ class GlobaleMenuOptionsRepository extends ServiceEntityRepository
         if($child->getRute()==null){
             $query="SELECT COUNT(*) childs FROM globale_menu_options m WHERE parent=:val_parent";
             $params=['val_parent' => $child->getId()];
-              dump($child);
-            dump($this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchColumn(0));
             if($this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchColumn(0)==0){
 
                unset($childs[$key]);

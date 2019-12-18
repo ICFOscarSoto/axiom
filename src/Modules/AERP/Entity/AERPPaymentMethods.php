@@ -29,7 +29,7 @@ class AERPPaymentMethods
     private $name;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="string", length=120)
      */
     private $expiration;
 
@@ -92,12 +92,12 @@ class AERPPaymentMethods
         return $this;
     }
 
-    public function getExpiration(): ?int
+    public function getExpiration(): ?string
     {
         return $this->expiration;
     }
 
-    public function setExpiration(int $expiration): self
+    public function setExpiration(string $expiration): self
     {
         $this->expiration = $expiration;
 
@@ -174,5 +174,10 @@ class AERPPaymentMethods
         $this->deleted = $deleted;
 
         return $this;
+    }
+
+    public function preProccess($kernel, $doctrine, $user){
+      //Allow only numbers and commas
+      $this->expiration=preg_replace('#[^0-9\,]#', '', $this->expiration);
     }
 }

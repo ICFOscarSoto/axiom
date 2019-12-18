@@ -13,6 +13,8 @@ use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\AERP\Entity\AERPCustomers;
 use App\Modules\AERP\Entity\AERPCustomerGroups;
 use App\Modules\Globale\Entity\GlobaleCountries;
+use App\Modules\Globale\Entity\GlobaleStates;
+use App\Modules\Globale\Entity\GlobaleCurrencies;
 use App\Modules\Globale\Entity\GlobaleCompanies;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
@@ -20,23 +22,28 @@ use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\AERP\Utils\AERPCustomersUtils;
 use App\Modules\ERP\Reports\ERPInvoiceReports;
 use App\Modules\ERP\Entity\ERPProducts;
+use App\Modules\ERP\Entity\ERPPaymentMethods;
 use App\Modules\ERP\Entity\ERPCategories;
 use App\Modules\ERP\Entity\ERPSuppliers;
+use App\Modules\ERP\Entity\ERPCustomers;
 use App\Modules\ERP\Entity\ERPEAN13;
 use App\Modules\ERP\Entity\ERPAttributeNames;
 use App\Modules\ERP\Entity\ERPAttributesValues;
 use App\Modules\ERP\Entity\ERPProductsAttributes;
+use App\Modules\Security\Utils\SecurityUtils;
 use \DateTime;
 
 class NavisionController extends Controller
 {
-  private $url="http://icf.edindns.es:9000/";
+  private $url="http://192.168.1.250:9000/";
+  private $module="Navision";
 
   /**
    * @Route("/api/navision/invoices", name="navisionInvoices")
    */
    public function navisionInvoices(Request $request){
      $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+     if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
      $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
      $userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
      $start=new DateTime('first day of this month');
@@ -99,6 +106,9 @@ class NavisionController extends Controller
       }
       return new Response(null);
     }
+
+
+
 
 
     /**
@@ -179,7 +189,7 @@ class NavisionController extends Controller
       $pm->flush();
       } else $productEntity=$productExists;
 
-      if (isset($product["EAN13"])) {
+      if (isset($product["EAN13"]) and strlen($product["EAN13"][0]["EAN13"])<13) {
         $EAN13=$product["EAN13"];
         foreach ($EAN13 as $key){
             $repositoryEAN13=$this->getDoctrine()->getRepository(ERPEAN13::class);
@@ -199,7 +209,7 @@ class NavisionController extends Controller
         }
       }
 
-      if (isset($product["atributos"])) {
+    /*  if (isset($product["atributos"])) {
         $attributes=$product["atributos"];
         foreach ($attributes as $key){
             $repositoryAttribute=$this->getDoctrine()->getRepository(ERPProductsAttributes::class);
@@ -223,10 +233,120 @@ class NavisionController extends Controller
             $pm->flush();
           }
         }
-      }
+      } */
 
 
 
       return new Response("El producto se ha importado correctamente");
     }
+
+
+
+    /**
+     * @Route("/api/navision/supplier/import", name="navisionImportSupplier")
+     */
+     public function navisionImportSupplier(Request $request){
+       //$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+       $json=file_get_contents($this->url.'navisionExport/do-NAVISION-getSuppliers.php');
+       $objects=json_decode($json, true);
+       $objects=$objects[0];
+       //dump($products["products"]);
+       $repositoryCountries=$this->getDoctrine()->getRepository(GlobaleCountries::class);
+       $repositoryCurrencies=$this->getDoctrine()->getRepository(GlobaleCurrencies::class);
+       $repositoryPaymentMethod=$this->getDoctrine()->getRepository(ERPPaymentMethods::class);
+       $repositoryStates=$this->getDoctrine()->getRepository(GlobaleStates::class);
+       $repository=$this->getDoctrine()->getRepository(ERPSuppliers::class);
+       foreach ($objects["class"] as $key=>$object){
+
+         if($object["vat"]==null) continue;
+
+
+         $obj=$repository->findOneBy(["code"=>$object["code"]]);
+         if ($obj==null) {
+           $obj=new ERPSuppliers();
+           $obj->setCode($object["code"]);
+           $obj->setCompany($this->getUser()->getCompany());
+           $obj->setDateadd(new \Datetime());
+           $obj->setDateupd(new \Datetime());
+           $obj->setDeleted(0);
+           $obj->setActive(1);
+         }
+          $country=$repositoryCountries->findOneBy(["alfa2"=>$object["country"]]);
+          $state=$repositoryStates->findOneBy(["name"=>$object["state"]]);
+          $currency=$repositoryCurrencies->findOneBy(["isocode"=>"EUR"]);
+          $paymentMethod=$repositoryPaymentMethod->findOneBy(["id"=>1]);
+          $obj->setVat($object["vat"]);
+          $obj->setName($object["name"]);
+          $obj->setSocialname($object["socialname"]);
+          $obj->setAddress(rtrim($object["address1"]." ".$object["address2"]));
+          $obj->setCity($object["city"]);
+          $obj->setPostcode($object["postcode"]);
+          $obj->setPhone($object["phone"]);
+          $obj->setWeb($object["web"]);
+          $obj->setEmail($object["email"]);
+          $obj->setCountry($country);
+          $obj->setState($state);
+          $obj->setCurrency($currency);
+          $obj->setPaymentMethod($paymentMethod);
+          $this->getDoctrine()->getManager()->persist($obj);
+          $this->getDoctrine()->getManager()->flush();
+
+
+       }
+       return new Response(null);
+     }
+
+     /**
+      * @Route("/api/navision/customer/import", name="navisionImportCustomer")
+      */
+      public function navisionImportCustomer(Request $request){
+        //$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+        $json=file_get_contents($this->url.'navisionExport/do-NAVISION-getCustomers.php');
+        $objects=json_decode($json, true);
+        $objects=$objects[0];
+        //dump($products["products"]);
+        $repositoryCountries=$this->getDoctrine()->getRepository(GlobaleCountries::class);
+        $repositoryCurrencies=$this->getDoctrine()->getRepository(GlobaleCurrencies::class);
+        $repositoryPaymentMethod=$this->getDoctrine()->getRepository(ERPPaymentMethods::class);
+        $repositoryStates=$this->getDoctrine()->getRepository(GlobaleStates::class);
+        $repository=$this->getDoctrine()->getRepository(ERPCustomers::class);
+        foreach ($objects["class"] as $key=>$object){
+
+          if($object["vat"]==null) continue;
+
+
+          $obj=$repository->findOneBy(["code"=>$object["code"]]);
+          if ($obj==null) {
+            $obj=new ERPCustomers();
+            $obj->setCode($object["code"]);
+            $obj->setCompany($this->getUser()->getCompany());
+            $obj->setDateadd(new \Datetime());
+            $obj->setDateupd(new \Datetime());
+            $obj->setDeleted(0);
+            $obj->setActive(1);
+          }
+           $country=$repositoryCountries->findOneBy(["alfa2"=>$object["country"]]);
+           $state=$repositoryStates->findOneBy(["name"=>$object["state"]]);
+           $currency=$repositoryCurrencies->findOneBy(["isocode"=>"EUR"]);
+           $paymentMethod=$repositoryPaymentMethod->findOneBy(["id"=>1]);
+           $obj->setVat($object["vat"]);
+           $obj->setName($object["name"]);
+           $obj->setSocialname($object["socialname"]);
+           $obj->setAddress(rtrim($object["address1"]." ".$object["address2"]));
+           $obj->setCity($object["city"]);
+           $obj->setPostcode($object["postcode"]);
+           $obj->setPhone($object["phone"]);
+           $obj->setWeb($object["web"]);
+           $obj->setEmail($object["email"]);
+           $obj->setCountry($country);
+           $obj->setState($state);
+           //$obj->setCurrency($currency);
+           $obj->setPaymentMethod($paymentMethod);
+           $this->getDoctrine()->getManager()->persist($obj);
+           $this->getDoctrine()->getManager()->flush();
+
+
+        }
+        return new Response(null);
+      }
 }

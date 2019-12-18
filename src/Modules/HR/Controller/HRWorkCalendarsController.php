@@ -82,9 +82,9 @@ class HRWorkCalendarsController extends Controller
    }
 
    /**
-    * @Route("/api/HR/workcalendars/list", name="workcalendarslist")
+    * @Route("/api/HR/workcalendars/{id}/list", name="workcalendarslist")
    */
-   public function workcalendarslist(RouterInterface $router,Request $request){
+   public function workcalendarslist($id, RouterInterface $router,Request $request){
      $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
      $user = $this->getUser();
      $locale = $request->getLocale();
@@ -93,7 +93,7 @@ class HRWorkCalendarsController extends Controller
      $repository = $manager->getRepository(HRWorkCalendars::class);
      $listUtils=new GlobaleListUtils();
      $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/WorkCalendars.json"),true);
-     $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, HRWorkCalendars::class);
+     $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, HRWorkCalendars::class,[["type"=>"and", "column"=>"workcalendargroup", "value"=>$id]],[],-1);
      return new JsonResponse($return);
    }
 

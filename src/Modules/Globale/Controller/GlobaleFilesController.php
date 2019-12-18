@@ -16,9 +16,9 @@ class GlobaleFilesController extends Controller
 
 
   /**
-   * @Route("/api/files/uploadTemp", name="uploadTemp")
+   * @Route("/api/files/uploadTemp/{type}", name="uploadTemp", defaults={"type"="Other"})
    */
-  public function uploadTemp(RouterInterface $router,Request $request){
+  public function uploadTemp($type, RouterInterface $router,Request $request){
     $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
     //Check if filespace in disk quota
     $company=$this->getUser()->getCompany();
@@ -26,7 +26,7 @@ class GlobaleFilesController extends Controller
     if($diskUsage[0]->getDiskspace()-$diskUsage[0]->getDiskusage()<=0)  return new JsonResponse(["result"=>-10]);
 
     if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
-      $uploadDir=$this->get('kernel')->getRootDir() . '/../public/temp/'.$this->getUser()->getId().'/';
+      $uploadDir=$this->get('kernel')->getRootDir().DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$this->getUser()->getCompany()->getId().DIRECTORY_SEPARATOR.'temp'.DIRECTORY_SEPARATOR.$this->getUser()->getId().DIRECTORY_SEPARATOR.$type.DIRECTORY_SEPARATOR;
       $output = array('uploaded' => false);
          $file = $request->files->get('file');
          //$fileName = md5(uniqid()).'.'.$file->guessExtension();

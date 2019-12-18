@@ -91,6 +91,7 @@ Repeat Password: Repetir password
 Email: Email
 Edit profile: Editar perfil
 Select users: Seleccione un usuario
+Select a usergroup: Seleccione un grupo
 Usergroup: Grupo
 usergroup: Grupo Usuarios
 user: Usuario
@@ -153,6 +154,7 @@ Inbox folder: Bandeja de entrada
 Sent folder: Elementos enviados
 Trash folder: Borradores
 Smtp protocol: Protocolo
+Document send: Enviar documento
 
 # CALENDAR MODULE
 #----------------------------------------------------------------------------------------------------------------------
@@ -306,7 +308,10 @@ Swiftcode: Código SWIFT
 # SALESBUDGETS
 #----------------------------------------------------------------------------------------------------------------------
 SalesBudgets: Presupuestos
-
+sales_budget: presupuesto
+sales_order: pedido
+sales_deliverynote: albarán
+sales_invoice: factura
 
 #COURSES
 #----------------------------------------------------------------------------------------------------------------------
@@ -459,8 +464,10 @@ Sales: Ventas
 Purchases: Compras
 Budgets: Presupuestos
 Orders: Pedidos
+SalesOrders: Pedidos
 DeliveryNotes: Albaranes
 Invoices: Facturas
+SalesInvoices: Facturas
 Customer: Cliente
 Search: Buscar
 Manufacturers: Fabricantes

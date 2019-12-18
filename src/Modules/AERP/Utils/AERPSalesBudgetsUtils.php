@@ -12,7 +12,7 @@ class AERPSalesBudgetsUtils
   private $module="AERP";
   private $name="SalesBudgets";
   public function getExcludedForm($params){
-    return [];
+    return ['inSalesOrder'];
   }
 
   public function getIncludedForm($params){
