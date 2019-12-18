@@ -311,6 +311,7 @@ class GlobaleFormUtils extends Controller
              //Aply convesion functions from controller to view
              $formView=$this->conversionView($formView);
 						 return $this->controller->render($render, array(
+              'id' => $id,
               'includes' => $includesArray,
               'include_pre_templates' => $this->includePreTemplate,
               'include_post_templates' => $this->includePostTemplate,

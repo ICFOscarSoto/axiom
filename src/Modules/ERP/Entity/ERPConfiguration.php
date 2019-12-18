@@ -1,18 +1,15 @@
 <?php
 
-namespace App\Modules\AERP\Entity;
+namespace App\Modules\ERP\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
 use \App\Modules\Globale\Entity\GlobaleTaxes;
-use \App\Modules\AERP\Entity\AERPPaymentMethods;
-use \App\Modules\AERP\Entity\AERPFinancialYears;
-use \App\Modules\AERP\Entity\AERPSeries;
 
 /**
- * @ORM\Entity(repositoryClass="App\Modules\AERP\Repository\AERPConfigurationRepository")
+ * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPConfigurationRepository")
  */
-class AERPConfiguration
+class ERPConfiguration
 {
     /**
      * @ORM\Id()
@@ -54,7 +51,7 @@ class AERPConfiguration
     private $defaultirpf=false;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\AERP\Entity\AERPPaymentMethods")
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPPaymentMethods")
      */
     private $defaultpaymentmethod;
 
@@ -108,17 +105,6 @@ class AERPConfiguration
      */
     private $register;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\AERP\Entity\AERPFinancialYears")
-     */
-    private $financialyear;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\AERP\Entity\AERPSeries")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $defaultserie;
-
 
     public function __construct($kernel=null, $doctrine=null, $user=null, $company=null)
     {
@@ -131,7 +117,7 @@ class AERPConfiguration
        $this->dateadd=new \Datetime();
        $this->dateupd=new \Datetime();
 
-       $classPaymentMethods="\App\Modules\AERP\Entity\AERPPaymentMethods";
+       $classPaymentMethods="\App\Modules\ERP\Entity\ERPPaymentMethods";
        $repositoryPaymentMethods=$doctrine->getRepository($classPaymentMethods);
        $paymentmethods=$repositoryPaymentMethods->findBy(["company"=>$company, "active"=>1, "deleted"=>0]);
        if(empty($paymentmethods)){
@@ -149,23 +135,6 @@ class AERPConfiguration
          $doctrine->getManager()->flush();
          $this->defaultpaymentmethod=$paymentmethod;
        }else $this->defaultpaymentmethod=$paymentmethods[0];
-
-       $classSeries="\App\Modules\AERP\Entity\AERPSeries";
-       $repositorySeries=$doctrine->getRepository($classSeries);
-       $series=$repositorySeries->findBy(["company"=>$company, "active"=>1, "deleted"=>0]);
-       if(empty($paymentmethods)){
-         $serie=new $classSeries();
-         $serie->setCompany($company);
-         $serie->setCode("A");
-         $serie->setName("GENERAL VENTA");
-         $serie->setDateadd(new \Datetime());
-         $serie->setDateupd(new \Datetime());
-         $serie->setActive(1);
-         $serie->setDeleted(0);
-         $doctrine->getManager()->persist($serie);
-         $doctrine->getManager()->flush();
-         $this->defaultserie=$serie;
-       }else $this->defaultserie=$series[0];
 
      }
 
@@ -248,12 +217,12 @@ class AERPConfiguration
         return $this;
     }
 
-    public function getDefaultpaymentmethod(): ?AERPPaymentMethods
+    public function getDefaultpaymentmethod(): ?ERPPaymentMethods
     {
         return $this->defaultpaymentmethod;
     }
 
-    public function setDefaultpaymentmethod(?AERPPaymentMethods $defaultpaymentmethod): self
+    public function setDefaultpaymentmethod(?ERPPaymentMethods $defaultpaymentmethod): self
     {
         $this->defaultpaymentmethod = $defaultpaymentmethod;
 
@@ -380,27 +349,4 @@ class AERPConfiguration
         return $this;
     }
 
-    public function getFinancialyear(): ?AERPFinancialYears
-    {
-        return $this->financialyear;
-    }
-
-    public function setFinancialyear(?AERPFinancialYears $financialyear): self
-    {
-        $this->financialyear = $financialyear;
-
-        return $this;
-    }
-
-    public function getDefaultserie(): ?AERPSeries
-    {
-        return $this->defaultserie;
-    }
-
-    public function setDefaultserie(?AERPSeries $defaultserie): self
-    {
-        $this->defaultserie = $defaultserie;
-
-        return $this;
-    }
 }

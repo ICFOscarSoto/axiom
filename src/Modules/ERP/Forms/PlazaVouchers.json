@@ -1,0 +1,34 @@
+[{
+    "sections": [
+        {
+            "name": "data",
+            "fields": [
+                {
+                    "name": "supplier",
+                    "cols": 6
+                },
+                {
+                    "name": "customer",
+                    "cols": 6
+                },
+                {
+                    "name": "pickupperson",
+                    "cols": 12
+                },
+                {
+                    "name": "user",
+                    "cols": 4,
+                    "readonly": true
+                },
+                {
+                    "name": "dateadd",
+                    "cols": 4,
+                    "readonly": true
+                }
+
+
+            ]
+        }
+    ],
+    "actionButtons": "@ERP/actionButtons_plazaVouchers.html.twig"
+}]

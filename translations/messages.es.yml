@@ -290,6 +290,7 @@ Bankaccount: Cuenta bancaria
 # SUPPLIERS
 #----------------------------------------------------------------------------------------------------------------------
 Supplier: Proveedor
+supplier: Proveedor
 Supplier data: Datos del proveedor
 Code: Código
 Activity: Actividad
@@ -483,3 +484,10 @@ Financialyear: Ejercicio fiscal
 Lopd: Membrete LOPD
 Contrast color: Color resaltado
 Shadow color: Color sombreado
+
+
+#PLAZA VOUCHERS
+#----------------------------------------------------------------------------------------------------------------------
+pickupperson: Persona recoge
+Pickupperson: Persona recoge
+Plaza Vouchers: Vales Plaza

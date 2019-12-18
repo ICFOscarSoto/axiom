@@ -1,0 +1,85 @@
+[{
+    "sections": [
+        {
+            "name": "General",
+            "fields": [
+                {
+                    "name": "defaulttax",
+                    "cols": 6
+                },
+                {
+                    "name": "defaultpaymentmethod",
+                    "cols": 6
+                },
+                {
+                    "name": "margincontrol",
+                    "cols": 2,
+                    "change": [{"field": "margin", "thisval": 0, "targetval":0}]
+                },
+                {
+                    "name": "margin",
+                    "caption": "Percent",
+                    "unity": "%",
+                    "depends":{"from": "margincontrol","vals":"[1]"},
+                    "cols": 2
+                },
+                {
+                    "name": "irpf",
+                    "cols": 2,
+                    "change": [{"field": "defaultirpf", "thisval": 0, "targetval":0}]
+                },
+                {
+                    "name": "defaultirpf",
+                    "cols": 2,
+                    "caption": "Percent",
+                    "unity": "%",
+                    "depends":{"from": "irpf","vals":"[1]"}
+                }
+
+            ]
+        },
+        {
+            "name": "Presupuestos",
+            "fields": [
+              {
+                  "name": "budgetexpiration",
+                  "cols": 2
+              },
+              {
+                  "name": "budgetexpirationtype",
+                  "cols": 4, "transform":
+          					{
+          						"type":"option",
+          						"options": {"Días": "days", "Semanas": "weeks", "Meses": "months", "Años": "years"}
+          					}
+              }
+            ]
+        },
+        {
+            "name": "Documentos",
+            "fields": [
+              {
+                  "name": "register",
+                  "cols": 12,
+                  "caption": "Register letterhead"
+              },
+              {
+                  "name": "lopd",
+                  "cols": 12
+              },
+              {
+                  "name": "bgcolor",
+                  "cols": 3,
+                  "format": "colour",
+                  "caption": "Contrast color"
+              },
+              {
+                  "name": "shadowcolor",
+                  "cols": 3,
+                  "format": "colour",
+                  "caption": "Shadow color"
+              }
+            ]
+        }
+    ]
+}]

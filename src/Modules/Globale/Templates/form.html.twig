@@ -4,7 +4,12 @@
   {% set counter = 1 %}
   {% if formConstructor.type is not defined or formConstructor.type != "modal" %}
   <div class="row">
-    <div style="text-align: right;" class="col-md-12">
+    <div style="text-align: left;" class="col-md-6">
+      {% if formConstructor.template.0.actionButtons is defined %}
+        {{ include(formConstructor.template.0.actionButtons) }}
+      {% endif %}
+    </div>
+    <div style="text-align: right;" class="col-md-6">
       <button attr-id="" attr-action="" id="{{formConstructor.name}}-button-cancel" type="button" class="btn btn">{{ ("Cancelar")|trans }}</button>
       <button attr-id="" attr-action="" id="{{formConstructor.name}}-button-save" type="button" class="btn btn-green">{{ ("Guardar")|trans }}</button>
     </div>

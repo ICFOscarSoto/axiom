@@ -1,0 +1,3 @@
+[
+  {"id": "editPlazaVouchers", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"formPlazaVouchers", "actionType" : "foreground", "confirm" :false, "tooltip":""}
+]

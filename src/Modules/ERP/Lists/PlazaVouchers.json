@@ -1,0 +1,28 @@
+[
+    {
+        "name": "id",
+        "caption": "id"
+    },
+
+    {
+        "name": "supplier__name",
+        "caption": "supplier",
+        "width":"20%"
+    },
+    {
+        "name": "customer__name",
+        "caption": "customer",
+        "width":"20%"
+    },
+    {
+        "name": "pickupperson",
+        "caption": "pickupperson",
+        "width":"20%"
+    },
+    {
+        "name": "dateadd",
+        "caption": "Date",
+        "type": "datetime",
+        "width":"15%"
+    }
+]

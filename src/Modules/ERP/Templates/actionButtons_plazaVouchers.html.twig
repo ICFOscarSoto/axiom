@@ -1,0 +1,9 @@
+{% if errors is not defined or errors|length == 0 %}
+  <div id="document-action-buttons" style="display:{% if id!=0 %}block;{% else %}none;{% endif %}">
+    <button id="document-button-print" type="button" class="btn btn-default btn-icon icon-left" onclick="window.open('{{ url("ERPPlazaVouchersPrint",{"id":id, "mode": "print"}) }}')">Imprimir<i class="fa fa-print"></i></button>
+    <button id="document-button-download" type="button" class="btn btn-default btn-icon icon-left" onclick="window.open('{{ url("ERPPlazaVouchersPrint",{"id":id, "mode": "download"}) }}')">Descargar<i class="fa fa-download"></i></button>
+    {% if userData.modules.Email is defined %}
+      <button id="document-button-email" type="button" class="btn btn-default btn-icon icon-left">Enviar<i class="fa fa-envelope"></i></button>
+    {% endif %}
+  </div>
+{% endif %}

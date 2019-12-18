@@ -127,6 +127,10 @@ Stock:
     resource: 'App\Modules\ERP\Controller\ERPStocksController'
     type:     annotation
 
+PlazaVouchers:
+  resource: 'App\Modules\ERP\Controller\ERPPlazaVouchersController'
+  type:      annotation
+
 Activity:
     resource: 'App\Modules\Globale\Controller\GlobaleActivitiesController'
     type:     annotation
