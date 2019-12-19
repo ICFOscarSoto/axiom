@@ -36,7 +36,7 @@ class ERPPlazaVouchersController extends Controller
    public function formPlazaVouchers($id, Request $request){
     $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
     if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
-    $new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-new"];
+    $new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-plus"];
     $template=dirname(__FILE__)."/../Forms/PlazaVouchers.json";
     $userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
     $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
@@ -55,7 +55,7 @@ class ERPPlazaVouchersController extends Controller
     return $this->render('@Globale/generictabform.html.twig', array(
             'entity_name' => $entity_name,
             'controllerName' => 'PlazaVouchersController',
-            'interfaceName' => 'PlazaVouchers',
+            'interfaceName' => $this->get('translator')->trans('PlazaVouchers'),
             'optionSelected' => 'genericindex',
 						'optionSelectedParams' => ["module"=>"ERP", "name"=>"PlazaVouchers"],
             'menuOptions' =>  $menurepository->formatOptions($userdata),
@@ -85,7 +85,7 @@ class ERPPlazaVouchersController extends Controller
     $utils->initialize($this->getUser(), new $this->class(), $template, $request,
                        $this, $this->getDoctrine(),method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],
                        method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
-    return $utils->make($id, $this->class, $action, "formplazavouchers", "full", "@Globale/form.html.twig", 'formplazavouchers', $this->utilsClass);
+    return $utils->make($id, $this->class, $action, "formPlazaVouchers", "full", "@Globale/form.html.twig", 'formPlazaVouchers', $this->utilsClass);
   }
 
 	/**
