@@ -286,6 +286,7 @@ Partialshipping: Envío parcial
 Pricesdeliverynote: Mostrar precios
 Surcharge: Recargo de equivalencia
 Bankaccount: Cuenta bancaria
+Select erpcustomers: Seleccionar cliente
 
 # SUPPLIERS
 #----------------------------------------------------------------------------------------------------------------------
@@ -305,6 +306,7 @@ Creditor: Credito
 Invoiceday: Dia de pago
 Paymentmethod: Forma de pago
 Swiftcode: Código SWIFT
+Select erpsuppliers: Seleccionar proveedor
 
 # SALESBUDGETS
 #----------------------------------------------------------------------------------------------------------------------
