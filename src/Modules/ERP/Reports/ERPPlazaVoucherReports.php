@@ -129,7 +129,7 @@ class ERPPlazaVoucherReports
     $this->pdf->Ln(10);$this->pdf->setX(40);
     $this->pdf->MultiCell(150,4,utf8_decode($document->getSupplier()->getAddress()),0,'L',false);
     $this->pdf->setX(40);
-    $this->pdf->MultiCell(150,4,utf8_decode($document->getSupplier()->getCity().' '.$document->getSupplier()->getPostcode().' '.$document->getSupplier()->getState()!=null?$document->getSupplier()->getState()->getName():''),0,'L',false);
+    $this->pdf->MultiCell(150,4,utf8_decode($document->getSupplier()->getCity().' '.$document->getSupplier()->getPostcode().' '.($document->getSupplier()->getState()?$document->getSupplier()->getState()->getName():'')),0,'L',false);
 
 
     $this->pdf->setXY(115, 15);
@@ -139,7 +139,7 @@ class ERPPlazaVoucherReports
     $this->pdf->SetFont('Arial','',10);
     $this->pdf->MultiCell(90,4,utf8_decode($document->getSupplier()->getAddress()),0,'L',false);
     $this->pdf->setX(115);
-    $this->pdf->MultiCell(90,4,utf8_decode($document->getSupplier()->getCity().' '.$document->getSupplier()->getPostcode().' '.$document->getSupplier()->getState()!=null?$document->getSupplier()->getState()->getName():''),0,'L',false);
+    $this->pdf->MultiCell(90,4,utf8_decode($document->getSupplier()->getCity().' '.$document->getSupplier()->getPostcode().' '.($document->getSupplier()->getState()?$document->getSupplier()->getState()->getName():'')),0,'L',false);
 
     $this->pdf->setXY(10, 85);
     //$this->pdf->MultiCell(180,4,utf8_decode('Por la presente les autorizo a hacer entrega de material a la empresa <b>'.$document->getCustomer()->getSocialName().'</b>' ),0,'L',false);
