@@ -148,7 +148,7 @@ class ERPPlazaVoucherReports
 
     $this->pdf->Ln(2);
     $this->pdf->setX(115);
-    $this->pdf->Cell(90,9,utf8_decode('En '.$this->user->getCompany()->getCity().' a '.$document->getDateadd()->format("d").' de '.$document->getDateadd()->format("F").' de '.$document->getDateadd()->format("Y")),'',0,'L',false);
+    $this->pdf->Cell(90,9,utf8_decode('En '.$this->user->getCompany()->getCity().' a '.$document->getDateadd()->format("d").' de '.strftime("%B",$document->getDateadd()->getTimestamp()).' de '.$document->getDateadd()->format("Y")),'',0,'L',false);
     $this->pdf->Ln(20);
     $this->pdf->setX(115);
     $this->pdf->Cell(90,9,utf8_decode('Fdo. '.$document->getUser()->getName().' '.$document->getUser()->getLastName()),'',0,'L',false);
@@ -193,7 +193,7 @@ class ERPPlazaVoucherReports
   }
 
   function create($params, $dest='I', $file=null){
-    setlocale( LC_NUMERIC, 'es_ES' );
+    setlocale( LC_ALL, 'es_ES' );
     $this->pdf  = new \FPDF();
     $this->pdf->AliasNbPages();
     $this->pdf->SetAutoPageBreak(false);
