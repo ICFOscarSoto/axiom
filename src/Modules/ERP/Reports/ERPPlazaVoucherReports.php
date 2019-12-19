@@ -30,14 +30,6 @@ class ERPPlazaVoucherReports
   private $cursor;
   private $positions=[];
 
-  private function secToH($seconds) {
-    $hours = floor($seconds / 3600);
-    $minutes = floor(($seconds / 60) % 60);
-    $seconds = $seconds % 60;
-    return sprintf("%02d", $hours).":".sprintf("%02d", $minutes).":".sprintf("%02d", $seconds);
-  }
-
-
   private function WriteText($text)
   {
       $intPosIni = 0;
@@ -194,7 +186,7 @@ class ERPPlazaVoucherReports
 
   function create($params, $dest='I', $file=null){
     setlocale( LC_ALL, 'es_ES' );
-    $this->pdf  = new \FPDF();
+    $this->pdf  = new \FPDF('L','mm','A5');
     $this->pdf->AliasNbPages();
     $this->pdf->SetAutoPageBreak(false);
     $doctrine=$params["doctrine"];
@@ -206,7 +198,7 @@ class ERPPlazaVoucherReports
 
       $this->pdf->image_path=$params["rootdir"].DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$params["user"]->getCompany()->getId().DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'company'.DIRECTORY_SEPARATOR;
       $this->pdf->user=$params["user"];
-      $this->pdf->AddPage('L','A5');
+      $this->pdf->AddPage();
 
       $this->docHeader($document);
       $this->docFooter($document);
