@@ -7,6 +7,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use App\Modules\ERP\Entity\ERPCustomers;
+use App\Modules\ERP\Entity\ERPSuppliers;
 use App\Modules\ERP\Entity\ERPPaymentMethods;
 use App\Modules\Globale\Entity\GlobaleCompanies;
 use App\Modules\Globale\Entity\GlobaleStates;
