@@ -142,6 +142,7 @@ class NavisionGet extends ContainerAwareCommand
       $repositoryStates=$this->doctrine->getRepository(GlobaleStates::class);
       $repository=$this->doctrine->getRepository(ERPSuppliers::class);
       foreach ($objects["class"] as $key=>$object){
+        $output->writeln('  - '.$object["code"].' - '.$object["socialname"]);
         if($object["vat"]==null) continue;
         $obj=$repository->findOneBy(["code"=>$object["code"]]);
         if ($obj==null) {
