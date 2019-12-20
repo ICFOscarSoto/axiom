@@ -98,9 +98,10 @@ class NavisionGet extends ContainerAwareCommand
         $state=$repositoryStates->findOneBy(["name"=>$object["state"]]);
         $currency=$repositoryCurrencies->findOneBy(["isocode"=>"EUR"]);
         $paymentMethod=$repositoryPaymentMethod->findOneBy(["id"=>1]);
+        if($object["socialname"][0]=='*') $obj->setActive(0); else $obj->setActive(1);
         $obj->setVat($object["vat"]);
-        $obj->setName($object["name"]);
-        $obj->setSocialname($object["socialname"]);
+        $obj->setName(ltrim(ltrim($object["name"]),'*'));
+        $obj->setSocialname(ltrim(ltrim($object["socialname"]),'*'));
         $obj->setAddress(rtrim($object["address1"]." ".$object["address2"]));
         $obj->setCity($object["city"]);
         $obj->setPostcode($object["postcode"]);
@@ -158,9 +159,10 @@ class NavisionGet extends ContainerAwareCommand
          $state=$repositoryStates->findOneBy(["name"=>$object["state"]]);
          $currency=$repositoryCurrencies->findOneBy(["isocode"=>"EUR"]);
          $paymentMethod=$repositoryPaymentMethod->findOneBy(["id"=>1]);
+         if($object["socialname"][0]=='*') $obj->setActive(0); else $obj->setActive(1);
          $obj->setVat($object["vat"]);
-         $obj->setName($object["name"]);
-         $obj->setSocialname($object["socialname"]);
+         $obj->setName(ltrim(ltrim($object["name"]),'*'));
+         $obj->setSocialname(ltrim(ltrim($object["socialname"]),'*'));
          $obj->setAddress(rtrim($object["address1"]." ".$object["address2"]));
          $obj->setCity($object["city"]);
          $obj->setPostcode($object["postcode"]);
