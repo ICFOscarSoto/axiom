@@ -135,11 +135,11 @@ class NavisionGet extends ContainerAwareCommand
       $objects=json_decode($json, true);
       $objects=$objects[0];
       //dump($products["products"]);
-      $repositoryCountries=$this->getDoctrine()->getRepository(GlobaleCountries::class);
-      $repositoryCurrencies=$this->getDoctrine()->getRepository(GlobaleCurrencies::class);
-      $repositoryPaymentMethod=$this->getDoctrine()->getRepository(ERPPaymentMethods::class);
-      $repositoryStates=$this->getDoctrine()->getRepository(GlobaleStates::class);
-      $repository=$this->getDoctrine()->getRepository(ERPSuppliers::class);
+      $repositoryCountries=$this->doctrine->getRepository(GlobaleCountries::class);
+      $repositoryCurrencies=$this->doctrine->getRepository(GlobaleCurrencies::class);
+      $repositoryPaymentMethod=$this->doctrine->getRepository(ERPPaymentMethods::class);
+      $repositoryStates=$this->doctrine->getRepository(GlobaleStates::class);
+      $repository=$this->doctrine->getRepository(ERPSuppliers::class);
       foreach ($objects["class"] as $key=>$object){
         if($object["vat"]==null) continue;
         $obj=$repository->findOneBy(["code"=>$object["code"]]);
@@ -169,11 +169,13 @@ class NavisionGet extends ContainerAwareCommand
          $obj->setState($state);
          $obj->setCurrency($currency);
          $obj->setPaymentMethod($paymentMethod);
-         $this->getDoctrine()->getManager()->persist($obj);
-         $this->getDoctrine()->getManager()->flush();
+         $this->doctrine->getManager()->persist($obj);
+         $this->doctrine->getManager()->flush();
          $result=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-changeDatetime.php?entity=suppliers&key='.$object["code"]);
       }
-      return new Response(null);
+      $navisionSync->setLastsync($datetime);
+      $this->doctrine->getManager()->persist($navisionSync);
+      $this->doctrine->getManager()->flush();
     }
 
 }
