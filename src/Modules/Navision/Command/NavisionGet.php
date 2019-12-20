@@ -69,7 +69,7 @@ class NavisionGet extends ContainerAwareCommand
      }
      $datetime=new \DateTime();
      $output->writeln('* Sincronizando clientes....');
-     $json=file_get_contents($this->url.'navisionExport/do-NAVISION-getCustomers.php?from='.$navisionSync->getLastsync()->getTimestamp());
+     $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getCustomers.php?from='.$navisionSync->getLastsync()->getTimestamp());
      $objects=json_decode($json, true);
      $objects=$objects[0];
      //dump($products["products"]);
@@ -87,7 +87,6 @@ class NavisionGet extends ContainerAwareCommand
          $obj->setCode($object["code"]);
          $obj->setCompany($this->company);
          $obj->setDateadd(new \Datetime());
-         $obj->setDateupd(new \Datetime());
          $obj->setDeleted(0);
          $obj->setActive(1);
        }
@@ -106,10 +105,12 @@ class NavisionGet extends ContainerAwareCommand
         $obj->setEmail($object["email"]);
         $obj->setCountry($country);
         $obj->setState($state);
+        $obj->setDateupd(new \Datetime());
         //$obj->setCurrency($currency);
         $obj->setPaymentMethod($paymentMethod);
         $this->doctrine->getManager()->persist($obj);
         $this->doctrine->getManager()->flush();
+        $result=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-changeDatetime.php?entity=customers&key='.$object["code"]);
      }
      $navisionSync->setLastsync($datetime);
      $this->doctrine->getManager()->persist($navisionSync);
