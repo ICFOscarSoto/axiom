@@ -1,0 +1,49 @@
+[
+    {
+        "name": "id",
+        "caption": "id"
+    },
+    {
+        "name": "code",
+        "caption": "code"
+    },
+    {
+        "name": "name",
+        "caption": "name"
+    },
+    {
+        "name": "start",
+        "type": "date",
+        "caption": "Start"
+    },
+    {
+        "name": "end",
+        "type": "date",
+        "caption": "End"
+    },
+    {
+        "name": "status",
+        "caption": "Status",
+        "replace":{
+           "0":{"text":"Cerrado","html":"Cerrado"},
+           "1":{"text":"Abierto","html":"Abierto"}
+         }
+
+    },
+    {
+        "name": "active",
+        "caption": "Estado",
+        "width": "10%",
+        "class": "dt-center",
+        "replace": {
+            "1": {
+                "text": "Activo",
+                "html": "<div style=\"min-width: 75px;\" class=\"label label-success\">Activo<\/div>"
+            },
+            "0": {
+                "text": "Desactivado",
+                "html": "<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado<\/div>"
+            }
+        }
+    }
+]

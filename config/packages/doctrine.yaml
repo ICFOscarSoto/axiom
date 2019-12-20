@@ -201,3 +201,8 @@ doctrine:
                 type: annotation
                 dir: '%kernel.project_dir%/src/Modules/AERP/Entity'
                 prefix: 'App\Modules\AERP\Entity'
+            Navision:
+                is_bundle: false
+                type: annotation
+                dir: '%kernel.project_dir%/src/Modules/Navision/Entity'
+                prefix: 'App\Modules\Navision\Entity'

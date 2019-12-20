@@ -1,0 +1,40 @@
+[{
+    "sections": [
+        {
+            "name": "data",
+            "fields": [
+                {
+                    "name": "code",
+                    "cols": 3
+                },
+                {
+                    "name": "name",
+                    "cols": 9
+                },
+                {
+                    "name": "start",
+                    "type": "date",
+                    "cols": 4
+                },
+                {
+                    "name": "end",
+                    "type": "date",
+                    "cols": 4
+                },
+                {
+                    "name": "status",
+                    "cols": 4,
+                    "transform":
+          						{
+          							"type":"option",
+          							"options": {"Cerrado": "0", "Abierto": "1"}
+          						}
+                },
+                {
+                    "name": "active",
+                    "cols": 4
+                }
+            ]
+        }
+    ]
+}]

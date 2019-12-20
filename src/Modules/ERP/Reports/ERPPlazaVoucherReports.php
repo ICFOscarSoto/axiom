@@ -144,44 +144,7 @@ class ERPPlazaVoucherReports
     $this->pdf->Ln(20);
     $this->pdf->setX(115);
     $this->pdf->Cell(90,9,utf8_decode('Fdo. '.$document->getUser()->getName().' '.$document->getUser()->getLastName()),'',0,'L',false);
-    //$this->pdf->SetDrawColor(0, 0, 0);
-    /*$this->pdf->Cell(22,9,utf8_decode('Nº Presupuesto'),'',0,'L',false);
-    $this->pdf->SetTextColor(0, 0, 0);
-    $this->pdf->Cell(60,9,utf8_decode($document->getCode()),'',0,'L',false);
-    $this->pdf->SetTextColor($this->bgcolor_r, $this->bgcolor_g, $this->bgcolor_b);
-    $this->pdf->Ln(4);
-    $this->pdf->Cell(22,9,utf8_decode('Fecha'),'',0,'L',false);
-    $this->pdf->SetTextColor(0, 0, 0);
-    $this->pdf->Cell(60,9,utf8_decode($document->getDate()->format("d/m/Y")),'',0,'L',false);
-    $this->pdf->Ln(4);
-    $this->pdf->SetTextColor($this->bgcolor_r, $this->bgcolor_g, $this->bgcolor_b);
-    $this->pdf->Cell(22,9,utf8_decode('Válido hasta:'),'',0,'L',false);
-    $this->pdf->SetTextColor(0, 0, 0);
-    $this->pdf->Cell(60,9,utf8_decode($document->getDateofferend()->format("d/m/Y")),'',0,'L',false);
-    $this->pdf->Ln(4);
-    $this->pdf->SetTextColor($this->bgcolor_r, $this->bgcolor_g, $this->bgcolor_b);
-    $this->pdf->Cell(22,9,utf8_decode('Cliente'),'',0,'L',false);
-    $this->pdf->SetTextColor(0, 0, 0);
-    $this->pdf->Cell(60,9,utf8_decode($document->getCustomer()->getCode()),'',0,'L',false);
-    $this->pdf->Ln(4);
-    $this->pdf->SetTextColor($this->bgcolor_r, $this->bgcolor_g, $this->bgcolor_b);
-    $this->pdf->Cell(22,9,utf8_decode('Página'),'',0,'L',false);
-    $this->pdf->SetTextColor(0, 0, 0);
-    $this->pdf->Cell(60,9,utf8_decode($this->pdf->PageNo().'/{nb}'),'',0,'L',false);
-    $this->pdf->setXY(110, 40);
-    $this->pdf->Cell(60,9,utf8_decode($document->getCustomername()),'',0,'L',false);
-    $this->pdf->setXY(110, 44);
-    $this->pdf->Cell(60,9,utf8_decode($document->getCustomeraddress()),'',0,'L',false);
-    $this->pdf->setXY(110, 48);
-    $this->pdf->Cell(60,9,utf8_decode($document->getCustomercity()." - ".$document->getCustomerpostcode()." - ".$document->getCustomerstate()),'',0,'L',false);
-    $this->pdf->setXY(110, 52);
-    $this->pdf->Cell(60,9,utf8_decode("NIF/NIE ".$document->getVat()),'',0,'L',false);
-    $this->pdf->SetTextColor($this->bgcolor_r, $this->bgcolor_g, $this->bgcolor_b);
-    $this->pdf->setXY(5, 31);
-    $this->pdf->SetDrawColor(248, 250, 255);
-    $this->pdf->SetFont('Arial','',14);
-    $this->pdf->Cell(60,9,utf8_decode('PRESUPUESTO'),'',0,'L',false);
-    $this->pdf->setXY($x, $y);*/
+    
   }
 
   function create($params, $dest='I', $file=null){
