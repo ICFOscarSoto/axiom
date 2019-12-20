@@ -114,7 +114,6 @@ class NavisionGet extends ContainerAwareCommand
      $navisionSync->setLastsync($datetime);
      $this->doctrine->getManager()->persist($navisionSync);
      $this->doctrine->getManager()->flush();
-     return new Response(null);
    }
 
 }
