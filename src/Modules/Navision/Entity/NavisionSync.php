@@ -26,6 +26,11 @@ class NavisionSync
      */
     private $lastsync;
 
+    /**
+     * @ORM\Column(type="bigint")
+     */
+    private $maxtimestamp;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -51,6 +56,18 @@ class NavisionSync
     public function setLastsync(\DateTimeInterface $lastsync): self
     {
         $this->lastsync = $lastsync;
+
+        return $this;
+    }
+
+    public function getMaxtimestamp(): ?int
+    {
+        return $this->maxtimestamp;
+    }
+
+    public function setMaxtimestamp(int $maxtimestamp): self
+    {
+        $this->maxtimestamp = $maxtimestamp;
 
         return $this;
     }

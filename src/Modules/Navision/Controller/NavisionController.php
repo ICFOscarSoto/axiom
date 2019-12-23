@@ -109,9 +109,6 @@ class NavisionController extends Controller
     }
 
 
-
-
-
     /**
      * @Route("/api/navision/product/importAttributes", name="navisionImportAttributes")
      */
@@ -240,5 +237,5 @@ class NavisionController extends Controller
 
       return new Response("El producto se ha importado correctamente");
     }
-    
+
 }
