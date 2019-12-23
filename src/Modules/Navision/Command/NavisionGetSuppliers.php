@@ -71,7 +71,7 @@ class NavisionGetSuppliers extends ContainerAwareCommand
       }
       $datetime=new \DateTime();
       $output->writeln('* Sincronizando proveedores....');
-      $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getSuppliers.php?from='.$navisionSync->getLastsync()->getMaxtimestamp());
+      $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getSuppliers.php?from='.$navisionSync->getMaxtimestamp());
       $objects=json_decode($json, true);
       $objects=$objects[0];
       //dump($products["products"]);

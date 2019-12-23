@@ -71,7 +71,7 @@ class NavisionGetCustomers extends ContainerAwareCommand
      }
      $datetime=new \DateTime();
      $output->writeln('* Sincronizando clientes....');
-     $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getCustomers.php?from='.$navisionSync->getLastsync()->getMaxtimestamp());
+     $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getCustomers.php?from='.$navisionSync->getMaxtimestamp());
      $objects=json_decode($json, true);
      $objects=$objects[0];
      //dump($products["products"]);
