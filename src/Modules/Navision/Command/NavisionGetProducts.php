@@ -94,9 +94,9 @@ class NavisionGetProducts extends ContainerAwareCommand
          $supplier=$repositorySupliers->findOneBy(["code"=>$object["Supplier"]]);
          if($object["Blocked"]==0) $obj->setActive(0); else $obj->setActive(1);
          $obj->setCode($object["code"]);
-         $obj->setName($product["Description"]);
-         $obj->setWeight($product["Weight"]);
-         $obj->setPVPR($product["ShoppingPrice"]);
+         $obj->setName($object["Description"]);
+         $obj->setWeight($object["Weight"]);
+         $obj->setPVPR($object["ShoppingPrice"]);
          /*$obj->setCity($object["city"]);
          $obj->setPostcode($object["postcode"]);
          $obj->setPhone($object["phone"]);
