@@ -83,7 +83,7 @@ class NavisionGetProducts extends ContainerAwareCommand
         //if($object["vat"]==null) continue;
         $obj=$repository->findOneBy(["code"=>$object["code"]]);
         if ($obj==null) {
-          $obj=new ERPSuppliers();
+          $obj=new ERPProducts();
           $obj->setCode($object["code"]);
           $obj->setCompany($this->company);
           $obj->setDateadd(new \Datetime());
@@ -97,6 +97,7 @@ class NavisionGetProducts extends ContainerAwareCommand
          $obj->setName($object["Description"]);
          $obj->setWeight($object["Weight"]);
          $obj->setPVPR($object["ShoppingPrice"]);
+         $obj->setSupplier($supplier);
          /*$obj->setCity($object["city"]);
          $obj->setPostcode($object["postcode"]);
          $obj->setPhone($object["phone"]);
