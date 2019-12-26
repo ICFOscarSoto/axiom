@@ -649,6 +649,67 @@ class ERPProducts
 
       //finalmente si no tenemos registrado un incremento para un grupo de cliente en particular, tendremos que generarlo. En primer
       //lugar obtenemos los grupos de clientes que no tienen asociado un incremento y posteriormente se lo generamos.
+/*
+      $CustomerGroupsRepository=$doctrine->getRepository(ERPCustomerGroups::class);
+      $customergroups=$CustomerGroupsRepository->findBy(["active"=>1,"deleted"=>0]);
+      $productEntity=$repositoryProduct->findOneBy(["id"=>$this->getId()]);
+      $customergroup_without_price=[];
+      foreach($customergroups as $customergroup){
+        if($repositoryProductPrices->existPrice($this,$customergroup,$this->getSupplier())==FALSE) array_push($customergroup_without_price,$customergroup);
+      }
+
+
+      foreach($customergroup_without_price as $customergroup){
+        $increment=$this->getMaxIncrement($doctrine,$customergroup);
+        $productpricesEntity= new ERPProductPrices();
+        $productpricesEntity->setProduct($this);
+        $productpricesEntity->setCustomergroup($customergroup);
+        $productpricesEntity->setSupplier($this->getSupplier());
+        $productpricesEntity->setIncrement($increment*1);
+        $productpricesEntity->setPrice(round($newShoppingPrice*(1+($increment/100)),2));
+        $productpricesEntity->setActive(1);
+        $productpricesEntity->setDeleted(0);
+        $productpricesEntity->setDateupd(new \DateTime());
+        $productpricesEntity->setDateadd(new \DateTime());
+        $em->persist($productpricesEntity);
+        $em->flush();
+
+      }
+  */
+
+    }
+
+
+    /*permite recalcular el precio de compra, el incremento y el PVP cuando cambiamos de proveedor principal*/
+    public function priceCalculatedNewMainSupplier($doctrine)
+    {
+      $em = $doctrine->getManager();
+      $newShoppingPrice=$this->PVPR*(1-$this->getShoppingDiscount($doctrine)/100);
+      $this->setShoppingPrice($newShoppingPrice);
+
+
+      $CustomerGroupsRepository=$doctrine->getRepository(ERPCustomerGroups::class);
+      $customergroups=$CustomerGroupsRepository->findBy(["active"=>1,"deleted"=>0]);
+      $maxincrement=0;
+      foreach($customergroups as $customergroup){
+        $increment=$this->getMaxIncrement($doctrine,$customergroup);
+        if($increment>$maxincrement) $maxincrement=$increment;
+      }
+
+      $this->setPvpincrement($maxincrement);
+      $this->setPVP($newShoppingPrice*(1+($maxincrement/100)));
+      //Una vez recalculado el PVP, tenemos que recalcular el precio para cada incremento de grupo que exista
+      $repositoryProduct=$doctrine->getRepository(ERPProducts::class);
+      $repositoryProductPrices=$doctrine->getRepository(ERPProductPrices::class);
+      $productprices=$repositoryProductPrices->pricesByProductId($this->getId());
+      foreach($productprices as $productprice)
+      {
+          $productpriceEntity=$repositoryProductPrices->findOneBy(["id"=>$productprice]);
+          $productpriceEntity->setPrice(round($newShoppingPrice*(1+($productpriceEntity->getIncrement()/100)),2));
+      }
+
+      //finalmente si no tenemos registrado un incremento para un grupo de cliente en particular, tendremos que generarlo. En primer
+      //lugar obtenemos los grupos de clientes que no tienen asociado un incremento y posteriormente se lo generamos.
       $CustomerGroupsRepository=$doctrine->getRepository(ERPCustomerGroups::class);
       $customergroups=$CustomerGroupsRepository->findBy(["active"=>1,"deleted"=>0]);
       $productEntity=$repositoryProduct->findOneBy(["id"=>$this->getId()]);
@@ -677,6 +738,7 @@ class ERPProducts
 
     }
 
+
     public function calculatePVP($doctrine){
          $CustomerGroupsRepository=$doctrine->getRepository(ERPCustomerGroups::class);
          $customergroups=$CustomerGroupsRepository->findBy(["active"=>1,"deleted"=>0]);
@@ -686,8 +748,6 @@ class ERPProducts
            //dump("Incremento ".$increment." para el grupo ".$customergroup->getName());
            if($increment>$maxincrement) $maxincrement=$increment;
          }
-         dump($this->shoppingPrice);
-         dump($maxincrement);
          $this->setPVP($this->shoppingPrice*(1+($maxincrement/100)));
          $this->setPvpincrement($maxincrement);
      }
@@ -703,9 +763,9 @@ class ERPProducts
       }
 
       if ($maxincrement==null){
-          dump("justo antes");
+
           $maxincrement=$repository->getMaxIncrement($this->supplier,null,$customergroup);
-          dump("Incremeto máximo de".$customergroup->getName()." ".$maxincrement);
+
       }
       if ($maxincrement==null){
           $category=$this->category;
@@ -726,9 +786,13 @@ class ERPProducts
 
 
     public function preProccess($kernel, $doctrine, $user, $params, $oldobj){
-      //If PVPR, Category or Suppliers is updated then ShoppingPrice is calculated
-      if(($this->PVPR!=$oldobj->getPVPR() or $this->category!=$oldobj->getCategory() or $this->supplier!=$oldobj->getSupplier()))
+      //si cambia el PVPR o la categoria, recalculamos precios
+      if(($this->PVPR!=$oldobj->getPVPR() or $this->category!=$oldobj->getCategory()))
           $this->priceCalculated($doctrine);
+      //en caso de que cambie el proveedor preferente, tenemos que tratarlo de manera diferente, ya que hay
+      //que recalcular el incremento y el PVP en la tabla del producto.
+      else if($this->supplier!=$oldobj->getSupplier())
+          $this->priceCalculatedNewMainSupplier($doctrine);
 
     }
 
