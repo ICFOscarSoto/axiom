@@ -6,7 +6,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use App\Modules\ERP\Entity\ERPCustomers;
+use App\Modules\ERP\Entity\ERPCategories;
 use App\Modules\ERP\Entity\ERPSuppliers;
 use App\Modules\ERP\Entity\ERPProducts;
 use App\Modules\ERP\Entity\ERPPaymentMethods;
@@ -76,12 +76,14 @@ class NavisionGetProducts extends ContainerAwareCommand
       $objects=json_decode($json, true);
       $objects=$objects[0];
       //dump($products["products"]);
+      $repositoryCategories=$this->doctrine->getRepository(ERPCategories::class);
       $repositorySupliers=$this->doctrine->getRepository(ERPSuppliers::class);
       $repository=$this->doctrine->getRepository(ERPProducts::class);
       foreach ($objects["class"] as $key=>$object){
         $output->writeln('  - '.$object["code"].' - '.$object["Description"]);
         //if($object["vat"]==null) continue;
         $obj=$repository->findOneBy(["code"=>$object["code"]]);
+        $oldobj=$obj;
         if ($obj==null) {
           $obj=new ERPProducts();
           $obj->setCode($object["code"]);
@@ -90,8 +92,10 @@ class NavisionGetProducts extends ContainerAwareCommand
           $obj->setDateupd(new \Datetime());
           $obj->setDeleted(0);
           $obj->setActive(1);
+          $category=$repositoryCategory->findOneBy(["name"=>"Sin Categoria"]);
+          $obj->setCategory($category);
         }
-         $supplier=$repositorySupliers->findOneBy(["code"=>$object["Supplier"]]);
+          $supplier=$repositorySupliers->findOneBy(["code"=>$object["Supplier"]]);
          if($object["Blocked"]==0) $obj->setActive(0); else $obj->setActive(1);
          $obj->setCode($object["code"]);
          $obj->setName($object["Description"]);
@@ -107,6 +111,7 @@ class NavisionGetProducts extends ContainerAwareCommand
          $obj->setState($state);
          $obj->setCurrency($currency);
          $obj->setPaymentMethod($paymentMethod);*/
+         $obj->preProccess($this, $this->doctrine, null, $params, $oldobj);
          $this->doctrine->getManager()->persist($obj);
          $this->doctrine->getManager()->flush();
       }

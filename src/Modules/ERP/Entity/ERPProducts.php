@@ -601,6 +601,7 @@ class ERPProducts
       $repositoryCategory=$doctrine->getRepository(ERPCategories::class);
       $category=$this->category;
       $shoppingDiscounts=$repository->findOneBy(["supplier"=>$this->supplier,"category"=>$category,"active"=>1,"deleted"=>0]);
+      if ($category!=null)
       while ($category->getParentid()!=null && $shoppingDiscounts==null){
           $category=$category->getParentid();
           $shoppingDiscounts=$repository->findOneBy(["supplier"=>$this->supplier,"category"=>$category,"active"=>1,"deleted"=>0]);
