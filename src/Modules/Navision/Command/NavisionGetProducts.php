@@ -76,7 +76,7 @@ class NavisionGetProducts extends ContainerAwareCommand
       $objects=json_decode($json, true);
       $objects=$objects[0];
       //dump($products["products"]);
-      $repositoryCategories=$this->doctrine->getRepository(ERPCategories::class);
+      $repositoryCategory=$this->doctrine->getRepository(ERPCategories::class);
       $repositorySupliers=$this->doctrine->getRepository(ERPSuppliers::class);
       $repository=$this->doctrine->getRepository(ERPProducts::class);
       foreach ($objects["class"] as $key=>$object){
