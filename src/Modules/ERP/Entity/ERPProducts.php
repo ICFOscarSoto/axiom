@@ -711,6 +711,7 @@ class ERPProducts
 
       //finalmente si no tenemos registrado un incremento para un grupo de cliente en particular, tendremos que generarlo. En primer
       //lugar obtenemos los grupos de clientes que no tienen asociado un incremento y posteriormente se lo generamos.
+/*
       $CustomerGroupsRepository=$doctrine->getRepository(ERPCustomerGroups::class);
       $customergroups=$CustomerGroupsRepository->findBy(["active"=>1,"deleted"=>0]);
       $productEntity=$repositoryProduct->findOneBy(["id"=>$this->getId()]);
@@ -736,6 +737,7 @@ class ERPProducts
         $em->flush();
 
       }
+      */
 
     }
 
