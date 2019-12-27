@@ -79,6 +79,10 @@ class NavisionGetProducts extends ContainerAwareCommand
       $repositoryCategory=$this->doctrine->getRepository(ERPCategories::class);
       $repositorySupliers=$this->doctrine->getRepository(ERPSuppliers::class);
       $repository=$this->doctrine->getRepository(ERPProducts::class);
+
+      //Disable SQL logger
+      $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
+
       foreach ($objects["class"] as $key=>$object){
         $output->writeln('  - '.$object["code"].' - '.$object["Description"]);
         //if($object["vat"]==null) continue;
@@ -114,6 +118,7 @@ class NavisionGetProducts extends ContainerAwareCommand
          //$obj->preProccess($this, $this->doctrine, null, null, $oldobj);
          $this->doctrine->getManager()->persist($obj);
          $this->doctrine->getManager()->flush();
+         $this->doctrine->getManager()->clear();
       }
       $navisionSync->setLastsync($datetime);
       $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
