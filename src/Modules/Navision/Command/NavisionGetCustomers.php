@@ -80,6 +80,10 @@ class NavisionGetCustomers extends ContainerAwareCommand
      $repositoryPaymentMethod=$this->doctrine->getRepository(ERPPaymentMethods::class);
      $repositoryStates=$this->doctrine->getRepository(GlobaleStates::class);
      $repository=$this->doctrine->getRepository(ERPCustomers::class);
+
+     //Disable SQL logger
+     $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
+
      foreach ($objects["class"] as $key=>$object){
        $output->writeln('  - '.$object["code"].' - '.$object["socialname"]);
        if($object["vat"]==null) continue;
@@ -113,6 +117,7 @@ class NavisionGetCustomers extends ContainerAwareCommand
         $obj->setPaymentMethod($paymentMethod);
         $this->doctrine->getManager()->persist($obj);
         $this->doctrine->getManager()->flush();
+        $this->doctrine->getManager()->clear();
 
      }
      $navisionSync->setLastsync($datetime);
