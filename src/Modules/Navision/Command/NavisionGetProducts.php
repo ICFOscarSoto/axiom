@@ -116,7 +116,7 @@ class NavisionGetProducts extends ContainerAwareCommand
          $obj->setCurrency($currency);
          $obj->setPaymentMethod($paymentMethod);*/
          //$obj->preProccess($this, $this->doctrine, null, null, $oldobj);
-         $this->doctrine->getManager()->persist($obj);
+         $this->doctrine->getManager()->merge($obj);
          $this->doctrine->getManager()->flush();
          $this->doctrine->getManager()->clear();
       }
