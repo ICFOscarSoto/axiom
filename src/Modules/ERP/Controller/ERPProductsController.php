@@ -146,7 +146,7 @@ class ERPProductsController extends Controller
 		/*	$listEAN13 = new ERPEAN13Utils();
 			$formUtilsEAN = new GlobaleFormUtils();
 			$formUtilsEAN->initialize($this->getUser(), new ERPEAN13(), dirname(__FILE__)."/../Forms/EAN13.json", $request, $this, $this->getDoctrine());
-			$forms[]=$formUtilsEAN->formatForm('EAN13', true, null, ERPEAN13::class); */
+			$forms[]=$formUtilsEAN->formatForm('EAN13', true, null, ERPEAN13::class);
 			$listReferences = new ERPReferencesUtils();
 			$formUtilsReferences = new GlobaleFormUtils();
 			$formUtilsReferences->initialize($this->getUser(), new ERPReferences(), dirname(__FILE__)."/../Forms/References.json", $request, $this, $this->getDoctrine());
@@ -162,7 +162,7 @@ class ERPProductsController extends Controller
 			$listAttributes->getExcludedForm(null),
 			$listAttributes->getIncludedForm(["parent"=>$product, "doctrine"=>$this->getDoctrine(), "user"=>$this->getUser()]));
 			$forms[]=$formUtilsAttributes->formatForm('ProductsAttributes', true, null, ERPProductsAttributes::class);
-
+*/
 			return $this->render('@ERP/productform.html.twig', array(
 				'controllerName' => 'productsController',
 				'interfaceName' => 'Productos',
@@ -170,11 +170,11 @@ class ERPProductsController extends Controller
 				'userData' => $userdata,
 				'id' => $id,
 				'id_object' => $id,
-				'form' => $formUtils->formatForm('products', true, $id, $this->class, "dataProduct"),
+				'form' => $formUtils->formatForm('products', true, $id, $this->class, "dataProduct")
 				//'listEAN13' => $listEAN13->formatListByProduct($id),
-				'listReferences' => $listReferences->formatListByProduct($id),
-				'listAttributes' => $listAttributes->formatListByProduct($id),
-				'forms' => $forms
+				//'listReferences' => $listReferences->formatListByProduct($id),
+				//'listAttributes' => $listAttributes->formatListByProduct($id),
+				//'forms' => $forms
 			));
 
 		}
