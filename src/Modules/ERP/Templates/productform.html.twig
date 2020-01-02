@@ -54,7 +54,7 @@
 		{{ include("@Globale/form_fields_unity.html.twig") }}
 		{# Check if field has a field type number #}
 		{{ include("@Globale/form_fields_type_number.html.twig") }}
-		<!-- {% if field.type is defined and field.type == 'image' %}
+		{% if field.type is defined and field.type == 'image' %}
 		<div class="col-md-6">
 			{# Field type Image #}
 			<div id="fileinput-{{field.name}}" class="fileinput fileinput-new" data-provides="fileinput">
@@ -136,7 +136,7 @@
 			});
 			</script>
 		</div>
-		{% endif %} -->
+		{% endif %}
 
 		{% endfor %}
 
@@ -233,27 +233,27 @@
 
 	</div>
 	<div class="row">
-		<div class="col-md-4">
+		<!-- <div class="col-md-4">
 			<div class="panel-title-list">Codigos EAN13</div>
 			{% if listEAN13 is defined %}
 			{% set listConstructor = listEAN13 %}
 			{{ include('@Globale/list.html.twig') }}
 			{% endif %}
-		</div>
-		<!-- <div class="col-md-4">
+		</div> -->
+		 <div class="col-md-4">
 			<div class="panel-title-list">Referencias cruzadas</div>
 			{% if listReferences is defined %}
 			{% set listConstructor = listReferences %}
 			{{ include('@Globale/list.html.twig') }}
 			{% endif %}
-		</div> -->
-		<!-- <div class="col-md-4">
+		</div>
+		<div class="col-md-4">
 			<div class="panel-title-list">Atributos</div>
 			{% if listAttributes is defined %}
 			{% set listConstructor = listAttributes %}
 			{{ include('@Globale/list.html.twig') }}
 			{% endif %}
-		</div> -->
+		</div>
 	</div>
 </div>
 <!-- END MAIN CONTENT -->
