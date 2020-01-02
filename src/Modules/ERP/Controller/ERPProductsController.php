@@ -142,7 +142,8 @@ class ERPProductsController extends Controller
 			$formUtils = new GlobaleFormUtils();
 			$formUtilsProducts = new ERPProductsUtils();
 			$formUtils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),$formUtilsProducts->getExcludedForm([]),$formUtilsProducts->getIncludedForm(["doctrine"=>$this->getDoctrine(), "user"=>$this->getUser(), "id"=>$id]));
-			$listEAN13 = new ERPEAN13Utils();
+
+/*			$listEAN13 = new ERPEAN13Utils();
 			$formUtilsEAN = new GlobaleFormUtils();
 			$formUtilsEAN->initialize($this->getUser(), new ERPEAN13(), dirname(__FILE__)."/../Forms/EAN13.json", $request, $this, $this->getDoctrine());
 			$forms[]=$formUtilsEAN->formatForm('EAN13', true, null, ERPEAN13::class);
@@ -150,15 +151,18 @@ class ERPProductsController extends Controller
 			$formUtilsReferences = new GlobaleFormUtils();
 			$formUtilsReferences->initialize($this->getUser(), new ERPReferences(), dirname(__FILE__)."/../Forms/References.json", $request, $this, $this->getDoctrine());
 			$forms[]=$formUtilsReferences->formatForm('References', true, null, ERPReferences::class);
-			$listAttributes = new ERPProductsAttributesUtils();
 
+
+			$listAttributes = new ERPProductsAttributesUtils();
 			$productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
 			$product=$productRepository->findOneBy(["id"=>$id, "active"=>1, "deleted"=>0, "company"=>$this->getUser()->getCompany()]);
 
 			$formUtilsAttributes = new GlobaleFormUtils();
-			$formUtilsAttributes->initialize($this->getUser(), new ERPProductsAttributes(), dirname(__FILE__)."/../Forms/References.json", $request, $this, $this->getDoctrine(),$listAttributes->getExcludedForm(null),$listAttributes->getIncludedForm(["parent"=>$product, "doctrine"=>$this->getDoctrine(), "user"=>$this->getUser()]));
+			$formUtilsAttributes->initialize($this->getUser(), new ERPProductsAttributes(), dirname(__FILE__)."/../Forms/References.json", $request, $this, $this->getDoctrine(),
+			$listAttributes->getExcludedForm(null),
+			$listAttributes->getIncludedForm(["parent"=>$product, "doctrine"=>$this->getDoctrine(), "user"=>$this->getUser()]));
 			$forms[]=$formUtilsAttributes->formatForm('ProductsAttributes', true, null, ERPProductsAttributes::class);
-
+*/
 			return $this->render('@ERP/productform.html.twig', array(
 				'controllerName' => 'productsController',
 				'interfaceName' => 'Productos',
@@ -166,11 +170,11 @@ class ERPProductsController extends Controller
 				'userData' => $userdata,
 				'id' => $id,
 				'id_object' => $id,
-				'form' => $formUtils->formatForm('products', true, $id, $this->class, "dataProduct"),
-				'listEAN13' => $listEAN13->formatListByProduct($id),
-				'listReferences' => $listReferences->formatListByProduct($id),
-				'listAttributes' => $listAttributes->formatListByProduct($id),
-				'forms' => $forms
+				'form' => $formUtils->formatForm('products', true, $id, $this->class, "dataProduct")
+				//'listEAN13' => $listEAN13->formatListByProduct($id),
+				//'listReferences' => $listReferences->formatListByProduct($id),
+				//'listAttributes' => $listAttributes->formatListByProduct($id),
+				//'forms' => $forms
 			));
 
 		}
