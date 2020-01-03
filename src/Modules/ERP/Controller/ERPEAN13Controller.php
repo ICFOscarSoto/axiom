@@ -49,7 +49,7 @@ class ERPEAN13Controller extends Controller
    */
    public function data($id, $action, $idproduct, Request $request)
    {
-   $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');   
+   $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
    $template=dirname(__FILE__)."/../Forms/EAN13.json";
    $utils = new GlobaleFormUtils();
    $utilsObj=new ERPEAN13Utils();
@@ -74,8 +74,16 @@ class ERPEAN13Controller extends Controller
    return $make;
   }
 
-
-
+  /**
+   * @Route("/{_locale}/listEAN13/{id}", name="listEAN13", defaults={"id"=0})
+   */
+  public function listEAN13($id){
+    $listEAN13 = new ERPEAN13Utils();
+    return $this->render('@Globale/list.html.twig', array(
+      'listConstructor' => $listEAN13->formatListByProduct($id),
+      'id_object'=>$id
+    ));
+  }
 
 
 
