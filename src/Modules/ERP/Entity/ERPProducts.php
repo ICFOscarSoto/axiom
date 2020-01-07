@@ -779,11 +779,12 @@ class ERPProducts
               $maxincrement=$repository->getMaxIncrement(null,$category,$customergroup);
           }
        }
-
+/*
       if ($maxincrement==null){
         $repository=$doctrine->getRepository(ERPCustomerGroups::class);
         $maxincrement=$repository->getIncrement($customergroup);
       }
+*/
       return $maxincrement;
     }
 
