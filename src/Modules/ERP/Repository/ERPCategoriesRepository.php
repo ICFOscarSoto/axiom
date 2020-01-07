@@ -36,7 +36,7 @@ class ERPCategoriesRepository extends ServiceEntityRepository
       ->getQuery()
       ->getResult();
       foreach($qb as $parent) {
-        $child=["id"=>$parent->getId(),"name"=>$parent->getName(), "childrens"=>$this->getChildrens($parent->getId(),[], $user)];
+        $child=["id"=>$parent->getId(),"name"=>addslashes($parent->getName()), "childrens"=>$this->getChildrens($parent->getId(),[], $user)];
         array_push($temp_childs,$child);
       }
       return $temp_childs;
@@ -60,7 +60,7 @@ class ERPCategoriesRepository extends ServiceEntityRepository
       $childrens=[];
       foreach($qb as $parent) {
       $child=[];
-      $child=["id"=>$parent->getId(),"name"=>$parent->getName(), "childrens"=>$this->getChildrens($parent->getId(), $child, $user)];
+      $child=["id"=>$parent->getId(),"name"=>addslashes($parent->getName()), "childrens"=>$this->getChildrens($parent->getId(), $child, $user)];
       array_push($childrens,$child);
       }
 

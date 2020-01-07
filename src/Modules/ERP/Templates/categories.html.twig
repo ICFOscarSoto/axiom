@@ -54,8 +54,11 @@
 				data+='';
 				return data;
 			}
-			var categories='{{ categories }}';
-			categories=categories.replace(/&quot;/g,'"');
+			var categories='{{(categories|raw)}}';
+			//categories=categories.replace(/&quot;/g,'"');
+			//categories=categories.replace(/&quot;/g,'"');
+
+			console.log(categories);
 			categories = $.parseJSON(categories);
 			categories.forEach( function(valor, indice, array) {
 				$("#categories").append(
@@ -86,7 +89,7 @@
 												afterInit: function ( event ) {
 
 												}
-											})
+											}).nestable('collapseAll')
 											.on('dragEnd', function(event, item, source, destination, position) {
 												$.ajax({
 													 dataType: "json",
