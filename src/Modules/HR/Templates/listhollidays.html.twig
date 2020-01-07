@@ -148,14 +148,6 @@
 	</div>
 	</p>
 	<!-- END BUTTONZONE -->
-
-
-
-
-
-
-
-
 			<div class="calendar-env">
 	    			<!-- Calendar Body -->
 	    			<div class="">
@@ -171,7 +163,6 @@
 	{{ include('@Globale/chat_histories.html.twig') }}
 </div>
 	<!-- MODALS  -->
-
 	{% set formConstructor = form %}
   {{ include('@Globale/genericajaxform.html.twig') }}
 	<!-- END MODALS -->
@@ -289,7 +280,7 @@
         });
 
 
-				$('[id^="modal-confirm-"]').on('hidden.bs.modal', function () {
+				$('[id^="holidays-modal-form"]').on('hidden.bs.modal', function () {
 				  elements_reload();
 				});
 

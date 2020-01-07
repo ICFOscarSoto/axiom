@@ -25,8 +25,8 @@
       tooltips: spanish_tooltips_datetimepicker,
       date: (dateField.isValid())?dateField:null
     });
-    if($(this).attr("minDate")!="" && typeof $(this).attr("minDate")!==typeof undefined) $(this).data("DateTimePicker").minDate(moment($(this).attr("minDate"), "MM-DD"));
-    if($(this).attr("maxDate")!="" && typeof $(this).attr("maxDate")!==typeof undefined) $(this).data("DateTimePicker").maxDate(moment($(this).attr("maxDate"), "MM-DD"));
+    if($(this).attr("minDate")!="" && typeof $(this).attr("minDate")!==typeof undefined) $(this).data("DateTimePicker").minDate(moment($(this).attr("minDate"), "YYYY-MM-DD"));
+    if($(this).attr("maxDate")!="" && typeof $(this).attr("maxDate")!==typeof undefined) $(this).data("DateTimePicker").maxDate(moment($(this).attr("maxDate"), "YYYY-MM-DD"));
   });
 
   $('.dateshortpicker').each(function(index) {
