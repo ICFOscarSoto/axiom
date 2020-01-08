@@ -102,8 +102,6 @@ class ERPIncrementsRepository extends ServiceEntityRepository
       }
 
       else if($supplier!=NULL){
-        dump($supplier->getId());
-        dump($customergroup->getId());
         $query="SELECT max(i.increment) as increment FROM erpincrements i WHERE i.supplier_id=:SUP AND i.category_id IS NULL  AND i.customergroup_id=:GRP AND i.active=1 AND i.deleted=0";
         $params=[ 'SUP' => $supplier->getId(),
                   'GRP' => $customergroup->getId()

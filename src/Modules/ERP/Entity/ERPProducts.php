@@ -618,6 +618,7 @@ class ERPProducts
       $em = $doctrine->getManager();
       $newShoppingPrice=$this->PVPR*(1-$this->getShoppingDiscount($doctrine)/100);
       $this->setShoppingPrice($newShoppingPrice);
+
       /*ante un cambio en los precios, si no tenemos almacenado el valor del incremento máximo
       para el producto, tendremos que recalcularlo. En cambio, si ya lo tenemos almacenado, simplemente se recalculará
       el PVP con ese incremento y con el nuevo precio de compra*/
@@ -641,7 +642,7 @@ class ERPProducts
       //Una vez recalculado el PVP, tenemos que recalcular el precio para cada incremento de grupo que exista
       $repositoryProduct=$doctrine->getRepository(ERPProducts::class);
       $repositoryProductPrices=$doctrine->getRepository(ERPProductPrices::class);
-      $productprices=$repositoryProductPrices->pricesByProductId($this->getId());
+      $productprices=$repositoryProductPrices->pricesByProductIdAndSupplier($this->getId(),$this->supplier->getId());
       foreach($productprices as $productprice)
       {
           $productpriceEntity=$repositoryProductPrices->findOneBy(["id"=>$productprice]);
@@ -699,10 +700,12 @@ class ERPProducts
 
       $this->setPvpincrement($maxincrement);
       $this->setPVP($newShoppingPrice*(1+($maxincrement/100)));
+
       //Una vez recalculado el PVP, tenemos que recalcular el precio para cada incremento de grupo que exista
       $repositoryProduct=$doctrine->getRepository(ERPProducts::class);
       $repositoryProductPrices=$doctrine->getRepository(ERPProductPrices::class);
-      $productprices=$repositoryProductPrices->pricesByProductId($this->getId());
+      $productprices=$repositoryProductPrices->pricesByProductIdAndSupplier($this->getId(),$this->supplier->getId());
+
       foreach($productprices as $productprice)
       {
           $productpriceEntity=$repositoryProductPrices->findOneBy(["id"=>$productprice]);
@@ -737,7 +740,7 @@ class ERPProducts
         $em->flush();
 
       }
-      */
+*/
 
     }
 

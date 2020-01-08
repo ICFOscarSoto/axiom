@@ -309,14 +309,6 @@ class ERPIncrements
             $incrementbygroup=$repository->getIncrementByGroup(null,$category,$customergroup);
           }
         }
-/*
-      if($incrementbygroup==null){
-        $repository=$doctrine->getRepository(ERPCustomerGroups::class);
-        $incrementbygroup=$repository->getIncrement($customergroup);
-        return $incrementbygroup;
-
-      }
-*/
 
       return $incrementbygroup;
     }

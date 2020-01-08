@@ -41,6 +41,18 @@ class ERPProductPricesRepository extends ServiceEntityRepository
 
     }
 
+
+      public function pricesByProductIdAndSupplier($product,$supplier){
+          $query="SELECT id from erpproduct_prices
+          WHERE product_id=:product AND supplier_id=:supplier";
+          $params=['product' => $product,
+                  'supplier' => $supplier
+                  ];
+          return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+
+      }
+
+
     public function existPrice($product,$customergroup,$supplier){
       $query="SELECT * FROM erpproduct_prices p WHERE p.product_id=:PROD AND p.customergroup_id=:GRP AND p.supplier_id=:SUP AND p.active=TRUE and p.deleted=0";
       $params=['PROD' => $product->getId(),
@@ -67,10 +79,10 @@ class ERPProductPricesRepository extends ServiceEntityRepository
       else return false;
     }
 
-    //lamamos a este método cuando hay algún cambio de incrementos en la tabla de CustomerGroups.
+    //Llamamos a este método cuando hay algún cambio de incrementos en la tabla de CustomerGroups.
     //Lo que hacemos es buscar cualquier tipo de precio para un producto y un proveedor. En caso de que exista,
     //este incremento de precio general no le afectará.
-        public function existPriceByProductSupplier($product,$supplier){
+    public function existPriceByProductSupplier($product,$supplier){
           $query="SELECT * FROM erpproduct_prices p WHERE p.product_id=:PROD AND p.supplier_id=:SUP AND p.active=TRUE and p.deleted=0";
           $params=['PROD' => $product->getId(),
                    'SUP' => $supplier->getId()
