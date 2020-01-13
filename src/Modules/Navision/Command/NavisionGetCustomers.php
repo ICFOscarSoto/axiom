@@ -65,8 +65,6 @@ class NavisionGetCustomers extends ContainerAwareCommand
      $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"customers"]);
      if ($navisionSync==null) {
        $navisionSync=new NavisionSync();
-       $navisionSync->setEntity("customers");
-       $navisionSync->setLastsync(new \DateTime("@0"));
        $navisionSync->setMaxtimestamp(0);
      }
      $datetime=new \DateTime();
@@ -91,7 +89,9 @@ class NavisionGetCustomers extends ContainerAwareCommand
        if ($obj==null) {
          $obj=new ERPCustomers();
          $obj->setCode($object["code"]);
-         $obj->setCompany($this->company);
+         $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
+         $company=$repositoryCompanies->find(2);
+         $obj->setCompany($company);
          $obj->setDateadd(new \Datetime());
          $obj->setDeleted(0);
          $obj->setActive(1);
@@ -119,6 +119,11 @@ class NavisionGetCustomers extends ContainerAwareCommand
         $this->doctrine->getManager()->flush();
         $this->doctrine->getManager()->clear();
 
+     }
+     $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"customers"]);
+     if ($navisionSync==null) {
+       $navisionSync=new NavisionSync();
+       $navisionSync->setEntity("customers");
      }
      $navisionSync->setLastsync($datetime);
      $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
