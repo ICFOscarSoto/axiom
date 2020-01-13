@@ -156,8 +156,8 @@ class ERPCustomers
     private $invoiceday;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCompanies", cascade={"persist"})
-     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
+     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCompanies")
+     * @ORM\JoinColumn(nullable=false)
      */
     private $company;
 
