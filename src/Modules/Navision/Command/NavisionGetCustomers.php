@@ -99,7 +99,7 @@ class NavisionGetCustomers extends ContainerAwareCommand
         $country=$repositoryCountries->findOneBy(["alfa2"=>$object["country"]]);
         $state=$repositoryStates->findOneBy(["name"=>$object["state"]]);
         $currency=$repositoryCurrencies->findOneBy(["isocode"=>"EUR"]);
-        $paymentMethod=$repositoryPaymentMethod->findOneBy(["id"=>1]);
+        $paymentMethod=$repositoryPaymentMethod->findOneBy(["paymentcode"=>$object["payment_method"]]);
         if($object["socialname"][0]=='*') $obj->setActive(0); else $obj->setActive(1);
         $obj->setVat($object["vat"]);
         $obj->setName(ltrim(ltrim($object["name"]),'*'));
