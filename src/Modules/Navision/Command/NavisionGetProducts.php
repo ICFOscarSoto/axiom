@@ -66,8 +66,6 @@ class NavisionGetProducts extends ContainerAwareCommand
       $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"products"]);
       if ($navisionSync==null) {
         $navisionSync=new NavisionSync();
-        $navisionSync->setEntity("products");
-        $navisionSync->setLastsync(new \DateTime("@0"));
         $navisionSync->setMaxtimestamp(0);
       }
       $datetime=new \DateTime();
@@ -91,7 +89,9 @@ class NavisionGetProducts extends ContainerAwareCommand
         if ($obj==null) {
           $obj=new ERPProducts();
           $obj->setCode($object["code"]);
-          $obj->setCompany($this->company);
+          $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
+          $company=$repositoryCompanies->find(2);
+          $obj->setCompany($company);
           $obj->setDateadd(new \Datetime());
           $obj->setDateupd(new \Datetime());
           $obj->setDeleted(0);
@@ -106,19 +106,14 @@ class NavisionGetProducts extends ContainerAwareCommand
          $obj->setWeight($object["Weight"]);
          $obj->setPVPR($object["ShoppingPrice"]);
          $obj->setSupplier($supplier);
-         /*$obj->setCity($object["city"]);
-         $obj->setPostcode($object["postcode"]);
-         $obj->setPhone($object["phone"]);
-         $obj->setWeb($object["web"]);
-         $obj->setEmail($object["email"]);
-         $obj->setCountry($country);
-         $obj->setState($state);
-         $obj->setCurrency($currency);
-         $obj->setPaymentMethod($paymentMethod);*/
          //$obj->preProccess($this, $this->doctrine, null, null, $oldobj);
          $this->doctrine->getManager()->merge($obj);
          $this->doctrine->getManager()->flush();
          $this->doctrine->getManager()->clear();
+      }$navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"customers"]);
+      if ($navisionSync==null) {
+        $navisionSync=new NavisionSync();
+        $navisionSync->setEntity("customers");
       }
       $navisionSync->setLastsync($datetime);
       $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
@@ -126,5 +121,11 @@ class NavisionGetProducts extends ContainerAwareCommand
       $this->doctrine->getManager()->flush();
     }
 
+
+
+    public function importReferences(InputInterface $input, OutputInterface $output){
+      $navisionSyncRepository=$this->doctrine->getRepository(NavisionSync::class);
+
+    }
 }
 ?>
