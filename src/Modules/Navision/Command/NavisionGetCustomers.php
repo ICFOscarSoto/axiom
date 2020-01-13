@@ -90,7 +90,7 @@ class NavisionGetCustomers extends ContainerAwareCommand
          $obj=new ERPCustomers();
          $obj->setCode($object["code"]);
          $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
-         $company=$repositoryCompanies->findOne(2);
+         $company=$repositoryCompanies->find(2);
          $obj->setCompany($company);
          $obj->setDateadd(new \Datetime());
          $obj->setDeleted(0);
