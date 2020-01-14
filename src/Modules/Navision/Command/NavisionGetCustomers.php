@@ -104,7 +104,10 @@ class NavisionGetCustomers extends ContainerAwareCommand
         $paymentMethod=$repositoryPaymentMethod->findOneBy(["paymentcode"=>$object["payment_method"]]);
         if($object["payment_terms"]!="") $paymentTerms=$repositoryPaymentTerms->findOneBy(["code"=>$object["payment_terms"]]);
         else $paymentTerms=$repositoryPaymentTerms->findOneBy(["id"=>"11"]);
-        if($object["socialname"][0]=='*') $obj->setActive(0); else $obj->setActive(1);
+        if($object["socialname"]!=null)
+          if($object["socialname"][0]=='*') $obj->setActive(0);
+            else $obj->setActive(1);
+        else $obj->setActive(1);
         $obj->setVat($object["vat"]);
         $obj->setName(ltrim(ltrim($object["name"]),'*'));
         $obj->setSocialname(ltrim(ltrim($object["socialname"]),'*'));
