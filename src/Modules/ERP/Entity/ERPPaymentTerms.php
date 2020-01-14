@@ -6,9 +6,9 @@ use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
 
 /**
- * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPPaymentMethodsRepository")
+ * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPPaymentTermsRepository")
  */
-class ERPPaymentMethods
+class ERPPaymentTerms
 {
     /**
      * @ORM\Id()
@@ -18,15 +18,19 @@ class ERPPaymentMethods
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=120)
+     * @ORM\Column(type="string", length=20)
      */
-    private $name;
+    private $code;
 
     /**
      * @ORM\Column(type="string", length=20)
      */
-    private $paymentcode;
+    private $firstexpiration;
 
+    /**
+     * @ORM\Column(type="string", length=150)
+     */
+    private $name;
 
     /**
      * @ORM\Column(type="datetime")
@@ -48,19 +52,42 @@ class ERPPaymentMethods
      */
     private $deleted;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCompanies")
-     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
-     */
-    private $company;
-
     public $newSeconds=1296000;
     public $updatedSeconds=1296000;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCompanies")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $company;
 
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getCode(): ?string
+    {
+        return $this->code;
+    }
+
+    public function setCode(string $code): self
+    {
+        $this->code = $code;
+
+        return $this;
+    }
+
+    public function getFirstexpiration(): ?string
+    {
+        return $this->firstexpiration;
+    }
+
+    public function setFirstexpiration(string $firstexpiration): self
+    {
+        $this->firstexpiration = $firstexpiration;
+
+        return $this;
     }
 
     public function getName(): ?string
@@ -71,18 +98,6 @@ class ERPPaymentMethods
     public function setName(string $name): self
     {
         $this->name = $name;
-
-        return $this;
-    }
-
-    public function getPaymentcode(): ?string
-    {
-        return $this->paymentcode;
-    }
-
-    public function setPaymentcode(string $paymentcode): self
-    {
-        $this->paymentcode = $paymentcode;
 
         return $this;
     }
@@ -147,27 +162,4 @@ class ERPPaymentMethods
         return $this;
     }
 
-    public function getCounterpart(): ?int
-    {
-        return $this->counterpart;
-    }
-
-    public function setCounterpart(int $counterpart): self
-    {
-        $this->counterpart = $counterpart;
-
-        return $this;
-    }
-
-    public function getCounterpartaccount(): ?string
-    {
-        return $this->counterpartaccount;
-    }
-
-    public function setCounterpartaccount(string $counterpartaccount): self
-    {
-        $this->counterpartaccount = $counterpartaccount;
-
-        return $this;
-    }
 }

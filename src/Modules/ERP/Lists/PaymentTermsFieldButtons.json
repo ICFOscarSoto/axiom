@@ -1,0 +1,8 @@
+[
+  {"id": "editPaymentTerms", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"genericdata", "routeParams":{"module":"ERP", "name":"PaymentTerms", "type":"modal" }, "modal":"PaymentTerms", "actionType" : "background", "confirm" :false, "tooltip":""},
+  {"id": "activation", "type": "option", "options": [
+      {"id": "desactivatePaymentTerms", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"genericdisable", "routeParams":{"module":"ERP", "name":"PaymentTerms"}, "confirm" :true, "actionType" : "background", "tooltip":"" },
+      {"id": "activatePaymentTerms", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "route":"genericenable", "routeParams":{"module":"ERP", "name":"PaymentTerms"}, "confirm" :true, "actionType" : "background", "tooltip":"" }
+  ]},
+  {"id": "deletePaymentTerms", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"genericdelete", "routeParams":{"module":"ERP", "name":"PaymentTerms"}, "confirm" :true, "undo" :false, "actionType" : "background", "tooltip":""}
+]

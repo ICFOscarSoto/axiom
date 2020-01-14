@@ -8,6 +8,7 @@ use \App\Modules\Globale\Entity\GlobaleCountries;
 use \App\Modules\ERP\Entity\ERPCustomerGroups;
 use \App\Modules\ERP\Entity\ERPPaymentMethods;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
+use \App\Modules\ERP\Entity\ERPPaymentTerms;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPCustomersRepository")
@@ -175,6 +176,12 @@ class ERPCustomers
      * @ORM\Column(type="string", length=180, nullable=true)
      */
     private $web;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPPaymentTerms")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $paymentterms;
 
     public function getId(): ?int
     {
@@ -556,6 +563,18 @@ class ERPCustomers
     public function setWeb(?string $web): self
     {
         $this->web = $web;
+
+        return $this;
+    }
+
+    public function getPaymentterms(): ?ERPPaymentTerms
+    {
+        return $this->paymentterms;
+    }
+
+    public function setPaymentterms(?ERPPaymentTerms $paymentterms): self
+    {
+        $this->paymentterms = $paymentterms;
 
         return $this;
     }

@@ -9,6 +9,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use App\Modules\ERP\Entity\ERPCustomers;
 use App\Modules\ERP\Entity\ERPSuppliers;
 use App\Modules\ERP\Entity\ERPPaymentMethods;
+use App\Modules\ERP\Entity\ERPPaymentTerms;
 use App\Modules\Globale\Entity\GlobaleCompanies;
 use App\Modules\Globale\Entity\GlobaleStates;
 use App\Modules\Globale\Entity\GlobaleCountries;
@@ -76,6 +77,7 @@ class NavisionGetCustomers extends ContainerAwareCommand
      $repositoryCountries=$this->doctrine->getRepository(GlobaleCountries::class);
      $repositoryCurrencies=$this->doctrine->getRepository(GlobaleCurrencies::class);
      $repositoryPaymentMethod=$this->doctrine->getRepository(ERPPaymentMethods::class);
+     $repositoryPaymentTerms=$this->doctrine->getRepository(ERPPaymentTerms::class);
      $repositoryStates=$this->doctrine->getRepository(GlobaleStates::class);
      $repository=$this->doctrine->getRepository(ERPCustomers::class);
 
@@ -100,6 +102,8 @@ class NavisionGetCustomers extends ContainerAwareCommand
         $state=$repositoryStates->findOneBy(["name"=>$object["state"]]);
         $currency=$repositoryCurrencies->findOneBy(["isocode"=>"EUR"]);
         $paymentMethod=$repositoryPaymentMethod->findOneBy(["paymentcode"=>$object["payment_method"]]);
+        if($object["payment_terms"]!="") $paymentTerms=$repositoryPaymentTerms->findOneBy(["code"=>$object["payment_terms"]]);
+        else $paymentTerms=$repositoryPaymentTerms->findOneBy(["id"=>"11"]);
         if($object["socialname"][0]=='*') $obj->setActive(0); else $obj->setActive(1);
         $obj->setVat($object["vat"]);
         $obj->setName(ltrim(ltrim($object["name"]),'*'));
@@ -115,6 +119,7 @@ class NavisionGetCustomers extends ContainerAwareCommand
         $obj->setDateupd(new \Datetime());
         //$obj->setCurrency($currency);
         $obj->setPaymentMethod($paymentMethod);
+        $obj->setPaymentTerms($paymentTerms);
         $this->doctrine->getManager()->persist($obj);
         $this->doctrine->getManager()->flush();
         $this->doctrine->getManager()->clear();

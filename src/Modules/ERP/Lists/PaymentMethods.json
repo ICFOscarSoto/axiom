@@ -1,8 +1,6 @@
 [ {"name": "id", "caption":""},
   {"name": "name", "caption":"Nombre", "width" : "50"},
   {"name": "paymentcode", "caption":"Código", "width" : "90"},
-  {"name": "expiration","caption":"Vencimiento", "width" : "50"},
-  {"name": "typeofexpiration","caption":"Tipo de vencimiento", "width" : "50"},
   {"name": "active", "caption":"Estado", "width":"10%" ,"class" : "dt-center", "replace":{
                              "1":{"text":"Activo","html":"<div style=\"min-width: 75px;\" class=\"label label-success\">Activo</div>"},
                              "0":{"text":"Desactivado","html":"<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado</div>"}
