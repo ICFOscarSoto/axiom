@@ -6,6 +6,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use App\Modules\ERP\Entity\ERPCategories;
 use App\Modules\ERP\Entity\ERPCustomers;
 use App\Modules\ERP\Entity\ERPSuppliers;
 use App\Modules\ERP\Entity\ERPProducts;
@@ -147,7 +148,6 @@ class NavisionGetProducts extends ContainerAwareCommand
 
       foreach ($objects["class"] as $key=>$object){
         $output->writeln('  - '.$object["Item No."].' - '.$object["Cross-Reference No."]);
-        //if($object["vat"]==null) continue;
         $obj=$repository->findOneBy(["name"=>$object["Cross-Reference No."]]);
         $nameEAN13=preg_replace('/\D/','',$object["Cross-Reference No."]);
         if ($obj==null and strlen($nameEAN13)==13) {
@@ -172,7 +172,6 @@ class NavisionGetProducts extends ContainerAwareCommand
           $this->doctrine->getManager()->clear();
         }
 
-         //$obj->preProccess($this, $this->doctrine, null, null, $oldobj);
 
       }
       $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"EAN13"]);
