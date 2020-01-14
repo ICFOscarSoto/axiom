@@ -91,7 +91,7 @@ class NavisionGetPaymentTerms extends ContainerAwareCommand
 
 
         $obj->setName($object["name"]);
-        $obj->setFirstexpiration($object["firstexpiration"]);
+        $obj->setFirstexpiration(preg_replace('/\D/', '', $object["firstexpiration"]));
         $obj->setDateupd(new \Datetime());
         $this->doctrine->getManager()->persist($obj);
         $this->doctrine->getManager()->flush();
