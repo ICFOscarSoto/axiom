@@ -115,10 +115,10 @@ class NavisionGetProducts extends ContainerAwareCommand
          $this->doctrine->getManager()->merge($obj);
          $this->doctrine->getManager()->flush();
          $this->doctrine->getManager()->clear();
-      }$navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"customers"]);
+      }$navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"products"]);
       if ($navisionSync==null) {
         $navisionSync=new NavisionSync();
-        $navisionSync->setEntity("customers");
+        $navisionSync->setEntity("products");
       }
       $navisionSync->setLastsync($datetime);
       $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
