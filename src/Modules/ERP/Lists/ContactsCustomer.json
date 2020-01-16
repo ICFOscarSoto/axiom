@@ -1,6 +1,5 @@
 [ {"name": "id", "caption":""},
   {"name": "name", "caption":"Nombre", "width" : "50"},
-  {"name": "lastname", "caption":"Apellido", "width" : "50"},
   {"name": "phone", "caption":"Teléfono", "width" : "50"},
   {"name": "email", "caption":"Email", "width" : "50"},
   {"name": "position", "caption":"Cargo", "width" : "50"},

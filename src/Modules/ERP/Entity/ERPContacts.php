@@ -6,6 +6,8 @@ use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\ERP\Entity\ERPDepartments;
 use \App\Modules\ERP\Entity\ERPSuppliers;
 use \App\Modules\ERP\Entity\ERPCustomers;
+use \App\Modules\Globale\Entity\GlobaleCountries;
+use \App\Modules\Globale\Entity\GlobaleStates;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPContactsRepository")
@@ -23,11 +25,6 @@ class ERPContacts
      * @ORM\Column(type="string", length=120)
      */
     private $name;
-
-    /**
-     * @ORM\Column(type="string", length=120)
-     */
-    private $lastname;
 
     /**
      * @ORM\Column(type="string", length=32, nullable=true)
@@ -100,6 +97,37 @@ class ERPContacts
      */
     private $position;
 
+    /**
+     * @ORM\Column(type="string", length=16, nullable=true)
+     */
+    private $code;
+
+    /**
+     * @ORM\Column(type="string", length=150, nullable=true)
+     */
+    private $address;
+
+    /**
+     * @ORM\Column(type="string", length=70, nullable=true)
+     */
+    private $city;
+
+      /**
+     * @ORM\Column(type="string", length=12)
+     */
+    private $postcode;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCountries")
+     * @ORM\JoinColumn(onDelete="SET NULL")
+     */
+    private $country;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleStates")
+     */
+    private $state;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -113,18 +141,6 @@ class ERPContacts
     public function setName(string $name): self
     {
         $this->name = $name;
-
-        return $this;
-    }
-
-    public function getLastname(): ?string
-    {
-        return $this->lastname;
-    }
-
-    public function setLastname(string $lastname): self
-    {
-        $this->lastname = $lastname;
 
         return $this;
     }
@@ -281,6 +297,78 @@ class ERPContacts
     public function setPosition(?string $position): self
     {
         $this->position = $position;
+
+        return $this;
+    }
+
+    public function getCode(): ?string
+    {
+        return $this->code;
+    }
+
+    public function setCode(?string $code): self
+    {
+        $this->code = $code;
+
+        return $this;
+    }
+
+    public function getAddress(): ?string
+    {
+        return $this->address;
+    }
+
+    public function setAddress(?string $address): self
+    {
+        $this->address = $address;
+
+        return $this;
+    }
+
+    public function getCity(): ?string
+    {
+        return $this->city;
+    }
+
+    public function setCity(?string $city): self
+    {
+        $this->city = $city;
+
+        return $this;
+    }
+
+    public function getPostcode(): ?string
+    {
+        return $this->postcode;
+    }
+
+    public function setPostcode(string $postcode): self
+    {
+        $this->postcode = $postcode;
+
+        return $this;
+    }
+
+    public function getCountry(): ?GlobaleCountries
+    {
+        return $this->country;
+    }
+
+    public function setCountry(?GlobaleCountries $country): self
+    {
+        $this->country = $country;
+
+        return $this;
+    }
+
+    public function getState(): ?GlobaleStates
+    {
+        return $this->state;
+    }
+
+    public function setState(?GlobaleStates $state): self
+    {
+        $this->state = $state;
 
         return $this;
     }
