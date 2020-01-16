@@ -114,7 +114,7 @@ class NavisionGetCustomers extends ContainerAwareCommand
         $obj->setAddress(rtrim($object["address1"]." ".$object["address2"]));
         $obj->setCity($object["city"]);
         $obj->setPostcode($object["postcode"]);
-        $obj->setPhone($object["phone"]);
+        $obj->setPhone(ltrim($object["phone"]));
         $obj->setWeb($object["web"]);
         $obj->setEmail($object["email"]);
         $obj->setCountry($country);

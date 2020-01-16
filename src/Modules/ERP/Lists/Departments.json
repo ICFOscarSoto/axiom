@@ -4,6 +4,10 @@
         "caption": "id"
     },
     {
+        "name": "code",
+        "caption": "code"
+    },
+    {
         "name": "name",
         "caption": "name"
     },

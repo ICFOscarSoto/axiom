@@ -9,8 +9,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use App\Modules\ERP\Entity\ERPContacts;
 use App\Modules\ERP\Entity\ERPCustomers;
 use App\Modules\ERP\Entity\ERPSuppliers;
-use App\Modules\ERP\Entity\ERPPaymentMethods;
-use App\Modules\ERP\Entity\ERPPaymentTerms;
+use App\Modules\ERP\Entity\ERPDepartments;
 use App\Modules\Globale\Entity\GlobaleCompanies;
 use App\Modules\Globale\Entity\GlobaleStates;
 use App\Modules\Globale\Entity\GlobaleCountries;
@@ -81,6 +80,7 @@ class NavisionGetContacts extends ContainerAwareCommand
     // $repositoryPaymentTerms=$this->doctrine->getRepository(ERPPaymentTerms::class);
      $repositoryStates=$this->doctrine->getRepository(GlobaleStates::class);
      $repositoryCustomers=$this->doctrine->getRepository(ERPCustomers::class);
+     $repositoryDepartments=$this->doctrine->getRepository(ERPDepartments::class);
      $repository=$this->doctrine->getRepository(ERPContacts::class);
 
      //Disable SQL logger
@@ -102,15 +102,18 @@ class NavisionGetContacts extends ContainerAwareCommand
         $country=$repositoryCountries->findOneBy(["alfa2"=>$object["country"]]);
         $state=$repositoryStates->findOneBy(["name"=>$object["state"]]);
         $customer=$repositoryCustomers->findOneBy(["code"=>$object["customer"]]);
+        $department=$repositoryDepartments->findOneBy(["code"=>$object["department"]]);
         $obj->setName(ltrim(ltrim($object["name"]),'*'));
         $obj->setAddress(rtrim($object["address1"]." ".$object["address2"]));
         $obj->setCity($object["city"]);
         $obj->setPostcode($object["postcode"]);
-        $obj->setPhone($object["phone"]);
+        $obj->setPhone(ltrim($object["phone"]));
         $obj->setEmail($object["email"]);
         $obj->setCountry($country);
         $obj->setState($state);
         $obj->setCustomer($customer);
+        $obj->setDepartment($department);
+        $obj->setPosition($object["jobtitle"]);
         $obj->setDateupd(new \Datetime());
         $this->doctrine->getManager()->persist($obj);
         $this->doctrine->getManager()->flush();
