@@ -145,7 +145,7 @@ class NavisionGetProducts extends ContainerAwareCommand
       foreach ($oldEAN13s as $oldEAN13){
           $count=0;
           $EAN13=$oldEAN13->getName();
-          foreach ($objects["class"] as $key=>$object){
+          foreach ($objects["ean13"] as $key=>$object){
               $nameEAN13=preg_replace('/\D/','',$object["Cross-Reference No."]);
               if ($EAN13==$nameEAN13) {
                 $count=1;
