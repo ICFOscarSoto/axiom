@@ -74,7 +74,6 @@ class NavisionGetContacts extends ContainerAwareCommand
      $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getContacts.php?from='.$navisionSync->getMaxtimestamp());
      $objects=json_decode($json, true);
      $objects=$objects[0];
-     dump($objects);
      //dump($products["products"]);
       $repositoryCountries=$this->doctrine->getRepository(GlobaleCountries::class);
      //$repositoryCurrencies=$this->doctrine->getRepository(GlobaleCurrencies::class);
