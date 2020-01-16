@@ -133,15 +133,37 @@ class NavisionGetProducts extends ContainerAwareCommand
         $navisionSync=new NavisionSync();
         $navisionSync->setMaxtimestamp(0);
       }
+      $repository=$this->doctrine->getRepository(ERPEAN13::class);
       $datetime=new \DateTime();
       $output->writeln('* Sincronizando EAN13....');
       $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getReferences.php?from='.$navisionSync->getMaxtimestamp());
       $objects=json_decode($json, true);
       $objects=$objects[0];
+
+      // Busco los EAN13 de axiom en Navision, y si no están los elimino
+      $oldEAN13s=$repository->findAll();
+      foreach ($oldEAN13s as $oldEAN13){
+          $count=0;
+          $EAN13=$oldEAN13->getName();
+          foreach ($objects["class"] as $key=>$object){
+              $nameEAN13=preg_replace('/\D/','',$object["Cross-Reference No."]);
+              if ($EAN13==$nameEAN13) {
+                $count=1;
+                break;
+              }
+          }
+          if ($count==0) {
+            $oldEAN13->setDeleted(1);
+            $oldEAN13->setActive(0);
+          }
+      }
+
+
+
       $repositoryCustomers=$this->doctrine->getRepository(ERPCustomers::class);
       $repositorySupliers=$this->doctrine->getRepository(ERPSuppliers::class);
       $repositoryProducts=$this->doctrine->getRepository(ERPProducts::class);
-      $repository=$this->doctrine->getRepository(ERPEAN13::class);
+
 
       //Disable SQL logger
       $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
