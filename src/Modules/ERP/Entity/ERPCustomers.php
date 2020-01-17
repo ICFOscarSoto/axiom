@@ -9,6 +9,7 @@ use \App\Modules\ERP\Entity\ERPCustomerGroups;
 use \App\Modules\ERP\Entity\ERPPaymentMethods;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
 use \App\Modules\ERP\Entity\ERPPaymentTerms;
+use \App\Modules\ERP\Entity\ERPCustomerActivities;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPCustomersRepository")
@@ -182,6 +183,11 @@ class ERPCustomers
      * @ORM\JoinColumn(nullable=true)
      */
     private $paymentterms;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPCustomerActivities")
+     */
+    private $activity;
 
     public function getId(): ?int
     {
@@ -575,6 +581,18 @@ class ERPCustomers
     public function setPaymentterms(?ERPPaymentTerms $paymentterms): self
     {
         $this->paymentterms = $paymentterms;
+
+        return $this;
+    }
+
+    public function getActivity(): ?ERPCustomerActivities
+    {
+        return $this->activity;
+    }
+
+    public function setActivity(?ERPCustomerActivities $activity): self
+    {
+        $this->activity = $activity;
 
         return $this;
     }

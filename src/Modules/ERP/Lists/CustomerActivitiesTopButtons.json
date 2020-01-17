@@ -1,0 +1,6 @@
+[
+  {"id" : "addTopCustomerActivities", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"genericdata", "routeParams":{"module":"ERP", "name":"CustomerActivities", "type":"modal" }, "modal":"CustomerActivities", "actionType" : "background", "confirm" :false, "tooltip" : ""},
+  {"id" : "deleteTopCustomerActivities", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true, "tooltip":""},
+  {"id" : "printTopCustomerActivities", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false, "tooltip":""},
+  {"id" : "exportTopCustomerActivities", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"genericexport", "routeParams":{"module":"ERP", "name":"CustomerActivities"}, "confirm" :false, "tooltip":""}
+]

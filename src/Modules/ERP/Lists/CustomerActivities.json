@@ -1,0 +1,30 @@
+[
+    {
+        "name": "id",
+        "caption": "id"
+    },
+    {
+        "name": "code",
+        "caption": "code"
+    },
+    {
+        "name": "name",
+        "caption": "name"
+    },
+    {
+        "name": "active",
+        "caption": "Estado",
+        "width": "10%",
+        "class": "dt-center",
+        "replace": {
+            "1": {
+                "text": "Activo",
+                "html": "<div style=\"min-width: 75px;\" class=\"label label-success\">Activo<\/div>"
+            },
+            "0": {
+                "text": "Desactivado",
+                "html": "<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado<\/div>"
+            }
+        }
+    }
+]
