@@ -55,6 +55,8 @@ class NavisionGetProducts extends ContainerAwareCommand
       break;
       case 'ean13': $this->importEAN13($input, $output);
       break;
+      case 'clearEAN13': $this->clearEAN13($input, $output);
+      break;
       case 'all':
         $this->importProduct($input, $output);
         $this->importEAN13($input, $output);
@@ -133,41 +135,19 @@ class NavisionGetProducts extends ContainerAwareCommand
         $navisionSync=new NavisionSync();
         $navisionSync->setMaxtimestamp(0);
       }
-      $repository=$this->doctrine->getRepository(ERPEAN13::class);
       $datetime=new \DateTime();
       $output->writeln('* Sincronizando EAN13....');
-      $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getReferences.php?from='.$navisionSync->getMaxtimestamp());
+      $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getEAN13.php?from='.$navisionSync->getMaxtimestamp());
       $objects=json_decode($json, true);
       $objects=$objects[0];
-
-      // Busco los EAN13 de axiom en Navision, y si no están los elimino
-      $oldEAN13s=$repository->findAll();
-      foreach ($oldEAN13s as $oldEAN13){
-          $count=0;
-          $EAN13=$oldEAN13->getName();
-          foreach ($objects["ean13"] as $key=>$object){
-              $nameEAN13=preg_replace('/\D/','',$object["Cross-Reference No."]);
-              if ($EAN13==$nameEAN13) {
-                $count=1;
-                break;
-              }
-          }
-          if ($count==0) {
-            $oldEAN13->setDeleted(1);
-            $oldEAN13->setActive(0);
-          }
-      }
-
-
 
       $repositoryCustomers=$this->doctrine->getRepository(ERPCustomers::class);
       $repositorySupliers=$this->doctrine->getRepository(ERPSuppliers::class);
       $repositoryProducts=$this->doctrine->getRepository(ERPProducts::class);
-
-
+      $repository=$this->doctrine->getRepository(ERPEAN13::class);
       //Disable SQL logger
       $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
-
+      $log=fopen("logEAN13.txt", "w");
       foreach ($objects["class"] as $key=>$object){
         $output->writeln('  - '.$object["Item No."].' - '.$object["Cross-Reference No."]);
         $obj=$repository->findOneBy(["name"=>$object["Cross-Reference No."]]);
@@ -184,18 +164,27 @@ class NavisionGetProducts extends ContainerAwareCommand
             $supplier=$repositorySupliers->findOneBy(["code"=>$object["Cross-Reference Type No."]]);
             $obj->setSupplier($supplier);
           } else $obj->setCustomer($customer);
-
           $product=$repositoryProducts->findOneBy(["code"=>$object["Item No."]]);
           if ($product!=null) {
-          $obj->setProduct($product);
-          $this->doctrine->getManager()->merge($obj);
-          $this->doctrine->getManager()->flush();
-        }
-          $this->doctrine->getManager()->clear();
+            $obj->setProduct($product);
+            $this->doctrine->getManager()->merge($obj);
+            $this->doctrine->getManager()->flush();
+          }
+
+        } else {
+          $txt;
+          if ($obj==null) {
+            $txt="Este EAN13 no es válido ".$object["Cross-Reference No."] . "\n";
+          } else {
+            $txt="Este EAN13 está duplicado ".$object["Cross-Reference No."] . "\n";
+          }
+          fwrite($log, $txt);
         }
 
+        $this->doctrine->getManager()->clear();
 
       }
+      fclose($log);
       $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"EAN13"]);
       if ($navisionSync==null) {
         $navisionSync=new NavisionSync();
@@ -206,6 +195,40 @@ class NavisionGetProducts extends ContainerAwareCommand
       $this->doctrine->getManager()->persist($navisionSync);
       $this->doctrine->getManager()->flush();
     }
+/*
+  Busco los EAN13 de axiom en Navision, y si no están los desactivo
+ */
+public function clearEAN13(InputInterface $input, OutputInterface $output){
+        $repository=$this->doctrine->getRepository(ERPEAN13::class);
+        $datetime=new \DateTime();
+        $output->writeln('* Limpiando EAN13....');
+        $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
+        $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getEAN13.php');
+        $objects=json_decode($json, true);
+        $objects=$objects[0];
+        //Disable SQL logger
+        $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
+        $oldEAN13s=$repository->findAll();
+        foreach ($oldEAN13s as $oldEAN13){
+            $count=0;
+            $EAN13=$oldEAN13->getName();
+            foreach ($objects["ean13"] as $key=>$object){
+                $nameEAN13=preg_replace('/\D/','',$object["Cross-Reference No."]);
+                if ($EAN13==$nameEAN13) {
+                  $count=1;
+                  break;
+                }
+            }
+            if ($count==0) {
+              $oldEAN13->setDeleted(1);
+              $oldEAN13->setActive(0);
+              $this->doctrine->getManager()->flush();
+              $this->doctrine->getManager()->clear();
+            }
+        }
+}
+
+
 
 }
 ?>
