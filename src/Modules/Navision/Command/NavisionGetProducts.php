@@ -173,7 +173,6 @@ class NavisionGetProducts extends ContainerAwareCommand
 
         } else {
           $txt;
-          dump($obj);
           if ($obj==null) {
             $txt="Este EAN13 no es válido ".$object["Cross-Reference No."] . "\n";
           } else {
