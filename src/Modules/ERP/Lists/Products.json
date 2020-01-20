@@ -1,6 +1,7 @@
 [ {"name": "id", "caption":""},
   {"name": "code", "caption":"SKU", "width" : "50"},
   {"name": "name", "caption":"Nombre", "width" : "50"},
+  {"name": "category__name", "caption":"Categoría", "width" : "50"},
   {"name": "description", "caption":"Descripción", "width" : "50"},
   {"name": "active", "caption":"Estado", "width":"10%" ,"class" : "dt-center", "replace":{
                              "1":{"text":"Activo","html":"<div style=\"min-width: 75px;\" class=\"label label-success\">Activo</div>"},

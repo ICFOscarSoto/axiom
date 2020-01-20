@@ -59,7 +59,11 @@ class ERPProductsController extends Controller
   				'menuOptions' =>  $menurepository->formatOptions($userdata),
   				'breadcrumb' =>  $menurepository->formatBreadcrumb($request->get('_route')),
   				'userData' => $userdata,
-  				'lists' => $templateLists
+  				'lists' => $templateLists,
+					'include_post_templates' => ['@ERP/categoriesmap.html.twig','@ERP/productlistcategories.html.twig'],
+					'include_footer' => [["type"=>"css", "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.css"],
+															 ["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.js"],
+															 ["type"=>"js",  "path"=>"/js/jquery.nestable.js"]]
   				]);
   		}
   		return new RedirectResponse($this->router->generate('app_login'));
@@ -268,7 +272,7 @@ class ERPProductsController extends Controller
  /**
  * @Route("/{_locale}/ERP/product/category/{id}/change/{idcat}", name="changeProductCategory", defaults={"id"=0, "idcat"=0})
  */
- public function changeProductCategory($id, $idcat){
+ public function changeProductCategory($id, $idcat, Request $request){
 	 $this->denyAccessUnlessGranted('ROLE_USER');
 	 $repositoryProduct=$this->getDoctrine()->getRepository(ERPProducts::class);
 	 $repositoryCategory=$this->getDoctrine()->getRepository(ERPCategories::class);
@@ -278,6 +282,7 @@ class ERPProductsController extends Controller
 	 }else {
 			$ids=$request->request->get('ids');
 	 }
+	 dump($ids);
 		$ids=explode(",",$ids);
 		foreach($ids as $item){
 			$product=$repositoryProduct->findOneBy(["id"=>$item, "company"=>$this->getUser()->getCompany()]);

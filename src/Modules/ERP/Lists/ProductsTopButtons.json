@@ -1,6 +1,7 @@
 [
   {"id" : "addTop", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"formProduct", "confirm" :false, "tooltip" : "Crear nuevo producto"},
   {"id" : "deleteTop", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true},
+  {"id" : "categoriesTop", "type" : "", "icon" : "fa fa-sitemap","name" : "", "route":"", "confirm" :false},
   {"id" : "printTop", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false},
   {"id" : "exportTop", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"", "confirm" :false}
 ]
