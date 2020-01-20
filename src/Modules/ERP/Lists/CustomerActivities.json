@@ -12,18 +12,6 @@
         "caption": "name"
     },
     {
-        "name": "purchaseorder",
-        "caption": "purchaseorder"
-    },
-    {
-        "name": "saleorder",
-        "caption": "saleorder"
-    },
-    {
-        "name": "invoice",
-        "caption": "invoice"
-    },
-    {
         "name": "active",
         "caption": "Estado",
         "width": "10%",

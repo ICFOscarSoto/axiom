@@ -7,7 +7,8 @@
 				{ "name": "vat","cols": 2},
 				{ "name": "socialname","cols": 5},
 				{ "name": "phone","cols": 2},
-				{ "name": "email","cols": 5}
+				{ "name": "email","cols": 2},
+				{ "name": "activity","cols": 2}
 			]
 		}
 		,

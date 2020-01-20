@@ -65,6 +65,11 @@ class ERPDepartments
     public $newSeconds=1296000;
     public $updatedSeconds=1296000;
 
+    /**
+     * @ORM\Column(type="string", length=16, nullable=true)
+     */
+    private $code;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -174,6 +179,18 @@ class ERPDepartments
     public function setDeleted(bool $deleted): self
     {
         $this->deleted = $deleted;
+
+        return $this;
+    }
+
+    public function getCode(): ?string
+    {
+        return $this->code;
+    }
+
+    public function setCode(?string $code): self
+    {
+        $this->code = $code;
 
         return $this;
     }

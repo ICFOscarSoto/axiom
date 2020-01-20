@@ -9,10 +9,12 @@
 				{ "name": "manufacturer","cols": 4},
 				{ "name": "supplier","cols": 4},
 				{ "name": "category","cols": 4},
+				{ "name": "selectcategory","cols": 4},
 				{	"name": "onsale", "cols": 2},
 				{	"name": "active", "cols": 2},
 				{	"name": "onbuy", "cols": 2},
 				{	"name": "weight", "cols": 2},
+				{	"name": "weight", "cols": 2, "unity": "kg", "class": "number-type"},
 				{	"name": "traceability", "cols": 2},
 				{	"name": "grouped", "cols": 2},
 				{	"name": "expiration", "cols": 2},
@@ -32,6 +34,9 @@
 				{ "name": "PVPR","cols": 2, "depends":{"from": "netprice","vals":"[0]"}},
 				{ "name": "PVP","cols": 2, "readonly":true},
 				{ "name": "shoppingdiscounts","cols": 2, "readonly":true, "depends":{"from": "netprice","vals":"[0]"}},
+				{ "name": "PVPR","cols": 2, "depends":{"from": "netprice","vals":"[0]"}, "unity": "€", "class": "number-type"},
+				{ "name": "PVP","cols": 2, "readonly":true, "unity": "€", "class": "number-type"},
+				{ "name": "shoppingdiscounts","cols": 2, "readonly":true, "depends":{"from": "netprice","vals":"[0]"}, "unity": "€", "class": "number-type"},
 				{ "name": "netprice","cols": 2},
 				{ "name": "shoppingPrice","cols": 2, "depends":{"from": "netprice","vals":"[1]"}}
 			]
