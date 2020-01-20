@@ -3,18 +3,18 @@
 		{
 			"name": "Customer data",
 			"fields": [
-				{ "name": "name", "cols": 2},
-				{ "name": "socialname","cols": 4},
+				{ "name": "name", "cols": 5},
 				{ "name": "vat","cols": 2},
+				{ "name": "socialname","cols": 5},
 				{ "name": "phone","cols": 2},
-				{ "name": "email","cols": 2}
+				{ "name": "email","cols": 5}
 			]
 		}
 		,
 	{
 		"name": "Address",
 		"fields": [
-			{ "name": "address", "cols": 6},
+			{ "name": "address", "cols": 6, "location": {"address": "address", "city":"city", "postcode":"postcode", "country": "country"}},
 			{ "name": "city","cols": 2},
 			{ "name": "state","cols": 2,"trigger":{"field":"country", "route":"generictrigger",
 				"moduleTrigger":"Globale", "classTrigger":"GlobaleCountries",
