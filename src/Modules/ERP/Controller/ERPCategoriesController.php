@@ -22,7 +22,7 @@ class ERPCategoriesController extends Controller
 {
 	  private $class=ERPCategories::class;
 	  private $module='ERP';
- 
+
     /**
      * @Route("/{_locale}/ERP/categories", name="categories")
      */
@@ -56,6 +56,15 @@ class ERPCategoriesController extends Controller
   		}
   		return new RedirectResponse($this->router->generate('app_login'));
     }
+
+		/**
+     * @Route("/api/ERP/categories/gettree", name="categoriesGetTree")
+     */
+    public function categoriesGetTree(RouterInterface $router,Request $request){
+			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			$obj = $this->getDoctrine()->getRepository($this->class)->getTree($this->getUser());
+			return new JsonResponse($obj);
+		}
 
 		/**
      * @Route("/api/ERP/categories/dragchange", name="categoriesDragChange")

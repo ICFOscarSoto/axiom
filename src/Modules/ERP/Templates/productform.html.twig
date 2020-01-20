@@ -28,7 +28,7 @@
 			{{ form_row(formConstructor.form['description']) }}
 			{{ form_row(formConstructor.form['manufacturer']) }}
 			{{ form_row(formConstructor.form['supplier']) }}
-			{{ form_row(formConstructor.form['category']) }}
+
 		</div>
 		{% for section in formConstructor.template.0.sections %}
 		{% for field in section.fields %}
@@ -143,6 +143,16 @@
 		{% endfor %}
 	</div>
 
+	<div class="row">
+		<div class="col-md-6">
+				{{ form_row(formConstructor.form['category']) }}
+		</div>
+		<div class="col-md-2">
+			<div class="form-group">
+				<button type="button" id="form_selectcategory" name="form[selectcategory]" class="btn-secondary btn" style="margin-top: 22px;">Seleccionar categoría</button>
+			</div>
+		</div>
+	</div>
 <div class="row">
 	<div class="col-md-2">
 		{{ form_row(formConstructor.form['netprice']) }}
@@ -258,8 +268,47 @@
 </div>
 <!-- END MAIN CONTENT -->
 
+<div class="modal fade" id="category-tree-modal" data-backdrop="static" style="display: none;">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Selección de categoria</h4>
+      </div>
+      <div id="category-tree-modal-body" class="modal-body">
+				<div id="list-2" class="nested-list dd with-margins custom-drag-button"><ol id="categories" class="dd-list"></ol></div>
+      </div>
+      <div id="category-tree-modal-footer" class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Cancelar</button>
+        <button attr-action="" id="category-tree-modal-button-continue" type="button" class="btn btn-red">Continuar</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script>
+
+function parseCategory(element){
+		var data='';
+		data+='';
+		element.forEach( function(valor, indice, array) {
+
+										data+='<li class="dd-item" data-id="'+valor.id+'">'+
+											''+
+											'<div class="dd-content">'+
+												'&nbsp;<input id="cb-categories-'+valor.id+'" attr-id="'+valor.id+'" type="checkbox" class="icheck">&nbsp;&nbsp;'+valor.name+
+											'</div>'+
+											((valor.childrens.length>0)?'<ol class="dd-list">':'')+
+											((valor.childrens.length>0)?parseCategory(valor.childrens):'')+
+											((valor.childrens.length>0)?'</ol>':'')+
+										'</li>';
+		});
+		data+='';
+		return data;
+	}
+
+
+
+
 $(document).ready(function() {
 	$('body').on('click', "#{{formConstructor.name}}-button-continue", function() {
 		if($("#{{formConstructor.name}}-form-body").find('form').valid()){
@@ -280,6 +329,84 @@ $(document).ready(function() {
 	});
 	$('body').on('click', "#{{formConstructor.name}}-button-cancel", function() {
 		window.history.back();
+	});
+
+	//Only allow select one category
+	$('body').on('ifChecked', "[id^=cb-categories-]", function() {
+		var element=$(this);
+		$('[id^=cb-categories-]').each(function(){
+			if(element.attr('id') != $(this).attr('id') ) $(this).iCheck('uncheck');
+		});
+	});
+
+
+	$('body').on('click', "#category-tree-modal-button-continue", function(){
+		if((++load_wait)==1) $("#load-spinner").fadeIn();
+		$.ajax({
+				type: "GET",
+				dataType: "json",
+				url: "/es/ERP/product/category/"+$("#id-parent").val()+"/change/"+$('[id^=cb-categories-]:checked').attr('attr-id'),
+			}).done(function( data, textStatus, jqXHR ) {
+				if((--load_wait)==0) $("#load-spinner").fadeOut();
+				if(data.result) toastr.success("Datos guardados correctamente", "Confirmación", confirmation);
+					else toastr.error("Ocurrió un error al guardar los datos", "Confirmación", confirmation);
+				$("#category-tree-modal").modal('toggle');
+				location.reload();
+		});
+
+
+	});
+
+
+	$.fn.nestableShow = function() {
+	    return this.each(function () {
+	        var $parents = $(this).parents();
+	        $parents.each(function (i) {
+	            var list = $(this).data("nestable");
+	            if (list) {
+	                $parents.slice(0, i).filter(list.options.itemNodeName).each(function(){
+	                    list.expandItem($(this));
+	                });
+	                return false;
+	            }
+	        });
+	    });
+	};
+
+	$('body').on('click', "#form_selectcategory", function() {
+		if((++load_wait)==1) $("#load-spinner").fadeIn();
+		$('#categories').empty();
+		//$('.dd').nestable('destroy');
+		//Get categories tree
+		$.ajax({
+		    type: "GET",
+		    dataType: "json",
+		    url: "{{url('categoriesGetTree')}}",
+			}).done(function( categories, textStatus, jqXHR ) {
+				if((--load_wait)==0) $("#load-spinner").fadeOut();
+				 //categories = $.parseJSON(data);
+	 			 categories.forEach( function(valor, indice, array) {
+	 				$("#categories").append(
+	 											'<li class="dd-item" data-id="'+valor.id+'">'+
+	 												'<div class="dd-content">'+
+	 													'&nbsp;<input id="cb-categories-'+valor.id+'" type="checkbox" class="icheck">&nbsp;&nbsp;'+valor.name+
+	 												'</div>'+
+	 													((valor.childrens.length>0)?'<ol class="dd-list">':'')+
+	 													((valor.childrens.length>0)?parseCategory(valor.childrens):'')+
+	 													((valor.childrens.length>0)?'</ol>':'')+
+	 											'</li>');
+
+				});
+				$('input.icheck').iCheck({
+					checkboxClass: 'icheckbox_flat-blue',
+					radioClass: 'iradio_flat-blue'
+				});
+				 $("#cb-categories-"+$("#form_category").val()).iCheck('check');
+				//$('.dd').nestable('init').nestable('collapseAll');
+				$('.dd').nestable('init').nestable('collapseAll');
+				$('[data-id='+$("#form_category").val()+']').nestableShow();
+				$("#category-tree-modal").modal();
+		});
 	});
 });
 </script>

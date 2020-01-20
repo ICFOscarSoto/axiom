@@ -17,6 +17,7 @@ use App\Modules\ERP\Entity\ERPReferences;
 use App\Modules\ERP\Entity\ERPProductsAttributes;
 use App\Modules\ERP\Entity\ERPManufacturers;
 use App\Modules\ERP\Entity\ERPStocks;
+use App\Modules\ERP\Entity\ERPCategories;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
@@ -111,7 +112,7 @@ class ERPProductsController extends Controller
 								'tabs' => [
 									["name" => "data", "icon"=>"fa fa-id-card", "caption"=>"Products data", "active"=>true, "route"=>$this->generateUrl("formInfoProduct",["id"=>$id])],
 									["name" => "list",  "icon"=>"fa fa-users", "caption"=>"References", "route"=>$this->generateUrl("listEAN13",["id"=>$id])],
-									["name"=>"productPrices", "icon"=>"fa fa-money", "caption"=>"Prices","route"=>$this->generateUrl("infoProductPrices",["id"=>$id])],
+									["name"=>  "productPrices", "icon"=>"fa fa-money", "caption"=>"Prices","route"=>$this->generateUrl("infoProductPrices",["id"=>$id])],
 									["name" => "stocks", "icon"=>"fa fa-id-card", "caption"=>"Stocks", "route"=>$this->generateUrl("infoStocks",["id"=>$id])],
 									["name" => "webproduct", "icon"=>"fa fa-id-card", "caption"=>"Web", "route"=>$this->generateUrl("dataWebProducts",["id"=>$id])],
 									["name" => "files", "icon"=>"fa fa-cloud", "caption"=>"Files", "route"=>$this->generateUrl("cloudfiles",["id"=>$id, "path"=>"products"])]
@@ -122,7 +123,8 @@ class ERPProductsController extends Controller
 									'include_header' => [["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker-es.js"],
 																			["type"=>"css", "path"=>"/js/rickshaw/rickshaw.min.css"]],
 									'include_footer' => [["type"=>"css", "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.css"],
-												 		 					 ["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.js"]]
+												 		 					 ["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.js"],
+																			 ["type"=>"js",  "path"=>"/js/jquery.nestable.js"]]
 
 				));
 		}
@@ -260,6 +262,34 @@ class ERPProductsController extends Controller
 	 $reportsUtils = new ERPEan13Reports();
 	 $pdf=$reportsUtils->create($params);
 	 return new Response("", 200, array('Content-Type' => 'application/pdf'));
+ }
+
+
+ /**
+ * @Route("/{_locale}/ERP/product/category/{id}/change/{idcat}", name="changeProductCategory", defaults={"id"=0, "idcat"=0})
+ */
+ public function changeProductCategory($id, $idcat){
+	 $this->denyAccessUnlessGranted('ROLE_USER');
+	 $repositoryProduct=$this->getDoctrine()->getRepository(ERPProducts::class);
+	 $repositoryCategory=$this->getDoctrine()->getRepository(ERPCategories::class);
+	 $ids=null;
+	 if($id!=0){
+		 $ids=$id;
+	 }else {
+			$ids=$request->request->get('ids');
+	 }
+		$ids=explode(",",$ids);
+		foreach($ids as $item){
+			$product=$repositoryProduct->findOneBy(["id"=>$item, "company"=>$this->getUser()->getCompany()]);
+			$category=$repositoryCategory->findOneBy(["id"=>$idcat, "company"=>$this->getUser()->getCompany()]);
+			if($product && $category){
+				$product->setCategory($category);
+				$this->getDoctrine()->getManager()->persist($product);
+				$this->getDoctrine()->getManager()->flush();
+				$result=1;
+			}else $result=-1;
+		}
+	 return new JsonResponse(array('result' => $result));
  }
 
 }

@@ -5,6 +5,7 @@ use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\Email\Entity\EmailAccounts;
@@ -23,23 +24,31 @@ class ERPProductsUtils
     $id=$params["id"];
     $productRepository=$doctrine->getRepository(ERPProducts::class);
     $products=$productRepository->findOneBy(["id"=>$id]);
-    if($products==null) return [
-    ['shoppingdiscounts', TextType::class, [
-      'required' => false,
-      'disabled' => true,
-      'attr'=> ["readonly"=>true],
-      'mapped' => false,
-      'data' => 0
-    ]]];
-    else return [
-    ['shoppingdiscounts', TextType::class, [
-      'required' => false,
-      'disabled' => true,
-      'attr'=> ["readonly"=>true],
-      'mapped' => false,
-      'data' => $products->getShoppingDiscount($doctrine)
-    ]]
-  ];
+    if($products==null)
+      $array=[
+      ['shoppingdiscounts', TextType::class, [
+        'required' => false,
+        'disabled' => true,
+        'attr'=> ["readonly"=>true],
+        'mapped' => false,
+        'data' => 0
+      ]],
+      ['selectcategory', ButtonType::class, [
+
+      ]]];
+    else $array=[
+      ['shoppingdiscounts', TextType::class, [
+        'required' => false,
+        'disabled' => true,
+        'attr'=> ["readonly"=>true],
+        'mapped' => false,
+        'data' => $products->getShoppingDiscount($doctrine)
+      ]],
+      ['selectcategory', ButtonType::class, [
+      ]]
+      ];
+
+    return $array;
   }
 
   public function formatList($user){

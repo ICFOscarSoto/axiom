@@ -46,6 +46,7 @@
               values 2
             {% else %}
             {# Default component of the form #}
+
             {{ form_row(formConstructor.form[field.name]) }}
               {# Check if field is a relation and must show the view button #}
               {{ include("@Globale/form_relation_button.html.twig") }}
