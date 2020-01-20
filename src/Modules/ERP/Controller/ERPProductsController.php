@@ -282,7 +282,6 @@ class ERPProductsController extends Controller
 	 }else {
 			$ids=$request->request->get('ids');
 	 }
-	 dump($ids);
 		$ids=explode(",",$ids);
 		foreach($ids as $item){
 			$product=$repositoryProduct->findOneBy(["id"=>$item, "company"=>$this->getUser()->getCompany()]);
