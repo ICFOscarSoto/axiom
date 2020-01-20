@@ -401,10 +401,10 @@ $(document).ready(function() {
 					checkboxClass: 'icheckbox_flat-blue',
 					radioClass: 'iradio_flat-blue'
 				});
-				 $("#cb-categories-"+$("#form_category").val()).iCheck('check');
+				if($("#form_category").val()!="") $("#cb-categories-"+$("#form_category").val()).iCheck('check');
 				//$('.dd').nestable('init').nestable('collapseAll');
 				$('.dd').nestable('init').nestable('collapseAll');
-				$('[data-id='+$("#form_category").val()+']').nestableShow();
+				if($("#form_category").val()!="") $('[data-id='+$("#form_category").val()+']').nestableShow();
 				$("#category-tree-modal").modal();
 		});
 	});
