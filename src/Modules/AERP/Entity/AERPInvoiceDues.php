@@ -7,7 +7,7 @@ use \App\Modules\Globale\Entity\GlobaleCompanies;
 use \App\Modules\AERP\Entity\AERPSalesInvoices;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\Modules\AERP\Entity\AERPInvoiceDuesRepository")
+ * @ORM\Entity(repositoryClass="App\Modules\AERP\Repository\AERPInvoiceDuesRepository")
  */
 class AERPInvoiceDues
 {

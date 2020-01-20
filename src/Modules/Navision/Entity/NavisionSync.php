@@ -5,7 +5,7 @@ namespace App\Modules\Navision\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\Modules\Navision\Entity\NavisionSyncRepository")
+ * @ORM\Entity(repositoryClass="App\Modules\Navision\Repository\NavisionSyncRepository")
  */
 class NavisionSync
 {
