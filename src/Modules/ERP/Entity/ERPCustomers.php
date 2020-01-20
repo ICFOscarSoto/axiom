@@ -189,6 +189,12 @@ class ERPCustomers
      */
     private $activity;
 
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    private $minimuminvoiceamount;
+
+
     public function getId(): ?int
     {
         return $this->id;
@@ -596,4 +602,17 @@ class ERPCustomers
 
         return $this;
     }
+
+    public function getMinimuminvoiceamount(): ?float
+    {
+        return $this->minimuminvoiceamount;
+    }
+
+    public function setMinimuminvoiceamount(?float $minimuminvoiceamount): self
+    {
+        $this->minimuminvoiceamount = $minimuminvoiceamount;
+
+        return $this;
+    }
+
 }

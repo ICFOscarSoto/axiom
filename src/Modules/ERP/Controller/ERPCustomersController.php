@@ -13,12 +13,14 @@ use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\ERP\Entity\ERPCustomers;
 use App\Modules\ERP\Entity\ERPCustomerGroups;
 use App\Modules\ERP\Entity\ERPCustomersPrices;
+use App\Modules\ERP\Entity\ERPCustomerCommentLines;
 use App\Modules\Globale\Entity\GlobaleCountries;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\ERP\Utils\ERPCustomersUtils;
 use App\Modules\ERP\Utils\ERPCustomersPricesUtils;
+use App\Modules\ERP\Utils\ERPCustomerCommentLinesUtils;
 use App\Modules\Security\Utils\SecurityUtils;
 
 class ERPCustomersController extends Controller
@@ -113,8 +115,8 @@ class ERPCustomersController extends Controller
 												//["name" => "contacts", "icon"=>"fa fa-headphones", "caption"=>"contactos" , "route"=>$this->generateUrl("contacts",["id"=>$id])],
 												//["name" => "bankaccounts", "icon"=>"fa fa-headphones", "caption"=>"Cuentas bancarias", "route"=>$this->generateUrl("bankaccounts",["id"=>$id])]
 											],
-								
-									
+
+
 									'include_header' => [["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker-es.js"],
 																			["type"=>"css", "path"=>"/js/rickshaw/rickshaw.min.css"]],
 									'include_footer' => [["type"=>"css", "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.css"],
@@ -138,6 +140,7 @@ class ERPCustomersController extends Controller
 				$formUtilsCustomers = new ERPCustomersUtils();
 				$formUtils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),$formUtilsCustomers->getExcludedForm([]),$formUtilsCustomers->getIncludedForm(["doctrine"=>$this->getDoctrine(), "user"=>$this->getUser(), "id"=>$id]));
 				$listCustomersPrices = new ERPCustomersPricesUtils();
+				$listCustomersCommentLines = new ERPCustomerCommentLinesUtils();
 			  $formUtilsCustomersPrices = new GlobaleFormUtils();
 			  $formUtilsCustomersPrices->initialize($this->getUser(), new ERPCustomersPrices(), dirname(__FILE__)."/../Forms/CustomersPrices.json", $request, $this, $this->getDoctrine());
 				$forms[]=$formUtilsCustomersPrices->formatForm('CustomersPrices', true, null, ERPCustomersPrices::class);
@@ -146,7 +149,7 @@ class ERPCustomersController extends Controller
 			//	$formUtilsReferences->initialize($this->getUser(), new ERPReferences(), dirname(__FILE__)."/../Forms/References.json", $request, $this, $this->getDoctrine());
 			// 	$forms[]=$formUtilsReferences->formatForm('References', true, null, ERPReferences::class);
 			//	$listAttributes = new ERPProductsAttributesUtils();
-		
+
 				$customerRepository=$this->getDoctrine()->getRepository(ERPCustomers::class);
 				$customer=$customerRepository->findOneBy(["id"=>$id, "active"=>1, "deleted"=>0, "company"=>$this->getUser()->getCompany()]);
 		/*
@@ -163,9 +166,10 @@ class ERPCustomersController extends Controller
 					'id_object' => $id,
 					'form' => $formUtils->formatForm('customers', true, $id, $this->class, "dataCustomers"),
 					'listCustomersPrices' => $listCustomersPrices->formatListByCustomer($id),
+					'listCustomersCommentLines' => $listCustomersCommentLines->formatListByCustomer($id),
 					'forms' => $forms
 				));
-		
+
 			}
 
 

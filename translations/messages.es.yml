@@ -289,6 +289,13 @@ Pricesdeliverynote: Mostrar precios
 Surcharge: Recargo de equivalencia
 Bankaccount: Cuenta bancaria
 Select erpcustomers: Seleccionar cliente
+Minimuminvoiceamount: Importe mínimo a facturar
+
+
+# CUSTOMERS COMMENT LINES
+#----------------------------------------------------------------------------------------------------------------------
+comment: Comentario
+dateadd: Fecha de creación
 
 # SUPPLIERS
 #----------------------------------------------------------------------------------------------------------------------

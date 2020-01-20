@@ -5,6 +5,7 @@ namespace App\Modules\ERP\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\ERP\Entity\ERPSuppliers;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
+use \App\Modules\ERP\Entity\ERPCustomers;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPBankAccountsRepository")
@@ -19,7 +20,7 @@ class ERPBankAccounts
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=120)
+     * @ORM\Column(type="string", length=120, nullable=true)
      */
     private $name;
 
@@ -78,6 +79,16 @@ class ERPBankAccounts
      * @ORM\Column(type="string", length=150, nullable=true)
      */
     private $creditoridentifier;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPCustomers")
+     */
+    private $customer;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPSuppliers")
+     */
+    private $supplier;
 
     public function getId(): ?int
     {
@@ -224,6 +235,30 @@ class ERPBankAccounts
     public function setCreditoridentifier(?string $creditoridentifier): self
     {
         $this->creditoridentifier = $creditoridentifier;
+
+        return $this;
+    }
+
+    public function getCustomer(): ?ERPCustomers
+    {
+        return $this->customer;
+    }
+
+    public function setCustomer(?ERPCustomers $customer): self
+    {
+        $this->customer = $customer;
+
+        return $this;
+    }
+
+    public function getSupplier(): ?ERPCustomers
+    {
+        return $this->supplier;
+    }
+
+    public function setSupplier(?ERPCustomers $supplier): self
+    {
+        $this->supplier = $supplier;
 
         return $this;
     }
