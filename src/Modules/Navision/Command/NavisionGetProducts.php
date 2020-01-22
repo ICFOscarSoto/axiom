@@ -150,9 +150,9 @@ class NavisionGetProducts extends ContainerAwareCommand
       $log=fopen("logEAN13.txt", "w");
       foreach ($objects["class"] as $key=>$object){
         $output->writeln('  - '.$object["Item No."].' - '.$object["Cross-Reference No."]);
-        $obj=$repository->findOneBy(["name"=>$object["Cross-Reference No."]]);
+        //$obj=$repository->findOneBy(["name"=>$object["Cross-Reference No."]]);
         $nameEAN13=preg_replace('/\D/','',$object["Cross-Reference No."]);
-        if ($obj==null and strlen($nameEAN13)==13) {
+        if (strlen($nameEAN13)==13) {
           $obj=new ERPEAN13();
           $obj->setName($nameEAN13);
           $obj->setDateadd(new \Datetime());
