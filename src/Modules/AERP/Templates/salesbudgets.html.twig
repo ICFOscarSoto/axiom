@@ -23,7 +23,7 @@
 		{#}<h2>{{ interfaceName }}</h2>#}
 		<!-- MAIN CONTENT -->
 		<div class="row">
-			{% if id!=0 and (errors is not defined or errors|length == 0) %}
+			{% if (errors is not defined or errors|length == 0) %}
 				<div style="text-align: left;" class="col-md-8">
 					{% if id!=0 %}
 						<div id="document-action-buttons" style="display:{% if id!=0 %}block;{% else %}none;{% endif %}">
