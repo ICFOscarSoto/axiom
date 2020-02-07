@@ -14,6 +14,34 @@
                 {
                     "name": "category",
                     "cols": 4
+                },
+                {
+                    "name": "discount1",
+                    "cols": 4
+                },
+                {
+                    "name": "discount2",
+                    "cols": 4
+                },
+                {
+                    "name": "discount3",
+                    "cols": 4
+                },
+                {
+                    "name": "discount4",
+                    "cols": 4
+                },
+                {
+                    "name": "quantity",
+                    "cols": 4
+                },
+                {
+                    "name": "start",
+                    "cols": 4
+                },
+                {
+                    "name": "end",
+                    "cols": 4
                 }
             ]
         }

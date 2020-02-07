@@ -10,7 +10,34 @@
     {
         "name": "discount",
         "caption": "discount"
-    },    
+    },{
+        "name": "discount1",
+        "caption": "discount1"
+    },
+    {
+        "name": "discount2",
+        "caption": "discount2"
+    },
+    {
+        "name": "discount3",
+        "caption": "discount3"
+    },
+    {
+        "name": "discount4",
+        "caption": "discount4"
+    },
+    {
+        "name": "quantity",
+        "caption": "quantity"
+    },
+    {
+        "name": "start",
+        "caption": "start"
+    },
+    {
+        "name": "end",
+        "caption": "end"
+    },
     {
         "name": "active",
         "caption": "Estado",

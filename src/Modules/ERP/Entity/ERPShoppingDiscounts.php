@@ -55,6 +55,41 @@ class ERPShoppingDiscounts
      */
     private $dateupd;
 
+    /**
+     * @ORM\Column(type="float")
+     */
+    private $discount1;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    private $discount2;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    private $discount3;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    private $discount4;
+
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $start;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $end;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $quantity;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -170,6 +205,90 @@ class ERPShoppingDiscounts
         $em->persist($productEntity);
         $em->flush();
       }
+    }
+
+    public function getDiscount1(): ?float
+    {
+        return $this->discount1;
+    }
+
+    public function setDiscount1(float $discount1): self
+    {
+        $this->discount1 = $discount1;
+
+        return $this;
+    }
+
+    public function getDiscount2(): ?float
+    {
+        return $this->discount2;
+    }
+
+    public function setDiscount2(?float $discount2): self
+    {
+        $this->discount2 = $discount2;
+
+        return $this;
+    }
+
+    public function getDiscount3(): ?float
+    {
+        return $this->discount3;
+    }
+
+    public function setDiscount3(?float $discount3): self
+    {
+        $this->discount3 = $discount3;
+
+        return $this;
+    }
+
+    public function getDiscount4(): ?float
+    {
+        return $this->discount4;
+    }
+
+    public function setDiscount4(?float $discount4): self
+    {
+        $this->discount4 = $discount4;
+
+        return $this;
+    }
+
+    public function getStart(): ?\DateTimeInterface
+    {
+        return $this->start;
+    }
+
+    public function setStart(\DateTimeInterface $start): self
+    {
+        $this->start = $start;
+
+        return $this;
+    }
+
+    public function getEnd(): ?\DateTimeInterface
+    {
+        return $this->end;
+    }
+
+    public function setEnd(?\DateTimeInterface $end): self
+    {
+        $this->end = $end;
+
+        return $this;
+    }
+
+    public function getQuantity(): ?int
+    {
+        return $this->quantity;
+    }
+
+    public function setQuantity(?int $quantity): self
+    {
+        $this->quantity = $quantity;
+
+        return $this;
     }
 
 }

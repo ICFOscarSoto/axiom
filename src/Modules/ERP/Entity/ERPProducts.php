@@ -141,13 +141,13 @@ class ERPProducts
     public $updatedSeconds=1296000;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPCategories")
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPCategories", fetch="EAGER")
      * @ORM\JoinColumn(onDelete="SET NULL")
      */
     private $category;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPSuppliers")
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPSuppliers", fetch="EAGER")
      * @ORM\JoinColumn(onDelete="SET NULL")
      */
     private $supplier;
