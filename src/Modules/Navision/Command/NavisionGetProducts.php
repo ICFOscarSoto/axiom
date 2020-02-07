@@ -244,74 +244,52 @@ public function importPrices(InputInterface $input, OutputInterface $output) {
   }
   $datetime=new \DateTime();
   $output->writeln('* Sincronizando precios....');
-  /*
-  $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getPrices.php?from='.$navisionSync->getMaxtimestamp());
-  $objects=json_decode($json, true);
-  $objects=$objects[0];
-  */
   $repositoryCategory=$this->doctrine->getRepository(ERPCategories::class);
   $repositorySupliers=$this->doctrine->getRepository(ERPSuppliers::class);
   $repositoryShoppingDiscounts=$this->doctrine->getRepository(ERPShoppingDiscounts::class);
   $repository=$this->doctrine->getRepository(ERPProducts::class);
 
-  $product=$repository->find(724);
+  $products=$repository->findAll();
 
   //Disable SQL logger
-  $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
+  foreach($products as $product) {
+    $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
+    $price=$repositoryShoppingDiscounts->findOneBy(["supplier"=>$product->getSupplier(),"category"=>$product->getCategory()]);
 
-  $price=$repositoryShoppingDiscounts->findOneBy(["supplier"=>$product->getSupplier(),"category"=>$product->getCategory()]);
-
-
-  if ($price==null){ $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getPrices.php?from='.$product->getCode());
-  $objects=json_decode($json, true);
-  $objects=$objects[0];
-
-  foreach ($objects["class"] as $prices){
-      if($prices["Discount"]!=0){
-      $product=$repository->find(724);
-      $supplier=$repositorySupliers->find($product->getSupplier()->getId());
-      $categoy=$repositoryCategory->find($product->getCategory()->getId());
-      $obj=new ERPShoppingDiscounts();
-      $obj->setSupplier($supplier);
-      $obj->setCategory($categoy);
-      $obj->setDiscount($prices["Discount"]);
-      $obj->setDiscount1($prices["Discount1"]);
-      $obj->setDiscount2($prices["Discount2"]);
-      $obj->setDiscount3($prices["Discount3"]);
-      $obj->setDiscount4($prices["Discount4"]);
-      $obj->setQuantity($prices["Quantity"]);
-      $obj->setStart(date_create_from_format("Y-m-d h:i:s.u",$prices["Starting"]["date"]));
-      if ($prices["Ending"]["date"]=="1753-01-01 00:00:00.000000") {
-        $obj->setEnd(null);
-      } else $obj->setEnd(date_create_from_format("Y-m-d h:i:s.u",$prices["Ending"]["date"]));
-      $obj->setDateadd(new \Datetime());
-      $obj->setDateupd(new \Datetime());
-      if (strtotime($prices["Ending"]["date"])<strtotime(date("d-m-Y H:i:00",time())) && $prices["Ending"]["date"]!="1753-01-01 00:00:00.000000" ) {
-        $obj->setActive(0);
-      } else $obj->setActive(1);
-      $obj->setDeleted(0);
-      $this->doctrine->getManager()->merge($obj);
-      $this->doctrine->getManager()->flush();
-      $this->doctrine->getManager()->clear();
+    if ($price==null){
+      $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getPrices.php?from='.$product->getCode());
+      $objects=json_decode($json, true);
+      $objects=$objects[0];
+      foreach ($objects["class"] as $prices){
+        if($prices["Discount"]!=0){
+          $supplier=$repositorySupliers->find($product->getSupplier()->getId());
+          $categoy=$repositoryCategory->find($product->getCategory()->getId());
+          $obj=new ERPShoppingDiscounts();
+          $obj->setSupplier($supplier);
+          $obj->setCategory($categoy);
+          $obj->setDiscount($prices["Discount"]);
+          $obj->setDiscount1($prices["Discount1"]);
+          $obj->setDiscount2($prices["Discount2"]);
+          $obj->setDiscount3($prices["Discount3"]);
+          $obj->setDiscount4($prices["Discount4"]);
+          $obj->setQuantity($prices["Quantity"]);
+          $obj->setStart(date_create_from_format("Y-m-d h:i:s.u",$prices["Starting"]["date"]));
+          if ($prices["Ending"]["date"]=="1753-01-01 00:00:00.000000") {
+            $obj->setEnd(null);
+          } else $obj->setEnd(date_create_from_format("Y-m-d h:i:s.u",$prices["Ending"]["date"]));
+          $obj->setDateadd(new \Datetime());
+          $obj->setDateupd(new \Datetime());
+          if (strtotime($prices["Ending"]["date"])<strtotime(date("d-m-Y H:i:00",time())) && $prices["Ending"]["date"]!="1753-01-01 00:00:00.000000" ) {
+            $obj->setActive(0);
+          } else $obj->setActive(1);
+          $obj->setDeleted(0);
+          $this->doctrine->getManager()->merge($obj);
+          $this->doctrine->getManager()->flush();
+          $this->doctrine->getManager()->clear();
+        }
+      }
     }
   }
-
-  }
-
-  //foreach ($allProducts as $product){
-
-  /*
-  $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"products"]);
-  if ($navisionSync==null) {
-    $navisionSync=new NavisionSync();
-    $navisionSync->setEntity("products");
-  }
-
-  $navisionSync->setLastsync($datetime);
-  $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
-  $this->doctrine->getManager()->persist($navisionSync);
-  $this->doctrine->getManager()->flush();*/
-  //}
 }
 }
 ?>
