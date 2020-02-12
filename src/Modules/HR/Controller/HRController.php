@@ -131,8 +131,11 @@ class HRController extends Controller
 												 ["name" => "sickleave", "icon"=>"fa fa-hospital-o", "caption"=>"Bajas", "route"=>$this->generateUrl("sickleaves",["id"=>$id])],
 												 ["name" => "vacations", "icon"=>"fa fa-paper-plane", "caption"=>"Vacaciones", "route"=>$this->generateUrl("vacations",["id"=>$id])],
 												 ["name" => "clocks", "icon"=>"fa fa-clock-o", "caption"=>"Fichajes", "route"=>$this->generateUrl("workerClocks",["id"=>$id])],
+												 ["name" => "equipment", "icon"=>"fa fa-wrench", "caption"=>"Equipamiento", "route"=>$this->generateUrl("generictablist",["module"=>"HR", "name"=>"WorkerEquipment", "id"=>$id])],
 												 ["name" => "files", "icon"=>"fa fa-cloud", "caption"=>"Archivos", "route"=>$this->generateUrl("cloudfiles",["id"=>$id, "path"=>"workers"])]
 												],
+							'include_tab_post_templates' => ['@HR/workerequipments.html.twig'],
+
 							'include_header' => [["type"=>"css", "path"=>"/js/jvectormap/jquery-jvectormap-1.2.2.css"],
 																	 ["type"=>"css", "path"=>"/js/rickshaw/rickshaw.min.css"],
 																	 ["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker-es.js"]],

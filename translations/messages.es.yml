@@ -252,6 +252,14 @@ Requestdate: Fecha solicitud
 Select a type...: Seleccionar un tipo...
 Hourslastday: Horas último dia
 
+# EQUIPMENTS
+#----------------------------------------------------------------------------------------------------------------------
+Equipment: Equipamiento
+WorkerEquipment: Equipamiento trabajador
+date: Fecha
+Deliverydate: Fecha entrega
+Serial: Num Serie
+
 # QUOTATION GROUPS
 #----------------------------------------------------------------------------------------------------------------------
 Quotation Groups: Grupos cotización

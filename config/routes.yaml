@@ -243,6 +243,10 @@ HRPeriods:
    resource: 'App\Modules\HR\Controller\HRPeriodsController'
    type:     annotation
 
+HREquipmentsController:
+   resource: 'App\Modules\HR\Controller\HREquipmentsController'
+   type:     annotation
+
 Cloud:
    resource: 'App\Modules\Cloud\Controller\CloudController'
    type:     annotation

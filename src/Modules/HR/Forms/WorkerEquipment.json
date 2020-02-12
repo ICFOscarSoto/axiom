@@ -1,0 +1,32 @@
+[{
+    "sections": [
+        {
+            "name": "data",
+            "fields": [
+                {
+                    "name": "equipment",
+                    "cols": 12,
+                    "readonly": true
+                },
+                {
+                    "name": "deliverydate",
+                    "cols": 6,
+                    "readonly": true
+                },
+                {
+                    "name": "serial",
+                    "cols": 6
+                },
+                {
+                    "name": "observations",
+                    "cols": 12
+                },
+                {
+                    "name": "active",
+                    "cols": 2
+                }
+
+            ]
+        }
+    ]
+}]

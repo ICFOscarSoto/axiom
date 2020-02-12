@@ -1,0 +1,6 @@
+[
+  {"id" : "addTopWorkerEquipment", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":""},
+  {"id" : "deleteTopWorkerEquipment", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true, "tooltip":""},
+  {"id" : "printTopWorkerEquipment", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false, "tooltip":""},
+  {"id" : "exportTopWorkerEquipment", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"genericexport", "routeParams":{"module":"HR", "name":"WorkerEquipment"}, "confirm" :false, "tooltip":""}
+]

@@ -1,0 +1,59 @@
+<div class="modal fade" id="new-equipment-modal" data-backdrop="static" style="display: none;">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Añadir equipamiento</h4>
+      </div>
+      <div id="new-equipment-modal-body" class="modal-body">
+				<div class="row" id="new-equipment-categories"></div>
+      </div>
+      <div id="new-equipment-modal-footer" class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Cancelar</button>
+        <button attr-action="" id="new-equipment-modal-button-continue" type="button" class="btn btn-red">Continuar</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+function getEquipment(id){
+  $.ajax({
+      type: "GET",
+      dataType: "json",
+      url: "/api/HR/equipments/elements/"+id+"/get",
+    }).done(function( elements, textStatus, jqXHR ) {
+      if((--load_wait)==0) $("#load-spinner").fadeOut();
+       elements.categories.forEach( function(valor, indice, array) {
+        $("#new-equipment-categories").append(
+                      '<div class=".col-xl-4 col-lg-4 col-md-4 col-sm-4 col-xs-12 col-12">'+
+                        '<div id="clock-9" class="tile-stats tile-dark-gray clock-user-card" style="height: 150px;">'+
+                        '  <div class="num" id="worker-img-9"><img src="'+valor.icon+'" alt="" class="img-circle" width="80" height="80"></div>'+
+                        '  <h3 style="font-size: 12px !important; text-align: center" id="worker-name-9">'+valor.name+'</h3>'+
+                        '  <p><span id="worker-start-label-9"></span><b><span id="worker-start-9"></span></b></p>'+
+                        '  <p><span id="worker-end-label-9"></span><b><span id="worker-end-9"></span></b> </p>'+
+                        '</div>'+
+                      '</div>');
+
+      });
+      $('input.icheck').iCheck({
+        checkboxClass: 'icheckbox_flat-blue',
+        radioClass: 'iradio_flat-blue'
+      });
+      if($("#form_category").val()!="") $("#cb-categories-"+$("#form_category").val()).iCheck('check');
+      //$('.dd').nestable('init').nestable('collapseAll');
+      $('.dd').nestable('init').nestable('collapseAll');
+      if($("#form_category").val()!="") $('[data-id='+$("#form_category").val()+']').nestableShow();
+      $("#category-tree-modal").modal();
+  });
+
+
+}
+
+$(document).ready(function() {
+  $('body').on('click', "#addTopWorkerEquipment-top-button-foreground", function() {
+      $("#new-equipment-modal").modal();
+  });
+
+  getEquipment(0);
+
+});
+</script>
