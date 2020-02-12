@@ -72,18 +72,10 @@
 			<div class="col-md-4">
 			{{ form_row(formConstructor.form['activity']) }}
 			</div>
+			<div class="col-md-4">
+			{{ form_row(formConstructor.form['authorizationcontrol']) }}
+			</div>
 		</div>
-	</div>
-</div>
-<div class="panel minimal">
-	<div class="panel-heading">
-		<div class="panel-title">Comentarios</div>
-	</div>
-<div class="panel-body">
-		{% if listCustomersCommentLines is defined %}
-		{% set listConstructor = listCustomersCommentLines %}
-		{{ include('@Globale/list.html.twig') }}
-		{% endif %}
 	</div>
 </div>
 <div class="panel minimal">
@@ -97,6 +89,9 @@
 		</div>
 		<div class="col-md-2">
 				{{ form_row(formConstructor.form['paymentmethod']) }}
+		</div>
+		<div class="col-md-2">
+				{{ form_row(formConstructor.form['paymentterms']) }}
 		</div>
 		<div class="col-md-2">
 			{{ form_row(formConstructor.form['maxcredit']) }}
@@ -141,6 +136,17 @@
 			{{ form_row(formConstructor.form['active']) }}
 			</div>
 	</div>
+	</div>
+</div>
+<div class="panel minimal">
+	<div class="panel-heading">
+		<div class="panel-title">Comentarios</div>
+	</div>
+<div class="panel-body">
+		{% if listCustomersCommentLines is defined %}
+		{% set listConstructor = listCustomersCommentLines %}
+		{{ include('@Globale/list.html.twig') }}
+		{% endif %}
 	</div>
 </div>
 

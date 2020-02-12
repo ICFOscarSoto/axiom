@@ -135,6 +135,7 @@ class NavisionGetCustomers extends ContainerAwareCommand
         $obj->setCustomergroup($customergroup);
         $obj->setMinimuminvoiceamount($object["minimuminvoiceamount"]);
         $obj->setMaxcredit($object["creditlimit"]);
+        $obj->setAuthorizationControl($object["authorizationcontrol"]);
 
         $this->doctrine->getManager()->persist($obj);
         $this->doctrine->getManager()->flush();

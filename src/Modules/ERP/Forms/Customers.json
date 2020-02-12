@@ -8,7 +8,8 @@
 				{ "name": "socialname","cols": 5},
 				{ "name": "phone","cols": 2},
 				{ "name": "email","cols": 2},
-				{ "name": "activity","cols": 2}
+				{ "name": "activity","cols": 2},
+				{ "name": "authorizationcontrol","cols": 2}
 			]
 		}
 		,
@@ -29,6 +30,7 @@
 		"fields": [
 			{ "name": "customergroup", "cols": 2},
 			{ "name": "paymentmethod","cols": 2},
+			{ "name": "paymentterms","cols": 2},
 			{ "name": "maxcredit","cols": 2},
 			{ "name": "mininvoice","cols": 2},
 			{ "name": "allowlinediscount","cols": 2},

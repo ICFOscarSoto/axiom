@@ -41,4 +41,22 @@ class ERPStocksRepository extends ServiceEntityRepository
       return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
 
     }
+
+    public function findInventoryStocks($company, $store=0, $category=0){
+      $query="SELECT stk.id as id,pr.name as product,strl.name as location,stk.quantity as quantity, stk.pendingreceive as pendingreceive, stk.pendingserve as pendingserve,stk.lastinventorydate as lastinventorydate FROM erpstocks stk
+                LEFT JOIN erpproducts pr
+                ON pr.id=stk.product_id
+                LEFT JOIN erpcategories ct
+                ON ct.id=pr.category_id
+                LEFT JOIN erpstore_locations strl
+                ON strl.id=stk.storelocation_id
+                LEFT JOIN erpstores st
+                ON st.id=strl.store_id
+                WHERE st.company_id=:company AND stk.deleted=0 AND stk.active=1 ";
+      if($store!=0) $query.=" AND st.id=".$store;
+     if($category!=0) $query.=" AND pr.category_id=".$category;
+      $query.=" ORDER BY pr.name ASC";
+      $params=['company' => $company->getId()];
+      return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+    }
 }

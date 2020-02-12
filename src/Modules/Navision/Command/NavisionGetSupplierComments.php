@@ -6,8 +6,8 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use App\Modules\ERP\Entity\ERPCustomers;
-use App\Modules\ERP\Entity\ERPCustomerCommentLines;
+use App\Modules\ERP\Entity\ERPSuppliers;
+use App\Modules\ERP\Entity\ERPSupplierCommentLines;
 use App\Modules\Globale\Entity\GlobaleDiskUsages;
 use App\Modules\Globale\Entity\GlobaleHistories;
 use App\Modules\Navision\Entity\NavisionSync;
@@ -15,7 +15,7 @@ use App\Modules\Navision\Entity\NavisionSync;
 use \App\Helpers\HelperFiles;
 
 
-class NavisionGetCustomerComments extends ContainerAwareCommand
+class NavisionGetSupplierComments extends ContainerAwareCommand
 {
   private $doctrine;
   private $company;
@@ -24,7 +24,7 @@ class NavisionGetCustomerComments extends ContainerAwareCommand
 
   protected function configure(){
         $this
-            ->setName('navision:getcustomercomments')
+            ->setName('navision:getsuppliercomments')
             ->setDescription('Sync navision principal entities')
             ->addArgument('entity', InputArgument::REQUIRED, '¿Entidad que sincronizar?')
         ;
@@ -43,10 +43,10 @@ class NavisionGetCustomerComments extends ContainerAwareCommand
     $output->writeln('Comenzando sincronizacion Navision');
     $output->writeln('==================================');
     switch($entity){
-      case 'customercomments': $this->importCustomerComment($input, $output);
+      case 'suppliercomments': $this->importCustomerComment($input, $output);
       break;
       case 'all':
-        $this->importCustomerComment($input, $output);
+        $this->importSupplierComment($input, $output);
       break;
       default:
         $output->writeln('Opcion no válida');
@@ -55,32 +55,31 @@ class NavisionGetCustomerComments extends ContainerAwareCommand
 
   }
 
-   public function importCustomerComment(InputInterface $input, OutputInterface $output){
+   public function importSupplierComment(InputInterface $input, OutputInterface $output){
      $navisionSyncRepository=$this->doctrine->getRepository(NavisionSync::class);
-     $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"customercomments"]);
+     $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"suppliercomments"]);
      if ($navisionSync==null) {
        $navisionSync=new NavisionSync();
        $navisionSync->setMaxtimestamp(0);
      }
      $datetime=new \DateTime();
-     $output->writeln('* Sincronizando comentarios de clientes....');
-     $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getComments.php?type=1&from='.$navisionSync->getMaxtimestamp());
+     $output->writeln('* Sincronizando comentarios de proveedores....');
+     $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getComments.php?type=2&from='.$navisionSync->getMaxtimestamp());
      $objects=json_decode($json, true);
      $objects=$objects[0];
-     $repositoryCustomers=$this->doctrine->getRepository(ERPCustomers::class);
-     $repository=$this->doctrine->getRepository(ERPCustomerCommentLines::class);
-
+     $repositorySuppliers=$this->doctrine->getRepository(ERPSuppliers::class);
+     $repository=$this->doctrine->getRepository(ERPSupplierCommentLines::class);
      //Disable SQL logger
      $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
 
      foreach ($objects["class"] as $key=>$object){
-       $customer=$repositoryCustomers->findOneBy(["code"=>$object["entity"]]);
-       if($object["comment"]!="" AND $customer!=NULL)
+       $supplier=$repositorySuppliers->findOneBy(["code"=>$object["entity"]]);
+       if($object["comment"]!="" AND $supplier!=NULL)
        {
-         $output->writeln('  - '.$object["customer"]);
+         $output->writeln('  - '.$object["entity"]);
          $obj=$repository->findOneBy(["comment"=>$object["comment"]]);
          if ($obj==null) {
-           $obj=new ERPCustomerCommentLines();
+           $obj=new ERPSupplierCommentLines();
            //$company=$repositoryCompanies->find(2);
            //$obj->setCompany($company);
            $obj->setComment($object["comment"]);
@@ -88,7 +87,7 @@ class NavisionGetCustomerComments extends ContainerAwareCommand
           // dump(date('Y-m-d 00:00:00',strtotime($object["date"]["date"])));
            $obj->setDateadd($datetime);
 
-           $obj->setCustomer($customer);
+           $obj->setSupplier($supplier);
            $obj->setDeleted(0);
            $obj->setActive(1);
            $obj->setDateupd($datetime);
@@ -99,10 +98,10 @@ class NavisionGetCustomerComments extends ContainerAwareCommand
      }
 
      }
-     $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"customercomments"]);
+     $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"suppliercomments"]);
      if ($navisionSync==null) {
        $navisionSync=new NavisionSync();
-       $navisionSync->setEntity("customercomments");
+       $navisionSync->setEntity("suppliercomments");
      }
      $navisionSync->setLastsync($datetime);
      $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);

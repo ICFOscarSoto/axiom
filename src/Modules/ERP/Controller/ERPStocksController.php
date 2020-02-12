@@ -11,14 +11,18 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\ERP\Entity\ERPStocks;
+use App\Modules\ERP\Entity\ERPStores;
+use App\Modules\ERP\Entity\ERPCategories;
 use App\Modules\ERP\Entity\ERPProducts;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\ERP\Utils\ERPStocksUtils;
+use App\Modules\Security\Utils\SecurityUtils;
 
 class ERPStocksController extends Controller
 {
+	private $module='ERP';
 	private $class=ERPStocks::class;
 	private $utilsClass=ERPStocksUtils::class;
 
@@ -72,6 +76,95 @@ class ERPStocksController extends Controller
 			));
 		}
 
+
+		/**
+		 * @Route("/{_locale}/stocks/inventory", name="inventory")
+		 */
+		 public function inventory(RouterInterface $router,Request $request)
+		 {
+		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		 if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
+		 //$this->denyAccessUnlessGranted('ROLE_ADMIN');
+		 $userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
+		 $locale = $request->getLocale();
+		 $this->router = $router;
+		 $store=$request->query->get("store",0);
+		 $category=$request->query->get("category",0);
+		 $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
+		 $utils = new $this->utilsClass();
+  	 $repository = $this->getDoctrine()->getManager()->getRepository($this->class);
+		 $repositoryStores = $this->getDoctrine()->getRepository(ERPStores::class);
+		 $stores = $repositoryStores->findBy(["company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
+		 $repositoryCategories = $this->getDoctrine()->getRepository(ERPCategories::class);
+		 $categories = $repositoryCategories->findBy(["company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
+
+
+		 if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+			 return $this->render('@ERP/inventory.html.twig', [
+				 'controllerName' => 'ERPStocksController',
+				 'interfaceName' => 'Inventario',
+				 'optionSelected' => "inventory",
+				 'menuOptions' =>  $menurepository->formatOptions($userdata),
+				 'breadcrumb' =>  $menurepository->formatBreadcrumb('inventory'),
+				 'userData' => $userdata,
+				 'stores' => $stores,
+				 'categories' => $categories,
+				 'selectedStore' => $store,
+				 'selectedCategory' => $category
+				 ]);
+		 } return new RedirectResponse($this->router->generate('app_login'));
+		 }
+
+
+		 /**
+		 * @Route("/api/ERP/inventory/elements/{store}/{category}/get", name="getInventoryStocks")
+		 */
+		 public function getInventoryStocks($store, $category, RouterInterface $router,Request $request){
+		  $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		  $stocksRepository=$this->getDoctrine()->getRepository(ERPStocks::class);
+	//		$categoriesRepository=$this->getDoctrine()->getRepository(ERPCategories::class);
+		//	$storesRepository=$this->getDoctrine()->getRepository(ERPStores::class);
+		//	$store=$storesRepository->findBy(["id"=>$store, "active"=>1, "deleted"=>0]);
+		//  $category = $categoriesRepository->findBy(["id"=>$category, "active"=>1, "deleted"=>0]);
+
+			$stocks=$stocksRepository->findInventoryStocks($this->getUser()->getCompany(),$store,$category);
+			$responseStocks=Array();
+
+			foreach($stocks as $stock){
+				$item['id']=$stock['id'];
+		    $item['product']=$stock['product'];
+		    $item['location']=$stock['location'];
+				$item['pendingreceive']=$stock['pendingreceive'];
+				$item['pendingserve']=$stock['pendingserve'];
+				$item['quantity']=$stock['quantity'];
+				$item['lastinventorydate']=$stock['lastinventorydate'];
+		    $responseStocks[]=$item;
+			}
+
+		  return new JsonResponse(["stocks"=>$responseStocks]);
+
+		 }
+
+
+		/**
+		 * @Route("/api/ERP/inventory/{id}/{qty}/save", name="saveInventoryStock")
+		 */
+		 public function saveInventoryStock($id, $qty, RouterInterface $router,Request $request){
+
+			  $repository=$this->getDoctrine()->getRepository($this->class);
+				$stock=$repository->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany()]);
+				if($stock){
+					$datetime=new \DateTime();
+					$stock->setQuantity($qty);
+					$stock->setLastinventorydate($datetime);
+					$manager=$this->getDoctrine()->getManager();
+					$manager->persist($stock);
+					$manager->flush();
+					return new JsonResponse(["result"=>1]);
+				}
+				else return new JsonResponse(["result"=>1]);
+		}
+
     /**
     * @Route("/api/global/stock/{id}/get", name="getStock")
     */
@@ -120,6 +213,8 @@ class ERPStocksController extends Controller
     $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, ERPStocks::class,[["type"=>"and", "column"=>"company", "value"=>$user->getCompany()],["type"=>"and", "column"=>"product", "value"=>$stock->getProduct()]]);
     return new JsonResponse($return);
   }
+
+
 
 	/**
 	* @Route("/{_locale}/admin/global/stock/{id}/disable", name="disableStock")
