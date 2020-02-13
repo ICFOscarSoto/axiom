@@ -10,8 +10,6 @@
 	<!-- Imported styles on this page -->
 	<link rel="stylesheet" href="{{ url('index') }}/js/jvectormap/jquery-jvectormap-1.2.2.css">
 	<link rel="stylesheet" href="{{ url('index') }}/js/rickshaw/rickshaw.min.css">
-	<script src="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker.min.js"></script>
-  <script src="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker-es.js"></script>
 {% endblock %}
 <title>{% block title %}{{ interfaceName }}{% endblock %}</title>
 <body class="page-body" data-url="{{ url('indexAdmin') }}">
@@ -26,7 +24,7 @@
 		<div class="principal-content">
 
 			<div class="row">
-				<div class="col-md-4">
+				<div class="col-md-3">
 					<div class="form-group">
 							<label class="" for="form_stores">Almacenes</label>
 							<select class="form-control select2" name="form_stores" id="form_stores">
@@ -39,7 +37,7 @@
 				</div>
 			</div>
 			<div class="row">
-				<div class="col-md-4">
+				<div class="col-md-3">
 					<div class="form-group">
 							<label class="" for="form_departments">Categorías</label>
 							<select class="form-control select2" name="form_categories" id="form_categories">
@@ -50,26 +48,37 @@
 							</select>
 					</div>
 				</div>
-				<div class="col-md-4">
-					<div class="form-group">
-							<label class="" for="form_departments">Fecha</label>
-							<input type="text" class="datepicker form-control">
-					</div>
-				</div>
 			</div>
 
 			<div class="row no-gutters documents-products-header">
-				 <div class="col-md-3 d-none d-sm-block">Nombre</div>
-				 <div class="col-md-1 d-none d-sm-block">Ubicación</div>
-				 <div class="col-md-1 d-none d-sm-block">Pendientes de Recibir</div>
-				 <div class="col-md-1 d-none d-sm-block">Pendientes de Servir</div>
-				 <div class="col-md-1 d-none d-sm-block">Cantidad Actual</div>
-				 <div class="col-md-1 d-none d-sm-block">Nueva Cantidad</div>
-				 <div class="col-md-2 d-none d-sm-block">Fecha de último inventario</div>
+				 <div class="col-10 col-sm-2">Fecha de último inventario</div>
+			   <div class="col-10 col-sm-1">Código</div>
+				 <div class="col-10 col-sm-4">Nombre</div>
+				 <div class="col-10 col-sm-1">Ubicación</div>
+				 <div class="col-10 col-sm-1">Cantidad Actual</div>
+				 <div class="col-10 col-sm-1">Nueva Cantidad</div>
 		 	</div>
-			<div class="row" id="new-inventory-products"></div>
+			<div class="row no-gutters" id="new-inventory-products"></div>
 		</div>
 		<script>
+
+		function datetimepicker(){
+		  $('.datetimepicker').each(function(index) {
+		    var valueField=$(this).val();
+		    var dateField=moment(valueField, "DD/MM/YYYY HH:mm:ss");
+		    $(this).datetimepicker({
+		    showTodayButton: true,
+		    format: 'DD/MM/YYYY HH:mm:ss',
+		    locale:'es',
+		    useCurrent: true,
+		    defaultDate: moment(),
+		    tooltips: spanish_tooltips_datetimepicker,
+		    date: (dateField.isValid())?dateField:null
+		    });
+		    if($(this).attr("minDate")!="" && typeof $(this).attr("minDate")!==typeof undefined) $(this).data("DateTimePicker").minDate(moment($(this).attr("minDate"), "YYYY-MM-DD"));
+		    if($(this).attr("maxDate")!="" && typeof $(this).attr("maxDate")!==typeof undefined) $(this).data("DateTimePicker").maxDate(moment($(this).attr("maxDate"), "YYYY-MM-DD"));
+		  });
+		}
 		function getStocks(store,category){
 			if((++load_wait)==1) $("#load-spinner").fadeIn();
 		  $.ajax({
@@ -80,48 +89,45 @@
 		      if((--load_wait)==0) $("#load-spinner").fadeOut();
 		       elements.stocks.forEach( function(valor, indice, array) {
 		        $("#new-inventory-products").append(
-		                      '<div class="col-md-3" >'+
+													'<div class="col-10 col-sm-2" >'+
+														'<div class="form-group">'+
+														'  <input id="lastinventorydate-'+valor.id+'" type="text" class="datetimepicker form-control" disabled value="'+valor.lastinventorydate+'" class="form-control">'+
+														'</div>'+
+													'</div>'+
+													'<div class="col-10 col-sm-1" >'+
+														'<div class="form-group">'+
+														'  <input id="producto-'+valor.id+'" type="text" disabled value="'+valor.product_code+'" class="form-control">'+
+														'</div>'+
+													'</div>'+
+		                      '<div class="col-10 col-sm-4" >'+
 		                        '<div class="form-group">'+
-		                        '  <input id="producto-'+valor.id+'" type="text" disabled value="'+valor.product+'" class="form-control">'+
+		                        '  <input id="producto-'+valor.id+'" type="text" disabled value="'+valor.product_name+'" class="form-control">'+
 														'</div>'+
 												 	'</div>'+
-													'<div class="col-md-1" >'+
+													'<div class="col-10 col-sm-1" >'+
 		                        '<div class="form-group">'+
 												   	'  <input id="location-'+valor.id+'" type="text" disabled value="'+valor.location+'" class="form-control">'+
 														'</div>'+
 													'</div>'+
-													'<div class="col-md-1" >'+
-		                        '<div class="form-group">'+
-												   	'  <input id="pendingreceive-'+valor.id+'" type="text" disabled value="'+valor.pendingreceive+'" class="form-control">'+
-														'</div>'+
-													'</div>'+
-													'<div class="col-md-1" >'+
-		                        '<div class="form-group">'+
-												   	'  <input id="pendingserve-'+valor.id+'" type="text" disabled value="'+valor.pendingserve+'" class="form-control">'+
-														'</div>'+
-													'</div>'+
-													'<div class="col-md-1" >'+
+													'<div class="col-10 col-sm-1" >'+
 		                        '<div class="form-group">'+
 														'  <input id="quantity-'+valor.id+'" type="text" disabled value="'+valor.quantity+'" class="form-control">'+
 		                        '</div>'+
 		                      '</div>'+
-													'<div class="col-md-1" >'+
+													'<div class="col-10 col-sm-1" >'+
 		                        '<div class="form-group">'+
 														'  <input id="newquantity-'+valor.id+'" type="number" class="form-control">'+
 		                        '</div>'+
 		                      '</div>'+
-													'<div class="col-md-2" >'+
-		                        '<div class="form-group">'+
-														'  <input id="lastinventorydate-'+valor.id+'" type="text" value="'+valor.lastinventorydate+'" class="form-control">'+
-		                        '</div>'+
-		                      '</div>'+
-													'<div class="col-md-2" >'+
+													'<div class="col-10 col-sm-2" >'+
 		                        '<div class="form-group">'+
 														'  <input id="button-save-stock-'+valor.id+'" attr-id="'+valor.id+'"  type="submit" value="Guardar" class="btn btn-green">'+
+														'  <input id="button-delete-stock-'+valor.id+'" attr-id="'+valor.id+'"  type="submit" value="Eliminar" class="btn btn-red">'+
 		                        '</div>'+
 		                      '</div>');
 
 		      });
+					datetimepicker();
 		  });
 
 
@@ -141,6 +147,27 @@
 		 });
 
 		}
+
+		function deleteStock(id){
+			console.log("dentro de delete:"+id);
+				if((++load_wait)==1) $("#load-spinner").fadeIn();
+				$.ajax({
+					 type: "GET",
+					 dataType: "json",
+					 url: "/api/ERP/inventory/"+id+"/delete",
+				 }).done(function(data, textStatus, jqXHR) {
+					 if((--load_wait)==0) $("#load-spinner").fadeOut();
+					 if(data.result) {
+						 toastr.success("Producto eliminado de esa ubicación", "Confirmación", confirmation);
+						 $("#new-inventory-products").empty();
+						 getStocks($("#form_stores").val(),$("#form_categories").val());
+					 	}
+						else toastr.error("Ocurrió un error al eliminar el producto de la ubicación", "Confirmación", confirmation);
+
+			 });
+
+		}
+
 	  {{ include("@Globale/form_fields_datetime.html.twig") }}
 		$(document).ready(function() {
 			var flagRefresh=true;
@@ -148,8 +175,8 @@
 
 
 			$('#form_stores').on('change', function() {
-			//	location.href=location.pathname+"?store="+$("#form_stores").val()+"&category="+$("#form_categories").val();
-			$("#new-inventory-products").empty();
+				//	location.href=location.pathname+"?store="+$("#form_stores").val()+"&category="+$("#form_categories").val();
+				$("#new-inventory-products").empty();
 				getStocks($("#form_stores").val(),$("#form_categories").val());
 			});
 
@@ -160,21 +187,66 @@
 			});
 
 			$('body').on('click','[id^="button-save-stock-"]', function(){
-			//	console.log($(this).attr('attr-id'));
-			//	console.log($('#quantity-'+$(this).attr('attr-id')).val());
-			if($('#newquantity-'+$(this).attr('attr-id')).val())
-			{
-				saveStock($(this).attr('attr-id'),$('#newquantity-'+$(this).attr('attr-id')).val());
-				$("#quantity-"+$(this).attr('attr-id')).val($('#newquantity-'+$(this).attr('attr-id')).val());
-				/*var timestamp=new Date() / 1000;
-				$("#lastinventorydate-"+$(this).attr('attr-id')).val(timestamp);*/
-			}
-			else
-			{
-				toastr.error("Por favor, indique una nueva cantidad", "ERROR", confirmation);
-			//	$('#newquantity-'+$(this).attr('attr-id')).addClass("red_border");
-			}
 
+
+					if($('#newquantity-'+$(this).attr('attr-id')).val() && $('#newquantity-'+$(this).attr('attr-id')).val()>0)
+					{
+						saveStock($(this).attr('attr-id'),$('#newquantity-'+$(this).attr('attr-id')).val());
+						$("#quantity-"+$(this).attr('attr-id')).val($('#newquantity-'+$(this).attr('attr-id')).val());
+
+						/*var timestamp=new Date() / 1000;
+						$("#lastinventorydate-"+$(this).attr('attr-id')).val(timestamp);*/
+					}
+
+					else if($('#newquantity-'+$(this).attr('attr-id')).val()==0)
+					{
+						id=$(this).attr('attr-id');
+						newqty=$("#newquantity-"+$(this).attr('attr-id')).val();
+						$.confirm({
+								theme: 'bootstrap',
+								title: '',
+								content: '¿Este producto se volverá a reponer en esta ubicación?',
+								buttons: {
+									 confirm: { text: 'Si', btnClass: 'btn-green', action: function(){
+										 				saveStock(id,newqty);
+										 				$("#quantity-"+id).val(newqty);
+									 				}
+
+								 					},
+									 cancel: { text: 'No', btnClass: 'btn-red', action: function(){
+														deleteStock(id);
+									 				}
+								 }
+								}
+						});
+
+					}
+
+					else{
+						toastr.error("Por favor, indique una nueva cantidad", "ERROR", confirmation);
+					}
+
+			});
+
+
+			$('body').on('click','[id^="button-delete-stock-"]', function(){
+					id=$(this).attr('attr-id');
+					$.confirm({
+							theme: 'bootstrap',
+							title: '',
+							content: '¿Estás seguro de que quieres eliminar el producto de la ubicación?',
+							buttons: {
+								 confirm: { text: 'Si', btnClass: 'btn-green', action: function(){
+													deleteStock(id);
+												}
+
+												},
+								 cancel: { text: 'No', btnClass: 'btn-red', action: function(){
+
+												}
+							 }
+							}
+					});
 
 			});
 
@@ -207,6 +279,10 @@
 	<!-- Imported scripts on this page -->
 	<script src="{{ url('index') }}js/datatables/datatables.js"></script>
 	<script src="{{ url('index') }}js/select2/select2.min.js"></script>
+	<script src="{{ url('index') }}js/moment.min.js"></script>
+	<script src="{{ url('index') }}js/moment-es.js"></script>
+	<script src="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker-es.js"></script>
+	<script src="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker.min.js"></script>
 	 {{ include('@Globale/bottom.html.twig') }}
 {% endblock %}
 </body>

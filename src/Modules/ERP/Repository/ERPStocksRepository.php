@@ -43,7 +43,7 @@ class ERPStocksRepository extends ServiceEntityRepository
     }
 
     public function findInventoryStocks($company, $store=0, $category=0){
-      $query="SELECT stk.id as id,pr.name as product,strl.name as location,stk.quantity as quantity, stk.pendingreceive as pendingreceive, stk.pendingserve as pendingserve,stk.lastinventorydate as lastinventorydate FROM erpstocks stk
+      $query="SELECT stk.id as id,pr.code as product_code, pr.name as product_name,strl.name as location,stk.quantity as quantity,stk.lastinventorydate as lastinventorydate FROM erpstocks stk
                 LEFT JOIN erpproducts pr
                 ON pr.id=stk.product_id
                 LEFT JOIN erpcategories ct

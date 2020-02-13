@@ -194,6 +194,11 @@ class ERPCustomers
      */
     private $minimuminvoiceamount;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $authorizationcontrol;
+
 
     public function getId(): ?int
     {
@@ -611,6 +616,18 @@ class ERPCustomers
     public function setMinimuminvoiceamount(?float $minimuminvoiceamount): self
     {
         $this->minimuminvoiceamount = $minimuminvoiceamount;
+
+        return $this;
+    }
+
+    public function getAuthorizationcontrol(): ?bool
+    {
+        return $this->authorizationcontrol;
+    }
+
+    public function setAuthorizationcontrol(?bool $authorizationcontrol): self
+    {
+        $this->authorizationcontrol = $authorizationcontrol;
 
         return $this;
     }

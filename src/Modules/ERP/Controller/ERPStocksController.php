@@ -66,6 +66,7 @@ class ERPStocksController extends Controller
 		 * @Route("/{_locale}/stocks/infoStocks/{id}", name="infoStocks", defaults={"id"=0})
 		 */
 		public function infoStocks($id, Request $request){
+			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 			$stocksReposiitory= $this->getDoctrine()->getRepository($this->class);
 			$stocks=$stocksReposiitory->stocksByStores($id);
 			foreach($stocks as $key=>$item){
@@ -100,6 +101,7 @@ class ERPStocksController extends Controller
 
 
 		 if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+			 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 			 return $this->render('@ERP/inventory.html.twig', [
 				 'controllerName' => 'ERPStocksController',
 				 'interfaceName' => 'Inventario',
@@ -132,10 +134,9 @@ class ERPStocksController extends Controller
 
 			foreach($stocks as $stock){
 				$item['id']=$stock['id'];
-		    $item['product']=$stock['product'];
+			  $item['product_code']=$stock['product_code'];
+		    $item['product_name']=$stock['product_name'];
 		    $item['location']=$stock['location'];
-				$item['pendingreceive']=$stock['pendingreceive'];
-				$item['pendingserve']=$stock['pendingserve'];
 				$item['quantity']=$stock['quantity'];
 				$item['lastinventorydate']=$stock['lastinventorydate'];
 		    $responseStocks[]=$item;
@@ -150,7 +151,7 @@ class ERPStocksController extends Controller
 		 * @Route("/api/ERP/inventory/{id}/{qty}/save", name="saveInventoryStock")
 		 */
 		 public function saveInventoryStock($id, $qty, RouterInterface $router,Request $request){
-
+			  $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 			  $repository=$this->getDoctrine()->getRepository($this->class);
 				$stock=$repository->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany()]);
 				if($stock){
@@ -162,14 +163,37 @@ class ERPStocksController extends Controller
 					$manager->flush();
 					return new JsonResponse(["result"=>1]);
 				}
-				else return new JsonResponse(["result"=>1]);
+				else return new JsonResponse(["result"=>-1]);
 		}
+
+		/**
+		 * @Route("/api/ERP/inventory/{id}/delete", name="deleteInventoryStock")
+		 */
+		 public function deleteInventoryStock($id, RouterInterface $router,Request $request){
+			 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			 $repository=$this->getDoctrine()->getRepository($this->class);
+			 $stock=$repository->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany()]);
+			 if($stock){
+				 	$datetime=new \DateTime();
+					$stock->setLastinventorydate($datetime);
+					$stock->setActive(0);
+					$stock->setDeleted(0);
+					$manager=$this->getDoctrine()->getManager();
+					$manager->persist($stock);
+					$manager->flush();
+					return new JsonResponse(["result"=>1]);
+			 }
+
+			else return new JsonResponse(["result"=>-1]);
+		}
+
 
     /**
     * @Route("/api/global/stock/{id}/get", name="getStock")
     */
     public function getStock($id){
-     $stock = $this->getDoctrine()->getRepository($this->class)->findOneById($id);
+		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		 $stock = $this->getDoctrine()->getRepository($this->class)->findOneById($id);
       if (!$stock) {
             throw $this->createNotFoundException('No currency found for id '.$id );
           }
@@ -236,6 +260,7 @@ class ERPStocksController extends Controller
 	 $result=$entityUtils->enableObject($id, $this->class, $this->getDoctrine());
 	 return new JsonResponse(array('result' => $result));
  }
+
  /**
  * @Route("/{_locale}/admin/global/stock/{id}/delete", name="deleteStock")
  */
