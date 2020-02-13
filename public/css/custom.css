@@ -516,7 +516,7 @@ table.dataTable.compact tbody th, table.dataTable.compact tbody td {
    width:100%;
    margin:0px auto;
    /*background-color:rgba(255, 255, 255, 0.5);*/
-   z-index: 9999;
+   z-index: 999999 !important;
    display: none;
    pointer-events:none;
 }

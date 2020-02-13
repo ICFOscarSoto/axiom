@@ -6,54 +6,138 @@
       </div>
       <div id="new-equipment-modal-body" class="modal-body">
 				<div class="row" id="new-equipment-categories"></div>
+        <div class="row" id="new-equipment-items"></div>
       </div>
       <div id="new-equipment-modal-footer" class="modal-footer">
-        <button type="button" class="btn btn-primary" data-dismiss="modal">Cancelar</button>
+        <button type="button" id="new-equipment-modal-button-cancel"  class="btn btn-primary">Cancelar</button>
         <button attr-action="" id="new-equipment-modal-button-continue" type="button" class="btn btn-red">Continuar</button>
       </div>
     </div>
   </div>
 </div>
 <script>
+function datetimepicker(){
+  $('.datetimepicker').each(function(index) {
+    var valueField=$(this).val();
+    var dateField=moment(valueField, "DD/MM/YYYY HH:mm:ss");
+    $(this).datetimepicker({
+    showTodayButton: true,
+    format: 'DD/MM/YYYY HH:mm:ss',
+    locale:'es',
+    useCurrent: true,
+    defaultDate: moment(),
+    tooltips: spanish_tooltips_datetimepicker,
+    date: (dateField.isValid())?dateField:null
+    });
+    if($(this).attr("minDate")!="" && typeof $(this).attr("minDate")!==typeof undefined) $(this).data("DateTimePicker").minDate(moment($(this).attr("minDate"), "YYYY-MM-DD"));
+    if($(this).attr("maxDate")!="" && typeof $(this).attr("maxDate")!==typeof undefined) $(this).data("DateTimePicker").maxDate(moment($(this).attr("maxDate"), "YYYY-MM-DD"));
+  });
+}
+
+function saveEquipment(id){
+  if((++load_wait)==1) $("#load-spinner").fadeIn();
+  var data={equipment: id, worker: $("#id-parent").val() ,deliverydate: $("#form_deliverydate").val(), serial: ($('#form_serial').val())?$('#form_serial').val():'',observations: $("#form_observations").val()};
+  console.log(data);
+  $.ajax({
+      type: "post",
+      dataType: "json",
+      data: JSON.stringify(data),
+      url: "/api/HR/equipments/elements/save",
+    }).done(function( result, textStatus, jqXHR ) {
+      if((--load_wait)==0) $("#load-spinner").fadeOut();
+      if(result.result){
+         toastr.success("Datos guardados correctamente", "Confirmación", confirmation);
+         $('#listWorkerEquipment').DataTable().ajax.reload();
+      }else toastr.error("Ocurrió un error al guardar los datos", "Confirmación", confirmation);
+      $("#new-equipment-modal").modal('hide');
+  });
+}
+
 function getEquipment(id){
+  if((++load_wait)==1) $("#load-spinner").fadeIn();
   $.ajax({
       type: "GET",
       dataType: "json",
       url: "/api/HR/equipments/elements/"+id+"/get",
     }).done(function( elements, textStatus, jqXHR ) {
+      $("#new-equipment-categories").empty();
+      $("#new-equipment-items").empty();
       if((--load_wait)==0) $("#load-spinner").fadeOut();
        elements.categories.forEach( function(valor, indice, array) {
         $("#new-equipment-categories").append(
-                      '<div class=".col-xl-4 col-lg-4 col-md-4 col-sm-4 col-xs-12 col-12">'+
-                        '<div id="clock-9" class="tile-stats tile-dark-gray clock-user-card" style="height: 150px;">'+
-                        '  <div class="num" id="worker-img-9"><img src="'+valor.icon+'" alt="" class="img-circle" width="80" height="80"></div>'+
-                        '  <h3 style="font-size: 12px !important; text-align: center" id="worker-name-9">'+valor.name+'</h3>'+
-                        '  <p><span id="worker-start-label-9"></span><b><span id="worker-start-9"></span></b></p>'+
-                        '  <p><span id="worker-end-label-9"></span><b><span id="worker-end-9"></span></b> </p>'+
+                      '<div class=".col-xl-3 col-lg-3 col-md-3 col-sm-3 col-xs-6 col-6">'+
+                        '<div id="equipment-category-item-'+valor.id+'" attr-id="'+valor.id+'" class="tile-stats tile-dark-gray clock-user-card" style="height: 150px;">'+
+                        '  <div class="num" id="worker-img-9"><img src="'+valor.icon+'" alt="" style="background: #e2e2e2" class="img-circle" width="80" height="80"></div>'+
+                        '  <h3 style="font-size: 12px !important; text-align: center">'+valor.name+'</h3>'+
                         '</div>'+
                       '</div>');
 
       });
-      $('input.icheck').iCheck({
-        checkboxClass: 'icheckbox_flat-blue',
-        radioClass: 'iradio_flat-blue'
-      });
-      if($("#form_category").val()!="") $("#cb-categories-"+$("#form_category").val()).iCheck('check');
-      //$('.dd').nestable('init').nestable('collapseAll');
-      $('.dd').nestable('init').nestable('collapseAll');
-      if($("#form_category").val()!="") $('[data-id='+$("#form_category").val()+']').nestableShow();
-      $("#category-tree-modal").modal();
+      elements.equipments.forEach( function(valor, indice, array) {
+       $("#new-equipment-items").append(
+                     '<div class=".col-xl-6 col-lg-6 col-md-6 col-sm-6 col-xs-12 col-12">'+
+                       '<div id="equipment-item-'+valor.id+'" attr-id="'+valor.id+'" attr-sn='+valor.requireserial+' class="tile-stats tile-gray clock-user-card" style="height: 30px;padding: 8px;border: 1px solid #dadada;">'+
+                       '  <h3 style="font-size: 12px !important; margin-top:0px; text-align: center">'+valor.name+'</h3>'+
+                       '</div>'+
+                     '</div>');
+
+     });
+      if(id>0) $("#new-equipment-items").append(
+                    '<div class=".col-xl-3 col-lg-3 col-md-3 col-sm-3 col-xs-6 col-6">'+
+                      '<div id="equipment-category-item-'+elements.parent+'" attr-id="'+elements.parent+'" class="tile-stats clock-user-card" style="height: 45px; padding: 6px;">'+
+                      '  <div class="num" id="worker-img-9" style="font-size: 30px;"><i class="fa fa-chevron-left"></i></div>'+
+                      '</div>'+
+                    '</div>');
   });
-
-
 }
 
 $(document).ready(function() {
   $('body').on('click', "#addTopWorkerEquipment-top-button-foreground", function() {
+      getEquipment(0);
+      $("#new-equipment-modal-button-continue").attr("attr-id", "");
+      $("#new-equipment-modal-button-continue").hide();
       $("#new-equipment-modal").modal();
+
   });
 
+  $('body').on('click', "[id^='equipment-category-item-']", function() {
+      getEquipment($(this).attr('attr-id'));
+  });
+
+  $('body').on('click', "#new-equipment-modal-button-continue", function() {
+    saveEquipment($(this).attr("attr-id"));
+  });
+
+  $('body').on('click', "#new-equipment-modal-button-cancel", function() {
+    $("#new-equipment-modal").modal('hide');
+    getEquipment(0);
+  });
+
+
+  $('body').on('click', "[id^='equipment-item-']", function() {
+      var itemid=$(this).attr("attr-id");
+      $("#new-equipment-modal-button-continue").attr("attr-id", itemid);
+      $("#new-equipment-modal-button-continue").show();
+      var requireserial=$(this).attr("attr-sn");
+      if(requireserial) fieldSerial=
+      $("#new-equipment-categories").empty();
+      $("#new-equipment-items").empty();
+      $("#new-equipment-items").append(
+                  '<div class="panel-body"><div class="row">'+
+                  '	  <div class="col-md-6">'+
+                  '		<div class="form-group"><label for="form_deliverydate" class="required">Fecha entrega</label><input type="text" id="form_deliverydate" name="form[deliverydate]" required="required" class="datetimepicker form-control" defaultdate=""></div>'+
+                  '	  </div>'+((requireserial=='true')?('<div class="col-md-6"><div class="form-group"><label for="form_serial" class="required">Num Serie</label><input type="text" id="form_serial" name="form[serial]" required="required" maxlength="200" class="form-control"></div></div>'):(''))+
+                  '	  <div class="col-md-12">'+
+                  '		<div class="form-group"><label for="form_observations">Observaciones</label><textarea id="form_observations" name="form[observations]" class="form-control"/></div>'+
+                  '	  </div>'+
+                  '</div></div>'
+      );
+      datetimepicker();
+  });
   getEquipment(0);
 
+
+
 });
+
 </script>

@@ -55,6 +55,11 @@ class HREquipments
      */
     private $deleted;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $requireserial;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -140,6 +145,18 @@ class HREquipments
     public function setDeleted(bool $deleted): self
     {
         $this->deleted = $deleted;
+
+        return $this;
+    }
+
+    public function getRequireserial(): ?bool
+    {
+        return $this->requireserial;
+    }
+
+    public function setRequireserial(bool $requireserial): self
+    {
+        $this->requireserial = $requireserial;
 
         return $this;
     }
