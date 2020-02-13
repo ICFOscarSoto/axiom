@@ -96,12 +96,12 @@
 													'</div>'+
 													'<div class="col-10 col-sm-1" >'+
 														'<div class="form-group">'+
-														'  <input id="producto-'+valor.id+'" type="text" disabled value="'+valor.product_code+'" class="form-control">'+
+														'  <input id="product_code-'+valor.id+'" type="text" disabled value="'+valor.product_code+'" class="form-control">'+
 														'</div>'+
 													'</div>'+
 		                      '<div class="col-10 col-sm-4" >'+
 		                        '<div class="form-group">'+
-		                        '  <input id="producto-'+valor.id+'" type="text" disabled value="'+valor.product_name+'" class="form-control">'+
+		                        '  <input id="product_name-'+valor.id+'" type="text" disabled value="'+valor.product_name+'" class="form-control">'+
 														'</div>'+
 												 	'</div>'+
 													'<div class="col-10 col-sm-1" >'+
@@ -133,12 +133,14 @@
 
 		}
 
-		function saveStock(id,qty){
+		function saveStock(id,prevqty,nextqty,product_code,location){
 			if((++load_wait)==1) $("#load-spinner").fadeIn();
+			var data={id: id, prevqty: prevqty ,nextqty: nextqty, product_code: product_code, location: location};
 			$.ajax({
-				 type: "GET",
+				 type: "POST",
 				 dataType: "json",
-				 url: "/api/ERP/inventory/"+id+"/"+qty+"/save",
+				 data: JSON.stringify(data),
+	       url: "/api/ERP/inventory/save",
 			 }).done(function(data, textStatus, jqXHR) {
 				 if((--load_wait)==0) $("#load-spinner").fadeOut();
 				 if(data.result) toastr.success("Datos guardados correctamente", "Confirmación", confirmation);
@@ -191,7 +193,7 @@
 
 					if($('#newquantity-'+$(this).attr('attr-id')).val() && $('#newquantity-'+$(this).attr('attr-id')).val()>0)
 					{
-						saveStock($(this).attr('attr-id'),$('#newquantity-'+$(this).attr('attr-id')).val());
+						saveStock($(this).attr('attr-id'),$('#quantity-'+$(this).attr('attr-id')).val(),$('#newquantity-'+$(this).attr('attr-id')).val(),$('#product_code-'+$(this).attr('attr-id')).val(),$('#location-'+$(this).attr('attr-id')).val());
 						$("#quantity-"+$(this).attr('attr-id')).val($('#newquantity-'+$(this).attr('attr-id')).val());
 
 						/*var timestamp=new Date() / 1000;
@@ -201,14 +203,17 @@
 					else if($('#newquantity-'+$(this).attr('attr-id')).val()==0)
 					{
 						id=$(this).attr('attr-id');
+						prevqty=$("#quantity-"+$(this).attr('attr-id')).val();
 						newqty=$("#newquantity-"+$(this).attr('attr-id')).val();
+						product_code=$("#product_code-"+$(this).attr('attr-id')).val();
+						location=$("#location-"+$(this).attr('attr-id')).val();
 						$.confirm({
 								theme: 'bootstrap',
 								title: '',
 								content: '¿Este producto se volverá a reponer en esta ubicación?',
 								buttons: {
 									 confirm: { text: 'Si', btnClass: 'btn-green', action: function(){
-										 				saveStock(id,newqty);
+										 				saveStock(id,prevqty,newqty,product_code,location);
 										 				$("#quantity-"+id).val(newqty);
 									 				}
 

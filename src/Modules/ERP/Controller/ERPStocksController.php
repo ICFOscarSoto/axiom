@@ -11,7 +11,9 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\ERP\Entity\ERPStocks;
+use App\Modules\ERP\Entity\ERPStockHistory;
 use App\Modules\ERP\Entity\ERPStores;
+use App\Modules\ERP\Entity\ERPStoreLocations;
 use App\Modules\ERP\Entity\ERPCategories;
 use App\Modules\ERP\Entity\ERPProducts;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
@@ -148,15 +150,39 @@ class ERPStocksController extends Controller
 
 
 		/**
-		 * @Route("/api/ERP/inventory/{id}/{qty}/save", name="saveInventoryStock")
+		 * @Route("/api/ERP/inventory/save", name="saveInventoryStock")
 		 */
-		 public function saveInventoryStock($id, $qty, RouterInterface $router,Request $request){
+		 public function saveInventoryStock(RouterInterface $router,Request $request){
 			  $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-			  $repository=$this->getDoctrine()->getRepository($this->class);
-				$stock=$repository->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany()]);
+
+			  $stock_object=json_decode($request->getContent());
+				$repositoryProducts=$this->getDoctrine()->getRepository(ERPProducts::class);
+				$product=$repositoryProducts->findOneBy(["code"=>$stock_object->product_code, "company"=>$this->getUser()->getCompany()]);
+				$repositoryStoreLocations=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
+				$storelocation=$repositoryStoreLocations->findOneBy(["name"=>$stock_object->location, "company"=>$this->getUser()->getCompany()]);
+				$repositoryStores=$this->getDoctrine()->getRepository(ERPStores::class);
+				$store=$repositoryStores->findOneBy(["id"=>$storelocation->getStore(), "company"=>$this->getUser()->getCompany()]);
+
+				$StockHistory= new ERPStockHistory();
+				$StockHistory->setProduct($product);
+				$StockHistory->setLocation($storelocation);
+				$StockHistory->setStore($store);
+				$StockHistory->setUser($this->getUser());
+				$StockHistory->setPreviousqty($stock_object->prevqty);
+				$StockHistory->setNewqty($stock_object->nextqty);
+				$StockHistory->setActive(1);
+				$StockHistory->setDeleted(0);
+				$StockHistory->setDateupd(new \DateTime());
+				$StockHistory->setDateadd(new \DateTime());
+				$manager=$this->getDoctrine()->getManager();
+				$manager->persist($StockHistory);
+				$manager->flush();
+
+				$repository=$this->getDoctrine()->getRepository($this->class);
+				$stock=$repository->findOneBy(["id"=>$stock_object->id, "company"=>$this->getUser()->getCompany()]);
 				if($stock){
 					$datetime=new \DateTime();
-					$stock->setQuantity($qty);
+					$stock->setQuantity($stock_object->nextqty);
 					$stock->setLastinventorydate($datetime);
 					$manager=$this->getDoctrine()->getManager();
 					$manager->persist($stock);
