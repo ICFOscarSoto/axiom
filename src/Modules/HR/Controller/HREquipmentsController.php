@@ -14,9 +14,16 @@ use App\Modules\HR\Entity\HREquipments;
 use App\Modules\HR\Entity\HRWorkers;
 use App\Modules\HR\Entity\HRWorkerEquipment;
 use App\Modules\HR\Reports\HREquipmentsReports;
+use App\Modules\HR\Utils\HRWorkerEquipmentUtils;
+use App\Modules\Cloud\Utils\CloudFilesUtils;
+use App\Modules\Globale\Utils\GlobaleFormUtils;
 
 class HREquipmentsController extends Controller
 {
+
+  private $module='HR';
+  private $class=HRWorkerEquipment::class;
+  private $utilsClass=HRWorkerEquipmentUtils::class;
 
   /**
   * @Route("/api/HR/equipments/elements/save", name="saveEquipmentsCategories")
@@ -45,7 +52,7 @@ class HREquipmentsController extends Controller
 
    $this->getDoctrine()->getManager()->persist($workerEquipment);
    $this->getDoctrine()->getManager()->flush();
-   return new JsonResponse(["result"=>1]);
+   return new JsonResponse(["result"=>1, "id"=>$workerEquipment->getId()]);
   }
 
  /**
@@ -88,6 +95,37 @@ class HREquipmentsController extends Controller
 	 $reportsUtils = new HREquipmentsReports();
    $params=["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "id"=>$document->getId(), "user"=>$this->getUser(), "document"=>$document];
    $pdf=$reportsUtils->create($params);
+ }
+
+
+ /**
+  * @Route("/{_locale}/HR/equipments/data/{id}/{action}/{idworker}", name="dataEquipments", defaults={"id"=0, "action"="read", "idworker"="0"})
+  */
+  public function data($id, $action, $idworker, Request $request){
+   $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+   $this->denyAccessUnlessGranted('ROLE_ADMIN');
+   $template=dirname(__FILE__)."/../Forms/WorkerEquipment.json";
+   $utils = new GlobaleFormUtils();
+   $utilsObj=new $this->utilsClass();
+   $workerEquipmentsRepository=$this->getDoctrine()->getRepository(HRWorkerEquipment::class);
+   $workerRepository=$this->getDoctrine()->getRepository(HRWorkers::class);
+   if($id==0){
+     if($idworker==0 ) $idworker=$request->query->get('worker');
+     if($idworker==0 || $idworker==null) $idworker=$request->request->get('id-parent',0);
+     $worker = $workerRepository->find($idworker);
+   }	else $obj = $workerEquipmentsRepository->find($id);
+
+   $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "parent"=>$id==0?$worker:$obj->getWorker()];
+   $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),
+                      method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
+
+  //-----------------   CLOUD ----------------------
+  $utilsCloud = new CloudFilesUtils();
+  $path="HRSickleaves";
+  $templateLists=["id"=>$path,"list"=>[$utilsCloud->formatList($this->getUser(),$path,$id)],"path"=>$this->generateUrl("cloudUpload",["id"=>$id, "path"=>$path])];
+  //------------------------------------------------
+
+  return $utils->make($id, $this->class, $action, "formWorkEquipments", "modal", "@Globale/form.html.twig", null, null, ["filesHRWorkEquipments"=>["template"=>"@Cloud/genericlistfiles.html.twig", "vars"=>["cloudConstructor"=>$templateLists]]]);
  }
 
 }

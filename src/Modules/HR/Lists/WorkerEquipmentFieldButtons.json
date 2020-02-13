@@ -1,5 +1,6 @@
 [
-  {"id": "editWorkerEquipment", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"genericdatatab", "routeParams":{"module":"HR", "name":"WorkerEquipment", "type":"modal", "idparent":"id" }, "modal":"WorkerEquipment", "actionType" : "background", "confirm" :false, "tooltip":""},
+  {"id": "editWorkerEquipment", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"dataEquipments", "modal":"WorkerEquipment", "actionType" : "background", "confirm" :false, "tooltip":""},
+  {"id": "printWorkerEquipment", "type" : "default", "icon" : "fa fa-print", "name" : "editar", "route":"printEquipmentReport", "actionType" : "foreground", "target":"_blank", "confirm" :false, "tooltip":""},
   {"id": "activation", "type": "option", "options": [
       {"id": "desactivateWorkerEquipment", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"genericdisable", "routeParams":{"module":"HR", "name":"WorkerEquipment"}, "confirm" :true, "actionType" : "background", "tooltip":"" },
       {"id": "activateWorkerEquipment", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "route":"genericenable", "routeParams":{"module":"HR", "name":"WorkerEquipment"}, "confirm" :true, "actionType" : "background", "tooltip":"" }

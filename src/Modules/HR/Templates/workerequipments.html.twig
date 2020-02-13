@@ -46,8 +46,9 @@ function saveEquipment(id){
     }).done(function( result, textStatus, jqXHR ) {
       if((--load_wait)==0) $("#load-spinner").fadeOut();
       if(result.result){
+        $('#listWorkerEquipment').DataTable().ajax.reload();
          toastr.success("Datos guardados correctamente", "Confirmación", confirmation);
-         $('#listWorkerEquipment').DataTable().ajax.reload();
+         window.open("/api/HR/equipments/report/"+result.id+"/print");
       }else toastr.error("Ocurrió un error al guardar los datos", "Confirmación", confirmation);
       $("#new-equipment-modal").modal('hide');
   });
