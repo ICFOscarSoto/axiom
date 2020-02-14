@@ -84,7 +84,7 @@ class HREquipmentsReports
     $this->pdf->Cell(15,6,utf8_decode($params["document"]->getQuantity()),1,0,'C');
     $this->pdf->Cell(50,6,utf8_decode($params["document"]->getSerial()),1,0,'C');
     $this->pdf->Cell(35,6,utf8_decode($params["document"]->getDeliverydate()->format('d/m/Y H:i')),1,0,'C');
-    $this->pdf->Cell(25,6,utf8_decode($params["document"]->getExpiration()->format('d/m/Y')),1,0,'C');
+    $this->pdf->Cell(25,6,utf8_decode($params["document"]->getExpiration()?$params["document"]->getExpiration()->format('d/m/Y'):''),1,0,'C');
 
     $this->pdf->Ln(20);
     $this->pdf->MultiCell(190,4,utf8_decode("El trabajador acepta los siguientes compromisos que se le solicita:"),0,'J');
