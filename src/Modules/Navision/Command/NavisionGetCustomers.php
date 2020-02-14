@@ -294,7 +294,8 @@ class NavisionGetCustomers extends ContainerAwareCommand
 
             $objbankaccount->setIban($object["iban"]);
             if(strlen($object["swift"])=="11") $objbankaccount->setSwiftcode($object["swift"]);
-            else $txt="El cliente ".$object["socialname"]." tiene un SWIFT no válido =>".$object["swift"] . "\n"
+            else{
+              $txt="El cliente ".$object["socialname"]." tiene un SWIFT no válido =>".$object["swift"] . "\n"
               fwrite($log, $txt);
             }
             $objbankaccount->setDateupd(new \Datetime());
@@ -304,6 +305,7 @@ class NavisionGetCustomers extends ContainerAwareCommand
         }
 
      }
+     fclose($log);
      $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"customers"]);
      if ($navisionSync==null) {
        $navisionSync=new NavisionSync();
