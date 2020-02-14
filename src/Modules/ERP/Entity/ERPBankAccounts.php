@@ -30,7 +30,7 @@ class ERPBankAccounts
     private $iban;
 
     /**
-     * @ORM\Column(type="string", length=11)
+     * @ORM\Column(type="string", length=11, nullable=true)
      */
     private $swiftcode;
 

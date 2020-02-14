@@ -293,9 +293,11 @@ class NavisionGetCustomers extends ContainerAwareCommand
             }
 
             $objbankaccount->setIban($object["iban"]);
-            if(strlen($object["swift"])=="11") $objbankaccount->setSwiftcode($object["swift"]);
+            $output->writeln(strlen($object["swift"]));
+           if(strlen($object["swift"])=="11" OR strlen($object["swift"])=="8") $objbankaccount->setSwiftcode($object["swift"]);
             else{
-              $txt="El cliente ".$object["socialname"]." tiene un SWIFT no válido =>".$object["swift"] . "\n"
+              $objbankaccount->setSwiftcode("REVISAR");
+              $txt="El cliente ".$object["socialname"]." tiene un SWIFT no válido =>".$object["swift"] . "\n";
               fwrite($log, $txt);
             }
             $objbankaccount->setDateupd(new \Datetime());
