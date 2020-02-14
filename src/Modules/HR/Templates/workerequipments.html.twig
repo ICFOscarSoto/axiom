@@ -36,7 +36,7 @@ function datetimepicker(){
 
 function saveEquipment(id){
   if((++load_wait)==1) $("#load-spinner").fadeIn();
-  var data={equipment: id, worker: $("#id-parent").val() ,deliverydate: $("#form_deliverydate").val(), serial: ($('#form_serial').val())?$('#form_serial').val():'',observations: $("#form_observations").val()};
+  var data={equipment: id, worker: $("#id-parent").val(), deliverydate: $("#form_deliverydate").val(), quantity: $("#form_quantity").val(), serial: ($('#form_serial').val())?$('#form_serial').val():'', size: ($('#form_size').val())?$('#form_size').val():'', expiration: ($('#form_expiration').val())?$('#form_expiration').val():'', observations: $("#form_observations").val()};
   console.log(data);
   $.ajax({
       type: "post",
@@ -77,7 +77,7 @@ function getEquipment(id){
       elements.equipments.forEach( function(valor, indice, array) {
        $("#new-equipment-items").append(
                      '<div class=".col-xl-6 col-lg-6 col-md-6 col-sm-6 col-xs-12 col-12">'+
-                       '<div id="equipment-item-'+valor.id+'" attr-id="'+valor.id+'" attr-sn='+valor.requireserial+' class="tile-stats tile-gray clock-user-card" style="height: 30px;padding: 8px;border: 1px solid #dadada;">'+
+                       '<div id="equipment-item-'+valor.id+'" attr-id="'+valor.id+'" attr-sn='+valor.requireserial+' attr-size='+valor.requiresize+' attr-expiration='+valor.requireexpiration+' class="tile-stats tile-gray clock-user-card" style="height: 30px;padding: 8px;border: 1px solid #dadada;">'+
                        '  <h3 style="font-size: 12px !important; margin-top:0px; text-align: center">'+valor.name+'</h3>'+
                        '</div>'+
                      '</div>');
@@ -119,15 +119,17 @@ $(document).ready(function() {
       var itemid=$(this).attr("attr-id");
       $("#new-equipment-modal-button-continue").attr("attr-id", itemid);
       $("#new-equipment-modal-button-continue").show();
-      var requireserial=$(this).attr("attr-sn");
-      if(requireserial) fieldSerial=
       $("#new-equipment-categories").empty();
       $("#new-equipment-items").empty();
       $("#new-equipment-items").append(
                   '<div class="panel-body"><div class="row">'+
-                  '	  <div class="col-md-6">'+
+                  '	  <div class="col-md-4">'+
                   '		<div class="form-group"><label for="form_deliverydate" class="required">Fecha entrega</label><input type="text" id="form_deliverydate" name="form[deliverydate]" required="required" class="datetimepicker form-control" defaultdate=""></div>'+
-                  '	  </div>'+((requireserial=='true')?('<div class="col-md-6"><div class="form-group"><label for="form_serial" class="required">Num Serie</label><input type="text" id="form_serial" name="form[serial]" required="required" maxlength="200" class="form-control"></div></div>'):(''))+
+                  '	  </div>'+
+                  '   <div class="col-md-2"><div class="form-group"><label for="form_quantity" class="required">Cantidad</label><input type="number" id="form_quantity" name="form[quantity]" required="required" maxlength="10" min="1" value="1" class="form-control"></div></div>' +
+                  (($(this).attr("attr-size")=='true')?('<div class="col-md-2"><div class="form-group"><label for="form_size" class="required">Talla</label><input type="text" id="form_size" name="form[size]" required="required" maxlength="10" class="form-control"></div></div>'):(''))+
+                  (($(this).attr("attr-sn")=='true')?('<div class="col-md-6"><div class="form-group"><label for="form_serial" class="required">Num Serie</label><input type="text" id="form_serial" name="form[serial]" required="required" maxlength="200" class="form-control"></div></div>'):(''))+
+                  (($(this).attr("attr-expiration")=='true')?('<div class="col-md-6"><div class="form-group"><label for="form_expiration" class="required">Caducidad</label><input type="text" id="form_expiration" name="form[expiration]" required="required" class="datetimepicker form-control"></div></div>'):(''))+
                   '	  <div class="col-md-12">'+
                   '		<div class="form-group"><label for="form_observations">Observaciones</label><textarea id="form_observations" name="form[observations]" class="form-control"/></div>'+
                   '	  </div>'+

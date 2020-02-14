@@ -74,15 +74,17 @@ class HREquipmentsReports
     $this->pdf->Ln(20);
     $this->pdf->MultiCell(190,4,utf8_decode("Con la presente acta la empresa hace entrega de la siguiente dotación al trabajador. Además reconoce haber sido informado de los trabajos y zonas en los que debe utilizar dicho equipo, así como haber recibido las instrucciones para su correcto uso:"),0,'J');
     $this->pdf->Ln(10);
-    $this->pdf->Cell(80,6,utf8_decode("Equipo"),1,0,'C',true);
-    $this->pdf->Cell(20,6,utf8_decode("Cantidad"),1,0,'C',true);
+    $this->pdf->Cell(65,6,utf8_decode("Equipo"),1,0,'C',true);
+    $this->pdf->Cell(15,6,utf8_decode("Cantidad"),1,0,'C',true);
     $this->pdf->Cell(50,6,utf8_decode("Número Serie"),1,0,'C',true);
-    $this->pdf->Cell(40,6,utf8_decode("Fecha Entrega"),1,0,'C',true);
+    $this->pdf->Cell(35,6,utf8_decode("Fecha Entrega"),1,0,'C',true);
+    $this->pdf->Cell(25,6,utf8_decode("Caducidad"),1,0,'C',true);
     $this->pdf->Ln(6);
-    $this->pdf->Cell(80,6,utf8_decode($this->equipment->getName()),1,0,'C');
-    $this->pdf->Cell(20,6,utf8_decode(1),1,0,'C');
+    $this->pdf->Cell(65,6,utf8_decode($this->equipment->getName().($params["document"]->getSize()?' - Talla '.$params["document"]->getSize():'')),1,0,'C');
+    $this->pdf->Cell(15,6,utf8_decode($params["document"]->getQuantity()),1,0,'C');
     $this->pdf->Cell(50,6,utf8_decode($params["document"]->getSerial()),1,0,'C');
-    $this->pdf->Cell(40,6,utf8_decode($params["document"]->getDeliverydate()->format('d/m/Y H:i')),1,0,'C');
+    $this->pdf->Cell(35,6,utf8_decode($params["document"]->getDeliverydate()->format('d/m/Y H:i')),1,0,'C');
+    $this->pdf->Cell(25,6,utf8_decode($params["document"]->getExpiration()->format('d/m/Y')),1,0,'C');
 
     $this->pdf->Ln(20);
     $this->pdf->MultiCell(190,4,utf8_decode("El trabajador acepta los siguientes compromisos que se le solicita:"),0,'J');

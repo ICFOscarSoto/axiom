@@ -43,6 +43,9 @@ class HREquipmentsController extends Controller
    $workerEquipment->setWorker($worker);
    $workerEquipment->setEquipment($itemEquipment);
    $workerEquipment->setSerial($equipment->serial);
+   $workerEquipment->setQuantity($equipment->quantity);
+   $workerEquipment->setSize($equipment->size);
+   $workerEquipment->setExpiration($equipment->expiration!=null?date_create_from_format('d/m/Y H:i:s',$equipment->expiration):null);
    $workerEquipment->setObservations($equipment->observations);
    $workerEquipment->setDeliverydate(date_create_from_format('d/m/Y H:i:s',$equipment->deliverydate));
    $workerEquipment->setDateadd(new \DateTime());
@@ -78,6 +81,8 @@ class HREquipmentsController extends Controller
     $item['id']=$equipment->getId();
     $item['name']=$equipment->getname();
     $item['requireserial']=$equipment->getRequireserial();
+    $item['requiresize']=$equipment->getRequiresize();
+    $item['requireexpiration']=$equipment->getRequireexpiration();
     $responsEquipments[]=$item;
   }
 

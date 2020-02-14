@@ -254,11 +254,16 @@ Hourslastday: Horas último dia
 
 # EQUIPMENTS
 #----------------------------------------------------------------------------------------------------------------------
+Equipments: Equipamientos
 Equipment: Equipamiento
 WorkerEquipment: Equipamiento trabajador
 date: Fecha
 Deliverydate: Fecha entrega
 Serial: Num Serie
+Requireserial: Num. serie
+Requiresize: Talla
+Requireexpiration: Caducidad
+Select hrequipmentcategories: Seleccionar categoria
 
 # QUOTATION GROUPS
 #----------------------------------------------------------------------------------------------------------------------
