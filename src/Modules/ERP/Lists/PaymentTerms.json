@@ -4,14 +4,6 @@
         "caption": "id"
     },
     {
-        "name": "code",
-        "caption": "code"
-    },
-    {
-        "name": "firstexpiration",
-        "caption": "firstexpiration"
-    },
-    {
         "name": "name",
         "caption": "name"
     },

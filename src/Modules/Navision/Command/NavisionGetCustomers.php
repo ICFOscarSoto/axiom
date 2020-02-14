@@ -108,10 +108,12 @@ class NavisionGetCustomers extends ContainerAwareCommand
         $currency=$repositoryCurrencies->findOneBy(["isocode"=>"EUR"]);
         $paymentMethod=$repositoryPaymentMethod->findOneBy(["paymentcode"=>$object["payment_method"]]);
         $activity=$repositoryCustomerActivities->findOneBy(["code"=>$object["activity"]]);
-        $customergroup=$repositoryCustomerGroups->findOneBy(["code"=>$object["customergroup"]]);
+        $customergroup=$repositoryCustomerGroups->findOneBy(["name"=>$object["customergroup"]]);
         $bankaccounts=$repositoryBankAccounts->findOneBy(["iban"=>$object["iban"]]);
+/*
         if($object["payment_terms"]!="") $paymentTerms=$repositoryPaymentTerms->findOneBy(["code"=>$object["payment_terms"]]);
         else $paymentTerms=$repositoryPaymentTerms->findOneBy(["id"=>"11"]);
+*/
         if($object["socialname"]!=null)
           if($object["socialname"][0]=='*') $obj->setActive(0);
             else $obj->setActive(1);
@@ -130,7 +132,7 @@ class NavisionGetCustomers extends ContainerAwareCommand
         $obj->setDateupd(new \Datetime());
         //$obj->setCurrency($currency);
         $obj->setPaymentMethod($paymentMethod);
-        $obj->setPaymentTerms($paymentTerms);
+        //$obj->setPaymentTerms($paymentTerms);
         $obj->setActivity($activity);
         $obj->setCustomergroup($customergroup);
         $obj->setMinimuminvoiceamount($object["minimuminvoiceamount"]);
