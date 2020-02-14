@@ -88,7 +88,7 @@ class NavisionGetCustomers extends ContainerAwareCommand
      $repository=$this->doctrine->getRepository(ERPCustomers::class);
      //Disable SQL logger
      $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
-
+     $log=fopen("WrongSwiftCodes.txt", "w");
      foreach ($objects["class"] as $key=>$object){
        $output->writeln('  - '.$object["code"].' - '.$object["socialname"]);
        if($object["vat"]==null) continue;
@@ -293,7 +293,10 @@ class NavisionGetCustomers extends ContainerAwareCommand
             }
 
             $objbankaccount->setIban($object["iban"]);
-            $objbankaccount->setSwiftcode($object["swift"]);
+            if(strlen($object["swift"])=="11") $objbankaccount->setSwiftcode($object["swift"]);
+            else $txt="El cliente ".$object["socialname"]." tiene un SWIFT no válido =>".$object["swift"] . "\n"
+              fwrite($log, $txt);
+            }
             $objbankaccount->setDateupd(new \Datetime());
             $this->doctrine->getManager()->persist($objbankaccount);
             $this->doctrine->getManager()->flush();
