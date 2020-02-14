@@ -1,0 +1,6 @@
+[
+  {"id" : "addTopEquipments", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"genericdata", "routeParams":{"module":"HR", "name":"Equipments", "type":"modal" }, "modal":"Equipments", "actionType" : "background", "confirm" :false, "tooltip" : ""},
+  {"id" : "deleteTopEquipments", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true, "tooltip":""},
+  {"id" : "printTopEquipments", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false, "tooltip":""},
+  {"id" : "exportTopEquipments", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"genericexport", "routeParams":{"module":"HR", "name":"Equipments"}, "confirm" :false, "tooltip":""}
+]

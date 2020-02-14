@@ -65,6 +65,21 @@ class HRWorkerEquipment
      */
     private $deliverydate;
 
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $quantity=1;
+
+    /**
+     * @ORM\Column(type="string", length=10, nullable=true)
+     */
+    private $size;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $expiration;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -174,6 +189,42 @@ class HRWorkerEquipment
     public function setDeliverydate(\DateTimeInterface $deliverydate): self
     {
         $this->deliverydate = $deliverydate;
+
+        return $this;
+    }
+
+    public function getQuantity(): ?int
+    {
+        return $this->quantity;
+    }
+
+    public function setQuantity(int $quantity): self
+    {
+        $this->quantity = $quantity;
+
+        return $this;
+    }
+
+    public function getSize(): ?string
+    {
+        return $this->size;
+    }
+
+    public function setSize(?string $size): self
+    {
+        $this->size = $size;
+
+        return $this;
+    }
+
+    public function getExpiration(): ?\DateTimeInterface
+    {
+        return $this->expiration;
+    }
+
+    public function setExpiration(?\DateTimeInterface $expiration): self
+    {
+        $this->expiration = $expiration;
 
         return $this;
     }

@@ -5,20 +5,27 @@
     },
     {
         "name": "equipment__name",
-        "caption": "Equipment"
+        "caption": "Equipment",
+        "width": "20%"
     },
     {
-        "name": "equipment__category__name",
-        "caption": "category"
+        "name": "size",
+        "caption": "Size"
     },
     {
         "name": "deliverydate",
         "caption": "Deliverydate",
-        "type": "datetime"
+        "type": "date"
     },
     {
         "name": "serial",
-        "caption": "Serial"
+        "caption": "Serial",
+        "width": "20%"
+    },
+    {
+        "name": "expiration",
+        "caption": "Expiration",
+        "type": "date"
     },
 
     {

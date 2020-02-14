@@ -1,0 +1,34 @@
+[{
+    "sections": [
+        {
+            "name": "data",
+            "fields": [
+                {
+                    "name": "name",
+                    "cols": 8
+                },
+                {
+                    "name": "category",
+                    "cols": 4
+                }
+              ]},
+          {
+                "name": "Requerir",
+                "fields": [
+                {
+                    "name": "requireserial",
+                    "cols": 2
+                },
+                {
+                    "name": "requiresize",
+                    "cols": 2
+                },
+                {
+                    "name": "requireexpiration",
+                    "cols": 2
+                }
+
+            ]
+        }
+    ]
+}]

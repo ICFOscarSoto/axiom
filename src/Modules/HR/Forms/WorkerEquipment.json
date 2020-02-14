@@ -10,11 +10,23 @@
                 },
                 {
                     "name": "deliverydate",
-                    "cols": 6,
+                    "cols": 4,
                     "readonly": true
                 },
                 {
+                    "name": "quantity",
+                    "cols": 2
+                },
+                {
+                    "name": "size",
+                    "cols": 2
+                },
+                {
                     "name": "serial",
+                    "cols": 6
+                },
+                {
+                    "name": "expiration",
                     "cols": 6
                 },
                 {

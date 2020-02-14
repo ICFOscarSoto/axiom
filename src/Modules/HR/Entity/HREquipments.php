@@ -60,6 +60,16 @@ class HREquipments
      */
     private $requireserial;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $requiresize;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $requireexpiration;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -157,6 +167,30 @@ class HREquipments
     public function setRequireserial(bool $requireserial): self
     {
         $this->requireserial = $requireserial;
+
+        return $this;
+    }
+
+    public function getRequiresize(): ?bool
+    {
+        return $this->requiresize;
+    }
+
+    public function setRequiresize(bool $requiresize): self
+    {
+        $this->requiresize = $requiresize;
+
+        return $this;
+    }
+
+    public function getRequireexpiration(): ?bool
+    {
+        return $this->requireexpiration;
+    }
+
+    public function setRequireexpiration(bool $requireexpiration): self
+    {
+        $this->requireexpiration = $requireexpiration;
 
         return $this;
     }
