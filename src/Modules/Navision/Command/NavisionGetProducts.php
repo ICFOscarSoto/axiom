@@ -12,6 +12,8 @@ use App\Modules\ERP\Entity\ERPSuppliers;
 use App\Modules\ERP\Entity\ERPProducts;
 use App\Modules\ERP\Entity\ERPEAN13;
 use App\Modules\ERP\Entity\ERPShoppingDiscounts;
+use App\Modules\ERP\Entity\ERPStocks;
+use App\Modules\ERP\Entity\ERPStoreLocations;
 use App\Modules\Globale\Entity\GlobaleCompanies;
 use App\Modules\Globale\Entity\GlobaleStates;
 use App\Modules\Globale\Entity\GlobaleCountries;
@@ -58,6 +60,8 @@ class NavisionGetProducts extends ContainerAwareCommand
       case 'clearEAN13': $this->clearEAN13($input, $output);
       break;
       case 'prices': $this->importPrices($input, $output);
+      break;
+      case 'stocks': $this->importStocks($input, $output);
       break;
       case 'all':
         $this->importProduct($input, $output);
@@ -248,7 +252,6 @@ public function importPrices(InputInterface $input, OutputInterface $output) {
   $repositorySupliers=$this->doctrine->getRepository(ERPSuppliers::class);
   $repositoryShoppingDiscounts=$this->doctrine->getRepository(ERPShoppingDiscounts::class);
   $repository=$this->doctrine->getRepository(ERPProducts::class);
-
   $products=$repository->findAll();
 
   //Disable SQL logger
@@ -291,5 +294,63 @@ public function importPrices(InputInterface $input, OutputInterface $output) {
     }
   }
 }
+
+
+public function importStocks(InputInterface $input, OutputInterface $output) {
+  $navisionSyncRepository=$this->doctrine->getRepository(NavisionSync::class);
+  $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"stocks"]);
+  if ($navisionSync==null) {
+    $navisionSync=new NavisionSync();
+    $navisionSync->setMaxtimestamp(0);
+  }
+  $datetime=new \DateTime();
+  $output->writeln('* Sincronizando stocks....');
+  $repositoryStocks=$this->doctrine->getRepository(ERPStocks::class);
+  $repositoryStoreLocations=$this->doctrine->getRepository(ERPStoreLocations::class);
+  $repository=$this->doctrine->getRepository(ERPProducts::class);
+  $product=$repository->findAll();
+
+  foreach ($products as $product){
+    $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getStocks.php?from='.$product->getCode());
+    $objects=json_decode($json, true);
+    $objects=$objects[0];
+
+    $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
+    $company=$repositoryCompanies->find(2);
+
+    foreach ($objects["class"] as $stock){
+      if($stock["Location Code"]!="TRANSITO"){
+      $location=$repositoryStoreLocations->findOneByName($stock["Location Code"]);
+      $stock_old=$repositoryStocks->findOneBy(["product"=>$product->getId(),"storelocation"=>$location->getId()]);
+
+      if($stock_old!=null){
+        $stock_old->setQuantity((int)$stock["stock"]);
+        $stock_old->setDateupd(new \Datetime());
+        $this->doctrine->getManager()->merge($stock_old);
+        $this->doctrine->getManager()->flush();
+        $this->doctrine->getManager()->clear();
+      } else {
+        $obj=new ERPStocks();
+        $obj->setCompany($company);
+        $obj->setProduct($product);
+        $obj->setDateadd(new \Datetime());
+        $obj->setDateupd(new \Datetime());
+        $obj->setStoreLocation($location);
+        $obj->setQuantity((int)$stock["stock"]);
+        $obj->setActive(1);
+        $obj->setDeleted(0);
+      }
+      $this->doctrine->getManager()->merge($obj);
+      $this->doctrine->getManager()->flush();
+      $this->doctrine->getManager()->clear();
+}
+
+
+    }
+
+  }
+
+}
+
 }
 ?>
