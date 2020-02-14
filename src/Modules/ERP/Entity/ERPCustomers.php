@@ -199,6 +199,11 @@ class ERPCustomers
      */
     private $authorizationcontrol;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $insured;
+
 
     public function getId(): ?int
     {
@@ -628,6 +633,18 @@ class ERPCustomers
     public function setAuthorizationcontrol(?bool $authorizationcontrol): self
     {
         $this->authorizationcontrol = $authorizationcontrol;
+
+        return $this;
+    }
+
+    public function getInsured(): ?bool
+    {
+        return $this->insured;
+    }
+
+    public function setInsured(?bool $insured): self
+    {
+        $this->insured = $insured;
 
         return $this;
     }
