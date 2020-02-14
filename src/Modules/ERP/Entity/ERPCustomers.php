@@ -179,8 +179,8 @@ class ERPCustomers
     private $web;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPPaymentTerms")
-     * @ORM\JoinColumn(nullable=true)
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPPaymentTerms", cascade={"persist"})
+     * @ORM\JoinColumn(nullable=true, onDelete="CASCADE")
      */
     private $paymentterms;
 
