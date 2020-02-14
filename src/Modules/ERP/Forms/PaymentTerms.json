@@ -4,14 +4,6 @@
             "name": "data",
             "fields": [
                 {
-                    "name": "code",
-                    "cols": 4
-                },
-                {
-                    "name": "firstexpiration",
-                    "cols": 4
-                },
-                {
                     "name": "name",
                     "cols": 4
                 },
