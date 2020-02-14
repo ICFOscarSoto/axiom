@@ -21,7 +21,7 @@ class ERPCustomerGroups
      * @ORM\Column(type="string", length=16, nullable=true)
      */
     private $code;
-    
+
     /**
      * @ORM\Column(type="string", length=150)
      */
@@ -54,7 +54,7 @@ class ERPCustomerGroups
     private $company;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", nullable=true)
      */
     private $rate;
 
