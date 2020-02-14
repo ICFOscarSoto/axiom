@@ -41,7 +41,10 @@
 			{ "name": "pricesdeliverynote","cols": 2},
 			{ "name": "surcharge","cols": 2},
 			{ "name": "invoiceday","cols": 2},
-			{ "name": "minimuminvoiceamount","cols": 2}
+			{ "name": "minimuminvoiceamount","cols": 2},
+			{ "name": "insured","cols": 2},
+			{ "name": "supplement","cols": 2},
+			{ "name": "cescecode","cols": 2}			
 		]
 	},
 	{

@@ -105,6 +105,15 @@
 		<div class="col-md-2">
 			{{ form_row(formConstructor.form['requiredordernumber']) }}
 		</div>
+		<div class="col-md-2">
+			{{ form_row(formConstructor.form['insured']) }}
+		</div>
+		<div class="col-md-2">
+			{{ form_row(formConstructor.form['supplement']) }}
+		</div>
+		<div class="col-md-2">
+			{{ form_row(formConstructor.form['cescecode']) }}
+		</div>
 	</div>
 	<div class="row">
 		<div class="col-md-2">
@@ -198,6 +207,7 @@
 
 <script>
 $(document).ready(function() {
+
 $('body').on('click', "#{{formConstructor.name}}-button-continue", function() {
 if($("#{{formConstructor.name}}-form-body").find('form').valid()){
 if((++load_wait)==1) $("#load-spinner").fadeIn();
@@ -218,5 +228,30 @@ else toastr.error("Ocurrió un error al guardar los datos", "Confirmación", con
 $('body').on('click', "#{{formConstructor.name}}-button-cancel", function() {
 window.history.back();
 });
+
+$('#form_insured').on('ifChecked', function(event){
+//  alert(event.type + ' callback');
+	$('#form_supplement').parent().parent().css('display','inline-block');
+	$('#form_cescecode').parent().parent().css('display','inline-block');
 });
+
+
+$('#form_insured').on('ifUnchecked', function(event){
+  //alert(event.type + ' callback');
+	$('#form_supplement').parent().parent().css('display','none');
+	$('#form_cescecode').parent().parent().css('display','none');
+});
+});
+
+if($('#form_insured').is(':checked')){
+	$('#form_supplement').parent().parent().css('display','inline-block');
+	$('#form_cescecode').parent().parent().css('display','inline-block');
+}
+else{
+	$('#form_supplement').parent().parent().css('display','none');
+	$('#form_cescecode').parent().parent().css('display','none');
+}
+
+
+
 </script>

@@ -199,6 +199,21 @@ class ERPCustomers
      */
     private $authorizationcontrol;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $insured;
+
+    /**
+     * @ORM\Column(type="string", length=32, nullable=true)
+     */
+    private $supplement;
+
+    /**
+     * @ORM\Column(type="string", length=32, nullable=true)
+     */
+    private $cescecode;
+
 
     public function getId(): ?int
     {
@@ -628,6 +643,42 @@ class ERPCustomers
     public function setAuthorizationcontrol(?bool $authorizationcontrol): self
     {
         $this->authorizationcontrol = $authorizationcontrol;
+
+        return $this;
+    }
+
+    public function getInsured(): ?bool
+    {
+        return $this->insured;
+    }
+
+    public function setInsured(?bool $insured): self
+    {
+        $this->insured = $insured;
+
+        return $this;
+    }
+
+    public function getSupplement(): ?string
+    {
+        return $this->supplement;
+    }
+
+    public function setSupplement(?string $supplement): self
+    {
+        $this->supplement = $supplement;
+
+        return $this;
+    }
+
+    public function getCescecode(): ?string
+    {
+        return $this->cescecode;
+    }
+
+    public function setCescecode(?string $cescecode): self
+    {
+        $this->cescecode = $cescecode;
 
         return $this;
     }
