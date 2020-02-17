@@ -37,19 +37,40 @@ class GlobaleListUtils
 		if($searchValue!=""){
         $metadata=$manager->getClassMetadata($classname);
 		  	foreach($metadata->getColumnNames() as $column){
-					$query->orWhere('p.'.$metadata->getFieldName($column).' LIKE :val_'.$metadata->getFieldName($column));
+          $tokensSearchValue=explode('*',$searchValue);
+          foreach($tokensSearchValue as $key=>$tokenSearch){
+            if($tokenSearch!=''){
+                $query->orWhere('p.'.$metadata->getFieldName($column).' LIKE :val_'.$metadata->getFieldName($column).'_'.$key);
+                $query->setParameter('val_'.$metadata->getFieldName($column).'_'.$key, '%'.$tokenSearch.'%');
+                $queryFiltered->orWhere('p.'.$metadata->getFieldName($column).' LIKE :val_'.$metadata->getFieldName($column).'_'.$key);
+                $queryFiltered->setParameter('val_'.$metadata->getFieldName($column).'_'.$key, '%'.$tokenSearch.'%');
+            }
+          }
+          /*$query->orWhere('p.'.$metadata->getFieldName($column).' LIKE :val_'.$metadata->getFieldName($column));
 					$query->setParameter('val_'.$metadata->getFieldName($column), '%'.$searchValue.'%');
 					$queryFiltered->andWhere('p.'.$metadata->getFieldName($column).' LIKE :val_'.$metadata->getFieldName($column));
-					$queryFiltered->setParameter('val_'.$metadata->getFieldName($column), '%'.$searchValue.'%');
-			     }
+					$queryFiltered->setParameter('val_'.$metadata->getFieldName($column), '%'.$searchValue.'%');*/
+
+
+			  }
   			//Añadimos los campos de las relaciones
   			foreach($listFields as $field){
   				$path=explode('__', $field["name"]);
   				if(count($path)>1){
-  					$query->orWhere($path[0].'.'.$path[1].' LIKE :val_'.$path[0].'_'.$path[1]);
+
+            $tokensSearchValue=explode('*',$searchValue);
+            foreach($tokensSearchValue as $key=>$tokenSearch){
+                  if($tokenSearch!=''){
+                    $query->orWhere($path[0].'.'.$path[1].' LIKE :val_'.$path[0].'_'.$path[1].'_'.$key);
+          					$query->setParameter('val_'.$path[0].'_'.$path[1].'_'.$key, '%'.$tokenSearch.'%');
+          					$query->orWhere($path[0].'.'.$path[1].' LIKE :val_'.$path[0].'_'.$path[1].'_'.$key);
+          					$query->setParameter('val_'.$path[0].'_'.$path[1].'_'.$key, '%'.$tokenSearch.'%');
+                  }
+            }
+  					/*$query->orWhere($path[0].'.'.$path[1].' LIKE :val_'.$path[0].'_'.$path[1]);
   					$query->setParameter('val_'.$path[0].'_'.$path[1], '%'.$searchValue.'%');
   					$query->orWhere($path[0].'.'.$path[1].' LIKE :val_'.$path[0].'_'.$path[1]);
-  					$query->setParameter('val_'.$path[0].'_'.$path[1], '%'.$searchValue.'%');
+  					$query->setParameter('val_'.$path[0].'_'.$path[1], '%'.$searchValue.'%');*/
   				}
   			}
 		}
@@ -90,10 +111,22 @@ class GlobaleListUtils
                   $database_field='p.'.$field["name"];
                 }
               }
-              $query->andWhere($database_field.' LIKE :val_'.$field["name"]);
+
+              $tokensSearchValue=explode('*',$searchValue);
+              foreach($tokensSearchValue as $key=>$tokenSearch){
+                if($tokenSearch!=''){
+                    $query->andWhere($database_field.' LIKE :val_'.$field["name"].'_'.$key);
+                    $query->setParameter('val_'.$field["name"].'_'.$key, '%'.$tokenSearch.'%');
+                    $queryFiltered->andWhere($database_field.' LIKE :val_'.$field["name"].'_'.$key);
+                    $queryFiltered->setParameter('val_'.$field["name"].'_'.$key, '%'.$tokenSearch.'%');
+                }
+              }
+              /*$query->andWhere($database_field.' LIKE :val_'.$field["name"]);
               $query->setParameter('val_'.$field["name"], '%'.$searchValue.'%');
               $queryFiltered->andWhere($database_field.' LIKE :val_'.$field["name"]);
-              $queryFiltered->setParameter('val_'.$field["name"], '%'.$searchValue.'%');
+              $queryFiltered->setParameter('val_'.$field["name"], '%'.$searchValue.'%');*/
+
+
     				}
         }else{
           //If field is datetime type or date
@@ -123,11 +156,12 @@ class GlobaleListUtils
         }
 		}
 
-		//Excluimos los elementos borrados
-			$query->andWhere('p.deleted = :valDeleted');
+		 //Excluimos los elementos borrados
+		 $query->andWhere('p.deleted = :valDeleted');
             $query->setParameter('valDeleted', 0);
-			$queryFiltered->andWhere('p.deleted = :valDeleted');
+		 $queryFiltered->andWhere('p.deleted = :valDeleted');
             $queryFiltered->setParameter('valDeleted', 0);
+
 
       //Detect if class has attribute companyId
       if(method_exists($classname, "getCompany")){

@@ -42,10 +42,10 @@
 
     });
 
-    //HOLA
     {% if field.modal is defined and field.modal|length  %}
           //CONTINUE BUTTON FOR MODAL FORMS
-          $('body').on('click', "#{{ field.modal }}-button-continue", function() {
+          $('body').on('click', "#{{ field.modal }}-button-continue", function(event) {
+                event.stopImmediatePropagation();
                 if($("#{{field.modal}}-modal-form-body").find('form').valid()){
                   if((++load_wait)==1) $("#load-spinner").fadeIn();
                   var id_parent='';
