@@ -308,7 +308,7 @@ public function importStocks(InputInterface $input, OutputInterface $output) {
   $repositoryStocks=$this->doctrine->getRepository(ERPStocks::class);
   $repositoryStoreLocations=$this->doctrine->getRepository(ERPStoreLocations::class);
   $repository=$this->doctrine->getRepository(ERPProducts::class);
-  $product=$repository->findAll();
+  $products=$repository->findAll();
 
   foreach ($products as $product){
     $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getStocks.php?from='.$product->getCode());
@@ -317,18 +317,16 @@ public function importStocks(InputInterface $input, OutputInterface $output) {
 
     $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
     $company=$repositoryCompanies->find(2);
-
+    $output->writeln('* Actualizando stocks '.$product->getCode());
     foreach ($objects["class"] as $stock){
-      if($stock["Location Code"]!="TRANSITO"){
-      $location=$repositoryStoreLocations->findOneByName($stock["Location Code"]);
+      $location=$repositoryStoreLocations->findOneBy(["name"=>$stock["Location Code"]]);
+      if($location!=null){
       $stock_old=$repositoryStocks->findOneBy(["product"=>$product->getId(),"storelocation"=>$location->getId()]);
 
       if($stock_old!=null){
         $stock_old->setQuantity((int)$stock["stock"]);
         $stock_old->setDateupd(new \Datetime());
         $this->doctrine->getManager()->merge($stock_old);
-        $this->doctrine->getManager()->flush();
-        $this->doctrine->getManager()->clear();
       } else {
         $obj=new ERPStocks();
         $obj->setCompany($company);
@@ -336,18 +334,19 @@ public function importStocks(InputInterface $input, OutputInterface $output) {
         $obj->setDateadd(new \Datetime());
         $obj->setDateupd(new \Datetime());
         $obj->setStoreLocation($location);
-        $obj->setQuantity((int)$stock["stock"]);
+        if ((int)$stock["stock"]<0) $quantiy=0; else $quantity=(int)$stock["stock"];
+        $obj->setQuantity($quantity);
         $obj->setActive(1);
         $obj->setDeleted(0);
+        $this->doctrine->getManager()->merge($obj);
       }
-      $this->doctrine->getManager()->merge($obj);
-      $this->doctrine->getManager()->flush();
-      $this->doctrine->getManager()->clear();
-}
-
 
     }
 
+
+    }
+    $this->doctrine->getManager()->flush();
+    $this->doctrine->getManager()->clear();
   }
 
 }
