@@ -47,4 +47,18 @@ class ERPCustomersRepository extends ServiceEntityRepository
         ;
     }
     */
+
+    public function findInsuredCustomers($company){
+      $query="SELECT c.id as id, c.code as code, c.name as name, c.socialname as socialname, c.vat as vat, c.supplement as supplement,c.cescecode as cescecode, m.name as paymentmethod, p.name as paymentterms FROM erpcustomers c
+                LEFT JOIN erppayment_terms p
+                ON p.id=c.paymentterms_id
+                LEFT JOIN erppayment_methods m
+                ON m.id=c.paymentmethod_id
+                WHERE c.insured=1 AND p.company_id=:company AND c.deleted=0 AND c.active=1 ";
+      $query.=" ORDER BY c.vat ASC";
+      $params=['company' => $company->getId()];
+      return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+    }
+
+
 }
