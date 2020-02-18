@@ -527,6 +527,23 @@ Lopd: Membrete LOPD
 Contrast color: Color resaltado
 Shadow color: Color sombreado
 
+# VEHICLES
+#----------------------------------------------------------------------------------------------------------------------
+Vehicles: Vehículos
+Brand: Marca
+Model: Modelo
+Licenseplate: Matrícula
+Licenseplatedate: Fecha Matriculación
+Licenseplateenddate: Fecha Fin Matriculación
+Licenseplatecountry: País Matriculación
+
+Refuelings: Repostajes
+Fuels: Combustibles
+Fuelcapacity: Capacidad depósito depositillo
+Types: Tipos
+Measureunit: Unidad medida
+Measureunitabbreviation: Abreviatura Unidad
+
 
 #PLAZA VOUCHERS
 #----------------------------------------------------------------------------------------------------------------------
