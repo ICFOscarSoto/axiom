@@ -14,7 +14,7 @@ class GlobaleListUtils
       return null;
     }
 
-    public function getRecords($user,$repository,$request,$manager,$listFields,$classname,$filters=[],$raw=[],$maxResults=null,$orderBy="id"): array
+    public function getRecords($user,$repository,$request,$manager,$listFields,$classname,$filters=[],$raw=[],$maxResults=null,$orderBy="id",$doctrine=null): array
     {
 
 		$return=array();
@@ -290,7 +290,7 @@ class GlobaleListUtils
                                 foreach($path as $step){
                                   if(method_exists($obj, "get".ucfirst($step))){
                                     $obj_id=$obj->getId();
-                                    $obj=$obj->{"get".ucfirst($step)}();
+                                    $obj=$obj->{"get".ucfirst($step)}($doctrine);
 
                                   }
                                 }
