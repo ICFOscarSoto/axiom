@@ -16,3 +16,4 @@ twig:
         '%kernel.project_dir%/src/Modules/Tracker/Templates': Tracker
         '%kernel.project_dir%/src/Modules/ERP/Templates': ERP
         '%kernel.project_dir%/src/Modules/Navision/Templates': Navision
+        '%kernel.project_dir%/src/Modules/Vehicles/Templates': Vehicles

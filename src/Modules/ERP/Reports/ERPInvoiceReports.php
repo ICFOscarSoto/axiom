@@ -159,7 +159,7 @@ class ERPInvoiceReports
 
   }
 
-  function create($params){
+  function create($params, $dest='I', $file=null){
     setlocale( LC_NUMERIC, 'es_ES' );
     $this->pdf  = new GlobaleReports();
     $this->pdf->AliasNbPages();
@@ -205,7 +205,9 @@ $this->docFooter($invoice);
       }
 
     }
-    return $this->pdf->Output();
+    return $this->pdf->Output($dest, $file==null?$document->getCode().".pdf":$file);
+
+    //return $this->pdf->Output();
 
 }
 }

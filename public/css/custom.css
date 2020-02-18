@@ -41,7 +41,6 @@ table {
       }
 };
 
-
 .form-validation-error {
   margin: 0px 0px 5px 0px !important;
   padding: 5px 15px 5px 15px;
@@ -694,6 +693,12 @@ label.error {
 
 .jconfirm-box-container{
   margin-left: 0 !important;
+}
+
+.form-group > label{
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
 }
 
 /*

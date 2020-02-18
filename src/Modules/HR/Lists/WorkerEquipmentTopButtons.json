@@ -1,4 +1,5 @@
 [
+  {"id" : "addVacationTop", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"dataEquipments", "routeParams":{"idworker":"worker_id"}, "modal":"workerequipment", "actionType" : "background", "confirm" :false, "tooltip" : ""},
   {"id" : "addTopWorkerEquipment", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":""},
   {"id" : "deleteTopWorkerEquipment", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true, "tooltip":""},
   {"id" : "printTopWorkerEquipment", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false, "tooltip":""},

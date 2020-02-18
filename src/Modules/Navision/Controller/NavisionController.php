@@ -76,14 +76,15 @@ class NavisionController extends Controller
       $end=$request->request->get("end");
       $start=date_create_from_format('d/m/Y',$start);
       $end=date_create_from_format('d/m/Y',$end);
-      $invoices=file_get_contents($this->url.'navisionExport/do-NAVISION-invoice-list.php?start='.$start->format("Y-m-d").'&end='.$end->format("Y-m-d"));
+      $url=$this->url.'navisionExport/do-NAVISION-invoice-list.php?cif='.$request->request->get("cif").'&customer='.$request->request->get("customer").'&start='.$start->format("Y-m-d").'&end='.$end->format("Y-m-d");
+      $invoices=file_get_contents($url);
       return new Response($invoices);
     }
 
   /**
-   * @Route("/api/navision/invoice/print/{id}", name="navisionPrintInvoice", defaults={"id"=0})
+   * @Route("/api/navision/invoice/print/{id}/{mode}", name="navisionPrintInvoice", defaults={"id"=0, "mode"="print"})
    */
-   public function navisionPrintInvoice($id, Request $request){
+   public function navisionPrintInvoice($id, $mode, Request $request){
      $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
      /*$ids=$request->request->get('ids');
      $ids=explode(",",$ids);*/
@@ -93,8 +94,41 @@ class NavisionController extends Controller
      $params=["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "ids"=>$ids, "user"=>$this->getUser(), "invoices"=>json_decode($invoice, true)];
      $reportsUtils = new ERPInvoiceReports();
      //dump($invoice);
-     $pdf=$reportsUtils->create($params);
-     return new Response("", 200, array('Content-Type' => 'application/pdf'));
+
+     switch($mode){
+       case "email":
+         $tempPath=$this->get('kernel')->getRootDir().DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$this->getUser()->getCompany()->getId().DIRECTORY_SEPARATOR.'temp'.DIRECTORY_SEPARATOR.$this->getUser()->getId().DIRECTORY_SEPARATOR.'Email'.DIRECTORY_SEPARATOR;
+         if (!file_exists($tempPath) && !is_dir($tempPath)) {
+             mkdir($tempPath, 0775, true);
+         }
+         $pdf=$reportsUtils->create($params,'F',$tempPath.$id.'.pdf');
+         return new JsonResponse(["result"=>1]);
+       break;
+       case "temp":
+         $tempPath=$this->get('kernel')->getRootDir().DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$this->getUser()->getCompany()->getId().DIRECTORY_SEPARATOR.'temp'.DIRECTORY_SEPARATOR.$this->getUser()->getId().DIRECTORY_SEPARATOR.'Others'.DIRECTORY_SEPARATOR;
+         if (!file_exists($tempPath) && !is_dir($tempPath)) {
+             mkdir($tempPath, 0775, true);
+         }
+         $pdf=$reportsUtils->create($params,'F',$tempPath.$id.'.pdf');
+         return new JsonResponse(["result"=>1]);
+       break;
+       case "download":
+         $pdf=$reportsUtils->create($params,'D',$id.'.pdf');
+         return new JsonResponse(["result"=>1]);
+       break;
+       case "print":
+       case "default":
+         $pdf=$reportsUtils->create($params,'I',$id.'.pdf');
+         return new JsonResponse(["result"=>1]);
+       break;
+     }
+     return new JsonResponse(["result"=>0]);
+
+
+
+
+     //$pdf=$reportsUtils->create($params);
+     //return new Response("", 200, array('Content-Type' => 'application/pdf'));
    }
 
 

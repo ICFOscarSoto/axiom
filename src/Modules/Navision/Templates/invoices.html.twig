@@ -40,6 +40,18 @@
 		<!-- MAIN CONTENT -->
 
     <div class="row">
+			<div class="col-md-2">
+        <div class="form-group">
+          <label for="form_start">CIF</label>
+          <input type="text" id="form_cif" name="form[cif]" class="form-control">
+        </div>
+      </div>
+			<div class="col-md-4">
+        <div class="form-group">
+          <label for="form_start">Cliente</label>
+          <input type="text" id="form_customer" name="form[customer]" class="form-control">
+        </div>
+      </div>
       <div class="col-md-2">
         <div class="form-group">
           <label for="form_start">Fecha de Inicio</label>
@@ -101,7 +113,7 @@
             $.ajax({
 			         url: '{{ url('navisionGetInvoices') }}',
 			         type: 'POST',
-			         data: 'start='+$("#form_start").val()+'&end='+$("#form_end").val(),
+			         data: 'cif='+$("#form_cif").val()+'&customer='+$("#form_customer").val()+'&start='+$("#form_start").val()+'&end='+$("#form_end").val(),
 			         success:  function( data ) {
 								 if((--load_wait)==0) $("#load-spinner").fadeOut();
                  $("#{{ listConstructor.id }}-body").html("");
@@ -118,7 +130,7 @@
                    element+='<td style="height: 15px !important; vertical-align: middle; padding: 5px 5px 5px 5px !important;">'+item.customer+'</td>';
                    element+='<td style="height: 15px !important; vertical-align: middle; padding: 5px 5px 5px 5px !important;">'+item.total+'</td>';
                    element+='<td style="height: 15px !important; vertical-align: middle; padding: 5px 5px 5px 5px !important;">'+item.date+'</td>';
-                   element+='<td style="height: 15px !important; vertical-align: middle; padding: 5px 5px 5px 5px !important;"><button attr-id="'+item.id+'" id="document-button-print-'+item.id+'" type="button" class="btn btn-default tooltip-primary"><i class="fa fa-print"></i></button></td>';
+                   element+='<td style="height: 15px !important; vertical-align: middle; padding: 5px 5px 5px 5px !important;"><button attr-id="'+item.id+'" id="document-button-print-'+item.id+'" type="button" class="btn btn-default tooltip-primary"><i class="fa fa-print"></i></button>&nbsp;&nbsp;<button attr-id="'+item.id+'" id="document-button-download-'+item.id+'" type="button" class="btn btn-default tooltip-primary"><i class="fa fa-download"></i></button></td>';
                    element+='</tr>';
                    html+=element;
                  });
@@ -131,6 +143,11 @@
 
           $('body').on('click', "[id^=document-button-print-]", function(e) {
              var win = window.open("/api/navision/invoice/print/"+$(this).attr("attr-id"), '_blank');
+             win.focus();
+          });
+
+					$('body').on('click', "[id^=document-button-download-]", function(e) {
+             var win = window.open("/api/navision/invoice/print/"+$(this).attr("attr-id")+"/download", '_blank');
              win.focus();
           });
 

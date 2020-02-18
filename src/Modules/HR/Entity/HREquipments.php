@@ -7,7 +7,7 @@ use \App\Modules\HR\Entity\HREquipmentCategories;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\Modules\HR\Entity\HREquipmentsRepository")
+ * @ORM\Entity(repositoryClass="App\Modules\HR\Repository\HREquipmentsRepository")
  */
 class HREquipments
 {

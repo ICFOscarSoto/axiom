@@ -1,0 +1,6 @@
+[
+  {"id" : "addTopRefuelings", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"genericdata", "routeParams":{"module":"Vehicles", "name":"Refuelings", "type":"modal" }, "modal":"Refuelings", "actionType" : "background", "confirm" :false, "tooltip" : ""},
+  {"id" : "deleteTopRefuelings", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true, "tooltip":""},
+  {"id" : "printTopRefuelings", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false, "tooltip":""},
+  {"id" : "exportTopRefuelings", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"genericexport", "routeParams":{"module":"Vehicles", "name":"Refuelings"}, "confirm" :false, "tooltip":""}
+]

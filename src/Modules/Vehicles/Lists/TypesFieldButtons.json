@@ -1,0 +1,8 @@
+[
+  {"id": "editTypes", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"genericdata", "routeParams":{"module":"Vehicles", "name":"Types", "type":"modal" }, "modal":"Types", "actionType" : "background", "confirm" :false, "tooltip":""},
+  {"id": "activation", "type": "option", "options": [
+      {"id": "desactivateTypes", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"genericdisable", "routeParams":{"module":"Vehicles", "name":"Types"}, "confirm" :true, "actionType" : "background", "tooltip":"" },
+      {"id": "activateTypes", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "route":"genericenable", "routeParams":{"module":"Vehicles", "name":"Types"}, "confirm" :true, "actionType" : "background", "tooltip":"" }
+  ]},
+  {"id": "deleteTypes", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"genericdelete", "routeParams":{"module":"Vehicles", "name":"Types"}, "confirm" :true, "undo" :false, "actionType" : "background", "tooltip":""}
+]

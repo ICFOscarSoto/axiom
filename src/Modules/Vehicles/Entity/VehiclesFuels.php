@@ -1,14 +1,13 @@
 <?php
 
-namespace App\Modules\HR\Entity;
+namespace App\Modules\Vehicles\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use \App\Modules\HR\Entity\HREquipmentCategories;
 
 /**
- * @ORM\Entity(repositoryClass="App\Modules\HR\Repository\HREquipmentCategoriesRepository")
+ * @ORM\Entity(repositoryClass="App\Modules\Vehicles\Repository\VehiclesFuelsRepository")
  */
-class HREquipmentCategories
+class VehiclesFuels
 {
     /**
      * @ORM\Id()
@@ -18,19 +17,19 @@ class HREquipmentCategories
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=150)
+     * @ORM\Column(type="string", length=125)
      */
     private $name;
 
     /**
-     * @ORM\Column(type="string", length=150)
+     * @ORM\Column(type="string", length=50)
      */
-    private $icon;
+    private $measureunit;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\HR\Entity\HREquipmentCategories")
+     * @ORM\Column(type="string", length=10)
      */
-    private $parent;
+    private $measureunitabbreviation;
 
     /**
      * @ORM\Column(type="datetime")
@@ -52,9 +51,6 @@ class HREquipmentCategories
      */
     private $deleted;
 
-
-
-
     public function getId(): ?int
     {
         return $this->id;
@@ -72,14 +68,26 @@ class HREquipmentCategories
         return $this;
     }
 
-    public function getIcon(): ?string
+    public function getMeasureunit(): ?string
     {
-        return $this->icon;
+        return $this->measureunit;
     }
 
-    public function setIcon(string $icon): self
+    public function setMeasureunit(string $measureunit): self
     {
-        $this->icon = $icon;
+        $this->measureunit = $measureunit;
+
+        return $this;
+    }
+
+    public function getMeasureunitabbreviation(): ?string
+    {
+        return $this->measureunitabbreviation;
+    }
+
+    public function setMeasureunitabbreviation(string $measureunitabbreviation): self
+    {
+        $this->measureunitabbreviation = $measureunitabbreviation;
 
         return $this;
     }
@@ -131,17 +139,4 @@ class HREquipmentCategories
 
         return $this;
     }
-
-    public function getParent(): ?HREquipmentCategories
-    {
-        return $this->parent;
-    }
-
-    public function setParent(?HREquipmentCategories $parent): self
-    {
-        $this->parent = $parent;
-
-        return $this;
-    }
-
 }

@@ -206,3 +206,8 @@ doctrine:
                 type: annotation
                 dir: '%kernel.project_dir%/src/Modules/Navision/Entity'
                 prefix: 'App\Modules\Navision\Entity'
+            Vehicles:
+                is_bundle: false
+                type: annotation
+                dir: '%kernel.project_dir%/src/Modules/Vehicles/Entity'
+                prefix: 'App\Modules\Vehicles\Entity'

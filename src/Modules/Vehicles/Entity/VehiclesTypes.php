@@ -1,14 +1,13 @@
 <?php
 
-namespace App\Modules\HR\Entity;
+namespace App\Modules\Vehicles\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use \App\Modules\HR\Entity\HREquipmentCategories;
 
 /**
- * @ORM\Entity(repositoryClass="App\Modules\HR\Repository\HREquipmentCategoriesRepository")
+ * @ORM\Entity(repositoryClass="App\Modules\Vehicles\Repository\VehiclesTypesRepository")
  */
-class HREquipmentCategories
+class VehiclesTypes
 {
     /**
      * @ORM\Id()
@@ -18,19 +17,24 @@ class HREquipmentCategories
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=150)
+     * @ORM\Column(type="string", length=125)
      */
     private $name;
 
     /**
-     * @ORM\Column(type="string", length=150)
+     * @ORM\Column(type="string", length=10)
      */
-    private $icon;
+    private $type;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\HR\Entity\HREquipmentCategories")
+     * @ORM\Column(type="string", length=10)
      */
-    private $parent;
+    private $code;
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $description;
 
     /**
      * @ORM\Column(type="datetime")
@@ -52,9 +56,6 @@ class HREquipmentCategories
      */
     private $deleted;
 
-
-
-
     public function getId(): ?int
     {
         return $this->id;
@@ -72,14 +73,38 @@ class HREquipmentCategories
         return $this;
     }
 
-    public function getIcon(): ?string
+    public function getType(): ?string
     {
-        return $this->icon;
+        return $this->type;
     }
 
-    public function setIcon(string $icon): self
+    public function setType(string $type): self
     {
-        $this->icon = $icon;
+        $this->type = $type;
+
+        return $this;
+    }
+
+    public function getCode(): ?string
+    {
+        return $this->code;
+    }
+
+    public function setCode(string $code): self
+    {
+        $this->code = $code;
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): self
+    {
+        $this->description = $description;
 
         return $this;
     }
@@ -131,17 +156,4 @@ class HREquipmentCategories
 
         return $this;
     }
-
-    public function getParent(): ?HREquipmentCategories
-    {
-        return $this->parent;
-    }
-
-    public function setParent(?HREquipmentCategories $parent): self
-    {
-        $this->parent = $parent;
-
-        return $this;
-    }
-
 }

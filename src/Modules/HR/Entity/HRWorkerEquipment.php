@@ -7,7 +7,7 @@ use \App\Modules\HR\Entity\HRWorkers;
 use \App\Modules\HR\Entity\HREquipments;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\Modules\HR\Entity\HRWorkerEquipmentRepository")
+ * @ORM\Entity(repositoryClass="App\Modules\HR\Repository\HRWorkerEquipmentRepository")
  */
 class HRWorkerEquipment
 {

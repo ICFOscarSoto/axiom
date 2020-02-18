@@ -37,7 +37,6 @@ function datetimepicker(){
 function saveEquipment(id){
   if((++load_wait)==1) $("#load-spinner").fadeIn();
   var data={equipment: id, worker: $("#id-parent").val(), deliverydate: $("#form_deliverydate").val(), quantity: $("#form_quantity").val(), serial: ($('#form_serial').val())?$('#form_serial').val():'', size: ($('#form_size').val())?$('#form_size').val():'', expiration: ($('#form_expiration').val())?$('#form_expiration').val():'', observations: $("#form_observations").val()};
-  console.log(data);
   $.ajax({
       type: "post",
       dataType: "json",

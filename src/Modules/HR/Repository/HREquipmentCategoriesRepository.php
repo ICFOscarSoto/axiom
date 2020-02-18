@@ -1,26 +1,26 @@
 <?php
 
-namespace App\Repository\Modules\HR\Entity;
+namespace App\Modules\HR\Repository;
 
-use App\Modules\HR\Entity\HREquipments;
+use App\Modules\HR\Entity\HREquipmentCategories;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
- * @method HREquipments|null find($id, $lockMode = null, $lockVersion = null)
- * @method HREquipments|null findOneBy(array $criteria, array $orderBy = null)
- * @method HREquipments[]    findAll()
- * @method HREquipments[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method HREquipmentCategories|null find($id, $lockMode = null, $lockVersion = null)
+ * @method HREquipmentCategories|null findOneBy(array $criteria, array $orderBy = null)
+ * @method HREquipmentCategories[]    findAll()
+ * @method HREquipmentCategories[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class HREquipmentsRepository extends ServiceEntityRepository
+class HREquipmentCategoriesRepository extends ServiceEntityRepository
 {
     public function __construct(RegistryInterface $registry)
     {
-        parent::__construct($registry, HREquipments::class);
+        parent::__construct($registry, HREquipmentCategories::class);
     }
 
     // /**
-    //  * @return HREquipments[] Returns an array of HREquipments objects
+    //  * @return HREquipmentCategories[] Returns an array of HREquipmentCategories objects
     //  */
     /*
     public function findByExampleField($value)
@@ -37,7 +37,7 @@ class HREquipmentsRepository extends ServiceEntityRepository
     */
 
     /*
-    public function findOneBySomeField($value): ?HREquipments
+    public function findOneBySomeField($value): ?HREquipmentCategories
     {
         return $this->createQueryBuilder('h')
             ->andWhere('h.exampleField = :val')

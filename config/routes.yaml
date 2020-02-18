@@ -298,3 +298,7 @@ AERPSalesDeliveryNotes:
 AERPSalesInvoices:
   resource: 'App\Modules\AERP\Controller\AERPSalesInvoicesController'
   type:      annotation
+
+VehiclesVehicles:
+  resource: 'App\Modules\Vehicles\Controller\VehiclesVehiclesController'
+  type:      annotation
