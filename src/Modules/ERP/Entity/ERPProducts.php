@@ -203,6 +203,17 @@ class ERPProducts
      */
     private $pvpincrement;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Modules\ERP\Entity\ERPStocks", mappedBy="product")
+     */
+    private $stocks;
+
+    public function getStockcampollano($doctrine): ?int
+    {
+        $stockRepository=$doctrine->getRepository('\App\Modules\ERP\Entity\ERPStocks');
+        $quantity=$stockRepository->findOneBy(["product"=>$this]);
+        return $quantity==null?0:$quantity->getQuantity();
+    }
 
     public function getId(): ?int
     {
@@ -853,6 +864,41 @@ class ERPProducts
      public function setPvpincrement(?float $pvpincrement): self
      {
          $this->pvpincrement = $pvpincrement;
+
+         return $this;
+     }
+
+
+
+
+
+     /**
+      * @return Collection|Stocks[]
+      */
+     public function getStocks(): Collection
+     {
+         return $this->stocks;
+     }
+
+     public function addNotification(GlobaleNotifications $stock): self
+     {
+         if (!$this->stocks->contains($stock)) {
+             $this->stocks[] = $stock;
+             $stock->setProduct($this);
+         }
+
+         return $this;
+     }
+
+     public function removeNotification(GlobaleNotifications $stock): self
+     {
+         if ($this->stocks->contains($stock)) {
+             $this->stocks->removeElement($stock);
+             // set the owning side to null (unless already changed)
+             if ($stock->getProduct() === $this) {
+                 $stock->setProduct(null);
+             }
+         }
 
          return $this;
      }
