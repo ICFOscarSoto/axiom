@@ -869,39 +869,4 @@ class ERPProducts
      }
 
 
-
-
-
-     /**
-      * @return Collection|Stocks[]
-      */
-     public function getStocks(): Collection
-     {
-         return $this->stocks;
-     }
-
-     public function addNotification(GlobaleNotifications $stock): self
-     {
-         if (!$this->stocks->contains($stock)) {
-             $this->stocks[] = $stock;
-             $stock->setProduct($this);
-         }
-
-         return $this;
-     }
-
-     public function removeNotification(GlobaleNotifications $stock): self
-     {
-         if ($this->stocks->contains($stock)) {
-             $this->stocks->removeElement($stock);
-             // set the owning side to null (unless already changed)
-             if ($stock->getProduct() === $this) {
-                 $stock->setProduct(null);
-             }
-         }
-
-         return $this;
-     }
-
-
 }
