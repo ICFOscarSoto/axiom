@@ -1,0 +1,176 @@
+{% set params = app.request.attributes.get('_route_params')|merge(app.request.query.all()) %}
+{% block header %}
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<meta name="description" content="Axiom Business Management" />
+	<meta name="author" content="" />
+	{{ include('@Globale/header.html.twig') }}
+	<!-- Imported styles on this page -->
+	<link rel="stylesheet" href="{{ url('index') }}css/bootstrap-grid.css">
+	<link rel="stylesheet" href="{{ url('index') }}/js/jvectormap/jquery-jvectormap-1.2.2.css">
+	<link rel="stylesheet" href="{{ url('index') }}/js/rickshaw/rickshaw.min.css">
+  <script src="{{ url('index') }}js/moment.min.js"></script>
+  <script src="{{ url('index') }}js/moment-es.js"></script>
+  <script src="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker.min.js"></script>
+  <script src="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker-es.js"></script>
+
+
+  <style type="text/css">
+    .basiclist {
+      border-bottom: #ebebeb 1px solid;
+    }
+    .basiclist:hover {
+      background: #f2f2f2;
+    }
+  </style>
+
+
+
+{% endblock %}
+<title>{% block title %}{{ interfaceName|trans }}{% endblock %}</title>
+<body class="page-body" data-url="{{ url('indexAdmin') }}">
+<div class="page-container"><!-- add class "sidebar-collapsed" to close sidebar by default, "chat-visible" to make chat appear always -->
+	{{ include('@Globale/sidebar_menu.html.twig') }}
+	<div class="main-content">
+		{{ include('@Globale/head.html.twig') }}
+		<hr />
+		{{ include('@Globale/breadcrumb.html.twig') }}
+		{#}<h2>{{ interfaceName }}</h2>#}
+		<!-- MAIN CONTENT -->
+
+    <div class="row">
+      <div class="col-md-2">
+        <div class="form-group">
+          <label for="form_start">Fecha de Inicio</label>
+          <input type="text" id="form_start" name="form[start]" class="datepicker form-control" defaultdate="" value="{{ start }}">
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="form-group">
+          <label for="form_end">Fecha de Fin</label>
+          <input type="text" id="form_end" name="form[end]" class="datepicker form-control" defaultdate="" value="{{ end }}">
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="form-group" style="margin-top: 21px;">
+          <button attr-id="" attr-action="" id="document-button-search" type="button" class="btn btn">Buscar</button>
+        </div>
+      </div>
+    </div>
+
+    {% set listConstructor = { id: 'insuredcustomerinvoices'} %}
+
+		<div class="row">
+			<div class="form-group" style="margin-top: 21px;">
+				<button attr-id="" attr-action="" id="document-button-export" type="button" class="btn btn-green">Exportar a Excel</button>
+			</div>
+		</div>
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>
+
+          </th>
+          {% for key in basiclist|first|keys %}
+          <th >{{ (key)|trans }}</th>
+          {% endfor %}
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="{{ listConstructor.id }}-body">
+          {% for item in basiclist %}
+            <tr class="basiclist" style="">
+              <td style="height: 15px !important; vertical-align: middle; padding: 5px 5px 5px 5px !important;">
+                <div class="checkbox checkbox-replace">
+									 <input type="checkbox" item-id="{{ item.id }}" class="{{ listConstructor.id }}-chk-list" id="{{ item.id }}-{{ listConstructor.id }}-chk-list">
+								</div>
+              </td>
+              {% for keyrow,value in item %}
+                <td style="height: 15px !important; vertical-align: middle; padding: 5px 5px 5px 5px !important;">{{ value|raw }}</td>
+              {% endfor %}
+              <td style="height: 15px !important; vertical-align: middle; padding: 5px 5px 5px 5px !important;"><button attr-id="{{ item.id }}" id="document-button-print-{{ item.id }}" type="button" class="btn btn-white"><i class="fa fa-print"></i></button></td>
+            </tr>
+
+          {% endfor %}
+      </tbody>
+    </table>
+
+		{{ include("@Globale/form_fields_type_number.html.twig") }}
+
+    <script>
+      {{ include("@Globale/form_fields_datetime.html.twig") }}
+
+      	$(document).ready(function() {
+          $('body').on('click', "#document-button-search", function(e) {
+            if((++load_wait)==1) $("#load-spinner").fadeIn();
+            $.ajax({
+			         url: '{{ url('navisionGetInsuredInvoices') }}',
+			         type: 'POST',
+			         data: 'start='+$("#form_start").val()+'&end='+$("#form_end").val(),
+			         success:  function( data ) {
+								 if((--load_wait)==0) $("#load-spinner").fadeOut();
+                 $("#{{ listConstructor.id }}-body").html("");
+                 var html="";
+                 jQuery.each(JSON.parse(data), function(i, item) {
+									 console.log(item);
+									 var element="";
+                   element+='<tr class="basiclist" style="">';
+									 element+='   <td style="height: 15px !important; vertical-align: middle; padding: 5px 5px 5px 5px !important;">';
+                   element+='   <div class="checkbox checkbox-replace">';
+       						 element+='			 <input type="checkbox" item-id="'+item.id+'" class="{{ listConstructor.id }}-chk-list icheck" id="'+item.id+'-{{ listConstructor.id }}-chk-list">';
+       						 element+='		</div>';
+                   element+='</td>';
+                   element+='<td style="height: 15px !important; vertical-align: middle; padding: 5px 5px 5px 5px !important;">'+item.supplement+'</td>';
+									 element+='<td style="height: 15px !important; vertical-align: middle; padding: 5px 5px 5px 5px !important;">'+item.vat+'</td>';
+                   element+='<td style="height: 15px !important; vertical-align: middle; padding: 5px 5px 5px 5px !important;">'+item.cescecode+'</td>';
+                   element+='<td style="height: 15px !important; vertical-align: middle; padding: 5px 5px 5px 5px !important;">'+item.date+'</td>';
+                   element+='<td style="height: 15px !important; vertical-align: middle; padding: 5px 5px 5px 5px !important;">'+item.total+'</td>';
+									 element+='<td style="height: 15px !important; vertical-align: middle; padding: 5px 5px 5px 5px !important;">'+item.paymentmethod+'</td>';
+									 element+='<td style="height: 15px !important; vertical-align: middle; padding: 5px 5px 5px 5px !important;">'+item.id+'</td>';
+									  element+='<td style="height: 15px !important; vertical-align: middle; padding: 5px 5px 5px 5px !important;">'+item.vencimiento+'</td>';
+                   element+='<td style="height: 15px !important; vertical-align: middle; padding: 5px 5px 5px 5px !important;"><button attr-id="'+item.id+'" id="document-button-print-'+item.id+'" type="button" class="btn btn-default tooltip-primary"><i class="fa fa-print"></i></button></td>';
+                   element+='</tr>';
+                   html+=element;
+                 });
+                 $("#{{ listConstructor.id }}-body").html(html);
+                 $('input.icheck').iCheck({});
+			         }
+			       });
+
+          });
+
+          $('body').on('click', "[id^=document-button-print-]", function(e) {
+             var win = window.open("/api/navision/invoice/print/"+$(this).attr("attr-id"), '_blank');
+             win.focus();
+          });
+
+					$('body').on('click', "[id=document-button-export]", function(e) {
+						var win = window.open("/api/navision/exportinsuredlist?start="+encodeURI($("#form_start").val())+"&end="+encodeURI($("#form_end").val()));
+						win.focus();
+
+          });
+
+
+        });
+    </script>
+<!-- END MODALS -->
+{% block footer %}
+
+<link rel="stylesheet" href="{{ url('index') }}js/datatables/datatables.css">
+<link rel="stylesheet" href="{{ url('index') }}js/select2/select2-bootstrap.css">
+<link rel="stylesheet" href="{{ url('index') }}js/select2/select2.css">
+<link rel="stylesheet" href="{{ url('index') }}css/custom.css">
+<link rel="stylesheet" href="{{ url('index') }}js/ol/ol.css">
+<link rel="stylesheet" href="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker.min.css">
+<!-- Imported scripts on this page -->
+<script src="{{ url('index') }}js/datatables/datatables.js"></script>
+<script src="{{ url('index') }}js/select2/select2.min.js"></script>
+
+
+
+<script src="{{ url('index') }}js/fileinput.js"></script>
+<script src="{{ url('index') }}js/ol/ol.js"></script>
+	 {{ include('@Globale/bottom.html.twig') }}
+{% endblock %}
+</body>

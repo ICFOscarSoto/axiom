@@ -33,6 +33,9 @@ use App\Modules\ERP\Entity\ERPProductsAttributes;
 use App\Modules\Navision\Entity\NavisionSync;
 use App\Modules\Security\Utils\SecurityUtils;
 use \DateTime;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\File\MimeType\FileinfoMimeTypeGuesser;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 class NavisionController extends Controller
 {
@@ -50,6 +53,7 @@ class NavisionController extends Controller
      $start=new DateTime('first day of this month');
      $end=new DateTime('last day of this month');
      $invoices=file_get_contents($this->url.'navisionExport/do-NAVISION-invoice-list.php?start='.$start->format("Y-m-d").'&end='.$end->format("Y-m-d"));
+
      return $this->render('@Navision/invoices.html.twig', [
        "interfaceName" => "Facturas",
        'optionSelected' => "navisionInvoices",
@@ -61,6 +65,7 @@ class NavisionController extends Controller
        'basiclist' => json_decode ($invoices, true)
      ]);
    }
+
 
    /**
     * @Route("/api/navision/get/invoices", name="navisionGetInvoices")
@@ -91,5 +96,179 @@ class NavisionController extends Controller
      $pdf=$reportsUtils->create($params);
      return new Response("", 200, array('Content-Type' => 'application/pdf'));
    }
+
+
+   /**
+    * @Route("/api/navision/insuredcustomerinvoices", name="navisionInsuredCustomerInvoices")
+    */
+    public function navisionInsuredCustomerInvoices(Request $request){
+      $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+      if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
+      $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
+      $userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
+      $start=new DateTime('first day of this month');
+      $end=new DateTime('last day of this month');
+      //  $start=new DateTime('first day of january this year');
+    //  $end=new DateTime('first day of march this year');
+
+      $customersRepository=$this->getDoctrine()->getRepository(ERPCustomers::class);
+      $customers=$customersRepository->findInsuredCustomers($this->getUser()->getCompany());
+
+
+      $invoices=Array();
+      foreach($customers as $customer)
+      {
+          $invoices_customer=file_get_contents($this->url.'navisionExport/do-NAVISION-invoice-list-by-customer.php?code='.$customer["code"].'&start='.$start->format("Y-m-d").'&end='.$end->format("Y-m-d"));
+          $invoices_list=json_decode($invoices_customer,true);
+          foreach($invoices_list as $invoice){
+            $item['Suplemento']=$customer["supplement"];
+            $item['Nif']=$customer["vat"];
+            $item['Código Cesce']=$customer["cescecode"];
+            $item['Fecha Factura']=$invoice['date'];
+            $item['Importe']=str_replace(".",",",$invoice['total'])."€";
+            $item['Forma de Pago']=$customer["paymentmethod"];
+            $item['id']=$invoice['id'];
+            $item['Vencimiento']=$invoice['due_date'];
+            $invoices[]=$item;
+        }
+      }
+
+      return $this->render('@ERP/insuredcustomerlist.html.twig', [
+        "interfaceName" => "Facturas Asegurados",
+        'optionSelected' => "navisionInsuredCustomerInvoices",
+        'menuOptions' =>  $menurepository->formatOptions($userdata),
+        'breadcrumb' =>  "navisionInsuredCustomerInvoices",
+        'userData' => $userdata,
+        'start' => $start->format("d/m/Y"),
+        'end' => $end->format("d/m/Y"),
+        'basiclist' => $invoices
+      ]);
+    }
+
+
+    /**
+     * @Route("/api/navision/get/insuredinvoices", name="navisionGetInsuredInvoices")
+     */
+     public function navisionGetInsuredInvoices(Request $request){
+       $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+       $start=$request->request->get("start");
+       $end=$request->request->get("end");
+       $start=date_create_from_format('d/m/Y',$start);
+       $end=date_create_from_format('d/m/Y',$end);
+
+       $customersRepository=$this->getDoctrine()->getRepository(ERPCustomers::class);
+       $customers=$customersRepository->findInsuredCustomers($this->getUser()->getCompany());
+
+       $invoices=Array();
+       foreach($customers as $customer)
+       {
+
+           $invoices_customer=file_get_contents($this->url.'navisionExport/do-NAVISION-invoice-list-by-customer.php?code='.$customer["code"].'&start='.$start->format("Y-m-d").'&end='.$end->format("Y-m-d"));
+           $invoices_list=json_decode($invoices_customer,true);
+           foreach($invoices_list as $invoice){
+             $item['supplement']=$customer["supplement"];
+             $item['vat']=$customer["vat"];
+             $item['cescecode']=$customer["cescecode"];
+             $item['date']=$invoice['date'];
+             $item['total']=str_replace(".",",",$invoice['total'])."€";
+             $item['paymentmethod']=$customer["paymentmethod"];
+             $item['id']=$invoice['id'];
+             $item['vencimiento']=$invoice['due_date'];
+             $invoices[]=$item;
+         }
+       }
+       return new Response(json_encode($invoices,true));
+
+     }
+
+
+     /**
+ 		 * @Route("/api/navision/exportinsuredlist", name="exportinsuredlist")
+ 		 */
+ 		 public function exportInsuredList(RouterInterface $router,Request $request)
+ 		 {
+
+       $start=$request->query->get("start");
+       $end=$request->query->get("end");
+ 			 $template=dirname(__FILE__)."/../Forms/InsuredCustomers.json";
+ 			 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+       $start=date_create_from_format('d/m/Y',$start);
+       $end=date_create_from_format('d/m/Y',$end);
+
+       $customersRepository=$this->getDoctrine()->getRepository(ERPCustomers::class);
+       $customers=$customersRepository->findInsuredCustomers($this->getUser()->getCompany());
+
+       $invoices=Array();
+       foreach($customers as $customer)
+       {
+
+           $invoices_customer=file_get_contents($this->url.'navisionExport/do-NAVISION-invoice-list-by-customer.php?code='.$customer["code"].'&start='.$start->format("Y-m-d").'&end='.$end->format("Y-m-d"));
+           $invoices_list=json_decode($invoices_customer,true);
+           foreach($invoices_list as $invoice){
+             $item['Suplemento']=$customer["supplement"];
+             $item['Nif']=$customer["vat"];
+             $item['Código Cesce']=$customer["cescecode"];
+             $item['Fecha Factura']=$invoice['date'];
+             $item['Importe']=$invoice['total'];
+             $item['Forma de Pago']=$customer["paymentmethod"];
+             $item['Vencimiento']=$invoice['due_date'];
+             $item['Numero Factura']=$invoice['id'];
+             $invoices[]=$item;
+         }
+       }
+ 			$result=$this->export($invoices,$template);
+ 			return $result;
+
+ 		 }
+
+
+     public function export($list, $template){
+       $this->template=$template;
+       $filename='ClientesAsegurados.csv';
+       $array=$list;
+       //exclude tags column, last
+       $key='_tags';
+       array_walk($array, function (&$v) use ($key) {
+        unset($v[$key]);
+       });
+    //	 $array=$this->applyFormats($array);
+
+       $fileContent=$this->createCSV($array);
+       $response = new Response($fileContent);
+       // Create the disposition of the file
+          $disposition = $response->headers->makeDisposition(
+              ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+              $filename
+        );
+       // Set the content disposition
+       $seconds_to_cache = 0;
+       $ts = gmdate("D, d M Y H:i:s", time() + $seconds_to_cache) . " GMT";
+       $response->headers->set("Expires", $ts);
+       $response->headers->set("Pragma", "cache");
+       $response->headers->set("Cache-Control", "max-age=0, no-cache, must-revalidate, proxy-revalidate");
+       $response->headers->set('Content-Type', 'application/force-download');
+       $response->headers->set('Content-Type', 'application/octet-stream');
+       $response->headers->set('Content-Type', 'application/download');
+       $response->headers->set('Content-Disposition', $disposition);
+       // Dispatch request
+       return $response;
+
+     }
+
+     private function createCSV(array &$array){
+        if (count($array) == 0) {
+          return null;
+        }
+        ob_start();
+        $df = fopen("php://output", 'w');
+        fputcsv($df, array_map("utf8_decode",array_keys(reset($array))));
+        foreach ($array as $row) {
+           fputcsv($df, array_values (array_map("utf8_decode", $row )));
+        }
+        fclose($df);
+        return ob_get_clean();
+    }
+
+
 
 }

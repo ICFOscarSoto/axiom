@@ -165,9 +165,9 @@ class NavisionGetCustomers extends ContainerAwareCommand
           $paymentTerms=$repositoryPaymentTerms->findOneBy(["id"=>"94"]);
         }
         //5 DÍAS
-        else if($id_paymentterms_nav=="089")
+        else if($id_paymentterms_nav=="017")
         {
-          $paymentTerms=$repositoryPaymentTerms->findOneBy(["id"=>"94"]);
+          $paymentTerms=$repositoryPaymentTerms->findOneBy(["id"=>"89"]);
         }
         //60-75 DÍAS
         else if($id_paymentterms_nav=="019" OR $id_paymentterms_nav=="023" OR $id_paymentterms_nav=="037" OR $id_paymentterms_nav=="040")
