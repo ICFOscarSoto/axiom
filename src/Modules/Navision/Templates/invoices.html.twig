@@ -88,14 +88,12 @@
           {% for item in basiclist %}
             <tr class="basiclist" style="">
               <td style="height: 15px !important; vertical-align: middle; padding: 5px 5px 5px 5px !important;">
-                <div class="checkbox checkbox-replace">
-									 <input type="checkbox" item-id="{{ item.id }}" class="{{ listConstructor.id }}-chk-list" id="{{ item.id }}-{{ listConstructor.id }}-chk-list">
-								</div>
-              </td>
+                <input type="checkbox" item-id="{{ item.id }}" class="{{ listConstructor.id }}-chk-list" id="{{ item.id }}-{{ listConstructor.id }}-chk-list">
+							</td>
               {% for keyrow,value in item %}
                 <td style="height: 15px !important; vertical-align: middle; padding: 5px 5px 5px 5px !important;">{{ value|raw }}</td>
               {% endfor %}
-              <td style="height: 15px !important; vertical-align: middle; padding: 5px 5px 5px 5px !important;"><button attr-id="{{ item.id }}" id="document-button-print-{{ item.id }}" type="button" class="btn btn-white"><i class="fa fa-print"></i></button></td>
+              <td style="height: 15px !important; vertical-align: middle; padding: 5px 5px 5px 5px !important;"><button attr-id="{{ item.id }}" id="document-button-print-{{ item.id }}" type="button" class="btn btn-white"><i class="fa fa-print"></i></button>&nbsp;&nbsp;<button attr-id="{{ item.id }}" id="document-button-download-{{ item.id }}" type="button" class="btn btn-default tooltip-primary"><i class="fa fa-download"></i></button></td>
             </tr>
 
           {% endfor %}
@@ -110,11 +108,13 @@
       	$(document).ready(function() {
           $('body').on('click', "#document-button-search", function(e) {
             if((++load_wait)==1) $("#load-spinner").fadeIn();
+						console.log("entro");
             $.ajax({
 			         url: '{{ url('navisionGetInvoices') }}',
 			         type: 'POST',
 			         data: 'cif='+$("#form_cif").val()+'&customer='+$("#form_customer").val()+'&start='+$("#form_start").val()+'&end='+$("#form_end").val(),
 			         success:  function( data ) {
+								 console.log("cargado");
 								 if((--load_wait)==0) $("#load-spinner").fadeOut();
                  $("#{{ listConstructor.id }}-body").html("");
                  var html="";
@@ -122,9 +122,9 @@
                    var element="";
                    element+='<tr class="basiclist" style="">';
                    element+='   <td style="height: 15px !important; vertical-align: middle; padding: 5px 5px 5px 5px !important;">';
-                   element+='   <div class="checkbox checkbox-replace">';
-       						 element+='			 <input type="checkbox" item-id="'+item.id+'" class="{{ listConstructor.id }}-chk-list icheck" id="'+item.id+'-{{ listConstructor.id }}-chk-list">';
-       						 element+='		</div>';
+                   //element+='   <div class="checkbox checkbox-replace">';
+       						 element+='			 <input type="checkbox" item-id="'+item.id+'" class="{{ listConstructor.id }}-chk-list" id="'+item.id+'-{{ listConstructor.id }}-chk-list">';
+       						 //element+='		</div>';
                    element+='</td>';
                    element+='<td style="height: 15px !important; vertical-align: middle; padding: 5px 5px 5px 5px !important;">'+item.id+'</td>';
                    element+='<td style="height: 15px !important; vertical-align: middle; padding: 5px 5px 5px 5px !important;">'+item.customer+'</td>';
@@ -135,7 +135,6 @@
                    html+=element;
                  });
                  $("#{{ listConstructor.id }}-body").html(html);
-                 $('input.icheck').iCheck({});
 			         }
 			       });
 
