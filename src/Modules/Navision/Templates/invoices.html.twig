@@ -71,6 +71,18 @@
       </div>
     </div>
 
+
+<div class="principal-content">
+		<div class="btn-group">
+        <a href="javascript:void(0);" style="font-size: 20px" id="printTop-top-button-foreground" type="button" class="btn tooltip-primary btn-default">
+            <i class="fa fa-print" aria-hidden="true"></i>
+        </a>
+				<a href="javascript:void(0);" style="font-size: 20px" id="downloadTop-top-button-foreground" type="button" class="btn tooltip-primary btn-default">
+            <i class="fa fa-download" aria-hidden="true"></i>
+        </a>
+		</div>
+
+		<p></p>
     {% set listConstructor = { id: 'invoices'} %}
     <table class="table table-bordered">
       <thead>
@@ -141,19 +153,41 @@
           });
 
           $('body').on('click', "[id^=document-button-print-]", function(e) {
-             var win = window.open("/api/navision/invoice/print/"+$(this).attr("attr-id"), '_blank');
+             var win = window.open("/api/navision/invoice/print?ids="+$(this).attr("attr-id"), '_blank');
              win.focus();
           });
 
 					$('body').on('click', "[id^=document-button-download-]", function(e) {
-             var win = window.open("/api/navision/invoice/print/"+$(this).attr("attr-id")+"/download", '_blank');
+             var win = window.open("/api/navision/invoice/print/download?ids="+$(this).attr("attr-id"), '_blank');
              win.focus();
           });
 
+					$('body').on('click', "[id^=printTop-top-button-]", function(e) {
+						var checked = [];
+            $.each($("input[id$='-chk-list']:checked"), function(){
+                checked.push($(this).attr("item-id"));
+            });
+						 if(checked.length>0)
+						 var win = window.open("/api/navision/invoice/print?ids="+checked.join(), '_blank');
+						 win.focus();
+					});
+
+					$('body').on('click', "[id^=downloadTop-top-button-]", function(e) {
+						var checked = [];
+            $.each($("input[id$='-chk-list']:checked"), function(){
+                checked.push($(this).attr("item-id"));
+            });
+						 if(checked.length>0)
+						 var win = window.open("/api/navision/invoice/print/download?ids="+checked.join(), '_blank');
+						 win.focus();
+					});
 
         });
     </script>
 <!-- END MODALS -->
+</div>
+</div>
+</div>
 {% block footer %}
 
 <link rel="stylesheet" href="{{ url('index') }}js/datatables/datatables.css">

@@ -82,15 +82,16 @@ class NavisionController extends Controller
     }
 
   /**
-   * @Route("/api/navision/invoice/print/{id}/{mode}", name="navisionPrintInvoice", defaults={"id"=0, "mode"="print"})
+   * @Route("/api/navision/invoice/print/{mode}", name="navisionPrintInvoice", defaults={"id"=0, "mode"="print"})
    */
-   public function navisionPrintInvoice($id, $mode, Request $request){
+   public function navisionPrintInvoice($mode, Request $request){
      $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-     /*$ids=$request->request->get('ids');
-     $ids=explode(",",$ids);*/
-     $invoice=file_get_contents($this->url.'navisionExport/do-NAVISION-invoice.php?invoices=["'.$id.'"]');
+     $ids=$request->query->get('ids');
+     $ids=explode(",",$ids);
+
+     $invoice=file_get_contents($this->url.'navisionExport/do-NAVISION-invoice.php?invoices='.json_encode($ids));
      //dump($this->url.'navisionExport/do-NAVISION-invoice.php?invoices=['.$id.']');
-     $ids=$id;
+     //$ids=$id;
      $params=["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "ids"=>$ids, "user"=>$this->getUser(), "invoices"=>json_decode($invoice, true)];
      $reportsUtils = new ERPInvoiceReports();
      //dump($invoice);
@@ -113,12 +114,12 @@ class NavisionController extends Controller
          return new JsonResponse(["result"=>1]);
        break;
        case "download":
-         $pdf=$reportsUtils->create($params,'D',$id.'.pdf');
+         $pdf=$reportsUtils->create($params,'D','factura.pdf');
          return new JsonResponse(["result"=>1]);
        break;
        case "print":
        case "default":
-         $pdf=$reportsUtils->create($params,'I',$id.'.pdf');
+         $pdf=$reportsUtils->create($params,'I','factura.pdf');
          return new JsonResponse(["result"=>1]);
        break;
      }
