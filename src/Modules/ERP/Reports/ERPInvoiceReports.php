@@ -145,6 +145,13 @@ class ERPInvoiceReports
     $this->pdf->Cell(60,9,utf8_decode($invoice["city"]." - ".$invoice["postcode"]." - ".$invoice["state"]),'',0,'L',false);
     $this->pdf->setXY(110, 52);
     $this->pdf->Cell(60,9,utf8_decode("NIF/NIE ".$invoice["vat_number"]),'',0,'L',false);
+
+    foreach($invoice["comments"] as $key=>$comment){
+      $this->pdf->setXY(110, 58+($key*4));
+      $this->pdf->Cell(60,9,utf8_decode($comment["comment"]),'',0,'L',false);
+    }
+
+
     $this->pdf->SetTextColor(44, 132, 194);
     $this->pdf->setXY(5, 31);
     $this->pdf->SetDrawColor(248, 250, 255);
