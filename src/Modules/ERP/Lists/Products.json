@@ -5,7 +5,7 @@
   {"name": "stockcampollano", "caption":"Stock C"},
   {"name": "description", "caption":"Descripción", "width" : "50"},
   {"name": "active", "caption":"Estado", "width":"10%" ,"class" : "dt-center", "replace":{
-                             "1":{"text":"Activo","html":"<div style=\"min-width: 75px;\" class=\"label label-success\">Activo</div>"},
+                             "1":{"text":"Activo","html":"<div style=\"min-width: 75px;\" class=\"label label-success\">Activo</div>", "default":true},
                              "0":{"text":"Desactivado","html":"<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado</div>"}
                            }
    }

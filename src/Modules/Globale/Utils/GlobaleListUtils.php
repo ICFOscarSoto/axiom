@@ -80,15 +80,31 @@ class GlobaleListUtils
 
         //Solo añadimos los campos de tipo data
        if(!isset($field["type"])||$field["type"]=="data"){
+
+
             $fieldNames=explode('_o_',$field["name"]);
           //foreach($fieldNames as $fieldName){
     				$searchValue=$request->query->get('columns');
+
+            /*if(isset($field["replace"])){
+              foreach($field["replace"] as $key=>$replace){
+                dump($replace);
+                if(isset($replace["default"]) && $replace["default"]==true){
+                  $query->andWhere('p.'.$field["name"].' = :val_'.$field["name"]);
+                  $query->setParameter('val_'.$field["name"], $key);
+                  $queryFiltered->andWhere('p.'.$field["name"].' = :val_'.$field["name"]);
+                  $queryFiltered->setParameter('val_'.$field["name"], $key);
+                }
+              }
+            }*/
+
             //Buscar el key del field["name"] en las columnas pasados por parametro
             $keyColumn=$this->searchColumns($searchValue, $field["name"]);
             if(!$keyColumn) continue;
+
             //TODO Campos mapeados como las coordenadas y demas petan aqui
     				$searchValue=trim($searchValue[$keyColumn]['search']['value']);
-    				if($searchValue!=""){ //Si hay algo que buscar
+    				if($searchValue!="" && $searchValue!="##ALL##"){ //Si hay algo que buscar
               $database_field=null;
               $fieldNames=explode('_o_',$field["name"]); //explotamos los campos concatenados
               if(count($fieldNames)>1){ //Si hay que concatenar algo
@@ -115,10 +131,15 @@ class GlobaleListUtils
               $tokensSearchValue=explode('*',$searchValue);
               foreach($tokensSearchValue as $key=>$tokenSearch){
                 if($tokenSearch!=''){
-                    $query->andWhere($database_field.' LIKE :val_'.$field["name"].'_'.$key);
-                    $query->setParameter('val_'.$field["name"].'_'.$key, '%'.$tokenSearch.'%');
-                    $queryFiltered->andWhere($database_field.' LIKE :val_'.$field["name"].'_'.$key);
-                    $queryFiltered->setParameter('val_'.$field["name"].'_'.$key, '%'.$tokenSearch.'%');
+                    if($tokenSearch=='##NULL##'){
+                      $query->andWhere($database_field.' IS NULL');
+                      $queryFiltered->andWhere($database_field.' IS NULL');
+                    }else{
+                      $query->andWhere($database_field.' LIKE :val_'.$field["name"].'_'.$key);
+                      $query->setParameter('val_'.$field["name"].'_'.$key, '%'.$tokenSearch.'%');
+                      $queryFiltered->andWhere($database_field.' LIKE :val_'.$field["name"].'_'.$key);
+                      $queryFiltered->setParameter('val_'.$field["name"].'_'.$key, '%'.$tokenSearch.'%');
+                    }
                 }
               }
               /*$query->andWhere($database_field.' LIKE :val_'.$field["name"]);
@@ -127,7 +148,19 @@ class GlobaleListUtils
               $queryFiltered->setParameter('val_'.$field["name"], '%'.$searchValue.'%');*/
 
 
-    				}
+    				}else{
+              //No hay nada que buscar miramos si tiene un valor por defecto
+              if($searchValue!="##ALL##" && isset($field["replace"])){
+                foreach($field["replace"] as $key=>$replace){
+                  if(isset($replace["default"]) && $replace["default"]==true){
+                    $query->andWhere('p.'.$field["name"].' = :val_'.$field["name"]);
+                    $query->setParameter('val_'.$field["name"], $key);
+                    $queryFiltered->andWhere('p.'.$field["name"].' = :val_'.$field["name"]);
+                    $queryFiltered->setParameter('val_'.$field["name"], $key);
+                  }
+                }
+              }
+            }
         }else{
           //If field is datetime type or date
           if($field["type"]=="datetime" || $field["type"]=="date"){
@@ -189,14 +222,15 @@ class GlobaleListUtils
 		//Generamos los LEFT JOIN de la consulta
     $definedLeftJoin=[];
 		foreach($listFields as $field){
-		$path=explode('__', $field["name"]);
-		if(count($path)>1){
-        if(array_search($path[0], $definedLeftJoin)===FALSE){
-				      $query->leftJoin('p.'.$path[0], $path[0]);
-				      $queryFiltered->leftJoin('p.'.$path[0], $path[0]);
-              $definedLeftJoin[]=$path[0];
-        }
-			}
+  		$path=explode('__', $field["name"]);
+  		if(count($path)>1){
+          if(array_search($path[0], $definedLeftJoin)===FALSE){
+  				      $query->leftJoin('p.'.$path[0], $path[0]);
+  				      $queryFiltered->leftJoin('p.'.$path[0], $path[0]);
+                $definedLeftJoin[]=$path[0];
+
+          }
+  			}
 		}
 
     //Añadimos los filtros pasados por parametros desde los controladores

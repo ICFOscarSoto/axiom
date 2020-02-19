@@ -344,10 +344,11 @@
 									{% if field.replace is defined %}
 									  {# Show combo box on replaces #}
 										<select id="s_{{ field.name }}" class="form-control table-header-search-input select2 select2-use">
-											<option value="">Todos</option>
+											<option value="##ALL##">Todos</option>
 											{% for key,option in field.replace %}
-												<option value="{{ key }}">{{ option.text }}</option>
+												<option value="{{ key }}" {% if option.default is defined and option.default == true%} attr-default="true" selected="selected" {% endif %}>{{ option.text }}</option>
 											{% endfor %}
+
 										</select>
 										<script>
 											$(document).ready(function() {
@@ -359,7 +360,10 @@
 											{# Relations #}
 
 												<select id="s_{{ field.name }}" class="form-control table-header-search-input select2 select2-use">
-													<option value="" selected>Todos</option>
+
+														<option value="##ALL##" selected> -- Todos -- </option>
+														<option value="##NULL##"> -- Ninguno -- </option>
+
 												</select>
 												<script>
 													$(document).ready(function() {
