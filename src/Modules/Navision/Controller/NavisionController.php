@@ -76,7 +76,7 @@ class NavisionController extends Controller
       $end=$request->request->get("end");
       $start=date_create_from_format('d/m/Y',$start);
       $end=date_create_from_format('d/m/Y',$end);
-      $url=$this->url.'navisionExport/do-NAVISION-invoice-list.php?cif='.$request->request->get("cif").'&customer='.$request->request->get("customer").'&start='.$start->format("Y-m-d").'&end='.$end->format("Y-m-d");
+      $url=$this->url.'navisionExport/do-NAVISION-invoice-list.php?numfact='.$request->request->get("numfact").'&cif='.$request->request->get("cif").'&customer='.$request->request->get("customer").'&start='.$start->format("Y-m-d").'&end='.$end->format("Y-m-d");
       $invoices=file_get_contents($url);
       return new Response($invoices);
     }

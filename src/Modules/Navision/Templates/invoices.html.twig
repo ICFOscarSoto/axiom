@@ -42,6 +42,12 @@
     <div class="row">
 			<div class="col-md-2">
         <div class="form-group">
+          <label for="form_start">Num. Factura</label>
+          <input type="text" id="form_numfact" name="form[numfact]" class="form-control">
+        </div>
+      </div>
+			<div class="col-md-2">
+        <div class="form-group">
           <label for="form_start">CIF</label>
           <input type="text" id="form_cif" name="form[cif]" class="form-control">
         </div>
@@ -88,7 +94,7 @@
       <thead>
         <tr>
           <th>
-
+						<input type="checkbox" class="select-chk-all" id="select-chk-all">
           </th>
           {% for key in basiclist|first|keys %}
           <th >{{ (key)|trans }}</th>
@@ -120,15 +126,14 @@
       	$(document).ready(function() {
           $('body').on('click', "#document-button-search", function(e) {
             if((++load_wait)==1) $("#load-spinner").fadeIn();
-						console.log("entro");
             $.ajax({
 			         url: '{{ url('navisionGetInvoices') }}',
 			         type: 'POST',
-			         data: 'cif='+$("#form_cif").val()+'&customer='+$("#form_customer").val()+'&start='+$("#form_start").val()+'&end='+$("#form_end").val(),
+			         data: 'numfact='+$("#form_numfact").val()+'&cif='+$("#form_cif").val()+'&customer='+$("#form_customer").val()+'&start='+$("#form_start").val()+'&end='+$("#form_end").val(),
 			         success:  function( data ) {
-								 console.log("cargado");
 								 if((--load_wait)==0) $("#load-spinner").fadeOut();
                  $("#{{ listConstructor.id }}-body").html("");
+								 $("#select-chk-all").prop('checked', false);
                  var html="";
                  jQuery.each(JSON.parse(data), function(i, item) {
                    var element="";
@@ -142,7 +147,9 @@
                    element+='<td style="height: 15px !important; vertical-align: middle; padding: 5px 5px 5px 5px !important;">'+item.customer+'</td>';
                    element+='<td style="height: 15px !important; vertical-align: middle; padding: 5px 5px 5px 5px !important;">'+item.total+'</td>';
                    element+='<td style="height: 15px !important; vertical-align: middle; padding: 5px 5px 5px 5px !important;">'+item.date+'</td>';
-                   element+='<td style="height: 15px !important; vertical-align: middle; padding: 5px 5px 5px 5px !important;"><button attr-id="'+item.id+'" id="document-button-print-'+item.id+'" type="button" class="btn btn-default tooltip-primary"><i class="fa fa-print"></i></button>&nbsp;&nbsp;<button attr-id="'+item.id+'" id="document-button-download-'+item.id+'" type="button" class="btn btn-default tooltip-primary"><i class="fa fa-download"></i></button></td>';
+                   element+='<td style="height: 15px !important; vertical-align: middle; padding: 5px 5px 5px 5px !important;"><button attr-id="'+item.id+'" id="document-button-print-'+item.id+'" type="button" class="btn btn-default tooltip-primary"><i class="fa fa-print"></i></button>&nbsp;&nbsp;&nbsp;<button attr-id="'+item.id+'" id="document-button-download-'+item.id+'" type="button" class="btn btn-default tooltip-primary"><i class="fa fa-download"></i></button>';
+									 //element+='{% if userData.modules.Email is defined %}&nbsp;&nbsp;&nbsp;<button id="document-button-email" type="button" class="btn btn-default btn-icon icon-left">Enviar<i class="fa fa-envelope"></i></button>{% endif %}';
+									 element+='</td>';
                    element+='</tr>';
                    html+=element;
                  });
@@ -152,17 +159,36 @@
 
           });
 
+					$('body').on('change', "#select-chk-all", function(e) {
+							e.stopImmediatePropagation();
+							var checkboxes = $("[id$='-chk-list']");
+  						checkboxes.prop('checked', $(this).is(':checked'));
+					});
+
+					$('body').on('click', ".basiclist", function(e) {
+							e.stopImmediatePropagation();
+							console.log("click");
+							var value=$(this).find('input').is(':checked')
+							$(this).find('input').prop('checked', !value);
+					});
+
+
+
+
           $('body').on('click', "[id^=document-button-print-]", function(e) {
+						 e.stopImmediatePropagation();
              var win = window.open("/api/navision/invoice/print?ids="+$(this).attr("attr-id"), '_blank');
              win.focus();
           });
 
 					$('body').on('click', "[id^=document-button-download-]", function(e) {
+						 e.stopImmediatePropagation();
              var win = window.open("/api/navision/invoice/print/download?ids="+$(this).attr("attr-id"), '_blank');
              win.focus();
           });
 
 					$('body').on('click', "[id^=printTop-top-button-]", function(e) {
+						e.stopImmediatePropagation();
 						var checked = [];
             $.each($("input[id$='-chk-list']:checked"), function(){
                 checked.push($(this).attr("item-id"));
@@ -173,6 +199,7 @@
 					});
 
 					$('body').on('click', "[id^=downloadTop-top-button-]", function(e) {
+						e.stopImmediatePropagation();
 						var checked = [];
             $.each($("input[id$='-chk-list']:checked"), function(){
                 checked.push($(this).attr("item-id"));
