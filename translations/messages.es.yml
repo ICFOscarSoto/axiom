@@ -308,6 +308,7 @@ Supplement: Suplemento
 Cescecode: Código CESCE
 Paymentterms: Vencimientos
 due_date: Vencimiento
+Authorizationcontrol: Control de personas autorizadas
 
 # CUSTOMERS COMMENT LINES
 #----------------------------------------------------------------------------------------------------------------------
