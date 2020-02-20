@@ -159,6 +159,10 @@
 
           });
 
+					$('body').on('click', "[id$='-chk-list']", function(e) {
+						e.stopPropagation();
+					});
+
 					$('body').on('change', "#select-chk-all", function(e) {
 							e.stopImmediatePropagation();
 							var checkboxes = $("[id$='-chk-list']");
@@ -171,9 +175,6 @@
 							var value=$(this).find('input').is(':checked')
 							$(this).find('input').prop('checked', !value);
 					});
-
-
-
 
           $('body').on('click', "[id^=document-button-print-]", function(e) {
 						 e.stopImmediatePropagation();
