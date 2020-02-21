@@ -293,8 +293,8 @@ Customergroup: Grupo de clientes
 CustomerGroup: Grupo de clientes
 Maxcredit: Credito máximo
 Mininvoice: Pedido mínimo
-Allowlinediscount: Permitir descuento en linea
-Requiredordernumber: Necesita numero de pedido
+Allowlinediscount: Permitir descuento en línea
+Requiredordernumber: Necesita número de pedido
 Additionaldiscount: Descuento adicional
 Invoicefordeliverynote: Entrega factura por pedido
 Partialshipping: Envío parcial
@@ -308,6 +308,7 @@ Supplement: Suplemento
 Cescecode: Código CESCE
 Paymentterms: Vencimientos
 due_date: Vencimiento
+Authorizationcontrol: Control de personas autorizadas
 
 # CUSTOMERS COMMENT LINES
 #----------------------------------------------------------------------------------------------------------------------

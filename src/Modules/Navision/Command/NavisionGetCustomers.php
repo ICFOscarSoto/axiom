@@ -293,7 +293,6 @@ class NavisionGetCustomers extends ContainerAwareCommand
             }
 
             $objbankaccount->setIban($object["iban"]);
-            $output->writeln(strlen($object["swift"]));
            if(strlen($object["swift"])=="11" OR strlen($object["swift"])=="8") $objbankaccount->setSwiftcode($object["swift"]);
             else{
               $objbankaccount->setSwiftcode("REVISAR");

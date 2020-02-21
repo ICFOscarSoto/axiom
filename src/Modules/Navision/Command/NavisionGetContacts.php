@@ -114,6 +114,7 @@ class NavisionGetContacts extends ContainerAwareCommand
         $obj->setCustomer($customer);
         $obj->setDepartment($department);
         $obj->setPosition($object["jobtitle"]);
+        if($object["authorizationcontrol"]) $obj->setAuthorizationcontrol(1);
         $obj->setDateupd(new \Datetime());
         $this->doctrine->getManager()->persist($obj);
         $this->doctrine->getManager()->flush();
