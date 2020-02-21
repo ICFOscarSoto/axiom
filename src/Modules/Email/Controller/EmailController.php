@@ -831,26 +831,26 @@ class EmailController extends Controller
 		$newFolders=0;
 		$newAccount=count($folders)>0?false:true;
 		try {
-			$inbox = imap_open('{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'/novalidate-cert}',$emailAccount->getUsername() ,$emailAccount->getPassword(),OP_HALFOPEN);
+			$inbox = imap_open('{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'}',$emailAccount->getUsername() ,$emailAccount->getPassword(),OP_HALFOPEN);
 		} catch (\Symfony\Component\Debug\Exception\ContextErrorException $e) {
 			return new JsonResponse(["result"=>-1, "error"=>imap_last_error()]);
 		}
 
 		  if($inbox==false) return new JsonResponse(["result"=>-1, "error"=>"Empty inbox. ".imap_last_error()]);
-			$list = imap_list($inbox, '{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'/novalidate-cert}', "*");
+			$list = imap_list($inbox, '{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'}', "*");
 			if (is_array($list)) {
 			    foreach ($list as $val) {
 							//Search if folder already exists
 							$emailFolder=$emailFoldersRepository->findOneBy([
 								"emailAccount"=> $emailAccount,
-								"name" => ltrim(imap_utf7_decode($val),'{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'/novalidate-cert}')
+								"name" => ltrim(imap_utf7_decode($val),'{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'}')
 							]);
 							if($emailFolder==null){
 								$newFolders++;
 								//Create folder
 								$em=$this->getDoctrine()->getManager();
 								$folder=new EmailFolders();
-				        $folder->setName(ltrim(imap_utf7_decode($val),'{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'/novalidate-cert}'));
+				        $folder->setName(ltrim(imap_utf7_decode($val),'{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'}'));
 				        $folder->setEmailAccount($emailAccount);
 				        $em->persist($folder);
 				        $em->flush();
