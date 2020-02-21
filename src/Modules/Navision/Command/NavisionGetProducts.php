@@ -259,7 +259,7 @@ public function importPrices(InputInterface $input, OutputInterface $output) {
     $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
     $price=$repositoryShoppingDiscounts->findOneBy(["supplier"=>$product->getSupplier(),"category"=>$product->getCategory()]);
 
-    if ($price==null and $product->getCategory()!=null){
+    if ($price==null and $product->getCategory()!=null and $product->getSupplier()!=null){
       $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getPrices.php?from='.$product->getCode());
       $objects=json_decode($json, true);
       $objects=$objects[0];
