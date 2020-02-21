@@ -259,7 +259,7 @@ public function importPrices(InputInterface $input, OutputInterface $output) {
     $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
     $price=$repositoryShoppingDiscounts->findOneBy(["supplier"=>$product->getSupplier(),"category"=>$product->getCategory()]);
 
-    if ($price==null){
+    if ($price==null and $product->getCategory()!=null){
       $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getPrices.php?from='.$product->getCode());
       $objects=json_decode($json, true);
       $objects=$objects[0];
@@ -309,12 +309,12 @@ public function importStocks(InputInterface $input, OutputInterface $output) {
   $repositoryStoreLocations=$this->doctrine->getRepository(ERPStoreLocations::class);
   $repository=$this->doctrine->getRepository(ERPProducts::class);
   $products=$repository->findAll();
-
-  foreach ($products as $product){
+  $product=$repository->find(306);
+//  foreach ($products as $product){
     $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getStocks.php?from='.$product->getCode());
     $objects=json_decode($json, true);
     $objects=$objects[0];
-
+    if ($objects){
     $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
     $company=$repositoryCompanies->find(2);
     $output->writeln('* Actualizando stocks '.$product->getCode());
@@ -345,9 +345,10 @@ public function importStocks(InputInterface $input, OutputInterface $output) {
 
 
     }
+  }
     $this->doctrine->getManager()->flush();
     $this->doctrine->getManager()->clear();
-  }
+//  }
 
 }
 
