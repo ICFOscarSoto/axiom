@@ -15,7 +15,7 @@
                }
              }
            } else {
-             toastr.error("No se pudo conectar con el servidor. Revise la configuración de la cuenta", "Confirmación", confirmationLong);
+             toastr.error("No se pudo conectar con el servidor. Revise la configuración de la cuenta. Error: "+data.error, "Confirmación", confirmationLong);
            }
          }
        });
