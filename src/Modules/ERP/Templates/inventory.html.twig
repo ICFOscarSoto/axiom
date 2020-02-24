@@ -151,7 +151,6 @@
 		}
 
 		function deleteStock(id){
-			console.log("dentro de delete:"+id);
 				if((++load_wait)==1) $("#load-spinner").fadeIn();
 				$.ajax({
 					 type: "GET",
@@ -202,18 +201,20 @@
 
 					else if($('#newquantity-'+$(this).attr('attr-id')).val()==0)
 					{
+
 						id=$(this).attr('attr-id');
 						prevqty=$("#quantity-"+$(this).attr('attr-id')).val();
 						newqty=$("#newquantity-"+$(this).attr('attr-id')).val();
 						product_code=$("#product_code-"+$(this).attr('attr-id')).val();
-						location=$("#location-"+$(this).attr('attr-id')).val();
+						storelocation=$("#location-"+$(this).attr('attr-id')).val();
+
 						$.confirm({
 								theme: 'bootstrap',
 								title: '',
 								content: '¿Este producto se volverá a reponer en esta ubicación?',
 								buttons: {
 									 confirm: { text: 'Si', btnClass: 'btn-green', action: function(){
-										 				saveStock(id,prevqty,newqty,product_code,location);
+										 				saveStock(id,prevqty,newqty,product_code,storelocation);
 										 				$("#quantity-"+id).val(newqty);
 									 				}
 
@@ -222,8 +223,9 @@
 														deleteStock(id);
 									 				}
 								 }
-								}
+							 }
 						});
+
 
 					}
 
