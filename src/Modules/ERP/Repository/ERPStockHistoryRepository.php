@@ -47,4 +47,24 @@ class ERPStockHistoryRepository extends ServiceEntityRepository
         ;
     }
     */
+
+    public function findHistory($product){
+      $query="SELECT h.id as id, pr.code as product_code,pr.name as product_name, strl.name as location,
+                str.name as store,CONCAT(u.name,' ',u.lastname) as user,
+                h.previousqty as prevqty, h.newqty as newqty, h.dateadd as dateadd
+                FROM erpstock_history h
+                LEFT JOIN erpproducts pr
+                ON pr.id=h.product_id
+                LEFT JOIN erpstore_locations strl
+                ON strl.id=h.location_id
+                LEFT JOIN erpstores str
+                ON str.id=h.store_id
+                LEFT JOIN globale_users u
+                ON u.id=h.user_id
+                WHERE h.product_id=:product AND h.deleted=0 AND h.active=1";
+      dump($query);
+      $query.=" ORDER BY h.dateadd DESC";
+      $params=['product' => $product];
+      return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+    }
 }

@@ -71,11 +71,32 @@ class ERPStocksController extends Controller
 			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 			$stocksReposiitory= $this->getDoctrine()->getRepository($this->class);
 			$stocks=$stocksReposiitory->stocksByStores($id);
-			foreach($stocks as $key=>$item){
+			foreach($stocks as $key=>$i){
 				$stocks[$key]["Acciones"]="<button>Ir</button>";
 			}
+
+		$repositoryHistory=$this->getDoctrine()->getRepository(ERPStockHistory::class);
+ 		 $history=$repositoryHistory->findHistory($id);
+ 		 $stockHistory=Array();
+
+ 		 foreach($history as $history_line){
+			 $item['Código']=$history_line['product_code'];
+ 			 $item['Nombre']=$history_line['product_name'];
+ 			 $item['Ubicación']=$history_line['location'];
+ 			 $item['Almacén']=$history_line['store'];
+ 			 $item['Stock Previo']=$history_line['prevqty'];
+ 			 $item['Stock Final']=$history_line['newqty'];
+ 			 $item['Fecha']=$history_line['dateadd'];
+			 $item['Usuario']=$history_line['user'];
+ 			 $stockHistory[]=$item;
+ 		 }
+
+		 dump($stockHistory);
+
 			return $this->render('@ERP/infoStocks.html.twig', array(
-				'stocklist'=>$stocks
+				'stocklist'=>$stocks,
+				'id'=>$id,
+				'historylist' => $stockHistory
 			));
 		}
 
@@ -118,6 +139,9 @@ class ERPStocksController extends Controller
 				 ]);
 		 } return new RedirectResponse($this->router->generate('app_login'));
 		 }
+
+
+
 
 
 		 /**
@@ -212,6 +236,33 @@ class ERPStocksController extends Controller
 
 			else return new JsonResponse(["result"=>-1]);
 		}
+
+
+
+		/**
+		* @Route("/api/global/stock/{id}/history", name="getStockHistory")
+		*/
+		public function getStockHistory($id){
+		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		 $repositoryHistory=$this->getDoctrine()->getRepository(ERPStockHistory::class);
+		 $history=$repositoryHistory->findHistory($id);
+		 $responseHistory=Array();
+
+		 foreach($history as $history_line){
+			 $item['product_code']=$history_line['product_code'];
+			 $item['product_name']=$history_line['product_name'];
+			 $item['location']=$history_line['location'];
+			 $item['store']=$history_line['store'];
+			 $item['prevqty']=$history_line['prevqty'];
+			 $item['newqty']=$history_line['newqty'];
+			 $item['dateadd']=$history_line['dateadd'];
+			 $responseHistory[]=$item;
+		 }
+
+		 return new JsonResponse(["history"=>$responseHistory]);
+
+		}
+
 
 
     /**
