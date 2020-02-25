@@ -25,6 +25,7 @@ class ERPInvoiceReports
   private $worker;
   private $monthNames=["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Setiembre", "Octubre", "Noviembre", "Diciembre"];
   private $month, $year;
+  private $pageNo=1;
 
   private function secToH($seconds) {
     $hours = floor($seconds / 3600);
@@ -135,7 +136,7 @@ class ERPInvoiceReports
     $this->pdf->SetTextColor(44, 132, 194);
     $this->pdf->Cell(20,9,utf8_decode('Página'),'',0,'L',false);
     $this->pdf->SetTextColor(0, 0, 0);
-    $this->pdf->Cell(60,9,utf8_decode($this->pdf->PageNo().'/{nb}'),'',0,'L',false);
+    $this->pdf->Cell(60,9,utf8_decode($this->pdf->GroupPageNo().'/'.$this->pdf->PageGroupAlias()),'',0,'L',false);
 
     $this->pdf->setXY(110, 40);
     $this->pdf->Cell(60,9,utf8_decode($invoice["customer"]),'',0,'L',false);
@@ -175,7 +176,7 @@ class ERPInvoiceReports
     $this->user=$params["user"];
     $invoices=$params["invoices"];
     foreach($invoices as $invoice){
-
+      $this->pdf->StartPageGroup();
       $columns=[["name"=>"CÓDIGO","width"=>30, "align"=>"L"], //190
                 ["name"=>"DESCRIPCIÓN","width"=>80,"align"=>"L"],
                 ["name"=>"UNIDADES","width"=>22,"align"=>"C"],
