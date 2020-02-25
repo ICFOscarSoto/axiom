@@ -214,6 +214,11 @@ class ERPCustomers
      */
     private $cescecode;
 
+    /**
+     * @ORM\Column(type="string", length=16, nullable=true)
+     */
+    private $paymentmode;
+
 
     public function getId(): ?int
     {
@@ -679,6 +684,18 @@ class ERPCustomers
     public function setCescecode(?string $cescecode): self
     {
         $this->cescecode = $cescecode;
+
+        return $this;
+    }
+
+    public function getPaymentmode(): ?string
+    {
+        return $this->paymentmode;
+    }
+
+    public function setPaymentmode(?string $paymentmode): self
+    {
+        $this->paymentmode = $paymentmode;
 
         return $this;
     }

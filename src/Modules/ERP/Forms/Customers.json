@@ -31,6 +31,7 @@
 			{ "name": "customergroup", "cols": 2},
 			{ "name": "paymentmethod","cols": 2},
 			{ "name": "paymentterms","cols": 2},
+			{ "name": "paymentmode","cols": 2},
 			{ "name": "maxcredit","cols": 2},
 			{ "name": "mininvoice","cols": 2},
 			{ "name": "allowlinediscount","cols": 2},
@@ -44,7 +45,7 @@
 			{ "name": "minimuminvoiceamount","cols": 2},
 			{ "name": "insured","cols": 2},
 			{ "name": "supplement","cols": 2},
-			{ "name": "cescecode","cols": 2}			
+			{ "name": "cescecode","cols": 2}
 		]
 	},
 	{

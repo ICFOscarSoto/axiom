@@ -61,9 +61,8 @@ class ERPStockHistoryRepository extends ServiceEntityRepository
                 ON str.id=h.store_id
                 LEFT JOIN globale_users u
                 ON u.id=h.user_id
-                WHERE h.product_id=:product AND h.deleted=0 AND h.active=1";
-      dump($query);
-      $query.=" ORDER BY h.dateadd DESC";
+                WHERE h.product_id=:product AND h.deleted=0 AND h.active=1 ";
+      $query.=" ORDER BY h.dateadd DESC LIMIT 50";
       $params=['product' => $product];
       return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
     }

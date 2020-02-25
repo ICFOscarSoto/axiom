@@ -309,6 +309,7 @@ Cescecode: Código CESCE
 Paymentterms: Vencimientos
 due_date: Vencimiento
 Authorizationcontrol: Control de personas autorizadas
+Paymentmode: Modo de Pago
 
 # CUSTOMERS COMMENT LINES
 #----------------------------------------------------------------------------------------------------------------------
