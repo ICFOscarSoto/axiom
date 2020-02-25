@@ -258,15 +258,14 @@ public function importPrices(InputInterface $input, OutputInterface $output) {
   foreach($products as $product) {
     $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
     $price=$repositoryShoppingDiscounts->findOneBy(["supplier"=>$product->getSupplier(),"category"=>$product->getCategory()]);
-
-    if ($price==null and $product->getCategory()!=null and $product->getSupplier()!=null){
+    if ($price==null && $product->getCategory()!=null && $product->getSupplier()!=null){
       $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getPrices.php?from='.$product->getCode());
       $objects=json_decode($json, true);
       $objects=$objects[0];
       foreach ($objects["class"] as $prices){
         if($prices["Discount"]!=0){
-          $supplier=$repositorySupliers->find($product->getSupplier()->getId());
-          $categoy=$repositoryCategory->find($product->getCategory()->getId());
+          $supplier=$repositorySupliers->findOneBy(["id"=>$product->getSupplier()->getId()]);
+          $categoy=$repositoryCategory->findOneBy(["id"=>$product->getCategory()->getId()]);
           $obj=new ERPShoppingDiscounts();
           $obj->setSupplier($supplier);
           $obj->setCategory($categoy);
