@@ -2,7 +2,7 @@
   {"name": "name", "caption":"Alias", "width" : "50"},
   {"name": "socialname", "caption":"Razón Social", "width" : "50"},
   {"name": "active", "caption":"Estado", "width":"10%" ,"class" : "dt-center", "replace":{
-                             "1":{"text":"Activo","html":"<div style=\"min-width: 75px;\" class=\"label label-success\">Activo</div>"},
+                             "1":{"text":"Activo","html":"<div style=\"min-width: 75px;\" class=\"label label-success\">Activo</div>","default":true},
                              "0":{"text":"Desactivado","html":"<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado</div>"}
                            }
    }
