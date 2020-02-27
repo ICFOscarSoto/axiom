@@ -35,7 +35,7 @@ class ERPSupplierActivities
     /**
      * @ORM\Column(type="boolean")
      */
-    private $deleted;
+     Private $deleted;
 
     /**
      * @ORM\Column(type="datetime")
