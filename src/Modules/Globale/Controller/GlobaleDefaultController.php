@@ -120,7 +120,7 @@ class GlobaleDefaultController extends Controller
     */
     public function genericdatatab($id, $idparent, $module, $name, $type, $action, $json, Request $request){
       $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-      $this->denyAccessUnlessGranted('ROLE_ADMIN');
+      //$this->denyAccessUnlessGranted('ROLE_ADMIN');
       $template=dirname(__FILE__)."/../../".$module."/Forms/".($json!=""?$json:$name).".json";
       $class="\App\Modules\\".$module."\Entity\\".$module.$name;
       $utils = new GlobaleFormUtils();
@@ -149,7 +149,7 @@ class GlobaleDefaultController extends Controller
        */
        public function widgetdata($id, $widget, $action, Request $request){
          $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-         $this->denyAccessUnlessGranted('ROLE_ADMIN');
+         //$this->denyAccessUnlessGranted('ROLE_ADMIN');
          $template=dirname(__FILE__)."/../../../Widgets/Forms/".$widget.".json";
          $class="\App\Widgets\Entity\Widgets".$widget;
          $utils = new GlobaleFormUtils();
@@ -224,7 +224,7 @@ class GlobaleDefaultController extends Controller
       */
       public function export($module, $name, Request $request){
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        //$this->denyAccessUnlessGranted('ROLE_ADMIN');
         $utilsExport = new GlobaleExportUtils();
         $user = $this->getUser();
         $manager = $this->getDoctrine()->getManager();
@@ -265,7 +265,7 @@ class GlobaleDefaultController extends Controller
      * @Route("/{_locale}/{module}/{name}/generic/{id}/disable", name="genericdisable")
      */
      public function disable($module, $name, Request $request, $id){
-      $this->denyAccessUnlessGranted('ROLE_ADMIN');
+      $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
       $entityUtils=new GlobaleEntityUtils();
       $class="\App\Modules\\".$module."\Entity\\".$module.$name;
       $result=$entityUtils->disableObject($id, $class, $this->getDoctrine());
@@ -275,7 +275,7 @@ class GlobaleDefaultController extends Controller
      * @Route("/{_locale}/{module}/{name}/generic/{id}/enable", name="genericenable")
      */
      public function enable($module, $name, Request $request, $id){
-      $this->denyAccessUnlessGranted('ROLE_ADMIN');
+      $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
       $entityUtils=new GlobaleEntityUtils();
       $class="\App\Modules\\".$module."\Entity\\".$module.$name;
       $result=$entityUtils->enableObject($id, $class, $this->getDoctrine());
@@ -285,7 +285,7 @@ class GlobaleDefaultController extends Controller
      * @Route("/{_locale}/{module}/{name}/generic/{id}/delete", name="genericdelete", defaults={"id"=0})
      */
      public function delete($module, $name, Request $request, $id){
-      $this->denyAccessUnlessGranted('ROLE_ADMIN');
+      $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
       $entityUtils=new GlobaleEntityUtils();
       $class="\App\Modules\\".$module."\Entity\\".$module.$name;
       if($id!=0) $result=$entityUtils->deleteObject($id, $class, $this->getDoctrine());

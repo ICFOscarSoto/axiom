@@ -11,6 +11,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\ERP\Entity\ERPCustomers;
+use App\Modules\ERP\Entity\ERPContacts;
 use App\Modules\ERP\Entity\ERPCustomerGroups;
 use App\Modules\ERP\Entity\ERPCustomersPrices;
 use App\Modules\ERP\Entity\ERPCustomerCommentLines;
@@ -188,7 +189,7 @@ class ERPCustomersController extends Controller
     $repository = $manager->getRepository($this->class);
     $listUtils=new GlobaleListUtils();
     $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Customers.json"),true);
-    $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, Customers::class,[["type"=>"and", "column"=>"company", "value"=>$user->getCompany()]]);
+    $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, ERPCustomers::class,[["type"=>"and", "column"=>"company", "value"=>$user->getCompany()]]);
     return new JsonResponse($return);
   }
 
@@ -223,5 +224,30 @@ class ERPCustomersController extends Controller
 	 $result=$entityUtils->deleteObject($id, $this->class, $this->getDoctrine());
 	 return new JsonResponse(array('result' => $result));
  }
+
+ /**
+	* @Route("/{_locale}/ERP/customers/get/emailaddres/{id}", name="getERPEmailAddress", defaults={"id"=0})
+	*/
+	public function getEmailAddress($id, Request $request){
+	 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+	 $customerRepository=$this->getDoctrine()->getRepository($this->class);
+	 $customerContactsRepository=$this->getDoctrine()->getRepository(ERPContacts::class);
+	 $customer=$customerRepository->findOneBy(['code'=>$id, 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
+	 $contacts=$customerContactsRepository->findBy(['customer'=>$customer, 'invoice'=>1, 'active'=>1, 'deleted'=>0]);
+	 $mailadresses=[];
+	 //First mail company
+
+	 if($customer!=NULL && $customer->getEmail()!=""){
+		 $mailadress=$customer->getName()." <".$customer->getEmail().">";
+		 $mailadresses[]=$mailadress;
+	 }
+	 foreach($contacts as $contact){
+		 if($contact->getEmail()!=""){
+			 $mailadress=$contact->getName()." ".$contact->getLastname()." <".$contact->getEmail().">";
+			 $mailadresses[]=$mailadress;
+		 }
+	 }
+	 return new JsonResponse(["adresses"=>$mailadresses]);
+	}
 
 }

@@ -86,6 +86,9 @@
 				<a href="javascript:void(0);" style="font-size: 20px" id="downloadTop-top-button-foreground" type="button" class="btn tooltip-primary btn-default">
             <i class="fa fa-download" aria-hidden="true"></i>
         </a>
+				<a href="javascript:void(0);" style="font-size: 20px" id="emailTop-top-button-foreground" type="button" class="btn tooltip-primary btn-default">
+						<i class="fa fa-envelope" aria-hidden="true"></i>
+				</a>
 		</div>
 
 		<p></p>
@@ -106,12 +109,15 @@
           {% for item in basiclist %}
             <tr class="basiclist" style="">
               <td style="height: 15px !important; vertical-align: middle; padding: 5px 5px 5px 5px !important;">
-                <input type="checkbox" item-id="{{ item.id }}" class="{{ listConstructor.id }}-chk-list" id="{{ item.id }}-{{ listConstructor.id }}-chk-list">
+                <input type="checkbox" attr-code="{{ item.Code }}" item-id="{{ item.id }}" class="{{ listConstructor.id }}-chk-list" id="{{ item.id }}-{{ listConstructor.id }}-chk-list">
 							</td>
               {% for keyrow,value in item %}
                 <td style="height: 15px !important; vertical-align: middle; padding: 5px 5px 5px 5px !important;">{{ value|raw }}</td>
               {% endfor %}
-              <td style="height: 15px !important; vertical-align: middle; padding: 5px 5px 5px 5px !important;"><button attr-id="{{ item.id }}" id="document-button-print-{{ item.id }}" type="button" class="btn btn-white"><i class="fa fa-print"></i></button>&nbsp;&nbsp;<button attr-id="{{ item.id }}" id="document-button-download-{{ item.id }}" type="button" class="btn btn-default tooltip-primary"><i class="fa fa-download"></i></button></td>
+              <td style="height: 15px !important; vertical-align: middle; padding: 5px 5px 5px 5px !important;"><button attr-id="{{ item.id }}" id="document-button-print-{{ item.id }}" type="button" class="btn btn-white"><i class="fa fa-print"></i></button>&nbsp;&nbsp;&nbsp;
+								<button attr-id="{{ item.id }}" id="document-button-download-{{ item.id }}" type="button" class="btn btn-default tooltip-primary"><i class="fa fa-download"></i></button>
+								{% if userData.modules.Email is defined %}&nbsp;&nbsp;&nbsp;<button attr-id="{{ item.id }}" attr-code="{{ item.Code }}"  id="document-button-email-{{ item.id }}" type="button" class="btn btn-default btn-icon icon-left">Enviar<i class="fa fa-envelope"></i></button>{% endif %}
+							</td>
             </tr>
 
           {% endfor %}
@@ -119,6 +125,9 @@
     </table>
 
 		{{ include("@Globale/form_fields_type_number.html.twig") }}
+
+		{% set sendRoute='/api/navision/invoice/print/email' %}
+		{{ include("@Navision/document_send.html.twig") }}
 
     <script>
       {{ include("@Globale/form_fields_datetime.html.twig") }}
@@ -140,15 +149,16 @@
                    element+='<tr class="basiclist" style="">';
                    element+='   <td style="height: 15px !important; vertical-align: middle; padding: 5px 5px 5px 5px !important;">';
                    //element+='   <div class="checkbox checkbox-replace">';
-       						 element+='			 <input type="checkbox" item-id="'+item.id+'" class="{{ listConstructor.id }}-chk-list" id="'+item.id+'-{{ listConstructor.id }}-chk-list">';
+       						 element+='			 <input type="checkbox" attr-code="'+item.Code+'" item-id="'+item.id+'" class="{{ listConstructor.id }}-chk-list" id="'+item.id+'-{{ listConstructor.id }}-chk-list">';
        						 //element+='		</div>';
                    element+='</td>';
                    element+='<td style="height: 15px !important; vertical-align: middle; padding: 5px 5px 5px 5px !important;">'+item.id+'</td>';
+									 element+='<td style="height: 15px !important; vertical-align: middle; padding: 5px 5px 5px 5px !important;">'+item.Code+'</td>';
                    element+='<td style="height: 15px !important; vertical-align: middle; padding: 5px 5px 5px 5px !important;">'+item.customer+'</td>';
-                   element+='<td style="height: 15px !important; vertical-align: middle; padding: 5px 5px 5px 5px !important;">'+item.total+'</td>';
+                   element+='<td style="height: 15px !important; vertical-align: middle; padding: 5px 5px 5px 5px !important;">'+item.Total+'</td>';
                    element+='<td style="height: 15px !important; vertical-align: middle; padding: 5px 5px 5px 5px !important;">'+item.date+'</td>';
                    element+='<td style="height: 15px !important; vertical-align: middle; padding: 5px 5px 5px 5px !important;"><button attr-id="'+item.id+'" id="document-button-print-'+item.id+'" type="button" class="btn btn-default tooltip-primary"><i class="fa fa-print"></i></button>&nbsp;&nbsp;&nbsp;<button attr-id="'+item.id+'" id="document-button-download-'+item.id+'" type="button" class="btn btn-default tooltip-primary"><i class="fa fa-download"></i></button>';
-									 //element+='{% if userData.modules.Email is defined %}&nbsp;&nbsp;&nbsp;<button id="document-button-email" type="button" class="btn btn-default btn-icon icon-left">Enviar<i class="fa fa-envelope"></i></button>{% endif %}';
+									 element+='{% if userData.modules.Email is defined %}&nbsp;&nbsp;&nbsp;<button attr-id="'+item.id+'" attr-code="'+item.Code+'" id="document-button-email" type="button" class="btn btn-default btn-icon icon-left">Enviar<i class="fa fa-envelope"></i></button>{% endif %}';
 									 element+='</td>';
                    element+='</tr>';
                    html+=element;
@@ -210,6 +220,8 @@
 						 win.focus();
 					});
 
+
+
         });
     </script>
 <!-- END MODALS -->
@@ -224,14 +236,14 @@
 <link rel="stylesheet" href="{{ url('index') }}css/custom.css">
 <link rel="stylesheet" href="{{ url('index') }}js/ol/ol.css">
 <link rel="stylesheet" href="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker.min.css">
+<link rel="stylesheet" href="{{ url('index') }}js/jodit/jodit.min.css">
 <!-- Imported scripts on this page -->
 <script src="{{ url('index') }}js/datatables/datatables.js"></script>
 <script src="{{ url('index') }}js/select2/select2.min.js"></script>
 
-
-
 <script src="{{ url('index') }}js/fileinput.js"></script>
 <script src="{{ url('index') }}js/ol/ol.js"></script>
+<script src="{{ url('index') }}js/jodit/jodit.min.js"></script>
 	 {{ include('@Globale/bottom.html.twig') }}
 {% endblock %}
 </body>

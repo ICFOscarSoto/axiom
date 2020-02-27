@@ -135,7 +135,7 @@ class ERPSuppliersController extends Controller
     $repository = $manager->getRepository($this->class);
     $listUtils=new GlobaleListUtils();
     $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Suppliers.json"),true);
-    $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, Suppliers::class,[["type"=>"and", "column"=>"company", "value"=>$user->getCompany()]]);
+    $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, ERPSuppliers::class,[["type"=>"and", "column"=>"company", "value"=>$user->getCompany()]]);
     return new JsonResponse($return);
   }
 

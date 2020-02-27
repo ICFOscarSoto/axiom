@@ -72,6 +72,7 @@ class GlobaleUsersController extends Controller
 	public function profile(RouterInterface $router,Request $request, UserPasswordEncoderInterface $encoder)
 	{
     $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+    
     $new_breadcrumb=["rute"=>null, "name"=>"Editar perfil", "icon"=>"fa fa-edit"];
     $template=dirname(__FILE__)."/../Forms/Profile.json";
     $userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
@@ -146,7 +147,7 @@ class GlobaleUsersController extends Controller
    */
    public function data($id, $action, Request $request, UserPasswordEncoderInterface $encoder){
     $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-    $this->denyAccessUnlessGranted('ROLE_ADMIN');
+    //$this->denyAccessUnlessGranted('ROLE_ADMIN');
     $template=dirname(__FILE__)."/../Forms/Users.json";
     $utils = new GlobaleFormUtils();
     $utilsObj=new $this->utilsClass();
