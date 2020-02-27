@@ -7,6 +7,7 @@ use App\Modules\Email\Entity\EmailFolders;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use \App\Modules\Globale\Entity\GlobaleCompanies;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\Email\Repository\EmailAccountsRepository")
@@ -146,6 +147,12 @@ class EmailAccounts
      * @ORM\Column(type="datetime", nullable=true)
      */
     private $lastcheck;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCompanies")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $company;
 
     public function __construct()
     {
@@ -492,6 +499,18 @@ class EmailAccounts
     public function setLastcheck(?\DateTimeInterface $lastcheck): self
     {
         $this->lastcheck = $lastcheck;
+
+        return $this;
+    }
+
+    public function getCompany(): ?GlobaleCompanies
+    {
+        return $this->company;
+    }
+
+    public function setCompany(?GlobaleCompanies $company): self
+    {
+        $this->company = $company;
 
         return $this;
     }
