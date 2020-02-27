@@ -144,19 +144,11 @@ class ERPCustomersController extends Controller
 			  $formUtilsCustomersPrices = new GlobaleFormUtils();
 			  $formUtilsCustomersPrices->initialize($this->getUser(), new ERPCustomersPrices(), dirname(__FILE__)."/../Forms/CustomersPrices.json", $request, $this, $this->getDoctrine());
 				$forms[]=$formUtilsCustomersPrices->formatForm('CustomersPrices', true, null, ERPCustomersPrices::class);
-			//	$listReferences = new ERPReferencesUtils();
-				//$formUtilsReferences = new GlobaleFormUtils();
-			//	$formUtilsReferences->initialize($this->getUser(), new ERPReferences(), dirname(__FILE__)."/../Forms/References.json", $request, $this, $this->getDoctrine());
-			// 	$forms[]=$formUtilsReferences->formatForm('References', true, null, ERPReferences::class);
-			//	$listAttributes = new ERPProductsAttributesUtils();
+
 
 				$customerRepository=$this->getDoctrine()->getRepository(ERPCustomers::class);
 				$customer=$customerRepository->findOneBy(["id"=>$id, "active"=>1, "deleted"=>0, "company"=>$this->getUser()->getCompany()]);
-		/*
-		  	$formUtilsAttributes = new GlobaleFormUtils();
-				$formUtilsAttributes->initialize($this->getUser(), new ERPProductsAttributes(), dirname(__FILE__)."/../Forms/References.json", $request, $this, $this->getDoctrine(),$listAttributes->getExcludedForm(null),$listAttributes->getIncludedForm(["parent"=>$product, "doctrine"=>$this->getDoctrine(), "user"=>$this->getUser()]));
-				$forms[]=$formUtilsAttributes->formatForm('ProductsAttributes', true, null, ERPProductsAttributes::class);
-		*/
+		
 				return $this->render('@ERP/customerform.html.twig', array(
 					'controllerName' => 'customersController',
 					'interfaceName' => 'Clientes',

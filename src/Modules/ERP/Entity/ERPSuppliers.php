@@ -9,6 +9,7 @@ use \App\Modules\Globale\Entity\GlobaleCurrencies;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
 use \App\Modules\ERP\Entity\ERPPaymentMethods;
 use \App\Modules\Globale\Entity\GlobaleStates;
+use \App\Modules\ERP\Entity\ERPPaymentTerms;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPSuppliersRepository")
@@ -181,6 +182,11 @@ class ERPSuppliers
      * @ORM\JoinColumn(onDelete="SET NULL")
      */
     private $state;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPPaymentTerms")
+     */
+    private $paymentterms;
 
 
     public function getId(): ?int
@@ -566,5 +572,17 @@ class ERPSuppliers
 
       if (empty($fieldErrors)) return ["valid"=>true];
         else return ["valid"=>false, "field_errors"=>$fieldErrors];
+    }
+
+    public function getPaymentterms(): ?ERPPaymentTerms
+    {
+        return $this->paymentterms;
+    }
+
+    public function setPaymentterms(?ERPPaymentTerms $paymentterms): self
+    {
+        $this->paymentterms = $paymentterms;
+
+        return $this;
     }
 }

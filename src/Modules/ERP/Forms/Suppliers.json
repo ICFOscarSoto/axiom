@@ -39,7 +39,8 @@
 			{ "name": "creditor","cols": 2},
 			{ "name": "invoiceday","cols": 2},
 			{ "name": "currency","cols": 3},
-			{ "name": "paymentmethod","cols": 3}
+			{ "name": "paymentmethod","cols": 3},
+			{ "name": "paymentterms","cols": 2}
 		]
 	},
 	{
