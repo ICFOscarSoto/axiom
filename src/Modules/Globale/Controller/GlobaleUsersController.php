@@ -146,7 +146,7 @@ class GlobaleUsersController extends Controller
    */
    public function data($id, $action, Request $request, UserPasswordEncoderInterface $encoder){
     $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-    $this->denyAccessUnlessGranted('ROLE_ADMIN');
+    //$this->denyAccessUnlessGranted('ROLE_ADMIN');
     $template=dirname(__FILE__)."/../Forms/Users.json";
     $utils = new GlobaleFormUtils();
     $utilsObj=new $this->utilsClass();
