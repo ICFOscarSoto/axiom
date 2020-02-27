@@ -62,7 +62,10 @@ class NavisionController extends Controller
        'userData' => $userdata,
        'start' => $start->format("d/m/Y"),
        'end' => $end->format("d/m/Y"),
-       'basiclist' => json_decode ($invoices, true)
+       'basiclist' => json_decode ($invoices, true),
+       'token' => uniqid('sign_').time(),
+       'documentType' => 'sales_invoice',
+       'documentPrefix' => '',
      ]);
    }
 
@@ -90,11 +93,12 @@ class NavisionController extends Controller
      $ids=explode(",",$ids);
 
      $invoice=file_get_contents($this->url.'navisionExport/do-NAVISION-invoice.php?invoices='.json_encode($ids));
+     $invoices=json_decode($invoice, true);
      //dump($this->url.'navisionExport/do-NAVISION-invoice.php?invoices=['.$id.']');
      //$ids=$id;
-     $params=["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "ids"=>$ids, "user"=>$this->getUser(), "invoices"=>json_decode($invoice, true)];
+     $params=["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "ids"=>$ids, "user"=>$this->getUser(), "invoices"=>$invoices];
      $reportsUtils = new ERPInvoiceReports();
-     //dump($invoice);
+     //dump($invoices);
 
      switch($mode){
        case "email":
@@ -102,7 +106,11 @@ class NavisionController extends Controller
          if (!file_exists($tempPath) && !is_dir($tempPath)) {
              mkdir($tempPath, 0775, true);
          }
-         $pdf=$reportsUtils->create($params,'F',$tempPath.$id.'.pdf');
+        foreach($ids as $key=>$id){
+           $params["ids"]=$id;
+           $params["invoices"]=[$invoices[$id]];
+           $pdf=$reportsUtils->create($params,'F',$tempPath.$id.'.pdf');
+         }
          return new JsonResponse(["result"=>1]);
        break;
        case "temp":
