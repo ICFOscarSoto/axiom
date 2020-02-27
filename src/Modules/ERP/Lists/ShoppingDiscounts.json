@@ -46,7 +46,7 @@
         "replace": {
             "1": {
                 "text": "Activo",
-                "html": "<div style=\"min-width: 75px;\" class=\"label label-success\">Activo<\/div>"
+                "html": "<div style=\"min-width: 75px;\" class=\"label label-success\">Activo<\/div>", "default":true
             },
             "0": {
                 "text": "Desactivado",

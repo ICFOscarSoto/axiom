@@ -121,7 +121,7 @@ Registrese: Sign up
 #----------------------------------------------------------------------------------------------------------------------
 Name: Nombre
 Vat: CIF/NIF
-Socialname: Denominación social
+Socialname: Razón social
 Country: País
 State: Provincia
 City: Ciudad
@@ -309,6 +309,7 @@ Cescecode: Código CESCE
 Paymentterms: Vencimientos
 due_date: Vencimiento
 Authorizationcontrol: Control de personas autorizadas
+Paymentmode: Modo de Pago
 
 # CUSTOMERS COMMENT LINES
 #----------------------------------------------------------------------------------------------------------------------

@@ -258,15 +258,14 @@ public function importPrices(InputInterface $input, OutputInterface $output) {
   foreach($products as $product) {
     $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
     $price=$repositoryShoppingDiscounts->findOneBy(["supplier"=>$product->getSupplier(),"category"=>$product->getCategory()]);
-
-    if ($price==null and $product->getCategory()!=null and $product->getSupplier()!=null){
-      $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getPrices.php?from='.$product->getCode());
+    if ($price==null && $product->getCategory()!=null && $product->getSupplier()!=null){
+      $supplier=$repositorySupliers->findOneBy(["id"=>$product->getSupplier()->getId()]);
+      $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getPrices.php?from='.$product->getCode().'&supplier='.$supplier->getCode());
       $objects=json_decode($json, true);
       $objects=$objects[0];
       foreach ($objects["class"] as $prices){
         if($prices["Discount"]!=0){
-          $supplier=$repositorySupliers->find($product->getSupplier()->getId());
-          $categoy=$repositoryCategory->find($product->getCategory()->getId());
+          $categoy=$repositoryCategory->findOneBy(["id"=>$product->getCategory()->getId()]);
           $obj=new ERPShoppingDiscounts();
           $obj->setSupplier($supplier);
           $obj->setCategory($categoy);
@@ -284,7 +283,9 @@ public function importPrices(InputInterface $input, OutputInterface $output) {
           $obj->setDateupd(new \Datetime());
           if (strtotime($prices["Ending"]["date"])<strtotime(date("d-m-Y H:i:00",time())) && $prices["Ending"]["date"]!="1753-01-01 00:00:00.000000" ) {
             $obj->setActive(0);
-          } else $obj->setActive(1);
+          } else {
+            $obj->setActive(1);
+          }
           $obj->setDeleted(0);
           $this->doctrine->getManager()->merge($obj);
           $this->doctrine->getManager()->flush();
