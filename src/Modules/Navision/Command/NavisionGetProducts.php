@@ -317,11 +317,16 @@ public function importStocks(InputInterface $input, OutputInterface $output) {
     if ($objects){
     $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
     $company=$repositoryCompanies->find(2);
-    $locations=$objects["locations"][0];
+
     foreach ($objects["quantitys"] as $stock){
-      if($stock["almacen"]==$locations["almacen"])
-      $location=$repositoryStoreLocations->findOneBy(["name"=>$locations["ubicacion"]]);
-      else $location=$repositoryStoreLocations->findOneBy(["name"=>$stock["almacen"]]);
+      
+      if ($objects["locations"]!=null) {
+        $locations=$objects["locations"][0];
+          if($stock["almacen"]==$locations["almacen"])
+            $location=$repositoryStoreLocations->findOneBy(["name"=>$locations["ubicacion"]]);
+            else $location=$repositoryStoreLocations->findOneBy(["name"=>$stock["almacen"]]);
+      } else $location=$repositoryStoreLocations->findOneBy(["name"=>$stock["almacen"]]);
+
         if($location!=null){
           $stock_old=$repositoryStocks->findOneBy(["product"=>$product->getId(),"storelocation"=>$location->getId()]);
           if($stock_old!=null){
