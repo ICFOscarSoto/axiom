@@ -266,6 +266,7 @@ public function importPrices(InputInterface $input, OutputInterface $output) {
       foreach ($objects["class"] as $prices){
         if($prices["Discount"]!=0){
           $categoy=$repositoryCategory->findOneBy(["id"=>$product->getCategory()->getId()]);
+          $output->writeln(' --> El producto '.$product->getCode().' está añadiendo el precio '.$prices["Discount"].' al proveedor '.$supplier->getCode().' en la categoría '.$category->getCode());
           $obj=new ERPShoppingDiscounts();
           $obj->setSupplier($supplier);
           $obj->setCategory($categoy);
@@ -319,7 +320,7 @@ public function importStocks(InputInterface $input, OutputInterface $output) {
     $company=$repositoryCompanies->find(2);
 
     foreach ($objects["quantitys"] as $stock){
-      
+
       if ($objects["locations"]!=null) {
         $locations=$objects["locations"][0];
           if($stock["almacen"]==$locations["almacen"])
