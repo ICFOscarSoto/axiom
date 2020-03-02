@@ -91,7 +91,7 @@ class ERPStocksController extends Controller
  			 $stockHistory[]=$item;
  		 }
 
-		 dump($stockHistory);
+		 //dump($stockHistory);
 
 			return $this->render('@ERP/infoStocks.html.twig', array(
 				'stocklist'=>$stocks,
