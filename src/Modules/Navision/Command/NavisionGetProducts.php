@@ -310,47 +310,45 @@ public function importStocks(InputInterface $input, OutputInterface $output) {
   $repositoryStoreLocations=$this->doctrine->getRepository(ERPStoreLocations::class);
   $repository=$this->doctrine->getRepository(ERPProducts::class);
   $products=$repository->findAll();
-  $product=$repository->find(306);
-//  foreach ($products as $product){
+  foreach ($products as $product){
     $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getStocks.php?from='.$product->getCode());
     $objects=json_decode($json, true);
     $objects=$objects[0];
     if ($objects){
     $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
     $company=$repositoryCompanies->find(2);
-    $output->writeln('* Actualizando stocks '.$product->getCode());
-    foreach ($objects["class"] as $stock){
-      $location=$repositoryStoreLocations->findOneBy(["name"=>$stock["Location Code"]]);
-      if($location!=null){
-      $stock_old=$repositoryStocks->findOneBy(["product"=>$product->getId(),"storelocation"=>$location->getId()]);
-
-      if($stock_old!=null){
-        $stock_old->setQuantity((int)$stock["stock"]);
-        $stock_old->setDateupd(new \Datetime());
-        $this->doctrine->getManager()->merge($stock_old);
-      } else {
-        $obj=new ERPStocks();
-        $obj->setCompany($company);
-        $obj->setProduct($product);
-        $obj->setDateadd(new \Datetime());
-        $obj->setDateupd(new \Datetime());
-        $obj->setStoreLocation($location);
-        if ((int)$stock["stock"]<0) $quantiy=0; else $quantity=(int)$stock["stock"];
-        $obj->setQuantity($quantity);
-        $obj->setActive(1);
-        $obj->setDeleted(0);
-        $this->doctrine->getManager()->merge($obj);
+    $locations=$objects["locations"][0];
+    foreach ($objects["quantitys"] as $stock){
+      if($stock["almacen"]==$locations["almacen"])
+      $location=$repositoryStoreLocations->findOneBy(["name"=>$locations["ubicacion"]]);
+      else $location=$repositoryStoreLocations->findOneBy(["name"=>$stock["almacen"]]);
+        if($location!=null){
+          $stock_old=$repositoryStocks->findOneBy(["product"=>$product->getId(),"storelocation"=>$location->getId()]);
+          if($stock_old!=null){
+            $stock_old->setQuantity((int)$stock["stock"]);
+            $stock_old->setDateupd(new \Datetime());
+            $this->doctrine->getManager()->merge($stock_old);
+          }
+          else {
+              $obj=new ERPStocks();
+              $obj->setCompany($company);
+              $obj->setProduct($product);
+              $obj->setDateadd(new \Datetime());
+              $obj->setDateupd(new \Datetime());
+              $obj->setStoreLocation($location);
+              if ((int)$stock["stock"]<0) $quantiy=0;
+              else $quantity=(int)$stock["stock"];
+              $obj->setQuantity($quantity);
+              $obj->setActive(1);
+              $obj->setDeleted(0);
+              $this->doctrine->getManager()->merge($obj);
+        }
       }
-
-    }
-
-
     }
   }
     $this->doctrine->getManager()->flush();
     $this->doctrine->getManager()->clear();
-//  }
-
+  }
 }
 
 }
