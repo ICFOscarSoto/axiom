@@ -176,7 +176,7 @@ class NavisionController extends Controller
         }
       }
 
-      return $this->render('@Navision/insuredcustomerlist.html.twig', [
+      return $this->render('@Navision/insuredcustomerinvoiceslist.html.twig', [
         "interfaceName" => "Facturas Asegurados",
         'optionSelected' => "navisionInsuredCustomerInvoices",
         'menuOptions' =>  $menurepository->formatOptions($userdata),
@@ -226,14 +226,14 @@ class NavisionController extends Controller
 
 
      /**
- 		 * @Route("/api/navision/exportinsuredlist", name="exportinsuredlist")
+ 		 * @Route("/api/navision/exportinsuredinvoiceslist", name="exportinsuredinvoiceslist")
  		 */
- 		 public function exportInsuredList(RouterInterface $router,Request $request)
+ 		 public function exportInsuredInvoicesList(RouterInterface $router,Request $request)
  		 {
 
        $start=$request->query->get("start");
        $end=$request->query->get("end");
- 			 $template=dirname(__FILE__)."/../Forms/InsuredCustomers.json";
+ 			 $template=dirname(__FILE__)."/../Forms/InsuredCustomerInvoices.json";
  			 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
        $start=date_create_from_format('d/m/Y',$start);
        $end=date_create_from_format('d/m/Y',$end);
@@ -259,15 +259,15 @@ class NavisionController extends Controller
              $invoices[]=$item;
          }
        }
- 			$result=$this->export($invoices,$template);
+ 			$result=$this->exportinvoices($invoices,$template);
  			return $result;
 
  		 }
 
 
-     public function export($list, $template){
+     public function exportinvoices($list, $template){
        $this->template=$template;
-       $filename='ClientesAsegurados.csv';
+       $filename='ListadoFacturasAsegurados.csv';
        $array=$list;
        //exclude tags column, last
        $key='_tags';
@@ -311,6 +311,102 @@ class NavisionController extends Controller
         fclose($df);
         return ob_get_clean();
     }
+
+
+    /**
+     * @Route("/api/navision/insuredcustomers", name="navisionInsuredCustomers")
+     */
+     public function navisionInsuredCustomers(Request $request){
+       $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+       if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
+       $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
+       $userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
+       $customersRepository=$this->getDoctrine()->getRepository(ERPCustomers::class);
+       $customers=$customersRepository->findInsuredCustomers($this->getUser()->getCompany());
+
+
+       $insuredcustomers=Array();
+       foreach($customers as $customer)
+       {
+             $item['id']=$customer["code"];
+             $item['Razón Social']=$customer["socialname"];
+             $item['CIF']=$customer["vat"];
+             $insuredcustomers[]=$item;
+       }
+
+       return $this->render('@Navision/insuredcustomerlist.html.twig', [
+         "interfaceName" => "Facturas Asegurados",
+         'optionSelected' => "navisionInsuredCustomers",
+         'menuOptions' =>  $menurepository->formatOptions($userdata),
+         'breadcrumb' =>  "navisionInsuredCustomers",
+         'userData' => $userdata,
+         'basiclist' => $insuredcustomers
+       ]);
+     }
+
+
+     /**
+ 		 * @Route("/api/navision/exportinsuredcustomerslist", name="exportinsuredcustomerslist")
+ 		 */
+ 		 public function exportInsuredCustomersList(RouterInterface $router,Request $request)
+ 		 {
+
+       $start=$request->query->get("start");
+       $end=$request->query->get("end");
+ 			 $template=dirname(__FILE__)."/../Forms/InsuredCustomers.json";
+ 			 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+
+       $customersRepository=$this->getDoctrine()->getRepository(ERPCustomers::class);
+       $customers=$customersRepository->findInsuredCustomers($this->getUser()->getCompany());
+
+       $insuredcustomers=Array();
+       foreach($customers as $customer)
+       {
+             $item['id']=$customer["code"];
+             $item['Razón Social']=$customer["socialname"];
+             $item['CIF']=$customer["vat"];
+             $insuredcustomers[]=$item;
+       }
+
+ 			$result=$this->exportcustomers($insuredcustomers,$template);
+ 			return $result;
+
+ 		 }
+
+
+
+     public function exportcustomers($list, $template){
+       $this->template=$template;
+       $filename='ListadoClientesAsegurados.csv';
+       $array=$list;
+       //exclude tags column, last
+       $key='_tags';
+       array_walk($array, function (&$v) use ($key) {
+        unset($v[$key]);
+       });
+     //	 $array=$this->applyFormats($array);
+
+       $fileContent=$this->createCSV($array);
+       $response = new Response($fileContent);
+       // Create the disposition of the file
+          $disposition = $response->headers->makeDisposition(
+              ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+              $filename
+        );
+       // Set the content disposition
+       $seconds_to_cache = 0;
+       $ts = gmdate("D, d M Y H:i:s", time() + $seconds_to_cache) . " GMT";
+       $response->headers->set("Expires", $ts);
+       $response->headers->set("Pragma", "cache");
+       $response->headers->set("Cache-Control", "max-age=0, no-cache, must-revalidate, proxy-revalidate");
+       $response->headers->set('Content-Type', 'application/force-download');
+       $response->headers->set('Content-Type', 'application/octet-stream');
+       $response->headers->set('Content-Type', 'application/download');
+       $response->headers->set('Content-Disposition', $disposition);
+       // Dispatch request
+       return $response;
+
+     }
 
 
 
