@@ -69,13 +69,16 @@
     <table class="table table-bordered">
       <thead>
         <tr>
-          <th>
-
-          </th>
-          {% for key in basiclist|first|keys %}
-          <th >{{ (key)|trans }}</th>
-          {% endfor %}
-          <th></th>
+        	 <th></th>
+					 <th>Suplemento</th>
+					 <th>Nif</th>
+					 <th>Código Cesce</th>
+					 <th>Fecha Factura</th>
+					 <th>Importe</th>
+					 <th>Forma de pago</th>
+					 <th>Numero de factura</th>
+					 <th>Vencimiento</th>
+					  <th></th>
         </tr>
       </thead>
       <tbody id="{{ listConstructor.id }}-body">

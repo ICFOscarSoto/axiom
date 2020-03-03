@@ -151,8 +151,8 @@ class NavisionController extends Controller
       $userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
       $start=new DateTime('first day of this month');
       $end=new DateTime('last day of this month');
-      //  $start=new DateTime('first day of january this year');
-    //  $end=new DateTime('first day of march this year');
+    //  $start=new DateTime('first day of january this year');
+  //    $end=new DateTime('first day of march this year');
 
       $customersRepository=$this->getDoctrine()->getRepository(ERPCustomers::class);
       $customers=$customersRepository->findInsuredCustomers($this->getUser()->getCompany());
@@ -176,7 +176,7 @@ class NavisionController extends Controller
         }
       }
 
-      return $this->render('@ERP/insuredcustomerlist.html.twig', [
+      return $this->render('@Navision/insuredcustomerlist.html.twig', [
         "interfaceName" => "Facturas Asegurados",
         'optionSelected' => "navisionInsuredCustomerInvoices",
         'menuOptions' =>  $menurepository->formatOptions($userdata),
