@@ -65,7 +65,10 @@ class NavisionGetProducts extends ContainerAwareCommand
       break;
       case 'all':
         $this->importProduct($input, $output);
+        $this->clearEAN13($input, $output);
         $this->importEAN13($input, $output);
+        $this->importPrices($input, $output);
+        $this->importStocks($input, $output);
       break;
       default:
         $output->writeln('Opcion no válida');
@@ -132,6 +135,12 @@ class NavisionGetProducts extends ContainerAwareCommand
       $this->doctrine->getManager()->persist($navisionSync);
       $this->doctrine->getManager()->flush();
     }
+
+    public function updateProduct(InputInterface $input, OutputInterface $output){
+
+    }
+
+
 
     public function importEAN13(InputInterface $input, OutputInterface $output){
       $navisionSyncRepository=$this->doctrine->getRepository(NavisionSync::class);
