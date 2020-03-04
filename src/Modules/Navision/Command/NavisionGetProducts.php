@@ -376,5 +376,64 @@ public function importStocks(InputInterface $input, OutputInterface $output) {
   }
 }
 
+/*
+  Si el producto no tiene descuento de compra, busco en Navision (Purchase Line Discount) los descuentos asociados que tiene.
+  Entonces los devuelvo y se los asigno al proveedor y la categoría del producto.
+ */
+
+public function importIncrements(InputInterface $input, OutputInterface $output) {
+
+  $navisionSyncRepository=$this->doctrine->getRepository(NavisionSync::class);
+  $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"increments"]);
+  if ($navisionSync==null) {
+    $navisionSync=new NavisionSync();
+    $navisionSync->setMaxtimestamp(0);
+  }
+  $datetime=new \DateTime();
+  $output->writeln('* Sincronizando incrementos....');
+  $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
+  $company=$repositoryCompanies->find(2);
+  $repositoryCategory=$this->doctrine->getRepository(ERPCategories::class);
+  $repositorySupliers=$this->doctrine->getRepository(ERPSuppliers::class);
+  $repositoryCustomeGroups=$this->doctrine->getRepository(ERPCustomerGroups::class);
+  $repositoryIncrements=$this->doctrine->getRepository(ERPIncrements::class);
+  $repository=$this->doctrine->getRepository(ERPProducts::class);
+  $products=$repository->findAll();
+
+  //Disable SQL logger
+  foreach($products as $product) {
+
+    $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
+    $increment=$repositoryIncrements->findOneBy(["supplier"=>$product->getSupplier(),"category"=>$product->getCategory()]);
+    if ($increment==null && $product->getCategory()!=null && $product->getSupplier()!=null){
+
+      $supplier=$repositorySupliers->findOneBy(["id"=>$product->getSupplier()->getId()]);
+      $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getIncrements.php?from='.$product->getCode().'&supplier='.$supplier->getCode());
+      $objects=json_decode($json, true);
+      $objects=$objects[0];
+      foreach ($objects["class"] as $increment){
+        if($increment["Discount"]!=0){
+            $category=$repositoryCategory->findOneBy(["id"=>$product->getCategory()->getId()]);
+            $customergroup=$repositoryCustomeGroups->findOneBy(["name"=>$increment["salescode"]]);
+            $obj=new ERPIncrements();
+            $obj->setSupplier($supplier);
+            $obj->setCategory($category);
+            $obj->setCustomergroup($customergroup);
+            $obj->setCompany($company);
+
+          }
+
+
+      }
+
+
+
+    }
+
+  }
+
+}
+
+
 }
 ?>
