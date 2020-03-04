@@ -55,6 +55,8 @@ class NavisionGetProducts extends ContainerAwareCommand
     switch($entity){
       case 'products': $this->importProduct($input, $output);
       break;
+      case 'clearProducts': $this->updateProduct($input, $output);
+      break;
       case 'ean13': $this->importEAN13($input, $output);
       break;
       case 'clearEAN13': $this->clearEAN13($input, $output);
@@ -140,13 +142,18 @@ class NavisionGetProducts extends ContainerAwareCommand
       $repository=$this->doctrine->getRepository(ERPProducts::class);
       $products=$repository->findAll();
       foreach ($products as $product){
-        $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-clearProduct.php?from='.$product->getCode());
+        $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-clearProducts.php?from='.$product->getCode());
         $objects=json_decode($json, true);
         $objects=$objects[0];
-        if($objects["stock"]==0 and $object["movimiento"]<"2017-01-01 00:00:00.000000") {
+        if($objects["class"][0]["movimiento"]!=null){
+        if((int)$objects["class"][0]["stock"]<=0 and $objects["class"][0]["movimiento"]["date"]<"2017-01-01 00:00:00.000000") {
         $product->setDeleted(0);
         $product->setActive(0);
+        $this->doctrine->getManager()->merge($product);
+        $this->doctrine->getManager()->flush();
+        $this->doctrine->getManager()->clear();
       }
+    }
       }
     }
 
