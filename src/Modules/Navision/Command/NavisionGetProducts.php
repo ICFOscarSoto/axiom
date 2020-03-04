@@ -137,7 +137,17 @@ class NavisionGetProducts extends ContainerAwareCommand
     }
 
     public function updateProduct(InputInterface $input, OutputInterface $output){
-
+      $repository=$this->doctrine->getRepository(ERPProducts::class);
+      $products=$repository->findAll();
+      foreach ($products as $product){
+        $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-clearProduct.php?from='.$product->getCode());
+        $objects=json_decode($json, true);
+        $objects=$objects[0];
+        if($objects["stock"]==0 and $object["movimiento"]<"2017-01-01 00:00:00.000000") {
+        $product->setDeleted(0);
+        $product->setActive(0);
+      }
+      }
     }
 
 
