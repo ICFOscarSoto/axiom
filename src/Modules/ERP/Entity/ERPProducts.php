@@ -773,7 +773,6 @@ class ERPProducts
       $repository=$doctrine->getRepository(ERPIncrements::class);
       $category=$this->category;
       $maxincrement=$repository->getMaxIncrement($this->supplier,$category,$customergroup);
-
       while ($category->getParentid()!=null && $maxincrement==null){
           $category=$category->getParentid();
           $maxincrement=$repository->getMaxIncrement($this->supplier,$category,$customergroup);

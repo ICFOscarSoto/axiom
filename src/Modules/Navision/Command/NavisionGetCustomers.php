@@ -12,6 +12,7 @@ use App\Modules\ERP\Entity\ERPPaymentMethods;
 use App\Modules\ERP\Entity\ERPPaymentTerms;
 use App\Modules\ERP\Entity\ERPCustomerActivities;
 use App\Modules\ERP\Entity\ERPCustomerGroups;
+use App\Modules\ERP\Entity\ERPCustomerCommentLines;
 use App\Modules\ERP\Entity\ERPBankAccounts;
 use App\Modules\Globale\Entity\GlobaleCompanies;
 use App\Modules\Globale\Entity\GlobaleStates;
@@ -57,6 +58,8 @@ class NavisionGetCustomers extends ContainerAwareCommand
       case 'all':
         $this->importCustomer($input, $output);
       break;
+      case 'comments':
+        $this->importCustomerComment($input, $output);
       default:
         $output->writeln('Opcion no válida');
       break;
@@ -313,6 +316,63 @@ class NavisionGetCustomers extends ContainerAwareCommand
      if ($navisionSync==null) {
        $navisionSync=new NavisionSync();
        $navisionSync->setEntity("customers");
+     }
+     $navisionSync->setLastsync($datetime);
+     $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
+     $this->doctrine->getManager()->persist($navisionSync);
+     $this->doctrine->getManager()->flush();
+   }
+
+
+
+   public function importCustomerComment(InputInterface $input, OutputInterface $output){
+     $navisionSyncRepository=$this->doctrine->getRepository(NavisionSync::class);
+     $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"customercomments"]);
+     if ($navisionSync==null) {
+       $navisionSync=new NavisionSync();
+       $navisionSync->setMaxtimestamp(0);
+     }
+     $datetime=new \DateTime();
+     $output->writeln('* Sincronizando comentarios de clientes....');
+     $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getComments.php?type=1&from='.$navisionSync->getMaxtimestamp());
+     $objects=json_decode($json, true);
+     $objects=$objects[0];
+     $repositoryCustomers=$this->doctrine->getRepository(ERPCustomers::class);
+     $repository=$this->doctrine->getRepository(ERPCustomerCommentLines::class);
+
+     //Disable SQL logger
+     $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
+
+     foreach ($objects["class"] as $key=>$object){
+       $customer=$repositoryCustomers->findOneBy(["code"=>$object["entity"]]);
+       if($object["comment"]!="" AND $customer!=NULL)
+       {
+         $output->writeln('  - '.$object["customer"]);
+         $obj=$repository->findOneBy(["comment"=>$object["comment"]]);
+         if ($obj==null) {
+           $obj=new ERPCustomerCommentLines();
+           //$company=$repositoryCompanies->find(2);
+           //$obj->setCompany($company);
+           $obj->setComment($object["comment"]);
+           $datetime=new \DateTime(date('Y-m-d 00:00:00',strtotime($object["date"]["date"])));
+          // dump(date('Y-m-d 00:00:00',strtotime($object["date"]["date"])));
+           $obj->setDateadd($datetime);
+
+           $obj->setCustomer($customer);
+           $obj->setDeleted(0);
+           $obj->setActive(1);
+           $obj->setDateupd($datetime);
+           $this->doctrine->getManager()->persist($obj);
+           $this->doctrine->getManager()->flush();
+           $this->doctrine->getManager()->clear();
+         }
+     }
+
+     }
+     $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"customercomments"]);
+     if ($navisionSync==null) {
+       $navisionSync=new NavisionSync();
+       $navisionSync->setEntity("customercomments");
      }
      $navisionSync->setLastsync($datetime);
      $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);

@@ -255,32 +255,37 @@ class ERPIncrements
       $products=$repositorySuppliers->productsBySupplier($this->supplier->getId());
       foreach($products as $product){
         $productEntity=$repositoryProduct->findOneBy(["id"=>$product]);
-        $productEntity->calculatePVP($doctrine);
-        $increment=$this->getIncrementByGroup($doctrine,$this->supplier,$productEntity->getCategory(),$this->customergroup);
-        if($increment!=NULL){
-          if($repositoryProductPrices->existPrice($productEntity,$this->customergroup,$this->supplier)){
-                $productpricesEntity=$repositoryProductPrices->findOneBy(["product"=>$productEntity,"customergroup"=>$this->customergroup,"supplier"=>$this->supplier]);
-                $productpricesEntity->setIncrement($increment);
-                $productpricesEntity->setPrice(round($productEntity->getShoppingPrice()*(1+($increment/100)),2));
+        //controlamos que un producto no pueda recibir incrementos si no tiee una categoría asocaida
+        if($productEntity->getCategory()!=null)
+        {
+            $productEntity->calculatePVP($doctrine);
+            $increment=$this->getIncrementByGroup($doctrine,$this->supplier,$productEntity->getCategory(),$this->customergroup);
+            if($increment!=NULL){
+              if($repositoryProductPrices->existPrice($productEntity,$this->customergroup,$this->supplier)){
+                    $productpricesEntity=$repositoryProductPrices->findOneBy(["product"=>$productEntity,"customergroup"=>$this->customergroup,"supplier"=>$this->supplier]);
+                    $productpricesEntity->setIncrement($increment);
+                    $productpricesEntity->setPrice(round($productEntity->getShoppingPrice()*(1+($increment/100)),2));
+                }
+              else {
+                    $productpricesEntity= new ERPProductPrices();
+                    $productpricesEntity->setProduct($productEntity);
+                    $productpricesEntity->setCustomergroup($this->customergroup);
+                    $productpricesEntity->setSupplier($this->supplier);
+                    $productpricesEntity->setIncrement($increment*1);
+                    $productpricesEntity->setPrice(round($productEntity->getShoppingPrice()*(1+($increment/100)),2));
+                    $productpricesEntity->setActive(1);
+                    $productpricesEntity->setDeleted(0);
+                    $productpricesEntity->setDateupd(new \DateTime());
+                    $productpricesEntity->setDateadd(new \DateTime());
+
+              }
+                  $em->persist($productpricesEntity);
             }
-          else {
-                $productpricesEntity= new ERPProductPrices();
-                $productpricesEntity->setProduct($productEntity);
-                $productpricesEntity->setCustomergroup($this->customergroup);
-                $productpricesEntity->setSupplier($this->supplier);
-                $productpricesEntity->setIncrement($increment*1);
-                $productpricesEntity->setPrice(round($productEntity->getShoppingPrice()*(1+($increment/100)),2));
-                $productpricesEntity->setActive(1);
-                $productpricesEntity->setDeleted(0);
-                $productpricesEntity->setDateupd(new \DateTime());
-                $productpricesEntity->setDateadd(new \DateTime());
+
+            $em->persist($productEntity);
+            $em->flush();
 
           }
-              $em->persist($productpricesEntity);
-        }
-
-        $em->persist($productEntity);
-        $em->flush();
       }
 
     }

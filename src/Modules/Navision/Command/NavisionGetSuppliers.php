@@ -8,6 +8,8 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use App\Modules\ERP\Entity\ERPCustomers;
 use App\Modules\ERP\Entity\ERPSuppliers;
+use App\Modules\ERP\Entity\ERPSupplierActivities;
+use App\Modules\ERP\Entity\ERPSupplierCommentLines;
 use App\Modules\ERP\Entity\ERPPaymentMethods;
 use App\Modules\ERP\Entity\ERPPaymentTerms;
 use App\Modules\Globale\Entity\GlobaleCompanies;
@@ -54,6 +56,8 @@ class NavisionGetSuppliers extends ContainerAwareCommand
       case 'all':
         $this->importSupplier($input, $output);
       break;
+      case 'comments':
+        $this->importSupplierComment($input, $output);
       default:
         $output->writeln('Opcion no válida');
       break;
@@ -78,9 +82,10 @@ class NavisionGetSuppliers extends ContainerAwareCommand
       $repositoryCurrencies=$this->doctrine->getRepository(GlobaleCurrencies::class);
       $repositoryPaymentMethod=$this->doctrine->getRepository(ERPPaymentMethods::class);
       $repositoryPaymentTerms=$this->doctrine->getRepository(ERPPaymentTerms::class);
+      $repositorySupplierActivities=$this->doctrine->getRepository(ERPSupplierActivities::class);
       $repositoryStates=$this->doctrine->getRepository(GlobaleStates::class);
       $repository=$this->doctrine->getRepository(ERPSuppliers::class);
-
+      $activity=NULL;
       //Disable SQL logger
       $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
 
@@ -237,7 +242,8 @@ class NavisionGetSuppliers extends ContainerAwareCommand
            $paymentTerms=$repositoryPaymentTerms->findOneBy(["id"=>"113"]);
          }
 
-         if($object["socialname"][0]=='*') $obj->setActive(0); else $obj->setActive(1);
+
+
          $obj->setVat($object["vat"]);
          $obj->setName(ltrim(ltrim($object["name"]),'*'));
          $obj->setSocialname(ltrim(ltrim($object["socialname"]),'*'));
@@ -252,14 +258,80 @@ class NavisionGetSuppliers extends ContainerAwareCommand
          $obj->setCurrency($currency);
          $obj->setPaymentMethod($paymentMethod);
          if($paymentTerms!=NULL) $obj->setPaymentTerms($paymentTerms);
+         if($object["subactivitycode"]!=NULL) $activity=$repositorySupplierActivities->findOneBy(["code"=>$object["subactivitycode"],"parentid"=>$object["activitycode"]]);
+         else if($object["activitycode"]!=NULL) $activity=$repositorySupplierActivities->findOneBy(["code"=>$object["activitycode"],"parentid"=>NULL]);
+         if($object["socialname"][0]=='*') $obj->setActive(0); else $obj->setActive(1);
+        if($activity!=NULL) $obj->setWorkactivity($activity);
+
+      //   dump("country: ".$country);
+  //        dump("state: ".$state);
+        //  dump("currency: ".$currency);
+
+        //if($paymentMethod!=NULL)  dump("paymentmethod:".$paymentMethod->getName());
+      //  if($paymentTerms!=NULL)  dump("paymentterms:".$paymentTerms->getName());
+
          $this->doctrine->getManager()->persist($obj);
-         $this->doctrine->getManager()->flush();
-         $this->doctrine->getManager()->clear();
+
       }
+      $this->doctrine->getManager()->flush();
+      $this->doctrine->getManager()->clear();
       $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"suppliers"]);
       if ($navisionSync==null) {
         $navisionSync=new NavisionSync();
         $navisionSync->setEntity("suppliers");
+      }
+      $navisionSync->setLastsync($datetime);
+      $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
+      $this->doctrine->getManager()->persist($navisionSync);
+      $this->doctrine->getManager()->flush();
+    }
+
+    public function importSupplierComment(InputInterface $input, OutputInterface $output){
+      $navisionSyncRepository=$this->doctrine->getRepository(NavisionSync::class);
+      $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"suppliercomments"]);
+      if ($navisionSync==null) {
+        $navisionSync=new NavisionSync();
+        $navisionSync->setMaxtimestamp(0);
+      }
+      $datetime=new \DateTime();
+      $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getComments.php?type=2&from='.$navisionSync->getMaxtimestamp());
+      $objects=json_decode($json, true);
+      $objects=$objects[0];
+      $repositorySuppliers=$this->doctrine->getRepository(ERPSuppliers::class);
+      $repository=$this->doctrine->getRepository(ERPSupplierCommentLines::class);
+      //Disable SQL logger
+      $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
+
+      foreach ($objects["class"] as $key=>$object){
+        $supplier=$repositorySuppliers->findOneBy(["code"=>$object["entity"]]);
+        if($object["comment"]!="" AND $supplier!=NULL)
+        {
+          $output->writeln($supplier->getName().'  - '.$object["entity"]);
+          $obj=$repository->findOneBy(["comment"=>$object["comment"]]);
+          if ($obj==null) {
+            $obj=new ERPSupplierCommentLines();
+            //$company=$repositoryCompanies->find(2);
+            //$obj->setCompany($company);
+            $obj->setComment($object["comment"]);
+            $datetime=new \DateTime(date('Y-m-d 00:00:00',strtotime($object["date"]["date"])));
+           // dump(date('Y-m-d 00:00:00',strtotime($object["date"]["date"])));
+            $obj->setDateadd($datetime);
+
+            $obj->setSupplier($supplier);
+            $obj->setDeleted(0);
+            $obj->setActive(1);
+            $obj->setDateupd($datetime);
+            $this->doctrine->getManager()->persist($obj);
+            $this->doctrine->getManager()->flush();
+            $this->doctrine->getManager()->clear();
+          }
+      }
+
+      }
+      $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"suppliercomments"]);
+      if ($navisionSync==null) {
+        $navisionSync=new NavisionSync();
+        $navisionSync->setEntity("suppliercomments");
       }
       $navisionSync->setLastsync($datetime);
       $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
