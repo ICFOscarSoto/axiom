@@ -8,12 +8,14 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use App\Modules\ERP\Entity\ERPCategories;
 use App\Modules\ERP\Entity\ERPCustomers;
+use App\Modules\ERP\Entity\ERPCustomerGroups;
 use App\Modules\ERP\Entity\ERPSuppliers;
 use App\Modules\ERP\Entity\ERPProducts;
 use App\Modules\ERP\Entity\ERPEAN13;
 use App\Modules\ERP\Entity\ERPShoppingDiscounts;
 use App\Modules\ERP\Entity\ERPStocks;
 use App\Modules\ERP\Entity\ERPStoreLocations;
+use App\Modules\ERP\Entity\ERPIncrements;
 use App\Modules\Globale\Entity\GlobaleCompanies;
 use App\Modules\Globale\Entity\GlobaleStates;
 use App\Modules\Globale\Entity\GlobaleCountries;
@@ -65,12 +67,15 @@ class NavisionGetProducts extends ContainerAwareCommand
       break;
       case 'stocks': $this->importStocks($input, $output);
       break;
+      case 'increments': $this->importIncrements($input, $output);
+      break;
       case 'all':
         $this->importProduct($input, $output);
         $this->clearEAN13($input, $output);
         $this->importEAN13($input, $output);
         $this->importPrices($input, $output);
         $this->importStocks($input, $output);
+        $this->importIncrements($input, $output);
       break;
       default:
         $output->writeln('Opcion no válida');
@@ -146,7 +151,7 @@ class NavisionGetProducts extends ContainerAwareCommand
         $objects=json_decode($json, true);
         $objects=$objects[0];
         if($objects["class"][0]["movimiento"]!=null){
-        if((int)$objects["class"][0]["stock"]<=0 and $objects["class"][0]["movimiento"]["date"]<"2017-01-01 00:00:00.000000") {
+        if($objects["class"][0]["movimiento"]["date"]<"2017-01-01 00:00:00.000000") {
         $product->setDeleted(0);
         $product->setActive(0);
         $this->doctrine->getManager()->merge($product);
@@ -408,8 +413,8 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
   $products=$repository->findAll();
 
   //Disable SQL logger
-  foreach($products as $product) {
-
+  /*foreach($products as $product) {*/
+    $product=$repository->findOneBy(["code"=>'208833']);
     $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
     $increment=$repositoryIncrements->findOneBy(["supplier"=>$product->getSupplier(),"category"=>$product->getCategory()]);
     if ($increment==null && $product->getCategory()!=null && $product->getSupplier()!=null){
@@ -418,8 +423,10 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
       $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getIncrements.php?from='.$product->getCode().'&supplier='.$supplier->getCode());
       $objects=json_decode($json, true);
       $objects=$objects[0];
+
       foreach ($objects["class"] as $increment){
         if($increment["Discount"]!=0){
+
             $category=$repositoryCategory->findOneBy(["id"=>$product->getCategory()->getId()]);
             $customergroup=$repositoryCustomeGroups->findOneBy(["name"=>$increment["salescode"]]);
             $obj=new ERPIncrements();
@@ -427,6 +434,16 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
             $obj->setCategory($category);
             $obj->setCustomergroup($customergroup);
             $obj->setCompany($company);
+            $pvp=$increment["pvp"];
+            $dto=$increment["Discount"];
+            $neto=$increment["neto"];
+            $precio_con_dto=$pvp-$pvp*($dto/100);
+            $inc=round((($precio_con_dto/$neto)-1)*100,2);
+            $obj->setIncrement($inc);
+            $obj->setDateadd(new \Datetime());
+            $obj->setDateupd(new \Datetime());
+            $obj->setActive(1);
+            $obj->setDeleted(0);
 
           }
 
@@ -437,7 +454,7 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
 
     }
 
-  }
+//  }
 
 }
 
