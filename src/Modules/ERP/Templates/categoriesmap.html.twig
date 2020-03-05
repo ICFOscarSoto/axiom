@@ -80,7 +80,7 @@ function showCategoriesMap(){
         $("#categories").append(
                       '<li class="dd-item" data-id="'+valor.id+'">'+
                         '<div class="dd-content">'+
-                          '&nbsp;<input id="cb-categories-'+valor.id+'" type="checkbox" class="icheck">&nbsp;&nbsp;'+valor.name+
+                          '&nbsp;<input id="cb-categories-'+valor.id+'" attr-id="'+valor.id+'" type="checkbox" class="icheck">&nbsp;&nbsp;'+valor.name+
                         '</div>'+
                           ((valor.childrens.length>0)?'<ol class="dd-list">':'')+
                           ((valor.childrens.length>0)?parseCategory(valor.childrens):'')+

@@ -36,7 +36,7 @@
 				{ "name": "shoppingdiscounts","cols": 2, "readonly":true, "depends":{"from": "netprice","vals":"[0]"}},
 				{ "name": "PVPR","cols": 2, "depends":{"from": "netprice","vals":"[0]"}, "unity": "€", "class": "number-type"},
 				{ "name": "PVP","cols": 2, "readonly":true, "unity": "€", "class": "number-type"},
-				{ "name": "shoppingdiscounts","cols": 2, "readonly":true, "depends":{"from": "netprice","vals":"[0]"}, "unity": "€", "class": "number-type"},
+				{ "name": "shoppingdiscounts","cols": 2, "readonly":true, "depends":{"from": "netprice","vals":"[0]"}, "unity": "%", "class": "number-type"},
 				{ "name": "netprice","cols": 2},
 				{ "name": "shoppingPrice","cols": 2, "depends":{"from": "netprice","vals":"[1]"}}
 			]
