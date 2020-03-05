@@ -121,8 +121,14 @@ class NavisionGetProducts extends ContainerAwareCommand
           $category=$repositoryCategory->findOneBy(["name"=>"Sin Categoria"]);
           $obj->setCategory($category);
         }
-          $supplier=$repositorySupliers->findOneBy(["code"=>$object["Supplier"]]);
-         if($object["Blocked"]==0) $obj->setActive(1); else $obj->setActive(0);
+         $supplier=$repositorySupliers->findOneBy(["code"=>$object["Supplier"]]);
+         $json2=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-clearProducts.php?from='.$object["code"]);
+         $movs=json_decode($json2, true);
+         $movs=$movs[0];
+         if($movs["class"][0]["movimiento"]["date"]>"2017-01-01 00:00:00.000000" and $object["Blocked"]==0) $obj->setActive(1); else $obj->setActive(0);
+         $repositoryTaxes=$this->doctrine->getRepository(GlobaleCompanies::class);
+         $taxes=$repositoryTaxes->find(1);
+         $obj->setTaxes($taxes);
          $obj->setCode($object["code"]);
          $obj->setName($object["Description"]);
          $obj->setWeight($object["Weight"]);
