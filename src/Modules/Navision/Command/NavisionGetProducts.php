@@ -11,6 +11,7 @@ use App\Modules\ERP\Entity\ERPCustomers;
 use App\Modules\ERP\Entity\ERPCustomerGroups;
 use App\Modules\ERP\Entity\ERPSuppliers;
 use App\Modules\ERP\Entity\ERPProducts;
+use App\Modules\ERP\Entity\ERPProductPrices;
 use App\Modules\ERP\Entity\ERPEAN13;
 use App\Modules\ERP\Entity\ERPShoppingDiscounts;
 use App\Modules\ERP\Entity\ERPStocks;
@@ -420,25 +421,29 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
   $repositoryCustomeGroups=$this->doctrine->getRepository(ERPCustomerGroups::class);
   $repositoryIncrements=$this->doctrine->getRepository(ERPIncrements::class);
   $repository=$this->doctrine->getRepository(ERPProducts::class);
-  $products=$repository->findAll();
+  $repositoryproductprices=$this->doctrine->getRepository(ERPProductPrices::class);
+
+//  $products=$repository->findAll();
 
   //Disable SQL logger
   /*foreach($products as $product) {*/
     $product=$repository->findOneBy(["code"=>'208833']);
     $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
-    $increment=$repositoryIncrements->findOneBy(["supplier"=>$product->getSupplier(),"category"=>$product->getCategory()]);
+    $increment=$repositoryIncrements->findOneBy(["supplier"=>$product->getSupplier(),"category"=>$product->getCategory(),"active"=>1,"deleted"=>0]);
+
     if ($increment==null && $product->getCategory()!=null && $product->getSupplier()!=null){
 
       $supplier=$repositorySupliers->findOneBy(["id"=>$product->getSupplier()->getId()]);
-      $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getIncrements.php?from='.$product->getCode().'&supplier='.$supplier->getCode());
+      $output->writeln($supplier->getCode());
+      $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getIncrements.php?product='.$product->getCode());
       $objects=json_decode($json, true);
       $objects=$objects[0];
 
       foreach ($objects["class"] as $increment){
-        if($increment["Discount"]!=0){
+        $customergroup=$repositoryCustomeGroups->findOneBy(["name"=>$increment["salescode"]]);
+        if($increment["Discount"]!=0 && $customergroup!=NULL){
 
             $category=$repositoryCategory->findOneBy(["id"=>$product->getCategory()->getId()]);
-            $customergroup=$repositoryCustomeGroups->findOneBy(["name"=>$increment["salescode"]]);
             $obj=new ERPIncrements();
             $obj->setSupplier($supplier);
             $obj->setCategory($category);
@@ -448,17 +453,22 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
             $dto=$increment["Discount"];
             $neto=$increment["neto"];
             $precio_con_dto=$pvp-$pvp*($dto/100);
-            $inc=round((($precio_con_dto/$neto)-1)*100,2);
+            $inc=(($precio_con_dto/$neto)-1)*100;
+
             $obj->setIncrement($inc);
             $obj->setDateadd(new \Datetime());
             $obj->setDateupd(new \Datetime());
             $obj->setActive(1);
             $obj->setDeleted(0);
+            $this->doctrine->getManager()->merge($obj);
+            $this->doctrine->getManager()->flush();
+            $obj->calculateIncrements($this->doctrine);
 
           }
 
 
       }
+        $this->doctrine->getManager()->clear();
 
 
 
