@@ -52,7 +52,7 @@ class NavisionController extends Controller
      $userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
      $start=new DateTime('first day of this month');
      $end=new DateTime('last day of this month');
-     $invoices=file_get_contents($this->url.'navisionExport/do-NAVISION-invoice-list.php?start='.$start->format("Y-m-d").'&end='.$end->format("Y-m-d"));
+     $invoices=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-invoice-list.php?start='.$start->format("Y-m-d").'&end='.$end->format("Y-m-d"));
 
      return $this->render('@Navision/invoices.html.twig', [
        "interfaceName" => "Facturas",
@@ -79,7 +79,7 @@ class NavisionController extends Controller
       $end=$request->request->get("end");
       $start=date_create_from_format('d/m/Y',$start);
       $end=date_create_from_format('d/m/Y',$end);
-      $url=$this->url.'navisionExport/do-NAVISION-invoice-list.php?numfact='.$request->request->get("numfact").'&cif='.$request->request->get("cif").'&customer='.$request->request->get("customer").'&start='.$start->format("Y-m-d").'&end='.$end->format("Y-m-d");
+      $url=$this->url.'navisionExport/axiom/do-NAVISION-invoice-list.php?numfact='.$request->request->get("numfact").'&cif='.$request->request->get("cif").'&customer='.$request->request->get("customer").'&start='.$start->format("Y-m-d").'&end='.$end->format("Y-m-d");
       $invoices=file_get_contents($url);
       return new Response($invoices);
     }
@@ -92,7 +92,7 @@ class NavisionController extends Controller
      $ids=$request->query->get('ids');
      $ids=explode(",",$ids);
 
-     $invoice=file_get_contents($this->url.'navisionExport/do-NAVISION-invoice.php?invoices='.json_encode($ids));
+     $invoice=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-invoice.php?invoices='.json_encode($ids));
      $invoices=json_decode($invoice, true);
      //dump($this->url.'navisionExport/do-NAVISION-invoice.php?invoices=['.$id.']');
      //$ids=$id;
