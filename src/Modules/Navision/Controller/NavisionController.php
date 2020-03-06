@@ -161,8 +161,10 @@ class NavisionController extends Controller
       $invoices=Array();
       foreach($customers as $customer)
       {
-          $invoices_customer=file_get_contents($this->url.'navisionExport/do-NAVISION-invoice-list-by-customer.php?code='.$customer["code"].'&start='.$start->format("Y-m-d").'&end='.$end->format("Y-m-d"));
+          $invoices_customer=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-invoice-list-by-customer.php?code='.$customer["code"].'&start='.$start->format("Y-m-d").'&end='.$end->format("Y-m-d"));
+          dump($invoices_customer);
           $invoices_list=json_decode($invoices_customer,true);
+
           foreach($invoices_list as $invoice){
             $item['Suplemento']=$customer["supplement"];
             $item['Nif']=$customer["vat"];
@@ -206,7 +208,7 @@ class NavisionController extends Controller
        foreach($customers as $customer)
        {
 
-           $invoices_customer=file_get_contents($this->url.'navisionExport/do-NAVISION-invoice-list-by-customer.php?code='.$customer["code"].'&start='.$start->format("Y-m-d").'&end='.$end->format("Y-m-d"));
+           $invoices_customer=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-invoice-list-by-customer.php?code='.$customer["code"].'&start='.$start->format("Y-m-d").'&end='.$end->format("Y-m-d"));
            $invoices_list=json_decode($invoices_customer,true);
            foreach($invoices_list as $invoice){
              $item['supplement']=$customer["supplement"];
