@@ -19,6 +19,7 @@ use App\Modules\ERP\Entity\ERPStoreLocations;
 use App\Modules\ERP\Entity\ERPIncrements;
 use App\Modules\Globale\Entity\GlobaleCompanies;
 use App\Modules\Globale\Entity\GlobaleStates;
+use App\Modules\Globale\Entity\GlobaleTaxes;
 use App\Modules\Globale\Entity\GlobaleCountries;
 use App\Modules\Globale\Entity\GlobaleCurrencies;
 use App\Modules\Globale\Entity\GlobaleDiskUsages;
@@ -57,8 +58,6 @@ class NavisionGetProducts extends ContainerAwareCommand
     $output->writeln('==================================');
     switch($entity){
       case 'products': $this->importProduct($input, $output);
-      break;
-      case 'clearProducts': $this->updateProduct($input, $output);
       break;
       case 'ean13': $this->importEAN13($input, $output);
       break;
@@ -123,6 +122,7 @@ class NavisionGetProducts extends ContainerAwareCommand
           $obj->setCategory($category);
         }
          $supplier=$repositorySupliers->findOneBy(["code"=>$object["Supplier"]]);
+         // Comprobamos si el producto no tiene movimientos desde 2017, en caso de que no tenga lo desactivamos
          $json2=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-clearProducts.php?from='.$object["code"]);
          $movs=json_decode($json2, true);
          $movs=$movs[0];
@@ -131,17 +131,35 @@ class NavisionGetProducts extends ContainerAwareCommand
             $obj->setActive(1);
             else $obj->setActive(0);
          else $obj->setActive(0);
-         $repositoryTaxes=$this->doctrine->getRepository(GlobaleCompanies::class);
+         $repositoryTaxes=$this->doctrine->getRepository(GlobaleTaxes::class);
          $taxes=$repositoryTaxes->find(1);
          $obj->setTaxes($taxes);
          $obj->setCode($object["code"]);
          $obj->setName($object["Description"]);
          $obj->setWeight($object["Weight"]);
-         $obj->setPVPR($object["ShoppingPrice"]);
+         // Comprobamos si el producto tiene descuentos, si no los tiene se le pone como precio neto.
+         $json3=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getPrices.php?from='.$object["code"].'$supplier='.$object["Supplier"]);
+         $prices=json_decode($json3, true);
+         $prices=$prices[0];
+         $obj->setnetprice(1);
+         foreach ($prices["class"] as $price){
+           if($price["Discount"]!=0){
+             if ($prices["Ending"]["date"]=="1753-01-01 00:00:00.000000") {
+               $obj->setnetprice(0);
+             }
+           }
+         }
+         if (!$obj->getnetprice()){
+           $obj->setPVPR($object["ShoppingPrice"]);
+           $obj->setShoppingPrice(0);
+         } else {
+           $obj->setPVPR(0);
+           $obj->setShoppingPrice($object["ShoppingPrice"]);
+         }
          $obj->setSupplier($supplier);
-         //$obj->preProccess($this, $this->doctrine, null, null, $oldobj);
          $this->doctrine->getManager()->merge($obj);
          $this->doctrine->getManager()->flush();
+         $obj->priceCalculated($this->doctrine);
          $this->doctrine->getManager()->clear();
       }$navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"products"]);
       if ($navisionSync==null) {
@@ -149,31 +167,10 @@ class NavisionGetProducts extends ContainerAwareCommand
         $navisionSync->setEntity("products");
       }
       $navisionSync->setLastsync($datetime);
-      //$navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
+      $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
       $this->doctrine->getManager()->persist($navisionSync);
       $this->doctrine->getManager()->flush();
     }
-
-    public function updateProduct(InputInterface $input, OutputInterface $output){
-      $repository=$this->doctrine->getRepository(ERPProducts::class);
-      $products=$repository->findAll();
-      foreach ($products as $product){
-        $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-clearProducts.php?from='.$product->getCode());
-        $objects=json_decode($json, true);
-        $objects=$objects[0];
-        if($objects["class"][0]["movimiento"]!=null){
-        if($objects["class"][0]["movimiento"]["date"]<"2017-01-01 00:00:00.000000") {
-        $product->setDeleted(0);
-        $product->setActive(0);
-        $this->doctrine->getManager()->merge($product);
-        $this->doctrine->getManager()->flush();
-        $this->doctrine->getManager()->clear();
-      }
-    }
-      }
-    }
-
-
 
     public function importEAN13(InputInterface $input, OutputInterface $output){
       $navisionSyncRepository=$this->doctrine->getRepository(NavisionSync::class);
@@ -238,7 +235,7 @@ class NavisionGetProducts extends ContainerAwareCommand
         $navisionSync->setEntity("EAN13");
       }
       $navisionSync->setLastsync($datetime);
-      //$navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
+      $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
       $this->doctrine->getManager()->persist($navisionSync);
       $this->doctrine->getManager()->flush();
     }
@@ -332,6 +329,7 @@ public function importPrices(InputInterface $input, OutputInterface $output) {
           $obj->setDeleted(0);
           $this->doctrine->getManager()->merge($obj);
           $this->doctrine->getManager()->flush();
+          $obj->setShoppingPrices($this->doctrine);
           $this->doctrine->getManager()->clear();
         }
       }
@@ -432,17 +430,14 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
     $increment=$repositoryIncrements->findOneBy(["supplier"=>$product->getSupplier(),"category"=>$product->getCategory(),"active"=>1,"deleted"=>0]);
 
     if ($increment==null && $product->getCategory()!=null && $product->getSupplier()!=null){
-
       $supplier=$repositorySupliers->findOneBy(["id"=>$product->getSupplier()->getId()]);
       $output->writeln($supplier->getCode());
       $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getIncrements.php?product='.$product->getCode());
       $objects=json_decode($json, true);
       $objects=$objects[0];
-
       foreach ($objects["class"] as $increment){
         $customergroup=$repositoryCustomeGroups->findOneBy(["name"=>$increment["salescode"]]);
         if($increment["Discount"]!=0 && $customergroup!=NULL){
-
             $category=$repositoryCategory->findOneBy(["id"=>$product->getCategory()->getId()]);
             $obj=new ERPIncrements();
             $obj->setSupplier($supplier);
@@ -454,7 +449,6 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
             $neto=$increment["neto"];
             $precio_con_dto=$pvp-$pvp*($dto/100);
             $inc=(($precio_con_dto/$neto)-1)*100;
-
             $obj->setIncrement($inc);
             $obj->setDateadd(new \Datetime());
             $obj->setDateupd(new \Datetime());
@@ -463,19 +457,10 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
             $this->doctrine->getManager()->merge($obj);
             $this->doctrine->getManager()->flush();
             $obj->calculateIncrements($this->doctrine);
-
           }
-
-
       }
         $this->doctrine->getManager()->clear();
-
-
-
     }
-
-//  }
-
 }
 
 
