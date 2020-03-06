@@ -19,6 +19,7 @@ use App\Modules\ERP\Entity\ERPStoreLocations;
 use App\Modules\ERP\Entity\ERPIncrements;
 use App\Modules\Globale\Entity\GlobaleCompanies;
 use App\Modules\Globale\Entity\GlobaleStates;
+use App\Modules\Globale\Entity\GlobaleTaxes;
 use App\Modules\Globale\Entity\GlobaleCountries;
 use App\Modules\Globale\Entity\GlobaleCurrencies;
 use App\Modules\Globale\Entity\GlobaleDiskUsages;
@@ -121,6 +122,7 @@ class NavisionGetProducts extends ContainerAwareCommand
           $obj->setCategory($category);
         }
          $supplier=$repositorySupliers->findOneBy(["code"=>$object["Supplier"]]);
+         // Comprobamos si el producto no tiene movimientos desde 2017, en caso de que no tenga lo desactivamos
          $json2=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-clearProducts.php?from='.$object["code"]);
          $movs=json_decode($json2, true);
          $movs=$movs[0];
@@ -129,17 +131,35 @@ class NavisionGetProducts extends ContainerAwareCommand
             $obj->setActive(1);
             else $obj->setActive(0);
          else $obj->setActive(0);
-         $repositoryTaxes=$this->doctrine->getRepository(GlobaleCompanies::class);
+         $repositoryTaxes=$this->doctrine->getRepository(GlobaleTaxes::class);
          $taxes=$repositoryTaxes->find(1);
          $obj->setTaxes($taxes);
          $obj->setCode($object["code"]);
          $obj->setName($object["Description"]);
          $obj->setWeight($object["Weight"]);
-         $obj->setPVPR($object["ShoppingPrice"]);
+         // Comprobamos si el producto tiene descuentos, si no los tiene se le pone como precio neto.
+         $json3=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getPrices.php?from='.$object["code"].'$supplier='.$object["Supplier"]);
+         $prices=json_decode($json3, true);
+         $prices=$prices[0];
+         $obj->setnetprice(1);
+         foreach ($prices["class"] as $price){
+           if($price["Discount"]!=0){
+             if ($prices["Ending"]["date"]=="1753-01-01 00:00:00.000000") {
+               $obj->setnetprice(0);
+             }
+           }
+         }
+         if (!$obj->getnetprice()){
+           $obj->setPVPR($object["ShoppingPrice"]);
+           $obj->setShoppingPrice(0);
+         } else {
+           $obj->setPVPR(0);
+           $obj->setShoppingPrice($object["ShoppingPrice"]);
+         }
          $obj->setSupplier($supplier);
          $this->doctrine->getManager()->merge($obj);
          $this->doctrine->getManager()->flush();
-         $obj->priceCalculated($this->$doctrine);
+         $obj->priceCalculated($this->doctrine);
          $this->doctrine->getManager()->clear();
       }$navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"products"]);
       if ($navisionSync==null) {

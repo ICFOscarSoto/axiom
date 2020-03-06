@@ -629,7 +629,6 @@ class ERPProducts
       $em = $doctrine->getManager();
       $newShoppingPrice=$this->PVPR*(1-$this->getShoppingDiscount($doctrine)/100);
       $this->setShoppingPrice($newShoppingPrice);
-
       /*ante un cambio en los precios, si no tenemos almacenado el valor del incremento máximo
       para el producto, tendremos que recalcularlo. En cambio, si ya lo tenemos almacenado, simplemente se recalculará
       el PVP con ese incremento y con el nuevo precio de compra*/
@@ -642,54 +641,21 @@ class ERPProducts
           $increment=$this->getMaxIncrement($doctrine,$customergroup);
           if($increment>$maxincrement) $maxincrement=$increment;
         }
-
         $this->setPvpincrement($maxincrement);
         $this->setPVP($newShoppingPrice*(1+($maxincrement/100)));
-
       }
-
       else $this->setPVP($newShoppingPrice*(1+($this->getPvpincrement()/100)));
-
       //Una vez recalculado el PVP, tenemos que recalcular el precio para cada incremento de grupo que exista
       $repositoryProduct=$doctrine->getRepository(ERPProducts::class);
       $repositoryProductPrices=$doctrine->getRepository(ERPProductPrices::class);
-      $productprices=$repositoryProductPrices->pricesByProductIdAndSupplier($this->getId(),$this->supplier->getId());
+      if ($this->supplier!=null){
+        $productprices=$repositoryProductPrices->pricesByProductIdAndSupplier($this->getId(),$this->supplier->getId());
       foreach($productprices as $productprice)
       {
           $productpriceEntity=$repositoryProductPrices->findOneBy(["id"=>$productprice]);
           $productpriceEntity->setPrice(round($newShoppingPrice*(1+($productpriceEntity->getIncrement()/100)),2));
       }
-
-      //finalmente si no tenemos registrado un incremento para un grupo de cliente en particular, tendremos que generarlo. En primer
-      //lugar obtenemos los grupos de clientes que no tienen asociado un incremento y posteriormente se lo generamos.
-/*
-      $CustomerGroupsRepository=$doctrine->getRepository(ERPCustomerGroups::class);
-      $customergroups=$CustomerGroupsRepository->findBy(["active"=>1,"deleted"=>0]);
-      $productEntity=$repositoryProduct->findOneBy(["id"=>$this->getId()]);
-      $customergroup_without_price=[];
-      foreach($customergroups as $customergroup){
-        if($repositoryProductPrices->existPrice($this,$customergroup,$this->getSupplier())==FALSE) array_push($customergroup_without_price,$customergroup);
-      }
-
-
-      foreach($customergroup_without_price as $customergroup){
-        $increment=$this->getMaxIncrement($doctrine,$customergroup);
-        $productpricesEntity= new ERPProductPrices();
-        $productpricesEntity->setProduct($this);
-        $productpricesEntity->setCustomergroup($customergroup);
-        $productpricesEntity->setSupplier($this->getSupplier());
-        $productpricesEntity->setIncrement($increment*1);
-        $productpricesEntity->setPrice(round($newShoppingPrice*(1+($increment/100)),2));
-        $productpricesEntity->setActive(1);
-        $productpricesEntity->setDeleted(0);
-        $productpricesEntity->setDateupd(new \DateTime());
-        $productpricesEntity->setDateadd(new \DateTime());
-        $em->persist($productpricesEntity);
-        $em->flush();
-
-      }
-  */
-
+}
     }
 
 
@@ -723,36 +689,6 @@ class ERPProducts
           $productpriceEntity->setPrice(round($newShoppingPrice*(1+($productpriceEntity->getIncrement()/100)),2));
       }
 
-      //finalmente si no tenemos registrado un incremento para un grupo de cliente en particular, tendremos que generarlo. En primer
-      //lugar obtenemos los grupos de clientes que no tienen asociado un incremento y posteriormente se lo generamos.
-/*
-      $CustomerGroupsRepository=$doctrine->getRepository(ERPCustomerGroups::class);
-      $customergroups=$CustomerGroupsRepository->findBy(["active"=>1,"deleted"=>0]);
-      $productEntity=$repositoryProduct->findOneBy(["id"=>$this->getId()]);
-      $customergroup_without_price=[];
-      foreach($customergroups as $customergroup){
-        if($repositoryProductPrices->existPrice($this,$customergroup,$this->getSupplier())==FALSE) array_push($customergroup_without_price,$customergroup);
-      }
-
-
-      foreach($customergroup_without_price as $customergroup){
-        $increment=$this->getMaxIncrement($doctrine,$customergroup);
-        $productpricesEntity= new ERPProductPrices();
-        $productpricesEntity->setProduct($this);
-        $productpricesEntity->setCustomergroup($customergroup);
-        $productpricesEntity->setSupplier($this->getSupplier());
-        $productpricesEntity->setIncrement($increment*1);
-        $productpricesEntity->setPrice(round($newShoppingPrice*(1+($increment/100)),2));
-        $productpricesEntity->setActive(1);
-        $productpricesEntity->setDeleted(0);
-        $productpricesEntity->setDateupd(new \DateTime());
-        $productpricesEntity->setDateadd(new \DateTime());
-        $em->persist($productpricesEntity);
-        $em->flush();
-
-      }
-*/
-
     }
 
 
@@ -773,6 +709,7 @@ class ERPProducts
       $repository=$doctrine->getRepository(ERPIncrements::class);
       $category=$this->category;
       $maxincrement=$repository->getMaxIncrement($this->supplier,$category,$customergroup);
+      if($category!=null){
       while ($category->getParentid()!=null && $maxincrement==null){
           $category=$category->getParentid();
           $maxincrement=$repository->getMaxIncrement($this->supplier,$category,$customergroup);
@@ -792,12 +729,7 @@ class ERPProducts
               $maxincrement=$repository->getMaxIncrement(null,$category,$customergroup);
           }
        }
-/*
-      if ($maxincrement==null){
-        $repository=$doctrine->getRepository(ERPCustomerGroups::class);
-        $maxincrement=$repository->getIncrement($customergroup);
-      }
-*/
+     }
       return $maxincrement;
     }
 
