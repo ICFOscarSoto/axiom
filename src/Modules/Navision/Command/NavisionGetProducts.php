@@ -58,8 +58,6 @@ class NavisionGetProducts extends ContainerAwareCommand
     switch($entity){
       case 'products': $this->importProduct($input, $output);
       break;
-      case 'clearProducts': $this->updateProduct($input, $output);
-      break;
       case 'ean13': $this->importEAN13($input, $output);
       break;
       case 'clearEAN13': $this->clearEAN13($input, $output);
@@ -139,9 +137,9 @@ class NavisionGetProducts extends ContainerAwareCommand
          $obj->setWeight($object["Weight"]);
          $obj->setPVPR($object["ShoppingPrice"]);
          $obj->setSupplier($supplier);
-         //$obj->preProccess($this, $this->doctrine, null, null, $oldobj);
          $this->doctrine->getManager()->merge($obj);
          $this->doctrine->getManager()->flush();
+         $obj->priceCalculated($this->$doctrine);
          $this->doctrine->getManager()->clear();
       }$navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"products"]);
       if ($navisionSync==null) {
@@ -149,31 +147,10 @@ class NavisionGetProducts extends ContainerAwareCommand
         $navisionSync->setEntity("products");
       }
       $navisionSync->setLastsync($datetime);
-      //$navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
+      $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
       $this->doctrine->getManager()->persist($navisionSync);
       $this->doctrine->getManager()->flush();
     }
-
-    public function updateProduct(InputInterface $input, OutputInterface $output){
-      $repository=$this->doctrine->getRepository(ERPProducts::class);
-      $products=$repository->findAll();
-      foreach ($products as $product){
-        $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-clearProducts.php?from='.$product->getCode());
-        $objects=json_decode($json, true);
-        $objects=$objects[0];
-        if($objects["class"][0]["movimiento"]!=null){
-        if($objects["class"][0]["movimiento"]["date"]<"2017-01-01 00:00:00.000000") {
-        $product->setDeleted(0);
-        $product->setActive(0);
-        $this->doctrine->getManager()->merge($product);
-        $this->doctrine->getManager()->flush();
-        $this->doctrine->getManager()->clear();
-      }
-    }
-      }
-    }
-
-
 
     public function importEAN13(InputInterface $input, OutputInterface $output){
       $navisionSyncRepository=$this->doctrine->getRepository(NavisionSync::class);
@@ -238,7 +215,7 @@ class NavisionGetProducts extends ContainerAwareCommand
         $navisionSync->setEntity("EAN13");
       }
       $navisionSync->setLastsync($datetime);
-      //$navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
+      $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
       $this->doctrine->getManager()->persist($navisionSync);
       $this->doctrine->getManager()->flush();
     }
@@ -332,6 +309,7 @@ public function importPrices(InputInterface $input, OutputInterface $output) {
           $obj->setDeleted(0);
           $this->doctrine->getManager()->merge($obj);
           $this->doctrine->getManager()->flush();
+          $obj->setShoppingPrices($this->doctrine);
           $this->doctrine->getManager()->clear();
         }
       }
@@ -432,17 +410,14 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
     $increment=$repositoryIncrements->findOneBy(["supplier"=>$product->getSupplier(),"category"=>$product->getCategory(),"active"=>1,"deleted"=>0]);
 
     if ($increment==null && $product->getCategory()!=null && $product->getSupplier()!=null){
-
       $supplier=$repositorySupliers->findOneBy(["id"=>$product->getSupplier()->getId()]);
       $output->writeln($supplier->getCode());
       $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getIncrements.php?product='.$product->getCode());
       $objects=json_decode($json, true);
       $objects=$objects[0];
-
       foreach ($objects["class"] as $increment){
         $customergroup=$repositoryCustomeGroups->findOneBy(["name"=>$increment["salescode"]]);
         if($increment["Discount"]!=0 && $customergroup!=NULL){
-
             $category=$repositoryCategory->findOneBy(["id"=>$product->getCategory()->getId()]);
             $obj=new ERPIncrements();
             $obj->setSupplier($supplier);
@@ -454,7 +429,6 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
             $neto=$increment["neto"];
             $precio_con_dto=$pvp-$pvp*($dto/100);
             $inc=(($precio_con_dto/$neto)-1)*100;
-
             $obj->setIncrement($inc);
             $obj->setDateadd(new \Datetime());
             $obj->setDateupd(new \Datetime());
@@ -463,19 +437,10 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
             $this->doctrine->getManager()->merge($obj);
             $this->doctrine->getManager()->flush();
             $obj->calculateIncrements($this->doctrine);
-
           }
-
-
       }
         $this->doctrine->getManager()->clear();
-
-
-
     }
-
-//  }
-
 }
 
 

@@ -180,20 +180,14 @@ class ERPShoppingDiscounts
     }
 
     public function postProccess($kernel, $doctrine, $user){
-      $em = $doctrine->getManager();
-      $repositoryProduct=$doctrine->getRepository(ERPProducts::class);
-      $repository=$doctrine->getRepository(ERPSuppliers::class);
-      $products=$repository->productsBySupplier($this->supplier->getId());
-      foreach($products as $product){
-        $productEntity=$repositoryProduct->findOneBy(["id"=>$product]);
-        $productEntity->priceCalculated($doctrine);
-        $em->persist($productEntity);
-        $em->flush();
-      }
-
+    $this->setShoppingPrices($doctrine);
     }
 
     public function delete($doctrine){
+    $this->setShoppingPrices($doctrine);
+    }
+
+    public function setShoppingPrices($doctrine){
       $em = $doctrine->getManager();
       $repositoryProduct=$doctrine->getRepository(ERPProducts::class);
       $repository=$doctrine->getRepository(ERPSuppliers::class);
@@ -201,7 +195,6 @@ class ERPShoppingDiscounts
       foreach($products as $product){
         $productEntity=$repositoryProduct->findOneBy(["id"=>$product]);
         $productEntity->priceCalculated($doctrine);
-      //  dump($productEntity->getShoppingDiscount($doctrine));
         $em->persist($productEntity);
         $em->flush();
       }
