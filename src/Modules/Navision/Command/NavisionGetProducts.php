@@ -35,7 +35,6 @@ class NavisionGetProducts extends ContainerAwareCommand
   private $company;
   private $entityManager;
   private $url="http://192.168.1.250:9000/";
-
   protected function configure(){
         $this
             ->setName('navision:getproducts')
@@ -43,16 +42,13 @@ class NavisionGetProducts extends ContainerAwareCommand
             ->addArgument('entity', InputArgument::REQUIRED, '¿Entidad que sincronizar?')
         ;
   }
-
   protected function execute(InputInterface $input, OutputInterface $output)
   {
     $this->doctrine = $this->getContainer()->get('doctrine');
     $this->entityManager = $this->doctrine->getManager();
     $entity = $input->getArgument('entity');
-
     $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
     $this->company=$repositoryCompanies->find(2);
-
     $output->writeln('');
     $output->writeln('Comenzando sincronizacion Navision');
     $output->writeln('==================================');
@@ -81,7 +77,6 @@ class NavisionGetProducts extends ContainerAwareCommand
         $output->writeln('Opcion no válida');
       break;
     }
-
   }
 
     public function importProduct(InputInterface $input, OutputInterface $output){
@@ -239,6 +234,7 @@ class NavisionGetProducts extends ContainerAwareCommand
       $this->doctrine->getManager()->persist($navisionSync);
       $this->doctrine->getManager()->flush();
     }
+
 /*
   Busco los EAN13 de axiom en Navision, y si no están los desactivo
  */
@@ -272,12 +268,10 @@ public function clearEAN13(InputInterface $input, OutputInterface $output){
         }
 }
 
-
 /*
   Si el producto no tiene descuento de compra, busco en Navision (Purchase Line Discount) los descuentos asociados que tiene.
   Entonces los devuelvo y se los asigno al proveedor y la categoría del producto.
  */
-
 public function importPrices(InputInterface $input, OutputInterface $output) {
   $navisionSyncRepository=$this->doctrine->getRepository(NavisionSync::class);
   $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"prices"]);
@@ -337,7 +331,6 @@ public function importPrices(InputInterface $input, OutputInterface $output) {
   }
 }
 
-
 public function importStocks(InputInterface $input, OutputInterface $output) {
   $navisionSyncRepository=$this->doctrine->getRepository(NavisionSync::class);
   $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"stocks"]);
@@ -358,40 +351,37 @@ public function importStocks(InputInterface $input, OutputInterface $output) {
     if ($objects){
     $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
     $company=$repositoryCompanies->find(2);
-
     foreach ($objects["quantitys"] as $stock){
-
       if ($objects["locations"]!=null) {
         $locations=$objects["locations"][0];
           if($stock["almacen"]==$locations["almacen"])
             $location=$repositoryStoreLocations->findOneBy(["name"=>$locations["ubicacion"]]);
             else $location=$repositoryStoreLocations->findOneBy(["name"=>$stock["almacen"]]);
       } else $location=$repositoryStoreLocations->findOneBy(["name"=>$stock["almacen"]]);
-
-        if($location!=null){
-          $stock_old=$repositoryStocks->findOneBy(["product"=>$product->getId(),"storelocation"=>$location->getId()]);
-          if($stock_old!=null){
-            $stock_old->setQuantity((int)$stock["stock"]);
-            $stock_old->setDateupd(new \Datetime());
-            $this->doctrine->getManager()->merge($stock_old);
+      if($location!=null){
+        $stock_old=$repositoryStocks->findOneBy(["product"=>$product->getId(),"storelocation"=>$location->getId()]);
+        if($stock_old!=null){
+          $stock_old->setQuantity((int)$stock["stock"]);
+          $stock_old->setDateupd(new \Datetime());
+          $this->doctrine->getManager()->merge($stock_old);
+        }
+        else {
+          $obj=new ERPStocks();
+          $obj->setCompany($company);
+          $obj->setProduct($product);
+          $obj->setDateadd(new \Datetime());
+          $obj->setDateupd(new \Datetime());
+          $obj->setStoreLocation($location);
+          if ((int)$stock["stock"]<0) $quantiy=0;
+          else $quantity=(int)$stock["stock"];
+          $obj->setQuantity($quantity);
+          $obj->setActive(1);
+          $obj->setDeleted(0);
+          $this->doctrine->getManager()->merge($obj);
           }
-          else {
-              $obj=new ERPStocks();
-              $obj->setCompany($company);
-              $obj->setProduct($product);
-              $obj->setDateadd(new \Datetime());
-              $obj->setDateupd(new \Datetime());
-              $obj->setStoreLocation($location);
-              if ((int)$stock["stock"]<0) $quantiy=0;
-              else $quantity=(int)$stock["stock"];
-              $obj->setQuantity($quantity);
-              $obj->setActive(1);
-              $obj->setDeleted(0);
-              $this->doctrine->getManager()->merge($obj);
         }
       }
     }
-  }
     $this->doctrine->getManager()->flush();
     $this->doctrine->getManager()->clear();
   }
@@ -403,7 +393,6 @@ public function importStocks(InputInterface $input, OutputInterface $output) {
  */
 
 public function importIncrements(InputInterface $input, OutputInterface $output) {
-
   $navisionSyncRepository=$this->doctrine->getRepository(NavisionSync::class);
   $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"increments"]);
   if ($navisionSync==null) {
@@ -420,15 +409,12 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
   $repositoryIncrements=$this->doctrine->getRepository(ERPIncrements::class);
   $repository=$this->doctrine->getRepository(ERPProducts::class);
   $repositoryproductprices=$this->doctrine->getRepository(ERPProductPrices::class);
-
 //  $products=$repository->findAll();
-
   //Disable SQL logger
   /*foreach($products as $product) {*/
     $product=$repository->findOneBy(["code"=>'208833']);
     $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
     $increment=$repositoryIncrements->findOneBy(["supplier"=>$product->getSupplier(),"category"=>$product->getCategory(),"active"=>1,"deleted"=>0]);
-
     if ($increment==null && $product->getCategory()!=null && $product->getSupplier()!=null){
       $supplier=$repositorySupliers->findOneBy(["id"=>$product->getSupplier()->getId()]);
       $output->writeln($supplier->getCode());
@@ -457,12 +443,11 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
             $this->doctrine->getManager()->merge($obj);
             $this->doctrine->getManager()->flush();
             $obj->calculateIncrements($this->doctrine);
-          }
+        }
       }
         $this->doctrine->getManager()->clear();
     }
 }
-
 
 }
 ?>
