@@ -157,25 +157,34 @@ class NavisionController extends Controller
       $customersRepository=$this->getDoctrine()->getRepository(ERPCustomers::class);
       $customers=$customersRepository->findInsuredCustomers($this->getUser()->getCompany());
 
-
-      $invoices=Array();
-      foreach($customers as $customer)
-      {
-          $invoices_customer=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-invoice-list-by-customer.php?code='.$customer["code"].'&start='.$start->format("Y-m-d").'&end='.$end->format("Y-m-d"));
-          $invoices_list=json_decode($invoices_customer,true);
-
-          foreach($invoices_list as $invoice){
-            $item['Suplemento']=$customer["supplement"];
-            $item['Nif']=$customer["vat"];
-            $item['Código Cesce']=$customer["cescecode"];
-            $item['Fecha Factura']=$invoice['date'];
-            $item['Importe']=str_replace(".",",",$invoice['total'])."€";
-            $item['Forma de Pago']=$customer["paymentmethod"];
-            $item['id']=$invoice['id'];
-            $item['Vencimiento']=$invoice['due_date'];
-            $invoices[]=$item;
-        }
+      $array_customers=[];
+      foreach($customers as $customer){
+         $array_customers[]=$customer["code"];
       }
+
+        $invoices=Array();
+
+        $invoices_customer=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-invoice-list-by-customer.php?customers='.json_encode($array_customers).'&start='.$start->format("Y-m-d").'&end='.$end->format("Y-m-d"));
+        $invoices_list=json_decode($invoices_customer,true);
+
+        foreach($customers as $customer)
+        {
+          $code=$customer["code"];
+          if($invoices_list[$code]["invoices"]!=NULL){
+            foreach($invoices_list[$code]["invoices"] as $invoice){
+              $item['Suplemento']=$customer["supplement"];
+              $item['Nif']=$customer["vat"];
+              $item['Código Cesce']=$customer["cescecode"];
+              $item['Fecha Factura']=$invoice['date'];
+              $item['Importe']=str_replace(".",",",$invoice['total'])."€";
+              $item['Forma de Pago']=$customer["paymentmethod"];
+              $item['id']=$invoice['id'];
+              $item['Vencimiento']=$invoice['due_date'];
+              $invoices[]=$item;
+            }
+          }
+        }
+
 
       return $this->render('@Navision/insuredcustomerinvoiceslist.html.twig', [
         "interfaceName" => "Facturas Asegurados",
@@ -203,6 +212,7 @@ class NavisionController extends Controller
        $customersRepository=$this->getDoctrine()->getRepository(ERPCustomers::class);
        $customers=$customersRepository->findInsuredCustomers($this->getUser()->getCompany());
 
+/*
        $invoices=Array();
        foreach($customers as $customer)
        {
@@ -221,6 +231,37 @@ class NavisionController extends Controller
              $invoices[]=$item;
          }
        }
+
+
+  */
+  $array_customers=[];
+  foreach($customers as $customer){
+     $array_customers[]=$customer["code"];
+  }
+
+    $invoices=Array();
+
+    $invoices_customer=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-invoice-list-by-customer.php?customers='.json_encode($array_customers).'&start='.$start->format("Y-m-d").'&end='.$end->format("Y-m-d"));
+    $invoices_list=json_decode($invoices_customer,true);
+
+    foreach($customers as $customer)
+    {
+      $code=$customer["code"];
+      if($invoices_list[$code]["invoices"]!=NULL){
+        foreach($invoices_list[$code]["invoices"] as $invoice){
+          $item['supplement']=$customer["supplement"];
+          $item['vat']=$customer["vat"];
+          $item['cescecode']=$customer["cescecode"];
+          $item['date']=$invoice['date'];
+          $item['total']=str_replace(".",",",$invoice['total'])."€";
+          $item['paymentmethod']=$customer["paymentmethod"];
+          $item['id']=$invoice['id'];
+          $item['vencimiento']=$invoice['due_date'];
+          $invoices[]=$item;
+        }
+      }
+    }
+
        return new Response(json_encode($invoices,true));
 
      }
@@ -241,7 +282,7 @@ class NavisionController extends Controller
 
        $customersRepository=$this->getDoctrine()->getRepository(ERPCustomers::class);
        $customers=$customersRepository->findInsuredCustomers($this->getUser()->getCompany());
-
+/*
        $invoices=Array();
        foreach($customers as $customer)
        {
@@ -259,6 +300,36 @@ class NavisionController extends Controller
              $item['Numero Factura']=$invoice['id'];
              $invoices[]=$item;
          }
+       }
+
+       */
+
+       $array_customers=[];
+       foreach($customers as $customer){
+          $array_customers[]=$customer["code"];
+       }
+
+       $invoices=Array();
+
+       $invoices_customer=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-invoice-list-by-customer.php?customers='.json_encode($array_customers).'&start='.$start->format("Y-m-d").'&end='.$end->format("Y-m-d"));
+       $invoices_list=json_decode($invoices_customer,true);
+
+        foreach($customers as $customer)
+        {
+           $code=$customer["code"];
+           if($invoices_list[$code]["invoices"]!=NULL){
+             foreach($invoices_list[$code]["invoices"] as $invoice){
+               $item['supplement']=$customer["supplement"];
+               $item['vat']=$customer["vat"];
+               $item['cescecode']=$customer["cescecode"];
+               $item['date']=$invoice['date'];
+               $item['total']=str_replace(".",",",$invoice['total'])."€";
+               $item['paymentmethod']=$customer["paymentmethod"];
+               $item['id']=$invoice['id'];
+               $item['vencimiento']=$invoice['due_date'];
+               $invoices[]=$item;
+             }
+           }
        }
  			$result=$this->exportinvoices($invoices,$template);
  			return $result;
