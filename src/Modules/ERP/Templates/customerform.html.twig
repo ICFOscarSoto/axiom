@@ -165,8 +165,8 @@
 <div class="panel minimal">
 	<div class="panel-body">
 		<div class="panel-title-list">Condiciones especiales</div>
-		{% if listCustomersPrices is defined %}
-		{% set listConstructor = listCustomersPrices %}
+		{% if listCustomerSpecialConditions is defined %}
+		{% set listConstructor = listCustomerSpecialConditions %}
 		{{ include('@Globale/list.html.twig') }}
 		{% endif %}
 	</div>
