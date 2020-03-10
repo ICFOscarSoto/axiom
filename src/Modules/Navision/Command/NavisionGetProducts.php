@@ -342,30 +342,26 @@ public function importStocks(InputInterface $input, OutputInterface $output) {
   $output->writeln('* Sincronizando stocks....');
   $repositoryStocks=$this->doctrine->getRepository(ERPStocks::class);
   $repositoryStoreLocations=$this->doctrine->getRepository(ERPStoreLocations::class);
-  $repository=$this->doctrine->getRepository(ERPProducts::class);
-  $products=$repository->findAll();
-  foreach ($products as $product){
-    $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getStocks.php?from='.$product->getCode());
+  $repositoryProducts=$this->doctrine->getRepository(ERPProducts::class);
+    $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getStocks.php?from='.$navisionSync->getMaxtimestamp());
     $objects=json_decode($json, true);
     $objects=$objects[0];
     if ($objects){
     $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
     $company=$repositoryCompanies->find(2);
-    foreach ($objects["quantitys"] as $stock){
-      if ($objects["locations"]!=null) {
-        $locations=$objects["locations"][0];
-          if($stock["almacen"]==$locations["almacen"])
-            $location=$repositoryStoreLocations->findOneBy(["name"=>$locations["ubicacion"]]);
-            else $location=$repositoryStoreLocations->findOneBy(["name"=>$stock["almacen"]]);
+    foreach ($objects["class"] as $stock){
+      $product=$repositoryProducts->findOneBy(["code"=>$stock["code"]]);
+      if ($stock["ubicacion"]!=null) {
+          $location=$repositoryStoreLocations->findOneBy(["name"=>$stock["ubicacion"]]);
       } else $location=$repositoryStoreLocations->findOneBy(["name"=>$stock["almacen"]]);
-      if($location!=null){
+      if ($location!=null and $product!=null) {
+        $output->writeln('Actualizando stock de '.$stock["code"]. " en la localizacion ".$stock["ubicacion"]);
         $stock_old=$repositoryStocks->findOneBy(["product"=>$product->getId(),"storelocation"=>$location->getId()]);
         if($stock_old!=null){
           $stock_old->setQuantity((int)$stock["stock"]);
           $stock_old->setDateupd(new \Datetime());
           $this->doctrine->getManager()->merge($stock_old);
-        }
-        else {
+        }else {
           $obj=new ERPStocks();
           $obj->setCompany($company);
           $obj->setProduct($product);
@@ -378,14 +374,23 @@ public function importStocks(InputInterface $input, OutputInterface $output) {
           $obj->setActive(1);
           $obj->setDeleted(0);
           $this->doctrine->getManager()->merge($obj);
-          }
         }
+        $this->doctrine->getManager()->flush();
+        $this->doctrine->getManager()->clear();
       }
     }
+    $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"products"]);
+    if ($navisionSync==null) {
+      $navisionSync=new NavisionSync();
+      $navisionSync->setEntity("products");
+    }
+    $navisionSync->setLastsync($datetime);
+    $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
+    $this->doctrine->getManager()->persist($navisionSync);
     $this->doctrine->getManager()->flush();
-    $this->doctrine->getManager()->clear();
+    }
+
   }
-}
 
 /*
   Si el producto no tiene descuento de compra, busco en Navision (Purchase Line Discount) los descuentos asociados que tiene.
