@@ -18,6 +18,7 @@ use App\Modules\ERP\Entity\ERPStocks;
 use App\Modules\ERP\Entity\ERPStoreLocations;
 use App\Modules\ERP\Entity\ERPIncrements;
 use App\Modules\ERP\Entity\ERPCustomerIncrements;
+use App\Modules\ERP\Entity\ERPCustomerPrices;
 use App\Modules\Globale\Entity\GlobaleCompanies;
 use App\Modules\Globale\Entity\GlobaleStates;
 use App\Modules\Globale\Entity\GlobaleTaxes;
@@ -417,6 +418,7 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
   $repositoryCustomerIncrements=$this->doctrine->getRepository(ERPCustomerIncrements::class);
   $repository=$this->doctrine->getRepository(ERPProducts::class);
   $repositoryproductprices=$this->doctrine->getRepository(ERPProductPrices::class);
+  $repositorycustomerprices=$this->doctrine->getRepository(ERPCustomerPrices::class);
 //  $products=$repository->findAll();
   //Disable SQL logger
   /*foreach($products as $product) {*/
@@ -460,6 +462,7 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
           //cliente concreto
           else if($increment["type"]==0 && $customerincrement==null)
           {
+            $output->writeln('Precios para el cliente '.$increment["salescode"]);
             $customer=$repositoryCustomers->findOneBy(["code"=>$increment["salescode"]]);
             if($increment["Discount"]!=0 && $customer!=NULL){
               $category=$repositoryCategory->findOneBy(["id"=>$product->getCategory()->getId()]);
@@ -480,7 +483,7 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
               $obj->setDeleted(0);
               $this->doctrine->getManager()->merge($obj);
               $this->doctrine->getManager()->flush();
-            //  $obj->calculateIncrements($this->doctrine);
+              $obj->calculateIncrements($this->doctrine);
             }
 
 

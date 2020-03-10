@@ -3,6 +3,10 @@
     {% set basiclist=productpriceslist %}
     {{ include('@Globale/basiclist.html.twig') }}
   </div>
+  <div class="col-md-4">
+    {% set basiclist=customerprices %}
+    {{ include('@Globale/basiclist.html.twig') }}
+  </div>
 </div>
 <div class="row">
   <div class="col-md-12">
@@ -13,4 +17,3 @@
     {% endif %}
   </div>
 </div>
-

@@ -11,6 +11,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\ERP\Entity\ERPProductPrices;
+use App\Modules\ERP\Entity\ERPCustomerPrices;
 use App\Modules\ERP\Entity\ERPOfferPrices;
 use App\Modules\ERP\Entity\ERPSuppliers;
 use App\Modules\ERP\Utils\ERPOfferPricesUtils;
@@ -35,14 +36,15 @@ class ERPProductPricesController extends Controller
 		$product=$productsRepository->findOneBy(["id"=>$id]);
 		$product_id=$product->getId();
 		$suppliersRepository=$this->getDoctrine()->getRepository(ERPSuppliers::class);
+		$customerPricesRepository=$this->getDoctrine()->getRepository(ERPCustomerPrices::class);
 		$default_supplier=$suppliersRepository->findOneBy(["id"=>$product->getSupplier()]);
     $productPricesRepository=$this->getDoctrine()->getRepository($this->class);
 		$productPrices=$productPricesRepository->pricesByProductSupplier($product,$default_supplier);
+		$customerPrices=$customerPricesRepository->pricesByProductSupplier($product,$default_supplier);
 		$listOfferPrices = new ERPOfferPricesUtils();
 		$formUtilsOfferPrices = new GlobaleFormUtils();
 		$formUtilsOfferPrices->initialize($this->getUser(), new ERPOfferPricesUtils(), dirname(__FILE__)."/../Forms/OfferPrices.json", $request, $this, $this->getDoctrine(),$listOfferPrices->getExcludedForm([]),$listOfferPrices->getIncludedForm(["doctrine"=>$this->getDoctrine(), "user"=>$this->getUser(),"id"=>$id, "parent"=>$product]));
 		$forms[]=$formUtilsOfferPrices->formatForm('OfferPrices', true, null, ERPOfferPrices::class);
-
     foreach($productPrices as $key=>$item){
       //$productPrices[$key]["Visualizar"]="<a href='/{_locale}/productprices/infoProductPrices/".$id."'>Ir</a>";
     		$productPrices[$key]["Visualizar"]="<a href='/{_locale}/es/generic/ERP/Increments/index'>Ir</a>";
@@ -50,6 +52,7 @@ class ERPProductPricesController extends Controller
 
     return $this->render('@ERP/productprices.html.twig', array(
       'productpriceslist'=>$productPrices,
+			'customerprices'=>$customerPrices,
 			'id' => $id,
 			'offerpriceslist' => $listOfferPrices->formatListByProduct($id),
 			'forms' => $forms
