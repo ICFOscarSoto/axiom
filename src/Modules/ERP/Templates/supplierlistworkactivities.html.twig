@@ -1,0 +1,32 @@
+
+
+
+<script>
+$(document).ready(function() {
+  $('body').on('click', "#workactivity-tree-modal-button-continue", function(){
+		if((++load_wait)==1) $("#load-spinner").fadeIn();
+    var ids=$.map($('.listSuppliers-chk-list:checked'), function(n, i){ return $(n).attr("item-id");}).join(',');
+		$.ajax({
+				type: "POST",
+				dataType: "json",
+        data: {ids: ids},
+				url: "/es/ERP/supplier/workactivity/0/change/"+$('[id^=cb-workactivities-]:checked').attr('attr-id'),
+			}).done(function( data, textStatus, jqXHR ) {
+				if((--load_wait)==0) $("#load-spinner").fadeOut();
+				if(data.result) toastr.success("Datos guardados correctamente", "Confirmación", confirmation);
+					else toastr.error("Ocurrió un error al guardar los datos", "Confirmación", confirmation);
+				$("#workactivity-tree-modal").modal('toggle');
+				$('#listWorkActivities').DataTable().ajax.reload();
+		});
+
+
+	});
+
+
+
+  $('body').on('click', "#workactivitiesTop-top-button-foreground", function() {
+    showWorkActivitiesMap();
+  });
+
+});
+</script>

@@ -1,0 +1,105 @@
+<div class="modal fade" id="workactivity-tree-modal" data-backdrop="static" style="display: none;">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Selección de Actividad</h4>
+      </div>
+      <div id="workactivity-tree-modal-body" class="modal-body">
+				<div id="list-2" class="nested-list dd with-margins custom-drag-button"><ol id="workactivities" class="dd-list"></ol></div>
+      </div>
+      <div id="workactivity-tree-modal-footer" class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Cancelar</button>
+        <button attr-action="" id="workactivity-tree-modal-button-continue" type="button" class="btn btn-red">Continuar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+$(document).ready(function() {
+  $.fn.nestableShow = function() {
+      return this.each(function () {
+          var $parents = $(this).parents();
+          $parents.each(function (i) {
+              var list = $(this).data("nestable");
+              if (list) {
+                  $parents.slice(0, i).filter(list.options.itemNodeName).each(function(){
+                      list.expandItem($(this));
+                  });
+                  return false;
+              }
+          });
+      });
+  };
+
+  //Only allow select one category
+	$('body').on('ifChecked', "[id^=cb-workactivities-]", function() {
+		var element=$(this);
+		$('[id^=cb-workactivities-]').each(function(){
+			if(element.attr('id') != $(this).attr('id') ) $(this).iCheck('uncheck');
+		});
+	});
+
+});
+
+
+
+function parseWorkActivity(element){
+		var data='';
+		data+='';
+		element.forEach( function(valor, indice, array) {
+
+										data+='<li class="dd-item" data-id="'+valor.id+'">'+
+											''+
+											'<div class="dd-content">'+
+												'&nbsp;<input id="cb-workactivities-'+valor.id+'" attr-id="'+valor.id+'" type="checkbox" class="icheck">&nbsp;&nbsp;'+valor.name+
+											'</div>'+
+											((valor.childrens.length>0)?'<ol class="dd-list">':'')+
+											((valor.childrens.length>0)?parseWorkActivity(valor.childrens):'')+
+											((valor.childrens.length>0)?'</ol>':'')+
+										'</li>';
+		});
+		data+='';
+		return data;
+	}
+
+function showWorkActivitiesMap(){
+  if((++load_wait)==1) $("#load-spinner").fadeIn();
+  $('#workactivities').empty();
+  //$('.dd').nestable('destroy');
+  //Get categories tree
+  $.ajax({
+      type: "GET",
+      dataType: "json",
+      url: "{{url('supplieractivitiesGetTree')}}",
+    }).done(function( workactivities, textStatus, jqXHR ) {
+      if((--load_wait)==0) $("#load-spinner").fadeOut();
+       //categories = $.parseJSON(data);
+       workactivities.forEach( function(valor, indice, array) {
+      //   console.log(valor.id);
+        $("#workactivities").append(
+                      '<li class="dd-item" data-id="'+valor.id+'">'+
+                        '<div class="dd-content">'+
+                          '&nbsp;<input id="cb-workactivities-'+valor.id+'" type="checkbox" class="icheck">&nbsp;&nbsp;'+valor.name+
+                        '</div>'+
+                          ((valor.childrens.length>0)?'<ol class="dd-list">':'')+
+                          ((valor.childrens.length>0)?parseWorkActivity(valor.childrens):'')+
+                          ((valor.childrens.length>0)?'</ol>':'')+
+                      '</li>');
+
+      });
+      $('input.icheck').iCheck({
+        checkboxClass: 'icheckbox_flat-blue',
+        radioClass: 'iradio_flat-blue'
+      });
+      if($("#form_workactivity").val()!="") $("#cb-workactivities-"+$("#form_workactivity").val()).iCheck('check');
+      //$('.dd').nestable('init').nestable('collapseAll');
+      $('.dd').nestable('init').nestable('collapseAll');
+      if($("#form_workactivity").val()!="") $('[data-id='+$("#form_workactivity").val()+']').nestableShow();
+      $("#workactivity-tree-modal").modal();
+  });
+}
+
+
+</script>

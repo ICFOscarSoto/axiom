@@ -1,0 +1,354 @@
+
+<!-- MAIN CONTENT -->
+<div class="principal-content" id="principal-content">
+{% set formConstructor = form %}
+
+<div id="{{formConstructor.name}}-form-body"><form>
+<div class="panel minimal">
+	<div class="panel-body">
+		<div class="row">
+		<div class="col-md-12">
+			<div id="{{formConstructor.name}}-validation-error" class="alert alert-danger form-validation-error" style="display: none">
+			<strong>Ocurrieron los siguientes errores:</strong></br></br><ul id="validation-errors-list"></ul>
+			</div>
+			<div id="{{formConstructor.name}}-validation-warning" class="alert alert-warning form-validation-error" style="display: none">
+				<strong>Revise las siguientes advertencias:</strong></br></br><ul id="validation-warnings-list"></ul>
+			</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="panel minimal">
+	<div class="panel-body">
+		<div class="row">
+			<div style="text-align: right;" class="col-md-12">
+				<button attr-id="" attr-action="" id="{{formConstructor.name}}-button-cancel" type="button" class="btn btn">{{ ("Cancelar")|trans }}</button>
+				<button attr-id="" attr-action="" id="{{formConstructor.name}}-button-continue" type="button" class="btn btn-green">{{ ("Guardar")|trans }}</button>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="panel minimal">
+	<input type="hidden" id="post-url" name="post-url" value="{{ url('dataCustomers',{'id': formConstructor.id_object, 'action':'save'}) }}">
+	<input type="hidden" id="id-object" name="id-object" value="{{ formConstructor.id_object }}">
+	{{ form_row(formConstructor.form['_token']) }}
+	<div class="panel-heading">
+		<div class="panel-title">Datos del proveedor</div>
+	</div>
+	<div class="panel-body">
+		<div class="row">
+			{% for section in formConstructor.template.0.sections %}
+			{% for field in section.fields %}
+			{# Check if field is a relation and must show the view button #}
+			{{ include("@Globale/form_relation_button.html.twig") }}
+			{# Check if field is an address and map is enabled #}
+			{{ include("@Globale/form_address_button.html.twig") }}
+			{# Check if field is an url #}
+			{{ include("@Globale/form_url_button.html.twig") }}
+			{# Check if field is an tel #}
+			{{ include("@Globale/form_tel_button.html.twig") }}
+			{# Check if field is an email #}
+			{{ include("@Globale/form_email_button.html.twig") }}
+			{# Check if field has trigger #}
+			{{ include("@Globale/form_trigger_field.html.twig") }}
+			{# Check if field has a linked field #}
+			{{ include("@Globale/form_fields_linked.html.twig") }}
+			{# Check if field has a dependency of other field #}
+			{{ include("@Globale/form_fields_depend.html.twig") }}
+			{# Check if field has a to change another field #}
+			{{ include("@Globale/form_fields_change.html.twig") }}
+			{# Check if field has unity field #}
+			{{ include("@Globale/form_fields_unity.html.twig") }}
+			{# Check if field has a field type number #}
+			{{ include("@Globale/form_fields_type_number.html.twig") }}
+			{% if field.type is defined and field.type == 'image' %}
+			<div class="col-md-2">
+				{# Field type Image #}
+				<div id="fileinput-{{field.name}}" class="fileinput fileinput-new" data-provides="fileinput">
+					<div class="fileinput-new thumbnail" style="width: {{ field.width }}; height: {{ field.height }};" data-trigger="fileinput">
+						<img id="fileinput-img-{{field.name}}" src="{{ url(field.value,{'id': formConstructor.id_object, 'type': field.imageType, 'size': 'medium'}) }}" alt="">
+					</div>
+					<div id="image-preview-{{field.name}}" class="fileinput-preview fileinput-exists thumbnail" style="width: {{ field.width }}; height: {{ field.height }}"></div>
+					<div>
+						{% if formConstructor.id_object !=0 %}
+						<span class="btn btn-white btn-file">
+							<span class="">Seleccionar</span>
+							<input type="file" id="form_{{field.name}}" name="form[{{field.name}}]" accept="image/*" class="form-control-file">
+						</span>
+						<a href="#" id="btn-image-cancel-{{field.name}}" class="btn btn-red fileinput-exists" data-dismiss="fileinput">Cancel</a>
+						<a href="#" id="btn-image-save-{{field.name}}" attr-imageType="{{field.imageType}}" class="btn btn-green fileinput-exists">Guardar</a>
+						{% endif %}
+					</div>
+				</div>
+
+
+
+				<script>
+				function b64toBlob(b64Data, contentType, sliceSize) {
+					contentType = contentType || '';
+					sliceSize = sliceSize || 512;
+					var byteCharacters = atob(b64Data);
+					var byteArrays = [];
+					for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+						var slice = byteCharacters.slice(offset, offset + sliceSize);
+						var byteNumbers = new Array(slice.length);
+						for (var i = 0; i < slice.length; i++) {
+							byteNumbers[i] = slice.charCodeAt(i);
+						}
+						var byteArray = new Uint8Array(byteNumbers);
+						byteArrays.push(byteArray);
+					}
+					var blob = new Blob(byteArrays, {type: contentType});
+					return blob;
+				}
+
+				$(document).ready(function() {
+					$( '#fileinput-img-{{field.name}}' ).load(function() {
+						$('#fileinput-img-{{field.name}}').fadeIn();
+					});
+
+					$('body').on('click', '[id^="btn-image-save"]', function(){
+						$('#fileinput-img-{{field.name}}').fadeOut();
+						var url = "{{url("uploadImage",{"type":field.imageType, "id": formConstructor.id_object})}}";
+						var image = $('#image-preview-{{field.name}}').find('img').attr('src');
+						var block = image.split(";");
+						var contentType = block[0].split(":")[1];
+						var realData = block[1].split(",")[1];
+						var blob = b64toBlob(realData, contentType);
+						var formData = new FormData();
+						formData.append('picture', blob);
+
+						if((++load_wait)==1) $("#load-spinner").fadeIn();
+						$.ajax({
+							url: url,
+							type: "POST",
+							cache: false,
+							contentType: false,
+							processData: false,
+							data: formData,
+							error:function(err){
+								$('#fileinput-img-{{field.name}}').fadeIn();
+								toastr.error("No se pudo subir la imagen", "Confirmación", confirmation);
+							},
+							success:function(data){
+								$('#fileinput-img-{{field.name}}').attr('src','{{ url(field.value,{'id': formConstructor.id_object, 'type': field.imageType, 'size': 'medium'}) }}?'+Date.now());
+								$('#fileinput-{{field.name}}').fileinput("clear");
+								if(data.result) toastr.success("Imagen cambiada correctamente", "Confirmación", confirmation);
+							},
+							complete:function(){
+								if((--load_wait)==0) $("#load-spinner").fadeOut();
+							}
+						});
+					});
+				});
+				</script>
+			</div>
+			{% endif %}
+			{% endfor %}
+
+			{% endfor %}
+			<div class="col-md-2">
+			{{ form_row(formConstructor.form['code']) }}
+			</div>
+			<div class="col-md-4">
+			{{ form_row(formConstructor.form['socialname']) }}
+			</div>
+			<div class="col-md-2">
+			{{ form_row(formConstructor.form['vat']) }}
+			</div>
+			<div class="col-md-4">
+			{{ form_row(formConstructor.form['name']) }}
+			</div>
+			<div class="col-md-3">
+			{{ form_row(formConstructor.form['email']) }}
+			</div>
+			<div class="col-md-3">
+			{{ form_row(formConstructor.form['web']) }}
+			</div>
+			<div class="col-md-2">
+			{{ form_row(formConstructor.form['phone']) }}
+			</div>
+			<div class="col-md-2">
+			{{ form_row(formConstructor.form['workactivity']) }}
+			</div>
+			<div class="col-md-2">
+				<div class="form-group">
+					<button type="button" id="form_selectworkactivity" name="form[selectworkactivity]" class="btn-secondary btn" style="margin-top: 22px;">Seleccionar Actividad</button>
+				</div>
+			</div>
+			</div>
+		</div>
+		<div class="panel-heading">
+			<div class="panel-title">Dirección</div>
+		</div>
+		<div class="panel-body">
+			<div class="row">
+			<div class="col-md-6">
+			{{ form_row(formConstructor.form['address']) }}
+			</div>
+			<div class="col-md-2">
+			{{ form_row(formConstructor.form['city']) }}
+			</div>
+			<div class="col-md-2">
+			{{ form_row(formConstructor.form['state']) }}
+			</div>
+			<div class="col-md-2">
+			{{ form_row(formConstructor.form['country']) }}
+			</div>
+			<div class="col-md-2">
+			{{ form_row(formConstructor.form['postcode']) }}
+			</div>
+		</div>
+	</div>
+</div>
+<div class="panel minimal">
+	<div class="panel-heading">
+		<div class="panel-title">Condiciones</div>
+	</div>
+	<div class="panel-body">
+	<div class="row">
+		<div class="col-md-2">
+			{{ form_row(formConstructor.form['minorder']) }}
+		</div>
+		<div class="col-md-2">
+				{{ form_row(formConstructor.form['freeshipping']) }}
+		</div>
+		<div class="col-md-2">
+				{{ form_row(formConstructor.form['estimateddelivery']) }}
+		</div>
+		<div class="col-md-2">
+				{{ form_row(formConstructor.form['averagedelivery']) }}
+		</div>
+		<div class="col-md-2">
+			{{ form_row(formConstructor.form['cancelremains']) }}
+		</div>
+		<div class="col-md-2">
+			{{ form_row(formConstructor.form['dropshipping']) }}
+		</div>
+		<div class="col-md-2">
+			{{ form_row(formConstructor.form['creditor']) }}
+		</div>
+		<div class="col-md-2">
+			{{ form_row(formConstructor.form['invoiceday']) }}
+		</div>
+		<div class="col-md-2">
+			{{ form_row(formConstructor.form['currency']) }}
+		</div>
+		<div class="col-md-2">
+			{{ form_row(formConstructor.form['paymentmethod']) }}
+		</div>
+		<div class="col-md-2">
+			{{ form_row(formConstructor.form['paymentterms']) }}
+		</div>
+	</div>
+</div>
+<div class="panel minimal">
+	<div class="panel-heading">
+		<div class="panel-title">Comentarios</div>
+	</div>
+<div class="panel-body">
+		{% if listSuppliersCommentLines is defined %}
+		{% set listConstructor = listSuppliersCommentLines %}
+		{{ include('@Globale/list.html.twig') }}
+		{% endif %}
+	</div>
+</div>
+
+
+<div class="panel-body">
+	<div class="row">
+			<div class="col-md-2">
+			{{ form_row(formConstructor.form['active']) }}
+			</div>
+	</div>
+</div>
+</div>
+
+{% for section in formConstructor.template.0.sections %}
+{% for field in section.fields %}
+{# Check if field is a relation and must show the view button #}
+{{ include("@Globale/form_relation_button.html.twig") }}
+{# Check if field is an address and map is enabled #}
+{{ include("@Globale/form_address_button.html.twig") }}
+{# Check if field is an url #}
+{{ include("@Globale/form_url_button.html.twig") }}
+{# Check if field is an tel #}
+{{ include("@Globale/form_tel_button.html.twig") }}
+{# Check if field is an email #}
+{{ include("@Globale/form_email_button.html.twig") }}
+{# Check if field has trigger #}
+{{ include("@Globale/form_trigger_field.html.twig") }}
+{# Check if field has a linked field #}
+{{ include("@Globale/form_fields_linked.html.twig") }}
+{# Check if field has a dependency of other field #}
+{{ include("@Globale/form_fields_depend.html.twig") }}
+{# Check if field has a to change another field #}
+{{ include("@Globale/form_fields_change.html.twig") }}
+{# Check if field has unity field #}
+{{ include("@Globale/form_fields_unity.html.twig") }}
+{# Check if field has a field type number #}
+{{ include("@Globale/form_fields_type_number.html.twig") }}
+
+{{ include("@ERP/workactivitiesmap.html.twig") }}
+{% endfor %}
+
+{% endfor %}
+</div>
+<div class="row">
+	<div style="text-align: right;" class="col-md-12">
+		<button attr-id="" attr-action="" id="{{formConstructor.name}}-button-cancel" type="button" class="btn btn">{{ ("Cancelar")|trans }}</button>
+		<button attr-id="" attr-action="" id="{{formConstructor.name}}-button-continue" type="button" class="btn btn-green">{{ ("Guardar")|trans }}</button>
+	</div>
+</div>
+</div>
+
+<script>
+$(document).ready(function() {
+
+$('body').on('click', "#{{formConstructor.name}}-button-continue", function() {
+if($("#{{formConstructor.name}}-form-body").find('form').valid()){
+	if((++load_wait)==1) $("#load-spinner").fadeIn();
+	$.post($("#{{formConstructor.name}}-form-body").find('form').find('#post-url').val(), $("#{{formConstructor.name}}-form-body").find('form').serialize(),
+	function(data, status, xhr){
+		if((--load_wait)==0) $("#load-spinner").fadeOut();
+		{{ include("@Globale/formvalidation.html.twig") }}
+		if(data.result){
+				//$("#tabs-list li").attr("attr-id",data.id);
+					toastr.success("Datos guardados correctamente", "Confirmación", confirmation);
+					if(data.reload) location.href=data.href;
+					$("#{{formConstructor.name}}-form-body").find('form').validate({ lang: 'es' }).resetForm();
+				}
+				else toastr.error("Ocurrió un error al guardar los datos", "Confirmación", confirmation);
+			}, "json");
+		}
+	});
+$('body').on('click', "#{{formConstructor.name}}-button-cancel", function() {
+	window.history.back();
+});
+
+
+$('body').on('click', "#workactivity-tree-modal-button-continue", function(){
+	if((++load_wait)==1) $("#load-spinner").fadeIn();
+	$.ajax({
+			type: "GET",
+			dataType: "json",
+			url: "/es/ERP/supplier/workactivity/"+$("#id-parent").val()+"/change/"+$('[id^=cb-workactivities-]:checked').attr('attr-id'),
+		}).done(function( data, textStatus, jqXHR ) {
+			if((--load_wait)==0) $("#load-spinner").fadeOut();
+			if(data.result) toastr.success("Datos guardados correctamente", "Confirmación", confirmation);
+				else toastr.error("Ocurrió un error al guardar los datos", "Confirmación", confirmation);
+			$("#workactivity-tree-modal").modal('toggle');
+			location.reload();
+	});
+
+
+});
+
+
+$('body').on('click', "#form_selectworkactivity", function() {
+	showWorkActivitiesMap();
+});
+
+});
+</script>
+<script src="{{ url('index') }}js/jquery.nestable.js"></script>

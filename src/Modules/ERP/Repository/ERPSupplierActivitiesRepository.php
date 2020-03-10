@@ -47,4 +47,48 @@ class ERPSupplierActivitiesRepository extends ServiceEntityRepository
         ;
     }
     */
+
+
+    public function getChildrens($id_workactivity, $temp_childs, $user)
+    {
+
+      $qb= $this->createQueryBuilder('e')
+      ->andWhere('e.parentid=:val_workactivity')
+      ->andWhere('e.active=:val_active')
+      ->andWhere('e.deleted=:val_deleted')
+      ->setParameter('val_workactivity', $id_workactivity)
+      ->setParameter('val_active', TRUE)
+      ->setParameter('val_deleted', FALSE)
+
+      ->getQuery()
+      ->getResult();
+      foreach($qb as $parent) {
+        $child=["id"=>$parent->getId(),"name"=>addslashes($parent->getName()), "childrens"=>$this->getChildrens($parent->getId(),[], $user)];
+        array_push($temp_childs,$child);
+      }
+      return $temp_childs;
+
+    }
+
+    public function getTree($user)
+    {
+      $qb= $this->createQueryBuilder('e')
+      ->andWhere('e.parentid is null')
+      ->andWhere('e.active=:val_active')
+      ->andWhere('e.deleted=:val_deleted')
+      ->setParameter('val_active', TRUE)
+      ->setParameter('val_deleted', FALSE)
+      ->getQuery()
+      ->getResult();
+
+      $childrens=[];
+      foreach($qb as $parent) {
+      $child=[];
+      $child=["id"=>$parent->getId(),"name"=>addslashes($parent->getName()), "childrens"=>$this->getChildrens($parent->getId(), $child, $user)];
+      array_push($childrens,$child);
+      }
+
+      return $childrens;
+
+    }
 }
