@@ -11,12 +11,15 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\ERP\Entity\ERPSuppliers;
+use App\Modules\ERP\Entity\ERPSupplierActivities;
+use App\Modules\ERP\Entity\ERPSupplierCommentLines;
 use App\Modules\ERP\Entity\ERPShoppingDiscounts;
 use App\Modules\Globale\Entity\GlobaleCountries;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\ERP\Utils\ERPSuppliersUtils;
+use App\Modules\ERP\Utils\ERPSupplierCommentLinesUtils;
 use App\Modules\ERP\Utils\ERPShoppingDiscountsUtils;
 use App\Modules\Security\Utils\SecurityUtils;
 
@@ -51,7 +54,11 @@ class ERPSuppliersController extends Controller
   				'breadcrumb' =>  $menurepository->formatBreadcrumb($request->get('_route')),
   				'userData' => $userdata,
   				'lists' => $templateLists,
-	        'forms' => $templateForms
+	        'forms' => $templateForms,
+					'include_post_templates' => ['@ERP/workactivitiesmap.html.twig','@ERP/productlistcategories.html.twig'],
+					'include_footer' => [["type"=>"css", "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.css"],
+															 ["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.js"],
+															 ["type"=>"js",  "path"=>"/js/jquery.nestable.js"]]
   				]);
   		}
   		return new RedirectResponse($this->router->generate('app_login'));
@@ -75,6 +82,7 @@ class ERPSuppliersController extends Controller
 		 $make= $utils->make($id, $this->class, $action, "formSuppliers", "full", "@Globale/form.html.twig", "formSupplier");
 		 return $make;
 		}
+
 
 		/**
      * @Route("/{_locale}/ERP/suppliers/form/{id}", name="formSupplier", defaults={"id"=0})
@@ -100,16 +108,68 @@ class ERPSuppliersController extends Controller
 							'userData' => $userdata,
 							'id' => $id,
 							'tab' => $request->query->get('tab','data'), //Show initial tab, by default data tab
-							'tabs' => [["name" => "data", "icon"=>"fa fa-id-card", "caption"=>"Supplier data", "active"=>true, "route"=>$this->generateUrl("dataSuppliers",["id"=>$id])],
+							'tabs' => [
+												["name" => "data", "icon"=>"fa fa-id-card", "caption"=>"Supplier data", "active"=>true, "route"=>$this->generateUrl("dataSuppliers",["id"=>$id])],
 												["name" => "addresses", "icon"=>"fa fa-location-arrow", "caption"=>"Shipping addresses", "route"=>$this->generateUrl("addresses",["id"=>$id, "type"=>"supplier"])],
 												["name" => "contacts",  "icon"=>"fa fa-users", "caption"=>"Contacts", "route"=>$this->generateUrl("generictablist",["function"=>"formatList","module"=>"ERP","name"=>"Contacts","id"=>$id])],
 												["name" => "bankaccounts", "icon"=>"fa fa-money", "caption"=>"Bank Accounts", "route"=>$this->generateUrl("bankaccounts",["id"=>$id])],
 												["name"=>"prices", "icon"=>"fa fa-money", "caption"=>"Shopping Discounts","route"=>$this->generateUrl("generictablist",["module"=>"ERP", "name"=>"ShoppingDiscounts", "id"=>$id])],
-												["name"=>"increments", "icon"=>"fa fa-money", "caption"=>"Increments","route"=>$this->generateUrl("generictablist",["module"=>"ERP", "name"=>"Increments", "id"=>$id])]
+												["name"=>"increments", "icon"=>"fa fa-money", "caption"=>"Increments","route"=>$this->generateUrl("generictablist",["module"=>"ERP", "name"=>"Increments", "id"=>$id])],
+												["name" => "newdata", "icon"=>"fa fa-id-card", "caption"=>"Supplier new data", "active"=>true, "route"=>$this->generateUrl("formInfoSuppliers",["id"=>$id])],
 											],
 									));
 			}
 
+
+
+
+			/**
+			 * @Route("/{_locale}/suppliers/info/{id}", name="formInfoSuppliers", defaults={"id"=0})
+			 */
+			public function formInfoSuppliers($id,  Request $request){
+				$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+				if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
+				$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
+				$new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-new"];
+				$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
+				$breadcrumb=$menurepository->formatBreadcrumb('suppliers');
+				array_push($breadcrumb, $new_breadcrumb);
+				$template=dirname(__FILE__)."/../Forms/Suppliers.json";
+				$formUtils = new GlobaleFormUtils();
+				$formUtilsSuppliers = new ERPSuppliersUtils();
+			  $listSuppliersCommentLines = new ERPSupplierCommentLinesUtils();
+				$formUtils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),$formUtilsSuppliers->getExcludedForm([]),$formUtilsSuppliers->getIncludedForm(["doctrine"=>$this->getDoctrine(), "user"=>$this->getUser(), "id"=>$id]));
+				//	$listCustomersPrices = new ERPCustomersPricesUtils();
+				//$listCustomersCommentLines = new ERPCustomerCommentLinesUtils();
+			//	$formUtilsCustomersPrices = new GlobaleFormUtils();
+			//$formUtilsCustomersPrices->initialize($this->getUser(), new ERPCustomersPrices(), dirname(__FILE__)."/../Forms/CustomersPrices.json", $request, $this, $this->getDoctrine());
+		//		$forms[]=$formUtilsCustomersPrices->formatForm('CustomersPrices', true, null, ERPCustomersPrices::class);
+
+
+				$supplierRepository=$this->getDoctrine()->getRepository(ERPSuppliers::class);
+				$supplier=$supplierRepository->findOneBy(["id"=>$id, "active"=>1, "deleted"=>0, "company"=>$this->getUser()->getCompany()]);
+
+				return $this->render('@ERP/supplierform.html.twig', array(
+					'controllerName' => 'suppliersController',
+					'interfaceName' => 'Clientes',
+					'optionSelected' => 'suppliers',
+					'userData' => $userdata,
+					'id' => $id,
+					'id_object' => $id,
+					'form' => $formUtils->formatForm('suppliers', true, $id, $this->class, "dataSuppliers"),
+					'listSuppliersCommentLines' => $listSuppliersCommentLines->formatListBySupplier($id),
+					'include_post_templates' => ['@ERP/workactivitiesmap.html.twig','@ERP/supplierlistworkactivities.html.twig'],
+					'include_footer' => [["type"=>"css", "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.css"],
+															 ["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.js"],
+															 ["type"=>"js",  "path"=>"/js/jquery.nestable.js"]]
+					/*,
+					'listSuppliersPrices' => $listCustomersPrices->formatListByCustomer($id),
+					'listCustomersCommentLines' => $listCustomersCommentLines->formatListByCustomer($id)
+					//'forms' => $forms
+					*/
+				));
+
+			}
 
 
     /**
@@ -169,6 +229,34 @@ class ERPSuppliersController extends Controller
 	 $entityUtils=new GlobaleEntityUtils();
 	 $result=$entityUtils->deleteObject($id, $this->class, $this->getDoctrine());
 	 return new JsonResponse(array('result' => $result));
+ }
+
+
+ /**
+ * @Route("/{_locale}/ERP/supplier/workactivity/{id}/change/{idworkact}", name="changeSupplierWorkActivity", defaults={"id"=0, "idcat"=0})
+ */
+ public function changeSupplierWorkActivity($id, $idworkact, Request $request){
+	$this->denyAccessUnlessGranted('ROLE_USER');
+	$repositorySupplier=$this->getDoctrine()->getRepository(ERPSuppliers::class);
+	$repositoryWorkActivity=$this->getDoctrine()->getRepository(ERPSupplierActivities::class);
+	$ids=null;
+	if($id!=0){
+		$ids=$id;
+	}else {
+		 $ids=$request->request->get('ids');
+	}
+	 $ids=explode(",",$ids);
+	 foreach($ids as $item){
+		 $supplier=$repositorySupplier->findOneBy(["id"=>$item, "company"=>$this->getUser()->getCompany()]);
+		 $workactivity=$repositoryWorkActivity->findOneBy(["id"=>$idworkact]);
+		 if($supplier && $workactivity){
+			 $supplier->setWorkActivity($workactivity);
+			 $this->getDoctrine()->getManager()->persist($supplier);
+			 $this->getDoctrine()->getManager()->flush();
+			 $result=1;
+		 }else $result=-1;
+	 }
+	return new JsonResponse(array('result' => $result));
  }
 
 }

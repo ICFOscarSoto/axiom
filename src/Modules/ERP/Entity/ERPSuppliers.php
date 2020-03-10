@@ -10,6 +10,7 @@ use \App\Modules\Globale\Entity\GlobaleCompanies;
 use \App\Modules\ERP\Entity\ERPPaymentMethods;
 use \App\Modules\Globale\Entity\GlobaleStates;
 use \App\Modules\ERP\Entity\ERPPaymentTerms;
+use \App\Modules\ERP\Entity\ERPSupplierActivities;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPSuppliersRepository")
@@ -187,6 +188,12 @@ class ERPSuppliers
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPPaymentTerms")
      */
     private $paymentterms;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPSupplierActivities", cascade={"persist"})
+     * @ORM\JoinColumn(onDelete="CASCADE")
+     */
+    private $workactivity;
 
 
     public function getId(): ?int
@@ -582,6 +589,18 @@ class ERPSuppliers
     public function setPaymentterms(?ERPPaymentTerms $paymentterms): self
     {
         $this->paymentterms = $paymentterms;
+
+        return $this;
+    }
+
+    public function getWorkactivity(): ?ERPSupplierActivities
+    {
+        return $this->workactivity;
+    }
+
+    public function setWorkactivity(?ERPSupplierActivities $workactivity): self
+    {
+        $this->workactivity = $workactivity;
 
         return $this;
     }

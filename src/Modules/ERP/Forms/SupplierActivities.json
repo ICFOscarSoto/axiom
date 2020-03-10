@@ -1,25 +1,9 @@
 [{
-    "sections": [
-        {
-            "name": "data",
-            "fields": [
-                {
-                    "name": "code",
-                    "cols": 4
-                },
-                {
-                    "name": "name",
-                    "cols": 4
-                },
-                {
-                    "name": "active",
-                    "cols": 4
-                },
-                {
-                    "name": "parentid",
-                    "cols": 4
-                }
-            ]
-        }
-    ]
+	"sections": [
+		{
+			"name": "Supplier Activity data",
+			"fields": [
+				{ "name": "name","cols": 12}
+			]
+		}]
 }]
