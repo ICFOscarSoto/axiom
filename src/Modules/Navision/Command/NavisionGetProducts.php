@@ -380,10 +380,10 @@ public function importStocks(InputInterface $input, OutputInterface $output) {
         $this->doctrine->getManager()->clear();
       }
     }
-    $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"products"]);
+    $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"stocks"]);
     if ($navisionSync==null) {
       $navisionSync=new NavisionSync();
-      $navisionSync->setEntity("products");
+      $navisionSync->setEntity("stocks");
     }
     $navisionSync->setLastsync($datetime);
     $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
