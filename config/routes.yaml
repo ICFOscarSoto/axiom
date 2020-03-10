@@ -51,8 +51,8 @@ CustomerGroups:
     resource: 'App\Modules\ERP\Controller\ERPCustomerGroupsController'
     type:     annotation
 
-CustomersPrices:
-    resource: 'App\Modules\ERP\Controller\ERPCustomersPricesController'
+CustomerSpecialConditions:
+    resource: 'App\Modules\ERP\Controller\ERPCustomerSpecialConditionsController'
     type:     annotation
 
 Increments:
@@ -61,6 +61,10 @@ Increments:
 
 Supplier:
     resource: 'App\Modules\ERP\Controller\ERPSuppliersController'
+    type:     annotation
+
+SupplierActivities:
+    resource: 'App\Modules\ERP\Controller\ERPSupplierActivitiesController'
     type:     annotation
 
 EAN13:

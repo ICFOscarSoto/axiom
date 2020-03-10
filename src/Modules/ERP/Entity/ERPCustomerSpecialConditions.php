@@ -10,9 +10,9 @@ use \App\Modules\ERP\Entity\ERPSuppliers;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
 
 /**
- * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPCustomersPricesRepository")
+ * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPCustomerSpecialConditionsRepository")
  */
-class ERPCustomersPrices
+class ERPCustomerSpecialConditions
 {
     /**
      * @ORM\Id()
@@ -23,13 +23,13 @@ class ERPCustomersPrices
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPCustomers")
-     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
+     * @ORM\JoinColumn(nullable=false)
      */
     private $customer;
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPCustomerGroups")
-     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
+     * @ORM\JoinColumn(nullable=false)
      */
     private $customergroup;
 
@@ -56,7 +56,7 @@ class ERPCustomersPrices
     /**
      * @ORM\Column(type="boolean")
      */
-    private $active=1;
+    private $active;
 
     /**
      * @ORM\Column(type="boolean")
@@ -65,7 +65,7 @@ class ERPCustomersPrices
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCompanies")
-     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
+     * @ORM\JoinColumn(nullable=false)
      */
     private $company;
 
@@ -182,8 +182,10 @@ class ERPCustomersPrices
         return $this;
     }
 
+
     public function formValidation($kernel, $doctrine, $user, $validationParams){
-          $repository=$doctrine->getRepository(ERPCustomersPrices::class);
+
+          $repository=$doctrine->getRepository(ERPCustomerSpecialConditions::class);
           $grupodefecto=$repository->checkDefaultGroup($this->customer, $this->customergroup, $this->company);
           $repetido=$repository->checkRepeated($this->customer, $this->supplier, $this->category, $this->customergroup, $this->company);
           if($grupodefecto!=NULL){
@@ -191,10 +193,7 @@ class ERPCustomersPrices
           }
           else if($this->supplier==NULL AND $this->category==NULL)
             return ["valid"=>false, "global_errors"=>["Por favor, selecciona un proveedor y/o una  categoría."]];
-          /*
-          else if($valido==NULL)
-            return ["valid"=>false, "global_errors"=>["No existe ningún producto para ese proveedor en esa categoría."]];
-          */
+
           else if($repetido!=NULL)
             return ["valid"=>false, "global_errors"=>["Ya existe un registro repetido para esos parámetros."]];
           else return ["valid"=>true];

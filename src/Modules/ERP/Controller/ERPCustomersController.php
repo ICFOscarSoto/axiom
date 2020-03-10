@@ -13,14 +13,14 @@ use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\ERP\Entity\ERPCustomers;
 use App\Modules\ERP\Entity\ERPContacts;
 use App\Modules\ERP\Entity\ERPCustomerGroups;
-use App\Modules\ERP\Entity\ERPCustomersPrices;
+use App\Modules\ERP\Entity\ERPCustomerSpecialConditions;
 use App\Modules\ERP\Entity\ERPCustomerCommentLines;
 use App\Modules\Globale\Entity\GlobaleCountries;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\ERP\Utils\ERPCustomersUtils;
-use App\Modules\ERP\Utils\ERPCustomersPricesUtils;
+use App\Modules\ERP\Utils\ERPCustomerSpecialConditionsUtils;
 use App\Modules\ERP\Utils\ERPCustomerCommentLinesUtils;
 use App\Modules\Security\Utils\SecurityUtils;
 
@@ -140,16 +140,18 @@ class ERPCustomersController extends Controller
 				$formUtils = new GlobaleFormUtils();
 				$formUtilsCustomers = new ERPCustomersUtils();
 				$formUtils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),$formUtilsCustomers->getExcludedForm([]),$formUtilsCustomers->getIncludedForm(["doctrine"=>$this->getDoctrine(), "user"=>$this->getUser(), "id"=>$id]));
-				$listCustomersPrices = new ERPCustomersPricesUtils();
+				$listCustomerSpecialConditions = new ERPCustomerSpecialConditionsUtils();
 				$listCustomersCommentLines = new ERPCustomerCommentLinesUtils();
-			  $formUtilsCustomersPrices = new GlobaleFormUtils();
-			  $formUtilsCustomersPrices->initialize($this->getUser(), new ERPCustomersPrices(), dirname(__FILE__)."/../Forms/CustomersPrices.json", $request, $this, $this->getDoctrine());
-				$forms[]=$formUtilsCustomersPrices->formatForm('CustomersPrices', true, null, ERPCustomersPrices::class);
-
+			  $formUtilsCustomerSpecialConditions = new GlobaleFormUtils();
+			  $formUtilsCustomerSpecialConditions->initialize($this->getUser(), new ERPCustomerSpecialConditions(), dirname(__FILE__)."/../Forms/CustomerSpecialConditions.json", $request, $this, $this->getDoctrine());
+				$formUtilsCustomersCommentLines = new GlobaleFormUtils();
+				$formUtilsCustomersCommentLines->initialize($this->getUser(), new ERPCustomerCommentLines(), dirname(__FILE__)."/../Forms/CustomerCommentLines.json", $request, $this, $this->getDoctrine());
+				$forms[]=$formUtilsCustomerSpecialConditions->formatForm('CustomerSpecialConditions', true, null, ERPCustomerSpecialConditions::class);
+				$forms[]=$formUtilsCustomersCommentLines->formatForm('CustomerCommentLines', true, null, ERPCustomerCommentLines::class);
 
 				$customerRepository=$this->getDoctrine()->getRepository(ERPCustomers::class);
 				$customer=$customerRepository->findOneBy(["id"=>$id, "active"=>1, "deleted"=>0, "company"=>$this->getUser()->getCompany()]);
-		
+
 				return $this->render('@ERP/customerform.html.twig', array(
 					'controllerName' => 'customersController',
 					'interfaceName' => 'Clientes',
@@ -158,7 +160,7 @@ class ERPCustomersController extends Controller
 					'id' => $id,
 					'id_object' => $id,
 					'form' => $formUtils->formatForm('customers', true, $id, $this->class, "dataCustomers"),
-					'listCustomersPrices' => $listCustomersPrices->formatListByCustomer($id),
+					'listCustomerSpecialConditions' => $listCustomerSpecialConditions->formatListByCustomer($id),
 					'listCustomersCommentLines' => $listCustomersCommentLines->formatListByCustomer($id),
 					'forms' => $forms
 				));

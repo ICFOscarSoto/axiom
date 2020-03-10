@@ -10,10 +10,6 @@
                 {
                     "name": "active",
                     "cols": 4
-                },
-                {
-                    "name": "customer",
-                    "cols": 4
                 }
             ]
         }

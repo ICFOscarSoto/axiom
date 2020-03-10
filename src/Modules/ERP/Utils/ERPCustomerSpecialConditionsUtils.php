@@ -8,10 +8,10 @@ use Symfony\Component\Form\Extension\Core\Type\FileType;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\ERP\Entity\ERPCustomers;
 
-class ERPCustomersPricesUtils
+class ERPCustomerSpecialConditionsUtils
 {
   private $module="ERP";
-  private $name="CustomersPrices";
+  private $name="CustomerSpecialConditions";
   public $parentClass="\App\Modules\ERP\Entity\ERPCustomers";
   public $parentField="customer";
 
@@ -38,18 +38,19 @@ class ERPCustomersPricesUtils
     return $list;
   }
   
+
   public function getExcludedForm($params){
     return ['customer'];
   }
-  
-  
+
+
   public function getIncludedForm($params){
     $doctrine=$params["doctrine"];
     $user=$params["user"];
     $id=$params["id"];
     return [];
-  }  
-  
+  }
+
   public function formatList($user, $customer){
     $list=[
       'id' => 'list'.$this->name,

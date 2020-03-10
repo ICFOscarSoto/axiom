@@ -11,9 +11,9 @@ class ERPCustomerCommentLinesUtils
 {
   private $module="ERP";
   private $name="CustomerCommentLines";
-  public function getExcludedForm($params){
-    return [];
-  }
+  public $parentClass="\App\Modules\ERP\Entity\ERPCustomers";
+  public $parentField="customer";
+
 
   public function formatListByCustomer($customer){
     $list=[
@@ -35,12 +35,17 @@ class ERPCustomerCommentLinesUtils
     ];
     return $list;
   }
-  
+
+
+  public function getExcludedForm($params){
+    return ['customer'];
+  }
+
 
   public function getIncludedForm($params){
     $doctrine=$params["doctrine"];
-    $id=$params["id"];
     $user=$params["user"];
+    $id=$params["id"];
     return [];
   }
 
