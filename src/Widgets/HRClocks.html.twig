@@ -1,18 +1,153 @@
 {{ include('@Widgets/widget_head.html.twig') }}
 
 <div class="col-md-4">
+  <div class="row" id="buttonClock">
+    <div id="clockIndefined" >
+      <div class="tile-title tile-gray">
+  			<div class="icon" style="height: 150px;text-align: center;vertical-align: bottom;">
 
+  			</div>
+  		</div>
+    </div>
+
+  </div>
+  <div class="row">
+    <div id="clockInfo" style="text-align: center;background: #f5f5f5;border-radius: 5px;vertical-align: middle;top: 50%;height: 40px;line-height: 40px;">
+    </div>
+  </div>
 </div>
-<div class="col-md-8"></div>
+<div class="col-md-8">
+  <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>Tipo</th>
+                <th>Inicio</th>
+                <th>Tipo</th>
+                <th>Fin</th>
+              </tr>
+            </thead>
+            <tbody id="clocksList">
+            </tbody>
+  </table>
+</div>
 
 {{ include('@Widgets/widget_footer.html.twig') }}
 {{ include('@Widgets/widget_settings.html.twig') }}
 
 <script>
+
+function setClockStar(){
+  $("#buttonClock").html('<div id="clockStart">' +
+    '<div class="tile-title tile-gray">' +
+    '	<div class="icon" style="height: 150px;text-align: center;vertical-align: bottom;">' +
+    '		<i class="fas fa-sign-in-alt" style="padding-top: 20px;top: 15px;color: #41ddaa;"></i>' +
+    '	</div>' +
+    '</div>' +
+    '</div>');
+  $('#clockInfo').html("Jornada no iniciada");
+}
+
+function setClockEnd(){
+  $("#buttonClock").html('<div id="clockEnd" >' +
+    '<div class="tile-title tile-gray">' +
+    '   <div class="icon" style="height: 150px;text-align: center;vertical-align: bottom;">' +
+    '     <i class="fas fa-sign-out-alt" style="padding-top: 20px;top: 15px;color: #ff7a7a;"></i>' +
+    '   </div>' +
+    ' </div>' +
+    '</div>');
+}
+
+function getClockList(){
+  $.ajax({
+     url: '{{ url('getlastclocks') }}',
+     type: 'POST',
+
+     success:  function( data ) {
+       $("#clocksList").empty();
+       jQuery.each(data, function(i, line) {
+         $("#clocksList").append('<tr>'+
+                                  '<td><i class="'+line.startIcon+'"></i></td>'+
+                                  '<td>'+line.startDate+'</td>'+
+                                  '<td><i class="'+line.endIcon+'"></i></td>'+
+                                  '<td>'+line.endDate+'</td>'+
+                                  '</tr>');
+       });
+     }
+   });
+}
+
+function getClockStatus(){
+  $.ajax({
+     url: '{{ url('getClockWorkerStatus',{'company': userData.companyId , 'id': 0}) }}',
+     type: 'POST',
+     data: {user: {{userData.id}}},
+
+     success:  function( data ) {
+         console.log(data);
+       if(data.result==0){
+         setClockStar();
+       }else{
+         setClockEnd();
+         $('#clockInfo').html('Iniciada: '+data.startedFormat);
+
+       }
+     }
+   });
+}
+
 $(function () {
+  getClockStatus();
+  getClockList();
+  $('body').on('click',"#clockStart", function (e) {
+    $.ajax({
+      url: '{{ url('doClocks',{'company': userData.companyId , 'id': 0}) }}',
+      type: 'POST',
+      data: {user: {{userData.id}}},
+      success:  function( data ) {
+        if(data.result==1){
+          setClockEnd();
+          getClockList();
+          $('#clockInfo').html('Iniciada: '+data.startedFormat);
+        }else{
+          toastr.error("No se pudo realizar la operación", "Confirmación", confirmation);
+        }
+
+        console.log(data);
+      }
+    });
+
+  });
+  $('body').on('click',"#clockEnd", function (e) {
+
+    $.confirm({
+        theme: 'bootstrap',
+        title: 'Cerrar jornada laboral',
+        content: '¿Esta seguro que desea cerrar ahora su jornada laboral?',
+        buttons: {
+           confirm: { text: 'Confirmar', btnClass: 'btn-red', action: function(){
+             $.ajax({
+               url: '{{ url('doClocks',{'company': userData.companyId , 'id': 0}) }}',
+               type: 'POST',
+               data: {user: {{userData.id}}},
+               success:  function( data ) {
+                 if(data.result==1){
+                   setClockStar();
+                   getClockList();
+                 }else{
+                   toastr.error("No se pudo realizar la operación", "Confirmación", confirmation);
+                 }
+
+                 console.log(data);
+               }
+             });
+           } },
+           cancel: { text: 'Cancelar' }
+        }
+    });
 
 
-  
+
+  });
 
 });
 </script>

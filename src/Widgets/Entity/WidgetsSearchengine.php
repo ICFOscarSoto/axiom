@@ -22,6 +22,7 @@ class WidgetsSearchengine
      * @ORM\JoinColumn(nullable=false)
      */
     private $userwidget;
+    
 
     /**
      * @ORM\Column(type="smallint", nullable=true)

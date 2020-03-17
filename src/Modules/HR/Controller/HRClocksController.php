@@ -17,6 +17,7 @@ use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\Globale\Utils\GlobaleExportUtils;
 use App\Modules\Globale\Utils\GlobaleListApiUtils;
+use App\Modules\Globale\Entity\GlobaleUsers;
 use App\Modules\Cloud\Controller\CloudController;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use App\Modules\HR\Utils\HRClocksUtils;
@@ -199,15 +200,22 @@ class HRClocksController extends Controller
 		 /**
  		 * @Route("/api/HR/doclock/{company}/{id}", name="doClocks")
  		 */
- 		 public function doClocks($company,$id, Request $request){
+ 		 public function doClocks($company, $id, Request $request){
 			date_default_timezone_set('Europe/Madrid');
 			$workersrepository=$this->getDoctrine()->getRepository(HRWorkers::class);
 			$clocksrepository=$this->getDoctrine()->getRepository(HRClocks::class);
+			$usersrepository=$this->getDoctrine()->getRepository(GlobaleUsers::class);
 			$companiesrepository=$this->getDoctrine()->getRepository(GlobaleCompanies::class);
 			$config=new GlobaleConfigVars();
 			$companiesrepository->find($company);
+
+			if($id==0 && $request->request->get('user')!=null){
+				$user=$usersrepository->findOneBy(["id"=>$request->request->get('user'), "active"=>1, "deleted"=>0]);
+				if($user==null) return new JsonResponse(["result"=>-2]);
+				$worker=$workersrepository->findOneBy(["company"=>$company, "user"=>$user, "active"=>1, "deleted"=>0]);
+			}else $worker=$workersrepository->findOneBy(["company"=>$company,"clockCode"=>$id]);
 			//Comprobamos si el empleado pertenece a la empresa
-			$worker=$workersrepository->findOneBy(["company"=>$company,"clockCode"=>$id]);
+
 			if($worker===NULL) return new JsonResponse(["result"=>-1]);
 			if($worker->getCompany()->getId()==$company){
 				//Comprobamos si hay un fichaje SeekableIterator
@@ -220,7 +228,7 @@ class HRClocksController extends Controller
 					$lastClock->setWorker($worker);
 					$lastClock->setStartLatitude($latitude);
 					$lastClock->setStartLongitude($longitude);
-					$lastClock->setStartIPaddress($this->container->get('request')->getClientIp());
+					$lastClock->setStartIPaddress($request->getClientIp());
 					$lastClock->setStart(new \DateTime());
 					$lastClock->setDateupd(new \DateTime());
 					$lastClock->setDateadd(new \DateTime());
@@ -252,11 +260,11 @@ class HRClocksController extends Controller
 					curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 					$result= curl_exec ($ch);
 					//curl_close ($ch);
-					return new JsonResponse(["result"=>1]);
+					return new JsonResponse(["result"=>1, "started"=>$lastClock->getStart(), "startedFormat"=>$lastClock->getStart()->format('d/m/Y H:i')]);
 				}else{
 					$lastClock->setEndLatitude($latitude);
 					$lastClock->setEndLongitude($longitude);
-					$lastClock->setEndIPaddress($this->container->get('request')->getClientIp());
+					$lastClock->setEndIPaddress($request->getClientIp());
 					$lastClock->setEnd(new \DateTime());
 					$lastClock->setDateupd(new \DateTime());
 					$lastClock->setTime(date_timestamp_get($lastClock->getEnd())-date_timestamp_get($lastClock->getStart()));
@@ -484,20 +492,56 @@ class HRClocksController extends Controller
 		/**
 		 * @Route("/api/HR/clocks/worker/{company}/{id}/status", name="getClockWorkerStatus")
 		 */
-		public function getClockWorkerStatus($company,$id){
+		public function getClockWorkerStatus($company, $id, Request $request){
 			$workersrepository=$this->getDoctrine()->getRepository(HRWorkers::class);
+			$usersrepository=$this->getDoctrine()->getRepository(GlobaleUsers::class);
 			$clocksrepository=$this->getDoctrine()->getRepository(HRClocks::class);
 			//Comprobamos si el empleado pertenece a la empresa
-
-			$worker=$workersrepository->findOneBy(["clockCode"=>$id]);
+			if($id==0 && $request->request->get('user')!=null){
+				$user=$usersrepository->findOneBy(["id"=>$request->request->get('user'), "active"=>1, "deleted"=>0]);
+				if($user==null) return new JsonResponse(["result"=>-2]);
+				$worker=$workersrepository->findOneBy(["user"=>$user, "active"=>1, "deleted"=>0]);
+			}else $worker=$workersrepository->findOneBy(["clockCode"=>$id]);
 			if($worker===NULL) return new JsonResponse(["result"=>-1]);
 			if($worker->getCompany()->getId()==$company){
 				//Comprobamos si hay un fichaje SeekableIterator
 				$lastClock=$clocksrepository->findOneBy(["worker"=>$worker,"end"=>NULL,"deleted"=>0,"active"=>1], ['id'=>'DESC']);
 				if($lastClock===NULL){
 					return new JsonResponse(["result"=>0]);
-				}else return new JsonResponse(["result"=>1, "started"=>$lastClock->getStart()]);
+				}else return new JsonResponse(["result"=>1, "started"=>$lastClock->getStart(), "startedFormat"=>$lastClock->getStart()->format('d/m/Y H:i')]);
 			} else return new JsonResponse(["result"=>-1]);
+		}
+
+
+		/**
+		 * @Route("/api/HR/clocks/worker/getlastclocks", name="getlastclocks")
+		 */
+		public function getlastclocks(Request $request){
+			$workersrepository=$this->getDoctrine()->getRepository(HRWorkers::class);
+			$usersrepository=$this->getDoctrine()->getRepository(GlobaleUsers::class);
+			$clocksrepository=$this->getDoctrine()->getRepository(HRClocks::class);
+
+			$user=$this->getUser();
+			$worker=$workersrepository->findOneBy(["user"=>$user, "active"=>1, "deleted"=>0]);
+			if($worker===NULL) return new JsonResponse(["result"=>-1]);
+
+			$lastClock=$clocksrepository->findBy(["worker"=>$worker,"deleted"=>0,"active"=>1], ['id'=>'DESC'], 5);
+			$result=[];
+			foreach($lastClock as $clock){
+				if($clock->getStartdevice()!=null) $item["startIcon"]="fas fa-fingerprint";
+					else if($clock->getStartlongitude()!=null) $item["startIcon"]="fas fa-mobile-alt";
+						else $item["startIcon"]="fas fa-desktop";
+				$item["startDate"]=$clock->getStart()->format('d/m/Y H:i');
+				if($clock->getEnddevice()!=null) $item["endIcon"]="fas fa-fingerprint";
+					else if($clock->getEndlongitude()!=null) $item["endIcon"]="fas fa-mobile-alt";
+						else $item["endIcon"]="fas fa-desktop";
+				$item["endDate"]=$clock->getEnd()!=null?$clock->getEnd()->format('d/m/Y H:i'):"";
+				$result[]=$item;
+			}
+
+			return new JsonResponse($result);
+
+
 		}
 
 
