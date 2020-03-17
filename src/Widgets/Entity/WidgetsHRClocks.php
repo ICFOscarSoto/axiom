@@ -5,11 +5,11 @@ namespace App\Widgets\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\Globale\Entity\GlobaleUsersWidgets;
 
-/**
+/** 
  * @ORM\Entity(repositoryClass="App\Widgets\Repository\WidgetsHRClocksRepository")
  */
 class WidgetsHRClocks
-{  
+{
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
