@@ -104,6 +104,17 @@ class HRClocks
     */
    private $observations;
 
+   /**
+    * @ORM\Column(type="string", length=64, nullable=true)
+    */
+   private $startIPaddress;
+
+   /**
+    * @ORM\Column(type="string", length=64, nullable=true)
+    */
+   private $endIPaddress;
+
+
     public function getId(): ?int
     {
         return $this->id;
@@ -309,6 +320,30 @@ class HRClocks
     public function setObservations(?string $observations): self
     {
         $this->observations = $observations;
+
+        return $this;
+    }
+
+    public function getStartIPaddress(): ?string
+    {
+        return $this->startIPaddress;
+    }
+
+    public function setStartIPaddress(?string $startIPaddress): self
+    {
+        $this->startIPaddress = $startIPaddress;
+
+        return $this;
+    }
+
+    public function getEndIPaddress(): ?string
+    {
+        return $this->endIPaddress;
+    }
+
+    public function setEndIPaddress(?string $endIPaddress): self
+    {
+        $this->endIPaddress = $endIPaddress;
 
         return $this;
     }

@@ -220,6 +220,7 @@ class HRClocksController extends Controller
 					$lastClock->setWorker($worker);
 					$lastClock->setStartLatitude($latitude);
 					$lastClock->setStartLongitude($longitude);
+					$lastClock->setStartIPaddress($this->container->get('request')->getClientIp());
 					$lastClock->setStart(new \DateTime());
 					$lastClock->setDateupd(new \DateTime());
 					$lastClock->setDateadd(new \DateTime());
@@ -255,6 +256,7 @@ class HRClocksController extends Controller
 				}else{
 					$lastClock->setEndLatitude($latitude);
 					$lastClock->setEndLongitude($longitude);
+					$lastClock->setEndIPaddress($this->container->get('request')->getClientIp());
 					$lastClock->setEnd(new \DateTime());
 					$lastClock->setDateupd(new \DateTime());
 					$lastClock->setTime(date_timestamp_get($lastClock->getEnd())-date_timestamp_get($lastClock->getStart()));
