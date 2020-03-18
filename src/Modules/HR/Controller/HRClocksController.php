@@ -505,7 +505,7 @@ class HRClocksController extends Controller
 			if($worker===NULL) return new JsonResponse(["result"=>-1]);
 			if($worker->getCompany()->getId()==$company){
 				//Comprobamos si hay un fichaje SeekableIterator
-				$lastClock=$clocksrepository->findOneBy(["worker"=>$worker,"end"=>NULL,"deleted"=>0,"active"=>1], ['id'=>'DESC']);
+				$lastClock=$clocksrepository->findOneBy(["worker"=>$worker,"end"=>NULL,"deleted"=>0,"active"=>1], ['start'=>'DESC']);
 				if($lastClock===NULL){
 					return new JsonResponse(["result"=>0]);
 				}else return new JsonResponse(["result"=>1, "started"=>$lastClock->getStart(), "startedFormat"=>$lastClock->getStart()->format('d/m/Y H:i')]);
