@@ -525,7 +525,7 @@ class HRClocksController extends Controller
 			$worker=$workersrepository->findOneBy(["user"=>$user, "active"=>1, "deleted"=>0]);
 			if($worker===NULL) return new JsonResponse(["result"=>-1]);
 
-			$lastClock=$clocksrepository->findBy(["worker"=>$worker,"deleted"=>0,"active"=>1], ['id'=>'DESC'], 5);
+			$lastClock=$clocksrepository->findBy(["worker"=>$worker,"deleted"=>0,"active"=>1], ['start'=>'DESC'], 5);
 			$result=[];
 			foreach($lastClock as $clock){
 				if($clock->getStartdevice()!=null) $item["startIcon"]="fas fa-fingerprint";
