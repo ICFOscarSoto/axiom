@@ -87,4 +87,17 @@ class ERPCustomerIncrementsRepository extends ServiceEntityRepository
 
       else return NULL;
     }
+
+    public function getIncrementIdByCustomer($supplier,$category,$customer)
+    {
+      $query="SELECT i.id as id FROM erpcustomer_increments i WHERE i.supplier_id=:SUP AND i.category_id=:CAT AND i.customer_id=:CST AND i.active=1 AND i.deleted=0";
+      $params=[ 'SUP' => $supplier->getId(),
+               'CAT' => $category->getId(),
+               'CST' => $customer->getId()
+               ];
+
+    return $this->getEntityManager()->getConnection()->executeQuery($query,$params)->fetch();
+
+
+    }
 }
