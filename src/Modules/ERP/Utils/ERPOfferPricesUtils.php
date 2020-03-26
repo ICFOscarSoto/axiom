@@ -19,7 +19,7 @@ class ERPOfferPricesUtils
   public $parentField="product";
   public $parentClassCustomerOfferPrices="\App\Modules\ERP\Entity\ERPCustomers";
   public $parentFieldCustomerOfferPrices="customer";
-  
+
 
   public function formatListByProduct($product){
     $list=[
@@ -64,35 +64,19 @@ class ERPOfferPricesUtils
     ];
     return $list;
   }
-  
- /*
-  public function formatListByCustomer($customer){
-    $list=[
-      'id' => 'listOfferPrices',
-      'route' => 'offerpriceslist',
-      'routeParams' => ["id" => $customer],
-      'orderColumn' => 2,
-      'orderDirection' => 'ASC',
-      'tagColumn' => 3,
-      'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/CustomerOfferPrices.json"),true),
-      'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/CustomerOfferPricesFieldButtons.json"),true),
-      'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/CustomerOfferPricesTopButtons.json"),true)
-    ];
-    return $list;
-  }
-  */
+
   public function getExcludedForm($params){
       return ['product'];
   }
 
   public function getIncludedForm($params){
-    
+
     $doctrine=$params["doctrine"];
     $id=$params["id"];
     $user=$params["user"];
     $offerpricesRepository=$doctrine->getRepository(ERPOfferPrices::class);
     $offerprice=$offerpricesRepository->findOneBy(["id"=>$id]);
-    
+
     if($offerprice!=NULL)
     {
       $product=$offerprice->getProduct();
@@ -105,7 +89,7 @@ class ERPOfferPricesUtils
         'data' => round($product->getShoppingPrice($doctrine),2)
       ]]
       ];
-      
+
     }
     else
     {
@@ -120,19 +104,19 @@ class ERPOfferPricesUtils
       ];
     }
   }
-  
+
   public function getExcludedFormCustomerOfferPrices($params){
       return ['customer'];
   }
-  
+
   public function getIncludedFormCustomerOfferPrices($params){
-    
+
     $doctrine=$params["doctrine"];
     $id=$params["id"];
     $user=$params["user"];
     $offerpricesRepository=$doctrine->getRepository(ERPOfferPrices::class);
     $offerprice=$offerpricesRepository->findOneBy(["id"=>$id]);
-    
+
     if($offerprice!=NULL)
     {
       $product=$offerprice->getProduct();
@@ -145,7 +129,7 @@ class ERPOfferPricesUtils
         'data' => round($product->getShoppingPrice($doctrine),2)
       ]]
       ];
-      
+
     }
     else
     {

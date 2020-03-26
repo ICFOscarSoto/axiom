@@ -178,6 +178,34 @@ class ERPOfferPricesRepository extends ServiceEntityRepository
 
     }
 
+    public function getOfferId($product,$customer,$qty,$start)
+    {
+      if($customer!=NULL){
+        $query="SELECT o.id as id
+        FROM erpoffer_prices o
+        WHERE o.product_id=:PROD AND o.customer_id=:CST AND o.quantity=:QTY AND o.type=2 AND (DATE(START)=DATE(:DATE_START))";
+        $params=[
+        'PROD' => $product->getId(),
+        'CST' => $customer->getId(),
+        'QTY' => $qty,
+        'DATE_START' => $start
+        ];
+        return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetch();
+     }
+     else{
+       $query="SELECT o.id as id
+       FROM erpoffer_prices o
+       WHERE o.product_id=:PROD AND o.customer_id IS NULL AND o.quantity=:QTY AND o.type=2 AND (DATE(START)=DATE(:DATE_START))";
+       $params=[
+       'PROD' => $product->getId(),
+       'QTY' => $qty,
+       'DATE_START' => $start
+       ];
+       return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetch();
+     }
+
+    }
+
     // /**
     //  * @return ERPOfferPrices[] Returns an array of ERPOfferPrices objects
     //  */

@@ -17,6 +17,7 @@ use App\Modules\ERP\Entity\ERPShoppingDiscounts;
 use App\Modules\ERP\Entity\ERPStocks;
 use App\Modules\ERP\Entity\ERPStoreLocations;
 use App\Modules\ERP\Entity\ERPIncrements;
+use App\Modules\ERP\Entity\ERPOfferPrices;
 use App\Modules\ERP\Entity\ERPCustomerIncrements;
 use App\Modules\ERP\Entity\ERPCustomerPrices;
 use App\Modules\Globale\Entity\GlobaleCompanies;
@@ -66,6 +67,8 @@ class NavisionGetProducts extends ContainerAwareCommand
       case 'stocks': $this->importStocks($input, $output);
       break;
       case 'increments': $this->importIncrements($input, $output);
+      break;
+      case 'offers': $this->importOffers($input, $output);
       break;
       case 'all':
         $this->importProduct($input, $output);
@@ -394,10 +397,6 @@ public function importStocks(InputInterface $input, OutputInterface $output) {
 
   }
 
-/*
-  Si el producto no tiene descuento de compra, busco en Navision (Purchase Line Discount) los descuentos asociados que tiene.
-  Entonces los devuelvo y se los asigno al proveedor y la categoría del producto.
- */
 
 public function importIncrements(InputInterface $input, OutputInterface $output) {
   $navisionSyncRepository=$this->doctrine->getRepository(NavisionSync::class);
@@ -494,7 +493,7 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
 
                 if($customerincrementaxiom_ID==null)
                 {
-                if($increment["Discount"]!=0 && $customer!=NULL){
+                if($increment["Discount"]!=0){
                     $category=$repositoryCategory->findOneBy(["id"=>$product->getCategory()->getId()]);
                     $obj=new ERPCustomerIncrements();
                     $obj->setSupplier($supplier);
@@ -547,6 +546,126 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
     }
   }
 
+}
+
+
+
+public function importOffers(InputInterface $input, OutputInterface $output) {
+  $navisionSyncRepository=$this->doctrine->getRepository(NavisionSync::class);
+  $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"offers"]);
+  if ($navisionSync==null) {
+    $navisionSync=new NavisionSync();
+    $navisionSync->setMaxtimestamp(0);
+  }
+  $datetime=new \DateTime();
+  $output->writeln('* Sincronizando ofertas....');
+  $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
+  $company=$repositoryCompanies->find(2);
+  $repositoryCustomers=$this->doctrine->getRepository(ERPCustomers::class);
+  $repositoryOfferPrices=$this->doctrine->getRepository(ERPOfferPrices::class);
+  $repository=$this->doctrine->getRepository(ERPProducts::class);
+  $products=$repository->findAll();
+  //Disable SQL logger
+ foreach($products as $product) {
+   //$product=$repository->findOneBy(["code"=>'230700300680']);
+    $output->writeln('  - '.$product->getName());
+    $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
+    $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getOffers.php?product='.$product->getCode());
+    $objects=json_decode($json, true);
+    $objects=$objects[0];
+    foreach ($objects["class"] as $offer){
+
+          //oferta para un solo cliente
+          if($offer["type"]==0)
+          {
+            $customer=$repositoryCustomers->findOneBy(["code"=>$offer["salescode"]]);
+
+            if($customer!=NULL)
+            {
+
+            $offer_ID=$repositoryOfferPrices->getOfferId($product,$customer,$offer["quantity"],$offer["startingdate"]["date"]);
+            if($offer_ID!=NULL){
+            //  $output->writeln();
+              $offeraxiom=$repositoryOfferPrices->findOneBy(["id"=>$offer_ID]);
+              $offeraxiom->setPrice($offer["price"]);
+              if ($offer["endingdate"]["date"]=="1753-01-01 00:00:00.000000") {
+                $offeraxiom->setEnd(null);
+              }
+              else $offeraxiom->setEnd(date_create_from_format("Y-m-d h:i:s.u",$offer["endingdate"]["date"]));
+              $this->doctrine->getManager()->merge($offeraxiom);
+              $this->doctrine->getManager()->flush();
+
+            }
+            else{
+
+              $obj=new ERPOfferPrices();
+              $obj->setProduct($product);
+              $obj->setCustomer($customer);
+              $obj->setCompany($company);
+              $obj->setType(2);
+              $obj->setPrice($offer["price"]);
+              $obj->setQuantity($offer["quantity"]);
+              $obj->setStart(date_create_from_format("Y-m-d h:i:s.u",$offer["startingdate"]["date"]));
+              if ($offer["endingdate"]["date"]=="1753-01-01 00:00:00.000000") {
+                $obj->setEnd(null);
+              } else $obj->setEnd(date_create_from_format("Y-m-d h:i:s.u",$offer["endingdate"]["date"]));
+              $obj->setDateadd(new \Datetime());
+              $obj->setDateupd(new \Datetime());
+              $obj->setActive(1);
+              $obj->setDeleted(0);
+              $this->doctrine->getManager()->merge($obj);
+              $this->doctrine->getManager()->flush();
+            }
+
+
+            }
+          }
+          //oferta para todos los clientes
+          else{
+
+            $offer_ID=$repositoryOfferPrices->getOfferId($product,NULL,$offer["quantity"],$offer["startingdate"]["date"]);
+            if($offer_ID!=NULL){
+              $offeraxiom=$repositoryOfferPrices->findOneBy(["id"=>$offer_ID]);
+              $offeraxiom->setPrice($offer["price"]);
+              if ($offer["endingdate"]["date"]=="1753-01-01 00:00:00.000000") {
+                $offeraxiom->setEnd(null);
+              }
+              else $offeraxiom->setEnd(date_create_from_format("Y-m-d h:i:s.u",$offer["endingdate"]["date"]));
+              $this->doctrine->getManager()->merge($offeraxiom);
+              $this->doctrine->getManager()->flush();
+
+            }
+
+            else{
+              $obj=new ERPOfferPrices();
+              $obj->setProduct($product);
+              $obj->setCompany($company);
+              $obj->setType(2);
+              $obj->setPrice($offer["price"]);
+              $obj->setQuantity($offer["quantity"]);
+              $obj->setStart(date_create_from_format("Y-m-d h:i:s.u",$offer["startingdate"]["date"]));
+              if ($offer["endingdate"]["date"]=="1753-01-01 00:00:00.000000") {
+                $obj->setEnd(null);
+              } else $obj->setEnd(date_create_from_format("Y-m-d h:i:s.u",$offer["endingdate"]["date"]));
+              $obj->setDateadd(new \Datetime());
+              $obj->setDateupd(new \Datetime());
+              $obj->setActive(1);
+              $obj->setDeleted(0);
+              $this->doctrine->getManager()->merge($obj);
+              $this->doctrine->getManager()->flush();
+
+
+            }
+
+
+
+          }
+
+      }
+      $this->doctrine->getManager()->clear();
+
+
+   }
 }
 
 }
