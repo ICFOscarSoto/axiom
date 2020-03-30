@@ -169,4 +169,18 @@ class ERPIncrementsRepository extends ServiceEntityRepository
       else return NULL;
     }
 
+
+    public function getIncrementIdByGroup($supplier,$category,$customergroup)
+    {
+
+        $query="SELECT i.id as id FROM erpincrements i WHERE i.supplier_id=:SUP AND i.category_id=:CAT AND i.customergroup_id=:GRP AND i.active=1 AND i.deleted=0";
+        $params=[ 'SUP' => $supplier->getId(),
+                 'CAT' => $category->getId(),
+                 'GRP' => $customergroup->getId()
+                 ];
+
+        return $this->getEntityManager()->getConnection()->executeQuery($query,$params)->fetch();
+
+    }
+
 }

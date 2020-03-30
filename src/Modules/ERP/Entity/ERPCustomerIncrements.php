@@ -68,6 +68,16 @@ class ERPCustomerIncrements
      */
     private $deleted;
 
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $start;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $end;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -202,7 +212,7 @@ class ERPCustomerIncrements
       $products=$repositorySuppliers->productsBySupplier($this->supplier->getId());
       foreach($products as $product){
         $productEntity=$repositoryProduct->findOneBy(["id"=>$product]);
-        //controlamos que un producto no pueda recibir incrementos si no tiee una categoría asocaida
+        //controlamos que un producto no pueda recibir incrementos si no tiene una categoría asocaida
         if($productEntity->getCategory()!=null)
         {
 
@@ -212,6 +222,8 @@ class ERPCustomerIncrements
                     $customerpricesEntity=$repositoryCustomerPrices->findOneBy(["product"=>$productEntity,"customer"=>$this->customer,"supplier"=>$this->supplier]);
                     $customerpricesEntity->setIncrement($increment);
                     $customerpricesEntity->setPrice(round($productEntity->getShoppingPrice()*(1+($increment/100)),2));
+                    $customerpricesEntity->setStart($this->getStart());
+                    $customerpricesEntity->setEnd($this->getEnd());
                 }
               else {
                     $customerpricesEntity= new ERPCustomerPrices();
@@ -224,6 +236,8 @@ class ERPCustomerIncrements
                     $customerpricesEntity->setDeleted(0);
                     $customerpricesEntity->setDateupd(new \DateTime());
                     $customerpricesEntity->setDateadd(new \DateTime());
+                    $customerpricesEntity->setStart($this->getStart());
+                    $customerpricesEntity->setEnd($this->getEnd());
 
               }
                   $em->persist($customerpricesEntity);
@@ -257,10 +271,34 @@ class ERPCustomerIncrements
         $incrementbycustomer=$repository->getIncrementByCustomer(null,$category,$customer);
         while ($category->getParentid()!=null && $incrementbycustomer==null){
             $category=$category->getParentid();
-            $incrementbycustomer=$repository->getIncrementByCustomer(null,$category,$customergroup);
+            $incrementbycustomer=$repository->getIncrementByCustomer(null,$category,$customer);
           }
         }
 
       return $incrementbycustomer;
+    }
+
+    public function getStart(): ?\DateTimeInterface
+    {
+        return $this->start;
+    }
+
+    public function setStart(?\DateTimeInterface $start): self
+    {
+        $this->start = $start;
+
+        return $this;
+    }
+
+    public function getEnd(): ?\DateTimeInterface
+    {
+        return $this->end;
+    }
+
+    public function setEnd(?\DateTimeInterface $end): self
+    {
+        $this->end = $end;
+
+        return $this;
     }
 }
