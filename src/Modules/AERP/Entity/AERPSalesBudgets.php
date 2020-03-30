@@ -127,6 +127,41 @@ class AERPSalesBudgets
     private $customerpostbox;
 
     /**
+     * @ORM\Column(type="string", length=200, nullable=true)
+     */
+    private $shiptoname;
+
+    /**
+     * @ORM\Column(type="string", length=150, nullable=true)
+     */
+    private $shiptoaddress;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCountries")
+     */
+    private $shiptocountry;
+
+    /**
+     * @ORM\Column(type="string", length=70, nullable=true)
+     */
+    private $shiptocity;
+
+    /**
+     * @ORM\Column(type="string", length=125, nullable=true)
+     */
+    private $shiptostate;
+
+    /**
+     * @ORM\Column(type="string", length=12, nullable=true)
+     */
+    private $shiptopostcode;
+
+    /**
+     * @ORM\Column(type="string", length=25, nullable=true)
+     */
+    private $shiptopostbox;
+
+    /**
      * @ORM\Column(type="string", length=20, nullable=true)
      */
     private $customercode;
@@ -502,6 +537,90 @@ class AERPSalesBudgets
     public function setCustomerpostbox(?string $customerpostbox): self
     {
         $this->customerpostbox = $customerpostbox;
+
+        return $this;
+    }
+
+    public function getShiptoname(): ?string
+    {
+        return $this->shiptoname;
+    }
+
+    public function setShiptoname(?string $shiptoname): self
+    {
+        $this->shiptoname = $shiptoname;
+
+        return $this;
+    }
+
+    public function getShiptoaddress(): ?string
+    {
+        return $this->shiptoaddress;
+    }
+
+    public function setShiptoaddress(?string $shiptoaddress): self
+    {
+        $this->shiptoaddress = $shiptoaddress;
+
+        return $this;
+    }
+
+    public function getShiptocountry(): ?GlobaleCountries
+    {
+        return $this->shiptocountry;
+    }
+
+    public function setShiptocountry(?GlobaleCountries $shiptocountry): self
+    {
+        $this->shiptocountry = $shiptocountry;
+
+        return $this;
+    }
+
+    public function getShiptocity(): ?string
+    {
+        return $this->shiptocity;
+    }
+
+    public function setShiptocity(?string $shiptocity): self
+    {
+        $this->shiptocity = $shiptocity;
+
+        return $this;
+    }
+
+    public function getShiptostate(): ?string
+    {
+        return $this->shiptostate;
+    }
+
+    public function setShiptostate(?string $shiptostate): self
+    {
+        $this->shiptostate = $shiptostate;
+
+        return $this;
+    }
+
+    public function getShiptopostcode(): ?string
+    {
+        return $this->shiptopostcode;
+    }
+
+    public function setShiptopostcode(?string $shiptopostcode): self
+    {
+        $this->shiptopostcode = $shiptopostcode;
+
+        return $this;
+    }
+
+    public function getShiptopostbox(): ?string
+    {
+        return $this->shiptopostbox;
+    }
+
+    public function setShiptopostbox(?string $shiptopostbox): self
+    {
+        $this->shiptopostbox = $shiptopostbox;
 
         return $this;
     }
