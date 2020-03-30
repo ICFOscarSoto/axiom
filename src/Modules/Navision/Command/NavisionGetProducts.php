@@ -422,6 +422,7 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
   //Disable SQL logger
   foreach($products as $product) {
   /*  $product=$repository->findOneBy(["code"=>'208833']);*/
+    $output->writeln($product->getCode().'  - '.$product->getName());
     $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
 
 
@@ -568,7 +569,7 @@ public function importOffers(InputInterface $input, OutputInterface $output) {
   //Disable SQL logger
  foreach($products as $product) {
    //$product=$repository->findOneBy(["code"=>'230700300680']);
-    $output->writeln('  - '.$product->getName());
+    $output->writeln($product->getCode().'  - '.$product->getName());
     $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
     $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getOffers.php?product='.$product->getCode());
     $objects=json_decode($json, true);
