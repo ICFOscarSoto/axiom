@@ -32,7 +32,7 @@ class CarrierCarriers
     private $name;
 
     /**
-     * @ORM\Column(type="string", length=32)
+     * @ORM\Column(type="string", length=32, nullable=true)
      */
     private $phone;
 
@@ -42,7 +42,7 @@ class CarrierCarriers
     private $country;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="datetime")
      */
     private $dateadd;
 
@@ -62,6 +62,11 @@ class CarrierCarriers
     private $deleted;
     public $newSeconds=1296000;
     public $updatedSeconds=1296000;
+
+    /**
+     * @ORM\Column(type="string", length=20, nullable=true)
+     */
+    private $code;
 
 
     public function __construct()
@@ -136,14 +141,14 @@ class CarrierCarriers
         return $this;
     }
 
-    public function getDateadd(): ?string
+    public function getDateadd(): ?\DateTimeInterface
     {
-        return $this->dteadd;
+        return $this->dateadd;
     }
 
-    public function setDateadd(string $dteadd): self
+    public function setDateadd(\DateTimeInterface $dateadd): self
     {
-        $this->dteadd = $dteadd;
+        $this->dateadd = $dateadd;
 
         return $this;
     }
@@ -180,6 +185,18 @@ class CarrierCarriers
     public function setDeleted(bool $deleted): self
     {
         $this->deleted = $deleted;
+
+        return $this;
+    }
+
+    public function getCode(): ?string
+    {
+        return $this->code;
+    }
+
+    public function setCode(?string $code): self
+    {
+        $this->code = $code;
 
         return $this;
     }

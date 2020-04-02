@@ -312,26 +312,109 @@ class NavisionGetSuppliers extends ContainerAwareCommand
         $supplier=$repositorySuppliers->findOneBy(["code"=>$object["entity"]]);
         if($object["comment"]!="" AND $supplier!=NULL)
         {
-          $output->writeln($supplier->getName().'  - '.$object["entity"]);
-          $obj=$repository->findOneBy(["comment"=>$object["comment"]]);
-          if ($obj==null) {
-            $obj=new ERPSupplierCommentLines();
-            //$company=$repositoryCompanies->find(2);
-            //$obj->setCompany($company);
-            $obj->setComment($object["comment"]);
-            $datetime=new \DateTime(date('Y-m-d 00:00:00',strtotime($object["date"]["date"])));
-           // dump(date('Y-m-d 00:00:00',strtotime($object["date"]["date"])));
-            $obj->setDateadd($datetime);
+          //comentarios generales del proveedor (type=0)
+          if($object["code"]=="")
+          {
+              $output->writeln($supplier->getName().'  - '.$object["entity"]);
+              $obj=$repository->findOneBy(["comment"=>$object["comment"]]);
+              if ($obj==null) {
+                $obj=new ERPSupplierCommentLines();
+                //$company=$repositoryCompanies->find(2);
+                //$obj->setCompany($company);
+                $obj->setComment($object["comment"]);
+                $datetime=new \DateTime(date('Y-m-d 00:00:00',strtotime($object["date"]["date"])));
+               // dump(date('Y-m-d 00:00:00',strtotime($object["date"]["date"])));
+                $obj->setDateadd($datetime);
 
-            $obj->setSupplier($supplier);
-            $obj->setDeleted(0);
-            $obj->setActive(1);
-            $obj->setDateupd($datetime);
-            $this->doctrine->getManager()->persist($obj);
-            $this->doctrine->getManager()->flush();
-            $this->doctrine->getManager()->clear();
+                $obj->setSupplier($supplier);
+                $obj->setType(0);
+                $obj->setDeleted(0);
+                $obj->setActive(1);
+                $obj->setDateupd($datetime);
+                $this->doctrine->getManager()->persist($obj);
+                $this->doctrine->getManager()->flush();
+                $this->doctrine->getManager()->clear();
+            }
+
           }
-      }
+          //comentarios condiciones especiales para los pedidos (type=1)
+          else if($object["code"]=="PEDIDO"){
+            $output->writeln($supplier->getName().'  - '.$object["entity"]);
+              $obj=$repository->findOneBy(["comment"=>$object["comment"]]);
+              if ($obj==null) {
+                $obj=new ERPSupplierCommentLines();
+                //$company=$repositoryCompanies->find(2);
+                //$obj->setCompany($company);
+                $obj->setComment($object["comment"]);
+                $datetime=new \DateTime(date('Y-m-d 00:00:00',strtotime($object["date"]["date"])));
+               // dump(date('Y-m-d 00:00:00',strtotime($object["date"]["date"])));
+                $obj->setDateadd($datetime);
+
+                $obj->setSupplier($supplier);
+                $obj->setType(1);
+                $obj->setDeleted(0);
+                $obj->setActive(1);
+                $obj->setDateupd($datetime);
+                $this->doctrine->getManager()->persist($obj);
+                $this->doctrine->getManager()->flush();
+                $this->doctrine->getManager()->clear();
+
+
+            }
+          }
+
+          //comentarios sobre las no conformidades (type=2)
+          else if($object["code"]=="NOCONFRM"){
+              $output->writeln($supplier->getName().'  - '.$object["entity"]);
+              $obj=$repository->findOneBy(["comment"=>$object["comment"]]);
+              if ($obj==null) {
+                $obj=new ERPSupplierCommentLines();
+                //$company=$repositoryCompanies->find(2);
+                //$obj->setCompany($company);
+                $obj->setComment($object["comment"]);
+                $datetime=new \DateTime(date('Y-m-d 00:00:00',strtotime($object["date"]["date"])));
+               // dump(date('Y-m-d 00:00:00',strtotime($object["date"]["date"])));
+                $obj->setDateadd($datetime);
+
+                $obj->setSupplier($supplier);
+                $obj->setType(2);
+                $obj->setSolution($object["solution"]);
+                $obj->setDeleted(0);
+                $obj->setActive(1);
+                $obj->setDateupd($datetime);
+                $this->doctrine->getManager()->persist($obj);
+                $this->doctrine->getManager()->flush();
+                $this->doctrine->getManager()->clear();
+
+            }
+          }
+            //comentarios sobre el rappel (type=3)
+          else if($object["code"]=="RAPPEL"){
+
+            $output->writeln($supplier->getName().'  - '.$object["entity"]);
+            $obj=$repository->findOneBy(["comment"=>$object["comment"]]);
+            if ($obj==null) {
+              $obj=new ERPSupplierCommentLines();
+              //$company=$repositoryCompanies->find(2);
+              //$obj->setCompany($company);
+              $obj->setComment($object["comment"]);
+              $datetime=new \DateTime(date('Y-m-d 00:00:00',strtotime($object["date"]["date"])));
+             // dump(date('Y-m-d 00:00:00',strtotime($object["date"]["date"])));
+              $obj->setDateadd($datetime);
+
+              $obj->setSupplier($supplier);
+              $obj->setType(3);
+              $obj->setDeleted(0);
+              $obj->setActive(1);
+              $obj->setDateupd($datetime);
+              $this->doctrine->getManager()->persist($obj);
+              $this->doctrine->getManager()->flush();
+              $this->doctrine->getManager()->clear();
+
+
+          }
+
+        }
 
       }
       $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"suppliercomments"]);
@@ -344,7 +427,7 @@ class NavisionGetSuppliers extends ContainerAwareCommand
       $this->doctrine->getManager()->persist($navisionSync);
       $this->doctrine->getManager()->flush();
     }
-
+  }
 
     public function importSupplierContact(InputInterface $input, OutputInterface $output){
       $repositoryCountries=$this->doctrine->getRepository(GlobaleCountries::class);

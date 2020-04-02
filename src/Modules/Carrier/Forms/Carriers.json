@@ -3,6 +3,7 @@
 		{
 			"name": "Carrier data",
 			"fields": [
+				{ "name": "code","cols": 2},
 				{ "name": "name","cols": 8},
 				{	"name": "phone", "cols": 4},
 				{	"name": "active", "cols": 2}

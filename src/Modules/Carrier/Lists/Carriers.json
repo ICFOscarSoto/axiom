@@ -1,4 +1,5 @@
 [ {"name": "id", "caption":""},
+  {"name": "code", "caption":"Código"},
   {"name": "name", "caption":"Nombre", "width" : "50"},
   {"name": "phone","caption":"Teléfono"},
   {"name": "country","caption":"País"},

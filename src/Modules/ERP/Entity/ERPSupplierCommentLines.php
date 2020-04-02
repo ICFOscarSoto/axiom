@@ -48,6 +48,16 @@ class ERPSupplierCommentLines
      */
     private $deleted;
 
+    /**
+     * @ORM\Column(type="smallint")
+     */
+    private $type;
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $solution;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -121,6 +131,30 @@ class ERPSupplierCommentLines
     public function setDeleted(bool $deleted): self
     {
         $this->deleted = $deleted;
+
+        return $this;
+    }
+
+    public function getType(): ?int
+    {
+        return $this->type;
+    }
+
+    public function setType(int $type): self
+    {
+        $this->type = $type;
+
+        return $this;
+    }
+
+    public function getSolution(): ?string
+    {
+        return $this->solution;
+    }
+
+    public function setSolution(?string $solution): self
+    {
+        $this->solution = $solution;
 
         return $this;
     }
