@@ -4,6 +4,7 @@ namespace App\Modules\Carrier\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
+use \App\Modules\Carrier\Entity\CarrierCarriers;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\Carrier\Repository\CarrierZonesRepository")
@@ -50,6 +51,12 @@ class CarrierZones
 
     public $newSeconds=1296000;
     public $updatedSeconds=1296000;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\Carrier\Entity\CarrierCarriers")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $carrier;
 
     public function getId(): ?int
     {
@@ -124,6 +131,18 @@ class CarrierZones
     public function setCompany(?GlobaleCompanies $company): self
     {
         $this->company = $company;
+
+        return $this;
+    }
+
+    public function getCarrier(): ?CarrierCarriers
+    {
+        return $this->carrier;
+    }
+
+    public function setCarrier(?CarrierCarriers $carrier): self
+    {
+        $this->carrier = $carrier;
 
         return $this;
     }
