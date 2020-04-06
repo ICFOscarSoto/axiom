@@ -8,6 +8,7 @@ use \App\Modules\Globale\Entity\GlobaleStates;
 use \App\Modules\Globale\Entity\GlobaleCountries;
 use \App\Modules\ERP\Entity\ERPSuppliers;
 use \App\Modules\ERP\Entity\ERPCustomers;
+use \App\Modules\ERP\Entity\ERPContacts;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPAddressesRepository")
@@ -44,7 +45,7 @@ class ERPAddresses
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleStates")
-     * @ORM\JoinColumn(nullable=false, onDelete="Cascade")
+     * @ORM\JoinColumn(nullable=true, onDelete="Cascade")
      */
     private $state;
 
@@ -80,7 +81,7 @@ class ERPAddresses
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCountries")
-     * @ORM\JoinColumn(nullable=false, onDelete="Cascade")
+     * @ORM\JoinColumn(nullable=true, onDelete="Cascade")
      */
     private $country;
 
@@ -98,6 +99,36 @@ class ERPAddresses
      * @ORM\JoinColumn(onDelete="Cascade")
      */
     private $customer;
+
+    /**
+     * @ORM\Column(type="string", length=120, nullable=true)
+     */
+    private $navisioncontact;
+
+    /**
+     * @ORM\OneToOne(targetEntity="\App\Modules\ERP\Entity\ERPContacts", cascade={"persist", "remove"})
+     */
+    private $contact;
+
+    /**
+     * @ORM\Column(type="string", length=16, nullable=true)
+     */
+    private $code;
+
+    /**
+     * @ORM\Column(type="string", length=180, nullable=true)
+     */
+    private $email;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $deliveryaddress;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $invoiceaddress;
 
     public function getId(): ?int
     {
@@ -275,6 +306,78 @@ class ERPAddresses
     public function setCustomer(?ERPCustomers $customer): self
     {
         $this->customer = $customer;
+
+        return $this;
+    }
+
+    public function getNavisioncontact(): ?string
+    {
+        return $this->navisioncontact;
+    }
+
+    public function setNavisioncontact(?string $navisioncontact): self
+    {
+        $this->navisioncontact = $navisioncontact;
+
+        return $this;
+    }
+
+    public function getContact(): ?ERPContacts
+    {
+        return $this->contact;
+    }
+
+    public function setContact(?ERPContacts $contact): self
+    {
+        $this->contact = $contact;
+
+        return $this;
+    }
+
+    public function getCode(): ?string
+    {
+        return $this->code;
+    }
+
+    public function setCode(?string $code): self
+    {
+        $this->code = $code;
+
+        return $this;
+    }
+
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(?string $email): self
+    {
+        $this->email = $email;
+
+        return $this;
+    }
+
+    public function getDeliveryaddress(): ?bool
+    {
+        return $this->deliveryaddress;
+    }
+
+    public function setDeliveryaddress(?bool $deliveryaddress): self
+    {
+        $this->deliveryaddress = $deliveryaddress;
+
+        return $this;
+    }
+
+    public function getInvoiceaddress(): ?bool
+    {
+        return $this->invoiceaddress;
+    }
+
+    public function setInvoiceaddress(?bool $invoiceaddress): self
+    {
+        $this->invoiceaddress = $invoiceaddress;
 
         return $this;
     }

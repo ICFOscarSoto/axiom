@@ -11,6 +11,8 @@ use \App\Modules\ERP\Entity\ERPPaymentMethods;
 use \App\Modules\Globale\Entity\GlobaleStates;
 use \App\Modules\ERP\Entity\ERPPaymentTerms;
 use \App\Modules\ERP\Entity\ERPSupplierActivities;
+use \App\Modules\Carrier\Entity\CarrierCarriers;
+use \App\Modules\Carrier\Entity\CarrierShippingConditions;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPSuppliersRepository")
@@ -194,6 +196,16 @@ class ERPSuppliers
      * @ORM\JoinColumn(onDelete="CASCADE")
      */
     private $workactivity;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\Carrier\Entity\CarrierCarriers")
+     */
+    private $carrier;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\Carrier\Entity\CarrierShippingConditions")
+     */
+    private $shippingconditions;
 
 
     public function getId(): ?int
@@ -604,4 +616,29 @@ class ERPSuppliers
 
         return $this;
     }
+
+    public function getCarrier(): ?CarrierCarriers
+    {
+        return $this->carrier;
+    }
+
+    public function setCarrier(?CarrierCarriers $carrier): self
+    {
+        $this->carrier = $carrier;
+
+        return $this;
+    }
+
+    public function getShippingconditions(): ?CarrierShippingConditions
+    {
+        return $this->shippingconditions;
+    }
+
+    public function setShippingconditions(?CarrierShippingConditions $shippingconditions): self
+    {
+        $this->shippingconditions = $shippingconditions;
+
+        return $this;
+    }
+
 }

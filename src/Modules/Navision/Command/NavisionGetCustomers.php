@@ -10,6 +10,7 @@ use App\Modules\ERP\Entity\ERPCustomers;
 use App\Modules\ERP\Entity\ERPSuppliers;
 use App\Modules\ERP\Entity\ERPDepartments;
 use App\Modules\ERP\Entity\ERPContacts;
+use App\Modules\ERP\Entity\ERPAddresses;
 use App\Modules\ERP\Entity\ERPPaymentMethods;
 use App\Modules\ERP\Entity\ERPPaymentTerms;
 use App\Modules\ERP\Entity\ERPCustomerActivities;
@@ -65,6 +66,8 @@ class NavisionGetCustomers extends ContainerAwareCommand
       break;
       case 'contacts':
         $this->importCustomerContact($input, $output);
+      case 'addresses':
+          $this->importCustomerAddresses($input, $output);
       break;
       default:
         $output->writeln('Opcion no válida');
@@ -421,7 +424,7 @@ class NavisionGetCustomers extends ContainerAwareCommand
 
            $obj=new ERPContacts();
            $obj->setCode($object["code"]);
-           $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
+        //   $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
            //$company=$repositoryCompanies->find(2);
            //$obj->setCompany($company);
            $obj->setDateadd(new \Datetime());
@@ -453,8 +456,7 @@ class NavisionGetCustomers extends ContainerAwareCommand
        //$this->doctrine->getManager()->clear();
 
    }
-
-   $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"customercontacts"]);
+      $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"customercontacts"]);
    if ($navisionSync==null) {
      $navisionSync=new NavisionSync();
      $navisionSync->setEntity("customercontacts");
@@ -464,6 +466,85 @@ class NavisionGetCustomers extends ContainerAwareCommand
    $this->doctrine->getManager()->persist($navisionSync);
    $this->doctrine->getManager()->flush();
  }
+
+ public function importCustomerAddresses(InputInterface $input, OutputInterface $output){
+   $repositoryCountries=$this->doctrine->getRepository(GlobaleCountries::class);
+   $repositoryStates=$this->doctrine->getRepository(GlobaleStates::class);
+   $repositoryCustomers=$this->doctrine->getRepository(ERPCustomers::class);
+   $repository=$this->doctrine->getRepository(ERPAddresses::class);
+   $navisionSyncRepository=$this->doctrine->getRepository(NavisionSync::class);
+   $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"customeraddresses"]);
+   if ($navisionSync==null) {
+     $navisionSync=new NavisionSync();
+     $navisionSync->setMaxtimestamp(0);
+   }
+   $datetime=new \DateTime();
+   $output->writeln('* Sincronizando direcciones de los clientes....');
+   $customers=$repositoryCustomers->findAll();
+
+   foreach($customers as $customer)
+   {
+     $output->writeln($customer->getCode().'  - '.$customer->getName());
+     //Disable SQL logger
+     $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
+     $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getCustomerAddresses.php?customer='.$customer->getCode().'&from='.$navisionSync->getMaxtimestamp());
+     $objects=json_decode($json, true);
+     $objects=$objects[0];
+
+     foreach ($objects["class"] as $key=>$object){
+       //$output->writeln('  - '.$object["code"].' - '.$object["name"]);
+       $output->writeln("Vamos a analizar la dirección ".$object["code"]);
+       $obj=$repository->findOneBy(["code"=>$object["code"]]);
+       if ($obj==null) {
+
+         $obj=new ERPAddresses();
+         $obj->setCode($object["code"]);
+         $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
+         $company=$repositoryCompanies->find(2);
+         $obj->setCompany($company);
+         $obj->setDateadd(new \Datetime());
+         $obj->setDeleted(0);
+         $obj->setActive(1);
+       }
+        if($object["country"]==NULL) $country=$repositoryCountries->findOneBy(["alfa2"=>"ES"]);
+        else $country=$repositoryCountries->findOneBy(["alfa2"=>$object["country"]]);
+
+
+        $state=$repositoryStates->findOneBy(["name"=>$object["state"]]);
+
+        $obj->setName(ltrim(ltrim($object["name"]),'*'));
+        $obj->setAddress(rtrim($object["address1"]." ".$object["address2"]));
+        $obj->setCity($object["city"]);
+        $obj->setPostcode($object["postcode"]);
+        $obj->setPhone(ltrim($object["phone"]));
+        $obj->setEmail($object["email"]);
+        $obj->setCountry($country);
+        $obj->setState($state);
+        $obj->setCustomer($customer);
+        $obj->setNavisioncontact($object["navisioncontact"]);
+        $obj->setInvoiceaddress($object["invoiceaddress"]);
+        $obj->setDeliveryaddress($object["deliveryaddress"]);
+    //    if($object["authorizationcontrol"]) $obj->setAuthorizationcontrol(1);
+        $obj->setDateupd(new \Datetime());
+
+        $this->doctrine->getManager()->persist($obj);
+        $this->doctrine->getManager()->flush();
+     }
+
+     //$this->doctrine->getManager()->clear();
+
+ }
+ $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"customeraddresses"]);
+ if ($navisionSync==null) {
+   $navisionSync=new NavisionSync();
+   $navisionSync->setEntity("customeraddresses");
+ }
+ $navisionSync->setLastsync($datetime);
+ $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
+ $this->doctrine->getManager()->persist($navisionSync);
+ $this->doctrine->getManager()->flush();
+}
+
 
 
 }

@@ -14,6 +14,8 @@ use App\Modules\ERP\Entity\ERPPaymentMethods;
 use App\Modules\ERP\Entity\ERPPaymentTerms;
 use App\Modules\ERP\Entity\ERPDepartments;
 use App\Modules\ERP\Entity\ERPContacts;
+use App\Modules\Carrier\Entity\CarrierCarriers;
+use App\Modules\Carrier\Entity\CarrierShippingConditions;
 use App\Modules\Globale\Entity\GlobaleCompanies;
 use App\Modules\Globale\Entity\GlobaleStates;
 use App\Modules\Globale\Entity\GlobaleCountries;
@@ -90,6 +92,8 @@ class NavisionGetSuppliers extends ContainerAwareCommand
       $repositoryPaymentTerms=$this->doctrine->getRepository(ERPPaymentTerms::class);
       $repositorySupplierActivities=$this->doctrine->getRepository(ERPSupplierActivities::class);
       $repositoryStates=$this->doctrine->getRepository(GlobaleStates::class);
+      $repositoryCarriers=$this->doctrine->getRepository(CarrierCarriers::class);
+      $repositoryCarrierShippingConditions=$this->doctrine->getRepository(CarrierShippingConditions::class);
       $repository=$this->doctrine->getRepository(ERPSuppliers::class);
       $activity=NULL;
       //Disable SQL logger
@@ -269,13 +273,16 @@ class NavisionGetSuppliers extends ContainerAwareCommand
          if($object["socialname"][0]=='*') $obj->setActive(0); else $obj->setActive(1);
         if($activity!=NULL) $obj->setWorkactivity($activity);
 
-      //   dump("country: ".$country);
-  //        dump("state: ".$state);
-        //  dump("currency: ".$currency);
-
-        //if($paymentMethod!=NULL)  dump("paymentmethod:".$paymentMethod->getName());
-      //  if($paymentTerms!=NULL)  dump("paymentterms:".$paymentTerms->getName());
-
+        /*DATOS PARA PEDIDOS*/
+         $carrier=$repositoryCarriers->findOneBy(["code"=>$object["carrier"]]);
+         $shippingconditions=$repositoryCarrierShippingConditions->findOneBy(["code"=>$object["shippingconditions"]]);
+         $obj->setEstimateddelivery((integer)$object["estimateddelivery"]);
+         $obj->setAveragedelivery($object["averagedelivery"]);
+         $obj->setCarrier($carrier);
+         $obj->setFreeshipping($object["freeshipping"]);
+         $obj->setMinorder($object["minorder"]);
+         $obj->setCancelremains($object["cancelremains"]);
+         $obj->setShippingconditions($shippingconditions);
          $this->doctrine->getManager()->persist($obj);
 
       }
