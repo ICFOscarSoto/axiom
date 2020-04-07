@@ -1,0 +1,6 @@
+[
+  {"id" : "addAddressTop", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"genericdatatab", "routeParams":{"module":"ERP", "name":"Addresses", "type":"modal", "idparent":"id","json":"CustomerAddresses"}, "modal":"Addresses", "actionType" : "background", "confirm" :false, "tooltip" : ""},  {"id" : "deleteAddressTop", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true, "tooltip":""},
+  {"id" : "deleteAddressTop", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true},
+  {"id" : "printAddressTop", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false},
+  {"id" : "exportAddressTop", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"", "confirm" :false}
+]

@@ -1,0 +1,18 @@
+[{
+	"sections": [
+		{
+			"name": "Address data",
+			"fields": [
+				{ "name": "address","cols": 7},
+				{ "name": "postcode","cols": 2},
+				{ "name": "city","cols": 3},
+				{ "name": "state","cols": 4},
+				{ "name": "country","cols": 3},
+				{ "name": "navisioncontact","cols": 4},
+				{ "name": "contact","cols": 4},
+				{ "name": "deliveryaddress","cols": 3},
+				{ "name": "invoiceaddress","cols": 3},
+				{	"name": "active", "cols": 2}
+			]
+		}]
+}]

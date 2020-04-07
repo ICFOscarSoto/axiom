@@ -310,6 +310,9 @@ Paymentterms: Vencimientos
 due_date: Vencimiento
 Authorizationcontrol: Control de personas autorizadas
 Paymentmode: Modo de Pago
+Addresses: Direcciones
+Deliveryaddress: Dirección para Entrega
+Invoiceaddress: Dirección para Facturación
 
 # CUSTOMERS COMMENT LINES
 #----------------------------------------------------------------------------------------------------------------------

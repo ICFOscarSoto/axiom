@@ -29,7 +29,7 @@ class ERPAddresses
     private $company;
 
     /**
-     * @ORM\Column(type="string", length=120)
+     * @ORM\Column(type="string", length=120, nullable=true)
      */
     private $name;
 
@@ -75,7 +75,7 @@ class ERPAddresses
     private $deleted;
 
     /**
-     * @ORM\Column(type="string", length=32)
+     * @ORM\Column(type="string", length=32, nullable=true)
      */
     private $phone;
 
@@ -291,13 +291,14 @@ class ERPAddresses
         return $this;
     }
 
+/*
     public function preProccess($kernel, $doctrine, $user,$params){
       if($params["type"]=="supplier"){
         $this->supplier=$params["obj"];
       }
 
     }
-
+*/
     public function getCustomer(): ?ERPCustomers
     {
         return $this->customer;

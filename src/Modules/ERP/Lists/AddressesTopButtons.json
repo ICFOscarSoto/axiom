@@ -1,5 +1,5 @@
 [
-  {"id" : "addAddressTop", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"dataAddresses", "routeParams":{"entity":"entity_id", "type":"type_entity"}, "modal":"addresses", "actionType" : "background", "confirm" :false, "tooltip" : "Crear nueva direccion"},
+  {"id" : "addAddressTop", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"genericdatatab", "routeParams":{"module":"ERP", "name":"Address", "type":"modal", "idparent":"id","json":"Address"}, "modal":"Address", "actionType" : "background", "confirm" :false, "tooltip" : ""},  {"id" : "deleteAddressTop", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true, "tooltip":""},
   {"id" : "deleteAddressTop", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true},
   {"id" : "printAddressTop", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false},
   {"id" : "exportAddressTop", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"", "confirm" :false}

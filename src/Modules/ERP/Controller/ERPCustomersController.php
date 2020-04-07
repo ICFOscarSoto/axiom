@@ -110,6 +110,7 @@ class ERPCustomersController extends Controller
 							'tab' => $request->query->get('tab','data'), //Show initial tab, by default data tab
 							'tabs' => [["name" => "data", "icon"=>"fa fa-headphones", "caption"=>"Datos cliente", "active"=>true, "route"=>$this->generateUrl("formInfoCustomer",["id"=>$id])],
 												["name" => "contacts",  "icon"=>"fa fa-users", "caption"=>"Contacts", "route"=>$this->generateUrl("generictablist",["function"=>"formatListCustomers","module"=>"ERP","name"=>"Contacts","id"=>$id])],
+												["name" => "addresses",  "icon"=>"fa fa-users", "caption"=>"Addresses", "route"=>$this->generateUrl("generictablist",["function"=>"formatListByCustomer","module"=>"ERP","name"=>"Addresses","id"=>$id])],
 												["name" => "offerprices",  "icon"=>"fa fa-money", "caption"=>"Precios Específicos", "route"=>$this->generateUrl("generictablist",["function"=>"formatListByCustomer","module"=>"ERP","name"=>"OfferPrices","id"=>$id])],
 												//["name"=>"offerprices", "icon"=>"fa fa-money", "caption"=>"Precios Específicos","route"=>$this->generateUrl("infoCustomerOfferPrices",["module"=>"ERP", "name"=>"OfferPrices", "id"=>$id])]
 												//["name" => "addresses", "icon"=>"fa fa-headphones", "caption"=>"direcciones", "route"=>$this->generateUrl("addresses",["id"=>$id, "type"=>"contact"])],
