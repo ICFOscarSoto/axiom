@@ -37,4 +37,19 @@ class ERPProductsVariantsUtils
     ];
     return $list;
   }
+
+  public function formatListByProduct($product){
+    $list=[
+      'id' => 'listProductsVariants',
+      'route' => 'productsvariantslist',
+      'routeParams' => ["id" => $product],
+      'orderColumn' => 2,
+      'orderDirection' => 'ASC',
+      'tagColumn' => 3,
+      'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/ProductsVariants.json"),true),
+      'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/ProductsVariantsFieldButtons.json"),true),
+      'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/ProductsVariantsTopButtons.json"),true)
+    ];
+    return $list;
+  }
 }

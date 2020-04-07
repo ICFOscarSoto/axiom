@@ -2,25 +2,25 @@
 
 namespace App\Modules\ERP\Repository;
 
-use App\Modules\ERP\Entity\ERPVariantsValues;
+use App\Modules\ERP\Entity\ERPTransfersHeader;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
- * @method ERPVariantsValues|null find($id, $lockMode = null, $lockVersion = null)
- * @method ERPVariantsValues|null findOneBy(array $criteria, array $orderBy = null)
- * @method ERPVariantsValues[]    findAll()
- * @method ERPVariantsValues[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method ERPTransfersHeader|null find($id, $lockMode = null, $lockVersion = null)
+ * @method ERPTransfersHeader|null findOneBy(array $criteria, array $orderBy = null)
+ * @method ERPTransfersHeader[]    findAll()
+ * @method ERPTransfersHeader[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class ERPVariantsValuesRepository extends ServiceEntityRepository
+class ERPTransfersHeaderRepository extends ServiceEntityRepository
 {
     public function __construct(RegistryInterface $registry)
     {
-        parent::__construct($registry, ERPVariantsValues::class);
+        parent::__construct($registry, ERPTransfersHeader::class);
     }
 
     // /**
-    //  * @return ERPVariantsValues[] Returns an array of ERPVariantsValues objects
+    //  * @return ERPTransfersHeader[] Returns an array of ERPTransfersHeader objects
     //  */
     /*
     public function findByExampleField($value)
@@ -37,7 +37,7 @@ class ERPVariantsValuesRepository extends ServiceEntityRepository
     */
 
     /*
-    public function findOneBySomeField($value): ?ERPVariantsValues
+    public function findOneBySomeField($value): ?ERPTransfersHeader
     {
         return $this->createQueryBuilder('e')
             ->andWhere('e.exampleField = :val')

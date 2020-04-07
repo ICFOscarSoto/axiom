@@ -103,6 +103,10 @@ Product:
     resource: 'App\Modules\ERP\Controller\ERPProductsController'
     type:     annotation
 
+ProductsVariants:
+    resource: 'App\Modules\ERP\Controller\ERPProductsVariantsController'
+    type:     annotation
+
 ProductPrices:
     resource: 'App\Modules\ERP\Controller\ERPProductPricesController'
     type:     annotation
