@@ -22,7 +22,6 @@ class ERPAddressesUtils
   public $parentFieldCustomerAddresses="customer";
 
   public function formatListByCustomer($user, $customer){
-    $contacts=
     $list=[
       'id' => 'list'.$this->name,
       'route' => 'genericlist',
