@@ -40,10 +40,13 @@ class GlobaleListUtils
           $tokensSearchValue=explode('*',$searchValue);
           foreach($tokensSearchValue as $key=>$tokenSearch){
             if($tokenSearch!=''){
-                $query->orWhere('p.'.$metadata->getFieldName($column).' LIKE :val_'.$metadata->getFieldName($column).'_'.$key);
-                $query->setParameter('val_'.$metadata->getFieldName($column).'_'.$key, '%'.$tokenSearch.'%');
-                $queryFiltered->orWhere('p.'.$metadata->getFieldName($column).' LIKE :val_'.$metadata->getFieldName($column).'_'.$key);
-                $queryFiltered->setParameter('val_'.$metadata->getFieldName($column).'_'.$key, '%'.$tokenSearch.'%');
+              //check if start with
+              if($tokenSearch[0]=='^'){ $starWildcard =''; $tokenSearch=substr($tokenSearch, 1);} else $starWildcard ='%';
+              if($tokenSearch[strlen($tokenSearch)-1]=='^'){ $endWildcard =''; $tokenSearch=substr($tokenSearch, 0, -1);}else $endWildcard ='%';
+              $query->orWhere('p.'.$metadata->getFieldName($column).' LIKE :val_'.$metadata->getFieldName($column).'_'.$key);
+              $query->setParameter('val_'.$metadata->getFieldName($column).'_'.$key, $starWildcard.$tokenSearch.$endWildcard);
+              $queryFiltered->orWhere('p.'.$metadata->getFieldName($column).' LIKE :val_'.$metadata->getFieldName($column).'_'.$key);
+              $queryFiltered->setParameter('val_'.$metadata->getFieldName($column).'_'.$key, $starWildcard.$tokenSearch.$endWildcard);
             }
           }
           /*$query->orWhere('p.'.$metadata->getFieldName($column).' LIKE :val_'.$metadata->getFieldName($column));
@@ -61,10 +64,12 @@ class GlobaleListUtils
             $tokensSearchValue=explode('*',$searchValue);
             foreach($tokensSearchValue as $key=>$tokenSearch){
                   if($tokenSearch!=''){
+                    if($tokenSearch[0]=='^'){ $starWildcard =''; $tokenSearch=substr($tokenSearch, 1);} else $starWildcard ='%';
+                    if($tokenSearch[strlen($tokenSearch)-1]=='^'){ $endWildcard =''; $tokenSearch=substr($tokenSearch, 0, -1);}else $endWildcard ='%';
                     $query->orWhere($path[0].'.'.$path[1].' LIKE :val_'.$path[0].'_'.$path[1].'_'.$key);
-          					$query->setParameter('val_'.$path[0].'_'.$path[1].'_'.$key, '%'.$tokenSearch.'%');
+          					$query->setParameter('val_'.$path[0].'_'.$path[1].'_'.$key, $starWildcard.$tokenSearch.$endWildcard);
           					$query->orWhere($path[0].'.'.$path[1].' LIKE :val_'.$path[0].'_'.$path[1].'_'.$key);
-          					$query->setParameter('val_'.$path[0].'_'.$path[1].'_'.$key, '%'.$tokenSearch.'%');
+          					$query->setParameter('val_'.$path[0].'_'.$path[1].'_'.$key, $starWildcard.$tokenSearch.$endWildcard);
                   }
             }
   					/*$query->orWhere($path[0].'.'.$path[1].' LIKE :val_'.$path[0].'_'.$path[1]);
@@ -135,10 +140,12 @@ class GlobaleListUtils
                       $query->andWhere($database_field.' IS NULL');
                       $queryFiltered->andWhere($database_field.' IS NULL');
                     }else{
+                      if($tokenSearch[0]=='^'){ $starWildcard =''; $tokenSearch=substr($tokenSearch, 1);} else $starWildcard ='%';
+                      if($tokenSearch[strlen($tokenSearch)-1]=='^'){ $endWildcard =''; $tokenSearch=substr($tokenSearch, 0, -1);}else $endWildcard ='%';
                       $query->andWhere($database_field.' LIKE :val_'.$field["name"].'_'.$key);
-                      $query->setParameter('val_'.$field["name"].'_'.$key, '%'.$tokenSearch.'%');
+                      $query->setParameter('val_'.$field["name"].'_'.$key, $starWildcard.$tokenSearch.$endWildcard);
                       $queryFiltered->andWhere($database_field.' LIKE :val_'.$field["name"].'_'.$key);
-                      $queryFiltered->setParameter('val_'.$field["name"].'_'.$key, '%'.$tokenSearch.'%');
+                      $queryFiltered->setParameter('val_'.$field["name"].'_'.$key, $starWildcard.$tokenSearch.$endWildcard);
                     }
                 }
               }
