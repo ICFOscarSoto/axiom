@@ -1,6 +1,8 @@
 [
-  {"id" : "addTopProductsVariants", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"genericdata", "routeParams":{"module":"ERP", "name":"ProductsVariants", "type":"modal" }, "modal":"ProductsVariants", "actionType" : "background", "confirm" :false, "tooltip" : ""},
-  {"id" : "deleteTopProductsVariants", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true, "tooltip":""},
-  {"id" : "printTopProductsVariants", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false, "tooltip":""},
-  {"id" : "exportTopProductsVariants", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"genericexport", "routeParams":{"module":"ERP", "name":"ProductsVariants"}, "confirm" :false, "tooltip":""}
+  {"id" : "addTopProductsAttributes", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "",
+    "route":"genericdatatab", "routeParams":{"module":"ERP", "name":"ProductsVariants", "type":"modal",
+      "idparent":"id" }, "modal":"ProductsVariants", "actionType" : "background", "confirm" :false, "tooltip" : ""},
+  {"id" : "deleteTopProductsAttributes", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true, "tooltip":""},
+  {"id" : "printTopProductsAttributes", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false, "tooltip":""},
+  {"id" : "exportTopProductsAttributes", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"genericexport", "routeParams":{"module":"ERP", "name":"ProductsAttributes"}, "confirm" :false, "tooltip":""}
 ]

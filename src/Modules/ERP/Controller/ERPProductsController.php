@@ -103,6 +103,35 @@ class ERPProductsController extends Controller
 			$productRepository=$this->getDoctrine()->getRepository($this->class);
 			$obj = $productRepository->findOneBy(['id'=>$id, 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
 			$product_name=$obj?$obj->getName():'';
+			if ($obj->getGrouped()) {
+				return $this->render('@Globale/generictabform.html.twig', array(
+									'entity_name' => $product_name,
+									'controllerName' => 'ProductsController',
+									'interfaceName' => 'Productos',
+									'optionSelected' => 'products',
+									'menuOptions' =>  $menurepository->formatOptions($userdata),
+									'breadcrumb' => $breadcrumb,
+									'userData' => $userdata,
+									'id' => $id,
+									'tab' => $request->query->get('tab','data'), //Show initial tab, by default data tab
+									'tabs' => [
+										["name" => "data", "icon"=>"fa fa-id-card", "caption"=>"Products data", "active"=>true, "route"=>$this->generateUrl("formInfoProduct",["id"=>$id])],
+										["name" => "variants", "icon"=>"fa fa-id-card", "caption"=>"Variants", "route"=>$this->generateUrl("generictablist",["function"=>"formatListByProduct","module"=>"ERP","name"=>"ProductsVariants","id"=>$id])],
+										["name" => "list",  "icon"=>"fa fa-users", "caption"=>"References", "route"=>$this->generateUrl("listEAN13",["id"=>$id])],
+										["name"=>  "productPrices", "icon"=>"fa fa-money", "caption"=>"Prices","route"=>$this->generateUrl("infoProductPrices",["id"=>$id])],
+										["name" => "stocks", "icon"=>"fa fa-id-card", "caption"=>"Stocks", "route"=>$this->generateUrl("infoStocks",["id"=>$id])],
+										["name" => "webproduct", "icon"=>"fa fa-id-card", "caption"=>"Web", "route"=>$this->generateUrl("dataWebProducts",["id"=>$id])],
+										["name" => "files", "icon"=>"fa fa-cloud", "caption"=>"Files", "route"=>$this->generateUrl("cloudfiles",["id"=>$id, "path"=>"products"])]
+										],
+										'include_header' => [["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker-es.js"],
+																				["type"=>"css", "path"=>"/js/rickshaw/rickshaw.min.css"]],
+										'include_footer' => [["type"=>"css", "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.css"],
+													 		 					 ["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.js"],
+																				 ["type"=>"js",  "path"=>"/js/jquery.nestable.js"]]
+
+					));
+
+			} else {
 			return $this->render('@Globale/generictabform.html.twig', array(
 								'entity_name' => $product_name,
 								'controllerName' => 'ProductsController',
@@ -121,16 +150,13 @@ class ERPProductsController extends Controller
 									["name" => "webproduct", "icon"=>"fa fa-id-card", "caption"=>"Web", "route"=>$this->generateUrl("dataWebProducts",["id"=>$id])],
 									["name" => "files", "icon"=>"fa fa-cloud", "caption"=>"Files", "route"=>$this->generateUrl("cloudfiles",["id"=>$id, "path"=>"products"])]
 									],
-
-								//	["name" => "stocks", "icon"=>"fa fa-id-card", "caption"=>"Stocks", "route"=>$this->generateUrl("stocks",["id"=>$id])]],
-
 									'include_header' => [["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker-es.js"],
 																			["type"=>"css", "path"=>"/js/rickshaw/rickshaw.min.css"]],
 									'include_footer' => [["type"=>"css", "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.css"],
 												 		 					 ["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.js"],
 																			 ["type"=>"js",  "path"=>"/js/jquery.nestable.js"]]
 
-				));
+				));}
 		}
 
 
