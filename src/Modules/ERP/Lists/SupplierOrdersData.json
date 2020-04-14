@@ -1,0 +1,46 @@
+[
+    {
+        "name": "id",
+        "caption": "id"
+    },
+    {
+        "name": "freeshipping",
+        "caption": "freeshipping"
+    },
+    {
+        "name": "minorder",
+        "caption": "minorder"
+    },
+    {
+        "name": "estimateddelivery",
+        "caption": "estimateddelivery"
+    },
+    {
+        "name": "averagedelivery",
+        "caption": "averagedelivery"
+    },
+    {
+        "name": "cancelremains",
+        "caption": "cancelremains"
+    },
+    {
+        "name": "dropshipping",
+        "caption": "dropshipping"
+    },
+    {
+        "name": "allowpicking",
+        "caption": "allowpicking"
+    },
+    {
+        "name": "supplier__name",
+        "caption": "supplier"
+    },
+    {
+        "name": "carrier__name",
+        "caption": "carrier"
+    },
+    {
+        "name": "shippingconditions__name",
+        "caption": "shippingconditions"
+    }
+]

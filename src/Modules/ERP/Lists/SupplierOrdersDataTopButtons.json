@@ -1,0 +1,6 @@
+[
+  {"id" : "addTopSupplierOrdersData", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"genericdatatab", "routeParams":{"module":"ERP", "name":"SupplierOrdersData", "type":"modal", "idparent":"id","json":"SupplierOrdersData" }, "modal":"SupplierOrdersData", "actionType" : "background", "confirm" :false, "tooltip" : ""},
+  {"id" : "deleteTopSupplierOrdersData", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true, "tooltip":""},
+  {"id" : "printTopSupplierOrdersData", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false, "tooltip":""},
+  {"id" : "exportTopSupplierOrdersData", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"genericexport", "routeParams":{"module":"ERP", "name":"SupplierOrdersData"}, "confirm" :false, "tooltip":""}
+]

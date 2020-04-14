@@ -9,6 +9,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use App\Modules\ERP\Entity\ERPCustomers;
 use App\Modules\ERP\Entity\ERPSuppliers;
 use App\Modules\ERP\Entity\ERPSupplierActivities;
+use App\Modules\ERP\Entity\ERPSupplierOrdersData;
 use App\Modules\ERP\Entity\ERPSupplierCommentLines;
 use App\Modules\ERP\Entity\ERPPaymentMethods;
 use App\Modules\ERP\Entity\ERPPaymentTerms;
@@ -91,6 +92,7 @@ class NavisionGetSuppliers extends ContainerAwareCommand
       $repositoryPaymentMethod=$this->doctrine->getRepository(ERPPaymentMethods::class);
       $repositoryPaymentTerms=$this->doctrine->getRepository(ERPPaymentTerms::class);
       $repositorySupplierActivities=$this->doctrine->getRepository(ERPSupplierActivities::class);
+      $repositorySupplierOrdersData=$this->doctrine->getRepository(ERPSupplierOrdersData::class);
       $repositoryStates=$this->doctrine->getRepository(GlobaleStates::class);
       $repositoryCarriers=$this->doctrine->getRepository(CarrierCarriers::class);
       $repositoryCarrierShippingConditions=$this->doctrine->getRepository(CarrierShippingConditions::class);
@@ -272,18 +274,35 @@ class NavisionGetSuppliers extends ContainerAwareCommand
          else if($object["activitycode"]!=NULL) $activity=$repositorySupplierActivities->findOneBy(["code"=>$object["activitycode"],"parentid"=>NULL]);
          if($object["socialname"][0]=='*') $obj->setActive(0); else $obj->setActive(1);
         if($activity!=NULL) $obj->setWorkactivity($activity);
+        $this->doctrine->getManager()->persist($obj);
 
         /*DATOS PARA PEDIDOS*/
-         $carrier=$repositoryCarriers->findOneBy(["code"=>$object["carrier"]]);
-         $shippingconditions=$repositoryCarrierShippingConditions->findOneBy(["code"=>$object["shippingconditions"]]);
-         $obj->setEstimateddelivery((integer)$object["estimateddelivery"]);
-         $obj->setAveragedelivery($object["averagedelivery"]);
-         $obj->setCarrier($carrier);
-         $obj->setFreeshipping($object["freeshipping"]);
-         $obj->setMinorder($object["minorder"]);
-         $obj->setCancelremains($object["cancelremains"]);
-         $obj->setShippingconditions($shippingconditions);
-         $this->doctrine->getManager()->persist($obj);
+
+         $supplier=$repository->findOneBy(["code"=>$object["code"]]);
+         if($supplier!=NULL){
+             $ordersData=$repositorySupplierOrdersData->findOneBy(["supplier"=>$supplier]);
+
+             if($ordersData==NULL)
+             {
+               $ordersData=new ERPSupplierOrdersData();
+               $ordersData->setSupplier($supplier);
+               $ordersData->setDateadd(new \Datetime());
+               $ordersData->setDateupd(new \Datetime());
+               $ordersData->setDeleted(0);
+               $ordersData->setActive(1);
+
+             }
+             $carrier=$repositoryCarriers->findOneBy(["code"=>$object["carrier"]]);
+             $shippingconditions=$repositoryCarrierShippingConditions->findOneBy(["code"=>$object["shippingconditions"]]);
+             $ordersData->setEstimateddelivery((integer)$object["estimateddelivery"]);
+             $ordersData->setAveragedelivery($object["averagedelivery"]);
+             $ordersData->setCarrier($carrier);
+             $ordersData->setFreeshipping($object["freeshipping"]);
+             $ordersData->setMinorder($object["minorder"]);
+             $ordersData->setCancelremains($object["cancelremains"]);
+             $ordersData->setShippingconditions($shippingconditions);
+             $this->doctrine->getManager()->persist($ordersData);
+        }
 
       }
       $this->doctrine->getManager()->flush();
@@ -298,6 +317,7 @@ class NavisionGetSuppliers extends ContainerAwareCommand
       $this->doctrine->getManager()->persist($navisionSync);
       $this->doctrine->getManager()->flush();
     }
+
 
     public function importSupplierComment(InputInterface $input, OutputInterface $output){
       $navisionSyncRepository=$this->doctrine->getRepository(NavisionSync::class);
@@ -346,7 +366,8 @@ class NavisionGetSuppliers extends ContainerAwareCommand
           }
           //comentarios condiciones especiales para los pedidos (type=1)
           else if($object["code"]=="PEDIDO"){
-            $output->writeln($supplier->getName().'  - '.$object["entity"]);
+              $output->writeln("------------------------PEDIDO");
+              $output->writeln($supplier->getName().'  - '.$object["entity"]);
               $obj=$repository->findOneBy(["comment"=>$object["comment"]]);
               if ($obj==null) {
                 $obj=new ERPSupplierCommentLines();
@@ -372,6 +393,7 @@ class NavisionGetSuppliers extends ContainerAwareCommand
 
           //comentarios sobre las no conformidades (type=2)
           else if($object["code"]=="NOCONFRM"){
+              $output->writeln("----------------------------NOCONF");
               $output->writeln($supplier->getName().'  - '.$object["entity"]);
               $obj=$repository->findOneBy(["comment"=>$object["comment"]]);
               if ($obj==null) {
@@ -397,7 +419,7 @@ class NavisionGetSuppliers extends ContainerAwareCommand
           }
             //comentarios sobre el rappel (type=3)
           else if($object["code"]=="RAPPEL"){
-
+            $output->writeln("---------------------RAPPEL");
             $output->writeln($supplier->getName().'  - '.$object["entity"]);
             $obj=$repository->findOneBy(["comment"=>$object["comment"]]);
             if ($obj==null) {

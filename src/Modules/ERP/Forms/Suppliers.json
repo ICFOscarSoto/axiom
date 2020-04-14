@@ -30,12 +30,6 @@
 	{
 		"name": "Conditions",
 		"fields": [
-			{ "name": "minorder", "cols": 2},
-			{ "name": "freeshipping","cols": 2},
-			{ "name": "estimateddelivery","cols": 2},
-			{ "name": "averagedelivery","cols": 2},
-			{ "name": "cancelremains","cols": 2},
-			{ "name": "dropshipping","cols": 2},
 			{ "name": "creditor","cols": 2},
 			{ "name": "invoiceday","cols": 2},
 			{ "name": "currency","cols": 3},

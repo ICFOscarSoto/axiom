@@ -29,7 +29,7 @@
 	</div>
 </div>
 <div class="panel minimal">
-	<input type="hidden" id="post-url" name="post-url" value="{{ url('dataCustomers',{'id': formConstructor.id_object, 'action':'save'}) }}">
+	<input type="hidden" id="post-url" name="post-url" value="{{ url('dataSuppliers',{'id': formConstructor.id_object, 'action':'save'}) }}">
 	<input type="hidden" id="id-object" name="id-object" value="{{ formConstructor.id_object }}">
 	{{ form_row(formConstructor.form['_token']) }}
 	<div class="panel-heading">
@@ -207,24 +207,6 @@
 	</div>
 	<div class="panel-body">
 	<div class="row">
-		<div class="col-md-2">
-			{{ form_row(formConstructor.form['minorder']) }}
-		</div>
-		<div class="col-md-2">
-				{{ form_row(formConstructor.form['freeshipping']) }}
-		</div>
-		<div class="col-md-2">
-				{{ form_row(formConstructor.form['estimateddelivery']) }}
-		</div>
-		<div class="col-md-2">
-				{{ form_row(formConstructor.form['averagedelivery']) }}
-		</div>
-		<div class="col-md-2">
-			{{ form_row(formConstructor.form['cancelremains']) }}
-		</div>
-		<div class="col-md-2">
-			{{ form_row(formConstructor.form['dropshipping']) }}
-		</div>
 		<div class="col-md-2">
 			{{ form_row(formConstructor.form['creditor']) }}
 		</div>

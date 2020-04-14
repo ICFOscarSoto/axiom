@@ -67,6 +67,10 @@ SupplierActivities:
     resource: 'App\Modules\ERP\Controller\ERPSupplierActivitiesController'
     type:     annotation
 
+SupplierOrdersData:
+    resource: 'App\Modules\ERP\Controller\ERPSupplierOrdersDataController'
+    type:     annotation
+
 EAN13:
     resource: 'App\Modules\ERP\Controller\ERPEAN13Controller'
     type:     annotation

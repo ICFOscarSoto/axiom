@@ -133,41 +133,6 @@ class ERPSuppliers
     private $paymentmethod;
 
     /**
-     * @ORM\Column(type="float", nullable=true)
-     */
-    private $minorder;
-
-    /**
-     * @ORM\Column(type="float", nullable=true)
-     */
-    private $freeshipping;
-
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
-    private $estimateddelivery;
-
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
-    private $averagedelivery;
-
-    /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
-    private $cancelremains;
-
-    /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
-    private $dropshipping;
-
-    /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
-    private $allowpicking;
-
-    /**
      * @ORM\Column(type="boolean", nullable=true)
      */
     private $creditor;
@@ -196,16 +161,6 @@ class ERPSuppliers
      * @ORM\JoinColumn(onDelete="CASCADE")
      */
     private $workactivity;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\Carrier\Entity\CarrierCarriers")
-     */
-    private $carrier;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\Carrier\Entity\CarrierShippingConditions")
-     */
-    private $shippingconditions;
 
 
     public function getId(): ?int
@@ -453,90 +408,6 @@ class ERPSuppliers
         return $this;
     }
 
-    public function getMinorder(): ?float
-    {
-        return $this->minorder;
-    }
-
-    public function setMinorder(?float $minorder): self
-    {
-        $this->minorder = $minorder;
-
-        return $this;
-    }
-
-    public function getFreeshipping(): ?float
-    {
-        return $this->freeshipping;
-    }
-
-    public function setFreeshipping(?float $freeshipping): self
-    {
-        $this->freeshipping = $freeshipping;
-
-        return $this;
-    }
-
-    public function getEstimateddelivery(): ?int
-    {
-        return $this->estimateddelivery;
-    }
-
-    public function setEstimateddelivery(?int $estimateddelivery): self
-    {
-        $this->estimateddelivery = $estimateddelivery;
-
-        return $this;
-    }
-
-    public function getAveragedelivery(): ?int
-    {
-        return $this->averagedelivery;
-    }
-
-    public function setAveragedelivery(?int $averagedelivery): self
-    {
-        $this->averagedelivery = $averagedelivery;
-
-        return $this;
-    }
-
-    public function getCancelremains(): ?bool
-    {
-        return $this->cancelremains;
-    }
-
-    public function setCancelremains(?bool $cancelremains): self
-    {
-        $this->cancelremains = $cancelremains;
-
-        return $this;
-    }
-
-    public function getDropshipping(): ?bool
-    {
-        return $this->dropshipping;
-    }
-
-    public function setDropshipping(?bool $dropshipping): self
-    {
-        $this->dropshipping = $dropshipping;
-
-        return $this;
-    }
-
-    public function getAllowpicking(): ?bool
-    {
-        return $this->allowpicking;
-    }
-
-    public function setAllowpicking(?bool $allowpicking): self
-    {
-        $this->allowpicking = $allowpicking;
-
-        return $this;
-    }
-
     public function getCreditor(): ?bool
     {
         return $this->creditor;
@@ -617,28 +488,5 @@ class ERPSuppliers
         return $this;
     }
 
-    public function getCarrier(): ?CarrierCarriers
-    {
-        return $this->carrier;
-    }
-
-    public function setCarrier(?CarrierCarriers $carrier): self
-    {
-        $this->carrier = $carrier;
-
-        return $this;
-    }
-
-    public function getShippingconditions(): ?CarrierShippingConditions
-    {
-        return $this->shippingconditions;
-    }
-
-    public function setShippingconditions(?CarrierShippingConditions $shippingconditions): self
-    {
-        $this->shippingconditions = $shippingconditions;
-
-        return $this;
-    }
 
 }

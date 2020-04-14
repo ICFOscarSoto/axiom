@@ -1,0 +1,49 @@
+[{
+    "sections": [
+        {
+            "name": "data",
+            "fields": [
+                {
+                    "name": "freeshipping",
+                    "cols": 4
+                },
+                {
+                    "name": "minorder",
+                    "cols": 4
+                },
+                {
+                    "name": "estimateddelivery",
+                    "cols": 4
+                },
+                {
+                    "name": "averagedelivery",
+                    "cols": 4
+                },
+                {
+                    "name": "cancelremains",
+                    "cols": 4
+                },
+                {
+                    "name": "dropshipping",
+                    "cols": 4
+                },
+                {
+                    "name": "allowpicking",
+                    "cols": 4
+                },
+                {
+                    "name": "supplier",
+                    "cols": 4
+                },
+                {
+                    "name": "carrier",
+                    "cols": 4
+                },
+                {
+                    "name": "shippingconditions",
+                    "cols": 4
+                }
+            ]
+        }
+    ]
+}]

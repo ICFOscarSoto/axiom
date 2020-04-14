@@ -1,0 +1,8 @@
+[
+  {"id": "editSupplierOrdersData", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"genericdata", "routeParams":{"module":"ERP", "name":"SupplierOrdersData", "type":"modal","json":"SupplierOrdersData" }, "modal":"SupplierOrdersData", "actionType" : "background", "confirm" :false, "tooltip":""},
+  {"id": "activation", "type": "option", "options": [
+      {"id": "desactivateSupplierOrdersData", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"genericdisable", "routeParams":{"module":"ERP", "name":"SupplierOrdersData"}, "confirm" :true, "actionType" : "background", "tooltip":"" },
+      {"id": "activateSupplierOrdersData", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "route":"genericenable", "routeParams":{"module":"ERP", "name":"SupplierOrdersData"}, "confirm" :true, "actionType" : "background", "tooltip":"" }
+  ]},
+  {"id": "deleteSupplierOrdersData", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"genericdelete", "routeParams":{"module":"ERP", "name":"SupplierOrdersData"}, "confirm" :true, "undo" :false, "actionType" : "background", "tooltip":""}
+]
