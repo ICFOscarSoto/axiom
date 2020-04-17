@@ -10,12 +10,26 @@ use App\Modules\Email\Entity\EmailAccounts;
 
 class ERPBankAccountsUtils
 {
-
-  public function formatListbyEntity($entity){
+  private $module="ERP";
+  private $name="BankAccounts";
+/*
+  public $parentClass="\App\Modules\ERP\Entity\ERPSuppliers";
+  public $parentField="supplier";
+*/
+  public function formatListbySupplier($id, $supplier){
+/*
+    $bankaccountsRepository=$doctrine->getRepository('App\\Modules\\ERP\\Entity\\ERPBankAccounts');
+    $bankaccount=$bankaccountsRepository->findOneBy(["supplier"=>$supplier]);
+*/
+  /*
+    if($bankaccount)
+    {
+*/
     $list=[
       'id' => 'listBankAccounts',
       'route' => 'bankaccountlist',
-      'routeParams' => ["id" => $entity],
+      /*'routeParams' => ["id" => $entity],*/
+      'routeParams' => ["id" => $id, "supplierid" => $supplier],
       'orderColumn' => 1,
       'orderDirection' => 'DESC',
       'tagColumn' => 2,
@@ -24,10 +38,12 @@ class ERPBankAccountsUtils
       'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../../ERP/Lists/BankAccountsTopButtons.json"),true)
     ];
     return $list;
+    //}
+
   }
 
   public function getExcludedForm($params){
-    return [];
+    return ["customer","supplier"];
   }
 
   public function getIncludedForm($params){

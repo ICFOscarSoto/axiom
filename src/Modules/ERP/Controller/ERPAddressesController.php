@@ -37,7 +37,7 @@ class ERPAddressesController extends Controller
   		$this->router = $router;
   		$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
     	$utils = new ERPAddressesUtils;
-  		$templateLists=$utils->formatListbyEntity($id);
+  		$templateLists=$utils->formatListbyCustomer($id);
 			$formUtils=new GlobaleFormUtils();
 			$formUtils->initialize($this->getUser(), new $this->class(), dirname(__FILE__)."/../Forms/Addresses.json", $request, $this, $this->getDoctrine());
 			$templateForms[]=$formUtils->formatForm('addresses', true, $id, $this->class, "dataAddresses",["id"=>$id, "type"=>$type, "action"=>"save"]);
