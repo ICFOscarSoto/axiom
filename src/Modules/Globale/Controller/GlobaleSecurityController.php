@@ -41,12 +41,27 @@ class GlobaleSecurityController extends Controller
 
 		$companyRepository=$this->getDoctrine()->getRepository(GlobaleCompanies::class);
 		$company = $companyRepository->findOneBy(["domain" => $domain]);
+		$session = $request->getSession();
+
+		$type=$request->query->get('login-type', $session->get('login-type', 'onlypass'));
+
+
+		switch($type){
+			case 'card':
+				$template='@Globale/login_card.html.twig';
+			break;
+			default:
+				$template='@Globale/login.html.twig';
+			break;
+		}
+		//$session->set('login-type', $type);
+
 		if($company!=null && $domain!="aplicode.com"){
 			$logo=$this->generateUrl('getImage', array('type'=>'companydark' ,'size'=>'medium','id'=>$company->getId()));
-			return $this->render('@Globale/login.html.twig', ['last_username' => $lastUsername, 'domain'=>$domain, 'type'=> 'hidden', 'error' => $error, 'logo' => $logo]);
+			return $this->render($template, ['last_username' => $lastUsername, 'domain'=>$domain, 'type'=> 'hidden', 'error' => $error, 'logo' => $logo]);
 		}else{
 			$logo=$this->generateUrl('getImage', array('type'=>'companydark' ,'size'=>'medium','id'=>1));
-			return $this->render('@Globale/login.html.twig', ['last_username' => $lastUsername, 'domain'=>($domain!="aplicode.com")?$domain:"", 'type'=> 'text', 'error' => $error,  'logo' => $logo]);
+			return $this->render($template, ['last_username' => $lastUsername, 'domain'=>($domain!="aplicode.com")?$domain:"", 'type'=> 'text', 'error' => $error,  'logo' => $logo]);
 		}
 	}
 
@@ -110,4 +125,6 @@ class GlobaleSecurityController extends Controller
 		// some logic to determine the $locale
 		$request->setLocale($locale);
 	}
+
+
 }

@@ -72,7 +72,7 @@ class GlobaleUsersController extends Controller
 	public function profile(RouterInterface $router,Request $request, UserPasswordEncoderInterface $encoder)
 	{
     $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-    
+
     $new_breadcrumb=["rute"=>null, "name"=>"Editar perfil", "icon"=>"fa fa-edit"];
     $template=dirname(__FILE__)."/../Forms/Profile.json";
     $userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
@@ -94,7 +94,9 @@ class GlobaleUsersController extends Controller
             'route' => $this->generateUrl("dataUser",["id"=>$this->getUser()->getId()]),
             'form' => $utils->formatForm("formprofile", true, $this->getUser()->getId(), $this->class, 'dataUser')
     ));*/
-    $tabs =  [["name" => "data", "caption"=>"Datos usuario", "icon"=>"entypo-book-open","active"=>true, "route"=>$this->generateUrl("dataUser",["id"=>$this->getUser()->getId()])]];
+    $tabs =  [
+      ["name" => "data", "caption"=>"Datos usuario", "icon"=>"entypo-book-open","active"=>true, "route"=>$this->generateUrl("dataUser",["id"=>$this->getUser()->getId()])]
+    ];
     //Configuration tabs of modules enabled
 		$modulespository=$this->getDoctrine()->getRepository(GlobaleCompaniesModules::class);
     $modules=$modulespository->findBy(["companyown"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
@@ -191,6 +193,7 @@ class GlobaleUsersController extends Controller
             'id' => $id,
             'tab' => $request->query->get('tab','data'), //Show initial tab, by default data tab
             'tabs' => [["name" => "data", "caption"=>"Datos usuario", "icon"=>"fa fa-user","active"=>true, "route"=>$this->generateUrl("dataUser",["id"=>$id])],
+                       ["name" => "Tarjetas", "icon"=>"fa fa-card", "caption"=>"Tarjetas", "route"=>$this->generateUrl("generictablist",["module"=>"Globale", "name"=>"UsersCards", "id"=>$id])],
                        ["name" => "groups", "caption"=>"Grupos", "icon"=>"fa fa-users", "route"=>$this->generateUrl("generictablist",["module"=>"Globale", "name"=>"UsersUserGroups", "id"=>$id])],
                        ["name" => "permissions", "caption"=>"Permisos", "icon"=>"fa fa-shield", "route"=>$this->generateUrl("userPermissions",["id"=>$id])]
                       ],

@@ -22,9 +22,11 @@ security:
             logout:
                 path:   /logout
                 target: /
+                invalidate_session: false
             guard:
                 authenticators:
                     - App\Modules\Security\Controller\TokenAuthenticator
+                    - App\Modules\Security\Controller\CardAuthenticator
                     - App\Modules\Security\Controller\LoginformAuthenticator
                 entry_point: App\Modules\Security\Controller\LoginformAuthenticator
             # activate different ways to authenticate

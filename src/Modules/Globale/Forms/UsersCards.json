@@ -1,0 +1,26 @@
+[{
+    "sections": [
+        {
+            "name": "data",
+            "fields": [
+                {
+                    "name": "cardid",
+                    "cols": 4
+                },
+                {
+                    "name": "type",
+                    "cols": 4,
+                    "transform":
+          						{
+          							"type":"option",
+          							"options": {"Tarjeta RFID": "0", "Tarjeta Magnetica": "1", "Llavero": "2", "Pulsera": "3"}
+          						}
+                },
+                {
+                    "name": "active",
+                    "cols": 4
+                }
+            ]
+        }
+    ]
+}]

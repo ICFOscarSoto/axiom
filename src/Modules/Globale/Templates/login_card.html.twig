@@ -1,0 +1,135 @@
+{% set params = app.request.attributes.get('_route_params')|merge(app.request.query.all()) %}
+{% block header %}
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<meta name="description" content="Axiom Business Management" />
+	<meta name="author" content="" />
+	{{ include('@Globale/header.html.twig') }}
+	<!-- Imported styles on this page -->
+	<link rel="stylesheet" href="{{ url('index') }}/js/jvectormap/jquery-jvectormap-1.2.2.css">
+	<link rel="stylesheet" href="{{ url('index') }}/js/rickshaw/rickshaw.min.css">
+{% endblock %}
+<title>Axiom | Login</title>
+
+<body class="page-body login-page login-form-fall">
+
+
+<!-- This is needed when you send requests via Ajax -->
+<script type="text/javascript">
+var baseurl = '';
+</script>
+
+<div class="login-container">
+	<div class="login-header">
+		<div class="login-content">
+			<a href="index.html" class="logo">
+				<img src="{{ logo }}" width="300" alt="" />
+			</a>
+			<p class="description">Inicie sesión para acceder a su cuenta de usuario</p>
+		</div>
+	</div>
+	<div class="col-md-6">
+		<div class="login-form">
+			<div class="login-content">
+				<p style="text-align: right;">Aproxime su tarjeta al lector</p>
+				<img src="/images/login_card.gif" alt="" />
+			</div>
+		</div>
+	</div>
+	<div class="col-md-6">
+		<div class="login-form">
+			<div class="login-content">
+				<div class="form-login-error">
+					<h3>Invalid login</h3>
+				</div>
+				<form method="post">
+					<div class="form-group">
+						{% if type == 'text'%}
+							<div class="input-group">
+								<div class="input-group-addon">
+									<i class="entypo-globe"></i>
+								</div>
+							<input type="text" class="form-control" name="domain" id="domain" placeholder="Dominio" autocomplete="off" value="{{ domain }}"/>
+							</div>
+						{% else %}
+							<input type="hidden" class="form-control" name="domain" id="domain" placeholder="Dominio" autocomplete="off" value="{{ domain }}"/>
+						{% endif %}
+
+					</div>
+					<p>Utilice sus credenciales</p>
+					<div class="form-group">
+						<div class="input-group">
+							<div class="input-group-addon">
+								<i class="entypo-user"></i>
+							</div>
+							<input type="text" class="form-control" name="email" id="email" placeholder="Usuario" autocomplete="off" />
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="input-group">
+							<div class="input-group-addon">
+								<i class="entypo-key"></i>
+							</div>
+
+							<input type="password" class="form-control" name="password" id="password" placeholder="Contraseña" autocomplete="off" />
+							 <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+						</div>
+
+					</div>
+
+
+					<div class="form-group">
+						<button type="submit" class="btn btn-primary btn-block btn-login">
+							<i class="entypo-login"></i>
+							Iniciar Sesión
+						</button>
+					</div>
+				</form>
+
+
+			</div>
+
+		</div>
+	</div>
+
+	<div class="login-content">
+
+		<a href="index.html" class="logo">
+			<img src="/images/logo-axiom.png" width="100" alt="" style="margin-top: 50px" />
+		</a>
+		<p class="description" style="font-size:8px">by Aplicode Engineered Technologies </p>
+	</div>
+	<div class="login-bottom-links">
+
+		{#<a href="extra-forgot-password.html" class="link">¿Olvidó su contraseña?</a>#}
+
+		<br />
+
+		<!-- <a href="#">ToS</a>  - <a href="#">Privacy Policy</a> -->
+
+	</div>
+
+</div>
+
+
+	<!-- Bottom scripts (common) -->
+	<script src="{{ url('index') }}js/gsap/TweenMax.min.js"></script>
+	<script src="{{ url('index') }}js/jquery-ui/js/jquery-ui-1.10.3.minimal.min.js"></script>
+	<script src="{{ url('index') }}js/bootstrap.js"></script>
+	<script src="{{ url('index') }}js/joinable.js"></script>
+	<script src="{{ url('index') }}js/resizeable.js"></script>
+	<script src="{{ url('index') }}js/neon-api.js"></script>
+	<script src="{{ url('index') }}js/jquery.validate.min.js"></script>
+	<script src="{{ url('index') }}js/neon-login.js"></script>
+
+
+	<!-- JavaScripts initializations and stuff -->
+	<script src="{{ url('index') }}js/neon-custom.js"></script>
+
+
+	<!-- Demo Settings -->
+	<script src="{{ url('index') }}js/neon-demo.js"></script>
+
+</body>
+</html>

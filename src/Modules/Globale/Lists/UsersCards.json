@@ -1,0 +1,36 @@
+[
+    {
+        "name": "id",
+        "caption": "id"
+    },
+    {
+        "name": "cardid",
+        "caption": "cardid"
+    },
+    {
+        "name": "type",
+        "caption": "type",
+        "replace":{
+           "0":{"text":"Tarjeta RFID","html":"Tarjeta RFID"},
+           "1":{"text":"Tarjeta Magnetica","html":"Tarjeta Magnetica"},
+           "2":{"text":"Llavero","html":"Llavero"},
+           "3":{"text":"Pulsera","html":"Pulsera"}
+         }
+    },
+    {
+        "name": "active",
+        "caption": "Estado",
+        "width": "10%",
+        "class": "dt-center",
+        "replace": {
+            "1": {
+                "text": "Activo",
+                "html": "<div style=\"min-width: 75px;\" class=\"label label-success\">Activo<\/div>"
+            },
+            "0": {
+                "text": "Desactivado",
+                "html": "<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado<\/div>"
+            }
+        }
+    }
+]
