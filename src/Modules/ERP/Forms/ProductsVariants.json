@@ -12,13 +12,12 @@
                     "cols": 4
                 },
                 {
-                    "name": "variantvalue",
-                    "cols": 4
-                },
-                {
                     "name": "variantname",
                     "cols": 4
-                }
+                },
+                { "name": "variantvalue","cols": 2, "trigger":{"field":"variantname", "route":"generictrigger",
+          				"moduleTrigger":"ERP", "classTrigger":"ERPVariants",
+          				"module":"ERP", "class":"ERPVariantsValues", "relationParameter":"variantname"}}
             ]
         }
     ]

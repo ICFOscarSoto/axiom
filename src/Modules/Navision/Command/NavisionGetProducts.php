@@ -20,6 +20,9 @@ use App\Modules\ERP\Entity\ERPIncrements;
 use App\Modules\ERP\Entity\ERPOfferPrices;
 use App\Modules\ERP\Entity\ERPCustomerIncrements;
 use App\Modules\ERP\Entity\ERPCustomerPrices;
+use App\Modules\ERP\Entity\ERPVariants;
+use App\Modules\ERP\Entity\ERPVariantsValues;
+use App\Modules\ERP\Entity\ERPProductsVariants;
 use App\Modules\Globale\Entity\GlobaleCompanies;
 use App\Modules\Globale\Entity\GlobaleStates;
 use App\Modules\Globale\Entity\GlobaleTaxes;
@@ -69,6 +72,10 @@ class NavisionGetProducts extends ContainerAwareCommand
       case 'increments': $this->importIncrements($input, $output);
       break;
       case 'offers': $this->importOffers($input, $output);
+      break;
+      case 'variants': $this->importVariants($input, $output);
+      break;
+      case 'values': $this->importProductsVariants($input, $output);
       break;
       case 'all':
         $this->importProduct($input, $output);
@@ -549,8 +556,6 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
 
 }
 
-
-
 public function importOffers(InputInterface $input, OutputInterface $output) {
   $navisionSyncRepository=$this->doctrine->getRepository(NavisionSync::class);
   $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"offers"]);
@@ -668,6 +673,71 @@ public function importOffers(InputInterface $input, OutputInterface $output) {
 
    }
 }
+
+public function importVariants(InputInterface $input, OutputInterface $output){
+        $repository=$this->doctrine->getRepository(ERPVariantsValues::class);
+        $output->writeln('* Importando tallas....');
+        $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
+        $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getVariants.php');
+        $objects=json_decode($json, true);
+        $objects=$objects[0]["class"];
+        //Disable SQL logger
+        $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
+        foreach ($objects as $object){
+          $obj=$repository->findOneBy(["name"=>$object["Code"]]);
+          if ($obj==null){
+            $obj=new ERPVariantsValues();
+            $obj->setName($object["Code"]);
+            $repositoryVariant=$this->doctrine->getRepository(ERPVariants::class);
+            $variantName=$repositoryVariant->findOneBy(["name"=>"Talla"]);
+            $obj->setVariantName($variantName);
+            $obj->setDateadd(new \Datetime());
+            $obj->setDateupd(new \Datetime());
+            $obj->setDeleted(0);
+            $obj->setActive(1);
+          }
+          $this->doctrine->getManager()->merge($obj);
+          $this->doctrine->getManager()->flush();
+          $this->doctrine->getManager()->clear();
+        }
+}
+
+public function importProductsVariants(InputInterface $input, OutputInterface $output){
+  $repository=$this->doctrine->getRepository(ERPProductsVariants::class);
+  $output->writeln('* Importando productos agrupados....');
+  $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
+  $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getProductsVariants.php');
+  $objects=json_decode($json, true);
+  $objects=$objects[0]["class"];
+  $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
+  foreach ($objects as $object){
+    $repositoryProduct=$this->doctrine->getRepository(ERPProducts::class);
+    $product=$repositoryProduct->findOneBy(["code"=>$object["product"]]);
+    $repositoryVariant=$this->doctrine->getRepository(ERPVariants::class);
+    $variant=$repositoryVariant->findOneBy(["name"=>$object["variant"]]);
+    $repositoryVariantValue=$this->doctrine->getRepository(ERPVariantsValues::class);
+    $variantValue=$repositoryVariantValue->findOneBy(["variantname"=>$variant, "name"=>$object["Code"]]);
+    $obj=$repository->findOneBy(["variantvalue"=>$variantValue, "product"=>$product]);
+    if ($obj==null and $product!=null){
+        $output->writeln('* Asignando la variante '.$object["Code"].' al producto '.$object["product"]);
+        if ($product->getGrouped()==0) $product->setGrouped(1);
+        $obj=new ERPProductsVariants();
+        $obj->setProduct($product);
+        $obj->setVariantvalue($variantValue);
+        $obj->setVariantname($variant);
+        $obj->setDateadd(new \Datetime());
+        $obj->setDateupd(new \Datetime());
+        $obj->setDeleted(0);
+        $obj->setActive(1);
+        $this->doctrine->getManager()->merge($obj);
+        $this->doctrine->getManager()->merge($product);
+    }
+
+      $this->doctrine->getManager()->flush();
+      $this->doctrine->getManager()->clear();
+    }
+}
+
 
 }
 ?>
