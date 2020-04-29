@@ -679,7 +679,7 @@ public function importVariants(InputInterface $input, OutputInterface $output){
         $output->writeln('* Importando variantes....');
         $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
         $repositoryVariant=$this->doctrine->getRepository(ERPVariants::class);
-        $variants->$repositoryVariant->findAll();
+        $variants=$repositoryVariant->findAll();
         foreach ($variants as $variant){
             $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getVariants.php?variant='.$variant->getName());
             $objects=json_decode($json, true);
@@ -687,7 +687,7 @@ public function importVariants(InputInterface $input, OutputInterface $output){
             //Disable SQL logger
             $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
             foreach ($objects as $object){
-              $obj=$repository->findOneBy(["name"=>$object["Code"]]);
+              $obj=$repository->findOneBy(["name"=>$object["value"]]);
               if ($obj==null){
                 $obj=new ERPVariantsValues();
                 $obj->setVariantName($variant);
@@ -736,6 +736,7 @@ public function importVariants(InputInterface $input, OutputInterface $output){
                   else if ($object["value"]=="VERDE PIST") $obj->setName("Verde Pistacho");
                   else if ($object["value"]=="VERDE PRIM") $obj->setName("Verde Primavera");
                   else if ($object["value"]=="VINTAGE RO") $obj->setName("Vintage Rose");
+                  else $obj->setName($object["value"]);
                 } else $obj->setName($object["value"]);
                 $obj->setDateadd(new \Datetime());
                 $obj->setDateupd(new \Datetime());
