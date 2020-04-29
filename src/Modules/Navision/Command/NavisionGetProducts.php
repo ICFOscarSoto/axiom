@@ -676,30 +676,77 @@ public function importOffers(InputInterface $input, OutputInterface $output) {
 
 public function importVariants(InputInterface $input, OutputInterface $output){
         $repository=$this->doctrine->getRepository(ERPVariantsValues::class);
-        $output->writeln('* Importando tallas....');
+        $output->writeln('* Importando variantes....');
         $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
-        $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getVariants.php');
-        $objects=json_decode($json, true);
-        $objects=$objects[0]["class"];
-        //Disable SQL logger
-        $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
-        foreach ($objects as $object){
-          $obj=$repository->findOneBy(["name"=>$object["Code"]]);
-          if ($obj==null){
-            $obj=new ERPVariantsValues();
-            $obj->setName($object["Code"]);
-            $repositoryVariant=$this->doctrine->getRepository(ERPVariants::class);
-            $variantName=$repositoryVariant->findOneBy(["name"=>"Talla"]);
-            $obj->setVariantName($variantName);
-            $obj->setDateadd(new \Datetime());
-            $obj->setDateupd(new \Datetime());
-            $obj->setDeleted(0);
-            $obj->setActive(1);
+        $repositoryVariant=$this->doctrine->getRepository(ERPVariants::class);
+        $variants->$repositoryVariant->findAll();
+        foreach ($variants as $variant){
+            $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getVariants.php?variant='.$variant->getName());
+            $objects=json_decode($json, true);
+            $objects=$objects[0]["class"];
+            //Disable SQL logger
+            $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
+            foreach ($objects as $object){
+              $obj=$repository->findOneBy(["name"=>$object["Code"]]);
+              if ($obj==null){
+                $obj=new ERPVariantsValues();
+                $obj->setVariantName($variant);
+                if ($variant->getName()=="Color") {
+                  if ($object["value"]=="AMARILLO C") $obj->setName("Amarillo Claro");
+                  else if ($object["value"]=="AMARILLO F") $obj->setName("Amarillo Fluor");
+                  else if ($object["value"]=="AMARILLO L") $obj->setName("Amarillo Limon");
+                  else if ($object["value"]=="AMARILLO R") $obj->setName("Amarillo Real");
+                  else if ($object["value"]=="ARENA VIGO") $obj->setName("Arena Vigore");
+                  else if ($object["value"]=="AZUL COBAL") $obj->setName("Azul Cobalto");
+                  else if ($object["value"]=="AZUL LUMIN") $obj->setName("Azul Luminoso");
+                  else if ($object["value"]=="AZUL MARIN") $obj->setName("Azul Marino");
+                  else if ($object["value"]=="AZUL ULTA") $obj->setName("Azul Ultramar");
+                  else if ($object["value"]=="BEIGE 585" or $object["value"]=="BEIGE") $obj->setName("Beige");
+                  else if ($object["value"]=="BLANCO 501"or $object["value"]=="BLANCO") $obj->setName("Blanco");
+                  else if ($object["value"]=="BLANCO BRI") $obj->setName("Blanco Brillo");
+                  else if ($object["value"]=="BLANCOPERL") $obj->setName("Blanco Perla");
+                  else if ($object["value"]=="CREMA 586" or $object["value"]=="CREMA") $obj->setName("Crema");
+                  else if ($object["value"]=="GAMUZA 543" or $object["value"]=="GAMUZA") $obj->setName("Gamuza");
+                  else if ($object["value"]=="GRIS AZULA") $obj->setName("Gris Azulado");
+                  else if ($object["value"]=="GRIS OSCUR") $obj->setName("Gris Oscuro");
+                  else if ($object["value"]=="GRIS VIGOR") $obj->setName("Gris Vigore");
+                  else if ($object["value"]=="MALVA MAST") $obj->setName("Malva Master");
+                  else if ($object["value"]=="MARFIL 528" or $object["value"]=="MARFIL") $obj->setName("Marfil");
+                  else if ($object["value"]=="MARRON TAB") $obj->setName("Marron Tabaco");
+                  else if ($object["value"]=="MARRONVINT") $obj->setName("Marron Vintage");
+                  else if ($object["value"]=="NARANJA CL") $obj->setName("Naranja Claro");
+                  else if ($object["value"]=="NARANJA FL") $obj->setName("Naranja Fluor");
+                  else if ($object["value"]=="NEGRO 587" or $object["value"]=="NEGRO") $obj->setName("Negro");
+                  else if ($object["value"]=="NEGRO BRIL") $obj->setName("Negro Brillo");
+                  else if ($object["value"]=="OCRE" or $object["value"]=="OCRE 587") $obj->setName("Ocre");
+                  else if ($object["value"]=="PARDO" or $object["value"]=="PARDO 517") $obj->setName("Pardo");
+                  else if ($object["value"]=="RAYAS GRAN") $obj->setName("Rayas Granate");
+                  else if ($object["value"]=="RAYAS NEGR") $obj->setName("Rayas Negras");
+                  else if ($object["value"]=="ROJO BURDE") $obj->setName("Rojo Burdeos");
+                  else if ($object["value"]=="ROJO CARRU") $obj->setName("Rojo Carruaje");
+                  else if ($object["value"]=="ROJO INGLE") $obj->setName("Rojo Ingles");
+                  else if ($object["value"]=="ROJOIMPERI") $obj->setName("Rojo Imperial");
+                  else if ($object["value"]=="ROSA PALID") $obj->setName("Rosa Palido");
+                  else if ($object["value"]=="SALMON OSC") $obj->setName("Salmon Oscuro");
+                  else if ($object["value"]=="TURQUESA C") $obj->setName("Turquesa Claro");
+                  else if ($object["value"]=="VERDE BOSQ") $obj->setName("Verde Bosque");
+                  else if ($object["value"]=="VERDE CLAR") $obj->setName("Verde Claro");
+                  else if ($object["value"]=="VERDE FRON") $obj->setName("Verde Fronton");
+                  else if ($object["value"]=="VERDE HIER") $obj->setName("Verde Hierba");
+                  else if ($object["value"]=="VERDE PIST") $obj->setName("Verde Pistacho");
+                  else if ($object["value"]=="VERDE PRIM") $obj->setName("Verde Primavera");
+                  else if ($object["value"]=="VINTAGE RO") $obj->setName("Vintage Rose");
+                } else $obj->setName($object["value"]);
+                $obj->setDateadd(new \Datetime());
+                $obj->setDateupd(new \Datetime());
+                $obj->setDeleted(0);
+                $obj->setActive(1);
+              }
+              $this->doctrine->getManager()->merge($obj);
+              $this->doctrine->getManager()->flush();
+              $this->doctrine->getManager()->clear();
+            }
           }
-          $this->doctrine->getManager()->merge($obj);
-          $this->doctrine->getManager()->flush();
-          $this->doctrine->getManager()->clear();
-        }
 }
 
 public function importProductsVariants(InputInterface $input, OutputInterface $output){
