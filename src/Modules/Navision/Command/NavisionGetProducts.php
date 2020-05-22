@@ -716,7 +716,8 @@ public function importVariants(InputInterface $input, OutputInterface $output){
                   else if ($object["value"]=="MARRONVINT") $obj->setName("Marron Vintage");
                   else if ($object["value"]=="NARANJA CL") $obj->setName("Naranja Claro");
                   else if ($object["value"]=="NARANJA FL") $obj->setName("Naranja Fluor");
-                  else if ($object["value"]=="NEGRO 587" or $object["value"]=="NEGRO") $obj->setName("Negro");
+                  else if ($object["value"]=="NEGRO 567" or $object["value"]=="NEGRO") $obj->setName("Negro");
+                  else if ($object["value"]=="VERDE CARR") $obj->setName("Verde Carruajes");
                   else if ($object["value"]=="NEGRO BRIL") $obj->setName("Negro Brillo");
                   else if ($object["value"]=="OCRE" or $object["value"]=="OCRE 587") $obj->setName("Ocre");
                   else if ($object["value"]=="PARDO" or $object["value"]=="PARDO 517") $obj->setName("Pardo");
@@ -754,36 +755,92 @@ public function importProductsVariants(InputInterface $input, OutputInterface $o
   $repository=$this->doctrine->getRepository(ERPProductsVariants::class);
   $output->writeln('* Importando productos agrupados....');
   $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
-  $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getProductsVariants.php');
-  $objects=json_decode($json, true);
-  $objects=$objects[0]["class"];
-  $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
-  foreach ($objects as $object){
-    $repositoryProduct=$this->doctrine->getRepository(ERPProducts::class);
-    $product=$repositoryProduct->findOneBy(["code"=>$object["product"]]);
-    $repositoryVariant=$this->doctrine->getRepository(ERPVariants::class);
-    $variant=$repositoryVariant->findOneBy(["name"=>$object["variant"]]);
-    $repositoryVariantValue=$this->doctrine->getRepository(ERPVariantsValues::class);
-    $variantValue=$repositoryVariantValue->findOneBy(["variantname"=>$variant, "name"=>$object["Code"]]);
-    $obj=$repository->findOneBy(["variantvalue"=>$variantValue, "product"=>$product]);
-    if ($obj==null and $product!=null){
-        $output->writeln('* Asignando la variante '.$object["Code"].' al producto '.$object["product"]);
-        if ($product->getGrouped()==0) $product->setGrouped(1);
-        $obj=new ERPProductsVariants();
-        $obj->setProduct($product);
-        $obj->setVariantvalue($variantValue);
-        $obj->setVariantname($variant);
-        $obj->setDateadd(new \Datetime());
-        $obj->setDateupd(new \Datetime());
-        $obj->setDeleted(0);
-        $obj->setActive(1);
-        $this->doctrine->getManager()->merge($obj);
-        $this->doctrine->getManager()->merge($product);
-    }
+  $this->importVariants($input, $output);
+  $repositoryVariant=$this->doctrine->getRepository(ERPVariants::class);
+  $variants=$repositoryVariant->findAll();
+  foreach($variants as $variant){
+      $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getProductsVariants.php?variant'.$variant->getName());
+      $objects=json_decode($json, true);
+      $objects=$objects[0]["class"];
+      $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
+      foreach ($objects as $object){
+        $repositoryProduct=$this->doctrine->getRepository(ERPProducts::class);
+        $product=$repositoryProduct->findOneBy(["code"=>$object["product"]]);
+        $repositoryVariant=$this->doctrine->getRepository(ERPVariants::class);
+        $nameVariantValue;
 
-      $this->doctrine->getManager()->flush();
-      $this->doctrine->getManager()->clear();
-    }
+
+        if ($variant->getName()=="Color") {
+          if ($object["Code"]=="AMARILLO C") $nameVariantValue="Amarillo Claro";
+          else if ($object["Code"]=="AMARILLO F") $nameVariantValue="Amarillo Fluor";
+          else if ($object["Code"]=="AMARILLO L") $nameVariantValue="Amarillo Limon";
+          else if ($object["Code"]=="AMARILLO R") $nameVariantValue="Amarillo Real";
+          else if ($object["Code"]=="ARENA VIGO") $nameVariantValue="Arena Vigore";
+          else if ($object["Code"]=="AZUL COBAL") $nameVariantValue="Azul Cobalto";
+          else if ($object["Code"]=="AZUL LUMIN") $nameVariantValue="Azul Luminoso";
+          else if ($object["Code"]=="AZUL MARIN") $nameVariantValue="Azul Marino";
+          else if ($object["Code"]=="AZUL ULTA") $nameVariantValue="Azul Ultramar";
+          else if ($object["Code"]=="BEIGE 585" or $object["Code"]=="BEIGE") $nameVariantValue="Beige";
+          else if ($object["Code"]=="BLANCO 501"or $object["Code"]=="BLANCO") $nameVariantValue="Blanco";
+          else if ($object["Code"]=="BLANCO BRI") $nameVariantValue="Blanco Brillo";
+          else if ($object["Code"]=="BLANCOPERL") $nameVariantValue="Blanco Perla";
+          else if ($object["Code"]=="CREMA 586" or $object["Code"]=="CREMA") $nameVariantValue="Crema";
+          else if ($object["Code"]=="GAMUZA 543" or $object["Code"]=="GAMUZA") $nameVariantValue="Gamuza";
+          else if ($object["Code"]=="GRIS AZULA") $nameVariantValue="Gris Azulado";
+          else if ($object["Code"]=="GRIS OSCUR") $nameVariantValue="Gris Oscuro";
+          else if ($object["Code"]=="GRIS VIGOR") $nameVariantValue="Gris Vigore";
+          else if ($object["Code"]=="MALVA MAST") $nameVariantValue="Malva Master";
+          else if ($object["Code"]=="MARFIL 528" or $object["Code"]=="MARFIL") $nameVariantValue="Marfil";
+          else if ($object["Code"]=="MARRON TAB") $nameVariantValue="Marron Tabaco";
+          else if ($object["Code"]=="MARRONVINT") $nameVariantValue="Marron Vintage";
+          else if ($object["Code"]=="NARANJA CL") $nameVariantValue="Naranja Claro";
+          else if ($object["Code"]=="NARANJA FL") $nameVariantValue="Naranja Fluor";
+          else if ($object["Code"]=="NEGRO 567" or $object["Code"]=="NEGRO") $nameVariantValue="Negro";
+          else if ($object["Code"]=="VERDE CARR") $nameVariantValue="Verde Carruajes";
+          else if ($object["Code"]=="NEGRO BRIL") $nameVariantValue="Negro Brillo";
+          else if ($object["Code"]=="OCRE" or $object["Code"]=="OCRE 587") $nameVariantValue="Ocre";
+          else if ($object["Code"]=="PARDO" or $object["Code"]=="PARDO 517") $nameVariantValue="Pardo";
+          else if ($object["Code"]=="RAYAS GRAN") $nameVariantValue="Rayas Granate";
+          else if ($object["Code"]=="RAYAS NEGR") $nameVariantValue="Rayas Negras";
+          else if ($object["Code"]=="ROJO BURDE") $nameVariantValue="Rojo Burdeos";
+          else if ($object["Code"]=="ROJO CARRU") $nameVariantValue="Rojo Carruaje";
+          else if ($object["Code"]=="ROJO INGLE") $nameVariantValue="Rojo Ingles";
+          else if ($object["Code"]=="ROJOIMPERI") $nameVariantValue="Rojo Imperial";
+          else if ($object["Code"]=="ROSA PALID") $nameVariantValue="Rosa Palido";
+          else if ($object["Code"]=="SALMON OSC") $nameVariantValue="Salmon Oscuro";
+          else if ($object["Code"]=="TURQUESA C") $nameVariantValue="Turquesa Claro";
+          else if ($object["Code"]=="VERDE BOSQ") $nameVariantValue="Verde Bosque";
+          else if ($object["Code"]=="VERDE CLAR") $nameVariantValue="Verde Claro";
+          else if ($object["Code"]=="VERDE FRON") $nameVariantValue="Verde Fronton";
+          else if ($object["Code"]=="VERDE HIER") $nameVariantValue="Verde Hierba";
+          else if ($object["Code"]=="VERDE PIST") $nameVariantValue="Verde Pistacho";
+          else if ($object["Code"]=="VERDE PRIM") $nameVariantValue="Verde Primavera";
+          else if ($object["Code"]=="VINTAGE RO") $nameVariantValue="Vintage Rose";
+          else $nameVariantValue=$object["value"];
+        } else $nameVariantValue=$object["value"];
+
+
+        $variantValue=$repositoryVariantValue->findOneBy(["variantname"=>$variant, "name"=>$nameVariantValue]);
+        $obj=$repository->findOneBy(["variantvalue"=>$variantValue, "product"=>$product]);
+        if ($obj==null and $product!=null){
+            $output->writeln('* Asignando la variante '.$object["Code"].' al producto '.$object["product"]);
+            if ($product->getGrouped()==0) $product->setGrouped(1);
+            $obj=new ERPProductsVariants();
+            $obj->setProduct($product);
+            $obj->setVariantvalue($variantValue);
+            $obj->setVariantname($variant);
+            $obj->setDateadd(new \Datetime());
+            $obj->setDateupd(new \Datetime());
+            $obj->setDeleted(0);
+            $obj->setActive(1);
+            $this->doctrine->getManager()->merge($obj);
+            $this->doctrine->getManager()->merge($product);
+        }
+
+          $this->doctrine->getManager()->flush();
+          $this->doctrine->getManager()->clear();
+        }
+      }
 }
 
 
