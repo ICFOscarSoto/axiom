@@ -762,16 +762,17 @@ public function importProductsVariants(InputInterface $input, OutputInterface $o
   $repositoryVariant=$this->doctrine->getRepository(ERPVariants::class);
   $variants=$repositoryVariant->findAll();
   foreach($variants as $variant){
-      $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getProductsVariants.php?variant'.$variant->getName());
+      $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getProductsVariants.php?variant='.$variant->getName());
       $objects=json_decode($json, true);
       $objects=$objects[0]["class"];
       $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
+
       foreach ($objects as $object){
+        $output->writeln('Entro'.$object["product"]);
         $repositoryProduct=$this->doctrine->getRepository(ERPProducts::class);
         $product=$repositoryProduct->findOneBy(["code"=>$object["product"]]);
-        $repositoryVariant=$this->doctrine->getRepository(ERPVariants::class);
+        $repositoryVariantValue=$this->doctrine->getRepository(ERPVariantsValues::class);
         $nameVariantValue;
-
 
         if ($variant->getName()=="Color") {
           if ($object["Code"]=="AMARILLO C") $nameVariantValue="Amarillo Claro";
@@ -819,8 +820,8 @@ public function importProductsVariants(InputInterface $input, OutputInterface $o
           else if ($object["Code"]=="VERDE PIST") $nameVariantValue="Verde Pistacho";
           else if ($object["Code"]=="VERDE PRIM") $nameVariantValue="Verde Primavera";
           else if ($object["Code"]=="VINTAGE RO") $nameVariantValue="Vintage Rose";
-          else $nameVariantValue=$object["value"];
-        } else $nameVariantValue=$object["value"];
+          else $nameVariantValue=$object["Code"];
+        } else $nameVariantValue=$object["Code"];
 
 
         $variantValue=$repositoryVariantValue->findOneBy(["variantname"=>$variant, "name"=>$nameVariantValue]);
