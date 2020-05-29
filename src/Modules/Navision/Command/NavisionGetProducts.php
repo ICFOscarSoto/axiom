@@ -682,6 +682,7 @@ public function importVariants(InputInterface $input, OutputInterface $output){
         $variants=$repositoryVariant->findAll();
         foreach ($variants as $variant){
             $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getVariants.php?variant='.$variant->getName());
+            $output->writeln('        -Importando valores de la variante '.$variant->getName());
             $objects=json_decode($json, true);
             $objects=$objects[0]["class"];
             //Disable SQL logger
@@ -766,9 +767,7 @@ public function importProductsVariants(InputInterface $input, OutputInterface $o
       $objects=json_decode($json, true);
       $objects=$objects[0]["class"];
       $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
-
       foreach ($objects as $object){
-        $output->writeln('Entro'.$object["product"]);
         $repositoryProduct=$this->doctrine->getRepository(ERPProducts::class);
         $product=$repositoryProduct->findOneBy(["code"=>$object["product"]]);
         $repositoryVariantValue=$this->doctrine->getRepository(ERPVariantsValues::class);
