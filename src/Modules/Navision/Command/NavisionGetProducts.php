@@ -767,12 +767,13 @@ public function importProductsVariants(InputInterface $input, OutputInterface $o
       $objects=json_decode($json, true);
       $objects=$objects[0]["class"];
       $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
+      $output->writeln('* Importando productos agrupados por '.$variant->getName());
       foreach ($objects as $object){
         $repositoryProduct=$this->doctrine->getRepository(ERPProducts::class);
         $product=$repositoryProduct->findOneBy(["code"=>$object["product"]]);
         $repositoryVariantValue=$this->doctrine->getRepository(ERPVariantsValues::class);
         $nameVariantValue;
-
+        //$output->writeln('       - Añadiendo variante a '.$object["product"]);
         if ($variant->getName()=="Color") {
           if ($object["Code"]=="AMARILLO C") $nameVariantValue="Amarillo Claro";
           else if ($object["Code"]=="AMARILLO F") $nameVariantValue="Amarillo Fluor";
