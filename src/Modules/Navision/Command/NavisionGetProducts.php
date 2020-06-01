@@ -174,6 +174,8 @@ class NavisionGetProducts extends ContainerAwareCommand
         $navisionSync->setEntity("products");
       }
       $navisionSync->setLastsync($datetime);
+      $output->writeln('* El nuevo maxtimestamp es ....'.$objects["maxtimestamp"]);
+      if ($objects["maxtimestamp"]>$navisionSync->getMaxtimestamp())
       $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
       $this->doctrine->getManager()->persist($navisionSync);
       $this->doctrine->getManager()->flush();
@@ -242,7 +244,6 @@ class NavisionGetProducts extends ContainerAwareCommand
         $navisionSync->setEntity("EAN13");
       }
       $navisionSync->setLastsync($datetime);
-      if ($objects["maxtimestamp"]>$navisionSync->getMaxtimestamp())
       $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
       $this->doctrine->getManager()->persist($navisionSync);
       $this->doctrine->getManager()->flush();
