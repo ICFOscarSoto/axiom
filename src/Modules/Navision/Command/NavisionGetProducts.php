@@ -92,6 +92,14 @@ class NavisionGetProducts extends ContainerAwareCommand
   }
 
     public function importProduct(InputInterface $input, OutputInterface $output){
+      //------   Create Lock Mutex    ------
+      $fp = fopen('/tmp/axiom-navisionGetProducts-importProduct.lock', 'c');
+      if (!flock($fp, LOCK_EX | LOCK_NB)) {
+        $output->writeln('* Fallo al iniciar la sincronizacion de productos: El proceso ya esta en ejecución.');
+        exit;
+      }
+
+      //------   Critical Section START   ------
       $navisionSyncRepository=$this->doctrine->getRepository(NavisionSync::class);
       $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"products"]);
       if ($navisionSync==null) {
@@ -179,9 +187,20 @@ class NavisionGetProducts extends ContainerAwareCommand
       $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
       $this->doctrine->getManager()->persist($navisionSync);
       $this->doctrine->getManager()->flush();
+      //------   Critical Section END   ------
+      //------   Remove Lock Mutex    ------
+      fclose($fp);
     }
 
     public function importEAN13(InputInterface $input, OutputInterface $output){
+      //------   Create Lock Mutex    ------
+      $fp = fopen('/tmp/axiom-navisionGetProducts-importEAN13.lock', 'c');
+      if (!flock($fp, LOCK_EX | LOCK_NB)) {
+        $output->writeln('* Fallo al iniciar la sincronizacion de EAN13: El proceso ya esta en ejecución.');
+        exit;
+      }
+
+      //------   Critical Section START   ------
       $navisionSyncRepository=$this->doctrine->getRepository(NavisionSync::class);
       $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"EAN13"]);
       if ($navisionSync==null) {
@@ -247,39 +266,53 @@ class NavisionGetProducts extends ContainerAwareCommand
       $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
       $this->doctrine->getManager()->persist($navisionSync);
       $this->doctrine->getManager()->flush();
+      //------   Critical Section END   ------
+      //------   Remove Lock Mutex    ------
+      fclose($fp);
     }
 
 /*
   Busco los EAN13 de axiom en Navision, y si no están los desactivo
  */
 public function clearEAN13(InputInterface $input, OutputInterface $output){
-        $repository=$this->doctrine->getRepository(ERPEAN13::class);
-        $datetime=new \DateTime();
-        $output->writeln('* Limpiando EAN13....');
-        $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
-        $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getEAN13.php');
-        $objects=json_decode($json, true);
-        $objects=$objects[0];
-        //Disable SQL logger
-        $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
-        $oldEAN13s=$repository->findAll();
-        foreach ($oldEAN13s as $oldEAN13){
-            $count=0;
-            $EAN13=$oldEAN13->getName();
-            foreach ($objects["ean13"] as $key=>$object){
-                $nameEAN13=preg_replace('/\D/','',$object["Cross-Reference No."]);
-                if ($EAN13==$nameEAN13) {
-                  $count=1;
-                  break;
-                }
-            }
-            if ($count==0) {
-              $oldEAN13->setDeleted(1);
-              $oldEAN13->setActive(0);
-              $this->doctrine->getManager()->flush();
-              $this->doctrine->getManager()->clear();
-            }
-        }
+  //------   Create Lock Mutex    ------
+  $fp = fopen('/tmp/axiom-navisionGetProducts-clearEAN13.lock', 'c');
+  if (!flock($fp, LOCK_EX | LOCK_NB)) {
+    $output->writeln('* Fallo al iniciar la sincronizacion de limpieza de EAN13: El proceso ya esta en ejecución.');
+    exit;
+  }
+
+  //------   Critical Section START   ------
+  $repository=$this->doctrine->getRepository(ERPEAN13::class);
+  $datetime=new \DateTime();
+  $output->writeln('* Limpiando EAN13....');
+  $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
+  $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getEAN13.php');
+  $objects=json_decode($json, true);
+  $objects=$objects[0];
+  //Disable SQL logger
+  $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
+  $oldEAN13s=$repository->findAll();
+  foreach ($oldEAN13s as $oldEAN13){
+      $count=0;
+      $EAN13=$oldEAN13->getName();
+      foreach ($objects["ean13"] as $key=>$object){
+          $nameEAN13=preg_replace('/\D/','',$object["Cross-Reference No."]);
+          if ($EAN13==$nameEAN13) {
+            $count=1;
+            break;
+          }
+      }
+      if ($count==0) {
+        $oldEAN13->setDeleted(1);
+        $oldEAN13->setActive(0);
+        $this->doctrine->getManager()->flush();
+        $this->doctrine->getManager()->clear();
+      }
+  }
+  //------   Critical Section END   ------
+  //------   Remove Lock Mutex    ------
+  fclose($fp);
 }
 
 /*
@@ -287,6 +320,14 @@ public function clearEAN13(InputInterface $input, OutputInterface $output){
   Entonces los devuelvo y se los asigno al proveedor y la categoría del producto.
  */
 public function importPrices(InputInterface $input, OutputInterface $output) {
+  //------   Create Lock Mutex    ------
+  $fp = fopen('/tmp/axiom-navisionGetProducts-importPrices.lock', 'c');
+  if (!flock($fp, LOCK_EX | LOCK_NB)) {
+    $output->writeln('* Fallo al iniciar la sincronizacion de precios: El proceso ya esta en ejecución.');
+    exit;
+  }
+
+  //------   Critical Section START   ------
   $navisionSyncRepository=$this->doctrine->getRepository(NavisionSync::class);
   $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"prices"]);
   if ($navisionSync==null) {
@@ -343,11 +384,14 @@ public function importPrices(InputInterface $input, OutputInterface $output) {
       }
     }
   }
+  //------   Critical Section END   ------
+  //------   Remove Lock Mutex    ------
+  fclose($fp);
 }
 
 public function importStocks(InputInterface $input, OutputInterface $output) {
   //------   Create Lock Mutex    ------
-  $fp = fopen('/tmp/importStocks.lock', 'c');
+  $fp = fopen('/tmp/axiom-navisionGetProducts-importStocks.lock', 'c');
   if (!flock($fp, LOCK_EX | LOCK_NB)) {
     $output->writeln('* Fallo al iniciar la sincronizacion de stocks: El proceso ya esta en ejecución.');
     exit;
@@ -419,6 +463,14 @@ public function importStocks(InputInterface $input, OutputInterface $output) {
 
 
 public function importIncrements(InputInterface $input, OutputInterface $output) {
+  //------   Create Lock Mutex    ------
+  $fp = fopen('/tmp/axiom-navisionGetProducts-importIncrements.lock', 'c');
+  if (!flock($fp, LOCK_EX | LOCK_NB)) {
+    $output->writeln('* Fallo al iniciar la sincronizacion incrementos: El proceso ya esta en ejecución.');
+    exit;
+  }
+
+  //------   Critical Section START   ------
   $navisionSyncRepository=$this->doctrine->getRepository(NavisionSync::class);
   $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"increments"]);
   if ($navisionSync==null) {
@@ -566,10 +618,20 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
         $this->doctrine->getManager()->clear();
     }
   }
-
+  //------   Critical Section END   ------
+  //------   Remove Lock Mutex    ------
+  fclose($fp);
 }
 
 public function importOffers(InputInterface $input, OutputInterface $output) {
+  //------   Create Lock Mutex    ------
+  $fp = fopen('/tmp/axiom-navisionGetProducts-importOffers.lock', 'c');
+  if (!flock($fp, LOCK_EX | LOCK_NB)) {
+    $output->writeln('* Fallo al iniciar la sincronizacion de ofertas: El proceso ya esta en ejecución.');
+    exit;
+  }
+
+  //------   Critical Section START   ------
   $navisionSyncRepository=$this->doctrine->getRepository(NavisionSync::class);
   $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"offers"]);
   if ($navisionSync==null) {
@@ -682,93 +744,111 @@ public function importOffers(InputInterface $input, OutputInterface $output) {
 
       }
       $this->doctrine->getManager()->clear();
-
-
    }
+   //------   Critical Section END   ------
+   //------   Remove Lock Mutex    ------
+   fclose($fp);
 }
 
 public function importVariants(InputInterface $input, OutputInterface $output){
-        $repository=$this->doctrine->getRepository(ERPVariantsValues::class);
-        $output->writeln('* Importando variantes....');
-        $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
-        $repositoryVariant=$this->doctrine->getRepository(ERPVariants::class);
-        $variants=$repositoryVariant->findAll();
-        foreach ($variants as $variant){
-            $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getVariants.php?variant='.$variant->getName());
-            $output->writeln('        -Importando valores de la variante '.$variant->getName());
-            $objects=json_decode($json, true);
-            $objects=$objects[0]["class"];
-            //Disable SQL logger
-            $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
-            foreach ($objects as $object){
-              $variantValue;
-              if ($variant->getName()=="Color") {
-                if ($object["value"]=="AMARILLO C") $variantValue="Amarillo Claro";
-                else if ($object["value"]=="AMARILLO F") $variantValue="Amarillo Fluor";
-                else if ($object["value"]=="AMARILLO L") $variantValue="Amarillo Limon";
-                else if ($object["value"]=="AMARILLO R") $variantValue="Amarillo Real";
-                else if ($object["value"]=="ARENA VIGO") $variantValue="Arena Vigore";
-                else if ($object["value"]=="AZUL COBAL") $variantValue="Azul Cobalto";
-                else if ($object["value"]=="AZUL LUMIN") $variantValue="Azul Luminoso";
-                else if ($object["value"]=="AZUL MARIN") $variantValue="Azul Marino";
-                else if ($object["value"]=="AZUL ULTA") $variantValue="Azul Ultramar";
-                else if ($object["value"]=="BEIGE 585" or $object["value"]=="BEIGE") $variantValue="Beige";
-                else if ($object["value"]=="BLANCO 501"or $object["value"]=="BLANCO") $variantValue="Blanco";
-                else if ($object["value"]=="BLANCO BRI") $variantValue="Blanco Brillo";
-                else if ($object["value"]=="BLANCOPERL") $variantValue="Blanco Perla";
-                else if ($object["value"]=="CREMA 586" or $object["value"]=="CREMA") $variantValue="Crema";
-                else if ($object["value"]=="GAMUZA 543" or $object["value"]=="GAMUZA") $variantValue="Gamuza";
-                else if ($object["value"]=="GRIS AZULA") $variantValue="Gris Azulado";
-                else if ($object["value"]=="GRIS OSCUR") $variantValue="Gris Oscuro";
-                else if ($object["value"]=="GRIS VIGOR") $variantValue="Gris Vigore";
-                else if ($object["value"]=="MALVA MAST") $variantValue="Malva Master";
-                else if ($object["value"]=="MARFIL 528" or $object["value"]=="MARFIL") $variantValue="Marfil";
-                else if ($object["value"]=="MARRON TAB") $variantValue="Marron Tabaco";
-                else if ($object["value"]=="MARRONVINT") $variantValue="Marron Vintage";
-                else if ($object["value"]=="NARANJA CL") $variantValue="Naranja Claro";
-                else if ($object["value"]=="NARANJA FL") $variantValue="Naranja Fluor";
-                else if ($object["value"]=="NEGRO 567" or $object["value"]=="NEGRO") $variantValue="Negro";
-                else if ($object["value"]=="VERDE CARR") $variantValue="Verde Carruajes";
-                else if ($object["value"]=="NEGRO BRIL") $variantValue="Negro Brillo";
-                else if ($object["value"]=="OCRE" or $object["value"]=="OCRE 587") $variantValue="Ocre";
-                else if ($object["value"]=="PARDO" or $object["value"]=="PARDO 517") $variantValue="Pardo";
-                else if ($object["value"]=="RAYAS GRAN") $variantValue="Rayas Granate";
-                else if ($object["value"]=="RAYAS NEGR") $variantValue="Rayas Negras";
-                else if ($object["value"]=="ROJO BURDE") $variantValue="Rojo Burdeos";
-                else if ($object["value"]=="ROJO CARRU") $variantValue="Rojo Carruaje";
-                else if ($object["value"]=="ROJO INGLE") $variantValue="Rojo Ingles";
-                else if ($object["value"]=="ROJOIMPERI") $variantValue="Rojo Imperial";
-                else if ($object["value"]=="ROSA PALID") $variantValue="Rosa Palido";
-                else if ($object["value"]=="SALMON OSC") $variantValue="Salmon Oscuro";
-                else if ($object["value"]=="TURQUESA C") $variantValue="Turquesa Claro";
-                else if ($object["value"]=="VERDE BOSQ") $variantValue="Verde Bosque";
-                else if ($object["value"]=="VERDE CLAR") $variantValue="Verde Claro";
-                else if ($object["value"]=="VERDE FRON") $variantValue="Verde Fronton";
-                else if ($object["value"]=="VERDE HIER") $variantValue="Verde Hierba";
-                else if ($object["value"]=="VERDE PIST") $variantValue="Verde Pistacho";
-                else if ($object["value"]=="VERDE PRIM") $variantValue="Verde Primavera";
-                else if ($object["value"]=="VINTAGE RO") $variantValue="Vintage Rose";
-                else $variantValue=$object["value"];
-              } else $variantValue=$object["value"];
+  //------   Create Lock Mutex    ------
+  $fp = fopen('/tmp/axiom-navisionGetProducts-importVariants.lock', 'c');
+  if (!flock($fp, LOCK_EX | LOCK_NB)) {
+    $output->writeln('* Fallo al iniciar la sincronizacion de variantes: El proceso ya esta en ejecución.');
+    exit;
+  }
+  //------   Critical Section START   ------
+  $repository=$this->doctrine->getRepository(ERPVariantsValues::class);
+  $output->writeln('* Importando variantes....');
+  $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
+  $repositoryVariant=$this->doctrine->getRepository(ERPVariants::class);
+  $variants=$repositoryVariant->findAll();
+  foreach ($variants as $variant){
+      $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getVariants.php?variant='.$variant->getName());
+      $output->writeln('        -Importando valores de la variante '.$variant->getName());
+      $objects=json_decode($json, true);
+      $objects=$objects[0]["class"];
+      //Disable SQL logger
+      $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
+      foreach ($objects as $object){
+        $variantValue;
+        if ($variant->getName()=="Color") {
+          if ($object["value"]=="AMARILLO C") $variantValue="Amarillo Claro";
+          else if ($object["value"]=="AMARILLO F") $variantValue="Amarillo Fluor";
+          else if ($object["value"]=="AMARILLO L") $variantValue="Amarillo Limon";
+          else if ($object["value"]=="AMARILLO R") $variantValue="Amarillo Real";
+          else if ($object["value"]=="ARENA VIGO") $variantValue="Arena Vigore";
+          else if ($object["value"]=="AZUL COBAL") $variantValue="Azul Cobalto";
+          else if ($object["value"]=="AZUL LUMIN") $variantValue="Azul Luminoso";
+          else if ($object["value"]=="AZUL MARIN") $variantValue="Azul Marino";
+          else if ($object["value"]=="AZUL ULTA") $variantValue="Azul Ultramar";
+          else if ($object["value"]=="BEIGE 585" or $object["value"]=="BEIGE") $variantValue="Beige";
+          else if ($object["value"]=="BLANCO 501"or $object["value"]=="BLANCO") $variantValue="Blanco";
+          else if ($object["value"]=="BLANCO BRI") $variantValue="Blanco Brillo";
+          else if ($object["value"]=="BLANCOPERL") $variantValue="Blanco Perla";
+          else if ($object["value"]=="CREMA 586" or $object["value"]=="CREMA") $variantValue="Crema";
+          else if ($object["value"]=="GAMUZA 543" or $object["value"]=="GAMUZA") $variantValue="Gamuza";
+          else if ($object["value"]=="GRIS AZULA") $variantValue="Gris Azulado";
+          else if ($object["value"]=="GRIS OSCUR") $variantValue="Gris Oscuro";
+          else if ($object["value"]=="GRIS VIGOR") $variantValue="Gris Vigore";
+          else if ($object["value"]=="MALVA MAST") $variantValue="Malva Master";
+          else if ($object["value"]=="MARFIL 528" or $object["value"]=="MARFIL") $variantValue="Marfil";
+          else if ($object["value"]=="MARRON TAB") $variantValue="Marron Tabaco";
+          else if ($object["value"]=="MARRONVINT") $variantValue="Marron Vintage";
+          else if ($object["value"]=="NARANJA CL") $variantValue="Naranja Claro";
+          else if ($object["value"]=="NARANJA FL") $variantValue="Naranja Fluor";
+          else if ($object["value"]=="NEGRO 567" or $object["value"]=="NEGRO") $variantValue="Negro";
+          else if ($object["value"]=="VERDE CARR") $variantValue="Verde Carruajes";
+          else if ($object["value"]=="NEGRO BRIL") $variantValue="Negro Brillo";
+          else if ($object["value"]=="OCRE" or $object["value"]=="OCRE 587") $variantValue="Ocre";
+          else if ($object["value"]=="PARDO" or $object["value"]=="PARDO 517") $variantValue="Pardo";
+          else if ($object["value"]=="RAYAS GRAN") $variantValue="Rayas Granate";
+          else if ($object["value"]=="RAYAS NEGR") $variantValue="Rayas Negras";
+          else if ($object["value"]=="ROJO BURDE") $variantValue="Rojo Burdeos";
+          else if ($object["value"]=="ROJO CARRU") $variantValue="Rojo Carruaje";
+          else if ($object["value"]=="ROJO INGLE") $variantValue="Rojo Ingles";
+          else if ($object["value"]=="ROJOIMPERI") $variantValue="Rojo Imperial";
+          else if ($object["value"]=="ROSA PALID") $variantValue="Rosa Palido";
+          else if ($object["value"]=="SALMON OSC") $variantValue="Salmon Oscuro";
+          else if ($object["value"]=="TURQUESA C") $variantValue="Turquesa Claro";
+          else if ($object["value"]=="VERDE BOSQ") $variantValue="Verde Bosque";
+          else if ($object["value"]=="VERDE CLAR") $variantValue="Verde Claro";
+          else if ($object["value"]=="VERDE FRON") $variantValue="Verde Fronton";
+          else if ($object["value"]=="VERDE HIER") $variantValue="Verde Hierba";
+          else if ($object["value"]=="VERDE PIST") $variantValue="Verde Pistacho";
+          else if ($object["value"]=="VERDE PRIM") $variantValue="Verde Primavera";
+          else if ($object["value"]=="VINTAGE RO") $variantValue="Vintage Rose";
+          else $variantValue=$object["value"];
+        } else $variantValue=$object["value"];
 
-              $obj=$repository->findOneBy(["name"=>$variantValue]);
-              if ($obj==null){
-                $obj=new ERPVariantsValues();
-                $obj->setVariantName($variant);
-                $obj->setName($variantValue);
-                $obj->setDateadd(new \Datetime());
-                $obj->setDateupd(new \Datetime());
-                $obj->setDeleted(0);
-                $obj->setActive(1);
-              }
-              $this->doctrine->getManager()->merge($obj);
-              $this->doctrine->getManager()->flush();
-              $this->doctrine->getManager()->clear();
-            }
-          }
+        $obj=$repository->findOneBy(["name"=>$variantValue]);
+        if ($obj==null){
+          $obj=new ERPVariantsValues();
+          $obj->setVariantName($variant);
+          $obj->setName($variantValue);
+          $obj->setDateadd(new \Datetime());
+          $obj->setDateupd(new \Datetime());
+          $obj->setDeleted(0);
+          $obj->setActive(1);
+        }
+        $this->doctrine->getManager()->merge($obj);
+        $this->doctrine->getManager()->flush();
+        $this->doctrine->getManager()->clear();
+      }
+    }
+    //------   Critical Section END   ------
+    //------   Remove Lock Mutex    ------
+    fclose($fp);
 }
 
 public function importProductsVariants(InputInterface $input, OutputInterface $output){
+  //------   Create Lock Mutex    ------
+  $fp = fopen('/tmp/axiom-navisionGetProducts-importProductsVariants.lock', 'c');
+  if (!flock($fp, LOCK_EX | LOCK_NB)) {
+    $output->writeln('* Fallo al iniciar la sincronizacion de agrupados: El proceso ya esta en ejecución.');
+    exit;
+  }
+  //------   Critical Section START   ------
   $repository=$this->doctrine->getRepository(ERPProductsVariants::class);
   $output->writeln('* Importando productos agrupados....');
   $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
@@ -858,6 +938,9 @@ public function importProductsVariants(InputInterface $input, OutputInterface $o
           $this->doctrine->getManager()->clear();
         }
       }
+      //------   Critical Section END   ------
+      //------   Remove Lock Mutex    ------
+      fclose($fp);
 }
 
 
