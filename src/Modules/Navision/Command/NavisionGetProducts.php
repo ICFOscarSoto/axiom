@@ -346,6 +346,14 @@ public function importPrices(InputInterface $input, OutputInterface $output) {
 }
 
 public function importStocks(InputInterface $input, OutputInterface $output) {
+  //------   Create Lock Mutex    ------
+  $fp = fopen('/tmp/importStocks.lock', 'r+');
+  if (!flock($fp, LOCK_EX | LOCK_NB)) {
+    $output->writeln('* Fallo al iniciar la sincronizacion de stocks: El proceso ya esta en ejecución.');
+    exit;
+  }
+
+  //------   Critical Section START   ------
   $navisionSyncRepository=$this->doctrine->getRepository(NavisionSync::class);
   $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"stocks"]);
   if ($navisionSync==null) {
@@ -404,6 +412,9 @@ public function importStocks(InputInterface $input, OutputInterface $output) {
     $this->doctrine->getManager()->flush();
     }
 
+    //------   Critical Section END   ------
+    //------   Remove Lock Mutex    ------
+    fclose($fp);
   }
 
 
