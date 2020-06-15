@@ -16,6 +16,9 @@ use App\Modules\ERP\Entity\ERPPaymentTerms;
 use App\Modules\ERP\Entity\ERPCustomerActivities;
 use App\Modules\ERP\Entity\ERPCustomerGroups;
 use App\Modules\ERP\Entity\ERPCustomerCommentLines;
+use App\Modules\ERP\Entity\ERPCustomerOrdersData;
+use App\Modules\Carrier\Entity\CarrierCarriers;
+use App\Modules\Carrier\Entity\CarrierShippingConditions;
 use App\Modules\ERP\Entity\ERPBankAccounts;
 use App\Modules\Globale\Entity\GlobaleCompanies;
 use App\Modules\Globale\Entity\GlobaleStates;
@@ -93,9 +96,12 @@ class NavisionGetCustomers extends ContainerAwareCommand
      $repositoryCurrencies=$this->doctrine->getRepository(GlobaleCurrencies::class);
      $repositoryPaymentMethod=$this->doctrine->getRepository(ERPPaymentMethods::class);
      $repositoryPaymentTerms=$this->doctrine->getRepository(ERPPaymentTerms::class);
+     $repositoryCustomerOrdersData=$this->doctrine->getRepository(ERPCustomerOrdersData::class);
      $repositoryCustomerActivities=$this->doctrine->getRepository(ERPCustomerActivities::class);
      $repositoryStates=$this->doctrine->getRepository(GlobaleStates::class);
      $repositoryCustomerGroups=$this->doctrine->getRepository(ERPCustomerGroups::class);
+     $repositoryCarriers=$this->doctrine->getRepository(CarrierCarriers::class);
+     $repositoryCarrierShippingConditions=$this->doctrine->getRepository(CarrierShippingConditions::class);
      $repositoryBankAccounts=$this->doctrine->getRepository(ERPBankAccounts::class);
      $repository=$this->doctrine->getRepository(ERPCustomers::class);
      //Disable SQL logger
@@ -280,9 +286,37 @@ class NavisionGetCustomers extends ContainerAwareCommand
         $obj->setCustomergroup($customergroup);
         $obj->setMinimuminvoiceamount($object["minimuminvoiceamount"]);
         $obj->setMaxcredit($object["creditlimit"]);
-        $obj->setAuthorizationControl($object["authorizationcontrol"]);
-        $obj->setRequiredordernumber($object["requiredordernumber"]);
         $obj->setPaymentMode($object["paymentmode"]);
+
+
+        /*DATOS PARA PEDIDOS*/
+
+         $customer=$repository->findOneBy(["code"=>$object["code"]]);
+         if($customer!=NULL){
+             $ordersData=$repositoryCustomerOrdersData->findOneBy(["customer"=>$customer]);
+
+             if($ordersData==NULL)
+             {
+               $ordersData=new ERPCustomerOrdersData();
+               $ordersData->setCustomer($customer);
+               $ordersData->setDateadd(new \Datetime());
+               $ordersData->setDateupd(new \Datetime());
+               $ordersData->setDeleted(0);
+               $ordersData->setActive(1);
+
+             }
+             $carrier=$repositoryCarriers->findOneBy(["code"=>$object["carrier"]]);
+             $shippingconditions=$repositoryCarrierShippingConditions->findOneBy(["code"=>$object["shippingconditions"]]);
+
+             $ordersData->setRequiredordernumber($object["requiredordernumber"]);
+             $ordersData->setInvoicefordeliverynote($object["invoicefordeliverynote"]);
+             $ordersData->setPricesdeliverynote($object["pricesdeliverynote"]);
+             $ordersData->setPartialshipping($object["partialshipping"]);
+             $ordersData->setAuthorizationcontrol($object["authorizationcontrol"]);
+             $ordersData->setCarrier($carrier);
+             $ordersData->setShippingconditions($shippingconditions);
+             $this->doctrine->getManager()->persist($ordersData);
+        }
 
         $this->doctrine->getManager()->persist($obj);
         $this->doctrine->getManager()->flush();
@@ -357,13 +391,41 @@ class NavisionGetCustomers extends ContainerAwareCommand
        $customer=$repositoryCustomers->findOneBy(["code"=>$object["entity"]]);
        if($object["comment"]!="" AND $customer!=NULL)
        {
-         $output->writeln('  - '.$object["customer"]);
+
+         //comentarios generales del cliente (type=0)
+         if($object["code"]=="")
+         {
+           $output->writeln('  - '.$object["entity"]);
+           $obj=$repository->findOneBy(["comment"=>$object["comment"]]);
+           if ($obj==null) {
+             $obj=new ERPCustomerCommentLines();
+             //$company=$repositoryCompanies->find(2);
+             //$obj->setCompany($company);
+             $obj->setComment($object["comment"]);
+             $obj->setType(0);
+             $datetime=new \DateTime(date('Y-m-d 00:00:00',strtotime($object["date"]["date"])));
+            // dump(date('Y-m-d 00:00:00',strtotime($object["date"]["date"])));
+             $obj->setDateadd($datetime);
+             $obj->setCustomer($customer);
+             $obj->setDeleted(0);
+             $obj->setActive(1);
+             $obj->setDateupd($datetime);
+             $this->doctrine->getManager()->persist($obj);
+             $this->doctrine->getManager()->flush();
+             $this->doctrine->getManager()->clear();
+           }
+       }
+
+       else if($object["code"]=="VENTAS")
+       {
+         $output->writeln('  - '.$object["entity"].' - VENTAS');
          $obj=$repository->findOneBy(["comment"=>$object["comment"]]);
          if ($obj==null) {
            $obj=new ERPCustomerCommentLines();
            //$company=$repositoryCompanies->find(2);
            //$obj->setCompany($company);
            $obj->setComment($object["comment"]);
+           $obj->setType(1);
            $datetime=new \DateTime(date('Y-m-d 00:00:00',strtotime($object["date"]["date"])));
           // dump(date('Y-m-d 00:00:00',strtotime($object["date"]["date"])));
            $obj->setDateadd($datetime);
@@ -376,6 +438,7 @@ class NavisionGetCustomers extends ContainerAwareCommand
            $this->doctrine->getManager()->flush();
            $this->doctrine->getManager()->clear();
          }
+       }
      }
 
      }
