@@ -176,10 +176,10 @@ class NavisionController extends Controller
               $item['Nif']=$customer["vat"];
               $item['Código Cesce']=$customer["cescecode"];
               $item['Fecha Factura']=$invoice['date'];
-              $item['Importe']=str_replace(".",",",$invoice['total'])."€";
+              $item['Importe']=str_replace(".",",",$invoice['total']);
               $item['Forma de Pago']=$customer["paymentmethod"];
-              $item['id']=$invoice['id'];
               $item['Vencimiento']=$invoice['due_date'];
+              $item['id']=$invoice['id'];
               $invoices[]=$item;
             }
           }
@@ -253,10 +253,10 @@ class NavisionController extends Controller
           $item['vat']=$customer["vat"];
           $item['cescecode']=$customer["cescecode"];
           $item['date']=$invoice['date'];
-          $item['total']=str_replace(".",",",$invoice['total'])."€";
+          $item['total']=str_replace(".",",",$invoice['total']);
           $item['paymentmethod']=$customer["paymentmethod"];
-          $item['id']=$invoice['id'];
           $item['vencimiento']=$invoice['due_date'];
+          $item['id']=$invoice['id'];
           $invoices[]=$item;
         }
       }
