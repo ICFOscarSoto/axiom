@@ -56,6 +56,14 @@ class NavisionGetPaymentTerms extends ContainerAwareCommand
   }
 
    public function importPaymentTerms(InputInterface $input, OutputInterface $output){
+     //------   Create Lock Mutex    ------
+     $fp = fopen('/tmp/axiom-NavisionGetPaymentTerms-importPaymentTerms.lock', 'c');
+     if (!flock($fp, LOCK_EX | LOCK_NB)) {
+       $output->writeln('* Fallo al iniciar la sincronizacion de terminos de pago: El proceso ya esta en ejecución.');
+       exit;
+     }
+
+     //------   Critical Section START   ------
      $navisionSyncRepository=$this->doctrine->getRepository(NavisionSync::class);
      $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"paymentterms"]);
      if ($navisionSync==null) {
@@ -102,6 +110,9 @@ class NavisionGetPaymentTerms extends ContainerAwareCommand
      $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
      $this->doctrine->getManager()->persist($navisionSync);
      $this->doctrine->getManager()->flush();
+     //------   Critical Section END   ------
+     //------   Remove Lock Mutex    ------
+     fclose($fp);
    }
 
 

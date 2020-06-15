@@ -157,6 +157,7 @@ class NavisionGetSalesBudgets extends ContainerAwareCommand
         $totalIrpf=0;
         $total=0;
         foreach($object["lines"] as $key=>$line){
+          $objLine=new ERPSalesBudgetsLines();
           $totalDto+=$line["dtoAmount"];
           $totalNet+=$line["lineamount"];
           $totalTax+=$line["VATAmount"];

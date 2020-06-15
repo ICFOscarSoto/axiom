@@ -75,6 +75,14 @@ class NavisionGetSuppliers extends ContainerAwareCommand
   }
 
     public function importSupplier(InputInterface $input, OutputInterface $output){
+      //------   Create Lock Mutex    ------
+      $fp = fopen('/tmp/axiom-NavisionGetSuppliers-importSupplier.lock', 'c');
+      if (!flock($fp, LOCK_EX | LOCK_NB)) {
+        $output->writeln('* Fallo al iniciar la sincronizacion de proveedores: El proceso ya esta en ejecución.');
+        exit;
+      }
+
+      //------   Critical Section START   ------
       $navisionSyncRepository=$this->doctrine->getRepository(NavisionSync::class);
       $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"suppliers"]);
       if ($navisionSync==null) {
@@ -316,10 +324,21 @@ class NavisionGetSuppliers extends ContainerAwareCommand
       $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
       $this->doctrine->getManager()->persist($navisionSync);
       $this->doctrine->getManager()->flush();
+      //------   Critical Section END   ------
+      //------   Remove Lock Mutex    ------
+      fclose($fp);
     }
 
 
     public function importSupplierComment(InputInterface $input, OutputInterface $output){
+      //------   Create Lock Mutex    ------
+      $fp = fopen('/tmp/axiom-NavisionGetSuppliers-importSupplierComment.lock', 'c');
+      if (!flock($fp, LOCK_EX | LOCK_NB)) {
+        $output->writeln('* Fallo al iniciar la sincronizacion de comentarios de proveedores: El proceso ya esta en ejecución.');
+        exit;
+      }
+
+      //------   Critical Section START   ------
       $navisionSyncRepository=$this->doctrine->getRepository(NavisionSync::class);
       $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"suppliercomments"]);
       if ($navisionSync==null) {
@@ -455,10 +474,21 @@ class NavisionGetSuppliers extends ContainerAwareCommand
       $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
       $this->doctrine->getManager()->persist($navisionSync);
       $this->doctrine->getManager()->flush();
+      //------   Critical Section END   ------
+      //------   Remove Lock Mutex    ------
+      fclose($fp);
     }
   }
 
     public function importSupplierContact(InputInterface $input, OutputInterface $output){
+      //------   Create Lock Mutex    ------
+      $fp = fopen('/tmp/axiom-NavisionGetSuppliers-importSupplierContact.lock', 'c');
+      if (!flock($fp, LOCK_EX | LOCK_NB)) {
+        $output->writeln('* Fallo al iniciar la sincronizacion de contactos de proveedores: El proceso ya esta en ejecución.');
+        exit;
+      }
+
+      //------   Critical Section START   ------
       $repositoryCountries=$this->doctrine->getRepository(GlobaleCountries::class);
       $repositoryStates=$this->doctrine->getRepository(GlobaleStates::class);
       $repositorySuppliers=$this->doctrine->getRepository(ERPSuppliers::class);
@@ -533,6 +563,9 @@ class NavisionGetSuppliers extends ContainerAwareCommand
     $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
     $this->doctrine->getManager()->persist($navisionSync);
     $this->doctrine->getManager()->flush();
+    //------   Critical Section END   ------
+    //------   Remove Lock Mutex    ------
+    fclose($fp);
     }
 
 }

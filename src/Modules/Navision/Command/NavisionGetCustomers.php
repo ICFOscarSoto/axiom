@@ -80,6 +80,14 @@ class NavisionGetCustomers extends ContainerAwareCommand
   }
 
    public function importCustomer(InputInterface $input, OutputInterface $output){
+     //------   Create Lock Mutex    ------
+     $fp = fopen('/tmp/axiom-navisionGetCustomers-importCustomer.lock', 'c');
+     if (!flock($fp, LOCK_EX | LOCK_NB)) {
+       $output->writeln('* Fallo al iniciar la sincronizacion de clientes: El proceso ya esta en ejecución.');
+       exit;
+     }
+
+     //------   Critical Section START   ------
      $navisionSyncRepository=$this->doctrine->getRepository(NavisionSync::class);
      $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"customers"]);
      if ($navisionSync==null) {
@@ -365,11 +373,22 @@ class NavisionGetCustomers extends ContainerAwareCommand
      $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
      $this->doctrine->getManager()->persist($navisionSync);
      $this->doctrine->getManager()->flush();
+     //------   Critical Section END   ------
+     //------   Remove Lock Mutex    ------
+     fclose($fp);
    }
 
 
 
    public function importCustomerComment(InputInterface $input, OutputInterface $output){
+     //------   Create Lock Mutex    ------
+     $fp = fopen('/tmp/axiom-navisionGetCustomers-importCustomerComment.lock', 'c');
+     if (!flock($fp, LOCK_EX | LOCK_NB)) {
+       $output->writeln('* Fallo al iniciar la sincronizacion de comentarios de clientes: El proceso ya esta en ejecución.');
+       exit;
+     }
+
+     //------   Critical Section START   ------
      $navisionSyncRepository=$this->doctrine->getRepository(NavisionSync::class);
      $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"customercomments"]);
      if ($navisionSync==null) {
@@ -451,10 +470,21 @@ class NavisionGetCustomers extends ContainerAwareCommand
      $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
      $this->doctrine->getManager()->persist($navisionSync);
      $this->doctrine->getManager()->flush();
+     //------   Critical Section END   ------
+     //------   Remove Lock Mutex    ------
+     fclose($fp);
    }
 
 
    public function importCustomerContact(InputInterface $input, OutputInterface $output){
+     //------   Create Lock Mutex    ------
+     $fp = fopen('/tmp/axiom-navisionGetCustomers-importCustomerContact.lock', 'c');
+     if (!flock($fp, LOCK_EX | LOCK_NB)) {
+       $output->writeln('* Fallo al iniciar la sincronizacion de contactos de clientes: El proceso ya esta en ejecución.');
+       exit;
+     }
+
+     //------   Critical Section START   ------
      $repositoryCountries=$this->doctrine->getRepository(GlobaleCountries::class);
      $repositoryStates=$this->doctrine->getRepository(GlobaleStates::class);
      $repositoryCustomers=$this->doctrine->getRepository(ERPCustomers::class);
@@ -528,9 +558,20 @@ class NavisionGetCustomers extends ContainerAwareCommand
    $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
    $this->doctrine->getManager()->persist($navisionSync);
    $this->doctrine->getManager()->flush();
+   //------   Critical Section END   ------
+   //------   Remove Lock Mutex    ------
+   fclose($fp);
  }
 
  public function importCustomerAddresses(InputInterface $input, OutputInterface $output){
+   //------   Create Lock Mutex    ------
+   $fp = fopen('/tmp/axiom-navisionGetCustomers-importCustomerAddresses.lock', 'c');
+   if (!flock($fp, LOCK_EX | LOCK_NB)) {
+     $output->writeln('* Fallo al iniciar la sincronizacion de direcciones de clientes: El proceso ya esta en ejecución.');
+     exit;
+   }
+
+   //------   Critical Section START   ------
    $repositoryCountries=$this->doctrine->getRepository(GlobaleCountries::class);
    $repositoryStates=$this->doctrine->getRepository(GlobaleStates::class);
    $repositoryCustomers=$this->doctrine->getRepository(ERPCustomers::class);
@@ -606,6 +647,9 @@ class NavisionGetCustomers extends ContainerAwareCommand
  $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
  $this->doctrine->getManager()->persist($navisionSync);
  $this->doctrine->getManager()->flush();
+ //------   Critical Section END   ------
+ //------   Remove Lock Mutex    ------
+ fclose($fp);
 }
 
 
