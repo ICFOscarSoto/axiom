@@ -142,7 +142,7 @@ class NavisionGetProducts extends ContainerAwareCommand
          $movs=json_decode($json2, true);
          $movs=$movs[0];
          if($movs["class"][0]["movimiento"]!=null)
-          if($movs["class"][0]["movimiento"]["date"]>"2017-01-01 00:00:00.000000" and $object["Blocked"]==0)
+          if($movs["class"][0]["movimiento"]["date"]>"2018-01-01 00:00:00.000000" and $object["Blocked"]==0)
             $obj->setActive(1);
             else $obj->setActive(0);
          else $obj->setActive(0);
