@@ -77,31 +77,18 @@ var baseurl = '';
 					</button>
 				</div>
 			</form>
-			<div class="login-content">
+		</div>
+		{% if cfgloginhtmlbottom is defined and cfgloginhtmlbottom!="" %}
+			{{ cfgloginhtmlbottom | raw }}
+		{% endif %}
+		<div class="row">
+			<div class="col-md-12" style="text-align: center;">
 				<a href="index.html" class="logo">
 					<img src="/images/logo-axiom.png" width="100" alt="" />
 				</a>
 				<p class="description" style="font-size:8px">by Aplicode Engineered Technologies </p>
 			</div>
-
-			{% if cfgloginhtmlbottom is defined %}
-			<div class="login-content">
-				{{ cfgloginhtmlbottom | raw }}
-			</div>
-			{% endif %}
-
-			<div class="login-bottom-links">
-
-				{#<a href="extra-forgot-password.html" class="link">¿Olvidó su contraseña?</a>#}
-
-				<br />
-
-				<!-- <a href="#">ToS</a>  - <a href="#">Privacy Policy</a> -->
-
-			</div>
-
 		</div>
-
 	</div>
 
 </div>
