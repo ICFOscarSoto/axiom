@@ -83,6 +83,13 @@ var baseurl = '';
 				</a>
 				<p class="description" style="font-size:8px">by Aplicode Engineered Technologies </p>
 			</div>
+
+			{% if cfgloginhtmlbottom is defined %}
+			<div class="login-content">
+				{{ cfgloginhtmlbottom | raw }}
+			</div>
+			{% endif %}
+
 			<div class="login-bottom-links">
 
 				{#<a href="extra-forgot-password.html" class="link">¿Olvidó su contraseña?</a>#}

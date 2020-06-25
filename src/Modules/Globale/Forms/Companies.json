@@ -23,6 +23,12 @@
 			]
 		},
 		{
+			"name": "Configuración General",
+			"fields": [
+				{	"name": "cfgloginhtmlbottom",	"cols": 12, "caption": "Login html Bottom"}
+			]
+		},
+		{
 			"name": "Devices",
 			"fields": [
 				{	"name": "deviceuser",	"cols": 6, "caption": "User", "readonly": true},

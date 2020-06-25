@@ -153,15 +153,20 @@ class GlobaleCompanies
      */
     private $agent;
 
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $cfgloginhtmlbottom;
+
 
 	public function __construct()
-    {
-        $this->userGroups = new ArrayCollection();
-        $this->users = new ArrayCollection();
-        $this->menuOptions = new ArrayCollection();
-        $this->dateadd = new \Datetime();
-        $this->dateupd =  new \Datetime();
-    }
+             {
+                 $this->userGroups = new ArrayCollection();
+                 $this->users = new ArrayCollection();
+                 $this->menuOptions = new ArrayCollection();
+                 $this->dateadd = new \Datetime();
+                 $this->dateupd =  new \Datetime();
+             }
 
     public function getId(): ?int
     {
@@ -616,6 +621,18 @@ class GlobaleCompanies
     public function setAgent(?GlobaleAgents $agent): self
     {
         $this->agent = $agent;
+
+        return $this;
+    }
+
+    public function getCfgloginhtmlbottom(): ?string
+    {
+        return $this->cfgloginhtmlbottom;
+    }
+
+    public function setCfgloginhtmlbottom(?string $cfgloginhtmlbottom): self
+    {
+        $this->cfgloginhtmlbottom = $cfgloginhtmlbottom;
 
         return $this;
     }
