@@ -189,14 +189,21 @@ class ERPInvoiceReports
       $last_shipping=null;
       for($i=0;$i<count($invoice["lines"]);$i++){
         if($invoice["lines"][$i]["shipment"]!=$last_shipping){
-          if($i>0)$data[]=["","","","","",""];
+          if($i>0){$data[]=["","","","","",""];$data[]=["","","","","",""];}
           $last_shipping=$invoice["lines"][$i]["shipment"];
           $data[]=["","#b#Nº Albarán ".$invoice["lines"][$i]["shipment"],"","","",""];
           $data[]=["","#b#".($invoice["lines"][$i]["contact"]!=""?$invoice["lines"][$i]["contact"]:$invoice["customer"]),"","","",""];
+          if(!empty($invoice["lines"][$i]["comments"])){
+            $data[]=["","#b#Comentarios: ","","","",""];
+            foreach($invoice["lines"][$i]["comments"] as $item){
+              if($item["comment"]!="") $data[]=["","      ".$item["comment"],"","","",""];
+            }
+              $data[]=["","","","","",""];
+          }
           if($invoice["lines"][$i]["customerreference"]!="") $data[]=["","SU PEDIDO Nº ".$invoice["lines"][$i]["customerreference"],"","","",""];
         }
-
         $data[]=[$invoice["lines"][$i]["referencecross"]!=""?$invoice["lines"][$i]["referencecross"]:$invoice["lines"][$i]["reference"],$invoice["lines"][$i]["description"],$invoice["lines"][$i]["quantity"],number_format($invoice["lines"][$i]["price"],4,',','.').json_decode('"\u0080"'),$invoice["lines"][$i]["desicount"].'%',number_format($invoice["lines"][$i]["linetotal"],2,',','.').json_decode('"\u0080"')];
+
       }
       $this->pdf->image_path=$params["rootdir"].DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$params["user"]->getCompany()->getId().DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'company'.DIRECTORY_SEPARATOR;
       $this->pdf->user=$params["user"];
