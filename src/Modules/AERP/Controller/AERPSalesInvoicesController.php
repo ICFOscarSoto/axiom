@@ -284,24 +284,48 @@ class AERPSalesInvoicesController extends Controller
 	}
 
 	/**
-	 * @Route("/{_locale}/AERP/salesinvoices/print/{id}", name="AERPSalesInvoicesPrint", defaults={"id"=0}))
+	 * @Route("/{_locale}/AERP/salesinvoices/print/{id}/{mode}", name="AERPSalesInvoicesPrint", defaults={"id"=0, "mode"="print"}))
 	 */
-	public function AERPSalesInvoicesPrint($id, RouterInterface $router,Request $request){
+	public function AERPSalesInvoicesPrint($id, $mode, RouterInterface $router,Request $request){
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		$documentRepository=$this->getDoctrine()->getRepository($this->class);
 		$documentLinesRepository=$this->getDoctrine()->getRepository($this->classLines);
 		$configrepository=$this->getDoctrine()->getRepository(AERPConfiguration::class);
 
-		$document=$documentRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$id, "deleted"=>0]);
-
-		if(!$document) return new Response("");
+		$document=$documentRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "code"=>$id, "deleted"=>0]);
+		if(!$document) return new JsonResponse(["result"=>-1]);
 		$lines=$documentLinesRepository->findBy(["salesinvoice"=>$document, "deleted"=>0, "active"=>1]);
 		$configuration=$configrepository->findOneBy(["company"=>$this->getUser()->getCompany()]);
 
-		$params=["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "id"=>$id, "user"=>$this->getUser(), "document"=>$document, "lines"=>$lines, "configuration"=>$configuration];
+		$params=["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "id"=>$document->getId(), "user"=>$this->getUser(), "document"=>$document, "lines"=>$lines, "configuration"=>$configuration];
 		$reportsUtils = new AERPSalesInvoicesReports();
-
-		$pdf=$reportsUtils->create($params);
+		switch($mode){
+			case "email":
+				$tempPath=$this->get('kernel')->getRootDir().DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$this->getUser()->getCompany()->getId().DIRECTORY_SEPARATOR.'temp'.DIRECTORY_SEPARATOR.$this->getUser()->getId().DIRECTORY_SEPARATOR.'Email'.DIRECTORY_SEPARATOR;
+				if (!file_exists($tempPath) && !is_dir($tempPath)) {
+						mkdir($tempPath, 0775, true);
+				}
+				$pdf=$reportsUtils->create($params,'F',$tempPath.$this->prefix.$document->getCode().'.pdf');
+				return new JsonResponse(["result"=>1]);
+			break;
+			case "temp":
+				$tempPath=$this->get('kernel')->getRootDir().DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$this->getUser()->getCompany()->getId().DIRECTORY_SEPARATOR.'temp'.DIRECTORY_SEPARATOR.$this->getUser()->getId().DIRECTORY_SEPARATOR.'Others'.DIRECTORY_SEPARATOR;
+				if (!file_exists($tempPath) && !is_dir($tempPath)) {
+						mkdir($tempPath, 0775, true);
+				}
+				$pdf=$reportsUtils->create($params,'F',$tempPath.$this->prefix.$document->getCode().'.pdf');
+				return new JsonResponse(["result"=>1]);
+			break;
+			case "download":
+				$pdf=$reportsUtils->create($params,'D',$this->prefix.$document->getCode().'.pdf');
+				return new JsonResponse(["result"=>1]);
+			break;
+			case "print":
+			case "default":
+				$pdf=$reportsUtils->create($params,'I',$this->prefix.$document->getCode().'.pdf');
+				return new JsonResponse(["result"=>1]);
+			break;
+		}
 		return new Response("", 200, array('Content-Type' => 'application/pdf'));
 	}
 

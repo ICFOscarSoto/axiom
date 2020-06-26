@@ -152,6 +152,15 @@
       new Jodit("#"+$(this).attr("id"),{});
     });
 
+    //Avoid Enter Key Submit form
+    $('body').on('keydown', 'form input', function(e) {
+      if(e.keyCode  == 13) {
+        e.preventDefault();
+        return false;
+      }
+    });
+
+
   });
 </script>
 
