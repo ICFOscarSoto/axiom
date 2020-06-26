@@ -240,7 +240,18 @@ class AERPSalesInvoicesReports
       $data=[];
       $last_shipping=null;
       foreach($lines as $line){
-        $data[]=[$line->getCode(),$line->getName(),$line->getQuantity(),$line->getUnitprice().json_decode('"\u0080"'),$line->getDtoperc()."%",$line->getTaxperc()."%",$line->getTotal().json_decode('"\u0080"')];
+        switch(strtoupper($line->getCode())){
+          case '#TXT':
+            $data[]=['',$line->getName(),'','','','',''];
+          break;
+          case '#TXTB':
+            $data[]=['','#b#'.$line->getName(),'','','','',''];
+          break;
+          default:
+            $data[]=[$line->getCode(),$line->getName(),$line->getQuantity(),$line->getUnitprice().json_decode('"\u0080"'),$line->getDtoperc()."%",$line->getTaxperc()."%",$line->getTotal().json_decode('"\u0080"')];
+          break;
+        }
+
       }
 
       $this->pdf->image_path=$params["rootdir"].DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$params["user"]->getCompany()->getId().DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'company'.DIRECTORY_SEPARATOR;

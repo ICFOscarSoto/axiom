@@ -61,7 +61,7 @@ class GlobaleSecurityController extends Controller
 			return $this->render($template, ['cfgloginhtmlbottom'=>$company->getCfgloginhtmlbottom(), 'last_username' => $lastUsername, 'domain'=>$domain, 'type'=> 'hidden', 'error' => $error, 'logo' => $logo]);
 		}else{
 			$logo=$this->generateUrl('getImage', array('type'=>'companydark' ,'size'=>'medium','id'=>1));
-			return $this->render($template, ['cfgloginhtmlbottom'=>$company->getCfgloginhtmlbottom(),'last_username' => $lastUsername, 'domain'=>($domain!="aplicode.com")?$domain:"", 'type'=> 'text', 'error' => $error,  'logo' => $logo]);
+			return $this->render($template, ['','last_username' => $lastUsername, 'domain'=>($domain!="aplicode.com")?$domain:"", 'type'=> 'text', 'error' => $error,  'logo' => $logo]);
 		}
 	}
 
