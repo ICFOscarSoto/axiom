@@ -138,7 +138,7 @@ class NavisionGetCustomers extends ContainerAwareCommand
         $currency=$repositoryCurrencies->findOneBy(["isocode"=>"EUR"]);
         $paymentMethod=$repositoryPaymentMethod->findOneBy(["paymentcode"=>$object["payment_method"]]);
         $activity=$repositoryCustomerActivities->findOneBy(["code"=>$object["activity"]]);
-        if($object["customergroup"]=="GDTO4" OR $object["customergroup"]=="GDTO5") $axiom_group="GDTO3";
+        if($object["customergroup"]=="GDTO4" OR $object["customergroup"]=="GDTO5" OR $object["customergroup"]=="" ) $axiom_group="GDTO3";
         else $axiom_group=$object["customergroup"];
         $customergroup=$repositoryCustomerGroups->findOneBy(["name"=>$axiom_group]);
         $bankaccounts=$repositoryBankAccounts->findOneBy(["iban"=>$object["iban"]]);
