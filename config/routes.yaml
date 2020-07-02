@@ -55,6 +55,18 @@ CustomerSpecialConditions:
     resource: 'App\Modules\ERP\Controller\ERPCustomerSpecialConditionsController'
     type:     annotation
 
+CustomerOrdersData:
+    resource: 'App\Modules\ERP\Controller\ERPCustomerOrdersDataController'
+    type:     annotation
+
+CustomerCommercialTerms:
+    resource: 'App\Modules\ERP\Controller\ERPCustomerCommercialTermsController'
+    type:     annotation
+
+CustomerCommentLines:
+    resource: 'App\Modules\ERP\Controller\ERPCustomerCommentLinesController'
+    type:     annotation
+
 Increments:
     resource: 'App\Modules\ERP\Controller\ERPIncrementsController'
     type:     annotation
@@ -69,6 +81,10 @@ SupplierActivities:
 
 SupplierOrdersData:
     resource: 'App\Modules\ERP\Controller\ERPSupplierOrdersDataController'
+    type:     annotation
+
+SupplierCommentLines:
+    resource: 'App\Modules\ERP\Controller\ERPSupplierCommentLinesController'
     type:     annotation
 
 EAN13:

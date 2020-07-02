@@ -1,0 +1,6 @@
+[
+  {"id" : "addTopCustomerCommercialTerms", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"genericdata", "routeParams":{"module":"ERP", "name":"CustomerCommercialTerms", "type":"modal" }, "modal":"CustomerCommercialTerms", "actionType" : "background", "confirm" :false, "tooltip" : ""},
+  {"id" : "deleteTopCustomerCommercialTerms", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true, "tooltip":""},
+  {"id" : "printTopCustomerCommercialTerms", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false, "tooltip":""},
+  {"id" : "exportTopCustomerCommercialTerms", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"genericexport", "routeParams":{"module":"ERP", "name":"CustomerCommercialTerms"}, "confirm" :false, "tooltip":""}
+]

@@ -1,0 +1,6 @@
+[
+  {"id" : "addTopCustomerOrdersData", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"genericdatatab", "routeParams":{"module":"ERP", "name":"CustomerOrdersData", "type":"modal", "idparent":"id","json":"CustomerOrdersData" }, "modal":"CustomerOrdersData", "actionType" : "background", "confirm" :false, "tooltip" : ""},
+  {"id" : "deleteTopCustomerOrdersData", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true, "tooltip":""},
+  {"id" : "printTopCustomerOrdersData", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false, "tooltip":""},
+  {"id" : "exportTopCustomerOrdersData", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"genericexport", "routeParams":{"module":"ERP", "name":"CustomerOrdersData"}, "confirm" :false, "tooltip":""}
+]

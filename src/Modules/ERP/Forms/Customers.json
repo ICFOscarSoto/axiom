@@ -9,7 +9,7 @@
 				{ "name": "phone","cols": 2},
 				{ "name": "email","cols": 2},
 				{ "name": "activity","cols": 2},
-				{ "name": "authorizationcontrol","cols": 2}
+				{ "name": "maincontact","cols": 2}
 			]
 		}
 		,
@@ -28,24 +28,13 @@
 	{
 		"name": "Conditions",
 		"fields": [
-			{ "name": "customergroup", "cols": 2},
 			{ "name": "paymentmethod","cols": 2},
 			{ "name": "paymentterms","cols": 2},
 			{ "name": "paymentmode","cols": 2},
 			{ "name": "maxcredit","cols": 2},
 			{ "name": "mininvoice","cols": 2},
-			{ "name": "allowlinediscount","cols": 2},
-			{ "name": "requiredordernumber","cols": 2},
-			{ "name": "additionaldiscount","cols": 2},
-			{ "name": "invoicefordeliverynote","cols": 2},
-			{ "name": "partialshipping","cols": 2},
-			{ "name": "pricesdeliverynote","cols": 2},
-			{ "name": "surcharge","cols": 2},
 			{ "name": "invoiceday","cols": 2},
-			{ "name": "minimuminvoiceamount","cols": 2},
-			{ "name": "insured","cols": 2},
-			{ "name": "supplement","cols": 2},
-			{ "name": "cescecode","cols": 2}
+			{ "name": "minimuminvoiceamount","cols": 2}
 		]
 	},
 	{

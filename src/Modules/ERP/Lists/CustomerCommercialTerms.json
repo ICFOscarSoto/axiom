@@ -1,0 +1,38 @@
+[
+    {
+        "name": "id",
+        "caption": "id"
+    },
+    {
+        "name": "allowlinediscount",
+        "caption": "allowlinediscount"
+    },
+    {
+        "name": "additionaldiscount",
+        "caption": "additionaldiscount"
+    },
+    {
+        "name": "surchage",
+        "caption": "surchage"
+    },
+    {
+        "name": "insured",
+        "caption": "insured"
+    },
+    {
+        "name": "supplement",
+        "caption": "supplement"
+    },
+    {
+        "name": "cescecode",
+        "caption": "cescecode"
+    },
+    {
+        "name": "customer__name",
+        "caption": "customer"
+    },
+    {
+        "name": "customergroup__name",
+        "caption": "customergroup"
+    }
+]

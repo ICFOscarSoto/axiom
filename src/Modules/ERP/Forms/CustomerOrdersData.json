@@ -1,0 +1,41 @@
+[{
+    "sections": [
+        {
+            "name": "data",
+            "fields": [
+                {
+                    "name": "requiredordernumber",
+                    "cols": 4
+                },
+                {
+                    "name": "invoicefordeliverynote",
+                    "cols": 4
+                },
+                {
+                    "name": "pricesdeliverynote",
+                    "cols": 4
+                },
+                {
+                    "name": "partialshipping",
+                    "cols": 4
+                },
+                {
+                    "name": "authorizationcontrol",
+                    "cols": 4
+                },
+                {
+                    "name": "customer",
+                    "cols": 4
+                },
+                {
+                    "name": "carrier",
+                    "cols": 4
+                },
+                {
+                    "name": "shippingconditions",
+                    "cols": 4
+                }
+            ]
+        }
+    ]
+}]

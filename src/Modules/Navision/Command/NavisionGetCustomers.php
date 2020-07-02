@@ -17,6 +17,7 @@ use App\Modules\ERP\Entity\ERPCustomerActivities;
 use App\Modules\ERP\Entity\ERPCustomerGroups;
 use App\Modules\ERP\Entity\ERPCustomerCommentLines;
 use App\Modules\ERP\Entity\ERPCustomerOrdersData;
+use App\Modules\ERP\Entity\ERPCustomerCommercialTerms;
 use App\Modules\Carrier\Entity\CarrierCarriers;
 use App\Modules\Carrier\Entity\CarrierShippingConditions;
 use App\Modules\ERP\Entity\ERPBankAccounts;
@@ -82,6 +83,8 @@ class NavisionGetCustomers extends ContainerAwareCommand
    public function importCustomer(InputInterface $input, OutputInterface $output){
      //------   Create Lock Mutex    ------
      $fp = fopen('/tmp/axiom-navisionGetCustomers-importCustomer.lock', 'c');
+     //  $fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetCustomers-importCustomer.lock', 'c');
+
      if (!flock($fp, LOCK_EX | LOCK_NB)) {
        $output->writeln('* Fallo al iniciar la sincronizacion de clientes: El proceso ya esta en ejecución.');
        exit;
@@ -105,6 +108,7 @@ class NavisionGetCustomers extends ContainerAwareCommand
      $repositoryPaymentMethod=$this->doctrine->getRepository(ERPPaymentMethods::class);
      $repositoryPaymentTerms=$this->doctrine->getRepository(ERPPaymentTerms::class);
      $repositoryCustomerOrdersData=$this->doctrine->getRepository(ERPCustomerOrdersData::class);
+     $repositoryCustomerCommercialTerms=$this->doctrine->getRepository(ERPCustomerCommercialTerms::class);
      $repositoryCustomerActivities=$this->doctrine->getRepository(ERPCustomerActivities::class);
      $repositoryStates=$this->doctrine->getRepository(GlobaleStates::class);
      $repositoryCustomerGroups=$this->doctrine->getRepository(ERPCustomerGroups::class);
@@ -134,7 +138,9 @@ class NavisionGetCustomers extends ContainerAwareCommand
         $currency=$repositoryCurrencies->findOneBy(["isocode"=>"EUR"]);
         $paymentMethod=$repositoryPaymentMethod->findOneBy(["paymentcode"=>$object["payment_method"]]);
         $activity=$repositoryCustomerActivities->findOneBy(["code"=>$object["activity"]]);
-        $customergroup=$repositoryCustomerGroups->findOneBy(["name"=>$object["customergroup"]]);
+        if($object["customergroup"]=="GDTO4" OR $object["customergroup"]=="GDTO5") $axiom_group="GDTO3";
+        else $axiom_group=$object["customergroup"];
+        $customergroup=$repositoryCustomerGroups->findOneBy(["name"=>$axiom_group]);
         $bankaccounts=$repositoryBankAccounts->findOneBy(["iban"=>$object["iban"]]);
 
         $id_paymentterms_nav=$object["payment_terms"];
@@ -291,16 +297,17 @@ class NavisionGetCustomers extends ContainerAwareCommand
         $obj->setPaymentMethod($paymentMethod);
         if($paymentTerms!=NULL) $obj->setPaymentTerms($paymentTerms);
         $obj->setActivity($activity);
-        $obj->setCustomergroup($customergroup);
+      //  $obj->setCustomergroup($customergroup);
         $obj->setMinimuminvoiceamount($object["minimuminvoiceamount"]);
         $obj->setMaxcredit($object["creditlimit"]);
         $obj->setPaymentMode($object["paymentmode"]);
 
 
-        /*DATOS PARA PEDIDOS*/
+
 
          $customer=$repository->findOneBy(["code"=>$object["code"]]);
          if($customer!=NULL){
+            /*DATOS PARA PEDIDOS*/
              $ordersData=$repositoryCustomerOrdersData->findOneBy(["customer"=>$customer]);
 
              if($ordersData==NULL)
@@ -324,11 +331,35 @@ class NavisionGetCustomers extends ContainerAwareCommand
              $ordersData->setCarrier($carrier);
              $ordersData->setShippingconditions($shippingconditions);
              $this->doctrine->getManager()->persist($ordersData);
+
+             /*DATOS PARA LAS CONDICIONES COMERCIALES*/
+             $commercialterms=$repositoryCustomerCommercialTerms->findOneBy(["customer"=>$customer]);
+
+             if($commercialterms==NULL)
+             {
+               $commercialterms=new ERPCustomerCommercialTerms();
+               $commercialterms->setCustomer($customer);
+               $commercialterms->setCustomergroup($customergroup);
+               $commercialterms->setDateadd(new \Datetime());
+               $commercialterms->setDateupd(new \Datetime());
+               $commercialterms->setDeleted(0);
+               $commercialterms->setActive(1);
+
+             }
+
+             $commercialterms->setAllowlinediscount($object["allowlinediscount"]);
+             $this->doctrine->getManager()->persist($commercialterms);
         }
+
+
+
 
         $this->doctrine->getManager()->persist($obj);
         $this->doctrine->getManager()->flush();
         $this->doctrine->getManager()->clear();
+
+
+
 
 
         //el cliente tiene datos bancarios
@@ -383,6 +414,7 @@ class NavisionGetCustomers extends ContainerAwareCommand
    public function importCustomerComment(InputInterface $input, OutputInterface $output){
      //------   Create Lock Mutex    ------
      $fp = fopen('/tmp/axiom-navisionGetCustomers-importCustomerComment.lock', 'c');
+     //$fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetCustomers-importCustomerComment.lock', 'c');
      if (!flock($fp, LOCK_EX | LOCK_NB)) {
        $output->writeln('* Fallo al iniciar la sincronizacion de comentarios de clientes: El proceso ya esta en ejecución.');
        exit;
@@ -479,6 +511,7 @@ class NavisionGetCustomers extends ContainerAwareCommand
    public function importCustomerContact(InputInterface $input, OutputInterface $output){
      //------   Create Lock Mutex    ------
      $fp = fopen('/tmp/axiom-navisionGetCustomers-importCustomerContact.lock', 'c');
+     //$fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetCustomers-importCustomerContact.lock', 'c');
      if (!flock($fp, LOCK_EX | LOCK_NB)) {
        $output->writeln('* Fallo al iniciar la sincronizacion de contactos de clientes: El proceso ya esta en ejecución.');
        exit;
@@ -566,6 +599,8 @@ class NavisionGetCustomers extends ContainerAwareCommand
  public function importCustomerAddresses(InputInterface $input, OutputInterface $output){
    //------   Create Lock Mutex    ------
    $fp = fopen('/tmp/axiom-navisionGetCustomers-importCustomerAddresses.lock', 'c');
+   //$fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetCustomers-importCustomerAddresses.lock', 'c');
+
    if (!flock($fp, LOCK_EX | LOCK_NB)) {
      $output->writeln('* Fallo al iniciar la sincronizacion de direcciones de clientes: El proceso ya esta en ejecución.');
      exit;

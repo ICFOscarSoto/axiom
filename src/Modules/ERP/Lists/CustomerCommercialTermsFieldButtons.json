@@ -1,0 +1,8 @@
+[
+  {"id": "editCustomerCommercialTerms", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"genericdata", "routeParams":{"module":"ERP", "name":"CustomerCommercialTerms", "type":"modal" }, "modal":"CustomerCommercialTerms", "actionType" : "background", "confirm" :false, "tooltip":""},
+  {"id": "activation", "type": "option", "options": [
+      {"id": "desactivateCustomerCommercialTerms", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"genericdisable", "routeParams":{"module":"ERP", "name":"CustomerCommercialTerms"}, "confirm" :true, "actionType" : "background", "tooltip":"" },
+      {"id": "activateCustomerCommercialTerms", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "route":"genericenable", "routeParams":{"module":"ERP", "name":"CustomerCommercialTerms"}, "confirm" :true, "actionType" : "background", "tooltip":"" }
+  ]},
+  {"id": "deleteCustomerCommercialTerms", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"genericdelete", "routeParams":{"module":"ERP", "name":"CustomerCommercialTerms"}, "confirm" :true, "undo" :false, "actionType" : "background", "tooltip":""}
+]

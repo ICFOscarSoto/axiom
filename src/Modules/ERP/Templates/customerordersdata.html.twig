@@ -18,52 +18,40 @@
 	      </div>
 	    </div>
 	  </div>
-		<input type="hidden" id="post-url" name="post-url" value="{{ url('dataSupplierOrdersData',{'id': formConstructor.id_object, 'parent': parent,  'action':'save'}) }}">
+		<input type="hidden" id="post-url" name="post-url" value="{{ url('dataCustomerOrdersData',{'id': formConstructor.id_object, 'parent': parent,  'action':'save'}) }}">
 		<input type="hidden" id="id-object" name="id-object" value="{{ formConstructor.id_object }}">
 		{{ form_row(formConstructor.form['_token']) }}
 	<div class="row">
 		<div class="col-md-2">
-    	{{ form_row(formConstructor.form['estimateddelivery']) }}
+    	{{ form_row(formConstructor.form['requiredordernumber']) }}
     </div>
     <div class="col-md-2">
-      {{ form_row(formConstructor.form['averagedelivery']) }}
+      {{ form_row(formConstructor.form['invoicefordeliverynote']) }}
     </div>
     <div class="col-md-2">
-      {{ form_row(formConstructor.form['freeshipping']) }}
+      {{ form_row(formConstructor.form['pricesdeliverynote']) }}
     </div>
     <div class="col-md-2">
-      {{ form_row(formConstructor.form['minorder']) }}
+      {{ form_row(formConstructor.form['partialshipping']) }}
     </div>
+		<div class="col-md-2">
+			{{ form_row(formConstructor.form['authorizationcontrol']) }}
+		</div>
     <div class="col-md-2">
         {{ form_row(formConstructor.form['carrier']) }}
     </div>
     <div class="col-md-2">
         {{ form_row(formConstructor.form['shippingconditions']) }}
     </div>
-     <div class="col-md-2">
-         {{ form_row(formConstructor.form['dropshipping']) }}
-		 </div>
-    <div class="col-md-2">
-        {{ form_row(formConstructor.form['allowpicking']) }}
-    </div>
 		</div>
 		<div class="row">
 		  <div class="col-md-12">
 		    <div class="panel-title-list">Comentarios de pedidos</div>
-		    {% if supplierordercommentslist is defined %}
-		    {% set listConstructor = supplierordercommentslist %}
+		    {% if customerorderscommentlineslist is defined %}
+		    {% set listConstructor = customerorderscommentlineslist %}
 		    {{ include('@Globale/list.html.twig') }}
 		    {% endif %}
 		  </div>
-		</div>
-		<div class="row">
-			<div class="col-md-12">
-				<div class="panel-title-list">Comentarios de rappel</div>
-				{% if supplierrappelcommentslist is defined %}
-				{% set listConstructor = supplierrappelcommentslist %}
-				{{ include('@Globale/list.html.twig') }}
-				{% endif %}
-			</div>
 		</div>
   </div>
 </div>

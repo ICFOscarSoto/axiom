@@ -1,0 +1,38 @@
+[
+    {
+        "name": "id",
+        "caption": "id"
+    },
+    {
+        "name": "requiredordernumber",
+        "caption": "requiredordernumber"
+    },
+    {
+        "name": "invoicefordeliverynote",
+        "caption": "invoicefordeliverynote"
+    },
+    {
+        "name": "pricesdeliverynote",
+        "caption": "pricesdeliverynote"
+    },
+    {
+        "name": "partialshipping",
+        "caption": "partialshipping"
+    },
+    {
+        "name": "authorizationcontrol",
+        "caption": "authorizationcontrol"
+    },
+    {
+        "name": "customer__name",
+        "caption": "supplier"
+    },
+    {
+        "name": "carrier__name",
+        "caption": "carrier"
+    },
+    {
+        "name": "shippingconditions__name",
+        "caption": "shippingconditions"
+    }
+]

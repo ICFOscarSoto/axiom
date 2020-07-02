@@ -11,7 +11,9 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\ERP\Entity\ERPSupplierOrdersData;
+use App\Modules\ERP\Entity\ERPSupplierCommentLines;
 use App\Modules\ERP\Utils\ERPSupplierOrdersDataUtils;
+use App\Modules\ERP\Utils\ERPSupplierCommentLinesUtils;
 use App\Modules\ERP\Entity\ERPSuppliers;
 use App\Modules\Globale\Entity\GlobaleCountries;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
@@ -29,10 +31,9 @@ class ERPSupplierOrdersDataController extends Controller
    * @Route("/{_locale}/supplierordersdata/infoSupplierOrdersData/{id}", name="infoSupplierOrdersData", defaults={"id"=0})
    */
   public function infoSupplierOrdersData($id, Request $request){
-/*
+
 		$suppliersRepository=$this->getDoctrine()->getRepository(ERPSuppliers::class);
 		$supplier=$suppliersRepository->findOneBy(["id"=>$id]);
-  	$supplier_id=$supplier->getId();*/
 		$supplierOrdersDataRepository=$this->getDoctrine()->getRepository(ERPSupplierOrdersData::class);
 		$supplierOrdersData=$supplierOrdersDataRepository->findOneBy(["supplier"=>$id]);
 		$this_id=$supplierOrdersData->getId();
@@ -41,16 +42,24 @@ class ERPSupplierOrdersDataController extends Controller
 		$formUtils = new GlobaleFormUtils();
 		$formUtilsSupplierOrdersData = new ERPSupplierOrdersDataUtils();
 		$formUtils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),$formUtilsSupplierOrdersData->getExcludedForm([]),$formUtilsSupplierOrdersData->getIncludedForm(["doctrine"=>$this->getDoctrine(), "user"=>$this->getUser(), "id"=>$this_id, "parent" => $id]));
-		//	$listCustomersPrices = new ERPCustomersPricesUtils();
-		//$listCustomersCommentLines = new ERPCustomerCommentLinesUtils();
-	//	$formUtilsCustomersPrices = new GlobaleFormUtils();
-	//$formUtilsCustomersPrices->initialize($this->getUser(), new ERPCustomersPrices(), dirname(__FILE__)."/../Forms/CustomersPrices.json", $request, $this, $this->getDoctrine());
-//		$forms[]=$formUtilsCustomersPrices->formatForm('CustomersPrices', true, null, ERPCustomersPrices::class);
 
+		/*SUPPLIER COMMENTS*/
 
-	//	$supplierRepository=$this->getDoctrine()->getRepository(ERPSuppliers::class);
-//		$supplier=$supplierRepository->findOneBy(["id"=>$id, "active"=>1, "deleted"=>0, "company"=>$this->getUser()->getCompany()]);
+		/*orders*/
+		$listSupplierCommentLines = new ERPSupplierCommentLinesUtils();
+		$formUtilsSupplierCommentLines = new GlobaleFormUtils();
+		$formUtilsSupplierCommentLines->initialize($this->getUser(), new ERPSupplierCommentLines(), dirname(__FILE__)."/../Forms/SupplierCommentLines.json", $request, $this, $this->getDoctrine(),$listSupplierCommentLines->getExcludedForm([]),$listSupplierCommentLines->getIncludedForm(["doctrine"=>$this->getDoctrine(), "user"=>$this->getUser(),"id"=>$id, "parent"=>$supplier]));
+		$listSupplierCommentLines->getIncludedForm(["doctrine"=>$this->getDoctrine(), "user"=>$this->getUser(),"id"=>$id, "parent"=>$supplier, "type"=>1]);
+		$forms[]=$formUtilsSupplierCommentLines->formatForm('SupplierCommentLines', true, null, ERPSupplierCommentLines::class);
 
+		/*rappel*/
+/*
+		$listSupplierRappelCommentLines = new ERPSupplierCommentLinesUtils();
+		$formUtilsSupplierRappelCommentLines = new GlobaleFormUtils();
+		$formUtilsSupplierRappelCommentLines->initialize($this->getUser(), new ERPSupplierCommentLines(), dirname(__FILE__)."/../Forms/SupplierCommentLines.json", $request, $this, $this->getDoctrine(),$listSupplierRappelCommentLines->getExcludedForm([]),$listSupplierRappelCommentLines->getIncludedForm(["doctrine"=>$this->getDoctrine(), "user"=>$this->getUser(),"id"=>$id, "parent"=>$supplier, "type"=>"3"]));
+		$listSupplierRappelCommentLines->getIncludedForm(["doctrine"=>$this->getDoctrine(), "user"=>$this->getUser(),"id"=>$id, "parent"=>$supplier, "type"=>3]);
+		$forms[]=$formUtilsSupplierOrdersCommentLines->formatForm('SupplierCommentLines', true, null, ERPSupplierCommentLines::class);
+*/
 		return $this->render('@ERP/supplierordersdata.html.twig', array(
 			'controllerName' => 'supplierOrdersDataController',
 			'interfaceName' => 'Proveedores',
@@ -60,6 +69,10 @@ class ERPSupplierOrdersDataController extends Controller
 			'parent' => $id,
 		/*	'id_object' => $id,*/
 			'form' => $formUtils->formatForm('SupplierOrdersData', true, $this_id, $this->class),
+			'supplierordercommentslist' => $listSupplierCommentLines->formatListBySupplierType($id,1),
+			'supplierrappelcommentslist' => $listSupplierCommentLines->formatListBySupplierType($id,3),
+			'forms' => $forms,
+		/*	'forms2' => $forms2,*/
 			'include_footer' => [["type"=>"css", "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.css"],
 													 ["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.js"],
 													 ["type"=>"js",  "path"=>"/js/jquery.nestable.js"]]

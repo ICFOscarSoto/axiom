@@ -7,6 +7,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\Email\Entity\EmailAccounts;
+use App\Modules\ERP\Entity\ERPContacts;
 
 class ERPCustomersUtils
 {
@@ -26,19 +27,27 @@ class ERPCustomersUtils
   }
 
   public function getExcludedForm($params){
-    return ['customer'];
+    return ['customer','maincontact'];
   }
 
   public function getIncludedForm($params){
-  /*
-    $doctrine=$params["doctrine"];
-    $user=$params["user"];
-    $id=$params["id"];
-    $productRepository=$doctrine->getRepository(ERPProducts::class);
-    $products=$productRepository->findOneBy(["id"=>$id]);
-    */
-    return [];
-  }
+
+  $doctrine=$params["doctrine"];
+  $user=$params["user"];
+  $id=$params["id"];
+  $contactsRepository=$doctrine->getRepository(ERPContacts::class);
+
+  return [['maincontact', ChoiceType::class, [
+    'required' => false,
+    'attr' => ['class' => 'select2'],
+    'choices' => $contactsRepository->findBy(["customer"=>$id]),
+    'placeholder' => 'Select a contact...',
+    'choice_label' => 'name',
+    'choice_value' => 'id'
+  ]
+  ]];
+}
+
 
 
 
