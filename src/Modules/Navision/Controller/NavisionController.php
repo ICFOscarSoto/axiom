@@ -323,7 +323,7 @@ class NavisionController extends Controller
                $item['vat']=$customer["vat"];
                $item['cescecode']=$customer["cescecode"];
                $item['date']=$invoice['date'];
-               $item['total']=str_replace(".",",",$invoice['total'])."€";
+               $item['total']=str_replace(".",",",$invoice['total']);
                $item['paymentmethod']=$customer["paymentmethod"];
                $item['vencimiento']=$invoice['due_date'];
                $item['id']=$invoice['id'];
