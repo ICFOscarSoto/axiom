@@ -410,7 +410,7 @@ class NavisionController extends Controller
        foreach($customers as $customer)
        {
              $item['id']=$customer["code"];
-             $item['Razón Social']=$customer["socialname"];
+             $item['Razon Social']=$customer["socialname"];
              $item['CIF']=$customer["vat"];
              $insuredcustomers[]=$item;
        }
@@ -444,7 +444,7 @@ class NavisionController extends Controller
        foreach($customers as $customer)
        {
              $item['id']=$customer["code"];
-             $item['Razón Social']=$customer["socialname"];
+             $item['Razon Social']=$customer["socialname"];
              $item['CIF']=$customer["vat"];
              $insuredcustomers[]=$item;
        }
