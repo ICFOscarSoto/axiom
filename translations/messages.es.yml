@@ -494,6 +494,7 @@ Select aerpmanufacturers: Seleccionar fabricante
 Select aerpseries: Seleccionar serie
 Select aerpfinancialyears: Seleccionar ejercicio fiscal
 Select aerppaymentmethods: Seleccionar método pago
+Select aerpwarehouselocations: Seleccionar ubicación
 Price: Precio
 Purchaseprice: Precio compra
 Onpurchase: Se compra
@@ -532,6 +533,9 @@ Financialyear: Ejercicio fiscal
 Lopd: Membrete LOPD
 Contrast color: Color resaltado
 Shadow color: Color sombreado
+Overownbankaccountaccount: Cuenta propia
+Overownbankaccount: Sobre cuenta propia
+Overcustomerbankaccount: Sobre cuenta cliente
 
 # VEHICLES
 #----------------------------------------------------------------------------------------------------------------------
