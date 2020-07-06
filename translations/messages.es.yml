@@ -314,6 +314,8 @@ Addresses: Direcciones
 Deliveryaddress: Dirección para Entrega
 Invoiceaddress: Dirección para Facturación
 Orders Data: Datos para pedidos
+Surchage: Recargo
+Commercial Terms: Condiciones Comerciales
 
 # CUSTOMERS COMMENT LINES
 #----------------------------------------------------------------------------------------------------------------------

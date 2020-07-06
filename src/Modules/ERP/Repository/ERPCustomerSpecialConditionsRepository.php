@@ -20,12 +20,11 @@ class ERPCustomerSpecialConditionsRepository extends ServiceEntityRepository
     }
 
 
-    public function checkDefaultGroup($customer,$customergroup, $company){
+    public function checkDefaultGroup($customer,$customergroup){
 
-      $query="SELECT * FROM erpcustomers c WHERE c.id=:CUST AND c.customergroup_id=:GRP AND c.active=1 AND c.deleted=0 AND c.company_id=:COMP";
+      $query="SELECT * FROM erpcustomer_commercial_terms c WHERE c.customer_id=:CUST AND c.customergroup_id=:GRP AND c.active=1 AND c.deleted=0";
       $params=['CUST' => $customer->getId(),
-               'GRP' => $customergroup->getId(),
-               'COMP' => $company->getId()
+               'GRP' => $customergroup->getId()
                ];
       $result=$this->getEntityManager()->getConnection()->executeQuery($query,$params)->fetch();
       return $result;

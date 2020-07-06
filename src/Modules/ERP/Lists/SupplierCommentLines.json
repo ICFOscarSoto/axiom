@@ -12,10 +12,6 @@
         "caption": "comment"
     },
     {
-        "name": "supplier__name",
-        "caption": "supplier"
-    },
-    {
         "name": "active",
         "caption": "Estado",
         "width": "10%",

@@ -1,0 +1,41 @@
+[{
+    "sections": [
+        {
+            "name": "data",
+            "fields": [
+                {
+                    "name": "allowlinediscount",
+                    "cols": 4
+                },
+                {
+                    "name": "additionaldiscount",
+                    "cols": 4
+                },
+                {
+                    "name": "surchage",
+                    "cols": 4
+                },
+                {
+                    "name": "insured",
+                    "cols": 4
+                },
+                {
+                    "name": "supplement",
+                    "cols": 4
+                },
+                {
+                    "name": "cescecode",
+                    "cols": 4
+                },
+                {
+                    "name": "customer",
+                    "cols": 4
+                },
+                {
+                    "name": "customergroup",
+                    "cols": 4
+                }
+            ]
+        }
+    ]
+}]

@@ -172,15 +172,18 @@ class NavisionController extends Controller
           $code=$customer["code"];
           if($invoices_list[$code]["invoices"]!=NULL){
             foreach($invoices_list[$code]["invoices"] as $invoice){
-              $item['Suplemento']=$customer["supplement"];
-              $item['Nif']=$customer["vat"];
-              $item['Código Cesce']=$customer["cescecode"];
-              $item['Fecha Factura']=$invoice['date'];
-              $item['Importe']=str_replace(".",",",$invoice['total']);
-              $item['Forma de Pago']=$customer["paymentmethod"];
-              $item['Vencimiento']=$invoice['due_date'];
-              $item['id']=$invoice['id'];
-              $invoices[]=$item;
+              if($invoice['total']>0)
+              {
+                $item['Suplemento']=$customer["supplement"];
+                $item['Nif']=$customer["vat"];
+                $item['Código Cesce']=$customer["cescecode"];
+                $item['Fecha Factura']=$invoice['date'];
+                $item['Importe']=str_replace(".",",",$invoice['total']);
+                $item['Forma de Pago']=$customer["paymentmethod"];
+                $item['Vencimiento']=$invoice['due_date'];
+                $item['id']=$invoice['id'];
+                $invoices[]=$item;
+              }
             }
           }
         }
@@ -249,15 +252,18 @@ class NavisionController extends Controller
       $code=$customer["code"];
       if($invoices_list[$code]["invoices"]!=NULL){
         foreach($invoices_list[$code]["invoices"] as $invoice){
-          $item['supplement']=$customer["supplement"];
-          $item['vat']=$customer["vat"];
-          $item['cescecode']=$customer["cescecode"];
-          $item['date']=$invoice['date'];
-          $item['total']=str_replace(".",",",$invoice['total']);
-          $item['paymentmethod']=$customer["paymentmethod"];
-          $item['vencimiento']=$invoice['due_date'];
-          $item['id']=$invoice['id'];
-          $invoices[]=$item;
+          if($invoice['total']>0)
+          {
+            $item['supplement']=$customer["supplement"];
+            $item['vat']=$customer["vat"];
+            $item['cescecode']=$customer["cescecode"];
+            $item['date']=$invoice['date'];
+            $item['total']=str_replace(".",",",$invoice['total']);
+            $item['paymentmethod']=$customer["paymentmethod"];
+            $item['vencimiento']=$invoice['due_date'];
+            $item['id']=$invoice['id'];
+            $invoices[]=$item;
+          }
         }
       }
     }
@@ -319,15 +325,18 @@ class NavisionController extends Controller
            $code=$customer["code"];
            if($invoices_list[$code]["invoices"]!=NULL){
              foreach($invoices_list[$code]["invoices"] as $invoice){
-               $item['supplement']=$customer["supplement"];
-               $item['vat']=$customer["vat"];
-               $item['cescecode']=$customer["cescecode"];
-               $item['date']=$invoice['date'];
-               $item['total']=str_replace(".",",",$invoice['total'])."€";
-               $item['paymentmethod']=$customer["paymentmethod"];
-               $item['vencimiento']=$invoice['due_date'];
-               $item['id']=$invoice['id'];
-               $invoices[]=$item;
+               if($invoice['total']>0)
+               {
+                 $item['supplement']=$customer["supplement"];
+                 $item['vat']=$customer["vat"];
+                 $item['cescecode']=$customer["cescecode"];
+                 $item['date']=$invoice['date'];
+                 $item['total']=str_replace(".",",",$invoice['total']);
+                 $item['paymentmethod']=$customer["paymentmethod"];
+                 $item['vencimiento']=$invoice['due_date'];
+                 $item['id']=$invoice['id'];
+                 $invoices[]=$item;
+               }
              }
            }
        }

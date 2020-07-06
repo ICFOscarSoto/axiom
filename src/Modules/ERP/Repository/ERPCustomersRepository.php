@@ -49,10 +49,13 @@ class ERPCustomersRepository extends ServiceEntityRepository
     */
 
     public function findInsuredCustomers($company){
-      $query="SELECT c.id as id, c.code as code, c.name as name, c.socialname as socialname, c.vat as vat, c.supplement as supplement,c.cescecode as cescecode, m.name as paymentmethod FROM erpcustomers c
-                LEFT JOIN erppayment_methods m
-                ON m.id=c.paymentmethod_id
-                WHERE c.insured=1 AND c.company_id=:company AND c.deleted=0 AND c.active=1 ";
+      $query="SELECT c.id as id, c.code as code, c.name as name, c.socialname as socialname, c.vat as vat, ct.supplement as supplement,ct.cescecode as cescecode, m.name as paymentmethod
+      FROM erpcustomers c
+        LEFT JOIN erppayment_methods m
+        ON m.id=c.paymentmethod_id
+        LEFT JOIN erpcustomer_commercial_terms ct
+        ON ct.customer_id=c.id
+        WHERE ct.insured=1 AND c.company_id=:company AND c.deleted=0 AND c.active=1 ";
       $query.=" ORDER BY c.vat ASC";
       $params=['company' => $company->getId()];
       return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();

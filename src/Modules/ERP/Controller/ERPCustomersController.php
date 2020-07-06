@@ -14,6 +14,7 @@ use App\Modules\ERP\Entity\ERPCustomers;
 use App\Modules\ERP\Entity\ERPContacts;
 use App\Modules\ERP\Entity\ERPCustomerGroups;
 use App\Modules\ERP\Entity\ERPCustomerSpecialConditions;
+use App\Modules\ERP\Entity\ERPCustomerCommercialTerms;
 use App\Modules\ERP\Entity\ERPCustomerCommentLines;
 use App\Modules\Globale\Entity\GlobaleCountries;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
@@ -109,6 +110,8 @@ class ERPCustomersController extends Controller
 							'id' => $id,
 							'tab' => $request->query->get('tab','data'), //Show initial tab, by default data tab
 							'tabs' => [["name" => "data", "icon"=>"fa fa-headphones", "caption"=>"Datos cliente", "active"=>true, "route"=>$this->generateUrl("formInfoCustomer",["id"=>$id])],
+												["name"=>  "customerordersdata", "icon"=>"fa fa-money", "caption"=>"Orders Data","route"=>$this->generateUrl("infoCustomerOrdersData",["id"=>$id])],
+												["name"=>  "customercommercialterms", "icon"=>"fa fa-money", "caption"=>"Commercial Terms","route"=>$this->generateUrl("infoCustomerCommercialTerms",["id"=>$id])],
 												["name" => "contacts",  "icon"=>"fa fa-users", "caption"=>"Contacts", "route"=>$this->generateUrl("generictablist",["function"=>"formatListCustomers","module"=>"ERP","name"=>"Contacts","id"=>$id])],
 												["name" => "addresses",  "icon"=>"fa fa-users", "caption"=>"Addresses", "route"=>$this->generateUrl("generictablist",["function"=>"formatListByCustomer","module"=>"ERP","name"=>"Addresses","id"=>$id])],
 												["name" => "offerprices",  "icon"=>"fa fa-money", "caption"=>"Precios Específicos", "route"=>$this->generateUrl("generictablist",["function"=>"formatListByCustomer","module"=>"ERP","name"=>"OfferPrices","id"=>$id])],

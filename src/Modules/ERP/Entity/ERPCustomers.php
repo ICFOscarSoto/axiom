@@ -10,6 +10,7 @@ use \App\Modules\ERP\Entity\ERPPaymentMethods;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
 use \App\Modules\ERP\Entity\ERPPaymentTerms;
 use \App\Modules\ERP\Entity\ERPCustomerActivities;
+use \App\Modules\ERP\Entity\ERPContacts;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPCustomersRepository")
@@ -106,12 +107,6 @@ class ERPCustomers
     private $blockcredit;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPCustomerGroups")
-     * @ORM\JoinColumn(onDelete="SET NULL")
-     */
-    private $customergroup;
-
-    /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPPaymentMethods")
      * @ORM\JoinColumn(onDelete="SET NULL")
      */
@@ -123,36 +118,6 @@ class ERPCustomers
     private $mininvoice;
 
     /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
-    private $allowlinediscount;
-
-    /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
-    private $requiredordernumber;
-
-    /**
-     * @ORM\Column(type="float", nullable=true)
-     */
-    private $additionaldiscount;
-
-    /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
-    private $invoicefordeliverynote;
-
-    /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
-    private $pricesdeliverynote;
-
-    /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
-    private $partialshipping;
-
-    /**
      * @ORM\Column(type="integer", nullable=true)
      */
     private $invoiceday;
@@ -162,11 +127,6 @@ class ERPCustomers
      * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     private $company;
-
-        /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
-    private $surcharge;
 
     /**
      * @ORM\Column(type="string", length=16, nullable=true)
@@ -194,30 +154,15 @@ class ERPCustomers
      */
     private $minimuminvoiceamount;
 
-    /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
-    private $authorizationcontrol;
-
-    /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
-    private $insured;
-
-    /**
-     * @ORM\Column(type="string", length=32, nullable=true)
-     */
-    private $supplement;
-
-    /**
-     * @ORM\Column(type="string", length=32, nullable=true)
-     */
-    private $cescecode;
-
-    /**
+      /**
      * @ORM\Column(type="string", length=16, nullable=true)
      */
     private $paymentmode;
+
+    /**
+     * @ORM\OneToOne(targetEntity="\App\Modules\ERP\Entity\ERPContacts", cascade={"persist", "remove"})
+     */
+    private $maincontact;
 
 
     public function getId(): ?int
@@ -417,18 +362,6 @@ class ERPCustomers
         return $this;
     }
 
-    public function getCustomergroup(): ?ERPCustomerGroups
-    {
-        return $this->customergroup;
-    }
-
-    public function setCustomergroup(?ERPCustomerGroups $customergroup): self
-    {
-        $this->customergroup = $customergroup;
-
-        return $this;
-    }
-
     public function getPaymentmethod(): ?ERPPaymentMethods
     {
         return $this->paymentmethod;
@@ -449,78 +382,6 @@ class ERPCustomers
     public function setMininvoice(?float $mininvoice): self
     {
         $this->mininvoice = $mininvoice;
-
-        return $this;
-    }
-
-    public function getAllowlinediscount(): ?bool
-    {
-        return $this->allowlinediscount;
-    }
-
-    public function setAllowlinediscount(?bool $allowlinediscount): self
-    {
-        $this->allowlinediscount = $allowlinediscount;
-
-        return $this;
-    }
-
-    public function getRequiredordernumber(): ?bool
-    {
-        return $this->requiredordernumber;
-    }
-
-    public function setRequiredordernumber(?bool $requiredordernumber): self
-    {
-        $this->requiredordernumber = $requiredordernumber;
-
-        return $this;
-    }
-
-    public function getAdditionaldiscount(): ?float
-    {
-        return $this->additionaldiscount;
-    }
-
-    public function setAdditionaldiscount(?float $additionaldiscount): self
-    {
-        $this->additionaldiscount = $additionaldiscount;
-
-        return $this;
-    }
-
-    public function getInvoicefordeliverynote(): ?bool
-    {
-        return $this->invoicefordeliverynote;
-    }
-
-    public function setInvoicefordeliverynote(?bool $invoicefordeliverynote): self
-    {
-        $this->invoicefordeliverynote = $invoicefordeliverynote;
-
-        return $this;
-    }
-
-    public function getPricesdeliverynote(): ?bool
-    {
-        return $this->pricesdeliverynote;
-    }
-
-    public function setPricesdeliverynote(?bool $pricesdeliverynote): self
-    {
-        $this->pricesdeliverynote = $pricesdeliverynote;
-
-        return $this;
-    }
-
-    public function getPartialshipping(): ?bool
-    {
-        return $this->partialshipping;
-    }
-
-    public function setPartialshipping(?bool $partialshipping): self
-    {
-        $this->partialshipping = $partialshipping;
 
         return $this;
     }
@@ -549,17 +410,6 @@ class ERPCustomers
         return $this;
     }
 
-    public function getSurcharge(): ?bool
-    {
-        return $this->surcharge;
-    }
-
-    public function setSurcharge(?bool $surcharge): self
-    {
-        $this->surcharge = $surcharge;
-
-        return $this;
-    }
 
     public function formValidation($kernel, $doctrine, $user, $validationParams){
       $fieldErrors=[];
@@ -640,53 +490,6 @@ class ERPCustomers
         return $this;
     }
 
-    public function getAuthorizationcontrol(): ?bool
-    {
-        return $this->authorizationcontrol;
-    }
-
-    public function setAuthorizationcontrol(?bool $authorizationcontrol): self
-    {
-        $this->authorizationcontrol = $authorizationcontrol;
-
-        return $this;
-    }
-
-    public function getInsured(): ?bool
-    {
-        return $this->insured;
-    }
-
-    public function setInsured(?bool $insured): self
-    {
-        $this->insured = $insured;
-
-        return $this;
-    }
-
-    public function getSupplement(): ?string
-    {
-        return $this->supplement;
-    }
-
-    public function setSupplement(?string $supplement): self
-    {
-        $this->supplement = $supplement;
-
-        return $this;
-    }
-
-    public function getCescecode(): ?string
-    {
-        return $this->cescecode;
-    }
-
-    public function setCescecode(?string $cescecode): self
-    {
-        $this->cescecode = $cescecode;
-
-        return $this;
-    }
 
     public function getPaymentmode(): ?string
     {
@@ -696,6 +499,18 @@ class ERPCustomers
     public function setPaymentmode(?string $paymentmode): self
     {
         $this->paymentmode = $paymentmode;
+
+        return $this;
+    }
+
+    public function getMaincontact(): ?ERPContacts
+    {
+        return $this->maincontact;
+    }
+
+    public function setMaincontact(?ERPContacts $maincontact): self
+    {
+        $this->maincontact = $maincontact;
 
         return $this;
     }

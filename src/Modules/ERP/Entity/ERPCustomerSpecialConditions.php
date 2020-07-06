@@ -186,7 +186,7 @@ class ERPCustomerSpecialConditions
     public function formValidation($kernel, $doctrine, $user, $validationParams){
 
           $repository=$doctrine->getRepository(ERPCustomerSpecialConditions::class);
-          $grupodefecto=$repository->checkDefaultGroup($this->customer, $this->customergroup, $this->company);
+          $grupodefecto=$repository->checkDefaultGroup($this->customer, $this->customergroup);
           $repetido=$repository->checkRepeated($this->customer, $this->supplier, $this->category, $this->customergroup, $this->company);
           if($grupodefecto!=NULL){
             return ["valid"=>false, "global_errors"=>["Has seleccionado el grupo de cliente por defecto para este cliente. Por favor elige otro."]];
