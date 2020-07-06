@@ -512,7 +512,7 @@ class NavisionGetCustomers extends ContainerAwareCommand
    public function importCustomerContact(InputInterface $input, OutputInterface $output){
      //------   Create Lock Mutex    ------
      $fp = fopen('/tmp/axiom-navisionGetCustomers-importCustomerContact.lock', 'c');
-     //$fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetCustomers-importCustomerContact.lock', 'c');
+    // $fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetCustomers-importCustomerContact.lock', 'c');
      if (!flock($fp, LOCK_EX | LOCK_NB)) {
        $output->writeln('* Fallo al iniciar la sincronizacion de contactos de clientes: El proceso ya esta en ejecución.');
        exit;
@@ -542,7 +542,7 @@ class NavisionGetCustomers extends ContainerAwareCommand
        $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getContacts.php?customer='.$customer->getCode().'&from='.$navisionSync->getMaxtimestamp());
        $objects=json_decode($json, true);
        $objects=$objects[0];
-
+       print_r($objects);
        foreach ($objects["class"] as $key=>$object){
          //$output->writeln('  - '.$object["code"].' - '.$object["name"]);
          $output->writeln("Vamos a analizar el contacto ".$object["code"]);
@@ -589,6 +589,7 @@ class NavisionGetCustomers extends ContainerAwareCommand
      $navisionSync->setEntity("customercontacts");
    }
    $navisionSync->setLastsync($datetime);
+   echo "añadimos el maxtimestamp:".$objects["maxtimestamp"];
    $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
    $this->doctrine->getManager()->persist($navisionSync);
    $this->doctrine->getManager()->flush();
