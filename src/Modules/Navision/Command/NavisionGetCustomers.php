@@ -70,6 +70,7 @@ class NavisionGetCustomers extends ContainerAwareCommand
       break;
       case 'contacts':
         $this->importCustomerContact($input, $output);
+      break;
       case 'addresses':
           $this->importCustomerAddresses($input, $output);
       break;
