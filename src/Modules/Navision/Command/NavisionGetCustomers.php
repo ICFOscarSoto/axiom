@@ -540,6 +540,7 @@ class NavisionGetCustomers extends ContainerAwareCommand
        //Disable SQL logger
        $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
        $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getContacts.php?customer='.$customer->getCode().'&from='.$navisionSync->getMaxtimestamp());
+       echo "después de consulta";
        $objects=json_decode($json, true);
        $objects=$objects[0];
        print_r($objects);
