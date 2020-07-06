@@ -502,20 +502,16 @@ class NavisionGetSuppliers extends ContainerAwareCommand
       }
       $datetime=new \DateTime();
       $output->writeln('* Sincronizando contactos de los proveedores....');
-      $suppliers=$repositorySuppliers->findAll();
 
-      foreach($suppliers as $supplier)
-      {
-        $output->writeln($supplier->getCode().'  - '.$supplier->getName());
         //Disable SQL logger
         $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
-        $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getContacts.php?supplier='.$supplier->getCode().'&from='.$navisionSync->getMaxtimestamp());
+        $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getAllContacts.php?type=1&from='.$navisionSync->getMaxtimestamp());
         $objects=json_decode($json, true);
         $objects=$objects[0];
 
         foreach ($objects["class"] as $key=>$object){
           //$output->writeln('  - '.$object["code"].' - '.$object["name"]);
-          $output->writeln("Vamos a analizar el contacto ".$object["code"]);
+          $output->writeln("Vamos a analizar el contacto ".$object["code"]." del proveedor ".$object["supplier"]);
           $obj=$repository->findOneBy(["code"=>$object["code"]]);
           if ($obj==null) {
 
@@ -530,6 +526,7 @@ class NavisionGetSuppliers extends ContainerAwareCommand
           }
            $country=$repositoryCountries->findOneBy(["alfa2"=>$object["country"]]);
            $state=$repositoryStates->findOneBy(["name"=>$object["state"]]);
+           $supplier=$repositorySuppliers->findOneBy(["code"=>$object["supplier"]]);
            //$customer=$repositoryCustomers->findOneBy(["code"=>$object["customer"]]);
            $department=$repositoryDepartments->findOneBy(["code"=>$object["department"]]);
            $obj->setName(ltrim(ltrim($object["name"]),'*'));
@@ -550,9 +547,7 @@ class NavisionGetSuppliers extends ContainerAwareCommand
            $this->doctrine->getManager()->flush();
         }
 
-        //$this->doctrine->getManager()->clear();
 
-    }
 
     $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"suppliercontacts"]);
     if ($navisionSync==null) {

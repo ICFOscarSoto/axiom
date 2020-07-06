@@ -294,11 +294,9 @@ class NavisionGetCustomers extends ContainerAwareCommand
         $obj->setCountry($country);
         $obj->setState($state);
         $obj->setDateupd(new \Datetime());
-        //$obj->setCurrency($currency);
         $obj->setPaymentMethod($paymentMethod);
         if($paymentTerms!=NULL) $obj->setPaymentTerms($paymentTerms);
         $obj->setActivity($activity);
-      //  $obj->setCustomergroup($customergroup);
         $obj->setMinimuminvoiceamount($object["minimuminvoiceamount"]);
         $obj->setMaxcredit($object["creditlimit"]);
         $obj->setPaymentMode($object["paymentmode"]);
@@ -352,16 +350,9 @@ class NavisionGetCustomers extends ContainerAwareCommand
              $this->doctrine->getManager()->persist($commercialterms);
         }
 
-
-
-
         $this->doctrine->getManager()->persist($obj);
         $this->doctrine->getManager()->flush();
         $this->doctrine->getManager()->clear();
-
-
-
-
 
         //el cliente tiene datos bancarios
         if($object["iban"]!=NULL)
@@ -451,12 +442,9 @@ class NavisionGetCustomers extends ContainerAwareCommand
            $obj=$repository->findOneBy(["comment"=>$object["comment"]]);
            if ($obj==null) {
              $obj=new ERPCustomerCommentLines();
-             //$company=$repositoryCompanies->find(2);
-             //$obj->setCompany($company);
              $obj->setComment($object["comment"]);
              $obj->setType(0);
              $datetime=new \DateTime(date('Y-m-d 00:00:00',strtotime($object["date"]["date"])));
-            // dump(date('Y-m-d 00:00:00',strtotime($object["date"]["date"])));
              $obj->setDateadd($datetime);
              $obj->setCustomer($customer);
              $obj->setDeleted(0);
@@ -474,12 +462,9 @@ class NavisionGetCustomers extends ContainerAwareCommand
          $obj=$repository->findOneBy(["comment"=>$object["comment"]]);
          if ($obj==null) {
            $obj=new ERPCustomerCommentLines();
-           //$company=$repositoryCompanies->find(2);
-           //$obj->setCompany($company);
            $obj->setComment($object["comment"]);
            $obj->setType(1);
            $datetime=new \DateTime(date('Y-m-d 00:00:00',strtotime($object["date"]["date"])));
-          // dump(date('Y-m-d 00:00:00',strtotime($object["date"]["date"])));
            $obj->setDateadd($datetime);
 
            $obj->setCustomer($customer);
@@ -532,37 +517,27 @@ class NavisionGetCustomers extends ContainerAwareCommand
      }
      $datetime=new \DateTime();
      $output->writeln('* Sincronizando contactos de los clientes....');
-     $customers=$repositoryCustomers->findAll();
 
-     foreach($customers as $customer)
-     {
-       $output->writeln($customer->getCode().'  - '.$customer->getName());
+
        //Disable SQL logger
        $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
-       $output->writeln("antes de consulta");
-       $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getContacts.php?customer='.$customer->getCode().'&from='.$navisionSync->getMaxtimestamp());
-       $output->writeln($this->url.'navisionExport/axiom/do-NAVISION-getContacts.php?customer='.$customer->getCode().'&from='.$navisionSync->getMaxtimestamp());
+       $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getAllContacts.php?type=0&from='.$navisionSync->getMaxtimestamp());
        $objects=json_decode($json, true);
        $objects=$objects[0];
-       print_r($objects);
        foreach ($objects["class"] as $key=>$object){
-         //$output->writeln('  - '.$object["code"].' - '.$object["name"]);
-         $output->writeln("Vamos a analizar el contacto ".$object["code"]);
+         $output->writeln("Vamos a analizar el contacto ".$object["code"]." correspondiente al cliente ".$object["customer"]);
          $obj=$repository->findOneBy(["code"=>$object["code"]]);
          if ($obj==null) {
 
            $obj=new ERPContacts();
            $obj->setCode($object["code"]);
-        //   $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
-           //$company=$repositoryCompanies->find(2);
-           //$obj->setCompany($company);
            $obj->setDateadd(new \Datetime());
            $obj->setDeleted(0);
            $obj->setActive(1);
          }
           $country=$repositoryCountries->findOneBy(["alfa2"=>$object["country"]]);
           $state=$repositoryStates->findOneBy(["name"=>$object["state"]]);
-          //$customer=$repositoryCustomers->findOneBy(["code"=>$object["customer"]]);
+          $customer=$repositoryCustomers->findOneBy(["code"=>$object["customer"]]);
           $department=$repositoryDepartments->findOneBy(["code"=>$object["department"]]);
           $obj->setName(ltrim(ltrim($object["name"]),'*'));
           $obj->setAddress(rtrim($object["address1"]." ".$object["address2"]));
@@ -575,23 +550,18 @@ class NavisionGetCustomers extends ContainerAwareCommand
           $obj->setCustomer($customer);
           $obj->setDepartment($department);
           $obj->setPosition($object["jobtitle"]);
-      //    if($object["authorizationcontrol"]) $obj->setAuthorizationcontrol(1);
           $obj->setDateupd(new \Datetime());
 
           $this->doctrine->getManager()->persist($obj);
           $this->doctrine->getManager()->flush();
        }
 
-       //$this->doctrine->getManager()->clear();
-
-   }
-      $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"customercontacts"]);
+  $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"customercontacts"]);
    if ($navisionSync==null) {
      $navisionSync=new NavisionSync();
      $navisionSync->setEntity("customercontacts");
    }
    $navisionSync->setLastsync($datetime);
-   echo "añadimos el maxtimestamp:".$objects["maxtimestamp"];
    $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
    $this->doctrine->getManager()->persist($navisionSync);
    $this->doctrine->getManager()->flush();
@@ -601,42 +571,37 @@ class NavisionGetCustomers extends ContainerAwareCommand
  }
 
  public function importCustomerAddresses(InputInterface $input, OutputInterface $output){
-   //------   Create Lock Mutex    ------
-   $fp = fopen('/tmp/axiom-navisionGetCustomers-importCustomerAddresses.lock', 'c');
-   //$fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetCustomers-importCustomerAddresses.lock', 'c');
+     //------   Create Lock Mutex    ------
+     $fp = fopen('/tmp/axiom-navisionGetCustomers-importCustomerAddresses.lock', 'c');
+    //$fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetCustomers-importCustomerAddresses.lock', 'c');
 
-   if (!flock($fp, LOCK_EX | LOCK_NB)) {
-     $output->writeln('* Fallo al iniciar la sincronizacion de direcciones de clientes: El proceso ya esta en ejecución.');
-     exit;
-   }
+     if (!flock($fp, LOCK_EX | LOCK_NB)) {
+       $output->writeln('* Fallo al iniciar la sincronizacion de direcciones de clientes: El proceso ya esta en ejecución.');
+       exit;
+     }
 
-   //------   Critical Section START   ------
-   $repositoryCountries=$this->doctrine->getRepository(GlobaleCountries::class);
-   $repositoryStates=$this->doctrine->getRepository(GlobaleStates::class);
-   $repositoryCustomers=$this->doctrine->getRepository(ERPCustomers::class);
-   $repository=$this->doctrine->getRepository(ERPAddresses::class);
-   $navisionSyncRepository=$this->doctrine->getRepository(NavisionSync::class);
-   $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"customeraddresses"]);
-   if ($navisionSync==null) {
-     $navisionSync=new NavisionSync();
-     $navisionSync->setMaxtimestamp(0);
-   }
-   $datetime=new \DateTime();
-   $output->writeln('* Sincronizando direcciones de los clientes....');
-   $customers=$repositoryCustomers->findAll();
+     //------   Critical Section START   ------
+     $repositoryCountries=$this->doctrine->getRepository(GlobaleCountries::class);
+     $repositoryStates=$this->doctrine->getRepository(GlobaleStates::class);
+     $repositoryCustomers=$this->doctrine->getRepository(ERPCustomers::class);
+     $repository=$this->doctrine->getRepository(ERPAddresses::class);
+     $navisionSyncRepository=$this->doctrine->getRepository(NavisionSync::class);
+     $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"customeraddresses"]);
+     if ($navisionSync==null) {
+       $navisionSync=new NavisionSync();
+       $navisionSync->setMaxtimestamp(0);
+     }
+     $datetime=new \DateTime();
+     $output->writeln('* Sincronizando direcciones de los clientes....');
 
-   foreach($customers as $customer)
-   {
-     $output->writeln($customer->getCode().'  - '.$customer->getName());
      //Disable SQL logger
      $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
-     $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getCustomerAddresses.php?customer='.$customer->getCode().'&from='.$navisionSync->getMaxtimestamp());
+     $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getAllCustomerAddresses.php?from='.$navisionSync->getMaxtimestamp());
      $objects=json_decode($json, true);
      $objects=$objects[0];
-
      foreach ($objects["class"] as $key=>$object){
-       //$output->writeln('  - '.$object["code"].' - '.$object["name"]);
-       $output->writeln("Vamos a analizar la dirección ".$object["code"]);
+
+       $output->writeln("Vamos a analizar la dirección ".$object["code"]." del cliente ".$object["customer"]);
        $obj=$repository->findOneBy(["code"=>$object["code"]]);
        if ($obj==null) {
 
@@ -649,12 +614,13 @@ class NavisionGetCustomers extends ContainerAwareCommand
          $obj->setDeleted(0);
          $obj->setActive(1);
        }
-        if($object["country"]==NULL) $country=$repositoryCountries->findOneBy(["alfa2"=>"ES"]);
+
+      if($object["country"]==NULL) $country=$repositoryCountries->findOneBy(["alfa2"=>"ES"]);
         else $country=$repositoryCountries->findOneBy(["alfa2"=>$object["country"]]);
 
 
         $state=$repositoryStates->findOneBy(["name"=>$object["state"]]);
-
+        $customer=$repositoryCustomers->findOneBy(["code"=>$object["customer"]]);
         $obj->setName(ltrim(ltrim($object["name"]),'*'));
         $obj->setAddress(rtrim($object["address1"]." ".$object["address2"]));
         $obj->setCity($object["city"]);
@@ -667,31 +633,26 @@ class NavisionGetCustomers extends ContainerAwareCommand
         $obj->setNavisioncontact($object["navisioncontact"]);
         $obj->setInvoiceaddress($object["invoiceaddress"]);
         $obj->setDeliveryaddress($object["deliveryaddress"]);
-    //    if($object["authorizationcontrol"]) $obj->setAuthorizationcontrol(1);
         $obj->setDateupd(new \Datetime());
 
         $this->doctrine->getManager()->persist($obj);
         $this->doctrine->getManager()->flush();
-     }
+      }
 
-     //$this->doctrine->getManager()->clear();
 
- }
- $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"customeraddresses"]);
- if ($navisionSync==null) {
-   $navisionSync=new NavisionSync();
-   $navisionSync->setEntity("customeraddresses");
- }
- $navisionSync->setLastsync($datetime);
- $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
- $this->doctrine->getManager()->persist($navisionSync);
- $this->doctrine->getManager()->flush();
- //------   Critical Section END   ------
- //------   Remove Lock Mutex    ------
- fclose($fp);
+   $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"customeraddresses"]);
+   if ($navisionSync==null) {
+     $navisionSync=new NavisionSync();
+     $navisionSync->setEntity("customeraddresses");
+   }
+   $navisionSync->setLastsync($datetime);
+   $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
+   $this->doctrine->getManager()->persist($navisionSync);
+   $this->doctrine->getManager()->flush();
+   //------   Critical Section END   ------
+   //------   Remove Lock Mutex    ------
+   fclose($fp);
 }
-
-
 
 }
 ?>
