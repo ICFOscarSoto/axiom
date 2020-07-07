@@ -69,7 +69,7 @@ class ERPEAN13Controller extends Controller
    $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "supplier"=>$default, "product"=>$id==0?$product:$obj->getProduct()];
    $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),
                           method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
-   $make=$utils->make($id, ERPEAN13::class, $action, "formEAN13", "modal");
+   $make=$utils->make($id, ERPEAN13::class, $action, "EAN13", "modal");
 
    return $make;
   }
@@ -77,11 +77,15 @@ class ERPEAN13Controller extends Controller
   /**
    * @Route("/{_locale}/listEAN13/{id}", name="listEAN13", defaults={"id"=0})
    */
-  public function listEAN13($id){
+  public function listEAN13($id, Request $request){
     $listEAN13 = new ERPEAN13Utils();
+    $formUtils=new GlobaleFormUtils();
+		$formUtils->initialize($this->getUser(), ERPEAN13::class, dirname(__FILE__)."/../Forms/EAN13.json", $request, $this, $this->getDoctrine());
+		$templateForms[]=$formUtils->formatForm('EAN13', true, null, ERPEAN13::class);
     return $this->render('@Globale/list.html.twig', array(
       'listConstructor' => $listEAN13->formatListByProduct($id),
-      'id_object'=>$id
+      'id_object'=>$id,
+      'forms' => $templateForms
     ));
   }
 
