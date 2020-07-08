@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repository\Modules\Vehicles\Entity;
+namespace App\Modules\Vehicles\Repository;
 
 use App\Modules\Vehicles\Entity\VehiclesRefuelings;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;

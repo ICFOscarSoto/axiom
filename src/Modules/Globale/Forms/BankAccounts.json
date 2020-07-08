@@ -1,0 +1,16 @@
+[{
+	"sections": [
+		{
+			"name": "Banckaccounts data",
+			"fields": [
+				{ "name": "name","cols": 12},
+				{ "name": "socialname","cols": 12},
+				{ "name": "creditoridentifier","cols": 12},
+				{ "name": "iban","cols": 8},
+				{ "name": "swiftcode","cols": 4},
+				{ "name": "sepacore","cols": 2},
+				{ "name": "sepab2b","cols": 2},
+				{ "name": "active","cols": 2}
+			]
+		}]
+}]

@@ -1,0 +1,36 @@
+<script>
+  function validate_sales_document(){
+    $(".error").remove();
+
+    var valid=true;
+    if($("#customer-form-id").val()==""){
+       $("#customer-form-code").parent().parent().append("<label id='customer-form-code-error' class='error' for='form_period'>Debe seleccionar un cliente</label>");
+       valid=false;
+    }
+    if($("#document-form-date").val()==""){
+       $("#document-form-date").parent().append("<label id='document-form-date-error' class='error' for='form_period'>La fecha es obligatoria</label>");
+       valid=false;
+    }
+    {% if documentType=="sales_budget" %}
+    if($("#document-form-dateofferend").val()==""){
+       $("#document-form-dateofferend").parent().append("<label id='document-form-dateofferend-error' class='error' for='form_period'>La fecha de expiración es obligatoria</label>");
+       valid=false;
+    }
+    {% endif %}
+    if($("#document-form-series-select").val()==""){
+       $("#document-form-series-select").parent().append("<label id='document-form-series-select-error' class='error' for='form_period'>La serie es obligatoria</label>");
+       valid=false;
+    }
+    if($("#customer-form-paymentmethod-select").val()==""){
+       $("#customer-form-paymentmethod-select").parent().append("<label id='customer-form-paymentmethod-select-error' class='error' for='form_period'>El metodo de pago es obligatorio</label>");
+       valid=false;
+    }
+    return valid;
+  }
+
+  $(document).ready(function() {
+    $('body').on('change', "#customer-form-code, #document-form-date, #document-form-series-select{% if documentType=="sales_budget" %}, #document-form-dateofferend{% endif %}", function(e) {
+      $("#"+$(this).attr("id")+"-error").remove();
+    });
+  });
+</script>

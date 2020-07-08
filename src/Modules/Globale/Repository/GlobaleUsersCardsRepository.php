@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repository\Modules\Globale\Entity;
+namespace App\Modules\Globale\Repository;
 
 use App\Modules\Globale\Entity\GlobaleUsersCards;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;

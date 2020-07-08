@@ -63,6 +63,15 @@ class NavisionGetSalesBudgets extends ContainerAwareCommand
   }
 
     public function importSalesBudgets(InputInterface $input, OutputInterface $output){
+      //------   Create Lock Mutex    ------
+      //$fp = fopen('/tmp/axiom-navisionGetProducts-importProduct.lock', 'c');
+      $fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetCustomers-importCustomer.lock', 'c');
+      if (!flock($fp, LOCK_EX | LOCK_NB)) {
+        $output->writeln('* Fallo al iniciar la sincronizacion de presupuestos: El proceso ya esta en ejecución.');
+        exit;
+      }
+
+      //------   Critical Section START   ------
       $navisionSyncRepository=$this->doctrine->getRepository(NavisionSync::class);
       $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"salesBudgets"]);
       if ($navisionSync==null) {
@@ -71,7 +80,7 @@ class NavisionGetSalesBudgets extends ContainerAwareCommand
       }
       $datetime=new \DateTime();
       $output->writeln('* Sincronizando presupuestos....');
-      $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-salesBudgets.php?from='.$navisionSync->getMaxtimestamp());
+      $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getSalesBudgets.php?from='.$navisionSync->getMaxtimestamp());
       $objects=json_decode($json, true);
       $objects=$objects[0];
       $repositorySalesBudgets=$this->doctrine->getRepository(ERPSalesBudgets::class);
@@ -81,14 +90,16 @@ class NavisionGetSalesBudgets extends ContainerAwareCommand
       $repositoryCustomers=$this->doctrine->getRepository(ERPCustomers::class);
       $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
       $repositoryCurrencies=$this->doctrine->getRepository(GlobaleCurrencies::class);
-      $company=$repositoryCompanies->find(2);
-      $currency=$repositoryCurrencies->findOneBy(["name"=>"Euro"]);
+
       //Disable SQL logger
       $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
 
       foreach ($objects["class"] as $key=>$object){
+        $company=$repositoryCompanies->find(2);
+        $currency=$repositoryCurrencies->findOneBy(["name"=>"Euro"]);
         $output->writeln('  - '.$object["code"].' - '.$object["customer"]);
         $obj=$repositorySalesBudgets->findOneBy(["code"=>$object["code"]]);
+        $cost=0;
         $oldobj=$obj;
         if ($obj==null) {
           $obj=new ERPSalesBudgets();
@@ -136,17 +147,18 @@ class NavisionGetSalesBudgets extends ContainerAwareCommand
          $obj->setIrpfperc(0);
          $obj->setSurcharge(0);
          $obj->setTaxexempt(0);
-         $obj->setTotalnet(0);
-         $obj->setTotaldto(0);
-         $obj->setTotalbase(0);
-         $obj->setTotaltax(0);
+         $obj->setCost($object["cost"]);
+         $obj->setTotalnet($object["linestotal"]);
+         $obj->setTotaldto($object["dto"]);
+         $obj->setTotalbase($object["base"]);
+         $obj->setTotaltax($object["vattotal"]);
          $obj->setTotalsurcharge(0);
          $obj->setTotalirpf(0);
-         $obj->setTotal(0);
+         $obj->setTotal($object["total"]);
+         $obj->setDateupd(new \Datetime());
 
-         $this->doctrine->getManager()->merge($obj);
+         $this->doctrine->getManager()->persist($obj);
          $this->doctrine->getManager()->flush();
-         $this->doctrine->getManager()->clear();
 
         //Process lines
         $totalNet=0;
@@ -157,17 +169,40 @@ class NavisionGetSalesBudgets extends ContainerAwareCommand
         $totalIrpf=0;
         $total=0;
         foreach($object["lines"] as $key=>$line){
-          $objLine=new ERPSalesBudgetsLines();
-          $totalDto+=$line["dtoAmount"];
-          $totalNet+=$line["lineamount"];
-          $totalTax+=$line["VATAmount"];
-          $total+=$line["lineamount"]+$line["VATAmount"];
-
+          $output->writeln('      -> Linea '.$line["linenum"].' - '.$line["reference"]);
+          $objLine=$repositorySalesBudgetsLines->findOneBy(["linenum"=>$line["linenum"]]);
+          if ($objLine==null) {
+            $objLine=new ERPSalesBudgetsLines();
+            $objLine->setSalesbudget($obj);
+            $objLine->setLinenum($line["linenum"]);
+            $objLine->setDateadd(new \Datetime());
+            $objLine->setDateupd(new \Datetime());
+            $objLine->setDeleted(0);
+            $objLine->setActive(1);
+          }
+          $product=$repositoryProducts->findOneBy(["code"=>$line["reference"]]);
+          if($product==NULL) continue;
+          $objLine->setCode($line["reference"]);
+          $objLine->setName($line["description"]);
+          $objLine->setProduct($product);
+          $objLine->setUnitprice($line["price"]);
+          $objLine->setQuantity($line["quantity"]);
+          $objLine->setCost($line["cost"]);
+          $objLine->setTaxperc($line["taxperc"]);
+          $objLine->setTaxunit(round($line["linetotal"]*$line["taxperc"]/100,2));
+          $objLine->setDtoperc($line["discountperc"]);
+          $objLine->setDtounit($line["discounttotal"]);
+          $objLine->setSurchargeperc($line["surchargeperc"]);
+          $objLine->setSurchargeunit(round($line["linetotal"]*$line["surchargeperc"]/100,2));
+          $objLine->setSubtotal($line["price"]*$line["quantity"]);
+          $objLine->setTotal($line["total"]);
+          $objLine->setDateupd(new \Datetime());
+          $this->doctrine->getManager()->persist($objLine);
+          $this->doctrine->getManager()->flush();
 
         }
-        $totalBase=$totalNet-$totalDto;
-
-        //Update totals
+        //$totalBase=$totalNet-$totalDto;
+        $this->doctrine->getManager()->clear();
 
       }
       $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"salesBudgets"]);
@@ -179,6 +214,9 @@ class NavisionGetSalesBudgets extends ContainerAwareCommand
       $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
       $this->doctrine->getManager()->persist($navisionSync);
       $this->doctrine->getManager()->flush();
+      //------   Critical Section END   ------
+      //------   Remove Lock Mutex    ------
+      fclose($fp);
     }
 
 }

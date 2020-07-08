@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\Globale\Entity\GlobaleUsers;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\Modules\Globale\Entity\GlobaleUsersCardsRepository")
+ * @ORM\Entity(repositoryClass="App\Modules\Globale\Repository\GlobaleUsersCardsRepository")
  */
 class GlobaleUsersCards
 {

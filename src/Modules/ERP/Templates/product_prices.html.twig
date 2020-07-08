@@ -1,0 +1,158 @@
+<div class="row">
+    <div style="text-align: right;" class="col-md-12">
+      <button attr-id="" attr-action="" id="formuser-button-cancel" type="button" class="btn btn">Cancelar</button>
+      <button attr-id="" attr-action="" id="formgroupprices-button-save" type="button" class="btn btn-green">Guardar</button>
+    </div>
+</div>
+<br/>
+<div class="row">
+{% for key, group in groups %}
+
+		<div class="col-md-12">
+			<div class="panel panel-default panel-shadow" data-collapsed="0" style="-webkit-box-shadow: none; box-shadow:none; padding:0px"><!-- to apply shadow add class "panel-shadow" -->
+				<!-- panel head -->
+				<div class="panel-heading" style="height: 34px;">
+					<div class="panel-title"><bold>{{ key|trans }}</bold></div>
+					<div class="panel-options" style="padding: 0px 10px; margin-top: -7px;">
+						<a href="#" data-rel="collapse"><i class="entypo-down-open"></i></a>
+					</div>
+				</div>
+				<!-- panel body -->
+				<div class="panel-body" id="price-group-{{ group.id }}" attr-id="{{ group.id }}">
+          <div class="row">
+            <div class="col-md-2">
+              <div class="form-group">
+                <label for="form_city">PVP</label>
+                <span id='unity-view-price-pvp-{{ group.id }}' class='input__unity'><span>€</span></span>
+                <input type="text" id="price-pvp-{{ group.id }}" attr-id="{{ group.id }}" maxlength="70" class="form-control input_parent__unity number-type" style="text-align: right;" value="{{ product.price }}" disabled>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <div class="form-group">
+                <label for="form_city">Descuento</label>
+                <span id='unity-view-price-pvp-{{ group.id }}' class='input__unity'><span>%</span></span>
+                <input type="text" id="price-disccount-{{ group.id }}" attr-id="{{ group.id }}" align="right" name="form[city]" style="text-align: right;" maxlength="70" value="{{ group.discount }}" class="form-control input_parent__unity number-type">
+              </div>
+            </div>
+            <div class="col-md-2">
+              <div class="form-group">
+                <label for="form_city">Compra</label>
+                <span id='unity-view-price-pvp-{{ group.id }}' class='input__unity'><span>€</span></span>
+                <input type="text" id="price-purchase-{{ group.id }}" attr-id="{{ group.id }}" maxlength="70" class="form-control input_parent__unity number-type" style="text-align: right;" value="{{ product.purchaseprice }}" disabled>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <div class="form-group">
+                <label for="form_city">Beneficio</label>
+                <span id='unity-view-price-pvp-{{ group.id }}' class='input__unity'><span>%</span></span>
+                <input type="text" id="price-profit-{{ group.id }}" attr-id="{{ group.id }}" name="form[city]" maxlength="70" style="text-align: right;" value="{{ group.profit }}" class="form-control input_parent__unity number-type">
+              </div>
+            </div>
+
+          <div class="col-md-2">
+            <div class="form-group">
+              <label for="form_city">Precio Fijo</label>
+              <span id='unity-view-price-pvp-{{ group.id }}' class='input__unity'><span>€</span></span>
+              <input type="text" id="price-fixed-{{ group.id }}" attr-id="{{ group.id }}" maxlength="70" class="form-control input_parent__unity number-type" value="{{ group.fixed }}" style="text-align: right;" value="">
+            </div>
+          </div>
+          <div class="col-md-2">
+            <div class="form-group">
+              <label for="form_city">TOTAL</label>
+              <span id='unity-view-price-pvp-{{ group.id }}' class='input__unity'><span>€</span></span>
+              <input type="text" id="price-total-{{ group.id }}" attr-id="{{ group.id }}" maxlength="70" class="form-control input_parent__unity number-type" value="{{ group.total }}" style="text-align: right; font-weight: bold" value="0" disabled>
+            </div>
+          </div>
+          </div>
+				</div>
+			</div>
+		</div>
+
+{% endfor %}
+	</div>
+  <br/>
+  <div class="row">
+      <div style="text-align: right;" class="col-md-12">
+        <button attr-id="" attr-action="" id="formuser-button-cancel" type="button" class="btn btn">Cancelar</button>
+        <button attr-id="" attr-action="" id="formgroupprices-button-save" type="button" class="btn btn-green">Guardar</button>
+      </div>
+  </div>
+
+<script>
+  function calculateTotal(){
+    {% for key, group in groups %}
+    var total{{ group.id }};
+      if($("#price-fixed-{{ group.id }}").val()!=""){
+        total{{ group.id }}=parseFloat($("#price-fixed-{{ group.id }}").val());
+      }else if($("#price-profit-{{ group.id }}").val()!=""){
+        total{{ group.id }}=parseFloat($("#price-purchase-{{ group.id }}").val())+($("#price-purchase-{{ group.id }}").val()*($("#price-profit-{{ group.id }}").val()/100));
+      }else if($("#price-disccount-{{ group.id }}").val()!=""){
+        total{{ group.id }}=parseFloat($("#price-pvp-{{ group.id }}").val())-($("#price-pvp-{{ group.id }}").val()*($("#price-disccount-{{ group.id }}").val()/100));
+      }else total{{ group.id }}=parseFloat($("#price-pvp-{{ group.id }}").val());
+      $("#price-total-{{ group.id }}").val(total{{ group.id }}.toFixed(2));
+    {% endfor %}
+  }
+
+  $(document).ready(function() {
+    $('body').on('keyup', "[id^=price-disccount-]", function() {
+      if($(this).val()!=""){
+        $("#price-profit-"+$(this).attr("attr-id")).val("");
+        $("#price-profit-"+$(this).attr("attr-id")).prop("disabled", true);
+        $("#price-fixed-"+$(this).attr("attr-id")).val("");
+        $("#price-fixed-"+$(this).attr("attr-id")).prop("disabled", true);
+      }else{
+        $("#price-profit-"+$(this).attr("attr-id")).prop("disabled", false);
+        $("#price-fixed-"+$(this).attr("attr-id")).prop("disabled", false);
+      }
+      calculateTotal();
+    });
+
+    $('body').on('keyup', "[id^=price-profit-]", function() {
+      if($(this).val()!=""){
+        $("#price-disccount-"+$(this).attr("attr-id")).val("");
+        $("#price-disccount-"+$(this).attr("attr-id")).prop("disabled", true);
+        $("#price-fixed-"+$(this).attr("attr-id")).val("");
+        $("#price-fixed-"+$(this).attr("attr-id")).prop("disabled", true);
+      }else{
+        $("#price-disccount-"+$(this).attr("attr-id")).prop("disabled", false);
+        $("#price-fixed-"+$(this).attr("attr-id")).prop("disabled", false);
+      }
+      calculateTotal();
+    });
+
+    $('body').on('keyup', "[id^=price-fixed-]", function() {
+      if($(this).val()!=""){
+        $("#price-profit-"+$(this).attr("attr-id")).val("");
+        $("#price-profit-"+$(this).attr("attr-id")).prop("disabled", true);
+        $("#price-disccount-"+$(this).attr("attr-id")).val("");
+        $("#price-disccount-"+$(this).attr("attr-id")).prop("disabled", true);
+      }else{
+        $("#price-profit-"+$(this).attr("attr-id")).prop("disabled", false);
+        $("#price-disccount-"+$(this).attr("attr-id")).prop("disabled", false);
+      }
+      calculateTotal();
+    });
+
+    $('body').on('click', '#formgroupprices-button-save', function() {
+      var prices=[];
+      $("[id^=price-group-]").each(function( index ) {
+        var price={group: $(this).attr("attr-id"), discount:parseFloat($("#price-disccount-"+$(this).attr("attr-id")).val()), profit:parseFloat($("#price-profit-"+$(this).attr("attr-id")).val()), fixed:parseFloat($("#price-fixed-"+$(this).attr("attr-id")).val())}
+        prices.push(price);
+      });
+      //console.log(JSON.stringify(prices));
+      $.ajax({
+         url: '{{ url('productSetGroupPrices',{'id':id}) }}',
+         type: 'POST',
+         data: JSON.stringify(prices),
+         success:  function( data ) {
+           if(data.result){
+             toastr.success("Datos guardados correctamente", "Confirmación", confirmation);
+           } else toastr.error("Ocurrió un error al guardar los datos", "Confirmación", confirmation);
+         }
+       });
+
+    });
+  });
+</script>
+{# Check if field has a field type number #}
+{{ include("@Globale/form_fields_type_number.html.twig") }}

@@ -475,8 +475,8 @@ class AERPCustomers
         //if($this->vat!=null && !$validator->isValidIdNumber($this->vat)) {$fieldErrors=["vat"=>"CIF/NIF/NIE no válido"]; }
         if($this->email!=null && !$validator->isValidEmail($this->email)) {$fieldErrors=["email"=>"Email no válido"]; }
         if($this->web!=null && !$validator->isValidURL($this->web)) {$fieldErrors=["web"=>"URL no válida"]; }
-        if($this->iban!=null && !$validator->isValidIban($this->iban)) {$fieldErrors=["iban"=>"URL no válida"]; }
-        if($this->swift!=null && !$validator->isValidSwift($this->swift)) {$fieldErrors=["swift"=>"URL no válida"]; }
+        if($this->iban!=null && !$validator->isValidIban($this->iban)) {$fieldErrors=["iban"=>"IBAN no válida"]; }
+        if($this->swift!=null && !$validator->isValidSwift($this->swift)) {$fieldErrors=["swift"=>"SWIFT no válido"]; }
 
         return ["valid"=>empty($fieldErrors), "field_errors"=>$fieldErrors];
       }

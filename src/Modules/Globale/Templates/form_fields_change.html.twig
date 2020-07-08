@@ -1,6 +1,7 @@
 {# CHANGE FIELDS #}
 <script>
   {% if field.change is defined %}
+
       {% for change in field.change %}
         $('body').on('change ifChanged', "#{{formConstructor.name}}-form-body #form_{{ field.name }}", function() {
           var val=null;
@@ -11,8 +12,15 @@
               var newval={{ change.targetval }}==1?'check':'uncheck';
               $("#{{formConstructor.name}}-form-body #form_{{ change.field }}").iCheck(newval);
             }else{
-              var newval='{{ change.targetval }}';
-              $("#{{formConstructor.name}}-form-body #form_{{ change.field }}").val(newval);
+              if($("#{{formConstructor.name}}-form-body #form_{{ change.field }}").hasClass('select2')){
+                console.log('{{ change.targetval }}');
+                if('{{ change.targetval }}'=='0')
+                  $("#{{formConstructor.name}}-form-body #form_{{ change.field }}").val(0).trigger('change.select2');
+                else $("#{{formConstructor.name}}-form-body #form_{{ change.field }}").select2("val", $("#{{formConstructor.name}}-form-body #form_{{ change.field }} option:contains('{{ change.targetval }}')").val() );
+              }else{
+                var newval='{{ change.targetval }}';
+                $("#{{formConstructor.name}}-form-body #form_{{ change.field }}").val(newval);
+              }
             }
           }
         });

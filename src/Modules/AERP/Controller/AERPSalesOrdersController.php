@@ -30,7 +30,9 @@ use App\Modules\AERP\Entity\AERPSalesOrders;
 use App\Modules\AERP\Entity\AERPSalesOrdersLines;
 use App\Modules\AERP\Entity\AERPProducts;
 use App\Modules\AERP\Entity\AERPFinancialYears;
+use App\Modules\AERP\Entity\AERPWarehouseLocations;
 use App\Modules\AERP\Reports\AERPSalesOrdersReports;
+use App\Modules\AERP\Entity\AERPProductsStocks;
 use App\Modules\Security\Utils\SecurityUtils;
 
 class AERPSalesOrdersController extends Controller
@@ -56,6 +58,8 @@ class AERPSalesOrdersController extends Controller
 		$seriesRepository=$this->getDoctrine()->getRepository(AERPSeries::class);
 		$documentRepository=$this->getDoctrine()->getRepository($this->class);
 		$documentLinesRepository=$this->getDoctrine()->getRepository($this->classLines);
+		$locationsRepository = $this->getDoctrine()->getRepository(AERPProductsStocks::class);
+		$productsRepository = $this->getDoctrine()->getRepository(AERPProducts::class);
 
 		$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
 		$locale = $request->getLocale();
@@ -120,6 +124,16 @@ class AERPSalesOrdersController extends Controller
 		if($id!=0){
 			$document=$documentRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$id, "active"=>1,"deleted"=>0]);
 			$documentLines=$documentLinesRepository->findBy(["salesorder"=>$document, "active"=>1,"deleted"=>0]);
+			//Get locations of product
+			foreach($documentLines as $key=>$item){
+				$locations=$locationsRepository->findWithStocks($productsRepository->findOneBy(["id"=>$item->getProduct()->getId()]), $this->getUser()->getCompany());
+				$locations_array=array();
+				foreach($locations as $location){
+					$locations_array[]=["id"=>$location->getLocation()->getId(), "name"=>$location->getLocation()->getName()."(".$location->getLocation()->getWarehouse()->getName().")", "stock"=>$location->getStock()];
+				}
+				$documentLines[$key]->locations=$locations_array;
+			}
+
 			$line->setLinenum(count($documentLines)+1);
 			array_push($documentLines, $line);
 		}
@@ -184,6 +198,7 @@ class AERPSalesOrdersController extends Controller
 		$seriesRepository=$this->getDoctrine()->getRepository(AERPSeries::class);
 		$taxesRepository=$this->getDoctrine()->getRepository(GlobaleTaxes::class);
 		$configrepository=$this->getDoctrine()->getRepository(AERPConfiguration::class);
+		$locationsRepository=$this->getDoctrine()->getRepository(AERPWarehouseLocations::class);
 
 		$document=$documentRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$id, "deleted"=>0]);
 		//Check if document belongs to company
@@ -249,6 +264,11 @@ class AERPSalesOrdersController extends Controller
 		foreach ($fields->lines as $key => $value) {
 			$line=$documentLinesRepository->findOneBy(["salesorder"=>$document, "id"=>$value->id]);
 			$product=$productsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$value->productid, "active"=>1, "deleted"=>0]);
+
+			if(isset($value->location))
+				$location=$locationsRepository->findOneBy(["id"=>$value->location]);
+				else $location=null;
+
 			//if(!$product) continue;
 			if($value->code=="") continue;
 			if(!$line && $value->deleted) continue;
@@ -263,6 +283,7 @@ class AERPSalesOrdersController extends Controller
 				$line->setProduct($product);
 				$line->setCode($value->code);
 				$line->setName($value->name);
+				if($location) $line->setLocation($location);
 				$line->setUnitprice(floatval($value->unitprice));
 				$line->setQuantity(floatval($value->quantity));
 				$line->setDtoperc(floatval($value->disccountperc));

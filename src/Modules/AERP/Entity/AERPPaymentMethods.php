@@ -4,6 +4,7 @@ namespace App\Modules\AERP\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
+use \App\Modules\Globale\Entity\GlobaleBankAccounts;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\AERP\Repository\AERPPaymentMethodsRepository")
@@ -62,6 +63,16 @@ class AERPPaymentMethods
      * @ORM\Column(type="boolean")
      */
     private $deleted;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $overownbankaccount;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleBankAccounts")
+     */
+    private $overownbankaccountaccount;
 
     public function getId(): ?int
     {
@@ -179,5 +190,29 @@ class AERPPaymentMethods
     public function preProccess($kernel, $doctrine, $user){
       //Allow only numbers and commas
       $this->expiration=preg_replace('#[^0-9\,]#', '', $this->expiration);
+    }
+
+    public function getOverownbankaccount(): ?bool
+    {
+        return $this->overownbankaccount;
+    }
+
+    public function setOverownbankaccount(bool $overownbankaccount): self
+    {
+        $this->overownbankaccount = $overownbankaccount;
+
+        return $this;
+    }
+
+    public function getOverownbankaccountaccount(): ?GlobaleBankAccounts
+    {
+        return $this->overownbankaccountaccount;
+    }
+
+    public function setOverownbankaccountaccount(?GlobaleBankAccounts $overownbankaccountaccount): self
+    {
+        $this->overownbankaccountaccount = $overownbankaccountaccount;
+
+        return $this;
     }
 }

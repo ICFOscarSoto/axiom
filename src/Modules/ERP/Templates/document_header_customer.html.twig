@@ -1,0 +1,43 @@
+<div class="panel panel-primary panel-shadow" data-collapsed="0" style="-webkit-box-shadow: none; box-shadow:none; padding:0px; margin-bottom: -1px;"><!-- to apply shadow add class "panel-shadow" -->
+  <div class="panel-body">
+    <div class="row">
+      <div class="col-md-2">
+        <div class="input-group">
+          <input type="text" id="customer-form-code" value="{% if document.customer!=null %}{{ document.customer.code }}{% endif %}" class="form-control" placeholder="Cod. Cliente">
+            <div class="input-group-btn">
+              <button type="button" id="customer-search-button" class="btn btn-white" style="height: 31px;" data-toggle="modal" data-target="#customer-search-modal-form">
+                  <i class="fa fa-search"></i> </button>
+            </div>
+        </div>
+      </div>
+      <input type="hidden" id="customer-form-id" class="form-control" value="{% if document.customer!=null %}{{ document.customer.id }}{% endif %}">
+      <input type="hidden" id="customer-form-irpf" value="{% if id!=0 %}{% if document.irpf %}true{% else %}false{% endif %}{% else %}{{ moduleConfig.irpf ? 'true' : 'false' }}{% endif %}" class="form-control">
+      <input type="hidden" id="customer-form-irpf-perc" value="{% if id!=0 %}{{ document.irpfperc }}{% else %}{{ moduleConfig.defaultirpf }}{% endif %}" class="form-control">
+      <input type="hidden" id="customer-form-taxexempt" value="{% if document.taxexempt %}true{% else %}false{% endif %}" class="form-control">
+      <input type="hidden" id="customer-form-surcharge" value="{% if document.surcharge %}true{% else %}false{% endif %}" class="form-control">
+      <div class="col-md-6"> <div class="form-group">
+        <span id="customer-form-view" class="select2-selection__view_nolabel" style="" attr-id=0 attr-url="{{ url('formCustomer',{'id':'_____'}) }}"><i class="fa fa-file-text-o" aria-hidden="true"></i><span>&nbsp;Ver Ficha</span></span>
+        <script>
+        $('body').on('click', "#customer-form-view", function(e){
+          var id=$(this).attr("attr-id");
+            if(id!=0 && id!=""){
+              url=$(this).attr("attr-url");
+              url=url.replace('_____',$(this).attr("attr-id"));
+              var win = window.open(url, '_blank');
+              win.focus();
+            }
+        });
+        </script>
+        <input type="text" id="customer-form-name" class="form-control" placeholder="Nombre cliente" value="{{ document.customername }}" disabled> </div> </div>
+      <div class="col-6 col-md-2"> <div class="form-group"> <input type="text" id="customer-form-vat" value="{{ document.vat }}" class="form-control" placeholder="CIF" disabled> </div> </div>
+      <div class="col-6 col-md-2"> <div class="form-group">
+      <input type="hidden" id="customer-form-customergroup" value="" class="form-control">
+      <select type="text" id="customer-form-customergroup-select"  class="form-control select2">
+        {% for option in customerGroups %}
+          <option value="{{ option.id }}" {% if document.customergroup!=null and option.id==document.customergroup.id %} selected="selected" {% endif %}>{{ option.text }}</option>
+        {% endfor %}
+      </select>
+      </div> </div>
+    </div>
+  </div>
+</div>

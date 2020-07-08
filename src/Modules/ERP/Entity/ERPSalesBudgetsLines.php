@@ -51,6 +51,16 @@ class ERPSalesBudgetsLines
     private $taxunit;
 
     /**
+     * @ORM\Column(type="float")
+     */
+    private $irpfperc=0;
+
+    /**
+     * @ORM\Column(type="float")
+     */
+    private $irpfunit=0;
+
+    /**
      * @ORM\Column(type="float", nullable=true)
      */
     private $surchargeperc;
@@ -89,6 +99,36 @@ class ERPSalesBudgetsLines
      * @ORM\Column(type="datetime")
      */
     private $dateupd;
+
+    /**
+     * @ORM\Column(type="string", length=250)
+     */
+    private $name;
+
+    /**
+     * @ORM\Column(type="float")
+     */
+    private $dtoperc;
+
+    /**
+     * @ORM\Column(type="float")
+     */
+    private $dtounit;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $linenum;
+
+    /**
+     * @ORM\Column(type="string", length=20)
+     */
+    private $code;
+
+    /**
+     * @ORM\Column(type="float")
+     */
+    private $cost;
 
     public function getId(): ?int
     {
@@ -262,4 +302,101 @@ class ERPSalesBudgetsLines
 
         return $this;
     }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): self
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    public function getDtoperc(): ?float
+    {
+        return $this->dtoperc;
+    }
+
+    public function setDtoperc(float $dtoperc): self
+    {
+        $this->dtoperc = $dtoperc;
+
+        return $this;
+    }
+
+    public function getDtounit(): ?float
+    {
+        return $this->dtounit;
+    }
+
+    public function setDtounit(float $dtounit): self
+    {
+        $this->dtounit = $dtounit;
+
+        return $this;
+    }
+
+    public function getLinenum(): ?int
+    {
+        return $this->linenum;
+    }
+
+    public function setLinenum(int $linenum): self
+    {
+        $this->linenum = $linenum;
+
+        return $this;
+    }
+
+    public function getCode(): ?string
+    {
+        return $this->code;
+    }
+
+    public function setCode(string $code): self
+    {
+        $this->code = $code;
+
+        return $this;
+    }
+
+    public function getCost(): ?float
+    {
+        return $this->cost;
+    }
+
+    public function setCost(float $cost): self
+    {
+        $this->cost = $cost;
+
+        return $this;
+    }
+
+    public function getIrpfperc(): ?float
+    {
+        return $this->irpfperc;
+    }
+
+    public function setIrpfperc(float $irpfperc): self
+    {
+        $this->irpfperc = $irpfperc;
+
+        return $this;
+    }
+
+    public function getIrpfunit(): ?float
+    {
+        return $this->irpfunit;
+    }
+
+    public function setIrpfunit(float $irpfunit): self
+    {
+        $this->irpfunit = $irpfunit;
+
+        return $this;
+    }
+
 }

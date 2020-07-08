@@ -17,7 +17,7 @@ class ERPCustomerCommentLinesUtils
 
   public function formatListByCustomer($customer){
     $list=[
-      'id' => 'list'.$this->name,
+      'id' => 'listCustomerCommentLinesDataOrder',
       'route' => 'genericlist',
       'routeParams' => ["module" => $this->module,
                         "name" => $this->name,

@@ -1,0 +1,22 @@
+[{
+    "sections": [
+        {
+            "name": "data",
+            "fields": [
+                {
+                    "name": "location",
+                    "cols": 6,
+                    "readonly": "noChange"
+                },
+                {
+                    "name": "stock",
+                    "cols": 2
+                },
+                {
+                    "name": "active",
+                    "cols": 2
+                }
+            ]
+        }
+    ]
+}]

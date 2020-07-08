@@ -1,0 +1,68 @@
+<script>
+		function recalculateDocument(){
+			var i=0;
+			var documentLines=$("#document-lines");
+			$("[id^='document-line-']:not('.deleted')").each(function() {
+				productSearch($(this).attr("attr-id"), $("#product-form-code-"+$(this).attr("attr-id")).val(), productFields, productSearchfields);
+			});
+		}
+
+    function calculateDocumentRow(id){
+      var price=parseFloat($("#product-form-price-"+id).val());
+      var quantity=parseFloat($("#product-form-quantity-"+id).val());
+      var disccount=parseFloat($("#product-form-disccount-"+id).val());
+      var tax=parseFloat($("#product-form-tax-"+id).val());
+      var surcharge=parseFloat($("#product-form-surcharge-"+id).val());
+      var irpf=parseFloat($("#product-form-irpf-"+id).val());
+
+      if($("#customer-form-irpf").val()=="true") var irpfperc=$("#customer-form-irpf-perc").val(); else var irpfperc=0;
+
+      //console.log("price:"+price+" - "+"quantity:"+quantity+" - "+"disccount:"+disccount+" - "+"tax:"+tax+" - "+"surcharge:"+surcharge+" - "+"irpf:"+irpf+" - "+"irpfperc:"+irpfperc);
+
+      price=(price=="")?0:price;
+      tax=(tax=="")?0:tax;
+      surcharge=(surcharge=="")?0:surcharge;
+      price=isNaN(price)?0:price;
+      quantity=isNaN(quantity)?0:quantity;
+      disccount=isNaN(disccount)?0:disccount;
+      tax=isNaN(tax)?0:tax;
+      surcharge=isNaN(surcharge)?0:surcharge;
+      irpf=isNaN(irpf)?0:irpf;
+      var subtotal=price*quantity;
+      $("#product-form-base-total-"+id).val(subtotal);
+      var disccounttotal=subtotal*disccount/100;
+      subtotal=(subtotal-disccounttotal).toFixed(2);
+      var taxtotal=(subtotal*tax/100).toFixed(2);
+      var irpftotal=(subtotal*irpfperc/100).toFixed(2);
+      var surchargetotal=(subtotal*surcharge/100).toFixed(2);
+      var total=parseFloat(subtotal)+parseFloat(taxtotal)+parseFloat(irpftotal)+parseFloat(surchargetotal);
+      $("#product-form-disccount-total-"+id).val(disccounttotal);
+      $("#product-form-tax-total-"+id).val(taxtotal);
+      $("#product-form-irpf-total-"+id).val(irpftotal);
+      $("#product-form-surcharge-total-"+id).val(surchargetotal);
+      $("#product-form-amount-"+id).val(total.toFixed(2));
+      calculateDocumentTotals();
+    }
+
+    function calculateDocumentTotals(){
+      var base=0;
+      var taxtotal=0;
+      var irpftotal=0;
+      var surchargetotal=0;
+      var disccounttotal=0;
+      var total=0;
+      $("[id^='product-form-base-total-']:not('.deleted')").each(function() {	base+=parseFloat(isNaN($(this).val())?0:$(this).val()); });
+      $("[id^='product-form-disccount-total-']:not('.deleted')").each(function() {	disccounttotal+=parseFloat(isNaN($(this).val())?0:$(this).val()); });
+      $("[id^='product-form-tax-total-']:not('.deleted')").each(function() {	taxtotal+=parseFloat(isNaN($(this).val())?0:$(this).val()); });
+      $("[id^='product-form-irpf-total-']:not('.deleted')").each(function() {	irpftotal+=parseFloat(isNaN($(this).val())?0:$(this).val()); });
+      $("[id^='product-form-surcharge-total-']:not('.deleted')").each(function() {	surchargetotal+=parseFloat(isNaN($(this).val())?0:$(this).val()); });
+      $("[id^='product-form-amount-']:not('.deleted')").each(function() {	total+=parseFloat(isNaN($(this).val())?0:$(this).val()); });
+      $("#totals_form_net").val(base.toFixed(2));
+      $("#totals_form_dto").val(disccounttotal.toFixed(2));
+      $("#totals_form_tax").val(taxtotal.toFixed(2));
+      $("#totals_form_irpf").val(irpftotal.toFixed(2));
+      $("#totals_form_surcharge").val(surchargetotal.toFixed(2));
+      $("#totals_form_total").val(total.toFixed(2));
+    }
+
+</script>
