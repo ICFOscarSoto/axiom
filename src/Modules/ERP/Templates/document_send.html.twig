@@ -30,7 +30,7 @@ $(document).ready(function() {
          if(data.result){
            if((++load_wait)==1) $("#load-spinner").fadeIn();
            $.ajax({
-              url: '{{ url('getEmailAddress') }}/'+$("#customer-form-id").val(),
+              url: '{{ url('getERPEmailAddress') }}/'+$("#customer-form-id").val(),
               type: 'POST',
               success:  function( data ) {
                  $('#mail-addresses').empty().trigger("change");
