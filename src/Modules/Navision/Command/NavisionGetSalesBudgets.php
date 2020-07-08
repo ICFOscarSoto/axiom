@@ -4,6 +4,7 @@ namespace App\Modules\Navision\Command;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use App\Modules\ERP\Entity\ERPSalesBudgets;
@@ -63,13 +64,33 @@ class NavisionGetSalesBudgets extends ContainerAwareCommand
   }
 
     public function importSalesBudgets(InputInterface $input, OutputInterface $output){
+      //------Sync first customers    ------
+      $command = $this->getApplication()->find('navision:getCustomers');
+      $arguments = [
+          'entity'    => 'customers'
+      ];
+      $cmdProductsInput = new ArrayInput($arguments);
+      $cmdProductsreturn = $command->run($cmdProductsInput, $output);
+
+      //------Sync first products    ------
+      $command = $this->getApplication()->find('navision:getProducts');
+      $arguments = [
+          'entity'    => 'products'
+      ];
+      $cmdProductsInput = new ArrayInput($arguments);
+      $cmdProductsreturn = $command->run($cmdProductsInput, $output);
+
       //------   Create Lock Mutex    ------
-      $fp = fopen('/tmp/axiom-navisionGetSalesBudgets-importSalesBudgets.lock', 'c');
-      //$fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetSalesBudgets-importSalesBudgets.lock', 'c');
+      if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+          $fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetSalesBudgets-importSalesBudgets.lock', 'c');
+      } else {
+          $fp = fopen('/tmp/axiom-navisionGetSalesBudgets-importSalesBudgets.lock', 'c');
+      }
       if (!flock($fp, LOCK_EX | LOCK_NB)) {
         $output->writeln('* Fallo al iniciar la sincronizacion de presupuestos: El proceso ya esta en ejecución.');
         exit;
       }
+
 
       //------   Critical Section START   ------
       $navisionSyncRepository=$this->doctrine->getRepository(NavisionSync::class);

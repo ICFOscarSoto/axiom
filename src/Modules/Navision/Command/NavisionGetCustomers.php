@@ -83,8 +83,11 @@ class NavisionGetCustomers extends ContainerAwareCommand
 
    public function importCustomer(InputInterface $input, OutputInterface $output){
      //------   Create Lock Mutex    ------
-     $fp = fopen('/tmp/axiom-navisionGetCustomers-importCustomer.lock', 'c');
-     //  $fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetCustomers-importCustomer.lock', 'c');
+     if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+         $fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetCustomers-importCustomer.lock', 'c');
+     } else {
+        $fp = fopen('/tmp/axiom-navisionGetCustomers-importCustomer.lock', 'c');
+     }
 
      if (!flock($fp, LOCK_EX | LOCK_NB)) {
        $output->writeln('* Fallo al iniciar la sincronizacion de clientes: El proceso ya esta en ejecución.');
