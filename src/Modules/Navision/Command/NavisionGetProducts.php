@@ -93,8 +93,8 @@ class NavisionGetProducts extends ContainerAwareCommand
 
     public function importProduct(InputInterface $input, OutputInterface $output){
       //------   Create Lock Mutex    ------
-      //$fp = fopen('/tmp/axiom-navisionGetProducts-importProduct.lock', 'c');
-      $fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetProducts-importProduct.lock', 'c');
+      $fp = fopen('/tmp/axiom-navisionGetProducts-importProduct.lock', 'c');
+      //$fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetProducts-importProduct.lock', 'c');
       if (!flock($fp, LOCK_EX | LOCK_NB)) {
         $output->writeln('* Fallo al iniciar la sincronizacion de productos: El proceso ya esta en ejecución.');
         exit;

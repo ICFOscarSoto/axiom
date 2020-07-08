@@ -64,8 +64,8 @@ class NavisionGetSalesBudgets extends ContainerAwareCommand
 
     public function importSalesBudgets(InputInterface $input, OutputInterface $output){
       //------   Create Lock Mutex    ------
-      //$fp = fopen('/tmp/axiom-navisionGetProducts-importProduct.lock', 'c');
-      $fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetCustomers-importCustomer.lock', 'c');
+      $fp = fopen('/tmp/axiom-navisionGetProducts-importProduct.lock', 'c');
+      //$fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetCustomers-importCustomer.lock', 'c');
       if (!flock($fp, LOCK_EX | LOCK_NB)) {
         $output->writeln('* Fallo al iniciar la sincronizacion de presupuestos: El proceso ya esta en ejecución.');
         exit;

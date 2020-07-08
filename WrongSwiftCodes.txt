@@ -1,9 +1,0 @@
-El cliente METALURGICA Y PLAS.LA MANCHA tiene un SWIFT no válido =>
-El cliente *OBRAS Y ESTRUCT. BONILLA,SL tiene un SWIFT no válido =>
-El cliente HERMANOS PEINADO S.L. tiene un SWIFT no válido =>
-El cliente ARENAS DE CHINCHILLA S.L. tiene un SWIFT no válido =>
-El cliente DESHIDRATADOS LOS LLANOS S.L. tiene un SWIFT no válido =>
-El cliente RODRIGUEZ FERNANDEZ JAVIER tiene un SWIFT no válido =>
-El cliente GRUPO OLIMARE S.L. tiene un SWIFT no válido =>
-El cliente GH SERVICIO DE ASISTENCIA TECNICA SUR S.L. tiene un SWIFT no válido =>
-El cliente ASESORIA INDUSTRIAL GANADERA ALONSO SL tiene un SWIFT no válido =>
