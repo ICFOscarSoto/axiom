@@ -65,7 +65,7 @@ class NavisionGetSalesBudgets extends ContainerAwareCommand
     public function importSalesBudgets(InputInterface $input, OutputInterface $output){
       //------   Create Lock Mutex    ------
       $fp = fopen('/tmp/axiom-navisionGetSalesBudgets-importSalesBudgets.lock', 'c');
-      //$fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetCustomers-importCustomer.lock', 'c');
+      //$fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetSalesBudgets-importSalesBudgets.lock', 'c');
       if (!flock($fp, LOCK_EX | LOCK_NB)) {
         $output->writeln('* Fallo al iniciar la sincronizacion de presupuestos: El proceso ya esta en ejecución.');
         exit;
@@ -114,7 +114,10 @@ class NavisionGetSalesBudgets extends ContainerAwareCommand
           $obj->setActive(1);
         }
          $customer=$repositoryCustomers->findOneBy(["code"=>$object["customer"]]);
-         if($customer==NULL) continue;
+         if($customer==NULL) {
+           //$output->writeln('     ! Saltado no existe el cliente');
+           //continue;
+         }
          $obj->setCustomer($customer);
 
          $author=$repositoryUsers->findOneBy(["email"=>$object["author"]]);
@@ -127,16 +130,16 @@ class NavisionGetSalesBudgets extends ContainerAwareCommand
          $obj->setVat($object["vat"]);
          $obj->setCustomername($object["customername"]);
          $obj->setCustomeraddress($object["customeraddress"]);
-         $obj->setCustomercountry($customer->getCountry());
+         $obj->setCustomercountry($customer?$customer->getCountry():null);
          $obj->setCustomercity($object["customercity"]);
-         $obj->setCustomerstate($customer->getState()!=null?$customer->getState()->getName():null);
+         $obj->setCustomerstate($customer?$customer->getState()!=null?$customer->getState()->getName():null:null);
          $obj->setCustomerpostcode($object["customerpostcode"]);
 
          $obj->setShiptoname($object["shiptoname"]);
          $obj->setShiptoaddress($object["shiptoaddress"]);
-         $obj->setShiptocountry($customer->getCountry());
+         $obj->setShiptocountry($customer?$customer->getCountry():null);
          $obj->setShiptocity($object["shiptocity"]);
-         $obj->setShiptostate($customer->getState()!=null?$customer->getState()->getName():null);
+         $obj->setShiptostate($customer?$customer->getState()!=null?$customer->getState()->getName():null:null);
          $obj->setShiptopostcode($object["shiptopostcode"]);
 
          $obj->setCustomercode($object["customer"]);
@@ -147,7 +150,7 @@ class NavisionGetSalesBudgets extends ContainerAwareCommand
          $obj->setIrpfperc(0);
          $obj->setSurcharge(0);
          $obj->setTaxexempt(0);
-         $obj->setCost($object["cost"]);
+         $obj->setCost(round($object["cost"],2));
          $obj->setTotalnet($object["linestotal"]);
          $obj->setTotaldto($object["dto"]);
          $obj->setTotalbase($object["base"]);
@@ -170,7 +173,7 @@ class NavisionGetSalesBudgets extends ContainerAwareCommand
         $total=0;
         foreach($object["lines"] as $key=>$line){
           $output->writeln('      -> Linea '.$line["linenum"].' - '.$line["reference"]);
-          $objLine=$repositorySalesBudgetsLines->findOneBy(["linenum"=>$line["linenum"]]);
+          $objLine=$repositorySalesBudgetsLines->findOneBy(["salesbudget"=>$obj,"linenum"=>$line["linenum"]]);
           if ($objLine==null) {
             $objLine=new ERPSalesBudgetsLines();
             $objLine->setSalesbudget($obj);
@@ -181,13 +184,16 @@ class NavisionGetSalesBudgets extends ContainerAwareCommand
             $objLine->setActive(1);
           }
           $product=$repositoryProducts->findOneBy(["code"=>$line["reference"]]);
-          if($product==NULL) continue;
+          if($product==NULL){
+             $output->writeln('     ! Saltado no existe el producto');
+             continue;
+          }
           $objLine->setCode($line["reference"]);
           $objLine->setName($line["description"]);
           $objLine->setProduct($product);
           $objLine->setUnitprice($line["price"]);
           $objLine->setQuantity($line["quantity"]);
-          $objLine->setCost($line["cost"]);
+          $objLine->setCost(round($line["cost"],2));
           $objLine->setTaxperc($line["taxperc"]);
           $objLine->setTaxunit(round($line["linetotal"]*$line["taxperc"]/100,2));
           $objLine->setDtoperc($line["discountperc"]);
@@ -199,9 +205,11 @@ class NavisionGetSalesBudgets extends ContainerAwareCommand
           $objLine->setDateupd(new \Datetime());
           $this->doctrine->getManager()->persist($objLine);
           $this->doctrine->getManager()->flush();
+          //$output->writeln('     - Grabado ID: '.$objLine->getId());
 
         }
         //$totalBase=$totalNet-$totalDto;
+        //$this->doctrine->getManager()->flush();
         $this->doctrine->getManager()->clear();
 
       }
