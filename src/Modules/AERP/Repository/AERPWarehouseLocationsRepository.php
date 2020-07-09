@@ -42,6 +42,7 @@ class AERPWarehouseLocationsRepository extends ServiceEntityRepository
 
         $params=['company' => $user->getCompany()->getId(), 'product' => $id];
         $result=$this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+        $ids[]=[];
         foreach($result as $key=>$item){
           $ids[]=$item['id'];
         }
