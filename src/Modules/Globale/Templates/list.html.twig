@@ -77,7 +77,8 @@
 								data=formatted;
 							 },0);
 							 $("#{{ listConstructor.id }}-footer").show();
-							$(this.footer()).html((typeof data!='string'?(Math.round(data*100)/100):data));
+
+							$(this.footer()).html((typeof data!='string'?parseFloat(Math.round(data*100)/100).toLocaleString('es'):data)+' '+$(this.footer()).attr("attr-unity"));
 						});
 					},
 					"columnDefs": [
@@ -122,6 +123,22 @@
 														return formatted;
 													}else return '00:00:00';
 											}
+										{% endif %}
+										{% if field.format == "float" %}
+											"render": function(data, type, row, meta){
+													//var date = new Date(data*1000);
+													//return ("0" + date.getHours()).slice(-2)+':'+("0" + date.getMinutes()).slice(-2)+':'+("0" + date.getSeconds()).slice(-2);;
+													if(data!=null){
+														//return data.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+														return parseFloat(data).toLocaleString('es'){% if field.unity is defined %}+' {{ field.unity }}'{% endif %};
+													}else return '0';
+											},
+											"sortFunc": (a, b, order) => {
+											    if (order === 'asc') {
+											        return parseFloat(a) - parseFloat(b);
+											    }
+											    return parseFloat(b) - parseFloat(a); // desc
+											},
 										{% endif %}
 									{% else %}
 										"render": function(data, type, row, meta){
@@ -174,7 +191,7 @@
 														{% endif %}
 													{% endif %}
 													{% endif %}
-												return text;
+												return text{% if field.unity is defined %}+' {{ field.unity }}'{% endif %};
 										},
 										{% endif %}
 								},
@@ -452,7 +469,7 @@
 				{# only show search fields in data type fields#}
 				{% for field in listConstructor.fields %}
 					{% if field.type is not defined or field.type == "data" %}
-						<td class="table-footer"></td>
+						<td class="table-footer" {% if field.unity is defined %} attr-unity="{{ field.unity }}" {% endif %}></td>
 					{% else %}
 						<td></td>
 					{% endif %}

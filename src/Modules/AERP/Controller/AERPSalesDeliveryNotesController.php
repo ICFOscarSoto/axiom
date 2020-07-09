@@ -26,6 +26,7 @@ use App\Modules\AERP\Entity\AERPSalesDeliveryNotes;
 use App\Modules\AERP\Entity\AERPSalesDeliveryNotesLines;
 use App\Modules\AERP\Entity\AERPProducts;
 use App\Modules\AERP\Entity\AERPFinancialYears;
+use App\Modules\AERP\Entity\AERPWarehouseLocations;
 use App\Modules\AERP\Reports\AERPSalesDeliveryNotesReports;
 use App\Modules\Security\Utils\SecurityUtils;
 
@@ -179,6 +180,7 @@ class AERPSalesDeliveryNotesController extends Controller
 		$seriesRepository=$this->getDoctrine()->getRepository(AERPSeries::class);
 		$taxesRepository=$this->getDoctrine()->getRepository(GlobaleTaxes::class);
 		$configrepository=$this->getDoctrine()->getRepository(AERPConfiguration::class);
+		$locationsRepository=$this->getDoctrine()->getRepository(AERPWarehouseLocations::class);
 
 		$document=$documentRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$id, "deleted"=>0]);
 		//Check if document belongs to company
@@ -245,6 +247,11 @@ class AERPSalesDeliveryNotesController extends Controller
 			$line=$documentLinesRepository->findOneBy(["salesdeliverynote"=>$document, "id"=>$value->id]);
 			$product=$productsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$value->productid, "active"=>1, "deleted"=>0]);
 			//if(!$product) continue;
+
+			if(isset($value->location))
+				$location=$locationsRepository->findOneBy(["id"=>$value->location]);
+				else $location=null;
+
 			if($value->code=="") continue;
 			if(!$line && $value->deleted) continue;
 			if(!$line ){
@@ -258,6 +265,7 @@ class AERPSalesDeliveryNotesController extends Controller
 				$line->setProduct($product);
 				$line->setCode($value->code);
 				$line->setName($value->name);
+				if($location) $line->setLocation($location);
 				$line->setUnitprice(floatval($value->unitprice));
 				$line->setQuantity(floatval($value->quantity));
 				$line->setDtoperc(floatval($value->disccountperc));

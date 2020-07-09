@@ -23,7 +23,19 @@
                 },
                 {
                     "name": "domiciled",
-                    "cols": 4
+                    "cols": 12,
+                    "depends":{"from": "overownbankaccount","vals":"[0]"},
+                    "change": [{"field": "overownbankaccount", "thisval": 1, "targetval":0}]
+                },
+                {
+                    "name": "overownbankaccount",
+                    "cols": 12, "depends":{"from": "domiciled","vals":"[0]"},
+                    "change": [{"field": "overownbankaccountaccount", "thisval": 0, "targetval":0}, {"field": "domiciled", "thisval": 1, "targetval":0}]
+                },
+                {
+                    "name": "overownbankaccountaccount",
+                    "caption": "bankAccount",
+                    "cols": 12, "depends":{"from": "overownbankaccount","vals":"[1]"}
                 },
                 {
                     "name": "active",

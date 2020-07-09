@@ -18,6 +18,7 @@ use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\AERP\Utils\AERPProductsUtils;
 use App\Modules\AERP\Entity\AERPCustomerGroups;
 use App\Modules\AERP\Entity\AERPCustomerGroupsPrices;
+use App\Modules\AERP\Entity\AERPProductsStocks;
 use App\Modules\Security\Utils\SecurityUtils;
 
 class AERPProductsController extends Controller
@@ -55,6 +56,7 @@ public function formAERPProduct($id,Request $request)
           'tab' => $request->query->get('tab','data'), //Show initial tab, by default data tab
           'tabs' => [	["name" => "data", "icon"=>"fa-address-card-o", "caption"=>"Datos productos", "active"=>true, "route"=>$this->generateUrl("dataAERPProducts",["id"=>$id])],
 											["name" => "files", "icon"=>"fa fa-money", "caption"=>"Precios grupos", "route"=>$this->generateUrl("AERPProductsPrices",["id"=>$id])],
+											["name" => "files", "icon"=>"fa fa-cubes", "caption"=>"Stocks", "route"=>$this->generateUrl("generictablist",["module"=>"AERP", "name"=>"ProductsStocks", "id"=>$id, "parent"=>$id])],
 											["name" => "files", "icon"=>"fa fa-cloud", "caption"=>"Archivos", "route"=>$this->generateUrl("cloudfiles",["id"=>$id, "path"=>"products"])]
                   	],
               ));
@@ -156,8 +158,9 @@ public function formAERPProduct($id,Request $request)
 		 $user = $this->getUser();
 		 $manager = $this->getDoctrine()->getManager();
 		 $repository = $manager->getRepository(AERPProducts::class);
+		 $locationsRepository = $manager->getRepository(AERPProductsStocks::class);
 		 if(!property_exists($this->class, $field)) return new JsonResponse(["result"=>0]);
-		 $obj=$repository->findOneBy(["company"=>$this->getUser()->getCompany(), $field => $query]);
+		 $obj=$repository->findOneBy(["company"=>$this->getUser()->getCompany(), $field => $query, "active"=>1, "deleted"=>0]);
 		 if(!$obj) return new JsonResponse(["result"=>0]);
 		 $result=[];
 		 foreach($fields as $field){
@@ -167,10 +170,16 @@ public function formAERPProduct($id,Request $request)
 				 if(is_object($result[$field])) $result[$field]=$result[$field]->getId();
 			 }
 		 }
+		 $locations=$locationsRepository->findWithStocks($obj, $this->getUser()->getCompany());
+		 $locations_array=array();
+		 foreach($locations as $location){
+			 $locations_array[]=["id"=>$location->getLocation()->getId(), "name"=>$location->getLocation()->getName()."(".$location->getLocation()->getWarehouse()->getName().")", "stock"=>$location->getStock()];
+		 }
 		 //get product price
 		 $result["price"]=$repository->getProductPrice($obj->getId(), $group, $this->getUser()->getCompany()->getId());
 		 $result["tax"]=$obj->getTax()?$obj->getTax()->getTax():0;
 		 $result["surcharge"]=$obj->getTax()?$obj->getTax()->getSurcharge():0;
+		 $result["locations"]=$locations_array;
 		 return new JsonResponse(["result"=>1, "data"=>$result]);
 	 }
 

@@ -27,13 +27,18 @@ class HRClocksRepository extends ServiceEntityRepository
                	ON (m1.worker_id = m2.worker_id AND m1.id < m2.id)
               	WHERE m2.id IS NULL AND m1.deleted=0 AND m1.active=1 AND m1.invalid<>1) hrc ON hrc.worker_id=hrw.id
               WHERE hrw.company_id = :company AND hrw.deleted=0 AND hrw.active=1 ";*/
-      $query="SELECT hrc.id, hrw.id workerid, hrw.name, hrw.lastname, hrc.start, hrc.end from hrworkers hrw
+    /*  $query="SELECT hrc.id, hrw.id workerid, hrw.name, hrw.lastname, hrc.start, hrc.end from hrworkers hrw
               LEFT JOIN (
               	SELECT m1.*
               	FROM hrclocks m1 LEFT JOIN hrclocks m2
                	ON (m1.worker_id = m2.worker_id AND m1.start < m2.start)
               	WHERE m2.id IS NULL AND m1.deleted=0 AND m1.active=1 AND m1.invalid<>1) hrc ON hrc.worker_id=hrw.id
-              WHERE hrw.company_id = :company AND hrw.deleted=0 AND hrw.active=1 ";
+              WHERE hrw.company_id = :company AND hrw.deleted=0 AND hrw.active=1 ";*/
+
+      $query="SELECT hrc.id, hrw.id workerid, hrw.name, hrw.lastname, hrc.start, hrc.end from hrworkers hrw
+              LEFT JOIN hrclocks hrc ON hrc.id=(SELECT id FROM hrclocks WHERE worker_id=hrw.id AND active=1 AND deleted=0 AND invalid<>1 ORDER BY start DESC LIMIT 1)
+              WHERE hrw.company_id = :company AND hrw.deleted=0 AND hrw.active=1";        
+
       if($department!=0) $query.=" AND hrw.department_id=".$department;
       if($workcenter!=0) $query.=" AND hrw.workcenters_id=".$workcenter;
       $query.=" ORDER BY lastname, name ASC";

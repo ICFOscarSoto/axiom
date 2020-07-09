@@ -11,7 +11,8 @@ use \App\Modules\ERP\Entity\ERPFinancialYears;
 use \App\Modules\ERP\Entity\ERPPaymentMethods;
 use \App\Modules\Globale\Entity\GlobaleCountries;
 use \App\Modules\ERP\Entity\ERPCustomerGroups;
-
+use \App\Modules\ERP\Entity\ERPSalesOrders;
+use \App\Modules\ERP\Entity\ERPSeries;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPSalesBudgetsRepository")
@@ -69,6 +70,10 @@ class ERPSalesBudgets
      */
     private $paymentmethod;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\AERP\Entity\AERPSeries")
+     */
+    private $serie;
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPCustomerGroups")
@@ -261,6 +266,15 @@ class ERPSalesBudgets
      */
     private $notes;
 
+    /**
+     * @ORM\Column(type="float")
+     */
+    private $cost;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPSalesOrders")
+     */
+    private $inSalesOrder;
 
     public function getId(): ?int
     {
@@ -819,4 +833,39 @@ class ERPSalesBudgets
         return $this;
     }
 
+    public function getCost(): ?float
+    {
+        return $this->cost;
+    }
+
+    public function setCost(float $cost): self
+    {
+        $this->cost = $cost;
+
+        return $this;
+    }
+
+    public function getInSalesOrder(): ?ERPSalesOrders
+    {
+        return $this->inSalesOrder;
+    }
+
+    public function setInSalesOrder(?ERPSalesOrders $inSalesOrder): self
+    {
+        $this->inSalesOrder = $inSalesOrder;
+
+        return $this;
+    }
+
+    public function getSerie(): ?ERPSeries
+    {
+        return $this->serie;
+    }
+
+    public function setSerie(?ERPSeries $serie): self
+    {
+        $this->serie = $serie;
+
+        return $this;
+    }
 }

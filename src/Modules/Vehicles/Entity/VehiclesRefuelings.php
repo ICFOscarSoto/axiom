@@ -7,7 +7,7 @@ use \App\Modules\Vehicles\Entity\VehiclesVehicles;
 use \App\Modules\Globale\Entity\GlobaleUsers;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\Modules\Vehicles\Entity\VehiclesRefuelingsRepository")
+ * @ORM\Entity(repositoryClass="App\Modules\Vehicles\Repository\VehiclesRefuelingsRepository")
  */
 class VehiclesRefuelings
 {

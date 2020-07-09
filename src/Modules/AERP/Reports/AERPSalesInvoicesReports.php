@@ -9,6 +9,7 @@ use App\Modules\Globale\Entity\MenuOptions;
 use App\Modules\Email\Entity\EmailAccounts;
 use App\Modules\Globale\Utils\FormUtils;
 use App\Modules\Globale\Utils\ListUtils;
+//use App\Modules\Globale\Entity\GlobaleBankAccounts;
 
 use App\Modules\Globale\Reports\GlobaleReports;
 
@@ -24,6 +25,8 @@ class AERPSalesInvoicesReports
 
   private $cursor;
   private $positions=[];
+
+  private $doctrine;
 
   private function secToH($seconds) {
     $hours = floor($seconds / 3600);
@@ -137,28 +140,41 @@ class AERPSalesInvoicesReports
     $this->pdf->SetFont('Arial','',7);
     $this->pdf->SetFillColor($this->shadowcolor_r, $this->shadowcolor_g, $this->shadowcolor_b);
     $this->pdf->Cell(40,3,utf8_decode('Forma de pago'),'B',0,'L',true);
-    $this->pdf->Cell(150,3,utf8_decode(""),'B',0,'L',true);
+    $this->pdf->Cell(150,3,utf8_decode($document->getPaymentMethod()?$document->getPaymentMethod()->getName():''),'B',0,'L',true);
     $this->pdf->Ln(3);
     $this->pdf->SetX(10);
     $this->pdf->Cell(40,3,utf8_decode('Datos bancarios'),'B',0,'L',true);
-    $this->pdf->Cell(150,3,utf8_decode(""),'B',0,'L',true);
+    if($document->getPaymentMethod() && $document->getPaymentMethod()->getOverownbankaccount()){
+      $bankaccount=$document->getPaymentMethod()->getOverownbankaccountaccount();
+      $this->pdf->Cell(150,3,utf8_decode($bankaccount?($bankaccount->getName().' - '.$bankaccount->getIban()):''),'B',0,'L',true);
+    }else{
+      if($document->getPaymentMethod() && $document->getPaymentMethod()->getDomiciled()){
+        $customer=$document->getCustomer();
+        $this->pdf->Cell(150,3,utf8_decode($customer?($customer->getIban()):''),'B',0,'L',true);
+      }
+    }
     $this->pdf->Ln(3);
     $this->pdf->SetX(10);
     $this->pdf->Cell(40,3,utf8_decode('Vencimientos'),'B',0,'L',true);
     $shadow=40;
-    /*foreach($invoice['expirations'] as $expiration){
-      $this->pdf->Cell(20,3,utf8_decode(date("d/m/Y",strtotime($expiration["date"]["date"]))),'B',0,'R',true);
+    $expirations=explode(',',$document->getPaymentMethod()->getExpiration());
+    foreach($expirations as $expiration){
+      $this->pdf->Cell(20,3,utf8_decode(date("d/m/Y",strtotime($document->getDate()->format('Y-m-d').' + '.$expiration.' days'))),'B',0,'R',true);
       $shadow+=20;
-    }*/
+    }
     $this->pdf->Cell(190-$shadow,3,"",'B',0,'R',true);
     $this->pdf->Ln(3);
     $this->pdf->SetX(10);
     $this->pdf->Cell(40,3,utf8_decode('Importe'),'B',0,'L',true);
+    foreach($expirations as $expiration){
+      $this->pdf->Cell(20,3,utf8_decode(number_format($document->getTotal()/count($expirations),2,',','.').json_decode('"\u0080"')),'B',0,'R',true);
+      $shadow+=20;
+    }
     /*foreach($invoice['expirations'] as $expiration){
       $this->pdf->Cell(20,3,utf8_decode($expiration["amount"].json_decode('"\u0080"')),'B',0,'R',true);
 
     }*/
-    $this->pdf->Cell(190-$shadow,3,"",'B',0,'R',true);
+    $this->pdf->Cell(190-$shadow+(20*count($expirations)),3,"",'B',0,'R',true);
     $this->pdf->Ln(3);
     $this->pdf->SetX(10);
     $this->pdf->Cell(190,3,utf8_decode(''),'B',0,'L',true);
@@ -220,7 +236,7 @@ class AERPSalesInvoicesReports
     $this->pdf  = new GlobaleReports();
     $this->pdf->AliasNbPages();
     $this->pdf->SetAutoPageBreak(false);
-    $doctrine=$params["doctrine"];
+    $this->doctrine=$params["doctrine"];
     $this->user=$params["user"];
     $document=$params["document"];
     $lines=$params["lines"];

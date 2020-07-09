@@ -1,0 +1,182 @@
+{% set params = app.request.attributes.get('_route_params')|merge(app.request.query.all()) %}
+{% block header %}
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<meta name="description" content="Axiom Business Management" />
+	<meta name="author" content="" />
+	<link rel="icon" href="images/favicon.ico">
+	{{ include('@Globale/header.html.twig') }}
+	<!-- Imported styles on this page -->
+	<link rel="stylesheet" href="{{ url('index') }}css/bootstrap-grid.css">
+	<link rel="stylesheet" href="{{ url('index') }}/js/jvectormap/jquery-jvectormap-1.2.2.css">
+	<link rel="stylesheet" href="{{ url('index') }}/js/rickshaw/rickshaw.min.css">
+{% endblock %}
+<title>{% block title %}{{ interfaceName|trans }}{% endblock %}</title>
+<body class="page-body" data-url="{{ url('indexAdmin') }}">
+<div class="page-container"><!-- add class "sidebar-collapsed" to close sidebar by default, "chat-visible" to make chat appear always -->
+	{{ include('@Globale/sidebar_menu.html.twig') }}
+	<div class="main-content">
+		{{ include('@Globale/head.html.twig') }}
+		<hr />
+		{{ include('@Globale/breadcrumb.html.twig') }}
+		{#}<h2>{{ interfaceName }}</h2>#}
+		<!-- MAIN CONTENT -->
+		<div class="row">
+			{% if (errors is not defined or errors|length == 0) %}
+				<div style="text-align: left;" class="col-md-8">
+					{% if id!=0 %}
+						<div id="document-action-buttons" style="display:{% if id!=0 %}block;{% else %}none;{% endif %}">
+							<button id="document-button-print" type="button" class="btn btn-default btn-icon icon-left" onclick="window.open('{{ url("ERPSalesBudgetsPrint",{"id":document.code, "mode": "print"}) }}')">Imprimir<i class="fa fa-print"></i></button>
+							<button id="document-button-download" type="button" class="btn btn-default btn-icon icon-left" onclick="window.open('{{ url("ERPSalesBudgetsPrint",{"id":document.code, "mode": "download"}) }}')">Descargar<i class="fa fa-download"></i></button>
+							{% if userData.modules.Email is defined %}
+							<button id="document-button-email" type="button" class="btn btn-default btn-icon icon-left">Enviar<i class="fa fa-envelope"></i></button>
+							{% endif %}
+							{% if document.inSalesOrder is null %}
+							{#<button id="document-button-makeorder" type="button" class="btn btn-default btn-icon icon-left">A Pedido<i class="fa fa-file"></i></button>#}
+							{% endif %}
+						</div>
+					{% endif %}
+				</div>
+		    <div style="text-align: right;" class="col-md-4">
+		      <button attr-id="" attr-action="" id="document-button-cancel" type="button" class="btn btn">Cancelar</button>
+		      {#<button attr-id="" attr-action="" id="document-button-save" type="button" class="btn btn-green">Guardar</button>#}
+		    </div>
+			{% endif %}
+		</div>
+		<div id="document-body">
+			{% set formConstructor = {"name": documentType} %}
+			{{ include("@Globale/form_validation.html.twig") }}
+			<br/>
+			{{ include('@ERP/document_header_customer.html.twig') }}
+			{{ include('@ERP/document_header_data.html.twig') }}
+			{{ include('@ERP/document_body_lines.html.twig') }}
+			{{ include('@ERP/document_body_totals.html.twig') }}
+			{{ include('@ERP/document_footer_notes.html.twig') }}
+		</div>
+			{{ include("@Globale/form_fields_type_number.html.twig") }}
+			{{ include('@ERP/document_lines_functions.html.twig') }}
+			{{ include('@ERP/document_search_product.html.twig') }}
+			{{ include('@ERP/document_search_customer.html.twig') }}
+			{{ include('@ERP/document_calculate_totals.html.twig') }}
+			{{ include('@ERP/document_prepare_json.html.twig') }}
+
+			{{ include('@ERP/document_sales_validation.html.twig') }}
+			{% if id!=0 %}
+			{% set sendRoute=url('ERPSalesBudgetsPrint',{"id": document.code, "mode": "email"}) %}
+			{{ include('@ERP/document_send.html.twig') }}
+			{% endif %}
+
+		<script>
+			function clearFields(fields){
+				fields.forEach(function(element) {
+					$("#"+element).val('');
+				});
+			}
+
+			function unlockFields(){
+				$("#document-button-save").prop("disabled", false);
+				$("#document-body :input").prop("disabled", false);
+			}
+			function lockFields(){
+				$("#document-button-save").prop("disabled", true);
+				$("#document-body :input").prop("disabled", true);
+			}
+
+			$(document).ready(function() {
+					{% if documentReadonly %}
+						lockFields();
+					{% endif %}
+
+					{{ include('@Globale/form_fields_datetime.html.twig') }}
+
+					$('body').on('click', "#document-button-makeorder", function(e) {
+						$.confirm({
+								theme: 'bootstrap',
+						    title: 'Crear pedido',
+						    content: '¿Esta seguro que desea crear un pedido a partir de este presupuesto?',
+						    buttons: {
+									 confirm: { text: 'Confirmar', btnClass: 'btn-red', action: function(){ window.location.href='{{ url('ERPOrderFromSalesBudgets',{"id": document.id}) }}' ;} },
+						       cancel: { text: 'Cancelar' }
+						    }
+						});
+					});
+
+					$('body').on('change', "#customer-form-customergroup-select", function(e) {
+						recalculateDocument();
+					});
+
+					$('body').on('change', "[id^='product-form-code-']", function(e) {
+						if($(this).attr("attr-id")==$("#document-lines").attr("attr-numlines")){
+							$("#product-form-remove-"+$(this).attr("attr-id")).show();
+							addDocumentLine();
+						}
+					});
+
+					$('body').on('focus', "[id^='product-search-button-']", function(e) {
+							$("#product-form-name-"+$(this).attr("attr-id")).focus();
+					});
+
+					$('body').on('click', "[id^='product-form-remove-']", function(e) {
+						removeDocumentLine($(this).attr('attr-id'));
+					});
+
+					$('body').on('change', "[id^='product-form-']", function(e) {
+						if($(this).hasClass("recalculate")){
+							calculateDocumentRow($(this).attr("attr-id"));
+						}
+					});
+
+					{# DOCUMENT SAVE #}
+					$('body').on('click', "#document-button-save", function(e) {
+						if(validate_sales_document())
+							$.ajax({
+				         url: '{{ url('dataERPSalesBudgets', {"id": id}) }}',
+				         type: 'POST',
+				         data: JSON.stringify(prepare_document_json()),
+				         success:  function( data ) {
+									 if((--load_wait)==0) $("#load-spinner").fadeOut();
+				           if(data.result){
+										 $("#document-form-id").val(data.data.id);
+										 $("#document-form-code").val(data.data.code);
+										 $("#document-form-date").val(data.data.date);
+										 jQuery.each(data.data.lines, function(i, line) {
+											 $("#product-form-line-id-"+line.linenum).val(line.id);
+										 });
+										 toastr.success("Documento guardado correctamente", "Confirmación", confirmation);
+										 {% if id==0 %} location.href="/es/ERP/salesbudgets/form/"+data.data.id; {% endif %}
+				           } else {
+										 toastr.error("No se pudo guardar el documento", "Confirmación", confirmation);
+									 }
+				         }
+				       });
+					 });
+
+			});
+
+		</script>
+
+<!-- END MODALS -->
+{% block footer %}
+
+<link rel="stylesheet" href="{{ url('index') }}js/datatables/datatables.css">
+<link rel="stylesheet" href="{{ url('index') }}js/select2/select2-bootstrap.css">
+<link rel="stylesheet" href="{{ url('index') }}js/select2/select2.css">
+<link rel="stylesheet" href="{{ url('index') }}css/custom.css">
+<link rel="stylesheet" href="{{ url('index') }}js/ol/ol.css">
+<link rel="stylesheet" href="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker.min.css">
+<link rel="stylesheet" href="{{ url('index') }}js/jodit/jodit.min.css">
+
+<!-- Imported scripts on this page -->
+<script src="{{ url('index') }}js/datatables/datatables.js"></script>
+<script src="{{ url('index') }}js/select2/select2.min.js"></script>
+<script src="{{ url('index') }}js/moment.min.js"></script>
+<script src="{{ url('index') }}js/moment-es.js"></script>
+<script src="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker-es.js"></script>
+<script src="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker.min.js"></script>
+<script src="{{ url('index') }}js/fileinput.js"></script>
+<script src="{{ url('index') }}js/ol/ol.js"></script>
+ <script src="{{ url('index') }}js/jodit/jodit.min.js"></script>
+	 {{ include('@Globale/bottom.html.twig') }}
+{% endblock %}
+</body>

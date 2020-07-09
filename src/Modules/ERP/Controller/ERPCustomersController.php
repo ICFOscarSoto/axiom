@@ -238,7 +238,7 @@ class ERPCustomersController extends Controller
 	 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 	 $customerRepository=$this->getDoctrine()->getRepository($this->class);
 	 $customerContactsRepository=$this->getDoctrine()->getRepository(ERPContacts::class);
-	 $customer=$customerRepository->findOneBy(['code'=>$id, 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
+	 $customer=$customerRepository->findOneBy(['id'=>$id, 'company'=>$this->getUser()->getCompany(), 'active'=>1, 'deleted'=>0]);
 	 $contacts=$customerContactsRepository->findBy(['customer'=>$customer, 'invoice'=>1, 'active'=>1, 'deleted'=>0]);
 	 $mailadresses=[];
 	 //First mail company

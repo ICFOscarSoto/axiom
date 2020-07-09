@@ -326,3 +326,7 @@ AERPSalesInvoices:
 VehiclesVehicles:
   resource: 'App\Modules\Vehicles\Controller\VehiclesVehiclesController'
   type:      annotation
+
+ERPSalesBudgets:
+  resource: 'App\Modules\ERP\Controller\ERPSalesBudgetsController'
+  type:      annotation

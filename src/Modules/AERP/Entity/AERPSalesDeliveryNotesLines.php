@@ -5,6 +5,7 @@ namespace App\Modules\AERP\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\AERP\Entity\AERPSalesDeliveryNotes;
 use \App\Modules\AERP\Entity\AERPProducts;
+use \App\Modules\AERP\Entity\AERPWarehouseLocations;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\AERP\Repository\AERPSalesDeliveryNotesLinesRepository")
@@ -124,6 +125,11 @@ class AERPSalesDeliveryNotesLines
      * @ORM\Column(type="string", length=20)
      */
     private $code;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\AERP\Entity\AERPWarehouseLocations")
+     */
+    private $location;
 
 
     public function getId(): ?int
@@ -379,6 +385,18 @@ class AERPSalesDeliveryNotesLines
     public function setIrpfunit(float $irpfunit): self
     {
         $this->irpfunit = $irpfunit;
+
+        return $this;
+    }
+
+    public function getLocation(): ?AERPWarehouseLocations
+    {
+        return $this->location;
+    }
+
+    public function setLocation(?AERPWarehouseLocations $location): self
+    {
+        $this->location = $location;
 
         return $this;
     }

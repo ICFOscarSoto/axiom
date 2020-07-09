@@ -64,7 +64,8 @@ class GlobaleCompaniesController extends Controller
 	 					'id' => $id,
 	 					'tab' => $request->query->get('tab','data'), //Show initial tab, by default data tab
 	 					'tabs' => [["name" => "data", "caption"=>"Datos empresa", "icon"=>"entypo-book-open","active"=>true, "route"=>$this->generateUrl("dataCompany",["id"=>$id])],
-	 										 ["name" => "bank", "icon"=>"fa fa-headphones", "caption"=>"Datos bancarios", "route"=>$this->generateUrl("dataCompanyBankAccounts",["identity"=>$id,"id"=>$obj?($obj->getBankaccount()?$obj->getBankaccount()->getId():0):0])],
+	 										 /*["name" => "bank", "icon"=>"fa fa-headphones", "caption"=>"Datos bancarios", "route"=>$this->generateUrl("dataCompanyBankAccounts",["identity"=>$id,"id"=>$obj?($obj->getBankaccount()?$obj->getBankaccount()->getId():0):0])],*/
+											 ["name" => "bank", "caption"=>"Datos bancarios", "icon"=>"fa fa-users", "route"=>$this->generateUrl("generictablist",["module"=>"Globale", "name"=>"BankAccounts", "id"=>$id])],
 											 ["name" => "modules", "caption"=>"Módulos", "icon"=>"fa fa-users", "route"=>$this->generateUrl("generictablist",["module"=>"Globale", "name"=>"CompaniesModules", "id"=>$id])],
 											 ["name" => "files", "icon"=>"fa fa-cloud", "caption"=>"Archivos", "route"=>$this->generateUrl("cloudfiles",["id"=>$id, "path"=>"companies"])],
 											 ["name" => "diskusage", "icon"=>"fa fa-database", "caption"=>"Uso disco", "route"=>$this->generateUrl("diskusage",["id"=>$id])]
@@ -147,7 +148,7 @@ class GlobaleCompaniesController extends Controller
 	  $obj = $repository->findOneBy(['id'=>$id, 'deleted'=>0]);
 	  $entity_name=$obj?$obj->getSocialname().' ('.$obj->getVat().')':'';
 		$tabs =  [["name" => "data", "caption"=>"Datos empresa", "icon"=>"entypo-book-open","active"=>true, "route"=>$this->generateUrl("dataCompanyAdmin",["id"=>$id])],
-							 ["name" => "bank", "icon"=>"fa fa-headphones", "caption"=>"Datos bancarios", "route"=>$this->generateUrl("dataMyCompanyBankAccounts",["identity"=>$id,"id"=>$obj?($obj->getBankaccount()?$obj->getBankaccount()->getId():0):0])],
+							 ["name" => "bank", "caption"=>"Datos bancarios", "icon"=>"fa fa-users", "route"=>$this->generateUrl("generictablist",["module"=>"Globale", "name"=>"BankAccounts", "id"=>$id])],
 							 ["name" => "autocloseclocks", "icon"=>"fa fa-clocks", "caption"=>"Cierre Jornada", "route"=>$this->generateUrl("generictablist",["module"=>"HR", "name"=>"AutoCloseClocks", "id"=>$id])]
 						 ];
 

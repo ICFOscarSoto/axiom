@@ -19,6 +19,43 @@ class AERPWarehouseLocationsRepository extends ServiceEntityRepository
         parent::__construct($registry, AERPWarehouseLocations::class);
     }
 
+    private function arrayToObject(array $array, $className) {
+      return unserialize(sprintf(
+          'O:%d:"%s"%s',
+          strlen($className),
+          $className,
+          strstr(serialize($array), ':')
+      ));
+    }
+
+    /**
+    * @return AERPWarehouseLocations[] Returns an array of AERPWarehouseLocations objects
+    */
+
+    public function findNotUsedByProduct($id, $user)
+    {
+      $query="SELECT wl.id FROM AERPWarehouse_locations wl
+	      LEFT JOIN AERPWarehouses w ON wl.warehouse_id=w.id
+	      LEFT JOIN AERPProducts_stocks s ON wl.id=s.location_id
+	      LEFT JOIN AERPProducts p ON s.product_id=p.id
+	      WHERE w.company_id=:company AND p.id=:product AND w.active=1 AND w.deleted=0 AND s.active=1 AND s.deleted=0";
+
+        $params=['company' => $user->getCompany()->getId(), 'product' => $id];
+        $result=$this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+        foreach($result as $key=>$item){
+          $ids[]=$item['id'];
+        }
+        $qb= $this->getEntityManager()->createQueryBuilder();
+        $linked = $qb->select('wl')
+                   ->from('\App\Modules\AERP\Entity\AERPWarehouseLocations', 'wl')
+                   ->where($qb->expr()->notIn('wl.id', implode(',',$ids)).' AND wl.active=1 AND wl.deleted=0')
+                   ->getQuery()
+                   ->getResult();
+        return $linked;
+    }
+
+
+
     // /**
     //  * @return AERPWarehouseLocations[] Returns an array of AERPWarehouseLocations objects
     //  */
