@@ -35,9 +35,9 @@ class AERPWarehouseLocationsRepository extends ServiceEntityRepository
     public function findNotUsedByProduct($id, $user)
     {
       $query="SELECT wl.id FROM aerpwarehouse_locations wl
-	      LEFT JOIN AERPWarehouses w ON wl.warehouse_id=w.id
-	      LEFT JOIN AERPProducts_stocks s ON wl.id=s.location_id
-	      LEFT JOIN AERPProducts p ON s.product_id=p.id
+	      LEFT JOIN aerpwarehouses w ON wl.warehouse_id=w.id
+	      LEFT JOIN aerpproducts_stocks s ON wl.id=s.location_id
+	      LEFT JOIN aerpproducts p ON s.product_id=p.id
 	      WHERE w.company_id=:company AND p.id=:product AND w.active=1 AND w.deleted=0 AND s.active=1 AND s.deleted=0";
 
         $params=['company' => $user->getCompany()->getId(), 'product' => $id];
