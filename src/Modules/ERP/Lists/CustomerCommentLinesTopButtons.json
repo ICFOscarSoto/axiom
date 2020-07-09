@@ -1,5 +1,5 @@
 [
-  {"id" : "addTopCustomerCommentLines", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"genericdatatab", "routeParams":{"module":"ERP", "name":"CustomerCommentLines", "type":"modal", "idparent":"id" }, "modal":"CustomerCommentLines", "actionType" : "background", "confirm" :false, "tooltip" : ""},
+  {"id" : "addTopCustomerCommentLines", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"dataCustomerCommentLines", "routeParams":{"type":"modal", "idparent":"id","type_comment":"0"}, "modal":"CustomerCommentLines", "actionType" : "background", "confirm" :false, "tooltip" : ""},
   {"id" : "deleteTopCustomerCommentLines", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true, "tooltip":""},
   {"id" : "printTopCustomerCommentLines", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false, "tooltip":""},
   {"id" : "exportTopCustomerCommentLines", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"genericexport", "routeParams":{"module":"ERP", "name":"CustomerCommentLines"}, "confirm" :false, "tooltip":""}

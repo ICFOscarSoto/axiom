@@ -165,7 +165,7 @@ class ERPCustomersController extends Controller
 					'id_object' => $id,
 					'form' => $formUtils->formatForm('customers', true, $id, $this->class, "dataCustomers"),
 					'listCustomerSpecialConditions' => $listCustomerSpecialConditions->formatListByCustomer($id),
-					'listCustomersCommentLines' => $listCustomersCommentLines->formatListByCustomer($id),
+					'listCustomersCommentLines' => $listCustomersCommentLines->formatListByCustomerType($id,0),
 					'forms' => $forms
 				));
 

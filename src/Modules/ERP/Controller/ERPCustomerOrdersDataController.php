@@ -43,16 +43,9 @@ class ERPCustomerOrdersDataController extends Controller
 		$formUtilsCustomerOrdersData = new ERPCustomerOrdersDataUtils();
 		$formUtils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),$formUtilsCustomerOrdersData->getExcludedForm([]),$formUtilsCustomerOrdersData->getIncludedForm(["doctrine"=>$this->getDoctrine(), "user"=>$this->getUser(), "id"=>$this_id, "parent" => $id]));
 
-		/*CUSTOMER COMMENTS*/
 
-		/*orders*/
 		$listCustomerCommentLines = new ERPCustomerCommentLinesUtils();
-		$formUtilsCustomerCommentLines = new GlobaleFormUtils();
-		$formUtilsCustomerCommentLines->initialize($this->getUser(), new ERPCustomerCommentLines(), dirname(__FILE__)."/../Forms/CustomerCommentLines.json", $request, $this, $this->getDoctrine(),$listCustomerCommentLines->getExcludedForm([]),$listCustomerCommentLines->getIncludedForm(["doctrine"=>$this->getDoctrine(), "user"=>$this->getUser(),"id"=>$this_id, "parent"=>$customer]));
-		$listCustomerCommentLines->getIncludedForm(["doctrine"=>$this->getDoctrine(), "user"=>$this->getUser(),"id"=>$this_id, "parent"=>$customer, "type"=>1]);
-		$forms[]=$formUtilsCustomerCommentLines->formatForm('CustomerCommentLines', true, null, ERPCustomerCommentLines::class);
-
-
+		$list=$listCustomerCommentLines->formatListByCustomerTypeOrdersData(1,$id);
 		return $this->render('@ERP/customerordersdata.html.twig', array(
 			'controllerName' => 'customerOrdersDataController',
 			'interfaceName' => 'Clientes',
@@ -62,8 +55,8 @@ class ERPCustomerOrdersDataController extends Controller
 			'parent' => $id,
 		/*	'id_object' => $id,*/
 			'form' => $formUtils->formatForm('CustomerOrdersData', true, $this_id, $this->class),
-			'customerorderscommentlineslist' => $listCustomerCommentLines->formatListByCustomerType($id,1),
-			'forms' => $forms,
+			'customerorderscommentlineslist' => $list,/*,
+			'forms' => $forms,*/
 		/*	'forms2' => $forms2,*/
 			'include_footer' => [["type"=>"css", "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.css"],
 													 ["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.js"],
