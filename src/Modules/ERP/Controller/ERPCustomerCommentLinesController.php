@@ -114,7 +114,6 @@ class ERPCustomerCommentLinesController extends Controller
 		 $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),
 															method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
 		 if($id==0) $utils->values(["customer"=>$parent,"type"=>$type_comment]);
-		 dump($utils);
 		 return $utils->make($id, $this->class, $action, "formCustomerCommentLinesOrdersData", "modal");
 		}
 
