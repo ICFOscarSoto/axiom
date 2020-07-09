@@ -2,7 +2,9 @@
 
 namespace App\Modules\AERP\Repository;
 
+use App\Modules\AERP\Entity\AERPWarehouses;
 use App\Modules\AERP\Entity\AERPWarehouseLocations;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
@@ -47,12 +49,23 @@ class AERPWarehouseLocationsRepository extends ServiceEntityRepository
           $ids[]=$item['id'];
         }
         $qb= $this->getEntityManager()->createQueryBuilder();
-        $linked = $qb->select('wl')
+        if(count($ids)==0){
+          $linked = $qb->select('wl')
                    ->from('\App\Modules\AERP\Entity\AERPWarehouseLocations', 'wl')
-                   ->where($qb->expr()->notIn('wl.id', implode(',',$ids)).' AND wl.active=1 AND wl.deleted=0')
-                   ->getQuery()
-                   ->getResult();
-        return $linked;
+                   ->where('wl.active=1 AND wl.deleted=0 AND w.company=:company')
+                   ->leftJoin("wl.warehouse", "w");
+          $qb->setParameters(array('company' => $user->getCompany()->getId()));
+
+        }else{ $linked = $qb->select('wl')
+                   ->from('\App\Modules\AERP\Entity\AERPWarehouseLocations', 'wl')
+                   ->where($qb->expr()->notIn('wl.id', implode(',',$ids)).' AND wl.active=1 AND wl.deleted=0  AND  w.company=:company')
+                    ->leftJoin("wl.warehouse", "w");
+         $qb->setParameters(array('company' => $user->getCompany()));
+        }
+
+        $query = $qb->getQuery();
+        return $query->getResult();
+
     }
 
 
