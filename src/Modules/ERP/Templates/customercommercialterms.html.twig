@@ -21,19 +21,23 @@
 		<input type="hidden" id="post-url" name="post-url" value="{{ url('dataCustomerCommercialTerms',{'id': formConstructor.id_object, 'parent': parent,  'action':'save'}) }}">
 		<input type="hidden" id="id-object" name="id-object" value="{{ formConstructor.id_object }}">
 		{{ form_row(formConstructor.form['_token']) }}
+		<div class="row">
+			<div class="col-md-2">
+	    	{{ form_row(formConstructor.form['customergroup']) }}
+	    </div>
+	    <div class="col-md-2">
+	      {{ form_row(formConstructor.form['additionaldiscount']) }}
+	    </div>
+		</div>
 	<div class="row">
 		<div class="col-md-2">
-    	{{ form_row(formConstructor.form['customergroup']) }}
-    </div>
-    <div class="col-md-2">
-      {{ form_row(formConstructor.form['allowlinediscount']) }}
-    </div>
-    <div class="col-md-2">
-      {{ form_row(formConstructor.form['additionaldiscount']) }}
-    </div>
-    <div class="col-md-2">
-      {{ form_row(formConstructor.form['surchage']) }}
-    </div>
+			  {{ form_row(formConstructor.form['allowlinediscount']) }}
+		</div>
+		<div class="col-md-2">
+			{{ form_row(formConstructor.form['surchage']) }}
+		</div>
+	</div>
+	<div class="row">
 		<div class="col-md-2">
 			{{ form_row(formConstructor.form['insured']) }}
 		</div>
@@ -46,7 +50,6 @@
 		</div>
   </div>
 </div>
-
 <div class="row">
 	<div style="text-align: right;" class="col-md-12">
 		<button attr-id="" attr-action="" id="{{formConstructor.name}}-button-cancel" type="button" class="btn btn">{{ ("Cancelar")|trans }}</button>
