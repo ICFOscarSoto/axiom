@@ -5,6 +5,7 @@ namespace App\Modules\AERP\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\AERP\Entity\AERPWarehouses;
 use \App\Modules\Globale\Entity\GlobaleUsers;
+use \App\Modules\Globale\Entity\GlobaleCompanies;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\AERP\Repository\AERPWarehouseLocationsRepository")
@@ -59,6 +60,12 @@ class AERPWarehouseLocations
      * @ORM\JoinColumn(nullable=false)
      */
     private $author;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCompanies")
+     * @ORM\JoinColumn(nullable=true)
+     */
+    private $company;
 
     public function getId(): ?int
     {
@@ -157,6 +164,18 @@ class AERPWarehouseLocations
     public function setAuthor(?GlobaleUsers $author): self
     {
         $this->author = $author;
+
+        return $this;
+    }
+
+    public function getCompany(): ?GlobaleCompanies
+    {
+        return $this->company;
+    }
+
+    public function setCompany(?GlobaleCompanies $company): self
+    {
+        $this->company = $company;
 
         return $this;
     }
