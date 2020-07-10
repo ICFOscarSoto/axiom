@@ -46,6 +46,11 @@ class ERPCustomerOrdersDataController extends Controller
 
 		$listCustomerCommentLines = new ERPCustomerCommentLinesUtils();
 		$list=$listCustomerCommentLines->formatListByCustomerTypeOrdersData(1,$id);
+
+		$formUtils2=new GlobaleFormUtils();
+		$formUtils2->initialize($this->getUser(), ERPCustomerCommentLines::class, dirname(__FILE__)."/../Forms/CustomerCommentLinesOrdersData.json", $request, $this, $this->getDoctrine());
+		$templateForms[]=$formUtils2->formatForm('CustomerCommentLinesOrdersData', true, null, ERPCustomerCommentLines::class);
+
 		return $this->render('@ERP/customerordersdata.html.twig', array(
 			'controllerName' => 'customerOrdersDataController',
 			'interfaceName' => 'Clientes',
@@ -55,8 +60,8 @@ class ERPCustomerOrdersDataController extends Controller
 			'parent' => $id,
 		/*	'id_object' => $id,*/
 			'form' => $formUtils->formatForm('CustomerOrdersData', true, $this_id, $this->class),
-			'customerorderscommentlineslist' => $list,/*,
-			'forms' => $forms,*/
+			'customerorderscommentlineslist' => $list,
+			'forms' => $templateForms,
 		/*	'forms2' => $forms2,*/
 			'include_footer' => [["type"=>"css", "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.css"],
 													 ["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.js"],

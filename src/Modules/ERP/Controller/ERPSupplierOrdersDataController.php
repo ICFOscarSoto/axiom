@@ -45,21 +45,23 @@ class ERPSupplierOrdersDataController extends Controller
 
 		/*SUPPLIER COMMENTS*/
 
-		/*orders*/
-		$listSupplierCommentLines = new ERPSupplierCommentLinesUtils();
-		$formUtilsSupplierCommentLines = new GlobaleFormUtils();
-		$formUtilsSupplierCommentLines->initialize($this->getUser(), new ERPSupplierCommentLines(), dirname(__FILE__)."/../Forms/SupplierCommentLines.json", $request, $this, $this->getDoctrine(),$listSupplierCommentLines->getExcludedForm([]),$listSupplierCommentLines->getIncludedForm(["doctrine"=>$this->getDoctrine(), "user"=>$this->getUser(),"id"=>$id, "parent"=>$supplier]));
-		$listSupplierCommentLines->getIncludedForm(["doctrine"=>$this->getDoctrine(), "user"=>$this->getUser(),"id"=>$id, "parent"=>$supplier, "type"=>1]);
-		$forms[]=$formUtilsSupplierCommentLines->formatForm('SupplierCommentLines', true, null, ERPSupplierCommentLines::class);
-
 		/*rappel*/
-/*
-		$listSupplierRappelCommentLines = new ERPSupplierCommentLinesUtils();
-		$formUtilsSupplierRappelCommentLines = new GlobaleFormUtils();
-		$formUtilsSupplierRappelCommentLines->initialize($this->getUser(), new ERPSupplierCommentLines(), dirname(__FILE__)."/../Forms/SupplierCommentLines.json", $request, $this, $this->getDoctrine(),$listSupplierRappelCommentLines->getExcludedForm([]),$listSupplierRappelCommentLines->getIncludedForm(["doctrine"=>$this->getDoctrine(), "user"=>$this->getUser(),"id"=>$id, "parent"=>$supplier, "type"=>"3"]));
-		$listSupplierRappelCommentLines->getIncludedForm(["doctrine"=>$this->getDoctrine(), "user"=>$this->getUser(),"id"=>$id, "parent"=>$supplier, "type"=>3]);
-		$forms[]=$formUtilsSupplierOrdersCommentLines->formatForm('SupplierCommentLines', true, null, ERPSupplierCommentLines::class);
-*/
+
+		$listSupplierCommentLines = new ERPSupplierCommentLinesUtils();
+		$formUtils2=new GlobaleFormUtils();
+		$formUtils2->initialize($this->getUser(), ERPSupplierCommentLines::class, dirname(__FILE__)."/../Forms/SupplierCommentLinesOrdersData.json", $request, $this, $this->getDoctrine());
+		$templateForms[]=$formUtils2->formatForm('SupplierCommentLinesOrdersData', true, null, ERPSupplierCommentLines::class);
+
+
+		$listSupplierCommentLinesRappel = new ERPSupplierCommentLinesUtils();
+	  $formUtils3=new GlobaleFormUtils();
+	  $formUtils3->initialize($this->getUser(), ERPSupplierCommentLines::class, dirname(__FILE__)."/../Forms/SupplierCommentLinesOrdersDataRappel.json", $request, $this, $this->getDoctrine());
+		$templateForms[]=$formUtils3->formatForm('SupplierCommentLinesOrdersDataRappel', true, null, ERPSupplierCommentLines::class);
+
+
+
+
+
 		return $this->render('@ERP/supplierordersdata.html.twig', array(
 			'controllerName' => 'supplierOrdersDataController',
 			'interfaceName' => 'Proveedores',
@@ -67,20 +69,13 @@ class ERPSupplierOrdersDataController extends Controller
 			'userData' => $userdata,
 			'id' => $this_id,
 			'parent' => $id,
-		/*	'id_object' => $id,*/
 			'form' => $formUtils->formatForm('SupplierOrdersData', true, $this_id, $this->class),
-			'supplierordercommentslist' => $listSupplierCommentLines->formatListBySupplierType($id,1),
-			'supplierrappelcommentslist' => $listSupplierCommentLines->formatListBySupplierType($id,3),
-			'forms' => $forms,
-		/*	'forms2' => $forms2,*/
+			'suppliercommentsordersdatalist' => $listSupplierCommentLines->formatListBySupplierTypeOrdersData(1,$id),
+			'supplierrappelcommentssordersdatalist'=> $listSupplierCommentLines->formatListBySupplierTypeOrdersDataRappel(3,$id),
+			'forms' => $templateForms,
 			'include_footer' => [["type"=>"css", "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.css"],
 													 ["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.js"],
 													 ["type"=>"js",  "path"=>"/js/jquery.nestable.js"]]
-			/*,
-			'listSuppliersPrices' => $listCustomersPrices->formatListByCustomer($id),
-			'listCustomersCommentLines' => $listCustomersCommentLines->formatListByCustomer($id)
-			//'forms' => $forms
-			*/
 		));
   }
 

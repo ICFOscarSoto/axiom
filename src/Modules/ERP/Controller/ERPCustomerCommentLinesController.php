@@ -35,7 +35,6 @@ class ERPCustomerCommentLinesController extends Controller
    	 $repository = $manager->getRepository($this->class);
    	 $listUtils=new GlobaleListUtils();
    	 $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/CustomerCommentLines.json"),true);
-
    	 $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, ERPCustomerCommentLines::class,[["type"=>"and", "column"=>"customer", "value"=>$customerid],["type"=>"and", "column"=>"type", "value"=>$type]]);
 		 return new JsonResponse($return);
     }
@@ -43,7 +42,7 @@ class ERPCustomerCommentLinesController extends Controller
 		/**
 		* @Route("/api/customercommentlinesordersdata/list/{customerid}/{type}", name="customercommentlinesordersdatalist")
 		*/
-		public function customercommentlineslistordersdata(RouterInterface $router,Request $request, $customerid, $type){
+		public function customercommentlinesordersdatalist(RouterInterface $router,Request $request, $customerid, $type){
 			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		 $user = $this->getUser();
 		 $locale = $request->getLocale();
@@ -58,9 +57,9 @@ class ERPCustomerCommentLinesController extends Controller
 		}
 
 		/**
-		 * @Route("/{_locale}/customercommentlines/data/{id}/{action}/{idparent}/{type}/{type_comment}", name="dataCustomerCommentLines", defaults={"id"=0, "idparent"="0", "type"="modal", "action"="read", "type_comment"="0"})
+		 * @Route("/{_locale}/customercommentlines/data/{id}/{action}/{idparent}/{type_comment}", name="dataCustomerCommentLines", defaults={"id"=0, "idparent"="0", "action"="read", "type_comment"="0"})
 		 */
-		 public function data($id, $idparent, $type, $type_comment, $action, Request $request){
+		 public function data($id, $idparent, $type_comment, $action, Request $request){
 		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		 $class="\App\Modules\ERP\Entity\ERPCustomerCommentLines";
 		 $utils = new GlobaleFormUtils();
@@ -82,13 +81,13 @@ class ERPCustomerCommentLinesController extends Controller
 
  		 $utils = new GlobaleFormUtils();
 		 $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),
-	 		 												method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
+	 		 												method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[],null,["idparent"=>$idparent,"action"=>$action,"type_comment"=>$type_comment]);
 		 if($id==0) $utils->values(["customer"=>$parent,"type"=>$type_comment]);
-		 return $utils->make($id, $this->class, $action, "formCustomerCommentLines", "modal");
+		 return $utils->make($id, $this->class, $action, "CustomerCommentLines", "modal");
 		}
 
 		/**
-		 * @Route("/{_locale}/customercommentlines/dataOrdersData/{id}/{action}/{idparent}/{type}/{type_comment}", name="dataCustomerCommentLinesOrdersData", defaults={"id"=0, "idparent"="0", "type"="modal", "action"="read", "type_comment"="0"})
+		 * @Route("/{_locale}/customercommentlines/dataOrdersData/{id}/{action}/{idparent}/{type}/{type_comment}", name="dataCustomerCommentLinesOrdersData", defaults={"id"=0, "idparent"="0", "type"="modal", "action"="read", "type_comment"="1"})
 		 */
 		 public function dataOrdersData($id, $idparent, $type, $type_comment, $action, Request $request){
 		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
@@ -112,9 +111,9 @@ class ERPCustomerCommentLinesController extends Controller
 
 		 $utils = new GlobaleFormUtils();
 		 $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),
-															method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
+															method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[],null,["idparent"=>$idparent,"action"=>$action,"type_comment"=>$type_comment]);
 		 if($id==0) $utils->values(["customer"=>$parent,"type"=>$type_comment]);
-		 return $utils->make($id, $this->class, $action, "formCustomerCommentLinesOrdersData", "modal");
+		 return $utils->make($id, $this->class, $action, "CustomerCommentLinesOrdersData", "modal");
 		}
 
 
