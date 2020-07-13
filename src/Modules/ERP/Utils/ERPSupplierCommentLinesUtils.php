@@ -81,6 +81,22 @@ class ERPSupplierCommentLinesUtils
   }
 
 
+  public function formatListBySupplierTypeIncidents($type,$parent){;
+    $list=[
+      'id' => 'list'.$this->name.$type,
+      'route' => 'suppliercommentlinesincidentslist',
+      'routeParams' => ["supplierid" => $parent, "type"=>$type],
+      'orderColumn' => 1,
+      'orderDirection' => 'ASC',
+      'tagColumn' => 1,
+      'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/SupplierCommentLinesIncidents.json"),true),
+      'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/SupplierCommentLinesIncidentsFieldButtons.json"),true),
+      'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/SupplierCommentLinesIncidentsTopButtons.json"),true)
+    ];
+    return $list;
+  }
+
+
 
   public function formatList($user){
     $list=[

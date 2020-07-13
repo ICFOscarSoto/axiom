@@ -1,0 +1,9 @@
+[
+  {"id" : "addTopSupplierCommentLinesIncidents", "type" : "btn-primary", "icon" : "fa fa-plus",
+    "name" : "", "route":"dataSupplierCommentLinesIncidents",
+    "routeParams":{"idparent":"parent","type_comment":"2"},
+    "modal":"SupplierCommentLinesIncidents", "actionType" : "background", "confirm" :false, "tooltip" : ""},
+  {"id" : "deleteTopSupplierCommentLinesIncidents", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true, "tooltip":""},
+  {"id" : "printTopSupplierCommentLinesIncidents", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false, "tooltip":""},
+  {"id" : "exportTopSupplierCommentLinesIncidents", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"genericexport", "routeParams":{"module":"ERP", "name":"SupplierCommentLines"}, "confirm" :false, "tooltip":""}
+]

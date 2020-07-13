@@ -117,6 +117,8 @@ class ERPSuppliersController extends Controller
 												["name" => "bankaccounts", "icon"=>"fa fa-money", "caption"=>"Bank Accounts", "route"=>$this->generateUrl("bankaccounts",["id"=>$id])],
 												["name"=>"prices", "icon"=>"fa fa-money", "caption"=>"Shopping Discounts","route"=>$this->generateUrl("generictablist",["module"=>"ERP", "name"=>"ShoppingDiscounts", "id"=>$id])],
 												["name"=>"increments", "icon"=>"fa fa-money", "caption"=>"Increments","route"=>$this->generateUrl("generictablist",["module"=>"ERP", "name"=>"Increments", "id"=>$id])],
+												["name" => "incidents", "icon"=>"fa fa-money", "caption"=>"Incidents", "route"=>$this->generateUrl("supplierincidents",["id"=>$id])],
+
 
 											],
 									));
