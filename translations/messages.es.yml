@@ -518,7 +518,9 @@ Budgets: Presupuestos
 Orders: Pedidos
 SalesOrders: Pedidos
 DeliveryNotes: Albaranes
+SalesDeliveryNotes: Albaranes
 Invoices: Facturas
+Invoice: Factura
 SalesInvoices: Facturas
 Customer: Cliente
 Search: Buscar
@@ -538,6 +540,19 @@ Shadow color: Color sombreado
 Overownbankaccountaccount: Cuenta propia
 Overownbankaccount: Sobre cuenta propia
 Overcustomerbankaccount: Sobre cuenta cliente
+Payments: Ingresos
+Amount: Cantidad
+Amountpending: Pendiente
+Amountsatisfied: Satisfecho
+Relationdoc: Relación documento
+Saleorder: Pedido
+Salebudget: Presupuesto
+Saledeliverynote: Albarán
+Saleinvoice: Factura
+Select aerpsalesorders: Seleccionar pedido
+Select aerpsalesinvoices: Seleccionar factura
+Document: Documento
+Concept: Concepto
 
 # VEHICLES
 #----------------------------------------------------------------------------------------------------------------------
