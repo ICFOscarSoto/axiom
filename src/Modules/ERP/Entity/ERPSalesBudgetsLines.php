@@ -33,12 +33,12 @@ class ERPSalesBudgetsLines
     /**
      * @ORM\Column(type="float")
      */
-    private $unitprice;
+    private $unitprice=0;
 
     /**
      * @ORM\Column(type="float")
      */
-    private $quantity=0;
+    private $quantity=1;
 
     /**
      * @ORM\Column(type="float")
@@ -73,12 +73,12 @@ class ERPSalesBudgetsLines
     /**
      * @ORM\Column(type="float")
      */
-    private $subtotal;
+    private $subtotal=0;
 
     /**
      * @ORM\Column(type="float")
      */
-    private $total;
+    private $total=0;
 
     /**
      * @ORM\Column(type="boolean")
@@ -108,12 +108,12 @@ class ERPSalesBudgetsLines
     /**
      * @ORM\Column(type="float")
      */
-    private $dtoperc;
+    private $dtoperc=0;
 
     /**
      * @ORM\Column(type="float")
      */
-    private $dtounit;
+    private $dtounit=0;
 
     /**
      * @ORM\Column(type="integer")
@@ -128,7 +128,7 @@ class ERPSalesBudgetsLines
     /**
      * @ORM\Column(type="float")
      */
-    private $cost;
+    private $cost=0;
 
     public function getId(): ?int
     {

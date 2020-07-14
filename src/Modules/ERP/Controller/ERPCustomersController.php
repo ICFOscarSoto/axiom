@@ -239,6 +239,7 @@ class ERPCustomersController extends Controller
 	 $customerRepository=$this->getDoctrine()->getRepository($this->class);
 	 $customerContactsRepository=$this->getDoctrine()->getRepository(ERPContacts::class);
 	 $customer=$customerRepository->findOneBy(['id'=>$id, 'company'=>$this->getUser()->getCompany(), 'active'=>1, 'deleted'=>0]);
+	 if(!$customer) $customer=$customerRepository->findOneBy(['code'=>$id, 'company'=>$this->getUser()->getCompany(), 'active'=>1, 'deleted'=>0]);
 	 $contacts=$customerContactsRepository->findBy(['customer'=>$customer, 'invoice'=>1, 'active'=>1, 'deleted'=>0]);
 	 $mailadresses=[];
 	 //First mail company

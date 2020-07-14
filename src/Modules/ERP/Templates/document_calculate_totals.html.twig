@@ -28,6 +28,7 @@
       tax=isNaN(tax)?0:tax;
       surcharge=isNaN(surcharge)?0:surcharge;
       irpf=isNaN(irpf)?0:irpf;
+			irpfperc=isNaN(irpfperc)?0:irpfperc;
       var subtotal=price*quantity;
       $("#product-form-base-total-"+id).val(subtotal);
       var disccounttotal=subtotal*disccount/100;
@@ -36,7 +37,7 @@
       var irpftotal=(subtotal*irpfperc/100).toFixed(2);
       var surchargetotal=(subtotal*surcharge/100).toFixed(2);
       var total=parseFloat(subtotal)+parseFloat(taxtotal)+parseFloat(irpftotal)+parseFloat(surchargetotal);
-      $("#product-form-disccount-total-"+id).val(disccounttotal);
+      $("#product-form-disccount-total-"+id).val(isNaN(disccounttotal)?0:disccounttotal);
       $("#product-form-tax-total-"+id).val(taxtotal);
       $("#product-form-irpf-total-"+id).val(irpftotal);
       $("#product-form-surcharge-total-"+id).val(surchargetotal);

@@ -458,7 +458,9 @@ class GlobaleFormUtils extends Controller
                   'choice_label' => function($obj, $key, $index) {
                       if(method_exists($obj, "getLastname"))
                         return $obj->getLastname().", ".$obj->getName();
-                      else if(method_exists($obj, "getName")) return $obj->getName(); else return '';
+                      else if(method_exists($obj, "getName")) return $obj->getName(); else
+                        if(method_exists($obj, "getCode")) return $obj->getCode();
+                      return '';
                   },
                   'choice_attr' => function($obj, $key, $index) {
                       return ['class' => $obj->getId()];
