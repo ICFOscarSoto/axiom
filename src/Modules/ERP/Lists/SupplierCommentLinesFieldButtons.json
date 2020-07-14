@@ -1,5 +1,5 @@
 [
-  {"id": "editSupplierCommentLines", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"genericdata", "routeParams":{"module":"ERP", "name":"SupplierCommentLines", "type":"modal" }, "modal":"SupplierCommentLines", "actionType" : "background", "confirm" :false, "tooltip":""},
+  {"id": "editSupplierCommentLines", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"dataSupplierCommentLines", "routeParams":{"idparent":"id","type_comment":"0"}, "modal":"SupplierCommentLines", "actionType" : "background", "confirm" :false, "tooltip" : ""},
   {"id": "activation", "type": "option", "options": [
       {"id": "desactivateSupplierCommentLines", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"genericdisable", "routeParams":{"module":"ERP", "name":"SupplierCommentLines"}, "confirm" :true, "actionType" : "background", "tooltip":"" },
       {"id": "activateSupplierCommentLines", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "route":"genericenable", "routeParams":{"module":"ERP", "name":"SupplierCommentLines"}, "confirm" :true, "actionType" : "background", "tooltip":"" }

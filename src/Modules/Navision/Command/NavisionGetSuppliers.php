@@ -333,6 +333,8 @@ class NavisionGetSuppliers extends ContainerAwareCommand
     public function importSupplierComment(InputInterface $input, OutputInterface $output){
       //------   Create Lock Mutex    ------
       $fp = fopen('/tmp/axiom-NavisionGetSuppliers-importSupplierComment.lock', 'c');
+      //$fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-NavisionGetSuppliers-importSupplierComment.lock', 'c');
+
       if (!flock($fp, LOCK_EX | LOCK_NB)) {
         $output->writeln('* Fallo al iniciar la sincronizacion de comentarios de proveedores: El proceso ya esta en ejecución.');
         exit;
@@ -354,15 +356,18 @@ class NavisionGetSuppliers extends ContainerAwareCommand
       //Disable SQL logger
       $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
 
+
       foreach ($objects["class"] as $key=>$object){
         $supplier=$repositorySuppliers->findOneBy(["code"=>$object["entity"]]);
         if($object["comment"]!="" AND $supplier!=NULL)
         {
+          $output->writeln($supplier->getName().'  - '.$object["entity"]);
           //comentarios generales del proveedor (type=0)
           if($object["code"]=="")
           {
               $output->writeln($supplier->getName().'  - '.$object["entity"]);
               $obj=$repository->findOneBy(["comment"=>$object["comment"]]);
+
               if ($obj==null) {
                 $obj=new ERPSupplierCommentLines();
                 //$company=$repositoryCompanies->find(2);
@@ -464,25 +469,30 @@ class NavisionGetSuppliers extends ContainerAwareCommand
 
         }
 
+
       }
-      $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"suppliercomments"]);
-      if ($navisionSync==null) {
-        $navisionSync=new NavisionSync();
-        $navisionSync->setEntity("suppliercomments");
-      }
-      $navisionSync->setLastsync($datetime);
-      $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
-      $this->doctrine->getManager()->persist($navisionSync);
-      $this->doctrine->getManager()->flush();
-      //------   Critical Section END   ------
-      //------   Remove Lock Mutex    ------
-      fclose($fp);
+
     }
+
+    $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"suppliercomments"]);
+    if ($navisionSync==null) {
+      $navisionSync=new NavisionSync();
+      $navisionSync->setEntity("suppliercomments");
+    }
+    $navisionSync->setLastsync($datetime);
+    $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
+    $this->doctrine->getManager()->persist($navisionSync);
+    $this->doctrine->getManager()->flush();
+    //------   Critical Section END   ------
+    //------   Remove Lock Mutex    ------
+    fclose($fp);
   }
 
     public function importSupplierContact(InputInterface $input, OutputInterface $output){
       //------   Create Lock Mutex    ------
       $fp = fopen('/tmp/axiom-NavisionGetSuppliers-importSupplierContact.lock', 'c');
+    //  $fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-NavisionGetSuppliers-importSupplierContact.lock', 'c');
+
       if (!flock($fp, LOCK_EX | LOCK_NB)) {
         $output->writeln('* Fallo al iniciar la sincronizacion de contactos de proveedores: El proceso ya esta en ejecución.');
         exit;

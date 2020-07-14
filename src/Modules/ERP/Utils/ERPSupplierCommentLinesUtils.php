@@ -11,16 +11,6 @@ class ERPSupplierCommentLinesUtils
 {
   private $module="ERP";
   private $name="SupplierCommentLines";
-  public function getExcludedForm($params){
-    return [];
-  }
-
-  public function getIncludedForm($params){
-    $doctrine=$params["doctrine"];
-    $id=$params["id"];
-    $user=$params["user"];
-    return [];
-  }
 
   public function formatListBySupplier($supplier){
     $list=[
@@ -46,20 +36,9 @@ class ERPSupplierCommentLinesUtils
 
   public function formatListBySupplierType($supplier,$type){
     $list=[
-      'id' => 'list'.$this->name,
-      'type' => $type,
+      'id' => 'list'.$this->name.$type,
       'route' => 'suppliercommentlineslist',
       'routeParams' => ["supplierid" => $supplier, "type"=>$type],
-      /*
-      'routeParams' => ["module" => $this->module,
-                        "name" => $this->name,
-                        "parent" => $supplier,
-                        'type' => $type,
-                        "field" => "supplier",
-                        "parentModule" => "ERP",
-                        "parentName" => "Suppliers"
-                      ],
-      */
       'orderColumn' => 1,
       'orderDirection' => 'ASC',
       'tagColumn' => 1,
@@ -70,7 +49,54 @@ class ERPSupplierCommentLinesUtils
     return $list;
   }
 
-  
+  public function formatListBySupplierTypeOrdersData($type,$parent){;
+    $list=[
+      'id' => 'list'.$this->name.$type,
+      'route' => 'suppliercommentlinesordersdatalist',
+      'routeParams' => ["supplierid" => $parent, "type"=>$type],
+      'orderColumn' => 1,
+      'orderDirection' => 'ASC',
+      'tagColumn' => 1,
+      'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/SupplierCommentLinesOrdersData.json"),true),
+      'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/SupplierCommentLinesOrdersDataFieldButtons.json"),true),
+      'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/SupplierCommentLinesOrdersDataTopButtons.json"),true)
+    ];
+    return $list;
+  }
+
+
+  public function formatListBySupplierTypeOrdersDataRappel($type,$parent){;
+    $list=[
+      'id' => 'list'.$this->name.$type,
+      'route' => 'suppliercommentlinesordersdatarappellist',
+      'routeParams' => ["supplierid" => $parent, "type"=>$type],
+      'orderColumn' => 1,
+      'orderDirection' => 'ASC',
+      'tagColumn' => 1,
+      'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/SupplierCommentLinesOrdersDataRappel.json"),true),
+      'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/SupplierCommentLinesOrdersDataRappelFieldButtons.json"),true),
+      'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/SupplierCommentLinesOrdersDataRappelTopButtons.json"),true)
+    ];
+    return $list;
+  }
+
+
+  public function formatListBySupplierTypeIncidents($type,$parent){;
+    $list=[
+      'id' => 'list'.$this->name.$type,
+      'route' => 'suppliercommentlinesincidentslist',
+      'routeParams' => ["supplierid" => $parent, "type"=>$type],
+      'orderColumn' => 1,
+      'orderDirection' => 'ASC',
+      'tagColumn' => 1,
+      'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/SupplierCommentLinesIncidents.json"),true),
+      'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/SupplierCommentLinesIncidentsFieldButtons.json"),true),
+      'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/SupplierCommentLinesIncidentsTopButtons.json"),true)
+    ];
+    return $list;
+  }
+
+
 
   public function formatList($user){
     $list=[
@@ -86,5 +112,17 @@ class ERPSupplierCommentLinesUtils
       'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/".$this->name."TopButtons.json"),true)
     ];
     return $list;
+  }
+
+  public function getExcludedForm($params){
+    return ["supplier","type"];
+  }
+
+  public function getIncludedForm($params){
+    $doctrine=$params["doctrine"];
+    $user=$params["user"];
+    $id=$params["id"];
+
+    return [];
   }
 }

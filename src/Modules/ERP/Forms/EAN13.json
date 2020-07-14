@@ -4,7 +4,6 @@
 			"name": "EAN13 data",
 			"fields": [
 				{ "name": "name","cols": 2},
-				{ "name": "product","cols": 2},
 				{ "name": "type", "cols": 3,
           "transform": {
               "type":"option",

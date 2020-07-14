@@ -109,14 +109,17 @@ class ERPSuppliersController extends Controller
 							'id' => $id,
 							'tab' => $request->query->get('tab','data'), //Show initial tab, by default data tab
 							'tabs' => [
-												["name" => "data", "icon"=>"fa fa-id-card", "caption"=>"Supplier data", "active"=>true, "route"=>$this->generateUrl("dataSuppliers",["id"=>$id])],
+												["name" => "data", "icon"=>"fa fa-id-card", "caption"=>"Supplier data", "active"=>true, "route"=>$this->generateUrl("formInfoSuppliers",["id"=>$id])],
+											/*	["name" => "data", "icon"=>"fa fa-id-card", "caption"=>"Supplier data", "active"=>true, "route"=>$this->generateUrl("dataSuppliers",["id"=>$id])],*/
 												["name"=>  "supplierordersdata", "icon"=>"fa fa-money", "caption"=>"Orders Data","route"=>$this->generateUrl("infoSupplierOrdersData",["id"=>$id])],
 											/*	["name" => "addresses", "icon"=>"fa fa-location-arrow", "caption"=>"Shipping addresses", "route"=>$this->generateUrl("addresses",["id"=>$id, "type"=>"supplier"])],*/
 												["name" => "contacts",  "icon"=>"fa fa-users", "caption"=>"Contacts", "route"=>$this->generateUrl("generictablist",["function"=>"formatList","module"=>"ERP","name"=>"Contacts","id"=>$id])],
 												["name" => "bankaccounts", "icon"=>"fa fa-money", "caption"=>"Bank Accounts", "route"=>$this->generateUrl("bankaccounts",["id"=>$id])],
 												["name"=>"prices", "icon"=>"fa fa-money", "caption"=>"Shopping Discounts","route"=>$this->generateUrl("generictablist",["module"=>"ERP", "name"=>"ShoppingDiscounts", "id"=>$id])],
 												["name"=>"increments", "icon"=>"fa fa-money", "caption"=>"Increments","route"=>$this->generateUrl("generictablist",["module"=>"ERP", "name"=>"Increments", "id"=>$id])],
-												["name" => "newdata", "icon"=>"fa fa-id-card", "caption"=>"Supplier new data", "active"=>true, "route"=>$this->generateUrl("formInfoSuppliers",["id"=>$id])],
+												["name" => "incidents", "icon"=>"fa fa-money", "caption"=>"Incidents", "route"=>$this->generateUrl("supplierincidents",["id"=>$id])],
+
+
 											],
 									));
 			}
@@ -138,14 +141,13 @@ class ERPSuppliersController extends Controller
 				$template=dirname(__FILE__)."/../Forms/Suppliers.json";
 				$formUtils = new GlobaleFormUtils();
 				$formUtilsSuppliers = new ERPSuppliersUtils();
-			  $listSuppliersCommentLines = new ERPSupplierCommentLinesUtils();
-				$formUtils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),$formUtilsSuppliers->getExcludedForm([]),$formUtilsSuppliers->getIncludedForm(["doctrine"=>$this->getDoctrine(), "user"=>$this->getUser(), "id"=>$id]));
-				//	$listCustomersPrices = new ERPCustomersPricesUtils();
-				//$listCustomersCommentLines = new ERPCustomerCommentLinesUtils();
-			//	$formUtilsCustomersPrices = new GlobaleFormUtils();
-			//$formUtilsCustomersPrices->initialize($this->getUser(), new ERPCustomersPrices(), dirname(__FILE__)."/../Forms/CustomersPrices.json", $request, $this, $this->getDoctrine());
-		//		$forms[]=$formUtilsCustomersPrices->formatForm('CustomersPrices', true, null, ERPCustomersPrices::class);
 
+				$formUtils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),$formUtilsSuppliers->getExcludedForm([]),$formUtilsSuppliers->getIncludedForm(["doctrine"=>$this->getDoctrine(), "user"=>$this->getUser(), "id"=>$id]));
+
+				$listSuppliersCommentLines = new ERPSupplierCommentLinesUtils();
+				$formUtilsSuppliersCommentLines = new GlobaleFormUtils();
+				$formUtilsSuppliersCommentLines->initialize($this->getUser(), new ERPSupplierCommentLines(), dirname(__FILE__)."/../Forms/SupplierCommentLines.json", $request, $this, $this->getDoctrine());
+				$forms[]=$formUtilsSuppliersCommentLines->formatForm('SupplierCommentLines', true, null, ERPSupplierCommentLines::class);
 
 				$supplierRepository=$this->getDoctrine()->getRepository(ERPSuppliers::class);
 				$supplier=$supplierRepository->findOneBy(["id"=>$id, "active"=>1, "deleted"=>0, "company"=>$this->getUser()->getCompany()]);
@@ -158,7 +160,8 @@ class ERPSuppliersController extends Controller
 					'id' => $id,
 					'id_object' => $id,
 					'form' => $formUtils->formatForm('suppliers', true, $id, $this->class, "dataSuppliers"),
-					'listSuppliersCommentLines' => $listSuppliersCommentLines->formatListBySupplier($id),
+					'listSuppliersCommentLines' => $listSuppliersCommentLines->formatListBySupplierType($id,0),
+					'forms' => $forms,
 					'include_post_templates' => ['@ERP/workactivitiesmap.html.twig','@ERP/supplierlistworkactivities.html.twig'],
 					'include_footer' => [["type"=>"css", "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.css"],
 															 ["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.js"],
