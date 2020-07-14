@@ -59,6 +59,7 @@ class ERPEAN13Controller extends Controller
    if($id==0){
     if($idproduct==0 ) $idproduct=$request->query->get('idproduct');
     if($idproduct==0 || $idproduct==null) $idproduct=$request->request->get('id-parent',0);
+
     $product = $defaultProduct->find($idproduct);
    }else $obj = $EAN13Repository->find($id);
    $supplier=$id==0?$product->getSupplier():$obj->getProduct()->getSupplier();
@@ -66,9 +67,15 @@ class ERPEAN13Controller extends Controller
    //$default=$defaultSupplier->findOneBy(['id'=>$supplier->getId()]);
    if($obj->getSupplier()==null) $default=$defaultSupplier->findOneBy(['id'=>$supplier->getId()]);
     else $default=$obj->getSupplier();
-   $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "supplier"=>$default, "product"=>$id==0?$product:$obj->getProduct()];
+
+
+   $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(),
+   "supplier"=>$default, "product"=>$id==0?$product:$obj->getProduct()];
+
    $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),
                           method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
+  if($id==0) $utils->values(["product"=>$product]);
+
    $make=$utils->make($id, ERPEAN13::class, $action, "EAN13", "modal");
 
    return $make;
