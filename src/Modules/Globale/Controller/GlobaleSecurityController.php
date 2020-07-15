@@ -75,6 +75,7 @@ class GlobaleSecurityController extends Controller
 		$userRepository=$this->getDoctrine()->getRepository(GlobaleUsers::class);
 		$userCardsRepository=$this->getDoctrine()->getRepository(GlobaleUsersCards::class);
 		$user=null;
+		$company=null;
 		if($request->request->get("nfctag")==null){
 			//Classic style domain, user and password
 			$domain = $request->request->get("domain");
@@ -84,17 +85,26 @@ class GlobaleSecurityController extends Controller
 		 	$company = $companyRepository->findOneBy(["domain" => $domain, "active"=>1, "deleted"=>0]);
 			if($company)
 		 		$user = $userRepository->findOneBy(["email" => $username, "company" => $company, "active"=>1, "deleted"=>0]);
+			if($user){
+				$password = $request->request->get("password");
+				$passwordEncoder = $this->container->get('security.password_encoder');
+				if(!$passwordEncoder->isPasswordValid($user, $password)){
+					return new JsonResponse(['token'=>'']);
+				}
+			}
+
 		}else{
 			//NFC read by mobile device
 			$userCard=$userCardsRepository->findOneBy(["cardid" => $request->request->get("nfctag"), "active"=>1, "deleted"=>0]);
-			if($userCard && $userCard->getUserasigned()->getActive() && !$userCard->getUserasigned()->getDeleted())
+			if($userCard && $userCard->getUserasigned()->getActive() && !$userCard->getUserasigned()->getDeleted()){
 				$user = $userCard->getUserasigned();
+				$company = $user->getCompany();
+			}
 		}
 
 		if($user){
-			$password = $request->request->get("password");
-			$passwordEncoder = $this->container->get('security.password_encoder');
-			if($passwordEncoder->isPasswordValid($user, $password)){
+
+
 				if($user->getApiToken()!=NULL){
 					$workersrepository=$this->getDoctrine()->getRepository(HRWorkers::class);
 					$worker=$workersrepository->findOneBy(["user"=>$user]);
@@ -124,7 +134,7 @@ class GlobaleSecurityController extends Controller
 																		 'allowRemoteClock'=>$worker->getAllowremoteclock(),
 																		 'token'=>$token]);
 					}
-			}
+
 		}else{
 			return new JsonResponse(['token'=>'']);
 		}
