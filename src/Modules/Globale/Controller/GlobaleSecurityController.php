@@ -11,6 +11,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use App\Modules\Globale\Entity\GlobaleCompanies;
 use App\Modules\Globale\Entity\GlobaleUsers;
+use App\Modules\Globale\Entity\GlobaleUsersCards;
 use App\Modules\HR\Entity\HRWorkers;
 use App\Modules\Globale\Controller\UserInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -70,14 +71,26 @@ class GlobaleSecurityController extends Controller
 		 */
 	public function getToken(Request $request)
 	{
-		$domain = $request->request->get("domain");
-		if($domain==NULL)
-			$domain = $this->getDomain($request->getUri());
-		$username = $request->request->get("username");
 		$companyRepository=$this->getDoctrine()->getRepository(GlobaleCompanies::class);
-	 	$company = $companyRepository->findOneBy(["domain" => $domain]);
 		$userRepository=$this->getDoctrine()->getRepository(GlobaleUsers::class);
-	 	$user = $userRepository->findOneBy(["email" => $username, "company" => $company]);
+		$userCardsRepository=$this->getDoctrine()->getRepository(GlobaleUsersCards::class);
+		$user=null;
+		if($request->request->get("nfctag")==null){
+			//Classic style domain, user and password
+			$domain = $request->request->get("domain");
+			if($domain==NULL)
+				$domain = $this->getDomain($request->getUri());
+			$username = $request->request->get("username");
+		 	$company = $companyRepository->findOneBy(["domain" => $domain, "active"=>1, "deleted"=>0]);
+			if($company)
+		 		$user = $userRepository->findOneBy(["email" => $username, "company" => $company, "active"=>1, "deleted"=>0]);
+		}else{
+			//NFC read by mobile device
+			$userCard=$userCardsRepository->findOneBy(["cardid" => $request->request->get("nfctag"), "active"=>1, "deleted"=>0]);
+			if($userCard && $userCard->getUserasigned()->getActive() && !$userCard->getUserasigned()->getDeleted())
+				$user = $userCard->getUserasigned();
+		}
+
 		if($user){
 			$password = $request->request->get("password");
 			$passwordEncoder = $this->container->get('security.password_encoder');
