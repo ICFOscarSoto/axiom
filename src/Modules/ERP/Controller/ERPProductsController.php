@@ -17,6 +17,8 @@ use App\Modules\ERP\Entity\ERPReferences;
 use App\Modules\ERP\Entity\ERPProductsAttributes;
 use App\Modules\ERP\Entity\ERPManufacturers;
 use App\Modules\ERP\Entity\ERPStocks;
+use App\Modules\ERP\Entity\ERPStoreLocations;
+use App\Modules\ERP\Entity\ERPStores;
 use App\Modules\ERP\Entity\ERPCategories;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
@@ -220,19 +222,31 @@ class ERPProductsController extends Controller
     public function getProduct($id,Request $request){
 			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 			$EAN13repository=$this->getDoctrine()->getRepository(ERPEAN13::class);
+			$Stocksrepository=$this->getDoctrine()->getRepository(ERPStocks::class);
+			$StoreLocationsrepository=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
+			$Storesrepository=$this->getDoctrine()->getRepository(ERPStores::class);
 			$obj=null;
 			if($id!=0){
 				$obj = $this->getDoctrine()->getRepository($this->class)->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
 			}else{
 				if($request->query->get('barcode',null)){
-						$EAN13=$this->getDoctrine()->getRepository($this->class)->findOneBy(["name"=>$request->query->get('barcode',null), "active"=>1, "deleted"=>0]);
-						if($EAN13) $obj->getProduct();
+						$EAN13=$EAN13repository->findOneBy(["name"=>$request->query->get('barcode',null), "active"=>1, "deleted"=>0]);
+						if($EAN13) $obj=$EAN13->getProduct();
 				}
 			}
 			if($obj){
+				$stocks=$Stocksrepository->findBy(["product"=>$obj, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
 				$result["id"]=$obj->getId();
 				$result["code"]=$obj->getCode();
 				$result["name"]=$obj->getName();
+				$result["provider"]=$obj->getSupplier()->getName();
+				$stock_items=[];
+				foreach($stocks as $stock){
+					$stock_item["location"]=$stock->getStorelocation()->getName();
+					$stock_item["quantity"]=$stock->getQuantity();
+					$stock_items[]=$stock_item;
+				}
+				$result["stock"]=$stock_items;
 				return new JsonResponse($result);
 			}
 			return new JsonResponse(["result"=>-1]);
