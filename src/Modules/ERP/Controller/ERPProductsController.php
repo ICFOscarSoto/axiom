@@ -215,15 +215,27 @@ class ERPProductsController extends Controller
 		}
 
     /**
-    * @Route("/api/global/product/{id}/get", name="getProduct")
+    * @Route("/api/erp/product/get/{id}", name="getProduct", defaults={"id"=0})
     */
-    public function getProduct($id){
-			$obj = $this->getDoctrine()->getRepository($this->class)->findById($id);
-			if (!$obj) {
-        throw $this->createNotFoundException('No product found for id '.$id );
+    public function getProduct($id,Request $request){
+			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			$EAN13repository=$this->getDoctrine()->getRepository(ERPEAN13::class);
+			$obj=null;
+			if($id!=0){
+				$obj = $this->getDoctrine()->getRepository($this->class)->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
+			}else{
+				if($request->query->get('barcode',null)){
+						$EAN13=$this->getDoctrine()->getRepository($this->class)->findOneBy(["name"=>$request->query->get('barcode',null), "active"=>1, "deleted"=>0]);
+						if($EAN13) $obj->getProduct();
+				}
 			}
-			return new JsonResponse();
-			return new JsonResponse($company->encodeJson());
+			if($obj){
+				$result["id"]=$obj->getId();
+				$result["code"]=$obj->getCode();
+				$result["name"]=$obj->getName();
+				return new JsonResponse($result);
+			}
+			return new JsonResponse(["result"=>-1]);
     }
 
   /**
