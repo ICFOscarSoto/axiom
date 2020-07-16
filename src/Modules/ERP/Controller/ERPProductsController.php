@@ -229,8 +229,8 @@ class ERPProductsController extends Controller
 			if($id!=0){
 				$obj = $this->getDoctrine()->getRepository($this->class)->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
 			}else{
-				if($request->query->get('barcode',null)){
-						$EAN13=$EAN13repository->findOneBy(["name"=>$request->query->get('barcode',null), "active"=>1, "deleted"=>0]);
+				if($request->request->get('barcode',null)){
+						$EAN13=$EAN13repository->findOneBy(["name"=>$request->request->get('barcode',null), "active"=>1, "deleted"=>0]);
 						if($EAN13) $obj=$EAN13->getProduct();
 				}
 			}
