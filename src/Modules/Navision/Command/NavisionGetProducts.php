@@ -59,7 +59,11 @@ class NavisionGetProducts extends ContainerAwareCommand
     $output->writeln('Comenzando sincronizacion Navision');
     $output->writeln('==================================');
     switch($entity){
-      case 'products': $this->importProduct($input, $output);
+      case 'products': {
+        $this->importProduct($input, $output);
+        $this->clearEAN13($input, $output);
+        $this->importEAN13($input, $output);
+      }
       break;
       case 'ean13': $this->importEAN13($input, $output);
       break;
