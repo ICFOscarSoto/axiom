@@ -242,8 +242,13 @@ class ERPProductsController extends Controller
 				$result["provider"]=$obj->getSupplier()->getName();
 				$stock_items=[];
 				foreach($stocks as $stock){
+					$stock_item["warehouse_code"]=$stock->getStorelocation()->getStore()->getCode();
+					$stock_item["warehouse"]=$stock->getStorelocation()->getStore()->getName();
 					$stock_item["location"]=$stock->getStorelocation()->getName();
-					$stock_item["quantity"]=$stock->getQuantity();
+					$stock_item["quantity"]=!$stock->getQuantity()?0:$stock->getQuantity();
+					$stock_item["pendingserve"]=!$stock->getPendingserve()?0:$stock->getPendingserve();
+					$stock_item["pendingreceive"]=!$stock->getPendingreceive()?0:$stock->getPendingreceive();
+					$stock_item["minstock"]=!$stock->getMinstock()?0:$stock->getMinstock();
 					$stock_items[]=$stock_item;
 				}
 				$result["stock"]=$stock_items;
