@@ -199,7 +199,12 @@ class NavisionGetProducts extends ContainerAwareCommand
 
     public function importEAN13(InputInterface $input, OutputInterface $output){
       //------   Create Lock Mutex    ------
-      $fp = fopen('/tmp/axiom-navisionGetProducts-importEAN13.lock', 'c');
+      if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+          $fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetProducts-importEAN13.lock', 'c');
+      } else {
+          $fp = fopen('/tmp/axiom-navisionGetProducts-importEAN13.lock', 'c');
+      }
+
       if (!flock($fp, LOCK_EX | LOCK_NB)) {
         $output->writeln('* Fallo al iniciar la sincronizacion de EAN13: El proceso ya esta en ejecución.');
         exit;
@@ -281,7 +286,12 @@ class NavisionGetProducts extends ContainerAwareCommand
  */
 public function clearEAN13(InputInterface $input, OutputInterface $output){
   //------   Create Lock Mutex    ------
-  $fp = fopen('/tmp/axiom-navisionGetProducts-clearEAN13.lock', 'c');
+  if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+      $fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetProducts-clearEAN13.lock', 'c');
+  } else {
+      $fp = fopen('/tmp/axiom-navisionGetProducts-clearEAN13.lock', 'c');
+  }
+
   if (!flock($fp, LOCK_EX | LOCK_NB)) {
     $output->writeln('* Fallo al iniciar la sincronizacion de limpieza de EAN13: El proceso ya esta en ejecución.');
     exit;
@@ -298,10 +308,11 @@ public function clearEAN13(InputInterface $input, OutputInterface $output){
   //Disable SQL logger
   $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
   $oldEAN13s=$repository->findAll();
+  //$oldEAN13=$repository->find(177);
   foreach ($oldEAN13s as $oldEAN13){
       $count=0;
       $EAN13=$oldEAN13->getName();
-      foreach ($objects["ean13"] as $key=>$object){
+      foreach ($objects["class"] as $key=>$object){
           $nameEAN13=preg_replace('/\D/','',$object["Cross-Reference No."]);
           if ($EAN13==$nameEAN13) {
             $count=1;
@@ -312,9 +323,9 @@ public function clearEAN13(InputInterface $input, OutputInterface $output){
         $oldEAN13->setDeleted(1);
         $oldEAN13->setActive(0);
         $this->doctrine->getManager()->flush();
-        $this->doctrine->getManager()->clear();
       }
   }
+  $this->doctrine->getManager()->clear();
   //------   Critical Section END   ------
   //------   Remove Lock Mutex    ------
   fclose($fp);
