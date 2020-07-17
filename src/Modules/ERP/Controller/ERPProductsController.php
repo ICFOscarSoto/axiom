@@ -239,7 +239,7 @@ class ERPProductsController extends Controller
 				$result["id"]=$obj->getId();
 				$result["code"]=$obj->getCode();
 				$result["name"]=$obj->getName();
-				$result["provider"]=$obj->getSupplier()->getName();
+				$result["provider"]=$obj->getSupplier()?$obj->getSupplier()->getName():"";
 				$stock_items=[];
 				foreach($stocks as $stock){
 					$stock_item["id"]=$stock->getId();
