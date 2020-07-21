@@ -238,7 +238,7 @@ class NavisionGetProducts extends ContainerAwareCommand
         $output->writeln('  - '.$object["Item No."].' - '.$object["Cross-Reference No."]);
         $obj=$repository->findOneBy(["name"=>$object["Cross-Reference No."]]);
         $nameEAN13=preg_replace('/\D/','',$object["Cross-Reference No."]);
-        if (strlen($nameEAN13)==13) {
+        if (strlen($nameEAN13)==13 and $obj==null) {
           $obj=new ERPEAN13();
           $obj->setName($nameEAN13);
           $obj->setDateadd(new \Datetime());
