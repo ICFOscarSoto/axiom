@@ -1,0 +1,30 @@
+[
+    {
+        "name": "id",
+        "caption": "id"
+    },
+    {
+        "name": "store__name",
+        "caption": "store"
+    },
+    {
+        "name": "user__name_o_user__lastname",
+        "caption": "user"
+    },
+    {
+        "name": "preferential",
+        "caption": "preferential",
+        "width": "10%",
+        "class": "dt-center",
+        "replace": {
+            "1": {
+                "text": "Si",
+                "html": "Si"
+            },
+            "0": {
+                "text": "",
+                "html": ""
+            }
+        }
+    }
+]

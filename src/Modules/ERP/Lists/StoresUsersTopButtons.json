@@ -1,0 +1,6 @@
+[
+  {"id" : "addTopStoresUsers", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"genericdatatab", "routeParams":{"module":"ERP", "name":"StoresUsers", "type":"modal", "idparent":"id" }, "modal":"StoresUsers", "actionType" : "background", "confirm" :false, "tooltip" : ""},
+  {"id" : "deleteTopStoresUsers", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true, "tooltip":""},
+  {"id" : "printTopStoresUsers", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false, "tooltip":""},
+  {"id" : "exportTopStoresUsers", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"genericexport", "routeParams":{"module":"ERP", "name":"StoresUsers"}, "confirm" :false, "tooltip":""}
+]

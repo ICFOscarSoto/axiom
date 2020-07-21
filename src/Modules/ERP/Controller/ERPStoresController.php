@@ -56,6 +56,41 @@ class ERPStoresController extends Controller
   		return new RedirectResponse($this->router->generate('app_login'));
     }
 
+
+		/**
+		 * @Route("/{_locale}/ERP/store/form/{id}", name="formERPStore", defaults={"id"=0})
+		 */
+		public function formERPStore($id,Request $request)
+		{
+		  $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		  if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
+		  $userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
+		  $locale = $request->getLocale();
+		  $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
+		  $repository=$this->getDoctrine()->getRepository($this->class);
+		  $obj = $repository->findOneBy(['id'=>$id, 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
+		  $entity_name=$obj?$obj->getName():'';
+			$new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-plus"];
+			$breadcrumb=$menurepository->formatBreadcrumb('genericindex','ERP','Stores');
+			array_push($breadcrumb,$new_breadcrumb);
+		  return $this->render('@Globale/generictabform.html.twig', array(
+		          'entity_name' => $entity_name,
+		          'controllerName' => 'StoresController',
+		          'interfaceName' => 'Almacenes',
+							'optionSelected' => 'genericindex',
+					    'optionSelectedParams' => ["module"=>"ERP", "name"=>"Products"],
+		          'menuOptions' =>  $menurepository->formatOptions($userdata),
+		          'breadcrumb' => $breadcrumb,
+		          'userData' => $userdata,
+		          'id' => $id,
+		          'tab' => $request->query->get('tab','data'), //Show initial tab, by default data tab
+		          'tabs' => [	["name" => "data", "icon"=>"fa-address-card-o", "caption"=>"Datos almacén", "active"=>true, "route"=>$this->generateUrl("dataStores",["id"=>$id])],
+													["name"=>"users", "icon"=>"fa fa-users", "caption"=>"Usuarios Asignados","route"=>$this->generateUrl("generictablist",["module"=>"ERP", "name"=>"StoresUsers", "id"=>$id, "parent"=>$id])],
+												],
+		              ));
+		  }
+
+
 		/**
 		 * @Route("/{_locale}/stores/data/{id}/{action}", name="dataStores", defaults={"id"=0, "action"="read"})
 		 */
