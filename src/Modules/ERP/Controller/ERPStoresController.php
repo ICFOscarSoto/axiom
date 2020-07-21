@@ -71,7 +71,7 @@ class ERPStoresController extends Controller
 		  $obj = $repository->findOneBy(['id'=>$id, 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
 		  $entity_name=$obj?$obj->getName():'';
 			$new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-plus"];
-			$breadcrumb=$menurepository->formatBreadcrumb('genericindex','ERP','Stores');
+			$breadcrumb=$menurepository->formatBreadcrumb('stores');
 			array_push($breadcrumb,$new_breadcrumb);
 		  return $this->render('@Globale/generictabform.html.twig', array(
 		          'entity_name' => $entity_name,
