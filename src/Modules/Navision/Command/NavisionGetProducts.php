@@ -235,10 +235,10 @@ class NavisionGetProducts extends ContainerAwareCommand
       $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
       $log=fopen("logEAN13.txt", "w");
       foreach ($objects["class"] as $key=>$object){
-        $obj=$repository->findOneBy(["name"=>$object["Cross-Reference No."]]);
         $nameEAN13=preg_replace('/\D/','',$object["Cross-Reference No."]);
+        $obj=$repository->findOneBy(["name"=>$nameEAN13]);
         if (strlen($nameEAN13)==13 and $obj==null) {
-          $output->writeln('  - '.$object["Item No."].' - '.$object["Cross-Reference No."]);
+          $output->writeln('  - '.$object["Item No."].' - '.$nameEAN13);
           $obj=new ERPEAN13();
           $obj->setName($nameEAN13);
           $obj->setDateadd(new \Datetime());
