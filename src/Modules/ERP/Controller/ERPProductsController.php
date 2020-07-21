@@ -19,6 +19,7 @@ use App\Modules\ERP\Entity\ERPManufacturers;
 use App\Modules\ERP\Entity\ERPStocks;
 use App\Modules\ERP\Entity\ERPStoreLocations;
 use App\Modules\ERP\Entity\ERPStores;
+use App\Modules\ERP\Entity\ERPStoresUsers;
 use App\Modules\ERP\Entity\ERPCategories;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
@@ -223,6 +224,7 @@ class ERPProductsController extends Controller
 			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 			$EAN13repository=$this->getDoctrine()->getRepository(ERPEAN13::class);
 			$Stocksrepository=$this->getDoctrine()->getRepository(ERPStocks::class);
+			$StoreUsersrepository=$this->getDoctrine()->getRepository(ERPStoresUsers::class);
 			$StoreLocationsrepository=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
 			$Storesrepository=$this->getDoctrine()->getRepository(ERPStores::class);
 			$obj=null;
@@ -242,15 +244,19 @@ class ERPProductsController extends Controller
 				$result["provider"]=$obj->getSupplier()?$obj->getSupplier()->getName():"";
 				$stock_items=[];
 				foreach($stocks as $stock){
-					$stock_item["id"]=$stock->getId();
-					$stock_item["warehouse_code"]=$stock->getStorelocation()->getStore()->getCode();
-					$stock_item["warehouse"]=$stock->getStorelocation()->getStore()->getName();
-					$stock_item["location"]=$stock->getStorelocation()->getName();
-					$stock_item["quantity"]=!$stock->getQuantity()?0:$stock->getQuantity();
-					$stock_item["pendingserve"]=!$stock->getPendingserve()?0:$stock->getPendingserve();
-					$stock_item["pendingreceive"]=!$stock->getPendingreceive()?0:$stock->getPendingreceive();
-					$stock_item["minstock"]=!$stock->getMinstock()?0:$stock->getMinstock();
-					$stock_items[]=$stock_item;
+					$storeUser=$StoreUsersrepository->findOneBy(["user"=>$this->getUser(), "store"=>$stock->getStorelocation()->getStore(), "active"=>1, "deleted"=>0]);
+					if($storeUser){
+						$stock_item["id"]=$stock->getId();
+						$stock_item["warehouse_code"]=$stock->getStorelocation()->getStore()->getCode();
+						$stock_item["warehouse"]=$stock->getStorelocation()->getStore()->getName();
+						$stock_item["warehouse_preferential"]=$storeUser->getPreferential();
+						$stock_item["location"]=$stock->getStorelocation()->getName();
+						$stock_item["quantity"]=!$stock->getQuantity()?0:$stock->getQuantity();
+						$stock_item["pendingserve"]=!$stock->getPendingserve()?0:$stock->getPendingserve();
+						$stock_item["pendingreceive"]=!$stock->getPendingreceive()?0:$stock->getPendingreceive();
+						$stock_item["minstock"]=!$stock->getMinstock()?0:$stock->getMinstock();
+						$stock_items[]=$stock_item;
+					}
 				}
 				$result["stock"]=$stock_items;
 				return new JsonResponse($result);
