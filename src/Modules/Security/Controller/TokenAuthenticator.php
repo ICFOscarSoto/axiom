@@ -39,7 +39,10 @@ class TokenAuthenticator extends AbstractGuardAuthenticator
      */
     public function supports(Request $request)
     {
-        return $request->request->has('X-AUTH-TOKEN')||$request->headers->has('X-AUTH-TOKEN');
+      $headers = $request->headers->all();
+      if(isset($headers["x-auth-token"])) $has_token=true; else $has_token=false;
+
+        return $request->request->has('X-AUTH-TOKEN')||$has_token;
     }
 
     /**
@@ -49,8 +52,8 @@ class TokenAuthenticator extends AbstractGuardAuthenticator
     public function getCredentials(Request $request)
     {
         return [
-            'token' => $request->request->has('X-AUTH-TOKEN')?$request->request->get('X-AUTH-TOKEN'):$request->headers->get('X-AUTH-TOKEN'),
-            'domain' => $request->request->has('X-AUTH-DOMAIN')?$request->request->get('X-AUTH-DOMAIN'):$request->headers->get('X-AUTH-DOMAIN')
+            'token' => $request->request->has('X-AUTH-TOKEN')?$request->request->get('X-AUTH-TOKEN'):$request->headers->get('x-auth-token'),
+            'domain' => $request->request->has('X-AUTH-DOMAIN')?$request->request->get('X-AUTH-DOMAIN'):$request->headers->get('x-auth-domain')
         ];
     }
 
