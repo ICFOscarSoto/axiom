@@ -1,0 +1,17 @@
+[{
+    "sections": [
+        {
+            "name": "data",
+            "fields": [
+                {
+                    "name": "user",
+                    "cols": 9
+                },
+                {
+                    "name": "preferential",
+                    "cols": 3
+                }
+            ]
+        }
+    ]
+}]

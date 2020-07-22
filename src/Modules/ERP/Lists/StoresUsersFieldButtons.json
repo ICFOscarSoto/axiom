@@ -1,0 +1,4 @@
+[
+  {"id": "editStoresUsers", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"genericdatatab", "routeParams":{"module":"ERP", "name":"StoresUsers", "type":"modal", "idparent":"id" }, "modal":"StoresUsers", "actionType" : "background", "confirm" :false, "tooltip":""},
+  {"id": "deleteStoresUsers", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"genericdelete", "routeParams":{"module":"ERP", "name":"StoresUsers"}, "confirm" :true, "undo" :false, "actionType" : "background", "tooltip":""}
+]
