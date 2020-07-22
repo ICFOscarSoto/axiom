@@ -290,6 +290,37 @@ class ERPProductsController extends Controller
     }
 
 		/**
+    * @Route("/api/erp/product/getimages/{id}", name="getProductImages", defaults={"id"=0})
+    */
+    public function getProductImages($id,Request $request){
+			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			$image_path = $this->get('kernel')->getRootDir().'/../cloud/'.$this->getUser()->getCompany()->getId().'/images/products/'.$id.'/';
+			$images=[];
+			$image=[["large"=>$this->generateUrl('getImage', array('type' => 'products', "size"=>"large", "id"=>$id, "number"=>0 ))],
+						 ["thumb"=>$this->generateUrl('getImage', array('type' => 'products', "size"=>"thumb", "id"=>$id, "number"=>0 ))],
+						 ["medium"=>$this->generateUrl('getImage', array('type' => 'products', "size"=>"medium", "id"=>$id, "number"=>0 ))]];
+			$images[]=$image;
+			$found=true;
+			$i=1;
+			while($found==true){
+				if(file_exists($image_path.$id."-".$i.'-large.png') || file_exists($image_path.$id."-".$i.'-large.jpg')){
+					$i++;
+				}else{
+					$found=false;
+					$i--;
+				}
+			}
+			for($j=1;$j<=$i;$j++){
+				$image=[["large"=>$this->generateUrl('getImage', array('type' => 'products', "size"=>"large", "id"=>$id, "number"=>$j ))],
+							 ["thumb"=>$this->generateUrl('getImage', array('type' => 'products', "size"=>"thumb", "id"=>$id, "number"=>$j ))],
+							 ["medium"=>$this->generateUrl('getImage', array('type' => 'products', "size"=>"medium", "id"=>$id, "number"=>$j ))]];
+				$images[]=$image;
+			}
+			return new JsonResponse(["images"=>$images]);
+    }
+
+
+		/**
 		* @Route("/api/prestashop/erp/product/get/{id}", name="prestashopGetProduct", defaults={"id"=0})
 		*/
 		public function prestashopGetProduct($id,Request $request){

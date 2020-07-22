@@ -217,9 +217,9 @@ class GlobaleImagesController extends Controller implements ContainerAwareInterf
 	}
 
 	/**
-	* @Route("/api/{type}/{id}/{size}/getimage", name="getImage", defaults={"type"="users", "size"="medium", "id"=0 })
+	* @Route("/api/{type}/{id}/{size}/getimage/{number}", name="getImage", defaults={"type"="users", "size"="medium", "id"=0, "number"=0 })
 	*/
-	public function getWorkerImage($type, $id, $size, Request $request)
+	public function getWorkerImage($type, $id, $size, $number, Request $request)
 	{
 		if($type!="company" && $type!="companydark"){
 			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
@@ -232,30 +232,37 @@ class GlobaleImagesController extends Controller implements ContainerAwareInterf
 			if($type=="company" || $type=="companydark") $image_path = $this->get('kernel')->getRootDir().'/../cloud/'.$id.'/images/';
 			else $image_path = $this->get('kernel')->getRootDir().'/../cloud/'.$user->getCompany()->getId().'/images/';
 			//$image_path = $this->get('kernel')->getRootDir() . '/../public/images/workers/';
-			if(file_exists($image_path.$type.'/'.$id.'-'.$size.'.png'))
-				$filename = $id.'-'.$size.'.png';
+			if($number==0) $total_path=$image_path.$type.'/'.$id.'-'.$size;
+				else $total_path=$image_path.$type.'/'.$id.'/'.$id.'-'.$number.'-'.$size;
+			if($number==0) $prev_filename=$id.'-'.$size;
+				else $prev_filename=$id.'-'.$number.'-'.$size;
+
+			if(file_exists($total_path.'.png'))
+				$filename = $prev_filename.'.png';
 				else
-				if(file_exists($image_path.$type.'/'.$id.'-'.$size.'.jpg'))
-					$filename = $id.'-'.$size.'.jpg';
-					else if($type=="companydark" && file_exists($image_path.$type.'/'.$id.'-'.$size.'.png')){
-						$filename = $id.'-'.$size.'.png'; $type="company";
-					} else if($type=="companydark" && file_exists($image_path.$type.'/'.$id.'-'.$size.'.jpg')){
-							$filename = $id.'-'.$size.'.jpg'; $type="company";
+				if(file_exists($total_path.'.jpg'))
+					$filename = $prev_filename.'.jpg';
+					else if($type=="companydark" && file_exists($total_path.'.png')){
+						$filename = $prev_filename.'.png'; $type="company";
+					} else if($type=="companydark" && file_exists($total_path.'.jpg')){
+							$filename = $prev_filename.'.jpg'; $type="company";
 					}else {
 							$image_path = $this->get('kernel')->getRootDir().'/../cloud/0/images/';
 							$filename = 'no-thumb.jpg';
 					}
 			//}else $filename = 'no-thumb.jpg';
-			$response = new BinaryFileResponse($image_path.$type.'/'.$filename);
+			if($number==0) $path=$image_path.$type.'/'.$filename;
+				else $path=$image_path.$type.'/'.$id.'/'.$filename;
+			$response = new BinaryFileResponse($path);
 			$mimeTypeGuesser = new FileinfoMimeTypeGuesser();
 			if($mimeTypeGuesser->isSupported()){
 				$seconds_to_cache = 7200;
 				$ts = gmdate("D, d M Y H:i:s", time() + $seconds_to_cache) . " GMT";
-				$response->headers->set('Content-Type', $mimeTypeGuesser->guess($image_path.$type.'/'.$filename));
+				$response->headers->set('Content-Type', $mimeTypeGuesser->guess($path));
 				$response->headers->set("Expires", $ts);
 				$response->headers->set("Pragma", "cache");
 				$response->headers->set("Cache-Control", "max-age=$seconds_to_cache");
-				$response->headers->set('Content-Type', $mimeTypeGuesser->guess($image_path.$type.'/'.$filename));
+				$response->headers->set('Content-Type', $mimeTypeGuesser->guess($path));
 			}else{
 				$response->headers->set('Content-Type', 'text/plain');
 			}
