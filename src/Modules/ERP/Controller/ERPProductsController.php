@@ -264,6 +264,47 @@ class ERPProductsController extends Controller
 			return new JsonResponse(["result"=>-1]);
     }
 
+		/**
+		* @Route("/api/prestashop/erp/product/get/{id}", name="prestashopGetProduct", defaults={"id"=0})
+		*/
+		public function prestashopGetProduct($id,Request $request){
+			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			$productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
+			$auth = base64_encode("6TI5549NR221TXMGMLLEHKENMG89C8YV");
+			$context = stream_context_create([
+			    "http" => ["header" => "Authorization: Basic $auth"]
+			]);
+			$array=[];
+			try{
+				$xml_string=file_get_contents("https://ferreteriacampollano.com/api/products/?filter[reference]=".$id, false, $context);
+				$xml = simplexml_load_string($xml_string);
+				$json = json_encode($xml);
+				$array = json_decode($json,TRUE);
+			}catch(Exception $e){}
+			if(isset($array["products"]["product"]["@attributes"]["id"])){
+				$idpresta=$array["products"]["product"]["@attributes"]["id"];
+				//GET PRODUCT INFO
+				try{
+					$xml_string=file_get_contents("https://ferreteriacampollano.com/api/products/".$idpresta, false, $context);
+					$xml = simplexml_load_string($xml_string, 'SimpleXMLElement', LIBXML_NOCDATA);
+					$json = json_encode($xml);
+					$array = json_decode($json,TRUE);
+					$description=$array["product"]["description"]["language"];
+					$product=$productRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "code"=>$id, "deleted"=>0]);
+					if($product){
+						$product->setDescription($description);
+						$this->getDoctrine()->getManager()->persist($product);
+						$this->getDoctrine()->getManager()->flush();
+						return new JsonResponse(["result"=>1]);
+					}
+
+				 }catch(Exception $e){}
+
+			}
+			return new JsonResponse(["result"=>-1]);
+		}
+
+
   /**
    * @Route("/{_locale}/admin/global/product/list", name="productlist")
    */
