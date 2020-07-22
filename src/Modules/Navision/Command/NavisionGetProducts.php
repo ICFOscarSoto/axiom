@@ -484,7 +484,12 @@ public function importStocks(InputInterface $input, OutputInterface $output) {
 
 public function importIncrements(InputInterface $input, OutputInterface $output) {
   //------   Create Lock Mutex    ------
-  $fp = fopen('/tmp/axiom-navisionGetProducts-importIncrements.lock', 'c');
+  //$fp = fopen('/tmp/axiom-navisionGetProducts-importIncrements.lock', 'c');
+  if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+      $fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetProducts-importIncrements.lock.lock', 'c');
+  } else {
+      $fp = fopen('/tmp/axiom-navisionGetProducts-importIncrements.lock.lock', 'c');
+  }
   if (!flock($fp, LOCK_EX | LOCK_NB)) {
     $output->writeln('* Fallo al iniciar la sincronizacion incrementos: El proceso ya esta en ejecución.');
     exit;
@@ -517,13 +522,14 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
     $output->writeln($product->getCode().'  - '.$product->getName());
     $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
 
-
     if ($product->getCategory()!=null && $product->getSupplier()!=null){
+
       $supplier=$repositorySupliers->findOneBy(["id"=>$product->getSupplier()->getId()]);
       $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getIncrements.php?product='.$product->getCode());
       $objects=json_decode($json, true);
       $objects=$objects[0];
       foreach ($objects["class"] as $increment){
+
         //grupos de clientes
         if($increment["type"]==1)
         {
@@ -555,35 +561,39 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
                     $obj->setDeleted(0);
                     $this->doctrine->getManager()->merge($obj);
                     $this->doctrine->getManager()->flush();
-                    $obj->calculateIncrements($this->doctrine);
+                   $obj->calculateIncrements($this->doctrine);
                 }
               }
-              //existe el incremento en axiom, luego hay que editarlo
+              //existe el incremento en axiom, luego hay que editarlo siempre y cuando haya habido alguna modificación
               else{
+
                 $incrementaxiom=$repositoryIncrements->findOneBy(["id"=>$incrementaxiom_ID]);
                 $pvp=$increment["pvp"];
                 $dto=$increment["Discount"];
                 $neto=$increment["neto"];
                 $precio_con_dto=$pvp-$pvp*($dto/100);
-                $inc=(($precio_con_dto/$neto)-1)*100;
-                $incrementaxiom->setIncrement($inc);
-                $incrementaxiom->setDateupd(new \Datetime());
-                $this->doctrine->getManager()->merge($incrementaxiom);
-                $this->doctrine->getManager()->flush();
-                $incrementaxiom->calculateIncrements($this->doctrine);
-
+                $inc=round((($precio_con_dto/$neto)-1)*100,2);
+                if(round($incrementaxiom->getIncrement(),2)!=$inc)
+                {
+                  $incrementaxiom->setIncrement($inc);
+                  $incrementaxiom->setDateupd(new \Datetime());
+                  $this->doctrine->getManager()->merge($incrementaxiom);
+                  $this->doctrine->getManager()->flush();
+                  $incrementaxiom->calculateIncrements($this->doctrine);
+                }
               }
             }
         }
           //cliente concreto
           else if($increment["type"]==0)
           {
+
             $customer=$repositoryCustomers->findOneBy(["code"=>$increment["salescode"]]);
 
             if($customer!=NULL)
             {
                 $customerincrementaxiom_ID=$repositoryCustomerIncrements->getIncrementIdByCustomer($product->getSupplier(),$product->getCategory(),$customer);
-
+                //no existe el incremento para el cliente, luego lo creamos
                 if($customerincrementaxiom_ID==null)
                 {
                 if($increment["Discount"]!=0){
@@ -613,6 +623,7 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
                 }
 
               }
+              //ya existe el descuento para ese cliente
               else{
 
                 $customerincrementaxiom=$repositoryCustomerIncrements->findOneBy(["id"=>$customerincrementaxiom_ID]);
@@ -620,18 +631,23 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
                 $dto=$increment["Discount"];
                 $neto=$increment["neto"];
                 $precio_con_dto=$pvp-$pvp*($dto/100);
-                $inc=(($precio_con_dto/$neto)-1)*100;
-                $customerincrementaxiom->setIncrement($inc);
-                $customerincrementaxiom->setDateupd(new \Datetime());
-                $customerincrementaxiom->setStart(date_create_from_format("Y-m-d h:i:s.u",$increment["startingdate"]["date"]));
-                if ($increment["endingdate"]["date"]=="1753-01-01 00:00:00.000000") {
-                  $customerincrementaxiom->setEnd(null);
-                } else $customerincrementaxiom->setEnd(date_create_from_format("Y-m-d h:i:s.u",$increment["endingdate"]["date"]));
-                $this->doctrine->getManager()->merge($customerincrementaxiom);
-                $this->doctrine->getManager()->flush();
-                $customerincrementaxiom->calculateIncrements($this->doctrine);
+                $inc=round((($precio_con_dto/$neto)-1)*100,2);
+                //antes de hacer ninguna modificación, comprobamos si ha habido algún cambio en el incremento, de no ser así, no se hace nada.
+                if(round($customerincrementaxiom->getIncrement(),2)!=$inc)
+                {
+                  $customerincrementaxiom->setIncrement($inc);
+                  $customerincrementaxiom->setDateupd(new \Datetime());
+                  $customerincrementaxiom->setStart(date_create_from_format("Y-m-d h:i:s.u",$increment["startingdate"]["date"]));
+                  if ($increment["endingdate"]["date"]=="1753-01-01 00:00:00.000000") {
+                    $customerincrementaxiom->setEnd(null);
+                  } else $customerincrementaxiom->setEnd(date_create_from_format("Y-m-d h:i:s.u",$increment["endingdate"]["date"]));
+                  $this->doctrine->getManager()->merge($customerincrementaxiom);
+                  $this->doctrine->getManager()->flush();
+                  $customerincrementaxiom->calculateIncrements($this->doctrine);
+                }
               }
             }
+
         }
 
       }
