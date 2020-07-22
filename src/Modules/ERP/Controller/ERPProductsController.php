@@ -265,6 +265,31 @@ class ERPProductsController extends Controller
     }
 
 		/**
+    * @Route("/api/erp/product/getdescription/{id}", name="getProductDescription", defaults={"id"=0})
+    */
+    public function getProductDescription($id,Request $request){
+			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			$EAN13repository=$this->getDoctrine()->getRepository(ERPEAN13::class);
+
+			$obj=null;
+			if($id!=0){
+				$obj = $this->getDoctrine()->getRepository($this->class)->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
+			}else{
+				if($request->request->get('barcode',null)){
+						$EAN13=$EAN13repository->findOneBy(["name"=>$request->request->get('barcode',null), "active"=>1, "deleted"=>0]);
+						if($EAN13) $obj=$EAN13->getProduct();
+				}
+			}
+			if($obj){
+
+				$result["id"]=$obj->getId();
+				$result["description"]=$obj->getDescription();
+				return new JsonResponse($result);
+			}
+			return new JsonResponse(["result"=>-1]);
+    }
+
+		/**
 		* @Route("/api/prestashop/erp/product/get/{id}", name="prestashopGetProduct", defaults={"id"=0})
 		*/
 		public function prestashopGetProduct($id,Request $request){
