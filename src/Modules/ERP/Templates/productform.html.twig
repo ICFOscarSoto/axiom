@@ -102,6 +102,10 @@
 					$('#fileinput-img-{{field.name}}').fadeIn();
 				});
 
+				$(".wysiwyg").each(function() {
+		      new Jodit("#"+$(this).attr("id"),{});
+		    });
+
 				$('body').on('click', '[id^="btn-image-save"]', function(){
 					$('#fileinput-img-{{field.name}}').fadeOut();
 					var url = "{{url("uploadImage",{"type":field.imageType, "id": formConstructor.id_object})}}";

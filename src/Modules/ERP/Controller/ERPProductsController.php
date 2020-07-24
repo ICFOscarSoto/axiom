@@ -264,6 +264,103 @@ class ERPProductsController extends Controller
 			return new JsonResponse(["result"=>-1]);
     }
 
+		/**
+    * @Route("/api/erp/product/getdescription/{id}", name="getProductDescription", defaults={"id"=0})
+    */
+    public function getProductDescription($id,Request $request){
+			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			$EAN13repository=$this->getDoctrine()->getRepository(ERPEAN13::class);
+
+			$obj=null;
+			if($id!=0){
+				$obj = $this->getDoctrine()->getRepository($this->class)->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
+			}else{
+				if($request->request->get('barcode',null)){
+						$EAN13=$EAN13repository->findOneBy(["name"=>$request->request->get('barcode',null), "active"=>1, "deleted"=>0]);
+						if($EAN13) $obj=$EAN13->getProduct();
+				}
+			}
+			if($obj){
+
+				$result["id"]=$obj->getId();
+				$result["description"]=$obj->getDescription();
+				return new JsonResponse($result);
+			}
+			return new JsonResponse(["result"=>-1]);
+    }
+
+		/**
+    * @Route("/api/erp/product/getimages/{id}", name="getProductImages", defaults={"id"=0})
+    */
+    public function getProductImages($id,Request $request){
+			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			$image_path = $this->get('kernel')->getRootDir().'/../cloud/'.$this->getUser()->getCompany()->getId().'/images/products/'.$id.'/';
+			$images=[];
+			$image=["large"=>$this->generateUrl('getImage', array('type' => 'products', "size"=>"large", "id"=>$id, "number"=>0 )),
+						 "thumb"=>$this->generateUrl('getImage', array('type' => 'products', "size"=>"thumb", "id"=>$id, "number"=>0 )),
+						 "medium"=>$this->generateUrl('getImage', array('type' => 'products', "size"=>"medium", "id"=>$id, "number"=>0 ))];
+			$images[]=$image;
+			$found=true;
+			$i=1;
+			while($found==true){
+				if(file_exists($image_path.$id."-".$i.'-large.png') || file_exists($image_path.$id."-".$i.'-large.jpg')){
+					$i++;
+				}else{
+					$found=false;
+					$i--;
+				}
+			}
+			for($j=1;$j<=$i;$j++){
+				$image=["large"=>$this->generateUrl('getImage', array('type' => 'products', "size"=>"large", "id"=>$id, "number"=>$j )),
+							 "thumb"=>$this->generateUrl('getImage', array('type' => 'products', "size"=>"thumb", "id"=>$id, "number"=>$j )),
+							 "medium"=>$this->generateUrl('getImage', array('type' => 'products', "size"=>"medium", "id"=>$id, "number"=>$j ))];
+				$images[]=$image;
+			}
+			return new JsonResponse(["images"=>$images]);
+    }
+
+
+		/**
+		* @Route("/api/prestashop/erp/product/get/{id}", name="prestashopGetProduct", defaults={"id"=0})
+		*/
+		public function prestashopGetProduct($id,Request $request){
+			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			$productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
+			$auth = base64_encode("6TI5549NR221TXMGMLLEHKENMG89C8YV");
+			$context = stream_context_create([
+			    "http" => ["header" => "Authorization: Basic $auth"]
+			]);
+			$array=[];
+			try{
+				$xml_string=file_get_contents("https://ferreteriacampollano.com/api/products/?filter[reference]=".$id, false, $context);
+				$xml = simplexml_load_string($xml_string);
+				$json = json_encode($xml);
+				$array = json_decode($json,TRUE);
+			}catch(Exception $e){}
+			if(isset($array["products"]["product"]["@attributes"]["id"])){
+				$idpresta=$array["products"]["product"]["@attributes"]["id"];
+				//GET PRODUCT INFO
+				try{
+					$xml_string=file_get_contents("https://ferreteriacampollano.com/api/products/".$idpresta, false, $context);
+					$xml = simplexml_load_string($xml_string, 'SimpleXMLElement', LIBXML_NOCDATA);
+					$json = json_encode($xml);
+					$array = json_decode($json,TRUE);
+					$description=$array["product"]["description"]["language"];
+					$product=$productRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "code"=>$id, "deleted"=>0]);
+					if($product){
+						$product->setDescription($description);
+						$this->getDoctrine()->getManager()->persist($product);
+						$this->getDoctrine()->getManager()->flush();
+						return new JsonResponse(["result"=>1]);
+					}
+
+				 }catch(Exception $e){}
+
+			}
+			return new JsonResponse(["result"=>-1]);
+		}
+
+
   /**
    * @Route("/{_locale}/admin/global/product/list", name="productlist")
    */
