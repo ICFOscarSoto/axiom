@@ -248,9 +248,113 @@ class ERPCustomerIncrements
 
           }
       }
+      $em->clear();
 
     }
 
+
+    public function calculateIncrementsBySupplierCategory($doctrine){
+      $em = $doctrine->getManager();
+      $repositoryProduct=$doctrine->getRepository(ERPProducts::class);
+      $repositoryCustomerPrices=$doctrine->getRepository(ERPCustomerPrices::class);
+      $repositoryCustomerGroups=$doctrine->getRepository(ERPCustomerGroups::class);
+      $repositorySuppliers=$doctrine->getRepository(ERPSuppliers::class);
+      $repositoryIncrements=$doctrine->getRepository(ERPIncrements::class);
+      //de momento partimos de que el proveedor nunca es NULL, pero en el futuro tendremos
+      //que permitir que pueda haber incrementos sólo por categría, por lo que esto no funcionaría.
+      $products=$repositoryProduct->productsBySupplierCategory($this->supplier->getId(),$this->category->getId());
+      foreach($products as $product){
+
+        $productEntity=$repositoryProduct->findOneBy(["id"=>$product]);
+        //controlamos que un producto no pueda recibir incrementos si no tiene una categoría asocaida
+      //  dump("Calculamos el incremento para el producto ".$productEntity->getCode());
+        if($productEntity->getCategory()!=null)
+        {
+
+            $increment=$this->getIncrementByCustomer($doctrine,$this->supplier,$productEntity->getCategory(),$this->customer);
+            if($increment!=NULL){
+              if($repositoryCustomerPrices->existPrice($productEntity,$this->customer,$this->supplier)){
+                    $customerpricesEntity=$repositoryCustomerPrices->findOneBy(["product"=>$productEntity,"customer"=>$this->customer,"supplier"=>$this->supplier]);
+                    $customerpricesEntity->setIncrement($increment);
+                    $customerpricesEntity->setPrice(round($productEntity->getShoppingPrice()*(1+($increment/100)),2));
+                    $customerpricesEntity->setStart($this->getStart());
+                    $customerpricesEntity->setEnd($this->getEnd());
+                }
+              else {
+                    $customerpricesEntity= new ERPCustomerPrices();
+                    $customerpricesEntity->setProduct($productEntity);
+                    $customerpricesEntity->setCustomer($this->customer);
+                    $customerpricesEntity->setSupplier($this->supplier);
+                    $customerpricesEntity->setIncrement($increment*1);
+                    $customerpricesEntity->setPrice(round($productEntity->getShoppingPrice()*(1+($increment/100)),2));
+                    $customerpricesEntity->setActive(1);
+                    $customerpricesEntity->setDeleted(0);
+                    $customerpricesEntity->setDateupd(new \DateTime());
+                    $customerpricesEntity->setDateadd(new \DateTime());
+                    $customerpricesEntity->setStart($this->getStart());
+                    $customerpricesEntity->setEnd($this->getEnd());
+
+              }
+                  $em->persist($customerpricesEntity);
+            }
+
+            //$em->persist($productEntity);
+            $em->flush();
+
+          }
+      }
+      //$em->clear();
+
+    }
+
+/*
+    public function calculateIncrementsByProduct($doctrine,$product_id){
+      $em = $doctrine->getManager();
+      $repositoryProduct=$doctrine->getRepository(ERPProducts::class);
+      $repositoryCustomerPrices=$doctrine->getRepository(ERPCustomerPrices::class);
+      $repositoryCustomerGroups=$doctrine->getRepository(ERPCustomerGroups::class);
+      $repositorySuppliers=$doctrine->getRepository(ERPSuppliers::class);
+      $repositoryIncrements=$doctrine->getRepository(ERPIncrements::class);
+      //de momento partimos de que el proveedor nunca es NULL, pero en el futuro tendremos
+      //que permitir que pueda haber incrementos sólo por categría, por lo que esto no funcionaría.
+    //  $products=$repositorySuppliers->productsBySupplier($this->supplier->getId());
+        $productEntity=$repositoryProduct->findOneBy(["id"=>$product_id]);
+        //controlamos que un producto no pueda recibir incrementos si no tiene una categoría asocaida
+        if($productEntity->getCategory()!=null)
+        {
+
+            $increment=$this->getIncrementByCustomer($doctrine,$this->supplier,$productEntity->getCategory(),$this->customer);
+            if($increment!=NULL){
+              if($repositoryCustomerPrices->existPrice($productEntity,$this->customer,$this->supplier)){
+                    $customerpricesEntity=$repositoryCustomerPrices->findOneBy(["product"=>$productEntity,"customer"=>$this->customer,"supplier"=>$this->supplier]);
+                    $customerpricesEntity->setIncrement($increment);
+                    $customerpricesEntity->setPrice(round($productEntity->getShoppingPrice()*(1+($increment/100)),2));
+                    $customerpricesEntity->setStart($this->getStart());
+                    $customerpricesEntity->setEnd($this->getEnd());
+                }
+              else {
+                    $customerpricesEntity= new ERPCustomerPrices();
+                    $customerpricesEntity->setProduct($productEntity);
+                    $customerpricesEntity->setCustomer($this->customer);
+                    $customerpricesEntity->setSupplier($this->supplier);
+                    $customerpricesEntity->setIncrement($increment*1);
+                    $customerpricesEntity->setPrice(round($productEntity->getShoppingPrice()*(1+($increment/100)),2));
+                    $customerpricesEntity->setActive(1);
+                    $customerpricesEntity->setDeleted(0);
+                    $customerpricesEntity->setDateupd(new \DateTime());
+                    $customerpricesEntity->setDateadd(new \DateTime());
+                    $customerpricesEntity->setStart($this->getStart());
+                    $customerpricesEntity->setEnd($this->getEnd());
+
+              }
+                  $em->persist($customerpricesEntity);
+            }
+            $em->flush();
+          }
+
+          $em->clear();
+    }
+*/
     public function getIncrementByCustomer($doctrine,$supplier,$productcategory,$customer)
     {
       $repository=$doctrine->getRepository(ERPCustomerIncrements::class);

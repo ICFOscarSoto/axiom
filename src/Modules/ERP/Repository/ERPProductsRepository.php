@@ -47,4 +47,18 @@ class ERPProductsRepository extends ServiceEntityRepository
         ;
     }
     */
+
+    public function productsBySupplierCategory($supplier,$category){
+      $query="SELECT id from erpproducts
+      where supplier_id=:supplier AND category_id=:category";
+      $params=['supplier' => $supplier,
+              'category' => $category];
+      $result=$this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+      return $result;
+
+
+
+    }
+
+
 }

@@ -5,6 +5,7 @@ namespace App\Modules\ERP\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\ERP\Entity\ERPSuppliers;
 use \App\Modules\ERP\Entity\ERPCategories;
+use \App\Modules\ERP\Entity\ERPIncrements;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPShoppingDiscountsRepository")
@@ -191,12 +192,16 @@ class ERPShoppingDiscounts
       $em = $doctrine->getManager();
       $repositoryProduct=$doctrine->getRepository(ERPProducts::class);
       $repository=$doctrine->getRepository(ERPSuppliers::class);
+      $repositoryIncrements=$doctrine->getRepository(ERPIncrements::class);
       $products=$repository->productsBySupplier($this->supplier->getId());
       foreach($products as $product){
         $productEntity=$repositoryProduct->findOneBy(["id"=>$product]);
         $productEntity->priceCalculated($doctrine);
+        $productEntity->calculateIncrementByProduct();
+        $productEntity->calculateCustomerIncrementByProduct();
         $em->persist($productEntity);
         $em->flush();
+
       }
     }
 

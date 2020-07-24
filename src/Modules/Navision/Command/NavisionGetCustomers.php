@@ -88,7 +88,6 @@ class NavisionGetCustomers extends ContainerAwareCommand
      } else {
         $fp = fopen('/tmp/axiom-navisionGetCustomers-importCustomer.lock', 'c');
      }
-
      if (!flock($fp, LOCK_EX | LOCK_NB)) {
        $output->writeln('* Fallo al iniciar la sincronizacion de clientes: El proceso ya esta en ejecución.');
        exit;
@@ -408,7 +407,12 @@ class NavisionGetCustomers extends ContainerAwareCommand
 
    public function importCustomerComment(InputInterface $input, OutputInterface $output){
      //------   Create Lock Mutex    ------
-     $fp = fopen('/tmp/axiom-navisionGetCustomers-importCustomerComment.lock', 'c');
+
+     if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+         $fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetCustomers-importCustomerComment.lock', 'c');
+     } else {
+         $fp = fopen('/tmp/axiom-navisionGetCustomers-importCustomerComment.lock', 'c');
+     }
      //$fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetCustomers-importCustomerComment.lock', 'c');
      if (!flock($fp, LOCK_EX | LOCK_NB)) {
        $output->writeln('* Fallo al iniciar la sincronizacion de comentarios de clientes: El proceso ya esta en ejecución.');
@@ -499,8 +503,12 @@ class NavisionGetCustomers extends ContainerAwareCommand
 
    public function importCustomerContact(InputInterface $input, OutputInterface $output){
      //------   Create Lock Mutex    ------
-     $fp = fopen('/tmp/axiom-navisionGetCustomers-importCustomerContact.lock', 'c');
-    // $fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetCustomers-importCustomerContact.lock', 'c');
+     if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+         $fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetCustomers-importCustomerContact.lock', 'c');
+     } else {
+         $fp = fopen('/tmp/axiom-navisionGetCustomers-importCustomerContact.lock', 'c');
+     }
+
      if (!flock($fp, LOCK_EX | LOCK_NB)) {
        $output->writeln('* Fallo al iniciar la sincronizacion de contactos de clientes: El proceso ya esta en ejecución.');
        exit;
@@ -575,8 +583,11 @@ class NavisionGetCustomers extends ContainerAwareCommand
 
  public function importCustomerAddresses(InputInterface $input, OutputInterface $output){
      //------   Create Lock Mutex    ------
-     $fp = fopen('/tmp/axiom-navisionGetCustomers-importCustomerAddresses.lock', 'c');
-    //$fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetCustomers-importCustomerAddresses.lock', 'c');
+     if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+         $fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetCustomers-importCustomerAddresses.lock', 'c');
+     } else {
+         $fp = fopen('/tmp/axiom-navisionGetCustomers-importCustomerAddresses.lock', 'c');
+     }
 
      if (!flock($fp, LOCK_EX | LOCK_NB)) {
        $output->writeln('* Fallo al iniciar la sincronizacion de direcciones de clientes: El proceso ya esta en ejecución.');

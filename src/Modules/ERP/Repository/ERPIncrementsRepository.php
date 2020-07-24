@@ -131,7 +131,6 @@ class ERPIncrementsRepository extends ServiceEntityRepository
 
     public function getIncrementByGroup($supplier,$category,$customergroup)
     {
-
       $result=0;
       if($supplier!=NULL AND $category!=NULL)
       {
