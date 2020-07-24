@@ -744,6 +744,10 @@ class ERPProducts
           $this->priceCalculatedNewMainSupplier($doctrine);
 
     }
+    public function postProccess($kernel, $doctrine, $user, $params, $oldobj){
+      $this->calculateIncrementByProduct($doctrine);
+      $this->calculateCustomerIncrementsByProduct($doctrine);
+    }
 
      public function formValidation($kernel, $doctrine, $user, $validationParams){
        $repository=$doctrine->getRepository(ERPProducts::class);
@@ -797,6 +801,115 @@ class ERPProducts
          $this->pvpincrement = $pvpincrement;
 
          return $this;
+     }
+
+     //método creado específicamente para actualizar los precios de un producto concreto, cuando se vea afectado su precio de compra.
+     public function calculateIncrementByProduct($doctrine){
+       $em = $doctrine->getManager();
+       $repositoryProductPrices=$doctrine->getRepository(ERPProductPrices::class);
+       $repositoryCustomerGroups=$doctrine->getRepository(ERPCustomerGroups::class);
+       $repositorySuppliers=$doctrine->getRepository(ERPSuppliers::class);
+       $repositoryIncrements=$doctrine->getRepository(ERPIncrements::class);
+       $repositoryCustomerGroups=$doctrine->getRepository(ERPCustomerGroups::class);
+       $repositorySuppliers=$doctrine->getRepository(ERPSuppliers::class);
+       $supplier=$repositorySuppliers->findOneBy(["id"=>$this->supplier]);
+       $repositoryCategories=$doctrine->getRepository(ERPCategories::class);
+       $category=$repositoryCategories->findOneBy(["id"=>$this->category]);
+       if($this->category!=null)
+        {
+           $this->calculatePVP($doctrine);
+           $customergroups=$repositoryCustomerGroups->findBy(["active"=>1,"deleted"=>0]);
+
+           foreach($customergroups as $customergroup){
+             $increment=$repositoryIncrements->getIncrementByGroup($supplier,$category,$customergroup);
+             if($increment!=NULL){
+               if($repositoryProductPrices->existPrice($this,$customergroup,$supplier)){
+                     $productpricesEntity=$repositoryProductPrices->findOneBy(["product"=>$this,"customergroup"=>$customergroup,"supplier"=>$supplier]);
+                     $productpricesEntity->setIncrement($increment);
+                     $productpricesEntity->setPrice(round($this->shoppingPrice*(1+($increment/100)),2));
+                 }
+               else {
+                     $productpricesEntity= new ERPProductPrices();
+                     $productpricesEntity->setProduct($this);
+                     $productpricesEntity->setCustomergroup($customergroup);
+                     $productpricesEntity->setSupplier($supplier);
+                     $productpricesEntity->setIncrement($increment*1);
+                     $productpricesEntity->setPrice(round($this->shoppingPrice*(1+($increment/100)),2));
+                     $productpricesEntity->setActive(1);
+                     $productpricesEntity->setDeleted(0);
+                     $productpricesEntity->setDateupd(new \DateTime());
+                     $productpricesEntity->setDateadd(new \DateTime());
+
+               }
+                   $em->persist($productpricesEntity);
+             }
+             $em->flush();
+          }
+
+         }
+
+     }
+
+
+  //método creado específicamente para actualizar los precios específicos de clientes para un producto concreto, cuando se vea afectado su precio de compra.
+   public function calculateCustomerIncrementsByProduct($doctrine){
+         $em = $doctrine->getManager();
+         $repositoryProduct=$doctrine->getRepository(ERPProducts::class);
+         $repositoryCustomerPrices=$doctrine->getRepository(ERPCustomerPrices::class);
+         $repositoryCustomers=$doctrine->getRepository(ERPCustomers::class);
+         $repositorySuppliers=$doctrine->getRepository(ERPSuppliers::class);
+         $repositoryIncrements=$doctrine->getRepository(ERPIncrements::class);
+         $supplier=$repositorySuppliers->findOneBy(["id"=>$this->supplier]);
+         $repositoryCategories=$doctrine->getRepository(ERPCategories::class);
+         $repositoryCustomerIncrements=$doctrine->getRepository(ERPCustomerIncrements::class);
+         $category=$repositoryCategories->findOneBy(["id"=>$this->category]);
+
+         //de momento partimos de que el proveedor nunca es NULL, pero en el futuro tendremos
+         //que permitir que pueda haber incrementos sólo por categría, por lo que esto no funcionaría.
+
+         //controlamos que un producto no pueda recibir incrementos si no tiene una categoría asocaida
+         if($this->getCategory()!=null)
+         {
+
+           $customers_ids=$repositoryCustomerPrices->findCustomersByProduct($this);
+           foreach($customers_ids as $customer_id)
+           {
+             $customer=$repositoryCustomers->findOneBy(["id"=>$customer_id]);
+             $customerincrement_obj=$repositoryCustomerIncrements->findOneBy(["supplier"=>$supplier,"category"=>$category,"customer"=>$customer]);
+             $increment=$repositoryCustomerIncrements->getIncrementByCustomer($supplier,$category,$customer);
+             if($increment!=NULL){
+               if($repositoryCustomerPrices->existPrice($this,$customer,$supplier)){
+                     $customerpricesEntity=$repositoryCustomerPrices->findOneBy(["product"=>$this,"customer"=>$customer,"supplier"=>$supplier]);
+                     $customerpricesEntity->setIncrement($increment);
+                     $customerpricesEntity->setPrice(round($this->getShoppingPrice()*(1+($increment/100)),2));
+                     $customerpricesEntity->setStart($customerincrement_obj->getStart());
+                     $customerpricesEntity->setEnd($customerincrement_obj->getEnd());
+                 }
+               else {
+                     $customerpricesEntity= new ERPCustomerPrices();
+                     $customerpricesEntity->setProduct($this);
+                     $customerpricesEntity->setCustomer($customer);
+                     $customerpricesEntity->setSupplier($supplier);
+                     $customerpricesEntity->setIncrement($increment*1);
+                     $customerpricesEntity->setPrice(round($this->getShoppingPrice()*(1+($increment/100)),2));
+                     $customerpricesEntity->setActive(1);
+                     $customerpricesEntity->setDeleted(0);
+                     $customerpricesEntity->setDateupd(new \DateTime());
+                     $customerpricesEntity->setDateadd(new \DateTime());
+                     $customerpricesEntity->setStart($customerincrement_obj->getStart());
+                     $customerpricesEntity->setEnd($customerincrement_obj->getEnd());
+
+               }
+                   $em->persist($customerpricesEntity);
+             }
+
+             //$em->persist($productEntity);
+             $em->flush();
+
+           }
+         }
+
+
      }
 
 
