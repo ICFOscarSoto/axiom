@@ -185,7 +185,8 @@ class NavisionGetProducts extends ContainerAwareCommand
          $this->doctrine->getManager()->flush();
          $obj->priceCalculated($this->doctrine);
          $this->doctrine->getManager()->clear();
-      }$navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"products"]);
+      }
+      $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"products"]);
       if ($navisionSync==null) {
         $navisionSync=new NavisionSync();
         $navisionSync->setEntity("products");
@@ -404,6 +405,7 @@ public function importPrices(InputInterface $input, OutputInterface $output) {
       }
     }
   }
+
   //------   Critical Section END   ------
   //------   Remove Lock Mutex    ------
   fclose($fp);
@@ -518,7 +520,7 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
   $products=$repository->findAll();
   //Disable SQL logger
   foreach($products as $product) {
-  /*  $product=$repository->findOneBy(["code"=>'208833']);*/
+
     $output->writeln($product->getCode().'  - '.$product->getName());
     $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
 
@@ -530,8 +532,8 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
       $objects=$objects[0];
       foreach ($objects["class"] as $increment){
 
-        //grupos de clientes
-        if($increment["type"]==1)
+      //grupos de clientes
+      if($increment["type"]==1)
         {
           $customergroup=$repositoryCustomeGroups->findOneBy(["name"=>$increment["salescode"]]);
 
@@ -541,8 +543,8 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
               //no existe el incremento en axiom
               if($incrementaxiom_ID==null)
               {
-
-                if($increment["Discount"]!=0){
+                $output->writeln('Añadimos el incremento para el grupo '.$increment["salescode"]);
+                if($increment["Discount"]!=0 AND $increment["neto"]!=0){
                     $category=$repositoryCategory->findOneBy(["id"=>$product->getCategory()->getId()]);
                     $obj=new ERPIncrements();
                     $obj->setSupplier($supplier);
@@ -559,14 +561,19 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
                     $obj->setDateupd(new \Datetime());
                     $obj->setActive(1);
                     $obj->setDeleted(0);
-                    $this->doctrine->getManager()->merge($obj);
+                    $this->doctrine->getManager()->persist($obj);
                     $this->doctrine->getManager()->flush();
-                   $obj->calculateIncrements($this->doctrine);
+                    $output->writeln('Actualizamos todos los productos asociados a ese incremento...');
+                    $obj->calculateIncrementsBySupplierCategory($this->doctrine);
                 }
+
               }
+
               //existe el incremento en axiom, luego hay que editarlo siempre y cuando haya habido alguna modificación
               else{
 
+                $output->writeln('Ya existe el incremento');
+/*
                 $incrementaxiom=$repositoryIncrements->findOneBy(["id"=>$incrementaxiom_ID]);
                 $pvp=$increment["pvp"];
                 $dto=$increment["Discount"];
@@ -577,10 +584,12 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
                 {
                   $incrementaxiom->setIncrement($inc);
                   $incrementaxiom->setDateupd(new \Datetime());
-                  $this->doctrine->getManager()->merge($incrementaxiom);
+                  $this->doctrine->getManager()->persist($incrementaxiom);
                   $this->doctrine->getManager()->flush();
-                  $incrementaxiom->calculateIncrements($this->doctrine);
+                  $incrementaxiom->calculateIncrementsBySupplierCategory($this->doctrine);
                 }
+*/
+
               }
             }
         }
@@ -589,14 +598,14 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
           {
 
             $customer=$repositoryCustomers->findOneBy(["code"=>$increment["salescode"]]);
-
             if($customer!=NULL)
             {
                 $customerincrementaxiom_ID=$repositoryCustomerIncrements->getIncrementIdByCustomer($product->getSupplier(),$product->getCategory(),$customer);
                 //no existe el incremento para el cliente, luego lo creamos
                 if($customerincrementaxiom_ID==null)
                 {
-                if($increment["Discount"]!=0){
+                $output->writeln('Añadimos incremento para el cliente '.$increment["salescode"]);
+                if($increment["Discount"]!=0 AND $increment["neto"]!=0){
                     $category=$repositoryCategory->findOneBy(["id"=>$product->getCategory()->getId()]);
                     $obj=new ERPCustomerIncrements();
                     $obj->setSupplier($supplier);
@@ -617,15 +626,17 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
                     } else $obj->setEnd(date_create_from_format("Y-m-d h:i:s.u",$increment["endingdate"]["date"]));
                     $obj->setActive(1);
                     $obj->setDeleted(0);
-                    $this->doctrine->getManager()->merge($obj);
+                    $this->doctrine->getManager()->persist($obj);
                     $this->doctrine->getManager()->flush();
-                    $obj->calculateIncrements($this->doctrine);
+                    $output->writeln('Actualizamos todos los productos asociados a ese incremento...');
+                    $obj->calculateIncrementsBySupplierCategory($this->doctrine);
                 }
 
               }
               //ya existe el descuento para ese cliente
               else{
-
+                  $output->writeln('Ya existe el incremento');
+                /*
                 $customerincrementaxiom=$repositoryCustomerIncrements->findOneBy(["id"=>$customerincrementaxiom_ID]);
                 $pvp=$increment["pvp"];
                 $dto=$increment["Discount"];
@@ -641,19 +652,38 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
                   if ($increment["endingdate"]["date"]=="1753-01-01 00:00:00.000000") {
                     $customerincrementaxiom->setEnd(null);
                   } else $customerincrementaxiom->setEnd(date_create_from_format("Y-m-d h:i:s.u",$increment["endingdate"]["date"]));
-                  $this->doctrine->getManager()->merge($customerincrementaxiom);
+                  $this->doctrine->getManager()->persist($customerincrementaxiom);
                   $this->doctrine->getManager()->flush();
-                  $customerincrementaxiom->calculateIncrements($this->doctrine);
+                  $customerincrementaxiom->calculateIncrementsBySupplierCategory($this->doctrine);
                 }
+
+                */
               }
             }
 
+          $output->writeln('Finalizado el incremento para el cliente');
         }
 
       }
-        $this->doctrine->getManager()->clear();
+
     }
-  }
+
+
+
+ }
+
+ $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"productincrements"]);
+ if ($navisionSync==null) {
+   $navisionSync=new NavisionSync();
+   $navisionSync->setEntity("productincrements");
+ }
+ $navisionSync->setLastsync($datetime);
+ $output->writeln('* El nuevo maxtimestamp es ....'.$objects["maxtimestamp"]);
+ if ($objects["maxtimestamp"]>$navisionSync->getMaxtimestamp())
+ $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
+ $this->doctrine->getManager()->persist($navisionSync);
+ $this->doctrine->getManager()->flush();
+ $this->doctrine->getManager()->clear();
   //------   Critical Section END   ------
   //------   Remove Lock Mutex    ------
   fclose($fp);
@@ -709,7 +739,7 @@ public function importOffers(InputInterface $input, OutputInterface $output) {
                 $offeraxiom->setEnd(null);
               }
               else $offeraxiom->setEnd(date_create_from_format("Y-m-d h:i:s.u",$offer["endingdate"]["date"]));
-              $this->doctrine->getManager()->merge($offeraxiom);
+              $this->doctrine->getManager()->persist($offeraxiom);
               $this->doctrine->getManager()->flush();
 
             }
@@ -730,7 +760,7 @@ public function importOffers(InputInterface $input, OutputInterface $output) {
               $obj->setDateupd(new \Datetime());
               $obj->setActive(1);
               $obj->setDeleted(0);
-              $this->doctrine->getManager()->merge($obj);
+              $this->doctrine->getManager()->persist($obj);
               $this->doctrine->getManager()->flush();
             }
 
@@ -748,7 +778,7 @@ public function importOffers(InputInterface $input, OutputInterface $output) {
                 $offeraxiom->setEnd(null);
               }
               else $offeraxiom->setEnd(date_create_from_format("Y-m-d h:i:s.u",$offer["endingdate"]["date"]));
-              $this->doctrine->getManager()->merge($offeraxiom);
+              $this->doctrine->getManager()->persist($offeraxiom);
               $this->doctrine->getManager()->flush();
 
             }
@@ -768,7 +798,7 @@ public function importOffers(InputInterface $input, OutputInterface $output) {
               $obj->setDateupd(new \Datetime());
               $obj->setActive(1);
               $obj->setDeleted(0);
-              $this->doctrine->getManager()->merge($obj);
+              $this->doctrine->getManager()->persist($obj);
               $this->doctrine->getManager()->flush();
 
 
