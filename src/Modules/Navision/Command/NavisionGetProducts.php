@@ -409,17 +409,17 @@ public function importPrices(InputInterface $input, OutputInterface $output) {
 
 public function pricesZero(InputInterface $input, OutputInterface $output){
   $repository=$this->doctrine->getRepository(ERPProducts::class);
-  $products=$repository->findBy(['shoppingPrice'=>0]);
+  $products=$repository->findBy(['shoppingPrice'=>0, ]);
   foreach ($products as $product){
     if ($product->getSupplier()){
     $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getProduct.php?product='.$product->getCode());
     $objects=json_decode($json, true);
     $object=$objects[0]["class"][0];
-    $json2=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getPrices.php?from='.$product->getCode().'$supplier='.$product->getSupplier()->getCode());
-    $prices=json_decode($json2, true);
-    $prices=$prices[0];
+    //$json2=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getPrices.php?from='.$product->getCode().'$supplier='.$product->getSupplier()->getCode());
+    //$prices=json_decode($json2, true);
+    //$prices=$prices[0];
     $product->setnetprice(1);
-    foreach ($prices["class"] as $price){
+    /*foreach ($prices["class"] as $price){
       if($price["Discount"]!=0){
         if ($prices["Ending"]["date"]=="1753-01-01 00:00:00.000000") {
           $product->setnetprice(0);
@@ -429,10 +429,10 @@ public function pricesZero(InputInterface $input, OutputInterface $output){
     if (!$product->getnetprice()){
       $product->setPVPR($object["ShoppingPrice"]);
       $product->setShoppingPrice(0);
-    } else {
+    } else {*/
       $product->setPVPR(0);
       $product->setShoppingPrice($object["ShoppingPrice"]);
-    }
+      $output->writeln('*Poniendo precio al producto'.$product->getCode());
     $this->doctrine->getManager()->merge($product);
     $this->doctrine->getManager()->flush();
     $product->priceCalculated($this->doctrine);
