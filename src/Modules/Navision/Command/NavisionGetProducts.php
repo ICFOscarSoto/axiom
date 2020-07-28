@@ -81,6 +81,8 @@ class NavisionGetProducts extends ContainerAwareCommand
       break;
       case 'values': $this->importProductsVariants($input, $output);
       break;
+      case 'prices0': $this->pricesZero($input, $output);
+      break;
       case 'all':
         $this->importProduct($input, $output);
         $this->clearEAN13($input, $output);
@@ -349,12 +351,6 @@ public function importPrices(InputInterface $input, OutputInterface $output) {
   }
 
   //------   Critical Section START   ------
-  $navisionSyncRepository=$this->doctrine->getRepository(NavisionSync::class);
-  $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"prices"]);
-  if ($navisionSync==null) {
-    $navisionSync=new NavisionSync();
-    $navisionSync->setMaxtimestamp(0);
-  }
   $datetime=new \DateTime();
   $output->writeln('* Sincronizando precios....');
   $repositoryCategory=$this->doctrine->getRepository(ERPCategories::class);
@@ -409,6 +405,42 @@ public function importPrices(InputInterface $input, OutputInterface $output) {
   //------   Critical Section END   ------
   //------   Remove Lock Mutex    ------
   fclose($fp);
+}
+
+public function pricesZero(InputInterface $input, OutputInterface $output){
+  $repository=$this->doctrine->getRepository(ERPProducts::class);
+  $products=$repository->findBy(['shoppingPrice'=>0]);
+  foreach ($products as $product){
+    if ($product->getSupplier()){
+    $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getProduct.php?product='.$product->getCode());
+    $objects=json_decode($json, true);
+    $object=$objects[0]["class"][0];
+    $json2=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getPrices.php?from='.$product->getCode().'$supplier='.$product->getSupplier()->getCode());
+    $prices=json_decode($json2, true);
+    $prices=$prices[0];
+    $product->setnetprice(1);
+    foreach ($prices["class"] as $price){
+      if($price["Discount"]!=0){
+        if ($prices["Ending"]["date"]=="1753-01-01 00:00:00.000000") {
+          $product->setnetprice(0);
+        }
+      }
+    }
+    if (!$product->getnetprice()){
+      $product->setPVPR($object["ShoppingPrice"]);
+      $product->setShoppingPrice(0);
+    } else {
+      $product->setPVPR(0);
+      $product->setShoppingPrice($object["ShoppingPrice"]);
+    }
+    $this->doctrine->getManager()->merge($product);
+    $this->doctrine->getManager()->flush();
+    $product->priceCalculated($this->doctrine);
+    $this->doctrine->getManager()->clear();
+  }
+
+
+  }
 }
 
 public function importStocks(InputInterface $input, OutputInterface $output) {
@@ -573,23 +605,6 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
               else{
 
                 $output->writeln('Ya existe el incremento');
-/*
-                $incrementaxiom=$repositoryIncrements->findOneBy(["id"=>$incrementaxiom_ID]);
-                $pvp=$increment["pvp"];
-                $dto=$increment["Discount"];
-                $neto=$increment["neto"];
-                $precio_con_dto=$pvp-$pvp*($dto/100);
-                $inc=round((($precio_con_dto/$neto)-1)*100,2);
-                if(round($incrementaxiom->getIncrement(),2)!=$inc)
-                {
-                  $incrementaxiom->setIncrement($inc);
-                  $incrementaxiom->setDateupd(new \Datetime());
-                  $this->doctrine->getManager()->persist($incrementaxiom);
-                  $this->doctrine->getManager()->flush();
-                  $incrementaxiom->calculateIncrementsBySupplierCategory($this->doctrine);
-                }
-*/
-
               }
             }
         }
