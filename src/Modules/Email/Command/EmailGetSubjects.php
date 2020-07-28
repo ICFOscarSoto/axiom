@@ -50,11 +50,7 @@ class EmailGetSubjects extends ContainerAwareCommand
           $entityManager->flush();
         //Get Ibox subjects
 
-
-
-
-
-        if($emailAccount->getInboxFolder()->getId()==$folder->getId()){
+        if($emailAccount->getInboxFolder()&&($emailAccount->getInboxFolder()->getId()==$folder->getId())){
           $olderMsgs=$emailSubjectsRepository->getUids($emailAccount->getInboxFolder()->getId());
           //$olderMsgs = array_reduce($olderMsgs, 'array_merge', array());
           $emailSubjectsRepository->deleteByFolder($emailAccount->getInboxFolder()->getId());
