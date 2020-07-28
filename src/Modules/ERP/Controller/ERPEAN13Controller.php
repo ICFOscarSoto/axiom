@@ -70,7 +70,7 @@ class ERPEAN13Controller extends Controller
 
 
    $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(),
-   "supplier"=>$default, "product"=>$id==0?$product:$obj->getProduct()];
+   "supplier"=>$default, "product"=>$id==0?$product:$obj->getProduct(), "productvariant"=>$id==0?null:$obj->getProductVariant()];
 
    $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),
                           method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);

@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\ERP\Entity\ERPSuppliers;
 use \App\Modules\ERP\Entity\ERPProducts;
 use \App\Modules\ERP\Entity\ERPCustomers;
+use \App\Modules\ERP\Entity\ERPProductsVariants;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPEAN13Repository")
@@ -66,6 +67,11 @@ class ERPEAN13
      * @ORM\Column(type="smallint", nullable=true)
      */
     private $type;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPProductsVariants")
+     */
+    private $productvariant;
 
     public function getId(): ?int
     {
@@ -176,6 +182,18 @@ class ERPEAN13
     public function setType(?int $type): self
     {
         $this->type = $type;
+
+        return $this;
+    }
+
+    public function getProductVariant(): ?ERPProductsVariants
+    {
+        return $this->productvariant;
+    }
+
+    public function setProductVariant(?ERPProductsVariants $productvariant): self
+    {
+        $this->productvariant = $productvariant;
 
         return $this;
     }

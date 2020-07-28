@@ -72,4 +72,16 @@ class ERPCustomerPricesRepository extends ServiceEntityRepository
       return $result;
 
     }
+
+    public function findCustomersByProduct($product){
+
+      $query="SELECT p.customer_id as customer
+              FROM erpcustomer_prices p
+              WHERE p.product_id=:PROD AND p.active=TRUE and p.deleted=0";
+      $params=['PROD' => $product->getId()
+              ];
+      $result=$this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+      return $result;
+
+    }
 }

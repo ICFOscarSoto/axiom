@@ -87,7 +87,7 @@ class ERPSupplierCommentLinesUtils
       'route' => 'suppliercommentlinesincidentslist',
       'routeParams' => ["supplierid" => $parent, "type"=>$type],
       'orderColumn' => 1,
-      'orderDirection' => 'ASC',
+      'orderDirection' => 'DESC',
       'tagColumn' => 1,
       'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/SupplierCommentLinesIncidents.json"),true),
       'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/SupplierCommentLinesIncidentsFieldButtons.json"),true),

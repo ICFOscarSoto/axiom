@@ -96,7 +96,7 @@ class ERPCustomerIncrementsRepository extends ServiceEntityRepository
                'CST' => $customer->getId()
                ];
 
-    return $this->getEntityManager()->getConnection()->executeQuery($query,$params)->fetch();
+    return $this->getEntityManager()->getConnection()->executeQuery($query,$params)->fetchColumn(0);
 
 
     }
