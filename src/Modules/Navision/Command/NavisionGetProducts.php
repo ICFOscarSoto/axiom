@@ -432,7 +432,8 @@ public function pricesZero(InputInterface $input, OutputInterface $output){
     } else {*/
       $product->setPVPR(0);
       $product->setShoppingPrice($object["ShoppingPrice"]);
-      $output->writeln('*Poniendo precio al producto'.$product->getCode());
+      if ($object["ShoppingPrice"]!=0) $output->writeln('*Poniendo precio al producto '.$product->getCode());
+      else $output->writeln('*Se deja precio 0 al producto '.$product->getCode());
     $this->doctrine->getManager()->merge($product);
     $this->doctrine->getManager()->flush();
     $product->priceCalculated($this->doctrine);
