@@ -3,8 +3,29 @@
 
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
+framework:
+    session:
+        # ...
+        handler_id: session.storage.custom
+
 parameters:
     locale: 'en'
+    app.activity_listener.class: App\Modules\Globale\Services\ActivityListener
+    pdo.db_options:
+        db_table:    globale_user_sessions
+        db_id_col:   sessionid
+        db_data_col: data
+        db_time_col: time
+        db_ipaddress_col: ipaddress
+        db_start_col: start
+        db_lastactivity_col: lastactivity
+        db_lifetime_col: lifetime
+        db_user_id_col: user_id
+        db_username: %env(string:DATABASE_USER)%
+        db_password: %env(string:DATABASE_PASS)%
+        db_host: %env(string:DATABASE_HOST)%
+        db_base: %env(string:DATABASE_BASE)%
+
 
 services:
     # default configuration for services in *this* file
@@ -29,3 +50,13 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+    app.activity_listener.class:
+            class: %app.activity_listener.class%
+            arguments: ['@security.token_storage','@doctrine.orm.entity_manager']
+            tags:
+                - { name: kernel.event_listener, event: kernel.controller, method: onCoreController }
+
+
+    session.storage.custom:
+            class: App\Modules\Globale\Services\SessionHandler
+            arguments: ["%pdo.db_options%", '@security.token_storage', '@doctrine.orm.entity_manager']

@@ -21,6 +21,7 @@ use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleProfilesUtils;
 use App\Modules\Globale\Utils\GlobaleExportUtils;
 use App\Modules\Globale\Utils\GlobalePrintUtils;
+use App\Modules\Globale\Entity\GlobaleUserSessions;
 use App\Modules\Email\Entity\EmailAccounts;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
@@ -423,6 +424,30 @@ class GlobaleUsersController extends Controller
       }else{
         return new JsonResponse(["result"=>-1]);
       }
+  }
+
+  /**
+  * @Route("/api/global/users/kick/{id}", name="kickuser")
+  */
+  public function kickuser($id,Request $request){
+      if ($this->get('security.authorization_checker')->isGranted('ROLE_GLOBAL')) {
+        $userRepository=$this->getDoctrine()->getRepository(GlobaleUsers::class);
+        $sessionRepository=$this->getDoctrine()->getRepository(GlobaleUserSessions::class);
+        $user = $userRepository->findOneBy(["id"=>$id]);
+        $em = $this->getDoctrine()->getEntityManager();
+        if($user){
+          $userSessions=$sessionRepository->findBy(["user"=>$user]);
+          foreach($userSessions as $userSession){
+            $userSession->setKick(1);
+            $em->persist($userSession);
+            $em->flush();
+          }
+          return new JsonResponse(["result"=>1]);
+        }else{
+          return new JsonResponse(["result"=>-1]);
+        }
+      }
+      return new JsonResponse(["result"=>-1]);
   }
 
 }
