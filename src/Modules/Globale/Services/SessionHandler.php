@@ -152,11 +152,11 @@ class SessionHandler extends PdoSessionHandler
 
                 //if userid is not null delete inecesary anonimous sessions
                 //if($userId){
-                  $stmt = $this->pdo->prepare(
+                /*  $stmt = $this->pdo->prepare(
                       "DELETE FROM $dbTable WHERE $dbIpaddressCol = :ipaddress and ($dbDataCol is null or $dbDataCol='')"
                   );
                   $stmt->bindValue(':ipaddress', $this->get_client_ip(), \PDO::PARAM_STR);
-                  $stmt->execute();
+                  $stmt->execute();*/
                 //}
 
 
