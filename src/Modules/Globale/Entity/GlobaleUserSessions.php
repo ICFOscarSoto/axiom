@@ -53,12 +53,12 @@ class GlobaleUserSessions
     private $lastactivity;
 
     /**
-     * @ORM\Column(type="integer", nullable=true)
+     * @ORM\Column(type="integer", options={"default" : 0})
      */
     private $lifetime;
 
     /**
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(type="boolean", options={"default" : 0})
      */
     private $kick;
 
