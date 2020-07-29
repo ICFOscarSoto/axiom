@@ -423,7 +423,7 @@ public function pricesZero(InputInterface $input, OutputInterface $output){
         $product->setShoppingPrice($object["lastShoppingPrice"]);
         $output->writeln('*Poniendo precio al producto '.$product->getCode());      }
         else {
-          $product->setActive(1);
+          $product->setActive(0);
           $output->writeln('*Se desactiva el producto '.$product->getCode());        }
     $this->doctrine->getManager()->merge($product);
     $this->doctrine->getManager()->flush();
