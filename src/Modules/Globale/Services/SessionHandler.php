@@ -41,6 +41,25 @@ class SessionHandler extends PdoSessionHandler
         parent::__construct($this->pdo, $this->dbOptions);
     }
 
+    private function get_client_ip() {
+        $ipaddress = '';
+        if (isset($_SERVER['HTTP_CLIENT_IP']))
+            $ipaddress = $_SERVER['HTTP_CLIENT_IP'];
+        else if(isset($_SERVER['HTTP_X_FORWARDED_FOR']))
+            $ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        else if(isset($_SERVER['HTTP_X_FORWARDED']))
+            $ipaddress = $_SERVER['HTTP_X_FORWARDED'];
+        else if(isset($_SERVER['HTTP_FORWARDED_FOR']))
+            $ipaddress = $_SERVER['HTTP_FORWARDED_FOR'];
+        else if(isset($_SERVER['HTTP_FORWARDED']))
+            $ipaddress = $_SERVER['HTTP_FORWARDED'];
+        else if(isset($_SERVER['REMOTE_ADDR']))
+            $ipaddress = $_SERVER['REMOTE_ADDR'];
+        else
+            $ipaddress = 'UNKNOWN';
+        return $ipaddress;
+    }
+
     public function read($id)
     {
         // get table/columns
@@ -126,7 +145,7 @@ class SessionHandler extends PdoSessionHandler
                 $stmt->bindParam(':data', $encoded, \PDO::PARAM_STR);
                 $stmt->bindValue(':time', time(), \PDO::PARAM_INT);
                 $stmt->bindValue(':user_id', $userId, \PDO::PARAM_INT);
-                $stmt->bindValue(':ipaddress', $_SERVER['REMOTE_ADDR'], \PDO::PARAM_STR);
+                $stmt->bindValue(':ipaddress', $this->get_client_ip(), \PDO::PARAM_STR);
                 $stmt->bindValue(':start', (new \Datetime())->format("Y-m-d H:i:s"), \PDO::PARAM_STR);
                 $stmt->bindValue(':lastactivity', (new \Datetime())->format("Y-m-d H:i:s"), \PDO::PARAM_STR);
                 $stmt->execute();
@@ -136,7 +155,7 @@ class SessionHandler extends PdoSessionHandler
                   $stmt = $this->pdo->prepare(
                       "DELETE FROM $dbTable WHERE $dbIpaddressCol = :ipaddress and ($dbDataCol is null or $dbDataCol='')"
                   );
-                  $stmt->bindValue(':ipaddress', $_SERVER['REMOTE_ADDR'], \PDO::PARAM_STR);
+                  $stmt->bindValue(':ipaddress', $this->get_client_ip(), \PDO::PARAM_STR);
                   $stmt->execute();
                 //}
 
@@ -171,7 +190,7 @@ class SessionHandler extends PdoSessionHandler
         $stmt->bindParam(':data', $encoded, \PDO::PARAM_STR);
         $stmt->bindValue(':time', time(), \PDO::PARAM_INT);
         $stmt->bindValue(':user_id', $userId, \PDO::PARAM_INT);
-        $stmt->bindValue(':ipaddress', $_SERVER['REMOTE_ADDR'], \PDO::PARAM_STR);
+        $stmt->bindValue(':ipaddress', $this->get_client_ip(), \PDO::PARAM_STR);
         $stmt->bindValue(':start', (new \Datetime())->format("Y-m-d H:i:s"), \PDO::PARAM_STR);
         $stmt->bindValue(':lastactivity', (new \Datetime())->format("Y-m-d H:i:s"), \PDO::PARAM_STR);
         $stmt->execute();
