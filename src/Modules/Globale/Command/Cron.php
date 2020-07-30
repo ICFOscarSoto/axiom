@@ -12,6 +12,7 @@ use App\Modules\HR\Entity\HRDepartments;
 use App\Modules\HR\Entity\HRWorkCenters;
 use App\Modules\Globale\Entity\GlobaleCompanies;
 use App\Modules\Globale\Entity\GlobaleHistories;
+use App\Modules\Globale\Entity\GlobaleUserSessions;
 
 class Cron extends ContainerAwareCommand
 {
@@ -31,10 +32,20 @@ class Cron extends ContainerAwareCommand
 
     //Execute different tasks
     $this->HRAutoCloseClocks($output);
+    $this->deleteSessionsWithoutData($output);
   }
   function GlobaleCalculateDiskUsage(){
 
 
+  }
+  
+  function deleteSessionsWithoutData($output){
+    $sessionsRepository = $this->doctrine->getRepository(GlobaleUserSessions::class);
+    $sessions=$sessionsRepository->findBy(["data"=>'']);
+    foreach($sessions as $session){
+      $this->entityManager->remove($session);
+    }
+    $this->entityManager->flush();
   }
 
   function HRAutoCloseClocks($output){

@@ -66,7 +66,7 @@ class SessionHandler extends PdoSessionHandler
         $dbTable   = $this->dbOptions['db_table'];
         $dbDataCol = $this->dbOptions['db_data_col'];
         $dbIdCol   = $this->dbOptions['db_id_col'];
-
+        //dump($id);
         try {
             $sql = "SELECT $dbDataCol, kick, $dbIdCol FROM $dbTable WHERE $dbIdCol = :id";
 
@@ -91,7 +91,7 @@ class SessionHandler extends PdoSessionHandler
               }
             }
 
-            if (count($sessionRows) == 1) {
+            if (count($sessionRows) >= 1) {
                 return base64_decode($sessionRows[0][0]);
             }
 
@@ -121,7 +121,7 @@ class SessionHandler extends PdoSessionHandler
 
         //session data can contain non binary safe characters so we need to encode it
         $encoded = base64_encode($data);
-
+        //dump($data);
         $userId = ($this->tokenStorage->getToken() && is_object($this->tokenStorage->getToken()->getUser())) ? $this->tokenStorage->getToken()->getUser()->getId():null;
         $userId = $userId?intval($userId):null;
         try {
@@ -150,7 +150,16 @@ class SessionHandler extends PdoSessionHandler
                 $stmt->bindValue(':lastactivity', (new \Datetime())->format("Y-m-d H:i:s"), \PDO::PARAM_STR);
                 $stmt->execute();
 
-                //if userid is not null delete inecesary anonimous sessions
+                //Delete old user sessions
+                if($userId){
+                  $stmt = $this->pdo->prepare(
+                      "DELETE m2 FROM globale_user_sessions AS m2 WHERE m2.user_id = :user_id AND m2.DATA <> '' AND m2.lastactivity <> (SELECT * FROM ((SELECT MAX(s2.lastactivity) FROM globale_user_sessions s2 WHERE s2.user_id  = :user_id)) AS Tbl)"
+                  );
+                  $stmt->bindValue(':user_id', $userId, \PDO::PARAM_INT);
+                  $stmt->execute();
+                }
+
+                //Delete inecesary anonimous sessions
                 //if($userId){
                   $stmt = $this->pdo->prepare(
                       "DELETE FROM $dbTable WHERE $dbIpaddressCol = :ipaddress and ($dbDataCol is null or $dbDataCol='')"
@@ -185,15 +194,18 @@ class SessionHandler extends PdoSessionHandler
 
         //session data can contain non binary safe characters so we need to encode it
         $encoded = base64_encode($data);
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->bindParam(':id', $id, \PDO::PARAM_STR);
-        $stmt->bindParam(':data', $encoded, \PDO::PARAM_STR);
-        $stmt->bindValue(':time', time(), \PDO::PARAM_INT);
-        $stmt->bindValue(':user_id', $userId, \PDO::PARAM_INT);
-        $stmt->bindValue(':ipaddress', $this->get_client_ip(), \PDO::PARAM_STR);
-        $stmt->bindValue(':start', (new \Datetime())->format("Y-m-d H:i:s"), \PDO::PARAM_STR);
-        $stmt->bindValue(':lastactivity', (new \Datetime())->format("Y-m-d H:i:s"), \PDO::PARAM_STR);
-        $stmt->execute();
+        //dump($data);
+        if($encoded!=''){
+          $stmt = $this->pdo->prepare($sql);
+          $stmt->bindParam(':id', $id, \PDO::PARAM_STR);
+          $stmt->bindParam(':data', $encoded, \PDO::PARAM_STR);
+          $stmt->bindValue(':time', time(), \PDO::PARAM_INT);
+          $stmt->bindValue(':user_id', $userId, \PDO::PARAM_INT);
+          $stmt->bindValue(':ipaddress', $this->get_client_ip(), \PDO::PARAM_STR);
+          $stmt->bindValue(':start', (new \Datetime())->format("Y-m-d H:i:s"), \PDO::PARAM_STR);
+          $stmt->bindValue(':lastactivity', (new \Datetime())->format("Y-m-d H:i:s"), \PDO::PARAM_STR);
+          $stmt->execute();
+        }
         return true;
     }
 }
