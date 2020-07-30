@@ -90,6 +90,7 @@ class ERPStocks
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPProductsVariants")
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     private $productvariant;
 
