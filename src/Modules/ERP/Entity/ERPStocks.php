@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\ERP\Entity\ERPProducts;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
 use \App\Modules\ERP\Entity\ERPStoreLocations;
+use \App\Modules\ERP\Entity\ERPProductsVariants;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPStocksRepository")
@@ -86,6 +87,11 @@ class ERPStocks
 
     public $newSeconds=1296000;
     public $updatedSeconds=1296000;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPProductsVariants")
+     */
+    private $productvariant;
 
     public function getId(): ?int
     {
@@ -232,6 +238,18 @@ class ERPStocks
     public function setStorelocation(?ERPStoreLocations $storelocation): self
     {
         $this->storelocation = $storelocation;
+
+        return $this;
+    }
+
+    public function getProductvariant(): ?ERPProductsVariants
+    {
+        return $this->productvariant;
+    }
+
+    public function setProductvariant(?ERPProductsVariants $productvariant): self
+    {
+        $this->productvariant = $productvariant;
 
         return $this;
     }
