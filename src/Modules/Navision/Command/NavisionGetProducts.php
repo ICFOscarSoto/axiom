@@ -477,7 +477,8 @@ public function importStocks(InputInterface $input, OutputInterface $output) {
       $location=$repositoryStoreLocations->findOneBy(["name"=>$stock["almacen"]]);
       if ($location!=null and $product!=null) {
         $output->writeln('Actualizando stock de '.$stock["code"]. " en la localizacion ".$stock["almacen"]);
-        $variantvalue=$repositoryVariantsValues->findOneBy(["name"=>$stock["variant"]]);
+        $namenameVariantValue=$this->variantColor($stock["variant"]);
+        $variantvalue=$repositoryVariantsValues->findOneBy(["name"=>$namenameVariantValue]);
         $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product->getId(),"variantvalue"=>$variantvalue]);
 
         if ($productvariant!=null) $stock_old=$repositoryStocks->findOneBy(["product"=>$product->getId(),"storelocation"=>$location->getId(), "productvariant"=>$productvariant->getId()]);
