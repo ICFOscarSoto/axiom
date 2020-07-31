@@ -434,9 +434,14 @@ public function pricesZero(InputInterface $input, OutputInterface $output){
 
 public function importStocks(InputInterface $input, OutputInterface $output) {
   //------   Create Lock Mutex    ------
-  $fp = fopen('/tmp/axiom-navisionGetProducts-importStocks.lock', 'c');
+  if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+      $fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetProducts-importStocks.lock', 'c');
+  } else {
+      $fp = fopen('/tmp/axiom-navisionGetProducts-importStocks.lock', 'c');
+  }
+
   if (!flock($fp, LOCK_EX | LOCK_NB)) {
-    $output->writeln('* Fallo al iniciar la sincronizacion de stocks: El proceso ya esta en ejecución.');
+    $output->writeln('* Fallo al iniciar la sincronizacion de limpieza de EAN13: El proceso ya esta en ejecución.');
     exit;
   }
 
@@ -452,20 +457,33 @@ public function importStocks(InputInterface $input, OutputInterface $output) {
   $repositoryStocks=$this->doctrine->getRepository(ERPStocks::class);
   $repositoryStoreLocations=$this->doctrine->getRepository(ERPStoreLocations::class);
   $repositoryProducts=$this->doctrine->getRepository(ERPProducts::class);
-    $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getStocks.php?from='.$navisionSync->getMaxtimestamp());
-    $objects=json_decode($json, true);
-    $objects=$objects[0];
+  $repositoryVariantsValues=$this->doctrine->getRepository(ERPVariantsValues::class);
+  $repositoryProductsVariants=$this->doctrine->getRepository(ERPProductsVariants::class);
+  $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getStocks.php?from='.$navisionSync->getMaxtimestamp());
+  $objects=json_decode($json, true);
+  $objects=$objects[0];
     if ($objects){
-    $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
-    $company=$repositoryCompanies->find(2);
-    foreach ($objects["class"] as $stock){
+      $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
+      $company=$repositoryCompanies->find(2);
+      foreach ($objects["class"] as $stock){
       $product=$repositoryProducts->findOneBy(["code"=>$stock["code"]]);
+      /*
+      Quitamos las ubicaciones en la sincronización
+
       if ($stock["ubicacion"]!=null) {
+
           $location=$repositoryStoreLocations->findOneBy(["name"=>$stock["ubicacion"]]);
-      } else $location=$repositoryStoreLocations->findOneBy(["name"=>$stock["almacen"]]);
+      } else       */
+      $location=$repositoryStoreLocations->findOneBy(["name"=>$stock["almacen"]]);
       if ($location!=null and $product!=null) {
-        $output->writeln('Actualizando stock de '.$stock["code"]. " en la localizacion ".$stock["ubicacion"]);
-        $stock_old=$repositoryStocks->findOneBy(["product"=>$product->getId(),"storelocation"=>$location->getId()]);
+        $output->writeln('Actualizando stock de '.$stock["code"]. " en la localizacion ".$stock["almacen"]);
+        $namenameVariantValue=$this->variantColor($stock["variant"]);
+        $variantvalue=$repositoryVariantsValues->findOneBy(["name"=>$namenameVariantValue]);
+        $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product->getId(),"variantvalue"=>$variantvalue]);
+
+        if ($productvariant!=null) $stock_old=$repositoryStocks->findOneBy(["product"=>$product->getId(),"storelocation"=>$location->getId(), "productvariant"=>$productvariant->getId()]);
+        else $stock_old=$repositoryStocks->findOneBy(["product"=>$product->getId(),"storelocation"=>$location->getId()]);
+
         if($stock_old!=null){
           $stock_old->setQuantity((int)$stock["stock"]);
           $stock_old->setDateupd(new \Datetime());
@@ -477,6 +495,7 @@ public function importStocks(InputInterface $input, OutputInterface $output) {
           $obj->setDateadd(new \Datetime());
           $obj->setDateupd(new \Datetime());
           $obj->setStoreLocation($location);
+          $obj->setProductVariant($productvariant);
           if ((int)$stock["stock"]<0) $quantiy=0;
           else $quantity=(int)$stock["stock"];
           $obj->setQuantity($quantity);
@@ -822,11 +841,16 @@ public function importOffers(InputInterface $input, OutputInterface $output) {
 
 public function importVariants(InputInterface $input, OutputInterface $output){
   //------   Create Lock Mutex    ------
-  $fp = fopen('/tmp/axiom-navisionGetProducts-importVariants.lock', 'c');
+  if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+      $fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetProducts-importVariants.lock', 'c');
+  } else {
+      $fp = fopen('/tmp/axiom-navisionGetProducts-importVariants.lock', 'c');
+  }
   if (!flock($fp, LOCK_EX | LOCK_NB)) {
-    $output->writeln('* Fallo al iniciar la sincronizacion de variantes: El proceso ya esta en ejecución.');
+    $output->writeln('* Fallo al iniciar la sincronizacion incrementos: El proceso ya esta en ejecución.');
     exit;
   }
+
   //------   Critical Section START   ------
   $repository=$this->doctrine->getRepository(ERPVariantsValues::class);
   $output->writeln('* Importando variantes....');
@@ -843,52 +867,8 @@ public function importVariants(InputInterface $input, OutputInterface $output){
       foreach ($objects as $object){
         $variantValue;
         if ($variant->getName()=="Color") {
-          if ($object["value"]=="AMARILLO C") $variantValue="Amarillo Claro";
-          else if ($object["value"]=="AMARILLO F") $variantValue="Amarillo Fluor";
-          else if ($object["value"]=="AMARILLO L") $variantValue="Amarillo Limon";
-          else if ($object["value"]=="AMARILLO R") $variantValue="Amarillo Real";
-          else if ($object["value"]=="ARENA VIGO") $variantValue="Arena Vigore";
-          else if ($object["value"]=="AZUL COBAL") $variantValue="Azul Cobalto";
-          else if ($object["value"]=="AZUL LUMIN") $variantValue="Azul Luminoso";
-          else if ($object["value"]=="AZUL MARIN") $variantValue="Azul Marino";
-          else if ($object["value"]=="AZUL ULTA") $variantValue="Azul Ultramar";
-          else if ($object["value"]=="BEIGE 585" or $object["value"]=="BEIGE") $variantValue="Beige";
-          else if ($object["value"]=="BLANCO 501"or $object["value"]=="BLANCO") $variantValue="Blanco";
-          else if ($object["value"]=="BLANCO BRI") $variantValue="Blanco Brillo";
-          else if ($object["value"]=="BLANCOPERL") $variantValue="Blanco Perla";
-          else if ($object["value"]=="CREMA 586" or $object["value"]=="CREMA") $variantValue="Crema";
-          else if ($object["value"]=="GAMUZA 543" or $object["value"]=="GAMUZA") $variantValue="Gamuza";
-          else if ($object["value"]=="GRIS AZULA") $variantValue="Gris Azulado";
-          else if ($object["value"]=="GRIS OSCUR") $variantValue="Gris Oscuro";
-          else if ($object["value"]=="GRIS VIGOR") $variantValue="Gris Vigore";
-          else if ($object["value"]=="MALVA MAST") $variantValue="Malva Master";
-          else if ($object["value"]=="MARFIL 528" or $object["value"]=="MARFIL") $variantValue="Marfil";
-          else if ($object["value"]=="MARRON TAB") $variantValue="Marron Tabaco";
-          else if ($object["value"]=="MARRONVINT") $variantValue="Marron Vintage";
-          else if ($object["value"]=="NARANJA CL") $variantValue="Naranja Claro";
-          else if ($object["value"]=="NARANJA FL") $variantValue="Naranja Fluor";
-          else if ($object["value"]=="NEGRO 567" or $object["value"]=="NEGRO") $variantValue="Negro";
-          else if ($object["value"]=="VERDE CARR") $variantValue="Verde Carruajes";
-          else if ($object["value"]=="NEGRO BRIL") $variantValue="Negro Brillo";
-          else if ($object["value"]=="OCRE" or $object["value"]=="OCRE 587") $variantValue="Ocre";
-          else if ($object["value"]=="PARDO" or $object["value"]=="PARDO 517") $variantValue="Pardo";
-          else if ($object["value"]=="RAYAS GRAN") $variantValue="Rayas Granate";
-          else if ($object["value"]=="RAYAS NEGR") $variantValue="Rayas Negras";
-          else if ($object["value"]=="ROJO BURDE") $variantValue="Rojo Burdeos";
-          else if ($object["value"]=="ROJO CARRU") $variantValue="Rojo Carruaje";
-          else if ($object["value"]=="ROJO INGLE") $variantValue="Rojo Ingles";
-          else if ($object["value"]=="ROJOIMPERI") $variantValue="Rojo Imperial";
-          else if ($object["value"]=="ROSA PALID") $variantValue="Rosa Palido";
-          else if ($object["value"]=="SALMON OSC") $variantValue="Salmon Oscuro";
-          else if ($object["value"]=="TURQUESA C") $variantValue="Turquesa Claro";
-          else if ($object["value"]=="VERDE BOSQ") $variantValue="Verde Bosque";
-          else if ($object["value"]=="VERDE CLAR") $variantValue="Verde Claro";
-          else if ($object["value"]=="VERDE FRON") $variantValue="Verde Fronton";
-          else if ($object["value"]=="VERDE HIER") $variantValue="Verde Hierba";
-          else if ($object["value"]=="VERDE PIST") $variantValue="Verde Pistacho";
-          else if ($object["value"]=="VERDE PRIM") $variantValue="Verde Primavera";
-          else if ($object["value"]=="VINTAGE RO") $variantValue="Vintage Rose";
-          else $variantValue=$object["value"];
+          $variantValue=$this->variantColor($object["value"]);
+
         } else $variantValue=$object["value"];
 
         $obj=$repository->findOneBy(["name"=>$variantValue]);
@@ -913,9 +893,13 @@ public function importVariants(InputInterface $input, OutputInterface $output){
 
 public function importProductsVariants(InputInterface $input, OutputInterface $output){
   //------   Create Lock Mutex    ------
-  $fp = fopen('/tmp/axiom-navisionGetProducts-importProductsVariants.lock', 'c');
+  if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+      $fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetProducts-importProductsVariants.lock', 'c');
+  } else {
+      $fp = fopen('/tmp/axiom-navisionGetProducts-importProductsVariants.lock', 'c');
+  }
   if (!flock($fp, LOCK_EX | LOCK_NB)) {
-    $output->writeln('* Fallo al iniciar la sincronizacion de agrupados: El proceso ya esta en ejecución.');
+    $output->writeln('* Fallo al iniciar la sincronizacion incrementos: El proceso ya esta en ejecución.');
     exit;
   }
   //------   Critical Section START   ------
@@ -938,52 +922,7 @@ public function importProductsVariants(InputInterface $input, OutputInterface $o
         $nameVariantValue;
         //$output->writeln('       - Añadiendo variante a '.$object["product"]);
         if ($variant->getName()=="Color") {
-          if ($object["Code"]=="AMARILLO C") $nameVariantValue="Amarillo Claro";
-          else if ($object["Code"]=="AMARILLO F") $nameVariantValue="Amarillo Fluor";
-          else if ($object["Code"]=="AMARILLO L") $nameVariantValue="Amarillo Limon";
-          else if ($object["Code"]=="AMARILLO R") $nameVariantValue="Amarillo Real";
-          else if ($object["Code"]=="ARENA VIGO") $nameVariantValue="Arena Vigore";
-          else if ($object["Code"]=="AZUL COBAL") $nameVariantValue="Azul Cobalto";
-          else if ($object["Code"]=="AZUL LUMIN") $nameVariantValue="Azul Luminoso";
-          else if ($object["Code"]=="AZUL MARIN") $nameVariantValue="Azul Marino";
-          else if ($object["Code"]=="AZUL ULTA") $nameVariantValue="Azul Ultramar";
-          else if ($object["Code"]=="BEIGE 585" or $object["Code"]=="BEIGE") $nameVariantValue="Beige";
-          else if ($object["Code"]=="BLANCO 501"or $object["Code"]=="BLANCO") $nameVariantValue="Blanco";
-          else if ($object["Code"]=="BLANCO BRI") $nameVariantValue="Blanco Brillo";
-          else if ($object["Code"]=="BLANCOPERL") $nameVariantValue="Blanco Perla";
-          else if ($object["Code"]=="CREMA 586" or $object["Code"]=="CREMA") $nameVariantValue="Crema";
-          else if ($object["Code"]=="GAMUZA 543" or $object["Code"]=="GAMUZA") $nameVariantValue="Gamuza";
-          else if ($object["Code"]=="GRIS AZULA") $nameVariantValue="Gris Azulado";
-          else if ($object["Code"]=="GRIS OSCUR") $nameVariantValue="Gris Oscuro";
-          else if ($object["Code"]=="GRIS VIGOR") $nameVariantValue="Gris Vigore";
-          else if ($object["Code"]=="MALVA MAST") $nameVariantValue="Malva Master";
-          else if ($object["Code"]=="MARFIL 528" or $object["Code"]=="MARFIL") $nameVariantValue="Marfil";
-          else if ($object["Code"]=="MARRON TAB") $nameVariantValue="Marron Tabaco";
-          else if ($object["Code"]=="MARRONVINT") $nameVariantValue="Marron Vintage";
-          else if ($object["Code"]=="NARANJA CL") $nameVariantValue="Naranja Claro";
-          else if ($object["Code"]=="NARANJA FL") $nameVariantValue="Naranja Fluor";
-          else if ($object["Code"]=="NEGRO 567" or $object["Code"]=="NEGRO") $nameVariantValue="Negro";
-          else if ($object["Code"]=="VERDE CARR") $nameVariantValue="Verde Carruajes";
-          else if ($object["Code"]=="NEGRO BRIL") $nameVariantValue="Negro Brillo";
-          else if ($object["Code"]=="OCRE" or $object["Code"]=="OCRE 587") $nameVariantValue="Ocre";
-          else if ($object["Code"]=="PARDO" or $object["Code"]=="PARDO 517") $nameVariantValue="Pardo";
-          else if ($object["Code"]=="RAYAS GRAN") $nameVariantValue="Rayas Granate";
-          else if ($object["Code"]=="RAYAS NEGR") $nameVariantValue="Rayas Negras";
-          else if ($object["Code"]=="ROJO BURDE") $nameVariantValue="Rojo Burdeos";
-          else if ($object["Code"]=="ROJO CARRU") $nameVariantValue="Rojo Carruaje";
-          else if ($object["Code"]=="ROJO INGLE") $nameVariantValue="Rojo Ingles";
-          else if ($object["Code"]=="ROJOIMPERI") $nameVariantValue="Rojo Imperial";
-          else if ($object["Code"]=="ROSA PALID") $nameVariantValue="Rosa Palido";
-          else if ($object["Code"]=="SALMON OSC") $nameVariantValue="Salmon Oscuro";
-          else if ($object["Code"]=="TURQUESA C") $nameVariantValue="Turquesa Claro";
-          else if ($object["Code"]=="VERDE BOSQ") $nameVariantValue="Verde Bosque";
-          else if ($object["Code"]=="VERDE CLAR") $nameVariantValue="Verde Claro";
-          else if ($object["Code"]=="VERDE FRON") $nameVariantValue="Verde Fronton";
-          else if ($object["Code"]=="VERDE HIER") $nameVariantValue="Verde Hierba";
-          else if ($object["Code"]=="VERDE PIST") $nameVariantValue="Verde Pistacho";
-          else if ($object["Code"]=="VERDE PRIM") $nameVariantValue="Verde Primavera";
-          else if ($object["Code"]=="VINTAGE RO") $nameVariantValue="Vintage Rose";
-          else $nameVariantValue=$object["Code"];
+          $nameVariantValue=$this->variantColor($object["Code"]);
         } else $nameVariantValue=$object["Code"];
 
 
@@ -1011,6 +950,56 @@ public function importProductsVariants(InputInterface $input, OutputInterface $o
       //------   Critical Section END   ------
       //------   Remove Lock Mutex    ------
       fclose($fp);
+}
+
+public function variantColor($nameVariantValue){
+  if ($nameVariantValue=="AMARILLO C") $nameVariantValue="Amarillo Claro";
+  else if ($nameVariantValue=="AMARILLO F") $nameVariantValue="Amarillo Fluor";
+  else if ($nameVariantValue=="AMARILLO L") $nameVariantValue="Amarillo Limon";
+  else if ($nameVariantValue=="AMARILLO R") $nameVariantValue="Amarillo Real";
+  else if ($nameVariantValue=="ARENA VIGO") $nameVariantValue="Arena Vigore";
+  else if ($nameVariantValue=="AZUL COBAL") $nameVariantValue="Azul Cobalto";
+  else if ($nameVariantValue=="AZUL LUMIN") $nameVariantValue="Azul Luminoso";
+  else if ($nameVariantValue=="AZUL MARIN") $nameVariantValue="Azul Marino";
+  else if ($nameVariantValue=="AZUL ULTA") $nameVariantValue="Azul Ultramar";
+  else if ($nameVariantValue=="BEIGE 585" or $nameVariantValue=="BEIGE") $nameVariantValue="Beige";
+  else if ($nameVariantValue=="BLANCO 501"or $nameVariantValue=="BLANCO") $nameVariantValue="Blanco";
+  else if ($nameVariantValue=="BLANCO BRI") $nameVariantValue="Blanco Brillo";
+  else if ($nameVariantValue=="BLANCOPERL") $nameVariantValue="Blanco Perla";
+  else if ($nameVariantValue=="CREMA 586" or $nameVariantValue=="CREMA") $nameVariantValue="Crema";
+  else if ($nameVariantValue=="GAMUZA 543" or $nameVariantValue=="GAMUZA") $nameVariantValue="Gamuza";
+  else if ($nameVariantValue=="GRIS AZULA") $nameVariantValue="Gris Azulado";
+  else if ($nameVariantValue=="GRIS OSCUR") $nameVariantValue="Gris Oscuro";
+  else if ($nameVariantValue=="GRIS VIGOR") $nameVariantValue="Gris Vigore";
+  else if ($nameVariantValue=="MALVA MAST") $nameVariantValue="Malva Master";
+  else if ($nameVariantValue=="MARFIL 528" or $nameVariantValue=="MARFIL") $nameVariantValue="Marfil";
+  else if ($nameVariantValue=="MARRON TAB") $nameVariantValue="Marron Tabaco";
+  else if ($nameVariantValue=="MARRONVINT") $nameVariantValue="Marron Vintage";
+  else if ($nameVariantValue=="NARANJA CL") $nameVariantValue="Naranja Claro";
+  else if ($nameVariantValue=="NARANJA FL") $nameVariantValue="Naranja Fluor";
+  else if ($nameVariantValue=="NEGRO 567" or $nameVariantValue=="NEGRO") $nameVariantValue="Negro";
+  else if ($nameVariantValue=="VERDE CARR") $nameVariantValue="Verde Carruajes";
+  else if ($nameVariantValue=="NEGRO BRIL") $nameVariantValue="Negro Brillo";
+  else if ($nameVariantValue=="OCRE" or $nameVariantValue=="OCRE 587") $nameVariantValue="Ocre";
+  else if ($nameVariantValue=="PARDO" or $nameVariantValue=="PARDO 517") $nameVariantValue="Pardo";
+  else if ($nameVariantValue=="RAYAS GRAN") $nameVariantValue="Rayas Granate";
+  else if ($nameVariantValue=="RAYAS NEGR") $nameVariantValue="Rayas Negras";
+  else if ($nameVariantValue=="ROJO BURDE") $nameVariantValue="Rojo Burdeos";
+  else if ($nameVariantValue=="ROJO CARRU") $nameVariantValue="Rojo Carruaje";
+  else if ($nameVariantValue=="ROJO INGLE") $nameVariantValue="Rojo Ingles";
+  else if ($nameVariantValue=="ROJOIMPERI") $nameVariantValue="Rojo Imperial";
+  else if ($nameVariantValue=="ROSA PALID") $nameVariantValue="Rosa Palido";
+  else if ($nameVariantValue=="SALMON OSC") $nameVariantValue="Salmon Oscuro";
+  else if ($nameVariantValue=="TURQUESA C") $nameVariantValue="Turquesa Claro";
+  else if ($nameVariantValue=="VERDE BOSQ") $nameVariantValue="Verde Bosque";
+  else if ($nameVariantValue=="VERDE CLAR") $nameVariantValue="Verde Claro";
+  else if ($nameVariantValue=="VERDE FRON") $nameVariantValue="Verde Fronton";
+  else if ($nameVariantValue=="VERDE HIER") $nameVariantValue="Verde Hierba";
+  else if ($nameVariantValue=="VERDE PIST") $nameVariantValue="Verde Pistacho";
+  else if ($nameVariantValue=="VERDE PRIM") $nameVariantValue="Verde Primavera";
+  else if ($nameVariantValue=="VINTAGE RO") $nameVariantValue="Vintage Rose";
+  else $nameVariantValue=ucwords(strtolower($nameVariantValue));
+  return $nameVariantValue;
 }
 
 
