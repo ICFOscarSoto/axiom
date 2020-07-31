@@ -36,7 +36,7 @@ class SessionHandler extends PdoSessionHandler
         $this->dbOptions = $dbOptions;
         $this->tokenStorage = $tokenStorage;
         $this->entityManager = $entityManager;
-        $this->uriExceptions = ["/es/admin/api/notifications/unreadlist", "/api/emails/unreadlist"];
+        $this->uriExceptions = ["/es/admin/api/notifications/unreadlist", "/api/emails/unreadlist", "/api/global/users/getstatus"];
 
         parent::__construct($this->pdo, $this->dbOptions);
     }

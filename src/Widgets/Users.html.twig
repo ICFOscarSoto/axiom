@@ -1,0 +1,142 @@
+{{ include('@Widgets/widget_head.html.twig') }}
+
+<div class="col-md-12 overflow-auto">
+  <ul style="list-style: none; padding-left: 0;" id="widgetUsers_userlist"></ul>
+</div>
+
+{{ include('@Widgets/widget_footer.html.twig') }}
+{{ include('@Widgets/widget_settings.html.twig') }}
+
+<script>
+var widgetUsers_userlist = $("#widgetUsers_userlist");
+var widgetUsers_users = widgetUsers_userlist.children("li");
+var ascending = true;
+var widgetUsers_showedUsers=[];
+var sortList = Array.prototype.sort.bind(widgetUsers_users);
+var doSort = function ( ascending ) {
+    sortList(function ( a, b ) {
+        var aText = a.getAttribute("attr-name");
+        var bText = b.getAttribute("attr-name");
+        if ( aText < bText ) {
+            return ascending ? -1 : 1;
+        }
+        if ( aText > bText ) {
+            return ascending ? 1 : -1;
+        }
+        return 0;
+    });
+    widgetUsers_userlist.append(widgetUsers_users);
+};
+function addUsers(){
+
+}
+function getUsers(){
+  $.ajax({
+     url: '{{ url('getUsersStatus') }}',
+     type: 'POST',
+
+     success:  function( data ) {
+       widgetUsers_showedUsers=[];
+       $.each( data, function( key, val ) {
+          //Add data
+          var now=moment();
+          var lastactivity=moment(val.lastactivity, "DD-MM-YYYY hh:mm:ss");
+          var diff=now.diff(lastactivity);
+          widgetUsers_showedUsers.push(val.user_id);
+          if (!$("#widgetUsers-usercard-"+val.user_id).length ) {
+          var card= '<li id="widgetUsers-usercard-li-'+val.user_id+'" attr-id="'+val.user_id+'" attr-name="'+val.user_name+' '+val.user_lastname+'"><div id="widgetUsers-usercard-'+val.user_id+'" attr-id="'+val.user_id+'" class="card" style="margin-bottom: 10px; background: #f8f8f8; padding: 5px; border-radius: 10px;">'+
+                    '<div class="row">'+
+                    '    <div class="col-sm-2" style="text-align: center;">'+
+                    '        <div style="position: absolute;display:inline;padding-top:5px;"><span id="widgetUsers-usercard-dot-'+val.user_id+'" style="height: 15px; width: 15px; background-color: #ff0000; border-radius: 50%; display: inline-block;"></span></div>'+
+                    '        <img id="widgetUsers-usercard-image-" class="img-circle" width="50" src="{{ url('index') }}api/user/'+val.user_id+'/getimage" alt="">'+
+                    '    </div>'+
+                    '    <div class="col-sm-10">'+
+                    '        <div class="card-body">'+
+                    '            <div class="row">'+
+                    '              <div class="col-sm-6">'+
+                    '                <h5 class="card-title"><b id="widgetUsers-usercard-name-'+val.user_id+'">'+val.user_name+' '+val.user_lastname+'</b></h5>'+
+                    '              </div>'+
+                    '              <div class="col-sm-6" style="text-align: right; padding-right: 25px; padding-top: 5px;">'+
+                    '                <i class="fa fa-info" id="widgetUsers-usercard-button-info-'+val.user_id+'" attr-id="'+val.user_id+'" data-toggle="tooltip" title="Ver información usuario"></i>&nbsp;&nbsp;&nbsp;<i id="widgetUsers-usercard-button-kill-'+val.user_id+'" data-toggle="tooltip" attr-id="'+val.user_id+'" title="Matar sesión usuario" class="fa fa-window-close"></i>'+
+                    '              </div>'+
+                    '            </div>'+
+                    '            <div class="row" style="padding-top: 4px;">'+
+                    '              <div class="col-sm-4">'+
+                    '                <i class="fas fa-sign-in-alt"></i><div style="padding-left:5px;display: inline;" id="widgetUsers-usercard-start-'+val.user_id+'">'+moment(val.start, "DD-MM-YYYY hh:mm:ss").calendar()+'</div>'+
+                    '              </div>'+
+                    '              <div class="col-sm-4">'+
+                    '                <i class="fas fa-stopwatch"></i><div style="padding-left:5px;display: inline;" attr-data="'+val.lastactivity+'" id="widgetUsers-usercard-lastactivity-'+val.user_id+'">'+moment(val.lastactivity, "DD-MM-YYYY hh:mm:ss").fromNow()+'</div>'+
+                    '              </div>'+
+                    '              <div class="col-sm-4">'+
+                    '                <i class="fas fa-network-wired"></i><div style="padding-left:5px;display: inline;" id="widgetUsers-usercard-ipaddress-'+val.user_id+'">'+val.ipaddress+'</div>'+
+                    '              </div>'+
+                    '            </div>'+
+                    '        </div>'+
+                    '    </div>'+
+                    ' </div>'+
+                    '</div></li>';
+            $("#widgetUsers_userlist").append(card);
+          }else{
+            //Update card data
+            $("#widgetUsers-usercard-start-"+val.user_id).text(moment(val.start, "DD-MM-YYYY hh:mm:ss").calendar());
+            $("#widgetUsers-usercard-lastactivity-"+val.user_id).text(moment(val.lastactivity, "DD-MM-YYYY hh:mm:ss").fromNow());
+            $("#widgetUsers-usercard-ipaddress-"+val.user_id).text(val.ipaddress);
+          }
+          if(diff<1200000) //20 minutes
+            color="#41dd54";
+            else if(diff<2400000) //40 minutes
+              color="#ff8217";
+              else color="#ff3b3b";
+          $("#widgetUsers-usercard-dot-"+val.user_id).css("background-color", color);
+ 		  });
+      //Check if is needed delete items
+      $("#widgetUsers_userlist").find('li').each(function(){
+        if(jQuery.inArray( parseInt($(this).attr("attr-id")), widgetUsers_showedUsers )==-1){
+          $("#widgetUsers-usercard-li-"+$(this).attr("attr-id")).remove();
+        }
+      });
+      //Reorder list
+      widgetUsers_users = widgetUsers_userlist.children("li");
+      sortList = Array.prototype.sort.bind(widgetUsers_users);
+      doSort(ascending);
+     }
+   });
+}
+
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip();
+  getUsers();
+  window.setInterval(function(){
+    getUsers();
+  }, 10000);
+});
+
+$('body').on('click', "[id^='widgetUsers-usercard-button-info-']", function() {
+  window.open("/es/user/form/"+$(this).attr("attr-id"));
+});
+
+$('body').on('click', "[id^='widgetUsers-usercard-button-kill-']", function() {
+  var user_id=$(this).attr("attr-id");
+  $.confirm({
+      theme: 'bootstrap',
+      title: 'Cerrar sesión usuario',
+      content: '¿Esta seguro que desea cerrar la sesión de este usuario?',
+      buttons: {
+        confirm: { text: 'Confirmar', btnClass: 'btn-red', action: function(){
+          $.ajax({
+            url: '/api/global/users/kick/'+user_id,
+            type: 'POST',
+            success:  function( data ) {
+              if(data.result==1){
+                toastr.success("Sesion de usuario cerrada", "Confirmación", confirmation);
+              }else{
+                toastr.error("No se pudo realizar la operación", "Confirmación", confirmation);
+              }
+            }
+          });
+        } },
+        cancel: { text: 'Cancelar' }
+     }
+   });
+});
+</script>

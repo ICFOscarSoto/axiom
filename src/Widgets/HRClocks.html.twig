@@ -83,7 +83,6 @@ function getClockStatus(){
      data: {user: {{userData.id}}},
 
      success:  function( data ) {
-         console.log(data);
        if(data.result==0){
          setClockStar();
        }else{

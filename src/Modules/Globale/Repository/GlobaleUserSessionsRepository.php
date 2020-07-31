@@ -22,19 +22,16 @@ class GlobaleUserSessionsRepository extends ServiceEntityRepository
     // /**
     //  * @return GlobaleUserSessions[] Returns an array of GlobaleUserSessions objects
     //  */
-    /*
-    public function findByExampleField($value)
+
+    public function findActiveSessions($company)
     {
-        return $this->createQueryBuilder('g')
-            ->andWhere('g.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('g.id', 'ASC')
-            ->setMaxResults(10)
+        return $this->createQueryBuilder('s')
+            ->andWhere('s.user IS NOT NULL')
             ->getQuery()
             ->getResult()
         ;
     }
-    */
+
 
     /*
     public function findOneBySomeField($value): ?GlobaleUserSessions

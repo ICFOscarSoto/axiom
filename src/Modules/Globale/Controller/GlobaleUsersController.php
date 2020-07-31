@@ -426,11 +426,40 @@ class GlobaleUsersController extends Controller
       }
   }
 
+
+
+
+/**
+* @Route("/api/global/users/getstatus", name="getUsersStatus")
+*/
+public function getUsersStatus(Request $request){
+    if ($this->get('security.authorization_checker')->isGranted('ROLE_ADMIN')) {
+      $userRepository=$this->getDoctrine()->getRepository(GlobaleUsers::class);
+      $sessionRepository=$this->getDoctrine()->getRepository(GlobaleUserSessions::class);
+      $sessions = $sessionRepository->findActiveSessions($this->getUser()->getCompany());
+      $result=[];
+			foreach($sessions as $session){
+				$item['user_id']=$session->getUser()->getId();
+        $item['user_name']=$session->getUser()->getName();
+        $item['user_lastname']=$session->getUser()->getLastname();
+        $item['user_email']=$session->getUser()->getEmail();
+        $item['start']=$session->getStart()->format("d-m-Y H:i:s");
+        $item['lastactivity']=$session->getLastactivity()->format("d-m-Y H:i:s");
+        $item['ipaddress']=$session->getIpaddress();
+				$result[]=$item;
+			}
+
+			return new JsonResponse($result);
+    }
+    return new JsonResponse(["result"=>-1]);
+}
+
+
   /**
   * @Route("/api/global/users/kick/{id}", name="kickuser")
   */
   public function kickuser($id,Request $request){
-      if ($this->get('security.authorization_checker')->isGranted('ROLE_GLOBAL')) {
+      if ($this->get('security.authorization_checker')->isGranted('ROLE_ADMIN')) {
         $userRepository=$this->getDoctrine()->getRepository(GlobaleUsers::class);
         $sessionRepository=$this->getDoctrine()->getRepository(GlobaleUserSessions::class);
         $user = $userRepository->findOneBy(["id"=>$id]);
