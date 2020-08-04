@@ -41,11 +41,16 @@
   <div class="panel-body">
     <div class="form-group">
       <label class="col-sm-1 control-label" for="mail-addresses">Para:</label>
-      <div class="col-sm-11">
+      <div class="col-sm-9">
         <select name="mail-addresses" id="mail-addresses" class="select2">
             <option value="" id="mail-address-0">Introducir manualmente</option>
         </select>
       </div>
+      <div class="col-sm-2">
+          <a href="javascript:;" class="btn btn-default" id="cc-button" onclick="$('#cc').parent().removeClass('hidden'); $('#cc').focus();">CC</a>
+          <a href="javascript:;" class="btn btn-default" id="bcc-button" onclick="$('#bcc').parent().removeClass('hidden'); $('#bcc').focus();">BCC</a>
+      </div>
+
     </div>
   </div>
   <div class="mail-compose">
@@ -53,10 +58,6 @@
         <label for="to">Para:</label>
         <input type="input" class="form-control" id="to" name="to" tabindex="1" />
         <input type="hidden" class="form-control" id="in_reply_to" name="in_reply_to" tabindex="1" />
-        <div class="field-options">
-          <a href="javascript:;" id="cc-button" onclick="$(this).hide(); $('#cc').parent().removeClass('hidden'); $('#cc').focus();">CC</a>
-          <a href="javascript:;" id="bcc-button" onclick="$(this).hide(); $('#bcc').parent().removeClass('hidden'); $('#bcc').focus();">BCC</a>
-        </div>
       </div>
       <div class="form-group hidden">
         <label for="cc">CC:</label>

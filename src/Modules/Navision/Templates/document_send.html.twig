@@ -42,6 +42,8 @@ $(document).ready(function() {
     var customercode=$(this).attr("attr-code");
     var id=$(this).attr("attr-id");
     $("#subject").val("{{ (documentType|trans)|capitalize }} "+id);
+    $("#cc").val("");
+    $("#bcc").val("");
     wysihtml5Editor.value="<p>Estimado cliente,</p><p>adjuntamos {{ documentType|trans }} número "+id+"</p>"+"<p>Saludos, atentamente</p><!-- start:"+token+" --><!-- end:"+token+" -->";
     getSignature();
     jsonFiles=[];
@@ -80,6 +82,8 @@ $(document).ready(function() {
      if(checked.length>0){
        var id=$(this).attr("attr-id");
        $("#subject").val("{{ (documentType|trans)|capitalize }}s "+checked.join(", "));
+       $("#cc").val("");
+       $("#bcc").val("");
        wysihtml5Editor.value="<p>Estimado cliente,</p><p>adjuntamos {{ documentType|trans }}s números: </br></br>"+checked.join("</br>")+"</p>"+"<p>Saludos, atentamente</p><!-- start:"+token+" --><!-- end:"+token+" -->";
        getSignature();
        //Prepare document
