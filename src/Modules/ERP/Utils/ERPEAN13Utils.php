@@ -32,18 +32,17 @@ class ERPEAN13Utils
     return $list;
   }
 
-  public function formatListProduct($product){
+  public function formatList($user, $object){
     $list=[
       'id' => 'listEAN13',
       'route' => 'genericlist',
       'routeParams' => ["module" => $this->module,
-                        "json" => "ContactsSupplier",
                         "name" => $this->name,
-                        "parent" => $product,
-                        "id" => $product,
-                        "field" => "supplier",
+                        "parent" => $object,
+                        "id" => $object,
+                        "field" => "product",
                         "parentModule" => "ERP",
-                        "parentName" => "Suppliers"
+                        "parentName" => "Products"
                       ],
       'orderColumn' => 2,
       'orderDirection' => 'ASC',

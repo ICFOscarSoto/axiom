@@ -39,9 +39,8 @@ class ERPEAN13Controller extends Controller
     $repository = $manager->getRepository($class);
     $listUtils=new GlobaleListUtils();
     $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/EAN13.json"),true);
-    $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $class, [["type"=>"and","column"=>"product", "value"=>$product]]);
+    $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $class, [["type"=>"and","column"=>"product", "value"=>$product],["type"=>"and","column"=>"deleted", "value"=>false]]);
     return new JsonResponse($return);
-
   }
 
   /**

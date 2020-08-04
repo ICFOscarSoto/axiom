@@ -120,8 +120,7 @@ class ERPProductsController extends Controller
 									'tabs' => [
 										["name" => "data", "icon"=>"fa fa-id-card", "caption"=>"Products data", "active"=>true, "route"=>$this->generateUrl("formInfoProduct",["id"=>$id])],
 										["name" => "variants", "icon"=>"fa fa-id-card", "caption"=>"Variants", "route"=>$this->generateUrl("generictablist",["function"=>"formatListByProduct","module"=>"ERP","name"=>"ProductsVariants","id"=>$id])],
-										//["name" => "list",  "icon"=>"fa fa-users", "caption"=>"References", "route"=>$this->generateUrl("listEAN13",["id"=>$id])],
-										["name" => "list",  "icon"=>"fa fa-users", "caption"=>"References", "route"=>$this->generateUrl("generictablist",["function"=>"formatListProduct","module"=>"ERP","name"=>"EAN13","id"=>$id])],
+										["name" => "list",  "icon"=>"fa fa-users", "caption"=>"References", "route"=>$this->generateUrl("listEAN13",["id"=>$id])],
 										["name"=>  "productPrices", "icon"=>"fa fa-money", "caption"=>"Prices","route"=>$this->generateUrl("infoProductPrices",["id"=>$id])],
 										["name" => "stocks", "icon"=>"fa fa-id-card", "caption"=>"Stocks", "route"=>$this->generateUrl("infoStocks",["id"=>$id])],
 										["name" => "webproduct", "icon"=>"fa fa-id-card", "caption"=>"Web", "route"=>$this->generateUrl("dataWebProducts",["id"=>$id])],
@@ -148,7 +147,8 @@ class ERPProductsController extends Controller
 								'tab' => $request->query->get('tab','data'), //Show initial tab, by default data tab
 								'tabs' => [
 									["name" => "data", "icon"=>"fa fa-id-card", "caption"=>"Products data", "active"=>true, "route"=>$this->generateUrl("formInfoProduct",["id"=>$id])],
-									["name" => "list",  "icon"=>"fa fa-users", "caption"=>"References", "route"=>$this->generateUrl("listEAN13",["id"=>$id])],
+									//["name" => "list",  "icon"=>"fa fa-users", "caption"=>"References", "route"=>$this->generateUrl("listEAN13",["id"=>$id])],
+									["name" => "list",  "icon"=>"fa fa-users", "caption"=>"References", "route"=>$this->generateUrl("generictablist",["module"=>"ERP", "name"=>"EAN13", "id"=>$id])],
 									["name"=>  "productPrices", "icon"=>"fa fa-money", "caption"=>"Prices","route"=>$this->generateUrl("infoProductPrices",["id"=>$id])],
 									["name" => "stocks", "icon"=>"fa fa-id-card", "caption"=>"Stocks", "route"=>$this->generateUrl("infoStocks",["id"=>$id])],
 									["name" => "webproduct", "icon"=>"fa fa-id-card", "caption"=>"Web", "route"=>$this->generateUrl("dataWebProducts",["id"=>$id])],
