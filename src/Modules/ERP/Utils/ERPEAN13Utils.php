@@ -14,13 +14,37 @@ use App\Modules\ERP\Entity\ERPSuppliers;
 
 class ERPEAN13Utils
 {
-
+  private $module="ERP";
+    private $name="EAN13";
 
   public function formatListByProduct($product){
     $list=[
       'id' => 'listEAN13',
       'route' => 'EAN13list',
       'routeParams' => ["id" => $product],
+      'orderColumn' => 2,
+      'orderDirection' => 'ASC',
+      'tagColumn' => 3,
+      'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/EAN13.json"),true),
+      'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/EAN13FieldButtons.json"),true),
+      'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/EAN13TopButtons.json"),true)
+    ];
+    return $list;
+  }
+
+  public function formatListProduct($product){
+    $list=[
+      'id' => 'listEAN13',
+      'route' => 'genericlist',
+      'routeParams' => ["module" => $this->module,
+                        "json" => "ContactsSupplier",
+                        "name" => $this->name,
+                        "parent" => $product,
+                        "id" => $product,
+                        "field" => "supplier",
+                        "parentModule" => "ERP",
+                        "parentName" => "Suppliers"
+                      ],
       'orderColumn' => 2,
       'orderDirection' => 'ASC',
       'tagColumn' => 3,
