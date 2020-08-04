@@ -32,28 +32,6 @@ class ERPEAN13Utils
     return $list;
   }
 
-  public function formatList($user, $object){
-    $list=[
-      'id' => 'listEAN13',
-      'route' => 'genericlist',
-      'routeParams' => ["module" => $this->module,
-                        "name" => $this->name,
-                        "parent" => $object,
-                        "id" => $object,
-                        "field" => "product",
-                        "parentModule" => "ERP",
-                        "parentName" => "Products"
-                      ],
-      'orderColumn' => 2,
-      'orderDirection' => 'ASC',
-      'tagColumn' => 3,
-      'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/EAN13.json"),true),
-      'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/EAN13FieldButtons.json"),true),
-      'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/EAN13TopButtons.json"),true)
-    ];
-    return $list;
-  }
-
 
   public function getExcludedForm($params){
     return ['product','supplier', 'productvariant'];
@@ -72,7 +50,7 @@ class ERPEAN13Utils
       'required' => false,
       'disabled' => false,
       'attr' => ['class' => 'select2', 'readonly' => true],
-      'choices' => $productsvariantsRepository->findBy(["product"=>$product->getId()]),
+      'choices' => $product?$productsvariantsRepository->findBy(["product"=>$product->getId()]):null,
       'placeholder' => 'Select a product',
       'choice_label' => function($obj, $key, $index) {
 
@@ -85,7 +63,7 @@ class ERPEAN13Utils
       'required' => false,
       'disabled' => false,
       'attr' => ['class' => 'select2', 'readonly' => true],
-      'choices' => $suppliersRepository->findBy(["company"=>$user->getCompany()]),
+      'choices' => $product?$suppliersRepository->findBy(["company"=>$user->getCompany()]):null,
       'placeholder' => 'Select a supplier',
       'choice_label' => function($obj, $key, $index) {
           return $obj->getName();

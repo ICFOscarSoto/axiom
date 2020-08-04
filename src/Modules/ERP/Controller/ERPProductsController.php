@@ -106,7 +106,7 @@ class ERPProductsController extends Controller
 			$productRepository=$this->getDoctrine()->getRepository($this->class);
 			$obj = $productRepository->findOneBy(['id'=>$id, 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
 			$product_name=$obj?$obj->getName():'';
-			if ($obj->getGrouped()) {
+			if ($obj && $obj->getGrouped()) {
 				return $this->render('@Globale/generictabform.html.twig', array(
 									'entity_name' => $product_name,
 									'controllerName' => 'ProductsController',
@@ -147,8 +147,7 @@ class ERPProductsController extends Controller
 								'tab' => $request->query->get('tab','data'), //Show initial tab, by default data tab
 								'tabs' => [
 									["name" => "data", "icon"=>"fa fa-id-card", "caption"=>"Products data", "active"=>true, "route"=>$this->generateUrl("formInfoProduct",["id"=>$id])],
-									//["name" => "list",  "icon"=>"fa fa-users", "caption"=>"References", "route"=>$this->generateUrl("listEAN13",["id"=>$id])],
-									["name" => "list",  "icon"=>"fa fa-users", "caption"=>"References", "route"=>$this->generateUrl("generictablist",["module"=>"ERP", "name"=>"EAN13", "id"=>$id])],
+									["name" => "list",  "icon"=>"fa fa-users", "caption"=>"References", "route"=>$this->generateUrl("listEAN13",["id"=>$id])],
 									["name"=>  "productPrices", "icon"=>"fa fa-money", "caption"=>"Prices","route"=>$this->generateUrl("infoProductPrices",["id"=>$id])],
 									["name" => "stocks", "icon"=>"fa fa-id-card", "caption"=>"Stocks", "route"=>$this->generateUrl("infoStocks",["id"=>$id])],
 									["name" => "webproduct", "icon"=>"fa fa-id-card", "caption"=>"Web", "route"=>$this->generateUrl("dataWebProducts",["id"=>$id])],
@@ -209,7 +208,7 @@ class ERPProductsController extends Controller
 				'userData' => $userdata,
 				'id' => $id,
 				'id_object' => $id,
-				'form' => $formUtils->formatForm('products', true, $id, $this->class, "dataProduct")
+				'form' => $formUtils->formatForm('products', false, $id, $this->class, "dataProduct")
 				//'listEAN13' => $listEAN13->formatListByProduct($id),
 				//'listReferences' => $listReferences->formatListByProduct($id),
 				//'listAttributes' => $listAttributes->formatListByProduct($id),

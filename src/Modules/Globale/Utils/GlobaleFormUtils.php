@@ -41,8 +41,10 @@ class GlobaleFormUtils extends Controller
   private $includePreTemplate=array();
   private $includePostTemplate=array();
   private $history;
+  private $ajax=false;
   public $preParams=array();
   public $postParams=array();
+
 
   //OLD INIT, ONLY FOR COMPATIBILITY
   public function init($doctrine, $request){
@@ -99,6 +101,7 @@ class GlobaleFormUtils extends Controller
  //class    = class of the entity element
  //route    = route of the save/read method in controller, generally dataEntity
   public function formatForm($name, $ajax=false, $id=null, $class=null, $route=null, $routeParams=[]){
+    $this->ajax=$ajax;
     if(!$id){
 				$this->obj=new $class();
 			} else{
@@ -443,11 +446,11 @@ class GlobaleFormUtils extends Controller
     $classname=explode('\\', $class);
     //If class has attribute company apply filter
     if(property_exists($class,'company')){
-      $choices= $this->doctrine->getRepository($class)->findBy(['company'=>$this->user->getCompany(),'active'=>true, 'deleted'=>false]);
+      $choices= (!$this->ajax || $this->obj->getId())?$this->doctrine->getRepository($class)->findBy(['company'=>$this->user->getCompany(),'active'=>true, 'deleted'=>false]):null;
     }else{
       if(property_exists($class,'active')){
-        $choices= $this->doctrine->getRepository($class)->findBy(['active'=>true, 'deleted'=>false]);
-      }else $choices= $this->doctrine->getRepository($class)->findAll();
+        $choices= (!$this->ajax || $this->obj->getId())?$this->doctrine->getRepository($class)->findBy(['active'=>true, 'deleted'=>false]):null;
+      }else $choices= (!$this->ajax || $this->obj->getId())?$this->doctrine->getRepository($class)->findAll():null;
     }
 
     $result =  [

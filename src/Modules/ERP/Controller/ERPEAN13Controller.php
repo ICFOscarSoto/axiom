@@ -39,8 +39,9 @@ class ERPEAN13Controller extends Controller
     $repository = $manager->getRepository($class);
     $listUtils=new GlobaleListUtils();
     $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/EAN13.json"),true);
-    $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $class, [["type"=>"and","column"=>"product", "value"=>$product],["type"=>"and","column"=>"deleted", "value"=>false]]);
+    $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $class, [["type"=>"and","column"=>"product", "value"=>$product]]);
     return new JsonResponse($return);
+
   }
 
   /**
@@ -86,7 +87,8 @@ class ERPEAN13Controller extends Controller
   public function listEAN13($id, Request $request){
     $listEAN13 = new ERPEAN13Utils();
     $formUtils=new GlobaleFormUtils();
-		$formUtils->initialize($this->getUser(), ERPEAN13::class, dirname(__FILE__)."/../Forms/EAN13.json", $request, $this, $this->getDoctrine());
+    $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(),"supplier"=>null, "product"=>null, "productvariant"=>null];
+    $formUtils->initialize($this->getUser(), ERPEAN13::class, dirname(__FILE__)."/../Forms/EAN13.json", $request, $this, $this->getDoctrine(),method_exists($listEAN13,'getExcludedForm')?$listEAN13->getExcludedForm($params):[],method_exists($listEAN13,'getIncludedForm')?$listEAN13->getIncludedForm($params):[]);
 		$templateForms[]=$formUtils->formatForm('EAN13', true, null, ERPEAN13::class);
     return $this->render('@Globale/list.html.twig', array(
       'listConstructor' => $listEAN13->formatListByProduct($id),
