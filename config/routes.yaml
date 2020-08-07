@@ -43,6 +43,10 @@ Histories:
     resource: 'App\Modules\Globale\Controller\GlobaleHistoriesController'
     type:     annotation
 
+Printers:
+    resource: 'App\Modules\Globale\Controller\GlobalePrintersController'
+    type:     annotation
+
 Customer:
     resource: 'App\Modules\ERP\Controller\ERPCustomersController'
     type:     annotation

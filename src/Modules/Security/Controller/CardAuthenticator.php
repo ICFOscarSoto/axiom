@@ -4,6 +4,7 @@ namespace App\Modules\Security\Controller;
 use App\Modules\Globale\Entity\GlobaleUsers;
 use App\Modules\Globale\Entity\GlobaleUsersCards;
 use App\Modules\Globale\Entity\GlobaleCompanies;
+use App\Modules\Globale\Entity\GlobaleWorkstations;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -38,7 +39,6 @@ class CardAuthenticator extends AbstractFormLoginAuthenticator
     {
         $this->em = $em;
         $this->router = $router;
-      //  $this->$session = $session;
     }
 
     function getDomain($url)
@@ -67,21 +67,19 @@ class CardAuthenticator extends AbstractFormLoginAuthenticator
      */
     public function getCredentials(Request $request)
     {
-      //$this->get('security.token_storage')->setToken(null);
-      //$this->get('request')->getSession()->invalidate();
-
-
         return [
             'cardid' => $request->query->get('X-AUTH-CARDID'),
             'domain' => $request->query->get('X-AUTH-DOMAIN'),
+            'deviceid' => $request->query->get('X-AUTH-DEVICEID'),
             'login-type'=>$request->query->get('login-type','card'),
         ];
     }
 
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
-        $cardid = $credentials['cardid'];
-        $domain = $credentials['domain'];
+        $cardid   = $credentials['cardid'];
+        $domain   = $credentials['domain'];
+        $deviceid = $credentials['deviceid'];
 
 
         if (null == $cardid) {
@@ -103,10 +101,9 @@ class CardAuthenticator extends AbstractFormLoginAuthenticator
             ->findOneBy(['cardid' => $decryptedCardId, 'active'=>1, 'deleted'=>0]);
         if($card!=null){
           $user=$card->getUserasigned();
-
           if($user->getCompany()!=$company) $user=null;
-
         }else $user=null;
+
         return $user;
     }
 
@@ -124,14 +121,33 @@ class CardAuthenticator extends AbstractFormLoginAuthenticator
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
     {
+        //Check if workstation is registered
+        $workstationRepository=$this->em->getRepository(GlobaleWorkstations::class);
+        $deviceId=$request->query->get('X-AUTH-DEVICEID');
+        $deviceName=$request->query->get('X-AUTH-DEVICENAME','');
+        $workstation=$workstationRepository->findOneBy(['deviceid'=>$deviceId, 'active'=>1, 'deleted'=>0]);
+        if($deviceId){
+          if(!$workstation){
+            $company=$this->em->getRepository(GlobaleCompanies::class)
+                ->findOneBy(['domain' => $request->query->get('X-AUTH-DOMAIN'), 'active'=>1, 'deleted'=>0]);
+            $workstation=new GlobaleWorkstations();
+            $workstation->setCompany($company);
+            $workstation->setDeviceId($deviceId);
+            $workstation->setDateadd(new \DateTime());
+            $workstation->setActive(1);
+            $workstation->setDeleted(0);
+          }
+          $workstation->setName($deviceName);
+          $workstation->setDateupd(new \DateTime());
+          $this->em->persist($workstation);
+          $this->em->flush();
+        }
+
         $request->getSession()->set('login-type', $request->query->get('login-type','card'));
         if ($targetPath = $this->getTargetPath($request->getSession(), $providerKey)) {
             return new RedirectResponse($targetPath);
         }
 
-        // For example : return new RedirectResponse($this->router->generate('some_route'));
-        //  return new RedirectResponse($this->router->generate('dashboard'));
-        //throw new \Exception('TODO: provide a valid redirect inside '.__FILE__);
     }
 
     protected function getLoginUrl()
@@ -141,14 +157,6 @@ class CardAuthenticator extends AbstractFormLoginAuthenticator
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
     {
-        /*$data = [
-            'message' => strtr($exception->getMessageKey(), $exception->getMessageData())
-
-            // or to translate this message
-            // $this->translator->trans($exception->getMessageKey(), $exception->getMessageData())
-        ];*/
-
-        //return $this->redirect($this->generateUrl('app_login'));
         return new RedirectResponse($this->router->generate('app_login'));
     }
 
@@ -157,12 +165,6 @@ class CardAuthenticator extends AbstractFormLoginAuthenticator
      */
     public function start(Request $request, AuthenticationException $authException = null)
     {
-        /*$data = [
-            // you might translate this message
-            'message' => 'Authentication Required'
-        ];
-
-        return new JsonResponse($data, Response::HTTP_UNAUTHORIZED);*/
         return new JsonResponse(["result"=>-1]);
     }
 
