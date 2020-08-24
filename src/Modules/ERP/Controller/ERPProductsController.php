@@ -430,29 +430,45 @@ class ERPProductsController extends Controller
  }
 
  /**
- * @Route("/{_locale}/admin/ERP/product/printLabel/{id}/{printer}/{copies}", name="printDirectly", defaults={"copies"=1})
+ * @Route("/{_locale}/admin/ERP/product/printLabel/{id}/{printer}/{copies}/{type}", name="printDirectly", defaults={"copies"=1,"type"=1})
  */
- public function printDirectly($id, $printer, $copies){
-	$repository=$this->getDoctrine()->getRepository(ERPEAN13::class);
-	$ean=$repository->findOneBy(["id"=>$id]);
-	$code="";
-	$barcode="0000000000000";
-	$name="";
-	if($ean){
-		$code=$ean->getProduct()->getCode();
-		$barcode=$ean->getName();
-		$name=$ean->getProduct()->getName();
+ public function printDirectly($id, $printer, $copies, $type){
+	$repositoryEAN=$this->getDoctrine()->getRepository(ERPEAN13::class);
+	$repositoryProduct=$this->getDoctrine()->getRepository(ERPProducts::class);
+	if($type==1){
+		$product=$repositoryProduct->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany()]);
+		$code="";
+		$barcode="0000000000000";
+		$name="";
+
+		if($product){
+			$code=$product->getCode();
+			$barcode=str_pad($product->getId(),10,'0', STR_PAD_LEFT);
+			$name=$product->getName();
+		}
+	}else
+	if($type==2){
+		$ean=$repositoryEAN->findOneBy(["id"=>$id]);
+		$code="";
+		$barcode="0000000000000";
+		$name="";
+		if($ean){
+			$code=$ean->getProduct()->getCode();
+			$barcode=$ean->getName();
+			$name=$ean->getProduct()->getName();
+		}
 	}
+	dump($barcode);
 	$params=["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "code"=>$code, "barcode"=>$barcode, "name"=>$name, "user"=>$this->getUser()];
 
 	$reportsUtils = new ERPEan13Reports();
 	$tempPath=$this->get('kernel')->getRootDir().DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$this->getUser()->getCompany()->getId().DIRECTORY_SEPARATOR.'printers'.DIRECTORY_SEPARATOR.$printer.DIRECTORY_SEPARATOR;
-	//$tempPath=$this->get('kernel')->getRootDir().DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$this->getUser()->getCompany()->getId().DIRECTORY_SEPARATOR.'temp'.DIRECTORY_SEPARATOR.$this->getUser()->getId().DIRECTORY_SEPARATOR.'Email'.DIRECTORY_SEPARATOR;
+
 	if (!file_exists($tempPath) && !is_dir($tempPath)) {
 			mkdir($tempPath, 0775, true);
 	}
 	for($i=0; $i<$copies; $i++){
-		$pdf=$reportsUtils->create($params,'F',$tempPath.$barcode.'-'.$i.'.pdf');
+		//$pdf=$reportsUtils->create($params,'F',$tempPath.$barcode.'-'.$i.'.pdf');
 	}
 	return new JsonResponse(["result"=>1]);
  }
