@@ -435,29 +435,25 @@ class ERPProductsController extends Controller
  public function printDirectly($id, $printer, $copies, $type){
 	$repositoryEAN=$this->getDoctrine()->getRepository(ERPEAN13::class);
 	$repositoryProduct=$this->getDoctrine()->getRepository(ERPProducts::class);
+	$code="";
+	$barcode="0000000000000";
+	$name="";
 	if($type==1){
 		$product=$repositoryProduct->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany()]);
-		$code="";
-		$barcode="0000000000000";
-		$name="";
-
 		if($product){
 			$code=$product->getCode();
 			$barcode=str_pad($product->getId(),10,'0', STR_PAD_LEFT);
 			$name=$product->getName();
 		}
 	}else
-	if($type==2){
-		$ean=$repositoryEAN->findOneBy(["id"=>$id]);
-		$code="";
-		$barcode="0000000000000";
-		$name="";
-		if($ean){
-			$code=$ean->getProduct()->getCode();
-			$barcode=$ean->getName();
-			$name=$ean->getProduct()->getName();
+		if($type==2){
+			$ean=$repositoryEAN->findOneBy(["id"=>$id]);
+			if($ean){
+				$code=$ean->getProduct()->getCode();
+				$barcode=$ean->getName();
+				$name=$ean->getProduct()->getName();
+			}
 		}
-	}
 	dump($barcode);
 	$params=["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "code"=>$code, "barcode"=>$barcode, "name"=>$name, "user"=>$this->getUser()];
 
@@ -468,7 +464,7 @@ class ERPProductsController extends Controller
 			mkdir($tempPath, 0775, true);
 	}
 	for($i=0; $i<$copies; $i++){
-		//$pdf=$reportsUtils->create($params,'F',$tempPath.$barcode.'-'.$i.'.pdf');
+		$pdf=$reportsUtils->create($params,'F',$tempPath.$barcode.'-'.$i.'.pdf');
 	}
 	return new JsonResponse(["result"=>1]);
  }
