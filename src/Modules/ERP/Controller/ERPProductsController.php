@@ -444,7 +444,7 @@ class ERPProductsController extends Controller
 		$product=$repositoryProduct->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany()]);
 		if($product){
 			$code=$product->getCode();
-			$barcode='p+'.str_pad($product->getId(),9,'0', STR_PAD_LEFT);
+			$barcode='p$'.str_pad($product->getId(),9,'0', STR_PAD_LEFT);
 			$name=$product->getName();
 		}
 	}else
@@ -460,7 +460,7 @@ class ERPProductsController extends Controller
 				$variant=$repositoryVariants->findOneBy(["id"=>$id]);
 				if($variant && $variant->getProduct() && $variant->getVariantvalue() && $variant->getVariantname()){
 					$code=$variant->getProduct()->getCode();
-					$barcode='v+'.str_pad($variant->getId(),9,'0', STR_PAD_LEFT);
+					$barcode='v$'.str_pad($variant->getId(),9,'0', STR_PAD_LEFT);
 					$name=$variant->getProduct()->getName().' - '.$variant->getVariantname()->getName().' '.$variant->getVariantname()->getName();
 				}
 			}
