@@ -162,9 +162,9 @@ function Code39($xpos, $ypos, $code, $baseline=0.5, $height=5){
   	$this->SetFont('Arial','',12);
     //$this->SetXY(0,-15);
   	//$this->Cell(62,6,$code,0,0,'C');
-    $this->SetXY(5,0.3);
+    $this->SetXY(5,0.1);
   	//$this->Cell(62,6,substr($barcode,-$len),0,0,'L');
-    $this->Cell(40,6,substr($code,3),0,0,'C');
+    $this->Cell(40,6,substr($code,2),0,0,'C');
     $this->SetFillColor(0);
 
     $code = '*'.strtoupper($code).'*';
@@ -220,7 +220,7 @@ class ERPEan13Reports{
         if(!$this->TestCheckDigit($params["barcode"])){
             $this->pdf->Image($params["rootdir"].DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$params["user"]->getCompany()->getId().DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'company'.DIRECTORY_SEPARATOR.'logoEAN.png', 54, 11, 7, 7);
             //$this->pdf->Image($params["rootdir"].DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$params["user"]->getCompany()->getId().DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'company'.DIRECTORY_SEPARATOR.'logoEAN.png', 55, 1, 7, 7);
-           $this->pdf->Code39(2,5,$params["barcode"],0.7,18);
+           $this->pdf->Code39(2,3,$params["barcode"],0.7,20);
          //else $this->pdf->EAN13(20,5,$params["barcode"],16,.40);
        }else{
          $this->pdf->Image($params["rootdir"].DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$params["user"]->getCompany()->getId().DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'company'.DIRECTORY_SEPARATOR.'logoEAN.png', 47, 6, 14, 14);
