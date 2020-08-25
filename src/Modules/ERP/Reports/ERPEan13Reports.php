@@ -14,9 +14,12 @@ use App\Modules\HR\Entity\HRClocks;
 use App\Modules\HR\Entity\HRVacations;
 use App\Modules\HR\Entity\HRSickleaves;
 use App\Modules\HR\Entity\HRHollidays;
+use BigFish\PDF417\PDF417;
+use BigFish\PDF417\Renderers\ImageRenderer;
+use BigFish\PDF417\Renderers\SvgRenderer;
+
 use \FPDF;
 use App\Modules\Globale\Reports\GlobaleReports;
-
 
 class PDF_EAN13 extends \FPDF
 {
@@ -104,6 +107,42 @@ class PDF_EAN13 extends \FPDF
     $this->Cell(40,6,substr($barcode,-$len),0,0,'C');
   }
 }
+
+
+/**
+ * @class PDF417
+ * Class to create PDF417 barcode arrays for TCPDF class.
+ * PDF417 (ISO/IEC 15438:2006) is a 2-dimensional stacked bar code created by Symbol Technologies in 1991.
+ * @package com.tecnick.tcpdf
+ * @author Nicola Asuni
+ * @version 1.0.004_PHP4
+ */
+class PDF_417 extends \FPDF{
+  function pdf417($params){
+    $pdf417 = new PDF417();
+    $data = $pdf417->encode($params["barcode"]);
+    $renderer = new ImageRenderer([
+    'format' => 'png',
+    'quality' => 100,
+    'scale' => 1,
+    'ratio'=>14
+    ]);
+    $this->SetFont('Arial','',12);
+    //$this->SetXY(0,-15);
+  	//$this->Cell(62,6,$code,0,0,'C');
+
+    $image = $renderer->render($data);
+    $image->save($params["rootdir"].DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$params["user"]->getCompany()->getId().DIRECTORY_SEPARATOR.'temp'.DIRECTORY_SEPARATOR.$params["user"]->getId().DIRECTORY_SEPARATOR.$params["code"].'.png');
+    $this->Image($params["rootdir"].DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$params["user"]->getCompany()->getId().DIRECTORY_SEPARATOR.'temp'.DIRECTORY_SEPARATOR.$params["user"]->getId().DIRECTORY_SEPARATOR.$params["code"].'.png', 1, 3);
+    $this->SetXY(0,2);
+    if(substr($params["barcode"],0,1)=="p")
+      $this->Cell(62,4,"ITEM ".substr($params["barcode"],2),0,0,'C');
+    if(substr($params["barcode"],0,1)=="v")
+      $this->Cell(62,4,"VAR ".substr($params["barcode"],2),0,0,'C');
+    $this->SetFillColor(0);
+  }
+} // end PDF417 class
+
 
 class PDF_Code39 extends FPDF
 {
@@ -199,6 +238,7 @@ class ERPEan13Reports{
   	//Test validity of check digit
   	$sum=0;
   	for($i=1;$i<=11;$i+=2)
+      if(!is_numeric($barcode[$i])) return false;
   		$sum+=3*$barcode[$i];
   	for($i=0;$i<=10;$i+=2)
   		$sum+=$barcode[$i];
@@ -209,8 +249,12 @@ class ERPEan13Reports{
     setlocale( LC_NUMERIC, 'es_ES' );
 
 
-      if(!$this->TestCheckDigit($params["barcode"])) $this->pdf = new PDF_Code39('L','mm',array(36,62));
-        else  $this->pdf = new PDF_EAN13('L','mm',array(36,62));
+      if(!$this->TestCheckDigit($params["barcode"])){
+         //$this->pdf = new PDF_Code39('L','mm',array(36,62));
+         $this->pdf = new PDF_417('L','mm',array(36,62));
+       }else{
+           $this->pdf = new PDF_EAN13('L','mm',array(36,62));
+      }
 
       $this->pdf->SetAutoPageBreak(false);
         $this->pdf->AddPage();
@@ -218,11 +262,11 @@ class ERPEan13Reports{
         //$this->pdf->Image($params["rootdir"].DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$params["user"]->getCompany()->getId().DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'company'.DIRECTORY_SEPARATOR.'logoEAN.png', 2, 6, 13, 13);
 
         if(!$this->TestCheckDigit($params["barcode"])){
-            $this->pdf->Image($params["rootdir"].DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$params["user"]->getCompany()->getId().DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'company'.DIRECTORY_SEPARATOR.'logoEAN.png', 54, 11, 7, 7);
-            //$this->pdf->Image($params["rootdir"].DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$params["user"]->getCompany()->getId().DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'company'.DIRECTORY_SEPARATOR.'logoEAN.png', 55, 1, 7, 7);
-           $this->pdf->Code39(2,3,$params["barcode"],0.5,20);
-         //else $this->pdf->EAN13(20,5,$params["barcode"],16,.40);
-       }else{
+
+          //     $this->pdf->Code39(2,3,$params["barcode"],0.5,20);
+            $this->pdf->pdf417($params);
+            $this->pdf->Image($params["rootdir"].DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$params["user"]->getCompany()->getId().DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'company'.DIRECTORY_SEPARATOR.'logoEAN.png',53, 11, 7, 7);
+        }else{
          $this->pdf->Image($params["rootdir"].DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$params["user"]->getCompany()->getId().DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'company'.DIRECTORY_SEPARATOR.'logoEAN.png', 47, 6, 14, 14);
          $this->pdf->EAN13(6,5,$params["barcode"],16,.40);
        }
