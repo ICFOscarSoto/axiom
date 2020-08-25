@@ -140,6 +140,7 @@ class PDF_417 extends \FPDF{
     if(substr($params["barcode"],0,1)=="v")
       $this->Cell(62,4,"VAR ".substr($params["barcode"],2),0,0,'C');
     $this->SetFillColor(0);
+    unlink($params["rootdir"].DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$params["user"]->getCompany()->getId().DIRECTORY_SEPARATOR.'temp'.DIRECTORY_SEPARATOR.$params["user"]->getId().DIRECTORY_SEPARATOR.$params["code"].'.png');
   }
 } // end PDF417 class
 
