@@ -119,9 +119,9 @@ class PDF_EAN13 extends \FPDF
  */
 class PDF_417 extends \FPDF{
   function pdf417($params){
-    $pdf417 = new PDF417();
+    $pdf417 = new \BigFish\PDF417\PDF417();
     $data = $pdf417->encode($params["barcode"]);
-    $renderer = new ImageRenderer([
+    $renderer = new \BigFish\PDF417\Renderers\ImageRenderer([
     'format' => 'png',
     'quality' => 100,
     'scale' => 1,
