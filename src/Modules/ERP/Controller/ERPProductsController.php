@@ -465,7 +465,7 @@ class ERPProductsController extends Controller
 				}
 			}
 		}
-	dump($barcode);
+	//dump($barcode);
 	$params=["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "code"=>$code, "barcode"=>$barcode, "name"=>$name, "user"=>$this->getUser()];
 
 	$reportsUtils = new ERPEan13Reports();
