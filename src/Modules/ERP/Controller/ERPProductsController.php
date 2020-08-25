@@ -461,7 +461,7 @@ class ERPProductsController extends Controller
 				if($variant && $variant->getProduct() && $variant->getVariantvalue() && $variant->getVariantname()){
 					$code=$variant->getProduct()->getCode();
 					$barcode='.v.'.str_pad($variant->getId(),9,'0', STR_PAD_LEFT);
-					$name=$variant->getProduct()->getName().' - '.$variant->getVariantname()->getName().' '.$variant->getVariantname()->getName();
+					$name=$variant->getProduct()->getName().' - '.$variant->getVariantname()->getName().' '.$variant->getVariantvalue()->getName();
 				}
 			}
 		}
