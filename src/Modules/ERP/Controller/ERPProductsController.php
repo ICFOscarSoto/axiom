@@ -21,6 +21,7 @@ use App\Modules\ERP\Entity\ERPStoreLocations;
 use App\Modules\ERP\Entity\ERPStores;
 use App\Modules\ERP\Entity\ERPStoresUsers;
 use App\Modules\ERP\Entity\ERPCategories;
+use App\Modules\ERP\Entity\ERPProductsVariants;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
@@ -435,23 +436,33 @@ class ERPProductsController extends Controller
  public function printDirectly($id, $printer, $copies, $type){
 	$repositoryEAN=$this->getDoctrine()->getRepository(ERPEAN13::class);
 	$repositoryProduct=$this->getDoctrine()->getRepository(ERPProducts::class);
+	$repositoryVariants=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
 	$code="";
 	$barcode="0000000000000";
 	$name="";
-	if($type==1){
+	if($type==1){  //Product id barcode
 		$product=$repositoryProduct->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany()]);
 		if($product){
 			$code=$product->getCode();
-			$barcode=str_pad($product->getId(),10,'0', STR_PAD_LEFT);
+			$barcode='p#'.str_pad($product->getId(),9,'0', STR_PAD_LEFT);
 			$name=$product->getName();
 		}
 	}else
-		if($type==2){
+		if($type==2){  //Product EAN barcode
 			$ean=$repositoryEAN->findOneBy(["id"=>$id]);
 			if($ean){
 				$code=$ean->getProduct()->getCode();
 				$barcode=$ean->getName();
 				$name=$ean->getProduct()->getName();
+			}
+		} else {
+			if($type==3){  //Variant id barcode
+				$variant=$repositoryVariants->findOneBy(["id"=>$id]);
+				if($variant && $variant->getProduct() && $variant->getVariantvalue() && $variant->getVariantname()){
+					$code=$variant->getProduct()->getCode();
+					$barcode='v#'.str_pad($variant->getId(),9,'0', STR_PAD_LEFT);
+					$name=$ean->getProduct()->getName().' - '.$variant->getVariantname()->getName().' '.$variant->getVariantname()->getName();
+				}
 			}
 		}
 	dump($barcode);
