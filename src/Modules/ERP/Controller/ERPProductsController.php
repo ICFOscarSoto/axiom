@@ -224,6 +224,7 @@ class ERPProductsController extends Controller
     public function getProduct($id,Request $request){
 			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 			$EAN13repository=$this->getDoctrine()->getRepository(ERPEAN13::class);
+			$Productrepository=$this->getDoctrine()->getRepository(ERPProducts::class);
 			$Stocksrepository=$this->getDoctrine()->getRepository(ERPStocks::class);
 			$StoreUsersrepository=$this->getDoctrine()->getRepository(ERPStoresUsers::class);
 			$StoreLocationsrepository=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
@@ -233,8 +234,16 @@ class ERPProductsController extends Controller
 				$obj = $this->getDoctrine()->getRepository($this->class)->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
 			}else{
 				if($request->request->get('barcode',null)){
-						$EAN13=$EAN13repository->findOneBy(["name"=>$request->request->get('barcode',null), "active"=>1, "deleted"=>0]);
-						if($EAN13) $obj=$EAN13->getProduct();
+						if(substr($request->request->get('barcode'),0,1)=="p"){
+							$product=$Productrepository->findOneBy(["id"=>substr($request->request->get('barcode'),2), "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
+							$obj=$product;
+						}else{
+							$EAN13=$EAN13repository->findOneBy(["name"=>$request->request->get('barcode',null), "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
+							if($EAN13){
+							 	$obj=$EAN13->getProduct();
+							}
+						}
+
 				}
 			}
 			if($obj){
