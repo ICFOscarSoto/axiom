@@ -160,8 +160,11 @@ function Code39($xpos, $ypos, $code, $baseline=0.5, $height=5){
 
     //Print text uder barcode
   	$this->SetFont('Arial','',12);
-    $this->SetXY(0,-15);
-  	$this->Cell(62,6,$code,0,0,'C');
+    //$this->SetXY(0,-15);
+  	//$this->Cell(62,6,$code,0,0,'C');
+    $this->SetXY(5,0.3);
+  	//$this->Cell(62,6,substr($barcode,-$len),0,0,'L');
+    $this->Cell(40,6,substr($code,3),0,0,'C');
     $this->SetFillColor(0);
 
     $code = '*'.strtoupper($code).'*';
@@ -214,9 +217,12 @@ class ERPEan13Reports{
         $this->pdf->SetFont('Arial','',12);
         //$this->pdf->Image($params["rootdir"].DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$params["user"]->getCompany()->getId().DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'company'.DIRECTORY_SEPARATOR.'logoEAN.png', 2, 6, 13, 13);
         $this->pdf->Image($params["rootdir"].DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$params["user"]->getCompany()->getId().DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'company'.DIRECTORY_SEPARATOR.'logoEAN.png', 47, 6, 14, 14);
-        if(!$this->TestCheckDigit($params["barcode"])) $this->pdf->Code39(6,5,$params["barcode"],0.5,16);
+        if(!$this->TestCheckDigit($params["barcode"])){
+           $this->pdf->Code39(2,5,$params["barcode"],2,16);
          //else $this->pdf->EAN13(20,5,$params["barcode"],16,.40);
-         else $this->pdf->EAN13(6,5,$params["barcode"],16,.40);
+       }else{
+         $this->pdf->EAN13(6,5,$params["barcode"],16,.40);
+       }
         //$this->pdf->SetY(-9.5);
         $this->pdf->SetY(-9.5);
         $this->pdf->SetX(0);
