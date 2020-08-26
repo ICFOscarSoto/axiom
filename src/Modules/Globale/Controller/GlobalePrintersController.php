@@ -99,7 +99,7 @@ class GlobalePrintersController extends Controller
 
 		//TODO get company for queries but be carefull because desktop app use this and is not logged :-(
 		if($deviceid!=0){
-			//Only printers of a device	
+			//Only printers of a device
 			$workstation=$workstationRepository->findOneBy(['deviceid'=>$deviceid, 'active'=>1, 'deleted'=>0]);
 			if(!$workstation) return new JsonResponse(["result"=>-1]);
 			$printers=$printersRepository->findBy(['workstation'=>$workstation, 'active'=>1, 'deleted'=>0]);
@@ -116,6 +116,7 @@ class GlobalePrintersController extends Controller
 		foreach($printers as $printer){
 			$item["id"]			=$printer->getId();
 			$item["name"]		=$printer->getName();
+			$item["workstation"]=$printer->getWorkstation()->getName();
 			$item["type"]		=$printer->getType();
 			$item["size"]		=$printer->getSize();
 			$arrayPrinters[]=$item;
