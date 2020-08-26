@@ -90,16 +90,28 @@ class GlobalePrintersController extends Controller
 	}
 
 	/**
-	 * @Route("/api/global/printers/get/{deviceid}", name="getPrinters")
+	 * @Route("/api/global/printers/get/{deviceid}/{type}", name="getPrinters", defaults={"deviceid"=0, "type"=-1})
 	 */
-	public function getPrinters($deviceid, RouterInterface $router,Request $request)
+	public function getPrinters($deviceid, $type, RouterInterface $router,Request $request)
 	{
-
 		$workstationRepository=$this->getDoctrine()->getRepository(GlobaleWorkstations::class);
 		$printersRepository=$this->getDoctrine()->getRepository(GlobalePrinters::class);
-		$workstation=$workstationRepository->findOneBy(['deviceid'=>$deviceid, 'active'=>1, 'deleted'=>0]);
-		if(!$workstation) return new JsonResponse(["result"=>-1]);
-		$printers=$printersRepository->findBy(['workstation'=>$workstation, 'active'=>1, 'deleted'=>0]);
+
+		//TODO get company for queries but be carefull because desktop app use this and is not logged :-(
+		if($deviceid!=0){
+			//Only printers of a device	
+			$workstation=$workstationRepository->findOneBy(['deviceid'=>$deviceid, 'active'=>1, 'deleted'=>0]);
+			if(!$workstation) return new JsonResponse(["result"=>-1]);
+			$printers=$printersRepository->findBy(['workstation'=>$workstation, 'active'=>1, 'deleted'=>0]);
+		}else{
+			//All printers
+			if($type==-1)
+				$printers=$printersRepository->findBy(['active'=>1, 'deleted'=>0]);
+			else $printers=$printersRepository->findBy(['type'=>$type, 'active'=>1, 'deleted'=>0]);
+		}
+
+
+
 		$arrayPrinters=[];
 		foreach($printers as $printer){
 			$item["id"]			=$printer->getId();
