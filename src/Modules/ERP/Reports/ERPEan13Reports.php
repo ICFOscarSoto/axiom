@@ -238,13 +238,14 @@ class ERPEan13Reports{
   function TestCheckDigit($barcode){
   	//Test validity of check digit
   	$sum=0;
+    if(strlen($barcode)<13)return null;
     try{
     	for($i=1;$i<=11;$i+=2)
         //if(!is_numeric($barcode[$i])) return false;
-    		$sum+=3*$barcode[$i];
+    		$sum+=3*intval($barcode[$i]);
     	for($i=0;$i<=10;$i+=2)
-    		$sum+=$barcode[$i];
-    	return ($sum+$barcode[12])%10==0;
+    		$sum+=intval($barcode[$i]);
+    	return ($sum+intval($barcode[12]))%10==0;
     }catch(Exception $e){
       return false;
     }
