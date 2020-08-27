@@ -243,7 +243,7 @@ class ERPProductsController extends Controller
 								$variant=$Variantsrepository->findOneBy(["id"=>intval(substr($request->request->get('barcode'),2)), "deleted"=>0]);
 								if($variant) $obj=$variant->getProduct();
 							}else{
-								$EAN13=$EAN13repository->findOneBy(["name"=>$request->request->get('barcode',null), "company"=>$this->getUser()->getCompany(), "deleted"=>0]);
+								$EAN13=$EAN13repository->findOneBy(["name"=>$request->request->get('barcode',null), "deleted"=>0]);
 								if($EAN13){
 								 	$obj=$EAN13->getProduct();
 								}
@@ -254,10 +254,49 @@ class ERPProductsController extends Controller
 			}
 			if($obj){
 				$stocks=$Stocksrepository->findBy(["product"=>$obj, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
+				$eans=$EAN13repository->findBy(["product"=>$obj, "productvariant"=>null, "active"=>1, "deleted"=>0]);
 				$result["id"]=$obj->getId();
 				$result["code"]=$obj->getCode();
 				$result["name"]=$obj->getName();
 				$result["provider"]=$obj->getSupplier()?$obj->getSupplier()->getName():"";
+				$result["eans"]=[];
+				foreach($eans as $ean){
+					$ean_item["barcode"]=$ean->getName();
+					$ean_item["type"]=$ean->getType();
+					if($ean->getSupplier()){
+						$ean_item["supplier"]["id"]=$ean->getSupplier()->getId();
+						$ean_item["supplier"]["name"]=$ean->getSupplier()->getName();
+					}else $ean_item["supplier"]=null;
+					if($ean->getCustomer()){
+						$ean_item["customer"]["id"]=$ean->getCustomer()->getId();
+						$ean_item["customer"]["name"]=$ean->getCustomer()->getName();
+					}else $ean_item["customer"]=null;
+					$result["eans"][]=$ean_item;
+				}
+
+				$variants=$Variantsrepository->findBy(["product"=>$obj, "active"=>1, "deleted"=>0]);
+				$result["variants"]=[];
+				foreach($variants as $variant){
+					$variant_item["name"]=$variant->getVariantname()->getName();
+					$variant_item["value"]=$variant->getVariantvalue()->getName();
+					$eans=$EAN13repository->findBy(["product"=>$obj, "productvariant"=>$variant, "active"=>1, "deleted"=>0]);
+					foreach($eans as $ean){
+						$ean_item["barcode"]=$ean->getName();
+						$ean_item["type"]=$ean->getType();
+						if($ean->getSupplier()){
+							$ean_item["supplier"]["id"]=$ean->getSupplier()->getId();
+							$ean_item["supplier"]["name"]=$ean->getSupplier()->getName();
+						}else $ean_item["supplier"]=null;
+						if($ean->getCustomer()){
+							$ean_item["customer"]["id"]=$ean->getCustomer()->getId();
+							$ean_item["customer"]["name"]=$ean->getCustomer()->getName();
+						}else $ean_item["customer"]=null;
+						$variant_item["eans"][]=$ean_item;
+					}
+					$result["variants"][]=$variant_item;
+				}
+
+
 				$stock_items=[];
 				foreach($stocks as $stock){
 					$storeUser=$StoreUsersrepository->findOneBy(["user"=>$this->getUser(), "store"=>$stock->getStorelocation()->getStore(), "active"=>1, "deleted"=>0]);
