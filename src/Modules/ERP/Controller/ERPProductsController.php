@@ -263,20 +263,20 @@ class ERPProductsController extends Controller
 				foreach($eans as $ean){
 					$ean_item["id"]=$ean->getId();
 					$ean_item["barcode"]=$ean->getName();
-					$ean_item["type"]=$ean->getType();
+					$ean_item["type"]=$ean->getType()==null?0:$ean->getType();
 					if($ean->getSupplier()){
 						$ean_item["supplierId"]=$ean->getSupplier()->getId();
 						$ean_item["supplierName"]=$ean->getSupplier()->getName();
 					}else{
-						$ean_item["supplierId"]=null;
-					  $ean_item["supplierName"]=null;
+						$ean_item["supplierId"]=0;
+					  $ean_item["supplierName"]='';
 					}
 					if($ean->getCustomer()){
 						$ean_item["customerId"]=$ean->getCustomer()->getId();
 						$ean_item["customerName"]=$ean->getCustomer()->getName();
 					}else{
-						$ean_item["customerId"]=null;
-						$ean_item["customerName"]=null;
+						$ean_item["customerId"]=0;
+						$ean_item["customerName"]='';
 					}
 					$result["eans"][]=$ean_item;
 				}
@@ -291,20 +291,20 @@ class ERPProductsController extends Controller
 					$variant_item["eans"]=[];
 					foreach($eans as $ean){
 						$ean_item["barcode"]=$ean->getName();
-						$ean_item["type"]=$ean->getType();
+						$ean_item["type"]=$ean->getType()==null?0:$ean->getType();
 						if($ean->getSupplier()){
 							$ean_item["supplierId"]=$ean->getSupplier()->getId();
 							$ean_item["supplierName"]=$ean->getSupplier()->getName();
 						}else{
-							$ean_item["supplierId"]=null;
-						  $ean_item["supplierName"]=null;
+							$ean_item["supplierId"]=0;
+						  $ean_item["supplierName"]='';
 						}
 						if($ean->getCustomer()){
 							$ean_item["customerId"]=$ean->getCustomer()->getId();
 							$ean_item["customerName"]=$ean->getCustomer()->getName();
 						}else{
-							$ean_item["customerId"]=null;
-							$ean_item["customerName"]=null;
+							$ean_item["customerId"]=0;
+							$ean_item["customerName"]='';
 						}
 						$variant_item["eans"][]=$ean_item;
 					}
