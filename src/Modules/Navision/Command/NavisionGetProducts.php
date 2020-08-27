@@ -252,7 +252,10 @@ class NavisionGetProducts extends ContainerAwareCommand
           if ($customer==null){
             $supplier=$repositorySupliers->findOneBy(["code"=>$object["Cross-Reference Type No."]]);
             $obj->setSupplier($supplier);
-          } else $obj->setCustomer($customer);
+            $obj->setType(1);
+          } else {$obj->setCustomer($customer);
+            $obj->setType(2);
+          }
           $product=$repositoryProducts->findOneBy(["code"=>$object["Item No."]]);
           if ($product!=null) {
             $obj->setProduct($product);
