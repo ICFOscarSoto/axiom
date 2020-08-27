@@ -261,36 +261,51 @@ class ERPProductsController extends Controller
 				$result["provider"]=$obj->getSupplier()?$obj->getSupplier()->getName():"";
 				$result["eans"]=[];
 				foreach($eans as $ean){
+					$ean_item["id"]=$ean->getId();
 					$ean_item["barcode"]=$ean->getName();
 					$ean_item["type"]=$ean->getType();
 					if($ean->getSupplier()){
-						$ean_item["supplier"]["id"]=$ean->getSupplier()->getId();
-						$ean_item["supplier"]["name"]=$ean->getSupplier()->getName();
-					}else $ean_item["supplier"]=null;
+						$ean_item["supplierId"]=$ean->getSupplier()->getId();
+						$ean_item["supplierName"]=$ean->getSupplier()->getName();
+					}else{
+						$ean_item["supplierId"]=null;
+					  $ean_item["supplierName"]=null;
+					}
 					if($ean->getCustomer()){
-						$ean_item["customer"]["id"]=$ean->getCustomer()->getId();
-						$ean_item["customer"]["name"]=$ean->getCustomer()->getName();
-					}else $ean_item["customer"]=null;
+						$ean_item["customerId"]=$ean->getCustomer()->getId();
+						$ean_item["customerName"]=$ean->getCustomer()->getName();
+					}else{
+						$ean_item["customerId"]=null;
+						$ean_item["customerName"]=null;
+					}
 					$result["eans"][]=$ean_item;
 				}
 
 				$variants=$Variantsrepository->findBy(["product"=>$obj, "active"=>1, "deleted"=>0]);
 				$result["variants"]=[];
 				foreach($variants as $variant){
+					$variant_item["id"]=$variant->getId();
 					$variant_item["name"]=$variant->getVariantname()->getName();
 					$variant_item["value"]=$variant->getVariantvalue()->getName();
 					$eans=$EAN13repository->findBy(["product"=>$obj, "productvariant"=>$variant, "active"=>1, "deleted"=>0]);
+					$variant_item["eans"]=[];
 					foreach($eans as $ean){
 						$ean_item["barcode"]=$ean->getName();
 						$ean_item["type"]=$ean->getType();
 						if($ean->getSupplier()){
-							$ean_item["supplier"]["id"]=$ean->getSupplier()->getId();
-							$ean_item["supplier"]["name"]=$ean->getSupplier()->getName();
-						}else $ean_item["supplier"]=null;
+							$ean_item["supplierId"]=$ean->getSupplier()->getId();
+							$ean_item["supplierName"]=$ean->getSupplier()->getName();
+						}else{
+							$ean_item["supplierId"]=null;
+						  $ean_item["supplierName"]=null;
+						}
 						if($ean->getCustomer()){
-							$ean_item["customer"]["id"]=$ean->getCustomer()->getId();
-							$ean_item["customer"]["name"]=$ean->getCustomer()->getName();
-						}else $ean_item["customer"]=null;
+							$ean_item["customerId"]=$ean->getCustomer()->getId();
+							$ean_item["customerName"]=$ean->getCustomer()->getName();
+						}else{
+							$ean_item["customerId"]=null;
+							$ean_item["customerName"]=null;
+						}
 						$variant_item["eans"][]=$ean_item;
 					}
 					$result["variants"][]=$variant_item;
