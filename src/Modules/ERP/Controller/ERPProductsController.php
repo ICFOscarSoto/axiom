@@ -218,6 +218,16 @@ class ERPProductsController extends Controller
 
 		}
 
+		/**
+    * @Route("/api/erp/product/search", name="searchProduct")
+    */
+    public function searchProduct(Request $request){
+			$search=$request->request->get('s',null);
+			$Productrepository=$this->getDoctrine()->getRepository(ERPProducts::class);
+			$result=$Productrepository->searchProduct($search);
+			return new JsonResponse($result);
+		}
+
     /**
     * @Route("/api/erp/product/get/{id}", name="getProduct", defaults={"id"=0})
     */
@@ -235,11 +245,11 @@ class ERPProductsController extends Controller
 				$obj = $this->getDoctrine()->getRepository($this->class)->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
 			}else{
 				if($request->request->get('barcode',null)){
-						if(substr($request->request->get('barcode'),0,2)=="p."){
+						if(substr($request->request->get('barcode'),0,2)=="P."){
 							$product=$Productrepository->findOneBy(["id"=>intval(substr($request->request->get('barcode'),2)), "company"=>$this->getUser()->getCompany(), "deleted"=>0]);
 							$obj=$product;
 						}else{
-							if(substr($request->request->get('barcode'),0,2)=="v."){
+							if(substr($request->request->get('barcode'),0,2)=="V."){
 								$variant=$Variantsrepository->findOneBy(["id"=>intval(substr($request->request->get('barcode'),2)), "deleted"=>0]);
 								if($variant) $obj=$variant->getProduct();
 							}else{
@@ -513,7 +523,7 @@ class ERPProductsController extends Controller
 		$product=$repositoryProduct->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany()]);
 		if($product){
 			$code=$product->getCode();
-			$barcode='p.'.str_pad($product->getId(),8,'0', STR_PAD_LEFT);
+			$barcode='P.'.str_pad($product->getId(),8,'0', STR_PAD_LEFT);
 			$name=$product->getName();
 		}
 	}else
@@ -529,7 +539,7 @@ class ERPProductsController extends Controller
 				$variant=$repositoryVariants->findOneBy(["id"=>$id]);
 				if($variant && $variant->getProduct() && $variant->getVariantvalue() && $variant->getVariantname()){
 					$code=$variant->getProduct()->getCode();
-					$barcode='v.'.str_pad($variant->getId(),8,'0', STR_PAD_LEFT);
+					$barcode='V.'.str_pad($variant->getId(),8,'0', STR_PAD_LEFT);
 					$name=$variant->getProduct()->getName().' - '.$variant->getVariantname()->getName().' '.$variant->getVariantvalue()->getName();
 				}
 			}
