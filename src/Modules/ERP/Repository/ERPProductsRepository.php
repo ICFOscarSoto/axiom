@@ -55,7 +55,6 @@ class ERPProductsRepository extends ServiceEntityRepository
         $string.=" AND (id='".$token."' OR name LIKE '%".$token."%' OR code LIKE '%".$token."%')";
       }
       $query="SELECT id, code, name from erpproducts where 1=1".$string;
-      dump($query);
       $result=$this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
       return $result;
     }
