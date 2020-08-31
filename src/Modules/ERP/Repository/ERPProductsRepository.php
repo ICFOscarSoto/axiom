@@ -48,6 +48,18 @@ class ERPProductsRepository extends ServiceEntityRepository
     }
     */
 
+    public function searchProduct($search){
+      $tokens=explode('*',$search);
+      $string='';
+      foreach($tokens as $token){
+        $string.=" AND (id='".$token."' OR name LIKE '%".$token."%' OR code LIKE '%".$token."%')";
+      }
+      $query="SELECT id, code, name from erpproducts where 1=1".$string;
+      dump($query);
+      $result=$this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
+      return $result;
+    }
+
     public function productsBySupplierCategory($supplier,$category){
       $query="SELECT id from erpproducts
       where supplier_id=:supplier AND category_id=:category";
