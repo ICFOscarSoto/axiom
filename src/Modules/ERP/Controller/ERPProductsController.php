@@ -245,11 +245,11 @@ class ERPProductsController extends Controller
 				$obj = $this->getDoctrine()->getRepository($this->class)->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
 			}else{
 				if($request->request->get('barcode',null)){
-						if(substr($request->request->get('barcode'),0,2)=="P."){
+						if(substr(strtoupper($request->request->get('barcode')),0,2)=="P."){
 							$product=$Productrepository->findOneBy(["id"=>intval(substr($request->request->get('barcode'),2)), "company"=>$this->getUser()->getCompany(), "deleted"=>0]);
 							$obj=$product;
 						}else{
-							if(substr($request->request->get('barcode'),0,2)=="V."){
+							if(substr(strtoupper($request->request->get('barcode')),0,2)=="V."){
 								$variant=$Variantsrepository->findOneBy(["id"=>intval(substr($request->request->get('barcode'),2)), "deleted"=>0]);
 								if($variant) $obj=$variant->getProduct();
 							}else{
