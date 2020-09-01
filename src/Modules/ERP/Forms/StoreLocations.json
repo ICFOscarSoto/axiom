@@ -1,11 +1,38 @@
 [{
-	"sections": [
-		{
-			"name": "Store Locations data",
-			"fields": [
-				{ "name": "store","cols": 4},
-				{ "name": "name","cols": 4},
-				{	"name": "active", "cols": 2}
-			]
-		}]
+    "sections": [
+        {
+            "name": "data",
+            "fields": [
+                {
+                    "name": "name",
+                    "cols": 4
+                },
+                {
+                    "name": "active",
+                    "cols": 2
+                },
+                {
+                    "name": "orientation",
+                    "cols": 2,
+                    "transform":
+          						{
+          							"type":"option",
+          							"options": {"Arriba": "0", "Abajo": "1", "Derecha": "2", "Izquierda": "3"}
+          						}
+                },
+                {
+                    "name": "accessibility",
+                    "cols": 2
+                },
+                {
+                    "name": "container",
+                    "cols": 2
+                },
+                {
+                    "name": "store",
+                    "cols": 4
+                }
+            ]
+        }
+    ]
 }]

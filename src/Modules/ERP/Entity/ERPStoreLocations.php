@@ -58,6 +58,21 @@ class ERPStoreLocations
     public $newSeconds=1296000;
     public $updatedSeconds=1296000;
 
+    /**
+     * @ORM\Column(type="smallint", nullable=true)
+     */
+    private $orientation;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $accessibility;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $container;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -143,6 +158,42 @@ class ERPStoreLocations
     public function setDeleted(bool $deleted): self
     {
         $this->deleted = $deleted;
+
+        return $this;
+    }
+
+    public function getOrientation(): ?int
+    {
+        return $this->orientation;
+    }
+
+    public function setOrientation(?int $orientation): self
+    {
+        $this->orientation = $orientation;
+
+        return $this;
+    }
+
+    public function getAccessibility(): ?bool
+    {
+        return $this->accessibility;
+    }
+
+    public function setAccessibility(bool $accessibility): self
+    {
+        $this->accessibility = $accessibility;
+
+        return $this;
+    }
+
+    public function getContainer(): ?bool
+    {
+        return $this->container;
+    }
+
+    public function setContainer(bool $container): self
+    {
+        $this->container = $container;
 
         return $this;
     }
