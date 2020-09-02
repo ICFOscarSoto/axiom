@@ -55,17 +55,28 @@ class ERPLocationsReports{
     $colOffset=15;
     $rowOffset=-10;
     foreach ($params["locations"] as $key=> $location){
+
       if($i%2==0){
+        if($row>=9){
+          $row=0;
+          $col=0;
+          $this->pdf->AddPage();
+        }
         $row++;
         $col=0;
       }else $col=1;
+
+
       $qrcode = new QRCode($options);
       $path=$tempPath.'loc-'.$location['id'].'.png';
       $qrcode->render('LOC.'.$location['name'], $path);
 
       $this->pdf->Rect($col*90+$colOffset, $row*28+$rowOffset, 90, 28);
       $this->pdf->Image($path, $col*90+$colOffset-4, $row*28+$rowOffset-4, 36, 36);
-      $this->pdf->SetFont('Arial','b',40);
+      $textSize=40;
+      $textSize=$textSize-(strlen($location['name']));
+      if(strlen($location['name'])>=8) $this->pdf->SetFont('Arial','b',$textSize);
+        else $this->pdf->SetFont('Arial','b',40);
 
       if($location['orientation']==0){
         $this->pdf->SetXY($col*90+$colOffset+28, $row*28+$rowOffset+16);
@@ -77,6 +88,7 @@ class ERPLocationsReports{
         $this->pdf->Image($params["rootdir"].DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'locations'.DIRECTORY_SEPARATOR.'arrow_down.png', $col*90+$colOffset+35, $row*28+$rowOffset+15,46,12);
         $this->pdf->Cell(62, 12, $location['name'], 0, 0, 'C');
       }
+      unlink($path);
       $i++;
     }
     //$this->pdf->Image($params["rootdir"].DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$params["user"]->getCompany()->getId().DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'company'.DIRECTORY_SEPARATOR.'logoEAN.png', 2, 6, 13, 13);
