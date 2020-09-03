@@ -19,32 +19,13 @@ class ERPStoreLocationsRepository extends ServiceEntityRepository
         parent::__construct($registry, ERPStoreLocations::class);
     }
 
-    // /**
-    //  * @return ERPStoreLocations[] Returns an array of ERPStoreLocations objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function findInventoryStoreLocations($company, $store=0)
     {
-        return $this->createQueryBuilder('e')
-            ->andWhere('e.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('e.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?ERPStoreLocations
-    {
-        return $this->createQueryBuilder('e')
-            ->andWhere('e.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
+        $query="SELECT stl.id as id,stl.name as name FROM erpstore_locations stl
+          WHERE stl.company_id=:company AND stl.active=1 ";
+        if($store!=0) $query.=" AND stl.store_id=".$store;
+        $query.=" ORDER BY stl.name ASC";
+        $params=['company' => $company->getId()];
+        return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+   }
 }
