@@ -1,9 +1,42 @@
-[ {"name": "id", "caption":""},
-  {"name": "name", "caption":"Nombre", "width" : "50"},
-  {"name": "store__name", "caption":"Almacen", "width" : "90"},
-  {"name": "active", "caption":"Estado", "width":"10%" ,"class" : "dt-center", "replace":{
-                             "1":{"text":"Activo","html":"<div style=\"min-width: 75px;\" class=\"label label-success\">Activo</div>"},
-                             "0":{"text":"Desactivado","html":"<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado</div>"}
-                           }
-   }
+[
+    {
+        "name": "id",
+        "caption": "id"
+    },
+    {
+        "name": "name",
+        "caption": "name"
+    },
+    {
+        "name": "orientation",
+        "caption": "orientation"
+    },
+    {
+        "name": "accessibility",
+        "caption": "accessibility"
+    },
+    {
+        "name": "container",
+        "caption": "container"
+    },
+    {
+        "name": "store__name",
+        "caption": "store"
+    },
+    {
+        "name": "active",
+        "caption": "Estado",
+        "width": "10%",
+        "class": "dt-center",
+        "replace": {
+            "1": {
+                "text": "Activo",
+                "html": "<div style=\"min-width: 75px;\" class=\"label label-success\">Activo<\/div>"
+            },
+            "0": {
+                "text": "Desactivado",
+                "html": "<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado<\/div>"
+            }
+        }
+    }
 ]

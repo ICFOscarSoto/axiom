@@ -15,6 +15,7 @@ use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\ERP\Utils\ERPStoreLocationsUtils;
+use App\Modules\ERP\Reports\ERPLocationsReports;
 
 class ERPStoreLocationsController extends Controller
 {
@@ -89,6 +90,21 @@ class ERPStoreLocationsController extends Controller
     $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoreLocations.json"),true);
     $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, ERPStoreLocations::class,[["type"=>"and", "column"=>"company", "value"=>$user->getCompany()]]);
     return new JsonResponse($return);
+  }
+
+	/**
+  * @Route("/api/ERP/locations/printLabel/{id}/{idend}", name="printLocationlabel")
+  */
+  public function printLocationlabel($id, $idend){
+	 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+ 	 $repository=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
+	 $locations=$repository->getLocations($id, $idend);
+ 	 $params=["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "locations"=>$locations, "user"=>$this->getUser()];
+ 	 $reportsUtils = new ERPLocationsReports();
+ 	 $pdf=$reportsUtils->create($params);
+ 	 return new Response("", 200, array('Content-Type' => 'application/pdf'));
+	 /*dump($locations);
+	 return new Response('');*/
   }
 
 	/**

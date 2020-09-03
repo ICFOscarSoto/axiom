@@ -1,6 +1,7 @@
 [
-  {"id" : "addTop", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"dataStoreLocations", "modal":"storelocations", "actionType" : "background", "confirm" :false, "tooltip" : "Crear nueva ubicación"},
-  {"id" : "deleteTop", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true},
-  {"id" : "printTop", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false},
-  {"id" : "exportTop", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"", "confirm" :false}
+  {"id" : "addTopStoreLocations", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "",  "route":"dataStoreLocations",
+    "modal":"storelocations", "actionType" : "background", "confirm" :false, "tooltip" : "Crear nueva ubicación"},
+  {"id" : "deleteTopStoreLocations", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true, "tooltip":""},
+  {"id" : "printTopStoreLocations", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false, "tooltip":""},
+  {"id" : "exportTopStoreLocations", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"genericexport", "routeParams":{"module":"ERP", "name":"StoreLocations"}, "confirm" :false, "tooltip":""}
 ]

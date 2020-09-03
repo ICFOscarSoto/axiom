@@ -14,6 +14,7 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
  */
 class ERPStoreLocationsRepository extends ServiceEntityRepository
 {
+
     public function __construct(RegistryInterface $registry)
     {
         parent::__construct($registry, ERPStoreLocations::class);
@@ -27,5 +28,12 @@ class ERPStoreLocationsRepository extends ServiceEntityRepository
         $query.=" ORDER BY stl.name ASC";
         $params=['company' => $company->getId()];
         return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+   }
+
+   public function getLocations($id, $endid){
+     $query="SELECT l.id, l.name, l.orientation
+             FROM erpstore_locations l WHERE l.active=TRUE and l.deleted=0 and l.id>=:id and l.id<=:endid";
+     $params=['id' => $id, 'endid' => $endid];
+     return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
    }
 }
