@@ -11,6 +11,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\ERP\Entity\ERPStoreLocations;
+use App\Modules\ERP\Entity\ERPStocks;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
@@ -105,6 +106,32 @@ class ERPStoreLocationsController extends Controller
  	 return new Response("", 200, array('Content-Type' => 'application/pdf'));
 	 /*dump($locations);
 	 return new Response('');*/
+  }
+
+	/**
+  * @Route("/api/ERP/location/get", name="getLocation")
+  */
+  public function getLocation(Request $request){
+	 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+ 	 $repository=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
+	 $stockRepository=$this->getDoctrine()->getRepository(ERPStocks::class);
+	 $location=$repository->findOneBy(["name"=>$request->request->get('loc')]);
+	 if(!$location) return new JsonResponse(["result"=>-1]);
+	 $products=$stockRepository->findBy(["storelocation"=>$location, "active"=>1, "deleted"=>0]);
+	 $result["id"]=$location->getId();
+	 $result["name"]=$location->getName();
+	 $result["storeId"]=$location->getStore()->getId();
+	 $result["storeName"]=$location->getStore()->getName();
+	 $result["inventory"]=[];
+	 foreach($products as $product){
+		 if($product->getProduct()->getActive() && !$product->getProduct()->getDeleted()){
+			 $result_product["id"]=$product->getProduct()->getId();
+			 $result_product["name"]=$product->getProduct()->getName();
+			 $result_product["quantity"]=$product->getQuantity();
+			 $result["inventory"][]=$result_product;
+		 }
+	 }
+	 return new JsonResponse($result);
   }
 
 	/**
