@@ -54,7 +54,8 @@ class ERPProductsRepository extends ServiceEntityRepository
       foreach($tokens as $token){
         $string.=" AND (id='".$token."' OR name LIKE '%".$token."%' OR code LIKE '%".$token."%')";
       }
-      $query="SELECT id, code, name from erpproducts where active=1 and deleted=0".$string;
+      //$query="SELECT id, code, name from erpproducts where active=1 and deleted=0".$string;
+      $query="SELECT id, code, name from erpproducts where deleted=0".$string;
       $result=$this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
       return $result;
     }
