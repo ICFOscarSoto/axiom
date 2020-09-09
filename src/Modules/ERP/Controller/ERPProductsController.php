@@ -513,6 +513,7 @@ class ERPProductsController extends Controller
  * @Route("/{_locale}/admin/ERP/product/printLabel/{id}/{printer}/{copies}/{type}", name="printDirectly", defaults={"copies"=1,"type"=1})
  */
  public function printDirectly($id, $printer, $copies, $type){
+	$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 	$repositoryEAN=$this->getDoctrine()->getRepository(ERPEAN13::class);
 	$repositoryProduct=$this->getDoctrine()->getRepository(ERPProducts::class);
 	$repositoryVariants=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
