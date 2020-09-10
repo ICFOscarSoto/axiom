@@ -71,6 +71,20 @@ class ERPReferencesController extends Controller
      return $utils->make($id, ERPReferences::class, $action, "formProducts", "modal");
     }
 
-
+    /**
+     * @Route("/{_locale}/listReferences/{id}", name="listReferences", defaults={"id"=0})
+     */
+    public function listReferences($id, Request $request){
+      $listReferences = new ERPReferencesUtils();
+      $formUtils=new GlobaleFormUtils();
+      $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(),"supplier"=>null, "product"=>null, "productvariant"=>null];
+      $formUtils->initialize($this->getUser(), ERPReferences::class, dirname(__FILE__)."/../Forms/References.json", $request, $this, $this->getDoctrine(),method_exists($listReferences,'getExcludedForm')?$listReferences->getExcludedForm($params):[],method_exists($listReferences,'getIncludedForm')?$listReferences->getIncludedForm($params):[]);
+      $templateForms[]=$formUtils->formatForm('References', true, null, ERPReferences::class);
+      return $this->render('@Globale/list.html.twig', array(
+        'listConstructor' => $listReferences->formatListByProduct($id),
+        'id_object'=>$id,
+        'forms' => $templateForms
+      ));
+    }
 
 }

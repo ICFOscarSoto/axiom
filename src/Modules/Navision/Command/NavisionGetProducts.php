@@ -13,6 +13,7 @@ use App\Modules\ERP\Entity\ERPSuppliers;
 use App\Modules\ERP\Entity\ERPProducts;
 use App\Modules\ERP\Entity\ERPProductPrices;
 use App\Modules\ERP\Entity\ERPEAN13;
+use App\Modules\ERP\Entity\ERPReferences;
 use App\Modules\ERP\Entity\ERPShoppingDiscounts;
 use App\Modules\ERP\Entity\ERPStocks;
 use App\Modules\ERP\Entity\ERPStoreLocations;
@@ -67,6 +68,8 @@ class NavisionGetProducts extends ContainerAwareCommand
       break;
       case 'ean13': $this->importEAN13($input, $output);
       break;
+      case 'references': $this->importReferences($input, $output);
+      break;
       case 'clearEAN13': $this->clearEAN13($input, $output);
       break;
       case 'prices': $this->importPrices($input, $output);
@@ -82,6 +85,8 @@ class NavisionGetProducts extends ContainerAwareCommand
       case 'values': $this->importProductsVariants($input, $output);
       break;
       case 'prices0': $this->pricesZero($input, $output);
+      break;
+      case 'blocked': $this->disableBlocked($input, $output);
       break;
       case 'all':
         $this->importProduct($input, $output);
@@ -104,7 +109,6 @@ class NavisionGetProducts extends ContainerAwareCommand
       } else {
           $fp = fopen('/tmp/axiom-navisionGetProducts-importProduct.lock', 'c');
       }
-
       if (!flock($fp, LOCK_EX | LOCK_NB)) {
         $output->writeln('* Fallo al iniciar la sincronizacion de productos: El proceso ya esta en ejecución.');
         exit;
@@ -143,7 +147,9 @@ class NavisionGetProducts extends ContainerAwareCommand
           $obj->setDateadd(new \Datetime());
           $obj->setDateupd(new \Datetime());
           $obj->setDeleted(0);
+          if ($object["Blocked"]==0)
           $obj->setActive(1);
+          else $obj->setActive(0);
           $category=$repositoryCategory->findOneBy(["name"=>"Sin Categoria"]);
           $obj->setCategory($category);
         }
@@ -1005,6 +1011,98 @@ public function variantColor($nameVariantValue){
   return $nameVariantValue;
 }
 
+
+public function disableBlocked(InputInterface $input, OutputInterface $output){
+  $repository=$this->doctrine->getRepository(ERPEAN13::class);
+  $datetime=new \DateTime();
+  $output->writeln('* Limpiando Products....');
+  $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
+  $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getProducts.php');
+  $objects=json_decode($json, true);
+  dump($objects);
+  /*foreach ($objects as $object){
+    $repositoryProduct=$this->doctrine->getRepository(ERPProducts::class);
+    $product=$repositoryProduct->findOneBy(["code"=>$object["code"]]);
+    $product->setActive(0);
+    $output->writeln('* Bloqueando....'.$product);
+    $this->doctrine->getManager()->merge($product);
+  }*/
+  $this->doctrine->getManager()->flush();
+  $this->doctrine->getManager()->clear();
+}
+
+public function importReferences(InputInterface $input, OutputInterface $output){
+  //------   Create Lock Mutex    ------
+  if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+      $fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetProducts-importReferences.lock', 'c');
+  } else {
+      $fp = fopen('/tmp/axiom-navisionGetProducts-importReferences.lock', 'c');
+  }
+
+  if (!flock($fp, LOCK_EX | LOCK_NB)) {
+    $output->writeln('* Fallo al iniciar la sincronizacion de Referencias Cruzadas: El proceso ya esta en ejecución.');
+    exit;
+  }
+
+  //------   Critical Section START   ------
+  $navisionSyncRepository=$this->doctrine->getRepository(NavisionSync::class);
+  $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"References"]);
+  if ($navisionSync==null) {
+    $navisionSync=new NavisionSync();
+    $navisionSync->setMaxtimestamp(0);
+  }
+  $datetime=new \DateTime();
+  $output->writeln('* Sincronizando References....');
+  $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getReferences.php?from='.$navisionSync->getMaxtimestamp());
+  $objects=json_decode($json, true);
+  $objects=$objects[0];
+
+  $repositoryCustomers=$this->doctrine->getRepository(ERPCustomers::class);
+  $repositorySupliers=$this->doctrine->getRepository(ERPSuppliers::class);
+  $repositoryProducts=$this->doctrine->getRepository(ERPProducts::class);
+  $repository=$this->doctrine->getRepository(ERPReferences::class);
+  //Disable SQL logger
+  $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
+  foreach ($objects["class"] as $key=>$object){
+    $reference=preg_replace('/\D/','',$object["Cross-Reference No."]);
+    $obj=$repository->findOneBy(["name"=>$reference]);
+    $output->writeln('  - '.$object["Item No."].' - '.$reference);
+    $obj=new ERPReferences();
+    $obj->setName($reference);
+    $obj->setDateadd(new \Datetime());
+    $obj->setDateupd(new \Datetime());
+    $obj->setDeleted(0);
+    $obj->setActive(1);
+    if ($object["Cross Reference Type"]=2){
+      $supplier=$repositorySupliers->findOneBy(["code"=>$object["Cross-Reference Type No."]]);
+      $obj->setSupplier($supplier);
+      $obj->setType(1);
+    } else {
+      $customer=$repositoryCustomers->findOneBy(["code"=>$object["Cross-Reference Type No."]]);
+      $obj->setCustomer($customer);
+      $obj->setType(2);
+    }
+    $product=$repositoryProducts->findOneBy(["code"=>$object["Item No."]]);
+    if ($product!=null) {
+      $obj->setProduct($product);
+      $this->doctrine->getManager()->merge($obj);
+      $this->doctrine->getManager()->flush();
+    }
+    $this->doctrine->getManager()->clear();
+  }
+  $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"References"]);
+  if ($navisionSync==null) {
+    $navisionSync=new NavisionSync();
+    $navisionSync->setEntity("References");
+  }
+  $navisionSync->setLastsync($datetime);
+  $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
+  $this->doctrine->getManager()->persist($navisionSync);
+  $this->doctrine->getManager()->flush();
+  //------   Critical Section END   ------
+  //------   Remove Lock Mutex    ------
+  fclose($fp);
+}
 
 }
 ?>

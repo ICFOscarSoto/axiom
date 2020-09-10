@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\ERP\Entity\ERPCustomers;
 use \App\Modules\ERP\Entity\ERPProducts;
 use \App\Modules\ERP\Entity\ERPSuppliers;
+use \App\Modules\ERP\Entity\ERPProductsVariants;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPReferencesRepository")
@@ -66,6 +67,11 @@ class ERPReferences
      * @ORM\JoinColumn(onDelete="CASCADE")
      */
     private $supplier;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPProductsVariants")
+     */
+    private $productvariant;
 
     public function getId(): ?int
     {
@@ -177,6 +183,18 @@ class ERPReferences
     public function setSupplier(?ERPSuppliers $supplier): self
     {
         $this->supplier = $supplier;
+
+        return $this;
+    }
+
+    public function getProductvariant(): ?ERPProductsVariants
+    {
+        return $this->productvariant;
+    }
+
+    public function setProductvariant(?ERPProductsVariants $productvariant): self
+    {
+        $this->productvariant = $productvariant;
 
         return $this;
     }
