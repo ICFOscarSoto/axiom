@@ -14,6 +14,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\HttpFoundation\Session\Session;
 use \App\Modules\Globale\Entity\GlobaleDiskUsages;
 use \App\Helpers\HelperFiles;
+use \App\Modules\Globale\Entity\GlobalePrinters;
 
 
 /**
@@ -107,6 +108,16 @@ class GlobaleUsers implements UserInterface
      * @ORM\Column(type="text", nullable=true)
      */
     private $apiToken;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobalePrinters")
+     */
+    private $defaultlabelprinter;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $alwaysprintownlabel;
 
 
 
@@ -458,6 +469,30 @@ class GlobaleUsers implements UserInterface
     public function setApiToken(?string $apiToken): self
     {
         $this->apiToken = $apiToken;
+
+        return $this;
+    }
+
+    public function getDefaultlabelprinter(): ?GlobalePrinters
+    {
+        return $this->defaultlabelprinter;
+    }
+
+    public function setDefaultlabelprinter(?GlobalePrinters $defaultlabelprinter): self
+    {
+        $this->defaultlabelprinter = $defaultlabelprinter;
+
+        return $this;
+    }
+
+    public function getAlwaysprintownlabel(): ?bool
+    {
+        return $this->alwaysprintownlabel;
+    }
+
+    public function setAlwaysprintownlabel(bool $alwaysprintownlabel): self
+    {
+        $this->alwaysprintownlabel = $alwaysprintownlabel;
 
         return $this;
     }

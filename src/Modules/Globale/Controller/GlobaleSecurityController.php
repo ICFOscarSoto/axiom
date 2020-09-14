@@ -117,7 +117,10 @@ class GlobaleSecurityController extends Controller
 																	 'name'=>$user->getName(),
 																	 'lastname'=>$user->getLastname(),
 																	 'allowRemoteClock'=>$worker->getAllowremoteclock(),
-																	 'token'=>$user->getApiToken()]);
+																	 'token'=>$user->getApiToken(),
+																	 'labelPrinter'=>$user->getDefaultlabelprinter()?$user->getDefaultlabelprinter()->getId():-1,
+																	 'printownlabel'=>$user->getAlwaysprintownlabel()
+																 ]);
 				}else{
 						$token = openssl_random_pseudo_bytes(200);
 						$token = bin2hex($token);
@@ -134,7 +137,10 @@ class GlobaleSecurityController extends Controller
 																		 'name'=>$user->getName(),
 																		 'lastname'=>$user->getLastname(),
 																		 'allowRemoteClock'=>$worker->getAllowremoteclock(),
-																		 'token'=>$token]);
+																		 'token'=>$token,
+																	 	 'labelPrinter'=>$user->getDefaultlabelprinter()?$user->getDefaultlabelprinter()->getId():-1,
+																	 	 'printownlabel'=>$user->getAlwaysprintownlabel()
+																 ]);
 					}
 
 		}else{
