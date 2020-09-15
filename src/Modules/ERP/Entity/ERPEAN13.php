@@ -21,7 +21,7 @@ class ERPEAN13
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=13)
+     * @ORM\Column(type="string", length=20)
      */
     private $name;
 
