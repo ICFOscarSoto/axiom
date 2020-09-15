@@ -132,8 +132,12 @@ class PDF_417 extends \FPDF{
   	//$this->Cell(62,6,$code,0,0,'C');
 
     $image = $renderer->render($data);
-    $image->save($params["rootdir"].DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$params["user"]->getCompany()->getId().DIRECTORY_SEPARATOR.'temp'.DIRECTORY_SEPARATOR.$params["user"]->getId().DIRECTORY_SEPARATOR.$params["code"].'.png');
-    $this->Image($params["rootdir"].DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$params["user"]->getCompany()->getId().DIRECTORY_SEPARATOR.'temp'.DIRECTORY_SEPARATOR.$params["user"]->getId().DIRECTORY_SEPARATOR.$params["code"].'.png', 1, 3);
+    $tempPath=$params["rootdir"].DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$params["user"]->getCompany()->getId().DIRECTORY_SEPARATOR.'temp'.DIRECTORY_SEPARATOR.$params["user"]->getId();
+    if (!file_exists($tempPath) && !is_dir($tempPath)) {
+  			mkdir($tempPath, 0775, true);
+  	}
+    $image->save($tempPath.DIRECTORY_SEPARATOR.$params["code"].'.png');
+    $this->Image($tempPath.DIRECTORY_SEPARATOR.$params["code"].'.png', 1, 3);
     $this->SetXY(0,2);
     if(substr($params["barcode"],0,1)=="p")
       $this->Cell(62,4,"ITEM ".substr($params["barcode"],2),0,0,'C');
