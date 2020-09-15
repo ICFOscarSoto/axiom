@@ -166,8 +166,6 @@ class NavisionGetProducts extends ContainerAwareCommand
          $obj->setTaxes($taxes);
          $obj->setCode($object["code"]);
          $obj->setWeight($object["Weight"]);
-         if ($object["Blocked"]==0)  $obj->setActive(1);
-         else $obj->setActive(0);
          // Comprobamos si el producto tiene descuentos, si no los tiene se le pone como precio neto.
          $json3=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getPrices.php?from='.$object["code"].'$supplier='.$object["Supplier"]);
          $prices=json_decode($json3, true);
