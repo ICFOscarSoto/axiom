@@ -13,6 +13,7 @@ use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\ERP\Entity\ERPEAN13;
 use App\Modules\ERP\Entity\ERPProducts;
 use App\Modules\ERP\Entity\ERPSuppliers;
+use App\Modules\ERP\Entity\ERPProductsVariants;
 use App\Modules\Globale\Entity\GlobaleCountries;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
@@ -97,6 +98,58 @@ class ERPEAN13Controller extends Controller
     ));
   }
 
+  /**
+   * @Route("/api/ERP/barcode/add/{id}/{type}", name="addBarcode", defaults={"id"=0, "type"=1})
+   */
+  public function addBarcode($id, $type, Request $request){
+    $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+  	$repositoryEAN=$this->getDoctrine()->getRepository(ERPEAN13::class);
+  	$repositoryProduct=$this->getDoctrine()->getRepository(ERPProducts::class);
+    $Variantsrepository=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
+    $barcode=$request->request->get('barcode',null);
+    if($barcode===false) return new JsonResponse(["result"=>-2, "text"=>"El código de barras no puede ser nulo"]);
+    //check if product exists
+    if($type==1)
+      $product=$repositoryProduct->findOneBy(["id"=>$id, "company"=> $this->getUser()->getCompany(), "deleted"=>0]);
+      else{
+        $variant=$Variantsrepository->findOneBy(["id"=>$id, "deleted"=>0]);
+        if($variant) $product=$variant->getProduct();
+          else return new JsonResponse(["result"=>-1, "text"=>"El producto no existe"]);
+      }
+    if(!$product) return new JsonResponse(["result"=>-1, "text"=>"El producto no existe"]);
+    if($product->getCompany()!=$this->getUser()->getCompany()) return new JsonResponse(["result"=>-1, "text"=>"El producto no existe"]);
+    //check if barcode exists
+    $tempbarcode=$repositoryEAN->findOneBy(["name"=>$barcode, "deleted"=>0]);
+    if($tempbarcode) return new JsonResponse(["result"=>-3, "text"=>"El código de barras ya esta en uso por este u otro producto"]);
+    //check if product has supplier
+    //if($product->getSupplier()===null) return new JsonResponse(["result"=>-4, "text"=>"El producto no tiene proveedor"]);
 
+    $newBarcode=new ERPEAN13();
+    $newBarcode->setSupplier($product->getSupplier());
+    $newBarcode->setProduct($product);
+    $newBarcode->setName($barcode);
+    $newBarcode->setDateadd(new \Datetime());
+    $newBarcode->setDateupd(new \Datetime());
+    $newBarcode->setActive(1);
+    $newBarcode->setDeleted(0);
+    $newBarcode->setType(1);
+    if($type==2)
+      $newBarcode->setProductvariant($variant);
+
+    $this->getDoctrine()->getManager()->persist($newBarcode);
+    $this->getDoctrine()->getManager()->flush();
+
+    //Create in Navision
+    $params=["axiom_id"=>$newBarcode->getId(), "product_code"=>$product->getCode(), "supplier_code"=>$newBarcode->getSupplier()===null?"P99999":$newBarcode->getSupplier()->getCode(), "barcode"=>$newBarcode->getName()];
+    $result_json=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-createEAN13.php?json='.json_encode($params));
+    $result=json_decode($result_json, true);
+    if($result["result"]==1)
+        return new JsonResponse(["result"=>1]);
+    else{
+      $this->getDoctrine()->getManager()->remove($newBarcode);
+      $this->getDoctrine()->getManager()->flush();
+      return new JsonResponse($result);
+    }
+  }
 
 }
