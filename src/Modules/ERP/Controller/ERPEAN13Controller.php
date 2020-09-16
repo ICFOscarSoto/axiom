@@ -128,6 +128,7 @@ class ERPEAN13Controller extends Controller
     $newBarcode->setSupplier($product->getSupplier());
     $newBarcode->setProduct($product);
     $newBarcode->setName($barcode);
+    $newBarcode->setAuthor($this->getUser());
     $newBarcode->setDateadd(new \Datetime());
     $newBarcode->setDateupd(new \Datetime());
     $newBarcode->setActive(1);

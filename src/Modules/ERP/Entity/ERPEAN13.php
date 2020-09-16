@@ -7,6 +7,7 @@ use \App\Modules\ERP\Entity\ERPSuppliers;
 use \App\Modules\ERP\Entity\ERPProducts;
 use \App\Modules\ERP\Entity\ERPCustomers;
 use \App\Modules\ERP\Entity\ERPProductsVariants;
+use \App\Modules\Globale\Entity\GlobaleUsers;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPEAN13Repository")
@@ -72,6 +73,11 @@ class ERPEAN13
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPProductsVariants")
      */
     private $productvariant;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleUsers")
+     */
+    private $author;
 
     public function getId(): ?int
     {
@@ -194,6 +200,18 @@ class ERPEAN13
     public function setProductVariant(?ERPProductsVariants $productvariant): self
     {
         $this->productvariant = $productvariant;
+
+        return $this;
+    }
+
+    public function getAuthor(): ?GlobaleUsers
+    {
+        return $this->author;
+    }
+
+    public function setAuthor(?GlobaleUsers $author): self
+    {
+        $this->author = $author;
 
         return $this;
     }
