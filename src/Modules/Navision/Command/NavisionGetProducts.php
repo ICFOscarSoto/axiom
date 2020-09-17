@@ -88,6 +88,8 @@ class NavisionGetProducts extends ContainerAwareCommand
       break;
       case 'blocked': $this->disableBlocked($input, $output);
       break;
+      case 'ownbarcodes': $this->createOwnBarcodes($input, $output);
+      break;
       case 'all':
         $this->importProduct($input, $output);
         $this->clearEAN13($input, $output);
@@ -1099,6 +1101,48 @@ public function importReferences(InputInterface $input, OutputInterface $output)
   //------   Critical Section END   ------
   //------   Remove Lock Mutex    ------
   fclose($fp);
+}
+
+
+public function createOwnBarcodes(InputInterface $input, OutputInterface $output){
+  //------   Create Lock Mutex    ------
+  if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+      $fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetProducts-createOwnBarcodes.lock', 'c');
+  } else {
+      $fp = fopen('/tmp/axiom-navisionGetProducts-createOwnBarcodes.lock', 'c');
+  }
+
+  if (!flock($fp, LOCK_EX | LOCK_NB)) {
+    $output->writeln('* Fallo al iniciar la creación de codigos barras propios en Navision: El proceso ya esta en ejecución.');
+    exit;
+  }
+
+  //------   Critical Section START   ------
+  $navisionSyncRepository=$this->doctrine->getRepository(NavisionSync::class);
+  $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"ownbarcodes"]);
+  if ($navisionSync==null) {
+    $navisionSync=new NavisionSync();
+    $navisionSync->setMaxtimestamp(0);
+  }
+
+
+
+
+
+
+  $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"ownbarcodes"]);
+  if ($navisionSync==null) {
+    $navisionSync=new NavisionSync();
+    $navisionSync->setEntity("ownbarcodes");
+  }
+  $navisionSync->setLastsync($datetime);
+  $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
+  $this->doctrine->getManager()->persist($navisionSync);
+  $this->doctrine->getManager()->flush();
+  //------   Critical Section END   ------
+  //------   Remove Lock Mutex    ------
+  fclose($fp);
+
 }
 
 }
