@@ -157,7 +157,7 @@ class NavisionGetProducts extends ContainerAwareCommand
          $movs=json_decode($json2, true);
          $movs=$movs[0];
          if($movs["class"][0]["movimiento"]!=null)
-          if($movs["class"][0]["movimiento"]["date"]>"2018-01-01 00:00:00.000000" and $object["Blocked"]==0)
+          if($movs["class"][0]["movimiento"]["date"]>"2019-09-09 00:00:00.000000" and $object["Blocked"]==0)
             $obj->setActive(1);
             else $obj->setActive(0);
          else $obj->setActive(0);
@@ -327,10 +327,11 @@ public function clearEAN13(InputInterface $input, OutputInterface $output){
       $EAN13=$oldEAN13->getName();
       foreach ($objects["class"] as $key=>$object){
           $nameEAN13=preg_replace('/\D/','',$object["Cross-Reference No."]);
-          if ($EAN13==$nameEAN13) {
+          if ($EAN13==$nameEAN13 or $object["idaxiom"]!=null) {
             $count=1;
             break;
           }
+
       }
       if ($count==0) {
         $oldEAN13->setDeleted(1);
