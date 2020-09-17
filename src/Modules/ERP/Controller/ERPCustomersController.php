@@ -264,10 +264,10 @@ class ERPCustomersController extends Controller
   public function addCall(Request $request)
  	 {
  	 $entityCall=new ERPCalls();
-	 $entityCall->setUniqueid($request->request->get('uid',null));
-	 $entityCall->setExtension($request->request->get('ext',null));
-	 $entityCall->setRemote($request->request->get('cid',null));
-	 $entityCall->setDirection($request->request->get('dir',null));
+	 $entityCall->setUniqueid($request->query->get('uid',null));
+	 $entityCall->setExtension($request->query->get('ext',null));
+	 $entityCall->setRemote($request->query->get('cid',null));
+	 $entityCall->setDirection($request->query->get('dir',null));
 	 $entityCall->setActive(true);
 	 $entityCall->setDeleted(false);
 	 $entityCall->setDateadd(new \Datetime);
