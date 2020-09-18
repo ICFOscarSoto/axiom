@@ -505,7 +505,7 @@ public function importStocks(InputInterface $input, OutputInterface $output) {
           $obj->setProductVariant($productvariant);
           if ((int)$stock["stock"]<0) $quantiy=0;
           else $quantity=(int)$stock["stock"];
-          $obj->setQuantity($quantity);
+          $obj->setQuantity(!$quantity?0:$quantity);
           $obj->setActive(1);
           $obj->setDeleted(0);
           $this->doctrine->getManager()->merge($obj);
