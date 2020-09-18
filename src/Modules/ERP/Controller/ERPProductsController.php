@@ -590,4 +590,13 @@ class ERPProductsController extends Controller
 	 return new JsonResponse(array('result' => $result));
  }
 
+ /**
+ * @Route("/api/ERP/product/stocks/{sku}", name="stocksInfo")
+ */
+ public function stocksInfo($sku){
+	 //Stocks and locations for Navision
+	 return new Response('');
+
+ }
+
 }

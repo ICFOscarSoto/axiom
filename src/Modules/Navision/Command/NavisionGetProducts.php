@@ -1125,11 +1125,22 @@ public function createOwnBarcodes(InputInterface $input, OutputInterface $output
     $navisionSync=new NavisionSync();
     $navisionSync->setMaxtimestamp(0);
   }
+  $datetime=new \DateTime();
+  $repositoryProducts=$this->doctrine->getRepository(ERPProducts::class);
+  $repositoryVariants=$this->doctrine->getRepository(ERPProductsVariants::class);
 
-
-
-
-
+  $products=$repositoryProducts->findAll();
+  foreach($products as $product){
+    $barcodes[]=["product_code"=>$product->getCode(), "barcode"=>'P.'.str_pad($product->getId(),8,'0', STR_PAD_LEFT), "axiom_id"=>$product->getId()];
+    $variants=$repositoryVariants->findBy(["product"=>$product, "deleted"=>0]);
+    foreach($variants as $variant){
+      $barcodes[]=["product_code"=>$product->getCode(), "barcode"=>'V.'.str_pad($variant->getId(),8,'0', STR_PAD_LEFT), "axiom_id"=>$product->getId()];
+    }
+  }
+  foreach($barcodes as $barcode){
+    $output->writeln('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-createEAN13.php?json='.json_encode($barcode));
+    $result=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-createEAN13.php?json='.json_encode($barcode));
+  }
 
   $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"ownbarcodes"]);
   if ($navisionSync==null) {
@@ -1137,7 +1148,7 @@ public function createOwnBarcodes(InputInterface $input, OutputInterface $output
     $navisionSync->setEntity("ownbarcodes");
   }
   $navisionSync->setLastsync($datetime);
-  $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
+  $navisionSync->setMaxtimestamp($datetime->getTimestamp());
   $this->doctrine->getManager()->persist($navisionSync);
   $this->doctrine->getManager()->flush();
   //------   Critical Section END   ------
