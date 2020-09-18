@@ -16,6 +16,7 @@ use App\Modules\ERP\Entity\ERPCustomerGroups;
 use App\Modules\ERP\Entity\ERPCustomerSpecialConditions;
 use App\Modules\ERP\Entity\ERPCustomerCommercialTerms;
 use App\Modules\ERP\Entity\ERPCustomerCommentLines;
+use App\Modules\ERP\Entity\ERPCalls;
 use App\Modules\Globale\Entity\GlobaleCountries;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
@@ -256,5 +257,24 @@ class ERPCustomersController extends Controller
 	 }
 	 return new JsonResponse(["adresses"=>$mailadresses]);
 	}
+
+	/**
+  * @Route("/api/voip/calls/add", name="addCall")
+  */
+  public function addCall(Request $request)
+ 	 {
+ 	 $entityCall=new ERPCalls();
+	 $entityCall->setUniqueid($request->query->get('uid',null));
+	 $entityCall->setExtension($request->query->get('ext',null));
+	 $entityCall->setRemote($request->query->get('cid',null));
+	 $entityCall->setDirection($request->query->get('dir',null));
+	 $entityCall->setActive(true);
+	 $entityCall->setDeleted(false);
+	 $entityCall->setDateadd(new \Datetime);
+	 $entityCall->setDateupd(new \Datetime);
+	 $this->getDoctrine()->getManager()->persist($entityCall);
+	 $this->getDoctrine()->getManager()->flush();
+ 	 return new JsonResponse(array('result' => 1));
+  }
 
 }
