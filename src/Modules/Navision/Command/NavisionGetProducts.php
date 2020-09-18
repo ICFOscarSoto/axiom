@@ -245,7 +245,7 @@ class NavisionGetProducts extends ContainerAwareCommand
       foreach ($objects["class"] as $key=>$object){
         $nameEAN13=preg_replace('/\D/','',$object["Cross-Reference No."]);
         $obj=$repository->findOneBy(["name"=>$nameEAN13]);
-        if ($obj==null) {
+        if ($obj==null and $object["idaxiom"]==null) {
           $output->writeln('  - '.$object["Item No."].' - '.$nameEAN13);
           $obj=new ERPEAN13();
           $obj->setName($nameEAN13);
@@ -507,7 +507,7 @@ public function importStocks(InputInterface $input, OutputInterface $output) {
           $obj->setProductVariant($productvariant);
           if ((int)$stock["stock"]<0) $quantiy=0;
           else $quantity=(int)$stock["stock"];
-          $obj->setQuantity($quantity);
+          $obj->setQuantity(!$quantity?0:$quantity);
           $obj->setActive(1);
           $obj->setDeleted(0);
           $this->doctrine->getManager()->merge($obj);
