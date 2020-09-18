@@ -1138,8 +1138,8 @@ public function createOwnBarcodes(InputInterface $input, OutputInterface $output
     }
   }
   foreach($barcodes as $barcode){
-    $output->writeln('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-createEAN13.php?json='.json_encode($barcode));
-    $result=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-createEAN13.php?json='.json_encode($barcode));
+    $output->writeln('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-createEAN132.php?json='.json_encode($barcode));
+    $result=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-createEAN132.php?json='.json_encode($barcode));
   }
 
   $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"ownbarcodes"]);
