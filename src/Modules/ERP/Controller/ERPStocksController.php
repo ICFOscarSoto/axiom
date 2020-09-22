@@ -27,6 +27,7 @@ class ERPStocksController extends Controller
 	private $module='ERP';
 	private $class=ERPStocks::class;
 	private $utilsClass=ERPStocksUtils::class;
+	private $url="http://192.168.1.250:9000/";
 
     /**
      * @Route("/{_locale}/ERP/{id}/stocks", name="stocks")
@@ -142,20 +143,13 @@ class ERPStocksController extends Controller
 
 
 
-
-
 		 /**
-		 * @Route("/api/ERP/inventory/elements/{store}/{category}/get", name="getInventoryStocks")
+		 * @Route("/api/ERP/inventory/elements/{store}/{location}/{category}/get", name="getInventoryStocks")
 		 */
-		 public function getInventoryStocks($store, $category, RouterInterface $router,Request $request){
+		 public function getInventoryStocks($store, $location, $category, RouterInterface $router,Request $request){
 		  $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		  $stocksRepository=$this->getDoctrine()->getRepository(ERPStocks::class);
-	//		$categoriesRepository=$this->getDoctrine()->getRepository(ERPCategories::class);
-		//	$storesRepository=$this->getDoctrine()->getRepository(ERPStores::class);
-		//	$store=$storesRepository->findBy(["id"=>$store, "active"=>1, "deleted"=>0]);
-		//  $category = $categoriesRepository->findBy(["id"=>$category, "active"=>1, "deleted"=>0]);
-
-			$stocks=$stocksRepository->findInventoryStocks($this->getUser()->getCompany(),$store,$category);
+			$stocks=$stocksRepository->findInventoryStocks($this->getUser()->getCompany(),$store,$location,$category);
 			$responseStocks=Array();
 
 			foreach($stocks as $stock){
@@ -171,6 +165,28 @@ class ERPStocksController extends Controller
 		  return new JsonResponse(["stocks"=>$responseStocks]);
 
 		 }
+
+
+		 /**
+		 * @Route("/api/ERP/inventory/{store}/locations/get", name="getInventoryLocations")
+		 */
+		 public function getInventoryLocations($store, RouterInterface $router,Request $request){
+			 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			 $storeLocationsRepository=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
+			 $storelocations=$storeLocationsRepository->findInventoryStoreLocations($this->getUser()->getCompany(),$store);
+		   $responseStoreLocations=Array();
+
+			foreach($storelocations as $storelocation){
+				$item['id']=$storelocation['id'];
+				$item['name']=$storelocation['name'];
+				$responseStoreLocations[]=$item;
+			}
+
+			return new JsonResponse(["storelocations"=>$responseStoreLocations]);
+
+		 }
+
+
 
 
 		/**
@@ -262,6 +278,104 @@ class ERPStocksController extends Controller
 		 return new JsonResponse(["history"=>$responseHistory]);
 
 		}
+
+
+		/*AÑADIMOS RUTAS PARA APP EN LAS PDAs*/
+
+		/**
+ 	 * @Route("/api/ERP/inventory/elements/{location}/get", name="getInventoryLocation")
+ 	 */
+ 	 public function getInventoryLocation($location, RouterInterface $router,Request $request){
+ 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+ 		$stocksRepository=$this->getDoctrine()->getRepository(ERPStocks::class);
+ 		$stocks=$stocksRepository->findInventoryStockByLocation($this->getUser()->getCompany(),$location);
+ 		$responseStocks=Array();
+
+ 		foreach($stocks as $stock){
+ 			$item['id']=$stock['id'];
+ 			$item['product_code']=$stock['product_code'];
+ 			$item['product_name']=$stock['product_name'];
+ 			$item['location']=$stock['location'];
+ 			$item['quantity']=$stock['quantity'];
+ 			$item['lastinventorydate']=$stock['lastinventorydate'];
+ 			$responseStocks[]=$item;
+ 		}
+
+ 		return new JsonResponse(["stocks"=>$responseStocks]);
+
+ 	 }
+
+
+	 /**
+		* @Route("/api/ERP/inventory/{location}/{product}/{qty}/saveStock", name="saveProductStock")
+		*/
+		public function saveProductStock($location, $product, $qty, RouterInterface $router,Request $request){
+			 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+
+			 $repositoryProducts=$this->getDoctrine()->getRepository(ERPProducts::class);
+			 $product_obj=$repositoryProducts->findOneBy(["code"=>$product, "company"=>$this->getUser()->getCompany()]);
+			 $repositoryStoreLocations=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
+			 $storelocation=$repositoryStoreLocations->findOneBy(["name"=>$location, "company"=>$this->getUser()->getCompany()]);
+			 $repositoryStores=$this->getDoctrine()->getRepository(ERPStores::class);
+			 $store=$repositoryStores->findOneBy(["id"=>$storelocation->getStore(), "company"=>$this->getUser()->getCompany()]);
+			 $repository=$this->getDoctrine()->getRepository($this->class);
+			 $stock=$repository->findOneBy(["storelocation"=>$storelocation,"product"=>$product_obj, "company"=>$this->getUser()->getCompany()]);
+
+			 $prev_stock=$stock->getQuantity();
+			 $new_stock=$qty;
+
+			 if($prev_stock!=$new_stock){
+
+				 $StockHistory= new ERPStockHistory();
+				 $StockHistory->setProduct($product_obj);
+				 $StockHistory->setLocation($storelocation);
+				 $StockHistory->setStore($store);
+				 $StockHistory->setUser($this->getUser());
+				 $StockHistory->setPreviousqty($prev_stock);
+				 $StockHistory->setNewqty($new_stock);
+				 $StockHistory->setActive(1);
+				 $StockHistory->setDeleted(0);
+				 $StockHistory->setDateupd(new \DateTime());
+				 $StockHistory->setDateadd(new \DateTime());
+				 $manager=$this->getDoctrine()->getManager();
+				 $manager->persist($StockHistory);
+				 $manager->flush();
+
+
+				 if($stock){
+				 	$datetime=new \DateTime();
+				 	$stock->setQuantity($new_stock);
+				 	$stock->setLastinventorydate($datetime);
+				 	$manager=$this->getDoctrine()->getManager();
+				 	$manager->persist($stock);
+				 	$manager->flush();
+				//	return new JsonResponse(["result"=>1]);
+
+				 }
+				// else return new JsonResponse(["result"=>-1]);
+			 }
+
+
+			 $total_stock=$repository->findStockByProductStore($product_obj->getId(),$store->getId());
+			 /*Obtenemos el stock que tiene en estos momentos el producto en Navision*/
+			 $json=file_get_contents($this->url.'navisionExport/axiom/app/do-NAVISION-getProductStock.php?code='.$product_obj->getCode().'&store='.$store->getCode());
+			 $objects=json_decode($json, true);
+			 $navision_stock=$objects[0]["stock"];
+
+			 if($total_stock>$navision_stock)
+			 {
+				 $new_navision_stock=$total_stock-$navision_stock;
+			//	 $json=file_get_contents($this->url.'navisionExport/axiom/app/do-NAVISION-setProductStock.php?code='.$product_obj->getCode().'&store='.$store->getCode().'$qty='.$new_navision_stock.'&type=2');
+
+			 }
+			 else if($total_stock<$navision_stock){
+				 	$new_navision_stock=$navision_stock-$total_stock;
+			//	 $json=file_get_contents($this->url.'navisionExport/axiom/app/do-NAVISION-setProductStock.php?code='.$product_obj->getCode().'&store='.$store->getCode().'$qty='.$new_navision_stock.'&type=3');
+
+			 }
+			 
+			return new JsonResponse(["result"=>1]);
+	 }
 
 
 
