@@ -243,6 +243,7 @@ class ERPProductsController extends Controller
 			$StoreLocationsrepository=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
 			$Storesrepository=$this->getDoctrine()->getRepository(ERPStores::class);
 			$obj=null;
+			$variant=null;
 			if($id!=0){
 				$obj = $this->getDoctrine()->getRepository($this->class)->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
 			}else{
@@ -258,6 +259,7 @@ class ERPProductsController extends Controller
 								$EAN13=$EAN13repository->findOneBy(["name"=>$request->request->get('barcode',null), "deleted"=>0]);
 								if($EAN13){
 								 	$obj=$EAN13->getProduct();
+									$variant=$obj->getProductvariant();
 								}
 							}
 						}
@@ -268,6 +270,10 @@ class ERPProductsController extends Controller
 				$stocks=$Stocksrepository->findBy(["product"=>$obj, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
 				$eans=$EAN13repository->findBy(["product"=>$obj, "productvariant"=>null, "active"=>1, "deleted"=>0]);
 				$result["id"]=$obj->getId();
+				$result["code"]=$obj->getCode();
+				$result["variant_id"]=$variant?$variant->getId():0;
+				$result["variant_name"]=$variant?$variant->getVariantname()->getName():"";
+				$result["variant_value"]=$variant?$variant->getVariantvalue()->getName():"";
 				$result["code"]=$obj->getCode();
 				$result["name"]=$obj->getName();
 				$result["provider"]=$obj->getSupplier()?$obj->getSupplier()->getName():"";
