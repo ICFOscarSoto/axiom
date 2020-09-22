@@ -331,8 +331,10 @@ class ERPProductsController extends Controller
 						$stock_item["id"]=$stock->getId();
 						$stock_item["warehouse_code"]=$stock->getStorelocation()->getStore()->getCode();
 						$stock_item["warehouse"]=$stock->getStorelocation()->getStore()->getName();
+						$stock_item["warehouse_id"]=$stock->getStorelocation()->getStore()->getId();
 						$stock_item["warehouse_preferential"]=$storeUser->getPreferential();
 						$stock_item["location"]=$stock->getStorelocation()->getName();
+						$stock_item["location_id"]=$stock->getStorelocation()->getId();
 						$stock_item["quantity"]=!$stock->getQuantity()?0:$stock->getQuantity();
 						$stock_item["pendingserve"]=!$stock->getPendingserve()?0:$stock->getPendingserve();
 						$stock_item["pendingreceive"]=!$stock->getPendingreceive()?0:$stock->getPendingreceive();
