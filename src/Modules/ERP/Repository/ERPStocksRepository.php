@@ -42,7 +42,7 @@ class ERPStocksRepository extends ServiceEntityRepository
 
     }
 
-    public function findInventoryStocks($company, $store=0, $category=0){
+    public function findInventoryStocks($company, $store=0, $location=0, $category=0){
       $query="SELECT stk.id as id,pr.code as product_code, pr.name as product_name,strl.name as location,stk.quantity as quantity,stk.lastinventorydate as lastinventorydate FROM erpstocks stk
                 LEFT JOIN erpproducts pr
                 ON pr.id=stk.product_id
@@ -54,9 +54,39 @@ class ERPStocksRepository extends ServiceEntityRepository
                 ON st.id=strl.store_id
                 WHERE st.company_id=:company AND stk.deleted=0 AND stk.active=1 ";
       if($store!=0) $query.=" AND st.id=".$store;
+      if($location!=0) $query.=" AND strl.id=".$location;
      if($category!=0) $query.=" AND pr.category_id=".$category;
       $query.=" ORDER BY pr.name ASC";
       $params=['company' => $company->getId()];
       return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
     }
+
+    public function findInventoryStockByLocation($company, $location=0){
+      $query="SELECT stk.id as id,pr.code as product_code, pr.name as product_name,strl.name as location,stk.quantity as quantity,stk.lastinventorydate as lastinventorydate FROM erpstocks stk
+                LEFT JOIN erpproducts pr
+                ON pr.id=stk.product_id
+                LEFT JOIN erpcategories ct
+                ON ct.id=pr.category_id
+                LEFT JOIN erpstore_locations strl
+                ON strl.id=stk.storelocation_id
+                LEFT JOIN erpstores st
+                ON st.id=strl.store_id
+                WHERE st.company_id=:company AND stk.deleted=0 AND stk.active=1 ";
+      if($location!=0) $query.=" AND strl.name='".$location."'";
+      $query.=" ORDER BY pr.name ASC";
+      $params=['company' => $company->getId()];
+      return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+    }
+
+    public function findStockByProductStore($product, $store){
+      $query='SELECT SUM(stk.quantity)
+      FROM erpstocks stk
+      LEFT JOIN erpstore_locations stl
+      ON stl.id=stk.storelocation_id
+      WHERE stk.product_id='.$product.' AND stl.store_id='.$store;
+      return $this->getEntityManager()->getConnection()->executeQuery($query)->fetchColumn(0);
+
+    }
+
+
 }

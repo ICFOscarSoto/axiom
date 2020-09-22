@@ -26,12 +26,21 @@
 			<div class="row">
 				<div class="col-md-3">
 					<div class="form-group">
-							<label class="" for="form_stores">Almacenes</label>
+							<label class="" for="form_stores">Seleccionar Almacén</label>
 							<select class="form-control select2" name="form_stores" id="form_stores">
 								<option value="0">Todos</option>
 								{% for store in stores %}
 									<option value="{{ store.id }}" {% if store.id == selectedStore %} selected {% endif %}>{{ store.name }}</option>
 								{% endfor %}
+							</select>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-3">
+					<div class="form-group">
+							<label class="" for="form_store_locations">Seleccionar Ubicación</label>
+							<select class="form-control select2" name="form_store_locations" id="form_store_locations">
 							</select>
 					</div>
 				</div>
@@ -79,12 +88,13 @@
 		    if($(this).attr("maxDate")!="" && typeof $(this).attr("maxDate")!==typeof undefined) $(this).data("DateTimePicker").maxDate(moment($(this).attr("maxDate"), "YYYY-MM-DD"));
 		  });
 		}
-		function getStocks(store,category){
+
+		function getStocks(store,location,category){
 			if((++load_wait)==1) $("#load-spinner").fadeIn();
 		  $.ajax({
 		      type: "GET",
 		      dataType: "json",
-		      url: "/api/ERP/inventory/elements/"+store+"/"+category+"/get",
+		      url: "/api/ERP/inventory/elements/"+store+"/"+location+"/"+category+"/get",
 		    }).done(function( elements, textStatus, jqXHR ) {
 		      if((--load_wait)==0) $("#load-spinner").fadeOut();
 		       elements.stocks.forEach( function(valor, indice, array) {
@@ -133,6 +143,21 @@
 
 		}
 
+		function getLocations(store){
+			if((++load_wait)==1) $("#load-spinner").fadeIn();
+			$.ajax({
+					type: "GET",
+					dataType: "json",
+					url: "/api/ERP/inventory/"+store+"/locations/get",
+				}).done(function( elements, textStatus, jqXHR ) {
+					if((--load_wait)==0) $("#load-spinner").fadeOut();
+					 elements.storelocations.forEach( function(valor, indice, array){
+						$("#form_store_locations").append('<option value="'+valor.id+'">'+valor.name+'</option>');
+					});
+					datetimepicker();
+				});
+		}
+
 		function saveStock(id,prevqty,nextqty,product_code,location){
 			if((++load_wait)==1) $("#load-spinner").fadeIn();
 			var data={id: id, prevqty: prevqty ,nextqty: nextqty, product_code: product_code, location: location};
@@ -161,7 +186,7 @@
 					 if(data.result) {
 						 toastr.success("Producto eliminado de esa ubicación", "Confirmación", confirmation);
 						 $("#new-inventory-products").empty();
-						 getStocks($("#form_stores").val(),$("#form_categories").val());
+						 getStocks($("#form_stores").val(),$("#form_store_locations").val(),$("#form_categories").val());
 					 	}
 						else toastr.error("Ocurrió un error al eliminar el producto de la ubicación", "Confirmación", confirmation);
 
@@ -177,14 +202,22 @@
 
 			$('#form_stores').on('change', function() {
 				//	location.href=location.pathname+"?store="+$("#form_stores").val()+"&category="+$("#form_categories").val();
+		  		$("#new-inventory-products").empty();
+
+		     getLocations($("#form_stores").val());
+				//getStocks($("#form_stores").val(),$("#form_categories").val());
+			});
+
+			$('#form_store_locations').on('change', function() {
+				//	location.href=location.pathname+"?store="+$("#form_stores").val()+"&category="+$("#form_categories").val();
 				$("#new-inventory-products").empty();
-				getStocks($("#form_stores").val(),$("#form_categories").val());
+				getStocks($("#form_stores").val(),$("#form_store_locations").val(),$("#form_categories").val());
 			});
 
 			$('#form_categories').on('change', function() {
 			//	location.href=location.pathname+"?store="+$("#form_stores").val()+"&category="+$("#form_categories").val();
 					$("#new-inventory-products").empty();
-					getStocks($("#form_stores").val(),$("#form_categories").val());
+					if($("#form_store_locations").val()!=null) getStocks($("#form_stores").val(),$("#form_store_locations").val(),$("#form_categories").val());
 			});
 
 			$('body').on('click','[id^="button-save-stock-"]', function(){
