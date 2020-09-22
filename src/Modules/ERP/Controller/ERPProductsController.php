@@ -595,7 +595,36 @@ class ERPProductsController extends Controller
  */
  public function stocksInfo($sku){
 	 //Stocks and locations for Navision
-	 return new Response('');
+	 $productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
+	 $product=$productRepository->findOneBy(["code"=>$sku]);
+	 $stocksRepository=$this->getDoctrine()->getRepository(ERPStocks::class);
+	 if($product!=NULL){
+	 		$stockCampollano=$stocksRepository->getStocksByProduct($product->getId(),1);
+	 		$stockRomica=$stocksRepository->getStocksByProduct($product->getId(),2);
+
+			return $this->render('@ERP/stocksNavision.html.twig', [
+			'controllerName' => 'ERPProductsController',
+			'interfaceName' => 'Stock Navision',
+			'optionSelected' => "stock",
+			'producto' => $product->getName(),
+			'stockCampollano' => $stockCampollano,
+			'stockRomica' => $stockRomica,
+			]);
+ 		}
+		else{
+			$stockCampollano=null;
+			$stockRomica=null;
+
+			return $this->render('@ERP/stocksNavision.html.twig', [
+			'controllerName' => 'ERPProductsController',
+			'interfaceName' => 'Stock Navision',
+			'optionSelected' => "stock",
+			'producto' => 'Este producto no existe',
+			'stockCampollano' => $stockCampollano,
+			'stockRomica' => $stockRomica,
+			]);
+		}
+
 
  }
 
