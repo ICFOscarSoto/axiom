@@ -243,6 +243,7 @@ class ERPProductsController extends Controller
 			$StoreLocationsrepository=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
 			$Storesrepository=$this->getDoctrine()->getRepository(ERPStores::class);
 			$obj=null;
+			$variant=null;
 			if($id!=0){
 				$obj = $this->getDoctrine()->getRepository($this->class)->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
 			}else{
@@ -258,6 +259,7 @@ class ERPProductsController extends Controller
 								$EAN13=$EAN13repository->findOneBy(["name"=>$request->request->get('barcode',null), "deleted"=>0]);
 								if($EAN13){
 								 	$obj=$EAN13->getProduct();
+									$variant=$EAN13->getProductvariant();
 								}
 							}
 						}
@@ -268,6 +270,10 @@ class ERPProductsController extends Controller
 				$stocks=$Stocksrepository->findBy(["product"=>$obj, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
 				$eans=$EAN13repository->findBy(["product"=>$obj, "productvariant"=>null, "active"=>1, "deleted"=>0]);
 				$result["id"]=$obj->getId();
+				$result["code"]=$obj->getCode();
+				$result["variant_id"]=$variant?$variant->getId():0;
+				$result["variant_name"]=$variant?$variant->getVariantname()->getName():"";
+				$result["variant_value"]=$variant?$variant->getVariantvalue()->getName():"";
 				$result["code"]=$obj->getCode();
 				$result["name"]=$obj->getName();
 				$result["provider"]=$obj->getSupplier()?$obj->getSupplier()->getName():"";
@@ -329,10 +335,13 @@ class ERPProductsController extends Controller
 					$storeUser=$StoreUsersrepository->findOneBy(["user"=>$this->getUser(), "store"=>$stock->getStorelocation()->getStore(), "active"=>1, "deleted"=>0]);
 					if($storeUser){
 						$stock_item["id"]=$stock->getId();
+						$stock_item["variant_id"]=!$stock->getProductvariant()?0:$stock->getProductvariant()->getId();
 						$stock_item["warehouse_code"]=$stock->getStorelocation()->getStore()->getCode();
 						$stock_item["warehouse"]=$stock->getStorelocation()->getStore()->getName();
+						$stock_item["warehouse_id"]=$stock->getStorelocation()->getStore()->getId();
 						$stock_item["warehouse_preferential"]=$storeUser->getPreferential();
 						$stock_item["location"]=$stock->getStorelocation()->getName();
+						$stock_item["location_id"]=$stock->getStorelocation()->getId();
 						$stock_item["quantity"]=!$stock->getQuantity()?0:$stock->getQuantity();
 						$stock_item["pendingserve"]=!$stock->getPendingserve()?0:$stock->getPendingserve();
 						$stock_item["pendingreceive"]=!$stock->getPendingreceive()?0:$stock->getPendingreceive();
@@ -627,5 +636,73 @@ class ERPProductsController extends Controller
 
 
  }
+
+ /**
+	* @Route("/api/ERP/product/locate/{id}/{type}", name="addProductLocation", defaults={"type"=1})
+	*/
+	public function addProductLocation($id, $type, RouterInterface $router,Request $request){
+		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+
+		 $repositoryProducts=$this->getDoctrine()->getRepository(ERPProducts::class);
+		 $repositoryStoreLocations=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
+		 $repositoryStores=$this->getDoctrine()->getRepository(ERPStores::class);
+		 $repositoryStocks=$this->getDoctrine()->getRepository(ERPStocks::class);
+		 $repositoryVariants=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
+		 $location=$request->request->get('loc',null);
+		 $storeId=$request->request->get('store',null);
+
+		 $store=$repositoryStores->findOneBy(["id"=>$storeId, "company"=>$this->getUser()->getCompany()]);
+		 if($store==null) return new JsonResponse(["result"=>-4, "text"=> "Almacén no encontrado"]);
+
+		 $variant=null;
+		 if($type==1){
+			 	$product=$repositoryProducts->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany(), "deleted"=>0]);
+			 	if($product==null || $location==null) return new JsonResponse(["result"=>-1, "text"=> "Producto no encontrado"]);
+		 }else{
+				$variant=$repositoryVariants->findOneBy(["id"=>$id, "deleted"=>0]);
+				if($variant==null || $location==null) return new JsonResponse(["result"=>-2, "text"=> "Variante no encontrada"]);
+				$product=$variant->getProduct();
+				if($product->getCompany()!=$this->getUser()->getCompany()) $product=null;
+			 	if($product==null || $location==null) return new JsonResponse(["result"=>-1, "text"=> "Producto no encontrado"]);
+		 }
+
+		 $storelocation=$repositoryStoreLocations->findOneBy(["name"=>$location, "store"=>$store, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
+		 if($storelocation==null) return new JsonResponse(["result"=>-3, "text"=> "Ubicación no encontrada"]);
+
+		 if($type==1)
+		 	$stock=$repositoryStocks->findOneBy(["product"=>$product, "storelocation"=>$storelocation, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
+			else $stock=$repositoryStocks->findOneBy(["product"=>$product, "productvariant"=>$variant, "storelocation"=>$storelocation, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
+
+		 if(!$stock){
+			 //Try to find in generic ALM01 or ALM02
+			 if($storeId==1)
+			 	$genericALM=$repositoryStoreLocations->findOneBy(["name"=>"ALM01", "store"=>$store, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
+				else $genericALM=$repositoryStoreLocations->findOneBy(["name"=>"ALM02", "store"=>$store, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
+
+			 if($type==1)
+			 	$stock=$repositoryStocks->findOneBy(["product"=>$product, "storelocation"=>$genericALM, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
+				else $stock=$repositoryStocks->findOneBy(["product"=>$product, "productvariant"=>$variant, "storelocation"=>$genericALM, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
+
+				 //return new JsonResponse(["result"=>0, "text"=> $product->getId()]);
+		 }
+
+		 if(!$stock){
+			 $stock=new ERPStocks();
+			 $stock->setDateadd(new \DateTime);
+			 $stock->setLastinventorydate(new \DateTime);
+			 $stock->setCompany($this->getUser()->getCompany());
+			 $stock->setProduct($product);
+			 $stock->setProductvariant($variant);
+			 $stock->setQuantity(0);
+			 $stock->setActive(1);
+			 $stock->setDeleted(0);
+		 }
+		 	 $stock->setDateupd(new \DateTime);
+			 $stock->setStorelocation($storelocation);
+
+			 $this->getDoctrine()->getManager()->persist($stock);
+			 $this->getDoctrine()->getManager()->flush();
+			 return new JsonResponse(["result"=>1, "text"=> ""]);
+ 	 }
 
 }
