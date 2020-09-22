@@ -335,7 +335,7 @@ class ERPProductsController extends Controller
 					$storeUser=$StoreUsersrepository->findOneBy(["user"=>$this->getUser(), "store"=>$stock->getStorelocation()->getStore(), "active"=>1, "deleted"=>0]);
 					if($storeUser){
 						$stock_item["id"]=$stock->getId();
-						$stock_item["variant_id"]=!$stock->getProductvariant()?0:$stock->getProductvariant();
+						$stock_item["variant_id"]=!$stock->getProductvariant()?0:$stock->getProductvariant()->getId();
 						$stock_item["warehouse_code"]=$stock->getStorelocation()->getStore()->getCode();
 						$stock_item["warehouse"]=$stock->getStorelocation()->getStore()->getName();
 						$stock_item["warehouse_id"]=$stock->getStorelocation()->getStore()->getId();
