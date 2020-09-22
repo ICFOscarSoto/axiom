@@ -259,7 +259,7 @@ class ERPProductsController extends Controller
 								$EAN13=$EAN13repository->findOneBy(["name"=>$request->request->get('barcode',null), "deleted"=>0]);
 								if($EAN13){
 								 	$obj=$EAN13->getProduct();
-									$variant=$obj->getProductvariant();
+									$variant=$EAN13->getProductvariant();
 								}
 							}
 						}
