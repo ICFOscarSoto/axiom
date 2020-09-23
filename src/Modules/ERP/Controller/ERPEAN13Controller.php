@@ -153,4 +153,28 @@ class ERPEAN13Controller extends Controller
     }
   }
 
+  /**
+   * @Route("/api/ERP/barcode/variant/{id}/{idvariant}", name="changeBarcodeVariant", defaults={"id"=0, "type"=1})
+   */
+  public function changeBarcodeVariant($id, $idvariant, Request $request){
+    $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+    $repositoryEAN=$this->getDoctrine()->getRepository(ERPEAN13::class);
+    $repositoryProduct=$this->getDoctrine()->getRepository(ERPProducts::class);
+    $Variantsrepository=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
+    $barcode=$request->request->get('barcode',null);
+    if($barcode===false) return new JsonResponse(["result"=>-1, "text"=>"El código de barras no puede ser nulo"]);
+    $product=$repositoryProduct->findOneBy(["id"=>$id, "company"=> $this->getUser()->getCompany(), "deleted"=>0]);
+    if(!$product) return new JsonResponse(["result"=>-2, "text"=>"El producto no existe"]);
+    $variant=$Variantsrepository->findOneBy(["id"=>$idvariant, "product"=>$product, "deleted"=>0]);
+    if(!$variant) return new JsonResponse(["result"=>-3, "text"=>"La variante no existe"]);
+    $ean=$repositoryEAN->findOneBy(["name"=>$barcode, "product"=>$product, "deleted"=>0]);
+    if(!$ean) return new JsonResponse(["result"=>-4, "text"=>"Codigo de barras incorrecto"]);
+    $ean->setProductvariant($variant);
+    $this->getDoctrine()->getManager()->remove($ean);
+    $this->getDoctrine()->getManager()->flush();
+    return new JsonResponse(["result"=>1, "text"=>""]);
+
+  }
+
+
 }
