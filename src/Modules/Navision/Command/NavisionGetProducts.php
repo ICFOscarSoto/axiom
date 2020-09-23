@@ -319,6 +319,7 @@ public function clearEAN13(InputInterface $input, OutputInterface $output){
   $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
   $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getEAN13.php');
   $objects=json_decode($json, true);
+  if (!is_array($objects)) die();
   $objects=$objects[0];
   //Disable SQL logger
   $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
