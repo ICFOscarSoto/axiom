@@ -7,6 +7,7 @@ use \App\Modules\ERP\Entity\ERPProducts;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
 use \App\Modules\ERP\Entity\ERPStoreLocations;
 use \App\Modules\ERP\Entity\ERPProductsVariants;
+use \App\Modules\Globale\Entity\GlobaleUsers;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPStocksRepository")
@@ -93,6 +94,11 @@ class ERPStocks
      * @ORM\JoinColumn(onDelete="CASCADE")
      */
     private $productvariant;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleUsers")
+     */
+    private $author;
 
     public function getId(): ?int
     {
@@ -251,6 +257,18 @@ class ERPStocks
     public function setProductvariant(?ERPProductsVariants $productvariant): self
     {
         $this->productvariant = $productvariant;
+
+        return $this;
+    }
+
+    public function getAuthor(): ?GlobaleUsers
+    {
+        return $this->author;
+    }
+
+    public function setAuthor(?GlobaleUsers $author): self
+    {
+        $this->author = $author;
 
         return $this;
     }

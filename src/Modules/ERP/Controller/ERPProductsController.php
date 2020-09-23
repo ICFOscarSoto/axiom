@@ -326,9 +326,12 @@ class ERPProductsController extends Controller
 						}
 						$variant_item["eans"][]=$ean_item;
 					}
+
 					$result["variants"][]=$variant_item;
 				}
-
+				usort($result["variants"], function($a, $b) {
+						return $a['value'] <=> $b['value'];
+				});
 
 				$stock_items=[];
 				foreach($stocks as $stock){
@@ -349,11 +352,16 @@ class ERPProductsController extends Controller
 						$stock_items[]=$stock_item;
 					}
 				}
+				usort($stock_items, function($a, $b) {
+				    return $a['warehouse_id'] <=> $b['warehouse_id'];
+				});
 				$result["stock"]=$stock_items;
 				return new JsonResponse($result);
 			}
 			return new JsonResponse(["result"=>-1]);
     }
+
+
 
 		/**
     * @Route("/api/erp/product/getdescription/{id}", name="getProductDescription", defaults={"id"=0})
@@ -697,6 +705,7 @@ class ERPProductsController extends Controller
 			 $stock->setActive(1);
 			 $stock->setDeleted(0);
 		 }
+		 	 $stock->setAuthor($this->getUser());
 		 	 $stock->setDateupd(new \DateTime);
 			 $stock->setStorelocation($storelocation);
 
