@@ -170,7 +170,7 @@ class ERPEAN13Controller extends Controller
     $ean=$repositoryEAN->findOneBy(["name"=>$barcode, "product"=>$product, "deleted"=>0]);
     if(!$ean) return new JsonResponse(["result"=>-4, "text"=>"Codigo de barras incorrecto"]);
     $ean->setProductvariant($variant);
-    $this->getDoctrine()->getManager()->remove($ean);
+    $this->getDoctrine()->getManager()->persist($ean);
     $this->getDoctrine()->getManager()->flush();
     return new JsonResponse(["result"=>1, "text"=>""]);
 
