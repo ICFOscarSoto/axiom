@@ -308,6 +308,7 @@ class ERPProductsController extends Controller
 					$eans=$EAN13repository->findBy(["product"=>$obj, "productvariant"=>$variant, "active"=>1, "deleted"=>0]);
 					$variant_item["eans"]=[];
 					foreach($eans as $ean){
+						$ean_item["id"]=$ean->getId();
 						$ean_item["barcode"]=$ean->getName();
 						$ean_item["type"]=$ean->getType()==null?0:$ean->getType();
 						if($ean->getSupplier()){
