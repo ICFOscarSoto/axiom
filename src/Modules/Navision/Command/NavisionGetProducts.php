@@ -330,7 +330,7 @@ public function clearEAN13(InputInterface $input, OutputInterface $output){
       $EAN13=$oldEAN13->getName();
       foreach ($objects["class"] as $key=>$object){
           $nameEAN13=preg_replace('/\D/','',$object["Cross-Reference No."]);
-          if ($EAN13==$nameEAN13 or $object["idaxiom"]!=null) {
+          if ($EAN13==$nameEAN13 and $object["idaxiom"]!=null) {
             $count=1;
             break;
           }
