@@ -62,7 +62,7 @@ class NavisionGetProducts extends ContainerAwareCommand
     switch($entity){
       case 'products': {
         $this->importProduct($input, $output);
-        $this->clearEAN13($input, $output);
+        //$this->clearEAN13($input, $output);
         $this->importEAN13($input, $output);
       }
       break;
@@ -92,7 +92,7 @@ class NavisionGetProducts extends ContainerAwareCommand
       break;
       case 'all':
         $this->importProduct($input, $output);
-        $this->clearEAN13($input, $output);
+        //$this->clearEAN13($input, $output);
         $this->importEAN13($input, $output);
         $this->importPrices($input, $output);
         $this->importStocks($input, $output);
