@@ -95,7 +95,8 @@ class ERPStocksRepository extends ServiceEntityRepository
         ON stl.id=stk.storelocation_id
         LEFT JOIN erpstores str
         ON str.id=stl.store_id
-        WHERE stk.product_id='.$product.' AND stl.store_id='.$store;
+        WHERE stk.product_id='.$product.' AND stl.store_id='.$store.' AND stk.active=1 AND stk.deleted=0
+         AND stl.active=1 AND stl.deleted=0  AND str.active=1 AND str.deleted=0';
         return $this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
     }
 
