@@ -34,82 +34,151 @@
 		<div class="main-content">
 		<div class="principal-content">
 
-				<div class="tab-content col-md-6"  style="padding:0;">
+				<div class="tab-content col-md-7"  style="padding:0;">
 					<div class="panel-body">
 						<div class="col-md-12">
 							<h2>{{ producto }}</h2>
 						</div>
 					</div>
 
-					{% if stockRomica is not null or stockCampollano is not null %}
 
-							<div class="panel-body">
-								<div class="col-md-6">
-								{% if stockRomica is not null %}
-									<label>Stock en Campollano</label>
-									<table class="table table-bordered">
-										<thead>
-											<tr>
-											  	<th>Ubicación</th>
-													<th>Cantidad</th>
-									  	</tr>
-										</thead>
-										<tbody>
-												{% for stock in stockCampollano %}
-												<tr>
-													<td>{{ stock.store_location }}</td>
-													<td>{{ stock.quantity }}</td>
-												</tr>
-												{% endfor %}
-										</tbody>
-									</table>
-								</div>
-							</div>
-							{% else %}
-							<div class="panel-body">
-								<div class="col-md-6">
-									<label>Este producto no tiene asociada ninguna ubicación en Campollano</label>
-								</div>
-							</div>
+
+					{% if variantes is not null %}
+						{% for variante in  variantes %}
+									<div class="panel-body">
+										<div class="col-md-12">
+												<h3>{{ variante.type }} {{ variante.name }}</h3>
+								 		</div>
+									</div>
+										<div class="panel-body">
+											<div class="col-md-6">
+											{% if stockCampollano[variante.id] is not empty %}
+												<label>Stock en Campollano</label>
+												<table class="table table-bordered">
+													<thead>
+														<tr>
+																<th>Ubicación</th>
+																<th>Cantidad</th>
+														</tr>
+													</thead>
+													<tbody>
+															{% for stock in stockCampollano[variante.id] %}
+															<tr>
+																<td>{{ stock.store_location }}</td>
+																<td>{{ stock.quantity }}</td>
+															</tr>
+															{% endfor %}
+													</tbody>
+											{% else %}
+															<label>Este producto no tiene asociada ninguna ubicación en Campollano</label>
+											{% endif %}
+											</table>
+										</div>
+									</div>
+
+										<div class="panel-body">
+											<div class="col-md-6">
+											{% if stockRomica[variante.id] is not empty %}
+												<label>Stock en Romica</label>
+												<table class="table table-bordered">
+													<thead>
+														<tr>
+																<th>Ubicación</th>
+																<th>Cantidad</th>
+														</tr>
+													</thead>
+													<tbody>
+															{% for stock in stockRomica[variante.id] %}
+															<tr>
+																<td>{{ stock.store_location }}</td>
+																<td>{{ stock.quantity }}</td>
+															</tr>
+															{% endfor %}
+													</tbody>
+													{% else %}
+															<label>Este producto no tiene asociada ninguna ubicación en Romica</label>
+													{% endif %}
+												</table>
+											</div>
+										</div>
+							{% endfor %}
+					{% else %}
+
+								{% if stockRomica is not null or stockCampollano is not null %}
+
+											<div class="panel-body">
+												<div class="col-md-6">
+												{% if stockCampollano is not null %}
+													<label>Stock en Campollano</label>
+													<table class="table table-bordered">
+														<thead>
+															<tr>
+															  	<th>Ubicación</th>
+																	<th>Cantidad</th>
+													  	</tr>
+														</thead>
+														<tbody>
+																{% for stock in stockCampollano %}
+																<tr>
+																	<td>{{ stock.store_location }}</td>
+																	<td>{{ stock.quantity }}</td>
+																</tr>
+																{% endfor %}
+														</tbody>
+														{% else %}
+														<thead>
+															<tr>
+																	<th>Ubicación</th>
+																	<th>Cantidad</th>
+															</tr>
+														</thead>
+														<tbody>
+																{% for stock in stockCampollano %}
+																<tr>
+																	<td>{{ stock.store_location }}</td>
+																	<td>{{ stock.quantity }}</td>
+																</tr>
+																{% endfor %}
+														</tbody>
+														{% endif %}
+													</table>
+												</div>
+											</div>
+											{% else %}
+													<label>Este producto no tiene asociada ninguna ubicación en Campollano</label>
+											{% endif %}
+
+
+											{% if stockRomica is not null %}
+											<div class="panel-body">
+												<div class="col-md-6">
+													<label>Stock en Romica</label>
+													<table class="table table-bordered">
+														<thead>
+															<tr>
+																	<th>Ubicación</th>
+																	<th>Cantidad</th>
+															</tr>
+														</thead>
+														<tbody>
+																{% for stock in stockRomica %}
+																<tr>
+																	<td>{{ stock.store_location }}</td>
+																	<td>{{ stock.quantity }}</td>
+																</tr>
+																{% endfor %}
+														</tbody>
+													</table>
+												</div>
+											</div>
+											{% else %}
+													<label>Este producto no tiene asociada ninguna ubicación en Romica</label>
+											{% endif %}
 							{% endif %}
 
 
-							{% if stockRomica is not null %}
-							<div class="panel-body">
-								<div class="col-md-6">
-									<label>Stock en Romica</label>
-									<table class="table table-bordered">
-										<thead>
-											<tr>
-													<th>Ubicación</th>
-													<th>Cantidad</th>
-											</tr>
-										</thead>
-										<tbody>
-												{% for stock in stockRomica %}
-												<tr>
-													<td>{{ stock.store_location }}</td>
-													<td>{{ stock.quantity }}</td>
-												</tr>
-												{% endfor %}
-										</tbody>
-									</table>
-								</div>
-							</div>
-							{% else %}
-							<div class="panel-body">
-								<div class="col-md-6">
-									<label>Este producto no tiene asociada ninguna ubicación en Romica</label>
-								</div>
-							</div>
-							{% endif %}
-							{% else %}
-							<div class="panel-body">
-								<div class="col-md-6">
-									<label>Este producto no tiene asociada ninguna ubicación</label>
-								</div>
-							</div>
-					{% endif %}
+
+
 				</div>
 			</div>
 		</div>

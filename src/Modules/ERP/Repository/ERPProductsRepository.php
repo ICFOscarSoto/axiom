@@ -68,8 +68,17 @@ class ERPProductsRepository extends ServiceEntityRepository
       $result=$this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
       return $result;
 
+    }
 
-
+    public function getVariants($product){
+        $query='SELECT pv.id as id,v.name as type, vv.name as name
+        FROM erpproducts_variants pv
+        LEFT JOIN erpvariants_values vv
+        ON pv.variantvalue_id=vv.id
+        LEFT JOIN erpvariants v
+        ON pv.variantname_id=v.id
+        WHERE pv.product_id='.$product.' AND pv.active=1 AND pv.deleted=0';
+        return $this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
     }
 
 

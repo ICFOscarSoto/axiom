@@ -617,17 +617,45 @@ class ERPProductsController extends Controller
 	 $product=$productRepository->findOneBy(["code"=>$sku]);
 	 $stocksRepository=$this->getDoctrine()->getRepository(ERPStocks::class);
 	 if($product!=NULL){
-	 		$stockCampollano=$stocksRepository->getStocksByProduct($product->getId(),1);
-	 		$stockRomica=$stocksRepository->getStocksByProduct($product->getId(),2);
 
-			return $this->render('@ERP/stocksNavision.html.twig', [
-			'controllerName' => 'ERPProductsController',
-			'interfaceName' => 'Stock Navision',
-			'optionSelected' => "stock",
-			'producto' => $product->getName(),
-			'stockCampollano' => $stockCampollano,
-			'stockRomica' => $stockRomica,
-			]);
+		 	$isgrouped=$product->getGrouped();
+			if($isgrouped)
+			{
+				$variants=$productRepository->getVariants($product->getId());
+				$stockCampollano=[];
+				$stockRomica=[];
+				foreach ($variants as $variant) {
+					$stockCampollano[$variant["id"]]=$stocksRepository->getStocksByProduct($product->getId(),$variant["id"],1);
+					$stockRomica[$variant["id"]]=$stocksRepository->getStocksByProduct($product->getId(),$variant["id"],2);
+				}
+
+				return $this->render('@ERP/stocksNavision.html.twig', [
+				'controllerName' => 'ERPProductsController',
+				'interfaceName' => 'Stock Navision',
+				'optionSelected' => "stock",
+				'producto' => $product->getName(),
+				'variantes' => $variants,
+				'agrupado' => $isgrouped,
+				'stockCampollano' => $stockCampollano,
+				'stockRomica' => $stockRomica,
+				]);
+
+			}
+			else{
+				$stockCampollano=$stocksRepository->getStocksByProduct($product->getId(),null,1);
+		 		$stockRomica=$stocksRepository->getStocksByProduct($product->getId(),null,2);
+				return $this->render('@ERP/stocksNavision.html.twig', [
+				'controllerName' => 'ERPProductsController',
+				'interfaceName' => 'Stock Navision',
+				'optionSelected' => "stock",
+				'producto' => $product->getName(),
+				'variantes' => null,
+				'stockCampollano' => $stockCampollano,
+				'stockRomica' => $stockRomica,
+				]);
+
+			}
+
  		}
 		else{
 			$stockCampollano=null;
@@ -638,6 +666,7 @@ class ERPProductsController extends Controller
 			'interfaceName' => 'Stock Navision',
 			'optionSelected' => "stock",
 			'producto' => 'Este producto no existe',
+			'variantes' => null,
 			'stockCampollano' => $stockCampollano,
 			'stockRomica' => $stockRomica,
 			]);
