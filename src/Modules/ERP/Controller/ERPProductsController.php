@@ -782,6 +782,8 @@ class ERPProductsController extends Controller
 			$storedstlocation=$repositoryStoreLocations->findOneBy(["name"=>$locationDestination, "store"=>$store, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
 			if($storedstlocation==null) return new JsonResponse(["result"=>-4, "text"=> "Ubicación destino no encontrada"]);
 
+			if($storelocation==$storedstlocation) return new JsonResponse(["result"=>1, "text"=> "No se han realizado cambios"]);
+
 			if($type==1){
 			 $stock=$repositoryStocks->findOneBy(["product"=>$product, "storelocation"=>$storelocation, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
 			 $stockdst=$repositoryStocks->findOneBy(["product"=>$product, "storelocation"=>$storedstlocation, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
