@@ -88,16 +88,34 @@ class ERPStocksRepository extends ServiceEntityRepository
 
     }
 
-    public function getStocksByProduct($product,$store){
-      $query='SELECT stk.quantity as quantity,stl.name as store_location, str.name as store
+    public function getStocksByProduct($product, $variant, $store){
+
+      if($variant==null)
+      {
+        $query='SELECT stk.quantity as quantity, stl.name as store_location, str.name as store
         FROM erpstocks stk
         LEFT JOIN erpstore_locations stl
         ON stl.id=stk.storelocation_id
         LEFT JOIN erpstores str
         ON str.id=stl.store_id
         WHERE stk.product_id='.$product.' AND stl.store_id='.$store.' AND stk.active=1 AND stk.deleted=0
-         AND stl.active=1 AND stl.deleted=0  AND str.active=1 AND str.deleted=0';
+        AND stl.active=1 AND stl.deleted=0  AND str.active=1 AND str.deleted=0';
         return $this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
+      }
+      else{
+        $query='SELECT stk.quantity as quantity, stl.name as store_location, str.name as store
+        FROM erpstocks stk
+        LEFT JOIN erpstore_locations stl
+        ON stl.id=stk.storelocation_id
+        LEFT JOIN erpstores str
+        ON str.id=stl.store_id
+        WHERE stk.product_id='.$product.' AND stk.productvariant_id='.$variant.' AND stl.store_id='.$store.' AND stk.active=1 AND stk.deleted=0
+        AND stl.active=1 AND stl.deleted=0  AND str.active=1 AND str.deleted=0';
+        return $this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
+
+      }
+
     }
+
 
 }
