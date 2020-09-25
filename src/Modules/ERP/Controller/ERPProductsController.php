@@ -17,6 +17,7 @@ use App\Modules\ERP\Entity\ERPReferences;
 use App\Modules\ERP\Entity\ERPProductsAttributes;
 use App\Modules\ERP\Entity\ERPManufacturers;
 use App\Modules\ERP\Entity\ERPStocks;
+use App\Modules\ERP\Entity\ERPStockHistory;
 use App\Modules\ERP\Entity\ERPStoreLocations;
 use App\Modules\ERP\Entity\ERPStores;
 use App\Modules\ERP\Entity\ERPStoresUsers;
@@ -714,5 +715,140 @@ class ERPProductsController extends Controller
 			 $this->getDoctrine()->getManager()->flush();
 			 return new JsonResponse(["result"=>1, "text"=> ""]);
  	 }
+
+	 /**
+	  * @Route("/api/ERP/product/locate/move/{id}/{type}", name="moveProductLocation", defaults={"type"=1})
+	  */
+	  public function moveProductLocation($id, $type, RouterInterface $router,Request $request){
+	 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+	 		$repositoryProducts=$this->getDoctrine()->getRepository(ERPProducts::class);
+	 		$repositoryStoreLocations=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
+	 		$repositoryStores=$this->getDoctrine()->getRepository(ERPStores::class);
+	 		$repositoryStocks=$this->getDoctrine()->getRepository(ERPStocks::class);
+	 		$repositoryVariants=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
+	 		$locationSource=$request->request->get('locsrc',null);
+			$locationDestination=$request->request->get('locdst',null);
+			$qty=$request->request->get('qty',null);
+	 		$storeId=$request->request->get('store',null);
+
+
+			$store=$repositoryStores->findOneBy(["id"=>$storeId, "company"=>$this->getUser()->getCompany()]);
+			if($store==null) return new JsonResponse(["result"=>-4, "text"=> "Almacén no encontrado"]);
+
+			$variant=null;
+			if($type==1){
+				 $product=$repositoryProducts->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany(), "deleted"=>0]);
+				 if($product==null || $locationSource==null) return new JsonResponse(["result"=>-1, "text"=> "Producto no encontrado"]);
+			}else{
+				 $variant=$repositoryVariants->findOneBy(["id"=>$id, "deleted"=>0]);
+				 if($variant==null || $locationSource==null) return new JsonResponse(["result"=>-2, "text"=> "Variante no encontrada"]);
+				 $product=$variant->getProduct();
+				 if($product->getCompany()!=$this->getUser()->getCompany()) $product=null;
+				 if($product==null || $locationSource==null) return new JsonResponse(["result"=>-1, "text"=> "Producto no encontrado"]);
+			}
+
+			$storelocation=$repositoryStoreLocations->findOneBy(["name"=>$locationSource, "store"=>$store, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
+			if($storelocation==null) return new JsonResponse(["result"=>-3, "text"=> "Ubicación origen no encontrada"]);
+
+			$storedstlocation=$repositoryStoreLocations->findOneBy(["name"=>$locationDestination, "store"=>$store, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
+			if($storedstlocation==null) return new JsonResponse(["result"=>-4, "text"=> "Ubicación destino no encontrada"]);
+
+			if($type==1){
+			 $stock=$repositoryStocks->findOneBy(["product"=>$product, "storelocation"=>$storelocation, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
+			 $stockdst=$repositoryStocks->findOneBy(["product"=>$product, "storelocation"=>$storedstlocation, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
+		  }else{
+			  $stock=$repositoryStocks->findOneBy(["product"=>$product, "productvariant"=>$variant, "storelocation"=>$storelocation, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
+				$stockdst=$repositoryStocks->findOneBy(["product"=>$product, "productvariant"=>$variant, "storelocation"=>$storedstlocation, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
+			}
+
+			if($stock){
+
+				if(!$stockdst){
+						if($stock->getQuantity()-$qty==0){
+							//change de location
+						 	$stock->setAuthor($this->getUser());
+			 		 	 	$stock->setDateupd(new \DateTime);
+			 			 	$stock->setStorelocation($storedstlocation);
+
+							$StockHistory= new ERPStockHistory();
+							$StockHistory->setProduct($product);
+							$StockHistory->setLocation($storelocation);
+							$StockHistory->setStore($store);
+							$StockHistory->setUser($this->getUser());
+							$StockHistory->setPreviousqty($stock->getQuantity());
+							$StockHistory->setNewqty(0);
+							$StockHistory->setActive(1);
+							$StockHistory->setDeleted(0);
+							$StockHistory->setDateupd(new \DateTime());
+							$StockHistory->setDateadd(new \DateTime());
+
+							$this->getDoctrine()->getManager()->persist($StockHistory);
+							$this->getDoctrine()->getManager()->persist($stock);
+			 			  $this->getDoctrine()->getManager()->flush();
+
+						}else if($stock->getQuantity()-$qty>0){
+							//Split location
+							$stock->setDateupd(new \DateTime);
+							$stock->setQuantity($stock->getQuantity()-$qty);
+
+							$newStock=new ERPStocks();
+				 			$newStock->setDateadd(new \DateTime);
+				 			$newStock->setLastinventorydate(new \DateTime);
+				 			$newStock->setCompany($this->getUser()->getCompany());
+				 			$newStock->setProduct($product);
+				 			$newStock->setProductvariant($variant);
+				 			$newStock->setQuantity($qty);
+				 			$newStock->setActive(1);
+				 			$newStock->setDeleted(0);
+				 		  $newStock->setAuthor($this->getUser());
+				 		  $newStock->setDateupd(new \DateTime);
+				 		  $newStock->setStorelocation($storedstlocation);
+
+							$this->getDoctrine()->getManager()->persist($stock);
+							$this->getDoctrine()->getManager()->persist($newStock);
+			 			  $this->getDoctrine()->getManager()->flush();
+
+						}else return new JsonResponse(["result"=>-6, "text"=> "No hay stock suficiente para realizar el movimiento"]);
+				}else{
+					if($stock->getQuantity()-$qty==0){
+						$stockdst->setDateupd(new \DateTime);
+						$stockdst->setQuantity($stockdst->getQuantity()+$qty);
+
+						$StockHistory= new ERPStockHistory();
+						$StockHistory->setProduct($product);
+						$StockHistory->setLocation($storelocation);
+						$StockHistory->setStore($store);
+						$StockHistory->setUser($this->getUser());
+						$StockHistory->setPreviousqty($stock->getQuantity());
+						$StockHistory->setNewqty(0);
+						$StockHistory->setActive(1);
+						$StockHistory->setDeleted(0);
+						$StockHistory->setDateupd(new \DateTime());
+						$StockHistory->setDateadd(new \DateTime());
+
+						$this->getDoctrine()->getManager()->persist($StockHistory);
+						$this->getDoctrine()->getManager()->persist($stockdst);
+						$this->getDoctrine()->getManager()->remove($stock);
+						$this->getDoctrine()->getManager()->flush();
+
+					}else if($stock->getQuantity()-$qty>0){
+						//Split location
+						$stock->setDateupd(new \DateTime);
+						$stock->setQuantity($stock->getQuantity()-$qty);
+						$stockdst->setDateupd(new \DateTime);
+						$stockdst->setQuantity($stockdst->getQuantity()+$qty);
+						$this->getDoctrine()->getManager()->persist($stock);
+						$this->getDoctrine()->getManager()->persist($stockdst);
+						$this->getDoctrine()->getManager()->flush();
+
+					}else return new JsonResponse(["result"=>-6, "text"=> "No hay stock suficiente para realizar el movimiento"]);
+				}
+
+				return new JsonResponse(["result"=>1, "text"=> "Cambio realizado correctamente"]);
+
+			}else return new JsonResponse(["result"=>-5, "text"=> "Stock no encontrado"]);
+
+
+		}
 
 }
