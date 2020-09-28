@@ -154,10 +154,13 @@ class GlobaleImagesController extends Controller implements ContainerAwareInterf
 
 			if($type=="products"){
 				//find last image
+				if (!file_exists($basePath.'images'.DIRECTORY_SEPARATOR.$type.DIRECTORY_SEPARATOR.$id)) {
+				    mkdir($basePath.'images'.DIRECTORY_SEPARATOR.$type.DIRECTORY_SEPARATOR.$id, 0777, true);
+				}
 				$found=true;
 				$i=1;
 			  while($found==true){
-					if(file_exists($basePath.'images'.DIRECTORY_SEPARATOR.$type.DIRECTORY_SEPARATOR.$id."-".$i.'-large.png') || file_exists($basePath.'images'.DIRECTORY_SEPARATOR.$type.DIRECTORY_SEPARATOR.$id."-".$i.'-large.jpg')){
+					if(file_exists($basePath.'images'.DIRECTORY_SEPARATOR.$type.DIRECTORY_SEPARATOR.$id.DIRECTORY_SEPARATOR.$id."-".$i.'-large.png') || file_exists($basePath.'images'.DIRECTORY_SEPARATOR.$type.DIRECTORY_SEPARATOR.$id.DIRECTORY_SEPARATOR.$id."-".$i.'-large.jpg')){
 						$i++;
 					}else{
 						$found=false;
@@ -173,28 +176,28 @@ class GlobaleImagesController extends Controller implements ContainerAwareInterf
 			    $constraint->aspectRatio();
 			    $constraint->upsize();
 			});
-			$image->save($basePath.'images'.DIRECTORY_SEPARATOR.$type.DIRECTORY_SEPARATOR.$id.($i!=null?'-'.$i:'').'-thumb.png');
+			$image->save($basePath.'images'.DIRECTORY_SEPARATOR.$type.DIRECTORY_SEPARATOR.$id.($i!=null?DIRECTORY_SEPARATOR.$id.'-'.$i:'').'-thumb.png');
 
 			$image = $manager->make($tempPath);
 			$image->resize(256, null, function ($constraint) {
 			    $constraint->aspectRatio();
 			    $constraint->upsize();
 			});
-			$image->save($basePath.'images'.DIRECTORY_SEPARATOR.$type.DIRECTORY_SEPARATOR.$id.($i!=null?'-'.$i:'').'-small.png');
+			$image->save($basePath.'images'.DIRECTORY_SEPARATOR.$type.DIRECTORY_SEPARATOR.$id.($i!=null?DIRECTORY_SEPARATOR.$id.'-'.$i:'').'-small.png');
 
 			$image = $manager->make($tempPath);
 			$image->resize(640, null, function ($constraint) {
 					$constraint->aspectRatio();
 					$constraint->upsize();
 			});
-			$image->save($basePath.'images'.DIRECTORY_SEPARATOR.$type.DIRECTORY_SEPARATOR.$id.($i!=null?'-'.$i:'').'-medium.png');
+			$image->save($basePath.'images'.DIRECTORY_SEPARATOR.$type.DIRECTORY_SEPARATOR.$id.($i!=null?DIRECTORY_SEPARATOR.$id.'-'.$i:'').'-medium.png');
 
 			$image = $manager->make($tempPath);
 			$image->resize(1024, null, function ($constraint) {
 					$constraint->aspectRatio();
 					$constraint->upsize();
 			});
-			$image->save($basePath.'images'.DIRECTORY_SEPARATOR.$type.DIRECTORY_SEPARATOR.$id.($i!=null?'-'.$i:'').'-large.png');
+			$image->save($basePath.'images'.DIRECTORY_SEPARATOR.$type.DIRECTORY_SEPARATOR.$id.($i!=null?DIRECTORY_SEPARATOR.$id.'-'.$i:'').'-large.png');
 
 			if (isset($tempPath)) { unlink($tempPath); }
 
