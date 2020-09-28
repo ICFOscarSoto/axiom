@@ -171,6 +171,10 @@ thead th.dt-right{
   /*color:#d5d5d5;*/
 }
 
+.fotorama__wrap{
+  border: 1px solid #cecece !important;
+  border-radius: 3px !important;
+}
 
 .table-header-search .select2-container .select2-choice {
   height: 23px !important;
@@ -700,6 +704,8 @@ label.error {
   overflow: hidden !important;
   text-overflow: ellipsis !important;
 }
+
+
 
 /*
 .spinner-container {

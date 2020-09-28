@@ -75,8 +75,13 @@
 					{% endif %}
 				</div>
 			</div>
+		{% elseif field.type is defined and field.type == 'gallery' %}
+			{# Gallery component of the form #}
+			{{ include("@Globale/form_fields_gallery.html.twig") }}
+		{% endif %}
+	{% endfor %}
 
-
+	{% endfor %}
 
 			<script>
 			function b64toBlob(b64Data, contentType, sliceSize) {
@@ -98,58 +103,16 @@
 			}
 
 			$(document).ready(function() {
-				$( '#fileinput-img-{{field.name}}' ).load(function() {
-					$('#fileinput-img-{{field.name}}').fadeIn();
+			  	$(".wysiwyg").each(function() {
+					new Jodit("#"+$(this).attr("id"),{});
 				});
 
-				$(".wysiwyg").each(function() {
-		      new Jodit("#"+$(this).attr("id"),{});
-		    });
-
-				$('body').on('click', '[id^="btn-image-save"]', function(){
-					$('#fileinput-img-{{field.name}}').fadeOut();
-					var url = "{{url("uploadImage",{"type":field.imageType, "id": formConstructor.id_object})}}";
-					var image = $('#image-preview-{{field.name}}').find('img').attr('src');
-					var block = image.split(";");
-					var contentType = block[0].split(":")[1];
-					var realData = block[1].split(",")[1];
-					var blob = b64toBlob(realData, contentType);
-					var formData = new FormData();
-					formData.append('picture', blob);
-
-					if((++load_wait)==1) $("#load-spinner").fadeIn();
-					$.ajax({
-						url: url,
-						type: "POST",
-						cache: false,
-						contentType: false,
-						processData: false,
-						data: formData,
-						error:function(err){
-							$('#fileinput-img-{{field.name}}').fadeIn();
-							toastr.error("No se pudo subir la imagen", "Confirmación", confirmation);
-						},
-						success:function(data){
-							$('#fileinput-img-{{field.name}}').attr('src','{{ url(field.value,{'id': formConstructor.id_object, 'type': field.imageType, 'size': 'medium'}) }}?'+Date.now());
-							$('#fileinput-{{field.name}}').fileinput("clear");
-							if(data.result) toastr.success("Imagen cambiada correctamente", "Confirmación", confirmation);
-						},
-						complete:function(){
-							if((--load_wait)==0) $("#load-spinner").fadeOut();
-						}
-					});
-				});
 			});
 			</script>
 		</div>
-		{% elseif field.type is defined and field.type == 'gallery' %}
-			{# Gallery component of the form #}
-			{{ include("@Globale/form_fields_gallery.html.twig") }}
-		{% endif %}
 
-		{% endfor %}
 
-		{% endfor %}
+
 	</div>
 
 	<div class="row">
