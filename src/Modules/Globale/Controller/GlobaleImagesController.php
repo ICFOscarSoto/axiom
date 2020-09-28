@@ -96,6 +96,7 @@ class GlobaleImagesController extends Controller implements ContainerAwareInterf
 	*/
 	public function uploadImage($id, $type, Request $request)
 	{
+		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		$file = $request->files->get('picture');
 		$user=$this->getUser();
 
@@ -103,7 +104,6 @@ class GlobaleImagesController extends Controller implements ContainerAwareInterf
 		$company=$this->getUser()->getCompany();
 		$diskUsage=$company->getDiskUsages();
 		if($diskUsage[0]->getDiskspace()-$diskUsage[0]->getDiskusage()<=0)  return new JsonResponse(["result"=>-10]);
-
 
 		switch($type){  //For check permissions
 
