@@ -397,10 +397,10 @@ class ERPProductsController extends Controller
 			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 			$image_path = $this->get('kernel')->getRootDir().'/../cloud/'.$this->getUser()->getCompany()->getId().'/images/products/'.$id.'/';
 			$images=[];
-			$image=["large"=>$this->generateUrl('getImage', array('type' => 'products', "size"=>"large", "id"=>$id, "number"=>0 )),
+			/*$image=["large"=>$this->generateUrl('getImage', array('type' => 'products', "size"=>"large", "id"=>$id, "number"=>0 )),
 						 "thumb"=>$this->generateUrl('getImage', array('type' => 'products', "size"=>"thumb", "id"=>$id, "number"=>0 )),
 						 "medium"=>$this->generateUrl('getImage', array('type' => 'products', "size"=>"medium", "id"=>$id, "number"=>0 ))];
-			$images[]=$image;
+			$images[]=$image;*/
 			$found=true;
 			$i=1;
 			while($found==true){
@@ -417,7 +417,7 @@ class ERPProductsController extends Controller
 							 "medium"=>$this->generateUrl('getImage', array('type' => 'products', "size"=>"medium", "id"=>$id, "number"=>$j ))];
 				$images[]=$image;
 			}
-			return new JsonResponse(["images"=>$images]);
+			return new JsonResponse(["result"=>1,"images"=>$images]);
     }
 
 

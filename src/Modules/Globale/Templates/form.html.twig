@@ -42,6 +42,9 @@
             {% if field.type is defined and field.type == 'image' %}
               {# Image component of the form #}
               {{ include("@Globale/form_fields_image.html.twig") }}
+            {% elseif field.type is defined and field.type == 'gallery' %}
+              {# Gallery component of the form #}
+              {{ include("@Globale/form_fields_gallery.html.twig") }}
             {% elseif field.type is defined and field.type == 'file' %}
               values 2
             {% else %}

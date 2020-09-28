@@ -1,0 +1,99 @@
+{# Field type Gallery #}
+<div id="gallery" class="fotorama" style="margin-right: 14px;margin-top: 20px;" data-maxheight="400" data-width="100%" data-maxwidth="100%" data-nav="thumbs" data-allowfullscreen="true">
+
+</div>
+<script>
+
+function b64toBlob(b64Data, contentType, sliceSize) {
+  contentType = contentType || '';
+  sliceSize = sliceSize || 512;
+  var byteCharacters = atob(b64Data);
+  var byteArrays = [];
+  for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+      var slice = byteCharacters.slice(offset, offset + sliceSize);
+      var byteNumbers = new Array(slice.length);
+      for (var i = 0; i < slice.length; i++) {
+          byteNumbers[i] = slice.charCodeAt(i);
+      }
+      var byteArray = new Uint8Array(byteNumbers);
+      byteArrays.push(byteArray);
+  }
+var blob = new Blob(byteArrays, {type: contentType});
+return blob;
+}
+
+$(document).ready(function() {
+//get images
+$.post("/api/erp/product/getimages/{{formConstructor.id_object}}",
+    function(data, status, xhr){
+        if(data.result){
+          console.log(data);
+          if(data.images.length>0){
+            var html='';
+            data.images.forEach(function(valor, indice, array) {
+              //if(indice>0){
+                html+='<a href="'+valor.large+'"><img src="'+valor.thumb+'"></a>';
+            //  }
+            });
+            $("#gallery").html(html);
+            $('.fotorama').fotorama();
+          /*var html='<img class="xzoom" src="'+data.images[0].medium+'" xoriginal="'+data.images[0].large+'" />';
+          html+='<div class="xzoom-thumbs">';
+          html+='<a href="'+data.images[0].large+'"><img class="xzoom-gallery" width="80" src="'+data.images[0].medium+'"></a>';
+          html+='</div>';
+          data.images.forEach(function(valor, indice, array) {
+            if(indice>0){
+              html+='<div class="xzoom-thumbs">';
+              html+='<a href="'+valor.large+'"><img class="xzoom-gallery" width="80" src="'+valor.medium+'"></a>';
+              html+='</div>';
+            }
+          });
+          html+='</div>';
+          $("#gallery").html(html);
+          $(".xzoom, .xzoom-gallery").xzoom({tint: '#333', Xoffset: 15});*/
+        }
+
+      }
+  }, "json");
+
+
+
+});
+
+$('body').on('click', '#btn-image-save-{{field.name}}', function(){
+  $('#fileinput-img-{{field.name}}').fadeOut();
+  var url = "{{url("uploadImage",{"type":field.imageType, "id": formConstructor.id_object})}}";
+  var image = $('#image-preview-{{field.name}}').find('img').attr('src');
+  console.log(image);
+  var block = image.split(";");
+  var contentType = block[0].split(":")[1];
+  var realData = block[1].split(",")[1];
+  var blob = b64toBlob(realData, contentType);
+  var formData = new FormData();
+  formData.append('picture', blob);
+
+  if((++load_wait)==1) $("#load-spinner").fadeIn();
+  $.ajax({
+      url: url,
+      type: "POST",
+      cache: false,
+      contentType: false,
+      processData: false,
+      data: formData,
+      error:function(err){
+          $('#fileinput-img-{{field.name}}').fadeIn();
+          toastr.error("No se pudo subir la imagen", "Confirmación", confirmation);
+      },
+      success:function(data){
+          $('#fileinput-img-{{field.name}}').attr('src','{{ url(field.value,{'id': formConstructor.id_object, 'type': field.imageType, 'size': 'medium'}) }}?'+Date.now());
+          $('#fileinput-{{field.name}}').fileinput("clear");
+          if(data.result) toastr.success("Imagen cambiada correctamente", "Confirmación", confirmation);
+      },
+      complete:function(){
+          if((--load_wait)==0) $("#load-spinner").fadeOut();
+      }
+    });
+});
+
+
+</script>

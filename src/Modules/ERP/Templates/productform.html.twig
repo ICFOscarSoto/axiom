@@ -142,6 +142,9 @@
 			});
 			</script>
 		</div>
+		{% elseif field.type is defined and field.type == 'gallery' %}
+			{# Gallery component of the form #}
+			{{ include("@Globale/form_fields_gallery.html.twig") }}
 		{% endif %}
 
 		{% endfor %}
