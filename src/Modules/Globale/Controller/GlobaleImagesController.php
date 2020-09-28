@@ -138,6 +138,19 @@ class GlobaleImagesController extends Controller implements ContainerAwareInterf
 				}*/
 			}
 
+			if($type=="products"){
+				//find last image
+				$found=true;
+				$i=1;
+			  while($found==true){
+					if(file_exists($image_path.$id."-".$i.'-large.png') || file_exists($image_path.$id."-".$i.'-large.jpg')){
+						$i++;
+					}else{
+						$found=false;
+					}
+				}
+			}else $i=null;
+
 			//50 256 640 1024
 			$manager = new ImageManager($this->container);
 
@@ -146,28 +159,28 @@ class GlobaleImagesController extends Controller implements ContainerAwareInterf
 			    $constraint->aspectRatio();
 			    $constraint->upsize();
 			});
-			$image->save($basePath.'images'.DIRECTORY_SEPARATOR.$type.DIRECTORY_SEPARATOR.$id.'-thumb.png');
+			$image->save($basePath.'images'.DIRECTORY_SEPARATOR.$type.DIRECTORY_SEPARATOR.$id.($i!=null?'-'.$i:'').'-thumb.png');
 
 			$image = $manager->make($tempPath);
 			$image->resize(256, null, function ($constraint) {
 			    $constraint->aspectRatio();
 			    $constraint->upsize();
 			});
-			$image->save($basePath.'images'.DIRECTORY_SEPARATOR.$type.DIRECTORY_SEPARATOR.$id.'-small.png');
+			$image->save($basePath.'images'.DIRECTORY_SEPARATOR.$type.DIRECTORY_SEPARATOR.$id.($i!=null?'-'.$i:'').'-small.png');
 
 			$image = $manager->make($tempPath);
 			$image->resize(640, null, function ($constraint) {
 					$constraint->aspectRatio();
 					$constraint->upsize();
 			});
-			$image->save($basePath.'images'.DIRECTORY_SEPARATOR.$type.DIRECTORY_SEPARATOR.$id.'-medium.png');
+			$image->save($basePath.'images'.DIRECTORY_SEPARATOR.$type.DIRECTORY_SEPARATOR.$id.($i!=null?'-'.$i:'').'-medium.png');
 
 			$image = $manager->make($tempPath);
 			$image->resize(1024, null, function ($constraint) {
 					$constraint->aspectRatio();
 					$constraint->upsize();
 			});
-			$image->save($basePath.'images'.DIRECTORY_SEPARATOR.$type.DIRECTORY_SEPARATOR.$id.'-large.png');
+			$image->save($basePath.'images'.DIRECTORY_SEPARATOR.$type.DIRECTORY_SEPARATOR.$id.($i!=null?'-'.$i:'').'-large.png');
 
 			if (isset($tempPath)) { unlink($tempPath); }
 
