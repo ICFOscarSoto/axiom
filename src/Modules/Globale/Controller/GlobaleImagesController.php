@@ -98,6 +98,12 @@ class GlobaleImagesController extends Controller implements ContainerAwareInterf
 	{
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		$file = $request->files->get('picture');
+		if($file===null){
+			 $fileBlob64 = $request->request->get('picture',null);
+			 $tempName = md5(uniqid()).'.jpg';
+		}else{
+			$tempName = md5(uniqid()).'.'.$file->guessExtension();
+		}
 		$user=$this->getUser();
 
 		//Check if filespace in disk quota
@@ -118,13 +124,21 @@ class GlobaleImagesController extends Controller implements ContainerAwareInterf
 				$basePath = $this->get('kernel')->getRootDir().DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$this->getUser()->getCompany()->getId().DIRECTORY_SEPARATOR;
 
 		}
-			$tempName = md5(uniqid()).'.'.$file->guessExtension();
+
+			/*if($file!==null){
+				$tempName = md5(uniqid()).'.'.$file->guessExtension();*/
+
 			$tempPath = $basePath.'temp'.DIRECTORY_SEPARATOR.$tempName;
 			//Create basepath if it not exists
 			if (!file_exists($basePath.'temp')) {
 			    mkdir($basePath.'temp', 0777, true);
 			}
-			$file->move($basePath.'temp'.DIRECTORY_SEPARATOR, $tempName);
+			if($file===null){
+				file_put_contents($tempPath, base64_decode($fileBlob64));
+			}else{
+				$file->move($basePath.'temp'.DIRECTORY_SEPARATOR, $tempName);
+			}
+
 			//Create type path if it not exists
 			if (!file_exists($basePath.'images'.DIRECTORY_SEPARATOR.$type)) {
 			    mkdir($basePath.'images'.DIRECTORY_SEPARATOR.$type, 0777, true);
