@@ -157,7 +157,7 @@ class GlobaleImagesController extends Controller implements ContainerAwareInterf
 				$found=true;
 				$i=1;
 			  while($found==true){
-					if(file_exists($basePath.'temp'.DIRECTORY_SEPARATOR.$id."-".$i.'-large.png') || file_exists($basePath.'temp'.DIRECTORY_SEPARATOR.$id."-".$i.'-large.jpg')){
+					if(file_exists($basePath.'images'.DIRECTORY_SEPARATOR.$type.DIRECTORY_SEPARATOR.$id."-".$i.'-large.png') || file_exists($basePath.'images'.DIRECTORY_SEPARATOR.$type.DIRECTORY_SEPARATOR.$id."-".$i.'-large.jpg')){
 						$i++;
 					}else{
 						$found=false;
