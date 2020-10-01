@@ -67,22 +67,6 @@ class NavisionGetSalesOrders extends ContainerAwareCommand
   }
 
     public function importSaleOrders(InputInterface $input, OutputInterface $output){
-      //------Sync Customers    ------
-      $command = $this->getApplication()->find('navision:getCustomers');
-      $arguments = [
-          'entity'    => 'customers'
-      ];
-      $cmdProductsInput = new ArrayInput($arguments);
-      $cmdProductsreturn = $command->run($cmdProductsInput, $output);
-
-      //------Sync first products    ------
-      $command = $this->getApplication()->find('navision:getProducts');
-      $arguments = [
-          'entity'    => 'products'
-      ];
-      $cmdProductsInput = new ArrayInput($arguments);
-      $cmdProductsreturn = $command->run($cmdProductsInput, $output);
-
       //------Sync Sales budgets    ------
       $command = $this->getApplication()->find('navision:getsalesbudgets');
       $arguments = [
