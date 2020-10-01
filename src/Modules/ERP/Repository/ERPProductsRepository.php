@@ -77,7 +77,7 @@ class ERPProductsRepository extends ServiceEntityRepository
         ON pv.variantvalue_id=vv.id
         LEFT JOIN erpvariants v
         ON pv.variantname_id=v.id
-        WHERE pv.product_id='.$product.' AND pv.active=1 AND pv.deleted=0';
+        WHERE pv.product_id='.$product.' AND pv.active=1 AND pv.deleted=0 ORDER BY name ASC';
         return $this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
     }
 
