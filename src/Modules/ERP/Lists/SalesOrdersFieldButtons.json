@@ -1,0 +1,4 @@
+[
+  {"id": "editSalesOrders", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"ERPSalesOrdersForm", "actionType" : "foreground", "confirm" :false, "tooltip":""},
+  {"id": "delete", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"genericdelete", "routeParams":{"module":"ERP", "name":"SalesOrders"}, "confirm" :true, "undo" :false, "tooltip":"Borrar impuesto", "actionType" : "background"}
+]

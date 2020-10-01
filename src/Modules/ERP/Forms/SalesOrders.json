@@ -1,0 +1,12 @@
+[{
+	"sections": [
+		{
+			"name": "Sales Orders data",
+			"fields": [
+				{ "name": "customer", "cols": 4}
+			]
+		}
+
+
+	]
+}]

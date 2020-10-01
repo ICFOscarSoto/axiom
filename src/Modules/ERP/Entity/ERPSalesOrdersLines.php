@@ -7,7 +7,7 @@ use \App\Modules\ERP\Entity\ERPSalesOrders;
 use \App\Modules\ERP\Entity\ERPProducts;
 
 /**
- * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPSalesOrdersLinesRepository")
+ * @ORM\Entity(repositoryClass="App\Repository\Modules\ERP\Entity\ERPSalesOrdersLinesRepository")
  */
 class ERPSalesOrdersLines
 {
@@ -20,20 +20,15 @@ class ERPSalesOrdersLines
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPSalesOrders")
-     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
+     * @ORM\JoinColumn(nullable=false)
      */
     private $salesorder;
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPProducts")
-     * @ORM\JoinColumn(nullable=true, onDelete="CASCADE")
+     * @ORM\JoinColumn(nullable=false)
      */
     private $product;
-
-    /**
-     * @ORM\Column(type="string", length=125, nullable=true)
-     */
-    private $name;
 
     /**
      * @ORM\Column(type="float")
@@ -44,16 +39,6 @@ class ERPSalesOrdersLines
      * @ORM\Column(type="float")
      */
     private $quantity=1;
-
-    /**
-     * @ORM\Column(type="float")
-     */
-    private $dtoperc=0;
-
-    /**
-     * @ORM\Column(type="float")
-     */
-    private $dtounit=0;
 
     /**
      * @ORM\Column(type="float")
@@ -76,12 +61,12 @@ class ERPSalesOrdersLines
     private $irpfunit=0;
 
     /**
-     * @ORM\Column(type="float", nullable=true)
+     * @ORM\Column(type="float")
      */
     private $surchargeperc=0;
 
     /**
-     * @ORM\Column(type="float", nullable=true)
+     * @ORM\Column(type="float")
      */
     private $surchargeunit=0;
 
@@ -116,15 +101,34 @@ class ERPSalesOrdersLines
     private $dateupd;
 
     /**
+     * @ORM\Column(type="string", length=250, nullable=true)
+     */
+    private $name;
+
+    /**
+     * @ORM\Column(type="float")
+     */
+    private $dtoperc=0;
+
+    /**
+     * @ORM\Column(type="float")
+     */
+    private $dtounit=0;
+
+    /**
      * @ORM\Column(type="integer")
      */
-    private $linenum=1;
+    private $linenum;
 
     /**
      * @ORM\Column(type="string", length=20)
      */
     private $code;
 
+    /**
+     * @ORM\Column(type="float")
+     */
+    private $cost=0;
 
     public function getId(): ?int
     {
@@ -203,6 +207,30 @@ class ERPSalesOrdersLines
         return $this;
     }
 
+    public function getIrpfperc(): ?float
+    {
+        return $this->irpfperc;
+    }
+
+    public function setIrpfperc(float $irpfperc): self
+    {
+        $this->irpfperc = $irpfperc;
+
+        return $this;
+    }
+
+    public function getIrpfunit(): ?float
+    {
+        return $this->irpfunit;
+    }
+
+    public function setIrpfunit(float $irpfunit): self
+    {
+        $this->irpfunit = $irpfunit;
+
+        return $this;
+    }
+
     public function getSurchargeperc(): ?float
     {
         return $this->surchargeperc;
@@ -220,7 +248,7 @@ class ERPSalesOrdersLines
         return $this->surchargeunit;
     }
 
-    public function setSurchargeunit(?float $surchargeunit): self
+    public function setSurchargeunit(float $surchargeunit): self
     {
         $this->surchargeunit = $surchargeunit;
 
@@ -299,18 +327,6 @@ class ERPSalesOrdersLines
         return $this;
     }
 
-    public function getLinenum(): ?int
-    {
-        return $this->linenum;
-    }
-
-    public function setLinenum(int $linenum): self
-    {
-        $this->linenum = $linenum;
-
-        return $this;
-    }
-
     public function getName(): ?string
     {
         return $this->name;
@@ -347,6 +363,18 @@ class ERPSalesOrdersLines
         return $this;
     }
 
+    public function getLinenum(): ?int
+    {
+        return $this->linenum;
+    }
+
+    public function setLinenum(int $linenum): self
+    {
+        $this->linenum = $linenum;
+
+        return $this;
+    }
+
     public function getCode(): ?string
     {
         return $this->code;
@@ -359,26 +387,14 @@ class ERPSalesOrdersLines
         return $this;
     }
 
-    public function getIrpfperc(): ?float
+    public function getCost(): ?float
     {
-        return $this->irpfperc;
+        return $this->cost;
     }
 
-    public function setIrpfperc(float $irpfperc): self
+    public function setCost(float $cost): self
     {
-        $this->irpfperc = $irpfperc;
-
-        return $this;
-    }
-
-    public function getIrpfunit(): ?float
-    {
-        return $this->irpfunit;
-    }
-
-    public function setIrpfunit(float $irpfunit): self
-    {
-        $this->irpfunit = $irpfunit;
+        $this->cost = $cost;
 
         return $this;
     }

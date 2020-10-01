@@ -334,3 +334,7 @@ VehiclesVehicles:
 ERPSalesBudgets:
   resource: 'App\Modules\ERP\Controller\ERPSalesBudgetsController'
   type:      annotation
+
+ERPSalesOrders:
+  resource: 'App\Modules\ERP\Controller\ERPSalesOrdersController'
+  type:      annotation

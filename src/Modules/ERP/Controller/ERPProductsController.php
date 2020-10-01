@@ -275,6 +275,8 @@ class ERPProductsController extends Controller
 				$result["variant_id"]=$variant?$variant->getId():0;
 				$result["variant_name"]=$variant?$variant->getVariantname()->getName():"";
 				$result["variant_value"]=$variant?$variant->getVariantvalue()->getName():"";
+				$result["variant_enabled"]=$variant?$variant->getEnabled():true;
+
 				$result["code"]=$obj->getCode();
 				$result["name"]=$obj->getName();
 				$result["provider"]=$obj->getSupplier()?$obj->getSupplier()->getName():"";
@@ -358,6 +360,7 @@ class ERPProductsController extends Controller
 				    return $a['warehouse_id'] <=> $b['warehouse_id'];
 				});
 				$result["stock"]=$stock_items;
+				$result["enabled"]=$obj->getEnabled();
 				return new JsonResponse($result);
 			}
 			return new JsonResponse(["result"=>-1]);

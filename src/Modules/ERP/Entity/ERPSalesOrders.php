@@ -2,8 +2,6 @@
 
 namespace App\Modules\ERP\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
 use \App\Modules\Globale\Entity\GlobaleUsers;
@@ -11,10 +9,11 @@ use \App\Modules\ERP\Entity\ERPCustomers;
 use \App\Modules\Globale\Entity\GlobaleCurrencies;
 use \App\Modules\ERP\Entity\ERPFinancialYears;
 use \App\Modules\ERP\Entity\ERPPaymentMethods;
-use \App\Modules\ERP\Entity\ERPSeries;
 use \App\Modules\Globale\Entity\GlobaleCountries;
 use \App\Modules\ERP\Entity\ERPCustomerGroups;
-//use \App\Modules\ERP\Entity\ERPSalesInvoices;
+use \App\Modules\ERP\Entity\ERPSalesOrders;
+use \App\Modules\ERP\Entity\ERPSeries;
+use \App\Modules\ERP\Entity\ERPSalesBudgets;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPSalesOrdersRepository")
@@ -73,7 +72,7 @@ class ERPSalesOrders
     private $paymentmethod;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPSeries")
+     * @ORM\ManyToOne(targetEntity="\App\Modules\AERP\Entity\AERPSeries")
      */
     private $serie;
 
@@ -129,6 +128,41 @@ class ERPSalesOrders
     private $customerpostbox;
 
     /**
+     * @ORM\Column(type="string", length=200, nullable=true)
+     */
+    private $shiptoname;
+
+    /**
+     * @ORM\Column(type="string", length=150, nullable=true)
+     */
+    private $shiptoaddress;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCountries")
+     */
+    private $shiptocountry;
+
+    /**
+     * @ORM\Column(type="string", length=70, nullable=true)
+     */
+    private $shiptocity;
+
+    /**
+     * @ORM\Column(type="string", length=125, nullable=true)
+     */
+    private $shiptostate;
+
+    /**
+     * @ORM\Column(type="string", length=12, nullable=true)
+     */
+    private $shiptopostcode;
+
+    /**
+     * @ORM\Column(type="string", length=25, nullable=true)
+     */
+    private $shiptopostbox;
+
+    /**
      * @ORM\Column(type="string", length=20, nullable=true)
      */
     private $customercode;
@@ -137,6 +171,11 @@ class ERPSalesOrders
      * @ORM\Column(type="datetime")
      */
     private $date;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $dateofferend;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
@@ -229,10 +268,14 @@ class ERPSalesOrders
     private $notes;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Modules\ERP\Entity\ERPSalesBudgets", mappedBy="inSalesOrder")
+     * @ORM\Column(type="float")
      */
-    private $salesBudgets;
+    private $cost;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPSalesBudgets")
+     */
+    private $salesbudget;
 
 
     public function getId(): ?int
@@ -408,18 +451,6 @@ class ERPSalesOrders
         return $this;
     }
 
-    public function getSerie(): ?ERPSeries
-    {
-        return $this->serie;
-    }
-
-    public function setSerie(?ERPSeries $serie): self
-    {
-        $this->serie = $serie;
-
-        return $this;
-    }
-
     public function getCustomername(): ?string
     {
         return $this->customername;
@@ -504,6 +535,90 @@ class ERPSalesOrders
         return $this;
     }
 
+    public function getShiptoname(): ?string
+    {
+        return $this->shiptoname;
+    }
+
+    public function setShiptoname(?string $shiptoname): self
+    {
+        $this->shiptoname = $shiptoname;
+
+        return $this;
+    }
+
+    public function getShiptoaddress(): ?string
+    {
+        return $this->shiptoaddress;
+    }
+
+    public function setShiptoaddress(?string $shiptoaddress): self
+    {
+        $this->shiptoaddress = $shiptoaddress;
+
+        return $this;
+    }
+
+    public function getShiptocountry(): ?GlobaleCountries
+    {
+        return $this->shiptocountry;
+    }
+
+    public function setShiptocountry(?GlobaleCountries $shiptocountry): self
+    {
+        $this->shiptocountry = $shiptocountry;
+
+        return $this;
+    }
+
+    public function getShiptocity(): ?string
+    {
+        return $this->shiptocity;
+    }
+
+    public function setShiptocity(?string $shiptocity): self
+    {
+        $this->shiptocity = $shiptocity;
+
+        return $this;
+    }
+
+    public function getShiptostate(): ?string
+    {
+        return $this->shiptostate;
+    }
+
+    public function setShiptostate(?string $shiptostate): self
+    {
+        $this->shiptostate = $shiptostate;
+
+        return $this;
+    }
+
+    public function getShiptopostcode(): ?string
+    {
+        return $this->shiptopostcode;
+    }
+
+    public function setShiptopostcode(?string $shiptopostcode): self
+    {
+        $this->shiptopostcode = $shiptopostcode;
+
+        return $this;
+    }
+
+    public function getShiptopostbox(): ?string
+    {
+        return $this->shiptopostbox;
+    }
+
+    public function setShiptopostbox(?string $shiptopostbox): self
+    {
+        $this->shiptopostbox = $shiptopostbox;
+
+        return $this;
+    }
+
     public function getCustomercode(): ?string
     {
         return $this->customercode;
@@ -524,6 +639,18 @@ class ERPSalesOrders
     public function setDate(\DateTimeInterface $date): self
     {
         $this->date = $date;
+
+        return $this;
+    }
+
+    public function getDateofferend(): ?\DateTimeInterface
+    {
+        return $this->dateofferend;
+    }
+
+    public function setDateofferend(?\DateTimeInterface $dateofferend): self
+    {
+        $this->dateofferend = $dateofferend;
 
         return $this;
     }
@@ -708,36 +835,40 @@ class ERPSalesOrders
         return $this;
     }
 
-    /**
-     * @return Collection|ERPSalesBudgets[]
-     */
-    public function getSalesBudgets(): Collection
+    public function getCost(): ?float
     {
-        return $this->salesBudgets;
+        return $this->cost;
     }
 
-    public function addSalesBudget(ERPSalesBudgets $salesBudget): self
+    public function setCost(float $cost): self
     {
-        if (!$this->salesBudgets->contains($salesBudget)) {
-            $this->salesBudgets[] = $salesBudget;
-            $salesBudget->setInSalesOrder($this);
-        }
-
-        return $this;
-    }
-
-    public function removeSalesBudget(ERPSalesBudgets $salesBudget): self
-    {
-        if ($this->salesBudgets->contains($salesBudget)) {
-            $this->salesBudgets->removeElement($salesBudget);
-            // set the owning side to null (unless already changed)
-            if ($salesBudget->getInSalesOrder() === $this) {
-                $salesBudget->setInSalesOrder(null);
-            }
-        }
+        $this->cost = $cost;
 
         return $this;
     }
 
 
+    public function getSerie(): ?ERPSeries
+    {
+        return $this->serie;
+    }
+
+    public function setSerie(?ERPSeries $serie): self
+    {
+        $this->serie = $serie;
+
+        return $this;
+    }
+
+    public function getSalesbudget(): ?ERPSalesBudgets
+    {
+        return $this->salesbudget;
+    }
+
+    public function setSalesbudget(?ERPSalesBudgets $salesbudget): self
+    {
+        $this->salesbudget = $salesbudget;
+
+        return $this;
+    }
 }

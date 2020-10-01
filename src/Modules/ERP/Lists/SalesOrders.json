@@ -1,0 +1,52 @@
+[   {
+      "name": "id",
+      "caption": "id",
+      "class": "hidden"
+  },
+  {
+      "name": "code",
+      "caption": "code",
+      "width": "15%",
+      "class": "all"
+  },
+  {
+      "name": "date",
+      "caption": "Date",
+      "type": "date",
+      "width": "15%","class":"min-desktop"
+  },
+  {
+      "name": "vat",
+      "caption": "vat","class":"min-desktop"
+
+  },
+  {
+      "name": "customername",
+      "caption": "Customer",
+      "width": "50%",
+      "class": "all"
+  },
+  {
+      "name" :"agent__name_o_agent__lastname","caption":"Agente"
+  },
+  {
+      "name": "cost",
+      "caption": "Cost",
+      "unity": "€",
+      "format": "float",
+      "sum": true,
+      "class" : "dt-right min-tablet",
+      "width": "50%"
+
+  },
+  {
+      "name": "total",
+      "caption": "Total",
+      "unity": "€",
+      "format": "float",
+      "sum": true,
+      "class" : "dt-right min-tablet",
+      "width": "50%"
+
+  }
+]
