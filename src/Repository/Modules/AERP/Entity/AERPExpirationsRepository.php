@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <?php
 
 namespace App\Repository\Modules\AERP\Entity;
@@ -21,3 +22,6 @@ class AERPExpirationsRepository extends ServiceEntityRepository
 
 
 }
+=======
+            ->getResult()
+>>>>>>> 0c5fa59ca96f57398f8bea5da882c3c04878d7c7
