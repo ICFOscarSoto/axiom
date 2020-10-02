@@ -185,10 +185,11 @@ class ERPEAN13Controller extends Controller
     $repositoryEAN=$this->getDoctrine()->getRepository(ERPEAN13::class);
     $ean=$repositoryEAN->findOneBy(["id"=>$id]);
     if($ean && $ean->getName()!=null && $ean->getName()!=""){
-      $deleteEAN=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-removeEAN.php?barcode='.$ean->getName());
+      dump('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-removeEAN13.php?barcode='.$ean->getName());
+      $deleteEAN=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-removeEAN13.php?barcode='.$ean->getName());
       $result_deleteEAN=json_decode($deleteEAN,true);
       if(isset($result_deleteEAN["result"]) && $result_deleteEAN["result"]==1)
-        $result=$entityUtils->deleteObject($id, $this->class, $this->getDoctrine());
+        $result=$entityUtils->deleteObject($id, ERPEAN13::class, $this->getDoctrine());
         else return new JsonResponse(array('result' => -1));
     }else{
       return new JsonResponse(array('result' => -1));
