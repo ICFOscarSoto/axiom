@@ -481,50 +481,54 @@ public function importStocks(InputInterface $input, OutputInterface $output) {
       $product=$repositoryProducts->findOneBy(["code"=>$stock["code"]]);
       $namenameVariantValue=$this->variantColor($stock["variant"]);
       $variantvalue=$repositoryVariantsValues->findOneBy(["name"=>$namenameVariantValue]);
-      $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product->getId(),"variantvalue"=>$variantvalue]);
 
       if($product) {
-          $old_stocks=$repositoryStocks->stocksByStore($product, $stock["almacen"]);
-        }
+          $old_stocks=$repositoryStocks->stockUpdate($product->getId(), $stock["almacen"]);
+          $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product->getId(),"variantvalue"=>$variantvalue]);
+          if($old_stocks!=null){
+              $stock_old=$repositoryStocks->findOneBy(["id"=>$old_stocks[0]["id"], "deleted"=>0]);
+              dump('Vamos a actualizar la linea '.$old_stocks[0]["id"].' del producto '.$product->getId().' en el almacen '.$stock["almacen"]);
+              if ((int)$stock["stock"]<0) $quantity=0;
+              else $quantity=(int)$stock["stock"];
+              $stock_old->setQuantity(!$quantity?0:$quantity);
+              $stock_old->setDateupd(new \Datetime());
+              $this->doctrine->getManager()->merge($stock_old);
+            }
 
-      if($old_stocks!=null){
-          $last_movement=$repositoryStocks->lastMovement($product->getId());
-          $new_stock=(int)$stock["stock"]-$old_stocks[0]["Quantity"]+$last_movement[0]["quantity"];
-          $stock_obj=$repositoryStocks->findBy($new_stock[0]["id"]);
+            else {
+              $location=$repositoryStoreLocations->findOneBy(["name"=>$stock["almacen"]]);
+              if($location!=null){
+              $obj=new ERPStocks();$obj->setCompany($company);
+              $obj->setProduct($product);
+              $obj->setDateadd(new \Datetime());
+              $obj->setDateupd(new \Datetime());
+              $obj->setStoreLocation($location);
+              $obj->setProductVariant($productvariant);
+              if ((int)$stock["stock"]<0) $quantiy=0;
+              else $quantity=(int)$stock["stock"];
+              $obj->setQuantity(!$quantity?0:$quantity);
+              $obj->setActive(1);
+              $obj->setDeleted(0);
+              $this->doctrine->getManager()->merge($obj);}
 
-          $stock_old->setQuantity($stock_new);
-          $stock_old->setDateupd(new \Datetime());
-          $this->doctrine->getManager()->merge($stock_old);
-        }else {
-          $obj=new ERPStocks();
-          $obj->setCompany($company);
-          $obj->setProduct($product);
-          $obj->setDateadd(new \Datetime());
-          $obj->setDateupd(new \Datetime());
-          $location=$repositoryStoreLocations->findOneBy(["name"=>$stock["almacen"]]);
-          $obj->setStoreLocation($location);
-          $obj->setProductVariant($productvariant);
-          if ((int)$stock["stock"]<0) $quantiy=0;
-          else $quantity=(int)$stock["stock"];
-          $obj->setQuantity(!$quantity?0:$quantity);
-          $obj->setActive(1);
-          $obj->setDeleted(0);
-          $this->doctrine->getManager()->merge($obj);
-        }
-        $this->doctrine->getManager()->flush();
-        $this->doctrine->getManager()->clear();
+            }
+            $this->doctrine->getManager()->flush();
+            $this->doctrine->getManager()->clear();
+          }
+
+          $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"stocks"]);
+          if ($navisionSync==null) {
+          $navisionSync=new NavisionSync();
+          $navisionSync->setEntity("stocks");
       }
-    }
-    $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"stocks"]);
-    if ($navisionSync==null) {
-      $navisionSync=new NavisionSync();
-      $navisionSync->setEntity("stocks");
+
+
     }
     $navisionSync->setLastsync($datetime);
     $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
     $this->doctrine->getManager()->persist($navisionSync);
     $this->doctrine->getManager()->flush();
-
+  }
 
     //------   Critical Section END   ------
     //------   Remove Lock Mutex    ------

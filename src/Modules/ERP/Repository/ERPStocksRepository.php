@@ -53,12 +53,13 @@ class ERPStocksRepository extends ServiceEntityRepository
       return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
     }
 
-    public function lastMovement($product_id){
-      $query="SELECT id, dateupd, quantity FROM erpstocks
-              WHERE storelocation_id IN (SELECT id FROM erpstore_locations WHERE store_id=1)
-              AND product_id= :product
-              ORDER BY dateupd DESC LIMIT 1";
-      $params=['product' => $product_id];
+    public function stockUpdate($product_id, $store){
+      $query="SELECT id, quantity FROM erpstocks WHERE product_id= :product AND storelocation_id IN
+                  (SELECT id FROM erpstore_locations WHERE store_id IN
+                    (SELECT id FROM erpstores WHERE CODE= :store))
+              ORDER BY quantity DESC
+              LIMIT 1";
+      $params=['product' => $product_id, 'store' => $store];
 
       return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
     }
