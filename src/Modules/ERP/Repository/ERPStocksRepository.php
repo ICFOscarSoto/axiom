@@ -31,15 +31,36 @@ class ERPStocksRepository extends ServiceEntityRepository
         ;
     }
 
-    public function stocksByStores($product){
-      $query="SELECT a.name Store, IFNULL (SUM(s.quantity),0) Quantity
-              FROM erpstores a LEFT JOIN erpstore_locations u ON a.id=u.store_id LEFT JOIN erpstocks s ON u.id=s.storelocation_id AND s.product_id= :product
+    public function stocksByStores($product_id){
+      $query="SELECT a.code Store, IFNULL (SUM(s.quantity),0) Quantity
+              FROM erpstores a LEFT JOIN erpstore_locations u ON a.id=u.store_id
+              LEFT JOIN erpstocks s ON u.id=s.storelocation_id AND s.product_id= :product
               WHERE a.active=TRUE and a.deleted=0
               GROUP BY a.name";
 
-      $params=['product' => $product];
+      $params=['product' => $product_id];
       return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
 
+    }
+
+    public function stocksByStore($product, $store){
+      $query="SELECT IFNULL (SUM(s.quantity),0) Quantity
+              FROM erpstores a LEFT JOIN erpstore_locations u ON a.id=u.store_id
+              LEFT JOIN erpstocks s ON u.id=s.storelocation_id AND s.product_id= :product
+              WHERE a.active=TRUE and a.deleted=0 and a.code= :store
+              GROUP BY a.name";
+      $params=['product' => $product->getId(), 'store' =>$store];
+      return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+    }
+
+    public function lastMovement($product_id){
+      $query="SELECT id, dateupd, quantity FROM erpstocks
+              WHERE storelocation_id IN (SELECT id FROM erpstore_locations WHERE store_id=1)
+              AND product_id= :product
+              ORDER BY dateupd DESC LIMIT 1";
+      $params=['product' => $product_id];
+
+      return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
     }
 
     public function findInventoryStocks($company, $store=0, $location=0, $category=0){

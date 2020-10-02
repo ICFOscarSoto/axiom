@@ -158,11 +158,13 @@ class NavisionGetProducts extends ContainerAwareCommand
          $json2=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-clearProducts.php?from='.$object["code"]);
          $movs=json_decode($json2, true);
          $movs=$movs[0];
+         /* Dejamos de desactivar productos desde el 2/10
+
          if($movs["class"][0]["movimiento"]!=null)
-          if($movs["class"][0]["movimiento"]["date"]>"2019-09-09 00:00:00.000000" and $object["Blocked"]==0)
+         if($movs["class"][0]["movimiento"]["date"]>"2019-09-09 00:00:00.000000" and $object["Blocked"]==0)
             $obj->setActive(1);
             else $obj->setActive(0);
-         else $obj->setActive(0);
+         else $obj->setActive(0); */
          $repositoryTaxes=$this->doctrine->getRepository(GlobaleTaxes::class);
          $taxes=$repositoryTaxes->find(1);
          $obj->setTaxes($taxes);
@@ -477,25 +479,20 @@ public function importStocks(InputInterface $input, OutputInterface $output) {
       $company=$repositoryCompanies->find(2);
       foreach ($objects["class"] as $stock){
       $product=$repositoryProducts->findOneBy(["code"=>$stock["code"]]);
-      /*
-      Quitamos las ubicaciones en la sincronización
+      $namenameVariantValue=$this->variantColor($stock["variant"]);
+      $variantvalue=$repositoryVariantsValues->findOneBy(["name"=>$namenameVariantValue]);
+      $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product->getId(),"variantvalue"=>$variantvalue]);
 
-      if ($stock["ubicacion"]!=null) {
+      if($product) {
+          $old_stocks=$repositoryStocks->stocksByStore($product, $stock["almacen"]);
+        }
 
-          $location=$repositoryStoreLocations->findOneBy(["name"=>$stock["ubicacion"]]);
-      } else       */
-      $location=$repositoryStoreLocations->findOneBy(["name"=>$stock["almacen"]]);
-      if ($location!=null and $product!=null) {
-        $output->writeln('Actualizando stock de '.$stock["code"]. " en la localizacion ".$stock["almacen"]);
-        $namenameVariantValue=$this->variantColor($stock["variant"]);
-        $variantvalue=$repositoryVariantsValues->findOneBy(["name"=>$namenameVariantValue]);
-        $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product->getId(),"variantvalue"=>$variantvalue]);
+      if($old_stocks!=null){
+          $last_movement=$repositoryStocks->lastMovement($product->getId());
+          $new_stock=(int)$stock["stock"]-$old_stocks[0]["Quantity"]+$last_movement[0]["quantity"];
+          $stock_obj=$repositoryStocks->findBy($new_stock[0]["id"]);
 
-        if ($productvariant!=null) $stock_old=$repositoryStocks->findOneBy(["product"=>$product->getId(),"storelocation"=>$location->getId(), "productvariant"=>$productvariant->getId()]);
-        else $stock_old=$repositoryStocks->findOneBy(["product"=>$product->getId(),"storelocation"=>$location->getId()]);
-
-        if($stock_old!=null){
-          $stock_old->setQuantity((int)$stock["stock"]);
+          $stock_old->setQuantity($stock_new);
           $stock_old->setDateupd(new \Datetime());
           $this->doctrine->getManager()->merge($stock_old);
         }else {
@@ -504,6 +501,7 @@ public function importStocks(InputInterface $input, OutputInterface $output) {
           $obj->setProduct($product);
           $obj->setDateadd(new \Datetime());
           $obj->setDateupd(new \Datetime());
+          $location=$repositoryStoreLocations->findOneBy(["name"=>$stock["almacen"]]);
           $obj->setStoreLocation($location);
           $obj->setProductVariant($productvariant);
           if ((int)$stock["stock"]<0) $quantiy=0;
@@ -526,7 +524,7 @@ public function importStocks(InputInterface $input, OutputInterface $output) {
     $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
     $this->doctrine->getManager()->persist($navisionSync);
     $this->doctrine->getManager()->flush();
-    }
+
 
     //------   Critical Section END   ------
     //------   Remove Lock Mutex    ------
