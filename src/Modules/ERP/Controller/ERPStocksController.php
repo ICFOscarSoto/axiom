@@ -493,7 +493,8 @@ class ERPStocksController extends Controller
 		 $variant=$item->getProductvariant();
 		 //$stocks=$Stocksrepository->findBy(["product"=>$obj, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
 		 $eans=$EAN13repository->findBy(["product"=>$obj, "productvariant"=>$variant?$variant:null, "active"=>1, "deleted"=>0]);
-		 $result_prod["id"]=$obj->getId();
+		 $result_prod["id"]=$item->getId();
+		 $result_prod["id_product"]=$obj->getId();
 		 $result_prod["code"]=$obj->getCode();
 		 $result_prod["variant_id"]=$variant?$variant->getId():0;
 		 $result_prod["variant_name"]=$variant?$variant->getVariantname()->getName():"";
