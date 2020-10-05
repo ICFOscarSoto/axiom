@@ -16,6 +16,8 @@ use App\Modules\ERP\Entity\ERPStores;
 use App\Modules\ERP\Entity\ERPStoreLocations;
 use App\Modules\ERP\Entity\ERPCategories;
 use App\Modules\ERP\Entity\ERPProducts;
+use App\Modules\ERP\Entity\ERPEAN13;
+use App\Modules\ERP\Entity\ERPProductsVariants;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
@@ -373,7 +375,7 @@ class ERPStocksController extends Controller
 			//	 $json=file_get_contents($this->url.'navisionExport/axiom/app/do-NAVISION-setProductStock.php?code='.$product_obj->getCode().'&store='.$store->getCode().'$qty='.$new_navision_stock.'&type=3');
 
 			 }
-			 
+
 			return new JsonResponse(["result"=>1]);
 	 }
 
@@ -387,7 +389,7 @@ class ERPStocksController extends Controller
 		 $stock = $this->getDoctrine()->getRepository($this->class)->findOneById($id);
       if (!$stock) {
             throw $this->createNotFoundException('No currency found for id '.$id );
-          }
+      }
           return new JsonResponse($stock->encodeJson());
     }
 
@@ -460,6 +462,129 @@ class ERPStocksController extends Controller
 	 $entityUtils=new GlobaleEntityUtils();
 	 $result=$entityUtils->deleteObject($id, $this->class, $this->getDoctrine());
 	 return new JsonResponse(array('result' => $result));
+ }
+
+
+ /**
+ * @Route("/api/erp/inventory/location/getproducts/{loc}", name="locationGetProduct")
+ */
+ public function getProduct($loc,Request $request){
+	 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+	 $EAN13repository=$this->getDoctrine()->getRepository(ERPEAN13::class);
+	 $Productrepository=$this->getDoctrine()->getRepository(ERPProducts::class);
+	 $Variantsrepository=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
+	 $Stocksrepository=$this->getDoctrine()->getRepository(ERPStocks::class);
+	 //$StoreUsersrepository=$this->getDoctrine()->getRepository(ERPStoresUsers::class);
+	 $StoreLocationsrepository=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
+	 $Storesrepository=$this->getDoctrine()->getRepository(ERPStores::class);
+	 $obj=null;
+	 $variant=null;
+
+	 $location=$StoreLocationsrepository->findBy(["name"=>$loc, "company"=>$this->getUser()->getCompany(), "deleted"=>0]);
+	 if(!$location) return new JsonResponse(["result"=>-1, "text"=>"Ubicación no encontrada"]);
+	 $products=$Stocksrepository->findBy(["storelocation"=>$location, "company"=>$this->getUser()->getCompany(), "deleted"=>0]);
+	 $array_products=[];
+	 foreach($products as $item){
+		 $obj=$item->getProduct();
+		 $variant=$item->getProductvariant();
+		 //$stocks=$Stocksrepository->findBy(["product"=>$obj, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
+		 $eans=$EAN13repository->findBy(["product"=>$obj, "productvariant"=>$variant?$variant:null, "active"=>1, "deleted"=>0]);
+		 $result["id"]=$obj->getId();
+		 $result["code"]=$obj->getCode();
+		 $result["variant_id"]=$variant?$variant->getId():0;
+		 $result["variant_name"]=$variant?$variant->getVariantname()->getName():"";
+		 $result["variant_value"]=$variant?$variant->getVariantvalue()->getName():"";
+		 $result["variant_active"]=$variant?$variant->getActive():true;
+		 $result["stock"]=$item->getQuantity();
+		 $result["code"]=$obj->getCode();
+		 $result["name"]=$obj->getName();
+		 $result["provider"]=$obj->getSupplier()?$obj->getSupplier()->getName():"";
+		 $result["eans"]=[];
+		 foreach($eans as $ean){
+			 $ean_item["id"]=$ean->getId();
+			 $ean_item["barcode"]=$ean->getName();
+			 $ean_item["type"]=$ean->getType()==null?0:$ean->getType();
+			 if($ean->getSupplier()){
+				 $ean_item["supplierId"]=$ean->getSupplier()->getId();
+				 $ean_item["supplierName"]=$ean->getSupplier()->getName();
+			 }else{
+				 $ean_item["supplierId"]=0;
+				 $ean_item["supplierName"]='';
+			 }
+			 if($ean->getCustomer()){
+				 $ean_item["customerId"]=$ean->getCustomer()->getId();
+				 $ean_item["customerName"]=$ean->getCustomer()->getName();
+			 }else{
+				 $ean_item["customerId"]=0;
+				 $ean_item["customerName"]='';
+			 }
+			 $result["eans"][]=$ean_item;
+		 }
+
+		 /*$variants=$Variantsrepository->findBy(["product"=>$obj, "active"=>1, "deleted"=>0]);
+		 $result["variants"]=[];
+		 foreach($variants as $variant){
+			 $variant_item["id"]=$variant->getId();
+			 $variant_item["name"]=$variant->getVariantname()->getName();
+			 $variant_item["value"]=$variant->getVariantvalue()->getName();
+			 $eans=$EAN13repository->findBy(["product"=>$obj, "productvariant"=>$variant, "active"=>1, "deleted"=>0]);
+			 $variant_item["eans"]=[];
+			 foreach($eans as $ean){
+				 $ean_item["id"]=$ean->getId();
+				 $ean_item["barcode"]=$ean->getName();
+				 $ean_item["type"]=$ean->getType()==null?0:$ean->getType();
+				 if($ean->getSupplier()){
+					 $ean_item["supplierId"]=$ean->getSupplier()->getId();
+					 $ean_item["supplierName"]=$ean->getSupplier()->getName();
+				 }else{
+					 $ean_item["supplierId"]=0;
+					 $ean_item["supplierName"]='';
+				 }
+				 if($ean->getCustomer()){
+					 $ean_item["customerId"]=$ean->getCustomer()->getId();
+					 $ean_item["customerName"]=$ean->getCustomer()->getName();
+				 }else{
+					 $ean_item["customerId"]=0;
+					 $ean_item["customerName"]='';
+				 }
+				 $variant_item["eans"][]=$ean_item;
+			 }
+
+			 $result["variants"][]=$variant_item;
+		 }
+		 usort($result["variants"], function($a, $b) {
+				 return $a['value'] <=> $b['value'];
+		 });*/
+
+		 /*$stock_items=[];
+		 foreach($stocks as $stock){
+			 $storeUser=$StoreUsersrepository->findOneBy(["user"=>$this->getUser(), "store"=>$stock->getStorelocation()->getStore(), "active"=>1, "deleted"=>0]);
+			 if($storeUser){
+				 $stock_item["id"]=$stock->getId();
+				 $stock_item["variant_id"]=!$stock->getProductvariant()?0:$stock->getProductvariant()->getId();
+				 $stock_item["warehouse_code"]=$stock->getStorelocation()->getStore()->getCode();
+				 $stock_item["warehouse"]=$stock->getStorelocation()->getStore()->getName();
+				 $stock_item["warehouse_id"]=$stock->getStorelocation()->getStore()->getId();
+				 $stock_item["warehouse_preferential"]=$storeUser->getPreferential();
+				 $stock_item["location"]=$stock->getStorelocation()->getName();
+				 $stock_item["location_id"]=$stock->getStorelocation()->getId();
+				 $stock_item["quantity"]=!$stock->getQuantity()?0:$stock->getQuantity();
+				 $stock_item["pendingserve"]=!$stock->getPendingserve()?0:$stock->getPendingserve();
+				 $stock_item["pendingreceive"]=!$stock->getPendingreceive()?0:$stock->getPendingreceive();
+				 $stock_item["minstock"]=!$stock->getMinstock()?0:$stock->getMinstock();
+				 $stock_items[]=$stock_item;
+			 }
+		 }
+		 usort($stock_items, function($a, $b) {
+				 return $a['warehouse_id'] <=> $b['warehouse_id'];
+		 });
+		 $result["stock"]=$stock_items;*/
+		 $result["active"]=$obj->getActive();
+		 $array_products[]=$result;
+	}
+
+
+	 return new JsonResponse(["result"=>1, "products"=>$array_products]);
  }
 
 }
