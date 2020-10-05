@@ -480,26 +480,30 @@ class ERPStocksController extends Controller
 	 $obj=null;
 	 $variant=null;
 
-	 $location=$StoreLocationsrepository->findBy(["name"=>$loc, "company"=>$this->getUser()->getCompany(), "deleted"=>0]);
+	 $location=$StoreLocationsrepository->findOneBy(["name"=>$loc, "company"=>$this->getUser()->getCompany(), "deleted"=>0]);
 	 if(!$location) return new JsonResponse(["result"=>-1, "text"=>"Ubicación no encontrada"]);
 	 $products=$Stocksrepository->findBy(["storelocation"=>$location, "company"=>$this->getUser()->getCompany(), "deleted"=>0]);
 	 $array_products=[];
+	 $result["id"]=$location->getId();
+	 $result["name"]=$location->getName();
+	 $result["storeId"]=$location->getStore()->getId();
+	 $result["storeName"]=$location->getStore()->getName();
 	 foreach($products as $item){
 		 $obj=$item->getProduct();
 		 $variant=$item->getProductvariant();
 		 //$stocks=$Stocksrepository->findBy(["product"=>$obj, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
 		 $eans=$EAN13repository->findBy(["product"=>$obj, "productvariant"=>$variant?$variant:null, "active"=>1, "deleted"=>0]);
-		 $result["id"]=$obj->getId();
-		 $result["code"]=$obj->getCode();
-		 $result["variant_id"]=$variant?$variant->getId():0;
-		 $result["variant_name"]=$variant?$variant->getVariantname()->getName():"";
-		 $result["variant_value"]=$variant?$variant->getVariantvalue()->getName():"";
-		 $result["variant_active"]=$variant?$variant->getActive():true;
-		 $result["stock"]=$item->getQuantity();
-		 $result["code"]=$obj->getCode();
-		 $result["name"]=$obj->getName();
-		 $result["provider"]=$obj->getSupplier()?$obj->getSupplier()->getName():"";
-		 $result["eans"]=[];
+		 $result_prod["id"]=$obj->getId();
+		 $result_prod["code"]=$obj->getCode();
+		 $result_prod["variant_id"]=$variant?$variant->getId():0;
+		 $result_prod["variant_name"]=$variant?$variant->getVariantname()->getName():"";
+		 $result_prod["variant_value"]=$variant?$variant->getVariantvalue()->getName():"";
+		 $result_prod["variant_active"]=$variant?$variant->getActive():true;
+		 $result_prod["stock"]=$item->getQuantity();
+		 $result_prod["code"]=$obj->getCode();
+		 $result_prod["name"]=$obj->getName();
+		 $result_prod["provider"]=$obj->getSupplier()?$obj->getSupplier()->getName():"";
+		 $result_prod["eans"]=[];
 		 foreach($eans as $ean){
 			 $ean_item["id"]=$ean->getId();
 			 $ean_item["barcode"]=$ean->getName();
@@ -518,7 +522,7 @@ class ERPStocksController extends Controller
 				 $ean_item["customerId"]=0;
 				 $ean_item["customerName"]='';
 			 }
-			 $result["eans"][]=$ean_item;
+			 $result_prod["eans"][]=$ean_item;
 		 }
 
 		 /*$variants=$Variantsrepository->findBy(["product"=>$obj, "active"=>1, "deleted"=>0]);
@@ -579,12 +583,12 @@ class ERPStocksController extends Controller
 				 return $a['warehouse_id'] <=> $b['warehouse_id'];
 		 });
 		 $result["stock"]=$stock_items;*/
-		 $result["active"]=$obj->getActive();
-		 $array_products[]=$result;
+		 $result_prod["active"]=$obj->getActive();
+		 $array_products[]=$result_prod;
 	}
+	$result["products"]=$array_products;
 
-
-	 return new JsonResponse(["result"=>1, "products"=>$array_products]);
+	 return new JsonResponse($result);
  }
 
 }
