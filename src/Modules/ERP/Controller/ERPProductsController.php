@@ -106,6 +106,13 @@ class ERPProductsController extends Controller
 			$breadcrumb=$menurepository->formatBreadcrumb('products');
 			array_push($breadcrumb, $new_breadcrumb);
 			$productRepository=$this->getDoctrine()->getRepository($this->class);
+
+			if($request->query->get('code',null)){
+				$obj = $productRepository->findOneBy(['code'=>$request->query->get('code',null), 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
+				if($obj) return $this->redirectToRoute('formProduct', ['id' => $obj->getId()]);
+				else return $this->redirectToRoute('formProduct', ['id' => 0]);
+			}
+			
 			$obj = $productRepository->findOneBy(['id'=>$id, 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
 			$product_name=$obj?$obj->getName():'';
 			if ($obj && $obj->getGrouped()) {
