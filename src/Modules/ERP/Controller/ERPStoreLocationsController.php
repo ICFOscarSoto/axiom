@@ -94,12 +94,26 @@ class ERPStoreLocationsController extends Controller
   }
 
 	/**
-  * @Route("/api/ERP/locations/printLabel/{id}/{idend}", name="printLocationlabel")
+  * @Route("/api/ERP/locations/printLabel/{id}/{idend}", name="printLocationlabel", defaults={"id"=0, "idend"="0"})
   */
-  public function printLocationlabel($id, $idend){
+  public function printLocationlabel($id, $idend,Request $request){
 	 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
  	 $repository=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
-	 $locations=$repository->getLocations($id, $idend);
+	 $json=$request->query->get('json',null);
+	 if($json){
+		 $json=json_decode($json, true);
+		 $locations=[];
+		 foreach($json as $item){
+			 $loc=$repository->findOneBy(["name"=>$item]);
+			 $locitem["id"]=$loc->getId();
+			 $locitem["name"]=$loc->getName();
+			 $locitem["orientation"]=$loc->getOrientation();
+			 if($loc) $locations[]=$locitem;
+		 }
+	 }else{
+		 $locations=$repository->getLocations($id, $idend);
+	 }
+
  	 $params=["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "locations"=>$locations, "user"=>$this->getUser()];
  	 $reportsUtils = new ERPLocationsReports();
  	 $pdf=$reportsUtils->create($params);
