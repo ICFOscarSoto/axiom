@@ -658,6 +658,7 @@ class ERPProductsController extends Controller
 				'interfaceName' => 'Stock Navision',
 				'optionSelected' => "stock",
 				'producto' => $product->getName(),
+				'sku_producto' => $product->getCode(),
 				'variantes' => $variants,
 				'agrupado' => $isgrouped,
 				'stockCampollano' => $stockCampollano,

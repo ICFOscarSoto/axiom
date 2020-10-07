@@ -359,6 +359,15 @@ table.dataTable.dtr-inline.collapsed > tbody > tr > td:first-child:before, table
 	border: none !important;
 }
 
+.stock-table  > thead > tr > th{
+  font-size:14px;
+}
+
+.stock-table  > tbody > tr > td{
+  font-size:16px;
+  font-weight: 600;
+}
+
 .table-bordered > tfoot > tr > td{
   font-size: 14px !important;
   font-weight: bold !important;
@@ -710,6 +719,7 @@ label.error {
 .transform-button{
   margin-top: 22px !important;
 }
+
 
 /*
 .spinner-container {
