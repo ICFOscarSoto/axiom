@@ -534,20 +534,32 @@ class ERPProductsController extends Controller
  }
 
  /**
- * @Route("/{_locale}/admin/ERP/product/printLabel/{id}", name="printeanlabel")
+ * @Route("/{_locale}/admin/ERP/product/printLabel/{id}/{type}", name="printeanlabel", defaults={"type"=1})
  */
- public function printeanlabel($id){
+ public function printeanlabel($id, $type){
 	 $repository=$this->getDoctrine()->getRepository(ERPEAN13::class);
-	 $ean=$repository->findOneBy(["id"=>$id]);
+	 $repositoryProduct=$this->getDoctrine()->getRepository(ERPProducts::class);
+	 $repositoryVariants=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
 	 $code="";
 	 $barcode="0000000000000";
 	 $name="";
-	 if($ean){
-		 $code=$ean->getProduct()->getCode();
-		 $barcode=$ean->getName();
-		 $name=$ean->getProduct()->getName();
+	 if($type==1){
+		 $ean=$repository->findOneBy(["id"=>$id]);
+		 if($ean){
+			 $code=$ean->getProduct()->getCode();
+			 $barcode=$ean->getName();
+			 $name=$ean->getProduct()->getName();
+		 }
+		 $params=["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "code"=>$code, "barcode"=>$barcode, "name"=>$name, "user"=>$this->getUser()];
+ 	 }else if($type==2){
+		 $product=$repositoryProduct->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany()]);
+	 		if($product){
+	 			$code=$product->getCode();
+	 			$barcode='P.'.str_pad($product->getId(),8,'0', STR_PAD_LEFT);
+	 			$name=$product->getName();
+			}
+			$params=["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "code"=>$code, "barcode"=>$barcode, "name"=>$name, "user"=>$this->getUser()];
 	 }
-	 $params=["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "code"=>$code, "barcode"=>$barcode, "name"=>$name, "user"=>$this->getUser()];
 	 $reportsUtils = new ERPEan13Reports();
 	 $pdf=$reportsUtils->create($params);
 	 return new Response("", 200, array('Content-Type' => 'application/pdf'));

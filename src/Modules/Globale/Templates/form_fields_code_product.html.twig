@@ -1,0 +1,37 @@
+{# CODEPRODUCT FIELDS ETC #}
+  {% if field.codeproduct is defined %}
+
+    <div class="modal fade" id="codeproduct-modal" data-backdrop="static" style="display: none;">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">Codigo barras</h4>
+          </div>
+          <div id="codeproduct-modal-body" class="modal-body">
+            <iframe height="400" width="100%" src="http://devaxiom.ferreteriacampollano.com/es/admin/ERP/product/printLabel/75804/2#zoom=150" type="application/pdf"></iframe>
+          </div>
+          <div id="codeproduct-modal-footer" class="modal-footer">
+            <button type="button" class="btn btn-primary" data-dismiss="modal">Cancelar</button>
+            <button attr-action="" id="codeproduct-modal-button-print" type="button" class="btn btn-red">Imprimir</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      $(document).ready(function() {
+        $("#{{formConstructor.name}}-form-body").find("#form_{{ field.name }}").before("<span id='codeproduct-view-{{formConstructor.name}}-{{ field.name }}' class='select2-selection__view' style='right: 18px;'><i class='fas fa-barcode' aria-hidden='true'></i><span>&nbsp;Etiqueta</span></span>");
+        $('body').on('click',"#codeproduct-view-{{formConstructor.name}}-{{ field.name }}", function (e) {
+          if($("#tab-head-variants").length){
+              //variants product
+               window.location.href = "?tab=variants";
+          }else{
+              //simple product
+              $("#codeproduct-modal").modal('toggle');
+          }
+
+        });
+
+      });
+    </script>
+  {% endif %}

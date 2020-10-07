@@ -4,7 +4,7 @@
 			"name": "Product data",
 			"fields": [
 				{ "name": "productImage", "cols": 3,	"type": "gallery", "imageType":"products", "value": "getImage", "width": "100%",	"height": "300px"},
-				{ "name": "code","cols": 3},
+				{ "name": "code","cols": 3, "codeproduct": true},
 				{ "name": "name","cols": 6},
 				{ "name": "manufacturer","cols": 2, "relation": {"route": "genericdata", "routeparams":{"module":"ERP","name":"Manufacturers"}, "type":"modal"}},
 				{ "name": "supplier","cols": 3, "relation": {"route": "formSupplier", "type":"full"}},

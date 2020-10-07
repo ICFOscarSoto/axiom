@@ -75,6 +75,8 @@
               {{ include("@Globale/form_fields_colour.html.twig") }}
               {# Check if field has a field type number #}
               {{ include("@Globale/form_fields_type_number.html.twig") }}
+              {# Check if field has a codeproduct #}
+              {{ include("@Globale/form_fields_code_product.html.twig") }}
             {% endif %}
         </div>
         {% set counter = counter +1 %}
