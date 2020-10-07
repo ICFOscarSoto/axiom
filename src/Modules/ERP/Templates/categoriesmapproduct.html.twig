@@ -1,0 +1,23 @@
+<script>
+$('body').on('click', "#category-tree-modal-button-continue", function(){
+  if((++load_wait)==1) $("#load-spinner").fadeIn();
+  $.ajax({
+      type: "GET",
+      dataType: "json",
+      url: "/es/ERP/product/category/"+$("#id-parent").val()+"/change/"+$('[id^=cb-categories-]:checked').attr('attr-id'),
+    }).done(function( data, textStatus, jqXHR ) {
+      if((--load_wait)==0) $("#load-spinner").fadeOut();
+      if(data.result) toastr.success("Datos guardados correctamente", "Confirmación", confirmation);
+        else toastr.error("Ocurrió un error al guardar los datos", "Confirmación", confirmation);
+      $("#category-tree-modal").modal('toggle');
+      location.reload();
+  });
+
+
+});
+
+
+$('body').on('click', "#form_selectcategory", function() {
+  showCategoriesMap();
+});
+</script>

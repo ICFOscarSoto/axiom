@@ -439,7 +439,12 @@ Category data: Datos Categoría
 References: Referencias Cruzadas
 Files: Archivos
 NetPrice: Precio Neto
-
+Product data: Información del producto
+Selectcategory: Seleccionar categoría
+Select erpmanufacturers: Seleccionar marca
+Onbuy: Se compra
+Netprice: Neto
+ShoppingPrice: Precio de compra
 #PRICES
 #----------------------------------------------------------------------------------------------------------------------
 Prices: Precios

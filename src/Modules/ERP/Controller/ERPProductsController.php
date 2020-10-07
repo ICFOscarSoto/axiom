@@ -79,16 +79,25 @@ class ERPProductsController extends Controller
 		 */
 		 public function dataProduct($id, $action, Request $request){
 		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-		 $this->denyAccessUnlessGranted('ROLE_ADMIN');
 		 $template=dirname(__FILE__)."/../Forms/Products.json";
 		 $utils = new GlobaleFormUtils();
 		 $utilsObj=new ERPProductsUtils();
 		 $manufacturerRepository= $this->getDoctrine()->getRepository(ERPManufacturers::class);
 		 $manufacturer=$manufacturerRepository->findOneBy(["name"=>"Prueba"]);
-		 $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine());
+		 //$utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine());
+		 $repository=$this->getDoctrine()->getRepository($this->class);
+		 $obj = $repository->findOneBy(['id'=>$id, 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
+		 if($id!=0 && $obj==null){
+		 		return $this->render('@Globale/notfound.html.twig',[]);
+		 }
+		 $classUtils=new ERPProductsUtils();
+		 $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "obj"=>$obj];
+		 $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),$classUtils->getExcludedForm($params),$classUtils->getIncludedForm($params));
+		 $make = $utils->make($id, $this->class, $action, "formProduct", "full", "@Globale/form.html.twig", "formProduct");
+		 return $make;
 
-		 $utils->values(["manufacturer"=>$manufacturer]);
-		 return $utils->make($id, $this->class, $action, "formproducts","full", "@ERP/productform.html.twig", "formProduct");
+		 //$utils->values(["manufacturer"=>$manufacturer]);
+		 //return $utils->make($id, $this->class, $action, "formproducts","full", "@ERP/productform.html.twig", "formProduct");
 
 		}
 
@@ -112,7 +121,7 @@ class ERPProductsController extends Controller
 				if($obj) return $this->redirectToRoute('formProduct', ['id' => $obj->getId()]);
 				else return $this->redirectToRoute('formProduct', ['id' => 0]);
 			}
-			
+
 			$obj = $productRepository->findOneBy(['id'=>$id, 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
 			$product_name=$obj?$obj->getName():'';
 			if ($obj && $obj->getGrouped()) {
@@ -127,7 +136,7 @@ class ERPProductsController extends Controller
 									'id' => $id,
 									'tab' => $request->query->get('tab','data'), //Show initial tab, by default data tab
 									'tabs' => [
-										["name" => "data", "icon"=>"fa fa-id-card", "caption"=>"Products data", "active"=>true, "route"=>$this->generateUrl("formInfoProduct",["id"=>$id])],
+										["name" => "data", "icon"=>"fa fa-id-card", "caption"=>"Products data", "active"=>true, "route"=>$this->generateUrl("dataProduct",["id"=>$id])],
 										["name" => "variants", "icon"=>"fa fa-id-card", "caption"=>"Variants", "route"=>$this->generateUrl("generictablist",["function"=>"formatListByProduct","module"=>"ERP","name"=>"ProductsVariants","id"=>$id])],
 										["name" => "ean13",  "icon"=>"fa fa-users", "caption"=>"EAN13", "route"=>$this->generateUrl("listEAN13",["id"=>$id])],
 										["name" => "references",  "icon"=>"fa fa-users", "caption"=>"References", "route"=>$this->generateUrl("listReferences",["id"=>$id])],
@@ -136,6 +145,7 @@ class ERPProductsController extends Controller
 										["name" => "webproduct", "icon"=>"fa fa-id-card", "caption"=>"Web", "route"=>$this->generateUrl("dataWebProducts",["id"=>$id])],
 										["name" => "files", "icon"=>"fa fa-cloud", "caption"=>"Files", "route"=>$this->generateUrl("cloudfiles",["id"=>$id, "path"=>"products"])]
 										],
+										'include_tab_post_templates' => ['@ERP/categoriesmap.html.twig', '@ERP/categoriesmapproduct.html.twig'],
 										'include_header' => [["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker-es.js"],
 																				["type"=>"css", "path"=>"/js/rickshaw/rickshaw.min.css"]],
 										'include_footer' => [["type"=>"css", "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.css"],
@@ -156,7 +166,7 @@ class ERPProductsController extends Controller
 								'id' => $id,
 								'tab' => $request->query->get('tab','data'), //Show initial tab, by default data tab
 								'tabs' => [
-									["name" => "data", "icon"=>"fa fa-id-card", "caption"=>"Products data", "active"=>true, "route"=>$this->generateUrl("formInfoProduct",["id"=>$id])],
+									["name" => "data", "icon"=>"fa fa-id-card", "caption"=>"Products data", "active"=>true, "route"=>$this->generateUrl("dataProduct",["id"=>$id])],
 									["name" => "ean13",  "icon"=>"fa fa-users", "caption"=>"EAN13", "route"=>$this->generateUrl("listEAN13",["id"=>$id])],
 									["name" => "references",  "icon"=>"fa fa-users", "caption"=>"References", "route"=>$this->generateUrl("listReferences",["id"=>$id])],
 									["name"=>  "productPrices", "icon"=>"fa fa-money", "caption"=>"Prices","route"=>$this->generateUrl("infoProductPrices",["id"=>$id])],
@@ -164,6 +174,7 @@ class ERPProductsController extends Controller
 									["name" => "webproduct", "icon"=>"fa fa-id-card", "caption"=>"Web", "route"=>$this->generateUrl("dataWebProducts",["id"=>$id])],
 									["name" => "files", "icon"=>"fa fa-cloud", "caption"=>"Files", "route"=>$this->generateUrl("cloudfiles",["id"=>$id, "path"=>"products"])]
 									],
+									'include_tab_post_templates' => ['@ERP/categoriesmap.html.twig', '@ERP/categoriesmapproduct.html.twig'],
 									'include_header' => [["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker-es.js"],
 																			["type"=>"css", "path"=>"/js/rickshaw/rickshaw.min.css"]],
 									'include_footer' => [["type"=>"css", "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.css"],

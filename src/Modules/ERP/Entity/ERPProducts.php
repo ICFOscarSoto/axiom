@@ -123,7 +123,7 @@ class ERPProducts
     /**
      * @ORM\Column(type="integer", nullable=true)
      */
-    private $minimumquantityofsale;
+    private $minimumquantityofsale=1;
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPManufacturers")

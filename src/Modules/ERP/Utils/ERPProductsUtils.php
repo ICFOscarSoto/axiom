@@ -34,7 +34,7 @@ class ERPProductsUtils
         'data' => 0
       ]],
       ['selectcategory', ButtonType::class, [
-
+        "attr"=> ["class"=>"transform-button"]
       ]]];
     else $array=[
       ['shoppingdiscounts', TextType::class, [
@@ -45,6 +45,7 @@ class ERPProductsUtils
         'data' => $products->getShoppingDiscount($doctrine)
       ]],
       ['selectcategory', ButtonType::class, [
+        "attr"=> ["class"=>"transform-button"]
       ]]
       ];
 
