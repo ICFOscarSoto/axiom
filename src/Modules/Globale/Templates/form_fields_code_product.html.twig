@@ -8,7 +8,7 @@
             <h4 class="modal-title">Codigo barras</h4>
           </div>
           <div id="codeproduct-modal-body" class="modal-body">
-            <iframe height="400" width="100%" src="http://devaxiom.ferreteriacampollano.com/es/admin/ERP/product/printLabel/75804/2#zoom=150" type="application/pdf"></iframe>
+            <iframe id="codeproduct-iframe" height="400" width="100%" src="" type="application/pdf"></iframe>
           </div>
           <div id="codeproduct-modal-footer" class="modal-footer">
             <button type="button" class="btn btn-primary" data-dismiss="modal">Cancelar</button>
@@ -27,6 +27,7 @@
                window.location.href = "?tab=variants";
           }else{
               //simple product
+              $("#codeproduct-iframe").attr("src", "http://devaxiom.ferreteriacampollano.com/es/admin/ERP/product/printLabel/{{ id }}/2#zoom=150");
               $("#codeproduct-modal").modal('toggle');
           }
 
