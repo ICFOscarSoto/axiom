@@ -167,7 +167,7 @@ class ERPSalesOrdersController extends Controller
 				'date' => ($document->getId()==null)?date('d-m-Y'):$document->getDate()->format('d/m/Y'),
 				'enddate' => ($document->getId()==null)?date('d-m-Y', strtotime(date('d-m-Y'). ' + '.$config->getBudgetexpiration().' '.$config->getBudgetexpirationtype())):$document->getDateofferend()->format('d/m/Y'),
 				'id' => $id,
-				'documentType' => 'sales_budget',
+				'documentType' => 'sales_order',
 				'documentPrefix' => $this->prefix,
 				'document' => $document,
 				'documentLines' => $documentLines,
