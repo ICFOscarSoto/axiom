@@ -75,7 +75,6 @@ class ERPCustomerOrdersDataController extends Controller
 	 */
 	 public function datacustomerOrdersData($id, $parent, $action, Request $request){
 	 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-	 $this->denyAccessUnlessGranted('ROLE_ADMIN');
 	 $template=dirname(__FILE__)."/../Forms/CustomerOrdersData.json";
 	 $utils = new GlobaleFormUtils();
 	 $obj = new $this->class();

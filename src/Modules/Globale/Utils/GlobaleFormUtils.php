@@ -23,12 +23,14 @@ class GlobaleFormUtils extends Controller
 {
   private $ignoredAttributes=array('id','deleted','dateadd','dateupd');
   private $user;
+  private $name;
   private $company;
   private $obj;
   private $obj_old;
   private $request;
   private $controller;
   private $doctrine;
+  private $permissions;
   private $entityManager;
   private $excludedAttributes;
   private $includedAttributes;
@@ -72,6 +74,8 @@ class GlobaleFormUtils extends Controller
     $this->includePostTemplate=$includePostTemplate;
     $this->includePreTemplate=$includePreTemplate;
     $this->history=$history;
+
+    $this->permissions=$this->user->getTemplateData($this->controller->get('kernel'), $this->doctrine);
     //Set active by default in new objects
     //$this->setDefaults();
 
@@ -131,6 +135,12 @@ class GlobaleFormUtils extends Controller
     foreach($this->entityManager->getClassMetadata($class)->fieldMappings as $key=>$value){
       if(!in_array($value['fieldName'],$this->ignoredAttributes)){ //Check if field is not excluded and not ignored
         if($this->searchTemplateField($value['fieldName'])!==false){ //Check if field is in template, otherwise skip it
+
+          //$readonly=false;
+          if(isset($this->permissions["permissions"][$this->name."_field_".$value['fieldName']]) && $this->permissions["permissions"][$this->name."_field_".$value['fieldName']]['allowaccess']==false) {
+            $readonly=true;
+          }else $readonly=false;
+
           switch($value['type']){
             case 'datetime':
             case 'date':
@@ -172,14 +182,14 @@ class GlobaleFormUtils extends Controller
                   break;
                   case 'button':
                     $form->add($field['name'], ButtonType::class, [
-                        'attr' => ['class' => $field["transform"]['class'].' '.isset($field["class"])?$field["class"]:''],
+                        'attr' => ['readonly' => $readonly, 'class' => $field["transform"]['class'].' '.isset($field["class"])?$field["class"]:''],
                     ]);
                   break;
                 }
               }else{
                  //There isnt transformation, check types
-                 $readonly=false;
-                 if(isset($field["readonly"])){
+
+                 if(isset($field["readonly"]) && $readonly==false){
                    if($field["readonly"]===true || $field["readonly"]===false) $readonly=$field["readonly"];
                     else if($field["readonly"]=="noChange"){
                       if($this->obj->{'get'.ucfirst($field["name"])}()==null){
@@ -232,10 +242,10 @@ class GlobaleFormUtils extends Controller
             }
         }
         if(!isset($field["trigger"])) {//If no trigger element, fill it
-          $form->add($value['fieldName'], ChoiceType::class, $this->choiceRelation($value["targetEntity"], $this->obj->{'get'.ucfirst($value["fieldName"])}(),$nullable, $route, $routeType));
+          $form->add($value['fieldName'], ChoiceType::class, $this->choiceRelation($field, $value['fieldName'], $value["targetEntity"], $this->obj->{'get'.ucfirst($value["fieldName"])}(),$nullable, $route, $routeType));
         }else{
           //$form->add($value['fieldName'], TextType::class, ["attr"=>["attr-module"=>$field["module"],"attr-name"=>$field["nameClass"]]]);
-          $form->add($value['fieldName'], ChoiceType::class, $this->choiceRelationTrigger($field,$nullable, $route, $routeType));
+          $form->add($value['fieldName'], ChoiceType::class, $this->choiceRelationTrigger($field, $value['fieldName'],$nullable, $route, $routeType));
         }
       }
     }
@@ -261,6 +271,7 @@ class GlobaleFormUtils extends Controller
   }
 
   public function make($id, $class, $action, $name, $type="full", $render="@Globale/form.html.twig", $returnRoute=null, $utilsClass=null, $includesArray=[]){
+    $this->name=$name;
      if(!($this->obj instanceof $class)){
 				$this->obj=new $class();
 			} else{
@@ -315,6 +326,7 @@ class GlobaleFormUtils extends Controller
              $formView=$this->conversionView($formView);
 						 return $this->controller->render($render, array(
               'id' => $id,
+              "userData"=>$this->permissions,
               'includes' => $includesArray,
               'include_pre_templates' => $this->includePreTemplate,
               'include_post_templates' => $this->includePostTemplate,
@@ -442,7 +454,7 @@ class GlobaleFormUtils extends Controller
 
   }
 
-  public function choiceRelation($class, $data, $nullable, $route=null, $routeType=null){
+  public function choiceRelation($field, $name, $class, $data, $nullable, $route=null, $routeType=null){
     $classname=explode('\\', $class);
     //If class has attribute company apply filter
     if(property_exists($class,'company')){
@@ -453,8 +465,12 @@ class GlobaleFormUtils extends Controller
       }else $choices= (!$this->ajax || $this->obj->getId())?$this->doctrine->getRepository($class)->findAll():null;
     }
 
+    if(isset($this->permissions["permissions"][$this->name."_field_".$name]) && $this->permissions["permissions"][$this->name."_field_".$name]['allowaccess']==false) {
+      $readonly=true;
+    }else $readonly=false;
+
     $result =  [
-                  'attr' => ['class' => 'select2', 'attr-target' => $route, 'attr-target-type' => $routeType],
+                  'attr' => ['class' => 'select2', 'disabled' => $readonly, 'attr-target' => $route, 'attr-target-type' => $routeType],
                   'required' => !$nullable,
                   'choices' => $choices,
                   //if class has attribute lastName concat it with name
@@ -480,7 +496,7 @@ class GlobaleFormUtils extends Controller
   }
 
 
-public function choiceRelationTrigger($field,$nullable, $route=null, $routeType=null){
+public function choiceRelationTrigger($field, $name, $nullable, $route=null, $routeType=null){
   $class="\App\Modules\\".$field["trigger"]["module"]."\\Entity\\".$field["trigger"]["class"];
   $classTrigger="\App\Modules\\".$field["trigger"]["moduleTrigger"]."\\Entity\\".$field["trigger"]["classTrigger"];
   $form=$this->request->request->get('form', null);
@@ -506,8 +522,13 @@ public function choiceRelationTrigger($field,$nullable, $route=null, $routeType=
       $choices= $this->doctrine->getRepository($class)->findBy(array_merge($filter,['active'=>true, 'deleted'=>false]));
     }else $choices= $this->doctrine->getRepository($class)->findAll();
   }
+
+  if(isset($this->permissions["permissions"][$this->name."_field_".$name]) && $this->permissions["permissions"][$this->name."_field_".$name]['allowaccess']==false) {
+    $readonly=true;
+  }else $readonly=false;
+
   $result =  [
-                'attr' => ['class' => 'select2', 'attr-target' => $route, 'attr-target-type' => $routeType],
+                'attr' => ['class' => 'select2', 'disabled' => $readonly, 'attr-target' => $route, 'attr-target-type' => $routeType],
                 'required' => !$nullable,
                 'choices' => $choices,
                 //if class has attribute lastName concat it with name

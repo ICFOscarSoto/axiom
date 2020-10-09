@@ -1,26 +1,26 @@
 <?php
 
-namespace App\Repository\Modules\Globale\Entity;
+namespace App\Modules\Globale\Repository;
 
-use App\Modules\Globale\Entity\GlobalePrinters;
+use App\Modules\Globale\Entity\GlobaleWorkstations;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
- * @method GlobalePrinters|null find($id, $lockMode = null, $lockVersion = null)
- * @method GlobalePrinters|null findOneBy(array $criteria, array $orderBy = null)
- * @method GlobalePrinters[]    findAll()
- * @method GlobalePrinters[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method GlobaleWorkstations|null find($id, $lockMode = null, $lockVersion = null)
+ * @method GlobaleWorkstations|null findOneBy(array $criteria, array $orderBy = null)
+ * @method GlobaleWorkstations[]    findAll()
+ * @method GlobaleWorkstations[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class GlobalePrintersRepository extends ServiceEntityRepository
+class GlobaleWorkstationsRepository extends ServiceEntityRepository
 {
     public function __construct(RegistryInterface $registry)
     {
-        parent::__construct($registry, GlobalePrinters::class);
+        parent::__construct($registry, GlobaleWorkstations::class);
     }
 
     // /**
-    //  * @return GlobalePrinters[] Returns an array of GlobalePrinters objects
+    //  * @return GlobaleWorkstations[] Returns an array of GlobaleWorkstations objects
     //  */
     /*
     public function findByExampleField($value)
@@ -37,7 +37,7 @@ class GlobalePrintersRepository extends ServiceEntityRepository
     */
 
     /*
-    public function findOneBySomeField($value): ?GlobalePrinters
+    public function findOneBySomeField($value): ?GlobaleWorkstations
     {
         return $this->createQueryBuilder('g')
             ->andWhere('g.exampleField = :val')

@@ -27,7 +27,6 @@ class ERPPaymentMethodsController extends Controller
     public function index(RouterInterface $router,Request $request)
     {
        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-  		//$this->denyAccessUnlessGranted('ROLE_ADMIN');
   		$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
   		$locale = $request->getLocale();
   		$this->router = $router;
@@ -58,7 +57,6 @@ class ERPPaymentMethodsController extends Controller
 		 public function data($id, $action, Request $request)
 		 {
 		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-		 $this->denyAccessUnlessGranted('ROLE_ADMIN');
 		 $template=dirname(__FILE__)."/../Forms/PaymentMethods.json";
 		 $utils = new GlobaleFormUtils();
 		 $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine());

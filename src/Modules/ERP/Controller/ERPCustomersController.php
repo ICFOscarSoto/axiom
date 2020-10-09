@@ -39,7 +39,6 @@ class ERPCustomersController extends Controller
       $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 			if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
 
-  		//$this->denyAccessUnlessGranted('ROLE_ADMIN');
   		$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
   		$locale = $request->getLocale();
   		$this->router = $router;
@@ -69,7 +68,6 @@ class ERPCustomersController extends Controller
 		 */
 		 public function data($id, $action, Request $request){
 		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-		 $this->denyAccessUnlessGranted('ROLE_ADMIN');
 		 $template=dirname(__FILE__)."/../Forms/Customers.json";
 		 $utils = new GlobaleFormUtils();
 		 $obj = new $this->class();
@@ -92,7 +90,6 @@ class ERPCustomersController extends Controller
     public function formCustomer($id,Request $request)
     {
       $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-  		$this->denyAccessUnlessGranted('ROLE_ADMIN');
   		$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
   		$locale = $request->getLocale();
   		$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);

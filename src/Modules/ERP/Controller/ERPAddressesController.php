@@ -31,7 +31,6 @@ class ERPAddressesController extends Controller
     public function index($id, $type, RouterInterface $router,Request $request)
     {
        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-  		//$this->denyAccessUnlessGranted('ROLE_ADMIN');
   		$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
   		$locale = $request->getLocale();
   		$this->router = $router;
@@ -60,7 +59,6 @@ class ERPAddressesController extends Controller
 		 public function data($id, $action, $type, $identity, Request $request)
 		 {
 		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-		 $this->denyAccessUnlessGranted('ROLE_ADMIN');
 		 $template=dirname(__FILE__)."/../Forms/Addresses.json";
 		 $utils = new GlobaleFormUtils();
 		 $utilsObj=new $this->utilsClass();

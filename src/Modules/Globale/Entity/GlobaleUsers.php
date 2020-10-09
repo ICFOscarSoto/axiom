@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use \App\Modules\Globale\Entity\GlobaleDiskUsages;
 use \App\Helpers\HelperFiles;
 use \App\Modules\Globale\Entity\GlobalePrinters;
+use \App\Modules\Security\Utils\SecurityUtils;
 
 
 /**
@@ -275,6 +276,7 @@ class GlobaleUsers implements UserInterface
       $data["companyId"]=$connectas==null?$this->getCompany()->getId():$connectas->getId();
       $data["unseenEmails"]=$unseenEmails;
       $data["emailAccounts"]=$emailAccounts;
+      $data["permissions"]=SecurityUtils::getZonePermissions($this, $doctrine);
       if(in_array("ROLE_ADMIN",$this->getRoles())){
         $diskusage=($connectas==null)?$this->getCompany()->getDiskUsages():$connectas->getDiskUsages();
         $data["diskusage"]["space"]=$filesHelper->formatBytes($diskusage[0]->getDiskspace());
@@ -283,7 +285,6 @@ class GlobaleUsers implements UserInterface
         $data["diskusage"]["free_perc"]=round($diskusage[0]->getDiskusage()*100/$diskusage[0]->getDiskspace(),1);
         $data["diskusage"]["distribution"]=json_decode($diskusage[0]->getDistribution(),true);
       }
-
   		return $data;
   	}
 

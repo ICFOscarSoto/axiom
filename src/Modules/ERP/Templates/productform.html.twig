@@ -103,9 +103,8 @@
 			}
 
 			$(document).ready(function() {
-			  	$(".wysiwyg").each(function() {
-					new Jodit("#"+$(this).attr("id"),{});
-				});
+				if($(this).attr("disabled")) new Jodit("#"+$(this).attr("id"),{ readonly: true });
+					else new Jodit("#"+$(this).attr("id"),{});
 
 			});
 			</script>

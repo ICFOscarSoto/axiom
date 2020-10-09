@@ -11,6 +11,7 @@ use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\Email\Entity\EmailAccounts;
 use App\Modules\ERP\Entity\ERPShoppingDiscounts;
 use App\Modules\ERP\Entity\ERPProducts;
+use App\Modules\Security\Utils\SecurityUtils;
 
 class ERPProductsUtils
 {
@@ -24,6 +25,13 @@ class ERPProductsUtils
     $id=$params["id"];
     $productRepository=$doctrine->getRepository(ERPProducts::class);
     $products=$productRepository->findOneBy(["id"=>$id]);
+    $permissions=SecurityUtils::getZonePermissions($user, $doctrine);
+
+    if(isset($permissions['field_form_selectcategory']) && $permissions['field_form_selectcategory']['allowaccess']==false) {
+      $readonly=true;
+    }else $readonly=false;
+
+
     if($products==null)
       $array=[
       ['shoppingdiscounts', TextType::class, [
@@ -34,7 +42,7 @@ class ERPProductsUtils
         'data' => 0
       ]],
       ['selectcategory', ButtonType::class, [
-        "attr"=> ["class"=>"transform-button"]
+        "attr"=> ['disabled' => $readonly, "class"=>"transform-button"]
       ]]];
     else $array=[
       ['shoppingdiscounts', TextType::class, [
@@ -45,7 +53,7 @@ class ERPProductsUtils
         'data' => $products->getShoppingDiscount($doctrine)
       ]],
       ['selectcategory', ButtonType::class, [
-        "attr"=> ["class"=>"transform-button"]
+        "attr"=> ['disabled' => $readonly, "class"=>"transform-button"]
       ]]
       ];
 
