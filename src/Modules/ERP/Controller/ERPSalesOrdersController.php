@@ -144,7 +144,7 @@ class ERPSalesOrdersController extends Controller
 		$breadcrumb=$menurepository->formatBreadcrumb('genericindex','ERP','SalesOrders');
 		array_push($breadcrumb,$new_breadcrumb);
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
-			return $this->render('@ERP/SalesOrders.html.twig', [
+			return $this->render('@ERP/salesorders.html.twig', [
 				'moduleConfig' => $config,
 				'controllerName' => 'categoriesController',
 				'interfaceName' => 'SalesOrders',
