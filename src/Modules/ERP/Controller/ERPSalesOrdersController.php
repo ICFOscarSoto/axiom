@@ -41,7 +41,7 @@ class ERPSalesOrdersController extends Controller
 	private $utilsClass=ERPSalesOrdersUtils::class;
 
 	/**
-	 * @Route("/{_locale}/ERP/SalesOrders/form/{id}", name="ERPSalesOrdersForm", defaults={"id"=0}))
+	 * @Route("/{_locale}/ERP/salesorders/form/{id}", name="ERPSalesOrdersForm", defaults={"id"=0}))
 	 */
 	public function ERPSalesOrdersForm($id, RouterInterface $router,Request $request)
 	{
