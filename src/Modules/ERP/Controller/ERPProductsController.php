@@ -117,8 +117,8 @@ class ERPProductsController extends Controller
 
 			if($request->query->get('code',null)){
 				$obj = $productRepository->findOneBy(['code'=>$request->query->get('code',null), 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
-				if($obj) return $this->redirectToRoute('formProduct', ['id' => $obj->getId()]);
-				else return $this->redirectToRoute('formProduct', ['id' => 0]);
+				if($obj) return $this->redirectToRoute($request->get('_route'), ['id' => $obj->getId()]);
+				else return $this->redirectToRoute($request->get('_route'), ['id' => 0]);
 			}
 
 			$obj = $productRepository->findOneBy(['id'=>$id, 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
