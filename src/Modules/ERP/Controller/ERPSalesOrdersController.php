@@ -56,6 +56,12 @@ class ERPSalesOrdersController extends Controller
 		$documentRepository=$this->getDoctrine()->getRepository(ERPSalesOrders::class);
 		$documentLinesRepository=$this->getDoctrine()->getRepository(ERPSalesOrdersLines::class);
 
+		if($request->query->get('code',null)){
+			$obj = $documentRepository->findOneBy(['code'=>$request->query->get('code',null), 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
+			if($obj) return $this->redirectToRoute($request->get('_route'), ['id' => $obj->getId()]);
+			else return $this->redirectToRoute($request->get('_route'), ['id' => 0]);
+		}
+
 		$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
 		$locale = $request->getLocale();
 		$this->router = $router;
