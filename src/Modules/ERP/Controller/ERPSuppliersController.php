@@ -95,7 +95,7 @@ class ERPSuppliersController extends Controller
     	$supplierrRepository=$this->getDoctrine()->getRepository($this->class);
 
 			if($request->query->get('code',null)){
-				$obj = $contactrRepository->findOneBy(['code'=>$request->query->get('code',null), 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
+				$obj = $supplierrRepository->findOneBy(['code'=>$request->query->get('code',null), 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
 				if($obj) return $this->redirectToRoute($request->get('_route'), ['id' => $obj->getId()]);
 				else return $this->redirectToRoute($request->get('_route'), ['id' => 0]);
 			}
