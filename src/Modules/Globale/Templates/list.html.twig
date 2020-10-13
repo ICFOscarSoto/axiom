@@ -351,6 +351,13 @@
 
 	<!-- BUTTON ZONE -->
 	{{ include('@Globale/list_button_top_paint.html.twig') }}
+
+	{% if include_pre_list_templates is defined %}
+		{% for template in include_pre_list_templates %}
+			{{ include(template) }}
+		{% endfor %}
+	{% endif %}
+
 	<table id="{{ listConstructor.id }}" class="table table-bordered hover stripe compact datatable" style="width: 100%">
 			<thead class="table-thead">
 				<tr>

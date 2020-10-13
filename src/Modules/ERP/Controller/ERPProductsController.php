@@ -64,6 +64,7 @@ class ERPProductsController extends Controller
   				'breadcrumb' =>  $menurepository->formatBreadcrumb($request->get('_route')),
   				'userData' => $userdata,
   				'lists' => $templateLists,
+					'include_pre_list_templates' => ['@ERP/product_barcode_search.html.twig'],
 					'include_post_templates' => ['@ERP/categoriesmap.html.twig','@ERP/productlistcategories.html.twig'],
 					'include_footer' => [["type"=>"css", "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.css"],
 															 ["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.js"],

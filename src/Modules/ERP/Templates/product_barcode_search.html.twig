@@ -1,0 +1,41 @@
+<div class="panel panel-default" data-collapsed="0">
+    <div class="panel-body">
+      <div class="col-md-4">
+        <label for="product_barcode_search" class="required">Código de barras</label>
+      	<div class="input-group minimal">
+      		<div class="input-group-addon">
+      			<i class="fas fa-barcode"></i>
+      		</div>
+      		<input id="product_barcode_search" name="product_barcode_search" type="text" class="form-control timepicker">
+      	</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  $(document).ready(function() {
+    $("#product_barcode_search").on('keypress',function(e) {
+        if(e.which == 13) {
+          $.ajax({
+             url: '{{ url('getProduct') }}',
+             type: 'POST',
+             data: "barcode="+$(this).val(),
+             success:  function( data ) {
+               if((--load_wait)==0) $("#load-spinner").fadeOut();
+               $("#product_barcode_search").val("");
+               if(data.result){
+                 if(data.result==-1)
+                  toastr.info("No se ha encontrado el producto", "Confirmación", confirmation);
+                  else toastr.error("Ocurrio un error inesperado al buscar el producto", "Confirmación", confirmation);
+               } else {
+                 if(data.id){
+                   window.location.href="/es/admin/global/product/form/"+data.id;
+                 }
+               }
+             }
+           });
+        }
+    });
+
+  });
+  </script>
