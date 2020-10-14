@@ -8,7 +8,7 @@ use \App\Modules\ERP\Entity\ERPStores;
 use \App\Modules\Globale\Entity\GlobaleUsers;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\Modules\ERP\Entity\ERPStoresUsersRepository")
+ * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPStoresUsersRepository")
  */
 class ERPStoresUsers
 {

@@ -1,13 +1,124 @@
 <div class="panel minimal">
-  <div class="panel-heading">
-        <div class="panel-title">Almacenes</div>
-  </div>
-  <div class="panel-body">
-    <div class="col-md-12">
-      {% set basiclist=stocklist %}
-      {{ include('@Globale/basiclist.html.twig') }}
-    </div>
-  </div>
+        {% for store in storelist %}
+        <div class="col-md-12">
+          <div class="panel panel-default panel-shadow" {% if store.preferential=="0" %}data-collapsed="1"{% endif %} style="-webkit-box-shadow: none; box-shadow:none; padding:0px;">
+              <div class="panel-heading">
+                <div class="panel-title">
+                <bold>{{store.name}} <span style="font-weight:600;">(TOTAL: {{ store.total }} unidades)</span></bold>
+                </div>
+                <div class="panel-options" style="padding: 0px 10px; margin-top: -7px;">
+    						    <a href="#" data-rel="collapse"><i class="entypo-down-open"></i></a>
+    					  </div>
+              </div>
+              <div class="panel-body">
+
+              {% if variantes is not null %}
+      						{% for variant in  store.variants %}
+                <div class="col-md-6">
+                    <div class="panel-title variant-title">
+                      <bold>{{variant.type}} {{variant.name}}</bold>
+                    </div>
+
+                    {% if variant.locations is not empty %}
+                      <table class="table stock-table">
+                        <thead>
+                          <tr>
+                              <th>Ubicación</th>
+                              <th>Stock</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                            {% for location in variant.locations %}
+                            <tr>
+                              <td style="width:50%;">{{ location.store_location }}</td>
+                              <td style="width:50%;">{{ location.quantity }}</td>
+                            </tr>
+                            {% endfor %}
+                            <tr>
+                              <td style="width:50%;">Total:</td>
+                              <td style="width:50%;">{{variant.total}}</td>
+                            </tr>
+                        </tbody>
+                      </table>
+                    {% else %}
+                    <table class="table stock-table">
+                      <thead>
+                        <tr>
+                            <th>Ubicación</th>
+                            <th>Stock</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                          <tr>
+                            <td>--</td>
+                            <td>--</td>
+                          </tr>
+                          <tr>
+                            <td style="width:50%;">Total:</td>
+                            <td style="width:50%;">0</td>
+                          </tr>
+                      </tbody>
+                    </table>
+
+                    {% endif %}
+
+                  </div>
+                  {% endfor %}
+
+              {% else %}
+
+                  {% if store.locations is not empty %}
+                    <table class="table stock-table">
+                      <thead>
+                        <tr>
+                            <th>Ubicación</th>
+                            <th>Cantidad</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                          {% for location in store.locations %}
+                          <tr>
+                            <td style="width:50%;">{{ location.store_location }}</td>
+                            <td style="width:50%;">{{ location.quantity }}</td>
+                          </tr>
+                          {% endfor %}
+                          <tr style="color:#272626;">
+                            <td style="width:50%;">Total</td>
+                            <td style="width:50%;">{{ store.total }}</td>
+                          </tr>
+                      </tbody>
+                    </table>
+                  {% else %}
+                  <table class="table stock-table">
+                    <thead>
+                      <tr>
+                          <th>Ubicación</th>
+                          <th>Cantidad</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                          <td style="width:50%;">--</td>
+                          <td style="width:50%;">--</td>
+                        </tr>
+                    </tbody>
+                  </table>
+
+                  {% endif %}
+
+
+              {% endif %}
+
+
+
+
+
+
+              </div>
+        </div>
+      </div>
+        {% endfor %}
+
 </div>
 <div class="panel minimal">
   <div class="panel-heading">
