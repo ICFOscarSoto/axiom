@@ -6,7 +6,7 @@
       		<div class="input-group-addon">
       			<i class="fas fa-barcode"></i>
       		</div>
-      		<input id="product_barcode_search" name="product_barcode_search" type="text" class="form-control timepicker">
+      		<input id="product_barcode_search" name="product_barcode_search" type="text" class="form-control" autofocus>
       	</div>
       </div>
     </div>
@@ -14,6 +14,8 @@
 
   <script>
   $(document).ready(function() {
+    $("#product_barcode_search").focus();
+
     $("#product_barcode_search").on('keypress',function(e) {
         if(e.which == 13) {
           $.ajax({
