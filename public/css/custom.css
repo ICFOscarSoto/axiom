@@ -365,8 +365,8 @@ table.dataTable.dtr-inline.collapsed > tbody > tr > td:first-child:before, table
 
 .stock-table  > tbody > tr > td{
   font-size:16px;
-  font-weight: 600;
 }
+
 
 .table-bordered > tfoot > tr > td{
   font-size: 14px !important;
@@ -720,6 +720,12 @@ label.error {
   margin-top: 22px !important;
 }
 
+
+.variant-title{
+  padding:8px;
+  background: #ffe9e9;
+  font-weight: 600;
+}
 
 /*
 .spinner-container {

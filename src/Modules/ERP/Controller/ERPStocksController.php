@@ -14,6 +14,7 @@ use App\Modules\ERP\Entity\ERPStocks;
 use App\Modules\ERP\Entity\ERPStockHistory;
 use App\Modules\ERP\Entity\ERPStores;
 use App\Modules\ERP\Entity\ERPStoreLocations;
+use App\Modules\ERP\Entity\ERPStoresUsers;
 use App\Modules\ERP\Entity\ERPCategories;
 use App\Modules\ERP\Entity\ERPProducts;
 use App\Modules\ERP\Entity\ERPEAN13;
@@ -72,35 +73,119 @@ class ERPStocksController extends Controller
 		 */
 		public function infoStocks($id, Request $request){
 			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-			$stocksReposiitory= $this->getDoctrine()->getRepository($this->class);
-			$stocks=$stocksReposiitory->stocksByStores($id);
-			foreach($stocks as $key=>$i){
-				$stocks[$key]["Acciones"]="<button>Ir</button>";
+
+			$stores_usersRepository=$this->getDoctrine()->getRepository(ERPStoresUsers::class);
+			$stores_by_user=$stores_usersRepository->getStoreByUser($this->getUser()->getId());
+			$stocksRepository= $this->getDoctrine()->getRepository($this->class);
+
+			$productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
+			$product=$productRepository->findOneBy(["id"=>$id]);
+
+			$isgrouped=$product->getGrouped();
+			if($isgrouped){
+
+				$variants=$productRepository->getVariants($product->getId());
+
+				$store_locations=array();
+				foreach($stores_by_user as $store){
+					foreach ($variants as $variant) {
+						$locations_array=$stocksRepository->getStocksByProduct($product->getId(),$variant["id"],$store["id"]);
+						$item=[];
+						foreach($locations_array as $location){
+								$item[]=$location;
+							}
+
+							$aux2["name"]=$variant["name"];
+							$aux2["type"]=$variant["type"];
+							$aux2["total"]=$stocksRepository->findStockByProductVariantStore($product->getId(),$variant["id"],$store["id"]);
+							$aux2["locations"]=$item;
+							$item_variants[]=$aux2;
+							$item=[];
+							$aux2=[];
+						}
+
+						$aux["name"]=$store["name"];
+						$aux["total"]=$stocksRepository->findStockByProductStore($product->getId(),$store["id"]);
+						$aux["preferential"]=$store["preferential"];
+						$aux["variants"]=$item_variants;
+						$store_locations[]=$aux;
+						$item_variants=[];
+						$aux=[];
+
+					}
+
+					$stocks=$stocksRepository->stocksByStores($id);
+	 			  $repositoryHistory=$this->getDoctrine()->getRepository(ERPStockHistory::class);
+					$history=$repositoryHistory->findHistory($id);
+					$stockHistory=Array();
+
+					foreach($history as $history_line){
+									 $item['Fecha']=$history_line['dateadd'];
+									 $item['Código']=$history_line['product_code'];
+						 			 $item['Nombre']=$history_line['product_name'];
+						 			 $item['Ubicación']=$history_line['location'];
+						 			 $item['Almacén']=$history_line['store'];
+						 			 $item['Stock Previo']=$history_line['prevqty'];
+						 			 $item['Stock Final']=$history_line['newqty'];
+									 $item['Usuario']=$history_line['user'];
+						 			 $stockHistory[]=$item;
+					}
+
+
+
+
+					return $this->render('@ERP/infoStocks.html.twig', array(
+										'storelist'=>$store_locations,
+										'id'=>$id,
+										'variantes' => $variants,
+										'historylist' => $stockHistory
+					));
+
 			}
+			else{
 
-		$repositoryHistory=$this->getDoctrine()->getRepository(ERPStockHistory::class);
- 		 $history=$repositoryHistory->findHistory($id);
- 		 $stockHistory=Array();
+						$store_locations=array();
+						foreach($stores_by_user as $store){
+								$locations_array=$stocksRepository->getStocksByProduct($product->getId(),null,$store["id"]);
+										foreach($locations_array as $location){
+												$item[]=$location;
+												//$item["location"]=$item2;
+											}
+								$aux["name"]=$store["name"];
+								$aux["total"]=$stocksRepository->findStockByProductStore($product->getId(),$store["id"]);
+								$aux["preferential"]=$store["preferential"];
+								$aux["locations"]=$item;
+								$store_locations[]=$aux;
+								$locations_array=[];
+								$item=[];
+								$aux=[];
+							}
 
- 		 foreach($history as $history_line){
-			 $item['Fecha']=$history_line['dateadd'];
-			 $item['Código']=$history_line['product_code'];
- 			 $item['Nombre']=$history_line['product_name'];
- 			 $item['Ubicación']=$history_line['location'];
- 			 $item['Almacén']=$history_line['store'];
- 			 $item['Stock Previo']=$history_line['prevqty'];
- 			 $item['Stock Final']=$history_line['newqty'];
-			 $item['Usuario']=$history_line['user'];
- 			 $stockHistory[]=$item;
- 		 }
+					$stocks=$stocksRepository->stocksByStores($id);
+	 			  $repositoryHistory=$this->getDoctrine()->getRepository(ERPStockHistory::class);
+					$history=$repositoryHistory->findHistory($id);
+					$stockHistory=Array();
 
-		 //dump($stockHistory);
+					foreach($history as $history_line){
+									 $item['Fecha']=$history_line['dateadd'];
+									 $item['Código']=$history_line['product_code'];
+						 			 $item['Nombre']=$history_line['product_name'];
+						 			 $item['Ubicación']=$history_line['location'];
+						 			 $item['Almacén']=$history_line['store'];
+						 			 $item['Stock Previo']=$history_line['prevqty'];
+						 			 $item['Stock Final']=$history_line['newqty'];
+									 $item['Usuario']=$history_line['user'];
+						 			 $stockHistory[]=$item;
+					}
 
-			return $this->render('@ERP/infoStocks.html.twig', array(
-				'stocklist'=>$stocks,
-				'id'=>$id,
-				'historylist' => $stockHistory
-			));
+					return $this->render('@ERP/infoStocks.html.twig', array(
+										'storelist'=>$store_locations,
+										'id'=>$id,
+										'variantes' => null,
+										'historylist' => $stockHistory
+					));
+
+				}
 		}
 
 

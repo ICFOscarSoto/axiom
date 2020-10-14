@@ -44,11 +44,19 @@ class ERPStocksRepository extends ServiceEntityRepository
     }
 
     public function stocksByStore($product, $store){
+      $query="SELECT a.code Store, IFNULL (SUM(s.quantity),0) Quantity
+              FROM erpstores a
+              LEFT JOIN erpstore_locations u ON a.id=u.store_id
+              LEFT JOIN erpstocks s ON u.id=s.storelocation_id AND s.product_id= :product
+              WHERE a.active=TRUE and a.deleted=0 AND a.id=:store
+              GROUP BY a.name";
+      /*
       $query="SELECT IFNULL (SUM(s.quantity),0) Quantity
               FROM erpstores a LEFT JOIN erpstore_locations u ON a.id=u.store_id
               LEFT JOIN erpstocks s ON u.id=s.storelocation_id AND s.product_id= :product
               WHERE a.active=TRUE and a.deleted=0 and a.code= :store
               GROUP BY a.name";
+              */
       $params=['product' => $product->getId(), 'store' =>$store];
       return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
     }
@@ -112,8 +120,7 @@ class ERPStocksRepository extends ServiceEntityRepository
 
     public function getStocksByProduct($product, $variant, $store){
 
-      if($variant==null)
-      {
+      if($variant==null){
         $query='SELECT stk.quantity as quantity, stl.name as store_location, str.name as store
         FROM erpstocks stk
         LEFT JOIN erpstore_locations stl
@@ -136,6 +143,17 @@ class ERPStocksRepository extends ServiceEntityRepository
         return $this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
 
       }
+
+    }
+
+    public function findStockByProductVariantStore($product, $variant, $store){
+      $query='SELECT SUM(stk.quantity) as TOTAL
+      FROM erpstocks stk
+      LEFT JOIN erpstore_locations stl
+      ON stl.id=stk.storelocation_id
+      WHERE stk.product_id='.$product.' AND stk.productvariant_id='.$variant.' AND stl.store_id='.$store.' AND stk.active=1 AND stk.deleted=0';
+      return $this->getEntityManager()->getConnection()->executeQuery($query)->fetchColumn(0);
+
 
     }
 

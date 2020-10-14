@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repository\Modules\ERP\Entity;
+namespace App\Modules\ERP\Repository;
 
 use App\Modules\ERP\Entity\ERPStoresUsers;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -47,4 +47,13 @@ class ERPStoresUsersRepository extends ServiceEntityRepository
         ;
     }
     */
+
+    public function getStoreByUser($user){
+      $query="SELECT s.name name,s.id id, su.preferential preferential
+            FROM erpstores_users su
+            LEFT JOIN erpstores s ON s.id=su.store_id
+            WHERE su.user_id=:user AND s.active=1 AND s.deleted=0 AND su.active=1 AND su.deleted=0";
+      $params=['user' => $user];
+      return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+    }
 }
