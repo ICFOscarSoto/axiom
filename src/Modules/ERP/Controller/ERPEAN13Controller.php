@@ -91,9 +91,11 @@ class ERPEAN13Controller extends Controller
     $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(),"supplier"=>null, "product"=>null, "productvariant"=>null];
     $formUtils->initialize($this->getUser(), ERPEAN13::class, dirname(__FILE__)."/../Forms/EAN13.json", $request, $this, $this->getDoctrine(),method_exists($listEAN13,'getExcludedForm')?$listEAN13->getExcludedForm($params):[],method_exists($listEAN13,'getIncludedForm')?$listEAN13->getIncludedForm($params):[]);
 		$templateForms[]=$formUtils->formatForm('EAN13', true, null, ERPEAN13::class);
+    $userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
     return $this->render('@Globale/list.html.twig', array(
       'listConstructor' => $listEAN13->formatListByProduct($id),
       'id_object'=>$id,
+      'userData' => $userdata,
       'forms' => $templateForms
     ));
   }
