@@ -144,6 +144,7 @@ class ERPStocksController extends Controller
 
 						$store_locations=array();
 						foreach($stores_by_user as $store){
+								$item=[];
 								$locations_array=$stocksRepository->getStocksByProduct($product->getId(),null,$store["id"]);
 										foreach($locations_array as $location){
 												$item[]=$location;
