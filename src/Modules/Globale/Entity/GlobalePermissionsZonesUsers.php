@@ -3,13 +3,13 @@
 namespace App\Modules\Globale\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use \App\Modules\Globale\Entity\GlobaleCompanies;
-use \App\Modules\Globale\Entity\GlobaleWorkstations;
+use \App\Modules\Globale\Entity\GlobaleUsers;
+use \App\Modules\Globale\Entity\GlobalePermissionsZones;
 
 /**
- * @ORM\Entity(repositoryClass="App\Modules\Globale\Repository\GlobalePrintersRepository")
+ * @ORM\Entity(repositoryClass="App\Modules\Globale\Repository\GlobalePermissionsZonesUsersRepository")
  */
-class GlobalePrinters
+class GlobalePermissionsZonesUsers
 {
     /**
      * @ORM\Id()
@@ -19,26 +19,21 @@ class GlobalePrinters
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCompanies")
+     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleUsers")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $company;
+    private $user;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleWorkstations")
+     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobalePermissionsZones")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $workstation;
+    private $permissionzone;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="boolean")
      */
-    private $name;
-
-    /**
-     * @ORM\Column(type="smallint")
-     */
-    private $type;
+    private $allowaccess;
 
     /**
      * @ORM\Column(type="boolean")
@@ -60,60 +55,43 @@ class GlobalePrinters
      */
     private $dateupd;
 
-    /**
-     * @ORM\Column(type="string", length=150)
-     */
-    private $size;
-
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getCompany(): ?GlobaleCompanies
+    public function getUser(): ?GlobaleUsers
     {
-        return $this->company;
+        return $this->user;
     }
 
-    public function setCompany(?GlobaleCompanies $company): self
+    public function setUser(?GlobaleUsers $user): self
     {
-        $this->company = $company;
+        $this->user = $user;
 
         return $this;
     }
 
-    public function getWorkstation(): ?GlobaleWorkstations
+    public function getPermissionzone(): ?GlobalePermissionsZones
     {
-        return $this->workstation;
+        return $this->permissionzone;
     }
 
-    public function setWorkstation(?GlobaleWorkstations $workstation): self
+    public function setPermissionzone(?GlobalePermissionsZones $permissionzone): self
     {
-        $this->workstation = $workstation;
+        $this->permissionzone = $permissionzone;
 
         return $this;
     }
 
-    public function getName(): ?string
+    public function getAllowaccess(): ?bool
     {
-        return $this->name;
+        return $this->allowaccess;
     }
 
-    public function setName(string $name): self
+    public function setAllowaccess(bool $allowaccess): self
     {
-        $this->name = $name;
-
-        return $this;
-    }
-
-    public function getType(): ?int
-    {
-        return $this->type;
-    }
-
-    public function setType(int $type): self
-    {
-        $this->type = $type;
+        $this->allowaccess = $allowaccess;
 
         return $this;
     }
@@ -162,18 +140,6 @@ class GlobalePrinters
     public function setDateupd(\DateTimeInterface $dateupd): self
     {
         $this->dateupd = $dateupd;
-
-        return $this;
-    }
-
-    public function getSize(): ?string
-    {
-        return $this->size;
-    }
-
-    public function setSize(string $size): self
-    {
-        $this->size = $size;
 
         return $this;
     }

@@ -40,6 +40,16 @@
 
   },
   {
+      "name": "totalbase",
+      "caption": "Base",
+      "unity": "€",
+      "format": "float",
+      "sum": true,
+      "class" : "dt-right min-tablet",
+      "width": "50%"
+
+  },
+  {
       "name": "total",
       "caption": "Total",
       "unity": "€",

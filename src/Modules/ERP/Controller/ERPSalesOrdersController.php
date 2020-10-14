@@ -41,7 +41,7 @@ class ERPSalesOrdersController extends Controller
 	private $utilsClass=ERPSalesOrdersUtils::class;
 
 	/**
-	 * @Route("/{_locale}/ERP/SalesOrders/form/{id}", name="ERPSalesOrdersForm", defaults={"id"=0}))
+	 * @Route("/{_locale}/ERP/salesorders/form/{id}", name="ERPSalesOrdersForm", defaults={"id"=0}))
 	 */
 	public function ERPSalesOrdersForm($id, RouterInterface $router,Request $request)
 	{
@@ -55,6 +55,12 @@ class ERPSalesOrdersController extends Controller
 		$seriesRepository=$this->getDoctrine()->getRepository(ERPSeries::class);
 		$documentRepository=$this->getDoctrine()->getRepository(ERPSalesOrders::class);
 		$documentLinesRepository=$this->getDoctrine()->getRepository(ERPSalesOrdersLines::class);
+
+		if($request->query->get('code',null)){
+			$obj = $documentRepository->findOneBy(['code'=>$request->query->get('code',null), 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
+			if($obj) return $this->redirectToRoute($request->get('_route'), ['id' => $obj->getId()]);
+			else return $this->redirectToRoute($request->get('_route'), ['id' => 0]);
+		}
 
 		$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
 		$locale = $request->getLocale();
@@ -144,7 +150,7 @@ class ERPSalesOrdersController extends Controller
 		$breadcrumb=$menurepository->formatBreadcrumb('genericindex','ERP','SalesOrders');
 		array_push($breadcrumb,$new_breadcrumb);
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
-			return $this->render('@ERP/SalesOrders.html.twig', [
+			return $this->render('@ERP/salesorders.html.twig', [
 				'moduleConfig' => $config,
 				'controllerName' => 'categoriesController',
 				'interfaceName' => 'SalesOrders',
@@ -161,7 +167,7 @@ class ERPSalesOrdersController extends Controller
 				'date' => ($document->getId()==null)?date('d-m-Y'):$document->getDate()->format('d/m/Y'),
 				'enddate' => ($document->getId()==null)?date('d-m-Y', strtotime(date('d-m-Y'). ' + '.$config->getBudgetexpiration().' '.$config->getBudgetexpirationtype())):$document->getDateofferend()->format('d/m/Y'),
 				'id' => $id,
-				'documentType' => 'sales_budget',
+				'documentType' => 'sales_order',
 				'documentPrefix' => $this->prefix,
 				'document' => $document,
 				'documentLines' => $documentLines,

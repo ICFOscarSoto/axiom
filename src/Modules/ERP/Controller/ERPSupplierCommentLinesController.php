@@ -207,7 +207,6 @@ public function supplierincidents($id, RouterInterface $router,Request $request)
 		   if($suppliercommentlines)
 			 {
 				 $this_id=$suppliercommentlines->getId();
-					//$this->denyAccessUnlessGranted('ROLE_ADMIN');
 		  		$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
 					$locale = $request->getLocale();
 					$this->router = $router;
@@ -230,7 +229,6 @@ public function supplierincidents($id, RouterInterface $router,Request $request)
 
 				else{
 						 $this_id=0;
-						 //$this->denyAccessUnlessGranted('ROLE_ADMIN');
 						 $userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
 						 $locale = $request->getLocale();
 						 $this->router = $router;

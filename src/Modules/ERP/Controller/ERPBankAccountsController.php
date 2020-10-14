@@ -38,7 +38,6 @@ class ERPBankAccountsController extends Controller
 			 if($bankAccounts)
 			 {
 			 $this_id=$bankAccounts->getId();
-  		//$this->denyAccessUnlessGranted('ROLE_ADMIN');
   		$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
   		$locale = $request->getLocale();
   		$this->router = $router;
@@ -63,7 +62,6 @@ class ERPBankAccountsController extends Controller
 
 				else{
 				 $this_id=0;
-				 //$this->denyAccessUnlessGranted('ROLE_ADMIN');
 				 $userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
 				 $locale = $request->getLocale();
 				 $this->router = $router;
@@ -111,7 +109,6 @@ class ERPBankAccountsController extends Controller
 		 public function data($id, $action, $identity, Request $request)
 		 {
 		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-		 $this->denyAccessUnlessGranted('ROLE_ADMIN');
 		 $template=dirname(__FILE__)."/../Forms/BankAccounts.json";
 		 $utils = new GlobaleFormUtils();
 		 $utilsObj=new $this->utilsClass();

@@ -199,33 +199,37 @@
 						{% endfor %}
 						{% set counter = 1 %}
 						{% for field in listConstructor.fieldButtons %}
-						{
-							"targets": {{ listConstructor.fields|length+counter }},
-							"orderable": false,
-							"width": "10px",
-							"className": "text-right",
-							"render": function(data, type, row, meta){
-									var buttons='';
-									{% if field.type is defined and field.type=="option" %}
-										{% for fieldOption in field.options %}
-											if(Array.isArray(row["{{ fieldOption.condition }}"]))
-											buttons+='<div class="btn-group {% if fieldOption.condition is defined %}'+((row["{{ fieldOption.condition }}"][0]*1 != "{{ fieldOption.conditionValue }}"*1) ? 'hide' : '')+'{% endif %}">	<button attr-id="'+row['id']+'" id="{{ listConstructor.id }}-field-button-{{ fieldOption.id }}-'+row['id']+'" type="button" class="{% if field.default is defined and field.default==true %}default-action{% endif %} btn btn-{{ fieldOption.type }} tooltip-primary" {% if field.tooltip is defined %} data-toggle="tooltip" data-placement="bottom" title="" data-original-title=" {{ field.tooltip }} {% endif %}';
-											else
-											buttons+='<div class="btn-group {% if fieldOption.condition is defined %}'+((row["{{ fieldOption.condition }}"]*1 != "{{ fieldOption.conditionValue }}"*1) ? 'hide' : '')+'{% endif %}">	<button attr-id="'+row['id']+'" id="{{ listConstructor.id }}-field-button-{{ fieldOption.id }}-'+row['id']+'" type="button" class="{% if field.default is defined and field.default==true %}default-action{% endif %} btn btn-{{ fieldOption.type }} tooltip-primary"';
-											buttons+='{% if fieldOption.tooltip is defined and fieldOption.tooltip != "" %} data-toggle="tooltip" data-placement="bottom" title="" data-original-title=" {{ fieldOption.tooltip }} {% endif %}"';
-											buttons+='{% if fieldOption.confirm is defined %}{% if fieldOption.confirm == true %}  onclick="jQuery(\'#{{ listConstructor.id }}-modal-confirm\').modal(\'show\', {backdrop: \'static\'});" {% endif %}{% endif %}>';
-											buttons+='<i class="{{ fieldOption.icon }}"></i></button></div>	';
-									{% endfor %}
-									{% else %}
-										buttons+='<div class="btn-group {% if field.condition is defined %}'+((row["{{ field.condition }}"]*1 != "{{ field.conditionValue }}"*1) ? 'hide' : '')+'{% endif %}">	<button attr-id="'+row['id']+'" id="{{ listConstructor.id }}-field-button-{{ field.id }}-'+row['id']+'" type="button" class="{% if field.default is defined and field.default==true %}default-action{% endif %} btn btn-{{ field.type }} tooltip-primary"';
-										buttons+='{% if field.tooltip is defined and field.tooltip != "" %} data-toggle="tooltip" data-placement="bottom" title="" data-original-title=" {{ field.tooltip }} {% endif %}"';
-										buttons+='{% if field.confirm is defined %}{% if field.confirm == true %}  onclick="jQuery(\'#{{ listConstructor.id }}-modal-confirm\').modal(\'show\', {backdrop: \'static\'});" {% endif %}{% endif %}>';
-										buttons+='<i class="{{ field.icon }}"></i></button></div>	';
-									{% endif %}
-  							 return buttons;
-								}
-						},
-						{% set counter = counter +1 %}
+							{% if userData.permissions[listConstructor.id ~ '_field_' ~ field.id] is not defined or (userData.permissions[listConstructor.id ~ '_field_' ~ field.id] is defined and userData.permissions[listConstructor.id ~ '_field_' ~ field.id].allowaccess == true) %}
+							{
+								"targets": {{ listConstructor.fields|length+counter }},
+								"orderable": false,
+								"width": "10px",
+								"className": "text-right",
+								"render": function(data, type, row, meta){
+										var buttons='';
+
+										{% if field.type is defined and field.type=="option" %}
+											{% for fieldOption in field.options %}
+												if(Array.isArray(row["{{ fieldOption.condition }}"]))
+												buttons+='<div class="btn-group {% if fieldOption.condition is defined %}'+((row["{{ fieldOption.condition }}"][0]*1 != "{{ fieldOption.conditionValue }}"*1) ? 'hide' : '')+'{% endif %}">	<button attr-id="'+row['id']+'" id="{{ listConstructor.id }}-field-button-{{ fieldOption.id }}-'+row['id']+'" type="button" class="{% if field.default is defined and field.default==true %}default-action{% endif %} btn btn-{{ fieldOption.type }} tooltip-primary" {% if field.tooltip is defined %} data-toggle="tooltip" data-placement="bottom" title="" data-original-title=" {{ field.tooltip }} {% endif %}';
+												else
+												buttons+='<div class="btn-group {% if fieldOption.condition is defined %}'+((row["{{ fieldOption.condition }}"]*1 != "{{ fieldOption.conditionValue }}"*1) ? 'hide' : '')+'{% endif %}">	<button attr-id="'+row['id']+'" id="{{ listConstructor.id }}-field-button-{{ fieldOption.id }}-'+row['id']+'" type="button" class="{% if field.default is defined and field.default==true %}default-action{% endif %} btn btn-{{ fieldOption.type }} tooltip-primary"';
+												buttons+='{% if fieldOption.tooltip is defined and fieldOption.tooltip != "" %} data-toggle="tooltip" data-placement="bottom" title="" data-original-title=" {{ fieldOption.tooltip }} {% endif %}"';
+												buttons+='{% if fieldOption.confirm is defined %}{% if fieldOption.confirm == true %}  onclick="jQuery(\'#{{ listConstructor.id }}-modal-confirm\').modal(\'show\', {backdrop: \'static\'});" {% endif %}{% endif %}>';
+												buttons+='<i class="{{ fieldOption.icon }}"></i></button></div>	';
+										{% endfor %}
+										{% else %}
+											buttons+='<div class="btn-group {% if field.condition is defined %}'+((row["{{ field.condition }}"]*1 != "{{ field.conditionValue }}"*1) ? 'hide' : '')+'{% endif %}">	<button attr-id="'+row['id']+'" id="{{ listConstructor.id }}-field-button-{{ field.id }}-'+row['id']+'" type="button" class="{% if field.default is defined and field.default==true %}default-action{% endif %} btn btn-{{ field.type }} tooltip-primary"';
+											buttons+='{% if field.tooltip is defined and field.tooltip != "" %} data-toggle="tooltip" data-placement="bottom" title="" data-original-title=" {{ field.tooltip }} {% endif %}"';
+											buttons+='{% if field.confirm is defined %}{% if field.confirm == true %}  onclick="jQuery(\'#{{ listConstructor.id }}-modal-confirm\').modal(\'show\', {backdrop: \'static\'});" {% endif %}{% endif %}>';
+											buttons+='<i class="{{ field.icon }}"></i></button></div>	';
+										{% endif %}
+
+	  							 return buttons;
+									}
+							},
+							{% set counter = counter +1 %}
+							{% endif %}
 						{% endfor %}
 
 
@@ -347,6 +351,13 @@
 
 	<!-- BUTTON ZONE -->
 	{{ include('@Globale/list_button_top_paint.html.twig') }}
+
+	{% if include_pre_list_templates is defined %}
+		{% for template in include_pre_list_templates %}
+			{{ include(template) }}
+		{% endfor %}
+	{% endif %}
+
 	<table id="{{ listConstructor.id }}" class="table table-bordered hover stripe compact datatable" style="width: 100%">
 			<thead class="table-thead">
 				<tr>
@@ -457,7 +468,9 @@
 					{% endfor %}
 
 					{% for field in listConstructor.fieldButtons %}
-						<th class="table-thead" width="10px" style="border-bottom: 1px solid #cecece !important;"></th>
+						{% if userData.permissions[listConstructor.id ~ '_field_' ~ field.id] is not defined or (userData.permissions[listConstructor.id ~ '_field_' ~ field.id] is defined and userData.permissions[listConstructor.id ~ '_field_' ~ field.id].allowaccess == true) %}
+							<th class="table-thead" width="10px" style="border-bottom: 1px solid #cecece !important;"></th>
+						{% endif %}
 					{% endfor %}
 
 			</thead>
@@ -476,7 +489,9 @@
 				{% endfor %}
 
 				{% for field in listConstructor.fieldButtons %}
-					<td class="table-footer"></td>
+					{% if userData.permissions[listConstructor.id ~ '_field_' ~ field.id] is not defined or (userData.permissions[listConstructor.id ~ '_field_' ~ field.id] is defined and userData.permissions[listConstructor.id ~ '_field_' ~ field.id].allowaccess == true) %}
+						<td class="table-footer"></td>
+					{% endif %}
 				{% endfor %}
 
 			</tr>

@@ -180,7 +180,7 @@ class ERPEAN13Controller extends Controller
   * @Route("/{_locale}/admin/ERP/barcode/{id}/delete", name="deleteEAN")
   */
   public function deleteEAN($id){
-    $this->denyAccessUnlessGranted('ROLE_ADMIN');
+    $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
     $entityUtils=new GlobaleEntityUtils();
     $repositoryEAN=$this->getDoctrine()->getRepository(ERPEAN13::class);
     $ean=$repositoryEAN->findOneBy(["id"=>$id]);

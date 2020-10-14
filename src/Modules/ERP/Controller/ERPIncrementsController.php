@@ -22,14 +22,14 @@ use App\Modules\ERP\Entity\ERPSuppliers;
 
 class ERPIncrementsController extends Controller
 {
-	
+
 		private $class=ERPIncrements::class;
-		private $utilsClass=ERPIncrementsUtils::class;		
+		private $utilsClass=ERPIncrementsUtils::class;
 		/**
 		* @Route("/api/globale/suppliercategoriestrigger", name="suppliercategoriestrigger", defaults={"id"=0})
 		*/
 		public function suppliercategoriestrigger(Request $request){
-			if ($this->get('security.authorization_checker')->isGranted('ROLE_ADMIN')) {
+					$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 					 $id = $request->request->get("id");
 					 $referencesRepository = $this->getDoctrine()->getRepository(ERPReferences::class);
 					 $products_ids=$referencesRepository->ProductsBySupplier($id);
@@ -40,12 +40,12 @@ class ERPIncrementsController extends Controller
 						 $categoria=$productObj->getCategory();
 						 $arrayCat[]=$categoria;
 			 	 	}
-			 
+
 			 $return=[];
-			 
+
 			// dump($arrayCat);
 			 foreach($arrayCat as $category){
-				 
+
 				 if($category->getParentid()!=NULL) $category=$category->getParentid();
 				 while($category->getParentid()!=NULL)
 				 {
@@ -53,7 +53,7 @@ class ERPIncrementsController extends Controller
 						$category=$category->getParentid();
 				 }
 				 $arrayCat[]=$category;
-				 
+
 			 }
 			// $array_total= array_values(array_unique($arrayCat));
 			$aux=[];
@@ -65,16 +65,12 @@ class ERPIncrementsController extends Controller
 					 	$return[]=$option;
 					 	array_push($aux,$category);
 					}
-		 		
+
 				}
 	 				return new JsonResponse($return);
-		 	}
-		 
-			 else{
-				 return new JsonResponse([]);
-			 }
-		 
+
+
 		 }
-		 
-	
+
+
 }

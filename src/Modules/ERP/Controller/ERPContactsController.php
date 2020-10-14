@@ -31,7 +31,6 @@ class ERPContactsController extends Controller
     public function index($id, RouterInterface $router,Request $request)
     {
        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-  		//$this->denyAccessUnlessGranted('ROLE_ADMIN');
   		$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
   		$locale = $request->getLocale();
   		$this->router = $router;
@@ -52,8 +51,8 @@ class ERPContactsController extends Controller
   		}
   		return new RedirectResponse($this->router->generate('app_login'));
     }
-		
-	
+
+
 
 		/**
 		 * @Route("/{_locale}/contact/data/{id}/{action}/{identity}", name="dataContacts", defaults={"id"=0, "action"="read", "identity"=0})
@@ -61,7 +60,6 @@ class ERPContactsController extends Controller
 		 public function data($id, $action, $identity, Request $request)
 		 {
 		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-		 $this->denyAccessUnlessGranted('ROLE_ADMIN');
 		 $template=dirname(__FILE__)."/../Forms/Contacts.json";
 		 $utils = new GlobaleFormUtils();
 		 $utilsObj=new $this->utilsClass();
@@ -79,7 +77,7 @@ class ERPContactsController extends Controller
 		 												method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
 		 return $utils->make($id, $this->class, $action, "formIdentities", "modal");
 		}
-		
+
     /**
     * @Route("/api/global/contact/{id}/get", name="getContact")
     */

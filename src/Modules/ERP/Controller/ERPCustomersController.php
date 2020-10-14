@@ -39,7 +39,6 @@ class ERPCustomersController extends Controller
       $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 			if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
 
-  		//$this->denyAccessUnlessGranted('ROLE_ADMIN');
   		$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
   		$locale = $request->getLocale();
   		$this->router = $router;
@@ -69,7 +68,6 @@ class ERPCustomersController extends Controller
 		 */
 		 public function data($id, $action, Request $request){
 		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-		 $this->denyAccessUnlessGranted('ROLE_ADMIN');
 		 $template=dirname(__FILE__)."/../Forms/Customers.json";
 		 $utils = new GlobaleFormUtils();
 		 $obj = new $this->class();
@@ -92,12 +90,18 @@ class ERPCustomersController extends Controller
     public function formCustomer($id,Request $request)
     {
       $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-  		$this->denyAccessUnlessGranted('ROLE_ADMIN');
   		$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
   		$locale = $request->getLocale();
   		$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
 			$breadcrumb=$menurepository->formatBreadcrumb('customers');
     	$contactrRepository=$this->getDoctrine()->getRepository($this->class);
+
+			if($request->query->get('code',null)){
+				$obj = $contactrRepository->findOneBy(['code'=>$request->query->get('code',null), 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
+				if($obj) return $this->redirectToRoute($request->get('_route'), ['id' => $obj->getId()]);
+				else return $this->redirectToRoute($request->get('_route'), ['id' => 0]);
+			}
+
 			$obj = $contactrRepository->findOneBy(['id'=>$id, 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
 			$entity_name=$obj?$obj->getSocialName():'';
 			return $this->render('@Globale/generictabform.html.twig', array(

@@ -37,18 +37,22 @@
         {% if tabs is defined %}
 	      <ul id="tabs-list" class="nav nav-tabs bordered"><!-- available classes "bordered", "right-aligned" -->
           {% for tabitem in tabs %}
-						<li class="{% if tab is defined and tabitem.name == tab %}active{% endif %}" id="tab-head-{{ tabitem.name }}" style="{% if not (tabitem.active is defined and tabitem.active == true) and id == 0 %}display:none;{% endif %}" attr-id="{{ id }}" attr-name="{{ tabitem.name }}" attr-route="{% if tabitem.route is defined %}{{ tabitem.route }}{% endif %}">
-							<a href="#tab-body-{{ tabitem.name }}" data-toggle="tab">
-								<span class="visible-xs"><i class="{{ tabitem.icon }}"></i></span>
-								<span class="hidden-xs">{{ (tabitem.caption)|trans }}</span>
-							</a>
-						</li>
-          {% endfor %}
+						{% if userData.permissions[app.request.attributes.get('_route') ~ '_tab_' ~ tabitem.name] is not defined or (userData.permissions[app.request.attributes.get('_route') ~ '_tab_' ~ tabitem.name] is defined and userData.permissions[app.request.attributes.get('_route') ~ '_tab_' ~ tabitem.name].allowaccess == true) %}
+							<li class="{% if tab is defined and tabitem.name == tab %}active{% endif %}" id="tab-head-{{ tabitem.name }}" style="{% if not (tabitem.active is defined and tabitem.active == true) and id == 0 %}display:none;{% endif %}" attr-id="{{ id }}" attr-name="{{ tabitem.name }}" attr-route="{% if tabitem.route is defined %}{{ tabitem.route }}{% endif %}">
+								<a href="#tab-body-{{ tabitem.name }}" data-toggle="tab">
+									<span class="visible-xs"><i class="{{ tabitem.icon }}"></i></span>
+									<span class="hidden-xs">{{ (tabitem.caption)|trans }}</span>
+								</a>
+							</li>
+						{% endif %}
+					{% endfor %}
 				</ul>
 					<div class="tab-content">
             {% for tabitem in tabs %}
-  						<div class="tab-pane {% if tab is defined and tabitem.name == tab %}active{% endif %}" style="{% if not (tabitem.active is defined and tabitem.active == true) and id == 0 %}display:none;{% endif %}" id="tab-body-{{ tabitem.name }}">
-  	          </div>
+							{% if userData.permissions[app.request.attributes.get('_route') ~ '_tab_' ~ tabitem.name] is not defined or (userData.permissions[app.request.attributes.get('_route') ~ '_tab_' ~ tabitem.name] is defined and userData.permissions[app.request.attributes.get('_route') ~ '_tab_' ~ tabitem.name].allowaccess == true) %}
+	  						<div class="tab-pane {% if tab is defined and tabitem.name == tab %}active{% endif %}" style="{% if not (tabitem.active is defined and tabitem.active == true) and id == 0 %}display:none;{% endif %}" id="tab-body-{{ tabitem.name }}">
+	  	          </div>
+							{% endif %}
             {% endfor %}
 	        </div>
         {% endif %}

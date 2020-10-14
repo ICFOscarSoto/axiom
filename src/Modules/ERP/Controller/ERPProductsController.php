@@ -46,7 +46,6 @@ class ERPProductsController extends Controller
     {
       $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 			if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
-  		//$this->denyAccessUnlessGranted('ROLE_ADMIN');
   		$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
   		$locale = $request->getLocale();
   		$this->router = $router;
@@ -65,6 +64,7 @@ class ERPProductsController extends Controller
   				'breadcrumb' =>  $menurepository->formatBreadcrumb($request->get('_route')),
   				'userData' => $userdata,
   				'lists' => $templateLists,
+					'include_pre_list_templates' => ['@ERP/product_barcode_search.html.twig'],
 					'include_post_templates' => ['@ERP/categoriesmap.html.twig','@ERP/productlistcategories.html.twig'],
 					'include_footer' => [["type"=>"css", "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.css"],
 															 ["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.js"],
@@ -118,8 +118,8 @@ class ERPProductsController extends Controller
 
 			if($request->query->get('code',null)){
 				$obj = $productRepository->findOneBy(['code'=>$request->query->get('code',null), 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
-				if($obj) return $this->redirectToRoute('formProduct', ['id' => $obj->getId()]);
-				else return $this->redirectToRoute('formProduct', ['id' => 0]);
+				if($obj) return $this->redirectToRoute($request->get('_route'), ['id' => $obj->getId()]);
+				else return $this->redirectToRoute($request->get('_route'), ['id' => 0]);
 			}
 
 			$obj = $productRepository->findOneBy(['id'=>$id, 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);

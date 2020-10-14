@@ -68,7 +68,6 @@ class ERPCustomerCommercialTermsController extends Controller
 	 */
 	 public function datacustomerCommercialTerms($id, $parent, $action, Request $request){
 	 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-	 $this->denyAccessUnlessGranted('ROLE_ADMIN');
 	 $template=dirname(__FILE__)."/../Forms/CustomerCommercialTerms.json";
 	 $utils = new GlobaleFormUtils();
 	 $obj = new $this->class();

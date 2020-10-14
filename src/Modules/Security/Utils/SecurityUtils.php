@@ -5,9 +5,12 @@ use App\Modules\Globale\Entity\GlobaleModules;
 use App\Modules\Globale\Entity\GlobaleUsers;
 use App\Modules\Globale\Entity\GlobaleUsersUserGroups;
 use App\Modules\Globale\Entity\GlobalePermissionsZones;
+use App\Modules\Globale\Entity\GlobalePermissionsZonesUsers;
+use App\Modules\Globale\Entity\GlobalePermissionsZonesUserGroups;
 use App\Modules\Globale\Entity\GlobalePermissionsRoutes;
 use App\Modules\Globale\Entity\GlobalePermissionsRoutesUsers;
 use App\Modules\Globale\Entity\GlobalePermissionsRoutesUserGroups;
+
 
 class SecurityUtils
 {
@@ -58,7 +61,45 @@ class SecurityUtils
 
   }
 
-  public function checkZonePermissions($module, $name, $user, $doctrine){
-    return true;
+  public function getZonePermissions($user, $doctrine){
+    $modulesRepository=$doctrine->getRepository(GlobaleModules::class);
+    $userRepository=$doctrine->getRepository(GlobaleUsers::class);
+    $userUsersGroupsRepository=$doctrine->getRepository(GlobaleUsersUserGroups::class);
+    $zonesRepository=$doctrine->getRepository(GlobalePermissionsZones::class);
+    $zonesUserRepository=$doctrine->getRepository(GlobalePermissionsZonesUsers::class);
+    $zonesUserGroupsRepository=$doctrine->getRepository(GlobalePermissionsZonesUserGroups::class);
+
+    $permissionZones=$zonesRepository->findBy(["active"=>1, "deleted"=>0]);
+    $permissions=[];
+    foreach($permissionZones as $permissionZone){
+      $permissions[$permissionZone->getName()]=["allowaccess" => false];
+      //Allow all for user global
+      if(in_array('ROLE_GLOBAL',$user->getRoles())){
+        $permissions[$permissionZone->getName()]=["allowaccess" => true];
+        continue;
+      }
+
+      //Check if user has explicit policies
+      if($permissions[$permissionZone->getName()]["allowaccess"]==false){
+        $userpolicy=$zonesUserRepository->findOneBy(["permissionzone"=>$permissionZone, "user"=>$user, "active"=>1, "deleted"=>0]);
+        if($userpolicy){
+            $permissions[$permissionZone->getName()]=["allowaccess" => $userpolicy->getAllowaccess()==1?true:false];
+        }
+      }
+
+      //No explicit user policy or set to inherit group, check groups policies
+      if($permissions[$permissionZone->getName()]["allowaccess"]==false){
+        $userGroups=$userUsersGroupsRepository->findBy(["user"=>$user, "active"=>1, "deleted"=>0]);
+        foreach($userGroups as $userGroup){
+          $grouppolicy=$zonesUserGroupsRepository->findOneBy(["permissionzone"=>$permissionZone, "usergroup"=>$userGroup->getUsergroup(), "active"=>1, "deleted"=>0]);
+          if($grouppolicy && $grouppolicy->getAllowaccess()){
+              $permissions[$permissionZone->getName()]=["allowaccess" => true];
+              continue;
+          }
+        }
+      }
+
+    }
+    return $permissions;
   }
 }
