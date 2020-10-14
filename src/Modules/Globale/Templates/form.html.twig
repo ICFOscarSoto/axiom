@@ -11,7 +11,7 @@
     </div>
     <div style="text-align: right;" class="col-md-6">
       <button attr-id="" attr-action="" id="{{formConstructor.name}}-button-cancel" type="button" class="btn btn">{{ ("Cancelar")|trans }}</button>
-      {% if (userData.permissions[formConstructor.name ~ '_save'] is defined and userData.permissions[formConstructor.name ~ '_save'].allowaccess == true) %}
+      {% if userData.permissions[formConstructor.name ~ '_save'] is not defined or (userData.permissions[formConstructor.name ~ '_save'] is defined and userData.permissions[formConstructor.name ~ '_save'].allowaccess == true) %}
         <button attr-id="" attr-action="" id="{{formConstructor.name}}-button-save" type="button" class="btn btn-green">{{ ("Guardar")|trans }}</button>
       {% endif %}
     </div>
@@ -117,7 +117,7 @@
   <div class="row">
     <div style="text-align: right;" class="col-md-12">
       <button attr-id="" attr-action="" id="{{formConstructor.name}}-button-cancel-bottom" type="button" class="btn btn">{{ ("Cancelar")|trans }}</button>
-      {% if (userData.permissions[formConstructor.name ~ '_save'] is defined and userData.permissions[formConstructor.name ~ '_save'].allowaccess == true) %}
+      {% if userData.permissions[formConstructor.name ~ '_save'] is not defined or (userData.permissions[formConstructor.name ~ '_save'] is defined and userData.permissions[formConstructor.name ~ '_save'].allowaccess == true) %}
         <button attr-id="" attr-action="" id="{{formConstructor.name}}-button-save-bottom" type="button" class="btn btn-green">{{ ("Guardar")|trans }}</button>
       {% endif %}
     </div>
@@ -128,7 +128,7 @@
 <script>
 
 	$(document).ready(function() {
-    {% if (userData.permissions[formConstructor.name ~ '_save'] is defined and userData.permissions[formConstructor.name ~ '_save'].allowaccess == true) %}
+    {% if userData.permissions[formConstructor.name ~ '_save'] is not defined or (userData.permissions[formConstructor.name ~ '_save'] is defined and userData.permissions[formConstructor.name ~ '_save'].allowaccess == true) %}
       $('body').on('click', "[id^='{{formConstructor.name}}-button-save']", function() {
             if($("#{{formConstructor.name}}-form-body").find('form').valid()){
               if((++load_wait)==1) $("#load-spinner").fadeIn();

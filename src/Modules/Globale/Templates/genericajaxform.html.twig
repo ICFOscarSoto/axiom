@@ -22,7 +22,7 @@
 					{% endfor %}
 					{% endif %}
 					<button type="button" class="btn btn-primary" data-dismiss="modal">{{ ("Cancelar")|trans }}</button>
-					  {% if (userData.permissions[formConstructor.name ~ '_save'] is defined and userData.permissions[formConstructor.name ~ '_save'].allowaccess == true) %}
+					  {% if userData.permissions[formConstructor.name ~ '_save'] is not defined or (userData.permissions[formConstructor.name ~ '_save'] is defined and userData.permissions[formConstructor.name ~ '_save'].allowaccess == true) %}
 							<button attr-id="" attr-action="" id="{{ form.id }}-button-continue" type="button" class="btn btn-red">{{ ("Guardar")|trans }}</button>
 						{% endif %}
 				</div>
