@@ -11,7 +11,6 @@
     					  </div>
               </div>
               <div class="panel-body">
-
               {% if variantes is not null %}
       						{% for variant in  store.variants %}
                 <div class="col-md-6">
@@ -64,9 +63,7 @@
 
                   </div>
                   {% endfor %}
-
               {% else %}
-
                   {% if store.locations is not empty %}
                     <table class="table stock-table">
                       <thead>
@@ -103,17 +100,8 @@
                         </tr>
                     </tbody>
                   </table>
-
                   {% endif %}
-
-
               {% endif %}
-
-
-
-
-
-
               </div>
         </div>
       </div>
