@@ -66,6 +66,8 @@ class NavisionGetProducts extends ContainerAwareCommand
         $this->importEAN13($input, $output);
       }
       break;
+      case 'names': $this->updateNames($input, $output);
+      break;
       case 'ean13': $this->importEAN13($input, $output);
       break;
       case 'references': $this->importReferences($input, $output);
@@ -494,7 +496,6 @@ public function importStocks(InputInterface $input, OutputInterface $output) {
               $stock_old->setDateupd(new \Datetime());
               $this->doctrine->getManager()->merge($stock_old);
             }
-
             else {
               $location=$repositoryStoreLocations->findOneBy(["name"=>$stock["almacen"]]);
               if($location!=null){
@@ -510,7 +511,6 @@ public function importStocks(InputInterface $input, OutputInterface $output) {
               $obj->setActive(1);
               $obj->setDeleted(0);
               $this->doctrine->getManager()->merge($obj);}
-
             }
             $this->doctrine->getManager()->flush();
             $this->doctrine->getManager()->clear();
@@ -1160,5 +1160,53 @@ public function createOwnBarcodes(InputInterface $input, OutputInterface $output
 
 }
 
+
+
+public function updateNames(InputInterface $input, OutputInterface $output){
+  //------   Create Lock Mutex    ------
+  if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+      $fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetProducts-updateNames.lock', 'c');
+  } else {
+      $fp = fopen('/tmp/axiom-navisionGetProducts-updateNames.lock', 'c');
+  }
+  if (!flock($fp, LOCK_EX | LOCK_NB)) {
+    $output->writeln('* Fallo al iniciar la actualización de nombres: El proceso ya esta en ejecución.');
+    exit;
+  }
+  //------   Critical Section START   ------
+  $navisionSyncRepository=$this->doctrine->getRepository(NavisionSync::class);
+  $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"updateNames"]);
+  if ($navisionSync==null) {
+    $navisionSync=new NavisionSync();
+    $navisionSync->setEntity("updateNames");
+    $navisionSync->setMaxtimestamp(0);
+  }
+  $datetime=new \DateTime();
+  $output->writeln('* Actualizando nombres....');
+  $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-updateNamesProducts.php?from='.$navisionSync->getMaxtimestamp());
+  $objects=json_decode($json, true);
+  $objects=$objects[0];
+  foreach ($objects["class"] as $object){
+    $productsRepository=$this->doctrine->getRepository(ERPProducts::class);
+    $product=$productsRepository->findOneBy(["code"=>$object["code"]]);
+    if ($product!=null){
+      $output->writeln('* Actualizando el nombre del producto '.$object["code"]);
+      $json2=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getProduct.php?product='.$object["code"]);
+      $objects2=json_decode($json2, true);
+      $objects2=$objects2[0];
+      if (!empty($objects2["class"])) $product->setName($objects2["class"][0]["Description"]);
+      $product->setDateupd(new \Datetime());
+      $this->doctrine->getManager()->merge($product);
+      $this->doctrine->getManager()->flush();
+      $this->doctrine->getManager()->clear();
+    }
+
+  }
+
+  $navisionSync->setLastsync($datetime);
+  $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
+  $this->doctrine->getManager()->persist($navisionSync);
+  $this->doctrine->getManager()->flush();
+}
 }
 ?>
