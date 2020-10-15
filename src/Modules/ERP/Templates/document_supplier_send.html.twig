@@ -1,0 +1,86 @@
+<div class="modal fade" tabindex="-1" id="document-send-form" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content" style="transform: matrix(1, 0, 0, 1, 0, 0);">
+        <div class="modal-header">
+          <h4 class="modal-title">{{ ('Document send')|trans }}</h4>
+        </div>
+        <div id="document-send-modal-form-body" style="padding: 0px 10px;">
+          {{ include('@Email/email_compose_mini_editor.html.twig') }}
+        </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+$(document).ready(function() {
+  $('body').on('click', "#document-button-email", function(e) {
+
+    $("#subject").val("{{ (documentType|trans)|capitalize }} "+$("#document-form-code").val());
+    wysihtml5Editor.value="<p>Estimado proveedor,</p><p>adjuntamos {{ documentType|trans }} número "+$("#document-form-code").val()+"</p>"+"<p>Saludos, atentamente</p><!-- start:"+token+" --><!-- end:"+token+" -->";
+    getSignature();
+    jsonFiles=[];
+    //Prepare document
+    if((++load_wait)==1) $("#load-spinner").fadeIn();
+    $.ajax({
+       url: '{{ sendRoute }}',
+       type: 'POST',
+       success:  function( data ) {
+         //Get customer addresses
+         if(data.result){
+           if((++load_wait)==1) $("#load-spinner").fadeIn();
+           $.ajax({
+              url: '{{ url('getERPEmailAddress') }}/'+$("#customer-form-id").val(),
+              type: 'POST',
+              success:  function( data ) {
+                 $('#mail-addresses').empty().trigger("change");
+                 var newOption = new Option("Introducir manualmente", "", false, false);
+                 $('#mail-addresses').append(newOption).trigger('change');
+                  var select=false;
+                  jQuery.each(data.adresses, function(i, item) {
+                    var newOption = new Option(item, item, select==false?true:false, select==false?true:false);
+                    select=true;
+                    $('#mail-addresses').append(newOption).trigger('change');
+                  });
+                  $("#document-send-form").modal('show');
+                },
+                complete: function(data){
+                  if((--load_wait)==0) $("#load-spinner").fadeOut();
+                }
+            });
+          }else toastr.error("Ocurrio un error al generar el documento", "Confirmación", confirmation);
+        },
+        complete: function(data){
+          if((--load_wait)==0) $("#load-spinner").fadeOut();
+        }
+
+     });
+     jsonFiles=['{{ documentPrefix }}'+$('#document-form-code').val()+'.pdf'];
+
+
+  });
+
+  $( "#form-send-mail" ).on( "submit", function( event ) {
+    $("#document-send-form").modal('hide');
+  });
+
+  $('#btn-discard-mail').click(function(){
+    $("#document-send-form").modal('hide');
+  });
+
+  $("#mail-addresses").on("change", function(event){
+    addressesChange();
+  });
+
+  function addressesChange(){
+    if($("#mail-addresses").val()==""){
+      $("#to").val("");
+      $("#to").parent().show();
+    }else{
+      $("#to").val($("#mail-addresses").val());
+      $("#to").parent().hide();
+    }
+  }
+  addressesChange();
+});
+</script>

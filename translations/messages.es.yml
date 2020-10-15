@@ -354,10 +354,17 @@ deadlines: Nº de plazos
 # SALESBUDGETS
 #----------------------------------------------------------------------------------------------------------------------
 SalesBudgets: Presupuestos
+SalesOrders: Pedidos
 sales_budget: presupuesto
 sales_order: pedido
 sales_deliverynote: albarán
 sales_invoice: factura
+PurchasesBudgets: Presupuestos compra
+PurchasesOrders: Pedidos compra
+purchases_budget: presupuesto compra
+purchases_order: pedido compra
+purchases_deliverynote: albarán compra
+purchases_invoice: factura compra
 
 #COURSES
 #----------------------------------------------------------------------------------------------------------------------

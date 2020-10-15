@@ -149,6 +149,7 @@ class NavisionGetSalesBudgets extends ContainerAwareCommand
          $obj->setAuthor($author);
          $obj->setAgent($agent);
          $obj->setVat($object["vat"]);
+         $obj->setStatus($object["status"]);
          $obj->setCustomername($object["customername"]);
          $obj->setCustomeraddress($object["customeraddress"]);
          $obj->setCustomercountry($customer?$customer->getCountry():null);

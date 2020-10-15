@@ -20,6 +20,9 @@
           <div class="form-group" style="margin-bottom: 0px;">
             <div class="input-group" >
               <a class="btn btn-white" attr-id="{{ line.linenum }}" id="product-form-remove-{{ line.linenum }}" style="position: absolute;height: 31px;left: 0px;padding: 9px 7px;z-index: 10;" href="#"> <i class="fa fa-remove"></i></a>
+              {% if line.product is not null %}
+                <span id="product-form-view-{{ line.linenum }}" class="select2-selection__view_nolabel" style="right: 42px !important; width: 32px !important;" attr-id="{{ line.product.id }}" attr-url="{{ url('formProduct',{'id':'_____'}) }}"><i class="fa fa-file-text-o" aria-hidden="true"></i><span>&nbsp;</span></span>
+              {% endif %}
               <input type="hidden" attr-id="{{ line.linenum }}" id="product-form-line-id-{{ line.linenum }}" value={% if line!=null %}{{ line.id }}{% endif %}><input type="hidden" attr-id="{{ line.linenum }}" id="product-form-id-{{ line.linenum }}" value={% if line.product!=null %}{{ line.product.id }}{% endif %}><input type="text" attr-id="{{ line.linenum }}" id="product-form-code-{{ line.linenum }}" class="form-control" style="padding-left: 28px; border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Cod. Producto" value="{{ line.code }}">
               <div class="input-group-btn"><button type="button" attr-id="{{ line.linenum }}" id="product-search-button-{{ line.linenum }}" class="btn btn-white" style="height: 31px; border-radius: 0px;"><i class="fa fa-search"></i> </button></div>
             </div>
@@ -54,3 +57,14 @@
 
   </div>
 </div>
+<script>
+$('body').on('click', "[id^='product-form-view-']", function(e){
+  var id=$(this).attr("attr-id");
+    if(id!=0 && id!=""){
+      url=$(this).attr("attr-url");
+      url=url.replace('_____',$(this).attr("attr-id"));
+      var win = window.open(url, '_blank');
+      win.focus();
+    }
+});
+</script>

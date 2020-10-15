@@ -1,0 +1,4 @@
+[
+  {"id": "editPruchasesBudgets", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"ERPPurchasesBudgetsForm", "actionType" : "foreground", "confirm" :false, "tooltip":""},
+  {"id": "delete", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"genericdelete", "routeParams":{"module":"ERP", "name":"PurchasesBudgets"}, "confirm" :true, "undo" :false, "tooltip":"Borrar presupuesto", "actionType" : "background"}
+]

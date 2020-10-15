@@ -1,0 +1,12 @@
+[{
+	"sections": [
+		{
+			"name": "Purchases Budgets data",
+			"fields": [
+				{ "name": "supplier", "cols": 4}
+			]
+		}
+
+
+	]
+}]

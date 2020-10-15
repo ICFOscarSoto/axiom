@@ -16,7 +16,7 @@
       <input type="hidden" id="customer-form-taxexempt" value="{% if document.taxexempt %}true{% else %}false{% endif %}" class="form-control">
       <input type="hidden" id="customer-form-surcharge" value="{% if document.surcharge %}true{% else %}false{% endif %}" class="form-control">
       <div class="col-md-6"> <div class="form-group">
-        <span id="customer-form-view" class="select2-selection__view_nolabel" style="" attr-id=0 attr-url="{{ url('formCustomer',{'id':'_____'}) }}"><i class="fa fa-file-text-o" aria-hidden="true"></i><span>&nbsp;Ver Ficha</span></span>
+        <span id="customer-form-view" class="select2-selection__view_nolabel" style="" attr-id="{{ document.customer.id }}" attr-url="{{ url('formCustomer',{'id':'_____'}) }}"><i class="fa fa-file-text-o" aria-hidden="true"></i><span>&nbsp;Ver Ficha</span></span>
         <script>
         $('body').on('click', "#customer-form-view", function(e){
           var id=$(this).attr("attr-id");
