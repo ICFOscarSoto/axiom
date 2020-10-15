@@ -4,14 +4,13 @@
           <div class="panel panel-default panel-shadow" {% if store.preferential=="0" %}data-collapsed="1"{% endif %} style="-webkit-box-shadow: none; box-shadow:none; padding:0px;">
               <div class="panel-heading">
                 <div class="panel-title">
-                <bold>{{store.name}} <span style="font-weight:600;">(TOTAL: {{ store.total }} unidades)</span></bold>
+                <bold>{{store.name}}{% if store.total is not null %}<span style="font-weight:600;"> (TOTAL: {{ store.total }} unidades)</span>{% endif %}</bold>
                 </div>
                 <div class="panel-options" style="padding: 0px 10px; margin-top: -7px;">
     						    <a href="#" data-rel="collapse"><i class="entypo-down-open"></i></a>
     					  </div>
               </div>
               <div class="panel-body">
-
               {% if variantes is not null %}
       						{% for variant in  store.variants %}
                 <div class="col-md-6">
@@ -64,9 +63,7 @@
 
                   </div>
                   {% endfor %}
-
               {% else %}
-
                   {% if store.locations is not empty %}
                     <table class="table stock-table">
                       <thead>
@@ -103,17 +100,8 @@
                         </tr>
                     </tbody>
                   </table>
-
                   {% endif %}
-
-
               {% endif %}
-
-
-
-
-
-
               </div>
         </div>
       </div>
