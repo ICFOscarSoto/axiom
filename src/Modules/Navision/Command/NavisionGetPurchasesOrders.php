@@ -157,7 +157,7 @@ class NavisionGetPurchasesOrders extends ContainerAwareCommand
          if($agent==NULL) $agent=$author;
          $obj->setAuthor($author);
          $obj->setAgent($agent);
-         $obj->setVat($object["vat"]);
+         $obj->setVat(preg_replace("/[^a-zA-Z0-9]/", "", $object["vat"]));
          $obj->setSuppliername($object["suppliername"]);
          $obj->setSupplieraddress($object["supplieraddress"]);
          $obj->setSuppliercountry($supplier?$supplier->getCountry():null);
