@@ -5,20 +5,15 @@ namespace App\Modules\ERP\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
 use \App\Modules\Globale\Entity\GlobaleUsers;
-use \App\Modules\ERP\Entity\ERPCustomers;
-use \App\Modules\Globale\Entity\GlobaleCurrencies;
-use \App\Modules\ERP\Entity\ERPFinancialYears;
-use \App\Modules\ERP\Entity\ERPPaymentMethods;
+use \App\Modules\ERP\Entity\ERPSuppliers;
 use \App\Modules\Globale\Entity\GlobaleCountries;
-use \App\Modules\ERP\Entity\ERPCustomerGroups;
-use \App\Modules\ERP\Entity\ERPSalesOrders;
-use \App\Modules\ERP\Entity\ERPSeries;
-use \App\Modules\ERP\Entity\ERPSalesBudgets;
+use \App\Modules\Globale\Entity\GlobaleCurrencies;
+use \App\Modules\ERP\Entity\ERPPurchasesOrders;
 
 /**
- * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPSalesOrdersRepository")
+ * @ORM\Entity(repositoryClass="App\Repository\Modules\ERP\Entity\ERPPurchasesBudgetsRepository")
  */
-class ERPSalesOrders
+class ERPPurchasesBudgets
 {
     /**
      * @ORM\Id()
@@ -29,13 +24,13 @@ class ERPSalesOrders
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCompanies")
-     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
+     * @ORM\JoinColumn(nullable=false)
      */
     private $company;
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleUsers")
-     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
+     * @ORM\JoinColumn(nullable=false)
      */
     private $author;
 
@@ -72,100 +67,59 @@ class ERPSalesOrders
     private $paymentmethod;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\AERP\Entity\AERPSeries")
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPSeries")
      */
     private $serie;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPCustomerGroups")
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPSuppliers")
      */
-    private $customergroup;
+    private $supplier;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPCustomers")
-     * @ORM\JoinColumn(onDelete="CASCADE")
-     */
-    private $customer;
-
-    /**
-     * @ORM\Column(type="string", length=14)
+     * @ORM\Column(type="string", length=14, nullable=true)
      */
     private $vat;
 
     /**
      * @ORM\Column(type="string", length=200, nullable=true)
      */
-    private $customername;
+    private $suppliername;
 
     /**
      * @ORM\Column(type="string", length=150, nullable=true)
      */
-    private $customeraddress;
+    private $supplieraddress;
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCountries")
      */
-    private $customercountry;
+    private $suppliercountry;
 
     /**
      * @ORM\Column(type="string", length=70, nullable=true)
      */
-    private $customercity;
+    private $suppliercity;
 
     /**
      * @ORM\Column(type="string", length=125, nullable=true)
      */
-    private $customerstate;
+    private $supplierstate;
 
     /**
      * @ORM\Column(type="string", length=12, nullable=true)
      */
-    private $customerpostcode;
+    private $supplierpostcode;
 
     /**
      * @ORM\Column(type="string", length=25, nullable=true)
      */
-    private $customerpostbox;
-
-    /**
-     * @ORM\Column(type="string", length=200, nullable=true)
-     */
-    private $shiptoname;
-
-    /**
-     * @ORM\Column(type="string", length=150, nullable=true)
-     */
-    private $shiptoaddress;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCountries")
-     */
-    private $shiptocountry;
-
-    /**
-     * @ORM\Column(type="string", length=70, nullable=true)
-     */
-    private $shiptocity;
-
-    /**
-     * @ORM\Column(type="string", length=125, nullable=true)
-     */
-    private $shiptostate;
-
-    /**
-     * @ORM\Column(type="string", length=12, nullable=true)
-     */
-    private $shiptopostcode;
-
-    /**
-     * @ORM\Column(type="string", length=25, nullable=true)
-     */
-    private $shiptopostbox;
+    private $supplierpostbox;
 
     /**
      * @ORM\Column(type="string", length=20, nullable=true)
      */
-    private $customercode;
+    private $suppliercode;
 
     /**
      * @ORM\Column(type="datetime")
@@ -176,11 +130,6 @@ class ERPSalesOrders
      * @ORM\Column(type="datetime", nullable=true)
      */
     private $dateofferend;
-
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
-    private $dateemail;
 
     /**
      * @ORM\Column(type="boolean")
@@ -273,14 +222,9 @@ class ERPSalesOrders
     private $notes;
 
     /**
-     * @ORM\Column(type="float")
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPPurchasesOrders")
      */
-    private $cost;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPSalesBudgets")
-     */
-    private $salesbudget;
+    private $inPurchasesOrder;
 
 
     public function getId(): ?int
@@ -324,18 +268,6 @@ class ERPSalesOrders
         return $this;
     }
 
-    public function getCustomer(): ?ERPCustomers
-    {
-        return $this->customer;
-    }
-
-    public function setCustomer(?ERPCustomers $customer): self
-    {
-        $this->customer = $customer;
-
-        return $this;
-    }
-
     public function getNumber(): ?int
     {
         return $this->number;
@@ -344,66 +276,6 @@ class ERPSalesOrders
     public function setNumber(int $number): self
     {
         $this->number = $number;
-
-        return $this;
-    }
-
-    public function getActive(): ?bool
-    {
-        return $this->active;
-    }
-
-    public function setActive(bool $active): self
-    {
-        $this->active = $active;
-
-        return $this;
-    }
-
-    public function getDeleted(): ?bool
-    {
-        return $this->deleted;
-    }
-
-    public function setDeleted(bool $deleted): self
-    {
-        $this->deleted = $deleted;
-
-        return $this;
-    }
-
-    public function getDateadd(): ?\DateTimeInterface
-    {
-        return $this->dateadd;
-    }
-
-    public function setDateadd(\DateTimeInterface $dateadd): self
-    {
-        $this->dateadd = $dateadd;
-
-        return $this;
-    }
-
-    public function getDateupd(): ?\DateTimeInterface
-    {
-        return $this->dateupd;
-    }
-
-    public function setDateupd(\DateTimeInterface $dateupd): self
-    {
-        $this->dateupd = $dateupd;
-
-        return $this;
-    }
-
-    public function getVat(): ?string
-    {
-        return $this->vat;
-    }
-
-    public function setVat(string $vat): self
-    {
-        $this->vat = $vat;
 
         return $this;
     }
@@ -456,182 +328,122 @@ class ERPSalesOrders
         return $this;
     }
 
-    public function getCustomername(): ?string
+    public function getSupplier(): ?ERPSuppliers
     {
-        return $this->customername;
+        return $this->supplier;
     }
 
-    public function setCustomername(?string $customername): self
+    public function setSupplier(?ERPSuppliers $supplier): self
     {
-        $this->customername = $customername;
+        $this->supplier = $supplier;
 
         return $this;
     }
 
-    public function getCustomeraddress(): ?string
+    public function getVat(): ?string
     {
-        return $this->customeraddress;
+        return $this->vat;
     }
 
-    public function setCustomeraddress(?string $customeraddress): self
+    public function setVat(?string $vat): self
     {
-        $this->customeraddress = $customeraddress;
+        $this->vat = $vat;
 
         return $this;
     }
 
-    public function getCustomercountry(): ?GlobaleCountries
+    public function getSuppliername(): ?string
     {
-        return $this->customercountry;
+        return $this->suppliername;
     }
 
-    public function setCustomercountry(?GlobaleCountries $customercountry): self
+    public function setSuppliername(?string $suppliername): self
     {
-        $this->customercountry = $customercountry;
+        $this->suppliername = $suppliername;
 
         return $this;
     }
 
-    public function getCustomercity(): ?string
+    public function getSupplieraddress(): ?string
     {
-        return $this->customercity;
+        return $this->supplieraddress;
     }
 
-    public function setCustomercity(?string $customercity): self
+    public function setSupplieraddress(?string $supplieraddress): self
     {
-        $this->customercity = $customercity;
+        $this->supplieraddress = $supplieraddress;
 
         return $this;
     }
 
-    public function getCustomerstate(): ?string
+    public function getSuppliercountry(): ?GlobaleCountries
     {
-        return $this->customerstate;
+        return $this->suppliercountry;
     }
 
-    public function setCustomerstate(?string $customerstate): self
+    public function setSuppliercountry(?GlobaleCountries $suppliercountry): self
     {
-        $this->customerstate = $customerstate;
+        $this->suppliercountry = $suppliercountry;
 
         return $this;
     }
 
-    public function getCustomerpostcode(): ?string
+    public function getSuppliercity(): ?string
     {
-        return $this->customerpostcode;
+        return $this->suppliercity;
     }
 
-    public function setCustomerpostcode(?string $customerpostcode): self
+    public function setSuppliercity(?string $suppliercity): self
     {
-        $this->customerpostcode = $customerpostcode;
+        $this->suppliercity = $suppliercity;
 
         return $this;
     }
 
-    public function getCustomerpostbox(): ?string
+    public function getSupplierstate(): ?string
     {
-        return $this->customerpostbox;
+        return $this->supplierstate;
     }
 
-    public function setCustomerpostbox(?string $customerpostbox): self
+    public function setSupplierstate(?string $supplierstate): self
     {
-        $this->customerpostbox = $customerpostbox;
+        $this->supplierstate = $supplierstate;
 
         return $this;
     }
 
-    public function getShiptoname(): ?string
+    public function getSupplierpostcode(): ?string
     {
-        return $this->shiptoname;
+        return $this->supplierpostcode;
     }
 
-    public function setShiptoname(?string $shiptoname): self
+    public function setSupplierpostcode(?string $supplierpostcode): self
     {
-        $this->shiptoname = $shiptoname;
+        $this->supplierpostcode = $supplierpostcode;
 
         return $this;
     }
 
-    public function getShiptoaddress(): ?string
+    public function getSupplierpostbox(): ?string
     {
-        return $this->shiptoaddress;
+        return $this->supplierpostbox;
     }
 
-    public function setShiptoaddress(?string $shiptoaddress): self
+    public function setSupplierpostbox(?string $supplierpostbox): self
     {
-        $this->shiptoaddress = $shiptoaddress;
+        $this->supplierpostbox = $supplierpostbox;
 
         return $this;
     }
 
-    public function getShiptocountry(): ?GlobaleCountries
+    public function getSuppliercode(): ?string
     {
-        return $this->shiptocountry;
+        return $this->suppliercode;
     }
 
-    public function setShiptocountry(?GlobaleCountries $shiptocountry): self
+    public function setSuppliercode(?string $suppliercode): self
     {
-        $this->shiptocountry = $shiptocountry;
-
-        return $this;
-    }
-
-    public function getShiptocity(): ?string
-    {
-        return $this->shiptocity;
-    }
-
-    public function setShiptocity(?string $shiptocity): self
-    {
-        $this->shiptocity = $shiptocity;
-
-        return $this;
-    }
-
-    public function getShiptostate(): ?string
-    {
-        return $this->shiptostate;
-    }
-
-    public function setShiptostate(?string $shiptostate): self
-    {
-        $this->shiptostate = $shiptostate;
-
-        return $this;
-    }
-
-    public function getShiptopostcode(): ?string
-    {
-        return $this->shiptopostcode;
-    }
-
-    public function setShiptopostcode(?string $shiptopostcode): self
-    {
-        $this->shiptopostcode = $shiptopostcode;
-
-        return $this;
-    }
-
-    public function getShiptopostbox(): ?string
-    {
-        return $this->shiptopostbox;
-    }
-
-    public function setShiptopostbox(?string $shiptopostbox): self
-    {
-        $this->shiptopostbox = $shiptopostbox;
-
-        return $this;
-    }
-
-    public function getCustomercode(): ?string
-    {
-        return $this->customercode;
-    }
-
-    public function setCustomercode(?string $customercode): self
-    {
-        $this->customercode = $customercode;
+        $this->suppliercode = $suppliercode;
 
         return $this;
     }
@@ -660,18 +472,6 @@ class ERPSalesOrders
         return $this;
     }
 
-    public function getDateemail(): ?\DateTimeInterface
-    {
-        return $this->dateemail;
-    }
-
-    public function setDateemail(?\DateTimeInterface $dateemail): self
-    {
-        $this->dateemail = $dateemail;
-
-        return $this;
-    }
-
     public function getIrpf(): ?bool
     {
         return $this->irpf;
@@ -680,6 +480,18 @@ class ERPSalesOrders
     public function setIrpf(bool $irpf): self
     {
         $this->irpf = $irpf;
+
+        return $this;
+    }
+
+    public function getIrpfperc(): ?float
+    {
+        return $this->irpfperc;
+    }
+
+    public function setIrpfperc(float $irpfperc): self
+    {
+        $this->irpfperc = $irpfperc;
 
         return $this;
     }
@@ -696,14 +508,26 @@ class ERPSalesOrders
         return $this;
     }
 
-    public function getTotalbase(): ?float
+    public function getTaxexempt(): ?bool
     {
-        return $this->totalbase;
+        return $this->taxexempt;
     }
 
-    public function setTotalbase(float $totalbase): self
+    public function setTaxexempt(bool $taxexempt): self
     {
-        $this->totalbase = $totalbase;
+        $this->taxexempt = $taxexempt;
+
+        return $this;
+    }
+
+    public function getTotalnet(): ?float
+    {
+        return $this->totalnet;
+    }
+
+    public function setTotalnet(float $totalnet): self
+    {
+        $this->totalnet = $totalnet;
 
         return $this;
     }
@@ -720,14 +544,14 @@ class ERPSalesOrders
         return $this;
     }
 
-    public function getTotalnet(): ?float
+    public function getTotalbase(): ?float
     {
-        return $this->totalnet;
+        return $this->totalbase;
     }
 
-    public function setTotalnet(float $totalnet): self
+    public function setTotalbase(float $totalbase): self
     {
-        $this->totalnet = $totalnet;
+        $this->totalbase = $totalbase;
 
         return $this;
     }
@@ -792,38 +616,50 @@ class ERPSalesOrders
         return $this;
     }
 
-    public function getCustomergroup(): ?ERPCustomerGroups
+    public function getActive(): ?bool
     {
-        return $this->customergroup;
+        return $this->active;
     }
 
-    public function setCustomergroup(?ERPCustomerGroups $customergroup): self
+    public function setActive(bool $active): self
     {
-        $this->customergroup = $customergroup;
+        $this->active = $active;
 
         return $this;
     }
 
-    public function getTaxexempt(): ?bool
+    public function getDeleted(): ?bool
     {
-        return $this->taxexempt;
+        return $this->deleted;
     }
 
-    public function setTaxexempt(bool $taxexempt): self
+    public function setDeleted(bool $deleted): self
     {
-        $this->taxexempt = $taxexempt;
+        $this->deleted = $deleted;
 
         return $this;
     }
 
-    public function getIrpfperc(): ?float
+    public function getDateadd(): ?\DateTimeInterface
     {
-        return $this->irpfperc;
+        return $this->dateadd;
     }
 
-    public function setIrpfperc(float $irpfperc): self
+    public function setDateadd(\DateTimeInterface $dateadd): self
     {
-        $this->irpfperc = $irpfperc;
+        $this->dateadd = $dateadd;
+
+        return $this;
+    }
+
+    public function getDateupd(): ?\DateTimeInterface
+    {
+        return $this->dateupd;
+    }
+
+    public function setDateupd(\DateTimeInterface $dateupd): self
+    {
+        $this->dateupd = $dateupd;
 
         return $this;
     }
@@ -852,19 +688,17 @@ class ERPSalesOrders
         return $this;
     }
 
-    public function getCost(): ?float
+    public function getInPurchasesOrder(): ?ERPPurchasesOrders
     {
-        return $this->cost;
+        return $this->inPurchasesOrder;
     }
 
-    public function setCost(float $cost): self
+    public function setInPurchasesOrder(?ERPPurchasesOrders $inPurchasesOrder): self
     {
-        $this->cost = $cost;
+        $this->inPurchasesOrder = $inPurchasesOrder;
 
         return $this;
     }
-
-
     public function getSerie(): ?ERPSeries
     {
         return $this->serie;
@@ -873,18 +707,6 @@ class ERPSalesOrders
     public function setSerie(?ERPSeries $serie): self
     {
         $this->serie = $serie;
-
-        return $this;
-    }
-
-    public function getSalesbudget(): ?ERPSalesBudgets
-    {
-        return $this->salesbudget;
-    }
-
-    public function setSalesbudget(?ERPSalesBudgets $salesbudget): self
-    {
-        $this->salesbudget = $salesbudget;
 
         return $this;
     }

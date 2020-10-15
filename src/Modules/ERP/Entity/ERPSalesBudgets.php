@@ -237,6 +237,11 @@ class ERPSalesBudgets
     private $total=0;
 
     /**
+     * @ORM\Column(type="smallint", nullable=true)
+     */
+    private $status;
+
+    /**
      * @ORM\Column(type="boolean")
      */
     private $active;
@@ -769,6 +774,18 @@ class ERPSalesBudgets
     public function setTotal(float $total): self
     {
         $this->total = $total;
+
+        return $this;
+    }
+
+    public function getStatus(): ?int
+    {
+        return $this->status;
+    }
+
+    public function setStatus(int $status): self
+    {
+        $this->status = $status;
 
         return $this;
     }

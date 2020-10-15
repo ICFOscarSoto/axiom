@@ -1,0 +1,4 @@
+[
+  {"id": "editPruchasesOrders", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"ERPPurchasesOrdersForm", "actionType" : "foreground", "confirm" :false, "tooltip":""},
+  {"id": "delete", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"genericdelete", "routeParams":{"module":"ERP", "name":"PurchasesOrders"}, "confirm" :true, "undo" :false, "tooltip":"Borrar pedido", "actionType" : "background"}
+]

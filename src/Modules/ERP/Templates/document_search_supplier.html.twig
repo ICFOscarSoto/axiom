@@ -1,0 +1,74 @@
+<div class="modal fade" tabindex="-1" id="supplier-search-modal-form" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content" style="transform: matrix(1, 0, 0, 1, 0, 0);">
+        <div class="modal-header">
+          <h4 class="modal-title">{{ ('Search')|trans }}&nbsp;{{ ('supplier')|trans }}</h4>
+        </div>
+        <div id="supplier-search-modal-form-body" style="height: 520px; padding: 0px 10px;">
+          {% set listConstructor = supplierslist %}
+          {% set listOrigin = "" %}
+          {# for know if list.html is invoked directly from controller and we need to make modals inside list#}
+          {{ include('@Globale/list.html.twig') }}
+        </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  var supplierFields=["supplier-form-id","supplier-form-code","supplier-form-vat","supplier-form-name", "supplier-form-suppliergroup", "supplier-form-paymentmethod", "supplier-form-taxexempt", "supplier-form-surcharge"];
+  var supplierSearchfields=["id","code","vat","name", "suppliergroup", "paymentmethod", "taxexempt", "surcharge"];
+
+  function postsupplierSearch(){
+    $("#supplier-form-suppliergroup-select").val($("#supplier-form-suppliergroup").val());
+    $("#supplier-form-suppliergroup-select").select2().trigger('change');
+    $("#supplier-form-paymentmethod-select").val($("#supplier-form-paymentmethod").val());
+    $("#supplier-form-paymentmethod-select").select2().trigger('change');
+    $("#supplier-form-view").attr("attr-id", $("#supplier-form-id").val());
+    recalculateDocument();
+  }
+
+  function supplierSearch(fields, searchFields){
+    if($("#supplier-form-code").val()!=""){
+      if((++load_wait)==1) $("#load-spinner").fadeIn();
+      $.ajax({
+         url: '{{ url('genericsearch',{'module':'ERP', 'name':'suppliers', 'field':'code'}) }}/'+$("#supplier-form-code").val(),
+         type: 'POST',
+         data: JSON.stringify(searchFields),
+         success:  function( data ) {
+           if((--load_wait)==0) $("#load-spinner").fadeOut();
+           if(data.result){
+             var i=0;
+             Object.entries(data.data).forEach(function(element) {
+               $("#"+fields[i]).val(element[1]);
+               i++;
+             });
+             postsupplierSearch();
+           } else {
+             clearFields(fields);
+             toastr.error("No se encontro el proveedor introducido", "Confirmación", confirmation);
+           }
+         }
+       });
+    }else clearFields(fields);
+  }
+
+  $(document).ready(function() {
+    {# supplier SEARCH #}
+    $('body').on('keypress', "#supplier-form-code", function(e) {
+        var code = e.keyCode || e.which;
+         if(code == 13) {
+           supplierSearch(supplierFields, supplierSearchfields);
+         }
+      });
+
+    $('body').on('change', "#supplier-form-code", function(e) {
+         supplierSearch(supplierFields, supplierSearchfields);
+    });
+
+    $('body').on('click', "[id^='listsuppliers-field-button-select-']", function(e) {
+      $("#supplier-form-code").val($(this).parent().parent().parent().children('td').eq(1).text());
+      $("#supplier-form-code").trigger('change');
+      $("#supplier-search-modal-form").modal('toggle');
+    });
+  });
+  </script>

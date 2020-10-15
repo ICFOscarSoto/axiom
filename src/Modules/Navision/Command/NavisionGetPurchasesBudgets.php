@@ -7,13 +7,10 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use App\Modules\ERP\Entity\ERPSalesBudgets;
-use App\Modules\ERP\Entity\ERPSalesBudgetsLines;
-use App\Modules\ERP\Entity\ERPSalesOrders;
-use App\Modules\ERP\Entity\ERPSalesOrdersLines;
-use App\Modules\ERP\Entity\ERPCustomers;
+use App\Modules\ERP\Entity\ERPPurchasesBudgets;
+use App\Modules\ERP\Entity\ERPPurchasesBudgetsLines;
+use App\Modules\ERP\Entity\ERPSuppliers;
 use App\Modules\ERP\Entity\ERPProducts;
-use App\Modules\ERP\Entity\ERPPaymentMethods;
 use App\Modules\Globale\Entity\GlobaleUsers;
 use App\Modules\Globale\Entity\GlobaleCompanies;
 use App\Modules\Globale\Entity\GlobaleStates;
@@ -26,7 +23,7 @@ use App\Modules\Navision\Entity\NavisionSync;
 use \App\Helpers\HelperFiles;
 
 
-class NavisionGetSalesOrders extends ContainerAwareCommand
+class NavisionGetPurchasesBudgets extends ContainerAwareCommand
 {
   private $doctrine;
   private $company;
@@ -35,7 +32,7 @@ class NavisionGetSalesOrders extends ContainerAwareCommand
 
   protected function configure(){
         $this
-            ->setName('navision:getsalesorders')
+            ->setName('navision:getpurchasesbudgets')
             ->setDescription('Sync navision principal entities')
             ->addArgument('entity', InputArgument::REQUIRED, '¿Entidad que sincronizar?')
         ;
@@ -54,10 +51,10 @@ class NavisionGetSalesOrders extends ContainerAwareCommand
     $output->writeln('Comenzando sincronizacion Navision');
     $output->writeln('==================================');
     switch($entity){
-      case 'salesorders': $this->importSaleOrders($input, $output);
+      case 'purchasesbudgets': $this->importSalesBudgets($input, $output);
       break;
       case 'all':
-        $this->importSaleOrders($input, $output);
+        $this->importSalesBudgets($input, $output);
       break;
       default:
         $output->writeln('Opcion no válida');
@@ -66,51 +63,45 @@ class NavisionGetSalesOrders extends ContainerAwareCommand
 
   }
 
-    public function importSaleOrders(InputInterface $input, OutputInterface $output){
-      //------Sync Sales budgets    ------
-      $command = $this->getApplication()->find('navision:getsalesbudgets');
+    public function importSalesBudgets(InputInterface $input, OutputInterface $output){
+      //------Sync first customers    ------
+      $command = $this->getApplication()->find('navision:getsuppliers');
       $arguments = [
-          'entity'    => 'salesbudgets'
+          'entity'    => 'suppliers'
       ];
       $cmdProductsInput = new ArrayInput($arguments);
       $cmdProductsreturn = $command->run($cmdProductsInput, $output);
 
 
-
       //------   Create Lock Mutex    ------
       if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-          $fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetSalesOrders-importSalesOrders.lock', 'c');
+          $fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetPurchasesBudgets-importPurchasesBudgets.lock', 'c');
       } else {
-          $fp = fopen('/tmp/axiom-navisionGetSalesOrders-importSalesOrders.lock', 'c');
+          $fp = fopen('/tmp/axiom-navisionGetPurchasesBudgets-importPurchasesBudgets.lock', 'c');
       }
       if (!flock($fp, LOCK_EX | LOCK_NB)) {
-        $output->writeln('* Fallo al iniciar la sincronizacion de presupuestos: El proceso ya esta en ejecución.');
+        $output->writeln('* Fallo al iniciar la sincronizacion de presupuestos de compra: El proceso ya esta en ejecución.');
         exit;
       }
 
+
       //------   Critical Section START   ------
       $navisionSyncRepository=$this->doctrine->getRepository(NavisionSync::class);
-      $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"salesOrders"]);
+      $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"purchasesBudgets"]);
       if ($navisionSync==null) {
         $navisionSync=new NavisionSync();
         $navisionSync->setMaxtimestamp(0);
       }
       $datetime=new \DateTime();
-      $output->writeln('* Sincronizando pedidos de venta....');
-      $ctx = stream_context_create(array('http'=>
-                    array('timeout' => 1800)
-                  ));
-      $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getSalesOrders.php?from='.$navisionSync->getMaxtimestamp(), false, $ctx);
+      $output->writeln('* Sincronizando presupuestos compra....');
+      $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getPurchasesBudgets.php?from='.$navisionSync->getMaxtimestamp());
       $objects=json_decode($json, true);
       $objects=$objects[0];
-      $repositoryPaymentMethods=$this->doctrine->getRepository(ERPPaymentMethods::class);
-      $repositorySalesBudgets=$this->doctrine->getRepository(ERPSalesBudgets::class);
-      $repositorySalesBudgetsLines=$this->doctrine->getRepository(ERPSalesBudgetsLines::class);
-      $repositorySalesOrders=$this->doctrine->getRepository(ERPSalesOrders::class);
-      $repositorySalesOrdersLines=$this->doctrine->getRepository(ERPSalesOrdersLines::class);
+      $repositoryPurchasesBudgets=$this->doctrine->getRepository(ERPPurchasesBudgets::class);
+      $repositoryPurchasesBudgetsLines=$this->doctrine->getRepository(ERPPurchasesBudgetsLines::class);
       $repositoryProducts=$this->doctrine->getRepository(ERPProducts::class);
       $repositoryUsers=$this->doctrine->getRepository(GlobaleUsers::class);
-      $repositoryCustomers=$this->doctrine->getRepository(ERPCustomers::class);
+      $repositorySuppliers=$this->doctrine->getRepository(ERPSuppliers::class);
       $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
       $repositoryCurrencies=$this->doctrine->getRepository(GlobaleCurrencies::class);
 
@@ -120,13 +111,12 @@ class NavisionGetSalesOrders extends ContainerAwareCommand
       foreach ($objects["class"] as $key=>$object){
         $company=$repositoryCompanies->find(2);
         $currency=$repositoryCurrencies->findOneBy(["name"=>"Euro"]);
-        $salesBudget=$repositorySalesBudgets->findOneBy(["code"=>$object["salesbudget"], "deleted"=>0]);
-        $output->writeln('  - '.$object["code"].' - '.$object["customer"]);
-        $obj=$repositorySalesOrders->findOneBy(["code"=>$object["code"]]);
+        $output->writeln('  - '.$object["code"].' - '.$object["supplier"]);
+        $obj=$repositoryPurchasesBudgets->findOneBy(["code"=>$object["code"]]);
         $cost=0;
         $oldobj=$obj;
         if ($obj==null) {
-          $obj=new ERPSalesOrders();
+          $obj=new ERPPurchasesBudgets();
           $obj->setCode($object["code"]);
           $number=intval(substr($object["code"], 5));
           $obj->setNumber($number);
@@ -137,18 +127,12 @@ class NavisionGetSalesOrders extends ContainerAwareCommand
           $obj->setDeleted(0);
           $obj->setActive(1);
         }
-         $customer=$repositoryCustomers->findOneBy(["code"=>$object["customer"]]);
-         if($customer==NULL) {
+         $supplier=$repositorySuppliers->findOneBy(["code"=>$object["supplier"]]);
+         if($supplier==NULL) {
            //$output->writeln('     ! Saltado no existe el cliente');
            //continue;
          }
-         $obj->setCustomer($customer);
-
-         $paymentmethod=$repositoryPaymentMethods->findOneBy(["paymentcode"=>$object["paymentcode"], "deleted"=>0]);
-         $obj->setPaymentmethod($paymentmethod);
-
-         $salesBudget=$repositorySalesBudgets->findOneBy(["code"=>$object["salesbudget"], "deleted"=>0]);
-         $obj->setSalesbudget($salesBudget);
+         $obj->setSupplier($supplier);
 
          $author=$repositoryUsers->findOneBy(["email"=>$object["author"]]);
          if($author==NULL) $author=$repositoryUsers->findOneBy(["name"=>"Administrador"]);
@@ -158,30 +142,21 @@ class NavisionGetSalesOrders extends ContainerAwareCommand
          $obj->setAuthor($author);
          $obj->setAgent($agent);
          $obj->setVat($object["vat"]);
-         $obj->setStatus($object["status"]);
-         $obj->setCustomername($object["customername"]);
-         $obj->setCustomeraddress($object["customeraddress"]);
-         $obj->setCustomercountry($customer?$customer->getCountry():null);
-         $obj->setCustomercity($object["customercity"]);
-         $obj->setCustomerstate($customer?$customer->getState()!=null?$customer->getState()->getName():null:null);
-         $obj->setCustomerpostcode($object["customerpostcode"]);
+         $obj->setSuppliername($object["suppliername"]);
+         $obj->setSupplieraddress($object["supplieraddress"]);
+         $obj->setSuppliercountry($supplier?$supplier->getCountry():null);
+         $obj->setSuppliercity($object["suppliercity"]);
+         $obj->setSupplierstate($supplier?$supplier->getState()!=null?$supplier->getState()->getName():null:null);
+         $obj->setSupplierpostcode($object["supplierpostcode"]);
 
-         $obj->setShiptoname($object["shiptoname"]);
-         $obj->setShiptoaddress($object["shiptoaddress"]);
-         $obj->setShiptocountry($customer?$customer->getCountry():null);
-         $obj->setShiptocity($object["shiptocity"]);
-         $obj->setShiptostate($customer?$customer->getState()!=null?$customer->getState()->getName():null:null);
-         $obj->setShiptopostcode($object["shiptopostcode"]);
-
-         $obj->setCustomercode($object["customer"]);
+         $obj->setSuppliercode($object["supplier"]);
          $obj->setDate(date_create_from_format("Y-m-d H:i:s.u",$object["date"]["date"]));
-         $obj->setDateofferend(date_create_from_format("Y-m-d H:i:s.u",$object["enddate"]["date"]));
-
+         $obj->setDateofferend(date_create_from_format("Y-m-d H:i:s.u",$object["launchdate"]["date"]));
+         $obj->setStatus($object["status"]);
          $obj->setIrpf(0);
          $obj->setIrpfperc(0);
          $obj->setSurcharge(0);
          $obj->setTaxexempt(0);
-         $obj->setCost(round($object["cost"],2));
          $obj->setTotalnet($object["linestotal"]);
          $obj->setTotaldto($object["dto"]);
          $obj->setTotalbase($object["base"]);
@@ -204,10 +179,10 @@ class NavisionGetSalesOrders extends ContainerAwareCommand
         $total=0;
         foreach($object["lines"] as $key=>$line){
           $output->writeln('      -> Linea '.$line["linenum"].' - '.$line["reference"]);
-          $objLine=$repositorySalesOrdersLines->findOneBy(["salesorder"=>$obj,"linenum"=>$line["linenum"]]);
+          $objLine=$repositoryPurchasesBudgetsLines->findOneBy(["purchasesbudget"=>$obj,"linenum"=>$line["linenum"]]);
           if ($objLine==null) {
-            $objLine=new ERPSalesOrdersLines();
-            $objLine->setSalesorder($obj);
+            $objLine=new ERPPurchasesBudgetsLines();
+            $objLine->setPurchasesbudget($obj);
             $objLine->setLinenum($line["linenum"]);
             $objLine->setDateadd(new \Datetime());
             $objLine->setDateupd(new \Datetime());
@@ -224,7 +199,6 @@ class NavisionGetSalesOrders extends ContainerAwareCommand
           $objLine->setProduct($product);
           $objLine->setUnitprice($line["price"]);
           $objLine->setQuantity($line["quantity"]);
-          $objLine->setCost(round($line["cost"],2));
           $objLine->setTaxperc($line["taxperc"]);
           $objLine->setTaxunit(round($line["linetotal"]*$line["taxperc"]/100,2));
           $objLine->setDtoperc($line["discountperc"]);
@@ -244,10 +218,10 @@ class NavisionGetSalesOrders extends ContainerAwareCommand
         $this->doctrine->getManager()->clear();
 
       }
-      $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"salesOrders"]);
+      $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"purchasesBudgets"]);
       if ($navisionSync==null) {
         $navisionSync=new NavisionSync();
-        $navisionSync->setEntity("salesOrders");
+        $navisionSync->setEntity("purchasesBudgets");
       }
       $navisionSync->setLastsync($datetime);
       $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);

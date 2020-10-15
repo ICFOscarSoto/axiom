@@ -76,9 +76,13 @@ class NavisionGetSuppliers extends ContainerAwareCommand
 
     public function importSupplier(InputInterface $input, OutputInterface $output){
       //------   Create Lock Mutex    ------
-      $fp = fopen('/tmp/axiom-NavisionGetSuppliers-importSupplier.lock', 'c');
+      if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+          $fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetSuppliers-importSupplier.lock', 'c');
+      } else {
+          $fp = fopen('/tmp/axiom-navisionGetSuppliers-importSupplier.lock', 'c');
+      }
       if (!flock($fp, LOCK_EX | LOCK_NB)) {
-        $output->writeln('* Fallo al iniciar la sincronizacion de proveedores: El proceso ya esta en ejecución.');
+        $output->writeln('* Fallo al iniciar la sincronizacion de presupuestos: El proceso ya esta en ejecución.');
         exit;
       }
 
