@@ -12,6 +12,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\Globale\Entity\GlobaleWidgets;
 use App\Modules\Globale\Entity\GlobaleUsersWidgets;
+use App\Modules\Security\Utils\SecurityUtils;
 
 class GlobaleDashboardController extends Controller
 {
@@ -34,8 +35,16 @@ class GlobaleDashboardController extends Controller
       $widgetsRepository=$this->getDoctrine()->getRepository(GlobaleWidgets::class);
       $usersWidgetsRepository=$this->getDoctrine()->getRepository(GlobaleUsersWidgets::class);
       $widgetConfigRepository=$this->getDoctrine()->getRepository(GlobaleWidgets::class);
-      //Select Widget Catalog for this user
+
+      $permissions=SecurityUtils::getZonePermissions($this->getUser(), $this->getDoctrine());
+
+      //Select Widget Catalog for this user with permissions
       $widgetsCatalog=$widgetConfigRepository->findAll();
+      foreach($widgetsCatalog as $key=>$widget){
+        if(isset($permissions["widget_".$widget->getName()]) && !$permissions["widget_".$widget->getName()]["allowaccess"]){
+          unset($widgetsCatalog[$key]);
+        }
+      }
 
       $userWidgets=$usersWidgetsRepository->findBy(["user"=>$this->getUser(),"active"=>1,"deleted"=>0]);
       foreach($userWidgets as $key=>$widget){
@@ -43,14 +52,16 @@ class GlobaleDashboardController extends Controller
         $widgetConfigRepository=$this->getDoctrine()->getRepository("\App\Widgets\Entity\Widgets".$widget->getWidget()->getName());
         $config=$widgetConfigRepository->findOneBy(["userwidget"=>$widget,"active"=>1,"deleted"=>0]);
         $userWidgets[$key]->settings=$config;
-
+        if(isset($permissions["widget_".$widget->getWidget()->getName()]) && !$permissions["widget_".$widget->getWidget()->getName()]["allowaccess"]){
+          unset($userWidgets[$key]);
+        }
       }
 			return $this->render('@Globale/dashboard.html.twig', [
 				'controllerName' => 'FadashboardController',
 				'interfaceName' => 'Panel de control',
         'optionSelected' => $request->attributes->get('_route'),
-				'menuOptions' =>  $menurepository->formatOptions($userdata),
-				'breadcrumb' =>  $menurepository->formatBreadcrumb($request->get('_route')),
+				'menuOptions' => $menurepository->formatOptions($userdata),
+				'breadcrumb' => $menurepository->formatBreadcrumb($request->get('_route')),
 				'userData' => $userdata,
         'widgets' => $userWidgets,
         'widgetsCatalog' => $widgetsCatalog
