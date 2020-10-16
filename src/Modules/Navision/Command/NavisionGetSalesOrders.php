@@ -244,15 +244,17 @@ class NavisionGetSalesOrders extends ContainerAwareCommand
         $this->doctrine->getManager()->clear();
 
       }
-      $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"salesOrders"]);
-      if ($navisionSync==null) {
-        $navisionSync=new NavisionSync();
-        $navisionSync->setEntity("salesOrders");
+      if($objects["maxtimestamp"]>0){
+        $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"salesOrders"]);
+        if ($navisionSync==null) {
+          $navisionSync=new NavisionSync();
+          $navisionSync->setEntity("salesOrders");
+        }
+        $navisionSync->setLastsync($datetime);
+        $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
+        $this->doctrine->getManager()->persist($navisionSync);
+        $this->doctrine->getManager()->flush();
       }
-      $navisionSync->setLastsync($datetime);
-      $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
-      $this->doctrine->getManager()->persist($navisionSync);
-      $this->doctrine->getManager()->flush();
       //------   Critical Section END   ------
       //------   Remove Lock Mutex    ------
       fclose($fp);

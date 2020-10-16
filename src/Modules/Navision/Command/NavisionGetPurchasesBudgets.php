@@ -218,15 +218,17 @@ class NavisionGetPurchasesBudgets extends ContainerAwareCommand
         $this->doctrine->getManager()->clear();
 
       }
-      $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"purchasesBudgets"]);
-      if ($navisionSync==null) {
-        $navisionSync=new NavisionSync();
-        $navisionSync->setEntity("purchasesBudgets");
+      if($objects["maxtimestamp"]>0){
+        $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"purchasesBudgets"]);
+        if ($navisionSync==null) {
+          $navisionSync=new NavisionSync();
+          $navisionSync->setEntity("purchasesBudgets");
+        }
+        $navisionSync->setLastsync($datetime);
+        $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
+        $this->doctrine->getManager()->persist($navisionSync);
+        $this->doctrine->getManager()->flush();
       }
-      $navisionSync->setLastsync($datetime);
-      $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
-      $this->doctrine->getManager()->persist($navisionSync);
-      $this->doctrine->getManager()->flush();
       //------   Critical Section END   ------
       //------   Remove Lock Mutex    ------
       fclose($fp);
