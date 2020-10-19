@@ -164,14 +164,14 @@ class NavisionGetSalesOrders extends ContainerAwareCommand
          $obj->setCustomercountry($customer?$customer->getCountry():null);
          $obj->setCustomercity($object["customercity"]);
          $obj->setCustomerstate($customer?$customer->getState()!=null?$customer->getState()->getName():null:null);
-         $obj->setCustomerpostcode($object["customerpostcode"]);
+         $obj->setCustomerpostcode(substr(preg_replace("/[^a-zA-Z0-9]/", "", $object["customerpostcode"]),0,12));
 
          $obj->setShiptoname($object["shiptoname"]);
          $obj->setShiptoaddress($object["shiptoaddress"]);
          $obj->setShiptocountry($customer?$customer->getCountry():null);
          $obj->setShiptocity($object["shiptocity"]);
          $obj->setShiptostate($customer?$customer->getState()!=null?$customer->getState()->getName():null:null);
-         $obj->setShiptopostcode($object["shiptopostcode"]);
+         $obj->setShiptopostcode(substr(preg_replace("/[^a-zA-Z0-9]/", "", $object["shiptopostcode"]),0,12));
 
          $obj->setCustomercode($object["customer"]);
          $obj->setDate(date_create_from_format("Y-m-d H:i:s.u",$object["date"]["date"]));
