@@ -303,7 +303,6 @@ class HRClocksController extends Controller
 		 */
 		 public function exportWorkerClocks($id, Request $request){
 			 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
- 			 $this->denyAccessUnlessGranted('ROLE_ADMIN');
 			 $utilsExport = new GlobaleExportUtils();
 			 $workerRepository=$this->getDoctrine()->getRepository(HRWorkers::class);
 			 $worker = $workerRepository->find($id);
@@ -322,7 +321,6 @@ class HRClocksController extends Controller
  		 */
  		 public function print($year,$month, Request $request){
  			 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-  		 $this->denyAccessUnlessGranted('ROLE_ADMIN');
 			 $workerRepository=$this->getDoctrine()->getRepository(HRWorkers::class);
 			 $ids=$request->request->get('ids');
 			 $ids=explode(",",$ids);
@@ -366,7 +364,6 @@ class HRClocksController extends Controller
 		 */
 		 public function data($id, $action, $idworker, Request $request){
 			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-			$this->denyAccessUnlessGranted('ROLE_ADMIN');
 			$clocksrepository=$this->getDoctrine()->getRepository(HRClocks::class);
 			$obj=$clocksrepository->findOneBy(["id"=>$id]);
 			if ($this->get('security.authorization_checker')->isGranted('ROLE_SUPERVISOR')) {
@@ -551,7 +548,7 @@ class HRClocksController extends Controller
 * @Route("/{_locale}/HR/clocks/{id}/incidence", name="declareIncidence")
 */
 public function declareIncidence($id){
-	$this->denyAccessUnlessGranted('ROLE_ADMIN');
+	$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 	$clocksrepository=$this->getDoctrine()->getRepository(HRClocks::class);
 	$obj=$clocksrepository->findOneBy(["id"=>$id]);
   $obj->setInvalid(1);
@@ -580,7 +577,7 @@ public function declareIncidence($id){
 	* @Route("/{_locale}/HR/clocks/{id}/disable", name="disableClock")
 	*/
 	public function disable($id){
-		$this->denyAccessUnlessGranted('ROLE_ADMIN');
+		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		$entityUtils=new GlobaleEntityUtils();
 		$result=$entityUtils->disableObject($id, $this->class, $this->getDoctrine());
 		return new JsonResponse(array('result' => $result));
@@ -589,7 +586,7 @@ public function declareIncidence($id){
 	* @Route("/{_locale}/HR/clocks/{id}/enable", name="enableClock")
 	*/
 	public function enable($id){
-		$this->denyAccessUnlessGranted('ROLE_ADMIN');
+		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		$entityUtils=new GlobaleEntityUtils();
 		$result=$entityUtils->enableObject($id, $this->class, $this->getDoctrine());
 		return new JsonResponse(array('result' => $result));
@@ -599,7 +596,7 @@ public function declareIncidence($id){
 	* @Route("/{_locale}/HR/clocks/{id}/delete", name="deleteClock", defaults={"id"=0})
 	*/
 	public function delete($id,Request $request){
-	 $this->denyAccessUnlessGranted('ROLE_ADMIN');
+	 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 	 $entityUtils=new GlobaleEntityUtils();
 	 if($id!=0) $result=$entityUtils->deleteObject($id, $this->class, $this->getDoctrine());
 		else {
