@@ -161,6 +161,7 @@ class HRClocksController extends Controller
 					'listConstructor' => $templateLists,
 					'forms' => $templateForms,
 					'worker_id' => $id,
+					'userData' => $userdata,
 					'data_clocks' => ["Today"=>["data"=>$clocksrepository->todayClocks($worker), "class"=>"tile-blue"],
 														"Yesterday"=>["data"=>$clocksrepository->yesterdayClocks($worker), "class"=>"tile-primary"],
 													  "This week"=>["data"=>$clocksrepository->thisWeekClocks($worker), "class"=>"tile-blue"],
