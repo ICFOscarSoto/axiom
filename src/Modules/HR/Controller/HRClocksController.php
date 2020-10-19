@@ -128,7 +128,6 @@ class HRClocksController extends Controller
 			public function index($id,RouterInterface $router,Request $request)
 			{
 			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-			$this->denyAccessUnlessGranted('ROLE_ADMIN');
 			$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
 			$locale = $request->getLocale();
 			$this->router = $router;
