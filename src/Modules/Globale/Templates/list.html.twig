@@ -199,7 +199,7 @@
 						{% endfor %}
 						{% set counter = 1 %}
 						{% for field in listConstructor.fieldButtons %}
-							{% if userData.permissions[listConstructor.id ~ '_field_' ~ field.id] is not defined or (userData.permissions[listConstructor.id ~ '_field_' ~ field.id] is defined and userData.permissions[listConstructor.id ~ '_field_' ~ field.id].allowaccess == true) %}
+
 							{
 								"targets": {{ listConstructor.fields|length+counter }},
 								"orderable": false,
@@ -207,7 +207,7 @@
 								"className": "text-right",
 								"render": function(data, type, row, meta){
 										var buttons='';
-
+										{% if userData.permissions[listConstructor.id ~ '_field_' ~ field.id] is not defined or (userData.permissions[listConstructor.id ~ '_field_' ~ field.id] is defined and userData.permissions[listConstructor.id ~ '_field_' ~ field.id].allowaccess == true) %}
 										{% if field.type is defined and field.type=="option" %}
 											{% for fieldOption in field.options %}
 												if(Array.isArray(row["{{ fieldOption.condition }}"]))
@@ -224,12 +224,12 @@
 											buttons+='{% if field.confirm is defined %}{% if field.confirm == true %}  onclick="jQuery(\'#{{ listConstructor.id }}-modal-confirm\').modal(\'show\', {backdrop: \'static\'});" {% endif %}{% endif %}>';
 											buttons+='<i class="{{ field.icon }}"></i></button></div>	';
 										{% endif %}
-
+										{% endif %}
 	  							 return buttons;
 									}
 							},
 							{% set counter = counter +1 %}
-							{% endif %}
+
 						{% endfor %}
 
 
@@ -468,9 +468,9 @@
 					{% endfor %}
 
 					{% for field in listConstructor.fieldButtons %}
-						{% if userData.permissions[listConstructor.id ~ '_field_' ~ field.id] is not defined or (userData.permissions[listConstructor.id ~ '_field_' ~ field.id] is defined and userData.permissions[listConstructor.id ~ '_field_' ~ field.id].allowaccess == true) %}
+
 							<th class="table-thead" width="10px" style="border-bottom: 1px solid #cecece !important;"></th>
-						{% endif %}
+
 					{% endfor %}
 
 			</thead>
@@ -489,9 +489,9 @@
 				{% endfor %}
 
 				{% for field in listConstructor.fieldButtons %}
-					{% if userData.permissions[listConstructor.id ~ '_field_' ~ field.id] is not defined or (userData.permissions[listConstructor.id ~ '_field_' ~ field.id] is defined and userData.permissions[listConstructor.id ~ '_field_' ~ field.id].allowaccess == true) %}
+
 						<td class="table-footer"></td>
-					{% endif %}
+					
 				{% endfor %}
 
 			</tr>
