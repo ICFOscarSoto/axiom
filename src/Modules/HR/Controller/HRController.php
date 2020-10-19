@@ -79,7 +79,6 @@ class HRController extends Controller
 		 */
 		 public function dataWorker($id, $action, Request $request){
 			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-			$this->denyAccessUnlessGranted('ROLE_ADMIN');
 			$template=dirname(__FILE__)."/../Forms/Workers.json";
 			$utils = new GlobaleFormUtils();
 	    $utilsObj=new $this->utilsClass();
