@@ -118,7 +118,7 @@ class GlobaleUsers implements UserInterface
     /**
      * @ORM\Column(type="boolean")
      */
-    private $alwaysprintownlabel;
+    private $alwaysprintownlabel=true;
 
 
 
