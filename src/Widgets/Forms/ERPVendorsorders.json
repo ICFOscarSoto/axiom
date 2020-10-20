@@ -1,0 +1,10 @@
+[{
+	"sections": [
+		{
+			"name": "data",
+			"fields": [
+        {	"name": "start", "cols": 6, "type": "date"},
+				{	"name": "end", "cols": 6, "type": "date"}
+			]
+		}]
+}]

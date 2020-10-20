@@ -1,0 +1,161 @@
+{{ include('@Widgets/widget_head.html.twig') }}
+<div class="col-md-12 overflow-auto">
+  <canvas id="ERPVendororders-orders-{{ widget.id }}" width="400" height="300"></canvas>
+</div>
+{{ include('@Widgets/widget_footer.html.twig') }}
+{{ include('@Widgets/widget_settings.html.twig') }}
+
+<script>
+
+var ctx = document.getElementById('ERPVendororders-orders-{{ widget.id }}');
+var stackedBar;
+var SalesOrderData = {
+label: 'Importe Pedidos(€)',
+data: [],
+backgroundColor: 'rgba(102, 207, 233, 1)',
+borderColor: 'rgba(58, 168, 196, 1)',
+borderWidth: 2,
+yAxisID: "y-axis-total"
+};
+
+var SalesBudgetsData = {
+label: 'Importe Presupuestos(€)',
+data: [],
+backgroundColor: 'rgba(140, 205, 127, 1)',
+borderColor: 'rgba(107, 180, 93, 1)',
+borderWidth: 2,
+yAxisID: "y-axis-total"
+};
+
+var SalesBenefictOrderData = {
+label: 'Beneficio Pedidos(€)',
+data: [],
+backgroundColor: 'rgba(181, 144, 227, 1)',
+borderColor: 'rgba(150, 104, 208, 1)',
+borderWidth: 2,
+yAxisID: "y-axis-total"
+};
+
+var SalesBenefictBudgetsData = {
+label: 'Beneficio Presupuestos(€)',
+data: [],
+backgroundColor: 'rgba(224, 223, 127, 0.6)',
+borderColor: 'rgba(205, 204, 84, 1)',
+borderWidth: 2,
+yAxisID: "y-axis-total"
+};
+
+var graphData = {
+labels: [],
+datasets: [SalesOrderData, SalesBenefictOrderData, SalesBudgetsData, SalesBenefictBudgetsData]
+};
+
+var chartOptions = {
+  onClick: function(e){
+      var element = this.getElementAtEvent(e);
+      if(element.length > 0){
+          //$("{{ widget.id }}-ERPVendororders-orders-modal").modal('toggle');
+          //alert("Clicked on a bar with index: "+element[0]._index+". Now this bar should be marked as active.");
+        }
+  },
+  scales: {
+    xAxes: [{
+      barPercentage: 1,
+      categoryPercentage: 0.6
+    }],
+    yAxes: [{
+      id: "y-axis-total",
+      stacked: false
+    }]
+  }
+};
+
+
+function getVendorsOrdersData(){
+  $.ajax({
+     url: '{{ url('widgetSalesvendor', {id: widget.id }) }}',
+     type: 'POST',
+
+     success:  function( data ) {
+         var array_salesOrder=[];
+         var array_salesOrderBenefict=[];
+         var array_salesBudget=[];
+         var array_salesBudgetBenefict=[];
+         var array_usersIds=[];
+         var array_salesOrderLabels=[];
+
+      if(typeof data.orders !== 'undefined')
+       $.each( data.orders, function( key, val ) {
+
+         array_salesOrder.push(val.total*1);
+         array_salesOrderBenefict.push(val.benefit*1);
+         array_salesBudget.push(0);
+         array_salesBudgetBenefict.push(0);
+         array_salesOrderLabels.push(val.NAME+" "+val.lastname);
+         array_usersIds.push(val.id);
+       });
+
+       if(typeof data.budgets !== 'undefined')
+        $.each( data.budgets, function( key, val ) {
+          index=array_usersIds.indexOf(val.id);
+          if(index!=-1){
+            array_salesBudget[index]=(val.total*1);
+            array_salesBudgetBenefict[index]=(val.benefit*1);
+          }else{
+            array_salesOrder.push(0);
+            array_salesOrderBenefict.push(0);
+            array_salesBudget.push(val.total*1);
+            array_salesBudgetBenefict.push(val.benefit*1);
+            array_salesOrderLabels.push(val.NAME+" "+val.lastname);
+            array_usersIds.push(val.id);
+          }
+        });
+
+
+      SalesOrderData.data=array_salesOrder;
+      SalesBenefictOrderData.data=array_salesOrderBenefict;
+      SalesBudgetsData.data=array_salesBudget;
+      SalesBenefictBudgetsData.data=array_salesBudgetBenefict;
+      graphData.labels = array_salesOrderLabels;
+      graphData.datasets= [SalesOrderData, SalesBenefictOrderData, SalesBudgetsData, SalesBenefictBudgetsData];
+      stackedBar.data=graphData;
+      stackedBar.update();
+      $("#ERPVendororders-orders").parents(".panel-default").children(".panel-heading").children(".panel-title").html("Ventas por vendedor desde "+data.from+" hasta "+data.to);
+
+     }
+   });
+ }
+
+
+$(function () {
+  $("{{ widget.id }}-ERPVendororders-orders-modal").modal();
+  stackedBar = new Chart(ctx, {
+    type: 'bar',
+    data: [],
+    options: chartOptions
+  });
+
+  getVendorsOrdersData();
+  window.setInterval(function(){
+    getVendorsOrdersData();
+  }, 60000);
+});
+</script>
+<div class="modal fade" tabindex="-1" id="{{ widget.id }}-ERPVendororders-orders-modal" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content" style="transform: matrix(1, 0, 0, 1, 0, 0);">
+        <div class="modal-header">
+          <h4 class="modal-title">{{ ('Settings')|trans }}</h4>
+        </div>
+        <div id="{{ widget.id }}-modal-form-body">
+
+        </div>
+        <div>
+        </div>
+        </br></br>
+        <div id="calendar-modal-new-calendar-footer" class="modal-footer">
+          <button type="button" class="btn btn-primary" data-dismiss="modal">{{ ("Close")|trans }}</button>
+        </div>
+      </div>
+    </div>
+  </div>

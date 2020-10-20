@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Security\Utils\SecurityUtils;
 use App\Modules\Globale\Entity\GlobaleCountries;
 use App\Modules\Globale\Entity\GlobaleCurrencies;
-
+use App\Modules\Globale\Entity\GlobaleUsersWidgets;
 /**
  * @Route("/")
  */
@@ -154,7 +154,14 @@ class GlobaleDefaultController extends Controller
          $class="\App\Widgets\Entity\Widgets".$widget;
          $utils = new GlobaleFormUtils();
          $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser()];
-         $obj=new $class();
+         $classRepositoryWidget=$this->getDoctrine()->getRepository(GlobaleUsersWidgets::class);
+         $classRepository=$this->getDoctrine()->getRepository($class);
+         $objWidget=$classRepositoryWidget->findOneBy(["id"=>$id, "active"=>1, "deleted"=>0]);
+         $obj = $classRepository->findOneBy(["userwidget"=>$objWidget, "active"=>1, "deleted"=>0]);
+
+         if(!$obj) $obj=new $class(); else $id=$obj->getId();
+
+         //if(!$obj) $obj=new $class();
          $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),
                             ["userwidget"],[],null,["widget"=>$widget]);
          return $utils->make($id, $class, $action, "form".$widget, "modal");

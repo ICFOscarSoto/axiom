@@ -30,7 +30,10 @@ use App\Modules\ERP\Entity\ERPSalesOrdersLines;
 use App\Modules\ERP\Entity\ERPProducts;
 use App\Modules\ERP\Entity\ERPFinancialYears;
 use App\Modules\ERP\Reports\ERPSalesOrdersReports;
+use App\Widgets\Entity\WidgetsERPVendorsorders;
+use App\Modules\Globale\Entity\GlobaleUsersWidgets;
 use App\Modules\Security\Utils\SecurityUtils;
+
 
 class ERPSalesOrdersController extends Controller
 {
@@ -439,6 +442,39 @@ class ERPSalesOrdersController extends Controller
 		}
 
 		return new RedirectResponse($this->generateUrl('ERPSalesOrdersForm',["id"=>$order->getId()]));
+	}
+
+	/**
+	 * @Route("/api/ERP/widget/salesvendor/{id}", name="widgetSalesvendor", defaults={"id"=0})
+	 */
+	public function widgetSalesvendor($id, RouterInterface $router,Request $request){
+		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		$widgetUserRepository=$this->getDoctrine()->getRepository(GlobaleUsersWidgets::class);
+		$widgetRepository=$this->getDoctrine()->getRepository(WidgetsERPVendorsorders::class);
+		$widgetUser=$widgetUserRepository->findOneBy(["id"=>$id, "active"=>1, "deleted"=>0]);
+		if(!$widgetUser) return new JsonResponse(["result"=>-1]);
+		if($widgetUser->getUser()!=$this->getUser()) return new JsonResponse(["result"=>-1]);
+		$widget=$widgetRepository->findOneBy(["userwidget"=>$widgetUser, "active"=>1, "deleted"=>0]);
+		if(!$widget) return new JsonResponse(["result"=>-1]);
+		if($widget->getStart()!=null){
+			$start=$widget->getStart()->format("Y-m-d");
+			$from=$widget->getStart()->format('d/m/Y');
+		}else{
+			$start=(new \Datetime())->sub(new \DateInterval('P1M'))->format("Y-m-d");
+			$from=(new \Datetime())->sub(new \DateInterval('P1M'))->format("d/m/Y");
+		}
+		if($widget->getEnd()!=null){
+			$end=$widget->getEnd()->format("Y-m-d");
+			$to=$widget->getEnd()->format('d/m/Y');
+		}else{
+			$end=(new \Datetime())->format("Y-m-d");
+			$to=(new \Datetime())->format("d/m/Y");
+		}
+		dump($start);
+		dump($end);
+		$array_orders=$widgetRepository->getOrdersbyVendor($this->getUser()->getCompany(), $start, $end);
+		$array_budgets=$widgetRepository->getBudgetsbyVendor($this->getUser()->getCompany(), $start, $end);
+		return new JsonResponse(["from"=>$from, "to"=>$to, "orders"=>$array_orders, "budgets"=>$array_budgets]);
 	}
 
 }
