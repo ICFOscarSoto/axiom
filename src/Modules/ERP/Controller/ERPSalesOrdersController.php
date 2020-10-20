@@ -470,8 +470,6 @@ class ERPSalesOrdersController extends Controller
 			$end=(new \Datetime())->format("Y-m-d");
 			$to=(new \Datetime())->format("d/m/Y");
 		}
-		dump($start);
-		dump($end);
 		$array_orders=$widgetRepository->getOrdersbyVendor($this->getUser()->getCompany(), $start, $end);
 		$array_budgets=$widgetRepository->getBudgetsbyVendor($this->getUser()->getCompany(), $start, $end);
 		return new JsonResponse(["from"=>$from, "to"=>$to, "orders"=>$array_orders, "budgets"=>$array_budgets]);
