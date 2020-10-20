@@ -4,10 +4,18 @@
 			"name": "Web Product data",
 			"fields": [
 				{ "name": "metatitle","cols": 8},
+				{
+						"name": "measurementunityofequivalence",
+						"cols": 2,
+						"transform":{
+								"type":"option",
+								"options":{"Seleccione unidad...":"-1","unidad":"0","metro":"1","kilo":"2","litro":"3","metro cuadrado":"4"}
+						}
+				},
+				{ "name": "equivalence","cols": 2},
 				{ "name": "metadescription","cols": 8},
-				{ "name": "additionalcost","cols": 8},
-				{ "name": "minquantityofsaleweb","cols": 8},
-				{	"name": "checkweb", "cols": 4},
+					{ "name": "minquantityofsaleweb","cols": 2},
+				{ "name": "additionalcost","cols": 2},
 				{	"name": "active", "cols": 2}
 			]
 		}]

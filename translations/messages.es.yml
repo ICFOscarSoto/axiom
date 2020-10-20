@@ -453,6 +453,16 @@ Onbuy: Se compra
 Netprice: Neto
 ShoppingPrice: Precio de compra
 Vaiants: Variantes
+Checkweb: Producto Web
+
+
+# WEB PRODUCT DATA
+#----------------------------------------------------------------------------------------------------------------------
+Web Product data: Datos Web
+Measurementunityofequivalence: Unidad de Medida de Equivalencia
+Equivalence: Equivalencia
+
+
 #PRICES
 #----------------------------------------------------------------------------------------------------------------------
 Prices: Precios

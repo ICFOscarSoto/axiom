@@ -208,6 +208,11 @@ class ERPProducts
      */
     private $stocks;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $checkweb;
+
     public function getStockcampollano($doctrine): ?int
     {
         $stockRepository=$doctrine->getRepository('\App\Modules\ERP\Entity\ERPStocks');
@@ -911,6 +916,18 @@ class ERPProducts
 
 
      }
+
+  public function getCheckweb(): ?bool
+  {
+      return $this->checkweb;
+  }
+
+  public function setCheckweb(?bool $checkweb): self
+  {
+      $this->checkweb = $checkweb;
+
+      return $this;
+  }
 
 
 }

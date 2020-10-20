@@ -25,11 +25,6 @@ class ERPWebProducts
     private $product;
 
     /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
-    private $checkweb;
-
-    /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCompanies")
      * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
@@ -78,6 +73,17 @@ class ERPWebProducts
      */
     private $minquantityofsaleweb;
 
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    private $equivalence;
+
+    /**
+     * @ORM\Column(type="string", length=32, nullable=true)
+     */
+    private $measurementunityofequivalence;
+
+
     public function getId(): ?int
     {
         return $this->id;
@@ -91,18 +97,6 @@ class ERPWebProducts
     public function setProduct(ERPProducts $product): self
     {
         $this->product = $product;
-
-        return $this;
-    }
-
-    public function getCheckweb(): ?bool
-    {
-        return $this->checkweb;
-    }
-
-    public function setCheckweb(?bool $checkweb): self
-    {
-        $this->checkweb = $checkweb;
 
         return $this;
     }
@@ -214,4 +208,30 @@ class ERPWebProducts
 
         return $this;
     }
+
+    public function getEquivalence(): ?float
+    {
+        return $this->equivalence;
+    }
+
+    public function setEquivalence(?float $equivalence): self
+    {
+        $this->equivalence = $equivalence;
+
+        return $this;
+    }
+
+    public function getMeasurementunityofequivalence(): ?string
+    {
+        return $this->measurementunityofequivalence;
+    }
+
+    public function setMeasurementunityofequivalence(?string $measurementunityofequivalence): self
+    {
+        $this->measurementunityofequivalence = $measurementunityofequivalence;
+
+        return $this;
+    }
+
+
 }

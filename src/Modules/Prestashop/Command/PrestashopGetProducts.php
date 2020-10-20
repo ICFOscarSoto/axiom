@@ -12,6 +12,7 @@ use App\Modules\ERP\Entity\ERPDepartments;
 use App\Modules\ERP\Entity\ERPContacts;
 use App\Modules\ERP\Entity\ERPAddresses;
 use App\Modules\ERP\Entity\ERPProducts;
+use App\Modules\ERP\Entity\ERPWebProducts;
 use App\Modules\ERP\Entity\ERPPaymentMethods;
 use App\Modules\ERP\Entity\ERPPaymentTerms;
 use App\Modules\ERP\Entity\ERPCustomerActivities;
@@ -65,6 +66,8 @@ class PrestashopGetProducts extends ContainerAwareCommand
       case 'products': $this->importProducts($input, $output);
       break;
       case 'images': $this->importImages($input, $output);
+      break;
+      case 'web': $this->importWebFields($input, $output);
       break;
       default:
         $output->writeln('Opcion no válida');
@@ -247,6 +250,129 @@ class PrestashopGetProducts extends ContainerAwareCommand
      fclose($fp);
    }
 
+   public function importWebFields(InputInterface $input, OutputInterface $output){
+     //------   Create Lock Mutex    ------
+     if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+         $fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-prestashopGetProducts-importWebFields.lock', 'c');
+     } else {
+        $fp = fopen('/tmp/axiom-prestashopGetProducts-importWebFields.lock', 'c');
+     }
 
+     if (!flock($fp, LOCK_EX | LOCK_NB)) {
+       $output->writeln('* Fallo al iniciar la sincronizacion de productos con prestashop: El proceso ya esta en ejecución.');
+       exit;
+     }
+
+
+     //------   Critical Section START   ------
+     $rawSync=false;
+     $navisionSyncRepository=$this->doctrine->getRepository(NavisionSync::class);
+     $productRepository=$this->doctrine->getRepository(ERPProducts::class);
+     $WebProductRepository=$this->doctrine->getRepository(ERPWebProducts::class);
+     $companyRepository=$this->doctrine->getRepository(GlobaleCompanies::class);
+     $company=$companyRepository->findOneBy(["id"=>2]);
+     $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"prestashop:webfields"]);
+     $doctrine = $this->getContainer()->get('doctrine');
+     if ($navisionSync==null) {
+       $navisionSync=new NavisionSync();
+       $navisionSync->setMaxtimestamp(0);
+       $navisionSync->setLastsync(date_create_from_format("Y-m-d H:i:s","2000-01-01 00:00:00"));
+     }
+     $datetime=new \DateTime();
+     $output->writeln('* Sincronizando campos web de prestashop....');
+
+     $auth = base64_encode($this->token);
+     $context = stream_context_create([
+         "http" => ["header" => "Authorization: Basic $auth"]
+     ]);
+     $array=[];
+     $products=[];
+
+     /*
+     Parámetros especiales que tenemos que sacar de la web y que se actualizaban a través del actualizador
+     - cantidad_pedido_minimo: lo usamos cuando queremos vender una cantidad de unidades mínimas de un producto. Este valor multiplica en la web el precio
+     y concatena al nombre el nº de unidades que se venden.
+     - unidad_medida: ese parámetro lo utilizamos para indicar en la web si el producto se venden en metros, kilos, etc... Lo establecemos en función de las
+     abreviaturas en los nombres de navision: "v/metro", "v/m", "vta/metro", etc.
+     - equivalencia y unidad_medida_equivalencia: son dos campos que se extran de un único campo en Navision para sacar el precio equivalente por unidad de medida (El litro te sale a €€)
+
+     */
+     //&filter[date_upd]=>[".$navisionSync->getLastsync()->format("Y-m-d H:i:s")."]
+     try{
+           //$xml_string=file_get_contents($this->url."/api/products/?display=[reference,name,cantidad_pedido_minimo,unidad_medida,equivalencia,unidad_medida_equivalencia,meta_title,meta_description]&filter[reference]=2322290200AC", false, $context);
+           $xml_string=file_get_contents($this->url."/api/products/?display=[reference,name,cantidad_pedido_minimo,unidad_medida,equivalencia,unidad_medida_equivalencia,meta_title,meta_description]", false, $context);
+           $xml = simplexml_load_string($xml_string, 'SimpleXMLElement', LIBXML_NOCDATA);
+           $json = json_encode($xml);
+           $array = json_decode($json,TRUE);
+           $products=isset($array["products"]["product"])?$array["products"]["product"]:[];
+          // $prodPrestashop=isset($array["products"]["product"])?$array["products"]["product"]:[];
+
+        //  dump($prodPrestashop);
+       foreach($products as $prodPrestashop){
+
+         //$output->writeln("Prod:".$prodPrestashop);
+         $output->writeln("Actualizando producto: ".$prodPrestashop["reference"]." - ".$prodPrestashop["name"]["language"]);
+         $cantidad_pedido_minimo=is_array($prodPrestashop["cantidad_pedido_minimo"])?"":$prodPrestashop["cantidad_pedido_minimo"];
+         $unidad_medida=is_array($prodPrestashop["unidad_medida"])?"":$prodPrestashop["unidad_medida"];
+         $equivalencia=is_array($prodPrestashop["equivalencia"])?"":$prodPrestashop["equivalencia"];
+         $unidad_medida_equivalencia=is_array($prodPrestashop["unidad_medida_equivalencia"])?"":$prodPrestashop["unidad_medida_equivalencia"];
+         $metatitle=is_array($prodPrestashop["meta_title"]["language"])?"":$prodPrestashop["meta_title"]["language"];
+         $metadescription=is_array($prodPrestashop["meta_description"]["language"])?"":$prodPrestashop["meta_description"]["language"];
+         $product=$productRepository->findOneBy(["company"=>$company, "code"=>$prodPrestashop["reference"], "deleted"=>0]);
+
+         //$output->writeln($cantidad_pedido_minimo." - ".$unidad_medida." - ".$equivalencia." - ".$unidad_medida_equivalencia. " - ".$metatitle. " - ".$metadescription);
+         //$output->writeln($cantidad_pedido_minimo." - ".$unidad_medida." - ".$equivalencia." - ".$unidad_medida_equivalencia. " - ".$metatitle. " - ".$metadescription);
+
+         if($product){
+           $product->setCheckweb(1);
+           $doctrine->getManager()->persist($product);
+           $webproduct=$WebProductRepository->findOneBy(["product"=>$product->getId()]);
+           if($webproduct){
+             $webproduct->setMinquantityofsaleweb($cantidad_pedido_minimo);
+             $webproduct->setEquivalence($equivalencia);
+             $webproduct->setMeasurementunityofequivalence($unidad_medida_equivalencia);
+             $webproduct->setMetatitle($metatitle);
+             $webproduct->setMetadescription($metadescription);
+             $doctrine->getManager()->persist($webproduct);
+             $doctrine->getManager()->flush();
+           }
+           else{
+             $obj=new ERPWebProducts();
+             $obj->setProduct($product);
+             $company=$companyRepository->find(2);
+             $obj->setCompany($company);
+             $obj->setMinquantityofsaleweb($cantidad_pedido_minimo);
+             $obj->setEquivalence($equivalencia);
+             $obj->setMeasurementunityofequivalence($unidad_medida_equivalencia);
+             $obj->setMetatitle($metatitle);
+             $obj->setMetadescription($metadescription);
+             $obj->setDateadd(new \Datetime());
+             $obj->setDateupd(new \Datetime());
+             $obj->setDeleted(0);
+             $obj->setActive(1);
+             $doctrine->getManager()->persist($obj);
+             $doctrine->getManager()->flush();
+           }
+           $doctrine->getManager()->clear();
+         }
+       }
+
+     }catch(Exception $e){}
+
+     $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"prestashop:webfields"]);
+     if ($navisionSync==null) {
+       $navisionSync=new NavisionSync();
+       $navisionSync->setEntity("prestashop:products");
+     }
+
+     $navisionSync->setLastsync($datetime);
+     $navisionSync->setMaxtimestamp($datetime->getTimestamp());
+     $doctrine->getManager()->persist($navisionSync);
+     $doctrine->getManager()->flush();
+     //------   Critical Section END   ------
+     //------   Remove Lock Mutex    ------
+     fclose($fp);
+
+   }
 }
 ?>

@@ -26,6 +26,7 @@
 				{	"name": "stockcontrol", "cols": 2},
 				{	"name": "onsale", "cols": 1},
 				{	"name": "onbuy", "cols": 1},
+				{	"name": "checkweb", "cols": 2},
 				{ "name": "description","cols": 12, "class":"wysiwyg"},
 				{	"name": "traceability", "cols": 2},
 				{	"name": "grouped", "cols": 2},
