@@ -137,7 +137,7 @@ class ERPProductsController extends Controller
 			if ($obj && $obj->getCheckweb()) {
 				$tabs[]=["name" => "webproduct", "icon"=>"fa fa-id-card", "caption"=>"Web", "route"=>$this->generateUrl("infoWebProducts",["id"=>$id])];
 			//	$tabs[]=["name" => "webproduct", "icon"=>"fa fa-id-card", "caption"=>"Web", "route"=>$this->generateUrl("generictablist",["function"=>"formatListByProduct","module"=>"ERP","name"=>"WebProducts","id"=>$id])];
-
+		}
 				return $this->render('@Globale/generictabform.html.twig', array(
 									'entity_name' => $product_name,
 									'controllerName' => 'ProductsController',
@@ -157,7 +157,7 @@ class ERPProductsController extends Controller
 																			 ["type"=>"js",  "path"=>"/js/jquery.nestable.js"]]
 					));
 
-		}
+
 	}
 
 		/**
