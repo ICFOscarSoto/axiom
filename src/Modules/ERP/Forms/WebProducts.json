@@ -16,7 +16,8 @@
 				{ "name": "metadescription","cols": 8},
 					{ "name": "minquantityofsaleweb","cols": 2},
 				{ "name": "additionalcost","cols": 2},
-				{	"name": "active", "cols": 2}
+				{	"name": "active", "cols": 2},
+				{	"name": "product", "cols": 2}
 			]
 		}]
 }]
