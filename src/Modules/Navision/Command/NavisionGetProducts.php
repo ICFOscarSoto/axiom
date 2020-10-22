@@ -173,7 +173,7 @@ class NavisionGetProducts extends ContainerAwareCommand
          $obj->setCode($object["code"]);
          $obj->setWeight($object["Weight"]);
          // Comprobamos si el producto tiene descuentos, si no los tiene se le pone como precio neto.
-         $json3=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getPrices.php?from='.$object["code"].'$supplier='.$object["Supplier"]);
+         $json3=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getPrices.php?from='.$object["code"].'&supplier='.$object["Supplier"]);
          $prices=json_decode($json3, true);
          $prices=$prices[0];
          $obj->setnetprice(1);
@@ -358,7 +358,12 @@ public function clearEAN13(InputInterface $input, OutputInterface $output){
  */
 public function importPrices(InputInterface $input, OutputInterface $output) {
   //------   Create Lock Mutex    ------
-  $fp = fopen('/tmp/axiom-navisionGetProducts-importPrices.lock', 'c');
+  if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+      $fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetProducts-importPrices.lock', 'c');
+  } else {
+      $fp = fopen('/tmp/axiom-navisionGetProducts-importPrices.lock', 'c');
+  }
+
   if (!flock($fp, LOCK_EX | LOCK_NB)) {
     $output->writeln('* Fallo al iniciar la sincronizacion de precios: El proceso ya esta en ejecución.');
     exit;
@@ -371,49 +376,77 @@ public function importPrices(InputInterface $input, OutputInterface $output) {
   $repositorySupliers=$this->doctrine->getRepository(ERPSuppliers::class);
   $repositoryShoppingDiscounts=$this->doctrine->getRepository(ERPShoppingDiscounts::class);
   $repository=$this->doctrine->getRepository(ERPProducts::class);
-  $products=$repository->findAll();
+  $page=5000;
+  $totalProducts=round(intval($repository->totalProducts())/$page);
+  $count=0;
+  while($count<$totalProducts){
+      $products=$repository->productsLimit(intval($count*$page),intval($page));
+      $count++;
 
-  //Disable SQL logger
-  foreach($products as $product) {
-    $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
-    $price=$repositoryShoppingDiscounts->findOneBy(["supplier"=>$product->getSupplier(),"category"=>$product->getCategory()]);
-    if ($price==null && $product->getCategory()!=null && $product->getSupplier()!=null){
-      $supplier=$repositorySupliers->findOneBy(["id"=>$product->getSupplier()->getId()]);
-      $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getPrices.php?from='.$product->getCode().'&supplier='.$supplier->getCode());
-      $objects=json_decode($json, true);
-      $objects=$objects[0];
-      foreach ($objects["class"] as $prices){
-        if($prices["Discount"]!=0){
-          $category=$repositoryCategory->findOneBy(["id"=>$product->getCategory()->getId()]);
-          $output->writeln(' --> El producto '.$product->getCode().' esta anadiendo el precio '.$prices["Discount"].' al proveedor '.$supplier->getCode().' en la categoria '.$category->getName());
-          $obj=new ERPShoppingDiscounts();
-          $obj->setSupplier($supplier);
-          $obj->setCategory($category);
-          $obj->setDiscount($prices["Discount"]);
-          $obj->setDiscount1($prices["Discount1"]);
-          $obj->setDiscount2($prices["Discount2"]);
-          $obj->setDiscount3($prices["Discount3"]);
-          $obj->setDiscount4($prices["Discount4"]);
-          $obj->setQuantity($prices["Quantity"]);
-          $obj->setStart(date_create_from_format("Y-m-d h:i:s.u",$prices["Starting"]["date"]));
-          if ($prices["Ending"]["date"]=="1753-01-01 00:00:00.000000") {
-            $obj->setEnd(null);
-          } else $obj->setEnd(date_create_from_format("Y-m-d h:i:s.u",$prices["Ending"]["date"]));
-          $obj->setDateadd(new \Datetime());
-          $obj->setDateupd(new \Datetime());
-          if (strtotime($prices["Ending"]["date"])<strtotime(date("d-m-Y H:i:00",time())) && $prices["Ending"]["date"]!="1753-01-01 00:00:00.000000" ) {
-            $obj->setActive(0);
-          } else {
-            $obj->setActive(1);
-          }
-          $obj->setDeleted(0);
-          $this->doctrine->getManager()->merge($obj);
-          $this->doctrine->getManager()->flush();
-          $obj->setShoppingPrices($this->doctrine);
-          $this->doctrine->getManager()->clear();
-        }
-      }
+      foreach($products as $id) {
+      $obj=$repository->findOneBy(["id"=>$id, "company"=>2]);
+      dump('Producto es '.$obj->getCode().' y el proveedor es '.$obj->getSupplier()->getCode());
+      $json3=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getPrices.php?from='.$obj->getCode().'&supplier='.$obj->getSupplier()->getCode());
+      $prices=json_decode($json3, true);
+      $prices=$prices[0];
+      $obj->setnetprice(1);
+      foreach ($prices["class"] as $price){
+        dump($price);
+              if($price["Discount"]!=0 and $price["Ending"]["date"]=="1753-01-01 00:00:00.000000") {
+                  $obj->setnetprice(0);
+                  $this->doctrine->getManager()->merge($obj);
+                  $this->doctrine->getManager()->flush();
+                  $this->doctrine->getManager()->clear();
+                }
+        dump($obj->getnetprice());
+            }
     }
+            //$products=$repository->findAll();
+            //Disable SQL logger
+        /*    foreach($products as $id) {
+              $product=$repository->findOneBy(["id"=>$id, "company"=>2]);
+              $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
+              $price=$repositoryShoppingDiscounts->findOneBy(["supplier"=>$product->getSupplier(),"category"=>$product->getCategory()]);
+              if ($price==null && $product->getCategory()!=null && $product->getSupplier()!=null){
+                $supplier=$repositorySupliers->findOneBy(["id"=>$product->getSupplier()->getId()]);
+                $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getPrices.php?from='.$product->getCode().'&supplier='.$supplier->getCode());
+                $objects=json_decode($json, true);
+                $objects=$objects[0];
+                foreach ($objects["class"] as $prices){
+                  if($prices["Discount"]!=0){
+                    $category=$repositoryCategory->findOneBy(["id"=>$product->getCategory()->getId()]);
+                    $output->writeln(' --> El producto '.$product->getCode().' esta anadiendo el precio '.$prices["Discount"].' al proveedor '.$supplier->getCode().' en la categoria '.$category->getName());
+                    $obj=new ERPShoppingDiscounts();
+                    $obj->setSupplier($supplier);
+                    $obj->setCategory($category);
+                    $obj->setDiscount($prices["Discount"]);
+                    $obj->setDiscount1($prices["Discount1"]);
+                    $obj->setDiscount2($prices["Discount2"]);
+                    $obj->setDiscount3($prices["Discount3"]);
+                    $obj->setDiscount4($prices["Discount4"]);
+                    $obj->setQuantity($prices["Quantity"]);
+                    $obj->setStart(date_create_from_format("Y-m-d h:i:s.u",$prices["Starting"]["date"]));
+                    if ($prices["Ending"]["date"]=="1753-01-01 00:00:00.000000") {
+                      $obj->setEnd(null);
+                    } else $obj->setEnd(date_create_from_format("Y-m-d h:i:s.u",$prices["Ending"]["date"]));
+                    $obj->setDateadd(new \Datetime());
+                    $obj->setDateupd(new \Datetime());
+                    if (strtotime($prices["Ending"]["date"])<strtotime(date("d-m-Y H:i:00",time())) && $prices["Ending"]["date"]!="1753-01-01 00:00:00.000000" ) {
+                      $obj->setActive(0);
+                    } else {
+                      $obj->setActive(1);
+                    }
+                    $obj->setDeleted(0);
+                    $this->doctrine->getManager()->merge($obj);
+                    $this->doctrine->getManager()->flush();
+                    if($obj->getEnd()==null) $obj->setShoppingPrices($this->doctrine);
+                    $this->doctrine->getManager()->clear();
+                  }
+                }
+              }
+
+
+            }*/
   }
 
   //------   Critical Section END   ------

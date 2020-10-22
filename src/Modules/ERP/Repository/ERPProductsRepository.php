@@ -77,8 +77,28 @@ class ERPProductsRepository extends ServiceEntityRepository
         ON pv.variantvalue_id=vv.id
         LEFT JOIN erpvariants v
         ON pv.variantname_id=v.id
-        WHERE pv.product_id='.$product.' AND pv.active=1 AND pv.deleted=0 ORDER BY name ASC';
-        return $this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
+        WHERE pv.product_id=:product AND pv.active=1 AND pv.deleted=0 ORDER BY name ASC';
+        $params=['product' => $product];
+        return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+    }
+
+    /* Nos devuelve la cantidad de productos con categoría */
+
+    public function totalProducts(){
+      $query='SELECT count(id) as total from erpproducts where category_id is not null';
+      $result=$this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
+      return $result[0]["total"];
+    }
+
+    /* Nos devuelve un número limitado de productos, para ello se le indica el índice desde el que empieza $start, y la cantidad que queremos devolver $page  */
+
+    public function productsLimit($start, $page){
+      $query='SELECT id FROM erpproducts
+              WHERE category_id IS NOT NULL
+              ORDER BY code
+              LIMIT 5000,'.$page.'';
+      $result=$this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
+      return $result;
     }
 
 
