@@ -92,9 +92,9 @@ class ERPStoreLocationsController extends Controller
   }
 
 	/**
-  * @Route("/api/ERP/locations/printLabel/{id}/{idend}", name="printLocationlabel", defaults={"id"=0, "idend"="0"})
+  * @Route("/api/ERP/locations/printLabel/{id}/{idend}/{type}", name="printLocationlabel", defaults={"id"=0, "idend"="0", "type"=1})
   */
-  public function printLocationlabel($id, $idend,Request $request){
+  public function printLocationlabel($id, $idend, $type, Request $request){
 	 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
  	 $repository=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
 	 $json=$request->query->get('json',null);
@@ -105,14 +105,14 @@ class ERPStoreLocationsController extends Controller
 			 $loc=$repository->findOneBy(["name"=>$item]);
 			 $locitem["id"]=$loc->getId();
 			 $locitem["name"]=$loc->getName();
-			 $locitem["orientation"]=$loc->getOrientation();
+			 if(isset($locitem["orientation"])) $locitem["orientation"]=$loc->getOrientation(); else $locitem["orientation"]=0;
 			 if($loc) $locations[]=$locitem;
 		 }
 	 }else{
 		 $locations=$repository->getLocations($id, $idend);
 	 }
 
- 	 $params=["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "locations"=>$locations, "user"=>$this->getUser()];
+ 	 $params=["type"=>$type, "doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "locations"=>$locations, "user"=>$this->getUser()];
  	 $reportsUtils = new ERPLocationsReports();
  	 $pdf=$reportsUtils->create($params);
  	 return new Response("", 200, array('Content-Type' => 'application/pdf'));
