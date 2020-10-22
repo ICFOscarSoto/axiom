@@ -193,12 +193,13 @@ class ERPShoppingDiscounts
       $repositoryProduct=$doctrine->getRepository(ERPProducts::class);
       $repository=$doctrine->getRepository(ERPSuppliers::class);
       $repositoryIncrements=$doctrine->getRepository(ERPIncrements::class);
-      $products=$repository->productsBySupplier($this->supplier->getId());
+      if ($this->getCategory()==null) $products=$repository->productsBySupplier($this->supplier->getId());
+      else $products=$repositoryProduct->productsBySupplierCategory($this->supplier->getId(),$this->category->getId());
       foreach($products as $product){
         $productEntity=$repositoryProduct->findOneBy(["id"=>$product]);
         $productEntity->priceCalculated($doctrine);
-        $productEntity->calculateIncrementByProduct();
-        $productEntity->calculateCustomerIncrementByProduct();
+        $productEntity->calculateIncrementByProduct($doctrine);
+        $productEntity->calculateCustomerIncrementsByProduct($doctrine);
         $em->persist($productEntity);
         $em->flush();
 
