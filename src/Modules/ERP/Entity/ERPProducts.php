@@ -752,6 +752,7 @@ class ERPProducts
     public function postProccess($kernel, $doctrine, $user, $params, $oldobj){
       $this->calculateIncrementByProduct($doctrine);
       $this->calculateCustomerIncrementsByProduct($doctrine);
+      if($this->getCheckweb()) $this->checkWebProduct($doctrine);
     }
 
      public function formValidation($kernel, $doctrine, $user, $validationParams){
@@ -928,6 +929,28 @@ class ERPProducts
 
       return $this;
   }
+
+   public function checkWebProduct($doctrine){
+     $em = $doctrine->getManager();
+     $repositoryWebProduct=$doctrine->getRepository(ERPWebProducts::class);
+     $companyRepository=$doctrine->getRepository(GlobaleCompanies::class);
+     $webproduct=$repositoryWebProduct->findOneBy(["product"=>$this]);
+
+     if($webproduct==null){
+       $obj=new ERPWebProducts();
+       $obj->setProduct($this);
+       $company=$companyRepository->find(2);
+       $obj->setCompany($company);
+       $obj->setDateadd(new \Datetime());
+       $obj->setDateupd(new \Datetime());
+       $obj->setDeleted(0);
+       $obj->setActive(1);
+       $em->persist($obj);
+       $em->flush();
+     }
+
+
+   }
 
 
 }

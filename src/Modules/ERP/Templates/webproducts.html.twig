@@ -1,0 +1,73 @@
+
+<!-- MAIN CONTENT -->
+<div class="principal-content" id="principal-content">
+	{% set formConstructor = form %}
+
+	<div id="{{formConstructor.name}}-form-body"><form>
+		<div class="panel minimal">
+	    <div class="panel-body">
+	      <div class="row">
+	        <div class="col-md-12">
+	          <div id="{{formConstructor.name}}-validation-error" class="alert alert-danger form-validation-error" style="display: none">
+	            <strong>Ocurrieron los siguientes errores:</strong></br></br><ul id="validation-errors-list"></ul>
+	          </div>
+	          <div id="{{formConstructor.name}}-validation-warning" class="alert alert-warning form-validation-error" style="display: none">
+	            <strong>Revise las siguientes advertencias:</strong></br></br><ul id="validation-warnings-list"></ul>
+	          </div>
+	        </div>
+	      </div>
+	    </div>
+	  </div>
+		<input type="hidden" id="post-url" name="post-url" value="{{ url('dataWebProducts',{'id': formConstructor.id_object, 'parent': parent,  'action':'save'}) }}">
+		<input type="hidden" id="id-object" name="id-object" value="{{ formConstructor.id_object }}">
+		{{ form_row(formConstructor.form['_token']) }}
+	<div class="row">
+		<div class="col-md-2">
+    	{{ form_row(formConstructor.form['metatitle']) }}
+    </div>
+    <div class="col-md-2">
+      {{ form_row(formConstructor.form['metadescription']) }}
+    </div>
+    <div class="col-md-2">
+      {{ form_row(formConstructor.form['measurementunityofequivalence']) }}
+    </div>
+    <div class="col-md-2">
+      {{ form_row(formConstructor.form['equivalence']) }}
+    </div>
+  </div>
+</div>
+
+<div class="row">
+	<div style="text-align: right;" class="col-md-12">
+		<button attr-id="" attr-action="" id="{{formConstructor.name}}-button-cancel" type="button" class="btn btn">{{ ("Cancelar")|trans }}</button>
+		<button attr-id="" attr-action="" id="{{formConstructor.name}}-button-continue" type="button" class="btn btn-green">{{ ("Guardar")|trans }}</button>
+	</div>
+</div>
+</div>
+<!-- END MAIN CONTENT -->
+
+<script>
+
+$(document).ready(function() {
+	$('body').on('click', "#{{formConstructor.name}}-button-continue", function() {
+		if($("#{{formConstructor.name}}-form-body").find('form').valid()){
+			if((++load_wait)==1) $("#load-spinner").fadeIn();
+			$.post($("#{{formConstructor.name}}-form-body").find('form').find('#post-url').val(), $("#{{formConstructor.name}}-form-body").find('form').serialize(),
+			function(data, status, xhr){
+				if((--load_wait)==0) $("#load-spinner").fadeOut();
+				{{ include("@Globale/formvalidation.html.twig") }}
+				if(data.result){
+					//$("#tabs-list li").attr("attr-id",data.id);
+					toastr.success("Datos guardados correctamente", "Confirmación", confirmation);
+					if(data.reload) location.href=data.href;
+					$("#{{formConstructor.name}}-form-body").find('form').validate({ lang: 'es' }).resetForm();
+				}
+				else toastr.error("Ocurrió un error al guardar los datos", "Confirmación", confirmation);
+			}, "json");
+		}
+	});
+	$('body').on('click', "#{{formConstructor.name}}-button-cancel", function() {
+		window.history.back();
+	});
+});
+</script>

@@ -10,6 +10,7 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
+use App\Modules\ERP\Entity\ERPProducts;
 use App\Modules\ERP\Entity\ERPWebProducts;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
@@ -50,20 +51,65 @@ class ERPWebProductsController extends Controller
   		return new RedirectResponse($this->router->generate('app_login'));
     }
 
-		/**
-		 * @Route("/{_locale}/webproducts/data/{id}/{action}", name="dataWebProducts", defaults={"id"=0, "action"="read"})
-		 */
-		 public function data($id, $action, Request $request){
-		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-		 $template=dirname(__FILE__)."/../Forms/WebProducts.json";
-		 $params=["doctrine"=>$this->getDoctrine(),"id"=>$id];
-		 $utils = new GlobaleFormUtils();
-		 //$utilsObj=new $this->utilsClass();
-		 //,method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]
-		 $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),['product']);
-		 return $utils->make($id, $this->class, $action, "formWebProducts", "full", "@Globale/form.html.twig", 'formProducts', $this->utilsClass);
 
-		}
+		/**
+	   * @Route("/{_locale}/webproducts/infoWebProducts/{id}", name="infoWebProducts", defaults={"id"=0})
+	   */
+	  public function infoWebProducts($id, Request $request){
+
+			//$productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
+			//$product=$productRepository->findOneBy(["id"=>$id]);
+			$webproductRepository=$this->getDoctrine()->getRepository(ERPWebProducts::class);
+			$webproduct=$webproductRepository->findOneBy(["product"=>$id]);
+			$this_id=$webproduct->getId();
+			$template=dirname(__FILE__)."/../Forms/WebProducts.json";
+	  	$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
+			$formUtils = new GlobaleFormUtils();
+			$formUtilsWebProducts = new ERPWebProductsUtils();
+			$formUtils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),$formUtilsWebProducts->getExcludedForm([]),$formUtilsWebProducts->getIncludedForm(["doctrine"=>$this->getDoctrine(), "user"=>$this->getUser(), "id"=>$this_id, "parent" => $id]));
+
+
+			return $this->render('@ERP/webproducts.html.twig', array(
+				'controllerName' => 'WebProductsController',
+				'interfaceName' => 'Productos',
+				'optionSelected' => 'webproducts',
+				'userData' => $userdata,
+				'id' => $this_id,
+				'parent' => $id,
+				'form' => $formUtils->formatForm('WebProducts', true, $this_id, $this->class),
+				'include_footer' => [["type"=>"css", "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.css"],
+														 ["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.js"],
+														 ["type"=>"js",  "path"=>"/js/jquery.nestable.js"]]
+			));
+	  }
+
+
+		/**
+		 * @Route("/{_locale}/webproducts/data/{id}/{parent}/{action}", name="dataWebProducts", defaults={"id"=0, "parent"=0 , "action"="read"})
+		 */
+		 public function dataWebProducts($id, $parent, $action, Request $request){
+
+		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+
+		 $template=dirname(__FILE__)."/../Forms/WebProducts.json";
+		 $utils = new GlobaleFormUtils();
+		 //$obj = new $this->class();
+
+		 $webProductsRepository=$this->getDoctrine()->getRepository(ERPWebProducts::class);
+		 $webproduct= new ERPWebProducts();
+		 $webproduct=$webProductsRepository->findOneBy(["id"=>$id]);
+
+		 $productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
+		 $product=$productRepository->findOneBy(["id"=>$parent]);
+		 $webproduct->setProduct($product);
+		 //$default= new GlobaleCountries();
+		 //$default=$default->findById(64);
+		 $utils->initialize($this->getUser(), $webproduct, $template, $request, $this, $this->getDoctrine(),["product"]);
+		 $utils->values(["product"=>$product]);
+		 $make=$utils->make($id, $this->class, $action, "formWebProducts", "modal", "@ERP/webproducts.html.twig");
+		 return $make;
+
+	 	}
 
 
 		/**
