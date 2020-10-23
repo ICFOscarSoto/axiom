@@ -120,7 +120,7 @@ function getVendorsOrdersData(){
       graphData.datasets= [SalesOrderData, SalesBenefictOrderData, SalesBudgetsData, SalesBenefictBudgetsData];
       stackedBar.data=graphData;
       stackedBar.update();
-      $("#ERPVendororders-orders").parents(".panel-default").children(".panel-heading").children(".panel-title").html("Ventas por vendedor desde "+data.from+" hasta "+data.to);
+      $("#ERPVendororders-orders-{{ widget.id }}").parents(".panel-default").children(".panel-heading").children(".panel-title").html("Ventas por vendedor desde "+data.from+" hasta "+data.to);
 
      }
    });

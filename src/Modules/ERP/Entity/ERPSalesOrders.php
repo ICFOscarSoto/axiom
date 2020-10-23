@@ -282,6 +282,16 @@ class ERPSalesOrders
      */
     private $salesbudget;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $websale;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $shipmentdate;
+
 
     public function getId(): ?int
     {
@@ -885,6 +895,30 @@ class ERPSalesOrders
     public function setSalesbudget(?ERPSalesBudgets $salesbudget): self
     {
         $this->salesbudget = $salesbudget;
+
+        return $this;
+    }
+
+    public function getWebsale(): ?bool
+    {
+        return $this->websale;
+    }
+
+    public function setWebsale(bool $websale): self
+    {
+        $this->websale = $websale;
+
+        return $this;
+    }
+
+    public function getShipmentdate(): ?\DateTimeInterface
+    {
+        return $this->shipmentdate;
+    }
+
+    public function setShipmentdate(?\DateTimeInterface $shipmentdate): self
+    {
+        $this->shipmentdate = $shipmentdate;
 
         return $this;
     }
