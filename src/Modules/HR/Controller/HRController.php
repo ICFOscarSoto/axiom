@@ -415,14 +415,14 @@ class HRController extends Controller
 	 */
 	 public function workerGetExtensions(Request $request){
 		 	$array=["refresh"=>60, "items"=>[
-				["number"=>11, "name"=>"Manolo Jiménez", "firstname"=>"", "lastname"=> "", "phone"=> "", "mobile"=> "", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
-				["number"=>12, "name"=>"Juanjo Roncero", "firstname"=>"", "lastname"=> "", "phone"=> "", "mobile"=> "", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
-				["number"=>13, "name"=>"Antonio Sánchez", "firstname"=>"", "lastname"=> "", "phone"=> "", "mobile"=> "", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
-				["number"=>14, "name"=>"María José Puche", "firstname"=>"", "lastname"=> "", "phone"=> "", "mobile"=> "", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
-				["number"=>15, "name"=>"Juan Ruiz", "firstname"=>"", "lastname"=> "", "phone"=> "", "mobile"=> "", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
-				["number"=>16, "name"=>"Antonio José Sánchez", "firstname"=>"", "lastname"=> "", "phone"=> "", "mobile"=> "", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
-				["number"=>17, "name"=>"Chema Sánchez", "firstname"=>"", "lastname"=> "", "phone"=> "", "mobile"=> "", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
-				["number"=>18, "name"=>"Juanga Sánchez", "firstname"=>"", "lastname"=> "", "phone"=> "", "mobile"=> "", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
+				["number"=>11, "name"=>"Manolo Jimenez", "firstname"=>"Manolo", "lastname"=> "Jimenez", "phone"=> "11", "mobile"=> "", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
+				["number"=>12, "name"=>"Juanjo Roncero", "firstname"=>"", "lastname"=> "", "phone"=> "", "mobile"=> "12", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
+				["number"=>13, "name"=>"Antonio Sanchez", "firstname"=>"", "lastname"=> "", "phone"=> "", "mobile"=> "13", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
+				["number"=>14, "name"=>"Maria Jose Puche", "firstname"=>"", "lastname"=> "", "phone"=> "", "mobile"=> "14", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
+				["number"=>15, "name"=>"Juan Ruiz", "firstname"=>"", "lastname"=> "", "phone"=> "", "mobile"=> "15", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
+				["number"=>16, "name"=>"Antonio Jose Sanchez", "firstname"=>"", "lastname"=> "", "phone"=> "16", "mobile"=> "", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
+				["number"=>17, "name"=>"Chema Sanchez", "firstname"=>"", "lastname"=> "", "phone"=> "17", "mobile"=> "", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
+				["number"=>18, "name"=>"Juanga Sanchez", "firstname"=>"", "lastname"=> "", "phone"=> "18", "mobile"=> "", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
 			]];
 /*12	Juanjo Roncero
 13	Antonio Sánchez
