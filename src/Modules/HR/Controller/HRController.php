@@ -414,54 +414,44 @@ class HRController extends Controller
 	 * @Route("/api/HR/workers/getextensions/2/json", name="workerGetExtensions", defaults={"id"=0})
 	 */
 	 public function workerGetExtensions(Request $request){
-		 	$array=["refresh"=>60, "items"=>[
-				["number"=>11, "name"=>"Manolo Jimenez", "firstname"=>"Manolo", "lastname"=> "Jimenez", "phone"=> "11", "mobile"=> "", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
-				["number"=>12, "name"=>"Juanjo Roncero", "firstname"=>"", "lastname"=> "", "phone"=> "", "mobile"=> "12", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
-				["number"=>13, "name"=>"Antonio Sanchez", "firstname"=>"", "lastname"=> "", "phone"=> "", "mobile"=> "13", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
-				["number"=>14, "name"=>"Maria Jose Puche", "firstname"=>"", "lastname"=> "", "phone"=> "", "mobile"=> "14", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
-				["number"=>15, "name"=>"Juan Ruiz", "firstname"=>"", "lastname"=> "", "phone"=> "", "mobile"=> "15", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
-				["number"=>16, "name"=>"Antonio Jose Sanchez", "firstname"=>"", "lastname"=> "", "phone"=> "16", "mobile"=> "", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
-				["number"=>17, "name"=>"Chema Sanchez", "firstname"=>"", "lastname"=> "", "phone"=> "17", "mobile"=> "", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
-				["number"=>18, "name"=>"Juanga Sanchez", "firstname"=>"", "lastname"=> "", "phone"=> "18", "mobile"=> "", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
+		 	$array=["refresh"=>3600, "items"=>[
+				["number"=>11, "name"=>"Manolo Jimenez", "firstname"=>"", "lastname"=> "", "phone"=> "", "mobile"=> "", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
+				["number"=>12, "name"=>"Juanjo Roncero", "firstname"=>"", "lastname"=> "", "phone"=> "", "mobile"=> "", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
+				["number"=>13, "name"=>"Antonio Sanchez", "firstname"=>"", "lastname"=> "", "phone"=> "", "mobile"=> "", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
+				["number"=>14, "name"=>"Maria Jose Puche", "firstname"=>"", "lastname"=> "", "phone"=> "", "mobile"=> "", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
+				["number"=>15, "name"=>"Juan Ruiz", "firstname"=>"", "lastname"=> "", "phone"=> "", "mobile"=> "", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
+				["number"=>16, "name"=>"Antonio Jose Sanchez", "firstname"=>"", "lastname"=> "", "phone"=> "", "mobile"=> "", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
+				["number"=>17, "name"=>"Chema Sanchez", "firstname"=>"", "lastname"=> "", "phone"=> "", "mobile"=> "", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
+				["number"=>19, "name"=>"Charo Puche", "firstname"=>"", "lastname"=> "", "phone"=> "", "mobile"=> "", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
+				["number"=>20, "name"=>"Juan Manuel Toribio", "firstname"=>"", "lastname"=> "", "phone"=> "", "mobile"=> "", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
+				["number"=>22, "name"=>"Ricardo Garcia", "firstname"=>"", "lastname"=> "", "phone"=> "", "mobile"=> "", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
+				["number"=>23, "name"=>"Carlos Delgado", "firstname"=>"", "lastname"=> "", "phone"=> "", "mobile"=> "", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
+				["number"=>24, "name"=>"Manolo Ortega", "firstname"=>"", "lastname"=> "", "phone"=> "", "mobile"=> "", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
+				["number"=>25, "name"=>"Daniel Gabaldon", "firstname"=>"", "lastname"=> "", "phone"=> "", "mobile"=> "", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
+				["number"=>26, "name"=>"Daniel Sanchez", "firstname"=>"", "lastname"=> "", "phone"=> "", "mobile"=> "", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
+				["number"=>27, "name"=>"Gabriel Toribio", "firstname"=>"", "lastname"=> "", "phone"=> "", "mobile"=> "", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
+				["number"=>28, "name"=>"Juan Sanchez", "firstname"=>"", "lastname"=> "", "phone"=> "", "mobile"=> "", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
+				["number"=>30, "name"=>"Jesus Jimenez", "firstname"=>"", "lastname"=> "", "phone"=> "", "mobile"=> "", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
+				["number"=>32, "name"=>"Miguel Picazo", "firstname"=>"", "lastname"=> "", "phone"=> "", "mobile"=> "", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
+				["number"=>33, "name"=>"Javier Garcia", "firstname"=>"", "lastname"=> "", "phone"=> "", "mobile"=> "", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
+				["number"=>34, "name"=>"Alvaro Lopez", "firstname"=>"", "lastname"=> "", "phone"=> "", "mobile"=> "", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
+				["number"=>35, "name"=>"Olivia Sanchez", "firstname"=>"", "lastname"=> "", "phone"=> "", "mobile"=> "", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
+				["number"=>36, "name"=>"David Martinez Rentero", "firstname"=>"", "lastname"=> "", "phone"=> "", "mobile"=> "", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
+				["number"=>37, "name"=>"Juan Catalan", "firstname"=>"", "lastname"=> "", "phone"=> "", "mobile"=> "", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
+				["number"=>38, "name"=>"Oscar Marin", "firstname"=>"", "lastname"=> "", "phone"=> "", "mobile"=> "", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
+				["number"=>39, "name"=>"Sergio Garcia", "firstname"=>"", "lastname"=> "", "phone"=> "", "mobile"=> "", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
+				["number"=>52, "name"=>"Oscar Soto", "firstname"=>"", "lastname"=> "", "phone"=> "", "mobile"=> "", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
+				["number"=>53, "name"=>"Jose Carlos Marin", "firstname"=>"", "lastname"=> "", "phone"=> "", "mobile"=> "", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
+				["number"=>54, "name"=>"David Martinez Garcia", "firstname"=>"", "lastname"=> "", "phone"=> "", "mobile"=> "", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
+				["number"=>55, "name"=>"Fran Martinez", "firstname"=>"", "lastname"=> "", "phone"=> "", "mobile"=> "", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
+				["number"=>56, "name"=>"Antonio Martinez", "firstname"=>"", "lastname"=> "", "phone"=> "", "mobile"=> "", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
+				["number"=>57, "name"=>"Joaquin Ramirez", "firstname"=>"", "lastname"=> "", "phone"=> "", "mobile"=> "", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
+				["number"=>58, "name"=>"Rafael Rubio", "firstname"=>"", "lastname"=> "", "phone"=> "", "mobile"=> "", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
+				["number"=>65, "name"=>"Emilio (Romica)", "firstname"=>"", "lastname"=> "", "phone"=> "", "mobile"=> "", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
+				["number"=>66, "name"=>"Jose Miguel Pardo", "firstname"=>"", "lastname"=> "", "phone"=> "", "mobile"=> "", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
+				["number"=>670287735, "name"=>"Paco Cano", "firstname"=>"", "lastname"=> "", "phone"=> "670287735", "mobile"=> "", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
+				["number"=>617455674, "name"=>"Hugo López", "firstname"=>"", "lastname"=> "", "phone"=> "", "mobile"=> "617455674", "email"=> "", "address"=> "", "city"=> "", "state"=> "", "zip"=> "", "comment"=> "", "presence"=> 0, "info"=> ""],
 			]];
-/*12	Juanjo Roncero
-13	Antonio Sánchez
-14	María José Puche
-15	Juan Ruiz
-16	Antonio José Sánchez
-17	Chema Sánchez
-18	Juanga Sánchez
-19	Charo Puche
-20	Juan Manuel Toribio
-22	Ricardo García
-23	Carlos Delgado
-24	Manolo Ortega
-25	Daniel Gabaldón
-26	Daniel Sánchez
-27	Gabriel Toribio
-28	Juan Sánchez
-30	Jesús Jiménez
-32	Miguel Picazo
-33	Javier García
-34	Álvaro López
-35	Olivia Sánchez
-36	David Martínez Rentero
-37	Juan Catalán
-38	Oscar Marin
-39	Sergio Garcia
-52	Oscar Soto
-53	José Carlos Marín
-54	David Martínez García
-55	Fran Martínez
-56	Antonio Martínez
-57	Joaquín Ramírez
-58	Rafael Rubio
-59	Paco Cano
-60	Hugo López
-65	Romica
-66	José Miguel Pardo*/
-
-
 
 			return new JsonResponse($array);
 	 }
