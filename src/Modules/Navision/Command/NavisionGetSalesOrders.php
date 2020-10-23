@@ -56,6 +56,8 @@ class NavisionGetSalesOrders extends ContainerAwareCommand
     switch($entity){
       case 'salesorders': $this->importSaleOrders($input, $output);
       break;
+      case 'websale': $this->importWebSaleOrders($input, $output);
+      break;
       case 'all':
         $this->importSaleOrders($input, $output);
       break;
@@ -245,6 +247,80 @@ class NavisionGetSalesOrders extends ContainerAwareCommand
         //$totalBase=$totalNet-$totalDto;
         //$this->doctrine->getManager()->flush();
         $this->doctrine->getManager()->clear();
+
+      }
+      if($objects["maxtimestamp"]>0){
+        $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"salesOrders"]);
+        if ($navisionSync==null) {
+          $navisionSync=new NavisionSync();
+          $navisionSync->setEntity("salesOrders");
+        }
+        $navisionSync->setLastsync($datetime);
+        $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
+        $this->doctrine->getManager()->persist($navisionSync);
+        $this->doctrine->getManager()->flush();
+      }
+      //------   Critical Section END   ------
+      //------   Remove Lock Mutex    ------
+      fclose($fp);
+    }
+
+    public function importWebSaleOrders(InputInterface $input, OutputInterface $output){
+      //------   Create Lock Mutex    ------
+      if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+          $fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetSalesOrders-importSalesOrders.lock', 'c');
+      } else {
+          $fp = fopen('/tmp/axiom-navisionGetSalesOrders-importSalesOrders.lock', 'c');
+      }
+      if (!flock($fp, LOCK_EX | LOCK_NB)) {
+        $output->writeln('* Fallo al iniciar la sincronizacion de presupuestos: El proceso ya esta en ejecución.');
+        exit;
+      }
+
+      //------   Critical Section START   ------
+      $navisionSyncRepository=$this->doctrine->getRepository(NavisionSync::class);
+      $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"salesOrders"]);
+      if ($navisionSync==null) {
+        $navisionSync=new NavisionSync();
+        $navisionSync->setMaxtimestamp(0);
+      }
+      $datetime=new \DateTime();
+      $output->writeln('* Sincronizando pedidos de venta....');
+      $ctx = stream_context_create(array('http'=>
+                    array('timeout' => 1800)
+                  ));
+      $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getSalesOrders.php?from='.$navisionSync->getMaxtimestamp(), false, $ctx);
+      $objects=json_decode($json, true);
+      $objects=$objects[0];
+      $repositoryPaymentMethods=$this->doctrine->getRepository(ERPPaymentMethods::class);
+      $repositorySalesBudgets=$this->doctrine->getRepository(ERPSalesBudgets::class);
+      $repositorySalesBudgetsLines=$this->doctrine->getRepository(ERPSalesBudgetsLines::class);
+      $repositorySalesOrders=$this->doctrine->getRepository(ERPSalesOrders::class);
+      $repositorySalesOrdersLines=$this->doctrine->getRepository(ERPSalesOrdersLines::class);
+      $repositoryProducts=$this->doctrine->getRepository(ERPProducts::class);
+      $repositoryUsers=$this->doctrine->getRepository(GlobaleUsers::class);
+      $repositoryCustomers=$this->doctrine->getRepository(ERPCustomers::class);
+      $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
+      $repositoryCurrencies=$this->doctrine->getRepository(GlobaleCurrencies::class);
+
+      //Disable SQL logger
+      $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
+
+      foreach ($objects["class"] as $key=>$object){
+        $output->writeln('  - '.$object["code"].' - '.$object["customer"]);
+        $obj=$repositorySalesOrders->findOneBy(["code"=>$object["code"]]);
+        $cost=0;
+        $oldobj=$obj;
+        if ($obj==null) {
+          continue;
+        }
+
+         if($object["ship"]==1) $obj->setShipmentdate(date_create_from_format("Y-m-d H:i:s.u",$object["shipmentdate"]["date"])); else $obj->setShipmentdate(null);
+         $obj->setWebsale($object["web"]);
+         $this->doctrine->getManager()->persist($obj);
+         $this->doctrine->getManager()->flush();
+
+
 
       }
       if($objects["maxtimestamp"]>0){
