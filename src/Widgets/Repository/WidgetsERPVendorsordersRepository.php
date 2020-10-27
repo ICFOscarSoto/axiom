@@ -23,7 +23,7 @@ class WidgetsERPVendorsordersRepository extends ServiceEntityRepository
       $query="SELECT u.id, u.NAME, IFNULL(u.lastname,'') lastname, ROUND(SUM(o.totalbase),2) total, ROUND(SUM(o.totalbase-o.cost),2) benefit  FROM erpsales_orders o
               LEFT JOIN globale_users u ON u.id=o.agent_id
               WHERE STATUS=1 AND o.DATE >= :START AND o.DATE<=:END
-              AND u.company_id=:COMPANY
+              AND u.company_id=:COMPANY AND o.shipmentdate IS NOT NULL
               GROUP BY(agent_id) ORDER BY u.NAME, u.lastname";
 
       $params=['START' => $start,
