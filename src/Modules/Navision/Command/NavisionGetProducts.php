@@ -11,6 +11,7 @@ use App\Modules\ERP\Entity\ERPCustomers;
 use App\Modules\ERP\Entity\ERPCustomerGroups;
 use App\Modules\ERP\Entity\ERPSuppliers;
 use App\Modules\ERP\Entity\ERPProducts;
+use App\Modules\ERP\Entity\ERPManufacturers;
 use App\Modules\ERP\Entity\ERPProductPrices;
 use App\Modules\ERP\Entity\ERPEAN13;
 use App\Modules\ERP\Entity\ERPReferences;
@@ -91,6 +92,8 @@ class NavisionGetProducts extends ContainerAwareCommand
       case 'blocked': $this->disableBlocked($input, $output);
       break;
       case 'ownbarcodes': $this->createOwnBarcodes($input, $output);
+      break;
+      case 'manufacturers': $this->updateManufacturers($input, $output);
       break;
       case 'all':
         $this->importProduct($input, $output);
@@ -192,6 +195,9 @@ class NavisionGetProducts extends ContainerAwareCommand
            $obj->setShoppingPrice($object["ShoppingPrice"]);
          }
          $obj->setSupplier($supplier);
+         $repositoryManufacturers=$this->doctrine->getRepository(ERPManufacturers::class);
+         $manufacturer=$repositoryManufacturers->findOneBy(["code"=>$object["Manufacturer"]]);
+         if($manufacturer!=NULL) $obj->setManufacturer($manufacturer);
          $this->doctrine->getManager()->merge($obj);
          $this->doctrine->getManager()->flush();
          $obj->priceCalculated($this->doctrine);
@@ -1228,6 +1234,55 @@ public function updateNames(InputInterface $input, OutputInterface $output){
       $objects2=json_decode($json2, true);
       $objects2=$objects2[0];
       if (!empty($objects2["class"])) $product->setName($objects2["class"][0]["Description"]);
+      $product->setDateupd(new \Datetime());
+      $this->doctrine->getManager()->merge($product);
+      $this->doctrine->getManager()->flush();
+      $this->doctrine->getManager()->clear();
+    }
+
+  }
+
+  $navisionSync->setLastsync($datetime);
+  $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
+  $this->doctrine->getManager()->persist($navisionSync);
+  $this->doctrine->getManager()->flush();
+}
+
+public function updateManufacturers(InputInterface $input, OutputInterface $output){
+  //------   Create Lock Mutex    ------
+  if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+      $fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetProducts-updateManufacturers.lock', 'c');
+  } else {
+      $fp = fopen('/tmp/axiom-navisionGetProducts-updateManufacturers.lock', 'c');
+  }
+  if (!flock($fp, LOCK_EX | LOCK_NB)) {
+    $output->writeln('* Fallo al iniciar la actualización de nombres: El proceso ya esta en ejecución.');
+    exit;
+  }
+  //------   Critical Section START   ------
+  $navisionSyncRepository=$this->doctrine->getRepository(NavisionSync::class);
+  $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"updateManufacturers"]);
+  if ($navisionSync==null) {
+    $navisionSync=new NavisionSync();
+    $navisionSync->setEntity("updateManufacturers");
+    $navisionSync->setMaxtimestamp(0);
+  }
+  $datetime=new \DateTime();
+  $output->writeln('* Actualizando marcas....');
+  $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-updateManufacturersProducts.php?from='.$navisionSync->getMaxtimestamp());
+  $objects=json_decode($json, true);
+  $objects=$objects[0];
+  foreach ($objects["class"] as $object){
+    $productsRepository=$this->doctrine->getRepository(ERPProducts::class);
+    $manufacturersRepository=$this->doctrine->getRepository(ERPManufacturers::class);
+    $product=$productsRepository->findOneBy(["code"=>$object["code"]]);
+    if ($product!=null){
+      $output->writeln('* Actualizando la marca del producto '.$object["code"]);
+      $marca_new=str_replace(" ","",($object["manufacturer"]));
+      if($marca_new=="BONFIGLI") $marca_new="BONFIGLIOLI";
+      if($marca_new=="JPANADERO") $marca_new="JUAN PANADERO";
+      $manufacturer=$manufacturersRepository->findOneBy(["code"=>$marca_new]);
+      $product->setManufacturer($manufacturer);
       $product->setDateupd(new \Datetime());
       $this->doctrine->getManager()->merge($product);
       $this->doctrine->getManager()->flush();
