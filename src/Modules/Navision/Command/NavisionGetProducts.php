@@ -182,7 +182,7 @@ class NavisionGetProducts extends ContainerAwareCommand
          $obj->setnetprice(1);
          foreach ($prices["class"] as $price){
            if($price["Discount"]!=0){
-             if ($prices["Ending"]["date"]=="1753-01-01 00:00:00.000000") {
+             if ($price["Ending"]["date"]=="1753-01-01 00:00:00.000000") {
                $obj->setnetprice(0);
              }
            }
