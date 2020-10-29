@@ -903,7 +903,7 @@ class ERPProductsController extends Controller
 		 if(!$product) return new JsonResponse(["result"=>-2, "text"=> "El producto proporcionado no existe"]);
 		 if($type==1){  //Product id barcode
 			 $result=$repositoryProduct->latestMovements($product);
-			 return new JsonResponse($result);
+			 return new JsonResponse(["result"=>1, "data"=>$result]);
 		 }else{
 			 //TODO: Movements by Variant, Navision haven't this information
 		 }
