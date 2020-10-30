@@ -135,7 +135,7 @@ class ERPProductsController extends Controller
 			["name" => "stocks", "icon"=>"fa fa-id-card", "caption"=>"Stocks", "route"=>$this->generateUrl("infoStocks",["id"=>$id])],
 			["name" => "files", "icon"=>"fa fa-cloud", "caption"=>"Files", "route"=>$this->generateUrl("cloudfiles",["id"=>$id, "path"=>"products"])]]);
 			if ($obj && $obj->getCheckweb()) {
-				$tabs[]=["name" => "webproduct", "icon"=>"fa fa-id-card", "caption"=>"Web", "route"=>$this->generateUrl("infoWebProducts",["id"=>$id])];
+				$tabs[]=["name" => "c", "icon"=>"fa fa-id-card", "caption"=>"Web", "route"=>$this->generateUrl("infoWebProducts",["id"=>$id])];
 			//	$tabs[]=["name" => "webproduct", "icon"=>"fa fa-id-card", "caption"=>"Web", "route"=>$this->generateUrl("generictablist",["function"=>"formatListByProduct","module"=>"ERP","name"=>"WebProducts","id"=>$id])];
 		}
 				return $this->render('@Globale/generictabform.html.twig', array(
@@ -149,7 +149,7 @@ class ERPProductsController extends Controller
 									'id' => $id,
 									'tab' => $request->query->get('tab','data'), //Show initial tab, by default data tab
 									'tabs' => $tabs,
-									'include_tab_post_templates' => ['@ERP/categoriesmap.html.twig', '@ERP/categoriesmapproduct.html.twig'],
+									'include_tab_post_templates' => ['@ERP/categoriesmap.html.twig', '@ERP/categoriesmapproduct.html.twig', '@ERP/triggerwebproduct.html.twig'],
 									'include_header' => [["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker-es.js"],
 																			["type"=>"css", "path"=>"/js/rickshaw/rickshaw.min.css"]],
 									'include_footer' => [["type"=>"css", "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.css"],
