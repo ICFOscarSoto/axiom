@@ -101,5 +101,20 @@ class ERPProductsRepository extends ServiceEntityRepository
       return $result;
     }
 
+    public function latestMovements($product, $limit=200){
+      $query='Select id,code,date,type,quantity,name
+              FROM
+              (SELECT o.id, o.code, o.date, 0 as type, quantity, customername name FROM erpsales_orders o
+              	LEFT JOIN erpsales_orders_lines l ON l.salesorder_id=o.id
+              	WHERE o.status=1 AND o.shipmentdate IS NOT NULL AND o.active=1 AND o.deleted=0 AND l.active=1 AND l.deleted=0 AND l.product_id=:product
+              UNION
+               SELECT o.id, o.code, o.date, 1 as type, quantity, suppliername name FROM erppurchases_orders o
+              	LEFT JOIN erppurchases_orders_lines l ON l.purchasesorder_id=o.id
+              	WHERE o.active=1 AND o.deleted=0 AND l.active=1 AND l.deleted=0 AND l.product_id=:product
+              ) movements ORDER BY DATE DESC LIMIT '.$limit;
+      $params=['product' => $product->getId()];
+      return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+    }
+
 
 }

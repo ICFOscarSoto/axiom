@@ -51,5 +51,20 @@ class WidgetsERPVendorsordersRepository extends ServiceEntityRepository
       return $result;
     }
 
+    public function getBudgetsbyVendorAndMonth($company, $vendor, $start, $end){
+      $query="SELECT u.id, u.NAME, IFNULL(u.lastname,'') lastname, ROUND(SUM(o.totalbase),2) total, ROUND(SUM(o.totalbase-o.cost),2) benefit  FROM erpsales_budgets o
+              LEFT JOIN globale_users u ON u.id=o.agent_id
+              WHERE STATUS=1 AND o.DATE >= :START AND o.DATE<=:END
+              AND u.company_id=:COMPANY
+              GROUP BY(agent_id) ORDER BY u.NAME, u.lastname";
+
+      $params=['START' => $start,
+               'END' => $end,
+               'COMPANY' => $company->getId()
+               ];
+
+      $result=$this->getEntityManager()->getConnection()->executeQuery($query,$params)->fetchAll();
+      return $result;
+    }
 
 }

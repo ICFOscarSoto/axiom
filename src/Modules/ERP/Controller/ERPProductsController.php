@@ -885,12 +885,32 @@ class ERPProductsController extends Controller
 
 					}else return new JsonResponse(["result"=>-6, "text"=> "No hay stock suficiente para realizar el movimiento"]);
 				}
-
 				return new JsonResponse(["result"=>1, "text"=> "Cambio realizado correctamente"]);
-
 			}else return new JsonResponse(["result"=>-5, "text"=> "Stock no encontrado"]);
 
 
 		}
+
+
+		/**
+		* @Route("/api/ERP/product/latestmovements/{id}/{type}", name="productLatestMovements", defaults={"type"=1})
+		*/
+		public function productLatestMovements($id, $type){
+		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		 $repositoryProduct=$this->getDoctrine()->getRepository(ERPProducts::class);
+		 $repositoryVariants=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
+		 $product=$repositoryProduct->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany(), "deleted"=>0]);
+		 if(!$product) return new JsonResponse(["result"=>-2, "text"=> "El producto proporcionado no existe"]);
+		 if($type==1){  //Product id barcode
+			 $result=$repositoryProduct->latestMovements($product);
+			 return new JsonResponse(["result"=>1, "data"=>$result]);
+		 }else{
+			 //TODO: Movements by Variant, Navision haven't this information
+		 }
+
+		 return new JsonResponse(["result"=>-1, "text"=> "Ocurrio un error inexperado"]);
+		}
+
+
 
 }
