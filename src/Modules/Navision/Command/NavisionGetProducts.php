@@ -391,6 +391,8 @@ public function importPrices(InputInterface $input, OutputInterface $output) {
 
       foreach($products as $id) {
       $obj=$repository->findOneBy(["id"=>$id, "company"=>2]);
+      //dump($id);
+      if ($obj->getSupplier()==null) {dump("hola"); continue;}
       $output->writeln('Producto es '.$obj->getCode().' y el proveedor es '.$obj->getSupplier()->getCode());
       $json3=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getPrices.php?from='.$obj->getCode().'&supplier='.$obj->getSupplier()->getCode());
       $prices=json_decode($json3, true);
@@ -400,10 +402,11 @@ public function importPrices(InputInterface $input, OutputInterface $output) {
               if($price["Discount"]!=0 and $price["Ending"]["date"]=="1753-01-01 00:00:00.000000") {
                   $obj->setnetprice(0);
                   $this->doctrine->getManager()->merge($obj);
-                  $this->doctrine->getManager()->flush();
-                  $this->doctrine->getManager()->clear();
                 }
             }
+
+            $this->doctrine->getManager()->flush();
+            $this->doctrine->getManager()->clear();
     }
             //$products=$repository->findAll();
             //Disable SQL logger
