@@ -85,7 +85,7 @@ class ERPProductsRepository extends ServiceEntityRepository
     /* Nos devuelve la cantidad de productos con categoría */
 
     public function totalProducts(){
-      $query='SELECT count(id) as total from erpproducts where category_id is not null';
+      $query='SELECT count(id) as total from erpproducts where category_id is not null and supplier_id is not null and netprice=0';
       $result=$this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
       return $result[0]["total"];
     }
@@ -94,9 +94,9 @@ class ERPProductsRepository extends ServiceEntityRepository
 
     public function productsLimit($start, $page){
       $query='SELECT id FROM erpproducts
-              WHERE category_id IS NOT NULL
+              WHERE category_id IS NOT NULL and supplier_id is not null and netprice=0
               ORDER BY code
-              LIMIT 5000,'.$page.'';
+              LIMIT '.$start.','.$page.'';
       $result=$this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
       return $result;
     }

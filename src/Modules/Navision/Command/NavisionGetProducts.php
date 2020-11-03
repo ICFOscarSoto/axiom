@@ -385,6 +385,7 @@ public function importPrices(InputInterface $input, OutputInterface $output) {
   $page=5000;
   $totalProducts=round(intval($repository->totalProducts())/$page);
   $count=0;
+
   while($count<$totalProducts){
       $products=$repository->productsLimit(intval($count*$page),intval($page));
       $count++;
@@ -396,6 +397,8 @@ public function importPrices(InputInterface $input, OutputInterface $output) {
               if ($product->getSupplier()==null)  continue;
               $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
               $price=$repositoryShoppingDiscounts->findOneBy(["supplier"=>$product->getSupplier(),"category"=>$product->getCategory()]);
+              if ($price) $output->writeln("El producto ".$product->getCode()." tiene el precio ". $price->getDiscount());
+              else $output->writeln("El producto ".$product->getCode()." no tiene precio");
               if ($price==null && $product->getCategory()!=null && $product->getSupplier()!=null){
                 $supplier=$repositorySupliers->findOneBy(["id"=>$product->getSupplier()->getId()]);
                 $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getPrices.php?from='.$product->getCode().'&supplier='.$supplier->getCode());
@@ -436,6 +439,7 @@ public function importPrices(InputInterface $input, OutputInterface $output) {
 
 
           }
+          $output->writeln($count);
   }
 
   //------   Critical Section END   ------
