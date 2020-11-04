@@ -116,5 +116,51 @@ class ERPProductsRepository extends ServiceEntityRepository
       return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
     }
 
+    public function getWebProductRefBySupplier($supplier)
+    {
+      $query="SELECT reference from erpproducts
+      where supplier_id=:supplier AND category_id=:category";
+      $params=['supplier' => $supplier->getId()];
+      $result=$this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+      return $result;
+
+
+
+    }
+
+    public function getPendigServe($product)
+    {
+      $query="SELECT SUM(l.quantity)
+          FROM erpsales_orders_lines l
+          LEFT JOIN erpsales_orders h
+          ON l.salesorder_id=h.id
+          WHERE l.product_id=:product AND h.status=1 AND h.shipmentdate IS NULL AND h.active=1 AND h.deleted=0";
+      $params=['product' => $product];
+      $result=$this->getEntityManager()->getConnection()->executeQuery($query,$params)->fetch();
+      return $result;
+
+    }
+
+/*
+dejamos pendiente esta consulta porque falta por añadir en los pedidos de compra algun campo que indique que el material
+de ese pedido ya se ha recibido
+
+    public function getPendigReceive($product)
+    {
+      $query="SELECT SUM(l.quantity)
+        FROM erppurchases_orders_lines l
+        LEFT JOIN erppurchases_orders p
+        ON p.id=l.purchasesorder_id
+        WHERE l.product_id=:product AND p.`status`=1";
+      $params=['product' => $product];
+      $result=$this->getEntityManager()->getConnection()->executeQuery($query,$params)->fetch();
+      return $result;
+
+    }
+
+*/
+
+
+
 
 }
