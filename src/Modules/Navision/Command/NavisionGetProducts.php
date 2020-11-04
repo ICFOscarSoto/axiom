@@ -87,7 +87,7 @@ class NavisionGetProducts extends ContainerAwareCommand
       break;
       case 'values': $this->importProductsVariants($input, $output);
       break;
-      case 'prices0': $this->pricesZero($input, $output);
+      case 'update': $this->updateProducts($input, $output);
       break;
       case 'blocked': $this->disableBlocked($input, $output);
       break;
@@ -447,24 +447,48 @@ public function importPrices(InputInterface $input, OutputInterface $output) {
   fclose($fp);
 }
 
-public function pricesZero(InputInterface $input, OutputInterface $output){
+public function updateProducts(InputInterface $input, OutputInterface $output){
   $repository=$this->doctrine->getRepository(ERPProducts::class);
-  $products=$repository->findBy(['shoppingPrice'=>0, ]);
+  $products=$repository->findBy(['code'=>'022010']);
   foreach ($products as $product){
+    dump("Cambiando el producto ".$product->getCode());
     $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getProduct.php?product='.$product->getCode());
     $objects=json_decode($json, true);
+    if ($objects[0]["class"]==null) continue;
     $object=$objects[0]["class"][0];
+    $repositorySupliers=$this->doctrine->getRepository(ERPSuppliers::class);
+    $supplier=$repositorySupliers->findOneBy(["code"=>$object["Supplier"]]);
+    // Comprobamos si el producto no tiene movimientos desde 2017, en caso de que no tenga lo desactivamos
+    $json2=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-clearProducts.php?from='.$product->getCode());
+    $movs=json_decode($json2, true);
+    $movs=$movs[0];
+    $repositoryTaxes=$this->doctrine->getRepository(GlobaleTaxes::class);
+    $taxes=$repositoryTaxes->find(1);
+    $product->setTaxes($taxes);
+    $product->setWeight($object["Weight"]);
+    // Comprobamos si el producto tiene descuentos, si no los tiene se le pone como precio neto.
+    $json3=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getPrices.php?from='.$product->getCode().'&supplier='.$object["Supplier"]);
+    $prices=json_decode($json3, true);
+    $prices=$prices[0];
     $product->setnetprice(1);
-    $product->setPVPR(0);
-    if ($object["ShoppingPrice"]!=0) {
-        $product->setShoppingPrice($object["ShoppingPrice"]);
-        $output->writeln('*Poniendo precio al producto '.$product->getCode());      }
-      else if ($object["lastShoppingPrice"]!=0) {
-        $product->setShoppingPrice($object["lastShoppingPrice"]);
-        $output->writeln('*Poniendo precio al producto '.$product->getCode());      }
-        else {
-          $product->setActive(0);
-          $output->writeln('*Se desactiva el producto '.$product->getCode());        }
+    foreach ($prices["class"] as $price){
+      if($price["Discount"]!=0){
+        if ($price["Ending"]["date"]=="1753-01-01 00:00:00.000000") {
+          $product->setnetprice(0);
+        }
+      }
+    }
+    if (!$product->getnetprice()){
+      $product->setPVPR($object["ShoppingPrice"]);
+      $product->setShoppingPrice(0);
+    } else {
+      $product->setPVPR(0);
+      $product->setShoppingPrice($object["ShoppingPrice"]);
+    }
+    $product->setSupplier($supplier);
+    $repositoryManufacturers=$this->doctrine->getRepository(ERPManufacturers::class);
+    $manufacturer=$repositoryManufacturers->findOneBy(["code"=>$object["Manufacturer"]]);
+    if($manufacturer!=NULL) $product->setManufacturer($manufacturer);
     $this->doctrine->getManager()->merge($product);
     $this->doctrine->getManager()->flush();
     $product->priceCalculated($this->doctrine);
