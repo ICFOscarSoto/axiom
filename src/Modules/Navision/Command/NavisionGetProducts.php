@@ -449,9 +449,9 @@ public function importPrices(InputInterface $input, OutputInterface $output) {
 
 public function updateProducts(InputInterface $input, OutputInterface $output){
   $repository=$this->doctrine->getRepository(ERPProducts::class);
-  $products=$repository->findBy(['code'=>'022010']);
+  $products=$repository->findBy(['PVP'=>0, 'PVPR'=>0]);
   foreach ($products as $product){
-    dump("Cambiando el producto ".$product->getCode());
+    $output->writeln("Cambiando el producto ".$product->getCode());
     $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getProduct.php?product='.$product->getCode());
     $objects=json_decode($json, true);
     if ($objects[0]["class"]==null) continue;
@@ -539,7 +539,7 @@ public function importStocks(InputInterface $input, OutputInterface $output) {
           $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product->getId(),"variantvalue"=>$variantvalue]);
           if($old_stocks!=null){
               $stock_old=$repositoryStocks->findOneBy(["id"=>$old_stocks[0]["id"], "deleted"=>0]);
-              dump('Vamos a actualizar la linea '.$old_stocks[0]["id"].' del producto '.$product->getId().' en el almacen '.$stock["almacen"]);
+              $output->writeln('Vamos a actualizar la linea '.$old_stocks[0]["id"].' del producto '.$product->getId().' en el almacen '.$stock["almacen"]);
               if ((int)$stock["stock"]<0) $quantity=0;
               else $quantity=(int)$stock["stock"];
               $stock_old->setQuantity(!$quantity?0:$quantity);
@@ -1072,7 +1072,7 @@ public function disableBlocked(InputInterface $input, OutputInterface $output){
   $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
   $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getProducts.php');
   $objects=json_decode($json, true);
-  dump($objects);
+  $output->writeln($objects);
   /*foreach ($objects as $object){
     $repositoryProduct=$this->doctrine->getRepository(ERPProducts::class);
     $product=$repositoryProduct->findOneBy(["code"=>$object["code"]]);
