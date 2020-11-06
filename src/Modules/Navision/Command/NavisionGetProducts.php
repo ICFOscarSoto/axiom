@@ -221,7 +221,7 @@ class NavisionGetProducts extends ContainerAwareCommand
       fclose($fp);
     }
 
-    public function importEAN13(InputInterface $input, OutputInterface $output){
+public function importEAN13(InputInterface $input, OutputInterface $output){
       //------   Create Lock Mutex    ------
       if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
           $fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetProducts-importEAN13.lock', 'c');
@@ -472,7 +472,7 @@ public function groupPrices(InputInterface $input, OutputInterface $output){
       }
       $newshoppingDiscount=$repositoryShopping->findOneBy(['supplier'=>$supplier,'category'=>$price->getCategory()->getParentid(), 'active'=>1]);
       if ($count==0 and $newshoppingDiscount==null) {
-        dump("Agrupo en ".$price->getCategory()->getParentid()->getName()." cuyo id es ".$price->getCategory()->getParentid()->getId());
+        $output->writeln("Agrupo en ".$price->getCategory()->getParentid()->getName()." cuyo id es ".$price->getCategory()->getParentid()->getId());
         $obj=new ERPShoppingDiscounts();
         $obj->setSupplier($supplier);
         $obj->setCategory($price->getCategory()->getParentid());
@@ -495,7 +495,7 @@ public function groupPrices(InputInterface $input, OutputInterface $output){
         // delete delete delete
         foreach($categories as $category){
           /*$shoppingDiscount=$repositoryShopping->findOneBy(['supplier'=>$supplier,'category'=>$category, 'active'=>1]);
-          if ($shoppingDiscount!=null) {dump("Elimino ".$shoppingDiscount->getId());$repositoryShopping->deleteShoppingDiscount($shoppingDiscount->getId());}*/
+          if ($shoppingDiscount!=null) {  $output->writeln("Elimino ".$shoppingDiscount->getId());$repositoryShopping->deleteShoppingDiscount($shoppingDiscount->getId());}*/
         }
       }
     }
@@ -674,8 +674,14 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
   $repository=$this->doctrine->getRepository(ERPProducts::class);
   $repositoryproductprices=$this->doctrine->getRepository(ERPProductPrices::class);
   $repositorycustomerprices=$this->doctrine->getRepository(ERPCustomerPrices::class);
-  $sup=$repositorySupliers->findOneBy(["id"=>1082]);
-  $products=$repository->findBy(["supplier"=>$sup]);
+  $page=5000;
+  $totalProducts=round(intval($repository->totalProducts())/$page);
+  $count=0;
+
+  while($count<$totalProducts){
+      $products=$repository->productsLimit(intval($count*$page),intval($page));
+      $count++;
+
   //Disable SQL logger
   foreach($products as $product) {
 
@@ -812,6 +818,7 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
 
 
  }
+}
 
  $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"productincrements"]);
  if ($navisionSync==null) {

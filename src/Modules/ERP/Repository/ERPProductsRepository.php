@@ -94,7 +94,7 @@ class ERPProductsRepository extends ServiceEntityRepository
 
     public function productsLimit($start, $page){
       $query='SELECT id FROM erpproducts
-              WHERE category_id IS NOT NULL and supplier_id is not null and netprice=0
+              WHERE active=1
               ORDER BY code
               LIMIT '.$start.','.$page.'';
       $result=$this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
