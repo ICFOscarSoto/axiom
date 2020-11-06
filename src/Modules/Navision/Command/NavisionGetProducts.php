@@ -95,6 +95,8 @@ class NavisionGetProducts extends ContainerAwareCommand
       break;
       case 'manufacturers': $this->updateManufacturers($input, $output);
       break;
+      case 'group': $this->groupPrices($input, $output);
+      break;
       case 'all':
         $this->importProduct($input, $output);
         //$this->clearEAN13($input, $output);
@@ -442,9 +444,62 @@ public function importPrices(InputInterface $input, OutputInterface $output) {
           $output->writeln($count);
   }
 
+
+
+
   //------   Critical Section END   ------
   //------   Remove Lock Mutex    ------
   fclose($fp);
+}
+
+
+public function groupPrices(InputInterface $input, OutputInterface $output){
+  $repository=$this->doctrine->getRepository(ERPCategories::class);
+  $repositorySuppliers=$this->doctrine->getRepository(ERPSuppliers::class);
+  $repositoryShopping=$this->doctrine->getRepository(ERPShoppingDiscounts::class);
+
+  $suppliers=$repositorySuppliers->findBy(['id'=>1082]);
+  foreach($suppliers as $supplier){
+    $prices=$repositoryShopping->findBy(['supplier'=>$supplier, 'active'=>1]);
+    foreach ($prices as $price){
+      if ($price->getCategory()==null or $price->getCategory()->getParentid()==null) continue;
+      $categories=$repository->findSisters($price->getCategory()->getParentid()->getId());
+      $count=0;
+      foreach($categories as $category){
+        $shoppingDiscount=$repositoryShopping->findOneBy(['supplier'=>$supplier,'category'=>$category, 'active'=>1]);
+        if ($shoppingDiscount==null or $shoppingDiscount->getDiscount()==$price->getDiscount()) continue;
+        else $count=1;
+      }
+      $newshoppingDiscount=$repositoryShopping->findOneBy(['supplier'=>$supplier,'category'=>$price->getCategory()->getParentid(), 'active'=>1]);
+      if ($count==0 and $newshoppingDiscount==null) {
+        dump("Agrupo en ".$price->getCategory()->getParentid()->getName()." cuyo id es ".$price->getCategory()->getParentid()->getId());
+        $obj=new ERPShoppingDiscounts();
+        $obj->setSupplier($supplier);
+        $obj->setCategory($price->getCategory()->getParentid());
+        $obj->setDiscount($price->getDiscount());
+        $obj->setDiscount1($price->getDiscount1());
+        $obj->setDiscount2($price->getDiscount2());
+        $obj->setDiscount3($price->getDiscount3());
+        $obj->setDiscount4($price->getDiscount4());
+        $obj->setQuantity($price->getQuantity());
+        $obj->setStart($price->getStart());
+        $obj->setEnd($price->getEnd());
+        $obj->setDateadd(new \Datetime());
+        $obj->setDateupd(new \Datetime());
+        $obj->setActive(1);
+        $obj->setDeleted(0);
+        $this->doctrine->getManager()->merge($obj);
+        $this->doctrine->getManager()->flush();
+        if($obj->getEnd()==null) $obj->setShoppingPrices($this->doctrine);
+        $this->doctrine->getManager()->clear();
+        // delete delete delete
+        foreach($categories as $category){
+          /*$shoppingDiscount=$repositoryShopping->findOneBy(['supplier'=>$supplier,'category'=>$category, 'active'=>1]);
+          if ($shoppingDiscount!=null) {dump("Elimino ".$shoppingDiscount->getId());$repositoryShopping->deleteShoppingDiscount($shoppingDiscount->getId());}*/
+        }
+      }
+    }
+  }
 }
 
 public function updateProducts(InputInterface $input, OutputInterface $output){
@@ -619,7 +674,8 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
   $repository=$this->doctrine->getRepository(ERPProducts::class);
   $repositoryproductprices=$this->doctrine->getRepository(ERPProductPrices::class);
   $repositorycustomerprices=$this->doctrine->getRepository(ERPCustomerPrices::class);
-  $products=$repository->findAll();
+  $sup=$repositorySupliers->findOneBy(["id"=>1082]);
+  $products=$repository->findBy(["supplier"=>$sup]);
   //Disable SQL logger
   foreach($products as $product) {
 
@@ -658,7 +714,7 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
                     $neto=$increment["neto"];
                     $precio_con_dto=$pvp-$pvp*($dto/100);
                     $inc=(($precio_con_dto/$neto)-1)*100;
-                    $obj->setIncrement($inc);
+                    $obj->setIncrement(round($inc));
                     $obj->setDateadd(new \Datetime());
                     $obj->setDateupd(new \Datetime());
                     $obj->setActive(1);

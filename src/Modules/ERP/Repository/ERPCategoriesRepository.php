@@ -68,8 +68,16 @@ class ERPCategoriesRepository extends ServiceEntityRepository
 
     }
 
+    public function findSisters($category){
+    $query='SELECT ID FROM erpcategories
+    where parentid_id=:category';
+    $params=['category' => $category];
+    $sisters=$this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+    return $sisters;
+    }
 
 
+    
 
     // /**
     //  * @return ERPCategories[] Returns an array of ERPCategories objects

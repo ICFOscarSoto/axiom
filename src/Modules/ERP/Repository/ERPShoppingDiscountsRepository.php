@@ -19,6 +19,13 @@ class ERPShoppingDiscountsRepository extends ServiceEntityRepository
         parent::__construct($registry, ERPShoppingDiscounts::class);
     }
 
+    public function deleteShoppingDiscount($id){
+      $query='DELETE FROM erpshopping_discounts
+      where id=:id';
+      $params=['id' => $id];
+      $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+    }
+
     // /**
     //  * @return ERPShoppingDiscounts[] Returns an array of ERPShoppingDiscounts objects
     //  */
