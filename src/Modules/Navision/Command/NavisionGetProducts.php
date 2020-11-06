@@ -683,8 +683,8 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
       $count++;
 
   //Disable SQL logger
-  foreach($products as $product) {
-
+  foreach($products as $id) {
+    $product=$repository->findOneBy(["id"=>$id, "company"=>2]);
     $output->writeln($product->getCode().'  - '.$product->getName());
     $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
 
