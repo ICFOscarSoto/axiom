@@ -396,7 +396,7 @@ public function importPrices(InputInterface $input, OutputInterface $output) {
             //Disable SQL logger
            foreach($products as $id) {
               $product=$repository->findOneBy(["id"=>$id, "company"=>2]);
-              if ($product->getSupplier()==null)  continue;
+              if ($product->getSupplier()==null or $product->getCategory()==null)  continue;
               $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
               $price=$repositoryShoppingDiscounts->findOneBy(["supplier"=>$product->getSupplier(),"category"=>$product->getCategory()]);
               if ($price) $output->writeln("El producto ".$product->getCode()." tiene el precio ". $price->getDiscount());
