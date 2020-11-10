@@ -32,7 +32,7 @@ class ChangeVoipStatus extends ContainerAwareCommand
     $worker=$workersrepository->findOneBy(["id"=>$id, "deleted"=>0, "active"=>1]);
     if(!$worker) {$output->writeln('* Trabajador no encontrado.');exit;}
     if(!$worker->getVoipregister() || !$worker->getVoippass() || !$worker->getExtension())  {$output->writeln('* VoIp no configurada para el trabajador.'); exit;}
-    $company=$companiesrepository->find(["id"=>$worker->getCompany()->getId(), "deleted"=>0, "active"=>1]);
+    $company=$companiesrepository->findOneBy(["id"=>$worker->getCompany()->getId(), "deleted"=>0, "active"=>1]);
     if(!$company) {$output->writeln('* Empresa no encontrada.');exit;}
     if(!$company->getVoipaddress() || !$company->getVoipregistercode() || !$company->getVoipunregistercode()) {$output->writeln('* VoIp no configurada para la empresa.'); exit;}
 
