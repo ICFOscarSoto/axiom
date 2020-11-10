@@ -83,6 +83,11 @@ class ERPWebProducts
      */
     private $measurementunityofequivalence;
 
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    private $webprice;
+
 
     public function getId(): ?int
     {
@@ -229,6 +234,135 @@ class ERPWebProducts
     public function setMeasurementunityofequivalence(?string $measurementunityofequivalence): self
     {
         $this->measurementunityofequivalence = $measurementunityofequivalence;
+
+        return $this;
+    }
+  /*
+    public function formValidation($kernel, $doctrine, $user, $validationParams){
+      if($this->measurementunityofequivalence!=NULL and (int)$this->equivalence=="0")
+          //return ["valid"=>false, "global_errors"=>["Tiene que indicar un valor para la equivalencia"]];
+      }
+      */
+
+    public function postProccess($kernel, $doctrine, $user, $params, $oldobj){
+      $this->updateWebProduct($doctrine,$oldobj);
+
+    }
+
+    public function updateWebProduct($doctrine,$oldobj){
+       $array_new_data=[];
+       foreach($oldobj as $clave=>$valor){
+
+         if($oldobj->$clave!=$this->$clave AND $clave!="dateupd"){
+          if($clave=="measurementunityofequivalence"){
+            if($this->$clave=="0") $array_new_data[$clave]="unidad";
+            else if($this->$clave=="1") $array_new_data[$clave]="metro";
+            else if($this->$clave=="2") $array_new_data[$clave]="kilo";
+            else if($this->$clave=="3") $array_new_data[$clave]="litro";
+            else if($this->$clave=="4") $array_new_data[$clave]="metro cuadrado";
+          }
+
+          else $array_new_data[$clave]=$this->$clave;
+
+         }
+       }
+
+       //se ha modificado algún valor, luego hay que actualizarlo en la web
+       if($array_new_data!=[]) {
+
+
+         $this_url="https://www.ferreteriacampollano.com";
+         $auth = base64_encode("6TI5549NR221TXMGMLLEHKENMG89C8YV");
+         $context = stream_context_create([
+             "http" => ["header" => "Authorization: Basic $auth"]
+         ]);
+
+         try{
+              //OBTENER ID DEL PRODUCTO EN prestashopGetProduct
+              dump($this->getProduct()->getCode());
+              $xml_string=file_get_contents($this_url."/api/products/?filter[reference]=".$this->getProduct()->getCode(), false, $context);
+              $xml = simplexml_load_string($xml_string, 'SimpleXMLElement', LIBXML_NOCDATA);
+              $id_prestashop=$xml->products->product['id'];
+              dump($id_prestashop);
+              //actualizamos prestashop
+               $xml_string=file_get_contents($this_url."/api/products/".$id_prestashop, false, $context);
+              // $xml_string=file_get_contents($this->url."/api/products/?display=[id,reference,name,cantidad_pedido_minimo,unidad_medida,equivalencia,unidad_medida_equivalencia,meta_title,meta_description]&filter[reference]=2322290200AC", false, $context);
+               $xml = simplexml_load_string($xml_string, 'SimpleXMLElement', LIBXML_NOCDATA);
+            //   $xml->product->cantidad_pedido_minimo="3";
+
+               unset($xml->product->manufacturer_name);
+               unset($xml->product->quantity);
+
+               $repositotyPrestashopFieldNames=$doctrine->getRepository(ERPPrestashopFieldNames::class);
+               foreach($array_new_data as $clave=>$valor)
+               {
+                 $PrestashopFieldName=$repositotyPrestashopFieldNames->findOneBy(["axiomname"=>$clave]);
+                 if($PrestashopFieldName!=NULL){
+                    $psname=$PrestashopFieldName->getPrestashopname();
+                    if($xml->product->$psname->language) {;
+                      $xml->product->$psname->language=$valor;
+                    }
+                    else $xml->product->$psname=$valor;
+                  }
+               }
+
+                $url = "https://www.ferreteriacampollano.com/api/products/".$id_prestashop;
+              //  $url= $this->url."/api/products/?display=[id,reference,name,cantidad_pedido_minimo,unidad_medida,equivalencia,unidad_medida_equivalencia,meta_title,meta_description]&filter[reference]=2322290200AC";
+                $ch = curl_init();
+
+                $putString = $xml->asXML();
+                //dump($putString);
+                /** use a max of 256KB of RAM before going to disk */
+                $putData = fopen('php://temp/maxmemory:256000', 'w');
+                if (!$putData) {
+                    die('could not open temp memory data');
+                }
+                fwrite($putData, $putString);
+                fseek($putData, 0);
+
+                // Headers
+                curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/xml','Authorization: Basic '.$auth));
+                // Binary transfer i.e. --data-BINARY
+                curl_setopt($ch, CURLOPT_BINARYTRANSFER, true);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_URL, $url);
+                // Using a PUT method i.e. -XPUT
+                curl_setopt($ch, CURLOPT_PUT, true);
+                curl_setopt($ch, CURLOPT_INFILESIZE, strlen($putString));
+
+                curl_setopt($ch, CURLOPT_INFILE, $putData);
+
+                $output = curl_exec($ch);
+
+                // Close the file
+                fclose($putData);
+                // Stop curl
+            //    curl_close($ch);
+
+                if (curl_errno($ch)) {  dump(curl_error($ch)); }
+                else {  curl_close($ch); }  // $data contains the result of the post...
+
+
+              }catch(Exception $e){}
+
+
+
+
+
+      }
+
+
+
+       }
+
+    public function getWebprice(): ?float
+    {
+        return $this->webprice;
+    }
+
+    public function setWebprice(?float $webprice): self
+    {
+        $this->webprice = $webprice;
 
         return $this;
     }

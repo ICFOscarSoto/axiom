@@ -22,12 +22,21 @@
 		<input type="hidden" id="id-object" name="id-object" value="{{ formConstructor.id_object }}">
 		{{ form_row(formConstructor.form['_token']) }}
 	<div class="row">
-		<div class="col-md-2">
+		<div class="col-md-4">
     	{{ form_row(formConstructor.form['metatitle']) }}
     </div>
-    <div class="col-md-2">
+    <div class="col-md-4">
       {{ form_row(formConstructor.form['metadescription']) }}
     </div>
+		<div class="col-md-1">
+			{{ form_row(formConstructor.form['webprice']) }}
+		</div>
+		<div class="col-md-1">
+			{{ form_row(formConstructor.form['additionalcost']) }}
+		</div>
+		<div class="col-md-1">
+			{{ form_row(formConstructor.form['minquantityofsaleweb']) }}
+		</div>
     <div class="col-md-2">
       {{ form_row(formConstructor.form['measurementunityofequivalence']) }}
     </div>

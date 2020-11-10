@@ -3,12 +3,11 @@
 namespace App\Modules\ERP\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use \App\Modules\Globale\Entity\GlobaleCompanies;
 
 /**
- * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPManufacturersRepository")
+ * @ORM\Entity(repositoryClass="App\Repository\Modules\ERP\Entity\ERPPrestashopFieldNamesRepository")
  */
-class ERPManufacturers
+class ERPPrestashopFieldNames
 {
     /**
      * @ORM\Id()
@@ -18,19 +17,14 @@ class ERPManufacturers
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=120)
+     * @ORM\Column(type="string", length=64)
      */
-    private $name;
+    private $axiomname;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCompanies")
-     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
+     * @ORM\Column(type="string", length=64)
      */
-    private $company;
-
-    public $newSeconds=1296000;
-    public $updatedSeconds=1296000;
-
+    private $prestashopname;
 
     /**
      * @ORM\Column(type="boolean")
@@ -52,40 +46,34 @@ class ERPManufacturers
      */
     private $dateupd;
 
-    /**
-     * @ORM\Column(type="string", length=20)
-     */
-    private $code;
-
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getName(): ?string
+    public function getAxiomname(): ?string
     {
-        return $this->name;
+        return $this->axiomname;
     }
 
-    public function setName(string $name): self
+    public function setAxiomname(string $axiomname): self
     {
-        $this->name = $name;
+        $this->axiomname = $axiomname;
 
         return $this;
     }
 
-    public function getCompany(): ?GlobaleCompanies
+    public function getPrestashopname(): ?string
     {
-        return $this->company;
+        return $this->prestashopname;
     }
 
-    public function setCompany(?GlobaleCompanies $company): self
+    public function setPrestashopname(string $prestashopname): self
     {
-        $this->company = $company;
+        $this->prestashopname = $prestashopname;
 
         return $this;
     }
-
 
     public function getActive(): ?bool
     {
@@ -131,18 +119,6 @@ class ERPManufacturers
     public function setDateupd(\DateTimeInterface $dateupd): self
     {
         $this->dateupd = $dateupd;
-
-        return $this;
-    }
-
-    public function getCode(): ?string
-    {
-        return $this->code;
-    }
-
-    public function setCode(string $code): self
-    {
-        $this->code = $code;
 
         return $this;
     }

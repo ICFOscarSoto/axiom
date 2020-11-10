@@ -85,7 +85,7 @@ class ERPProductsRepository extends ServiceEntityRepository
     /* Nos devuelve la cantidad de productos con categoría */
 
     public function totalProducts(){
-      $query='SELECT count(id) as total from erpproducts where category_id is not null';
+      $query='SELECT count(id) as total from erpproducts where category_id is not null and supplier_id is not null and netprice=0';
       $result=$this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
       return $result[0]["total"];
     }
@@ -94,12 +94,73 @@ class ERPProductsRepository extends ServiceEntityRepository
 
     public function productsLimit($start, $page){
       $query='SELECT id FROM erpproducts
-              WHERE category_id IS NOT NULL
+              WHERE active=1
               ORDER BY code
-              LIMIT 5000,'.$page.'';
+              LIMIT '.$start.','.$page.'';
       $result=$this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
       return $result;
     }
+
+    public function latestMovements($product, $limit=200){
+      $query='Select id,code,date,type,quantity,name
+              FROM
+              (SELECT o.id, o.code, o.date, 0 as type, quantity, customername name FROM erpsales_orders o
+              	LEFT JOIN erpsales_orders_lines l ON l.salesorder_id=o.id
+              	WHERE o.status=1 AND o.shipmentdate IS NOT NULL AND o.active=1 AND o.deleted=0 AND l.active=1 AND l.deleted=0 AND l.product_id=:product
+              UNION
+               SELECT o.id, o.code, o.date, 1 as type, quantity, suppliername name FROM erppurchases_orders o
+              	LEFT JOIN erppurchases_orders_lines l ON l.purchasesorder_id=o.id
+              	WHERE o.active=1 AND o.deleted=0 AND l.active=1 AND l.deleted=0 AND l.product_id=:product
+              ) movements ORDER BY DATE DESC LIMIT '.$limit;
+      $params=['product' => $product->getId()];
+      return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+    }
+
+    public function getWebProductRefBySupplier($supplier)
+    {
+      $query="SELECT reference from erpproducts
+      where supplier_id=:supplier AND category_id=:category";
+      $params=['supplier' => $supplier->getId()];
+      $result=$this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+      return $result;
+
+
+
+    }
+
+    public function getPendigServe($product)
+    {
+      $query="SELECT SUM(l.quantity)
+          FROM erpsales_orders_lines l
+          LEFT JOIN erpsales_orders h
+          ON l.salesorder_id=h.id
+          WHERE l.product_id=:product AND h.status=1 AND h.shipmentdate IS NULL AND h.active=1 AND h.deleted=0";
+      $params=['product' => $product];
+      $result=$this->getEntityManager()->getConnection()->executeQuery($query,$params)->fetch();
+      return $result;
+
+    }
+
+/*
+dejamos pendiente esta consulta porque falta por añadir en los pedidos de compra algun campo que indique que el material
+de ese pedido ya se ha recibido
+
+    public function getPendigReceive($product)
+    {
+      $query="SELECT SUM(l.quantity)
+        FROM erppurchases_orders_lines l
+        LEFT JOIN erppurchases_orders p
+        ON p.id=l.purchasesorder_id
+        WHERE l.product_id=:product AND p.`status`=1";
+      $params=['product' => $product];
+      $result=$this->getEntityManager()->getConnection()->executeQuery($query,$params)->fetch();
+      return $result;
+
+    }
+
+*/
+
+
 
 
 }

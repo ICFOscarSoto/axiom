@@ -7,6 +7,7 @@ use \App\Modules\ERP\Entity\ERPManufacturers;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
 use \App\Modules\ERP\Entity\ERPCategories;
 use \App\Modules\ERP\Entity\ERPSuppliers;
+use \App\Modules\ERP\Entity\ERPPrestashopFieldNames;
 use \App\Modules\ERP\Entity\ERPProductPrices;
 use \App\Modules\ERP\Entity\ERPCustomerGroups;
 use \App\Modules\HR\Entity\HRWorkers;
@@ -212,6 +213,11 @@ class ERPProducts
      * @ORM\Column(type="boolean", nullable=true)
      */
     private $checkweb;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $purchasepacking;
 
     public function getStockcampollano($doctrine): ?int
     {
@@ -752,7 +758,7 @@ class ERPProducts
     public function postProccess($kernel, $doctrine, $user, $params, $oldobj){
       $this->calculateIncrementByProduct($doctrine);
       $this->calculateCustomerIncrementsByProduct($doctrine);
-      if($this->getCheckweb()) $this->checkWebProduct($doctrine);
+      if($this->getCheckweb()) $this->checkWebProduct($doctrine,$oldobj);
     }
 
      public function formValidation($kernel, $doctrine, $user, $validationParams){
@@ -930,7 +936,7 @@ class ERPProducts
       return $this;
   }
 
-   public function checkWebProduct($doctrine){
+   public function checkWebProduct($doctrine,$oldobj){
      $em = $doctrine->getManager();
      $repositoryWebProduct=$doctrine->getRepository(ERPWebProducts::class);
      $companyRepository=$doctrine->getRepository(GlobaleCompanies::class);
@@ -949,7 +955,177 @@ class ERPProducts
        $em->flush();
      }
 
+    // dump($oldobj);
+    $array_new_data=[];
+     foreach($oldobj as $clave=>$valor){
 
+       if($oldobj->$clave!=$this->$clave AND $clave!="dateupd") $array_new_data[$clave]=$this->$clave;
+     }
+
+     if($array_new_data!=[])  $this->updateWebProduct($doctrine,$array_new_data);
+
+
+   }
+
+
+   public function updateWebProduct($doctrine,$array_new_data){
+
+     dump($array_new_data);
+     $this_url="https://www.ferreteriacampollano.com";
+     $auth = base64_encode("6TI5549NR221TXMGMLLEHKENMG89C8YV");
+     $context = stream_context_create([
+         "http" => ["header" => "Authorization: Basic $auth"]
+     ]);
+
+     try{
+
+           //OBTENER ID DEL PRODUCTO EN prestashopGetProduct
+           $xml_string=file_get_contents($this_url."/api/products/?filter[reference]=".$this->getCode(), false, $context);
+           $xml = simplexml_load_string($xml_string, 'SimpleXMLElement', LIBXML_NOCDATA);
+           $id_prestashop=$xml->products->product['id'];
+
+
+         //   $xml->product->cantidad_pedido_minimo="3";
+
+
+
+
+           $repositoryPrestashopFieldNames=$doctrine->getRepository(ERPPrestashopFieldNames::class);
+           foreach($array_new_data as $clave=>$valor)
+           {
+             $PrestashopFieldName=$repositoryPrestashopFieldNames->findOneBy(["axiomname"=>$clave]);
+             if($PrestashopFieldName!=NULL){
+
+               //obtenemos el XML del producto en prestashop. El cuál lo tenemos que modificar
+                $xml_string=file_get_contents($this_url."/api/products/".$id_prestashop, false, $context);
+               // $xml_string=file_get_contents($this->url."/api/products/?display=[id,reference,name,cantidad_pedido_minimo,unidad_medida,equivalencia,unidad_medida_equivalencia,meta_title,meta_description]&filter[reference]=2322290200AC", false, $context);
+                $xml = simplexml_load_string($xml_string, 'SimpleXMLElement', LIBXML_NOCDATA);
+                unset($xml->product->manufacturer_name);
+                unset($xml->product->quantity);
+
+                $psname=$PrestashopFieldName->getPrestashopname();
+                if($xml->product->$psname->language) {;
+                  $xml->product->$psname->language=$valor;
+                }
+                else $xml->product->$psname=$valor;
+                $url = "https://www.ferreteriacampollano.com/api/products/".$id_prestashop;
+              //  $url= $this->url."/api/products/?display=[id,reference,name,cantidad_pedido_minimo,unidad_medida,equivalencia,unidad_medida_equivalencia,meta_title,meta_description]&filter[reference]=2322290200AC";
+                $ch = curl_init();
+
+                $putString = $xml->asXML();
+                //dump($putString);
+                /** use a max of 256KB of RAM before going to disk */
+                $putData = fopen('php://temp/maxmemory:256000', 'w');
+                if (!$putData) {
+                    die('could not open temp memory data');
+                }
+                fwrite($putData, $putString);
+                fseek($putData, 0);
+
+                // Headers
+                curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/xml','Authorization: Basic '.$auth));
+                // Binary transfer i.e. --data-BINARY
+                curl_setopt($ch, CURLOPT_BINARYTRANSFER, true);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_URL, $url);
+                // Using a PUT method i.e. -XPUT
+                curl_setopt($ch, CURLOPT_PUT, true);
+                curl_setopt($ch, CURLOPT_INFILESIZE, strlen($putString));
+
+                curl_setopt($ch, CURLOPT_INFILE, $putData);
+
+                $output = curl_exec($ch);
+
+                // Close the file
+                fclose($putData);
+                // Stop curl
+            //    curl_close($ch);
+
+                if (curl_errno($ch)) {  dump(curl_error($ch)); }
+                else {  curl_close($ch); }  // $data contains the result of the post...
+
+              }
+
+              else{
+
+                  if($clave=="manufacturer"){
+                    //OBTENER ID DEL PRODUCTO EN prestashopGetProduct
+
+                    $xml_string=file_get_contents($this_url."/api/manufacturers/?display=[id]&filter[name]=".$valor->getCode(), false, $context);
+                    $xml = simplexml_load_string($xml_string, 'SimpleXMLElement', LIBXML_NOCDATA);
+                    $id_manufacturer=$xml->manufacturers->manufacturer->id;
+
+                    //obtenemos el XML del producto en prestashop. El cuál lo tenemos que modificar
+                     $xml_string=file_get_contents($this_url."/api/products/".$id_prestashop, false, $context);
+                    // $xml_string=file_get_contents($this->url."/api/products/?display=[id,reference,name,cantidad_pedido_minimo,unidad_medida,equivalencia,unidad_medida_equivalencia,meta_title,meta_description]&filter[reference]=2322290200AC", false, $context);
+                     $xml = simplexml_load_string($xml_string, 'SimpleXMLElement', LIBXML_NOCDATA);
+                     unset($xml->product->manufacturer_name);
+                     unset($xml->product->quantity);
+
+                    $xml->product->id_manufacturer=$id_manufacturer[0];
+
+
+
+
+                    $url = "https://www.ferreteriacampollano.com/api/products/".$id_prestashop;
+                  //  $url= $this->url."/api/products/?display=[id,reference,name,cantidad_pedido_minimo,unidad_medida,equivalencia,unidad_medida_equivalencia,meta_title,meta_description]&filter[reference]=2322290200AC";
+                    $ch = curl_init();
+
+                    $putString = $xml->asXML();
+                    //dump($putString);
+                    /** use a max of 256KB of RAM before going to disk */
+                    $putData = fopen('php://temp/maxmemory:256000', 'w');
+                    if (!$putData) {
+                        die('could not open temp memory data');
+                    }
+                    fwrite($putData, $putString);
+                    fseek($putData, 0);
+
+                    // Headers
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/xml','Authorization: Basic '.$auth));
+                    // Binary transfer i.e. --data-BINARY
+                    curl_setopt($ch, CURLOPT_BINARYTRANSFER, true);
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($ch, CURLOPT_URL, $url);
+                    // Using a PUT method i.e. -XPUT
+                    curl_setopt($ch, CURLOPT_PUT, true);
+                    curl_setopt($ch, CURLOPT_INFILESIZE, strlen($putString));
+
+                    curl_setopt($ch, CURLOPT_INFILE, $putData);
+
+                    $output = curl_exec($ch);
+
+                    // Close the file
+                    fclose($putData);
+                    // Stop curl
+                //    curl_close($ch);
+
+                    if (curl_errno($ch)) {  dump(curl_error($ch)); }
+                    else {  curl_close($ch); }  // $data contains the result of the post...
+
+
+                  }
+
+              }
+           }
+
+
+
+
+          }catch(Exception $e){}
+
+      }
+
+   public function getPurchasepacking(): ?int
+   {
+       return $this->purchasepacking;
+   }
+
+   public function setPurchasepacking(?int $purchasepacking): self
+   {
+       $this->purchasepacking = $purchasepacking;
+
+       return $this;
    }
 
 

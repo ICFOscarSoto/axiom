@@ -11,6 +11,7 @@ use App\Modules\ERP\Entity\ERPCustomers;
 use App\Modules\ERP\Entity\ERPCustomerGroups;
 use App\Modules\ERP\Entity\ERPSuppliers;
 use App\Modules\ERP\Entity\ERPProducts;
+use App\Modules\ERP\Entity\ERPManufacturers;
 use App\Modules\ERP\Entity\ERPProductPrices;
 use App\Modules\ERP\Entity\ERPEAN13;
 use App\Modules\ERP\Entity\ERPReferences;
@@ -86,11 +87,15 @@ class NavisionGetProducts extends ContainerAwareCommand
       break;
       case 'values': $this->importProductsVariants($input, $output);
       break;
-      case 'prices0': $this->pricesZero($input, $output);
+      case 'update': $this->updateProducts($input, $output);
       break;
       case 'blocked': $this->disableBlocked($input, $output);
       break;
       case 'ownbarcodes': $this->createOwnBarcodes($input, $output);
+      break;
+      case 'manufacturers': $this->updateManufacturers($input, $output);
+      break;
+      case 'group': $this->groupPrices($input, $output);
       break;
       case 'all':
         $this->importProduct($input, $output);
@@ -179,7 +184,7 @@ class NavisionGetProducts extends ContainerAwareCommand
          $obj->setnetprice(1);
          foreach ($prices["class"] as $price){
            if($price["Discount"]!=0){
-             if ($prices["Ending"]["date"]=="1753-01-01 00:00:00.000000") {
+             if ($price["Ending"]["date"]=="1753-01-01 00:00:00.000000") {
                $obj->setnetprice(0);
              }
            }
@@ -192,6 +197,9 @@ class NavisionGetProducts extends ContainerAwareCommand
            $obj->setShoppingPrice($object["ShoppingPrice"]);
          }
          $obj->setSupplier($supplier);
+         $repositoryManufacturers=$this->doctrine->getRepository(ERPManufacturers::class);
+         $manufacturer=$repositoryManufacturers->findOneBy(["code"=>$object["Manufacturer"]]);
+         if($manufacturer!=NULL) $obj->setManufacturer($manufacturer);
          $this->doctrine->getManager()->merge($obj);
          $this->doctrine->getManager()->flush();
          $obj->priceCalculated($this->doctrine);
@@ -213,7 +221,7 @@ class NavisionGetProducts extends ContainerAwareCommand
       fclose($fp);
     }
 
-    public function importEAN13(InputInterface $input, OutputInterface $output){
+public function importEAN13(InputInterface $input, OutputInterface $output){
       //------   Create Lock Mutex    ------
       if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
           $fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetProducts-importEAN13.lock', 'c');
@@ -379,34 +387,20 @@ public function importPrices(InputInterface $input, OutputInterface $output) {
   $page=5000;
   $totalProducts=round(intval($repository->totalProducts())/$page);
   $count=0;
+
   while($count<$totalProducts){
       $products=$repository->productsLimit(intval($count*$page),intval($page));
       $count++;
 
-      foreach($products as $id) {
-      $obj=$repository->findOneBy(["id"=>$id, "company"=>2]);
-      dump('Producto es '.$obj->getCode().' y el proveedor es '.$obj->getSupplier()->getCode());
-      $json3=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getPrices.php?from='.$obj->getCode().'&supplier='.$obj->getSupplier()->getCode());
-      $prices=json_decode($json3, true);
-      $prices=$prices[0];
-      $obj->setnetprice(1);
-      foreach ($prices["class"] as $price){
-        dump($price);
-              if($price["Discount"]!=0 and $price["Ending"]["date"]=="1753-01-01 00:00:00.000000") {
-                  $obj->setnetprice(0);
-                  $this->doctrine->getManager()->merge($obj);
-                  $this->doctrine->getManager()->flush();
-                  $this->doctrine->getManager()->clear();
-                }
-        dump($obj->getnetprice());
-            }
-    }
             //$products=$repository->findAll();
             //Disable SQL logger
-        /*    foreach($products as $id) {
+           foreach($products as $id) {
               $product=$repository->findOneBy(["id"=>$id, "company"=>2]);
+              if ($product->getSupplier()==null or $product->getCategory()==null)  continue;
               $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
               $price=$repositoryShoppingDiscounts->findOneBy(["supplier"=>$product->getSupplier(),"category"=>$product->getCategory()]);
+              if ($price) $output->writeln("El producto ".$product->getCode()." tiene el precio ". $price->getDiscount());
+              else $output->writeln("El producto ".$product->getCode()." no tiene precio");
               if ($price==null && $product->getCategory()!=null && $product->getSupplier()!=null){
                 $supplier=$repositorySupliers->findOneBy(["id"=>$product->getSupplier()->getId()]);
                 $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getPrices.php?from='.$product->getCode().'&supplier='.$supplier->getCode());
@@ -446,32 +440,110 @@ public function importPrices(InputInterface $input, OutputInterface $output) {
               }
 
 
-            }*/
+          }
+          $output->writeln($count);
   }
+
+
+
 
   //------   Critical Section END   ------
   //------   Remove Lock Mutex    ------
   fclose($fp);
 }
 
-public function pricesZero(InputInterface $input, OutputInterface $output){
+
+public function groupPrices(InputInterface $input, OutputInterface $output){
+  $repository=$this->doctrine->getRepository(ERPCategories::class);
+  $repositorySuppliers=$this->doctrine->getRepository(ERPSuppliers::class);
+  $repositoryShopping=$this->doctrine->getRepository(ERPShoppingDiscounts::class);
+
+  $suppliers=$repositorySuppliers->findBy(['id'=>1082]);
+  foreach($suppliers as $supplier){
+    $prices=$repositoryShopping->findBy(['supplier'=>$supplier, 'active'=>1]);
+    foreach ($prices as $price){
+      if ($price->getCategory()==null or $price->getCategory()->getParentid()==null) continue;
+      $categories=$repository->findSisters($price->getCategory()->getParentid()->getId());
+      $count=0;
+      foreach($categories as $category){
+        $shoppingDiscount=$repositoryShopping->findOneBy(['supplier'=>$supplier,'category'=>$category, 'active'=>1]);
+        if ($shoppingDiscount==null or $shoppingDiscount->getDiscount()==$price->getDiscount()) continue;
+        else $count=1;
+      }
+      $newshoppingDiscount=$repositoryShopping->findOneBy(['supplier'=>$supplier,'category'=>$price->getCategory()->getParentid(), 'active'=>1]);
+      if ($count==0 and $newshoppingDiscount==null) {
+        $output->writeln("Agrupo en ".$price->getCategory()->getParentid()->getName()." cuyo id es ".$price->getCategory()->getParentid()->getId());
+        $obj=new ERPShoppingDiscounts();
+        $obj->setSupplier($supplier);
+        $obj->setCategory($price->getCategory()->getParentid());
+        $obj->setDiscount($price->getDiscount());
+        $obj->setDiscount1($price->getDiscount1());
+        $obj->setDiscount2($price->getDiscount2());
+        $obj->setDiscount3($price->getDiscount3());
+        $obj->setDiscount4($price->getDiscount4());
+        $obj->setQuantity($price->getQuantity());
+        $obj->setStart($price->getStart());
+        $obj->setEnd($price->getEnd());
+        $obj->setDateadd(new \Datetime());
+        $obj->setDateupd(new \Datetime());
+        $obj->setActive(1);
+        $obj->setDeleted(0);
+        $this->doctrine->getManager()->merge($obj);
+        $this->doctrine->getManager()->flush();
+        if($obj->getEnd()==null) $obj->setShoppingPrices($this->doctrine);
+        $this->doctrine->getManager()->clear();
+        // delete delete delete
+        foreach($categories as $category){
+          /*$shoppingDiscount=$repositoryShopping->findOneBy(['supplier'=>$supplier,'category'=>$category, 'active'=>1]);
+          if ($shoppingDiscount!=null) {  $output->writeln("Elimino ".$shoppingDiscount->getId());$repositoryShopping->deleteShoppingDiscount($shoppingDiscount->getId());}*/
+        }
+      }
+    }
+  }
+}
+
+public function updateProducts(InputInterface $input, OutputInterface $output){
   $repository=$this->doctrine->getRepository(ERPProducts::class);
-  $products=$repository->findBy(['shoppingPrice'=>0, ]);
+  $products=$repository->findBy(['PVP'=>0, 'PVPR'=>0]);
   foreach ($products as $product){
+    $output->writeln("Cambiando el producto ".$product->getCode());
     $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getProduct.php?product='.$product->getCode());
     $objects=json_decode($json, true);
+    if ($objects[0]["class"]==null) continue;
     $object=$objects[0]["class"][0];
+    $repositorySupliers=$this->doctrine->getRepository(ERPSuppliers::class);
+    $supplier=$repositorySupliers->findOneBy(["code"=>$object["Supplier"]]);
+    // Comprobamos si el producto no tiene movimientos desde 2017, en caso de que no tenga lo desactivamos
+    $json2=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-clearProducts.php?from='.$product->getCode());
+    $movs=json_decode($json2, true);
+    $movs=$movs[0];
+    $repositoryTaxes=$this->doctrine->getRepository(GlobaleTaxes::class);
+    $taxes=$repositoryTaxes->find(1);
+    $product->setTaxes($taxes);
+    $product->setWeight($object["Weight"]);
+    // Comprobamos si el producto tiene descuentos, si no los tiene se le pone como precio neto.
+    $json3=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getPrices.php?from='.$product->getCode().'&supplier='.$object["Supplier"]);
+    $prices=json_decode($json3, true);
+    $prices=$prices[0];
     $product->setnetprice(1);
-    $product->setPVPR(0);
-    if ($object["ShoppingPrice"]!=0) {
-        $product->setShoppingPrice($object["ShoppingPrice"]);
-        $output->writeln('*Poniendo precio al producto '.$product->getCode());      }
-      else if ($object["lastShoppingPrice"]!=0) {
-        $product->setShoppingPrice($object["lastShoppingPrice"]);
-        $output->writeln('*Poniendo precio al producto '.$product->getCode());      }
-        else {
-          $product->setActive(0);
-          $output->writeln('*Se desactiva el producto '.$product->getCode());        }
+    foreach ($prices["class"] as $price){
+      if($price["Discount"]!=0){
+        if ($price["Ending"]["date"]=="1753-01-01 00:00:00.000000") {
+          $product->setnetprice(0);
+        }
+      }
+    }
+    if (!$product->getnetprice()){
+      $product->setPVPR($object["ShoppingPrice"]);
+      $product->setShoppingPrice(0);
+    } else {
+      $product->setPVPR(0);
+      $product->setShoppingPrice($object["ShoppingPrice"]);
+    }
+    $product->setSupplier($supplier);
+    $repositoryManufacturers=$this->doctrine->getRepository(ERPManufacturers::class);
+    $manufacturer=$repositoryManufacturers->findOneBy(["code"=>$object["Manufacturer"]]);
+    if($manufacturer!=NULL) $product->setManufacturer($manufacturer);
     $this->doctrine->getManager()->merge($product);
     $this->doctrine->getManager()->flush();
     $product->priceCalculated($this->doctrine);
@@ -522,7 +594,7 @@ public function importStocks(InputInterface $input, OutputInterface $output) {
           $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product->getId(),"variantvalue"=>$variantvalue]);
           if($old_stocks!=null){
               $stock_old=$repositoryStocks->findOneBy(["id"=>$old_stocks[0]["id"], "deleted"=>0]);
-              dump('Vamos a actualizar la linea '.$old_stocks[0]["id"].' del producto '.$product->getId().' en el almacen '.$stock["almacen"]);
+              $output->writeln('Vamos a actualizar la linea '.$old_stocks[0]["id"].' del producto '.$product->getId().' en el almacen '.$stock["almacen"]);
               if ((int)$stock["stock"]<0) $quantity=0;
               else $quantity=(int)$stock["stock"];
               $stock_old->setQuantity(!$quantity?0:$quantity);
@@ -602,10 +674,17 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
   $repository=$this->doctrine->getRepository(ERPProducts::class);
   $repositoryproductprices=$this->doctrine->getRepository(ERPProductPrices::class);
   $repositorycustomerprices=$this->doctrine->getRepository(ERPCustomerPrices::class);
-  $products=$repository->findAll();
-  //Disable SQL logger
-  foreach($products as $product) {
+  $page=5000;
+  $totalProducts=round(intval($repository->totalProducts())/$page);
+  $count=0;
 
+  while($count<$totalProducts){
+      $products=$repository->productsLimit(intval($count*$page),intval($page));
+      $count++;
+
+  //Disable SQL logger
+  foreach($products as $id) {
+    $product=$repository->findOneBy(["id"=>$id, "company"=>2]);
     $output->writeln($product->getCode().'  - '.$product->getName());
     $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
 
@@ -641,7 +720,7 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
                     $neto=$increment["neto"];
                     $precio_con_dto=$pvp-$pvp*($dto/100);
                     $inc=(($precio_con_dto/$neto)-1)*100;
-                    $obj->setIncrement($inc);
+                    $obj->setIncrement(round($inc));
                     $obj->setDateadd(new \Datetime());
                     $obj->setDateupd(new \Datetime());
                     $obj->setActive(1);
@@ -739,6 +818,7 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
 
 
  }
+}
 
  $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"productincrements"]);
  if ($navisionSync==null) {
@@ -1055,7 +1135,7 @@ public function disableBlocked(InputInterface $input, OutputInterface $output){
   $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
   $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getProducts.php');
   $objects=json_decode($json, true);
-  dump($objects);
+  $output->writeln($objects);
   /*foreach ($objects as $object){
     $repositoryProduct=$this->doctrine->getRepository(ERPProducts::class);
     $product=$repositoryProduct->findOneBy(["code"=>$object["code"]]);
@@ -1228,6 +1308,55 @@ public function updateNames(InputInterface $input, OutputInterface $output){
       $objects2=json_decode($json2, true);
       $objects2=$objects2[0];
       if (!empty($objects2["class"])) $product->setName($objects2["class"][0]["Description"]);
+      $product->setDateupd(new \Datetime());
+      $this->doctrine->getManager()->merge($product);
+      $this->doctrine->getManager()->flush();
+      $this->doctrine->getManager()->clear();
+    }
+
+  }
+
+  $navisionSync->setLastsync($datetime);
+  $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
+  $this->doctrine->getManager()->persist($navisionSync);
+  $this->doctrine->getManager()->flush();
+}
+
+public function updateManufacturers(InputInterface $input, OutputInterface $output){
+  //------   Create Lock Mutex    ------
+  if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+      $fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetProducts-updateManufacturers.lock', 'c');
+  } else {
+      $fp = fopen('/tmp/axiom-navisionGetProducts-updateManufacturers.lock', 'c');
+  }
+  if (!flock($fp, LOCK_EX | LOCK_NB)) {
+    $output->writeln('* Fallo al iniciar la actualización de nombres: El proceso ya esta en ejecución.');
+    exit;
+  }
+  //------   Critical Section START   ------
+  $navisionSyncRepository=$this->doctrine->getRepository(NavisionSync::class);
+  $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"updateManufacturers"]);
+  if ($navisionSync==null) {
+    $navisionSync=new NavisionSync();
+    $navisionSync->setEntity("updateManufacturers");
+    $navisionSync->setMaxtimestamp(0);
+  }
+  $datetime=new \DateTime();
+  $output->writeln('* Actualizando marcas....');
+  $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-updateManufacturersProducts.php?from='.$navisionSync->getMaxtimestamp());
+  $objects=json_decode($json, true);
+  $objects=$objects[0];
+  foreach ($objects["class"] as $object){
+    $productsRepository=$this->doctrine->getRepository(ERPProducts::class);
+    $manufacturersRepository=$this->doctrine->getRepository(ERPManufacturers::class);
+    $product=$productsRepository->findOneBy(["code"=>$object["code"]]);
+    if ($product!=null){
+      $output->writeln('* Actualizando la marca del producto '.$object["code"]);
+      $marca_new=str_replace(" ","",($object["manufacturer"]));
+      if($marca_new=="BONFIGLI") $marca_new="BONFIGLIOLI";
+      if($marca_new=="JPANADERO") $marca_new="JUAN PANADERO";
+      $manufacturer=$manufacturersRepository->findOneBy(["code"=>$marca_new]);
+      $product->setManufacturer($manufacturer);
       $product->setDateupd(new \Datetime());
       $this->doctrine->getManager()->merge($product);
       $this->doctrine->getManager()->flush();
