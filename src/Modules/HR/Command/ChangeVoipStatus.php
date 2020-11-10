@@ -35,7 +35,7 @@ class ChangeVoipStatus extends ContainerAwareCommand
     $company=$companiesrepository->findOneBy(["id"=>$worker->getCompany()->getId(), "deleted"=>0, "active"=>1]);
     if(!$company) {$output->writeln('* Empresa no encontrada.');exit;}
     if(!$company->getVoipaddress() || !$company->getVoipregistercode() || !$company->getVoipunregistercode()) {$output->writeln('* VoIp no configurada para la empresa.'); exit;}
-
+    $output->writeln("screen -d -m -S pjsua".$worker->getExtension().$type==1?"in":"out"." /home/operador/pjproject-2.6/pjsip-apps/bin/pjsua-x86_64-unknown-linux-gnu --id=sip:".$worker->getExtension()."@".$company->getVoipaddress()." --registrar=sip:".$company->getVoipaddress()." --local-port=3037 --username=".$worker->getExtension()." --password=".$worker->getVoippass()." --null-audio --no-tcp --realm=* sip:".$type==1?$company->getVoipregistercode():$company->getVoipunregistercode()."@".$company->getVoipaddress());
     shell_exec("screen -d -m -S pjsua".$worker->getExtension().$type==1?"in":"out"." /home/operador/pjproject-2.6/pjsip-apps/bin/pjsua-x86_64-unknown-linux-gnu --id=sip:".$worker->getExtension()."@".$company->getVoipaddress()." --registrar=sip:".$company->getVoipaddress()." --local-port=3037 --username=".$worker->getExtension()." --password=".$worker->getVoippass()." --null-audio --no-tcp --realm=* sip:".$type==1?$company->getVoipregistercode():$company->getVoipunregistercode()."@".$company->getVoipaddress());
     sleep(10);
     shell_exec("screen -S pjsua".$worker->getExtension().$type==1?"in":"out"." -X quit");
