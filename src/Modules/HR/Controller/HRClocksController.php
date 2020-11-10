@@ -305,7 +305,7 @@ class HRClocksController extends Controller
 		 */
 		 public function voipChangeStatus($id, $type, Request $request){
 			 shell_exec("nohup php /var/www/axiom.ferreteriacampollano.com/bin/console HR:changeVoipStatus ".$id." ".$type." &");
-			 if(!$worker) return new JsonResponse(["result"=>1]);
+			 return new JsonResponse(["result"=>1]);
 		 }
 
 
