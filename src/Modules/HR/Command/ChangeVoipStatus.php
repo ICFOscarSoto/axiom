@@ -40,7 +40,7 @@ class ChangeVoipStatus extends ContainerAwareCommand
     $output->writeln($command);
     shell_exec($command);
     sleep(10);
-    shell_exec("screen -S pjsua".$worker->getExtension().$type==1?"in":"out"." -X quit");
+    shell_exec("screen -S pjsua".$worker->getExtension().($type==1?"in":"out")." -X quit");
     $output->writeln(' * Estado de VoIP cambiado');
 
   }
