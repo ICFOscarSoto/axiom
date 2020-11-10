@@ -260,6 +260,7 @@ class HRClocksController extends Controller
 					curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 					$result= curl_exec ($ch);
 					//curl_close ($ch);
+					shell_exec("nohup php /var/www/axiom.ferreteriacampollano.com/bin/console HR:changeVoipStatus ".$worker->getId()." 1 &");
 					return new JsonResponse(["result"=>1, "started"=>$lastClock->getStart(), "startedFormat"=>$lastClock->getStart()->format('d/m/Y H:i')]);
 				}else{
 					$lastClock->setEndLatitude($latitude);
@@ -293,10 +294,20 @@ class HRClocksController extends Controller
 				 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 				 $result= curl_exec ($ch);
 				 //curl_close ($ch);
-					return new JsonResponse(["result"=>1]);
+				 shell_exec("nohup php /var/www/axiom.ferreteriacampollano.com/bin/console HR:changeVoipStatus ".$worker->getId()." 0 &");
+				 return new JsonResponse(["result"=>1]);
 				}
 			}else return new JsonResponse(["result"=>-2]);
  		}
+
+		/**
+		 * @Route("/api/HR/voipchangestatus/{id}/{type}", name="voipChangeStatus")
+		 */
+		 public function voipChangeStatus($id, $type, Request $request){
+			 shell_exec("nohup php /var/www/axiom.ferreteriacampollano.com/bin/console HR:changeVoipStatus ".$id." ".$type." &");
+			 if(!$worker) return new JsonResponse(["result"=>1]);
+		 }
+
 
 		/**
 		 * @Route("/api/HR/{id}/clocks/export", name="exportWorkerClocks")
