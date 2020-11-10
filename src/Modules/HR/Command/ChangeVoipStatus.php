@@ -6,13 +6,14 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use App\Modules\HR\Entity\HRClocks;
+use App\Modules\HR\Entity\HRWorkers;
+use App\Modules\Globale\Entity\GlobaleCompanies;
 
-class ChangeStatusVoip extends ContainerAwareCommand
+class ChangeVoipStatus extends ContainerAwareCommand
 {
   protected function configure(){
         $this
-            ->setName('HR:changestatusvoip')
+            ->setName('HR:changeVoipStatus')
             ->setDescription('Cambiar estado en central VoIP')
             ->addArgument('worker', InputArgument::REQUIRED, '¿Trabajador afectado?')
             ->addArgument('type', InputArgument::REQUIRED, '¿Nuevo estado de la central?')
@@ -25,10 +26,7 @@ class ChangeStatusVoip extends ContainerAwareCommand
     $entityManager = $doctrine->getManager();
     $id = $input->getArgument('worker');
     $type = $input->getArgument('type');
-
     $workersrepository=$doctrine->getRepository(HRWorkers::class);
-    $clocksrepository=$doctrine->getRepository(HRClocks::class);
-    $usersrepository=$doctrine->getRepository(GlobaleUsers::class);
     $companiesrepository=$doctrine->getRepository(GlobaleCompanies::class);
 
     $worker=$workersrepository->findOneBy(["id"=>$id, "deleted"=>0, "active"=>1]);
