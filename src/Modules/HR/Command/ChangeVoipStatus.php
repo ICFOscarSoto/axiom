@@ -8,7 +8,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use App\Modules\HR\Entity\HRClocks;
 
-class ClocksAutoClose extends ContainerAwareCommand
+class ChangeStatusVoip extends ContainerAwareCommand
 {
   protected function configure(){
         $this
