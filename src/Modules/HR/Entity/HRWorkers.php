@@ -191,6 +191,21 @@ class HRWorkers
     */
    private $shift;
 
+   /**
+    * @ORM\Column(type="string", length=4, nullable=true)
+    */
+   private $extension;
+
+   /**
+    * @ORM\Column(type="string", length=24, nullable=true)
+    */
+   private $voippass;
+
+   /**
+    * @ORM\Column(type="boolean")
+    */
+   private $voipregister;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -604,5 +619,41 @@ class HRWorkers
         if($this->iban!=null && !$validator->isValidIban($this->iban)) {$fieldErrors=["iban"=>"Formato de IBAN incorrecto"]; }
         return ["valid"=>empty($fieldErrors), "field_errors"=>$fieldErrors];
       }
+    }
+
+    public function getExtension(): ?string
+    {
+        return $this->extension;
+    }
+
+    public function setExtension(?string $extension): self
+    {
+        $this->extension = $extension;
+
+        return $this;
+    }
+
+    public function getVoippass(): ?string
+    {
+        return $this->voippass;
+    }
+
+    public function setVoippass(?string $voippass): self
+    {
+        $this->voippass = $voippass;
+
+        return $this;
+    }
+
+    public function getVoipregister(): ?bool
+    {
+        return $this->voipregister;
+    }
+
+    public function setVoipregister(bool $voipregister): self
+    {
+        $this->voipregister = $voipregister;
+
+        return $this;
     }
 }

@@ -158,15 +158,30 @@ class GlobaleCompanies
      */
     private $cfgloginhtmlbottom;
 
+    /**
+     * @ORM\Column(type="string", length=24, nullable=true)
+     */
+    private $voipaddress;
+
+    /**
+     * @ORM\Column(type="string", length=8, nullable=true)
+     */
+    private $voipregistercode;
+
+    /**
+     * @ORM\Column(type="string", length=8, nullable=true)
+     */
+    private $voipunregistercode;
+
 
 	public function __construct()
-             {
-                 $this->userGroups = new ArrayCollection();
-                 $this->users = new ArrayCollection();
-                 $this->menuOptions = new ArrayCollection();
-                 $this->dateadd = new \Datetime();
-                 $this->dateupd =  new \Datetime();
-             }
+                                        {
+                                            $this->userGroups = new ArrayCollection();
+                                            $this->users = new ArrayCollection();
+                                            $this->menuOptions = new ArrayCollection();
+                                            $this->dateadd = new \Datetime();
+                                            $this->dateupd =  new \Datetime();
+                                        }
 
     public function getId(): ?int
     {
@@ -633,6 +648,42 @@ class GlobaleCompanies
     public function setCfgloginhtmlbottom(?string $cfgloginhtmlbottom): self
     {
         $this->cfgloginhtmlbottom = $cfgloginhtmlbottom;
+
+        return $this;
+    }
+
+    public function getVoipaddress(): ?string
+    {
+        return $this->voipaddress;
+    }
+
+    public function setVoipaddress(?string $voipaddress): self
+    {
+        $this->voipaddress = $voipaddress;
+
+        return $this;
+    }
+
+    public function getVoipregistercode(): ?string
+    {
+        return $this->voipregistercode;
+    }
+
+    public function setVoipregistercode(?string $voipregistercode): self
+    {
+        $this->voipregistercode = $voipregistercode;
+
+        return $this;
+    }
+
+    public function getVoipunregistercode(): ?string
+    {
+        return $this->voipunregistercode;
+    }
+
+    public function setVoipunregistercode(?string $voipunregistercode): self
+    {
+        $this->voipunregistercode = $voipunregistercode;
 
         return $this;
     }

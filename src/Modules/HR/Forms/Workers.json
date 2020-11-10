@@ -48,6 +48,14 @@
 			]
 		},
 		{
+			"name": "Telefonía",
+			"fields": [
+				{	"name": "extension", "cols": 3},
+				{	"name": "voippass", "caption": "Password", "cols": 4},
+				{	"name": "voipregister", "caption": "Registro auto", "cols": 2}
+			]
+		},
+		{
 			"name": "",
 			"fields": [
 				{	"name": "allowremoteclock", "cols": 2},

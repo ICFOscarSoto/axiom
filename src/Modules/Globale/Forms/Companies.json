@@ -34,5 +34,13 @@
 				{	"name": "deviceuser",	"cols": 6, "caption": "User", "readonly": true},
 				{	"name": "devicepassword", "cols": 6, "caption": "Password", "readonly": true}
 			]
+		},
+		{
+			"name": "Telefonía",
+			"fields": [
+				{	"name": "voipaddress",	"cols": 6, "caption": "IP Central"},
+				{	"name": "voipregistercode",	"cols": 2, "caption": "Cod. Registro"},
+				{	"name": "voipunregistercode",	"cols": 2, "caption": "Cod. Desregistro"}
+			]
 		}]
 }]
