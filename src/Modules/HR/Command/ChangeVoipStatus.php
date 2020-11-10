@@ -36,7 +36,7 @@ class ChangeVoipStatus extends ContainerAwareCommand
     if(!$company) {$output->writeln('* Empresa no encontrada.');exit;}
     $output->writeln("* Ejecutando comando...");
     if(!$company->getVoipaddress() || !$company->getVoipregistercode() || !$company->getVoipunregistercode()) {$output->writeln('* VoIp no configurada para la empresa.'); exit;}
-    $command="screen -d -m -S pjsua".$worker->getExtension().($type==1?"in":"out")." /home/operador/pjproject-2.6/pjsip-apps/bin/pjsua-x86_64-unknown-linux-gnu --id=sip:".$worker->getExtension()."@".$company->getVoipaddress()." --registrar=sip:".$company->getVoipaddress()." --local-port=3037 --username=".$worker->getExtension()." --password=".$worker->getVoippass()." --null-audio --no-tcp --realm=* sip:".($type==1?$company->getVoipregistercode():$company->getVoipunregistercode())."@".$company->getVoipaddress();
+    $command="screen -d -m -S pjsua".$worker->getExtension().($type==1?"in":"out")." /home/operador/pjproject-2.6/pjsip-apps/bin/pjsua-x86_64-unknown-linux-gnu --id=sip:".$worker->getExtension()."@".$company->getVoipaddress()." --registrar=sip:".$company->getVoipaddress()." --local-port=".(5000+$worker->getExtension())." --username=".$worker->getExtension()." --password=".$worker->getVoippass()." --null-audio --no-tcp --realm=* sip:".($type==1?$company->getVoipregistercode():$company->getVoipunregistercode())."@".$company->getVoipaddress();
     $output->writeln($command);
     shell_exec($command);
     sleep(10);
