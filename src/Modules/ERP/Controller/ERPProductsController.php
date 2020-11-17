@@ -417,7 +417,7 @@ class ERPProductsController extends Controller
 							 "medium"=>$this->generateUrl('getImage', array('type' => 'products', "size"=>"medium", "id"=>$id, "number"=>$j ))];
 				$images[]=$image;
 			}
-			
+
 			return new JsonResponse(["result"=>1,"images"=>$images]);
     }
 
@@ -446,13 +446,17 @@ class ERPProductsController extends Controller
 			$productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
 			$product=$productRepository->findOneBy(["id"=>$id]);
 
+			$images=null;
+			$image_path = $this->get('kernel')->getRootDir().'/../cloud/'.$product->getCompany()->getId().'/images/products/';
 
-			$image_path = $this->get('kernel')->getRootDir().'/../cloud/'.$product->getCompany()->getId().'/images/products/'.$id.'/';
-
+			if(file_exists($image_path.$id.'-large.png') || file_exists($image_path.$id.'-large.jpg')){
+				$images[]=$this->get('kernel')->getRootDir().'/../cloud/'.$product->getCompany()->getId().'/images/products/'.$id."-large.png";
+			}
+			
 			$found=true;
 			$i=1;
 			while($found==true){
-				if(file_exists($image_path.$id."-".$i.'-large.png') || file_exists($image_path.$id."-".$i.'-large.jpg')){
+				if(file_exists($image_path.$id.'/'.$id."-".$i.'-large.png') || file_exists($image_path.$id.'/'.$id."-".$i.'-large.jpg')){
 					$i++;
 				}else{
 					$found=false;

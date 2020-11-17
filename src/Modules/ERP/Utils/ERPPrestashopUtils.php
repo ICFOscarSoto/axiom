@@ -675,7 +675,15 @@ class ERPPrestashopUtils
     $xml = simplexml_load_string($xml_string, 'SimpleXMLElement', LIBXML_NOCDATA);
     $id_prestashop=$xml->products->product['id'];
 
-    $image_path = $rootDir.'/../cloud/'.$product->getCompany()->getId().'/images/products/'.$id.'/';
+    //$image_path = $rootDir.'/../cloud/'.$product->getCompany()->getId().'/images/products/'.$id.'/';
+
+    $images=null;
+    $image_path = $this->get('kernel')->getRootDir().'/../cloud/'.$product->getCompany()->getId().'/images/products/';
+
+    if(file_exists($image_path.$id.'-large.png') || file_exists($image_path.$id.'-large.jpg')){
+      $images[]=$this->get('kernel')->getRootDir().'/../cloud/'.$product->getCompany()->getId().'/images/products/'.$id."-large.png";
+    }
+
 
     $found=true;
     $i=1;

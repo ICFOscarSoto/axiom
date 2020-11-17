@@ -3,7 +3,7 @@
   <a href="#" id="btn-erase" class="btn btn-red">Eliminar imágenes</a>
 </div>
 <div id="upload_image_button_container" style="display:none;">
-  <a href="#" id="btn-uploadimages" class="btn btn-blue">Subir imágenes a la web</a>
+  <a href="#" id="btn-uploadimages" class="btn btn-green">Subir imágenes a la web</a>
 </div>
 <div id="gallery" class="fotorama" style="margin-right: 14px;margin-top: 20px; height: 300px" data-height="230" data-maxheight="230" data-width="100%" data-maxwidth="100%" data-nav="thumbs" data-allowfullscreen="true">
 
@@ -61,13 +61,13 @@ $.post("/api/erp/product/getimages/{{formConstructor.id_object}}",
             $("#delete_button_container").css("display","inline-block");
             checkWebProduct();
         }
-        else{/*
+        else{
           var html='';
               html+='<a href="api/products/0/large/getimage/1"><img src="/api/products/0/thumb/getimage/1"></a>';
 
           $("#gallery").html(html);
           $('.fotorama').fotorama();
-*/
+
         }
 
       }
@@ -137,6 +137,44 @@ $('body').on('click', "#btn-erase", function() {
 });
 
 $('body').on('click', "#btn-uploadimages", function() {
+
+
+  $.confirm({
+      theme: 'bootstrap',
+      title: '',
+      content: '¿Estás seguro de que quieres subir las imágenes? Las que ya existan en la web se borrarán.',
+      buttons: {
+         confirm: { text: 'Si', btnClass: 'btn-green', action: function(){
+                      confirmdelete();
+
+                }
+
+                },
+         cancel: { text: 'No', btnClass: 'btn-red', action: function(){
+
+                }
+       }
+     }
+  });
+
+
+
+});
+
+
+
+
+
+
+});
+
+function checkWebProduct()
+{
+  if($("#form_checkweb").is(':checked'))  $('#upload_image_button_container').css('display','inline-block');
+  else $('#upload_image_button_container').css('display','none');
+}
+
+function confirmdelete(){
   id={{ id }};
   if((++load_wait)==1) $("#load-spinner").fadeIn();
   $.ajax({
@@ -151,16 +189,6 @@ $('body').on('click', "#btn-uploadimages", function() {
       else toastr.error("Ocurrió un error inesperado en la carga de imágenes en Prestashop", "Confirmación", confirmation);
 
  });
-});
-
-
-
-});
-
-function checkWebProduct()
-{
-  if($("#form_checkweb").is(':checked'))  $('#upload_image_button_container').css('display','inline-block');
-  else $('#upload_image_button_container').css('display','none');
 }
 
 </script>
