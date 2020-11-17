@@ -678,17 +678,17 @@ class ERPPrestashopUtils
     //$image_path = $rootDir.'/../cloud/'.$product->getCompany()->getId().'/images/products/'.$id.'/';
 
     $images=null;
-    $image_path = $this->get('kernel')->getRootDir().'/../cloud/'.$product->getCompany()->getId().'/images/products/';
+    $image_path = $rootDir.'/../cloud/'.$product->getCompany()->getId().'/images/products/';
 
     if(file_exists($image_path.$id.'-large.png') || file_exists($image_path.$id.'-large.jpg')){
-      $images[]=$this->get('kernel')->getRootDir().'/../cloud/'.$product->getCompany()->getId().'/images/products/'.$id."-large.png";
+      $images[]=$rootDir.'/../cloud/'.$product->getCompany()->getId().'/images/products/'.$id."-large.png";
     }
 
 
     $found=true;
     $i=1;
     while($found==true){
-      if(file_exists($image_path.$id."-".$i.'-large.png') || file_exists($image_path.$id."-".$i.'-large.jpg')){
+      if(file_exists($image_path.$id.'/'.$id."-".$i.'-large.png') || file_exists($image_path.$id.'/'.$id."-".$i.'-large.jpg')){
         $i++;
       }else{
         $found=false;
