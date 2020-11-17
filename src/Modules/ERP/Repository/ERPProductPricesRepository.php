@@ -41,6 +41,15 @@ class ERPProductPricesRepository extends ServiceEntityRepository
 
     }
 
+    public function getPriceforGroup($product,$group){
+      $query="SELECT price FROM erpproduct_prices
+      WHERE product_id=:product AND customergroup_id=:group AND active=1 AND deleted=0";
+      $params=['product' => $product->getId(),
+              'group' => $group->getId()
+              ];
+      return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchColumn();
+    }
+
 
       public function pricesByProductIdAndSupplier($product,$supplier){
           $query="SELECT id from erpproduct_prices

@@ -487,6 +487,41 @@ class ERPSuppliers
 
         return $this;
     }
+  /*
+    public function postProccess($kernel, $doctrine, $user, $params, $oldobj){
+
+
+
+            //hay que crear los objetos de las entidades dependientes de supplier cuando se crea un supplier por primera vez
+
+
+             $repositoryProduct=$doctrine->getRepository(ERPProducts::class);
+             $repositoryWebProduct=$doctrine->getRepository(ERPWebProducts::class);
+             $product_ids=$repositoryProduct->getWebProductBySupplier($this);
+             foreach($product_ids as $product_id){
+
+               $product=$repositoryProduct->findOneBy(["id"=>$product_id]);
+               $webproduct=$repositoryWebProduct->findOneBy(["product"=>$product]);
+               $prestashopUtils= new ERPPrestashopUtils();
+               $prestashopUtils->updateWebProductPrices($doctrine,$product,$webproduct);
+
+               if($oldobj->getEstimateddelivery()!=$this->getEstimateddelivery()){
+                 $plazo_entrega=null;
+                 if($this->getEstimateddelivery()) $plazo_entrega=$this->getEstimateddelivery()+4;
+                 else $plazo_entrega="-1";
+                 $array_new_data = [];
+                 $array_new_data["estimateddelivery"]=$plazo_entrega;
+
+                 $prestashopUtils= new ERPPrestashopUtils();
+                 $prestashopUtils->updateWebProduct($doctrine,$array_new_data,$product,$webproduct);
+              }
+
+
+           }
+
+
+   }
+*/
 
 
 }

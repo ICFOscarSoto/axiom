@@ -8,6 +8,7 @@ use \App\Modules\ERP\Entity\ERPProducts;
 use \App\Modules\ERP\Entity\ERPCustomers;
 use \App\Modules\ERP\Entity\ERPProductsVariants;
 use \App\Modules\Globale\Entity\GlobaleUsers;
+use \App\Modules\ERP\Utils\ERPPrestashopUtils;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPEAN13Repository")
@@ -215,4 +216,38 @@ class ERPEAN13
 
         return $this;
     }
+/*
+    public function postProccess($kernel, $doctrine, $user, $params, $oldobj){
+
+      $productRepository=$doctrine->getRepository(ERPProducts::class);
+      $product=$productRepository->findOneBy(["id"=>$this->getProduct()->getId()]);
+
+      if($productRepository->getVariants($product->getId()))
+      {
+
+      }
+      else{
+
+      $repository=$doctrine->getRepository(ERPEAN13::class);
+      $ean13=$repository->findOneBy(["product"=>$product,"supplier"=>$product->getSupplier(),"active"=>1,"deleted"=>0]);
+      if($this->name==$ean13->getName()) {
+
+        $array_new_data = [];
+        $array_new_data["ean13"]=$this->name;
+
+        $webproductRepository=$doctrine->getRepository(ERPWebProducts::class);
+        $webproduct=$webproductRepository->findOneBy(["product"=>$product]);
+
+        $prestashopUtils= new ERPPrestashopUtils();
+        $prestashopUtils->updateWebProduct($doctrine,$array_new_data,$product,$webproduct);
+
+
+      }
+
+
+      }
+  */
+  }
+
+
 }

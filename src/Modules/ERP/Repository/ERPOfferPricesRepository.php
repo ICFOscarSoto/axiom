@@ -80,7 +80,7 @@ class ERPOfferPricesRepository extends ServiceEntityRepository
             else return false;
           }
           else{
-            $query="SELECT * FROM erpoffer_prices o WHERE o.product_id=:PROD AND o.id!=:ID AND o.customer_id IS NULL AND o.quantity=:QTY
+            $query="SELECT * FROM erpoffer_prices o WHERE o.product_id=:PROD AND o.id!=:ID AND o.customer_id IS NULL AND o.quantity=:QTY AND
             ((DATE(:DATE_START) BETWEEN DATE(START) AND DATE(END))
             OR (DATE(:DATE_END) BETWEEN DATE(START) AND DATE(END))
             OR (DATE(START)<DATE(:DATE_END) AND DATE(END) IS NULL)
@@ -167,6 +167,19 @@ class ERPOfferPricesRepository extends ServiceEntityRepository
       }
     }
 
+
+    public function getAvailableOfferID($product,$today){
+      $date_today=$today->format("Y-m-d");
+      $query="SELECT  id as id FROM erpoffer_prices o WHERE o.product_id=:PROD AND o.customer_id IS NULL AND o.quantity=1 AND
+      ((DATE(START)<=DATE(:TODAY)) AND (DATE(END) IS NULL OR DATE(END)>=DATE(:TODAY)))
+      AND o.active=1 AND o.deleted=0";
+      $params=[
+      'PROD' => $product->getId(),
+      'TODAY' => $date_today
+      ];
+      return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetch();
+
+    }
     public function offerPricesByCustomer($customer){
       $query="SELECT c.code as Product, c.name as Name, p.increment as Increment, p.price as Price, p.start as Start, p.end as End
               FROM erpoffer_prices p
@@ -177,6 +190,20 @@ class ERPOfferPricesRepository extends ServiceEntityRepository
 
 
     }
+
+    public function getAvailableQuantityOffers($product,$today){
+      $date_today=$today->format("Y-m-d");
+      $query="SELECT id as id FROM erpoffer_prices o WHERE o.product_id=:PROD AND o.customer_id IS NULL AND o.quantity>1 AND
+      ((DATE(START)<=DATE(:TODAY)) AND (DATE(END) IS NULL OR DATE(END)>=DATE(:TODAY)))
+      AND o.active=1 AND o.deleted=0";
+      $params=[
+      'PROD' => $product->getId(),
+      'TODAY' => $date_today
+      ];
+      return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+
+    }
+
 
     public function getOfferId($product,$customer,$qty,$start)
     {

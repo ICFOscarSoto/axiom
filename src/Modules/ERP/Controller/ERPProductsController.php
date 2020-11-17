@@ -33,10 +33,12 @@ use App\Modules\ERP\Utils\ERPStocksUtils;
 use App\Modules\ERP\Utils\ERPProductsAttributesUtils;
 use App\Modules\Security\Utils\SecurityUtils;
 use App\Modules\ERP\Reports\ERPEan13Reports;
+use App\Modules\ERP\Utils\ERPPrestashopUtils;
 
 class ERPProductsController extends Controller
 {
 	private $class=ERPProducts::class;
+	private $utilsClass=ERPPrestashopUtils::class;
 	private $module='ERP';
 	//private $utilsClass=ERPProductsUtils::class;
     /**
@@ -415,9 +417,62 @@ class ERPProductsController extends Controller
 							 "medium"=>$this->generateUrl('getImage', array('type' => 'products', "size"=>"medium", "id"=>$id, "number"=>$j ))];
 				$images[]=$image;
 			}
+			
 			return new JsonResponse(["result"=>1,"images"=>$images]);
     }
 
+
+		/**
+		* @Route("/api/erp/product/uploadwebimages/{id}", name="uploadWebImages", defaults={"id"=0})
+		*/
+		public function uploadWebImages($id,Request $request){
+				$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+				$productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
+				$product=$productRepository->findOneBy(["id"=>$id]);
+
+				$rootDir=$this->get('kernel')->getRootDir();
+				$prestashopUtils= new ERPPrestashopUtils();
+				$return=$prestashopUtils->uploadProductImages($product,$rootDir);
+
+				if($return) return new JsonResponse(["result"=>1]);
+				else return new JsonResponse(NULL);
+		}
+
+		/**
+		* @Route("/api/erp/product/deleteimages/{id}", name="deleteImages", defaults={"id"=0})
+		*/
+		public function deleteImages($id,Request $request){
+			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			$productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
+			$product=$productRepository->findOneBy(["id"=>$id]);
+
+
+			$image_path = $this->get('kernel')->getRootDir().'/../cloud/'.$product->getCompany()->getId().'/images/products/'.$id.'/';
+
+			$found=true;
+			$i=1;
+			while($found==true){
+				if(file_exists($image_path.$id."-".$i.'-large.png') || file_exists($image_path.$id."-".$i.'-large.jpg')){
+					$i++;
+				}else{
+					$found=false;
+					$i--;
+				}
+			}
+			for($j=1;$j<=$i;$j++){
+				$image=$this->get('kernel')->getRootDir().'/../cloud/'.$product->getCompany()->getId().'/images/products/'.$id."/".$id."-".$j."-large.png";
+				$images[]=$image;
+			}
+
+
+			foreach($images as $image)
+			{
+				if(file_exists($image)) unlink($image);
+
+			}
+
+			return new JsonResponse(["result"=>1]);
+		}
 
 		/**
 		* @Route("/api/prestashop/erp/product/get/{id}", name="prestashopGetProduct", defaults={"id"=0})

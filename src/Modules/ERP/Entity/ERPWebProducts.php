@@ -5,6 +5,7 @@ namespace App\Modules\ERP\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\ERP\Entity\ERPProducts;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
+use \App\Modules\ERP\Utils\ERPPrestashopUtils;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPWebProductsRepository")
@@ -87,6 +88,11 @@ class ERPWebProducts
      * @ORM\Column(type="float", nullable=true)
      */
     private $webprice;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $manomano;
 
 
     public function getId(): ?int
@@ -249,6 +255,13 @@ class ERPWebProducts
 
     }
 
+    public function preProccess($kernel, $doctrine, $user, $params, $oldobj){
+
+      if($this->getMinquantityofsaleweb()==NULL or $this->getMinquantityofsaleweb()<1) $this->setMinquantityofsaleweb(1);
+      if($this->getAdditionalcost()==NULL) $this->setAdditionalcost(0);
+
+    }
+
     public function updateWebProduct($doctrine,$oldobj){
        $array_new_data=[];
        foreach($oldobj as $clave=>$valor){
@@ -270,90 +283,14 @@ class ERPWebProducts
        //se ha modificado algún valor, luego hay que actualizarlo en la web
        if($array_new_data!=[]) {
 
-
-         $this_url="https://www.ferreteriacampollano.com";
-         $auth = base64_encode("6TI5549NR221TXMGMLLEHKENMG89C8YV");
-         $context = stream_context_create([
-             "http" => ["header" => "Authorization: Basic $auth"]
-         ]);
-
-         try{
-              //OBTENER ID DEL PRODUCTO EN prestashopGetProduct
-              dump($this->getProduct()->getCode());
-              $xml_string=file_get_contents($this_url."/api/products/?filter[reference]=".$this->getProduct()->getCode(), false, $context);
-              $xml = simplexml_load_string($xml_string, 'SimpleXMLElement', LIBXML_NOCDATA);
-              $id_prestashop=$xml->products->product['id'];
-              dump($id_prestashop);
-              //actualizamos prestashop
-               $xml_string=file_get_contents($this_url."/api/products/".$id_prestashop, false, $context);
-              // $xml_string=file_get_contents($this->url."/api/products/?display=[id,reference,name,cantidad_pedido_minimo,unidad_medida,equivalencia,unidad_medida_equivalencia,meta_title,meta_description]&filter[reference]=2322290200AC", false, $context);
-               $xml = simplexml_load_string($xml_string, 'SimpleXMLElement', LIBXML_NOCDATA);
-            //   $xml->product->cantidad_pedido_minimo="3";
-
-               unset($xml->product->manufacturer_name);
-               unset($xml->product->quantity);
-
-               $repositotyPrestashopFieldNames=$doctrine->getRepository(ERPPrestashopFieldNames::class);
-               foreach($array_new_data as $clave=>$valor)
-               {
-                 $PrestashopFieldName=$repositotyPrestashopFieldNames->findOneBy(["axiomname"=>$clave]);
-                 if($PrestashopFieldName!=NULL){
-                    $psname=$PrestashopFieldName->getPrestashopname();
-                    if($xml->product->$psname->language) {;
-                      $xml->product->$psname->language=$valor;
-                    }
-                    else $xml->product->$psname=$valor;
-                  }
-               }
-
-                $url = "https://www.ferreteriacampollano.com/api/products/".$id_prestashop;
-              //  $url= $this->url."/api/products/?display=[id,reference,name,cantidad_pedido_minimo,unidad_medida,equivalencia,unidad_medida_equivalencia,meta_title,meta_description]&filter[reference]=2322290200AC";
-                $ch = curl_init();
-
-                $putString = $xml->asXML();
-                //dump($putString);
-                /** use a max of 256KB of RAM before going to disk */
-                $putData = fopen('php://temp/maxmemory:256000', 'w');
-                if (!$putData) {
-                    die('could not open temp memory data');
-                }
-                fwrite($putData, $putString);
-                fseek($putData, 0);
-
-                // Headers
-                curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/xml','Authorization: Basic '.$auth));
-                // Binary transfer i.e. --data-BINARY
-                curl_setopt($ch, CURLOPT_BINARYTRANSFER, true);
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($ch, CURLOPT_URL, $url);
-                // Using a PUT method i.e. -XPUT
-                curl_setopt($ch, CURLOPT_PUT, true);
-                curl_setopt($ch, CURLOPT_INFILESIZE, strlen($putString));
-
-                curl_setopt($ch, CURLOPT_INFILE, $putData);
-
-                $output = curl_exec($ch);
-
-                // Close the file
-                fclose($putData);
-                // Stop curl
-            //    curl_close($ch);
-
-                if (curl_errno($ch)) {  dump(curl_error($ch)); }
-                else {  curl_close($ch); }  // $data contains the result of the post...
-
-
-              }catch(Exception $e){}
-
-
-
-
-
-      }
-
-
+         $prestashopUtils= new ERPPrestashopUtils();
+         $repositoryProduct=$doctrine->getRepository(ERPProducts::class);
+         $product=$repositoryProduct->findOneBy(["id"=>$this->getProduct()->getId()]);
+         $prestashopUtils->updateWebProduct($doctrine,$array_new_data,$product,$this);
 
        }
+
+   }
 
     public function getWebprice(): ?float
     {
@@ -363,6 +300,18 @@ class ERPWebProducts
     public function setWebprice(?float $webprice): self
     {
         $this->webprice = $webprice;
+
+        return $this;
+    }
+
+    public function getManomano(): ?bool
+    {
+        return $this->manomano;
+    }
+
+    public function setManomano(?bool $manomano): self
+    {
+        $this->manomano = $manomano;
 
         return $this;
     }

@@ -146,6 +146,24 @@ class ERPStocksRepository extends ServiceEntityRepository
 
     }
 
+    public function getAllStocksByProduct($product, $variant){
+
+      if($variant==null){
+        $query='SELECT SUM(stk.quantity) AS quantity
+        FROM erpstocks stk
+        WHERE stk.product_id='.$product.' AND stk.active=1 AND stk.deleted=0';
+        return $this->getEntityManager()->getConnection()->executeQuery($query)->fetchColumn(0);
+      }
+      else{
+        $query='SELECT SUM(stk.quantity) as quantity
+        FROM erpstocks stk
+        WHERE stk.product_id='.$product.' AND stk.productvariant_id='.$variant.' AND stk.active=1 AND stk.deleted=0';
+        return $this->getEntityManager()->getConnection()->executeQuery($query)->fetchColumn(0);
+
+      }
+
+    }
+
     public function findStockByProductVariantStore($product, $variant, $store){
       $query='SELECT SUM(stk.quantity) as TOTAL
       FROM erpstocks stk

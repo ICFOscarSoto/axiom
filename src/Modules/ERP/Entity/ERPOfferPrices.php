@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\ERP\Entity\ERPProducts;
 use \App\Modules\ERP\Entity\ERPCustomers;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
-
+use \App\Modules\ERP\Utils\ERPPrestashopUtils;
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPOfferPricesRepository")
  */
@@ -256,7 +256,24 @@ class ERPOfferPrices
       $this->price=round($product->getShoppingPrice()*(1+$this->increment/100),2);
       if($this->quantity==NULL OR $this->quantity<1) $this->quantity=1;
     }
+/*
+    public function postProccess($kernel, $doctrine, $user, $params, $oldobj){
 
+
+      if($this->getCustomer()==null) {
+        $repository=$doctrine->getRepository(ERPProducts::class);
+        $product=$repository->findOneBy(["id"=>$this->product->getId(),"company"=>$user->getCompany(),"active"=>1,"deleted"=>0]);
+        $repositoryWebProduct=$doctrine->getRepository(ERPWebProducts::class);
+        $webproduct=$repositoryWebProduct->findOneBy(["product"=>$product]);
+        if($product->getCheckweb()) {
+          $prestashopUtils= new ERPPrestashopUtils();
+          $prestashopUtils->updateWebProductPrices($doctrine,$product,$webproduct);
+        }
+      }
+
+
+    }
+*/
     public function getQuantity(): ?int
     {
         return $this->quantity;
@@ -268,4 +285,5 @@ class ERPOfferPrices
 
         return $this;
     }
+
 }

@@ -116,10 +116,10 @@ class ERPProductsRepository extends ServiceEntityRepository
       return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
     }
 
-    public function getWebProductRefBySupplier($supplier)
+    public function getWebProductBySupplier($supplier)
     {
-      $query="SELECT reference from erpproducts
-      where supplier_id=:supplier AND category_id=:category";
+      $query="SELECT id from erpproducts
+      where supplier_id=:supplier AND checkweb=1";
       $params=['supplier' => $supplier->getId()];
       $result=$this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
       return $result;

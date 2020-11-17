@@ -663,4 +663,128 @@ class ERPPrestashopUtils
   }
 
 
+  public function uploadProductImages($product,$rootDir){
+
+    $auth = base64_encode("6TI5549NR221TXMGMLLEHKENMG89C8YV");
+    $context = stream_context_create(["http" => ["header" => "Authorization: Basic $auth"]]);
+
+    $id=$product->getId();
+
+    //OBTENER ID DEL PRODUCTO EN prestashop
+    $xml_string=file_get_contents($this->this_url."/api/products/?filter[reference]=".$product->getCode(), false, $context);
+    $xml = simplexml_load_string($xml_string, 'SimpleXMLElement', LIBXML_NOCDATA);
+    $id_prestashop=$xml->products->product['id'];
+
+    $image_path = $rootDir.'/../cloud/'.$product->getCompany()->getId().'/images/products/'.$id.'/';
+
+    $found=true;
+    $i=1;
+    while($found==true){
+      if(file_exists($image_path.$id."-".$i.'-large.png') || file_exists($image_path.$id."-".$i.'-large.jpg')){
+        $i++;
+      }else{
+        $found=false;
+        $i--;
+      }
+    }
+    for($j=1;$j<=$i;$j++){
+      $image=$rootDir.'/../cloud/'.$product->getCompany()->getId().'/images/products/'.$id."/".$id."-".$j."-large.png";
+      $images[]=$image;
+    }
+
+
+    if($id_prestashop!=NULL AND !empty($images))
+    {
+
+      //  try{
+          $xml_string=$this->curl_get_contents($this->this_url."/api/images/products/".$id_prestashop, false, $context);
+        //  dump($xml_string);
+          if($xml_string!="401 Unauthorized" AND $xml_string!="")
+          {
+            $xml_string=file_get_contents($this->this_url."/api/images/products/".$id_prestashop, false, $context);
+            $xml = simplexml_load_string($xml_string, 'SimpleXMLElement', LIBXML_NOCDATA);
+            if($this->deleteProductImages($id_prestashop,$xml)==false) return false;
+          }
+        // }catch(Exception $e){}
+
+        $url = $this->this_url.'/api/images/products/'.$id_prestashop;
+
+
+        foreach($images as $image)
+        {
+            $key = '6TI5549NR221TXMGMLLEHKENMG89C8YV';
+            $ch = curl_init();
+
+            // Headers
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: multipart/form-data', 'Expect:'));
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_USERPWD, $key.':');
+            curl_setopt($ch, CURLOPT_POSTFIELDS, array('image'=> new \CurlFile($image)));
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+            $result = curl_exec($ch);
+          if (curl_errno($ch)) {
+              //dump(curl_error($ch));
+              return false;
+          }
+          else {
+              curl_close($ch);
+          }
+
+        }
+    return true;
+
+   }
+   else return false;
+
+}
+
+
+public function deleteProductImages($id_prestashop,$xml){
+  $auth = base64_encode("6TI5549NR221TXMGMLLEHKENMG89C8YV");
+  $context = stream_context_create(["http" => ["header" => "Authorization: Basic $auth"]]);
+
+
+  $xml_string=file_get_contents($this->this_url."/api/images/products/".$id_prestashop, false, $context);
+  $xml = simplexml_load_string($xml_string, 'SimpleXMLElement', LIBXML_NOCDATA);
+
+  foreach ($xml->image->declination as $image)
+  {
+
+    //$xml_string=file_get_contents($this->this_url."/api/images/products/".$id_prestashop."/".$image["id"]."?ps_method=DELETE", false, $context);
+
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/xml','Authorization: Basic '.$auth));
+    curl_setopt($ch, CURLOPT_URL, $this->this_url."/api/images/products/".$id_prestashop."/".$image["id"]."?ps_method=DELETE");
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    $output = curl_exec($ch);
+
+    if (curl_errno($ch)) {  return false; }
+    else {  curl_close($ch); }
+
+
+  }
+
+  return true;
+
+
+}
+
+
+function curl_get_contents($url)
+{
+  $ch = curl_init($url);
+  $auth = base64_encode("6TI5549NR221TXMGMLLEHKENMG89C8YV");
+  $context = stream_context_create(["http" => ["header" => "Authorization: Basic $auth"]]);
+  curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/xml','Authorization: Basic '.$auth));
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+  curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+  curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+  curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+  $data = curl_exec($ch);
+  curl_close($ch);
+  return $data;
+}
+
 }

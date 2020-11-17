@@ -69,6 +69,8 @@ class PrestashopGetProducts extends ContainerAwareCommand
       break;
       case 'web': $this->importWebFields($input, $output);
       break;
+      case 'updateproduct': $this->updateProduct($input, $output);
+      break;
       default:
         $output->writeln('Opcion no válida');
       break;
@@ -300,7 +302,7 @@ class PrestashopGetProducts extends ContainerAwareCommand
      //&filter[date_upd]=>[".$navisionSync->getLastsync()->format("Y-m-d H:i:s")."]
      try{
            //$xml_string=file_get_contents($this->url."/api/products/?display=[reference,name,cantidad_pedido_minimo,unidad_medida,equivalencia,unidad_medida_equivalencia,meta_title,meta_description]&filter[reference]=2322290200AC", false, $context);
-           $xml_string=file_get_contents($this->url."/api/products/?display=[reference,name,cantidad_pedido_minimo,unidad_medida,equivalencia,unidad_medida_equivalencia,meta_title,meta_description]", false, $context);
+           $xml_string=file_get_contents($this->url."/api/products/?display=[reference,name,cantidad_pedido_minimo,unidad_medida,equivalencia,unidad_medida_equivalencia,meta_title,meta_description,id_supplier,active]", false, $context);
            $xml = simplexml_load_string($xml_string, 'SimpleXMLElement', LIBXML_NOCDATA);
            $json = json_encode($xml);
            $array = json_decode($json,TRUE);
@@ -320,41 +322,45 @@ class PrestashopGetProducts extends ContainerAwareCommand
          $metadescription=is_array($prodPrestashop["meta_description"]["language"])?"":$prodPrestashop["meta_description"]["language"];
          $product=$productRepository->findOneBy(["company"=>$company, "code"=>$prodPrestashop["reference"], "deleted"=>0]);
 
-         //$output->writeln($cantidad_pedido_minimo." - ".$unidad_medida." - ".$equivalencia." - ".$unidad_medida_equivalencia. " - ".$metatitle. " - ".$metadescription);
-         //$output->writeln($cantidad_pedido_minimo." - ".$unidad_medida." - ".$equivalencia." - ".$unidad_medida_equivalencia. " - ".$metatitle. " - ".$metadescription);
+         $proveedorPS=$prodPrestashop["id_supplier"];
 
-         if($product){
-           $product->setCheckweb(1);
-           $doctrine->getManager()->persist($product);
-           $webproduct=$WebProductRepository->findOneBy(["product"=>$product->getId()]);
-           if($webproduct){
-             $webproduct->setMinquantityofsaleweb($cantidad_pedido_minimo);
-             $webproduct->setEquivalence($equivalencia);
-             $webproduct->setMeasurementunityofequivalence($unidad_medida_equivalencia);
-             $webproduct->setMetatitle($metatitle);
-             $webproduct->setMetadescription($metadescription);
-             $doctrine->getManager()->persist($webproduct);
-             $doctrine->getManager()->flush();
-           }
-           else{
-             $obj=new ERPWebProducts();
-             $obj->setProduct($product);
-             $company=$companyRepository->find(2);
-             $obj->setCompany($company);
-             $obj->setMinquantityofsaleweb($cantidad_pedido_minimo);
-             $obj->setEquivalence($equivalencia);
-             $obj->setMeasurementunityofequivalence($unidad_medida_equivalencia);
-             $obj->setMetatitle($metatitle);
-             $obj->setMetadescription($metadescription);
-             $obj->setDateadd(new \Datetime());
-             $obj->setDateupd(new \Datetime());
-             $obj->setDeleted(0);
-             $obj->setActive(1);
-             $doctrine->getManager()->persist($obj);
-             $doctrine->getManager()->flush();
-           }
-           $doctrine->getManager()->clear();
+         //$output->writeln($cantidad_pedido_minimo." - ".$unidad_medida." - ".$equivalencia." - ".$unidad_medida_equivalencia. " - ".$metatitle. " - ".$metadescription);
+         //$output->writeln($cantidad_pedido_minimo." - ".$unidad_medida." - ".$equivalencia." - ".$unidad_medida_equivalencia. " - ".$metatitle. " - ".$metadescription);
+         if($prodPrestashop["active"] AND $product){
+             $product->setCheckweb(1);
+             $doctrine->getManager()->persist($product);
+             $webproduct=$WebProductRepository->findOneBy(["product"=>$product->getId()]);
+             if($webproduct){
+               $webproduct->setMinquantityofsaleweb($cantidad_pedido_minimo);
+               $webproduct->setEquivalence($equivalencia);
+               $webproduct->setMeasurementunityofequivalence($unidad_medida_equivalencia);
+               $webproduct->setMetatitle($metatitle);
+               $webproduct->setMetadescription($metadescription);
+               if($proveedorPS=="2")  $webproduct->setManomano(1);
+               $doctrine->getManager()->persist($webproduct);
+               $doctrine->getManager()->flush();
+             }
+             else{
+               $obj=new ERPWebProducts();
+               $obj->setProduct($product);
+               $company=$companyRepository->find(2);
+               $obj->setCompany($company);
+               $obj->setMinquantityofsaleweb($cantidad_pedido_minimo);
+               $obj->setEquivalence($equivalencia);
+               $obj->setMeasurementunityofequivalence($unidad_medida_equivalencia);
+               $obj->setMetatitle($metatitle);
+               $obj->setMetadescription($metadescription);
+               if($proveedorPS=="2")  $obj->setManomano(1);
+               $obj->setDateadd(new \Datetime());
+               $obj->setDateupd(new \Datetime());
+               $obj->setDeleted(0);
+               $obj->setActive(1);
+               $doctrine->getManager()->persist($obj);
+               $doctrine->getManager()->flush();
+             }
+             $doctrine->getManager()->clear();
          }
+
        }
 
      }catch(Exception $e){}
@@ -362,7 +368,7 @@ class PrestashopGetProducts extends ContainerAwareCommand
      $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"prestashop:webfields"]);
      if ($navisionSync==null) {
        $navisionSync=new NavisionSync();
-       $navisionSync->setEntity("prestashop:products");
+       $navisionSync->setEntity("prestashop:webfields");
      }
 
      $navisionSync->setLastsync($datetime);
@@ -374,5 +380,67 @@ class PrestashopGetProducts extends ContainerAwareCommand
      fclose($fp);
 
    }
+
+   public function updateProduct(InputInterface $input, OutputInterface $output){
+
+     $auth = base64_encode($this->token);
+     $context = stream_context_create([
+         "http" => ["header" => "Authorization: Basic $auth"]
+     ]);
+     $array=[];
+     $products=[];
+
+     try{
+           $xml_string=file_get_contents($this->url."/api/products/2284", false, $context);
+          // $xml_string=file_get_contents($this->url."/api/products/?display=[id,reference,name,cantidad_pedido_minimo,unidad_medida,equivalencia,unidad_medida_equivalencia,meta_title,meta_description]&filter[reference]=2322290200AC", false, $context);
+           $xml = simplexml_load_string($xml_string, 'SimpleXMLElement', LIBXML_NOCDATA);
+           $xml->product->cantidad_pedido_minimo="3";
+
+           unset($xml->product->manufacturer_name);
+           unset($xml->product->quantity);
+
+
+            $url = "https://www.ferreteriacampollano.com/api/products/2284";
+          //  $url= $this->url."/api/products/?display=[id,reference,name,cantidad_pedido_minimo,unidad_medida,equivalencia,unidad_medida_equivalencia,meta_title,meta_description]&filter[reference]=2322290200AC";
+            $ch = curl_init();
+
+            $putString = $xml->asXML();
+            //dump($putString);
+            /** use a max of 256KB of RAM before going to disk */
+            $putData = fopen('php://temp/maxmemory:256000', 'w');
+            if (!$putData) {
+                die('could not open temp memory data');
+            }
+            fwrite($putData, $putString);
+            fseek($putData, 0);
+
+            // Headers
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/xml','Authorization: Basic '.base64_encode($this->token)));
+            // Binary transfer i.e. --data-BINARY
+            curl_setopt($ch, CURLOPT_BINARYTRANSFER, true);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_URL, $url);
+            // Using a PUT method i.e. -XPUT
+            curl_setopt($ch, CURLOPT_PUT, true);
+            curl_setopt($ch, CURLOPT_INFILESIZE, strlen($putString));
+
+            curl_setopt($ch, CURLOPT_INFILE, $putData);
+
+            $output = curl_exec($ch);
+            echo $output;
+
+            // Close the file
+            fclose($putData);
+            // Stop curl
+        //    curl_close($ch);
+
+            if (curl_errno($ch)) {  print curl_error($ch); }
+            else {  curl_close($ch); }  // $data contains the result of the post...
+
+
+      }catch(Exception $e){}
+
+
+      }
 }
 ?>
