@@ -64,7 +64,7 @@ class ERPCategories
     private $position;
 
     /**
-     * @ORM\Column(type="smallint", nullable=true)
+     * @ORM\Column(type="string", length=150, nullable=true)
      */
     private $prestashopcategory;
 
