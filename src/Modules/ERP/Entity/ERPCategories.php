@@ -63,6 +63,13 @@ class ERPCategories
      */
     private $position;
 
+    /**
+     * @ORM\Column(type="smallint", nullable=true)
+     */
+    private $prestashopcategory;
+
+
+
     public function getId(): ?int
     {
         return $this->id;
@@ -163,4 +170,17 @@ class ERPCategories
 
         return $this;
     }
+
+    public function getPrestashopcategory(): ?int
+    {
+        return $this->prestashopcategory;
+    }
+
+    public function setPrestashopcategory(?int $prestashopcategory): self
+    {
+        $this->prestashopcategory = $prestashopcategory;
+
+        return $this;
+    }
+
 }
