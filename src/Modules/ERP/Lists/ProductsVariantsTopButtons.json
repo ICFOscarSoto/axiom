@@ -1,8 +1,8 @@
 [
-  {"id" : "addTopProductsAttributes", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "",
-    "route":"genericdatatab", "routeParams":{"module":"ERP", "name":"ProductsVariants", "type":"modal",
-      "idparent":"id" }, "modal":"ProductsVariants", "actionType" : "background", "confirm" :false, "tooltip" : ""},
-  {"id" : "deleteTopProductsAttributes", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true, "tooltip":""},
-  {"id" : "printTopProductsAttributes", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false, "tooltip":""},
-  {"id" : "exportTopProductsAttributes", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"genericexport", "routeParams":{"module":"ERP", "name":"ProductsAttributes"}, "confirm" :false, "tooltip":""}
+  {"id" : "addProductsVariantsTop", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"dataProductsVariants",
+    "routeParams":{"idproduct":"id"}, "modal":"ProductsVariants", "actionType" : "background", "confirm" :false, "tooltip" : "Crear nuevo EAN13"},
+      
+  {"id" : "deleteTopProductsVariants", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true, "tooltip":""},
+  {"id" : "printTopProductsVariants", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false, "tooltip":""},
+  {"id" : "exportTopProductsVariantss", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"genericexport", "routeParams":{"module":"ERP", "name":"ProductsAttributes"}, "confirm" :false, "tooltip":""}
 ]
