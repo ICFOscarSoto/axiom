@@ -355,7 +355,9 @@ class ERPProductsController extends Controller
 				    return $a['warehouse_id'] <=> $b['warehouse_id'];
 				});
 				$result["stock"]=$stock_items;
+				$result["web"]=$obj->getCheckweb();
 				$result["active"]=$obj->getActive();
+
 				return new JsonResponse($result);
 			}
 			return new JsonResponse(["result"=>-1]);
@@ -452,7 +454,7 @@ class ERPProductsController extends Controller
 			if(file_exists($image_path.$id.'-large.png') || file_exists($image_path.$id.'-large.jpg')){
 				$images[]=$this->get('kernel')->getRootDir().'/../cloud/'.$product->getCompany()->getId().'/images/products/'.$id."-large.png";
 			}
-			
+
 			$found=true;
 			$i=1;
 			while($found==true){
