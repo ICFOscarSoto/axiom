@@ -355,7 +355,7 @@ class ERPProductsController extends Controller
 				    return $a['warehouse_id'] <=> $b['warehouse_id'];
 				});
 				$result["stock"]=$stock_items;
-				$result["web"]=$obj->getCheckweb();
+				$result["web"]=$obj->getCheckweb()!==null?$obj->getCheckweb():false;
 				$result["active"]=$obj->getActive();
 
 				return new JsonResponse($result);
