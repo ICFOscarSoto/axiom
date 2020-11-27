@@ -1403,10 +1403,11 @@ public function createProducts(InputInterface $input, OutputInterface $output){
   $array_products=[];
   foreach($product_ids as $product_id)
   {
-
-    if($product_id["id"]=="194254")
+/*
+  ($product_id["id"]=="194254")
     {
-        $product_obj=$repository->findOneBy(["id"=>$product_id["id"]]);
+  */
+       $product_obj=$repository->findOneBy(["id"=>$product_id["id"]]);
 
         $repositorysuppliers=$this->doctrine->getRepository(ERPSuppliers::class);
         $supplier=$repositorysuppliers->findOneBy(["id"=>$product_obj->getSupplier()->getId()]);
@@ -1444,7 +1445,10 @@ public function createProducts(InputInterface $input, OutputInterface $output){
         $array_products=[];
         $item=[];
 
-    }
+      /*
+     }
+     */
+
   }
 
 
