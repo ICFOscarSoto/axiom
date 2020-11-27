@@ -1425,6 +1425,7 @@ public function createProducts(InputInterface $input, OutputInterface $output){
         $item["vendor"]=$supplier->getCode();
         $item["vendoritem"]=$supplier_reference?$supplier_reference->getName():'';
         $item["checkweb"]=$product_obj->getCheckweb();
+        $item["dateupd"]=$product_obj->getDateupd();
         $array_products=$item;
 
 
