@@ -109,10 +109,10 @@ class AXIOMGetOrders extends ContainerAwareCommand
 
 
       $output->writeln(json_encode($orderHeader));
-      //$result=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-createEAN132.php?json='.json_encode($orderHeader));
+      $result=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-createPurchasesOrders.php?json='.json_encode($orderHeader));
     }
 
-    
+
     //------   Critical Section END   ------
     //------   Remove Lock Mutex    ------
     fclose($fp);
