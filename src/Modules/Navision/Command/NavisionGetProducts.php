@@ -1430,7 +1430,7 @@ public function createProducts(InputInterface $input, OutputInterface $output){
         $array_products=$item;
         $json = json_encode($array_products);
 
-        file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-createProduct.php?json='.$json);
+        file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-createProduct.php?json='.urlencode($json));
 
         /*
         $ch = curl_init($this->url.'navisionExport/axiom/do-NAVISION-createProduct.php');
