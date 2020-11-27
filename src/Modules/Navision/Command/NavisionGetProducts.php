@@ -1404,7 +1404,7 @@ public function createProducts(InputInterface $input, OutputInterface $output){
   foreach($product_ids as $product_id)
   {
 
-    if($product_id["id"]=="194225")
+    if($product_id["id"]=="194257")
     {
         $product_obj=$repository->findOneBy(["id"=>$product_id["id"]]);
 
