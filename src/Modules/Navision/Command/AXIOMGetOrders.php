@@ -94,7 +94,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
       "Buy-from Post Code"=>$order->getSupplierpostcode(),
       "Buy-from City"=>$order->getSuppliercity(),
       "Buy-from County"=>$order->getSupplierstate(),
-      "No oferta relacionada"=>$order->getPurchasesbudget()->getCode(),
+      "No oferta relacionada"=>$order->getPurchasesbudget()?$order->getPurchasesbudget()->getCode():'',
       "Ship-to Post Code"=>$order->getSupplierpostcode(),
       "Status"=>$order->getStatus(),
       "Payment Method Code"=>$order->getSupplier()->getPaymentmethod()->getPaymentcode(),
