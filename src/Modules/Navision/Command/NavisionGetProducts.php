@@ -97,6 +97,8 @@ class NavisionGetProducts extends ContainerAwareCommand
       break;
       case 'group': $this->groupPrices($input, $output);
       break;
+      case 'createproducts': $this->createProducts($input, $output);
+      break;
       case 'all':
         $this->importProduct($input, $output);
         //$this->clearEAN13($input, $output);
@@ -1370,5 +1372,86 @@ public function updateManufacturers(InputInterface $input, OutputInterface $outp
   $this->doctrine->getManager()->persist($navisionSync);
   $this->doctrine->getManager()->flush();
 }
+
+
+public function createProducts(InputInterface $input, OutputInterface $output){
+
+  if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+      $fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetProducts-createProducts.lock', 'c');
+  } else {
+      $fp = fopen('/tmp/axiom-navisionGetProducts-createProducts.lock', 'c');
+  }
+  if (!flock($fp, LOCK_EX | LOCK_NB)) {
+    $output->writeln('* Fallo al iniciar la creación de productos en Navision.');
+    exit;
+  }
+
+
+  //------   Critical Section START   ------
+  $navisionSyncRepository=$this->doctrine->getRepository(NavisionSync::class);
+  $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"createProducts"]);
+  if ($navisionSync==null) {
+    $navisionSync=new NavisionSync();
+    $navisionSync->setEntity("createProducts");
+    $navisionSync->setMaxtimestamp(0);
+  }
+  $datetime=new \DateTime();
+  $output->writeln('* Creando productos en Navision....');
+  $repository=$this->doctrine->getRepository(ERPProducts::class);
+  $product_ids=$repository->getProductsToNavision();
+  $item=[];
+  $array_products=[];
+  foreach($product_ids as $product_id)
+  {
+
+    if($product_id["id"]=="194225")
+    {
+        $product_obj=$repository->findOneBy(["id"=>$product_id["id"]]);
+
+        $repositorysuppliers=$this->doctrine->getRepository(ERPSuppliers::class);
+        $supplier=$repositorysuppliers->findOneBy(["id"=>$product_obj->getSupplier()->getId()]);
+        $repositoryreferences=$this->doctrine->getRepository(ERPReferences::class);
+        $supplier_reference=$repositoryreferences->findOneBy(["product"=>$product_obj->getId(),"supplier"=>$supplier->getId()]);
+
+        $item["code"]=$product_obj->getCode();
+        $item["name"]=$product_obj->getName();
+        $item["description"]=$product_obj->getDescription();
+        $item["onsale"]=$product_obj->getOnsale();
+        $item["active"]=$product_obj->getActive();
+        $item["deleted"]=$product_obj->getDeleted();
+        $item["manufacturer"]=$product_obj->getManufacturer()->getName();
+        $item["pvp"]=$product_obj->getPVP();
+        $item["shoppingPrice"]=$product_obj->getShoppingPrice();
+        $item["vendor"]=$supplier->getCode();
+        $item["vendoritem"]=$supplier_reference->getName();
+        $item["checkweb"]=$product_obj->getCheckweb();
+        $array_products=$item;
+
+
+
+        # Setup request to send json via POST.
+        $json = json_encode($array_products);
+        dump($json);
+        /*
+        $ch = curl_init($this->url.'navisionExport/axiom/do-NAVISION-createProduct.php');
+        curl_setopt( $ch, CURLOPT_POSTFIELDS, $json );
+        curl_setopt( $ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
+        curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
+        $result = curl_exec($ch);
+        curl_close($ch);
+
+        $array_products=[];
+        $item=[];
+        */
+    }
+  }
+
+
+
+
+
+}
+
+
 }
 ?>
