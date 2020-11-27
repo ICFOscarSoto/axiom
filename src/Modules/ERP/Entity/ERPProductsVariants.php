@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\ERP\Entity\ERPProducts;
 use \App\Modules\ERP\Entity\ERPVariantsValues;
 use \App\Modules\ERP\Entity\ERPVariants;
+use \App\Modules\ERP\Utils\ERPPrestashopUtils;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPProductsVariantsRepository")
@@ -145,4 +146,20 @@ class ERPProductsVariants
 
         return $this;
     }
+/*
+    public function postProccess($kernel, $doctrine, $user, $params, $oldobj){
+
+
+      $array_new_data = [];
+      $array_new_data["variants"]["type"]=$this->getVariantname()->getName();
+      $array_new_data["variants"]["new"]=$this->getVariantvalue()->getName();
+      $array_new_data["variants"]["old"]="42";
+
+      $webproductRepository=$doctrine->getRepository(ERPWebProducts::class);
+      $webproduct=$webproductRepository->findOneBy(["product"=>$this->getProduct()]);
+
+      $prestashopUtils= new ERPPrestashopUtils();
+      $prestashopUtils->updateWebProduct($doctrine,$array_new_data,$this->getProduct(),$webproduct);
+
+    }*/
 }

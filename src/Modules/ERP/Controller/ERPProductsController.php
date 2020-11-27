@@ -452,7 +452,7 @@ class ERPProductsController extends Controller
 			if(file_exists($image_path.$id.'-large.png') || file_exists($image_path.$id.'-large.jpg')){
 				$images[]=$this->get('kernel')->getRootDir().'/../cloud/'.$product->getCompany()->getId().'/images/products/'.$id."-large.png";
 			}
-			
+
 			$found=true;
 			$i=1;
 			while($found==true){
@@ -970,6 +970,26 @@ class ERPProductsController extends Controller
 		 return new JsonResponse(["result"=>-1, "text"=> "Ocurrio un error inexperado"]);
 		}
 
+
+		/**
+		* @Route("/api/ERP/product/pscategoriesgettree/{id}", name="psCategoriesGetTree", defaults={"id"=0})
+		*/
+		public function psCategoriesGetTree($id, RouterInterface $router,Request $request){
+/*
+			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			$productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
+			$product=$productRepository->findOneBy(["id"=>$id]);
+
+			$rootDir=$this->get('kernel')->getRootDir();
+			$prestashopUtils= new ERPPrestashopUtils();
+			$result=$prestashopUtils->getCategoriesTree(2);
+
+			if($result) return new JsonResponse(["result"=>$result]);
+			else return new JsonResponse(NULL);
+
+*/
+
+			}
 
 
 }
