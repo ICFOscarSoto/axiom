@@ -10,7 +10,6 @@ use App\Modules\ERP\Entity\ERPSuppliers;
 use App\Modules\ERP\Entity\ERPProducts;
 use App\Modules\ERP\Entity\ERPProductsVariants;
 use App\Modules\ERP\Entity\ERPPurchasesOrders;
-use App\Modules\ERP\Entity\ERPPurchasesOrdersLine;
 use App\Modules\Globale\Entity\GlobaleCompanies;
 use App\Modules\Globale\Entity\GlobaleStates;
 use App\Modules\Globale\Entity\GlobaleCountries;
@@ -75,10 +74,6 @@ class AXIOMGetOrders extends ContainerAwareCommand
 
     //------   Critical Section START   ------
     $repositoryPurchasesOrders=$this->doctrine->getRepository(ERPPurchasesOrders::class);
-    $repositoryPurchasesOrdersLines=$this->doctrine->getRepository(ERPPurchasesOrdersLines::class);
-    $repositorySuppliers=$this->doctrine->getRepository(ERPSuppliers::class);
-    $repositoryProducts=$this->doctrine->getRepository(ERPProducts::class);
-    $repositoryVariants=$this->doctrine->getRepository(ERPProductsVariants::class);
 
     //$orders=$repositoryPurchasesOrders->findAll();
     $orders=$repositoryPurchasesOrders->findBy(["code"=>"20PC09132"]);
