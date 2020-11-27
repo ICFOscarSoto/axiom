@@ -141,6 +141,17 @@ class ERPProductsRepository extends ServiceEntityRepository
 
     }
 
+    public function getProductsToNavision()
+    {
+      //$date_aux = new \DateTime('2020-11-13');
+    //  $date=$date_aux->format("Y-m-d");
+      $query="SELECT id FROM erpproducts WHERE dateadd>'2020-11-13'";
+    //  $params=['DATE' => $date];
+      $result=$this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
+      return $result;
+
+    }
+
 /*
 dejamos pendiente esta consulta porque falta por añadir en los pedidos de compra algun campo que indique que el material
 de ese pedido ya se ha recibido
