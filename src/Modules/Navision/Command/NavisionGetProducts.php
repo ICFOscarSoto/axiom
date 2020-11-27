@@ -1410,10 +1410,11 @@ public function createProducts(InputInterface $input, OutputInterface $output){
        $product_obj=$repository->findOneBy(["id"=>$product_id["id"]]);
 
         $repositorysuppliers=$this->doctrine->getRepository(ERPSuppliers::class);
-        $supplier=$repositorysuppliers->findOneBy(["id"=>$product_obj->getSupplier()->getId()]);
+        if($product_obj->getSupplier()!=null) $supplier=$repositorysuppliers->findOneBy(["id"=>$product_obj->getSupplier()->getId()]);
+        else $supplier=null;
         $repositoryreferences=$this->doctrine->getRepository(ERPReferences::class);
-        $supplier_reference=$repositoryreferences->findOneBy(["product"=>$product_obj,"supplier"=>$supplier]);
-
+        if($supplier!=null) $supplier_reference=$repositoryreferences->findOneBy(["product"=>$product_obj,"supplier"=>$supplier]);
+        else $supplier_reference=null;
         $item["code"]=$product_obj->getCode();
         $item["name"]=$product_obj->getName();
         $item["description"]=$product_obj->getDescription();
