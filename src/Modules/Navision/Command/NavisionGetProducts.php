@@ -806,7 +806,7 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
                   $customerincrementaxiom->calculateIncrementsBySupplierCategory($this->doctrine);
                 }
 
-                
+
               }
             }
 
@@ -1411,7 +1411,7 @@ public function createProducts(InputInterface $input, OutputInterface $output){
         $repositorysuppliers=$this->doctrine->getRepository(ERPSuppliers::class);
         $supplier=$repositorysuppliers->findOneBy(["id"=>$product_obj->getSupplier()->getId()]);
         $repositoryreferences=$this->doctrine->getRepository(ERPReferences::class);
-        $supplier_reference=$repositoryreferences->findOneBy(["product"=>$product_obj->getId(),"supplier"=>$supplier->getId()]);
+        $supplier_reference=$repositoryreferences->findOneBy(["product"=>$product_obj,"supplier"=>$supplier]);
 
         $item["code"]=$product_obj->getCode();
         $item["name"]=$product_obj->getName();
@@ -1419,11 +1419,11 @@ public function createProducts(InputInterface $input, OutputInterface $output){
         $item["onsale"]=$product_obj->getOnsale();
         $item["active"]=$product_obj->getActive();
         $item["deleted"]=$product_obj->getDeleted();
-        $item["manufacturer"]=$product_obj->getManufacturer()->getName();
+        $item["manufacturer"]=$product_obj->getManufacturer()?$product_obj->getManufacturer()->getName():'';
         $item["pvp"]=$product_obj->getPVP();
         $item["shoppingPrice"]=$product_obj->getShoppingPrice();
         $item["vendor"]=$supplier->getCode();
-        $item["vendoritem"]=$supplier_reference->getName();
+        $item["vendoritem"]=$supplier_reference?$supplier_reference->getName():'';
         $item["checkweb"]=$product_obj->getCheckweb();
         $array_products=$item;
 
