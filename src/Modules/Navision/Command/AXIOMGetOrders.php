@@ -112,15 +112,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
       //$result=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-createEAN132.php?json='.json_encode($orderHeader));
     }
 
-    $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"ownbarcodes"]);
-    if ($navisionSync==null) {
-      $navisionSync=new NavisionSync();
-      $navisionSync->setEntity("ownbarcodes");
-    }
-    $navisionSync->setLastsync($datetime);
-    $navisionSync->setMaxtimestamp($datetime->getTimestamp());
-    $this->doctrine->getManager()->persist($navisionSync);
-    $this->doctrine->getManager()->flush();
+    
     //------   Critical Section END   ------
     //------   Remove Lock Mutex    ------
     fclose($fp);
