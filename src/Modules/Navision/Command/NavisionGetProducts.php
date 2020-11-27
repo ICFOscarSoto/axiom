@@ -1404,7 +1404,7 @@ public function createProducts(InputInterface $input, OutputInterface $output){
   foreach($product_ids as $product_id)
   {
 
-    if($product_id["id"]=="194257")
+    if($product_id["id"]=="194254")
     {
         $product_obj=$repository->findOneBy(["id"=>$product_id["id"]]);
 
@@ -1426,13 +1426,12 @@ public function createProducts(InputInterface $input, OutputInterface $output){
         $item["vendoritem"]=$supplier_reference?$supplier_reference->getName():'';
         $item["checkweb"]=$product_obj->getCheckweb();
         $item["dateupd"]=$product_obj->getDateupd();
+
         $array_products=$item;
-
-
-
-        # Setup request to send json via POST.
         $json = json_encode($array_products);
-        dump($json);
+
+        file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-createProduct.php?json='.url_encode($json));
+
         /*
         $ch = curl_init($this->url.'navisionExport/axiom/do-NAVISION-createProduct.php');
         curl_setopt( $ch, CURLOPT_POSTFIELDS, $json );
@@ -1440,10 +1439,10 @@ public function createProducts(InputInterface $input, OutputInterface $output){
         curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
         $result = curl_exec($ch);
         curl_close($ch);
-
+*/
         $array_products=[];
         $item=[];
-        */
+
     }
   }
 
