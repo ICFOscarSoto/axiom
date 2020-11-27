@@ -80,7 +80,10 @@ class AXIOMGetOrders extends ContainerAwareCommand
     $repositoryProducts=$this->doctrine->getRepository(ERPProducts::class);
     $repositoryVariants=$this->doctrine->getRepository(ERPProductsVariants::class);
 
-    $orders=$repositoryPurchasesOrders->findAll();
+    //$orders=$repositoryPurchasesOrders->findAll();
+    $orders=$repositoryPurchasesOrders->findBy(["code"=>"20PC09132"]);
+
+
     foreach($orders as $order){
       if ($order->getAuthor()->getName()=="Administrador") $author=null;
       else $author=$order->getAuthor()->getEmail();
