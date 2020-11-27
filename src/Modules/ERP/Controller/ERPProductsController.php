@@ -27,6 +27,7 @@ use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\ERP\Utils\ERPProductsUtils;
+use App\Modules\ERP\Utils\ERPProductsVariantsUtils;
 use App\Modules\ERP\Utils\ERPEAN13Utils;
 use App\Modules\ERP\Utils\ERPReferencesUtils;
 use App\Modules\ERP\Utils\ERPStocksUtils;
@@ -129,7 +130,7 @@ class ERPProductsController extends Controller
 			$obj = $productRepository->findOneBy(['id'=>$id, 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
 			$product_name=$obj?$obj->getName():'';
 			if ($obj && $obj->getGrouped()) {
-				$tabs[]=["name" => "variants", "icon"=>"fa fa-id-card", "caption"=>"Variants", "route"=>$this->generateUrl("generictablist",["function"=>"formatListByProduct","module"=>"ERP","name"=>"ProductsVariants","id"=>$id])];
+				$tabs[]=["name" => "variants", "icon"=>"fa fa-id-card", "caption"=>"Variants", "route"=>$this->generateUrl("listProductsVariants",["id"=>$id])];
 			}
 			$tabs=array_merge($tabs,[["name" => "ean13",  "icon"=>"fa fa-users", "caption"=>"EAN13", "route"=>$this->generateUrl("listEAN13",["id"=>$id])],
 			["name" => "references",  "icon"=>"fa fa-users", "caption"=>"References", "route"=>$this->generateUrl("listReferences",["id"=>$id])],
@@ -355,7 +356,9 @@ class ERPProductsController extends Controller
 				    return $a['warehouse_id'] <=> $b['warehouse_id'];
 				});
 				$result["stock"]=$stock_items;
+				$result["web"]=$obj->getCheckweb()!==null?$obj->getCheckweb():false;
 				$result["active"]=$obj->getActive();
+
 				return new JsonResponse($result);
 			}
 			return new JsonResponse(["result"=>-1]);

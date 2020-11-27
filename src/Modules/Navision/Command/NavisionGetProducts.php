@@ -743,7 +743,7 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
             }
         }
           //cliente concreto
-          else if($increment["type"]==0)
+          /*else if($increment["type"]==0)
           {
 
             $customer=$repositoryCustomers->findOneBy(["code"=>$increment["salescode"]]);
@@ -806,12 +806,12 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
                   $customerincrementaxiom->calculateIncrementsBySupplierCategory($this->doctrine);
                 }
 
-                */
+                
               }
             }
 
           $output->writeln('Finalizado el incremento para el cliente');
-        }
+        }*/
 
       }
 

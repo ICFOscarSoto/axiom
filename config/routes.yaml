@@ -95,6 +95,10 @@ EAN13:
     resource: 'App\Modules\ERP\Controller\ERPEAN13Controller'
     type:     annotation
 
+ProductsVariants:
+    resource: 'App\Modules\ERP\Controller\ERPProductsVariantsController'
+    type:     annotation
+
 Categories:
     resource: 'App\Modules\ERP\Controller\ERPCategoriesController'
     type:     annotation

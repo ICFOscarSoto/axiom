@@ -20,16 +20,10 @@ class ERPProductsVariantsUtils
   public function getIncludedForm($params){
     $doctrine=$params["doctrine"];
     $user=$params["user"];
-    //$product=$params["parent"];
+    $product=$params["product"];
     $productsRepository=$doctrine->getRepository(ERPProducts::class);
 
-    return [['product', ChoiceType::class, [
-      'required' => true,
-      'attr' => ['class' => 'select2'],
-      'choices' => $productsRepository->findBy(["id"=>$params["parent"]]),
-      'choice_label' => 'name',
-      'choice_value' => 'id'
-      ]]];
+    return [];
   }
 
   public function formatList($user){
@@ -48,7 +42,7 @@ class ERPProductsVariantsUtils
     return $list;
   }
 
-  public function formatListByProduct($user, $product){
+  public function formatListByProduct($product){
     $list=[
       'id' => 'list'.$this->name,
       'route' => 'genericlist',
