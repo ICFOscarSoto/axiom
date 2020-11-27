@@ -31,7 +31,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
 
   protected function configure(){
         $this
-            ->setName('navision:getmanufacturers')
+            ->setName('navision:createorders')
             ->setDescription('Sync navision principal entities')
             ->addArgument('entity', InputArgument::REQUIRED, '¿Entidad que sincronizar?')
         ;
