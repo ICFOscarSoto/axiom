@@ -189,7 +189,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
 
         //$orders=$repositorySalesOrders->findAll();
         $orders=$repositorySalesOrders->findBy(["code"=>"20PV41334"]);
-
+/*
 
         foreach($orders as $order){
           if ($order->getAuthor()->getName()=="Administrador") $author=null;
@@ -227,7 +227,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
       fclose($fp);
 
     }
-
+*/
   }
 }
 ?>
