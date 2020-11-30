@@ -114,6 +114,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
       $orderLinesArray=[];
 
       $orderlines=$repositoryPurchasesOrdersLines->findBy(["purchaseorder"=>$order]);
+
       foreach($orderlines as $orderline){
       //  $productrepository=$doctrine->getRepository(ERPProducts::class);
       //$product=$productrepository->getOneBy(["id"=>$orderline->getProduct()->getId()]);
@@ -127,7 +128,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
           "No."=>$orderline->getCode(),
           "Document No."=>$order->getCode(),
         /*  "Cross-Reference No."=>,*/
-          "Description"=>substr($orderline->getName(),0,50),,
+          "Description"=>substr($orderline->getName(),0,50),
           "Description 2"=>substr($orderline->getName(),50,50),
           "Quantity"=>$quantity,
           "Outstanding Quantity"=>$quantity,
