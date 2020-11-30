@@ -90,7 +90,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
 
       if (strpos($order->getCode(),'20PC')) $devolucion=0;
       else $devolucion=1;
-      $orderJson[]=["No."=>$order->getCode(),
+      $orderJson=["No."=>$order->getCode(),
       "Buy-from Vendor No."=>$order->getSupplier()->getCode(),
       "Assigned User ID"=>$author,
       "Purchaser Code"=>$order->getAgent()->getEmail(),
@@ -125,7 +125,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
         $unitprice=$orderline->getUnitprice();
         $total=$orderline->getTotal();
         $dto=$orderline->getDtoperc();
-        $linenum=$orderline->getgetLinenum()*10000;
+        $linenum=$orderline->getLinenum()*10000;
         $line[]=[
           "No."=>$orderline->getCode(),
           "Document No."=>$order->getCode(),
