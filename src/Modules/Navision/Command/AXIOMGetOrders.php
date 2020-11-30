@@ -10,6 +10,7 @@ use App\Modules\ERP\Entity\ERPSuppliers;
 use App\Modules\ERP\Entity\ERPProducts;
 use App\Modules\ERP\Entity\ERPProductsVariants;
 use App\Modules\ERP\Entity\ERPPurchasesOrders;
+use App\Modules\ERP\Entity\ERPPurchasesOrdersLines;
 use App\Modules\Globale\Entity\GlobaleCompanies;
 use App\Modules\Globale\Entity\GlobaleStates;
 use App\Modules\Globale\Entity\GlobaleCountries;
@@ -74,6 +75,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
 
     //------   Critical Section START   ------
     $repositoryPurchasesOrders=$this->doctrine->getRepository(ERPPurchasesOrders::class);
+    $repositoryPurchasesOrdersLines=$this->doctrine->getRepository(ERPPurchasesOrdersLines::class);
 
     //$orders=$repositoryPurchasesOrders->findAll();
     $orders=$repositoryPurchasesOrders->findBy(["code"=>"20PC09132"]);
@@ -83,6 +85,9 @@ class AXIOMGetOrders extends ContainerAwareCommand
       if ($order->getAuthor()->getName()=="Administrador") $author=null;
       else $author=$order->getAuthor()->getEmail();
 
+
+      if (strpos($order->getCode(),'20PC')) $devolucion=0;
+      else $devolucion=1;
       $orderHeader[]=["No."=>$order->getCode(),
       "Buy-from Vendor No."=>$order->getSupplier()->getCode(),
       "Assigned User ID"=>$author,
@@ -101,15 +106,36 @@ class AXIOMGetOrders extends ContainerAwareCommand
       "VAT Registration No."=>$order->getVat(),
       "Document Date" => $order->getDate(),
       "Fecha 1.lanzamiento" => $order->getDateofferend(),
-      //"Line Amount"=>$order->getTotalnet(),
-      //"Line Discount Amount"=>$order->getTotaldto(),
-      //"Amount Including VAT"=>$order->getTotal()
-      ];
+      "Es Devolucion"=>$devolucion      ];
 
 
 
       $output->writeln(json_encode($orderHeader));
       $result=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-createPurchasesOrders.php?json='.json_encode($orderHeader));
+
+
+      $orderlines=$repositoryPurchasesOrdersLines->findBy(["purchaseorder_id"=>$order->getId()]);
+      foreach($orderlines as $orderline){
+        $line[]=[
+          "No.",
+          "Cross-Reference No.",
+          "Description",
+          "Description 2",
+          "Quantity",
+          "Unit price (LCY)",
+          "Line Discount %",
+          "Line Discount Amount",
+          "Amount",
+          "Amount including VAT",
+          "type",
+          "Line No." (10000),
+          "EC %" vat,
+          "taxpec" vat
+
+
+        ];
+      }
+
     }
 
 
