@@ -88,7 +88,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
 
       if (strpos($order->getCode(),'20PC')) $devolucion=0;
       else $devolucion=1;
-      $orderHeader[]=["No."=>$order->getCode(),
+      $orderJson[]=["No."=>$order->getCode(),
       "Buy-from Vendor No."=>$order->getSupplier()->getCode(),
       "Assigned User ID"=>$author,
       "Purchaser Code"=>$order->getAgent()->getEmail(),
@@ -109,36 +109,55 @@ class AXIOMGetOrders extends ContainerAwareCommand
       "Es Devolucion"=>$devolucion,
       "Order Date"=>$order->getDateadd()    ];
 
+    //  $output->writeln(json_encode($orderJson));
 
-
-      $output->writeln(json_encode($orderHeader));
-      $result=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-createPurchasesOrders.php?json='.urlencode(json_encode($orderHeader)));
-
+      $orderLinesArray=[];
 
       $orderlines=$repositoryPurchasesOrdersLines->findBy(["purchaseorder"=>$order]);
       foreach($orderlines as $orderline){
-      /*  $line[]=[
-          "No.",
-          "Cross-Reference No.",
-          "Description",
-          "Description 2",
-          "Quantity",
-          "Unit price (LCY)",
-          "Line Discount %",
-          "Line Discount Amount",
-          "Amount",
-          "Amount including VAT",
-          "type",
-          "Line No." (10000),
-          "EC %" vat,
-          "taxpec" vat
+      //  $productrepository=$doctrine->getRepository(ERPProducts::class);
+      //$product=$productrepository->getOneBy(["id"=>$orderline->getProduct()->getId()]);
 
+        $quantity=$orderline->getQuantity();
+        $unitprice=$orderline->getUnitprice();
+        $total=$orderline->getTotal();
+        $dto=$orderline->setDtoperc();
+        $linenum=$orderline->getgetLinenum()*10000;
+        $line[]=[
+          "No."=>$orderline->getCode(),
+          "Document No."=>$order->getCode(),
+        /*  "Cross-Reference No."=>,*/
+          "Description"=>substr($orderline->getName(),0,50),,
+          "Description 2"=>substr($orderline->getName(),50,50),
+          "Quantity"=>$quantity,
+          "Outstanding Quantity"=>$quantity,
+          "Line Discount %"=>$dto,
+          "Line Discount Amount"=>$orderline->setDtounit(),
+          "Amount"=>round($total/1.21,0),
+          "Amount including VAT"=>$total,
+          "type"=>2,
+          "Line No."=>$linenum,
+          /*"EC %" vat,*/
+          "VAT %"=>$orderline->getTaxperc(),
+          "Direct Unit Cost"=>$unitprice,
+          "Unit price (LCY)"=>$unitprice,
+          "Unit Cost (LCY)"=>round(($total/1.21)/$quantity,0),
+          "Unit Cost"=>round(($total/1.21)/$quantity,0),
+          "Line Discount Amount"=>($unitprice*$quantity)*($dto/100)
+        ];
 
-        ];*/
+        $orderLinesArray=$line;
+
       }
 
-    }
+      $orderJson["lines"]=$orderLinesArray;
 
+      dump($orderJson);
+
+/*
+      $result=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-createPurchasesOrders.php?json='.urlencode(json_encode($orderJson)));
+*/
+    }
 
     //------   Critical Section END   ------
     //------   Remove Lock Mutex    ------
