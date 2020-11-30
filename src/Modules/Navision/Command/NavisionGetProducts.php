@@ -1407,7 +1407,7 @@ public function createProducts(InputInterface $input, OutputInterface $output){
   ($product_id["id"]=="194254")
     {
   */
-       $product_obj=$repository->findOneBy(["id"=>194343]);
+       $product_obj=$repository->findOneBy(["id"=>$product_id["id"]]);
 
         $repositorysuppliers=$this->doctrine->getRepository(ERPSuppliers::class);
         if($product_obj->getSupplier()!=null) $supplier=$repositorysuppliers->findOneBy(["id"=>$product_obj->getSupplier()->getId()]);
@@ -1421,7 +1421,7 @@ public function createProducts(InputInterface $input, OutputInterface $output){
         $item["onsale"]=$product_obj->getOnsale();
         $item["active"]=$product_obj->getActive();
         $item["deleted"]=$product_obj->getDeleted();
-        $item["manufacturer"]=$product_obj->getManufacturer()?$product_obj->getManufacturer()->getName():'';
+        $item["manufacturer"]=$product_obj->getManufacturer()?$product_obj->getManufacturer()->getCode():'';
         $item["pvp"]=$product_obj->getPVP();
         $item["shoppingPrice"]=$product_obj->getShoppingPrice();
         $item["vendor"]=$supplier?$supplier->getCode():'';
