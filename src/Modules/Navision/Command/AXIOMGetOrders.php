@@ -171,62 +171,63 @@ class AXIOMGetOrders extends ContainerAwareCommand
 
 
   public function createSales(InputInterface $input, OutputInterface $output){
-    //------   Create Lock Mutex    ------
-    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-        $fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetProducts-createOrders.lock', 'c');
-    } else {
-        $fp = fopen('/tmp/axiom-navisionGetProducts-createOrders.lock', 'c');
+        //------   Create Lock Mutex    ------
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            $fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetProducts-createOrders.lock', 'c');
+        } else {
+            $fp = fopen('/tmp/axiom-navisionGetProducts-createOrders.lock', 'c');
+        }
+
+        if (!flock($fp, LOCK_EX | LOCK_NB)) {
+          $output->writeln('* Fallo al iniciar la creación de pedidos en Navision: El proceso ya esta en ejecución.');
+          exit;
+        }
+
+        //------   Critical Section START   ------
+        $repositorySalesOrders=$this->doctrine->getRepository(ERPSalesOrders::class);
+        $repositorySalesOrdersLines=$this->doctrine->getRepository(ERPSalesOrdersLines::class);
+
+        //$orders=$repositorySalesOrders->findAll();
+        $orders=$repositorySalesOrders->findBy(["code"=>"20PV41334"]);
+
+
+        foreach($orders as $order){
+          if ($order->getAuthor()->getName()=="Administrador") $author=null;
+          else $author=$order->getAuthor()->getEmail();
+          $orderJson[]=["No."=>$order->getCode(),
+          "Bill-to Customer No."=>$order->getCustomercode(),
+          "Bill-to Name"=>substr($order->getCustomername(),0,50),
+          "Bill-to Name 2"=>substr($order->getCustomername(),50,50),
+          "Bill-to Address"=>substr($order->getCustomeraddress(),0,50),
+          "Bill-to Address 2"=>substr($order->getCustomeraddress(),50,50),
+          "Bill-to City"=>$order->getCustomercity(),
+          "Ship-to Name"=>substr($order->getShiptoname(),0,50),
+          "Ship-to Name 2"=>substr($order->getShiptoname(),50,50),
+          "Ship-to Address"=>substr($order->getShiptoaddress(),0,50),
+          "Ship-to Address 2"=>substr($order->getShiptoaddress(),50,50),
+          "Shipment Date"=>$order->getShipmentdate(),
+          "VAT Registration No."=>$order->getVat(),
+          "Ship-to City"=>$order->getShiptocity(),
+          "Bill-to Post Code">$order->getCustomerpostcode(),,
+          "Bill-to County"=>$order->getCustomerstate(),
+          "Ship-to Post Code"=>$order->getShiptopostcode(),
+          "Ship-to County"=>$order->getShiptostate(),
+          "Document Date"=>$order->getDate(),
+          "Payment Method Code"=>$order->getPaymentmethod()->getCode(),
+          "Status"=>$order->getStatus(),
+          "No oferta relacionada"=>$order->getSalesbudget()->getCode(),
+          "Fecha Limite Validez Oferta"=>$order->getDateofferend(),
+          "Pedido WEB"=>$order->getWebsale()
+
+
+        ];
+
+      //------   Critical Section END   ------
+      //------   Remove Lock Mutex    ------
+      fclose($fp);
+
     }
 
-    if (!flock($fp, LOCK_EX | LOCK_NB)) {
-      $output->writeln('* Fallo al iniciar la creación de pedidos en Navision: El proceso ya esta en ejecución.');
-      exit;
-    }
-
-    //------   Critical Section START   ------
-    $repositorySalesOrders=$this->doctrine->getRepository(ERPSalesOrders::class);
-    $repositorySalesOrdersLines=$this->doctrine->getRepository(ERPSalesOrdersLines::class);
-
-    //$orders=$repositorySalesOrders->findAll();
-    $orders=$repositorySalesOrders->findBy(["code"=>"20PV41334"]);
-
-
-    foreach($orders as $order){
-      if ($order->getAuthor()->getName()=="Administrador") $author=null;
-      else $author=$order->getAuthor()->getEmail();
-      $orderJson[]=["No."=>$order->getCode(),
-      "Bill-to Customer No."=>$order->getCustomercode(),
-      "Bill-to Name"=>substr($order->getCustomername(),0,50),
-      "Bill-to Name 2"=>substr($order->getCustomername(),50,50),
-      "Bill-to Address"=>substr($order->getCustomeraddress(),0,50),
-      "Bill-to Address 2"=>substr($order->getCustomeraddress(),50,50),
-      "Bill-to City"=>$order->getCustomercity(),
-      "Ship-to Name"=>substr($order->getShiptoname(),0,50),
-      "Ship-to Name 2"=>substr($order->getShiptoname(),50,50),
-      "Ship-to Address"=>substr($order->getShiptoaddress(),0,50),
-      "Ship-to Address 2"=>substr($order->getShiptoaddress(),50,50),
-      "Shipment Date"=>$order->getShipmentdate(),
-      "VAT Registration No."=>$order->getVat(),
-      "Ship-to City"=>$order->getShiptocity(),
-      "Bill-to Post Code">$order->getCustomerpostcode(),,
-      "Bill-to County"=>$order->getCustomerstate(),
-      "Ship-to Post Code"=>$order->getShiptopostcode(),
-      "Ship-to County"=>$order->getShiptostate(),
-      "Document Date"=>$order->getDate(),
-      "Payment Method Code"=>$order->getPaymentmethod()->getCode(),
-      "Status"=>$order->getStatus(),
-      "No oferta relacionada"=>$order->getSalesbudget()->getCode(),
-      "Fecha Limite Validez Oferta"=>$order->getDateofferend(),
-      "Pedido WEB"=>$order->getWebsale()
-
-
-    ];
-
-  //------   Critical Section END   ------
-  //------   Remove Lock Mutex    ------
-  fclose($fp);
-
-}
-
+  }
 }
 ?>
