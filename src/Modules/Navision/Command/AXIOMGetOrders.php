@@ -11,6 +11,8 @@ use App\Modules\ERP\Entity\ERPProducts;
 use App\Modules\ERP\Entity\ERPProductsVariants;
 use App\Modules\ERP\Entity\ERPPurchasesOrders;
 use App\Modules\ERP\Entity\ERPPurchasesOrdersLines;
+use App\Modules\ERP\Entity\ERPSalesOrders;
+use App\Modules\ERP\Entity\ERPSalesOrdersLines;
 use App\Modules\Globale\Entity\GlobaleCompanies;
 use App\Modules\Globale\Entity\GlobaleStates;
 use App\Modules\Globale\Entity\GlobaleCountries;
@@ -88,7 +90,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
 
       if (strpos($order->getCode(),'20PC')) $devolucion=0;
       else $devolucion=1;
-      $orderJson=["No."=>$order->getCode(),
+      $orderJson[]=["No."=>$order->getCode(),
       "Buy-from Vendor No."=>$order->getSupplier()->getCode(),
       "Assigned User ID"=>$author,
       "Purchaser Code"=>$order->getAgent()->getEmail(),
@@ -107,15 +109,13 @@ class AXIOMGetOrders extends ContainerAwareCommand
       "Document Date" => $order->getDate(),
       "Fecha 1.lanzamiento" => $order->getDateofferend(),
       "Es Devolucion"=>$devolucion,
-      "Order Date"=>$order->getDateadd()
-
-      ];
+      "Order Date"=>$order->getDateadd()    ];
 
     //  $output->writeln(json_encode($orderJson));
 
       $orderLinesArray=[];
 
-      $orderlines=$repositoryPurchasesOrdersLines->findBy(["purchasesorder"=>$order]);
+      $orderlines=$repositoryPurchasesOrdersLines->findBy(["purchaseorder"=>$order]);
 
       foreach($orderlines as $orderline){
       //  $productrepository=$doctrine->getRepository(ERPProducts::class);
@@ -124,20 +124,21 @@ class AXIOMGetOrders extends ContainerAwareCommand
         $quantity=$orderline->getQuantity();
         $unitprice=$orderline->getUnitprice();
         $total=$orderline->getTotal();
-        $dto=$orderline->getDtoperc();
-        $linenum=$orderline->getLinenum()*10000;
+        $dto=$orderline->setDtoperc();
+        $linenum=$orderline->getgetLinenum()*10000;
         $line[]=[
           "No."=>$orderline->getCode(),
           "Document No."=>$order->getCode(),
         /*  "Cross-Reference No."=>,*/
           "Description"=>substr($orderline->getName(),0,50),
-          "Description 2"=>substr($orderline->getName(),50,50)?substr($orderline->getName(),50,50):"",
+          "Description 2"=>substr($orderline->getName(),50,50),
           "Quantity"=>$quantity,
           "Outstanding Quantity"=>$quantity,
           "Line Discount %"=>$dto,
-          "Line Discount Amount"=>$orderline->getDtounit(),
+          "Line Discount Amount"=>$orderline->setDtounit(),
           "Amount"=>round($total/1.21,0),
           "Amount including VAT"=>$total,
+          "type"=>2,
           "Line No."=>$linenum,
           /*"EC %" vat,*/
           "VAT %"=>$orderline->getTaxperc(),
@@ -153,10 +154,12 @@ class AXIOMGetOrders extends ContainerAwareCommand
       }
 
       $orderJson["lines"]=$orderLinesArray;
-    //  echo json_encode($orderJson);
 
+      dump($orderJson);
+
+/*
       $result=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-createPurchasesOrders.php?json='.urlencode(json_encode($orderJson)));
-
+*/
     }
 
     //------   Critical Section END   ------
@@ -166,6 +169,64 @@ class AXIOMGetOrders extends ContainerAwareCommand
   }
 
 
+
+  public function createSales(InputInterface $input, OutputInterface $output){
+    //------   Create Lock Mutex    ------
+    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+        $fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetProducts-createOrders.lock', 'c');
+    } else {
+        $fp = fopen('/tmp/axiom-navisionGetProducts-createOrders.lock', 'c');
+    }
+
+    if (!flock($fp, LOCK_EX | LOCK_NB)) {
+      $output->writeln('* Fallo al iniciar la creación de pedidos en Navision: El proceso ya esta en ejecución.');
+      exit;
+    }
+
+    //------   Critical Section START   ------
+    $repositorySalesOrders=$this->doctrine->getRepository(ERPSalesOrders::class);
+    $repositorySalesOrdersLines=$this->doctrine->getRepository(ERPSalesOrdersLines::class);
+
+    //$orders=$repositorySalesOrders->findAll();
+    $orders=$repositorySalesOrders->findBy(["code"=>"20PV41334"]);
+
+
+    foreach($orders as $order){
+      if ($order->getAuthor()->getName()=="Administrador") $author=null;
+      else $author=$order->getAuthor()->getEmail();
+      $orderJson[]=["No."=>$order->getCode(),
+      "Bill-to Customer No."=>$order->getCustomercode(),
+      "Bill-to Name"=>substr($order->getCustomername(),0,50),
+      "Bill-to Name 2"=>substr($order->getCustomername(),50,50),
+      "Bill-to Address"=>substr($order->getCustomeraddress(),0,50),
+      "Bill-to Address 2"=>substr($order->getCustomeraddress(),50,50),
+      "Bill-to City"=>$order->getCustomercity(),
+      "Ship-to Name"=>substr($order->getShiptoname(),0,50),
+      "Ship-to Name 2"=>substr($order->getShiptoname(),50,50),
+      "Ship-to Address"=>substr($order->getShiptoaddress(),0,50),
+      "Ship-to Address 2"=>substr($order->getShiptoaddress(),50,50),
+      "Shipment Date"=>$order->getShipmentdate(),
+      "VAT Registration No."=>$order->getVat(),
+      "Ship-to City"=>$order->getShiptocity(),
+      "Bill-to Post Code">$order->getCustomerpostcode(),,
+      "Bill-to County"=>$order->getCustomerstate(),
+      "Ship-to Post Code"=>$order->getShiptopostcode(),
+      "Ship-to County"=>$order->getShiptostate(),
+      "Document Date"=>$order->getDate(),
+      "Payment Method Code"=>$order->getPaymentmethod()->getCode(),
+      "Status"=>$order->getStatus(),
+      "No oferta relacionada"=>$order->getSalesbudget()->getCode(),
+      "Fecha Limite Validez Oferta"=>$order->getDateofferend(),
+      "Pedido WEB"=>$order->getWebsale()
+
+
+    ];
+
+  //------   Critical Section END   ------
+  //------   Remove Lock Mutex    ------
+  fclose($fp);
+
+}
 
 }
 ?>
