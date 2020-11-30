@@ -122,7 +122,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
         $quantity=$orderline->getQuantity();
         $unitprice=$orderline->getUnitprice();
         $total=$orderline->getTotal();
-        $dto=$orderline->setDtoperc();
+        $dto=$orderline->getDtoperc();
         $linenum=$orderline->getgetLinenum()*10000;
         $line[]=[
           "No."=>$orderline->getCode(),
@@ -133,7 +133,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
           "Quantity"=>$quantity,
           "Outstanding Quantity"=>$quantity,
           "Line Discount %"=>$dto,
-          "Line Discount Amount"=>$orderline->setDtounit(),
+          "Line Discount Amount"=>$orderline->getDtounit(),
           "Amount"=>round($total/1.21,0),
           "Amount including VAT"=>$total,
           "type"=>2,
