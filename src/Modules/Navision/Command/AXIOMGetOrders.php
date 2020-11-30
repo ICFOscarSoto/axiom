@@ -63,13 +63,13 @@ class AXIOMGetOrders extends ContainerAwareCommand
   public function createOrders(InputInterface $input, OutputInterface $output){
     //------   Create Lock Mutex    ------
     if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-        $fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetProducts-createOwnBarcodes.lock', 'c');
+        $fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetProducts-createOrders.lock', 'c');
     } else {
-        $fp = fopen('/tmp/axiom-navisionGetProducts-createOwnBarcodes.lock', 'c');
+        $fp = fopen('/tmp/axiom-navisionGetProducts-createOrders.lock', 'c');
     }
 
     if (!flock($fp, LOCK_EX | LOCK_NB)) {
-      $output->writeln('* Fallo al iniciar la creación de codigos barras propios en Navision: El proceso ya esta en ejecución.');
+      $output->writeln('* Fallo al iniciar la creación de pedidos en Navision: El proceso ya esta en ejecución.');
       exit;
     }
 
