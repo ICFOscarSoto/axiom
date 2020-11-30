@@ -153,11 +153,10 @@ class AXIOMGetOrders extends ContainerAwareCommand
       }
 
       $orderJson["lines"]=$orderLinesArray;
-      echo json_encode($orderJson);
+    //  echo json_encode($orderJson);
 
-/*
       $result=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-createPurchasesOrders.php?json='.urlencode(json_encode($orderJson)));
-*/
+
     }
 
     //------   Critical Section END   ------
