@@ -123,7 +123,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
         $unitprice=$orderline->getUnitprice();
         $total=$orderline->getTotal();
         $dto=$orderline->getDtoperc();
-        $linenum=$orderline->getgetLinenum()*10000;
+        $linenum=$orderline->getLinenum()*10000;
         $line[]=[
           "No."=>$orderline->getCode(),
           "Document No."=>$order->getCode(),
