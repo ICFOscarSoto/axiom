@@ -116,7 +116,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
 
       $orderlines=$repositoryPurchasesOrdersLines->findBy(["purchaseorder_id"=>$order->getId()]);
       foreach($orderlines as $orderline){
-        $line[]=[
+      /*  $line[]=[
           "No.",
           "Cross-Reference No.",
           "Description",
@@ -133,7 +133,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
           "taxpec" vat
 
 
-        ];
+        ];*/
       }
 
     }
