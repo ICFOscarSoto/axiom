@@ -87,7 +87,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
       if ($order->getAuthor()->getName()=="Administrador") $author=null;
       else $author=$order->getAuthor()->getEmail();
 
-
+      dump(strpos($order->getCode(),'20PC'));
       if (strpos($order->getCode(),'20PC')!=false) $devolucion=0;
       else $devolucion=1;
       $orderJson=["No."=>$order->getCode(),
