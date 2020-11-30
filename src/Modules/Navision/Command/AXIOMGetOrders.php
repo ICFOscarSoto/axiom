@@ -129,14 +129,13 @@ class AXIOMGetOrders extends ContainerAwareCommand
           "Document No."=>$order->getCode(),
         /*  "Cross-Reference No."=>,*/
           "Description"=>substr($orderline->getName(),0,50),
-          "Description 2"=>substr($orderline->getName(),50,50),
+          "Description 2"=>substr($orderline->getName(),50,50)?substr($orderline->getName(),50,50):"",
           "Quantity"=>$quantity,
           "Outstanding Quantity"=>$quantity,
           "Line Discount %"=>$dto,
           "Line Discount Amount"=>$orderline->getDtounit(),
           "Amount"=>round($total/1.21,0),
           "Amount including VAT"=>$total,
-          "type"=>2,
           "Line No."=>$linenum,
           /*"EC %" vat,*/
           "VAT %"=>$orderline->getTaxperc(),
@@ -152,8 +151,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
       }
 
       $orderJson["lines"]=$orderLinesArray;
-
-      dump($orderJson);
+      json_encode($orderJson);
 
 /*
       $result=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-createPurchasesOrders.php?json='.urlencode(json_encode($orderJson)));
