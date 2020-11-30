@@ -135,7 +135,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
           "Outstanding Quantity"=>$quantity,
           "Line Discount %"=>$dto,
           "Line Discount Amount"=>$orderline->getDtounit(),
-          "Amount"=>round($total/1.21,0),
+          "Amount"=>round($total/1.21,2),
           "Amount including VAT"=>$total,
           "type"=>2,
           "Line No."=>$linenum,
@@ -143,8 +143,8 @@ class AXIOMGetOrders extends ContainerAwareCommand
           "VAT %"=>$orderline->getTaxperc(),
           "Direct Unit Cost"=>$unitprice,
           "Unit price (LCY)"=>$unitprice,
-          "Unit Cost (LCY)"=>round(($total/1.21)/$quantity,0),
-          "Unit Cost"=>round(($total/1.21)/$quantity,0),
+          "Unit Cost (LCY)"=>round(($total/1.21)/$quantity,2),
+          "Unit Cost"=>round(($total/1.21)/$quantity,2),
           "Line Discount Amount"=>($unitprice*$quantity)*($dto/100)
         ];
 
