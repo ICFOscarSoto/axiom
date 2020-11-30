@@ -106,7 +106,8 @@ class AXIOMGetOrders extends ContainerAwareCommand
       "VAT Registration No."=>$order->getVat(),
       "Document Date" => $order->getDate(),
       "Fecha 1.lanzamiento" => $order->getDateofferend(),
-      "Es Devolucion"=>$devolucion      ];
+      "Es Devolucion"=>$devolucion,
+      "Order Date"=>$order->getDateadd()    ];
 
 
 
