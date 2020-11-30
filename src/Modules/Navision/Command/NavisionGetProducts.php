@@ -1407,7 +1407,7 @@ public function createProducts(InputInterface $input, OutputInterface $output){
   ($product_id["id"]=="194254")
     {
   */
-       $product_obj=$repository->findOneBy(["id"=>$product_id["id"]]);
+       $product_obj=$repository->findOneBy(["id"=>194343]);
 
         $repositorysuppliers=$this->doctrine->getRepository(ERPSuppliers::class);
         if($product_obj->getSupplier()!=null) $supplier=$repositorysuppliers->findOneBy(["id"=>$product_obj->getSupplier()->getId()]);
