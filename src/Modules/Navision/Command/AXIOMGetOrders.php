@@ -88,7 +88,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
 
       if (strpos($order->getCode(),'20PC')) $devolucion=0;
       else $devolucion=1;
-      $orderJson[]=["No."=>$order->getCode(),
+      $orderJson=["No."=>$order->getCode(),
       "Buy-from Vendor No."=>$order->getSupplier()->getCode(),
       "Assigned User ID"=>$author,
       "Purchaser Code"=>$order->getAgent()->getEmail(),
@@ -107,7 +107,9 @@ class AXIOMGetOrders extends ContainerAwareCommand
       "Document Date" => $order->getDate(),
       "Fecha 1.lanzamiento" => $order->getDateofferend(),
       "Es Devolucion"=>$devolucion,
-      "Order Date"=>$order->getDateadd()    ];
+      "Order Date"=>$order->getDateadd()
+
+      ];
 
     //  $output->writeln(json_encode($orderJson));
 
