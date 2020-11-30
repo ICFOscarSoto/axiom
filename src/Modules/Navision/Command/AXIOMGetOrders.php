@@ -113,7 +113,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
 
       $orderLinesArray=[];
 
-      $orderlines=$repositoryPurchasesOrdersLines->findBy(["purchaseorder"=>$order]);
+      $orderlines=$repositoryPurchasesOrdersLines->findBy(["purchasesorder"=>$order]);
 
       foreach($orderlines as $orderline){
       //  $productrepository=$doctrine->getRepository(ERPProducts::class);
