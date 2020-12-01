@@ -225,7 +225,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
           "Ship-to Post Code"=>$order->getShiptopostcode(),
           "Ship-to County"=>$order->getShiptostate(),
           "Document Date"=>$order->getDate(),
-          "Payment Method Code"=>$order->getPaymentmethod()?$order->getPaymentmethod()->getCode():'',
+          "Payment Method Code"=>$order->getPaymentmethod()?$order->getPaymentmethod()->getPaymentcode():'',
           "Status"=>$order->getStatus(),
           "No oferta relacionada"=>$order->getSalesbudget()->getCode(),
           "Fecha Limite Validez Oferta"=>$order->getDateofferend(),
