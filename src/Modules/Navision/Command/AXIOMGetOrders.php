@@ -86,7 +86,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
 
     foreach($orders_id as $order_id){
       $order=$repositoryPurchasesOrders->findOneBy(["id"=>$order_id]);
-      if($order->getCode()!="20PC08951") continue;
+      if($order->getCode()!="20PC09057" AND $order->getCode()!="20PC09111") continue;
       $output->writeln("Insertando el pedido: ".$order->getCode());
 
       if ($order->getAuthor()->getName()=="Administrador") $author=null;
