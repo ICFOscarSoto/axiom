@@ -225,7 +225,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
           "Ship-to Post Code"=>$order->getShiptopostcode(),
           "Ship-to County"=>$order->getShiptostate(),
           "Document Date"=>$order->getDate(),
-          "Payment Method Code"=>$order->getPaymentmethod()->getCode(),
+          "Payment Method Code"=>$order->getPaymentmethod()?$order->getPaymentmethod()->getCode():'',
           "Status"=>$order->getStatus(),
           "No oferta relacionada"=>$order->getSalesbudget()->getCode(),
           "Fecha Limite Validez Oferta"=>$order->getDateofferend(),
@@ -237,6 +237,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
       //------
       }
       fclose($fp);
+      $output->writeln(json_encode($orderJson));
       $result=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-createSalesOrders.php?json='.urlencode(json_encode($orderJson)));
 
     }
