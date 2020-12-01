@@ -185,9 +185,9 @@ class AXIOMGetOrders extends ContainerAwareCommand
   public function createSales(InputInterface $input, OutputInterface $output){
         //------   Create Lock Mutex    ------
         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-            $fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetProducts-createOrders.lock', 'c');
+            $fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetProducts-createSales.lock', 'c');
         } else {
-            $fp = fopen('/tmp/axiom-navisionGetProducts-createOrders.lock', 'c');
+            $fp = fopen('/tmp/axiom-navisionGetProducts-createSales.lock', 'c');
         }
 
         if (!flock($fp, LOCK_EX | LOCK_NB)) {
