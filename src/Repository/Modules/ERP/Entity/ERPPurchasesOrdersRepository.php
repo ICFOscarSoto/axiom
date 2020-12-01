@@ -47,4 +47,15 @@ class ERPPurchasesOrdersRepository extends ServiceEntityRepository
         ;
     }
     */
+
+    public function getPurchasesOrdersByDate()
+    {
+      //$date_aux = new \DateTime('2020-11-13');
+    //  $date=$date_aux->format("Y-m-d");
+      $query="SELECT id FROM erppurchases_orders WHERE dateadd>='2020-11-14' AND dateadd<'2020-11-27'";
+    //  $params=['DATE' => $date];
+      $result=$this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
+      return $result;
+
+    }
 }

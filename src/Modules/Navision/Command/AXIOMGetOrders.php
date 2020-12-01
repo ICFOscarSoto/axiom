@@ -80,15 +80,19 @@ class AXIOMGetOrders extends ContainerAwareCommand
     $repositoryPurchasesOrdersLines=$this->doctrine->getRepository(ERPPurchasesOrdersLines::class);
 
     //$orders=$repositoryPurchasesOrders->findAll();
-    $orders=$repositoryPurchasesOrders->findBy(["code"=>"20PC08690"]);
+    $orders_id=$repositoryPurchasesOrders->getPurchasesOrdersByDate();
 
+    foreach($orders_id as $order_id){
+      $order=$repositoryPurchasesOrders->findOneBy(["id"=>$order_id]);
+      $output->writeln("Insertando el pedido: ".$order->getCode());
 
-    foreach($orders as $order){
       if ($order->getAuthor()->getName()=="Administrador") $author=null;
       else $author=$order->getAuthor()->getEmail();
 
       if (strncmp($order->getCode(), "20PC", 4) === 0) $devolucion=0;
       else $devolucion=1;
+
+      if($devolucion==1) continue;
       $orderJson=["No."=>$order->getCode(),
       "Buy-from Vendor No."=>$order->getSupplier()->getCode(),
       "Assigned User ID"=>$author,
@@ -119,6 +123,8 @@ class AXIOMGetOrders extends ContainerAwareCommand
       foreach($orderlines as $orderline){
       //  $productrepository=$doctrine->getRepository(ERPProducts::class);
       //$product=$productrepository->getOneBy(["id"=>$orderline->getProduct()->getId()]);
+
+       $output->writeln("   > ".$orderline->getCode());
 
         $quantity=$orderline->getQuantity();
         $unitprice=$orderline->getUnitprice();
