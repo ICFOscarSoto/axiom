@@ -100,7 +100,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
 
     //  $num=(int)substr($order->getCode(),5);
     //  if($order->getCode()!="20PC08951") continue;
-    
+
       $orderJson=["No."=>$order->getCode(),
       "Buy-from Vendor No."=>$order->getSuppliercode(),
       "Assigned User ID"=>$author,
@@ -240,13 +240,49 @@ class AXIOMGetOrders extends ContainerAwareCommand
           "Pedido WEB"=>$web
         ];
 
-      //------   Critical Section END   ------
-      //------   Remove Lock Mutex    ------
-      //------
+
+
+        $orderlines=$repositorySalesOrdersLines->findBy(["purchasesorder"=>$order]);
+
+        foreach($orderlines as $orderline){
+        //  $productrepository=$doctrine->getRepository(ERPProducts::class);
+        //$product=$productrepository->getOneBy(["id"=>$orderline->getProduct()->getId()]);
+
+         $output->writeln("   > ".$orderline->getCode());
+
+          $quantity=$orderline->getQuantity();
+          if($quantity==0) $quantity=1;
+          $unitprice=$orderline->getUnitprice();
+          $total=$orderline->getTotal();
+          $dto=$orderline->getDtoperc();
+          $linenum=$orderline->getLinenum()*10000;
+          $line[]=[
+            "No."=>$orderline->getCode(),
+            "Document No."=>$order->getCode(),
+            "Line No."=>$linenum,
+          /*  "Cross-Reference No."=>,*/
+            "Description"=>substr($orderline->getName(),0,50),
+            "Description 2"=>substr($orderline->getName(),50,50),
+            "Quantity"=>$quantity,
+            "Discounttotal"=>$orderline->getDtounit(),
+            "Discountperc"=>$orderline->getDtoperc()
+          ];
+
+          $orderLinesArray=$line;
+
+        }
+
+        $orderJson["lines"]=$orderLinesArray;
+
+        fclose($fp);
+        $output->writeln(json_encode($orderJson));
+        $result=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-createSalesOrders.php?json='.urlencode(json_encode($orderJson)));
+
       }
-      fclose($fp);
-      $output->writeln(json_encode($orderJson));
-      $result=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-createSalesOrders.php?json='.urlencode(json_encode($orderJson)));
+
+    //------   Critical Section END   ------
+    //------   Remove Lock Mutex    ------
+    //------
 
     }
 
