@@ -107,7 +107,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
       "No oferta relacionada"=>$order->getPurchasesbudget()?$order->getPurchasesbudget()->getCode():'',
       "Ship-to Post Code"=>$order->getSupplierpostcode(),
       "Status"=>$order->getStatus(),
-      "Payment Method Code"=>$order->getSupplier()->getPaymentmethod()->getPaymentcode(),
+      "Payment Method Code"=>$order->getSupplier()?$order->getSupplier()->getPaymentmethod()->getPaymentcode():'',
       "VAT Registration No."=>$order->getVat(),
       "Document Date" => $order->getDate(),
       "Fecha 1.lanzamiento" => $order->getDateofferend(),
