@@ -54,6 +54,8 @@ class AXIOMGetOrders extends ContainerAwareCommand
     switch($entity){
       case 'purchasesOrders': $this->createOrders($input, $output);
       break;
+      case 'salesOrders': $this->createSales($input, $output);
+      break;
       default:
         $output->writeln('Opcion no válida');
       break;
@@ -198,8 +200,8 @@ class AXIOMGetOrders extends ContainerAwareCommand
         $repositorySalesOrdersLines=$this->doctrine->getRepository(ERPSalesOrdersLines::class);
 
         //$orders=$repositorySalesOrders->findAll();
-        $orders=$repositorySalesOrders->findBy(["code"=>"20PV41334"]);
-/*
+        $orders=$repositorySalesOrders->findBy(["code"=>"20PV41341"]);
+
 
         foreach($orders as $order){
           if ($order->getAuthor()->getName()=="Administrador") $author=null;
@@ -218,7 +220,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
           "Shipment Date"=>$order->getShipmentdate(),
           "VAT Registration No."=>$order->getVat(),
           "Ship-to City"=>$order->getShiptocity(),
-          "Bill-to Post Code">$order->getCustomerpostcode(),,
+          "Bill-to Post Code"=>$order->getCustomerpostcode(),
           "Bill-to County"=>$order->getCustomerstate(),
           "Ship-to Post Code"=>$order->getShiptopostcode(),
           "Ship-to County"=>$order->getShiptostate(),
@@ -228,16 +230,16 @@ class AXIOMGetOrders extends ContainerAwareCommand
           "No oferta relacionada"=>$order->getSalesbudget()->getCode(),
           "Fecha Limite Validez Oferta"=>$order->getDateofferend(),
           "Pedido WEB"=>$order->getWebsale()
-
-
         ];
 
       //------   Critical Section END   ------
       //------   Remove Lock Mutex    ------
+      //------
+      }
       fclose($fp);
+      $result=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-createSalesOrders.php?json='.urlencode(json_encode($orderJson)));
 
     }
-*/
+
   }
-}
 ?>
