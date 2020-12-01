@@ -94,7 +94,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
 
       if($devolucion==1) continue;
       $orderJson=["No."=>$order->getCode(),
-      "Buy-from Vendor No."=>$order->getSupplier()->getCode(),
+      "Buy-from Vendor No."=>$order->getSuppliercode(),
       "Assigned User ID"=>$author,
       "Purchaser Code"=>$order->getAgent()->getEmail(),
       "Buy-from Vendor Name"=>substr($order->getSuppliername(),0,50),
@@ -127,6 +127,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
        $output->writeln("   > ".$orderline->getCode());
 
         $quantity=$orderline->getQuantity();
+        if($quantity==0) $quantity=1;
         $unitprice=$orderline->getUnitprice();
         $total=$orderline->getTotal();
         $dto=$orderline->getDtoperc();
