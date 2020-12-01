@@ -94,9 +94,9 @@ class AXIOMGetOrders extends ContainerAwareCommand
       if (strncmp($order->getCode(), "20PC", 4) === 0) $devolucion=0;
       else $devolucion=1;
 
-      $num=(int)substr($order->getCode(),8);
+      $num=(int)substr($order->getCode(),5);
 
-      if($devolucion==1) continue;
+      if($devolucion==1 OR $num!="8951" OR $num!="9057" OR $num!="9111") continue;
       $orderJson=["No."=>$order->getCode(),
       "Buy-from Vendor No."=>$order->getSuppliercode(),
       "Assigned User ID"=>$author,
