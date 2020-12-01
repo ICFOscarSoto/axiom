@@ -148,7 +148,10 @@ class AXIOMGetOrders extends ContainerAwareCommand
           "Line Discount Amount"=>($unitprice*$quantity)*($dto/100),
           "Coste unit. directo UM precio"=>$unitprice,
           "Unit Cost UM Precio"=>($unitprice)*($dto/100),
-          "VAT Base Amount"=>round($total/1.21,2)
+          "VAT Base Amount"=>round($total/1.21,2),
+          "Line Amount"=>round($total/1.21,2),
+          "Importe pendiente base"=>round($total/1.21,2),
+          "Importe pendiente base (DL)"=>round($total/1.21,2)
         ];
 
         $orderLinesArray=$line;
@@ -157,8 +160,8 @@ class AXIOMGetOrders extends ContainerAwareCommand
 
       $orderJson["lines"]=$orderLinesArray;
 
-    // dump(json_encode($orderJson));
-      $result=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-createPurchasesOrders.php?json='.urlencode(json_encode($orderJson)));
+        dump(json_encode($orderJson));
+    //  $result=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-createPurchasesOrders.php?json='.urlencode(json_encode($orderJson)));
 
     }
 
