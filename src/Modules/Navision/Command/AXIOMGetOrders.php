@@ -80,7 +80,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
     $repositoryPurchasesOrdersLines=$this->doctrine->getRepository(ERPPurchasesOrdersLines::class);
 
     //$orders=$repositoryPurchasesOrders->findAll();
-    $orders=$repositoryPurchasesOrders->findBy(["code"=>"20PC09132"]);
+    $orders=$repositoryPurchasesOrders->findBy(["code"=>"20PC09131"]);
 
 
     foreach($orders as $order){
@@ -160,8 +160,8 @@ class AXIOMGetOrders extends ContainerAwareCommand
 
       $orderJson["lines"]=$orderLinesArray;
 
-        dump(json_encode($orderJson));
-    //  $result=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-createPurchasesOrders.php?json='.urlencode(json_encode($orderJson)));
+        //dump(json_encode($orderJson));
+      $result=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-createPurchasesOrders.php?json='.urlencode(json_encode($orderJson)));
 
     }
 
