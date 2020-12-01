@@ -147,7 +147,8 @@ class AXIOMGetOrders extends ContainerAwareCommand
           "Unit Cost"=>round(($total/1.21)/$quantity,2),
           "Line Discount Amount"=>($unitprice*$quantity)*($dto/100),
           "Coste unit. directo UM precio"=>$unitprice,
-          "Unit Cost UM Precio"=>($unitprice)*($dto/100)
+          "Unit Cost UM Precio"=>($unitprice)*($dto/100),
+          "VAT Base Amount"=>round($total/1.21,2)
         ];
 
         $orderLinesArray=$line;
