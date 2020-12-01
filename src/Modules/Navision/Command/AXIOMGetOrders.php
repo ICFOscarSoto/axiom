@@ -90,7 +90,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
       if (strncmp($order->getCode(), "20PC", 4) === 0) $devolucion=0;
       else $devolucion=1;
 
-      if($order->getCode()!="20DEVC00646") continue;
+      if($devolucion==0 OR $order->getCode()=="20DEVC00644") continue;
 
       $output->writeln("Insertando el pedido: ".$order->getCode());
 
