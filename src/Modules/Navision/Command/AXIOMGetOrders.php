@@ -208,6 +208,8 @@ class AXIOMGetOrders extends ContainerAwareCommand
         foreach($orders as $order){
           if ($order->getAuthor()->getName()=="Administrador") $author=null;
           else $author=$order->getAuthor()->getEmail();
+          if ($order->getWebsale()) $web=1;
+          else $web=0;
           $orderJson[]=["No."=>$order->getCode(),
           "Bill-to Customer No."=>$order->getCustomercode(),
           "Bill-to Name"=>substr($order->getCustomername(),0,50),
@@ -231,7 +233,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
           "Status"=>$order->getStatus(),
           "No oferta relacionada"=>$order->getSalesbudget()?$order->getSalesbudget()->getCode():'',
           "Fecha Limite Validez Oferta"=>$order->getDateofferend(),
-          "Pedido WEB"=>$order->getWebsale()
+          "Pedido WEB"=>$web
         ];
 
       //------   Critical Section END   ------
