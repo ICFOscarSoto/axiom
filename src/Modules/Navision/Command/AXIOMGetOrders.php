@@ -80,7 +80,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
     $repositoryPurchasesOrdersLines=$this->doctrine->getRepository(ERPPurchasesOrdersLines::class);
 
     //$orders=$repositoryPurchasesOrders->findAll();
-    $orders=$repositoryPurchasesOrders->findBy(["code"=>"20PC08693"]);
+    $orders=$repositoryPurchasesOrders->findBy(["code"=>"20PC08690"]);
 
 
     foreach($orders as $order){
