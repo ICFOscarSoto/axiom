@@ -209,13 +209,14 @@ class AXIOMGetOrders extends ContainerAwareCommand
 
 
 
-        $orders_id=$repositorySalesOrders->findNews();
-        //$orders=$repositorySalesOrders->findBy(["code"=>"20DV01521"]);
+        //$orders_id=$repositorySalesOrders->findNews();
+        $orders=$repositorySalesOrders->findBy(["code"=>"20PV40186"]);
 
 
 
-        foreach($orders_id as $order_id){
-          $order=$repositorySalesOrders->findOneBy(["id"=>$order_id]);
+      /*  foreach($orders_id as $order_id){
+          $order=$repositorySalesOrders->findOneBy(["id"=>$order_id]); */
+          foreach($orders as $order){
           if (strncmp($order->getCode(), "20PV", 4) === 0) $devolucion=0;
           else $devolucion=1;
           $output->writeln("Insertando el pedido: ".$order->getCode());
