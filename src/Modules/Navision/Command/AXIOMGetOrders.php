@@ -209,7 +209,9 @@ class AXIOMGetOrders extends ContainerAwareCommand
         $orders=$repositorySalesOrders->findBy(["code"=>"20PV41341"]);
 
 
+
         foreach($orders as $order){
+          $output->writeln("Insertando el pedido: ".$order->getCode());
           if ($order->getAuthor()->getName()=="Administrador") $author=null;
           else $author=$order->getAuthor()->getEmail();
           if ($order->getWebsale()) $web=1;
@@ -238,7 +240,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
           "No oferta relacionada"=>$order->getSalesbudget()?$order->getSalesbudget()->getCode():'',
           "Fecha Limite Validez Oferta"=>$order->getDateofferend(),
           "Pedido WEB"=>$web,
-          "Order Date"=>$order->getDateadd() 
+          "Order Date"=>$order->getDateadd()
         ];
 
 
@@ -283,8 +285,8 @@ class AXIOMGetOrders extends ContainerAwareCommand
         $orderJson["lines"]=$orderLinesArray;
 
         fclose($fp);
-        $output->writeln(json_encode($orderJson));
-        //$result=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-createSalesOrders.php?json='.urlencode(json_encode($orderJson)));
+      //  $output->writeln(json_encode($orderJson));
+        $result=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-createSalesOrders.php?json='.urlencode(json_encode($orderJson)));
 
       }
 
