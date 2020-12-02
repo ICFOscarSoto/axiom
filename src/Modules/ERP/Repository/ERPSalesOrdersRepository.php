@@ -22,4 +22,11 @@ class ERPSalesOrdersRepository extends ServiceEntityRepository
       return $code;
     }
 
+    public function findNews()
+    {
+      $query="SELECT id FROM erpsales_orders WHERE dateadd>='2020-11-14' AND dateadd<'2020-11-27'";
+      $result=$this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
+      return $result;
+
+    }
 }
