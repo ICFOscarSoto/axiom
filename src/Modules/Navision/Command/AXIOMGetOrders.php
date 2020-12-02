@@ -241,7 +241,9 @@ class AXIOMGetOrders extends ContainerAwareCommand
           "Fecha Limite Validez Oferta"=>$order->getDateofferend(),
           "Pedido WEB"=>$web,
           "Order Date"=>$order->getDateadd(),
-          "Assigned User ID"=>$author
+          "Assigned User ID"=>$author,
+          "Amount"=>round($total/1.21,2),
+          "Amount including VAT"=>$total,
         ];
 
 
