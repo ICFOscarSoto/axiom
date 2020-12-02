@@ -56,6 +56,8 @@ class AXIOMGetOrders extends ContainerAwareCommand
       break;
       case 'salesOrders': $this->createSales($input, $output);
       break;
+      case 'checkPurchaseOrders': $this->checkPurchaseOrders($input, $output);
+      break;
       default:
         $output->writeln('Opcion no válida');
       break;
@@ -86,7 +88,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
 
     foreach($orders_id as $order_id){
       $order=$repositoryPurchasesOrders->findOneBy(["id"=>$order_id]);
-    //  if($order->getCode()!="20PC09111") continue;
+    //  if($order->getCode()!="20PC08771") continue;
       if (strncmp($order->getCode(), "20PC", 4) === 0) $devolucion=0;
       else $devolucion=1;
 
@@ -175,8 +177,8 @@ class AXIOMGetOrders extends ContainerAwareCommand
 
       $orderJson["lines"]=$orderLinesArray;
 
-    //  dump(json_encode($orderJson));
-      $result=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-createPurchasesOrders.php?json='.urlencode(json_encode($orderJson)));
+      //   dump(json_encode($orderJson));
+       $result=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-createPurchasesOrders.php?json='.urlencode(json_encode($orderJson)));
 
     }
 
@@ -302,6 +304,41 @@ class AXIOMGetOrders extends ContainerAwareCommand
     //------
 
     fclose($fp);
+    }
+
+    public function checkPurchaseOrders(InputInterface $input, OutputInterface $output)
+    {
+
+      if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+          $fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetProducts-checkPurchaseOrders.lock', 'c');
+      } else {
+          $fp = fopen('/tmp/axiom-navisionGetProducts-checkPurchase.lock', 'c');
+      }
+
+      if (!flock($fp, LOCK_EX | LOCK_NB)) {
+        $output->writeln('* Fallo al iniciar la creación de pedidos en Navision: El proceso ya esta en ejecución.');
+        exit;
+      }
+
+      //------   Critical Section START   ------
+      $repositoryPurchasesOrders=$this->doctrine->getRepository(ERPPurchasesOrders::class);
+      $repositoryPurchasesOrdersLines=$this->doctrine->getRepository(ERPPurchasesOrdersLines::class);
+
+      $orders_id=$repositoryPurchasesOrders->getPurchasesOrdersByDate();
+      $log=fopen("purchaseOrders.txt", "w");
+      foreach($orders_id as $order_id){
+        $order=$repositoryPurchasesOrders->findOneBy(["id"=>$order_id]);
+        $result=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-checkPurchaseOrder.php?code='.$order->getCode());
+
+        if($result==false){
+           $txt="El pedido ".$order->getCode()." no está en Navision \n";
+            fwrite($log, $txt);
+          }
+
+      }
+
+      fclose($log);
+
     }
 
   }
