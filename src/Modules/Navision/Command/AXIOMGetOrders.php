@@ -263,7 +263,15 @@ class AXIOMGetOrders extends ContainerAwareCommand
             "Description 2"=>substr($orderline->getName(),50,50),
             "Quantity"=>$quantity,
             "Discounttotal"=>$orderline->getDtounit(),
-            "Discountperc"=>$orderline->getDtoperc()
+            "Discountperc"=>$orderline->getDtoperc(),
+            "Unit price"=>$unitprice,
+            "Unit price UM precio"=>$unitprice,
+            "Unit Cost (LCY)"=>round(($total/1.21)/$quantity,2),
+            "Unit Cost"=>round(($total/1.21)/$quantity,2),
+            "VAT Base Amount"=>round($total/1.21,2),
+            "Importe pendiente base"=>round($total/1.21,2),
+            "Importe pendiente base (DL)"=>round($total/1.21,2)
+
           ];
 
           $orderLinesArray=$line;
