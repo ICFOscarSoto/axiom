@@ -207,8 +207,8 @@ class AXIOMGetOrders extends ContainerAwareCommand
 
 
 
-        $orders_id=$repositorySalesOrders->findNews();
-        //$orders=$repositorySalesOrders->findBy(["code"=>"20DV01593"]);
+        //$orders_id=$repositorySalesOrders->findNews();
+        $orders=$repositorySalesOrders->findBy(["code"=>"20DV01521"]);
 
 
 
