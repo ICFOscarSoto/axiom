@@ -88,7 +88,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
 
     foreach($orders_id as $order_id){
       $order=$repositoryPurchasesOrders->findOneBy(["id"=>$order_id]);
-      if($order->getCode()!="20PC08771") continue;
+    //  if($order->getCode()!="20PC08771") continue;
       if (strncmp($order->getCode(), "20PC", 4) === 0) $devolucion=0;
       else $devolucion=1;
 
@@ -177,8 +177,8 @@ class AXIOMGetOrders extends ContainerAwareCommand
 
       $orderJson["lines"]=$orderLinesArray;
 
-         dump(json_encode($orderJson));
-    //  $result=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-createPurchasesOrders.php?json='.urlencode(json_encode($orderJson)));
+      //   dump(json_encode($orderJson));
+       $result=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-createPurchasesOrders.php?json='.urlencode(json_encode($orderJson)));
 
     }
 
