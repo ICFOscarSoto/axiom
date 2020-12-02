@@ -241,9 +241,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
           "Fecha Limite Validez Oferta"=>$order->getDateofferend(),
           "Pedido WEB"=>$web,
           "Order Date"=>$order->getDateadd(),
-          "Assigned User ID"=>$author,
-          "Amount"=>round($total/1.21,2),
-          "Amount including VAT"=>$total,
+          "Assigned User ID"=>$author
         ];
 
 
@@ -277,7 +275,9 @@ class AXIOMGetOrders extends ContainerAwareCommand
             "VAT Base Amount"=>round($total/1.21,2),
             "Line Amount"=>round($total/1.21,2),
             "Importe pendiente base"=>round($total/1.21,2),
-            "Importe pendiente base (DL)"=>round($total/1.21,2)
+            "Importe pendiente base (DL)"=>round($total/1.21,2),
+            "Amount"=>round($total/1.21,2),
+            "Amount including VAT"=>$total
 
           ];
 
