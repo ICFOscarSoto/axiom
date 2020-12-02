@@ -214,7 +214,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
           else $author=$order->getAuthor()->getEmail();
           if ($order->getWebsale()) $web=1;
           else $web=0;
-          $orderJson[]=["No."=>$order->getCode(),
+          $orderJson=["No."=>$order->getCode(),
           "Bill-to Customer No."=>$order->getCustomercode(),
           "Bill-to Name"=>substr($order->getCustomername(),0,50),
           "Bill-to Name 2"=>substr($order->getCustomername(),50,50),
