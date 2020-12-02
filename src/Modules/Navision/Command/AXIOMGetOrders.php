@@ -205,12 +205,16 @@ class AXIOMGetOrders extends ContainerAwareCommand
         $repositorySalesOrders=$this->doctrine->getRepository(ERPSalesOrders::class);
         $repositorySalesOrdersLines=$this->doctrine->getRepository(ERPSalesOrdersLines::class);
 
-        //$orders=$repositorySalesOrders->findAll();
+
+
+        //$orders=$repositorySalesOrders->findNews();
         $orders=$repositorySalesOrders->findBy(["code"=>"20PV41341"]);
 
 
 
         foreach($orders as $order){
+          if (strncmp($order->getCode(), "20PV", 4) === 0) $devolucion=0;
+          else $devolucion=1;
           $output->writeln("Insertando el pedido: ".$order->getCode());
           if ($order->getAuthor()->getName()=="Administrador") $author=null;
           else $author=$order->getAuthor()->getEmail();
@@ -241,6 +245,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
           "Fecha Limite Validez Oferta"=>$order->getDateofferend(),
           "Pedido WEB"=>$web,
           "Order Date"=>$order->getDateadd(),
+          "Es devolucion"=>$devolucion,
           "Assigned User ID"=>$author
         ];
 
