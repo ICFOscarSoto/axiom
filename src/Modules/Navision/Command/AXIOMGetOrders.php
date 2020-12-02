@@ -277,7 +277,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
             "Importe pendiente base"=>round($total/1.21,2),
             "Importe pendiente base (DL)"=>round($total/1.21,2),
             "Amount"=>round($total/1.21,2),
-            "Amount including VAT"=>$total
+            "Amount Including VAT"=>$total
 
           ];
 
