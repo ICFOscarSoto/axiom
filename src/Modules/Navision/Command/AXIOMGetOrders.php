@@ -264,7 +264,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
             "Quantity"=>$quantity,
             "Discounttotal"=>$orderline->getDtounit(),
             "Discountperc"=>$orderline->getDtoperc(),
-            "Unit price"=>$unitprice,
+            "Unit Price"=>$unitprice,
             "Unit price UM precio"=>$unitprice,
             "Unit Cost (LCY)"=>round(($total/1.21)/$quantity,2),
             "Unit Cost"=>round(($total/1.21)/$quantity,2),
