@@ -240,7 +240,8 @@ class AXIOMGetOrders extends ContainerAwareCommand
           "No oferta relacionada"=>$order->getSalesbudget()?$order->getSalesbudget()->getCode():'',
           "Fecha Limite Validez Oferta"=>$order->getDateofferend(),
           "Pedido WEB"=>$web,
-          "Order Date"=>$order->getDateadd()
+          "Order Date"=>$order->getDateadd(),
+          "Assigned User ID"=>$author
         ];
 
 
