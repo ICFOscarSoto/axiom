@@ -310,7 +310,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
           )
         );
         $context  = stream_context_create($opts);
-        $otuput->writeln($context);
+        $output->writeln($context);
         $result=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-createSalesOrders.php', false, $context);
 
       }
