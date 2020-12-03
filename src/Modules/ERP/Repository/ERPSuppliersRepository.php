@@ -46,4 +46,15 @@ class ERPSuppliersRepository extends ServiceEntityRepository
 
 
     }
+
+    public function getSuppliersToNavision()
+    {
+      //$date_aux = new \DateTime('2020-11-13');
+    //  $date=$date_aux->format("Y-m-d");
+      $query="SELECT id FROM erpsuppliers WHERE dateadd>='2020-11-14'";
+    //  $params=['DATE' => $date];
+      $result=$this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
+      return $result;
+
+    }
 }
