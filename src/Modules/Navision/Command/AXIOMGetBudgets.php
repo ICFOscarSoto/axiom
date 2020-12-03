@@ -91,7 +91,7 @@ class AXIOMGetBudgets extends ContainerAwareCommand
 
     foreach($budgets_id as $budget_id){
       $budget=$repositorySalesBudgets->findOneBy(["id"=>$budget_id]);
-      if($budget->getCode()!="20OFV11713") continue;
+    //  if($budget->getCode()!="20OFV11713") continue;
 
       $output->writeln("Insertando el presupuesto: ".$budget->getCode());
 
