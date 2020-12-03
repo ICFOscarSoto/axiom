@@ -58,7 +58,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
       break;
       case 'checkPurchaseOrders': $this->checkPurchaseOrders($input, $output);
       break;
-      case 'checkSaleOrders': $this->checkPurchaseOrders($input, $output);
+      case 'checkSaleOrders': $this->checkSaleOrders($input, $output);
       break;
       default:
         $output->writeln('Opcion no válida');
