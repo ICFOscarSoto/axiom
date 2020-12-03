@@ -88,7 +88,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
 
     foreach($orders_id as $order_id){
       $order=$repositoryPurchasesOrders->findOneBy(["id"=>$order_id]);
-     if($order->getCode()!="20PC09117") continue;
+     //if($order->getCode()!="20PC09117") continue;
       if (strncmp($order->getCode(), "20PC", 4) === 0) $devolucion=0;
       else $devolucion=1;
 
