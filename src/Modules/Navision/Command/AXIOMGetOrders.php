@@ -88,7 +88,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
 
     foreach($orders_id as $order_id){
       $order=$repositoryPurchasesOrders->findOneBy(["id"=>$order_id]);
-    //  if($order->getCode()!="20PC08771") continue;
+     if($order->getCode()!="20PC08771") continue;
       if (strncmp($order->getCode(), "20PC", 4) === 0) $devolucion=0;
       else $devolucion=1;
 
@@ -96,8 +96,10 @@ class AXIOMGetOrders extends ContainerAwareCommand
 
       $output->writeln("Insertando el pedido: ".$order->getCode());
 
-      if ($order->getAuthor()->getName()=="Administrador") $author=null;
-      else $author=$order->getAuthor()->getEmail();
+      if ($budget->getAuthor()->getName()=="Administrador") $author=null;
+      else $author=$budget->getAuthor()->getEmail();
+      if ($budget->getAgent()->getName()=="Administrador") $agent=null;
+      else $agent=$budget->getAuthor()->getEmail();
 
 
     //  $num=(int)substr($order->getCode(),5);
@@ -107,13 +109,13 @@ class AXIOMGetOrders extends ContainerAwareCommand
       "Buy-from Vendor No."=>$order->getSuppliercode(),
       "Assigned User ID"=>$author,
       "Purchaser Code"=>$order->getAgent()->getEmail(),
-      "Buy-from Vendor Name"=>substr($order->getSuppliername(),0,50),
-      "Buy-from Vendor Name 2"=>substr($order->getSuppliername(),50,50),
-      "Buy-from Address"=>substr($order->getSupplieraddress(),0,50),
-      "Buy-from Address 2"=>substr($order->getSupplieraddress(),50,50),
+      "Buy-from Vendor Name"=>substr($this->clean($order->getSuppliername()),0,50),
+      "Buy-from Vendor Name 2"=>substr($this->clean($order->getSuppliername()),50,50),
+      "Buy-from Address"=>substr($this->clean($order->getSupplieraddress()),0,50),
+      "Buy-from Address 2"=>substr($this->clean($order->getSupplieraddress()),50,50),
       "Buy-from Post Code"=>$order->getSupplierpostcode(),
-      "Buy-from City"=>$order->getSuppliercity(),
-      "Buy-from County"=>$order->getSupplierstate(),
+      "Buy-from City"=>$this->clean($order->getSuppliercity()),
+      "Buy-from County"=>$this->clean($order->getSupplierstate()),
       "No oferta relacionada"=>$order->getPurchasesbudget()?$order->getPurchasesbudget()->getCode():'',
       "Ship-to Post Code"=>$order->getSupplierpostcode(),
       "Status"=>$order->getStatus(),
@@ -122,11 +124,11 @@ class AXIOMGetOrders extends ContainerAwareCommand
       "Document Date" => $order->getDate(),
       "Fecha 1.lanzamiento" => $order->getDateofferend(),
       "Es Devolucion"=>$devolucion,
-      "Order Date"=>$order->getDateadd()    ];
+      "Order Date"=>$order->getDateadd(),
+      "Agent"=>$agent    ];
 
     //  $output->writeln(json_encode($orderJson));
 
-      $orderLinesArray=[];
 
       $orderlines=$repositoryPurchasesOrdersLines->findBy(["purchasesorder"=>$order]);
 
@@ -142,12 +144,12 @@ class AXIOMGetOrders extends ContainerAwareCommand
         $total=$orderline->getTotal();
         $dto=$orderline->getDtoperc();
         $linenum=$orderline->getLinenum()*10000;
-        $line[]=[
+        $line=[
           "No."=>$orderline->getCode(),
           "Document No."=>$order->getCode(),
         /*  "Cross-Reference No."=>,*/
-          "Description"=>substr($orderline->getName(),0,50),
-          "Description 2"=>substr($orderline->getName(),50,50),
+          "Description"=>substr($this->clean($orderline->getName()),0,50),
+          "Description 2"=>substr($this->clean($orderline->getName()),50,50),
           "Quantity"=>$quantity,
           "Outstanding Quantity"=>$quantity,
           "Line Discount %"=>$dto,
@@ -171,14 +173,31 @@ class AXIOMGetOrders extends ContainerAwareCommand
           "Importe pendiente base (DL)"=>round($total/1.21,2)
         ];
 
-        $orderLinesArray=$line;
+        $orderJson["lines"][]=$line;
 
       }
 
-      $orderJson["lines"]=$orderLinesArray;
+
 
       //   dump(json_encode($orderJson));
-       $result=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-createPurchasesOrders.php?json='.urlencode(json_encode($orderJson)));
+    //   $result=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-createPurchasesOrders.php?json='.urlencode(json_encode($orderJson)));
+
+    $postdata = http_build_query(
+        array(
+            'json' => json_encode($budgetJson)
+        )
+    );
+    $opts = array('http' =>
+      array(
+          'method'  => 'POST',
+          'header'  => 'Content-Type: application/x-www-form-urlencoded',
+          'content' => $postdata
+      )
+    );
+    $context  = stream_context_create($opts);
+    $result=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-createPurchasesOrders.php', false, $context);
+
+
 
     }
 
