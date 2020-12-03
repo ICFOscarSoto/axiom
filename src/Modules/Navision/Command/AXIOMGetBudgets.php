@@ -99,8 +99,7 @@ class AXIOMGetBudgets extends ContainerAwareCommand
       else $author=$budget->getAuthor()->getEmail();
       if ($budget->getAgent()->getName()=="Administrador") $agent=null;
       else $agent=$budget->getAuthor()->getEmail();
-      if ($budget->getWebsale()) $web=1;
-      else $web=0;
+
 
       $estadooferta=2;
       $devolucion=0;
@@ -128,7 +127,6 @@ class AXIOMGetBudgets extends ContainerAwareCommand
       "Status"=>$budget->getStatus(),
       "No oferta relacionada"=>$budget->getSalesbudget()?$budget->getSalesbudget()->getCode():'',
       "Fecha Limite Validez Oferta"=>$budget->getDateofferend(),
-      "Pedido WEB"=>$web,
       "Order Date"=>$budget->getDateadd(),
       "Es devolucion"=>$devolucion,
       "Assigned User ID"=>$author,
