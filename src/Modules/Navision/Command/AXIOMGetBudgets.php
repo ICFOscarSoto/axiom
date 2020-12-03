@@ -87,11 +87,11 @@ class AXIOMGetBudgets extends ContainerAwareCommand
     $repositorySalesBudgetsLines=$this->doctrine->getRepository(ERPSalesBudgetsLines::class);
 
     //$orders=$repositoryPurchasesOrders->findAll();
-    $budgets_id=$repositorySalesBudgets->getSalesBudgetsByDate();
+    $budgets_id=$repositorySalesBudgets->findNews();
 
     foreach($budgets_id as $budget_id){
       $budget=$repositorySalesBudgets->findOneBy(["id"=>$budget_id]);
-    //  if($order->getCode()!="20PC09057" AND $order->getCode()!="20PC09111") continue;
+      if($budget->getCode()!="20OFV11510") continue;
 
       $output->writeln("Insertando el presupuesto: ".$budget->getCode());
 
@@ -180,8 +180,8 @@ class AXIOMGetBudgets extends ContainerAwareCommand
 
       $budgetJson["lines"]=$budgetLinesArray;
 
-    //  dump(json_encode($orderJson));
-      $result=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-createBudgets.php?json='.urlencode(json_encode($budgetJson)));
+      dump(json_encode($orderJson));
+    //  $result=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-createBudgets.php?json='.urlencode(json_encode($budgetJson)));
 
     }
 
