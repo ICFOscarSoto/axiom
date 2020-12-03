@@ -124,7 +124,6 @@ class AXIOMGetBudgets extends ContainerAwareCommand
       "Document Date"=>$budget->getDate(),
       "Payment Method Code"=>$budget->getPaymentmethod()?$budget->getPaymentmethod()->getPaymentcode():'',
       "Status"=>$budget->getStatus(),
-      "No oferta relacionada"=>$budget->getSalesbudget()?$budget->getSalesbudget()->getCode():'',
       "Fecha Limite Validez Oferta"=>$budget->getDateofferend(),
       "Order Date"=>$budget->getDateadd(),
       "Es devolucion"=>$devolucion,
