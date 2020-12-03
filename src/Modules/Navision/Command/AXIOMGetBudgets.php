@@ -172,7 +172,7 @@ class AXIOMGetBudgets extends ContainerAwareCommand
 
       $budgetJson["lines"]=$budgetLinesArray;
 
-      dump(json_encode($orderJson));
+      dump(json_encode($budgetJson));
     //  $result=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-createBudgets.php?json='.urlencode(json_encode($budgetJson)));
 
     }
