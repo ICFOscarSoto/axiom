@@ -128,10 +128,7 @@ class AXIOMGetBudgets extends ContainerAwareCommand
       "Order Date"=>$budget->getDateadd(),
       "Es devolucion"=>$devolucion,
       "Assigned User ID"=>$author,
-      "Agent"=>$agent,
-      "No. Series"=>$numeroseries,
-      "Proforma invoice"=>$proforma,
-      "Estado Oferta"=>$estadooferta
+      "Agent"=>$agent
       ];
 
       $budgetLinesArray=[];
