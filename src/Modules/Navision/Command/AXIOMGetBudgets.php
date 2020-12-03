@@ -172,7 +172,7 @@ class AXIOMGetBudgets extends ContainerAwareCommand
 
       $postdata = http_build_query(
           array(
-              'json' => json_encode($orderJson)
+              'json' => json_encode($budgetJson)
           )
       );
       $opts = array('http' =>
