@@ -190,7 +190,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
 
   public function clean($string) {
      $string=str_replace(' ', ' ', $string); //Replace non white space char for white space
-     $string=preg_replace('/[^A-Za-zÁ-Úá-ú0-9\s\-]/', '', $string); // Removes special chars.
+     $string=preg_replace('/[^A-Za-zÁ-Úá-ú0-9\s,.!?+\\\-"\'()]/', '', $string); // Removes special chars.
      $string=trim($string);
      return $string;
   }
@@ -229,16 +229,16 @@ class AXIOMGetOrders extends ContainerAwareCommand
           if ($order->getWebsale()) $web=1;
           else $web=0;
           $orderJson=["No."=>$order->getCode(),
-          "Bill-to Customer No."=>$order->getCustomercode(),
-          "Bill-to Name"=>substr($order->getCustomername(),0,50),
-          "Bill-to Name 2"=>substr($order->getCustomername(),50,50),
-          "Bill-to Address"=>substr($order->getCustomeraddress(),0,50),
-          "Bill-to Address 2"=>substr($order->getCustomeraddress(),50,50),
+          "Bill-to Customer No."=>$this->clean($order->getCustomercode()),
+          "Bill-to Name"=>substr($this->clean($order->getCustomername()),0,50),
+          "Bill-to Name 2"=>substr($this->clean($order->getCustomername()),50,50),
+          "Bill-to Address"=>substr($this->clean($order->getCustomeraddress()),0,50),
+          "Bill-to Address 2"=>substr($this->clean($order->getCustomeraddress()),50,50),
           "Bill-to City"=>$order->getCustomercity(),
-          "Ship-to Name"=>substr($order->getShiptoname(),0,50),
-          "Ship-to Name 2"=>substr($order->getShiptoname(),50,50),
-          "Ship-to Address"=>substr($order->getShiptoaddress(),0,50),
-          "Ship-to Address 2"=>substr($order->getShiptoaddress(),50,50),
+          "Ship-to Name"=>substr($this->clean($order->getShiptoname()),0,50),
+          "Ship-to Name 2"=>substr($this->clean($order->getShiptoname()),50,50),
+          "Ship-to Address"=>substr($this->clean($order->getShiptoaddress()),0,50),
+          "Ship-to Address 2"=>substr($this->clean($order->getShiptoaddress()),50,50),
           "Shipment Date"=>$order->getShipmentdate(),
           "VAT Registration No."=>$order->getVat(),
           "Ship-to City"=>$order->getShiptocity(),
@@ -295,8 +295,8 @@ class AXIOMGetOrders extends ContainerAwareCommand
         $orderJson["lines"]=$orderLinesArray;
 
 
-        $output->writeln(json_encode($orderJson,JSON_UNESCAPED_UNICODE | JSON_PARTIAL_OUTPUT_ON_ERROR));
-        $result=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-createSalesOrders.php?json='.urlencode(json_encode($orderJson)));
+        //$output->writeln(json_encode($orderJson,JSON_UNESCAPED_UNICODE));
+        $result=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-createSalesOrders.php?json='.urlencode(json_encode($orderJson,JSON_UNESCAPED_UNICODE)));
 
       }
     //------   Critical Section END   ------
