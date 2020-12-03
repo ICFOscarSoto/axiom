@@ -115,7 +115,6 @@ class AXIOMGetBudgets extends ContainerAwareCommand
       "Ship-to Name 2"=>substr($this->clean($budget->getShiptoname()),50,50),
       "Ship-to Address"=>substr($this->clean($budget->getShiptoaddress()),0,50),
       "Ship-to Address 2"=>substr($this->clean($budget->getShiptoaddress()),50,50),
-      "Shipment Date"=>$budget->getShipmentdate(),
       "VAT Registration No."=>$this->clean($budget->getVat()),
       "Ship-to City"=>$this->clean($budget->getShiptocity()),
       "Bill-to Post Code"=>$budget->getCustomerpostcode(),
