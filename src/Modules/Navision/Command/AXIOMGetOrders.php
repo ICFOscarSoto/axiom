@@ -272,7 +272,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
           $total=$orderline->getTotal();
           $dto=$orderline->getDtoperc();
           $linenum=$orderline->getLinenum()*10000;
-          $line[]=[
+          $line=[
             "No."=>$orderline->getCode(),
             "Document No."=>$order->getCode(),
             "Line No."=>$linenum,
@@ -291,11 +291,11 @@ class AXIOMGetOrders extends ContainerAwareCommand
             "Amount"=>round($total/1.21,2),
             "Amount Including VAT"=>$total
           ];
-          $orderLinesArray=$line;
-
+          //$orderLinesArray=$line;
+          $orderJson["lines"][]=$line;
         }
 
-        $orderJson["lines"]=$orderLinesArray;
+      //  $orderJson["lines"]=$orderLinesArray;
 
         $postdata = http_build_query(
             array(
