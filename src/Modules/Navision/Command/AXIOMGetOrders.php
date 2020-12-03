@@ -211,9 +211,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
 
         //$orders_id=$repositorySalesOrders->findNews();
         $orders=$repositorySalesOrders->findBy(["code"=>"20PV40186"]);
-
-
-
+        dump($orders);
       /*  foreach($orders_id as $order_id){
           $order=$repositorySalesOrders->findOneBy(["id"=>$order_id]); */
           foreach($orders as $order){
@@ -271,7 +269,6 @@ class AXIOMGetOrders extends ContainerAwareCommand
             "No."=>$orderline->getCode(),
             "Document No."=>$order->getCode(),
             "Line No."=>$linenum,
-          /*  "Cross-Reference No."=>,*/
             "Description"=>substr($orderline->getName(),0,50),
             "Description 2"=>substr($orderline->getName(),50,50),
             "Quantity"=>$quantity,
