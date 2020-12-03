@@ -164,6 +164,7 @@ class AXIOMGetBudgets extends ContainerAwareCommand
           "Importe pendiente base (DL)"=>round($total/1.21,2),
           "Amount"=>round($total/1.21,2),
           "Amount Including VAT"=>$total,
+          "Line No."=>$linenum,
         ];
 
         $budgetLinesArray=$line;
