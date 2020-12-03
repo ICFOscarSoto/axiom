@@ -102,8 +102,6 @@ class AXIOMGetBudgets extends ContainerAwareCommand
       if ($budget->getWebsale()) $web=1;
       else $web=0;
 
-      $numeroseries="V-OFER";
-      $proforma=0;
       $estadooferta=2;
       $devolucion=0;
 
