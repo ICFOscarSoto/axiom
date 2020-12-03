@@ -165,14 +165,14 @@ class AXIOMGetBudgets extends ContainerAwareCommand
           "Line No."=>$linenum
         ];
 
-          $budgetJson["lines"]=$line;
+          $budgetJson["lines"][]=$line;
 
       }
 
 
 
-      $result=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-createBudgets.php?json='.urlencode(json_encode($budgetJson)));
-      /*
+    //  $result=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-createBudgets.php?json='.urlencode(json_encode($budgetJson)));
+
 
       $postdata = http_build_query(
           array(
@@ -189,7 +189,7 @@ class AXIOMGetBudgets extends ContainerAwareCommand
       $context  = stream_context_create($opts);
       $result=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-createBudgets.php', false, $context);
 
-      */
+      
 
 
     }
