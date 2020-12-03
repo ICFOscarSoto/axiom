@@ -91,7 +91,7 @@ class AXIOMGetBudgets extends ContainerAwareCommand
 
     foreach($budgets_id as $budget_id){
       $budget=$repositorySalesBudgets->findOneBy(["id"=>$budget_id]);
-      if($budget->getCode()!="20OFV11510") continue;
+      if($budget->getCode()!="20OFV11713") continue;
 
       $output->writeln("Insertando el presupuesto: ".$budget->getCode());
 
@@ -189,7 +189,7 @@ class AXIOMGetBudgets extends ContainerAwareCommand
       $context  = stream_context_create($opts);
       $result=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-createBudgets.php', false, $context);
 
-      
+
 
 
     }
