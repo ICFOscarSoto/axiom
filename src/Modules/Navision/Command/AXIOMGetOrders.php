@@ -189,7 +189,8 @@ class AXIOMGetOrders extends ContainerAwareCommand
   }
 
   public function clean($string) {
-     $string=str_replace('\S', ' ', $string);
+     $string=str_replace(' ', ' ', $string); //Replace non white space char for white space
+     $string=trim($string);
      return preg_replace('/[^A-Za-z0-9\s\-]/', '', $string); // Removes special chars.
   }
 
