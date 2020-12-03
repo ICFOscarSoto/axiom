@@ -211,7 +211,6 @@ class AXIOMGetOrders extends ContainerAwareCommand
 
         //$orders_id=$repositorySalesOrders->findNews();
         $orders=$repositorySalesOrders->findBy(["code"=>"20PV40186"]);
-        dump($orders);
       /*  foreach($orders_id as $order_id){
           $order=$repositorySalesOrders->findOneBy(["id"=>$order_id]); */
           foreach($orders as $order){
@@ -251,7 +250,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
           "Assigned User ID"=>$author
         ];
 
-
+        dump($orderJson);
 
         $orderlines=$repositorySalesOrdersLines->findBy(["salesorder"=>$order]);
 
@@ -283,13 +282,12 @@ class AXIOMGetOrders extends ContainerAwareCommand
             "Importe pendiente base (DL)"=>round($total/1.21,2),
             "Amount"=>round($total/1.21,2),
             "Amount Including VAT"=>$total
-
           ];
-
           $orderLinesArray=$line;
 
         }
 
+        dump($orderLinesArray);
         $orderJson["lines"]=$orderLinesArray;
 
 
