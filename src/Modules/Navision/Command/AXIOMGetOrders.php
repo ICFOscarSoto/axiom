@@ -96,10 +96,10 @@ class AXIOMGetOrders extends ContainerAwareCommand
 
       $output->writeln("Insertando el pedido: ".$order->getCode());
 
-      if ($budget->getAuthor()->getName()=="Administrador") $author=null;
-      else $author=$budget->getAuthor()->getEmail();
-      if ($budget->getAgent()->getName()=="Administrador") $agent=null;
-      else $agent=$budget->getAuthor()->getEmail();
+      if ($order->getAuthor()->getName()=="Administrador") $author=null;
+      else $author=$order->getAuthor()->getEmail();
+      if ($order->getAgent()->getName()=="Administrador") $agent=null;
+      else $agent=$order->getAuthor()->getEmail();
 
 
     //  $num=(int)substr($order->getCode(),5);
@@ -184,7 +184,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
 
     $postdata = http_build_query(
         array(
-            'json' => json_encode($budgetJson)
+            'json' => json_encode($orderJson)
         )
     );
     $opts = array('http' =>
