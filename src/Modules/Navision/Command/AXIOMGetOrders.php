@@ -188,6 +188,11 @@ class AXIOMGetOrders extends ContainerAwareCommand
 
   }
 
+  function clean($string) {
+     $string=str_replace('\S', ' ', $string);
+     return preg_replace('/[^A-Za-z0-9\s\-]/', '', $string); // Removes special chars.
+  }
+
 
 
   public function createSales(InputInterface $input, OutputInterface $output){
@@ -250,8 +255,6 @@ class AXIOMGetOrders extends ContainerAwareCommand
           "Assigned User ID"=>$author
         ];
 
-        dump($orderJson);
-
         $orderlines=$repositorySalesOrdersLines->findBy(["salesorder"=>$order]);
 
         foreach($orderlines as $orderline){
@@ -268,8 +271,8 @@ class AXIOMGetOrders extends ContainerAwareCommand
             "No."=>$orderline->getCode(),
             "Document No."=>$order->getCode(),
             "Line No."=>$linenum,
-            "Description"=>substr($orderline->getName(),0,50),
-            "Description 2"=>substr($orderline->getName(),50,50),
+            "Description"=>substr(clean($orderline->getName()),0,50),
+            "Description 2"=>substr(clean($orderline->getName()),50,50),
             "Quantity"=>$quantity,
             "Discounttotal"=>$orderline->getDtounit(),
             "Discountperc"=>$orderline->getDtoperc(),
@@ -287,12 +290,10 @@ class AXIOMGetOrders extends ContainerAwareCommand
 
         }
 
-        dump($orderLinesArray);
         $orderJson["lines"]=$orderLinesArray;
 
 
-        $output->writeln("no hay na".json_encode($orderJson,JSON_UNESCAPED_UNICODE | JSON_PARTIAL_OUTPUT_ON_ERROR));
-        $output->writeln("na de na");
+        $output->writeln(json_encode($orderJson,JSON_UNESCAPED_UNICODE | JSON_PARTIAL_OUTPUT_ON_ERROR));
         $result=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-createSalesOrders.php?json='.urlencode(json_encode($orderJson)));
 
       }
