@@ -291,7 +291,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
         $orderJson["lines"]=$orderLinesArray;
 
 
-        $output->writeln("no hay na".json_encode($orderJson));
+        $output->writeln("no hay na".json_encode($orderJson,JSON_UNESCAPED_UNICODE | JSON_PARTIAL_OUTPUT_ON_ERROR));
         $output->writeln("na de na");
         $result=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-createSalesOrders.php?json='.urlencode(json_encode($orderJson)));
 
