@@ -131,8 +131,6 @@ class AXIOMGetBudgets extends ContainerAwareCommand
       "Agent"=>$agent
       ];
 
-      $budgetLinesArray=[];
-
       $budgetlines=$repositorySalesBudgetsLines->findBy(["salesbudget"=>$budget]);
 
       foreach($budgetlines as $budgetline){
@@ -147,7 +145,7 @@ class AXIOMGetBudgets extends ContainerAwareCommand
         $total=$budgetline->getTotal();
         $dto=$budgetline->getDtoperc();
         $linenum=$budgetline->getLinenum()*10000;
-        $line[]=[
+        $line=[
           "No."=>$budgetline->getCode(),
           "Document No."=>$budget->getCode(),
           "Description"=>substr($this->clean($budgetline->getName()),0,50),
@@ -167,14 +165,26 @@ class AXIOMGetBudgets extends ContainerAwareCommand
           "Line No."=>$linenum
         ];
 
-        $budgetLinesArray=$line;
+          $budgetJson["lines"]=$line;
 
       }
 
-      $budgetJson["lines"]=$budgetLinesArray;
 
-      dump(json_encode($budgetJson));
-    //  $result=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-createBudgets.php?json='.urlencode(json_encode($budgetJson)));
+      $postdata = http_build_query(
+          array(
+              'json' => json_encode($orderJson)
+          )
+      );
+      $opts = array('http' =>
+        array(
+            'method'  => 'POST',
+            'header'  => 'Content-Type: application/x-www-form-urlencoded',
+            'content' => $postdata
+        )
+      );
+      $context  = stream_context_create($opts);
+      $result=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-createBudgets.php', false, $context);
+
 
     }
 
