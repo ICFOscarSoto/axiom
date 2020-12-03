@@ -188,7 +188,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
 
   }
 
-  function clean($string) {
+  public function clean($string) {
      $string=str_replace('\S', ' ', $string);
      return preg_replace('/[^A-Za-z0-9\s\-]/', '', $string); // Removes special chars.
   }
