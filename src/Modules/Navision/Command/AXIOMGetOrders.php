@@ -226,6 +226,8 @@ class AXIOMGetOrders extends ContainerAwareCommand
           $output->writeln("Insertando el pedido: ".$order->getCode());
           if ($order->getAuthor()->getName()=="Administrador") $author=null;
           else $author=$order->getAuthor()->getEmail();
+          if ($order->getAgent()->getName()=="Administrador") $agent=null;
+          else $agent=$order->getAuthor()->getEmail();
           if ($order->getWebsale()) $web=1;
           else $web=0;
           $orderJson=["No."=>$this->clean($order->getCode()),
@@ -254,7 +256,8 @@ class AXIOMGetOrders extends ContainerAwareCommand
           "Pedido WEB"=>$web,
           "Order Date"=>$order->getDateadd(),
           "Es devolucion"=>$devolucion,
-          "Assigned User ID"=>$author
+          "Assigned User ID"=>$author,
+          "Agent"=>$agent
         ];
 
         $orderlines=$repositorySalesOrdersLines->findBy(["salesorder"=>$order]);
