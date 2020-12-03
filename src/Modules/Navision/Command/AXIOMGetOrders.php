@@ -58,6 +58,8 @@ class AXIOMGetOrders extends ContainerAwareCommand
       break;
       case 'checkPurchaseOrders': $this->checkPurchaseOrders($input, $output);
       break;
+      case 'checkSaleOrders': $this->checkPurchaseOrders($input, $output);
+      break;
       default:
         $output->writeln('Opcion no válida');
       break;
@@ -362,6 +364,42 @@ class AXIOMGetOrders extends ContainerAwareCommand
       foreach($orders_id as $order_id){
         $order=$repositoryPurchasesOrders->findOneBy(["id"=>$order_id]);
         $result=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-checkPurchaseOrder.php?code='.$order->getCode());
+
+        if($result==false){
+           $txt="El pedido ".$order->getCode()." no está en Navision \n";
+            fwrite($log, $txt);
+          }
+
+      }
+
+      fclose($log);
+
+    }
+
+
+    public function checkSaleOrders(InputInterface $input, OutputInterface $output)
+    {
+
+      if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+          $fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetProducts-checkSaleOrders.lock', 'c');
+      } else {
+          $fp = fopen('/tmp/axiom-navisionGetProducts-checkSaleOrders.lock', 'c');
+      }
+
+      if (!flock($fp, LOCK_EX | LOCK_NB)) {
+        $output->writeln('* Fallo al iniciar la creación de pedidos en Navision: El proceso ya esta en ejecución.');
+        exit;
+      }
+
+      //------   Critical Section START   ------
+      $repositorySalesOrders->doctrine->getRepository(ERPSalesOrders::class);
+      $repositorySalesOrdersLines=$this->doctrine->getRepository(ERPSalesOrdersLines::class);
+
+      $orders_id=$repositorySalesOrders->findNews();
+      $log=fopen("saleOrders.txt", "w");
+      foreach($orders_id as $order_id){
+        $order=$repositorySalesOrders->findOneBy(["id"=>$order_id]);
+        $result=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-checkSale.php?code='.$order->getCode());
 
         if($result==false){
            $txt="El pedido ".$order->getCode()." no está en Navision \n";
