@@ -216,10 +216,10 @@ class AXIOMGetOrders extends ContainerAwareCommand
 
 
 
-        $orders_id=$repositorySalesOrders->findNews();
-        //$orders=$repositorySalesOrders->findBy(["code"=>"20PV40186"]);
-        foreach($orders_id as $order_id){
-          $order=$repositorySalesOrders->findOneBy(["id"=>$order_id]); 
+        //$orders_id=$repositorySalesOrders->findNews();
+        $orders=$repositorySalesOrders->findBy(["code"=>"20PV39993"]);
+        //foreach($orders_id as $order_id){
+          //$order=$repositorySalesOrders->findOneBy(["id"=>$order_id]);
         //  foreach($orders as $order){
           if (strncmp($order->getCode(), "20PV", 4) === 0) $devolucion=0;
           else $devolucion=1;
@@ -228,24 +228,24 @@ class AXIOMGetOrders extends ContainerAwareCommand
           else $author=$order->getAuthor()->getEmail();
           if ($order->getWebsale()) $web=1;
           else $web=0;
-          $orderJson=["No."=>$order->getCode(),
+          $orderJson=["No."=>$this->clean($order->getCode()),
           "Bill-to Customer No."=>$this->clean($order->getCustomercode()),
           "Bill-to Name"=>substr($this->clean($order->getCustomername()),0,50),
           "Bill-to Name 2"=>substr($this->clean($order->getCustomername()),50,50),
           "Bill-to Address"=>substr($this->clean($order->getCustomeraddress()),0,50),
           "Bill-to Address 2"=>substr($this->clean($order->getCustomeraddress()),50,50),
-          "Bill-to City"=>$order->getCustomercity(),
+          "Bill-to City"=>$this->clean($order->getCustomercity()),
           "Ship-to Name"=>substr($this->clean($order->getShiptoname()),0,50),
           "Ship-to Name 2"=>substr($this->clean($order->getShiptoname()),50,50),
           "Ship-to Address"=>substr($this->clean($order->getShiptoaddress()),0,50),
           "Ship-to Address 2"=>substr($this->clean($order->getShiptoaddress()),50,50),
           "Shipment Date"=>$order->getShipmentdate(),
-          "VAT Registration No."=>$order->getVat(),
-          "Ship-to City"=>$order->getShiptocity(),
+          "VAT Registration No."=>$this->clean($order->getVat()),
+          "Ship-to City"=>$this->clean($order->getShiptocity()),
           "Bill-to Post Code"=>$order->getCustomerpostcode(),
-          "Bill-to County"=>$order->getCustomerstate(),
+          "Bill-to County"=>$this->clean($order->getCustomerstate()),
           "Ship-to Post Code"=>$order->getShiptopostcode(),
-          "Ship-to County"=>$order->getShiptostate(),
+          "Ship-to County"=>$this->clean($order->getShiptostate()),
           "Document Date"=>$order->getDate(),
           "Payment Method Code"=>$order->getPaymentmethod()?$order->getPaymentmethod()->getPaymentcode():'',
           "Status"=>$order->getStatus(),
