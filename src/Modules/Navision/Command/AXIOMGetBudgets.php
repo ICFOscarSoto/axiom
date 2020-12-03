@@ -157,9 +157,8 @@ class AXIOMGetBudgets extends ContainerAwareCommand
         $line[]=[
           "No."=>$budgetline->getCode(),
           "Document No."=>$budgetline->getCode(),
-        /*  "Cross-Reference No."=>,*/
           "Description"=>substr($this->clean($budgetline->getName()),0,50),
-          "Description 2"=>>substr($this->clean($budgetline->getName()),50,50),
+          "Description 2"=>substr($this->clean($budgetline->getName()),50,50),
           "Quantity"=>$quantity,
           "Discounttotal"=>$budgetline->getDtounit(),
           "Discountperc"=>$budgetline->getDtoperc(),
