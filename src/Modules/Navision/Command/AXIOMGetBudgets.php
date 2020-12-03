@@ -149,7 +149,7 @@ class AXIOMGetBudgets extends ContainerAwareCommand
         $linenum=$budgetline->getLinenum()*10000;
         $line[]=[
           "No."=>$budgetline->getCode(),
-          "Document No."=>$budgetline->getCode(),
+          "Document No."=>$budget->getCode(),
           "Description"=>substr($this->clean($budgetline->getName()),0,50),
           "Description 2"=>substr($this->clean($budgetline->getName()),50,50),
           "Quantity"=>$quantity,
@@ -164,7 +164,7 @@ class AXIOMGetBudgets extends ContainerAwareCommand
           "Importe pendiente base (DL)"=>round($total/1.21,2),
           "Amount"=>round($total/1.21,2),
           "Amount Including VAT"=>$total,
-          "Line No."=>$linenum,
+          "Line No."=>$linenum
         ];
 
         $budgetLinesArray=$line;
