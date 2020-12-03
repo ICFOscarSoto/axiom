@@ -190,7 +190,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
 
   public function clean($string) {
      $string=str_replace(' ', ' ', $string); //Replace non white space char for white space
-     $string=preg_replace('/[^A-Za-zÁ-Úá-ú0-9\s,.!?+\\-"()]/', '', $string); // Removes special chars.
+     $string=preg_replace('/[^A-Za-zÁ-Úá-ú0-9\s,.!?+\\-"\'()]/', '', $string); // Removes special chars.
      $string=trim($string);
      return $string;
   }
@@ -216,10 +216,10 @@ class AXIOMGetOrders extends ContainerAwareCommand
 
 
 
-        //$orders_id=$repositorySalesOrders->findNews();
-        $orders=$repositorySalesOrders->findBy(["code"=>"20PV39852"]);
-        //foreach($orders_id as $order_id){
-          //$order=$repositorySalesOrders->findOneBy(["id"=>$order_id]);
+        $orders_id=$repositorySalesOrders->findNews();
+        //$orders=$repositorySalesOrders->findBy(["code"=>"20PV39852"]);
+        foreach($orders_id as $order_id){
+          $order=$repositorySalesOrders->findOneBy(["id"=>$order_id]);
           foreach($orders as $order){
           if (strncmp($order->getCode(), "20PV", 4) === 0) $devolucion=0;
           else $devolucion=1;
@@ -295,7 +295,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
         $orderJson["lines"]=$orderLinesArray;
 
 
-        $output->writeln(json_encode($orderJson,JSON_UNESCAPED_UNICODE));
+        //$output->writeln(json_encode($orderJson,JSON_UNESCAPED_UNICODE));
         $result=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-createSalesOrders.php?json='.urlencode(json_encode($orderJson)));
 
       }
