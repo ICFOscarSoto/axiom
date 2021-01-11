@@ -1379,7 +1379,7 @@ public function updateManufacturers(InputInterface $input, OutputInterface $outp
 public function exportNames(InputInterface $input, OutputInterface $output){
 
   $repositoryProducts=$this->doctrine->getRepository(ERPProducts::class);
-  $products=$repositoryProducts->findAll();
+  //$products=$repositoryProducts->findAll();
   //foreach ($products as $product){
   $product=$repositoryProducts->findOneBy(["code"=>'55S77']);
   $item=[
