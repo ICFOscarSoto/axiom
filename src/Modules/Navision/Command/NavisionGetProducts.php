@@ -1382,11 +1382,17 @@ public function exportNames(InputInterface $input, OutputInterface $output){
   //$products=$repositoryProducts->findAll();
   //foreach ($products as $product){
   $product=$repositoryProducts->findOneBy(["code"=>'55S77']);
+  $item=[];
+  $array_products=[];
   $item=[
     "code"=>$product->getCode(),
     "Description"=>substr($product->getName(),0,30),
     "Description 2"=>substr($product->getName(),30,30)];
   $output->writeln('Actualizando '.urlencode($item));
+
+  $array_products=$item;
+  $json = json_encode($array_products);
+
   $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-updateNames.php?from='.urlencode($item));
   //}
 }
