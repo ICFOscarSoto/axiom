@@ -99,6 +99,8 @@ class NavisionGetProducts extends ContainerAwareCommand
       break;
       case 'createproducts': $this->createProducts($input, $output);
       break;
+      case 'updatenames': $this->createProducts($input, $output);
+      break;
       case 'all':
         $this->importProduct($input, $output);
         //$this->clearEAN13($input, $output);
@@ -1371,6 +1373,22 @@ public function updateManufacturers(InputInterface $input, OutputInterface $outp
   $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
   $this->doctrine->getManager()->persist($navisionSync);
   $this->doctrine->getManager()->flush();
+}
+
+
+public function exportNames(InputInterface $input, OutputInterface $output){
+
+  $repositoryProducts=$this->doctrine->getRepository(ERPProducts::class);
+  $products=$repositoryProducts->findAll();
+  //foreach ($products as $product){
+  $product=$repositoryProducts->findOneBy(["code"=>'55S77']);
+  $item=[
+    "code"=>$product->getCode(),
+    "Description"=>substr($product->getName(),0,30),
+    "Description 2"=>substr($product->getName(),30,30)];
+
+  $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-updateNames.php?from='.$item);
+  //}
 }
 
 
