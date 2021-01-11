@@ -99,7 +99,7 @@ class NavisionGetProducts extends ContainerAwareCommand
       break;
       case 'createproducts': $this->createProducts($input, $output);
       break;
-      case 'updatenames': $this->createProducts($input, $output);
+      case 'updatenames': $this->exportNames($input, $output);
       break;
       case 'all':
         $this->importProduct($input, $output);
