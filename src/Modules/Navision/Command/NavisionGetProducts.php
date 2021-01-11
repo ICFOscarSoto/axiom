@@ -1386,8 +1386,8 @@ public function exportNames(InputInterface $input, OutputInterface $output){
     "code"=>$product->getCode(),
     "Description"=>substr($product->getName(),0,30),
     "Description 2"=>substr($product->getName(),30,30)];
-  $output->writeln('Actualizando '.$item["code"]);
-  $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-updateNames.php?from='.$item);
+  $output->writeln('Actualizando '.urlencode($item));
+  $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-updateNames.php?from='.urlencode($item));
   //}
 }
 
@@ -1421,12 +1421,7 @@ public function createProducts(InputInterface $input, OutputInterface $output){
   $array_products=[];
   foreach($product_ids as $product_id)
   {
-/*
-  ($product_id["id"]=="194254")
-    {
-  */
-       $product_obj=$repository->findOneBy(["id"=>$product_id["id"]]);
-
+        $product_obj=$repository->findOneBy(["id"=>$product_id["id"]]);
         $repositorysuppliers=$this->doctrine->getRepository(ERPSuppliers::class);
         if($product_obj->getSupplier()!=null) $supplier=$repositorysuppliers->findOneBy(["id"=>$product_obj->getSupplier()->getId()]);
         else $supplier=null;
