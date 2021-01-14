@@ -1386,6 +1386,8 @@ public function exportNames(InputInterface $input, OutputInterface $output){
   $Description=substr($product->getName(),0,30);
   $Description2=substr($product->getName(),30,30);
 
+  $output->writeln('Actualizando el producto '.$code);
+
 
   $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-exportNames.php?code='.$code.'&desc1='.urlencode($Description).'&desc2='.urlencode($Description2));
   }
