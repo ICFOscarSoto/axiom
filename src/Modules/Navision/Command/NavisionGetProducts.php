@@ -1390,7 +1390,7 @@ public function exportNames(InputInterface $input, OutputInterface $output){
     "Description 2"=>substr($product->getName(),30,30)];
 
 
-  $json=file_get_contents(urldecode($this->url.'navisionExport/axiom/do-NAVISION-updateNamess.php?code='.$item["code"].'&desc1='.$item["Description"].'&desc2='.$item["Description 2"]));
+  $json=file_get_contents(urlencode($this->url.'navisionExport/axiom/do-NAVISION-updateNamess.php?code='.$item["code"].'&desc1='.$item["Description"].'&desc2='.$item["Description 2"])) ;
   //}
 }
 
