@@ -1377,20 +1377,24 @@ public function updateManufacturers(InputInterface $input, OutputInterface $outp
 
 
 public function exportNames(InputInterface $input, OutputInterface $output){
+  $repository=$this->doctrine->getRepository(ERPProducts::class);
 
-  $repositoryProducts=$this->doctrine->getRepository(ERPProducts::class);
-  $products=$repositoryProducts->findAll();
-  foreach ($products as $product){
-  //$product=$repositoryProducts->findOneBy(["code"=>'55S77']);
-  $code=$product->getCode();
-  $Description=substr($product->getName(),0,30);
-  $Description2=substr($product->getName(),30,30);
+  $page=5000;
+  $totalProducts=round(intval($repository->totalProducts())/$page);
+  $count=0;
 
-  $output->writeln('Actualizando el producto '.$code);
-
-
-  $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-exportNames.php?code='.$code.'&desc1='.urlencode($Description).'&desc2='.urlencode($Description2));
-  }
+  while($count<$totalProducts){
+      $products=$repository->productsLimit(intval($count*$page),intval($page));
+      $count++;
+        foreach ($products as $product){
+        //$product=$repositoryProducts->findOneBy(["code"=>'55S77']);
+        $code=$product->getCode();
+        $Description=substr($product->getName(),0,30);
+        $Description2=substr($product->getName(),30,30);
+        $output->writeln('Actualizando el producto '.$code);
+        $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-exportNames.php?code='.$code.'&desc1='.urlencode($Description).'&desc2='.urlencode($Description2));
+      }
+    }
 }
 
 
