@@ -1386,8 +1386,8 @@ public function exportNames(InputInterface $input, OutputInterface $output){
   while($count<$totalProducts){
       $products=$repository->productsLimit(intval($count*$page),intval($page));
       $count++;
-        foreach ($products as $product){
-        //$product=$repositoryProducts->findOneBy(["code"=>'55S77']);
+        foreach ($products as $id){
+        $product=$repositoryProducts->findOneBy(["id"=>$id]);
         $code=$product->getCode();
         $Description=substr($product->getName(),0,30);
         $Description2=substr($product->getName(),30,30);
