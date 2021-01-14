@@ -99,7 +99,7 @@ class NavisionGetProducts extends ContainerAwareCommand
       break;
       case 'createproducts': $this->createProducts($input, $output);
       break;
-      case 'updatenames': $this->exportNames($input, $output);
+      case 'exportnames': $this->exportNames($input, $output);
       break;
       case 'all':
         $this->importProduct($input, $output);
@@ -1379,19 +1379,16 @@ public function updateManufacturers(InputInterface $input, OutputInterface $outp
 public function exportNames(InputInterface $input, OutputInterface $output){
 
   $repositoryProducts=$this->doctrine->getRepository(ERPProducts::class);
-  //$products=$repositoryProducts->findAll();
-  //foreach ($products as $product){
-  $product=$repositoryProducts->findOneBy(["code"=>'55S77']);
-  $item=[];
-  $array_products=[];
-  $item=[
-    "code"=>$product->getCode(),
-    "Description"=>substr($product->getName(),0,30),
-    "Description 2"=>substr($product->getName(),30,30)];
+  $products=$repositoryProducts->findAll();
+  foreach ($products as $product){
+  //$product=$repositoryProducts->findOneBy(["code"=>'55S77']);
+  $code=$product->getCode();
+  $Description=substr($product->getName(),0,30);
+  $Description2=substr($product->getName(),30,30);
 
 
-  $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-updateNamess.php?code='.$item["code"].'&desc1='.urlencode($item["Description"]).'&desc2='.urlencode($item["Description 2"]));
-  //}
+  $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-exportNames.php?code='.$code.'&desc1='.urlencode($Description).'&desc2='.urlencode($Description2));
+  }
 }
 
 
