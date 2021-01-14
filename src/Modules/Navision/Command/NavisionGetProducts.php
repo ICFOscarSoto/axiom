@@ -1391,7 +1391,7 @@ public function exportNames(InputInterface $input, OutputInterface $output){
 
 
   $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-updateNamess.php?code='.$item["code"].'&desc1='.urlencode($item["Description"]).'&desc2='.urlencode($item["Description 2"]));
-  //}
+  dump($json);//}
 }
 
 
