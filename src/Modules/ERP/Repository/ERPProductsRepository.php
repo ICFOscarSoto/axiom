@@ -91,7 +91,7 @@ class ERPProductsRepository extends ServiceEntityRepository
     }
 
     public function totalProducts(){
-      $query='SELECT count(id) as total from erpproducts where actvie!=2';
+      $query='SELECT count(id) as total from erpproducts where active!=2';
       $result=$this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
       return $result[0]["total"];
     }
