@@ -679,11 +679,11 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
   $repositoryproductprices=$this->doctrine->getRepository(ERPProductPrices::class);
   $repositorycustomerprices=$this->doctrine->getRepository(ERPCustomerPrices::class);
   $page=5000;
-  $totalProducts=round(intval($repository->totalProducts())/$page);
+  $totalProducts=round(intval($repository->totalProductsCategory())/$page);
   $count=0;
 
   while($count<$totalProducts){
-      $products=$repository->productsLimit(intval($count*$page),intval($page));
+      $products=$repository->productsLimitActive(intval($count*$page),intval($page));
       $count++;
 
   //Disable SQL logger

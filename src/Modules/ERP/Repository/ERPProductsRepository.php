@@ -84,15 +84,21 @@ class ERPProductsRepository extends ServiceEntityRepository
 
     /* Nos devuelve la cantidad de productos con categoría */
 
-    public function totalProducts(){
+    public function totalProductsCategory(){
       $query='SELECT count(id) as total from erpproducts where category_id is not null and supplier_id is not null and netprice=0';
+      $result=$this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
+      return $result[0]["total"];
+    }
+
+    public function totalProducts(){
+      $query='SELECT count(id) as total from erpproducts where actvie!=2';
       $result=$this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
       return $result[0]["total"];
     }
 
     /* Nos devuelve un número limitado de productos, para ello se le indica el índice desde el que empieza $start, y la cantidad que queremos devolver $page  */
 
-    public function productsLimit($start, $page){
+    public function productsLimitActive($start, $page){
       $query='SELECT id FROM erpproducts
               WHERE active=1
               ORDER BY code
@@ -100,6 +106,16 @@ class ERPProductsRepository extends ServiceEntityRepository
       $result=$this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
       return $result;
     }
+
+    public function productsLimit($start, $page){
+      $query='SELECT id FROM erpproducts
+              WHERE active!=2
+              ORDER BY code
+              LIMIT '.$start.','.$page.'';
+      $result=$this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
+      return $result;
+    }
+
 
     public function latestMovements($product, $limit=200){
       $query='Select id,code,date,type,quantity,name
