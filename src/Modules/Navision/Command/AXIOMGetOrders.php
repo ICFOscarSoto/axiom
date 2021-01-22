@@ -392,7 +392,7 @@ class AXIOMGetOrders extends ContainerAwareCommand
       }
 
       //------   Critical Section START   ------
-      $repositorySalesOrders->doctrine->getRepository(ERPSalesOrders::class);
+      $repositorySalesOrders=$this->doctrine->getRepository(ERPSalesOrders::class);
       $repositorySalesOrdersLines=$this->doctrine->getRepository(ERPSalesOrdersLines::class);
 
       $orders_id=$repositorySalesOrders->findNews();

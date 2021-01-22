@@ -327,6 +327,79 @@ class ERPPrestashopUtils
 
 
 
+                    }//END OF estimateddelivery
+
+                    /*
+                     las variantes las tratamos de manera diferente :
+                     - Si por ejemplo le cambiamos el nombre a una variante en Axiom, para que este cambio tenga efecto en PS,
+                       le pasamos la variante antigua para que la borre y la nueva para que la cree.
+                     - En cambio, si creamos una nueva variante en el producto, le pasamos null como variante anterior y solo
+                       se encargará de crear la nueva.
+                    */
+                    else if($clave=="variants"){
+
+                      if($valor["old"]!=null)
+                      {
+                        //comprobamos si existe la variante antigua en Prestashop
+                        ///api/product_option_values/ --> fcattribute
+                        $xml_string_variant=file_get_contents($this->this_url."/api/product_option_values/?display=[id]&filter[name]=".$valor["old"], false, $context);
+                        $xml_variant = simplexml_load_string($xml_string_variant, 'SimpleXMLElement', LIBXML_NOCDATA);
+                        $id_attribute_old=$xml_variant->product_option_values->product_option_value->id;
+
+                        //dump("El id de la variante antigua es: ".$id_attribute_old);
+                        //la variante antigua sí que existe en prestashop, luego hay que comprobar si la combinación variante-producto también existe      y borrarla
+                        if($id_attribute_old!=NULL)
+                        {
+                          //obtenemos todas las combinaciones asociadas al producto.
+                          $xml_string_product_combinations=file_get_contents($this->this_url."/api/combinations/?display=[id]&filter[id_product]=".$id_prestashop, false, $context);
+                          $xml_product_combinations = simplexml_load_string($xml_string_product_combinations, 'SimpleXMLElement', LIBXML_NOCDATA);
+
+                          //dump($xml_product_combinations);
+                          foreach($xml_product_combinations->combinations->combination as $comb)
+                          {
+                            $array=array_unique((array) $comb);
+
+                            //obtenemos cada combinación por el ID.
+                          //  dump($this->this_url."/api/combinations/".$array["id"]);
+                            $xml_string_product_combination=file_get_contents($this->this_url."/api/combinations/".$array["id"], false, $context);
+                            $xml_product_combination = simplexml_load_string($xml_string_product_combination, 'SimpleXMLElement', LIBXML_NOCDATA);
+                            $id_attribute_ps=$xml_product_combination->combination->associations->product_option_values->product_option_value;
+                            $array_id_attribute=array_unique((array) $id_attribute_ps);
+                            if($array_id_attribute["id"]==$id_attribute_old){
+                              dump("vamos a borrar la combinación ".$array["id"]);
+                              $this->deleteCombination($xml_product_combination,$array["id"]);
+                              continue;
+                            }
+                        }
+                        }
+                      }
+
+
+                      //OBTENER ID DE Prestashop de la nueva variante
+
+                      $xml_string_variant=file_get_contents($this->this_url."/api/product_option_values/?display=[id]&filter[name]=".$valor["new"], false, $context);
+                      $xml_variant = simplexml_load_string($xml_string_variant, 'SimpleXMLElement', LIBXML_NOCDATA);
+                      $id_attribute_new=$xml_variant->product_option_values->product_option_value->id;
+
+                      $this->addCombination($id_prestashop,$id_attribute_new);
+
+                        ///api/combinations/ --> fcproduct_attribute
+                        ///api/product_option_values --> fcattribute + fcattribute_lang
+
+                      //id_attribute_group=4 (Talla)
+                      //id_attribute_group=9 (Color)
+                      //https://www.ferreteriacampollano.com/api/product_options/4 --> saca todas las tallas en PS
+
+
+                      //https://www.ferreteriacampollano.com/api/product_option_values/&filter[name]=$valor
+                      //sacamos de ahí el id del atributo y buscamos en el producto
+
+                      //https://www.ferreteriacampollano.com/api/products/id
+                      //sacamos el id de cada <associatons><product_option_values><product_option_value>
+
+
+                      //https://www.ferreteriacampollano.com/api/product_option_values/
+
                     }
 
                  }
@@ -794,5 +867,110 @@ function curl_get_contents($url)
   curl_close($ch);
   return $data;
 }
+
+
+public function deleteCombination($xml,$combination_id){
+
+  $auth = base64_encode("6TI5549NR221TXMGMLLEHKENMG89C8YV");
+  $context = stream_context_create(["http" => ["header" => "Authorization: Basic $auth"]]);
+
+  $url=$this->this_url."/api/combinations/".$combination_id;
+  $putString = $xml->asXML();
+
+  $ch = curl_init();
+  $putData = fopen('php://temp/maxmemory:256000', 'w');
+  if (!$putData) {
+      die('could not open temp memory data');
+  }
+  fwrite($putData, $putString);
+  fseek($putData, 0);
+
+
+  curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/xml','Authorization: Basic '.$auth));
+  curl_setopt($ch, CURLOPT_BINARYTRANSFER, true);
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+  curl_setopt($ch, CURLOPT_URL, $url);
+  //curl_setopt($ch, CURLOPT_PUT, true);
+  curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "DELETE");
+  curl_setopt($ch, CURLOPT_INFILESIZE, strlen($putString));
+  curl_setopt($ch, CURLOPT_INFILE, $putData);
+
+  $output = curl_exec($ch);
+
+  fclose($putData);
+  if (curl_errno($ch)) {  dump(curl_error($ch)); }
+  else {  curl_close($ch); }
+
+}
+
+
+public function addCombination($id_product,$id_attribute){
+
+  $auth = base64_encode("6TI5549NR221TXMGMLLEHKENMG89C8YV");
+  $context = stream_context_create(["http" => ["header" => "Authorization: Basic $auth"]]);
+
+  $xml_string=file_get_contents($this->this_url."/api/combinations?schema=blank", false, $context);
+  $xml = simplexml_load_string($xml_string, 'SimpleXMLElement', LIBXML_NOCDATA);
+  $xml->combination->id_product=$id_product;
+  $xml->combination->location="";
+  $xml->combination->ean13="";
+  $xml->combination->upc="";
+  $xml->combination->quantity=0;
+  $xml->combination->reference="";
+  $xml->combination->supplier_reference="";
+  $xml->combination->wholesale_price=0;
+  $xml->combination->price=0;
+  $xml->combination->ecotax=0;
+  $xml->combination->weight=0;
+  $xml->combination->unit_price_impact=0;
+  $xml->combination->minimal_quantity=1;
+  $xml->combination->default_on="";
+  $xml->combination->available_date="0000-00-00 00:00:00";
+  $xml->combination->associations->product_option_values->product_option_value->id=$id_attribute;
+
+
+  $url=$this->this_url."/api/combinations/";
+  $postString=$xml->asXML();
+  $ch = curl_init();
+
+
+  curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/xml','Authorization: Basic '.$auth));
+  curl_setopt($ch, CURLOPT_BINARYTRANSFER, true);
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+  curl_setopt($ch, CURLOPT_URL, $url);
+  curl_setopt($ch, CURLOPT_POST, true);
+  curl_setopt($ch, CURLOPT_POSTFIELDS, $postString);
+
+  $output = curl_exec($ch);
+
+  if (curl_errno($ch)) {  dump(curl_error($ch)); }
+  else {  curl_close($ch); }
+
+
+}
+
+public function getCategoriesTree($parent)
+{
+  $auth = base64_encode("6TI5549NR221TXMGMLLEHKENMG89C8YV");
+  $context = stream_context_create(["http" => ["header" => "Authorization: Basic $auth"]]);
+
+  $xml_string=file_get_contents($this->this_url."/api/categories?display=[id,name,id_parent,level_depth]&filter[active]=1&filter[id_parent]=".$parent, false, $context);
+  $xml = simplexml_load_string($xml_string, 'SimpleXMLElement', LIBXML_NOCDATA);
+
+  $categories_JSON=[];
+  //dump($xml);
+  //dump($xml->categories);;
+  foreach ($xml->categories->category as $category){
+    //dump($category);
+     $array=array_unique((array) $category);
+     $array_name=array_unique((array) $array["name"]);
+     $cat=["id"=>$array["id"],"name"=>$array_name["language"],"childrens"=>$this->getCategoriesTree($array["id"])];
+     array_push($categories_JSON,$cat);
+   }
+
+  // return $categories_JSON;
+   return null;
+
+  }
 
 }
