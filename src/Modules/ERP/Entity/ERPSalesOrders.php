@@ -295,7 +295,9 @@ class ERPSalesOrders
     /**
      * @ORM\Column(type="integer", nullable=true)
      */
-    private $customernumber;
+    private $externalordernumber;
+
+
 
 
     public function getId(): ?int
@@ -928,15 +930,16 @@ class ERPSalesOrders
         return $this;
     }
 
-    public function getCustomernumber(): ?int
+    public function getExternalordernumber(): ?int
     {
-        return $this->customernumber;
+        return $this->externalordernumber;
     }
 
-    public function setCustomernumber(?int $customernumber): self
+    public function setExternalordernumber(?int $externalordernumber): self
     {
-        $this->customernumber = $customernumber;
+        $this->externalordernumber = $externalordernumber;
 
         return $this;
     }
+
 }
