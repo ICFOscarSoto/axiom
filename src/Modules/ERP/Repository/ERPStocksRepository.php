@@ -74,7 +74,7 @@ class ERPStocksRepository extends ServiceEntityRepository
 
 
     public function stockVariantUpdate($variant_id, $store){
-      $query="SELECT id, quantity FROM erpstocks WHERE variant_id= :variant AND storelocation_id IN
+      $query="SELECT id, quantity FROM erpstocks WHERE productvariant_id= :variant AND storelocation_id IN
                   (SELECT id FROM erpstore_locations WHERE store_id IN
                     (SELECT id FROM erpstores WHERE CODE= :store))
               ORDER BY quantity DESC
