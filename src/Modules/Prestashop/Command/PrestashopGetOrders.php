@@ -131,7 +131,7 @@ class PrestashopGetOrders extends ContainerAwareCommand
       foreach($xml->orders->order as $order)
       {
         $item=array_unique((array) $order);
-      dump("Pedido ".$item["id"]);
+    //  dump("Pedido ".$item["id"]);
        $xml_order_string=file_get_contents($this->url."/api/orders/".$item["id"], false, $context);
        $xml_order = simplexml_load_string($xml_order_string, 'SimpleXMLElement', LIBXML_NOCDATA);
        $json = json_encode($xml_order);
@@ -320,13 +320,13 @@ class PrestashopGetOrders extends ContainerAwareCommand
 
         $order_lines_array=$order_array["associations"]["order_rows"]["order_row"];
 
-        dump($order_lines_array);
+        //dump($order_lines_array);
 
         foreach($order_lines_array as $array){
-          if(isset($array["id"])) dump($array["id"]);
+          if(isset($array["id"]))// dump($array["id"]);
           else{
             $aux[]=$array;
-            dump($aux);
+        //    dump($aux);
           }
 
         }

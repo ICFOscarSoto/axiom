@@ -366,7 +366,7 @@ class ERPPrestashopUtils
                             $id_attribute_ps=$xml_product_combination->combination->associations->product_option_values->product_option_value;
                             $array_id_attribute=array_unique((array) $id_attribute_ps);
                             if($array_id_attribute["id"]==$id_attribute_old){
-                              dump("vamos a borrar la combinación ".$array["id"]);
+                            //  dump("vamos a borrar la combinación ".$array["id"]);
                               $this->deleteCombination($xml_product_combination,$array["id"]);
                               continue;
                             }
