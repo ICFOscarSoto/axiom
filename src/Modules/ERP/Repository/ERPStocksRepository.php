@@ -79,7 +79,7 @@ class ERPStocksRepository extends ServiceEntityRepository
                     (SELECT id FROM erpstores WHERE CODE= :store))
               ORDER BY quantity DESC
               LIMIT 1";
-      $params=['product' => $product_id, 'store' => $store];
+      $params=['variant' => $variant_id, 'store' => $store];
 
       return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
     }
