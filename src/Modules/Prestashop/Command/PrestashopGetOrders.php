@@ -321,15 +321,16 @@ class PrestashopGetOrders extends ContainerAwareCommand
         $order_lines_array=$order_array["associations"]["order_rows"]["order_row"];
 
         //dump($order_lines_array);
-
+/*
         foreach($order_lines_array as $array){
+
           if(isset($array["id"]))// dump($array["id"]);
           else{
             $aux[]=$array;
         //    dump($aux);
           }
 
-        }
+        }*/
         //$lines=$order_lines_array;
 /*
         foreach($lines as $line){
