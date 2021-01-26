@@ -72,6 +72,18 @@ class ERPStocksRepository extends ServiceEntityRepository
       return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
     }
 
+
+    public function stockVariantUpdate($variant_id, $store){
+      $query="SELECT id, quantity FROM erpstocks WHERE variant_id= :variant AND storelocation_id IN
+                  (SELECT id FROM erpstore_locations WHERE store_id IN
+                    (SELECT id FROM erpstores WHERE CODE= :store))
+              ORDER BY quantity DESC
+              LIMIT 1";
+      $params=['product' => $product_id, 'store' => $store];
+
+      return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+    }
+
     public function findInventoryStocks($company, $store=0, $location=0, $category=0){
       $query="SELECT stk.id as id,pr.code as product_code, pr.name as product_name,strl.name as location,stk.quantity as quantity,stk.lastinventorydate as lastinventorydate FROM erpstocks stk
                 LEFT JOIN erpproducts pr
