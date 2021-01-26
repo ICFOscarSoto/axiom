@@ -292,6 +292,11 @@ class ERPSalesOrders
      */
     private $shipmentdate;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $customernumber;
+
 
     public function getId(): ?int
     {
@@ -919,6 +924,18 @@ class ERPSalesOrders
     public function setShipmentdate(?\DateTimeInterface $shipmentdate): self
     {
         $this->shipmentdate = $shipmentdate;
+
+        return $this;
+    }
+
+    public function getCustomernumber(): ?int
+    {
+        return $this->customernumber;
+    }
+
+    public function setCustomernumber(?int $customernumber): self
+    {
+        $this->customernumber = $customernumber;
 
         return $this;
     }
