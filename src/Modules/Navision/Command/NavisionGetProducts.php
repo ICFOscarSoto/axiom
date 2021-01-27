@@ -596,9 +596,10 @@ public function importStocks(InputInterface $input, OutputInterface $output) {
       if($product) {
           if ($stock["variant"]==null) $old_stocks=$repositoryStocks->stockUpdate($product->getId(), $stock["almacen"]);
           else {
+            $output->writeln('El producto '.$product->getId().' tiene la variante '.$stock["variant"]);
             $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product->getId(),"variantvalue"=>$variantvalue]);
             $old_stocks=$repositoryStocks->stockVariantUpdate($productvariant->getId(), $stock["almacen"]);
-        }
+          }
           if($old_stocks!=null){
               $stock_old=$repositoryStocks->findOneBy(["id"=>$old_stocks[0]["id"], "deleted"=>0]);
               $output->writeln('Vamos a actualizar la linea '.$old_stocks[0]["id"].' del producto '.$product->getId().' en el almacen '.$stock["almacen"]);
