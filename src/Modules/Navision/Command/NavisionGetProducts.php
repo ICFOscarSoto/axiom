@@ -600,6 +600,8 @@ public function importStocks(InputInterface $input, OutputInterface $output) {
               $output->writeln('El producto '.$product->getId().' tiene la variante '.$stock["variant"]);
             }
             else $old_stocks=$repositoryStocks->stockUpdate($product->getId(), $stock["almacen"]);
+
+            if($old_stocks[0]["id"]!=null)
               $stock_old=$repositoryStocks->findOneBy(["id"=>$old_stocks[0]["id"], "deleted"=>0]);
               $output->writeln('Vamos a actualizar la linea '.$old_stocks[0]["id"].' del producto '.$product->getId().' en el almacen '.$stock["almacen"]);
               if ((int)$stock["stock"]<0) $quantity=0;
