@@ -194,6 +194,7 @@ class NavisionGetSalesOrders extends ContainerAwareCommand
          $obj->setTotalsurcharge(0);
          $obj->setTotalirpf(0);
          $obj->setTotal($object["total"]);
+         $obj->setExternalordernumber($object["external_document_number"]);
          $obj->setDateupd(new \Datetime());
 
          $this->doctrine->getManager()->persist($obj);
