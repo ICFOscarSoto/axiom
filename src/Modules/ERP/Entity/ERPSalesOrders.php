@@ -293,12 +293,9 @@ class ERPSalesOrders
     private $shipmentdate;
 
     /**
-     * @ORM\Column(type="integer", nullable=true)
+     * @ORM\Column(type="string", length=32, nullable=true)
      */
     private $externalordernumber;
-
-
-
 
     public function getId(): ?int
     {
@@ -930,12 +927,12 @@ class ERPSalesOrders
         return $this;
     }
 
-    public function getExternalordernumber(): ?int
+    public function getExternalordernumber(): ?string
     {
         return $this->externalordernumber;
     }
 
-    public function setExternalordernumber(?int $externalordernumber): self
+    public function setExternalordernumber(?string $externalordernumber): self
     {
         $this->externalordernumber = $externalordernumber;
 
