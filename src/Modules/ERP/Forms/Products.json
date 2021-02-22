@@ -36,10 +36,6 @@
 				{	"name": "bigsize", "cols": 2},
 				{	"name": "promotion", "cols": 2},
 				{	"name": "rotation", "cols": 2},
-				{ "name": "type", "cols": 6, "transform": {
-						"type":"option",
-						"options": {"Elige uno":"0", "Supplier": "1", "Customer": "2"}
-				}},
 				{	"name": "active", "cols": 2}
 			]
 		}]
