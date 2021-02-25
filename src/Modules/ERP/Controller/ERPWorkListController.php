@@ -68,7 +68,6 @@ class ERPWorkListController extends Controller
     if($id!=0){
 			$worklist=$worklistRepository->findBy(["user"=>$user, "active"=>true,"deleted"=>false]);
 			//	$worklist=$worklistRepository->findByUser($id);
-			dump($worklist);
 		}
 
 
@@ -108,7 +107,6 @@ class ERPWorkListController extends Controller
 
     //Get content of the json reques
     $fields=json_decode($request->getContent());
-		dump($fields);
 		$linenumIds=[];
     foreach ($fields->lines as $key => $value) {
 			if($value->code!=null)
