@@ -343,10 +343,21 @@ ERPSalesOrders:
   resource: 'App\Modules\ERP\Controller\ERPSalesOrdersController'
   type:      annotation
 
+ERPSalesTraceability:
+  resource: 'App\Modules\ERP\Controller\ERPSalesTraceabilityController'
+  type:      annotation
+
+ERPSalesTraceabilityHistory:
+  resource: 'App\Modules\ERP\Controller\ERPSalesTraceabilityHistoryController'
+  type:      annotation
+
 ERPPurchasesBudgets:
   resource: 'App\Modules\ERP\Controller\ERPPurchasesBudgetsController'
   type:      annotation
 
 ERPPurchasesOrders:
   resource: 'App\Modules\ERP\Controller\ERPPurchasesOrdersController'
+  type:      annotation
+ERPWorkList:
+  resource: 'App\Modules\ERP\Controller\ERPWorkListController'
   type:      annotation

@@ -1,0 +1,81 @@
+<script>
+    function addWorkListLine(){
+      var worklistLines=$("#worklist-lines");
+      var prevline=parseInt(worklistLines.attr("attr-numlines"));
+      var numLines=parseInt(worklistLines.attr("attr-numlines"))+1;
+      var code=$("#product-form-code-"+prevline).val();
+      if(code!="")
+      {
+         worklistLines.append(''+
+        '<div class="row no-gutters" attr-id="'+numLines+'"  id="worklist-line-'+numLines+'">'+
+        '<div class="col-12 d-block d-sm-none" style="height: 15px;">&nbsp;</div>'+
+        '<div class="col-2 d-block d-sm-none" style="top: 8px;">Cod. Prod.</div>'+
+        '	<div class="col-10 col-md-2">'+
+        '		<div class="form-group" style="margin-bottom: 0px;">'+
+        '			<div class="input-group" >'+
+        '				<a class="btn btn-white" attr-id="'+numLines+'" id="product-form-remove-'+numLines+'" style="position: absolute;height: 31px;left: 0px;padding: 9px 7px;z-index: 10;" href="#"> <i class="fa fa-remove"></i></a>'+
+        '				<input type="hidden" attr-id="'+numLines+'" id="product-form-line-id-'+numLines+'"><input type="hidden" attr-id="'+numLines+'" id="product-form-id-'+numLines+'"><input type="text" readonly attr-id="'+numLines+'" id="product-form-code-'+numLines+'" class="form-control" style="padding-left: 28px; border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Cod. Producto">'+
+        '				<div class="input-group-btn"><button type="button" attr-id="'+numLines+'" id="product-search-button-'+numLines+'" class="btn btn-white" style="height: 31px; border-radius: 0px;"><i class="fa fa-search"></i> </button></div>'+
+        '			</div>'+
+        '		</div>'+
+        '	</div>'+
+        ' <div class="col-2 d-block d-sm-none" style="top: 8px;">Nombre</div>'+
+        '	<div class="col-10 col-md-3"> <div class="form-group" style="margin-bottom: 0px;"> <input readonly type="text" id="product-form-name-'+numLines+'" class="form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Nombre"> </div> </div>'+
+        ' <div class="col-2 d-block d-sm-none" style="top: 8px;left: 5px;">Cantidad</div>'+
+        '	<div class="col-3 col-md-1"> <div class="form-group" style="margin-bottom: 0px;"> <input type="hidden" attr-id="1" value=0 id="product-form-base-total-'+numLines+'"><input type="text" attr-id="'+numLines+'" value=1 id="product-form-quantity-'+numLines+'" class="recalculate form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Cantidad"> </div> </div>'+
+        '<div class="col-2 d-block d-sm-none" style="top: 8px;">Ubicación</div>'+
+        '<div class="col-8 col-sm-2"> <div class="form-group" style="margin-bottom: 0px;"> <select attr-id="" id="product-form-location-'+numLines+'" class="form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Ubicación"></select> </div> </div>'+
+        '</div>');
+        worklistLines.attr("attr-numlines", numLines);
+      }
+      else{
+        toastr.warning("Por favor, elige un producto antes de añadir una nueva línea", "Alerta", confirmation);
+      }
+    }
+
+
+    function removeWorkListLine(numLine){
+    //  var workListLines=$("#worklist-lines");
+    //  var numLines=parseInt(worklistLines.attr("attr-numlines"));
+    //  if(numLines!=numLine){
+         //$("#document-line-"+numLine).remove();
+         $("#worklist-line-"+numLine).addClass("deleted");
+
+         $("#worklist-line-"+numLine).fadeOut();
+         $("#worklist-line-"+numLine).attr("id","worklist-line-deleted");
+         //documentLines.attr("attr-numlines",numLines);
+         //numerateLines();
+    //  }
+        saveLines();
+        numerateLines();
+        saveLines();
+      	window.history.back();
+    }
+
+
+    function numerateLines(){
+      var i=0;
+      var workListLines=$("#worklist-lines");
+      $("[id^='worklist-line-']:not(.deleted)").each(function() {
+          i++;
+          $(this).find("#product-form-id-"+$(this).attr("attr-id")).attr("attr-id",i);
+          $(this).find("#product-form-line-id-"+$(this).attr("attr-id")).attr("attr-id",i);
+          $(this).find("#product-form-line-id-"+$(this).attr("attr-id")).attr("id","product-form-line-id-"+i);
+          $(this).find("#product-form-id-"+$(this).attr("attr-id")).attr("id","product-form-id-"+i);
+          $(this).find("#product-form-code-"+$(this).attr("attr-id")).attr("attr-id",i);
+          $(this).find("#product-form-code-"+$(this).attr("attr-id")).attr("id","product-form-code-"+i);
+          $(this).find("#product-form-name-"+$(this).attr("attr-id")).attr("id","product-form-name-"+i);
+          $(this).find("#product-form-location-"+$(this).attr("attr-id")).attr("id","product-form-location-"+i);
+          $(this).find("#product-search-button-"+$(this).attr("attr-id")).attr("attr-id",i);
+          $(this).find("#product-search-button-"+$(this).attr("attr-id")).attr("id","product-search-button-"+i);
+          $(this).find("#product-form-quantity-"+$(this).attr("attr-id")).attr("attr-id",i);
+          $(this).find("#product-form-quantity-"+$(this).attr("attr-id")).attr("id","product-form-quantity-"+i);
+          $(this).find("#product-form-remove-"+$(this).attr("attr-id")).attr("attr-id",i);
+          $(this).find("#product-form-remove-"+$(this).attr("attr-id")).attr("id","product-form-remove-"+i);
+          $(this).attr('attr-id',i);
+          $(this).attr('id','worklist-line-'+i);
+      });
+      worklistLines.attr("attr-numlines", i);
+    }
+
+</script>
