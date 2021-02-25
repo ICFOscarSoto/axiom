@@ -27,6 +27,7 @@
         '<div class="col-8 col-sm-2"> <div class="form-group" style="margin-bottom: 0px;"> <select attr-id="" id="product-form-location-'+numLines+'" class="form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Ubicación"></select> </div> </div>'+
         '</div>');
         worklistLines.attr("attr-numlines", numLines);
+        numerateLines();
       }
       else{
         toastr.warning("Por favor, elige un producto antes de añadir una nueva línea", "Alerta", confirmation);
@@ -46,10 +47,10 @@
          //documentLines.attr("attr-numlines",numLines);
          //numerateLines();
     //  }
-        saveLines();
+        //saveLines();
         numerateLines();
-        saveLines();
-      	window.history.back();
+      //  saveLines();
+      	//window.history.back();
     }
 
 

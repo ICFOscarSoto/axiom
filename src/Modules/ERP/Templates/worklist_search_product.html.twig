@@ -63,14 +63,14 @@ $(document).ready(function() {
     $("#product-search-modal-form").attr("attr-id",$(this).attr("attr-id"));
     $("#product-search-modal-form").modal('show');
   });
-
+/*
   $('body').on('keypress', "[id^='product-form-code-']", function(e) {
       var code = e.keyCode || e.which;
        if(code == 13) {
          productSearch($(this).attr("attr-id"), $(this).val(), productFields, productSearchfields);
        }
     });
-  /*
+  
   $('body').on('change', "[id^='product-form-code-']", function(e) {
        productSearch($(this).attr("attr-id"), $(this).val(), productFields, productSearchfields);
   });
@@ -82,7 +82,7 @@ $(document).ready(function() {
     $("#product-form-name-"+$("#product-search-modal-form").attr("attr-id")).val($(this).parent().parent().parent().children('td').eq(2).text());
     $("#product-form-name-"+$("#product-search-modal-form").attr("attr-id")).trigger('change');
     $("#product-search-modal-form").modal('toggle');
-    
+
   //  checkList();
   });
 });
