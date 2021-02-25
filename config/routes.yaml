@@ -342,7 +342,6 @@ ERPSalesBudgets:
 ERPSalesOrders:
   resource: 'App\Modules\ERP\Controller\ERPSalesOrdersController'
   type:      annotation
-     annotation
 
 ERPPurchasesBudgets:
   resource: 'App\Modules\ERP\Controller\ERPPurchasesBudgetsController'
