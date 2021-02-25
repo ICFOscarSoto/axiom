@@ -342,14 +342,7 @@ ERPSalesBudgets:
 ERPSalesOrders:
   resource: 'App\Modules\ERP\Controller\ERPSalesOrdersController'
   type:      annotation
-
-ERPSalesTraceability:
-  resource: 'App\Modules\ERP\Controller\ERPSalesTraceabilityController'
-  type:      annotation
-
-ERPSalesTraceabilityHistory:
-  resource: 'App\Modules\ERP\Controller\ERPSalesTraceabilityHistoryController'
-  type:      annotation
+     annotation
 
 ERPPurchasesBudgets:
   resource: 'App\Modules\ERP\Controller\ERPPurchasesBudgetsController'
