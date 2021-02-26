@@ -77,6 +77,8 @@ class NavisionGetProducts extends ContainerAwareCommand
       break;
       case 'prices': $this->importPrices($input, $output);
       break;
+      case 'updatePrices': $this->updatePrices($input, $output);
+      break;
       case 'stocks': $this->importStocks($input, $output);
       break;
       case 'increments': $this->importIncrements($input, $output);
@@ -115,7 +117,7 @@ class NavisionGetProducts extends ContainerAwareCommand
     }
   }
 
-    public function importProduct(InputInterface $input, OutputInterface $output){
+public function importProduct(InputInterface $input, OutputInterface $output){
       //------   Create Lock Mutex    ------
       if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
           $fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetProducts-importProduct.lock', 'c');
@@ -139,6 +141,7 @@ class NavisionGetProducts extends ContainerAwareCommand
       $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getProducts.php?from='.$navisionSync->getMaxtimestamp());
       $objects=json_decode($json, true);
       $objects=$objects[0];
+      $output->writeln('conseguimos los productos');
       $repositoryCategory=$this->doctrine->getRepository(ERPCategories::class);
       $repositorySupliers=$this->doctrine->getRepository(ERPSuppliers::class);
       $repository=$this->doctrine->getRepository(ERPProducts::class);
@@ -164,7 +167,7 @@ class NavisionGetProducts extends ContainerAwareCommand
           $category=$repositoryCategory->findOneBy(["name"=>"Sin Categoria"]);
           $obj->setCategory($category);
         }
-         $supplier=$repositorySupliers->findOneBy(["code"=>$object["Supplier"]]);
+         $supplier=$repositorySupliers->findOneBy(["code"=>$object["code"]]);
          // Comprobamos si el producto no tiene movimientos desde 2017, en caso de que no tenga lo desactivamos
          $json2=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-clearProducts.php?from='.$object["code"]);
          $movs=json_decode($json2, true);
@@ -1331,6 +1334,30 @@ public function updateNames(InputInterface $input, OutputInterface $output){
   $this->doctrine->getManager()->flush();
 }
 
+
+public function updatePrices(InputInterface $input, OutputInterface $output){
+  $output->writeln('* Actualiando precios cientos en Axiom....');
+  $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-updateProducts.php');
+  $objects=json_decode($json, true);
+  $objects=$objects[0];
+  foreach ($objects["class"] as $object){
+    $productsRepository=$this->doctrine->getRepository(ERPProducts::class);
+    $product=$productsRepository->findOneBy(["code"=>$object["code"]]);
+    $packing=1;
+    if ($object["Unidad medida precio"]=='C') $packing=100;
+    else if ($object["Unidad medida precio"]=='M') $packing=1000;
+    $product->setPurchasepacking($packing);
+    if ($packing!=1){
+      $product->setShoppingPrice($product->getShoppingPrice()/$packing);
+      $this->doctrine->getManager()->merge($product);
+      $this->doctrine->getManager()->flush();
+      $this->doctrine->getManager()->clear();
+    }
+
+  }
+}
+
+
 public function updateManufacturers(InputInterface $input, OutputInterface $output){
   //------   Create Lock Mutex    ------
   if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
@@ -1401,6 +1428,7 @@ public function exportNames(InputInterface $input, OutputInterface $output){
       }
     }
 }
+
 
 
 public function createProducts(InputInterface $input, OutputInterface $output){
