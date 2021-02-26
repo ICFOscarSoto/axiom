@@ -1348,7 +1348,7 @@ public function updatePrices(InputInterface $input, OutputInterface $output){
     else if ($object["Unidad medida precio"]=='M') $packing=1000;
     $product->setPurchasepacking($packing);
     if ($packing!=1){
-      $product->setShoppingPrice($product->getShoppingPrice()/$packing);
+      $product->setShoppingPrice($object["ShoppingPrice"]/$packing);
       $this->doctrine->getManager()->merge($product);
       $this->doctrine->getManager()->flush();
       $this->doctrine->getManager()->clear();
