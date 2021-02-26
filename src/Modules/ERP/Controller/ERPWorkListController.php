@@ -57,7 +57,7 @@ class ERPWorkListController extends Controller
 		$classProductsUtils="\App\Modules\ERP\Utils\ERPProductsUtils";
 		$productsutils = new $classProductsUtils();
 		$productslist=$productsutils->formatList($this->getUser());
-		$productslist["fieldButtons"]=[["id"=>"select", "type" => "default", "default"=>true, "icon" => "fa fa-dot-circle-o", "name" => "editar", "route" => null, "actionType" => "background", "modal"=>"", "confirm" => false, "tooltip" =>""]];
+		$productslist["fieldButtons"]=[["id"=>"select", "type" => "default", "default"=>true, "icon" => "fa fa-plus-circle", "name" => "editar", "route" => null, "actionType" => "background", "modal"=>"", "confirm" => false, "tooltip" =>""]];
 		$productslist["topButtons"]=[];
 
     $new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-plus"];
@@ -141,6 +141,13 @@ class ERPWorkListController extends Controller
     //return new JsonResponse(["result"=>1]);
   }
 
-
-
+	/**
+   * @Route("/{_locale}/ERP/worklist/empty/{id}", name="dataERPEmptyWorkList", defaults={"id"=0}))
+   */
+  public function empty($id, RouterInterface $router,Request $request){
+		  $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			$worklistRepository=$this->getDoctrine()->getRepository(ERPWorkList::class);
+			$worklistRepository->emptyList($id);
+			return new JsonResponse(["result"=>1]);
+	}
 }

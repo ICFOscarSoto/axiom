@@ -48,4 +48,11 @@ class ERPWorkListRepository extends ServiceEntityRepository
     }
     */
 
+    public function emptyList($id){
+      $query='DELETE FROM erpwork_list
+      where user_id=:id';
+      $params=['id' => $id];
+      $this->getEntityManager()->getConnection()->executeQuery($query, $params);
+    }
+
 }

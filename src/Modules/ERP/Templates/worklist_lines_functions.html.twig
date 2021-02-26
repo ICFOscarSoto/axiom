@@ -4,8 +4,8 @@
       var prevline=parseInt(worklistLines.attr("attr-numlines"));
       var numLines=parseInt(worklistLines.attr("attr-numlines"))+1;
       var code=$("#product-form-code-"+prevline).val();
-      if(code!="")
-      {
+    //  if(code!="")
+    //  {
          worklistLines.append(''+
         '<div class="row no-gutters" attr-id="'+numLines+'"  id="worklist-line-'+numLines+'">'+
         '<div class="col-12 d-block d-sm-none" style="height: 15px;">&nbsp;</div>'+
@@ -28,10 +28,10 @@
         '</div>');
         worklistLines.attr("attr-numlines", numLines);
         numerateLines();
-      }
-      else{
-        toastr.warning("Por favor, elige un producto antes de añadir una nueva línea", "Alerta", confirmation);
-      }
+    //  }
+  //    else{
+  //      toastr.warning("Por favor, elige un producto antes de añadir una nueva línea", "Alerta", confirmation);
+  //    }
     }
 
 
@@ -47,10 +47,10 @@
          //documentLines.attr("attr-numlines",numLines);
          //numerateLines();
     //  }
-        //saveLines();
+        saveLines();
         numerateLines();
       //  saveLines();
-      	//window.history.back();
+
     }
 
 
