@@ -535,7 +535,7 @@ public function groupPrices(InputInterface $input, OutputInterface $output){
 
 public function updateProducts(InputInterface $input, OutputInterface $output){
   $repository=$this->doctrine->getRepository(ERPProducts::class);
-  $products=$repository->findBy(['shoppingPrice'=>0]);
+  $products=$repository->findBy(['shoppingPrice'=>0, 'active'=>1]);
   foreach ($products as $product){
     $output->writeln("Cambiando el producto ".$product->getCode());
     $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getProduct.php?product='.$product->getCode());
@@ -566,7 +566,7 @@ public function updateProducts(InputInterface $input, OutputInterface $output){
     }
     if (!$product->getnetprice()){
       $product->setPVPR($object["ShoppingPrice"]);
-      $product->setShoppingPrice($product->getPVPR()*(1-$product->getShoppingDiscount($this->doctrine)/100));  
+      $product->setShoppingPrice($product->getPVPR()*(1-$product->getShoppingDiscount($this->doctrine)/100));
     } else {
       $product->setPVPR(0);
       if ($product->getPurchasepacking()!=0) $product->setShoppingPrice($object["ShoppingPrice"]/$product->getPurchasepacking());
