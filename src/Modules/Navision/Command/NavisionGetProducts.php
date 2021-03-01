@@ -161,13 +161,12 @@ public function importProduct(InputInterface $input, OutputInterface $output){
           $company=$repositoryCompanies->find(2);
           $obj->setCompany($company);
           $obj->setDateadd(new \Datetime());
-          $obj->setDateupd(new \Datetime());
           $obj->setDeleted(0);
           $obj->setName($object["Description"]);
           $category=$repositoryCategory->findOneBy(["name"=>"Sin Categoria"]);
           $obj->setCategory($category);
         }
-         $supplier=$repositorySupliers->findOneBy(["code"=>$object["code"]]);
+         $supplier=$repositorySupliers->findOneBy(["code"=>$object["Supplier"]]);
          // Comprobamos si el producto no tiene movimientos desde 2017, en caso de que no tenga lo desactivamos
          $json2=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-clearProducts.php?from='.$object["code"]);
          $movs=json_decode($json2, true);
@@ -204,6 +203,7 @@ public function importProduct(InputInterface $input, OutputInterface $output){
            $obj->setShoppingPrice($object["ShoppingPrice"]);
          }
          $obj->setSupplier($supplier);
+         $obj->setDateupd(new \Datetime());
          $repositoryManufacturers=$this->doctrine->getRepository(ERPManufacturers::class);
          $manufacturer=$repositoryManufacturers->findOneBy(["code"=>$object["Manufacturer"]]);
          if($manufacturer!=NULL) $obj->setManufacturer($manufacturer);
@@ -399,8 +399,6 @@ public function importPrices(InputInterface $input, OutputInterface $output) {
       $products=$repository->productsLimit(intval($count*$page),intval($page));
       $count++;
 
-            //$products=$repository->findAll();
-            //Disable SQL logger
            foreach($products as $id) {
               $product=$repository->findOneBy(["id"=>$id, "company"=>2]);
               if ($product->getSupplier()==null or $product->getCategory()==null)  continue;
@@ -457,6 +455,28 @@ public function importPrices(InputInterface $input, OutputInterface $output) {
   //------   Critical Section END   ------
   //------   Remove Lock Mutex    ------
   fclose($fp);
+}
+
+public function updatePrices(InputInterface $input, OutputInterface $output){
+  $output->writeln('* Actualiando precios cientos en Axiom....');
+  $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-updateProducts.php');
+  $objects=json_decode($json, true);
+  $objects=$objects[0];
+  foreach ($objects["class"] as $object){
+    $productsRepository=$this->doctrine->getRepository(ERPProducts::class);
+    $product=$productsRepository->findOneBy(["code"=>$object["code"]]);
+    $packing=1;
+    if ($object["Unidad medida precio"]=='C') $packing=100;
+    else if ($object["Unidad medida precio"]=='M') $packing=1000;
+    $product->setPurchasepacking($packing);
+    if ($packing!=1){
+      $product->setShoppingPrice($object["ShoppingPrice"]/$packing);
+      $this->doctrine->getManager()->merge($product);
+      $this->doctrine->getManager()->flush();
+      $this->doctrine->getManager()->clear();
+    }
+
+  }
 }
 
 
@@ -521,7 +541,7 @@ public function updateProducts(InputInterface $input, OutputInterface $output){
     $repositorySupliers=$this->doctrine->getRepository(ERPSuppliers::class);
     $supplier=$repositorySupliers->findOneBy(["code"=>$object["Supplier"]]);
     // Comprobamos si el producto no tiene movimientos desde 2017, en caso de que no tenga lo desactivamos
-    /*$json2=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-clearProducts.php?from='.$product->getCode());
+    $json2=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-clearProducts.php?from='.$product->getCode());
     $movs=json_decode($json2, true);
     $movs=$movs[0];
     $repositoryTaxes=$this->doctrine->getRepository(GlobaleTaxes::class);
@@ -546,8 +566,9 @@ public function updateProducts(InputInterface $input, OutputInterface $output){
     } else {
       $product->setPVPR(0);
       $product->setShoppingPrice($object["ShoppingPrice"]);
-    }*/
+    }
     $product->setSupplier($supplier);
+    $product->setDateupd(new \Datetime());
     $repositoryManufacturers=$this->doctrine->getRepository(ERPManufacturers::class);
     $manufacturer=$repositoryManufacturers->findOneBy(["code"=>$object["Manufacturer"]]);
     if($manufacturer!=NULL) $product->setManufacturer($manufacturer);
@@ -1139,7 +1160,6 @@ public function variantColor($nameVariantValue){
   return $nameVariantValue;
 }
 
-
 public function disableBlocked(InputInterface $input, OutputInterface $output){
   $repository=$this->doctrine->getRepository(ERPEAN13::class);
   $datetime=new \DateTime();
@@ -1232,7 +1252,6 @@ public function importReferences(InputInterface $input, OutputInterface $output)
   fclose($fp);
 }
 
-
 public function createOwnBarcodes(InputInterface $input, OutputInterface $output){
   //------   Create Lock Mutex    ------
   if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
@@ -1285,8 +1304,6 @@ public function createOwnBarcodes(InputInterface $input, OutputInterface $output
 
 }
 
-
-
 public function updateNames(InputInterface $input, OutputInterface $output){
   //------   Create Lock Mutex    ------
   if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
@@ -1332,29 +1349,6 @@ public function updateNames(InputInterface $input, OutputInterface $output){
   $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
   $this->doctrine->getManager()->persist($navisionSync);
   $this->doctrine->getManager()->flush();
-}
-
-
-public function updatePrices(InputInterface $input, OutputInterface $output){
-  $output->writeln('* Actualiando precios cientos en Axiom....');
-  $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-updateProducts.php');
-  $objects=json_decode($json, true);
-  $objects=$objects[0];
-  foreach ($objects["class"] as $object){
-    $productsRepository=$this->doctrine->getRepository(ERPProducts::class);
-    $product=$productsRepository->findOneBy(["code"=>$object["code"]]);
-    $packing=1;
-    if ($object["Unidad medida precio"]=='C') $packing=100;
-    else if ($object["Unidad medida precio"]=='M') $packing=1000;
-    $product->setPurchasepacking($packing);
-    if ($packing!=1){
-      $product->setShoppingPrice($object["ShoppingPrice"]/$packing);
-      $this->doctrine->getManager()->merge($product);
-      $this->doctrine->getManager()->flush();
-      $this->doctrine->getManager()->clear();
-    }
-
-  }
 }
 
 
