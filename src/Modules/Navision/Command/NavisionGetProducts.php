@@ -469,16 +469,17 @@ public function updatePrices(InputInterface $input, OutputInterface $output){
     if ($object["Unidad medida precio"]=='C') $packing=100;
     else if ($object["Unidad medida precio"]=='M') $packing=1000;
     $product->setPurchasepacking($packing);
+    if ($product->getNetprice()==0)  $product->setShoppingPrice($product->getPVPR()*(1-$product->getShoppingDiscount($this->doctrine)/100));
+
     if ($packing!=1){
       $product->setShoppingPrice($object["ShoppingPrice"]/$packing);
-      $product->calculatePVP($this->doctrine);
-      $product->calculateIncrementByProduct($this->doctrine);
-      $product->calculateCustomerIncrementsByProduct($this->doctrine);
-      $this->doctrine->getManager()->merge($product);
-      $this->doctrine->getManager()->flush();
-      $this->doctrine->getManager()->clear();
     }
-
+    $product->calculatePVP($this->doctrine);
+    $product->calculateIncrementByProduct($this->doctrine);
+    $product->calculateCustomerIncrementsByProduct($this->doctrine);
+    $this->doctrine->getManager()->merge($product);
+    $this->doctrine->getManager()->flush();
+    $this->doctrine->getManager()->clear();
   }
 }
 
@@ -565,7 +566,7 @@ public function updateProducts(InputInterface $input, OutputInterface $output){
     }
     if (!$product->getnetprice()){
       $product->setPVPR($object["ShoppingPrice"]);
-      $product->setShoppingPrice(0);
+      $product->setShoppingPrice($product->getPVPR()*(1-$product->getShoppingDiscount($this->doctrine)/100));  
     } else {
       $product->setPVPR(0);
       if ($product->getPurchasepacking()!=0) $product->setShoppingPrice($object["ShoppingPrice"]/$product->getPurchasepacking());
