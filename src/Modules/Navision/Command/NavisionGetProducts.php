@@ -511,7 +511,7 @@ public function groupPrices(InputInterface $input, OutputInterface $output){
 
 public function updateProducts(InputInterface $input, OutputInterface $output){
   $repository=$this->doctrine->getRepository(ERPProducts::class);
-  $products=$repository->findBy(['PVP'=>0, 'PVPR'=>0]);
+  $products=$repository->findBy(['supplier'=>null]);
   foreach ($products as $product){
     $output->writeln("Cambiando el producto ".$product->getCode());
     $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getProduct.php?product='.$product->getCode());
@@ -521,7 +521,7 @@ public function updateProducts(InputInterface $input, OutputInterface $output){
     $repositorySupliers=$this->doctrine->getRepository(ERPSuppliers::class);
     $supplier=$repositorySupliers->findOneBy(["code"=>$object["Supplier"]]);
     // Comprobamos si el producto no tiene movimientos desde 2017, en caso de que no tenga lo desactivamos
-    $json2=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-clearProducts.php?from='.$product->getCode());
+    /*$json2=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-clearProducts.php?from='.$product->getCode());
     $movs=json_decode($json2, true);
     $movs=$movs[0];
     $repositoryTaxes=$this->doctrine->getRepository(GlobaleTaxes::class);
@@ -546,7 +546,7 @@ public function updateProducts(InputInterface $input, OutputInterface $output){
     } else {
       $product->setPVPR(0);
       $product->setShoppingPrice($object["ShoppingPrice"]);
-    }
+    }*/
     $product->setSupplier($supplier);
     $repositoryManufacturers=$this->doctrine->getRepository(ERPManufacturers::class);
     $manufacturer=$repositoryManufacturers->findOneBy(["code"=>$object["Manufacturer"]]);
