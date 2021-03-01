@@ -568,7 +568,7 @@ public function updateProducts(InputInterface $input, OutputInterface $output){
       $product->setShoppingPrice(0);
     } else {
       $product->setPVPR(0);
-      if ($product->getPurchasepacking() is not null ) $product->setShoppingPrice($object["ShoppingPrice"]/$product->getPurchasepacking());
+      if ($product->getPurchasepacking()!=0) $product->setShoppingPrice($object["ShoppingPrice"]/$product->getPurchasepacking());
       else $product->setShoppingPrice($object["ShoppingPrice"]);
     }
     $product->setSupplier($supplier);
