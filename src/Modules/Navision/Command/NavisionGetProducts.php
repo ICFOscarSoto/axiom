@@ -565,6 +565,10 @@ public function updateProducts(InputInterface $input, OutputInterface $output){
       }
     }
     if (!$product->getnetprice()){
+      if ($product->getPurchasepacking()!=0){
+        $product->setPVPR($object["ShoppingPrice"]/$product->getPurchasepacking());
+        $product->setShoppingPrice(($product->getPVPR()*(1-$product->getShoppingDiscount($this->doctrine)/100))/$product->getPurchasepacking());
+      }
       $product->setPVPR($object["ShoppingPrice"]);
       $product->setShoppingPrice($product->getPVPR()*(1-$product->getShoppingDiscount($this->doctrine)/100));
     } else {
