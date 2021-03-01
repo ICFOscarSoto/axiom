@@ -471,6 +471,9 @@ public function updatePrices(InputInterface $input, OutputInterface $output){
     $product->setPurchasepacking($packing);
     if ($packing!=1){
       $product->setShoppingPrice($object["ShoppingPrice"]/$packing);
+      $product->calculatePVP($this->doctrine);
+      $product->calculateIncrementByProduct($this->doctrine);
+      $product->calculateCustomerIncrementsByProduct($this->doctrine);
       $this->doctrine->getManager()->merge($product);
       $this->doctrine->getManager()->flush();
       $this->doctrine->getManager()->clear();
@@ -531,7 +534,7 @@ public function groupPrices(InputInterface $input, OutputInterface $output){
 
 public function updateProducts(InputInterface $input, OutputInterface $output){
   $repository=$this->doctrine->getRepository(ERPProducts::class);
-  $products=$repository->findBy(['supplier'=>null]);
+  $products=$repository->findBy(['shoppingPrice'=>0]);
   foreach ($products as $product){
     $output->writeln("Cambiando el producto ".$product->getCode());
     $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getProduct.php?product='.$product->getCode());
@@ -572,9 +575,11 @@ public function updateProducts(InputInterface $input, OutputInterface $output){
     $repositoryManufacturers=$this->doctrine->getRepository(ERPManufacturers::class);
     $manufacturer=$repositoryManufacturers->findOneBy(["code"=>$object["Manufacturer"]]);
     if($manufacturer!=NULL) $product->setManufacturer($manufacturer);
+    $product->calculatePVP($this->doctrine);
+    $product->calculateIncrementByProduct($this->doctrine);
+    $product->calculateCustomerIncrementsByProduct($this->doctrine);
     $this->doctrine->getManager()->merge($product);
     $this->doctrine->getManager()->flush();
-    $product->priceCalculated($this->doctrine);
     $this->doctrine->getManager()->clear();
   }
 }
