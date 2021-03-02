@@ -463,8 +463,10 @@ public function updatePrices(InputInterface $input, OutputInterface $output){
   $objects=json_decode($json, true);
   $objects=$objects[0];
   foreach ($objects["class"] as $object){
+
     $productsRepository=$this->doctrine->getRepository(ERPProducts::class);
     $product=$productsRepository->findOneBy(["code"=>$object["code"]]);
+    $output->writeln("Comprobando precio del producto ".$product->getCode());
     $packing=1;
     if ($object["Unidad medida precio"]=='C') $packing=100;
     else if ($object["Unidad medida precio"]=='M') $packing=1000;
@@ -476,6 +478,7 @@ public function updatePrices(InputInterface $input, OutputInterface $output){
     }
 
     $product->calculatePVP($this->doctrine);
+    $this->doctrine->getManager()->merge($product);
     $product=$product->calculateIncrementByProduct($this->doctrine);
     $product=$product->calculateCustomerIncrementsByProduct($this->doctrine);
     $this->doctrine->getManager()->merge($product);
