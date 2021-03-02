@@ -586,7 +586,7 @@ public function updateProducts(InputInterface $input, OutputInterface $output){
     $product->calculateCustomerIncrementsByProduct($this->doctrine);
     $this->doctrine->getManager()->merge($product);
     $this->doctrine->getManager()->flush();
-    $this->doctrine->getManager()->clear($product);
+    $this->doctrine->getManager()->clear();
   }
 }
 
