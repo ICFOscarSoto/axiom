@@ -587,10 +587,10 @@ public function updateProducts(InputInterface $input, OutputInterface $output){
     $product->calculateCustomerIncrementsByProduct($this->doctrine);
     $repositoryProductPrices=$this->doctrine->getRepository(ERPProductPrices::class);
     $productPrices=$repositoryProductPrices->findBy(['product'=>$product->getId()]);
-    $this->doctrine->getManager()->persist($product);
+    $this->doctrine->getManager()->merge($product);
     foreach ($productPrices as $productPrice){
       $productPrice=$repositoryProductPrices->findOneBy(['id'=>$productPrice]);
-      $this->doctrine->getManager()->persist($productPrice);
+      $this->doctrine->getManager()->merge($productPrice);
     }
     $this->doctrine->getManager()->flush();
     $this->doctrine->getManager()->clear();
