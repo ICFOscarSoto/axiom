@@ -584,8 +584,8 @@ public function updateProducts(InputInterface $input, OutputInterface $output){
     if($manufacturer!=NULL) $product->setManufacturer($manufacturer);
 
     $product->calculatePVP($this->doctrine);
-    $product->calculateIncrementByProduct($this->doctrine);
-    $product->calculateCustomerIncrementsByProduct($this->doctrine);
+    $product=$product->calculateIncrementByProduct($this->doctrine);
+    $product=$product->calculateCustomerIncrementsByProduct($this->doctrine);
     $this->doctrine->getManager()->persist($product);
     $this->doctrine->getManager()->flush();
     $this->doctrine->getManager()->clear();

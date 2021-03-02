@@ -859,10 +859,11 @@ class ERPProducts
                    $em->persist($productpricesEntity);
              }
              $em->flush();
+             $em->clear();
           }
 
          }
-
+         return $this;
      }
 
 
@@ -920,10 +921,10 @@ class ERPProducts
 
              //$em->persist($productEntity);
              $em->flush();
-
+             $em->clear();
            }
          }
-
+         return $this;
 
      }
 
