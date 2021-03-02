@@ -471,6 +471,7 @@ public function updatePrices(InputInterface $input, OutputInterface $output){
     if ($object["Unidad medida precio"]=='C') $packing=100;
     else if ($object["Unidad medida precio"]=='M') $packing=1000;
     $product->setPurchasepacking($packing);
+    $output->writeln("  -> Packing ".$packing);
     if ($product->getNetprice()==0)  $product->setShoppingPrice($product->getPVPR()*(1-$product->getShoppingDiscount($this->doctrine)/100));
 
     if ($packing!=1){
