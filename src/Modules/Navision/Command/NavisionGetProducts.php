@@ -588,7 +588,8 @@ public function updateProducts(InputInterface $input, OutputInterface $output){
     $repositoryProductPrices=$this->doctrine->getRepository(ERPProductPrices::class);
     $productPrices=$repositoryProductPrices->findBy(['product'=>$product->getId()]);
     foreach ($productPrices as $productPrice){
-      $this->doctrine->getManager()->merge($productPrices);
+      $productPrice=$repositoryProductPrices->findOneBy(['id'=>$productPrice]);
+      $this->doctrine->getManager()->merge($productPrice);
       $this->doctrine->getManager()->flush();
     }
     $this->doctrine->getManager()->merge($product);
