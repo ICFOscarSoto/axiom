@@ -485,6 +485,7 @@ public function updatePrices(InputInterface $input, OutputInterface $output){
     $this->doctrine->getManager()->merge($product);
     $this->doctrine->getManager()->flush();
     $this->doctrine->getManager()->clear();
+    $output->writeln("  -> Packing ".$product->getPurchasepacking());
   }
 }
 
