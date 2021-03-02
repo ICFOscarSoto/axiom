@@ -581,18 +581,17 @@ public function updateProducts(InputInterface $input, OutputInterface $output){
     $repositoryManufacturers=$this->doctrine->getRepository(ERPManufacturers::class);
     $manufacturer=$repositoryManufacturers->findOneBy(["code"=>$object["Manufacturer"]]);
     if($manufacturer!=NULL) $product->setManufacturer($manufacturer);
+
     $product->calculatePVP($this->doctrine);
     $product->calculateIncrementByProduct($this->doctrine);
     $product->calculateCustomerIncrementsByProduct($this->doctrine);
-
     $repositoryProductPrices=$this->doctrine->getRepository(ERPProductPrices::class);
     $productPrices=$repositoryProductPrices->findBy(['product'=>$product->getId()]);
+    $this->doctrine->getManager()->persist($product);
     foreach ($productPrices as $productPrice){
       $productPrice=$repositoryProductPrices->findOneBy(['id'=>$productPrice]);
       $this->doctrine->getManager()->persist($productPrice);
-      $this->doctrine->getManager()->flush();
     }
-    $this->doctrine->getManager()->persist($product);
     $this->doctrine->getManager()->flush();
     $this->doctrine->getManager()->clear();
   }
