@@ -473,7 +473,7 @@ public function updatePrices(InputInterface $input, OutputInterface $output){
     $product->setPurchasepacking($packing);
     $this->doctrine->getManager()->persist($product);
     $this->doctrine->getManager()->flush();
-    $product=$productsRepository->findOneBy(["code"=>$object["code"]]);
+    /*$product=$productsRepository->findOneBy(["code"=>$object["code"]]);
     $output->writeln("  -> Packing ".$packing);
     if ($product->getNetprice()==0)  $product->setShoppingPrice($product->getPVPR()*(1-$product->getShoppingDiscount($this->doctrine)/100));
 
@@ -488,7 +488,7 @@ public function updatePrices(InputInterface $input, OutputInterface $output){
     $this->doctrine->getManager()->merge($product);
     $this->doctrine->getManager()->flush();
     $this->doctrine->getManager()->clear();
-    $output->writeln("  -> Packing ".$product->getPurchasepacking());
+    $output->writeln("  -> Packing ".$product->getPurchasepacking());*/
   }
 }
 
