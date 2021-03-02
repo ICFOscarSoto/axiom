@@ -474,9 +474,10 @@ public function updatePrices(InputInterface $input, OutputInterface $output){
     if ($packing!=1){
       $product->setShoppingPrice($object["ShoppingPrice"]/$packing);
     }
+
     $product->calculatePVP($this->doctrine);
-    $product->calculateIncrementByProduct($this->doctrine);
-    $product->calculateCustomerIncrementsByProduct($this->doctrine);
+    $product=$product->calculateIncrementByProduct($this->doctrine);
+    $product=$product->calculateCustomerIncrementsByProduct($this->doctrine);
     $this->doctrine->getManager()->merge($product);
     $this->doctrine->getManager()->flush();
     $this->doctrine->getManager()->clear();
@@ -535,7 +536,7 @@ public function groupPrices(InputInterface $input, OutputInterface $output){
 
 public function updateProducts(InputInterface $input, OutputInterface $output){
   $repository=$this->doctrine->getRepository(ERPProducts::class);
-  $products=$repository->findBy(['purchasepacking'=>0]);
+  $products=$repository->findBy(['shoppingPrice'=>0]);
   $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
   foreach ($products as $product){
     $output->writeln("Cambiando el producto ".$product->getCode());
