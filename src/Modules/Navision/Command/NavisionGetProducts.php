@@ -584,6 +584,13 @@ public function updateProducts(InputInterface $input, OutputInterface $output){
     $product->calculatePVP($this->doctrine);
     $product->calculateIncrementByProduct($this->doctrine);
     $product->calculateCustomerIncrementsByProduct($this->doctrine);
+
+    $repositoryProductPrices=$this->doctrine->getRepository(ERPProductPrices::class);
+    $productPrices=$repositoryProductPrices->findBy(['product_id'=>$product->getId()]);
+    foreach ($productPrices as $productPrice){
+      $this->doctrine->getMagange()->merge($productPrices);
+      $this->doctrine->getManager()->flush();
+    }
     $this->doctrine->getManager()->merge($product);
     $this->doctrine->getManager()->flush();
     $this->doctrine->getManager()->clear();
