@@ -20,7 +20,7 @@ class ERPProductPrices
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPProducts")
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPProducts", cascade={"persist"})
      * @ORM\JoinColumn(nullable=false)
      */
     private $product;
