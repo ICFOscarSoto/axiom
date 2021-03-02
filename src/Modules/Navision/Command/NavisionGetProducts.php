@@ -587,8 +587,8 @@ public function updateProducts(InputInterface $input, OutputInterface $output){
     $product->calculateCustomerIncrementsByProduct($this->doctrine);
     $this->doctrine->getManager()->persist($product);
     $this->doctrine->getManager()->flush();
-    }
     $this->doctrine->getManager()->clear();
+    }
 }
 
 public function importStocks(InputInterface $input, OutputInterface $output) {
