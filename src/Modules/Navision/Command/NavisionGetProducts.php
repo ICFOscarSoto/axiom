@@ -479,7 +479,8 @@ public function updatePrices(InputInterface $input, OutputInterface $output){
     }
 
     $product->calculatePVP($this->doctrine);
-    $this->doctrine->getManager()->merge($product);
+    $this->doctrine->getManager()->persist($product);
+    $this->doctrine->getManager()->flush();
     $product=$product->calculateIncrementByProduct($this->doctrine);
     $product=$product->calculateCustomerIncrementsByProduct($this->doctrine);
     $this->doctrine->getManager()->merge($product);
