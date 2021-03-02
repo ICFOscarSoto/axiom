@@ -535,7 +535,7 @@ public function groupPrices(InputInterface $input, OutputInterface $output){
 
 public function updateProducts(InputInterface $input, OutputInterface $output){
   $repository=$this->doctrine->getRepository(ERPProducts::class);
-  $products=$repository->findBy(['shoppingPrice'=>0, 'active'=>1]);
+  $products=$repository->findBy(['shoppingPrice'=>0]);
   $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
   foreach ($products as $product){
     $output->writeln("Cambiando el producto ".$product->getCode());
