@@ -535,7 +535,7 @@ public function groupPrices(InputInterface $input, OutputInterface $output){
 
 public function updateProducts(InputInterface $input, OutputInterface $output){
   $repository=$this->doctrine->getRepository(ERPProducts::class);
-  $products=$repository->findBy(['shoppingPrice'=>0, 'active'=>1]);
+  $products=$repository->findBy(['shoppingPrice'=>0, 'active'=>1, 'code'=>192105007]);
   foreach ($products as $product){
     $output->writeln("Cambiando el producto ".$product->getCode());
     $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getProduct.php?product='.$product->getCode());
@@ -586,9 +586,9 @@ public function updateProducts(InputInterface $input, OutputInterface $output){
     $product->calculateCustomerIncrementsByProduct($this->doctrine);
 
     $repositoryProductPrices=$this->doctrine->getRepository(ERPProductPrices::class);
-    $productPrices=$repositoryProductPrices->findBy(['product_id'=>$product->getId()]);
+    $productPrices=$repositoryProductPrices->findBy(['product'=>$product->getId()]);
     foreach ($productPrices as $productPrice){
-      $this->doctrine->getMagange()->merge($productPrices);
+      $this->doctrine->getManager()->merge($productPrices);
       $this->doctrine->getManager()->flush();
     }
     $this->doctrine->getManager()->merge($product);
