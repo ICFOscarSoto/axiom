@@ -588,12 +588,14 @@ public function updateProducts(InputInterface $input, OutputInterface $output){
     $repositoryProductPrices=$this->doctrine->getRepository(ERPProductPrices::class);
     $productPrices=$repositoryProductPrices->findBy(['product'=>$product->getId()]);
     $this->doctrine->getManager()->merge($product);
+    $this->doctrine->getManager()->flush();
+    $this->doctrine->getManager()->clear();
     foreach ($productPrices as $productPrice){
       $productPrice=$repositoryProductPrices->findOneBy(['id'=>$productPrice]);
       $this->doctrine->getManager()->merge($productPrice);
+      $this->doctrine->getManager()->flush();
+      $this->doctrine->getManager()->clear();
     }
-    $this->doctrine->getManager()->flush();
-    $this->doctrine->getManager()->clear();
   }
 }
 
