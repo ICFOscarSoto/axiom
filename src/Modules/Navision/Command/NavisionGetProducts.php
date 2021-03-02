@@ -471,7 +471,7 @@ public function updatePrices(InputInterface $input, OutputInterface $output){
     if ($object["Unidad medida precio"]=='C') $packing=100;
     else if ($object["Unidad medida precio"]=='M') $packing=1000;
     $product->setPurchasepacking($packing);
-    $this->doctrine->getManager()->persist($product);
+    $this->doctrine->getManager()->merge($product);
     $this->doctrine->getManager()->flush();
     $this->doctrine->getManager()->clear();
     $product=$productsRepository->findOneBy(["code"=>$object["code"]]);
