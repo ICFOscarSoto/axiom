@@ -183,6 +183,10 @@ public function importProduct(InputInterface $input, OutputInterface $output){
          $obj->setTaxes($taxes);
          $obj->setCode($object["code"]);
          $obj->setWeight($object["Weight"]);
+         $packing=1;
+         if ($object["Unidad medida precio"]=='C') $packing=100;
+         else if ($object["Unidad medida precio"]=='M') $packing=1000;
+         $product->setPurchasepacking($packing);
          // Comprobamos si el producto tiene descuentos, si no los tiene se le pone como precio neto.
          $json3=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getPrices.php?from='.$object["code"].'&supplier='.$object["Supplier"]);
          $prices=json_decode($json3, true);
@@ -196,11 +200,11 @@ public function importProduct(InputInterface $input, OutputInterface $output){
            }
          }
          if (!$obj->getnetprice()){
-           $obj->setPVPR($object["ShoppingPrice"]);
-           $obj->setShoppingPrice(0);
+           $obj->setPVPR($object["ShoppingPrice"]/$product->getPurchasepacking());
+           $obj->setShoppingPrice($product->getPVPR()*(1-$product->getShoppingDiscount($this->doctrine)/100));
          } else {
            $obj->setPVPR(0);
-           $obj->setShoppingPrice($object["ShoppingPrice"]);
+           $obj->setShoppingPrice($object["ShoppingPrice"]/$product->getPurchasepacking());
          }
          $obj->setSupplier($supplier);
          $obj->setDateupd(new \Datetime());
@@ -482,7 +486,6 @@ public function updatePrices(InputInterface $input, OutputInterface $output){
     $this->doctrine->getManager()->clear();
   }
 }
-
 
 public function groupPrices(InputInterface $input, OutputInterface $output){
   $repository=$this->doctrine->getRepository(ERPCategories::class);
