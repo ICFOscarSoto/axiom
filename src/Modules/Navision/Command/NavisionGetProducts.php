@@ -186,7 +186,7 @@ public function importProduct(InputInterface $input, OutputInterface $output){
          $packing=1;
          if ($object["Unidad medida precio"]=='C') $packing=100;
          else if ($object["Unidad medida precio"]=='M') $packing=1000;
-         $product->setPurchasepacking($packing);
+         $obj->setPurchasepacking($packing);
          // Comprobamos si el producto tiene descuentos, si no los tiene se le pone como precio neto.
          $json3=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getPrices.php?from='.$object["code"].'&supplier='.$object["Supplier"]);
          $prices=json_decode($json3, true);
