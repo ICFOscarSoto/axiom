@@ -200,11 +200,11 @@ public function importProduct(InputInterface $input, OutputInterface $output){
            }
          }
          if (!$obj->getnetprice()){
-           $obj->setPVPR($object["ShoppingPrice"]/$product->getPurchasepacking());
-           $obj->setShoppingPrice($product->getPVPR()*(1-$product->getShoppingDiscount($this->doctrine)/100));
+           $obj->setPVPR($object["ShoppingPrice"]/$obj->getPurchasepacking());
+           $obj->setShoppingPrice($obj->getPVPR()*(1-$obj->getShoppingDiscount($this->doctrine)/100));
          } else {
            $obj->setPVPR(0);
-           $obj->setShoppingPrice($object["ShoppingPrice"]/$product->getPurchasepacking());
+           $obj->setShoppingPrice($object["ShoppingPrice"]/$obj->getPurchasepacking());
          }
          $obj->setSupplier($supplier);
          $obj->setDateupd(new \Datetime());
