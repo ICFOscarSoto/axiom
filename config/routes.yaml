@@ -343,6 +343,10 @@ ERPSalesOrders:
   resource: 'App\Modules\ERP\Controller\ERPSalesOrdersController'
   type:      annotation
 
+ERPSalesTickets:
+  resource: 'App\Modules\ERP\Controller\ERPSalesTicketsController'
+  type:      annotation
+
 ERPPurchasesBudgets:
   resource: 'App\Modules\ERP\Controller\ERPPurchasesBudgetsController'
   type:      annotation
@@ -350,6 +354,7 @@ ERPPurchasesBudgets:
 ERPPurchasesOrders:
   resource: 'App\Modules\ERP\Controller\ERPPurchasesOrdersController'
   type:      annotation
+
 ERPWorkList:
   resource: 'App\Modules\ERP\Controller\ERPWorkListController'
   type:      annotation

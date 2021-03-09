@@ -1,0 +1,12 @@
+[{
+	"sections": [
+		{
+			"name": "Tickets",
+			"fields": [
+				{ "name": "salesticketstate__name","cols": 4},
+				{ "name": "agent","cols": 4},
+				{ "name": "observations","cols": 4},
+				{	"name": "active", "cols": 2}
+			]
+		}]
+}]
