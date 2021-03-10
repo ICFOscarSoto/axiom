@@ -22,12 +22,6 @@
 		{{ include('@Globale/breadcrumb.html.twig') }}
 		{#}<h2>{{ interfaceName }}</h2>#}
 		<!-- MAIN CONTENT -->
-		<div class="row">
-				<div style="text-align: right;" class="col-md-4">
-					<button attr-id="" attr-action="" id="salesticket-button-cancel" type="button" class="btn btn">Cancelar</button>
-					<button attr-id="" attr-action="" id="salesticket-button-save" type="button" class="btn btn-green">Guardar</button>
-				</div>
-		</div>
 		<div id="salesticket-body">
 			{% set formConstructor = {"name": ticketType} %}
 			{{ include("@Globale/form_validation.html.twig") }}
@@ -38,10 +32,18 @@
 			{{ include('@ERP/salesticket_search_customer.html.twig') }}
 			{{ include('@ERP/salesticket_prepare_json.html.twig') }}
 
-		<script>
+			<div class="row">
+					<div class="col-md-4">
+						<button attr-id="" attr-action="" id="salesticket-button-cancel" type="button" class="btn btn">Cancelar</button>
+						<button attr-id="" attr-action="" id="salesticket-button-save" type="button" class="btn btn-green">Guardar</button>
+					</div>
+			</div>
+		</div>
+</div>
+
+<script>
 
 			$(document).ready(function() {
-
 					{# DOCUMENT SAVE #}
 					$('body').on('click', "#salesticket-button-save", function(e) {
 							$.ajax({
@@ -51,7 +53,7 @@
 				         success:  function( data ) {
 									 if((--load_wait)==0) $("#load-spinner").fadeOut();
 				           if(data.result){
-										 $("#salesticket-form-id").val(data.data.id);
+									//	 $("#salesticket-form-id").val(data.data.id);
 										 toastr.success("Documento guardado correctamente", "Confirmación", confirmation);
 										 {% if id==0 %} location.href="/es/ERP/salestickets/form/"+data.data.id; {% endif %}
 				           } else {

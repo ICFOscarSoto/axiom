@@ -74,6 +74,11 @@ class ERPSalesTickets
      */
     private $customername;
 
+    /**
+     * @ORM\Column(type="string", length=180, nullable=true)
+     */
+    private $email;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -195,6 +200,18 @@ class ERPSalesTickets
     public function setCustomername(?string $customername): self
     {
         $this->customername = $customername;
+
+        return $this;
+    }
+
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(?string $email): self
+    {
+        $this->email = $email;
 
         return $this;
     }

@@ -20,7 +20,7 @@
 
 
   function postCustomerSearch(){
-    $("#customer-form-view").attr("attr-id", $("#customer-form-id").val());
+  //  $("#customer-form-view").attr("attr-id").val($("#customer-form-id").val());
   }
   function customerSearch(fields, searchFields){
     if($("#customer-form-code").val()!=""){
@@ -61,11 +61,27 @@
          customerSearch(customerFields, customerSearchfields);
     });
 */
+  $('body').on('change', "[id^='customer-form-name']", function(e) {
+       	$('#customer-form-view').css('display','inline-block');
+  });
+
     $('body').on('click', "[id^='listCustomerswithcode-field-button-select-']", function(e) {
+
+      $("#customer-form-id").val($(this).attr('attr-id'));
+      $("#customer-form-id").trigger('change');
       $("#customer-form-code").val($(this).parent().parent().parent().children('td').eq(1).text());
       $("#customer-form-code").trigger('change');
       $("#customer-form-name").val($(this).parent().parent().parent().children('td').eq(2).text());
       $("#customer-form-name").trigger('change');
+      $("#customer-form-name").attr("disabled", true);
+      $("#customer-form-email").val($(this).parent().parent().parent().children('td').eq(4).text());
+      $("#customer-form-email").trigger('change');
+      $("#customer-form-email").attr("disabled", true);
+      $("#customer-form-view").attr("attr-id",$(this).attr("attr-id"));
+      $("#customer-form-view").css("display","inline-block");
+
+
+    //  $("#customer-form-view"+$("#customer-search-modal-form").attr("attr-id")).val($(this).parent().parent().parent().children('td').eq(1).text());
       $("#customer-search-modal-form").modal('toggle');
     });
   });

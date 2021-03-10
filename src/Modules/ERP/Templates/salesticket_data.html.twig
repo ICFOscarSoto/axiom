@@ -3,14 +3,22 @@
     <div class="row">
       <div class="col-6 col-sm-2"> <div class="form-group">
         <input type="hidden" id="salesticket-form-states" class="form-control">
-        <select type="text" id="salesticket-form-states-select" class="form-control select2">
+        <select type="text" id="salesticket-form-states-select" class="form-control select2" required>
           {% for option in states %}
             <option value="{{ option.id }}"{% if id!=0 %}{% if salesticket.salesticketstate!=null and option.id==salesticket.salesticketstate.id %} selected="selected" {% endif %}{% endif %}>{{ option.text }}</option>
           {% endfor %}
         </select>
       </div>
     </div>
+    </div>
+    <div class="row">
+      <div class="col-6 col-sm-6"> <div class="form-group">
+        <label for="salesticket-form-observations">Observaciones</label>
+        <textarea id="salesticket-form-observations" name="salesticket-form-observations" class="form-control">{% if salesticket.observations!=null %}{{ salesticket.observations }}{% endif %}</textarea>
 
+      </div>
+    </div>
     </div>
   </div>
 </div>
+<br>

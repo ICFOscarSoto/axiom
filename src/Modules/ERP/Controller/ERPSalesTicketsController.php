@@ -69,14 +69,12 @@ class ERPSalesTicketsController extends Controller
 			 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 			 if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
 			 $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
-	 		 $configrepository=$this->getDoctrine()->getRepository(ERPConfiguration::class);
 		   $salesticketsRepository=$this->getDoctrine()->getRepository(ERPSalesTickets::class);
 			 $salesticketsstatesRepository=$this->getDoctrine()->getRepository(ERPSalesTicketsStates::class);
 			 $userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
 	 	   $locale = $request->getLocale();
 	 	//	 $this->router = $router;
 
-	 		 $config=$configrepository->findOneBy(["company"=>$this->getUser()->getCompany()]);
 
 			 //Search Customers
 	 		$classCustomersUtils="\App\Modules\ERP\Utils\ERPCustomersUtils";
@@ -85,6 +83,7 @@ class ERPSalesTicketsController extends Controller
 	 		$customerslist["fieldButtons"]=[["id"=>"select", "type" => "default", "default"=>true, "icon" => "fa fa-dot-circle-o", "name" => "editar", "route" => null, "actionType" => "background", "modal"=>"", "confirm" => false, "tooltip" =>""]];
 	 		$customerslist["topButtons"]=[];
 
+			$salesticket=null;
 			if($id!=0){
 				$salesticket=$salesticketsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$id, "active"=>1,"deleted"=>0]);
 			}
@@ -92,7 +91,6 @@ class ERPSalesTicketsController extends Controller
 				$salesticket=new $this->class();
 			}
 
-			//dump($customerslist);
 			//sales ticket states
 			$objects=$salesticketsstatesRepository->findBy(["active"=>1,"deleted"=>0]);
 			$states=[];
@@ -111,7 +109,6 @@ class ERPSalesTicketsController extends Controller
 
 			if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 				return $this->render('@ERP/salestickets.html.twig', [
-					'moduleConfig' => $config,
 					'controllerName' => 'categoriesController',
 					'interfaceName' => 'SalesTickets',
 					'optionSelected' => 'genericindex',
@@ -167,6 +164,8 @@ class ERPSalesTicketsController extends Controller
 	 	$salesticket->setCustomer($customer);
 		$salesticket->setCustomername($fields->customername);
 		$salesticket->setSalesticketstate($salesticketstate);
+		$salesticket->setEmail($fields->email);
+		$salesticket->setObservations($fields->observations);
 	 //	$salesticket->setObservations($fields->observations);
 	 	$salesticket->setDateupd(new \DateTime());
 	 	$this->getDoctrine()->getManager()->persist($salesticket);

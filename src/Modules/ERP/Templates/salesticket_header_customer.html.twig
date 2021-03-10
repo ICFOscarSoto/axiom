@@ -1,33 +1,28 @@
 <div class="panel panel-primary panel-shadow" data-collapsed="0" style="-webkit-box-shadow: none; box-shadow:none; padding:0px; margin-bottom: -1px;"><!-- to apply shadow add class "panel-shadow" -->
   <div class="panel-body">
-    <div class="row">
-      <div class="col-md-4">
-        <div class="input-group">
-          <input type="text" id="customer-form-search" class="form-control" placeholder="Buscar cliente...">
-            <div class="input-group-btn">
-              <button type="button" id="customer-search-button" class="btn btn-white" style="height: 31px;" data-toggle="modal" data-target="#customer-search-modal-form">
-                  <i class="fa fa-search"></i> </button>
-            </div>
+      <div class="row">
+        <div class="col-md-4">
+          <div class="input-group">
+            <input type="text" id="customer-form-search" class="form-control" placeholder="Buscar cliente...">
+              <div class="input-group-btn">
+                <button type="button" id="customer-search-button" class="btn btn-white" style="height: 31px;" data-toggle="modal" data-target="#customer-search-modal-form">
+                    <i class="fa fa-search"></i> </button>
+              </div>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
-</div>
-<div class="panel panel-primary panel-shadow" data-collapsed="0" style="-webkit-box-shadow: none; box-shadow:none; padding:0px; margin-bottom: -1px;"><!-- to apply shadow add class "panel-shadow" -->
-  <div class="panel-body">
+      <br>
       <div class="row">
         <div class="col-md-6">
           <div class="form-group">
-            {% if salesticket.customer!=null %}
-            <span id="customer-form-view" class="select2-selection__view_nolabel" style="" attr-id="{{ salesticket.customer.id }}" attr-url="{{ url('formCustomer',{'id':'_____'}) }}"><i class="fa fa-file-text-o" aria-hidden="true"></i><span>&nbsp;Ver Ficha</span></span>
-            {% endif %}
-            <input type="text" id="customer-form-name" value="{% if salesticket.customer!=null %}{{ salesticket.customer.name }}{% endif %}" class="form-control" placeholder="Nombre del Cliente" disabled>
+            <span id="customer-form-view" class="select2-selection__view_nolabel" {% if salesticket.customer!=null %} attr-id="{{ salesticket.customer.id }}" {% else %} style="display:none;" {% endif %} attr-url="{{ url('formCustomer',{'id':'_____'}) }}"><i class="fa fa-file-text-o" aria-hidden="true"></i><span>&nbsp;Ver Ficha</span></span>
+            <input type="text" id="customer-form-name" {% if salesticket.customer!=null %} value="{{ salesticket.customer.name }}" disabled {% endif %} class="form-control" placeholder="Nombre del Cliente">
 
           </div>
         </div>
         <div class="col-md-3">
           <div class="form-group">
-            <input type="text" id="customer-form-email" value="{% if salesticket.customer!=null %}{{ salesticket.customer.email }}{% endif %}" class="form-control" placeholder="Email del Cliente" disabled>
+            <input type="text" id="customer-form-email" {% if salesticket.customer!=null %} value="{{ salesticket.customer.email }}" disabled {% endif %} class="form-control" placeholder="Email del Cliente">
           </div>
         </div>
         <input type="hidden" id="customer-form-code" class="form-control" value="{% if salesticket.customer!=null %}{{ salesticket.customer.code }}{% endif %}">
