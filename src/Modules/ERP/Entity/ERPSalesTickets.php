@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\Globale\Entity\GlobaleUsers;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
 use \App\Modules\ERP\Entity\ERPSalesTicketsStates;
+use \App\Modules\ERP\Entity\ERPCustomers;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPSalesTicketsRepository")
@@ -62,6 +63,16 @@ class ERPSalesTickets
      * @ORM\JoinColumn(nullable=false)
      */
     private $salesticketstate;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPCustomers")
+     */
+    private $customer;
+
+    /**
+     * @ORM\Column(type="string", length=200, nullable=true)
+     */
+    private $customername;
 
     public function getId(): ?int
     {
@@ -160,6 +171,30 @@ class ERPSalesTickets
     public function setSalesticketstate(?ERPSalesTicketsStates $salesticketstate): self
     {
         $this->salesticketstate = $salesticketstate;
+
+        return $this;
+    }
+
+    public function getCustomer(): ?ERPCustomers
+    {
+        return $this->customer;
+    }
+
+    public function setCustomer(?ERPCustomers $customer): self
+    {
+        $this->customer = $customer;
+
+        return $this;
+    }
+
+    public function getCustomername(): ?string
+    {
+        return $this->customername;
+    }
+
+    public function setCustomername(?string $customername): self
+    {
+        $this->customername = $customername;
 
         return $this;
     }

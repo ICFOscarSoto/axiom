@@ -26,6 +26,22 @@ class ERPCustomersUtils
     return $list;
   }
 
+
+  public function formatListWithCode($user){
+    $list=[
+      'id' => 'listCustomerswithcode',
+      'route' => 'customerlistwithcode',
+      'routeParams' => ["id" => $user->getId()],
+      'orderColumn' => 2,
+      'orderDirection' => 'ASC',
+      'tagColumn' => 3,
+      'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/CustomersWithCode.json"),true),
+      'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/CustomersFieldButtons.json"),true),
+      'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/CustomersTopButtons.json"),true)
+    ];
+    return $list;
+  }
+
   public function getExcludedForm($params){
     return ['customer','maincontact'];
   }

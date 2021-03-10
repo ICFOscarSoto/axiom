@@ -1,8 +1,4 @@
 [
-  {"id": "edit", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"formSalesTickets", "confirm" :false, "actionType" : "foreground" },
-  {"id": "activation", "type": "option", "options": [
-      {"id": "desactivate", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"disableSalesTickets", "confirm" :true, "actionType" : "background" },
-      {"id": "activate", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "route":"enableSalesTickets", "confirm" :true, "actionType" : "background" }
-  ]},
-  {"id": "delete", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"deleteSalesTickets", "confirm" :true, "undo" :false, "tooltip":"Borrar grupo de cliente", "actionType" : "background"}
+  {"id": "editSalesTickets", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"formSalesTickets", "actionType" : "foreground", "confirm" :false, "tooltip":""},
+  {"id": "delete", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"genericdelete", "routeParams":{"module":"ERP", "name":"SalesTickets"}, "confirm" :true, "undo" :false, "tooltip":"Borrar impuesto", "actionType" : "background"}
 ]

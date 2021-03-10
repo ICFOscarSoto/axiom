@@ -10,33 +10,33 @@ use App\Modules\Globale\Entity\MenuOptions;
 class ERPSalesTicketsUtils
 {
 
-  public function formatList($user){
-    $list=[
-      'id' => 'listSalesTickets',
-      'route' => 'salesticketslist',
-      'routeParams' => ["id" => $user->getId()],
-      'orderColumn' => 2,
-      'orderDirection' => 'ASC',
-      'tagColumn' => 3,
-      'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/SalesTickets.json"),true),
-      'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/SalesTicketsFieldButtons.json"),true),
-      'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/SalesTicketsTopButtons.json"),true)
-    ];
-    return $list;
-  }
-
+  private $module="ERP";
+  private $name="SalesTickets";
   public function getExcludedForm($params){
     return [];
   }
 
   public function getIncludedForm($params){
-  /*
     $doctrine=$params["doctrine"];
-    $user=$params["user"];
     $id=$params["id"];
-    $productRepository=$doctrine->getRepository(ERPProducts::class);
-    $products=$productRepository->findOneBy(["id"=>$id]);
-    */
+    $user=$params["user"];
     return [];
   }
+
+  public function formatList($user){
+    $list=[
+      'id' => 'list'.$this->name,
+      'route' => 'genericlist',
+      'routeParams' => ["module" => $this->module,
+                        "name" => $this->name],
+      'orderColumn' => 2,
+      'orderDirection' => 'DESC',
+      'tagColumn' => 2,
+      'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/".$this->name.".json"),true),
+      'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/".$this->name."FieldButtons.json"),true),
+      'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/".$this->name."TopButtons.json"),true)
+    ];
+    return $list;
+  }
+
 }

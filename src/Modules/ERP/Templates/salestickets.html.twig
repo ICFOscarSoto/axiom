@@ -1,80 +1,91 @@
-
-<!-- MAIN CONTENT -->
-<div class="principal-content" id="principal-content">
-	{% set formConstructor = form %}
-	<div id="{{formConstructor.name}}-form-body"><form>
-		<div class="panel minimal">
-	    <div class="panel-body">
-	      <div class="row">
-	        <div class="col-md-12">
-	          <div id="{{formConstructor.name}}-validation-error" class="alert alert-danger form-validation-error" style="display: none">
-	            <strong>Ocurrieron los siguientes errores:</strong></br></br><ul id="validation-errors-list"></ul>
-	          </div>
-	          <div id="{{formConstructor.name}}-validation-warning" class="alert alert-warning form-validation-error" style="display: none">
-	            <strong>Revise las siguientes advertencias:</strong></br></br><ul id="validation-warnings-list"></ul>
-	          </div>
-	        </div>
-	      </div>
-	    </div>
-	  </div>
-
-		<input type="hidden" id="post-url" name="post-url" value="{{ url('dataSalesTickets',{'id': formConstructor.id_object, 'action':'save'}) }}">
-		<input type="hidden" id="id-object" name="id-object" value="{{ formConstructor.id_object }}">
-		{{ form_row(formConstructor.form['_token']) }}
-<div class="panel minimal">
-<div class="panel-body">
-	<div class="row">
-		<div class="col-md-2">
-			{{ form_row(formConstructor.form['salesticketstate']) }}
+{% set params = app.request.attributes.get('_route_params')|merge(app.request.query.all()) %}
+{% block header %}
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<meta name="description" content="Axiom Business Management" />
+	<meta name="author" content="" />
+	<link rel="icon" href="images/favicon.ico">
+	{{ include('@Globale/header.html.twig') }}
+	<!-- Imported styles on this page -->
+	<link rel="stylesheet" href="{{ url('index') }}css/bootstrap-grid.css">
+	<link rel="stylesheet" href="{{ url('index') }}/js/jvectormap/jquery-jvectormap-1.2.2.css">
+	<link rel="stylesheet" href="{{ url('index') }}/js/rickshaw/rickshaw.min.css">
+{% endblock %}
+<title>{% block title %}{{ interfaceName|trans }}{% endblock %}</title>
+<body class="page-body" data-url="{{ url('indexAdmin') }}">
+<div class="page-container"><!-- add class "sidebar-collapsed" to close sidebar by default, "chat-visible" to make chat appear always -->
+	{{ include('@Globale/sidebar_menu.html.twig') }}
+	<div class="main-content">
+		{{ include('@Globale/head.html.twig') }}
+		<hr />
+		{{ include('@Globale/breadcrumb.html.twig') }}
+		{#}<h2>{{ interfaceName }}</h2>#}
+		<!-- MAIN CONTENT -->
+		<div class="row">
+				<div style="text-align: right;" class="col-md-4">
+					<button attr-id="" attr-action="" id="salesticket-button-cancel" type="button" class="btn btn">Cancelar</button>
+					<button attr-id="" attr-action="" id="salesticket-button-save" type="button" class="btn btn-green">Guardar</button>
+				</div>
 		</div>
-		<div class="col-md-2">
-			{{ form_row(formConstructor.form['agent']) }}
+		<div id="salesticket-body">
+			{% set formConstructor = {"name": ticketType} %}
+			{{ include("@Globale/form_validation.html.twig") }}
+			<br/>
+			{{ include('@ERP/salesticket_header_customer.html.twig') }}
+			{{ include('@ERP/salesticket_data.html.twig') }}
 		</div>
-		<div class="col-md-2">
-			{{ form_row(formConstructor.form['observations']) }}
-		</div>
-		<div class="col-md-2">
-			{{ form_row(formConstructor.form['active']) }}
-		</div>
-	</div>
-	</div>
-</div>
-</div>
-<div class="panel minimal">
-<div class="panel-body">
-<div class="row">
-	<div style="text-align: right;" class="col-md-12">
-		<button attr-id="" attr-action="" id="{{formConstructor.name}}-button-cancel" type="button" class="btn btn">{{ ("Cancelar")|trans }}</button>
-		<button attr-id="" attr-action="" id="{{formConstructor.name}}-button-continue" type="button" class="btn btn-green">{{ ("Guardar")|trans }}</button>
-	</div>
-</div>
-</div>
-</div>
+			{{ include('@ERP/salesticket_search_customer.html.twig') }}
+			{{ include('@ERP/salesticket_prepare_json.html.twig') }}
 
-</div>
-<!-- END MAIN CONTENT -->
-<script>
+		<script>
 
-$(document).ready(function() {
-	$('body').on('click', "#{{formConstructor.name}}-button-continue", function() {
-		if($("#{{formConstructor.name}}-form-body").find('form').valid()){
-			if((++load_wait)==1) $("#load-spinner").fadeIn();
-			$.post($("#{{formConstructor.name}}-form-body").find('form').find('#post-url').val(), $("#{{formConstructor.name}}-form-body").find('form').serialize(),
-			function(data, status, xhr){
-				if((--load_wait)==0) $("#load-spinner").fadeOut();
-				{{ include("@Globale/formvalidation.html.twig") }}
-				if(data.result){
-					//$("#tabs-list li").attr("attr-id",data.id);
-					toastr.success("Datos guardados correctamente", "Confirmación", confirmation);
-					if(data.reload) location.href=data.href;
-					$("#{{formConstructor.name}}-form-body").find('form').validate({ lang: 'es' }).resetForm();
-				}
-				else toastr.error("Ocurrió un error al guardar los datos", "Confirmación", confirmation);
-			}, "json");
-		}
-	});
-	$('body').on('click', "#{{formConstructor.name}}-button-cancel", function() {
-		window.history.back();
-	});
-});
-</script>
+			$(document).ready(function() {
+
+					{# DOCUMENT SAVE #}
+					$('body').on('click', "#salesticket-button-save", function(e) {
+							$.ajax({
+				         url: '{{ url('dataSalesTickets', {"id": id}) }}',
+				         type: 'POST',
+				         data: JSON.stringify(prepare_salesticket_json()),
+				         success:  function( data ) {
+									 if((--load_wait)==0) $("#load-spinner").fadeOut();
+				           if(data.result){
+										 $("#salesticket-form-id").val(data.data.id);
+										 toastr.success("Documento guardado correctamente", "Confirmación", confirmation);
+										 {% if id==0 %} location.href="/es/ERP/salestickets/form/"+data.data.id; {% endif %}
+				           } else {
+										 toastr.error("No se pudo guardar el documento", "Confirmación", confirmation);
+									 }
+				         }
+				       });
+					 });
+
+			});
+
+		</script>
+
+<!-- END MODALS -->
+{% block footer %}
+
+<link rel="stylesheet" href="{{ url('index') }}js/datatables/datatables.css">
+<link rel="stylesheet" href="{{ url('index') }}js/select2/select2-bootstrap.css">
+<link rel="stylesheet" href="{{ url('index') }}js/select2/select2.css">
+<link rel="stylesheet" href="{{ url('index') }}css/custom.css">
+<link rel="stylesheet" href="{{ url('index') }}js/ol/ol.css">
+<link rel="stylesheet" href="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker.min.css">
+<link rel="stylesheet" href="{{ url('index') }}js/jodit/jodit.min.css">
+
+<!-- Imported scripts on this page -->
+<script src="{{ url('index') }}js/datatables/datatables.js"></script>
+<script src="{{ url('index') }}js/select2/select2.min.js"></script>
+<script src="{{ url('index') }}js/moment.min.js"></script>
+<script src="{{ url('index') }}js/moment-es.js"></script>
+<script src="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker-es.js"></script>
+<script src="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker.min.js"></script>
+<script src="{{ url('index') }}js/fileinput.js"></script>
+<script src="{{ url('index') }}js/ol/ol.js"></script>
+ <script src="{{ url('index') }}js/jodit/jodit.min.js"></script>
+	 {{ include('@Globale/bottom.html.twig') }}
+{% endblock %}
+</body>

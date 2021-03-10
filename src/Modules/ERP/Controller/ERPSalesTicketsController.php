@@ -10,7 +10,10 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
+use App\Modules\ERP\Entity\ERPConfiguration;
 use App\Modules\ERP\Entity\ERPSalesTickets;
+use App\Modules\ERP\Entity\ERPCustomers;
+use App\Modules\ERP\Entity\ERPSalesTIcketsStates;
 use App\Modules\ERP\Entity\ERPSalesTicketsHistory;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
@@ -29,13 +32,13 @@ class ERPSalesTicketsController extends Controller
 		/**
      * @Route("/{_locale}/ERP/salestickets", name="salestickets")
      */
-    public function index(RouterInterface $router,Request $request)
+    public function index($id, RouterInterface $router,Request $request)
     {
       $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 			if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
   		$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
   		$locale = $request->getLocale();
-  		$this->router = $router;
+  	//	$this->router = $router;
   		$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
     	$utils = new $this->utilsClass();
   		$templateLists[]=$utils->formatList($this->getUser());
@@ -61,40 +64,72 @@ class ERPSalesTicketsController extends Controller
 		/**
 		 * @Route("/{_locale}/ERP/salestickets/form/{id}", name="formSalesTickets", defaults={"id"=0})
 		 */
-		 public function formSalesTickets($id, Request $request){
-			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-			if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
-			$new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-new"];
-			$template=dirname(__FILE__)."/../Forms/SalesTickets.json";
-			$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
-			$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
-			$breadcrumb=$menurepository->formatBreadcrumb('salestickets');
-			array_push($breadcrumb, $new_breadcrumb);
-/*
-			if($request->query->get('code',null)){
-				$obj = $productRepository->findOneBy(['code'=>$request->query->get('code',null), 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
-				if($obj) return $this->redirectToRoute($request->get('_route'), ['id' => $obj->getId()]);
-				else return $this->redirectToRoute($request->get('_route'), ['id' => 0]);
-			}
-*/
-			$tabs=[["name" => "data", "icon"=>"fa fa-id-card", "caption"=>"Sales Tickets data", "active"=>true, "route"=>$this->generateUrl("formInfoSalesTickets",["id"=>$id])]];
+		 public function formSalesTickets($id, Request $request)
+		 {
+			 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			 if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
+			 $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
+	 		 $configrepository=$this->getDoctrine()->getRepository(ERPConfiguration::class);
+		   $salesticketsRepository=$this->getDoctrine()->getRepository(ERPSalesTickets::class);
+			 $salesticketsstatesRepository=$this->getDoctrine()->getRepository(ERPSalesTicketsStates::class);
+			 $userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
+	 	   $locale = $request->getLocale();
+	 	//	 $this->router = $router;
 
-		return $this->render('@Globale/generictabform.html.twig', array(
-									'controllerName' => 'SalesTicketsController',
-									'interfaceName' => 'SalesTickets',
-									'optionSelected' => 'salestickets',
-									'menuOptions' =>  $menurepository->formatOptions($userdata),
-									'breadcrumb' => $breadcrumb,
-									'userData' => $userdata,
-									'id' => $id,
-									'tab' => $request->query->get('tab','data'), //Show initial tab, by default data tab
-									'tabs' => $tabs,
-									'include_header' => [["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker-es.js"],
-																			["type"=>"css", "path"=>"/js/rickshaw/rickshaw.min.css"]],
-									'include_footer' => [["type"=>"css", "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.css"],
-												 		 					 ["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.js"],
-																			 ["type"=>"js",  "path"=>"/js/jquery.nestable.js"]]
-					));
+	 		 $config=$configrepository->findOneBy(["company"=>$this->getUser()->getCompany()]);
+
+			 //Search Customers
+	 		$classCustomersUtils="\App\Modules\ERP\Utils\ERPCustomersUtils";
+	 		$customersutils = new $classCustomersUtils();
+	 		$customerslist=$customersutils->formatListWithCode($this->getUser());
+	 		$customerslist["fieldButtons"]=[["id"=>"select", "type" => "default", "default"=>true, "icon" => "fa fa-dot-circle-o", "name" => "editar", "route" => null, "actionType" => "background", "modal"=>"", "confirm" => false, "tooltip" =>""]];
+	 		$customerslist["topButtons"]=[];
+
+			if($id!=0){
+				$salesticket=$salesticketsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$id, "active"=>1,"deleted"=>0]);
+			}
+			if($salesticket==null){
+				$salesticket=new $this->class();
+			}
+
+			//dump($customerslist);
+			//sales ticket states
+			$objects=$salesticketsstatesRepository->findBy(["active"=>1,"deleted"=>0]);
+			$states=[];
+			$option["id"]=null;
+			$option["text"]="Estado del ticket";
+			$states[]=$option;
+			foreach($objects as $item){
+				$option["id"]=$item->getId();
+				$option["text"]=$item->getName();
+				$states[]=$option;
+			}
+
+			$new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-plus"];
+			$breadcrumb=$menurepository->formatBreadcrumb('genericindex','ERP','SalesTickets');
+			array_push($breadcrumb,$new_breadcrumb);
+
+			if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+				return $this->render('@ERP/salestickets.html.twig', [
+					'moduleConfig' => $config,
+					'controllerName' => 'categoriesController',
+					'interfaceName' => 'SalesTickets',
+					'optionSelected' => 'genericindex',
+					'optionSelectedParams' => ["module"=>"ERP", "name"=>"SalesTickets"],
+					'menuOptions' =>  $menurepository->formatOptions($userdata),
+					'breadcrumb' =>  $breadcrumb,
+					'userData' => $userdata,
+					'customerslist' => $customerslist,
+					'states' => $states,
+					'ticketType' => 'sales_ticket',
+					'salesticket' => $salesticket,
+					'id' => $id,
+					]);
+			}
+			return new RedirectResponse($this->router->generate('app_login'));
+
+
+
 
 
 	}
@@ -104,15 +139,42 @@ class ERPSalesTicketsController extends Controller
 	 * @Route("/{_locale}/ERP/salestickets/data/{id}/{action}", name="dataSalesTickets", defaults={"id"=0, "action"="read"})
 	 */
 	 public function dataSalesTickets($id, $action, Request $request){
+	  $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+	 	$salesticketsRepository=$this->getDoctrine()->getRepository(ERPSalesTickets::class);
+	 	$customersRepository=$this->getDoctrine()->getRepository(ERPCustomers::class);
+		$salesticketsstatesRepository=$this->getDoctrine()->getRepository(ERPSalesTicketsStates::class);
+	 	$configrepository=$this->getDoctrine()->getRepository(ERPConfiguration::class);
 
-	 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-	 $template=dirname(__FILE__)."/../Forms/SalesTickets.json";
-	 $utils = new GlobaleFormUtils();
-	 $obj = new $this->class();
+	 	$salesticket=$salesticketsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$id, "deleted"=>0]);
 
-	 $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine());
-	 $make= $utils->make($id, $this->class, $action, "formSalesTickets", "full", "@Globale/form.html.twig", "formSalesTickets");
-	 return $make;
+	 	//Get content of the json reques
+	 	$fields=json_decode($request->getContent());
+	 	$customer=$customersRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "code"=>$fields->customercode, "active"=>1, "deleted"=>0]);
+
+		$salesticketstate=$salesticketsstatesRepository->findOneBy(["id"=>$fields->salesticketstate, "active"=>1, "deleted"=>0]);
+	 	if(!$customer) return new JsonResponse(["result"=>0]); //if no customer, do nothing
+
+
+
+	 	if(!$salesticket){
+	 		$salesticket=new ERPSalesTickets();
+	 		$salesticket->setAgent($this->getUser());
+	 		$salesticket->setActive(1);
+	 		$salesticket->setDeleted(0);
+	 		$salesticket->setDateadd(new \DateTime());
+	 	}
+	 	$salesticket->setCompany($this->getUser()->getCompany());
+	 	$salesticket->setCustomer($customer);
+		$salesticket->setCustomername($fields->customername);
+		$salesticket->setSalesticketstate($salesticketstate);
+	 //	$salesticket->setObservations($fields->observations);
+	 	$salesticket->setDateupd(new \DateTime());
+	 	$this->getDoctrine()->getManager()->persist($salesticket);
+	 	$this->getDoctrine()->getManager()->flush();
+
+	 	return new JsonResponse(["result"=>1,"data"=>["id"=>$salesticket->getId()]]);
+	 	//return new JsonResponse(["result"=>1]);
+
 	}
 
 

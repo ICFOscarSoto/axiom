@@ -1,0 +1,13 @@
+<script>
+  function prepare_salesticket_json(){
+
+    var salesticketFields = new Object();
+    var lines=[];
+    salesticketFields.id=$("#salesticket-form-id").val();
+    salesticketFields.salesticketstate=$("#salesticket-form-states-select").val();
+    salesticketFields.customername=$("#customer-form-name").val();
+    salesticketFields.customercode=$("#customer-form-code").val();
+
+    return salesticketFields;
+  }
+</script>

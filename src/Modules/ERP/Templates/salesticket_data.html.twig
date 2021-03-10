@@ -1,0 +1,16 @@
+<div class="panel panel-primary panel-shadow" data-collapsed="0" style="-webkit-box-shadow: none; box-shadow:none; padding:0px; margin-bottom: -1px;"><!-- to apply shadow add class "panel-shadow" -->
+  <div class="panel-body">
+    <div class="row">
+      <div class="col-6 col-sm-2"> <div class="form-group">
+        <input type="hidden" id="salesticket-form-states" class="form-control">
+        <select type="text" id="salesticket-form-states-select" class="form-control select2">
+          {% for option in states %}
+            <option value="{{ option.id }}"{% if id!=0 %}{% if salesticket.salesticketstate!=null and option.id==salesticket.salesticketstate.id %} selected="selected" {% endif %}{% else %}{% if option.id==moduleConfig.defaultsalesticketstate.id %} selected="selected" {% endif %}{% endif %}>{{ option.text }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+
+    </div>
+  </div>
+</div>
