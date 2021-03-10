@@ -5,7 +5,7 @@
         <input type="hidden" id="salesticket-form-states" class="form-control">
         <select type="text" id="salesticket-form-states-select" class="form-control select2">
           {% for option in states %}
-            <option value="{{ option.id }}"{% if id!=0 %}{% if salesticket.salesticketstate!=null and option.id==salesticket.salesticketstate.id %} selected="selected" {% endif %}{% else %}{% if option.id==moduleConfig.defaultsalesticketstate.id %} selected="selected" {% endif %}{% endif %}>{{ option.text }}</option>
+            <option value="{{ option.id }}"{% if id!=0 %}{% if salesticket.salesticketstate!=null and option.id==salesticket.salesticketstate.id %} selected="selected" {% endif %}{% endif %}>{{ option.text }}</option>
           {% endfor %}
         </select>
       </div>
