@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\ERP\Entity\ERPConfiguration;
 use App\Modules\ERP\Entity\ERPSalesTickets;
+use App\Modules\ERP\Entity\ERPSalesOrders;
 use App\Modules\ERP\Entity\ERPCustomers;
 use App\Modules\ERP\Entity\ERPSalesTIcketsStates;
 use App\Modules\ERP\Entity\ERPSalesTicketsHistory;
@@ -83,6 +84,20 @@ class ERPSalesTicketsController extends Controller
 	 		$customerslist["fieldButtons"]=[["id"=>"select", "type" => "default", "default"=>true, "icon" => "fa fa-dot-circle-o", "name" => "editar", "route" => null, "actionType" => "background", "modal"=>"", "confirm" => false, "tooltip" =>""]];
 	 		$customerslist["topButtons"]=[];
 
+
+			//Search Sales Orders
+
+			/*
+			$salesordersRepository=$this->getDoctrine()->getRepository(ERPSalesOrders::class);
+			$salesorderslist=$salesordersRepository->getOrdersWithExternalNumber();
+			*/
+		 $classSalesOrdersUtils="\App\Modules\ERP\Utils\ERPSalesOrdersUtils";
+		 $salesordersutils = new $classSalesOrdersUtils();
+		 $salesorderslist=$salesordersutils->formatListWithNumber($this->getUser());
+
+		 $salesorderslist["fieldButtons"]=[["id"=>"select", "type" => "default", "default"=>true, "icon" => "fa fa-dot-circle-o", "name" => "editar", "route" => null, "actionType" => "background", "modal"=>"", "confirm" => false, "tooltip" =>""]];
+		 $salesorderslist["topButtons"]=[];
+
 			$salesticket=null;
 			if($id!=0){
 				$salesticket=$salesticketsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$id, "active"=>1,"deleted"=>0]);
@@ -107,6 +122,9 @@ class ERPSalesTicketsController extends Controller
 			$breadcrumb=$menurepository->formatBreadcrumb('genericindex','ERP','SalesTickets');
 			array_push($breadcrumb,$new_breadcrumb);
 
+			$listSalesTicketsHistory = new ERPSalesTicketsHistoryUtils();
+
+
 			if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 				return $this->render('@ERP/salestickets.html.twig', [
 					'controllerName' => 'categoriesController',
@@ -117,9 +135,11 @@ class ERPSalesTicketsController extends Controller
 					'breadcrumb' =>  $breadcrumb,
 					'userData' => $userdata,
 					'customerslist' => $customerslist,
+					'salesorderslist' => $salesorderslist,
 					'states' => $states,
 					'ticketType' => 'sales_ticket',
 					'salesticket' => $salesticket,
+					'salesticketshistorylist' => $listSalesTicketsHistory->formatListByTicket($id),
 					'id' => $id,
 					]);
 			}
@@ -138,6 +158,7 @@ class ERPSalesTicketsController extends Controller
 	 public function dataSalesTickets($id, $action, Request $request){
 	  $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 	 	$salesticketsRepository=$this->getDoctrine()->getRepository(ERPSalesTickets::class);
+		$salesordersRepository=$this->getDoctrine()->getRepository(ERPSalesOrders::class);
 	 	$customersRepository=$this->getDoctrine()->getRepository(ERPCustomers::class);
 		$salesticketsstatesRepository=$this->getDoctrine()->getRepository(ERPSalesTicketsStates::class);
 	 	$configrepository=$this->getDoctrine()->getRepository(ERPConfiguration::class);
@@ -149,8 +170,7 @@ class ERPSalesTicketsController extends Controller
 	 	$customer=$customersRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "code"=>$fields->customercode, "active"=>1, "deleted"=>0]);
 
 		$salesticketstate=$salesticketsstatesRepository->findOneBy(["id"=>$fields->salesticketstate, "active"=>1, "deleted"=>0]);
-	 	if(!$customer) return new JsonResponse(["result"=>0]); //if no customer, do nothing
-
+	 //	if(!$customer) return new JsonResponse(["result"=>0]); //if no customer, do nothing
 
 
 	 	if(!$salesticket){
@@ -163,12 +183,30 @@ class ERPSalesTicketsController extends Controller
 	 	$salesticket->setCompany($this->getUser()->getCompany());
 	 	$salesticket->setCustomer($customer);
 		$salesticket->setCustomername($fields->customername);
+		if($fields->salesordernumber!="")
+		{
+			$salesorder=$salesordersRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "externalordernumber"=>$fields->salesordernumber, "active"=>1, "deleted"=>0]);
+			$salesticket->setSalesOrder($salesorder);
+		}
+		$salesticket->setSalesordernumber($fields->salesordernumber);
 		$salesticket->setSalesticketstate($salesticketstate);
 		$salesticket->setEmail($fields->email);
 		$salesticket->setObservations($fields->observations);
-	 //	$salesticket->setObservations($fields->observations);
 	 	$salesticket->setDateupd(new \DateTime());
 	 	$this->getDoctrine()->getManager()->persist($salesticket);
+
+
+		$history_obj=new ERPSalesTicketsHistory();
+		$history_obj->setAgent($this->getUser());
+		$history_obj->setSalesTicket($salesticket);
+		$history_obj->setObservations($fields->observations);
+		$history_obj->setSalesticketstate($salesticketstate);
+		$history_obj->setActive(1);
+		$history_obj->setDeleted(0);
+		$history_obj->setDateupd(new \DateTime());
+		$history_obj->setDateadd(new \DateTime());
+
+		$this->getDoctrine()->getManager()->persist($history_obj);
 	 	$this->getDoctrine()->getManager()->flush();
 
 	 	return new JsonResponse(["result"=>1,"data"=>["id"=>$salesticket->getId()]]);

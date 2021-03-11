@@ -26,10 +26,12 @@
 			{% set formConstructor = {"name": ticketType} %}
 			{{ include("@Globale/form_validation.html.twig") }}
 			<br/>
-			{{ include('@ERP/salesticket_header_customer.html.twig') }}
+			{{ include('@ERP/salesticket_header_searching.html.twig') }}
+			{{ include('@ERP/salesticket_customer_data.html.twig') }}
 			{{ include('@ERP/salesticket_data.html.twig') }}
 		</div>
 			{{ include('@ERP/salesticket_search_customer.html.twig') }}
+			{{ include('@ERP/salesticket_search_salesorder.html.twig') }}
 			{{ include('@ERP/salesticket_prepare_json.html.twig') }}
 
 			<div class="row">

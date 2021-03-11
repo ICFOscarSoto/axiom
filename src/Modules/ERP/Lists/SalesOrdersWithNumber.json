@@ -1,0 +1,45 @@
+[   {
+      "name": "id",
+      "caption": "id",
+      "class": "hidden"
+  },
+  {
+      "name": "code",
+      "caption": "code",
+      "width": "15%",
+      "class": "all"
+  },
+  {
+      "name": "externalordernumber",
+      "caption": "Nº de pedido web",
+      "width": "15%",
+      "class": "all"
+  },
+  {
+      "name": "date",
+      "caption": "Date",
+      "type": "date",
+      "width": "15%","class":"min-desktop"
+  },
+  {
+      "name": "customername",
+      "caption": "Customer",
+      "width": "40%",
+      "class": "all"
+  },
+  {
+      "name": "customercode",
+      "caption": "Código de cliente",
+      "width": "40%",
+      "class": "all"
+  },
+  {
+      "name" :"agent__name_o_agent__lastname","caption":"Agente"
+  },
+
+  {"name": "active", "caption":"Estado", "width":"10%" ,"class" : "dt-center", "replace":{
+                             "1":{"text":"Activo","html":"<div style=\"min-width: 75px;\" class=\"label label-success\">Activo</div>","default":true},
+                             "0":{"text":"Desactivado","html":"<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado</div>"}
+                           }
+   }
+]

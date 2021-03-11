@@ -475,4 +475,22 @@ class ERPSalesOrdersController extends Controller
 		return new JsonResponse(["from"=>$from, "to"=>$to, "orders"=>$array_orders, "budgets"=>$array_budgets]);
 	}
 
+
+		  /**
+		   * @Route("/api/salesorders/listwithnumber", name="salesorderlistwithnumber")
+		   */
+		  public function indexlistwithnumber(RouterInterface $router,Request $request){
+		    $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		    $user = $this->getUser();
+		    $locale = $request->getLocale();
+		    $this->router = $router;
+		    $manager = $this->getDoctrine()->getManager();
+		    $repository = $manager->getRepository($this->class);
+		    $listUtils=new GlobaleListUtils();
+		    $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/SalesOrdersWithNumber.json"),true);
+		    $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, ERPSalesOrders::class,[["type"=>"and", "column"=>"company", "value"=>$user->getCompany()]]);
+		    return new JsonResponse($return);
+		  }
+
+
 }

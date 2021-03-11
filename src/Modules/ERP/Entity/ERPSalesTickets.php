@@ -6,7 +6,9 @@ use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\Globale\Entity\GlobaleUsers;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
 use \App\Modules\ERP\Entity\ERPSalesTicketsStates;
+use \App\Modules\ERP\Entity\ERPSalesTicketsHistory;
 use \App\Modules\ERP\Entity\ERPCustomers;
+use \App\Modules\ERP\Entity\ERPSalesOrders;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPSalesTicketsRepository")
@@ -78,6 +80,16 @@ class ERPSalesTickets
      * @ORM\Column(type="string", length=180, nullable=true)
      */
     private $email;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPSalesOrders")
+     */
+    private $salesorder;
+
+    /**
+     * @ORM\Column(type="string", length=32)
+     */
+    private $salesordernumber;
 
     public function getId(): ?int
     {
@@ -215,4 +227,44 @@ class ERPSalesTickets
 
         return $this;
     }
+
+    public function getSalesorder(): ?ERPSalesOrders
+    {
+        return $this->salesorder;
+    }
+
+    public function setSalesorder(?ERPSalesOrders $salesorder): self
+    {
+        $this->salesorder = $salesorder;
+
+        return $this;
+    }
+
+    public function getSalesordernumber(): ?string
+    {
+        return $this->salesordernumber;
+    }
+
+    public function setSalesordernumber(string $salesordernumber): self
+    {
+        $this->salesordernumber = $salesordernumber;
+
+        return $this;
+    }
+
+    public function postProccess($kernel, $doctrine, $user, $params, $oldobj){
+
+       $em = $doctrine->getManager();
+       $history_obj=new ERPSalesTicdketsHistory();
+       $history_obj->setAgent($this->agent);
+       $history_obj->setSalesTicket($this);
+       $history_obj->setObservations($this->observations);
+       $history_obj->setActive(1);
+       $history_obj->setDeleted(0);
+       $history_obj->setDateupd(new \DateTime());
+       $history_obj->setDateadd(new \DateTime());
+       $em->persist($history_obj);
+       $em->flush();
+
+     }
 }

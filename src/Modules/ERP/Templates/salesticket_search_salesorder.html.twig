@@ -1,0 +1,45 @@
+<div class="modal fade" tabindex="-1" id="salesorder-search-modal-form" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content" style="transform: matrix(1, 0, 0, 1, 0, 0);display:inline-block;">
+        <div class="modal-header">
+          <h4 class="modal-title">{{ ('Search')|trans }}&nbsp;{{ ('salesorder')|trans }}</h4>
+        </div>
+        <div id="salesorder-search-modal-form-body" style="height: 520px; padding: 0px 10px;">
+          {% set listConstructor = salesorderslist %}
+          {% set listOrigin = "" %}
+          {# for know if list.html is invoked directly from controller and we need to make modals inside list#}
+          {{ include('@Globale/list.html.twig') }}
+        </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+
+  $(document).ready(function() {
+/*
+  $('body').on('change', "[id^='salesorder-form-number']", function(e) {
+       	$('#salesorder-form-view').css('display','inline-block');
+  });*/
+
+    $('body').on('click', "[id^='listSalesOrderswithnumber-field-button-select-']", function(e) {
+    //  $("#salesorder-form-id").val($(this).attr('attr-id'));
+    //  $("#salesorder-form-id").trigger('change');
+      $("#salesorder-form-number").val($(this).parent().parent().parent().children('td').eq(2).text());
+      $("#salesorder-form-number").trigger('change');
+      $("#salesorder-form-number").attr("disabled", true);
+      $("#salesorder-form-view").attr("attr-id",$(this).attr("attr-id"));
+      $("#salesorder-form-view").css("display","inline-block");
+      $("#customer-form-code").val($(this).parent().parent().parent().children('td').eq(5).text());
+      $("#customer-form-code").trigger('change');
+      $("#customer-form-name").val($(this).parent().parent().parent().children('td').eq(4).text());
+      $("#customer-form-name").trigger('change');
+      $("#customer-form-name").attr("disabled", true);
+
+
+     $("#salesorder-search-modal-form").modal('toggle');
+    });
+
+  });
+</script>

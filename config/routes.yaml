@@ -347,6 +347,10 @@ ERPSalesTickets:
   resource: 'App\Modules\ERP\Controller\ERPSalesTicketsController'
   type:      annotation
 
+ERPSalesTicketsHistory:
+  resource: 'App\Modules\ERP\Controller\ERPSalesTicketsHistoryController'
+  type:      annotation
+
 ERPPurchasesBudgets:
   resource: 'App\Modules\ERP\Controller\ERPPurchasesBudgetsController'
   type:      annotation
