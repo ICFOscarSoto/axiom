@@ -14,7 +14,7 @@ use App\Modules\ERP\Entity\ERPConfiguration;
 use App\Modules\ERP\Entity\ERPSalesTickets;
 use App\Modules\ERP\Entity\ERPSalesOrders;
 use App\Modules\ERP\Entity\ERPCustomers;
-use App\Modules\ERP\Entity\ERPSalesTIcketsStates;
+use App\Modules\ERP\Entity\ERPSalesTicketsStates;
 use App\Modules\ERP\Entity\ERPSalesTicketsHistory;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
