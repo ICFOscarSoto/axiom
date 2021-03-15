@@ -40,4 +40,29 @@ $('body').on('click', "#customer-form-view", function(e){
     win.focus();
   }
 });
+
+
+$('body').on('click', "#salesorder-form-view", function(e){
+    var id=$(this).attr("attr-id");
+    if(id!=0 && id!=""){
+    url=$(this).attr("attr-url");
+    url=url.replace('_____',$(this).attr("attr-id"));
+    var win = window.open(url, '_blank');
+    win.focus();
+  }
+  });
+
+  $('body').on('click', "#salesorder-form-external-view", function(e){
+    url1="https://www.ferreteriacampollano.com/admin320zsqccu/index.php?controller=AdminOrders&id_order=";
+    url2="&vieworder&token=754aeb19ae44be8bae2739a918819e20";
+    var id=$(this).attr("attr-id");
+    if(id!=0 && id!=""){
+      url=url1+id+url2;
+    //  url=url.replace('_____',$(this).attr("attr-id"));
+      var win = window.open(url, '_blank');
+      win.focus();
+    }
+
+
+});
 </script>

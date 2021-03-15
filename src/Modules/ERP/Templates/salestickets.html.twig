@@ -36,8 +36,17 @@
 
 			<div class="row">
 					<div class="col-md-4">
-						<button attr-id="" attr-action="" id="salesticket-button-cancel" type="button" class="btn btn">Cancelar</button>
-						<button attr-id="" attr-action="" id="salesticket-button-save" type="button" class="btn btn-green">Guardar</button>
+						{% if salesticket.agent is not null %}
+						 	{% if userData.id==salesticket.agent.id %}
+								<button attr-id="" attr-action="" id="salesticket-button-cancel" type="button" class="btn btn">Cancelar</button>
+								<button attr-id="" attr-action="" id="salesticket-button-save" type="button" class="btn btn-green">Guardar</button>
+							{% else %}
+								<button attr-id="" attr-action="" id="salesticket-button-cancel" type="button" class="btn btn">Cancelar</button>
+							{% endif %}
+						{% else %}
+							<button attr-id="" attr-action="" id="salesticket-button-cancel" type="button" class="btn btn">Cancelar</button>
+							<button attr-id="" attr-action="" id="salesticket-button-save" type="button" class="btn btn-green">Guardar</button>
+						{% endif %}
 					</div>
 			</div>
 		</div>
@@ -64,6 +73,10 @@
 				         }
 				       });
 					 });
+
+					 $('body').on('click', "#{{formConstructor.name}}-button-cancel", function() {
+				 			window.history.back();
+				 	});
 
 			});
 

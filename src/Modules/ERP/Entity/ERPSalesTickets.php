@@ -91,6 +91,11 @@ class ERPSalesTickets
      */
     private $salesordernumber;
 
+    /**
+     * @ORM\Column(type="string", length=32, nullable=true)
+     */
+    private $externalsalesordernumber;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -267,4 +272,16 @@ class ERPSalesTickets
        $em->flush();
 
      }
+
+    public function getExternalsalesordernumber(): ?string
+    {
+        return $this->externalsalesordernumber;
+    }
+
+    public function setExternalsalesordernumber(?string $externalsalesordernumber): self
+    {
+        $this->externalsalesordernumber = $externalsalesordernumber;
+
+        return $this;
+    }
 }

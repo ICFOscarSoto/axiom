@@ -10,6 +10,7 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
+use App\Modules\Globale\Entity\GlobaleUsers;
 use App\Modules\ERP\Entity\ERPConfiguration;
 use App\Modules\ERP\Entity\ERPSalesTickets;
 use App\Modules\ERP\Entity\ERPSalesOrders;
@@ -65,16 +66,27 @@ class ERPSalesTicketsController extends Controller
 		/**
 		 * @Route("/{_locale}/ERP/salestickets/form/{id}", name="formSalesTickets", defaults={"id"=0})
 		 */
-		 public function formSalesTickets($id, Request $request)
+		 public function formSalesTickets($id, RouterInterface $router, Request $request)
 		 {
 			 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 			 if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
 			 $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
+			 $configrepository=$this->getDoctrine()->getRepository(ERPConfiguration::class);
 		   $salesticketsRepository=$this->getDoctrine()->getRepository(ERPSalesTickets::class);
 			 $salesticketsstatesRepository=$this->getDoctrine()->getRepository(ERPSalesTicketsStates::class);
+			 $agentsRepository=$this->getDoctrine()->getRepository(GlobaleUsers::class);
 			 $userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
 	 	   $locale = $request->getLocale();
-	 	//	 $this->router = $router;
+	 		 $this->router = $router;
+
+			 $config=$configrepository->findOneBy(["company"=>$this->getUser()->getCompany()]);
+
+
+			if($request->query->get('code',null)){
+				$obj = $documentRepository->findOneBy(['code'=>$request->query->get('code',null), 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
+				if($obj) return $this->redirectToRoute($request->get('_route'), ['id' => $obj->getId()]);
+				else return $this->redirectToRoute($request->get('_route'), ['id' => 0]);
+			}
 
 
 			 //Search Customers
@@ -118,6 +130,18 @@ class ERPSalesTicketsController extends Controller
 				$states[]=$option;
 			}
 
+			//agents
+			$agent_objects=$agentsRepository->findBy(["active"=>1,"deleted"=>0]);
+			$agents=[];
+			//$option["id"]=null;
+			//$option["text"]="Elige agente";
+			$agents[]=$option;
+			foreach($agent_objects as $item){
+				$option["id"]=$item->getId();
+				$option["text"]=$item->getName();
+				$agents[]=$option;
+			}
+
 			$new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-plus"];
 			$breadcrumb=$menurepository->formatBreadcrumb('genericindex','ERP','SalesTickets');
 			array_push($breadcrumb,$new_breadcrumb);
@@ -127,6 +151,7 @@ class ERPSalesTicketsController extends Controller
 
 			if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 				return $this->render('@ERP/salestickets.html.twig', [
+					'moduleConfig' => $config,
 					'controllerName' => 'categoriesController',
 					'interfaceName' => 'SalesTickets',
 					'optionSelected' => 'genericindex',
@@ -137,6 +162,7 @@ class ERPSalesTicketsController extends Controller
 					'customerslist' => $customerslist,
 					'salesorderslist' => $salesorderslist,
 					'states' => $states,
+					'agents' => $agents,
 					'ticketType' => 'sales_ticket',
 					'salesticket' => $salesticket,
 					'salesticketshistorylist' => $listSalesTicketsHistory->formatListByTicket($id),
@@ -162,6 +188,8 @@ class ERPSalesTicketsController extends Controller
 	 	$customersRepository=$this->getDoctrine()->getRepository(ERPCustomers::class);
 		$salesticketsstatesRepository=$this->getDoctrine()->getRepository(ERPSalesTicketsStates::class);
 	 	$configrepository=$this->getDoctrine()->getRepository(ERPConfiguration::class);
+		$agentsRepository=$this->getDoctrine()->getRepository(GlobaleUsers::class);
+
 
 	 	$salesticket=$salesticketsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$id, "deleted"=>0]);
 
@@ -175,20 +203,28 @@ class ERPSalesTicketsController extends Controller
 
 	 	if(!$salesticket){
 	 		$salesticket=new ERPSalesTickets();
-	 		$salesticket->setAgent($this->getUser());
 	 		$salesticket->setActive(1);
 	 		$salesticket->setDeleted(0);
 	 		$salesticket->setDateadd(new \DateTime());
 	 	}
+
+		if($fields->salesticketnewagent!=""){
+			$newagent=$agentsRepository->findOneBy(["id"=>$fields->salesticketnewagent,"active"=>1,"deleted"=>0]);
+			$salesticket->setAgent($newagent);
+		}
+		else{
+					$salesticket->setAgent($this->getUser());
+		}
 	 	$salesticket->setCompany($this->getUser()->getCompany());
 	 	$salesticket->setCustomer($customer);
 		$salesticket->setCustomername($fields->customername);
 		if($fields->salesordernumber!="")
 		{
-			$salesorder=$salesordersRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "externalordernumber"=>$fields->salesordernumber, "active"=>1, "deleted"=>0]);
+			$salesorder=$salesordersRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "code"=>$fields->salesordernumber, "active"=>1, "deleted"=>0]);
 			$salesticket->setSalesOrder($salesorder);
 		}
 		$salesticket->setSalesordernumber($fields->salesordernumber);
+		$salesticket->setExternalsalesordernumber($fields->externalsalesordernumber);
 		$salesticket->setSalesticketstate($salesticketstate);
 		$salesticket->setEmail($fields->email);
 		$salesticket->setObservations($fields->observations);
