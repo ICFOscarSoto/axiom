@@ -79,6 +79,26 @@ class ERPProductsController extends Controller
     }
 
 		/**
+		 * @Route("/{_locale}/products/navcategory", name="navcategory")
+		 */
+		public function getCategoryNav(){
+			$json=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-getCategoryNavs.php');
+      $objects=json_decode($json, true);
+      $objects=$objects[0]["class"];
+			return new JsonResponse($objects);
+		}
+
+		/**
+		 * @Route("/{_locale}/products/navfamily/{category}", name="navfamily")
+		 */
+		public function getFamilyNav($category){
+			$json=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-getFamilyNavs.php?category='.$category);
+			$objects=json_decode($json, true);
+			$objects=$objects[0]["class"];
+			return new JsonResponse($objects);
+		}
+
+		/**
 		 * @Route("/{_locale}/products/data/{id}/{action}", name="dataProduct", defaults={"id"=0, "action"="read"})
 		 */
 		 public function dataProduct($id, $action, Request $request){
@@ -99,10 +119,6 @@ class ERPProductsController extends Controller
 		 $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),$classUtils->getExcludedForm($params),$classUtils->getIncludedForm($params));
 		 $make = $utils->make($id, $this->class, $action, "formProduct", "full", "@Globale/form.html.twig", "formProduct");
 		 return $make;
-
-		 //$utils->values(["manufacturer"=>$manufacturer]);
-		 //return $utils->make($id, $this->class, $action, "formproducts","full", "@ERP/productform.html.twig", "formProduct");
-
 		}
 
 
@@ -179,28 +195,6 @@ class ERPProductsController extends Controller
 			$formUtilsProducts = new ERPProductsUtils();
 			$formUtils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),$formUtilsProducts->getExcludedForm([]),$formUtilsProducts->getIncludedForm(["doctrine"=>$this->getDoctrine(), "user"=>$this->getUser(), "id"=>$id]));
 
-		/*$listEAN13 = new ERPEAN13Utils();
-			$formUtilsEAN = new GlobaleFormUtils();
-			$formUtilsEAN->initialize($this->getUser(), new ERPEAN13(), dirname(__FILE__)."/../Forms/EAN13.json", $request, $this, $this->getDoctrine());
-			$forms[]=$formUtilsEAN->formatForm('EAN13', true, null, ERPEAN13::class);
-
-
-			$listReferences = new ERPReferencesUtils();
-			$formUtilsReferences = new GlobaleFormUtils();
-			$formUtilsReferences->initialize($this->getUser(), new ERPReferences(), dirname(__FILE__)."/../Forms/References.json", $request, $this, $this->getDoctrine());
-			$forms[]=$formUtilsReferences->formatForm('References', true, null, ERPReferences::class);
-
-
-			$listAttributes = new ERPProductsAttributesUtils();
-			$productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
-			$product=$productRepository->findOneBy(["id"=>$id, "active"=>1, "deleted"=>0, "company"=>$this->getUser()->getCompany()]);
-
-			$formUtilsAttributes = new GlobaleFormUtils();
-			$formUtilsAttributes->initialize($this->getUser(), new ERPProductsAttributes(), dirname(__FILE__)."/../Forms/References.json", $request, $this, $this->getDoctrine(),
-			$listAttributes->getExcludedForm(null),
-			$listAttributes->getIncludedForm(["parent"=>$product, "doctrine"=>$this->getDoctrine(), "user"=>$this->getUser()]));
-			$forms[]=$formUtilsAttributes->formatForm('ProductsAttributes', true, null, ERPProductsAttributes::class);
-*/
 			return $this->render('@ERP/productform.html.twig', array(
 				'controllerName' => 'productsController',
 				'interfaceName' => 'Productos',
@@ -209,10 +203,6 @@ class ERPProductsController extends Controller
 				'id' => $id,
 				'id_object' => $id,
 				'form' => $formUtils->formatForm('products', false, $id, $this->class, "dataProduct")
-				//'listEAN13' => $listEAN13->formatListByProduct($id),
-				//'listReferences' => $listReferences->formatListByProduct($id),
-				//'listAttributes' => $listAttributes->formatListByProduct($id),
-				//'forms' => $forms
 			));
 
 		}
