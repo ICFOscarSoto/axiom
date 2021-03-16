@@ -236,6 +236,23 @@ table.dataTable.dtr-inline.collapsed > tbody > tr > td:first-child:before, table
 .select2-selection__view:hover{
   background: #f1f1f1;
 }
+.select2-selection__view_tickets {
+      height: 25px;
+      position: absolute;
+      top: 25px;
+      right: 19px;
+      width: 75px;
+      border: 1px solid #e8e8e8;
+      border-radius: 3px;
+      background: #ffffff;
+      line-height: 24px !important;
+      text-align: center;
+      cursor: pointer;
+      z-index: 999;
+}
+.select2-selection__view_tickets:hover{
+  background: #f1f1f1;
+}
 
 .select2-container--default .select2-results__option--highlighted[aria-selected] {
     background-color: #bababa !important;
