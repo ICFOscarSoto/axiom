@@ -123,7 +123,7 @@ class PrestashopGetCustomers extends ContainerAwareCommand
 
     //  $output->writeln($this->url."/api/orders?filter[invoice_date]=['.$tenminutesbefore.','.$now.']&date=1");
     //  $xml_string=file_get_contents($this->url."/api/customers/?display=[id]&filter[date_add]=[".$twelveminutesbefore.",".$now."]&date=1", false, $context);
-      $xml_string=file_get_contents($this->url."/api/customers/?display=[id]&filter[date_add]=[2020-01-01,2020-12-31]&filter[id_default_group]=8&date=1", false, $context);
+      $xml_string=file_get_contents($this->url."/api/customers/?display=[id]&filter[date_add]=[2019-01-01,2019-12-31]&filter[id_default_group]=8&date=1", false, $context);
       $xml = simplexml_load_string($xml_string, 'SimpleXMLElement', LIBXML_NOCDATA);
       $maxtimestamp=0;
       foreach($xml->customers->customer as $customer)
