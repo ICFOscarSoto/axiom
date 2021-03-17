@@ -10,7 +10,17 @@
 				{	"name": "roles", "cols": 4},
 				{	"name": "password",	"cols": 4},
 				{	"name": "emailDefaultAccount", "cols": 4},
+				{	"name": "workstation", "cols": 4},
+				{	"name": "defaultlabelprinter", "cols": 4},				
 				{	"name": "active", "cols": 2}
+
 			]
-		}]
+		},
+		{
+			"name": "Mensajeria",
+			"fields": [
+				{ "name": "discorduser", "cols": 4}
+			]
+		}
+	]
 }]

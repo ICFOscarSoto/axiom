@@ -53,6 +53,16 @@ class GlobaleWorkstations
      */
     private $deleted;
 
+    /**
+     * @ORM\Column(type="string", length=128, nullable=true)
+     */
+    private $ipaddress;
+
+    /**
+     * @ORM\Column(type="string", length=17, nullable=true)
+     */
+    private $mac;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -138,6 +148,30 @@ class GlobaleWorkstations
     public function setDeleted(bool $deleted): self
     {
         $this->deleted = $deleted;
+
+        return $this;
+    }
+
+    public function getIpaddress(): ?string
+    {
+        return $this->ipaddress;
+    }
+
+    public function setIpaddress(?string $ipaddress): self
+    {
+        $this->ipaddress = $ipaddress;
+
+        return $this;
+    }
+
+    public function getMac(): ?string
+    {
+        return $this->mac;
+    }
+
+    public function setMac(?string $mac): self
+    {
+        $this->mac = $mac;
 
         return $this;
     }

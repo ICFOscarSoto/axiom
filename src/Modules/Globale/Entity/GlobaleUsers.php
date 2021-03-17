@@ -2,6 +2,7 @@
 
 namespace App\Modules\Globale\Entity;
 
+use App\Modules\Globale\Entity\GlobaleWorkstations;
 use App\Modules\Calendar\Entity\CalendarCalendars;
 use App\Modules\Globale\Entity\GlobaleCompanies;
 use App\Modules\Email\Entity\EmailAccounts;
@@ -119,6 +120,16 @@ class GlobaleUsers implements UserInterface
      * @ORM\Column(type="boolean")
      */
     private $alwaysprintownlabel=true;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleWorkstations")
+     */
+    private $workstation;
+
+    /**
+     * @ORM\Column(type="string", length=125, nullable=true)
+     */
+    private $discorduser;
 
 
 
@@ -494,6 +505,30 @@ class GlobaleUsers implements UserInterface
     public function setAlwaysprintownlabel(bool $alwaysprintownlabel): self
     {
         $this->alwaysprintownlabel = $alwaysprintownlabel;
+
+        return $this;
+    }
+
+    public function getWorkstation(): ?GlobaleWorkstations
+    {
+        return $this->workstation;
+    }
+
+    public function setWorkstation(?GlobaleWorkstations $workstation): self
+    {
+        $this->workstation = $workstation;
+
+        return $this;
+    }
+
+    public function getDiscorduser(): ?string
+    {
+        return $this->discorduser;
+    }
+
+    public function setDiscorduser(?string $discorduser): self
+    {
+        $this->discorduser = $discorduser;
 
         return $this;
     }
