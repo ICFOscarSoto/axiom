@@ -65,6 +65,7 @@ class NavisionGetProducts extends ContainerAwareCommand
         $this->importProduct($input, $output);
         //$this->clearEAN13($input, $output);
         $this->importEAN13($input, $output);
+        $this->importProductsVariants($input, $output);
       }
       break;
       case 'names': $this->updateNames($input, $output);
@@ -878,7 +879,7 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
 
 
  }
-}
+ }
 
  $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"productincrements"]);
  if ($navisionSync==null) {
