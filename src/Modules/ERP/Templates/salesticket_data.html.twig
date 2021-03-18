@@ -1,0 +1,54 @@
+<div class="panel panel-primary panel-shadow" data-collapsed="0" style="-webkit-box-shadow: none; box-shadow:none; padding:0px; margin-bottom: -1px;"><!-- to apply shadow add class "panel-shadow" -->
+  <div class="panel-body">
+    <div class="panel-title">Información de la incidencia</div>
+    <div class="row">
+      <div class="col-6 col-sm-2"> <div class="form-group">
+        <input type="hidden" id="salesticket-form-states" class="form-control">
+          <label for="salesticket-form-states-select">Estado del ticket</label>
+        <select type="text" id="salesticket-form-states-select" class="form-control select2" required>
+          {% for option in states %}
+            <option value="{{ option.id }}"{% if id!=0 %}{% if salesticket.salesticketstate!=null and option.id==salesticket.salesticketstate.id %} selected="selected" {% endif %}{% else %}{% if option.id==1 %} selected="selected"{% endif %}{% endif %}>{{ option.text }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    {% if salesticket.agent is not null %}
+      <div class="col-md-2">
+        <label for="salesticket-form-agent">Agente asignado:</label>
+        <div class="form-group">
+          <input type="text" id="salesticket-form-agent" value="{{ salesticket.agent.name }}" disabled="disabled" class="form-control" placeholder="Agente asignado">
+        </div>
+      </div>
+    {% endif %}
+    <div class="col-4 col-sm-2"> <div class="form-group">
+      <input type="hidden" id="salesticket-form-agents" class="form-control">
+        <label for="salesticket-form-agents-select">Traspasar a otro agente</label>
+      <select type="text" id="salesticket-form-agents-select" class="form-control select2" required>
+        {% for option in agents %}
+          <option value="{{ option.id }}"{% if userData.id!=null and option.id==userData.id %} selected="selected" {% endif %}>{{ option.text }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+    </div>
+    <div class="row">
+      <div class="col-6 col-sm-6"> <div class="form-group" >
+        <label for="salesticket-form-observations">Observaciones</label>
+        <textarea id="salesticket-form-observations" name="salesticket-form-observations" class="form-control" style="min-height:90px;">{% if salesticket.observations!=null %}{{ salesticket.observations }}{% endif %}</textarea>
+
+      </div>
+    </div>
+    </div>
+    <div class="row">
+    <div class="col-md-12">
+      <div class="panel-title-list">Historial</div>
+      {% if salesticketshistorylist is defined %}
+      {% set listConstructor = salesticketshistorylist %}
+      {{ include('@Globale/simplelist.html.twig') }}
+      {% endif %}
+    </div>
+  </div>
+  </div>
+</div>
+<br>
+<br>

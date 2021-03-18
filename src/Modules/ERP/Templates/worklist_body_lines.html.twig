@@ -1,0 +1,64 @@
+<div class="panel panel-primary panel-shadow" data-collapsed="0" style="-webkit-box-shadow: none; box-shadow:none;min-height:200px"><!-- to apply shadow add class "panel-shadow" -->
+  <div class="panel-body" style="padding: 0px !important;" id="worklist-lines" attr-numlines="{{ worklistLines|length }}">
+    <div class="btn-group">
+      <button id="add-line" style="font-size:20px;" type="button" class=" btn btn-primary tooltip-primary"><i class="fa fa-plus" ></i></button>
+    </div>
+    <p></p>
+    <div class="row no-gutters worklist-products-header">
+      <div class="col-sm-2 d-none d-sm-block" style="font-weight:bold;font-size:13px;padding: 7px 2px;">Cod. Producto</div>
+      <div class="col-sm-3 d-none d-sm-block" style="font-weight:bold;font-size:13px;padding: 7px 2px;">Descripción</div>
+      <div class="col-sm-1 d-none d-sm-block" style="font-weight:bold;font-size:13px;padding: 7px 2px;">Cantidad</div>
+      <div class="col-sm-1 d-none d-sm-block" style="font-weight:bold;font-size:13px;padding: 7px 2px;">Ubicación</div>
+
+    </div>
+    {% for line in  worklistLines %}
+      <div class="row no-gutters" attr-id="{{ line.linenum }}" id="worklist-line-{{ line.linenum }}">
+        <div class="col-2 d-block d-sm-none" style="top: 8px;">Cod. Prod.</div>
+        <div class="col-10 col-sm-2">
+          <div class="form-group" style="margin-bottom: 0px;length:258px;">
+            <div class="input-group" style="width:100%;">
+              <a class="btn btn-white" attr-id="{{ line.linenum }}" id="product-form-remove-{{ line.linenum }}" style="position: absolute;height: 31px;left: 0px;padding: 9px 7px;z-index: 10;" href="#"> <i class="fa fa-remove"></i></a>
+              {% if line.product is not null %}
+                <span id="product-form-view-{{ line.linenum }}" class="select2-selection__view_nolabel" style="width: 38px; height: 31px; right: 0px; top:0;" attr-id="{{ line.linenum }}" attr-url="{{ url('formProduct',{'id':'_____'}) }}"><i class="fa fa-file-text-o" aria-hidden="true"></i><span>&nbsp;</span></span>
+
+              {% endif %}
+              <input type="hidden" readonly attr-id="{{ line.linenum }}" id="product-form-line-id-{{ line.linenum }}" value={% if line!=null %}{{ line.linenum }}{% endif %}><input type="hidden" readonly attr-id="{{ line.linenum }}" id="product-form-id-{{ line.linenum }}" value={% if line.product!=null %}{{ line.linenum }}{% endif %}><input type="text" readonly attr-id="{{ line.linenum }}" id="product-form-code-{{ line.linenum }}" class="form-control" style="padding-left: 28px; border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Cod. Producto" value="{{ line.code }}">
+              {% if  line.code is null %}
+              <div class="input-group-btn"><button type="button" attr-id="{{ line.linenum }}" id="product-search-button-{{ line.linenum }}" class="btn btn-white" style="height: 31px; border-radius: 0px;"><i class="fa fa-search"></i> </button></div>
+              {% else %}
+              <div class="input-group-btn"></div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        <div class="col-2 d-block d-sm-none" style="top: 8px;">Nombre</div>
+        <div class="col-10 col-sm-3"> <div class="form-group" style="margin-bottom: 0px;"> <input type="text" readonly id="product-form-name-{{ line.linenum }}" class="form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Nombre" value="{{ line.name }}"> </div> </div>
+        <div class="col-2 d-block d-sm-none" style="top: 8px;">Cantidad</div>
+        <div class="col-3 col-sm-1"> <div class="form-group" style="margin-bottom: 0px;"> <input type="text" id="product-form-quantity-{{ line.linenum }}" class="form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Nombre" value="{{ line.quantity }}"> </div> </div>
+        <div class="col-2 d-block d-sm-none" style="top: 8px;">Ubicación</div>
+        <div class="col-8 col-sm-2">
+          <div class="form-group" style="margin-bottom: 0px;"> <select attr-id="{{ line.linenum }}" id="product-form-location-{{ line.linenum }}" class="form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Ubicación">
+          {% if line.locations is defined %}
+            {% for location in line.locations %}
+                <option value="{{ location.id }}" {% if location.id == line.location.id %} selected {% endif %}>{{ location.name }}</option>
+            {% endfor %}
+          {% endif %}
+          </select>
+        </div>
+      </div>
+      </div>
+    {% endfor %}
+
+  </div>
+</div>
+<script>
+$('body').on('click', "[id^='product-form-view-']", function(e){
+  var id=$(this).attr("attr-id");
+    if(id!=0 && id!=""){
+      url=$(this).attr("attr-url");
+      url=url.replace('_____',$(this).attr("attr-id"));
+      var win = window.open(url, '_blank');
+      win.focus();
+    }
+});
+</script>

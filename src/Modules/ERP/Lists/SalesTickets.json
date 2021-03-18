@@ -1,0 +1,24 @@
+[
+  {"name": "id", "caption":""},
+  {
+      "name" :"customername","caption":"Cliente"
+  },
+  {
+      "name" :"email","caption":"Email"
+  },
+  {
+      "name" :"salesordernumber","caption":"Nº de pedido"
+  },
+  {
+      "name" :"externalsalesordernumber","caption":"Nº de pedido externo"
+  },
+  {
+      "name" :"dateadd","caption":"Fecha del Ticket"
+  },
+  {
+      "name" :"salesticketstate__name","caption":"Estado del Ticket"
+  },
+  {
+      "name" :"agent__name","caption":"Agente"
+  }
+]

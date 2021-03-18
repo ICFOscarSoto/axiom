@@ -1,0 +1,538 @@
+{% if include_pre_templates is defined %}
+	{% for template in include_pre_templates %}
+		{{ include(template) }}
+	{% endfor %}
+{% endif %}
+<input type="hidden" id="search_param"/>
+<script>
+			$(document).ready(function() {
+				var ${{ listConstructor.id }}_var = jQuery("#{{ listConstructor.id }}");
+				var {{ listConstructor.id }} = ${{ listConstructor.id }}_var.DataTable( {
+					"aLengthMenu": [[10, 20, 50, 250], [10, 20, 50, 250]],
+					"pageLength": 20,
+					"oClasses":{
+						"sLengthSelect": "select2"
+					},
+					//"processing": true,
+					"serverSide": true,
+					{% if listConstructor.routeParams is defined %}
+					"ajax": "{{ url( listConstructor.route, listConstructor.routeParams) }}",
+					{% else %}
+					"ajax": "{{ url( listConstructor.route ) }}",
+					{% endif %}
+					"language": {
+						//"processing": '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Cargando...</span> ',
+						"lengthMenu": "Mostrar _MENU_ registros por página",
+						"zeroRecords": "No se encontraron registros",
+						"info": "Mostrando página _PAGE_ de _PAGES_",
+						"infoEmpty": "No se encontraron registros",
+						"infoFiltered": "(filtrados de _MAX_ registros totales)",
+						"search":         "Buscar",
+						"paginate": {
+							"first":      "Primero",
+							"previous":   "Anterior",
+							"next":       "Siguiente",
+							"last":       "Último"
+						},
+
+					},
+
+					"order": [[ {{  listConstructor.orderColumn }}, "{{  listConstructor.orderDirection }}" ]],
+					"columns": [
+            { "name": "checkboxes" ,"data": null, defaultContent: '' },
+						{% for field in  listConstructor.fields %}
+							{ "name": "{{ field.name }}" ,"data": "{{ field.name }}" },
+						{% endfor %}
+
+					],
+					"drawCallback": function( settings ) {
+
+							replaceCheckboxes();
+					},
+
+					{# Sumamos columnas con sum=true #}
+					"footerCallback": function(row, data, start, end, display) {
+						var api = this.api();
+
+						api.columns('.sum', {
+							page: 'current'
+						}).every(function() {
+							var data = this
+								.data()
+								.reduce(function(a, b) {
+									var x = parseFloat(a) || 0;
+									var y = parseFloat(b) || 0;
+									return x + y;
+								}, 0);
+							 this.columns('.time', {page: 'current'}).every(function() {
+								 //if has format we format it
+	 	 							if(data!=null){
+	 								var duration = moment.duration(data, 'seconds');
+	 								var formatted = duration.format("hh:mm:ss");
+	 								if(formatted.length==2) formatted="00:00:"+formatted;
+	 								if(formatted.length==5) formatted="00:"+formatted;
+	 							}else formatted = '00:00:00';
+								data=formatted;
+							 },0);
+							 $("#{{ listConstructor.id }}-footer").show();
+
+							$(this.footer()).html((typeof data!='string'?parseFloat(Math.round(data*100)/100).toLocaleString('es'):data)+' '+$(this.footer()).attr("attr-unity"));
+						});
+					},
+					"columnDefs": [
+						{
+							"targets": 0,
+							"orderable": false,
+							"className": "text-center",
+							"render": function(data, type, row, meta){
+
+									return '<div class="checkbox checkbox-replace">'+
+											  '<input type="checkbox" item-id="'+row['id']+'" class="{{ listConstructor.id }}-chk-list" id="'+row['id']+'-{{ listConstructor.id }}-chk-list">'+
+											  '</div>';
+								}
+						},
+
+						{% set counter = 1 %}
+						{% for field in listConstructor.fields %}
+								{
+									"targets": {{ counter }},
+									{# only show order field in data type fields#}
+									{% if (field.type is not defined or field.type == "data") and (field.orderable is not defined or field.orderable == true) %}
+									"orderable": true,
+									{% else %}
+									"orderable": false,
+									{% endif %}
+
+
+
+									{% if field.class is defined %} "className": "{{ field.class }}", {% endif %}
+									{% if field.width is defined %} "width": "{{ field.width }}", {% endif %}
+
+									{% if field.format is defined %}
+										{% if field.format == "time" %}
+											"render": function(data, type, row, meta){
+													//var date = new Date(data*1000);
+													//return ("0" + date.getHours()).slice(-2)+':'+("0" + date.getMinutes()).slice(-2)+':'+("0" + date.getSeconds()).slice(-2);;
+													if(data!=null){
+														var duration = moment.duration(data, 'seconds');
+														var formatted = duration.format("hh:mm:ss");
+														if(formatted.length==2) formatted="00:00:"+formatted;
+														if(formatted.length==5) formatted="00:"+formatted;
+														return formatted;
+													}else return '00:00:00';
+											}
+										{% endif %}
+										{% if field.format == "float" %}
+											"render": function(data, type, row, meta){
+													//var date = new Date(data*1000);
+													//return ("0" + date.getHours()).slice(-2)+':'+("0" + date.getMinutes()).slice(-2)+':'+("0" + date.getSeconds()).slice(-2);;
+													if(data!=null){
+														//return data.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+														return parseFloat(data).toLocaleString('es'){% if field.unity is defined %}+' {{ field.unity }}'{% endif %};
+													}else return '0';
+											},
+											"sortFunc": (a, b, order) => {
+											    if (order === 'asc') {
+											        return parseFloat(a) - parseFloat(b);
+											    }
+											    return parseFloat(b) - parseFloat(a); // desc
+											},
+										{% endif %}
+									{% else %}
+										"render": function(data, type, row, meta){
+
+											var text='';
+											var id=0;
+												if(Array.isArray(data)){
+													text=data[1];
+													id=data[0];
+													}
+													else text=data;
+											{#	if({{counter}}=={{listConstructor.tagColumn}}){
+													text+="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+													row['_tags'].forEach(function(valor, indice, array) {
+															text+='<div class="label label-'+valor.type+'">'+valor.name+'</div>';
+													});
+												}#}
+												{# Check if has a select associated and fill it #}
+													{% if '__' in field.name %}
+														{# check if exist the element in select #}
+														if(row["{{ field.name}}"]!=null)
+															if ($('#s_{{ field.name}}').find("option[value='" + row["{{ field.name}}"] + "']").length) {
+															   // $('#s_{{ field.name}}').val(row["{{ field.name}}"]).trigger('change');
+															} else {
+																	{# element not exist add it #}
+															    var newOption = new Option(row["{{ field.name}}"], row["{{ field.name}}"], false, false);
+															    $('#s_{{ field.name}}').append(newOption);
+															}
+													{% endif %}
+												{# if field is datetime convert it to spanish date format #}
+												{% if field.type is defined %}
+													{% if field.type == "datetime" %}
+														if(text!=null){
+															var date=moment(text, "YYYY-MM-DD HH:mm:ss");
+															text=date.format('DD/MM/YYYY HH:mm:ss');
+														}
+													{% else %}
+														{% if field.type == "date" %}
+															if(text!=null){
+																var date=moment(text, "YYYY-MM-DD");
+																text=date.format('DD/MM/YYYY');
+															}
+															{% else %}
+																{% if field.type == "dateshort" %}
+																	if(text!=null){
+																		var date=moment(text+'/1970', "DD/MM/YYYY");
+																		text=date.format('DD/MM');
+																	}
+																{% endif %}
+														{% endif %}
+													{% endif %}
+													{% endif %}
+												return text{% if field.unity is defined %}+' {{ field.unity }}'{% endif %};
+										},
+										{% endif %}
+								},
+						{% set counter = counter +1 %}
+						{% endfor %}
+						{% set counter = 1 %}
+
+
+
+						{ "visible": false, "targets": 1 }
+					]
+				}).on( 'processing.dt', function ( e, settings, processing ) {
+					if(processing){
+						if((++load_wait)==1) $("#load-spinner").fadeIn();
+					 }else{
+						if((load_wait)>0){ load_wait--; if(load_wait==0) $("#load-spinner").fadeOut();}
+					}
+    		}).on('preDraw', function () {
+        	if((load_wait)==0){
+						$("#load-spinner").fadeIn();
+						load_wait++;
+
+					}
+		    })
+		    .on( 'draw.dt', function () {
+		      if((load_wait)>0){ load_wait--; if(load_wait==0) $("#load-spinner").fadeOut();}
+		    });
+
+				//Double click row action
+				$('#{{ listConstructor.id }} tbody').on('dblclick', 'tr', function () {
+					var data = {{ listConstructor.id }}.row( this ).data();
+					{% if listConstructor.rowAction is defined %}
+						{# Default action defined in controller #}
+						$('#{{ listConstructor.id }}-field-button-{{ listConstructor.rowAction }}-'+data.id).trigger('click');
+					{% else %}
+						if ($(".default-action")[0]){
+							{# Default action defined in list buttons json #}
+							$(this).find('.default-action').trigger('click');
+						} else {
+							{# Default action no defined, execute first button #}
+							$(this).find("button").filter(":first").trigger('click');
+						}
+					{% endif %}
+				});
+
+				// Initalize Select Dropdown after DataTables is created
+				${{ listConstructor.id }}_var.closest( '.dataTables_wrapper' ).find( 'select' ).select2( {
+					minimumResultsForSearch: -1
+				});
+
+				// Highlighted rows
+				$('body').on('click', '.{{ listConstructor.id }}-chk-list', function() {
+					$p =  $(this).closest('tr');
+					var is_checked = $(this).is(':checked');
+					$p[is_checked ? 'addClass' : 'removeClass']( 'highlight' );
+				});
+
+				var typingTimer;                //timer identifier
+				var doneTypingInterval = 700;  //time in ms, 5 second for example
+				var searchColumn;
+				function clearSearchTimeOut(){
+					clearTimeout(typingTimer);
+  				typingTimer = setTimeout(doSearch, doneTypingInterval);
+				}
+
+				function doSearch () {
+					{{ listConstructor.id }}.columns(searchColumn+':name').search( $("#s_"+searchColumn).val() ).draw();
+					arrayParams={{ listConstructor.id }}.ajax.params();
+					$("#search_param").val(jQuery.param(arrayParams));
+				}
+
+				{% for field in listConstructor.fields %}
+
+					{% if field.replace is defined %}
+						$('body').on('change', '#s_{{ field.name }}', function() {
+							{{ listConstructor.id }}.columns('{{ field.name }}:name').search( this.value ).draw();
+							arrayParams={{ listConstructor.id }}.ajax.params();
+							$("#search_param").val(jQuery.param(arrayParams));
+						});
+					{% else %}
+						if($("#s_{{ field.name }}").is('select')) event="change"; else event="keyup";
+						$('body').on(event, '#s_{{ field.name }}', function() {
+							searchColumn='{{ field.name }}';
+							if($(this).is('select')) doSearch ();
+								else{
+									clearSearchTimeOut();
+								}
+						});
+						$('body').on('keydown', '#s_{{ field.name }}', function() {
+							 clearTimeout(typingTimer);
+						});
+					{% endif %}
+
+
+
+				{% endfor %}
+
+				// Button select all checkboxes
+				$("#{{ listConstructor.id }}-chkall").click(function(){
+					var is_checked = $(this).is(':checked');
+					$p =  $("[id^='{{ listConstructor.id }}-chk-list']").closest('tr');
+					if(is_checked){
+						$("[id*='{{ listConstructor.id }}-chk-list']").iCheck('check');
+						$("[id*='{{ listConstructor.id }}-chk-list']").attr('checked', true);
+						$("[id*='{{ listConstructor.id }}-chk-list']").parent().parent().addClass('checked');
+						$p.addClass( 'highlight' );
+					}else{
+						$("[id*='{{ listConstructor.id }}-chk-list']").iCheck('uncheck');
+						$("[id*='{{ listConstructor.id }}-chk-list']").attr('checked', false);
+						$("[id*='{{ listConstructor.id }}-chk-list']").parent().parent().removeClass('checked');
+						$p.removeClass( 'highlight' );
+					 }
+				});
+				{# moved modal confirm #}
+			});
+
+			//Top buttons Background or modal
+	</script>
+
+
+	{% if include_pre_list_templates is defined %}
+		{% for template in include_pre_list_templates %}
+			{{ include(template) }}
+		{% endfor %}
+	{% endif %}
+
+	<table id="{{ listConstructor.id }}" class="table table-bordered hover stripe compact datatable" style="width: 100%">
+			<thead class="table-thead">
+				<tr>
+					<th class="table-header-search" style="border-bottom: 1px solid #cecece !important;vertical-align: middle;text-align: center;font-size: 22px;color: #cececece;">
+						<i class="fa fa-search"></i>
+					</th>
+					{# only show search fields in data type fields#}
+					{% for field in listConstructor.fields %}
+						{% if field.type is not defined or field.type == "data" %}
+							<th class="table-header-search" style="border-bottom: 1px solid #cecece !important;">
+								{% if field.filter is not defined or field.filter == true %}
+									{% if field.replace is defined %}
+									  {# Show combo box on replaces #}
+										<select id="s_{{ field.name }}" class="form-control table-header-search-input select2 select2-use">
+											<option value="##ALL##">Todos</option>
+											{% for key,option in field.replace %}
+												<option value="{{ key }}" {% if option.default is defined and option.default == true%} attr-default="true" selected="selected" {% endif %}>{{ option.text }}</option>
+											{% endfor %}
+
+										</select>
+										<script>
+											$(document).ready(function() {
+												$("#s_{{ field.name }}").select2({dropdownCssClass : 'select2-bigdrop'});
+											});
+										</script>
+									{% else %}
+										{% if '__' in field.name %}
+											{# Relations #}
+
+												<select id="s_{{ field.name }}" class="form-control table-header-search-input select2 select2-use">
+
+														<option value="##ALL##" selected> -- Todos -- </option>
+														<option value="##NULL##"> -- Ninguno -- </option>
+
+												</select>
+												<script>
+													$(document).ready(function() {
+														$("#s_{{ field.name }}").select2({dropdownCssClass : 'select2-bigdrop'});
+													});
+												</script>
+										{% else %}
+									   	{# Other fields show inputs #}
+
+											<input id="s_{{ field.name }}" type="text" class="table-header-search-input form-control" placeholder="Buscar {{ (field.caption)|trans }}"  autocomplete="off"/>
+
+										{% endif %}
+									{% endif %}
+								{% endif %}
+							</th>
+						{% else %}
+							<th class="table-header-search" style="border-bottom: 1px solid #cecece !important;">
+								{% if field.type == "datetime" %}
+									<div><div style="z-index: 5 !important;" class='input-group date'>
+												<input id="s_{{ field.name }}_from" attr-group="{{ field.name }}" attr-max="s_{{ field.name }}_to" type="text" class="datetimepicker table-header-search-input form-control" placeholder="{{ (field.caption)|trans }} desde"  autocomplete="off"/>
+												<span class="input-group-addon">
+                        	<span class="glyphicon glyphicon-calendar"></span>
+                    		</span>
+										</div></div>
+									<div style="height: 5px;"></div>
+									<div><div style="z-index: 2 !important;" class='input-group date'>
+										<input id="s_{{ field.name }}_to" attr-group="{{ field.name }}" attr-min="s_{{ field.name }}_from" type="text" class="datetimepicker table-header-search-input form-control" placeholder="{{ (field.caption)|trans }} hasta"  autocomplete="off"/>
+										<span class="input-group-addon">
+											<span class="glyphicon glyphicon-calendar"></span>
+										</span>
+									</div></div>
+									{% else %}
+									{% if field.type == "date" %}
+										<div><div style="z-index: 5 !important;" class='input-group date'>
+													<input id="s_{{ field.name }}_from" attr-group="{{ field.name }}" attr-max="s_{{ field.name }}_to" type="text" class="datepicker table-header-search-input form-control" placeholder="{{ (field.caption)|trans }} desde"  autocomplete="off"/>
+													<span class="input-group-addon">
+														<span class="glyphicon glyphicon-calendar"></span>
+													</span>
+											</div></div>
+										<div style="height: 5px;"></div>
+										<div><div style="z-index: 2 !important;" class='input-group date'>
+											<input id="s_{{ field.name }}_to" attr-group="{{ field.name }}" attr-min="s_{{ field.name }}_from" type="text" class="datepicker table-header-search-input form-control" placeholder="{{ (field.caption)|trans }} hasta"  autocomplete="off"/>
+											<span class="input-group-addon">
+												<span class="glyphicon glyphicon-calendar"></span>
+											</span>
+										</div></div>
+									{% endif %}
+								{% endif %}
+							</th>
+						{% endif %}
+					{% endfor %}
+
+				</tr>
+					<th class="table-header-name table-thead" style="border-bottom: 1px solid #cecece !important;">
+						<div class="checkbox checkbox-replace">
+							<input type="checkbox" id="{{ listConstructor.id }}-chkall">
+						</div>
+					</th>
+					{% for field in listConstructor.fields %}
+						<th style="border-bottom: 1px solid #cecece !important;" class="table-header-name table-thead {% if field.sum is defined and field.sum == true %} sum {% endif %} {% if field.format is defined %} {{field.format}} {% endif %}">{{ (field.caption)|trans }} </th>
+					{% endfor %}
+
+			</thead>
+		<tfoot id="{{ listConstructor.id }}-footer" style="display:none">
+			<tr>
+				<td class="table-footer">
+					<b>TOTALES</b>
+				</td>
+				{# only show search fields in data type fields#}
+				{% for field in listConstructor.fields %}
+					{% if field.type is not defined or field.type == "data" %}
+						<td class="table-footer" {% if field.unity is defined %} attr-unity="{{ field.unity }}" {% endif %}></td>
+					{% else %}
+						<td></td>
+					{% endif %}
+				{% endfor %}
+
+
+
+			</tr>
+		</tfoot>
+	</table>
+
+	{{ include('@Globale/list_modal_confirm.html.twig') }}
+
+	<script>
+	$(document).ready(function() {
+		$('body').tooltip({ selector: '[data-toggle="tooltip"]' });
+		$('.datetimepicker').each(function(index) {
+			var valueField=$(this).val();
+			var dateField=moment(valueField, "DD/MM/YYYY HH:mm:ss");
+				$(this).datetimepicker({
+				showTodayButton: true,
+				format: 'DD/MM/YYYY HH:mm:ss',
+				locale:'es',
+				useCurrent: false,
+				tooltips: spanish_tooltips_datetimepicker,
+				date: (dateField.isValid())?dateField:null
+			});
+		});
+		$('.datepicker').each(function(index) {
+			var valueField=$(this).val();
+			var dateField=moment(valueField, "DD/MM/YYYY");
+				$(this).datetimepicker({
+				showTodayButton: true,
+				format: 'DD/MM/YYYY',
+				locale:'es',
+				useCurrent: false,
+				tooltips: spanish_tooltips_datetimepicker,
+				date: (dateField.isValid())?dateField:null
+			});
+		});
+
+		$('.timepicker').each(function(index) {
+			var valueField=$(this).val();
+			var dateField=moment(valueField, "HH:mm:ss");
+				$(this).datetimepicker({
+				showTodayButton: true,
+				format: 'HH:mm:ss',
+				locale:'es',
+				useCurrent: false,
+				tooltips: spanish_tooltips_datetimepicker,
+				date: (dateField.isValid())?dateField:null
+			});
+
+		});
+		$("[id$='_from']").on("dp.change", function (e) {
+				var from_date=e.date;
+				var to_date=$('#'+$(this).attr('attr-max')).data("DateTimePicker").date();
+				from_date=from_date!=null?from_date.format("YYYY-MM-DD HH:mm:ss"):"";
+				to_date=to_date!=null?to_date.format("YYYY-MM-DD HH:mm:ss"):"";
+				$('#'+$(this).attr('attr-max')).data("DateTimePicker").minDate(e.date);
+				$("#{{ listConstructor.id }}").DataTable().columns($(this).attr('attr-group')+':name').search( from_date+'#'+to_date ).draw();
+				arrayParams=$("#{{ listConstructor.id }}").DataTable().ajax.params();
+				$("#search_param").val(jQuery.param(arrayParams));
+		});
+		$("[id$='_to']").on("dp.change", function (e) {
+				var to_date=e.date;
+				var from_date=$('#'+$(this).attr('attr-min')).data("DateTimePicker").date();
+				if(e.oldDate==null){
+					e.date.set({h:23,m:59,s:59});
+					$('#'+$(this).attr('id')).data("DateTimePicker").date(e.date);
+				}
+				from_date=from_date!=null?from_date.format("YYYY-MM-DD HH:mm:ss"):"";
+				to_date=to_date!=null?to_date.format("YYYY-MM-DD HH:mm:ss"):"";
+				$('#'+$(this).attr('attr-min')).data("DateTimePicker").maxDate(e.date);
+				$("#{{ listConstructor.id }}").DataTable().columns($(this).attr('attr-group')+':name').search( from_date+'#'+to_date ).draw();
+				arrayParams=$("#{{ listConstructor.id }}").DataTable().ajax.params();
+				$("#search_param").val(jQuery.param(arrayParams));
+		});
+
+		$('body').on('click', "#clear-filters", function() {
+				$("#clear-filters").parent().parent().parent().find('input').val('');
+				$("#clear-filters").parent().parent().parent().find('select').select2('val', $(this).find(">:first-child").val());
+				//$('#s_invalid').select2('val', $('#s_invalid option:first-child').val());
+				$("#{{ listConstructor.id }}").DataTable().columns().search("").draw();
+				//$("#{{ listConstructor.id }}").DataTable().ajax.reload();
+
+		});
+
+
+
+
+		/*$("[id$='_to']").on("dp.change", function (e) {
+				$('#'+$(this).attr('attr-min')).data("DateTimePicker").maxDate(e.date);
+				console.log("Cambio");
+		});*/
+	});
+	</script>
+
+{% if include_post_templates is defined %}
+	{% for template in include_post_templates %}
+		{{ include(template) }}
+	{% endfor %}
+{% endif %}
+
+{% if listOrigin is not defined %}
+<!-- MODALS  -->
+	{% if forms is defined %}
+		{% for form in forms %}
+			{% set formConstructor = form %}
+			{{ include('@Globale/genericajaxform.html.twig') }}
+		{% endfor %}
+	{% endif %}
+	<!-- END MODALS -->
+{% endif %}

@@ -454,7 +454,6 @@ public function getUsersStatus(Request $request){
     return new JsonResponse(["result"=>-1]);
 }
 
-
   /**
   * @Route("/api/global/users/kick/{id}", name="kickuser")
   */
@@ -477,6 +476,19 @@ public function getUsersStatus(Request $request){
         }
       }
       return new JsonResponse(["result"=>-1]);
+  }
+
+  /**
+  * @Route("/api/global/users/poweronworkstation/{discorduser}", name="botPowerOnWorkStation")
+  */
+  public function botPowerOnWorkStation($discorduser,Request $request){
+      $userRepository=$this->getDoctrine()->getRepository(GlobaleUsers::class);
+      $user = $userRepository->findOneBy(["discorduser"=>$discorduser]);
+      if(!$user) return new JsonResponse(["result"=>-1]);
+      if(!$user->getWorkstation()) return new JsonResponse(["result"=>-2]);
+      if($user->getWorkstation()->getMac()==null) return new JsonResponse(["result"=>-3]);
+      shell_exec("wakeonlan ".$user->getWorkstation()->getMac());
+      return new JsonResponse(["result"=>1]);
   }
 
 }

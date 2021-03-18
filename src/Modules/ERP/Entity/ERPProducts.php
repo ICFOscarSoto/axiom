@@ -856,13 +856,14 @@ class ERPProducts
                      $productpricesEntity->setDateadd(new \DateTime());
 
                }
-                   $em->persist($productpricesEntity);
+                   $em->merge($productpricesEntity);
              }
              $em->flush();
+             $em->clear();
           }
 
          }
-
+         return $this;
      }
 
 
@@ -915,15 +916,15 @@ class ERPProducts
                      $customerpricesEntity->setEnd($customerincrement_obj->getEnd());
 
                }
-                   $em->persist($customerpricesEntity);
+                   $em->merge($customerpricesEntity);
              }
 
              //$em->persist($productEntity);
              $em->flush();
-
+             $em->clear();
            }
          }
-
+         return $this;
 
      }
 

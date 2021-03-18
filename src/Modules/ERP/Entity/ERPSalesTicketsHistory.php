@@ -1,14 +1,16 @@
 <?php
 
-namespace App\Modules\Globale\Entity;
+namespace App\Modules\ERP\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use \App\Modules\Globale\Entity\GlobaleCompanies;
+use \App\Modules\ERP\Entity\ERPSalesTickets;
+use \App\Modules\Globale\Entity\GlobaleUsers;
+use \App\Modules\ERP\Entity\ERPSalesTicketsStates;
 
 /**
- * @ORM\Entity(repositoryClass="App\Modules\Globale\Repository\GlobaleWorkstationsRepository")
+ * @ORM\Entity(repositoryClass="App\Repository\Modules\ERP\Entity\ERPSalesTicketsHistoryRepository")
  */
-class GlobaleWorkstations
+class ERPSalesTicketsHistory
 {
     /**
      * @ORM\Id()
@@ -18,20 +20,27 @@ class GlobaleWorkstations
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCompanies")
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPSalesTickets")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $company;
+    private $salesticket;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleUsers")
+     * @ORM\JoinColumn(nullable=false)
      */
-    private $deviceid;
+    private $agent;
 
     /**
-     * @ORM\Column(type="string", length=150)
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPSalesTicketsStates")
+     * @ORM\JoinColumn(nullable=false)
      */
-    private $name;
+    private $salesticketstate;
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $observations;
 
     /**
      * @ORM\Column(type="datetime")
@@ -53,53 +62,55 @@ class GlobaleWorkstations
      */
     private $deleted;
 
-    /**
-     * @ORM\Column(type="string", length=128, nullable=true)
-     */
-    private $ipaddress;
-
-    /**
-     * @ORM\Column(type="string", length=17, nullable=true)
-     */
-    private $mac;
-
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getCompany(): ?GlobaleCompanies
+    public function getSalesticket(): ?ERPSalesTickets
     {
-        return $this->company;
+        return $this->salesticket;
     }
 
-    public function setCompany(?GlobaleCompanies $company): self
+    public function setSalesticket(?ERPSalesTickets $salesticket): self
     {
-        $this->company = $company;
+        $this->salesticket = $salesticket;
 
         return $this;
     }
 
-    public function getDeviceid(): ?string
+    public function getAgent(): ?GlobaleUsers
     {
-        return $this->deviceid;
+        return $this->agent;
     }
 
-    public function setDeviceid(string $deviceid): self
+    public function setAgent(?GlobaleUsers $agent): self
     {
-        $this->deviceid = $deviceid;
+        $this->agent = $agent;
 
         return $this;
     }
 
-    public function getName(): ?string
+    public function getSalesticketstate(): ?ERPSalesTicketsStates
     {
-        return $this->name;
+        return $this->salesticketstate;
     }
 
-    public function setName(string $name): self
+    public function setSalesticketstate(?ERPSalesTicketsStates $salesticketstate): self
     {
-        $this->name = $name;
+        $this->salesticketstate = $salesticketstate;
+
+        return $this;
+    }
+
+    public function getObservations(): ?string
+    {
+        return $this->observations;
+    }
+
+    public function setObservations(?string $observations): self
+    {
+        $this->observations = $observations;
 
         return $this;
     }
@@ -148,30 +159,6 @@ class GlobaleWorkstations
     public function setDeleted(bool $deleted): self
     {
         $this->deleted = $deleted;
-
-        return $this;
-    }
-
-    public function getIpaddress(): ?string
-    {
-        return $this->ipaddress;
-    }
-
-    public function setIpaddress(?string $ipaddress): self
-    {
-        $this->ipaddress = $ipaddress;
-
-        return $this;
-    }
-
-    public function getMac(): ?string
-    {
-        return $this->mac;
-    }
-
-    public function setMac(?string $mac): self
-    {
-        $this->mac = $mac;
 
         return $this;
     }

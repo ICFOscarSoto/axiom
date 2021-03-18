@@ -98,6 +98,8 @@ user: Usuario
 data: Datos
 Select globaleusergroups: Seleccione un grupo de usuarios
 Signature: Firma
+Defaultlabelprinter: Impresora Etiquetas
+Discorduser: Usuario Discord
 
 #ACTIVITIES
 #----------------------------------------------------------------------------------------------------------------------
