@@ -350,3 +350,7 @@ ERPPurchasesBudgets:
 ERPPurchasesOrders:
   resource: 'App\Modules\ERP\Controller\ERPPurchasesOrdersController'
   type:      annotation
+
+ERPMyBackpack:
+  resource: 'App\Modules\ERP\Controller\ERPMyBackpackController'
+  type:      annotation
