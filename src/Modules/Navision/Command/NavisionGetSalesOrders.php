@@ -75,14 +75,14 @@ class NavisionGetSalesOrders extends ContainerAwareCommand
 
     public function importSaleOrders(InputInterface $input, OutputInterface $output){
       //------Sync Sales budgets    ------
-/*
+
       $command = $this->getApplication()->find('navision:getsalesbudgets');
       $arguments = [
           'entity'    => 'salesbudgets'
       ];
       $cmdProductsInput = new ArrayInput($arguments);
       $cmdProductsreturn = $command->run($cmdProductsInput, $output);
-*/
+
 
       //------   Create Lock Mutex    ------
       if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
