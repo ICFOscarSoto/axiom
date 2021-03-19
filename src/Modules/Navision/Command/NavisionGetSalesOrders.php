@@ -75,14 +75,14 @@ class NavisionGetSalesOrders extends ContainerAwareCommand
 
     public function importSaleOrders(InputInterface $input, OutputInterface $output){
       //------Sync Sales budgets    ------
-
+/*
       $command = $this->getApplication()->find('navision:getsalesbudgets');
       $arguments = [
           'entity'    => 'salesbudgets'
       ];
       $cmdProductsInput = new ArrayInput($arguments);
       $cmdProductsreturn = $command->run($cmdProductsInput, $output);
-
+*/
 
       //------   Create Lock Mutex    ------
       if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
@@ -392,7 +392,7 @@ class NavisionGetSalesOrders extends ContainerAwareCommand
          else{
               $obj->setCustomer($customer);
               $commercialterms=$repositoryCustomerCommercialTerms->findOneBy(["customer"=>$customer]);
-              $obj->setCustomergroup($commercialterms->getCustomergroup());
+              if($commercialterms!=null) $obj->setCustomergroup($commercialterms->getCustomergroup());
 
             }//existe el cliente asociado al pedido
            $paymentmethod=$repositoryPaymentMethods->findOneBy(["paymentcode"=>$object["paymentcode"], "deleted"=>0]);
