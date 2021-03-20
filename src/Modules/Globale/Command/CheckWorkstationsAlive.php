@@ -19,6 +19,7 @@ class CheckWorkstationsAlive extends ContainerAwareCommand
         $this
             ->setName('globale:checkworkstationsalive')
             ->setDescription('Check if workstations are alive')
+            ->addArgument('ip', InputArgument::REQUIRED, '¿que ip checkear?')
         ;
   }
 
@@ -26,10 +27,15 @@ class CheckWorkstationsAlive extends ContainerAwareCommand
   {
     $this->doctrine = $this->getContainer()->get('doctrine');
     $this->entityManager = $this->doctrine->getManager();
-
-    //Execute different tasks
-    $output->writeln([__DIR__]);
-    $this->CheckStatus($output);
+    $ip = $input->getArgument('ip');
+    switch($ip){
+      case 'all':
+        $this->CheckStatus($output);
+      break;
+      default:
+        $this->CheckIpStatus($output, $ip);
+      break;
+    }
   }
 
   function CheckStatus($output){
@@ -38,15 +44,22 @@ class CheckWorkstationsAlive extends ContainerAwareCommand
     $workstationsRepository = $this->doctrine->getRepository(GlobaleWorkstations::class);
     $workstations=$workstationsRepository->findBy(["deleted"=>0, "active"=>1]);
     foreach($workstations as $key=>$item){
-      $alive=false;
       if($item->getIpaddress()){
-        $output->writeln([' -Cheking icmp: '.$item->getIpaddress()]);
-        $exec = exec("ping -c 2 -s 64 -t 64 ".$item->getIpaddress());
-        $array=explode("=", $exec );
-        $output->writeln([end($array)]);
-        $array = explode("/", end($array) );
-        if(is_array($array) && count($array)>1 && $array[1]>0) $alive=true;
+        shell_exec ("nohup php bin/console globale:checkworkstationsalive ".$item->getIpaddress()." &");
       }
+    }
+  }
+
+  function CheckIpStatus($output, $ip){
+    $workstationsRepository = $this->doctrine->getRepository(GlobaleWorkstations::class);
+    $item=$workstationsRepository->findOneBy(["ipaddress"=>$ip,"deleted"=>0, "active"=>1]);
+    if($item){
+      $alive=false;
+      $exec = exec("ping -c 2 -s 64 -t 64 ".$item->getIpaddress());
+      $array=explode("=", $exec );
+      $output->writeln([end($array)]);
+      $array = explode("/", end($array) );
+      if(is_array($array) && count($array)>1 && $array[1]>0) $alive=true;
       if($item->getAlive()!=$alive){
           if($alive) file_get_contents("https://icfbot.ferreteriacampollano.com/message.php?msg=".urlencode(":computer: El equipo ".$item->getName()." está encendido :green_circle:"));
             else file_get_contents("https://icfbot.ferreteriacampollano.com/message.php?msg=".urlencode(":computer: El equipo ".$item->getName()." se ha apagado :red_circle:"));
@@ -54,10 +67,8 @@ class CheckWorkstationsAlive extends ContainerAwareCommand
           $this->entityManager->persist($item);
           $this->entityManager->flush();
       }
-
     }
   }
-
 
 }
 ?>
