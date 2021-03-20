@@ -45,7 +45,7 @@ class CheckWorkstationsAlive extends ContainerAwareCommand
     $workstations=$workstationsRepository->findBy(["deleted"=>0, "active"=>1]);
     foreach($workstations as $key=>$item){
       if($item->getIpaddress()){
-        shell_exec ("nohup php bin/console globale:checkworkstationsalive ".$item->getIpaddress()." &");
+        shell_exec ("nohup php bin/console globale:checkworkstationsalive ".$item->getIpaddress()." > /dev/null 2>&1 &");
       }
     }
   }
