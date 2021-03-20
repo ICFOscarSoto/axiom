@@ -491,4 +491,17 @@ public function getUsersStatus(Request $request){
       return new JsonResponse(["result"=>1]);
   }
 
+  /**
+  * @Route("/api/global/users/poweroffworkstation/{discorduser}", name="botPowerOffWorkStation")
+  */
+  public function botPowerOnWorkStation($discorduser,Request $request){
+      $userRepository=$this->getDoctrine()->getRepository(GlobaleUsers::class);
+      $user = $userRepository->findOneBy(["discorduser"=>$discorduser]);
+      if(!$user) return new JsonResponse(["result"=>-1]);
+      if(!$user->getWorkstation()) return new JsonResponse(["result"=>-2]);
+      if($user->getWorkstation()->getIpaddress()==null) return new JsonResponse(["result"=>-3]);
+      shell_exec("net rpc shutdown -I ".$user->getWorkstation()->getIpaddress()." -U ".$user->getWorkstation()->getUser()."%".$user->getWorkstation()->getPassword());
+      return new JsonResponse(["result"=>1]);
+  }
+
 }
