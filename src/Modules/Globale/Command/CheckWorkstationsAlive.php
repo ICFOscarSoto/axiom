@@ -45,7 +45,8 @@ class CheckWorkstationsAlive extends ContainerAwareCommand
     $workstations=$workstationsRepository->findBy(["deleted"=>0, "active"=>1]);
     foreach($workstations as $key=>$item){
       if($item->getIpaddress()){
-        shell_exec ("nohup php bin/console globale:checkworkstationsalive ".$item->getIpaddress()." > /dev/null 2>&1 &");
+        $output->writeln($this->getContainer()->get('kernel')->getRootDir());
+        shell_exec ("nohup php ".$this->getContainer()->get('kernel')->getRootDir()."/../bin/console globale:checkworkstationsalive ".$item->getIpaddress()." > /dev/null 2>&1 &");
       }
     }
   }
@@ -61,8 +62,8 @@ class CheckWorkstationsAlive extends ContainerAwareCommand
       $array = explode("/", end($array) );
       if(is_array($array) && count($array)>1 && $array[1]>0) $alive=true;
       if($item->getAlive()!=$alive){
-          if($alive) file_get_contents("https://icfbot.ferreteriacampollano.com/message.php?msg=".urlencode(":computer: El equipo ".$item->getName()." está encendido :green_circle:"));
-            else file_get_contents("https://icfbot.ferreteriacampollano.com/message.php?msg=".urlencode(":computer: El equipo ".$item->getName()." se ha apagado :red_circle:"));
+          //if($alive) file_get_contents("https://icfbot.ferreteriacampollano.com/message.php?msg=".urlencode(":computer: El equipo ".$item->getName()." está encendido :green_circle:"));
+          //  else file_get_contents("https://icfbot.ferreteriacampollano.com/message.php?msg=".urlencode(":computer: El equipo ".$item->getName()." se ha apagado :red_circle:"));
           $item->setAlive($alive);
           $this->entityManager->persist($item);
           $this->entityManager->flush();
