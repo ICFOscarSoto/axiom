@@ -494,7 +494,7 @@ public function getUsersStatus(Request $request){
   /**
   * @Route("/api/global/users/poweroffworkstation/{discorduser}", name="botPowerOffWorkStation")
   */
-  public function botPowerOnWorkStation($discorduser,Request $request){
+  public function botPowerOffWorkStation($discorduser,Request $request){
       $userRepository=$this->getDoctrine()->getRepository(GlobaleUsers::class);
       $user = $userRepository->findOneBy(["discorduser"=>$discorduser]);
       if(!$user) return new JsonResponse(["result"=>-1]);
