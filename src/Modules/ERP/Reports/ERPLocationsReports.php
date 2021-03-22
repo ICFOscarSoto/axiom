@@ -131,7 +131,7 @@ class ERPLocationsReports{
       }
     }
     if($params["type"]==3){
-      $this->pdf  = new \FPDF('P','mm',array(68,32));
+      $this->pdf  = new \FPDF('P','mm',array(32,68));
       $this->pdf->AliasNbPages();
       $this->pdf->SetAutoPageBreak(false);
       $this->pdf->AddPage();
