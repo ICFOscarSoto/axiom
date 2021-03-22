@@ -138,7 +138,8 @@ class ERPLocationsReports{
       $options = new QROptions([
         'version'    => 1,
         'outputType' => QRCode::OUTPUT_IMAGE_PNG,
-        'eccLevel'   => QRCode::ECC_M
+        'eccLevel'   => QRCode::ECC_M,
+        'scale' => 26
       ]);
 
       foreach ($params["locations"] as $key=> $location){
