@@ -143,8 +143,6 @@ class ERPLocationsReports{
         'scale' => 26
       ]);
 
-      $i=1;
-      $this->pdf->SetFillColor(255, 248, 53);
       $this->pdf->Rect(0, 0, 210, 148, 'DF');
       $this->pdf->Rect(0, 148, 210, 149, 'DF');
       $this->pdf->SetFont('Arial','b',90);
@@ -152,14 +150,12 @@ class ERPLocationsReports{
           $this->pdf->AddPage();
           $this->pdf->Rect(0, 0, 210, 148, 'DF');
           $this->pdf->Rect(0, 148, 210, 149, 'DF');
-          $i=1;
         $qrcode = new QRCode($options);
         $path=$tempPath.'loc-'.$location['id'].'.png';
         $qrcode->render('LOC.'.$location['name'], $path);
-        $this->pdf->Image($path, 30, 150-17, 150, 150);
+        $this->pdf->Image($path, 0, 0, 0, 0);
         $this->pdf->SetXY(0,150+105);
         $this->pdf->Cell(210, 50, $location['name'], 0, 0, 'C');
-        $i++;
 
         unlink($path);
       }
