@@ -135,18 +135,18 @@ class ERPLocationsReports{
       $this->pdf->AliasNbPages();
       $this->pdf->SetAutoPageBreak(false);
       $this->pdf->SetFont('Arial','',24);
-      /*$options = new QROptions([
+      $options = new QROptions([
         'version'    => 1,
         'outputType' => QRCode::OUTPUT_IMAGE_PNG,
         'eccLevel'   => QRCode::ECC_M,
         'scale' => 26
-      ]);*/
+      ]);
 
       foreach ($params["locations"] as $key=> $location){
         $this->pdf->AddPage();
-        //$qrcode = new QRCode($options);
+        $qrcode = new QRCode($options);
         $path=$tempPath.'loc-'.$location['id'].'.png';
-        //$qrcode->render('LOC.'.$location['name'], $path);
+        $qrcode->render('LOC.'.$location['name'], $path);
         $this->pdf->Image($path, 1, 7.5, 30, 30);
         $this->pdf->SetXY(0,5);
 
@@ -159,7 +159,7 @@ class ERPLocationsReports{
       }
 
 
-        //unlink($path);
+        unlink($path);
       }
     }
 
