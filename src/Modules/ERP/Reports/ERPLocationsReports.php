@@ -131,33 +131,35 @@ class ERPLocationsReports{
       }
     }
     if($params["type"]==3){
-      $this->pdf  = new \FPDF('P','mm',array(32,68));
+      $this->pdf  = new \FPDF('L','mm',array(38,62));
       $this->pdf->AliasNbPages();
       $this->pdf->SetAutoPageBreak(false);
-      $this->pdf->AddPage();
-      $this->pdf->SetFont('Arial','',12);
-      $options = new QROptions([
+      $this->pdf->SetFont('Arial','',24);
+      /*$options = new QROptions([
         'version'    => 1,
         'outputType' => QRCode::OUTPUT_IMAGE_PNG,
         'eccLevel'   => QRCode::ECC_M,
         'scale' => 26
-      ]);
+      ]);*/
 
-      $this->pdf->Rect(0, 0, 210, 148, 'DF');
-      $this->pdf->Rect(0, 148, 210, 149, 'DF');
-      $this->pdf->SetFont('Arial','b',90);
       foreach ($params["locations"] as $key=> $location){
-          $this->pdf->AddPage();
-          $this->pdf->Rect(0, 0, 210, 148, 'DF');
-          $this->pdf->Rect(0, 148, 210, 149, 'DF');
-        $qrcode = new QRCode($options);
+        $this->pdf->AddPage();
+        //$qrcode = new QRCode($options);
         $path=$tempPath.'loc-'.$location['id'].'.png';
-        $qrcode->render('LOC.'.$location['name'], $path);
-        $this->pdf->Image($path, 0, 0, 0, 0);
-        $this->pdf->SetXY(0,150+105);
-        $this->pdf->Cell(210, 50, $location['name'], 0, 0, 'C');
+        //$qrcode->render('LOC.'.$location['name'], $path);
+        $this->pdf->Image($path, 1, 7.5, 30, 30);
+        $this->pdf->SetXY(0,5);
 
-        unlink($path);
+        $this->pdf->Cell(65, -1.5, $location['name'], 0, 0, 'C');
+        if($location['orientation']==0){
+          $this->pdf->Image($params["rootdir"].DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'locations'.DIRECTORY_SEPARATOR.'arrow_up.png', 32.5,13,28,15);
+        }
+        if($location['orientation']==1){
+        $this->pdf->Image($params["rootdir"].DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'locations'.DIRECTORY_SEPARATOR.'arrow_down.png', 32.5,15,28,15);
+      }
+
+
+        //unlink($path);
       }
     }
 
