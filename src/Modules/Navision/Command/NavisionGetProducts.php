@@ -1251,11 +1251,11 @@ public function importReferences(InputInterface $input, OutputInterface $output)
     $obj->setDateupd(new \Datetime());
     $obj->setDeleted(0);
     $obj->setActive(1);
-    if ($object["Cross Reference Type"]==2){
+    if ($object["Cross-Reference Type"]==2){
       $supplier=$repositorySupliers->findOneBy(["code"=>$object["Cross-Reference Type No."]]);
       $obj->setSupplier($supplier);
       $obj->setType(1);
-    } else if ($object["Cross Reference Type"]==1){
+    } else if ($object["Cross-Reference Type"]==1){
       $customer=$repositoryCustomers->findOneBy(["code"=>$object["Cross-Reference Type No."]]);
       $obj->setCustomer($customer);
       $obj->setType(2);
