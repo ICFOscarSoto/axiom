@@ -1304,9 +1304,9 @@ public function clearReferences(InputInterface $input, OutputInterface $output){
       $count++;
       foreach ($references as $id) {
         $reference=$repository->findOneBy(["id"=>$id, "company"=>2]);
-        if ($reference->getType()=1)
+        if ($reference->getType()==1)
         $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getReference.php?reference='.$reference->getName().'$crossReferenceNo='.$reference->getSupplier()->getCode());
-        else if ($reference->getType()=2)
+        else if ($reference->getType()==2)
         $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getReference.php?reference='.$reference->getName().'$crossReferenceNo='.$reference->getCustomer()->getCode());
 
         $objects=json_decode($json, true);
