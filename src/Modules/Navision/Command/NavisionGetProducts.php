@@ -1242,8 +1242,8 @@ public function importReferences(InputInterface $input, OutputInterface $output)
   //Disable SQL logger
   $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
   foreach ($objects["class"] as $key=>$object){
-    $reference=preg_replace('/\D/','',$object["Cross-Reference No."]);
-    $obj=$repository->findOneBy(["name"=>$reference]);
+    //$reference=preg_replace('/\D/','',$object["Cross-Reference No."]);
+    $obj=$repository->findOneBy(["name"=>$object["Cross-Reference No."]]);
     $output->writeln('  - '.$object["Item No."].' - '.$reference);
     $obj=new ERPReferences();
     $obj->setName($reference);
