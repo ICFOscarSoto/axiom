@@ -1255,7 +1255,7 @@ public function importReferences(InputInterface $input, OutputInterface $output)
       $supplier=$repositorySupliers->findOneBy(["code"=>$object["Cross-Reference Type No."]]);
       $obj->setSupplier($supplier);
       $obj->setType(1);
-    } else {
+    } else if ($object["Cross Reference Type"]=1){
       $customer=$repositoryCustomers->findOneBy(["code"=>$object["Cross-Reference Type No."]]);
       $obj->setCustomer($customer);
       $obj->setType(2);
@@ -1280,6 +1280,47 @@ public function importReferences(InputInterface $input, OutputInterface $output)
   //------   Critical Section END   ------
   //------   Remove Lock Mutex    ------
   fclose($fp);
+}
+
+
+public function clearReferences(InputInterface $input, OutputInterface $output){
+  if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+      $fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetProducts-clearReferences.lock', 'c');
+  } else {
+      $fp = fopen('/tmp/axiom-navisionGetProducts-clearReferences.lock', 'c');
+  }
+
+  if (!flock($fp, LOCK_EX | LOCK_NB)) {
+    $output->writeln('* Fallo al iniciar la limpieza de referencias cruzadas: El proceso ya esta en ejecución.');
+    exit;
+  }
+
+  $repository=$this->doctrine->getRepository(ERPReferences::class);
+  $page=5000;
+  $totalReferences=round(intval($repository->totalReferences())/$page);
+  $count=0;
+  while($count<$totalReferences){
+      $references=$repository->referencesLimit(intval($count*$page),intval($page));
+      $count++;
+      foreach ($references as $id) {
+        $reference=$repository->findOneBy(["id"=>$id, "company"=>2]);
+        if ($reference->getType()=1)
+        $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getReference.php?reference='.$reference->getName().'$crossReferenceNo='.$reference->getSupplier()->getCode());
+        else if ($reference->getType()=2)
+        $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getReference.php?reference='.$reference->getName().'$crossReferenceNo='.$reference->getCustomer()->getCode());
+
+        $objects=json_decode($json, true);
+        if ($objects[0]["class"]!=null) continue;
+        $output->writeln('* Desactivando la referencia  '.$reference->getName());
+
+        $reference->setActive(0);
+        $reference->setDeleted(1);
+        $this->doctrine->getManager()->merge($reference);
+        $this->doctrine->getManager()->flush();
+        $this->doctrine->getManager()->clear();
+      }
+  }
+
 }
 
 public function createOwnBarcodes(InputInterface $input, OutputInterface $output){
@@ -1538,6 +1579,7 @@ public function defuseProducts(InputInterface $input, OutputInterface $output){
         $output->writeln('* Desactivando el producto '.$product->getCode());
 
         $product->setActive(0);
+        $product->setDeleted(1);
         $this->doctrine->getManager()->merge($product);
         $this->doctrine->getManager()->flush();
         $this->doctrine->getManager()->clear();
