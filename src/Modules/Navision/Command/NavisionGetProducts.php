@@ -1244,7 +1244,7 @@ public function importReferences(InputInterface $input, OutputInterface $output)
   foreach ($objects["class"] as $key=>$object){
     //$reference=preg_replace('/\D/','',$object["Cross-Reference No."]);
     $obj=$repository->findOneBy(["name"=>$object["Cross-Reference No."]]);
-    $output->writeln('  - '.$object["Item No."].' - '.$reference);
+    $output->writeln('  -Añadiendo al objeto'.$object["Item No."].' la referencia '.$object["Cross-Reference No."]);
     $obj=new ERPReferences();
     $obj->setName($object["Cross-Reference No."]);
     $obj->setDateadd(new \Datetime());
