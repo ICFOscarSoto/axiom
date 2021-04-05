@@ -1,0 +1,49 @@
+[{
+    "sections": [
+        {
+            "name": "data",
+            "fields": [
+                {
+                    "name": "code",
+                    "cols": 3
+                },
+                {
+                    "name": "date",
+                    "cols": 3
+                },
+                {
+                    "name": "supplier",
+                    "cols": 6,
+                    "relation": {"route": "formSupplier", "type":"full"}
+                },
+                {
+                    "name": "packages",
+                    "cols": 2,
+                    "class": "number-type"
+                },
+                {
+                    "name": "carrier",
+                    "relation": {"route": "genericdata", "routeparams":{"module":"ERP","name":"Carriers"}, "type":"modal"},
+                    "cols": 4
+                },
+                {
+                    "name": "store",
+                    "relation": {"route": "genericdata", "routeparams":{"module":"ERP","name":"Stores"}, "type":"modal"},
+                    "cols": 3
+                },
+                {
+                    "name": "location",
+                    "cols": 3,
+                    "trigger":{"field":"store", "route":"generictrigger",
+              				"moduleTrigger":"ERP", "classTrigger":"ERPStores",
+              				"module":"ERP", "class":"ERPStoreLocations", "relationParameter":"store"}
+                },
+                {
+                    "name": "active",
+                    "cols": 4
+                }
+
+            ]
+        }
+    ]
+}]

@@ -1,0 +1,6 @@
+[
+  {"id" : "addTopInputs", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"inputsForm", "actionType" : "foreground", "confirm" :false, "tooltip" : ""},
+  {"id" : "deleteTopInputs", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true, "tooltip":""},
+  {"id" : "printTopInputs", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false, "tooltip":""},
+  {"id" : "exportTopInputs", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"genericexport", "routeParams":{"module":"ERP", "name":"Inputs"}, "confirm" :false, "tooltip":""}
+]

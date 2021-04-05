@@ -1,0 +1,60 @@
+[{
+    "sections": [
+        {
+            "name": "data",
+            "fields": [
+                {
+                    "name": "name",
+                    "cols": 12
+                },
+                {
+                    "name": "address",
+                    "cols": 8,
+                    "location": {"address": "address", "city":"city", "postcode":"postcode", "country": "country"}
+                },
+                {
+                    "name": "city",
+                    "cols": 4
+                },
+                {
+                    "name": "country",
+                    "cols": 4
+                },
+                {
+                    "name": "state",
+                    "cols": 4, "trigger":{"field":"country", "route":"generictrigger",
+              				"moduleTrigger":"Globale", "classTrigger":"GlobaleCountries",
+              				"module":"Globale", "class":"GlobaleStates", "relationParameter":"country"}
+                },
+                {
+                    "name": "postcode",
+                    "cols": 4
+                },
+                {
+                    "name": "phone",
+                    "cols": 4,
+                    "format": "tel"
+                },
+                {
+                    "name": "email",
+                    "cols": 8,
+                    "format": "email"
+                },
+                {
+                    "name": "web",
+                    "cols": 12,
+                    "format": "url"
+                },
+                {
+                    "name": "trackingweb",
+                    "cols": 12,
+                    "format": "url"
+                },
+                {
+                    "name": "active",
+                    "cols": 4
+                }
+            ]
+        }
+    ]
+}]

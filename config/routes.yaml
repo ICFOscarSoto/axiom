@@ -359,6 +359,11 @@ ERPPurchasesOrders:
   resource: 'App\Modules\ERP\Controller\ERPPurchasesOrdersController'
   type:      annotation
 
+ERPPurchasesDeliveryNotesController:
+  resource: 'App\Modules\ERP\Controller\ERPPurchasesDeliveryNotesController'
+  type:      annotation
+
+
 ERPMyBackpack:
   resource: 'App\Modules\ERP\Controller\ERPMyBackpackController'
   type:      annotation

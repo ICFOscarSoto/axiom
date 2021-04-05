@@ -68,6 +68,15 @@ Country: País
 Countries: Paises
 Country data: Datos del país
 
+#CARRIERS
+#----------------------------------------------------------------------------------------------------------------------
+Select erpcarriers: Seleccionar transportista
+
+
+#COUNTRIES
+#----------------------------------------------------------------------------------------------------------------------
+Select GlobaleStates: Seleccionar provincia
+
 #AGENTS
 #----------------------------------------------------------------------------------------------------------------------
 Agents: Agentes
@@ -582,6 +591,10 @@ Select aerpsalesinvoices: Seleccionar factura
 Document: Documento
 Concept: Concepto
 Cost: Coste
+Select erpstores: Seleccionar Almacén
+Select erpstorelocations: Seleccionar Ubicación
+Inputs: Entradas
+Select ERPStoreLocations: Seleccionar Ubicación
 
 # VEHICLES
 #----------------------------------------------------------------------------------------------------------------------

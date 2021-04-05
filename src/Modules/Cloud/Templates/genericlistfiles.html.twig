@@ -14,11 +14,19 @@
       {% endif %}
       {{ include('@Globale/list.html.twig') }}
 
-      <div class="btn-group">
-
-    						<a attr-search=" false " attr-href="" href="javascript:void(0);" style="font-size: 20px" id="{{ cloudConstructor.id }}-top-button" type="button" class="btn tooltip-primary btn-primary dz-clickable" data-toggle="tooltip" data-placement="bottom" title="" data-original-title=" Subir archivos  ">
-    							<i class="fa fa-cloud-upload"></i></a>
-                </div>
+      <div class="btn-group" style="display:inline-flex;">
+               {% if cloudConstructor.types is defined and cloudConstructor.types|length >0 %}
+                <select name="type" id="type">
+                  {% for type in cloudConstructor.types %}
+                    <option value="{{ type }}">{{ type }}</option>
+                  {% endfor %}
+                </select>
+                {% endif %}
+                <a attr-search=" false " attr-href="" href="javascript:void(0);" style="font-size: 20px;height: 31px;" id="{{ cloudConstructor.id }}-scan-button" type="button" class="btn btn-primary dz-clickable" data-toggle="tooltip" data-placement="bottom" title="" data-original-title=" Escanear archivo  ">
+    						<i class="fa fa-eye"></i></a>
+    						<a attr-search=" false " attr-href="" href="javascript:void(0);" style="font-size: 20px;height: 31px;" id="{{ cloudConstructor.id }}-top-button" type="button" class="btn btn-primary dz-clickable" data-toggle="tooltip" data-placement="bottom" title="" data-original-title=" Subir archivo  ">
+    						<i class="fa fa-cloud-upload"></i></a>
+      </div>
       <script>
         $(document).ready(function(){
           Dropzone.autoDiscover = false;
@@ -38,8 +46,17 @@
                         $("#{{ listConstructor.id }}").DataTable().ajax.reload();
                       }
                   });
+                  this.on("sending", function(file, xhr, formData){
+                    if($('#type').length){
+                      formData.append('type', $('#type').val());
+                    }
+                  });
               }
+
           });
+
+
+
 
         });
         </script>

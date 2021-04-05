@@ -1,0 +1,8 @@
+[
+  {"id": "editInputs", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"inputsForm", "actionType" : "foreground", "confirm" :false, "tooltip":""},
+  {"id": "activation", "type": "option", "options": [
+      {"id": "desactivateInputs", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"genericdisable", "routeParams":{"module":"ERP", "name":"Inputs"}, "confirm" :true, "actionType" : "background", "tooltip":"" },
+      {"id": "activateInputs", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "route":"genericenable", "routeParams":{"module":"ERP", "name":"Inputs"}, "confirm" :true, "actionType" : "background", "tooltip":"" }
+  ]},
+  {"id": "deleteInputs", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"genericdelete", "routeParams":{"module":"ERP", "name":"Inputs"}, "confirm" :true, "undo" :false, "actionType" : "background", "tooltip":""}
+]

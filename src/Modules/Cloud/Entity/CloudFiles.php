@@ -87,6 +87,11 @@ class CloudFiles
     */
    private $idclass;
 
+   /**
+    * @ORM\Column(type="string", length=150, nullable=true)
+    */
+   private $type;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -244,6 +249,18 @@ class CloudFiles
     public function setIdclass(int $idclass): self
     {
         $this->idclass = $idclass;
+
+        return $this;
+    }
+
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
+
+    public function setType(?string $type): self
+    {
+        $this->type = $type;
 
         return $this;
     }

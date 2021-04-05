@@ -53,14 +53,15 @@ class CloudController extends Controller
 	}
 
 	/**
-	 * @Route("/api/cloud/files/{path}/{id}/form", name="cloudfiles")
+	 * @Route("/api/cloud/files/{path}/{id}/form/{types}", name="cloudfiles", defaults={"types"="[]"})
 	 */
-	public function cloudfiles($path, $id, RouterInterface $router,Request $request){
+	public function cloudfiles($path, $id, $types, RouterInterface $router,Request $request){
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		$this->router = $router;
 		$user=$this->getUser();
 		$utils = new $this->utilsClass();
-		$templateLists=["id"=>"cloudZone".$path, "list"=>[$utils->formatList($user,$path,$id)],"path"=>$this->generateUrl("cloudUpload",["id"=>$id, "path"=>$path])];
+		$types=json_decode($types);
+		$templateLists=["id"=>"cloudZone".$path, "list"=>[$utils->formatList($user,$path,$id)], "types"=>$types, "path"=>$this->generateUrl("cloudUpload",["id"=>$id, "path"=>$path])];
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 			return $this->render('@Cloud/genericlistfiles.html.twig', [
 				'cloudConstructor' => $templateLists
@@ -75,7 +76,7 @@ class CloudController extends Controller
      */
     public function cloudUpload($id,$path, RouterInterface $router, Request $request){
       $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-
+			$type=$request->request->get('type');
 			//Check if filespace in disk quota
 			$company=$this->getUser()->getCompany();
 			$diskUsage=$company->getDiskUsages();
@@ -101,6 +102,7 @@ class CloudController extends Controller
                 $cloudFile->setCompany($this->getUser()->getCompany());
                 $cloudFile->setUser($this->getUser());
                 $cloudFile->setName($file->getClientOriginalName());
+								$cloudFile->setType($type);
                 $cloudFile->setHashname($fileName);
                 $cloudFile->setSize(filesize($uploadDir.$fileName));
                 $cloudFile->setPath($path);

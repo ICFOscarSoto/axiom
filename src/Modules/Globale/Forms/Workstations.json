@@ -1,0 +1,29 @@
+[{
+    "sections": [
+        {
+            "name": "data",
+            "fields": [
+                {
+                    "name": "deviceid",
+                    "cols": 4
+                },
+                {
+                    "name": "name",
+                    "cols": 4
+                },
+                {
+                    "name": "active",
+                    "cols": 4
+                },
+                {
+                    "name": "ipaddress",
+                    "cols": 4
+                },
+                {
+                    "name": "mac",
+                    "cols": 4
+                }
+            ]
+        }
+    ]
+}]

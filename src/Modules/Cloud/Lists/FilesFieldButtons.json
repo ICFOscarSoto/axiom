@@ -5,5 +5,5 @@
       {"id": "desactivate", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"disableFile", "confirm" :true, "actionType" : "background" },
       {"id": "activate", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "route":"enableFile", "confirm" :true, "actionType" : "background" }
   ]},
-  {"id": "delete", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"deleteFile", "confirm" :true, "undo" :false, "tooltip":"Borrar trabajador", "actionType" : "background"}
+  {"id": "delete", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"deleteFile", "confirm" :true, "undo" :false, "tooltip":"Borrar archivo", "actionType" : "background"}
 ]
