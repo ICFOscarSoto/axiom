@@ -28,6 +28,12 @@
       "class": "all"
   },
   {
+      "name": "customer__email",
+      "caption": "Email",
+      "width": "40%",
+      "class": "all"
+  },
+  {
       "name": "customercode",
       "caption": "Código de cliente",
       "width": "40%",

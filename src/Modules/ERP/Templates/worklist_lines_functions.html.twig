@@ -21,10 +21,10 @@
         '	</div>'+
         ' <div class="col-2 d-block d-sm-none" style="top: 8px;">Nombre</div>'+
         '	<div class="col-10 col-md-3"> <div class="form-group" style="margin-bottom: 0px;"> <input readonly type="text" id="product-form-name-'+numLines+'" class="form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Nombre"> </div> </div>'+
+        ' <div class="col-2 d-block d-sm-none" style="top: 8px;left: 5px;">Variantes</div>'+
+        '<div class="col-8 col-sm-1"> <div class="form-group" style="margin-bottom: 0px;"> <select attr-id="" id="product-form-variants-'+numLines+'" class="form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Variantes"></select> </div> </div>'+
         ' <div class="col-2 d-block d-sm-none" style="top: 8px;left: 5px;">Cantidad</div>'+
         '	<div class="col-3 col-md-1"> <div class="form-group" style="margin-bottom: 0px;"> <input type="hidden" attr-id="1" value=0 id="product-form-base-total-'+numLines+'"><input type="text" attr-id="'+numLines+'" value=1 id="product-form-quantity-'+numLines+'" class="recalculate form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Cantidad"> </div> </div>'+
-        '<div class="col-2 d-block d-sm-none" style="top: 8px;">Ubicación</div>'+
-        '<div class="col-8 col-sm-2"> <div class="form-group" style="margin-bottom: 0px;"> <select attr-id="" id="product-form-location-'+numLines+'" class="form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Ubicación"></select> </div> </div>'+
         '</div>');
         worklistLines.attr("attr-numlines", numLines);
         numerateLines();
@@ -69,6 +69,8 @@
           $(this).find("#product-form-location-"+$(this).attr("attr-id")).attr("id","product-form-location-"+i);
           $(this).find("#product-search-button-"+$(this).attr("attr-id")).attr("attr-id",i);
           $(this).find("#product-search-button-"+$(this).attr("attr-id")).attr("id","product-search-button-"+i);
+          $(this).find("#product-form-variants-"+$(this).attr("attr-id")).attr("attr-id",i);
+          $(this).find("#product-form-variants-"+$(this).attr("attr-id")).attr("id","product-form-variants-"+i);
           $(this).find("#product-form-quantity-"+$(this).attr("attr-id")).attr("attr-id",i);
           $(this).find("#product-form-quantity-"+$(this).attr("attr-id")).attr("id","product-form-quantity-"+i);
           $(this).find("#product-form-remove-"+$(this).attr("attr-id")).attr("attr-id",i);

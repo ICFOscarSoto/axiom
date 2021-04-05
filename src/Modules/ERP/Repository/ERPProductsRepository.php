@@ -82,6 +82,18 @@ class ERPProductsRepository extends ServiceEntityRepository
         return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
     }
 
+    public function getVariantValues($product){
+        $query='SELECT vv.id as id, vv.name as name
+        FROM erpproducts_variants pv
+        LEFT JOIN erpvariants_values vv
+        ON pv.variantvalue_id=vv.id
+        LEFT JOIN erpvariants v
+        ON pv.variantname_id=v.id
+        WHERE pv.product_id=:product AND pv.active=1 AND pv.deleted=0 ORDER BY name ASC';
+        $params=['product' => $product];
+        return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+    }
+
     /* Nos devuelve la cantidad de productos con categoría */
 
     public function totalProductsCategory(){
