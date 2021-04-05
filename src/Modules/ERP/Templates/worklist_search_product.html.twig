@@ -20,6 +20,20 @@ var productFields=["product-form-id","product-form-code","product-form-name"];
 var productSearchfields=["id","code","name"];
 
 
+function getVariants(id,code){
+  if((++load_wait)==1) $("#load-spinner").fadeIn();
+  $.ajax({
+      type: "GET",
+      dataType: "json",
+      url: "/api/ERP/product/variants/"+code+"/get",
+    }).done(function( elements, textStatus, jqXHR ) {
+      if((--load_wait)==0) $("#load-spinner").fadeOut();
+       elements.variants.forEach( function(valor, indice, array){
+        $("#product-form-variants-"+id).append('<option value="'+valor.id+'">'+valor.name+'</option>');
+      });
+    });
+}
+
 function productSearch(id, val, fields, searchFields){
   if(val!=""){
     if((++load_wait)==1) $("#load-spinner").fadeIn();
@@ -42,7 +56,7 @@ function productSearch(id, val, fields, searchFields){
             {
               jQuery.each( data.data.locations, function( i, val ) {
                 $("#product-form-location-"+id).append(new Option(val.name, val.id));
-                console.log(val.name);
+              //  console.log(val.name);
               });
             }
 
@@ -76,12 +90,17 @@ $(document).ready(function() {
   });
   */
 
+  $('body').on('change', "[id^='product-form-code-']", function(e) {
+  //  getVariants($(this).val());
+  });
+
   $('body').on('click', "[id^='listProducts-field-button-select-']", function(e) {
     $("#product-form-code-"+$("#product-search-modal-form").attr("attr-id")).val($(this).parent().parent().parent().children('td').eq(1).text());
     $("#product-form-code-"+$("#product-search-modal-form").attr("attr-id")).trigger('change');
     $("#product-form-name-"+$("#product-search-modal-form").attr("attr-id")).val($(this).parent().parent().parent().children('td').eq(2).text());
     $("#product-form-name-"+$("#product-search-modal-form").attr("attr-id")).trigger('change');
     $("#product-search-modal-form").modal('toggle');
+    getVariants($("#product-search-modal-form").attr("attr-id"),$(this).parent().parent().parent().children('td').eq(1).text());
 
   //  checkList();
   });

@@ -36,6 +36,20 @@ class ERPReferencesRepository extends ServiceEntityRepository
 
       }
 
+      public function totalReferences(){
+        $query='SELECT count(id) as total from erpreferences where active!=2';
+        $result=$this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
+        return $result[0]["total"];
+      }
+
+      public function referencesLimit($start, $page){
+        $query='SELECT id FROM erpreferences
+                WHERE active=!2
+                ORDER BY name
+                LIMIT '.$start.','.$page.'';
+        $result=$this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
+        return $result;
+      }
     // /**
     //  * @return ERPReferences[] Returns an array of ERPReferences objects
     //  */

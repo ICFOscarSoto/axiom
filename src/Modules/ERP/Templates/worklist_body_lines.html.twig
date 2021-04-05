@@ -7,9 +7,8 @@
     <div class="row no-gutters worklist-products-header">
       <div class="col-sm-2 d-none d-sm-block" style="font-weight:bold;font-size:13px;padding: 7px 2px;">Cod. Producto</div>
       <div class="col-sm-3 d-none d-sm-block" style="font-weight:bold;font-size:13px;padding: 7px 2px;">Descripción</div>
+      <div class="col-sm-1 d-none d-sm-block" style="font-weight:bold;font-size:13px;padding: 7px 2px;">Variante</div>
       <div class="col-sm-1 d-none d-sm-block" style="font-weight:bold;font-size:13px;padding: 7px 2px;">Cantidad</div>
-      <div class="col-sm-1 d-none d-sm-block" style="font-weight:bold;font-size:13px;padding: 7px 2px;">Ubicación</div>
-
     </div>
     {% for line in  worklistLines %}
       <div class="row no-gutters" attr-id="{{ line.linenum }}" id="worklist-line-{{ line.linenum }}">
@@ -33,19 +32,17 @@
         </div>
         <div class="col-2 d-block d-sm-none" style="top: 8px;">Nombre</div>
         <div class="col-10 col-sm-3"> <div class="form-group" style="margin-bottom: 0px;"> <input type="text" readonly id="product-form-name-{{ line.linenum }}" class="form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Nombre" value="{{ line.name }}"> </div> </div>
+        <div class="col-2 d-block d-sm-none" style="top: 8px;">Variantes</div>
+              {% if line.variant!=null %}
+              <div class="col-3 col-sm-1"> <div class="form-group" style="margin-bottom: 0px;"> <input type="text" readonly id="product-form-variants-{{ line.variant.id }}" class="form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Nombre" value="{{ line.variant.name }}"> </div> </div>
+              {% else %}
+              <div class="col-3 col-sm-1">
+              <select class="form-control select2" name="product-form-variants-{{ line.linenum }}" id="product-form-variants-{{ line.linenum }}">
+              </select>
+            </div>
+              {% endif %}
         <div class="col-2 d-block d-sm-none" style="top: 8px;">Cantidad</div>
         <div class="col-3 col-sm-1"> <div class="form-group" style="margin-bottom: 0px;"> <input type="text" id="product-form-quantity-{{ line.linenum }}" class="form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Nombre" value="{{ line.quantity }}"> </div> </div>
-        <div class="col-2 d-block d-sm-none" style="top: 8px;">Ubicación</div>
-        <div class="col-8 col-sm-2">
-          <div class="form-group" style="margin-bottom: 0px;"> <select attr-id="{{ line.linenum }}" id="product-form-location-{{ line.linenum }}" class="form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Ubicación">
-          {% if line.locations is defined %}
-            {% for location in line.locations %}
-                <option value="{{ location.id }}" {% if location.id == line.location.id %} selected {% endif %}>{{ location.name }}</option>
-            {% endfor %}
-          {% endif %}
-          </select>
-        </div>
-      </div>
       </div>
     {% endfor %}
 

@@ -20,6 +20,7 @@ use App\Modules\ERP\Utils\ERPSalesOrdersUtils;
 use App\Modules\ERP\Entity\ERPConfiguration;
 use App\Modules\ERP\Entity\ERPSeries;
 use App\Modules\ERP\Entity\ERPProducts;
+use App\Modules\ERP\Entity\ERPVariantsValues;
 use App\Modules\ERP\Entity\ERPWorkList;
 use App\Modules\Globale\Entity\GlobaleUsersWidgets;
 use App\Modules\Globale\Entity\GlobaleUsers;
@@ -102,6 +103,7 @@ class ERPWorkListController extends Controller
     $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
     $worklistRepository=$this->getDoctrine()->getRepository(ERPWorkList::class);
     $productsRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
+		$variantsRepository=$this->getDoctrine()->getRepository(ERPVariantsValues::class);
 
     $worklist=$worklistRepository->findAll(["user"=>$this->getUser()->getCompany(),"deleted"=>0]);
 
@@ -113,6 +115,7 @@ class ERPWorkListController extends Controller
 			{
       $product=$productsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "code"=>$value->code, "active"=>1, "deleted"=>0]);
       $line=$worklistRepository->findOneBy(["product"=>$product]);
+
 
       //if(!$product) continue;
       if(!$line ){
@@ -127,6 +130,11 @@ class ERPWorkListController extends Controller
         $line->setCode($value->code);
         $line->setName($value->name);
         $line->setQuantity(floatval($value->quantity));
+			//	dump($value->variant);
+				if(isset($value->variant)){
+					 $variant=$variantsRepository->findOneBy(["id"=>$value->variant]);
+					  $line->setVariant($variant);
+				 }
         if($value->deleted){
           $line->setActive(0);
           $line->setDeleted(1);

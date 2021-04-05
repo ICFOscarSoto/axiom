@@ -63,6 +63,31 @@ class GlobaleWorkstations
      */
     private $mac;
 
+    /**
+     * @ORM\Column(type="smallint", nullable=true)
+     */
+    private $os;
+
+    /**
+     * @ORM\Column(type="string", length=150, nullable=true)
+     */
+    private $user;
+
+    /**
+     * @ORM\Column(type="string", length=150, nullable=true)
+     */
+    private $password;
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $comments;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $alive=false;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -172,6 +197,66 @@ class GlobaleWorkstations
     public function setMac(?string $mac): self
     {
         $this->mac = $mac;
+
+        return $this;
+    }
+
+    public function getOs(): ?int
+    {
+        return $this->os;
+    }
+
+    public function setOs(?int $os): self
+    {
+        $this->os = $os;
+
+        return $this;
+    }
+
+    public function getUser(): ?string
+    {
+        return $this->user;
+    }
+
+    public function setUser(?string $user): self
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    public function getPassword(): ?string
+    {
+        return $this->password;
+    }
+
+    public function setPassword(?string $password): self
+    {
+        $this->password = $password;
+
+        return $this;
+    }
+
+    public function getComments(): ?string
+    {
+        return $this->comments;
+    }
+
+    public function setComments(?string $comments): self
+    {
+        $this->comments = $comments;
+
+        return $this;
+    }
+
+    public function getAlive(): ?bool
+    {
+        return $this->alive;
+    }
+
+    public function setAlive(bool $alive): self
+    {
+        $this->alive = $alive;
 
         return $this;
     }

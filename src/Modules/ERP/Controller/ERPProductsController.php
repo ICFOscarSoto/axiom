@@ -985,4 +985,27 @@ class ERPProductsController extends Controller
 			}
 
 
+			/**
+	 	 * @Route("/api/ERP/product/variants/{code}/get", name="getProductVariants")
+	 	 */
+	 	 public function getProductVariants($code, RouterInterface $router,Request $request){
+	 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			$productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
+	 	  $product=$productRepository->findOneBy(["code"=>$code]);
+
+		//	$repositoryVariants=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
+			$variants=$productRepository->getVariantValues($product->getId());
+	 		$responseVariants=Array();
+
+	 		foreach($variants as $variant){
+				$item['id']=$variant['id'];
+	 			$item['name']=$variant['name'];
+	 			$responseVariants[]=$item;
+	 		}
+
+	 		return new JsonResponse(["variants"=>$responseVariants]);
+
+	 	 }
+
+
 }

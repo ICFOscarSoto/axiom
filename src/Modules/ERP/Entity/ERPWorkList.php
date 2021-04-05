@@ -5,6 +5,8 @@ namespace App\Modules\ERP\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\Globale\Entity\GlobaleUsers;
 use \App\Modules\ERP\Entity\ERPProducts;
+use \App\Modules\ERP\Entity\ERPProductsVariants;
+use \App\Modules\ERP\Entity\ERPVariantsValues;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPWorkListRepository")
@@ -69,6 +71,13 @@ class ERPWorkList
      * @ORM\Column(type="integer")
      */
     private $linenum;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPVariantsValues")
+     */
+    private $variant;
+
+
 
     public function getId(): ?int
     {
@@ -194,4 +203,18 @@ class ERPWorkList
 
         return $this;
     }
+
+    public function getVariant(): ?ERPVariantsValues
+    {
+        return $this->variant;
+    }
+
+    public function setVariant(?ERPVariantsValues $variant): self
+    {
+        $this->variant = $variant;
+
+        return $this;
+    }
+
+
 }

@@ -177,7 +177,7 @@ class PrestashopGetCustomers extends ContainerAwareCommand
 
               $customergroup=$repositoryCustomerGroups->findOneBy(["name"=>$axiom_group]);
 
-              $obj->setActive(1);
+            //  $obj->setActive(1);
               if($customer_array["cif"]!=null) $obj->setVat($customer_array["cif"]);
               if($customer_array["empresa"]){
                  $obj->setName($customer_array["empresa"]);
@@ -185,8 +185,8 @@ class PrestashopGetCustomers extends ContainerAwareCommand
 
               }
               else {
-                $obj->setName($customer_array["firstname"].$customer_array["lastname"]);
-                $obj->setSocialname($customer_array["firstname"].$customer_array["lastname"]);
+                $obj->setName($customer_array["firstname"]." ".$customer_array["lastname"]);
+                $obj->setSocialname($customer_array["firstname"]." ".$customer_array["lastname"]);
               }
 
               $xml_addresses_string=file_get_contents($this->url."/api/addresses/?display=[id]&filter[id_customer]=".$customer_array["id"], false, $context);

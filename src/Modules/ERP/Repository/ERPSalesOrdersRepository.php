@@ -29,4 +29,15 @@ class ERPSalesOrdersRepository extends ServiceEntityRepository
       return $result;
 
     }
+
+    public function getOrdersWithExternalNumber(){
+      $query="SELECT s.id, s.code, s.externalordernumber, s.date, s.customername, s.customercode, a.name
+      FROM erpsales_orders s
+      LEFT JOIN globale_users a ON a.id=s.agent_id
+      WHERE s.externalordernumber!=NULL";
+      $result=$this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
+      return $result;
+    }
+
+
 }

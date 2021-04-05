@@ -10,6 +10,7 @@
       line.linenum=$(this).attr("attr-id");
       line.code=$(this).find("#product-form-code-"+$(this).attr("attr-id")).val();
       line.name=$(this).find("#product-form-name-"+$(this).attr("attr-id")).val();
+      line.variant=$(this).find("#product-form-variants-"+$(this).attr("attr-id")).val();
       line.quantity=$(this).find("#product-form-quantity-"+$(this).attr("attr-id")).val();
       line.deleted=$(this).hasClass('deleted');
       lines.push(line);

@@ -65,6 +65,7 @@ class NavisionGetProducts extends ContainerAwareCommand
         $this->importProduct($input, $output);
         //$this->clearEAN13($input, $output);
         $this->importEAN13($input, $output);
+        $this->importProductsVariants($input, $output);
       }
       break;
       case 'names': $this->updateNames($input, $output);
@@ -102,6 +103,8 @@ class NavisionGetProducts extends ContainerAwareCommand
       case 'createproducts': $this->createProducts($input, $output);
       break;
       case 'exportnames': $this->exportNames($input, $output);
+      break;
+      case 'defuse': $this->defuseProducts($input, $output);
       break;
       case 'all':
         $this->importProduct($input, $output);
@@ -167,6 +170,7 @@ public function importProduct(InputInterface $input, OutputInterface $output){
           $obj->setCategory($category);
         }
          $supplier=$repositorySupliers->findOneBy(["code"=>$object["Supplier"]]);
+         if (strlen($object["Description"])>4) $obj->setName($object["Description"]);
          // Comprobamos si el producto no tiene movimientos desde 2017, en caso de que no tenga lo desactivamos
          $json2=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-clearProducts.php?from='.$object["code"]);
          $movs=json_decode($json2, true);
@@ -615,7 +619,7 @@ public function importStocks(InputInterface $input, OutputInterface $output) {
   }
 
   if (!flock($fp, LOCK_EX | LOCK_NB)) {
-    $output->writeln('* Fallo al iniciar la sincronizacion de limpieza de EAN13: El proceso ya esta en ejecución.');
+    $output->writeln('* Fallo al iniciar la sincronizacion de los stocks: El proceso ya esta en ejecución.');
     exit;
   }
 
@@ -699,7 +703,6 @@ public function importStocks(InputInterface $input, OutputInterface $output) {
     //------   Remove Lock Mutex    ------
     fclose($fp);
   }
-
 
 public function importIncrements(InputInterface $input, OutputInterface $output) {
   //------   Create Lock Mutex    ------
@@ -878,7 +881,7 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
 
 
  }
-}
+ }
 
  $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"productincrements"]);
  if ($navisionSync==null) {
@@ -1239,20 +1242,20 @@ public function importReferences(InputInterface $input, OutputInterface $output)
   //Disable SQL logger
   $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
   foreach ($objects["class"] as $key=>$object){
-    $reference=preg_replace('/\D/','',$object["Cross-Reference No."]);
-    $obj=$repository->findOneBy(["name"=>$reference]);
-    $output->writeln('  - '.$object["Item No."].' - '.$reference);
+    //$reference=preg_replace('/\D/','',$object["Cross-Reference No."]);
+    $obj=$repository->findOneBy(["name"=>$object["Cross-Reference No."]]);
+    $output->writeln('  -Añadiendo al objeto'.$object["Item No."].' la referencia '.$object["Cross-Reference No."]);
     $obj=new ERPReferences();
-    $obj->setName($reference);
+    $obj->setName($object["Cross-Reference No."]);
     $obj->setDateadd(new \Datetime());
     $obj->setDateupd(new \Datetime());
     $obj->setDeleted(0);
     $obj->setActive(1);
-    if ($object["Cross Reference Type"]=2){
+    if ($object["Cross-Reference Type"]==2){
       $supplier=$repositorySupliers->findOneBy(["code"=>$object["Cross-Reference Type No."]]);
       $obj->setSupplier($supplier);
       $obj->setType(1);
-    } else {
+    } else if ($object["Cross-Reference Type"]==1){
       $customer=$repositoryCustomers->findOneBy(["code"=>$object["Cross-Reference Type No."]]);
       $obj->setCustomer($customer);
       $obj->setType(2);
@@ -1277,6 +1280,47 @@ public function importReferences(InputInterface $input, OutputInterface $output)
   //------   Critical Section END   ------
   //------   Remove Lock Mutex    ------
   fclose($fp);
+}
+
+
+public function clearReferences(InputInterface $input, OutputInterface $output){
+  if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+      $fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetProducts-clearReferences.lock', 'c');
+  } else {
+      $fp = fopen('/tmp/axiom-navisionGetProducts-clearReferences.lock', 'c');
+  }
+
+  if (!flock($fp, LOCK_EX | LOCK_NB)) {
+    $output->writeln('* Fallo al iniciar la limpieza de referencias cruzadas: El proceso ya esta en ejecución.');
+    exit;
+  }
+
+  $repository=$this->doctrine->getRepository(ERPReferences::class);
+  $page=5000;
+  $totalReferences=round(intval($repository->totalReferences())/$page);
+  $count=0;
+  while($count<$totalReferences){
+      $references=$repository->referencesLimit(intval($count*$page),intval($page));
+      $count++;
+      foreach ($references as $id) {
+        $reference=$repository->findOneBy(["id"=>$id, "company"=>2]);
+        if ($reference->getType()==1)
+        $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getReference.php?reference='.$reference->getName().'$crossReferenceNo='.$reference->getSupplier()->getCode());
+        else if ($reference->getType()==2)
+        $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getReference.php?reference='.$reference->getName().'$crossReferenceNo='.$reference->getCustomer()->getCode());
+
+        $objects=json_decode($json, true);
+        if ($objects[0]["class"]!=null) continue;
+        $output->writeln('* Desactivando la referencia  '.$reference->getName());
+
+        $reference->setActive(0);
+        $reference->setDeleted(1);
+        $this->doctrine->getManager()->merge($reference);
+        $this->doctrine->getManager()->flush();
+        $this->doctrine->getManager()->clear();
+      }
+  }
+
 }
 
 public function createOwnBarcodes(InputInterface $input, OutputInterface $output){
@@ -1363,7 +1407,7 @@ public function updateNames(InputInterface $input, OutputInterface $output){
       $json2=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getProduct.php?product='.$object["code"]);
       $objects2=json_decode($json2, true);
       $objects2=$objects2[0];
-      if (!empty($objects2["class"])) $product->setName($objects2["class"][0]["Description"]);
+      if (!empty($objects2["class"]) and strlen($objects2["class"][0]["Description"])) $product->setName($objects2["class"][0]["Description"]);
       $product->setDateupd(new \Datetime());
       $this->doctrine->getManager()->merge($product);
       $this->doctrine->getManager()->flush();
@@ -1377,7 +1421,6 @@ public function updateNames(InputInterface $input, OutputInterface $output){
   $this->doctrine->getManager()->persist($navisionSync);
   $this->doctrine->getManager()->flush();
 }
-
 
 public function updateManufacturers(InputInterface $input, OutputInterface $output){
   //------   Create Lock Mutex    ------
@@ -1428,7 +1471,6 @@ public function updateManufacturers(InputInterface $input, OutputInterface $outp
   $this->doctrine->getManager()->flush();
 }
 
-
 public function exportNames(InputInterface $input, OutputInterface $output){
   $repository=$this->doctrine->getRepository(ERPProducts::class);
 
@@ -1450,10 +1492,7 @@ public function exportNames(InputInterface $input, OutputInterface $output){
     }
 }
 
-
-
 public function createProducts(InputInterface $input, OutputInterface $output){
-
   if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
       $fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetProducts-createProducts.lock', 'c');
   } else {
@@ -1463,8 +1502,6 @@ public function createProducts(InputInterface $input, OutputInterface $output){
     $output->writeln('* Fallo al iniciar la creación de productos en Navision.');
     exit;
   }
-
-
   //------   Critical Section START   ------
   $navisionSyncRepository=$this->doctrine->getRepository(NavisionSync::class);
   $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"createProducts"]);
@@ -1479,8 +1516,8 @@ public function createProducts(InputInterface $input, OutputInterface $output){
   $product_ids=$repository->getProductsToNavision();
   $item=[];
   $array_products=[];
-  foreach($product_ids as $product_id)
-  {
+    foreach($product_ids as $product_id)
+    {
         $product_obj=$repository->findOneBy(["id"=>$product_id["id"]]);
         $repositorysuppliers=$this->doctrine->getRepository(ERPSuppliers::class);
         if($product_obj->getSupplier()!=null) $supplier=$repositorysuppliers->findOneBy(["id"=>$product_obj->getSupplier()->getId()]);
@@ -1507,7 +1544,6 @@ public function createProducts(InputInterface $input, OutputInterface $output){
 
         $result=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-createProduct.php?json='.urlencode($json));
         $output->writeln($result);
-
         /*
         $ch = curl_init($this->url.'navisionExport/axiom/do-NAVISION-createProduct.php');
         curl_setopt( $ch, CURLOPT_POSTFIELDS, $json );
@@ -1515,22 +1551,42 @@ public function createProducts(InputInterface $input, OutputInterface $output){
         curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
         $result = curl_exec($ch);
         curl_close($ch);
-*/
+        */
         $array_products=[];
         $item=[];
 
       /*
      }
      */
-
   }
-
-
-
-
 
 }
 
+public function defuseProducts(InputInterface $input, OutputInterface $output){
+  $repository=$this->doctrine->getRepository(ERPProducts::class);
+  $page=5000;
+  $totalProducts=round(intval($repository->totalProducts())/$page);
+  $count=0;
 
+  while($count<$totalProducts){
+      $products=$repository->productsLimit(intval($count*$page),intval($page));
+      $count++;
+      foreach ($products as $id) {
+        $product=$repository->findOneBy(["id"=>$id, "company"=>2]);
+        $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getProduct.php?product='.$product->getCode());
+        $objects=json_decode($json, true);
+        if ($objects[0]["class"]!=null) continue;
+        $output->writeln('* Desactivando el producto '.$product->getCode());
+
+        $product->setActive(0);
+        $product->setDeleted(1);
+        $this->doctrine->getManager()->merge($product);
+        $this->doctrine->getManager()->flush();
+        $this->doctrine->getManager()->clear();
+      }
+
+    }
+
+  }
 }
 ?>

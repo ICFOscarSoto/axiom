@@ -133,8 +133,9 @@ class ERPSalesTicketsController extends Controller
 			//agents
 			$agent_objects=$agentsRepository->findBy(["active"=>1,"deleted"=>0]);
 			$agents=[];
-			//$option["id"]=null;
-			//$option["text"]="Elige agente";
+			$option=null;
+			$option["id"]=null;
+		  $option["text"]="Elige agente...";
 			$agents[]=$option;
 			foreach($agent_objects as $item){
 				$option["id"]=$item->getId();
@@ -147,7 +148,6 @@ class ERPSalesTicketsController extends Controller
 			array_push($breadcrumb,$new_breadcrumb);
 
 			$listSalesTicketsHistory = new ERPSalesTicketsHistoryUtils();
-
 
 			if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 				return $this->render('@ERP/salestickets.html.twig', [
