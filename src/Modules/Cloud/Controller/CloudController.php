@@ -207,6 +207,7 @@ class CloudController extends Controller
 						 		mkdir($uploadDir, 0775, true);
 						 }
 						 if (rename($files[0],$uploadDir.$fileName)) {
+							 chmod($uploadDir.$fileName, 777);
 							 chown($uploadDir.$fileName, 'www-data');
 							 chgrp($uploadDir.$fileName, 'www-data');
 							 chmod($uploadDir.$fileName, 774);
