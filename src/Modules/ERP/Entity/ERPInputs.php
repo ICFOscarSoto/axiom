@@ -253,7 +253,7 @@ class ERPInputs
 
     public function postUploadCloudFile($cloudFile){
       if($cloudFile->getCompany()->getId()==2 && $cloudFile->getType()=="Albarán Proveedor"){
-        $msg="Nueva entrada albarán Nº ".$this->code." en almacén ".$this->store->getName();
+        $msg="Nueva entrada albarán Nº ".$this->code." en ".$this->store->getName();
         $channel='819214160985456650';
         file_get_contents('https://icfbot.ferreteriacampollano.com/file.php?channel='.$channel.'&msg='.urlencode($msg).'&file=/var/www/axiom.ferreteriacampollano.com/cloud/2/'.$cloudFile->getPath().'/'.$cloudFile->getIdclass().'/'.$cloudFile->getHashname().'&filename='.$cloudFile->getName());
       }

@@ -79,9 +79,9 @@ class CloudController extends Controller
 
 
     /**
-     * @Route("/api/cloud/files/{path}/{id}/upload", name="cloudUpload")
+     * @Route("/api/cloud/files/{path}/{id}/upload/{module}", name="cloudUpload", defaults={"module"=""})
      */
-    public function cloudUpload($id,$path, RouterInterface $router, Request $request){
+    public function cloudUpload($id,$path,$module, RouterInterface $router, Request $request){
       $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 			$type=$request->request->get('type');
 			//Check if filespace in disk quota
@@ -123,6 +123,17 @@ class CloudController extends Controller
                 $manager = $this->getDoctrine()->getManager();
                 $manager->persist($cloudFile);
                 $manager->flush();
+
+							$classModule='\App\Modules\\'.$module.'\Entity\\'.$path;
+ 							 if(class_exists($classModule)){
+ 								 $classRepository=$this->getDoctrine()->getRepository($classModule);
+ 								 $obj=$classRepository->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany()]);
+ 								 if($obj){
+ 									 if(method_exists($obj, 'postUploadCloudFile')){
+ 										 $obj->postUploadCloudFile($cloudFile);
+ 									 }
+ 								 }
+ 							 }
              }
              return new JsonResponse($output);
         }else return new JsonResponse($output);
