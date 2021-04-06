@@ -206,13 +206,7 @@ class CloudController extends Controller
 						 if (!file_exists($uploadDir) && !is_dir($uploadDir)) {
 						 		mkdir($uploadDir, 0775, true);
 						 }
-						 $umask = umask();
-						 umask(0777);
 						 if (rename($files[0],$uploadDir.$fileName)) {
-
-							 chmod("/ruta/directorio/fichero.txt", 0755);
-
-							 chmod($uploadDir.$fileName, 0777);
 							 chown($uploadDir.$fileName, 'www-data');
 							 chgrp($uploadDir.$fileName, 'www-data');
 							 chmod($uploadDir.$fileName, 0774);
@@ -237,7 +231,6 @@ class CloudController extends Controller
 						 }else{
 							 return new JsonResponse(["result"=>-4, "files"=>[]]);
 						 }
-						 umask($umask);
 
 						 return new JsonResponse(["result"=>1, "files"=>$files]);
 						}
