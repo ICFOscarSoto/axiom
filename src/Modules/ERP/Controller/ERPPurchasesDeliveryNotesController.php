@@ -61,7 +61,7 @@ class ERPPurchasesDeliveryNotesController extends Controller
 		}
 
 		$obj = $inputsRepository->findOneBy(['id'=>$id, 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
-		$entity_name=$obj?$obj->getCode():'';
+		$entity_name=$obj?($obj->getSupplier()->getName().' ('.$obj->getCode().')'):'';
 		return $this->render('@Globale/generictabform.html.twig', array(
 						'entity_name' => $entity_name,
 						'controllerName' => 'CustomersController',
@@ -84,4 +84,17 @@ class ERPPurchasesDeliveryNotesController extends Controller
 								));
 	}
 
+	/**
+	 * @Route("/{_locale}/ERP/inputs/discord_notify/{id}", name="inputsDiscordNotify", defaults={"id"=0})
+	 */
+	public function inputsDiscordNotify($id,RouterInterface $router,Request $request)
+	{
+		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
+		$locale = $request->getLocale();
+		$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
+		$breadcrumb=$menurepository->formatBreadcrumb('inputs');
+		$inputsRepository=$this->getDoctrine()->getRepository(ERPInputs::class);
+		$input=$inputsRepository->findOneBy(["id"=>$id, "active"=>1, "deleted"=>0, "company"=>$this->getUser()->getCompany() ]);
+	}
 }

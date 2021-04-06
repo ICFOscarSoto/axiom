@@ -131,6 +131,11 @@ class GlobaleUsers implements UserInterface
      */
     private $discorduser;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Modules\Globale\Entity\GlobaleScanners")
+     */
+    private $scanner;
+
 
 
     public function __construct()
@@ -529,6 +534,18 @@ class GlobaleUsers implements UserInterface
     public function setDiscorduser(?string $discorduser): self
     {
         $this->discorduser = $discorduser;
+
+        return $this;
+    }
+
+    public function getScanner(): ?GlobaleScanners
+    {
+        return $this->scanner;
+    }
+
+    public function setScanner(?GlobaleScanners $scanner): self
+    {
+        $this->scanner = $scanner;
 
         return $this;
     }

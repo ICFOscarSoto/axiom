@@ -48,7 +48,7 @@ return blob;
 
 $(document).ready(function() {
 //get images
-$.post("/api/erp/product/getimages/{{formConstructor.id_object}}",
+$.post("/api/{{field.imageType}}/getimages/{{formConstructor.id_object}}",
     function(data, status, xhr){
         if(data.result){
           if(data.images.length>0){
@@ -63,7 +63,7 @@ $.post("/api/erp/product/getimages/{{formConstructor.id_object}}",
         }
         else{
           var html='';
-              html+='<a href="api/products/0/large/getimage/1"><img src="/api/products/0/thumb/getimage/1"></a>';
+              html+='<a href="api/{{field.imageType}}/0/large/getimage/1"><img src="/api/{{field.imageType}}/0/thumb/getimage/1"></a>';
 
           $("#gallery").html(html);
           $('.fotorama').fotorama();
@@ -124,7 +124,7 @@ $('body').on('click', "#btn-erase", function() {
   $.ajax({
      type: "GET",
      dataType: "json",
-     url: "/api/erp/product/deleteimages/"+id,
+     url: "/api/{{field.imageType}}/deleteimages/"+id,
    }).done(function(data, textStatus, jqXHR) {
      if((--load_wait)==0) $("#load-spinner").fadeOut();
      if(data.result!="-1") {

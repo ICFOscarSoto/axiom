@@ -1,6 +1,19 @@
 {% set listConstructor = cloudConstructor.list[0] %}
 {% set listOrigin = "genericlist" %}
 {# for know if list.html is invoked directly from controller and we need to make modals inside list#}
+
+<div id="{{ cloudConstructor.id }}-waiting-escaner-modal" class="waiting-modal-container">
+	<div class="waiting-modal">
+    <div>
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="212px" height="96px" viewBox="0 0 120 96" version="1.1">
+        <path style=" stroke:none;fill-rule:nonzero;fill:rgb(193,193,193);fill-opacity:1;" d="M 2.050781 20.382812 L 87.683594 48 L 119.109375 48 L 119.84375 45.796875 C 120.371094 44.226562 119.523438 42.527344 117.949219 42 L 6.804688 6.15625 C 5.234375 5.632812 3.535156 6.480469 3.011719 8.050781 L 0.15625 16.585938 C -0.371094 18.15625 0.476562 19.859375 2.050781 20.382812 Z M 6 54 C 2.6875 54 0 56.6875 0 60 L 0 84 C 0 87.3125 2.6875 90 6 90 L 114 90 C 117.3125 90 120 87.3125 120 84 L 120 54 Z M 22.5 75 C 22.5 75.828125 21.828125 76.5 21 76.5 L 15 76.5 C 14.171875 76.5 13.5 75.828125 13.5 75 L 13.5 69 C 13.5 68.171875 14.171875 67.5 15 67.5 L 21 67.5 C 21.828125 67.5 22.5 68.171875 22.5 69 Z M 40.5 75 C 40.5 75.828125 39.828125 76.5 39 76.5 L 33 76.5 C 32.171875 76.5 31.5 75.828125 31.5 75 L 31.5 69 C 31.5 68.171875 32.171875 67.5 33 67.5 L 39 67.5 C 39.828125 67.5 40.5 68.171875 40.5 69 Z M 40.5 75 "/>
+      </svg>
+    </div>
+    <div>Esperando documento escaneado</div>
+      <p style="text-align: center;font-weight: 600;"><a id="{{ cloudConstructor.id }}-cancel-escaner" href="javascript:void(0)"> - Cancelar - </p>
+  </div>
+</div>
+
   <div class="panel minimal">
   <div class="panel-heading">
     <div class="panel-title">Archivos adjuntos</div>
@@ -22,8 +35,10 @@
                   {% endfor %}
                 </select>
                 {% endif %}
+                {% if scanner is defined and scanner != null %}
                 <a attr-search=" false " attr-href="" href="javascript:void(0);" style="font-size: 20px;height: 31px;" id="{{ cloudConstructor.id }}-scan-button" type="button" class="btn btn-primary dz-clickable" data-toggle="tooltip" data-placement="bottom" title="" data-original-title=" Escanear archivo  ">
     						<i class="fa fa-eye"></i></a>
+                {% endif %}
     						<a attr-search=" false " attr-href="" href="javascript:void(0);" style="font-size: 20px;height: 31px;" id="{{ cloudConstructor.id }}-top-button" type="button" class="btn btn-primary dz-clickable" data-toggle="tooltip" data-placement="bottom" title="" data-original-title=" Subir archivo  ">
     						<i class="fa fa-cloud-upload"></i></a>
       </div>
@@ -55,10 +70,23 @@
 
           });
 
+          {% if scanner is defined and scanner != null %}
+            $('body').on('click',"#{{ cloudConstructor.id }}-scan-button", function (e) {
+              $("#{{ cloudConstructor.id }}-waiting-escaner-modal").fadeIn();
+              $.post( "{{ url('cloudWaitForScan',{'id_scanner': scanner.id, 'id': id, 'path':path}) }}", {type: $('#type').val() }, function( data ) {
+                $("#{{ listConstructor.id }}").DataTable().ajax.reload();
+              }, "json").done(function() {
+                $("#{{ listConstructor.id }}").DataTable().ajax.reload();
+              }).always(function() {
+                $("#{{ cloudConstructor.id }}-waiting-escaner-modal").fadeOut();
+              });
+            });
 
-
-
-        });
+            $('body').on('click',"#{{ cloudConstructor.id }}-cancel-escaner", function (e) {
+              $("#{{ cloudConstructor.id }}-waiting-escaner-modal").fadeOut();
+            });
+          });
+        {% endif %}
         </script>
     </div></div>
 </div>

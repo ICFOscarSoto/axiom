@@ -15,7 +15,9 @@ use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\Cloud\Entity\CloudFiles;
+use App\Modules\Globale\Entity\GlobaleScanners;
 use App\Modules\Cloud\Utils\CloudFilesUtils;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
@@ -59,12 +61,16 @@ class CloudController extends Controller
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		$this->router = $router;
 		$user=$this->getUser();
+		$scanner=$user->getScanner();
 		$utils = new $this->utilsClass();
 		$types=json_decode($types);
 		$templateLists=["id"=>"cloudZone".$path, "list"=>[$utils->formatList($user,$path,$id)], "types"=>$types, "path"=>$this->generateUrl("cloudUpload",["id"=>$id, "path"=>$path])];
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 			return $this->render('@Cloud/genericlistfiles.html.twig', [
-				'cloudConstructor' => $templateLists
+				'cloudConstructor' => $templateLists,
+				'scanner' => $scanner,
+				'path' => $path,
+				'id' => $id
 				]);
 			}
 		return new RedirectResponse($this->router->generate('app_login'));
@@ -125,11 +131,13 @@ class CloudController extends Controller
 		/**
 		 * @Route("/api/cloud/files/{id}/get", name="cloudGetFiles")
 		 */
-		public function getFiles($id){
-      $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-      if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+		public function getFiles($id, RouterInterface $router, Request $request){
+
         $cloudFileRepository = $this->getDoctrine()->getRepository(CloudFiles::class);
         $cloudFile=$this->getDoctrine()->getRepository(CloudFiles::class)->find($id);
+				if(!$cloudFile) return new RedirectResponse($router->generate('app_login'));
+				//$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+	      if ($this->get('security.authorization_checker')->isGranted('ROLE_USER') || $cloudFile->getHashname()==$request->query->get('hash')) {
         if($cloudFile!=NULL){
           $filename=$uploadDir=$this->get('kernel')->getRootDir() . '/../cloud/'.$cloudFile->getCompany()->getId().'/'.$cloudFile->getPath().'/'.$cloudFile->getIdclass().'/'.$cloudFile->getHashname();
           $response = new BinaryFileResponse($filename);
@@ -142,7 +150,7 @@ class CloudController extends Controller
           $response->setContentDisposition(ResponseHeaderBag::DISPOSITION_INLINE,$cloudFile->getName());
           return $response;
         }return new Response('');
-      }else return new RedirectResponse($this->router->generate('app_login'));
+      }else return new RedirectResponse($router->generate('app_login'));
 		}
     /**
 		 * @Route("/api/cloud/files/{id}/download", name="cloudDownloadFiles")
@@ -162,6 +170,76 @@ class CloudController extends Controller
         }return new Response('');
       }else return new RedirectResponse($this->router->generate('app_login'));
 		}
+
+		/**
+		 * @Route("/api/cloud/files/waitforscan/{id_scanner}/{path}/{id}", name="cloudWaitForScan", defaults={"id"=0})
+		 */
+		public function cloudWaitForScan($id, $id_scanner, $path, RouterInterface $router, Request $request){
+      $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+      if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+        $scannersRepository = $this->getDoctrine()->getRepository(GlobaleScanners::class);
+        $scanner=$this->getDoctrine()->getRepository(GlobaleScanners::class)->find($id);
+				if(!$scanner) return new JsonResponse(["result"=>-1]);
+				if(!(file_exists($scanner->getPath()) && is_dir($scanner->getPath()))) return new JsonResponse(["result"=>-2]);
+				$type=$request->request->get('type');
+				$time=time();
+				//Clear scanner directory
+				/*if($scanner->getPath()!='/' && $scanner->getPath()!='/home/'){
+					$files = glob($scanner->getPath()."*");
+					foreach($files as $file){ // iterate files
+					  if(is_file($file)) {
+					    unlink($file); // delete file
+					  }
+					}
+				}*/
+				$count=0; $scanned=false;
+				while(!$scanned && $count<=$scanner->getTimeout()){
+					$files = glob($scanner->getPath()."*");
+					$files = array_merge ( array_filter($files, function ($file) use ($time){ return filemtime($file) >= $time; }), array_filter($files, function ($file) use ($time){ return filectime($file) >= $time; }));
+					if ($files)
+						{
+					   $scanned=true;
+						 //Copy file
+						 if($id==0) $uploadDir=$this->get('kernel')->getRootDir() . '/../cloud/'.$this->getUser()->getCompany()->getId().'/temp/'.$this->getUser()->getId().'/'.$path.'/';
+						 else $uploadDir=$this->get('kernel')->getRootDir() . '/../cloud/'.$this->getUser()->getCompany()->getId().'/'.$path.'/'.$id.'/';
+						 $fileName = date("YmdHis").'_'.md5(uniqid());
+						 if (!file_exists($uploadDir) && !is_dir($uploadDir)) {
+						 		mkdir($uploadDir, 0775, true);
+						 }
+						 if (rename($files[0],$uploadDir.$fileName)) {
+						 	 $cloudFile=new CloudFiles();
+						 	 $cloudFile->setCompany($this->getUser()->getCompany());
+						 	 $cloudFile->setUser($this->getUser());
+						 	 $cloudFile->setName(basename($files[0]));
+						 	 $cloudFile->setType($type);
+						 	 $cloudFile->setHashname($fileName);
+						 	 $cloudFile->setSize(filesize($uploadDir.$fileName));
+						 	 $cloudFile->setPath($path);
+						 	 //$cloudFile->setRoles('');
+						 	 $cloudFile->setIdclass($id);
+						 	 $cloudFile->setPublic(true);
+						 	 $cloudFile->setDateupd(new \DateTime());
+						 	 $cloudFile->setDateadd(new \DateTime());
+						 	 $cloudFile->setActive(true);
+						 	 $cloudFile->setDeleted(false);
+						 	 $manager = $this->getDoctrine()->getManager();
+						 	 $manager->persist($cloudFile);
+						 	 $manager->flush();
+						 }else{
+							 return new JsonResponse(["result"=>-4, "files"=>[]]);
+						 }
+
+
+						 return new JsonResponse(["result"=>1, "files"=>$files]);
+						}
+					sleep(1);
+					$count++;
+				}
+					return new JsonResponse(["result"=>0, "files"=>[]]);
+			}
+				return new JsonResponse(["result"=>-3, "files"=>[]]);
+		}
+
 
   	/**
   	* @Route("/{_locale}/cloud/files/{id}/disable", name="disableFile")

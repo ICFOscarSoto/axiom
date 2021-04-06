@@ -247,6 +247,71 @@ class GlobaleImagesController extends Controller implements ContainerAwareInterf
 	}
 
 	/**
+	* @Route("/api/{type}/getimages/{id}", name="getProductImages", defaults={"id"=0})
+	*/
+	public function getProductImages($id,$type, Request $request){
+		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		$image_path = $this->get('kernel')->getRootDir().'/../cloud/'.$this->getUser()->getCompany()->getId().'/images/'.$type.'/'.$id.'/';
+		$images=[];
+		if(file_exists( $this->get('kernel')->getRootDir().'/../cloud/'.$this->getUser()->getCompany()->getId().'/images/'.$type.'/'.$id.'-large.png') || file_exists( $this->get('kernel')->getRootDir().'/../cloud/'.$this->getUser()->getCompany()->getId().'/images/products/'.$id.'-large.jpg')){
+			$image=["large"=>$this->generateUrl('getImage', array('type' => $type, "size"=>"large", "id"=>$id, "number"=>0 )),
+						 "thumb"=>$this->generateUrl('getImage', array('type' => $type, "size"=>"thumb", "id"=>$id, "number"=>0 )),
+						 "medium"=>$this->generateUrl('getImage', array('type' => $type, "size"=>"medium", "id"=>$id, "number"=>0 ))];
+			$images[]=$image;
+		}
+		$found=true;
+		$i=1;
+		while($found==true){
+			if(file_exists($image_path.$id."-".$i.'-large.png') || file_exists($image_path.$id."-".$i.'-large.jpg')){
+				$i++;
+			}else{
+				$found=false;
+				$i--;
+			}
+		}
+		for($j=1;$j<=$i;$j++){
+			$image=["large"=>$this->generateUrl('getImage', array('type' => $type, "size"=>"large", "id"=>$id, "number"=>$j )),
+						 "thumb"=>$this->generateUrl('getImage', array('type' => $type, "size"=>"thumb", "id"=>$id, "number"=>$j )),
+						 "medium"=>$this->generateUrl('getImage', array('type' => $type, "size"=>"medium", "id"=>$id, "number"=>$j ))];
+			$images[]=$image;
+		}
+
+		return new JsonResponse(["result"=>1,"images"=>$images]);
+	}
+
+	/**
+	* @Route("/api/{type}/deleteimages/{id}", name="deleteImages", defaults={"id"=0})
+	*/
+	public function deleteImages($id,$type,Request $request){
+		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		$images=null;
+		$image_path = $this->get('kernel')->getRootDir().'/../cloud/'.$this->getUser()->getCompany()->getId().'/images/'.$type.'/';
+		if(file_exists($image_path.$id.'-large.png') || file_exists($image_path.$id.'-large.jpg')){
+			$images[]=$this->get('kernel')->getRootDir().'/../cloud/'.$this->getUser()->getCompany()->getId().'/images/'.$type.'/'.$id."-large.png";
+		}
+		$found=true;
+		$i=1;
+		while($found==true){
+			if(file_exists($image_path.$id.'/'.$id."-".$i.'-large.png') || file_exists($image_path.$id.'/'.$id."-".$i.'-large.jpg')){
+				$i++;
+			}else{
+				$found=false;
+				$i--;
+			}
+		}
+		for($j=1;$j<=$i;$j++){
+			$image=$this->get('kernel')->getRootDir().'/../cloud/'.$this->getUser()->getCompany()->getId().'/images/'.$type.'/'.$id."/".$id."-".$j."-large.png";
+			$images[]=$image;
+		}
+		foreach($images as $image){
+			if(file_exists($image)) unlink($image);
+		}
+
+		return new JsonResponse(["result"=>1]);
+	}
+
+
+	/**
 	* @Route("/api/{type}/{id}/{size}/getimage/{number}", name="getImage", defaults={"type"="users", "size"="medium", "id"=0, "number"=0 })
 	*/
 	public function getWorkerImage($type, $id, $size, $number, Request $request)

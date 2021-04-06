@@ -755,6 +755,33 @@ label.error {
   font-weight: 600;
 }
 
+.waiting-modal{
+  position: absolute;
+  left: 40%;
+  top: 10%;
+  height: fit-content;
+  width: fit-content;
+  margin: 10px 10px;
+  border: 4px #c1c1c1 dashed;
+  border-radius: 18px;
+  background-color: rgba(255, 255, 255, 1);
+  transform: translate(-50%, -35%);
+  padding: 50px 106px;
+  font-size: 14px;
+}
+
+.waiting-modal-container{
+  /* position: absolute; */
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  margin: 0px auto;
+  /* background-color: rgba(255, 255, 255, 0.5); */
+  z-index: 999999 !important;
+  display: none;
+  /* pointer-events: none;
+}
+
 /*
 .spinner-container {
    position: absolute;

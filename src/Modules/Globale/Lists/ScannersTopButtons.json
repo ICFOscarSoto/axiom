@@ -1,0 +1,6 @@
+[
+  {"id" : "addTopScanners", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"genericdata", "routeParams":{"module":"Globale", "name":"Scanners", "type":"modal" }, "modal":"Scanners", "actionType" : "background", "confirm" :false, "tooltip" : ""},
+  {"id" : "deleteTopScanners", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true, "tooltip":""},
+  {"id" : "printTopScanners", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false, "tooltip":""},
+  {"id" : "exportTopScanners", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"genericexport", "routeParams":{"module":"Globale", "name":"Scanners"}, "confirm" :false, "tooltip":""}
+]

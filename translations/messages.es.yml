@@ -596,6 +596,10 @@ Select erpstores: Seleccionar Almacén
 Select erpstorelocations: Seleccionar Ubicación
 Inputs: Entradas
 Select ERPStoreLocations: Seleccionar Ubicación
+Packages: Bultos
+Comments: Comentarios
+Carrier: Transportista
+
 
 # VEHICLES
 #----------------------------------------------------------------------------------------------------------------------

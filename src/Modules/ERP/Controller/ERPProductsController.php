@@ -382,40 +382,6 @@ class ERPProductsController extends Controller
     }
 
 		/**
-    * @Route("/api/erp/product/getimages/{id}", name="getProductImages", defaults={"id"=0})
-    */
-    public function getProductImages($id,Request $request){
-			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-			$image_path = $this->get('kernel')->getRootDir().'/../cloud/'.$this->getUser()->getCompany()->getId().'/images/products/'.$id.'/';
-			$images=[];
-			if(file_exists( $this->get('kernel')->getRootDir().'/../cloud/'.$this->getUser()->getCompany()->getId().'/images/products/'.$id.'-large.png') || file_exists( $this->get('kernel')->getRootDir().'/../cloud/'.$this->getUser()->getCompany()->getId().'/images/products/'.$id.'-large.jpg')){
-				$image=["large"=>$this->generateUrl('getImage', array('type' => 'products', "size"=>"large", "id"=>$id, "number"=>0 )),
-							 "thumb"=>$this->generateUrl('getImage', array('type' => 'products', "size"=>"thumb", "id"=>$id, "number"=>0 )),
-							 "medium"=>$this->generateUrl('getImage', array('type' => 'products', "size"=>"medium", "id"=>$id, "number"=>0 ))];
-				$images[]=$image;
-			}
-			$found=true;
-			$i=1;
-			while($found==true){
-				if(file_exists($image_path.$id."-".$i.'-large.png') || file_exists($image_path.$id."-".$i.'-large.jpg')){
-					$i++;
-				}else{
-					$found=false;
-					$i--;
-				}
-			}
-			for($j=1;$j<=$i;$j++){
-				$image=["large"=>$this->generateUrl('getImage', array('type' => 'products', "size"=>"large", "id"=>$id, "number"=>$j )),
-							 "thumb"=>$this->generateUrl('getImage', array('type' => 'products', "size"=>"thumb", "id"=>$id, "number"=>$j )),
-							 "medium"=>$this->generateUrl('getImage', array('type' => 'products', "size"=>"medium", "id"=>$id, "number"=>$j ))];
-				$images[]=$image;
-			}
-
-			return new JsonResponse(["result"=>1,"images"=>$images]);
-    }
-
-
-		/**
 		* @Route("/api/erp/product/uploadwebimages/{id}", name="uploadWebImages", defaults={"id"=0})
 		*/
 		public function uploadWebImages($id,Request $request){
@@ -431,45 +397,7 @@ class ERPProductsController extends Controller
 				else return new JsonResponse(NULL);
 		}
 
-		/**
-		* @Route("/api/erp/product/deleteimages/{id}", name="deleteImages", defaults={"id"=0})
-		*/
-		public function deleteImages($id,Request $request){
-			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-			$productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
-			$product=$productRepository->findOneBy(["id"=>$id]);
-
-			$images=null;
-			$image_path = $this->get('kernel')->getRootDir().'/../cloud/'.$product->getCompany()->getId().'/images/products/';
-
-			if(file_exists($image_path.$id.'-large.png') || file_exists($image_path.$id.'-large.jpg')){
-				$images[]=$this->get('kernel')->getRootDir().'/../cloud/'.$product->getCompany()->getId().'/images/products/'.$id."-large.png";
-			}
-
-			$found=true;
-			$i=1;
-			while($found==true){
-				if(file_exists($image_path.$id.'/'.$id."-".$i.'-large.png') || file_exists($image_path.$id.'/'.$id."-".$i.'-large.jpg')){
-					$i++;
-				}else{
-					$found=false;
-					$i--;
-				}
-			}
-			for($j=1;$j<=$i;$j++){
-				$image=$this->get('kernel')->getRootDir().'/../cloud/'.$product->getCompany()->getId().'/images/products/'.$id."/".$id."-".$j."-large.png";
-				$images[]=$image;
-			}
-
-
-			foreach($images as $image)
-			{
-				if(file_exists($image)) unlink($image);
-
-			}
-
-			return new JsonResponse(["result"=>1]);
-		}
+		
 
 		/**
 		* @Route("/api/prestashop/erp/product/get/{id}", name="prestashopGetProduct", defaults={"id"=0})
