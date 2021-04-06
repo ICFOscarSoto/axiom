@@ -73,8 +73,12 @@
           {% if scanner is defined and scanner != null %}
             $('body').on('click',"#{{ cloudConstructor.id }}-scan-button", function (e) {
               $("#{{ cloudConstructor.id }}-waiting-escaner-modal").fadeIn();
-              $.post( "{{ url('cloudWaitForScan',{'id_scanner': scanner.id, 'id': id, 'path':path}) }}", {type: $('#type').val() }, function( data ) {
-                $("#{{ listConstructor.id }}").DataTable().ajax.reload();
+							{% if module is defined %}
+              $.post( "{{ url('cloudWaitForScan',{'id_scanner': scanner.id, 'id': id, 'path':path, 'module':module}) }}", {type: $('#type').val() }, function( data ) {
+							{% else %}
+							$.post( "{{ url('cloudWaitForScan',{'id_scanner': scanner.id, 'id': id, 'path':path}) }}", {type: $('#type').val() }, function( data ) {
+							{% endif %}
+								$("#{{ listConstructor.id }}").DataTable().ajax.reload();
               }, "json").done(function() {
                 $("#{{ listConstructor.id }}").DataTable().ajax.reload();
               }).always(function() {

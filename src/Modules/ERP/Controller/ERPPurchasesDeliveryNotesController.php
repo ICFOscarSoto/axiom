@@ -74,7 +74,7 @@ class ERPPurchasesDeliveryNotesController extends Controller
 						'id' => $id,
 						'tab' => $request->query->get('tab','data'), //Show initial tab, by default data tab
 						'tabs' => [["name" => "data", "icon"=>"fa fa-file", "caption"=>"Datos", "active"=>true, "route"=>$this->generateUrl("genericdata",["module"=>"ERP", "name"=>"Inputs", "type"=>"full", "id"=>$id])],
-											 ["name" => "files", "icon"=>"fa fa-cloud", "caption"=>"Archivos", "route"=>$this->generateUrl("cloudfiles",["id"=>$id, "path"=>"ERPInputs", "types"=>json_encode(["Albarán Proveedor","Recibo Transportista", "Etiqueta Expedición", "Otros"])])]
+											 ["name" => "files", "icon"=>"fa fa-cloud", "caption"=>"Archivos", "route"=>$this->generateUrl("cloudfiles",["id"=>$id, "path"=>"ERPInputs", "module" => "ERP", "types"=>json_encode(["Albarán Proveedor","Recibo Transportista", "Etiqueta Expedición", "Otros"])])]
 										],
 
 								'include_header' => [["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker-es.js"],
@@ -96,5 +96,6 @@ class ERPPurchasesDeliveryNotesController extends Controller
 		$breadcrumb=$menurepository->formatBreadcrumb('inputs');
 		$inputsRepository=$this->getDoctrine()->getRepository(ERPInputs::class);
 		$input=$inputsRepository->findOneBy(["id"=>$id, "active"=>1, "deleted"=>0, "company"=>$this->getUser()->getCompany() ]);
+
 	}
 }

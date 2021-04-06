@@ -55,9 +55,9 @@ class CloudController extends Controller
 	}
 
 	/**
-	 * @Route("/api/cloud/files/{path}/{id}/form/{types}", name="cloudfiles", defaults={"types"="[]"})
+	 * @Route("/api/cloud/files/{path}/{id}/form/{types}/{module}", name="cloudfiles", defaults={"types"="[]", "module"="Globale"})
 	 */
-	public function cloudfiles($path, $id, $types, RouterInterface $router,Request $request){
+	public function cloudfiles($path, $id, $types, $module, RouterInterface $router,Request $request){
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		$this->router = $router;
 		$user=$this->getUser();
@@ -70,7 +70,8 @@ class CloudController extends Controller
 				'cloudConstructor' => $templateLists,
 				'scanner' => $scanner,
 				'path' => $path,
-				'id' => $id
+				'id' => $id,
+				'module' => $module
 				]);
 			}
 		return new RedirectResponse($this->router->generate('app_login'));
@@ -172,9 +173,9 @@ class CloudController extends Controller
 		}
 
 		/**
-		 * @Route("/api/cloud/files/waitforscan/{id_scanner}/{path}/{id}", name="cloudWaitForScan", defaults={"id"=0})
+		 * @Route("/api/cloud/files/waitforscan/{id_scanner}/{path}/{id}/{module}", name="cloudWaitForScan", defaults={"id"=0, "module"=""})
 		 */
-		public function cloudWaitForScan($id, $id_scanner, $path, RouterInterface $router, Request $request){
+		public function cloudWaitForScan($id, $id_scanner, $path, $module, RouterInterface $router, Request $request){
       $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
       if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
         $scannersRepository = $this->getDoctrine()->getRepository(GlobaleScanners::class);
@@ -207,9 +208,9 @@ class CloudController extends Controller
 						 		mkdir($uploadDir, 0775, true);
 						 }
 						 if (rename($files[0],$uploadDir.$fileName)) {
-							 chown($uploadDir.$fileName, 'www-data');
-							 chgrp($uploadDir.$fileName, 'www-data');
-							 chmod($uploadDir.$fileName, 0774);
+							 //chown($uploadDir.$fileName, 'www-data');
+							 //chgrp($uploadDir.$fileName, 'www-data');
+							 //chmod($uploadDir.$fileName, 0774);
 						 	 $cloudFile=new CloudFiles();
 						 	 $cloudFile->setCompany($this->getUser()->getCompany());
 						 	 $cloudFile->setUser($this->getUser());
@@ -228,6 +229,18 @@ class CloudController extends Controller
 						 	 $manager = $this->getDoctrine()->getManager();
 						 	 $manager->persist($cloudFile);
 						 	 $manager->flush();
+
+							 $classModule='\App\Modules\\'.$module.'\Entity\\'.$path;
+							 if(class_exists($classModule)){
+								 $classRepository=$this->getDoctrine()->getRepository($classModule);
+								 $obj=$classRepository->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany()]);
+								 if($obj){
+									 if(method_exists($obj, 'postUploadCloudFile')){
+										 $obj->postUploadCloudFile($cloudFile);
+									 }
+								 }
+							 }
+
 						 }else{
 							 return new JsonResponse(["result"=>-4, "files"=>[]]);
 						 }
