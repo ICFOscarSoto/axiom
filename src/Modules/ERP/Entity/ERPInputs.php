@@ -288,7 +288,7 @@ class ERPInputs
         $channel='819214160985456650';
         file_get_contents('https://icfbot.ferreteriacampollano.com/file.php?channel='.$channel.'&msg='.urlencode($msg).'&file='.urlencode('/var/www/axiom.ferreteriacampollano.com/cloud/2/'.$cloudFile->getPath().'/'.$cloudFile->getIdclass().'/'.$cloudFile->getHashname()).'&filename='.urlencode($cloudFile->getName()));
         if($this->comments!=""){
-          $msg="**Comentarios:** \n ".$this->comments.'\n\nMas info en: '.'[http://devaxiom.ferreteriacampollano.com/es/ERP/inputs/form/'.$this->id.'](http://devaxiom.ferreteriacampollano.com/es/ERP/inputs/form/'.$this->id.')';
+          $msg="**Comentarios:** \n ".strip_tags($this->comments).'\\n\\nMas info en: '.'http://devaxiom.ferreteriacampollano.com/es/ERP/inputs/form/'.$this->id;
           file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
         }
     }
