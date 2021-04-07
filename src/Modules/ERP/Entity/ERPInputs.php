@@ -279,7 +279,6 @@ class ERPInputs
       $cloudRepository=$doctrine->getRepository(CloudFiles::class);
       $files=$cloudRepository->findBy(["company"=>$user->getCompany(), "path"=>"ERPInputs", "idclass"=>$this->id, "type"=>"Albarán Proveedor"]);
       if(count($files)>0 && $this->inputdate!="" && $oldobj->getInputdate()==""){
-        dump($files);
         $this->discordNotify($files[0]);
       }
     }
@@ -290,12 +289,11 @@ class ERPInputs
         $msg="Nueva entrada albarán Nº **".$this->code."** de **".$this->supplier->getName()."**";
         if($this->store!=null) $msg=$msg." en ".$this->store->getName();
         file_get_contents('https://icfbot.ferreteriacampollano.com/file.php?channel='.$channel.'&msg='.urlencode($msg).'&file='.urlencode('/var/www/axiom.ferreteriacampollano.com/cloud/2/'.$cloudFile->getPath().'/'.$cloudFile->getIdclass().'/'.$cloudFile->getHashname()).'&filename='.urlencode($cloudFile->getName()));
-        dump('https://icfbot.ferreteriacampollano.com/file.php?channel='.$channel.'&msg='.urlencode($msg).'&file='.urlencode('/var/www/axiom.ferreteriacampollano.com/cloud/2/'.$cloudFile->getPath().'/'.$cloudFile->getIdclass().'/'.$cloudFile->getHashname()).'&filename='.urlencode($cloudFile->getName()));
         if($this->comments!=""){
           $msg="**Comentarios:** \n".strip_tags($this->comments);
           file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
         }
-        $msg="\n\nMas info en: \n".'http://devaxiom.ferreteriacampollano.com/es/ERP/inputs/form/'.$this->id;
+        $msg="\n\nMas info en: \n".'https://axiom.ferreteriacampollano.com/es/ERP/inputs/form/'.$this->id;
         file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
     }
 

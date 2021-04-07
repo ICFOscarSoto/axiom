@@ -51,7 +51,7 @@
 							url: '{{cloudConstructor.path}}/{{ module }}',
 						{% else %}
 						 url: '{{cloudConstructor.path}}',
-						{% endif %}	
+						{% endif %}
 						  maxFilesize: 20,  // in Mb
               addRemoveLinks: false,
               clickable: '#{{ cloudConstructor.id }}-top-button',
@@ -87,6 +87,7 @@
                 $("#{{ listConstructor.id }}").DataTable().ajax.reload();
               }).always(function() {
                 $("#{{ cloudConstructor.id }}-waiting-escaner-modal").fadeOut();
+								$("#{{ listConstructor.id }}").DataTable().ajax.reload();
               });
             });
 
