@@ -73,7 +73,7 @@ class ERPPurchasesDeliveryNotesController extends Controller
 						'userData' => $userdata,
 						'id' => $id,
 						'tab' => $request->query->get('tab','data'), //Show initial tab, by default data tab
-						'tabs' => [["name" => "data", "icon"=>"fa fa-file", "caption"=>"Datos", "active"=>true, "route"=>$this->generateUrl("genericdata",["module"=>"ERP", "name"=>"Inputs", "type"=>"full", "id"=>$id])],
+						'tabs' => [["name" => "data", "icon"=>"fa fa-file", "caption"=>"Datos", "active"=>true, "route"=>$this->generateUrl("dataInput",["id"=>$id])],
 											 ["name" => "files", "icon"=>"fa fa-cloud", "caption"=>"Archivos", "route"=>$this->generateUrl("cloudfiles",["id"=>$id, "path"=>"ERPInputs", "module" => "ERP", "types"=>json_encode(["Albarán Proveedor","Recibo Transportista", "Etiqueta Expedición", "Otros"])])]
 										],
 
@@ -83,6 +83,28 @@ class ERPPurchasesDeliveryNotesController extends Controller
 																		 ["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.js"]]
 								));
 	}
+
+	/**
+	 * @Route("/{_locale}/ERP/inputs/data/{id}/{action}", name="dataInput", defaults={"id"=0, "action"="read"})
+	 */
+	 public function dataInput($id, $action, Request $request){
+	 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+	 $template=dirname(__FILE__)."/../Forms/Inputs.json";
+	 $utils = new GlobaleFormUtils();
+	 $utilsObj=new ERPInputsUtils();
+
+	 $repository=$this->getDoctrine()->getRepository(ERPInputs::class);
+	 $obj = $repository->findOneBy(['id'=>$id, 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
+	 if($id!=0 && $obj==null){
+			return $this->render('@Globale/notfound.html.twig',[]);
+	 }
+	 $classUtils=new ERPInputsUtils();
+	 $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "obj"=>$obj];
+	 $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),$classUtils->getExcludedForm($params),$classUtils->getIncludedForm($params),null,[],[],[],true);
+	 $make = $utils->make($id, ERPInputs::class, $action, "formInput", "full", "@Globale/form.html.twig",'inputsForm');
+	 return $make;
+	}
+
 
 	/**
 	 * @Route("/{_locale}/ERP/inputs/discord_notify/{id}", name="inputsDiscordNotify", defaults={"id"=0})
