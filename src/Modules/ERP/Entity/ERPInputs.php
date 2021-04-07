@@ -279,18 +279,22 @@ class ERPInputs
       $cloudRepository=$doctrine->getRepository(CloudFiles::class);
       $files=$cloudRepository->findBy(["company"=>$user->getCompany(), "path"=>"ERPInputs", "idclass"=>$this->id, "type"=>"Albarán Proveedor"]);
       if(count($files)>0 && $this->inputdate!="" && $oldobj->getInputdate()==""){
+        dump($files);
         $this->discordNotify($files[0]);
       }
     }
 
     public function discordNotify($cloudFile){
-        $msg="Nueva entrada albarán Nº **".$this->code."** de **".$this->supplier->getName()."** en ".$this->store->getName();
+        $msg="Nueva entrada albarán Nº **".$this->code."** de **".$this->supplier->getName().$this->store?("** en ".$this->store->getName()):'';
         $channel='819214160985456650';
         file_get_contents('https://icfbot.ferreteriacampollano.com/file.php?channel='.$channel.'&msg='.urlencode($msg).'&file='.urlencode('/var/www/axiom.ferreteriacampollano.com/cloud/2/'.$cloudFile->getPath().'/'.$cloudFile->getIdclass().'/'.$cloudFile->getHashname()).'&filename='.urlencode($cloudFile->getName()));
+        dump('https://icfbot.ferreteriacampollano.com/file.php?channel='.$channel.'&msg='.urlencode($msg).'&file='.urlencode('/var/www/axiom.ferreteriacampollano.com/cloud/2/'.$cloudFile->getPath().'/'.$cloudFile->getIdclass().'/'.$cloudFile->getHashname()).'&filename='.urlencode($cloudFile->getName()));
         if($this->comments!=""){
-          $msg="**Comentarios:** \n ".strip_tags($this->comments).'\\n\\nMas info en: '.'http://devaxiom.ferreteriacampollano.com/es/ERP/inputs/form/'.$this->id;
+          $msg="**Comentarios:** \n ".strip_tags($this->comments);
           file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
         }
+        $msg="\n\nMas info en: \n".'http://devaxiom.ferreteriacampollano.com/es/ERP/inputs/form/'.$this->id;
+        file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
     }
 
     public function getInputdate(): ?\DateTimeInterface
