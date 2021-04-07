@@ -285,7 +285,7 @@ class ERPInputs
     }
 
     public function discordNotify($cloudFile){
-        $channel='819214160985456650';
+        $channel='829033245332996106';
 
         $msg="Nueva entrada albarán Nº **".$this->code."** de **".$this->supplier->getName()."**";
         if($this->store!=null) $msg=$msg." en ".$this->store->getName();
