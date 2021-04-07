@@ -3,11 +3,13 @@
 namespace App\Modules\ERP\Entity;
 
 use App\Modules\Globale\Entity\GlobaleCompanies;
+use App\Modules\Globale\Entity\GlobaleUsers;
 use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\ERP\Entity\ERPCarriers;
 use \App\Modules\ERP\Entity\ERPSuppliers;
 use \App\Modules\ERP\Entity\ERPStoreLocations;
 use \App\Modules\ERP\Entity\ERPStores;
+use \App\Modules\Cloud\Entity\CloudFiles;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\Modules\ERP\Entity\ERPInputsRepository")
@@ -37,9 +39,9 @@ class ERPInputs
     private $carrier;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", nullable=true)
      */
-    private $packages=1;
+    private $packages;
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPSuppliers")
@@ -49,13 +51,13 @@ class ERPInputs
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPStoreLocations")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=true)
      */
     private $location;
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPStores")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=true)
      */
     private $store;
 
@@ -89,6 +91,22 @@ class ERPInputs
      * @ORM\Column(type="text", nullable=true)
      */
     private $comments;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $inputdate;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Modules\Globale\Entity\GlobaleUsers")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $author;
+
+    public function __construct()
+    {
+      $this->date=new \DateTime();
+    }
 
     public function getId(): ?int
     {
@@ -247,17 +265,55 @@ class ERPInputs
     public function setComments(?string $comments): self
     {
         $this->comments = $comments;
+        return $this;
+    }
+
+    //Called automatically when a file is uploaded or scanned
+    public function postUploadCloudFile($cloudFile, $doctrine){
+      if($cloudFile->getCompany()->getId()==2 && $cloudFile->getType()=="Albarán Proveedor" && $this->inputdate!=""){
+        $this->discordNotify($cloudFile);
+      }
+    }
+
+    public function postProccess($kernel, $doctrine, $user, $params, $oldobj){
+      $cloudRepository=$doctrine->getRepository(CloudFiles::class);
+      $files=$cloudRepository->findBy(["company"=>$user->getCompany(), "path"=>"ERPInputs", "idclass"=>$this->id, "type"=>"Albarán Proveedor"]);
+      if(count($files)>0 && $this->inputdate!="" && $oldobj->getInputdate()==""){
+        $this->discordNotify($files[0]);
+      }
+    }
+
+    public function discordNotify($cloudFile){
+        $msg="Nueva entrada albarán Nº **".$this->code."** de **".$this->supplier->getName()."** en ".$this->store->getName();
+        $channel='819214160985456650';
+        file_get_contents('https://icfbot.ferreteriacampollano.com/file.php?channel='.$channel.'&msg='.urlencode($msg).'&file='.urlencode('/var/www/axiom.ferreteriacampollano.com/cloud/2/'.$cloudFile->getPath().'/'.$cloudFile->getIdclass().'/'.$cloudFile->getHashname()).'&filename='.urlencode($cloudFile->getName()));
+        if($this->comments!=""){
+          $msg="**Comentarios:** \n ".$this->comments.'\n\nMas info en: '.'[http://devaxiom.ferreteriacampollano.com/es/ERP/inputs/form/'.$this->id.'](http://devaxiom.ferreteriacampollano.com/es/ERP/inputs/form/'.$this->id.')';
+          file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
+        }
+    }
+
+    public function getInputdate(): ?\DateTimeInterface
+    {
+        return $this->inputdate;
+    }
+
+    public function setInputdate(?\DateTimeInterface $inputdate): self
+    {
+        $this->inputdate = $inputdate;
 
         return $this;
     }
 
-    public function postUploadCloudFile($cloudFile){
-      if($cloudFile->getCompany()->getId()==2 && $cloudFile->getType()=="Albarán Proveedor"){
-        $msg="Nueva entrada albarán Nº ".$this->code." en ".$this->store->getName();
-        $channel='819214160985456650';
-        file_get_contents('https://icfbot.ferreteriacampollano.com/file.php?channel='.$channel.'&msg='.urlencode($msg).'&file=/var/www/axiom.ferreteriacampollano.com/cloud/2/'.$cloudFile->getPath().'/'.$cloudFile->getIdclass().'/'.$cloudFile->getHashname().'&filename='.$cloudFile->getName());
-      }
+    public function getAuthor(): ?GlobaleUsers
+    {
+        return $this->author;
+    }
 
+    public function setAuthor(?GlobaleUsers $author): self
+    {
+        $this->author = $author;
 
+        return $this;
     }
 }

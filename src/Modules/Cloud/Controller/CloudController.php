@@ -130,7 +130,7 @@ class CloudController extends Controller
  								 $obj=$classRepository->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany()]);
  								 if($obj){
  									 if(method_exists($obj, 'postUploadCloudFile')){
- 										 $obj->postUploadCloudFile($cloudFile);
+ 										 $obj->postUploadCloudFile($cloudFile, $this->getDoctrine());
  									 }
  								 }
  							 }
@@ -247,7 +247,7 @@ class CloudController extends Controller
 								 $obj=$classRepository->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany()]);
 								 if($obj){
 									 if(method_exists($obj, 'postUploadCloudFile')){
-										 $obj->postUploadCloudFile($cloudFile);
+										 $obj->postUploadCloudFile($cloudFile, $this->getDoctrine());
 									 }
 								 }
 							 }

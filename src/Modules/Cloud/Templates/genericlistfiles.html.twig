@@ -47,8 +47,12 @@
           Dropzone.autoDiscover = false;
           var jsonFiles = [];
           var dropzone_default = new Dropzone(".{{ cloudConstructor.id }}", {
-              url: '{{cloudConstructor.path}}',
-              maxFilesize: 20,  // in Mb
+						{% if module is defined and module !="" %}
+							url: '{{cloudConstructor.path}}/{{ module }}',
+						{% else %}
+						 url: '{{cloudConstructor.path}}',
+						{% endif %}	
+						  maxFilesize: 20,  // in Mb
               addRemoveLinks: false,
               clickable: '#{{ cloudConstructor.id }}-top-button',
               init: function () {
