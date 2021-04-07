@@ -285,7 +285,7 @@ class ERPInputs
     }
 
     public function discordNotify($cloudFile){
-        $msg="Nueva entrada albarán Nº **".$this->code."** de **".$this->supplier->getName().$this->store?("** en ".$this->store->getName()):'';
+        $msg="Nueva entrada albarán Nº **".$this->code."** de **".$this->supplier->getName().($this->store!=null)?("** en ".$this->store->getName()):'';
         $channel='819214160985456650';
         file_get_contents('https://icfbot.ferreteriacampollano.com/file.php?channel='.$channel.'&msg='.urlencode($msg).'&file='.urlencode('/var/www/axiom.ferreteriacampollano.com/cloud/2/'.$cloudFile->getPath().'/'.$cloudFile->getIdclass().'/'.$cloudFile->getHashname()).'&filename='.urlencode($cloudFile->getName()));
         dump('https://icfbot.ferreteriacampollano.com/file.php?channel='.$channel.'&msg='.urlencode($msg).'&file='.urlencode('/var/www/axiom.ferreteriacampollano.com/cloud/2/'.$cloudFile->getPath().'/'.$cloudFile->getIdclass().'/'.$cloudFile->getHashname()).'&filename='.urlencode($cloudFile->getName()));
