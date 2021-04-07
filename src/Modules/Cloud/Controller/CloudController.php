@@ -190,7 +190,7 @@ class CloudController extends Controller
       $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
       if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
         $scannersRepository = $this->getDoctrine()->getRepository(GlobaleScanners::class);
-        $scanner=$this->getDoctrine()->getRepository(GlobaleScanners::class)->find($id);
+        $scanner=$scannersRepository->findOneBy(["id"=>$id_scanner, "active"=>1, "deleted"=>0]);
 				if(!$scanner) return new JsonResponse(["result"=>-1]);
 				if(!(file_exists($scanner->getPath()) && is_dir($scanner->getPath()))) return new JsonResponse(["result"=>-2]);
 				$type=$request->request->get('type');
