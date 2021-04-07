@@ -600,7 +600,9 @@ Packages: Bultos
 Comments: Comentarios
 Carrier: Transportista
 Inputdate: Fecha de Entrada
-
+store: Almacén
+packages: Bultos
+location: Ubicación
 
 # VEHICLES
 #----------------------------------------------------------------------------------------------------------------------

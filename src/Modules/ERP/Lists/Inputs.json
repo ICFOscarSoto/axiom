@@ -8,43 +8,25 @@
         "caption": "code"
     },
     {
-        "name": "date",
-        "caption": "date"
-    },
-    {
-        "name": "packages",
-        "caption": "packages"
-    },
-    {
-        "name": "carrier__name",
-        "caption": "carrier"
-    },
-    {
         "name": "supplier__name",
         "caption": "supplier"
     },
     {
-        "name": "location__name",
-        "caption": "location"
+        "name": "date",
+        "caption": "date",
+        "type": "date",
+        "width": "15%","class":"min-desktop"
     },
     {
         "name": "store__name",
         "caption": "store"
     },
     {
-        "name": "active",
-        "caption": "Estado",
-        "width": "10%",
-        "class": "dt-center",
-        "replace": {
-            "1": {
-                "text": "Activo",
-                "html": "<div style=\"min-width: 75px;\" class=\"label label-success\">Activo<\/div>"
-            },
-            "0": {
-                "text": "Desactivado",
-                "html": "<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado<\/div>"
-            }
-        }
+        "name": "packages",
+        "caption": "packages"
+    },
+    {
+        "name": "location__name",
+        "caption": "location"
     }
 ]
