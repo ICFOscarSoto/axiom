@@ -65,7 +65,7 @@ class ERPPurchasesDeliveryNotesController extends Controller
 		return $this->render('@Globale/generictabform.html.twig', array(
 						'entity_name' => $entity_name,
 						'controllerName' => 'CustomersController',
-						'interfaceName' => 'Inputs',
+						'interfaceName' => 'Entradas Almacén',
 						'optionSelected' => 'genericindex',
 						'optionSelectedParams' => ["module"=>"ERP", "name"=>"Inputs"],
 						'menuOptions' =>  $menurepository->formatOptions($userdata),
