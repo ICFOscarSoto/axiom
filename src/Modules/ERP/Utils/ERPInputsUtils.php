@@ -29,7 +29,7 @@ class ERPInputsUtils
       'routeParams' => ["module" => $this->module,
                         "name" => $this->name],
       'orderColumn' => 2,
-      'orderDirection' => 'ASC',
+      'orderDirection' => 'DESC',
       'tagColumn' => 2,
       'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/".$this->name.".json"),true),
       'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/".$this->name."FieldButtons.json"),true),
