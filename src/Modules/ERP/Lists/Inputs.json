@@ -4,6 +4,12 @@
         "caption": "id"
     },
     {
+        "name": "date",
+        "caption": "Fecha Albarán",
+        "type": "date",
+        "width": "15%","class":"min-desktop"
+    },
+    {
         "name": "code",
         "caption": "code"
     },
@@ -12,8 +18,8 @@
         "caption": "supplier"
     },
     {
-        "name": "date",
-        "caption": "date",
+        "name": "inputdate",
+        "caption": "Fecha Entrada",
         "type": "date",
         "width": "15%","class":"min-desktop"
     },
