@@ -271,6 +271,7 @@ class ERPInputs
     //Called automatically when a file is uploaded or scanned
     public function postUploadCloudFile($cloudFile, $doctrine){
       if($cloudFile->getCompany()->getId()==2 && $cloudFile->getType()=="Albarán Proveedor" && $this->inputdate!=""){
+        sleep(1);
         $this->discordNotify($cloudFile);
       }
     }
