@@ -152,15 +152,24 @@ class GlobaleFormUtils extends Controller
               if(isset($field["minDate"])) $attr["minDate"]=$field["minDate"];
               if(isset($field["maxDate"])) $attr["maxDate"]=$field["maxDate"];
 
+              if(isset($field["readonly"])){
+                if($field["readonly"]===true || $field["readonly"]===false) $readonly=$field["readonly"];
+                 else if($field["readonly"]=="noChange"){
+                   if($this->obj->{'get'.ucfirst($field["name"])}()==null){
+                     $readonly=false;
+                   }else $readonly=true;
+                 }
+              }
+
               if(isset($field["type"])){
                 if($field["type"]=="date")
-                  $form->add($value['fieldName'], DateType::class, ['required' => !$value["nullable"], 'empty_data' => '', 'widget' => 'single_text', 'format' => 'dd/MM/yyyy', 'attr' => array_merge(['class' => 'datepicker' , 'defaultDate' => isset($field["defaultDate"])?$field["defaultDate"]:'' ],$attr)]);
+                  $form->add($value['fieldName'], DateType::class, ['disabled' => $readonly, 'required' => !$value["nullable"], 'empty_data' => '', 'widget' => 'single_text', 'format' => 'dd/MM/yyyy', 'attr' => array_merge(['autocomplete' => 'off', 'class' => 'datepicker' , 'defaultDate' => isset($field["defaultDate"])?$field["defaultDate"]:'' ],$attr)]);
                 if($field["type"]=="time")
-                  $form->add($value['fieldName'], TimeType::class, ['required' => !$value["nullable"], 'empty_data' => '', 'widget' => 'single_text', 'attr' => array_merge(['class' => 'timepicker'],$attr)]);
-              }else $form->add($value['fieldName'], DateTimeType::class, ['required' => !$value["nullable"], 'empty_data' => '', 'widget' => 'single_text', 'format' => 'dd/MM/yyyy kk:mm:ss', 'attr' => array_merge(['class' => 'datetimepicker', 'defaultDate' => isset($field["defaultDate"])?$field["defaultDate"]:'' ],$attr)]);
+                  $form->add($value['fieldName'], TimeType::class, ['disabled' => $readonly, 'required' => !$value["nullable"], 'empty_data' => '', 'widget' => 'single_text', 'attr' => array_merge(['autocomplete' => 'off', 'class' => 'timepicker'],$attr)]);
+              }else $form->add($value['fieldName'], DateTimeType::class, ['required' => !$value["nullable"], 'empty_data' => '', 'widget' => 'single_text', 'format' => 'dd/MM/yyyy kk:mm:ss', 'attr' => array_merge(['autocomplete' => 'off', 'class' => 'datetimepicker', 'defaultDate' => isset($field["defaultDate"])?$field["defaultDate"]:'' ],$attr)]);
             break;
             case 'json':
-              $form->add($value['fieldName'], TextType::class, ['required' => !$value["nullable"], 'attr'=>['class' => 'tagsinput']]);
+              $form->add($value['fieldName'], TextType::class, ['required' => !$value["nullable"], 'attr'=>['autocomplete' => 'off', 'class' => 'tagsinput']]);
               $form->get($value['fieldName'])
                   ->addModelTransformer(new CallbackTransformer(
                       function ($tagsAsArray) {return implode(',', $tagsAsArray);},
@@ -182,7 +191,7 @@ class GlobaleFormUtils extends Controller
                   break;
                   case 'button':
                     $form->add($field['name'], ButtonType::class, [
-                        'attr' => ['readonly' => $readonly, 'class' => $field["transform"]['class'].' '.isset($field["class"])?$field["class"]:''],
+                        'attr' => ['autocomplete' => 'off', 'readonly' => $readonly, 'class' => $field["transform"]['class'].' '.isset($field["class"])?$field["class"]:''],
                     ]);
                   break;
                 }
@@ -201,19 +210,19 @@ class GlobaleFormUtils extends Controller
                  if(isset($field["type"])){
                    switch ($field['type']){
                      case 'time':
-                       $form->add($value['fieldName'], TextType::class, ['label'=>$label, 'disabled' => $readonly, 'required' => !$value["nullable"], 'attr' => ['readonly' => $readonly, 'class' => 'timepicker']]);
+                       $form->add($value['fieldName'], TextType::class, ['label'=>$label, 'disabled' => $readonly, 'required' => !$value["nullable"], 'attr' => ['autocomplete' => 'off', 'readonly' => $readonly, 'class' => 'timepicker']]);
                      break;
                      case "dateshort":
-                         $form->add($value['fieldName'], TextType::class, ['disabled' => $readonly, 'required' => !$value["nullable"], 'empty_data' => '', 'attr' => ['readonly' => $readonly, 'class' => 'dateshortpicker', 'defaultDate' => isset($field["defaultDate"])?$field["defaultDate"]:'' ]]);
+                         $form->add($value['fieldName'], TextType::class, ['disabled' => $readonly, 'required' => !$value["nullable"], 'empty_data' => '', 'attr' => ['autocomplete' => 'off', 'readonly' => $readonly, 'class' => 'dateshortpicker', 'defaultDate' => isset($field["defaultDate"])?$field["defaultDate"]:'' ]]);
                      break;
                      default:
-                      $form->add($value['fieldName'],null,['label'=>$label, 'disabled' => $readonly, 'attr'=>['readonly' => $readonly,'class'=>isset($field["class"])?$field["class"]:'']]);
+                      $form->add($value['fieldName'],null,['label'=>$label, 'disabled' => $readonly, 'attr'=>['autocomplete' => 'off', 'readonly' => $readonly,'class'=>isset($field["class"])?$field["class"]:'']]);
                    }
                  }else{
-                   $form->add($value['fieldName'],null,['label'=>$label, 'disabled' => $readonly, 'attr'=>['readonly' => $readonly,'class'=>isset($field["class"])?$field["class"]:'']]);
+                   $form->add($value['fieldName'],null,['label'=>$label, 'disabled' => $readonly, 'attr'=>['autocomplete' => 'off', 'readonly' => $readonly,'class'=>isset($field["class"])?$field["class"]:'']]);
                  }
               }
-            }else $form->add($value['fieldName'],null,['disabled' => $readonly,'attr'=>['readonly' => $readonly,'class'=>isset($field["class"])?$field["class"]:'']]);
+            }else $form->add($value['fieldName'],null,['disabled' => $readonly,'attr'=>['autocomplete' => 'off', 'readonly' => $readonly,'class'=>isset($field["class"])?$field["class"]:'']]);
             break;
           }
         }

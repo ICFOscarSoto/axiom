@@ -112,6 +112,9 @@ table {
     margin-right: -1px;
     outline: 0;
 }
+.disabled{
+  cursor: not-allowed !important;
+}
 
 .nested-list.custom-drag-button .dd-handle {
   width: 30px !important;
