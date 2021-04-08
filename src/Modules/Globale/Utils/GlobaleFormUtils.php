@@ -163,13 +163,13 @@ class GlobaleFormUtils extends Controller
 
               if(isset($field["type"])){
                 if($field["type"]=="date")
-                  $form->add($value['fieldName'], DateType::class, ['disabled' => $readonly, 'required' => !$value["nullable"], 'empty_data' => '', 'widget' => 'single_text', 'format' => 'dd/MM/yyyy', 'attr' => array_merge(['autocomplete' => 'off', 'class' => 'datepicker' , 'defaultDate' => isset($field["defaultDate"])?$field["defaultDate"]:'' ],$attr)]);
+                  $form->add($value['fieldName'], DateType::class, ['label'=>(isset($field["caption"])?$field["caption"]:$field["name"]), 'disabled' => $readonly, 'required' => !$value["nullable"], 'empty_data' => '', 'widget' => 'single_text', 'format' => 'dd/MM/yyyy', 'attr' => array_merge(['autocomplete' => 'off', 'class' => 'datepicker' , 'defaultDate' => isset($field["defaultDate"])?$field["defaultDate"]:'' ],$attr)]);
                 if($field["type"]=="time")
-                  $form->add($value['fieldName'], TimeType::class, ['disabled' => $readonly, 'required' => !$value["nullable"], 'empty_data' => '', 'widget' => 'single_text', 'attr' => array_merge(['autocomplete' => 'off', 'class' => 'timepicker'],$attr)]);
+                  $form->add($value['fieldName'], TimeType::class, ['label'=>(isset($field["caption"])?$field["caption"]:$field["name"]), 'disabled' => $readonly, 'required' => !$value["nullable"], 'empty_data' => '', 'widget' => 'single_text', 'attr' => array_merge(['autocomplete' => 'off', 'class' => 'timepicker'],$attr)]);
               }else $form->add($value['fieldName'], DateTimeType::class, ['required' => !$value["nullable"], 'empty_data' => '', 'widget' => 'single_text', 'format' => 'dd/MM/yyyy kk:mm:ss', 'attr' => array_merge(['autocomplete' => 'off', 'class' => 'datetimepicker', 'defaultDate' => isset($field["defaultDate"])?$field["defaultDate"]:'' ],$attr)]);
             break;
             case 'json':
-              $form->add($value['fieldName'], TextType::class, ['required' => !$value["nullable"], 'attr'=>['autocomplete' => 'off', 'class' => 'tagsinput']]);
+              $form->add($value['fieldName'], TextType::class, ['label'=>(isset($field["caption"])?$field["caption"]:$field["name"]), 'required' => !$value["nullable"], 'attr'=>['autocomplete' => 'off', 'class' => 'tagsinput']]);
               $form->get($value['fieldName'])
                   ->addModelTransformer(new CallbackTransformer(
                       function ($tagsAsArray) {return implode(',', $tagsAsArray);},
