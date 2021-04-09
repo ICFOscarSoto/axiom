@@ -99,7 +99,7 @@
 								{
 									"targets": {{ counter }},
 									{# only show order field in data type fields#}
-									{% if (field.type is not defined or field.type == "data" or field.type == "date") and (field.orderable is not defined or field.orderable == true) %}
+									{% if (field.type is not defined or field.type == "data" or field.type == "date" or field.type == "datetime" or field.type == "time") and (field.orderable is not defined or field.orderable == true) %}
 									"orderable": true,
 									{% else %}
 									"orderable": false,
