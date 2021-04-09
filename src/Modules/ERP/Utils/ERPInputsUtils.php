@@ -5,6 +5,7 @@ use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 
 class ERPInputsUtils
@@ -16,10 +17,18 @@ class ERPInputsUtils
   }
 
   public function getIncludedForm($params){
+
     $doctrine=$params["doctrine"];
     $id=$params["id"];
     $user=$params["user"];
-    return [];
+    $author=$params["author"]?$params["author"]:$user;
+    return [['author', TextType::class, [
+      'required' => false,
+      'disabled' => true,
+      'attr'=> ["readonly"=>true],
+      'mapped' => false,
+      'data' => $author->getName().' '.$author->getLastname()
+    ]]];
   }
 
   public function formatList($user){

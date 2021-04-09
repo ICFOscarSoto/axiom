@@ -7,15 +7,21 @@
                 {
                     "name": "code",
                     "caption": "Nº Albarán",
-                    "cols": 3,
+                    "cols": 2,
                     "readonly": "noChange"
                 },
                 {
                     "name": "date",
-                    "cols": 3,
+                    "cols": 2,
                     "type": "date",
                     "caption": "Fecha Albarán",
                     "readonly": "noChange"
+                },
+                {
+                    "name": "author",
+                    "cols": 3,
+                    "type": "date",
+                    "readonly": "true"
                 },
                 {
                     "name": "supplier",
