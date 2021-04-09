@@ -268,6 +268,30 @@ class ERPInputs
         return $this;
     }
 
+    public function getInputdate(): ?\DateTimeInterface
+    {
+        return $this->inputdate;
+    }
+
+    public function setInputdate(?\DateTimeInterface $inputdate): self
+    {
+        $this->inputdate = $inputdate;
+
+        return $this;
+    }
+
+    public function getAuthor(): ?GlobaleUsers
+    {
+        return $this->author;
+    }
+
+    public function setAuthor(?GlobaleUsers $author): self
+    {
+        $this->author = $author;
+
+        return $this;
+    }
+
     //Called automatically when a file is uploaded or scanned
     public function postUploadCloudFile($cloudFile, $doctrine){
       if($cloudFile->getCompany()->getId()==2 && $cloudFile->getType()=="Albarán Proveedor" && $this->inputdate!=""){
@@ -298,27 +322,15 @@ class ERPInputs
         file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
     }
 
-    public function getInputdate(): ?\DateTimeInterface
-    {
-        return $this->inputdate;
+    public function formValidation($controller, $doctrine, $user, $validationParams){
+      $repository=$doctrine->getRepository(ERPInputs::class);
+      $input=$repository->findCleanCode($this->code, $this->supplier, $user);
+      if($input!=null && $input['id']!=$this->id)
+        return ["valid"=>false, "global_errors"=>["El albarán ".$input['code']." ya existe para el proveedor ".$this->supplier->getName().". Puede visualizarlo y modificarlo haciendo click <a href='/es/ERP/inputs/form/".$input['id']."'>aquí.</a>"]];
+      else {
+        return ["valid"=>true];
+      }
+
     }
 
-    public function setInputdate(?\DateTimeInterface $inputdate): self
-    {
-        $this->inputdate = $inputdate;
-
-        return $this;
-    }
-
-    public function getAuthor(): ?GlobaleUsers
-    {
-        return $this->author;
-    }
-
-    public function setAuthor(?GlobaleUsers $author): self
-    {
-        $this->author = $author;
-
-        return $this;
-    }
 }
