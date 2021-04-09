@@ -397,7 +397,7 @@ class ERPProductsController extends Controller
 				else return new JsonResponse(NULL);
 		}
 
-		
+
 
 		/**
 		* @Route("/api/prestashop/erp/product/get/{id}", name="prestashopGetProduct", defaults={"id"=0})
@@ -871,6 +871,17 @@ class ERPProductsController extends Controller
 
 		}
 
+		/**
+		* @Route("/api/erp/product/getimages/{id}", name="getProductImages")
+		*/
+		public function getProductImages($id, RouterInterface $router,Request $request){
+			$response = $this->forward('App\Modules\Globale\Controller\GlobaleImagesController::getTypeImages', [
+				'type'  => 'products',
+				'id' => $id,
+			]);
+		 return $response;
+		 //return new JsonResponse([]);
+		}
 
 		/**
 		* @Route("/api/ERP/product/latestmovements/{id}/{type}", name="productLatestMovements", defaults={"type"=1})
@@ -934,6 +945,5 @@ class ERPProductsController extends Controller
 	 		return new JsonResponse(["variants"=>$responseVariants]);
 
 	 	 }
-
 
 }
