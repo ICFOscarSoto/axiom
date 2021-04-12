@@ -426,6 +426,10 @@ class ERPCustomers
         $fieldErrors["paymentmethod"]="This field is required.";
       }
 
+      $repository=$doctrine->getRepository(ERPCustomers::class);
+      $customer=$repository->findOneBy(["email"=>$this->email,"company"=>$user->getCompany(),"active"=>1,"deleted"=>0]);
+      if($customer!=null) $fieldErrors["email"]="This email account is being used by another customer.";
+
       if (empty($fieldErrors)) return ["valid"=>true];
         else return ["valid"=>false, "field_errors"=>$fieldErrors];
     }
@@ -514,5 +518,4 @@ class ERPCustomers
 
         return $this;
     }
-
 }

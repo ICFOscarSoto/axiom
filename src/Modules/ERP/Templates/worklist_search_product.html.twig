@@ -19,7 +19,6 @@
 var productFields=["product-form-id","product-form-code","product-form-name"];
 var productSearchfields=["id","code","name"];
 
-
 function getVariants(id,code){
   if((++load_wait)==1) $("#load-spinner").fadeIn();
   $.ajax({
@@ -28,10 +27,58 @@ function getVariants(id,code){
       url: "/api/ERP/product/variants/"+code+"/get",
     }).done(function( elements, textStatus, jqXHR ) {
       if((--load_wait)==0) $("#load-spinner").fadeOut();
+       $("#product-form-variants-"+id).append('<option value="-1">Selecciona Variante...</option>');
        elements.variants.forEach( function(valor, indice, array){
-        $("#product-form-variants-"+id).append('<option value="'+valor.id+'">'+valor.name+'</option>');
+        $("#product-form-variants-"+id).append('<option value="'+valor.name+'">'+valor.name+'</option>');
       });
     });
+}
+
+
+function getLocations(id,store,code,variant){
+  if((++load_wait)==1) $("#load-spinner").fadeIn();
+  $.ajax({
+      type: "GET",
+      dataType: "json",
+      url: "/api/ERP/worklist/locations/"+store+"/"+code+"/"+variant+"/get",
+    }).done(function( elements, textStatus, jqXHR ) {
+      if((--load_wait)==0) $("#load-spinner").fadeOut();
+       elements.locations.forEach( function(valor, indice, array){
+        $("#product-form-locations-"+id).append('<option value="'+valor.id+'">'+valor.name+'</option>');
+      });
+    });
+}
+
+function getStores(id){
+  if((++load_wait)==1) $("#load-spinner").fadeIn();
+  $.ajax({
+      type: "GET",
+      dataType: "json",
+      url: "/api/ERP/worklist/stores/get",
+    }).done(function( elements, textStatus, jqXHR ) {
+      if((--load_wait)==0) $("#load-spinner").fadeOut();
+        $("#product-form-stores-"+id).append('<option value="0">Selecciona Almacén...</option>');
+       elements.stores.forEach( function(valor, indice, array){
+        $("#product-form-stores-"+id).append('<option value="'+valor.id+'">'+valor.name+'</option>');
+      });
+    });
+
+}
+
+
+function isGrouped(code){
+    if((++load_wait)==1) $("#load-spinner").fadeIn();
+    $.ajax({
+       type: "GET",
+       dataType: "json",
+       url: "/api/ERP/product/"+code+"/grouped",
+     }).done(function(data, textStatus, jqXHR) {
+       if((--load_wait)==0) $("#load-spinner").fadeOut();
+       if(data.result)  return true;
+      else return false;
+
+   });
+
 }
 
 function productSearch(id, val, fields, searchFields){
@@ -59,7 +106,6 @@ function productSearch(id, val, fields, searchFields){
               //  console.log(val.name);
               });
             }
-
 
            postProductSearch(id);
          } else {
@@ -90,8 +136,15 @@ $(document).ready(function() {
   });
   */
 
-  $('body').on('change', "[id^='product-form-code-']", function(e) {
-  //  getVariants($(this).val());
+  $('body').on('change', "[id^='product-form-stores-']", function(e) {
+    var id=$(this).attr("attr-id");
+    var store=$("#product-form-stores-"+id).val();
+    var code=$("#product-form-code-"+id).val();
+    var variant=$("#product-form-variants-"+id).val();
+  //  alert(variant);
+    $("#product-form-locations-"+id).empty();
+    getLocations(id,store,code,variant);
+
   });
 
   $('body').on('click', "[id^='listProducts-field-button-select-']", function(e) {
@@ -100,7 +153,11 @@ $(document).ready(function() {
     $("#product-form-name-"+$("#product-search-modal-form").attr("attr-id")).val($(this).parent().parent().parent().children('td').eq(2).text());
     $("#product-form-name-"+$("#product-search-modal-form").attr("attr-id")).trigger('change');
     $("#product-search-modal-form").modal('toggle');
-    getVariants($("#product-search-modal-form").attr("attr-id"),$(this).parent().parent().parent().children('td').eq(1).text());
+    getStores($("#product-search-modal-form").attr("attr-id"));
+    var id=$("#product-search-modal-form").attr("attr-id");
+    var code=$(this).parent().parent().parent().children('td').eq(1).text();
+    if(isGrouped(code)) getVariants(id,code);
+    else  $("#product-form-variants-"+id).prop("readonly",true);
 
   //  checkList();
   });

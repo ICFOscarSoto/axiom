@@ -22,6 +22,9 @@ use App\Modules\ERP\Entity\ERPSeries;
 use App\Modules\ERP\Entity\ERPProducts;
 use App\Modules\ERP\Entity\ERPVariantsValues;
 use App\Modules\ERP\Entity\ERPWorkList;
+use App\Modules\ERP\Entity\ERPStores;
+use App\Modules\ERP\Entity\ERPStocks;
+use App\Modules\ERP\Entity\ERPStoreLocations;
 use App\Modules\Globale\Entity\GlobaleUsersWidgets;
 use App\Modules\Globale\Entity\GlobaleUsers;
 use App\Modules\Security\Utils\SecurityUtils;
@@ -38,11 +41,13 @@ class ERPWorkListController extends Controller
 	 */
 	public function index(RouterInterface $router,Request $request)
 	{
-    $id=$this->getUser()->getId();
+		if($this->getUser()!=null) $id=$this->getUser()->getId();
+	//	else return $this->redirectToRoute();
 		$usersRepository=$this->getDoctrine()->getRepository(GlobaleUsers::class);
 		$user=$usersRepository->findOneBy(["id"=>$id]);
     $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
     $worklistRepository=$this->getDoctrine()->getRepository(ERPWorkList::class);
+		$storesRepository=$this->getDoctrine()->getRepository(ERPStores::class);
 
     if($request->query->get('code',null)){
 			$obj = $worklistRepository->findOneBy(['code'=>$request->query->get('code',null), 'company'=>$this->getUser()->getCompany(), 'active'=>1, 'deleted'=>0]);
@@ -76,6 +81,20 @@ class ERPWorkListController extends Controller
 			$worklist=new $this->class();
 		}
 
+
+		//stores
+		$store_objects=$storesRepository->findBy(["active"=>1,"deleted"=>0]);
+		$stores=[];
+		$option=null;
+		$option["id"]=null;
+		$option["text"]="Selecciona Almacén...";
+		$stores[]=$option;
+		foreach($store_objects as $item){
+			$option["id"]=$item->getId();
+			$option["text"]=$item->getName();
+			$stores[]=$option;
+		}
+
     if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
       return $this->render('@ERP/worklist.html.twig', [
       /*  'moduleConfig' => $config,*/
@@ -88,6 +107,7 @@ class ERPWorkListController extends Controller
         'userData' => $userdata,
         'worklistLines' => $worklist,
         'productslist' => $productslist,
+				'stores' => $stores,
         'id' => $id
         ]);
     }
@@ -104,6 +124,9 @@ class ERPWorkListController extends Controller
     $worklistRepository=$this->getDoctrine()->getRepository(ERPWorkList::class);
     $productsRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
 		$variantsRepository=$this->getDoctrine()->getRepository(ERPVariantsValues::class);
+		$storesRepository=$this->getDoctrine()->getRepository(ERPStores::class);
+		$storeLocationsRepository=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
+
 
     $worklist=$worklistRepository->findAll(["user"=>$this->getUser()->getCompany(),"deleted"=>0]);
 
@@ -131,10 +154,18 @@ class ERPWorkListController extends Controller
         $line->setName($value->name);
         $line->setQuantity(floatval($value->quantity));
 			//	dump($value->variant);
-				if(isset($value->variant)){
-					 $variant=$variantsRepository->findOneBy(["id"=>$value->variant]);
+				if(isset($value->variant) AND $value->variant!="-1"){
+					 $variant=$variantsRepository->findOneBy(["name"=>$value->variant]);
 					  $line->setVariant($variant);
 				 }
+				 if(isset($value->store)){
+						$store=$storesRepository->findOneBy(["id"=>$value->store]);
+						 $line->setStore($store);
+					}
+				if(isset($value->location)){
+						 $location=$storeLocationsRepository->findOneBy(["id"=>$value->location]);
+							$line->setLocation($location);
+					}
         if($value->deleted){
           $line->setActive(0);
           $line->setDeleted(1);
@@ -158,4 +189,59 @@ class ERPWorkListController extends Controller
 			$worklistRepository->emptyList($id);
 			return new JsonResponse(["result"=>1]);
 	}
+
+	/**
+ * @Route("/api/ERP/worklist/locations/{store}/{product}/{variant}/get", name="getProductLocations", defaults={"variant"=0}))
+ */
+ public function getProductLocations($store, $product, $variant, RouterInterface $router,Request $request){
+	$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+	$stocksRepository=$this->getDoctrine()->getRepository(ERPStocks::class);
+  $productsRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
+	$variantsRepository=$this->getDoctrine()->getRepository(ERPVariantsValues::class);
+	$product_object=$productsRepository->findOneBy(["code"=>$product]);
+	if($variant!=0)
+	{
+		$variant_object=$variantsRepository->findOneBy(["name"=>$variant]);
+		$storeLocations=$stocksRepository->findLocationsByStoreProduct($store, $product_object->getId(),$variant_object->getId());
+
+	}
+	else {
+		$storeLocations=$stocksRepository->findLocationsByStoreProduct($store, $product_object->getId(),null);
+
+	}
+
+
+
+
+	$response=Array();
+
+	foreach($storeLocations as $location){
+		$item['id']=$location['id'];
+		$item['name']=$location['name'];
+		$response[]=$item;
+	}
+
+	return new JsonResponse(["locations"=>$response]);
+
+ }
+
+ /**
+* @Route("/api/ERP/worklist/stores/get", name="getWorkListStores")
+*/
+public function getWorkListStores(RouterInterface $router,Request $request){
+ $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+ $storesRepository=$this->getDoctrine()->getRepository(ERPStores::class);
+ $stores=$storesRepository->getStoresInfo();
+
+ $response=Array();
+
+ foreach($stores as $store){
+	 $item['id']=$store['id'];
+	 $item['name']=$store['name'];
+	 $response[]=$item;
+ }
+
+ return new JsonResponse(["stores"=>$response]);
+
+}
 }

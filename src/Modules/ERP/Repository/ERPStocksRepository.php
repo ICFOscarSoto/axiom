@@ -187,5 +187,27 @@ class ERPStocksRepository extends ServiceEntityRepository
 
     }
 
+    public function findLocationsByStoreProduct($store,$product,$variant)
+    {
+      if($variant==null)
+      {
+      $query='SELECT sl.id, sl.name
+        FROM erpstore_locations sl
+        LEFT JOIN erpstocks s
+        ON s.storelocation_id=sl.id
+        WHERE sl.store_id='.$store.' AND sl.active=1 AND sl.deleted=0 AND s.product_id='.$product;
+        return $this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
+      }
+      else{
+        $query='SELECT sl.id, sl.name
+          FROM erpstore_locations sl
+          LEFT JOIN erpstocks s
+          ON s.storelocation_id=sl.id
+          LEFT JOIN erpproducts_variants pv
+          ON pv.id=s.productvariant_id
+          WHERE sl.store_id='.$store.' AND sl.active=1 AND sl.deleted=0 AND s.product_id='.$product.' AND pv.variantvalue_id='.$variant;
+          return $this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
 
+      }
+    }
 }

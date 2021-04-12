@@ -7,6 +7,8 @@ use \App\Modules\Globale\Entity\GlobaleUsers;
 use \App\Modules\ERP\Entity\ERPProducts;
 use \App\Modules\ERP\Entity\ERPProductsVariants;
 use \App\Modules\ERP\Entity\ERPVariantsValues;
+use \App\Modules\ERP\Entity\ERPStores;
+use \App\Modules\ERP\Entity\ERPStoreLocations;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPWorkListRepository")
@@ -76,6 +78,16 @@ class ERPWorkList
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPVariantsValues")
      */
     private $variant;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPStores")
+     */
+    private $store;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPStoreLocations")
+     */
+    private $location;
 
 
 
@@ -212,6 +224,30 @@ class ERPWorkList
     public function setVariant(?ERPVariantsValues $variant): self
     {
         $this->variant = $variant;
+
+        return $this;
+    }
+
+    public function getStore(): ?ERPStores
+    {
+        return $this->store;
+    }
+
+    public function setStore(?ERPStores $store): self
+    {
+        $this->store = $store;
+
+        return $this;
+    }
+
+    public function getLocation(): ?ERPStoreLocations
+    {
+        return $this->location;
+    }
+
+    public function setLocation(?ERPStoreLocations $location): self
+    {
+        $this->location = $location;
 
         return $this;
     }

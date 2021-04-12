@@ -11,6 +11,8 @@
       line.code=$(this).find("#product-form-code-"+$(this).attr("attr-id")).val();
       line.name=$(this).find("#product-form-name-"+$(this).attr("attr-id")).val();
       line.variant=$(this).find("#product-form-variants-"+$(this).attr("attr-id")).val();
+      line.store=$(this).find("#product-form-stores-"+$(this).attr("attr-id")).val();
+      line.location=$(this).find("#product-form-locations-"+$(this).attr("attr-id")).val();
       line.quantity=$(this).find("#product-form-quantity-"+$(this).attr("attr-id")).val();
       line.deleted=$(this).hasClass('deleted');
       lines.push(line);

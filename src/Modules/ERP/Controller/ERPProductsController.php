@@ -397,7 +397,7 @@ class ERPProductsController extends Controller
 				else return new JsonResponse(NULL);
 		}
 
-		
+
 
 		/**
 		* @Route("/api/prestashop/erp/product/get/{id}", name="prestashopGetProduct", defaults={"id"=0})
@@ -934,6 +934,23 @@ class ERPProductsController extends Controller
 	 		return new JsonResponse(["variants"=>$responseVariants]);
 
 	 	 }
+
+
+		 /**
+		* @Route("/api/ERP/product/{code}/grouped", name="isGrouped")
+		*/
+		public function isGrouped($code, RouterInterface $router,Request $request){
+		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		 $productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
+		 $product=$productRepository->findOneBy(["code"=>$code]);
+
+		 if($product->getGrouped()) return new JsonResponse(["result"=>true]);
+		 else return new JsonResponse(["result"=>false]);
+
+
+		}
+
+
 
 
 }
