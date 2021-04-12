@@ -12,6 +12,7 @@
     });
     if($(this).attr("minDate")!="" && typeof $(this).attr("minDate")!==typeof undefined) $(this).data("DateTimePicker").minDate(moment($(this).attr("minDate"), "YYYY-MM-DD"));
     if($(this).attr("maxDate")!="" && typeof $(this).attr("maxDate")!==typeof undefined) $(this).data("DateTimePicker").maxDate(moment($(this).attr("maxDate"), "YYYY-MM-DD"));
+    $(this).before("<span id='now-view-{{formConstructor.name}}-"+$(this).attr("id")+"' target='"+$(this).attr("id")+"' class='select2-selection__view"+($(this).is(':disabled')?" disabled":"")+"' style='right: 18px;'><i class='fa fa-clock-o' aria-hidden='true'></i><span>&nbsp;Ahora</span></span>");
   });
 
   $('.datepicker').each(function(index) {
@@ -27,6 +28,7 @@
     });
     if($(this).attr("minDate")!="" && typeof $(this).attr("minDate")!==typeof undefined) $(this).data("DateTimePicker").minDate(moment($(this).attr("minDate"), "YYYY-MM-DD"));
     if($(this).attr("maxDate")!="" && typeof $(this).attr("maxDate")!==typeof undefined) $(this).data("DateTimePicker").maxDate(moment($(this).attr("maxDate"), "YYYY-MM-DD"));
+    $(this).before("<span id='now-view-{{formConstructor.name}}-"+$(this).attr("id")+"' target='"+$(this).attr("id")+"' class='select2-selection__view"+($(this).is(':disabled')?" disabled":"")+"' style='right: 18px;'><i class='fa fa-clock-o' aria-hidden='true'></i><span>&nbsp;Ahora</span></span>");
   });
 
   $('.dateshortpicker').each(function(index) {
@@ -46,6 +48,7 @@
     if($(this).attr("defaultDate")!="" && typeof $(this).attr("defaultDate")!==typeof undefined && $(this).data("DateTimePicker").date()==null) $(this).data("DateTimePicker").defaultDate(moment($(this).attr("defaultDate"), "YYYY-MM-DD"));
     if($(this).attr("minDate")!="" && typeof $(this).attr("minDate")!==typeof undefined) $(this).data("DateTimePicker").minDate(moment($(this).attr("minDate"), "YYYY-MM-DD"));
     if($(this).attr("maxDate")!="" && typeof $(this).attr("maxDate")!==typeof undefined) $(this).data("DateTimePicker").maxDate(moment($(this).attr("maxDate"), "YYYY-MM-DD"));
+    $(this).before("<span id='now-view-{{formConstructor.name}}-"+$(this).attr("id")+"' target='"+$(this).attr("id")+"' class='select2-selection__view"+($(this).is(':disabled')?" disabled":"")+"' style='right: 18px;'><i class='fa fa-clock-o' aria-hidden='true'></i><span>&nbsp;Ahora</span></span>");
   });
 
   $('.timepicker').each(function(index) {
@@ -59,4 +62,13 @@
       tooltips: spanish_tooltips_datetimepicker,
       date: (dateField.isValid())?dateField:null
     });
+    $(this).before("<span id='now-view-{{formConstructor.name}}-"+$(this).attr("id")+"' target='"+$(this).attr("id")+"' class='select2-selection__view"+($(this).is(':disabled')?" disabled":"")+"' style='right: 18px;'><i class='fa fa-clock-o' aria-hidden='true'></i><span>&nbsp;Ahora</span></span>");
+  });
+
+
+
+  $('body').on('click',"[id^=now-view-{{formConstructor.name}}-]", function (e) {
+    if( $('#'+$(this).attr('target')).not(':disabled')){
+      $('#'+$(this).attr('target')).data("DateTimePicker").date(new Date());
+    }
   });

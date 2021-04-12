@@ -247,9 +247,9 @@ class GlobaleImagesController extends Controller implements ContainerAwareInterf
 	}
 
 	/**
-	* @Route("/api/{type}/getimages/{id}", name="getProductImages", defaults={"id"=0})
+	* @Route("/api/{type}/getimages/{id}", name="getTypeImages", defaults={"id"=0})
 	*/
-	public function getProductImages($id,$type, Request $request){
+	public function getTypeImages($id,$type, Request $request){
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		$image_path = $this->get('kernel')->getRootDir().'/../cloud/'.$this->getUser()->getCompany()->getId().'/images/'.$type.'/'.$id.'/';
 		$images=[];

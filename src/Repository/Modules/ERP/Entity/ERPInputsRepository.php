@@ -19,6 +19,13 @@ class ERPInputsRepository extends ServiceEntityRepository
         parent::__construct($registry, ERPInputs::class);
     }
 
+    public function findCleanCode($code, $supplier, $user)
+    {
+      $query="SELECT * FROM axiomdb_ferricam.erpinputs WHERE REGEXP_REPLACE(code, '[^A-Za-z0-9]', '') LIKE REGEXP_REPLACE('".$code."', '[^A-Za-z0-9]', '') and supplier_id=".$supplier->getId()." and company_id=".$user->getCompany()->getId()." and deleted=0";
+      $result=$this->getEntityManager()->getConnection()->executeQuery($query)->fetch();
+      return $result;
+    }
+
     // /**
     //  * @return ERPInputs[] Returns an array of ERPInputs objects
     //  */

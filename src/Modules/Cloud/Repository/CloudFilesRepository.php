@@ -19,6 +19,13 @@ class CloudFilesRepository extends ServiceEntityRepository
         parent::__construct($registry, CloudFiles::class);
     }
 
+    public function findRecentPdfs($lastsync){
+      if($lastsync==null) $lastsync=new \Datetime("1900-01-01");
+      $query="SELECT * FROM cloud_files WHERE SUBSTRING_INDEX(name, '.', -1)='pdf' and dateupd>='".$lastsync->format('Y-m-d H:i:s')."' and deleted=0";
+      $result=$this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
+      return $result;
+    }
+
     // /**
     //  * @return CloudFile[] Returns an array of CloudFile objects
     //  */

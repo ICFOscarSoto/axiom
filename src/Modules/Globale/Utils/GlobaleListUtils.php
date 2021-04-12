@@ -216,12 +216,16 @@ class GlobaleListUtils
 		//Formamos el orden de los datos
 		if($request->query->has('order')){
 			 $order=$request->query->get('order');
-  			 $path=explode('__', $listFields[(($order[0]['column'])-1)*1]["name"]);
-			 if(count($path)>1){
-				$query->addOrderBy($path[0].'.'.$path[1], $order[0]['dir']);
-			 }else{
-				$query->addOrderBy('p.'.strtolower($listFields[(($order[0]['column'])-1)*1]["name"]), $order[0]['dir']);
-			}
+         $fields=explode('_o_', $listFields[(($order[0]['column'])-1)*1]["name"]);
+         foreach($fields as $field){
+      		 $path=explode('__', $field);
+    			 if(count($path)>1){
+    				$query->addOrderBy($path[0].'.'.$path[1], $order[0]['dir']);
+    			 }else{
+    				$query->addOrderBy('p.'.strtolower($field), $order[0]['dir']);
+    			 }
+         }
+
 		}else{
       $query->addOrderBy('p.'.$orderBy);
     }

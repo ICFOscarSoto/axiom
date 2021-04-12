@@ -99,7 +99,7 @@
 								{
 									"targets": {{ counter }},
 									{# only show order field in data type fields#}
-									{% if (field.type is not defined or field.type == "data") and (field.orderable is not defined or field.orderable == true) %}
+									{% if (field.type is not defined or field.type == "data" or field.type == "date" or field.type == "datetime" or field.type == "time") and (field.orderable is not defined or field.orderable == true) %}
 									"orderable": true,
 									{% else %}
 									"orderable": false,
@@ -112,6 +112,7 @@
 
 									{% if field.format is defined %}
 										{% if field.format == "time" %}
+
 											"render": function(data, type, row, meta){
 													//var date = new Date(data*1000);
 													//return ("0" + date.getHours()).slice(-2)+':'+("0" + date.getMinutes()).slice(-2)+':'+("0" + date.getSeconds()).slice(-2);;
@@ -491,7 +492,7 @@
 				{% for field in listConstructor.fieldButtons %}
 
 						<td class="table-footer"></td>
-					
+
 				{% endfor %}
 
 			</tr>

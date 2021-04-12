@@ -871,6 +871,17 @@ class ERPProductsController extends Controller
 
 		}
 
+		/**
+		* @Route("/api/erp/product/getimages/{id}", name="getProductImages")
+		*/
+		public function getProductImages($id, RouterInterface $router,Request $request){
+			$response = $this->forward('App\Modules\Globale\Controller\GlobaleImagesController::getTypeImages', [
+				'type'  => 'products',
+				'id' => $id,
+			]);
+		 return $response;
+		 //return new JsonResponse([]);
+		}
 
 		/**
 		* @Route("/api/ERP/product/latestmovements/{id}/{type}", name="productLatestMovements", defaults={"type"=1})
@@ -935,6 +946,7 @@ class ERPProductsController extends Controller
 
 	 	 }
 
+<<<<<<< HEAD
 
 		 /**
 		* @Route("/api/ERP/product/{code}/grouped", name="isGrouped")
@@ -953,4 +965,6 @@ class ERPProductsController extends Controller
 
 
 
+=======
+>>>>>>> e1253df43130170f6203022a1f6a95f6afa0e18e
 }

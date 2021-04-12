@@ -4,17 +4,23 @@
         "caption": "id"
     },
     {
+        "name": "date",
+        "caption": "Fecha Albarán",
+        "type": "date",
+        "width": "15%","class":"min-desktop"
+    },
+    {
         "name": "code",
-        "caption": "code"
+        "caption": "Nº Albarán"
     },
     {
         "name": "supplier__name",
         "caption": "supplier"
     },
     {
-        "name": "date",
-        "caption": "date",
-        "type": "date",
+        "name": "inputdate",
+        "caption": "Fecha Entrada",
+        "type": "datetime",
         "width": "15%","class":"min-desktop"
     },
     {
@@ -28,5 +34,9 @@
     {
         "name": "location__name",
         "caption": "location"
+    },
+    {
+        "name": "author__name_o_author__lastname",
+        "caption": "Author"
     }
 ]

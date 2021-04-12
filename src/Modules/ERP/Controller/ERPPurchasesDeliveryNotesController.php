@@ -30,6 +30,8 @@ use App\Modules\ERP\Entity\ERPPurchasesOrdersLines;
 use App\Modules\ERP\Entity\ERPProducts;
 use App\Modules\ERP\Entity\ERPFinancialYears;
 use App\Modules\ERP\Entity\ERPInputs;
+use App\Modules\ERP\Entity\ERPStores;
+use App\Modules\ERP\Entity\ERPStoresUsers;
 use App\Modules\ERP\Utils\ERPInputsUtils;
 use App\Modules\ERP\Reports\ERPPurchasesBudgetsReports;
 use App\Modules\Security\Utils\SecurityUtils;
@@ -65,7 +67,7 @@ class ERPPurchasesDeliveryNotesController extends Controller
 		return $this->render('@Globale/generictabform.html.twig', array(
 						'entity_name' => $entity_name,
 						'controllerName' => 'CustomersController',
-						'interfaceName' => 'Inputs',
+						'interfaceName' => 'Entradas Almacén',
 						'optionSelected' => 'genericindex',
 						'optionSelectedParams' => ["module"=>"ERP", "name"=>"Inputs"],
 						'menuOptions' =>  $menurepository->formatOptions($userdata),
@@ -99,9 +101,19 @@ class ERPPurchasesDeliveryNotesController extends Controller
 			return $this->render('@Globale/notfound.html.twig',[]);
 	 }
 	 $classUtils=new ERPInputsUtils();
-	 $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "obj"=>$obj];
+	 if($obj==null) {
+		//Check preferential store of user
+		$storesRepository=$this->getDoctrine()->getRepository(ERPStores::class);
+		$storesUsersRepository=$this->getDoctrine()->getRepository(ERPStoresUsers::class);
+		$storeUsers=$storesUsersRepository->findOneBy(["user"=>$this->getUser(), "company"=>$this->getUser()->getCompany(), "preferential"=>1, "deleted"=>0]);
+		$obj=new ERPInputs();
+		if($storeUsers) $obj->setStore($storeUsers->getStore());
+	 }
+	 $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "obj"=>$obj, "author"=>$obj->getAuthor()];
 	 $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),$classUtils->getExcludedForm($params),$classUtils->getIncludedForm($params),null,[],[],[],true);
+
 	 $make = $utils->make($id, ERPInputs::class, $action, "formInput", "full", "@Globale/form.html.twig",'inputsForm');
+
 	 return $make;
 	}
 
