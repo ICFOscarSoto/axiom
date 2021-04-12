@@ -946,25 +946,20 @@ class ERPProductsController extends Controller
 
 	 	 }
 
-<<<<<<< HEAD
-
 		 /**
-		* @Route("/api/ERP/product/{code}/grouped", name="isGrouped")
-		*/
-		public function isGrouped($code, RouterInterface $router,Request $request){
-		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-		 $productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
-		 $product=$productRepository->findOneBy(["code"=>$code]);
+	 * @Route("/api/ERP/product/{code}/grouped", name="isGrouped")
+	 */
+	 public function isGrouped($code, RouterInterface $router,Request $request){
+		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		$productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
+		$product=$productRepository->findOneBy(["code"=>$code]);
 
-		 if($product->getGrouped()) return new JsonResponse(["result"=>true]);
-		 else return new JsonResponse(["result"=>false]);
-
-
-		}
+		if($product->getGrouped()) return new JsonResponse(["result"=>true]);
+		else return new JsonResponse(["result"=>false]);
 
 
+	 }
 
 
-=======
->>>>>>> e1253df43130170f6203022a1f6a95f6afa0e18e
+
 }
