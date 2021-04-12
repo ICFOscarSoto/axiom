@@ -219,7 +219,7 @@ class NavisionGetSalesOrders extends ContainerAwareCommand
                 }
                 else {
                   $obj_customer->setName($customer_array["firstname"]." ".$customer_array["lastname"]);
-                  $obj_customer->setSocialname($customer_array["firstname"].$customer_array["lastname"]);
+                  $obj_customer->setSocialname($customer_array["firstname"]." ".$customer_array["lastname"]);
                 }
 
 
