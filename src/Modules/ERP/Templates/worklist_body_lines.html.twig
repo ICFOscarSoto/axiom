@@ -49,17 +49,23 @@
         {% endif %}
         <div class="col-2 d-block d-sm-none" style="top: 8px;">Almacén</div>
         <div class="col-3 col-sm-2">
+          {% if line.store!=null %}
+          <div class="form-group" style="margin-bottom: 0px;">
+            <input type="text" readonly id="product-form-stores-{{ line.store.id }}" class="form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Almacén" value="{{ line.store.name }}">
+          </div>
+          {% else %}
           <select type="text"  attr-id="{{ line.linenum }}" id="product-form-stores-{{ line.linenum }}" class="form-control select2" required>
                   {% for option in stores %}
                     <option value="{{ option.id }}" {% if line.store!=null and option.id==line.store.id %} selected="selected" {% endif %}>{{ option.text }}</option>
                   {% endfor %}
           </select>
+          {% endif %}
         </div>
         <div class="col-2 d-block d-sm-none" style="top: 8px;">Ubicaciones</div>
         {% if line.location!=null %}
         <div class="col-3 col-sm-1">
           <div class="form-group" style="margin-bottom: 0px;">
-            <input type="text" readonly id="product-form-locations-{{ line.location.id }}" class="form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Nombre" value="{{ line.location.name }}">
+            <input type="text" readonly id="product-form-locations-{{ line.location.id }}" class="form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Ubicación" value="{{ line.location.name }}">
           </div>
         </div>
         {% else %}
