@@ -106,6 +106,10 @@ class NavisionGetProducts extends ContainerAwareCommand
       break;
       case 'defuse': $this->defuseProducts($input, $output);
       break;
+      case 'clear':
+        $this->defuseProducts($input, $output);
+        $this->clearEAN13($input, $output);
+      break;
       case 'all':
         $this->importProduct($input, $output);
         //$this->clearEAN13($input, $output);
@@ -338,38 +342,31 @@ public function clearEAN13(InputInterface $input, OutputInterface $output){
     $output->writeln('* Fallo al iniciar la sincronizacion de limpieza de EAN13: El proceso ya esta en ejecución.');
     exit;
   }
-
-  //------   Critical Section START   ------
   $repository=$this->doctrine->getRepository(ERPEAN13::class);
-  $datetime=new \DateTime();
-  $output->writeln('* Limpiando EAN13....');
-  $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
-  $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getEAN13.php');
-  $objects=json_decode($json, true);
-  if (!is_array($objects)) die();
-  $objects=$objects[0];
-  //Disable SQL logger
-  $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
-  $oldEAN13s=$repository->findAll();
-  //$oldEAN13=$repository->find(177);
-  foreach ($oldEAN13s as $oldEAN13){
-      $count=0;
-      $EAN13=$oldEAN13->getName();
-      foreach ($objects["class"] as $key=>$object){
-          $nameEAN13=preg_replace('/\D/','',$object["Cross-Reference No."]);
-          if ($EAN13==$nameEAN13) {
-            $count=1;
-            break;
-          }
+  $page=5000;
+  $totalEAN13=round(intval($repository->totalEAN13())/$page);
+  $count=0;
+  while($count<$totalEAN13){
+      $EAN13s=$repository->EAN13Limit(intval($count*$page),intval($page));
+      $count++;
+      foreach ($EAN13s as $id) {
+        $EAN13=$repository->findOneBy(["id"=>$id, "company"=>2]);
+        if ($EAN13->getType()==1)
+        $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-searchEAN13.php?EAN13='.$EAN13->getName().'$crossReferenceNo='.$EAN13->getSupplier()->getCode().'$item='.$EAN13->getProduct()->getCode());
+        else if ($EAN13->getType()==2)
+        $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-searchEAN13.php?EAN13='.$EAN13->getName().'$crossReferenceNo='.$EAN13->getCustomer()->getCode().'$item='.$EAN13->getProduct()->getCode());
 
-      }
-      if ($count==0) {
-        $oldEAN13->setDeleted(1);
-        $oldEAN13->setActive(0);
+        $objects=json_decode($json, true);
+        if ($objects[0]["class"]!=null) continue;
+        $output->writeln('* Desactivando la referencia  '.$reference->getName());
+
+        $reference->setActive(0);
+        $reference->setDeleted(1);
+        $this->doctrine->getManager()->merge($reference);
         $this->doctrine->getManager()->flush();
+        $this->doctrine->getManager()->clear();
       }
   }
-  $this->doctrine->getManager()->clear();
   //------   Critical Section END   ------
   //------   Remove Lock Mutex    ------
   fclose($fp);
@@ -1281,7 +1278,6 @@ public function importReferences(InputInterface $input, OutputInterface $output)
   //------   Remove Lock Mutex    ------
   fclose($fp);
 }
-
 
 public function clearReferences(InputInterface $input, OutputInterface $output){
   if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {

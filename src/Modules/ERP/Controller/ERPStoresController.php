@@ -85,6 +85,7 @@ class ERPStoresController extends Controller
 		          'tab' => $request->query->get('tab','data'), //Show initial tab, by default data tab
 		          'tabs' => [	["name" => "data", "icon"=>"fa-address-card-o", "caption"=>"Datos almacén", "active"=>true, "route"=>$this->generateUrl("dataStores",["id"=>$id])],
 													["name"=>"users", "icon"=>"fa fa-users", "caption"=>"Usuarios Asignados","route"=>$this->generateUrl("generictablist",["module"=>"ERP", "name"=>"StoresUsers", "id"=>$id, "parent"=>$id])],
+													["name"=>"locations", "icon"=>"fa fa-users", "caption"=>"Ubicaciones","route"=>$this->generateUrl("listLocations",["id"=>$id])],
 												],
 		              ));
 		  }

@@ -22,19 +22,19 @@ class ERPStoreLocationsUtils
     return [];
   }
 
-  public function formatList($user){
+  public function formatListByStore($store){
     $list=[
-      'id' => 'list'.$this->name,
-      'route' => 'genericlist',
-      'routeParams' => ["module" => $this->module,
-                        "name" => $this->name],
+      'id' => 'listLocations',
+      'route' => 'storelocationlist',
+      'routeParams' => ["id" => $store],
       'orderColumn' => 2,
       'orderDirection' => 'ASC',
-      'tagColumn' => 2,
-      'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/".$this->name.".json"),true),
-      'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/".$this->name."FieldButtons.json"),true),
-      'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/".$this->name."TopButtons.json"),true)
+      'tagColumn' => 3,
+      'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoreLocations.json"),true),
+      'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoreLocationsFieldButtons.json"),true),
+      'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoreLocationsTopButtons.json"),true)
     ];
     return $list;
   }
+
 }

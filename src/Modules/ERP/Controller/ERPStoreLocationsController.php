@@ -92,7 +92,26 @@ class ERPStoreLocationsController extends Controller
   }
 
 	/**
-  * @Route("/api/ERP/locations/printLabel/{id}/{idend}/{type}", name="printLocationlabel", defaults={"id"=0, "idend"="0", "type"=1})
+   * @Route("/{_locale}/listLocations/{id}", name="listLocations", defaults={"id"=0})
+   */
+  public function listLocations($id, Request $request){
+    $listLocations = new ERPStoreLocationsUtils();
+    $formUtils=new GlobaleFormUtils();
+    $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser()];
+    $formUtils->initialize($this->getUser(), ERPEAN13::class, dirname(__FILE__)."/../Forms/StoreLocations.json", $request, $this, $this->getDoctrine());
+		$templateForms[]=$formUtils->formatForm('storelocations', true, null, ERPStoreLocations::class);
+    $userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
+    return $this->render('@Globale/list.html.twig', array(
+      'listConstructor' => $listLocations->formatListByStore($id),
+      'id_object'=>$id,
+      'forms' => $templateForms
+    ));
+  }
+
+
+
+	/**
+  * @Route("/api/ERP/locations/printLabel/{id}/{idend}/{type}", name="printlocationlabel", defaults={"id"=0, "idend"="0", "type"=1})
   */
   public function printLocationlabel($id, $idend, $type, Request $request){
 	 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
