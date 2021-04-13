@@ -9,33 +9,58 @@
     },
     {
         "name": "orientation",
-        "caption": "orientation"
+        "caption": "orientation",
+        "width": "10%",
+        "class": "dt-center",
+        "replace": {
+           "0": {
+              "text": "Arriba",
+              "html": "<div style=\"min-width: 75px;\">Flecha hacia arriba<\/div>"
+           },
+           "1": {
+                "text": "Abajo",
+                "html": "<div style=\"min-width: 75px;\">Flecha hacia abajo<\/div>"
+            },
+
+            "2": {
+                "text": "Derecha",
+                "html": "<div style=\"min-width: 75px;\">Flecha hacia la derecha<\/div>"
+            },
+            "3": {
+                "text": "Izquierda",
+                "html": "<div style=\"min-width: 75px;\">Flecha hacia la izquierda<\/div>"
+            }
+        }
     },
     {
         "name": "accessibility",
-        "caption": "accessibility"
+        "caption": "accessibility",
+        "width": "10%",
+        "class": "dt-center",
+        "replace": {
+            "0": {
+                "text": "No",
+                "html": "<div style=\"min-width: 75px;\" class=\"label label-danger\">No<\/div>"
+            },
+            "1": {
+                "text": "Si",
+                "html": "<div style=\"min-width: 75px;\" class=\"label label-success\">Si<\/div>"
+            }
+        }
     },
     {
         "name": "container",
-        "caption": "container"
-    },
-    {
-        "name": "store__name",
-        "caption": "store"
-    },
-    {
-        "name": "active",
-        "caption": "Estado",
+        "caption": "container",
         "width": "10%",
         "class": "dt-center",
         "replace": {
             "1": {
-                "text": "Activo",
-                "html": "<div style=\"min-width: 75px;\" class=\"label label-success\">Activo<\/div>"
+                "text": "Si",
+                "html": "<div style=\"min-width: 75px;\">Si<\/div>"
             },
             "0": {
-                "text": "Desactivado",
-                "html": "<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado<\/div>"
+                "text": "No",
+                "html": "<div style=\"min-width: 75px;\">No<\/div>"
             }
         }
     }
