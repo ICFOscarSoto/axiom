@@ -136,6 +136,11 @@ class GlobaleUsers implements UserInterface
      */
     private $scanner;
 
+    /**
+     * @ORM\Column(type="string", length=125, nullable=true)
+     */
+    private $discordchannel;
+
 
 
     public function __construct()
@@ -546,6 +551,18 @@ class GlobaleUsers implements UserInterface
     public function setScanner(?GlobaleScanners $scanner): self
     {
         $this->scanner = $scanner;
+
+        return $this;
+    }
+
+    public function getDiscordchannel(): ?string
+    {
+        return $this->discordchannel;
+    }
+
+    public function setDiscordchannel(?string $discordchannel): self
+    {
+        $this->discordchannel = $discordchannel;
 
         return $this;
     }

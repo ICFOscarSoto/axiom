@@ -504,4 +504,18 @@ public function getUsersStatus(Request $request){
       return new JsonResponse(["result"=>1]);
   }
 
+  /**
+  * @Route("/api/global/users/updateuserchannel/{discorduser}/{channel}", name="updateUserChannel")
+  */
+  public function updateUserChannel($discorduser, $channel, Request $request){
+      $userRepository=$this->getDoctrine()->getRepository(GlobaleUsers::class);
+      $user = $userRepository->findOneBy(["discorduser"=>$discorduser]);
+      $em = $this->getDoctrine()->getEntityManager();
+      if(!$user) return new JsonResponse(["result"=>-1]);
+      if(!$user-getDiscordchannel()) return new JsonResponse(["result"=>-1]);
+      $user->setDiscordchannel($channel);
+      $em->persist($user);
+      $em->flush();
+      return new JsonResponse(["result"=>1]);
+    }
 }
