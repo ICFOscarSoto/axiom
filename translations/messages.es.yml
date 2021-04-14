@@ -605,6 +605,9 @@ Inputdate: Fecha de Entrada
 store: Almacén
 packages: Bultos
 location: Ubicación
+accessibility: Accesible
+container: Contenedor
+orientation: Orientacion
 
 # VEHICLES
 #----------------------------------------------------------------------------------------------------------------------

@@ -111,7 +111,7 @@ class ERPStoreLocationsController extends Controller
 
 
 	/**
-  * @Route("/api/ERP/locations/printLabel/{id}/{idend}/{type}", name="printlocationlabel", defaults={"id"=0, "idend"="0", "type"=1})
+  * @Route("/api/ERP/locations/printLabel/{id}/{idend}/{type}", name="printlocationlabel", defaults={"id"=0, "idend"=0, "type"=1})
   */
   public function printLocationlabel($id, $idend, $type, Request $request){
 	 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
@@ -128,6 +128,7 @@ class ERPStoreLocationsController extends Controller
 			 if($loc) $locations[]=$locitem;
 		 }
 	 }else{
+		 if ($idend==0) $idend=$id;
 		 $locations=$repository->getLocations($id, $idend);
 	 }
 
