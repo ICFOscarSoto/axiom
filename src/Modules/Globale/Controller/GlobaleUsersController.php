@@ -512,7 +512,7 @@ public function getUsersStatus(Request $request){
       $user = $userRepository->findOneBy(["discorduser"=>$discorduser]);
       $em = $this->getDoctrine()->getEntityManager();
       if(!$user) return new JsonResponse(["result"=>-1]);
-      if(!$user->getDiscordchannel()) return new JsonResponse(["result"=>-2]);
+      if($user->getDiscordchannel()) return new JsonResponse(["result"=>-2]);
       $user->setDiscordchannel($channel);
       $em->persist($user);
       $em->flush();
