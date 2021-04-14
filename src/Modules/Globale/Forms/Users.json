@@ -20,7 +20,8 @@
 		{
 			"name": "Mensajeria",
 			"fields": [
-				{ "name": "discorduser", "cols": 4}
+				{ "name": "discorduser", "cols": 4},
+				{ "name": "discordchannel", "cols": 4}
 			]
 		}
 	]
