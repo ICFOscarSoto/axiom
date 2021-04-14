@@ -209,6 +209,13 @@ class ERPSalesTicketsController extends Controller
 	 	}
 
 		if($fields->salesticketnewagent!=""){
+			$newagent=$agentsRepository->findOneBy(["id"=>$fields->salesticketnewagent, "active"=>1, "deleted"=>0]);
+			$channel=$newagent->getDiscordchannel();
+			$msg=$this->getUser()->getName()." ha solicitado que gestiones la incidencia Nº **".$id."**";
+			file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
+			$msg="\n\nMás info en: \n".'https://axiom.ferreteriacampollano.com/es/ERP/salestickets/form/'.$id;
+			file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
+
 			$newagent=$agentsRepository->findOneBy(["id"=>$fields->salesticketnewagent,"active"=>1,"deleted"=>0]);
 			$salesticket->setAgent($newagent);
 		}
