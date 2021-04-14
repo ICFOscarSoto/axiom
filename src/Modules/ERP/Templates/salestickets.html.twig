@@ -63,6 +63,7 @@
 				           if(data.result){
 									//	 $("#salesticket-form-id").val(data.data.id);
 										 toastr.success("Documento guardado correctamente", "Confirmación", confirmation);
+										  location.reload();
 										 {% if id==0 %} location.href="/es/ERP/salestickets/form/"+data.data.id; {% endif %}
 				           } else {
 										 toastr.error("No se pudo guardar el documento", "Confirmación", confirmation);
