@@ -113,6 +113,7 @@ class ERPSalesTicketsController extends Controller
 			$salesticket=null;
 			if($id!=0){
 				$salesticket=$salesticketsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$id, "active"=>1,"deleted"=>0]);
+				$salesticket->setObservations("");
 			}
 			if($salesticket==null){
 				$salesticket=new $this->class();
