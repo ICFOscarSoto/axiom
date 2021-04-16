@@ -21,7 +21,7 @@ class CloudFilesUtils
 			'orderColumn' => 1,
 			'orderDirection' => 'ASC',
 			'tagColumn' => 1,
-      'rowAction' => 'download',
+      'rowAction' => 'view',
 			'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Files.json"),true),
 			'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/FilesFieldButtons.json"),true),
 			'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/FilesTopButtons.json"),true)

@@ -410,7 +410,7 @@ class HRClocksController extends Controller
 			//-----------------   CLOUD ----------------------
 			$utilsCloud = new CloudFilesUtils();
 			$path="HRClocks";
-			$templateLists=["id"=>$path,"list"=>[$utilsCloud->formatList($this->getUser(),$path,$id)],"path"=>$this->generateUrl("cloudUpload",["id"=>$id, "path"=>$path])];
+			$templateLists=["id"=>$path,"list"=>[$utilsCloud->formatList($this->getUser(),$path,$id)],"types"=>["Justificante asistencia", "Declaración responsable", "Otros"], "path"=>$this->generateUrl("cloudUpload",["id"=>$id, "path"=>$path])];
 			//------------------------------------------------
 			return $utils->make($id, $this->class, $action, "formworker", "modal", "@Globale/form.html.twig", null, null, ["filesHRClocks"=>["template"=>"@Cloud/genericlistfiles.html.twig", "vars"=>[
 				"cloudConstructor"=>$templateLists,

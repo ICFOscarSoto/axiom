@@ -244,7 +244,9 @@ class CloudController extends Controller
 							 $classModule='\App\Modules\\'.$module.'\Entity\\'.$path;
 							 if(class_exists($classModule)){
 								 $classRepository=$this->getDoctrine()->getRepository($classModule);
-								 $obj=$classRepository->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany()]);
+								 if(property_exists($classModule, "company"))
+								 		$obj=$classRepository->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany()]);
+								 	else $obj=$classRepository->findOneBy(["id"=>$id]);
 								 if($obj){
 									 if(method_exists($obj, 'postUploadCloudFile')){
 										 $obj->postUploadCloudFile($cloudFile, $this->getDoctrine());

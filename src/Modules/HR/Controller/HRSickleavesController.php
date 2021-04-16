@@ -123,10 +123,16 @@ class HRSickleavesController extends Controller
     //-----------------   CLOUD ----------------------
     $utilsCloud = new CloudFilesUtils();
     $path="HRSickleaves";
-		$templateLists=["id"=>$path,"list"=>[$utilsCloud->formatList($this->getUser(),$path,$id)],"path"=>$this->generateUrl("cloudUpload",["id"=>$id, "path"=>$path])];
+		$templateLists=["id"=>$path,"list"=>[$utilsCloud->formatList($this->getUser(),$path,$id)], "types"=>["Informe médico", "Parte de baja", "Justificante", "Renovación baja", "Otros"], "path"=>$this->generateUrl("cloudUpload",["id"=>$id, "path"=>$path])];
     //------------------------------------------------
 
-    return $utils->make($id, $this->class, $action, "formworker", "modal", "@Globale/form.html.twig", null, null, ["filesHRSickleaves"=>["template"=>"@Cloud/genericlistfiles.html.twig", "vars"=>["cloudConstructor"=>$templateLists]]]);
+    return $utils->make($id, $this->class, $action, "formworker", "modal", "@Globale/form.html.twig", null, null, ["filesHRSickleaves"=>["template"=>"@Cloud/genericlistfiles.html.twig", "vars"=>[
+      "cloudConstructor"=>$templateLists,
+      "scanner"=>$this->getUser()->getScanner(),
+      'path' => $path,
+      'id' => $id,
+      'module' => "HR"
+      ]]]);
    }
 
    /**

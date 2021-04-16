@@ -101,6 +101,11 @@
   {% set cloudConstructor = null %}
   {% if includes is defined %}
     {% for includeitem in includes %}
+      {% set foo = "" %}
+      {% set scanner = "" %}
+      {% set path = "" %}
+      {% set module = "" %}
+      {% set id = "" %}
       {% if includeitem.vars is defined %}
         {% for keyitem,varitem in includeitem.vars %}
           {% if keyitem =="cloudConstructor" %}
@@ -118,6 +123,7 @@
           {% if keyitem =="id" %}
               {% set id = varitem %}
           {% endif %}
+        
         {% endfor %}
       {% endif %}
         {{ include(includeitem.template) }}

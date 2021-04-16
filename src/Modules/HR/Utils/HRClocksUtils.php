@@ -37,6 +37,7 @@ class HRClocksUtils
       'orderColumn' => 2,
       'orderDirection' => 'DESC',
       'tagColumn' => 2,
+      'rowAction' => 'edit',
       'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Clocks.json"),true),
       'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/ClocksFieldButtons.json"),true),
       'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/ClocksTopButtons.json"),true)
@@ -52,6 +53,7 @@ class HRClocksUtils
       'orderColumn' => 2,
       'orderDirection' => 'DESC',
       'tagColumn' => 2,
+      'rowAction' => 'edit',
       'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Clocks.json"),true),
       'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/ClocksFieldButtonsAdmin.json"),true),
       'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/ClocksTopButtonsAdmin.json"),true)

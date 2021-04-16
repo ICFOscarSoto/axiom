@@ -262,6 +262,7 @@ Approved: Aprobado
 Workerobservations: Observaciones trabajador
 Companyobservations: Observaciones empresa
 Requestdate: Fecha solicitud
+requestdate: Fecha solicitud
 Select a type...: Seleccionar un tipo...
 Hourslastday: Horas último dia
 
@@ -277,6 +278,7 @@ Requireserial: Num. serie
 Requiresize: Talla
 Requireexpiration: Caducidad
 Select hrequipmentcategories: Seleccionar categoria
+Select a category: Seleccionar categoria
 
 # QUOTATION GROUPS
 #----------------------------------------------------------------------------------------------------------------------

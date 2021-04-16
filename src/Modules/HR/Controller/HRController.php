@@ -131,7 +131,7 @@ class HRController extends Controller
 												 ["name" => "vacations", "icon"=>"fa fa-paper-plane", "caption"=>"Vacaciones", "route"=>$this->generateUrl("vacations",["id"=>$id])],
 												 ["name" => "clocks", "icon"=>"fa fa-clock-o", "caption"=>"Fichajes", "route"=>$this->generateUrl("workerClocks",["id"=>$id])],
 												 ["name" => "equipment", "icon"=>"fa fa-wrench", "caption"=>"Equipamiento", "route"=>$this->generateUrl("generictablist",["module"=>"HR", "name"=>"WorkerEquipment", "id"=>$id])],
-												 ["name" => "files", "icon"=>"fa fa-cloud", "caption"=>"Archivos", "route"=>$this->generateUrl("cloudfiles",["id"=>$id, "path"=>"workers"])]
+												 ["name" => "files", "icon"=>"fa fa-cloud", "caption"=>"Archivos", "route"=>$this->generateUrl("cloudfiles",["id"=>$id, "path"=>"workers", "module"=>"HR", "types"=>json_encode(["Contrato laboral","Nomina","Finiquito","Tratamiento datos","Indemnización","Expediente", "Otros"])])]
 												],
 							'include_tab_post_templates' => ['@HR/workerequipments.html.twig'],
 
