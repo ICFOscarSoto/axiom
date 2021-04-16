@@ -414,7 +414,7 @@ class HRClocksController extends Controller
 			//------------------------------------------------
 			return $utils->make($id, $this->class, $action, "formworker", "modal", "@Globale/form.html.twig", null, null, ["filesHRClocks"=>["template"=>"@Cloud/genericlistfiles.html.twig", "vars"=>[
 				"cloudConstructor"=>$templateLists,
-				"escaner"=>$this->getUser()->getScanner(),
+				"scanner"=>$this->getUser()->getScanner(),
 				'path' => "HRClocks",
 				'id' => $id,
 				'module' => "HR"
