@@ -106,6 +106,18 @@
           {% if keyitem =="cloudConstructor" %}
               {% set cloudConstructor = varitem %}
           {% endif %}
+          {% if keyitem =="scanner" %}
+              {% set scanner = varitem %}
+          {% endif %}
+          {% if keyitem =="path" %}
+              {% set path = varitem %}
+          {% endif %}
+          {% if keyitem =="module" %}
+              {% set module = varitem %}
+          {% endif %}
+          {% if keyitem =="id" %}
+              {% set id = varitem %}
+          {% endif %}
         {% endfor %}
       {% endif %}
         {{ include(includeitem.template) }}
