@@ -113,6 +113,7 @@ class ERPSalesTicketsController extends Controller
 			$salesticket=null;
 			if($id!=0){
 				$salesticket=$salesticketsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$id, "active"=>1,"deleted"=>0]);
+				$salesticket->setObservations("");
 			}
 			if($salesticket==null){
 				$salesticket=new $this->class();
@@ -208,20 +209,15 @@ class ERPSalesTicketsController extends Controller
 	 		$salesticket->setDateadd(new \DateTime());
 	 	}
 
-		if($fields->salesticketnewagent!=""){
-			$newagent=$agentsRepository->findOneBy(["id"=>$fields->salesticketnewagent, "active"=>1, "deleted"=>0]);
-			$channel=$newagent->getDiscordchannel();
-			$msg=$this->getUser()->getName()." ha solicitado que gestiones la incidencia Nº **".$id."**";
-			file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
-			$msg="\n\nMás info en: \n".'https://axiom.ferreteriacampollano.com/es/ERP/salestickets/form/'.$id;
-			file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
+ 		if($fields->salesticketnewagent!=""){
 
-			$newagent=$agentsRepository->findOneBy(["id"=>$fields->salesticketnewagent,"active"=>1,"deleted"=>0]);
-			$salesticket->setAgent($newagent);
-		}
-		else{
-					$salesticket->setAgent($this->getUser());
-		}
+				$newagent=$agentsRepository->findOneBy(["id"=>$fields->salesticketnewagent,"active"=>1,"deleted"=>0]);
+				$salesticket->setAgent($newagent);
+			}
+			else{
+						$salesticket->setAgent($this->getUser());
+			}
+
 	 	$salesticket->setCompany($this->getUser()->getCompany());
 	 	$salesticket->setCustomer($customer);
 		$salesticket->setCustomername($fields->customername);
@@ -238,6 +234,27 @@ class ERPSalesTicketsController extends Controller
 	 	$salesticket->setDateupd(new \DateTime());
 	 	$this->getDoctrine()->getManager()->persist($salesticket);
 
+	if($fields->salesticketnewagent!=""){
+		if($id==0){
+				$newid=$salesticketsRepository->getLastID()+1;
+				$newagent=$agentsRepository->findOneBy(["id"=>$fields->salesticketnewagent, "active"=>1, "deleted"=>0]);
+				$channel=$newagent->getDiscordchannel();
+				$msg=$this->getUser()->getName()." ha solicitado que gestiones la incidencia Nº **".$newid."**";
+				file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
+				$msg="\n\nMás info en: \n".'https://axiom.ferreteriacampollano.com/es/ERP/salestickets/form/'.$newid;
+				file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
+			}
+			else{
+
+				$newagent=$agentsRepository->findOneBy(["id"=>$fields->salesticketnewagent, "active"=>1, "deleted"=>0]);
+				$channel=$newagent->getDiscordchannel();
+				$msg=$this->getUser()->getName()." ha solicitado que gestiones la incidencia Nº **".$id."**";
+				file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
+				$msg="\n\nMás info en: \n".'https://axiom.ferreteriacampollano.com/es/ERP/salestickets/form/'.$id;
+				file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
+
+			}
+		}
 
 		$history_obj=new ERPSalesTicketsHistory();
 		$history_obj->setAgent($this->getUser());

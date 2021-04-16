@@ -47,4 +47,11 @@ class ERPSalesTicketsRepository extends ServiceEntityRepository
         ;
     }
     */
+
+    public function getLastID(){
+      $query='SELECT max(id)
+      FROM erpsales_tickets';
+      return $this->getEntityManager()->getConnection()->executeQuery($query)->fetchColumn(0);
+
+    }
 }
