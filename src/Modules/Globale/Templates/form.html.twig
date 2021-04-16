@@ -103,14 +103,15 @@
     {% for includeitem in includes %}
       {% if includeitem.vars is defined %}
         {% for keyitem,varitem in includeitem.vars %}
-        <script>console.log('{{keyitem}}');</script>
           {% if keyitem =="cloudConstructor" %}
               {% set cloudConstructor = varitem %}
           {% endif %}
           {% if keyitem =="scanner" %}
+          <script>console.log('{{keyitem}}');</script>
               {% set scanner = varitem %}
           {% endif %}
           {% if keyitem =="path" %}
+          <script>console.log('{{keyitem}}');</script>
               {% set path = varitem %}
           {% endif %}
           {% if keyitem =="module" %}
