@@ -45,6 +45,7 @@
       <script>
         $(document).ready(function(){
 					console.log('{{scanner}}');
+					console.log('{{path}}');
           Dropzone.autoDiscover = false;
           var jsonFiles = [];
           var dropzone_default = new Dropzone(".{{ cloudConstructor.id }}", {
