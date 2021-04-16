@@ -412,7 +412,13 @@ class HRClocksController extends Controller
 			$path="HRClocks";
 			$templateLists=["id"=>$path,"list"=>[$utilsCloud->formatList($this->getUser(),$path,$id)],"path"=>$this->generateUrl("cloudUpload",["id"=>$id, "path"=>$path])];
 			//------------------------------------------------
-			return $utils->make($id, $this->class, $action, "formworker", "modal", "@Globale/form.html.twig", null, null, ["filesHRClocks"=>["template"=>"@Cloud/genericlistfiles.html.twig", "vars"=>["cloudConstructor"=>$templateLists]]]);
+			return $utils->make($id, $this->class, $action, "formworker", "modal", "@Globale/form.html.twig", null, null, ["filesHRClocks"=>["template"=>"@Cloud/genericlistfiles.html.twig", "vars"=>[
+				"cloudConstructor"=>$templateLists,
+				"escaner"=>$this->getUser()->getScanner(),
+				'path' => "HRClocks",
+				'id' => $id,
+				'module' => "HR"
+				]]]);
 			//return $utils->make($id, $this->class, $action, "formworker", "modal");
 		}
 
