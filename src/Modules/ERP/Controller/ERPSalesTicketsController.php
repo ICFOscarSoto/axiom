@@ -233,7 +233,7 @@ class ERPSalesTicketsController extends Controller
 		$salesticket->setObservations($fields->observations);
 	 	$salesticket->setDateupd(new \DateTime());
 	 	$this->getDoctrine()->getManager()->persist($salesticket);
-/*
+
 	if($fields->salesticketnewagent!=""){
 		if($id==0){
 				$newid=$salesticketsRepository->getLastID()+1;
@@ -255,7 +255,7 @@ class ERPSalesTicketsController extends Controller
 
 			}
 		}
-*/
+
 		$history_obj=new ERPSalesTicketsHistory();
 		$history_obj->setAgent($this->getUser());
 		$history_obj->setSalesTicket($salesticket);
