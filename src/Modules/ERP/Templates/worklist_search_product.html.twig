@@ -156,8 +156,7 @@ $(document).ready(function() {
     getStores($("#product-search-modal-form").attr("attr-id"));
     var id=$("#product-search-modal-form").attr("attr-id");
     var code=$(this).parent().parent().parent().children('td').eq(1).text();
-    if(isGrouped(code)) getVariants(id,code);
-    else  $("#product-form-variants-"+id).prop("readonly",true);
+    getVariants(id,code);
 
   //  checkList();
   });
