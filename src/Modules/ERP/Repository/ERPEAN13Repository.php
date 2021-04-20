@@ -19,6 +19,21 @@ class ERPEAN13Repository extends ServiceEntityRepository
         parent::__construct($registry, ERPEAN13::class);
     }
 
+    public function totalEAN13(){
+      $query='SELECT count(id) as total from erpEAN13 where active!=2';
+      $result=$this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
+      return $result[0]["total"];
+    }
+
+    public function EAN13Limit($start, $page){
+      $query='SELECT id FROM erpEAN13
+              WHERE active=!2
+              ORDER BY name
+              LIMIT '.$start.','.$page.'';
+      $result=$this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
+      return $result;
+    }
+
     // /**
     //  * @return ERPEAN13[] Returns an array of ERPEAN13 objects
     //  */

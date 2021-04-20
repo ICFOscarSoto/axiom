@@ -10,6 +10,7 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
+use App\Modules\ERP\Entity\ERPStores;
 use App\Modules\ERP\Entity\ERPStoreLocations;
 use App\Modules\ERP\Entity\ERPStocks;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
@@ -76,19 +77,21 @@ class ERPStoreLocationsController extends Controller
     }
 
   /**
-   * @Route("/api/storelocation/list", name="storelocationlist")
+   * @Route("/api/storelocation/{id}/list", name="storelocationlist")
    */
-  public function indexlist(RouterInterface $router,Request $request){
+  public function indexlist($id, RouterInterface $router,Request $request){
     $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
     $user = $this->getUser();
-    $locale = $request->getLocale();
+		$storeRepository=$this->getDoctrine()->getRepository(ERPStores::class);
+		$store=$storeRepository->find($id);
+		$locale = $request->getLocale();
     $this->router = $router;
     $manager = $this->getDoctrine()->getManager();
     $repository = $manager->getRepository(ERPStoreLocations::class);
     $listUtils=new GlobaleListUtils();
     $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoreLocations.json"),true);
-    $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, ERPStoreLocations::class,[["type"=>"and", "column"=>"company", "value"=>$user->getCompany()]]);
-    return new JsonResponse($return);
+    $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, ERPStoreLocations::class,[["type"=>"and", "column"=>"store", "value"=>$store]]);
+		return new JsonResponse($return);
   }
 
 	/**
@@ -139,6 +142,25 @@ class ERPStoreLocationsController extends Controller
 	 /*dump($locations);
 	 return new Response('');*/
   }
+	/**
+  * @Route("/api/ERP/locations/printLocationlabelDirectly/{id}/{copies}", name="printLocationlabelDirectly", defaults={"id"=0, "copies"=1})
+  */
+	public function printLocationlabelDirectly($id,$copies, Request $request){
+	 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+	 $locations=$repository->getLocations($id, $idend);
+ 	 $params=["type"=>3, "doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "locations"=>$locations, "user"=>$this->getUser()];
+ 	 $reportsUtils = new ERPLocationsReports();
+ 	 $pdf=$reportsUtils->create($params);
+	 $tempPath=$this->get('kernel')->getRootDir().DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$this->getUser()->getCompany()->getId().DIRECTORY_SEPARATOR.'printers'.DIRECTORY_SEPARATOR.$printer.DIRECTORY_SEPARATOR;
+
+	 if (!file_exists($tempPath) && !is_dir($tempPath)) {
+			mkdir($tempPath, 0775, true);
+	 }
+	 for($i=0; $i<$copies; $i++){
+		$pdf=$reportsUtils->create($params);
+	 }
+	 return new JsonResponse(["result"=>1]);
+}
 
 	/**
   * @Route("/api/ERP/location/get", name="getLocation")
