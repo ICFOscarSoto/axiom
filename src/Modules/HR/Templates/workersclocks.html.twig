@@ -60,6 +60,8 @@
 							<h3 style="font-size: 12px !important; text-align: center" id="worker-name-{{clock.workerid}}">{{clock.lastname}}, {{clock.name}}</h3>
 							<p><span id="worker-start-label-{{clock.workerid}}"></span><b><span id="worker-start-{{clock.workerid}}">{{clock.start}}</span></b></p>
 							<p><span id="worker-end-label-{{clock.workerid}}"></span><b><span id="worker-end-{{clock.workerid}}">{{clock.end}}</span></b> </p>
+							<p><span id="worker-today-label-{{clock.workerid}}"></span><b><span style="font-size:14px" id="worker-today-{{clock.workerid}}"></span></b> </p>
+							<p><span id="worker-yesterday-label-{{clock.workerid}}"></span><b><span id="worker-yesterday-{{clock.workerid}}"></span></b> </p>
 						</div>
 					</div>
 				</a>
@@ -116,6 +118,10 @@
 												$("#clock-"+val.workerid).addClass('tile-red'); $("#clock-"+val.workerid).removeClass('tile-aqua'); $("#clock-"+val.workerid).removeClass('tile-green'); $("#clock-"+val.workerid).removeClass('tile-gray');$("#clock-"+val.workerid).removeClass('tile-primary');
 												$("#worker-start-"+val.workerid).text('Horario previsto:');
 												$("#worker-end-"+val.workerid).text(val.must_work_start+" - "+val.must_work_end);
+												$("#worker-today-label-"+val.workerid).text('Hoy: ');
+												$("#worker-today-"+val.workerid).text(val.today.formated);
+												$("#worker-yesterday-label-"+val.workerid).text('Ayer: ');
+												$("#worker-yesterday-"+val.workerid).text(val.yesterday.formated);
 											}
 										}
 									}
@@ -127,14 +133,23 @@
 								$("#worker-end-"+val.workerid).text((val.end!=null)?val.end:'Sin salida registrada');
 								$("#worker-start-label-"+val.workerid).text('');
 								$("#worker-end-label-"+val.workerid).text('');
+								$("#worker-today-label-"+val.workerid).text('Hoy: ');
+								$("#worker-today-"+val.workerid).text(val.today.formated);
+								$("#worker-yesterday-label-"+val.workerid).text('Ayer: ');
+								$("#worker-yesterday-"+val.workerid).text(val.yesterday.formated);
 							 }
 						 	}else{
 								$("#worker-start-label-"+val.workerid).text('Entrada: ');
 								$("#worker-end-label-"+val.workerid).text('Salida: ');
+								$("#worker-today-label-"+val.workerid).text('Hoy: ');
 								if(!$("#clock-"+val.workerid).hasClass('tile-green')) {$("#clock-"+val.workerid).removeClass('blink'); $("#clock-"+val.workerid).addClass('blink');}
 								$("#clock-"+val.workerid).addClass('tile-green'); $("#clock-"+val.workerid).removeClass('tile-gray'); $("#clock-"+val.workerid).removeClass('tile-aqua');
 								$("#worker-start-"+val.workerid).text((val.start!=null)?val.start:'Sin entrada registrada');
 								$("#worker-end-"+val.workerid).text((val.end!=null)?val.end:'Sin salida registrada');
+								$("#worker-today-"+val.workerid).text(val.today.formated);
+								$("#worker-yesterday-label-"+val.workerid).text('Ayer: ');
+								$("#worker-yesterday-"+val.workerid).text(val.yesterday.formated);
+
 							}
 
 					 });

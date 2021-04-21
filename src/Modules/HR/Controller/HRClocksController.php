@@ -106,6 +106,8 @@ class HRClocksController extends Controller
  		  $workCenters = $repositoryWorkCenters->findBy(["company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
 			$repository = $this->getDoctrine()->getManager()->getRepository($this->class);
       if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+				$clocksdata=$repository->findWorkersClocks($this->getUser()->getCompany(),$department,$workcenter);
+
         return $this->render('@HR/workersclocks.html.twig', [
           'controllerName' => 'HRClocksController',
           'interfaceName' => 'Estado Fichaje',
@@ -113,7 +115,7 @@ class HRClocksController extends Controller
           'menuOptions' =>  $menurepository->formatOptions($userdata),
           'breadcrumb' =>  $menurepository->formatBreadcrumb('clocksStatus'),
           'userData' => $userdata,
-					'clocksList' => $repository->findWorkersClocks($this->getUser()->getCompany(),$department,$workcenter),
+					'clocksList' => $clocksdata,
  				  'departments' => $departments,
 					'selectedDepartment' => $department,
  				  'workcenters' => $workCenters,
@@ -477,6 +479,10 @@ class HRClocksController extends Controller
 		$repository = $manager->getRepository($this->class);
 		$workersClocks=$repository->findWorkersClocks($user->getCompany());
 		foreach($workersClocks as $key=>$item){
+
+			$workersClocks[$key]["today"]=$repository->todayClocks($workerRepository->findOneBy(["id"=>$item["workerid"], "deleted"=>0]));
+			$workersClocks[$key]["yesterday"]=$repository->yesterdayClocks($workerRepository->findOneBy(["id"=>$item["workerid"], "deleted"=>0]));
+
 			$vacation=$vacationsRepository->dayVacations($workerRepository->find($item["workerid"]), date ("Y-m-d"));
 			$workersClocks[$key]["vacation"]=$vacation?$vacation["type"]:0;
 			$sickleave=$sickleaveRepository->daySickleave($workerRepository->find($item["workerid"]), date ("Y-m-d"));
