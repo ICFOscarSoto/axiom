@@ -4,34 +4,46 @@
         "caption": "id"
     },
     {
-        "name": "deviceid",
-        "caption": "deviceid"
-    },
-    {
         "name": "name",
         "caption": "name"
     },
     {
         "name": "ipaddress",
-        "caption": "ipaddress"
+        "caption": "Dirección IP"
     },
     {
         "name": "mac",
-        "caption": "mac"
+        "caption": "Dirección MAC"
     },
     {
-        "name": "active",
+        "name": "os",
+        "caption": "S.O.",
+        "width": "10%",
+        "class": "dt-center",
+        "replace": {
+            "1": {
+                "text": "Windows OS",
+                "html": "<i class=\"fab fa-windows\" aria-hidden=\"true\"></i>&nbsp;Windows"
+            },
+            "2": {
+                "text": "Apagado",
+                "html": "<i class=\"fab fa-linux\" aria-hidden=\"true\"></i>&nbsp;Linux"
+            }
+        }
+    },
+    {
+        "name": "alive",
         "caption": "Estado",
         "width": "10%",
         "class": "dt-center",
         "replace": {
             "1": {
-                "text": "Activo",
-                "html": "<div style=\"min-width: 75px;\" class=\"label label-success\">Activo<\/div>"
+                "text": "Encendido",
+                "html": "<div style=\"min-width: 75px;\" class=\"label label-success\">Encendido<\/div>"
             },
             "0": {
-                "text": "Desactivado",
-                "html": "<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado<\/div>"
+                "text": "Apagado",
+                "html": "<div style=\"min-width: 75px;\" class=\"label label-danger\">Apagado<\/div>"
             }
         }
     }

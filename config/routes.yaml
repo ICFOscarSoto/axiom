@@ -47,6 +47,10 @@ Printers:
     resource: 'App\Modules\Globale\Controller\GlobalePrintersController'
     type:     annotation
 
+Workstations:
+    resource: 'App\Modules\Globale\Controller\GlobaleWorkstationsController'
+    type:     annotation
+
 Customer:
     resource: 'App\Modules\ERP\Controller\ERPCustomersController'
     type:     annotation
