@@ -946,6 +946,33 @@ class ERPProductsController extends Controller
 
 	 	 }
 
+
+		 /**
+		* @Route("/api/ERP/product/suppliers/{code}/get", name="getProductSuppliers", defaults={"code"=0})
+		*/
+		public function getProductSuppliers($code, RouterInterface $router,Request $request){
+		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		 $productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
+		 $product=$productRepository->findOneBy(["code"=>$code]);
+
+	 //	$repositoryVariants=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
+		 $suppliers=$productRepository->getSuppliers($product->getId());
+		 $responseSuppliers=Array();
+
+		 foreach($suppliers as $supplier){
+
+			 $item['id']=$supplier['id'];
+			 $item['name']=$supplier['name'];
+			 if($product->getSupplier()->getId()==$supplier['id']) $item['preferential']=1;
+			 else $item['preferential']=0;
+			 $responseSuppliers[]=$item;
+		 }
+
+		 return new JsonResponse(["suppliers"=>$responseSuppliers]);
+
+		}
+
+
 		 /**
 	 * @Route("/api/ERP/product/{code}/grouped", name="isGrouped")
 	 */
@@ -954,8 +981,8 @@ class ERPProductsController extends Controller
 		$productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
 		$product=$productRepository->findOneBy(["code"=>$code]);
 
-		if($product->getGrouped()) return new JsonResponse(["result"=>true]);
-		else return new JsonResponse(["result"=>false]);
+		if($product->getGrouped()) return new JsonResponse(["result"=>1]);
+		else return new JsonResponse(["result"=>0]);
 
 
 	 }

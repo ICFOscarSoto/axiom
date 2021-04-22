@@ -180,6 +180,18 @@ class ERPProductsRepository extends ServiceEntityRepository
 
     }
 
+
+    public function getSuppliers($product){
+        $query='SELECT s.id as id, s.name as name
+        FROM erpsuppliers s
+        LEFT JOIN erpproduct_prices pp
+        ON pp.supplier_id=s.id
+        WHERE pp.product_id='.$product.' AND pp.active=1 AND pp.deleted=0
+        GROUP BY s.id,s.name
+        ORDER BY name ASC';
+        return $this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
+    }
+
 /*
 dejamos pendiente esta consulta porque falta por añadir en los pedidos de compra algun campo que indique que el material
 de ese pedido ya se ha recibido

@@ -1,0 +1,24 @@
+<script>
+  function prepare_purchasesdemands_json(){
+
+    var purchasesdemandsFields = new Object();
+    var lines=[];
+
+    $("[id^='purchasesdemands-line-']").each(function() {
+      var line = new Object();
+      line.id=$(this).find("#product-form-line-id-"+$(this).attr("attr-id")).val();
+      line.linenum=$(this).attr("attr-id");
+      line.code=$(this).find("#product-form-code-"+$(this).attr("attr-id")).val();
+    //  line.name=$(this).find("#product-form-name-"+$(this).attr("attr-id")).val();
+      line.variant=$(this).find("#product-form-variants-"+$(this).attr("attr-id")).val();
+      line.supplier=$(this).find("#product-form-suppliers-"+$(this).attr("attr-id")).val();
+      line.quantity=$(this).find("#product-form-quantity-"+$(this).attr("attr-id")).val();
+      line.reason=$(this).find("#product-form-reasons-"+$(this).attr("attr-id")).val();
+      line.deleted=$(this).hasClass('deleted');
+      lines.push(line);
+    });
+
+    purchasesdemandsFields.lines=lines;
+    return purchasesdemandsFields;
+  }
+</script>

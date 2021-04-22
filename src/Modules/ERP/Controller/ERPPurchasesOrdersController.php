@@ -422,4 +422,71 @@ class ERPPurchasesOrdersController extends Controller
 		return new RedirectResponse($this->generateUrl('ERPPurchasesOrdersForm',["id"=>$order->getId()]));
 	}
 
+	/**
+	 * @Route("/api/ERP/PurchasesOrders/findproduct/{productid}", name="ERPFindProductInPurchasesOrders", defaults={"productid"=0})
+	 */
+	public function ERPFindProductInPurchasesOrders($productid, RouterInterface $router,Request $request){
+		$purchasesordersRepository=$this->getDoctrine()->getRepository(ERPPurchasesOrders::class);
+		$purchasesorder=null;
+		$purchasesorder=$purchasesordersRepository->getPurchaseOrderByProduct($productid);
+		$item['id']=$purchasesorder['id'];
+		$item['code']=$purchasesorder['code'];
+		return new JsonResponse(["result"=>$item]);
+
+	}
+
+	/**
+	 * @Route("/api/ERP/PurchasesOrders/findpurchaseorder/{productid}", name="ERPFindPurchasesOrderBySupplier", defaults={"productid"=0})
+	 */
+	public function ERPFindPurchasesOrderBySupplier($productid, RouterInterface $router,Request $request){
+		$productsRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
+		$product=$productsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$productid, "active"=>1, "deleted"=>0]);
+		$supplierid=$product->getSupplier()->getId();
+		$purchasesordersRepository=$this->getDoctrine()->getRepository(ERPPurchasesOrders::class);
+		$purchasesorder=null;
+		$purchasesorder=$purchasesordersRepository->getPurchaseOrderBySupplier($supplierid);
+		$item['id']=$purchasesorder['id'];
+		$item['code']=$purchasesorder['code'];
+		return new JsonResponse(["result"=>$item]);
+
+	}
+
+	/**
+	 * @Route("/api/ERP/PurchasesOrders/addproduct/{productid}/{quantity}/{id}", name="ERPAddProductToPurchaseOrder", defaults={"productid"=0, "id"=0})
+	 */
+	public function ERPAddProductToPurchaseOrder($productid, $quantity, $id, RouterInterface $router,Request $request){
+     $productsRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
+		 $purchasesordersRepository=$this->getDoctrine()->getRepository(ERPPurchasesOrders::class);
+		 $order=$purchasesordersRepository->findOneBy(["id"=>$id]);
+		 $product=$productsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$productid, "active"=>1, "deleted"=>0]);
+		 $purchasesordersLinesRepository=$this->getDoctrine()->getRepository(ERPPurchasesOrdersLines::class);
+
+			$line=new ERPPurchasesOrdersLines();
+			$line->setActive(1);
+			$line->setDeleted(0);
+			$line->setDateadd(new \DateTime());
+			$line->setPurchasesorder($order);
+			$line->setLinenum($purchasesordersLinesRepository->getLastLine($id)+1);
+			$line->setProduct($product);
+			$line->setCode($product->getCode());
+			$line->setName($product->getName());
+			$line->setUnitprice(floatval($product->getShoppingPrice()));
+			$line->setQuantity($quantity);
+		//	$line->setDtoperc();
+		//	$line->setDtounit();
+		//	$line->setTaxperc();
+	//		$line->setTaxunit(floatval($value->taxunit));
+	//		$line->setIrpfperc(floatval($value->irpfperc));
+	//		$line->setIrpfunit(floatval($value->irpfunit));
+	//		$line->setSurchargeperc(floatval($value->surchargeperc));
+	//		$line->setSurchargeunit(floatval($value->surchargeunit));
+	//		$line->setSubtotal(floatval($value->subtotal));
+      //$line->setTotal(floatval($value->total));
+			$line->setDateupd(new \DateTime());
+			$this->getDoctrine()->getManager()->persist($line);
+			$this->getDoctrine()->getManager()->flush();
+			return new JsonResponse(["result"=>1]);
+
+	}
+
 }

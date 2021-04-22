@@ -58,4 +58,17 @@ class ERPPurchasesOrdersRepository extends ServiceEntityRepository
       return $result;
 
     }
+    public function getPurchaseOrderByProduct($productid)
+    {
+      $query="SELECT o.id,o.code
+      FROM erppurchases_orders o
+      LEFT JOIN erppurchases_orders_lines l
+      ON l.purchasesorder_id=o.id
+      WHERE l.product_id=".$productid." AND o.status=0
+      GROUP BY o.id,o.code";
+      //$params=['productid' => $productid];
+      return $this->getEntityManager()->getConnection()->executeQuery($query)->fetch();
+
+    }
+
 }

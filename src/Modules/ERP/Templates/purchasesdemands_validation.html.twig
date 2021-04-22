@@ -1,0 +1,27 @@
+<script>
+  function validate_purchases_demands(){
+    $(".error").remove();
+
+    var valid=true;
+    $("[id^='purchasesdemands-line-']").each(function() {
+
+      if($(this).find("#product-form-reasons-"+$(this).attr("attr-id")).val()=="-1")
+      {
+       code=$(this).find("#product-form-code-"+$(this).attr("attr-id")).val()
+       toastr.error("No se ha indicado el motivo para el producto "+code, "Confirmación", confirmation);
+        valid=false;
+        return valid;
+      }
+      if($(this).find("#product-form-suppliers-"+$(this).attr("attr-id")).val()=="-1")
+      {
+       code=$(this).find("#product-form-code-"+$(this).attr("attr-id")).val()
+       toastr.error("No se ha seleccionado proveedor para el producto "+code, "Confirmación", confirmation);
+        valid=false;
+        return valid;
+      }
+  });
+
+  return valid;
+
+}
+</script>

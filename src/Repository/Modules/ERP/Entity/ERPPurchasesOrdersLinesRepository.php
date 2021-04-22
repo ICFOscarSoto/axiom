@@ -47,4 +47,13 @@ class ERPPurchasesOrdersLinesRepository extends ServiceEntityRepository
         ;
     }
     */
+
+public function getLastLine($purchaseorderid)
+{
+  $query="SELECT max(l.linenum) as linenum FROM erppurchases_orders_lines l WHERE purchasesorder_id=".$purchaseorderid." AND l.active=1 AND l.deleted=0";
+  $result=$this->getEntityManager()->getConnection()->executeQuery($query)->fetch();
+  return $result['linenum'];
+
+}
+
 }

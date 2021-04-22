@@ -1,0 +1,99 @@
+<div class="panel panel-primary panel-shadow" data-collapsed="0" style="-webkit-box-shadow: none; box-shadow:none;min-height:200px"><!-- to apply shadow add class "panel-shadow" -->
+  <div class="panel-body" style="padding: 0px !important;" id="purchasesdemands-lines" attr-numlines="{{ purchasesdemandsLines|length }}">
+    <div class="btn-group">
+      <button id="add-line" style="font-size:20px;" type="button" class=" btn btn-primary tooltip-primary"><i class="fa fa-plus" ></i></button>
+    </div>
+    <p></p>
+    <input type="hidden" readonly attr-id="{{ userData.id }}" id="userID" value="{{ userData.id }}">
+    <input type="hidden" readonly attr-id="{{ userData.name }}" id="userName" value="{{ userData.name }}">
+    <div class="row no-gutters purchasesdemands-products-header">
+      <div class="col-sm-2 d-none d-sm-block" style="font-weight:bold;font-size:13px;padding: 7px 2px;">Cod. Producto</div>
+      <div class="col-sm-3 d-none d-sm-block" style="font-weight:bold;font-size:13px;padding: 7px 2px;">Descripción</div>
+      <div class="col-sm-1 d-none d-sm-block" style="font-weight:bold;font-size:13px;padding: 7px 2px;">Variante</div>
+      <div class="col-sm-1 d-none d-sm-block" style="font-weight:bold;font-size:13px;padding: 7px 2px;">Proveedor</div>
+      <div class="col-sm-2 d-none d-sm-block" style="font-weight:bold;font-size:13px;padding: 7px 2px;">Motivo</div>
+      <div class="col-sm-1 d-none d-sm-block" style="font-weight:bold;font-size:13px;padding: 7px 2px;">Agente</div>
+      <div class="col-sm-1 d-none d-sm-block" style="font-weight:bold;font-size:13px;padding: 7px 2px;">Cantidad</div>
+    </div>
+    {% for line in  purchasesdemandsLines %}
+      <div class="row no-gutters" attr-id="{{ line.linenum }}" id="purchasesdemands-line-{{ line.linenum }}" style="margin-bottom:8px;">
+        <div class="col-2 d-block d-sm-none" style="top: 8px;">Cod. Prod.</div>
+        <div class="col-10 col-sm-2">
+          <div class="form-group" style="margin-bottom: 0px;length:258px;">
+            <div class="input-group" style="width:100%;">
+              <a class="btn btn-white" attr-id="{{ line.linenum }}" id="product-form-remove-{{ line.linenum }}" style="position: absolute;height: 31px;left: 0px;padding: 9px 7px;z-index: 10;" href="#"> <i class="fa fa-remove"></i></a>
+              {% if line.product is not null %}
+                <span id="product-form-view-{{ line.linenum }}" class="select2-selection__view_nolabel" style="width: 38px; height: 31px; right: 0px; top:0;" attr-id="{{ line.product.id }}" attr-url="{{ url('formProduct',{'id':'_____'}) }}"><i class="fa fa-file-text-o" aria-hidden="true"></i><span>&nbsp;</span></span>
+
+              {% endif %}
+              <input type="hidden" readonly attr-id="{{ line.linenum }}" id="product-form-line-id-{{ line.linenum }}" value={% if line!=null %}{{ line.linenum }}{% endif %}>
+              <input type="hidden" readonly attr-id="{{ line.linenum }}" id="product-form-id-{{ line.linenum }}" value={% if line.product!=null %}{{ line.product.id }}{% endif %}>
+              <input type="text" readonly attr-id="{{ line.linenum }}" id="product-form-code-{{ line.linenum }}" class="form-control" style="padding-left: 28px; border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Cod. Producto" value="{{ line.product.code }}">
+              {% if  line.product.code is null %}
+              <div class="input-group-btn"><button type="button" attr-id="{{ line.linenum }}" id="product-search-button-{{ line.linenum }}" class="btn btn-white" style="height: 31px; border-radius: 0px;"><i class="fa fa-search"></i> </button></div>
+              {% else %}
+              <div class="input-group-btn"></div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        <div class="col-2 d-block d-sm-none" style="top: 8px;">Nombre</div>
+        <div class="col-10 col-sm-3"> <div class="form-group" style="margin-bottom: 0px;"> <input type="text" readonly id="product-form-name-{{ line.linenum }}" class="form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Nombre" value="{{ line.product.name }}"> </div> </div>
+        <div class="col-2 d-block d-sm-none" style="top: 8px;">Variantes</div>
+        {% if line.variant!=null %}
+        <div class="col-3 col-sm-1">
+          <div class="form-group" style="margin-bottom: 0px;">
+            <input type="text" readonly id="product-form-variants-{{ line.linenum }}" class="form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Nombre" value="{{ line.variant.name }}">
+          </div>
+        </div>
+        {% else %}
+        <div class="col-3 col-sm-1">
+              <select class="form-control select2" name="product-form-variants-{{ line.linenum }}" id="product-form-variants-{{ line.linenum }}">
+              </select>
+        </div>
+        {% endif %}
+        <div class="col-2 d-block d-sm-none" style="top: 8px;">Provedor</div>
+        <div class="col-3 col-sm-1">
+          <div class="col-3 col-sm-1">
+            <div class="form-group" style="margin-bottom: 0px;">
+              <input type="text" readonly id="product-form-suppliers-{{ line.linenum }}" class="form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Nombre" value="{{ line.supplier.name }}">
+            </div>
+          </div>
+        </div>
+        <div class="col-2 d-block d-sm-none" style="top: 8px;">Motivo</div>
+        {% if line.reason!=null %}
+        <div class="col-3 col-sm-2">
+          <div class="form-group" style="margin-bottom: 0px;">
+            <input type="text" readonly id="product-form-reasons-{{ line.linenum }}" class="form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Nombre" value="{{ line.reason.name }}">
+          </div>
+        </div>
+        {% else %}
+        <div class="col-3 col-sm-2">
+              <select class="form-control select2" name="product-form-reasons-{{ line.linenum }}" id="product-form-reasons-{{ line.linenum }}">
+              </select>
+        </div>
+        {% endif %}
+        <div class="col-2 d-block d-sm-none" style="top: 8px;">Agente</div>
+        <div class="col-3 col-sm-1"> <div class="form-group" style="margin-bottom: 0px;"><input type="hidden" id="product-form-agentid-{{ line.linenum }}"  value="{{ line.agent.id }}"> <input type="text" readonly id="product-form-agent-{{ line.linenum }}" class="form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Nombre" value="{{ line.agent.name }} {{ line.agent.lastname }}"> </div> </div>
+        <div class="col-2 d-block d-sm-none" style="top: 8px;">Cantidad</div>
+        <div class="col-3 col-sm-1"> <div class="form-group" style="margin-bottom: 0px;"> <input type="text" id="product-form-quantity-{{ line.linenum }}" class="form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Nombre" value="{{ line.quantity }}"> </div> </div>
+        <div class="form-group" style="margin: 3px 0 0 3px;">
+          <button attr-id="{{ line.linenum }}" id="product-form-send-{{ line.linenum }}" type="button" class=" btn btn-info tooltip-primary" data-toggle="tooltip" data-placement="bottom" title="" data-original-title=" Añadir a pedido de compra "><i class="fa fa-shopping-cart" aria-hidden="true"></i></button>
+        </div>
+
+      </div>
+    {% endfor %}
+
+  </div>
+</div>
+<script>
+$('body').on('click', "[id^='product-form-view-']", function(e){
+  var id=$(this).attr("attr-id");
+    if(id!=0 && id!=""){
+      url=$(this).attr("attr-url");
+      url=url.replace('_____',$(this).attr("attr-id"));
+      var win = window.open(url, '_blank');
+      win.focus();
+    }
+});
+</script>

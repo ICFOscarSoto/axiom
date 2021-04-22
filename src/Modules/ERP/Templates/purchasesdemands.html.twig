@@ -1,0 +1,121 @@
+{% set params = app.request.attributes.get('_route_params')|merge(app.request.query.all()) %}
+{% block header %}
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<meta name="description" content="Axiom Business Management" />
+	<meta name="author" content="" />
+	<link rel="icon" href="images/favicon.ico">
+	{{ include('@Globale/header.html.twig') }}
+	<!-- Imported styles on this page -->
+	<link rel="stylesheet" href="{{ url('index') }}css/bootstrap-grid.css">
+	<link rel="stylesheet" href="{{ url('index') }}/js/jvectormap/jquery-jvectormap-1.2.2.css">
+	<link rel="stylesheet" href="{{ url('index') }}/js/rickshaw/rickshaw.min.css">
+{% endblock %}
+<title>{% block title %}{{ interfaceName|trans }}{% endblock %}</title>
+<body class="page-body" data-url="{{ url('indexAdmin') }}">
+<div class="page-container"><!-- add class "sidebar-collapsed" to close sidebar by default, "chat-visible" to make chat appear always -->
+{{ include('@Globale/sidebar_menu.html.twig') }}
+<div class="main-content">
+  {{ include('@Globale/head.html.twig') }}
+  <hr />
+  {{ include('@Globale/breadcrumb.html.twig') }}
+  {#}<h2>{{ interfaceName }}</h2>#}
+  <!-- MAIN CONTENT -->
+  <div id="document-body">
+	<h2>Lista de necesidades de compra</h2>
+    {{ include('@ERP/purchasesdemands_body_lines.html.twig') }}
+  </div>
+  {{ include('@ERP/purchasesdemands_lines_functions.html.twig') }}
+	{{ include('@ERP/purchasesdemands_search_product.html.twig') }}
+	{{ include('@ERP/purchasesdemands_prepare_json.html.twig') }}
+	{{ include('@ERP/purchasesdemands_validation.html.twig') }}
+  <div class="row">
+    <div class="col-md-4">
+      <button attr-id="" attr-action="" id="purchasesdemands-button-cancel" type="button" class="btn btn">Cancelar</button>
+      <button attr-id="" attr-action="" id="purchasesdemands-button-save" type="button" class="btn btn-green">Guardar</button>
+    </div>
+  </div>
+</div>
+</div>
+  <script>
+  function clearFields(fields){
+    fields.forEach(function(element) {
+      $("#"+element).val('');
+    });
+  }
+
+	function saveLines()
+	{
+		$.ajax({
+			 url: '{{ url('dataERPPurchasesDemands') }}',
+			 type: 'POST',
+			 data: JSON.stringify(prepare_purchasesdemands_json()),
+			 success:  function( data ) {
+				 if((--load_wait)==0) $("#load-spinner").fadeOut();
+				 if(data.result){
+					 jQuery.each(data.data.lines, function(i, line) {
+						 $("#product-form-line-id-"+line.linenum).val(line.id);
+					 });
+					 toastr.success("Lista guardada correctamente", "Confirmación", confirmation);
+					 location.reload();
+				 } else {
+					 toastr.error("No se pudo guardar la lista", "Confirmación", confirmation);
+				 }
+			 }
+		 });
+
+	}
+
+	$(document).ready(function() {
+
+	//	addWorkListLine();
+    $('body').on('focus', "[id^='product-search-button-']", function(e) {
+        $("#product-form-name-"+$(this).attr("attr-id")).focus();
+    });
+
+		$('body').on('click', "[id^='product-form-remove-']", function(e) {
+			removePurchasesDemandsLine($(this).attr('attr-id'));
+		});
+
+    $('body').on('click', "#add-line", function(e) {
+			  addPurchasesDemandsLine();
+		});
+
+    {# DOCUMENT SAVE #}
+    $('body').on('click', "#purchasesdemands-button-save", function(e) {
+			if(validate_purchases_demands()){
+				saveLines();
+			}
+
+     });
+		$('body').on('click', "[id^='product-form-send-']", function(e) {
+
+			findPurchaseOrder($(this).attr("attr-id"));
+		});
+	});
+  </script>
+
+  <!-- END MODALS -->
+  {% block footer %}
+  <link rel="stylesheet" href="{{ url('index') }}js/datatables/datatables.css">
+  <link rel="stylesheet" href="{{ url('index') }}js/select2/select2-bootstrap.css">
+  <link rel="stylesheet" href="{{ url('index') }}js/select2/select2.css">
+  <link rel="stylesheet" href="{{ url('index') }}css/custom.css">
+  <link rel="stylesheet" href="{{ url('index') }}js/ol/ol.css">
+  <link rel="stylesheet" href="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker.min.css">
+  <link rel="stylesheet" href="{{ url('index') }}js/jodit/jodit.min.css">
+
+  <!-- Imported scripts on this page -->
+  <script src="{{ url('index') }}js/datatables/datatables.js"></script>
+  <script src="{{ url('index') }}js/select2/select2.min.js"></script>
+  <script src="{{ url('index') }}js/moment.min.js"></script>
+  <script src="{{ url('index') }}js/moment-es.js"></script>
+  <script src="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker-es.js"></script>
+  <script src="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker.min.js"></script>
+  <script src="{{ url('index') }}js/fileinput.js"></script>
+  <script src="{{ url('index') }}js/ol/ol.js"></script>
+   <script src="{{ url('index') }}js/jodit/jodit.min.js"></script>
+  	 {{ include('@Globale/bottom.html.twig') }}
+  {% endblock %}
+  </body>
