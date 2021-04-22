@@ -1,8 +1,8 @@
 [
   {"id": "editWorkstations", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"genericdata", "routeParams":{"module":"Globale", "name":"Workstations", "type":"modal" }, "modal":"Workstations", "actionType" : "background", "confirm" :false, "tooltip":""},
-  {"id": "activation", "type": "option", "options": [
-      {"id": "desactivateWorkstations", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"genericdisable", "routeParams":{"module":"Globale", "name":"Workstations"}, "confirm" :true, "actionType" : "background", "tooltip":"" },
-      {"id": "activateWorkstations", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "route":"genericenable", "routeParams":{"module":"Globale", "name":"Workstations"}, "confirm" :true, "actionType" : "background", "tooltip":"" }
+  {"id": "power", "type": "option", "options": [
+      {"id": "poweroffWorkstations", "type" : "danger", "condition": "alive", "conditionValue" :true , "icon" : "fas fa-power-off","name" : "apagar", "route":"powerOffWorkStation", "confirm" :true, "actionType" : "background", "tooltip":"Apagar equipo" },
+      {"id": "poweronWorkstations", "type" : "success", "condition": "alive", "conditionValue" :false, "icon" : "fas fa-power-off","name" : "encender", "route":"powerOnWorkStation", "confirm" :true, "actionType" : "background", "tooltip":"Encender equipo" }
   ]},
   {"id": "deleteWorkstations", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"genericdelete", "routeParams":{"module":"Globale", "name":"Workstations"}, "confirm" :true, "undo" :false, "actionType" : "background", "tooltip":""}
 ]
