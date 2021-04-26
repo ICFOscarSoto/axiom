@@ -6,28 +6,28 @@
           <div class="form-group">
             <label for="salesticket-form-name">Nombre del cliente:</label>
             <span id="customer-form-view" class="select2-selection__view_tickets" {% if salesticket.customer!=null %} attr-id="{{ salesticket.customer.id }}" {% else %} style="display:none;" {% endif %} attr-url="{{ url('formCustomer',{'id':'_____'}) }}"><i class="fa fa-file-text-o" aria-hidden="true"></i><span>&nbsp;Ver Ficha</span></span>
-            <input type="text" id="customer-form-name" {% if salesticket.customer!=null %} value="{{ salesticket.customer.name }}" disabled {% endif %} class="form-control" placeholder="Nombre del Cliente">
+            <input type="text" readonly id="customer-form-name" {% if salesticket.customer!=null %} value="{{ salesticket.customer.name }}" disabled {% endif %} class="form-control" placeholder="Nombre del Cliente">
 
           </div>
         </div>
         <div class="col-md-3">
           <label for="salesticket-form-email">Email del cliente:</label>
           <div class="form-group">
-            <input type="text" id="customer-form-email" {% if salesticket.customer!=null %} value="{{ salesticket.customer.email }}" disabled {% endif %} class="form-control" placeholder="Email del Cliente">
+            <input type="text" readonly id="customer-form-email" {% if salesticket.customer!=null %} value="{{ salesticket.customer.email }}" disabled {% endif %} class="form-control" placeholder="Email del Cliente">
           </div>
         </div>
         <div class="col-md-3">
           <div class="form-group">
             <label for="salesticket-form-salesorder">Nº de pedido:</label>
             <span id="salesorder-form-view" class="select2-selection__view_tickets" {% if salesticket.salesorder!=null %} attr-id="{{ salesticket.salesorder.id }}" {% else %} style="display:none;" {% endif %} attr-url="{{ url('ERPSalesOrdersForm',{'id':'_____'}) }}"><i class="fa fa-file-text-o" aria-hidden="true"></i><span>&nbsp;Ver Pedido</span></span>
-            <input type="text" id="salesorder-form-number" {% if salesticket.salesorder!=null %} value="{{ salesticket.salesordernumber }}" disabled {% endif %} class="form-control" placeholder="Nº de pedido">
+            <input type="text" readonly id="salesorder-form-number" {% if salesticket.salesorder!=null %} value="{{ salesticket.salesordernumber }}" disabled {% endif %} class="form-control" placeholder="Nº de pedido">
           </div>
         </div>
         <div class="col-md-3">
           <div class="form-group">
             <label for="salesticket-form-external">Nº de pedido externo:</label>
             <span id="salesorder-form-external-view" class="select2-selection__view_tickets" {% if salesticket.externalsalesordernumber!=null %} attr-id="{{ salesticket.externalsalesordernumber }}" {% else %} style="display:none;" {% endif %} ><i class="fa fa-file-text-o" aria-hidden="true"></i><span>&nbsp;Ver Pedido</span></span>
-            <input type="text" id="salesorder-form-external" {% if salesticket.externalsalesordernumber!=null %} value="{{ salesticket.externalsalesordernumber }}" disabled {% endif %} class="form-control" placeholder="Nº de pedido externo">
+            <input type="text" readonly id="salesorder-form-external" {% if salesticket.externalsalesordernumber!=null %} value="{{ salesticket.externalsalesordernumber }}" disabled {% endif %} class="form-control" placeholder="Nº de pedido externo">
           </div>
         </div>
         <input type="hidden" id="customer-form-code" class="form-control" value="{% if salesticket.customer!=null %}{{ salesticket.customer.code }}{% endif %}">

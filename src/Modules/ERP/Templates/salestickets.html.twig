@@ -34,6 +34,7 @@
 			{{ include('@ERP/salesticket_search_customer.html.twig') }}
 			{{ include('@ERP/salesticket_search_salesorder.html.twig') }}
 			{{ include('@ERP/salesticket_prepare_json.html.twig') }}
+			{{ include('@ERP/salesticket_validation.html.twig') }}
 
 			<div class="row">
 					<div class="col-md-4">
@@ -54,6 +55,8 @@
 			$(document).ready(function() {
 					{# DOCUMENT SAVE #}
 					$('body').on('click', "#salesticket-button-save", function(e) {
+						if(validate_salesticket())
+						{
 							$.ajax({
 				         url: '{{ url('dataSalesTickets', {"id": id}) }}',
 				         type: 'POST',
@@ -70,6 +73,7 @@
 									 }
 				         }
 				       });
+						}
 					 });
 
 					 $('body').on('click', "#{{formConstructor.name}}-button-cancel", function() {
