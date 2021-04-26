@@ -3,13 +3,18 @@
 		{{ include(template) }}
 	{% endfor %}
 {% endif %}
+
+{% set session_MaxResults = app.session.get(listConstructor.id ~ '-maxResults') %}
+{% dump(listConstructor.id ~ '-maxResults') %}
+{% dump(app.session) %}
+
 <input type="hidden" id="search_param"/>
 <script>
 			$(document).ready(function() {
 				var ${{ listConstructor.id }}_var = jQuery("#{{ listConstructor.id }}");
 				var {{ listConstructor.id }} = ${{ listConstructor.id }}_var.DataTable( {
 					"aLengthMenu": [[10, 20, 50, 250], [10, 20, 50, 250]],
-					"pageLength": 20,
+					"pageLength": {% if session_MaxResults is not null %}{{ session_MaxResults }}{% else %}20{% endif %},
 					"oClasses":{
 						"sLengthSelect": "select2"
 					},
@@ -282,8 +287,8 @@
 					$p[is_checked ? 'addClass' : 'removeClass']( 'highlight' );
 				});
 
-				var typingTimer;                //timer identifier
-				var doneTypingInterval = 700;  //time in ms, 5 second for example
+				var typingTimer;
+				var doneTypingInterval = 700;
 				var searchColumn;
 				function clearSearchTimeOut(){
 					clearTimeout(typingTimer);
@@ -388,7 +393,7 @@
 										{% if '__' in field.name %}
 											{# Relations #}
 
-												<select id="s_{{ field.name }}" class="form-control table-header-search-input select2 select2-use">
+												{#<select id="s_{{ field.name }}" class="form-control table-header-search-input select2 select2-use">
 
 														<option value="##ALL##" selected> -- Todos -- </option>
 														<option value="##NULL##"> -- Ninguno -- </option>
@@ -398,7 +403,8 @@
 													$(document).ready(function() {
 														$("#s_{{ field.name }}").select2({dropdownCssClass : 'select2-bigdrop'});
 													});
-												</script>
+												</script>#}
+													<input id="s_{{ field.name }}" type="text" class="table-header-search-input form-control" placeholder="Buscar {{ (field.caption)|trans }}"  autocomplete="off"/>
 										{% else %}
 									   	{# Other fields show inputs #}
 

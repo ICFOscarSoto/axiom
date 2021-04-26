@@ -6,7 +6,9 @@
 framework:
     session:
         # ...
+        enabled: true
         handler_id: session.storage.custom
+
 
 parameters:
     locale: 'en'

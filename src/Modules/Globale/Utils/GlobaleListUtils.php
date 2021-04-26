@@ -1,6 +1,7 @@
 <?php
 namespace App\Modules\Globale\Utils;
 use App\Modules\Globale\Entity\GlobaleCompanies;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 class GlobaleListUtils
 {
@@ -16,6 +17,8 @@ class GlobaleListUtils
 
     public function getRecords($user,$repository,$request,$manager,$listFields,$classname,$filters=[],$raw=[],$maxResults=null,$orderBy="id",$doctrine=null): array
     {
+    $listName=$request->attributes->get('name');
+    $session = new Session();
 
 		$return=array();
 		$query = $repository->createQueryBuilder('p');
@@ -23,9 +26,18 @@ class GlobaleListUtils
     if($maxResults===NULL){
         $query->setFirstResult($request->query->getInt('start', 0));
         $query->setMaxResults($request->query->getInt('length', 20));
+        if($request->query->getInt('length')!=null){
+          $session->set('list'.$listName.'-maxResults', $request->query->getInt('length'));
+        }
     }else if($maxResults>=0){
       $query->setFirstResult($request->query->getInt('start', 0));
       $query->setMaxResults($maxResults);
+      $session->set('list'.$listName.'-maxResults', $maxResults);
+    }
+    if($filters!=[]){
+      $session->set('list'.$listName.'-filters', $filters);
+    }else{
+      $filters=$session->get('list'.$listName.'-filters',[]);
     }
 
     $queryFiltered = $repository->createQueryBuilder('p')->select('count(p.id)');
