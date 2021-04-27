@@ -24,7 +24,6 @@ class GlobaleListUtils
 		$query = $repository->createQueryBuilder('p');
 
     if($maxResults===NULL){
-        dump($request->query->getInt('length'));
         $query->setFirstResult($request->query->getInt('start', 0));
         $query->setMaxResults($request->query->getInt('length', 20));
         //$session->set('list'.$listName.'-start', $request->query->getInt('start'));
