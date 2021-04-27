@@ -18,27 +18,36 @@ class GlobaleListUtils
     public function getRecords($user,$repository,$request,$manager,$listFields,$classname,$filters=[],$raw=[],$maxResults=null,$orderBy="id",$doctrine=null): array
     {
     $listName=$request->attributes->get('name');
-    $session = new Session();
+    //$session = new Session();
 
 		$return=array();
 		$query = $repository->createQueryBuilder('p');
 
     if($maxResults===NULL){
+        dump($request->query->getInt('length'));
         $query->setFirstResult($request->query->getInt('start', 0));
         $query->setMaxResults($request->query->getInt('length', 20));
-        if($request->query->getInt('length')!=null){
-          $session->set('list'.$listName.'-maxResults', $request->query->getInt('length'));
-        }
+        //$session->set('list'.$listName.'-start', $request->query->getInt('start'));
+        //$session->set('list'.$listName.'-length', $request->query->getInt('length'));
+
     }else if($maxResults>=0){
       $query->setFirstResult($request->query->getInt('start', 0));
       $query->setMaxResults($maxResults);
-      $session->set('list'.$listName.'-maxResults', $maxResults);
+      //$session->set('list'.$listName.'-length', $request->query->getInt('length', 20));
+      //$session->set('list'.$listName.'-start', $request->query->getInt('start', 0));
     }
-    if($filters!=[]){
-      $session->set('list'.$listName.'-filters', $filters);
-    }else{
+
+
+    //SESSION GLOBAL FILTERS CONTROLLER
+    if($filters==[]){
       $filters=$session->get('list'.$listName.'-filters',[]);
+    }else if(count($filters)==1 && array_key_exists("company", $filters[0]) && $filters[0]["company"]==$user->getCompany()){
+      $filters=array_merge($session->get('list'.$listName.'-filters',[]),$filters);
+      //$session->set('list'.$listName.'-filters', $filters);
+    }else{
+      //$session->set('list'.$listName.'-filters', $filters);
     }
+
 
     $queryFiltered = $repository->createQueryBuilder('p')->select('count(p.id)');
     $queryTotal = $repository->createQueryBuilder('p')->select('count(p.id)');

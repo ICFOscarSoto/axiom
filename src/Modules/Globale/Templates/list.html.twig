@@ -4,20 +4,128 @@
 	{% endfor %}
 {% endif %}
 
-{% set session_MaxResults = app.session.get(listConstructor.id ~ '-maxResults') %}
-{% dump(listConstructor.id ~ '-maxResults') %}
-{% dump(app.session) %}
-
 <input type="hidden" id="search_param"/>
 <script>
+var url = new URL(window.location.href);
+			function insertParam(key, value) {
+			    key = encodeURIComponent(key);
+			    value = encodeURIComponent(value);
+
+			    // kvp looks like ['key1=value1', 'key2=value2', ...]
+			    var kvp = document.location.search.substr(1).split('&');
+			    let i=0;
+
+			    for(; i<kvp.length; i++){
+			        if (kvp[i].startsWith(key + '=')) {
+			            let pair = kvp[i].split('=');
+			            pair[1] = value;
+			            kvp[i] = pair.join('=');
+			            break;
+			        }
+			    }
+
+			    if(i >= kvp.length){
+			        kvp[kvp.length] = [key,value].join('=');
+			    }
+
+			    // can return this or...
+			    let params = kvp.join('&');
+
+			    // reload page with new params
+			    document.location.search = params;
+			}
+
+			function updateURLParameter(url, param, paramVal)
+{
+    var TheAnchor = null;
+    var newAdditionalURL = "";
+    var tempArray = url.split("?");
+    var baseURL = tempArray[0];
+    var additionalURL = tempArray[1];
+    var temp = "";
+
+    if (additionalURL)
+    {
+        var tmpAnchor = additionalURL.split("#");
+        var TheParams = tmpAnchor[0];
+            TheAnchor = tmpAnchor[1];
+        if(TheAnchor)
+            additionalURL = TheParams;
+
+        tempArray = additionalURL.split("&");
+
+        for (var i=0; i<tempArray.length; i++)
+        {
+            if(tempArray[i].split('=')[0] != param)
+            {
+                newAdditionalURL += temp + tempArray[i];
+                temp = "&";
+            }
+        }
+    }
+    else
+    {
+        var tmpAnchor = baseURL.split("#");
+        var TheParams = tmpAnchor[0];
+            TheAnchor  = tmpAnchor[1];
+
+        if(TheParams)
+            baseURL = TheParams;
+    }
+
+    if(TheAnchor)
+        paramVal += "#" + TheAnchor;
+
+    var rows_txt = temp + "" + param + "=" + paramVal;
+    return baseURL + "?" + newAdditionalURL + rows_txt;
+}
+
 			$(document).ready(function() {
+
 				var ${{ listConstructor.id }}_var = jQuery("#{{ listConstructor.id }}");
 				var {{ listConstructor.id }} = ${{ listConstructor.id }}_var.DataTable( {
 					"aLengthMenu": [[10, 20, 50, 250], [10, 20, 50, 250]],
-					"pageLength": {% if session_MaxResults is not null %}{{ session_MaxResults }}{% else %}20{% endif %},
+					"pageLength": (url.searchParams.get('length')?url.searchParams.get('length')*1:20),
 					"oClasses":{
 						"sLengthSelect": "select2"
 					},
+					"searchCols": [
+						null,
+						{% for field in listConstructor.fields %}
+
+							{% if field.type is defined and field.type == "date" %}
+								{% set searchdate='' %}
+
+								{% if app.request.get('s_' ~ field.name ~ '_from') != null %}
+									{% set searchdate=app.request.get('s_' ~ field.name ~ '_from') ~ '#' %}
+								{% endif %}
+
+								{% if app.request.get('s_' ~ field.name ~ '_to') != null %}
+									{% if searchdate == '' %}
+										{% set searchdate = '#' %}
+									{% endif %}
+									{% set searchdate=searchdate ~ app.request.get('s_' ~ field.name ~ '_to') %}
+								{% endif %}
+								{% if searchdate != '' %}
+									{ "search": "{{ searchdate }}" },
+								{% else %}
+									null,
+								{% endif %}
+							{% else %}
+
+								{% if app.request.get('s_' ~ field.name) != null %}
+									{ "search": "{{ app.request.get('s_' ~ field.name) }}" },
+								{% else %}
+									null,
+								{% endif %}
+
+							{% endif %}
+
+						{% endfor %}
+
+					],
+
+					"displayStart": (url.searchParams.get('start')?url.searchParams.get('start')*1:0),
 					//"processing": true,
 					"serverSide": true,
 					{% if listConstructor.routeParams is defined %}
@@ -244,6 +352,10 @@
 				}).on( 'processing.dt', function ( e, settings, processing ) {
 					if(processing){
 						if((++load_wait)==1) $("#load-spinner").fadeIn();
+						/*url = new URL(window.location.href);
+						url.searchParams.set('start', $("#{{ listConstructor.id }}").DataTable().page.info().start);
+						window.history.replaceState(null, null, url);*/
+						//window.history.replaceState('', '', updateURLParameter(window.location.href, "start", $("#{{ listConstructor.id }}").DataTable().page.info().start*1));
 					 }else{
 						if((load_wait)>0){ load_wait--; if(load_wait==0) $("#load-spinner").fadeOut();}
 					}
@@ -256,7 +368,14 @@
 		    })
 		    .on( 'draw.dt', function () {
 		      if((load_wait)>0){ load_wait--; if(load_wait==0) $("#load-spinner").fadeOut();}
-		    });
+
+		    })
+				.on( 'page.dt', function () {
+					window.history.replaceState('', '', updateURLParameter(window.location.href, "start", $("#{{ listConstructor.id }}").DataTable().page.info().start));
+				})
+				.on( 'length.dt', function () {
+					window.history.replaceState('', '', updateURLParameter(window.location.href, "length", $("#{{ listConstructor.id }}").DataTable().page.info().length));
+				});;
 
 				//Double click row action
 				$('#{{ listConstructor.id }} tbody').on('dblclick', 'tr', function () {
@@ -298,6 +417,16 @@
 				function doSearch () {
 					{{ listConstructor.id }}.columns(searchColumn+':name').search( $("#s_"+searchColumn).val() ).draw();
 					arrayParams={{ listConstructor.id }}.ajax.params();
+					$("[id^='s_']" ).each(function( index ) {
+						url = new URL(window.location.href);
+						if($(this).val()!=""){
+							url.searchParams.set($(this).attr('id'), $(this).val());
+						}
+							else url.searchParams.delete($(this).attr('id'));
+						window.history.replaceState(null, null, url);
+					});
+
+					window.history.replaceState('', '', updateURLParameter(window.location.href, "start", 0));
 					$("#search_param").val(jQuery.param(arrayParams));
 				}
 
@@ -308,6 +437,11 @@
 							{{ listConstructor.id }}.columns('{{ field.name }}:name').search( this.value ).draw();
 							arrayParams={{ listConstructor.id }}.ajax.params();
 							$("#search_param").val(jQuery.param(arrayParams));
+							console.log($("#s_{{ field.name }}").val());
+							url = new URL(window.location.href);
+							url.searchParams.set("s_{{ field.name }}",$("#s_{{ field.name }}").val());
+							window.history.replaceState(null, null, url);
+
 						});
 					{% else %}
 						if($("#s_{{ field.name }}").is('select')) event="change"; else event="keyup";
@@ -378,9 +512,9 @@
 									{% if field.replace is defined %}
 									  {# Show combo box on replaces #}
 										<select id="s_{{ field.name }}" class="form-control table-header-search-input select2 select2-use">
-											<option value="##ALL##">Todos</option>
+											<option value="##ALL##" {% if app.request.get('s_' ~ field.name)!=null and app.request.get('s_' ~ field.name)=='##ALL##' %} selected="selected" {% endif %}>Todos</option>
 											{% for key,option in field.replace %}
-												<option value="{{ key }}" {% if option.default is defined and option.default == true%} attr-default="true" selected="selected" {% endif %}>{{ option.text }}</option>
+												<option value="{{ key }}"{% if app.request.get('s_' ~ field.name)!=null %}{% if app.request.get('s_' ~ field.name) == (key ~ '') %} selected="selected" {% endif %}{% else %}{% if option.default is defined and option.default == true%} attr-default="true" selected="selected" {% endif %}{% endif %}>{{ option.text }}</option>
 											{% endfor %}
 
 										</select>
@@ -405,11 +539,22 @@
 													});
 												</script>#}
 													<input id="s_{{ field.name }}" type="text" class="table-header-search-input form-control" placeholder="Buscar {{ (field.caption)|trans }}"  autocomplete="off"/>
+													<script>
+														$(document).ready(function() {
+														if(url.searchParams.get('s_{{ field.name }}')!=null)
+															$("#s_{{ field.name }}").val(url.searchParams.get('s_{{ field.name }}'));
+														});
+													</script>
 										{% else %}
 									   	{# Other fields show inputs #}
 
 											<input id="s_{{ field.name }}" type="text" class="table-header-search-input form-control" placeholder="Buscar {{ (field.caption)|trans }}"  autocomplete="off"/>
-
+											<script>
+													if(url.searchParams.get('s_{{ field.name }}')!=null)
+														$(document).ready(function() {
+															$("#s_{{ field.name }}").val(url.searchParams.get('s_{{ field.name }}'));
+														});
+											</script>
 										{% endif %}
 									{% endif %}
 								{% endif %}
@@ -418,33 +563,35 @@
 							<th class="table-header-search" style="border-bottom: 1px solid #cecece !important;">
 								{% if field.type == "datetime" %}
 									<div><div style="z-index: 5 !important;" class='input-group date'>
-												<input id="s_{{ field.name }}_from" attr-group="{{ field.name }}" attr-max="s_{{ field.name }}_to" type="text" class="datetimepicker table-header-search-input form-control" placeholder="{{ (field.caption)|trans }} desde"  autocomplete="off"/>
+												<input id="s_{{ field.name }}_from" attr-group="{{ field.name }}" attr-max="s_{{ field.name }}_to" type="text" class="datetimepicker table-header-search-input form-control" placeholder="{{ (field.caption)|trans }} desde" value="{% if app.request.get('s_' ~ field.name ~ '_from')!=null %}{{ app.request.get('s_' ~ field.name ~ '_from')|date("d/m/Y H:i:s") }}{% endif %}" autocomplete="off"/>
 												<span class="input-group-addon">
                         	<span class="glyphicon glyphicon-calendar"></span>
                     		</span>
 										</div></div>
 									<div style="height: 5px;"></div>
 									<div><div style="z-index: 2 !important;" class='input-group date'>
-										<input id="s_{{ field.name }}_to" attr-group="{{ field.name }}" attr-min="s_{{ field.name }}_from" type="text" class="datetimepicker table-header-search-input form-control" placeholder="{{ (field.caption)|trans }} hasta"  autocomplete="off"/>
+										<input id="s_{{ field.name }}_to" attr-group="{{ field.name }}" attr-min="s_{{ field.name }}_from" type="text" class="datetimepicker table-header-search-input form-control" placeholder="{{ (field.caption)|trans }} hasta" value="{% if app.request.get('s_' ~ field.name ~ '_to')!=null %}{{ app.request.get('s_' ~ field.name ~ '_to')|date("d/m/Y H:i:s") }}{% endif %}" autocomplete="off"/>
 										<span class="input-group-addon">
 											<span class="glyphicon glyphicon-calendar"></span>
 										</span>
 									</div></div>
+
 									{% else %}
 									{% if field.type == "date" %}
 										<div><div style="z-index: 5 !important;" class='input-group date'>
-													<input id="s_{{ field.name }}_from" attr-group="{{ field.name }}" attr-max="s_{{ field.name }}_to" type="text" class="datepicker table-header-search-input form-control" placeholder="{{ (field.caption)|trans }} desde"  autocomplete="off"/>
+													<input id="s_{{ field.name }}_from" attr-group="{{ field.name }}" attr-max="s_{{ field.name }}_to" type="text" class="datepicker table-header-search-input form-control" placeholder="{{ (field.caption)|trans }} desde" value="{% if app.request.get('s_' ~ field.name ~ '_from')!=null %}{{ app.request.get('s_' ~ field.name ~ '_from')|date("d/m/Y") }}{% endif %}" autocomplete="off"/>
 													<span class="input-group-addon">
 														<span class="glyphicon glyphicon-calendar"></span>
 													</span>
 											</div></div>
 										<div style="height: 5px;"></div>
 										<div><div style="z-index: 2 !important;" class='input-group date'>
-											<input id="s_{{ field.name }}_to" attr-group="{{ field.name }}" attr-min="s_{{ field.name }}_from" type="text" class="datepicker table-header-search-input form-control" placeholder="{{ (field.caption)|trans }} hasta"  autocomplete="off"/>
+											<input id="s_{{ field.name }}_to" attr-group="{{ field.name }}" attr-min="s_{{ field.name }}_from" type="text" class="datepicker table-header-search-input form-control" placeholder="{{ (field.caption)|trans }} hasta" value="{% if app.request.get('s_' ~ field.name ~ '_to')!=null %}{{ app.request.get('s_' ~ field.name ~ '_to')|date("d/m/Y") }}{% endif %}" autocomplete="off"/>
 											<span class="input-group-addon">
 												<span class="glyphicon glyphicon-calendar"></span>
 											</span>
 										</div></div>
+
 									{% endif %}
 								{% endif %}
 							</th>
@@ -557,6 +704,13 @@
 				$("#{{ listConstructor.id }}").DataTable().columns($(this).attr('attr-group')+':name').search( from_date+'#'+to_date ).draw();
 				arrayParams=$("#{{ listConstructor.id }}").DataTable().ajax.params();
 				$("#search_param").val(jQuery.param(arrayParams));
+
+				url = new URL(window.location.href);
+				if(from_date+'#'+to_date!="#")
+					url.searchParams.set($(this).attr('id'), from_date);
+					else url.searchParams.delete($(this).attr('id'));
+				window.history.replaceState(null, null, url);
+
 		});
 		$("[id$='_to']").on("dp.change", function (e) {
 				var to_date=e.date;
@@ -571,12 +725,23 @@
 				$("#{{ listConstructor.id }}").DataTable().columns($(this).attr('attr-group')+':name').search( from_date+'#'+to_date ).draw();
 				arrayParams=$("#{{ listConstructor.id }}").DataTable().ajax.params();
 				$("#search_param").val(jQuery.param(arrayParams));
+
+				url = new URL(window.location.href);
+				if(from_date+'#'+to_date!="#")
+					url.searchParams.set($(this).attr('id'), to_date);
+					else url.searchParams.delete($(this).attr('id'));
+				window.history.replaceState(null, null, url);
 		});
 
 		$('body').on('click', "#clear-filters", function() {
 				$("#clear-filters").parent().parent().parent().find('input').val('');
 				$("#clear-filters").parent().parent().parent().find('select').select2('val', $(this).find(">:first-child").val());
 				//$('#s_invalid').select2('val', $('#s_invalid option:first-child').val());
+				url = new URL(window.location.href);
+				{% for field in listConstructor.fields %}
+				url.searchParams.delete('s_{{ field.name }}');
+				{% endfor %}
+				window.history.replaceState(null, null, url);
 				$("#{{ listConstructor.id }}").DataTable().columns().search("").draw();
 				//$("#{{ listConstructor.id }}").DataTable().ajax.reload();
 

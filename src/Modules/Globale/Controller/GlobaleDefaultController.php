@@ -71,7 +71,7 @@ class GlobaleDefaultController extends Controller
 		$formUtils->initialize($this->getUser(), new $class(), dirname(__FILE__)."/../../".$module."/Forms/".$name.".json", $request, $this, $this->getDoctrine());
 		$templateForms[]=$formUtils->formatForm($name, true, null, $class,null,["module"=>$module, "name"=>$name]);
 		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
-			return $this->render('@Globale/genericlist.html.twig', [
+			$response = $this->render('@Globale/genericlist.html.twig', [
 				'controllerName' => $name.'Controller',
 				'interfaceName' => $this->get('translator')->trans($name),
 				'optionSelected' => $request->attributes->get('_route'),
@@ -90,6 +90,9 @@ class GlobaleDefaultController extends Controller
                              ["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.js"],
                              ["type"=>"css", "path"=>"/css/timeline.css"]]
 				]);
+        $response->headers->set('Cache-Control', 'must-revalidate, no-store, no-cache, private');
+        return $response;
+
 		}
 		return new RedirectResponse($this->router->generate('app_login'));
     }
