@@ -39,9 +39,9 @@ class GlobaleListUtils
 
     //SESSION GLOBAL FILTERS CONTROLLER
     if($filters==[]){
-      $filters=$session->get('list'.$listName.'-filters',[]);
+      //$filters=$session->get('list'.$listName.'-filters',[]);
     }else if(count($filters)==1 && array_key_exists("company", $filters[0]) && $filters[0]["company"]==$user->getCompany()){
-      $filters=array_merge($session->get('list'.$listName.'-filters',[]),$filters);
+      //$filters=array_merge($session->get('list'.$listName.'-filters',[]),$filters);
       //$session->set('list'.$listName.'-filters', $filters);
     }else{
       //$session->set('list'.$listName.'-filters', $filters);
