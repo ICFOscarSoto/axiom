@@ -1,6 +1,9 @@
 [
   {"name": "id", "caption":""},
   {
+      "name" :"code","caption":"Nº de Ticket"
+  },
+  {
       "name" :"customername","caption":"Cliente"
   },
   {
@@ -13,12 +16,14 @@
       "name" :"externalsalesordernumber","caption":"Nº de pedido externo"
   },
   {
-      "name" :"dateadd","caption":"Fecha del Ticket"
+      "name" :"dateadd",
+      "caption":"Fecha de creación",
+      "type": "datetime"
   },
   {
       "name" :"salesticketstate__name","caption":"Estado del Ticket"
   },
   {
-      "name" :"agent__name","caption":"Agente"
+      "name" :"agent__name_o_agent__lastname","caption":"Agente"
   }
 ]

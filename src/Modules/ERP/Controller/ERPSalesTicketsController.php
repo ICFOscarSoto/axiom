@@ -88,6 +88,11 @@ class ERPSalesTicketsController extends Controller
 				else return $this->redirectToRoute($request->get('_route'), ['id' => 0]);
 			}
 
+			$code="";
+			if($id==0){
+				$newid=$salesticketsRepository->getLastID()+1;
+				$code="#".date("Y")."000".$newid;
+			}
 
 			 //Search Customers
 	 		$classCustomersUtils="\App\Modules\ERP\Utils\ERPCustomersUtils";
@@ -140,7 +145,7 @@ class ERPSalesTicketsController extends Controller
 			$agents[]=$option;
 			foreach($agent_objects as $item){
 				$option["id"]=$item->getId();
-				$option["text"]=$item->getName();
+				$option["text"]=$item->getName()." ".$item->getLastname();
 				$agents[]=$option;
 			}
 
@@ -168,6 +173,7 @@ class ERPSalesTicketsController extends Controller
 					'salesticket' => $salesticket,
 					'salesticketshistorylist' => $listSalesTicketsHistory->formatListByTicket($id),
 					'id' => $id,
+					'code' => $code,
 					]);
 			}
 			return new RedirectResponse($this->router->generate('app_login'));
@@ -201,12 +207,13 @@ class ERPSalesTicketsController extends Controller
 		$salesticketstate=$salesticketsstatesRepository->findOneBy(["id"=>$fields->salesticketstate, "active"=>1, "deleted"=>0]);
 	 //	if(!$customer) return new JsonResponse(["result"=>0]); //if no customer, do nothing
 
-
+		$newid=$salesticketsRepository->getLastID()+1;
 	 	if(!$salesticket){
 	 		$salesticket=new ERPSalesTickets();
 	 		$salesticket->setActive(1);
 	 		$salesticket->setDeleted(0);
 	 		$salesticket->setDateadd(new \DateTime());
+			$salesticket->setCode("#".date("Y")."000".$newid);
 	 	}
 
  		if($fields->salesticketnewagent!=""){
@@ -236,7 +243,7 @@ class ERPSalesTicketsController extends Controller
 
 	if($fields->salesticketnewagent!=""){
 		if($id==0){
-				$newid=$salesticketsRepository->getLastID()+1;
+
 				$newagent=$agentsRepository->findOneBy(["id"=>$fields->salesticketnewagent, "active"=>1, "deleted"=>0]);
 				$channel=$newagent->getDiscordchannel();
 				$msg=$this->getUser()->getName()." ha solicitado que gestiones la incidencia Nº **".$newid."**";

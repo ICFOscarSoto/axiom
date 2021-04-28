@@ -1,8 +1,12 @@
 [
   {"name": "id", "caption":"Ticket History", "width" : "50"},
-  {"name": "dateadd", "caption":"Fecha", "width" : "50"},
+  {"name": "dateadd",
+    "caption":"Fecha",
+    "width" : "50",
+    "type": "datetime"
+  },
   {"name": "salesticketstate__name", "caption":"Estado", "width" : "50"},
   {"name": "observations", "caption":"Observaciones", "width" : "50"},
-  {"name": "agent__name", "caption":"Agente", "width" : "50"}
+  {"name": "agent__name_o_agent__lastname", "caption":"Agente", "width" : "50"}
 
 ]
