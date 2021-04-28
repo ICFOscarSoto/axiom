@@ -498,14 +498,19 @@ class ERPProductsController extends Controller
 	 $code="";
 	 $barcode="0000000000000";
 	 $name="";
+	 $noValidate=false;
 	 if($type==1){
 		 $ean=$repository->findOneBy(["id"=>$id]);
 		 if($ean){
 			 $code=$ean->getProduct()->getCode();
 			 $barcode=$ean->getName();
 			 $name=$ean->getProduct()->getName();
+			 if ($ean->getCustomer())
+			  	if ($ean->getCustomer()->getCode()=='C01448') $noValidate=true;
+					else $noValidate=false;
+			else $noValidate=false;
 		 }
-		 $params=["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "code"=>$code, "barcode"=>$barcode, "name"=>$name, "user"=>$this->getUser()];
+		 $params=["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "code"=>$code, "barcode"=>$barcode, "name"=>$name, "user"=>$this->getUser(), "noValidate"=>$noValidate];
  	 }else if($type==2){
 		 $product=$repositoryProduct->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany()]);
 	 		if($product){
@@ -513,7 +518,7 @@ class ERPProductsController extends Controller
 	 			$barcode='P.'.str_pad($product->getId(),8,'0', STR_PAD_LEFT);
 	 			$name=$product->getName();
 			}
-			$params=["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "code"=>$code, "barcode"=>$barcode, "name"=>$name, "user"=>$this->getUser()];
+			$params=["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "code"=>$code, "barcode"=>$barcode, "name"=>$name, "user"=>$this->getUser(), "noValidate"=>$noValidate];
 	 }
 	 $reportsUtils = new ERPEan13Reports();
 	 $pdf=$reportsUtils->create($params);

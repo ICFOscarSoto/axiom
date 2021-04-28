@@ -23,8 +23,8 @@ use App\Modules\Globale\Reports\GlobaleReports;
 
 class PDF_EAN13 extends \FPDF
 {
-  function EAN13($x, $y, $barcode, $h=16, $w=.35){
-	   $this->Barcode($x,$y,$barcode,$h,$w,13);
+  function EAN13($x, $y, $barcode, $h=16, $w=.35, $noValidate){
+	   $this->Barcode($x,$y,$barcode,$h,$w,13,$noValidate);
   }
 
   function UPC_A($x, $y, $barcode, $h=16, $w=.35){
@@ -54,7 +54,7 @@ class PDF_EAN13 extends \FPDF
   	return ($sum+$barcode[12])%10==0;
   }
 
-  function Barcode($x, $y, $barcode, $h, $w, $len){
+  function Barcode($x, $y, $barcode, $h, $w, $len, $noValidate){
   	//Padding
   	$barcode=str_pad($barcode,$len-1,'0',STR_PAD_LEFT);
   	if($len==12)
@@ -62,7 +62,7 @@ class PDF_EAN13 extends \FPDF
   	//Add or control the check digit
   	if(strlen($barcode)==12)
   		$barcode.=$this->GetCheckDigit($barcode);
-  	elseif(!$this->TestCheckDigit($barcode))
+  	elseif(!$this->TestCheckDigit($barcode) and $noValidate==false)
   		$this->Error('Incorrect check digit');
   	//Convert digits to bars
   	$codes=array(
@@ -259,7 +259,7 @@ class ERPEan13Reports{
     setlocale( LC_NUMERIC, 'es_ES' );
 
 
-      if(!$this->TestCheckDigit($params["barcode"])){
+      if(!$this->TestCheckDigit($params["barcode"]) and $params["noValidate"]==false){
          //$this->pdf = new PDF_Code39('L','mm',array(36,62));
          $this->pdf = new PDF_417('L','mm',array(36,62));
        }else{
@@ -271,14 +271,14 @@ class ERPEan13Reports{
         $this->pdf->SetFont('Arial','',12);
         //$this->pdf->Image($params["rootdir"].DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$params["user"]->getCompany()->getId().DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'company'.DIRECTORY_SEPARATOR.'logoEAN.png', 2, 6, 13, 13);
 
-        if(!$this->TestCheckDigit($params["barcode"])){
+        if(!$this->TestCheckDigit($params["barcode"]) and $params["noValidate"]==false){
 
           //     $this->pdf->Code39(2,3,$params["barcode"],0.5,20);
             $this->pdf->pdf417($params);
             $this->pdf->Image($params["rootdir"].DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$params["user"]->getCompany()->getId().DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'company'.DIRECTORY_SEPARATOR.'logoEAN.png',53, 11, 7, 7);
         }else{
          $this->pdf->Image($params["rootdir"].DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$params["user"]->getCompany()->getId().DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'company'.DIRECTORY_SEPARATOR.'logoEAN.png', 47, 6, 14, 14);
-         $this->pdf->EAN13(6,5,$params["barcode"],16,.40);
+         $this->pdf->EAN13(6,5,$params["barcode"],16,.40, $params["noValidate"]);
        }
         //$this->pdf->SetY(-9.5);
         $this->pdf->SetY(-9.5);
