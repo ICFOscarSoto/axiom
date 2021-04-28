@@ -91,7 +91,10 @@ class ERPSalesTicketsController extends Controller
 			$code="";
 			if($id==0){
 				$newid=$salesticketsRepository->getLastID()+1;
-				$code="#".date("Y")."000".$newid;
+				if($newid<10) $code="#".date("Y")."0000".$newid;
+				else if($newid<100) $code="#".date("Y")."000".$newid;
+				else if($newid<1000) $code="#".date("Y")."00".$newid;
+				else if($newid<10000) $code="#".date("Y")."0".$newid;
 			}
 
 			 //Search Customers
@@ -213,7 +216,11 @@ class ERPSalesTicketsController extends Controller
 	 		$salesticket->setActive(1);
 	 		$salesticket->setDeleted(0);
 	 		$salesticket->setDateadd(new \DateTime());
-			$salesticket->setCode("#".date("Y")."000".$newid);
+			if($newid<10) $salesticket->setCode("#".date("Y")."0000".$newid);
+			else if($newid<100) $salesticket->setCode("#".date("Y")."000".$newid);
+			else if($newid<1000) $salesticket->setCode("#".date("Y")."00".$newid);
+			else if($newid<10000) $salesticket->setCode("#".date("Y")."0".$newid);
+
 	 	}
 
  		if($fields->salesticketnewagent!=""){
