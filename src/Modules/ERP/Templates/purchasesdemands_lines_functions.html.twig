@@ -24,14 +24,13 @@
         ' <div class="col-2 d-block d-sm-none" style="top: 8px;left: 5px;">Variantes</div>'+
         '<div class="col-3 col-md-1"> <div class="form-group" style="margin-bottom: 0px;"> <select attr-id="" id="product-form-variants-'+numLines+'" class="form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Variantes"></select> </div> </div>'+
         '<div class="col-2 d-block d-sm-none" style="top: 8px;left: 5px;">Proveedor</div>'+
-        '<div class="col-3 col-md-1"> <div class="form-group" style="margin-bottom: 0px;"> <select attr-id="" id="product-form-suppliers-'+numLines+'" class="form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Proveedor"></select> </div> </div>'+
-        '<div class="col-2 d-block d-sm-none" style="top: 8px;left: 5px;">Razón</div>'+
-        '<div class="col-8 col-sm-2"> <div class="form-group" style="margin-bottom: 0px;"> <select attr-id="" id="product-form-reasons-'+numLines+'" class="form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Razón"></select> </div> </div>'+
+        '<div class="col-3 col-md-2"> <div class="form-group" style="margin-bottom: 0px;"> <select attr-id="" id="product-form-suppliers-'+numLines+'" class="form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Proveedor"></select> </div> </div>'+
+        '<div class="col-2 d-block d-sm-none" style="top: 8px;left: 5px;">Motivo</div>'+
+        '<div class="col-8 col-sm-1"> <div class="form-group" style="margin-bottom: 0px;"> <select attr-id="" id="product-form-reasons-'+numLines+'" class="form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Razón"></select> </div> </div>'+
         '<div class="col-2 d-block d-sm-none" style="top: 8px;left: 5px;">Agente</div>'+
         '<div class="col-3 col-md-1"> <div class="form-group" style="margin-bottom: 0px;"><input type="hidden" id="product-form-agentid-'+numLines+'"><input type="text" readonly attr-id="'+numLines+'" id="product-form-agent-'+numLines+'" class="recalculate form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Agente"> </div> </div>'+
         '<div class="col-2 d-block d-sm-none" style="top: 8px;left: 5px;">Cantidad</div>'+
         '<div class="col-3 col-md-1"> <div class="form-group" style="margin-bottom: 0px;"><input type="text" attr-id="'+numLines+'" value=1 id="product-form-quantity-'+numLines+'" class="recalculate form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Cantidad"> </div> </div>'+
-        '<div class="form-group" style="margin: 3px 0 0 3px;"><div class="input-group"> <button attr-id="'+numLines+'" id="product-form-send-'+numLines+'" type="button" class=" btn btn-info tooltip-primary" data-toggle="tooltip" data-placement="bottom" title="" data-original-title=" Añadir a pedido de compra "><i class="fa fa-shopping-cart" aria-hidden="true"></i></button></div></div>'+
         '</div>');
         purchasesdemandsLines.attr("attr-numlines", numLines);
         numerateLines();
@@ -41,22 +40,54 @@
   //    }
     }
 
-
+/*
     function removePurchasesDemandsLine(numLine){
-    //  var workListLines=$("#worklist-lines");
-    //  var numLines=parseInt(worklistLines.attr("attr-numlines"));
-    //  if(numLines!=numLine){
-         //$("#document-line-"+numLine).remove();
-         $("#purchasesdemands-line-"+numLine).addClass("deleted");
+           code=$("#product-form-reject-code-"+numline).val();
+           reason=$("#product-reject-reason-"+numline).val();
+           rejectNotificaction(code,reason);
+           $("#purchasesdemands-line-"+numLine).addClass("deleted");
+           $("#purchasesdemands-line-"+numLine).fadeOut();
+           $("#purchasesdemands-line-"+numLine).attr("id","purchasesdemands-line-deleted");
+    }*/
 
-         $("#purchasesdemands-line-"+numLine).fadeOut();
-         $("#purchasesdemands-line-"+numLine).attr("id","purchasesdemands-line-deleted");
-         //documentLines.attr("attr-numlines",numLines);
-         //numerateLines();
-    //  }
-        saveLines();
-        numerateLines();
-      //  saveLines();
+
+    function rejectProductNotification(agent,code,reason)
+    {
+      if((++load_wait)==1) $("#load-spinner").fadeIn();
+      var data={agent: agent, code: code, reason: reason};
+      $.ajax({
+         type: "POST",
+         dataType: "json",
+         data: JSON.stringify(data),
+         url: "/api/ERP/purchasesdemands/rejectProductNotification",
+       }).done(function(data, textStatus, jqXHR) {
+         if((--load_wait)==0) $("#load-spinner").fadeOut();
+         if(data.result) toastr.success("Datos guardados correctamente", "Confirmación", confirmation);
+          else toastr.error("Ocurrió un error al guardar los datos", "Confirmación", confirmation);
+
+     });
+
+    }
+
+    function saveLines()
+    {
+      $.ajax({
+         url: '{{ url('dataERPPurchasesDemands') }}',
+         type: 'POST',
+         data: JSON.stringify(prepare_purchasesdemands_json()),
+         success:  function( data ) {
+           if((--load_wait)==0) $("#load-spinner").fadeOut();
+           if(data.result){
+             jQuery.each(data.data.lines, function(i, line) {
+               $("#product-form-line-id-"+line.linenum).val(line.id);
+             });
+             toastr.success("Lista guardada correctamente", "Confirmación", confirmation);
+             location.reload();
+           } else {
+             toastr.error("No se pudo guardar la lista", "Confirmación", confirmation);
+           }
+         }
+       });
 
     }
 
@@ -90,6 +121,8 @@
       });
       purchasesdemandsLines.attr("attr-numlines", i);
     }
+
+
 
     function findPurchaseOrder(id){
       var productid=$("#product-form-id-"+id).val();

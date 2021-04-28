@@ -30,6 +30,7 @@
 	{{ include('@ERP/purchasesdemands_search_product.html.twig') }}
 	{{ include('@ERP/purchasesdemands_prepare_json.html.twig') }}
 	{{ include('@ERP/purchasesdemands_validation.html.twig') }}
+	{{ include('@ERP/purchasesdemands_reject_product.html.twig') }}
   <div class="row">
     <div class="col-md-4">
       <button attr-id="" attr-action="" id="purchasesdemands-button-cancel" type="button" class="btn btn">Cancelar</button>
@@ -90,8 +91,67 @@
 
      });
 		$('body').on('click', "[id^='product-form-send-']", function(e) {
-
 			findPurchaseOrder($(this).attr("attr-id"));
+		});
+
+		$('body').on('click', "[id^='product-form-reject-']", function(e) {
+			numline=$(this).attr("attr-id");
+			code=$("#product-form-code-"+numline).val();
+			$("#product-reject-modal-form").attr("attr-id",$(this).attr("attr-id"));
+	    $("#product-reject-modal-form").modal('show');
+			$("#product-reject-modal-form").append(
+			'<div class="modal-dialog modal-lg">'+
+			'<div class="modal-content" style="transform: matrix(1, 0, 0, 1, 0, 0);">'+
+			'<div class="modal-header">'+
+			'<h4 class="modal-title">Rechazar producto '+code+'</h4>'+
+			'</div>'+
+			'<div id="product-reject-modal-form-body" style="padding: 0px 10px;">'+
+			'<div class="row">'+
+			'<div class="col-6 col-sm-6">'+
+			'<div class="form-group">'+
+			'<input type="hidden" id="product-form-reject-code-'+numline+'" value="'+code+'">'+
+			'<label for="product-reject-reason">Motivo</label>'+
+			'<textarea id="product-reject-reason-'+numline+'" name="product-reject-reason" class="form-control" style="min-height:40px;"></textarea>'+
+			'</div>'+
+			'</div>'+
+			'</div>'+
+			'</div>'+
+			'<div id="product-reject-modal-form-buttons" style="padding: 0px 10px;">'+
+			'<div class="row">'+
+			'<div class="col-6 col-sm-6">'+
+			'<div class="form-group">'+
+			'<button attr-id="" attr-action="" id="product-reject-button-cancel-'+numline+'" type="button" class="btn btn">Cancelar</button>'+
+			'<button attr-id="'+numline+'" attr-action=""  id="product-reject-button-save-'+numline+'" type="button" class="btn btn-green">Aceptar</button>'+
+			'</div>'+
+			'</div>'+
+			'</div>'+
+			'</div>'+
+			'<br>'+
+			'</div>'+
+			'<div>');
+
+		});
+
+		$('body').on('click', "[id^='product-reject-button-save-']", function(e) {
+		  	agent=$("#product-form-agentid-"+numline).val();
+				code=$("#product-form-reject-code-"+numline).val();
+				reason=$("#product-reject-reason-"+numline).val();
+				rejectProductNotification(agent,code,reason);
+				$("#purchasesdemands-line-"+numLine).addClass("deleted");
+				$("#purchasesdemands-line-"+numLine).fadeOut();
+				$("#purchasesdemands-line-"+numLine).attr("id","purchasesdemands-line-deleted");
+				saveLines();
+        numerateLines();
+				$("#product-reject-modal-form").modal('toggle');
+				$("#product-reject-modal-form").empty();
+			//	removePurchasesDemandsLine($(this).attr('attr-id'));
+		});
+
+
+		$('body').on('click', "[id^='product-reject-button-cancel-']", function(e) {
+			$("#product-reject-modal-form").modal('toggle');
+				$("#product-reject-modal-form").empty();
+
 		});
 	});
   </script>

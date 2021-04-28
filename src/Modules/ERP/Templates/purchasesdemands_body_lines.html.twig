@@ -10,8 +10,8 @@
       <div class="col-sm-2 d-none d-sm-block" style="font-weight:bold;font-size:13px;padding: 7px 2px;">Cod. Producto</div>
       <div class="col-sm-3 d-none d-sm-block" style="font-weight:bold;font-size:13px;padding: 7px 2px;">Descripción</div>
       <div class="col-sm-1 d-none d-sm-block" style="font-weight:bold;font-size:13px;padding: 7px 2px;">Variante</div>
-      <div class="col-sm-1 d-none d-sm-block" style="font-weight:bold;font-size:13px;padding: 7px 2px;">Proveedor</div>
-      <div class="col-sm-2 d-none d-sm-block" style="font-weight:bold;font-size:13px;padding: 7px 2px;">Motivo</div>
+      <div class="col-sm-2 d-none d-sm-block" style="font-weight:bold;font-size:13px;padding: 7px 2px;">Proveedor</div>
+      <div class="col-sm-1 d-none d-sm-block" style="font-weight:bold;font-size:13px;padding: 7px 2px;">Motivo</div>
       <div class="col-sm-1 d-none d-sm-block" style="font-weight:bold;font-size:13px;padding: 7px 2px;">Agente</div>
       <div class="col-sm-1 d-none d-sm-block" style="font-weight:bold;font-size:13px;padding: 7px 2px;">Cantidad</div>
     </div>
@@ -53,22 +53,20 @@
         </div>
         {% endif %}
         <div class="col-2 d-block d-sm-none" style="top: 8px;">Provedor</div>
-        <div class="col-3 col-sm-1">
-          <div class="col-3 col-sm-1">
+        <div class="col-3 col-sm-2">
             <div class="form-group" style="margin-bottom: 0px;">
               <input type="text" readonly id="product-form-suppliers-{{ line.linenum }}" class="form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Nombre" value="{{ line.supplier.name }}">
             </div>
-          </div>
         </div>
         <div class="col-2 d-block d-sm-none" style="top: 8px;">Motivo</div>
         {% if line.reason!=null %}
-        <div class="col-3 col-sm-2">
+        <div class="col-3 col-sm-1">
           <div class="form-group" style="margin-bottom: 0px;">
             <input type="text" readonly id="product-form-reasons-{{ line.linenum }}" class="form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Nombre" value="{{ line.reason.name }}">
           </div>
         </div>
         {% else %}
-        <div class="col-3 col-sm-2">
+        <div class="col-3 col-sm-1">
               <select class="form-control select2" name="product-form-reasons-{{ line.linenum }}" id="product-form-reasons-{{ line.linenum }}">
               </select>
         </div>
@@ -79,6 +77,9 @@
         <div class="col-3 col-sm-1"> <div class="form-group" style="margin-bottom: 0px;"> <input type="text" id="product-form-quantity-{{ line.linenum }}" class="form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Nombre" value="{{ line.quantity }}"> </div> </div>
         <div class="form-group" style="margin: 3px 0 0 3px;">
           <button attr-id="{{ line.linenum }}" id="product-form-send-{{ line.linenum }}" type="button" class=" btn btn-info tooltip-primary" data-toggle="tooltip" data-placement="bottom" title="" data-original-title=" Añadir a pedido de compra "><i class="fa fa-shopping-cart" aria-hidden="true"></i></button>
+        </div>
+        <div class="form-group" style="margin: 3px 0 0 3px;">
+          <button attr-id="{{ line.linenum }}" id="product-form-reject-{{ line.linenum }}" type="button" class=" btn btn-danger tooltip-primary" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Rechazar "><i class="fa fa-thumbs-down" aria-hidden="true"></i></button>
         </div>
 
       </div>

@@ -20,6 +20,7 @@ use App\Modules\ERP\Utils\ERPSalesOrdersUtils;
 use App\Modules\ERP\Entity\ERPConfiguration;
 use App\Modules\ERP\Entity\ERPSeries;
 use App\Modules\ERP\Entity\ERPProducts;
+use App\Modules\ERP\Entity\ERPSuppliers;
 use App\Modules\ERP\Entity\ERPVariantsValues;
 use App\Modules\ERP\Entity\ERPPurchasesDemands;
 use App\Modules\ERP\Entity\ERPPurchasesDemandsReasons;
@@ -105,6 +106,7 @@ class ERPPurchasesDemandsController extends Controller
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		$purchasesdemandsRepository=$this->getDoctrine()->getRepository(ERPPurchasesDemands::class);
 		$productsRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
+		$suppliersRepository=$this->getDoctrine()->getRepository(ERPSuppliers::class);
 		$variantsRepository=$this->getDoctrine()->getRepository(ERPVariantsValues::class);
 		$reasonsRepository=$this->getDoctrine()->getRepository(ERPPurchasesDemandsReasons::class);
 
@@ -119,6 +121,7 @@ class ERPPurchasesDemandsController extends Controller
 			if($value->code!=null)
 			{
 			$product=$productsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "code"=>$value->code, "active"=>1, "deleted"=>0]);
+			$supplier=$suppliersRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "name"=>$value->supplier, "active"=>1, "deleted"=>0]);
 			$line=$purchasesdemandsRepository->findOneBy(["product"=>$product]);
 
 
@@ -132,6 +135,7 @@ class ERPPurchasesDemandsController extends Controller
 			}
 				$line->setLinenum($value->linenum);
 				$line->setProduct($product);
+				$line->setSupplier($supplier);
 				$line->setQuantity(floatval($value->quantity));
 			//	dump($value->variant);
 				if(isset($value->variant) AND $value->variant!="-1"){
@@ -173,6 +177,26 @@ class ERPPurchasesDemandsController extends Controller
 	}
 
 	return new JsonResponse(["reasons"=>$responseReasons]);
+
+ }
+
+
+ /**
+ * @Route("/api/ERP/purchasesdemands/rejectProductNotification", name="rejectProductNotification")
+ */
+ public function rejectProductNotification(RouterInterface $router,Request $request){
+ $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+ $nofitication_object=json_decode($request->getContent());
+ $agentsRepository=$this->getDoctrine()->getRepository(GlobaleUsers::class);
+ $agent=$agentsRepository->findOneBy(["id"=>$nofitication_object->agent,"active"=>1,"deleted"=>0]);
+
+ $channel=$agent->getDiscordchannel();
+ $msg=":shopping_cart: :no_entry_sign: Tu solicitud de compra del producto ".$nofitication_object->code." ha sido rechazada por ".$this->getUser()->getName()." ".$this->getUser()->getLastName();
+ file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
+ $msg="Motivo :point_right: **".$nofitication_object->reason."**";
+ file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
+
+ return new JsonResponse(["result"=>1]);
 
  }
 
