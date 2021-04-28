@@ -7,7 +7,7 @@
           <label for="salesticket-form-states-select">Estado del ticket</label>
         <select type="text" id="salesticket-form-states-select" class="form-control select2" required>
           {% for option in states %}
-            <option value="{{ option.id }}"{% if id!=0 %}{% if salesticket.salesticketstate!=null and option.id==salesticket.salesticketstate.id %} selected="selected" {% endif %}{% else %}{% if option.id==1 %} selected="selected"{% endif %}{% endif %}>{{ option.text }}</option>
+            <option value="{{ option.id }}"{% if id!=0 %}{% if salesticket.salesticketstate!=null and option.id==salesticket.salesticketstate.id %} selected="selected" {% endif %}{% else %}{% if option.id==5 %} selected="selected"{% endif %}{% endif %}>{{ option.text }}</option>
           {% endfor %}
         </select>
       </div>
