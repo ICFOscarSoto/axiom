@@ -12,6 +12,7 @@ Shifts and schedules: Turnos y horarios
 Others: Otros
 Modules: Módulos
 States: Provincias
+Select hrworkers: Seleccione trabajador
 
 images: Imágenes
 companies: Empresas
@@ -554,7 +555,8 @@ Payment due: Vencimiento
 FinancialYears: Ejercicio Fiscal
 Barcode: Cod. Barras
 Sales: Ventas
-Sales Tickets: Tickets de Ventas
+Sales Tickets: Incidencias de Ventas
+SalesTickets: Incidencias de Ventas
 Purchases: Compras
 Budgets: Presupuestos
 Orders: Pedidos
@@ -624,11 +626,11 @@ Licenseplatecountry: País Matriculación
 
 Refuelings: Repostajes
 Fuels: Combustibles
-Fuelcapacity: Capacidad depósito depositillo
+Fuelcapacity: Capacidad depósito
 Types: Tipos
 Measureunit: Unidad medida
 Measureunitabbreviation: Abreviatura Unidad
-
+mileage: Kilometraje
 
 #PLAZA VOUCHERS
 #----------------------------------------------------------------------------------------------------------------------
@@ -649,3 +651,21 @@ Metatitle: Meta-título
 Metadescription: Meta descripción
 Additionalcost: Gastos Extra
 Minquantityofsaleweb: Cantidad Mínima de venta Web
+
+#MEETINGS
+#----------------------------------------------------------------------------------------------------------------------
+place: Lugar
+Place: Lugar
+Summon: Convocatoria
+meeting: Reunión
+Meetings: Reuniones
+Meetingdate: Fecha y hora convocatoria
+convener: Convocante
+Startdate: Fecha y hora inicio
+Enddate: Fecha y hora fin
+Agenda: Orden del día
+Report: Acta
+Summoneds: Participantes
+witness: Asiste
+sendedSummon: Enviada convocatoria
+MeetingsSummoneds: Participantes
