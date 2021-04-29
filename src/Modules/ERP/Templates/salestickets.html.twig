@@ -27,28 +27,19 @@
 			{% set formConstructor = {"name": ticketType} %}
 			{{ include("@Globale/form_validation.html.twig") }}
 			<br/>
+			{{ include('@ERP/salesticket_buttons.html.twig') }}
 			{{ include('@ERP/salesticket_header.html.twig') }}
 			{{ include('@ERP/salesticket_searching.html.twig') }}
 			{{ include('@ERP/salesticket_customer_data.html.twig') }}
 			{{ include('@ERP/salesticket_data.html.twig') }}
 			{{ include('@ERP/salesticket_timeline.html.twig') }}
+			{{ include('@ERP/salesticket_buttons.html.twig') }}
 		</div>
 			{{ include('@ERP/salesticket_search_customer.html.twig') }}
 			{{ include('@ERP/salesticket_search_salesorder.html.twig') }}
 			{{ include('@ERP/salesticket_prepare_json.html.twig') }}
 			{{ include('@ERP/salesticket_validation.html.twig') }}
 
-			<div class="row">
-					<div class="col-md-4">
-						{% if salesticket.agent is not null %}
-								<button attr-id="" attr-action="" id="salesticket-button-cancel" type="button" class="btn btn">Cancelar</button>
-								<button attr-id="" attr-action="" id="salesticket-button-save" type="button" class="btn btn-green">Guardar</button>
-						{% else %}
-							<button attr-id="" attr-action="" id="salesticket-button-cancel" type="button" class="btn btn">Cancelar</button>
-							<button attr-id="" attr-action="" id="salesticket-button-save" type="button" class="btn btn-green">Guardar</button>
-						{% endif %}
-					</div>
-			</div>
 		</div>
 </div>
 
