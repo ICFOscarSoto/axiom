@@ -536,6 +536,7 @@ class ERPProductsController extends Controller
 	$code="";
 	$barcode="0000000000000";
 	$name="";
+	$noValidate=false;
 	if($type==1){  //Product id barcode
 		$product=$repositoryProduct->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany()]);
 		if($product){
@@ -550,6 +551,10 @@ class ERPProductsController extends Controller
 				$code=$ean->getProduct()->getCode();
 				$barcode=$ean->getName();
 				$name=$ean->getProduct()->getName();
+				if ($ean->getCustomer())
+ 			  	if ($ean->getCustomer()->getCode()=='C01448') $noValidate=true;
+ 					else $noValidate=false;
+ 			else $noValidate=false;
 			}
 		} else {
 			if($type==3){  //Variant id barcode
@@ -562,7 +567,7 @@ class ERPProductsController extends Controller
 			}
 		}
 	//dump($barcode);
-	$params=["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "code"=>$code, "barcode"=>$barcode, "name"=>$name, "user"=>$this->getUser()];
+	$params=["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "code"=>$code, "barcode"=>$barcode, "name"=>$name, "user"=>$this->getUser(), "noValidate"=>$noValidate];
 
 	$reportsUtils = new ERPEan13Reports();
 	$tempPath=$this->get('kernel')->getRootDir().DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$this->getUser()->getCompany()->getId().DIRECTORY_SEPARATOR.'printers'.DIRECTORY_SEPARATOR.$printer.DIRECTORY_SEPARATOR;
