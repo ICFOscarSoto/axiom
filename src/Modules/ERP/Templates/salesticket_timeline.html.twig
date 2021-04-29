@@ -13,8 +13,8 @@
   $(document).ready(function(){
     id={{ id }};
     var items="";
-    var lastagentname="";
-    var lastagentid="";
+    var angentasignedname=$("#salesticket-form-agent").val();
+    var angentasignedid=$("#salesticket-form-agent-id").val();
     if((++load_wait)==1) $("#load-spinner").fadeIn();
     $.ajax({
         type: "GET",
@@ -50,18 +50,18 @@
 
             items+=item;
         });
-        /*
+
             var item='<li>'
             +'<time class="cbp_tmtime" datetime=""><span id="create-time-text" style="font-size:15px;">Ahora</span></time>'
             +'<div class="cbp_tmicon bg-info">'
-            +'<img src="{{ url('index') }}api/user/'+newagentid+'/getimage" alt="" class="img-circle" width="40" height="40">'
+            +'<img src="{{ url('index') }}api/user/'+angentasignedid+'/getimage" alt="" class="img-circle" width="40" height="40">'
             +'</div>'
             +'<div class="cbp_tmlabel">'
-            +'<h2>Agente asignado: '+newagentname+'</h2>'
+            +'<h2>Agente asignado: '+angentasignedname+'</h2>'
             +'<h2>Sin actividad</h2>'
             +'</li>';
             items+=item;
-            */
+
           $("#ul_timeline").append(items);
       });
 });

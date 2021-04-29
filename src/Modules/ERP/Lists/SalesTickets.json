@@ -4,6 +4,11 @@
       "name" :"code","caption":"Nº de Ticket"
   },
   {
+      "name" :"dateadd",
+      "caption":"Fecha de creación",
+      "type": "datetime"
+  },
+  {
       "name" :"customername","caption":"Cliente"
   },
   {
@@ -14,11 +19,6 @@
   },
   {
       "name" :"externalsalesordernumber","caption":"Nº de pedido externo"
-  },
-  {
-      "name" :"dateadd",
-      "caption":"Fecha de creación",
-      "type": "datetime"
   },
   {
       "name" :"salesticketstate__name","caption":"Estado del Ticket"
