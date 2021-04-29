@@ -34,6 +34,8 @@
               +'<h2>Agente asignado: '+valor.agentname+'</h2>'
               +'<h2>Observaciones: <strong>'+valor.observations+'</strong></h2>'
               +'</li>';
+            items+=item;
+
           }
           else{
             var item='<li>'
@@ -46,9 +48,22 @@
                 +'<h2>Observaciones: <strong>'+valor.observations+'</strong></h2>'
                 +'<h2>>> Traspasa la incidencia a '+valor.newagentname+'</h2>'
                 +'</li>';
+
+              items+=item;
+
+              var item='<li>'
+                  +'<time class="cbp_tmtime" datetime=""><span id="create-time-text" style="font-size:15px;">'+valor.dateadd+'</span></time>'
+                  +'<div class="cbp_tmicon bg-info">'
+                  +'<img src="{{ url('index') }}api/user/'+valor.newagentid+'/getimage" alt="" class="img-circle" width="40" height="40">'
+                  +'</div>'
+                  +'<div class="cbp_tmlabel">'
+                  +'<h2>Nuevo agente asignado: '+valor.newagentname+'</h2>'
+                  +'</li>';
+
+              items+=item;
           }
 
-            items+=item;
+
         });
 
             var item='<li>'
