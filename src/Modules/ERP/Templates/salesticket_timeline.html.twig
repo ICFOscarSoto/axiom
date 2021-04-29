@@ -23,6 +23,8 @@
       }).done(function( elements, textStatus, jqXHR ) {
         if((--load_wait)==0) $("#load-spinner").fadeOut();
          elements.history.forEach( function(valor, indice, array){
+          if(valor.newagentid==valor.agentid)
+          {
           var item='<li>'
               +'<time class="cbp_tmtime" datetime=""><span id="create-time-text" style="font-size:15px;">'+valor.dateadd+'</span></time>'
               +'<div class="cbp_tmicon bg-info">'
@@ -33,22 +35,34 @@
               +'<h2>Observaciones: </h2>'
               +'<p>'+valor.observations+'</p>'
               +'</li>';
-            lastagentname=valor.agentname;
-            lastagentid=valor.agentid;
+          }
+          else{
+            var item='<li>'
+                +'<time class="cbp_tmtime" datetime=""><span id="create-time-text" style="font-size:15px;">'+valor.dateadd+'</span></time>'
+                +'<div class="cbp_tmicon bg-info">'
+                +'<img src="{{ url('index') }}api/user/'+valor.agentid+'/getimage" alt="" class="img-circle" width="40" height="40">'
+                +'</div>'
+                +'<div class="cbp_tmlabel">'
+                +'<h2>Agente asignado: '+valor.agentname+'</h2>'
+                +'<h2>Observaciones: </h2>'
+                +'<h2>>> Traspasa la incidencia a '+valor.newagentname+'</h2>'
+                +'</li>';
+          }
+
             items+=item;
         });
-
+        /*
             var item='<li>'
             +'<time class="cbp_tmtime" datetime=""><span id="create-time-text" style="font-size:15px;">Ahora</span></time>'
             +'<div class="cbp_tmicon bg-info">'
-            +'<img src="{{ url('index') }}api/user/'+lastagentid+'/getimage" alt="" class="img-circle" width="40" height="40">'
+            +'<img src="{{ url('index') }}api/user/'+newagentid+'/getimage" alt="" class="img-circle" width="40" height="40">'
             +'</div>'
             +'<div class="cbp_tmlabel">'
-            +'<h2>Agente asignado: '+lastagentname+'</h2>'
+            +'<h2>Agente asignado: '+newagentname+'</h2>'
             +'<h2>Sin actividad</h2>'
             +'</li>';
             items+=item;
-
+            */
           $("#ul_timeline").append(items);
       });
 });

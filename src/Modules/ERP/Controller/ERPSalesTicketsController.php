@@ -276,8 +276,9 @@ class ERPSalesTicketsController extends Controller
 		$history_obj=new ERPSalesTicketsHistory();
 		$history_obj->setAgent($this->getUser());
 		if($fields->salesticketnewagent!=""){
-			$history_obj->setAgentAsigned($newagent);
+			$history_obj->setNewagent($newagent);
 		}
+		else 	$history_obj->setNewagent($this->getUser());
 
 		$history_obj->setSalesTicket($salesticket);
 		$history_obj->setObservations($fields->observations);
@@ -410,6 +411,8 @@ class ERPSalesTicketsController extends Controller
 		$item['dateadd']=$line->getDateadd()->format('H:i:s d/m/Y');
 		$item['agentid']=$line->getAgent()->getId();
 		$item['agentname']=$line->getAgent()->getName()." ".$line->getAgent()->getLastName();
+		$item['newagentname']=$line->getNewagent()->getName()." ".$line->getNewagent()->getLastName();
+		$item['newagentid']=$line->getNewagent()->getId();
 		$item['observations']=$line->getObservations();
 		$response[]=$item;
 	}
