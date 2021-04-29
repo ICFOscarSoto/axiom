@@ -22,21 +22,12 @@
       </select>
     </div>
   </div>
-    </div>
-    <div class="row">
+  </div>
+  <div class="row">
       <div class="col-6 col-sm-6"> <div class="form-group" >
         <label for="salesticket-form-observations">Observaciones</label>
         <textarea id="salesticket-form-observations" name="salesticket-form-observations" class="form-control" style="min-height:90px;">{% if salesticket.observations!=null %}{{ salesticket.observations }}{% endif %}</textarea>
       </div>
-    </div>
-    </div>
-    <div class="row">
-    <div class="col-md-12">
-      <div class="panel-title-list">Historial</div>
-      {% if salesticketshistorylist is defined %}
-      {% set listConstructor = salesticketshistorylist %}
-      {{ include('@Globale/simplelist.html.twig') }}
-      {% endif %}
     </div>
   </div>
   </div>

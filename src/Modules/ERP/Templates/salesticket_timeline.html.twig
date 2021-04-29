@@ -1,0 +1,55 @@
+<div class="panel panel-primary panel-shadow" data-collapsed="0" style="-webkit-box-shadow: none; box-shadow:none; padding:0px; margin-bottom: -1px;"><!-- to apply shadow add class "panel-shadow" -->
+  <div class="panel-body">
+    <div class="panel-title">Trazabilidad</div>
+    <div class="col-md-12">
+      <ul class="cbp_tmtimeline" id="ul_timeline">
+
+      </ul>
+    </div>
+  </div>
+  </div>
+</div>
+
+<script>
+  $(document).ready(function(){
+    id={{ id }};
+    var items="";
+    var lastagentname="";
+    var lastagentid="";
+    if((++load_wait)==1) $("#load-spinner").fadeIn();
+    $.ajax({
+        type: "GET",
+        dataType: "json",
+        url: "/api/ERP/salestickets/history/get/"+id,
+      }).done(function( elements, textStatus, jqXHR ) {
+        if((--load_wait)==0) $("#load-spinner").fadeOut();
+         elements.history.forEach( function(valor, indice, array){
+          var item='<li>'
+              +'<time class="cbp_tmtime" datetime=""><span id="create-time-text" style="font-size:15px;">'+valor.dateadd+'</span></time>'
+              +'<div class="cbp_tmicon bg-info">'
+              +'<img src="http://demoaxiom.ferreteriacampollano.com/api/workers/'+valor.agentid+'/thumb/getimage" alt="" class="img-circle" width="40" height="40">'
+              +'</div>'
+              +'<div class="cbp_tmlabel">'
+              +'<h2>Agente asignado: '+valor.agentname+'</h2>'
+              +'<h2>Observaciones: </h2>'
+              +'<p>'+valor.observations+'</p>'
+              +'</li>';
+            lastagentname=valor.agentname;
+            lastagentid=valor.agentid;
+            items+=item;
+        });
+            var item='<li>'
+            +'<time class="cbp_tmtime" datetime=""><span id="create-time-text" style="font-size:15px;">Ahora</span></time>'
+            +'<div class="cbp_tmicon bg-info">'
+            +'<img src="http://demoaxiom.ferreteriacampollano.com/api/workers/'+lastagentid+'/thumb/getimage" alt="" class="img-circle" width="40" height="40">'
+            +'</div>'
+            +'<div class="cbp_tmlabel">'
+            +'<h2>Agente asignado: '+lastagentname+'</h2>'
+            +'<h2>Sin actividad</h2>'
+            +'</li>';
+            items+=item;
+
+          $("#ul_timeline").append(items);
+      });
+});
+</script>

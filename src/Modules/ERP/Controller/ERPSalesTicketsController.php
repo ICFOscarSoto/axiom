@@ -73,6 +73,7 @@ class ERPSalesTicketsController extends Controller
 			 $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
 			 $configrepository=$this->getDoctrine()->getRepository(ERPConfiguration::class);
 		   $salesticketsRepository=$this->getDoctrine()->getRepository(ERPSalesTickets::class);
+		//	 $SalesTicketsHistoryRepository = $this->getDoctrine()->getRepository(ERPSalesTicketsHistory::class);
 			 $salesticketsstatesRepository=$this->getDoctrine()->getRepository(ERPSalesTicketsStates::class);
 			 $agentsRepository=$this->getDoctrine()->getRepository(GlobaleUsers::class);
 			 $userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
@@ -156,7 +157,7 @@ class ERPSalesTicketsController extends Controller
 			$breadcrumb=$menurepository->formatBreadcrumb('genericindex','ERP','SalesTickets');
 			array_push($breadcrumb,$new_breadcrumb);
 
-			$listSalesTicketsHistory = new ERPSalesTicketsHistoryUtils();
+		//	$salesticketHistory=$SalesTicketsHistoryRepository->->findBy(["salesticket"=>$salesticket,"active"=>1,"deleted"=>0]);
 
 			if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 				return $this->render('@ERP/salestickets.html.twig', [
@@ -174,7 +175,7 @@ class ERPSalesTicketsController extends Controller
 					'agents' => $agents,
 					'ticketType' => 'sales_ticket',
 					'salesticket' => $salesticket,
-					'salesticketshistorylist' => $listSalesTicketsHistory->formatListByTicket($id),
+				/*	'salesticketshistory' => $salesticketHistory,*/
 					'id' => $id,
 					'code' => $code,
 					]);
@@ -248,7 +249,9 @@ class ERPSalesTicketsController extends Controller
 	 	$salesticket->setDateupd(new \DateTime());
 	 	$this->getDoctrine()->getManager()->persist($salesticket);
 
-	if($fields->salesticketnewagent!=""){
+		$newagent=null;
+		if($fields->salesticketnewagent!=""){
+
 		if($id==0){
 
 				$newagent=$agentsRepository->findOneBy(["id"=>$fields->salesticketnewagent, "active"=>1, "deleted"=>0]);
@@ -272,6 +275,10 @@ class ERPSalesTicketsController extends Controller
 
 		$history_obj=new ERPSalesTicketsHistory();
 		$history_obj->setAgent($this->getUser());
+		if($fields->salesticketnewagent!=""){
+			$history_obj->setAgentAsigned($newagent);
+		}
+
 		$history_obj->setSalesTicket($salesticket);
 		$history_obj->setObservations($fields->observations);
 		$history_obj->setSalesticketstate($salesticketstate);
@@ -376,13 +383,39 @@ class ERPSalesTicketsController extends Controller
 
 
  /**
- * @Route("/{_locale}/ERP/salestraceability/{id}/delete", name="deleteSalesTickets")
+ * @Route("/{_locale}/ERP/salestickets/{id}/delete", name="deleteSalesTickets")
  */
  public function delete($id){
 	 $this->denyAccessUnlessGranted('ROLE_GLOBAL');
 	 $entityUtils=new GlobaleEntityUtils();
 	 $result=$entityUtils->deleteObject($id, $this->class, $this->getDoctrine());
 	 return new JsonResponse(array('result' => $result));
+ }
+
+
+ /**
+ * @Route("/api/ERP/salestickets/history/get/{id}", name="getSalesTicketHistory", defaults={"id"=0})
+ */
+ public function getSalesTicketHistory($id, RouterInterface $router,Request $request){
+	$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+	$salesticketsRepository=$this->getDoctrine()->getRepository(ERPSalesTickets::class);
+	$salesticketsHistoryRepository=$this->getDoctrine()->getRepository(ERPSalesTicketsHistory::class);
+	$salesticket=$salesticketsRepository->findOneBy(["id"=>$id]);
+
+//	$repositoryVariants=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
+	$salesticketshistory=$salesticketsHistoryRepository->findBy(["salesticket"=>$salesticket,"active"=>1,"deleted"=>0]);
+	$response=Array();
+
+	foreach($salesticketshistory as $line){
+		$item['dateadd']=$line->getDateadd()->format('H:i:s d/m/Y');
+		$item['agentid']=$line->getAgent()->getId();
+		$item['agentname']=$line->getAgent()->getName()." ".$line->getAgent()->getLastName();
+		$item['observations']=$line->getObservations();
+		$response[]=$item;
+	}
+
+	return new JsonResponse(["history"=>$response]);
+
  }
 
 
