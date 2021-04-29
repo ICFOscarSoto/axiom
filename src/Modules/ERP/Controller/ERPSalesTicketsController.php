@@ -414,6 +414,7 @@ class ERPSalesTicketsController extends Controller
 		$item['newagentname']=$line->getNewagent()->getName()." ".$line->getNewagent()->getLastName();
 		$item['newagentid']=$line->getNewagent()->getId();
 		$item['observations']=$line->getObservations();
+		$item['state']=$line->getSalesticketstate()->getName();
 		$response[]=$item;
 	}
 
