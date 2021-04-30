@@ -1,26 +1,48 @@
 <div class="panel panel-primary panel-shadow" data-collapsed="0" style="-webkit-box-shadow: none; box-shadow:none; padding:0px; margin-bottom: -1px;"><!-- to apply shadow add class "panel-shadow" -->
     <div class="panel-body">
     <div class="row">
-
+      {% if salesticket.salesticketstate!=null %}
+      <div class="col-md-2">
+        <label for="salesticket-form-currentstate">Estado actual:</label>
+        <input {% if salesticket.salesticketstate.id!=3 %}style="background-color:#00a651!important;color:#fff;"{% else %}style="background-color:#cc2424!important;color:#fff;"{% endif %} type="text" id="salesticket-form-currentstate" value="{{ salesticket.salesticketstate.name }}" disabled="disabled" class="form-control" placeholder="Estado actual">
+      </div>
+      {% else %}
+        <div class="col-md-2">
+          <label for="salesticket-form-currentstate">Estado actual:</label>
+          <input style="background-color:#00a651!important;color:#fff;" type="text" id="salesticket-form-currentstate" value="Abierto" disabled="disabled" class="form-control" placeholder="Estado actual">
+        </div>
+        {% endif %}
       {% if salesticket.agent is not null %}
         <div class="col-md-2">
           <label for="salesticket-form-agent">Agente asignado:</label>
           <div class="form-group">
           <input type="text" id="salesticket-form-agent" value="{{ salesticket.agent.name }} {{ salesticket.agent.lastname }}" disabled="disabled" class="form-control" placeholder="Agente asignado">
+          <input type="hidden" id="salesticket-form-agent-id" value="{{ salesticket.agent.id }}" class="form-control">
           </div>
         </div>
       {% else %}
       <div class="col-md-2">
         <label for="salesticket-form-agent">Agente asignado:</label>
         <div class="form-group">
-        <input type="text" id="salesticket-form-agent" value="{{ userData.name }}" disabled="disabled" class="form-control" placeholder="Agente asignado">
+        <input type="text" id="salesticket-form-agent" value="{{ userData.name }} {{ userData.firstname }}" disabled="disabled" class="form-control" placeholder="Agente asignado">
+        <input type="hidden" id="salesticket-form-agent-id" value="{{ userData.id }}" class="form-control">
         </div>
       </div>
       {% endif %}
+      {% if salesticket.dateupd is not null %}
       <div class="col-md-2">
         <label for="salesticket-form-agent">Fecha de última actualización:</label>
         <input type="datetime" id="salesticket-form-dateadd" value="{{ salesticket.dateupd|date('h:m:s d/m/Y ') }}" disabled="disabled" class="form-control" placeholder="Fecha">
       </div>
+      <div class="col-md-6" style="text-align:right;">
+        {% if id!=0 %}
+        <h2>Ticket {{ salesticket.code }}</h2>
+        {% else %}
+          <h2>Ticket {{ code }}</h2>
+        {% endif %}
+        <br>
+      </div>
+      {% else %}
       <div class="col-md-8" style="text-align:right;">
         {% if id!=0 %}
         <h2>Ticket {{ salesticket.code }}</h2>
@@ -29,6 +51,8 @@
         {% endif %}
         <br>
       </div>
+      {% endif %}
+
     </div>
   </div>
   </div>

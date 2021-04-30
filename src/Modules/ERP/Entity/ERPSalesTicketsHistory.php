@@ -32,6 +32,11 @@ class ERPSalesTicketsHistory
     private $agent;
 
     /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleUsers")
+     */
+    private $newagent;
+
+    /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPSalesTicketsStates")
      * @ORM\JoinColumn(nullable=false)
      */
@@ -87,6 +92,18 @@ class ERPSalesTicketsHistory
     public function setAgent(?GlobaleUsers $agent): self
     {
         $this->agent = $agent;
+
+        return $this;
+    }
+
+    public function getNewagent(): ?GlobaleUsers
+    {
+        return $this->newagent;
+    }
+
+    public function setNewagent(?GlobaleUsers $newagent): self
+    {
+        $this->newagent = $newagent;
 
         return $this;
     }

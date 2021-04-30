@@ -6349,6 +6349,153 @@ fieldset[disabled] .calendar-env .calendar-body .fc-content .fc-view table tbody
     visibility: visible;
   }
 }
+
+
+.page-body .main-content .cbp_tmtimeline_tickets:before {
+  background: #f5f5f6;
+  width: 5px;
+  margin-left: -6px;
+}
+.page-body .main-content .cbp_tmtimeline_tickets > li .cbp_tmtime_tickets > span {
+  color: #111;
+  font-size: 14px;
+}
+.page-body .main-content .cbp_tmtimeline_tickets > li .cbp_tmtime_tickets > span:first-child {
+  margin-bottom: 2px;
+  color: #6f6f6f;
+}
+.page-body .main-content .cbp_tmtimeline_tickets > li .cbp_tmtime_tickets > span:last-child {
+  color: #303641;
+  zoom: 1;
+  -webkit-opacity: 0.8;
+  -moz-opacity: 0.8;
+  opacity: 0.8;
+  filter: alpha(opacity=80);
+  font-size: 12px;
+}
+.page-body .main-content .cbp_tmtimeline_tickets > li .cbp_tmtime_tickets > span.large {
+  font-size: 17px;
+}
+.page-body .main-content .cbp_tmtimeline_tickets > li .cbp_tmtime_tickets > span.hidden + span {
+  margin-top: 8px;
+}
+.page-body .main-content .cbp_tmtimeline_tickets > li .cbp_tmicon_tickets {
+  background: #ffffff;
+  color: #d2d2d2;
+  -moz-box-shadow: 0px 0px 0px 5px #f5f5f6;
+  -webkit-box-shadow: 0px 0px 0px 5px #f5f5f6;
+  box-shadow: 0px 0px 0px 5px #f5f5f6;
+}
+.page-body .main-content .cbp_tmtimeline_tickets > li .cbp_tmicon_tickets.bg-primary {
+  background-color: #303641;
+  color: #fff;
+}
+.page-body .main-content .cbp_tmtimeline_tickets > li .cbp_tmicon_tickets.bg-secondary {
+  background-color: #ee4749;
+  color: #fff;
+}
+.page-body .main-content .cbp_tmtimeline_tickets > li .cbp_tmicon_tickets.bg-success {
+  background-color: #00a651;
+  color: #fff;
+}
+.page-body .main-content .cbp_tmtimeline_tickets > li .cbp_tmicon_tickets.bg-info {
+  background-color: #21a9e1;
+  color: #fff;
+}
+.page-body .main-content .cbp_tmtimeline_tickets > li .cbp_tmicon_tickets.bg-warning {
+  background-color: #fad839;
+  color: #fff;
+}
+.page-body .main-content .cbp_tmtimeline_tickets > li .cbp_tmicon_tickets.bg-danger {
+  background-color: #cc2424;
+  color: #fff;
+}
+.page-body .main-content .cbp_tmtimeline_tickets > li .cbp_tmlabel_tickets {
+  background: #f5f5f6;
+  color: #737881;
+  margin-bottom: 70px;
+  padding: 1.7em;
+  -webkit-border-radius: 3px;
+  -webkit-background-clip: padding-box;
+  -moz-border-radius: 3px;
+  -moz-background-clip: padding;
+  border-radius: 3px;
+  background-clip: padding-box;
+}
+.page-body .main-content .cbp_tmtimeline_tickets > li .cbp_tmlabel_tickets h2,
+.page-body .main-content .cbp_tmtimeline_tickets > li .cbp_tmlabel_tickets h3,
+.page-body .main-content .cbp_tmtimeline_tickets > li .cbp_tmlabel_tickets p {
+  color: #737881;
+  font-family: "Helvetica Neue", Helvetica, "Noto Sans", sans-serif;
+  font-size: 12px;
+  margin: 0;
+  line-height: 1.42857143;
+}
+.page-body .main-content .cbp_tmtimeline_tickets > li .cbp_tmlabel_tickets p + p {
+  margin-top: 15px;
+}
+.page-body .main-content .cbp_tmtimeline_tickets > li .cbp_tmlabel_tickets h2 {
+  font-size: 14px;
+}
+
+.page-body .main-content .cbp_tmtimeline_tickets > li .cbp_tmlabel_tickets h3 {
+  font-size: 13px;
+}
+.page-body .main-content .cbp_tmtimeline_tickets > li .cbp_tmlabel_tickets h2 a {
+  color: #303641;
+}
+.page-body .main-content .cbp_tmtimeline_tickets > li .cbp_tmlabel_tickets h2 span {
+  zoom: 1;
+  -webkit-opacity: 0.6;
+  -moz-opacity: 0.6;
+  opacity: 0.6;
+  filter: alpha(opacity=60);
+}
+.page-body .main-content .cbp_tmtimeline_tickets > li .cbp_tmlabel_tickets:after {
+  border-right-color: #f5f5f6;
+}
+.page-body .main-content .cbp_tmtimeline_tickets > li .cbp_tmlabel_tickets.empty {
+  background: 0;
+  padding: 9px 0;
+  margin-bottom: 70px;
+}
+.page-body .main-content .cbp_tmtimeline_tickets > li .cbp_tmlabel_tickets.empty:after {
+  visibility: hidden;
+}
+@media screen and (max-width: 47.2em) {
+  .page-body .main-content .cbp_tmtimeline_tickets > li .cbp_tmlabel_tickets:after {
+    border-right-color: transparent;
+    border-bottom-color: #f5f5f6;
+    left: 10px;
+  }
+  .page-body .main-content .cbp_tmtimeline_tickets > li .large {
+    font-weight: bold;
+    font-size: 16px !important;
+  }
+  .page-body .main-content .cbp_tmtimeline_tickets > li .cbp_tmlabel_tickets.empty {
+    background: #f5f5f6;
+    padding: 1.7em;
+  }
+  .page-body .main-content .cbp_tmtimeline_tickets > li .cbp_tmlabel_tickets.empty:after {
+    visibility: visible;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 .timeline-centered {
   position: relative;
   margin-bottom: 30px;

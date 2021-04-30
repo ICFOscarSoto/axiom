@@ -415,7 +415,7 @@ var url = new URL(window.location.href);
 				}
 
 				function doSearch () {
-					{{ listConstructor.id }}.columns(searchColumn+':name').search( $("#s_"+searchColumn).val() ).draw();
+					{{ listConstructor.id }}.columns(searchColumn+':name').search( $("[id='s_"+searchColumn+"'][attr-list-id='{{ listConstructor.id }}']").val() ).draw();
 					arrayParams={{ listConstructor.id }}.ajax.params();
 					$("[id^='s_']" ).each(function( index ) {
 						url = new URL(window.location.href);
@@ -437,7 +437,6 @@ var url = new URL(window.location.href);
 							{{ listConstructor.id }}.columns('{{ field.name }}:name').search( this.value ).draw();
 							arrayParams={{ listConstructor.id }}.ajax.params();
 							$("#search_param").val(jQuery.param(arrayParams));
-							console.log($("#s_{{ field.name }}").val());
 							url = new URL(window.location.href);
 							url.searchParams.set("s_{{ field.name }}",$("#s_{{ field.name }}").val());
 							window.history.replaceState(null, null, url);
@@ -447,6 +446,7 @@ var url = new URL(window.location.href);
 						if($("#s_{{ field.name }}").is('select')) event="change"; else event="keyup";
 						$('body').on(event, '#s_{{ field.name }}', function() {
 							searchColumn='{{ field.name }}';
+
 							if($(this).is('select')) doSearch ();
 								else{
 									clearSearchTimeOut();
@@ -511,7 +511,7 @@ var url = new URL(window.location.href);
 								{% if field.filter is not defined or field.filter == true %}
 									{% if field.replace is defined %}
 									  {# Show combo box on replaces #}
-										<select id="s_{{ field.name }}" class="form-control table-header-search-input select2 select2-use">
+										<select id="s_{{ field.name }}" attr-list-id="{{ listConstructor.id }}" class="form-control table-header-search-input select2 select2-use">
 											<option value="##ALL##" {% if app.request.get('s_' ~ field.name)!=null and app.request.get('s_' ~ field.name)=='##ALL##' %} selected="selected" {% endif %}>Todos</option>
 											{% for key,option in field.replace %}
 												<option value="{{ key }}"{% if app.request.get('s_' ~ field.name)!=null %}{% if app.request.get('s_' ~ field.name) == (key ~ '') %} selected="selected" {% endif %}{% else %}{% if option.default is defined and option.default == true%} attr-default="true" selected="selected" {% endif %}{% endif %}>{{ option.text }}</option>
@@ -538,7 +538,7 @@ var url = new URL(window.location.href);
 														$("#s_{{ field.name }}").select2({dropdownCssClass : 'select2-bigdrop'});
 													});
 												</script>#}
-													<input id="s_{{ field.name }}" type="text" class="table-header-search-input form-control" placeholder="Buscar {{ (field.caption)|trans }}"  autocomplete="off"/>
+													<input id="s_{{ field.name }}" attr-list-id="{{ listConstructor.id }}" type="text" class="table-header-search-input form-control" placeholder="Buscar {{ (field.caption)|trans }}"  autocomplete="off"/>
 													<script>
 														$(document).ready(function() {
 														if(url.searchParams.get('s_{{ field.name }}')!=null)
@@ -548,7 +548,7 @@ var url = new URL(window.location.href);
 										{% else %}
 									   	{# Other fields show inputs #}
 
-											<input id="s_{{ field.name }}" type="text" class="table-header-search-input form-control" placeholder="Buscar {{ (field.caption)|trans }}"  autocomplete="off"/>
+											<input id="s_{{ field.name }}" attr-list-id="{{ listConstructor.id }}" type="text" class="table-header-search-input form-control" placeholder="Buscar {{ (field.caption)|trans }}"  autocomplete="off"/>
 											<script>
 													if(url.searchParams.get('s_{{ field.name }}')!=null)
 														$(document).ready(function() {
@@ -563,14 +563,14 @@ var url = new URL(window.location.href);
 							<th class="table-header-search" style="border-bottom: 1px solid #cecece !important;">
 								{% if field.type == "datetime" %}
 									<div><div style="z-index: 5 !important;" class='input-group date'>
-												<input id="s_{{ field.name }}_from" attr-group="{{ field.name }}" attr-max="s_{{ field.name }}_to" type="text" class="datetimepicker table-header-search-input form-control" placeholder="{{ (field.caption)|trans }} desde" value="{% if app.request.get('s_' ~ field.name ~ '_from')!=null %}{{ app.request.get('s_' ~ field.name ~ '_from')|date("d/m/Y H:i:s") }}{% endif %}" autocomplete="off"/>
+												<input id="s_{{ field.name }}_from" attr-list-id="{{ listConstructor.id }}" attr-group="{{ field.name }}" attr-max="s_{{ field.name }}_to" type="text" class="datetimepicker table-header-search-input form-control" placeholder="{{ (field.caption)|trans }} desde" value="{% if app.request.get('s_' ~ field.name ~ '_from')!=null %}{{ app.request.get('s_' ~ field.name ~ '_from')|date("d/m/Y H:i:s") }}{% endif %}" autocomplete="off"/>
 												<span class="input-group-addon">
                         	<span class="glyphicon glyphicon-calendar"></span>
                     		</span>
 										</div></div>
 									<div style="height: 5px;"></div>
 									<div><div style="z-index: 2 !important;" class='input-group date'>
-										<input id="s_{{ field.name }}_to" attr-group="{{ field.name }}" attr-min="s_{{ field.name }}_from" type="text" class="datetimepicker table-header-search-input form-control" placeholder="{{ (field.caption)|trans }} hasta" value="{% if app.request.get('s_' ~ field.name ~ '_to')!=null %}{{ app.request.get('s_' ~ field.name ~ '_to')|date("d/m/Y H:i:s") }}{% endif %}" autocomplete="off"/>
+										<input id="s_{{ field.name }}_to" attr-list-id="{{ listConstructor.id }}" attr-group="{{ field.name }}" attr-min="s_{{ field.name }}_from" type="text" class="datetimepicker table-header-search-input form-control" placeholder="{{ (field.caption)|trans }} hasta" value="{% if app.request.get('s_' ~ field.name ~ '_to')!=null %}{{ app.request.get('s_' ~ field.name ~ '_to')|date("d/m/Y H:i:s") }}{% endif %}" autocomplete="off"/>
 										<span class="input-group-addon">
 											<span class="glyphicon glyphicon-calendar"></span>
 										</span>
@@ -579,14 +579,14 @@ var url = new URL(window.location.href);
 									{% else %}
 									{% if field.type == "date" %}
 										<div><div style="z-index: 5 !important;" class='input-group date'>
-													<input id="s_{{ field.name }}_from" attr-group="{{ field.name }}" attr-max="s_{{ field.name }}_to" type="text" class="datepicker table-header-search-input form-control" placeholder="{{ (field.caption)|trans }} desde" value="{% if app.request.get('s_' ~ field.name ~ '_from')!=null %}{{ app.request.get('s_' ~ field.name ~ '_from')|date("d/m/Y") }}{% endif %}" autocomplete="off"/>
+													<input id="s_{{ field.name }}_from" attr-list-id="{{ listConstructor.id }}" attr-group="{{ field.name }}" attr-max="s_{{ field.name }}_to" type="text" class="datepicker table-header-search-input form-control" placeholder="{{ (field.caption)|trans }} desde" value="{% if app.request.get('s_' ~ field.name ~ '_from')!=null %}{{ app.request.get('s_' ~ field.name ~ '_from')|date("d/m/Y") }}{% endif %}" autocomplete="off"/>
 													<span class="input-group-addon">
 														<span class="glyphicon glyphicon-calendar"></span>
 													</span>
 											</div></div>
 										<div style="height: 5px;"></div>
 										<div><div style="z-index: 2 !important;" class='input-group date'>
-											<input id="s_{{ field.name }}_to" attr-group="{{ field.name }}" attr-min="s_{{ field.name }}_from" type="text" class="datepicker table-header-search-input form-control" placeholder="{{ (field.caption)|trans }} hasta" value="{% if app.request.get('s_' ~ field.name ~ '_to')!=null %}{{ app.request.get('s_' ~ field.name ~ '_to')|date("d/m/Y") }}{% endif %}" autocomplete="off"/>
+											<input id="s_{{ field.name }}_to" attr-list-id="{{ listConstructor.id }}" attr-group="{{ field.name }}" attr-min="s_{{ field.name }}_from" type="text" class="datepicker table-header-search-input form-control" placeholder="{{ (field.caption)|trans }} hasta" value="{% if app.request.get('s_' ~ field.name ~ '_to')!=null %}{{ app.request.get('s_' ~ field.name ~ '_to')|date("d/m/Y") }}{% endif %}" autocomplete="off"/>
 											<span class="input-group-addon">
 												<span class="glyphicon glyphicon-calendar"></span>
 											</span>

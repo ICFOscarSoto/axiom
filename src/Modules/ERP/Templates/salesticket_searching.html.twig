@@ -1,7 +1,7 @@
 {% if salesticket.customer==null %}
 <div id="panel-searching" class="panel panel-primary panel-shadow" data-collapsed="0" style="-webkit-box-shadow: none; box-shadow:none; padding:0px; margin-bottom: -1px;"><!-- to apply shadow add class "panel-shadow" -->
   <div class="panel-body">
-    <div class="panel-title">Filtros de búsqueda</div>
+    <div class="panel-title">Filtros de búsqueda <strong>(puedes buscar por cliente o por pedido asociado a la incidencia)</strong></div>
     <div class="row">
       <div class="col-md-3">
         <div class="input-group">
@@ -12,6 +12,7 @@
             </div>
           </div>
         </div>
+        <p style="line-height: 31px;font-size:15px;">ó</p>
         <div class="col-md-3">
           <div class="input-group">
             <input type="text" id="salesorder-form-search" class="form-control" placeholder="Buscar pedido...">

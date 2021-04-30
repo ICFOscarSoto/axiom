@@ -73,6 +73,7 @@ class ERPSalesTicketsController extends Controller
 			 $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
 			 $configrepository=$this->getDoctrine()->getRepository(ERPConfiguration::class);
 		   $salesticketsRepository=$this->getDoctrine()->getRepository(ERPSalesTickets::class);
+			 $SalesTicketsHistoryRepository = $this->getDoctrine()->getRepository(ERPSalesTicketsHistory::class);
 			 $salesticketsstatesRepository=$this->getDoctrine()->getRepository(ERPSalesTicketsStates::class);
 			 $agentsRepository=$this->getDoctrine()->getRepository(GlobaleUsers::class);
 			 $userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
@@ -91,10 +92,10 @@ class ERPSalesTicketsController extends Controller
 			$code="";
 			if($id==0){
 				$newid=$salesticketsRepository->getLastID()+1;
-				if($newid<10) $code="#".date("Y")."0000".$newid;
-				else if($newid<100) $code="#".date("Y")."000".$newid;
-				else if($newid<1000) $code="#".date("Y")."00".$newid;
-				else if($newid<10000) $code="#".date("Y")."0".$newid;
+				if($newid<10) $code="#V".date("Y")."0000".$newid;
+				else if($newid<100) $code="#V".date("Y")."000".$newid;
+				else if($newid<1000) $code="#V".date("Y")."00".$newid;
+				else if($newid<10000) $code="#V".date("Y")."0".$newid;
 			}
 
 			 //Search Customers
@@ -128,11 +129,8 @@ class ERPSalesTicketsController extends Controller
 			}
 
 			//sales ticket states
-			$objects=$salesticketsstatesRepository->findBy(["active"=>1,"deleted"=>0]);
+			$objects=$salesticketsstatesRepository->findBy(["active"=>1,"deleted"=>0],["name"=>"ASC"]);
 			$states=[];
-			$option["id"]=null;
-			$option["text"]="Estado del ticket";
-			$states[]=$option;
 			foreach($objects as $item){
 				$option["id"]=$item->getId();
 				$option["text"]=$item->getName();
@@ -140,7 +138,7 @@ class ERPSalesTicketsController extends Controller
 			}
 
 			//agents
-			$agent_objects=$agentsRepository->findBy(["active"=>1,"deleted"=>0]);
+			$agent_objects=$agentsRepository->findBy(["active"=>1,"deleted"=>0],["name"=>"ASC"]);
 			$agents=[];
 			$option=null;
 			$option["id"]=null;
@@ -156,8 +154,12 @@ class ERPSalesTicketsController extends Controller
 			$breadcrumb=$menurepository->formatBreadcrumb('genericindex','ERP','SalesTickets');
 			array_push($breadcrumb,$new_breadcrumb);
 
-			$listSalesTicketsHistory = new ERPSalesTicketsHistoryUtils();
+		//	$salesticketHistory=$SalesTicketsHistoryRepository->->findBy(["salesticket"=>$salesticket,"active"=>1,"deleted"=>0]);
 
+		$histories=$SalesTicketsHistoryRepository->findBy(["salesticket"=>$salesticket,"active"=>1,"deleted"=>0],["dateadd"=>"DESC"]);
+		foreach($histories as $key=>$item){
+			$histories[$key]=$item;
+		}
 			if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 				return $this->render('@ERP/salestickets.html.twig', [
 					'moduleConfig' => $config,
@@ -174,7 +176,8 @@ class ERPSalesTicketsController extends Controller
 					'agents' => $agents,
 					'ticketType' => 'sales_ticket',
 					'salesticket' => $salesticket,
-					'salesticketshistorylist' => $listSalesTicketsHistory->formatListByTicket($id),
+					'histories'=>$histories,
+				/*	'salesticketshistory' => $salesticketHistory,*/
 					'id' => $id,
 					'code' => $code,
 					]);
@@ -216,10 +219,10 @@ class ERPSalesTicketsController extends Controller
 	 		$salesticket->setActive(1);
 	 		$salesticket->setDeleted(0);
 	 		$salesticket->setDateadd(new \DateTime());
-			if($newid<10) $salesticket->setCode("#".date("Y")."0000".$newid);
-			else if($newid<100) $salesticket->setCode("#".date("Y")."000".$newid);
-			else if($newid<1000) $salesticket->setCode("#".date("Y")."00".$newid);
-			else if($newid<10000) $salesticket->setCode("#".date("Y")."0".$newid);
+			if($newid<10) $salesticket->setCode("#V".date("Y")."0000".$newid);
+			else if($newid<100) $salesticket->setCode("#V".date("Y")."000".$newid);
+			else if($newid<1000) $salesticket->setCode("#V".date("Y")."00".$newid);
+			else if($newid<10000) $salesticket->setCode("#V".date("Y")."0".$newid);
 
 	 	}
 
@@ -248,21 +251,23 @@ class ERPSalesTicketsController extends Controller
 	 	$salesticket->setDateupd(new \DateTime());
 	 	$this->getDoctrine()->getManager()->persist($salesticket);
 
-	if($fields->salesticketnewagent!=""){
+		$newagent=null;
+		if($fields->salesticketnewagent!=""){
+
 		if($id==0){
 
 				$newagent=$agentsRepository->findOneBy(["id"=>$fields->salesticketnewagent, "active"=>1, "deleted"=>0]);
 				$channel=$newagent->getDiscordchannel();
-				$msg=$this->getUser()->getName()." ha solicitado que gestiones la incidencia Nº **".$newid."**";
+				$msg=$this->getUser()->getName()." ha solicitado que gestiones la incidencia Nº **"."#V".date("Y")."000".$newid."**";
 				file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
 				$msg="\n\nMás info en: \n".'https://axiom.ferreteriacampollano.com/es/ERP/salestickets/form/'.$newid;
 				file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
 			}
 			else{
-
+				$salesticket=$salesticketsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$id, "deleted"=>0]);
 				$newagent=$agentsRepository->findOneBy(["id"=>$fields->salesticketnewagent, "active"=>1, "deleted"=>0]);
 				$channel=$newagent->getDiscordchannel();
-				$msg=$this->getUser()->getName()." ha solicitado que gestiones la incidencia Nº **".$id."**";
+				$msg=$this->getUser()->getName()." ha solicitado que gestiones la incidencia Nº **".$salesticket->getCode()."**";
 				file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
 				$msg="\n\nMás info en: \n".'https://axiom.ferreteriacampollano.com/es/ERP/salestickets/form/'.$id;
 				file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
@@ -272,6 +277,11 @@ class ERPSalesTicketsController extends Controller
 
 		$history_obj=new ERPSalesTicketsHistory();
 		$history_obj->setAgent($this->getUser());
+		if($fields->salesticketnewagent!=""){
+			$history_obj->setNewagent($newagent);
+		}
+		else 	$history_obj->setNewagent($this->getUser());
+
 		$history_obj->setSalesTicket($salesticket);
 		$history_obj->setObservations($fields->observations);
 		$history_obj->setSalesticketstate($salesticketstate);
@@ -376,13 +386,43 @@ class ERPSalesTicketsController extends Controller
 
 
  /**
- * @Route("/{_locale}/ERP/salestraceability/{id}/delete", name="deleteSalesTickets")
+ * @Route("/{_locale}/ERP/salestickets/{id}/delete", name="deleteSalesTickets")
  */
  public function delete($id){
 	 $this->denyAccessUnlessGranted('ROLE_GLOBAL');
 	 $entityUtils=new GlobaleEntityUtils();
 	 $result=$entityUtils->deleteObject($id, $this->class, $this->getDoctrine());
 	 return new JsonResponse(array('result' => $result));
+ }
+
+
+ /**
+ * @Route("/api/ERP/salestickets/history/get/{id}", name="getSalesTicketHistory", defaults={"id"=0})
+ */
+ public function getSalesTicketHistory($id, RouterInterface $router,Request $request){
+	$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+	$salesticketsRepository=$this->getDoctrine()->getRepository(ERPSalesTickets::class);
+	$salesticketsHistoryRepository=$this->getDoctrine()->getRepository(ERPSalesTicketsHistory::class);
+	$salesticket=$salesticketsRepository->findOneBy(["id"=>$id]);
+
+//	$repositoryVariants=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
+	$salesticketshistory=$salesticketsHistoryRepository->findBy(["salesticket"=>$salesticket,"active"=>1,"deleted"=>0],["dateadd"=>"DESC"]);
+	$response=Array();
+
+	foreach($salesticketshistory as $line){
+		$item['dateadd']=$line->getDateadd()->format('H:i:s d/m/Y');
+		$item['dateadd2']=$line->getDateadd();
+		$item['agentid']=$line->getAgent()->getId();
+		$item['agentname']=$line->getAgent()->getName()." ".$line->getAgent()->getLastName();
+		$item['newagentname']=$line->getNewagent()->getName()." ".$line->getNewagent()->getLastName();
+		$item['newagentid']=$line->getNewagent()->getId();
+		$item['observations']=$line->getObservations();
+		$item['state']=$line->getSalesticketstate()->getName();
+		$response[]=$item;
+	}
+
+	return new JsonResponse(["history"=>$response]);
+
  }
 
 

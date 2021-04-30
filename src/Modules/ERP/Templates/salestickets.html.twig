@@ -9,6 +9,7 @@
 	{{ include('@Globale/header.html.twig') }}
 	<!-- Imported styles on this page -->
 	<link rel="stylesheet" href="{{ url('index') }}css/bootstrap-grid.css">
+		<link rel="stylesheet" href="{{ url('index') }}css/timeline.css">
 	<link rel="stylesheet" href="{{ url('index') }}/js/jvectormap/jquery-jvectormap-1.2.2.css">
 	<link rel="stylesheet" href="{{ url('index') }}/js/rickshaw/rickshaw.min.css">
 {% endblock %}
@@ -24,29 +25,17 @@
 		<!-- MAIN CONTENT -->
 		<div id="salesticket-body">
 			{% set formConstructor = {"name": ticketType} %}
-			{{ include("@Globale/form_validation.html.twig") }}
-			<br/>
+			{{ include('@ERP/salesticket_buttons.html.twig') }}
 			{{ include('@ERP/salesticket_header.html.twig') }}
 			{{ include('@ERP/salesticket_searching.html.twig') }}
 			{{ include('@ERP/salesticket_customer_data.html.twig') }}
 			{{ include('@ERP/salesticket_data.html.twig') }}
-		</div>
+			</div>
 			{{ include('@ERP/salesticket_search_customer.html.twig') }}
 			{{ include('@ERP/salesticket_search_salesorder.html.twig') }}
 			{{ include('@ERP/salesticket_prepare_json.html.twig') }}
 			{{ include('@ERP/salesticket_validation.html.twig') }}
 
-			<div class="row">
-					<div class="col-md-4">
-						{% if salesticket.agent is not null %}
-								<button attr-id="" attr-action="" id="salesticket-button-cancel" type="button" class="btn btn">Cancelar</button>
-								<button attr-id="" attr-action="" id="salesticket-button-save" type="button" class="btn btn-green">Guardar</button>
-						{% else %}
-							<button attr-id="" attr-action="" id="salesticket-button-cancel" type="button" class="btn btn">Cancelar</button>
-							<button attr-id="" attr-action="" id="salesticket-button-save" type="button" class="btn btn-green">Guardar</button>
-						{% endif %}
-					</div>
-			</div>
 		</div>
 </div>
 
