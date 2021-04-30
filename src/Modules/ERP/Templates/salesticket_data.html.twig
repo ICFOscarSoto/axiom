@@ -59,7 +59,7 @@
     var obj_create=moment('{{history.dateadd|date('Y-m-d H:i:s')}}');
     {% if history.newagent.id==history.agent.id %}
               var item='<li>'
-                  +'<time class="cbp_tmtime_tickets" datetime="">'+
+                  +'<time class="cbp_tmtime_tickets" datetime="">'
                   +'<span id="create-time-text">'+obj_create.format('HH:mm:ss D/MM/YY')+'</span><p>'+obj_create.from()+'</p>'
                   +'<h2>{{ history.agent.name }} {{ history.agent.lastname }}</h2>'
                   +'</time>'
@@ -90,7 +90,7 @@
             items+=item_aux;
 
             var item='<li>'
-                +'<time class="cbp_tmtime_tickets" datetime="">'+
+                +'<time class="cbp_tmtime_tickets" datetime="">'
                 +'<span id="create-time-text">'+obj_create.format('HH:mm:ss D/MM/YY')+'</span><p>'+obj_create.from()+'</p>'
                 +'<h2>{{ history.agent.name }} {{ history.agent.lastname }}</h2>'
                 +'</time>'

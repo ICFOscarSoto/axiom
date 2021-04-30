@@ -25,8 +25,6 @@
 		<!-- MAIN CONTENT -->
 		<div id="salesticket-body">
 			{% set formConstructor = {"name": ticketType} %}
-			{{ include("@Globale/form_validation.html.twig") }}
-			<br/>
 			{{ include('@ERP/salesticket_buttons.html.twig') }}
 			{{ include('@ERP/salesticket_header.html.twig') }}
 			{{ include('@ERP/salesticket_searching.html.twig') }}
