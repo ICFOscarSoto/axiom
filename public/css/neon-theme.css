@@ -6423,6 +6423,7 @@ fieldset[disabled] .calendar-env .calendar-body .fc-content .fc-view table tbody
   background-clip: padding-box;
 }
 .page-body .main-content .cbp_tmtimeline_tickets > li .cbp_tmlabel_tickets h2,
+.page-body .main-content .cbp_tmtimeline_tickets > li .cbp_tmlabel_tickets h3,
 .page-body .main-content .cbp_tmtimeline_tickets > li .cbp_tmlabel_tickets p {
   color: #737881;
   font-family: "Helvetica Neue", Helvetica, "Noto Sans", sans-serif;
@@ -6435,6 +6436,10 @@ fieldset[disabled] .calendar-env .calendar-body .fc-content .fc-view table tbody
 }
 .page-body .main-content .cbp_tmtimeline_tickets > li .cbp_tmlabel_tickets h2 {
   font-size: 14px;
+}
+
+.page-body .main-content .cbp_tmtimeline_tickets > li .cbp_tmlabel_tickets h3 {
+  font-size: 13px;
 }
 .page-body .main-content .cbp_tmtimeline_tickets > li .cbp_tmlabel_tickets h2 a {
   color: #303641;

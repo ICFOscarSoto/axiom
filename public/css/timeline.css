@@ -196,6 +196,12 @@
 	border-bottom: 1px solid rgba(255,255,255,0.4);
 }
 
+.cbp_tmtimeline_tickets > li .cbp_tmlabel_tickets h3 {
+	margin-top: 0px;
+	padding: 0 0 10px 0;
+	border-bottom: 1px solid rgba(255,255,255,0.4);
+}
+
 /* The triangle */
 .cbp_tmtimeline_tickets > li .cbp_tmlabel_tickets:after {
 	right: 100%;
