@@ -404,11 +404,12 @@ class ERPSalesTicketsController extends Controller
 	$salesticket=$salesticketsRepository->findOneBy(["id"=>$id]);
 
 //	$repositoryVariants=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
-	$salesticketshistory=$salesticketsHistoryRepository->findBy(["salesticket"=>$salesticket,"active"=>1,"deleted"=>0]);
+	$salesticketshistory=$salesticketsHistoryRepository->findBy(["salesticket"=>$salesticket,"active"=>1,"deleted"=>0],["dateadd"=>"DESC"]);
 	$response=Array();
 
 	foreach($salesticketshistory as $line){
 		$item['dateadd']=$line->getDateadd()->format('H:i:s d/m/Y');
+		$item['dateadd2']=$line->getDateadd();
 		$item['agentid']=$line->getAgent()->getId();
 		$item['agentname']=$line->getAgent()->getName()." ".$line->getAgent()->getLastName();
 		$item['newagentname']=$line->getNewagent()->getName()." ".$line->getNewagent()->getLastName();
