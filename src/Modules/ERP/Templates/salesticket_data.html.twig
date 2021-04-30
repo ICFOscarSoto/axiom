@@ -58,22 +58,20 @@
     {% for history in histories %}
     var obj_create=moment('{{history.dateadd|date('Y-m-d H:i:s')}}');
     {% if history.newagent.id==history.agent.id %}
-          var item='<li>'
-              +'<time class="cbp_tmtime_tickets" datetime="">'
-              +'<span id="create-time-text>'+obj_create.format('HH:mm:ss D/MM/YY')+'</span><p>'+obj_create.from()+'</p>'
-              +'<h2>{{ history.agent.name }} {{ history.agent.lastname }}</h2>'
-              '</time>'
-              +'<div class="cbp_tmicon_tickets bg-info">'
-              +'<img src="{{ url('index') }}api/user/{{ history.agent.id }}/getimage" alt="" class="img-circle" width="40" height="40">'
-              +'</div>'
-              +'<div class="cbp_tmlabel_tickets">'
-              +'<h2><strong>{{ history.observations }}</strong></h2>'
-              +'<h3>Estado del ticket: <strong>{{ history.salesticketstate.name }}</strong></h3>'
-              +'</div>'
-              +'</li>';
+              var item='<li>'
+                  +'<time class="cbp_tmtime_tickets" datetime="">'+
+                  +'<span id="create-time-text">'+obj_create.format('HH:mm:ss D/MM/YY')+'</span><p>'+obj_create.from()+'</p>'
+                  +'<h2>{{ history.agent.name }} {{ history.agent.lastname }}</h2>'
+                  +'</time>'
+                  +'<div class="cbp_tmicon_tickets bg-info">'
+                  +'<img src="{{ url('index') }}api/user/{{ history.agent.id }}/getimage" alt="" class="img-circle" width="40" height="40">'
+                  +'</div>'
+                  +'<div class="cbp_tmlabel_tickets">'
+                  +'<h2><strong>{{ history.observations }}</strong></h2>'
+                  +'<h3>Estado del ticket: <strong>{{ history.salesticketstate.name }}</strong></h3>'
+                  +'</div>'
+                  +'</li>';
             items+=item;
-
-          }
   {% else %}
             var item_aux='<li>'
                 +'<time class="cbp_tmtime_tickets" datetime="">'
@@ -93,7 +91,7 @@
 
             var item='<li>'
                 +'<time class="cbp_tmtime_tickets" datetime="">'+
-                '<span id="create-time-text">'+obj_create.format('HH:mm:ss D/MM/YY')+'</span><p>'+obj_create.from()+'</p>'
+                +'<span id="create-time-text">'+obj_create.format('HH:mm:ss D/MM/YY')+'</span><p>'+obj_create.from()+'</p>'
                 +'<h2>{{ history.agent.name }} {{ history.agent.lastname }}</h2>'
                 +'</time>'
                 +'<div class="cbp_tmicon_tickets bg-info">'
@@ -111,6 +109,5 @@
     {% endif %}
     {% endfor %}
     $("#ul_timeline_tickets").append(items);
-
 });
 </script>
