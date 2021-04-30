@@ -14,6 +14,10 @@
         "caption": "Nº Albarán"
     },
     {
+        "name": "supplier__code",
+        "caption": "Cod. Proveedor"
+    },
+    {
         "name": "supplier__name",
         "caption": "supplier"
     },
