@@ -70,7 +70,7 @@
               +'<time class="cbp_tmtime_tickets" datetime="">'
               +'<span id="create-time-text" style="font-size:15px;">'+valor.dateadd+'</span>'
               +'<h2>'+valor.agentname+'</h2>'
-              '</time>'
+              +'</time>'
               +'<div class="cbp_tmicon_tickets bg-info">'
               +'<img src="{{ url('index') }}api/user/'+valor.agentid+'/getimage" alt="" class="img-circle" width="40" height="40">'
               +'</div>'
@@ -79,7 +79,6 @@
               +'<h2>Estado del ticket: <strong>'+valor.state+'</strong></h2>'
               +'</li>';
             items+=item;
-
           }
           else{
             var item_aux='<li>'
