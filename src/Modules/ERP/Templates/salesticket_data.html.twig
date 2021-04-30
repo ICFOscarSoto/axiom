@@ -1,43 +1,121 @@
 <div class="panel panel-primary panel-shadow" data-collapsed="0" style="-webkit-box-shadow: none; box-shadow:none; padding:0px; margin-bottom: -1px;"><!-- to apply shadow add class "panel-shadow" -->
-  <div class="panel-body">
-
-    <div class="panel-title">Información de la incidencia</div>
-    <div class="row">
-      <div class="col-6 col-sm-2"> <div class="form-group">
-        <input type="hidden" id="salesticket-form-states" class="form-control">
-          <label for="salesticket-form-states-select">Estado del ticket</label>
-        <select type="text" id="salesticket-form-states-select" class="form-control select2" required>
-          {% for option in states %}
-            <option value="{{ option.id }}"{% if id!=0 %}{% if salesticket.salesticketstate!=null and option.id==salesticket.salesticketstate.id %} selected="selected" {% endif %}{% else %}{% if option.id==5 %} selected="selected"{% endif %}{% endif %}>{{ option.text }}</option>
-          {% endfor %}
-        </select>
+  <div class="col-md-4">
+    <div class="panel-body">
+        <div class="panel-title">Información de la incidencia</div>
+        <div class="row">
+          <div class="col-6 col-sm-6">
+            <div class="form-group">
+              <input type="hidden" id="salesticket-form-states" class="form-control">
+                <label for="salesticket-form-states-select">Estado del ticket</label>
+              <select type="text" id="salesticket-form-states-select" class="form-control select2" required>
+                {% for option in states %}
+                  <option value="{{ option.id }}"{% if id!=0 %}{% if salesticket.salesticketstate!=null and option.id==salesticket.salesticketstate.id %} selected="selected" {% endif %}{% else %}{% if option.id==5 %} selected="selected"{% endif %}{% endif %}>{{ option.text }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+        <div class="col-6 col-sm-6">
+          <div class="form-group">
+            <input type="hidden" id="salesticket-form-agents" class="form-control">
+            <label for="salesticket-form-agents-select">Traspasar a otro agente</label>
+            <select type="text" id="salesticket-form-agents-select" class="form-control select2" required>
+              {% for option in agents %}
+                <option value="{{ option.id }}">{{ option.text }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+          <div class="col-12 col-sm-12">
+            <div class="form-group" >
+            <label for="salesticket-form-observations">Observaciones</label>
+            <textarea id="salesticket-form-observations" name="salesticket-form-observations" class="form-control" style="min-height:90px;">{% if salesticket.observations!=null %}{{ salesticket.observations }}{% endif %}</textarea>
+            <script>
+            $(document).ready(function() {
+              var editor = new Jodit('#salesticket-form-observations');
+            });
+            </script>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="col-4 col-sm-2"> <div class="form-group">
-      <input type="hidden" id="salesticket-form-agents" class="form-control">
-        <label for="salesticket-form-agents-select">Traspasar a otro agente</label>
-      <select type="text" id="salesticket-form-agents-select" class="form-control select2" required>
-        {% for option in agents %}
-          <option value="{{ option.id }}">{{ option.text }}</option>
-        {% endfor %}
-      </select>
-    </div>
   </div>
-  </div>
-  <div class="row">
-      <div class="col-6 col-sm-6"> <div class="form-group" >
-        <label for="salesticket-form-observations">Observaciones</label>
-        <textarea id="salesticket-form-observations" name="salesticket-form-observations" class="form-control" style="min-height:90px;">{% if salesticket.observations!=null %}{{ salesticket.observations }}{% endif %}</textarea>
-        <script>
-        $(document).ready(function() {
-          var editor = new Jodit('#salesticket-form-observations');
-        });
-        </script>
-
+  <div class="col-md-8">
+    <div class="panel-body">
+      <div class="panel-title">Trazabilidad</div>
+      <div class="col-md-12">
+        <ul class="cbp_tmtimeline_tickets" id="ul_timeline_tickets"></ul>
       </div>
     </div>
-  </div>
   </div>
 </div>
-<br>
-<br>
+<script>
+  $(document).ready(function(){
+    id={{ id }};
+    var items="";
+    var angentasignedname=$("#salesticket-form-agent").val();
+    var angentasignedid=$("#salesticket-form-agent-id").val();
+    if((++load_wait)==1) $("#load-spinner").fadeIn();
+    $.ajax({
+        type: "GET",
+        dataType: "json",
+        url: "/api/ERP/salestickets/history/get/"+id,
+      }).done(function( elements, textStatus, jqXHR ) {
+        if((--load_wait)==0) $("#load-spinner").fadeOut();
+         elements.history.forEach( function(valor, indice, array){
+          if(valor.newagentid==valor.agentid)
+          {
+          var item='<li>'
+              +'<time class="cbp_tmtime_tickets" datetime="">'
+              +'<span id="create-time-text" style="font-size:15px;">'+valor.dateadd+'</span>'
+              +'<h2>'+valor.agentname+'</h2>'
+              +'</time>'
+              +'<div class="cbp_tmicon_tickets bg-info">'
+              +'<img src="{{ url('index') }}api/user/'+valor.agentid+'/getimage" alt="" class="img-circle" width="40" height="40">'
+              +'</div>'
+              +'<div class="cbp_tmlabel_tickets">'
+              +'<h2><strong>'+valor.observations+'</strong></h2>'
+              +'<h2>Estado del ticket: <strong>'+valor.state+'</strong></h2>'
+              +'</li>';
+            items+=item;
+          }
+          else{
+            var item_aux='<li>'
+                +'<time class="cbp_tmtime_tickets" datetime="">'
+                +'<span id="create-time-text" style="font-size:15px;">'+valor.dateadd+'</span>'
+                +'<h2>'+valor.newagentname+'</h2>'
+                +'</time>'
+                +'<div class="cbp_tmicon_tickets bg-info">'
+                +'<img src="{{ url('index') }}api/user/'+valor.newagentid+'/getimage" alt="" class="img-circle" width="40" height="40">'
+                +'</div>'
+                +'<div class="cbp_tmlabel_tickets">'
+                +'<h2>Estado del ticket: <strong>'+valor.state+'</strong></h2>'
+                +'</li>';
+
+            items+=item_aux;
+
+            var item='<li>'
+                +'<time class="cbp_tmtime_tickets" datetime="">'+
+                '<span id="create-time-text" style="font-size:15px;">'+valor.dateadd+'</span>'
+                +'<h2>'+valor.agentname+'</h2>'
+                +'</time>'
+                +'<div class="cbp_tmicon_tickets bg-info">'
+                +'<img src="{{ url('index') }}api/user/'+valor.agentid+'/getimage" alt="" class="img-circle" width="40" height="40">'
+                +'</div>'
+                +'<div class="cbp_tmlabel_tickets">'
+                +'<h2><strong>'+valor.observations+'</strong></h2>'
+                +'<h2><i class="fa fa-forward" aria-hidden="true"></i> Traspasa la incidencia a '+valor.newagentname+'</h2>'
+                +'</li>';
+
+              items+=item;
+
+
+          }
+
+
+        });
+          $("#ul_timeline_tickets").append(items);
+      });
+});
+</script>
