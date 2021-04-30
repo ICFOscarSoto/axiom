@@ -175,6 +175,7 @@
 .cbp_tmtimeline_tickets > li .cbp_tmtime_tickets h2 {
 	font-size: 14px;
 	text-align: right;
+	margin:0;
 }
 /* Right content */
 .cbp_tmtimeline_tickets > li .cbp_tmlabel_tickets {
