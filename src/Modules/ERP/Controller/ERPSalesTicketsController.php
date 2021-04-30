@@ -131,9 +131,6 @@ class ERPSalesTicketsController extends Controller
 			//sales ticket states
 			$objects=$salesticketsstatesRepository->findBy(["active"=>1,"deleted"=>0],["name"=>"ASC"]);
 			$states=[];
-			$option["id"]=null;
-			$option["text"]="Estado del ticket";
-			$states[]=$option;
 			foreach($objects as $item){
 				$option["id"]=$item->getId();
 				$option["text"]=$item->getName();
