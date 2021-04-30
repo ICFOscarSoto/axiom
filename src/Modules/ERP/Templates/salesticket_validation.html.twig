@@ -18,6 +18,15 @@
          return valid;
 
       }
+      if($("#salesticket-form-states-select").val()=="-1")
+      {
+        toastr.error("Por favor, selecciona un nuevo estado para la incidencia", "Confirmación", confirmation);
+         valid=false;
+         return valid;
+
+      }
+
+
       /*
       if($(this).find("#product-form-suppliers-"+$(this).attr("attr-id")).val()=="-1")
       {

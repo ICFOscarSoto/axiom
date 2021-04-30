@@ -6,10 +6,11 @@
           <div class="col-6 col-sm-6">
             <div class="form-group">
               <input type="hidden" id="salesticket-form-states" class="form-control">
-                <label for="salesticket-form-states-select">Estado del ticket</label>
+                <label for="salesticket-form-states-select">Cambiar estado del ticket</label>
               <select type="text" id="salesticket-form-states-select" class="form-control select2" required>
+                  <option value="-1">Elegir estado...</option>
                 {% for option in states %}
-                  <option value="{{ option.id }}"{% if id!=0 %}{% if salesticket.salesticketstate!=null and option.id==salesticket.salesticketstate.id %} selected="selected" {% endif %}{% else %}{% if option.id==5 %} selected="selected"{% endif %}{% endif %}>{{ option.text }}</option>
+                  <option value="{{ option.id }}">{{ option.text }}</option>
                 {% endfor %}
               </select>
             </div>
