@@ -73,7 +73,7 @@ class ERPSalesTicketsController extends Controller
 			 $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
 			 $configrepository=$this->getDoctrine()->getRepository(ERPConfiguration::class);
 		   $salesticketsRepository=$this->getDoctrine()->getRepository(ERPSalesTickets::class);
-		//	 $SalesTicketsHistoryRepository = $this->getDoctrine()->getRepository(ERPSalesTicketsHistory::class);
+			 $SalesTicketsHistoryRepository = $this->getDoctrine()->getRepository(ERPSalesTicketsHistory::class);
 			 $salesticketsstatesRepository=$this->getDoctrine()->getRepository(ERPSalesTicketsStates::class);
 			 $agentsRepository=$this->getDoctrine()->getRepository(GlobaleUsers::class);
 			 $userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
@@ -129,7 +129,7 @@ class ERPSalesTicketsController extends Controller
 			}
 
 			//sales ticket states
-			$objects=$salesticketsstatesRepository->findBy(["active"=>1,"deleted"=>0]);
+			$objects=$salesticketsstatesRepository->findBy(["active"=>1,"deleted"=>0],["name"=>"ASC"]);
 			$states=[];
 			$option["id"]=null;
 			$option["text"]="Estado del ticket";
@@ -141,7 +141,7 @@ class ERPSalesTicketsController extends Controller
 			}
 
 			//agents
-			$agent_objects=$agentsRepository->findBy(["active"=>1,"deleted"=>0]);
+			$agent_objects=$agentsRepository->findBy(["active"=>1,"deleted"=>0],["name"=>"ASC"]);
 			$agents=[];
 			$option=null;
 			$option["id"]=null;
@@ -159,6 +159,10 @@ class ERPSalesTicketsController extends Controller
 
 		//	$salesticketHistory=$SalesTicketsHistoryRepository->->findBy(["salesticket"=>$salesticket,"active"=>1,"deleted"=>0]);
 
+		$histories=$SalesTicketsHistoryRepository->findBy(["salesticket"=>$salesticket,"active"=>1,"deleted"=>0],["dateadd"=>"DESC"]);
+		foreach($histories as $key=>$item){
+			$histories[$key]=$item;
+		}
 			if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 				return $this->render('@ERP/salestickets.html.twig', [
 					'moduleConfig' => $config,
@@ -175,6 +179,7 @@ class ERPSalesTicketsController extends Controller
 					'agents' => $agents,
 					'ticketType' => 'sales_ticket',
 					'salesticket' => $salesticket,
+					'histories'=>$histories,
 				/*	'salesticketshistory' => $salesticketHistory,*/
 					'id' => $id,
 					'code' => $code,
