@@ -46,7 +46,7 @@ class VehiclesVehiclesController extends Controller
 	 	}
 	 	$params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "object"=>$obj];
 	 	$utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
-	 	return $utils->make($id, $this->class, $action, "formvehicle", "full", "@Globale/form.html.twig", "formVehicles");
+	 	return $utils->make($id, $this->class, $action, "formvehicle", "full", "@Globale/form.html.twig", "formVehicle");
 	 }
 
 	 /**

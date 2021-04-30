@@ -53,7 +53,7 @@ class ERPPurchasesDeliveryNotesController extends Controller
 		$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
 		$locale = $request->getLocale();
 		$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
-		$breadcrumb=$menurepository->formatBreadcrumb('inputs');
+		$breadcrumb=$menurepository->formatBreadcrumb('genericindex','ERP','Inputs');
 		$inputsRepository=$this->getDoctrine()->getRepository(ERPInputs::class);
 
 		if($request->query->get('code',null)){

@@ -1,0 +1,27 @@
+<script>
+
+$(document).ready(function() {
+console.log("Entro");
+console.log($("#id-object").val());
+  if($("#id-object").val()=="0"){
+    console.log("Entro");
+  }else{
+    $("#panel-meeting").hide();
+  }
+
+
+  $('body').on('click', "#sendMeetingsSummoneds-top-button-foreground", function(event) {
+    $.confirm({
+        //theme: 'bootstrap',
+        title: 'Enviar convocatorias',
+        content: '¿Desea enviar la convocatoria a todos los participantes?',
+        alignMiddle: true,
+        animateFromElement: false,
+        buttons: {
+           confirm: { text: 'Confirmar', btnClass: 'btn-red', action: function(){ window.location.href='' ;} },
+           cancel: { text: 'Cancelar' }
+        }
+    });
+  });
+});
+</script>

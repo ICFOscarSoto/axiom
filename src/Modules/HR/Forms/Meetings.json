@@ -1,0 +1,46 @@
+[{
+    "sections": [
+        {
+            "name": "Summon",
+            "fields": [
+                {
+                    "name": "name",
+                    "cols": 6
+                },
+                {
+                    "name": "meetingdate",
+                    "cols": 3
+                },
+                {
+                    "name": "place",
+                    "cols": 3
+                },
+                {
+                    "name": "agenda",
+                    "cols": 12,
+                    "class": "wysiwyg"
+                }
+
+            ]
+        },
+        {
+            "name": "meeting",
+            "fields": [
+              {
+                  "name": "startdate",
+                  "cols": 4
+              },
+              {
+                  "name": "enddate",
+                  "cols": 4
+              },
+              {
+                  "name": "report",
+                  "cols": 12,
+                  "height": "500",
+                  "class": "wysiwyg"
+              }
+            ]
+        }
+    ]
+}]

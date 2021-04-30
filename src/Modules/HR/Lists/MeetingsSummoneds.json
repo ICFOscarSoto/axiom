@@ -1,0 +1,40 @@
+[
+    {
+        "name": "id",
+        "caption": "id"
+    },
+    {
+        "name": "worker__name_o_worker__lastname",
+        "caption": "name"
+    },
+    {
+        "name": "sended",
+        "caption": "sendedSummon",
+        "class": "dt-center",
+        "replace": {
+            "1": {
+                "text": "Enviada",
+                "html": "<div style=\"min-width: 75px;\" class=\"label label-success\">Enviada<\/div>"
+            },
+            "0": {
+                "text": "No Enviada",
+                "html": "<div style=\"min-width: 75px;\" class=\"label label-danger\">No Enviada<\/div>"
+            }
+        }
+    },
+    {
+        "name": "witness",
+        "caption": "witness",
+        "class": "dt-center",
+        "replace": {
+            "1": {
+                "text": "Asiste",
+                "html": "<div style=\"min-width: 75px;\" class=\"label label-success\">Asiste<\/div>"
+            },
+            "0": {
+                "text": "No asiste",
+                "html": "<div style=\"min-width: 75px;\" class=\"label label-danger\">No asiste<\/div>"
+            }
+        }
+    }
+]

@@ -1,0 +1,8 @@
+[
+  {"id": "editMeetingsSummoneds", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"genericdata", "routeParams":{"module":"HR", "name":"MeetingsSummoneds", "type":"modal" }, "modal":"MeetingsSummoneds", "actionType" : "background", "confirm" :false, "tooltip":""},
+  {"id": "witness", "type": "option", "options": [
+      {"id": "desactivateMeetingsSummoneds", "type" : "success", "condition": "witness", "conditionValue" :false , "icon" : "fas fa-thumbs-up","name" : "No asitencia", "route":"confirmWitness", "confirm" :true, "confirm_msg":"confirmar la asistencia de este participante", "actionType" : "background", "tooltip":"Confirmar la asistencia del participante" },
+      {"id": "activateMeetingsSummoneds", "type" : "danger", "condition": "witness", "conditionValue" :true, "icon" : "fas fa-thumbs-down","name" : "Asiste", "route":"unconfirmWitness", "confirm" :true, "confirm_msg":"confirmar la no asistencia de este participante", "actionType" : "background", "tooltip":"Confirmar la NO asistencia del participante" }
+  ]},
+  {"id": "deleteMeetingsSummoneds", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"genericdelete", "routeParams":{"module":"HR", "name":"MeetingsSummoneds"}, "confirm" :true, "undo" :false, "actionType" : "background", "tooltip":""}
+]

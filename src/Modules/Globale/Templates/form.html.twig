@@ -28,7 +28,7 @@
 
   {% for section in formConstructor.template.0.sections %}
 
-  <div class="panel minimal">
+  <div class="panel minimal" id="panel-{{ section.name }}">
     <div class="panel-heading">
       <div class="panel-title">{{ (section.name)|trans }}</div>
     </div>
@@ -123,7 +123,7 @@
           {% if keyitem =="id" %}
               {% set id = varitem %}
           {% endif %}
-        
+
         {% endfor %}
       {% endif %}
         {{ include(includeitem.template) }}

@@ -1,0 +1,13 @@
+[{
+    "sections": [
+        {
+            "name": "data",
+            "fields": [
+                {
+                    "name": "worker",
+                    "cols": 12
+                }
+            ]
+        }
+    ]
+}]

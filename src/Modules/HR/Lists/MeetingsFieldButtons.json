@@ -1,0 +1,4 @@
+[
+  {"id": "editMeetings", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"formMeetings", "actionType" : "foreground", "confirm" :false, "tooltip":""},
+  {"id": "deleteMeetings", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"genericdelete", "routeParams":{"module":"HR", "name":"Meetings"}, "confirm" :true, "undo" :false, "actionType" : "background", "tooltip":""}
+]

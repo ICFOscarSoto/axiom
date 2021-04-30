@@ -3,7 +3,7 @@
         {
             "name": "data",
             "fields": [
-                { "name": "vehicleImage", "cols": 4,	"type": "image", "imageType":"vehicles", "value": "getImage", "width": "100%",	"height": "250px"},
+                { "name": "vehicleImage", "cols": 4,	"type": "gallery", "imageType":"vehicles", "value": "getImage", "width": "100%",	"height": "250px"},
                 {
                     "name": "brand",
                     "cols": 4
@@ -22,11 +22,13 @@
                 },
                 {
                     "name": "licenseplatedate",
+                    "caption": "Licenseplatedate",
                     "cols": 2,
                     "type": "date"
                 },
                 {
                     "name": "licenseplateenddate",
+                    "caption": "Licenseplateenddate",
                     "cols": 3,
                     "type": "date"
                 },
@@ -45,7 +47,7 @@
                 {
                     "name": "km",
                     "cols": 2,
-                    "readonly": true
+                    "readonly": "noChange"
                 },
                 {
                     "name": "active",

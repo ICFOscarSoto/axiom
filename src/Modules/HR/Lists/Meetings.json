@@ -1,0 +1,23 @@
+[
+    {
+        "name": "id",
+        "caption": "id"
+    },
+    {
+        "name": "meetingdate",
+        "caption": "date",
+        "type": "datetime"
+    },
+    {
+        "name": "name",
+        "caption": "name"
+    },
+    {
+        "name": "place",
+        "caption": "place"
+    },
+    {
+        "name": "author__name_o_author__lastname",
+        "caption": "convener"
+    }
+]
