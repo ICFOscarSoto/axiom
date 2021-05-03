@@ -2,14 +2,33 @@
     <div class="panel-body">
     <div class="row">
       {% if salesticket.salesticketstate!=null %}
+
+        {% set color_state = '' %}
+        {% if salesticket.salesticketstate.id == 1 %}
+           {% set color_state = '#21a9e1' %}
+           {% set color_text = '#fff' %}
+        {% elseif salesticket.salesticketstate.id == 2 %}
+           {% set color_state = '#cc2424' %}
+           {% set color_text = '#fff' %}
+        {% elseif salesticket.salesticketstate.id == 3 %}
+           {% set color_state = '#00a651' %}
+           {% set color_text = '#fff' %}
+        {% elseif salesticket.salesticketstate.id == 4 %}
+           {% set color_state = '#21a9e1' %}
+           {% set color_text = '#fff' %}
+        {% else %}
+           {% set color_state = '#ebebeb' %}
+           {% set color_text = '#000' %}
+        {% endif %}
+
       <div class="col-md-2">
         <label for="salesticket-form-currentstate">Estado actual:</label>
-        <input {% if salesticket.salesticketstate.id!=3 %}style="background-color:#00a651!important;color:#fff;"{% else %}style="background-color:#cc2424!important;color:#fff;"{% endif %} type="text" id="salesticket-form-currentstate" value="{{ salesticket.salesticketstate.name }}" disabled="disabled" class="form-control" placeholder="Estado actual">
+        <input style="background-color:{{color_state}}!important;color:{{color_text}}!important;" type="text" id="salesticket-form-currentstate" value="{{ salesticket.salesticketstate.name }}" disabled="disabled" class="form-control" placeholder="Estado actual">
       </div>
       {% else %}
         <div class="col-md-2">
           <label for="salesticket-form-currentstate">Estado actual:</label>
-          <input style="background-color:#00a651!important;color:#fff;" type="text" id="salesticket-form-currentstate" value="Abierto" disabled="disabled" class="form-control" placeholder="Estado actual">
+          <input style="background-color:#ebebeb!important;color:#000;" type="text" id="salesticket-form-currentstate" value="Abierto" disabled="disabled" class="form-control" placeholder="Estado actual">
         </div>
         {% endif %}
       {% if salesticket.agent is not null %}
