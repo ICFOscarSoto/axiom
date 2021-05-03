@@ -21,7 +21,31 @@
       "name" :"externalsalesordernumber","caption":"Nº de pedido externo"
   },
   {
-      "name" :"salesticketstate__name","caption":"Estado del Ticket"
+      "name" :"salesticketstate__name",
+      "caption":"Estado del Ticket",
+      "class": "dt-center",
+      "replace": {
+          "Abierto": {
+              "text": "Abierto",
+              "html": "<div style=\"min-width: 75px;\" class=\"label label-default\">Abierto<\/div>"
+          },
+          "Solucionado": {
+              "text": "Solucionado",
+              "html": "<div style=\"min-width: 75px;\" class=\"label label-success\">Solucionado<\/div>"
+          },
+          "Cliente esperando solución": {
+              "text": "Cliente esperando solución",
+              "html": "<div style=\"min-width: 75px;\" class=\"label label-danger\">Cliente esperando solución<\/div>"
+          },
+          "Envio condicionado": {
+              "text": "Cliente esperando solución",
+              "html": "<div style=\"min-width: 75px;\" class=\"label label-warning\">Cliente esperando solución<\/div>"
+          },
+          "Material defectuoso": {
+              "text": "Material defectuoso",
+              "html": "<div style=\"min-width: 75px;\" class=\"label label-warning\">Material defectuoso<\/div>"
+          }
+      }
   },
   {
       "name" :"agent__name_o_agent__lastname","caption":"Agente"
