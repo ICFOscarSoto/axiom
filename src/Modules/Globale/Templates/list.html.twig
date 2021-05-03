@@ -271,7 +271,7 @@ var url = new URL(window.location.href);
 													});
 												}#}
 												{# Check if has a select associated and fill it #}
-													{% if '__' in field.name %}
+													{% if '__' in field.name and field.replace is not defined %}
 														{# check if exist the element in select #}
 														if(row["{{ field.name}}"]!=null)
 															if ($('#s_{{ field.name}}').find("option[value='" + row["{{ field.name}}"] + "']").length) {
