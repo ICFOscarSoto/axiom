@@ -34,7 +34,7 @@
               +'<img src="{{ url('index') }}api/user/'+valor.agentid+'/getimage" alt="" class="img-circle" width="40" height="40">'
               +'</div>'
               +'<div class="cbp_tmlabel">'
-              +'<h2><strong>'+valor.observations+'</strong></h2>'
+              +'<h2><div>'+valor.observations+'</div></h2>'
               +'<h2>Estado del ticket: <strong>'+valor.state+'</strong></h2>'
               +'</li>';
             items+=item;
@@ -64,7 +64,7 @@
                 +'<img src="{{ url('index') }}api/user/'+valor.agentid+'/getimage" alt="" class="img-circle" width="40" height="40">'
                 +'</div>'
                 +'<div class="cbp_tmlabel">'
-                +'<h2><strong>'+valor.observations+'</strong></h2>'
+                +'<h2><div>'+valor.observations+'</div></h2>'
                 +'<h2><i class="fa fa-forward" aria-hidden="true"></i> Traspasa la incidencia a '+valor.newagentname+'</h2>'
                 +'</li>';
 
