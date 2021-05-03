@@ -4,18 +4,17 @@
       "class": "hidden"
   },
   {
+      "name": "code",
+      "caption": "Nº de pedido",
+      "width": "15%",
+      "class": "all"
+  },
+  {
       "name": "externalordernumber",
       "caption": "Nº de pedido web",
       "width": "15%",
       "class": "all"
   },
-  {
-      "name": "code",
-      "caption": "code",
-      "width": "15%",
-      "class": "all"
-  },
-
   {
       "name": "date",
       "caption": "Date",
