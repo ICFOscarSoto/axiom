@@ -21,29 +21,29 @@
       "name" :"externalsalesordernumber","caption":"Nº de pedido externo"
   },
   {
-      "name" :"salesticketstate__name",
+      "name" :"salesticketstate",
       "caption":"Estado del Ticket",
       "class": "dt-center",
       "replace": {
-          "Abierto": {
+          "5": {
               "text": "Abierto",
               "html": "<div style=\"min-width: 75px;\" class=\"label label-default\">Abierto<\/div>"
           },
-          "Solucionado": {
+          "3": {
               "text": "Solucionado",
               "html": "<div style=\"min-width: 75px;\" class=\"label label-success\">Solucionado<\/div>"
           },
-          "Cliente esperando solución": {
+          "2": {
               "text": "Cliente esperando solución",
               "html": "<div style=\"min-width: 75px;\" class=\"label label-danger\">Cliente esperando solución<\/div>"
           },
-          "Envio condicionado": {
-              "text": "Cliente esperando solución",
-              "html": "<div style=\"min-width: 75px;\" class=\"label label-warning\">Cliente esperando solución<\/div>"
+          "1": {
+              "text": "Envio condicionado",
+              "html": "<div style=\"min-width: 75px;\" class=\"label label-info\">Envio condicionado<\/div>"
           },
-          "Material defectuoso": {
+          "4": {
               "text": "Material defectuoso",
-              "html": "<div style=\"min-width: 75px;\" class=\"label label-warning\">Material defectuoso<\/div>"
+              "html": "<div style=\"min-width: 75px;\" class=\"label label-info\">Material defectuoso<\/div>"
           }
       }
   },
