@@ -67,7 +67,7 @@
                   +'<img src="{{ url('index') }}api/user/{{ history.agent.id }}/getimage" alt="" class="img-circle" width="40" height="40">'
                   +'</div>'
                   +'<div class="cbp_tmlabel_tickets">'
-                  +'<h2><strong>{{ history.observations }}</strong></h2>'
+                  +'<h2>{{ history.observations|raw }}</h2>'
                   +'<h3>Estado del ticket: <strong>{{ history.salesticketstate.name }}</strong></h3>'
                   +'</div>'
                   +'</li>';
@@ -98,7 +98,7 @@
                 +'<img src="{{ url('index') }}api/user/{{ history.agent.id }}/getimage" alt="" class="img-circle" width="40" height="40">'
                 +'</div>'
                 +'<div class="cbp_tmlabel_tickets">'
-                +'<h2><strong>{{ history.observations }}</strong></h2>'
+                +'<h2>{{ history.observations|raw }}</h2>'
                 +'<h3>Estado del ticket: <strong>{{ history.salesticketstate.name }}</strong></h3>'
                 +'<h3><i class="fa fa-forward" aria-hidden="true"></i> Traspasa la incidencia a {{ history.newagent.name }}</h3>'
                 +'</div>'
