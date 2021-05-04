@@ -150,8 +150,8 @@
 
 .cbp_tmtimeline_tickets > li .cbp_tmtime_tickets {
 	display: block;
-	width: 40%;
-	padding-right: 228px;
+	width: 45%;
+	padding-right: 30%;
 	position: absolute;
 	text-align: right;
 }
