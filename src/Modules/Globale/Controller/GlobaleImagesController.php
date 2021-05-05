@@ -24,6 +24,23 @@ class GlobaleImagesController extends Controller implements ContainerAwareInterf
 
 	use ContainerAwareTrait;
 
+		/**
+     * @Route("/api/{type}/{id}/takecameraimage", name="takecameraimage")
+     */
+	public function takecameraimage($ext, Request $request)
+	{
+		//$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		//if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+		return $this->render('@Globale/takecameraimage.html.twig', array(
+						'entity_name' => $entity_name,
+						'controllerName' => 'CustomersController'
+					));
+	//	}
+	//	return new RedirectResponse($this->router->generate('app_login'));
+	}
+
+
+
 	/**
      * @Route("/api/files/{ext}/getimage", name="getFilesImage")
      */

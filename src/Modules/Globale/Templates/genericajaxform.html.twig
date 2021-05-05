@@ -1,4 +1,4 @@
-<div class="modal fade" tabindex="-1" id="{{ form.id }}-modal-form" aria-hidden="true">
+<div class="modal fade" id="{{ form.id }}-modal-form" aria-hidden="true">
 		<div class="modal-dialog modal-lg">
 			<div class="modal-content" style="transform: matrix(1, 0, 0, 1, 0, 0);">
 				<div class="modal-header">
@@ -31,7 +31,7 @@
 	</div>
 {% if form.template[0].buttons is defined %}
 {% for button in form.template[0].buttons %}
-	<div class="modal fade" tabindex="-1" id="modal-confirm-{{ button.name }}" aria-hidden="true">
+	<div class="modal fade" id="modal-confirm-{{ button.name }}" aria-hidden="true">
 		<div class="modal-dialog">
 			<div class="modal-content" style="transform: matrix(1, 0, 0, 1, 0, 0);">
 				<div class="modal-header">
