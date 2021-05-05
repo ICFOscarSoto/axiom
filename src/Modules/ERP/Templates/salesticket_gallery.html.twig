@@ -1,0 +1,136 @@
+<div id="delete_button_container" style="display:none;">
+  <a href="#" id="btn-erase" class="btn btn-red">Eliminar imágenes</a>
+</div>
+<div id="upload_image_button_container" style="display:none;">
+  <a href="#" id="btn-uploadimages" class="btn btn-green">Subir imágenes a la web</a>
+</div>
+<div id="gallery" class="fotorama" style="margin-right: 14px;margin-top: 20px; height: 300px" data-height="230" data-maxheight="230" data-width="100%" data-maxwidth="100%" data-nav="thumbs" data-allowfullscreen="true">
+
+</div>
+<div id="fileinput-{{ gallery.name }}" class="fileinput fileinput-new" data-provides="fileinput">
+  <div class="fileinput-new thumbnail" style="width: {{ gallery.width }}; height: {{ gallery.height }};display:none;" data-trigger="fileinput" >
+    <img id="fileinput-img-{{ gallery.name }}" src="{{ url(gallery.value,{'id': id, 'type': gallery.imageType, 'size': 'medium'}) }}" alt="">
+  </div>
+  <div id="image-preview-{{ gallery.name }}" class="fileinput-preview fileinput-exists thumbnail" style="width: {{ gallery.width }}; height: {{ gallery.height }};display:none;" ></div>
+  <div>
+    <span class="btn btn-orange btn-file">
+      <span class="">Añadir imagen...</span>
+      <input type="file" id="form_{{ gallery.name }}" name="form[{{ gallery.name }}]" accept="image/*" class="transform-button btn">
+    </span>
+    <a href="#" id="btn-image-cancel-{{ gallery.name }}" class="btn btn-red fileinput-exists" data-dismiss="fileinput">Cancel</a>
+    <a href="#" id="btn-image-save-{{ gallery.name }}" attr-imageType="{{ gallery.imageType }}" class="btn btn-green fileinput-exists">Guardar</a>
+  </div>
+
+
+</div>
+<script>
+
+function b64toBlob(b64Data, contentType, sliceSize) {
+  contentType = contentType || '';
+  sliceSize = sliceSize || 512;
+  var byteCharacters = atob(b64Data);
+  var byteArrays = [];
+  for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+      var slice = byteCharacters.slice(offset, offset + sliceSize);
+      var byteNumbers = new Array(slice.length);
+      for (var i = 0; i < slice.length; i++) {
+          byteNumbers[i] = slice.charCodeAt(i);
+      }
+      var byteArray = new Uint8Array(byteNumbers);
+      byteArrays.push(byteArray);
+  }
+var blob = new Blob(byteArrays, {type: contentType});
+return blob;
+}
+
+$(document).ready(function() {
+//get images
+$.post("/api/{{gallery.imageType}}/getimages/{{id}}",
+    function(data, status, xhr){
+        if(data.result){
+          if(data.images.length>0){
+            var html='';
+            data.images.forEach(function(valor, indice, array) {
+                html+='<a href="'+valor.large+'"><img src="'+valor.thumb+'"></a>';
+            });
+            $("#gallery").html(html);
+            $('.fotorama').fotorama();
+            $("#delete_button_container").css("display","inline-block");
+        }
+        else{
+          var html='';
+              html+='<a href="api/{{gallery.imageType}}/0/large/getimage/1"><img src="/api/{{gallery.imageType}}/0/thumb/getimage/1"></a>';
+
+          $("#gallery").html(html);
+          $('.fotorama').fotorama();
+
+        }
+
+      }
+  }, "json");
+
+
+
+  $( '#fileinput-img-{{gallery.name}}' ).load(function() {
+    $('#fileinput-img-{{gallery.name}}').fadeIn();
+  });
+
+  $('body').on('click', '#btn-image-save-{{gallery.name}}', function(){
+    $('#fileinput-img-{{gallery.name}}').fadeOut();
+    var url = "{{url("uploadImage",{"type":gallery.imageType, "id": id})}}";
+    var image = $('#image-preview-{{gallery.name}}').find('img').attr('src');
+    var block = image.split(";");
+    var contentType = block[0].split(":")[1];
+    var realData = block[1].split(",")[1];
+    var blob = b64toBlob(realData, contentType);
+    var formData = new FormData();
+    formData.append('picture', blob);
+
+    if((++load_wait)==1) $("#load-spinner").fadeIn();
+    $.ajax({
+        url: url,
+        type: "POST",
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: formData,
+        error:function(err){
+            $('#fileinput-img-{{gallery.name}}').fadeIn();
+            toastr.error("No se pudo subir la imagen", "Confirmación", confirmation);
+        },
+        success:function(data){
+            $('#fileinput-img-{{gallery.name}}').attr('src','{{ url(gallery.value,{'id': id, 'type': gallery.imageType, 'size': 'medium'}) }}?'+Date.now());
+            $('#fileinput-{{gallery.name}}').fileinput("clear");
+            if(data.result) toastr.success("Imagen cambiada correctamente", "Confirmación", confirmation);
+            location.reload();
+          //  $('#formProduct-button-save').trigger('click');
+        },
+        complete:function(){
+            if((--load_wait)==0) $("#load-spinner").fadeOut();
+        }
+      });
+
+
+});
+
+
+$('body').on('click', "#btn-erase", function() {
+  id={{ id }};
+  if((++load_wait)==1) $("#load-spinner").fadeIn();
+  $.ajax({
+     type: "GET",
+     dataType: "json",
+     url: "/api/{{gallery.imageType}}/deleteimages/"+id,
+   }).done(function(data, textStatus, jqXHR) {
+     if((--load_wait)==0) $("#load-spinner").fadeOut();
+     if(data.result!="-1") {
+       toastr.success("Imágenes borradas correctamente", "Confirmación", confirmation);
+       location.reload();
+      }
+      else toastr.error("Ocurrió un error inesperado en el borrado de imagenes", "Confirmación", confirmation);
+
+ });
+});
+
+});
+</script>

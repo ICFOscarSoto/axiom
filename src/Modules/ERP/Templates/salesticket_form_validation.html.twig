@@ -1,0 +1,17 @@
+<div class="panel minimal">
+  <div class="panel-body">
+    <div class="row">
+      <div class="col-md-12">
+        <div id="salestickets-info" class="alert alert-info form-validation-error" style="display: {% if infos is defined and infos|length > 0 %}block;{% else %}none;{% endif %}">
+          <strong>Información:</strong></br></br><ul id="validation-infos-list">
+            {% if infos is defined %}
+              {% for item in infos %}
+                <li>{{ item | raw }}</li>
+              {% endfor %}
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

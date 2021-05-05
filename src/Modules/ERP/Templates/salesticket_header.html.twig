@@ -1,10 +1,11 @@
-<div class="panel panel-primary panel-shadow" data-collapsed="0" style="-webkit-box-shadow: none; box-shadow:none; padding:0px; margin-bottom: -1px;"><!-- to apply shadow add class "panel-shadow" -->
+{% if id!=0 %}
+<div class="panel panel-primary panel-shadow" data-collapsed="0" style="-webkit-box-shadow: none; box-shadow:none; margin-bottom: -1px;"><!-- to apply shadow add class "panel-shadow" -->
     <div class="panel-body">
     <div class="row">
       {% if salesticket.salesticketstate!=null %}
 
-        {% set color_state = '' %}
-        {% if salesticket.salesticketstate.id == 1 %}
+      {% set color_state = '' %}
+      {% if salesticket.salesticketstate.id == 1 %}
            {% set color_state = '#21a9e1' %}
            {% set color_text = '#fff' %}
         {% elseif salesticket.salesticketstate.id == 2 %}
@@ -77,3 +78,4 @@
   </div>
 <br>
 <br>
+{% endif %}
