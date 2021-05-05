@@ -169,7 +169,7 @@ class GlobaleImagesController extends Controller implements ContainerAwareInterf
 				}*/
 			}
 
-			if($type=="products"){
+			if($type=="products" OR $type=="salestickets"){
 				//find last image
 				if (!file_exists($basePath.'images'.DIRECTORY_SEPARATOR.$type.DIRECTORY_SEPARATOR.$id)) {
 				    mkdir($basePath.'images'.DIRECTORY_SEPARATOR.$type.DIRECTORY_SEPARATOR.$id, 0777, true);

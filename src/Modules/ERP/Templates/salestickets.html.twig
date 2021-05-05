@@ -25,9 +25,11 @@
 		<!-- MAIN CONTENT -->
 		<div id="salesticket-body">
 			{% set formConstructor = {"name": ticketType} %}
+			{{ include('@ERP/salesticket_form_validation.html.twig') }}
+			{{ include('@ERP/salesticket_add_information.html.twig') }}
 			{{ include('@ERP/salesticket_buttons.html.twig') }}
-			{{ include('@ERP/salesticket_header.html.twig') }}
 			{{ include('@ERP/salesticket_searching.html.twig') }}
+			{{ include('@ERP/salesticket_header.html.twig') }}
 			{{ include('@ERP/salesticket_customer_data.html.twig') }}
 			{{ include('@ERP/salesticket_data.html.twig') }}
 			</div>
@@ -69,6 +71,11 @@
 				 			window.history.back();
 				 	});
 
+
+					$( '#fileinput-img-{{gallery.name}}' ).load(function() {
+						$('#fileinput-img-{{gallery.name}}').fadeIn();
+					});
+
 			});
 
 		</script>
@@ -93,7 +100,8 @@
 <script src="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker.min.js"></script>
 <script src="{{ url('index') }}js/fileinput.js"></script>
 <script src="{{ url('index') }}js/ol/ol.js"></script>
- <script src="{{ url('index') }}js/jodit/jodit.min.js"></script>
-	 {{ include('@Globale/bottom.html.twig') }}
+<script src="{{ url('index') }}js/jodit/jodit.min.js"></script>
+<script src="{{ url('index') }}js/jquery.nestable.js"></script>
+{{ include('@Globale/bottom.html.twig') }}
 {% endblock %}
 </body>

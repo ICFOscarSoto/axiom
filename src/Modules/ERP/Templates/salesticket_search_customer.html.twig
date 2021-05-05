@@ -62,7 +62,7 @@
     });
 */
   $('body').on('change', "[id^='customer-form-name']", function(e) {
-       	$('#customer-form-view').css('display','inline-block');
+       	$('#customer-form-view').css('display','block');
   });
 
     $('body').on('click', "[id^='listCustomerswithcode-field-button-select-']", function(e) {
@@ -79,6 +79,9 @@
       $("#customer-form-email").attr("disabled", true);
       $("#customer-form-view").attr("attr-id",$(this).attr("attr-id"));
       $("#customer-form-view").css("display","inline-block");
+      $("#panel-button").css("display","block");
+      $("#customer-data").css("display","block");
+
 
 
     //  $("#customer-form-view"+$("#customer-search-modal-form").attr("attr-id")).val($(this).parent().parent().parent().children('td').eq(1).text());
