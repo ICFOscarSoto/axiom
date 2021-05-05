@@ -279,7 +279,7 @@ class GlobaleFormUtils extends Controller
     $this->values=$values;
   }
 
-  public function make($id, $class, $action, $name, $type="full", $render="@Globale/form.html.twig", $returnRoute=null, $utilsClass=null, $includesArray=[]){
+  public function make($id, $class, $action, $name, $type="full", $render="@Globale/form.html.twig", $returnRoute=null, $utilsClass=null, $includesArray=[], $custom_vars=[]){
     $this->name=$name;
      if(!($this->obj instanceof $class)){
 				$this->obj=new $class();
@@ -333,14 +333,14 @@ class GlobaleFormUtils extends Controller
              $formView=$form->createView();
              //Aply convesion functions from controller to view
              $formView=$this->conversionView($formView);
-						 return $this->controller->render($render, array(
+						 return $this->controller->render($render, array_merge(array(
               'id' => $id,
               "userData"=>$this->permissions,
               'includes' => $includesArray,
               'include_pre_templates' => $this->includePreTemplate,
               'include_post_templates' => $this->includePostTemplate,
               'formConstructor' => ["id"=>$id, "id_object"=>$id, "name"=>$name, "form" => $formView, "type" => $type, "post"=>$route, "template" => json_decode(file_get_contents ($this->template),true)]
-              ));
+            ),$custom_vars));
 				break;
 			}
   }

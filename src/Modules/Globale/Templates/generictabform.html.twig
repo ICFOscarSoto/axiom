@@ -67,21 +67,22 @@
   {% endif %}
 
   <script>
+	function readTabContent(){
+		url=$('#tabs-list li.active').attr("attr-route");
+		if(url!=""){
+			if((++load_wait)==1) $("#load-spinner").fadeIn();
+			$.post(url, null,
+				function(data, status, xhr){
+					$("#tab-body-"+$('#tabs-list li.active').attr("attr-name")).html(data);
+					$("#tab-body-"+$('#tabs-list li.active').attr("attr-name")).find(':checkbox').not($('[id$=-chkall]')).iCheck({checkboxClass: 'icheckbox_flat-blue', radioClass: 'iradio_flat-blue'});
+					$("#tab-body-"+$('#tabs-list li.active').attr("attr-name")+" select").select2();
+					$("#tab-body-"+$('#tabs-list li.active').attr("attr-name")+" .fileinput").fileinput();
+					if((--load_wait)==0) $("#load-spinner").fadeOut();
+			});
+		}
+	}
     $(document).ready(function() {
-      function readTabContent(){
-        url=$('#tabs-list li.active').attr("attr-route");
-        if(url!=""){
-          if((++load_wait)==1) $("#load-spinner").fadeIn();
-          $.post(url, null,
-            function(data, status, xhr){
-              $("#tab-body-"+$('#tabs-list li.active').attr("attr-name")).html(data);
-							$("#tab-body-"+$('#tabs-list li.active').attr("attr-name")).find(':checkbox').not($('[id$=-chkall]')).iCheck({checkboxClass: 'icheckbox_flat-blue', radioClass: 'iradio_flat-blue'});
-							$("#tab-body-"+$('#tabs-list li.active').attr("attr-name")+" select").select2();
-							$("#tab-body-"+$('#tabs-list li.active').attr("attr-name")+" .fileinput").fileinput();
-              if((--load_wait)==0) $("#load-spinner").fadeOut();
-          });
-        }
-      }
+
       $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
         readTabContent();
       });

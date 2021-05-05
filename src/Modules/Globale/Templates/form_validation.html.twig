@@ -20,6 +20,15 @@
             {% endif %}
           </ul>
         </div>
+        <div id="{{formConstructor.name}}-info" class="alert alert-info form-validation-error" style="display: {% if infos is defined and infos|length > 0 %}block;{% else %}none;{% endif %}">
+          <strong>Información:</strong></br></br><ul id="validation-infos-list">
+            {% if infos is defined %}
+              {% for item in infos %}
+                <li>{{ item | raw }}</li>
+              {% endfor %}
+            {% endif %}
+          </ul>
+        </div>
       </div>
     </div>
   </div>

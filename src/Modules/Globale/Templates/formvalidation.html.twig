@@ -25,3 +25,13 @@ if(typeof data.validation !== 'undefined' && typeof data.validation.global_warni
   $("#{{formConstructor.name}}-form-body #validation-warnings-list").html(warnings);
   $("#{{formConstructor.name}}-form-body [id$='-validation-warning']").slideDown();
 }
+{# GLOBAL_INFOS #}
+var infos="";
+if(typeof data.validation !== 'undefined' && typeof data.validation.global_infos !== 'undefined'){
+  Object.keys(data.validation.global_infos).forEach(function(index){
+    infos+="<li>"+data.validation.global_infos[index]+"</li>";
+  });
+  $("html, body").animate({ scrollTop: 0 }, "fast");
+  $("#{{formConstructor.name}}-form-body #validation-infos-list").html(infos);
+  $("#{{formConstructor.name}}-form-body [id$='-validation-infos']").slideDown();
+}
