@@ -50,6 +50,11 @@ class HRDepartments
     public $newSeconds=3600;
     public $updatedSeconds=3600;
 
+    /**
+     * @ORM\Column(type="string", length=125, nullable=true)
+     */
+    private $discordchannel;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -123,6 +128,18 @@ class HRDepartments
     public function setDeleted(bool $deleted): self
     {
         $this->deleted = $deleted;
+
+        return $this;
+    }
+
+    public function getDiscordchannel(): ?string
+    {
+        return $this->discordchannel;
+    }
+
+    public function setDiscordchannel(?string $discordchannel): self
+    {
+        $this->discordchannel = $discordchannel;
 
         return $this;
     }
