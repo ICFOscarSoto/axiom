@@ -17,3 +17,46 @@
   </div>
 </div>
 {% endif %}
+<script>
+  function validate_salesticket(){
+    $  (".error").remove();
+      var valid=true;
+
+      if($("#customer-form-code").val()=="")
+      {
+
+       toastr.error("Por favor, selecciona un cliente", "Confirmación", confirmation);
+        valid=false;
+        return valid;
+      }
+
+      if($("#salesticket-form-observations").val()=="")
+      {
+        toastr.error("Por favor, añade una observación a la incidencia", "Confirmación", confirmation);
+         valid=false;
+         return valid;
+
+      }
+      if($("#salesticket-form-states-select").val()=="-1")
+      {
+        toastr.error("Por favor, selecciona un nuevo estado para la incidencia", "Confirmación", confirmation);
+         valid=false;
+         return valid;
+
+      }
+
+
+      /*
+      if($(this).find("#product-form-suppliers-"+$(this).attr("attr-id")).val()=="-1")
+      {
+       code=$(this).find("#product-form-code-"+$(this).attr("attr-id")).val()
+       toastr.error("No se ha seleccionado proveedor para el producto "+code, "Confirmación", confirmation);
+        valid=false;
+        return valid;
+      }
+*/
+
+  return valid;
+
+}
+</script>

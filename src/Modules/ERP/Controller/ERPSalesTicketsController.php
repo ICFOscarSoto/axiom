@@ -171,10 +171,12 @@ class ERPSalesTicketsController extends Controller
 		 $gallery["height"]="300px";
 
 		 $infos=null;
-		 if($id==0) $infos[]="Tienes 2 OPCIONES: buscar un pedido para asociarlo a la incidencia o buscar un cliente. Si eliges buscar un pedido, el cliente también se asociará automáticamente a la incidencia.";
-
+		 if($id==0){
+			 $infos[]="Tienes 2 OPCIONES: buscar un pedido para asociarlo a la incidencia o buscar un cliente. Si eliges buscar un pedido, el cliente también se asociará automáticamente a la incidencia.";
+			 $infos[]="Si necesitas ampliar los detalles de la incidencia, puedes hacerlo pinchando en el botón 'Añadir información'. También puedes añadir imágenes si lo necesitas.";
+		 }
 		 else if($salesticket->getSalesticketstate()->getName()!="Solucionado")	$infos[]="Si necesitas ampliar los detalles de la incidencia, puedes hacerlo pinchando en el botón 'Añadir información'. También puedes añadir imágenes si lo necesitas.";
-		 
+
 
 			if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 				return $this->render('@ERP/salestickets.html.twig', [
