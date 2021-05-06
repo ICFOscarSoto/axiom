@@ -1,14 +1,36 @@
 <script>
-
+var await_reload=false;
 $(document).ready(function() {
-console.log("Entro");
-console.log($("#id-object").val());
-  if($("#id-object").val()=="0"){
-    console.log("Entro");
-  }else{
-    $("#panel-meeting").hide();
-  }
+  var meeting_status=0;
+  $.initialize("#id-object", function() {
+    if($("#id-object").val()>0){
+      //Disable elements
+      $("#form_name").prop( "readonly", true );
+      $("#form_meetingdate").prop( "readonly", true );
+      $("#now-view-formmeeting-form_meetingdate").hide();
+      $("#form_place").prop( "readonly", true );
 
+      window["formmeeting-editor-form_agenda"].setReadOnly(true);
+      //change panels order
+      $("#panel-meeting").insertBefore("#panel-Summon");
+
+    }else{
+
+      $("#panel-meeting").hide();
+    }
+  });
+
+  $.initialize("#form_meeting-status", function() {
+      var meetingstatus=$("#form_meeting-status").val();
+      switch(meetingstatus){
+        case "2":
+          $("#top-left-actionbuttons").html("<button id=\"start_meeting\" type=\"button\" class=\"btn btn-green\">Iniciar reunión</button>");
+        break;
+        case "3":
+          $("#top-left-actionbuttons").html("<button id=\"end_meeting\" type=\"button\" class=\"btn btn-red\">Finalizar reunión</button>");
+        break;
+      }
+  });
 
   $('body').on('click', "#sendMeetingsSummoneds-top-button-foreground", function(event) {
     $.confirm({
@@ -20,6 +42,53 @@ console.log($("#id-object").val());
         buttons: {
            confirm: { text: 'Confirmar', btnClass: 'btn-red', action: function(){ window.location.href='' ;} },
            cancel: { text: 'Cancelar' }
+        }
+    });
+  });
+  $('body').on('click', "#start_meeting", function(event) {
+    $('#now-view-formmeeting-form_startdate').trigger('click');
+    $('#formmeeting-button-save').trigger('click');
+    $.confirm({
+        //theme: 'bootstrap',
+        title: 'Verificar asistencia',
+        content: 'Compruebe la asistencia de los participantes',
+        alignMiddle: false,
+        animateFromElement: false,
+        buttons: {
+           confirm: { text: 'Ir', btnClass: 'btn-red', action: function(){
+              $('.nav-tabs a[href="#tab-body-summoneds"]').tab('show');
+            }
+           }
+        }
+    });
+  });
+
+  $(document).ajaxComplete(function( event, xhr, settings ) {
+      if ( settings.url === $("#post-url").val() ) {
+              readTabContent();
+              await_reload=false;
+      }
+      if ( settings.url === '{{ url("sendSummoneds",{'idparent':id}) }}' ) {
+              readTabContent();
+      }
+      
+  });
+
+  $('body').on('click', "#end_meeting", function(event) {
+    $.confirm({
+        //theme: 'bootstrap',
+        title: 'Finalizar reunión',
+        content: '¿Seguro que desea finalizar ahora la reunión?',
+        alignMiddle: false,
+        animateFromElement: false,
+        buttons: {
+           confirm: { text: 'Finalizar', btnClass: 'btn-red', action: function(){
+             $('#now-view-formmeeting-form_enddate').trigger('click');
+             $('#formmeeting-button-save').trigger('click');
+             await_reload=true;
+            }
+          },
+          cancel: { text: 'Cancelar' }
         }
     });
   });

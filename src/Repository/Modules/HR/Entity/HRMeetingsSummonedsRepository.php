@@ -19,32 +19,15 @@ class HRMeetingsSummonedsRepository extends ServiceEntityRepository
         parent::__construct($registry, HRMeetingsSummoneds::class);
     }
 
-    // /**
-    //  * @return HRMeetingsSummoneds[] Returns an array of HRMeetingsSummoneds objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function getElegibleSummoneds($meeting, $user)
     {
-        return $this->createQueryBuilder('h')
-            ->andWhere('h.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('h.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
+      $query="SELECT w.id FROM hrworkers w WHERE w.company_id=".$user->getCompany()->getId()." AND w.id NOT IN (
+        SELECT s.worker_id FROM hrmeetings_summoneds s WHERE s.meeting_id=".$meeting->getId()." AND s.active=1 AND s.deleted=0
+      )
+      AND w.id<>".$meeting->getAuthor()->getId()." AND w.active=1 AND w.deleted=0 ORDER by w.lastname,w.name";
+      $params=[];
+      return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
 
-    /*
-    public function findOneBySomeField($value): ?HRMeetingsSummoneds
-    {
-        return $this->createQueryBuilder('h')
-            ->andWhere('h.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
     }
-    */
+
 }
