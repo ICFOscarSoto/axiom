@@ -392,7 +392,7 @@ class NavisionGetSalesOrders extends ContainerAwareCommand
 
          else{
               $obj->setCustomer($customer);
-              $obj->setCustomercode($customer->getCode());
+              if($customer!=null) $obj->setCustomercode($customer->getCode());
               $commercialterms=$repositoryCustomerCommercialTerms->findOneBy(["customer"=>$customer]);
               if($commercialterms!=null) $obj->setCustomergroup($commercialterms->getCustomergroup());
 
