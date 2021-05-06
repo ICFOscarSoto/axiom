@@ -41,6 +41,16 @@ class ERPSalesTicketsStates
      */
     private $dateupd;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $notifytime;
+
+    /**
+     * @ORM\Column(type="string", length=16, nullable=true)
+     */
+    private $notifyunit;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -102,6 +112,30 @@ class ERPSalesTicketsStates
     public function setDateupd(\DateTimeInterface $dateupd): self
     {
         $this->dateupd = $dateupd;
+
+        return $this;
+    }
+
+    public function getNotifytime(): ?int
+    {
+        return $this->notifytime;
+    }
+
+    public function setNotifytime(?int $notifytime): self
+    {
+        $this->notifytime = $notifytime;
+
+        return $this;
+    }
+
+    public function getNotifyunit(): ?string
+    {
+        return $this->notifyunit;
+    }
+
+    public function setNotifyunit(?string $notifyunit): self
+    {
+        $this->notifyunit = $notifyunit;
 
         return $this;
     }
