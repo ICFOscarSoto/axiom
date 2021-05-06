@@ -33,9 +33,13 @@
                 $('#{{ listConstructor.id }}-modal-button-continue').attr('attr-action','{{ url(field.route, routeParams) }}');
                 $('#{{ listConstructor.id }}-modal-button-continue').attr('attr-send-list','1');
                 $('#{{ listConstructor.id }}-modal-button-continue').attr('attr-action-type','{{ field.actionType }}');
-                $('#{{ listConstructor.id }}-modal-body').html('¿Está seguro que desea {{field.name}} los registro seleccionados? {% if field.undo is defined and field.undo==false %} </br><b>¡ATENCIÓN!</b> Esta operación no podrá deshacerse.{% endif %}');
+                $('#{{ listConstructor.id }}-modal-body').html('¿Está seguro que desea {% if field.confirm_msg is defined %}{{ field.confirm_msg }}{% else %}{{field.name}} los registros seleccionados{% endif %}? {% if field.undo is defined and field.undo==false %} </br><b>¡ATENCIÓN!</b> Esta operación no podrá deshacerse.{% endif %}');
                 $("#{{ listConstructor.id }}-modal-confirm").modal();
               {% else %}
+                {# TODO: action withoud modal #}
+
+
+
 
               {% endif %}
 
