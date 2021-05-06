@@ -1,4 +1,4 @@
 [
-  {"id" : "addTopMeetingsSummoneds", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"genericdatatab", "routeParams":{"module":"HR", "name":"MeetingsSummoneds", "idparent":"id", "type":"modal" }, "modal":"MeetingsSummoneds", "actionType" : "background", "confirm" :false, "tooltip" : ""},
-  {"id" : "sendMeetingsSummoneds", "type" : "btn-default", "icon" : "fas fa-paper-plane", "name" : "", "route":"", "tooltip" : "Enviar convocatorias a TODOS los participantes"}
+  {"id" : "addTopMeetingsSummoneds", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"genericdatatab", "routeParams":{"module":"HR", "name":"MeetingsSummoneds", "idparent":"id", "type":"modal" }, "modal":"MeetingsSummoneds", "actionType" : "background", "confirm" :false, "tooltip" : "Añadir participante"},
+  {"id" : "sendMeetingsSummoneds", "type" : "btn-default", "icon" : "fas fa-paper-plane", "name" : "", "route":"sendSummoneds", "routeParams":{"idparent":"id"}, "confirm" :true,  "confirm_msg":"enviar la convocatoria de los participantes seleccionados", "modal":false, "actionType" : "background", "tooltip" : "Enviar convocatorias a participantes seleccionados"}
 ]

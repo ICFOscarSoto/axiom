@@ -15,6 +15,212 @@ class GlobaleListUtils
       return null;
     }
 
+    public function getRecordsSQL($user,$repository,$request,$manager,$listFields,$classname,$select_fields,$from,$where,$maxResults=null,$orderBy="id"): array{
+      $listName=$request->attributes->get('name');
+      $return=array();
+      $start=0;
+      $length=20;
+      if($maxResults===NULL){
+          $start=$request->query->getInt('start', 0);
+          $length=$request->query->getInt('length', 20);
+      }else if($maxResults>=0){
+          $start=$request->query->getInt('start', 0);
+          $length=$maxResults;
+      }
+
+      //Formamos el orden de los datos
+  		if($request->query->has('order')){
+  			 $order=$request->query->get('order');
+         $orderDir=$order[0]['dir'];
+         $order=$order[0]['column'];
+  		}else{
+        $order=$orderBy;
+        $orderDir='ASC';
+      }
+      //Filtros por columnas
+      $searchValue=$request->query->get('columns');
+
+      $sql_records="SELECT ";
+      $sql_total="SELECT COUNT";
+      $sql_filter="SELECT COUNT";
+      foreach($select_fields as $field=>$as){
+        $sql_records.=$field.' AS '.$as.',';
+        if($sql_total=='SELECT COUNT') $sql_total.='('.$field.') total';
+        if($sql_filter=='SELECT COUNT') $sql_filter.='('.$field.') total';
+      }
+      $sql_records=rtrim($sql_records,',');
+      $sql_records.=' FROM '.$from;
+      $sql_total.=' FROM '.$from;
+      $sql_filter.=' FROM '.$from;
+
+      $filter_where=$where;
+
+      //Formamos el filtro de busqueda global
+      //--------------------------------------------------------
+      $global_filter="";
+      $searchValue=$request->query->get('search');
+      $searchValue=$searchValue["value"];
+      if($searchValue!=""){
+          $metadata=$manager->getClassMetadata($classname);
+          foreach($metadata->getColumnNames() as $column){
+            $tokensSearchValue=explode('*',$searchValue);
+            foreach($tokensSearchValue as $key=>$tokenSearch){
+              if($tokenSearch!=''){
+                //check if start with
+                if($tokenSearch[0]=='^'){ $starWildcard =''; $tokenSearch=substr($tokenSearch, 1);} else $starWildcard ='%';
+                if($tokenSearch[strlen($tokenSearch)-1]=='^'){ $endWildcard =''; $tokenSearch=substr($tokenSearch, 0, -1);}else $endWildcard ='%';
+                $global_filter.=' OR '.'p.'.$metadata->getFieldName($column).' LIKE \''.$starWildcard.$tokenSearch.$endWildcard.'\'';
+              }
+            }
+
+          }
+          //Añadimos los campos de las relaciones
+          foreach($listFields as $field){
+            $database_field=null;
+            $fieldNames=explode('_o_',$field["name"]); //explotamos los campos concatenados
+            if(count($fieldNames)>1){ //Si hay que concatenar algo
+              $database_field='concat_ws(\' \',';
+              foreach($fieldNames as $fieldName){
+                  $path=explode('__', $fieldName);  //explotamos las relaciones foraneas
+                  if(count($path)>1){
+                    $database_field.=$path[0].'.'.$path[1].',';  // si viene de otra tabla
+                  }else{
+                    $database_field.='p.'.$path[0].','; // si viene de la misma tabla
+                  }
+              }
+              $database_field=rtrim($database_field,',');
+              $database_field.=')';  //cerramos el concat_ws
+            }else{ //No hay nada que concatenar es un campo simple
+              $path=explode('__', $fieldNames[0]);
+              if(count($path)>1){
+                $database_field=$path[0].'.'.$path[1];
+              }else{
+                $database_field='p.'.$field["name"];
+              }
+            }
+            dump($database_field);
+            $tokensSearchValue=explode('*',$searchValue);
+            foreach($tokensSearchValue as $key=>$tokenSearch){
+              if($tokenSearch!=''){
+                if($tokenSearch[0]=='^'){ $starWildcard =''; $tokenSearch=substr($tokenSearch, 1);} else $starWildcard ='%';
+                if($tokenSearch[strlen($tokenSearch)-1]=='^'){ $endWildcard =''; $tokenSearch=substr($tokenSearch, 0, -1);}else $endWildcard ='%';
+                $global_filter.=' OR '.$database_field.' LIKE \''.$starWildcard.$tokenSearch.$endWildcard.'\'';
+              }
+            }
+
+          }
+      }
+      $global_filter=ltrim($global_filter, ' OR');
+      if($global_filter!='')
+        $global_filter="AND (".$global_filter.")";
+      $filter_where.=$global_filter;
+      //++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+      //Formamos los filtros de busqueda por columna
+      //--------------------------------------------------------
+  		foreach($listFields as $key => $field){
+
+          //Solo añadimos los campos de tipo data
+         if(!isset($field["type"])||$field["type"]=="data"){
+              $fieldNames=explode('_o_',$field["name"]);
+              $searchValue=$request->query->get('columns');
+
+              //Buscar el key del field["name"] en las columnas pasados por parametro
+              $keyColumn=$this->searchColumns($searchValue, $field["name"]);
+              if(!$keyColumn) continue;
+
+              //TODO Campos mapeados como las coordenadas y demas petan aqui
+      				$searchValue=trim($searchValue[$keyColumn]['search']['value']);
+      				if($searchValue!="" && $searchValue!="##ALL##"){ //Si hay algo que buscar
+                $database_field=null;
+                $fieldNames=explode('_o_',$field["name"]); //explotamos los campos concatenados
+                if(count($fieldNames)>1){ //Si hay que concatenar algo
+                  $database_field='concat_ws(\' \',';
+                  foreach($fieldNames as $fieldName){
+                      $path=explode('__', $fieldName);  //explotamos las relaciones foraneas
+                      if(count($path)>1){
+                        $database_field.=$path[0].'.'.$path[1].',';  // si viene de otra tabla
+                      }else{
+                        $database_field.='p.'.$path[0].','; // si viene de la misma tabla
+                      }
+                  }
+                  $database_field=rtrim($database_field,',');
+                  $database_field.=')';  //cerramos el concat_ws
+                }else{ //No hay nada que concatenar es un campo simple
+                  $path=explode('__', $fieldNames[0]);
+                  if(count($path)>1){
+                    $database_field=$path[0].'.'.$path[1];
+                  }else{
+                    $database_field='p.'.$field["name"];
+                  }
+                }
+
+                $tokensSearchValue=explode('*',$searchValue);
+                foreach($tokensSearchValue as $key=>$tokenSearch){
+                  if($tokenSearch!=''){
+                      if($tokenSearch=='##NULL##'){
+                        $filter_where.=" AND ".$database_field." IS NULL";
+                      }else{
+                        if($tokenSearch[0]=='^'){ $starWildcard =''; $tokenSearch=substr($tokenSearch, 1);} else $starWildcard ='%';
+                        if($tokenSearch[strlen($tokenSearch)-1]=='^'){ $endWildcard =''; $tokenSearch=substr($tokenSearch, 0, -1);}else $endWildcard ='%';
+                        $filter_where.=" AND ".$database_field." LIKE '".$starWildcard.$tokenSearch.$endWildcard."'";
+                      }
+                  }
+                }
+      				}else{
+                //No hay nada que buscar miramos si tiene un valor por defecto
+                if($searchValue!="##ALL##" && isset($field["replace"])){
+                  foreach($field["replace"] as $key=>$replace){
+                    if(isset($replace["default"]) && $replace["default"]==true){
+                      $filter_where.=" AND ".$field["name"]." = '".$key."'";
+                    }
+                  }
+                }
+              }
+          }else{
+            //If field is datetime type or date
+            if($field["type"]=="datetime" || $field["type"]=="date"){
+              $searchValue=$request->query->get('columns');
+              $keyColumn=$this->searchColumns($searchValue, $field["name"]);
+              if(!$keyColumn) continue;
+              $searchValue=$searchValue[$keyColumn]['search']['value'];
+              if($searchValue!=""){
+                $searchValue=explode("#", $searchValue);
+                $date_from=$searchValue[0];
+                $date_to=isset($searchValue[1])?$searchValue[1]:"2999-12-30 23:59:59";
+                if($date_from!=''){
+                  $filter_where.=" AND p.".$field["name"]." >= '".$date_from."'";
+                }
+                if($date_to!=''){
+                  $filter_where.=" AND p.".$field["name"]." <= '".$date_to."'";
+                }
+              }
+            }
+          }
+  		}
+      //++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      $sql_total.=' WHERE '.$where;
+      $sql_filter.=' WHERE '.$filter_where;
+      $sql_records.=' WHERE '.$filter_where;
+      $sql_records.=' ORDER BY '.$order.' '.$orderDir;
+      $sql_records.=' LIMIT '.$start.', '.$length;
+      $result=$manager->getConnection()->executeQuery($sql_records)->fetchAll();
+      $result_total=$manager->getConnection()->executeQuery($sql_total)->fetch();
+      $result_filter=$manager->getConnection()->executeQuery($sql_filter)->fetch();
+
+      $tags=array();
+      $return['recordsTotal']=$result_total["total"];
+      $return['recordsFiltered']=$result_filter["total"];
+      $return['data']=[];
+      foreach($result as $key=>$row){
+        $return['data'][]=$row;
+      }
+      //dump(json_encode($sql_records));
+      $return["_tags"]=$tags;
+      return $return;
+      }
+
+
     public function getRecords($user,$repository,$request,$manager,$listFields,$classname,$filters=[],$raw=[],$maxResults=null,$orderBy="id",$doctrine=null): array
     {
     $listName=$request->attributes->get('name');
@@ -78,6 +284,18 @@ class GlobaleListUtils
 			  }
   			//Añadimos los campos de las relaciones
   			foreach($listFields as $field){
+
+
+
+
+
+
+
+
+
+
+
+
   				$path=explode('__', $field["name"]);
   				if(count($path)>1){
 

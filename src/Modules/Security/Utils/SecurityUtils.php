@@ -3,6 +3,7 @@ namespace App\Modules\Security\Utils;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use App\Modules\Globale\Entity\GlobaleModules;
 use App\Modules\Globale\Entity\GlobaleUsers;
+use App\Modules\Globale\Entity\GlobaleUserGroups;
 use App\Modules\Globale\Entity\GlobaleUsersUserGroups;
 use App\Modules\Globale\Entity\GlobalePermissionsZones;
 use App\Modules\Globale\Entity\GlobalePermissionsZonesUsers;
@@ -101,5 +102,23 @@ class SecurityUtils
 
     }
     return $permissions;
+  }
+
+  public function isAdmin($user, $doctrine){
+    $userRepository=$doctrine->getRepository(GlobaleUsers::class);
+    $userGroupsRepository=$doctrine->getRepository(GlobaleUserGroups::class);
+    $userUsersGroupsRepository=$doctrine->getRepository(GlobaleUsersUserGroups::class);
+    $adminGroups=$userGroupsRepository->findBy(["company"=>$user->getCompany(),"isadmin"=>1,"active"=>1,"deleted"=>0]);
+    $isAdmin=false;
+    foreach($adminGroups as $group){
+      $usergroup=$userUsersGroupsRepository->findOneBy(["user"=>$user,"usergroup"=>$group,"active"=>1,"deleted"=>0]);
+      if($usergroup){
+        $isAdmin=true;
+        break;
+      }
+
+    }
+    return $isAdmin;
+
   }
 }

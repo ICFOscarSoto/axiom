@@ -14,14 +14,42 @@ class HRMeetingsSummonedsUtils
   public $parentClass="\App\Modules\HR\Entity\HRMeetings";
   public $parentField="meeting";
   public function getExcludedForm($params){
-    return ['meeting'];
+    return ['meeting','worker'];
   }
 
   public function getIncludedForm($params){
     $doctrine=$params["doctrine"];
     $id=$params["id"];
     $user=$params["user"];
-    return [];
+    $parent=$params["parent"];
+
+    $em=$doctrine->getManager();
+    $repository=$doctrine->getRepository("\App\Modules\HR\Entity\HRMeetingsSummoneds");
+    $repositoryWorker=$doctrine->getRepository("\App\Modules\HR\Entity\HRWorkers");
+    $elegibles=$repository->getElegibleSummoneds($parent, $user);
+    $options=[];
+    foreach($elegibles as $elegible){
+      $worker=$repositoryWorker->find($elegible["id"]);
+      if($worker) $options[]=$worker;
+    }
+
+    return [
+    ['worker', ChoiceType::class, [
+      'required' => true,
+      'attr' => ['class' => 'select2', 'attr-target' => 'formWorker', 'attr-target-type' => 'full'],
+      'choices' => $options,
+      'placeholder' => 'Select hrworkers',
+      'choice_label' => function($obj, $key, $index) {
+          if(method_exists($obj, "getLastname"))
+            return $obj->getLastname().", ".$obj->getName();
+          else return $obj->getName();
+      },
+      'choice_attr' => function($obj, $key, $index) {
+        return ['class' => $obj->getId()];
+      },
+      'choice_value' => 'id'
+    ]]
+  ];
   }
 
   public function formatList($user, $parent){

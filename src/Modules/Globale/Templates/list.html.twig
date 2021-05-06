@@ -3,7 +3,7 @@
 		{{ include(template) }}
 	{% endfor %}
 {% endif %}
-
+  {{ include("@Globale/form_validation.html.twig") }}
 <input type="hidden" id="search_param"/>
 <script>
 var url = new URL(window.location.href);
