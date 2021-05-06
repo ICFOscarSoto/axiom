@@ -320,7 +320,7 @@ class NavisionGetSalesOrders extends ContainerAwareCommand
                 $this->doctrine->getManager()->persist($obj_customer);
 
                 $obj->setCustomer($obj_customer);
-                $obj->setCustomercode($obj_customer->getCode());
+              //  $obj->setCustomercode($obj_customer->getCode());
 
 
                 $this->doctrine->getManager()->flush();
@@ -392,7 +392,7 @@ class NavisionGetSalesOrders extends ContainerAwareCommand
 
          else{
               $obj->setCustomer($customer);
-              $obj->setCustomercode($customer->getCode());
+          //    $obj->setCustomercode($customer->getCode());
               $commercialterms=$repositoryCustomerCommercialTerms->findOneBy(["customer"=>$customer]);
               if($commercialterms!=null) $obj->setCustomergroup($commercialterms->getCustomergroup());
 
@@ -431,7 +431,7 @@ class NavisionGetSalesOrders extends ContainerAwareCommand
            $obj->setShiptostate($customer?$customer->getState()!=null?$customer->getState()->getName():null:null);
            $obj->setShiptopostcode(substr(preg_replace("/[^a-zA-Z0-9]/", "", $object["shiptopostcode"]),0,12));
 
-          // $obj->setCustomercode($object["customer"]);
+           $obj->setCustomercode($object["customer"]);
 
 
 
