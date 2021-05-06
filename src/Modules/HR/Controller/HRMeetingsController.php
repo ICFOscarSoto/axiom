@@ -113,7 +113,7 @@ class HRMeetingsController extends Controller
 					]);
 			}
 			if(!SecurityUtils::isAdmin($this->getUser(), $this->getDoctrine())){
-				if($obj->getAuthor()!=$this->getUser()){
+				if($obj && $obj->getAuthor()!=$this->getUser()){
 					$worker=$repositoryWorkers->findOneBy(["company"=>$this->getUser()->getCompany(), "deleted"=>0, "user"=>$this->getUser()]);
 					if(!$worker) return $this->render('@Globale/notfound.html.twig',[
 						"status_code"=>401,
