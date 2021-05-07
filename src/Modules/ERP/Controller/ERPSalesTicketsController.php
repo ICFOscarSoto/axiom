@@ -228,6 +228,10 @@ class ERPSalesTicketsController extends Controller
 
 	 	}
 
+		if($id==0){
+			$salesticket->setAuthor($this->getUser());
+		}
+		
  		if($fields->salesticketnewagent!=""){
 
 				$newagent=$agentsRepository->findOneBy(["id"=>$fields->salesticketnewagent,"active"=>1,"deleted"=>0]);

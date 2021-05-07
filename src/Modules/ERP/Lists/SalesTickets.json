@@ -1,7 +1,7 @@
 [
   {"name": "id", "caption":""},
   {
-      "name" :"code","caption":"Nº de Ticket"
+      "name" :"code","caption":"Nº de incidencia"
   },
   {
       "name" :"dateadd",
@@ -15,14 +15,11 @@
       "name" :"email","caption":"Email"
   },
   {
-      "name" :"salesordernumber","caption":"Nº de pedido"
-  },
-  {
-      "name" :"externalsalesordernumber","caption":"Nº de pedido externo"
+      "name" :"salesordernumber_o_externalsalesordernumber","caption":"Nº de pedido"
   },
   {
       "name" :"salesticketstate__id",
-      "caption":"Estado del Ticket",
+      "caption":"Estado de la incidencia",
       "class": "dt-center",
       "replace": {
           "5": {"text": "Abierto", "html": "<div style=\"min-width: 75px;\" class=\"label label-default\">Abierto<\/div>"},
@@ -34,5 +31,10 @@
   },
   {
       "name" :"agent__name_o_agent__lastname_o_department__name","caption":"Asignado a"
+  },
+  {
+      "name" :"author__name_o_author__lastname","caption":"Creada por"
   }
+
+
 ]

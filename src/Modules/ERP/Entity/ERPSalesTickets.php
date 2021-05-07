@@ -106,6 +106,11 @@ class ERPSalesTickets
      */
     private $department;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleUsers")
+     */
+   private $author;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -315,6 +320,18 @@ class ERPSalesTickets
     public function setDepartment(?HRDepartments $department): self
     {
         $this->department = $department;
+
+        return $this;
+    }
+
+    public function getAuthor(): ?GlobaleUsers
+    {
+        return $this->author;
+    }
+
+    public function setAuthor(?GlobaleUsers $author): self
+    {
+        $this->author = $author;
 
         return $this;
     }
