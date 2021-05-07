@@ -74,7 +74,7 @@ class ERPSalesTicketsController extends Controller
 	 		$customerslist=$customersutils->formatListWithCode($this->getUser());
 	 		$customerslist["fieldButtons"]=[["id"=>"select", "type" => "default", "default"=>true, "icon" => "fa fa-dot-circle-o", "name" => "editar", "route" => null, "actionType" => "background", "modal"=>"", "confirm" => false, "tooltip" =>""]];
 	 		$customerslist["topButtons"]=[];
-
+			$customerslist["multiselect"]=false;
 
 			//Search Sales Orders
 
@@ -88,6 +88,7 @@ class ERPSalesTicketsController extends Controller
 
 		 $salesorderslist["fieldButtons"]=[["id"=>"select", "type" => "default", "default"=>true, "icon" => "fa fa-dot-circle-o", "name" => "editar", "route" => null, "actionType" => "background", "modal"=>"", "confirm" => false, "tooltip" =>""]];
 		 $salesorderslist["topButtons"]=[];
+		 $salesorderslist["multiselect"]=false;
 
 			$salesticket=null;
 			if($id!=0){
@@ -231,7 +232,7 @@ class ERPSalesTicketsController extends Controller
 		if($id==0){
 			$salesticket->setAuthor($this->getUser());
 		}
-		
+
  		if($fields->salesticketnewagent!=""){
 
 				$newagent=$agentsRepository->findOneBy(["id"=>$fields->salesticketnewagent,"active"=>1,"deleted"=>0]);

@@ -200,10 +200,13 @@ var url = new URL(window.location.href);
 							"orderable": false,
 							"className": "text-center",
 							"render": function(data, type, row, meta){
-
+									{% if listConstructor.multiselect is defined and listConstructor.multiselect==false %}
+									return ''
+									{% else %}
 									return '<div class="checkbox checkbox-replace">'+
 											  '<input type="checkbox" item-id="'+row['id']+'" class="{{ listConstructor.id }}-chk-list" id="'+row['id']+'-{{ listConstructor.id }}-chk-list">'+
 											  '</div>';
+									{% endif %}
 								}
 						},
 
@@ -613,9 +616,13 @@ var url = new URL(window.location.href);
 
 				</tr>
 					<th class="table-header-name table-thead" style="border-bottom: 1px solid #cecece !important;">
+						{% if listConstructor.multiselect is defined and listConstructor.multiselect==false %}
+
+						{% else %}
 						<div class="checkbox checkbox-replace">
 							<input type="checkbox" id="{{ listConstructor.id }}-chkall">
 						</div>
+						{% endif %}
 					</th>
 					{% for field in listConstructor.fields %}
 						<th style="border-bottom: 1px solid #cecece !important;" class="table-header-name table-thead {% if field.sum is defined and field.sum == true %} sum {% endif %} {% if field.format is defined %} {{field.format}} {% endif %}">{{ (field.caption)|trans }} </th>

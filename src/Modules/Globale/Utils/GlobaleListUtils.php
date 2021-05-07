@@ -98,7 +98,6 @@ class GlobaleListUtils
                 $database_field='p.'.$field["name"];
               }
             }
-            dump($database_field);
             $tokensSearchValue=explode('*',$searchValue);
             foreach($tokensSearchValue as $key=>$tokenSearch){
               if($tokenSearch!=''){
