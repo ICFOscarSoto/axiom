@@ -23,10 +23,10 @@
     $  (".error").remove();
       var valid=true;
 
-      if($("#customer-form-code").val()=="")
+      if($("#customer-form-code").val()=="" AND $("#salesorder-form-id").val()=="")
       {
 
-       toastr.error("Por favor, selecciona un cliente", "Confirmación", confirmation);
+       toastr.error("Por favor, selecciona un cliente o un pedido", "Confirmación", confirmation);
         valid=false;
         return valid;
       }
