@@ -72,7 +72,7 @@ class ERPSalesTicketsController extends Controller
 	 		$classCustomersUtils="\App\Modules\ERP\Utils\ERPCustomersUtils";
 	 		$customersutils = new $classCustomersUtils();
 	 		$customerslist=$customersutils->formatListWithCode($this->getUser());
-	 		$customerslist["fieldButtons"]=[["id"=>"select", "type" => "default", "default"=>true, "icon" => "fa fa-dot-circle-o", "name" => "editar", "route" => null, "actionType" => "background", "modal"=>"", "confirm" => false, "tooltip" =>""]];
+	 		$customerslist["fieldButtons"]=[["id"=>"select", "type" => "success", "default"=>true, "icon" => "fas fa-plus", "name" => "editar", "route" => null, "actionType" => "background", "modal"=>"", "confirm" => false, "tooltip" =>""]];
 	 		$customerslist["topButtons"]=[];
 			$customerslist["multiselect"]=false;
 
@@ -86,7 +86,7 @@ class ERPSalesTicketsController extends Controller
 		 $salesordersutils = new $classSalesOrdersUtils();
 		 $salesorderslist=$salesordersutils->formatListWithNumber($this->getUser());
 
-		 $salesorderslist["fieldButtons"]=[["id"=>"select", "type" => "default", "default"=>true, "icon" => "fa fa-dot-circle-o", "name" => "editar", "route" => null, "actionType" => "background", "modal"=>"", "confirm" => false, "tooltip" =>""]];
+		 $salesorderslist["fieldButtons"]=[["id"=>"select", "type" => "success", "default"=>true, "icon" => "fas fa-plus", "name" => "editar", "route" => null, "actionType" => "background", "modal"=>"", "confirm" => false, "tooltip" =>""]];
 		 $salesorderslist["topButtons"]=[];
 		 $salesorderslist["multiselect"]=false;
 
