@@ -33,6 +33,6 @@
       }
   },
   {
-      "name" :"agent__name_o_agent__lastname","caption":"Agente"
+      "name" :"agent__name_o_agent__lastname_o_department__name","caption":"Asignado a"
   }
 ]

@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\ERP\Entity\ERPSalesTickets;
 use \App\Modules\Globale\Entity\GlobaleUsers;
 use \App\Modules\ERP\Entity\ERPSalesTicketsStates;
+use \App\Modules\HR\Entity\HRDepartments;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\Modules\ERP\Entity\ERPSalesTicketsHistoryRepository")
@@ -27,7 +28,6 @@ class ERPSalesTicketsHistory
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleUsers")
-     * @ORM\JoinColumn(nullable=false)
      */
     private $agent;
 
@@ -66,6 +66,11 @@ class ERPSalesTicketsHistory
      * @ORM\Column(type="boolean")
      */
     private $deleted;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\HR\Entity\HRDepartments")
+     */
+    private $newdepartment;
 
     public function getId(): ?int
     {
@@ -176,6 +181,18 @@ class ERPSalesTicketsHistory
     public function setDeleted(bool $deleted): self
     {
         $this->deleted = $deleted;
+
+        return $this;
+    }
+
+    public function getNewdepartment(): ?HRDepartments
+    {
+        return $this->newdepartment;
+    }
+
+    public function setNewdepartment(?HRDepartments $newdepartment): self
+    {
+        $this->newdepartment = $newdepartment;
 
         return $this;
     }

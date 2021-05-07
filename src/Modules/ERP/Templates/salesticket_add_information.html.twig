@@ -1,5 +1,5 @@
 <div class="modal fade" tabindex="-1" id="add-information-modal-form" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog-salestickets">
       <div class="modal-content" style="transform: matrix(1, 0, 0, 1, 0, 0);display:inline-block;">
         <div class="modal-header">
           <h4 class="modal-title">Añadir información</h4>
@@ -26,6 +26,17 @@
                   <label for="salesticket-form-agents-select">Traspasar a otro agente</label>
                   <select type="text" id="salesticket-form-agents-select" class="form-control select2" required>
                     {% for option in agents %}
+                      <option value="{{ option.id }}">{{ option.text }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+              <div class="col-6 col-sm-6">
+                <div class="form-group">
+                  <input type="hidden" id="salesticket-form-departments" class="form-control">
+                  <label for="salesticket-form-departments-select">Traspasar a otro departamento</label>
+                  <select type="text" id="salesticket-form-departments-select" class="form-control select2" required>
+                    {% for option in departments %}
                       <option value="{{ option.id }}">{{ option.text }}</option>
                     {% endfor %}
                   </select>
@@ -63,5 +74,24 @@ $('body').on('click', "#salesticket-button-cancel", function(e){
 //  alert("ey");
    $("#add-information-modal-form").modal('toggle');
 });
+
+$('body').on('change', "#salesticket-form-agents-select", function(e) {
+  $("#salesticket-form-departments-select").parent().parent().css("display","none");
+
+
+});
+
+$('body').on('change', "#salesticket-form-departments-select", function(e) {
+  $("#salesticket-form-agents-select").parent().parent().css("display","none");
+
+
+});
+$('body').on('click', "#salesticket-button-add-info", function(e) {
+
+    $("#salesticket-form-agents-select").parent().parent().css("display","block");
+    $("#salesticket-form-departments-select").parent().parent().css("display","block");
+
+});
+
 });
 </script>

@@ -43,6 +43,7 @@
       $("#customer-form-name").attr("disabled", true);
       $("#customer-form-email").val($(this).parent().parent().parent().children('td').eq(5).text());
       $("#customer-form-email").trigger('change');
+      $("#panel-searching").css("display","none");
       $("#panel-button").css("display","block");
       $("#customer-data").css("display","block");
       $("#validation-infos-list").empty();

@@ -10,6 +10,7 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
+use App\Modules\HR\Entity\HRDepartments;
 use App\Modules\Globale\Entity\GlobaleUsers;
 use App\Modules\ERP\Entity\ERPConfiguration;
 use App\Modules\ERP\Entity\ERPSalesTickets;
@@ -32,38 +33,6 @@ class ERPSalesTicketsController extends Controller
 
 
 		/**
-     * @Route("/{_locale}/ERP/salestickets", name="salestickets")
-     */
-    public function index($id, RouterInterface $router,Request $request)
-    {
-      $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-			if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
-  		$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
-  		$locale = $request->getLocale();
-  	//	$this->router = $router;
-  		$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
-    	$utils = new $this->utilsClass();
-  		$templateLists[]=$utils->formatList($this->getUser());
-			$formUtils=new GlobaleFormUtils();
-			$formUtils->initialize($this->getUser(), new $this->class(), dirname(__FILE__)."/../Forms/SalesTickets.json", $request, $this, $this->getDoctrine());
-			$templateForms[]=$formUtils->formatForm('salestickets', true, null, $this->class);
-  		if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
-  			return $this->render('@Globale/genericlist.html.twig', [
-  				'controllerName' => 'salesTicketsController',
-  				'interfaceName' => 'Trazabilidad ventas',
-  				'optionSelected' => $request->attributes->get('_route'),
-  				'menuOptions' =>  $menurepository->formatOptions($userdata),
-  				'breadcrumb' =>  $menurepository->formatBreadcrumb($request->get('_route')),
-  				'userData' => $userdata,
-  				'lists' => $templateLists,
-	        'forms' => $templateForms
-  				]);
-  		}
-  		return new RedirectResponse($this->router->generate('app_login'));
-    }
-
-
-		/**
 		 * @Route("/{_locale}/ERP/salestickets/form/{id}", name="formSalesTickets", defaults={"id"=0})
 		 */
 		 public function formSalesTickets($id, RouterInterface $router, Request $request)
@@ -76,6 +45,7 @@ class ERPSalesTicketsController extends Controller
 			 $SalesTicketsHistoryRepository = $this->getDoctrine()->getRepository(ERPSalesTicketsHistory::class);
 			 $salesticketsstatesRepository=$this->getDoctrine()->getRepository(ERPSalesTicketsStates::class);
 			 $agentsRepository=$this->getDoctrine()->getRepository(GlobaleUsers::class);
+			 $departmentsRepository=$this->getDoctrine()->getRepository(HRDepartments::class);
 			 $userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
 	 	   $locale = $request->getLocale();
 	 		 $this->router = $router;
@@ -150,6 +120,19 @@ class ERPSalesTicketsController extends Controller
 				$agents[]=$option;
 			}
 
+			//departments
+			$department_objects=$departmentsRepository->findBy(["active"=>1,"deleted"=>0],["name"=>"ASC"]);
+			$departments=[];
+			$option=null;
+			$option["id"]=null;
+			$option["text"]="Elige departamento...";
+			$departments[]=$option;
+			foreach($department_objects as $item){
+				$option["id"]=$item->getId();
+				$option["text"]=$item->getName();
+				$departments[]=$option;
+			}
+
 			$new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-plus"];
 			$breadcrumb=$menurepository->formatBreadcrumb('genericindex','ERP','SalesTickets');
 			array_push($breadcrumb,$new_breadcrumb);
@@ -191,6 +174,7 @@ class ERPSalesTicketsController extends Controller
 					'salesorderslist' => $salesorderslist,
 					'states' => $states,
 					'agents' => $agents,
+					'departments' => $departments,
 					'ticketType' => 'sales_ticket',
 					'salesticket' => $salesticket,
 					'histories'=> $histories,
@@ -220,7 +204,7 @@ class ERPSalesTicketsController extends Controller
 		$salesticketsstatesRepository=$this->getDoctrine()->getRepository(ERPSalesTicketsStates::class);
 	 	$configrepository=$this->getDoctrine()->getRepository(ERPConfiguration::class);
 		$agentsRepository=$this->getDoctrine()->getRepository(GlobaleUsers::class);
-
+		$departmentsRepository=$this->getDoctrine()->getRepository(HRDepartments::class);
 
 	 	$salesticket=$salesticketsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$id, "deleted"=>0]);
 
@@ -248,9 +232,17 @@ class ERPSalesTicketsController extends Controller
 
 				$newagent=$agentsRepository->findOneBy(["id"=>$fields->salesticketnewagent,"active"=>1,"deleted"=>0]);
 				$salesticket->setAgent($newagent);
+				$salesticket->setDepartment(null);
 			}
-			else{
-						$salesticket->setAgent($this->getUser());
+			else if($fields->salesticketnewdepartment!=""){
+						$newdepartment=$departmentsRepository->findOneBy(["id"=>$fields->salesticketnewdepartment,"active"=>1,"deleted"=>0]);
+						$salesticket->setAgent(null);
+						$salesticket->setDepartment($newdepartment);
+			}
+			else {
+				$salesticket->setAgent($this->getUser());
+				$salesticket->setDepartment(null);
+
 			}
 
 	 	$salesticket->setCompany($this->getUser()->getCompany());
@@ -270,6 +262,7 @@ class ERPSalesTicketsController extends Controller
 	 	$this->getDoctrine()->getManager()->persist($salesticket);
 
 		$newagent=null;
+		$newdepartment=null;
 		if($fields->salesticketnewagent!=""){
 
 		if($id==0){
@@ -293,12 +286,33 @@ class ERPSalesTicketsController extends Controller
 			}
 		}
 
+		if($fields->salesticketnewdepartment!=""){
+
+				$newdepartment=$departmentsRepository->findOneBy(["id"=>$fields->salesticketnewdepartment,"active"=>1,"deleted"=>0]);
+				$channel=$newdepartment->getDiscordchannel();
+				$msg=$this->getUser()->getName()." ha solicitado que este departamento gestione la incidencia Nº **".$salesticket->getCode()."**";
+				file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
+				$msg="\n\nMás info en: \n".'https://axiom.ferreteriacampollano.com/es/ERP/salestickets/form/'.$id;
+				file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
+
+		}
+
+
+
 		$history_obj=new ERPSalesTicketsHistory();
 		$history_obj->setAgent($this->getUser());
+
 		if($fields->salesticketnewagent!=""){
 			$history_obj->setNewagent($newagent);
+			$history_obj->setNewdepartment(null);
 		}
+		else 	if($fields->salesticketnewdepartment!=""){
+			$history_obj->setNewagent(null);
+			$history_obj->setNewdepartment($newdepartment);
+		}
+
 		else 	$history_obj->setNewagent($this->getUser());
+
 
 		$history_obj->setSalesTicket($salesticket);
 		$history_obj->setObservations($fields->observations);
@@ -315,42 +329,6 @@ class ERPSalesTicketsController extends Controller
 	 	//return new JsonResponse(["result"=>1]);
 
 	}
-
-
-	/**
-	 * @Route("/{_locale}/ERP/salestickets/info/{id}/{action}", name="formInfoSalesTickets", defaults={"id"=0, "action"="read"})
-	 */
-	 public function formInfoSalesTickets($id, $action, Request $request){
-		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-		 if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
-		 $userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
-		 $new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-new"];
-		 $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
-		 $breadcrumb=$menurepository->formatBreadcrumb('salestickets');
-		 array_push($breadcrumb, $new_breadcrumb);
-		 $template=dirname(__FILE__)."/../Forms/SalesTickets.json";
-		 $formUtils = new GlobaleFormUtils();
-		 $formUtilsSalesTickets = new ERPSalesTicketsUtils();
-	 	 $formUtils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),$formUtilsSalesTickets->getExcludedForm([]),$formUtilsSalesTickets->getIncludedForm(["doctrine"=>$this->getDoctrine(), "user"=>$this->getUser(), "id"=>$id]));
-		 $salesticketsRepository=$this->getDoctrine()->getRepository(ERPSalesTickets::class);
-		 $salesticket=$salesticketsRepository->findOneBy(["id"=>$id, "active"=>1, "deleted"=>0, "company"=>$this->getUser()->getCompany()]);
-
-		// $listSalesTicketsHistory = new ERPSalesTicketsHistoryUtils();
-
-		 return $this->render('@ERP/salestickets.html.twig', array(
-			 'controllerName' => 'salesticketsController',
-			 'interfaceName' => 'SalesTickets',
-			 'optionSelected' => 'salestickets',
-			 'form' => $formUtils->formatForm('salestickets', false, $id, $this->class, "dataSalesTickets"),
-			 'userData' => $userdata,
-			 'id' => $id,
-			 'id_object' => $id,
-			 /*,
-			 'salesticketshistorylist' => $listSalesTicketsHistory->formatListByTickets($id),*/
-		 ));
-
-	}
-
 
 		/**
 		 * @Route("/api/salestickets/list", name="salesticketslist")
@@ -434,6 +412,17 @@ class ERPSalesTicketsController extends Controller
 		$item['agentname']=$line->getAgent()->getName()." ".$line->getAgent()->getLastName();
 		$item['newagentname']=$line->getNewagent()->getName()." ".$line->getNewagent()->getLastName();
 		$item['newagentid']=$line->getNewagent()->getId();
+		$item['newagentname']=$line->getNewagent()->getName()." ".$line->getNewagent()->getLastName();
+		if($line->getNewagent())
+		{
+		$item['newagentid']=$line->getNewagent()->getId();
+		$item['newagentname']=$line->getNewagent()->getName()." ".$line->getNewagent()->getLastName();
+		}
+		if($line->getNewdepartment())
+		{
+		$item['newdepartmentid']=$line->getNewdepartment()->getId();
+		$item['newagentname']=$line->getNewdepartment()->getName()." ".$line->getNewagent()->getLastName();
+		}
 		$item['observations']=$line->getObservations();
 		$item['state']=$line->getSalesticketstate()->getName();
 		$response[]=$item;

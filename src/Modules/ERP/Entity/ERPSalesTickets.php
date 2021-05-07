@@ -9,6 +9,7 @@ use \App\Modules\ERP\Entity\ERPSalesTicketsStates;
 use \App\Modules\ERP\Entity\ERPSalesTicketsHistory;
 use \App\Modules\ERP\Entity\ERPCustomers;
 use \App\Modules\ERP\Entity\ERPSalesOrders;
+use \App\Modules\HR\Entity\HRDepartments;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPSalesTicketsRepository")
@@ -24,7 +25,6 @@ class ERPSalesTickets
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleUsers")
-     * @ORM\JoinColumn(nullable=false)
      */
     private $agent;
 
@@ -100,6 +100,11 @@ class ERPSalesTickets
      * @ORM\Column(type="string", length=20)
      */
     private $code;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\HR\Entity\HRDepartments")
+     */
+    private $department;
 
     public function getId(): ?int
     {
@@ -298,6 +303,18 @@ class ERPSalesTickets
     public function setCode(string $code): self
     {
         $this->code = $code;
+
+        return $this;
+    }
+
+    public function getDepartment(): ?HRDepartments
+    {
+        return $this->department;
+    }
+
+    public function setDepartment(?HRDepartments $department): self
+    {
+        $this->department = $department;
 
         return $this;
     }
