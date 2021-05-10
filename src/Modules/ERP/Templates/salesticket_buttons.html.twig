@@ -1,29 +1,50 @@
+<div class="panel" id="panel-button">
+  <div class="row">
+ {% if id==0 %}
+  <div class="col-md-6">
+        <div class="form-group">
+              <input type="hidden" id="salesticket-form-reasons" class="form-control">
+              <select type="text" id="salesticket-form-reasons-select" class="form-control select2" required>
+                  <option value="-1">Elegir motivo...</option>
+                {% for option in reasons %}
+                    <option value="{{ option.id }}">{{ option.text }}</option>
+                {% endfor %}
+              </select>
+        </div>
+  </div>
+{% endif %}
 {% if id!=0 %}
-{% if salesticket.salesticketstate.name!="Solucionado" %}
-<div class="panel" id="panel-button" {% if id==0 %} style="display:none;" {% endif %}>
-<div class="row">
-    <div style="text-align: left;" class="col-md-6"></div>
-    <div style="text-align: right;margin-bottom:10px;" class="col-md-6">
-      <button type="button" id="salesticket-button-add-info" class="btn btn-blue" data-toggle="modal" data-target="#add-information-modal-form" >
-        Añadir información
-        <i class="fa fa-plus" aria-hidden="true"></i>
-      </button>
-    </div>
-  </div>
-</div>
-</div>
-{% endif %}
+  {% if salesticket.salesticketstate.name!="Solucionado" %}
+      <div class="col-md-6"></div>
+      <div style="text-align: right;margin-bottom:10px;" class="col-md-6">
+        <br>
+        <button type="button" id="salesticket-button-add-info" class="btn btn-blue" data-toggle="modal" data-target="#add-information-modal-form" >
+          Añadir información
+          <i class="fa fa-plus" aria-hidden="true"></i>
+        </button>
+      </div>
+  {% endif %}
 {% else %}
-<div class="panel" id="panel-button" {% if id==0 %} style="display:none;" {% endif %}>
-<div class="row">
-    <div style="text-align: left;" class="col-md-6"></div>
-    <div style="text-align: right;margin-bottom:10px;" class="col-md-6">
-      <button type="button" id="salesticket-button-add-info" class="btn btn-blue" data-toggle="modal" data-target="#add-information-modal-form" >
+  <div id="info-add" style="text-align:right;display:none;margin-bottom:10px;" style="text-align: right;" class="col-md-6">
+  <div class="form-group">
+    <label for="salesticket-button-add-info"></label>
+    <button type="button" id="salesticket-button-add-info" class="btn btn-blue" data-toggle="modal" data-target="#add-information-modal-form" >
         Añadir información
         <i class="fa fa-plus" aria-hidden="true"></i>
-      </button>
-    </div>
+    </button>
   </div>
-</div>
-</div>
+  </div>
 {% endif %}
+</div>
+</div>
+<script>
+$(document).ready(function() {
+  $('body').on('change', "#salesticket-form-reasons-select", function(e) {
+    $("#panel-searching").css("display","block");
+    $("#validation-infos-list").empty();
+    $("#validation-infos-list").append("<li>Tienes 2 OPCIONES: buscar un pedido para asociarlo a la incidencia o buscar un cliente. Si eliges buscar un pedido, el cliente también se asociará automáticamente a la incidencia.</li>");
+
+  //  $("#info-add").css("display","block");
+  });
+});
+</script>

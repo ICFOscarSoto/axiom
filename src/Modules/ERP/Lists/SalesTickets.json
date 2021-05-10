@@ -25,8 +25,9 @@
           "5": {"text": "Abierto", "html": "<div style=\"min-width: 75px;\" class=\"label label-default\">Abierto<\/div>"},
           "3": {"text": "Solucionado", "html": "<div style=\"min-width: 75px;\" class=\"label label-success\">Solucionado<\/div>"},
           "2": {"text": "Cliente esperando solución", "html": "<div style=\"min-width: 75px;\" class=\"label label-danger\">Cliente esperando solución<\/div>"},
-          "1": {"text": "Envio condicionado", "html": "<div style=\"min-width: 75px;\" class=\"label label-info\">Envio condicionado<\/div>"},
-          "4": {"text": "Material defectuoso", "html": "<div style=\"min-width: 75px;\" class=\"label label-info\">Material defectuoso<\/div>"}
+          "1": {"text": "Pendiente de proveedor", "html": "<div style=\"min-width: 75px;\" class=\"label label-info\">Pendiente de proveedor<\/div>"},
+          "4": {"text": "Esperando respuesta del cliente", "html": "<div style=\"min-width: 75px;\" class=\"label label-info\">Esperando respuesta del cliente<\/div>"},
+          "6": {"text": "Pendiente de agencia", "html": "<div style=\"min-width: 75px;\" class=\"label label-info\">Pendiente de agencia<\/div>"}
       }
   },
   {

@@ -17,6 +17,7 @@ use App\Modules\ERP\Entity\ERPSalesTickets;
 use App\Modules\ERP\Entity\ERPSalesOrders;
 use App\Modules\ERP\Entity\ERPCustomers;
 use App\Modules\ERP\Entity\ERPSalesTicketsStates;
+use App\Modules\ERP\Entity\ERPSalesTicketsReasons;
 use App\Modules\ERP\Entity\ERPSalesTicketsHistory;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
@@ -44,6 +45,7 @@ class ERPSalesTicketsController extends Controller
 		   $salesticketsRepository=$this->getDoctrine()->getRepository(ERPSalesTickets::class);
 			 $SalesTicketsHistoryRepository = $this->getDoctrine()->getRepository(ERPSalesTicketsHistory::class);
 			 $salesticketsstatesRepository=$this->getDoctrine()->getRepository(ERPSalesTicketsStates::class);
+			 $salesticketsreasonsRepository=$this->getDoctrine()->getRepository(ERPSalesTicketsReasons::class);
 			 $agentsRepository=$this->getDoctrine()->getRepository(GlobaleUsers::class);
 			 $departmentsRepository=$this->getDoctrine()->getRepository(HRDepartments::class);
 			 $userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
@@ -107,6 +109,15 @@ class ERPSalesTicketsController extends Controller
 				$states[]=$option;
 			}
 
+			//sales ticket reasons
+			$objects=$salesticketsreasonsRepository->findBy(["active"=>1,"deleted"=>0],["name"=>"ASC"]);
+			$reasons=[];
+			foreach($objects as $item){
+				$option["id"]=$item->getId();
+				$option["text"]=$item->getName();
+				$reasons[]=$option;
+			}
+
 			//agents
 			$agent_objects=$agentsRepository->findBy(["active"=>1,"deleted"=>0],["name"=>"ASC"]);
 			$agents=[];
@@ -155,7 +166,7 @@ class ERPSalesTicketsController extends Controller
 
 		 $infos=null;
 		 if($id==0){
-			 $infos[]="Tienes 2 OPCIONES: buscar un pedido para asociarlo a la incidencia o buscar un cliente. Si eliges buscar un pedido, el cliente también se asociará automáticamente a la incidencia.";
+			 $infos[]="Elige el motivo de la incidencia";
 		 }
 		 else if($salesticket->getSalesticketstate()->getName()!="Solucionado")	$infos[]="Si necesitas ampliar los detalles de la incidencia, puedes hacerlo pinchando en el botón 'Añadir información'. También puedes añadir imágenes si lo necesitas.";
 
@@ -173,6 +184,7 @@ class ERPSalesTicketsController extends Controller
 					'customerslist' => $customerslist,
 					'salesorderslist' => $salesorderslist,
 					'states' => $states,
+					'reasons' => $reasons,
 					'agents' => $agents,
 					'departments' => $departments,
 					'ticketType' => 'sales_ticket',
@@ -202,6 +214,7 @@ class ERPSalesTicketsController extends Controller
 		$salesordersRepository=$this->getDoctrine()->getRepository(ERPSalesOrders::class);
 	 	$customersRepository=$this->getDoctrine()->getRepository(ERPCustomers::class);
 		$salesticketsstatesRepository=$this->getDoctrine()->getRepository(ERPSalesTicketsStates::class);
+		$salesticketsreasonsRepository=$this->getDoctrine()->getRepository(ERPSalesTicketsReasons::class);
 	 	$configrepository=$this->getDoctrine()->getRepository(ERPConfiguration::class);
 		$agentsRepository=$this->getDoctrine()->getRepository(GlobaleUsers::class);
 		$departmentsRepository=$this->getDoctrine()->getRepository(HRDepartments::class);
@@ -213,11 +226,16 @@ class ERPSalesTicketsController extends Controller
 	 	$customer=$customersRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "code"=>$fields->customercode, "active"=>1, "deleted"=>0]);
 
 		$salesticketstate=$salesticketsstatesRepository->findOneBy(["id"=>$fields->salesticketstate, "active"=>1, "deleted"=>0]);
+
+
+
 	 //	if(!$customer) return new JsonResponse(["result"=>0]); //if no customer, do nothing
 
 		$newid=$salesticketsRepository->getLastID()+1;
 	 	if(!$salesticket){
-	 		$salesticket=new ERPSalesTickets();
+	 		$salesticket=new ERPSalesTickets($fields->salesticketstate);
+			$salesticketreason=$salesticketsreasonsRepository->findOneBy(["id"=>$fields->salesticketreason, "active"=>1, "deleted"=>0]);
+			$salesticket->setReason($salesticketreason);
 	 		$salesticket->setActive(1);
 	 		$salesticket->setDeleted(0);
 	 		$salesticket->setDateadd(new \DateTime());
@@ -231,7 +249,7 @@ class ERPSalesTicketsController extends Controller
 		if($id==0){
 			$salesticket->setAuthor($this->getUser());
 		}
-		
+
  		if($fields->salesticketnewagent!=""){
 
 				$newagent=$agentsRepository->findOneBy(["id"=>$fields->salesticketnewagent,"active"=>1,"deleted"=>0]);

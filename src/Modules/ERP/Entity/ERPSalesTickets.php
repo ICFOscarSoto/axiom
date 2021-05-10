@@ -10,6 +10,7 @@ use \App\Modules\ERP\Entity\ERPSalesTicketsHistory;
 use \App\Modules\ERP\Entity\ERPCustomers;
 use \App\Modules\ERP\Entity\ERPSalesOrders;
 use \App\Modules\HR\Entity\HRDepartments;
+use \App\Modules\ERP\Entity\ERPSalesTicketsReasons;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPSalesTicketsRepository")
@@ -110,6 +111,11 @@ class ERPSalesTickets
      * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleUsers")
      */
    private $author;
+
+    /**
+    * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPSalesTicketsReasons")
+    */
+   private $reason;
 
     public function getId(): ?int
     {
@@ -335,4 +341,17 @@ class ERPSalesTickets
 
         return $this;
     }
+
+    public function getReason(): ?ERPSalesTicketsReasons
+    {
+        return $this->reason;
+    }
+
+    public function setReason(?ERPSalesTicketsReasons $reason): self
+    {
+        $this->reason = $reason;
+
+        return $this;
+    }
+
 }
