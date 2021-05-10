@@ -1,7 +1,7 @@
 <div class="panel" id="panel-button">
   <div class="row">
  {% if id==0 %}
-  <div class="col-md-6">
+  <div class="col-md-3">
         <div class="form-group">
               <input type="hidden" id="salesticket-form-reasons" class="form-control">
               <select type="text" id="salesticket-form-reasons-select" class="form-control select2" required>
@@ -15,8 +15,7 @@
 {% endif %}
 {% if id!=0 %}
   {% if salesticket.salesticketstate.name!="Solucionado" %}
-      <div class="col-md-6"></div>
-      <div style="text-align: right;margin-bottom:10px;" class="col-md-6">
+      <div style="text-align: right;margin-bottom:10px;" class="col-md-12">
         <br>
         <button type="button" id="salesticket-button-add-info" class="btn btn-blue" data-toggle="modal" data-target="#add-information-modal-form" >
           Añadir información
@@ -25,7 +24,7 @@
       </div>
   {% endif %}
 {% else %}
-  <div id="info-add" style="text-align:right;display:none;margin-bottom:10px;" style="text-align: right;" class="col-md-6">
+  <div id="info-add" style="text-align:right;display:none;margin-bottom:10px;" style="text-align: right;" class="col-md-9">
   <div class="form-group">
     <label for="salesticket-button-add-info"></label>
     <button type="button" id="salesticket-button-add-info" class="btn btn-blue" data-toggle="modal" data-target="#add-information-modal-form" >
