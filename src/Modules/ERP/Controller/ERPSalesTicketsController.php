@@ -282,6 +282,7 @@ class ERPSalesTicketsController extends Controller
 		$salesticket->setEmail($fields->email);
 		$salesticket->setObservations($fields->observations);
 	 	$salesticket->setDateupd(new \DateTime());
+		$salesticket->setDatelastnotify(new \DateTime());
 	 	$this->getDoctrine()->getManager()->persist($salesticket);
 
 		$newagent=null;

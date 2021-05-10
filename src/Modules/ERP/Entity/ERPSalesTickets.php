@@ -117,6 +117,11 @@ class ERPSalesTickets
     */
    private $reason;
 
+   /**
+    * @ORM\Column(type="datetime", nullable=true)
+    */
+   private $datelastnotify;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -350,6 +355,18 @@ class ERPSalesTickets
     public function setReason(?ERPSalesTicketsReasons $reason): self
     {
         $this->reason = $reason;
+
+        return $this;
+    }
+
+    public function getDatelastnotify(): ?\DateTimeInterface
+    {
+        return $this->datelastnotify;
+    }
+
+    public function setDatelastnotify(?\DateTimeInterface $datelastnotify): self
+    {
+        $this->datelastnotify = $datelastnotify;
 
         return $this;
     }
