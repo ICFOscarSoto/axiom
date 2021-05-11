@@ -18,6 +18,20 @@ class HRWorkerRepository extends ServiceEntityRepository
         parent::__construct($registry, HRWorkers::class);
     }
 
+
+    public function isWorking($worker){
+      $conn = $this->getEntityManager()->getConnection();
+      $query = "SELECT c.* FROM hrclocks c
+              LEFT JOIN hrworkers h ON h.id = c.worker_id
+              WHERE c.active = 1 AND c.deleted = 0 AND c.invalid <> 1
+              AND c.start IS not null AND c.end IS NULL AND
+              h.active = 1 AND h.deleted = 0 AND h.id = :worker_id";
+      $params=['worker_id' => $worker->getId()];
+      $result=$this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+      if(count($result)==0) return false; else return true;
+
+    }
+
     function getNoUsers($user){
       return $this->createQueryBuilder('w')
           ->leftJoin('w.user', 'u')
