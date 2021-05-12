@@ -1,0 +1,20 @@
+<script>
+  function prepare_storeticket_json(){
+
+    var storeticketFields = new Object();
+    var lines=[];
+    storeticketFields.id=$("#storeticket-form-id").val();
+    storeticketFields.storeticketstate=$("#storeticket-form-states-select").val();
+    storeticketFields.storeticketreason=$("#storeticket-form-reasons-select").val();
+    storeticketFields.storeticketnewagent=$("#storeticket-form-agents-select").val();
+    storeticketFields.storeticketnewdepartment=$("#storeticket-form-departments-select").val();
+    storeticketFields.productname=$("#product-form-name").val();
+    storeticketFields.productcode=$("#product-form-code").val();
+    storeticketFields.productvariant=$("#product-form-variant").val();
+    storeticketFields.store=$("#storeticket-form-store").val();
+    storeticketFields.storelocation=$("#storeticket-form-storelocation").val();
+    storeticketFields.observations=$("#storeticket-form-observations").val();
+
+    return storeticketFields;
+  }
+</script>

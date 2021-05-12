@@ -1,0 +1,91 @@
+{% if id!=0 %}
+<div class="panel panel-primary panel-shadow" data-collapsed="0" style="-webkit-box-shadow: none; box-shadow:none; margin-bottom: -1px;"><!-- to apply shadow add class "panel-shadow" -->
+    <div class="panel-body">
+    <div class="row">
+      {% if storeticket.storeticketstate!=null %}
+
+      {% set color_state = '' %}
+      {% if storeticket.storeticketstate.id == 1 %}
+           {% set color_state = '#21a9e1' %}
+           {% set color_text = '#fff' %}
+        {% elseif storeticket.storeticketstate.id == 2 %}
+           {% set color_state = '#cc2424' %}
+           {% set color_text = '#fff' %}
+        {% elseif storeticket.storeticketstate.id == 3 %}
+           {% set color_state = '#00a651' %}
+           {% set color_text = '#fff' %}
+        {% elseif storeticket.storeticketstate.id == 4 %}
+           {% set color_state = '#21a9e1' %}
+           {% set color_text = '#fff' %}
+        {% elseif storeticket.storeticketstate.id == 6 %}
+              {% set color_state = '#21a9e1' %}
+              {% set color_text = '#fff' %}
+        {% else %}
+           {% set color_state = '#ebebeb' %}
+           {% set color_text = '#000' %}
+        {% endif %}
+
+      <div class="col-md-2">
+        <label for="storeticket-form-currentstate">Estado actual:</label>
+        <input style="background-color:{{color_state}}!important;color:{{color_text}}!important;" type="text" id="storeticket-form-currentstate" value="{{ storeticket.storeticketstate.name }}" disabled="disabled" class="form-control" placeholder="Estado actual">
+      </div>
+      {% else %}
+        <div class="col-md-2">
+          <label for="storeticket-form-currentstate">Estado actual:</label>
+          <input style="background-color:#ebebeb!important;color:#000;" type="text" id="storeticket-form-currentstate" value="Abierta" disabled="disabled" class="form-control" placeholder="Estado actual">
+        </div>
+        {% endif %}
+      {% if id!=0 %}
+      <div class="col-md-2">
+        <label for="storeticket-form-reason">Motivo:</label>
+        <input type="text" id="storeticket-form-reason" value="{{ storeticket.reason.name }}" disabled="disabled" class="form-control" placeholder="Motivo">
+      </div>
+      {% endif %}
+      {% if storeticket.agent is not null %}
+        <div class="col-md-2">
+          <label for="storeticket-form-agent">Agente asignado:</label>
+          <div class="form-group">
+          <input type="text" id="storeticket-form-agent" value="{{ storeticket.agent.name }} {{ storeticket.agent.lastname }}" disabled="disabled" class="form-control" placeholder="Agente asignado">
+          <input type="hidden" id="storeticket-form-agent-id" value="{{ storeticket.agent.id }}" class="form-control">
+          </div>
+        </div>
+      {% endif %}
+      {% if storeticket.department is not null %}
+        <div class="col-md-2">
+          <label for="storeticket-form-department">Departamento asignado:</label>
+          <div class="form-group">
+          <input type="text" id="storeticket-form-department" value="{{ storeticket.department.name }}" disabled="disabled" class="form-control" placeholder="Departamento asignado">
+          <input type="hidden" id="storeticket-form-department-id" value="{{ storeticket.department.id }}" class="form-control">
+          </div>
+        </div>
+      {% endif %}
+      {% if storeticket.dateupd is not null %}
+      <div class="col-md-2">
+        <label for="storeticket-form-agent">Fecha de última actualización:</label>
+        <input type="datetime" id="storeticket-form-dateadd" value="{{ storeticket.dateupd|date('h:m:s d/m/Y ') }}" disabled="disabled" class="form-control" placeholder="Fecha">
+      </div>
+      <div class="col-md-4" style="text-align:right;">
+        {% if id!=0 %}
+        <h2>Ticket {{ storeticket.code }}</h2>
+        {% else %}
+          <h2>Ticket {{ code }}</h2>
+        {% endif %}
+        <br>
+      </div>
+      {% else %}
+      <div class="col-md-8" style="text-align:right;">
+        {% if id!=0 %}
+        <h2>Ticket {{ storeticket.code }}</h2>
+        {% else %}
+          <h2>Ticket {{ code }}</h2>
+        {% endif %}
+        <br>
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+  </div>
+<br>
+<br>
+{% endif %}

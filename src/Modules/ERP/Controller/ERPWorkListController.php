@@ -199,7 +199,7 @@ class ERPWorkListController extends Controller
   $productsRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
 	$variantsRepository=$this->getDoctrine()->getRepository(ERPVariantsValues::class);
 	$product_object=$productsRepository->findOneBy(["code"=>$product]);
-	if($variant!=0)
+	if($variant!=0 AND $variant!="-1")
 	{
 		$variant_object=$variantsRepository->findOneBy(["name"=>$variant]);
 		$storeLocations=$stocksRepository->findLocationsByStoreProduct($store, $product_object->getId(),$variant_object->getId());

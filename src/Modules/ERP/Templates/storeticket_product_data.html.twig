@@ -1,0 +1,104 @@
+<div class="panel panel-primary panel-shadow" id="product-data" {% if id==0 %} style="display:none;"{% endif %} data-collapsed="0" style="-webkit-box-shadow: none; box-shadow:none; margin-bottom: -1px;"><!-- to apply shadow add class "panel-shadow" -->
+  <div class="panel-body">
+    <div class="panel-title">Información del producto</div>
+      <div class="row">
+        <div class="col-md-3">
+          <div class="form-group">
+            <label for="storeticket-form-name">Nombre del producto:</label>
+            <span id="product-form-view" class="select2-selection__view_tickets" {% if storeticket.product!=null %} attr-id="{{ storeticket.product.id }}" {% else %} style="display:none;" {% endif %} attr-url="{{ url('formProduct',{'id':'_____'}) }}"><i class="fa fa-file-text-o" aria-hidden="true"></i><span>&nbsp;Ver Ficha</span></span>
+            <input type="text" readonly id="product-form-name" {% if storeticket.product!=null %} value="{{ storeticket.product.name }}" disabled {% endif %} class="form-control" placeholder="Nombre del Producto">
+          </div>
+        </div>
+        {% if storeticket.variant==null %}
+          {% if id==0 %}
+            <div class="col-md-3">
+              <div class="form-group">
+                  <label for="product-form-variant">Variantes</label>
+                  <select type="text" id="product-form-variant" class="form-control select2">
+                  </select>
+              </div>
+            </div>
+          {% endif %}
+        {% else %}
+          <div class="col-md-3">
+            <div class="form-group">
+              <label for="storeticket-form-name">Variante</label>
+              <input type="text" readonly id="product-form-variant" {% if storeticket.variant!=null %} value="{{ storeticket.variant.name }}" disabled {% endif %} class="form-control" placeholder="Variante del Producto">
+            </div>
+          </div>
+        {% endif %}
+        {% if storeticket.store==null %}
+          {% if id==0 %}
+            <div class="col-md-3">
+              <div class="form-group">
+                <label for="storeticket-form-store">Almacén</label>
+                <select type="text" id="storeticket-form-store" class="form-control select2" required>
+                  {% for option in stores %}
+                    <option value="{{ option.id }}">{{ option.text }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          {% endif %}
+        {% else %}
+        <div class="col-md-3">
+          <div class="form-group">
+            <label for="storeticket-form-store">Almacén</label>
+            <input type="text" readonly id="storeticket-form-store" {% if storeticket.store!=null %} value="{{ storeticket.store.name }}" disabled {% endif %} class="form-control" placeholder="Almacén">
+          </div>
+        </div>
+        {% endif %}
+        {% if storeticket.storelocation==null %}
+          {% if id==0 %}
+            <div class="col-md-3">
+              <div class="form-group">
+                <label for="storeticket-form-storelocation">Ubicación</label>
+                <select type="text" id="storeticket-form-storelocation" class="form-control select2" required>
+                </select>
+              </div>
+            </div>
+          {% endif %}
+        {% else %}
+        <div class="col-md-3">
+          <div class="form-group">
+            <label for="storeticket-form-storelocation">Ubicación</label>
+            <input type="text" readonly id="storeticket-form-storelocation" {% if storeticket.storelocation!=null %} value="{{ storeticket.storelocation.name }}" disabled {% endif %} class="form-control" placeholder="Ubicación">
+          </div>
+        </div>
+        {% endif %}
+        <input type="hidden" id="product-form-code" class="form-control" value="{% if storeticket.product!=null %}{{ storeticket.product.code }}{% endif %}">
+        <input type="hidden" id="product-form-id" class="form-control" value="{% if storeticket.product!=null %}{{ storeticket.product.id }}{% endif %}">
+      </div>
+      <br>
+</div>
+</div>
+<br>
+<br>
+<script>
+function getLocations(store,code,variant){
+  if((++load_wait)==1) $("#load-spinner").fadeIn();
+  $.ajax({
+      type: "GET",
+      dataType: "json",
+      url: "/api/ERP/worklist/locations/"+store+"/"+code+"/"+variant+"/get",
+    }).done(function( elements, textStatus, jqXHR ) {
+      if((--load_wait)==0) $("#load-spinner").fadeOut();
+      $("#storeticket-form-storelocation").empty();
+        $("#storeticket-form-storelocation").append('<option value="-1">Selecciona ubicación...</option>');
+       elements.locations.forEach( function(valor, indice, array){
+        $("#storeticket-form-storelocation").append('<option value="'+valor.id+'">'+valor.name+'</option>');
+      });
+    });
+}
+$(document).ready(function() {
+  $('body').on('change', "#storeticket-form-store", function(e) {
+    var store=$("#storeticket-form-store").val();
+    var code=$("#product-form-code").val();
+    var variant=$("#product-form-variant").val();
+  //  alert(variant);
+    $("#product-form-location").empty();
+    getLocations(store,code,variant);
+
+  });
+});
+</script>

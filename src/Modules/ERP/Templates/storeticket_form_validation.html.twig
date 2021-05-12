@@ -1,0 +1,44 @@
+{% if info is not null %}
+<div class="panel minimal">
+  <div class="panel-body">
+    <div class="row">
+      <div class="col-md-12">
+        <div id="storetickets-info" class="alert alert-info form-validation-error" style="display: {% if info is defined and info|length > 0 %}block;{% else %}none;{% endif %}">
+          <strong>Información:</strong></br></br>
+          <ul id="validation-info-list">
+            {% if info is defined %}
+              {% for item in info %}
+                <li>{{ item | raw }}</li>
+              {% endfor %}
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+<script>
+  function validate_storeticket(){
+    $  (".error").remove();
+      var valid=true;
+
+      if($("#storeticket-form-observations").val()=="")
+      {
+        toastr.error("Por favor, añade una observación a la incidencia", "Confirmación", confirmation);
+         valid=false;
+         return valid;
+
+      }
+      if($("#storeticket-form-states-select").val()=="-1")
+      {
+        toastr.error("Por favor, selecciona un estado", "Confirmación", confirmation);
+         valid=false;
+         return valid;
+
+      }
+
+  return valid;
+
+}
+</script>

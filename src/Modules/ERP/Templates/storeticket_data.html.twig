@@ -1,0 +1,114 @@
+{% if id!=0 %}
+<div class="panel panel-primary panel-shadow" data-collapsed="0" style="-webkit-box-shadow: none; box-shadow:none; padding:0px; margin-bottom: -1px;"><!-- to apply shadow add class "panel-shadow" -->
+  <div class="col-md-4">
+    <div class="panel-body">
+        <div class="row">
+          <div class="col-12 col-sm-12">
+        		{{ include('@ERP/storeticket_gallery.html.twig') }}
+          </div>
+        </div>
+    </div>
+  </div>
+  <div class="col-md-8">
+    <div class="panel-body">
+      <div class="col-md-12">
+        <ul class="cbp_tmtimeline_tickets" id="ul_timeline_tickets"></ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+<script>
+  $(document).ready(function(){
+    id={{ id }};
+    var items="";
+    {% for history in histories %}
+    var obj_create=moment('{{history.dateadd|date('Y-m-d H:i:s')}}');
+    {% if history.newagent is not null %}
+      {% if history.newagent.id==history.agent.id %}
+                var item='<li>'
+                    +'<time class="cbp_tmtime_tickets" datetime="">'
+                    +'<span id="create-time-text">'+obj_create.format('HH:mm:ss D/MM/YY')+'</span><p>'+obj_create.from()+'</p>'
+                    +'<h2>{{ history.agent.name }} {{ history.agent.lastname }}</h2>'
+                    +'</time>'
+                    +'<div class="cbp_tmicon_tickets bg-info">'
+                    +'<img src="{{ url('index') }}api/user/{{ history.agent.id }}/getimage" alt="" class="img-circle" width="40" height="40">'
+                    +'</div>'
+                    +'<div class="cbp_tmlabel_tickets">'
+                    +'<h2>{{ history.observations|raw }}</h2>'
+                    +'<h3>Estado del ticket: <strong>{{ history.storeticketstate.name }}</strong></h3>'
+                    +'</div>'
+                    +'</li>';
+              items+=item;
+      {% else %}
+          var item_aux='<li>'
+              +'<time class="cbp_tmtime_tickets" datetime="">'
+              +'<span id="create-time-text">'+obj_create.format('HH:mm:ss D/MM/YY')+'</span>'
+              +'<p>'+obj_create.from()+'</p>'
+              +'<h2>{{ history.newagent.name }} {{ history.newagent.lastname }}</h2>'
+              +'</time>'
+              +'<div class="cbp_tmicon_tickets bg-info">'
+              +'<img src="{{ url('index') }}api/user/{{ history.newagent.id }}/getimage" alt="" class="img-circle" width="40" height="40">'
+              +'</div>'
+              +'<div class="cbp_tmlabel_tickets">'
+              +'<h2>Acción pendiente</h2>'
+              +'</div>'
+              +'</li>';
+
+          items+=item_aux;
+
+          var item='<li>'
+              +'<time class="cbp_tmtime_tickets" datetime="">'
+              +'<span id="create-time-text">'+obj_create.format('HH:mm:ss D/MM/YY')+'</span><p>'+obj_create.from()+'</p>'
+              +'<h2>{{ history.agent.name }} {{ history.agent.lastname }}</h2>'
+              +'</time>'
+              +'<div class="cbp_tmicon_tickets bg-info">'
+              +'<img src="{{ url('index') }}api/user/{{ history.agent.id }}/getimage" alt="" class="img-circle" width="40" height="40">'
+              +'</div>'
+              +'<div class="cbp_tmlabel_tickets">'
+              +'<h2>{{ history.observations|raw }}</h2>'
+              +'<h3>Estado de la incidencia: <strong>{{ history.storeticketstate.name }}</strong></h3>'
+              +'<h3><i class="fa fa-forward" aria-hidden="true"></i> Traspasa la incidencia a {{ history.newagent.name }}</h3>'
+              +'</div>'
+              +'</li>';
+
+            items+=item;
+      {% endif %}
+      {% elseif history.newdepartment is not null %}
+              var item_aux='<li>'
+                  +'<time class="cbp_tmtime_tickets" datetime="">'
+                  +'<span id="create-time-text">'+obj_create.format('HH:mm:ss D/MM/YY')+'</span>'
+                  +'<p>'+obj_create.from()+'</p>'
+                  +'<h2>Departamento de {{ history.newdepartment.name }}</h2>'
+                  +'</time>'
+                  +'<div class="cbp_tmicon_tickets bg-info">'
+                  +'<img src="{{ url('index') }}api/user/0/getimage" alt="" class="img-circle" width="40" height="40">'
+                  +'</div>'
+                  +'<div class="cbp_tmlabel_tickets">'
+                  +'<h2>Acción pendiente</h2>'
+                  +'</div>'
+                  +'</li>';
+
+              items+=item_aux;
+
+              var item='<li>'
+                  +'<time class="cbp_tmtime_tickets" datetime="">'
+                  +'<span id="create-time-text">'+obj_create.format('HH:mm:ss D/MM/YY')+'</span><p>'+obj_create.from()+'</p>'
+                  +'<h2>{{ history.agent.name }} {{ history.agent.lastname }}</h2>'
+                  +'</time>'
+                  +'<div class="cbp_tmicon_tickets bg-info">'
+                  +'<img src="{{ url('index') }}api/user/{{ history.agent.id }}/getimage" alt="" class="img-circle" width="40" height="40">'
+                  +'</div>'
+                  +'<div class="cbp_tmlabel_tickets">'
+                  +'<h2>{{ history.observations|raw }}</h2>'
+                  +'<h3>Estado del ticket: <strong>{{ history.storeticketstate.name }}</strong></h3>'
+                  +'<h3><i class="fa fa-forward" aria-hidden="true"></i> Traspasa la incidencia al departamento de {{ history.newdepartment.name }}</h3>'
+                  +'</div>'
+                  +'</li>';
+
+                items+=item;
+    {% endif %}
+    {% endfor %}
+    $("#ul_timeline_tickets").append(items);
+});
+</script>

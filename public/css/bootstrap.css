@@ -5949,6 +5949,14 @@ button.close {
   .modal-dialog-salestickets .modal-content{
     width: 100%;
   }
+
+  .modal-dialog-storetickets {
+    width: 43%;
+    margin: 30px auto;
+  }
+  .modal-dialog-storetickets .modal-content{
+    width: 100%;
+  }
   .modal-content {
     -webkit-box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);

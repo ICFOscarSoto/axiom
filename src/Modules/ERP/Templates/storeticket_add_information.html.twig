@@ -1,0 +1,97 @@
+<div class="modal fade" tabindex="-1" id="add-information-modal-form" aria-hidden="true">
+    <div class="modal-dialog-storetickets">
+      <div class="modal-content" style="transform: matrix(1, 0, 0, 1, 0, 0);display:inline-block;">
+        <div class="modal-header">
+          <h4 class="modal-title">Añadir información</h4>
+        </div>
+        <br>
+        <br>
+        <div id="add-information-modal-form-body" style="height: 520px; padding: 0px 10px;">
+              <div class="row">
+                <div class="col-6 col-sm-6">
+                  <div class="form-group">
+                    <input type="hidden" id="storeticket-form-states" class="form-control">
+                      <label for="storeticket-form-states-select">Estado actual de la incidencia</label>
+                    <select type="text" id="storeticket-form-states-select" class="form-control select2" required>
+                        <option value="-1">Elegir estado...</option>
+                      {% for option in states %}
+                        <option value="{{ option.id }}">{{ option.text }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                </div>
+              <div class="col-6 col-sm-6">
+                <div class="form-group">
+                  <input type="hidden" id="storeticket-form-agents" class="form-control">
+                  <label for="storeticket-form-agents-select">Traspasar a otro agente</label>
+                  <select type="text" id="storeticket-form-agents-select" class="form-control select2" required>
+                    {% for option in agents %}
+                      <option value="{{ option.id }}">{{ option.text }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+              <div class="col-6 col-sm-6">
+                <div class="form-group">
+                  <input type="hidden" id="storeticket-form-departments" class="form-control">
+                  <label for="storeticket-form-departments-select">Traspasar a otro departamento</label>
+                  <select type="text" id="storeticket-form-departments-select" class="form-control select2" required>
+                    {% for option in departments %}
+                      <option value="{{ option.id }}">{{ option.text }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+                <div class="col-12 col-sm-12">
+                  <div class="form-group" >
+                  <label for="storeticket-form-observations">Observaciones</label>
+                  <textarea id="storeticket-form-observations" name="storeticket-form-observations" class="form-control" style="min-height:90px;">{% if storeticket.observations!=null %}{{ storeticket.observations }}{% endif %}</textarea>
+                  <script>
+                  $(document).ready(function() {
+                    var editor = new Jodit('#storeticket-form-observations');
+                  });
+                  </script>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+                <div style="text-align: left;" class="col-md-6"></div>
+                <div style="text-align: right;margin-bottom:10px;" class="col-md-6">
+                  <button attr-id="" attr-action="" id="storeticket-button-cancel" type="button" class="btn btn">Cancelar</button>
+                  <button attr-id="" attr-action="" id="storeticket-button-save" type="button" class="btn btn-green">Guardar</button>
+                </div>
+              </div>
+        </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  $(document).ready(function() {
+$('body').on('click', "#storeticket-button-cancel", function(e){
+//  alert("ey");
+   $("#add-information-modal-form").modal('toggle');
+});
+
+$('body').on('change', "#storeticket-form-agents-select", function(e) {
+  $("#storeticket-form-departments-select").parent().parent().css("display","none");
+
+
+});
+
+$('body').on('change', "#storeticket-form-departments-select", function(e) {
+  $("#storeticket-form-agents-select").parent().parent().css("display","none");
+
+
+});
+$('body').on('click', "#storeticket-button-add-info", function(e) {
+
+    $("#storeticket-form-agents-select").parent().parent().css("display","block");
+    $("#storeticket-form-departments-select").parent().parent().css("display","block");
+
+});
+
+});
+</script>

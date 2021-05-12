@@ -1,0 +1,4 @@
+[
+  {"id": "editStoreTickets", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"formStoreTickets", "actionType" : "foreground", "confirm" :false, "tooltip":""},
+  {"id": "delete", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"genericdelete", "routeParams":{"module":"ERP", "name":"StoreTickets"}, "confirm" :true, "undo" :false, "tooltip":"Borrar Incidencia", "actionType" : "background"}
+]
