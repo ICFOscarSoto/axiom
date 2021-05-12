@@ -320,6 +320,19 @@ class ERPSalesTicketsController extends Controller
 
 		}
 
+		if($id!=0){
+			if($salesticketstate->getName()=="Solucionado"){
+				$author=$salesticket->getAuthor();
+				if($author->getId()!=$this->getUser()->getId())
+				{
+					$channel=$author->getDiscordchannel();
+					$msg=$this->getUser()->getName()." ha solucionado la incidencia Nº **".$salesticket->getCode()."**";
+					file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
+					$msg="\n\nMás info en: \n".'https://axiom.ferreteriacampollano.com/es/ERP/salestickets/form/'.$id;
+					file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
+				}
+			}
+		}
 
 
 		$history_obj=new ERPSalesTicketsHistory();
