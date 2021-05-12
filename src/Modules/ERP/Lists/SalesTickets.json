@@ -31,6 +31,9 @@
       }
   },
   {
+      "name" :"reason__name","caption":"Motivo"
+  },
+  {
       "name" :"agent__name_o_agent__lastname_o_department__name","caption":"Asignado a"
   },
   {

@@ -41,6 +41,7 @@
                     +'</li>';
               items+=item;
       {% else %}
+        {% if history.salesticketstate.name!="Solucionado" %}
           var item_aux='<li>'
               +'<time class="cbp_tmtime_tickets" datetime="">'
               +'<span id="create-time-text">'+obj_create.format('HH:mm:ss D/MM/YY')+'</span>'
@@ -56,7 +57,7 @@
               +'</li>';
 
           items+=item_aux;
-
+          {% endif %}
           var item='<li>'
               +'<time class="cbp_tmtime_tickets" datetime="">'
               +'<span id="create-time-text">'+obj_create.format('HH:mm:ss D/MM/YY')+'</span><p>'+obj_create.from()+'</p>'

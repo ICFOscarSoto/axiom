@@ -23,7 +23,6 @@ use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\ERP\Utils\ERPSalesTicketsUtils;
-use App\Modules\ERP\Utils\ERPSalesTicketsHistoryUtils;
 use App\Modules\Security\Utils\SecurityUtils;
 
 class ERPSalesTicketsController extends Controller
