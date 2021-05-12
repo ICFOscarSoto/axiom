@@ -164,11 +164,11 @@ class ERPSalesTicketsController extends Controller
 		 $gallery["width"]="100%";
 		 $gallery["height"]="300px";
 
-		 $infos=null;
+		 $info=null;
 		 if($id==0){
-			 $infos[]="Elige el motivo de la incidencia";
+			 $info[]="Elige el motivo de la incidencia";
 		 }
-		 else if($salesticket->getSalesticketstate()->getName()!="Solucionada")	$infos[]="Si necesitas ampliar los detalles de la incidencia, puedes hacerlo pinchando en el botón 'Añadir información'. También puedes añadir imágenes si lo necesitas.";
+		 else if($salesticket->getSalesticketstate()->getName()!="Solucionada")	$info[]="Si necesitas ampliar los detalles de la incidencia, puedes hacerlo pinchando en el botón 'Añadir información'. También puedes añadir imágenes si lo necesitas.";
 
 
 			if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
@@ -193,7 +193,7 @@ class ERPSalesTicketsController extends Controller
 					'gallery' => $gallery,
 					'id' => $id,
 					'code' => $code,
-					'infos' => $infos
+					'info' => $info
 					]);
 			}
 			return new RedirectResponse($this->router->generate('app_login'));
