@@ -22,8 +22,8 @@
       "caption":"Estado de la incidencia",
       "class": "dt-center",
       "replace": {
-          "5": {"text": "Abierto", "html": "<div style=\"min-width: 75px;\" class=\"label label-default\">Abierto<\/div>"},
-          "3": {"text": "Solucionado", "html": "<div style=\"min-width: 75px;\" class=\"label label-success\">Solucionado<\/div>"},
+          "5": {"text": "Abierta", "html": "<div style=\"min-width: 75px;\" class=\"label label-default\">Abierta<\/div>"},
+          "3": {"text": "Solucionada", "html": "<div style=\"min-width: 75px;\" class=\"label label-success\">Solucionada<\/div>"},
           "2": {"text": "Cliente esperando solución", "html": "<div style=\"min-width: 75px;\" class=\"label label-danger\">Cliente esperando solución<\/div>"},
           "1": {"text": "Pendiente de proveedor", "html": "<div style=\"min-width: 75px;\" class=\"label label-info\">Pendiente de proveedor<\/div>"},
           "4": {"text": "Esperando respuesta del cliente", "html": "<div style=\"min-width: 75px;\" class=\"label label-info\">Esperando respuesta del cliente<\/div>"},

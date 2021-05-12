@@ -168,7 +168,7 @@ class ERPSalesTicketsController extends Controller
 		 if($id==0){
 			 $infos[]="Elige el motivo de la incidencia";
 		 }
-		 else if($salesticket->getSalesticketstate()->getName()!="Solucionado")	$infos[]="Si necesitas ampliar los detalles de la incidencia, puedes hacerlo pinchando en el botón 'Añadir información'. También puedes añadir imágenes si lo necesitas.";
+		 else if($salesticket->getSalesticketstate()->getName()!="Solucionada")	$infos[]="Si necesitas ampliar los detalles de la incidencia, puedes hacerlo pinchando en el botón 'Añadir información'. También puedes añadir imágenes si lo necesitas.";
 
 
 			if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
@@ -321,7 +321,7 @@ class ERPSalesTicketsController extends Controller
 		}
 
 		if($id!=0){
-			if($salesticketstate->getName()=="Solucionado"){
+			if($salesticketstate->getName()=="Solucionada"){
 				$author=$salesticket->getAuthor();
 				if($author->getId()!=$this->getUser()->getId())
 				{
