@@ -12,6 +12,7 @@ use \App\Modules\ERP\Entity\ERPStores;
 use \App\Modules\ERP\Entity\ERPStoreLocations;
 use \App\Modules\HR\Entity\HRDepartments;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
+use \App\Modules\ERP\Entity\ERPSalesOrders;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPStoreTicketsRepository")
@@ -114,6 +115,11 @@ class ERPStoreTickets
      * @ORM\Column(type="datetime", nullable=true)
      */
     private $datelastnotify;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPSalesOrders")
+     */
+    private $salesorder;
 
     public function getId(): ?int
     {
@@ -320,6 +326,18 @@ class ERPStoreTickets
     public function setDatelastnotify(?\DateTimeInterface $datelastnotify): self
     {
         $this->datelastnotify = $datelastnotify;
+
+        return $this;
+    }
+
+    public function getSalesorder(): ?ERPSalesOrders
+    {
+        return $this->salesorder;
+    }
+
+    public function setSalesorder(?ERPSalesOrders $salesorder): self
+    {
+        $this->salesorder = $salesorder;
 
         return $this;
     }

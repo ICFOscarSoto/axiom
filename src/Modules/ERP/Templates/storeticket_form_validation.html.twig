@@ -23,6 +23,13 @@
     $  (".error").remove();
       var valid=true;
 
+      if($("#product-form-code").val()=="")
+      {
+       toastr.error("Por favor, selecciona un producto", "Confirmación", confirmation);
+        valid=false;
+        return valid;
+      }
+
       if($("#storeticket-form-observations").val()=="")
       {
         toastr.error("Por favor, añade una observación a la incidencia", "Confirmación", confirmation);
