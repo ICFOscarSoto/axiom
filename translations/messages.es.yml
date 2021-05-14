@@ -615,7 +615,8 @@ location: Ubicación
 accessibility: Accesible
 container: Contenedor
 orientation: Orientacion
-
+Accessibility: Accesible
+Container: Contenedor
 # VEHICLES
 #----------------------------------------------------------------------------------------------------------------------
 Vehicles: Vehículos

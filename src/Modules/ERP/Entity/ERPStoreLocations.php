@@ -48,7 +48,7 @@ class ERPStoreLocations
     /**
      * @ORM\Column(type="boolean")
      */
-    private $active;
+    private $active=1;
 
     /**
      * @ORM\Column(type="boolean")
@@ -66,7 +66,7 @@ class ERPStoreLocations
     /**
      * @ORM\Column(type="boolean")
      */
-    private $accessibility;
+    private $accessibility=1;
 
     /**
      * @ORM\Column(type="boolean")

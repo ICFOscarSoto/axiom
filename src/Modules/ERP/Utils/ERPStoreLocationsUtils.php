@@ -12,13 +12,14 @@ class ERPStoreLocationsUtils
   private $module="ERP";
   private $name="StoreLocations";
   public function getExcludedForm($params){
-    return [];
+    return ["store"];
   }
 
   public function getIncludedForm($params){
     $doctrine=$params["doctrine"];
     $id=$params["id"];
     $user=$params["user"];
+    $store=$params["store"];
     return [];
   }
 

@@ -55,13 +55,31 @@ class ERPStoreLocationsController extends Controller
     }
 
 		/**
-		 * @Route("/{_locale}/storelocations/data/{id}/{action}", name="dataStoreLocations", defaults={"id"=0, "action"="read"})
+		 * @Route("/{_locale}/storelocations/data/{id}/{action}/{storeid}", name="dataStoreLocations", defaults={"id"=0, "action"="read", "storeid"=1})
 		 */
-		 public function data($id, $action, Request $request){
+		 public function data($id, $action, $storeid, Request $request){
 		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		 $template=dirname(__FILE__)."/../Forms/StoreLocations.json";
+
 		 $utils = new GlobaleFormUtils();
-		 $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine());
+		 $utilsObj = new ERPStoreLocationsUtils();
+		 $defaultStore=$this->getDoctrine()->getRepository(ERPStores::class);
+		 $StoreLocationsRepository=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
+		 $obj=new ERPStoreLocations();;
+	   if($id==0){
+	    if($storeid==0 ) $storeid=$request->query->get('$storeid');
+	    if($storeid==0 || $storeid==null) $storeid=$request->request->get('id-parent',0);
+
+	    $store = $defaultStore->find($storeid);
+	   }else $obj = $StoreLocationsRepository->find($id);
+
+		 $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(),"store"=>$id==0?$store:$obj->getStore()];
+
+	   $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),
+	                          method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
+
+		 if($id==0) $utils->values(["store"=>$store]);
+
 		 return $utils->make($id, $this->class, $action, "formStoreLocations", "modal");
 		}
 

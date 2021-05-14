@@ -8,10 +8,6 @@
                     "cols": 4
                 },
                 {
-                    "name": "active",
-                    "cols": 2
-                },
-                {
                     "name": "orientation",
                     "cols": 2,
                     "transform":
@@ -26,11 +22,7 @@
                 },
                 {
                     "name": "container",
-                    "cols": 2    
-                },
-                {
-                    "name": "store",
-                    "cols": 4
+                    "cols": 2
                 }
             ]
         }
