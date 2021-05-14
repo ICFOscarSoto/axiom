@@ -147,10 +147,10 @@ class ERPLocationsReports{
         $qrcode = new QRCode($options);
         $path=$tempPath.'loc-'.$location['id'].'.png';
         $qrcode->render('LOC.'.$location['name'], $path);
-        $this->pdf->Image($path, -1, 3, 35, 35);
+        $this->pdf->Image($path, -1, 7, 33, 33);
         $this->pdf->SetXY(0,5);
 
-        $this->pdf->Cell(65, -1.5, $location['name'], 0, 0, 'C');
+        $this->pdf->Cell(65, 5.5, $location['name'], 0, 0, 'C');
         if($location['orientation']==0){
           $this->pdf->Image($params["rootdir"].DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'locations'.DIRECTORY_SEPARATOR.'arrow_up.png', 32.5,13,28,15);
         }
