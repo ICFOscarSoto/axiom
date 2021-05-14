@@ -134,7 +134,7 @@ class ERPLocationsReports{
       $this->pdf  = new \FPDF('L','mm',array(38,62));
       $this->pdf->AliasNbPages();
       $this->pdf->SetAutoPageBreak(false);
-      $this->pdf->SetFont('Arial','',24);
+      $this->pdf->SetFont('Arial','',20);
       $options = new QROptions([
         'version'    => 1,
         'outputType' => QRCode::OUTPUT_IMAGE_PNG,
@@ -147,7 +147,7 @@ class ERPLocationsReports{
         $qrcode = new QRCode($options);
         $path=$tempPath.'loc-'.$location['id'].'.png';
         $qrcode->render('LOC.'.$location['name'], $path);
-        $this->pdf->Image($path, -1, 7, 33, 33);
+        $this->pdf->Image($path, -1, 7, 30, 30);
         $this->pdf->SetXY(0,5);
 
         $this->pdf->Cell(65, 5.5, $location['name'], 0, 0, 'C');
