@@ -27,7 +27,8 @@
           "2": {"text": "Cliente esperando solución", "html": "<div style=\"min-width: 75px;\" class=\"label label-danger\">Cliente esperando solución<\/div>"},
           "1": {"text": "Pendiente de proveedor", "html": "<div style=\"min-width: 75px;\" class=\"label label-info\">Pendiente de proveedor<\/div>"},
           "4": {"text": "Esperando respuesta del cliente", "html": "<div style=\"min-width: 75px;\" class=\"label label-info\">Esperando respuesta del cliente<\/div>"},
-          "6": {"text": "Pendiente de agencia", "html": "<div style=\"min-width: 75px;\" class=\"label label-info\">Pendiente de agencia<\/div>"}
+          "6": {"text": "Pendiente de agencia", "html": "<div style=\"min-width: 75px;\" class=\"label label-info\">Pendiente de agencia<\/div>"},
+          "7": {"text": "Pendiente de abono", "html": "<div style=\"min-width: 75px;\" class=\"label label-info\">Pendiente de abono<\/div>"}
       }
   },
   {
