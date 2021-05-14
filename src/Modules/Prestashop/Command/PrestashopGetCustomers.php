@@ -412,8 +412,8 @@ class PrestashopGetCustomers extends ContainerAwareCommand
       $lasttimestamp=$date->format($datetimeFormat);
 
       $now=date('Y-m-d H:i:s');
-      $output->writeln($lasttimestamp);
-      $output->writeln($this->url."/api/customers/?display=[id]&filter[date_upd]=[".$lasttimestamp.",".$now."]&date=1");
+    //  $output->writeln($lasttimestamp);
+      //$output->writeln($this->url."/api/customers/?display=[id]&filter[date_upd]=[".$lasttimestamp.",".$now."]&date=1");
     //  $xml_string=file_get_contents($this->url."/api/customers/?display=[id]&filter[date_add]=[".$twelveminutesbefore.",".$now."]&date=1", false, $context);
       $xml_string=file_get_contents($this->url."/api/customers/?display=[id]&filter[date_upd]=[".$lasttimestamp.",".$now."]&date=1", false, $context);
       $xml = simplexml_load_string($xml_string, 'SimpleXMLElement', LIBXML_NOCDATA);
@@ -468,7 +468,7 @@ class PrestashopGetCustomers extends ContainerAwareCommand
               if($customer_array["id_default_group"]==2 OR $customer_array["id_default_group"]==3 OR $customer_array["id_default_group"]==6) $axiom_group="GDTO3";
               else if($customer_array["id_default_group"]==8) $axiom_group="GDTO2";
               else if($customer_array["id_default_group"]==7) $axiom_group="GDTO1";
-              else $axiom_group="";
+              else $axiom_group="GDTO3";
 
               $customergroup=$repositoryCustomerGroups->findOneBy(["name"=>$axiom_group]);
 
