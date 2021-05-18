@@ -223,8 +223,8 @@ class ERPProducts
     public function getStockcampollano($doctrine): ?int
     {
         $stockRepository=$doctrine->getRepository('\App\Modules\ERP\Entity\ERPStocks');
-        $quantity=$stockRepository->findOneBy(["product"=>$this]);
-        return $quantity==null?0:$quantity->getQuantity();
+        $stockCampollano=$stockRepository->getStocksByProduct($this->getId(),null,1);
+        return $stockCampollano[0]["quantity"];
     }
 
     public function getId(): ?int
