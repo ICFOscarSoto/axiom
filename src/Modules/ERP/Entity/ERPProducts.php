@@ -233,7 +233,6 @@ class ERPProducts
           $stockCampollano;
           foreach ($variants as $variant) {
             $stockCampollano=$stockRepository->getStocksByProduct($this->id,$variant["id"],1);
-            dump($stockCampollano);
             if ($stockCampollano!=null) $quantityCampollano+=$stockCampollano[0]["quantity"];
           }
         }
