@@ -222,9 +222,22 @@ class ERPProducts
 
     public function getStockcampollano($doctrine): ?int
     {
+        $quantityCampollano=0;
         $stockRepository=$doctrine->getRepository('\App\Modules\ERP\Entity\ERPStocks');
-        $stockCampollano=$stockRepository->getStocksByProduct($this->getId(),null,1);
-        return $stockCampollano[0]["quantity"];
+        if (!$this->getGrouped()) {
+          $stockCampollano=$stockRepository->getStocksByProduct($this->id,null,1);
+          if ($stockCampollano[0]["quantity"]!=null) $quantityCampollano=$stockCampollano[0]["quantity"];}
+        else{
+          $productRepository=$doctrine->getRepository('\App\Modules\ERP\Entity\ERPProducts');
+          $variants=$productRepository->getVariants($this->id);
+          $stockCampollano;
+          foreach ($variants as $variant) {
+            $stockCampollano=$stockRepository->getStocksByProduct($this->id,$variant["id"],1);
+            dump($stockCampollano);
+            if ($stockCampollano!=null) $quantityCampollano+=$stockCampollano[0]["quantity"];
+          }
+        }
+        return $quantityCampollano;
     }
 
     public function getId(): ?int
