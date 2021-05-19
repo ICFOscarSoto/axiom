@@ -157,13 +157,10 @@ class ERPSalesTicketsController extends Controller
 			}
 
 			//stores
-			$store_objects=$storesRepository->findBy(["active"=>1,"deleted"=>0]);
+			$store_objects=$storesRepository->getMainStores();
 			$default_stores=[];
 			foreach($store_objects as $item){
-				$option["id"]=$item->getId();
-				$option["code"]=$item->getCode();
-				$option["name"]=$item->getName();
-				$default_stores[]=$option;
+				$default_stores[]=$item;
 			}
 
 			$new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-plus"];
@@ -509,8 +506,8 @@ class ERPSalesTicketsController extends Controller
 
 
 			}//finaliza la creación de la incidencia de almacén
-		}*/
-
+		}
+*/
 		return new JsonResponse(["result"=>1,"data"=>["id"=>$salesticket->getId()]]);
 
 	}

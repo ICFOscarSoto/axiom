@@ -56,4 +56,13 @@ class ERPStoresRepository extends ServiceEntityRepository
         return $this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
 
     }
+
+    public function getMainStores()
+    {
+      $query='SELECT *
+        FROM erpstores
+        WHERE active=1 AND deleted=0 AND (id=1 OR id=2 OR id=7)' ;
+        return $this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
+
+    }
 }
