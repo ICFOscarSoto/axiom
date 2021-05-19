@@ -53,7 +53,7 @@ $(document).ready(function() {
       $("#store-searching-product").css("display","block");
       $("#storelocation-searching-product").css("display","block");
       $("#validation-info-list").empty();
-      $("#validation-info-list").append("<li>Busca el producto para el que ha surgido la incidencia. Si el producto está includio en algún pedido de venta, también puedes añadirlo a la incidencia.</li>");
+      $("#validation-info-list").append("<li>Busca el producto para el que ha surgido la incidencia.</li>");
     }
     //fallo de ubicación
     else if(id==2){
@@ -62,8 +62,8 @@ $(document).ready(function() {
 
     }
     else {
-      $("#panel-searching").css("display","none");
-      $("#product-searching").css("display","none");
+      $("#panel-searching").css("display","block");
+      $("#product-searching").css("display","block");
       $("#validation-info-list").empty();
       $("#validation-info-list").append("<li>Busca el producto para el que ha surgido la incidencia</li>");
 

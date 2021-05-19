@@ -29,6 +29,13 @@
         return valid;
       }
 
+      if($("#storeticket-form-reasons-select").val()=="2" && ( $("#storeticket-form-storelocation").val()=="" || $("#storeticket-form-storelocation").val()=="-1" ))
+      {
+         toastr.error("Por favor, selecciona una ubicación", "Confirmación", confirmation);
+         valid=false;
+         return valid;
+      }
+
       if($("#storeticket-form-observations").val()=="")
       {
         toastr.error("Por favor, añade una observación a la incidencia", "Confirmación", confirmation);
