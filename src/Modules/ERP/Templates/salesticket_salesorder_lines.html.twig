@@ -32,9 +32,11 @@
               <table id="listStores" class="table table-bordered" style="width: 100%;">
               <thead class="table-thead">
               <tr role="row">
+              <!--
               <th scope="col">
               <label class="cb-wrapper"><input type="checkbox" id="checkTodosStores"><div class="checked"></div></label>
               </th>
+              -->
               <th scope="col">Código</th>
               <th scope="col">Nombre</th>
               </thead>
@@ -43,7 +45,7 @@
               <tr>
                 <td>
                 <div class="custom-control custom-checkbox">
-                <input type="checkbox" name="checkstorelist[]" class="custom-control-input" id="customStoreCheck1" value="{{ store.code }}">
+                <input type="checkbox" name="checkstorelist[]" class="custom-control-input" id="customStoreCheck-{{ store.id }}" value="{{ store.code }}" {% if store.id==1 %} readonly disabled checked="checked" {%endif %}>
                 </div>
                 </td>
                 <td>{{ store.code }}</td>
@@ -68,13 +70,13 @@
 </div>
 <script>
 $("#checkTodosOrderLines").change(function () {
-      $("#order-lines-modal-form-body input[type=checkbox]").prop('checked', $(this).prop("checked"));
+         $("#order-lines-modal-form-body input[type=checkbox]").prop('checked', $(this).prop("checked"));
 });
-
+/*
 $("#checkTodosStores").change(function () {
-      $("#stores-modal-form-body input[type=checkbox]").prop('checked', $(this).prop("checked"));
+    $("#stores-modal-form-body input[type=checkbox]").prop('checked', $(this).prop("checked"));
 });
-
+*/
 $(document).ready(function() {
     $('#order-lines-button-add').click(function(){
     var linesselected = '';
