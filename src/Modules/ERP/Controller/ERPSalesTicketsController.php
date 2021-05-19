@@ -105,8 +105,12 @@ class ERPSalesTicketsController extends Controller
 			if($id!=0){
 				$salesticket=$salesticketsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$id, "active"=>1,"deleted"=>0]);
 				$salesticket->setObservations("");
-				$products=json_decode($salesticket->getProducts());
-				$stores_to_check=json_decode($salesticket->getStores());
+				if($salesticket->getReason()->getId()=="3")
+				{
+					$products=json_decode($salesticket->getProducts());
+					$stores_to_check=json_decode($salesticket->getStores());
+				}
+
 			}
 			if($salesticket==null){
 				$salesticket=new $this->class();
