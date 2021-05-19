@@ -39,9 +39,16 @@
 <script>
 $(document).ready(function() {
   $('body').on('change', "#salesticket-form-reasons-select", function(e) {
+    id=$("#salesticket-form-reasons-select").val();
+    //fallo de stock
+    if(id==3){
+      $("#products-failed").css("display","block");
+      $("#stores-failed").css("display","block");
+    }
     $("#panel-searching").css("display","block");
     $("#validation-info-list").empty();
     $("#validation-info-list").append("<li>Tienes 2 OPCIONES: buscar un pedido para asociarlo a la incidencia o buscar un cliente. Si eliges buscar un pedido, el cliente también se asociará automáticamente a la incidencia.</li>");
+
 
   //  $("#info-add").css("display","block");
   });
