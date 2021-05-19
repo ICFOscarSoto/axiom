@@ -62,9 +62,21 @@ class ERPStoreTicketsRepository extends ServiceEntityRepository
             LEFT JOIN erpstore_tickets_states ets ON ets.id = et.storeticketstate_id
             LEFT JOIN globale_users gu ON gu.id = et.agent_id
             LEFT JOIN hrdepartments h ON h.id = et.department_id
-            WHERE et.active = 1 AND et.deleted = 0
+            WHERE et.active = 1 AND et.deleted = 0 AND et.reason_id != 1
             HAVING datenotify<=NOW()";
       return $this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
+    }
+
+
+    public function getTicketsforInventory($store,$today){
+      $date_today=$today->format("Y-m-d");
+      $query="SELECT *
+            FROM erpstore_tickets et
+            WHERE et.active = 1 AND et.deleted = 0 AND et.storeticketstate_id!=2 AND et.store_id=:STORE AND DATE(DATEADD)<DATE(:TODAY)
+            GROUP BY product_id";
+      $params=['STORE' => $store,
+               'TODAY' => $date_today];
+      return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
     }
 
     public function getLastID(){

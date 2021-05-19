@@ -13,6 +13,7 @@ use \App\Modules\ERP\Entity\ERPStoreLocations;
 use \App\Modules\HR\Entity\HRDepartments;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
 use \App\Modules\ERP\Entity\ERPSalesOrders;
+use \App\Modules\ERP\Entity\ERPSalesTickets;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPStoreTicketsRepository")
@@ -116,10 +117,12 @@ class ERPStoreTickets
      */
     private $datelastnotify;
 
+
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPSalesOrders")
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPSalesTickets", cascade={"persist", "remove"})
      */
-    private $salesorder;
+    private $salesticket;
+
 
     public function getId(): ?int
     {
@@ -330,15 +333,17 @@ class ERPStoreTickets
         return $this;
     }
 
-    public function getSalesorder(): ?ERPSalesOrders
+
+    public function getSalesticket(): ?ERPSalesTickets
     {
-        return $this->salesorder;
+        return $this->salesticket;
     }
 
-    public function setSalesorder(?ERPSalesOrders $salesorder): self
+    public function setSalesticket(?ERPSalesTickets $salesticket): self
     {
-        $this->salesorder = $salesorder;
+        $this->salesticket = $salesticket;
 
         return $this;
     }
+
 }

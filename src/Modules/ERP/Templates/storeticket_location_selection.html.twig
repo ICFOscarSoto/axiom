@@ -1,0 +1,42 @@
+<div class="modal fade" tabindex="-1" id="location-selection-modal-form" aria-hidden="true">
+    <div class="modal-dialog-location-selection">
+      <div class="modal-content" style="transform: matrix(1, 0, 0, 1, 0, 0);display:inline-block;">
+        <div class="modal-header">
+          <h4 class="modal-title" style="text-align:center;">Elige el tipo de incidencia de ubicación</h4>
+        </div>
+        <br>
+        <br>
+        <div id="location-selection-modal-form-body" style="height: 80px; padding: 0px 10px;">
+          <div class="row">
+            <div class="col-md-12" style="text-align:center;">
+              <button type="button" id="panel-location-button-product" class="btn btn-blue">
+                Producto mal ubicado
+              </button>
+              <button type="button" id="panel-location-button-location" class="btn btn-blue">
+                Problemas en ubicación concreta
+              </button>
+          </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<script>
+$(document).ready(function() {
+  $('body').on('click', "#panel-location-button-product", function(e) {
+    $("#panel-searching").css("display","block");
+    $("#product-searching").css("display","block");
+    $("#location-selection-modal-form").modal('toggle');
+  });
+
+  $('body').on('click', "#panel-location-button-location", function(e) {
+    $("#ticket-data").css("display","block");
+    $("#product-store-info").css("display","block");
+    $("#product-storelocation-info").css("display","block");
+    $("#location-selection-modal-form").modal('toggle');
+  });
+
+
+
+});
+</script>

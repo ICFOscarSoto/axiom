@@ -21,7 +21,6 @@ use App\Modules\ERP\Entity\ERPStores;
 use App\Modules\ERP\Entity\ERPStoreLocations;
 use App\Modules\ERP\Entity\ERPProducts;
 use App\Modules\ERP\Entity\ERPVariantsValues;
-use App\Modules\ERP\Entity\ERPSalesOrders;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
@@ -92,13 +91,6 @@ class ERPStoreTicketsController extends Controller
 			$productslist["fieldButtons"]=[["id"=>"select", "type" => "default", "default"=>true, "icon" => "fa fa-plus-circle", "name" => "editar", "route" => null, "actionType" => "background", "modal"=>"", "confirm" => false, "tooltip" =>""]];
 			$productslist["topButtons"]=[];
 
-			//Search Sales Orders
-		 $classSalesOrdersUtils="\App\Modules\ERP\Utils\ERPSalesOrdersUtils";
-		 $salesordersutils = new $classSalesOrdersUtils();
-		 $salesorderslist=$salesordersutils->formatListWithNumber($this->getUser());
-		 $salesorderslist["fieldButtons"]=[["id"=>"select", "type" => "success", "default"=>true, "icon" => "fas fa-plus", "name" => "editar", "route" => null, "actionType" => "background", "modal"=>"", "confirm" => false, "tooltip" =>""]];
-		 $salesorderslist["topButtons"]=[];
-		 $salesorderslist["multiselect"]=false;
 
 			//stores
 			$store_objects=$storesRepository->findBy(["active"=>1,"deleted"=>0]);
@@ -193,9 +185,7 @@ class ERPStoreTicketsController extends Controller
 					'breadcrumb' =>  $breadcrumb,
 					'userData' => $userdata,
 					'productslist' => $productslist,
-					'salesorderslist' => $salesorderslist,
 					'stores' => $stores,
-
 					'states' => $states,
 					'reasons' => $reasons,
 					'agents' => $agents,
@@ -221,7 +211,6 @@ class ERPStoreTicketsController extends Controller
 			 $storeticketsRepository=$this->getDoctrine()->getRepository(ERPStoreTickets::class);
 			 $productsRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
 			 $variantsRepository=$this->getDoctrine()->getRepository(ERPVariantsValues::class);
-			 $salesordersRepository=$this->getDoctrine()->getRepository(ERPSalesOrders::class);
 			 $storeticketsstatesRepository=$this->getDoctrine()->getRepository(ERPStoreTicketsStates::class);
 			 $storeticketsreasonsRepository=$this->getDoctrine()->getRepository(ERPStoreTicketsReasons::class);
 			 $storesRepository=$this->getDoctrine()->getRepository(ERPStores::class);
@@ -244,7 +233,7 @@ class ERPStoreTicketsController extends Controller
 
 			 $newid=$storeticketsRepository->getLastID()+1;
 			 if(!$storeticket){
-				 $storeticket=new ERPStoreTickets($fields->storeticketstate);
+				 $storeticket=new ERPStoreTickets();
 				 $storeticketreason=$storeticketsreasonsRepository->findOneBy(["id"=>$fields->storeticketreason, "active"=>1, "deleted"=>0]);
 				 $storeticket->setReason($storeticketreason);
 				 $storeticket->setActive(1);
@@ -286,11 +275,6 @@ class ERPStoreTicketsController extends Controller
 					 $storeticket->setVariant($variant);
 				}
 
-				if($fields->salesordernumber!="")
-				{
-					$salesorder=$salesordersRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "code"=>$fields->salesordernumber, "active"=>1, "deleted"=>0]);
-					$storeticket->setSalesOrder($salesorder);
-				}
 
 				if(isset($fields->store) AND $fields->store!="-1"){
 					 $store=$storesRepository->findOneBy(["id"=>$fields->store]);

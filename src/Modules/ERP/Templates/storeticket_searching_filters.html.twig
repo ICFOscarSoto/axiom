@@ -11,21 +11,10 @@
             </div>
           </div>
       </div>
-      <div class="col-md-3" id="salesorder-searching" style="display:none;">
-        <div class="input-group">
-          <input type="text" id="salesorder-form-search" class="form-control" placeholder="Buscar pedido..." data-toggle="modal" data-target="#salesorder-search-modal-form">
-          <div class="input-group-btn">
-            <button type="button" id="salesorder-search-button" class="btn btn-white" style="height: 31px;" data-toggle="modal" data-target="#salesorder-search-modal-form">
-              <i class="fa fa-search"></i> </button>
-            </div>
-          </div>
-        </div>
     </div>
   <br>
   </div>
 </div>
-
-
 <script>
 
 $('body').on('click', "#product-form-view", function(e){
@@ -37,15 +26,4 @@ $('body').on('click', "#product-form-view", function(e){
     win.focus();
   }
 });
-
-$('body').on('click', "#salesorder-form-view", function(e){
-    var id=$(this).attr("attr-id");
-    if(id!=0 && id!=""){
-    url=$(this).attr("attr-url");
-    url=url.replace('_____',$(this).attr("attr-id"));
-    var win = window.open(url, '_blank');
-    win.focus();
-  }
-  });
-
 </script>

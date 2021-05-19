@@ -493,4 +493,32 @@ class ERPSalesOrdersController extends Controller
 		  }
 
 
+			/**
+		 * @Route("/api/ERP/salesorders/products/get/{code}", name="getSalesOrderProducts", defaults={"code"=0}))
+		 */
+		 public function getSalesOrderProducts($code, RouterInterface $router,Request $request){
+			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			$orderRepository=$this->getDoctrine()->getRepository(ERPSalesOrders::class);
+			$orderLinesRepository=$this->getDoctrine()->getRepository(ERPSalesOrdersLines::class);
+			$order=$orderRepository->findOneBy(["code"=>$code,"active"=>1,"deleted"=>0]);
+
+			$lines=$orderLinesRepository->findBy(["salesorder"=>$order,"active"=>1,"deleted"=>0]);
+
+			$response=Array();
+
+			foreach($lines as $line){
+				$item['productid']=$line->getProduct()->getId();
+				$item['name']=$line->getProduct()->getName();
+				$item['linenum']=$line->getLinenum();
+				$item['code']=$line->getCode();
+				$item['variant']=null;
+				$item['quantity']=$line->getQuantity();
+				$response[]=$item;
+			}
+
+			return new JsonResponse(["lines"=>$response]);
+
+		 }
+
+
 }

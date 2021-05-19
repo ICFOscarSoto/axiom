@@ -22,8 +22,7 @@
   function validate_storeticket(){
     $  (".error").remove();
       var valid=true;
-
-      if($("#product-form-code").val()=="")
+      if($("#product-form-code").val()=="" && $("#storeticket-form-reasons-select").val()!="2")
       {
        toastr.error("Por favor, selecciona un producto", "Confirmación", confirmation);
         valid=false;

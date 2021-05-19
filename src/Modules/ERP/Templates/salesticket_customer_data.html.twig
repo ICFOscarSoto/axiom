@@ -1,6 +1,6 @@
 <div class="panel panel-primary panel-shadow" id="customer-data" {% if id==0 %} style="display:none;"{% endif %} data-collapsed="0" style="-webkit-box-shadow: none; box-shadow:none; margin-bottom: -1px;"><!-- to apply shadow add class "panel-shadow" -->
   <div class="panel-body">
-    <div class="panel-title">Información del cliente</div>
+    <div class="panel-title">Información de venta</div>
       <div class="row">
         <div class="col-md-3">
           <div class="form-group">
@@ -30,6 +30,47 @@
             <input type="text" readonly id="salesorder-form-external" {% if salesticket.externalsalesordernumber!=null %} value="{{ salesticket.externalsalesordernumber }}" disabled {% endif %} class="form-control" placeholder="Nº de pedido externo">
           </div>
         </div>
+        {% if salesticket.products!=null %}
+        <div class="col-md-3">
+          <div class="form-group">
+              <label for="salesticket-form-email">Productos en los que ha fallado el stock:</label>
+              <ul>
+                {% for product in products %}
+                  <li>{{ product }}</li>
+                {% endfor %}
+              </ul>
+          </div>
+        </div>
+        {% else %}
+        <div class="col-md-3">
+          <div class="form-group">
+              <label for="products-stock-failed">Productos en los que ha fallado el stock:</label>
+              <ul id="products-stock-failed">
+              </ul>
+          </div>
+        </div>
+        {% endif %}
+        {% if salesticket.stores!=null %}
+        <div class="col-md-3">
+          <div class="form-group">
+              <label for="stores-to-check">Almacenes en los que revisar los fallos de stock:</label>
+              <ul>
+                {% for store in stores_to_check %}
+                  <li>{{ store }}</li>
+                {% endfor %}
+              </ul>
+          </div>
+        </div>
+        {% else %}
+        <div class="col-md-3">
+          <div class="form-group">
+              <label for="stores-to-check">Almacenes en los que revisar los fallos de stock:</label>
+              <ul id="stores-to-check">
+              </ul>
+          </div>
+        </div>
+        {% endif %}
+
         <input type="hidden" id="customer-form-code" class="form-control" value="{% if salesticket.customer!=null %}{{ salesticket.customer.code }}{% endif %}">
         <input type="hidden" id="customer-form-id" class="form-control" value="{% if salesticket.customer!=null %}{{ salesticket.customer.id }}{% endif %}">
         <input type="hidden" id="salesorder-form-id" class="form-control" value="{% if salesticket.salesorder!=null %}{{ salesticket.salesorder.id }}{% endif %}">

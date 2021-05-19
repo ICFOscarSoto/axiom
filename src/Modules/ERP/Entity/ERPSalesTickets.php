@@ -11,6 +11,8 @@ use \App\Modules\ERP\Entity\ERPCustomers;
 use \App\Modules\ERP\Entity\ERPSalesOrders;
 use \App\Modules\HR\Entity\HRDepartments;
 use \App\Modules\ERP\Entity\ERPSalesTicketsReasons;
+use \App\Modules\ERP\Entity\ERPStoreTickets;
+use \App\Modules\ERP\Entity\ERPStores;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPSalesTicketsRepository")
@@ -121,6 +123,21 @@ class ERPSalesTickets
     * @ORM\Column(type="datetime", nullable=true)
     */
    private $datelastnotify;
+
+   /**
+    * @ORM\OneToOne(targetEntity="\App\Modules\ERP\Entity\ERPStoreTickets", cascade={"persist", "remove"})
+    */
+   private $storeticket;
+
+   /**
+    * @ORM\Column(type="json_array", nullable=true)
+    */
+   private $products;
+
+   /**
+    * @ORM\Column(type="json_array", nullable=true)
+    */
+   private $stores;
 
     public function getId(): ?int
     {
@@ -367,6 +384,42 @@ class ERPSalesTickets
     public function setDatelastnotify(?\DateTimeInterface $datelastnotify): self
     {
         $this->datelastnotify = $datelastnotify;
+
+        return $this;
+    }
+
+    public function getStoreticket(): ?ERPStoreTickets
+    {
+        return $this->storeticket;
+    }
+
+    public function setStoreticket(?ERPStoreTickets $storeticket): self
+    {
+        $this->storeticket = $storeticket;
+
+        return $this;
+    }
+
+    public function getProducts()
+    {
+        return $this->products;
+    }
+
+    public function setProducts($products): self
+    {
+        $this->products = $products;
+
+        return $this;
+    }
+
+    public function getStores()
+    {
+        return $this->stores;
+    }
+
+    public function setStores($stores): self
+    {
+        $this->stores = $stores;
 
         return $this;
     }

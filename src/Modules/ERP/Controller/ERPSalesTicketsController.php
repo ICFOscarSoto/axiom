@@ -16,14 +16,21 @@ use App\Modules\ERP\Entity\ERPConfiguration;
 use App\Modules\ERP\Entity\ERPSalesTickets;
 use App\Modules\ERP\Entity\ERPSalesOrders;
 use App\Modules\ERP\Entity\ERPCustomers;
+use App\Modules\ERP\Entity\ERPProducts;
+use App\Modules\ERP\Entity\ERPStores;
 use App\Modules\ERP\Entity\ERPSalesTicketsStates;
 use App\Modules\ERP\Entity\ERPSalesTicketsReasons;
 use App\Modules\ERP\Entity\ERPSalesTicketsHistory;
+use App\Modules\ERP\Entity\ERPStoreTickets;
+use App\Modules\ERP\Entity\ERPStoreTicketsHistory;
+use App\Modules\ERP\Entity\ERPStoreTicketsStates;
+use App\Modules\ERP\Entity\ERPStoreTicketsReasons;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\ERP\Utils\ERPSalesTicketsUtils;
 use App\Modules\Security\Utils\SecurityUtils;
+
 
 class ERPSalesTicketsController extends Controller
 {
@@ -45,6 +52,7 @@ class ERPSalesTicketsController extends Controller
 			 $SalesTicketsHistoryRepository = $this->getDoctrine()->getRepository(ERPSalesTicketsHistory::class);
 			 $salesticketsstatesRepository=$this->getDoctrine()->getRepository(ERPSalesTicketsStates::class);
 			 $salesticketsreasonsRepository=$this->getDoctrine()->getRepository(ERPSalesTicketsReasons::class);
+			 $storesRepository=$this->getDoctrine()->getRepository(ERPStores::class);
 			 $agentsRepository=$this->getDoctrine()->getRepository(GlobaleUsers::class);
 			 $departmentsRepository=$this->getDoctrine()->getRepository(HRDepartments::class);
 			 $userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
@@ -92,9 +100,13 @@ class ERPSalesTicketsController extends Controller
 		 $salesorderslist["multiselect"]=false;
 
 			$salesticket=null;
+			$products=null;
+			$stores_to_check=null;
 			if($id!=0){
 				$salesticket=$salesticketsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$id, "active"=>1,"deleted"=>0]);
 				$salesticket->setObservations("");
+				$products=json_decode($salesticket->getProducts());
+				$stores_to_check=json_decode($salesticket->getStores());
 			}
 			if($salesticket==null){
 				$salesticket=new $this->class();
@@ -144,6 +156,16 @@ class ERPSalesTicketsController extends Controller
 				$departments[]=$option;
 			}
 
+			//stores
+			$store_objects=$storesRepository->findBy(["active"=>1,"deleted"=>0]);
+			$default_stores=[];
+			foreach($store_objects as $item){
+				$option["id"]=$item->getId();
+				$option["code"]=$item->getCode();
+				$option["name"]=$item->getName();
+				$default_stores[]=$option;
+			}
+
 			$new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-plus"];
 			$breadcrumb=$menurepository->formatBreadcrumb('genericindex','ERP','SalesTickets');
 			array_push($breadcrumb,$new_breadcrumb);
@@ -183,10 +205,13 @@ class ERPSalesTicketsController extends Controller
 					'userData' => $userdata,
 					'customerslist' => $customerslist,
 					'salesorderslist' => $salesorderslist,
+					'default_stores' => $default_stores,
+					'stores_to_check' => $stores_to_check,
 					'states' => $states,
 					'reasons' => $reasons,
 					'agents' => $agents,
 					'departments' => $departments,
+					'products' => $products,
 					'ticketType' => 'sales_ticket',
 					'salesticket' => $salesticket,
 					'histories'=> $histories,
@@ -208,6 +233,7 @@ class ERPSalesTicketsController extends Controller
 	 public function dataSalesTickets($id, $action, Request $request){
 	  $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 	 	$salesticketsRepository=$this->getDoctrine()->getRepository(ERPSalesTickets::class);
+		$storeticketsRepository=$this->getDoctrine()->getRepository(ERPStoreTickets::class);
 		$salesordersRepository=$this->getDoctrine()->getRepository(ERPSalesOrders::class);
 	 	$customersRepository=$this->getDoctrine()->getRepository(ERPCustomers::class);
 		$salesticketsstatesRepository=$this->getDoctrine()->getRepository(ERPSalesTicketsStates::class);
@@ -230,7 +256,7 @@ class ERPSalesTicketsController extends Controller
 
 		$newid=$salesticketsRepository->getLastID()+1;
 	 	if(!$salesticket){
-	 		$salesticket=new ERPSalesTickets($fields->salesticketstate);
+	 		$salesticket=new ERPSalesTickets();
 			$salesticketreason=$salesticketsreasonsRepository->findOneBy(["id"=>$fields->salesticketreason, "active"=>1, "deleted"=>0]);
 			$salesticket->setReason($salesticketreason);
 	 		$salesticket->setActive(1);
@@ -242,9 +268,22 @@ class ERPSalesTicketsController extends Controller
 			else if($newid<10000) $salesticket->setCode("#V".date("Y")."0".$newid);
 
 	 	}
+		$products=null;
+		$stores=null;
 
 		if($id==0){
 			$salesticket->setAuthor($this->getUser());
+			if($fields->products!="")
+			{
+				$products=explode(",",$fields->products);
+				$salesticket->setProducts(json_encode($products));
+			}
+			if($fields->stores!="")
+			{
+				$stores=explode(",",$fields->stores);
+				$salesticket->setStores(json_encode($stores));
+			}
+
 		}
 
  		if($fields->salesticketnewagent!=""){
@@ -308,12 +347,28 @@ class ERPSalesTicketsController extends Controller
 
 		if($fields->salesticketnewdepartment!=""){
 
+			if($id==0){
+
+				$newdepartment=$departmentsRepository->findOneBy(["id"=>$fields->salesticketnewdepartment,"active"=>1,"deleted"=>0]);
+				$channel=$newdepartment->getDiscordchannel();
+				$msg=$this->getUser()->getName()." ha solicitado que este departamento gestione la incidencia Nº **"."#V".date("Y")."000".$newid."**";
+				file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
+				$msg="\n\nMás info en: \n".'https://axiom.ferreteriacampollano.com/es/ERP/salestickets/form/'.$newid;
+				file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
+			}
+
+			else{
+				$salesticket=$salesticketsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$id, "deleted"=>0]);
 				$newdepartment=$departmentsRepository->findOneBy(["id"=>$fields->salesticketnewdepartment,"active"=>1,"deleted"=>0]);
 				$channel=$newdepartment->getDiscordchannel();
 				$msg=$this->getUser()->getName()." ha solicitado que este departamento gestione la incidencia Nº **".$salesticket->getCode()."**";
 				file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
 				$msg="\n\nMás info en: \n".'https://axiom.ferreteriacampollano.com/es/ERP/salestickets/form/'.$id;
 				file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
+
+			}
+
+
 
 		}
 
@@ -358,8 +413,105 @@ class ERPSalesTicketsController extends Controller
 		$this->getDoctrine()->getManager()->persist($history_obj);
 	 	$this->getDoctrine()->getManager()->flush();
 
-	 	return new JsonResponse(["result"=>1,"data"=>["id"=>$salesticket->getId()]]);
-	 	//return new JsonResponse(["result"=>1]);
+
+
+		//en el momento de crear la incidencia de ventas por "Fallo de stock", creamos también una incidencia de almacén.
+/*
+		if($id==0){
+			if($salesticketreason->getName()=="Fallo de stock"){
+						for($i=0;$i<count($products);$i++){
+							for($j=0;$j<count($stores);$j++){
+										$cont=1;
+										$storeticketsstatesRepository=$this->getDoctrine()->getRepository(ERPStoreTicketsStates::class);
+										$storeticketsreasonsRepository=$this->getDoctrine()->getRepository(ERPStoreTicketsReasons::class);
+										$productsRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
+										$storesRepository=$this->getDoctrine()->getRepository(ERPStores::class);
+
+										$newid=$storeticketsRepository->getLastID()+$cont;
+										$storeticket=new ERPStoreTickets();
+										$storeticketreason=$storeticketsreasonsRepository->findOneBy(["name"=>"Fallo de stock", "active"=>1, "deleted"=>0]);
+										$storeticket->setReason($storeticketreason);
+										$storeticket->setActive(1);
+										$storeticket->setDeleted(0);
+										$storeticket->setDateadd(new \DateTime());
+										if($newid<10) $storeticket->setCode("#A".date("Y")."0000".$newid);
+										else if($newid<100) $storeticket->setCode("#A".date("Y")."000".$newid);
+										else if($newid<1000) $storeticket->setCode("#A".date("Y")."00".$newid);
+										else if($newid<10000) $storeticket->setCode("#A".date("Y")."0".$newid);
+										$storeticket->setAuthor($this->getUser());
+
+										//el ID d Juanjo Molina es el 49
+										$newagent=$agentsRepository->findOneBy(["id"=>9,"active"=>1,"deleted"=>0]);
+										$storeticket->setAgent($newagent);
+										$storeticket->setCompany($this->getUser()->getCompany());
+									 // $storeticket->setProduct($product);
+
+
+										$product=$productsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "code"=>$products[$i], "active"=>1, "deleted"=>0]);
+										$product_name=$product->getName();
+										$storeticket->setProduct($product);
+
+										$store=$storesRepository->findOneBy(["code"=>$stores[$j], "active"=>1, "deleted"=>0]);
+										$store_name=$store->getName();
+										$storeticket->setStore($store);
+
+
+										$storeticketstate=$storeticketsstatesRepository->findOneBy(["name"=>"Abierta", "active"=>1, "deleted"=>0]);
+										$storeticket->setStoreticketstate($storeticketstate);
+										$storeticket->setObservations("Incidencia creada automáticamente por fallo de stock del producto ".$product->getName()." para que se revise el stock en ".$store_name);
+										$storeticket->setDateupd(new \DateTime());
+										$storeticket->setDatelastnotify(new \DateTime());
+
+										$lastsalesticket=$salesticketsRepository->findOneBy(["id"=>$salesticketsRepository->getLastID(),"active"=>1, "deleted"=>0]);
+										$storeticket->setSalesTicket($lastsalesticket);
+										$this->getDoctrine()->getManager()->persist($storeticket);
+										$this->getDoctrine()->getManager()->flush();
+
+										//en el caso de que sólo se genere una incidencia de almacén, pondremos el vínculo a esa incidencia en la incidencia de venta.
+										//En caso contrario, al generar varias incidencias de almacén, no podremos poner este vínculo.
+
+										$laststoreticket=$storeticketsRepository->findOneBy(["id"=>$storeticketsRepository->getLastID(),"active"=>1, "deleted"=>0]);
+
+										if(count($products)==1 AND count($stores)==1)
+										{
+										$lastsalesticket->setStoreTicket($laststoreticket);
+										$this->getDoctrine()->getManager()->persist($lastsalesticket);
+										$this->getDoctrine()->getManager()->flush();
+										}
+
+
+									 $history_obj=new ERPStoreTicketsHistory();
+						 			 $history_obj->setAgent($this->getUser());
+						 			 $history_obj->setNewagent($newagent);
+
+									 $history_obj->setStoreTicket($laststoreticket);
+
+						 			 $history_obj->setObservations("Incidencia creada automáticamente por fallo de stock del producto ".$product_name." para que se revise el stock en ".$store_name);
+						 			 $history_obj->setStoreticketstate($storeticketstate);
+						 			 $history_obj->setActive(1);
+						 			 $history_obj->setDeleted(0);
+						 			 $history_obj->setDateupd(new \DateTime());
+						 			 $history_obj->setDateadd(new \DateTime());
+
+						 			 $this->getDoctrine()->getManager()->persist($history_obj);
+						 			 $this->getDoctrine()->getManager()->flush();
+									 $cont++;
+					 		}
+
+						}
+
+
+					///	$channel=$newagent->getDiscordchannel();
+					///	$msg=$this->getUser()->getName()." ha solicitado que gestiones la incidencia Nº **"."#A".date("Y")."000".$newid."**";
+					//	file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
+					//	$msg="\n\nMás info en: \n".'https://axiom.ferreteriacampollano.com/es/ERP/storetickets/form/'.$newid;
+					//	file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
+
+
+			}//finaliza la creación de la incidencia de almacén
+		}*/
+
+		return new JsonResponse(["result"=>1,"data"=>["id"=>$salesticket->getId()]]);
 
 	}
 
@@ -464,6 +616,7 @@ class ERPSalesTicketsController extends Controller
 	return new JsonResponse(["history"=>$response]);
 
  }
+
 
 
 }

@@ -1,0 +1,75 @@
+<div class="panel" id="panel-button">
+  <div class="row">
+  {% if id==0 %}
+    <div class="col-md-3">
+          <div class="form-group">
+                <select type="text" id="storeticket-form-reasons-select" class="form-control select2" required>
+                    <option value="-1">Elegir motivo...</option>
+                  {% for option in reasons %}
+                      <option value="{{ option.id }}">{{ option.text }}</option>
+                  {% endfor %}
+                </select>
+          </div>
+    </div>
+  {% endif %}
+  {% if id!=0 %}
+    {% if storeticket.storeticketstate.name!="Solucionada" %}
+        <div style="text-align: right;margin-bottom:10px;" class="col-md-12">
+          <br>
+          <button type="button" id="storeticket-button-add-info" class="btn btn-blue" data-toggle="modal" data-target="#add-information-modal-form" >
+            Añadir información
+            <i class="fa fa-plus" aria-hidden="true"></i>
+          </button>
+        </div>
+    {% endif %}
+  {% else %}
+    <div id="info-add" style="text-align:right;display:none;margin-bottom:10px;" style="text-align: right;" class="col-md-9">
+    <div class="form-group">
+      <label for="storeticket-button-add-info"></label>
+      <button type="button" id="storeticket-button-add-info" class="btn btn-blue" data-toggle="modal" data-target="#add-information-modal-form" >
+          Añadir información
+          <i class="fa fa-plus" aria-hidden="true"></i>
+      </button>
+    </div>
+    </div>
+  {% endif %}
+  </div>
+</div>
+<script>
+$(document).ready(function() {
+  $('body').on('change', "#storeticket-form-reasons-select", function(e) {
+    id=$("#storeticket-form-reasons-select").val();
+    $("#panel-searching").css("display","none");
+    $("#product-searching").css("display","none");
+    $("#store-searching").css("display","none");
+    $("#storelocation-searching").css("display","none");
+    $("#store-searching-product").css("display","none");
+    $("#storelocation-searching-product").css("display","none");
+    //fallo de stock
+    if(id==1)
+    {
+      $("#panel-searching").css("display","block");
+      $("#product-searching").css("display","block");
+      $("#store-searching-product").css("display","block");
+      $("#storelocation-searching-product").css("display","block");
+      $("#validation-info-list").empty();
+      $("#validation-info-list").append("<li>Busca el producto para el que ha surgido la incidencia. Si el producto está includio en algún pedido de venta, también puedes añadirlo a la incidencia.</li>");
+    }
+    //fallo de ubicación
+    else if(id==2){
+
+        $("#location-selection-modal-form").modal('toggle');
+
+    }
+    else {
+      $("#panel-searching").css("display","none");
+      $("#product-searching").css("display","none");
+      $("#validation-info-list").empty();
+      $("#validation-info-list").append("<li>Busca el producto para el que ha surgido la incidencia</li>");
+
+    }
+
+
+  });
+});
+</script>

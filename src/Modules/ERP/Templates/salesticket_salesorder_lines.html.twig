@@ -1,0 +1,127 @@
+<div class="modal fade" tabindex="-1" id="order-lines-modal-form" aria-hidden="true">
+    <div class="modal-dialog-salestickets">
+      <div class="modal-content" style="transform: matrix(1, 0, 0, 1, 0, 0);display:inline-block;">
+        <div class="modal-header">
+          <h4 class="modal-title">Información para hacer inventario</h4>
+        </div>
+        <br>
+        <br>
+        <div class="panel-body">
+          <div class="row">
+            <div id="order-lines-modal-form-body" style="padding: 0px 10px;width:100%;">
+              <label for="listProducts">¿En qué producto(s) ha fallado el stock?</label>
+              <table id="listProducts" class="table table-bordered" style="width: 100%;">
+              <thead class="table-thead">
+              <tr role="row">
+              <th scope="col">
+              <label class="cb-wrapper"><input type="checkbox" id="checkTodosOrderLines"><div class="checked"></div></label>
+              </th>
+              <th scope="col">SKU</th>
+              <th scope="col">Nombre</th>
+              <th scope="col">Cantidad</th>
+            </thead>
+              <tbody>
+              </tbody>
+              </table>
+              <input type="hidden" id="product-references">
+            </div>
+          </div>
+          <div class="row">
+            <div id="stores-modal-form-body" style="padding: 0px 10px;width:100%;">
+              <label for="listStores">¿En qué almacen(es) quieres que se haga inventario?</label>
+              <table id="listStores" class="table table-bordered" style="width: 100%;">
+              <thead class="table-thead">
+              <tr role="row">
+              <th scope="col">
+              <label class="cb-wrapper"><input type="checkbox" id="checkTodosStores"><div class="checked"></div></label>
+              </th>
+              <th scope="col">Código</th>
+              <th scope="col">Nombre</th>
+              </thead>
+              <tbody>
+              {% for store in default_stores %}
+              <tr>
+                <td>
+                <div class="custom-control custom-checkbox">
+                <input type="checkbox" name="checkstorelist[]" class="custom-control-input" id="customStoreCheck1" value="{{ store.code }}">
+                </div>
+                </td>
+                <td>{{ store.code }}</td>
+                <td>{{ store.name }}</td>
+              </tr>
+              {% endfor %}
+             </tbody>
+              </table>
+              <input type="hidden" id="stores-codes">
+            </div>
+          </div>
+          <div class="row">
+            <div style="text-align: left;" class="col-md-6"></div>
+            <div style="text-align: right;margin-bottom:10px;" class="col-md-6">
+                    <button attr-id="" attr-action="" id="order-lines-button-cancel" type="button" class="btn btn">Cancelar</button>
+                    <button attr-id="" attr-action="" id="order-lines-button-add" type="button" class="btn btn-green">Guardar</button>
+            </div>
+          </div>
+      </div>
+  </div>
+  </div>
+</div>
+<script>
+$("#checkTodosOrderLines").change(function () {
+      $("#order-lines-modal-form-body input[type=checkbox]").prop('checked', $(this).prop("checked"));
+});
+
+$("#checkTodosStores").change(function () {
+      $("#stores-modal-form-body input[type=checkbox]").prop('checked', $(this).prop("checked"));
+});
+
+$(document).ready(function() {
+    $('#order-lines-button-add').click(function(){
+    var linesselected = '';
+    var storesselected = '';
+    $('#order-lines-modal-form-body input[type=checkbox]').each(function(){
+        if (this.checked && this.id!="checkTodosOrderLines") {
+              linesselected += $(this).val()+',';
+              $("#products-stock-failed").append("<li>"+$(this).val()+"</li>");
+        }
+    });
+    $('#stores-modal-form-body input[type=checkbox]').each(function(){
+        if (this.checked && this.id!="checkTodosStores") {
+              storesselected += $(this).val()+',';
+              $("#stores-to-check").append("<li>"+$(this).val()+"</li>");
+        }
+    });
+
+    if (linesselected != '')
+      {
+        if (storesselected != '')
+          {
+              $("#product-references").val(linesselected.substring(0,(linesselected.length-1)));
+              $("#stores-codes").val(storesselected.substring(0,(storesselected.length-1)));
+              $("#panel-searching").css("display","none");
+              $("#panel-button").css("display","block");
+              $("#customer-data").css("display","block");
+              $("#info-add").css("display","block");
+              $("#validation-infos-list").empty();
+              $("#validation-infos-list").append("<li>Si necesitas ampliar los detalles de la incidencia, puedes hacerlo pinchando en el botón 'Añadir información'. También puedes añadir imágenes si lo necesitas</li>");
+              $("#salesorder-search-modal-form").modal('toggle');
+              $("#order-lines-modal-form").modal('toggle');
+          }
+          else{
+              alert('Debes seleccionar al menos almacén.');
+          }
+
+      }
+      else
+              alert('Debes seleccionar al menos un producto.');
+
+          return false;
+      });
+
+
+      $('body').on('click', "#order-lines-button-cancel", function(e){
+      //  alert("ey");
+         $("#order-lines-modal-form").modal('toggle');
+      });
+  });
+</script>
