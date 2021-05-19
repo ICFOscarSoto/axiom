@@ -43,9 +43,10 @@
 
 			$(document).ready(function() {
 					{# DOCUMENT SAVE #}
-					$('body').on('click', "#storeticket-button-save", function(e) {
+					$('body').on('click', "#storeticket-button-save", function(e) {		
 						if(validate_storeticket())
 						{
+							$(this).attr("disabled","disabled");
 							$.ajax({
 				         url: '{{ url('dataStoreTickets', {"id": id}) }}',
 				         type: 'POST',
