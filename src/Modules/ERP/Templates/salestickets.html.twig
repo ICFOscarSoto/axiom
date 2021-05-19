@@ -45,6 +45,9 @@
 			$(document).ready(function() {
 					{# DOCUMENT SAVE #}
 					$('body').on('click', "#salesticket-button-save", function(e) {
+
+					$(this).attr("disabled","disabled");
+
 						if(validate_salesticket())
 						{
 							$.ajax({
@@ -52,6 +55,7 @@
 				         type: 'POST',
 				         data: JSON.stringify(prepare_salesticket_json()),
 				         success:  function( data ) {
+
 									 if((--load_wait)==0) $("#load-spinner").fadeOut();
 				           if(data.result){
 									//	 $("#salesticket-form-id").val(data.data.id);
@@ -63,6 +67,7 @@
 									 }
 				         }
 				       });
+
 						}
 					 });
 
