@@ -71,7 +71,7 @@ class ERPLocationsReports{
 
         $qrcode = new QRCode($options);
         $path=$tempPath.'loc-'.$location['id'].'.png';
-        $qrcode->render('LOC.'.$location['name'].'-STR.'.$location['store'], $path);
+        $qrcode->render('LOC.'.$location['name'].'|STR.'.$location['store'], $path);
 
         $this->pdf->Rect($col*90+$colOffset, $row*28+$rowOffset, 90, 28);
         $this->pdf->Image($path, $col*90+$colOffset-4, $row*28+$rowOffset-4, 36, 36);
@@ -121,7 +121,7 @@ class ERPLocationsReports{
         }
         $qrcode = new QRCode($options);
         $path=$tempPath.'loc-'.$location['id'].'.png';
-        $qrcode->render('LOC.'.$location['name'], $path);
+        $qrcode->render('LOC.'.$location['name'].'|STR.'.$location['store'], $path);
         $this->pdf->Image($path, 30, ($i-1)*150-17, 150, 150);
         $this->pdf->SetXY(0,($i-1)*150+105);
         $this->pdf->Cell(210, 50, $location['name'], 0, 0, 'C');
@@ -146,7 +146,7 @@ class ERPLocationsReports{
         $this->pdf->AddPage();
         $qrcode = new QRCode($options);
         $path=$tempPath.'loc-'.$location['id'].'.png';
-        $qrcode->render('LOC.'.$location['name'], $path);
+        $qrcode->render('LOC.'.$location['name'].'|STR.'.$location['store'], $path);
         $this->pdf->Image($path, -1, 7, 30, 30);
         $this->pdf->SetXY(0,5);
 
