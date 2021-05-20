@@ -31,7 +31,7 @@ class ERPStoreLocationsRepository extends ServiceEntityRepository
    }
 
    public function getLocations($id, $endid){
-     $query="SELECT l.id, l.name, l.orientation
+     $query="SELECT l.id, l.name, l.orientation, l.store_id
              FROM erpstore_locations l WHERE l.active=TRUE and l.deleted=0 and l.id>=:id and l.id<=:endid";
      $params=['id' => $id, 'endid' => $endid];
      return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();

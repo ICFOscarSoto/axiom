@@ -146,7 +146,7 @@ class ERPLocationsReports{
         $this->pdf->AddPage();
         $qrcode = new QRCode($options);
         $path=$tempPath.'loc-'.$location['id'].'.png';
-        $qrcode->render('LOC.'.$location['name'].'.STR.'.$location['store_id'], $path);
+        $qrcode->render('LOC.'.$location['name'].'#STR.'.$location['store_id'], $path);
         $this->pdf->Image($path, -1, 7, 30, 30);
         $this->pdf->SetXY(0,5);
 
