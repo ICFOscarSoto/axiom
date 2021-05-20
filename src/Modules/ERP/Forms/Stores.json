@@ -11,6 +11,7 @@
 				{	"name": "postcode", "cols": 4},
 				{	"name": "phone", "cols": 4},
 				{	"name": "country", "cols": 4},
+				{	"name": "inventorymanager", "cols": 4},
 				{	"name": "active", "cols": 2}
 			]
 		}]
