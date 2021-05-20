@@ -161,7 +161,7 @@ class ERPSalesTicketsController extends Controller
 			}
 
 			//stores
-			$store_objects=$storesRepository->getMainStores();
+			$store_objects=$storesRepository->getInventoryStores();
 			$default_stores=[];
 			foreach($store_objects as $item){
 				$default_stores[]=$item;

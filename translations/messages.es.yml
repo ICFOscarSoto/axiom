@@ -617,6 +617,8 @@ container: Contenedor
 orientation: Orientacion
 Accessibility: Accesible
 Container: Contenedor
+inventorymanager: Gestor de inventarios
+Inventorymanager: Gestor de inventarios
 # VEHICLES
 #----------------------------------------------------------------------------------------------------------------------
 Vehicles: Vehículos

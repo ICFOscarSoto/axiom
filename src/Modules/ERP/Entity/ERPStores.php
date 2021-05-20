@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\Globale\Entity\GlobaleStates;
 use \App\Modules\Globale\Entity\GlobaleCountries;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
+use \App\Modules\Globale\Entity\GlobaleUsers;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPStoresRepository")
@@ -89,6 +90,11 @@ class ERPStores
 
     public $newSeconds=1296000;
     public $updatedSeconds=1296000;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleUsers")
+     */
+    private $inventorymanager;
 
     public function getId(): ?int
     {
@@ -247,6 +253,18 @@ class ERPStores
     public function setDateupd(\DateTimeInterface $dateupd): self
     {
         $this->dateupd = $dateupd;
+
+        return $this;
+    }
+
+    public function getInventorymanager(): ?GlobaleUsers
+    {
+        return $this->inventorymanager;
+    }
+
+    public function setInventorymanager(?GlobaleUsers $inventorymanager): self
+    {
+        $this->inventorymanager = $inventorymanager;
 
         return $this;
     }
