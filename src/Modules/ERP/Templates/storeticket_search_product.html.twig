@@ -15,6 +15,24 @@
 </div>
 
 <script>
+
+function checkGrouped(code){
+    if((++load_wait)==1) $("#load-spinner").fadeIn();
+    $.ajax({
+       type: "GET",
+       dataType: "json",
+       url: "/api/ERP/product/"+code+"/grouped",
+     }).done(function(data, textStatus, jqXHR) {
+       if((--load_wait)==0) $("#load-spinner").fadeOut();
+       if(data.result=="1") {
+         $("#product-variant-info").css("display","block");
+       }
+
+   });
+
+
+}
+
   function getVariants(code){
     if((++load_wait)==1) $("#load-spinner").fadeIn();
     $.ajax({
@@ -63,6 +81,7 @@
   $('body').on('click', "[id^='listProducts-field-button-select-']", function(e) {
 
       id=$("#storeticket-form-reasons-select").val();
+      code=$(this).parent().parent().parent().children('td').eq(1).text();
 
       $("#product-form-id").val($(this).attr('attr-id'));
       $("#product-form-id").trigger('change');
@@ -74,8 +93,7 @@
       $("#product-form-view").attr("attr-id",$(this).attr("attr-id"));
       $("#product-form-view").css("display","inline-block");
       $("#product-name-info").css("display","block");
-      $("#product-variant-info").css("display","block");
-
+      checkGrouped(code);
 
       //fallo de stock
       if(id==1){
