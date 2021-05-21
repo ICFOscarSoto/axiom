@@ -26,12 +26,12 @@
 		<div id="salesticket-body">
 			{% set formConstructor = {"name": ticketType} %}
 			{{ include('@ERP/salesticket_form_validation.html.twig') }}
-			{{ include('@ERP/salesticket_add_information.html.twig') }}
-			{{ include('@ERP/salesticket_buttons.html.twig') }}
+			{{ include('@ERP/salesticket_modal_add_information.html.twig') }}
+			{{ include('@ERP/salesticket_reason_and_button_add.html.twig') }}
 			{{ include('@ERP/salesticket_searching.html.twig') }}
 			{{ include('@ERP/salesticket_header.html.twig') }}
 			{{ include('@ERP/salesticket_customer_data.html.twig') }}
-			{{ include('@ERP/salesticket_data.html.twig') }}
+			{{ include('@ERP/salesticket_gallery_timeline.html.twig') }}
 			</div>
 			{{ include('@ERP/salesticket_search_customer.html.twig') }}
 			{{ include('@ERP/salesticket_search_salesorder.html.twig') }}
