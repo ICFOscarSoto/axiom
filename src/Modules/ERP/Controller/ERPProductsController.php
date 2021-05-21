@@ -689,9 +689,15 @@ class ERPProductsController extends Controller
 		 $repositoryStocks=$this->getDoctrine()->getRepository(ERPStocks::class);
 		 $repositoryVariants=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
 		 $location=$request->request->get('loc',null);
-		 $storeId=$request->request->get('store',null);
+		 //Get Store ID
+		 $storeId=1;
+		 $locationArray=explode('+',$location);
+		 $location=$locationArray[0];
+		 if(isset($locationArray[1]))	$storeId=intval(substr($locationArray[1],4));
+		 if($storeId==0) $storeId=1;
 
-		 $store=$repositoryStores->findOneBy(["id"=>$storeId, "company"=>$this->getUser()->getCompany()]);
+		 //$storeId=$request->request->get('store',null);
+		 		 $store=$repositoryStores->findOneBy(["id"=>$storeId, "company"=>$this->getUser()->getCompany()]);
 		 if($store==null) return new JsonResponse(["result"=>-4, "text"=> "Almacén no encontrado"]);
 
 		 $variant=null;
@@ -759,7 +765,19 @@ class ERPProductsController extends Controller
 	 		$locationSource=$request->request->get('locsrc',null);
 			$locationDestination=$request->request->get('locdst',null);
 			$qty=$request->request->get('qty',null);
-	 		$storeId=$request->request->get('store',null);
+
+			//Get Store ID
+			$storeId=1;
+			$locationArray=explode('+',$locationSource);
+			$locationSource=$locationArray[0];
+			if(isset($locationArray[1]))	$storeId=intval(substr($locationArray[1],4));
+
+			$locationArray=explode('+',$locationDestination);
+			$locationDestination=$locationArray[0];
+
+			if($storeId==0) $storeId=1;
+
+	 		//$storeId=$request->request->get('store',null);
 
 
 			$store=$repositoryStores->findOneBy(["id"=>$storeId, "company"=>$this->getUser()->getCompany()]);

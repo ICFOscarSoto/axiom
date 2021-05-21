@@ -11,6 +11,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\ERP\Entity\ERPStores;
+use App\Modules\ERP\Entity\ERPStoresUsers;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
@@ -158,5 +159,31 @@ class ERPStoresController extends Controller
 	 $result=$entityUtils->deleteObject($id, $this->class, $this->getDoctrine());
 	 return new JsonResponse(array('result' => $result));
  }
+
+
+ /**
+  * @Route("/api/ERP/stores/get", name="getUserStores")
+  */
+ public function getUserStores(RouterInterface $router,Request $request)
+ {
+	 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+   $storesUsersRepository=$this->getDoctrine()->getRepository(ERPStoresUsers::class);
+	 $stores=$storesUsersRepository->findBy(["user"=>$this->getUser(), "active"=>1, "deleted"=>0]);
+
+ 	$arrayStores=[];
+ 	foreach($stores as $store){
+		if(!$store->getStore()->getActive() || !$store->getStore()->getDeleted) continue;
+ 		$item["id"]			  =$store->getStore()->getId();
+		$item["code"]		  =$store->getStore()->getCode();
+		$item["name"]		  =$store->getStore()->getName();
+		$item["address"]  =$store->getStore()->getAddress();
+		$item["city"]		  =$store->getStore()->getCity();
+		$item["postcode"]	=$store->getStore()->getPostcode();
+		$item["phone"]		=$store->getStore()->getPhone();
+ 		$arrayStores[]=$item;
+ 	}
+ 	return new JsonResponse($arrayStores);
+ }
+
 
 }
