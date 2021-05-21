@@ -20,7 +20,7 @@
                     </select>
                   </div>
                 </div>
-              <div class="col-6 col-sm-6">
+              <div class="col-6 col-sm-6" id="combo-agents">
                 <div class="form-group">
                   <input type="hidden" id="storeticket-form-agents" class="form-control">
                   <label for="storeticket-form-agents-select">Traspasar a otro agente</label>
@@ -31,7 +31,7 @@
                   </select>
                 </div>
               </div>
-              <div class="col-6 col-sm-6">
+              <div class="col-6 col-sm-6" id="combo-agents">
                 <div class="form-group">
                   <input type="hidden" id="storeticket-form-departments" class="form-control">
                   <label for="storeticket-form-departments-select">Traspasar a otro departamento</label>
@@ -69,29 +69,50 @@
 </div>
 
 <script>
-  $(document).ready(function() {
-$('body').on('click', "#storeticket-button-cancel", function(e){
-//  alert("ey");
-   $("#add-information-modal-form").modal('toggle');
-});
-
-$('body').on('change', "#storeticket-form-agents-select", function(e) {
-  $("#storeticket-form-departments-select").parent().parent().css("display","none");
+$(document).ready(function() {
 
 
-});
+  $('body').on('change', "#storeticket-form-agents-select", function(e) {
+    $("#storeticket-form-departments-select").parent().parent().css("display","none");
+  });
 
-$('body').on('change', "#storeticket-form-departments-select", function(e) {
-  $("#storeticket-form-agents-select").parent().parent().css("display","none");
+  $('body').on('change', "#storeticket-form-departments-select", function(e) {
+    $("#storeticket-form-agents-select").parent().parent().css("display","none");
+  });
 
+  $('body').on('click', "#storeticket-button-add-info", function(e) {
+      $("#storeticket-form-agents-select").parent().parent().css("display","block");
+      $("#storeticket-form-departments-select").parent().parent().css("display","block");
+  });
 
-});
-$('body').on('click', "#storeticket-button-add-info", function(e) {
+  {# DOCUMENT SAVE #}
+  $('body').on('click', "#storeticket-button-save", function(e) {
+    if(validate_storeticket())
+    {
+      $(this).attr("disabled","disabled");
+      $.ajax({
+         url: '{{ url('dataStoreTickets', {"id": id}) }}',
+         type: 'POST',
+         data: JSON.stringify(prepare_storeticket_json()),
+         success:  function( data ) {
+           if((--load_wait)==0) $("#load-spinner").fadeOut();
+           if(data.result){
+          //	 $("#salesticket-form-id").val(data.data.id);
+             toastr.success("Documento guardado correctamente", "Confirmación", confirmation);
+              location.reload();
+             {% if id==0 %} location.href="/es/ERP/storetickets/form/"+data.data.id; {% endif %}
+           } else {
+             toastr.error("No se pudo guardar el documento", "Confirmación", confirmation);
+           }
+         }
+       });
+    }
+   });
 
-    $("#storeticket-form-agents-select").parent().parent().css("display","block");
-    $("#storeticket-form-departments-select").parent().parent().css("display","block");
-
-});
+   $('body').on('click', "#storeticket-button-cancel", function(e){
+   //  alert("ey");
+      $("#add-information-modal-form").modal('toggle');
+   });
 
 });
 </script>

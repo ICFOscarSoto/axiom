@@ -9,6 +9,18 @@
       "type": "datetime"
   },
   {
+      "name" :"product__name",
+      "caption":"Producto"
+  },
+  {
+      "name" :"store__code",
+      "caption":"Almacén"
+  },
+  {
+      "name" :"storelocation__name",
+      "caption":"Ubicación"
+  },
+  {
       "name" :"storeticketstate__id",
       "caption":"Estado de la incidencia",
       "class": "dt-center",
@@ -16,6 +28,9 @@
           "1": {"text": "Abierta", "html": "<div style=\"min-width: 75px;\" class=\"label label-default\">Abierta<\/div>"},
           "2": {"text": "Solucionada", "html": "<div style=\"min-width: 75px;\" class=\"label label-success\">Solucionada<\/div>"}
         }
+  },
+  {
+      "name" :"reason__name","caption":"Motivo"
   },
   {
       "name" :"agent__name_o_agent__lastname_o_department__name","caption":"Asignado a"

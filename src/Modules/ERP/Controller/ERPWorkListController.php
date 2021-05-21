@@ -210,9 +210,6 @@ class ERPWorkListController extends Controller
 
 	}
 
-
-
-
 	$response=Array();
 
 	foreach($storeLocations as $location){

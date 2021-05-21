@@ -110,5 +110,12 @@
     {% endif %}
     {% endfor %}
     $("#ul_timeline_tickets").append(items);
+
+
+
+    $('#fileinput-img-{{gallery.name}}' ).load(function() {
+    		$('#fileinput-img-{{gallery.name}}').fadeIn();
+    });
+
 });
 </script>

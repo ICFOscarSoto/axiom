@@ -1,0 +1,138 @@
+<div class="modal fade" tabindex="-1" id="select-stores-modal-form" aria-hidden="true">
+    <div class="modal-dialog-salestickets">
+      <div class="modal-content" style="transform: matrix(1, 0, 0, 1, 0, 0);display:inline-block;">
+        <div class="modal-header">
+          <h4 class="modal-title">Información para hacer inventario</h4>
+        </div>
+        <br>
+        <br>
+        <div class="panel-body">
+          <div class="row">
+            <div id="stores-modal-form-body" style="padding: 0px 10px;width:100%;">
+              <label for="listStores">¿En qué almacen quieres que se haga inventario?</label>
+              <table id="listStores" class="table table-bordered" style="width: 100%;">
+              <thead class="table-thead">
+              <tr role="row">
+              <th scope="col"></th>
+              <th scope="col">Código</th>
+              <th scope="col">Nombre</th>
+              </thead>
+              <tbody>
+              {% for store in default_stores %}
+              <tr>
+                <td>
+                <div class="custom-control custom-checkbox">
+                <input type="checkbox" name="checkstorelist[]" class="custom-control-input" id="customStoreCheck-{{ store.id }}" value="{{ store.code }}" {% if store.id==1 %} checked="checked" {%endif %}>
+                </div>
+                </td>
+                <td>{{ store.code }}</td>
+                <td>{{ store.name }}</td>
+              </tr>
+              {% endfor %}
+             </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="row">
+            <div style="text-align: left;" class="col-md-6"></div>
+            <div style="text-align: right;margin-bottom:10px;" class="col-md-6">
+                    <button attr-id="" attr-action="" id="select-stores-button-cancel" type="button" class="btn btn">Cancelar</button>
+                    <button attr-id="" attr-action="" id="select-stores-button-add" type="button" class="btn btn-green">Guardar</button>
+            </div>
+          </div>
+      </div>
+  </div>
+  </div>
+</div>
+<script>
+
+
+function saveTicket()
+{
+  if(validate_storeticket())
+  {
+  $('#select-stores-button-add').attr("disabled","disabled");
+    $.ajax({
+       url: '{{ url('dataStoreTickets', {"id": id}) }}',
+       type: 'POST',
+       data: JSON.stringify(prepare_storeticket_json()),
+       success:  function( data ) {
+         if((--load_wait)==0) $("#load-spinner").fadeOut();
+         if(data.result){
+        //	 $("#salesticket-form-id").val(data.data.id);
+           toastr.success("Documento guardado correctamente", "Confirmación", confirmation);
+            location.reload();
+           {% if id==0 %} location.href="/es/ERP/storetickets/form/"+data.data.id; {% endif %}
+         } else {
+           toastr.error("No se pudo guardar el documento", "Confirmación", confirmation);
+         }
+       }
+     });
+ }
+
+
+}
+
+$(document).ready(function() {
+      $('input[type=checkbox]').click(function(){
+        $('#stores-modal-form-body input[type=checkbox]').removeAttr('checked');
+        $(this).prop("checked", true);
+
+    });
+
+    $('#select-stores-button-add').click(function(){
+          var storesselected = '';
+
+          $('#stores-modal-form-body input[type=checkbox]').each(function(){
+              if (this.checked) {
+                    $("#panel-searching").css("display","none");
+                    $("#panel-button").css("display","block");
+                    $("#ticket-data").css("display","block");
+                    $("#product-store-info").css("display","block");
+
+                    /*al ser un fallo de stock, desde aquí seleccionamos el almacén en el que se quiere hacer
+                    el inventario, y el valor lo guardamos en un campo type="text" que sustituye al select que aparece
+                    con el resto de motivos de la incidencia*/
+                    $("#product-store-info-stock-failed").css("display","block");
+                    $("#storeticket-form-store-stock-failed").val($(this).val());
+                    $("#storeticket-form-store-stock-failed").prop('disabled', 'disabled');
+                    $("#product-store-info").css("display","none");
+                    $("#storeticket-form-store").empty();
+
+
+                    						$.confirm({
+                    								theme: 'bootstrap',
+                    								title: '',
+                    								content: 'Vas a solicitar que se haga inventario de la referencia '+$("#product-form-code").val()+' en el almacén '+$(this).val()+" ¿Estás seguro?",
+                    								buttons: {
+                    									 confirm: { text: 'Si', btnClass: 'btn-green', action: function(){
+                    										 				saveTicket();
+                    									 				}
+
+                    								 					},
+                    									 cancel: { text: 'No', btnClass: 'btn-red', action: function(){
+
+                    									 				}
+                    								 }
+                    							 }
+                    						});
+
+                  //  $("#info-add").css("display","block");
+                //    $("#product-search-modal-form").modal('toggle');
+                //    $("#select-stores-modal-form").modal('toggle');
+              }
+          });
+
+
+
+
+          return false;
+      });
+
+
+      $('body').on('click', "#select-stores-button-cancel", function(e){
+      //  alert("ey");
+         $("#select-stores-modal-form").modal('toggle');
+      });
+  });
+</script>
