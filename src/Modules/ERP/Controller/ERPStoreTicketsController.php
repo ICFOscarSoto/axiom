@@ -105,6 +105,12 @@ class ERPStoreTicketsController extends Controller
 				$stores[]=$option;
 			}
 
+			//stores for inventory
+			$inventory_store_objects=$storesRepository->getInventoryStores();
+			$default_stores=[];
+			foreach($inventory_store_objects as $item){
+				$default_stores[]=$item;
+			}
 			//store ticket states
 			$objects=$storeticketsstatesRepository->findBy(["active"=>1,"deleted"=>0],["name"=>"ASC"]);
 			$states=[];
@@ -153,53 +159,54 @@ class ERPStoreTicketsController extends Controller
 			$breadcrumb=$menurepository->formatBreadcrumb('genericindex','ERP','StoreTickets');
 			array_push($breadcrumb,$new_breadcrumb);
 
-		$histories=$storeTicketsHistoryRepository->findBy(["storeticket"=>$storeticket,"active"=>1,"deleted"=>0],["dateadd"=>"DESC"]);
-		foreach($histories as $key=>$item){
-			$histories[$key]=$item;
-		}
+			$histories=$storeTicketsHistoryRepository->findBy(["storeticket"=>$storeticket,"active"=>1,"deleted"=>0],["dateadd"=>"DESC"]);
+			foreach($histories as $key=>$item){
+				$histories[$key]=$item;
+			}
 
-		 $gallery=[];
-		 $gallery["name"]="storeticketImage";
-		 $gallery["cols"]=3;
-		 $gallery["type"]="gallery";
-		 $gallery["imageType"]="storetickets";
-		 $gallery["value"]="getImage";
-		 $gallery["width"]="100%";
-		 $gallery["height"]="300px";
+			 $gallery=[];
+			 $gallery["name"]="storeticketImage";
+			 $gallery["cols"]=3;
+			 $gallery["type"]="gallery";
+			 $gallery["imageType"]="storetickets";
+			 $gallery["value"]="getImage";
+			 $gallery["width"]="100%";
+			 $gallery["height"]="300px";
 
-		 $info=null;
-		 if($id==0){
-			 $info[]="Elige el motivo de la incidencia";
-		 }
-		 else if($storeticket->getStoreticketstate()->getName()!="Solucionada")	$info[]="Si necesitas ampliar los detalles de la incidencia, puedes hacerlo pinchando en el botón 'Añadir información'. También puedes añadir imágenes si lo necesitas.";
+			 $info=null;
+			 if($id==0){
+				 $info[]="Elige el motivo de la incidencia";
+			 }
+			 else if($storeticket->getStoreticketstate()->getName()!="Solucionada" AND $storeticket->getStoreticketstate()->getId()!="1")	$info[]="Para completar los detalles de la incidencia, tienes que pinchar en el botón 'Añadir información'. También puedes añadir imágenes si lo necesitas.";
 
 
 			if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
-				return $this->render('@ERP/storetickets.html.twig', [
-					'moduleConfig' => $config,
-					'controllerName' => 'categoriesController',
-					'interfaceName' => 'StoreTickets',
-					'optionSelected' => 'genericindex',
-					'optionSelectedParams' => ["module"=>"ERP", "name"=>"StoreTickets"],
-					'menuOptions' =>  $menurepository->formatOptions($userdata),
-					'breadcrumb' =>  $breadcrumb,
-					'userData' => $userdata,
-					'productslist' => $productslist,
-					'stores' => $stores,
-					'states' => $states,
-					'reasons' => $reasons,
-					'agents' => $agents,
-					'departments' => $departments,
-					'ticketType' => 'store_ticket',
-					'storeticket' => $storeticket,
-					'histories'=> $histories,
-					'gallery' => $gallery,
-					'id' => $id,
-					'code' => $code,
-					'info' => $info
-					]);
-			}
-			return new RedirectResponse($this->router->generate('app_login'));
+					return $this->render('@ERP/storetickets.html.twig', [
+						'moduleConfig' => $config,
+						'controllerName' => 'categoriesController',
+						'interfaceName' => 'StoreTickets',
+						'optionSelected' => 'genericindex',
+						'optionSelectedParams' => ["module"=>"ERP", "name"=>"StoreTickets"],
+						'menuOptions' =>  $menurepository->formatOptions($userdata),
+						'breadcrumb' =>  $breadcrumb,
+						'userData' => $userdata,
+						'productslist' => $productslist,
+						'stores' => $stores,
+						'default_stores' => $default_stores,
+						'states' => $states,
+						'reasons' => $reasons,
+						'agents' => $agents,
+						'departments' => $departments,
+						'ticketType' => 'store_ticket',
+						'storeticket' => $storeticket,
+						'histories'=> $histories,
+						'gallery' => $gallery,
+						'id' => $id,
+						'code' => $code,
+						'info' => $info
+						]);
+				}
+				return new RedirectResponse($this->router->generate('app_login'));
 
      }
 
@@ -224,12 +231,9 @@ class ERPStoreTicketsController extends Controller
 			 //Get content of the json reques
 			 $fields=json_decode($request->getContent());
 			 $product=$productsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "code"=>$fields->productcode, "active"=>1, "deleted"=>0]);
-
-			 $storeticketstate=$storeticketsstatesRepository->findOneBy(["id"=>$fields->storeticketstate, "active"=>1, "deleted"=>0]);
-
-
-
-			//	if(!$customer) return new JsonResponse(["result"=>0]); //if no customer, do nothing
+			 $product_name=$product->getName();
+			 if($id==0 AND $fields->storeticketreason=="1")  $storeticketstate=$storeticketsstatesRepository->findOneBy(["id"=>"1", "active"=>1, "deleted"=>0]);
+			 else $storeticketstate=$storeticketsstatesRepository->findOneBy(["id"=>$fields->storeticketstate, "active"=>1, "deleted"=>0]);
 
 			 $newid=$storeticketsRepository->getLastID()+1;
 			 if(!$storeticket){
@@ -275,16 +279,29 @@ class ERPStoreTicketsController extends Controller
 					 $storeticket->setVariant($variant);
 				}
 
+				/*
+				En las indicencias por fallo de stock, el almacén lo seleccionamos de un listado en una modal donde sólo aparecen
+				los almacenes en los que se realizan inventarios. En cambio, en el resto en el resto usamos un select con todos los almacenes.
+				Esta distinción hace que el almacen seleccionado lo recojamos en dos campos diferentes "$fields->store" y "$fields->storestockfailed"
+				que en ningún caso ambos serán distintos de null.
+				*/
 
-				if(isset($fields->store) AND $fields->store!="-1"){
+				if(isset($fields->store) AND $fields->store!="-1" AND $fields->store!=null){
 					 $store=$storesRepository->findOneBy(["id"=>$fields->store]);
 					 $storeticket->setStore($store);
+				 }
+				 else if(isset($fields->storestockfailed) AND $fields->storestockfailed!=null){
+					 $store=$storesRepository->findOneBy(["code"=>$fields->storestockfailed]);
+					 $storeticket->setStore($store);
+
 				 }
 
 			if(isset($fields->storelocation) AND $fields->storelocation!="-1"){
  						 $storelocation=$storeLocationsRepository->findOneBy(["id"=>$fields->storelocation]);
  						 $storeticket->setStorelocation($storelocation);
  			 }
+			 //para los fallos de stock, ponemos el estado "Abierta" por defecto.
+
 
 			 $storeticket->setStoreticketstate($storeticketstate);
 			 $storeticket->setObservations($fields->observations);
@@ -297,13 +314,16 @@ class ERPStoreTicketsController extends Controller
 			 if($fields->storeticketnewagent!=""){
 
 			 if($id==0){
+					 if($fields->storeticketreason!="1")
+					 {
+						 $newagent=$agentsRepository->findOneBy(["id"=>$fields->storeticketnewagent, "active"=>1, "deleted"=>0]);
+						 $channel=$newagent->getDiscordchannel();
+						 $msg=$this->getUser()->getName()." ha solicitado que gestiones la incidencia Nº **"."#A".date("Y")."000".$newid."**";
+						 file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
+						 $msg="\n\nMás info en: \n".'https://axiom.ferreteriacampollano.com/es/ERP/storetickets/form/'.$newid;
+						 file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
+					 }
 
-					 $newagent=$agentsRepository->findOneBy(["id"=>$fields->storeticketnewagent, "active"=>1, "deleted"=>0]);
-					 $channel=$newagent->getDiscordchannel();
-					 $msg=$this->getUser()->getName()." ha solicitado que gestiones la incidencia Nº **"."#A".date("Y")."000".$newid."**";
-					 file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
-					 $msg="\n\nMás info en: \n".'https://axiom.ferreteriacampollano.com/es/ERP/storetickets/form/'.$newid;
-					 file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
 				 }
 				 else{
 					 $storeticket=$storeticketsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$id, "deleted"=>0]);
@@ -342,34 +362,57 @@ class ERPStoreTicketsController extends Controller
 	 			}
 	 		}
 
+			if($id==0 AND $fields->storeticketreason=="1")
+			{
 
+				 $history_obj=new ERPStoreTicketsHistory();
+				 $history_obj->setAgent($this->getUser());
 
-			 $history_obj=new ERPStoreTicketsHistory();
-			 $history_obj->setAgent($this->getUser());
-
-			 if($fields->storeticketnewagent!=""){
-				 $history_obj->setNewagent($newagent);
+				 $store=$storesRepository->findOneBy(["code"=>$fields->storestockfailed]);
+				 $inventorymanager=$store->getInventorymanager();
+				 $history_obj->setNewagent($inventorymanager);
 				 $history_obj->setNewdepartment(null);
+
+				 $history_obj->setStoreTicket($storeticket);
+				 $history_obj->setObservations("Hacer inventario del producto  ".$product_name." en el almacén ".$store->getName());
+				 $history_obj->setStoreticketstate($storeticketstate);
+				 $history_obj->setActive(1);
+				 $history_obj->setDeleted(0);
+				 $history_obj->setDateupd(new \DateTime());
+				 $history_obj->setDateadd(new \DateTime());
+
+				 $this->getDoctrine()->getManager()->persist($history_obj);
+				 $this->getDoctrine()->getManager()->flush();
 			 }
-			 else 	if($fields->storeticketnewdepartment!=""){
-				 $history_obj->setNewagent(null);
-				 $history_obj->setNewdepartment($newdepartment);
+
+			 else
+			 {
+				 $history_obj=new ERPStoreTicketsHistory();
+				 $history_obj->setAgent($this->getUser());
+
+				 if($fields->storeticketnewagent!=""){
+					 $history_obj->setNewagent($newagent);
+					 $history_obj->setNewdepartment(null);
+				 }
+				 else if($fields->storeticketnewdepartment!=""){
+					 $history_obj->setNewagent(null);
+					 $history_obj->setNewdepartment($newdepartment);
+				 }
+
+				 else $history_obj->setNewagent($this->getUser());
+
+
+				 $history_obj->setStoreTicket($storeticket);
+				 $history_obj->setObservations($fields->observations);
+				 $history_obj->setStoreticketstate($storeticketstate);
+				 $history_obj->setActive(1);
+				 $history_obj->setDeleted(0);
+				 $history_obj->setDateupd(new \DateTime());
+				 $history_obj->setDateadd(new \DateTime());
+
+				 $this->getDoctrine()->getManager()->persist($history_obj);
+				 $this->getDoctrine()->getManager()->flush();
 			 }
-
-			 else $history_obj->setNewagent($this->getUser());
-
-
-			 $history_obj->setStoreTicket($storeticket);
-			 $history_obj->setObservations($fields->observations);
-			 $history_obj->setStoreticketstate($storeticketstate);
-			 $history_obj->setActive(1);
-			 $history_obj->setDeleted(0);
-			 $history_obj->setDateupd(new \DateTime());
-			 $history_obj->setDateadd(new \DateTime());
-
-			 $this->getDoctrine()->getManager()->persist($history_obj);
-			 $this->getDoctrine()->getManager()->flush();
-
 			 return new JsonResponse(["result"=>1,"data"=>["id"=>$storeticket->getId()]]);
 
 		 }

@@ -13,10 +13,10 @@
     </div>
   {% endif %}
   {% if id!=0 %}
-    {% if storeticket.storeticketstate.name!="Solucionada" %}
+    {% if storeticket.storeticketstate.name!="Solucionada" and storeticket.reason.id!="1" %}
         <div style="text-align: right;margin-bottom:10px;" class="col-md-12">
           <br>
-          <button type="button" id="storeticket-button-add-info" class="btn btn-blue" data-toggle="modal" data-target="#add-information-modal-form" >
+          <button type="button" id="storeticket-button-add-info" class="btn btn-blue">
             Añadir información
             <i class="fa fa-plus" aria-hidden="true"></i>
           </button>
@@ -26,7 +26,7 @@
     <div id="info-add" style="text-align:right;display:none;margin-bottom:10px;" style="text-align: right;" class="col-md-9">
     <div class="form-group">
       <label for="storeticket-button-add-info"></label>
-      <button type="button" id="storeticket-button-add-info" class="btn btn-blue" data-toggle="modal" data-target="#add-information-modal-form" >
+      <button type="button" id="storeticket-button-add-info" class="btn btn-blue">
           Añadir información
           <i class="fa fa-plus" aria-hidden="true"></i>
       </button>
@@ -45,6 +45,8 @@ $(document).ready(function() {
     $("#storelocation-searching").css("display","none");
     $("#store-searching-product").css("display","none");
     $("#storelocation-searching-product").css("display","none");
+    $("#storeticket-form-reasons-select").prop('disabled', 'disabled');
+
     //fallo de stock
     if(id==1)
     {
@@ -53,7 +55,7 @@ $(document).ready(function() {
       $("#store-searching-product").css("display","block");
       $("#storelocation-searching-product").css("display","block");
       $("#validation-info-list").empty();
-      $("#validation-info-list").append("<li>Busca el producto para el que ha surgido la incidencia.</li>");
+      $("#validation-info-list").append("<li>Indica la referencia en la que ha fallado el stock.</li>");
     }
     //fallo de ubicación
     else if(id==2){
@@ -61,14 +63,20 @@ $(document).ready(function() {
         $("#location-selection-modal-form").modal('toggle');
 
     }
-    else {
+    //problema de caducidad
+    else if(id==3){
       $("#panel-searching").css("display","block");
       $("#product-searching").css("display","block");
       $("#validation-info-list").empty();
-      $("#validation-info-list").append("<li>Busca el producto para el que ha surgido la incidencia</li>");
+      $("#validation-info-list").append("<li>Elige el producto que está caducado.</li>");
 
     }
 
+
+  });
+
+  $('body').on('click', "#storeticket-button-add-info", function(e) {
+    $("#add-information-modal-form").modal('show');
 
   });
 });

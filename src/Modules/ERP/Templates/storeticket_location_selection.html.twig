@@ -13,7 +13,7 @@
                 Producto mal ubicado
               </button>
               <button type="button" id="panel-location-button-location" class="btn btn-blue">
-                Problemas en una ubicación 
+                Problemas en una ubicación
               </button>
           </div>
           </div>
@@ -27,6 +27,8 @@ $(document).ready(function() {
     $("#panel-searching").css("display","block");
     $("#product-searching").css("display","block");
     $("#location-selection-modal-form").modal('toggle');
+    $("#validation-info-list").empty();
+    $("#validation-info-list").append("<li>Elige el producto que está mal ubicado.</li>");
   });
 
   $('body').on('click', "#panel-location-button-location", function(e) {
@@ -34,6 +36,8 @@ $(document).ready(function() {
     $("#product-store-info").css("display","block");
     $("#product-storelocation-info").css("display","block");
     $("#location-selection-modal-form").modal('toggle');
+    $("#validation-info-list").empty();
+    $("#validation-info-list").append("<li>Elige la ubicación en la que ha surgido la incidencia.</li>");
   });
 
 

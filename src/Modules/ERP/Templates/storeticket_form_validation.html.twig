@@ -36,14 +36,23 @@
          return valid;
       }
 
-      if($("#storeticket-form-observations").val()=="")
+      if($("#storeticket-form-observations").val()=="" && $("#storeticket-form-reasons-select").val()!="1")
       {
         toastr.error("Por favor, añade una observación a la incidencia", "Confirmación", confirmation);
          valid=false;
          return valid;
 
       }
-      if($("#storeticket-form-states-select").val()=="-1")
+
+      if($("#storeticket-form-observations-stock-falied").val()=="" && $("#storeticket-form-reasons-select").val()=="1")
+      {
+        toastr.error("Por favor, añade una observación", "Confirmación", confirmation);
+         valid=false;
+         return valid;
+
+      }
+
+      if($("#storeticket-form-states-select").val()=="-1" && $("#storeticket-form-reasons-select").val()!="1")
       {
         toastr.error("Por favor, selecciona un estado", "Confirmación", confirmation);
          valid=false;

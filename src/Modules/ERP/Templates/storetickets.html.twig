@@ -35,46 +35,10 @@
 			{{ include('@ERP/storeticket_gallery_timeline.html.twig') }}
 			</div>
 			{{ include('@ERP/storeticket_search_product.html.twig') }}
+			{{ include('@ERP/storeticket_select_stores.html.twig') }}
 			{{ include('@ERP/storeticket_prepare_json.html.twig') }}
 		</div>
 </div>
-
-<script>
-
-			$(document).ready(function() {
-					{# DOCUMENT SAVE #}
-					$('body').on('click', "#storeticket-button-save", function(e) {		
-						if(validate_storeticket())
-						{
-							$(this).attr("disabled","disabled");
-							$.ajax({
-				         url: '{{ url('dataStoreTickets', {"id": id}) }}',
-				         type: 'POST',
-				         data: JSON.stringify(prepare_storeticket_json()),
-				         success:  function( data ) {
-									 if((--load_wait)==0) $("#load-spinner").fadeOut();
-				           if(data.result){
-									//	 $("#salesticket-form-id").val(data.data.id);
-										 toastr.success("Documento guardado correctamente", "Confirmación", confirmation);
-										  location.reload();
-										 {% if id==0 %} location.href="/es/ERP/storetickets/form/"+data.data.id; {% endif %}
-				           } else {
-										 toastr.error("No se pudo guardar el documento", "Confirmación", confirmation);
-									 }
-				         }
-				       });
-						}
-					 });
-
-
-					$( '#fileinput-img-{{gallery.name}}' ).load(function() {
-						$('#fileinput-img-{{gallery.name}}').fadeIn();
-					});
-
-			});
-
-		</script>
-
 <!-- END MODALS -->
 {% block footer %}
 
