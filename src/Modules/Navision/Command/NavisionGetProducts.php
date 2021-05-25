@@ -113,6 +113,8 @@ class NavisionGetProducts extends ContainerAwareCommand
       case 'all':
         $this->importProduct($input, $output);
         //$this->clearEAN13($input, $output);
+        $this->importVariants($input, $output);
+        $this->importProductsVariants($input, $output);
         $this->importEAN13($input, $output);
         $this->importPrices($input, $output);
         $this->importStocks($input, $output);
