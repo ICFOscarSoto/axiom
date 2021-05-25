@@ -71,6 +71,27 @@ $(document).ready(function() {
       $("#validation-info-list").append("<li>Elige el producto que está caducado.</li>");
 
     }
+    //material con desperfectos
+    else if(id==4){
+      $("#panel-searching").css("display","block");
+      $("#product-searching").css("display","block");
+      $("#validation-info-list").empty();
+      $("#validation-info-list").append("<li>Elige el producto que has detectado que tiene algún tipo de desperfecto.</li>");
+
+    }
+    //Embalaje original no encontrado
+    else if(id==5){
+      $("#panel-searching").css("display","block");
+      $("#product-searching").css("display","block");
+      $("#validation-info-list").empty();
+      $("#validation-info-list").append("<li>Elige el producto para el que no has encontrado su embalaje original.</li>");
+
+    }
+    //Producto mal etiquetado
+    else if(id==6){
+        $("#label-fail-selection-modal-form").modal('toggle');
+
+    }
 
 
   });

@@ -22,31 +22,24 @@
   function validate_storeticket(){
     $  (".error").remove();
       var valid=true;
-      if($("#product-form-code").val()=="" && $("#storeticket-form-reasons-select").val()!="2")
+      //en todos los motivos excepto en el "problema de ubicación" y en "producto mal etiquetado", es obligatorio elegir el producto
+      if($("#product-form-code").val()=="" && $("#storeticket-form-reasons-select").val()!="2" && $("#storeticket-form-reasons-select").val()!="6")
       {
        toastr.error("Por favor, selecciona un producto", "Confirmación", confirmation);
         valid=false;
         return valid;
       }
-
+      //Cuando el motivo es "problema de ubicación", es obligatorio indicar una ubicación
       if($("#storeticket-form-reasons-select").val()=="2" && ( $("#storeticket-form-storelocation").val()=="" || $("#storeticket-form-storelocation").val()=="-1" ))
       {
          toastr.error("Por favor, selecciona una ubicación", "Confirmación", confirmation);
          valid=false;
          return valid;
       }
-
+      //En todos los motivos exceptuando los fallos de stock, es obligatorio añadir observaciones
       if($("#storeticket-form-observations").val()=="" && $("#storeticket-form-reasons-select").val()!="1")
       {
         toastr.error("Por favor, añade una observación a la incidencia", "Confirmación", confirmation);
-         valid=false;
-         return valid;
-
-      }
-
-      if($("#storeticket-form-observations-stock-falied").val()=="" && $("#storeticket-form-reasons-select").val()=="1")
-      {
-        toastr.error("Por favor, añade una observación", "Confirmación", confirmation);
          valid=false;
          return valid;
 

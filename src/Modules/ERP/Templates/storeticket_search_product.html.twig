@@ -100,8 +100,9 @@ function checkGrouped(code){
 
         $("#select-stores-modal-form").modal('show');
       }
+
       //fallo de problema de ubicación
-      else if(id==2){
+      else {
 
         $("#panel-searching").css("display","none");
         $("#panel-button").css("display","block");
@@ -113,22 +114,6 @@ function checkGrouped(code){
 
         $("#validation-info-list").empty();
         $("#validation-info-list").append("<li>OPCIONAL: puedes elegir la variante (si es agrupado), el almacén y la ubicación.</li><li>Para completar los detalles de la incidencia, tienes que pinchar en el botón 'Añadir información'.</li>");
-      }
-
-      //problema caducidad
-      else{
-
-        $("#panel-searching").css("display","none");
-        $("#panel-button").css("display","block");
-        $("#ticket-data").css("display","block");
-        $("#product-store-info").css("display","block");
-        $("#product-storelocation-info").css("display","block");
-        $("#info-add").css("display","block");
-        $("#product-search-modal-form").modal('toggle');
-        $("#validation-info-list").empty();
-        $("#validation-info-list").append("<li>OPCIONAL: puedes elegir la variante (si es agrupado), el almacén y la ubicación.</li><li>Para completar los detalles de la incidencia, tienes que pinchar en el botón 'Añadir información'.</li>");
-
-
       }
 
       var code=$(this).parent().parent().parent().children('td').eq(1).text();
