@@ -107,7 +107,7 @@ class NavisionGetProducts extends ContainerAwareCommand
       case 'defuse': $this->defuseProducts($input, $output);
       break;
       case 'clear':
-        $this->defuseProducts($input, $output);
+        //$this->defuseProducts($input, $output);
         $this->clearEAN13($input, $output);
       break;
       case 'all':

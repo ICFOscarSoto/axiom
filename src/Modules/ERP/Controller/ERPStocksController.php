@@ -37,7 +37,7 @@ class ERPStocksController extends Controller
      */
     public function index($id, RouterInterface $router, Request $request)
     {
-       $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+      $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
   		$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
   		$locale = $request->getLocale();
   		$this->router = $router;
@@ -71,19 +71,14 @@ class ERPStocksController extends Controller
 		 */
 		public function infoStocks($id, Request $request){
 			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-
 			$stores_usersRepository=$this->getDoctrine()->getRepository(ERPStoresUsers::class);
 			$stores_by_user=$stores_usersRepository->getStoreByUser($this->getUser()->getId());
 			$stocksRepository= $this->getDoctrine()->getRepository($this->class);
-
 			$productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
 			$product=$productRepository->findOneBy(["id"=>$id]);
-
 			$isgrouped=$product->getGrouped();
 			if($isgrouped){
-
 				$variants=$productRepository->getVariants($product->getId());
-
 				$store_locations=array();
 				foreach($stores_by_user as $store){
 					foreach ($variants as $variant) {
@@ -92,7 +87,6 @@ class ERPStocksController extends Controller
 						foreach($locations_array as $location){
 								$item[]=$location;
 							}
-
 							$aux2["name"]=$variant["name"];
 							$aux2["type"]=$variant["type"];
 							$aux2["total"]=$stocksRepository->findStockByProductVariantStore($product->getId(),$variant["id"],$store["id"]);
@@ -101,7 +95,6 @@ class ERPStocksController extends Controller
 							$item=[];
 							$aux2=[];
 						}
-
 						$aux["name"]=$store["name"];
 						$aux["total"]=$stocksRepository->findStockByProductStore($product->getId(),$store["id"]);
 						$aux["preferential"]=$store["preferential"];
@@ -109,7 +102,6 @@ class ERPStocksController extends Controller
 						$store_locations[]=$aux;
 						$item_variants=[];
 						$aux=[];
-
 					}
 
 					$stocks=$stocksRepository->stocksByStores($id);
@@ -129,19 +121,14 @@ class ERPStocksController extends Controller
 						 			 $stockHistory[]=$item;
 					}
 
-
-
-
 					return $this->render('@ERP/infoStocks.html.twig', array(
 										'storelist'=>$store_locations,
 										'id'=>$id,
 										'variantes' => $variants,
 										'historylist' => $stockHistory
 					));
-
 			}
 			else{
-
 						$store_locations=array();
 						foreach($stores_by_user as $store){
 								$item=[];
@@ -183,10 +170,8 @@ class ERPStocksController extends Controller
 										'variantes' => null,
 										'historylist' => $stockHistory
 					));
-
 				}
 		}
-
 
 		/**
 		 * @Route("/{_locale}/stocks/inventory", name="inventory")
@@ -208,7 +193,6 @@ class ERPStocksController extends Controller
 		 $repositoryCategories = $this->getDoctrine()->getRepository(ERPCategories::class);
 		 $categories = $repositoryCategories->findBy(["company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
 
-
 		 if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 			 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 			 return $this->render('@ERP/inventory.html.twig', [
@@ -225,8 +209,6 @@ class ERPStocksController extends Controller
 				 ]);
 		 } return new RedirectResponse($this->router->generate('app_login'));
 		 }
-
-
 
 		 /**
 		 * @Route("/api/ERP/inventory/elements/{store}/{location}/{category}/get", name="getInventoryStocks")
@@ -248,9 +230,7 @@ class ERPStocksController extends Controller
 			}
 
 		  return new JsonResponse(["stocks"=>$responseStocks]);
-
 		 }
-
 
 		 /**
 		 * @Route("/api/ERP/inventory/{store}/locations/get", name="getInventoryLocations")
@@ -266,20 +246,14 @@ class ERPStocksController extends Controller
 				$item['name']=$storelocation['name'];
 				$responseStoreLocations[]=$item;
 			}
-
 			return new JsonResponse(["storelocations"=>$responseStoreLocations]);
-
 		 }
-
-
-
 
 		/**
 		 * @Route("/api/ERP/inventory/save", name="saveInventoryStock")
 		 */
 		 public function saveInventoryStock(RouterInterface $router,Request $request){
 			  $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-
 			  $stock_object=json_decode($request->getContent());
 				$repositoryProducts=$this->getDoctrine()->getRepository(ERPProducts::class);
 				$product=$repositoryProducts->findOneBy(["code"=>$stock_object->product_code, "company"=>$this->getUser()->getCompany()]);
@@ -287,7 +261,6 @@ class ERPStocksController extends Controller
 				$storelocation=$repositoryStoreLocations->findOneBy(["name"=>$stock_object->location, "company"=>$this->getUser()->getCompany()]);
 				$repositoryStores=$this->getDoctrine()->getRepository(ERPStores::class);
 				$store=$repositoryStores->findOneBy(["id"=>$storelocation->getStore(), "company"=>$this->getUser()->getCompany()]);
-
 				$StockHistory= new ERPStockHistory();
 				$StockHistory->setProduct($product);
 				$StockHistory->setLocation($storelocation);
@@ -302,7 +275,6 @@ class ERPStocksController extends Controller
 				$manager=$this->getDoctrine()->getManager();
 				$manager->persist($StockHistory);
 				$manager->flush();
-
 				$repository=$this->getDoctrine()->getRepository($this->class);
 				$stock=$repository->findOneBy(["id"=>$stock_object->id, "company"=>$this->getUser()->getCompany()]);
 				if($stock){
@@ -334,11 +306,8 @@ class ERPStocksController extends Controller
 					$manager->flush();
 					return new JsonResponse(["result"=>1]);
 			 }
-
 			else return new JsonResponse(["result"=>-1]);
 		}
-
-
 
 		/**
 		* @Route("/api/global/stock/{id}/history", name="getStockHistory")
@@ -348,7 +317,6 @@ class ERPStocksController extends Controller
 		 $repositoryHistory=$this->getDoctrine()->getRepository(ERPStockHistory::class);
 		 $history=$repositoryHistory->findHistory($id);
 		 $responseHistory=Array();
-
 		 foreach($history as $history_line){
 			 $item['product_code']=$history_line['product_code'];
 			 $item['product_name']=$history_line['product_name'];
@@ -359,11 +327,8 @@ class ERPStocksController extends Controller
 			 $item['dateadd']=$history_line['dateadd'];
 			 $responseHistory[]=$item;
 		 }
-
-		 return new JsonResponse(["history"=>$responseHistory]);
-
+		return new JsonResponse(["history"=>$responseHistory]);
 		}
-
 
 		/*AÑADIMOS RUTAS PARA APP EN LAS PDAs*/
 
@@ -375,7 +340,6 @@ class ERPStocksController extends Controller
  		$stocksRepository=$this->getDoctrine()->getRepository(ERPStocks::class);
  		$stocks=$stocksRepository->findInventoryStockByLocation($this->getUser()->getCompany(),$location);
  		$responseStocks=Array();
-
  		foreach($stocks as $stock){
  			$item['id']=$stock['id'];
  			$item['product_code']=$stock['product_code'];
@@ -385,18 +349,14 @@ class ERPStocksController extends Controller
  			$item['lastinventorydate']=$stock['lastinventorydate'];
  			$responseStocks[]=$item;
  		}
-
  		return new JsonResponse(["stocks"=>$responseStocks]);
-
  	 }
-
 
 	 /**
 		* @Route("/api/ERP/inventory/{location}/{product}/{qty}/saveStock", name="saveProductStock")
 		*/
 		public function saveProductStock($location, $product, $qty, RouterInterface $router,Request $request){
 			 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-
 			 $repositoryProducts=$this->getDoctrine()->getRepository(ERPProducts::class);
 			 $product_obj=$repositoryProducts->findOneBy(["code"=>$product, "company"=>$this->getUser()->getCompany()]);
 			 $repositoryStoreLocations=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
@@ -405,12 +365,9 @@ class ERPStocksController extends Controller
 			 $store=$repositoryStores->findOneBy(["id"=>$storelocation->getStore(), "company"=>$this->getUser()->getCompany()]);
 			 $repository=$this->getDoctrine()->getRepository($this->class);
 			 $stock=$repository->findOneBy(["storelocation"=>$storelocation,"product"=>$product_obj, "company"=>$this->getUser()->getCompany()]);
-
 			 $prev_stock=$stock->getQuantity();
 			 $new_stock=$qty;
-
 			 if($prev_stock!=$new_stock){
-
 				 $StockHistory= new ERPStockHistory();
 				 $StockHistory->setProduct($product_obj);
 				 $StockHistory->setLocation($storelocation);
@@ -425,8 +382,6 @@ class ERPStocksController extends Controller
 				 $manager=$this->getDoctrine()->getManager();
 				 $manager->persist($StockHistory);
 				 $manager->flush();
-
-
 				 if($stock){
 				 	$datetime=new \DateTime();
 				 	$stock->setQuantity($new_stock);
@@ -435,34 +390,25 @@ class ERPStocksController extends Controller
 				 	$manager->persist($stock);
 				 	$manager->flush();
 				//	return new JsonResponse(["result"=>1]);
-
 				 }
 				// else return new JsonResponse(["result"=>-1]);
 			 }
-
-
 			 $total_stock=$repository->findStockByProductStore($product_obj->getId(),$store->getId());
 			 /*Obtenemos el stock que tiene en estos momentos el producto en Navision*/
 			 $json=file_get_contents($this->url.'navisionExport/axiom/app/do-NAVISION-getProductStock.php?code='.$product_obj->getCode().'&store='.$store->getCode());
 			 $objects=json_decode($json, true);
 			 $navision_stock=$objects[0]["stock"];
-
 			 if($total_stock>$navision_stock)
 			 {
 				 $new_navision_stock=$total_stock-$navision_stock;
 			//	 $json=file_get_contents($this->url.'navisionExport/axiom/app/do-NAVISION-setProductStock.php?code='.$product_obj->getCode().'&store='.$store->getCode().'$qty='.$new_navision_stock.'&type=2');
-
 			 }
 			 else if($total_stock<$navision_stock){
 				 	$new_navision_stock=$navision_stock-$total_stock;
 			//	 $json=file_get_contents($this->url.'navisionExport/axiom/app/do-NAVISION-setProductStock.php?code='.$product_obj->getCode().'&store='.$store->getCode().'$qty='.$new_navision_stock.'&type=3');
-
 			 }
-
 			return new JsonResponse(["result"=>1]);
 	 }
-
-
 
     /**
     * @Route("/api/global/stock/{id}/get", name="getStock")
@@ -473,7 +419,7 @@ class ERPStocksController extends Controller
       if (!$stock) {
             throw $this->createNotFoundException('No currency found for id '.$id );
       }
-          return new JsonResponse($stock->encodeJson());
+    return new JsonResponse($stock->encodeJson());
     }
 
   /**
@@ -494,8 +440,6 @@ class ERPStocksController extends Controller
 		return new JsonResponse($return);
   }
 
-
-
 	/**
    * @Route("/api/stock/list/{id}", name="stockproductlist")
    */
@@ -514,13 +458,10 @@ class ERPStocksController extends Controller
     return new JsonResponse($return);
   }
 
-
-
 	/**
 	* @Route("/{_locale}/admin/global/stock/{id}/disable", name="disableStock")
 	*/
- public function disable($id)
-	 {
+ public function disable($id){
 	 $this->denyAccessUnlessGranted('ROLE_GLOBAL');
 	 $entityUtils=new GlobaleEntityUtils();
 	 $result=$entityUtils->disableObject($id, $this->class, $this->getDoctrine());
@@ -541,6 +482,7 @@ class ERPStocksController extends Controller
  * @Route("/{_locale}/admin/global/stock/{id}/delete", name="deleteStock")
  */
  public function delete($id){
+	 $stockDeleted;
 	 $this->denyAccessUnlessGranted('ROLE_GLOBAL');
 	 $entityUtils=new GlobaleEntityUtils();
 	 $result=$entityUtils->deleteObject($id, $this->class, $this->getDoctrine());
