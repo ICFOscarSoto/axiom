@@ -107,7 +107,7 @@ class NavisionGetProducts extends ContainerAwareCommand
       case 'defuse': $this->defuseProducts($input, $output);
       break;
       case 'clear':
-        $this->defuseProducts($input, $output);
+        //$this->defuseProducts($input, $output);
         $this->clearEAN13($input, $output);
       break;
       case 'all':
@@ -648,10 +648,10 @@ public function importStocks(InputInterface $input, OutputInterface $output) {
       if($product) {
             $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product->getId(),"variantvalue"=>$variantvalue]);
             if($productvariant!=null) {
-              $old_stocks=$repositoryStocks->stockVariantUpdate($productvariant->getId(), $stock["almacen"]);
+              $old_stocks=$repositoryStocks->stockVariantUpdate($productvariant->getId(), $stock["almacen"], "deleted"=>0);
               $output->writeln('El producto '.$product->getId().' tiene la variante '.$stock["variant"]);
             }
-            else $old_stocks=$repositoryStocks->stockUpdate($product->getId(), $stock["almacen"]);
+            else $old_stocks=$repositoryStocks->stockUpdate($product->getId(), $stock["almacen"], "deleted"=>0);
 
             if($old_stocks[0]["id"]!=null) {
               $stock_old=$repositoryStocks->findOneBy(["id"=>$old_stocks[0]["id"], "deleted"=>0]);
