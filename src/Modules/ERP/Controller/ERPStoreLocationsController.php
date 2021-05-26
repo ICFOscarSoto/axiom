@@ -69,17 +69,14 @@ class ERPStoreLocationsController extends Controller
 	   if($id==0){
 	    if($storeid==0 ) $storeid=$request->query->get('$storeid');
 	    if($storeid==0 || $storeid==null) $storeid=$request->request->get('id-parent',0);
-
 	    $store = $defaultStore->find($storeid);
-	   }else $obj = $StoreLocationsRepository->find($id);
+			}	else 	$obj = $StoreLocationsRepository->find($id);
 
 		 $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(),"store"=>$id==0?$store:$obj->getStore()];
 
 	   $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),
 	                          method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
-
 		 if($id==0) $utils->values(["store"=>$store]);
-
 		 return $utils->make($id, $this->class, $action, "formStoreLocations", "modal");
 		}
 

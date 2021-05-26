@@ -1,5 +1,6 @@
 [
   {"id": "printLocation", "type" : "default", "icon" : "fa fa-print", "name" : "imprimir", "route":"printlocationlabel", "routeParams":{"type":"3"},"actionType" : "foreground", "target":"_blank", "confirm" :false},
-  {"id": "editStoreLocations", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"genericdata", "routeParams":{"module":"ERP", "name":"StoreLocations", "type":"modal" }, "modal":"StoreLocations", "actionType" : "background", "confirm" :false, "tooltip":""},
+  {"id": "editStoreLocations", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"dataStoreLocations",
+     "modal":"storelocations", "actionType" : "background",    "confirm" :false, "tooltip":""},  
   {"id": "deleteStoreLocations", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"genericdelete", "routeParams":{"module":"ERP", "name":"StoreLocations"}, "confirm" :true, "undo" :false, "actionType" : "background", "tooltip":""}
 ]
