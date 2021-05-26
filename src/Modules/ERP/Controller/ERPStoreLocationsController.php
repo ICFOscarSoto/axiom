@@ -55,7 +55,7 @@ class ERPStoreLocationsController extends Controller
     }
 
 		/**
-		 * @Route("/{_locale}/storelocations/data/{id}/{action}/{storeid}", name="dataStoreLocations", defaults={"id"=0, "action"="read", "storeid"=1})
+		 * @Route("/{_locale}/storelocations/data/{id}/{action}/{storeid}", name="dataStoreLocations", defaults={"id"=0, "action"="read", "storeid"=0})
 		 */
 		 public function data($id, $action, $storeid, Request $request){
 		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
