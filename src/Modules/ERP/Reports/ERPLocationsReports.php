@@ -124,7 +124,7 @@ class ERPLocationsReports{
         $path=$tempPath.'loc-'.$location['id'].'.png';
         //$path=$tempPath.'loc-5831.png';
         $qrcode->render('LOC.'.$location['name'].'+STR.'.$location['store_id'], $path);
-        $this->pdf->Image($path, 45, 3, 150, 150);
+        $this->pdf->Image($path, 30, -1, 150, 150);
         $this->pdf->SetXY(0,105);
         $this->pdf->Cell(210, 54, $location['name'], 0, 0, 'C');
 
