@@ -75,6 +75,18 @@ $('body').on('click', "#salesticket-button-cancel", function(e){
    $("#add-information-modal-form").modal('toggle');
 });
 
+$('body').on('change', "#salesticket-form-states-select", function(e) {
+
+  if($("#salesticket-form-states-select").val()=="3"){
+    $("#salesticket-form-agents-select").parent().parent().css("display","none");
+    $("#salesticket-form-departments-select").parent().parent().css("display","none");
+  }
+  else{
+    $("#salesticket-form-agents-select").parent().parent().css("display","block");
+    $("#salesticket-form-departments-select").parent().parent().css("display","block");
+  }
+})
+
 $('body').on('change', "#salesticket-form-agents-select", function(e) {
   $("#salesticket-form-departments-select").parent().parent().css("display","none");
 
