@@ -61,7 +61,8 @@ class ERPStoresRepository extends ServiceEntityRepository
     {
       $query='SELECT *
         FROM erpstores
-        WHERE active=1 AND deleted=0 AND inventorymanager_id is not null';
+        WHERE active=1 AND deleted=0 AND inventorymanager_id is not null
+        ORDER BY code ASC';
         return $this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
 
     }

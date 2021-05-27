@@ -44,11 +44,17 @@ $(document).ready(function() {
     if(id==3){
       $("#products-failed").css("display","block");
       $("#stores-failed").css("display","block");
+      $("#panel-searching").css("display","block");
+      $("#searching-customer").css("display","none");
+      $("#o_separator").css("display","none");
+      $("#validation-info-list").empty();
+      $("#validation-info-list").append("<li>Busca el pedido en el que se ha producido un fallo de stock.</li>");
     }
-    $("#panel-searching").css("display","block");
-    $("#validation-info-list").empty();
-    $("#validation-info-list").append("<li>Tienes 2 OPCIONES: buscar un pedido para asociarlo a la incidencia o buscar un cliente. Si eliges buscar un pedido, el cliente también se asociará automáticamente a la incidencia.</li>");
-
+    else{
+        $("#panel-searching").css("display","block");
+        $("#validation-info-list").empty();
+        $("#validation-info-list").append("<li>Tienes 2 OPCIONES: buscar un pedido para asociarlo a la incidencia o buscar un cliente. Si eliges buscar un pedido, el cliente también se asociará automáticamente a la incidencia.</li>");
+      }
 
   //  $("#info-add").css("display","block");
   });
