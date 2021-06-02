@@ -40,18 +40,20 @@ class InventoryRemember extends ContainerAwareCommand
         $output->writeln('===================================================');
         $date= new \DateTime();
 
+      //  $date= new \DateTime();
+
         $stores=$storesRepository->getInventoryStores();
         foreach($stores as $store)
         {
 
-            $tickets=$storeTicketsRepository->getTicketsforInventory($store["id"],$date);
+            $tickets=$storeTicketsRepository->getTicketsforInventory($store["id"]);
             $inventory=null;
             if(!empty($tickets))
             {
               foreach($tickets as $ticket){
                 $storeticket=$storeTicketsRepository->findOneBy(["id"=>$ticket["id"], "active"=>1, "deleted"=>0]);
                 $product=$storeticket->getProduct();
-                $inventory[]= $product->getCode()." - ".$product->getName().">> https://axiom.ferreteriacampollano.com/es/ERP/storetickets/fixed/".$storeticket->getId();
+                $inventory[]= $product->getCode()." - ".$product->getName().">> https://axiom.ferreteriacampollano.com/es/ERP/storetickets/solved/".$storeticket->getId();
               }
             }
 
