@@ -17,6 +17,7 @@ use App\Modules\ERP\Entity\ERPStoreTickets;
 use App\Modules\ERP\Entity\ERPStoreTicketsHistory;
 use App\Modules\ERP\Entity\ERPStoreTicketsStates;
 use App\Modules\ERP\Entity\ERPStoreTicketsReasons;
+use App\Modules\ERP\Entity\ERPSalesTickets;
 use App\Modules\ERP\Entity\ERPStores;
 use App\Modules\ERP\Entity\ERPStoreLocations;
 use App\Modules\ERP\Entity\ERPProducts;
@@ -216,6 +217,7 @@ class ERPStoreTicketsController extends Controller
 			public function dataStoreTickets($id, $action, Request $request){
 			 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 			 $storeticketsRepository=$this->getDoctrine()->getRepository(ERPStoreTickets::class);
+			 $salesticketsRepository=$this->getDoctrine()->getRepository(ERPSalesTickets::class);
 			 $productsRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
 			 $variantsRepository=$this->getDoctrine()->getRepository(ERPVariantsValues::class);
 			 $storeticketsstatesRepository=$this->getDoctrine()->getRepository(ERPStoreTicketsStates::class);
@@ -247,7 +249,6 @@ class ERPStoreTicketsController extends Controller
 				 else if($newid<100) $storeticket->setCode("#A".date("Y")."000".$newid);
 				 else if($newid<1000) $storeticket->setCode("#A".date("Y")."00".$newid);
 				 else if($newid<10000) $storeticket->setCode("#A".date("Y")."0".$newid);
-
 			 }
 
 			 if($id==0){
@@ -311,21 +312,25 @@ class ERPStoreTicketsController extends Controller
 
 			 $newagent=null;
 			 $newdepartment=null;
+
+			 //si la incidencia se ha traspasado a otro agente
 			 if($fields->storeticketnewagent!=""){
 
-			 if($id==0){
-					 if($fields->storeticketreason!="1")
-					 {
-						 $newagent=$agentsRepository->findOneBy(["id"=>$fields->storeticketnewagent, "active"=>1, "deleted"=>0]);
-						 $channel=$newagent->getDiscordchannel();
-						 $msg=$this->getUser()->getName()." ha solicitado que gestiones la incidencia Nº **"."#A".date("Y")."000".$newid."**";
-						 file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
-						 $msg="\n\nMás info en: \n".'https://axiom.ferreteriacampollano.com/es/ERP/storetickets/form/'.$newid;
-						 file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
-					 }
+				 if($id==0){
+						 if($fields->storeticketreason!="1")
+						 {
+							 //si la incidencia se acaba de crear y no es un "fallo de stock" se envia un mensaje por discord al otro agente
+							 $newagent=$agentsRepository->findOneBy(["id"=>$fields->storeticketnewagent, "active"=>1, "deleted"=>0]);
+							 $channel=$newagent->getDiscordchannel();
+							 $msg=$this->getUser()->getName()." ha solicitado que gestiones la incidencia Nº **"."#A".date("Y")."000".$newid."**";
+							 file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
+							 $msg="\n\nMás info en: \n".'https://axiom.ferreteriacampollano.com/es/ERP/storetickets/form/'.$newid;
+							 file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
+						 }
 
-				 }
+					}
 				 else{
+
 					 $storeticket=$storeticketsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$id, "deleted"=>0]);
 					 $newagent=$agentsRepository->findOneBy(["id"=>$fields->storeticketnewagent, "active"=>1, "deleted"=>0]);
 					 $channel=$newagent->getDiscordchannel();
@@ -337,6 +342,7 @@ class ERPStoreTicketsController extends Controller
 				 }
 			 }
 
+			 //si la incidencia se traspasa un departamento
 			 if($fields->storeticketnewdepartment!=""){
 
 					 $newdepartment=$departmentsRepository->findOneBy(["id"=>$fields->storeticketnewdepartment,"active"=>1,"deleted"=>0]);
@@ -350,21 +356,69 @@ class ERPStoreTicketsController extends Controller
 
 			 if($id!=0){
 	 			if($storeticketstate->getName()=="Solucionada"){
-	 				$author=$storeticket->getAuthor();
-	 				if($author->getId()!=$this->getUser()->getId())
-	 				{
-	 					$channel=$author->getDiscordchannel();
-	 					$msg=$this->getUser()->getName()." ha solucionado la incidencia Nº **".$storeticket->getCode()."**";
-	 					file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
-	 					$msg="\n\nMás info en: \n".'https://axiom.ferreteriacampollano.com/es/ERP/storetickets/form/'.$id;
-	 					file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
-	 				}
+					//en todas las incidencias que no sean fallo de stock, se comprueba si la persona que la ha solucionada es la misma
+					//que la que la ha creado. De no ser así, se le envía un mensaje por discord.
+					if($fields->storeticketreason!="1")
+					{
+		 				$author=$storeticket->getAuthor();
+		 				if($author->getId()!=$this->getUser()->getId())
+		 				{
+							//si la incidencia la ha solucionado alguien distinto al autor de la misma, se le envía un discord a creador.
+		 					$channel=$author->getDiscordchannel();
+		 					$msg=$this->getUser()->getName()." ha solucionado la incidencia Nº **".$storeticket->getCode()."**";
+		 					file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
+		 					$msg="\n\nMás info en: \n".'https://axiom.ferreteriacampollano.com/es/ERP/storetickets/form/'.$id;
+		 					file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
+		 				}
+					}
+					/*en el caso de las incidencias por fallo de stock, primero se comprueba si la incidencia viene de una incidencia de venta para avisar
+					en este caso al creador de la incidencia de venta.*/
+					else{
+						if($storeticketstate->getSalesTicket()!=null){
+
+							$salesticket=$salesticketsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$storeticket->getSalesTicket()->getId(), "active"=>1,"deleted"=>0]);
+							$channel=$salesticket->getAuthor()->getDiscordchannel();
+							$msg=$this->getUser()->getName()." ha hecho el inventario del producto ".$storeticket->getProduct()->getCode()." asociado a la incidencia Nº **".$salesticket->getCode()."**";
+							file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
+							$msg="\n\nMás info en: \n".'https://axiom.ferreteriacampollano.com/es/ERP/salesticket/form/'.$salesticket->getId();
+							file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
+
+						}
+						else{
+
+							$author=$storeticket->getAuthor();
+			 				if($author->getId()!=$this->getUser()->getId())
+			 				{
+								//si la incidencia la ha solucionado alguien distinto al autor de la misma, se le envía un discord a creador.
+			 					$channel=$author->getDiscordchannel();
+								$msg=$this->getUser()->getName()." ha hecho el inventario del producto ".$storeticket->getProduct()->getCode()." asociado a la incidencia Nº **".$storeticket->getCode()."**";
+			 					file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
+			 					$msg="\n\nMás info en: \n".'https://axiom.ferreteriacampollano.com/es/ERP/storetickets/form/'.$id;
+			 					file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
+			 				}
+
+
+						}
+
+					}
 	 			}
+
+
+
 	 		}
 
 			if($id==0 AND $fields->storeticketreason=="1")
 			{
 
+				 //enviamos la notificación al gestor de inventario
+/*
+				 $inventorymanager=$store->getInventorymanager();
+				 $channel=$inventorymanager->getDiscordchannel();
+				 $msg="\n:bell: INVENTARIO ".$store_name.": ";
+				 $msg=$msg."**".$product->getCode()." - ".$product->getName()."** >>> http://demoaxiom.ferreteriacampollano.com/es/ERP/storetickets/solved/".$newid."\n";
+				 file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
+*/
+				//en las incidencias por fallo de stock, se creará un registro automático en el historial de la incidencia
 				 $history_obj=new ERPStoreTicketsHistory();
 				 $history_obj->setAgent($this->getUser());
 
@@ -372,7 +426,6 @@ class ERPStoreTicketsController extends Controller
 				 $inventorymanager=$store->getInventorymanager();
 				 $history_obj->setNewagent($inventorymanager);
 				 $history_obj->setNewdepartment(null);
-
 				 $history_obj->setStoreTicket($storeticket);
 				 $history_obj->setObservations("Hacer inventario del producto  ".$product_name." en el almacén ".$store->getName());
 				 $history_obj->setStoreticketstate($storeticketstate);
@@ -380,7 +433,6 @@ class ERPStoreTicketsController extends Controller
 				 $history_obj->setDeleted(0);
 				 $history_obj->setDateupd(new \DateTime());
 				 $history_obj->setDateadd(new \DateTime());
-
 				 $this->getDoctrine()->getManager()->persist($history_obj);
 				 $this->getDoctrine()->getManager()->flush();
 			 }
@@ -401,7 +453,6 @@ class ERPStoreTicketsController extends Controller
 
 				 else $history_obj->setNewagent($this->getUser());
 
-
 				 $history_obj->setStoreTicket($storeticket);
 				 $history_obj->setObservations($fields->observations);
 				 $history_obj->setStoreticketstate($storeticketstate);
@@ -409,10 +460,10 @@ class ERPStoreTicketsController extends Controller
 				 $history_obj->setDeleted(0);
 				 $history_obj->setDateupd(new \DateTime());
 				 $history_obj->setDateadd(new \DateTime());
-
 				 $this->getDoctrine()->getManager()->persist($history_obj);
 				 $this->getDoctrine()->getManager()->flush();
 			 }
+
 			 return new JsonResponse(["result"=>1,"data"=>["id"=>$storeticket->getId()]]);
 
 		 }
@@ -444,7 +495,7 @@ class ERPStoreTicketsController extends Controller
 	 		if (!$storetickets) {
 	 					throw $this->createNotFoundException('No currency found for id '.$id );
 	 				}
-	 				return new JsonResponse($storetickets->encodeJson());
+	 	  return new JsonResponse($storetickets->encodeJson());
 	 	}
 
 	 /**
@@ -457,6 +508,8 @@ class ERPStoreTicketsController extends Controller
 	  $result=$entityUtils->disableObject($id, $this->class, $this->getDoctrine());
 	  return new JsonResponse(array('result' => $result));
 	 }
+
+
 	 /**
 	 * @Route("/{_locale}/ERP/storetickets/{id}/enable", name="enableStoreTickets")
 	 */
@@ -484,41 +537,141 @@ class ERPStoreTicketsController extends Controller
 	 * @Route("/api/ERP/storetickets/history/get/{id}", name="getStoreTicketHistory", defaults={"id"=0})
 	 */
 	 public function getStoreTicketHistory($id, RouterInterface $router,Request $request){
-	 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-	 $storeticketsRepository=$this->getDoctrine()->getRepository(ERPStoreTickets::class);
-	 $storeticketsHistoryRepository=$this->getDoctrine()->getRepository(ERPStoreTicketsHistory::class);
-	 $storeticket=$storeticketsRepository->findOneBy(["id"=>$id]);
+			 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			 $storeticketsRepository=$this->getDoctrine()->getRepository(ERPStoreTickets::class);
+			 $storeticketsHistoryRepository=$this->getDoctrine()->getRepository(ERPStoreTicketsHistory::class);
+			 $storeticket=$storeticketsRepository->findOneBy(["id"=>$id]);
 
-	 $storeticketshistory=$storeticketsHistoryRepository->findBy(["storeticket"=>$storeticket,"active"=>1,"deleted"=>0],["dateadd"=>"DESC"]);
-	 $response=Array();
+			 $storeticketshistory=$storeticketsHistoryRepository->findBy(["storeticket"=>$storeticket,"active"=>1,"deleted"=>0],["dateadd"=>"DESC"]);
+			 $response=Array();
 
-	 foreach($storeticketshistory as $line){
-	 	$item['dateadd']=$line->getDateadd()->format('H:i:s d/m/Y');
-	 	$item['dateadd2']=$line->getDateadd();
-	 	$item['agentid']=$line->getAgent()->getId();
-	 	$item['agentname']=$line->getAgent()->getName()." ".$line->getAgent()->getLastName();
-	 	$item['newagentname']=$line->getNewagent()->getName()." ".$line->getNewagent()->getLastName();
-	 	$item['newagentid']=$line->getNewagent()->getId();
-	 	$item['newagentname']=$line->getNewagent()->getName()." ".$line->getNewagent()->getLastName();
-	 	if($line->getNewagent())
-	 	{
-	 	$item['newagentid']=$line->getNewagent()->getId();
-	 	$item['newagentname']=$line->getNewagent()->getName()." ".$line->getNewagent()->getLastName();
-	 	}
-	 	if($line->getNewdepartment())
-	 	{
-	 	$item['newdepartmentid']=$line->getNewdepartment()->getId();
-	 	$item['newagentname']=$line->getNewdepartment()->getName()." ".$line->getNewagent()->getLastName();
-	 	}
-	 	$item['observations']=$line->getObservations();
-	 	$item['state']=$line->getStoreticketstate()->getName();
-	 	$response[]=$item;
+			 foreach($storeticketshistory as $line){
+
+			 	$item['dateadd']=$line->getDateadd()->format('H:i:s d/m/Y');
+			 	$item['dateadd2']=$line->getDateadd();
+			 	$item['agentid']=$line->getAgent()->getId();
+			 	$item['agentname']=$line->getAgent()->getName()." ".$line->getAgent()->getLastName();
+			 	$item['newagentname']=$line->getNewagent()->getName()." ".$line->getNewagent()->getLastName();
+			 	$item['newagentid']=$line->getNewagent()->getId();
+			 	$item['newagentname']=$line->getNewagent()->getName()." ".$line->getNewagent()->getLastName();
+
+				if($line->getNewagent())
+			 	{
+				 	$item['newagentid']=$line->getNewagent()->getId();
+				 	$item['newagentname']=$line->getNewagent()->getName()." ".$line->getNewagent()->getLastName();
+			 	}
+			 	if($line->getNewdepartment())
+			 	{
+				 	$item['newdepartmentid']=$line->getNewdepartment()->getId();
+				 	$item['newagentname']=$line->getNewdepartment()->getName()." ".$line->getNewagent()->getLastName();
+			 	}
+
+			 	$item['observations']=$line->getObservations();
+			 	$item['state']=$line->getStoreticketstate()->getName();
+			 	$response[]=$item;
+
+			 }
+
+			 return new JsonResponse(["history"=>$response]);
+
 	 }
 
-	 return new JsonResponse(["history"=>$response]);
+
+	 /**
+	 * @Route("/{_locale}/ERP/storetickets/solved/{id}", name="storeticketsolved")
+	 */
+	 public function storeticketsolved($id){
+			$storeticketsRepository=$this->getDoctrine()->getRepository(ERPStoreTickets::class);
+			$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
+			$configrepository=$this->getDoctrine()->getRepository(ERPConfiguration::class);
+			$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
+			$config=$configrepository->findOneBy(["company"=>$this->getUser()->getCompany()]);
+			$storeticket=$storeticketsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$id, "active"=>1,"deleted"=>0]);
+			$code="";
+			$code=$storeticket->getCode();
+
+			if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+							 return $this->render('@ERP/storeticket_solving.html.twig', [
+								 'moduleConfig' => $config,
+								 'interfaceName' => 'storeticketsolved',
+								 'optionSelected' => 'storeticketsolved',
+								 'menuOptions' =>  $menurepository->formatOptions($userdata),
+								 'id' => $id,
+								 'storeticket' => $storeticket
+								 ]);
+						 }
+	   return new RedirectResponse($this->router->generate('app_login'));
+	 }
+
+
+	 /**
+	 * @Route("/api/ERP/storetickets/setsolved/{id}", name="storeticketsetsolved")
+	 */
+	 public function storeticketsetsolved($id){
+		 $this->denyAccessUnlessGranted('ROLE_GLOBAL');
+		 $storeticketsRepository=$this->getDoctrine()->getRepository(ERPStoreTickets::class);
+		 $salesticketsRepository=$this->getDoctrine()->getRepository(ERPSalesTickets::class);
+		 $storeticketsstatesRepository=$this->getDoctrine()->getRepository(ERPStoreTicketsStates::class);
+		 $storesRepository=$this->getDoctrine()->getRepository(ERPStores::class);
+		 $storeticket=null;
+		 $salesticket=null;
+		 $storeticket=$storeticketsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$id, "active"=>1,"deleted"=>0]);
+		 if($storeticket->getSalesTicket()!=null) $salesticket=$salesticketsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$storeticket->getSalesTicket()->getId(), "active"=>1,"deleted"=>0]);
+		 if($storeticket==null) return new JsonResponse(["result"=>0]);
+		 $state=$storeticketsstatesRepository->findOneBy(["id"=>2, "active"=>1,"deleted"=>0]);
+		 $storeticket->setStoreticketstate($state);
+		 $this->getDoctrine()->getManager()->persist($storeticket);
+
+		 //hay una incidencia de venta asociada, luego hay que avisar al gestor que ha creado dicha incidencia de que ya se ha hecho el inventario.
+		 if($salesticket){
+			 $channel=$salesticket->getAuthor()->getDiscordchannel();
+			 $msg="Ya se ha hecho el inventario del producto **".$storeticket->getProduct()->getName()."** asociado a la incidencia **".$salesticket->getCode()."**";
+			 file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
+			 $msg="\n\nRevisa tu incidencia en: \n".'https://axiom.ferreteriacampollano.com/es/ERP/salestickets/form/'.$salesticket->getId();
+			 file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
+
+		 }
+
+
+		 $history_obj=new ERPStoreTicketsHistory();
+		 $history_obj->setAgent($storeticket->getAgent());
+
+		 $store=$storesRepository->findOneBy(["code"=>$storeticket->getStore()->getId()]);
+		 $history_obj->setNewagent($storeticket->getAgent());
+		 $history_obj->setNewdepartment(null);
+
+		 $history_obj->setStoreTicket($storeticket);
+		 $history_obj->setObservations("Inventario completado");
+		 $history_obj->setStoreticketstate($state);
+		 $history_obj->setActive(1);
+		 $history_obj->setDeleted(0);
+		 $history_obj->setDateupd(new \DateTime());
+		 $history_obj->setDateadd(new \DateTime());
+
+		 $this->getDoctrine()->getManager()->persist($history_obj);
+		 $this->getDoctrine()->getManager()->flush();
+
+		 return new JsonResponse(["result"=>1]);
+
 
 	 }
 
+
+	 /**
+	* @Route("/api/ERP/storetickets/checksolved/{id}", name="storeticketchecksolved")
+	*/
+	public function storeticketchecksolved($id){
+
+		$this->denyAccessUnlessGranted('ROLE_GLOBAL');
+		$storeticketsRepository=$this->getDoctrine()->getRepository(ERPStoreTickets::class);
+		$storesRepository=$this->getDoctrine()->getRepository(ERPStores::class);
+		$storeticket=null;
+		$storeticket=$storeticketsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$id, "active"=>1,"deleted"=>0]);
+
+		if($storeticket->getStoreticketstate()->getId()==2) return new JsonResponse(["result"=>1]);
+		else return new JsonResponse(["result"=>0]);
+
+	}
 
 
 }

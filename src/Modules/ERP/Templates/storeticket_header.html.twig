@@ -9,6 +9,7 @@
                {% set color_text = '#fff' %}
             {% elseif storeticket.storeticketstate.id == 2 %}
                {% set color_state = '#00a651' %}
+                {% set color_text = '#fff' %}
             {% else %}
                {% set color_state = '#ebebeb' %}
                {% set color_text = '#000' %}
@@ -16,7 +17,7 @@
 
           <div class="col-md-2">
             <label for="storeticket-form-currentstate">Estado actual:</label>
-            <input style="background-color:{{color_state}}!important;color:{{color_text}}!important;" type="text" id="storeticket-form-currentstate" value="{{ storeticket.storeticketstate.name }}" disabled="disabled" class="form-control" placeholder="Estado actual">
+            <input style="background-color:{{ color_state }}!important;color:{{ color_text }}!important;" type="text" id="storeticket-form-currentstate" value="{{ storeticket.storeticketstate.name }}" disabled="disabled" class="form-control" placeholder="Estado actual">
           </div>
       {% else %}
         <div class="col-md-2">

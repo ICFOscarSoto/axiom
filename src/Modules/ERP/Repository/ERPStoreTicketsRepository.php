@@ -68,14 +68,12 @@ class ERPStoreTicketsRepository extends ServiceEntityRepository
     }
 
 
-    public function getTicketsforInventory($store,$today){
-      $date_today=$today->format("Y-m-d");
+    public function getTicketsforInventory($store){
       $query="SELECT *
             FROM erpstore_tickets et
-            WHERE et.active = 1 AND et.deleted = 0 AND et.storeticketstate_id!=2 AND et.reason_id=1 AND et.store_id=:STORE AND DATE(DATEADD)<DATE(:TODAY)
+            WHERE et.active = 1 AND et.deleted = 0 AND et.storeticketstate_id!=2 AND et.reason_id=1 AND et.store_id=:STORE
             GROUP BY product_id";
-      $params=['STORE' => $store,
-               'TODAY' => $date_today];
+      $params=['STORE' => $store];
       return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
     }
 
