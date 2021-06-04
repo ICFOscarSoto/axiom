@@ -116,6 +116,7 @@ class NavisionGetProducts extends ContainerAwareCommand
         $this->importVariants($input, $output);
         $this->importProductsVariants($input, $output);
         $this->importEAN13($input, $output);
+        $this->importReferences($input, $output);
         $this->importPrices($input, $output);
         $this->importStocks($input, $output);
         $this->importIncrements($input, $output);

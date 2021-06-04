@@ -70,12 +70,13 @@ class ERPEAN13Controller extends Controller
 
 
    $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(),
-   "supplier"=>$default, "product"=>$id==0?$product:$obj->getProduct(), "productvariant"=>$id==0?null:$obj->getProductVariant()];
+   "supplier"=>$default, "product"=>$id==0?$product:$obj->getProduct(),
+   "productvariant"=>$id==0?null:$obj->getProductVariant()];
 
    $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),
-                          method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
+                          method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],
+                          method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
   if($id==0) $utils->values(["product"=>$product]);
-
    $make=$utils->make($id, ERPEAN13::class, $action, "EAN13", "modal");
 
    return $make;

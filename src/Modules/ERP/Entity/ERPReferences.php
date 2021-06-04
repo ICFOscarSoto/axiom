@@ -73,6 +73,11 @@ class ERPReferences
      */
     private $productvariant;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $description;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -195,6 +200,18 @@ class ERPReferences
     public function setProductvariant(?ERPProductsVariants $productvariant): self
     {
         $this->productvariant = $productvariant;
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): self
+    {
+        $this->description = $description;
 
         return $this;
     }

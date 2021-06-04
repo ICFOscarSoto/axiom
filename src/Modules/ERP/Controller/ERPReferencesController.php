@@ -54,21 +54,28 @@ class ERPReferencesController extends Controller
      $utils = new GlobaleFormUtils();
      $utilsObj=new ERPReferencesUtils();
      $defaultProduct=$this->getDoctrine()->getRepository(ERPProducts::class);
-     $EAN13Repository=$this->getDoctrine()->getRepository(ERPReferences::class);
+     $referencesRepository=$this->getDoctrine()->getRepository(ERPReferences::class);
      $obj=new ERPReferences();
      if($id==0){
       if($idproduct==0 ) $idproduct=$request->query->get('idproduct');
       if($idproduct==0 || $idproduct==null) $idproduct=$request->request->get('id-parent',0);
       $product = $defaultProduct->find($idproduct);
-    }else $obj = $EAN13Repository->find($id);
+    }else $obj = $referencesRepository->find($id);
      $supplier=$id==0?$product->getSupplier():$obj->getProduct()->getSupplier();
      $defaultSupplier=$this->getDoctrine()->getRepository(ERPSuppliers::class);
+
      if($obj->getSupplier()==null) $default=$defaultSupplier->findOneBy(['id'=>$supplier->getId()]);
-      else $default=$obj->getSupplier();
-     $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "supplier"=>$default, "product"=>$id==0?$product:$obj->getProduct()];
+     else $default=$obj->getSupplier();
+
+     $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(),
+     "supplier"=>$default, "product"=>$id==0?$product:$obj->getProduct(),
+     "productvariant"=>$id==0?null:$obj->getProductVariant()];
      $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),
-                            method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
-     return $utils->make($id, ERPReferences::class, $action, "formProducts", "modal");
+                            method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],
+                            method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
+     if($id==0) $utils->values(["product"=>$product]);
+     $make=$utils->make($id, ERPReferences::class, $action, "references", "modal");
+     return $make;
     }
 
     /**
@@ -78,8 +85,11 @@ class ERPReferencesController extends Controller
       $listReferences = new ERPReferencesUtils();
       $formUtils=new GlobaleFormUtils();
       $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(),"supplier"=>null, "product"=>null, "productvariant"=>null];
-      $formUtils->initialize($this->getUser(), ERPReferences::class, dirname(__FILE__)."/../Forms/References.json", $request, $this, $this->getDoctrine(),method_exists($listReferences,'getExcludedForm')?$listReferences->getExcludedForm($params):[],method_exists($listReferences,'getIncludedForm')?$listReferences->getIncludedForm($params):[]);
-      $templateForms[]=$formUtils->formatForm('References', true, null, ERPReferences::class);
+      $formUtils->initialize($this->getUser(), ERPReferences::class,
+      dirname(__FILE__)."/../Forms/References.json", $request, $this, $this->getDoctrine(),
+      method_exists($listReferences,'getExcludedForm')?$listReferences->getExcludedForm($params):[],
+      method_exists($listReferences,'getIncludedForm')?$listReferences->getIncludedForm($params):[]);
+      $templateForms[]=$formUtils->formatForm('references', true, null, ERPReferences::class);
       return $this->render('@Globale/list.html.twig', array(
         'listConstructor' => $listReferences->formatListByProduct($id),
         'id_object'=>$id,
