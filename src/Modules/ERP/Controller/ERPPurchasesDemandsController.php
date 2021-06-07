@@ -120,7 +120,7 @@ class ERPPurchasesDemandsController extends Controller
 		foreach ($fields->lines as $key => $value) {
 			if($value->code!=null)
 			{
-			$product=$productsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "code"=>$value->code, "active"=>1, "deleted"=>0]);
+			$product=$productsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "code"=>$value->code, "deleted"=>0]);
 			$supplier=$suppliersRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "name"=>$value->supplier, "active"=>1, "deleted"=>0]);
 			$line=$purchasesdemandsRepository->findOneBy(["product"=>$product]);
 

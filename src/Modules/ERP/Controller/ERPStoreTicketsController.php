@@ -232,7 +232,7 @@ class ERPStoreTicketsController extends Controller
 
 			 //Get content of the json reques
 			 $fields=json_decode($request->getContent());
-			 $product=$productsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "code"=>$fields->productcode, "active"=>1, "deleted"=>0]);
+			 $product=$productsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "code"=>$fields->productcode, "deleted"=>0]);
 			 $product_name=$product->getName();
 			 if($id==0 AND $fields->storeticketreason=="1")  $storeticketstate=$storeticketsstatesRepository->findOneBy(["id"=>"1", "active"=>1, "deleted"=>0]);
 			 else $storeticketstate=$storeticketsstatesRepository->findOneBy(["id"=>$fields->storeticketstate, "active"=>1, "deleted"=>0]);

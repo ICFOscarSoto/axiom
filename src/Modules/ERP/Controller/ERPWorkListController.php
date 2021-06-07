@@ -138,7 +138,7 @@ class ERPWorkListController extends Controller
     foreach ($fields->lines as $key => $value) {
 			if($value->code!=null)
 			{
-      $product=$productsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "code"=>$value->code, "active"=>1, "deleted"=>0]);
+      $product=$productsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "code"=>$value->code, "deleted"=>0]);
       $line=$worklistRepository->findOneBy(["product"=>$product]);
 
 
