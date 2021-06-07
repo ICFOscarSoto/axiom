@@ -47,13 +47,12 @@
 					$('body').on('click', "#salesticket-button-save", function(e) {
 						if(validate_salesticket())
 						{
-							$(this).attr("disabled","disabled");
+						//	$(this).attr("disabled","disabled");
 							$.ajax({
 				         url: '{{ url('dataSalesTickets', {"id": id}) }}',
 				         type: 'POST',
 				         data: JSON.stringify(prepare_salesticket_json()),
 				         success:  function( data ) {
-
 									 if((--load_wait)==0) $("#load-spinner").fadeOut();
 				           if(data.result){
 									//	 $("#salesticket-form-id").val(data.data.id);
