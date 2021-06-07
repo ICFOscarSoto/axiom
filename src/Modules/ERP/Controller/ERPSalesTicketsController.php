@@ -447,7 +447,7 @@ class ERPSalesTicketsController extends Controller
 						else if($newid<10000) $storeticket->setCode("#A".date("Y")."0".$newid);
 						$storeticket->setAuthor($this->getUser());
 
-						$product=$productsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "code"=>$products[$i], "active"=>1, "deleted"=>0]);
+						$product=$productsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "code"=>$products[$i], "deleted"=>0]);
 						$product_name=$product->getName();
 						$storeticket->setProduct($product);
 
