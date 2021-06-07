@@ -47,7 +47,7 @@
 					$('body').on('click', "#salesticket-button-save", function(e) {
 						if(validate_salesticket())
 						{
-						//	$(this).attr("disabled","disabled");
+							$(this).attr("disabled","disabled");
 							$.ajax({
 				         url: '{{ url('dataSalesTickets', {"id": id}) }}',
 				         type: 'POST',
