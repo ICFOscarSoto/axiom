@@ -309,6 +309,36 @@ public function getWorkListProducts(Request $request){
 }
 
 
+/**
+* @Route("/api/erp/worklist/qtylinechange/{id}/{qty}", name="qtyLineChange", defaults={"qty"=1})
+*/
+public function qtyLineChange($id, $qty, Request $request){
+	$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+	$worklistRepository=$this->getDoctrine()->getRepository(ERPWorkList::class);
+	$line=$worklistRepository->findOneBy(["id"=>$id,"user"=>$this->getUser(),"deleted"=>0]);
+	if(!$line) return new JsonResponse(["result"=>-1, "text"=> "Linea no encontrada"]);
+	$line->setQuantity($qty);
+	$line->setDateupd(new \DateTime());
+	$this->getDoctrine()->getManager()->persist($line);
+	$this->getDoctrine()->getManager()->flush();
+	return new JsonResponse(["result"=>1]);
+}
+
+/**
+* @Route("/api/erp/worklist/removeline/{id}", name="removeLine")
+*/
+public function qtyLineChange($id, $qty, Request $request){
+	$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+	$worklistRepository=$this->getDoctrine()->getRepository(ERPWorkList::class);
+	$line=$worklistRepository->findOneBy(["id"=>$id,"user"=>$this->getUser(),"deleted"=>0]);
+	if(!$line) return new JsonResponse(["result"=>-1, "text"=> "Linea no encontrada"]);
+	$line->setDeleted(1);
+	$line->setActive(0);
+	$line->setDateupd(new \DateTime());
+	$this->getDoctrine()->getManager()->persist($line);
+	$this->getDoctrine()->getManager()->flush();
+	return new JsonResponse(["result"=>1]);
+}
 
 
 }
