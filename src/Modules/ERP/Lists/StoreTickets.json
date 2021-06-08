@@ -9,7 +9,7 @@
       "type": "datetime"
   },
   {
-      "name" :"product__name",
+      "name" :"product__code_o_product__name",
       "caption":"Producto"
   },
   {
