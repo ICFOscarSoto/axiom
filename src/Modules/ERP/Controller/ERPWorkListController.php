@@ -43,6 +43,7 @@ class ERPWorkListController extends Controller
 	 */
 	public function index(RouterInterface $router,Request $request)
 	{
+		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		if($this->getUser()!=null) $id=$this->getUser()->getId();
 	//	else return $this->redirectToRoute();
 		$usersRepository=$this->getDoctrine()->getRepository(GlobaleUsers::class);
