@@ -43,6 +43,7 @@ function getLocations(id,store,code,variant){
       url: "/api/ERP/worklist/locations/"+store+"/"+code+"/"+variant+"/get",
     }).done(function( elements, textStatus, jqXHR ) {
       if((--load_wait)==0) $("#load-spinner").fadeOut();
+      $("#product-form-locations-"+id).append('<option value="0">Selecciona Ubicación...</option>');
        elements.locations.forEach( function(valor, indice, array){
         $("#product-form-locations-"+id).append('<option value="'+valor.id+'">'+valor.name+'</option>');
       });
