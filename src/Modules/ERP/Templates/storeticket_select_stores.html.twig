@@ -53,7 +53,7 @@ $("#checkTodos").change(function () {
          $("stores-modal-form-body input[type=checkbox]").prop('checked', $(this).prop("checked"));
 });
 
-function saveTicket()
+function saveTicket(cont)
 {
   if(validate_storeticket())
   {
@@ -67,8 +67,11 @@ function saveTicket()
          if(data.result){
         //	 $("#salesticket-form-id").val(data.data.id);
            toastr.success("Documento guardado correctamente", "Confirmación", confirmation);
-            location.reload();
-           {% if id==0 %} location.href="/es/ERP/storetickets/form/"+data.data.id; {% endif %}
+           if(cont==1){
+             location.reload();
+             {% if id==0 %} location.href="/es/ERP/storetickets/form/"+data.data.id; {% endif %}
+           }
+           else location.href="/es/generic/ERP/StoreTickets/index";
          } else {
            toastr.error("No se pudo guardar el documento", "Confirmación", confirmation);
          }
@@ -89,10 +92,11 @@ $(document).ready(function() {
 
     $('#select-stores-button-add').click(function(){
           var storesselected = '';
-
+          var cont = 0;
           $('#stores-modal-form-body input[type=checkbox]').each(function(){
               if (this.checked && this.id!="checkTodos") {
                     storesselected += $(this).val()+',';
+                    cont=cont+1;
               }
           });
 
@@ -106,7 +110,7 @@ $(document).ready(function() {
                 content: 'Vas a solicitar que se haga inventario de la referencia '+$("#product-form-code").val()+" ¿Estás seguro?",
                 buttons: {
                    confirm: { text: 'Si', btnClass: 'btn-green', action: function(){
-                            saveTicket();
+                            saveTicket(cont);
                              window.location.href="/es/generic/ERP/StoreTickets/index";
                           }
 
