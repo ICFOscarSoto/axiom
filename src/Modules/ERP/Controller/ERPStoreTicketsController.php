@@ -255,13 +255,16 @@ class ERPStoreTicketsController extends Controller
 								else if($newid<1000) $storeticket->setCode("#A".date("Y")."00".$newid);
 								else if($newid<10000) $storeticket->setCode("#A".date("Y")."0".$newid);
 								$storeticket->setAuthor($this->getUser());
-								$storeticket->setAgent($this->getUser());
+
 								$storeticket->setDepartment(null);
 								$storeticket->setCompany($this->getUser()->getCompany());
 								$storeticket->setProduct($product);
 								$store=$storesRepository->findOneBy(["code"=>$stores[$i]]);
 								$storeticket->setStore($store);
 
+								$inventorymanager=$inventorymanager=$store->getInventorymanager();
+								$storeticket->setAgent($inventorymanager);
+								$storeticket->setObservations("Hacer inventario del producto  ".$product_name." en el almacén ".$store->getName());
 								$storeticket->setStoreticketstate($storeticketstate);
 								$storeticket->setObservations($fields->observations);
 								$storeticket->setDateupd(new \DateTime());
