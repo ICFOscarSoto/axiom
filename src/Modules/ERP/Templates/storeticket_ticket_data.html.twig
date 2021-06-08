@@ -60,14 +60,6 @@
           </div>
         </div>
         {% endif %}
-        {% if id==0 %}
-        <div class="col-md-3" id="product-store-info-stock-failed" style="display:none;">
-          <div class="form-group">
-            <label for="storeticket-form-store-stock-failed">Almacén</label>
-            <input type="text" readonly id="storeticket-form-store-stock-failed" disabled class="form-control" placeholder="Almacén">
-          </div>
-        </div>
-          {% endif %}
         {% if storeticket.storelocation==null %}
           {% if id==0 %}
             <div class="col-md-3" id="product-storelocation-info" style="display:none;">
