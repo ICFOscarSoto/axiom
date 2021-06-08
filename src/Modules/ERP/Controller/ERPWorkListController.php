@@ -43,6 +43,7 @@ class ERPWorkListController extends Controller
 	 */
 	public function index(RouterInterface $router,Request $request)
 	{
+		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		if($this->getUser()!=null) $id=$this->getUser()->getId();
 	//	else return $this->redirectToRoute();
 		$usersRepository=$this->getDoctrine()->getRepository(GlobaleUsers::class);
@@ -327,7 +328,7 @@ public function qtyLineChange($id, $qty, Request $request){
 /**
 * @Route("/api/erp/worklist/removeline/{id}", name="removeLine")
 */
-public function removeLine($id, $qty, Request $request){
+public function removeLine($id, Request $request){
 	$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 	$worklistRepository=$this->getDoctrine()->getRepository(ERPWorkList::class);
 	$line=$worklistRepository->findOneBy(["id"=>$id,"user"=>$this->getUser(),"deleted"=>0]);
