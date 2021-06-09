@@ -176,7 +176,7 @@ class ERPWorkListController extends Controller
 					 }elseif(isset($value->variant_id) AND $value->variant_id!="-1"){
 	 					$product_variant=$productsVariantsRepository->findOneBy(["id"=>$value->variant_id,"deleted"=>0]);
 	 					$variant=$product_variant->getVariantvalue();
-	 					$line=$worklistRepository->findOneBy(["product"=>$product,"user"=>$this->getUser(),"variant"=>$variant,"deleted"=>0]);
+	 					$line->setVariant($variant);
 					}
 					 if(isset($value->store)){
 							$store=$storesRepository->findOneBy(["id"=>$value->store]);
