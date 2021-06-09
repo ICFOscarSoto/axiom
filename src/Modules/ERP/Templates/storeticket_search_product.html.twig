@@ -43,7 +43,7 @@ function checkGrouped(code){
         if((--load_wait)==0) $("#load-spinner").fadeOut();
          $("#product-form-variant").append('<option value="-1">Selecciona Variante...</option>');
          elements.variants.forEach( function(valor, indice, array){
-          $("#product-form-variant").append('<option value="'+valor.name+'">'+valor.name+'</option>');
+          $("#product-form-variant").append('<option value="'+valor.id+'">'+valor.name+'</option>');
         });
       });
   }

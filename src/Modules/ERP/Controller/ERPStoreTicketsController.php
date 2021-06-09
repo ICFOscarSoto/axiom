@@ -334,7 +334,7 @@ class ERPStoreTicketsController extends Controller
 							$storeticket->setProduct($product);
 
 							if(isset($fields->productvariant) AND $fields->productvariant!="-1"){
-									$variant=$variantsRepository->findOneBy(["name"=>$fields->productvariant]);
+									$variant=$variantsRepository->findOneBy(["id"=>$fields->productvariant]);
 									$storeticket->setVariant($variant);
 							 }
 
