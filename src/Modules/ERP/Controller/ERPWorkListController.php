@@ -185,19 +185,19 @@ class ERPWorkListController extends Controller
 	        $this->getDoctrine()->getManager()->persist($line);
 	        $this->getDoctrine()->getManager()->flush();
 					$linenumIds[]=["linenum"=>$value->linenum, "id"=>$line->getId()];
-					$product=[];
-					$product["id"]=$line->getId();
-					$product["id_product"]=$product->getId();
-					$product["code"]=$product->getCode();
-					$product["name"]=$product->getName();
-					$product["variant_id"]=$variant?$variant->getId():0;
-					$product["variant_name"]=$variant?$variant->getVariantname()->getName():"";
-					$product["variant_value"]=$variant?$variant->getName():"";
-					$product["variant_active"]=$variant?$variant->getActive():true;
-					$product["stock"]=$line->getQuantity();
-					$product["provider"]=$product->getSupplier()?$product->getSupplier()->getName():"";
-					$product["eans"]=[];
-					$products[]=$product;
+					$product_item=[];
+					$product_item["id"]=$line->getId();
+					$product_item["id_product"]=$product->getId();
+					$product_item["code"]=$product->getCode();
+					$product_item["name"]=$product->getName();
+					$product_item["variant_id"]=$variant?$variant->getId():0;
+					$product_item["variant_name"]=$variant?$variant->getVariantname()->getName():"";
+					$product_item["variant_value"]=$variant?$variant->getName():"";
+					$product_item["variant_active"]=$variant?$variant->getActive():true;
+					$product_item["stock"]=$line->getQuantity();
+					$product_item["provider"]=$product->getSupplier()?$product->getSupplier()->getName():"";
+					$product_item["eans"]=[];
+					$products[]=$product_item;
 			}
     }
     return new JsonResponse(["result"=>1,"data"=>["id"=>$this->getUser()->getId(), "lines"=>$linenumIds],"products"=>$products]);
