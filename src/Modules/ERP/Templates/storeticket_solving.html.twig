@@ -1,3 +1,4 @@
+{% set params = app.request.attributes.get('_route_params')|merge(app.request.query.all()) %}
 {% block header %}
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta charset="utf-8">
