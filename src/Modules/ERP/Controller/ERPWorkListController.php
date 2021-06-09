@@ -145,7 +145,7 @@ class ERPWorkListController extends Controller
 			if($value->code!=null){
 	      $product=$productsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "code"=>$value->code, "deleted"=>0]);
 				if(isset($value->variant) AND $value->variant!="-1"){
-					$variant=$variantsRepository->findOneBy(["name"=>$value->variant]);
+					$variant=$variantsRepository->findOneBy(["id"=>$value->variant]);
 					$line=$worklistRepository->findOneBy(["product"=>$product,"user"=>$this->getUser(),"variant"=>$variant,"deleted"=>0]);
 				}
 				else{
@@ -167,7 +167,7 @@ class ERPWorkListController extends Controller
 	        $line->setQuantity(floatval($value->quantity));
 				//	dump($value->variant);
 					if(isset($value->variant) AND $value->variant!="-1"){
-						 $variant=$variantsRepository->findOneBy(["name"=>$value->variant]);
+						 $variant=$variantsRepository->findOneBy(["id"=>$value->variant]);
 						  $line->setVariant($variant);
 					 }
 					 if(isset($value->store)){
