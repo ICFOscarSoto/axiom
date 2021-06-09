@@ -290,11 +290,12 @@ public function getWorkListProducts(Request $request){
 	$Storesrepository=$this->getDoctrine()->getRepository(ERPStores::class);
 	$worklistRepository=$this->getDoctrine()->getRepository(ERPWorkList::class);
 	$obj=null;
-	$variant=null;
+
 
 	$products=$worklistRepository->findBy(["user"=>$this->getUser(),"deleted"=>0]);
 	$array_products=[];
 	foreach($products as $item){
+		$variant=null;
 		$obj=$item->getProduct();
 		if($item->getVariant()!==null){
 			$variant=$Variantsrepository->findOneBy(["variantvalue"=>$item->getVariant(), "product"=>$item->getProduct()]);
