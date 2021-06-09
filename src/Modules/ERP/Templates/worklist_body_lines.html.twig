@@ -7,9 +7,9 @@
     <div class="row no-gutters worklist-products-header">
       <div class="col-sm-2 d-none d-sm-block" style="font-weight:bold;font-size:13px;padding: 7px 2px;">Cod. Producto</div>
       <div class="col-sm-3 d-none d-sm-block" style="font-weight:bold;font-size:13px;padding: 7px 2px;">Descripción</div>
-      <div class="col-sm-1 d-none d-sm-block" style="font-weight:bold;font-size:13px;padding: 7px 2px;">Variante</div>
+      <div class="col-sm-2 d-none d-sm-block" style="font-weight:bold;font-size:13px;padding: 7px 2px;">Variante</div>
       <div class="col-sm-2 d-none d-sm-block" style="font-weight:bold;font-size:13px;padding: 7px 2px;">Almacén</div>
-      <div class="col-sm-1 d-none d-sm-block" style="font-weight:bold;font-size:13px;padding: 7px 2px;">Ubicación</div>
+      <div class="col-sm-2 d-none d-sm-block" style="font-weight:bold;font-size:13px;padding: 7px 2px;">Ubicación</div>
       <div class="col-sm-1 d-none d-sm-block" style="font-weight:bold;font-size:13px;padding: 7px 2px;">Cantidad</div>
     </div>
     {% for line in  worklistLines %}
@@ -36,13 +36,13 @@
         <div class="col-10 col-sm-3"> <div class="form-group" style="margin-bottom: 0px;"> <input type="text" readonly id="product-form-name-{{ line.linenum }}" class="form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Nombre" value="{{ line.name }}"> </div> </div>
         <div class="col-2 d-block d-sm-none" style="top: 8px;">Variantes</div>
         {% if line.variant!=null %}
-        <div class="col-3 col-sm-1">
+        <div class="col-3 col-sm-2">
           <div class="form-group" style="margin-bottom: 0px;">
             <input type="text" readonly id="product-form-variants-{{ line.linenum }}" class="form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Nombre" value="{{ line.variant.name }}">
           </div>
         </div>
         {% else %}
-        <div class="col-3 col-sm-1">
+        <div class="col-3 col-sm-2">
       <input class="form-control" id="product-form-not-grouped-{{ line.linenum }}" type=text disabled style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Sin variantes">
        </div>
         {% endif %}
@@ -62,13 +62,13 @@
         </div>
         <div class="col-2 d-block d-sm-none" style="top: 8px;">Ubicaciones</div>
         {% if line.location!=null %}
-        <div class="col-3 col-sm-1">
+        <div class="col-3 col-sm-2">
           <div class="form-group" style="margin-bottom: 0px;">
             <input type="text" readonly id="product-form-locations-{{ line.location.id }}" class="form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Ubicación" value="{{ line.location.name }}">
           </div>
         </div>
         {% else %}
-        <div class="col-3 col-sm-1">
+        <div class="col-3 col-sm-2">
               <select class="form-control select2" name="product-form-locations-{{ line.linenum }}" id="product-form-locations-{{ line.linenum }}">
               </select>
        </div>

@@ -141,6 +141,7 @@ class ERPWorkListController extends Controller
 		$linenumIds=[];
 		$products=[];
     foreach ($fields->lines as $key => $value) {
+			$variant=null;
 			if($value->code!=null){
 	      $product=$productsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "code"=>$value->code, "deleted"=>0]);
 				if(isset($value->variant) AND $value->variant!="-1"){
