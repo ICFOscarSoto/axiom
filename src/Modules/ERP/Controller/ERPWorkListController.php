@@ -145,10 +145,10 @@ class ERPWorkListController extends Controller
 	      $product=$productsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "code"=>$value->code, "deleted"=>0]);
 				if(isset($value->variant) AND $value->variant!="-1"){
 					$variant=$variantsRepository->findOneBy(["name"=>$value->variant]);
-					$line=$worklistRepository->findOneBy(["product"=>$product,"user"=>$this->getUser(),"variant"=>$variant]);
+					$line=$worklistRepository->findOneBy(["product"=>$product,"user"=>$this->getUser(),"variant"=>$variant,"deleted"=>0]);
 				}
 				else{
-	      	$line=$worklistRepository->findOneBy(["product"=>$product,"user"=>$this->getUser()]);
+	      	$line=$worklistRepository->findOneBy(["product"=>$product,"user"=>$this->getUser(),"deleted"=>0]);
 				}
 
 	      //if(!$product) continue;
