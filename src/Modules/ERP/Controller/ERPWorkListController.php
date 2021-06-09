@@ -197,6 +197,7 @@ class ERPWorkListController extends Controller
 					$product_item["stock"]=$line->getQuantity();
 					$product_item["provider"]=$product->getSupplier()?$product->getSupplier()->getName():"";
 					$product_item["eans"]=[];
+					$product_item["active"]=$product->getActive();
 					$products[]=$product_item;
 			}
     }
