@@ -108,6 +108,7 @@ class ERPLocationsReports{
 
 
       $i=1;
+      $this->pdf->AddPage();
       $this->pdf->SetFillColor(255, 248, 53);
       $this->pdf->Rect(0, 0, 210, 148, 'DF');
       $this->pdf->Rect(0, 148, 210, 149, 'DF');
