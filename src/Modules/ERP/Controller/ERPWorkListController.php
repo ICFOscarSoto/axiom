@@ -127,6 +127,7 @@ class ERPWorkListController extends Controller
     $worklistRepository=$this->getDoctrine()->getRepository(ERPWorkList::class);
     $productsRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
 		$variantsRepository=$this->getDoctrine()->getRepository(ERPVariantsValues::class);
+		$productsVariantsRepository=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
 		$storesRepository=$this->getDoctrine()->getRepository(ERPStores::class);
 		$storeLocationsRepository=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
 
@@ -147,8 +148,11 @@ class ERPWorkListController extends Controller
 				if(isset($value->variant) AND $value->variant!="-1"){
 					$variant=$variantsRepository->findOneBy(["id"=>$value->variant,"deleted"=>0]);
 					$line=$worklistRepository->findOneBy(["product"=>$product,"user"=>$this->getUser(),"variant"=>$variant,"deleted"=>0]);
-				}
-				else{
+				}elseif(isset($value->variant_id) AND $value->variant_id!="-1"){
+					$product_variant=$productsVariantsRepository->findOneBy(["id"=>$value->variant_id,"deleted"=>0]);
+					$variant=$product_variant->getVariantvalue();
+					$line=$worklistRepository->findOneBy(["product"=>$product,"user"=>$this->getUser(),"variant"=>$variant,"deleted"=>0]);
+				}else{
 	      	$line=$worklistRepository->findOneBy(["product"=>$product,"user"=>$this->getUser(),"deleted"=>0]);
 				}
 
@@ -169,7 +173,11 @@ class ERPWorkListController extends Controller
 					if(isset($value->variant) AND $value->variant!="-1"){
 						 $variant=$variantsRepository->findOneBy(["id"=>$value->variant,"deleted"=>0]);
 						  $line->setVariant($variant);
-					 }
+					 }elseif(isset($value->variant_id) AND $value->variant_id!="-1"){
+	 					$product_variant=$productsVariantsRepository->findOneBy(["id"=>$value->variant_id,"deleted"=>0]);
+	 					$variant=$product_variant->getVariantvalue();
+	 					$line->setVariant($variant);
+					}
 					 if(isset($value->store)){
 							$store=$storesRepository->findOneBy(["id"=>$value->store]);
 							 $line->setStore($store);
