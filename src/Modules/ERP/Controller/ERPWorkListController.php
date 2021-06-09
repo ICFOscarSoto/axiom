@@ -134,55 +134,56 @@ class ERPWorkListController extends Controller
     $worklist=$worklistRepository->findAll(["user"=>$this->getUser()->getCompany(),"deleted"=>0]);
 
     //Get content of the json reques
-    $fields=json_decode($request->getContent());
+		$data=$request->request->get('data', null); //Try getting post data (for PDAs)
+		if(!$data) $data=$request->getContent();
+		$fields=json_decode($data); //if no post data var, get content of header directly
+
 		$linenumIds=[];
     foreach ($fields->lines as $key => $value) {
-			if($value->code!=null)
-			{
-      $product=$productsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "code"=>$value->code, "deleted"=>0]);
-
-			if(isset($value->variant) AND $value->variant!="-1"){
-				$variant=$variantsRepository->findOneBy(["name"=>$value->variant]);
-				$line=$worklistRepository->findOneBy(["product"=>$product,"user"=>$this->getUser(),"variant"=>$variant]);
-			}
-			else{
-      	$line=$worklistRepository->findOneBy(["product"=>$product,"user"=>$this->getUser()]);
-			}
-
-      //if(!$product) continue;
-      if(!$line ){
-        $line=new ERPWorkList();
-        $line->setUser($this->getUser());
-        $line->setActive(1);
-        $line->setDeleted(0);
-        $line->setDateadd(new \DateTime());
-      }
-		  	$line->setLinenum($value->linenum);
-        $line->setProduct($product);
-        $line->setCode($value->code);
-        $line->setName($value->name);
-        $line->setQuantity(floatval($value->quantity));
-			//	dump($value->variant);
+			if($value->code!=null){
+	      $product=$productsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "code"=>$value->code, "deleted"=>0]);
 				if(isset($value->variant) AND $value->variant!="-1"){
-					 $variant=$variantsRepository->findOneBy(["name"=>$value->variant]);
-					  $line->setVariant($variant);
-				 }
-				 if(isset($value->store)){
-						$store=$storesRepository->findOneBy(["id"=>$value->store]);
-						 $line->setStore($store);
-					}
-				if(isset($value->location)){
-						 $location=$storeLocationsRepository->findOneBy(["id"=>$value->location]);
-							$line->setLocation($location);
-					}
-        if($value->deleted){
-          $line->setActive(0);
-          $line->setDeleted(1);
-        }
-        $line->setDateupd(new \DateTime());
-        $this->getDoctrine()->getManager()->persist($line);
-        $this->getDoctrine()->getManager()->flush();
-				$linenumIds[]=["linenum"=>$value->linenum, "id"=>$line->getId()];
+					$variant=$variantsRepository->findOneBy(["name"=>$value->variant]);
+					$line=$worklistRepository->findOneBy(["product"=>$product,"user"=>$this->getUser(),"variant"=>$variant]);
+				}
+				else{
+	      	$line=$worklistRepository->findOneBy(["product"=>$product,"user"=>$this->getUser()]);
+				}
+
+	      //if(!$product) continue;
+	      if(!$line ){
+	        $line=new ERPWorkList();
+	        $line->setUser($this->getUser());
+	        $line->setActive(1);
+	        $line->setDeleted(0);
+	        $line->setDateadd(new \DateTime());
+	      }
+			  	$line->setLinenum($value->linenum);
+	        $line->setProduct($product);
+	        $line->setCode($value->code);
+	        $line->setName($value->name);
+	        $line->setQuantity(floatval($value->quantity));
+				//	dump($value->variant);
+					if(isset($value->variant) AND $value->variant!="-1"){
+						 $variant=$variantsRepository->findOneBy(["name"=>$value->variant]);
+						  $line->setVariant($variant);
+					 }
+					 if(isset($value->store)){
+							$store=$storesRepository->findOneBy(["id"=>$value->store]);
+							 $line->setStore($store);
+						}
+					if(isset($value->location)){
+							 $location=$storeLocationsRepository->findOneBy(["id"=>$value->location]);
+								$line->setLocation($location);
+						}
+	        if($value->deleted){
+	          $line->setActive(0);
+	          $line->setDeleted(1);
+	        }
+	        $line->setDateupd(new \DateTime());
+	        $this->getDoctrine()->getManager()->persist($line);
+	        $this->getDoctrine()->getManager()->flush();
+					$linenumIds[]=["linenum"=>$value->linenum, "id"=>$line->getId()];
 			}
     }
     return new JsonResponse(["result"=>1,"data"=>["id"=>$this->getUser()->getId(), "lines"=>$linenumIds]]);
