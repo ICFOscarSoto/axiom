@@ -641,7 +641,7 @@ class ERPStoreTicketsController extends Controller
 	 /**
 	 * @Route("/{_locale}/ERP/storetickets/solved/{id}", name="storeticketsolved")
 	 */
-	 public function storeticketsolved($id){
+	 public function storeticketsolved($id, RouterInterface $router, Request $request){
 		  $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 			if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
 			$storeticketsRepository=$this->getDoctrine()->getRepository(ERPStoreTickets::class);
