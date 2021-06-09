@@ -724,7 +724,7 @@ class ERPStoreTicketsController extends Controller
 	*/
 	public function storeticketchecksolved($id){
 
-		$this->denyAccessUnlessGranted('ROLE_GLOBAL');
+		//$this->denyAccessUnlessGranted('ROLE_GLOBAL');
 		$storeticketsRepository=$this->getDoctrine()->getRepository(ERPStoreTickets::class);
 		$storesRepository=$this->getDoctrine()->getRepository(ERPStores::class);
 		$storeticket=null;

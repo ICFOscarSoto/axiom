@@ -1,4 +1,3 @@
-{% set params = app.request.attributes.get('_route_params')|merge(app.request.query.all()) %}
 {% block header %}
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta charset="utf-8">
@@ -6,9 +5,10 @@
 	<meta name="description" content="Axiom Business Management" />
 	<meta name="author" content="" />
 	<link rel="icon" href="images/favicon.ico">
+	{{ include('@Globale/header.html.twig') }}
 	<!-- Imported styles on this page -->
 	<link rel="stylesheet" href="{{ url('index') }}css/bootstrap-grid.css">
-		<link rel="stylesheet" href="{{ url('index') }}css/timeline.css">
+	<link rel="stylesheet" href="{{ url('index') }}css/timeline.css">
 	<link rel="stylesheet" href="{{ url('index') }}/js/jvectormap/jquery-jvectormap-1.2.2.css">
 	<link rel="stylesheet" href="{{ url('index') }}/js/rickshaw/rickshaw.min.css">
 {% endblock %}
@@ -68,7 +68,6 @@
 <script src="{{ url('index') }}js/jodit/jodit.min.js"></script>
 <script src="{{ url('index') }}js/jquery.nestable.js"></script>
 {{ include('@Globale/bottom.html.twig') }}
-
 </body>
 
 
@@ -80,6 +79,7 @@ function checkState(){
 	code=$("#storeticketcode").val();
 	product=$("#storeticketproduct").val();
 	if((++load_wait)==1) $("#load-spinner").fadeIn();
+
 	 $.ajax({
 			type: "GET",
 			dataType: "json",
@@ -87,12 +87,9 @@ function checkState(){
 		}).done(function(data, textStatus, jqXHR) {
 			if((--load_wait)==0) $("#load-spinner").fadeOut();
 			if(data.result=="1") {
-				alert("esta incidencia ya está solucionada");
 				window.location.href="/es/ERP/storetickets/form/"+id;
 			}
-
 			else{
-
 				$.confirm({
 						theme: 'bootstrap',
 						title: '',
@@ -113,24 +110,20 @@ function checkState(){
 												});
 											}
 
-											},
-							 cancel: { text: 'No', btnClass: 'btn-red', action: function(){
-
+							},
+							cancel: { text: 'No', btnClass: 'btn-red', action: function(){
 										 window.location.href="/";
-											}
-						 }
-					 }
+									 		}
+						 				}
+					 		}
 				});
-
 			}
-
 	});
 
 }
 
 
 $(document).ready(function() {
-
 checkState();
 
 });
