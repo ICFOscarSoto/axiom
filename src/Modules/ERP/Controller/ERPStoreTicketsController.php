@@ -641,23 +641,13 @@ class ERPStoreTicketsController extends Controller
 	 /**
 	 * @Route("/{_locale}/ERP/storetickets/solved/{id}", name="storeticketsolved")
 	 */
-	 public function storeticketsolved($id, RouterInterface $router, Request $request){
+	 public function storeticketsolved($id){
 		  $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-			if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
 			$storeticketsRepository=$this->getDoctrine()->getRepository(ERPStoreTickets::class);
 			$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
 			$configrepository=$this->getDoctrine()->getRepository(ERPConfiguration::class);
 			$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
 			$config=$configrepository->findOneBy(["company"=>$this->getUser()->getCompany()]);
-			$locale = $request->getLocale();
-			$this->router = $router;
-
-			if($request->query->get('code',null)){
-				$obj = $documentRepository->findOneBy(['code'=>$request->query->get('code',null), 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
-				if($obj) return $this->redirectToRoute($request->get('_route'), ['id' => $obj->getId()]);
-				else return $this->redirectToRoute($request->get('_route'), ['id' => 0]);
-			}
-
 			$storeticket=$storeticketsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$id, "active"=>1,"deleted"=>0]);
 			$code="";
 			$code=$storeticket->getCode();
