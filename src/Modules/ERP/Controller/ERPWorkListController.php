@@ -139,15 +139,16 @@ class ERPWorkListController extends Controller
 		$fields=json_decode($data); //if no post data var, get content of header directly
 
 		$linenumIds=[];
+		$products=[];
     foreach ($fields->lines as $key => $value) {
 			if($value->code!=null){
 	      $product=$productsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "code"=>$value->code, "deleted"=>0]);
 				if(isset($value->variant) AND $value->variant!="-1"){
 					$variant=$variantsRepository->findOneBy(["name"=>$value->variant]);
-					$line=$worklistRepository->findOneBy(["product"=>$product,"user"=>$this->getUser(),"variant"=>$variant]);
+					$line=$worklistRepository->findOneBy(["product"=>$product,"user"=>$this->getUser(),"variant"=>$variant,"deleted"=>0]);
 				}
 				else{
-	      	$line=$worklistRepository->findOneBy(["product"=>$product,"user"=>$this->getUser()]);
+	      	$line=$worklistRepository->findOneBy(["product"=>$product,"user"=>$this->getUser(),"deleted"=>0]);
 				}
 
 	      //if(!$product) continue;
@@ -184,9 +185,23 @@ class ERPWorkListController extends Controller
 	        $this->getDoctrine()->getManager()->persist($line);
 	        $this->getDoctrine()->getManager()->flush();
 					$linenumIds[]=["linenum"=>$value->linenum, "id"=>$line->getId()];
+					$product_item=[];
+					$product_item["id"]=$line->getId();
+					$product_item["id_product"]=$product->getId();
+					$product_item["code"]=$product->getCode();
+					$product_item["name"]=$product->getName();
+					$product_item["variant_id"]=$variant?$variant->getId():0;
+					$product_item["variant_name"]=$variant?$variant->getVariantname()->getName():"";
+					$product_item["variant_value"]=$variant?$variant->getName():"";
+					$product_item["variant_active"]=$variant?$variant->getActive():true;
+					$product_item["stock"]=$line->getQuantity();
+					$product_item["provider"]=$product->getSupplier()?$product->getSupplier()->getName():"";
+					$product_item["eans"]=[];
+					$product_item["active"]=$product->getActive();
+					$products[]=$product_item;
 			}
     }
-    return new JsonResponse(["result"=>1,"data"=>["id"=>$this->getUser()->getId(), "lines"=>$linenumIds]]);
+    return new JsonResponse(["result"=>1,"data"=>["id"=>$this->getUser()->getId(), "lines"=>$linenumIds],"products"=>$products]);
     //return new JsonResponse(["result"=>1]);
   }
 
