@@ -139,6 +139,7 @@ class ERPWorkListController extends Controller
 		$fields=json_decode($data); //if no post data var, get content of header directly
 
 		$linenumIds=[];
+		$products=[];
     foreach ($fields->lines as $key => $value) {
 			if($value->code!=null){
 	      $product=$productsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "code"=>$value->code, "deleted"=>0]);
@@ -184,9 +185,10 @@ class ERPWorkListController extends Controller
 	        $this->getDoctrine()->getManager()->persist($line);
 	        $this->getDoctrine()->getManager()->flush();
 					$linenumIds[]=["linenum"=>$value->linenum, "id"=>$line->getId()];
+					$products[]=$line;
 			}
     }
-    return new JsonResponse(["result"=>1,"data"=>["id"=>$this->getUser()->getId(), "lines"=>$linenumIds]]);
+    return new JsonResponse(["result"=>1,"data"=>["id"=>$this->getUser()->getId(), "lines"=>$linenumIds],"products"=>$products]);
     //return new JsonResponse(["result"=>1]);
   }
 
