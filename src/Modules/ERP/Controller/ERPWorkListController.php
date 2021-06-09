@@ -185,7 +185,19 @@ class ERPWorkListController extends Controller
 	        $this->getDoctrine()->getManager()->persist($line);
 	        $this->getDoctrine()->getManager()->flush();
 					$linenumIds[]=["linenum"=>$value->linenum, "id"=>$line->getId()];
-					$products[]=$line;
+					$product=[];
+					$product["id"]=$line->getId();
+					$product["id_product"]=$product->getId();
+					$product["code"]=$product->getCode();
+					$product["name"]=$product->getName();
+					$product["variant_id"]=$variant?$variant->getId():0;
+					$product["variant_name"]=$variant?$variant->getVariantname()->getName():"";
+					$product["variant_value"]=$variant?$variant->getName():"";
+					$product["variant_active"]=$variant?$variant->getActive():true;
+					$product["stock"]=$line->getQuantity();
+					$product["provider"]=$product->getSupplier()?$product->getSupplier()->getName():"";
+					$product["eans"]=[];
+					$products[]=$product;
 			}
     }
     return new JsonResponse(["result"=>1,"data"=>["id"=>$this->getUser()->getId(), "lines"=>$linenumIds],"products"=>$products]);
