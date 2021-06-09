@@ -643,6 +643,7 @@ class ERPStoreTicketsController extends Controller
 	 */
 	 public function storeticketsolved($id){
 		  $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
 			$storeticketsRepository=$this->getDoctrine()->getRepository(ERPStoreTickets::class);
 			$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
 			$configrepository=$this->getDoctrine()->getRepository(ERPConfiguration::class);
