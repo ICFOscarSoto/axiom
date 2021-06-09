@@ -135,7 +135,8 @@ class ERPWorkListController extends Controller
 
     //Get content of the json reques
 		$data=$request->request->get('data', null); //Try getting post data (for PDAs)
-		if(!$data) $fields=json_decode($request->getContent()); //if no post data var, get content of header directly
+		if(!$data) $data=$request->getContent();
+		$fields=json_decode($data); //if no post data var, get content of header directly
 
 		$linenumIds=[];
     foreach ($fields->lines as $key => $value) {
