@@ -297,7 +297,7 @@ public function getWorkListProducts(Request $request){
 	foreach($products as $item){
 		$obj=$item->getProduct();
 
-		$variant=$Variantsrepository->findOneBy(["variant_value"=>$item->getVariant()->getId(), "product"=>$item, "deleted"=>0];
+		$variant=$Variantsrepository->findOneBy(["variant_value"=>$item->getVariant()->getId(), "product"=>$item, "deleted"=>0]);
 		//$stocks=$Stocksrepository->findBy(["product"=>$obj, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
 		$eans=$EAN13repository->findBy(["product"=>$obj, "productvariant"=>$variant?$variant:null, "active"=>1, "deleted"=>0]);
 		$result_prod["id"]=$item->getId();
