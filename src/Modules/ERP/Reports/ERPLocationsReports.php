@@ -95,7 +95,7 @@ class ERPLocationsReports{
       }
     }
     if(!isset($params["type"]) || $params["type"]==2){
-      $this->pdf  = new \FPDF('L','mm','A4');
+      $this->pdf  = new \FPDF('P','mm','A4');
       $this->pdf->AliasNbPages();
       $this->pdf->SetAutoPageBreak(false);
       $this->pdf->SetFont('Arial','',12);
