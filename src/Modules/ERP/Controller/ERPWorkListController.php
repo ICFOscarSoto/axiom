@@ -143,6 +143,7 @@ class ERPWorkListController extends Controller
 		$products=[];
     foreach ($fields->lines as $key => $value) {
 			$variant=null;
+			$product_variant=null;
 			if($value->code!=null){
 	      $product=$productsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "code"=>$value->code, "deleted"=>0]);
 				if(isset($value->variant) AND $value->variant!="-1"){
@@ -199,7 +200,7 @@ class ERPWorkListController extends Controller
 					$product_item["id_product"]=$product->getId();
 					$product_item["code"]=$product->getCode();
 					$product_item["name"]=$product->getName();
-					$product_item["variant_id"]=$variant?$variant->getId():0;
+					$product_item["variant_id"]=$product_variant?$product_variant->getId():($variant?$variant->getId():0);
 					$product_item["variant_name"]=$variant?$variant->getVariantname()->getName():"";
 					$product_item["variant_value"]=$variant?$variant->getName():"";
 					$product_item["variant_active"]=$variant?$variant->getActive():true;
