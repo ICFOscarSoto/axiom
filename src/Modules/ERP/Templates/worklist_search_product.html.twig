@@ -67,7 +67,7 @@ function getStores(id){
 }
 
 
-function isGrouped(code){
+function checkGrouped(id,code){
     if((++load_wait)==1) $("#load-spinner").fadeIn();
     $.ajax({
        type: "GET",
@@ -75,8 +75,10 @@ function isGrouped(code){
        url: "/api/ERP/product/"+code+"/grouped",
      }).done(function(data, textStatus, jqXHR) {
        if((--load_wait)==0) $("#load-spinner").fadeOut();
-       if(data.result)  return true;
-      else return false;
+       if(data.result!="1") {
+         $("#product-form-variants-"+id).css("display","none");
+         $("#product-form-not-grouped-"+id).css("display","block");
+       }
 
    });
 
@@ -154,9 +156,11 @@ $(document).ready(function() {
     $("#product-form-name-"+$("#product-search-modal-form").attr("attr-id")).val($(this).parent().parent().parent().children('td').eq(2).text());
     $("#product-form-name-"+$("#product-search-modal-form").attr("attr-id")).trigger('change');
     $("#product-search-modal-form").modal('toggle');
+
     getStores($("#product-search-modal-form").attr("attr-id"));
     var id=$("#product-search-modal-form").attr("attr-id");
     var code=$(this).parent().parent().parent().children('td').eq(1).text();
+    checkGrouped(id,code);
     getVariants(id,code);
 
   //  checkList();

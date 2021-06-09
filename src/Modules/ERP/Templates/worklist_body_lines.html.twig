@@ -43,8 +43,7 @@
         </div>
         {% else %}
         <div class="col-3 col-sm-1">
-              <select class="form-control select2" name="product-form-variants-{{ line.linenum }}" id="product-form-variants-{{ line.linenum }}">
-              </select>
+      <input class="form-control" id="product-form-not-grouped-{{ line.linenum }}" type=text disabled style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Sin variantes">
        </div>
         {% endif %}
         <div class="col-2 d-block d-sm-none" style="top: 8px;">Almacén</div>
