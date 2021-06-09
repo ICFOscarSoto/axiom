@@ -79,6 +79,9 @@ function checkGrouped(id,code){
          $("#product-form-variants-"+id).css("display","none");
          $("#product-form-not-grouped-"+id).css("display","block");
        }
+       else{
+           getVariants(id,code);
+       }
 
    });
 
@@ -106,14 +109,12 @@ function productSearch(id, val, fields, searchFields){
             {
               jQuery.each( data.data.locations, function( i, val ) {
                 $("#product-form-location-"+id).append(new Option(val.name, val.id));
-              //  console.log(val.name);
               });
             }
 
            postProductSearch(id);
          } else {
            clearFields(fields);
-           //toastr.warning("No se encontro el producto introducido", "Confirmación", confirmation);
          }
        }
      });
@@ -121,23 +122,12 @@ function productSearch(id, val, fields, searchFields){
 }
 
 $(document).ready(function() {
+
   {# PRODUCT SEARCH #}
   $('body').on('click', "[id^='product-search-button-']", function(e) {
     $("#product-search-modal-form").attr("attr-id",$(this).attr("attr-id"));
     $("#product-search-modal-form").modal('show');
   });
-/*
-  $('body').on('keypress', "[id^='product-form-code-']", function(e) {
-      var code = e.keyCode || e.which;
-       if(code == 13) {
-         productSearch($(this).attr("attr-id"), $(this).val(), productFields, productSearchfields);
-       }
-    });
-
-  $('body').on('change', "[id^='product-form-code-']", function(e) {
-       productSearch($(this).attr("attr-id"), $(this).val(), productFields, productSearchfields);
-  });
-  */
 
   $('body').on('change', "[id^='product-form-stores-']", function(e) {
     var id=$(this).attr("attr-id");
@@ -156,12 +146,10 @@ $(document).ready(function() {
     $("#product-form-name-"+$("#product-search-modal-form").attr("attr-id")).val($(this).parent().parent().parent().children('td').eq(2).text());
     $("#product-form-name-"+$("#product-search-modal-form").attr("attr-id")).trigger('change');
     $("#product-search-modal-form").modal('toggle');
-
-    getStores($("#product-search-modal-form").attr("attr-id"));
     var id=$("#product-search-modal-form").attr("attr-id");
     var code=$(this).parent().parent().parent().children('td').eq(1).text();
     checkGrouped(id,code);
-    getVariants(id,code);
+    getStores($("#product-search-modal-form").attr("attr-id"));
 
   //  checkList();
   });
