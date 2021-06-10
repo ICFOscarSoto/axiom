@@ -64,7 +64,7 @@ class InventoryRemember extends ContainerAwareCommand
             //Send notification to inventory manager.
             $agent=$usersRepository->findOneBy(["id"=>$store["inventorymanager_id"],"active"=>1,"deleted"=>0]);
             $channel_agent=$agent->getDiscordchannel();
-            dump("El agente es ".$agent->getName());
+            dump("El agente es ".$agent->getName()." ".$agent->getLastname());
             dump("Su canal de discord es ".$channel_agent);
 
             //Check if the user has a worker associated
