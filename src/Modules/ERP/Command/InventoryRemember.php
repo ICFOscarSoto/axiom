@@ -43,12 +43,10 @@ class InventoryRemember extends ContainerAwareCommand
       //  $date= new \DateTime();
 
         $stores=$storesRepository->getInventoryStores();
-        dump($stores);
         foreach($stores as $store)
         {
-
+            dump("revisando si hay productos a inventariar en ".$store->getCode());
             $tickets=$storeTicketsRepository->getTicketsforInventory($store["id"]);
-            dump($tickets);
             $inventory=null;
             if(!empty($tickets))
             {
@@ -62,8 +60,9 @@ class InventoryRemember extends ContainerAwareCommand
 
             if(!empty($inventory)){
 
+            dump("Hay productos a inventariar...";)
             //Send notification to inventory manager.
-            $agent=$usersRepository->findOneBy(["id"=>$store["inventorymanager_id"],"active"=>1,"deleted"=>0]);
+            $agent=$usersRepository->findOneBy(["id"=>$store->getInventorymanager()->getId(),"active"=>1,"deleted"=>0]);
             $channel_agent=$agent->getDiscordchannel();
 
             //Check if the user has a worker associated
