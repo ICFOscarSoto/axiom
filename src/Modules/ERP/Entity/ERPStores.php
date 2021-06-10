@@ -96,6 +96,11 @@ class ERPStores
      */
     private $inventorymanager;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $managed;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -265,6 +270,18 @@ class ERPStores
     public function setInventorymanager(?GlobaleUsers $inventorymanager): self
     {
         $this->inventorymanager = $inventorymanager;
+
+        return $this;
+    }
+
+    public function getManaged(): ?bool
+    {
+        return $this->managed;
+    }
+
+    public function setManaged(?bool $managed): self
+    {
+        $this->managed = $managed;
 
         return $this;
     }

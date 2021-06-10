@@ -661,9 +661,10 @@ public function importStocks(InputInterface $input, OutputInterface $output) {
               $output->writeln('Vamos a actualizar la linea '.$old_stocks[0]["id"].' del producto '.$product->getId().' en el almacen '.$stock["almacen"]);
               if ((int)$stock["stock"]<0) $quantity=0;
               else $quantity=(int)$stock["stock"];
-              $stock_old->setQuantity(!$quantity?0:$quantity);
-              $stock_old->setDateupd(new \Datetime());
-              $this->doctrine->getManager()->merge($stock_old);
+              if ($stock_old->getStorelocation()->getStore()->getManaged()!=1) {
+                $stock_old->setQuantity(!$quantity?0:$quantity);
+                $stock_old->setDateupd(new \Datetime());
+                $this->doctrine->getManager()->merge($stock_old);}
             }
             else {
               $location=$repositoryStoreLocations->findOneBy(["name"=>$stock["almacen"]]);
@@ -704,6 +705,90 @@ public function importStocks(InputInterface $input, OutputInterface $output) {
     fclose($fp);
   }
 
+
+    /* Solo se añaden las lineas de traspasos realizadas en Navision en los almacenes gestionados*/
+public function updateStocksStoresManaged(InputInterface $input, OutputInterface $output){
+  //------   Create Lock Mutex    ------
+  //$fp = fopen('/tmp/axiom-navisionGetProducts-importIncrements.lock', 'c');
+  if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+      $fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetProducts-updateStocksStoresManaged.lock.lock', 'c');
+  } else {
+      $fp = fopen('/tmp/axiom-navisionGetProducts-updateStocksStoresManaged.lock.lock', 'c');
+  }
+  if (!flock($fp, LOCK_EX | LOCK_NB)) {
+    $output->writeln('* Fallo al iniciar la sincronizacion de almacenes gestionados: El proceso ya esta en ejecución.');
+    exit;
+  }
+  //------   Critical Section START   ------
+  $navisionSyncRepository=$this->doctrine->getRepository(NavisionSync::class);
+  $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"storesManaged"]);
+  if ($navisionSync==null) {
+    $navisionSync=new NavisionSync();
+    $navisionSync->setMaxtimestamp(0);
+  }
+  $datetime=new \DateTime();
+  $output->writeln('* Sincronizando almacenes gestionados....');
+  $repositoryProducts=$this->doctrine->getRepository(ERPProducts::class);
+  $repositoryVariantsValues=$this->doctrine->getRepository(ERPVariantsValues::class);
+  $repositoryProductsVariants=$this->doctrine->getRepository(ERPProductsVariants::class);
+  $repositoryStocks=$this->doctrine->getRepository(ERPStocks::class);
+  $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getStocksManaged.php?from='.$navisionSync->getMaxtimestamp());
+  $objects=json_decode($json, true);
+  $objects=$objects[0];
+  if ($objects){
+    $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
+    $company=$repositoryCompanies->find(2);
+    foreach ($objects["class"] as $stock){}
+      $product=$repositoryProducts->findOneBy(["code"=>$stock["code"]]);
+      $namenameVariantValue=$this->variantColor($stock["variant"]);
+      $variantvalue=$repositoryVariantsValues->findOneBy(["name"=>$namenameVariantValue]);
+
+      if($product) {
+            $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product->getId(),"variantvalue"=>$variantvalue]);
+            if($productvariant!=null) {
+              $old_stocks=$repositoryStocks->stockVariantUpdate($productvariant->getId(), $stock["almacen"]);
+              $output->writeln('El producto '.$product->getId().' tiene la variante '.$stock["variant"]);
+            }
+            else $old_stocks=$repositoryStocks->stockUpdate($product->getId(), $stock["almacen"]);
+
+            if($old_stocks[0]["id"]!=null) {
+              $stock_old=$repositoryStocks->findOneBy(["id"=>$old_stocks[0]["id"], "deleted"=>0]);
+              $output->writeln('Vamos a actualizar la linea '.$old_stocks[0]["id"].' del producto '.$product->getId().' en el almacen '.$stock["almacen"]);
+              if ($stock_old->getStorelocation()->getStore()->getManaged()==1) {
+              $stock_old->setQuantity($stock_old->getQuantity()+((int)$stock["stock"]));
+              $stock_old->setDateupd(new \Datetime());
+              $this->doctrine->getManager()->merge($stock_old);}
+            }
+            else {
+              $location=$repositoryStoreLocations->findOneBy(["name"=>$stock["almacen"]]);
+              if($location!=null){
+              $obj=new ERPStocks();$obj->setCompany($company);
+              $obj->setProduct($product);
+              $obj->setDateadd(new \Datetime());
+              $obj->setDateupd(new \Datetime());
+              $obj->setStoreLocation($location);
+              $obj->setProductVariant($productvariant);
+              if ((int)$stock["stock"]<0) $quantiy=0;
+              else $quantity=(int)$stock["stock"];
+              $obj->setQuantity(!$quantity?0:$quantity);
+              $obj->setActive(1);
+              $obj->setDeleted(0);
+              $this->doctrine->getManager()->merge($obj);}
+            }
+            $this->doctrine->getManager()->flush();
+            $this->doctrine->getManager()->clear();
+          }
+
+          $navisionSync->setLastsync($datetime);
+          $navisionSync->setMaxtimestamp($objects["maxEntry"]);
+          $this->doctrine->getManager()->persist($navisionSync);
+          $this->doctrine->getManager()->flush();
+
+    }
+
+
+
+}
 public function importIncrements(InputInterface $input, OutputInterface $output) {
   //------   Create Lock Mutex    ------
   //$fp = fopen('/tmp/axiom-navisionGetProducts-importIncrements.lock', 'c');
