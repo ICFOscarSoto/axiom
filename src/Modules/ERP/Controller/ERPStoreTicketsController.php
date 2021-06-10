@@ -670,7 +670,7 @@ class ERPStoreTicketsController extends Controller
 	 * @Route("/api/ERP/storetickets/setsolved/{id}", name="storeticketsetsolved")
 	 */
 	 public function storeticketsetsolved($id){
-		 $this->denyAccessUnlessGranted('ROLE_GLOBAL');
+		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		 $storeticketsRepository=$this->getDoctrine()->getRepository(ERPStoreTickets::class);
 		 $salesticketsRepository=$this->getDoctrine()->getRepository(ERPSalesTickets::class);
 		 $storeticketsstatesRepository=$this->getDoctrine()->getRepository(ERPStoreTicketsStates::class);
