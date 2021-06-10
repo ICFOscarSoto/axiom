@@ -43,10 +43,12 @@ class InventoryRemember extends ContainerAwareCommand
       //  $date= new \DateTime();
 
         $stores=$storesRepository->getInventoryStores();
+        dump($stores);
         foreach($stores as $store)
         {
 
             $tickets=$storeTicketsRepository->getTicketsforInventory($store["id"]);
+            dump($tickets);
             $inventory=null;
             if(!empty($tickets))
             {
