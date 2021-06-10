@@ -95,7 +95,7 @@ class ERPLocationsReports{
       }
     }
     if(!isset($params["type"]) || $params["type"]==2){
-      $this->pdf  = new \FPDF('L','mm','A5');
+      $this->pdf  = new \FPDF('P','mm','A4');
       $this->pdf->AliasNbPages();
       $this->pdf->SetAutoPageBreak(false);
       $this->pdf->SetFont('Arial','',12);
@@ -107,27 +107,32 @@ class ERPLocationsReports{
       ]);
 
 
+      $i=1;
+      $this->pdf->AddPage();
+      $this->pdf->SetFillColor(255, 248, 53);
+      $this->pdf->Rect(0, 0, 210, 148, 'DF');
+      $this->pdf->Rect(0, 148, 210, 149, 'DF');
+      $this->pdf->SetFont('Arial','b',90);
+
       foreach ($params["locations"] as $key=> $location){
-      /*  if($i%3==0){
+        if($i%3==0){
           $this->pdf->AddPage();
           $this->pdf->Rect(0, 0, 210, 148, 'DF');
           $this->pdf->Rect(0, 148, 210, 149, 'DF');
             $i=1;
-        }*/
-
-        $this->pdf->AddPage();
+        }
         $this->pdf->SetFillColor(255, 248, 53);
-        $this->pdf->Rect(0, 0, 210, 200, 'DF');
-        $this->pdf->SetFont('Arial','b',80);
+        $this->pdf->Rect(0, 0, 210, 148, 'DF');
+        $this->pdf->Rect(0, 148, 210, 149, 'DF');
+        $this->pdf->SetFont('Arial','b',90);
 
         $qrcode = new QRCode($options);
         $path=$tempPath.'loc-'.$location['id'].'.png';
-        //$path=$tempPath.'loc-5831.png';
         $qrcode->render('LOC.'.$location['name'].'+STR.'.$location['store_id'], $path);
-        $this->pdf->Image($path, 30, -15, 150, 150);
-        $this->pdf->SetXY(0,105);
+        $this->pdf->Image($path, 30, ($i-1)*150-17, 150, 150);
+        $this->pdf->SetXY(0,($i-1)*150+105);
         $this->pdf->Cell(210, 54, $location['name'], 0, 0, 'C');
-
+        $i++;
         unlink($path);
       }
     }
@@ -168,3 +173,44 @@ class ERPLocationsReports{
 
   }
 }
+
+
+
+
+/*    if(!isset($params["type"]) || $params["type"]==2){
+      $this->pdf  = new \FPDF('L','mm','A5');
+      $this->pdf->AliasNbPages();
+      $this->pdf->SetAutoPageBreak(false);
+      $this->pdf->SetFont('Arial','',12);
+      $options = new QROptions([
+        'version'    => 1,
+        'outputType' => QRCode::OUTPUT_IMAGE_PNG,
+        'eccLevel'   => QRCode::ECC_M,
+        'scale' => 26
+      ]);
+
+
+      foreach ($params["locations"] as $key=> $location){
+      /*  if($i%3==0){
+          $this->pdf->AddPage();
+          $this->pdf->Rect(0, 0, 210, 148, 'DF');
+          $this->pdf->Rect(0, 148, 210, 149, 'DF');
+            $i=1;
+        }*/
+
+      /*  $this->pdf->AddPage();
+        $this->pdf->SetFillColor(255, 248, 53);
+        $this->pdf->Rect(0, 0, 210, 200, 'DF');
+        $this->pdf->SetFont('Arial','b',80);
+
+        $qrcode = new QRCode($options);
+        $path=$tempPath.'loc-'.$location['id'].'.png';
+        //$path=$tempPath.'loc-5831.png';
+        $qrcode->render('LOC.'.$location['name'].'+STR.'.$location['store_id'], $path);
+        $this->pdf->Image($path, 30, -15, 150, 150);
+        $this->pdf->SetXY(0,105);
+        $this->pdf->Cell(210, 54, $location['name'], 0, 0, 'C');
+
+        unlink($path);
+      }
+    }*/
