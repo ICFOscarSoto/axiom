@@ -84,16 +84,16 @@ class InventoryRemember extends ContainerAwareCommand
                   $cont=1;
                   foreach ($inventory as $reference)
                   {
-                      if($cont<9) $msg_products1=$msg_products1."**".$reference."**\n";
-                      else if($cont<17) $msg_products2=$msg_products2."**".$reference."**\n";
+                      if($cont<10) $msg_products1=$msg_products1."**".$reference."**\n";
+                      else if($cont<18) $msg_products2=$msg_products2."**".$reference."**\n";
                       else $msg_products3=$msg_products3."**".$reference."**\n";
                       $cont++;
                   }
 
                   $cont--;
-                  if($cont<9) file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel_agent.'&msg='.urlencode($msg_title."\n\n".$msg_products));
+                  if($cont<10) file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel_agent.'&msg='.urlencode($msg_title."\n\n".$msg_products));
 
-                  else if($cont<17){
+                  else if($cont<18){
                     file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel_agent.'&msg='.urlencode($msg_title."\n\n".$msg_products1));
                     file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel_agent.'&msg='.urlencode($msg_products2));
                   }
@@ -104,7 +104,7 @@ class InventoryRemember extends ContainerAwareCommand
                     file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel_agent.'&msg='.urlencode($msg_products3));
                   }
 
-                  if($cont>25) {
+                  if($cont>26) {
                     $msg="Exceso de productos para inventariar en almacén ".$store["name"];
                     file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel=822001670623199262&msg='.urlencode($msg));
                   }
