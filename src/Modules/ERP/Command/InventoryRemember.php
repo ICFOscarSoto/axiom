@@ -78,14 +78,37 @@ class InventoryRemember extends ContainerAwareCommand
                 else{
 
                   $msg_title=":bell: INVENTARIO ".$store["name"]." (".$date->format("d/m/Y").") :bell:\n¡Hola ".$agent->getName()."! Te paso el listado diario de referencias que hay que inventariar en ".$store["name"]." :";
-                  $msg_products="";
+                  $msg_products1="";
+                  $msg_products2="";
+                  $msg_products3="";
+                  $cont=1;
                   foreach ($inventory as $reference)
                   {
-                      $msg_products=$msg_products."**".$reference."**\n";
+                      if($cont<8) $msg_products1=$msg_products1."**".$reference."**\n";
+                      else if($cont<16) $msg_products2=$msg_products2."**".$reference."**\n";
+                      else $msg_products3=$msg_products3."**".$reference."**\n";
+                      $cont++;
                   }
 
-                  dump('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel_agent.'&msg='.urlencode($msg_title."\n\n".$msg_products));
-                  file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel_agent.'&msg='.urlencode($msg_title."\n\n".$msg_products));
+                  $cont--;
+                  if($cont<8) file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel_agent.'&msg='.urlencode($msg_title."\n\n".$msg_products));
+
+                  else if($cont<16){
+                    file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel_agent.'&msg='.urlencode($msg_title."\n\n".$msg_products1));
+                    file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel_agent.'&msg='.urlencode($msg_products2));
+                  }
+
+                  else{
+                    file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel_agent.'&msg='.urlencode($msg_title."\n\n".$msg_products1));
+                    file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel_agent.'&msg='.urlencode($msg_products2));
+                    file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel_agent.'&msg='.urlencode($msg_products3));
+                  }
+
+                  if($cont>24) {
+                    $msg="Exceso de productos para inventariar en almacén ".$store["name"];
+                    file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel=822001670623199262&msg='.urlencode($msg));
+                  }
+
                   $output->writeln('   - Notificación recordatorio enviada al gestor de '.$store["name"]);
                 }
             }
