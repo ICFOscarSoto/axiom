@@ -60,7 +60,7 @@ class InventoryRemember extends ContainerAwareCommand
 
             if(!empty($inventory)){
 
-            dump("Hay productos a inventariar...";)
+            dump("Hay productos a inventariar...");
             //Send notification to inventory manager.
             $agent=$usersRepository->findOneBy(["id"=>$store->getInventorymanager()->getId(),"active"=>1,"deleted"=>0]);
             $channel_agent=$agent->getDiscordchannel();
