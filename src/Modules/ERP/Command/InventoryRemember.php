@@ -64,6 +64,8 @@ class InventoryRemember extends ContainerAwareCommand
             //Send notification to inventory manager.
             $agent=$usersRepository->findOneBy(["id"=>$store["inventorymanager_id"],"active"=>1,"deleted"=>0]);
             $channel_agent=$agent->getDiscordchannel();
+            dump("El agente es ".$agent->getName());
+            dump("Su canal de discord es ".$channel_agent);
 
             //Check if the user has a worker associated
             $worker=$workersRepository->findOneBy(["user"=>$agent, "active"=>1, "deleted"=>0]);
@@ -81,7 +83,7 @@ class InventoryRemember extends ContainerAwareCommand
                   {
                       $msg_products=$msg_products."**".$reference."**\n";
                   }
-                  
+
                   file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel_agent.'&msg='.urlencode($msg_title."\n\n".$msg_products));
                   $output->writeln('   - Notificación recordatorio enviada al gestor de '.$store["name"]);
                 }
