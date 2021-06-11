@@ -45,6 +45,12 @@ $(document).ready(function() {
     $("#storelocation-searching").css("display","none");
     $("#store-searching-product").css("display","none");
     $("#storelocation-searching-product").css("display","none");
+    $("#ticket-data").css("display","none");
+
+    $("#product-form-id").empty();
+    $("#product-form-code").empty();
+    $("#product-form-name").empty();
+
 
     //fallo de stock
     if(id==1)
@@ -97,6 +103,9 @@ $(document).ready(function() {
 
   $('body').on('click', "#storeticket-button-add-info", function(e) {
     $("#add-information-modal-form").modal('show');
+    $("#combo-agents").css("display","none");
+    $("#combo-departments").css("display","none");
+    $("#select-newstate").css("display","none");
 
   });
 });

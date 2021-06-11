@@ -238,6 +238,8 @@ class ERPStoreTicketsController extends Controller
 			 else $storeticketstate=$storeticketsstatesRepository->findOneBy(["id"=>$fields->storeticketstate, "active"=>1, "deleted"=>0]);
 			 $stores=null;
 			 $stores=explode(",",$fields->stores);
+
+			 //incidencias por fallo de stock que se manden a hacer inventario
 			 if($fields->stores!=""){
 				 			for($i=0;$i<count($stores);$i++){
 
@@ -292,7 +294,7 @@ class ERPStoreTicketsController extends Controller
 							}
 
 			 }
-
+			 //resto de incidencias
 			 else{
 
 							$newid=$storeticketsRepository->getLastID()+1;
@@ -362,7 +364,11 @@ class ERPStoreTicketsController extends Controller
 							//para los fallos de stock, ponemos el estado "Abierta" por defecto.
 
 
-							$storeticket->setStoreticketstate($storeticketstate);
+							if($fields->myself=="1"){
+								$storeticketstate=$storeticketsstatesRepository->findOneBy(["id"=>"2", "active"=>1, "deleted"=>0]);
+								$storeticket->setStoreticketstate($storeticketstate);
+							}
+							else $storeticket->setStoreticketstate($storeticketstate);
 							$storeticket->setObservations($fields->observations);
 							$storeticket->setDateupd(new \DateTime());
 							$storeticket->setDatelastnotify(new \DateTime());
@@ -465,18 +471,10 @@ class ERPStoreTicketsController extends Controller
 
 						 }
 
-						 if($id==0 AND $fields->storeticketreason=="1")
+						 if($id==0 AND $fields->storeticketreason=="1" AND $fields->myself!="1")
 						 {
 
-								//enviamos la notificación al gestor de inventario
-				/*
-								$inventorymanager=$store->getInventorymanager();
-								$channel=$inventorymanager->getDiscordchannel();
-								$msg="\n:bell: INVENTARIO ".$store_name.": ";
-								$msg=$msg."**".$product->getCode()." - ".$product->getName()."** >>> http://demoaxiom.ferreteriacampollano.com/es/ERP/storetickets/solved/".$newid."\n";
-								file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
-				*/
-							 //en las incidencias por fallo de stock, se creará un registro automático en el historial de la incidencia
+							 //en las incidencias por fallo de stock, se creará un registro automático en el historial de la incidencia a no ser que el usuario la haya resuelto él mismo (myself=1)
 								$history_obj=new ERPStoreTicketsHistory();
 								$history_obj->setAgent($this->getUser());
 
