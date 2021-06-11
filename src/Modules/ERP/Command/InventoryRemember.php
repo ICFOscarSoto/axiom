@@ -71,11 +71,11 @@ class InventoryRemember extends ContainerAwareCommand
             $worker=$workersRepository->findOneBy(["user"=>$agent, "active"=>1, "deleted"=>0]);
             if($worker){
                 //Check if worker is working now
-              /*  if(!$workersRepository->isWorking($worker)){
+               if(!$workersRepository->isWorking($worker)){
                   $output->writeln('   - El trabajador no esta trabajando ahora');
                 }
 
-                else{*/
+                else{
 
                   $msg_title=":bell: INVENTARIO ".$store["name"]." (".$date->format("d/m/Y").") :bell:\n¡Hola ".$agent->getName()."! Te paso el listado diario de referencias que hay que inventariar en ".$store["name"]." :";
                   $msg_products1="";
@@ -110,7 +110,7 @@ class InventoryRemember extends ContainerAwareCommand
                   }
                   */
                   $output->writeln('   - Notificación recordatorio enviada al gestor de '.$store["name"]);
-                //}
+                }
             }
 
           }
