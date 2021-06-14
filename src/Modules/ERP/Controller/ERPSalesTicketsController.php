@@ -411,7 +411,8 @@ class ERPSalesTicketsController extends Controller
 
 
 		$history_obj->setSalesTicket($salesticket);
-		$history_obj->setObservations($fields->observations);
+		if($id==0 and $fields->myself=="1") $history_obj->setObservations($fields->observations."<br><p>Yo me encargo de ajustar el stock</p>");
+		else $history_obj->setObservations($fields->observations);
 		$history_obj->setSalesticketstate($salesticketstate);
 		$history_obj->setActive(1);
 		$history_obj->setDeleted(0);
@@ -425,7 +426,7 @@ class ERPSalesTicketsController extends Controller
 		//en el momento de crear la incidencia de ventas por "Fallo de stock", creamos también una incidencia de almacén a no ser que el usuario haya resuelto la incidencia.
 
 		if($id==0 AND $salesticketstate->getName()!="Solucionada"){
-			if($salesticketreason->getName()=="Fallo de stock"){
+			if($salesticketreason->getName()=="Fallo de stock" AND $fields->myself!="1"){
 				for($i=0;$i<count($products);$i++){
 					for($j=0;$j<count($stores);$j++){
 						$cont=1;

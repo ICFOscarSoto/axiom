@@ -28,7 +28,7 @@
           </div>
           <div class="row">
             <div id="stores-modal-form-body" style="padding: 0px 10px;width:100%;">
-              <label for="listStores">¿En qué almacen(es) quieres que se haga inventario?</label>
+              <label for="listStores">¿En qué almacen(es) se va a revisar el stock?</label>
               <table id="listStores" class="table table-bordered" style="width: 100%;">
               <thead class="table-thead">
               <tr role="row">
@@ -99,6 +99,7 @@ $(document).ready(function() {
       {
         if (storesselected != '')
           {
+              if(!storesselected.includes('ALM02')) $("#decide-if-inventory-modal-form").modal('show');
               $("#product-references").val(linesselected.substring(0,(linesselected.length-1)));
               $("#stores-codes").val(storesselected.substring(0,(storesselected.length-1)));
               $("#panel-searching").css("display","none");

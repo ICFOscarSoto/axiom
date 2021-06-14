@@ -1,0 +1,55 @@
+<div class="modal fade" tabindex="-1" id="decide-if-inventory-modal-form" aria-hidden="true">
+    <div class="modal-dialog-decide-if-inventory">
+      <div class="modal-content" style="transform: matrix(1, 0, 0, 1, 0, 0);display:inline-block;">
+        <div class="modal-header">
+          <h4 class="modal-title" style="text-align:center;">¿Vas a arreglar tú el stock o quieres que se haga inventario?</h4>
+        </div>
+        <br>
+        <br>
+        <div id="location-selection-modal-form-body" style="height: 80px; padding: 0px 10px;">
+          <div class="row">
+            <div class="col-md-12" style="text-align:center;">
+              <button type="button" id="panel-location-button-myself" class="btn btn-blue">
+                Lo arreglo yo
+              </button>
+              <button type="button" id="panel-location-button-inventory" class="btn btn-blue">
+                Que hagan inventario
+              </button>
+                <input type="hidden" id="myself">
+          </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<script>
+$(document).ready(function() {
+  $('body').on('click', "#panel-location-button-myself", function(e) {
+    $("#decide-if-inventory-modal-form").modal('toggle');
+  //  $("#salesorder-search-modal-form").modal('toggle');
+    $("#panel-searching").css("display","none");
+    $("#panel-button").css("display","block");
+    $("#customer-data").css("display","block");
+    $("#info-add").css("display","block");
+    $("#myself").val("1");
+    $("#validation-infos-list").empty();
+    $("#validation-infos-list").append("<li>Si necesitas ampliar los detalles de la incidencia, puedes hacerlo pinchando en el botón 'Añadir información'. También puedes añadir imágenes si lo necesitas</li>");
+
+  });
+
+  $('body').on('click', "#panel-location-button-inventory", function(e) {
+    $("#decide-if-inventory-modal-form").modal('toggle');
+//    $("#salesorder-search-modal-form").modal('toggle');
+    $("#panel-searching").css("display","none");
+    $("#panel-button").css("display","block");
+    $("#customer-data").css("display","block");
+    $("#info-add").css("display","block");
+    $("#validation-infos-list").empty();
+    $("#validation-infos-list").append("<li>Si necesitas ampliar los detalles de la incidencia, puedes hacerlo pinchando en el botón 'Añadir información'. También puedes añadir imágenes si lo necesitas</li>");
+
+  });
+
+
+
+});
+</script>
