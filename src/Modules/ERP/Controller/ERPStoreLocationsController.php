@@ -91,6 +91,8 @@ class ERPStoreLocationsController extends Controller
           return new JsonResponse($storelocation->encodeJson());
     }
 
+
+
   /**
    * @Route("/api/storelocation/{id}/list", name="storelocationlist")
    */
@@ -126,6 +128,30 @@ class ERPStoreLocationsController extends Controller
     ));
   }
 
+		/**
+		* @Route("/api/ERP/printSelected/{type}", name="printSelected", defaults={"type"=3})
+		*/
+		public function printSelected($type, Request $request){
+			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			$repository=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
+			dump($request);
+			$ids=$request->query->get('ids');
+			$ids=explode(",",$ids);
+			$locations=[];
+				foreach($ids as $item){
+					dump($item);
+					$loc=$repository->findOneBy(["id"=>$item]);
+					$locitem["id"]=$loc->getId();
+					$locitem["name"]=$loc->getName();
+					$locitem["store_id"]=$loc->getStore()->getId();
+					if(isset($locitem["orientation"])) $locitem["orientation"]=$loc->getOrientation(); else $locitem["orientation"]=0;
+					if($loc) $locations[]=$locitem;
+				}
+			$params=["type"=>$type, "doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "locations"=>$locations, "user"=>$this->getUser()];
+			$reportsUtils = new ERPLocationsReports();
+			$pdf=$reportsUtils->create($params);
+			return new Response("", 200, array('Content-Type' => 'application/pdf'));
+		}
 
 
 	/**

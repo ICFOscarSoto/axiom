@@ -2,6 +2,6 @@
   {"id" : "addTopStoreLocations", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "",  "route":"dataStoreLocations",
   "routeParams":{"store_id":"id_object"},  "modal":"storelocations", "actionType" : "background", "confirm" :false, "tooltip" : "Crear nueva ubicación"},
   {"id" : "deleteTopStoreLocations", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true, "tooltip":""},
-  {"id" : "printTopStoreLocations", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false, "tooltip":""},
+  {"id" : "printTopStoreLocations", "type" : "", "icon" : "fa fa-print","name" : "", "route":"printSelected", "confirm" :false, "tooltip":"", "actionType" : "foreground"},
   {"id" : "exportTopStoreLocations", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"genericexport", "routeParams":{"module":"ERP", "name":"StoreLocations"}, "confirm" :false, "tooltip":""}
 ]
