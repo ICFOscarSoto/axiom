@@ -120,8 +120,17 @@ $('body').on('click', "[id$='-top-button-foreground']", function() {
     var url=$(this).attr('attr-href');
     var target=$(this).attr('attr-target');
     if (typeof target !== typeof undefined && target !== false) target='_self';
+
+    ids=[];
+    var selectedItems = $("input[class*='-chk-list']:checked").map(function(){
+        return $(this).attr("item-id");
+    }).toArray();
+    ids=selectedItems;
+
     if($(this).attr('attr-search')==1){
-      url+='?'+$("#search_param").val();
+      url+='?ids='+ids+'&'+$("#search_param").val();
+    }else{
+      url+='?ids='+ids;
     }
     window.open(
       url,
