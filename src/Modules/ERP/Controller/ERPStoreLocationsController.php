@@ -134,12 +134,10 @@ class ERPStoreLocationsController extends Controller
 		public function printSelected($type, Request $request){
 			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 			$repository=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
-			dump($request);
 			$ids=$request->query->get('ids');
 			$ids=explode(",",$ids);
 			$locations=[];
 				foreach($ids as $item){
-					dump($item);
 					$loc=$repository->findOneBy(["id"=>$item]);
 					$locitem["id"]=$loc->getId();
 					$locitem["name"]=$loc->getName();
