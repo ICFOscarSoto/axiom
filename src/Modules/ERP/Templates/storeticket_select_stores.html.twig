@@ -149,7 +149,6 @@ $(document).ready(function() {
                    cancel: { text: 'Que hagan inventario', btnClass: 'btn-red', action: function(){
                           $("#stores-codes").empty();
                           storesselected +=default_store+',';
-                          alert(storesselected);
                           $("#stores-codes").val(storesselected.substring(0,(storesselected.length-1)));
                           saveTicket(cont);
                            window.location.href="/es/generic/ERP/StoreTickets/index";
