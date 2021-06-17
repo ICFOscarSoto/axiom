@@ -20,7 +20,7 @@
               <th scope="col">Nombre</th>
               </thead>
               <tbody>
-              {% for store in default_stores %}
+              {% for store in inventory_stores %}
               <tr>
                 <td>
                 <div class="custom-control custom-checkbox">
@@ -93,17 +93,23 @@ $(document).ready(function() {
     $('#select-stores-button-add').click(function(){
           var storesselected = '';
           var cont = 0;
+          var myself = 0;
+          var default_store = $('#default-store').val();
+
           $('#stores-modal-form-body input[type=checkbox]').each(function(){
               if (this.checked && this.id!="checkTodos") {
-                    storesselected += $(this).val()+',';
+                    if($(this).val()==default_store) myself=1;
+                    else  storesselected += $(this).val()+',';
                     cont=cont+1;
               }
           });
 
 
           $("#stores-codes").val(storesselected.substring(0,(storesselected.length-1)));
-          if (storesselected != '')
+          //ha seleccionado algún almacen pero NO el suyo por defecto
+          if (storesselected != '' && myself==0)
           {
+
             $.confirm({
                 theme: 'bootstrap',
                 title: '',
@@ -124,7 +130,62 @@ $(document).ready(function() {
 
 
           }
+          //ha seleccionado algún almacén y aparte el suyo por defecto
+          else if (storesselected != '' && myself==1)
+          {
 
+            $.confirm({
+                theme: 'bootstrap',
+                title: '',
+                content: '¿Has arreglado tú el stock en '+default_store+' o quieres que hagan inventario?',
+                buttons: {
+                   confirm: { text: 'Lo he arreglado yo', btnClass: 'btn-green', action: function(){
+                            $("#myself").val("1");
+                            saveTicket(cont);
+                             window.location.href="/es/generic/ERP/StoreTickets/index";
+                          }
+
+                          },
+                   cancel: { text: 'Que hagan inventario', btnClass: 'btn-red', action: function(){
+                          $("#stores-codes").empty();
+                          storesselected +=default_store+',';
+                          alert(storesselected);
+                          $("#stores-codes").val(storesselected.substring(0,(storesselected.length-1)));
+                          saveTicket(cont);
+                           window.location.href="/es/generic/ERP/StoreTickets/index";
+                          }
+                        }
+                }
+              });
+
+          }
+          //ha seleccionado solo el suyo por defecto
+          else if (storesselected == '' && myself==1)
+          {
+               $.confirm({
+                 theme: 'bootstrap',
+                 title: '',
+                 content: '¿Has arreglado tú el stock en '+default_store+' o quieres que hagan inventario?',
+                 buttons: {
+                    confirm: { text: 'Lo he arreglado yo', btnClass: 'btn-green', action: function(){
+                             $("#myself").val("1");
+                             saveTicket(cont);
+                              window.location.href="/es/generic/ERP/StoreTickets/index";
+                           }
+
+                           },
+                    cancel: { text: 'Que hagan inventario', btnClass: 'btn-red', action: function(){
+                           $("#stores-codes").empty();
+                           storesselected +=default_store+',';
+                           alert(storesselected);
+                           $("#stores-codes").val(storesselected.substring(0,(storesselected.length-1)));
+                           saveTicket(cont);
+                            window.location.href="/es/generic/ERP/StoreTickets/index";
+                           }
+                         }
+                 }
+               });
+          }
           else{
               alert('Debes seleccionar al menos un almacén.');
           }

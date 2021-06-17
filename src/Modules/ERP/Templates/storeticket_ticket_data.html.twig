@@ -80,6 +80,7 @@
         {% endif %}
         <input type="hidden" id="product-form-code" class="form-control" value="{% if storeticket.product!=null %}{{ storeticket.product.code }}{% endif %}">
         <input type="hidden" id="product-form-id" class="form-control" value="{% if storeticket.product!=null %}{{ storeticket.product.id }}{% endif %}">
+        <input type="hidden" id="default-store" class="form-control" value="{{ default_store }}">
       </div>
       <br>
 </div>

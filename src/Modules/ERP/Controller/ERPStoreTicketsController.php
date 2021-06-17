@@ -20,6 +20,7 @@ use App\Modules\ERP\Entity\ERPStoreTicketsReasons;
 use App\Modules\ERP\Entity\ERPSalesTickets;
 use App\Modules\ERP\Entity\ERPStores;
 use App\Modules\ERP\Entity\ERPStoreLocations;
+use App\Modules\ERP\Entity\ERPStoresUsers;
 use App\Modules\ERP\Entity\ERPProducts;
 use App\Modules\ERP\Entity\ERPVariantsValues;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
@@ -108,10 +109,16 @@ class ERPStoreTicketsController extends Controller
 
 			//stores for inventory
 			$inventory_store_objects=$storesRepository->getInventoryStores();
-			$default_stores=[];
+			$inventory_stores=[];
 			foreach($inventory_store_objects as $item){
-				$default_stores[]=$item;
+				$inventory_stores[]=$item;
 			}
+
+			//defaul store
+			$StoreUsersrepository=$this->getDoctrine()->getRepository(ERPStoresUsers::class);
+			$storeUser=$StoreUsersrepository->findOneBy(["user"=>$this->getUser(), "active"=>1, "deleted"=>0, "preferential"=>1]);
+			$default_store=$storeUser->getStore()->getCode();
+
 			//store ticket states
 			$objects=$storeticketsstatesRepository->findBy(["active"=>1,"deleted"=>0],["name"=>"ASC"]);
 			$states=[];
@@ -193,7 +200,8 @@ class ERPStoreTicketsController extends Controller
 						'userData' => $userdata,
 						'productslist' => $productslist,
 						'stores' => $stores,
-						'default_stores' => $default_stores,
+						'default_store' => $default_store,
+						'inventory_stores' => $inventory_stores,
 						'states' => $states,
 						'reasons' => $reasons,
 						'agents' => $agents,
@@ -239,8 +247,9 @@ class ERPStoreTicketsController extends Controller
 			 $stores=null;
 			 $stores=explode(",",$fields->stores);
 
-			 //incidencias por fallo de stock que se manden a hacer inventario
+
 			 if($fields->stores!=""){
+				 			//incidencias por fallo de stock que se manden a hacer inventario
 				 			for($i=0;$i<count($stores);$i++){
 
 								$cont=1;
@@ -293,9 +302,65 @@ class ERPStoreTicketsController extends Controller
 
 							}
 
+							//aparte de mandar hacer inventario, él se encarga de arreglar el stock en su almacén por defecto
+							if($fields->myself=="1"){
+
+
+								$newid=$storeticketsRepository->getLastID()+1;
+
+								$storeticket=new ERPStoreTickets();
+								$storeticketreason=$storeticketsreasonsRepository->findOneBy(["id"=>$fields->storeticketreason, "active"=>1, "deleted"=>0]);
+								$storeticket->setReason($storeticketreason);
+								$storeticket->setActive(1);
+								$storeticket->setDeleted(0);
+								$storeticket->setDateadd(new \DateTime());
+								if($newid<10) $storeticket->setCode("#A".date("Y")."0000".$newid);
+								else if($newid<100) $storeticket->setCode("#A".date("Y")."000".$newid);
+								else if($newid<1000) $storeticket->setCode("#A".date("Y")."00".$newid);
+								else if($newid<10000) $storeticket->setCode("#A".date("Y")."0".$newid);
+								$storeticket->setAuthor($this->getUser());
+
+								$storeticket->setDepartment(null);
+								$storeticket->setCompany($this->getUser()->getCompany());
+								$storeticket->setProduct($product);
+								$StoreUsersrepository=$this->getDoctrine()->getRepository(ERPStoresUsers::class);
+								$storeUser=$StoreUsersrepository->findOneBy(["user"=>$this->getUser(), "active"=>1, "deleted"=>0, "preferential"=>1]);
+								$default_store=$storeUser->getStore();
+								$storeticket->setStore($default_store);
+
+
+								$storeticket->setAgent($this->getUser());
+								$storeticket->setObservations("Stock arreglado para el producto ".$product_name." en el almacén ".$default_store->getName());
+								$state_resolved=$storeticketsstatesRepository->findOneBy(["id"=>2, "active"=>1, "deleted"=>0]);
+								$storeticket->setStoreticketstate($state_resolved);
+								$storeticket->setObservations($fields->observations);
+								$storeticket->setDateupd(new \DateTime());
+								$storeticket->setDatelastnotify(new \DateTime());
+								$this->getDoctrine()->getManager()->persist($storeticket);
+
+								$history_obj=new ERPStoreTicketsHistory();
+								$history_obj->setAgent($this->getUser());
+
+								$history_obj->setNewagent($this->getUser());
+								$history_obj->setNewdepartment(null);
+								$history_obj->setStoreTicket($storeticket);
+								$history_obj->setObservations("Stock arreglado para el producto ".$product_name." en el almacén ".$default_store->getName());
+								$history_obj->setStoreticketstate($state_resolved);
+								$history_obj->setActive(1);
+								$history_obj->setDeleted(0);
+								$history_obj->setDateupd(new \DateTime());
+								$history_obj->setDateadd(new \DateTime());
+								$this->getDoctrine()->getManager()->persist($history_obj);
+								$this->getDoctrine()->getManager()->flush();
+
+							}
+
 			 }
-			 //resto de incidencias
+
+			 //incidencias en las que no se manda a hacer inventario
 			 else{
+				 //resto de incidencias excepto las de fallo de stock en las que él mismo arregla el stock
+				 	if($fields->myself!="1"){
 
 							$newid=$storeticketsRepository->getLastID()+1;
 							if(!$storeticket){
@@ -361,14 +426,11 @@ class ERPStoreTicketsController extends Controller
 											$storelocation=$storeLocationsRepository->findOneBy(["id"=>$fields->storelocation]);
 											$storeticket->setStorelocation($storelocation);
 								}
+
 							//para los fallos de stock, ponemos el estado "Abierta" por defecto.
 
 
-							if($fields->myself=="1"){
-								$storeticketstate=$storeticketsstatesRepository->findOneBy(["id"=>"2", "active"=>1, "deleted"=>0]);
-								$storeticket->setStoreticketstate($storeticketstate);
-							}
-							else $storeticket->setStoreticketstate($storeticketstate);
+							$storeticket->setStoreticketstate($storeticketstate);
 							$storeticket->setObservations($fields->observations);
 							$storeticket->setDateupd(new \DateTime());
 							$storeticket->setDatelastnotify(new \DateTime());
@@ -471,30 +533,6 @@ class ERPStoreTicketsController extends Controller
 
 						 }
 
-						 if($id==0 AND $fields->storeticketreason=="1" AND $fields->myself!="1")
-						 {
-
-							 //en las incidencias por fallo de stock, se creará un registro automático en el historial de la incidencia a no ser que el usuario la haya resuelto él mismo (myself=1)
-								$history_obj=new ERPStoreTicketsHistory();
-								$history_obj->setAgent($this->getUser());
-
-								$store=$storesRepository->findOneBy(["code"=>$fields->storestockfailed]);
-								$inventorymanager=$store->getInventorymanager();
-								$history_obj->setNewagent($inventorymanager);
-								$history_obj->setNewdepartment(null);
-								$history_obj->setStoreTicket($storeticket);
-								$history_obj->setObservations("Hacer inventario del producto  ".$product_name." en el almacén ".$store->getName());
-								$history_obj->setStoreticketstate($storeticketstate);
-								$history_obj->setActive(1);
-								$history_obj->setDeleted(0);
-								$history_obj->setDateupd(new \DateTime());
-								$history_obj->setDateadd(new \DateTime());
-								$this->getDoctrine()->getManager()->persist($history_obj);
-								$this->getDoctrine()->getManager()->flush();
-							}
-
-							else
-							{
 								$history_obj=new ERPStoreTicketsHistory();
 								$history_obj->setAgent($this->getUser());
 
@@ -518,7 +556,59 @@ class ERPStoreTicketsController extends Controller
 								$history_obj->setDateadd(new \DateTime());
 								$this->getDoctrine()->getManager()->persist($history_obj);
 								$this->getDoctrine()->getManager()->flush();
-							}
+
+
+				}
+				//incidencias en las que el propio usuario se ha encargado de arreglar el stock
+				else{
+
+								$newid=$storeticketsRepository->getLastID()+1;
+
+								$storeticket=new ERPStoreTickets();
+								$storeticketreason=$storeticketsreasonsRepository->findOneBy(["id"=>$fields->storeticketreason, "active"=>1, "deleted"=>0]);
+								$storeticket->setReason($storeticketreason);
+								$storeticket->setActive(1);
+								$storeticket->setDeleted(0);
+								$storeticket->setDateadd(new \DateTime());
+								if($newid<10) $storeticket->setCode("#A".date("Y")."0000".$newid);
+								else if($newid<100) $storeticket->setCode("#A".date("Y")."000".$newid);
+								else if($newid<1000) $storeticket->setCode("#A".date("Y")."00".$newid);
+								else if($newid<10000) $storeticket->setCode("#A".date("Y")."0".$newid);
+								$storeticket->setAuthor($this->getUser());
+
+								$storeticket->setDepartment(null);
+								$storeticket->setCompany($this->getUser()->getCompany());
+								$storeticket->setProduct($product);
+								$StoreUsersrepository=$this->getDoctrine()->getRepository(ERPStoresUsers::class);
+								$storeUser=$StoreUsersrepository->findOneBy(["user"=>$this->getUser(), "active"=>1, "deleted"=>0, "preferential"=>1]);
+								$default_store=$storeUser->getStore();
+								$storeticket->setStore($default_store);
+
+
+								$storeticket->setAgent($this->getUser());
+								$storeticket->setObservations("Stock arreglado para el producto ".$product_name." en el almacén ".$default_store->getName());
+								$state_resolved=$storeticketsstatesRepository->findOneBy(["id"=>2, "active"=>1, "deleted"=>0]);
+								$storeticket->setStoreticketstate($state_resolved);
+								$storeticket->setObservations($fields->observations);
+								$storeticket->setDateupd(new \DateTime());
+								$storeticket->setDatelastnotify(new \DateTime());
+								$this->getDoctrine()->getManager()->persist($storeticket);
+
+								$history_obj=new ERPStoreTicketsHistory();
+								$history_obj->setAgent($this->getUser());
+
+								$history_obj->setNewagent($this->getUser());
+								$history_obj->setNewdepartment(null);
+								$history_obj->setStoreTicket($storeticket);
+								$history_obj->setObservations("Stock arreglado para el producto ".$product_name." en el almacén ".$default_store->getName());
+								$history_obj->setStoreticketstate($state_resolved);
+								$history_obj->setActive(1);
+								$history_obj->setDeleted(0);
+								$history_obj->setDateupd(new \DateTime());
+								$history_obj->setDateadd(new \DateTime());
+								$this->getDoctrine()->getManager()->persist($history_obj);
+								$this->getDoctrine()->getManager()->flush();
+				}
 
 			 }
 
