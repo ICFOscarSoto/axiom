@@ -12,6 +12,10 @@
                     "cols": 4
                 },
                 {
+                    "name": "standarduser",
+                    "cols": 4
+                },
+                {
                     "name": "active",
                     "cols": 4
                 },

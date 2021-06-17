@@ -88,6 +88,11 @@ class GlobaleWorkstations
      */
     private $alive=false;
 
+    /**
+     * @ORM\Column(type="string", length=150, nullable=true)
+     */
+    private $standarduser;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -257,6 +262,18 @@ class GlobaleWorkstations
     public function setAlive(bool $alive): self
     {
         $this->alive = $alive;
+
+        return $this;
+    }
+
+    public function getStandarduser(): ?string
+    {
+        return $this->standarduser;
+    }
+
+    public function setStandarduser(?string $standarduser): self
+    {
+        $this->standarduser = $standarduser;
 
         return $this;
     }

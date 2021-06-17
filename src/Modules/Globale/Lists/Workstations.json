@@ -8,6 +8,10 @@
         "caption": "name"
     },
     {
+        "name": "standarduser",
+        "caption": "Usuario"
+    },
+    {
         "name": "ipaddress",
         "caption": "Dirección IP"
     },
