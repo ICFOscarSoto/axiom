@@ -25,6 +25,7 @@ use App\Modules\ERP\Entity\ERPStoreTickets;
 use App\Modules\ERP\Entity\ERPStoreTicketsHistory;
 use App\Modules\ERP\Entity\ERPStoreTicketsStates;
 use App\Modules\ERP\Entity\ERPStoreTicketsReasons;
+use App\Modules\ERP\Entity\ERPStoresUsers;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
@@ -88,7 +89,7 @@ class ERPSalesTicketsController extends Controller
 			if($salesticket->getReason()->getId()=="3")
 			{
 				$products=json_decode($salesticket->getProducts());
-				$stores_to_check=json_decode($salesticket->getStores());
+				if($salesticket->getStores()!=null) $stores_to_check=json_decode($salesticket->getStores());
 			}
 
 		}
@@ -161,10 +162,16 @@ class ERPSalesTicketsController extends Controller
 
 		//stores
 		$store_objects=$storesRepository->getInventoryStores();
-		$default_stores=[];
+		$inventory_stores=[];
 		foreach($store_objects as $item){
-			$default_stores[]=$item;
+			$inventory_stores[]=$item;
 		}
+
+		//defaul store
+		$StoreUsersrepository=$this->getDoctrine()->getRepository(ERPStoresUsers::class);
+		$storeUser=$StoreUsersrepository->findOneBy(["user"=>$this->getUser(), "active"=>1, "deleted"=>0, "preferential"=>1]);
+		$default_store=$storeUser->getStore()->getCode();
+
 
 		$new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-plus"];
 		$breadcrumb=$menurepository->formatBreadcrumb('genericindex','ERP','SalesTickets');
@@ -203,7 +210,8 @@ class ERPSalesTicketsController extends Controller
 				'userData' => $userdata,
 				'customerslist' => $customerslist,
 				'salesorderslist' => $salesorderslist,
-				'default_stores' => $default_stores,
+				'default_store' => $default_store,
+				'inventory_stores' => $inventory_stores,
 				'stores_to_check' => $stores_to_check,
 				'states' => $states,
 				'reasons' => $reasons,

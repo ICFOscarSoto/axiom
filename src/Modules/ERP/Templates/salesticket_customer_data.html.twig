@@ -53,7 +53,7 @@
         {% if salesticket.stores!=null %}
         <div class="col-md-3">
           <div class="form-group">
-              <label for="stores-to-check">Almacenes en los que revisar los fallos de stock:</label>
+              <label for="stores-to-check">Almacenes en los que se solicita hacer inventario:</label>
               <ul>
                 {% for store in stores_to_check %}
                   <li>{{ store }}</li>
@@ -64,7 +64,7 @@
         {% else %}
         <div class="col-md-3" id="stores-failed" style="display:none;">
           <div class="form-group">
-              <label for="stores-to-check">Almacenes en los que revisar los fallos de stock:</label>
+              <label for="stores-to-check">Almacenes en los que se solicita hacer inventario</label>
               <ul id="stores-to-check">
               </ul>
           </div>
@@ -74,7 +74,8 @@
         <input type="hidden" id="customer-form-code" class="form-control" value="{% if salesticket.customer!=null %}{{ salesticket.customer.code }}{% endif %}">
         <input type="hidden" id="customer-form-id" class="form-control" value="{% if salesticket.customer!=null %}{{ salesticket.customer.id }}{% endif %}">
         <input type="hidden" id="salesorder-form-id" class="form-control" value="{% if salesticket.salesorder!=null %}{{ salesticket.salesorder.id }}{% endif %}">
-      </div>
+        <input type="hidden" id="default-store" class="form-control" value="{{ default_store }}">
+    </div>
       <br>
 </div>
 </div>
