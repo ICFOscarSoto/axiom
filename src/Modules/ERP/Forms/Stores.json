@@ -12,6 +12,7 @@
 				{	"name": "phone", "cols": 4},
 				{	"name": "country", "cols": 4},
 				{	"name": "inventorymanager", "cols": 4},
+				{	"name": "managed", "caption":"Gestor", "cols": 2},
 				{	"name": "active", "cols": 2}
 			]
 		}]

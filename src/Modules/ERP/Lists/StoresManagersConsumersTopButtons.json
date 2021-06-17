@@ -1,0 +1,6 @@
+[
+  {"id" : "addTopStoresManagersConsumers", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"genericdatatab", "routeParams":{"module":"ERP", "name":"StoresManagersConsumers", "idparent":"id", "type":"modal" }, "modal":"StoresManagersConsumers", "actionType" : "background", "confirm" :false, "tooltip" : ""},
+  {"id" : "deleteTopStoresManagersConsumers", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true, "tooltip":""},
+  {"id" : "printTopStoresManagersConsumers", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false, "tooltip":""},
+  {"id" : "exportTopStoresManagersConsumers", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"genericexport", "routeParams":{"module":"ERP", "name":"StoresManagersConsumers"}, "confirm" :false, "tooltip":""}
+]

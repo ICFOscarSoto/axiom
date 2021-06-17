@@ -1,0 +1,33 @@
+[{
+    "sections": [
+        {
+            "name": "data",
+            "fields": [
+                {
+                    "name": "name",
+                    "cols": 4
+                },
+                {
+                    "name": "lastname",
+                    "cols": 4
+                },
+                {
+                    "name": "idcard",
+                    "cols": 4
+                },
+                {
+                    "name": "code2",
+                    "cols": 4
+                },
+                {
+                    "name": "nfcid",
+                    "cols": 4
+                },
+                {
+                    "name": "active",
+                    "cols": 4
+                }
+            ]
+        }
+    ]
+}]

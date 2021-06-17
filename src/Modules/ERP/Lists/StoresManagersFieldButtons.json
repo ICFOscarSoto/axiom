@@ -1,0 +1,8 @@
+[
+  {"id": "editStoresManagers", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"formStoresManagers", "confirm" :false, "actionType" : "foreground", "tooltip":""},
+  {"id": "activation", "type": "option", "options": [
+      {"id": "desactivateStoresManagers", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"genericdisable", "routeParams":{"module":"ERP", "name":"StoresManagers"}, "confirm" :true, "actionType" : "background", "tooltip":"" },
+      {"id": "activateStoresManagers", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "route":"genericenable", "routeParams":{"module":"ERP", "name":"StoresManagers"}, "confirm" :true, "actionType" : "background", "tooltip":"" }
+  ]},
+  {"id": "deleteStoresManagers", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"genericdelete", "routeParams":{"module":"ERP", "name":"StoresManagers"}, "confirm" :true, "undo" :false, "actionType" : "background", "tooltip":""}
+]

@@ -1,0 +1,21 @@
+[{
+    "sections": [
+        {
+            "name": "data",
+            "fields": [
+                {
+                    "name": "name",
+                    "cols": 4
+                },
+                {
+                    "name": "active",
+                    "cols": 4
+                },
+                {
+                    "name": "customer",
+                    "cols": 4
+                }
+            ]
+        }
+    ]
+}]
