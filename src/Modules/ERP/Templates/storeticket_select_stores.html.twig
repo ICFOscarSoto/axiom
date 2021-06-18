@@ -72,7 +72,12 @@ function saveTicket(cont)
              {% if id==0 %} location.href="/es/ERP/storetickets/form/"+data.data.id; {% endif %}
            }
            else location.href="/es/generic/ERP/StoreTickets/index";
-         } else {
+         }
+         else if(data.result=="0"){
+            toastr.error("Ya hay pendiente un inventario de este producto", "Confirmación", confirmation);
+            $('#select-stores-button-add').removeAttr('disabled');
+         }
+         else {
            toastr.error("No se pudo guardar el documento", "Confirmación", confirmation);
          }
        }
@@ -83,12 +88,6 @@ function saveTicket(cont)
 }
 
 $(document).ready(function() {
-  /*
-      $('input[type=checkbox]').click(function(){
-        $('#stores-modal-form-body input[type=checkbox]').removeAttr('checked');
-        $(this).prop("checked", true);
-
-    });*/
 
     $('#select-stores-button-add').click(function(){
           var storesselected = '';
@@ -117,7 +116,7 @@ $(document).ready(function() {
                 buttons: {
                    confirm: { text: 'Si', btnClass: 'btn-green', action: function(){
                             saveTicket(cont);
-                             window.location.href="/es/generic/ERP/StoreTickets/index";
+                            // window.location.href="/es/generic/ERP/StoreTickets/index";
                           }
 
                           },
@@ -142,7 +141,7 @@ $(document).ready(function() {
                    confirm: { text: 'Lo he arreglado yo', btnClass: 'btn-green', action: function(){
                             $("#myself").val("1");
                             saveTicket(cont);
-                             window.location.href="/es/generic/ERP/StoreTickets/index";
+                            // window.location.href="/es/generic/ERP/StoreTickets/index";
                           }
 
                           },
@@ -151,7 +150,7 @@ $(document).ready(function() {
                           storesselected +=default_store+',';
                           $("#stores-codes").val(storesselected.substring(0,(storesselected.length-1)));
                           saveTicket(cont);
-                           window.location.href="/es/generic/ERP/StoreTickets/index";
+                        //   window.location.href="/es/generic/ERP/StoreTickets/index";
                           }
                         }
                 }
@@ -169,17 +168,16 @@ $(document).ready(function() {
                     confirm: { text: 'Lo he arreglado yo', btnClass: 'btn-green', action: function(){
                              $("#myself").val("1");
                              saveTicket(cont);
-                              window.location.href="/es/generic/ERP/StoreTickets/index";
+                            //  window.location.href="/es/generic/ERP/StoreTickets/index";
                            }
 
                            },
                     cancel: { text: 'Que hagan inventario', btnClass: 'btn-red', action: function(){
                            $("#stores-codes").empty();
                            storesselected +=default_store+',';
-                           alert(storesselected);
                            $("#stores-codes").val(storesselected.substring(0,(storesselected.length-1)));
                            saveTicket(cont);
-                            window.location.href="/es/generic/ERP/StoreTickets/index";
+                        //    window.location.href="/es/generic/ERP/StoreTickets/index";
                            }
                          }
                  }
