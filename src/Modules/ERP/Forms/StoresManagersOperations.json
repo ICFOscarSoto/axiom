@@ -1,0 +1,29 @@
+[{
+    "sections": [
+        {
+            "name": "data",
+            "fields": [
+                {
+                    "name": "date",
+                    "cols": 4
+                },
+                {
+                    "name": "active",
+                    "cols": 4
+                },
+                {
+                    "name": "agent",
+                    "cols": 4
+                },
+                {
+                    "name": "consumer",
+                    "cols": 4
+                },
+                {
+                    "name": "store",
+                    "cols": 4
+                }
+            ]
+        }
+    ]
+}]
