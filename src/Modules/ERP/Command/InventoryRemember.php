@@ -48,12 +48,15 @@ class InventoryRemember extends ContainerAwareCommand
 //  dump("revisando si hay productos a inventariar en ".$store["name"]);
             $tickets=$storeTicketsRepository->getTicketsforInventory($store["id"]);
             $inventory=null;
+            $variant=null;
             if(!empty($tickets))
             {
               foreach($tickets as $ticket){
                 $storeticket=$storeTicketsRepository->findOneBy(["id"=>$ticket["id"], "active"=>1, "deleted"=>0]);
                 $product=$storeticket->getProduct();
-                $inventory[]= $product->getCode()." - ".$product->getName().">> https://axiom.ferreteriacampollano.com/es/ERP/storetickets/solved/".$storeticket->getId();
+                $variant=$storeticket->getVariant();
+                if($variant) $inventory[]= $product->getCode()." - ".$product->getName().">> https://axiom.ferreteriacampollano.com/es/ERP/storetickets/solved/".$storeticket->getId();
+                else $inventory[]= $product->getCode()." - ".$product->getName()." - Variante ".$variant->getName()." >> https://axiom.ferreteriacampollano.com/es/ERP/storetickets/solved/".$storeticket->getId();
               }
             }
 

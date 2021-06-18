@@ -83,12 +83,13 @@ class ERPStoreTicketsRepository extends ServiceEntityRepository
 
     }
 
-    public function notPendingInventory($productid, $storeid){
+    public function notPendingInventory($productid, $storeid, $variantid){
       $query="SELECT *
             FROM erpstore_tickets et
-            WHERE et.active = 1 AND et.deleted = 0 AND et.reason_id=1 AND et.store_id=:STORE AND et.product_id=:PRODUCT";
+            WHERE et.active = 1 AND et.deleted = 0 AND et.reason_id=1 AND et.store_id=:STORE AND et.product_id=:PRODUCT AND et.variant_id=:VARIANT";
       $params=['PRODUCT' =>$productid,
-               'STORE' => $storeid];
+               'STORE' => $storeid,
+               'VARIANT' => $variantid ];
 
       $result=null;
       $result=$this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();

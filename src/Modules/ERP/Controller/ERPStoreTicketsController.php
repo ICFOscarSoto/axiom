@@ -246,70 +246,137 @@ class ERPStoreTicketsController extends Controller
 			 else $storeticketstate=$storeticketsstatesRepository->findOneBy(["id"=>$fields->storeticketstate, "active"=>1, "deleted"=>0]);
 			 $stores=null;
 			 $stores=explode(",",$fields->stores);
-
+			 $variants=null;
+			 $variants=explode(",",$fields->variants);
 
 			 if($fields->stores!=""){
-				 			//incidencias por fallo de stock que se manden a hacer inventario
-				 			for($i=0;$i<count($stores);$i++){
-								$store=$storesRepository->findOneBy(["code"=>$stores[$i]]);
-								if($storeticketsRepository->notPendingInventory($product->getId(),$store->getId()))
+				 	//incidencias por fallo de stock que se manden a hacer inventario (variantes de producto)
+					if($fields->variants!=""){
+					 			for($i=0;$i<count($stores);$i++)
 								{
-										$cont=1;
-										$newid=$storeticketsRepository->getLastID()+$cont;
+									for($j=0;$j<count($variants);$j++)
+									{
+										$store=$storesRepository->findOneBy(["code"=>$stores[$i]]);
+										if($storeticketsRepository->notPendingInventory($product->getId(),$store->getId(),$variants[$j]))
+										{
+												$cont=1;
+												$newid=$storeticketsRepository->getLastID()+$cont;
 
-										$storeticket=new ERPStoreTickets();
-										$storeticketreason=$storeticketsreasonsRepository->findOneBy(["id"=>$fields->storeticketreason, "active"=>1, "deleted"=>0]);
-										$storeticket->setReason($storeticketreason);
-										$storeticket->setActive(1);
-										$storeticket->setDeleted(0);
-										$storeticket->setDateadd(new \DateTime());
-										if($newid<10) $storeticket->setCode("#A".date("Y")."0000".$newid);
-										else if($newid<100) $storeticket->setCode("#A".date("Y")."000".$newid);
-										else if($newid<1000) $storeticket->setCode("#A".date("Y")."00".$newid);
-										else if($newid<10000) $storeticket->setCode("#A".date("Y")."0".$newid);
-										$storeticket->setAuthor($this->getUser());
+												$storeticket=new ERPStoreTickets();
+												$storeticketreason=$storeticketsreasonsRepository->findOneBy(["id"=>$fields->storeticketreason, "active"=>1, "deleted"=>0]);
+												$storeticket->setReason($storeticketreason);
+												$storeticket->setActive(1);
+												$storeticket->setDeleted(0);
+												$storeticket->setDateadd(new \DateTime());
+												if($newid<10) $storeticket->setCode("#A".date("Y")."0000".$newid);
+												else if($newid<100) $storeticket->setCode("#A".date("Y")."000".$newid);
+												else if($newid<1000) $storeticket->setCode("#A".date("Y")."00".$newid);
+												else if($newid<10000) $storeticket->setCode("#A".date("Y")."0".$newid);
+												$storeticket->setAuthor($this->getUser());
 
-										$storeticket->setDepartment(null);
-										$storeticket->setCompany($this->getUser()->getCompany());
-										$storeticket->setProduct($product);
+												$storeticket->setDepartment(null);
+												$storeticket->setCompany($this->getUser()->getCompany());
+												$storeticket->setProduct($product);
+												$variant=$variantsRepository->findOneBy(["id"=>$variants[$j]]);
+												$storeticket->setVariant($variant);
 
-										$storeticket->setStore($store);
+												$storeticket->setStore($store);
 
-										$inventorymanager=$inventorymanager=$store->getInventorymanager();
-										$storeticket->setAgent($inventorymanager);
-										$storeticket->setObservations("Hacer inventario del producto  ".$product_name." en el almacén ".$store->getName());
-										$storeticket->setStoreticketstate($storeticketstate);
-										$storeticket->setObservations($fields->observations);
-										$storeticket->setDateupd(new \DateTime());
-										$storeticket->setDatelastnotify(new \DateTime());
-										$this->getDoctrine()->getManager()->persist($storeticket);
+												$inventorymanager=$inventorymanager=$store->getInventorymanager();
+												$storeticket->setAgent($inventorymanager);
+												$storeticket->setObservations("Hacer inventario de la variante ".$variant->getName()." del producto  ".$product_name." en el almacén ".$store->getName());
+												$storeticket->setStoreticketstate($storeticketstate);
+												$storeticket->setObservations($fields->observations);
+												$storeticket->setDateupd(new \DateTime());
+												$storeticket->setDatelastnotify(new \DateTime());
+												$this->getDoctrine()->getManager()->persist($storeticket);
 
-										$history_obj=new ERPStoreTicketsHistory();
-										$history_obj->setAgent($this->getUser());
+												$history_obj=new ERPStoreTicketsHistory();
+												$history_obj->setAgent($this->getUser());
 
 
-										$inventorymanager=$store->getInventorymanager();
-										$history_obj->setNewagent($inventorymanager);
-										$history_obj->setNewdepartment(null);
-										$history_obj->setStoreTicket($storeticket);
-										$history_obj->setObservations("Hacer inventario del producto  ".$product_name." en el almacén ".$store->getName());
-										$history_obj->setStoreticketstate($storeticketstate);
-										$history_obj->setActive(1);
-										$history_obj->setDeleted(0);
-										$history_obj->setDateupd(new \DateTime());
-										$history_obj->setDateadd(new \DateTime());
-										$this->getDoctrine()->getManager()->persist($history_obj);
-										$this->getDoctrine()->getManager()->flush();
+												$inventorymanager=$store->getInventorymanager();
+												$history_obj->setNewagent($inventorymanager);
+												$history_obj->setNewdepartment(null);
+												$history_obj->setStoreTicket($storeticket);
+												$history_obj->setObservations("Hacer inventario de la variante ".$variant->getName()." del producto  ".$product_name." en el almacén ".$store->getName());
+												$history_obj->setStoreticketstate($storeticketstate);
+												$history_obj->setActive(1);
+												$history_obj->setDeleted(0);
+												$history_obj->setDateupd(new \DateTime());
+												$history_obj->setDateadd(new \DateTime());
+												$this->getDoctrine()->getManager()->persist($history_obj);
+												$this->getDoctrine()->getManager()->flush();
 
+										}
+
+										else return new JsonResponse(["result"=>0]);
+									}
 								}
 
-								else return new JsonResponse(["result"=>0]);
+							}
+						//incidencias por fallo de stock que se manden a hacer inventario (producto simple)
+							else{
+								for($i=0;$i<count($stores);$i++){
+									$store=$storesRepository->findOneBy(["code"=>$stores[$i]]);
+									if($storeticketsRepository->notPendingInventory($product->getId(),$store->getId(),null))
+									{
+											$cont=1;
+											$newid=$storeticketsRepository->getLastID()+$cont;
+
+											$storeticket=new ERPStoreTickets();
+											$storeticketreason=$storeticketsreasonsRepository->findOneBy(["id"=>$fields->storeticketreason, "active"=>1, "deleted"=>0]);
+											$storeticket->setReason($storeticketreason);
+											$storeticket->setActive(1);
+											$storeticket->setDeleted(0);
+											$storeticket->setDateadd(new \DateTime());
+											if($newid<10) $storeticket->setCode("#A".date("Y")."0000".$newid);
+											else if($newid<100) $storeticket->setCode("#A".date("Y")."000".$newid);
+											else if($newid<1000) $storeticket->setCode("#A".date("Y")."00".$newid);
+											else if($newid<10000) $storeticket->setCode("#A".date("Y")."0".$newid);
+											$storeticket->setAuthor($this->getUser());
+
+											$storeticket->setDepartment(null);
+											$storeticket->setCompany($this->getUser()->getCompany());
+											$storeticket->setProduct($product);
+
+											$storeticket->setStore($store);
+
+											$inventorymanager=$inventorymanager=$store->getInventorymanager();
+											$storeticket->setAgent($inventorymanager);
+											$storeticket->setObservations("Hacer inventario del producto  ".$product_name." en el almacén ".$store->getName());
+											$storeticket->setStoreticketstate($storeticketstate);
+											$storeticket->setObservations($fields->observations);
+											$storeticket->setDateupd(new \DateTime());
+											$storeticket->setDatelastnotify(new \DateTime());
+											$this->getDoctrine()->getManager()->persist($storeticket);
+
+											$history_obj=new ERPStoreTicketsHistory();
+											$history_obj->setAgent($this->getUser());
+
+
+											$inventorymanager=$store->getInventorymanager();
+											$history_obj->setNewagent($inventorymanager);
+											$history_obj->setNewdepartment(null);
+											$history_obj->setStoreTicket($storeticket);
+											$history_obj->setObservations("Hacer inventario del producto  ".$product_name." en el almacén ".$store->getName());
+											$history_obj->setStoreticketstate($storeticketstate);
+											$history_obj->setActive(1);
+											$history_obj->setDeleted(0);
+											$history_obj->setDateupd(new \DateTime());
+											$history_obj->setDateadd(new \DateTime());
+											$this->getDoctrine()->getManager()->persist($history_obj);
+											$this->getDoctrine()->getManager()->flush();
+
+									}
+
+									else return new JsonResponse(["result"=>0]);
+								}
+
 							}
 
 							//aparte de mandar hacer inventario, él se encarga de arreglar el stock en su almacén por defecto
 							if($fields->myself=="1"){
-
-
 								$newid=$storeticketsRepository->getLastID()+1;
 
 								$storeticket=new ERPStoreTickets();

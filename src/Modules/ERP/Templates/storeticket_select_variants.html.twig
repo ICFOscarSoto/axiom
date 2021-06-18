@@ -1,0 +1,109 @@
+<div class="modal fade" tabindex="-1" id="select-variants-modal-form" aria-hidden="true">
+    <div class="modal-dialog-select-variants">
+      <div class="modal-content" style="transform: matrix(1, 0, 0, 1, 0, 0);display:inline-block;">
+        <div class="modal-header">
+          <h4 class="modal-title">Variantes del producto</h4>
+        </div>
+        <br>
+        <br>
+        <div class="panel-body">
+          <div class="row">
+            <div id="variants-modal-form-body" style="padding: 0px 10px;width:100%;">
+              <label for="listVariants">Selecciona las variantes con fallo de stock</label>
+              <table id="listVariants" class="table table-bordered" style="width: 100%;">
+              <thead class="table-thead">
+              <tr role="row">
+                <th scope="col">
+                <label class="cb-wrapper"><input type="checkbox" id="checkTodos"><div class="checked"></div></label>
+                </th>
+              <th scope="col">Variantes</th>
+              </thead>
+              <tbody id="variants-body">
+              </tbody>
+              </table>
+                <input type="hidden" id="variants-codes">
+            </div>
+          </div>
+          <div class="row">
+            <div style="text-align: left;" class="col-md-6"></div>
+            <div style="text-align: right;margin-bottom:10px;" class="col-md-6">
+                    <button attr-id="" attr-action="" id="select-Variantes-button-cancel" type="button" class="btn btn">Cancelar</button>
+                    <button attr-id="" attr-action="" id="select-variants-button-select" type="button" class="btn btn-green">Seleccionar</button>
+            </div>
+          </div>
+      </div>
+  </div>
+  </div>
+</div>
+<script>
+
+$("#checkTodos").change(function () {
+    $("variants-modal-form-body input[type=checkbox]").prop('checked', $(this).prop("checked"));
+});
+
+function saveTicket(cont)
+{
+  if(validate_storeticket())
+  {
+  $('#select-variants-button-select').attr("disabled","disabled");
+    $.ajax({
+       url: '{{ url('dataStoreTickets', {"id": id}) }}',
+       type: 'POST',
+       data: JSON.stringify(prepare_storeticket_json()),
+       success:  function( data ) {
+         if((--load_wait)==0) $("#load-spinner").fadeOut();
+         if(data.result){
+        //	 $("#salesticket-form-id").val(data.data.id);
+           toastr.success("Documento guardado correctamente", "Confirmación", confirmation);
+           if(cont==1){
+             location.reload();
+             {% if id==0 %} location.href="/es/ERP/storetickets/form/"+data.data.id; {% endif %}
+           }
+           else location.href="/es/generic/ERP/StoreTickets/index";
+         }
+         else if(data.result=="0"){
+            toastr.error("Ya hay pendiente un inventario de este producto", "Confirmación", confirmation);
+            $('#select-stores-button-add').removeAttr('disabled');
+         }
+         else {
+           toastr.error("No se pudo guardar el documento", "Confirmación", confirmation);
+         }
+       }
+     });
+ }
+
+
+}
+
+$(document).ready(function() {
+
+    $('#select-variants-button-select').click(function(){
+          var variantsselected = '';
+          var cont = 0;
+          $('#variants-modal-form-body input[type=checkbox]').each(function(){
+              if (this.checked && this.id!="checkTodos") {
+
+                    variantsselected += $(this).val()+',';
+                    cont=cont+1;
+              }
+          });
+          $("#variants-codes").val(variantsselected.substring(0,(variantsselected.length-1)));
+          if (variantsselected != '')
+          {
+            $("#select-stores-modal-form").modal('show');
+          }
+
+          else{
+              alert('Debes seleccionar al menos un almacén.');
+          }
+
+          $("#select-variants-modal-form").modal('toggle');
+      });
+
+
+      $('body').on('click', "#select-variants-button-cancel", function(e){
+      //  alert("ey");
+         $("#select-variants-modal-form").modal('toggle');
+      });
+  });
+</script>

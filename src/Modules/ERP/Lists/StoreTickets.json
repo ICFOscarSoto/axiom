@@ -13,6 +13,10 @@
       "caption":"Producto"
   },
   {
+      "name" :"variant__name",
+      "caption":"Variante"
+  },
+  {
       "name" :"store__code",
       "caption":"Almacén"
   },
