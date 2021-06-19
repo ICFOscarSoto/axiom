@@ -48,9 +48,9 @@ class ERPStoresManagersOperationsController extends Controller
 	private $module='ERP';
 
     /**
-		 * @Route("/api/erp/storesmanagers/operations/create/{id}", name="formStoresManagers", defaults={"id"=0})
+		 * @Route("/api/erp/storesmanagers/operations/create/{id}", name="createOperations", defaults={"id"=0})
 		 */
-		 public function formProduct($id, Request $request){
+		 public function createOperations($id, Request $request){
 			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 			if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
 			$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
@@ -94,7 +94,10 @@ class ERPStoresManagersOperationsController extends Controller
 						$line->setDeleted(false);
 						$this->getDoctrine()->getManager()->persist($line);
 						$this->getDoctrine()->getManager()->flush();
+						//Discount quantities
+
 					}
+
 					//Clear worklist
 					foreach($worklistProducts as $item){
 						$this->getDoctrine()->getManager()->remove($item);
