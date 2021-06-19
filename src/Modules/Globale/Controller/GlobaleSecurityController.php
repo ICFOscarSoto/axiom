@@ -110,13 +110,13 @@ class GlobaleSecurityController extends Controller
 					$worker=$workersrepository->findOneBy(["user"=>$user]);
 
 					return new JsonResponse(['id'=>$user->getId(),
-																	 'workerId'=>$worker->getId(),
-																	 'clockId'=>$worker->getClockCode(),
+																	 'workerId'=>$worker!=null?$worker->getId():null,
+																	 'clockId'=>$worker!=null?$worker->getClockCode():null,
 																	 'companyId'=>$company->getId(),
 																	 'domain'=>$company->getDomain(),
 																	 'name'=>$user->getName(),
 																	 'lastname'=>$user->getLastname(),
-																	 'allowRemoteClock'=>$worker->getAllowremoteclock(),
+																	 'allowRemoteClock'=>$worker!=null?$worker->getAllowremoteclock():null,
 																	 'token'=>$user->getApiToken(),
 																	 'labelPrinter'=>$user->getDefaultlabelprinter()?$user->getDefaultlabelprinter()->getId():-1,
 																	 'printownlabel'=>$user->getAlwaysprintownlabel()
