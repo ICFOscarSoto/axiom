@@ -196,7 +196,7 @@ class ERPStoresManagersConsumers
       $repository=$doctrine->getRepository(ERPStoresManagersConsumers::class);
       $fieldErrors=[];
       $obj=$repository->findOneBy(["nfcid"=>$this->nfcid,"deleted"=>0]);
-      if($obj!=null && $obj->getId()!=$this->getId()){
+      if($obj!=null && $obj->getId()!=$this->getId() && $this->nfcid!=null){
         return ["valid"=>false, "global_errors"=>["La tarjeta NFC ya esta asignada a otro trabajador."]];
       }else {
         return ["valid"=>empty($fieldErrors), "field_errors"=>$fieldErrors];
