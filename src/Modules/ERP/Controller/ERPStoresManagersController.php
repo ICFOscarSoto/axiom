@@ -178,7 +178,7 @@ class ERPStoresManagersController extends Controller
 		$manager = $this->getDoctrine()->getManager();
 		$repository = $manager->getRepository($this->class);
 		$repositoryConsumers = $manager->getRepository(ERPStoresManagersConsumers::class);
-		$obj=$repositoryConsumers->findOneBy(["deleted"=>0, "nfcid"=>$nfcid]);
+		$obj=$repositoryConsumers->findOneBy(["active"=>1, "deleted"=>0, "nfcid"=>$nfcid]);
 		if(!$obj) return new JsonResponse(array('result' => -1, 'text'=>"No existe este usuario"));
 		if($obj->getManager()->getCompany()!=$this->getUser()->getCompany()) return new JsonResponse(array('result' => -2, 'text'=>"No existe este usuario"));
 
