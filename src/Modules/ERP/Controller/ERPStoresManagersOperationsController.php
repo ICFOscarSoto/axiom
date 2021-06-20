@@ -217,7 +217,7 @@ class ERPStoresManagersOperationsController extends Controller
 			$consumer=$consumerRepository->findOneBy(["id"=>$id,"active"=>1,"deleted"=>0]);
 			if(!$consumer) return new JsonResponse(["result"=>-2, "text"=> "El usuario no existe"]);
 			if($consumer->getManager()->getCompany()!=$this->getUser()->getCompany()) return new JsonResponse(["result"=>-3, "text"=> "Operación no autorizada"]);
-			$location=$storeLocationsRepository->findOneBy(["store"=>$store, "company"=>$this->getUser()->getCompany(), "active"=>1,"deleted"=>0]);
+			$location=$storeLocationsRepository->findOneBy(["store"=>$store->getStore(), "company"=>$this->getUser()->getCompany(), "active"=>1,"deleted"=>0]);
 			if(!$location) return new JsonResponse(["result"=>-4, "text"=> "No existen ubicación en el almacén gestor"]);
 
 			$worklistProducts=$worklistRepository->findBy(["user"=>$this->getUser(),"deleted"=>0]);
@@ -254,7 +254,6 @@ class ERPStoresManagersOperationsController extends Controller
 						//Discount quantities
 						$stock=$stocksRepository->findOneBy(["product"=>$item->getProduct(), "productvariant"=>$item->getVariant(), "company"=>$this->getUser()->getCompany(), "storelocation"=>$location, "active"=>1, "deleted"=>0]);
 						if($stock!=null){
-								dump("no entro ".$stock->getId());
 							$stock->setQuantity($stock->getQuantity()-($item->getQuantity()));
 							$stock->setDateupd(new \Datetime());
 							$this->getDoctrine()->getManager()->persist($stock);
@@ -262,7 +261,6 @@ class ERPStoresManagersOperationsController extends Controller
 						}else{
 								//Stocks doesnt exist, create it
 								$stock=new ERPStocks();
-								dump("entro");
 								$stock->setProduct($item->getProduct());
 								$stock->setCompany($this->getUser()->getCompany());
 								$stock->setStorelocation($location);
