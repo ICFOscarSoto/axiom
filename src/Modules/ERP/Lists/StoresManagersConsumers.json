@@ -13,15 +13,15 @@
     },
     {
         "name": "idcard",
-        "caption": "idcard"
+        "caption": "DNI"
     },
     {
         "name": "code2",
-        "caption": "code2"
+        "caption": "Cod. Trabajador"
     },
     {
         "name": "nfcid",
-        "caption": "nfcid"
+        "caption": "Cod. NFC"
     },
     {
         "name": "active",

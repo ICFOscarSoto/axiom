@@ -5,15 +5,20 @@
     },
     {
         "name": "date",
-        "caption": "date"
+        "caption": "date",
+        "type": "date"
     },
     {
         "name": "agent__name_o_agent__lastname",
-        "caption": "agent"
+        "caption": "Agente"
+    },
+    {
+        "name": "consumer__code2",
+        "caption": "Cod. Trabajador"
     },
     {
         "name": "consumer__name_o_consumer__lastname",
-        "caption": "consumer"
+        "caption": "Trabajador"
     },
     {
         "name": "store__name",

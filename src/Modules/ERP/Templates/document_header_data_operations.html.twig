@@ -1,0 +1,17 @@
+<div class="panel panel-primary panel-shadow" data-collapsed="0" style="-webkit-box-shadow: none; box-shadow:none; padding:0px; margin-bottom: -1px;"><!-- to apply shadow add class "panel-shadow" -->
+  <div class="panel-body">
+    <div class="row">
+      <div class="col-6 col-sm-2"> <div class="input-group"> <span class="input-group-addon"><i class="fa fa-hashtag"></i></span><input type="hidden" id="document-form-id" value="{{ document.id }}" class="form-control"><input type="text" id="document-form-code" value="{{ document.code }}" class="form-control" placeholder="N. Documento" disabled> </div></div>
+      <div class="col-6 col-sm-2"> <div class="input-group"> <span class="input-group-addon"><i class="fa fa-calendar"></i></span> <input type="text" id="document-form-date" class="form-control datepicker" style="z-index:99 !important;" placeholder="Fecha" value="{{ date }}"></div></div>
+      {% if documentType is defined and documentType == "sales_budget" %}<div class="col-6 col-sm-2"> <div class="input-group"> <span class="input-group-addon"><i class="fa fa-calendar"></i></span> <input type="text" id="document-form-dateofferend" class="form-control datepicker" style="z-index:99 !important;" placeholder="Fin oferta" value="{{ enddate }}"></div></div> {% endif %}
+      <div class="col-6 col-sm-2"> <div class="input-group"> <span class="input-group-addon"><i class="fa fa-hashtag"></i></span> <input type="text" id="document-form-customercode" class="form-control" placeholder="Su referencia" value="{{ document.customercode }}"> </div> </div>
+      <div class="col-6 col-sm-2"> <div class="form-group">
+       <input type="text" id="document-form-consumer" class="form-control" placeholder="Empleado" value="({% if document.consumer.code2 is null %}{{ document.consumer.idcard }}{% else %}{{ document.consumer.code2 }}{% endif %}) {{ document.consumer.lastname }}, {{ document.consumer.name }}">
+      </div> </div>
+      <div class="col-6 col-sm-2"> <div class="form-group">
+         <input type="text" id="document-form-consumer" class="form-control" placeholder="Gestor" value="{{ document.store.name }}">
+      </div> </div>
+
+    </div>
+  </div>
+</div>
