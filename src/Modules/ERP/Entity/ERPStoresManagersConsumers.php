@@ -191,4 +191,15 @@ class ERPStoresManagersConsumers
 
         return $this;
     }
+
+    public function formValidation($kernel, $doctrine, $user, $validationParams){
+      $repository=$doctrine->getRepository(ERPStoresManagersConsumers::class);
+      $fieldErrors=[];
+      $obj=$repository->findOneBy(["nfcid"=>$this->nfcid,"deleted"=>0]);
+      if($obj!=null && $obj->getId()!=$this->getId()){
+        return ["valid"=>false, "global_errors"=>["La tarjeta NFC ya esta asignada a otro trabajador."]];
+      }else {
+        return ["valid"=>empty($fieldErrors), "field_errors"=>$fieldErrors];
+      }
+    }
 }
