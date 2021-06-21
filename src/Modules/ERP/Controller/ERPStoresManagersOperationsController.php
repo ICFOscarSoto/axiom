@@ -212,6 +212,7 @@ class ERPStoresManagersOperationsController extends Controller
 			$storeRepository=$this->getDoctrine()->getRepository(ERPStoresUsers::class);
 			$storeLocationsRepository=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
 			$stocksRepository=$this->getDoctrine()->getRepository(ERPStocks::class);
+			$productVariantRepository=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
 			$store=$storeRepository->findOneBy(["user"=>$this->getUser(),"preferential"=>1,"active"=>1,"deleted"=>0]);
 			if(!$store) return new JsonResponse(["result"=>-4, "text"=> "El usuario no tiene almacén preferente"]);
 			$consumer=$consumerRepository->findOneBy(["id"=>$id,"active"=>1,"deleted"=>0]);
@@ -261,6 +262,9 @@ class ERPStoresManagersOperationsController extends Controller
 						}else{
 								//Stocks doesnt exist, create it
 								$stock=new ERPStocks();
+								if($item->getVariant())
+									$productvariant=$productVariantRepository->findOneBy(["product"=>$item->getProduct(), "variantvalue"=>$item->getVariant(),"active"=>1, "deleted"=>0]);
+									else $productvariant=null;
 								$stock->setProduct($item->getProduct());
 								$stock->setCompany($this->getUser()->getCompany());
 								$stock->setStorelocation($location);
@@ -269,7 +273,7 @@ class ERPStoresManagersOperationsController extends Controller
 								$stock->setDateupd(new \Datetime());
 								$stock->setActive(true);
 								$stock->setDeleted(false);
-								$stock->setProductvariant($item->getVariant()?$item->getVariant()->getVariantname():null);
+								$stock->setProductvariant($productvariant);
 								$this->getDoctrine()->getManager()->persist($stock);
 								$this->getDoctrine()->getManager()->flush();
 						}
