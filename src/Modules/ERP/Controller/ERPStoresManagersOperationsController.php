@@ -269,7 +269,7 @@ class ERPStoresManagersOperationsController extends Controller
 								$stock->setDateupd(new \Datetime());
 								$stock->setActive(true);
 								$stock->setDeleted(false);
-								$stock->setProductvariant($item->getVariant());
+								$stock->setProductvariant($item->getVariant()?$item->getVariant()->getVariantname():null);
 								$this->getDoctrine()->getManager()->persist($stock);
 								$this->getDoctrine()->getManager()->flush();
 						}
