@@ -1,0 +1,37 @@
+[{
+    "sections": [
+        {
+            "name": "data",
+            "fields": [
+                {
+                    "name": "PendingToReceive",
+                    "cols": 4
+                },
+                {
+                    "name": "PendingToServe",
+                    "cols": 4
+                },
+                {
+                    "name": "MinimumAmount",
+                    "cols": 4
+                },
+                {
+                    "name": "MaximunQuantity",
+                    "cols": 4
+                },
+                {
+                    "name": "active",
+                    "cols": 4
+                },
+                {
+                    "name": "product",
+                    "cols": 4
+                },
+                {
+                    "name": "Store",
+                    "cols": 4
+                }
+            ]
+        }
+    ]
+}]

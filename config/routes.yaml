@@ -389,3 +389,6 @@ ERPStoresManagersController:
 
 ERPStoresManagersOperationsController:
   resource: 'App\Modules\ERP\Controller\ERPStoresManagersOperationsController'
+
+ERPInfoStocksController:
+  resource: 'App\Modules\ERP\Controller\ERPInfoStocksController'
