@@ -23,6 +23,8 @@ use App\Modules\ERP\Entity\ERPStores;
 use App\Modules\ERP\Entity\ERPStoresManagers;
 use App\Modules\ERP\Entity\ERPStoresManagersConsumers;
 use App\Modules\ERP\Entity\ERPStoresManagersUsers;
+use App\Modules\ERP\Entity\ERPStoresManagersOperations;
+use App\Modules\ERP\Entity\ERPStoresManagersOperationsLines;
 use App\Modules\ERP\Entity\ERPStoresUsers;
 use App\Modules\ERP\Entity\ERPCategories;
 use App\Modules\ERP\Entity\ERPProductsVariants;
@@ -64,6 +66,7 @@ class ERPStoresManagersController extends Controller
 				["name" => "data", "icon"=>"fa fa-id-card", "caption"=>"Managers data", "active"=>true, "route"=>$this->generateUrl("dataStoresManagers",["id"=>$id])],
 				["name" => "storesmanagersusers", "caption"=>"Users", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("listStoresManagersUsers",["id"=>$id])],
 				["name" => "storesmanagersconsumers", "caption"=>"Consumidores", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("listStoresManagersConsumers",["id"=>$id])],
+				["name" => "storesmanagersreports", "caption"=>"Reports", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("storesManagersReports",["id"=>$id])]
 			];
 			$obj = $repository->findOneBy(['id'=>$id, 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
 			$obj_name=$obj?$obj->getName():'';
@@ -269,5 +272,67 @@ class ERPStoresManagersController extends Controller
 		$result=$repository->search($search, $usermanager->getManager());
 		return new JsonResponse($result);
 	}
+
+	/**
+	 * @Route("/{_locale}/erp/storesmanagers/reports/{id}", name="storesManagersReports", defaults={"id"=0})
+	 */
+	 public function storesManagersReports($id, Request $request)
+	 {
+
+		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		 if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
+
+		 $userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
+		 $locale = $request->getLocale();
+
+		 $from=new \Datetime();
+		 $from->modify('first day of this month');
+		 $to=new \Datetime();
+		 $to->modify('+1 day');
+
+		 if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+				 return $this->render('@ERP/storesmanagersreports.html.twig', [
+					 'controllerName' => 'storesManagersController',
+					 'interfaceName' => 'StoresManagesReports',
+					 'optionSelected' => 'genericindex',
+					 'optionSelectedParams' => ["module"=>"ERP", "name"=>"StoresManagersReports"],
+					 'userData' => $userdata,
+					 'id' => $id,
+					 'from' => $from,
+					 'to' => $to
+
+					 ]);
+			 }
+			 return new RedirectResponse($this->router->generate('app_login'));
+	}
+
+	/**
+	 * @Route("api/ERP/storesmanagers/getreports/{id}", name="storesManagersGetReports", defaults={"id"=0})
+	 */
+	 public function storesManagersGetReports($id, Request $request)
+	 {
+				 $from=new \Datetime();
+				 $from->modify('first day of this month');
+				 $to=new \Datetime();
+				 $to->modify('+1 day');
+				 $operationsRepository=$this->getDoctrine()->getRepository(ERPStoresManagersOperations::class);
+				 $operationLinesRepository=$this->getDoctrine()->getRepository(ERPStoresManagersOperationsLines::class);
+
+				 $array_consumers=$operationsRepository->getOperationsByConsumer($id,$from,$to);
+				 $array_consumerproducts=$operationLinesRepository->getProductsByConsumer($id,$from,$to);
+				 $array_bestproducts=$operationLinesRepository->getBestProducts($id,$from,$to);
+				 $managerRepository=$this->getDoctrine()->getRepository(ERPStoresManagers::class);
+				 $eanRepostory=$this->getDoctrine()->getRepository(ERPEAN13::class);
+				 $manager=$managerRepository->findOneBy(["id"=>$id]);
+				 $array=[];
+				 foreach($array_bestproducts as $best){
+					 $ean13=$eanRepostory->getEANByCustomer($manager->getCustomer()->getId(),$best["product_id"]);
+					 $best["ean13"]=$ean13;
+					 array_push($array,$best);
+				 }
+				 return new JsonResponse(["from"=>$from, "to"=>$to, "consumers"=>$array_consumers, "consumerproducts"=>$array_consumerproducts, "bestproducts"=>$array]);
+
+
+	 }
 
 }

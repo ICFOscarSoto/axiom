@@ -210,9 +210,8 @@ var chartBestProductsOptions = {
 };
 
 function getData(){
-  datefrom="fa";
   $.ajax({
-     url: '{{ url('storesManagersGetReports', {"id": id, "datefrom": datefrom }) }}',
+     url: '{{ url('storesManagersGetReports', {"id": id}) }}',
      type: 'POST',
 
      success:  function( data ) {
