@@ -22,6 +22,7 @@ use App\Modules\ERP\Entity\ERPStoreLocations;
 use App\Modules\ERP\Entity\ERPStores;
 use App\Modules\ERP\Entity\ERPStoresManagers;
 use App\Modules\ERP\Entity\ERPStoresManagersConsumers;
+use App\Modules\ERP\Entity\ERPStoresManagersUsers;
 use App\Modules\ERP\Entity\ERPStoresUsers;
 use App\Modules\ERP\Entity\ERPCategories;
 use App\Modules\ERP\Entity\ERPProductsVariants;
@@ -30,6 +31,7 @@ use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\ERP\Utils\ERPProductsUtils;
 use App\Modules\ERP\Utils\ERPStoresManagersConsumersUtils;
+use App\Modules\ERP\Utils\ERPStoresManagersUsersUtils;
 use App\Modules\ERP\Utils\ERPEAN13Utils;
 use App\Modules\ERP\Utils\ERPReferencesUtils;
 use App\Modules\ERP\Utils\ERPStocksUtils;
@@ -60,7 +62,8 @@ class ERPStoresManagersController extends Controller
 
 			$tabs=[
 				["name" => "data", "icon"=>"fa fa-id-card", "caption"=>"Managers data", "active"=>true, "route"=>$this->generateUrl("dataStoresManagers",["id"=>$id])],
-				["name" => "storesmanagersconsumers", "caption"=>"Consumers", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("listStoresManagersConsumers",["id"=>$id])],
+				["name" => "storesmanagersusers", "caption"=>"Users", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("listStoresManagersUsers",["id"=>$id])],
+				["name" => "storesmanagersconsumers", "caption"=>"Consumidores", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("listStoresManagersConsumers",["id"=>$id])],
 			];
 			$obj = $repository->findOneBy(['id'=>$id, 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
 			$obj_name=$obj?$obj->getName():'';
@@ -170,6 +173,62 @@ class ERPStoresManagersController extends Controller
 	}
 
 	/**
+	 * @Route("/{_locale}/erp/storesmanagers/{id}/users", name="listStoresManagersUsers")
+	 */
+	public function listStoresManagersUsers($id,RouterInterface $router,Request $request)
+	{
+	$childClass=ERPStoresManagersUsers::class;
+	$utils = new ERPStoresManagersUtils();
+	$utilsObj=new ERPStoresManagersUsersUtils();
+	$templateLists=$utils->formatUsersList($id);
+	$formName='StoresManagersUsers';
+	$formJson=dirname(__FILE__)."/../Forms/StoresManagersUsers.json";
+
+	$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+	if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
+	$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
+	$locale = $request->getLocale();
+	$this->router = $router;
+	$repository=$this->getDoctrine()->getRepository($this->class);
+	$repositoryChild=$this->getDoctrine()->getRepository($childClass);
+	$obj=$repository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$id, "deleted"=>0]);
+	$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
+
+	$formUtils=new GlobaleFormUtils();
+	$params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "parent"=>$obj];
+	$formUtils->initialize($this->getUser(), new $childClass(), $formJson, $request, $this, $this->getDoctrine(),method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
+	$templateForms[]=$formUtils->formatForm($formName, true, $id, $childClass);
+
+		return $this->render('@Globale/list.html.twig', [
+			'id' => $id,
+			'listConstructor' => $templateLists,
+			'forms' => $templateForms,
+			'userData' => $userdata,
+			]);
+
+	return new RedirectResponse($this->router->generate('app_login'));
+	}
+
+	/**
+	 * @Route("/{_locale}/erp/storesmanagersusers/{id}/list", name="StoresManagersUserslist")
+	 */
+	public function StoresManagersUserslist($id, RouterInterface $router,Request $request)
+	{
+		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		$user = $this->getUser();
+		$locale = $request->getLocale();
+		$this->router = $router;
+		$manager = $this->getDoctrine()->getManager();
+		$repository = $manager->getRepository($this->class);
+		$repositoryConsumers = $manager->getRepository(ERPStoresManagersUsers::class);
+		$listUtils=new GlobaleListUtils();
+		$obj=$repository->findBy(["company"=>$this->getUser()->getCompany(), "deleted"=>0, "id"=>$id]);
+		$listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersUsers.json"),true);
+		$return=$listUtils->getRecords($user,$repositoryConsumers,$request,$manager,$listFields, ERPStoresManagersUsers::class,[["type"=>"and", "column"=>"manager", "value"=>$obj]]);
+		return new JsonResponse($return);
+	}
+
+	/**
 	 * @Route("/api/ERP/storesmanagers/consumers/get/{nfcid}", name="getStoresManagerConsumer", defaults={"nfcid"=-1})
 	 */
 	public function getStoresManagerConsumer($nfcid, RouterInterface $router,Request $request)
@@ -178,19 +237,37 @@ class ERPStoresManagersController extends Controller
 		$manager = $this->getDoctrine()->getManager();
 		$repository = $manager->getRepository($this->class);
 		$repositoryConsumers = $manager->getRepository(ERPStoresManagersConsumers::class);
-		$obj=$repositoryConsumers->findOneBy(["active"=>1, "deleted"=>0, "nfcid"=>$nfcid]);
+		if($nfcid!=-1)
+			$obj=$repositoryConsumers->findOneBy(["active"=>1, "deleted"=>0, "nfcid"=>$nfcid]);
+		else $obj=$repositoryConsumers->findOneBy(["active"=>1, "deleted"=>0, "id"=>$request->request->get('id',-1)]);
+
 		if(!$obj) return new JsonResponse(array('result' => -1, 'text'=>"No existe este usuario"));
 		if($obj->getManager()->getCompany()!=$this->getUser()->getCompany()) return new JsonResponse(array('result' => -2, 'text'=>"No existe este usuario"));
 
 		$result["id"]=$obj->getId();
 		$result["name"]=$obj->getName();
 		$result["lastname"]=$obj->getLastname();
+		$result["nfcid"]=$obj->getNfcid();
 		$result["idcard"]=$obj->getIdcard();
 		$result["code2"]=$obj->getCode2();
 		$result["active"]=$obj->getActive();
 
 		return new JsonResponse($result);
 
+	}
+
+	/**
+	* @Route("/api/erp/storesmanagers/consumers/search", name="searchConsumer")
+	*/
+	public function searchConsumer(Request $request){
+		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		$search=$request->request->get('s',null);
+		$repositoryUsers=$this->getDoctrine()->getRepository(ERPStoresManagersUsers::class);
+		$usermanager=$repositoryUsers->findOneBy(["user"=>$this->getUser(), "active"=>1, "deleted"=>0]);
+		if(!$usermanager) return new JsonResponse(array('result' => -1, 'text'=>"Usuario no asignado a gestor"));
+		$repository=$this->getDoctrine()->getRepository(ERPStoresManagersConsumers::class);
+		$result=$repository->search($search, $usermanager->getManager());
+		return new JsonResponse($result);
 	}
 
 }

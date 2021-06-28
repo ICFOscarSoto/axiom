@@ -19,6 +19,20 @@ class ERPStoresManagersConsumersRepository extends ServiceEntityRepository
         parent::__construct($registry, ERPStoresManagersConsumers::class);
     }
 
+
+    public function search($search, $manager){
+      $tokens=explode('*',$search);
+      $string='';
+      foreach($tokens as $token){
+        $string.=" AND (id='".$token."' OR name LIKE '%".$token."%' OR lastname LIKE '%".$token."%' OR code2 LIKE '%".$token."%' OR idcard LIKE '%".$token."%' OR nfcid LIKE '%".$token."%')";
+      }
+
+      $query="SELECT id, name, lastname, code2, idcard, nfcid, active from erpstores_managers_consumers where manager_id=".$manager->getId()." AND deleted=0".$string." LIMIT 100";
+      $result=$this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
+      return $result;
+    }
+
+
     // /**
     //  * @return ERPStoresManagedConsumers[] Returns an array of ERPStoresManagedConsumers objects
     //  */
