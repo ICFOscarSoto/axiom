@@ -1,0 +1,346 @@
+<div class="panel-heading">
+<div class="panel-title">Estadísticas</div>
+</div>
+<div class="panel-body" style="">
+<div class="row">
+  <div class="col-md-4">
+    <label for="date-from">Fecha de inicio:</label>
+    <input type="text" id="date-from" attr="minDate" value="{{ from|date('Y-m-d H:i:s') }}" class="datetimepicker form-control" placeholder="{{ from|date('Y-m-d H:i:s') }}">
+  </div>
+  <div class="col-md-4">
+    <label for="date-to">Fecha de fin:</label>
+    <input type="text" id="date-to" attr="maxDate" value="{{ to|date('Y-m-d H:i:s') }}" class="datetimepicker form-control"  placeholder="{{ to|date('Y-m-d H:i:s') }}">
+  </div>
+ </div>
+<div class="row">
+<div class="col-md-6 overflow-auto" style="border:1px solid #ccc">
+  <canvas id="ERPStoresManagersReports-consumeroperations-{{ id }}" width="100%"></canvas>
+</div>
+<div class="col-md-6 overflow-auto" style="border:1px solid #ccc">
+  <canvas id="ERPStoresManagersReports-consumerproducts-{{ id }}" width="100%"></canvas>
+</div>
+</div>
+<div class="row">
+  <div class="col-md-6 overflow-auto" style="border:1px solid #ccc">
+    <canvas id="ERPStoresManagersReports-bestproducts-{{ id }}" width="100%"></canvas>
+  </div>
+  <div class="col-md-6 overflow-auto" style="border:1px solid #ccc">
+  </div>
+</div>
+</div>
+
+<script>
+
+
+function datetimepicker(){
+	$('.datetimepicker').each(function(index) {
+		  var valueField=$(this).val();
+		  var dateField=moment(valueField, "DD/MM/YYYY HH:mm:ss");
+		  $(this).datetimepicker({
+		  showTodayButton: true,
+	    format: 'DD/MM/YYYY HH:mm:ss',
+	    locale:'es',
+		  useCurrent: true,
+		  defaultDate: moment(),
+		  tooltips: spanish_tooltips_datetimepicker,
+		  date: (dateField.isValid())?dateField:null
+		  });
+		  if($(this).attr("minDate")!="" && typeof $(this).attr("minDate")!==typeof undefined) $(this).data("DateTimePicker").minDate(moment($(this).attr("minDate"), "YYYY-MM-DD"));
+		  if($(this).attr("maxDate")!="" && typeof $(this).attr("maxDate")!==typeof undefined) $(this).data("DateTimePicker").maxDate(moment($(this).attr("maxDate"), "YYYY-MM-DD"));
+		});
+}
+
+
+var ctxConsumerOperations = document.getElementById('ERPStoresManagersReports-consumeroperations-{{ id }}');
+var ctxConsumerProducts = document.getElementById('ERPStoresManagersReports-consumerproducts-{{ id }}');
+var ctxBestProducts = document.getElementById('ERPStoresManagersReports-bestproducts-{{ id }}');
+
+var stackedBar;
+
+var ConsumerOperationsData = {
+label: 'Nº de operaciones por usuario',
+data: [],
+backgroundColor:[
+      'rgba(255, 99, 132, 0.2)',
+      'rgba(255, 159, 64, 0.2)',
+      'rgba(255, 205, 86, 0.2)',
+      'rgba(75, 192, 192, 0.2)',
+      'rgba(54, 162, 235, 0.2)',
+      'rgba(153, 102, 255, 0.2)',
+      'rgba(201, 203, 207, 0.2)'
+    ],
+borderColor:  [
+      'rgb(255, 99, 132)',
+      'rgb(255, 159, 64)',
+      'rgb(255, 205, 86)',
+      'rgb(75, 192, 192)',
+      'rgb(54, 162, 235)',
+      'rgb(153, 102, 255)',
+      'rgb(201, 203, 207)'
+    ],
+borderWidth: 2,
+yAxisID: "y-axis-total"
+};
+
+var ConsumerProductsData = {
+label: 'Nº de productos por usuario',
+data: [],
+backgroundColor:[
+      'rgba(255, 99, 132, 0.2)',
+      'rgba(255, 159, 64, 0.2)',
+      'rgba(255, 205, 86, 0.2)',
+      'rgba(75, 192, 192, 0.2)',
+      'rgba(54, 162, 235, 0.2)',
+      'rgba(153, 102, 255, 0.2)',
+      'rgba(201, 203, 207, 0.2)'
+    ],
+borderColor:  [
+      'rgb(255, 99, 132)',
+      'rgb(255, 159, 64)',
+      'rgb(255, 205, 86)',
+      'rgb(75, 192, 192)',
+      'rgb(54, 162, 235)',
+      'rgb(153, 102, 255)',
+      'rgb(201, 203, 207)'
+    ],
+borderWidth: 2,
+yAxisID: "y-axis-total"
+};
+
+
+var BestProductsData = {
+label: 'Productos más utilizados',
+data: [],
+backgroundColor:[
+      'rgba(255, 99, 132, 0.2)',
+      'rgba(255, 159, 64, 0.2)',
+      'rgba(255, 205, 86, 0.2)',
+      'rgba(75, 192, 192, 0.2)',
+      'rgba(54, 162, 235, 0.2)',
+      'rgba(153, 102, 255, 0.2)',
+      'rgba(201, 203, 207, 0.2)'
+    ],
+borderColor:  [
+      'rgb(255, 99, 132)',
+      'rgb(255, 159, 64)',
+      'rgb(255, 205, 86)',
+      'rgb(75, 192, 192)',
+      'rgb(54, 162, 235)',
+      'rgb(153, 102, 255)',
+      'rgb(201, 203, 207)'
+    ],
+borderWidth: 2,
+yAxisID: "y-axis-total"
+};
+
+
+var ConsumerOperationsgraphData = {
+labels: [],
+datasets: [ConsumerOperationsData]
+};
+
+var ConsumerProductsgraphData = {
+labels: [],
+datasets: [ConsumerProductsData]
+};
+
+var BestProductsgraphData = {
+labels: [],
+datasets: [BestProductsData]
+};
+
+var chartConsumerOperationsOptions = {
+  onClick: function(e){
+      var element = this.getElementAtEvent(e);
+      if(element.length > 0){
+          $("#{{ id }}-ERPStoresManagersReports-consumeroperations-modal").modal('toggle');
+          //console.log("Clicked on a bar with index: "+element[0]._index+". Now this bar should be marked as active.");
+        }
+  },
+  scales: {
+    xAxes: [{
+      barPercentage: 1,
+      categoryPercentage: 0.6
+    }],
+    yAxes: [{
+      id: "y-axis-total",
+      stacked: false
+    }]
+  }
+};
+
+var chartConsumerProductsOptions = {
+  onClick: function(e){
+      var element = this.getElementAtEvent(e);
+      if(element.length > 0){
+          $("#{{ id }}-ERPStoresManagersReports-consumerproducts-modal").modal('toggle');
+          //console.log("Clicked on a bar with index: "+element[0]._index+". Now this bar should be marked as active.");
+        }
+  },
+  scales: {
+    xAxes: [{
+      barPercentage: 1,
+      categoryPercentage: 0.6
+    }],
+    yAxes: [{
+      id: "y-axis-total",
+      stacked: false
+    }]
+  }
+};
+
+var chartBestProductsOptions = {
+  onClick: function(e){
+      var element = this.getElementAtEvent(e);
+      if(element.length > 0){
+          $("#{{ id }}-ERPStoresManagersReports-bestproducts-modal").modal('toggle');
+          //console.log("Clicked on a bar with index: "+element[0]._index+". Now this bar should be marked as active.");
+        }
+  },
+  scales: {
+    xAxes: [{
+      barPercentage: 1,
+      categoryPercentage: 0.6
+    }],
+    yAxes: [{
+      id: "y-axis-total",
+      stacked: false
+    }]
+  }
+};
+
+function getData(){
+  datefrom="fa";
+  $.ajax({
+     url: '{{ url('storesManagersGetReports', {"id": id, "datefrom": datefrom }) }}',
+     type: 'POST',
+
+     success:  function( data ) {
+         var array_ConsumerOperations=[];
+         var array_ConsumerOperationsLabels=[];
+         var array_ConsumerProducts=[];
+         var array_ConsumerProductsLabels=[];
+         var array_BestProducts=[];
+         var array_BestProductsLabels=[];
+
+      if(typeof data.consumers !== 'undefined')
+       $.each( data.consumers, function( key, val ) {
+
+         array_ConsumerOperations.push(val.total*1);
+         array_ConsumerOperationsLabels.push(val.NAME+" "+val.lastname);
+      //   array_usersIds.push(val.id);
+       });
+
+       if(typeof data.consumerproducts !== 'undefined')
+        $.each( data.consumerproducts, function( key, val ) {
+
+          array_ConsumerProducts.push(val.total*1);
+          array_ConsumerProductsLabels.push(val.NAME+" "+val.lastname);
+       //   array_usersIds.push(val.id);
+        });
+
+        if(typeof data.bestproducts !== 'undefined')
+         $.each( data.bestproducts, function( key, val ) {
+
+           array_BestProducts.push(val.total*1);
+           array_BestProductsLabels.push(val.ean13);
+        //   array_usersIds.push(val.id);
+         });
+
+      ConsumerOperationsData.data=array_ConsumerOperations;
+      ConsumerOperationsgraphData.labels = array_ConsumerOperationsLabels;
+      ConsumerOperationsgraphData.datasets= [ConsumerOperationsData];
+      stackedBarConsumerOperations.data=ConsumerOperationsgraphData;
+      stackedBarConsumerOperations.update();
+
+
+      ConsumerProductsData.data=array_ConsumerProducts;
+      ConsumerProductsgraphData.labels = array_ConsumerProductsLabels;
+      ConsumerProductsgraphData.datasets= [ConsumerProductsData];
+      stackedBarConsumerProducts.data=ConsumerProductsgraphData;
+      stackedBarConsumerProducts.update();
+
+
+      BestProductsData.data=array_BestProducts;
+      BestProductsgraphData.labels = array_BestProductsLabels;
+      BestProductsgraphData.datasets= [BestProductsData];
+      stackedBarBestProducts.data=BestProductsgraphData;
+      stackedBarBestProducts.update();
+    //  $("#ERPStoresManagersReports-consumeroperations-{{ id }}").parents(".panel-default").children(".panel-heading").children(".panel-title").html("Consumor por trabajador desde "+data.from+" hasta "+data.to);
+
+     }
+   });
+ }
+
+
+$(function () {
+  datetimepicker();
+  stackedBarConsumerOperations = new Chart(ctxConsumerOperations, {
+    type: 'bar',
+    data: [],
+    options: chartConsumerOperationsOptions
+  });
+
+  stackedBarConsumerProducts = new Chart(ctxConsumerProducts, {
+    type: 'bar',
+    data: [],
+    options: chartConsumerProductsOptions
+  });
+
+  stackedBarBestProducts = new Chart(ctxBestProducts, {
+    type: 'doughnut',
+    data: [],
+    options: chartBestProductsOptions
+  });
+
+  getData();
+  window.setInterval(function(){
+    getData();
+  }, 60000);
+});
+
+
+/*
+var getDate = function (input) {
+    return new Date(input.date.valueOf());
+}
+
+$('#date-from, #date-to').datepicker({
+    format: "dd/mm/yyyy",
+    language: 'es'
+});
+
+$('#date-from').datepicker({
+    startDate: '+5d',
+    endDate: '+35d',
+}).on('changeDate',
+    function (selected) {
+        $('#date-to').datepicker('setStartDate', getDate(selected));
+    });
+
+$('#date-to').datepicker({
+    startDate: '+6d',
+    endDate: '+36d',
+}).on('changeDate',
+    function (selected) {
+        $('#date-from').datepicker('setEndDate', getDate(selected));
+    });
+*/
+</script>
+
+{% block footer %}
+<!--
+	<link rel="stylesheet" href="{{ url('index') }}js/datatables/datatables.css">
+	<link rel="stylesheet" href="{{ url('index') }}js/select2/select2-bootstrap.css">
+	<link rel="stylesheet" href="{{ url('index') }}js/select2/select2.css">
+	<link rel="stylesheet" href="{{ url('index') }}css/custom.css">
+	<link rel="stylesheet" href="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker.min.css">
+	<script src="{{ url('index') }}js/datatables/datatables.js"></script>
+	<script src="{{ url('index') }}js/select2/select2.min.js"></script>
+	<script src="{{ url('index') }}js/moment.min.js"></script>
+	<script src="{{ url('index') }}js/moment-es.js"></script>
+	<script src="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker-es.js"></script>
+	<script src="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker.min.js"></script>
+-->
+	 {{ include('@Globale/bottom.html.twig') }}
+{% endblock %}

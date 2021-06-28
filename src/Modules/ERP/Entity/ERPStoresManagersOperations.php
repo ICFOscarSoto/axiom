@@ -7,7 +7,7 @@ use App\Modules\Globale\Entity\GlobaleUsers;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\Modules\ERP\Entity\ERPStoresManagersOperationsRepository")
+ * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPStoresManagersOperationsRepository")
  */
 class ERPStoresManagersOperations
 {

@@ -7,7 +7,7 @@ use \App\Modules\ERP\Entity\ERPVariantsValues;
 use \App\Modules\ERP\Entity\ERPStoreLocations;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\Modules\ERP\Entity\ERPStoresManagersOperationsLinesRepository")
+ * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPStoresManagersOperationsLinesRepository")
  */
 class ERPStoresManagersOperationsLines
 {
