@@ -98,6 +98,34 @@ $(document).ready(function() {
 
     }
 
+    //Referencia de proveedor duplicada
+    else if(id==7){
+      $("#panel-searching").css("display","block");
+      $("#product-searching").css("display","block");
+      $("#validation-info-list").empty();
+      $("#validation-info-list").append("<li>Indica la referencia que está duplicada e indica en las observaciones la referencia correcta.</li>");
+
+    }
+
+    //Artículo duplicado
+    else if(id==8){
+      $("#panel-searching").css("display","block");
+      $("#product-searching").css("display","block");
+      $("#validation-info-list").empty();
+      $("#validation-info-list").append("<li>Elige el artículo que está duplicado e indica en las observaciones el artículo correcto.</li>");
+
+    }
+
+    //Inventario sin actualizar
+    else if(id==9){
+      $("#panel-searching").css("display","block");
+      $("#product-searching").css("display","block");
+      $("#validation-info-list").empty();
+      $("#validation-info-list").append("<li>Elige el artículo que no tiene un inventario hecho o que lleva mucho tiempo sin inventariarse</li>");
+
+    }
+
+
 
   });
 
