@@ -34,6 +34,12 @@ class ERPEAN13Repository extends ServiceEntityRepository
       return $result;
     }
 
+    public function getEANByCustomer($customer,$product){
+      $query='SELECT name FROM erpEAN13
+              WHERE active=1 AND customer_id='.$customer.' AND product_id='.$product;
+      return $this->getEntityManager()->getConnection()->executeQuery($query)->fetchColumn(0);
+    }
+
     // /**
     //  * @return ERPEAN13[] Returns an array of ERPEAN13 objects
     //  */
