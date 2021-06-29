@@ -42,6 +42,10 @@ use App\Modules\ERP\Utils\ERPProductsAttributesUtils;
 use App\Modules\Security\Utils\SecurityUtils;
 use App\Modules\ERP\Reports\ERPEan13Reports;
 use App\Modules\ERP\Utils\ERPStoresManagersUtils;
+use \DateTime;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\File\MimeType\FileinfoMimeTypeGuesser;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 class ERPStoresManagersController extends Controller
 {
@@ -304,7 +308,7 @@ class ERPStoresManagersController extends Controller
 		 $new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-plus"];
 		 $breadcrumb=$menurepository->formatBreadcrumb('genericindex','ERP','StoreTickets');
 		 array_push($breadcrumb,$new_breadcrumb);
-		 
+
 		 if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 				 return $this->render('@ERP/storesmanagerslocalreports.html.twig', [
 					 'controllerName' => 'storesManagersController',
@@ -401,28 +405,211 @@ class ERPStoresManagersController extends Controller
 	 */
 	 public function exportConsumerOperations(RouterInterface $router,Request $request)
 	 {
+		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		 $template=dirname(__FILE__)."/../Forms/ConsumerOperations.json";
 
 		 $start=$request->query->get("start");
 		 $end=$request->query->get("end");
-		 $template=dirname(__FILE__)."/../Forms/InsuredCustomers.json";
-		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-		 /*
-		 $customersRepository=$this->getDoctrine()->getRepository(ERPCustomers::class);
-		 $customers=$customersRepository->findInsuredCustomers($this->getUser()->getCompany());
-		 */
-		 $result_array=Array();/*
-		 foreach($customers as $customer)
-		 {
-					 $item['id']=$customer["code"];
-					 $item['Razón Social']=$customer["socialname"];
-					 $item['CIF']=$customer["vat"];
-					 $result_array[]=$item;
-		 }
-*/
-		$result=$this->exportcustomers($result_array,$template);
-		return $result;
+		 $labels=$request->query->get("labels");
+		 $data=$request->query->get("data");
 
+		 $labels_array=explode(",",$labels);
+		 $data_array=explode(",",$data);
+		 $count=sizeof($labels_array);
+
+		 $result_array=Array();
+		 for($i=0;$i<$count;$i++){
+			 $item["trabajador"]=$labels_array[$i];
+			 $item["Operaciones"]=$data_array[$i];
+		   $result_array[]=$item;
+		 }
+
+
+		 $result=$this->exportOperations($result_array,$template);
+		 return $result;
 
 	 }
+
+
+	 public function exportOperations($list, $template){
+		 $this->template=$template;
+		 $filename='Operaciones.csv';
+		 $array=$list;
+		 //exclude tags column, last
+		 $key='_tags';
+		 array_walk($array, function (&$v) use ($key) {
+			unset($v[$key]);
+		 });
+	 //	 $array=$this->applyFormats($array);
+
+		 $fileContent=$this->createCSV($array);
+		 $response = new Response($fileContent);
+		 // Create the disposition of the file
+				$disposition = $response->headers->makeDisposition(
+						ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+						$filename
+			);
+		 // Set the content disposition
+		 $seconds_to_cache = 0;
+		 $ts = gmdate("D, d M Y H:i:s", time() + $seconds_to_cache) . " GMT";
+		 $response->headers->set("Expires", $ts);
+		 $response->headers->set("Pragma", "cache");
+		 $response->headers->set("Cache-Control", "max-age=0, no-cache, must-revalidate, proxy-revalidate");
+		 $response->headers->set('Content-Type', 'application/force-download');
+		 $response->headers->set('Content-Type', 'application/octet-stream');
+		 $response->headers->set('Content-Type', 'application/download');
+		 $response->headers->set('Content-Disposition', $disposition);
+		 // Dispatch request
+		 return $response;
+
+	 }
+
+
+	 	 /**
+	 	 * @Route("/api/ERP/storesmanagers/exportconsumerproducts", name="exportConsumerProducts")
+	 	 */
+	 	 public function exportConsumerProducts(RouterInterface $router,Request $request)
+	 	 {
+	 		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+	 		 $template=dirname(__FILE__)."/../Forms/ConsumerProducts.json";
+
+	 		 $start=$request->query->get("start");
+	 		 $end=$request->query->get("end");
+	 		 $labels=$request->query->get("labels");
+	 		 $data=$request->query->get("data");
+
+	 		 $labels_array=explode(",",$labels);
+	 		 $data_array=explode(",",$data);
+	 		 $count=sizeof($labels_array);
+
+	 		 $result_array=Array();
+	 		 for($i=0;$i<$count;$i++){
+	 			 $item["trabajador"]=$labels_array[$i];
+	 			 $item["Nº de productos"]=$data_array[$i];
+	 		   $result_array[]=$item;
+	 		 }
+
+
+	 		 $result=$this->exportProductsByConsumer($result_array,$template);
+	 		 return $result;
+
+	 	 }
+
+
+	 	 public function exportProductsByConsumer($list, $template){
+	 		 $this->template=$template;
+	 		 $filename='Productos_por_consumidor.csv';
+	 		 $array=$list;
+	 		 //exclude tags column, last
+	 		 $key='_tags';
+	 		 array_walk($array, function (&$v) use ($key) {
+	 			unset($v[$key]);
+	 		 });
+	 	 //	 $array=$this->applyFormats($array);
+
+	 		 $fileContent=$this->createCSV($array);
+	 		 $response = new Response($fileContent);
+	 		 // Create the disposition of the file
+	 				$disposition = $response->headers->makeDisposition(
+	 						ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+	 						$filename
+	 			);
+	 		 // Set the content disposition
+	 		 $seconds_to_cache = 0;
+	 		 $ts = gmdate("D, d M Y H:i:s", time() + $seconds_to_cache) . " GMT";
+	 		 $response->headers->set("Expires", $ts);
+	 		 $response->headers->set("Pragma", "cache");
+	 		 $response->headers->set("Cache-Control", "max-age=0, no-cache, must-revalidate, proxy-revalidate");
+	 		 $response->headers->set('Content-Type', 'application/force-download');
+	 		 $response->headers->set('Content-Type', 'application/octet-stream');
+	 		 $response->headers->set('Content-Type', 'application/download');
+	 		 $response->headers->set('Content-Disposition', $disposition);
+	 		 // Dispatch request
+	 		 return $response;
+
+	 	 }
+
+
+
+		 /**
+	 	 * @Route("/api/ERP/storesmanagers/exportbestproducts", name="exportBestProducts")
+	 	 */
+	 	 public function exportBestProducts(RouterInterface $router,Request $request)
+	 	 {
+	 		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+	 		 $template=dirname(__FILE__)."/../Forms/BestProducts.json";
+
+	 		 $start=$request->query->get("start");
+	 		 $end=$request->query->get("end");
+	 		 $labels=$request->query->get("labels");
+	 		 $data=$request->query->get("data");
+
+	 		 $labels_array=explode(",",$labels);
+	 		 $data_array=explode(",",$data);
+	 		 $count=sizeof($labels_array);
+
+	 		 $result_array=Array();
+	 		 for($i=0;$i<$count;$i++){
+	 			 $item["Producto"]=$labels_array[$i];
+	 			 $item["Cantidad"]=$data_array[$i];
+	 		   $result_array[]=$item;
+	 		 }
+
+
+	 		 $result=$this->exportQuantityProducts($result_array,$template);
+	 		 return $result;
+
+	 	 }
+
+
+	 	 public function exportQuantityProducts($list, $template){
+	 		 $this->template=$template;
+	 		 $filename='Productos_mas_utilizados.csv';
+	 		 $array=$list;
+	 		 //exclude tags column, last
+	 		 $key='_tags';
+	 		 array_walk($array, function (&$v) use ($key) {
+	 			unset($v[$key]);
+	 		 });
+	 	 //	 $array=$this->applyFormats($array);
+
+	 		 $fileContent=$this->createCSV($array);
+	 		 $response = new Response($fileContent);
+	 		 // Create the disposition of the file
+	 				$disposition = $response->headers->makeDisposition(
+	 						ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+	 						$filename
+	 			);
+	 		 // Set the content disposition
+	 		 $seconds_to_cache = 0;
+	 		 $ts = gmdate("D, d M Y H:i:s", time() + $seconds_to_cache) . " GMT";
+	 		 $response->headers->set("Expires", $ts);
+	 		 $response->headers->set("Pragma", "cache");
+	 		 $response->headers->set("Cache-Control", "max-age=0, no-cache, must-revalidate, proxy-revalidate");
+	 		 $response->headers->set('Content-Type', 'application/force-download');
+	 		 $response->headers->set('Content-Type', 'application/octet-stream');
+	 		 $response->headers->set('Content-Type', 'application/download');
+	 		 $response->headers->set('Content-Disposition', $disposition);
+	 		 // Dispatch request
+	 		 return $response;
+
+	 	 }
+
+
+
+	 private function createCSV(array &$array){
+			if (count($array) == 0) {
+				return null;
+			}
+			ob_start();
+			$df = fopen("php://output", 'w');
+			fputcsv($df, array_map("utf8_decode",array_keys(reset($array))));
+			foreach ($array as $row) {
+				 fputcsv($df, array_values (array_map("utf8_decode", $row )));
+			}
+			fclose($df);
+			return ob_get_clean();
+	}
+
 
 }

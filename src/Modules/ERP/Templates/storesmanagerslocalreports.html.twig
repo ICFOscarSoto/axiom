@@ -54,7 +54,7 @@
 				<div class="col-md-12">
         <div class="col-md-6 overflow-auto" style="border:1px solid #ccc">
 				</br>
-				<button id="consumeroperations-export" style="display:none;" type="button" class="btn btn-default btn-icon icon-left" onclick="exportconsumeroperations();">Exportar informe<i class="fa fa-download"></i></button>
+				<button id="consumeroperations-export" style="display:none;" type="button" class="btn btn-default btn-icon icon-left">Exportar informe<i class="fa fa-download"></i></button>
 				</br>
 				</br>
           <canvas id="ERPStoresManagersReports-consumeroperations-{{ id }}" width="100%"></canvas>
@@ -351,27 +351,30 @@ function getData(){
 
 
 
-function exportconsumeroperations(){
-  data=ConsumerOperationsData.data;
-  labels=ConsumerOperationsgraphData.labels;
+ $('body').on('click', "[id=consumeroperations-export]", function(e) {
+	 labels=ConsumerOperationsgraphData.labels;
+	 data=ConsumerOperationsData.data;
+	 var win = window.open("/api/ERP/storesmanagers/exportconsumeroperations?start="+encodeURI($("#date-from").val())+"&end="+encodeURI($("#date-to").val())+"&labels="+encodeURI(labels)+"&data="+encodeURI(data));
+	 win.focus();
 
+ });
 
-}
+ $('body').on('click', "[id=consumerproducts-export]", function(e) {
+	 labels=ConsumerProductsgraphData.labels;
+	 data=ConsumerProductsData.data;
+	 var win = window.open("/api/ERP/storesmanagers/exportconsumerproducts?start="+encodeURI($("#date-from").val())+"&end="+encodeURI($("#date-to").val())+"&labels="+encodeURI(labels)+"&data="+encodeURI(data));
+	 win.focus();
 
+ });
 
-function exportconsumerproducts(){
-  data=ConsumerProductsData.data;
-  labels=ConsumerProductsgraphData.labels;
+ $('body').on('click', "[id=bestproducts-export]", function(e) {
+	labels=BestProductsgraphData.labels;
+	data=BestProductsData.data;
+	var win = window.open("/api/ERP/storesmanagers/exportbestproducts?start="+encodeURI($("#date-from").val())+"&end="+encodeURI($("#date-to").val())+"&labels="+encodeURI(labels)+"&data="+encodeURI(data));
+	win.focus();
 
+ });
 
-}
-
-function exportbestproducts(){
-  data=BestProducts.data;
-  labels=BesProductsgraphData.labels;
-
-
-}
 
 function datepicker(){
   /*
