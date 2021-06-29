@@ -1,69 +1,95 @@
-<script src="{{ url('index') }}js/moment.min.js"></script>
-<script src="{{ url('index') }}js/moment-es.js"></script>
-<script src="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker.min.js"></script>
-<script src="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker-es.js"></script>
-<div class="panel-heading">
-<div class="panel-title">Informes del gestor</div>
-</div>
-<div class="panel-body" style="">
-<div class="row">
-  <div class="col-md-2">
-    <div class="form-group">
-      <input type="text" id="date-from" attr="minDate" name="form[from]" class="datepicker form-control" defaultdate="" value="" placeholder="Fecha de inicio...">
+
+{% set params = app.request.attributes.get('_route_params')|merge(app.request.query.all()) %}
+{% block header %}
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<meta name="description" content="Axiom Business Management" />
+	<meta name="author" content="" />
+	<link rel="icon" href="images/favicon.ico">
+	{{ include('@Globale/header.html.twig') }}
+  <script src="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker-es.js"></script>
+  <link rel="stylesheet" href="{{ url('index') }}js/rickshaw/rickshaw.min.css">
+	<!-- Imported styles on this page -->
+	<link rel="stylesheet" href="{{ url('index') }}css/bootstrap-grid.css">
+		<link rel="stylesheet" href="{{ url('index') }}css/timeline.css">
+	<link rel="stylesheet" href="{{ url('index') }}/js/jvectormap/jquery-jvectormap-1.2.2.css">
+	<link rel="stylesheet" href="{{ url('index') }}/js/rickshaw/rickshaw.min.css">
+{% endblock %}
+<title>{% block title %}{{ interfaceName|trans }}{% endblock %}</title>
+<body class="page-body" data-url="{{ url('indexAdmin') }}">
+<div class="page-container"><!-- add class "sidebar-collapsed" to close sidebar by default, "chat-visible" to make chat appear always -->
+	{{ include('@Globale/sidebar_menu.html.twig') }}
+	<div class="main-content">
+		{{ include('@Globale/head.html.twig') }}
+		<hr />
+		{{ include('@Globale/breadcrumb.html.twig') }}
+		{#}<h2>{{ interfaceName }}</h2>#}
+		<!-- MAIN CONTENT -->
+		<div id="storemanagerslocalreports-body">
+        <div class="panel-heading">
+        <div class="panel-title">Informes del gestor</div>
+        </div>
+        <div class="panel-body" style="">
+        <div class="row">
+					<div class="col-md-2">
+				    <div class="form-group">
+				      <input type="text" id="date-from" attr="minDate" name="form[from]" class="datepicker form-control" defaultdate="" value="" placeholder="Fecha de inicio...">
+				    </div>
+				  </div>
+				  <div class="col-md-2">
+				    <div class="form-group">
+				      <input type="text" id="date-to" attr="maxDate"  name="form[to]" class="datepicker form-control" defaultdate="" value="" placeholder="Fecha de fin...">
+				    </div>
+				  </div>
+				  <div class="col-md-2">
+				    <div class="form-group">
+				      <button id="get-reports" type="button" class="btn btn-default btn-icon icon-left" onclick="getData();">Generar informe<i class="fa fa-download"></i></button>
+				    </div>
+				  </div>
+        </div>
+				</br>
+				</br>
+        <div class="row">
+				<div class="col-md-12">
+        <div class="col-md-6 overflow-auto" style="border:1px solid #ccc">
+				</br>
+				<button id="consumeroperations-export" style="display:none;" type="button" class="btn btn-default btn-icon icon-left" onclick="exportconsumeroperations();">Exportar informe<i class="fa fa-download"></i></button>
+				</br>
+				</br>
+          <canvas id="ERPStoresManagersReports-consumeroperations-{{ id }}" width="100%"></canvas>
+        </div>
+        <div class="col-md-6 overflow-auto" style="border:1px solid #ccc">
+				</br>
+				<button id="consumerproducts-export"  style="display:none;" type="button" class="btn btn-default btn-icon icon-left" onclick="exportconsumerproducts();">Exportar informe<i class="fa fa-download"></i></button>
+				</br>
+				</br>
+          <canvas id="ERPStoresManagersReports-consumerproducts-{{ id }}" width="100%"></canvas>
+        </div>
+        </div>
+			</div>
+			</br>
+			</br>
+        <div class="row">
+					<div class="col-md-12">
+          <div class="col-md-6 overflow-auto" style="border:1px solid #ccc">
+					</br>
+					<button id="bestproducts-export"  style="display:none;" type="button" class="btn btn-default btn-icon icon-left" onclick="exportbestproducts();">Exportar informe<i class="fa fa-download"></i></button>
+					</br>
+					</br>
+					<canvas id="ERPStoresManagersReports-bestproducts-{{ id }}" width="100%"></canvas>
+          </div>
+          <div class="col-md-6">
+							&nbsp;
+          </div>
+				</div>
+        </div>
+        </div>
+      </div>
     </div>
-  </div>
-  <div class="col-md-2">
-    <div class="form-group">
-      <input type="text" id="date-to" attr="maxDate"  name="form[to]" class="datepicker form-control" defaultdate="" value="" placeholder="Fecha de fin...">
-    </div>
-  </div>
-  <div class="col-md-2">
-    <div class="form-group">
-      <button id="get-reports" type="button" class="btn btn-default btn-icon icon-left" onclick="getData();">Generar informe<i class="fa fa-download"></i></button>
-    </div>
-  </div>
 </div>
-</br>
-</br>
-<div class="row">
-<div class="col-md-12">
-<div class="col-md-6 overflow-auto" style="border:1px solid #ccc">
-</br>
-<button id="consumeroperations-export" style="display:none;" type="button" class="btn btn-default btn-icon icon-left" onclick="exportconsumeroperations();">Exportar informe<i class="fa fa-download"></i></button>
-</br>
-</br>
-  <canvas id="ERPStoresManagersReports-consumeroperations-{{ id }}" width="100%"></canvas>
-</div>
-<div class="col-md-6 overflow-auto" style="border:1px solid #ccc">
-</br>
-<button id="consumerproducts-export"  style="display:none;" type="button" class="btn btn-default btn-icon icon-left" onclick="exportconsumerproducts();">Exportar informe<i class="fa fa-download"></i></button>
-</br>
-</br>
-  <canvas id="ERPStoresManagersReports-consumerproducts-{{ id }}" width="100%"></canvas>
-</div>
-</div>
-</div>
-</br>
-</br>
-<div class="row">
-  <div class="col-md-12">
-  <div class="col-md-6 overflow-auto" style="border:1px solid #ccc">
-  </br>
-  <button id="bestproducts-export"  style="display:none;" type="button" class="btn btn-default btn-icon icon-left" onclick="exportbestproducts();">Exportar informe<i class="fa fa-download"></i></button>
-  </br>
-  </br>
-  <canvas id="ERPStoresManagersReports-bestproducts-{{ id }}" width="100%"></canvas>
-  </div>
-  <div class="col-md-6">
-      &nbsp;
-  </div>
-</div>
-</div>
-</div>
+
 <script>
-
-
-
 var ctxConsumerOperations = document.getElementById('ERPStoresManagersReports-consumeroperations-{{ id }}');
 var ctxConsumerProducts = document.getElementById('ERPStoresManagersReports-consumerproducts-{{ id }}');
 var ctxBestProducts = document.getElementById('ERPStoresManagersReports-bestproducts-{{ id }}');
@@ -222,7 +248,7 @@ var chartBestProductsOptions = {
   }
 };
 
-$(function () {
+$(document).ready(function() {
   datepicker();
   stackedBarConsumerOperations = new Chart(ctxConsumerOperations, {
     type: 'bar',
@@ -241,8 +267,9 @@ $(function () {
     data: [],
     options: chartBestProductsOptions
   });
+
+//  getData();
 /*
-  getData();
   window.setInterval(function(){
     getData();
   }, 60000);*/
@@ -314,10 +341,9 @@ function getData(){
       stackedBarBestProducts.data=BestProductsgraphData;
       stackedBarBestProducts.update();
 
-
-      $('#consumeroperations-export').css("display","block");
-      $('#consumerproducts-export').css("display","block");
-      $('#bestproducts-export').css("display","block");
+			$('#consumeroperations-export').css("display","block");
+			$('#consumerproducts-export').css("display","block");
+			$('#bestproducts-export').css("display","block");
 
      }
    });
@@ -332,7 +358,23 @@ function exportconsumeroperations(){
 
 }
 
+
+function exportconsumerproducts(){
+  data=ConsumerProductsData.data;
+  labels=ConsumerProductsgraphData.labels;
+
+
+}
+
+function exportbestproducts(){
+  data=BestProducts.data;
+  labels=BesProductsgraphData.labels;
+
+
+}
+
 function datepicker(){
+  /*
 	$('.datetimepicker').each(function(index) {
 		  var valueField=$(this).val();
 		  var dateField=moment(valueField, "DD/MM/YYYY HH:mm:ss");
@@ -348,7 +390,7 @@ function datepicker(){
 		  if($(this).attr("minDate")!="" && typeof $(this).attr("minDate")!==typeof undefined) $(this).data("DateTimePicker").minDate(moment($(this).attr("minDate"), "YYYY-MM-DD"));
 		  if($(this).attr("maxDate")!="" && typeof $(this).attr("maxDate")!==typeof undefined) $(this).data("DateTimePicker").maxDate(moment($(this).attr("maxDate"), "YYYY-MM-DD"));
 		});
-
+*/
     $('.datepicker').each(function(index) {
       var valueField=$(this).val();
       var dateField=moment(valueField, "DD/MM/YYYY");
@@ -387,4 +429,8 @@ function datepicker(){
 <script src="{{ url('index') }}js/fileinput.js"></script>
 <script src="{{ url('index') }}js/ol/ol.js"></script>
 	 {{ include('@Globale/bottom.html.twig') }}
+   <link rel="stylesheet" href="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker.min.css">
+ 																		<script src="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker.min.js"></script>
+ 															<script src="{{ url('index') }}js/jquery.nestable.js"></script>
 {% endblock %}
+</body>

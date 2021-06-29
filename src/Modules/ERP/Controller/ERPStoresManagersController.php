@@ -6,6 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -273,6 +274,58 @@ class ERPStoresManagersController extends Controller
 		return new JsonResponse($result);
 	}
 
+
+
+	/**
+	 * @Route("/{_locale}/erp/storesmanagers/localreports", name="storesManagersLocalReports")
+	 */
+	 public function storesManagersLocalReports(RouterInterface $router, Request $request)
+	 {
+
+		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		 if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
+		 $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
+		 $userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
+		 $locale = $request->getLocale();
+		$this->router = $router;
+
+		 $storemanageruser=null;
+		 $storeManagersUsersRepository=$this->getDoctrine()->getRepository(ERPStoresManagersUsers::class);
+		 $storemanageruser=$storeManagersUsersRepository->findOneBy(["user"=>$this->getUser()]);
+		 if(!$storemanageruser)		 return new RedirectResponse($this->router->generate('app_login'));
+		 else $id=$storemanageruser->getManager()->getId();
+
+		 $from=new \Datetime();
+		 $from->modify('first day of this month');
+		 $to=new \Datetime();
+		 $to->modify('+1 day');
+
+
+		 $new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-plus"];
+		 $breadcrumb=$menurepository->formatBreadcrumb('genericindex','ERP','StoreTickets');
+		 array_push($breadcrumb,$new_breadcrumb);
+		 
+		 if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+				 return $this->render('@ERP/storesmanagerslocalreports.html.twig', [
+					 'controllerName' => 'storesManagersController',
+					 'interfaceName' => 'StoresManagesReports',
+					 'optionSelected' => 'genericindex',
+					 'optionSelectedParams' => ["module"=>"ERP", "name"=>"StoresManagersReports"],
+					 'menuOptions' =>  $menurepository->formatOptions($userdata),
+					 'breadcrumb' =>  $breadcrumb,
+					 'userData' => $userdata,
+					 'id' => $id,
+					 'from' => $from,
+					 'to' => $to
+
+					 ]);
+			 }
+			 return new RedirectResponse($this->router->generate('app_login'));
+	}
+
+
+
+
 	/**
 	 * @Route("/{_locale}/erp/storesmanagers/reports/{id}", name="storesManagersReports", defaults={"id"=0})
 	 */
@@ -311,16 +364,22 @@ class ERPStoresManagersController extends Controller
 	 */
 	 public function storesManagersGetReports($id, Request $request)
 	 {
+		 /*
 				 $from=new \Datetime();
 				 $from->modify('first day of this month');
 				 $to=new \Datetime();
-				 $to->modify('+1 day');
+				 $to->modify('+1 day');*/
+
+				 $start=$request->request->get("start");
+				 $end=$request->request->get("end");
+				 $start=date_create_from_format('d/m/Y',$start);
+				 $end=date_create_from_format('d/m/Y',$end);
 				 $operationsRepository=$this->getDoctrine()->getRepository(ERPStoresManagersOperations::class);
 				 $operationLinesRepository=$this->getDoctrine()->getRepository(ERPStoresManagersOperationsLines::class);
 
-				 $array_consumers=$operationsRepository->getOperationsByConsumer($id,$from,$to);
-				 $array_consumerproducts=$operationLinesRepository->getProductsByConsumer($id,$from,$to);
-				 $array_bestproducts=$operationLinesRepository->getBestProducts($id,$from,$to);
+				 $array_consumers=$operationsRepository->getOperationsByConsumer($id,$start,$end);
+				 $array_consumerproducts=$operationLinesRepository->getProductsByConsumer($id,$start,$end);
+				 $array_bestproducts=$operationLinesRepository->getBestProducts($id,$start,$end);
 				 $managerRepository=$this->getDoctrine()->getRepository(ERPStoresManagers::class);
 				 $eanRepostory=$this->getDoctrine()->getRepository(ERPEAN13::class);
 				 $manager=$managerRepository->findOneBy(["id"=>$id]);
@@ -330,7 +389,38 @@ class ERPStoresManagersController extends Controller
 					 $best["ean13"]=$ean13;
 					 array_push($array,$best);
 				 }
-				 return new JsonResponse(["from"=>$from, "to"=>$to, "consumers"=>$array_consumers, "consumerproducts"=>$array_consumerproducts, "bestproducts"=>$array]);
+				 return new JsonResponse(["from"=>$start, "to"=>$end, "consumers"=>$array_consumers, "consumerproducts"=>$array_consumerproducts, "bestproducts"=>$array]);
+
+
+	 }
+
+
+
+	 /**
+	 * @Route("/api/ERP/storesmanagers/exportconsumeroperations", name="exportConsumerOperations")
+	 */
+	 public function exportConsumerOperations(RouterInterface $router,Request $request)
+	 {
+
+		 $start=$request->query->get("start");
+		 $end=$request->query->get("end");
+		 $template=dirname(__FILE__)."/../Forms/InsuredCustomers.json";
+		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		 /*
+		 $customersRepository=$this->getDoctrine()->getRepository(ERPCustomers::class);
+		 $customers=$customersRepository->findInsuredCustomers($this->getUser()->getCompany());
+		 */
+		 $result_array=Array();/*
+		 foreach($customers as $customer)
+		 {
+					 $item['id']=$customer["code"];
+					 $item['Razón Social']=$customer["socialname"];
+					 $item['CIF']=$customer["vat"];
+					 $result_array[]=$item;
+		 }
+*/
+		$result=$this->exportcustomers($result_array,$template);
+		return $result;
 
 
 	 }
