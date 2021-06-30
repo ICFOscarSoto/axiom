@@ -3,9 +3,13 @@
         {
             "name": "data",
             "fields": [
-              
+
                 {
                     "name": "user",
+                    "cols": 8
+                },
+                {
+                    "name": "isadmin",
                     "cols": 8
                 },
                 {

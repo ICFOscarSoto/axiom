@@ -49,6 +49,11 @@ class ERPStoresManagersUsers
      */
     private $deleted;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $isadmin;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -122,6 +127,18 @@ class ERPStoresManagersUsers
     public function setDeleted(bool $deleted): self
     {
         $this->deleted = $deleted;
+
+        return $this;
+    }
+
+    public function getIsadmin(): ?bool
+    {
+        return $this->isadmin;
+    }
+
+    public function setIsadmin(?bool $isadmin): self
+    {
+        $this->isadmin = $isadmin;
 
         return $this;
     }

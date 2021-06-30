@@ -8,6 +8,22 @@
         "caption": "user"
     },
     {
+        "name": "isadmin",
+        "caption": "Administrador",
+        "width": "10%",
+        "class": "dt-center",
+        "replace": {
+            "1": {
+                "text": "Si",
+                "html": "<div style=\"min-width: 75px;\" class=\"label label-success\">Si<\/div>"
+            },
+            "0": {
+                "text": "No",
+                "html": "<div style=\"min-width: 75px;\" class=\"label label-danger\">No<\/div>"
+            }
+        }
+    },
+    {
         "name": "active",
         "caption": "Estado",
         "width": "10%",
