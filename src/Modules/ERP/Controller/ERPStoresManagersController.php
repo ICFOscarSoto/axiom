@@ -314,11 +314,11 @@ class ERPStoresManagersController extends Controller
 		 $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
 		 $userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
 		 $locale = $request->getLocale();
-		$this->router = $router;
+		 $this->router = $router;
 
 		 $storemanageruser=null;
 		 $storeManagersUsersRepository=$this->getDoctrine()->getRepository(ERPStoresManagersUsers::class);
-		 $storemanageruser=$storeManagersUsersRepository->findOneBy(["user"=>$this->getUser()]);
+		 $storemanageruser=$storeManagersUsersRepository->findOneBy(["user"=>$this->getUser(),"isadmin"=>1]);
 		 if(!$storemanageruser)		 return new RedirectResponse($this->router->generate('app_login'));
 		 else $id=$storemanageruser->getManager()->getId();
 
