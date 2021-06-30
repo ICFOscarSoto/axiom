@@ -205,7 +205,33 @@ class ERPWorkListController extends Controller
 					$product_item["variant_name"]=$variant?$variant->getVariantname()->getName():"";
 					$product_item["variant_value"]=$variant?$variant->getName():"";
 					$product_item["variant_active"]=$variant?$variant->getActive():true;
-					$product_item["stock"]=$line->getQuantity();
+					$product_item["quantity"]=$line->getQuantity();
+
+					$stock_items=[];
+					$stocks=$Stocksrepository->findBy(["product"=>$product, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
+					foreach($stocks as $stock){
+						$storeUser=$StoreUsersrepository->findOneBy(["user"=>$this->getUser(), "store"=>$stock->getStorelocation()->getStore(), "active"=>1, "deleted"=>0]);
+						if($storeUser){
+							$stock_item["id"]=$stock->getId();
+							$stock_item["variant_id"]=!$stock->getProductvariant()?0:$stock->getProductvariant()->getId();
+							$stock_item["warehouse_code"]=$stock->getStorelocation()->getStore()->getCode();
+							$stock_item["warehouse"]=$stock->getStorelocation()->getStore()->getName();
+							$stock_item["warehouse_id"]=$stock->getStorelocation()->getStore()->getId();
+							$stock_item["warehouse_preferential"]=$storeUser->getPreferential();
+							$stock_item["location"]=$stock->getStorelocation()->getName();
+							$stock_item["location_id"]=$stock->getStorelocation()->getId();
+							$stock_item["quantity"]=!$stock->getQuantity()?0:$stock->getQuantity();
+							$stock_item["pendingserve"]=!$stock->getPendingserve()?0:$stock->getPendingserve();
+							$stock_item["pendingreceive"]=!$stock->getPendingreceive()?0:$stock->getPendingreceive();
+							$stock_item["minstock"]=!$stock->getMinstock()?0:$stock->getMinstock();
+							$stock_items[]=$stock_item;
+						}
+					}
+					usort($stock_items, function($a, $b) {
+							return $a['warehouse_id'] <=> $b['warehouse_id'];
+					});
+					$product_item["stock"]=$stock_items;
+
 					$product_item["provider"]=$product->getSupplier()?$product->getSupplier()->getName():"";
 					$product_item["eans"]=[];
 					$product_item["active"]=$product->getActive();
