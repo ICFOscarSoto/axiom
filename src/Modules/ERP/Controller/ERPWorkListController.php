@@ -131,7 +131,8 @@ class ERPWorkListController extends Controller
 		$productsVariantsRepository=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
 		$storesRepository=$this->getDoctrine()->getRepository(ERPStores::class);
 		$storeLocationsRepository=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
-
+		$Stocksrepository=$this->getDoctrine()->getRepository(ERPStocks::class);
+		$StoreUsersrepository=$this->getDoctrine()->getRepository(ERPStoresUsers::class);
 
     $worklist=$worklistRepository->findAll(["user"=>$this->getUser()->getCompany(),"deleted"=>0]);
 
