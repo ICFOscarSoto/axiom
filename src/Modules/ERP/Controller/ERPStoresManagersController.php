@@ -278,6 +278,29 @@ class ERPStoresManagersController extends Controller
 		return new JsonResponse($result);
 	}
 
+	/**
+	* @Route("/api/erp/storesmanagers/consumers/changenfc/{id}/{nfcid}", name="changeconsumernfc", defaults={"nfcid"=-1})
+	*/
+	public function changeconsumernfc($id, $nfcid, Request $request){
+		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		if($nfcid=="" || $nfcid==-1) return new JsonResponse(array('result' => -5, 'text'=>"El codigo nfc no puede ser nulo"));
+		$repositoryUsers=$this->getDoctrine()->getRepository(ERPStoresManagersUsers::class);
+		$usermanager=$repositoryUsers->findOneBy(["user"=>$this->getUser(), "active"=>1, "deleted"=>0]);
+		if(!$usermanager) return new JsonResponse(array('result' => -1, 'text'=>"Usuario no asignado a gestor"));
+		$repository=$this->getDoctrine()->getRepository(ERPStoresManagersConsumers::class);
+		$consumer=$repository->findOneBy(["id"=>$id, "deleted"=>0]);
+		if(!$consumer) return new JsonResponse(array('result' => -2, 'text'=>"Trabajador no encontrado"));
+		if($consumer->getManager()!=$usermanager->getManager()) return new JsonResponse(array('result' => -3, 'text'=>"Trabajador no encontrado"));
+		$obj=$repository->findOneBy(["nfcid"=>$nfcid,"deleted"=>0]);
+		if($obj!=null && $obj->getId()!=$consumer->getId() && $nfcid!=null) return new JsonResponse(array('result' => -4, 'text'=>"Tarjeta ya asignada a otro trabajador"));
+
+		$consumer->setNfcid($nfcid);
+		$consumer->setDateupd(new \Datetime());
+		$this->getDoctrine()->getManager()->persist($consumer);
+		$this->getDoctrine()->getManager()->flush();
+		return new JsonResponse(["result"=>1]);
+	}
+
 
 
 	/**
