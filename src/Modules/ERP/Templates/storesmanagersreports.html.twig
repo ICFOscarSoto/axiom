@@ -17,6 +17,15 @@
       <input type="text" id="date-to" attr="maxDate"  name="form[to]" class="datepicker form-control" defaultdate="" value="" placeholder="Fecha de fin...">
     </div>
   </div>
+  <div class="col-md-3">
+    <div class="form-group">
+      <select type="text" id="stores" class="form-control select2" required>
+        {% for option in stores %}
+          <option value="{{ option.id }}">{{ option.text }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
   <div class="col-md-2">
     <div class="form-group">
       <button id="get-reports" type="button" class="btn btn-default btn-icon icon-left" onclick="getData();">Generar informe<i class="fa fa-download"></i></button>
@@ -257,7 +266,7 @@ function getData(){
     $.ajax({
      url: '{{ url('storesManagersGetReports', {"id": id}) }}',
      type: 'POST',
-     data: 'start='+$("#date-from").val()+'&end='+$("#date-to").val(),
+     data: 'start='+$("#date-from").val()+'&end='+$("#date-to").val()+'&store='+$('#stores').val(),
   //   data: JSON.stringify(data),
 
      success:  function( data ) {

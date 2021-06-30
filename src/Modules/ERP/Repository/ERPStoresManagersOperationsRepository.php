@@ -48,17 +48,35 @@ class ERPStoresManagersOperationsRepository extends ServiceEntityRepository
     }
     */
 
-    public function getOperationsByConsumer($manager, $start, $end){
+    public function getOperationsByConsumer($manager, $start, $end, $store){
     $date_start=$start->format("Y-m-d");
     $date_end=$end->format("Y-m-d");
-    $query="SELECT c.id, c.NAME, IFNULL(c.lastname,'') lastname, COUNT(c.id) total
-    FROM erpstores_managers_operations o
-    LEFT JOIN erpstores_managers_consumers c ON c.id=o.consumer_id
-    WHERE o.active=1 AND o.DATE >= :START AND o.DATE<=:END
-    GROUP BY(o.consumer_id) ORDER BY c.NAME, c.lastname";
-    $params=['START' => $date_start,
-             'END' => $date_end
-             ];
+
+    if($store==null){
+        $query="SELECT c.id, c.NAME, IFNULL(c.lastname,'') lastname, COUNT(c.id) total
+        FROM erpstores_managers_operations o
+        LEFT JOIN erpstores_managers_consumers c ON c.id=o.consumer_id
+        WHERE o.active=1 AND o.DATE >= :START AND o.DATE<=:END
+        GROUP BY(o.consumer_id) ORDER BY c.NAME, c.lastname";
+        $params=['START' => $date_start,
+                 'END' => $date_end
+                 ];
+
+    }
+    else{
+
+      $query="SELECT c.id, c.NAME, IFNULL(c.lastname,'') lastname, COUNT(c.id) total
+      FROM erpstores_managers_operations o
+      LEFT JOIN erpstores_managers_consumers c ON c.id=o.consumer_id
+      WHERE o.active=1 AND o.DATE >= :START AND o.DATE<=:END AND o.store_id=:STORE
+      GROUP BY(o.consumer_id) ORDER BY c.NAME, c.lastname";
+      $params=['START' => $date_start,
+               'END' => $date_end,
+               'STORE' => $store
+               ];
+
+
+    }
 
     $result=$this->getEntityManager()->getConnection()->executeQuery($query,$params)->fetchAll();
     return $result;

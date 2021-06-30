@@ -26,6 +26,7 @@ use App\Modules\ERP\Entity\ERPStoresManagersConsumers;
 use App\Modules\ERP\Entity\ERPStoresManagersUsers;
 use App\Modules\ERP\Entity\ERPStoresManagersOperations;
 use App\Modules\ERP\Entity\ERPStoresManagersOperationsLines;
+use App\Modules\ERP\Entity\ERPStoresManagersUsersStores;
 use App\Modules\ERP\Entity\ERPStoresUsers;
 use App\Modules\ERP\Entity\ERPCategories;
 use App\Modules\ERP\Entity\ERPProductsVariants;
@@ -332,6 +333,23 @@ class ERPStoresManagersController extends Controller
 		 $breadcrumb=$menurepository->formatBreadcrumb('genericindex','ERP','StoreTickets');
 		 array_push($breadcrumb,$new_breadcrumb);
 
+		 $storesmanagersusersstoresRepository=$this->getDoctrine()->getRepository(ERPStoresManagersUsersStores::class);
+		 $store_objects=$storesmanagersusersstoresRepository->findBy(["manageruser"=>$storemanageruser,"active"=>1,"deleted"=>0]);
+		 $stores=[];
+		 $option=null;
+		 $option["id"]=null;
+		 $option["text"]="Selecciona Almacén...";
+		 $stores[]=$option;
+		 $option=null;
+		 $option["id"]=-1;
+		 $option["text"]="Todos";
+		 $stores[]=$option;
+		 foreach($store_objects as $item){
+			 $option["id"]=$item->getStore()->getId();
+			 $option["text"]=$item->getName();
+			 $stores[]=$option;
+		 }
+
 		 if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 				 return $this->render('@ERP/storesmanagerslocalreports.html.twig', [
 					 'controllerName' => 'storesManagersController',
@@ -343,7 +361,8 @@ class ERPStoresManagersController extends Controller
 					 'userData' => $userdata,
 					 'id' => $id,
 					 'from' => $from,
-					 'to' => $to
+					 'to' => $to,
+					 'stores' => $stores
 
 					 ]);
 			 }
@@ -370,6 +389,27 @@ class ERPStoresManagersController extends Controller
 		 $to=new \Datetime();
 		 $to->modify('+1 day');
 
+		 $storemanageruser=null;
+		 $storeManagersUsersRepository=$this->getDoctrine()->getRepository(ERPStoresManagersUsers::class);
+		 $storemanageruser=$storeManagersUsersRepository->findOneBy(["user"=>$this->getUser(),"isadmin"=>1]);
+
+		 $storesmanagersusersstoresRepository=$this->getDoctrine()->getRepository(ERPStoresManagersUsersStores::class);
+		 $store_objects=$storesmanagersusersstoresRepository->findBy(["manageruser"=>$storemanageruser,"active"=>1,"deleted"=>0]);
+		 $stores=[];
+		 $option=null;
+		 $option["id"]=null;
+		 $option["text"]="Selecciona Almacén...";
+		 $stores[]=$option;
+		 $option=null;
+		 $option["id"]=-1;
+		 $option["text"]="Todos";
+		 $stores[]=$option;
+		 foreach($store_objects as $item){
+			 $option["id"]=$item->getStore()->getId();
+			 $option["text"]=$item->getName();
+			 $stores[]=$option;
+		 }
+
 		 if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 				 return $this->render('@ERP/storesmanagersreports.html.twig', [
 					 'controllerName' => 'storesManagersController',
@@ -379,7 +419,8 @@ class ERPStoresManagersController extends Controller
 					 'userData' => $userdata,
 					 'id' => $id,
 					 'from' => $from,
-					 'to' => $to
+					 'to' => $to,
+					 'stores' => $stores
 
 					 ]);
 			 }
@@ -399,14 +440,25 @@ class ERPStoresManagersController extends Controller
 
 				 $start=$request->request->get("start");
 				 $end=$request->request->get("end");
+				 $store=$request->request->get("store");
 				 $start=date_create_from_format('d/m/Y',$start);
 				 $end=date_create_from_format('d/m/Y',$end);
 				 $operationsRepository=$this->getDoctrine()->getRepository(ERPStoresManagersOperations::class);
 				 $operationLinesRepository=$this->getDoctrine()->getRepository(ERPStoresManagersOperationsLines::class);
 
-				 $array_consumers=$operationsRepository->getOperationsByConsumer($id,$start,$end);
-				 $array_consumerproducts=$operationLinesRepository->getProductsByConsumer($id,$start,$end);
-				 $array_bestproducts=$operationLinesRepository->getBestProducts($id,$start,$end);
+				 if($store=="-1"){
+					 $array_consumers=$operationsRepository->getOperationsByConsumer($id,$start,$end,null);
+					 $array_consumerproducts=$operationLinesRepository->getProductsByConsumer($id,$start,$end,null);
+					 $array_bestproducts=$operationLinesRepository->getBestProducts($id,$start,$end,null);
+
+				 }
+				 else{
+					 $array_consumers=$operationsRepository->getOperationsByConsumer($id,$start,$end,$store);
+					 $array_consumerproducts=$operationLinesRepository->getProductsByConsumer($id,$start,$end, $store);
+					 $array_bestproducts=$operationLinesRepository->getBestProducts($id,$start,$end,$store);
+
+				 }
+
 				 $managerRepository=$this->getDoctrine()->getRepository(ERPStoresManagers::class);
 				 $eanRepostory=$this->getDoctrine()->getRepository(ERPEAN13::class);
 				 $manager=$managerRepository->findOneBy(["id"=>$id]);
