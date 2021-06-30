@@ -179,7 +179,7 @@ class ERPSalesTicketsController extends Controller
 
 		$histories=$SalesTicketsHistoryRepository->findBy(["salesticket"=>$salesticket,"active"=>1,"deleted"=>0],["dateadd"=>"DESC"]);
 		foreach($histories as $key=>$item){
-			$histories[$key]=$item;
+		 	$histories[$key]=$item;
 		}
 
 		$gallery=[];
@@ -321,7 +321,7 @@ class ERPSalesTicketsController extends Controller
 		$salesticket->setExternalsalesordernumber($fields->externalsalesordernumber);
 		$salesticket->setSalesticketstate($salesticketstate);
 		$salesticket->setEmail($fields->email);
-		$salesticket->setObservations($fields->observations);
+		$salesticket->setObservations(str_replace("\n", '<br>', $fields->observations));
 		$salesticket->setDateupd(new \DateTime());
 		$salesticket->setDatelastnotify(new \DateTime());
 		$this->getDoctrine()->getManager()->persist($salesticket);
@@ -420,7 +420,7 @@ class ERPSalesTicketsController extends Controller
 
 		$history_obj->setSalesTicket($salesticket);
 		if($id==0 and $fields->myself=="1") $history_obj->setObservations($fields->observations."<br><p>Yo me encargo de ajustar el stock</p>");
-		else $history_obj->setObservations($fields->observations);
+		else 		$history_obj->setObservations(str_replace("\n", '<br>', $fields->observations));
 		$history_obj->setSalesticketstate($salesticketstate);
 		$history_obj->setActive(1);
 		$history_obj->setDeleted(0);

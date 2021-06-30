@@ -286,7 +286,7 @@ class ERPStoreTicketsController extends Controller
 												$storeticket->setAgent($inventorymanager);
 												$storeticket->setObservations("Hacer inventario de la variante ".$variant->getName()." del producto  ".$product_name." en el almacén ".$store->getName());
 												$storeticket->setStoreticketstate($storeticketstate);
-												$storeticket->setObservations($fields->observations);
+												$storeticket->setObservations(str_replace("\n", '<br>', $fields->observations));
 												$storeticket->setDateupd(new \DateTime());
 												$storeticket->setDatelastnotify(new \DateTime());
 												$this->getDoctrine()->getManager()->persist($storeticket);
@@ -346,7 +346,7 @@ class ERPStoreTicketsController extends Controller
 											$storeticket->setAgent($inventorymanager);
 											$storeticket->setObservations("Hacer inventario del producto  ".$product_name." en el almacén ".$store->getName());
 											$storeticket->setStoreticketstate($storeticketstate);
-											$storeticket->setObservations($fields->observations);
+											$storeticket->setObservations(str_replace("\n", '<br>', $fields->observations));
 											$storeticket->setDateupd(new \DateTime());
 											$storeticket->setDatelastnotify(new \DateTime());
 											$this->getDoctrine()->getManager()->persist($storeticket);
@@ -404,7 +404,7 @@ class ERPStoreTicketsController extends Controller
 								$storeticket->setObservations("Stock arreglado para el producto ".$product_name." en el almacén ".$default_store->getName());
 								$state_resolved=$storeticketsstatesRepository->findOneBy(["id"=>2, "active"=>1, "deleted"=>0]);
 								$storeticket->setStoreticketstate($state_resolved);
-								$storeticket->setObservations($fields->observations);
+								$storeticket->setObservations(str_replace("\n", '<br>', $fields->observations));
 								$storeticket->setDateupd(new \DateTime());
 								$storeticket->setDatelastnotify(new \DateTime());
 								$this->getDoctrine()->getManager()->persist($storeticket);
@@ -502,7 +502,7 @@ class ERPStoreTicketsController extends Controller
 
 
 							$storeticket->setStoreticketstate($storeticketstate);
-							$storeticket->setObservations($fields->observations);
+							$storeticket->setObservations(str_replace("\n", '<br>', $fields->observations));
 							$storeticket->setDateupd(new \DateTime());
 							$storeticket->setDatelastnotify(new \DateTime());
 							$this->getDoctrine()->getManager()->persist($storeticket);
@@ -619,7 +619,7 @@ class ERPStoreTicketsController extends Controller
 								else $history_obj->setNewagent($this->getUser());
 
 								$history_obj->setStoreTicket($storeticket);
-								$history_obj->setObservations($fields->observations);
+								$history_obj->setObservations(str_replace("\n", '<br>', $fields->observations));
 								$history_obj->setStoreticketstate($storeticketstate);
 								$history_obj->setActive(1);
 								$history_obj->setDeleted(0);
@@ -660,7 +660,7 @@ class ERPStoreTicketsController extends Controller
 								$storeticket->setObservations("Stock arreglado para el producto ".$product_name." en el almacén ".$default_store->getName());
 								$state_resolved=$storeticketsstatesRepository->findOneBy(["id"=>2, "active"=>1, "deleted"=>0]);
 								$storeticket->setStoreticketstate($state_resolved);
-								$storeticket->setObservations($fields->observations);
+								$storeticket->setObservations(str_replace("\n", '<br>', $fields->observations));
 								$storeticket->setDateupd(new \DateTime());
 								$storeticket->setDatelastnotify(new \DateTime());
 								$this->getDoctrine()->getManager()->persist($storeticket);
