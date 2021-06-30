@@ -1,0 +1,35 @@
+<script>
+  function validate_report(){
+
+		var valid=true;
+
+		if($("#date-from").val()==""){
+			toastr.error("Por favor, indica una fecha de inicio", "Confirmación", confirmation);
+			 valid=false;
+			 return valid;
+		 }
+
+		 if($("#date-to").val()==""){
+ 			toastr.error("Por favor, indica una fecha de fin", "Confirmación", confirmation);
+ 			 valid=false;
+ 			 return valid;
+ 		 }
+
+		 if($("#stores").val()==""){
+ 			toastr.error("Por favor, selecciona un almacén", "Confirmación", confirmation);
+ 			 valid=false;
+ 			 return valid;
+ 		 }
+
+		 	if($("#date-from").val()>$("#date-to").val()){
+
+				toastr.error("Por favor, selecciona un rango de fechas correcto", "Confirmación", confirmation);
+	 			 valid=false;
+	 			 return valid;
+
+			}
+
+		 return valid;
+	}
+
+</script>

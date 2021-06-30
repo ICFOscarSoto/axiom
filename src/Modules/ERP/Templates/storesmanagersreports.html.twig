@@ -69,6 +69,7 @@
 </div>
 </div>
 </div>
+{{ include('@ERP/storesmanagersreports_validation.html.twig') }}
 <script>
 
 
@@ -260,7 +261,8 @@ $(function () {
 
 
 function getData(){
-
+  if(validate_report())
+	{
   if($("#date-from").val()!="")
     if((++load_wait)==1) $("#load-spinner").fadeIn();
     $.ajax({
@@ -330,6 +332,7 @@ function getData(){
 
      }
    });
+ }
  }
 
 

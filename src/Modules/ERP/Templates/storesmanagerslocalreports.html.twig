@@ -97,7 +97,7 @@
       </div>
     </div>
 </div>
-
+{{ include('@ERP/storesmanagersreports_validation.html.twig') }}
 <script>
 var ctxConsumerOperations = document.getElementById('ERPStoresManagersReports-consumeroperations-{{ id }}');
 var ctxConsumerProducts = document.getElementById('ERPStoresManagersReports-consumerproducts-{{ id }}');
@@ -287,8 +287,8 @@ $(document).ready(function() {
 
 
 function getData(){
-
-  if($("#date-from").val()!="")
+	if(validate_report())
+	{
     if((++load_wait)==1) $("#load-spinner").fadeIn();
     $.ajax({
      url: '{{ url('storesManagersGetReports', {"id": id}) }}',
@@ -357,6 +357,7 @@ function getData(){
      }
    });
  }
+}
 
 
 
