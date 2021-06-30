@@ -25,6 +25,7 @@ use App\Modules\ERP\Entity\ERPProductsVariants;
 use App\Modules\ERP\Entity\ERPVariantsValues;
 use App\Modules\ERP\Entity\ERPWorkList;
 use App\Modules\ERP\Entity\ERPStores;
+use App\Modules\ERP\Entity\ERPStoresUsers;
 use App\Modules\ERP\Entity\ERPStocks;
 use App\Modules\ERP\Entity\ERPStoreLocations;
 use App\Modules\Globale\Entity\GlobaleUsersWidgets;
@@ -288,6 +289,7 @@ public function getWorkListProducts(Request $request){
 	$Stocksrepository=$this->getDoctrine()->getRepository(ERPStocks::class);
 	//$StoreUsersrepository=$this->getDoctrine()->getRepository(ERPStoresUsers::class);
 	$StoreLocationsrepository=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
+	$StoreUsersrepository=$this->getDoctrine()->getRepository(ERPStoresUsers::class);
 	$Storesrepository=$this->getDoctrine()->getRepository(ERPStores::class);
 	$worklistRepository=$this->getDoctrine()->getRepository(ERPWorkList::class);
 	$obj=null;
@@ -310,7 +312,37 @@ public function getWorkListProducts(Request $request){
 		$result_prod["variant_name"]=$variant?$variant->getVariantname()->getName():"";
 		$result_prod["variant_value"]=$variant?$variant->getVariantvalue()->getName():"";
 		$result_prod["variant_active"]=$variant?$variant->getActive():true;
-		$result_prod["stock"]=$item->getQuantity();
+		$result_prod["quantity"]=$item->getQuantity();
+
+
+		$stock_items=[];
+		$stocks=$Stocksrepository->findBy(["product"=>$obj, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
+		foreach($stocks as $stock){
+			$storeUser=$StoreUsersrepository->findOneBy(["user"=>$this->getUser(), "store"=>$stock->getStorelocation()->getStore(), "active"=>1, "deleted"=>0]);
+			if($storeUser){
+				$stock_item["id"]=$stock->getId();
+				$stock_item["variant_id"]=!$stock->getProductvariant()?0:$stock->getProductvariant()->getId();
+				$stock_item["warehouse_code"]=$stock->getStorelocation()->getStore()->getCode();
+				$stock_item["warehouse"]=$stock->getStorelocation()->getStore()->getName();
+				$stock_item["warehouse_id"]=$stock->getStorelocation()->getStore()->getId();
+				$stock_item["warehouse_preferential"]=$storeUser->getPreferential();
+				$stock_item["location"]=$stock->getStorelocation()->getName();
+				$stock_item["location_id"]=$stock->getStorelocation()->getId();
+				$stock_item["quantity"]=!$stock->getQuantity()?0:$stock->getQuantity();
+				$stock_item["pendingserve"]=!$stock->getPendingserve()?0:$stock->getPendingserve();
+				$stock_item["pendingreceive"]=!$stock->getPendingreceive()?0:$stock->getPendingreceive();
+				$stock_item["minstock"]=!$stock->getMinstock()?0:$stock->getMinstock();
+				$stock_items[]=$stock_item;
+			}
+		}
+		usort($stock_items, function($a, $b) {
+				return $a['warehouse_id'] <=> $b['warehouse_id'];
+		});
+		$result_prod["stock"]=$stock_items;
+
+
+
+
 		$result_prod["code"]=$obj->getCode();
 		$result_prod["name"]=$obj->getName();
 		$result_prod["provider"]=$obj->getSupplier()?$obj->getSupplier()->getName():"";
