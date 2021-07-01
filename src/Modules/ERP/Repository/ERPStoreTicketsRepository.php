@@ -71,7 +71,7 @@ class ERPStoreTicketsRepository extends ServiceEntityRepository
     public function getTicketsforInventory($store){
       $query="SELECT *
             FROM erpstore_tickets et
-            WHERE et.active = 1 AND et.deleted = 0 AND et.storeticketstate_id!=2 AND et.reason_id=1 AND et.store_id=:STORE LIMIT 20";
+            WHERE et.active = 1 AND et.deleted = 0 AND et.storeticketstate_id!=2 AND et.reason_id=1 AND et.store_id=:STORE LIMIT 25";
       $params=['STORE' => $store];
       return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
     }
