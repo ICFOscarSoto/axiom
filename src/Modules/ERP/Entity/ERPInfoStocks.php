@@ -28,27 +28,27 @@ class ERPInfoStocks
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPStores")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $Store;
+    private $store;
 
     /**
      * @ORM\Column(type="float", nullable=true)
      */
-    private $PendingToReceive;
+    private $pendingToReceive;
 
     /**
      * @ORM\Column(type="float", nullable=true)
      */
-    private $PendingToServe;
+    private $pendingToServe;
 
     /**
      * @ORM\Column(type="float", nullable=true)
      */
-    private $MinimumAmount;
+    private $minimumAmount;
 
     /**
      * @ORM\Column(type="float", nullable=true)
      */
-    private $MaximunQuantity;
+    private $maximunQuantity;
 
     /**
      * @ORM\Column(type="datetime")
@@ -89,60 +89,60 @@ class ERPInfoStocks
 
     public function getStore(): ?ERPStores
     {
-        return $this->Store;
+        return $this->store;
     }
 
-    public function setStore(?ERPStores $Store): self
+    public function setStore(?ERPStores $store): self
     {
-        $this->Store = $Store;
+        $this->store = $store;
 
         return $this;
     }
 
     public function getPendingToReceive(): ?float
     {
-        return $this->PendingToReceive;
+        return $this->pendingToReceive;
     }
 
-    public function setPendingToReceive(?float $PendingToReceive): self
+    public function setPendingToReceive(?float $pendingToReceive): self
     {
-        $this->PendingToReceive = $PendingToReceive;
+        $this->pendingToReceive = $pendingToReceive;
 
         return $this;
     }
 
     public function getPendingToServe(): ?float
     {
-        return $this->PendingToServe;
+        return $this->pendingToServe;
     }
 
-    public function setPendingToServe(?float $PendingToServe): self
+    public function setPendingToServe(?float $pendingToServe): self
     {
-        $this->PendingToServe = $PendingToServe;
+        $this->pendingToServe = $pendingToServe;
 
         return $this;
     }
 
     public function getMinimumAmount(): ?float
     {
-        return $this->MinimumAmount;
+        return $this->minimumAmount;
     }
 
-    public function setMinimumAmount(?float $MinimumAmount): self
+    public function setMinimumAmount(?float $minimumAmount): self
     {
-        $this->MinimumAmount = $MinimumAmount;
+        $this->minimumAmount = $minimumAmount;
 
         return $this;
     }
 
     public function getMaximunQuantity(): ?float
     {
-        return $this->MaximunQuantity;
+        return $this->maximunQuantity;
     }
 
-    public function setMaximunQuantity(?float $MaximunQuantity): self
+    public function setMaximunQuantity(?float $maximunQuantity): self
     {
-        $this->MaximunQuantity = $MaximunQuantity;
+        $this->maximunQuantity = $maximunQuantity;
 
         return $this;
     }

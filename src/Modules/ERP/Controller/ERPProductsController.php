@@ -23,6 +23,7 @@ use App\Modules\ERP\Entity\ERPStores;
 use App\Modules\ERP\Entity\ERPStoresUsers;
 use App\Modules\ERP\Entity\ERPCategories;
 use App\Modules\ERP\Entity\ERPProductsVariants;
+use App\Modules\ERP\Entity\ERPInfoStocks;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
@@ -34,6 +35,7 @@ use App\Modules\ERP\Utils\ERPStocksUtils;
 use App\Modules\ERP\Utils\ERPProductsAttributesUtils;
 use App\Modules\Security\Utils\SecurityUtils;
 use App\Modules\ERP\Reports\ERPEan13Reports;
+use App\Modules\ERP\Reports\ERPPrintQR;
 use App\Modules\ERP\Utils\ERPPrestashopUtils;
 
 class ERPProductsController extends Controller
@@ -41,6 +43,7 @@ class ERPProductsController extends Controller
 	private $class=ERPProducts::class;
 	private $utilsClass=ERPPrestashopUtils::class;
 	private $module='ERP';
+  private $url="http://192.168.1.250:9000/";
 	//private $utilsClass=ERPProductsUtils::class;
     /**
      * @Route("/{_locale}/admin/global/products", name="products")
@@ -1024,5 +1027,66 @@ class ERPProductsController extends Controller
 	 }
 
 
+	 /**
+	 * 	@Route("/es/ERP/generateQR", name="generateQR")
+	 */
+
+	 public function generateQR(RouterInterface $router,Request $request){
+		 $params["name"]=$request->query->get('name',null);
+		 $printQRUtils = new ERPPrintQR();
+		 $pdf=$printQRUtils->create($params);
+		 return new Response("", 200, array('Content-Type' => 'application/pdf'));
+	 }
+
+
+	 /**
+	 * @Route("/es/ERP/receiveTransfer/{transfer}", name="receiveTransfer")
+	 */
+
+	 public function receiveTransfer($transfer, RouterInterface $router,Request $request){
+		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+
+		 $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getTransfer.php?from='.$transfer);
+		 $objects=json_decode($json, true);
+		 $objects=$objects[0]["class"];
+		 foreach ($objects as $object){
+		 // buscamos el almacen del traspaso
+		 $storeRepository=$this->getDoctrine()->getRepository(ERPStores::class);
+		 $store=$storeRepository->findOneBy(['code'=>$object["almacen"]]);
+		 // buscamos el producto del traspaso
+		 $productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
+		 $product=$productRepository->findOneBy(['code'=>$object["code"]]);
+		 // buscamos la fila de los traspasos del producto y del almacén
+		 $infostocksRepository=$this->getDoctrine()->getRepository(ERPInfoStocks::class);
+ 		 $infostocks=$infostocksRepository->findOneBy(['store'=>$store->getId(), 'product'=>$product->getId()]);
+		 if ($infostocks==null) {
+			 $infostocks= new ERPInfoStocks();
+			 $infostocks->setDateadd(new \DateTime);
+			 $infostocks->setDateupd(new \DateTime);
+			 $infostocks->setProduct($product);
+			 $infostocks->setStore($store);
+			 $infostocks->setActive(1);
+			 $infostocks->setDeleted(0);
+		 }
+		 // actualizamos el stock del pendiente de recibir
+		 $received=(int)$object["stock"];
+		 $infostocks->setPendingToReceive($infostocks->getPendingToReceive()-$received);
+		 $this->getDoctrine()->getManager()->persist($infostocks);
+		 // si el traspaso se realiza en un almacén que no sea campollano/romica buscamos el stock del producto para modificarlo
+		 // en la ubicación genérica de ese almacén
+		 if ($store->getId()>2){
+			 $locationRepository=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
+			 $location=$locationRepository->findOneBy(['store'=>$store->getId()]);
+			 $stockRepository=$this->getDoctrine()->getRepository(ERPStocks::class);
+			 $stock=$stockRepository->findOneBy(['storelocation'=>$location->getId(), 'product'=>$product->getId()]);
+			 $stock->setQuantity($stock->getQuantity()+$received);
+			 $this->getDoctrine()->getManager()->persist($stock);
+		 }
+
+		 $this->getDoctrine()->getManager()->flush();
+	 	}
+
+		 return new Response();
+	 }
 
 }
