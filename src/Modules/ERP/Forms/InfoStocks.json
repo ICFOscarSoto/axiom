@@ -4,19 +4,19 @@
             "name": "data",
             "fields": [
                 {
-                    "name": "PendingToReceive",
+                    "name": "pendingToReceive",
                     "cols": 4
                 },
                 {
-                    "name": "PendingToServe",
+                    "name": "pendingToServe",
                     "cols": 4
                 },
                 {
-                    "name": "MinimumAmount",
+                    "name": "minimumQuantity",
                     "cols": 4
                 },
                 {
-                    "name": "MaximunQuantity",
+                    "name": "maximunQuantity",
                     "cols": 4
                 },
                 {
@@ -28,7 +28,7 @@
                     "cols": 4
                 },
                 {
-                    "name": "Store",
+                    "name": "store",
                     "cols": 4
                 }
             ]

@@ -4,28 +4,28 @@
         "caption": "id"
     },
     {
-        "name": "PendingToReceive",
-        "caption": "PendingToReceive"
+        "name": "pendingToReceive",
+        "caption": "pendingToReceive"
     },
     {
-        "name": "PendingToServe",
-        "caption": "PendingToServe"
+        "name": "pendingToServe",
+        "caption": "pendingToServe"
     },
     {
-        "name": "MinimumAmount",
-        "caption": "MinimumAmount"
+        "name": "minimumQuantity",
+        "caption": "minimumQuantity"
     },
     {
-        "name": "MaximunQuantity",
-        "caption": "MaximunQuantity"
+        "name": "maximunQuantity",
+        "caption": "maximunQuantity"
     },
     {
         "name": "product__name",
         "caption": "product"
     },
     {
-        "name": "Store__name",
-        "caption": "Store"
+        "name": "store__name",
+        "caption": "store"
     },
     {
         "name": "active",
