@@ -153,8 +153,9 @@ class PrestashopGetCustomers extends ContainerAwareCommand
              $customerentity=new ERPCustomers();
 
              $obj=$repositoryCustomers->findOneBy(["email"=>$customer_array["email"]]);
+             if($obj==null) $obj=$repositoryCustomers->findOneBy(["vat"=>$customer_array["cif"]]);
                       /*
-            Si no existe en axiom ningún cliente con ese email o estamos ante un usuario de grupo "cliente/GDTO3/GDTO2/GDTO1", entonces lo insertamos en Axiom.
+            Si no existe en axiom ningún cliente con ese email o CIF o estamos ante un usuario de grupo "cliente/GDTO3/GDTO2/GDTO1", entonces lo insertamos en Axiom.
             Este filtro lo ponemos porque es posible que ya exista una referencia a ese usuario en la BDD de algún pedido anterior
             que haya hecho como invitado. En este caso, le daremos preferencia a los datos del usuario en su cuenta registrada como como "cliente/GDTO3/GDTO2/GDTO1".
             */
@@ -327,7 +328,7 @@ class PrestashopGetCustomers extends ContainerAwareCommand
                   $this->doctrine->getManager()->flush();
            }
 
-         }//no está en Axiom
+         }//fin de no está en Axiom
          else{
            $output->writeln('Este cliente ya está incluido en Axiom');
 
