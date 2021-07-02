@@ -4,5 +4,5 @@
       {"id": "desactivateStoresManagersOperations", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"genericdisable", "routeParams":{"module":"ERP", "name":"StoresManagersOperations"}, "confirm" :true, "actionType" : "background", "tooltip":"" },
       {"id": "activateStoresManagersOperations", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "route":"genericenable", "routeParams":{"module":"ERP", "name":"StoresManagersOperations"}, "confirm" :true, "actionType" : "background", "tooltip":"" }
   ]},
-  {"id": "deleteStoresManagersOperations", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"genericdelete", "routeParams":{"module":"ERP", "name":"StoresManagersOperations"}, "confirm" :true, "undo" :false, "actionType" : "background", "tooltip":""}
+  {"id": "deleteStoresManagersOperations", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"deleteOperation", "confirm" :true, "undo" :false, "actionType" : "background", "tooltip":"Borrar esta operación"}
 ]

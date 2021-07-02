@@ -193,6 +193,7 @@ public function importProduct(InputInterface $input, OutputInterface $output){
          $taxes=$repositoryTaxes->find(1);
          $obj->setTaxes($taxes);
          $obj->setCode($object["code"]);
+         $obj->setCheckweb($object["ProductoWEB"]);
          $obj->setWeight($object["Weight"]);
          $packing=1;
          if ($object["Unidad medida precio"]=='C') $packing=100;
