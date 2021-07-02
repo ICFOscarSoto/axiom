@@ -2,6 +2,7 @@
 
 namespace App\Modules\ERP\Entity;
 
+use App\Modules\Globale\Entity\GlobaleUsers;
 use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\ERP\Entity\ERPProducts;
 use \App\Modules\ERP\Entity\ERPStores;
@@ -28,27 +29,27 @@ class ERPInfoStocks
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPStores")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $Store;
+    private $store;
 
     /**
      * @ORM\Column(type="float", nullable=true)
      */
-    private $PendingToReceive;
+    private $pendingToReceive;
 
     /**
      * @ORM\Column(type="float", nullable=true)
      */
-    private $PendingToServe;
+    private $pendingToServe;
 
     /**
      * @ORM\Column(type="float", nullable=true)
      */
-    private $MinimumAmount;
+    private $minimumQuantity;
 
     /**
      * @ORM\Column(type="float", nullable=true)
      */
-    private $MaximunQuantity;
+    private $maximunQuantity;
 
     /**
      * @ORM\Column(type="datetime")
@@ -70,6 +71,17 @@ class ERPInfoStocks
      */
     private $deleted;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Modules\ERP\Entity\ERPProductsVariants")
+     */
+    private $productvariant;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Modules\Globale\Entity\GlobaleUsers")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $author;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -89,60 +101,60 @@ class ERPInfoStocks
 
     public function getStore(): ?ERPStores
     {
-        return $this->Store;
+        return $this->store;
     }
 
-    public function setStore(?ERPStores $Store): self
+    public function setStore(?ERPStores $store): self
     {
-        $this->Store = $Store;
+        $this->store = $store;
 
         return $this;
     }
 
     public function getPendingToReceive(): ?float
     {
-        return $this->PendingToReceive;
+        return $this->pendingToReceive;
     }
 
-    public function setPendingToReceive(?float $PendingToReceive): self
+    public function setPendingToReceive(?float $pendingToReceive): self
     {
-        $this->PendingToReceive = $PendingToReceive;
+        $this->pendingToReceive = $pendingToReceive;
 
         return $this;
     }
 
     public function getPendingToServe(): ?float
     {
-        return $this->PendingToServe;
+        return $this->pendingToServe;
     }
 
-    public function setPendingToServe(?float $PendingToServe): self
+    public function setPendingToServe(?float $pendingToServe): self
     {
-        $this->PendingToServe = $PendingToServe;
+        $this->pendingToServe = $pendingToServe;
 
         return $this;
     }
 
-    public function getMinimumAmount(): ?float
+    public function getMinimumQuantity(): ?float
     {
-        return $this->MinimumAmount;
+        return $this->minimumQuantity;
     }
 
-    public function setMinimumAmount(?float $MinimumAmount): self
+    public function setMinimumQuantity(?float $minimumQuantity): self
     {
-        $this->MinimumAmount = $MinimumAmount;
+        $this->minimumQuantity = $minimumQuantity;
 
         return $this;
     }
 
     public function getMaximunQuantity(): ?float
     {
-        return $this->MaximunQuantity;
+        return $this->maximunQuantity;
     }
 
-    public function setMaximunQuantity(?float $MaximunQuantity): self
+    public function setMaximunQuantity(?float $maximunQuantity): self
     {
-        $this->MaximunQuantity = $MaximunQuantity;
+        $this->maximunQuantity = $maximunQuantity;
 
         return $this;
     }
@@ -191,6 +203,30 @@ class ERPInfoStocks
     public function setDeleted(bool $deleted): self
     {
         $this->deleted = $deleted;
+
+        return $this;
+    }
+
+    public function getProductvariant(): ?ERPProductsVariants
+    {
+        return $this->productvariant;
+    }
+
+    public function setProductvariant(?ERPProductsVariants $productvariant): self
+    {
+        $this->productvariant = $productvariant;
+
+        return $this;
+    }
+
+    public function getAuthor(): ?GlobaleUsers
+    {
+        return $this->author;
+    }
+
+    public function setAuthor(?GlobaleUsers $author): self
+    {
+        $this->author = $author;
 
         return $this;
     }

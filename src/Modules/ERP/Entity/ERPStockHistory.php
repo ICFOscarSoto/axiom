@@ -74,6 +74,11 @@ class ERPStockHistory
      */
     private $dateupd;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Modules\ERP\Entity\ERPProductsVariants")
+     */
+    private $productvariant;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -195,6 +200,18 @@ class ERPStockHistory
     public function setDateupd(\DateTimeInterface $dateupd): self
     {
         $this->dateupd = $dateupd;
+
+        return $this;
+    }
+
+    public function getProductvariant(): ?ERPProductsVariants
+    {
+        return $this->productvariant;
+    }
+
+    public function setProductvariant(?ERPProductsVariants $productvariant): self
+    {
+        $this->productvariant = $productvariant;
 
         return $this;
     }
