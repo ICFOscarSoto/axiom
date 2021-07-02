@@ -1,11 +1,11 @@
 [ {"name": "id", "caption":""},
-  {"name": "code", "caption":"Código", "width" : "50"},
-  {"name": "name", "caption":"Nombre", "width" : "90"},
-  {"name": "address", "caption":"Dirección", "width" : "50"},
-  {"name": "postcode","caption":"Código Postal", "width" : "50"},
-  {"name": "state__name","caption":"Provincia", "width" : "50"},
-  {"name": "phone","caption":"Teléfono", "width" : "50"},
-  {"name": "country__name","caption":"País", "width" : "50"},
+  {"name": "code", "caption":"Código"},
+  {"name": "name", "caption":"Nombre"},
+  {"name": "address", "caption":"Dirección"},
+  {"name": "postcode","caption":"Código Postal"},
+  {"name": "state__name","caption":"Provincia"},
+  {"name": "phone","caption":"Teléfono"},
+  {"name": "country__name","caption":"País"},
   {"name": "managed","caption":"Gestor","class" : "dt-center", "replace":{
                              "1":{"text":"SI","html":"SI"},
                              "0":{"text":"No","html":"No"}
