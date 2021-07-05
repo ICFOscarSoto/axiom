@@ -25,6 +25,7 @@ use App\Modules\ERP\Entity\ERPCategories;
 use App\Modules\ERP\Entity\ERPProductsVariants;
 use App\Modules\ERP\Entity\ERPInfoStocks;
 use App\Modules\ERP\Entity\ERPStoresManagersUsers;
+use App\Modules\ERP\Entity\ERPStoresManagersUsersStores;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
@@ -1033,7 +1034,9 @@ class ERPProductsController extends Controller
 	 */
 
 	 public function generateQR(RouterInterface $router,Request $request){
-		 $params["name"]=$request->query->get('name',null);
+		 $transfer=$request->query->get('name',null);
+		 $transfer=substr($transfer,3);
+		 $params["name"]=$transfer;
 		 $printQRUtils = new ERPPrintQR();
 		 $pdf=$printQRUtils->create($params);
 		 return new Response("", 200, array('Content-Type' => 'application/pdf'));
@@ -1046,22 +1049,26 @@ class ERPProductsController extends Controller
 
 	 public function receiveTransfer($transfer, RouterInterface $router,Request $request){
 		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-		 $transfer=substr($transfer,3);
 		 $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getTransfer.php?from='.$transfer);
 		 $objects=json_decode($json, true);
 		 $objects=$objects[0]["class"];
-		 $manageUserRepository=$this->getDoctrine()->getRepository(ERPStoresManagersUsers::class);
-		 $manageUser=$manageUserRepository->findOneBy(['user'=>$this->getUser()->getId()]);
-		 if ($manageUser==null) return new JsonResponse(["result"=>-1, "text"=>"El usuario ".$this->getUser()->getName()." no tiene permisos de recepcionar material."]);
+		 $managerUserRepository=$this->getDoctrine()->getRepository(ERPStoresManagersUsers::class);
+		 $managerUser=$managerUserRepository->findOneBy(['user'=>$this->getUser()->getId()]);
+
+		 if ($managerUser==null) return new JsonResponse(["result"=>-1, "text"=>"El usuario ".$this->getUser()->getName()." no tiene permisos de recepcionar material."]);
 
 		 foreach ($objects as $object){
 		 // buscamos el almacen del traspaso
 		 $storeRepository=$this->getDoctrine()->getRepository(ERPStores::class);
 		 $store=$storeRepository->findOneBy(['code'=>$object["almacen"]]);
+
+		 $storeUsersRepository=$this->getDoctrine()->getRepository(ERPStoresUsers::class);
+		 $storeUsers=$storeUsersRepository->findOneBy(['user'=>$this->getUser()->getId(),'store'=>$store->getId(), 'active'=>1, 'preferential'=>1]);
+		 if ($storeUsers==null) return new JsonResponse(["result"=>-2, "text"=>"El usuario ".$this->getUser()->getName()." no es gestor del almacén ".$store->getName()]);
 		 // buscamos el producto del traspaso
 		 $productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
 		 $product=$productRepository->findOneBy(['code'=>$object["code"]]);
-		 if ($product==null) return new JsonResponse(["result"=>-4, "text"=>"El producto ".$object["code"]." no existe en la base de datos"]);
+		 if ($product==null) return new JsonResponse(["result"=>-3, "text"=>"El producto ".$object["code"]." no existe en la base de datos"]);
 		 // buscamos la fila de los traspasos del producto y del almacén
 		 $infostocksRepository=$this->getDoctrine()->getRepository(ERPInfoStocks::class);
  		 $infostocks=$infostocksRepository->findOneBy(['store'=>$store->getId(), 'product'=>$product->getId()]);
@@ -1088,7 +1095,7 @@ class ERPProductsController extends Controller
 			 $stock=$stockRepository->findOneBy(['storelocation'=>$location->getId(), 'product'=>$product->getId()]);
 			 $stock->setQuantity($stock->getQuantity()+$received);
 			 $this->getDoctrine()->getManager()->persist($stock);
-		 } else return new JsonResponse(["result"=>-5, "text"=>"El almacén de destino (".$store->getName().") no se corresponde con un almacén gestionado"]);
+		 } else return new JsonResponse(["result"=>-4, "text"=>"El almacén de destino (".$store->getName().") no se corresponde con un almacén gestionado"]);
 
 
 		 $this->getDoctrine()->getManager()->flush();
