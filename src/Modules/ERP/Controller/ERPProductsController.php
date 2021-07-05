@@ -24,6 +24,7 @@ use App\Modules\ERP\Entity\ERPStoresUsers;
 use App\Modules\ERP\Entity\ERPCategories;
 use App\Modules\ERP\Entity\ERPProductsVariants;
 use App\Modules\ERP\Entity\ERPInfoStocks;
+use App\Modules\ERP\Entity\ERPStoresManagersUsers;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
@@ -1045,10 +1046,14 @@ class ERPProductsController extends Controller
 
 	 public function receiveTransfer($transfer, RouterInterface $router,Request $request){
 		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-
+		 $transfer=substr($transfer,3);
 		 $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getTransfer.php?from='.$transfer);
 		 $objects=json_decode($json, true);
 		 $objects=$objects[0]["class"];
+		 $manageUserRepository=$this->getDoctrine()->getRepository(ERPStoresManagersUsers::class);
+		 $manageUser=$manageUserRepository->findOneBy(['user'=>$this->getUser()->getId()]);
+		 if ($manageUser==null) return new JsonResponse(["result"=>-1, "text"=>"El usuario ".$this->getUser()->getName()." no tiene permisos de recepcionar material."]);
+
 		 foreach ($objects as $object){
 		 // buscamos el almacen del traspaso
 		 $storeRepository=$this->getDoctrine()->getRepository(ERPStores::class);
@@ -1056,6 +1061,7 @@ class ERPProductsController extends Controller
 		 // buscamos el producto del traspaso
 		 $productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
 		 $product=$productRepository->findOneBy(['code'=>$object["code"]]);
+		 if ($product==null) return new JsonResponse(["result"=>-4, "text"=>"El producto ".$object["code"]." no existe en la base de datos"]);
 		 // buscamos la fila de los traspasos del producto y del almacén
 		 $infostocksRepository=$this->getDoctrine()->getRepository(ERPInfoStocks::class);
  		 $infostocks=$infostocksRepository->findOneBy(['store'=>$store->getId(), 'product'=>$product->getId()]);
@@ -1074,6 +1080,7 @@ class ERPProductsController extends Controller
 		 $this->getDoctrine()->getManager()->persist($infostocks);
 		 // si el traspaso se realiza en un almacén que no sea campollano/romica buscamos el stock del producto para modificarlo
 		 // en la ubicación genérica de ese almacén
+		 dump($this->getUser()->getId());
 		 if ($store->getId()>2){
 			 $locationRepository=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
 			 $location=$locationRepository->findOneBy(['store'=>$store->getId()]);
@@ -1081,12 +1088,13 @@ class ERPProductsController extends Controller
 			 $stock=$stockRepository->findOneBy(['storelocation'=>$location->getId(), 'product'=>$product->getId()]);
 			 $stock->setQuantity($stock->getQuantity()+$received);
 			 $this->getDoctrine()->getManager()->persist($stock);
-		 }
+		 } else return new JsonResponse(["result"=>-5, "text"=>"El almacén de destino (".$store->getName().") no se corresponde con un almacén gestionado"]);
+
 
 		 $this->getDoctrine()->getManager()->flush();
 	 	}
 
-		 return new Response();
+		 return new JsonResponse(["result"=>1, "text"=>"Se ha recepcionado la mercancia del traspaso ".$transfer]);
 	 }
 
 }
