@@ -41,7 +41,7 @@ function create($params){
     $qrcode = new QRCode($options);
     $path=$params['name'].'.png';
     $qrcode->render($params['name'], $path);
-    $this->pdf->Image($path, -1, 7, 30, 30);
+    $this->pdf->Image($path, 16, 7, 32, 32);
     $this->pdf->SetXY(0,5);
     $this->pdf->Cell(65, 5.5, $params['name'], 0, 0, 'C');
     unlink($path);
