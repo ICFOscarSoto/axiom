@@ -25,6 +25,7 @@ class ImportStocks extends ContainerAwareCommand
         $this
             ->setName('ERP:importStocks')
             ->setDescription('Importación de inventario')
+            ->addArgument('file_path', InputArgument::REQUIRED, '¿Ruta del archivo a importar?')
             ->addArgument('user', InputArgument::REQUIRED, '¿Nombre de usuario que lanza el proceso?')
         ;
   }
@@ -33,6 +34,7 @@ class ImportStocks extends ContainerAwareCommand
   {
         $map[]=["sku"=>false,"variantname"=>false,"variantvalue"=>false,"minstock"=>false,"maxstock"=>false,"qty"=>false,"store"=>false,"location"=>false];
         $username = $input->getArgument('user');
+        $file = $input->getArgument('file_path');
         $doctrine = $this->getContainer()->get('doctrine');
         $entityManager = $doctrine->getManager();
         $usersRepository=$doctrine->getRepository(GlobaleUsers::class);
@@ -52,7 +54,6 @@ class ImportStocks extends ContainerAwareCommand
         if(!$user) die('- El usuario especificado no existe');
         $company=$user->getCompany();
         $output->writeln('- Abriendo fichero');
-        $file='/home/david/Documentos/import_stocks.csv';
         if(!file_exists($file)) die('- No existe el fichero CSV de importacion');
         $handle = fopen($file,'r');
         if($handle===false) die('- No se pudo abrir el fichero CSV de importacion');
