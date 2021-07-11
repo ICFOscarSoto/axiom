@@ -74,7 +74,6 @@ class ImportStocks extends ContainerAwareCommand
         if($map["sku"]===false) die('- Falta la columna obligatoria sku');
         if($map["variantname"]===false) die('- Falta la columna obligatoria variantname');
         if($map["variantvalue"]===false) die('- Falta la columna obligatoria variantvalue');
-        if($map["qty"]===false) die('- Falta la columna obligatoria qty');
         if($map["store"]===false) die('- Falta la columna obligatoria store');
         if($map["location"]===false) die('- Falta la columna obligatoria location');
 
@@ -104,40 +103,44 @@ class ImportStocks extends ContainerAwareCommand
           $output->writeln('   -> '.$data[$map["sku"]]);
 
           $stock=$stocksRepository->findOneBy(["product"=>$product, "productvariant"=>$variant, "storelocation"=>$location, "deleted"=>0]);
-          if(!$stock){
-            $stock=new ERPStocks();
-            $stock->setProduct($product);
-            $stock->setProductvariant($variant);
-            $stock->setCompany($company);
-            $stock->setStorelocation($location);
-            $stock->setAuthor($user);
-            $stock->setDateadd(new \Datetime());
-            $stock->setActive(true);
-            $stock->setDeleted(false);
-          }else{
-            if($stock->getQuantity()!=($data[$map["qty"]]*1)){
-              //Save Stock History
-              $stockHistory=new ERPStockHistory();
-              $stockHistory->setProduct($product);
-              $stockHistory->setProductvariant($variant);
-              $stockHistory->setLocation($location);
-              $stockHistory->setStore($store);
-              $stockHistory->setUser($user);
-              $stockHistory->setPreviousqty($stock->getQuantity());
-              $stockHistory->setNewqty($data[$map["qty"]]*1);
-              $stockHistory->setDateadd(new \Datetime());
-              $stockHistory->setDateupd(new \Datetime());
-              $stockHistory->setActive(true);
-              $stockHistory->setDeleted(false);
-              $doctrine->getManager()->persist($stockHistory);
-              $doctrine->getManager()->flush();
+          if($map["qty"]!==false && $data[$map["qty"]]!=null){
+            if(!$stock){
+              $stock=new ERPStocks();
+              $stock->setProduct($product);
+              $stock->setProductvariant($variant);
+              $stock->setCompany($company);
+              $stock->setStorelocation($location);
+              $stock->setAuthor($user);
+              $stock->setDateadd(new \Datetime());
+              $stock->setActive(true);
+              $stock->setDeleted(false);
+            }else{
+
+              if($stock->getQuantity()!=($data[$map["qty"]]*1)){
+                //Save Stock History
+                $stockHistory=new ERPStockHistory();
+                $stockHistory->setProduct($product);
+                $stockHistory->setProductvariant($variant);
+                $stockHistory->setLocation($location);
+                $stockHistory->setStore($store);
+                $stockHistory->setUser($user);
+                $stockHistory->setPreviousqty($stock->getQuantity());
+                $stockHistory->setNewqty($data[$map["qty"]]*1);
+                $stockHistory->setDateadd(new \Datetime());
+                $stockHistory->setDateupd(new \Datetime());
+                $stockHistory->setActive(true);
+                $stockHistory->setDeleted(false);
+                $doctrine->getManager()->persist($stockHistory);
+                $doctrine->getManager()->flush();
+              }
             }
+            $stock->setQuantity($data[$map["qty"]]);
+            $stock->setLastinventorydate(new \Datetime());
+            $stock->setDateupd(new \Datetime());
+            $doctrine->getManager()->persist($stock);
+            $doctrine->getManager()->flush();
           }
-          $stock->setQuantity($data[$map["qty"]]);
-          $stock->setLastinventorydate(new \Datetime());
-          $stock->setDateupd(new \Datetime());
-          $doctrine->getManager()->persist($stock);
-          $doctrine->getManager()->flush();
+
 
           //INFO Stock
           if(!$map["minstock"] || !$map["maxstock"]) continue;

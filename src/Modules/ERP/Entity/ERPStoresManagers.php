@@ -3,6 +3,7 @@
 namespace App\Modules\ERP\Entity;
 
 use App\Modules\Globale\Entity\GlobaleCompanies;
+use App\Modules\Globale\Entity\GlobaleUsers;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -53,6 +54,16 @@ class ERPStoresManagers
      * @ORM\JoinColumn(nullable=false)
      */
     private $company;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Modules\Globale\Entity\GlobaleUsers")
+     */
+    private $user;
+
+    /**
+     * @ORM\Column(type="string", length=125, nullable=true)
+     */
+    private $discordchannel;
 
     public function getId(): ?int
     {
@@ -139,6 +150,30 @@ class ERPStoresManagers
     public function setCompany(?GlobaleCompanies $company): self
     {
         $this->company = $company;
+
+        return $this;
+    }
+
+    public function getUser(): ?GlobaleUsers
+    {
+        return $this->user;
+    }
+
+    public function setUser(?GlobaleUsers $user): self
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    public function getDiscordchannel(): ?string
+    {
+        return $this->discordchannel;
+    }
+
+    public function setDiscordchannel(?string $discordchannel): self
+    {
+        $this->discordchannel = $discordchannel;
 
         return $this;
     }

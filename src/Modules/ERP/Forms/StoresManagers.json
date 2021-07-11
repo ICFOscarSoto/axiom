@@ -5,14 +5,23 @@
             "fields": [
                 {
                     "name": "name",
-                    "cols": 4
-                },
-                {
-                    "name": "active",
-                    "cols": 4
+                    "cols": 5
                 },
                 {
                     "name": "customer",
+                    "cols": 7
+                },
+                {
+                    "name": "user",
+                    "caption": "Responsable",
+                    "cols": 4
+                },
+                {
+                    "name": "discordchannel",
+                    "cols": 6
+                },
+                {
+                    "name": "active",
                     "cols": 4
                 }
             ]
