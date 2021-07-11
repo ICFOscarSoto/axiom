@@ -50,13 +50,6 @@ class ERPStocksRepository extends ServiceEntityRepository
               LEFT JOIN erpstocks s ON u.id=s.storelocation_id AND s.product_id= :product
               WHERE a.active=TRUE and a.deleted=0 AND a.id=:store
               GROUP BY a.name";
-      /*
-      $query="SELECT IFNULL (SUM(s.quantity),0) Quantity
-              FROM erpstores a LEFT JOIN erpstore_locations u ON a.id=u.store_id
-              LEFT JOIN erpstocks s ON u.id=s.storelocation_id AND s.product_id= :product
-              WHERE a.active=TRUE and a.deleted=0 and a.code= :store
-              GROUP BY a.name";
-              */
       $params=['product' => $product->getId(), 'store' =>$store];
       return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
     }
@@ -69,6 +62,23 @@ class ERPStocksRepository extends ServiceEntityRepository
               LIMIT 1";
       $params=['product' => $product_id, 'store' => $store];
 
+      return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+    }
+
+    public function setZeroStocks($product_id, $store, $stock_id, $productvariant_id){
+      $query="UPDATE erpstocks
+              SET quantity=0
+              WHERE product_id= :product AND deleted=0 AND storelocation_id IN
+                  (SELECT id FROM erpstore_locations WHERE store_id IN
+                    (SELECT id FROM erpstores WHERE CODE=:store)) AND id!=:stock";
+      $query2="UPDATE erpstocks
+              SET quantity=0
+              WHERE productvariant_id= :productvariant AND deleted=0 AND storelocation_id IN
+                  (SELECT id FROM erpstore_locations WHERE store_id IN
+                    (SELECT id FROM erpstores WHERE CODE=:store)) AND id!=:stock";
+      $params=['product' => $product_id, 'store' => $store, 'stock'=>$stock_id, 'productvariant'=>$productvariant_id];
+
+      if ($productvariant_id!=null) return $this->getEntityManager()->getConnection()->executeQuery($query2, $params)->fetchAll();
       return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
     }
 

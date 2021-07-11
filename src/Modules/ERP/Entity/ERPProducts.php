@@ -224,18 +224,8 @@ class ERPProducts
     {
         $quantityCampollano=0;
         $stockRepository=$doctrine->getRepository('\App\Modules\ERP\Entity\ERPStocks');
-        if (!$this->getGrouped()) {
-          $stockCampollano=$stockRepository->getStocksByProduct($this->id,null,1);
-          if ($stockCampollano[0]["quantity"]!=null) $quantityCampollano=$stockCampollano[0]["quantity"];}
-        else{
-          $productRepository=$doctrine->getRepository('\App\Modules\ERP\Entity\ERPProducts');
-          $variants=$productRepository->getVariants($this->id);
-          $stockCampollano;
-          foreach ($variants as $variant) {
-            $stockCampollano=$stockRepository->getStocksByProduct($this->id,$variant["id"],1);
-            if ($stockCampollano!=null) $quantityCampollano+=$stockCampollano[0]["quantity"];
-          }
-        }
+        $stockCampollano=$stockRepository->findStockByProductStore($this->id,1);
+        if ($stockCampollano!=null) $quantityCampollano=$stockCampollano;
         return $quantityCampollano;
     }
 

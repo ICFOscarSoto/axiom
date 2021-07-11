@@ -841,6 +841,7 @@ class ERPStoreTicketsController extends Controller
 		 if($storeticket==null) return new JsonResponse(["result"=>0]);
 		 $state=$storeticketsstatesRepository->findOneBy(["id"=>2, "active"=>1,"deleted"=>0]);
 		 $storeticket->setStoreticketstate($state);
+		 $storeticket->setAgent($this->getUser());
 		 $this->getDoctrine()->getManager()->persist($storeticket);
 
 		 //hay una incidencia de venta asociada, luego hay que avisar al gestor que ha creado dicha incidencia de que ya se ha hecho el inventario.

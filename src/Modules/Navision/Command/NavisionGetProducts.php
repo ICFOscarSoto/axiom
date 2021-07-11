@@ -650,8 +650,10 @@ public function importStocks(InputInterface $input, OutputInterface $output) {
       $variantvalue=$repositoryVariantsValues->findOneBy(["name"=>$namenameVariantValue]);
 
       if($product) {
+            $productVariantId = null;
             $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product->getId(),"variantvalue"=>$variantvalue]);
             if($productvariant!=null) {
+              $productVariantId=$productvariant->getId();
               $old_stocks=$repositoryStocks->stockVariantUpdate($productvariant->getId(), $stock["almacen"]);
               $output->writeln('El producto '.$product->getId().' tiene la variante '.$stock["variant"]);
             }
@@ -663,14 +665,17 @@ public function importStocks(InputInterface $input, OutputInterface $output) {
               if ((int)$stock["stock"]<0) $quantity=0;
               else $quantity=(int)$stock["stock"];
               if ($stock_old->getStorelocation()->getStore()->getManaged()!=1) {
+                $updateStocks=$repositoryStocks->setZeroStocks($product->getId(), $stock["almacen"],$stock_old->getId(),$productVariantId);
                 $stock_old->setQuantity(!$quantity?0:$quantity);
                 $stock_old->setDateupd(new \Datetime());
-                $this->doctrine->getManager()->merge($stock_old);}
+                $this->doctrine->getManager()->merge($stock_old);
+              }
             }
             else {
               $location=$repositoryStoreLocations->findOneBy(["name"=>$stock["almacen"]]);
               if($location!=null){
-              $obj=new ERPStocks();$obj->setCompany($company);
+              $obj=new ERPStocks();
+              $obj->setCompany($company);
               $obj->setProduct($product);
               $obj->setDateadd(new \Datetime());
               $obj->setDateupd(new \Datetime());
