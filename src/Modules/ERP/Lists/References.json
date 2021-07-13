@@ -1,5 +1,5 @@
 [ {"name": "id", "caption":""},
-  {"name": "name", "caption":"name", "width" : "50"},
-  {"name": "supplier__name", "caption":"supplier", "width" : "50"},
-  {"name": "customer__name", "caption":"customer", "width" : "50"}
+  {"name": "name", "caption":"name"},
+  {"name": "supplier__name", "caption":"supplier"},
+  {"name": "customer__name", "caption":"customer"}
 ]

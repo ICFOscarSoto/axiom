@@ -1,6 +1,6 @@
 [ {"name": "id", "caption":""},
-  {"name": "name", "caption":"EAN13", "width" : "50"},
-  {"name": "productvariant__variantvalue__name", "caption":"Variante", "width" : "50"},
-  {"name": "supplier__name", "caption":"supplier", "width" : "50"},
-  {"name": "customer__name", "caption":"customer", "width" : "50"}
+  {"name": "name", "caption":"EAN13"},
+  {"name": "productvariant__variantvalue__name", "caption":"Variante"},
+  {"name": "supplier__name", "caption":"supplier"},
+  {"name": "customer__name", "caption":"customer"}
 ]

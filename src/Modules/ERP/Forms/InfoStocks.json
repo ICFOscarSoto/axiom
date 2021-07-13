@@ -20,14 +20,6 @@
                     "cols": 4
                 },
                 {
-                    "name": "active",
-                    "cols": 4
-                },
-                {
-                    "name": "product",
-                    "cols": 4
-                },
-                {
                     "name": "store",
                     "cols": 4
                 }
