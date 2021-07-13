@@ -579,7 +579,6 @@ class ERPProductsController extends Controller
 				}
 			}
 		}
-	//dump($barcode);
 	$params=["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "code"=>$code, "barcode"=>$barcode, "name"=>$name, "user"=>$this->getUser(), "noValidate"=>$noValidate];
 
 	$reportsUtils = new ERPEan13Reports();
@@ -1054,14 +1053,12 @@ class ERPProductsController extends Controller
 		 $objects=$objects[0]["class"];
 		 $managerUserRepository=$this->getDoctrine()->getRepository(ERPStoresManagersUsers::class);
 		 $managerUser=$managerUserRepository->findOneBy(['user'=>$this->getUser()->getId()]);
-
 		 if ($managerUser==null) return new JsonResponse(["result"=>-1, "text"=>"El usuario ".$this->getUser()->getName()." no tiene permisos de recepcionar material."]);
 
 		 foreach ($objects as $object){
 		 // buscamos el almacen del traspaso
 		 $storeRepository=$this->getDoctrine()->getRepository(ERPStores::class);
 		 $store=$storeRepository->findOneBy(['code'=>$object["almacen"]]);
-
 		 $storeUsersRepository=$this->getDoctrine()->getRepository(ERPStoresUsers::class);
 		 $storeUsers=$storeUsersRepository->findOneBy(['user'=>$this->getUser()->getId(),'store'=>$store->getId(), 'active'=>1, 'preferential'=>1]);
 		 if ($storeUsers==null) return new JsonResponse(["result"=>-2, "text"=>"El usuario ".$this->getUser()->getName()." no es gestor del almacén ".$store->getName()]);
@@ -1087,7 +1084,6 @@ class ERPProductsController extends Controller
 		 $this->getDoctrine()->getManager()->persist($infostocks);
 		 // si el traspaso se realiza en un almacén que no sea campollano/romica buscamos el stock del producto para modificarlo
 		 // en la ubicación genérica de ese almacén
-		 dump($this->getUser()->getId());
 		 if ($store->getId()>2){
 			 $locationRepository=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
 			 $location=$locationRepository->findOneBy(['store'=>$store->getId()]);
