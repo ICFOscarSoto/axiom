@@ -17,6 +17,7 @@ use App\Modules\ERP\Entity\ERPReferences;
 use App\Modules\ERP\Entity\ERPProductsAttributes;
 use App\Modules\ERP\Entity\ERPManufacturers;
 use App\Modules\ERP\Entity\ERPStocks;
+use App\Modules\ERP\Entity\ERPInfoStocks;
 use App\Modules\ERP\Entity\ERPStockHistory;
 use App\Modules\ERP\Entity\ERPStoreLocations;
 use App\Modules\ERP\Entity\ERPStores;
@@ -208,10 +209,12 @@ class ERPStoresManagersOperationsController extends Controller
 			if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
 			$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
 			$worklistRepository=$this->getDoctrine()->getRepository(ERPWorkList::class);
+			$managerRepository=$this->getDoctrine()->getRepository(ERPStoresManagers::class);
 			$consumerRepository=$this->getDoctrine()->getRepository(ERPStoresManagersConsumers::class);
 			$storeRepository=$this->getDoctrine()->getRepository(ERPStoresUsers::class);
 			$storeLocationsRepository=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
 			$stocksRepository=$this->getDoctrine()->getRepository(ERPStocks::class);
+			$infostocksRepository=$this->getDoctrine()->getRepository(ERPInfoStocks::class);
 			$productVariantRepository=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
 			$store=$storeRepository->findOneBy(["user"=>$this->getUser(),"preferential"=>1,"active"=>1,"deleted"=>0]);
 			if(!$store) return new JsonResponse(["result"=>-4, "text"=> "El usuario no tiene almacén preferente"]);
@@ -256,6 +259,8 @@ class ERPStoresManagersOperationsController extends Controller
 						$stock=$stocksRepository->findOneBy(["product"=>$item->getProduct(), "productvariant"=>$item->getVariant(), "company"=>$this->getUser()->getCompany(), "storelocation"=>$location, "active"=>1, "deleted"=>0]);
 						if($stock!=null){
 							$stock->setQuantity($stock->getQuantity()-($item->getQuantity()));
+
+
 							$stock->setDateupd(new \Datetime());
 							$this->getDoctrine()->getManager()->persist($stock);
 							$this->getDoctrine()->getManager()->flush();
@@ -277,7 +282,19 @@ class ERPStoresManagersOperationsController extends Controller
 								$this->getDoctrine()->getManager()->persist($stock);
 								$this->getDoctrine()->getManager()->flush();
 						}
-
+						//Inform low Stock
+						$infostock=$infostocksRepository->findOneBy(["product"=>$item->getProduct(), "store"=>$store->getStore(), "productvariant"=>$item->getVariant(),"active"=>1, "deleted"=>0]);
+						if($infostock){
+							if($infostock->getMinimumQuantity()>=$stock->getQuantity()){
+								//Inform to discotd channel
+								$manager=$consumer->getManager();
+								if($manager->getDiscordchannel()!=null){
+									$channel=$manager->getDiscordchannel();
+									$msg="Ref: **".$item->getProduct()->getCode()."** - ".$item->getProduct()->getName()." realizar traspaso a **".$store->getStore()->getName()."** - Cantidad: **".($infostock->getMaximunQuantity()-$stock->getQuantity()." unidades.**");
+									file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
+								}
+							}
+						}
 					}
 
 					//Clear worklist
