@@ -746,7 +746,7 @@ public function updateStocksStoresManaged(InputInterface $input, OutputInterface
   if ($objects){
     $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
     $company=$repositoryCompanies->find(2);
-    foreach ($objects["class"] as $stock){}
+    foreach ($objects["class"] as $stock){
       $product=$repositoryProducts->findOneBy(["code"=>$stock["code"]]);
       $namenameVariantValue=$this->variantColor($stock["variant"]);
       $variantvalue=$repositoryVariantsValues->findOneBy(["name"=>$namenameVariantValue]);
@@ -781,15 +781,18 @@ public function updateStocksStoresManaged(InputInterface $input, OutputInterface
               $obj->setQuantity(!$quantity?0:$quantity);
               $obj->setActive(1);
               $obj->setDeleted(0);
+              $output->writeln('Vamos a crear la linea del producto '.$product->getId().' en el almacen '.$stock["almacen"]);
               $this->doctrine->getManager()->merge($obj);}
             }
             $this->doctrine->getManager()->flush();
             $this->doctrine->getManager()->clear();
           }
+        }
 
+          $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"storesManaged"]);
           $navisionSync->setLastsync($datetime);
-          $navisionSync->setMaxtimestamp($objects["maxEntry"]);
-          $this->doctrine->getManager()->persist($navisionSync);
+          //$navisionSync->setMaxtimestamp($objects["maxEntry"]);
+          //$this->doctrine->getManager()->persist($navisionSync);
           $this->doctrine->getManager()->flush();
 
     }
