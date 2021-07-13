@@ -58,7 +58,7 @@ class ERPStoresManagersOperationsLinesRepository extends ServiceEntityRepository
     LEFT JOIN erpstores_managers_operations o ON l.operation_id=o.id
     LEFT JOIN erpstores_managers_consumers c ON c.id=o.consumer_id
     WHERE o.active=1 AND o.DATE >= :START AND o.DATE<=:END
-    GROUP BY(o.consumer_id) ORDER BY c.NAME, c.lastname";
+    GROUP BY(o.consumer_id) ORDER BY c.NAME, c.lastname LIMIT 20";
     $params=['START' => $date_start,
              'END' => $date_end
              ];
@@ -70,7 +70,7 @@ class ERPStoresManagersOperationsLinesRepository extends ServiceEntityRepository
       LEFT JOIN erpstores_managers_operations o ON l.operation_id=o.id
       LEFT JOIN erpstores_managers_consumers c ON c.id=o.consumer_id
       WHERE o.active=1 AND o.DATE >= :START AND o.DATE<=:END AND o.store_id=:STORE
-      GROUP BY(o.consumer_id) ORDER BY c.NAME, c.lastname";
+      GROUP BY(o.consumer_id) ORDER BY c.NAME, c.lastname LIMIT 20";
       $params=['START' => $date_start,
                'END' => $date_end,
                'STORE' => $store,
@@ -94,7 +94,7 @@ class ERPStoresManagersOperationsLinesRepository extends ServiceEntityRepository
     LEFT JOIN erpstores_managers_operations o ON l.operation_id=o.id
     LEFT JOIN erpstores_managers m ON m.id=o.manager_id
     WHERE o.active=1 AND m.id=:MANAGER AND o.DATE >= :START AND o.DATE<=:END
-    GROUP BY(l.code)  ORDER BY total DESC";
+    GROUP BY(l.code)  ORDER BY total DESC LIMIT 10";
     $params=['MANAGER' => $manager,
              'START' => $date_start,
              'END' => $date_end
@@ -107,7 +107,7 @@ class ERPStoresManagersOperationsLinesRepository extends ServiceEntityRepository
     LEFT JOIN erpstores_managers_operations o ON l.operation_id=o.id
     LEFT JOIN erpstores_managers m ON m.id=o.manager_id
     WHERE o.active=1 AND m.id=:MANAGER AND o.DATE >= :START AND o.DATE<=:END AND o.store_id=:STORE
-    GROUP BY(l.code)  ORDER BY total DESC";
+    GROUP BY(l.code)  ORDER BY total DESC LIMIT 10";
     $params=['MANAGER' => $manager,
              'START' => $date_start,
              'END' => $date_end,

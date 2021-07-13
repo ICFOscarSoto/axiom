@@ -21,8 +21,8 @@
  			 return valid;
  		 }
 
-		 	if($("#date-from").val()>$("#date-to").val()){
 
+		 	if(Date.parse($("#date-from").val()) >= Date.parse($("#date-to").val())){
 				toastr.error("Por favor, selecciona un rango de fechas correcto", "Confirmación", confirmation);
 	 			 valid=false;
 	 			 return valid;

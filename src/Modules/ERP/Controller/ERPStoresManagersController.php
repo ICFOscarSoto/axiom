@@ -618,13 +618,19 @@ class ERPStoresManagersController extends Controller
 	 		 $end=$request->query->get("end");
 	 		 $labels=$request->query->get("labels");
 	 		 $data=$request->query->get("data");
+			 $codes=$request->query->get("codes");
+			 $names=$request->query->get("names");
 
 	 		 $labels_array=explode(",",$labels);
 	 		 $data_array=explode(",",$data);
+			 $codes_array=explode(",",$codes);
+			 $names_array=explode(",",$names);
 	 		 $count=sizeof($labels_array);
 
 	 		 $result_array=Array();
 	 		 for($i=0;$i<$count;$i++){
+				 $item["Código"]=$codes_array[$i];
+				 $item["Nombre"]=$names_array[$i];
 	 			 $item["Producto"]=$labels_array[$i];
 	 			 $item["Cantidad"]=$data_array[$i];
 	 		   $result_array[]=$item;
