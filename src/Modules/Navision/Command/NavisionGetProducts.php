@@ -791,8 +791,8 @@ public function updateStocksStoresManaged(InputInterface $input, OutputInterface
 
           $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"storesManaged"]);
           $navisionSync->setLastsync($datetime);
-          //$navisionSync->setMaxtimestamp($objects["maxEntry"]);
-          //$this->doctrine->getManager()->persist($navisionSync);
+          $navisionSync->setMaxtimestamp($objects["maxEntry"]);
+          $this->doctrine->getManager()->persist($navisionSync);
           $this->doctrine->getManager()->flush();
 
     }
