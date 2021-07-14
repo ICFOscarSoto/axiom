@@ -34,12 +34,12 @@
         <div class="row">
 					<div class="col-md-2">
 				    <div class="form-group">
-				      <input type="text" id="date-from" attr="minDate" name="form[from]" class="datepicker form-control" defaultdate="" value="" placeholder="Fecha de inicio...">
+				      <input type="text" id="date-from" name="form[from]" class="datepicker form-control"  placeholder="Fecha de inicio...">
 				    </div>
 				  </div>
 				  <div class="col-md-2">
 				    <div class="form-group">
-				      <input type="text" id="date-to" attr="maxDate"  name="form[to]" class="datepicker form-control" defaultdate="" value="" placeholder="Fecha de fin...">
+				      <input type="text" id="date-to" name="form[to]" class="datepicker form-control" placeholder="Fecha de fin...">
 				    </div>
 				  </div>
 					<div class="col-md-3">
@@ -115,7 +115,10 @@ backgroundColor:[
       'rgba(75, 192, 192, 0.2)',
       'rgba(54, 162, 235, 0.2)',
       'rgba(153, 102, 255, 0.2)',
-      'rgba(201, 203, 207, 0.2)'
+			'rgba(255, 189, 253, 0.2)',
+			'rgba(196, 248, 239, 0.2)',
+			'rgba(200, 244, 213, 0.2)',
+			'rgba(201, 203, 207, 0.2)'
     ],
 borderColor:  [
       'rgb(255, 99, 132)',
@@ -124,7 +127,10 @@ borderColor:  [
       'rgb(75, 192, 192)',
       'rgb(54, 162, 235)',
       'rgb(153, 102, 255)',
-      'rgb(201, 203, 207)'
+			'rgb(255, 189, 253)',
+			'rgb(196, 248, 239)',
+			'rgb(200, 244, 213)',
+			'rgb(201, 203, 207)'
     ],
 borderWidth: 2,
 yAxisID: "y-axis-total"
@@ -140,7 +146,10 @@ backgroundColor:[
       'rgba(75, 192, 192, 0.2)',
       'rgba(54, 162, 235, 0.2)',
       'rgba(153, 102, 255, 0.2)',
-      'rgba(201, 203, 207, 0.2)'
+			'rgba(255, 189, 253, 0.2)',
+			'rgba(196, 248, 239, 0.2)',
+			'rgba(200, 244, 213, 0.2)',
+			'rgba(201, 203, 207, 0.2)'
     ],
 borderColor:  [
       'rgb(255, 99, 132)',
@@ -149,7 +158,10 @@ borderColor:  [
       'rgb(75, 192, 192)',
       'rgb(54, 162, 235)',
       'rgb(153, 102, 255)',
-      'rgb(201, 203, 207)'
+			'rgb(255, 189, 253)',
+			'rgb(196, 248, 239)',
+			'rgb(200, 244, 213)',
+			'rgb(201, 203, 207)'
     ],
 borderWidth: 2,
 yAxisID: "y-axis-total"
@@ -166,7 +178,10 @@ backgroundColor:[
       'rgba(75, 192, 192, 0.2)',
       'rgba(54, 162, 235, 0.2)',
       'rgba(153, 102, 255, 0.2)',
-      'rgba(201, 203, 207, 0.2)'
+			'rgba(255, 189, 253, 0.2)',
+			'rgba(196, 248, 239, 0.2)',
+			'rgba(200, 244, 213, 0.2)',
+			'rgba(201, 203, 207, 0.2)'
     ],
 borderColor:  [
       'rgb(255, 99, 132)',
@@ -175,7 +190,10 @@ borderColor:  [
       'rgb(75, 192, 192)',
       'rgb(54, 162, 235)',
       'rgb(153, 102, 255)',
-      'rgb(201, 203, 207)'
+			'rgb(255, 189, 253)',
+			'rgb(196, 248, 239)',
+			'rgb(200, 244, 213)',
+			'rgb(201, 203, 207)',
     ],
 borderWidth: 2,
 yAxisID: "y-axis-total"
@@ -196,6 +214,9 @@ var BestProductsgraphData = {
 labels: [],
 datasets: [BestProductsData]
 };
+
+var BestProductsCodes = [];
+var BestProductsNames = [];
 
 var chartConsumerOperationsOptions = {
   onClick: function(e){
@@ -306,6 +327,7 @@ function getData(){
          var array_BestProducts=[];
          var array_BestProductsLabels=[];
 
+
       if(typeof data.consumers !== 'undefined')
        $.each( data.consumers, function( key, val ) {
 
@@ -327,6 +349,8 @@ function getData(){
 
            array_BestProducts.push(val.total*1);
            array_BestProductsLabels.push(val.ean13);
+					 BestProductsCodes.push(val.code);
+					 BestProductsNames.push(val.name);
         //   array_usersIds.push(val.id);
          });
 
@@ -380,7 +404,9 @@ function getData(){
  $('body').on('click', "[id=bestproducts-export]", function(e) {
 	labels=BestProductsgraphData.labels;
 	data=BestProductsData.data;
-	var win = window.open("/api/ERP/storesmanagers/exportbestproducts?start="+encodeURI($("#date-from").val())+"&end="+encodeURI($("#date-to").val())+"&labels="+encodeURI(labels)+"&data="+encodeURI(data));
+	codes=BestProductsCodes;
+	names=BestProductsNames;
+	var win = window.open("/api/ERP/storesmanagers/exportbestproducts?start="+encodeURI($("#date-from").val())+"&end="+encodeURI($("#date-to").val())+"&labels="+encodeURI(labels)+"&data="+encodeURI(data)+"&codes="+encodeURI(codes)+"&names="+encodeURI(names));
 	win.focus();
 
  });
@@ -402,8 +428,9 @@ function datepicker(){
 		  });
 		  if($(this).attr("minDate")!="" && typeof $(this).attr("minDate")!==typeof undefined) $(this).data("DateTimePicker").minDate(moment($(this).attr("minDate"), "YYYY-MM-DD"));
 		  if($(this).attr("maxDate")!="" && typeof $(this).attr("maxDate")!==typeof undefined) $(this).data("DateTimePicker").maxDate(moment($(this).attr("maxDate"), "YYYY-MM-DD"));
-		});
-*/
+		});*/
+
+
     $('.datepicker').each(function(index) {
       var valueField=$(this).val();
       var dateField=moment(valueField, "DD/MM/YYYY");
@@ -415,11 +442,30 @@ function datepicker(){
         tooltips: spanish_tooltips_datetimepicker,
         date: (dateField.isValid())?dateField:null
       });
+
       if($(this).attr("minDate")!="" && typeof $(this).attr("minDate")!==typeof undefined) $(this).data("DatePicker").minDate(moment($(this).attr("minDate"), "YYYY-MM-DD"));
       if($(this).attr("maxDate")!="" && typeof $(this).attr("maxDate")!==typeof undefined) $(this).data("DatePicker").maxDate(moment($(this).attr("maxDate"), "YYYY-MM-DD"));
 
     });
 
+/*
+		$("#date-from").datetimepicker({
+		numberOfMonths: 2,
+
+      onSelect: function(selected) {
+        $("#date-to").datepicker("option","minDate", selected);
+
+      }
+		});
+
+		$("#date-to").datetimepicker({
+		numberOfMonths: 2,
+
+			onSelect: function(selected) {
+				$("#date-from").datepicker("option","minDate", selected);
+
+			}
+		});*/
 
 }
 </script>
