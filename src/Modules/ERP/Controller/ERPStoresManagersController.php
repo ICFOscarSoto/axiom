@@ -390,7 +390,7 @@ class ERPStoresManagersController extends Controller
 		 $to->modify('+1 day');
 
 		 $storeManagerRepository=$this->getDoctrine()->getRepository(ERPStoresManagers::class);
-		 $storeManager=$storeManagerRepository>findOneBy(["id"=>$id]);
+		 $storeManager=$storeManagerRepository->findOneBy(["id"=>$id]);
 		 $storemanageruser=null;
 		 $storeManagersUsersRepository=$this->getDoctrine()->getRepository(ERPStoresManagersUsers::class);
 		 $storemanageruser=$storeManagersUsersRepository->findOneBy(["user"=>$this->getUser(),"manager"=>$storeManager,"isadmin"=>1]);
