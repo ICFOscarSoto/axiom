@@ -12,7 +12,7 @@ class ERPInfoStocksUtils
   private $module="ERP";
   private $name="InfoStocks";
   public function getExcludedForm($params){
-    return [];
+    return ['product'];
   }
 
   public function getIncludedForm($params){

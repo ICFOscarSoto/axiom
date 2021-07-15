@@ -89,7 +89,7 @@ class ERPInfoStocksController extends Controller
      $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),
                             method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],
                             method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
-    if($id==0) $utils->values(["product"=>$product]);
+     if($id==0) $utils->values(["product"=>$product]);
      $make=$utils->make($id, ERPInfoStocks::class, $action, "infoStocks", "modal");
 
      return $make;
