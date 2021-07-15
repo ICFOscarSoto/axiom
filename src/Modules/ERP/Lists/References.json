@@ -1,5 +1,6 @@
 [ {"name": "id", "caption":""},
   {"name": "name", "caption":"name"},
+  {"name": "description", "caption":"description"},
   {"name": "supplier__name", "caption":"supplier"},
   {"name": "customer__name", "caption":"customer"}
 ]
