@@ -10,8 +10,13 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
+use App\Modules\Globale\Entity\GlobaleUsers;
 use App\Modules\ERP\Entity\ERPProducts;
 use App\Modules\ERP\Entity\ERPInfoStocks;
+use App\Modules\ERP\Entity\ERPStoreLocations;
+use App\Modules\ERP\Entity\ERPStocks;
+use App\Modules\ERP\Entity\ERPStores;
+use App\Modules\ERP\Entity\ERPStockHistory;
 use App\Modules\Globale\Entity\GlobaleCountries;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
@@ -21,7 +26,7 @@ use App\Modules\ERP\Utils\ERPInfoStocksUtils;
 
 class ERPInfoStocksController extends Controller
 {
-
+  private $url="http://192.168.1.250:9000/";
 
   /**
    * @Route("/es/infoStocks/{id}/list", name="infoStockslist")
@@ -93,6 +98,64 @@ class ERPInfoStocksController extends Controller
      $make=$utils->make($id, ERPInfoStocks::class, $action, "infoStocks", "modal");
 
      return $make;
+    }
+
+
+  /**
+   * @Route("/{_locale}/updateStocksManageds", name="updateStocksManageds")
+   */
+    public function updateStocksManageds(RouterInterface $router,Request $request){
+    //$store=$request->query->get('store',null);
+    $storeName='GESTOR ALI';
+    $date=$request->query->get('date',null);
+
+
+    $usersRepository=$this->getDoctrine()->getRepository(GlobaleUsers::class);
+    $user=$usersRepository->findOneBy(["email"=>"oscar.soto@ferreteriacampollano.com", "deleted"=>0]);
+
+
+    $infoRepository=$this->getDoctrine()->getRepository(ERPInfoStocks::class);
+    $productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
+    $storeLocationsRepository=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
+    $storeRepository=$this->getDoctrine()->getRepository(ERPStores::class);
+    $stockRepository=$this->getDoctrine()->getRepository(ERPStocks::class);
+    $store=$storeRepository->findOneBy(["code"=>$storeName]);
+    $infoStocks=$infoRepository->getOperations($storeName);
+    $storeLocation=$storeLocationsRepository->findOneBy(["name"=>$storeName]);
+    $storeName='';
+    foreach($infoStocks as $infoStock){
+      $product=$productRepository->findOneBy(["code"=>$infoStock["code"]]);
+      $stock=$stockRepository->findOneBy(["storelocation"=>$storeLocation->getId(), "product"=>$product->getId()]);
+      $quantity=$stock->getQuantity()-$infoStock["vendido"];
+      $stockHistory=new ERPStockHistory();
+      $stockHistory->setProduct($product);
+      $stockHistory->setLocation($storeLocation);
+      $stockHistory->setStore($store);
+      $stockHistory->setUser($user);
+      $stockHistory->setPreviousqty($stock->getQuantity());
+      $stockHistory->setNewqty($quantity);
+      $stockHistory->setDateadd(new \Datetime());
+      $stockHistory->setDateupd(new \Datetime());
+      $stockHistory->setActive(true);
+      $stockHistory->setDeleted(false);
+      $this->getDoctrine()->getManager()->persist($stockHistory);
+      $stock->setQuantity($quantity);
+      $this->getDoctrine()->getManager()->persist($stock);
+      $this->getDoctrine()->getManager()->flush();
+    }
+    $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getTransfersByStore.php?store='.$storeName.'&date='.$date);
+    $objects=json_decode($json, true);
+    $objects=$objects[0]["class"];
+    foreach ($objects as $object){
+      $product=$productRepository->findOneBy(["code"=>$object["code"]]);
+      $stock=$stockRepository->findOneBy(["storelocation"=>$storeLocation->getId(), "product"=>$product->getId()]);
+      $quantity=$stock->getQuantity()+$object["stock"];
+      $stock->setQuantity($quantity);
+      $this->getDoctrine()->getManager()->persist($stock);
+      $this->getDoctrine()->getManager()->flush();
+    }
+
+    return new JsonResponse(["result"=>1, "text"=>"Se ha ajustado el stock"]);
     }
 
 }

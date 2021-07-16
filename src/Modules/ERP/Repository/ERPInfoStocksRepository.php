@@ -19,6 +19,18 @@ class ERPInfoStocksRepository extends ServiceEntityRepository
         parent::__construct($registry, ERPInfoStocks::class);
     }
 
+
+    public function getOperations($store){
+      $query='SELECT SUM(quantity) vendido, code, product_id
+              FROM erpstores_managers_operations_lines
+              WHERE CODE=CODE AND operation_id IN
+                  (SELECT id FROM erpstores_managers_operations
+                  WHERE store_id IN (SELECT id FROM erpstores WHERE CODE=:store))
+              GROUP BY CODE';
+      $params=['store' => $store];
+      $result=$this->getEntityManager()->getConnection()->executeQuery($query,$params)->fetchAll();
+      return $result;
+    }
     // /**
     //  * @return ERPInfoStocks[] Returns an array of ERPInfoStocks objects
     //  */
