@@ -65,21 +65,20 @@ class ERPStocksRepository extends ServiceEntityRepository
       return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
     }
 
-    public function setZeroStocks($product_id, $store, $stock_id, $productvariant_id){
+    public function setZeroStocks($product_id, $store_id, $stock_id, $productvariant_id){
       $query="UPDATE erpstocks
               SET quantity=0
-              WHERE product_id= :product AND deleted=0 AND storelocation_id IN
+              WHERE product_id= :product AND id!=:stock AND deleted=0 AND storelocation_id IN
                   (SELECT id FROM erpstore_locations WHERE store_id IN
-                    (SELECT id FROM erpstores WHERE CODE=:store)) AND id!=:stock";
+                    (SELECT id FROM erpstores WHERE id=:store_id))";
       $query2="UPDATE erpstocks
               SET quantity=0
               WHERE productvariant_id= :productvariant AND deleted=0 AND storelocation_id IN
                   (SELECT id FROM erpstore_locations WHERE store_id IN
-                    (SELECT id FROM erpstores WHERE CODE=:store)) AND id!=:stock";
-      $params=['product' => $product_id, 'store' => $store, 'stock'=>$stock_id, 'productvariant'=>$productvariant_id];
-
-      if ($productvariant_id!=null) return $this->getEntityManager()->getConnection()->executeQuery($query2, $params)->fetchAll();
-      return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+                    (SELECT id FROM erpstores WHERE id=:store_id)) AND id!=:stock";
+      $params=['product' => $product_id, 'store_id' => $store_id, 'stock'=>$stock_id, 'productvariant'=>$productvariant_id];
+      if ($productvariant_id!=null) return $this->getEntityManager()->getConnection()->executeQuery($query2, $params);
+      return $this->getEntityManager()->getConnection()->executeQuery($query, $params);
     }
 
 
