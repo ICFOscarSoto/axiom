@@ -17,6 +17,7 @@ use App\Modules\ERP\Entity\ERPEAN13;
 use App\Modules\ERP\Entity\ERPReferences;
 use App\Modules\ERP\Entity\ERPShoppingDiscounts;
 use App\Modules\ERP\Entity\ERPStocks;
+use App\Modules\ERP\Entity\ERPStores;
 use App\Modules\ERP\Entity\ERPStoreLocations;
 use App\Modules\ERP\Entity\ERPIncrements;
 use App\Modules\ERP\Entity\ERPOfferPrices;
@@ -650,6 +651,8 @@ public function importStocks(InputInterface $input, OutputInterface $output) {
       $product=$repositoryProducts->findOneBy(["code"=>$stock["code"]]);
       $namenameVariantValue=$this->variantColor($stock["variant"]);
       $variantvalue=$repositoryVariantsValues->findOneBy(["name"=>$namenameVariantValue]);
+      $storeRepository=$this->doctrine->getRepository(ERPStores::class);
+      $store=$storeRepository->findOneBy(["code"=>$stock["almacen"]]);
 
       if($product) {
             $productVariantId = null;
@@ -667,7 +670,7 @@ public function importStocks(InputInterface $input, OutputInterface $output) {
               if ((int)$stock["stock"]<0) $quantity=0;
               else $quantity=(int)$stock["stock"];
               if ($stock_old->getStorelocation()->getStore()->getManaged()!=1) {
-                $updateStocks=$repositoryStocks->setZeroStocks($product->getId(), $stock["almacen"],$stock_old->getId(),$productVariantId);
+                $updateStocks=$repositoryStocks->setZeroStocks($product->getId(), $store->getId(),$stock_old->getId(),$productVariantId);
                 $stock_old->setQuantity(!$quantity?0:$quantity);
                 $stock_old->setDateupd(new \Datetime());
                 $this->doctrine->getManager()->merge($stock_old);
