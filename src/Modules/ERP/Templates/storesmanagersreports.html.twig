@@ -63,8 +63,12 @@
   </br>
   <canvas id="ERPStoresManagersReports-bestproducts-{{ id }}" width="100%"></canvas>
   </div>
-  <div class="col-md-6">
-      &nbsp;
+  <div class="col-md-6" style="border:1px solid #ccc">
+    </br>
+    <button id="operations-export"  style="display:none;" type="button" class="btn btn-default btn-icon icon-left" onclick="exportoperations();">Exportar informe<i class="fa fa-download"></i></button>
+    </br>
+    </br>
+    <canvas id="ERPStoresManagersReports-operations-{{ id }}" width="100%"></canvas>
   </div>
 </div>
 </div>
@@ -77,6 +81,7 @@
 var ctxConsumerOperations = document.getElementById('ERPStoresManagersReports-consumeroperations-{{ id }}');
 var ctxConsumerProducts = document.getElementById('ERPStoresManagersReports-consumerproducts-{{ id }}');
 var ctxBestProducts = document.getElementById('ERPStoresManagersReports-bestproducts-{{ id }}');
+var ctxOperations = document.getElementById('ERPStoresManagersReports-operations-{{ id }}');
 
 var stackedBar;
 
@@ -175,6 +180,38 @@ yAxisID: "y-axis-total"
 };
 
 
+var OperationsData = {
+label: 'Operaciones diarias',
+data: [],
+backgroundColor:[
+      'rgba(255, 99, 132, 0.2)',
+      'rgba(255, 159, 64, 0.2)',
+      'rgba(255, 205, 86, 0.2)',
+      'rgba(75, 192, 192, 0.2)',
+      'rgba(54, 162, 235, 0.2)',
+      'rgba(153, 102, 255, 0.2)',
+			'rgba(255, 189, 253, 0.2)',
+			'rgba(196, 248, 239, 0.2)',
+			'rgba(200, 244, 213, 0.2)',
+			'rgba(201, 203, 207, 0.2)'
+    ],
+borderColor:  [
+      'rgb(255, 99, 132)',
+      'rgb(255, 159, 64)',
+      'rgb(255, 205, 86)',
+      'rgb(75, 192, 192)',
+      'rgb(54, 162, 235)',
+      'rgb(153, 102, 255)',
+			'rgb(255, 189, 253)',
+			'rgb(196, 248, 239)',
+			'rgb(200, 244, 213)',
+			'rgb(201, 203, 207)',
+    ],
+borderWidth: 2,
+yAxisID: "y-axis-total"
+};
+
+
 var ConsumerOperationsgraphData = {
 labels: [],
 datasets: [ConsumerOperationsData]
@@ -189,6 +226,15 @@ var BestProductsgraphData = {
 labels: [],
 datasets: [BestProductsData]
 };
+
+var BestProductsCodes = [];
+var BestProductsNames = [];
+
+var OperationsgraphData = {
+labels: [],
+datasets: [OperationsData]
+};
+
 
 var chartConsumerOperationsOptions = {
   onClick: function(e){
@@ -250,6 +296,26 @@ var chartBestProductsOptions = {
   }
 };
 
+var chartOperationsOptions = {
+  onClick: function(e){
+      var element = this.getElementAtEvent(e);
+      if(element.length > 0){
+          $("#{{ id }}-ERPStoresManagersReports-operations-modal").modal('toggle');
+          //console.log("Clicked on a bar with index: "+element[0]._index+". Now this bar should be marked as active.");
+        }
+  },
+  scales: {
+    xAxes: [{
+      barPercentage: 1,
+      categoryPercentage: 0.6
+    }],
+    yAxes: [{
+      id: "y-axis-total",
+      stacked: false
+    }]
+  }
+};
+
 $(function () {
   datepicker();
   stackedBarConsumerOperations = new Chart(ctxConsumerOperations, {
@@ -266,6 +332,12 @@ $(function () {
 
   stackedBarBestProducts = new Chart(ctxBestProducts, {
     type: 'doughnut',
+    data: [],
+    options: chartBestProductsOptions
+  });
+
+  stackedBarOperations = new Chart(ctxOperations, {
+    type: 'line',
     data: [],
     options: chartBestProductsOptions
   });
@@ -298,6 +370,8 @@ function getData(){
          var array_ConsumerProductsLabels=[];
          var array_BestProducts=[];
          var array_BestProductsLabels=[];
+         var array_Operations=[];
+        var array_OperationsLabels=[];
 
       if(typeof data.consumers !== 'undefined')
        $.each( data.consumers, function( key, val ) {
@@ -320,8 +394,18 @@ function getData(){
 
            array_BestProducts.push(val.total*1);
            array_BestProductsLabels.push(val.ean13);
+           BestProductsCodes.push(val.code);
+          BestProductsNames.push(val.name);
         //   array_usersIds.push(val.id);
          });
+
+         if(typeof data.operations !== 'undefined')
+            $.each( data.operations, function( key, val ) {
+
+              array_Operations.push(val.total*1);
+              array_OperationsLabels.push(val.date);
+           //   array_usersIds.push(val.id);
+          });
 
       ConsumerOperationsData.data=array_ConsumerOperations;
       ConsumerOperationsgraphData.labels = array_ConsumerOperationsLabels;
@@ -343,10 +427,17 @@ function getData(){
       stackedBarBestProducts.data=BestProductsgraphData;
       stackedBarBestProducts.update();
 
+      OperationsData.data=array_Operations;
+			OperationsgraphData.labels = array_OperationsLabels;
+			OperationsgraphData.datasets= [OperationsData];
+			stackedBarOperations.data=OperationsgraphData;
+			stackedBarOperations.update();
+
 
       $('#consumeroperations-export').css("display","block");
       $('#consumerproducts-export').css("display","block");
       $('#bestproducts-export').css("display","block");
+      	$('#operations-export').css("display","block");
 
      }
    });
@@ -375,8 +466,19 @@ function getData(){
   $('body').on('click', "[id=bestproducts-export]", function(e) {
  	labels=BestProductsgraphData.labels;
  	data=BestProductsData.data;
- 	var win = window.open("/api/ERP/storesmanagers/exportbestproducts?start="+encodeURI($("#date-from").val())+"&end="+encodeURI($("#date-to").val())+"&labels="+encodeURI(labels)+"&data="+encodeURI(data));
+ 	codes=BestProductsCodes;
+ 	names=BestProductsNames;
+ 	var win = window.open("/api/ERP/storesmanagers/exportbestproducts?start="+encodeURI($("#date-from").val())+"&end="+encodeURI($("#date-to").val())+"&labels="+encodeURI(labels)+"&data="+encodeURI(data)+"&codes="+encodeURI(codes)+"&names="+encodeURI(names));
  	win.focus();
+
+  });
+
+  $('body').on('click', "[id=operations-export]", function(e) {
+   id = {{ id }};
+   labels=OperationsgraphData.labels;
+   data=OperationsData.data;
+   var win = window.open("/api/ERP/storesmanagers/exportoperations?id="+id+"&start="+encodeURI($("#date-from").val())+"&end="+encodeURI($("#date-to").val())+'&store='+encodeURI($('#stores').val()));
+   win.focus();
 
   });
 

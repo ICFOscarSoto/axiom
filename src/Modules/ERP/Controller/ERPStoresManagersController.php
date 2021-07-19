@@ -48,6 +48,7 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\MimeType\FileinfoMimeTypeGuesser;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
+
 class ERPStoresManagersController extends Controller
 {
 	private $class=ERPStoresManagers::class;
@@ -323,12 +324,6 @@ class ERPStoresManagersController extends Controller
 		 if(!$storemanageruser)		 return new RedirectResponse($this->router->generate('app_login'));
 		 else $id=$storemanageruser->getManager()->getId();
 
-		 $from=new \Datetime();
-		 $from->modify('first day of this month');
-		 $to=new \Datetime();
-		 $to->modify('+1 day');
-
-
 		 $new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-plus"];
 		 $breadcrumb=$menurepository->formatBreadcrumb('genericindex','ERP','StoreTickets');
 		 array_push($breadcrumb,$new_breadcrumb);
@@ -360,8 +355,6 @@ class ERPStoresManagersController extends Controller
 					 'breadcrumb' =>  $breadcrumb,
 					 'userData' => $userdata,
 					 'id' => $id,
-					 'from' => $from,
-					 'to' => $to,
 					 'stores' => $stores
 
 					 ]);
@@ -383,11 +376,6 @@ class ERPStoresManagersController extends Controller
 
 		 $userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
 		 $locale = $request->getLocale();
-
-		 $from=new \Datetime();
-		 $from->modify('first day of this month');
-		 $to=new \Datetime();
-		 $to->modify('+1 day');
 
 		 $storeManagerRepository=$this->getDoctrine()->getRepository(ERPStoresManagers::class);
 		 $storeManager=$storeManagerRepository->findOneBy(["id"=>$id]);
@@ -420,8 +408,6 @@ class ERPStoresManagersController extends Controller
 					 'optionSelectedParams' => ["module"=>"ERP", "name"=>"StoresManagersReports"],
 					 'userData' => $userdata,
 					 'id' => $id,
-					 'from' => $from,
-					 'to' => $to,
 					 'stores' => $stores
 
 					 ]);
@@ -434,12 +420,6 @@ class ERPStoresManagersController extends Controller
 	 */
 	 public function storesManagersGetReports($id, Request $request)
 	 {
-		 /*
-				 $from=new \Datetime();
-				 $from->modify('first day of this month');
-				 $to=new \Datetime();
-				 $to->modify('+1 day');*/
-
 				 $start=$request->request->get("start");
 				 $end=$request->request->get("end");
 				 $store=$request->request->get("store");
@@ -452,14 +432,17 @@ class ERPStoresManagersController extends Controller
 					 $array_consumers=$operationsRepository->getOperationsByConsumer($id,$start,$end,null);
 					 $array_consumerproducts=$operationLinesRepository->getProductsByConsumer($id,$start,$end,null);
 					 $array_bestproducts=$operationLinesRepository->getBestProducts($id,$start,$end,null);
+					 $array_operations=$operationsRepository->getDailyOperations($id,$start,$end,null);
 
 				 }
 				 else{
 					 $array_consumers=$operationsRepository->getOperationsByConsumer($id,$start,$end,$store);
 					 $array_consumerproducts=$operationLinesRepository->getProductsByConsumer($id,$start,$end, $store);
 					 $array_bestproducts=$operationLinesRepository->getBestProducts($id,$start,$end,$store);
+					 $array_operations=$operationsRepository->getDailyOperations($id,$start,$end,$store);
 
 				 }
+
 
 				 $managerRepository=$this->getDoctrine()->getRepository(ERPStoresManagers::class);
 				 $eanRepostory=$this->getDoctrine()->getRepository(ERPEAN13::class);
@@ -470,7 +453,7 @@ class ERPStoresManagersController extends Controller
 					 $best["ean13"]=$ean13;
 					 array_push($array,$best);
 				 }
-				 return new JsonResponse(["from"=>$start, "to"=>$end, "consumers"=>$array_consumers, "consumerproducts"=>$array_consumerproducts, "bestproducts"=>$array]);
+				 return new JsonResponse(["from"=>$start, "to"=>$end, "consumers"=>$array_consumers, "consumerproducts"=>$array_consumerproducts, "bestproducts"=>$array, "operations"=>$array_operations]);
 
 
 	 }
@@ -502,13 +485,13 @@ class ERPStoresManagersController extends Controller
 		 }
 
 
-		 $result=$this->exportOperations($result_array,$template);
+		 $result=$this->csvConsumerOperations($result_array,$template);
 		 return $result;
 
 	 }
 
 
-	 public function exportOperations($list, $template){
+	 public function csvConsumerOperations($list, $template){
 		 $this->template=$template;
 		 $filename='Operaciones.csv';
 		 $array=$list;
@@ -567,13 +550,13 @@ class ERPStoresManagersController extends Controller
 	 		 }
 
 
-	 		 $result=$this->exportProductsByConsumer($result_array,$template);
+	 		 $result=$this->csvConsumerProducts($result_array,$template);
 	 		 return $result;
 
 	 	 }
 
 
-	 	 public function exportProductsByConsumer($list, $template){
+	 	 public function csvConsumerProducts($list, $template){
 	 		 $this->template=$template;
 	 		 $filename='Productos_por_consumidor.csv';
 	 		 $array=$list;
@@ -639,13 +622,13 @@ class ERPStoresManagersController extends Controller
 	 		 }
 
 
-	 		 $result=$this->exportQuantityProducts($result_array,$template);
+	 		 $result=$this->csvBestProducts($result_array,$template);
 	 		 return $result;
 
 	 	 }
 
 
-	 	 public function exportQuantityProducts($list, $template){
+	 	 public function csvBestProducts($list, $template){
 	 		 $this->template=$template;
 	 		 $filename='Productos_mas_utilizados.csv';
 	 		 $array=$list;
@@ -679,16 +662,89 @@ class ERPStoresManagersController extends Controller
 	 	 }
 
 
+		 /**
+		* @Route("/api/ERP/storesmanagers/exportoperations", name="exportOperations")
+		*/
+		public function exportOperations(RouterInterface $router,Request $request)
+		{
+			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			$template=dirname(__FILE__)."/../Forms/Operations.json";
+
+			$id=$request->query->get("id");
+			$start=$request->query->get("start");
+			$end=$request->query->get("end");
+
+			$date_start=date_create_from_format('d/m/Y', $start);
+			$date_end=date_create_from_format('d/m/Y', $end);
+
+			$store=$request->query->get("store");
+			$operationsRepository=$this->getDoctrine()->getRepository(ERPStoresManagersOperations::class);
+			if($store=="-1") $array_detailedoperations=$operationsRepository->getDetailedOperations($id,$date_start,$date_end,null);
+			else $array_detailedoperations=$operationsRepository->getDetailedOperations($id,$date_start,$date_end,$store);
+
+			$result_array=Array();
+			foreach($array_detailedoperations as $operation)
+			{
+				$item["Código"]=$operation["code"];
+				$item["Nombre"]=$operation["name"];
+				$item["Cantidad"]=$operation["quantity"];
+				$item["Agente"]=$operation["agente"];
+				$item["Consumidor"]=$operation["consumidor"];
+				$item["Fecha"]=$operation["fecha"];
+				$result_array[]=$item;
+
+			}
+
+			$result=$this->csvOperations($result_array,$template);
+			return $result;
+
+		}
+
+
+		public function csvOperations($list, $template){
+			$this->template=$template;
+			$filename='Operaciones_detalladas.csv';
+			$array=$list;
+			//exclude tags column, last
+			$key='_tags';
+			array_walk($array, function (&$v) use ($key) {
+			 unset($v[$key]);
+			});
+		//	 $array=$this->applyFormats($array);
+
+			$fileContent=$this->createCSV($array);
+			$response = new Response($fileContent);
+			// Create the disposition of the file
+				 $disposition = $response->headers->makeDisposition(
+						 ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+						 $filename
+			 );
+			// Set the content disposition
+			$seconds_to_cache = 0;
+			$ts = gmdate("D, d M Y H:i:s", time() + $seconds_to_cache) . " GMT";
+			$response->headers->set("Expires", $ts);
+			$response->headers->set("Pragma", "cache");
+			$response->headers->set("Cache-Control", "max-age=0, no-cache, must-revalidate, proxy-revalidate");
+			$response->headers->set('Content-Type', 'application/force-download');
+			$response->headers->set('Content-Type', 'application/octet-stream');
+			$response->headers->set('Content-Type', 'application/download');
+			$response->headers->set('Content-Disposition', $disposition);
+			// Dispatch request
+			return $response;
+
+		}
 
 	 private function createCSV(array &$array){
+
 			if (count($array) == 0) {
 				return null;
 			}
 			ob_start();
 			$df = fopen("php://output", 'w');
-			fputcsv($df, array_map("utf8_decode",array_keys(reset($array))));
+			$delimiter = ';';
+			fputcsv($df, array_map("utf8_decode",array_keys(reset($array))), ";");
 			foreach ($array as $row) {
-				 fputcsv($df, array_values (array_map("utf8_decode", $row )));
+				 fputcsv($df, array_values (array_map("utf8_decode", $row )), ";");
 			}
 			fclose($df);
 			return ob_get_clean();
