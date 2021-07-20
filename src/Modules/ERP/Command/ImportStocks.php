@@ -81,8 +81,11 @@ class ImportStocks extends ContainerAwareCommand
         while ( ($data = fgetcsv($handle) ) !== FALSE ) {
           $product=$productsRepository->findOneBy(["code"=>$data[$map["sku"]], "deleted"=>0]);
           if(!$product) {
-            $output->writeln('   -> '.$data[$map["sku"]].' - Producto no encontrado');
-            $checked=false;
+            $product=$productsRepository->findOneBy(["code"=>"0".$data[$map["sku"]], "deleted"=>0]);
+            if(!$product) {
+              $output->writeln('   -> '.$data[$map["sku"]].' - Producto no encontrado');
+              $checked=false;
+            }
           }
         }
         if($checked==false) die('-- ¡NO SE PROCESO EL FICHERO! -- Existen códigos de producto no válidos, revíselos y vuelva a intentarlo');
@@ -93,8 +96,11 @@ class ImportStocks extends ContainerAwareCommand
         while ( ($data = fgetcsv($handle) ) !== FALSE ) {
           $product=$productsRepository->findOneBy(["code"=>$data[$map["sku"]], "deleted"=>0]);
           if(!$product) {
-            $output->writeln('   -> '.$data[$map["sku"]].' - Producto no encontrado');
-            continue;
+            $product=$productsRepository->findOneBy(["code"=>"0".$data[$map["sku"]], "deleted"=>0]);
+            if(!$product) {
+              $output->writeln('   -> '.$data[$map["sku"]].' - Producto no encontrado');
+              continue;
+            }
           }
           $variant=null;
           if((isset($data[$map["variantname"]]) && $data[$map["variantname"]]!=null) || (isset($data[$map["variantvalue"]]) && $data[$map["variantvalue"]]!=null)){
