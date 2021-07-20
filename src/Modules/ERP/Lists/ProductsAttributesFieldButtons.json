@@ -1,5 +1,5 @@
 [
-  {"id": "editProductsAttributes", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"genericdata", "routeParams":{"module":"ERP", "name":"ProductsAttributes", "type":"modal" }, "modal":"ProductsAttributes", "actionType" : "background", "confirm" :false, "tooltip":""},
+  {"id": "editProductsAttributes", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"genericdata", "routeParams":{"module":"ERP", "name":"ProductsAttributes", "type":"modal","idparent":"parent" }, "modal":"ProductsAttributes", "actionType" : "background", "confirm" :false, "tooltip":""},
   {"id": "activation", "type": "option", "options": [
       {"id": "desactivateProductsAttributes", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"genericdisable", "routeParams":{"module":"ERP", "name":"ProductsAttributes"}, "confirm" :true, "actionType" : "background", "tooltip":"" },
       {"id": "activateProductsAttributes", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "route":"genericenable", "routeParams":{"module":"ERP", "name":"ProductsAttributes"}, "confirm" :true, "actionType" : "background", "tooltip":"" }
