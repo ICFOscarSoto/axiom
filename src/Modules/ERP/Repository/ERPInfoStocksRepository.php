@@ -20,14 +20,14 @@ class ERPInfoStocksRepository extends ServiceEntityRepository
     }
 
 
-    public function getOperations($store){
+    public function getOperations($store, $date){
       $query='SELECT SUM(quantity) vendido, code, product_id
               FROM erpstores_managers_operations_lines
-              WHERE CODE=CODE AND operation_id IN
+              WHERE CODE=CODE AND dateadd> CAST(:datestart AS DATETIME) AND operation_id IN
                   (SELECT id FROM erpstores_managers_operations
                   WHERE store_id IN (SELECT id FROM erpstores WHERE CODE=:store))
               GROUP BY CODE';
-      $params=['store' => $store];
+      $params=['store' => $store, 'datestart'=>$date];
       $result=$this->getEntityManager()->getConnection()->executeQuery($query,$params)->fetchAll();
       return $result;
     }

@@ -107,17 +107,16 @@ class ERPInfoStocksController extends Controller
     public function updateStocksManageds(RouterInterface $router,Request $request){
     $storeName=$request->query->get('store',null);
     $date=$request->query->get('date',null);
-
+    $date2=$request->query->get('date2',null);
     $usersRepository=$this->getDoctrine()->getRepository(GlobaleUsers::class);
     $user=$usersRepository->findOneBy(["email"=>"oscar.soto@ferreteriacampollano.com", "deleted"=>0]);
-
     $infoRepository=$this->getDoctrine()->getRepository(ERPInfoStocks::class);
     $productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
     $storeLocationsRepository=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
     $storeRepository=$this->getDoctrine()->getRepository(ERPStores::class);
     $stockRepository=$this->getDoctrine()->getRepository(ERPStocks::class);
     $store=$storeRepository->findOneBy(["code"=>$storeName]);
-    $infoStocks=$infoRepository->getOperations($storeName);
+    $infoStocks=$infoRepository->getOperations($storeName,$date2);
     $storeLocation=$storeLocationsRepository->findOneBy(["name"=>$storeName]);
     foreach($infoStocks as $infoStock){
       $product=$productRepository->findOneBy(["code"=>$infoStock["code"]]);
