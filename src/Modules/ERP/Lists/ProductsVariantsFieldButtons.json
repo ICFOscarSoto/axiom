@@ -6,5 +6,5 @@
       {"id": "desactivateProductsVariants", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"genericdisable", "routeParams":{"module":"ERP", "name":"ProductsVariants"}, "confirm" :true, "actionType" : "background", "tooltip":"" },
       {"id": "activateProductsVariants", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "route":"genericenable", "routeParams":{"module":"ERP", "name":"ProductsVariants"}, "confirm" :true, "actionType" : "background", "tooltip":"" }
   ]},
-  {"id": "deleteProductsVariants", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"genericdelete", "routeParams":{"module":"ERP", "name":"ProductsVariants"}, "confirm" :true, "undo" :false, "actionType" : "background", "tooltip":""}
+  {"id": "deleteProductsVariants", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"deleteProductVariant", "confirm" :true, "undo" :false, "actionType" : "background", "tooltip":""}
 ]
