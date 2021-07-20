@@ -85,7 +85,7 @@ class ImportStocks extends ContainerAwareCommand
             $checked=false;
           }
         }
-        if($checked==false) die('-- ¡NO SE PROCESO EL FICHERO! -- Existen códigos de producto no válidos, revíselos y vuelva a intentarlo')
+        if($checked==false) die('-- ¡NO SE PROCESO EL FICHERO! -- Existen códigos de producto no válidos, revíselos y vuelva a intentarlo');
         fclose($handle);
 
         $handle = fopen($file,'r');
