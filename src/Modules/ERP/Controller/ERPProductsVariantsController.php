@@ -18,10 +18,14 @@ use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\ERP\Utils\ERPProductsVariantsUtils;
+use \App\Modules\ERP\Utils\ERPPrestashopUtils;
 
 
 class ERPProductsVariantsController extends Controller
 {
+
+  private $class=ERPProductsVariants::class;
+  private $utilsClass=ERPProductsVariantsUtils::class;
 
 
   /**
@@ -90,6 +94,64 @@ class ERPProductsVariantsController extends Controller
       'userData' => $userdata,
       'forms' => $templateForms
     ));
+  }
+
+  /**
+  * @Route("/{_locale}/ProductsVariants/{id}/delete", name="deleteProductVariant")
+  */
+  public function delete($id){
+    $this->denyAccessUnlessGranted('ROLE_GLOBAL');
+    $entityUtils=new GlobaleEntityUtils();
+    $result=$entityUtils->deleteObject($id, $this->class, $this->getDoctrine());
+
+    $this_url="https://www.ferreteriacampollano.com";
+    $auth = base64_encode("6TI5549NR221TXMGMLLEHKENMG89C8YV");
+    $context = stream_context_create(["http" => ["header" => "Authorization: Basic $auth"]]);
+    $productsVariantsRepository=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
+    $productsVariant=$productsVariantsRepository->find($id);
+
+
+    // MIRAMOS SI EXISTE EL PRODUCTO EN PRESTASHOP OBTENIENDO EL ID
+    $xml_string=file_get_contents($this_url."/api/products/?filter[reference]=".$productsVariant->getProduct()->getCode(), false, $context);
+    $xml = simplexml_load_string($xml_string, 'SimpleXMLElement', LIBXML_NOCDATA);
+    $id_prestashop=NULL;
+    $id_prestashop=$xml->products->product['id'];
+
+
+
+    //comprobamos si existe la variante en Prestashop
+    $xml_string_variant=file_get_contents($this_url."/api/product_option_values/?display=[id]&filter[name]=".$productsVariant->getVariantvalue()->getName(), false, $context);
+    $xml_variant = simplexml_load_string($xml_string_variant, 'SimpleXMLElement', LIBXML_NOCDATA);
+    $id_attribute=$xml_variant->product_option_values->product_option_value->id;
+    //la variante sí que existe en prestashop, luego hay que comprobar si la combinación variante-producto también existe y borrarla
+    if($id_attribute!=NULL)
+    {
+      //obtenemos todas las combinaciones asociadas al producto.
+      $xml_string_product_combinations=file_get_contents($this_url."/api/combinations/?display=[id]&filter[id_product]=".$id_prestashop, false, $context);
+      $xml_product_combinations = simplexml_load_string($xml_string_product_combinations, 'SimpleXMLElement', LIBXML_NOCDATA);
+
+    //  dump($xml_product_combinations);
+      foreach($xml_product_combinations->combinations->combination as $comb)
+      {
+        $array=array_unique((array) $comb);
+
+        //obtenemos cada combinación por el ID.
+        $xml_string_product_combination=file_get_contents($this_url."/api/combinations/".$array["id"], false, $context);
+        $xml_product_combination = simplexml_load_string($xml_string_product_combination, 'SimpleXMLElement', LIBXML_NOCDATA);
+        $id_attribute_ps=$xml_product_combination->combination->associations->product_option_values->product_option_value;
+        $array_id_attribute=array_unique((array) $id_attribute_ps);
+    //    dump($array_id_attribute["id"]."--".$id_attribute);
+        if($array_id_attribute["id"]==$id_attribute){
+          $prestashopUtils= new ERPPrestashopUtils();
+          $prestashopUtils->deleteCombination($xml_product_combination,$array["id"]);
+          continue;
+        }
+    }
+    }
+
+
+
+    return new JsonResponse(array('result' => $result));
   }
 
 
