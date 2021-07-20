@@ -146,14 +146,18 @@ class ERPProductsVariants
 
         return $this;
     }
-/*
+
     public function postProccess($kernel, $doctrine, $user, $params, $oldobj){
 
 
       $array_new_data = [];
       $array_new_data["variants"]["type"]=$this->getVariantname()->getName();
       $array_new_data["variants"]["new"]=$this->getVariantvalue()->getName();
-      $array_new_data["variants"]["old"]="42";
+      if($oldobj->getVariantvalue()) $array_new_data["variants"]["old"]=$oldobj->getVariantvalue()->getName();
+      else $array_new_data["variants"]["old"]=null;
+
+      //dump($this);
+    //  dump($array_new_data);
 
       $webproductRepository=$doctrine->getRepository(ERPWebProducts::class);
       $webproduct=$webproductRepository->findOneBy(["product"=>$this->getProduct()]);
@@ -161,5 +165,5 @@ class ERPProductsVariants
       $prestashopUtils= new ERPPrestashopUtils();
       $prestashopUtils->updateWebProduct($doctrine,$array_new_data,$this->getProduct(),$webproduct);
 
-    }*/
+    }
 }

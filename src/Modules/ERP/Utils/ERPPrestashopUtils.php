@@ -50,7 +50,6 @@ class ERPPrestashopUtils
 
                    //obtenemos el XML del producto en prestashop que tenemos que modificar
                     $xml_string=file_get_contents($this->this_url."/api/products/".$id_prestashop, false, $context);
-                   // $xml_string=file_get_contents($this->url."/api/products/?display=[id,reference,name,cantidad_pedido_minimo,unidad_medida,equivalencia,unidad_medida_equivalencia,meta_title,meta_description]&filter[reference]=2322290200AC", false, $context);
                     $xml = simplexml_load_string($xml_string, 'SimpleXMLElement', LIBXML_NOCDATA);
                     unset($xml->product->manufacturer_name);
                     unset($xml->product->quantity);
@@ -60,8 +59,23 @@ class ERPPrestashopUtils
                  }
              }
              else{
+               //hay que desactivarlo de la web
 
-                 //hay que desactivarlo de la web
+               //OBTENER ID DEL PRODUCTO EN prestashop
+               $xml_string=file_get_contents($this->this_url."/api/products/?filter[reference]=".$product->getCode(), false, $context);
+               $xml = simplexml_load_string($xml_string, 'SimpleXMLElement', LIBXML_NOCDATA);
+               $id_prestashop=$xml->products->product['id'];
+
+               //obtenemos el XML del producto en prestashop que tenemos que modificar
+                $xml_string=file_get_contents($this->this_url."/api/products/".$id_prestashop, false, $context);
+                $xml = simplexml_load_string($xml_string, 'SimpleXMLElement', LIBXML_NOCDATA);
+                unset($xml->product->manufacturer_name);
+                unset($xml->product->quantity);
+                $xml->product->active=0;
+                $this->callWSUpdateProduct($id_prestashop,$xml);
+
+
+
 
              }
 
