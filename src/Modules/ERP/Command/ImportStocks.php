@@ -76,7 +76,19 @@ class ImportStocks extends ContainerAwareCommand
         if($map["variantvalue"]===false) die('- Falta la columna obligatoria variantvalue');
         if($map["store"]===false) die('- Falta la columna obligatoria store');
         if($map["location"]===false) die('- Falta la columna obligatoria location');
+        $output->writeln('- Verificando códigos de productos del fichero');
+        $checked=true;
+        while ( ($data = fgetcsv($handle) ) !== FALSE ) {
+          $product=$productsRepository->findOneBy(["code"=>$data[$map["sku"]], "deleted"=>0]);
+          if(!$product) {
+            $output->writeln('   -> '.$data[$map["sku"]].' - Producto no encontrado');
+            $checked=false;
+          }
+        }
+        if($checked==false) die('-- ¡NO SE PROCESO EL FICHERO! -- Existen códigos de producto no válidos, revíselos y vuelva a intentarlo')
+        fclose($handle);
 
+        $handle = fopen($file,'r');
         $output->writeln('- Procesando datos del fichero');
         while ( ($data = fgetcsv($handle) ) !== FALSE ) {
           $product=$productsRepository->findOneBy(["code"=>$data[$map["sku"]], "deleted"=>0]);
