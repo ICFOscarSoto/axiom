@@ -90,8 +90,8 @@ class ImportStocks extends ContainerAwareCommand
         }
         if($checked==false) die('-- ¡NO SE PROCESO EL FICHERO! -- Existen códigos de producto no válidos, revíselos y vuelva a intentarlo');
         fclose($handle);
-
         $handle = fopen($file,'r');
+        $headers=fgetcsv($handle);
         $output->writeln('- Procesando datos del fichero');
         while ( ($data = fgetcsv($handle) ) !== FALSE ) {
           $product=$productsRepository->findOneBy(["code"=>$data[$map["sku"]], "deleted"=>0]);
