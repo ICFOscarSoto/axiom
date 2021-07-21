@@ -115,12 +115,11 @@ class ERPInfoStocksController extends Controller
     $storeLocationsRepository=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
     $storeRepository=$this->getDoctrine()->getRepository(ERPStores::class);
     $stockRepository=$this->getDoctrine()->getRepository(ERPStocks::class);
-
-    if ($storeName="ALI") {
+    if ($storeName=='ALI') {
       $storeLocation=$storeLocationsRepository->findOneBy(["name"=>"GESTOR ALI"]);
       $store=$storeRepository->findOneBy(["code"=>"GESTOR ALI"]);
       $infoStocks=$infoRepository->getOperations("GESTOR ALI",$date2);
-  }
+    }
     else {
       $storeLocation=$storeLocationsRepository->findOneBy(["name"=>$storeName]);
       $store=$storeRepository->findOneBy(["code"=>$storeName]);
