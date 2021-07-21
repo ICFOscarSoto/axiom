@@ -128,6 +128,7 @@ class ERPInfoStocksController extends Controller
     foreach($infoStocks as $infoStock){
       $product=$productRepository->findOneBy(["code"=>$infoStock["code"]]);
       $stock=$stockRepository->findOneBy(["storelocation"=>$storeLocation->getId(), "product"=>$product->getId()]);
+
       $quantity=$stock->getQuantity()-$infoStock["vendido"];
       $stockHistory=new ERPStockHistory();
       $stockHistory->setProduct($product);
@@ -151,10 +152,11 @@ class ERPInfoStocksController extends Controller
     foreach ($objects as $object){
       $product=$productRepository->findOneBy(["code"=>$object["code"]]);
       $stock=$stockRepository->findOneBy(["storelocation"=>$storeLocation->getId(), "product"=>$product->getId()]);
+      if ($stock!=null){
       $quantity=$stock->getQuantity()+$object["stock"];
       $stock->setQuantity($quantity);
       $this->getDoctrine()->getManager()->persist($stock);
-      $this->getDoctrine()->getManager()->flush();
+      $this->getDoctrine()->getManager()->flush();}
     }
 
     return new JsonResponse(["result"=>1, "text"=>"Se ha ajustado el stock"]);
