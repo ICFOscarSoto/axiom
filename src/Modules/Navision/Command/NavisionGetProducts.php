@@ -1250,7 +1250,7 @@ public function variantColor($nameVariantValue){
   else if ($nameVariantValue=="AZUL MARIN") $nameVariantValue="Azul Marino";
   else if ($nameVariantValue=="AZUL ULTA") $nameVariantValue="Azul Ultramar";
   else if ($nameVariantValue=="BEIGE 585" or $nameVariantValue=="BEIGE") $nameVariantValue="Beige";
-  else if ($nameVariantValue=="BLANCO 501"or $nameVariantValue=="BLANCO") $nameVariantValue="Blanco";
+  else if ($nameVariantValue=="BLANCO 501" or $nameVariantValue=="BLANCO" or $nameVariantValue=="BLANCA") $nameVariantValue="Blanco";
   else if ($nameVariantValue=="BLANCO BRI") $nameVariantValue="Blanco Brillo";
   else if ($nameVariantValue=="BLANCOPERL") $nameVariantValue="Blanco Perla";
   else if ($nameVariantValue=="CREMA 586" or $nameVariantValue=="CREMA") $nameVariantValue="Crema";
