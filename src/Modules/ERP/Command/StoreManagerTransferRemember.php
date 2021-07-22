@@ -86,13 +86,11 @@ class StoreManagerTransferRemember extends ContainerAwareCommand
         foreach($info_stocks as $infostock){
           $product=$productsRepository->findOneBy(["id"=>$infostock["product_id"]]);
           $info=$infoStocksRepository->findOneBy(["product"=>$infostock["product_id"], "store"=>$store->getId()]);
-          $msg="Ref: **".$product->getCode()."** - ".$product->getName()." realizar traspaso a **".$store->getName()."** - Cantidad: **".($info->getMaximunQuantity()-$infostock["quantity"]." unidades.**");
-          $output->writeln($msg);
           if($manager->getDiscordchannel()!=null){
             $channel=$manager->getDiscordchannel();
             $msg="Ref: **".$product->getCode()."** - ".$product->getName()." realizar traspaso a **".$store->getName()."** - Cantidad: **".($info->getMaximunQuantity()-$infostock["quantity"]." unidades.**");
-            $output->writeln($msg);
             file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
+            sleep(1);
           }
         }
   }
