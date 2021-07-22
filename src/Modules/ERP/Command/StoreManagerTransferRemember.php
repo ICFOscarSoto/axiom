@@ -61,7 +61,7 @@ class StoreManagerTransferRemember extends ContainerAwareCommand
         if(!$store) {
           die(' - Gestor no encontrado');
         }
-        $info_stocks=$infoStocksRepository->findBy(["store"=>$store, "active"=>1, "deleted"=>0]);
+       /*$info_stocks=$infoStocksRepository->findBy(["store"=>$store, "active"=>1, "deleted"=>0]);
         foreach($info_stocks as $infostock){
             $location=$locationsRepository->findOneBy(["name"=>$store->getCode(), "active"=>1, "deleted"=>0]);
             if(!$location) {
@@ -80,8 +80,18 @@ class StoreManagerTransferRemember extends ContainerAwareCommand
                 file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
               }
             }
-        }
+        }*/
 
+        $info_stocks=$infoStocksRepository->getMinimum($store->getCode());
+        foreach($info_stocks as $infostock){
+          $product=$productsRepository->findOneBy(["id"=>$infostock["product_id"]]);
+          $info=$infoStocksRepository->findOneBy(["product"=>$infostock["product_id"], "store"=>$store->getId()]);
+          if($manager->getDiscordchannel()!=null){
+            $channel=$manager->getDiscordchannel();
+            $msg="Ref: **".$infostock->getProduct()->getCode()."** - ".$product->getName()." realizar traspaso a **".$store->getName()."** - Cantidad: **".($info->getMaximunQuantity()-$infostock["quantity"]." unidades.**");
+            file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
+          }
+        }
   }
 }
 ?>

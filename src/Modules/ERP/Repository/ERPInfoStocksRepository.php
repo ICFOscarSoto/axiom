@@ -31,6 +31,22 @@ class ERPInfoStocksRepository extends ServiceEntityRepository
       $result=$this->getEntityManager()->getConnection()->executeQuery($query,$params)->fetchAll();
       return $result;
     }
+
+    public function getMinimum($store){
+      $query='SELECT s.product_id, s.quantity FROM erpstocks s
+      WHERE s.quantity < (SELECT i.minimum_quantity
+                          FROM erpinfo_stocks i
+                          WHERE i.product_id=s.product_id
+                          AND store_id IN (SELECT id FROM erpstores WHERE CODE=:store))
+      AND storelocation_id IN (SELECT id
+                              FROM erpstore_locations
+                              WHERE store_id IN (SELECT id FROM erpstores WHERE CODE=:store))';
+      $params=['store' => $store];
+      $result=$this->getEntityManager()->getConnection()->executeQuery($query,$params)->fetchAll();
+      return $result;
+    }
+
+
     // /**
     //  * @return ERPInfoStocks[] Returns an array of ERPInfoStocks objects
     //  */
