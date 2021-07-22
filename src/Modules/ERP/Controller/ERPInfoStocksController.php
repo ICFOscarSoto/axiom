@@ -52,6 +52,7 @@ class ERPInfoStocksController extends Controller
      * @Route("/{_locale}/listInfoStocks/{id}", name="listInfoStocks", defaults={"id"=0})
      */
     public function listInfoStocks($id, Request $request){
+      $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
       $listInfoStocks = new ERPInfoStocksUtils();
       $formUtils=new GlobaleFormUtils();
       $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "product"=>null];
