@@ -1207,9 +1207,9 @@ public function importProductsVariants(InputInterface $input, OutputInterface $o
         $repositoryVariantValue=$this->doctrine->getRepository(ERPVariantsValues::class);
         $nameVariantValue;
         //$output->writeln('       - Añadiendo variante a '.$object["product"]);
-        if ($variant->getName()=="Color") {
-          $nameVariantValue=$this->variantColor($object["Code"]);
-        } else $nameVariantValue=$object["Code"];
+        if ($variant->getName()=="Color") $nameVariantValue=$this->variantColor($object["Code"]);
+        else if ($variant->getName()=="Fragancia") $nameVariantValue=$this->variantFragrance($object["Fragancia"]);
+        else $nameVariantValue=$object["Code"];
 
 
         $variantValue=$repositoryVariantValue->findOneBy(["variantname"=>$variant, "name"=>$nameVariantValue]);
