@@ -1153,10 +1153,9 @@ public function importVariants(InputInterface $input, OutputInterface $output){
       $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
       foreach ($objects as $object){
         $variantValue;
-        if ($variant->getName()=="Color") {
-          $variantValue=$this->variantColor($object["value"]);
-
-        } else $variantValue=$object["value"];
+        if ($variant->getName()=="Color") $variantValue=$this->variantColor($object["value"]);
+        else if ($variant->getName()=="Fragancia") $variantValue=$this->variantFragrance($object["value"]);
+        else $variantValue=$object["value"];
 
         $obj=$repository->findOneBy(["name"=>$variantValue]);
         if ($obj==null){
@@ -1238,7 +1237,13 @@ public function importProductsVariants(InputInterface $input, OutputInterface $o
       //------   Remove Lock Mutex    ------
       fclose($fp);
 }
-
+public function variantFragrance($nameVariantValue){
+  if ($nameVariantValue=="BLUE SILVE") $nameVariantValue="Blue Silver";
+  if ($nameVariantValue=="FOREVER YO") $nameVariantValue="Forever Young";
+  if ($nameVariantValue=="NEUTRALIZA") $nameVariantValue="Neutralizador";
+  else $nameVariantValue=ucwords(strtolower($nameVariantValue));
+  return $nameVariantValue;
+}
 public function variantColor($nameVariantValue){
   if ($nameVariantValue=="AMARILLO C") $nameVariantValue="Amarillo Claro";
   else if ($nameVariantValue=="AMARILLO F") $nameVariantValue="Amarillo Fluor";
