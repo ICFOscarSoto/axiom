@@ -1208,7 +1208,7 @@ public function importProductsVariants(InputInterface $input, OutputInterface $o
         $nameVariantValue;
         //$output->writeln('       - Añadiendo variante a '.$object["product"]);
         if ($variant->getName()=="Color") $nameVariantValue=$this->variantColor($object["Code"]);
-        else if ($variant->getName()=="Fragancia") $nameVariantValue=$this->variantFragrance($object["Fragancia"]);
+        else if ($variant->getName()=="Fragancia") $nameVariantValue=$this->variantFragrance($object["Code"]);
         else $nameVariantValue=$object["Code"];
 
 
