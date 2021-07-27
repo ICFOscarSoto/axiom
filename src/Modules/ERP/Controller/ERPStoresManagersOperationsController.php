@@ -288,11 +288,11 @@ class ERPStoresManagersOperationsController extends Controller
 							if($infostock->getMinimumQuantity()>=$stock->getQuantity()){
 								//Inform to discotd channel
 								$manager=$consumer->getManager();
-								if($manager->getDiscordchannel()!=null){
+							/*	if($manager->getDiscordchannel()!=null){
 									$channel=$manager->getDiscordchannel();
 									$msg="Ref: **".$item->getProduct()->getCode()."** - ".$item->getProduct()->getName()." realizar traspaso a **".$store->getStore()->getName()."** - Cantidad: **".($infostock->getMaximunQuantity()-$stock->getQuantity()." unidades.**");
 									file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
-								}
+								} */
 							}
 						}
 					}
