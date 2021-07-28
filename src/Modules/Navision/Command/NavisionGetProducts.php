@@ -1348,29 +1348,31 @@ public function importReferences(InputInterface $input, OutputInterface $output)
   foreach ($objects["class"] as $key=>$object){
     //$reference=preg_replace('/\D/','',$object["Cross-Reference No."]);
     $obj=$repository->findOneBy(["name"=>$object["Cross-Reference No."]]);
-    $output->writeln('  -Añadiendo al objeto'.$object["Item No."].' la referencia '.$object["Cross-Reference No."]);
-    $obj=new ERPReferences();
-    $obj->setName($object["Cross-Reference No."]);
-    $obj->setDateadd(new \Datetime());
-    $obj->setDateupd(new \Datetime());
-    $obj->setDeleted(0);
-    $obj->setActive(1);
-    if ($object["Cross-Reference Type"]==2){
-      $supplier=$repositorySupliers->findOneBy(["code"=>$object["Cross-Reference Type No."]]);
-      $obj->setSupplier($supplier);
-      $obj->setType(1);
-    } else if ($object["Cross-Reference Type"]==1){
-      $customer=$repositoryCustomers->findOneBy(["code"=>$object["Cross-Reference Type No."]]);
-      $obj->setCustomer($customer);
-      $obj->setType(2);
+    $output->writeln('  -Añadiendo al producto '.$object["Item No."].' la referencia '.$object["Cross-Reference No."]);
+    if ($obj==null){
+      $obj=new ERPReferences();
+      $obj->setName($object["Cross-Reference No."]);
+      $obj->setDateadd(new \Datetime());
+      $obj->setDateupd(new \Datetime());
+      $obj->setDeleted(0);
+      $obj->setActive(1);
+      if ($object["Cross-Reference Type"]==2){
+        $supplier=$repositorySupliers->findOneBy(["code"=>$object["Cross-Reference Type No."]]);
+        $obj->setSupplier($supplier);
+        $obj->setType(1);
+      } else if ($object["Cross-Reference Type"]==1){
+        $customer=$repositoryCustomers->findOneBy(["code"=>$object["Cross-Reference Type No."]]);
+        $obj->setCustomer($customer);
+        $obj->setType(2);
+      }
+      $product=$repositoryProducts->findOneBy(["code"=>$object["Item No."]]);
+      if ($product!=null) {
+        $obj->setProduct($product);
+        $this->doctrine->getManager()->merge($obj);
+        $this->doctrine->getManager()->flush();
+      }
+      $this->doctrine->getManager()->clear();
     }
-    $product=$repositoryProducts->findOneBy(["code"=>$object["Item No."]]);
-    if ($product!=null) {
-      $obj->setProduct($product);
-      $this->doctrine->getManager()->merge($obj);
-      $this->doctrine->getManager()->flush();
-    }
-    $this->doctrine->getManager()->clear();
   }
   $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"References"]);
   if ($navisionSync==null) {
