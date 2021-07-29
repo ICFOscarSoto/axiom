@@ -1388,7 +1388,7 @@ public function importReferences(InputInterface $input, OutputInterface $output)
     $navisionSync->setEntity("References");
   }
   $navisionSync->setLastsync($datetime);
-  //$navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
+  $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
   $this->doctrine->getManager()->persist($navisionSync);
   $this->doctrine->getManager()->flush();
   //------   Critical Section END   ------
