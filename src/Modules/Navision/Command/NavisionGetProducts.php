@@ -1352,6 +1352,7 @@ public function importReferences(InputInterface $input, OutputInterface $output)
     if ($obj==null){
       $obj=new ERPReferences();
       $obj->setName($object["Cross-Reference No."]);
+      $obj->setDescription($object["Description"]);
       $obj->setDateadd(new \Datetime());
       $obj->setDateupd(new \Datetime());
       $obj->setDeleted(0);
@@ -1371,6 +1372,12 @@ public function importReferences(InputInterface $input, OutputInterface $output)
         $this->doctrine->getManager()->merge($obj);
         $this->doctrine->getManager()->flush();
       }
+      $this->doctrine->getManager()->clear();
+    }
+    else {
+      $obj->setDescription($object["Description"]);
+      $this->doctrine->getManager()->merge($obj);
+      $this->doctrine->getManager()->flush();
       $this->doctrine->getManager()->clear();
     }
   }
