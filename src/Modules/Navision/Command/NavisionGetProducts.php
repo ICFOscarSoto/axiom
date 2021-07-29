@@ -1347,14 +1347,17 @@ public function importReferences(InputInterface $input, OutputInterface $output)
   $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
   foreach ($objects["class"] as $key=>$object){
     //$reference=preg_replace('/\D/','',$object["Cross-Reference No."]);
-    $obj=$repository->findOneBy(["name"=>$object["Cross-Reference No."]]);
-    $output->writeln('  -Añadiendo al producto '.$object["Item No."].' la referencia '.$object["Cross-Reference No."]);
+    $product=$repositoryProducts->findOneBy(["code"=>$object["Item No."]]);
+    if ($product!=null) {
+    $obj=$repository->findOneBy(["name"=>$object["Cross-Reference No."], "product"=>$product->getId()]);
     if ($obj==null){
+      $output->writeln('  -Añadiendo al producto '.$object["Item No."].' la referencia '.$object["Cross-Reference No."]);
       $obj=new ERPReferences();
       $obj->setName($object["Cross-Reference No."]);
       $obj->setDescription($object["Description"]);
       $obj->setDateadd(new \Datetime());
       $obj->setDateupd(new \Datetime());
+        $obj->setProduct($product);
       $obj->setDeleted(0);
       $obj->setActive(1);
       if ($object["Cross-Reference Type"]==2){
@@ -1366,20 +1369,18 @@ public function importReferences(InputInterface $input, OutputInterface $output)
         $obj->setCustomer($customer);
         $obj->setType(2);
       }
-      $product=$repositoryProducts->findOneBy(["code"=>$object["Item No."]]);
-      if ($product!=null) {
-        $obj->setProduct($product);
-        $this->doctrine->getManager()->merge($obj);
-        $this->doctrine->getManager()->flush();
-      }
+      $this->doctrine->getManager()->merge($obj);
+      $this->doctrine->getManager()->flush();
       $this->doctrine->getManager()->clear();
     }
     else {
+      $output->writeln('  -Modificando la referencia '.$object["Cross-Reference No."].' del producto '.$object["Item No."]);
       $obj->setDescription($object["Description"]);
       $this->doctrine->getManager()->merge($obj);
       $this->doctrine->getManager()->flush();
       $this->doctrine->getManager()->clear();
     }
+  }
   }
   $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"References"]);
   if ($navisionSync==null) {
@@ -1387,7 +1388,7 @@ public function importReferences(InputInterface $input, OutputInterface $output)
     $navisionSync->setEntity("References");
   }
   $navisionSync->setLastsync($datetime);
-  $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
+  //$navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
   $this->doctrine->getManager()->persist($navisionSync);
   $this->doctrine->getManager()->flush();
   //------   Critical Section END   ------
