@@ -202,7 +202,9 @@ class GlobaleListUtils
       $sql_filter.=' WHERE '.$filter_where;
       $sql_records.=' WHERE '.$filter_where;
       $sql_records.=' ORDER BY '.$order.' '.$orderDir;
-      $sql_records.=' LIMIT '.$start.', '.$length;
+
+      if($length!=-1) $sql_records.=' LIMIT '.$start.', '.$length;
+
       $result=$manager->getConnection()->executeQuery($sql_records)->fetchAll();
       $result_total=$manager->getConnection()->executeQuery($sql_total)->fetch();
       $result_filter=$manager->getConnection()->executeQuery($sql_filter)->fetch();
@@ -228,9 +230,12 @@ class GlobaleListUtils
 		$return=array();
 		$query = $repository->createQueryBuilder('p');
 
+    dump($maxResults);
     if($maxResults===NULL){
         $query->setFirstResult($request->query->getInt('start', 0));
-        $query->setMaxResults($request->query->getInt('length', 20));
+        if($request->query->getInt('length')==null) $query->setMaxResults($request->query->getInt('length', 50));
+          else if($request->query->getInt('length')!==-1) $query->setMaxResults($request->query->getInt('length'));
+
         //$session->set('list'.$listName.'-start', $request->query->getInt('start'));
         //$session->set('list'.$listName.'-length', $request->query->getInt('length'));
 
