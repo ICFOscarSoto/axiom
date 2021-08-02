@@ -230,7 +230,6 @@ class GlobaleListUtils
 		$return=array();
 		$query = $repository->createQueryBuilder('p');
 
-    dump($maxResults);
     if($maxResults===NULL){
         $query->setFirstResult($request->query->getInt('start', 0));
         if($request->query->getInt('length')==null) $query->setMaxResults($request->query->getInt('length', 50));
