@@ -22,6 +22,10 @@
                 {
                     "name": "store",
                     "cols": 4
+                },
+                {
+                    "name": "active",
+                    "cols": 4
                 }
             ]
         }
