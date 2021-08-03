@@ -599,7 +599,7 @@ class GlobaleListUtils
                                       }
                                     }
                                 }
-                                $temp_val=str_replace('´', "'", $temp_val);
+                                $temp_val=str_replace(' ', "'", $temp_val);
                                 $data_ob[$name]=isset($data_ob[$name])?$data_ob[$name]." ".$temp_val:$temp_val;
                               }
                     break;
