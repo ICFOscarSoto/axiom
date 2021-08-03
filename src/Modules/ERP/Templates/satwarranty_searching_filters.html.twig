@@ -1,0 +1,48 @@
+<div id="panel-searching" class="panel panel-primary panel-shadow" data-collapsed="0" style="-webkit-box-shadow: none; box-shadow:none; margin-bottom: -1px;"><!-- to apply shadow add class "panel-shadow" -->
+  <div class="panel-body">
+    <div class="panel-title">Filtros de búsqueda</div>
+    <div class="row">
+      <div class="col-md-3" id="product-searching">
+        <div class="input-group">
+          <input type="text" id="product-form-search" class="form-control" placeholder="Buscar producto..." data-toggle="modal" data-target="#product-search-modal-form">
+          <div class="input-group-btn">
+            <button type="button" id="product-search-button" class="btn btn-white" style="height: 31px;" data-toggle="modal" data-target="#product-search-modal-form">
+              <i class="fa fa-search"></i> </button>
+            </div>
+          </div>
+      </div>
+
+    <div class="col-md-3" id="searching-customer">
+      <div class="input-group">
+        <input type="text" id="customer-form-search" class="form-control" placeholder="Buscar cliente..." data-toggle="modal" data-target="#customer-search-modal-form">
+        <div class="input-group-btn">
+          <button type="button" id="customer-search-button" class="btn btn-white" style="height: 31px;" data-toggle="modal" data-target="#customer-search-modal-form">
+            <i class="fa fa-search"></i> </button>
+          </div>
+        </div>
+      </div>
+  </div>
+  </div>
+</div>
+<script>
+
+$('body').on('click', "#product-form-view", function(e){
+    var id=$(this).attr("attr-id");
+    if(id!=0 && id!=""){
+    url=$(this).attr("attr-url");
+    url=url.replace('_____',$(this).attr("attr-id"));
+    var win = window.open(url, '_blank');
+    win.focus();
+  }
+});
+
+$('body').on('click', "#customer-form-view", function(e){
+    var id=$(this).attr("attr-id");
+    if(id!=0 && id!=""){
+    url=$(this).attr("attr-url");
+    url=url.replace('_____',$(this).attr("attr-id"));
+    var win = window.open(url, '_blank');
+    win.focus();
+  }
+});
+</script>

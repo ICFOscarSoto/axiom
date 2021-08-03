@@ -1,0 +1,42 @@
+<div class="panel panel-primary panel-shadow" data-collapsed="0" style="-webkit-box-shadow: none; box-shadow:none; margin-bottom: -1px;"><!-- to apply shadow add class "panel-shadow" -->
+    <div class="panel-body">
+    <div class="row">
+    <div class="col-md-6">
+    {% if satwarranty.state!=null %}
+        <div class="col-md-6">
+            <label for="satwarranty-form-currentstate">Estado actual:</label>
+            <select type="text" id="satwarranty-form-currentstate" class="form-control select2" required>
+              {% for option in states %}
+                <option value="{{ option.id }}" {% if satwarranty.state.id==option.id %}selected{% endif %}>{{ option.text }}</option>
+              {% endfor %}
+            </select>
+          </div>
+      {% else %}
+        <div class="col-md-6">
+          <label for="satwarranty-form-currentstate">Estado actual:</label>
+          <select type="text" id="satwarranty-form-currentstate" class="form-control select2" required>
+              <option value="-1">Elegir estado...</option>
+            {% for option in states %}
+              <option value="{{ option.id }}">{{ option.text }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      {% endif %}
+      {% if satwarranty.dateadd is not null %}
+      <div class="col-md-6">
+        <label for="satwarranty-form-dateadd">Fecha de alta:</label>
+        <input type="datetime" id="satwarranty-form-dateadd" value="{{ satwarranty.dateadd|date('h:m:s d/m/Y ') }}" disabled="disabled" class="form-control" placeholder="Fecha de Alta">
+      </div>
+      {% endif %}
+      </div>
+    <div style="text-align: right;margin-bottom:10px;" class="col-md-6">
+      {% if id!=0 %}
+          <h2>Nº {{ satwarranty.repairnumber }}</h2>
+      {% endif %}
+    </div>
+  </div>
+</div>
+  </div>
+  </div>
+<br>
+<br>

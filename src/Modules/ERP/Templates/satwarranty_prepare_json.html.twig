@@ -1,0 +1,22 @@
+<script>
+  function prepare_satwarranties_json(){
+
+    var satwarrantyFields = new Object();
+    satwarrantyFields.id=$("#satwarranty-form-id").val();
+    satwarrantyFields.state=$("#satwarranty-form-currentstate").val();
+    satwarrantyFields.salesmanager=$("#satwarranty-form-salesmanager").val();
+    satwarrantyFields.customername=$("#customer-form-name").val();
+    satwarrantyFields.customercode=$("#customer-form-code").val();
+    satwarrantyFields.description=$("#satwarranty-form-description").val();
+    satwarrantyFields.productcode=$("#product-form-code").val();
+    satwarrantyFields.productvariant=$("#product-form-variant").val();
+    satwarrantyFields.store=$("#satwarranty-form-store").val();
+    satwarrantyFields.storelocation=$("#satwarranty-form-storelocation").val();
+    satwarrantyFields.description=$("#satwarranty-form-description").val();
+    satwarrantyFields.carrier=$("#satwarranty-form-carrier").val();
+    satwarrantyFields.quantity=$("#product-form-quantity").val();
+
+
+    return satwarrantyFields;
+  }
+</script>

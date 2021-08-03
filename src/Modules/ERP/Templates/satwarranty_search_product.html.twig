@@ -1,0 +1,132 @@
+<div class="modal fade" tabindex="-1" id="product-search-modal-form" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content" style="transform: matrix(1, 0, 0, 1, 0, 0);display:inline-block;">
+        <div class="modal-header">
+          <h4 class="modal-title">{{ ('Search')|trans }}&nbsp;{{ ('product')|trans }}</h4>
+        </div>
+        <div id="product-search-modal-form-body" style="height: 520px; padding: 0px 10px;">
+          {% set listConstructor = productslist %}
+          {% set listOrigin = "" %}
+          {# for know if list.html is invoked directly from controller and we need to make modals inside list#}
+          {{ include('@Globale/list.html.twig') }}
+        </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+function checkGrouped(code){
+    if((++load_wait)==1) $("#load-spinner").fadeIn();
+    $.ajax({
+       type: "GET",
+       dataType: "json",
+       url: "/api/ERP/product/"+code+"/grouped",
+     }).done(function(data, textStatus, jqXHR) {
+       if((--load_wait)==0) $("#load-spinner").fadeOut();
+       if(data.result=="1") {
+         $("#product-variant-info").css("display","block");
+       }
+   });
+
+}
+
+function getVariants(code){
+    if((++load_wait)==1) $("#load-spinner").fadeIn();
+    $.ajax({
+        type: "GET",
+        dataType: "json",
+        url: "/api/ERP/product/variants/"+code+"/get",
+      }).done(function( elements, textStatus, jqXHR ) {
+        if((--load_wait)==0) $("#load-spinner").fadeOut();
+         $("#product-form-variant").append('<option value="-1">Selecciona Variante...</option>');
+         elements.variants.forEach( function(valor, indice, array){
+          $("#product-form-variant").append('<option value="'+valor.id+'">'+valor.name+'</option>');
+        });
+      });
+  }
+
+
+  function getVariantsStockFailed(code){
+    if((++load_wait)==1) $("#load-spinner").fadeIn();
+    $.ajax({
+        type: "GET",
+        dataType: "json",
+        url: "/api/ERP/product/variants/"+code+"/get",
+      }).done(function( elements, textStatus, jqXHR ) {
+        if((--load_wait)==0) $("#load-spinner").fadeOut();
+         elements.variants.forEach( function(valor, indice, array){
+            $("#variants-body").append(
+            '<tr>'+
+            '<td>'+
+            '<div class="custom-control custom-checkbox">'+
+            '<input type="checkbox" name="checksvariantslist[]" class="custom-control-input" id="customVariantsCheck-'+valor.id+'" value="'+valor.id+'">'+
+            '</div>'+
+            '</td>'+
+            '<td>'+valor.name+'</td>'+
+            '</tr>');
+
+        });
+        $("#select-variants-modal-form").modal('show');
+      });
+  }
+
+  function productSearch(fields, searchFields){
+    alert("bamos a ver");
+    if($("#product-form-code").val()!=""){
+      if((++load_wait)==1) $("#load-spinner").fadeIn();
+      $.ajax({
+         url: '{{ url('genericsearch',{'module':'ERP', 'name':'Products', 'field':'code'}) }}/'+$("#product-form-code").val(),
+         type: 'POST',
+         data: JSON.stringify(searchFields),
+         success:  function( data ) {
+           if((--load_wait)==0) $("#load-spinner").fadeOut();
+           if(data.result){
+             var i=0;
+             Object.entries(data.data).forEach(function(element) {
+               $("#"+fields[i]).val(element[1]);
+               i++;
+             });
+           } else {
+             clearFields(fields);
+             toastr.error("No se encontro el product introducido", "Confirmación", confirmation);
+           }
+         }
+       });
+    } else clearFields(fields);
+  }
+
+  $(document).ready(function() {
+
+    {# CUSTOMER SEARCH #}
+  $('body').on('change', "[id^='product-form-name']", function(e) {
+       	$('#product-form-view').css('display','block');
+  });
+
+
+
+  $('body').on('click', "[id^='listProducts-field-button-select-']", function(e) {
+
+      id=$("#storeticket-form-reasons-select").val();
+      code=$(this).parent().parent().parent().children('td').eq(1).text();
+
+      $("#product-form-id").val($(this).attr('attr-id'));
+      $("#product-form-id").trigger('change');
+      $("#product-form-code").val($(this).parent().parent().parent().children('td').eq(1).text());
+      $("#product-form-code").trigger('change');
+      $("#product-form-name").val($(this).parent().parent().parent().children('td').eq(2).text());
+      $("#product-form-name").trigger('change');
+      $("#product-form-name").attr("disabled", true);
+      $("#product-form-view").attr("attr-id",$(this).attr("attr-id"));
+      $("#product-search-modal-form").modal('toggle');
+      $("#product-store-info").css("display","block");
+      $("#product-storelocation-info").css("display","block");
+
+      checkGrouped(code);
+
+      var code=$(this).parent().parent().parent().children('td').eq(1).text();
+      getVariants(code);
+
+    });
+  });
+  </script>

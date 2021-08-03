@@ -1,0 +1,179 @@
+<div class="panel panel-primary panel-shadow" id="ticket-data" data-collapsed="0" style="-webkit-box-shadow: none; box-shadow:none; margin-bottom: -1px;"><!-- to apply shadow add class "panel-shadow" -->
+  <div class="panel-body">
+    <div class="panel-title">Información del producto</div>
+      <div class="row">
+        {% if satwarranty.product==null %}
+            {% if id==0 %}
+              <div class="col-md-3" id="product-name-info">
+                <div class="form-group">
+                  <label for="satwarranty-form-name">Nombre del producto:</label>
+                  <span id="product-form-view" class="select2-selection__view_tickets" {% if satwarranty.product!=null %} attr-id="{{ satwarranty.product.id }}" {% else %} style="display:none;" {% endif %} attr-url="{{ url('formProduct',{'id':'_____'}) }}"><i class="fa fa-file-text-o" aria-hidden="true"></i><span>&nbsp;Ver Ficha</span></span>
+                  <input type="text" readonly id="product-form-name" {% if satwarranty.product!=null %} value="{{ satwarranty.product.name }}" disabled {% endif %} class="form-control" placeholder="Nombre del Producto">
+                </div>
+              </div>
+            {% endif %}
+        {% else %}
+          <div class="col-md-3" id="product-name-info">
+            <div class="form-group">
+              <label for="satwarranty-form-name">Nombre del producto:</label>
+              <span id="product-form-view" class="select2-selection__view_tickets" {% if satwarranty.product!=null %} attr-id="{{ satwarranty.product.id }}" {% else %} style="display:none;" {% endif %} attr-url="{{ url('formProduct',{'id':'_____'}) }}"><i class="fa fa-file-text-o" aria-hidden="true"></i><span>&nbsp;Ver Ficha</span></span>
+              <input type="text" readonly id="product-form-name" {% if satwarranty.product!=null %} value="{{ satwarranty.product.name }}" disabled {% endif %} class="form-control" placeholder="Nombre del producto">
+            </div>
+          </div>
+        {% endif %}
+        {% if satwarranty.variant==null %}
+          {% if id==0 %}
+            <div class="col-md-3" id="product-variant-info" >
+              <div class="form-group">
+                  <label for="product-form-variant">Variantes</label>
+                  <select type="text" id="product-form-variant" class="form-control select2">
+                  </select>
+              </div>
+            </div>
+          {% endif %}
+        {% else %}
+          <div class="col-md-3" id="product-variant-info">
+            <div class="form-group">
+              <label for="product-form-variant">Variante</label>
+              <input type="text" readonly id="product-form-variant" {% if satwarranty.variant!=null %} value="{{ satwarranty.variant.name }}" disabled {% endif %} class="form-control" placeholder="Variante del Producto">
+            </div>
+          </div>
+        {% endif %}
+        {% if satwarranty.quantity==null %}
+          {% if id==0 %}
+            <div class="col-md-3" id="product-quantity-info" >
+              <div class="form-group">
+                  <label for="product-form-quantity">Cantidad</label>
+                  <input type="number" id="product-form-quantity" value="1" class="form-control" placeholder="Cantidad del Producto">
+              </div>
+            </div>
+          {% endif %}
+        {% else %}
+          <div class="col-md-3" id="product-quantity-info">
+            <div class="form-group">
+              <label for="product-form-quantity">Cantidad</label>
+              <input type="number" readonly id="product-form-quantity" {% if satwarranty.quantity!=null %} value="{{ satwarranty.quantity }}" disabled {% endif %} class="form-control" placeholder="Cantidad del Producto">
+            </div>
+          </div>
+        {% endif %}
+
+        {% if satwarranty.store==null %}
+          {% if id==0 %}
+            <div class="col-md-3" id="product-store-info" style="display:none;">
+              <div class="form-group">
+                <label for="satwarranty-form-store">Almacén</label>
+                <select type="text" id="satwarranty-form-store" class="form-control select2" required>
+                  {% for option in stores %}
+                    <option value="{{ option.id }}">{{ option.text }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          {% endif %}
+        {% else %}
+        <div class="col-md-3" id="product-store-info">
+          <div class="form-group">
+            <label for="satwarranty-form-store">Almacén</label>
+            <input type="text" readonly id="satwarranty-form-store" {% if satwarranty.store!=null %} value="{{ satwarranty.store.name }}" disabled {% endif %} class="form-control" placeholder="Almacén">
+          </div>
+        </div>
+        {% endif %}
+        {% if satwarranty.storelocation==null %}
+          {% if id==0 %}
+            <div class="col-md-3" id="product-storelocation-info"  style="display:none;">
+              <div class="form-group">
+                <label for="satwarranty-form-storelocation">Ubicación</label>
+                <select type="text" id="satwarranty-form-storelocation" class="form-control select2" required>
+                </select>
+              </div>
+            </div>
+          {% endif %}
+        {% else %}
+        <div class="col-md-3" id="product-storelocation-info">
+          <div class="form-group">
+            <label for="satwarranty-form-storelocation">Ubicación</label>
+            <input type="text" readonly id="satwarranty-form-storelocation" {% if satwarranty.storelocation!=null %} value="{{ satwarranty.storelocation.name }}" disabled {% endif %} class="form-control" placeholder="Ubicación">
+          </div>
+        </div>
+        {% endif %}
+        <input type="hidden" id="product-form-code" class="form-control" value="{% if satwarranty.product!=null %}{{ satwarranty.product.code }}{% endif %}">
+        <input type="hidden" id="product-form-id" class="form-control" value="{% if satwarranty.product!=null %}{{ satwarranty.product.id }}{% endif %}">
+      </div>
+      <div class="row">
+          <div class="col-12 col-sm-12">
+            <div class="form-group" >
+            <label for="satwarranty-form-description">Descripción</label>
+            <textarea id="satwarranty-form-description" name="satwarranty-form-description" class="form-control" style="min-height:90px;">{% if satwarranty.description!=null %}{{ satwarranty.description }}{% endif %}</textarea>
+            <script>
+            $(document).ready(function() {
+              var editor = new Jodit('#satwarranty-form-description');
+            });
+            </script>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+          <div class="col-12 col-sm-12" style="text-align: right;>
+            <div class="form-group">
+              <button attr-id="" attr-action="" id="satwarranty-button-cancel" type="button" class="btn btn">Cancelar</button>
+              <button attr-id="" attr-action="" id="satwarranty-button-save" type="button" class="btn btn-green">Guardar</button>
+            </div>
+      </div>
+    </div>
+      <br>
+</div>
+</div>
+<br>
+<br>
+<script>
+
+function getProductLocations(store,code,variant){
+  if((++load_wait)==1) $("#load-spinner").fadeIn();
+  $.ajax({
+      type: "GET",
+      dataType: "json",
+      url: "/api/ERP/worklist/locations/"+store+"/"+code+"/"+variant+"/get",
+    }).done(function( elements, textStatus, jqXHR ) {
+      if((--load_wait)==0) $("#load-spinner").fadeOut();
+      $("#satwarranty-form-storelocation").empty();
+        $("#satwarranty-form-storelocation").append('<option value="-1">Selecciona ubicación...</option>');
+       elements.locations.forEach( function(valor, indice, array){
+        $("#satwarranty-form-storelocation").append('<option value="'+valor.id+'">'+valor.name+'</option>');
+      });
+    });
+}
+
+function getStoreLocations(store){
+  if((++load_wait)==1) $("#load-spinner").fadeIn();
+  $.ajax({
+      type: "GET",
+      dataType: "json",
+      url: "/api/ERP/inventory/"+store+"/locations/get",
+    }).done(function( elements, textStatus, jqXHR ) {
+      if((--load_wait)==0) $("#load-spinner").fadeOut();
+      $("#satwarranty-form-storelocation").append('<option value="-1">Selecciona ubicación...</option>');
+       elements.storelocations.forEach( function(valor, indice, array){
+        $("#satwarranty-form-storelocation").append('<option value="'+valor.id+'">'+valor.name+'</option>');
+      });
+      datetimepicker();
+    });
+}
+
+$(document).ready(function() {
+
+  $('body').on('change', "#satwarranty-form-store", function(e) {
+    var store=$("#satwarranty-form-store").val();
+    var code="";
+    code=$("#product-form-code").val();
+    var variant=$("#product-form-variant").val();
+
+    $("#satwarranty-form-storelocation").empty();
+    $("#satwarranty-form-store").val(store);
+    if(code!="")  getProductLocations(store,code,variant);
+    else getStoreLocations(store);
+  });
+
+});
+
+
+</script>

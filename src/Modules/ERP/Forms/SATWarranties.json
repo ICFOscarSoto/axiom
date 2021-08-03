@@ -1,0 +1,44 @@
+[{
+    "sections": [
+        {
+            "name": "data",
+            "fields": [
+                { "name": "ERPSATWarrantiesImage", "cols": 3,	"type": "gallery", "imageType":"ERPSATWarrantiesImage", "value": "getImage", "width": "100%",	"height": "300px"},
+                {
+                    "name": "repairnumber",
+                    "caption": "Nº de reparación",
+                    "cols": 2,
+                    "readonly": "noChange"
+                },
+                {
+                    "name": "supplier",
+                    "cols": 6,
+                    "relation": {"route": "formSupplier", "type":"full"}
+                },
+                {
+                    "name": "carrier",
+                    "relation": {"route": "genericdata", "routeparams":{"module":"ERP","name":"Carriers"}, "type":"modal"},
+                    "cols": 4
+                },
+                {
+                    "name": "store",
+                    "relation": {"route": "genericdata", "routeparams":{"module":"ERP","name":"Stores"}, "type":"modal"},
+                    "cols": 3
+                },
+                {
+                    "name": "storelocation",
+                    "cols": 3,
+                    "trigger":{"field":"store", "route":"generictrigger",
+              				"moduleTrigger":"ERP", "classTrigger":"ERPStores",
+              				"module":"ERP", "class":"ERPStoreLocations", "relationParameter":"store"}
+                },
+                {
+                    "name": "description",
+                    "cols": 12,
+                    "class":"wysiwyg"
+                }
+
+            ]
+        }
+    ]
+}]

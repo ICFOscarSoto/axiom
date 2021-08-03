@@ -1,0 +1,116 @@
+<div class="panel panel-primary panel-shadow" id="ticket-data" data-collapsed="0" style="-webkit-box-shadow: none; box-shadow:none; margin-bottom: -1px;"><!-- to apply shadow add class "panel-shadow" -->
+  <div class="panel-body">
+    <div class="panel-title">Información del cliente</div>
+    <div class="row">
+      <div class="col-md-3">
+        <div class="form-group">
+          <label for="satwarranty-form-name">Nombre del cliente:</label>
+          <span id="customer-form-view" class="select2-selection__view_tickets" {% if satwarranty.customer!=null %} attr-id="{{ satwarranty.customer.id }}" {% else %} style="display:none;" {% endif %} attr-url="{{ url('formCustomer',{'id':'_____'}) }}"><i class="fa fa-file-text-o" aria-hidden="true"></i><span>&nbsp;Ver Ficha</span></span>
+          <input type="text" readonly id="customer-form-name" {% if satwarranty.customer!=null %} value="{{ satwarranty.customer.name }}" disabled {% endif %} class="form-control" placeholder="Nombre del Cliente">
+
+        </div>
+      </div>
+      <div class="col-md-3">
+        <label for="satwarranty-form-email">Email del cliente:</label>
+        <div class="form-group">
+          <input type="text" readonly id="customer-form-email" {% if satwarranty.customer!=null %} value="{{ satwarranty.customer.email }}" disabled {% endif %} class="form-control" placeholder="Email del Cliente">
+        </div>
+      </div>
+      {% if satwarranty.salesmanager is not null %}
+        <div class="col-md-2">
+          <label for="satwarranty-form-salesmanager">Agente de ventas:</label>
+          <div class="form-group">
+          <input type="text" id="satwarranty-form-salesmanager" value="{{ satwarranty.salesmanager.name }} {{ satwarranty.salesmanager.lastname }}" disabled="disabled" class="form-control" placeholder="Agente de ventas">
+          <input type="hidden" id="satwarranty-form-salesmanager-id" value="{{ satwarranty.salesmanager.id }}" class="form-control">
+          </div>
+        </div>
+      {% else %}
+      <div class="col-md-2">
+        <label for="satwarranty-form-salesmanager">Agente de ventas:</label>
+        <div class="form-group">
+          <select type="text" id="satwarranty-form-salesmanager" class="form-control select2" required>
+            {% for option in salesmanagers %}
+              <option value="{{ option.id }}">{{ option.text }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      {% endif %}
+      {% if satwarranty.carrier is not null %}
+        <div class="col-md-2">
+          <label for="satwarranty-form-carrier">Transportista:</label>
+          <div class="form-group">
+          <input type="text" id="satwarranty-form-carrier" value="{{ satwarranty.carrier.name }}" disabled="disabled" class="form-control" placeholder="Transportista">
+          <input type="hidden" id="satwarranty-form-carrier-id" value="{{ satwarranty.carrier.id }}" class="form-control">
+          </div>
+        </div>
+      {% else %}
+      <div class="col-md-2">
+        <label for="satwarranty-form-carrier">Transportista:</label>
+        <div class="form-group">
+          <select type="text" id="satwarranty-form-carrier" class="form-control select2" required>
+            {% for option in carriers %}
+              <option value="{{ option.id }}">{{ option.text }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      {% endif %}
+      <input type="hidden" id="customer-form-code" class="form-control" value="{% if satwarranty.customer!=null %}{{ satwarranty.customer.code }}{% endif %}">
+      <input type="hidden" id="customer-form-id" class="form-control" value="{% if satwarranty.customer!=null %}{{ satwarranty.customer.id }}{% endif %}">
+</div>
+</div>
+<br>
+<br>
+<script>
+
+function getProductLocations(store,code,variant){
+  if((++load_wait)==1) $("#load-spinner").fadeIn();
+  $.ajax({
+      type: "GET",
+      dataType: "json",
+      url: "/api/ERP/worklist/locations/"+store+"/"+code+"/"+variant+"/get",
+    }).done(function( elements, textStatus, jqXHR ) {
+      if((--load_wait)==0) $("#load-spinner").fadeOut();
+      $("#satwarranty-form-storelocation").empty();
+        $("#satwarranty-form-storelocation").append('<option value="-1">Selecciona ubicación...</option>');
+       elements.locations.forEach( function(valor, indice, array){
+        $("#satwarranty-form-storelocation").append('<option value="'+valor.id+'">'+valor.name+'</option>');
+      });
+    });
+}
+
+function getStoreLocations(store){
+  if((++load_wait)==1) $("#load-spinner").fadeIn();
+  $.ajax({
+      type: "GET",
+      dataType: "json",
+      url: "/api/ERP/inventory/"+store+"/locations/get",
+    }).done(function( elements, textStatus, jqXHR ) {
+      if((--load_wait)==0) $("#load-spinner").fadeOut();
+      $("#satwarranty-form-storelocation").append('<option value="-1">Selecciona ubicación...</option>');
+       elements.storelocations.forEach( function(valor, indice, array){
+        $("#satwarranty-form-storelocation").append('<option value="'+valor.id+'">'+valor.name+'</option>');
+      });
+      datetimepicker();
+    });
+}
+
+$(document).ready(function() {
+
+  $('body').on('change', "#satwarranty-form-store", function(e) {
+    var store=$("#satwarranty-form-store").val();
+    var code="";
+    code=$("#product-form-code").val();
+    var variant=$("#product-form-variant").val();
+
+    $("#satwarranty-form-storelocation").empty();
+    $("#satwarranty-form-store").val(store);
+    if(code!="")  getProductLocations(store,code,variant);
+    else getStoreLocations(store);
+  });
+
+});
+
+
+</script>

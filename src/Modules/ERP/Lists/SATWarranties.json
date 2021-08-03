@@ -1,0 +1,32 @@
+[
+    {
+        "name": "id",
+        "caption": "id"
+    },
+    {
+        "name": "dateadd",
+        "caption": "Fecha Garantía",
+        "type": "date",
+        "width": "15%","class":"min-desktop"
+    },
+    {
+        "name": "repairnumber",
+        "caption": "Nº de reparación"
+    },
+    {
+        "name": "supplier__code",
+        "caption": "Cod. Proveedor"
+    },
+    {
+        "name": "supplier__name",
+        "caption": "supplier"
+    },
+    {
+        "name": "store__name",
+        "caption": "store"
+    },
+    {
+        "name": "storelocation__name",
+        "caption": "location"
+    }
+]
