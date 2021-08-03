@@ -66,6 +66,8 @@ class NavisionGetProducts extends ContainerAwareCommand
         $this->importProduct($input, $output);
         //$this->clearEAN13($input, $output);
         $this->importEAN13($input, $output);
+        $this->importReferences($input, $output);
+        $this->importVariants($input, $output);
         $this->importProductsVariants($input, $output);
       }
       break;
@@ -903,7 +905,7 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
             }
         }
           //cliente concreto
-          /*else if($increment["type"]==0)
+          else if($increment["type"]==0)
           {
 
             $customer=$repositoryCustomers->findOneBy(["code"=>$increment["salescode"]]);
@@ -945,7 +947,7 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
               //ya existe el descuento para ese cliente
               else{
                   $output->writeln('Ya existe el incremento');
-                /*
+
                 $customerincrementaxiom=$repositoryCustomerIncrements->findOneBy(["id"=>$customerincrementaxiom_ID]);
                 $pvp=$increment["pvp"];
                 $dto=$increment["Discount"];
@@ -971,7 +973,7 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
             }
 
           $output->writeln('Finalizado el incremento para el cliente');
-        }*/
+        }
 
       }
 
