@@ -599,7 +599,7 @@ class GlobaleListUtils
                                       }
                                     }
                                 }
-                                $temp_val=str_replace(' ', "'", $temp_val);
+                                //$temp_val=str_replace('´', "'", $temp_val);
                                 $data_ob[$name]=isset($data_ob[$name])?$data_ob[$name]." ".$temp_val:$temp_val;
                               }
                     break;
@@ -623,7 +623,13 @@ class GlobaleListUtils
         }
       }
 			$data_ob["_tags"]=$tags;
-			$return["data"][]=$data_ob;
+
+      //Fix for datatables error when single quote
+      foreach($data_ob as $key_data=>$value_data){
+        $data_ob[$key_data]=str_replace("'", "´", $data_ob[$key_data]);
+      }
+
+      $return["data"][]=$data_ob;
 		}
 		return $return;
     }

@@ -85,7 +85,7 @@ var url = new URL(window.location.href);
 				var ${{ listConstructor.id }}_var = jQuery("#{{ listConstructor.id }}");
 				var {{ listConstructor.id }} = ${{ listConstructor.id }}_var.DataTable( {
 					"aLengthMenu": [[10, 20, 50, 250, 1000, -1], [10, 20, 50, 250, 1000, "Todos"]],
-					"pageLength": (url.searchParams.get('length')?url.searchParams.get('length')*1:20),
+					"pageLength": (url.searchParams.get('length')?url.searchParams.get('length')*1:50),
 					"oClasses":{
 						"sLengthSelect": "select2"
 					},
