@@ -203,8 +203,7 @@ class GlobaleListUtils
       $sql_records.=' WHERE '.$filter_where;
       $sql_records.=' ORDER BY '.$order.' '.$orderDir;
 
-      //if($length!=-1)
-      $sql_records.=' LIMIT '.$start.', '.$length;
+      if($length!=-1) $sql_records.=' LIMIT '.$start.', '.$length;
 
       $result=$manager->getConnection()->executeQuery($sql_records)->fetchAll();
       $result_total=$manager->getConnection()->executeQuery($sql_total)->fetch();
