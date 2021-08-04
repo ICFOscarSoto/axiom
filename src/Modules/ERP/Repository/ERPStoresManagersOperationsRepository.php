@@ -27,7 +27,8 @@ class ERPStoresManagersOperationsRepository extends ServiceEntityRepository
                 LEFT JOIN erpstores_managers_operations o ON o.id = l.operation_id
               	WHERE l.active = 1 AND l.deleted= 0 AND o.active = 1 AND o.deleted= 0
                 AND o.id IN ($array_ids)
-              	GROUP BY p.code, l.variant_id";
+              	GROUP BY p.code, l.variant_id
+                HAVING qty>0";
       $result=$this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
       return $result;
     }
