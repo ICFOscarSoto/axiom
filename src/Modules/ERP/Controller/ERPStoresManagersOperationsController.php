@@ -385,7 +385,7 @@ class ERPStoresManagersOperationsController extends Controller
 					if($line["qty"]<$line["minimumquantityofsale"]) $error="Cantidad minima";
 					$row=[$barcode, $line["code"], "", "", $line["qty"],$line["name"],$line["minimumquantityofsale"],$error];
 					if(!$error)	$writer->writeSheetRow('Hoja1', $row);
-						else $writer->writeSheetRow('Hoja1', $row, array('fill'=>"#AA0000"));
+						else $writer->writeSheetRow('Hoja1', $row, array('fill'=>"#AA0000", "color"=>"#ffffff"));
 					$row_number++;
 				}
 			}
