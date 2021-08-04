@@ -21,7 +21,7 @@ class ERPStoresManagersOperationsRepository extends ServiceEntityRepository
 
     public function getOperationsProducts($user, $array_ids)
     {
-      $query="SELECT p.id, p.code, l.variant_id, p.name, SUM(l.quantity) qty
+      $query="SELECT p.id, p.code, l.variant_id, p.name, SUM(l.quantity) qty, IFNULL(p.minimumquantityofsale,1) minimumquantityofsale
               	FROM erpstores_managers_operations_lines l
               	LEFT JOIN erpproducts p ON p.id = l.product_id
                 LEFT JOIN erpstores_managers_operations o ON o.id = l.operation_id
