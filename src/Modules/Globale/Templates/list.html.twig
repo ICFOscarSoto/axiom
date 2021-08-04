@@ -233,7 +233,7 @@ var url = new URL(window.location.href);
 													//var date = new Date(data*1000);
 													//return ("0" + date.getHours()).slice(-2)+':'+("0" + date.getMinutes()).slice(-2)+':'+("0" + date.getSeconds()).slice(-2);;
 													if(data!=null){
-														var duration = moment.duration(data, 'seconds');
+														var duration = moment.duration(data*1, 'seconds');
 														var formatted = duration.format("hh:mm:ss");
 														if(formatted.length==2) formatted="00:00:"+formatted;
 														if(formatted.length==5) formatted="00:"+formatted;
@@ -288,7 +288,7 @@ var url = new URL(window.location.href);
 												{# if field is datetime convert it to spanish date format #}
 												{% if field.type is defined %}
 													{% if field.type == "datetime" %}
-														if(text!=null){
+														if(text!=null && text!=""){
 															var date=moment(text, "YYYY-MM-DD HH:mm:ss");
 															text=date.format('DD/MM/YYYY HH:mm:ss');
 														}
