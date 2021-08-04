@@ -849,8 +849,8 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
       $count++;
 
   //Disable SQL logger
-  //  foreach($products as $id) {
-    $product=$repository->findOneBy(["id"=>909, "company"=>2]);
+    foreach($products as $id) {
+    $product=$repository->findOneBy(["id"=>$id, "company"=>2]);
     $output->writeln($product->getCode().'  - '.$product->getName());
     $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
 
@@ -861,7 +861,7 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
       $objects=json_decode($json, true);
       $objects=$objects[0];
       foreach ($objects["class"] as $increment){
-
+        if($increment["neto"]==0) continue;
       //grupos de clientes
       if($increment["type"]==1)
         {
@@ -974,7 +974,7 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
 
 
 
-  //}
+  }
  }
 
  $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"productincrements"]);
