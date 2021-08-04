@@ -19,6 +19,19 @@ class ERPStoresManagersOperationsRepository extends ServiceEntityRepository
         parent::__construct($registry, ERPStoresManagersOperations::class);
     }
 
+    public function getOperationsProducts($user, $array_ids)
+    {
+      $query="SELECT p.id, p.code, l.variant_id, p.name, SUM(l.quantity) qty
+              	FROM erpstores_managers_operations_lines l
+              	LEFT JOIN erpproducts p ON p.id = l.product_id
+                LEFT JOIN erpstores_managers_operations o ON o.id = l.operation_id
+              	WHERE l.active = 1 AND l.deleted= 0 AND o.active = 1 AND o.deleted= 0
+                AND o.id IN ($array_ids)
+              	GROUP BY p.code, l.variant_id";
+      $result=$this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
+      return $result;
+    }
+
     // /**
     //  * @return ERPStoresManagersOperations[] Returns an array of ERPStoresManagersOperations objects
     //  */

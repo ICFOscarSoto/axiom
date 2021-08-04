@@ -26,6 +26,7 @@ use App\Modules\ERP\Entity\ERPStoresManagersConsumers;
 use App\Modules\ERP\Entity\ERPStoresUsers;
 use App\Modules\ERP\Entity\ERPCategories;
 use App\Modules\ERP\Entity\ERPProductsVariants;
+use App\Modules\ERP\Entity\ERPVariantsValues;
 use App\Modules\ERP\Entity\ERPStoresManagersOperations;
 use App\Modules\ERP\Entity\ERPStoresManagersOperationsLines;
 use App\Modules\ERP\Entity\ERPWorkList;
@@ -45,6 +46,10 @@ use App\Modules\ERP\Utils\ERPProductsAttributesUtils;
 use App\Modules\Security\Utils\SecurityUtils;
 use App\Modules\ERP\Reports\ERPEan13Reports;
 use App\Modules\ERP\Utils\ERPStoresManagersUtils;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+
+include "includes/XLSXWriter/XLSXWriter.php";
 
 class ERPStoresManagersOperationsController extends Controller
 {
@@ -332,5 +337,59 @@ class ERPStoresManagersOperationsController extends Controller
 		 $result=$entityUtils->deleteObject($id, $this->class, $this->getDoctrine());
 	 	 return new JsonResponse(array('result' => $result));
 	  }
+
+		/**
+		* @Route("/{_locale}/erp/storesmanagers/operations/exportxls", name="operationsexportxls")
+		*/
+		public function operationsexportxls(Request $request){
+			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			$operationsRepository=$this->getDoctrine()->getRepository(ERPStoresManagersOperations::class);
+			$productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
+			$productVariantRepository=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
+			$variantValuesRepository=$this->getDoctrine()->getRepository(ERPVariantsValues::class);
+			$ids=$request->query->get('ids');
+
+			//$ids=explode(",",$ids);
+			$uploadDir=$this->get('kernel')->getRootDir() . '/../cloud/'.$this->getUser()->getCompany()->getId().'/temp/'.$this->getUser()->getId().'/';
+			if (!file_exists($uploadDir) && !is_dir($uploadDir)) {
+					mkdir($uploadDir, 0775, true);
+			}
+			$filename = date("YmdHis").'_'.md5(uniqid()).'.xlsx';
+
+			$writer = new \XLSXWriter();
+			$header = array("string","string","string","string");
+			$writer->setAuthor($this->getUser()->getName().' '.$this->getUser()->getLastname());
+			$writer->writeSheetHeader('Hoja1', $header, $col_options = ['suppress_row'=>true] );
+			$writer->writeSheetRow('Hoja1', ["CODIGO DE BARRAS", "CODIGO", "", "", "CANTIDAD"]);
+
+			if($ids!=null){
+				$lines=$operationsRepository->getOperationsProducts($this->getUser(),$ids);
+				foreach($lines as $line){
+					if($line["variant_id"]==null)
+						$barcode='P.'.str_pad($line["id"],8,'0', STR_PAD_LEFT);
+						else{
+							 $product=$productRepository->findOneBy(["id"=>$line["id"], "company"=> $this->getUser()->getCompany(),"deleted"=>0]);
+							 if(!$product) $barcode='P.'.str_pad($line["id"],8,'0', STR_PAD_LEFT);
+							 else{
+								 $variantValue=$variantValuesRepository->findOneBy(["id"=>$line["variant_id"], "deleted"=>0]);
+								 if(!$variantValue) $barcode='P.'.str_pad($line["id"],8,'0', STR_PAD_LEFT);
+								 else{
+							 		$variant=$productVariantRepository->findOneBy(["product"=>$product, "variantvalue"=> $variantValue, "deleted"=>0]);
+									if(!$variant) $barcode='P.'.str_pad($line["id"],8,'0', STR_PAD_LEFT);
+									else $barcode='V.'.str_pad($variant->getId(),8,'0', STR_PAD_LEFT);
+								}
+						 	 }
+						 }
+					$row=[$barcode, $line["code"], "", "", $line["qty"]];
+					$writer->writeSheetRow('Hoja1', $row);
+				}
+			}
+
+			$writer->writeToFile($uploadDir.$filename);
+			$response = new BinaryFileResponse($uploadDir.$filename);
+			$response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+			$response->setContentDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT,'exported_operations.xlsx');
+			return $response;
+		}
 
 }

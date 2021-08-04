@@ -62,7 +62,7 @@
               {% else %}
               {% endif %}
             {% else %}
-              //Get data and open modal form
+              {# Get data and open modal form #}
               {% if field.confirm is not defined or field.confirm == false %}
                 $('body').on('click', "[id^='{{ listConstructor.id }}-field-button-{{ field.id }}']", function() {
                   url=$("#{{ listConstructor.id }}-field-button-{{ field.id }}-url").val();
