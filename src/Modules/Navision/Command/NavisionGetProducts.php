@@ -111,6 +111,8 @@ class NavisionGetProducts extends ContainerAwareCommand
       break;
       case 'storesManaged': $this->updateStocksStoresManaged($input, $output);
       break;
+      case 'minimumsQuantity': $this->importMinimunsQuantity($input, $output);
+      break;
       case 'clear':
         //$this->defuseProducts($input, $output);
         $this->clearEAN13($input, $output);
@@ -847,8 +849,8 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
       $count++;
 
   //Disable SQL logger
-  foreach($products as $id) {
-    $product=$repository->findOneBy(["id"=>$id, "company"=>2]);
+  //  foreach($products as $id) {
+    $product=$repository->findOneBy(["id"=>909, "company"=>2]);
     $output->writeln($product->getCode().'  - '.$product->getName());
     $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
 
@@ -905,16 +907,12 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
             }
         }
           //cliente concreto
-          else if($increment["type"]==0)
-          {
-
+          else if($increment["type"]==0){
             $customer=$repositoryCustomers->findOneBy(["code"=>$increment["salescode"]]);
-            if($customer!=NULL)
-            {
+            if($customer!=NULL){
                 $customerincrementaxiom_ID=$repositoryCustomerIncrements->getIncrementIdByCustomer($product->getSupplier(),$product->getCategory(),$customer);
                 //no existe el incremento para el cliente, luego lo creamos
-                if($customerincrementaxiom_ID==null)
-                {
+                if($customerincrementaxiom_ID==null){
                 $output->writeln('Añadimos incremento para el cliente '.$increment["salescode"]);
                 if($increment["Discount"]!=0 AND $increment["neto"]!=0){
                     $category=$repositoryCategory->findOneBy(["id"=>$product->getCategory()->getId()]);
@@ -946,8 +944,7 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
               }
               //ya existe el descuento para ese cliente
               else{
-                  $output->writeln('Ya existe el incremento');
-
+                $output->writeln('Ya existe el incremento');
                 $customerincrementaxiom=$repositoryCustomerIncrements->findOneBy(["id"=>$customerincrementaxiom_ID]);
                 $pvp=$increment["pvp"];
                 $dto=$increment["Discount"];
@@ -955,8 +952,7 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
                 $precio_con_dto=$pvp-$pvp*($dto/100);
                 $inc=round((($precio_con_dto/$neto)-1)*100,2);
                 //antes de hacer ninguna modificación, comprobamos si ha habido algún cambio en el incremento, de no ser así, no se hace nada.
-                if(round($customerincrementaxiom->getIncrement(),2)!=$inc)
-                {
+                if(round($customerincrementaxiom->getIncrement(),2)!=$inc){
                   $customerincrementaxiom->setIncrement($inc);
                   $customerincrementaxiom->setDateupd(new \Datetime());
                   $customerincrementaxiom->setStart(date_create_from_format("Y-m-d h:i:s.u",$increment["startingdate"]["date"]));
@@ -967,11 +963,8 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
                   $this->doctrine->getManager()->flush();
                   $customerincrementaxiom->calculateIncrementsBySupplierCategory($this->doctrine);
                 }
-
-
               }
             }
-
           $output->writeln('Finalizado el incremento para el cliente');
         }
 
@@ -981,7 +974,7 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
 
 
 
- }
+  //}
  }
 
  $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"productincrements"]);
@@ -1001,6 +994,22 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
   fclose($fp);
 }
 
+
+
+public function importMinimunsQuantity(InputInterface $input, OutputInterface $output){
+  $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getMinimumsQuantity.php');
+  $objects=json_decode($json, true);
+  $objects=$objects[0];
+  $repository=$this->doctrine->getRepository(ERPProducts::class);
+  foreach ($objects["class"] as $object){
+    $product=$repository->findOneBy(["code"=>$object["code"]]);
+    $product->setMinimumquantityofsale($object["minimo"]);
+    $this->doctrine->getManager()->persist($product);
+    $this->doctrine->getManager()->flush();
+  }
+  $this->doctrine->getManager()->clear();
+
+}
 public function importOffers(InputInterface $input, OutputInterface $output) {
   //------   Create Lock Mutex    ------
   $fp = fopen('/tmp/axiom-navisionGetProducts-importOffers.lock', 'c');
