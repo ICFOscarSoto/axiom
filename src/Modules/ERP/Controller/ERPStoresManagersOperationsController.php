@@ -360,7 +360,7 @@ class ERPStoresManagersOperationsController extends Controller
 			$header = array("string","string","string","string");
 			$writer->setAuthor($this->getUser()->getName().' '.$this->getUser()->getLastname());
 			$writer->writeSheetHeader('Hoja1', $header, $col_options = ['suppress_row'=>true] );
-			$writer->writeSheetRow('Hoja1', ["CODIGO DE BARRAS", "CODIGO", "DESCRIPCION", "", "CANTIDAD"]);
+			$writer->writeSheetRow('Hoja1', ["CODIGO DE BARRAS", "CODIGO", "", "", "CANTIDAD","DESCRIPCION"]);
 
 			if($ids!=null){
 				$lines=$operationsRepository->getOperationsProducts($this->getUser(),$ids);
@@ -380,7 +380,7 @@ class ERPStoresManagersOperationsController extends Controller
 								}
 						 	 }
 						 }
-					$row=[$barcode, $line["code"], $line["name"], "", $line["qty"]];
+					$row=[$barcode, $line["code"], "", "", $line["qty"],$line["name"]];
 					$writer->writeSheetRow('Hoja1', $row);
 				}
 			}
