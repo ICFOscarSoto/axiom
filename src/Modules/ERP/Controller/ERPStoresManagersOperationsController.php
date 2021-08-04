@@ -355,16 +355,18 @@ class ERPStoresManagersOperationsController extends Controller
 					mkdir($uploadDir, 0775, true);
 			}
 			$filename = date("YmdHis").'_'.md5(uniqid()).'.xlsx';
+			$errorstyle[] = array('fill'=>"#AA0000");
 
 			$writer = new \XLSXWriter();
 			$header = array("string","string","string","string");
 			$writer->setAuthor($this->getUser()->getName().' '.$this->getUser()->getLastname());
 			$writer->writeSheetHeader('Hoja1', $header, $col_options = ['suppress_row'=>true] );
-			$writer->writeSheetRow('Hoja1', ["CODIGO DE BARRAS", "CODIGO", "", "", "CANTIDAD","DESCRIPCION","CANTIDAD MIN"]);
-
+			$writer->writeSheetRow('Hoja1', ["CODIGO DE BARRAS", "CODIGO", "", "", "CANTIDAD","DESCRIPCION","CANTIDAD MIN","ERROR"]);
+			$row_number=1;
 			if($ids!=null){
 				$lines=$operationsRepository->getOperationsProducts($this->getUser(),$ids);
 				foreach($lines as $line){
+					$error=null;
 					if($line["variant_id"]==null)
 						$barcode='P.'.str_pad($line["id"],8,'0', STR_PAD_LEFT);
 						else{
@@ -380,8 +382,11 @@ class ERPStoresManagersOperationsController extends Controller
 								}
 						 	 }
 						 }
-					$row=[$barcode, $line["code"], "", "", $line["qty"],$line["name"],$line["minimumquantityofsale"]];
-					$writer->writeSheetRow('Hoja1', $row);
+					if($line["minimumquantityofsale"]<$line["qty"]) $error="Cantidad minima";
+					$row=[$barcode, $line["code"], "", "", $line["qty"],$line["name"],$line["minimumquantityofsale"],$error];
+					if(!$error)	$writer->writeSheetRow('Hoja1', $row);
+						else $writer->writeSheetRow('Hoja1', $row, array('fill'=>"#AA0000"));
+					$row_number++;
 				}
 			}
 
