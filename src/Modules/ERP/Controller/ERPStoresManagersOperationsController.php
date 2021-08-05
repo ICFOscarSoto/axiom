@@ -48,8 +48,8 @@ use App\Modules\ERP\Reports\ERPEan13Reports;
 use App\Modules\ERP\Utils\ERPStoresManagersUtils;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
-
-include "includes/XLSXWriter/XLSXWriter.php";
+use App\Modules\Globale\Helpers\XLSXWriter\XLSXWriter;
+//include "includes/XLSXWriter/XLSXWriter.php";
 
 class ERPStoresManagersOperationsController extends Controller
 {
@@ -357,7 +357,7 @@ class ERPStoresManagersOperationsController extends Controller
 			$filename = date("YmdHis").'_'.md5(uniqid()).'.xlsx';
 			$errorstyle[] = array('fill'=>"#AA0000");
 
-			$writer = new \XLSXWriter();
+			$writer = new XLSXWriter();
 			$header = array("string","string","string","string");
 			$writer->setAuthor($this->getUser()->getName().' '.$this->getUser()->getLastname());
 			$writer->writeSheetHeader('Hoja1', $header, $col_options = ['suppress_row'=>true] );
