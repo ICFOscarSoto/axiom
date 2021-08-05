@@ -561,7 +561,8 @@ class ERPStoresManagersOperationsController extends Controller
 																																	'erpstores_managers_operations_lines l
 																																	LEFT JOIN erpstores_managers_operations o ON o.id=l.operation_id
 																																	LEFT JOIN erpproduct_prices p ON p.id=l.product_id',
-																																	'o.active=1 AND o.manager_id='.$id.' AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'"'
+																																	'o.active=1 AND o.manager_id='.$id.' AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'"
+																																	GROUP BY (l.product_id)'
 																																	);
 			}
 			else
@@ -571,7 +572,8 @@ class ERPStoresManagersOperationsController extends Controller
 																																	'erpstores_managers_operations_lines l
 																																	LEFT JOIN erpstores_managers_operations o ON o.id=l.operation_id
 																																	LEFT JOIN erpproduct_prices p ON p.id=l.product_id',
-																																	'o.active=1 AND o.manager_id='.$id.' AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'"'
+																																	'o.active=1 AND o.manager_id='.$id.' AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'"
+																																	GROUP BY (l.product_id)'
 																																	);
 
 			}
