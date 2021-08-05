@@ -1,0 +1,205 @@
+
+{% set params = app.request.attributes.get('_route_params')|merge(app.request.query.all()) %}
+{% block header %}
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<meta name="description" content="Axiom Business Management" />
+	<meta name="author" content="" />
+	<link rel="icon" href="images/favicon.ico">
+	{{ include('@Globale/header.html.twig') }}
+  <script src="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker-es.js"></script>
+  <link rel="stylesheet" href="{{ url('index') }}js/rickshaw/rickshaw.min.css">
+	<!-- Imported styles on this page -->
+	<link rel="stylesheet" href="{{ url('index') }}css/bootstrap-grid.css">
+		<link rel="stylesheet" href="{{ url('index') }}css/timeline.css">
+	<link rel="stylesheet" href="{{ url('index') }}/js/jvectormap/jquery-jvectormap-1.2.2.css">
+	<link rel="stylesheet" href="{{ url('index') }}/js/rickshaw/rickshaw.min.css">
+{% endblock %}
+<title>{% block title %}{{ interfaceName|trans }}{% endblock %}</title>
+<body class="page-body" data-url="{{ url('indexAdmin') }}">
+<div class="page-container"><!-- add class "sidebar-collapsed" to close sidebar by default, "chat-visible" to make chat appear always -->
+	{{ include('@Globale/sidebar_menu.html.twig') }}
+	<div class="main-content">
+		{{ include('@Globale/head.html.twig') }}
+		<hr />
+		{{ include('@Globale/breadcrumb.html.twig') }}
+		{#}<h2>{{ interfaceName }}</h2>#}
+		<!-- MAIN CONTENT -->
+		<div id="storemanagerslocalreports-body">
+        <div class="panel-heading">
+        <div class="panel-title">Informes del gestor</div>
+        </div>
+        <div class="panel-body" style="">
+        <div class="row">
+					<div class="col-md-2">
+				    <div class="form-group">
+				      <input type="text" id="date-from" name="form[from]" class="datepicker form-control"  placeholder="Fecha de inicio...">
+				    </div>
+				  </div>
+				  <div class="col-md-2">
+				    <div class="form-group">
+				      <input type="text" id="date-to" name="form[to]" class="datepicker form-control" placeholder="Fecha de fin...">
+				    </div>
+				  </div>
+					<div class="col-md-3">
+						<div class="form-group">
+							<select type="text" id="stores" class="form-control select2" required>
+								{% for option in stores %}
+									<option value="{{ option.id }}" {% if option.id=="-1" %}selected{% endif %}>{{ option.text }}</option>
+								{% endfor %}
+							</select>
+						</div>
+					</div>
+				  <div class="col-md-2">
+				    <div class="form-group">
+				      <button id="get-reports" type="button" class="btn btn-default btn-icon icon-left" onclick="getData();">Generar informes<i class="fa fa-download"></i></button>
+				    </div>
+				  </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-12">
+            <div class="panel-title-list">Consumos personal</div>
+            {% if consumersoperationslist is defined %}
+            {% set listConstructor = consumersoperationslist %}
+            {{ include('@Globale/list.html.twig') }}
+            {% endif %}
+          </div>
+        </div>
+
+				<div class="row">
+					<div class="col-md-12">
+						<div class="panel-title-list">Ranking productos</div>
+						{% if productslist is defined %}
+						{% set listConstructor = productslist %}
+						{{ include('@Globale/list.html.twig') }}
+						{% endif %}
+					</div>
+				</div>
+
+
+        </div>
+      </div>
+    </div>
+</div>
+{{ include('@ERP/storesmanagersoperationsreports_validation.html.twig') }}
+<script>
+
+
+function updateURLParameter(url, param, paramVal)
+{
+    var TheAnchor = null;
+    var newAdditionalURL = "";
+    var tempArray = url.split("?");
+    var baseURL = tempArray[0];
+    var additionalURL = tempArray[1];
+    var temp = "";
+
+    if (additionalURL)
+    {
+        var tmpAnchor = additionalURL.split("#");
+        var TheParams = tmpAnchor[0];
+            TheAnchor = tmpAnchor[1];
+        if(TheAnchor)
+            additionalURL = TheParams;
+
+        tempArray = additionalURL.split("&");
+
+        for (var i=0; i<tempArray.length; i++)
+        {
+            if(tempArray[i].split('=')[0] != param)
+            {
+                newAdditionalURL += temp + tempArray[i];
+                temp = "&";
+            }
+        }
+    }
+    else
+    {
+        var tmpAnchor = baseURL.split("#");
+        var TheParams = tmpAnchor[0];
+            TheAnchor  = tmpAnchor[1];
+
+        if(TheParams)
+            baseURL = TheParams;
+    }
+
+    if(TheAnchor)
+        paramVal += "#" + TheAnchor;
+
+    var rows_txt = temp + "" + param + "=" + paramVal;
+    return baseURL + "?" + newAdditionalURL + rows_txt;
+}
+
+
+$(document).ready(function() {
+  datepicker();
+
+});
+
+
+
+function getData(){
+	if(validate_report())
+	{
+			var url_list=$("#{{ consumersoperationslist.id }}").DataTable().ajax.url();
+			url_list=updateURLParameter(url_list,"datefrom",$('#date-from').val());
+			url_list=updateURLParameter(url_list,"dateto",$('#date-to').val());
+		  $("#{{ consumersoperationslist.id }}").DataTable().ajax.url(url_list).load();
+
+			var url_list2=$("#{{ productslist.id }}").DataTable().ajax.url();
+			url_list2=updateURLParameter(url_list2,"datefrom",$('#date-from').val());
+			url_list2=updateURLParameter(url_list2,"dateto",$('#date-to').val());
+		  $("#{{ productslist.id }}").DataTable().ajax.url(url_list).load();
+ }
+}
+
+
+
+function datepicker(){
+
+    $('.datepicker').each(function(index) {
+      var valueField=$(this).val();
+      var dateField=moment(valueField, "DD/MM/YYYY");
+        $(this).datetimepicker({
+        showTodayButton: true,
+        format: 'DD/MM/YYYY',
+        locale:'es',
+        useCurrent: false,
+        tooltips: spanish_tooltips_datetimepicker,
+        date: (dateField.isValid())?dateField:null
+      });
+
+      if($(this).attr("minDate")!="" && typeof $(this).attr("minDate")!==typeof undefined) $(this).data("DatePicker").minDate(moment($(this).attr("minDate"), "YYYY-MM-DD"));
+      if($(this).attr("maxDate")!="" && typeof $(this).attr("maxDate")!==typeof undefined) $(this).data("DatePicker").maxDate(moment($(this).attr("maxDate"), "YYYY-MM-DD"));
+
+    });
+
+
+}
+</script>
+
+<!-- END MODALS -->
+{% block footer %}
+
+<link rel="stylesheet" href="{{ url('index') }}js/datatables/datatables.css">
+<link rel="stylesheet" href="{{ url('index') }}js/select2/select2-bootstrap.css">
+<link rel="stylesheet" href="{{ url('index') }}js/select2/select2.css">
+<link rel="stylesheet" href="{{ url('index') }}css/custom.css">
+<link rel="stylesheet" href="{{ url('index') }}js/ol/ol.css">
+<link rel="stylesheet" href="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker.min.css">
+<!-- Imported scripts on this page -->
+<script src="{{ url('index') }}js/datatables/datatables.js"></script>
+<script src="{{ url('index') }}js/select2/select2.min.js"></script>
+
+
+
+<script src="{{ url('index') }}js/fileinput.js"></script>
+<script src="{{ url('index') }}js/ol/ol.js"></script>
+	 {{ include('@Globale/bottom.html.twig') }}
+   <link rel="stylesheet" href="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker.min.css">
+ 																		<script src="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker.min.js"></script>
+ 															<script src="{{ url('index') }}js/jquery.nestable.js"></script>
+{% endblock %}
+</body>

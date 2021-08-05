@@ -1,0 +1,1 @@
+[{"id": "editStoresManagersReportsOperations", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"operationsForm", "actionType" : "foreground", "confirm" :false, "tooltip":""}]

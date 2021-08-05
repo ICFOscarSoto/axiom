@@ -7,10 +7,10 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 
-class ERPStoresManagersOperationsUtils
+class ERPStoresManagersOperationsLinesUtils
 {
   private $module="ERP";
-  private $name="StoresManagersOperations";
+  private $name="StoresManagersOperationsLines";
   public function getExcludedForm($params){
     return [];
   }
@@ -39,10 +39,10 @@ class ERPStoresManagersOperationsUtils
     return $list;
   }
 
-  public function formatConsumersReportsList($id,$start,$end){
+  public function formatProductsReportsList($id,$start,$end){
     $list=[
       'id' => 'list'.$this->name,
-      'route' => 'consumersreportslist',
+      'route' => 'productsreportslist',
       'routeParams' => ["id" => $id,
                         "module" => $this->module,
                         "name" => $this->name,
@@ -51,9 +51,9 @@ class ERPStoresManagersOperationsUtils
       'orderColumn' => 2,
       'orderDirection' => 'DESC',
       'tagColumn' => 2,
-      'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersConsumersOperationsReports.json"),true),
-      'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersConsumersOperationsReportsFieldButtons.json"),true),
-      'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersConsumersOperationsReportsTopButtons.json"),true)
+      'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersProductsOperationsReports.json"),true),
+      'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersProductsOperationsReportsFieldButtons.json"),true),
+      'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersProductsOperationsReportsTopButtons.json"),true)
     ];
     return $list;
   }

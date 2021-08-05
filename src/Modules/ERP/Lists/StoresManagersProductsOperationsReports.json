@@ -1,0 +1,20 @@
+[
+  {
+      "name": "product__id",
+      "caption": "id"
+  },
+  {
+      "name": "code",
+      "caption": "código"
+  },
+  {
+      "name": "name",
+      "caption": "name"
+  },
+    {
+      "name": "suma",
+      "caption": "Suma de precio Venta",
+      "sum":true,
+      "unity":"€"
+  }
+]

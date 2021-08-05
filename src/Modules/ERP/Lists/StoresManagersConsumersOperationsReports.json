@@ -1,0 +1,25 @@
+[
+
+  {
+      "name": "consumer__id",
+      "caption": "id"
+  },
+  {
+      "name": "consumer__name_o_consumer__lastname",
+      "caption": "Nombre del trabajador"
+  },
+  {
+      "name": "consumer__idcard",
+      "caption": "DNI"
+  },
+  {
+      "name": "consumer__code2",
+      "caption": "Cod. Trabajador"
+  },
+  {
+      "name": "prueba",
+      "caption": "Suma de precio Venta",
+      "sum":true,
+      "unity":"€"
+  }
+]
