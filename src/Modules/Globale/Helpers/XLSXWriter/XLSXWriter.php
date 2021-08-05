@@ -1,4 +1,6 @@
 <?php
+namespace App\Modules\Globale\Helpers\XLSXWriter;
+
 /*
  * @license MIT License
  * */
@@ -99,7 +101,7 @@ class XLSXWriter
 		}
 		$zip = new \ZipArchive();
 		if (empty($this->sheets))                       { self::log("Error in ".__CLASS__."::".__FUNCTION__.", no worksheets defined."); return; }
-		if (!$zip->open($filename, ZipArchive::CREATE)) { self::log("Error in ".__CLASS__."::".__FUNCTION__.", unable to create zip."); return; }
+		if (!$zip->open($filename, \ZipArchive::CREATE)) { self::log("Error in ".__CLASS__."::".__FUNCTION__.", unable to create zip."); return; }
 
 		$zip->addEmptyDir("docProps/");
 		$zip->addFromString("docProps/app.xml" , self::buildAppXML() );

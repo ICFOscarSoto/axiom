@@ -863,16 +863,12 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
       foreach ($objects["class"] as $increment){
         if($increment["neto"]==0) continue;
       //grupos de clientes
-      if($increment["type"]==1)
-        {
+      if($increment["type"]==1){
           $customergroup=$repositoryCustomeGroups->findOneBy(["name"=>$increment["salescode"]]);
-
-          if($customergroup!=NULL)
-          {
+          if($customergroup!=NULL){
               $incrementaxiom_ID=$repositoryIncrements->getIncrementIdByGroup($product->getSupplier(), $product->getCategory(), $customergroup);
               //no existe el incremento en axiom
-              if($incrementaxiom_ID==null)
-              {
+              if($incrementaxiom_ID==null)  {
                 $output->writeln('Añadimos el incremento para el grupo '.$increment["salescode"]);
                 if($increment["Discount"]!=0 AND $increment["neto"]!=0){
                     $category=$repositoryCategory->findOneBy(["id"=>$product->getCategory()->getId()]);
@@ -896,18 +892,15 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
                     $output->writeln('Actualizamos todos los productos asociados a ese incremento...');
                     $obj->calculateIncrementsBySupplierCategory($this->doctrine);
                 }
-
               }
-
               //existe el incremento en axiom, luego hay que editarlo siempre y cuando haya habido alguna modificación
               else{
-
                 $output->writeln('Ya existe el incremento');
               }
             }
-        }
-          //cliente concreto
-          else if($increment["type"]==0){
+          }
+      //cliente concreto
+      else if($increment["type"]==0){
             $customer=$repositoryCustomers->findOneBy(["code"=>$increment["salescode"]]);
             if($customer!=NULL){
                 $customerincrementaxiom_ID=$repositoryCustomerIncrements->getIncrementIdByCustomer($product->getSupplier(),$product->getCategory(),$customer);
@@ -940,7 +933,6 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
                     $output->writeln('Actualizamos todos los productos asociados a ese incremento...');
                     $obj->calculateIncrementsBySupplierCategory($this->doctrine);
                 }
-
               }
               //ya existe el descuento para ese cliente
               else{
@@ -964,13 +956,12 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
                   $customerincrementaxiom->calculateIncrementsBySupplierCategory($this->doctrine);
                 }
               }
-
-              $this->doctrine->getManager()->clear();
             }
-          $output->writeln('Finalizado el incremento para el cliente');
+            $output->writeln('Finalizado el incremento para el cliente');
         }
-
+        $this->doctrine->getManager()->clear();
       }
+
 
     }
 
