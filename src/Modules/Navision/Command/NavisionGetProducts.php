@@ -964,6 +964,8 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
                   $customerincrementaxiom->calculateIncrementsBySupplierCategory($this->doctrine);
                 }
               }
+
+              $this->doctrine->getManager()->clear();
             }
           $output->writeln('Finalizado el incremento para el cliente');
         }
