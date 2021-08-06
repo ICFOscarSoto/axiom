@@ -167,6 +167,8 @@ public function importProduct(InputInterface $input, OutputInterface $output){
       $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
 
       foreach ($objects["class"] as $key=>$object){
+      /*  if($object["code"]=="1028723")
+        {*/
         $output->writeln('  - '.$object["code"].' - '.$object["Description"]);
         //if($object["vat"]==null) continue;
         $obj=$repository->findOneBy(["code"=>$object["code"]]);
@@ -234,6 +236,7 @@ public function importProduct(InputInterface $input, OutputInterface $output){
          $this->doctrine->getManager()->flush();
          $obj->priceCalculated($this->doctrine);
          $this->doctrine->getManager()->clear();
+      /* }*/
       }
       $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"products"]);
       if ($navisionSync==null) {
@@ -851,11 +854,13 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
   //Disable SQL logger
     foreach($products as $id) {
     $product=$repository->findOneBy(["id"=>$id, "company"=>2]);
-    $output->writeln($product->getCode().'  - '.$product->getName());
+
     $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
 
+if($product->getCode()=="1028723")
+{
+    $output->writeln($product->getCode().'  - '.$product->getName());
     if ($product->getCategory()!=null && $product->getSupplier()!=null){
-
       $supplier=$repositorySupliers->findOneBy(["id"=>$product->getSupplier()->getId()]);
       $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getIncrements.php?product='.$product->getCode());
       $objects=json_decode($json, true);
@@ -864,6 +869,7 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
         if($increment["neto"]==0) continue;
       //grupos de clientes
       if($increment["type"]==1){
+
           $customergroup=$repositoryCustomeGroups->findOneBy(["name"=>$increment["salescode"]]);
           if($customergroup!=NULL){
               $incrementaxiom_ID=$repositoryIncrements->getIncrementIdByGroup($product->getSupplier(), $product->getCategory(), $customergroup);
@@ -959,13 +965,13 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
             }
             $output->writeln('Finalizado el incremento para el cliente');
         }
-        $this->doctrine->getManager()->clear();
+      //  $this->doctrine->getManager()->clear();
       }
 
 
     }
 
-
+  }
 
   }
  }
