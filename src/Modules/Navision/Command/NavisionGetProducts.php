@@ -965,7 +965,7 @@ if($product->getCode()=="1028723")
             }
             $output->writeln('Finalizado el incremento para el cliente');
         }
-      //  $this->doctrine->getManager()->clear();
+        $this->doctrine->getManager()->clear();
       }
 
 
@@ -975,7 +975,9 @@ if($product->getCode()=="1028723")
 
   }
  }
-
+ $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getIncrements.php?product='.$product->getCode());
+ $objects=json_decode($json, true);
+ $objects=$objects[0];
  $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"productincrements"]);
  if ($navisionSync==null) {
    $navisionSync=new NavisionSync();
