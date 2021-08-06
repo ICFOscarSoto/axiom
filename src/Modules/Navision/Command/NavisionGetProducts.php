@@ -965,7 +965,7 @@ if($product->getCode()=="1028723")
             }
             $output->writeln('Finalizado el incremento para el cliente');
         }
-        $this->doctrine->getManager()->clear();
+      //  $this->doctrine->getManager()->clear();
       }
 
 
