@@ -91,29 +91,6 @@ function checkGroupedStockFailed(code){
       });
   }
 
-  function productSearch(fields, searchFields){
-    if($("#product-form-code").val()!=""){
-      if((++load_wait)==1) $("#load-spinner").fadeIn();
-      $.ajax({
-         url: '{{ url('genericsearch',{'module':'ERP', 'name':'Products', 'field':'code'}) }}/'+$("#product-form-code").val(),
-         type: 'POST',
-         data: JSON.stringify(searchFields),
-         success:  function( data ) {
-           if((--load_wait)==0) $("#load-spinner").fadeOut();
-           if(data.result){
-             var i=0;
-             Object.entries(data.data).forEach(function(element) {
-               $("#"+fields[i]).val(element[1]);
-               i++;
-             });
-           } else {
-             clearFields(fields);
-             toastr.error("No se encontro el product introducido", "Confirmación", confirmation);
-           }
-         }
-       });
-    }else clearFields(fields);
-  }
 
   $(document).ready(function() {
     {# CUSTOMER SEARCH #}
@@ -126,7 +103,6 @@ function checkGroupedStockFailed(code){
       id=$("#storeticket-form-reasons-select").val();
       code=$(this).parent().parent().parent().children('td').eq(1).text();
 
-
       $("#product-form-id").val($(this).attr('attr-id'));
       $("#product-form-id").trigger('change');
       $("#product-form-code").val($(this).parent().parent().parent().children('td').eq(1).text());
@@ -137,7 +113,6 @@ function checkGroupedStockFailed(code){
       $("#product-form-view").attr("attr-id",$(this).attr("attr-id"));
       $("#product-form-view").css("display","inline-block");
       $("#product-name-info").css("display","block");
-
 
       //fallo de stock
       if(id==1){
@@ -160,10 +135,6 @@ function checkGroupedStockFailed(code){
         var code=$(this).parent().parent().parent().children('td').eq(1).text();
         getVariants(code);
       }
-
-
-
-
 
     });
   });
