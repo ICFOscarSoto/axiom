@@ -833,7 +833,6 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
   $datetime=new \DateTime();
   $output->writeln('* Sincronizando incrementos....');
   $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
-  $company=$repositoryCompanies->find(2);
   $repositoryCategory=$this->doctrine->getRepository(ERPCategories::class);
   $repositorySupliers=$this->doctrine->getRepository(ERPSuppliers::class);
   $repositoryCustomers=$this->doctrine->getRepository(ERPCustomers::class);
@@ -854,11 +853,8 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
   //Disable SQL logger
     foreach($products as $id) {
     $product=$repository->findOneBy(["id"=>$id, "company"=>2]);
-
+    $company=$repositoryCompanies->find(2);
     $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
-
-if($product->getCode()=="1028723")
-{
     $output->writeln($product->getCode().'  - '.$product->getName());
     if ($product->getCategory()!=null && $product->getSupplier()!=null){
       $supplier=$repositorySupliers->findOneBy(["id"=>$product->getSupplier()->getId()]);
@@ -901,7 +897,23 @@ if($product->getCode()=="1028723")
               }
               //existe el incremento en axiom, luego hay que editarlo siempre y cuando haya habido alguna modificación
               else{
-                $output->writeln('Ya existe el incremento');
+                $output->writeln('Ya existe el incremento de grupo '.$incrementaxiom_ID["id"]);
+                $incrementaxiom=$repositoryIncrements->findOneBy(["id"=>$incrementaxiom_ID]);
+                $pvp=$increment["pvp"];
+                $dto=$increment["Discount"];
+                $neto=$increment["neto"];
+                $precio_con_dto=$pvp-$pvp*($dto/100);
+                $inc=round((($precio_con_dto/$neto)-1)*100,2);
+                //antes de hacer ninguna modificación, comprobamos si ha habido algún cambio en el incremento, de no ser así, no se hace nada.
+                if(round($incrementaxiom->getIncrement(),2)!=$inc){
+                  $output->writeln('Actualizamos el incremento de grupo '.$incrementaxiom_ID["id"]);
+                  $incrementaxiom->setIncrement($inc);
+                  $incrementaxiom->setDateupd(new \Datetime());
+                  $this->doctrine->getManager()->persist($incrementaxiom);
+                  $this->doctrine->getManager()->flush();
+                }
+                $output->writeln('Actualizamos los precios del incremento '.$incrementaxiom_ID["id"]);
+                $incrementaxiom->calculateIncrementsBySupplierCategory($this->doctrine);
               }
             }
           }
@@ -942,7 +954,7 @@ if($product->getCode()=="1028723")
               }
               //ya existe el descuento para ese cliente
               else{
-                $output->writeln('Ya existe el incremento');
+                $output->writeln('Ya existe el incremento de cliente '.$customerincrementaxiom_ID);
                 $customerincrementaxiom=$repositoryCustomerIncrements->findOneBy(["id"=>$customerincrementaxiom_ID]);
                 $pvp=$increment["pvp"];
                 $dto=$increment["Discount"];
@@ -951,6 +963,7 @@ if($product->getCode()=="1028723")
                 $inc=round((($precio_con_dto/$neto)-1)*100,2);
                 //antes de hacer ninguna modificación, comprobamos si ha habido algún cambio en el incremento, de no ser así, no se hace nada.
                 if(round($customerincrementaxiom->getIncrement(),2)!=$inc){
+                  $output->writeln('Actualizamos el incremento de cliente '.$customerincrementaxiom_ID);
                   $customerincrementaxiom->setIncrement($inc);
                   $customerincrementaxiom->setDateupd(new \Datetime());
                   $customerincrementaxiom->setStart(date_create_from_format("Y-m-d h:i:s.u",$increment["startingdate"]["date"]));
@@ -959,37 +972,23 @@ if($product->getCode()=="1028723")
                   } else $customerincrementaxiom->setEnd(date_create_from_format("Y-m-d h:i:s.u",$increment["endingdate"]["date"]));
                   $this->doctrine->getManager()->persist($customerincrementaxiom);
                   $this->doctrine->getManager()->flush();
-                  $customerincrementaxiom->calculateIncrementsBySupplierCategory($this->doctrine);
                 }
+
+                $output->writeln('Actualizamos los precios del incremento cliente '.$customerincrementaxiom_ID);
+                $customerincrementaxiom->calculateIncrementsBySupplierCategory($this->doctrine);
               }
             }
             $output->writeln('Finalizado el incremento para el cliente');
         }
-      //  $this->doctrine->getManager()->clear();
       }
 
 
     }
 
-  }
 
+            $this->doctrine->getManager()->clear();
   }
  }
- $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getIncrements.php?product='.$product->getCode());
- $objects=json_decode($json, true);
- $objects=$objects[0];
- $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"productincrements"]);
- if ($navisionSync==null) {
-   $navisionSync=new NavisionSync();
-   $navisionSync->setEntity("productincrements");
- }
- $navisionSync->setLastsync($datetime);
- $output->writeln('* El nuevo maxtimestamp es ....'.$objects["maxtimestamp"]);
- if ($objects["maxtimestamp"]>$navisionSync->getMaxtimestamp())
- $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
- $this->doctrine->getManager()->persist($navisionSync);
- $this->doctrine->getManager()->flush();
- $this->doctrine->getManager()->clear();
   //------   Critical Section END   ------
   //------   Remove Lock Mutex    ------
   fclose($fp);
