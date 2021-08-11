@@ -852,7 +852,9 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
 
   //Disable SQL logger
     foreach($products as $id) {
-    $product=$repository->findOneBy(["id"=>$id, "company"=>2]);
+    $product=$repository->findOneBy(["id"=>$id, "company"=>2, "active" => 1]);
+    if($product)
+    {
     $company=$repositoryCompanies->find(2);
     $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
     $output->writeln($product->getCode().'  - '.$product->getName());
@@ -928,6 +930,7 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
       //cliente concreto
       else if($increment["type"]==0){
             $customer=$repositoryCustomers->findOneBy(["code"=>$increment["salescode"]]);
+            if($customer!=NULL){
             if($customer->getId()=="6291"){
                 $customerincrementaxiom_ID=$repositoryCustomerIncrements->getIncrementIdByCustomer($product->getSupplier(),$product->getCategory(),$customer);
                 //no existe el incremento para el cliente, luego lo creamos
@@ -994,6 +997,7 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
                 else   $output->writeln('Ya hemos actualizado los productos con este incremento');
               }
             }
+          }
             $output->writeln('Finalizado el incremento para el cliente');
         }
       }
@@ -1003,6 +1007,8 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
 
 
             $this->doctrine->getManager()->clear();
+
+      }//active products
   }
  }
   //------   Critical Section END   ------
