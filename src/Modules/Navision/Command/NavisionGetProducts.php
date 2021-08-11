@@ -1053,10 +1053,10 @@ public function importOffers(InputInterface $input, OutputInterface $output) {
   $repositoryCustomers=$this->doctrine->getRepository(ERPCustomers::class);
   $repositoryOfferPrices=$this->doctrine->getRepository(ERPOfferPrices::class);
   $repository=$this->doctrine->getRepository(ERPProducts::class);
-  $products=$repository->findAll();
+  $products=$repository->findBy(["active"=>1]);
   //Disable SQL logger
  foreach($products as $product) {
-   //$product=$repository->findOneBy(["code"=>'230700300680']);
+  // $product=$repository->findOneBy(["code"=>'0202031006']);
     $output->writeln($product->getCode().'  - '.$product->getName());
     $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
     $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getOffers.php?product='.$product->getCode());
@@ -1071,23 +1071,23 @@ public function importOffers(InputInterface $input, OutputInterface $output) {
 
             if($customer!=NULL)
             {
+              $offer_ID=$repositoryOfferPrices->getOfferId($product,$customer,(int)round($offer["quantity"]),round($offer["price"],2));
+              if($offer_ID!=NULL){
+                $output->writeln("Existe la oferta");
+                $offeraxiom=$repositoryOfferPrices->findOneBy(["id"=>$offer_ID]);
+                $offeraxiom->setPrice($offer["price"]);
+                if ($offer["endingdate"]["date"]=="1753-01-01 00:00:00.000000") {
+                  $offeraxiom->setEnd(null);
+                }
+                else $offeraxiom->setEnd(date_create_from_format("Y-m-d h:i:s.u",$offer["endingdate"]["date"]));
+                //dump($offeraxiom);
+                $this->doctrine->getManager()->persist($offeraxiom);
+                $this->doctrine->getManager()->flush();
+                $output->writeln("Actualizamos la oferta");
 
-            $offer_ID=$repositoryOfferPrices->getOfferId($product,$customer,$offer["quantity"],$offer["startingdate"]["date"]);
-            if($offer_ID!=NULL){
-            //  $output->writeln();
-              $offeraxiom=$repositoryOfferPrices->findOneBy(["id"=>$offer_ID]);
-              $offeraxiom->setPrice($offer["price"]);
-              if ($offer["endingdate"]["date"]=="1753-01-01 00:00:00.000000") {
-                $offeraxiom->setEnd(null);
               }
-              else $offeraxiom->setEnd(date_create_from_format("Y-m-d h:i:s.u",$offer["endingdate"]["date"]));
-              $this->doctrine->getManager()->persist($offeraxiom);
-              $this->doctrine->getManager()->flush();
-              $output->writeln("Creamos nueva oferta");
-
-            }
             else{
-
+              $output->writeln("No existe la oferta");
               $obj=new ERPOfferPrices();
               $obj->setProduct($product);
               $obj->setCustomer($customer);
@@ -1103,9 +1103,10 @@ public function importOffers(InputInterface $input, OutputInterface $output) {
               $obj->setDateupd(new \Datetime());
               $obj->setActive(1);
               $obj->setDeleted(0);
+
               $this->doctrine->getManager()->persist($obj);
               $this->doctrine->getManager()->flush();
-                $output->writeln("Actualizamos la oferta");
+              $output->writeln("Creamos la oferta");
             }
 
 
@@ -1114,7 +1115,7 @@ public function importOffers(InputInterface $input, OutputInterface $output) {
           //oferta para todos los clientes
           else{
 
-            $offer_ID=$repositoryOfferPrices->getOfferId($product,NULL,$offer["quantity"],$offer["startingdate"]["date"]);
+            $offer_ID=$repositoryOfferPrices->getOfferId($product,NULL,(int)round($offer["quantity"]),round($offer["price"],2));
             if($offer_ID!=NULL){
               $offeraxiom=$repositoryOfferPrices->findOneBy(["id"=>$offer_ID]);
               $offeraxiom->setPrice($offer["price"]);
