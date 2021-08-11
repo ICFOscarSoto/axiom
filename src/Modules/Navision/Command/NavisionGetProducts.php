@@ -862,10 +862,10 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
       $objects=json_decode($json, true);
       $objects=$objects[0];
       foreach ($objects["class"] as $increment){
-        if($increment["neto"]==0) continue;
+      if($increment["neto"]==0) continue;
       //grupos de clientes
       if($increment["type"]==1){
-
+          continue;
           $customergroup=$repositoryCustomeGroups->findOneBy(["name"=>$increment["salescode"]]);
           if($customergroup!=NULL){
               $incrementaxiom_ID=$repositoryIncrements->getIncrementIdByGroup($product->getSupplier(), $product->getCategory(), $customergroup);
@@ -912,45 +912,53 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
                   $this->doctrine->getManager()->persist($incrementaxiom);
                   $this->doctrine->getManager()->flush();
                 }
-                $output->writeln('Actualizamos los precios del incremento '.$incrementaxiom_ID["id"]);
-                $incrementaxiom->calculateIncrementsBySupplierCategory($this->doctrine);
+
+              //  $output->writeln(date("Y-m-d"));
+              //  $output->writeln(date("Y-m-d", strtotime($incrementaxiom->getDateupd()->format('Y-m-d'))));
+
+                if(date("Y-m-d")!=date("Y-m-d", strtotime($incrementaxiom->getDateupd()->format('Y-m-d'))))
+                {
+                  $output->writeln('Actualizamos los precios del incremento '.$incrementaxiom_ID["id"]);
+                  $incrementaxiom->calculateIncrementsBySupplierCategory($this->doctrine);
+                }
+                else   $output->writeln('Ya hemos actualizado los productos con este incremento');
               }
             }
           }
       //cliente concreto
       else if($increment["type"]==0){
             $customer=$repositoryCustomers->findOneBy(["code"=>$increment["salescode"]]);
-            if($customer!=NULL){
+            if($customer->getId()=="6291"){
                 $customerincrementaxiom_ID=$repositoryCustomerIncrements->getIncrementIdByCustomer($product->getSupplier(),$product->getCategory(),$customer);
                 //no existe el incremento para el cliente, luego lo creamos
                 if($customerincrementaxiom_ID==null){
-                $output->writeln('Añadimos incremento para el cliente '.$increment["salescode"]);
-                if($increment["Discount"]!=0 AND $increment["neto"]!=0){
-                    $category=$repositoryCategory->findOneBy(["id"=>$product->getCategory()->getId()]);
-                    $obj=new ERPCustomerIncrements();
-                    $obj->setSupplier($supplier);
-                    $obj->setCategory($category);
-                    $obj->setCustomer($customer);
-                    $obj->setCompany($company);
-                    $pvp=$increment["pvp"];
-                    $dto=$increment["Discount"];
-                    $neto=$increment["neto"];
-                    $precio_con_dto=$pvp-$pvp*($dto/100);
-                    $inc=(($precio_con_dto/$neto)-1)*100;
-                    $obj->setIncrement($inc);
-                    $obj->setDateadd(new \Datetime());
-                    $obj->setDateupd(new \Datetime());
-                    $obj->setStart(date_create_from_format("Y-m-d h:i:s.u",$increment["startingdate"]["date"]));
-                    if ($increment["endingdate"]["date"]=="1753-01-01 00:00:00.000000") {
-                      $obj->setEnd(null);
-                    } else $obj->setEnd(date_create_from_format("Y-m-d h:i:s.u",$increment["endingdate"]["date"]));
-                    $obj->setActive(1);
-                    $obj->setDeleted(0);
-                    $this->doctrine->getManager()->persist($obj);
-                    $this->doctrine->getManager()->flush();
-                    $output->writeln('Actualizamos todos los productos asociados a ese incremento...');
-                    $obj->calculateIncrementsBySupplierCategory($this->doctrine);
-                }
+                  $output->writeln('Añadimos incremento para el cliente '.$increment["salescode"]);
+                  if($increment["Discount"]!=0 AND $increment["neto"]!=0){
+                      $category=$repositoryCategory->findOneBy(["id"=>$product->getCategory()->getId()]);
+                      $obj=new ERPCustomerIncrements();
+                      $obj->setSupplier($supplier);
+                      $obj->setCategory($category);
+                      $obj->setCustomer($customer);
+                      $obj->setCompany($company);
+                      $pvp=$increment["pvp"];
+                      $dto=$increment["Discount"];
+                      $neto=$increment["neto"];
+                      $precio_con_dto=$pvp-$pvp*($dto/100);
+                      $inc=(($precio_con_dto/$neto)-1)*100;
+                      $obj->setIncrement($inc);
+                      $obj->setDateadd(new \Datetime());
+                      $obj->setDateupd(new \Datetime());
+                      $obj->setStart(date_create_from_format("Y-m-d h:i:s.u",$increment["startingdate"]["date"]));
+                      if ($increment["endingdate"]["date"]=="1753-01-01 00:00:00.000000") {
+                        $obj->setEnd(null);
+                      } else $obj->setEnd(date_create_from_format("Y-m-d h:i:s.u",$increment["endingdate"]["date"]));
+                      $obj->setActive(1);
+                      $obj->setDeleted(0);
+                      $this->doctrine->getManager()->persist($obj);
+                      $this->doctrine->getManager()->flush();
+                      $output->writeln('Actualizamos todos los productos asociados a ese incremento...');
+                      $obj->calculateIncrementsBySupplierCategory($this->doctrine);
+                  }
               }
               //ya existe el descuento para ese cliente
               else{
@@ -976,6 +984,14 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
 
                 $output->writeln('Actualizamos los precios del incremento cliente '.$customerincrementaxiom_ID);
                 $customerincrementaxiom->calculateIncrementsBySupplierCategory($this->doctrine);
+
+
+                if((date("Y-m-d", strtotime("yesterday"))!=date("Y-m-d", strtotime($customerincrementaxiom->getDateupd()->format('Y-m-d')))) AND (date("Y-m-d")!=date("Y-m-d", strtotime($customerincrementaxiom->getDateupd()->format('Y-m-d')))))
+                {
+                    $output->writeln('Actualizamos los precios del incremento cliente '.$customerincrementaxiom_ID);
+                    $customerincrementaxiom->calculateIncrementsBySupplierCategory($this->doctrine);
+                }
+                else   $output->writeln('Ya hemos actualizado los productos con este incremento');
               }
             }
             $output->writeln('Finalizado el incremento para el cliente');
