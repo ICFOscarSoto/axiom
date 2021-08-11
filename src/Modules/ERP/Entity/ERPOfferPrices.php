@@ -27,7 +27,7 @@ class ERPOfferPrices
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPCustomers")
-     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     private $customer;
 
