@@ -650,7 +650,6 @@ class ERPStoresManagersOperationsController extends Controller
 																																			 'o.active=1 AND o.consumer_id='.$consumerid.' AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'" AND o.store_id='.$store);
 					 }
 					 else{
-						 dump("aqui");
 						 $return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields,ERPStoresManagersOperationsLines::class,['l.product_id'=>'id','o.date'=>'date','l.code'=>'code','l.name'=>'name','s.name'=>'store__name','l.quantity'=>'quantity','p.price'=>'price','IFNULL(ROUND(IFNULL(of.price,p.price)*l.quantity,2),0)'=>'total'],
 																																				 'erpstores_managers_operations_lines l
 																																				 LEFT JOIN erpstores_managers_operations o ON o.id=l.operation_id
