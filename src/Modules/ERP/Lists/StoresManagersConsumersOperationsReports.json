@@ -1,7 +1,6 @@
 [
-
   {
-      "name": "consumer__id",
+      "name": "id",
       "caption": "id"
   },
   {

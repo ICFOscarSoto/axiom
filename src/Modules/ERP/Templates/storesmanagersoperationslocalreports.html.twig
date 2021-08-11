@@ -28,7 +28,6 @@
 		<!-- MAIN CONTENT -->
 		<div id="storemanagerslocalreports-body">
         <div class="panel-heading">
-        <div class="panel-title">Informes del gestor</div>
         </div>
         <div class="panel-body" style="">
         <div class="row">
@@ -53,21 +52,34 @@
 					</div>
 				  <div class="col-md-2">
 				    <div class="form-group">
-				      <button id="get-reports" type="button" class="btn btn-default btn-icon icon-left" onclick="getData();">Generar informes<i class="fa fa-download"></i></button>
+				      <button id="get-reports" type="button" class="btn btn-default btn-icon icon-left" onclick="getData();">Actualizar informes<i class="fa fa-sync"></i></button>
 				    </div>
 				  </div>
         </div>
-
+				</br>
+				</br>
         <div class="row">
           <div class="col-md-12">
             <div class="panel-title-list">Consumos personal</div>
-            {% if consumersoperationslist is defined %}
-            {% set listConstructor = consumersoperationslist %}
-            {{ include('@Globale/list.html.twig') }}
-            {% endif %}
+							<div class="col-md-7">
+	            {% if consumersoperationslist is defined %}
+	            {% set listConstructor = consumersoperationslist %}
+	            {{ include('@Globale/list.html.twig') }}
+	            {% endif %}
+						</div>
+						</br></br></br></br></br>
+						<div class="col-md-5 overflow-auto" style="border:1px solid #ccc">
+							</br>
+
+							<button id="consumeroperations-export" style="display:none;" type="button" class="btn btn-default btn-icon icon-left">Exportar informe<i class="fa fa-download"></i></button>
+							</br>
+							</br>
+								<canvas id="ERPStoresManagersReports-consumeroperations-{{ id }}" width="100%"></canvas>
+						</div>
           </div>
         </div>
-
+			</br>
+			</br>
 				<div class="row">
 					<div class="col-md-12">
 						<div class="panel-title-list">Ranking productos</div>
@@ -77,14 +89,77 @@
 						{% endif %}
 					</div>
 				</div>
-
-
+				{{ include('@ERP/storesmanagersoperationslocalreports_details.html.twig') }}
         </div>
       </div>
     </div>
 </div>
+
 {{ include('@ERP/storesmanagersoperationsreports_validation.html.twig') }}
 <script>
+var ctxConsumerOperations = document.getElementById('ERPStoresManagersReports-consumeroperations-{{ id }}');
+var stackedBar;
+
+
+
+var ConsumerOperationsData = {
+label: 'Consumo por usuario (TOP 10)',
+data: [],
+backgroundColor:[
+      'rgba(255, 99, 132, 0.2)',
+      'rgba(255, 159, 64, 0.2)',
+      'rgba(255, 205, 86, 0.2)',
+      'rgba(75, 192, 192, 0.2)',
+      'rgba(54, 162, 235, 0.2)',
+      'rgba(153, 102, 255, 0.2)',
+			'rgba(255, 189, 253, 0.2)',
+			'rgba(196, 248, 239, 0.2)',
+			'rgba(200, 244, 213, 0.2)',
+			'rgba(201, 203, 207, 0.2)'
+    ],
+borderColor:  [
+      'rgb(255, 99, 132)',
+      'rgb(255, 159, 64)',
+      'rgb(255, 205, 86)',
+      'rgb(75, 192, 192)',
+      'rgb(54, 162, 235)',
+      'rgb(153, 102, 255)',
+			'rgb(255, 189, 253)',
+			'rgb(196, 248, 239)',
+			'rgb(200, 244, 213)',
+			'rgb(201, 203, 207)'
+    ],
+borderWidth: 2,
+yAxisID: "y-axis-total"
+};
+
+
+var ConsumerOperationsgraphData = {
+labels: [],
+datasets: [ConsumerOperationsData]
+};
+
+
+var chartConsumerOperationsOptions = {
+  onClick: function(e){
+      var element = this.getElementAtEvent(e);
+      if(element.length > 0){
+          $("#{{ id }}-ERPStoresManagersReports-consumeroperations-modal").modal('toggle');
+          //console.log("Clicked on a bar with index: "+element[0]._index+". Now this bar should be marked as active.");
+        }
+  },
+  scales: {
+    xAxes: [{
+      barPercentage: 1,
+      categoryPercentage: 0.6
+    }],
+    yAxes: [{
+      id: "y-axis-total",
+      stacked: false
+    }]
+  }
+};
+
 
 
 function updateURLParameter(url, param, paramVal)
@@ -133,10 +208,6 @@ function updateURLParameter(url, param, paramVal)
 }
 
 
-$(document).ready(function() {
-  datepicker();
-
-});
 
 
 
@@ -146,16 +217,57 @@ function getData(){
 			var url_list=$("#{{ consumersoperationslist.id }}").DataTable().ajax.url();
 			url_list=updateURLParameter(url_list,"datefrom",$('#date-from').val());
 			url_list=updateURLParameter(url_list,"dateto",$('#date-to').val());
+			url_list=updateURLParameter(url_list,"store",$('#stores').val());
 		  $("#{{ consumersoperationslist.id }}").DataTable().ajax.url(url_list).load();
 
 			var url_list2=$("#{{ productslist.id }}").DataTable().ajax.url();
 			url_list2=updateURLParameter(url_list2,"datefrom",$('#date-from').val());
 			url_list2=updateURLParameter(url_list2,"dateto",$('#date-to').val());
-		  $("#{{ productslist.id }}").DataTable().ajax.url(url_list).load();
+			url_list2=updateURLParameter(url_list2,"store",$('#stores').val());
+		  $("#{{ productslist.id }}").DataTable().ajax.url(url_list2).load();
+
+
+			if((++load_wait)==1) $("#load-spinner").fadeIn();
+	    $.ajax({
+	     url: '{{ url('storesManagersGetReports', {"id": id}) }}',
+	     type: 'POST',
+	     data: 'start='+$("#date-from").val()+'&end='+$("#date-to").val()+'&store='+$('#stores').val(),
+	  //   data: JSON.stringify(data),
+
+	     success:  function( data ) {
+
+	       if((--load_wait)==0) $("#load-spinner").fadeOut();
+				 var array_ConsumerOperations=[];
+				 var array_ConsumerOperationsLabels=[];
+
+				 if(typeof data.consumers !== 'undefined')
+					$.each( data.consumers, function( key, val ) {
+
+						array_ConsumerOperations.push(val.total*1);
+						array_ConsumerOperationsLabels.push(val.NAME+" "+val.lastname);
+				 //   array_usersIds.push(val.id);
+					});
+
+					ConsumerOperationsData.data=array_ConsumerOperations;
+					ConsumerOperationsgraphData.labels = array_ConsumerOperationsLabels;
+					ConsumerOperationsgraphData.datasets= [ConsumerOperationsData];
+					stackedBarConsumerOperations.data=ConsumerOperationsgraphData;
+					stackedBarConsumerOperations.update();
+
+					$('#consumeroperations-export').css("display","block");
+					}
+				});
  }
 }
 
 
+$('body').on('click', "[id=consumeroperations-export]", function(e) {
+	labels=ConsumerOperationsgraphData.labels;
+	data=ConsumerOperationsData.data;
+	var win = window.open("/api/ERP/storesmanagers/exportconsumeroperations?start="+encodeURI($("#date-from").val())+"&end="+encodeURI($("#date-to").val())+"&labels="+encodeURI(labels)+"&data="+encodeURI(data));
+	win.focus();
+
+});
 
 function datepicker(){
 
@@ -178,6 +290,20 @@ function datepicker(){
 
 
 }
+
+
+
+
+$(document).ready(function() {
+  datepicker();
+	getData();
+	stackedBarConsumerOperations = new Chart(ctxConsumerOperations, {
+    type: 'bar',
+    data: [],
+    options: chartConsumerOperationsOptions
+  });
+
+});
 </script>
 
 <!-- END MODALS -->

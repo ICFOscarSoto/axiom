@@ -442,7 +442,8 @@ class ERPStoresManagersOperationsController extends Controller
 				 $stores[]=$option;
 			 }
 			 $listConsumersOperationsReports = new ERPStoresManagersOperationsUtils();
-			 $listConsumersOperationsLinesReports = new ERPStoresManagersOperationsLinesUtils();
+			 $listOperationsLinesReports = new ERPStoresManagersOperationsLinesUtils();
+			 //$listConsumersOperationsDetailsReports = new ERPStoresManagersOperationsLinesUtils();
 			 if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 					 return $this->render('@ERP/storesmanagersoperationslocalreports.html.twig', [
 						 'controllerName' => 'storesManagersOperationsController',
@@ -454,8 +455,10 @@ class ERPStoresManagersOperationsController extends Controller
 						 'userData' => $userdata,
 						 'id' => $id,
 						 'stores' => $stores,
-						 'consumersoperationslist' => $listConsumersOperationsReports->formatConsumersReportsList($id,null,null),
-						 'productslist' => $listConsumersOperationsLinesReports->formatProductsReportsList($id,null,null)
+						 'consumersoperationslist' => $listConsumersOperationsReports->formatConsumersReportsList($id,null,null,null),
+						 'productslist' => $listOperationsLinesReports->formatProductsReportsList($id,null,null,null),
+						 'detailedlist'=>	$listOperationsLinesReports->formatConsumersReportsDetailedList(null,null,null,null)/*,
+						 'include_pre_list_templates' => ['@ERP/storesmanagersoperationslocalreports_details.html.twig'],*/
 
 						 ]);
 				 }
@@ -478,6 +481,8 @@ class ERPStoresManagersOperationsController extends Controller
 			$repository = $manager->getRepository($this->class);
 			$id=$request->query->get("id",$request->request->get("id"));
 			$start=	$request->query->get("datefrom",$request->request->get("datefrom"));
+			$store=	$request->query->get("store",$request->request->get("store"));
+			if($store=="-1") $store=null;
 
 			$datefrom=date_create_from_format('d/m/Y',$start);
 			$end=	$request->query->get("dateto",$request->request->get("dateto"));
@@ -496,30 +501,36 @@ class ERPStoresManagersOperationsController extends Controller
 
 			$listUtils=new GlobaleListUtils();
 			$listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersConsumersOperationsReports.json"),true);
-			if($start!=null)
+
+			dump($start);
+			dump($end);
+			if($store)
 			{
-				$return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields,ERPStoresManagersOperations::class,['c.id'=>'consumer__id','concat(c.name," ",c.lastname)'=>'consumer__name_o_consumer__lastname','c.idcard'=>'consumer__idcard','c.code2'=>'consumer__code2','IFNULL(ROUND(SUM(p.price*l.quantity),2),0)'=>'prueba'],
+			$return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields,ERPStoresManagersOperations::class,['o.consumer_id'=>'id','concat(c.name," ",c.lastname)'=>'consumer__name_o_consumer__lastname','c.idcard'=>'consumer__idcard','c.code2'=>'consumer__code2','IFNULL(ROUND(SUM(IFNULL(of.price,p.price)*l.quantity),2),0)'=>'prueba'],
 																																	'erpstores_managers_operations o
+																																	LEFT JOIN erpstores_managers m ON m.id=o.manager_id
 																																	LEFT JOIN erpstores_managers_consumers c ON c.id=o.consumer_id
 																																	LEFT JOIN erpstores_managers_operations_lines l ON l.operation_id=o.id
+																																	LEFT JOIN erpoffer_prices of ON of.id=l.product_id AND of.customer_id=m.customer_id
 																																	LEFT JOIN erpproduct_prices p ON p.id=l.product_id',
-																																	'o.active=1 AND o.manager_id='.$id.' AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'"
+																																	'o.active=1 AND o.manager_id='.$id.' AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'" AND o.store_id='.$store.'
 																																	GROUP BY(o.consumer_id)'
 																																	);
 			}
-			else
-			{
-
-				$return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields,ERPStoresManagersOperations::class,['c.id'=>'consumer__id','concat(c.name," ",c.lastname)'=>'consumer__name_o_consumer__lastname','c.idcard'=>'consumer__idcard','c.code2'=>'consumer__code2','IFNULL(ROUND(SUM(p.price*l.quantity),2),0)'=>'prueba'],
+			else{
+				$return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields,ERPStoresManagersOperations::class,['o.consumer_id'=>'id','concat(c.name," ",c.lastname)'=>'consumer__name_o_consumer__lastname','c.idcard'=>'consumer__idcard','c.code2'=>'consumer__code2','IFNULL(ROUND(SUM(IFNULL(of.price,p.price)*l.quantity),2),0)'=>'prueba'],
 																																		'erpstores_managers_operations o
+																																		LEFT JOIN erpstores_managers m ON m.id=o.manager_id
 																																		LEFT JOIN erpstores_managers_consumers c ON c.id=o.consumer_id
 																																		LEFT JOIN erpstores_managers_operations_lines l ON l.operation_id=o.id
+																																		LEFT JOIN erpoffer_prices of ON of.id=l.product_id AND of.customer_id=m.customer_id
 																																		LEFT JOIN erpproduct_prices p ON p.id=l.product_id',
-																																		'o.active=1 AND o.manager_id=1
+																																		'o.active=1 AND o.manager_id='.$id.' AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'"
 																																		GROUP BY(o.consumer_id)'
 																																		);
 
 			}
+
 			return new JsonResponse($return);
 
 		}
@@ -537,6 +548,8 @@ class ERPStoresManagersOperationsController extends Controller
 			$repository = $manager->getRepository($this->class);
 			$id=$request->query->get("id",$request->request->get("id"));
 			$start=	$request->query->get("datefrom",$request->request->get("datefrom"));
+			$store=	$request->query->get("store",$request->request->get("store"));
+			if($store=="-1") $store=null;
 
 			$datefrom=date_create_from_format('d/m/Y',$start);
 			$end=	$request->query->get("dateto",$request->request->get("dateto"));
@@ -555,31 +568,133 @@ class ERPStoresManagersOperationsController extends Controller
 
 			$listUtils=new GlobaleListUtils();
 			$listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersProductsOperationsReports.json"),true);
-			if($start!=null)
-			{
-				$return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields,ERPStoresManagersOperations::class,['l.product_id'=>'product__id','l.code'=>'code','l.name'=>'name','IFNULL(ROUND(SUM(p.price*l.quantity),2),0)'=>'suma'],
-																																	'erpstores_managers_operations_lines l
-																																	LEFT JOIN erpstores_managers_operations o ON o.id=l.operation_id
-																																	LEFT JOIN erpproduct_prices p ON p.id=l.product_id',
-																																	'o.active=1 AND o.manager_id='.$id.' AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'"
-																																	GROUP BY (l.product_id)'
-																																	);
-			}
-			else
-			{
 
-				$return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields,ERPStoresManagersOperations::class,['l.product_id'=>'product__id','l.code'=>'code','l.name'=>'name','IFNULL(ROUND(SUM(p.price*l.quantity),2),0)'=>'suma'],
+			if($store){
+
+			$return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields,ERPStoresManagersOperations::class,['l.product_id'=>'product__id','l.code'=>'code','l.name'=>'name','IFNULL(ROUND(SUM(IFNULL(of.price,p.price)*l.quantity),2),0)'=>'suma'],
 																																	'erpstores_managers_operations_lines l
 																																	LEFT JOIN erpstores_managers_operations o ON o.id=l.operation_id
-																																	LEFT JOIN erpproduct_prices p ON p.id=l.product_id',
-																																	'o.active=1 AND o.manager_id='.$id.' AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'"
+																																	LEFT JOIN erpstores_managers m ON m.id=o.manager_id
+																																	LEFT JOIN erpoffer_prices of ON of.id=l.product_id AND of.customer_id=m.customer_id
+																																	LEFT JOIN erpproduct_prices p ON p.id=l.product_id
+																																	LEFT JOIN erpproducts pr ON pr.id=p.product_id',
+																																	'o.active=1 AND o.manager_id='.$id.' AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'" AND o.store_id='.$store.'
 																																	GROUP BY (l.product_id)'
 																																	);
 
+		  }
+			else{
+
+			$return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields,ERPStoresManagersOperations::class,['l.product_id'=>'product__id','l.code'=>'code','l.name'=>'name','IFNULL(ROUND(SUM(IFNULL(of.price,p.price)*l.quantity),2),0)'=>'suma'],
+																																		'erpstores_managers_operations_lines l
+																																		LEFT JOIN erpstores_managers_operations o ON o.id=l.operation_id
+																																		LEFT JOIN erpstores_managers m ON m.id=o.manager_id
+																																		LEFT JOIN erpoffer_prices of ON of.id=l.product_id AND of.customer_id=m.customer_id
+																																		LEFT JOIN erpproduct_prices p ON p.id=l.product_id
+																																		LEFT JOIN erpproducts pr ON pr.id=p.product_id',
+																																		'o.active=1 AND o.manager_id='.$id.' AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'"
+																																		GROUP BY (l.product_id)'
+																																		);
+
 			}
+
 			return new JsonResponse($return);
 
 		}
+
+
+
+		/**
+		 * @Route("/{_locale}/erp/storesmanagers/operations/reportsdetailedlist", name="consumersReportsDetailedList")
+		 */
+		 public function consumersReportsDetailedList(RouterInterface $router,Request $request)
+		 {
+			 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			 $user = $this->getUser();
+			 $locale = $request->getLocale();
+			 $this->router = $router;
+			 $manager = $this->getDoctrine()->getManager();
+			 $repository = $manager->getRepository($this->class);
+			 $consumerid=$request->query->get("consumerid",$request->request->get("consumerid"));
+			 $start=	$request->query->get("datefrom",$request->request->get("datefrom"));
+			 $store=	$request->query->get("store",$request->request->get("store"));
+			 if($store=="-1") $store=null;
+
+			 $datefrom=date_create_from_format('d/m/Y',$start);
+			 $end=	$request->query->get("dateto",$request->request->get("dateto"));
+			 $dateto=date_create_from_format('d/m/Y',$end);
+			 if($datefrom)	$start=$datefrom->format("Y-m-d");
+			 else{
+					$start=new \Datetime();
+					$start->setTimestamp(0);
+					$start=$start->format("Y-m-d");
+			 }
+			 if($dateto)	$end=$dateto->format("Y-m-d");
+			 else{
+					$end=new \Datetime();
+					$end=$end->format("Y-m-d");
+				}
+
+			 $listUtils=new GlobaleListUtils();
+			 $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersConsumersOperationsDetailedReports.json"),true);
+
+			 if($consumerid)
+			 {
+					 if($store)
+					 {
+					 $return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields,ERPStoresManagersOperationsLines::class,['l.product_id'=>'id','o.date'=>'date','l.code'=>'code','l.name'=>'name','s.name'=>'store__name','l.quantity'=>'quantity','p.price'=>'price','IFNULL(ROUND(IFNULL(of.price,p.price)*l.quantity,2),0)'=>'total'],
+																																			 'erpstores_managers_operations_lines l
+																																			 LEFT JOIN erpstores_managers_operations o ON o.id=l.operation_id
+																																			 LEFT JOIN erpstores_managers m ON m.id=o.manager_id
+																																			 LEFT JOIN erpoffer_prices of ON of.id=l.product_id AND of.customer_id=m.customer_id
+ 																																			 LEFT JOIN erpproduct_prices p ON p.id=l.product_id
+																																			 LEFT JOIN erpstores s ON s.id=o.store_id',
+																																			 'o.active=1 AND o.consumer_id='.$consumerid.' AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'" AND o.store_id='.$store);
+					 }
+					 else{
+						 dump("aqui");
+						 $return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields,ERPStoresManagersOperationsLines::class,['l.product_id'=>'id','o.date'=>'date','l.code'=>'code','l.name'=>'name','s.name'=>'store__name','l.quantity'=>'quantity','p.price'=>'price','IFNULL(ROUND(IFNULL(of.price,p.price)*l.quantity,2),0)'=>'total'],
+																																				 'erpstores_managers_operations_lines l
+																																				 LEFT JOIN erpstores_managers_operations o ON o.id=l.operation_id
+																																				 LEFT JOIN erpstores_managers m ON m.id=o.manager_id
+																																				 LEFT JOIN erpoffer_prices of ON of.id=l.product_id AND of.customer_id=m.customer_id
+																																					LEFT JOIN erpproduct_prices p ON p.id=l.product_id
+																																				 LEFT JOIN erpstores s ON s.id=o.store_id',
+																																				 'o.active=1 AND o.consumer_id='.$consumerid.' AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'"');
+
+					 }
+		 	 }
+			else{
+
+				if($store)
+				{
+				$return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields,ERPStoresManagersOperationsLines::class,['l.product_id'=>'id','o.date'=>'date','l.code'=>'code','l.name'=>'name','s.name'=>'store__name','l.quantity'=>'quantity','p.price'=>'price','IFNULL(ROUND(IFNULL(of.price,p.price)*l.quantity,2),0)'=>'total'],
+																																		'erpstores_managers_operations_lines l
+																																		LEFT JOIN erpstores_managers_operations o ON o.id=l.operation_id
+																																		LEFT JOIN erpstores_managers m ON m.id=o.manager_id
+																																		LEFT JOIN erpoffer_prices of ON of.id=l.product_id AND of.customer_id=m.customer_id
+																																		LEFT JOIN erpproduct_prices p ON p.id=l.product_id
+																																		LEFT JOIN erpstores s ON s.id=o.store_id',
+																																		'o.active=1 AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'" AND o.store_id='.$store);
+				}
+				else{
+					$return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields,ERPStoresManagersOperationsLines::class,['l.product_id'=>'id','o.date'=>'date','l.code'=>'code','l.name'=>'name','s.name'=>'store__name','l.quantity'=>'quantity','p.price'=>'price','IFNULL(ROUND(IFNULL(of.price,p.price)*l.quantity,2),0)'=>'total'],
+																																			'erpstores_managers_operations_lines l
+																																			LEFT JOIN erpstores_managers_operations o ON o.id=l.operation_id
+																																			LEFT JOIN erpstores_managers m ON m.id=o.manager_id
+																																			LEFT JOIN erpoffer_prices of ON of.id=l.product_id AND of.customer_id=m.customer_id
+																																			LEFT JOIN erpproduct_prices p ON p.id=l.product_id
+																																			LEFT JOIN erpstores s ON s.id=o.store_id',
+																																			'o.active=1 AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'"');
+
+				}
+
+			}
+			 return new JsonResponse($return);
+
+
+		 }
+
 
 
 

@@ -1,0 +1,36 @@
+[
+  {
+      "name": "id",
+      "caption": "id"
+  },
+  {
+      "name": "date",
+      "caption": "date"
+  },
+  {
+      "name": "code",
+      "caption": "código"
+  },
+  {
+      "name": "name",
+      "caption": "name"
+  },
+  {
+      "name": "store__name",
+      "caption": "store"
+  },
+  {
+      "name": "quantity",
+      "caption": "quantity"
+  },
+  {
+      "name": "price",
+      "caption": "price"
+  },
+    {
+      "name": "total",
+      "caption": "Importe gastado",
+      "sum":true,
+      "unity":"€"
+  }
+]

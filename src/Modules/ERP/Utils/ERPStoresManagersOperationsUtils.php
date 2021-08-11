@@ -39,7 +39,7 @@ class ERPStoresManagersOperationsUtils
     return $list;
   }
 
-  public function formatConsumersReportsList($id,$start,$end){
+  public function formatConsumersReportsList($id,$start,$end,$store){
     $list=[
       'id' => 'list'.$this->name,
       'route' => 'consumersreportslist',
@@ -47,7 +47,8 @@ class ERPStoresManagersOperationsUtils
                         "module" => $this->module,
                         "name" => $this->name,
                         "start" => $start,
-                        "end" => $end],
+                        "end" => $end,
+                        "store" => $store],
       'orderColumn' => 2,
       'orderDirection' => 'DESC',
       'tagColumn' => 2,

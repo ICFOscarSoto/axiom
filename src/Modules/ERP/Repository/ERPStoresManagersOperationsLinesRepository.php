@@ -49,8 +49,12 @@ class ERPStoresManagersOperationsLinesRepository extends ServiceEntityRepository
     */
 
     public function getProductsByConsumer($manager, $start, $end, $store){
-    $date_start=$start->format("Y-m-d");
-    $date_end=$end->format("Y-m-d");
+    if($start) $date_start=$start->format("Y-m-d");
+    else $date_start=null;
+
+    if($end)  $date_end=$end->format("Y-m-d");
+    else $date_end=null;
+
     if($store==null){
 
     $query="SELECT c.id, c.NAME, IFNULL(c.lastname,'') lastname, SUM(l.quantity) total
@@ -85,8 +89,11 @@ class ERPStoresManagersOperationsLinesRepository extends ServiceEntityRepository
 
 
   public function getBestProducts($manager, $start, $end, $store){
-  $date_start=$start->format("Y-m-d");
-  $date_end=$end->format("Y-m-d");
+    if($start) $date_start=$start->format("Y-m-d");
+    else $date_start=null;
+
+    if($end)  $date_end=$end->format("Y-m-d");
+    else $date_end=null;
 
   if($store==null){
     $query="SELECT l.product_id, l.code, l.name, SUM(l.quantity) total

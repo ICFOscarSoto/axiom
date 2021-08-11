@@ -64,15 +64,30 @@ class ERPStoresManagersOperationsRepository extends ServiceEntityRepository
 
     public function getOperationsByConsumer($manager, $start, $end, $store)
     {
-    $date_start=$start->format("Y-m-d");
-    $date_end=$end->format("Y-m-d");
+
+    if($start) $date_start=$start->format("Y-m-d");
+    else{
+      $date_start=new \Datetime();
+      $date_start->setTimestamp(0);
+      $date_start=$date_start->format("Y-m-d");
+
+    }
+
+
+    if($end)  $date_end=$end->format("Y-m-d");
+    else {
+      $date_end=new \Datetime();
+      $date_end=$date_end->format("Y-m-d");
+    }
 
     if($store==null){
-        $query="SELECT c.id, c.NAME, IFNULL(c.lastname,'') lastname, COUNT(c.id) total
+        $query="SELECT c.id, c.NAME, IFNULL(c.lastname,'') lastname, IFNULL(ROUND(SUM(p.price*l.quantity),2),0) total
         FROM erpstores_managers_operations o
         LEFT JOIN erpstores_managers_consumers c ON c.id=o.consumer_id
+        LEFT JOIN erpstores_managers_operations_lines l ON l.operation_id=o.id
+        LEFT JOIN erpproduct_prices p ON p.id=l.product_id
         WHERE o.active=1 AND o.manager_id=:MANAGER AND o.DATE >= :START AND o.DATE<=:END
-        GROUP BY(o.consumer_id) ORDER BY c.NAME, c.lastname";
+        GROUP BY(o.consumer_id) ORDER BY c.NAME, c.lastname LIMIT 10";
         $params=[
                  'MANAGER' => $manager,
                  'START' => $date_start,
@@ -82,11 +97,13 @@ class ERPStoresManagersOperationsRepository extends ServiceEntityRepository
     }
     else{
 
-      $query="SELECT c.id, c.NAME, IFNULL(c.lastname,'') lastname, COUNT(c.id) total
+      $query="SELECT c.id, c.NAME, IFNULL(c.lastname,'') lastname, IFNULL(ROUND(SUM(p.price*l.quantity),2),0) total
       FROM erpstores_managers_operations o
       LEFT JOIN erpstores_managers_consumers c ON c.id=o.consumer_id
+      LEFT JOIN erpstores_managers_operations_lines l ON l.operation_id=o.id
+      LEFT JOIN erpproduct_prices p ON p.id=l.product_id
       WHERE o.active=1 AND o.manager_id=:MANAGER AND o.DATE >= :START AND o.DATE<=:END AND o.store_id=:STORE
-      GROUP BY(o.consumer_id) ORDER BY c.NAME, c.lastname";
+      GROUP BY(o.consumer_id) ORDER BY c.NAME, c.lastname LIMIT 10";
       $params=[
 
                'MANAGER' => $manager,
@@ -107,8 +124,11 @@ class ERPStoresManagersOperationsRepository extends ServiceEntityRepository
 
   public function getDailyOperations($manager, $start, $end, $store)
   {
-      $date_start=$start->format("Y-m-d");
-      $date_end=$end->format("Y-m-d");
+    if($start) $date_start=$start->format("Y-m-d");
+    else $date_start=null;
+
+    if($end)  $date_end=$end->format("Y-m-d");
+    else $date_end=null;
 
       if($store==null){
           $query="SELECT COUNT(id) total, DATE_FORMAT(date,'%d-%m-%Y') date

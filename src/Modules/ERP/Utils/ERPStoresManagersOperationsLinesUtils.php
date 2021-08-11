@@ -39,7 +39,7 @@ class ERPStoresManagersOperationsLinesUtils
     return $list;
   }
 
-  public function formatProductsReportsList($id,$start,$end){
+  public function formatProductsReportsList($id,$start,$end,$store){
     $list=[
       'id' => 'list'.$this->name,
       'route' => 'productsreportslist',
@@ -47,13 +47,34 @@ class ERPStoresManagersOperationsLinesUtils
                         "module" => $this->module,
                         "name" => $this->name,
                         "start" => $start,
-                        "end" => $end],
+                        "end" => $end,
+                        "store" => $store],
       'orderColumn' => 2,
       'orderDirection' => 'DESC',
       'tagColumn' => 2,
       'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersProductsOperationsReports.json"),true),
       'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersProductsOperationsReportsFieldButtons.json"),true),
       'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersProductsOperationsReportsTopButtons.json"),true)
+    ];
+    return $list;
+  }
+
+  public function formatConsumersReportsDetailedList($consumerid,$start,$end,$store){
+    $list=[
+      'id' => 'list2'.$this->name,
+      'route' => 'consumersReportsDetailedList',
+      'routeParams' => ["module" => $this->module,
+                        "name" => "2".$this->name,
+                        "consumerid" => $consumerid,
+                        "start" => $start,
+                        "end" => $end,
+                        "store" => $store],
+      'orderColumn' => 2,
+      'orderDirection' => 'DESC',
+      'tagColumn' => 2,
+      'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersConsumersOperationsDetailedReports.json"),true),
+      'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersConsumersOperationsDetailedReportsFieldButtons.json"),true),
+      'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersConsumersOperationsDetailedReportsTopButtons.json"),true)
     ];
     return $list;
   }

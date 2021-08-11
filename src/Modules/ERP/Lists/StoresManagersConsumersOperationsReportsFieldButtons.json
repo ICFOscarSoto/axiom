@@ -1,1 +1,3 @@
-[{"id": "editStoresManagersReportsOperations", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"operationsForm", "actionType" : "foreground", "confirm" :false, "tooltip":""}]
+[
+{"id": "consumerDetailsButton", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"", "modal":"consumeroperations", "actionType" : "background", "confirm" :false} 
+]
