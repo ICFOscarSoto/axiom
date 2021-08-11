@@ -1083,6 +1083,7 @@ public function importOffers(InputInterface $input, OutputInterface $output) {
               else $offeraxiom->setEnd(date_create_from_format("Y-m-d h:i:s.u",$offer["endingdate"]["date"]));
               $this->doctrine->getManager()->persist($offeraxiom);
               $this->doctrine->getManager()->flush();
+              $output->writeln("Creamos nueva oferta");
 
             }
             else{
@@ -1104,6 +1105,7 @@ public function importOffers(InputInterface $input, OutputInterface $output) {
               $obj->setDeleted(0);
               $this->doctrine->getManager()->persist($obj);
               $this->doctrine->getManager()->flush();
+                $output->writeln("Actualizamos la oferta");
             }
 
 
