@@ -20,14 +20,13 @@ class ERPOfferPrices
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPProducts")
-     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPProducts", cascade={"persist"})
+     * @ORM\JoinColumn(nullable=false)
      */
     private $product;
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPCustomers")
-     * @ORM\JoinColumn(onDelete="CASCADE")
      */
     private $customer;
 
@@ -77,8 +76,8 @@ class ERPOfferPrices
     private $deleted;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCompanies")
-     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
+     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCompanies", cascade={"persist"})
+     * @ORM\JoinColumn(nullable=false)
      */
     private $company;
 
