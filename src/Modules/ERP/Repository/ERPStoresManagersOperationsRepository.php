@@ -104,7 +104,7 @@ class ERPStoresManagersOperationsRepository extends ServiceEntityRepository
       LEFT JOIN erpstores_managers m ON m.id=o.manager_id
       LEFT JOIN erpstores_managers_consumers c ON c.id=o.consumer_id
       LEFT JOIN erpstores_managers_operations_lines l ON l.operation_id=o.id
-      EFT JOIN erpoffer_prices of ON of.id=l.product_id AND of.customer_id=m.customer_id
+      LEFT JOIN erpoffer_prices of ON of.id=l.product_id AND of.customer_id=m.customer_id
       LEFT JOIN erpproduct_prices p ON p.id=l.product_id
       WHERE o.active=1 AND o.manager_id=:MANAGER AND o.DATE >= :START AND o.DATE<=:END AND o.store_id=:STORE
       GROUP BY(o.consumer_id) ORDER BY c.NAME, c.lastname LIMIT 10";
