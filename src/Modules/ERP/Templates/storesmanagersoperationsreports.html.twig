@@ -183,7 +183,13 @@ var chartConsumerOperationsOptions = {
     }],
     yAxes: [{
       id: "y-axis-total",
-      stacked: false
+      stacked: false,
+			ticks: {
+                    // Include a dollar sign in the ticks
+                    callback: function(value, index, values) {
+                        return value + '€';
+                    }
+			}
     }]
   }
 };
@@ -205,7 +211,13 @@ var chartBestProductsOptions = {
     }],
     yAxes: [{
       id: "y-axis-total",
-      stacked: false
+      stacked: false,
+			ticks: {
+                    // Include a dollar sign in the ticks
+                    callback: function(value, index, values) {
+                        return value + '€';
+                    }
+			}
     }]
   }
 };
@@ -389,7 +401,7 @@ $(document).ready(function() {
   });
 
 	stackedBarBestProducts = new Chart(ctxBestProducts, {
-    type: 'doughnut',
+    type: 'bar',
     data: [],
     options: chartBestProductsOptions
   });
