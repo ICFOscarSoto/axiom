@@ -58,44 +58,49 @@
         </div>
 				</br>
 				</br>
+					<hr>
+				<div class="row">
+          <div class="col-md-6">
+<!--
+					</br>
+					<button id="consumeroperations-export" style="display:none;" type="button" class="btn btn-default btn-icon icon-left">Exportar informe<i class="fa fa-download"></i></button>
+-->
+					</br>
+					</br>
+						<canvas id="ERPStoresManagersReports-consumeroperations-{{ id }}" width="100%"></canvas>
+					</div>
+					<div class="col-md-6">
+<!--
+					</br>
+					<button id="bestproducts-export" style="display:none;" type="button" class="btn btn-default btn-icon icon-left">Exportar informe<i class="fa fa-download"></i></button>
+-->
+					</br>
+					</br>
+						<canvas id="ERPStoresManagersReports-bestproducts-{{ id }}" width="100%"></canvas>
+					</div>
+				</div>
+				</br>
+				</br>
         <div class="row">
           <div class="col-md-12">
             <div class="panel-title-list">Consumos personal</div>
-							<div class="col-md-7">
-	            {% if consumersoperationslist is defined %}
-	            {% set listConstructor = consumersoperationslist %}
-	            {{ include('@Globale/list.html.twig') }}
-	            {% endif %}
-						</div>
-						</br></br></br></br></br>
-						<div class="col-md-5 overflow-auto" style="border:1px solid #ccc">
-							</br>
-
-							<button id="consumeroperations-export" style="display:none;" type="button" class="btn btn-default btn-icon icon-left">Exportar informe<i class="fa fa-download"></i></button>
-							</br>
-							</br>
-								<canvas id="ERPStoresManagersReports-consumeroperations-{{ id }}" width="100%"></canvas>
-						</div>
+							<div class="col-md-12">
+		            {% if consumersoperationslist is defined %}
+		            {% set listConstructor = consumersoperationslist %}
+		            {{ include('@Globale/list.html.twig') }}
+		            {% endif %}
+							</div>
           </div>
         </div>
 			</br>
 			</br>
 				<div class="row">
-					<div class="col-md-7">
+					<div class="col-md-12">
 						<div class="panel-title-list">Ranking productos</div>
 						{% if productslist is defined %}
 						{% set listConstructor = productslist %}
 						{{ include('@Globale/list.html.twig') }}
 						{% endif %}
-					</div>
-					</br></br></br></br></br></br></br></br>
-					<div class="col-md-5 overflow-auto" style="border:1px solid #ccc">
-						</br>
-
-						<button id="bestproducts-export" style="display:none;" type="button" class="btn btn-default btn-icon icon-left">Exportar informe<i class="fa fa-download"></i></button>
-						</br>
-						</br>
-							<canvas id="ERPStoresManagersReports-bestproducts-{{ id }}" width="100%"></canvas>
 					</div>
 			</div>
         </div>

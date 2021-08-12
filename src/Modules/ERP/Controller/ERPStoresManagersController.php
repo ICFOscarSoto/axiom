@@ -70,7 +70,7 @@ class ERPStoresManagersController extends Controller
 			$repository=$this->getDoctrine()->getRepository($this->class);
 
 			$tabs=[
-				["name" => "data", "icon"=>"fa fa-id-card", "caption"=>"Managers data", "active"=>true, "route"=>$this->generateUrl("dataStoresManagers",["id"=>$id])],
+				["name" => "data", "icon"=>"fa fa-id-card", "caption"=>"Manager data", "active"=>true, "route"=>$this->generateUrl("dataStoresManagers",["id"=>$id])],
 				["name" => "storesmanagersusers", "caption"=>"Users", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("listStoresManagersUsers",["id"=>$id])],
 				["name" => "storesmanagersconsumers", "caption"=>"Consumidores", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("listStoresManagersConsumers",["id"=>$id])],
 				["name" => "storesmanagersoperationsreports", "caption"=>"Reports", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("storesManagersOperationsReports",["id"=>$id])]

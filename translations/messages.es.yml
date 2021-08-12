@@ -469,8 +469,12 @@ Select erpmanufacturers: Seleccionar marca
 Onbuy: Se compra
 Netprice: Neto
 ShoppingPrice: Precio de compra
-Vaiants: Variantes
+Variants: Variantes
 Checkweb: Producto Web
+pendingToReceive: Pendiente de Recibir
+pendingToServe: Pendiente de Servir
+minimumQuantity: Cantidad Mínima
+maximumQuantity: Cantidad Máxima
 
 
 # WEB PRODUCT DATA
@@ -675,3 +679,9 @@ Summoneds: Participantes
 witness: Asiste
 sendedSummon: Enviada convocatoria
 MeetingsSummoneds: Participantes
+
+
+#STORE MANAGERS
+#----------------------------------------------------------------------------------------------------------------------
+Manager data: Datos del gestor
+Reports: Informes
