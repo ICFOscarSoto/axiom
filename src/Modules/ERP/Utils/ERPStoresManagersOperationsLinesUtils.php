@@ -79,5 +79,25 @@ class ERPStoresManagersOperationsLinesUtils
     return $list;
   }
 
+  public function formatProductsReportsDetailedList($productid,$start,$end,$store){
+    $list=[
+      'id' => 'list3'.$this->name,
+      'route' => 'productsReportsDetailedList',
+      'routeParams' => ["module" => $this->module,
+                        "name" => "3".$this->name,
+                        "productid" => $productid,
+                        "start" => $start,
+                        "end" => $end,
+                        "store" => $store],
+      'orderColumn' => 2,
+      'orderDirection' => 'DESC',
+      'tagColumn' => 2,
+      'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersProductsOperationsDetailedReports.json"),true),
+      'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersProductsOperationsDetailedReportsFieldButtons.json"),true),
+      'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersProductsOperationsDetailedReportsTopButtons.json"),true)
+    ];
+    return $list;
+  }
+
 
 }

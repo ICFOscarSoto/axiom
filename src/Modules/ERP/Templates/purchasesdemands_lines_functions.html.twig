@@ -71,6 +71,7 @@
 
     function saveLines()
     {
+        if((++load_wait)==1) $("#load-spinner").fadeIn();
       $.ajax({
          url: '{{ url('dataERPPurchasesDemands') }}',
          type: 'POST',
@@ -123,6 +124,24 @@
     }
 
 
+
+    function removePurchasesDemandsLine(numLine){
+    //  var workListLines=$("#worklist-lines");
+    //  var numLines=parseInt(worklistLines.attr("attr-numlines"));
+    //  if(numLines!=numLine){
+         //$("#document-line-"+numLine).remove();
+         $("#purchasesdemands-line-"+numLine).addClass("deleted");
+
+         $("#purchasesdemands-line-"+numLine).fadeOut();
+         $("#purchasesdemands-line-"+numLine).attr("id","purchasesdemands-line-deleted");
+         //documentLines.attr("attr-numlines",numLines);
+         //numerateLines();
+    //  }
+        saveLines();
+        numerateLines();
+      //  saveLines();
+
+    }
 
     function findPurchaseOrder(id){
       var productid=$("#product-form-id-"+id).val();

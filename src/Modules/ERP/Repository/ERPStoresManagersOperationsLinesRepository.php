@@ -47,7 +47,7 @@ class ERPStoresManagersOperationsLinesRepository extends ServiceEntityRepository
         ;
     }
     */
-
+/*
     public function getProductsByConsumer($manager, $start, $end, $store){
     if($start) $date_start=$start->format("Y-m-d");
     else $date_start=null;
@@ -84,22 +84,33 @@ class ERPStoresManagersOperationsLinesRepository extends ServiceEntityRepository
     $result=$this->getEntityManager()->getConnection()->executeQuery($query,$params)->fetchAll();
     return $result;
 
-      }
+    }
 
-
+*/
 
   public function getBestProducts($manager, $start, $end, $store){
     if($start) $date_start=$start->format("Y-m-d");
-    else $date_start=null;
+    else{
+      $date_start=new \Datetime();
+      $date_start->setTimestamp(0);
+      $date_start=$date_start->format("Y-m-d");
+
+    }
+
 
     if($end)  $date_end=$end->format("Y-m-d");
-    else $date_end=null;
+    else {
+      $date_end=new \Datetime();
+      $date_end=$date_end->format("Y-m-d");
+    }
 
   if($store==null){
-    $query="SELECT l.product_id, l.code, l.name, SUM(l.quantity) total
+    $query="SELECT l.product_id, l.code, l.name, IFNULL(ROUND(SUM(IFNULL(of.price,p.price)*l.quantity),2),0) total
     FROM erpstores_managers_operations_lines l
     LEFT JOIN erpstores_managers_operations o ON l.operation_id=o.id
     LEFT JOIN erpstores_managers m ON m.id=o.manager_id
+    LEFT JOIN erpoffer_prices of ON of.id=l.product_id AND of.customer_id=m.customer_id
+    LEFT JOIN erpproduct_prices p ON p.id=l.product_id
     WHERE o.active=1 AND m.id=:MANAGER AND o.DATE >= :START AND o.DATE<=:END
     GROUP BY(l.code)  ORDER BY total DESC LIMIT 10";
     $params=['MANAGER' => $manager,
@@ -109,10 +120,12 @@ class ERPStoresManagersOperationsLinesRepository extends ServiceEntityRepository
   }
   else{
 
-    $query="SELECT l.product_id, l.code, l.name, SUM(l.quantity) total
+    $query="SELECT l.product_id, l.code, l.name, IFNULL(ROUND(SUM(IFNULL(of.price,p.price)*l.quantity),2),0) total
     FROM erpstores_managers_operations_lines l
     LEFT JOIN erpstores_managers_operations o ON l.operation_id=o.id
     LEFT JOIN erpstores_managers m ON m.id=o.manager_id
+    LEFT JOIN erpoffer_prices of ON of.id=l.product_id AND of.customer_id=m.customer_id
+    LEFT JOIN erpproduct_prices p ON p.id=l.product_id
     WHERE o.active=1 AND m.id=:MANAGER AND o.DATE >= :START AND o.DATE<=:END AND o.store_id=:STORE
     GROUP BY(l.code)  ORDER BY total DESC LIMIT 10";
     $params=['MANAGER' => $manager,

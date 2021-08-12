@@ -205,28 +205,28 @@ class ERPOfferPricesRepository extends ServiceEntityRepository
     }
 
 
-    public function getOfferId($product,$customer,$qty,$start)
+    public function getOfferId($product,$customer,$qty,$price)
     {
       if($customer!=NULL){
         $query="SELECT o.id as id
         FROM erpoffer_prices o
-        WHERE o.product_id=:PROD AND o.customer_id=:CST AND o.quantity=:QTY AND o.type=2 AND (DATE(START)=DATE(:DATE_START))";
+        WHERE o.product_id=:PROD AND o.customer_id=:CST AND o.quantity=:QTY AND o.type=2 AND o.price=:PRICE";
         $params=[
         'PROD' => $product->getId(),
         'CST' => $customer->getId(),
         'QTY' => $qty,
-        'DATE_START' => $start
+        'PRICE' => $price
         ];
         return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetch();
      }
      else{
        $query="SELECT o.id as id
        FROM erpoffer_prices o
-       WHERE o.product_id=:PROD AND o.customer_id IS NULL AND o.quantity=:QTY AND o.type=2 AND (DATE(START)=DATE(:DATE_START))";
+       WHERE o.product_id=:PROD AND o.customer_id IS NULL AND o.quantity=:QTY AND o.type=2 AND o.price=:PRICE";
        $params=[
        'PROD' => $product->getId(),
        'QTY' => $qty,
-       'DATE_START' => $start
+        'PRICE' => $price
        ];
        return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetch();
      }

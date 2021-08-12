@@ -356,7 +356,7 @@ function getData(){
   if($("#date-from").val()!="")
     if((++load_wait)==1) $("#load-spinner").fadeIn();
     $.ajax({
-     url: '{{ url('storesManagersGetReports', {"id": id}) }}',
+     url: '{{ url('storesManagersOperationsGetReports', {"id": id}) }}',
      type: 'POST',
      data: 'start='+$("#date-from").val()+'&end='+$("#date-to").val()+'&store='+$('#stores').val(),
   //   data: JSON.stringify(data),
