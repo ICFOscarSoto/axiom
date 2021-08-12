@@ -608,10 +608,11 @@ class ERPStoresManagersOperationsController extends Controller
 
 			if($store)
 			{
-			$return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields,ERPStoresManagersOperations::class,['o.consumer_id'=>'id','concat(c.name," ",c.lastname)'=>'consumer__name_o_consumer__lastname','c.idcard'=>'consumer__idcard','c.code2'=>'consumer__code2','IFNULL(ROUND(SUM(IFNULL(of.price,p.price)*l.quantity),2),0)'=>'prueba'],
+			$return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields,ERPStoresManagersOperations::class,['o.consumer_id'=>'id','concat(u.name," ",IFNULL(u.lastname,""))'=>'agent__name_o_agent__lastname','concat(c.name," ",c.lastname)'=>'consumer__name_o_consumer__lastname','c.idcard'=>'consumer__idcard','c.code2'=>'consumer__code2','IFNULL(ROUND(SUM(IFNULL(of.price,p.price)*l.quantity),2),0)'=>'prueba'],
 																																	'erpstores_managers_operations o
 																																	LEFT JOIN erpstores_managers m ON m.id=o.manager_id
 																																	LEFT JOIN erpstores_managers_consumers c ON c.id=o.consumer_id
+																																	LEFT JOIN globale_users u ON u.id=o.agent_id
 																																	LEFT JOIN erpstores_managers_operations_lines l ON l.operation_id=o.id
 																																	LEFT JOIN erpoffer_prices of ON of.id=l.product_id AND of.customer_id=m.customer_id
 																																	LEFT JOIN erpproduct_prices p ON p.id=l.product_id',
@@ -620,10 +621,11 @@ class ERPStoresManagersOperationsController extends Controller
 																																	);
 			}
 			else{
-				$return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields,ERPStoresManagersOperations::class,['o.consumer_id'=>'id','concat(c.name," ",c.lastname)'=>'consumer__name_o_consumer__lastname','c.idcard'=>'consumer__idcard','c.code2'=>'consumer__code2','IFNULL(ROUND(SUM(IFNULL(of.price,p.price)*l.quantity),2),0)'=>'prueba'],
+				$return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields,ERPStoresManagersOperations::class,['o.consumer_id'=>'id','concat(u.name," ",IFNULL(u.lastname,""))'=>'agent__name_o_agent__lastname','concat(c.name," ",c.lastname)'=>'consumer__name_o_consumer__lastname','c.idcard'=>'consumer__idcard','c.code2'=>'consumer__code2','IFNULL(ROUND(SUM(IFNULL(of.price,p.price)*l.quantity),2),0)'=>'prueba'],
 																																		'erpstores_managers_operations o
 																																		LEFT JOIN erpstores_managers m ON m.id=o.manager_id
 																																		LEFT JOIN erpstores_managers_consumers c ON c.id=o.consumer_id
+																																		LEFT JOIN globale_users u ON u.id=o.agent_id
 																																		LEFT JOIN erpstores_managers_operations_lines l ON l.operation_id=o.id
 																																		LEFT JOIN erpoffer_prices of ON of.id=l.product_id AND of.customer_id=m.customer_id
 																																		LEFT JOIN erpproduct_prices p ON p.id=l.product_id',
