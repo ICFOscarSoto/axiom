@@ -1049,7 +1049,7 @@ public function importOffers(InputInterface $input, OutputInterface $output) {
   $datetime=new \DateTime();
   $output->writeln('* Sincronizando ofertas....');
   $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
-  $company=$repositoryCompanies->find(2);
+
   $repositoryCustomers=$this->doctrine->getRepository(ERPCustomers::class);
   $repositoryOfferPrices=$this->doctrine->getRepository(ERPOfferPrices::class);
   $repository=$this->doctrine->getRepository(ERPProducts::class);
@@ -1062,6 +1062,8 @@ public function importOffers(InputInterface $input, OutputInterface $output) {
     $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getOffers.php?product='.$product->getCode());
     $objects=json_decode($json, true);
     $objects=$objects[0];
+    $company=$repositoryCompanies->find(2);
+
     foreach ($objects["class"] as $offer){
 
           //oferta para un solo cliente
@@ -1082,7 +1084,6 @@ public function importOffers(InputInterface $input, OutputInterface $output) {
                 else $offeraxiom->setEnd(date_create_from_format("Y-m-d h:i:s.u",$offer["endingdate"]["date"]));
                 //dump($offeraxiom);
                 $this->doctrine->getManager()->persist($offeraxiom);
-                $this->doctrine->getManager()->flush();
                 $output->writeln("Actualizamos la oferta");
 
               }
@@ -1105,7 +1106,6 @@ public function importOffers(InputInterface $input, OutputInterface $output) {
               $obj->setDeleted(0);
 
               $this->doctrine->getManager()->persist($obj);
-              $this->doctrine->getManager()->flush();
               $output->writeln("Creamos la oferta");
             }
 
@@ -1153,9 +1153,11 @@ public function importOffers(InputInterface $input, OutputInterface $output) {
 
           }
 
+
       }
-      $this->doctrine->getManager()->clear();
+
    }
+     $this->doctrine->getManager()->clear();
    //------   Critical Section END   ------
    //------   Remove Lock Mutex    ------
    fclose($fp);
