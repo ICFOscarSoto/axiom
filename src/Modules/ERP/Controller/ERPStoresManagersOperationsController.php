@@ -681,7 +681,7 @@ class ERPStoresManagersOperationsController extends Controller
 																																	LEFT JOIN erpproduct_prices p ON p.id=l.product_id
 																																	LEFT JOIN erpproducts pr ON pr.id=p.product_id',
 																																	'o.active=1 AND o.manager_id='.$id.' AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'" AND o.store_id='.$store.'
-																																	GROUP BY (l.product_id)'
+																																	GROUP BY (l.product_id)',null
 																																	);
 
 		  }
@@ -695,7 +695,7 @@ class ERPStoresManagersOperationsController extends Controller
 																																		LEFT JOIN erpproduct_prices p ON p.id=l.product_id
 																																		LEFT JOIN erpproducts pr ON pr.id=p.product_id',
 																																		'o.active=1 AND o.manager_id='.$id.' AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'"
-																																		GROUP BY (l.product_id)'
+																																		GROUP BY (l.product_id)',null
 																																		);
 
 			}
@@ -751,7 +751,7 @@ class ERPStoresManagersOperationsController extends Controller
 																																			 LEFT JOIN erpoffer_prices of ON of.id=l.product_id AND of.customer_id=m.customer_id
  																																			 LEFT JOIN erpproduct_prices p ON p.id=l.product_id
 																																			 LEFT JOIN erpstores s ON s.id=o.store_id',
-																																			 'o.active=1 AND o.consumer_id='.$consumerid.' AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'" AND o.store_id='.$store);
+																																			 'o.active=1 AND o.consumer_id='.$consumerid.' AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'" AND o.store_id='.$store,null);
 					 }
 					 else{
 						 $return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields,ERPStoresManagersOperationsLines::class,['l.product_id'=>'id','o.date'=>'date','l.code'=>'code','l.name'=>'name','s.name'=>'store__name','l.quantity'=>'quantity','IFNULL(of.price,p.price)'=>'price','IFNULL(ROUND(IFNULL(of.price,p.price)*l.quantity,2),0)'=>'total'],
@@ -761,7 +761,7 @@ class ERPStoresManagersOperationsController extends Controller
 																																				 LEFT JOIN erpoffer_prices of ON of.id=l.product_id AND of.customer_id=m.customer_id
 																																					LEFT JOIN erpproduct_prices p ON p.id=l.product_id
 																																				 LEFT JOIN erpstores s ON s.id=o.store_id',
-																																				 'o.active=1 AND o.consumer_id='.$consumerid.' AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'"');
+																																				 'o.active=1 AND o.consumer_id='.$consumerid.' AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'"',null);
 
 					 }
 		 	 }
@@ -776,7 +776,7 @@ class ERPStoresManagersOperationsController extends Controller
 																																		LEFT JOIN erpoffer_prices of ON of.id=l.product_id AND of.customer_id=m.customer_id
 																																		LEFT JOIN erpproduct_prices p ON p.id=l.product_id
 																																		LEFT JOIN erpstores s ON s.id=o.store_id',
-																																		'o.active=1 AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'" AND o.store_id='.$store);
+																																		'o.active=1 AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'" AND o.store_id='.$store,null);
 				}
 				else{
 					$return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields,ERPStoresManagersOperationsLines::class,['l.product_id'=>'id','o.date'=>'date','l.code'=>'code','l.name'=>'name','s.name'=>'store__name','l.quantity'=>'quantity','IFNULL(of.price,p.price)'=>'price','IFNULL(ROUND(IFNULL(of.price,p.price)*l.quantity,2),0)'=>'total'],
@@ -786,7 +786,7 @@ class ERPStoresManagersOperationsController extends Controller
 																																			LEFT JOIN erpoffer_prices of ON of.id=l.product_id AND of.customer_id=m.customer_id
 																																			LEFT JOIN erpproduct_prices p ON p.id=l.product_id
 																																			LEFT JOIN erpstores s ON s.id=o.store_id',
-																																			'o.active=1 AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'"');
+																																			'o.active=1 AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'"',null);
 
 				}
 
@@ -841,7 +841,7 @@ class ERPStoresManagersOperationsController extends Controller
 																																				LEFT JOIN erpoffer_prices of ON of.id=l.product_id AND of.customer_id=m.customer_id
 																																				LEFT JOIN erpproduct_prices p ON p.id=l.product_id
 																																				LEFT JOIN erpstores s ON s.id=o.store_id',
-																																				'o.active=1 AND l.product_id='.$productid.' AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'" AND o.store_id='.$store);
+																																				'o.active=1 AND l.product_id='.$productid.' AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'" AND o.store_id='.$store,null);
 						}
 						else{
 							$return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields,ERPStoresManagersOperationsLines::class,['l.product_id'=>'id','o.date'=>'date','l.code'=>'code','l.name'=>'name','concat(c.name," ",c.lastname)'=>'consumer__name_o_consumer__lastname','s.name'=>'store__name','l.quantity'=>'quantity','IFNULL(of.price,p.price)'=>'price','IFNULL(ROUND(IFNULL(of.price,p.price)*l.quantity,2),0)'=>'total'],
@@ -852,7 +852,7 @@ class ERPStoresManagersOperationsController extends Controller
 																																					LEFT JOIN erpoffer_prices of ON of.id=l.product_id AND of.customer_id=m.customer_id
 																																					 LEFT JOIN erpproduct_prices p ON p.id=l.product_id
 																																					LEFT JOIN erpstores s ON s.id=o.store_id',
-																																					'o.active=1 AND l.product_id='.$productid.' AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'"');
+																																					'o.active=1 AND l.product_id='.$productid.' AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'"',null);
 
 						}
 				}
@@ -867,7 +867,7 @@ class ERPStoresManagersOperationsController extends Controller
 																																		 LEFT JOIN erpoffer_prices of ON of.id=l.product_id AND of.customer_id=m.customer_id
 																																		 LEFT JOIN erpproduct_prices p ON p.id=l.product_id
 																																		 LEFT JOIN erpstores s ON s.id=o.store_id',
-																																		 'o.active=1 AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'" AND o.store_id='.$store);
+																																		 'o.active=1 AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'" AND o.store_id='.$store,null);
 				 }
 				 else{
 					 $return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields,ERPStoresManagersOperationsLines::class,['l.product_id'=>'id','o.date'=>'date','l.code'=>'code','l.name'=>'name','concat(c.name," ",c.lastname)'=>'consumer__name_o_consumer__lastname','s.name'=>'store__name','l.quantity'=>'quantity','IFNULL(of.price,p.price)'=>'price','IFNULL(ROUND(IFNULL(of.price,p.price)*l.quantity,2),0)'=>'total'],
@@ -878,7 +878,7 @@ class ERPStoresManagersOperationsController extends Controller
 																																			 LEFT JOIN erpoffer_prices of ON of.id=l.product_id AND of.customer_id=m.customer_id
 																																			 LEFT JOIN erpproduct_prices p ON p.id=l.product_id
 																																			 LEFT JOIN erpstores s ON s.id=o.store_id',
-																																			 'o.active=1 AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'"');
+																																			 'o.active=1 AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'"',null);
 
 				 }
 
