@@ -67,7 +67,7 @@
 -->
 					</br>
 					</br>
-						<canvas id="ERPStoresManagersReports-consumeroperations-{{ id }}" width="100%"></canvas>
+						<canvas id="ERPStoresManagersOperationsReports-consumeroperations-{{ id }}" width="100%"></canvas>
 					</div>
 					<div class="col-md-6">
 <!--
@@ -76,7 +76,7 @@
 -->
 					</br>
 					</br>
-						<canvas id="ERPStoresManagersReports-bestproducts-{{ id }}" width="100%"></canvas>
+						<canvas id="ERPStoresManagersOperationsReports-bestproducts-{{ id }}" width="100%"></canvas>
 					</div>
 				</div>
 				</br>
@@ -110,8 +110,8 @@
 {{ include('@ERP/storesmanagersoperationsreports_details.html.twig') }}
 {{ include('@ERP/storesmanagersoperationsreports_validation.html.twig') }}
 <script>
-var ctxConsumerOperations = document.getElementById('ERPStoresManagersReports-consumeroperations-{{ id }}');
-var ctxBestProducts = document.getElementById('ERPStoresManagersReports-bestproducts-{{ id }}');
+var ctxConsumerOperations = document.getElementById('ERPStoresManagersOperationsReports-consumeroperations-{{ id }}');
+var ctxBestProducts = document.getElementById('ERPStoresManagersOperationsReports-bestproducts-{{ id }}');
 
 var stackedBar;
 
@@ -198,7 +198,7 @@ var chartConsumerOperationsOptions = {
   onClick: function(e){
       var element = this.getElementAtEvent(e);
       if(element.length > 0){
-          $("#{{ id }}-ERPStoresManagersReports-consumeroperations-modal").modal('toggle');
+          $("#{{ id }}-ERPStoresManagersOperationsReports-consumeroperations-modal").modal('toggle');
           //console.log("Clicked on a bar with index: "+element[0]._index+". Now this bar should be marked as active.");
         }
   },
@@ -226,7 +226,7 @@ var chartBestProductsOptions = {
   onClick: function(e){
       var element = this.getElementAtEvent(e);
       if(element.length > 0){
-          $("#{{ id }}-ERPStoresManagersReports-bestproducts-modal").modal('toggle');
+          $("#{{ id }}-ERPStoresManagersOperationsReports-bestproducts-modal").modal('toggle');
           //console.log("Clicked on a bar with index: "+element[0]._index+". Now this bar should be marked as active.");
         }
   },

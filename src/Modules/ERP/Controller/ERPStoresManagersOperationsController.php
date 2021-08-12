@@ -507,7 +507,7 @@ class ERPStoresManagersOperationsController extends Controller
 						 'controllerName' => 'storesManagersOperationsController',
 						 'interfaceName' => 'StoresManagesReports',
 						 'optionSelected' => 'genericindex',
-						 'optionSelectedParams' => ["module"=>"ERP", "name"=>"StoresManagersReports"],
+						 'optionSelectedParams' => ["module"=>"ERP", "name"=>"StoresManagersOperationsReports"],
 						 'menuOptions' =>  $menurepository->formatOptions($userdata),
 						 'breadcrumb' =>  $breadcrumb,
 						 'userData' => $userdata,
@@ -761,7 +761,7 @@ class ERPStoresManagersOperationsController extends Controller
 																																				 LEFT JOIN erpstores_managers_operations o ON o.id=l.operation_id
 																																				 LEFT JOIN erpstores_managers m ON m.id=o.manager_id
 																																				 LEFT JOIN erpoffer_prices of ON of.id=l.product_id AND of.customer_id=m.customer_id
-																																					LEFT JOIN erpproduct_prices p ON p.id=l.product_id
+																																				 LEFT JOIN erpproduct_prices p ON p.id=l.product_id
 																																				 LEFT JOIN erpstores s ON s.id=o.store_id',
 																																				 'o.active=1 AND o.consumer_id='.$consumerid.' AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'"',null);
 
