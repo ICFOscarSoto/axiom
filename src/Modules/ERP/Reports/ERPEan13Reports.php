@@ -136,8 +136,9 @@ class PDF_417 extends \FPDF{
     if (!file_exists($tempPath) && !is_dir($tempPath)) {
   			mkdir($tempPath, 0775, true);
   	}
-    $image->save($tempPath.DIRECTORY_SEPARATOR.$params["code"].'.png');
-    $this->Image($tempPath.DIRECTORY_SEPARATOR.$params["code"].'.png', 1, 3);
+    $code=preg_replace('([^A-Za-z0-9])', '', $params["code"]);;
+    $image->save($tempPath.DIRECTORY_SEPARATOR.$code.'.png');
+    $this->Image($tempPath.DIRECTORY_SEPARATOR.$code.'.png', 1, 3);
     $this->SetXY(0,2);
     if(substr($params["barcode"],0,1)=="p")
       $this->Cell(62,4,"ITEM ".substr($params["barcode"],2),0,0,'C');
