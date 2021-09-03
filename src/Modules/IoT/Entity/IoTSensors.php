@@ -73,6 +73,16 @@ class IoTSensors
      */
     private $deleted;
 
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    private $max;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    private $min;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -206,6 +216,30 @@ class IoTSensors
     public function setDeleted(bool $deleted): self
     {
         $this->deleted = $deleted;
+
+        return $this;
+    }
+
+    public function getMax(): ?float
+    {
+        return $this->max;
+    }
+
+    public function setMax(?float $max): self
+    {
+        $this->max = $max;
+
+        return $this;
+    }
+
+    public function getMin(): ?float
+    {
+        return $this->min;
+    }
+
+    public function setMin(?float $min): self
+    {
+        $this->min = $min;
 
         return $this;
     }
