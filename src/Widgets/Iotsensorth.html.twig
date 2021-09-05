@@ -1,0 +1,66 @@
+{{ include('@Widgets/widget_head.html.twig') }}
+{% if widget.settings.device == null %}
+  {% set deviceid=0 %}
+  {% set devicename="" %}
+{% else %}
+  {% set deviceid=widget.settings.device.id %}
+  {% set devicename=widget.settings.device.name %}
+{% endif %}
+<div id="display_sensor_temp_{{ deviceid }}" class="col-md-6 display_sensor_norminal">
+  <div class="display_sensor_label">Temperatura</div>
+  <div class="display_sensor_value">
+    <div style="display:inline;" class="display_sensor_icon"><i class="fas fa-thermometer-half"></i></div>
+    <div style="display:inline;" id="sensor_temp_{{ deviceid }}">0 ºC</div>
+  </div>
+  <div class="display_sensor_lastseen" id="sensor_temp_lastseen_{{ deviceid }}">El 00/00/0000 a las 00:00</div>
+</div>
+<div id="display_sensor_hum_{{ deviceid }}" class="col-md-6 display_sensor_norminal">
+  <div class="display_sensor_label">Humedad</div>
+  <div class="display_sensor_value">
+    <div style="display:inline;" class="display_sensor_icon"><i class="fas fa-tint"></i></i></div>
+    <div style="display:inline;" id="sensor_hum_{{ deviceid }}">0 %</div>
+  </div>
+  <div class="display_sensor_lastseen" id="sensor_hum_lastseen_{{ deviceid }}">El 00/00/0000 a las 00:00</div>
+</div>
+{{ include('@Widgets/widget_footer.html.twig') }}
+{{ include('@Widgets/widget_settings.html.twig') }}
+
+<script>
+
+function getLastSensorData_{{ deviceid }}(){
+  $.ajax({
+     url: '{{ url('Iotlastsensordata', {id:deviceid }) }}',
+     type: 'POST',
+
+     success:  function( data ) {
+       console.log(data);
+       if(data.result){
+         data.data.forEach( function(valor, indice, array){
+           if(valor.type=="temp"){ $("#sensor_temp_{{ deviceid }}").html(valor.value+" "+valor.unit_abrv); var sensortype="temp"; }
+           if(valor.type=="hum"){ $("#sensor_hum_{{ deviceid }}").html(valor.value+" "+valor.unit_abrv); var sensortype="hum"; }
+           if(valor.status=='norminal'){
+             $("#display_sensor_"+sensortype+"_{{ deviceid }}").removeClass("display_sensor_failure");
+             $("#display_sensor_"+sensortype+"_{{ deviceid }}").addClass("display_sensor_norminal");
+             console.log("entro");
+           }
+           if(valor.status=='failure'){
+             $("#display_sensor_"+sensortype+"_{{ deviceid }}").removeClass("display_sensor_norminal");
+             $("#display_sensor_"+sensortype+"_{{ deviceid }}").addClass("display_sensor_failure");
+           }
+           $("#sensor_"+sensortype+"_lastseen_{{ deviceid }}").html(valor.date);
+        });
+
+       }
+      }
+
+   });
+}
+
+$(function () {
+$("#title-widget-{{ widget.widget.id }}").html("{{devicename}}");
+getLastSensorData_{{ deviceid }}();
+  window.setInterval(function(){
+    getLastSensorData_{{ deviceid }}();
+  }, 60000);
+});
+</script>

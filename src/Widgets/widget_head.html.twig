@@ -2,7 +2,7 @@
   <div class="grid-stack-item-content" style="display:flex;flex-direction:column; overflow: hidden;">
     <div class="panel panel-default" style="padding:0px; flex:1; overflow: auto;">
       <div class="panel-heading">
-        <div class="panel-title">{{ widget.widget.description }}</div>
+        <div class="panel-title" id="title-widget-{{ widget.widget.id }}">{{ widget.widget.description }}</div>
         <div class="panel-options">
           <a href="#" id="config-widget-{{ widget.id }}" attr-id="{{ widget.id }}" attr-widget="{{ widget.widget.name }}"><i class="entypo-cog"></i></a>
           <a href="#" id="move-widget-{{ widget.id }}" attr-id="{{ widget.id }}" class="widget-move"><i class="fa fa-arrows"></i></a>

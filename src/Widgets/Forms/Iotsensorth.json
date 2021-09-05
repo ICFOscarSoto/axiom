@@ -1,0 +1,9 @@
+[{
+	"sections": [
+		{
+			"name": "data",
+			"fields": [
+        {	"name": "device", "cols": 6}
+			]
+		}]
+}]

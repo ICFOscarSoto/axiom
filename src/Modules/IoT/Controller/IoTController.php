@@ -61,4 +61,30 @@ class IoTController extends Controller
 			}
 			return new JsonResponse(["result"=>1]);
 	}
+
+	/**
+	 * @Route("/api/iot/{id}/lastdata", name="Iotlastsensordata")
+	 */
+	public function lastdata($id,RouterInterface $router,Request $request){
+			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			$devicesRepository=$this->getDoctrine()->getRepository(IoTDevices::class);
+			$sensorsRepository=$this->getDoctrine()->getRepository(IoTSensors::class);
+			$dataRepository=$this->getDoctrine()->getRepository(IoTData::class);
+			$device=$devicesRepository->findOneBy(['id'=>$id, 'company'=>$this->getUser()->getCompany(), 'active'=>1, 'deleted'=>0]);
+			if(!$device) return new JsonResponse(["result"=>-1]);
+			$sensors=$sensorsRepository->findBy(['device'=>$device, 'active'=>1, 'deleted'=>0]);
+			$result=[];
+			foreach($sensors as $sensor){
+				$data=$dataRepository->getLastData($sensor->getId());
+				$status='norminal';
+				if($sensor->getMax() && $data["data"]>$sensor->getMax()){
+					$status='failure';
+				}
+				if($sensor->getMin() && $data["data"]<$sensor->getMin()){
+					$status='failure';
+				}
+				$result[]=["id"=>$sensor->getId(), "name"=>$sensor->getName(), "description"=> $sensor->getDescription(),"value"=>$data["data"], "type"=>$sensor->getType(), "unit"=>$sensor->getUnit(), "unit_abrv"=> $sensor->getUnitAbrv(), "status"=>$status, "date"=>$sensor->getDateadd()->format("d/m/Y H:i:s")];
+			}
+			return new JsonResponse(["result"=>1, "data"=> $result]);
+	}
 }

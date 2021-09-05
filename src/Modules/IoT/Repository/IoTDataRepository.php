@@ -19,6 +19,11 @@ class IoTDataRepository extends ServiceEntityRepository
         parent::__construct($registry, IoTData::class);
     }
 
+    public function getLastData($sensor){
+      $query='SELECT data, dateupd FROM io_tdata WHERE sensor_id='.$sensor.' ORDER BY dateupd DESC LIMIT 1';
+      $result=$this->getEntityManager()->getConnection()->executeQuery($query)->fetch();
+      return $result;
+    }
     // /**
     //  * @return IoTData[] Returns an array of IoTData objects
     //  */
