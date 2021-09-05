@@ -20,7 +20,7 @@ class IoTDataRepository extends ServiceEntityRepository
     }
 
     public function getLastData($sensor){
-      $query='SELECT data, dateupd FROM io_tdata WHERE sensor_id='.$sensor.' ORDER BY dateupd DESC LIMIT 1';
+      $query='SELECT data, DATE_FORMAT(dateupd, "%d/%m/%Y %H:%i") dateupd FROM io_tdata WHERE sensor_id='.$sensor.' ORDER BY dateupd DESC LIMIT 1';
       $result=$this->getEntityManager()->getConnection()->executeQuery($query)->fetch();
       return $result;
     }

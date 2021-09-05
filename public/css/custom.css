@@ -817,6 +817,7 @@ label.error {
   border-color: #95e476;
   font-size: 10px;
   padding: 3px;
+  text-align: center;
 }
 
 .display_sensor_norminal .display_sensor_icon{
@@ -860,6 +861,7 @@ label.error {
   border-color: #ff9a9a;
   font-size: 10px;
   padding: 3px;
+  text-align: center;
 }
 
 .display_sensor_failure .display_sensor_icon{
