@@ -51,13 +51,44 @@ class IoTController extends Controller
 				$data = new IoTData();
 				$data->setSensor($sensor);
 				$data->setCounter(1);
-				$data->setData($values_array[$key]/(pow(10,$sensor->getAccuracy())));
+				$value=$values_array[$key]/(pow(10,$sensor->getAccuracy()));
+				$data->setData($value);
 				$data->setDateadd(new \DateTime());
 				$data->setDateupd(new \DateTime());
 				$data->setActive(1);
 				$data->setDeleted(0);
 				$this->getDoctrine()->getManager()->persist($data);
 				$this->getDoctrine()->getManager()->flush();
+				if($device->getDiscordchannel()==null) continue;
+				if($sensor->getMax()!=null && $value>$sensor->getMax() && $sensor->getNotified()==false){
+					file_get_contents("https://icfbot.ferreteriacampollano.com/message.php?channel=".$device->getDiscordchannel()."&msg=".urlencode(":warning: ".$sensor->getDescription()." en ".$device->getName()." ha superado el valor máximo (".$sensor->getMax()." ".$sensor->getUnitAbrv()."), ahora está en **".$value." ".$sensor->getUnitAbrv()."**"));
+					$sensor->setNotified(1);
+					$this->getDoctrine()->getManager()->persist($sensor);
+					$this->getDoctrine()->getManager()->flush();
+				}
+				if($sensor->getMin()!=null && $value<$sensor->getMin() && $sensor->getNotified()==false){
+					file_get_contents("https://icfbot.ferreteriacampollano.com/message.php?channel=".$device->getDiscordchannel()."&msg=".urlencode(":warning: ".$sensor->getDescription()." en ".$device->getName()." ha rebasado el valor mínimo (".$sensor->getMax()." ".$sensor->getUnitAbrv()."), ahora está en **".$value." ".$sensor->getUnitAbrv()."**"));
+					$sensor->setNotified(1);
+					$this->getDoctrine()->getManager()->persist($sensor);
+					$this->getDoctrine()->getManager()->flush();
+				}
+				$min=false;
+				$max=false;
+				if($sensor->getMax()!=null && $value<=$sensor->getMax()){
+					$max=true;
+				}
+				if($sensor->getMin()!=null && $value>=$sensor->getMin()){
+					$min=true;
+				}
+				if($sensor->getMax()==null) $max=true;
+				if($sensor->getMin()==null) $min=true;
+				if($min && $max && $sensor->getNotified()){
+					file_get_contents("https://icfbot.ferreteriacampollano.com/message.php?channel=".$device->getDiscordchannel()."&msg=".urlencode(":white_check_mark: ".$sensor->getDescription()." en ".$device->getName()." ha vuelto a los valores correctos"));
+					$sensor->setNotified(0);
+					$this->getDoctrine()->getManager()->persist($sensor);
+					$this->getDoctrine()->getManager()->flush();
+				}
+
 			}
 			return new JsonResponse(["result"=>1]);
 	}

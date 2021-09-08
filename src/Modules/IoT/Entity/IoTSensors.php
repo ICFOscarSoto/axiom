@@ -83,6 +83,11 @@ class IoTSensors
      */
     private $min;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $notified=false;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -240,6 +245,18 @@ class IoTSensors
     public function setMin(?float $min): self
     {
         $this->min = $min;
+
+        return $this;
+    }
+
+    public function getNotified(): ?bool
+    {
+        return $this->notified;
+    }
+
+    public function setNotified(?bool $notified): self
+    {
+        $this->notified = $notified;
 
         return $this;
     }
