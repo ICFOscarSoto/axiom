@@ -333,7 +333,7 @@ public function importEAN13(InputInterface $input, OutputInterface $output){
         $navisionSync->setEntity("EAN13");
       }
       $navisionSync->setLastsync($datetime);
-      $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
+      if ($objects["maxtimestamp"]!=0) $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
       $this->doctrine->getManager()->persist($navisionSync);
       $this->doctrine->getManager()->flush();
       //------   Critical Section END   ------
