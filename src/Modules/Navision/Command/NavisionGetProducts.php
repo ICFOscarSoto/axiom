@@ -1727,7 +1727,7 @@ public function defuseProducts(InputInterface $input, OutputInterface $output){
         $objects=json_decode($json, true);
         if ($objects[0]["class"]!=null) continue;
         $output->writeln('* Desactivando el producto '.$product->getCode());
-
+        $repository->deleteRelations($product->getId());
         $product->setActive(0);
         $product->setDeleted(1);
         $this->doctrine->getManager()->merge($product);

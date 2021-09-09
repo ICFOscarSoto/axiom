@@ -192,6 +192,19 @@ class ERPProductsRepository extends ServiceEntityRepository
         return $this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
     }
 
+    public function deleteRelations($product){
+      $query="UPDATE erpreferences
+              SET active=0, deleted=1
+              WHERE product_id= :product";
+      $result=$this->getEntityManager()->getConnection()->executeQuery($query, $params);
+      $query2="UPDATE erpean13
+              SET active=0, deleted=1
+              WHERE product_id= :product";
+      $params=['product' => $product];
+      $result2=$this->getEntityManager()->getConnection()->executeQuery($query2, $params)
+      return $result2;
+    }
+
 /*
 dejamos pendiente esta consulta porque falta por añadir en los pedidos de compra algun campo que indique que el material
 de ese pedido ya se ha recibido
