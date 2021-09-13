@@ -10,6 +10,7 @@ use App\Modules\Email\Entity\EmailAccounts;
 use App\Modules\Email\Entity\EmailFolders;
 use App\Modules\Email\Entity\EmailSubjects;
 use App\Helpers\HelperMail;
+use App\Helpers\HelperMailDavid;
 
 class EmailGetSubjects extends ContainerAwareCommand
 {
@@ -33,6 +34,7 @@ class EmailGetSubjects extends ContainerAwareCommand
     $emailAccounts=$emailAccountsRepository->findAll();
 
     foreach($emailAccounts as $emailAccount){
+      if($emailAccount->getUsername()!="david.mrentero@ferreteriacampollano.com") continue;
       //get folders
       $emailFolders=$emailFoldersRepository->findBy(["emailAccount"=>$emailAccount]);
       $countUnseen=0;
@@ -72,6 +74,9 @@ class EmailGetSubjects extends ContainerAwareCommand
               $subject->setDate(new \DateTime(date('Y-m-d H:i:s',$emailSubject->udate)));
               $entityManager->persist($subject);
               $entityManager->flush();
+              if($emailAccount->getUsername()=="david.mrentero@ferreteriacampollano.com"){
+                  HelperMailDavid::checkMail($emailSubject, $emailAccount, $inbox, $output);
+              }
             }
           }
       }
