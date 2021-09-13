@@ -193,6 +193,7 @@ class ERPProductsRepository extends ServiceEntityRepository
     }
 
     public function deleteRelations($product){
+      
       $query="UPDATE erpreferences
               SET active=0, deleted=1
               WHERE product_id= :product";
@@ -201,11 +202,7 @@ class ERPProductsRepository extends ServiceEntityRepository
               SET active=0, deleted=1
               WHERE product_id= :product";
       $params=['product' => $product];
-<<<<<<< HEAD
       $result2=$this->getEntityManager()->getConnection()->executeQuery($query2, $params);
-=======
-      $result2=$this->getEntityManager()->getConnection()->executeQuery($query2, $params)
->>>>>>> e02e551e311f18163ff9661004d0a408de31f088
       return $result2;
     }
 
