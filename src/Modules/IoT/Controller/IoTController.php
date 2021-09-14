@@ -61,13 +61,13 @@ class IoTController extends Controller
 				$this->getDoctrine()->getManager()->flush();
 				if($device->getDiscordchannel()==null) continue;
 				if($sensor->getMax()!=null && $value>$sensor->getMax() && $sensor->getNotified()==false){
-					file_get_contents("https://icfbot.ferreteriacampollano.com/message.php?channel=".$device->getDiscordchannel()."&msg=".urlencode(":warning: ".$sensor->getDescription()." en ".$device->getName()." ha superado el valor máximo (".$sensor->getMax()." ".$sensor->getUnitAbrv()."), ahora está en **".$value." ".$sensor->getUnitAbrv()."**"));
+					file_get_contents("https://icfbot.ferreteriacampollano.com/message.php?channel=".$device->getDiscordchannel()."&msg=".urlencode(":warning: ".$device->getName().": ".$sensor->getDescription()." ha superado el valor máximo (".$sensor->getMax()." ".$sensor->getUnitAbrv()."), ahora está en **".$value." ".$sensor->getUnitAbrv()."**"));
 					$sensor->setNotified(1);
 					$this->getDoctrine()->getManager()->persist($sensor);
 					$this->getDoctrine()->getManager()->flush();
 				}
 				if($sensor->getMin()!=null && $value<$sensor->getMin() && $sensor->getNotified()==false){
-					file_get_contents("https://icfbot.ferreteriacampollano.com/message.php?channel=".$device->getDiscordchannel()."&msg=".urlencode(":warning: ".$sensor->getDescription()." en ".$device->getName()." ha rebasado el valor mínimo (".$sensor->getMax()." ".$sensor->getUnitAbrv()."), ahora está en **".$value." ".$sensor->getUnitAbrv()."**"));
+					file_get_contents("https://icfbot.ferreteriacampollano.com/message.php?channel=".$device->getDiscordchannel()."&msg=".urlencode(":warning: ".$device->getName().": ".$sensor->getDescription()." ha rebasado el valor mínimo (".$sensor->getMax()." ".$sensor->getUnitAbrv()."), ahora está en **".$value." ".$sensor->getUnitAbrv()."**"));
 					$sensor->setNotified(1);
 					$this->getDoctrine()->getManager()->persist($sensor);
 					$this->getDoctrine()->getManager()->flush();
@@ -83,7 +83,7 @@ class IoTController extends Controller
 				if($sensor->getMax()==null) $max=true;
 				if($sensor->getMin()==null) $min=true;
 				if($min && $max && $sensor->getNotified()){
-					file_get_contents("https://icfbot.ferreteriacampollano.com/message.php?channel=".$device->getDiscordchannel()."&msg=".urlencode(":white_check_mark: ".$sensor->getDescription()." en ".$device->getName()." ha vuelto a los valores correctos"));
+					file_get_contents("https://icfbot.ferreteriacampollano.com/message.php?channel=".$device->getDiscordchannel()."&msg=".urlencode(":white_check_mark: ".$device->getName().": ".$sensor->getDescription()." ha vuelto a los valores correctos"));
 					$sensor->setNotified(0);
 					$this->getDoctrine()->getManager()->persist($sensor);
 					$this->getDoctrine()->getManager()->flush();
