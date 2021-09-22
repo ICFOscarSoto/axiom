@@ -44,6 +44,7 @@ class NavisionGetProducts extends ContainerAwareCommand
   private $company;
   private $entityManager;
   private $url="http://192.168.1.250:9000/";
+  private $discordchannel="883046233017552956";
   protected function configure(){
         $this
             ->setName('navision:getproducts')
@@ -713,7 +714,13 @@ public function importStocks(InputInterface $input, OutputInterface $output) {
 
     }
     $navisionSync->setLastsync($datetime);
-    $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
+    if($objects["maxtimestamp"]!=0) $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
+    /*else {
+    $icon=":warning: ";
+    $msg=" ";
+    //Send notification
+    file_get_contents("https://icfbot.ferreteriacampollano.com/message.php?channel=".$discordchannel."&msg=".urlencode($icon."Sincronizacion : ".$msg));
+  } */
     $this->doctrine->getManager()->persist($navisionSync);
     $this->doctrine->getManager()->flush();
   }
@@ -773,7 +780,7 @@ public function updateStocksStoresManaged(InputInterface $input, OutputInterface
               $stock_old=$repositoryStocks->findOneBy(["id"=>$old_stocks[0]["id"], "deleted"=>0]);
               $output->writeln('Vamos a actualizar la linea '.$old_stocks[0]["id"].' del producto '.$product->getId().' en el almacen '.$stock["almacen"]);
               if ($stock_old->getStorelocation()->getStore()->getManaged()==1) {
-              $stock_old->setQuantity($stock_old->getQuantity()+((int)$stock["stock"]));
+              $stock_old->setQuantity($stock_old->getQuantity()-((int)$stock["stock"]));
               $stock_old->setDateupd(new \Datetime());
               $this->doctrine->getManager()->merge($stock_old);}
             }
@@ -801,7 +808,7 @@ public function updateStocksStoresManaged(InputInterface $input, OutputInterface
 
           $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"storesManaged"]);
           $navisionSync->setLastsync($datetime);
-          $navisionSync->setMaxtimestamp($objects["maxEntry"]);
+          if ($objects["maxEntry"]!=0) $navisionSync->setMaxtimestamp($objects["maxEntry"]);
           $this->doctrine->getManager()->persist($navisionSync);
           $this->doctrine->getManager()->flush();
 
