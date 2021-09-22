@@ -780,7 +780,7 @@ public function updateStocksStoresManaged(InputInterface $input, OutputInterface
               $stock_old=$repositoryStocks->findOneBy(["id"=>$old_stocks[0]["id"], "deleted"=>0]);
               $output->writeln('Vamos a actualizar la linea '.$old_stocks[0]["id"].' del producto '.$product->getId().' en el almacen '.$stock["almacen"]);
               if ($stock_old->getStorelocation()->getStore()->getManaged()==1) {
-              $stock_old->setQuantity($stock_old->getQuantity()-((int)$stock["stock"]));
+              $stock_old->setQuantity($stock_old->getQuantity()+((int)$stock["stock"]));
               $stock_old->setDateupd(new \Datetime());
               $this->doctrine->getManager()->merge($stock_old);}
             }
@@ -809,6 +809,12 @@ public function updateStocksStoresManaged(InputInterface $input, OutputInterface
           $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"storesManaged"]);
           $navisionSync->setLastsync($datetime);
           if ($objects["maxEntry"]!=0) $navisionSync->setMaxtimestamp($objects["maxEntry"]);
+          else {
+          $icon=":warning: ";
+          $msg=" Fallo en el maxEntry de los almacenes gestioandos";
+          //Send notification
+          file_get_contents("https://icfbot.ferreteriacampollano.com/message.php?channel=".$discordchannel."&msg=".urlencode($icon."Sincronizacion : ".$msg));
+          }
           $this->doctrine->getManager()->persist($navisionSync);
           $this->doctrine->getManager()->flush();
 
