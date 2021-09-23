@@ -50,6 +50,7 @@ class NavisionGetProducts extends ContainerAwareCommand
             ->setName('navision:getproducts')
             ->setDescription('Sync navision principal entities')
             ->addArgument('entity', InputArgument::REQUIRED, '¿Entidad que sincronizar?')
+            ->addArgument('code', InputArgument::OPTIONAL, '¿Objeto que sincronizar?')
         ;
   }
   protected function execute(InputInterface $input, OutputInterface $output)
@@ -57,6 +58,7 @@ class NavisionGetProducts extends ContainerAwareCommand
     $this->doctrine = $this->getContainer()->get('doctrine');
     $this->entityManager = $this->doctrine->getManager();
     $entity = $input->getArgument('entity');
+    $code = $input->getArgument('code');
     $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
     $this->company=$repositoryCompanies->find(2);
     $output->writeln('');
@@ -114,7 +116,7 @@ class NavisionGetProducts extends ContainerAwareCommand
       break;
       case 'minimumsQuantity': $this->importMinimunsQuantity($input, $output);
       break;
-      case 'productStock': $this->importStock($input, $output);
+      case 'productStock': $this->importStock($input, $output, $code);
       break;
       case 'clear':
         //$this->defuseProducts($input, $output);
@@ -624,7 +626,7 @@ public function updateProducts(InputInterface $input, OutputInterface $output){
     }
 }
 
-public function importStock(InputInterface $input, OutputInterface $output){
+public function importStock(InputInterface $input, OutputInterface $output, $code=null){
   //------   Create Lock Mutex    ------
   if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
       $fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetProducts-importStocks.lock', 'c');
@@ -636,7 +638,6 @@ public function importStock(InputInterface $input, OutputInterface $output){
     $output->writeln('* Fallo al iniciar la sincronizacion de los stocks: El proceso ya esta en ejecución.');
     exit;
   }
-  $code='24NEREA8AIRE';
   $output->writeln('* Sincronizando stocks....');
   $repositoryStocks=$this->doctrine->getRepository(ERPStocks::class);
   $repositoryStoreLocations=$this->doctrine->getRepository(ERPStoreLocations::class);
@@ -665,7 +666,6 @@ public function importStock(InputInterface $input, OutputInterface $output){
               $output->writeln('El producto '.$product->getId().' tiene la variante '.$stock["variant"]);
             }
             else $old_stocks=$repositoryStocks->stockUpdate($product->getId(), $stock["almacen"]);
-            dump($old_stocks);
             if($old_stocks!=null) {
               if ($old_stocks[0]["id"]!=null){
               $stock_old=$repositoryStocks->findOneBy(["id"=>$old_stocks[0]["id"], "deleted"=>0]);
