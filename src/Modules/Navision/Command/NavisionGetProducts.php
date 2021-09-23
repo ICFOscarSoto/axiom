@@ -114,6 +114,8 @@ class NavisionGetProducts extends ContainerAwareCommand
       break;
       case 'minimumsQuantity': $this->importMinimunsQuantity($input, $output);
       break;
+      case 'productStock': $this->importStock($input, $output);
+      break;
       case 'clear':
         //$this->defuseProducts($input, $output);
         $this->clearEAN13($input, $output);
@@ -621,6 +623,93 @@ public function updateProducts(InputInterface $input, OutputInterface $output){
     $this->doctrine->getManager()->clear();
     }
 }
+
+public function importStock(InputInterface $input, OutputInterface $output){
+  //------   Create Lock Mutex    ------
+  if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+      $fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetProducts-importStocks.lock', 'c');
+  } else {
+      $fp = fopen('/tmp/axiom-navisionGetProducts-importStocks.lock', 'c');
+  }
+
+  if (!flock($fp, LOCK_EX | LOCK_NB)) {
+    $output->writeln('* Fallo al iniciar la sincronizacion de los stocks: El proceso ya esta en ejecución.');
+    exit;
+  }
+  $code='24NEREA8AIRE';
+  $output->writeln('* Sincronizando stocks....');
+  $repositoryStocks=$this->doctrine->getRepository(ERPStocks::class);
+  $repositoryStoreLocations=$this->doctrine->getRepository(ERPStoreLocations::class);
+  $repositoryProducts=$this->doctrine->getRepository(ERPProducts::class);
+  $repositoryVariantsValues=$this->doctrine->getRepository(ERPVariantsValues::class);
+  $repositoryProductsVariants=$this->doctrine->getRepository(ERPProductsVariants::class);
+  $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getStocks.php?product='.$code);
+  $objects=json_decode($json, true);
+  $objects=$objects[0];
+    if ($objects){
+      $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
+      $company=$repositoryCompanies->find(2);
+      foreach ($objects["class"] as $stock){
+      $product=$repositoryProducts->findOneBy(["code"=>$stock["code"]]);
+      $namenameVariantValue=$this->variantColor($stock["variant"]);
+      $variantvalue=$repositoryVariantsValues->findOneBy(["name"=>$namenameVariantValue]);
+      $storeRepository=$this->doctrine->getRepository(ERPStores::class);
+      $store=$storeRepository->findOneBy(["code"=>$stock["almacen"]]);
+
+      if($product) {
+            $productVariantId = null;
+            $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product->getId(),"variantvalue"=>$variantvalue]);
+            if($productvariant!=null) {
+              $productVariantId=$productvariant->getId();
+              $old_stocks=$repositoryStocks->stockVariantUpdate($productvariant->getId(), $stock["almacen"]);
+              $output->writeln('El producto '.$product->getId().' tiene la variante '.$stock["variant"]);
+            }
+            else $old_stocks=$repositoryStocks->stockUpdate($product->getId(), $stock["almacen"]);
+            dump($old_stocks);
+            if($old_stocks!=null) {
+              if ($old_stocks[0]["id"]!=null){
+              $stock_old=$repositoryStocks->findOneBy(["id"=>$old_stocks[0]["id"], "deleted"=>0]);
+              $output->writeln('Vamos a actualizar la linea '.$old_stocks[0]["id"].' del producto '.$product->getId().' en el almacen '.$stock["almacen"]);
+              if ((int)$stock["stock"]<0) $quantity=0;
+              else $quantity=(int)$stock["stock"];
+              if ($stock_old->getStorelocation()->getStore()->getManaged()!=1) {
+                $updateStocks=$repositoryStocks->setZeroStocks($product->getId(), $store->getId(),$stock_old->getId(),$productVariantId);
+                $stock_old->setQuantity(!$quantity?0:$quantity);
+                $stock_old->setDateupd(new \Datetime());
+                $this->doctrine->getManager()->merge($stock_old);
+              }
+              }
+            }
+            else {
+              $location=$repositoryStoreLocations->findOneBy(["name"=>$stock["almacen"]]);
+              if($location!=null){
+              $output->writeln('Vamos a añadir una linea de stock al producto '.$product->getId().' en el almacen '.$stock["almacen"]);
+              $obj=new ERPStocks();
+              $obj->setCompany($company);
+              $obj->setProduct($product);
+              $obj->setDateadd(new \Datetime());
+              $obj->setDateupd(new \Datetime());
+              $obj->setStoreLocation($location);
+              $obj->setProductVariant($productvariant);
+              if ((int)$stock["stock"]<0) $quantiy=0;
+              else $quantity=(int)$stock["stock"];
+              $obj->setQuantity(!$quantity?0:$quantity);
+              $obj->setActive(1);
+              $obj->setDeleted(0);
+              $this->doctrine->getManager()->merge($obj);
+            }
+            }
+            $this->doctrine->getManager()->flush();
+            $this->doctrine->getManager()->clear();
+          }
+
+
+
+    }
+    $this->doctrine->getManager()->flush();
+    }
+}
+
 
 public function importStocks(InputInterface $input, OutputInterface $output) {
   //------   Create Lock Mutex    ------
