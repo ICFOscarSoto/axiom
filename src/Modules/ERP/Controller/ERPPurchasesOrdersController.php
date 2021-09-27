@@ -429,25 +429,31 @@ class ERPPurchasesOrdersController extends Controller
 		$purchasesordersRepository=$this->getDoctrine()->getRepository(ERPPurchasesOrders::class);
 		$purchasesorder=null;
 		$purchasesorder=$purchasesordersRepository->getPurchaseOrderByProduct($productid);
-		$item['id']=$purchasesorder['id'];
-		$item['code']=$purchasesorder['code'];
-		return new JsonResponse(["result"=>$item]);
+		if($purchasesorder!=null)
+		{
+			$item['id']=$purchasesorder['id'];
+			$item['code']=$purchasesorder['code'];
+			return new JsonResponse(["result"=>$item]);
+		}
+		else return new JsonResponse(["result"=>-1]);
 
 	}
 
 	/**
-	 * @Route("/api/ERP/PurchasesOrders/findpurchaseorder/{productid}", name="ERPFindPurchasesOrderBySupplier", defaults={"productid"=0})
+	 * @Route("/api/ERP/PurchasesOrders/findpurchaseorder/{supplierid}", name="ERPFindPurchasesOrderBySupplier", defaults={"supplierid"=0})
 	 */
-	public function ERPFindPurchasesOrderBySupplier($productid, RouterInterface $router,Request $request){
-		$productsRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
-		$product=$productsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$productid, "active"=>1, "deleted"=>0]);
-		$supplierid=$product->getSupplier()->getId();
+	public function ERPFindPurchasesOrderBySupplier($supplierid, RouterInterface $router,Request $request){
 		$purchasesordersRepository=$this->getDoctrine()->getRepository(ERPPurchasesOrders::class);
 		$purchasesorder=null;
 		$purchasesorder=$purchasesordersRepository->getPurchaseOrderBySupplier($supplierid);
-		$item['id']=$purchasesorder['id'];
-		$item['code']=$purchasesorder['code'];
-		return new JsonResponse(["result"=>$item]);
+
+		if($purchasesorder!=null)
+		{
+			$item['id']=$purchasesorder['id'];
+			$item['name']=$purchasesorder['name'];
+			return new JsonResponse(["result"=>$item]);
+		}
+		else return new JsonResponse(["result"=>-1]);
 
 	}
 

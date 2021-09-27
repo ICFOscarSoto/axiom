@@ -28,10 +28,10 @@ function getVariants(id,code){
     }).done(function( elements, textStatus, jqXHR ) {
       if((--load_wait)==0) $("#load-spinner").fadeOut();
 
-        $("#product-form-variants-"+id).empty();
-        $("#product-form-variants-"+id).append('<option value="-1">Elige una...</option>');
+        $("#product-form-variants-id-"+id).empty();
+        $("#product-form-variants-id-"+id).append('<option value="-1">Elige una...</option>');
          elements.variants.forEach( function(valor, indice, array){
-          $("#product-form-variants-"+id).append('<option value="'+valor.name+'">'+valor.name+'</option>');
+          $("#product-form-variants-id-"+id).append('<option value="'+valor.id+'">'+valor.name+'</option>');
         });
     });
 }
@@ -46,11 +46,11 @@ function getSuppliers(id,code){
     }).done(function( elements, textStatus, jqXHR ) {
       if((--load_wait)==0) $("#load-spinner").fadeOut();
 
-        $("#product-form-suppliers-"+id).empty();
-        $("#product-form-suppliers-"+id).append('<option value="-1">Elige uno...</option>');
+        $("#product-form-suppliers-id-"+id).empty();
+        $("#product-form-suppliers-id-"+id).append('<option value="-1">Elige uno...</option>');
          elements.suppliers.forEach( function(valor, indice, array){
-           if(valor.preferential==1) $("#product-form-suppliers-"+id).append('<option selected="selected" value="'+valor.name+'">'+valor.name+'</option>');
-           else $("#product-form-suppliers-"+id).append('<option value="'+valor.name+'">'+valor.name+'</option>');
+           if(valor.preferential==1) $("#product-form-suppliers-id-"+id).append('<option selected="selected" value="'+valor.id+'">'+valor.name+'</option>');
+           else $("#product-form-suppliers-id-"+id).append('<option value="'+valor.id+'">'+valor.name+'</option>');
         });
     });
 }
@@ -64,10 +64,10 @@ function getReasons(id){
       url: "/api/ERP/purchasesdemands/reasons/get",
     }).done(function( elements, textStatus, jqXHR ) {
       if((--load_wait)==0) $("#load-spinner").fadeOut();
-       $("#product-form-reasons-"+id).empty();
-       $("#product-form-reasons-"+id).append('<option value="-1">Selecciona Motivo...</option>');
+       $("#product-form-reasons-id-"+id).empty();
+       $("#product-form-reasons-id-"+id).append('<option value="-1">Selecciona Motivo...</option>');
        elements.reasons.forEach( function(valor, indice, array){
-        $("#product-form-reasons-"+id).append('<option value="'+valor.name+'">'+valor.name+'</option>');
+        $("#product-form-reasons-id-"+id).append('<option value="'+valor.id+'">'+valor.name+'</option>');
       });
     });
 }

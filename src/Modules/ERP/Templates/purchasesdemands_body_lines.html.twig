@@ -1,5 +1,5 @@
 <div class="panel panel-primary panel-shadow" data-collapsed="0" style="-webkit-box-shadow: none; box-shadow:none;min-height:200px"><!-- to apply shadow add class "panel-shadow" -->
-  <div class="panel-body" style="padding: 0px !important;" id="purchasesdemands-lines" attr-numlines="{{ purchasesdemandsLines|length }}">
+  <div class="panel-body" style="padding: 0px !important;" id="purchasesdemands-lines" {% if purchasesdemandsLines %} attr-numlines="{{ purchasesdemandsLines|length }}" {% else %}attr-numlines="0" {% endif %}>
     <div class="btn-group">
       <button id="add-line" style="font-size:20px;" type="button" class=" btn btn-primary tooltip-primary"><i class="fa fa-plus" ></i></button>
     </div>
@@ -44,6 +44,7 @@
         <div class="col-3 col-sm-1">
           <div class="form-group" style="margin-bottom: 0px;">
             <input type="text" readonly id="product-form-variants-{{ line.linenum }}" class="form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Nombre" value="{{ line.variant.name }}">
+            <input type="hidden" id="product-form-variants-id-{{ line.linenum }}" class="form-control" value="{{ line.variant.id }}">
           </div>
         </div>
         {% else %}
@@ -56,6 +57,7 @@
         <div class="col-3 col-sm-2">
             <div class="form-group" style="margin-bottom: 0px;">
               <input type="text" readonly id="product-form-suppliers-{{ line.linenum }}" class="form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Nombre" value="{{ line.supplier.name }}">
+              <input type="hidden" id="product-form-suppliers-id-{{ line.linenum }}" class="form-control" value="{{ line.supplier.id }}">
             </div>
         </div>
         <div class="col-2 d-block d-sm-none" style="top: 8px;">Motivo</div>
@@ -63,6 +65,7 @@
         <div class="col-3 col-sm-1">
           <div class="form-group" style="margin-bottom: 0px;">
             <input type="text" readonly id="product-form-reasons-{{ line.linenum }}" class="form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Nombre" value="{{ line.reason.name }}">
+            <input type="hidden" id="product-form-reasons-id-{{ line.linenum }}" class="form-control" value="{{ line.reason.id }}">
           </div>
         </div>
         {% else %}

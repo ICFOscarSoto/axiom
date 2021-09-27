@@ -91,7 +91,7 @@
 
      });
 		$('body').on('click', "[id^='product-form-send-']", function(e) {
-			findPurchaseOrder($(this).attr("attr-id"));
+			findProductOnPurchaseOrder($(this).attr("attr-id"));
 		});
 
 		$('body').on('click', "[id^='product-form-reject-']", function(e) {

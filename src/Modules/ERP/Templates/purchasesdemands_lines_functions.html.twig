@@ -22,11 +22,11 @@
         ' <div class="col-2 d-block d-sm-none" style="top: 8px;">Nombre</div>'+
         '	<div class="col-10 col-md-3"> <div class="form-group" style="margin-bottom: 0px;"> <input readonly type="text" id="product-form-name-'+numLines+'" class="form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Nombre"> </div> </div>'+
         ' <div class="col-2 d-block d-sm-none" style="top: 8px;left: 5px;">Variantes</div>'+
-        '<div class="col-3 col-md-1"> <div class="form-group" style="margin-bottom: 0px;"> <select attr-id="" id="product-form-variants-'+numLines+'" class="form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Variantes"></select> </div> </div>'+
+        '<div class="col-3 col-md-1"> <div class="form-group" style="margin-bottom: 0px;"> <select attr-id="" id="product-form-variants-id-'+numLines+'" class="form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Variantes"></select> </div> </div>'+
         '<div class="col-2 d-block d-sm-none" style="top: 8px;left: 5px;">Proveedor</div>'+
-        '<div class="col-3 col-md-2"> <div class="form-group" style="margin-bottom: 0px;"> <select attr-id="" id="product-form-suppliers-'+numLines+'" class="form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Proveedor"></select> </div> </div>'+
+        '<div class="col-3 col-md-2"> <div class="form-group" style="margin-bottom: 0px;"> <select attr-id="" id="product-form-suppliers-id-'+numLines+'" class="form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Proveedor"></select> </div> </div>'+
         '<div class="col-2 d-block d-sm-none" style="top: 8px;left: 5px;">Motivo</div>'+
-        '<div class="col-8 col-sm-1"> <div class="form-group" style="margin-bottom: 0px;"> <select attr-id="" id="product-form-reasons-'+numLines+'" class="form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Razón"></select> </div> </div>'+
+        '<div class="col-8 col-sm-1"> <div class="form-group" style="margin-bottom: 0px;"> <select attr-id="" id="product-form-reasons-id-'+numLines+'" class="form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Razón"></select> </div> </div>'+
         '<div class="col-2 d-block d-sm-none" style="top: 8px;left: 5px;">Agente</div>'+
         '<div class="col-3 col-md-1"> <div class="form-group" style="margin-bottom: 0px;"><input type="hidden" id="product-form-agentid-'+numLines+'"><input type="text" readonly attr-id="'+numLines+'" id="product-form-agent-'+numLines+'" class="recalculate form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Agente"> </div> </div>'+
         '<div class="col-2 d-block d-sm-none" style="top: 8px;left: 5px;">Cantidad</div>'+
@@ -143,10 +143,12 @@
 
     }
 
-    function findPurchaseOrder(id){
+    function findProductOnPurchaseOrder(id){
       var productid=$("#product-form-id-"+id).val();
       var productcode=$("#product-form-code-"+id).val();
       var quantity=$("#product-form-quantity-"+id).val();
+      var supplier=$("#product-form-suppliers-id-"+id).val();
+
       if((++load_wait)==1) $("#load-spinner").fadeIn();
       $.ajax({
           type: "GET",
@@ -178,9 +180,58 @@
              });
            }
 
+           else{
 
+                findPurchaseOrder(supplier);
+            }
 
         });
+
+    }
+
+    function findPurchaseOrder(supplier){
+
+      if((++load_wait)==1) $("#load-spinner").fadeIn();
+      $.ajax({
+          type: "GET",
+          dataType: "json",
+          url: "/api/ERP/PurchasesOrders/findpurchaseorder/"+supplier,
+        }).done(function( data, textStatus, jqXHR ) {
+
+          if((--load_wait)==0) $("#load-spinner").fadeOut();
+
+           if(data.result.id!=null){
+            var id=data.result.id;
+            var name=data.result.name;
+
+            $.confirm({
+                theme: 'bootstrap',
+                title: '',
+                content: 'Ya existe un pedido de compra para el proveedor <b><a href="{{ url('index') }}es/ERP/purchasesorders/form/'+id+'" target="_blank">'+name+'</a></b> ¿Quieres añadir el producto?',
+                buttons: {
+                   confirm: { text: 'Si', btnClass: 'btn-green', action: function(){
+
+                               addProductToPurchaseOrder(productid,quantity,id);
+
+                          }
+
+                          },
+                   cancel: { text: 'No', btnClass: 'btn-red', action: function(){
+                             alert("no");
+                          }
+                 }
+               }
+            });
+          }
+
+          else{
+
+               //createPurchaseOrder(supplier);
+           }
+
+
+      });
+
 
     }
 
@@ -195,6 +246,21 @@
           if((--load_wait)==0) $("#load-spinner").fadeOut();
           if(data.result) toastr.success("Datos guardados correctamente", "Confirmación", confirmation);
   					else toastr.error("Ocurrió un error al guardar los datos", "Confirmación", confirmation);
+        });
+
+    }
+
+    function addProductToPurchaseOrder(productid,quantity){
+
+      if((++load_wait)==1) $("#load-spinner").fadeIn();
+      $.ajax({
+          type: "GET",
+          dataType: "json",
+          url: "/api/ERP/PurchasesOrders/addproduct/"+productid+"/"+quantity+"/"+orderid
+        }).done(function( data, textStatus, jqXHR ) {
+          if((--load_wait)==0) $("#load-spinner").fadeOut();
+          if(data.result) toastr.success("Datos guardados correctamente", "Confirmación", confirmation);
+            else toastr.error("Ocurrió un error al guardar los datos", "Confirmación", confirmation);
         });
 
     }

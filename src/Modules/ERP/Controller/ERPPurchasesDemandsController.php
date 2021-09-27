@@ -43,7 +43,14 @@ class ERPPurchasesDemandsController extends Controller
 	 */
 	public function index(RouterInterface $router,Request $request)
 	{
-		if($this->getUser()!=null) $id=$this->getUser()->getId();
+
+		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		if($this->getUser()){
+			if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
+			$id=$this->getUser()->getId();
+
+		}
+		else return $this->redirect($this->generateUrl('unauthorized'));
 	//	else return $this->redirectToRoute();
 		$usersRepository=$this->getDoctrine()->getRepository(GlobaleUsers::class);
 		$user=$usersRepository->findOneBy(["id"=>$id]);
@@ -75,10 +82,10 @@ class ERPPurchasesDemandsController extends Controller
 		$purchasesdemands=$purchasesdemandsRepository->findBy(["active"=>true,"deleted"=>false]);
 
 
-
+/*
     if($purchasesdemands==null){
 			$purchasesdemands=new $this->class();
-		}
+		}*/
 
     if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
       return $this->render('@ERP/purchasesdemands.html.twig', [
@@ -120,8 +127,9 @@ class ERPPurchasesDemandsController extends Controller
 		foreach ($fields->lines as $key => $value) {
 			if($value->code!=null)
 			{
+
 			$product=$productsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "code"=>$value->code, "deleted"=>0]);
-			$supplier=$suppliersRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "name"=>$value->supplier, "active"=>1, "deleted"=>0]);
+			$supplier=$suppliersRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$value->supplier, "active"=>1, "deleted"=>0]);
 			$line=$purchasesdemandsRepository->findOneBy(["product"=>$product]);
 
 
@@ -139,11 +147,11 @@ class ERPPurchasesDemandsController extends Controller
 				$line->setQuantity(floatval($value->quantity));
 			//	dump($value->variant);
 				if(isset($value->variant) AND $value->variant!="-1"){
-					 $variant=$variantsRepository->findOneBy(["name"=>$value->variant]);
+					 $variant=$variantsRepository->findOneBy(["id"=>$value->variant]);
 						$line->setVariant($variant);
 				 }
 				 if(isset($value->reason) AND $value->reason!="-1"){
-						 $reason=$reasonsRepository->findOneBy(["name"=>$value->reason]);
+						 $reason=$reasonsRepository->findOneBy(["id"=>$value->reason]);
 						 $line->setReason($reason);
 					}
 				if($value->deleted){

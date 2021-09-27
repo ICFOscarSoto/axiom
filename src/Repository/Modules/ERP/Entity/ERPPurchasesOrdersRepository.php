@@ -71,4 +71,15 @@ class ERPPurchasesOrdersRepository extends ServiceEntityRepository
 
     }
 
+    public function getPurchaseOrderBySupplier($supplierid)
+    {
+      $query="SELECT o.id,s.name
+      FROM erppurchases_orders o
+      LEFT JOIN erpsuppliers s
+      ON s.id=o.supplier_id
+      WHERE o.supplier_id=".$supplierid." AND o.status=0";
+      return $this->getEntityManager()->getConnection()->executeQuery($query)->fetch();
+
+    }
+
 }
