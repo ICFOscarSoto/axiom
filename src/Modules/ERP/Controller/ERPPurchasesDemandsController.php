@@ -123,6 +123,7 @@ class ERPPurchasesDemandsController extends Controller
 
 		//Get content of the json reques
 		$fields=json_decode($request->getContent());
+			dump($fields);
 		$linenumIds=[];
 		foreach ($fields->lines as $key => $value) {
 			if($value->code!=null)
@@ -130,7 +131,12 @@ class ERPPurchasesDemandsController extends Controller
 
 			$product=$productsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "code"=>$value->code, "deleted"=>0]);
 			$supplier=$suppliersRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$value->supplier, "active"=>1, "deleted"=>0]);
-			$line=$purchasesdemandsRepository->findOneBy(["product"=>$product]);
+			$variant=null;
+			if(isset($value->variant) AND $value->variant!="-1"){
+				  $variant=$variantsRepository->findOneBy(["id"=>$value->variant]);
+				 	$line=$purchasesdemandsRepository->findOneBy(["product"=>$product, "active"=>1, "deleted"=>0,"variant"=>$variant]);
+				}
+			else $line=$purchasesdemandsRepository->findOneBy(["product"=>$product, "active"=>1, "deleted"=>0]);
 
 
 			//if(!$product) continue;
@@ -145,9 +151,8 @@ class ERPPurchasesDemandsController extends Controller
 				$line->setProduct($product);
 				$line->setSupplier($supplier);
 				$line->setQuantity(floatval($value->quantity));
-			//	dump($value->variant);
-				if(isset($value->variant) AND $value->variant!="-1"){
-					 $variant=$variantsRepository->findOneBy(["id"=>$value->variant]);
+
+				if($variant){
 						$line->setVariant($variant);
 				 }
 				 if(isset($value->reason) AND $value->reason!="-1"){
