@@ -31,10 +31,10 @@ class EmailGetSubjects extends ContainerAwareCommand
             '==================',
             '',
     ]);
-    $emailAccounts=$emailAccountsRepository->findAll();
+    $emailAccounts=$emailAccountsRepository->findBy(["active"=>1, "deleted"=>0]);
 
     foreach($emailAccounts as $emailAccount){
-      if($emailAccount->getUsername()!="david.mrentero@ferreteriacampollano.com") continue;
+      $output->writeln([' -> checking '.$emailAccount->getUsername()]);
       //get folders
       $emailFolders=$emailFoldersRepository->findBy(["emailAccount"=>$emailAccount]);
       $countUnseen=0;
@@ -63,19 +63,22 @@ class EmailGetSubjects extends ContainerAwareCommand
             array_reverse($emailsUnseen);
             $emailSubjects=imap_fetch_overview ($inbox, implode(',',$emailsUnseen), 0);
             foreach($emailSubjects as $emailSubject){
+
               $subject = new EmailSubjects();
               $subject->setFolder($emailAccount->getInboxFolder());
               $subject->setUid($emailSubject->uid);
               $subject->setRecent(!in_array($emailSubject->uid, $olderMsgs));
               $subject->setMessageId(isset($emailSubject->message_id)?$emailSubject->message_id:'');
               $subject->setMsgno($emailSubject->msgno);
-              $subject->setSubject(isset($emailSubject->subject)?HelperMail::decode_header(imap_utf8($emailSubject->subject)):'');
+              $subject->setSubject(utf8_encode(isset($emailSubject->subject)?substr(HelperMail::decode_header(imap_utf8($emailSubject->subject)),0,255):''));
               $subject->setFromEmail(isset($emailSubject->from)?HelperMail::decode_header(imap_utf8($emailSubject->from)):'');
               $subject->setDate(new \DateTime(date('Y-m-d H:i:s',$emailSubject->udate)));
               $entityManager->persist($subject);
               $entityManager->flush();
-              if($emailAccount->getUsername()=="david.mrentero@ferreteriacampollano.com"){
-                  HelperMailDavid::checkMail($emailSubject, $emailAccount, $inbox, $output);
+
+              $class="\App\Modules\\Email\\Proccessors\\".str_replace('.','_',str_replace('@','¡',$emailAccount->getUsername()));
+              if(class_exists($class)){
+                  $class::checkMail($emailSubject, $emailAccount, $inbox, $output, $doctrine);
               }
             }
           }

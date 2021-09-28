@@ -56,6 +56,11 @@ class GlobaleStates
     public $newSeconds=1296000;
     public $updatedSeconds=1296000;
 
+    /**
+     * @ORM\Column(type="string", length=10, nullable=true)
+     */
+    private $numcode;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -141,6 +146,18 @@ class GlobaleStates
     public function setCountry(?GlobaleCountries $country): self
     {
         $this->country = $country;
+
+        return $this;
+    }
+
+    public function getNumcode(): ?string
+    {
+        return $this->numcode;
+    }
+
+    public function setNumcode(?string $numcode): self
+    {
+        $this->numcode = $numcode;
 
         return $this;
     }

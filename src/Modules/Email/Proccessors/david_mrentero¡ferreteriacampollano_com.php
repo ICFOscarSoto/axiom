@@ -1,11 +1,13 @@
 <?php
-namespace App\Helpers;
+namespace App\Modules\Email\Proccessors;
 use App\Modules\Email\Utils\EmailUtils;
+use App\Helpers\HelperMail;
+use App\Modules\Email\Helpers\HelperMercateo;
 use App\Modules\Globale\Utils\GlobaleTranslatorUtils;
 
-class HelperMailDavid {
+class david_mrentero¡ferreteriacampollano_com {
 
-    public function checkMail($subject, $account, $inbox, $output){
+    public function checkMail($subject, $account, $inbox, $output, $doctrine){
       $discordchannel="883046233017552956";
       $output->writeln([isset($subject->subject)?('Procesando: '.HelperMail::decode_header(imap_utf8($subject->subject))):('Procesando: Correo sin asunto')]);
       $from=HelperMail::decode_header(imap_utf8($subject->from));
@@ -54,7 +56,8 @@ class HelperMailDavid {
                //Send notification
                file_get_contents("https://icfbot.ferreteriacampollano.com/message.php?channel=".$discordchannel."&msg=".urlencode($icon."RAID NAVISION: ".$result));
            }
-          break;
+        break;
+
 
       }
     }
