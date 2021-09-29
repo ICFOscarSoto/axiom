@@ -104,6 +104,9 @@ class ERPInfoStocksController extends Controller
 
   /**
    * @Route("/{_locale}/updateStocksManageds", name="updateStocksManageds")
+   * store => codigo del almacén en AXIOM
+   * date => fecha de inicio de los movimientos en formato dd/mm/aaaa
+   * date2 => fecha de inicio de los movimientos en formato aaaa/mm/dd
    */
     public function updateStocksManageds(RouterInterface $router,Request $request){
     $storeName=$request->query->get('store',null);
@@ -129,7 +132,7 @@ class ERPInfoStocksController extends Controller
     foreach($infoStocks as $infoStock){
       $product=$productRepository->findOneBy(["code"=>$infoStock["code"]]);
       $stock=$stockRepository->findOneBy(["storelocation"=>$storeLocation->getId(), "product"=>$product->getId()]);
-
+      if ($stock==NULL) continue;
       $quantity=$stock->getQuantity()-$infoStock["vendido"];
       $stockHistory=new ERPStockHistory();
       $stockHistory->setProduct($product);
@@ -145,7 +148,6 @@ class ERPInfoStocksController extends Controller
       $this->getDoctrine()->getManager()->persist($stockHistory);
       $stock->setQuantity($quantity);
       $this->getDoctrine()->getManager()->persist($stock);
-      $this->getDoctrine()->getManager()->flush();
     }
     $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getTransfersByStore.php?store='.$storeName.'&date='.$date);
     $objects=json_decode($json, true);
@@ -155,11 +157,23 @@ class ERPInfoStocksController extends Controller
       $stock=$stockRepository->findOneBy(["storelocation"=>$storeLocation->getId(), "product"=>$product->getId()]);
       if ($stock!=null){
       $quantity=$stock->getQuantity()+$object["stock"];
+      $stockHistory=new ERPStockHistory();
+      $stockHistory->setProduct($product);
+      $stockHistory->setLocation($storeLocation);
+      $stockHistory->setStore($store);
+      $stockHistory->setUser($user);
+      $stockHistory->setPreviousqty($stock->getQuantity());
+      $stockHistory->setNewqty($quantity);
+      $stockHistory->setDateadd(new \Datetime());
+      $stockHistory->setDateupd(new \Datetime());
+      $stockHistory->setActive(true);
+      $stockHistory->setDeleted(false);
+      $this->getDoctrine()->getManager()->persist($stockHistory);
       $stock->setQuantity($quantity);
-      $this->getDoctrine()->getManager()->persist($stock);
-      $this->getDoctrine()->getManager()->flush();}
+      $this->getDoctrine()->getManager()->persist($stock);}
     }
 
+    $this->getDoctrine()->getManager()->flush();
     return new JsonResponse(["result"=>1, "text"=>"Se ha ajustado el stock"]);
     }
 

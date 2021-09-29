@@ -26,7 +26,9 @@ use App\Modules\ERP\Entity\ERPCustomerPrices;
 use App\Modules\ERP\Entity\ERPVariants;
 use App\Modules\ERP\Entity\ERPVariantsValues;
 use App\Modules\ERP\Entity\ERPProductsVariants;
+use App\Modules\ERP\Entity\ERPStockHistory;
 use App\Modules\Globale\Entity\GlobaleCompanies;
+use App\Modules\Globale\Entity\GlobaleUsers;
 use App\Modules\Globale\Entity\GlobaleStates;
 use App\Modules\Globale\Entity\GlobaleTaxes;
 use App\Modules\Globale\Entity\GlobaleCountries;
@@ -846,6 +848,9 @@ public function updateStocksStoresManaged(InputInterface $input, OutputInterface
   $repositoryVariantsValues=$this->doctrine->getRepository(ERPVariantsValues::class);
   $repositoryProductsVariants=$this->doctrine->getRepository(ERPProductsVariants::class);
   $repositoryStocks=$this->doctrine->getRepository(ERPStocks::class);
+  $storeLocationsRepository=$this->doctrine->getRepository(ERPStoreLocations::class);
+  $storeRepository=$this->doctrine->getRepository(ERPStores::class);
+  $userRepository=$this->doctrine->getRepository(GlobaleUsers::class);
   $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getStocksManaged.php?from='.$navisionSync->getMaxtimestamp());
   $objects=json_decode($json, true);
   $objects=$objects[0];
@@ -869,9 +874,25 @@ public function updateStocksStoresManaged(InputInterface $input, OutputInterface
               $stock_old=$repositoryStocks->findOneBy(["id"=>$old_stocks[0]["id"], "deleted"=>0]);
               $output->writeln('Vamos a actualizar la linea '.$old_stocks[0]["id"].' del producto '.$product->getId().' en el almacen '.$stock["almacen"]);
               if ($stock_old->getStorelocation()->getStore()->getManaged()==1) {
+              $storeLocation=$storeLocationsRepository->findOneBy(["name"=>$stock["almacen"]]);
+              $store=$storeRepository->findOneBy(["code"=>$stock["almacen"]]);
+              $user=$userRepository->findOneBy(["email"=>"josemiguel.pardo@ferreteriacampollano.com"]);
+              $stockHistory=new ERPStockHistory();
+              $stockHistory->setProduct($product);
+              $stockHistory->setLocation($storeLocation);
+              $stockHistory->setStore($store);
+              $stockHistory->setUser($user);
+              $stockHistory->setPreviousqty($stock_old->getQuantity());
+              $stockHistory->setNewqty($stock_old->getQuantity()+((int)$stock["stock"]));
+              $stockHistory->setDateadd(new \Datetime());
+              $stockHistory->setDateupd(new \Datetime());
+              $stockHistory->setActive(true);
+              $stockHistory->setDeleted(false);
+              $this->doctrine->getManager()->merge($stockHistory);
               $stock_old->setQuantity($stock_old->getQuantity()+((int)$stock["stock"]));
               $stock_old->setDateupd(new \Datetime());
-              $this->doctrine->getManager()->merge($stock_old);}
+              $this->doctrine->getManager()->merge($stock_old);
+            }
             }
             else {
               $location=$repositoryStoreLocations->findOneBy(["name"=>$stock["almacen"]]);
