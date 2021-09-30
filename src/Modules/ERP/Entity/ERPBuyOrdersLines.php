@@ -106,27 +106,7 @@ class ERPBuyOrdersLines
      */
     private $dateupd;
 
-    /**
-     * @ORM\Column(type="float", nullable=true)
-     */
-    private $dto1;
-
-    /**
-     * @ORM\Column(type="float", nullable=true)
-     */
-    private $dto2;
-
-    /**
-     * @ORM\Column(type="float", nullable=true)
-     */
-    private $dto3;
-
-    /**
-     * @ORM\Column(type="float", nullable=true)
-     */
-    private $dto4;
-
-    /**
+      /**
      * @ORM\Column(type="float", nullable=true)
      */
     private $discount1;
@@ -356,54 +336,6 @@ class ERPBuyOrdersLines
     public function setDateupd(\DateTimeInterface $dateupd): self
     {
         $this->dateupd = $dateupd;
-
-        return $this;
-    }
-
-    public function getDto1(): ?float
-    {
-        return $this->dto1;
-    }
-
-    public function setDto1(?float $dto1): self
-    {
-        $this->dto1 = $dto1;
-
-        return $this;
-    }
-
-    public function getDto2(): ?float
-    {
-        return $this->dto2;
-    }
-
-    public function setDto2(?float $dto2): self
-    {
-        $this->dto2 = $dto2;
-
-        return $this;
-    }
-
-    public function getDto3(): ?float
-    {
-        return $this->dto3;
-    }
-
-    public function setDto3(?float $dto3): self
-    {
-        $this->dto3 = $dto3;
-
-        return $this;
-    }
-
-    public function getDto4(): ?float
-    {
-        return $this->dto4;
-    }
-
-    public function setDto4(?float $dto4): self
-    {
-        $this->dto4 = $dto4;
 
         return $this;
     }
