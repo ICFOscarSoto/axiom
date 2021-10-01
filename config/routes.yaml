@@ -380,6 +380,9 @@ ERPPurchasesDeliveryNotesController:
   resource: 'App\Modules\ERP\Controller\ERPPurchasesDeliveryNotesController'
   type:      annotation
 
+ERPBuyOrders:
+  resource: 'App\Modules\ERP\Controller\ERPBuyOrdersController'
+  type:      annotation
 
 ERPMyBackpack:
   resource: 'App\Modules\ERP\Controller\ERPMyBackpackController'

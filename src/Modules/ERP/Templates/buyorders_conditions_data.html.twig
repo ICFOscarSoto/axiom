@@ -1,0 +1,71 @@
+<div class="panel panel-primary panel-shadow" id="supplier-conditions" {% if id==0 %} style="display:none;"{% endif %} data-collapsed="0" style="-webkit-box-shadow: none; box-shadow:none; margin-bottom: -1px;"><!-- to apply shadow add class "panel-shadow" -->
+  <div class="panel-body">
+    <div class="panel-title">Condiciones</div>
+      <div class="row">
+        {% if buyorder.store==null %}
+          {% if id==0 %}
+            <div class="col-md-2" id="buyorder-store-info">
+              <div class="form-group">
+                <label for="buyorder-form-store">Almacén de entrega</label>
+                <select type="text" id="buyorder-form-store" class="form-control select2" required>
+                  {% for option in stores %}
+                    <option value="{{ option.id }}" {% if option.id==1 %}selected{% endif %}>{{ option.text }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          {% endif %}
+        {% else %}
+        <div class="col-md-2" id="buyorder-store-info">
+          <div class="form-group">
+            <label for="buyorder-form-store">Almacén:</label>
+            <input type="text" readonly id="buyorder-form-store" {% if buyorder.store!=null %} value="{{ buyorder.store.name }}" disabled {% endif %} class="form-control" placeholder="Almacén">
+          </div>
+        </div>
+        {% endif %}
+        <div class="col-md-2">
+          <label for="supplier-form-minorder">Importe mínimo:</label>
+          <div class="form-group">
+            <input type="number" readonly id="supplier-form-minorder" {% if buyorder!=null %} value="{{ buyorder.minorder }}" disabled {% endif %} class="form-control">
+          </div>
+        </div>
+        <div class="col-md-2">
+          <label for="supplier-form-freeshipping">Portes gratis desde:</label>
+          <div class="form-group">
+            <input type="number" readonly id="supplier-form-freeshipping" {% if buyorder!=null %} value="{{ buyorder.freeshipping }}" disabled {% endif %} class="form-control">
+          </div>
+        </div>
+        <div class="col-md-2">
+          <label for="supplier-form-email">Gastos adicionales</label>
+          <div class="form-group">
+            <input type="number" id="supplier-form-additionalcost" class="form-control" placeholder="0">
+          </div>
+        </div>
+        <div class="col-md-1">
+          <label for="supplier-form-email">Peso</label>
+          <div class="form-group">
+            <input type="number" readonly id="supplier-form-weight" class="form-control" placeholder="0">
+          </div>
+        </div>
+        <div class="col-md-1">
+            <label for="supplier-form-priority">Urgente</label>
+            <div class="form-group">
+            <input type="checkbox" id="supplier-form-priority">
+            </div>
+          </div>
+        <div class="col-md-1">
+            <label for="supplier-form-priority">Leido</label>
+            <div class="form-group">
+            <input type="checkbox" id="supplier-form-read">
+            </div>
+          </div>
+        </div>
+</div>
+
+
+    </div>
+    <br>
+</div>
+</div>
+<br>
+<br>

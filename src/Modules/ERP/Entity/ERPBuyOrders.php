@@ -9,6 +9,9 @@ use \App\Modules\ERP\Entity\ERPSuppliers;
 use \App\Modules\ERP\Entity\ERPPaymentMethods;
 use \App\Modules\ERP\Entity\ERPStores;
 use \App\Modules\ERP\Entity\ERPBuyOrdersStates;
+use \App\Modules\Globale\Entity\GlobaleStates;
+use \App\Modules\Globale\Entity\GlobaleCountries;
+use \App\Modules\ERP\Entity\ERPCustomers;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\Modules\ERP\Entity\ERPBuyOrdersRepository")
@@ -147,6 +150,56 @@ class ERPBuyOrders
      * @ORM\JoinColumn(nullable=false)
      */
     private $state;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPCustomers")
+     */
+    private $customer;
+
+    /**
+     * @ORM\Column(type="string", length=150, nullable=true)
+     */
+    private $destinationaddress;
+
+    /**
+     * @ORM\Column(type="string", length=32, nullable=true)
+     */
+    private $destionationphone;
+
+    /**
+     * @ORM\Column(type="string", length=180, nullable=true)
+     */
+    private $destinationemail;
+
+    /**
+     * @ORM\Column(type="string", length=12, nullable=true)
+     */
+    private $destinationpostcode;
+
+    /**
+     * @ORM\Column(type="string", length=70, nullable=true)
+     */
+    private $destinationcity;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleStates")
+     * @ORM\JoinColumn(onDelete="SET NULL")
+     */
+    private $destinationstate;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCountries")
+     */
+    private $destinationcountry;
+
+    /**
+     * @ORM\Column(type="smallint", nullable=true)
+     */
+    private $readed;
+
+
+
+
 
     public function getId(): ?int
     {
@@ -440,4 +493,127 @@ class ERPBuyOrders
 
         return $this;
     }
+
+    public function getCustomer(): ?ERPCustomers
+    {
+        return $this->customer;
+    }
+
+    public function setCustomer(?ERPCustomers $customer): self
+    {
+        $this->customer = $customer;
+
+        return $this;
+    }
+
+    public function getDestinationaddress(): ?string
+    {
+        return $this->destinationaddress;
+    }
+
+    public function setDestinationaddress(?string $destinationaddress): self
+    {
+        $this->destinationaddress = $destinationaddress;
+
+        return $this;
+    }
+
+    public function getDestionationphone(): ?string
+    {
+        return $this->destionationphone;
+    }
+
+    public function setDestionationphone(?string $destionationphone): self
+    {
+        $this->destionationphone = $destionationphone;
+
+        return $this;
+    }
+
+    public function getDestinationemail(): ?string
+    {
+        return $this->destinationemail;
+    }
+
+    public function setDestinationemail(?string $destinationemail): self
+    {
+        $this->destinationemail = $destinationemail;
+
+        return $this;
+    }
+
+    public function getDestinationpostcode(): ?string
+    {
+        return $this->destinationpostcode;
+    }
+
+    public function setDestinationpostcode(?string $destinationpostcode): self
+    {
+        $this->destinationpostcode = $destinationpostcode;
+
+        return $this;
+    }
+
+    public function getDestinationcity(): ?string
+    {
+        return $this->destinationcity;
+    }
+
+    public function setDestinationcity(?string $destinationcity): self
+    {
+        $this->destinationcity = $destinationcity;
+
+        return $this;
+    }
+
+    public function getDestinationstate(): ?GlobaleStates
+    {
+        return $this->destinationstate;
+    }
+
+    public function setDestinationstate(?GlobaleStates $destinationstate): self
+    {
+        $this->destinationstate = $destinationstate;
+
+        return $this;
+    }
+
+    public function getRelation(): ?string
+    {
+        return $this->relation;
+    }
+
+    public function setRelation(string $relation): self
+    {
+        $this->relation = $relation;
+
+        return $this;
+    }
+
+    public function getDestinationcountry(): ?GlobaleCountries
+    {
+        return $this->destinationcountry;
+    }
+
+    public function setDestinationcountry(?GlobaleCountries $destinationcountry): self
+    {
+        $this->destinationcountry = $destinationcountry;
+
+        return $this;
+    }
+
+    public function getReaded(): ?int
+    {
+        return $this->readed;
+    }
+
+    public function setReaded(?int $readed): self
+    {
+        $this->readed = $readed;
+
+        return $this;
+    }
+
+
+
 }
