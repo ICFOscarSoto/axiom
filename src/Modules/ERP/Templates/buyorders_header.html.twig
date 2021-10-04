@@ -43,37 +43,32 @@
       {% if buyorder.estimateddelivery is not null %}
       <div class="col-md-2" id="buyorder-form-estimateddelivery-div">
         <label for="buyorder-form-estimateddelivery">Fecha estimada de entrega:</label>
-        <input type="text" id="buyorder-form-estimateddelivery" name="" class="datepicker form-control" value="{{ buyorder.estimateddelivery|date('h:m:s d/m/Y ') }}">
+        <div class="input-group">
+          <span class="input-group-addon"><i class="fa fa-calendar" aria-hidden="true"></i></span>
+          <input type="text" id="buyorder-form-estimateddelivery" style="z-index:99 !important;" name="" class="datepicker form-control" value="{{ buyorder.estimateddelivery|date('h:m:s d/m/Y ') }}">
+        </div>
       </div>
       {% else %}
       <div class="col-md-2" id="buyorder-form-estimateddelivery-div">
         <label for="buyorder-form-estimateddelivery">Fecha estimada de entrega:</label>
-        <input type="text" id="buyorder-form-estimateddelivery" name="" class="datepicker form-control">
+        <div class="input-group">
+          <span class="input-group-addon"><i class="fa fa-calendar" aria-hidden="true"></i></span>
+          <input type="text" id="buyorder-form-estimateddelivery" style="z-index:99 !important;" name="" class="datepicker form-control">
+        </div>
       </div>
       {% endif %}
       {% if id!=0 %}
-      <div class="col-md-2" style="text-align:right;">
+      <div class="col-md-6" style="text-align:right;">
           <h2>Nº {{ buyorder.code }}</h2>
+        <br>
+      </div>
+      {% else %}
+      <div class="col-md-6" style="text-align:right;">
+          <h2>Nº #21PC08923</h2>
         <br>
       </div>
       {% endif %}
       <br>
   </div>
 </div>
-  </div>
-  </div>
-<br>
-<br>
-
-
-<script>
-  $('body').on('click', "#storeticket-form-view", function(e){
-    var id=$(this).attr("attr-id");
-    if(id!=0 && id!=""){
-    url=$(this).attr("attr-url");
-    url=url.replace('_____',$(this).attr("attr-id"));
-    var win = window.open(url, '_blank');
-    win.focus();
-    }
-});
-</script>
+</div>

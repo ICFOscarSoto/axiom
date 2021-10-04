@@ -25,6 +25,7 @@
 		<!-- MAIN CONTENT -->
 		<div id="buyorders-body">
 			{% set formConstructor = form %}
+				{{ include('@ERP/buyorders_header.html.twig') }}
 				{{ include('@ERP/buyorders_data.html.twig') }}
 				{{ include('@ERP/buyorders_destination.html.twig') }}
 		</div>

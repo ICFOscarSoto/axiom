@@ -241,4 +241,6 @@ class ERPBuyOrdersController extends Controller
 		$return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, CustomerGroups::class,[["type"=>"and", "column"=>"company", "value"=>$user->getCompany()]]);
 		return new JsonResponse($return);
 	}
+
+
 }

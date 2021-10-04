@@ -52,25 +52,39 @@
       if($("#buyorder-form-freeshipping").val()==0) $("#buyorder-form-shippingcharge").val("PAGADOS");
       else  $("#buyorder-form-shippingcharge").val("DEBIDOS");
   }
-/*
+
   function setEstimatedDate(){
-
-      var estimated=parseInt($("#buyorder-form-estiamteddelivery-number").val());
+      var estimated=parseInt($("#buyorder-form-estimateddelivery-number").val());
       var res = new Date();
-      res.setDate(res.getDate() + 7);
-      var date = res.getFullYear()+'-'+(res.getMonth()+1)+'-'+res.getDate();
+      res.setDate(res.getDate() + estimated);
+      //si la fecha de entrega estimada cae en fin de semana, se pasa al lunes siguiente
+      if(res.getDay()==6) res.setDate(res.getDate() + 2);
+      else if(res.getDay()==7) res.setDate(res.getDate() + 1);
+
+
+      var day;
+      //si el día es menor que 10, añadimos un 0 delante para evitar posibles fallos
+      if(res.getDate()<10) day= "0"+res.getDate();
+      else day= res.getDate();
+
+      var datetoday = day+'/'+(res.getMonth()+1)+'/'+res.getFullYear();
 
 
 
+      $("#buyorder-form-estimateddelivery").val(datetoday);
+
+
+
+/*
 
     estimated=$("#buyorder-form-estiamteddelivery-number").val();
     alert(estimated);
     var fecha = Date.now();
     alert(fecha);
     fecha.setDate(fecha.getDate() + estimated);
-    alert(fecha);
+    alert(fecha);*/
   }
-*/
+
   $(document).ready(function() {
     {# SUPPLIER SEARCH #}
 
@@ -120,9 +134,9 @@
           $("#buyorder-form-freeshipping").val(elements.freeshipping);
           $("#buyorder-form-freeshipping").trigger('change');
           $("#buyorder-form-freeshipping").attr("disabled", true);
-          $("#buyorder-form-estiamteddelivery-number").val(elements.estimateddelivery);
+          $("#buyorder-form-estimateddelivery-number").val(elements.estimateddelivery);
          setShippingCharge();
-         //setEstimatedDate();
+         setEstimatedDate();
 
         });
 

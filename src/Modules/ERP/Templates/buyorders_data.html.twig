@@ -1,70 +1,5 @@
 <div class="panel panel-primary panel-shadow" data-collapsed="0" style="-webkit-box-shadow: none; box-shadow:none; margin-bottom: -1px;"><!-- to apply shadow add class "panel-shadow" -->
-    <div class="panel-body">
-    <div class="row">
-      {% if buyorder.state!=null %}
-          <div class="col-md-2">
-            <label for="buyorder-form-currentstate">Estado actual:</label>
-            <select type="text" id="buyorder-form-currentstate" class="form-control select2" required>
-              {% for option in states %}
-                <option value="{{ option.id }}" {% if buyorder.state.id== option.id %}selected{% endif %}>{{ option.text }}</option>
-              {% endfor %}
-            </select>
-          </div>
-      {% else %}
-      <div class="col-md-2">
-        <label for="buyorder-form-currentstate">Estado actual:</label>
-        <select type="text" id="buyorder-form-currentstate" class="form-control select2" required>
-          {% for option in states %}
-            <option value="{{ option.id }}" {% if option.id==1 %}selected{% endif %}>{{ option.text }}</option>
-          {% endfor %}
-        </select>
-      </div>
-      {% endif %}
-      {% if buyorder.agent is not null %}
-        <div class="col-md-2">
-          <label for="buyorder-form-agent">Agente:</label>
-          <div class="form-group">
-          <input type="text" id="buyorder-form-agent" value="{{ buyorder.agent.name }} {{ buyorder.agent.lastname }}" disabled="disabled" class="form-control" placeholder="Agente">
-          <input type="hidden" id="buyorder-form-agent-id" value="{{ buyorder.agent.id }}" class="form-control">
-          </div>
-        </div>.name
-      {% else %}
-      <div class="col-md-2">
-        <label for="buyorder-form-agen-select">Agente:</label>
-        <div class="form-group">
-          <select type="text" id="buyorder-form-agents-select" class="form-control select2" required>
-            {% for option in agents %}
-              <option value="{{ option.id }}" {% if option.id==userData.id %}selected{% endif %}>{{ option.text }}</option>
-            {% endfor %}
-          </select>
-        </div>
-      </div>
-      {% endif %}
-      {% if buyorder.estimateddelivery is not null %}
-      <div class="col-md-2" id="buyorder-form-estimateddelivery-div">
-        <label for="buyorder-form-estimateddelivery">Fecha estimada de entrega:</label>
-        <div class="input-group">
-          <span class="input-group-addon"><i class="fa fa-calendar" aria-hidden="true"></i></span>
-          <input type="text" id="buyorder-form-estimateddelivery" name="" class="datepicker form-control" value="{{ buyorder.estimateddelivery|date('h:m:s d/m/Y ') }}">
-        </div>
-      </div>
-      {% else %}
-      <div class="col-md-2" id="buyorder-form-estimateddelivery-div">
-        <label for="buyorder-form-estimateddelivery">Fecha estimada de entrega:</label>
-        <div class="input-group">
-          <span class="input-group-addon"><i class="fa fa-calendar" aria-hidden="true"></i></span>
-          <input type="text" id="buyorder-form-estimateddelivery" name="" class="datepicker form-control">
-        </div>
-      </div>
-      {% endif %}
-      {% if id!=0 %}
-      <div class="col-md-2" style="text-align:right;">
-          <h2>Nº {{ buyorder.code }}</h2>
-        <br>
-      </div>
-      {% endif %}
-      <br>
-  </div>
+  <div class="panel-body">
   <div class="row">
     <div class="col-md-2" id="searching-supplier">
       <label for="supplier-form-code">Código de Proveedor:</label>
@@ -76,28 +11,29 @@
           </div>
         </div>
       </div>
-      <div class="col-md-2">
+      <div class="col-md-4">
         <label for="supplier-form-name">Nombre del proveedor:</label>
         <div class="form-group">
-          <input type="text"  id="supplier-form-name" {% if buyorder.suppliername!=null %} value="{{ buyorder.suppliername }}"  {% endif %} class="form-control" placeholder="Nombre del proveedor">
+          <span id="supplier-form-view" class="select2-selection__view_tickets" {% if buyorder.supplier!=null %} attr-id="{{ buyorder.supplier.id }}" {% else %} style="display:none;" {% endif %} attr-url="{{ url('formSupplier',{'id':'_____'}) }}"><i class="fa fa-file-text-o" aria-hidden="true"></i><span>&nbsp;Ver Ficha</span></span>
+          <input type="text" readonly id="supplier-form-name" {% if buyorder.suppliername!=null %} value="{{ buyorder.suppliername }}"  {% endif %} class="form-control" placeholder="Nombre del proveedor">
         </div>
       </div>
       <div class="col-md-2">
         <label for="supplier-form-email">Email del proveedor:</label>
         <div class="form-group">
-          <input type="text"  id="supplier-form-email" {% if buyorder.email!=null %} value="{{ buyorder.email }}"  {% endif %} class="form-control" placeholder="Email del proveedor">
+          <input type="text"  readonly id="supplier-form-email" {% if buyorder.email!=null %} value="{{ buyorder.email }}"  {% endif %} class="form-control" placeholder="Email del proveedor">
         </div>
       </div>
       <div class="col-md-2">
         <label for="supplier-form-phone">Teléfono del proveedor:</label>
         <div class="form-group">
-          <input type="text"  id="supplier-form-phone" {% if buyorder.phone!=null %} value="{{ buyorder.phone }}"  {% endif %} class="form-control" placeholder="Teléfono del proveedor">
+          <input type="text" readonly id="supplier-form-phone" {% if buyorder.phone!=null %} value="{{ buyorder.phone }}"  {% endif %} class="form-control" placeholder="Teléfono del proveedor">
         </div>
       </div>
       <div class="col-md-2">
         <label for="supplier-form-paymentmethod">Método de pago:</label>
         <div class="form-group">
-          <input type="text"  id="supplier-form-paymentmethod" {% if buyorder.paymentmethod!=null %} value="{{ buyorder.paymentmethod }}"  {% endif %} class="form-control" placeholder="Método de pago">
+          <input type="text" readonly id="supplier-form-paymentmethod" {% if buyorder.paymentmethod!=null %} value="{{ buyorder.paymentmethod }}"  {% endif %} class="form-control" placeholder="Método de pago">
         </div>
       </div>
   </div>
@@ -128,31 +64,31 @@
     <div class="col-md-2">
       <label for="buyorder-form-shippingcharge">Portes:</label>
       <div class="form-group">
-        <input type="text"  id="buyorder-form-shippingcharge" {% if buyorder.shippingcharge!=null %}{% if buyorder.shippingcharge=="1" %} value="PAGADOS" {% else %} value="DEBIDOS"{% endif %} {% endif %} class="form-control" placeholder="Portes...">
+        <input type="text"  id="buyorder-form-shippingcharge" disabled {% if buyorder.shippingcharge!=null %}{% if buyorder.shippingcharge=="1" %} value="PAGADOS" {% else %} value="DEBIDOS"{% endif %} {% endif %} class="form-control" placeholder="Portes...">
       </div>
     </div>
     <div class="col-md-1">
       <label for="buyorder-form-minorder">Importe mínimo:</label>
       <div class="form-group">
-        <input type="text"  id="buyorder-form-minorder" {% if buyorder.minorder!=null %} value="{{ buyorder.minorder }}" {% endif %} class="form-control" placeholder="Importe mínimo...">
+        <input type="text"  id="buyorder-form-minorder" {% if buyorder.minorder!=null %} value="{{ buyorder.minorder }}" {% endif %} class="form-control">
       </div>
     </div>
     <div class="col-md-1">
       <label for="buyorder-form-freeshipping">Portes desde:</label>
       <div class="form-group">
-        <input type="text"  id="buyorder-form-freeshipping" {% if buyorder.freeshipping!=null %} value="{{ buyorder.freeshipping }}" {% endif %} class="form-control" placeholder="Portes pagados desde...">
+        <input type="text"  id="buyorder-form-freeshipping" {% if buyorder.freeshipping!=null %} value="{{ buyorder.freeshipping }}" {% endif %} class="form-control">
       </div>
     </div>
     <div class="col-md-1">
       <label for="buyorder-form-additionalcost">Gastos extra:</label>
       <div class="form-group">
-        <input type="text"  id="buyorder-form-additionalcost" {% if buyorder.additionalcost!=null %} value="{{ buyorder.additionalcost }}" {% endif %} class="form-control" placeholder="Gastos adicionales...">
+        <input type="text"  id="buyorder-form-additionalcost" {% if buyorder.additionalcost!=null %} value="{{ buyorder.additionalcost }}" {% endif %} class="form-control">
       </div>
     </div>
     <div class="col-md-1">
       <label for="buyorder-form-weight">Peso:</label>
       <div class="form-group">
-        <input type="text"  id="buyorder-form-weight" {% if buyorder.weight!=null %} value="{{ buyorder.weight }}" {% endif %} class="form-control" placeholder="Peso...">
+        <input type="text"  id="buyorder-form-weight" {% if buyorder.weight!=null %} value="{{ buyorder.weight }}" {% endif %} class="form-control">
       </div>
     </div>
     <div class="col-md-1">
@@ -168,12 +104,13 @@
       </div>
     </div>
   </div>
+  <input type="hidden" id="buyorder-form-estimateddelivery-number">
 </div>
 </div>
 
 
 <script>
-  $('body').on('click', "#storeticket-form-view", function(e){
+  $('body').on('click', "#supplier-form-view", function(e){
     var id=$(this).attr("attr-id");
     if(id!=0 && id!=""){
     url=$(this).attr("attr-url");
@@ -188,6 +125,10 @@
     $('body').on('change', "#buyorder-form-store", function(e) {
 
       if($("#buyorder-form-store").val()=="6") $("#destination-data").css("display","block");
+      else{
+        $("#destination-data").css("display","none");
+
+      }
     });
   });
 </script>
