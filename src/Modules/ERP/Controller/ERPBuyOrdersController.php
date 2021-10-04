@@ -189,7 +189,7 @@ class ERPBuyOrdersController extends Controller
 			//Search Customers
 			$classCustomersUtils="\App\Modules\ERP\Utils\ERPCustomersUtils";
 			$customersutils = new $classCustomersUtils();
-			$customerslist=$customersutils->formatListWithCode($this->getUser());
+			$customerslist=$customersutils->formatListCustomized($this->getUser());
 			$customerslist["fieldButtons"]=[["id"=>"select", "type" => "success", "default"=>true, "icon" => "fas fa-plus", "name" => "editar", "route" => null, "actionType" => "background", "modal"=>"", "confirm" => false, "tooltip" =>""]];
 			$customerslist["topButtons"]=[];
 			$customerslist["multiselect"]=false;

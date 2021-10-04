@@ -123,12 +123,24 @@
   $(document).ready(function() {
 
     $('body').on('change', "#buyorder-form-store", function(e) {
-
-      if($("#buyorder-form-store").val()=="6") $("#destination-data").css("display","block");
+      //Almacén de Envíos Directos
+      if($("#buyorder-form-store").val()=="6"){
+         $("#destination-data").css("display","block");
+         $("#destination-form-address").val('');
+         $("#destination-form-city").val('');
+         $("#destination-form-postcode").val('');
+         $("#destination-form-state").val('');
+         $("#destination-form-country").val('');
+         $("#destination-form-phone").val('');
+          $("#destination-form-email").val('');
+       }
       else{
-        $("#destination-data").css("display","none");
+        setStoreInfo($(this).val());
+      //  $("#destination-data").css("display","none");
 
       }
+
+
     });
   });
 </script>

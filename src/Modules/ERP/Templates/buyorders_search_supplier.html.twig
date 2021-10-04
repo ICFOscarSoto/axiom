@@ -61,28 +61,30 @@
       if(res.getDay()==6) res.setDate(res.getDate() + 2);
       else if(res.getDay()==7) res.setDate(res.getDate() + 1);
 
-
       var day;
       //si el día es menor que 10, añadimos un 0 delante para evitar posibles fallos
       if(res.getDate()<10) day= "0"+res.getDate();
       else day= res.getDate();
-
       var datetoday = day+'/'+(res.getMonth()+1)+'/'+res.getFullYear();
-
-
-
       $("#buyorder-form-estimateddelivery").val(datetoday);
+  }
 
-
-
-/*
-
-    estimated=$("#buyorder-form-estiamteddelivery-number").val();
-    alert(estimated);
-    var fecha = Date.now();
-    alert(fecha);
-    fecha.setDate(fecha.getDate() + estimated);
-    alert(fecha);*/
+  function setStoreInfo(id){
+    if((++load_wait)==1) $("#load-spinner").fadeIn();
+    $.ajax({
+       type: "GET",
+       dataType: "json",
+       url: "/api/ERP/stores/getstoreinfo/"+id,
+     }).done(function(elements, textStatus, jqXHR) {
+       if((--load_wait)==0) $("#load-spinner").fadeOut();
+        $("#destination-form-address").val(elements.infostore.address);
+        $("#destination-form-city").val(elements.infostore.city);
+        $("#destination-form-postcode").val(elements.infostore.postcode);
+        $("#destination-form-state").val(elements.infostore.stateid);
+        $("#destination-form-state").trigger('change');
+        $("#destination-form-country").val(elements.infostore.countryid);
+        $("#destination-form-phone").val(elements.infostore.phone);
+      });
   }
 
   $(document).ready(function() {
@@ -137,6 +139,7 @@
           $("#buyorder-form-estimateddelivery-number").val(elements.estimateddelivery);
          setShippingCharge();
          setEstimatedDate();
+         setStoreInfo(1);
 
         });
 

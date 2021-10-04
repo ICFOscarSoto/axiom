@@ -65,18 +65,30 @@
        	$('#customer-form-view').css('display','block');
   });
 
-    $('body').on('click', "[id^='listCustomerswithcode-field-button-select-']", function(e) {
+    $('body').on('click', "[id^='listCustomerscustomized-field-button-select-']", function(e) {
 
       $("#customer-form-id").val($(this).attr('attr-id'));
       $("#customer-form-id").trigger('change');
       $("#destination-form-code").val($(this).parent().parent().parent().children('td').eq(1).text());
       $("#destination-form-code").trigger('change');
       $("#destination-form-code").attr("disabled", true);
-      $("#destination-form-email").val($(this).parent().parent().parent().children('td').eq(4).text());
+      $("#destination-form-email").val($(this).parent().parent().parent().children('td').eq(3).text());
       $("#destination-form-email").trigger('change');
-      $("#destination-form-email").attr("disabled", true);
+      $("#destination-form-phone").val($(this).parent().parent().parent().children('td').eq(4).text());
+      $("#destination-form-phone").trigger('change');
+      $("#destination-form-address").val($(this).parent().parent().parent().children('td').eq(5).text());
+      $("#destination-form-address").trigger('change');
+      $("#destination-form-postcode").val($(this).parent().parent().parent().children('td').eq(6).text());
+      $("#destination-form-postcode").trigger('change');
+      $("#destination-form-city").val($(this).parent().parent().parent().children('td').eq(7).text());
+      $("#destination-form-city").trigger('change');
+      $("#destination-form-state").val($(this).parent().parent().parent().children('td').eq(8).text());
+      $("#destination-form-state").trigger('change');
+      $("#destination-form-country").val($(this).parent().parent().parent().children('td').eq(9).text());
+      $("#destination-form-country").trigger('change');
       $("#destination-form-view").attr("attr-id",$(this).attr("attr-id"));
       $("#destination-form-view").css("display","inline-block");
+
 
     //  $("#customer-form-view"+$("#customer-search-modal-form").attr("attr-id")).val($(this).parent().parent().parent().children('td').eq(1).text());
       $("#customer-search-modal-form").modal('toggle');

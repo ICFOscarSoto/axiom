@@ -42,6 +42,22 @@ class ERPCustomersUtils
     return $list;
   }
 
+
+  public function formatListCustomized($user){
+    $list=[
+      'id' => 'listCustomerscustomized',
+      'route' => 'customerlistcustomized',
+      'routeParams' => ["id" => $user->getId()],
+      'orderColumn' => 2,
+      'orderDirection' => 'ASC',
+      'tagColumn' => 3,
+      'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/CustomersCustomized.json"),true),
+      'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/CustomersFieldButtons.json"),true),
+      'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/CustomersTopButtons.json"),true)
+    ];
+    return $list;
+  }
+
   public function getExcludedForm($params){
     return ['customer','maincontact'];
   }

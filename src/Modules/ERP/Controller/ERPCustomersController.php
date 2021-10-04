@@ -221,6 +221,22 @@ class ERPCustomersController extends Controller
 	    return new JsonResponse($return);
 	  }
 
+		/**
+		 * @Route("/api/customer/listcustomized", name="customerlistcustomized")
+		 */
+		public function indexlistcustomized(RouterInterface $router,Request $request){
+			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			$user = $this->getUser();
+			$locale = $request->getLocale();
+			$this->router = $router;
+			$manager = $this->getDoctrine()->getManager();
+			$repository = $manager->getRepository($this->class);
+			$listUtils=new GlobaleListUtils();
+			$listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/CustomersCustomized.json"),true);
+			$return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, ERPCustomers::class,[["type"=>"and", "column"=>"company", "value"=>$user->getCompany()]]);
+			return new JsonResponse($return);
+		}
+
 
 
 	/**
