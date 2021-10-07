@@ -77,7 +77,7 @@
        url: "/api/ERP/stores/getstoreinfo/"+id,
      }).done(function(elements, textStatus, jqXHR) {
        if((--load_wait)==0) $("#load-spinner").fadeOut();
-       $("#destination-form-name").val(elements.infostore.name);
+        $("#destination-form-name").val(elements.infostore.name);
         $("#destination-form-address").val(elements.infostore.address);
         $("#destination-form-city").val(elements.infostore.city);
         $("#destination-form-postcode").val(elements.infostore.postcode);
