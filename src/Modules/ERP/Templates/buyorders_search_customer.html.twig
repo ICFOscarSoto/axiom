@@ -69,9 +69,9 @@
 
       $("#customer-form-id").val($(this).attr('attr-id'));
       $("#customer-form-id").trigger('change');
-      $("#destination-form-code").val($(this).parent().parent().parent().children('td').eq(1).text());
-      $("#destination-form-code").trigger('change');
-      $("#destination-form-code").attr("disabled", true);
+      $("#destination-form-customercode").val($(this).parent().parent().parent().children('td').eq(1).text());
+      $("#destination-form-customercode").trigger('change');
+      $("#destination-form-customercode").attr("disabled", true);
       $("#destination-form-email").val($(this).parent().parent().parent().children('td').eq(3).text());
       $("#destination-form-email").trigger('change');
       $("#destination-form-phone").val($(this).parent().parent().parent().children('td').eq(4).text());

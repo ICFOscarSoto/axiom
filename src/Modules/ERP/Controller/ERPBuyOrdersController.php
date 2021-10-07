@@ -16,6 +16,7 @@ use App\Modules\Globale\Entity\GlobaleUsers;
 use App\Modules\Globale\Entity\GlobaleStates;
 use App\Modules\ERP\Entity\ERPProviders;
 use App\Modules\ERP\Entity\ERPCustomers;
+use App\Modules\ERP\Entity\ERPSuppliers;
 use App\Modules\Globale\Entity\GlobaleCountries;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
@@ -225,6 +226,117 @@ class ERPBuyOrdersController extends Controller
     		return new RedirectResponse($this->router->generate('app_login'));
 
   }
+
+	/**
+	* @Route("/{_locale}/ERP/buyorders/data/{id}/{action}", name="dataBuyOrders", defaults={"id"=0, "action"="read"})
+	*/
+	public function dataBuyOrders($id, $action, Request $request){
+		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		$buyordersRepository=$this->getDoctrine()->getRepository(ERPBuyOrders::class);
+		$buyorderslinesRepository=$this->getDoctrine()->getRepository(ERPBuyOrdersLines::class);
+		$buyorderstatesRepository=$this->getDoctrine()->getRepository(ERPBuyOrdersStates::class);
+		$suppliersRepository=$this->getDoctrine()->getRepository(ERPSuppliers::class);
+		$customersRepository=$this->getDoctrine()->getRepository(ERPCustomers::class);
+		$paymentMethodsrepository=$this->getDoctrine()->getRepository(ERPPaymentMethods::class);
+		$storesRepository=$this->getDoctrine()->getRepository(ERPStores::class);
+		$configrepository=$this->getDoctrine()->getRepository(ERPConfiguration::class);
+		$agentsRepository=$this->getDoctrine()->getRepository(GlobaleUsers::class);
+		$globalstatesRepository=$this->getDoctrine()->getRepository(GlobaleStates::class);
+		$globalcountriesRepository=$this->getDoctrine()->getRepository(GlobaleCountries::class);
+
+		//Get content of the json reques
+		$fields=json_decode($request->getContent());
+
+		$buyorder=$buyordersRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$id, "deleted"=>0]);
+		$supplier=$suppliersRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "code"=>$fields->suppliercode, "active"=>1, "deleted"=>0]);
+		$customer=null;
+		if($fields->customercode)	$customer=$customersRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "code"=>$fields->customercode, "active"=>1, "deleted"=>0]);
+		$buyorderstate=$buyorderstatesRepository->findOneBy(["id"=>$fields->state, "active"=>1, "deleted"=>0]);
+		$products=null;
+		$stores=null;
+
+		$newid=$buyordersRepository->getLastID()+1;
+		if(!$buyorder){
+			$buyorder=new ERPBuyOrders();
+			$buyorder->setActive(1);
+			$buyorder->setDeleted(0);
+			$buyorder->setAuthor($this->getUser());
+			$buyorder->setDateadd(new \DateTime());
+
+			if($newid<10) $buyorder->setCode("#PC".date("Y")."0000".$newid);
+			else if($newid<100) $salesticket->setCode("#PC".date("Y")."000".$newid);
+			else if($newid<1000) $salesticket->setCode("#PC".date("Y")."00".$newid);
+			else if($newid<10000) $salesticket->setCode("#PC".date("Y")."0".$newid);
+
+		}
+
+
+
+		$buyorder->setCompany($this->getUser()->getCompany());
+		$buyorder->setDateupd(new \DateTime());
+		$buyorder->setState($buyorderstate);
+
+	  $estimateddelivery=date_create_from_format('d/m/Y',$fields->estimateddelivery);
+	//	dump("1:".$estimateddelivery);
+	//	$dateformatted=\DateTime::createFromFormat('Y-m-d', strtotime($estimateddelivery));
+	//	dump("2:".$dateformatted);
+		$buyorder->setEstimateddelivery($estimateddelivery);
+
+		$agent=$agentsRepository->findOneBy(["id"=>$fields->agent, "active"=>1, "deleted"=>0]);
+		$buyorder->setAgent($agent);
+		$buyorder->setSupplier($supplier);
+		$buyorder->setSuppliername($supplier->getName());
+		$buyorder->setSuppliercode($supplier->getCode());
+		$buyorder->setSupplierdeliverynote($fields->supplierdeliverynote);
+		$buyorder->setEmail($fields->supplieremail);
+		$buyorder->setPhone($fields->supplierphone);
+
+	  $paymentmethod=$paymentMethodsrepository->findOneBy(["name"=>$fields->supplierpaymentmethod, "active"=>1, "deleted"=>0]);;
+		$buyorder->setPaymentmethod($paymentmethod);
+
+
+		$buyorder->setMinorder($fields->minorder);
+		$buyorder->setFreeshipping($fields->freeshipping);
+		$buyorder->setAdditionalcost(floatval($fields->additionalcost));
+		$buyorder->setWeight($fields->weight);
+
+		$store=$storesRepository->findOneBy(["id"=>$fields->store, "active"=>1, "deleted"=>0]);
+  	$buyorder->setStore($store);
+
+		$buyorder->setPriority($fields->priority);
+		$buyorder->setReaded(intval($fields->readed));
+		if($fields->shippingcharge=="PAGADOS") $buyorder->setShippingcharge(0);
+		else $buyorder->setShippingcharge(1);
+
+	//	$buyorder->setShippingcosts(intval($fields->shippingcosts));
+
+
+
+
+
+			$destinationstate=$globalstatesRepository->findOneBy(["id"=>$fields->destinationstate, "active"=>1, "deleted"=>0]);
+			$destinationcountry=$globalcountriesRepository->findOneBy(["id"=>$fields->destinationcountry, "active"=>1, "deleted"=>0]);
+			if($customer){
+				$buyorder->setCustomer($customer);
+
+			}
+			$buyorder->setDestinationname($fields->destinationname);
+			$buyorder->setDestinationaddress($fields->destinationaddress);
+			$buyorder->setDestinationphone($fields->destinationphone);
+			$buyorder->setDestinationemail($fields->destinationemail);
+			$buyorder->setDestinationpostcode($fields->destinationpostcode);
+			$buyorder->setDestinationcity($fields->destinationcity);
+			$buyorder->setDestinationstate($destinationstate);
+			$buyorder->setDestinationcountry($destinationcountry);
+
+
+			$this->getDoctrine()->getManager()->persist($buyorder);
+			$this->getDoctrine()->getManager()->flush();
+
+
+
+		return new JsonResponse(["result"=>1,"data"=>["id"=>$buyorder->getId()]]);
+	}
 
 	/**
 	 * @Route("/api/buyorders/list", name="buyorderslist")

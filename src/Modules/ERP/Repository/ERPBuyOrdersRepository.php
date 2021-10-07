@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repository\Modules\ERP\Entity;
+namespace App\Modules\ERP\Repository;
 
 use App\Modules\ERP\Entity\ERPBuyOrders;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -47,4 +47,10 @@ class ERPBuyOrdersRepository extends ServiceEntityRepository
         ;
     }
     */
+    public function getLastID(){
+      $query='SELECT max(id)
+      FROM erpbuy_orders';
+      return $this->getEntityManager()->getConnection()->executeQuery($query)->fetchColumn(0);
+
+    }
 }

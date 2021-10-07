@@ -193,6 +193,7 @@ class ERPStoresController extends Controller
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		$storesRepository=$this->getDoctrine()->getRepository(ERPStores::class);
 		$store=$storesRepository->findOneBy(["id"=>$id, "active"=>1, "deleted"=>0]);
+		$item["address"]=$store->getName();
 		$item["address"]=$store->getAddress();
 		$item["city"]=$store->getCity();
 		$item["postcode"]=$store->getPostcode();

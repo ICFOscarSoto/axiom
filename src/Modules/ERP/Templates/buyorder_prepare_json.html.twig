@@ -1,0 +1,58 @@
+<script>
+  function prepare_buyorder_json(){
+
+    var buyorderFields = new Object();
+    var lines=[];
+
+
+    buyorderFields.state=$("#buyorder-form-currentstate").val();
+    buyorderFields.state=$("#buyorder-form-currentstate").val();
+    buyorderFields.estimateddelivery=$("#buyorder-form-estimateddelivery").val();
+    buyorderFields.agent=$("#buyorder-form-agent").val();
+
+
+    buyorderFields.suppliercode=$("#supplier-form-code").val();
+    buyorderFields.supplierdeliverynote=$("#supplier-form-deliverynote").val();
+    buyorderFields.supplieremail=$("#supplier-form-email").val();
+    buyorderFields.supplierphone=$("#supplier-form-phone").val();
+    buyorderFields.supplierpaymentmethod=$("#supplier-form-paymentmethod").val();
+    buyorderFields.minorder=$("#buyorder-form-minorder").val();
+    buyorderFields.freeshipping=$("#buyorder-form-freeshipping").val();
+    buyorderFields.additionalcost=$("#buyorder-form-additionalcost").val();
+    buyorderFields.weight=$("#buyorder-form-weight").val();
+    buyorderFields.store=$("#buyorder-form-store").val();
+
+
+    buyorderFields.priority=$("#buyorder-form-priority").val();
+    buyorderFields.readed=$("#buyorder-form-readed").val();
+    buyorderFields.shippingcharge=$("#buyorder-form-shippingcharge").val();
+  //  buyorderFields.shippingcosts=$("#buyorder-form-shippingcosts").val();
+
+    buyorderFields.customercode=$("#destination-form-customercode").val();
+    buyorderFields.customername=$("#destination-form-customername").val();
+    buyorderFields.destinationstate=$("#destination-form-state").val();
+    buyorderFields.destinationcountry=$("#destination-form-country").val();
+    buyorderFields.destinationaddress=$("#destination-form-address").val();
+    buyorderFields.destinationphone=$("#destination-form-phone").val();
+    buyorderFields.destinationemail=$("#destination-form-email").val();
+    buyorderFields.destinationpostcode=$("#destination-form-postcode").val();
+    buyorderFields.destinationcity=$("#destination-form-city").val();
+    /*
+    buyorderFields.id=$("#salesticket-form-id").val();
+    salesticketFields.salesticketstate=$("#salesticket-form-states-select").val();
+    salesticketFields.salesticketreason=$("#salesticket-form-reasons-select").val();
+    salesticketFields.salesticketnewagent=$("#salesticket-form-agents-select").val();
+    salesticketFields.salesticketnewdepartment=$("#salesticket-form-departments-select").val();
+    salesticketFields.customername=$("#customer-form-name").val();
+    salesticketFields.customercode=$("#customer-form-code").val();
+    salesticketFields.salesordernumber=$("#salesorder-form-number").val();
+    salesticketFields.externalsalesordernumber=$("#salesorder-form-external").val();
+    salesticketFields.email=$("#customer-form-email").val();
+    salesticketFields.observations=$("#salesticket-form-observations").val();
+    salesticketFields.products=$("#product-references").val();
+    salesticketFields.stores=$("#stores-codes").val();
+    salesticketFields.myself=$("#myself").val();*/
+
+    return buyorderFields;
+  }
+</script>

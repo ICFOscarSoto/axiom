@@ -14,7 +14,7 @@ use \App\Modules\Globale\Entity\GlobaleCountries;
 use \App\Modules\ERP\Entity\ERPCustomers;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\Modules\ERP\Entity\ERPBuyOrdersRepository")
+ * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPBuyOrdersRepository")
  */
 class ERPBuyOrders
 {
@@ -164,7 +164,7 @@ class ERPBuyOrders
     /**
      * @ORM\Column(type="string", length=32, nullable=true)
      */
-    private $destionationphone;
+    private $destinationphone;
 
     /**
      * @ORM\Column(type="string", length=180, nullable=true)
@@ -196,6 +196,16 @@ class ERPBuyOrders
      * @ORM\Column(type="smallint", nullable=true)
      */
     private $readed;
+
+    /**
+     * @ORM\Column(type="string", length=20, nullable=true)
+     */
+    private $supplierdeliverynote;
+
+    /**
+     * @ORM\Column(type="string", length=100, nullable=true)
+     */
+    private $destinationname;
 
 
 
@@ -518,14 +528,14 @@ class ERPBuyOrders
         return $this;
     }
 
-    public function getDestionationphone(): ?string
+    public function getDestinationphone(): ?string
     {
-        return $this->destionationphone;
+        return $this->destinationphone;
     }
 
-    public function setDestionationphone(?string $destionationphone): self
+    public function setDestinationphone(?string $destinationphone): self
     {
-        $this->destionationphone = $destionationphone;
+        $this->destinationphone = $destinationphone;
 
         return $this;
     }
@@ -578,17 +588,6 @@ class ERPBuyOrders
         return $this;
     }
 
-    public function getRelation(): ?string
-    {
-        return $this->relation;
-    }
-
-    public function setRelation(string $relation): self
-    {
-        $this->relation = $relation;
-
-        return $this;
-    }
 
     public function getDestinationcountry(): ?GlobaleCountries
     {
@@ -610,6 +609,30 @@ class ERPBuyOrders
     public function setReaded(?int $readed): self
     {
         $this->readed = $readed;
+
+        return $this;
+    }
+
+    public function getSupplierdeliverynote(): ?string
+    {
+        return $this->supplierdeliverynote;
+    }
+
+    public function setSupplierdeliverynote(?string $supplierdeliverynote): self
+    {
+        $this->supplierdeliverynote = $supplierdeliverynote;
+
+        return $this;
+    }
+
+    public function getDestinationname(): ?string
+    {
+        return $this->destinationname;
+    }
+
+    public function setDestinationname(?string $destinationname): self
+    {
+        $this->destinationname = $destinationname;
 
         return $this;
     }
