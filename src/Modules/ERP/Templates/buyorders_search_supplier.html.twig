@@ -49,8 +49,16 @@
 
 
   function setShippingCharge(){
-      if($("#buyorder-form-freeshipping").val()==0) $("#buyorder-form-shippingcharge").val("PAGADOS");
-      else  $("#buyorder-form-shippingcharge").val("DEBIDOS");
+      if($("#buyorder-form-freeshipping").val()==0){
+         $("#buyorder-form-shippingcharge").val("PAGADOS");
+         $("#buyorder-form-shippingcharge").addClass("input-success");
+         $("#buyorder-form-shippingcharge").removeClass("input-danger");
+       }
+      else {
+         $("#buyorder-form-shippingcharge").val("DEBIDOS");
+          $("#buyorder-form-shippingcharge").addClass("input-danger");
+           $("#buyorder-form-shippingcharge").removeClass("input-success");
+       }
   }
 
   function setEstimatedDate(){

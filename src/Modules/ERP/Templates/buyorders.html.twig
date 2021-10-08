@@ -49,7 +49,7 @@
 			</div>
 			{{ include('@ERP/buyorders_search_supplier.html.twig') }}
 
-			{{ include('@ERP/buyorder_prepare_json.html.twig') }}
+
 
     </div>
 		 <div class="tab-pane" style="" id="tab-body-send">
@@ -64,6 +64,8 @@
 			<button attr-id="" attr-action="" id="buyorder-button-save" type="button" class="btn btn-green">Guardar</button>
 		</div>
 	</div>
+			{{ include('@ERP/buyorder_select_addresses.html.twig') }}
+				{{ include('@ERP/buyorder_prepare_json.html.twig') }}
 
 	</div>
 </div>

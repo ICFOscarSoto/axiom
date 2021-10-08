@@ -314,4 +314,32 @@ class ERPCustomersController extends Controller
  	 return new JsonResponse(array('result' => 1));
   }
 
+
+	/**
+  	* @Route("/api/ERP/customer/addresses/{id}/get", name="getCustomerAddresses")
+	*/
+ public function getCustomerAddresses($id, RouterInterface $router,Request $request){
+	$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+	$customerRepository=$this->getDoctrine()->getRepository(ERPCustomers::class);
+	$customer=$customerRepository->findOneBy(["id"=>$id]);
+
+//	$repositoryVariants=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
+	$addresses=$customerRepository->getAddresses($customer->getId());
+	$responseAddresses=Array();
+
+	foreach($addresses as $address){
+					$item['id']=$address['id'];
+		 			$item['name']=$address['name'];
+					$item['address']=$address['address'];
+					$item['postcode']=$address['postcode'];
+					$item['city']=$address['city'];
+					$item['phone']=$address['phone'];
+					$item['email']=$address['email'];
+		 			$responseAddresses[]=$item;
+	}
+		return new JsonResponse($responseAddresses);
+
+}
+
+
 }

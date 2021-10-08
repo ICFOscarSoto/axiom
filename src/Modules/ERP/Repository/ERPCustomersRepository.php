@@ -61,5 +61,15 @@ class ERPCustomersRepository extends ServiceEntityRepository
       return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
     }
 
+    public function getAddresses($customer){
+        $query='SELECT a.id as id, a.name as name, a.address as address, a.postcode as postcode, a.city as city, a.phone as phone, a.email as email
+        FROM erpcustomers c
+        LEFT JOIN erpaddresses a
+        ON a.customer_id=c.id
+        WHERE a.customer_id=:customer AND a.active=1 AND a.deleted=0 ORDER BY name ASC';
+        $params=['customer' => $customer];
+        return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+    }
+
 
 }

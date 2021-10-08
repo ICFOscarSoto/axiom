@@ -124,8 +124,9 @@ class ERPBuyOrdersController extends Controller
 			$classSuppliersUtils="\App\Modules\ERP\Utils\ERPSuppliersUtils";
 			$suppliersutils = new $classSuppliersUtils();
 			$supplierslist=$suppliersutils->formatListCustomized($this->getUser());
-			$supplierslist["fieldButtons"]=[["id"=>"select", "type" => "default", "default"=>true, "icon" => "fa fa-dot-circle-o", "name" => "editar", "route" => null, "actionType" => "background", "modal"=>"", "confirm" => false, "tooltip" =>""]];
+			$supplierslist["fieldButtons"]=[["id"=>"select", "type" => "success", "default"=>true, "icon" => "fa fa-plus", "name" => "editar", "route" => null, "actionType" => "background", "modal"=>"", "confirm" => false, "tooltip" =>""]];
 			$supplierslist["topButtons"]=[];
+			$supplierslist["multiselect"]=false;
 
 
 			//stores
