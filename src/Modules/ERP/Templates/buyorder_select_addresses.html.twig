@@ -32,9 +32,6 @@ $(document).ready(function() {
 
   $('body').on('click', "[id^='address-form-buttonadd-']", function(e) {
 
-
-      $("#destination-form-name").val($("#address-form-name-"+$(this).attr("attr-id")).val());
-      $("#destination-form-name").trigger('change');
       $("#destination-form-address").val($("#address-form-address-"+$(this).attr("attr-id")).val());
       $("#destination-form-address").trigger('change');
       $("#destination-form-postcode").val($("#address-form-postcode-"+$(this).attr("attr-id")).val());

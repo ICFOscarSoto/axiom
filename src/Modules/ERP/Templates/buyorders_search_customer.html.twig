@@ -72,6 +72,10 @@
       $("#destination-form-customercode").val($(this).parent().parent().parent().children('td').eq(1).text());
       $("#destination-form-customercode").trigger('change');
       $("#destination-form-customercode").attr("disabled", true);
+      $("#destination-form-name").val($(this).parent().parent().parent().children('td').eq(2).text());
+      $("#destination-form-name").trigger('change');
+      $("#destination-form-name").attr("disabled", true);
+
 
       getAddresses($(this).attr('attr-id'));
 /*
