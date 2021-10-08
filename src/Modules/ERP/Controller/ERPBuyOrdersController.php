@@ -261,6 +261,7 @@ class ERPBuyOrdersController extends Controller
 			$buyorder->setActive(1);
 			$buyorder->setDeleted(0);
 			$buyorder->setAuthor($this->getUser());
+			$buyorder->setAgent($this->getUser());
 			$buyorder->setDateadd(new \DateTime());
 
 			if($newid<10) $buyorder->setCode("#PC".date("Y")."0000".$newid);
@@ -282,8 +283,7 @@ class ERPBuyOrdersController extends Controller
 	//	dump("2:".$dateformatted);
 		$buyorder->setEstimateddelivery($estimateddelivery);
 
-		$agent=$agentsRepository->findOneBy(["id"=>$fields->agent, "active"=>1, "deleted"=>0]);
-		$buyorder->setAgent($agent);
+
 		$buyorder->setSupplier($supplier);
 		$buyorder->setSuppliername($supplier->getName());
 		$buyorder->setSuppliercode($supplier->getCode());

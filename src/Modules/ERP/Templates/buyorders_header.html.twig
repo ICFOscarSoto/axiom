@@ -2,7 +2,7 @@
       {% if buyorder.agent is not null %}
       <div class="col-md-12" style="text-align:right;">
       <img src="{{ url('index') }}api/user/{{ buyorder.agent.id }}/getimage" alt="" class="img-circle" width="40" height="40">
-      <strong>{{ buyorder.agent.name }}</strong>
+      <strong>{{ buyorder.agent.name }}{{ buyorder.agent.lastname }}</strong>
       </div>
       {% else %}
       <div class="col-md-12" style="text-align:right;">
