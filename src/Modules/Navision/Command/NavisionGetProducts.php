@@ -713,7 +713,6 @@ public function importStock(InputInterface $input, OutputInterface $output, $cod
     }
 }
 
-
 public function importStocks(InputInterface $input, OutputInterface $output) {
   //------   Create Lock Mutex    ------
   if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
@@ -824,6 +823,7 @@ public function importStocks(InputInterface $input, OutputInterface $output) {
 
 
     /* Solo se añaden las lineas de traspasos realizadas en Navision en los almacenes gestionados*/
+
 public function updateStocksStoresManaged(InputInterface $input, OutputInterface $output){
   //------   Create Lock Mutex    ------
   //$fp = fopen('/tmp/axiom-navisionGetProducts-importIncrements.lock', 'c');
@@ -937,6 +937,7 @@ public function updateStocksStoresManaged(InputInterface $input, OutputInterface
 
 
 }
+
 public function importIncrements(InputInterface $input, OutputInterface $output) {
   //------   Create Lock Mutex    ------
   //$fp = fopen('/tmp/axiom-navisionGetProducts-importIncrements.lock', 'c');
@@ -1454,6 +1455,9 @@ public function variantColor($nameVariantValue){
   else if ($nameVariantValue=="VERDE PIST") $nameVariantValue="Verde Pistacho";
   else if ($nameVariantValue=="VERDE PRIM") $nameVariantValue="Verde Primavera";
   else if ($nameVariantValue=="VINTAGE RO") $nameVariantValue="Vintage Rose";
+  else if ($nameVariantValue=="NEGRO/BLN") $nameVariantValue="Negro y blanco";
+  else if ($nameVariantValue=="ROJO/BLN") $nameVariantValue="Rojo y blanco";
+  else if ($nameVariantValue=="ROYAL/BLN") $nameVariantValue="Azul royal y blanco";
   else $nameVariantValue=ucwords(strtolower($nameVariantValue));
   return $nameVariantValue;
 }
