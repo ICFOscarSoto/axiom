@@ -47,6 +47,7 @@ class NavisionGetProducts extends ContainerAwareCommand
   private $entityManager;
   private $url="http://192.168.1.250:9000/";
   private $discordchannel="883046233017552956";
+
   protected function configure(){
         $this
             ->setName('navision:getproducts')
@@ -916,14 +917,17 @@ public function updateStocksStoresManaged(InputInterface $input, OutputInterface
           }
         }
 
-          $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"storesManaged"]);
-          $navisionSync->setLastsync($datetime);
-          if ($objects["maxEntry"]!=0) $navisionSync->setMaxtimestamp($objects["maxEntry"]);
+
+          if ($objects["maxEntry"]!=0) {
+            $navisionSync->setMaxtimestamp($objects["maxEntry"]);
+            $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"storesManaged"]);
+            $navisionSync->setLastsync($datetime);
+          }
           else {
           $icon=":warning: ";
           $msg=" Fallo en el maxEntry de los almacenes gestioandos";
           //Send notification
-          file_get_contents("https://icfbot.ferreteriacampollano.com/message.php?channel=".$discordchannel."&msg=".urlencode($icon."Sincronizacion : ".$msg));
+          file_get_contents("https://icfbot.ferreteriacampollano.com/message.php?channel=".$this->discordchannel."&msg=".urlencode($icon."Sincronizacion : ".$msg));
           }
           $this->doctrine->getManager()->persist($navisionSync);
           $this->doctrine->getManager()->flush();

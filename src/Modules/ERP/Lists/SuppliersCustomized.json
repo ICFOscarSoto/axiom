@@ -1,0 +1,7 @@
+[ {"name": "id", "caption":""},
+  {"name": "code", "caption":"Code"},
+  {"name": "name", "caption":"Nombre"},
+  {"name": "email", "caption":"Email"},
+  {"name": "phone", "caption":"Phone"},
+  {"name": "paymentmethod__name", "caption":"Payment Method"}
+]

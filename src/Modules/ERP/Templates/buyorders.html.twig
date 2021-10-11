@@ -1,0 +1,149 @@
+{% set params = app.request.attributes.get('_route_params')|merge(app.request.query.all()) %}
+{% block header %}
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<meta name="description" content="Axiom Business Management" />
+	<meta name="author" content="" />
+	<link rel="icon" href="images/favicon.ico">
+	{{ include('@Globale/header.html.twig') }}
+	<!-- Imported styles on this page -->
+	<link rel="stylesheet" href="{{ url('index') }}css/bootstrap-grid.css">
+		<link rel="stylesheet" href="{{ url('index') }}css/timeline.css">
+	<link rel="stylesheet" href="{{ url('index') }}/js/jvectormap/jquery-jvectormap-1.2.2.css">
+	<link rel="stylesheet" href="{{ url('index') }}/js/rickshaw/rickshaw.min.css">
+{% endblock %}
+<title>{% block title %}{{ interfaceName|trans }}{% endblock %}</title>
+<body class="page-body" data-url="{{ url('indexAdmin') }}">
+<div class="page-container"><!-- add class "sidebar-collapsed" to close sidebar by default, "chat-visible" to make chat appear always -->
+	{{ include('@Globale/sidebar_menu.html.twig') }}
+	<div class="main-content">
+		{{ include('@Globale/head.html.twig') }}
+		<hr />
+		{{ include('@Globale/breadcrumb.html.twig') }}
+		{#}<h2>{{ interfaceName }}</h2>#}
+		<!-- MAIN CONTENT -->
+		{{ include('@ERP/buyorders_header.html.twig') }}
+		<ul id="tabs-list" class="nav nav-tabs bordered" style="margin-top:0px!important">
+    <li class="active" id="tab-head-data" style="" attr-id="" attr-name="data">
+        <a href="#tab-body-data" data-toggle="tab">
+            <span class="visible-xs"><i class="fa fa-id-card" aria-hidden="true"></i></span>
+            <span class="hidden-xs">Pedido de compra</span>
+        </a>
+    </li>
+		<li id="tab-head-send" attr-id="" attr-name="data" {% if id==0 %}style="display:none;"{% endif %}>
+        <a href="#tab-body-send" data-toggle="tab">
+            <span class="visible-xs"><i class="fa fa-id-card" aria-hidden="true"></i></span>
+            <span class="hidden-xs">Envíos</span>
+        </a>
+    </li>
+</ul>
+<div class="tab-content">
+    <div class="tab-pane active" style="" id="tab-body-data">
+			<div id="buyorders-body">
+				{% set formConstructor = form %}
+					{{ include('@ERP/buyorder_form_validation.html.twig') }}
+
+					{{ include('@ERP/buyorders_data.html.twig') }}
+
+			</div>
+			{{ include('@ERP/buyorders_search_supplier.html.twig') }}
+
+
+
+    </div>
+		 <div class="tab-pane" style="" id="tab-body-send">
+					{{ include('@ERP/buyorders_destination.html.twig') }}
+					{{ include('@ERP/buyorders_search_customer.html.twig') }}
+		</div>
+</div>
+<div class="row">
+		<div style="text-align: left;" class="col-md-6"></div>
+		<div style="text-align: right;margin-bottom:10px;" class="col-md-6">
+			<button attr-id="" attr-action="" id="buyorder-button-cancel" type="button" class="btn btn">Cancelar</button>
+			<button attr-id="" attr-action="" id="buyorder-button-save" type="button" class="btn btn-green">Guardar</button>
+		</div>
+	</div>
+			{{ include('@ERP/buyorder_select_addresses.html.twig') }}
+				{{ include('@ERP/buyorder_prepare_json.html.twig') }}
+
+	</div>
+</div>
+<script>
+
+function datepicker(){
+
+    $('.datepicker').each(function(index) {
+      var valueField=$(this).val();
+      var dateField=moment(valueField, "DD/MM/YYYY");
+        $(this).datetimepicker({
+        showTodayButton: true,
+        format: 'DD/MM/YYYY',
+        locale:'es',
+        useCurrent: false,
+        tooltips: spanish_tooltips_datetimepicker,
+        date: (dateField.isValid())?dateField:null
+      });
+
+    });
+
+
+}
+
+$(document).ready(function() {
+  datepicker();
+
+
+{# DOCUMENT SAVE #}
+$('body').on('click', "#buyorder-button-save", function(e) {
+	if(validate_buyorder())
+	{
+		//	$(this).attr("disabled","disabled");
+			$.ajax({
+					 url: '{{ url('dataBuyOrders', {"id": id}) }}',
+					 type: 'POST',
+					 data: JSON.stringify(prepare_buyorder_json()),
+					 success:  function( data ) {
+					 if((--load_wait)==0) $("#load-spinner").fadeOut();
+					  if(data.result){
+							//	 $("#salesticket-form-id").val(data.data.id);
+								 toastr.success("Documento guardado correctamente", "Confirmación", confirmation);
+								location.reload();
+								 {% if id==0 %} location.href="/es/ERP/buyorders/form/"+data.data.id; {% endif %}
+					           } else {
+											 toastr.error("No se pudo guardar el documento", "Confirmación", confirmation);
+									}
+					       }
+					     });
+
+  }
+});
+
+
+});
+</script>
+<!-- END MODALS -->
+{% block footer %}
+
+<link rel="stylesheet" href="{{ url('index') }}js/datatables/datatables.css">
+<link rel="stylesheet" href="{{ url('index') }}js/select2/select2-bootstrap.css">
+<link rel="stylesheet" href="{{ url('index') }}js/select2/select2.css">
+<link rel="stylesheet" href="{{ url('index') }}css/custom.css">
+<link rel="stylesheet" href="{{ url('index') }}js/ol/ol.css">
+<link rel="stylesheet" href="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker.min.css">
+<link rel="stylesheet" href="{{ url('index') }}js/jodit/jodit.min.css">
+
+<!-- Imported scripts on this page -->
+<script src="{{ url('index') }}js/datatables/datatables.js"></script>
+<script src="{{ url('index') }}js/select2/select2.min.js"></script>
+<script src="{{ url('index') }}js/moment.min.js"></script>
+<script src="{{ url('index') }}js/moment-es.js"></script>
+<script src="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker-es.js"></script>
+<script src="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker.min.js"></script>
+<script src="{{ url('index') }}js/fileinput.js"></script>
+<script src="{{ url('index') }}js/ol/ol.js"></script>
+<script src="{{ url('index') }}js/jodit/jodit.min.js"></script>
+<script src="{{ url('index') }}js/jquery.nestable.js"></script>
+{{ include('@Globale/bottom.html.twig') }}
+{% endblock %}
+</body>

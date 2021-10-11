@@ -11,6 +11,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\ERP\Entity\ERPSuppliers;
+use App\Modules\ERP\Entity\ERPSupplierOrdersData;
 use App\Modules\ERP\Entity\ERPSupplierActivities;
 use App\Modules\ERP\Entity\ERPSupplierCommentLines;
 use App\Modules\ERP\Entity\ERPShoppingDiscounts;
@@ -210,6 +211,22 @@ class ERPSuppliersController extends Controller
 
 
 	/**
+	 * @Route("/api/supplier/listwithcode", name="supplierlistcustomized")
+	 */
+	public function indexlistcustomized(RouterInterface $router,Request $request){
+		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		$user = $this->getUser();
+		$locale = $request->getLocale();
+		$this->router = $router;
+		$manager = $this->getDoctrine()->getManager();
+		$repository = $manager->getRepository($this->class);
+		$listUtils=new GlobaleListUtils();
+		$listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/SuppliersCustomized.json"),true);
+		$return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, ERPSuppliers::class,[["type"=>"and", "column"=>"company", "value"=>$user->getCompany()]]);
+		return new JsonResponse($return);
+	}
+
+	/**
 	* @Route("/{_locale}/admin/global/supplier/{id}/disable", name="disableSupplier")
 	*/
  public function disable($id)
@@ -267,5 +284,24 @@ class ERPSuppliersController extends Controller
 	return new JsonResponse(array('result' => $result));
  }
 
+
+ /**
+* @Route("/api/ERP/supplier/orderinfo/{code}/get", name="getOrderInfo")
+*/
+public function getOrderInfo($code, RouterInterface $router,Request $request){
+ $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+ $supplierRepository=$this->getDoctrine()->getRepository(ERPSuppliers::class);
+ $supplier=$supplierRepository->findOneBy(["code"=>$code]);
+
+ $supplierOrdersDataRepository=$this->getDoctrine()->getRepository(ERPSupplierOrdersData::class);
+ $supplierordersdata=$supplierOrdersDataRepository->findOneBy(["supplier"=>$supplier]);
+
+ $minorder=$supplierordersdata->getMinorder();
+ $freeshipping=$supplierordersdata->getFreeshipping();
+ $estimateddelivery=$supplierordersdata->getEstimateddelivery();
+
+ return new JsonResponse(["minorder"=>$minorder,"freeshipping"=>$freeshipping,"estimateddelivery"=>$estimateddelivery]);
+
+}
 
 }

@@ -221,6 +221,22 @@ class ERPCustomersController extends Controller
 	    return new JsonResponse($return);
 	  }
 
+		/**
+		 * @Route("/api/customer/listcustomized", name="customerlistcustomized")
+		 */
+		public function indexlistcustomized(RouterInterface $router,Request $request){
+			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			$user = $this->getUser();
+			$locale = $request->getLocale();
+			$this->router = $router;
+			$manager = $this->getDoctrine()->getManager();
+			$repository = $manager->getRepository($this->class);
+			$listUtils=new GlobaleListUtils();
+			$listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/CustomersCustomized.json"),true);
+			$return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, ERPCustomers::class,[["type"=>"and", "column"=>"company", "value"=>$user->getCompany()]]);
+			return new JsonResponse($return);
+		}
+
 
 
 	/**
@@ -297,5 +313,33 @@ class ERPCustomersController extends Controller
 	 $this->getDoctrine()->getManager()->flush();
  	 return new JsonResponse(array('result' => 1));
   }
+
+
+	/**
+  	* @Route("/api/ERP/customer/addresses/{id}/get", name="getCustomerAddresses")
+	*/
+ public function getCustomerAddresses($id, RouterInterface $router,Request $request){
+	$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+	$customerRepository=$this->getDoctrine()->getRepository(ERPCustomers::class);
+	$customer=$customerRepository->findOneBy(["id"=>$id]);
+
+//	$repositoryVariants=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
+	$addresses=$customerRepository->getAddresses($customer->getId());
+	$responseAddresses=Array();
+
+	foreach($addresses as $address){
+					$item['id']=$address['id'];
+		 			$item['name']=$address['name'];
+					$item['address']=$address['address'];
+					$item['postcode']=$address['postcode'];
+					$item['city']=$address['city'];
+					$item['phone']=$address['phone'];
+					$item['email']=$address['email'];
+		 			$responseAddresses[]=$item;
+	}
+		return new JsonResponse($responseAddresses);
+
+}
+
 
 }

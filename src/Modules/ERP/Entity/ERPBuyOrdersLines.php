@@ -131,6 +131,11 @@ class ERPBuyOrdersLines
      */
     private $totaldiscount;
 
+    /**
+     * @ORM\Column(type="string", length=32)
+     */
+    private $supplierreference;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -396,6 +401,18 @@ class ERPBuyOrdersLines
     public function setTotaldiscount(?float $totaldiscount): self
     {
         $this->totaldiscount = $totaldiscount;
+
+        return $this;
+    }
+
+    public function getSupplierreference(): ?string
+    {
+        return $this->supplierreference;
+    }
+
+    public function setSupplierreference(string $supplierreference): self
+    {
+        $this->supplierreference = $supplierreference;
 
         return $this;
     }

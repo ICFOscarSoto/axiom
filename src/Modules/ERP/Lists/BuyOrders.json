@@ -1,0 +1,12 @@
+[   {
+      "name": "id",
+      "caption": "id",
+      "class": "hidden"
+  },
+  {
+      "name": "code",
+      "caption": "code",
+      "width": "15%",
+      "class": "all"
+  }
+]

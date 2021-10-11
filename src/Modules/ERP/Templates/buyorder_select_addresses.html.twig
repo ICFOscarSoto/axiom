@@ -1,0 +1,60 @@
+<div class="modal fade" tabindex="-1" id="select-addresses-modal-form" aria-hidden="true">
+    <div class="modal-dialog-select-addresses">
+      <div class="modal-content" style="transform: matrix(1, 0, 0, 1, 0, 0);display:inline-block;">
+        <div class="modal-header">
+          <h4 class="modal-title">Direcciones del cliente</h4>
+        </div>
+        <br>
+        <br>
+        <div class="panel-body">
+          <div class="row">
+            <div id="addresses-modal-form-body" style="padding: 0px 10px;width:100%;">
+              <label for="listAddresses">Elige la dirección</label>
+              <div id="addresses-body">
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div style="text-align: left;" class="col-md-6"></div>
+            <div style="text-align: right;margin-bottom:10px;" class="col-md-6">
+                    <button attr-id="" attr-action="" id="select-address-button-cancel" type="button" class="btn btn">Cancelar</button>
+                    <button attr-id="" attr-action="" id="select-address-button-add" type="button" class="btn btn-green">Guardar</button>
+            </div>
+          </div>
+      </div>
+  </div>
+  </div>
+</div>
+<script>
+
+
+$(document).ready(function() {
+
+  $('body').on('click', "[id^='address-form-buttonadd-']", function(e) {
+
+      $("#destination-form-address").val($("#address-form-address-"+$(this).attr("attr-id")).val());
+      $("#destination-form-address").trigger('change');
+      $("#destination-form-postcode").val($("#address-form-postcode-"+$(this).attr("attr-id")).val());
+      $("#destination-form-postcode").trigger('change');
+      $("#destination-form-city").val($("#address-form-city-"+$(this).attr("attr-id")).val());
+      $("#destination-form-city").trigger('change');
+      $("#destination-form-phone").val($("#address-form-phone-"+$(this).attr("attr-id")).val());
+      $("#destination-form-phone").trigger('change');
+      $("#destination-form-email").val($("#address-form-email-"+$(this).attr("attr-id")).val());
+      $("#destination-form-email").trigger('change');
+
+      $("#destination-form-view").attr("attr-id",$(this).attr("attr-id"));
+      $("#destination-form-view").css("display","inline-block");
+       $("#select-addresses-modal-form").modal('toggle');
+      $("#customer-search-modal-form").modal('toggle');
+
+
+      });
+
+
+      $('body').on('click', "#select-address-button-cancel", function(e){
+      //  alert("ey");
+         $("#select-addresses-modal-form").modal('toggle');
+      });
+  });
+</script>

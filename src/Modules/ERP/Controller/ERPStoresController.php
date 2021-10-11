@@ -185,5 +185,27 @@ class ERPStoresController extends Controller
  	return new JsonResponse($arrayStores);
  }
 
+ /**
+  * @Route("/api/ERP/stores/getstoreinfo/{id}", name="getStoreInfo", defaults={"id"=0})
+  */
+	public function getStoreInfo($id, RouterInterface $router,Request $request)
+	{
+		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		$storesRepository=$this->getDoctrine()->getRepository(ERPStores::class);
+		$store=$storesRepository->findOneBy(["id"=>$id, "active"=>1, "deleted"=>0]);
+		$item["name"]=$store->getName();
+		$item["address"]=$store->getAddress();
+		$item["city"]=$store->getCity();
+		$item["postcode"]=$store->getPostcode();
+		$item["phone"]=$store->getPhone();
+		$item["stateid"]=3;
+		$item["statename"]="Albacete";
+		$item["countryid"]=64;
+		$item["countryname"]="España";
+		return new JsonResponse(["infostore"=>$item]);
+
+	}
+
+
 
 }
