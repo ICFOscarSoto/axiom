@@ -33,7 +33,6 @@ function getLastSensorData_{{ deviceid }}(){
      type: 'POST',
 
      success:  function( data ) {
-       console.log(data);
        if(data.result){
          data.data.forEach( function(valor, indice, array){
            if(valor.type=="temp"){ $("#sensor_temp_{{ deviceid }}").html(valor.value+" "+valor.unit_abrv); var sensortype="temp"; }
@@ -41,7 +40,6 @@ function getLastSensorData_{{ deviceid }}(){
            if(valor.status=='norminal'){
              $("#display_sensor_"+sensortype+"_{{ deviceid }}").removeClass("display_sensor_failure");
              $("#display_sensor_"+sensortype+"_{{ deviceid }}").addClass("display_sensor_norminal");
-             console.log("entro");
            }
            if(valor.status=='failure'){
              $("#display_sensor_"+sensortype+"_{{ deviceid }}").removeClass("display_sensor_norminal");

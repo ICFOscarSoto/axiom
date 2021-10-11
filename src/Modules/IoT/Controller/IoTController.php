@@ -114,7 +114,7 @@ class IoTController extends Controller
 				if($sensor->getMin() && $data["data"]<$sensor->getMin()){
 					$status='failure';
 				}
-				$result[]=["id"=>$sensor->getId(), "name"=>$sensor->getName(), "description"=> $sensor->getDescription(),"value"=>$data["data"], "type"=>$sensor->getType(), "unit"=>$sensor->getUnit(), "unit_abrv"=> $sensor->getUnitAbrv(), "status"=>$status, "date"=>$data["dateupd"]];
+				$result[]=["id"=>$sensor->getId(), "name"=>$sensor->getName(), "description"=> $sensor->getDescription(),"value"=>$data["data"], "type"=>$sensor->getType(), "unit"=>$sensor->getUnit(), "unit_abrv"=> $sensor->getUnitAbrv(), "status"=>$status, "date"=>$data["date"]];
 			}
 			return new JsonResponse(["result"=>1, "data"=> $result]);
 	}
