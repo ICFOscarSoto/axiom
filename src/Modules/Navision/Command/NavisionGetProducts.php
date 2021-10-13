@@ -918,7 +918,6 @@ public function updateStocksStoresManaged(InputInterface $input, OutputInterface
 
           if ($objects["maxEntry"]!=0) {
             $navisionSync->setMaxtimestamp($objects["maxEntry"]);
-            $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"storesManaged"]);
             $navisionSync->setLastsync($datetime);
           }
           else {
