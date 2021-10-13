@@ -1,7 +1,7 @@
 <div class="panel panel-primary panel-shadow" data-collapsed="0" style="-webkit-box-shadow: none; box-shadow:none; margin-bottom: -1px;"><!-- to apply shadow add class "panel-shadow" -->
   <div class="panel-body">
     <div class="row">
-      <div class="col-md-6">
+      <div class="col-md-4">
         <label for="supplier-form-code">Código de Proveedor:</label>
         <div class="input-group">
           <input type="text" readonly id="supplier-form-code" {% if buyorder.supplier!=null %} value="{{ buyorder.supplier.code }}" disabled {% endif %}  class="form-control" placeholder="Búsqueda de provedor..." data-toggle="modal" data-target="#supplier-search-modal-form">
@@ -11,7 +11,6 @@
             </div>
           </div>
       </div>
-      {% if buyorder.estimateddelivery!=null %}
       <div class="col-md-2">
         <label for="buyorder-form-estimateddelivery">Fecha estimada de entrega:</label>
         <div class="input-group">
@@ -19,15 +18,6 @@
           <input type="text" id="buyorder-form-estimateddelivery" style="z-index:99 !important;" value="{{ buyorder.estimateddelivery|date('d/m/Y') }}" placeholder="{{ buyorder.estimateddelivery|date('Y-m-d') }}" class="datepicker form-control">
         </div>
       </div>
-      {% else %}
-      <div class="col-md-2">
-        <label for="buyorder-form-estimateddelivery">Fecha estimada de entrega:</label>
-        <div class="input-group">
-          <span class="input-group-addon"><i class="fa fa-calendar" aria-hidden="true"></i></span>
-          <input type="text" id="buyorder-form-estimateddelivery" style="z-index:99 !important;" name="" class="datepicker form-control">
-        </div>
-      </div>
-      {% endif %}
       {% if buyorder.state!=null %}
           <div class="col-md-2">
             <label for="buyorder-form-currentstate">Estado actual:</label>
@@ -45,6 +35,12 @@
             <option value="{{ option.id }}" {% if option.id==1 %}selected{% endif %}>{{ option.text }}</option>
           {% endfor %}
         </select>
+      </div>
+      <div class="col-md-2">
+        <label for="supplier-form-offer">Oferta relacionada</label>
+        <div class="form-group">
+          <input type="text" id="supplier-form-offer" readonly class="form-control" placeholder="Oferta relacionada">
+        </div>
       </div>
       {% endif %}
       <div class="col-md-2" style="text-align:right;">
@@ -147,15 +143,19 @@
         <input type="number"  id="buyorder-form-weight" value="{{ buyorder.weight }}" class="form-control">
       </div>
     </div>
+    <div class="col-md-2">
+      <label for="buyorder-form-typeofconfirmation">Tipo de confirmación:</label>
+      <div class="form-group">
+        <input type="text" readonly id="buyorder-form-typeofconfirmation" {% if buyorder.typeofconfirmation=="1" %} value="WEB" {% else %}  value="CORREO"{% endif %} class="form-control" placeholder="Portes...">
+      </div>
+    </div>
     <div class="col-md-1">
-
       <div class="input-group">
         <input type="checkbox"  id="buyorder-form-priority" {% if buyorder.priority==1 %} checked {% endif %} class="form-check-input icheck" placeholder="Urgente...">
         <label for="buyorder-form-priority">&nbsp; Urgente</label>
       </div>
     </div>
     <div class="col-md-1">
-
       <div class="input-group">
         <input type="checkbox"  id="buyorder-form-readed" {% if buyorder.readed==1 %} checked {% endif %} class="form-check-input icheck" placeholder="Leído...">
           <label for="buyorder-form-readed">&nbsp; Leído</label>

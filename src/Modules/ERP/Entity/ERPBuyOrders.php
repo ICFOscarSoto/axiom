@@ -207,6 +207,11 @@ class ERPBuyOrders
      */
     private $destinationname;
 
+    /**
+     * @ORM\Column(type="smallint", nullable=true)
+     */
+    private $typeofconfirmation;
+
 
 
 
@@ -633,6 +638,18 @@ class ERPBuyOrders
     public function setDestinationname(?string $destinationname): self
     {
         $this->destinationname = $destinationname;
+
+        return $this;
+    }
+
+    public function getTypeofconfirmation(): ?int
+    {
+        return $this->typeofconfirmation;
+    }
+
+    public function setTypeofconfirmation(?int $typeofconfirmation): self
+    {
+        $this->typeofconfirmation = $typeofconfirmation;
 
         return $this;
     }

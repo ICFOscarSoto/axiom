@@ -309,18 +309,14 @@ class ERPBuyOrdersController extends Controller
 		if($fields->shippingcharge=="PAGADOS") $buyorder->setShippingcharge(0);
 		else $buyorder->setShippingcharge(1);
 
+		 if($fields->typeofconfirmation=="WEB") $buyorder->setTypeofconfirmation(1);
+		 else $buyorder->setTypeofconfirmation(0);
+
 	//	$buyorder->setShippingcosts(intval($fields->shippingcosts));
-
-
-
-		  dump($fields->destinationstate);
-			dump($fields->destinationcountry);
 
 			$destinationstate=$globalstatesRepository->findOneBy(["id"=>$fields->destinationstate, "active"=>1, "deleted"=>0]);
 			$destinationcountry=$globalcountriesRepository->findOneBy(["id"=>$fields->destinationcountry, "active"=>1, "deleted"=>0]);
 
-			dump($destinationstate);
-			dump($destinationcountry);
 
 			if($customer){
 				$buyorder->setCustomer($customer);
