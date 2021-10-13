@@ -14,14 +14,9 @@
               </div>
             </div>
           </div>
-          <div class="row">
-            <div style="text-align: left;" class="col-md-6"></div>
-            <div style="text-align: right;margin-bottom:10px;" class="col-md-6">
-                    <button attr-id="" attr-action="" id="select-address-button-cancel" type="button" class="btn btn">Cancelar</button>
-                    <button attr-id="" attr-action="" id="select-address-button-add" type="button" class="btn btn-green">Guardar</button>
-            </div>
-          </div>
       </div>
+      <br>
+      <br>
   </div>
   </div>
 </div>
@@ -38,6 +33,10 @@ $(document).ready(function() {
       $("#destination-form-postcode").trigger('change');
       $("#destination-form-city").val($("#address-form-city-"+$(this).attr("attr-id")).val());
       $("#destination-form-city").trigger('change');
+      $("#destination-form-state").val($("#address-form-state-"+$(this).attr("attr-id")).val());
+      $("#destination-form-state").trigger('change');
+      $("#destination-form-country").val($("#address-form-country-"+$(this).attr("attr-id")).val());
+      $("#destination-form-country").trigger('change');
       $("#destination-form-phone").val($("#address-form-phone-"+$(this).attr("attr-id")).val());
       $("#destination-form-phone").trigger('change');
       $("#destination-form-email").val($("#address-form-email-"+$(this).attr("attr-id")).val());

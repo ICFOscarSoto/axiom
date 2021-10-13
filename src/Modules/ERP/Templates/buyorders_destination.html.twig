@@ -1,10 +1,10 @@
 <div class="panel panel-primary panel-shadow" id="destination-data" data-collapsed="0" style="-webkit-box-shadow: none; box-shadow:none; margin-bottom: -1px;"><!-- to apply shadow add class "panel-shadow" -->
   <div class="panel-body">
     <div class="row">
-      <div class="col-md-6" id="searching-customer" style="display:none;">
+      <div class="col-md-6" id="searching-customer" {% if buyorder.customer==null or id==0 %}style="display:none;"{% endif %}>
         <label for="destination-form-address">Código de Cliente:</label>
         <div class="input-group">
-          <input type="text" readonly id="destination-form-customercode" {% if buyorder.customer!=null %} value="{{ buyorder.customer.code }}" disabled {% endif %}  class="form-control" placeholder="Selecciona cliente..." data-toggle="modal" data-target="#customer-search-modal-form">
+          <input type="text" readonly id="destination-form-customercode" {% if buyorder.customer!=null %} value="{{ buyorder.customer.code }}" {% endif %}  class="form-control" placeholder="Selecciona cliente..." data-toggle="modal" data-target="#customer-search-modal-form">
           <div class="input-group-btn">
             <button type="button" id="destination-form-customercode" class="btn btn-white" style="height: 31px;" data-toggle="modal" data-target="#customer-search-modal-form">
               <i class="fa fa-search"></i> </button>

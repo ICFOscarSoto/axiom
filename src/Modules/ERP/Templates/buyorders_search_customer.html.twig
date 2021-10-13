@@ -126,10 +126,11 @@
                   '<div class="col-10 col-sm-1"> <div class="form-group" style="margin-bottom: 0px;"> <input type="text" readonly id="address-form-postcode-'+valor.id+'" class="form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Código Postal" value="'+valor.postcode+'"> </div> </div>'+
                   '<div class="col-2 d-block d-sm-none" style="top: 8px;">Ciudad</div>'+
                   '<div class="col-10 col-sm-2"> <div class="form-group" style="margin-bottom: 0px;"> <input type="text" readonly id="address-form-city-'+valor.id+'" class="form-control" style="border: 1px solid #ebebeb !important; border-radius: 0px;" placeholder="Ciudad" value="'+valor.city+'"> </div> </div>'+
+                  '<input type="hidden" id="address-form-state-'+valor.id+'" value="'+valor.stateid+'">'+
+                  '<input type="hidden" id="address-form-country-'+valor.id+'" value="'+valor.countryid+'">'+
                   '<input type="hidden" id="address-form-email-'+valor.id+'" value="'+valor.email+'">'+
                   '<input type="hidden" id="address-form-phone-'+valor.id+'" value="'+valor.phone+'">'+
                   '<div class="btn-group "><button attr-id="'+valor.id+'" id="address-form-buttonadd-'+valor.id+'" type="button" class="default-action btn btn-success tooltip-primary"><i class="fa fa-plus" aria-hidden="true"></i></button></div>'+
-
                   '</div>'
                 );
 

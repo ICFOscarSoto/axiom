@@ -327,6 +327,21 @@ class ERPCustomersController extends Controller
 	$addresses=$customerRepository->getAddresses($customer->getId());
 	$responseAddresses=Array();
 
+	$item['id']="0";
+	$item['name']=$customer->getName();
+	$item['address']=$customer->getAddress();
+	$item['postcode']=$customer->getPostcode();
+	$item['city']=$customer->getCity();
+	$item['phone']=$customer->getPhone();
+	$item['email']=$customer->getEmail();
+	$item['stateid']=$customer->getState()->getId();
+	$item['statename']=$customer->getState()->getName();
+	$item['countryid']=$customer->getCountry()->getId();
+	$item['countryname']=$customer->getCountry()->getName();
+
+	$responseAddresses[]=$item;
+	$item=null;
+
 	foreach($addresses as $address){
 					$item['id']=$address['id'];
 		 			$item['name']=$address['name'];
@@ -335,7 +350,12 @@ class ERPCustomersController extends Controller
 					$item['city']=$address['city'];
 					$item['phone']=$address['phone'];
 					$item['email']=$address['email'];
+					$item['stateid']=$address['stateid'];
+					$item['statename']=$address['statename'];
+					$item['countryid']=$address['countryid'];
+					$item['countryname']=$address['countryname'];
 		 			$responseAddresses[]=$item;
+					$item=null;
 	}
 		return new JsonResponse($responseAddresses);
 
