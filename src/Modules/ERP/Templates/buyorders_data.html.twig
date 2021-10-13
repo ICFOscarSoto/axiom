@@ -11,6 +11,15 @@
             </div>
           </div>
       </div>
+      {% if buyorder.estimateddelivery!=null %}
+      <div class="col-md-2">
+        <label for="buyorder-form-estimateddelivery">Fecha estimada de entrega:</label>
+        <div class="input-group">
+          <span class="input-group-addon"><i class="fa fa-calendar" aria-hidden="true"></i></span>
+          <input type="text" id="buyorder-form-estimateddelivery" style="z-index:99 !important;" value="{{ buyorder.estimateddelivery|date('d/m/Y') }}" placeholder="{{ buyorder.estimateddelivery|date('Y-m-d') }}" class="datepicker form-control">
+        </div>
+      </div>
+      {% else %}
       <div class="col-md-2">
         <label for="buyorder-form-estimateddelivery">Fecha estimada de entrega:</label>
         <div class="input-group">
@@ -18,6 +27,7 @@
           <input type="text" id="buyorder-form-estimateddelivery" style="z-index:99 !important;" name="" class="datepicker form-control">
         </div>
       </div>
+      {% endif %}
       {% if buyorder.state!=null %}
           <div class="col-md-2">
             <label for="buyorder-form-currentstate">Estado actual:</label>
@@ -51,31 +61,31 @@
         <label for="supplier-form-name">Nombre del proveedor:</label>
         <div class="form-group">
           <span id="supplier-form-view" class="select2-selection__view_tickets" {% if buyorder.supplier!=null %} attr-id="{{ buyorder.supplier.id }}" {% else %} style="display:none;" {% endif %} attr-url="{{ url('formSupplier',{'id':'_____'}) }}"><i class="fa fa-file-text-o" aria-hidden="true"></i><span>&nbsp;Ver Ficha</span></span>
-          <input type="text" readonly id="supplier-form-name" {% if buyorder.suppliername!=null %} value="{{ buyorder.suppliername }}"  {% endif %} class="form-control" placeholder="Nombre del proveedor">
+          <input type="text" readonly id="supplier-form-name" value="{{ buyorder.suppliername }}" class="form-control" placeholder="Nombre del proveedor">
         </div>
       </div>
       <div class="col-md-2">
         <label for="supplier-form-email">Email del proveedor:</label>
         <div class="form-group">
-          <input type="text"  readonly id="supplier-form-email" {% if buyorder.email!=null %} value="{{ buyorder.email }}"  {% endif %} class="form-control" placeholder="Email del proveedor">
+          <input type="text"  readonly id="supplier-form-email" value="{{ buyorder.email }}"  class="form-control" placeholder="Email del proveedor">
         </div>
       </div>
       <div class="col-md-2">
         <label for="supplier-form-phone">Teléfono del proveedor:</label>
         <div class="form-group">
-          <input type="text" readonly id="supplier-form-phone" {% if buyorder.phone!=null %} value="{{ buyorder.phone }}"  {% endif %} class="form-control" placeholder="Teléfono del proveedor">
+          <input type="text" readonly id="supplier-form-phone"  value="{{ buyorder.phone }}"  class="form-control" placeholder="Teléfono del proveedor">
         </div>
       </div>
       <div class="col-md-2">
         <label for="supplier-form-paymentmethod">Método de pago:</label>
         <div class="form-group">
-          <input type="text" readonly id="supplier-form-paymentmethod" {% if buyorder.paymentmethod!=null %} value="{{ buyorder.paymentmethod.name }}"  {% endif %} class="form-control" placeholder="Método de pago">
+          <input type="text" readonly id="supplier-form-paymentmethod" {% if buyorder.paymentmethod!=null %} value="{{ buyorder.paymentmethod.name }}" {% endif %} class="form-control" placeholder="Método de pago">
         </div>
       </div>
       <div class="col-md-2">
         <label for="supplier-form-deliverynote">Nº albarán proveedor:</label>
         <div class="form-group">
-          <input type="text" id="supplier-form-deliverynote" {% if buyorder.supplierdeliverynote!=null %} value="{{ buyorder.supplierdeliverynote }}"  {% endif %} class="form-control" placeholder="Nº de albarán proveedor">
+          <input type="text" id="supplier-form-deliverynote" value="{{ buyorder.supplierdeliverynote }}"  class="form-control" placeholder="Nº de albarán proveedor">
         </div>
       </div>
   </div>
@@ -106,48 +116,48 @@
     <div class="col-md-2">
       <label for="buyorder-form-shippingcharge">Portes:</label>
       <div class="form-group">
-        <input type="text"  readonly id="buyorder-form-shippingcharge" {% if buyorder.shippingcharge!=null %}{% if buyorder.shippingcharge=="1" %} value="PAGADOS" {% else %} value="DEBIDOS"{% endif %} {% endif %} class="form-control" placeholder="Portes...">
+        <input type="text"  readonly id="buyorder-form-shippingcharge" {% if buyorder.shippingcharge=="1" %} class="form-control input-success"  value="PAGADOS" {% else %}  class="form-control input-danger"  value="DEBIDOS"{% endif %} class="form-control" placeholder="Portes...">
       </div>
     </div>
     <div class="col-md-2">
       <label for="buyorder-form-freeshipping">Portes gratis desde:</label>
       <div class="input-group">
         <span class="input-group-addon"><i class="fa fa-euro" aria-hidden="true"></i></span>
-        <input type="text"  id="buyorder-form-freeshipping" {% if buyorder.freeshipping!=null %} value="{{ buyorder.freeshipping }}" {% endif %} class="form-control">
+        <input type="text"  readonly id="buyorder-form-freeshipping" value="{{ buyorder.freeshipping }}" class="form-control">
       </div>
     </div>
     <div class="col-md-2">
       <label for="buyorder-form-minorder">Importe mínimo:</label>
       <div class="input-group">
         <span class="input-group-addon"><i class="fa fa-euro" aria-hidden="true"></i></span>
-        <input type="number"  id="buyorder-form-minorder" {% if buyorder.minorder!=null %} value="{{ buyorder.minorder }}" {% endif %} class="form-control">
+        <input type="number" readonly id="buyorder-form-minorder" value="{{ buyorder.minorder }}" class="form-control">
       </div>
     </div>
     <div class="col-md-2">
       <label for="buyorder-form-additionalcost">Gastos extra:</label>
       <div class="input-group">
         <span class="input-group-addon"><i class="fa fa-euro" aria-hidden="true"></i></span>
-        <input type="number"  id="buyorder-form-additionalcost" {% if buyorder.additionalcost!=null %} value="{{ buyorder.additionalcost }}" {% endif %} class="form-control">
+        <input type="number"  id="buyorder-form-additionalcost"  value="{{ buyorder.additionalcost }}"  class="form-control">
       </div>
     </div>
     <div class="col-md-2">
       <label for="buyorder-form-weight">Peso:</label>
       <div class="input-group">
         <span class="input-group-addon"><i class="fa fa-balance-scale" aria-hidden="true"></i></span>
-        <input type="number"  id="buyorder-form-weight" {% if buyorder.weight!=null %} value="{{ buyorder.weight }}" {% endif %} class="form-control">
+        <input type="number"  id="buyorder-form-weight" value="{{ buyorder.weight }}" class="form-control">
       </div>
     </div>
     <div class="col-md-1">
 
       <div class="input-group">
-        <input type="checkbox"  id="buyorder-form-priority" {% if buyorder.priority!=null %}{% if buyorder.priority==1 %} checked {% endif %}{% endif %} class="form-check-input icheck" placeholder="Urgente...">
+        <input type="checkbox"  id="buyorder-form-priority" {% if buyorder.priority==1 %} checked {% endif %} class="form-check-input icheck" placeholder="Urgente...">
         <label for="buyorder-form-priority">&nbsp; Urgente</label>
       </div>
     </div>
     <div class="col-md-1">
 
       <div class="input-group">
-        <input type="checkbox"  id="buyorder-form-readed" {% if buyorder.readed!=null %}{% if buyorder.readed==1 %} checked {% endif %}{% endif %} class="form-check-input icheck" placeholder="Leído...">
+        <input type="checkbox"  id="buyorder-form-readed" {% if buyorder.readed==1 %} checked {% endif %} class="form-check-input icheck" placeholder="Leído...">
           <label for="buyorder-form-readed">&nbsp; Leído</label>
       </div>
     </div>

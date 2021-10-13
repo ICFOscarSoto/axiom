@@ -62,10 +62,15 @@ class ERPCustomersRepository extends ServiceEntityRepository
     }
 
     public function getAddresses($customer){
-        $query='SELECT a.id as id, a.name as name, a.address as address, a.postcode as postcode, a.city as city, a.phone as phone, a.email as email
+        $query='SELECT a.id as id, a.name as name, a.address as address, a.postcode as postcode, a.city as city,
+        a.phone as phone, a.email as email, s.id AS stateid, s.name as statename, ct.id as countryid, ct.name as countryname
         FROM erpcustomers c
         LEFT JOIN erpaddresses a
         ON a.customer_id=c.id
+        LEFT JOIN globale_states s
+        ON s.id=a.state_id
+        LEFT JOIN globale_countries ct
+        ON ct.id=a.country_id
         WHERE a.customer_id=:customer AND a.active=1 AND a.deleted=0 ORDER BY name ASC';
         $params=['customer' => $customer];
         return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();

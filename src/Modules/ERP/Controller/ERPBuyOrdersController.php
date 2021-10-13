@@ -313,10 +313,15 @@ class ERPBuyOrdersController extends Controller
 
 
 
-
+		  dump($fields->destinationstate);
+			dump($fields->destinationcountry);
 
 			$destinationstate=$globalstatesRepository->findOneBy(["id"=>$fields->destinationstate, "active"=>1, "deleted"=>0]);
 			$destinationcountry=$globalcountriesRepository->findOneBy(["id"=>$fields->destinationcountry, "active"=>1, "deleted"=>0]);
+
+			dump($destinationstate);
+			dump($destinationcountry);
+
 			if($customer){
 				$buyorder->setCustomer($customer);
 

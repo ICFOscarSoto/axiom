@@ -23,8 +23,10 @@
     buyorderFields.store=$("#buyorder-form-store").val();
 
 
-    buyorderFields.priority=$("#buyorder-form-priority").val();
-    buyorderFields.readed=$("#buyorder-form-readed").val();
+    if($("#buyorder-form-priority").prop('checked')) buyorderFields.priority=1;
+    else buyorderFields.priority=0;
+    if($("#buyorder-form-readed").prop('checked')) buyorderFields.readed=1;
+    else buyorderFields.readed=0;
     buyorderFields.shippingcharge=$("#buyorder-form-shippingcharge").val();
   //  buyorderFields.shippingcosts=$("#buyorder-form-shippingcosts").val();
 
