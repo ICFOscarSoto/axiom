@@ -86,29 +86,6 @@
       </div>
   </div>
   <div class="row">
-    {% if buyorder.store!=null %}
-        <div class="col-md-2">
-          <div class="form-group">
-            <label for="buyorder-form-store">Almacén destino:</label>
-            <select type="text" id="buyorder-form-store" class="form-control select2" required>
-              {% for option in stores %}
-                <option value="{{ option.id }}" {% if option.id==buyorder.store.id %} selected{% endif %}>{{ option.text }}</option>
-              {% endfor %}
-            </select>
-          </div>
-        </div>
-    {% else %}
-    <div class="col-md-2">
-      <div class="form-group">
-        <label for="buyorder-form-store">Almacén destino:</label>
-        <select type="text" id="buyorder-form-store" class="form-control select2" required>
-          {% for option in stores %}
-            <option value="{{ option.id }}" {% if option.id==1 %} selected{% endif %}>{{ option.text }}</option>
-          {% endfor %}
-        </select>
-      </div>
-    </div>
-    {% endif %}
     <div class="col-md-2">
       <label for="buyorder-form-shippingcharge">Portes:</label>
       <div class="form-group">

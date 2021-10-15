@@ -1,4 +1,5 @@
-[   {
+[
+  {
       "name": "id",
       "caption": "id",
       "class": "hidden"
@@ -6,7 +7,26 @@
   {
       "name": "code",
       "caption": "code",
-      "width": "15%",
+      "class": "all"
+  },
+  {
+      "name": "dateadd",
+      "caption": "dateadd",
+      "class": "all"
+  },
+  {
+      "name": "estimateddelivery",
+      "caption": "Fecha estimada de entrega",
+      "class": "all"
+  },
+  {
+      "name": "supplier__name",
+      "caption": "Proveedor",
+      "class": "all"
+  },
+  {
+      "name": "author__name_o_author__lastname",
+      "caption": "Autor",
       "class": "all"
   }
 ]
