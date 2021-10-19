@@ -27,7 +27,7 @@
       <div class="col-md-4" id="searching-customer" {% if buyorder.customer==null or id==0 %}style="display:none;"{% endif %}>
         <label for="destination-form-address">Código de Cliente:</label>
         <div class="input-group">
-          <input type="text" readonly id="destination-form-customercode" {% if buyorder.customer!=null %} value="{{ buyorder.customer.code }}" {% endif %}  class="form-control" placeholder="Selecciona cliente..." data-toggle="modal" data-target="#customer-search-modal-form">
+          <input type="text" readonly id="destination-form-customercode" {% if buyorder.customer!=null %} value="{{ buyorder.customer.code }}" {% endif %} class="form-control" placeholder="Selecciona cliente..." data-toggle="modal" data-target="#customer-search-modal-form">
           <div class="input-group-btn">
             <button type="button" id="destination-form-customercode" class="btn btn-white" style="height: 31px;" data-toggle="modal" data-target="#customer-search-modal-form">
               <i class="fa fa-search"></i> </button>
@@ -37,13 +37,13 @@
         <div class="col-md-2">
           <label for="destination-form-name">Nombre:</label>
           <div class="form-group">
-            <input type="text"  id="destination-form-name" {% if buyorder.destinationname!=null %} value="{{ buyorder.destinationname }}"  {% endif %} class="form-control" placeholder="Nombre">
+            <input type="text"  id="destination-form-name" value="{{ buyorder.destinationname }}" class="form-control" placeholder="Nombre">
           </div>
         </div>
         <div class="col-md-4">
           <label for="destination-form-address">Dirección:</label>
           <div class="form-group">
-            <input type="text"  id="destination-form-address" {% if buyorder.destinationaddress!=null %} value="{{ buyorder.destinationaddress }}"  {% endif %} class="form-control" placeholder="Dirección destino">
+            <input type="text"  id="destination-form-address" value="{{ buyorder.destinationaddress }}"   class="form-control" placeholder="Dirección destino">
           </div>
         </div>
         </div>
@@ -51,25 +51,25 @@
         <div class="col-md-2">
           <label for="destination-form-phone">Teléfono:</label>
           <div class="form-group">
-            <input type="text"  id="destination-form-phone" {% if buyorder.destinationphone!=null %} value="{{ buyorder.destinationphone }}"  {% endif %} class="form-control" placeholder="Teléfono destino">
+            <input type="text"  id="destination-form-phone" value="{{ buyorder.destinationphone }}"  class="form-control" placeholder="Teléfono destino">
           </div>
         </div>
         <div class="col-md-2">
           <label for="destination-form-email">Email:</label>
           <div class="form-group">
-            <input type="text"  id="destination-form-email" {% if buyorder.destinationemail!=null %} value="{{ buyorder.destinationemail }}"  {% endif %} class="form-control" placeholder="Email destino">
+            <input type="text"  id="destination-form-email" value="{{ buyorder.destinationemail }}"  class="form-control" placeholder="Email destino">
           </div>
         </div>
         <div class="col-md-2">
           <label for="destination-form-postcode">Código postal:</label>
           <div class="form-group">
-            <input type="text"  id="destination-form-postcode" {% if buyorder.destinationpostcode!=null %} value="{{ buyorder.destinationpostcode }}"  {% endif %} class="form-control" placeholder="Código postal destino">
+            <input type="text"  id="destination-form-postcode" value="{{ buyorder.destinationpostcode }}"  class="form-control" placeholder="Código postal destino">
           </div>
         </div>
         <div class="col-md-2">
           <label for="destination-form-city">Ciudad:</label>
           <div class="form-group">
-            <input type="text"  id="destination-form-city" {% if buyorder.destinationcity!=null %} value="{{ buyorder.destinationcity }}"  {% endif %} class="form-control" placeholder="Ciudad destino">
+            <input type="text"  id="destination-form-city" value="{{ buyorder.destinationcity }}" class="form-control" placeholder="Ciudad destino">
           </div>
         </div>
         {% if buyorder.destinationstate!=null %}

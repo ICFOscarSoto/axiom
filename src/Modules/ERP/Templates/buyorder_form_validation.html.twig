@@ -2,6 +2,12 @@
   function validate_buyorder(){
     //$(".error").remove();
       var valid=true;
+      if($("#supplier-form-code").val()==""){
+        toastr.error("Por favor, selecciona un proveedor", "Confirmación", confirmation);
+         valid=false;
+         return valid;
+
+      }
 /*
       if($("#customer-form-code").val()=="" && $("#salesorder-form-number").val()=="")
       {

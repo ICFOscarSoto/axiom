@@ -47,7 +47,7 @@
       {% if id!=0 %}
           <h3>Nº {{ buyorder.code }}</h3>
       {% else %}
-          <h3>Nº ________</h3>
+          <h3>Nº ______________</h3>
       {% endif %}
       </div>
   </div>
@@ -168,14 +168,12 @@
          $("#destination-form-state").val('');
          $("#destination-form-country").val('');
          $("#destination-form-phone").val('');
-          $("#destination-form-email").val('');
-          $("#searching-customer").css("display","block");
+         $("#destination-form-email").val('');
+         $("#searching-customer").css("display","block");
        }
       else{
         setStoreInfo($(this).val());
           $("#searching-customer").css("display","none");
-      //  $("#destination-data").css("display","none");
-
       }
 
 
