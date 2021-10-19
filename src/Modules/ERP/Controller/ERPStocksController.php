@@ -110,15 +110,19 @@ class ERPStocksController extends Controller
 					$stockHistory=Array();
 
 					foreach($history as $history_line){
-									 $item['Fecha']=$history_line['dateadd'];
-									 $item['Código']=$history_line['product_code'];
-						 			 $item['Nombre']=$history_line['product_name'];
-						 			 $item['Ubicación']=$history_line['location'];
-						 			 $item['Almacén']=$history_line['store'];
-						 			 $item['Stock Previo']=$history_line['prevqty'];
-						 			 $item['Stock Final']=$history_line['newqty'];
-									 $item['Usuario']=$history_line['user'];
-						 			 $stockHistory[]=$item;
+						$item['Fecha']=$history_line['dateadd'];
+						//$item['Código']=$history_line['product_code'];
+						//$item['Nombre']=$history_line['product_name'];
+						$item['Operacion']=$history_line['numOperation'];
+						$item['Tipo']=$history_line['type'];
+						$item['Cantidad']=$history_line['quantity'];
+						$item['Ubicación']=$history_line['location'];
+						$item['Almacén']=$history_line['store'];
+						$item['Comentario']=$history_line['comment'];
+						$item['Stock Previo']=$history_line['prevqty'];
+						$item['Stock Final']=$history_line['newqty'];
+						$item['Usuario']=$history_line['user'];
+						$stockHistory[]=$item;
 					}
 
 					return $this->render('@ERP/infoStocks.html.twig', array(
@@ -154,10 +158,14 @@ class ERPStocksController extends Controller
 
 					foreach($history as $history_line){
 									 $item['Fecha']=$history_line['dateadd'];
-									 $item['Código']=$history_line['product_code'];
-						 			 $item['Nombre']=$history_line['product_name'];
+									 //$item['Código']=$history_line['product_code'];
+						 			 //$item['Nombre']=$history_line['product_name'];
+									 $item['Operacion']=$history_line['numOperation'];
+									 $item['Tipo']=$history_line['type'];
+									 $item['Cantidad']=$history_line['quantity'];
 						 			 $item['Ubicación']=$history_line['location'];
 						 			 $item['Almacén']=$history_line['store'];
+									 $item['Comentario']=$history_line['comment'];
 						 			 $item['Stock Previo']=$history_line['prevqty'];
 						 			 $item['Stock Final']=$history_line['newqty'];
 									 $item['Usuario']=$history_line['user'];

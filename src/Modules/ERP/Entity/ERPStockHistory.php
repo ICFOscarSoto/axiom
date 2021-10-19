@@ -7,6 +7,7 @@ use \App\Modules\ERP\Entity\ERPProducts;
 use \App\Modules\ERP\Entity\ERPStoreLocations;
 use \App\Modules\ERP\Entity\ERPStores;
 use \App\Modules\Globale\Entity\GlobaleUsers;
+use \App\Modules\ERP\Entity\ERPTypesMovements;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPStockHistoryRepository")
@@ -78,6 +79,26 @@ class ERPStockHistory
      * @ORM\ManyToOne(targetEntity="App\Modules\ERP\Entity\ERPProductsVariants")
      */
     private $productvariant;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPTypesMovements")
+     */
+    private $type;
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $comment;
+
+    /**
+     * @ORM\Column(type="string", length=10, nullable=true)
+     */
+    private $numOperation;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    private $quantity;
 
     public function getId(): ?int
     {
@@ -212,6 +233,54 @@ class ERPStockHistory
     public function setProductvariant(?ERPProductsVariants $productvariant): self
     {
         $this->productvariant = $productvariant;
+
+        return $this;
+    }
+
+    public function getType(): ?ERPTypesMovements
+    {
+        return $this->type;
+    }
+
+    public function setType(?ERPTypesMovements $type): self
+    {
+        $this->type = $type;
+
+        return $this;
+    }
+
+    public function getComment(): ?string
+    {
+        return $this->comment;
+    }
+
+    public function setComment(?string $comment): self
+    {
+        $this->comment = $comment;
+
+        return $this;
+    }
+
+    public function getNumOperation(): ?string
+    {
+        return $this->numOperation;
+    }
+
+    public function setNumOperation(?string $numOperation): self
+    {
+        $this->numOperation = $numOperation;
+
+        return $this;
+    }
+
+    public function getQuantity(): ?float
+    {
+        return $this->quantity;
+    }
+
+    public function setQuantity(?float $quantity): self
+    {
+        $this->quantity = $quantity;
 
         return $this;
     }

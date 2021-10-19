@@ -1,0 +1,6 @@
+[
+  {"id" : "addTopTypesMovements", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"genericdata", "routeParams":{"module":"ERP", "name":"TypesMovements", "type":"modal" }, "modal":"TypesMovements", "actionType" : "background", "confirm" :false, "tooltip" : ""},
+  {"id" : "deleteTopTypesMovements", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true, "tooltip":""},
+  {"id" : "printTopTypesMovements", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false, "tooltip":""},
+  {"id" : "exportTopTypesMovements", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"genericexport", "routeParams":{"module":"ERP", "name":"TypesMovements"}, "confirm" :false, "tooltip":""}
+]
