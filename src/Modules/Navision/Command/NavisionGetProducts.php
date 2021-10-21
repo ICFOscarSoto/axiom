@@ -887,7 +887,7 @@ public function updateStocksStoresManaged(InputInterface $input, OutputInterface
               $stockHistory->setDateadd(new \Datetime());
               $stockHistory->setDateupd(new \Datetime());
               $stockHistory->setNumOperation($stock["no"]);
-              $stockHistory->setQuantity((int)$stock["stock"]));
+              $stockHistory->setQuantity((int)$stock["stock"]);
               $stockHistory->setActive(true);
               $stockHistory->setDeleted(false);
               $this->doctrine->getManager()->merge($stockHistory);
