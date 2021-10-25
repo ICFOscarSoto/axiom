@@ -113,6 +113,14 @@
           url: "/api/ERP/customer/addresses/"+id+"/get",
         }).done(function( elements, textStatus, jqXHR ) {
           if((--load_wait)==0) $("#load-spinner").fadeOut();
+            $("#addresses-body").append(
+              '<div class="row no-gutters">'+
+              '<div class="col-sm-4 d-none d-sm-block" style="font-weight:bold;font-size:13px;padding: 7px 2px;">Nombre</div>'+
+              '<div class="col-sm-4 d-none d-sm-block" style="font-weight:bold;font-size:13px;padding: 7px 2px;">Dirección</div>'+
+              '<div class="col-sm-1 d-none d-sm-block" style="font-weight:bold;font-size:13px;padding: 7px 2px;">C.P.</div>'+
+              '<div class="col-sm-2 d-none d-sm-block" style="font-weight:bold;font-size:13px;padding: 7px 2px;">Ciudad</div>'+
+              '</div>'
+            );
            elements.forEach( function(valor, indice, array){
               $("#addresses-body").append(
                 '<div class="row no-gutters" attr-id="'+valor.id+'" id="address-line-'+valor.id+'">'+
