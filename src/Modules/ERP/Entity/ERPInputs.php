@@ -106,12 +106,17 @@ class ERPInputs
     /**
      * @ORM\Column(type="boolean", nullable=false, options={"default" : false})
      */
-    private $navinput;
+    private $navinput=false;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Modules\Globale\Entity\GlobaleUsers")
      */
     private $navauthor;
+
+    /**
+     * @ORM\Column(type="string", length=20, nullable=true)
+     */
+    private $ourcode;
 
     public function __construct()
     {
@@ -363,6 +368,18 @@ class ERPInputs
     public function setNavauthor(?GlobaleUsers $navauthor): self
     {
         $this->navauthor = $navauthor;
+
+        return $this;
+    }
+
+    public function getOurcode(): ?string
+    {
+        return $this->ourcode;
+    }
+
+    public function setOurcode(?string $ourcode): self
+    {
+        $this->ourcode = $ourcode;
 
         return $this;
     }

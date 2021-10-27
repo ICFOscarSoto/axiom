@@ -10,6 +10,10 @@
     },
     {
         "name": "code",
+        "caption": "Alb. Prov."
+    },
+    {
+        "name": "ourcode",
         "caption": "Nº Albarán"
     },
     {
