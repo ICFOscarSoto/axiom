@@ -82,7 +82,7 @@ class NavisionGetInputs extends ContainerAwareCommand
       $inputs=$repositoryInputs->findBy(["navinput"=>false, "active"=>1, "deleted"=>0]);
       foreach($inputs as $input){
 
-          $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getPurchaseDeliveryExists.php?code='.$input->getCode().'&supplier='.$input->getSupplier()->getCode());
+          $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getPurchaseDeliveryExists.php?code='.urlencode($input->getCode()).'&supplier='.urlencode($input->getSupplier()->getCode()));
           $object=json_decode($json, true);
           if(json_last_error() !== JSON_ERROR_NONE){
             continue;
