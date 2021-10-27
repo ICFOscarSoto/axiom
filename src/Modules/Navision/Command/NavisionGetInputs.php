@@ -91,7 +91,7 @@ class NavisionGetInputs extends ContainerAwareCommand
               continue;
             }
           $user=$repositoryUsers->findOneBy(["email"=>$object["data"]["author"]]);
-          if(!$user) continue;
+          //if(!$user) continue;
           $output->writeln('  - '.$input->getCode().' -> '.$object["data"]["code"]);
           $input->setNavinput(true);
           $input->setNavauthor($user);
