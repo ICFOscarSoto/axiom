@@ -45,10 +45,5 @@
     {
         "name": "navauthor__name_o_navauthor__lastname",
         "caption": "Autor Navision"
-    },
-    {
-        "name": "haspdf",
-        "caption": "pdf",
-        "visible": false
     }
 ]
