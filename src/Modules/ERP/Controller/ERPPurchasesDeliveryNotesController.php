@@ -43,7 +43,7 @@ class ERPPurchasesDeliveryNotesController extends Controller
 	private $class=ERPPurchasesDeliveryNotes::class;
 	private $classLines=ERPPurchasesDeliveryLines::class;
 	private $utilsClass=ERPPurchasesDeliveryUtils::class;
-
+  private $url="http://192.168.1.250:9000";
 	/**
 	 * @Route("/{_locale}/ERP/inputs/form/{id}", name="inputsForm", defaults={"id"=0})
 	 */
@@ -117,6 +117,39 @@ class ERPPurchasesDeliveryNotesController extends Controller
 	 return $make;
 	}
 
+	/**
+	 * @Route("/api/ERP/inputs/list", name="apiInputList", defaults={"id"=0, "action"="read"})
+	 */
+	 public function apiInputList($id, $action, Request $request){
+	 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+	 $search=$request->request->get('s',$request->query->get('s',null));
+	 $inputsRepository=$this->getDoctrine()->getRepository(ERPInputs::class);
+	 //Get user default warehouse
+
+
+	 $ctx = stream_context_create(array('http'=>
+								 array('timeout' => 1800)
+							 ));
+	 $json=file_get_contents($this->url.'/navisionExport/axiom/do-NAVISION-getPurchaseDeliveries.php?s='.$search, false, $ctx);
+	 //return new Response($this->url.'/navisionExport/axiom/do-NAVISION-getPurchaseDeliveries.php?s='.$search);
+	 $array=json_decode($json,true);
+	 foreach($array["class"] as $key=>$item){
+		 //Search input with supplier delivery note code
+		 $input=$inputsRepository->findOneBy(['code'=>$item['supplierdeliverycode'], 'company'=>$this->getUser()->getCompany(), 'active'=>1, 'deleted'=>0]);
+		 if($input){
+			$array["class"][$key]["input_id"]=$input->getId();
+		 	$array["class"][$key]["packages"]=$input->getPackages();
+		}else{
+			$array["class"][$key]["input_id"]=-1;
+			$array["class"][$key]["packages"]=-1;
+		}
+
+	 }
+
+	 return new JsonResponse($array);
+
+	}
+
 
 	/**
 	 * @Route("/{_locale}/ERP/inputs/discord_notify/{id}", name="inputsDiscordNotify", defaults={"id"=0})
@@ -131,5 +164,20 @@ class ERPPurchasesDeliveryNotesController extends Controller
 		$inputsRepository=$this->getDoctrine()->getRepository(ERPInputs::class);
 		$input=$inputsRepository->findOneBy(["id"=>$id, "active"=>1, "deleted"=>0, "company"=>$this->getUser()->getCompany() ]);
 
+	}
+
+	/**
+	 * @Route("/{_locale}/ERP/inputs/assign/{id}", name="inputsAssign", defaults={"id"=0})
+	 */
+	public function inputsAssign($id,RouterInterface $router,Request $request)
+	{
+		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
+		$locale = $request->getLocale();
+		$inputsRepository=$this->getDoctrine()->getRepository(ERPInputs::class);
+		$input=$inputsRepository->findOneBy(["id"=>$id, "active"=>1, "deleted"=>0, "company"=>$this->getUser()->getCompany()]);
+		$input->setNavauthor($this->getUser());
+		$this->getDoctrine()->getManager()->persist($input);
+		$this->getDoctrine()->getManager()->flush();
 	}
 }

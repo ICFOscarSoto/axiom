@@ -6,8 +6,7 @@
     {
         "name": "date",
         "caption": "Fecha Albarán",
-        "type": "date",
-        "width": "15%","class":"min-desktop"
+        "type": "date"
     },
     {
         "name": "code",
@@ -24,11 +23,10 @@
     {
         "name": "inputdate",
         "caption": "Fecha Entrada",
-        "type": "datetime",
-        "width": "15%","class":"min-desktop"
+        "type": "datetime"
     },
     {
-        "name": "store__name",
+        "name": "store__code",
         "caption": "store"
     },
     {
@@ -36,11 +34,21 @@
         "caption": "packages"
     },
     {
-        "name": "location__name",
-        "caption": "location"
-    },
-    {
         "name": "author__name_o_author__lastname",
         "caption": "Author"
+    },
+    {"name": "navinput", "caption":"En Navision","class" : "dt-center", "replace":{
+                               "1":{"text":"Si","html":"<div style=\"min-width: 25px;\" class=\"label label-success\">SI</div>"},
+                               "0":{"text":"No","html":"<div style=\"min-width: 25px;\" class=\"label label-danger\">NO</div>", "default":true}
+                             }
+    },
+    {
+        "name": "navauthor__name_o_navauthor__lastname",
+        "caption": "Autor Navision"
+    },
+    {
+        "name": "haspdf",
+        "caption": "pdf",
+        "visible": false
     }
 ]

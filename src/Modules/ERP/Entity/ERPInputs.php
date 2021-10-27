@@ -103,6 +103,16 @@ class ERPInputs
      */
     private $author;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=false, options={"default" : false})
+     */
+    private $navinput;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Modules\Globale\Entity\GlobaleUsers")
+     */
+    private $navauthor;
+
     public function __construct()
     {
       //$this->date=new \DateTime();
@@ -332,5 +342,31 @@ class ERPInputs
       }
 
     }
+
+    public function getNavinput(): ?bool
+    {
+        return $this->navinput;
+    }
+
+    public function setNavinput(?bool $navinput): self
+    {
+        $this->navinput = $navinput;
+
+        return $this;
+    }
+
+    public function getNavauthor(): ?GlobaleUsers
+    {
+        return $this->navauthor;
+    }
+
+    public function setNavauthor(?GlobaleUsers $navauthor): self
+    {
+        $this->navauthor = $navauthor;
+
+        return $this;
+    }
+
+
 
 }
