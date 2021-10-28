@@ -220,7 +220,7 @@ var url = new URL(window.location.href);
 									{% else %}
 									"orderable": false,
 									{% endif %}
-									{% if field.visible is defined %} "visible": "{{ field.visible }}", {% else %} "visible": "true", {% endif %}
+									{% if field.visible is defined %} "visible": "{{ field.visible }}", {% else %} {% if field.name != 'id' %}"visible": "true", {% endif %}{% endif %}
 
 
 									{% if field.class is defined %} "className": "{{ field.class }}", {% endif %}
