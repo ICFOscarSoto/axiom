@@ -176,8 +176,17 @@ class ERPPurchasesDeliveryNotesController extends Controller
 		$locale = $request->getLocale();
 		$inputsRepository=$this->getDoctrine()->getRepository(ERPInputs::class);
 		$input=$inputsRepository->findOneBy(["id"=>$id, "active"=>1, "deleted"=>0, "company"=>$this->getUser()->getCompany()]);
-		$input->setNavauthor($this->getUser());
-		$this->getDoctrine()->getManager()->persist($input);
-		$this->getDoctrine()->getManager()->flush();
+		$result=[];
+		if(!$input->getNavinput()){
+			$input->setNavauthor($this->getUser());
+			$this->getDoctrine()->getManager()->persist($input);
+			$this->getDoctrine()->getManager()->flush();
+			$result["result"]=1;
+			return new JsonResponse($result);
+		}else{
+			$result["result"]=-1;
+			$result["text"]='No se puede asignar el autor cuando ya está en Navision.';
+			return new JsonResponse($result);
+		}
 	}
 }

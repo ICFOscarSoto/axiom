@@ -1,6 +1,6 @@
 [
   {"id": "editInputs", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"inputsForm", "actionType" : "foreground", "confirm" :false, "tooltip":"Editar entrada"},
   {"id": "assignInputs", "type" : "default", "icon" : "fab fa-mixer","name" : "asignarse", "route":"inputsAssign", "confirm" :true, "undo" :true, "actionType" : "background", "tooltip":"Asignarme esta entrada"},
-  {"id": "cloudFiles", "type" : "default", "icon" : "fas fa-cloud","name" : "asignarse", "route":"inputsForm", "routeParams":{"tab":"files"}, "confirm" :false, "undo" :true, "actionType" : "foreground", "tooltip":"Ver documentación"},
+  {"id": "cloudFiles", "type" : "default", "icon" : "fas fa-cloud","name" : "asignarse", "route":"inputsForm", "routeParams":{"tab":"files"}, "confirm" :false, "undo" :true, "actionType" : "foreground", "target":"_blank", "tooltip":"Ver documentación"},
   {"id": "deleteInputs", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"genericdelete", "routeParams":{"module":"ERP", "name":"Inputs"}, "confirm" :true, "undo" :false, "actionType" : "background", "tooltip":"Borrar entrada"}
 ]

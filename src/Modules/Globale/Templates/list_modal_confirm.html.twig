@@ -36,6 +36,15 @@ $(document).ready(function() {
         form.submit();
       }else{
         $.post($(this).attr('attr-action'), "ids="+ids, function(data, textStatus) {
+          if (data.hasOwnProperty('result')) {
+            if(data.result==1){
+              toastr.success("Datos guardados correctamente", "Confirmación", confirmation);
+            }else{
+              if (data.hasOwnProperty('text')) {
+               toastr.error(data.text, "Confirmación", confirmation);
+             }else toastr.error("Ocurrió un error al guardar los datos", "Confirmación", confirmation);
+            }
+          }
           $.each( data, function( key, val ) {
           });
         }).always(function() {
