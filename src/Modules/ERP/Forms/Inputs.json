@@ -7,8 +7,7 @@
                 {
                     "name": "code",
                     "caption": "Nº Albarán",
-                    "cols": 2,
-                    "readonly": "noChange"
+                    "cols": 2
                 },
                 {
                     "name": "date",
