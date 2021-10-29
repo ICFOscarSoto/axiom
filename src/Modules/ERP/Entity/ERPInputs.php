@@ -327,7 +327,7 @@ class ERPInputs
       //Ourcode is changed? check it with Navision
       if($this->ourcode!=null && $this->ourcode!=$oldobj->getOurcode()){
         $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getPurchaseDeliveryExistsbyNo.php?code='.urlencode($this->ourcode).'&supplier='.urlencode($this->supplier->getCode()).'&newcode='.urlencode($this->getCode()));
-        dump($this->url.'navisionExport/axiom/do-NAVISION-getPurchaseDeliveryExistsbyNo.php?code='.urlencode($this->ourcode).'&supplier='.urlencode($this->supplier->getCode()).'&newcode='.urlencode($this->getCode()));
+        //dump($this->url.'navisionExport/axiom/do-NAVISION-getPurchaseDeliveryExistsbyNo.php?code='.urlencode($this->ourcode).'&supplier='.urlencode($this->supplier->getCode()).'&newcode='.urlencode($this->getCode()));
         $object=json_decode($json, true);
         //dump($object);
         if(json_last_error() == JSON_ERROR_NONE && $object["result"]==1){
