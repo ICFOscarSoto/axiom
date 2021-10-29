@@ -29,7 +29,6 @@ class ERPInputsRepository extends ServiceEntityRepository
     public function findOurCleanCode($code, $user)
     {
       $query="SELECT * FROM axiomdb_ferricam.erpinputs WHERE REGEXP_REPLACE(ourcode, '[^A-Za-z0-9]', '') LIKE REGEXP_REPLACE('".$code."', '[^A-Za-z0-9]', '') and company_id=".$user->getCompany()->getId()." and deleted=0";
-      dump($query);
       $result=$this->getEntityManager()->getConnection()->executeQuery($query)->fetch();
       return $result;
     }
