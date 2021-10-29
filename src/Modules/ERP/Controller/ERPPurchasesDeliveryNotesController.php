@@ -109,7 +109,7 @@ class ERPPurchasesDeliveryNotesController extends Controller
 		$obj=new ERPInputs();
 		if($storeUsers) $obj->setStore($storeUsers->getStore());
 	 }
-	 $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "obj"=>$obj, "author"=>$obj->getAuthor()];
+	 $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "obj"=>$obj, "author"=>$obj->getAuthor(), "navauthor"=>$obj->getNavauthor()];
 	 $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),$classUtils->getExcludedForm($params),$classUtils->getIncludedForm($params),null,[],[],[],true);
 
 	 $make = $utils->make($id, ERPInputs::class, $action, "formInput", "full", "@Globale/form.html.twig",'inputsForm');

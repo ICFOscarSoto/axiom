@@ -54,13 +54,42 @@
                     "trigger":{"field":"store", "route":"generictrigger",
               				"moduleTrigger":"ERP", "classTrigger":"ERPStores",
               				"module":"ERP", "class":"ERPStoreLocations", "relationParameter":"store"}
-                },
-                {
-                    "name": "comments",
-                    "cols": 12,
-                    "class":"wysiwyg"
                 }
 
+            ]
+        },
+        {
+            "name": "relations",
+            "fields": [
+                {
+                    "name": "navauthor",
+                    "caption": "Autor Navision",
+                    "cols": 2,
+                    "type": "date",
+                    "readonly": true
+                },
+                {
+                    "name": "ourcode",
+                    "caption": "Nuestro Albarán",
+                    "cols": 2,
+                    "readonly": "noChange"
+                },
+                {
+                    "name": "navinput",
+                    "caption": "En Navision",
+                    "cols": 2,
+                    "readonly": true
+                }
+            ]
+        },
+        {
+            "name": "Otros",
+            "fields": [
+              {
+                  "name": "comments",
+                  "cols": 12,
+                  "class":"wysiwyg"
+              }
             ]
         }
     ]

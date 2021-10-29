@@ -17,7 +17,6 @@
     </div>
   </div>
   {% endif %}
-
   {{ include("@Globale/form_validation.html.twig") }}
 
   {% if include_pre_templates is defined %}
@@ -27,70 +26,73 @@
   {% endif %}
 
   {% for section in formConstructor.template.0.sections %}
-
-  <div class="panel minimal" id="panel-{{ section.name }}">
-    <div class="panel-heading">
-      <div class="panel-title">{{ (section.name)|trans }}</div>
-    </div>
-    <div class="panel-body">
-      <div class="row">
-        <script>
-        $(document).ready(function() {
-          {{ include("@Globale/form_fields_datetime.html.twig") }}
-        });
-        </script>
-      {% for field in section.fields %}
-        <div class="col-md-{{ field.cols }}">
-            {% if field.type is defined and field.type == 'image' %}
-              {# Image component of the form #}
-              {{ include("@Globale/form_fields_image.html.twig") }}
-            {% elseif field.type is defined and field.type == 'gallery' %}
-              {# Gallery component of the form #}
-              {{ include("@Globale/form_fields_gallery.html.twig") }}
-            {% elseif field.type is defined and field.type == 'file' %}
-              values 2
-            {% else %}
-            {# Default component of the form #}
-
-            {{ form_row(formConstructor.form[field.name]) }}
-              {# Check if field is a relation and must show the view button #}
-              {{ include("@Globale/form_relation_button.html.twig") }}
-              {# Check if field is an address and map is enabled #}
-              {{ include("@Globale/form_address_button.html.twig") }}
-              {# Check if field is an url #}
-              {{ include("@Globale/form_url_button.html.twig") }}
-              {# Check if field is an tel #}
-              {{ include("@Globale/form_tel_button.html.twig") }}
-              {# Check if field is an email #}
-              {{ include("@Globale/form_email_button.html.twig") }}
-              {# Check if field has trigger #}
-              {{ include("@Globale/form_trigger_field.html.twig") }}
-              {# Check if field has a linked field #}
-              {{ include("@Globale/form_fields_linked.html.twig") }}
-              {# Check if field has a dependency of other field #}
-              {{ include("@Globale/form_fields_depend.html.twig") }}
-              {# Check if field has a to change another field #}
-              {{ include("@Globale/form_fields_change.html.twig") }}
-              {# Check if field has unity field #}
-              {{ include("@Globale/form_fields_unity.html.twig") }}
-              {# Check if field is an colour #}
-              {{ include("@Globale/form_fields_colour.html.twig") }}
-              {# Check if field has a field type number #}
-              {{ include("@Globale/form_fields_type_number.html.twig") }}
-              {# Check if field has a codeproduct #}
-              {{ include("@Globale/form_fields_code_product.html.twig") }}
-            {% endif %}
+      {% if userData.permissions[formConstructor.name ~ '_section_' ~ section.name] is not defined or (userData.permissions[formConstructor.name ~ '_section_' ~ section.name] is defined and userData.permissions[formConstructor.name ~ '_section_' ~ section.name].allowaccess == true) %}
+      <div class="panel minimal" id="panel-{{ section.name }}">
+      {% else %}
+      <div class="panel minimal" id="panel-{{ section.name }}" style="display:none">
+      {% endif %}
+        <div class="panel-heading">
+          <div class="panel-title">{{ (section.name)|trans }}</div>
         </div>
-        {% set counter = counter +1 %}
-      {% endfor %}
+        <div class="panel-body">
+          <div class="row">
+            <script>
+            $(document).ready(function() {
+              {{ include("@Globale/form_fields_datetime.html.twig") }}
+            });
+            </script>
+          {% for field in section.fields %}
+            <div class="col-md-{{ field.cols }}">
+                {% if field.type is defined and field.type == 'image' %}
+                  {# Image component of the form #}
+                  {{ include("@Globale/form_fields_image.html.twig") }}
+                {% elseif field.type is defined and field.type == 'gallery' %}
+                  {# Gallery component of the form #}
+                  {{ include("@Globale/form_fields_gallery.html.twig") }}
+                {% elseif field.type is defined and field.type == 'file' %}
+                  values 2
+                {% else %}
+                {# Default component of the form #}
 
-      {% if formConstructor.post is defined %} <input type="hidden" id="post-url" name="post-url" value="{{ formConstructor.post }}"> {% endif %}
-      <input type="hidden" id="id-object" name="id-object" value="{{ formConstructor.id_object }}">
+                {{ form_row(formConstructor.form[field.name]) }}
+                  {# Check if field is a relation and must show the view button #}
+                  {{ include("@Globale/form_relation_button.html.twig") }}
+                  {# Check if field is an address and map is enabled #}
+                  {{ include("@Globale/form_address_button.html.twig") }}
+                  {# Check if field is an url #}
+                  {{ include("@Globale/form_url_button.html.twig") }}
+                  {# Check if field is an tel #}
+                  {{ include("@Globale/form_tel_button.html.twig") }}
+                  {# Check if field is an email #}
+                  {{ include("@Globale/form_email_button.html.twig") }}
+                  {# Check if field has trigger #}
+                  {{ include("@Globale/form_trigger_field.html.twig") }}
+                  {# Check if field has a linked field #}
+                  {{ include("@Globale/form_fields_linked.html.twig") }}
+                  {# Check if field has a dependency of other field #}
+                  {{ include("@Globale/form_fields_depend.html.twig") }}
+                  {# Check if field has a to change another field #}
+                  {{ include("@Globale/form_fields_change.html.twig") }}
+                  {# Check if field has unity field #}
+                  {{ include("@Globale/form_fields_unity.html.twig") }}
+                  {# Check if field is an colour #}
+                  {{ include("@Globale/form_fields_colour.html.twig") }}
+                  {# Check if field has a field type number #}
+                  {{ include("@Globale/form_fields_type_number.html.twig") }}
+                  {# Check if field has a codeproduct #}
+                  {{ include("@Globale/form_fields_code_product.html.twig") }}
+                {% endif %}
+            </div>
+            {% set counter = counter +1 %}
+          {% endfor %}
 
+          {% if formConstructor.post is defined %} <input type="hidden" id="post-url" name="post-url" value="{{ formConstructor.post }}"> {% endif %}
+          <input type="hidden" id="id-object" name="id-object" value="{{ formConstructor.id_object }}">
+
+          </div>
+
+        </div>
       </div>
-
-    </div>
-  </div>
   {% endfor %}
   {% if include_post_templates is defined %}
   	{% for template in include_post_templates %}

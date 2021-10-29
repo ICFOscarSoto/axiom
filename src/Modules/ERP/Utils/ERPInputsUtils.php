@@ -13,7 +13,7 @@ class ERPInputsUtils
   private $module="ERP";
   private $name="Inputs";
   public function getExcludedForm($params){
-    return [];
+    return ['navauthor'];
   }
 
   public function getIncludedForm($params){
@@ -22,13 +22,22 @@ class ERPInputsUtils
     $id=$params["id"];
     $user=$params["user"];
     $author=$params["author"]?$params["author"]:$user;
+    $navauthor=$params["navauthor"];
     return [['author', TextType::class, [
       'required' => false,
       'disabled' => true,
       'attr'=> ["readonly"=>true],
       'mapped' => false,
       'data' => $author->getName().' '.$author->getLastname()
-    ]]];
+    ]],
+    ['navauthor', TextType::class, [
+      'required' => false,
+      'disabled' => true,
+      'attr'=> ["readonly"=>true],
+      'mapped' => false,
+      'data' => $navauthor?($navauthor->getName().' '.$navauthor->getLastname()):''
+    ]]
+  ];
   }
 
   public function formatList($user){

@@ -35,3 +35,7 @@ if(typeof data.validation !== 'undefined' && typeof data.validation.global_infos
   $("#{{formConstructor.name}}-form-body #validation-infos-list").html(infos);
   $("#{{formConstructor.name}}-form-body [id$='-validation-infos']").slideDown();
 }
+
+if(typeof data.validation !== 'undefined' && typeof data.validation.reload !== 'undefined'){
+  if(data.validation.reload) location.reload();
+}

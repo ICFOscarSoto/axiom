@@ -118,6 +118,8 @@ class ERPInputs
      */
     private $ourcode;
 
+    private $url="http://192.168.1.250:9000/";
+
     public function __construct()
     {
       //$this->date=new \DateTime();
@@ -317,10 +319,33 @@ class ERPInputs
 
     public function postProccess($kernel, $doctrine, $user, $params, $oldobj){
       $cloudRepository=$doctrine->getRepository(CloudFiles::class);
+      $repositoryUsers=$doctrine->getRepository(GlobaleUsers::class);
       $files=$cloudRepository->findBy(["company"=>$user->getCompany(), "path"=>"ERPInputs", "idclass"=>$this->id, "type"=>"Albarán Proveedor"]);
       if(count($files)>0 && $this->inputdate!="" && $oldobj->getInputdate()==""){
         $this->discordNotify($files[0]);
       }
+      //Ourcode is changed? check it with Navision
+      if($this->ourcode!=null && $this->ourcode!=$oldobj->getOurcode()){
+        $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getPurchaseDeliveryExistsbyNo.php?code='.urlencode($this->ourcode).'&supplier='.urlencode($this->supplier->getCode()).'&newcode='.urlencode($this->getCode()));
+        dump($this->url.'navisionExport/axiom/do-NAVISION-getPurchaseDeliveryExistsbyNo.php?code='.urlencode($this->ourcode).'&supplier='.urlencode($this->supplier->getCode()).'&newcode='.urlencode($this->getCode()));
+        $object=json_decode($json, true);
+        //dump($object);
+        if(json_last_error() == JSON_ERROR_NONE && $object["result"]==1){
+            $user=$repositoryUsers->findOneBy(["email"=>$object["data"]["author"]]);
+            $this->setNavinput(true);
+            $this->setNavauthor($user);
+            $doctrine->getManager()->persist($this);
+            $doctrine->getManager()->flush();
+        }else{
+            $this->setOurcode(null);
+            $doctrine->getManager()->persist($this);
+            $doctrine->getManager()->flush();
+        }
+
+      }
+
+
+
     }
 
     public function discordNotify($cloudFile){
@@ -339,12 +364,23 @@ class ERPInputs
 
     public function formValidation($controller, $doctrine, $user, $validationParams){
       $repository=$doctrine->getRepository(ERPInputs::class);
+
+      /*if($this->id!=null)
+        $obj=$repository->find($this->id);
+        else $obj=null;*/
+
+      $global_errors=[];
       $input=$repository->findCleanCode($this->code, $this->supplier, $user);
-      if($input!=null && $input['id']!=$this->id)
-        return ["valid"=>false, "global_errors"=>["El albarán ".$input['code']." ya existe para el proveedor ".$this->supplier->getName().". Puede visualizarlo y modificarlo haciendo click <a href='/es/ERP/inputs/form/".$input['id']."'>aquí.</a>"]];
-      else {
-        return ["valid"=>true];
+      if($input!=null && $input['id']!=$this->id) $global_errors[]="El albarán ".$input['code']." ya existe para el proveedor ".$this->supplier->getName().". Puede visualizarlo y modificarlo haciendo click <a href='/es/ERP/inputs/form/".$input['id']."'>aquí.</a>";
+
+      if($this->ourcode!=null ){
+        $input=$repository->findOurCleanCode($this->ourcode, $user);
+        if($input!=null && $input['id']!=$this->id) $global_errors[]="Nuestro número de albarán ".$input['ourcode']." ya esta asignado a otro albarán de proveedor";
       }
+
+      if(count($global_errors)==0) return ["reload"=>true, "valid"=>true];
+      //if(count($global_errors)==0) return ["valid"=>true];
+        else return ["valid"=>false, "global_errors"=>$global_errors];
 
     }
 
