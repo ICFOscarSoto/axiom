@@ -484,10 +484,19 @@ class GlobaleFormUtils extends Controller
                   'choices' => $choices,
                   //if class has attribute lastName concat it with name
                   'choice_label' => function($obj, $key, $index) {
-                      if(method_exists($obj, "getLastname"))
-                        return $obj->getLastname().", ".$obj->getName();
-                      else if(method_exists($obj, "getName")) return $obj->getName(); else
-                        if(method_exists($obj, "getCode")) return $obj->getCode();
+                      if(method_exists($obj, "getLastname")){
+
+                        return (method_exists($obj, "getCode")?('('.$obj->getCode().') - '):'').$obj->getLastname().", ".$obj->getName();
+                      }else{
+                         if(method_exists($obj, "getName")){
+                           return (method_exists($obj, "getCode")?('('.$obj->getCode().') - '):'').$obj->getName();
+                         }else{
+                           if(method_exists($obj, "getCode")) return $obj->getCode();
+                         }
+                      }
+
+
+
                       return '';
                   },
                   'choice_attr' => function($obj, $key, $index) {
