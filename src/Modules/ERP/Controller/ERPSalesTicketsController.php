@@ -433,7 +433,7 @@ class ERPSalesTicketsController extends Controller
 
 		//en el momento de crear la incidencia de ventas por "Fallo de stock", creamos también una incidencia de almacén a no ser que el usuario haya resuelto la incidencia.
 
-		if($id==0 AND $salesticketstate->getName()!="Solucionada"){
+		if($id==0){
 			if($salesticketreason->getName()=="Fallo de stock" AND $fields->myself!="1"){
 				for($i=0;$i<count($products);$i++){
 					for($j=0;$j<count($stores);$j++){
