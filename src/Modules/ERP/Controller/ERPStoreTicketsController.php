@@ -459,7 +459,7 @@ class ERPStoreTicketsController extends Controller
 								}
 								else if($fields->storeticketnewdepartment!=""){
 											$newdepartment=$departmentsRepository->findOneBy(["id"=>$fields->storeticketnewdepartment,"active"=>1,"deleted"=>0]);
-											$storeticket->setAgent($this->getUser());
+											$storeticket->setAgent(null);
 											$storeticket->setDepartment($newdepartment);
 								}
 								else {

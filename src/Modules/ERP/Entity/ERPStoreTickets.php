@@ -41,7 +41,6 @@ class ERPStoreTickets
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPStoreTicketsReasons")
-     * @ORM\JoinColumn(nullable=false)
      */
     private $reason;
 
