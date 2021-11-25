@@ -478,7 +478,9 @@ pendingToReceive: Pendiente de Recibir
 pendingToServe: Pendiente de Servir
 minimumQuantity: Cantidad Mínima
 maximumQuantity: Cantidad Máxima
-
+Product: Producto
+Select erpproducts: Seleccionar producto
+Quantitytoserve: Cantidad a servir
 
 # WEB PRODUCT DATA
 #----------------------------------------------------------------------------------------------------------------------
