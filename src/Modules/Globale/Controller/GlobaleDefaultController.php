@@ -198,9 +198,10 @@ class GlobaleDefaultController extends Controller
        if($json!="")
         $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../../".$module."/Lists/".$json.".json"),true);
        else{
-         $data=$request->get('fields');
-         $fields=json_decode(htmlspecialchars_decode($data),true);
-         if($fields!==null){
+
+         $data=$request->get('fields','');
+         if($data!='') $fields=json_decode(htmlspecialchars_decode($data),true);
+         if($data!='' && $fields!==null){
            $listFields=$fields;
          }else{
             $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../../".$module."/Lists/".$name.".json"),true);
