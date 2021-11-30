@@ -1,0 +1,72 @@
+{% if field.type is defined and field.type == "searchable" %}
+<div id="{{formConstructor.name}}-{{ field.name }}-search-modal-form-container">
+<div class="modal fade" style="z-index: 99999 !important" tabindex="-1" id="{{formConstructor.name}}-{{ field.name }}-search-modal-form" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content" style="transform: matrix(1, 0, 0, 1, 0, 0);display:inline-block;">
+        <div class="modal-header">
+          <h4 class="modal-title">{{ ('Search')|trans }}&nbsp;{{ (field.name)|trans }}</h4>
+        </div>
+        <div id="{{formConstructor.name}}-{{ field.name }}-search-modal-form-body" style="height: 520px; padding: 0px 10px;">
+          {% set listConstructor = searchables[field.name] %}
+          {% set listOrigin = "" %}
+          {% set hidePageLength = true %}
+          {% set hideCheckBoxes = true %}
+          {{ include('@Globale/list.html.twig') }}
+        </div>
+    </div>
+  </div>
+</div>
+</div>
+{% set listConstructor = searchables[field.name] %}
+{% set listOrigin = "" %}
+{% set hidePageLength = true %}
+
+<script>
+  $(document).ready(function() {
+    element =$('label[for="form_{{ field.name }}"]').detach();
+    html=$("#{{formConstructor.name}}-form-body").find("#form_{{ field.name }}").parent().html();
+    newHtml='<div class="input-group">'+html+
+            '<div class="input-group-btn">'+
+            '<button type="button" id="{{ field.name }}-form-clear" class="btn btn-white" style="height: 31px;">'+
+            '<i class="fas fa-times" aria-hidden="true"></i> </button>'+
+            '<button type="button" id="{{ field.name }}-form-search" class="btn btn-white" style="height: 31px;" data-toggle="modal" data-target="#{{formConstructor.name}}-{{ field.name }}-search-modal-form">'+
+            '<i class="fa fa-search" aria-hidden="true"></i> </button>'+
+            '</div></div>';
+    $("#{{formConstructor.name}}-form-body").find("#form_{{ field.name }}").parent().html(newHtml);
+    $("#{{formConstructor.name}}-form-body").find("#form_{{ field.name }}").parent().parent().before(element);
+
+    $(document).on('hidden.bs.modal', '#{{formConstructor.name}}-{{ field.name }}-search-modal-form', function (event) {
+      modal=$('#{{formConstructor.name}}-{{ field.name }}-search-modal-form');
+      $('#{{formConstructor.name}}-{{ field.name }}-search-modal-form').detach();
+      $('#{{formConstructor.name}}-{{ field.name }}-search-modal-form-container').append(modal);
+    });
+
+    $(document).on('show.bs.modal', '#{{formConstructor.name}}-{{ field.name }}-search-modal-form',function (event) {
+      $('#{{formConstructor.name}}-{{ field.name }}-search-modal-form').detach().prependTo('.page-container');
+    });
+
+  });
+
+  $('body').on('click', "#{{ field.name }}-form-clear", function() {
+    $("#form_{{ field.name }}").val('');
+    $("#form_{{ field.name }}_id").val('');
+  });
+
+  $('body').on('click', "#form_{{ field.name }}", function() {
+    $('#{{ field.name }}-form-search').trigger("click");
+  });
+
+  $('body').on('click', "[id^='{{ listConstructor.id }}-field-button-select-']", function() {
+    id=$(this).attr('attr-id');
+    value='';
+    if( $("#{{ listConstructor.id }}-code-"+id).length ) value='('+$("#{{ listConstructor.id }}-code-"+id).text()+') ';
+    if( $("#{{ listConstructor.id }}-name_o_lastname-"+id).length ) value+=$("#{{ listConstructor.id }}-name_o_lastname-"+id).text();
+      else if( $("#{{ listConstructor.id }}-name-"+id).length ) value+=$("#{{ listConstructor.id }}-name-"+id).text();
+    $("#form_{{ field.name }}").val(value);
+    $("#form_{{ field.name }}_id").val(id);
+    $("#{{formConstructor.name}}-{{ field.name }}-search-modal-form").modal('hide');
+  });
+
+</script>
+
+{% endif %}

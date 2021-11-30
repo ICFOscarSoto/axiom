@@ -175,6 +175,7 @@ class GlobaleDefaultController extends Controller
       * @Route("/api/{module}/{name}/generic/list/{parent}/{field}/{parentModule}/{parentName}/{json}", name="genericlist", defaults={"parent"=0, "field"=null, "parentModule"="", "parentName"="", "json"=""})
       */
      public function list($module, $name, $parent, $field, $parentModule, $parentName, $json, RouterInterface $router,Request $request){
+
        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
        $user = $this->getUser();
        $locale = $request->getLocale();
@@ -191,7 +192,21 @@ class GlobaleDefaultController extends Controller
        }
        $listUtils=new GlobaleListUtils();
 
-       $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../../".$module."/Lists/".($json!=""?$json:$name).".json"),true);
+
+
+
+       if($json!="")
+        $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../../".$module."/Lists/".$json.".json"),true);
+       else{
+         $data=$request->get('fields');
+         $fields=json_decode(htmlspecialchars_decode($data),true);
+         if($fields!==null){
+           $listFields=$fields;
+         }else{
+            $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../../".$module."/Lists/".$name.".json"),true);
+         }
+       }
+
        if(property_exists($class, "user") && !in_array("ROLE_GLOBAL", $user->getRoles()) && !in_array("ROLE_SUPERADMIN", $user->getRoles()) && !in_array("ROLE_ADMIN", $user->getRoles())) $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $class, $filter);
         else if(property_exists($class, "company")) $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $class, $filter);
           else $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $class, count($filter)>1?[$filter[1]]:[]);

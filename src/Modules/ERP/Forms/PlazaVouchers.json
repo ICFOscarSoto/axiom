@@ -5,10 +5,14 @@
             "fields": [
                 {
                     "name": "supplier",
+                    "type": "searchable",
+                    "typeParams":{"module": "ERP", "name": "Suppliers", "route": "formSupplier"},
                     "cols": 6
                 },
                 {
                     "name": "customer",
+                    "type": "searchable",
+                    "typeParams":{"module": "ERP", "name": "Customers", "route": "formCustomer"},
                     "cols": 6
                 },
                 {
@@ -18,6 +22,8 @@
                 {
                     "name": "user",
                     "cols": 4,
+                    "type": "searchable",
+                    "typeParams":{"module": "Globale", "name": "Users", "route": "formUser"},
                     "readonly": true
                 },
                 {

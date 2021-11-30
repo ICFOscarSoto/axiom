@@ -58,7 +58,7 @@ class ERPStoresManagersProducts
     /**
      * @ORM\Column(type="integer", nullable=true)
      */
-    private $quantitytoserve;
+    private $quantitytoserve=1;
 
     public function getId(): ?int
     {

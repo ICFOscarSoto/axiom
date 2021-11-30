@@ -16,7 +16,8 @@ class ERPPlazaVouchersUtils
   private $module="ERP";
   private $name="PlazaVouchers";
   public function getExcludedForm($params){
-    return ['user'];
+    //return ['user'];
+    return [];
   }
 
   public function getIncludedForm($params){
@@ -34,7 +35,7 @@ class ERPPlazaVouchersUtils
       'format' => 'dd/MM/yyyy kk:mm:ss',
       'attr'=> ["readonly"=>true,'class' => 'datetimepicker']
     ]],
-    ['user', ChoiceType::class, [
+    /*['user', ChoiceType::class, [
       'required' => true,
       'attr' => ['class' => 'select2', 'readonly' => true],
       'choices' => $user,
@@ -44,7 +45,7 @@ class ERPPlazaVouchersUtils
           else return $obj->getName();
       },
       'data' => $user,
-    ]]
+    ]]*/
   ];
   }
 

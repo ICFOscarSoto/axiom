@@ -9,11 +9,15 @@
                 },
                 {
                     "name": "customer",
+                    "type": "searchable",
+                    "typeParams":{"module": "ERP", "name": "Customers", "route": "formCustomer"},
                     "cols": 7
                 },
                 {
                     "name": "user",
                     "caption": "Responsable",
+                    "type": "searchable",
+                    "typeParams":{"module": "Globale", "name": "Users"},
                     "cols": 4
                 },
                 {

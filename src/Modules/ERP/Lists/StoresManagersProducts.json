@@ -8,6 +8,10 @@
         "caption": "name"
     },
     {
+      "name": "quantitytoserve",
+      "caption": "Cantidad servir"
+    },
+    {
         "name": "active",
         "caption": "Estado",
         "width": "10%",

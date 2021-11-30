@@ -81,11 +81,16 @@ var url = new URL(window.location.href);
 }
 
 			$(document).ready(function() {
-
 				var ${{ listConstructor.id }}_var = jQuery("#{{ listConstructor.id }}");
 				var {{ listConstructor.id }} = ${{ listConstructor.id }}_var.DataTable( {
-					"aLengthMenu": [[10, 20, 50, 250, 1000, -1], [10, 20, 50, 250, 1000, "Todos"]],
-					"pageLength": (url.searchParams.get('length')?url.searchParams.get('length')*1:50),
+
+					{% if hidePageLength is defined and hidePageLength == true%}
+					 "bLengthChange" : false,
+					 "pageLength": 20,
+					{% else %}
+					 "aLengthMenu": [[10, 20, 50, 250, 1000, -1], [10, 20, 50, 250, 1000, "Todos"]],
+					 "pageLength": (url.searchParams.get('length')?url.searchParams.get('length')*1:50),
+					{% endif %}
 					"oClasses":{
 						"sLengthSelect": "select2"
 					},
@@ -96,15 +101,15 @@ var url = new URL(window.location.href);
 							{% if field.type is defined and field.type == "date" %}
 								{% set searchdate='' %}
 
-								{% if app.request.get('s_' ~ field.name ~ '_from') != null %}
-									{% set searchdate=app.request.get('s_' ~ field.name ~ '_from') ~ '#' %}
+								{% if app.request.get('s_' ~ listConstructor.id ~ '_' ~ field.name ~ '_from') != null %}
+									{% set searchdate=app.request.get('s_' ~ listConstructor.id ~ '_' ~ field.name ~ '_from') ~ '#' %}
 								{% endif %}
 
-								{% if app.request.get('s_' ~ field.name ~ '_to') != null %}
+								{% if app.request.get('s_' ~ listConstructor.id ~ '_' ~ field.name ~ '_to') != null %}
 									{% if searchdate == '' %}
 										{% set searchdate = '#' %}
 									{% endif %}
-									{% set searchdate=searchdate ~ app.request.get('s_' ~ field.name ~ '_to') %}
+									{% set searchdate=searchdate ~ app.request.get('s_' ~ listConstructor.id ~ '_' ~ field.name ~ '_to') %}
 								{% endif %}
 								{% if searchdate != '' %}
 									{ "search": "{{ searchdate }}" },
@@ -113,8 +118,8 @@ var url = new URL(window.location.href);
 								{% endif %}
 							{% else %}
 
-								{% if app.request.get('s_' ~ field.name) != null %}
-									{ "search": "{{ app.request.get('s_' ~ field.name) }}" },
+								{% if app.request.get('s_' ~ listConstructor.id ~ '_' ~ field.name) != null %}
+									{ "search": "{{ app.request.get('s_' ~ listConstructor.id ~ '_' ~ field.name) }}" },
 								{% else %}
 									null,
 								{% endif %}
@@ -129,9 +134,12 @@ var url = new URL(window.location.href);
 					//"processing": true,
 					"serverSide": true,
 					{% if listConstructor.routeParams is defined %}
-					"ajax": "{{ url( listConstructor.route, listConstructor.routeParams) }}",
+						"ajax": {
+								"url" : "{{ url( listConstructor.route, listConstructor.routeParams) }}",
+								"data" : {"fields": "{{ listConstructor.fields|json_encode() }}"}
+						},
 					{% else %}
-					"ajax": "{{ url( listConstructor.route ) }}",
+						"ajax": "{{ url( listConstructor.route ) }}",
 					{% endif %}
 					"language": {
 						//"processing": '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Cargando...</span> ',
@@ -162,7 +170,7 @@ var url = new URL(window.location.href);
 					],
 					"drawCallback": function( settings ) {
 
-							replaceCheckboxes();
+							//replaceCheckboxes();
 					},
 
 					{# Sumamos columnas con sum=true #}
@@ -199,6 +207,9 @@ var url = new URL(window.location.href);
 							"targets": 0,
 							"orderable": false,
 							"className": "text-center",
+							{% if hideCheckBoxes is defined and hideCheckBoxes %}
+								"visible": false,
+							{% endif %}
 							"render": function(data, type, row, meta){
 									{% if listConstructor.multiselect is defined and listConstructor.multiselect==false %}
 									return ''
@@ -277,12 +288,12 @@ var url = new URL(window.location.href);
 													{% if '__' in field.name and field.replace is not defined %}
 														{# check if exist the element in select #}
 														if(row["{{ field.name}}"]!=null)
-															if ($('#s_{{ field.name}}').find("option[value='" + row["{{ field.name}}"] + "']").length) {
+															if ($('#s_{{ listConstructor.id }}_{{ field.name}}').find("option[value='" + row["{{ field.name}}"] + "']").length) {
 															   // $('#s_{{ field.name}}').val(row["{{ field.name}}"]).trigger('change');
 															} else {
 																	{# element not exist add it #}
 															    var newOption = new Option(row["{{ field.name}}"], row["{{ field.name}}"], false, false);
-															    $('#s_{{ field.name}}').append(newOption);
+															    $('#s_{{ listConstructor.id }}_{{ field.name}}').append(newOption);
 															}
 													{% endif %}
 												{# if field is datetime convert it to spanish date format #}
@@ -308,7 +319,7 @@ var url = new URL(window.location.href);
 														{% endif %}
 													{% endif %}
 													{% endif %}
-												return text{% if field.unity is defined %}+' {{ field.unity }}'{% endif %};
+												return '<div id="{{ listConstructor.id }}-{{ field.name}}-'+row['id']+'">'+text{% if field.unity is defined %}+' {{ field.unity }}'{% endif %}+'</div>';
 										},
 										{% endif %}
 								},
@@ -418,9 +429,9 @@ var url = new URL(window.location.href);
 				}
 
 				function doSearch () {
-					{{ listConstructor.id }}.columns(searchColumn+':name').search( $("[id='s_"+searchColumn+"'][attr-list-id='{{ listConstructor.id }}']").val() ).draw();
+					{{ listConstructor.id }}.columns(searchColumn+':name').search( $("[id='s_{{ listConstructor.id }}_"+searchColumn+"'][attr-list-id='{{ listConstructor.id }}']").val() ).draw();
 					arrayParams={{ listConstructor.id }}.ajax.params();
-					$("[id^='s_']" ).each(function( index ) {
+					$("[id^='s_{{ listConstructor.id }}_']" ).each(function( index ) {
 						url = new URL(window.location.href);
 						if($(this).val()!=""){
 							url.searchParams.set($(this).attr('id'), $(this).val());
@@ -436,18 +447,18 @@ var url = new URL(window.location.href);
 				{% for field in listConstructor.fields %}
 
 					{% if field.replace is defined %}
-						$('body').on('change', '#s_{{ field.name }}', function() {
+						$('body').on('change', '#s_{{ listConstructor.id }}_{{ field.name }}', function() {
 							{{ listConstructor.id }}.columns('{{ field.name }}:name').search( this.value ).draw();
 							arrayParams={{ listConstructor.id }}.ajax.params();
 							$("#search_param").val(jQuery.param(arrayParams));
 							url = new URL(window.location.href);
-							url.searchParams.set("s_{{ field.name }}",$("#s_{{ field.name }}").val());
+							url.searchParams.set("s_{{ listConstructor.id }}_{{ field.name }}",$("#s_{{ listConstructor.id }}_{{ field.name }}").val());
 							window.history.replaceState(null, null, url);
 
 						});
 					{% else %}
-						if($("#s_{{ field.name }}").is('select')) event="change"; else event="keyup";
-						$('body').on(event, '#s_{{ field.name }}', function() {
+						if($("#s_{{ listConstructor.id }}_{{ field.name }}").is('select')) event="change"; else event="keyup";
+						$('body').on(event, '#s_{{ listConstructor.id }}_{{ field.name }}', function() {
 							searchColumn='{{ field.name }}';
 
 							if($(this).is('select')) doSearch ();
@@ -455,7 +466,7 @@ var url = new URL(window.location.href);
 									clearSearchTimeOut();
 								}
 						});
-						$('body').on('keydown', '#s_{{ field.name }}', function() {
+						$('body').on('keydown', '#s_{{ listConstructor.id }}_{{ field.name }}', function() {
 							 clearTimeout(typingTimer);
 						});
 					{% endif %}
@@ -514,16 +525,16 @@ var url = new URL(window.location.href);
 								{% if field.filter is not defined or field.filter == true %}
 									{% if field.replace is defined %}
 									  {# Show combo box on replaces #}
-										<select id="s_{{ field.name }}" attr-list-id="{{ listConstructor.id }}" class="form-control table-header-search-input select2 select2-use">
-											<option value="##ALL##" {% if app.request.get('s_' ~ field.name)!=null and app.request.get('s_' ~ field.name)=='##ALL##' %} selected="selected" {% endif %}>Todos</option>
+										<select id="s_{{ listConstructor.id }}_{{ field.name }}" attr-list-id="{{ listConstructor.id }}" class="form-control table-header-search-input select2 select2-use">
+											<option value="##ALL##" {% if app.request.get('s_' ~ listConstructor.id ~ '_' ~ field.name)!=null and app.request.get('s_' ~ listConstructor.id ~ '_' ~ field.name)=='##ALL##' %} selected="selected" {% endif %}>Todos</option>
 											{% for key,option in field.replace %}
-												<option value="{{ key }}"{% if app.request.get('s_' ~ field.name)!=null %}{% if app.request.get('s_' ~ field.name) == (key ~ '') %} selected="selected" {% endif %}{% else %}{% if option.default is defined and option.default == true%} attr-default="true" selected="selected" {% endif %}{% endif %}>{{ option.text }}</option>
+												<option value="{{ key }}"{% if app.request.get('s_' ~ listConstructor.id ~ '_' ~ field.name)!=null %}{% if app.request.get('s_' ~ listConstructor.id ~ '_' ~ field.name) == (key ~ '') %} selected="selected" {% endif %}{% else %}{% if option.default is defined and option.default == true%} attr-default="true" selected="selected" {% endif %}{% endif %}>{{ option.text }}</option>
 											{% endfor %}
 
 										</select>
 										<script>
 											$(document).ready(function() {
-												$("#s_{{ field.name }}").select2({dropdownCssClass : 'select2-bigdrop'});
+												$("#s_{{ listConstructor.id }}_{{ field.name }}").select2({dropdownCssClass : 'select2-bigdrop'});
 											});
 										</script>
 									{% else %}
@@ -541,21 +552,21 @@ var url = new URL(window.location.href);
 														$("#s_{{ field.name }}").select2({dropdownCssClass : 'select2-bigdrop'});
 													});
 												</script>#}
-													<input id="s_{{ field.name }}" attr-list-id="{{ listConstructor.id }}" type="text" class="table-header-search-input form-control" placeholder="Buscar {{ (field.caption)|trans }}"  autocomplete="off"/>
+													<input id="s_{{ listConstructor.id }}_{{ field.name }}" attr-list-id="{{ listConstructor.id }}" type="text" class="table-header-search-input form-control" placeholder="Buscar {{ (field.caption)|trans }}"  autocomplete="off"/>
 													<script>
 														$(document).ready(function() {
-														if(url.searchParams.get('s_{{ field.name }}')!=null)
-															$("#s_{{ field.name }}").val(url.searchParams.get('s_{{ field.name }}'));
+														if(url.searchParams.get('s_{{ listConstructor.id }}_{{ field.name }}')!=null)
+															$("#s_{{ listConstructor.id }}_{{ field.name }}").val(url.searchParams.get('s_{{ listConstructor.id }}_{{ field.name }}'));
 														});
 													</script>
 										{% else %}
 									   	{# Other fields show inputs #}
 
-											<input id="s_{{ field.name }}" attr-list-id="{{ listConstructor.id }}" type="text" class="table-header-search-input form-control" placeholder="Buscar {{ (field.caption)|trans }}"  autocomplete="off"/>
+											<input id="s_{{ listConstructor.id }}_{{ field.name }}" attr-list-id="{{ listConstructor.id }}" type="text" class="table-header-search-input form-control" placeholder="Buscar {{ (field.caption)|trans }}"  autocomplete="off"/>
 											<script>
-													if(url.searchParams.get('s_{{ field.name }}')!=null)
+													if(url.searchParams.get('s_{{ listConstructor.id }}_{{ field.name }}')!=null)
 														$(document).ready(function() {
-															$("#s_{{ field.name }}").val(url.searchParams.get('s_{{ field.name }}'));
+															$("#s_{{ listConstructor.id }}_{{ field.name }}").val(url.searchParams.get('s_{{ listConstructor.id }}_{{ field.name }}'));
 														});
 											</script>
 										{% endif %}
@@ -566,14 +577,14 @@ var url = new URL(window.location.href);
 							<th class="table-header-search" style="border-bottom: 1px solid #cecece !important;">
 								{% if field.type == "datetime" %}
 									<div><div style="z-index: 5 !important;" class='input-group date'>
-												<input id="s_{{ field.name }}_from" attr-list-id="{{ listConstructor.id }}" attr-group="{{ field.name }}" attr-max="s_{{ field.name }}_to" type="text" class="datetimepicker table-header-search-input form-control" placeholder="{{ (field.caption)|trans }} desde" value="{% if app.request.get('s_' ~ field.name ~ '_from')!=null %}{{ app.request.get('s_' ~ field.name ~ '_from')|date("d/m/Y H:i:s") }}{% endif %}" autocomplete="off"/>
+												<input id="s_{{ listConstructor.id }}_{{ field.name }}_from" attr-list-id="{{ listConstructor.id }}" attr-group="{{ field.name }}" attr-max="s_{{ listConstructor.id }}_{{ field.name }}_to" type="text" class="datetimepicker table-header-search-input form-control" placeholder="{{ (field.caption)|trans }} desde" value="{% if app.request.get('s_' ~ listConstructor.id ~ '_' ~ field.name ~ '_from')!=null %}{{ app.request.get('s_' ~ listConstructor.id ~ '_' ~ field.name ~ '_from')|date("d/m/Y H:i:s") }}{% endif %}" autocomplete="off"/>
 												<span class="input-group-addon">
                         	<span class="glyphicon glyphicon-calendar"></span>
                     		</span>
 										</div></div>
 									<div style="height: 5px;"></div>
 									<div><div style="z-index: 2 !important;" class='input-group date'>
-										<input id="s_{{ field.name }}_to" attr-list-id="{{ listConstructor.id }}" attr-group="{{ field.name }}" attr-min="s_{{ field.name }}_from" type="text" class="datetimepicker table-header-search-input form-control" placeholder="{{ (field.caption)|trans }} hasta" value="{% if app.request.get('s_' ~ field.name ~ '_to')!=null %}{{ app.request.get('s_' ~ field.name ~ '_to')|date("d/m/Y H:i:s") }}{% endif %}" autocomplete="off"/>
+										<input id="s_{{ listConstructor.id }}_{{ field.name }}_to" attr-list-id="{{ listConstructor.id }}" attr-group="{{ field.name }}" attr-min="s_{{ listConstructor.id }}_{{ field.name }}_from" type="text" class="datetimepicker table-header-search-input form-control" placeholder="{{ (field.caption)|trans }} hasta" value="{% if app.request.get('s_' ~ listConstructor.id ~ '_' ~ field.name ~ '_to')!=null %}{{ app.request.get('s_' ~ listConstructor.id ~ '_' ~ field.name ~ '_to')|date("d/m/Y H:i:s") }}{% endif %}" autocomplete="off"/>
 										<span class="input-group-addon">
 											<span class="glyphicon glyphicon-calendar"></span>
 										</span>
@@ -582,14 +593,14 @@ var url = new URL(window.location.href);
 									{% else %}
 									{% if field.type == "date" %}
 										<div><div style="z-index: 5 !important;" class='input-group date'>
-													<input id="s_{{ field.name }}_from" attr-list-id="{{ listConstructor.id }}" attr-group="{{ field.name }}" attr-max="s_{{ field.name }}_to" type="text" class="datepicker table-header-search-input form-control" placeholder="{{ (field.caption)|trans }} desde" value="{% if app.request.get('s_' ~ field.name ~ '_from')!=null %}{{ app.request.get('s_' ~ field.name ~ '_from')|date("d/m/Y") }}{% endif %}" autocomplete="off"/>
+													<input id="s_{{ listConstructor.id }}_{{ field.name }}_from" attr-list-id="{{ listConstructor.id }}" attr-group="{{ field.name }}" attr-max="s_{{ listConstructor.id }}_{{ field.name }}_to" type="text" class="datepicker table-header-search-input form-control" placeholder="{{ (field.caption)|trans }} desde" value="{% if app.request.get('s_' ~ listConstructor.id ~ '_' ~ field.name ~ '_from')!=null %}{{ app.request.get('s_' ~ listConstructor.id ~ '_' ~ field.name ~ '_from')|date("d/m/Y") }}{% endif %}" autocomplete="off"/>
 													<span class="input-group-addon">
 														<span class="glyphicon glyphicon-calendar"></span>
 													</span>
 											</div></div>
 										<div style="height: 5px;"></div>
 										<div><div style="z-index: 2 !important;" class='input-group date'>
-											<input id="s_{{ field.name }}_to" attr-list-id="{{ listConstructor.id }}" attr-group="{{ field.name }}" attr-min="s_{{ field.name }}_from" type="text" class="datepicker table-header-search-input form-control" placeholder="{{ (field.caption)|trans }} hasta" value="{% if app.request.get('s_' ~ field.name ~ '_to')!=null %}{{ app.request.get('s_' ~ field.name ~ '_to')|date("d/m/Y") }}{% endif %}" autocomplete="off"/>
+											<input id="s_{{ listConstructor.id }}_{{ field.name }}_to" attr-list-id="{{ listConstructor.id }}" attr-group="{{ field.name }}" attr-min="s_{{ listConstructor.id }}_{{ field.name }}_from" type="text" class="datepicker table-header-search-input form-control" placeholder="{{ (field.caption)|trans }} hasta" value="{% if app.request.get('s_' ~ listConstructor.id ~ '_' ~ field.name ~ '_to')!=null %}{{ app.request.get('s_' ~ listConstructor.id ~ '_' ~ field.name ~ '_to')|date("d/m/Y") }}{% endif %}" autocomplete="off"/>
 											<span class="input-group-addon">
 												<span class="glyphicon glyphicon-calendar"></span>
 											</span>
@@ -746,7 +757,7 @@ var url = new URL(window.location.href);
 				//$('#s_invalid').select2('val', $('#s_invalid option:first-child').val());
 				url = new URL(window.location.href);
 				{% for field in listConstructor.fields %}
-				url.searchParams.delete('s_{{ field.name }}');
+				url.searchParams.delete('s_{{ listConstructor.id }}_{{ field.name }}');
 				{% endfor %}
 				window.history.replaceState(null, null, url);
 				$("#{{ listConstructor.id }}").DataTable().columns().search("").draw();

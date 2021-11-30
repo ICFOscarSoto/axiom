@@ -5,6 +5,8 @@
             "fields": [
                 {
                     "name": "product",
+                    "type": "searchable",
+                    "typeParams":{"module": "ERP", "name": "Products"},
                     "cols": 8
                 },
                 {
