@@ -194,7 +194,7 @@ class GlobaleDefaultController extends Controller
 
 
 
-
+       /*
        if($json!="")
         $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../../".$module."/Lists/".$json.".json"),true);
        else{
@@ -207,7 +207,11 @@ class GlobaleDefaultController extends Controller
             $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../../".$module."/Lists/".$name.".json"),true);
          }
        }
-
+       if(property_exists($class, "user") && !in_array("ROLE_GLOBAL", $user->getRoles()) && !in_array("ROLE_SUPERADMIN", $user->getRoles()) && !in_array("ROLE_ADMIN", $user->getRoles())) $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $class, $filter);
+        else if(property_exists($class, "company")) $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $class, $filter);
+          else $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $class, count($filter)>1?[$filter[1]]:[]);
+       return new JsonResponse($return);*/
+       $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../../".$module."/Lists/".($json!=""?$json:$name).".json"),true);
        if(property_exists($class, "user") && !in_array("ROLE_GLOBAL", $user->getRoles()) && !in_array("ROLE_SUPERADMIN", $user->getRoles()) && !in_array("ROLE_ADMIN", $user->getRoles())) $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $class, $filter);
         else if(property_exists($class, "company")) $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $class, $filter);
           else $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $class, count($filter)>1?[$filter[1]]:[]);
