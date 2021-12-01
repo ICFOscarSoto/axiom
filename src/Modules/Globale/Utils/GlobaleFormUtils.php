@@ -254,7 +254,7 @@ class GlobaleFormUtils extends Controller
             $form->add($value['fieldName'], ChoiceType::class, $this->choiceRelation($field, $value['fieldName'], $value["targetEntity"], $this->obj->{'get'.ucfirst($value["fieldName"])}(),$nullable, $route, $routeType));
           else{
              //2021-11-26 - Added for searchables relationship fields
-            $form->add($value['fieldName'], TextType::class, ['mapped'=>false, 'label'=>(isset($field["caption"])?$field["caption"]:$field["name"]), 'required' => isset($field["nullable"])?!$field["nullable"]:'false', 'attr'=>['autocomplete' => 'off', 'readonly' =>true, 'class' => 'searchable-field']]);
+            $form->add($value['fieldName'], TextType::class, ['mapped'=>false, 'label'=>(isset($field["caption"])?$field["caption"]:ucfirst($field["name"])), 'required' => isset($field["nullable"])?!$field["nullable"]:'false', 'attr'=>['autocomplete' => 'off', 'readonly' =>true, 'class' => 'searchable-field']]);
             $form->add($value['fieldName'].'_id', HiddenType::class, ['mapped'=>false, 'required' => isset($field["nullable"])?!$field["nullable"]:'false', 'attr'=>['attr-attribute' => $value['fieldName'], 'class' => '']]);
           }
         }else{
