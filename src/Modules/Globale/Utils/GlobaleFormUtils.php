@@ -252,10 +252,11 @@ class GlobaleFormUtils extends Controller
         if(!isset($field["trigger"])) {//If no trigger element, fill it
           if(!isset($field['type']) || $field['type']!="searchable")
             $form->add($value['fieldName'], ChoiceType::class, $this->choiceRelation($field, $value['fieldName'], $value["targetEntity"], $this->obj->{'get'.ucfirst($value["fieldName"])}(),$nullable, $route, $routeType));
-          else
+          else{
              //2021-11-26 - Added for searchables relationship fields
             $form->add($value['fieldName'], TextType::class, ['mapped'=>false, 'label'=>(isset($field["caption"])?$field["caption"]:$field["name"]), 'required' => isset($field["nullable"])?!$field["nullable"]:'false', 'attr'=>['autocomplete' => 'off', 'readonly' =>true, 'class' => 'searchable-field']]);
             $form->add($value['fieldName'].'_id', HiddenType::class, ['mapped'=>false, 'required' => isset($field["nullable"])?!$field["nullable"]:'false', 'attr'=>['attr-attribute' => $value['fieldName'], 'class' => '']]);
+          }
         }else{
           //$form->add($value['fieldName'], TextType::class, ["attr"=>["attr-module"=>$field["module"],"attr-name"=>$field["nameClass"]]]);
           $form->add($value['fieldName'], ChoiceType::class, $this->choiceRelationTrigger($field, $value['fieldName'],$nullable, $route, $routeType));
@@ -447,7 +448,7 @@ class GlobaleFormUtils extends Controller
             if(method_exists($obj,'set'.lcfirst($key))) $obj->{'set'.lcfirst($key)}($val);
        }
 
-       foreach($form->getIterator()->getIterator() as $key => $val){   //2021-11-26 - Added for searchables relationship fields
+      foreach($form->getIterator()->getIterator() as $key => $val){   //2021-11-26 - Added for searchables relationship fields
          if(strpos($key,'_id')!==false){
            $parentField=str_replace('_id','',$key);
            $targetEntity=$this->entityManager->getClassMetadata($form->getConfig()->getDataClass())->associationMappings[$parentField]['targetEntity'];
