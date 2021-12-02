@@ -242,7 +242,8 @@ class ERPStoreTicketsController extends Controller
 			 $fields=json_decode($request->getContent());
 			 $product=$productsRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "code"=>$fields->productcode, "deleted"=>0]);
 			 $product_name=$product->getName();
-			 if($id==0 AND $fields->storeticketreason=="1")  $storeticketstate=$storeticketsstatesRepository->findOneBy(["id"=>"1", "active"=>1, "deleted"=>0]);
+			 //si el motivo es fallo de stock o inventario sin actualizar, el estado siempre será abierto
+			 if($id==0 AND ($fields->storeticketreason=="1" OR $fields->storeticketreason=="9"))  $storeticketstate=$storeticketsstatesRepository->findOneBy(["id"=>"1", "active"=>1, "deleted"=>0]);
 			 else $storeticketstate=$storeticketsstatesRepository->findOneBy(["id"=>$fields->storeticketstate, "active"=>1, "deleted"=>0]);
 			 $stores=null;
 			 $stores=explode(",",$fields->stores);
@@ -553,9 +554,9 @@ class ERPStoreTicketsController extends Controller
 
 							if($id!=0){
 							 if($storeticketstate->getName()=="Solucionada"){
-								 //en todas las incidencias que no sean fallo de stock, se comprueba si la persona que la ha solucionada es la misma
+								 //en todas las incidencias que no sean fallo de stock o inventario sin actualizar, se comprueba si la persona que la ha solucionada es la misma
 								 //que la que la ha creado. De no ser así, se le envía un mensaje por discord.
-								 if($fields->storeticketreason!="1")
+								 if($fields->storeticketreason!="1" AND $fields->storeticketreason!="9")
 								 {
 									 $author=$storeticket->getAuthor();
 									 if($author->getId()!=$this->getUser()->getId())
