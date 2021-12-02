@@ -24,8 +24,9 @@
                 },
                 {
                     "name": "supplier",
-                    "cols": 6,
-                    "relation": {"route": "formSupplier", "type":"full"}
+                    "type": "searchable",
+                    "typeParams":{"module": "ERP", "name": "Suppliers", "route": "formSupplier"},
+                    "cols": 6
                 },
                 {
                     "name": "packages",
@@ -34,7 +35,8 @@
                 },
                 {
                     "name": "carrier",
-                    "relation": {"route": "genericdata", "routeparams":{"module":"ERP","name":"Carriers"}, "type":"modal"},
+                    "type": "searchable",
+                    "typeParams":{"module": "ERP", "name": "Carriers", "route": "genericdata", "routeparams":{"module":"ERP","name":"Carriers"}, "type":"modal"},
                     "cols": 4
                 },
                 {

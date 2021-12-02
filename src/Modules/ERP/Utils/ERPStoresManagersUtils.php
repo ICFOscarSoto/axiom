@@ -53,6 +53,21 @@ class ERPStoresManagersUtils
     return $list;
   }
 
+  public function formatProductsList($id){
+    $list=[
+      'id' => 'listStoresManagersProducts',
+      'route' => 'StoresManagersProductslist',
+      'routeParams' => ["id" => $id],
+      'orderColumn' => 2,
+      'orderDirection' => 'DESC',
+      'tagColumn' => 2,
+      'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersProducts.json"),true),
+      'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersProductsFieldButtons.json"),true),
+      'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersProductsTopButtons.json"),true)
+    ];
+    return $list;
+  }
+
   public function formatUsersList($id){
     $list=[
       'id' => 'listStoresManagersUsers',

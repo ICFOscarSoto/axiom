@@ -1,0 +1,23 @@
+[{
+    "sections": [
+        {
+            "name": "data",
+            "fields": [
+                {
+                    "name": "product",
+                    "type": "searchable",
+                    "typeParams":{"module": "ERP", "name": "Products"},
+                    "cols": 8
+                },
+                {
+                    "name": "quantitytoserve",
+                    "cols": 2
+                },
+                {
+                    "name": "active",
+                    "cols": 2
+                }
+            ]
+        }
+    ]
+}]

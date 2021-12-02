@@ -61,6 +61,11 @@ table {
   text-decoration: underline;
 }
 
+.searchable-field{
+  background-color: white !important;
+  cursor: pointer;
+}
+
 
 .grid-stack>.grid-stack-item>.ui-resizable-se {
     right: 4px !important;
@@ -287,9 +292,12 @@ table.dataTable.dtr-inline.collapsed > tbody > tr > td:first-child:before, table
 
 
 
-.form-control[disabled], .form-control[readonly], fieldset[disabled] .form-control {
+.form-control[disabled], fieldset[disabled] .form-control {
     background-color: #f6f6f6 !important;
     opacity: 1;
+}
+.form-control[readonly]{
+  
 }
 
 .form-group .input-success{
@@ -640,6 +648,7 @@ label.form-check-label {
 
 .modal .modal-content {
   border: 1px solid #404040;
+  width: 100%;
 }
 
 .fc-toolbar .fc-left{

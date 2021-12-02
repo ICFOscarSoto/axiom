@@ -140,7 +140,6 @@ class GlobaleFormUtils extends Controller
           if(isset($this->permissions["permissions"][$this->name."_field_".$value['fieldName']]) && $this->permissions["permissions"][$this->name."_field_".$value['fieldName']]['allowaccess']==false) {
             $readonly=true;
           }else $readonly=false;
-
           switch($value['type']){
             case 'datetime':
             case 'date':
@@ -251,7 +250,13 @@ class GlobaleFormUtils extends Controller
             }
         }
         if(!isset($field["trigger"])) {//If no trigger element, fill it
-          $form->add($value['fieldName'], ChoiceType::class, $this->choiceRelation($field, $value['fieldName'], $value["targetEntity"], $this->obj->{'get'.ucfirst($value["fieldName"])}(),$nullable, $route, $routeType));
+          if(!isset($field['type']) || $field['type']!="searchable")
+            $form->add($value['fieldName'], ChoiceType::class, $this->choiceRelation($field, $value['fieldName'], $value["targetEntity"], $this->obj->{'get'.ucfirst($value["fieldName"])}(),$nullable, $route, $routeType));
+          else{
+             //2021-11-26 - Added for searchables relationship fields
+            $form->add($value['fieldName'], TextType::class, ['mapped'=>false, 'label'=>(isset($field["caption"])?$field["caption"]:ucfirst($field["name"])), 'required' => isset($field["nullable"])?!$field["nullable"]:'false', 'attr'=>['autocomplete' => 'off', 'readonly' =>true, 'class' => 'searchable-field']]);
+            $form->add($value['fieldName'].'_id', HiddenType::class, ['mapped'=>false, 'required' => isset($field["nullable"])?!$field["nullable"]:'false', 'attr'=>['attr-attribute' => $value['fieldName'], 'class' => '']]);
+          }
         }else{
           //$form->add($value['fieldName'], TextType::class, ["attr"=>["attr-module"=>$field["module"],"attr-name"=>$field["nameClass"]]]);
           $form->add($value['fieldName'], ChoiceType::class, $this->choiceRelationTrigger($field, $value['fieldName'],$nullable, $route, $routeType));
@@ -333,12 +338,16 @@ class GlobaleFormUtils extends Controller
              $formView=$form->createView();
              //Aply convesion functions from controller to view
              $formView=$this->conversionView($formView);
+             $formView=$this->conversionSearchable($formView); //2021-11-26 - Added for searchables relationship fields
+             $searchables=$this->getSearchables($form); //2021-11-26 - Added for searchables relationship fields
+
 						 return $this->controller->render($render, array_merge(array(
               'id' => $id,
               "userData"=>$this->permissions,
               'includes' => $includesArray,
               'include_pre_templates' => $this->includePreTemplate,
               'include_post_templates' => $this->includePostTemplate,
+              'searchables' => $searchables,
               'formConstructor' => ["id"=>$id, "id_object"=>$id, "name"=>$name, "form" => $formView, "type" => $type, "post"=>$route, "template" => json_decode(file_get_contents ($this->template),true)]
             ),$custom_vars));
 				break;
@@ -357,6 +366,59 @@ class GlobaleFormUtils extends Controller
       }
     }
     return $formView;
+  }
+
+  //2021-11-26 - Added for searchables relationship fields
+  private function conversionSearchable($formView){
+    foreach ($this->templateArray[0]['sections'] as $keySection => $valueSection) {
+      foreach ($valueSection['fields'] as $keyField => $valueField) {
+        if(isset($valueField['type']) && $valueField['type']=='searchable'){
+            $class="\App\Modules\\".$valueField['typeParams']["module"]."\Entity\\".$valueField['typeParams']["module"].$valueField['typeParams']["name"];
+            $value="";
+            if(method_exists($class, 'getCode') && $formView->vars["value"]->{'get'.lcfirst($valueField["name"])}()!==null) $value.='('.$formView->vars["value"]->{'get'.lcfirst($valueField["name"])}()->getCode().') ';
+            if(method_exists($class, 'getName') && $formView->vars["value"]->{'get'.lcfirst($valueField["name"])}()!==null) $value=$value.$formView->vars["value"]->{'get'.lcfirst($valueField["name"])}()->getName();
+            if(method_exists($class, 'getLastname') && $formView->vars["value"]->{'get'.lcfirst($valueField["name"])}()!==null) $value=$value.' '.$formView->vars["value"]->{'get'.lcfirst($valueField["name"])}()->getLastname();
+
+
+            $formView->children[$valueField["name"]]->vars["value"]=$value;
+            if($formView->vars["value"]->{'get'.lcfirst($valueField["name"])}()!==null)
+              $formView->children[$valueField["name"].'_id']->vars["value"]=$formView->vars["value"]->{'get'.lcfirst($valueField["name"])}()->getId();
+        }
+      }
+    }
+    return $formView;
+  }
+  private function getSearchables($form){
+    $searchables=[];
+    foreach ($this->templateArray[0]['sections'] as $keySection => $valueSection) {
+      foreach ($valueSection['fields'] as $keyField => $valueField) {
+        $searchable=[];
+        if(isset($valueField['type']) && $valueField['type']=='searchable'){
+          //if($form->getIterator()->offsetExists($valueField["name"])){
+            $class="\App\Modules\\".$valueField['typeParams']["module"]."\Entity\\".$valueField['typeParams']["module"].$valueField['typeParams']["name"];
+            $fields=[["name" =>"id", "caption" =>""]];
+            $cols=0;
+            if(method_exists($class,'getCode')){ $fields[]=["name" =>"code", "caption" =>""]; $cols++;}
+            if(method_exists($class,'getLastname')){ $fields[]=["name" =>"name_o_lastname", "caption" =>""]; $cols++;}else if(method_exists($class,'getName')){ $fields[]=["name" =>"name", "caption" =>""]; $cols++;}
+            if(method_exists($class,'getSocialname')){ $fields[]=["name" =>"socialname", "caption" =>""]; $cols++;}
+            if(method_exists($class,'getEmail') && $cols<3){ $fields[]=["name" =>"email", "caption" =>""]; $cols++;}
+            $list=[
+              'id' => 'listSearch'.$valueField["name"],
+              'route' => 'genericlist',
+              'routeParams' => $valueField["typeParams"],
+              'orderColumn' => 1,
+              'orderDirection' => 'ASC',
+              'tagColumn' => 1,
+              'fields' => $fields,
+              'fieldButtons' => [["id"=>"select", "type" => "success", "default"=>true, "icon" => "fas fa-plus", "name" => "editar", "route" => null, "actionType" => "background", "modal"=>"", "confirm" => false, "tooltip" =>""]],
+              'topButtons' => []
+            ];
+          //}
+          $searchables[$valueField["name"]]=$list;
+        }
+      }
+    }
+    return $searchables;
   }
 
  private function conversionController($obj){
@@ -383,8 +445,19 @@ class GlobaleFormUtils extends Controller
        $obj = $this->conversionController($obj);
        //definimos los valores predefinidos
        foreach($this->values as $key => $val){
-          if(method_exists($obj,'set'.lcfirst($key))) $obj->{'set'.lcfirst($key)}($val);
+            if(method_exists($obj,'set'.lcfirst($key))) $obj->{'set'.lcfirst($key)}($val);
        }
+
+      foreach($form->getIterator()->getIterator() as $key => $val){   //2021-11-26 - Added for searchables relationship fields
+         if(strpos($key,'_id')!==false){
+           $parentField=str_replace('_id','',$key);
+           $targetEntity=$this->entityManager->getClassMetadata($form->getConfig()->getDataClass())->associationMappings[$parentField]['targetEntity'];
+           $relationRepository=$this->doctrine->getRepository($targetEntity);
+           $relationObj=$relationRepository->findOneBy(['id'=>$form->getIterator()->offsetGet($key)->getData()]);
+           if(method_exists($obj,'set'.lcfirst($parentField))) $obj->{'set'.lcfirst($parentField)}($relationObj);
+         }
+       }
+
        if($obj->getId() == null){
          $obj->setDateadd(new \DateTime());
          $obj->setDeleted(false);

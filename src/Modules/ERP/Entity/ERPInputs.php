@@ -379,7 +379,6 @@ class ERPInputs
       }
 
       if(count($global_errors)==0) return ["reload"=>true, "valid"=>true];
-      //if(count($global_errors)==0) return ["valid"=>true];
         else return ["valid"=>false, "global_errors"=>$global_errors];
 
     }
