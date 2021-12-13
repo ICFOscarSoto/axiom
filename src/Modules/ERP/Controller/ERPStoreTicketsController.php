@@ -452,6 +452,12 @@ class ERPStoreTicketsController extends Controller
 								$storeticket->setAuthor($this->getUser());
 							}
 
+							/*dentro de las incidencias que no son "fallo de stock", 
+							//las inciencias "Inventario sin actualizar" se tienen que tratar de manera diferente al resto, ya que al guardarlas se pasan automáticamente
+							//al gestor de inventarios. Si no pusieramos este control, la incidencia se asignaría al mismo usuario que la ha creddo.
+							*/
+							if($fields->storeticketreason!="9")
+							{
 								if($fields->storeticketnewagent!=""){
 
 									$newagent=$agentsRepository->findOneBy(["id"=>$fields->storeticketnewagent,"active"=>1,"deleted"=>0]);
@@ -468,6 +474,19 @@ class ERPStoreTicketsController extends Controller
 									$storeticket->setDepartment(null);
 
 								}
+
+							}
+
+							else{
+
+								$store=$storesRepository->findOneBy(["id"=>$fields->store]);
+								$inventorymanager=$inventorymanager=$store->getInventorymanager();
+								$storeticket->setAgent($inventorymanager);
+								$storeticket->setDepartment(null);
+
+
+							}
+
 
 							$storeticket->setCompany($this->getUser()->getCompany());
 							$storeticket->setProduct($product);
@@ -607,17 +626,30 @@ class ERPStoreTicketsController extends Controller
 
 								$history_obj=new ERPStoreTicketsHistory();
 								$history_obj->setAgent($this->getUser());
+								if($fields->storeticketreason!="9")
+								{
+									if($fields->storeticketnewagent!=""){
+										$history_obj->setNewagent($newagent);
+										$history_obj->setNewdepartment(null);
+									}
 
-								if($fields->storeticketnewagent!=""){
-									$history_obj->setNewagent($newagent);
-									$history_obj->setNewdepartment(null);
+									else if($fields->storeticketnewdepartment!=""){
+										$history_obj->setNewagent(null);
+										$history_obj->setNewdepartment($newdepartment);
+									}
+
+									else $history_obj->setNewagent($this->getUser());
 								}
-								else if($fields->storeticketnewdepartment!=""){
-									$history_obj->setNewagent(null);
-									$history_obj->setNewdepartment($newdepartment);
+								else{
+
+										  $store=$storesRepository->findOneBy(["id"=>$fields->store]);
+											$inventorymanager=$inventorymanager=$store->getInventorymanager();
+										  $history_obj->setNewagent($inventorymanager);
+										  $history_obj->setNewdepartment(null);
+
 								}
 
-								else $history_obj->setNewagent($this->getUser());
+
 
 								$history_obj->setStoreTicket($storeticket);
 								$history_obj->setObservations(str_replace("\n", '<br>', $fields->observations));
