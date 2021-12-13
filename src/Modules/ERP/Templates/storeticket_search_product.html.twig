@@ -130,6 +130,11 @@ function checkGroupedStockFailed(code){
         $("#info-add").css("display","block");
         $("#product-search-modal-form").modal('toggle');
 
+        if(id==9){
+            $("#main_buttons").css("display","block");
+            $("#info-add").css("display","none");
+        }
+
         $("#validation-info-list").empty();
         $("#validation-info-list").append("<li>OPCIONAL: puedes elegir la variante (si es agrupado), el almacén y la ubicación.</li><li>Para completar los detalles de la incidencia, tienes que pinchar en el botón 'Añadir información'.</li>");
         var code=$(this).parent().parent().parent().children('td').eq(1).text();

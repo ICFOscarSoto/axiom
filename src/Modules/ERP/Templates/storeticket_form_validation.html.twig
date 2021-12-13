@@ -36,16 +36,22 @@
          valid=false;
          return valid;
       }
-      //En todos los motivos exceptuando los fallos de stock, es obligatorio añadir observaciones
-      if($("#storeticket-form-observations").val()=="" && $("#storeticket-form-reasons-select").val()!="1")
+      //En todos los motivos exceptuando los fallos de stock y en inventario sin actualizar, es obligatorio añadir observaciones
+      if($("#storeticket-form-observations").val()=="" && $("#storeticket-form-reasons-select").val()!="1" && $("#storeticket-form-reasons-select").val()!="9")
       {
-        toastr.error("Por favor, añade una observación a la incidencia", "Confirmación", confirmation);
+         toastr.error("Por favor, añade una observación a la incidencia", "Confirmación", confirmation);
          valid=false;
          return valid;
 
       }
+      if($("#storeticket-form-reasons-select").val()=="9" && $("#storeticket-form-store").val()==""){
+        toastr.error("Por favor, selecciona un almacén", "Confirmación", confirmation);
+        valid=false;
+        return valid;
 
-      if($("#storeticket-form-states-select").val()=="-1" && $("#storeticket-form-reasons-select").val()!="1")
+      }
+      //En todos los motivos exceptuando los fallos de stock y en inventario sin actualizar, es obligatorio seleccionar un estado
+      if($("#storeticket-form-states-select").val()=="-1" && $("#storeticket-form-reasons-select").val()!="1" && $("#storeticket-form-reasons-select").val()!="9")
       {
         toastr.error("Por favor, selecciona un estado", "Confirmación", confirmation);
          valid=false;
