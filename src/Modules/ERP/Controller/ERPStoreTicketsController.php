@@ -18,6 +18,7 @@ use App\Modules\ERP\Entity\ERPStoreTicketsHistory;
 use App\Modules\ERP\Entity\ERPStoreTicketsStates;
 use App\Modules\ERP\Entity\ERPStoreTicketsReasons;
 use App\Modules\ERP\Entity\ERPSalesTickets;
+use App\Modules\ERP\Entity\ERPSalesOrders;
 use App\Modules\ERP\Entity\ERPStores;
 use App\Modules\ERP\Entity\ERPStoreLocations;
 use App\Modules\ERP\Entity\ERPStoresUsers;
@@ -452,7 +453,7 @@ class ERPStoreTicketsController extends Controller
 								$storeticket->setAuthor($this->getUser());
 							}
 
-							/*dentro de las incidencias que no son "fallo de stock", 
+							/*dentro de las incidencias que no son "fallo de stock",
 							//las inciencias "Inventario sin actualizar" se tienen que tratar de manera diferente al resto, ya que al guardarlas se pasan automáticamente
 							//al gestor de inventarios. Si no pusieramos este control, la incidencia se asignaría al mismo usuario que la ha creddo.
 							*/
@@ -865,6 +866,7 @@ class ERPStoreTicketsController extends Controller
 		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		 $storeticketsRepository=$this->getDoctrine()->getRepository(ERPStoreTickets::class);
 		 $salesticketsRepository=$this->getDoctrine()->getRepository(ERPSalesTickets::class);
+		 $salesordersRepository=$this->getDoctrine()->getRepository(ERPSalesOrders::class);
 		 $storeticketsstatesRepository=$this->getDoctrine()->getRepository(ERPStoreTicketsStates::class);
 		 $storesRepository=$this->getDoctrine()->getRepository(ERPStores::class);
 		 $storeticket=null;
@@ -879,11 +881,24 @@ class ERPStoreTicketsController extends Controller
 
 		 //hay una incidencia de venta asociada, luego hay que avisar al gestor que ha creado dicha incidencia de que ya se ha hecho el inventario.
 		 if($salesticket){
+			 //creador del ticket
 			 $channel=$salesticket->getAuthor()->getDiscordchannel();
 			 $msg="Ya se ha hecho el inventario del producto **".$storeticket->getProduct()->getName()."** asociado a la incidencia **".$salesticket->getCode()."**";
 			 file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
 			 $msg="\n\nRevisa tu incidencia en: \n".'https://axiom.ferreteriacampollano.com/es/ERP/salestickets/form/'.$salesticket->getId();
 			 file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
+
+			 $salesorder=$salesordersRepository->findOneBy(["id"=>$salesticket->getSalesOrder()->getId()]);
+			 //si el creador de la incidencia de ventas es distinto del agente asociado al pedido de venta
+			 if($salesticket->getAuthor()->getDiscordchannel()!= $salesorder->getAuthor()->getDiscordchannel())
+			 {
+				 	$channel=$salesorder->getAuthor()->getDiscordchannel();
+					$msg="Ya se ha hecho el inventario del producto **".$storeticket->getProduct()->getName()."** asociado a tu pedido **".$salesorder->getCode()."**";
+	 			  file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
+	 			  $msg="\n\nRevisa tu incidencia en: \n".'https://axiom.ferreteriacampollano.com/es/ERP/salestickets/form/'.$salesticket->getId();
+	 			  file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
+			}
+
 
 		 }
 
