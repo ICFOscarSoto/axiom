@@ -57,7 +57,6 @@ class ERPLocationsReports{
       $colOffset=15;
       $rowOffset=-10;
       foreach ($params["locations"] as $key=> $location){
-
         if($i%2==0){
           if($row>=9){
             $row=0;
@@ -67,19 +66,15 @@ class ERPLocationsReports{
           $row++;
           $col=0;
         }else $col=1;
-
-
         $qrcode = new QRCode($options);
         $path=$tempPath.'loc-'.$location['id'].'.png';
         $qrcode->render('LOC.'.$location['name'].'+STR.'.$location['store_id'], $path);
-
         $this->pdf->Rect($col*90+$colOffset, $row*28+$rowOffset, 90, 28);
         $this->pdf->Image($path, $col*90+$colOffset-4, $row*28+$rowOffset-4, 36, 36);
         $textSize=40;
         $textSize=$textSize-(strlen($location['name']));
         if(strlen($location['name'])>=8) $this->pdf->SetFont('Arial','b',$textSize);
-          else $this->pdf->SetFont('Arial','b',40);
-
+        else $this->pdf->SetFont('Arial','b',40);
         if($location['orientation']==0){
           $this->pdf->SetXY($col*90+$colOffset+28, $row*28+$rowOffset+16);
           $this->pdf->Image($params["rootdir"].DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'locations'.DIRECTORY_SEPARATOR.'arrow_up.png', $col*90+$colOffset+35, $row*28+$rowOffset+2,46,12);
@@ -105,8 +100,6 @@ class ERPLocationsReports{
         'eccLevel'   => QRCode::ECC_M,
         'scale' => 26
       ]);
-
-
       $i=1;
       $this->pdf->AddPage();
       $this->pdf->SetFillColor(255, 248, 53);
@@ -119,13 +112,12 @@ class ERPLocationsReports{
           $this->pdf->AddPage();
           $this->pdf->Rect(0, 0, 210, 148, 'DF');
           $this->pdf->Rect(0, 148, 210, 149, 'DF');
-            $i=1;
+          $i=1;
         }
         $this->pdf->SetFillColor(255, 248, 53);
         $this->pdf->Rect(0, 0, 210, 148, 'DF');
         $this->pdf->Rect(0, 148, 210, 149, 'DF');
         $this->pdf->SetFont('Arial','b',90);
-
         $qrcode = new QRCode($options);
         $path=$tempPath.'loc-'.$location['id'].'.png';
         $qrcode->render('LOC.'.$location['name'].'+STR.'.$location['store_id'], $path);
@@ -153,64 +145,31 @@ class ERPLocationsReports{
         $qrcode = new QRCode($options);
         $path=$tempPath.'loc-'.$location['id'].'.png';
         $qrcode->render('LOC.'.$location['name'].'+STR.'.$location['store_id'], $path);
+        // Si la ubicación no es izquierda, colocamos el QR en la izquierda de la etiqueta
+        if($location['orientation']!=3){
         $this->pdf->Image($path, -1, 7, 30, 30);
         $this->pdf->SetXY(0,5);
-
         $this->pdf->Cell(65, 5.5, $location['name'], 0, 0, 'C');
+        }
         if($location['orientation']==0){
           $this->pdf->Image($params["rootdir"].DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'locations'.DIRECTORY_SEPARATOR.'arrow_up.png', 32.5,13,28,15);
         }
         if($location['orientation']==1){
-        $this->pdf->Image($params["rootdir"].DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'locations'.DIRECTORY_SEPARATOR.'arrow_down.png', 32.5,15,28,15);
-      }
-
-
+          $this->pdf->Image($params["rootdir"].DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'locations'.DIRECTORY_SEPARATOR.'arrow_down.png', 32.5,15,28,15);
+        }
+        if($location['orientation']==2){
+          $this->pdf->Image($params["rootdir"].DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'locations'.DIRECTORY_SEPARATOR.'arrow_right.png', 37,12,18,22);
+        }
+        // Si la ubicación es izquierda, colocamos el QR en la derecha de la etiqueta
+        if($location['orientation']==3){
+          $this->pdf->Image($path, 30, 7, 30, 30);
+          $this->pdf->SetXY(0,5);
+          $this->pdf->Cell(65, 5.5, $location['name'], 0, 0, 'C');
+          $this->pdf->Image($params["rootdir"].DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'locations'.DIRECTORY_SEPARATOR.'arrow_left.png',3,11,18,22);
+        }
         unlink($path);
       }
     }
-
     return $this->pdf->Output();
-
   }
 }
-
-
-
-
-/*    if(!isset($params["type"]) || $params["type"]==2){
-      $this->pdf  = new \FPDF('L','mm','A5');
-      $this->pdf->AliasNbPages();
-      $this->pdf->SetAutoPageBreak(false);
-      $this->pdf->SetFont('Arial','',12);
-      $options = new QROptions([
-        'version'    => 1,
-        'outputType' => QRCode::OUTPUT_IMAGE_PNG,
-        'eccLevel'   => QRCode::ECC_M,
-        'scale' => 26
-      ]);
-
-
-      foreach ($params["locations"] as $key=> $location){
-      /*  if($i%3==0){
-          $this->pdf->AddPage();
-          $this->pdf->Rect(0, 0, 210, 148, 'DF');
-          $this->pdf->Rect(0, 148, 210, 149, 'DF');
-            $i=1;
-        }*/
-
-      /*  $this->pdf->AddPage();
-        $this->pdf->SetFillColor(255, 248, 53);
-        $this->pdf->Rect(0, 0, 210, 200, 'DF');
-        $this->pdf->SetFont('Arial','b',80);
-
-        $qrcode = new QRCode($options);
-        $path=$tempPath.'loc-'.$location['id'].'.png';
-        //$path=$tempPath.'loc-5831.png';
-        $qrcode->render('LOC.'.$location['name'].'+STR.'.$location['store_id'], $path);
-        $this->pdf->Image($path, 30, -15, 150, 150);
-        $this->pdf->SetXY(0,105);
-        $this->pdf->Cell(210, 54, $location['name'], 0, 0, 'C');
-
-        unlink($path);
-      }
-    }*/
