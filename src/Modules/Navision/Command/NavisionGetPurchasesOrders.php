@@ -206,7 +206,7 @@ class NavisionGetPurchasesOrders extends ContainerAwareCommand
             $objLine->setActive(1);
           }
           $product=$repositoryProducts->findOneBy(["code"=>$line["reference"]]);
-          if($product==NULL){
+          if($product==NULL OR $product->getCode()=="999"){
              $output->writeln('     ! Saltado no existe el producto');
              continue;
           }
