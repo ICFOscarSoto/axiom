@@ -27,7 +27,7 @@
         {% endif %}
       <div class="col-md-2">
         <label for="storeticket-form-reason">Motivo:</label>
-        <input type="text" id="storeticket-form-reason" value="{{ storeticket.reason.name }}" disabled="disabled" class="form-control" placeholder="Motivo">
+        <input type="text" id="storeticket-form-reasons-select" value="{{ storeticket.reason.name }}" disabled="disabled" class="form-control" placeholder="Motivo">
       </div>
       {% if storeticket.agent is not null %}
         <div class="col-md-2">
