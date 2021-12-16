@@ -66,7 +66,6 @@ class ERPShoppingDiscountsController extends Controller
     $shoppingDiscountsRepository=$this->getDoctrine()->getRepository(ERPShoppingDiscounts::class);
     $productsRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
     $product=$productsRepository->findOneById($new_item->id);
-    dump($new_item);
     if ($new_item->netprice) {
       if ($new_item->shoppingPrice!=$product->getShoppingPrice() and $new_item->shoppingPrice!=0){
         $product->setShoppingPrice($new_item->shoppingPrice);

@@ -1069,7 +1069,6 @@ class ERPProductsController extends Controller
 			 $product=[];
 		 }
 
-		 dump($products);
 		 return new JsonResponse(["products"=>$products]);
  	}
 
