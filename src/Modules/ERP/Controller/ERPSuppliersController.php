@@ -56,7 +56,8 @@ class ERPSuppliersController extends Controller
   				'lists' => $templateLists,
 	        'forms' => $templateForms,
 					'include_post_templates' => ['@ERP/workactivitiesmap.html.twig','@ERP/productlistcategories.html.twig'],
-					'include_footer' => [["type"=>"css", "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.css"],
+					'include_footer' => [["type"=>"js", "path"=>"/js/datetimepicker/bootstrap-datetimepicker-es.js"],
+															["type"=>"css", "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.css"],
 															 ["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.js"],
 															 ["type"=>"js",  "path"=>"/js/jquery.nestable.js"]]
   				]);
@@ -123,9 +124,12 @@ class ERPSuppliersController extends Controller
 												["name"=>"prices", "icon"=>"fa fa-money", "caption"=>"Shopping Discounts","route"=>$this->generateUrl("generictablist",["module"=>"ERP", "name"=>"ShoppingDiscounts", "id"=>$id])],
 												["name"=>"increments", "icon"=>"fa fa-money", "caption"=>"Increments","route"=>$this->generateUrl("generictablist",["module"=>"ERP", "name"=>"Increments", "id"=>$id])],
 												["name" => "incidents", "icon"=>"fa fa-money", "caption"=>"Incidents", "route"=>$this->generateUrl("supplierincidents",["id"=>$id])],
-
-
 											],
+
+							'include_footer' => [["type"=>"js", "path"=>"/js/datetimepicker/bootstrap-datetimepicker-es.js"],
+																	["type"=>"css", "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.css"],
+																	["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.js"],
+																	["type"=>"js",  "path"=>"/js/jquery.nestable.js"]]
 									));
 			}
 

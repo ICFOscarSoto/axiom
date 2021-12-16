@@ -37,11 +37,15 @@
                 },
                 {
                     "name": "start",
-                    "cols": 4
+                    "type":"date",
+                    "cols": 4,
+                    "linked": {"field":"end", "by":"minDate"}
                 },
                 {
                     "name": "end",
-                    "cols": 4
+                    "type" : "date",
+                    "cols": 4,
+                    "linked": {"field":"start", "by":"maxDate"}
                 }
             ]
         }

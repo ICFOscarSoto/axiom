@@ -401,3 +401,6 @@ ERPInfoStocksController:
 
 ERPBuyOffersController:
   resource: 'App\Modules\ERP\Controller\ERPBuyOffersController'
+
+ERPShoppingDiscountsController:
+  resource: 'App\Modules\ERP\Controller\ERPShoppingDiscountsController'

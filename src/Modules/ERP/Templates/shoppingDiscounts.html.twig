@@ -1,0 +1,344 @@
+{% set params = app.request.attributes.get('_route_params')|merge(app.request.query.all()) %}
+{% block header %}
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<meta name="description" content="Axiom Business Management" />
+	<meta name="author" content="" />
+	<link rel="icon" href="images/favicon.ico">
+	{{ include('@Globale/header.html.twig') }}
+	<!-- Imported styles on this page -->
+<!--	<link rel="stylesheet" href="{{ url('index') }}css/bootstrap-grid.css"> -->
+		<link rel="stylesheet" href="{{ url('index') }}css/timeline.css">
+	<link rel="stylesheet" href="{{ url('index') }}/js/jvectormap/jquery-jvectormap-1.2.2.css">
+	<link rel="stylesheet" href="{{ url('index') }}/js/rickshaw/rickshaw.min.css">
+{% endblock %}
+<title>{% block title %}{{ interfaceName|trans }}{% endblock %}</title>
+<body class="page-body" data-url="{{ url('indexAdmin') }}">
+<div class="page-container"><!-- add class "sidebar-collapsed" to close sidebar by default, "chat-visible" to make chat appear always -->
+	{{ include('@Globale/sidebar_menu.html.twig') }}
+	<div class="main-content">
+		{{ include('@Globale/head.html.twig') }}
+		<hr />
+		{{ include('@Globale/breadcrumb.html.twig') }}
+		{#}<h2>{{ interfaceName }}</h2>#}
+		<!-- MAIN CONTENT -->
+		<div class="row">
+		<div class="col-md-3 float-right">
+			<div class="form-group">
+				<input type="hidden" id="supplier" class="form-control">
+					<select type="text" id="supplier-select" class="form-control select2" required>
+					<option value="-1">Elegir proveedor...</option>
+						{% for option in suppliers %}
+							<option value="{{ option.id }}">{{ option.name }}</option>
+						{% endfor %}
+					</select>
+			</div>
+		</div>
+		<div class="col-md-3" id="categories" style="display:none;">
+			<div class="form-group">
+				<input type="hidden" id="category" class="form-control" >
+					<select type="text" id="category_select" class="form-control select2"  required>
+					<option value="-1">Elegir categoria...</option>
+						{% for option in category %}
+							<option value="{{ option.id }}">{{ option.name }}</option>
+						{% endfor %}
+					</select>
+			</div>
+		</div>
+		<!-- <div class="col-md-3 me-auto">
+			<div class="form-group">
+				<button type="button" id="update_rate" class="form-control" style="display:none;">Update rate</button>
+			</div>
+		</div> -->
+	</div>
+	<table id="header-list-products" class="table table-bordered table-responsive-md table-striped text-center" style="display:none; width: 100%">
+		<thead class="table-thead">
+			<th style="border-bottom: 1px solid #cecece !important;" class="table-header-name table-thead "> Código artículo </th>
+			<th style="border-bottom: 1px solid #cecece !important;" class="table-header-name table-thead "> Referencia proveedor </th>
+			<th style="border-bottom: 1px solid #cecece !important;" class="table-header-name table-thead "> EAN13 </th>
+			<th style="border-bottom: 1px solid #cecece !important;" class="table-header-name table-thead "> Descripcion </th>
+			<th style="border-bottom: 1px solid #cecece !important;" class="table-header-name table-thead "> Categoría </th>
+			<th style="border-bottom: 1px solid #cecece !important;" class="table-header-name table-thead "> Neto </th>
+			<th style="border-bottom: 1px solid #cecece !important;" class="table-header-name table-thead "> Precio fabricante </th>
+			<th style="border-bottom: 1px solid #cecece !important;" class="table-header-name table-thead " colspan="3">  Nuevo precio fabricante </th>
+			<th style="border-bottom: 1px solid #cecece !important;" class="table-header-name table-thead "> PVP </th>
+			<th style="border-bottom: 1px solid #cecece !important;" class="table-header-name table-thead "> Nuevo PVP </th>
+			<th style="border-bottom: 1px solid #cecece !important;" class="table-header-name table-thead "> Cantidad </th>
+			<th style="border-bottom: 1px solid #cecece !important;" class="table-header-name table-thead "> Descuento </th>
+			<th style="border-bottom: 1px solid #cecece !important;" class="table-header-name table-thead "> Nuevo descuento </th>
+			<th style="border-bottom: 1px solid #cecece !important;" class="table-header-name table-thead "> Variación alta </th>
+			<th style="border-bottom: 1px solid #cecece !important;" class="table-header-name table-thead "> Fecha inicial </th>
+			<th style="border-bottom: 1px solid #cecece !important;" class="table-header-name table-thead "> Nueva fecha inicial </th>
+			<th style="border-bottom: 1px solid #cecece !important;" class="table-header-name table-thead "> Fecha final </th>
+			<th style="border-bottom: 1px solid #cecece !important;" class="table-header-name table-thead "> Nueva fecha final </th>
+			<th style="border-bottom: 1px solid #cecece !important;" class="table-header-name table-thead "> Discontinuar </th>
+			<th style="border-bottom: 1px solid #cecece !important;" class="table-header-name table-thead "> Embalaje </th>
+			<th style="border-bottom: 1px solid #cecece !important;" class="table-header-name table-thead "> Nuevo embalaje </th>
+			<th style="border-bottom: 1px solid #cecece !important;" class="table-header-name table-thead "> Editar </th>
+		</thead>
+
+</table>
+
+	<!--	<div class="products-footer" id="products-footer" style="display:block;">
+			<div class="form-group">
+				<input id="file" name="file" type="file" accept=".csv" />
+				<button type="submit" id="submit-file" class="btn btn-primary">Upload file</button>
+			</div>
+		</div> -->
+		<form id="data" name="data" method="post" enctype="multipart/form-data" style="display:none;">
+			<input id="file" name="file" type="file" accept=".csv" />
+			<button type="button" id="submit-file" class="btn btn-primary">Upload file</button>
+		</form>
+		<!-- END MAIN CONTENT -->
+
+<script>
+			var updateRates;
+		  $(document).ready(function() {
+		  $('body').on('change', "#supplier-select", function(e) {
+				$("#header-list-products").css("display","block");
+				$("#body-list-products").css("display","block");
+				$("#data").css("display","block");
+				$("#update_rate").css("display","block");
+				$("#categories").css("display","block");
+				getProducts($("#supplier-select").val(),0);
+			  });
+
+
+
+		/*	$('body').on('click','[id^="button-save-"]', function(){
+					update($(this).attr('id'));
+			});
+*/
+			$('body').on('click',"#update_rate", function(){
+				/*var allTDs = document.getElementsByName("row_products");
+					for ( var counter = 0; counter < allTDs.length; counter++ ){
+   				console.log(allTDs[counter]); */
+				$('[attr-id^="row_products-"]').each(function() {
+					update($(this).attr('id'));
+				});
+			});
+
+				$('body').on('click',"#submit-file", function(){
+					var formData = new FormData(document.getElementById('data'));
+					$.ajax({
+							url: "/api/cloud/files/shoppingDiscount/0/upload/shoppingDiscount",
+							type: 'POST',
+							data: formData,
+							async: false,
+							success: function (data) {
+									if (data.uploaded==true) {
+										open('{{tempPath}}'+data.fileName,$("#supplier-select").val(),0);
+										for (var i = 0; i < updateRates.length; i++){
+										  var obj = updateRates[i];
+										  for (var key in obj){
+										    var value = obj[key];
+												if (key!='id') {
+													var valor=value;
+													if (key=='shopping_price') {
+														var old_id=key+'-'+obj['id'];
+														var new_id='new_'+key+'-'+obj['id'];
+														document.getElementById(new_id).value=valor;
+														if (document.getElementById(new_id).value==document.getElementById(old_id).textContent) document.getElementById(obj['id']).style="color:#0087FF";
+														else if (document.getElementById(new_id).value<=document.getElementById(old_id).textContent)	document.getElementById(obj['id']).style="color:#FF0000";
+														else if (document.getElementById(new_id).value>=document.getElementById(old_id).textContent)	document.getElementById(obj['id']).style="color:#0DB400";
+													}
+												}
+										  }
+										}
+									}
+									else toastr.error("No se ha subido el fichero correctamente");
+							},
+							cache: false,
+							contentType: false,
+							processData: false
+					});
+
+					$('[attr-id^="row_products-"]').each(function() {
+							if ($('#new_PVP-'+$(this).attr('id')).val()=='' && $('#new_shopping_price-'+$(this).attr('id')).val()=='' && $('#new_discount-'+$(this).attr('id')).val()=='')
+							//	document.getElementById("disable-"+$(this).attr('id')).checked=true;
+							$("#disable-"+$(this).attr('id')).parent().addClass('checked');
+					});
+
+				});
+		});
+
+		function update(id){
+			if(document.getElementById('product_netprice-'+id).checked==false && $('#new_PVP-'+id).val()!=0 && $('#new_PVP-'+id).val()!=document.getElementById('PVP-'+id).textContent){
+						savePVP(id,
+						$('#new_PVP-'+id).val(),
+						$('#supplier-select').val(),
+						$('#discount-'+id).val().
+						$('#new_start-'+id).val(),
+						$('#new_end-'+id).val(),
+						$('#product_netprice-'+id).val());
+				}
+			else if (document.getElementById('product_netprice-'+id).checked==true && $('#new_shopping_price-'+id).val()!=0  && $('#new_shopping_price-'+id).val()!=document.getElementById('shopping_price-'+id).textContent){
+						saveShoppingPrice(id,
+						$('#new_shopping_price-'+id).val(),
+						$('#supplier-select').val(),
+						$('#product_netprice-'+id).val());
+				}
+			else if (document.getElementById('disable-'+id).checked==true){
+					disableProduct(id);
+			}
+		}
+
+		function open(fileSelect, supplier){
+			if((++load_wait)==1) $("#load-spinner").fadeIn();
+			var data={fileSelect: fileSelect, supplier : supplier};
+
+			$.ajax({
+				 type: "POST",
+				 dataType: "json",
+				 data: JSON.stringify(data),
+				 async: false,
+				 url: "/api/ERP/shoppingDiscounts/readcsv",
+			 }).done(function(data, textStatus, jqXHR) {
+				 if((--load_wait)==0) $("#load-spinner").fadeOut();
+				 if(data.result>0) {
+					 toastr.success("Datos leídos correctamente", "Confirmación", confirmation);
+					 updateRates=data.data;
+				 	}
+				 else toastr.error("Ocurrió un error al leer los datos", "Confirmación", confirmation);
+		 });
+		}
+
+
+		function disableProduct(id){
+			if((++load_wait)==1) $("#load-spinner").fadeIn();
+			var data={id: id};
+			$.ajax({
+				 type: "POST",
+				 dataType: "json",
+				 data: JSON.stringify(data),
+				 url: "/admin/global/product/"+id+"/disable",
+			 }).done(function(data, textStatus, jqXHR) {
+				 if((--load_wait)==0) $("#load-spinner").fadeOut();
+				 if(data.result>0) toastr.success("Se ha desactivado el producto correctamente", "Confirmación", confirmation);
+					else toastr.error("Ocurrió un error al desactivar el producto "+id, "Confirmación", confirmation);
+			});
+
+		}
+
+		function cloudTemp(fileSelect){
+			if((++load_wait)==1) $("#load-spinner").fadeIn();
+			var data={file: file};
+			$.ajax({
+				 type: "POST",
+				 dataType: "json",
+				 data: JSON.stringify(data),
+				 url: "/api/cloud/files/shoppinDiscount/0/upload/shoppinDiscount",
+			 }).done(function(data, textStatus, jqXHR) {
+				 if((--load_wait)==0) $("#load-spinner").fadeOut();
+				 if(data.result>0) toastr.success("Datos leídos correctamente", "Confirmación", confirmation);
+				 else toastr.error("Ocurrió un error al leer los datos", "Confirmación", confirmation);
+		 });
+		}
+
+		function savePVP(id,PVP,supplier,discount,start,end, netprice){
+			if((++load_wait)==1) $("#load-spinner").fadeIn();
+			var data={id: id, PVP: PVP ,supplier: supplier, discount:discount, start: start, end: end, netprice: netprice};
+			$.ajax({
+				 type: "POST",
+				 dataType: "json",
+				 data: JSON.stringify(data),
+	       url: "/api/ERP/shoppingDiscounts/save",
+			 }).done(function(data, textStatus, jqXHR) {
+				 if((--load_wait)==0) $("#load-spinner").fadeOut();
+				 if(data.result>0) toastr.success("Datos guardados correctamente", "Confirmación", confirmation);
+ 					else toastr.error("Ocurrió un error al guardar el PVP del producto "+id, "Confirmación", confirmation);
+		 });
+		}
+
+		function saveShoppingPrice(id,shoppingPrice, supplier, netprice){
+			if((++load_wait)==1) $("#load-spinner").fadeIn();
+			var data={id: id, shoppingPrice: shoppingPrice, supplier: supplier, netprice: netprice};
+			$.ajax({
+				 type: "POST",
+				 dataType: "json",
+				 data: JSON.stringify(data),
+				 url: "/api/ERP/shoppingDiscounts/save",
+			 }).done(function(data, textStatus, jqXHR) {
+				 if((--load_wait)==0) $("#load-spinner").fadeOut();
+				 if(data.result>0) toastr.success("Datos guardados correctamente ", "Confirmación", confirmation);
+					else toastr.error("Ocurrió un error al guardar el precio de compra del producto "+id, "Confirmación", confirmation);
+		 });
+		}
+
+		function getProducts(supplier,category){
+			if((++load_wait)==1) $("#load-spinner").fadeIn();
+			$.ajax({
+					type: "GET",
+					dataType: "json",
+					url: "/api/erp/getproducts/"+supplier+"/"+category,
+				}).done(function( elements, textStatus, jqXHR ) {
+					if((--load_wait)==0) $("#load-spinner").fadeOut();
+					 elements.products.forEach( function(valor, indice, array) {
+						// $("#body-list-products").append("<b> eyyy </b>");+
+						$("#header-list-products").append(
+							'<tr attr-id="row_products-'+valor.id+'" id="'+valor.id+'">'+
+								'<td style="border-bottom: 1px solid #cecece !important;" id="product_code-'+valor.id+'" value="'+valor.code+'"> '+valor.code+'</td>' +
+								'<td style="border-bottom: 1px solid #cecece !important;" id="product_reference-'+valor.id+'" value="'+valor.reference+'"> '+valor.reference+'</td>' +
+								'<td style="border-bottom: 1px solid #cecece !important;" id="product_ean-'+valor.id+'" value="'+valor.EAN13+'"> '+valor.EAN13+'</td>' +
+								'<td style="border-bottom: 1px solid #cecece !important;" id="product_name-'+valor.id+'" value="'+valor.name+'"> '+valor.name+'</td>' +
+								'<td style="border-bottom: 1px solid #cecece !important;" id="product_category-'+valor.id+'" value="'+valor.category+'"> '+valor.category+'</td>' +
+								'<td style="border-bottom: 1px solid #cecece !important;">' +
+								(valor.netprice=="true" ?	'<input id="product_netprice-'+valor.id+'" type="checkbox" checked class="icheck"></td>' :
+								'<input id="product_netprice-'+valor.id+'" type="checkbox" class="icheck"></td>') +
+								'<td style="border-bottom: 1px solid #cecece !important;" id="shopping_price-'+valor.id+'" value="'+valor.shopping_price+'">'+valor.shopping_price+'</td>' +
+								'<td style="border-bottom: 1px solid #cecece !important;" colspan="3"> <input id="new_shopping_price-'+valor.id+'" value="" type="float" class="form-control"></td>'+
+								'<td style="border-bottom: 1px solid #cecece !important;" id="PVP-'+valor.id+'" value="'+valor.PVP+'"> '+valor.PVP+'</td>' +
+								'<td style="border-bottom: 1px solid #cecece !important;"> <input id="new_PVP-'+valor.id+'" type="float" class="form-control"></td>'+
+								'<td style="border-bottom: 1px solid #cecece !important;" id="quantity-'+valor.id+'" value="'+valor.quantity+'"> '+valor.quantity+'</td>' +
+								'<td style="border-bottom: 1px solid #cecece !important;" id="discount-'+valor.id+'" value="'+valor.discount+'"> '+valor.discount+'</td>' +
+								'<td style="border-bottom: 1px solid #cecece !important;"> <input id="new_discount-'+valor.id+'" type="number" class="form-control"></td>'+
+								'<td style="border-bottom: 1px solid #cecece !important;"> <input id="alert_price-'+valor.id+'" type="checkbox" class="icheck"></td>'+
+								'<td style="border-bottom: 1px solid #cecece !important;" id="start-'+valor.id+'" value="'+valor.start+'"> '+valor.start+'</td>' +
+								'<td style="border-bottom: 1px solid #cecece !important;"> <input id="new_start-'+valor.id+'" type="date" class="form-control"></td>'+
+								'<td style="border-bottom: 1px solid #cecece !important;" id="end-'+valor.id+'" value="'+valor.end+'"> '+valor.end+'</td>' +
+								'<td style="border-bottom: 1px solid #cecece !important;"> <input id="new_end-'+valor.id+'" type="date" class="form-control"></td>'+
+								'<td style="border-bottom: 1px solid #cecece !important;"> <input id="disable-'+valor.id+'" type="checkbox" class="icheck"></td>'+
+								'<td style="border-bottom: 1px solid #cecece !important;" id="packing-'+valor.id+'" value="'+valor.packing+'"> '+valor.packing+'</td>' +
+								'<td style="border-bottom: 1px solid #cecece !important;"> <input id="new_start-'+valor.packing+'" class="form-control"></td>'+
+								'<td style="border-bottom: 1px solid #cecece !important;" id="button_save-'+valor.id+'"value="0"> <input id="button-save-'+valor.id+'" attr-id="'+valor.id+'"  type="submit" value="Guardar" class="btn btn-green"></td>' +
+							'</tr>');
+
+							$('input.icheck').iCheck({
+				        checkboxClass: 'icheckbox_flat-blue',
+				        radioClass: 'iradio_flat-blue'
+				      });
+					});
+			});
+		}
+
+</script>
+
+
+
+		<!-- END MODALS -->
+		{% block footer %}
+
+		<link rel="stylesheet" href="{{ url('index') }}js/datatables/datatables.css">
+		<link rel="stylesheet" href="{{ url('index') }}js/select2/select2-bootstrap.css">
+		<link rel="stylesheet" href="{{ url('index') }}js/select2/select2.css">
+		<link rel="stylesheet" href="{{ url('index') }}css/custom.css">
+		<link rel="stylesheet" href="{{ url('index') }}js/ol/ol.css">
+		<link rel="stylesheet" href="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker.min.css">
+		<link rel="stylesheet" href="{{ url('index') }}js/jodit/jodit.min.css">
+
+		<!-- Imported scripts on this page -->
+		<script src="{{ url('index') }}js/datatables/datatables.js"></script>
+		<script src="{{ url('index') }}js/select2/select2.min.js"></script>
+		<script src="{{ url('index') }}js/moment.min.js"></script>
+		<script src="{{ url('index') }}js/moment-es.js"></script>
+		<script src="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker-es.js"></script>
+		<script src="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker.min.js"></script>
+		<script src="{{ url('index') }}js/fileinput.js"></script>
+		<script src="{{ url('index') }}js/ol/ol.js"></script>
+		<script src="{{ url('index') }}js/jodit/jodit.min.js"></script>
+		<script src="{{ url('index') }}js/jquery.nestable.js"></script>
+		{{ include('@Globale/bottom.html.twig') }}
+		{% endblock %}
+		</body>
+</body>

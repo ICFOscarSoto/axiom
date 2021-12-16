@@ -21,6 +21,8 @@ use App\Modules\ERP\Entity\ERPStockHistory;
 use App\Modules\ERP\Entity\ERPStoreLocations;
 use App\Modules\ERP\Entity\ERPStores;
 use App\Modules\ERP\Entity\ERPStoresUsers;
+use App\Modules\ERP\Entity\ERPShoppingDiscounts;
+use App\Modules\ERP\Entity\ERPShoppingPrices;
 use App\Modules\ERP\Entity\ERPCategories;
 use App\Modules\ERP\Entity\ERPProductsVariants;
 use App\Modules\ERP\Entity\ERPInfoStocks;
@@ -1013,6 +1015,64 @@ class ERPProductsController extends Controller
 		}
 
 
+		/**
+ 	 * @Route("/api/erp/getproducts/{supplier}/{category}", name="getProducts")
+ 	 */
+ 	public function getProducts($supplier, $category){
+ 	 	 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		 $productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
+		 $referenceRepository=$this->getDoctrine()->getRepository(ERPReferences::class);
+		 $EAN13Repository=$this->getDoctrine()->getRepository(ERPEAN13::class);
+		 $shoppingDiscountRepository=$this->getDoctrine()->getRepository(ERPShoppingDiscounts::class);
+		 $shoppingPricesRepository=$this->getDoctrine()->getRepository(ERPShoppingPrices::class);
+		 $objects=$productRepository->productsBySupplierCategory($supplier,$category);
+		 $products=[];
+		 foreach ($objects as $object){
+			 $item=$productRepository->findOneById($object["id"]);
+			 $product["id"]=$object["id"];
+			 $product["code"]=$item->getCode();
+			 $reference=$referenceRepository->findOneBy(["product"=>$item->getId(),"supplier"=>$supplier, "active"=>1, "deleted"=>0]);
+			 if ($reference!=null) $product["reference"]=$reference->getName();
+			 else $product["reference"]='';
+			 $EAN13=$EAN13Repository->findOneBy(["product"=>$item->getId(),"supplier"=>$supplier, "active"=>1, "deleted"=>0]);
+			 if($EAN13!=null)	 $product["EAN13"]=$EAN13->getName();
+			 else $product["EAN13"]='';
+			 $product["name"]=$item->getName();
+			 if($item->getCategory()!=null)  $product["category"]=$item->getCategory()->getName();
+			 else $product["category"]='';
+			 $product["netprice"]=$item->getNetprice()==1?"true":"false";
+			 $product["shopping_price"]=$item->getShoppingPrice();
+			 $product["PVP"]=$item->getPVPR();
+			 if ($item->getNetprice()==false) $shoppingDiscounts=$this->getShoppingDiscounts($supplier,$item->getCategory());
+			 else $shoppingDiscounts=null;
+			 if ($shoppingDiscounts!=null) {
+				 $product["discount"]=$shoppingDiscounts->getDiscount();
+				 $product["start"]=$shoppingDiscounts->getStart();
+				 $product["end"]=$shoppingDiscounts->getEnd();
+			 }
+			 else {
+				 $product["discount"]=0;
+				 $product["start"]='';
+				 $product["end"]='';
+			 }
+			 $products[]=$product;
+			 if ($item->getNetprice()){
+				 $product["code"]='---';
+				 $product["reference"]='---';
+				 $productPrices=$shoppingPricesRepository->getShoppingPrices($object["id"],$supplier);
+				 foreach ($productPrices as $specificPrice){
+					 $product["quantity"]=$specificPrice["quantity"];
+					 $product["shopping_price"]=$specificPrice["price"];
+					 $products[]=$product;
+				 }
+			 }
+			 $product=[];
+		 }
+
+		 dump($products);
+		 return new JsonResponse(["products"=>$products]);
+ 	}
+
 		 /**
 	 * @Route("/api/ERP/product/{code}/grouped", name="isGrouped")
 	 */
@@ -1027,6 +1087,21 @@ class ERPProductsController extends Controller
 
 	 }
 
+	 public function getShoppingDiscounts($supplier, $category){
+		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		 $repositoryShoppingDiscounts=$this->getDoctrine()->getRepository(ERPShoppingDiscounts::class);
+		 //Search in the treeCategories which is the most specific with ShoppingDiscounts
+		 $repositoryCategory=$this->getDoctrine()->getRepository(ERPCategories::class);
+		 $shoppingDiscounts=$repositoryShoppingDiscounts->findOneBy(["supplier"=>$supplier,"category"=>$category,"active"=>1,"deleted"=>0]);
+		 if ($category!=null)
+		 while ($category->getParentid()!=null && $shoppingDiscounts==null){
+				 $category=$category->getParentid();
+				 $shoppingDiscounts=$repositoryShoppingDiscounts->findOneBy(["supplier"=>$supplier,"category"=>$category,"active"=>1,"deleted"=>0]);
+		 }
+		 if ($shoppingDiscounts==null)
+				 $shoppingDiscounts=$repositoryShoppingDiscounts->findOneBy(["supplier"=>$supplier,"active"=>1,"deleted"=>0]);
+		 return $shoppingDiscounts!=null?$shoppingDiscounts:0;
+	 }
 
 	 /**
 	 * 	@Route("/es/ERP/generateQR", name="generateQR")

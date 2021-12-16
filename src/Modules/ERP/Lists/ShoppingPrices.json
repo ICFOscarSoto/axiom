@@ -1,0 +1,54 @@
+[
+    {
+        "name": "id",
+        "caption": "id"
+    },
+    {
+        "name": "quantity",
+        "caption": "quantity"
+    },
+    {
+        "name": "netprice",
+        "caption": "netprice"
+    },
+    {
+        "name": "discount",
+        "caption": "discount"
+    },
+    {
+        "name": "price",
+        "caption": "price"
+    },
+    {
+        "name": "datestart",
+        "caption": "datestart"
+    },
+    {
+        "name": "dateend",
+        "caption": "dateend"
+    },
+    {
+        "name": "product__name",
+        "caption": "product"
+    },
+    {
+        "name": "supplier__name",
+        "caption": "supplier"
+    },
+    {
+        "name": "active",
+        "caption": "Estado",
+        "width": "10%",
+        "class": "dt-center",
+        "replace": {
+            "1": {
+                "text": "Activo",
+                "html": "<div style=\"min-width: 75px;\" class=\"label label-success\">Activo<\/div>"
+            },
+            "0": {
+                "text": "Desactivado",
+                "html": "<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado<\/div>"
+            }
+        }
+    }
+]

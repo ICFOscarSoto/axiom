@@ -61,8 +61,10 @@ class ERPProductsRepository extends ServiceEntityRepository
     }
 
     public function productsBySupplierCategory($supplier,$category){
-      $query="SELECT id from erpproducts
+      if($category!=0) $query="SELECT id from erpproducts
       where supplier_id=:supplier AND category_id=:category";
+      else $query="SELECT id from erpproducts
+      where supplier_id=:supplier";
       $params=['supplier' => $supplier,
               'category' => $category];
       $result=$this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
@@ -193,7 +195,7 @@ class ERPProductsRepository extends ServiceEntityRepository
     }
 
     public function deleteRelations($product){
-      
+
       $query="UPDATE erpreferences
               SET active=0, deleted=1
               WHERE product_id= :product";

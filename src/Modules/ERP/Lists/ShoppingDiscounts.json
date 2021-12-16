@@ -32,10 +32,12 @@
     },
     {
         "name": "start",
+        "type" : "date",
         "caption": "start"
     },
     {
         "name": "end",
+        "type" : "date",
         "caption": "end"
     },
     {
