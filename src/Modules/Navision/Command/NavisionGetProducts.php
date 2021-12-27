@@ -253,9 +253,10 @@ public function importProduct(InputInterface $input, OutputInterface $output){
       }
       $navisionSync->setLastsync($datetime);
       $output->writeln('* El nuevo maxtimestamp es ....'.$objects["maxtimestamp"]);
-      if ($objects["maxtimestamp"]>$navisionSync->getMaxtimestamp())
-      $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
-      $this->doctrine->getManager()->persist($navisionSync);
+      if ($objects["maxtimestamp"]!=0 and $objects["maxtimestamp"]>$navisionSync->getMaxtimestamp()){
+        $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
+        $this->doctrine->getManager()->persist($navisionSync);
+      }
       $this->doctrine->getManager()->flush();
       //------   Critical Section END   ------
       //------   Remove Lock Mutex    ------
