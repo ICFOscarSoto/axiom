@@ -246,8 +246,10 @@ public function importProduct(InputInterface $input, OutputInterface $output){
          $this->doctrine->getManager()->clear();
       /* }*/
       }
+
       if ($objects["maxtimestamp"]!=null and $objects["maxtimestamp"]!=0 and $objects["maxtimestamp"]>$navisionSync->getMaxtimestamp()){
         $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
+        $navisionSync->setLastsync($datetime);
         $this->doctrine->getManager()->persist($navisionSync);
       }
       $this->doctrine->getManager()->flush();
