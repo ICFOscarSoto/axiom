@@ -71,10 +71,12 @@ private function updateTimestamp(InputInterface $input, OutputInterface $output,
   $objects=json_decode($json, true);
   $objects=$objects[0];
   $navisionSyncRepository=$this->doctrine->getRepository(NavisionSync::class);
-  $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>$name]);
-  $navisionSync->setMaxtimestamp((int)$objects["maxtimestamp"]);
-  $navisionSync->setLastsync($datetime);
-  $this->doctrine->getManager()->persist($navisionSync);
+  if ((int)$objects["maxtimestamp"]!=0) {
+    $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>$name]);
+    $navisionSync->setMaxtimestamp((int)$objects["maxtimestamp"]);
+    $navisionSync->setLastsync($datetime);
+    $this->doctrine->getManager()->persist($navisionSync);
+  }
   $this->doctrine->getManager()->flush();
 }
 
