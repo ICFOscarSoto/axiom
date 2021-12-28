@@ -246,14 +246,7 @@ public function importProduct(InputInterface $input, OutputInterface $output){
          $this->doctrine->getManager()->clear();
       /* }*/
       }
-      $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"products"]);
-      if ($navisionSync==null) {
-        $navisionSync=new NavisionSync();
-        $navisionSync->setEntity("products");
-      }
-      $navisionSync->setLastsync($datetime);
-      $output->writeln('* El nuevo maxtimestamp es ....'.$objects["maxtimestamp"]);
-      if ($objects["maxtimestamp"]!=0 and $objects["maxtimestamp"]>$navisionSync->getMaxtimestamp()){
+      if ($objects["maxtimestamp"]!=null and $objects["maxtimestamp"]!=0 and $objects["maxtimestamp"]>$navisionSync->getMaxtimestamp()){
         $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
         $this->doctrine->getManager()->persist($navisionSync);
       }
