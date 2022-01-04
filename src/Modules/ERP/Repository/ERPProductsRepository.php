@@ -195,7 +195,7 @@ class ERPProductsRepository extends ServiceEntityRepository
     }
 
     public function deleteRelations($product){
-
+      $params=['product' => $product];
       $query="UPDATE erpreferences
               SET active=0, deleted=1
               WHERE product_id= :product";
@@ -203,9 +203,16 @@ class ERPProductsRepository extends ServiceEntityRepository
       $query2="UPDATE erpean13
               SET active=0, deleted=1
               WHERE product_id= :product";
-      $params=['product' => $product];
       $result2=$this->getEntityManager()->getConnection()->executeQuery($query2, $params);
       return $result2;
+    }
+
+    public function getProductsByManager($manager){
+      $query="SELECT product_id
+              FROM erpstores_managers_products
+              WHERE manager_id=:manager and active=1 and deleted!=0";
+      $params=['manager' => $manager];
+      return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
     }
 
 /*
