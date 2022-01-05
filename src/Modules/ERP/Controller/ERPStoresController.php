@@ -169,10 +169,9 @@ class ERPStoresController extends Controller
 	 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
    $storesUsersRepository=$this->getDoctrine()->getRepository(ERPStoresUsers::class);
 	 $stores=$storesUsersRepository->findBy(["user"=>$this->getUser(), "active"=>1, "deleted"=>0]);
-
- 	$arrayStores=[];
+ 		$arrayStores=[];
  	foreach($stores as $store){
-		if(!$store->getStore()->getActive() || !$store->getStore()->getDeleted) continue;
+
  		$item["id"]			  =$store->getStore()->getId();
 		$item["code"]		  =$store->getStore()->getCode();
 		$item["name"]		  =$store->getStore()->getName();
