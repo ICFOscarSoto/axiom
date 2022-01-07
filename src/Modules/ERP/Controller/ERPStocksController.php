@@ -344,7 +344,7 @@ class ERPStocksController extends Controller
 		/**
 		 * @Route("/es/stock/stockHistory/list", name="stockHistorylist")
 		 */
-		public function stockHistory(RouterInterface $router,Request $request){
+		/*public function stockHistory(RouterInterface $router,Request $request){
 			$managerRepository=$this->getDoctrine()->getRepository(ERPStoresManagers::class);
 			$productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
 			$managerId=$managerRepository->find(1);
@@ -395,7 +395,7 @@ class ERPStocksController extends Controller
 								'historylist' => $stockHistory
 			));
 		}
-
+*/
 		/*AÑADIMOS RUTAS PARA APP EN LAS PDAs*/
 
 		/**
