@@ -18,6 +18,7 @@ use App\Modules\ERP\Entity\ERPStoresUsers;
 use App\Modules\ERP\Entity\ERPCategories;
 use App\Modules\ERP\Entity\ERPProducts;
 use App\Modules\ERP\Entity\ERPEAN13;
+use App\Modules\ERP\Entity\ERPTypesMovements;
 use App\Modules\ERP\Entity\ERPProductsVariants;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
@@ -361,60 +362,91 @@ class ERPStocksController extends Controller
  	 }
 
 	 /**
-		* @Route("/api/ERP/inventory/{location}/{product}/{qty}/saveStock", name="saveProductStock")
+		* @Route("/api/ERP/inventory/create/{location}/{product}/{variant}/{qty}/{type}", name="inventoryCreate")
 		*/
-		public function saveProductStock($location, $product, $qty, RouterInterface $router,Request $request){
+		public function inventoryCreate($location, $product, $variant, $qty, $type, RouterInterface $router,Request $request){
 			 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			 //TODO: Comprobar que el usuario tiene permisos para hacer inventarios
+
 			 $repositoryProducts=$this->getDoctrine()->getRepository(ERPProducts::class);
-			 $product_obj=$repositoryProducts->findOneBy(["code"=>$product, "company"=>$this->getUser()->getCompany()]);
 			 $repositoryStoreLocations=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
-			 $storelocation=$repositoryStoreLocations->findOneBy(["name"=>$location, "company"=>$this->getUser()->getCompany()]);
 			 $repositoryStores=$this->getDoctrine()->getRepository(ERPStores::class);
-			 $store=$repositoryStores->findOneBy(["id"=>$storelocation->getStore(), "company"=>$this->getUser()->getCompany()]);
+			 $repositoryType=$this->getDoctrine()->getRepository(ERPTypesMovements::class);
 			 $repository=$this->getDoctrine()->getRepository($this->class);
-			 $stock=$repository->findOneBy(["storelocation"=>$storelocation,"product"=>$product_obj, "company"=>$this->getUser()->getCompany()]);
-			 $prev_stock=$stock->getQuantity();
-			 $new_stock=$qty;
-			 if($prev_stock!=$new_stock){
+			 $manager=$this->getDoctrine()->getManager();
+			 //TODO: Comprobar si el usuario esta asignado al almacen
+
+
+			 $product_obj=$repositoryProducts->findOneBy(["id"=>$product, "company"=>$this->getUser()->getCompany(), "deleted"=>0]);
+			 if(!$product_obj) return new JsonResponse(["result"=>-2, "text"=>"Producto no encontrado"]);
+
+			 //TODO: Aceptar variante de producto
+			 $variant=null;
+
+			 $storelocation=$repositoryStoreLocations->findOneBy(["id"=>$location, "company"=>$this->getUser()->getCompany(), "deleted"=>0]);
+			 if(!$storelocation) return new JsonResponse(["result"=>-3, "text"=>"Ubicación no encontrada"]);
+			 $store=$repositoryStores->findOneBy(["id"=>$storelocation->getStore(), "company"=>$this->getUser()->getCompany(), "deleted"=>0]);
+			 if(!$store) return new JsonResponse(["result"=>-4, "text"=>"Almacén no encontrado"]);
+			 $movementType=$repositoryType->findOneBy(["id"=>$type, "active"=>1, "deleted"=>0]);
+			 if(!$movementType) return new JsonResponse(["result"=>-5, "text"=>"Tipo de movimiento no soportado"]);
+			 $stock=$repository->findOneBy(["storelocation"=>$storelocation,"product"=>$product_obj, "company"=>$this->getUser()->getCompany(), "deleted"=>0]);
+
+			 if(!$stock){
+			 	$stock = new ERPStocks();
+			 	$stock->setProduct($product_obj);
+			 	$stock->setCompany($this->getUser()->getCompany());
+			 	$stock->setStorelocation($storelocation);
+			 	$stock->setDateadd(new \DateTime());
+			 	$stock->setActive(1);
+			 	$stock->setDeleted(0);
+			 	$stock->setAuthor($this->getUser());
+				$prev_stock=0;
+			}else{
+				$prev_stock=$stock->getQuantity();
+			}
+			  $stock->setQuantity($qty);
+			  $stock->setLastinventorydate(new \DateTime());
+			  $stock->setDateupd(new \DateTime());
+			  $manager->persist($stock);
+			  $manager->flush();
+
+		 if($prev_stock!=$qty){
 				 $StockHistory= new ERPStockHistory();
 				 $StockHistory->setProduct($product_obj);
 				 $StockHistory->setLocation($storelocation);
 				 $StockHistory->setStore($store);
 				 $StockHistory->setUser($this->getUser());
 				 $StockHistory->setPreviousqty($prev_stock);
-				 $StockHistory->setNewqty($new_stock);
+				 $StockHistory->setNewqty($qty);
 				 $StockHistory->setActive(1);
 				 $StockHistory->setDeleted(0);
 				 $StockHistory->setDateupd(new \DateTime());
 				 $StockHistory->setDateadd(new \DateTime());
-				 $manager=$this->getDoctrine()->getManager();
+				 $StockHistory->setProductvariant($variant);
+				 $StockHistory->setType($movementType);
+				 $StockHistory->setComment(null);
+				 $StockHistory->setNumOperation(null);
+				 $StockHistory->setQuantity(null);
 				 $manager->persist($StockHistory);
 				 $manager->flush();
-				 if($stock){
-				 	$datetime=new \DateTime();
-				 	$stock->setQuantity($new_stock);
-				 	$stock->setLastinventorydate($datetime);
-				 	$manager=$this->getDoctrine()->getManager();
-				 	$manager->persist($stock);
-				 	$manager->flush();
-				//	return new JsonResponse(["result"=>1]);
-				 }
-				// else return new JsonResponse(["result"=>-1]);
 			 }
-			 $total_stock=$repository->findStockByProductStore($product_obj->getId(),$store->getId());
+
+			 /*CALCULAMOS EL STOCK TOTAL DEL ALMACEN EN TODAS LAS UBICACIONES PARA REALIZAR EL AJUSTE EN NAVISION*/
 			 /*Obtenemos el stock que tiene en estos momentos el producto en Navision*/
+
+			 //TODO: En principio dejamos esta parte pendiente de valorar y terminar si procede
+			 /*$total_stock=$repository->findStockByProductStore($product_obj->getId(),$store->getId());
 			 $json=file_get_contents($this->url.'navisionExport/axiom/app/do-NAVISION-getProductStock.php?code='.$product_obj->getCode().'&store='.$store->getCode());
 			 $objects=json_decode($json, true);
 			 $navision_stock=$objects[0]["stock"];
-			 if($total_stock>$navision_stock)
-			 {
+			 if($total_stock>$navision_stock){
 				 $new_navision_stock=$total_stock-$navision_stock;
-			//	 $json=file_get_contents($this->url.'navisionExport/axiom/app/do-NAVISION-setProductStock.php?code='.$product_obj->getCode().'&store='.$store->getCode().'$qty='.$new_navision_stock.'&type=2');
+				 //$json=file_get_contents($this->url.'navisionExport/axiom/app/do-NAVISION-setProductStock.php?code='.$product_obj->getCode().'&store='.$store->getCode().'$qty='.$new_navision_stock.'&type=2');
 			 }
 			 else if($total_stock<$navision_stock){
 				 	$new_navision_stock=$navision_stock-$total_stock;
-			//	 $json=file_get_contents($this->url.'navisionExport/axiom/app/do-NAVISION-setProductStock.php?code='.$product_obj->getCode().'&store='.$store->getCode().'$qty='.$new_navision_stock.'&type=3');
-			 }
+					//$json=file_get_contents($this->url.'navisionExport/axiom/app/do-NAVISION-setProductStock.php?code='.$product_obj->getCode().'&store='.$store->getCode().'$qty='.$new_navision_stock.'&type=3');
+			 }*/
 			return new JsonResponse(["result"=>1]);
 	 }
 
