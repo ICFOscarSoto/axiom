@@ -18,6 +18,7 @@ use App\Modules\ERP\Entity\ERPStoresUsers;
 use App\Modules\ERP\Entity\ERPCategories;
 use App\Modules\ERP\Entity\ERPProducts;
 use App\Modules\ERP\Entity\ERPEAN13;
+use App\Modules\ERP\Entity\ERPStoresManagers;
 use App\Modules\ERP\Entity\ERPTypesMovements;
 use App\Modules\ERP\Entity\ERPProductsVariants;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
@@ -339,6 +340,62 @@ class ERPStocksController extends Controller
 		return new JsonResponse(["history"=>$responseHistory]);
 		}
 
+
+		/**
+		 * @Route("/es/stock/stockHistory/list", name="stockHistorylist")
+		 */
+		public function stockHistory(RouterInterface $router,Request $request){
+			$managerRepository=$this->getDoctrine()->getRepository(ERPStoresManagers::class);
+			$productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
+			$managerId=$managerRepository->find(1);
+			$products=$productRepository->getProductsByManager($managerId->getId());
+
+			$stores_usersRepository=$this->getDoctrine()->getRepository(ERPStoresUsers::class);
+			$stocksRepository= $this->getDoctrine()->getRepository($this->class);
+			$stores_by_user=$stores_usersRepository->getStoreByUser($this->getUser()->getId());
+			$store_locations=array();
+			foreach($stores_by_user as $store){
+								$item=[];
+								$aux["name"]=$store["name"];
+								$aux["total"]=0;
+								$aux["preferential"]=$store["preferential"];
+								$aux["locations"]=$item;
+								$store_locations[]=$aux;
+								$locations_array=[];
+								$item=[];
+								$aux=[];
+			}
+
+			$stockHistory=Array();
+			foreach ($products as $product) {
+				$repositoryHistory=$this->getDoctrine()->getRepository(ERPStockHistory::class);
+				$history=$repositoryHistory->findHistory($product["product_id"]);
+
+				foreach($history as $history_line){
+								 $item['Fecha']=$history_line['dateadd'];
+								 $item['Código']=$history_line['product_code'];
+								 $item['Nombre']=$history_line['product_name'];
+								 $item['Operacion']=$history_line['numOperation'];
+								 $item['Tipo']=$history_line['type'];
+								 $item['Cantidad']=$history_line['quantity'];
+								 $item['Ubicación']=$history_line['location'];
+								 $item['Almacén']=$history_line['store'];
+								 $item['Comentario']=$history_line['comment'];
+								 $item['Stock Previo']=$history_line['prevqty'];
+								 $item['Stock Final']=$history_line['newqty'];
+								 $item['Usuario']=$history_line['user'];
+								 $stockHistory[]=$item;
+				}
+			}
+
+			return $this->render('@ERP/infoStocks.html.twig', array(
+								'storelist'=>$store_locations,
+								'id'=>null,
+								'variantes' => null,
+								'historylist' => $stockHistory
+			));
+		}
+
 		/*AÑADIMOS RUTAS PARA APP EN LAS PDAs*/
 
 		/**
@@ -461,6 +518,7 @@ class ERPStocksController extends Controller
       }
     return new JsonResponse($stock->encodeJson());
     }
+
 
   /**
    * @Route("/api/stock/{id}/list", name="stocklist")
