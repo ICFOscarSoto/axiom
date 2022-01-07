@@ -69,6 +69,7 @@ class NavisionGetProducts extends ContainerAwareCommand
     $output->writeln('==================================');
     switch($entity){
       case 'products': {
+        $this->defuseProducts($input, $output);
         $this->importProduct($input, $output);
         //$this->clearEAN13($input, $output);
         $this->importEAN13($input, $output);
@@ -247,7 +248,7 @@ public function importProduct(InputInterface $input, OutputInterface $output){
       /* }*/
       }
       $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"products"]);
-      
+
       if ($objects["maxtimestamp"]!=null and $objects["maxtimestamp"]!=0 and $objects["maxtimestamp"]>$navisionSync->getMaxtimestamp()){
         $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
         $navisionSync->setLastsync($datetime);

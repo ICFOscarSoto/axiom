@@ -210,7 +210,7 @@ class ERPProductsRepository extends ServiceEntityRepository
     public function getProductsByManager($manager){
       $query="SELECT product_id
               FROM erpstores_managers_products
-              WHERE manager_id=:manager and active=1 and deleted!=0";
+              WHERE manager_id=:manager and active=1 and deleted=0";
       $params=['manager' => $manager];
       return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
     }
