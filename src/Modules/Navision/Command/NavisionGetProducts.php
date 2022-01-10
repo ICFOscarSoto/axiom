@@ -262,7 +262,20 @@ public function importProduct(InputInterface $input, OutputInterface $output){
         }
       }
       // Eliminado de tabla de cambios
-      file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-changeGetProductsDelete.php?deleteProductsChange='.json_encode($deleteProductChange));
+      $postdata = http_build_query(
+          array(
+              'deleteProductsChange' => json_encode($deleteProductChange)
+          )
+      );
+      $opts = array('http' =>
+          array(
+              'method'  => 'POST',
+              'header'  => 'Content-Type: application/x-www-form-urlencoded',
+              'content' => $postdata
+          )
+      );
+      $context = stream_context_create($opts);
+      file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-changeGetProductsDelete.php');
       //------   Critical Section END   ------
       //------   Remove Lock Mutex    ------
       fclose($fp);
@@ -270,6 +283,7 @@ public function importProduct(InputInterface $input, OutputInterface $output){
 
 public function importEAN13(InputInterface $input, OutputInterface $output){
       //------   Create Lock Mutex    ------
+      $fp = null;
       if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
           $fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetProducts-importEAN13.lock', 'c');
       } else {
