@@ -268,12 +268,13 @@ class ERPStoresManagersOperationsController extends Controller
 						$this->getDoctrine()->getManager()->flush();
 						//Discount quantities
 						$stock=$stocksRepository->findOneBy(["product"=>$item->getProduct(), "productvariant"=>$item->getVariant(), "company"=>$this->getUser()->getCompany(), "storelocation"=>$location, "active"=>1, "deleted"=>0]);
-
+						$qty=-(int)$item->getQuantity();
 						$stockHistory=new ERPStockHistory();
 						$stockHistory->setProduct($item->getProduct());
 						$stockHistory->setLocation($location);
 						$stockHistory->setStore($store->getStore());
 						$stockHistory->setUser($this->getUser());
+						$stockHistory->setQuantity($qty);
 						$stockHistory->setPreviousqty($stock->getQuantity());
 						$stockHistory->setNewqty($stock->getQuantity()-$item->getQuantity());
 						$stockHistory->setNumOperation($operation->getId());
