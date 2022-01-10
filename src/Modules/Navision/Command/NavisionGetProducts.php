@@ -275,7 +275,7 @@ public function importProduct(InputInterface $input, OutputInterface $output){
           )
       );
       $context = stream_context_create($opts);
-      file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-changeGetProductsDelete.php');
+      file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-changeGetProductsDelete.php',false,$context);
       //------   Critical Section END   ------
       //------   Remove Lock Mutex    ------
       fclose($fp);
