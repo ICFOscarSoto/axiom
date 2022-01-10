@@ -634,7 +634,7 @@ public function updateProducts(InputInterface $input, OutputInterface $output){
     $this->doctrine->getManager()->clear();
     }
 */
-
+/*
   $repository=$this->doctrine->getRepository(ERPProducts::class);
   $page=5000;
   $totalProducts=round(intval($repository->totalProducts())/$page);
@@ -664,6 +664,23 @@ public function updateProducts(InputInterface $input, OutputInterface $output){
         $this->doctrine->getManager()->clear();
       }
   }
+  */
+  $repository=$this->doctrine->getRepository(ERPProducts::class);
+  $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-clearProducts.php');
+  $objects=json_decode($json, true);
+  $objects=$objects[0];
+  foreach ($objects["class"] as $key=>$object) {
+    $product=$repository->findOneBy(["code"=>$object["No."], "company"=>2]);
+    if ($product!=null){
+      $output->writeln('Desactivando el producto '.$object["No."]);
+      $product->setActive(0);
+      $product->setDateupd(new \Datetime());
+      $this->doctrine->getManager()->merge($product);
+      $this->doctrine->getManager()->flush();
+      $this->doctrine->getManager()->clear();
+    }
+  }
+
 }
 
 public function importStock(InputInterface $input, OutputInterface $output, $code=null){
