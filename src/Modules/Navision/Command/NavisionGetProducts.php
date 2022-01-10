@@ -27,6 +27,7 @@ use App\Modules\ERP\Entity\ERPVariants;
 use App\Modules\ERP\Entity\ERPVariantsValues;
 use App\Modules\ERP\Entity\ERPProductsVariants;
 use App\Modules\ERP\Entity\ERPStockHistory;
+use App\Modules\ERP\Entity\ERPTypesMovements;
 use App\Modules\Globale\Entity\GlobaleCompanies;
 use App\Modules\Globale\Entity\GlobaleUsers;
 use App\Modules\Globale\Entity\GlobaleStates;
@@ -69,7 +70,7 @@ class NavisionGetProducts extends ContainerAwareCommand
     $output->writeln('==================================');
     switch($entity){
       case 'products': {
-        $this->defuseProducts($input, $output);
+        //$this->defuseProducts($input, $output);
         $this->importProduct($input, $output);
         //$this->clearEAN13($input, $output);
         $this->importEAN13($input, $output);
@@ -875,6 +876,8 @@ public function updateStocksStoresManaged(InputInterface $input, OutputInterface
               $storeLocation=$storeLocationsRepository->findOneBy(["name"=>$stock["almacen"]]);
               $store=$storeRepository->findOneBy(["code"=>$stock["almacen"]]);
               $user=$userRepository->findOneBy(["email"=>"josemiguel.pardo@ferreteriacampollano.com"]);
+              $typesRepository=$this->doctrine->getRepository(ERPTypesMovements::class);
+        			$type=$typesRepository->findOneBy(["name"=>"Traspaso recibido"]);
               $stockHistory=new ERPStockHistory();
               $stockHistory->setProduct($product);
               $stockHistory->setLocation($storeLocation);
@@ -884,6 +887,7 @@ public function updateStocksStoresManaged(InputInterface $input, OutputInterface
               $stockHistory->setNewqty($stock_old->getQuantity()+((int)$stock["stock"]));
               $stockHistory->setDateadd(new \Datetime());
               $stockHistory->setDateupd(new \Datetime());
+              $stockHistory->setType($type);
               $stockHistory->setNumOperation($stock["no"]);
               $stockHistory->setQuantity((int)$stock["stock"]);
               $stockHistory->setActive(true);
