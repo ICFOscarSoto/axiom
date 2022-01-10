@@ -201,13 +201,13 @@ public function importProduct(InputInterface $input, OutputInterface $output){
          $json2=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-clearProducts.php?from='.$object["code"]);
          $movs=json_decode($json2, true);
          $movs=$movs[0];
-         /* Dejamos de desactivar productos desde el 2/10
+         // Dejamos de desactivar productos desde el 2/10
 
-         if($movs["class"][0]["movimiento"]!=null)
+         /* if($movs["class"][0]["movimiento"]!=null)
          if($movs["class"][0]["movimiento"]["date"]>"2019-09-09 00:00:00.000000" and $object["Blocked"]==0)
             $obj->setActive(1);
             else $obj->setActive(0);
-         else $obj->setActive(0); */
+         else $obj->setActive(0);*/ 
          $repositoryTaxes=$this->doctrine->getRepository(GlobaleTaxes::class);
          $taxes=$repositoryTaxes->find(1);
          $obj->setTaxes($taxes);
@@ -569,7 +569,7 @@ public function groupPrices(InputInterface $input, OutputInterface $output){
 }
 
 public function updateProducts(InputInterface $input, OutputInterface $output){
-  $repository=$this->doctrine->getRepository(ERPProducts::class);
+/*  $repository=$this->doctrine->getRepository(ERPProducts::class);
   $products=$repository->findBy(['shoppingPrice'=>0]);
   $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
   foreach ($products as $product){
@@ -626,6 +626,38 @@ public function updateProducts(InputInterface $input, OutputInterface $output){
     $this->doctrine->getManager()->flush();
     $this->doctrine->getManager()->clear();
     }
+*/
+
+  $repository=$this->doctrine->getRepository(ERPProducts::class);
+  $page=5000;
+  $totalProducts=round(intval($repository->totalProducts())/$page);
+  $count=0;
+
+  while($count<$totalProducts){
+      $products=$repository->productsLimit(intval($count*$page),intval($page));
+      $count++;
+      foreach($products as $id) {
+        $product=$repository->findOneBy(["id"=>$id, "company"=>2]);
+        $json2=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-clearProducts.php?from='.$product->getCode());
+        $movs=json_decode($json2, true);
+        $movs=$movs[0];
+        // Dejamos de desactivar productos desde el 2/10
+        if($movs["class"][0]["movimiento"]!=null)
+          if($movs["class"][0]["movimiento"]["date"]>"2019-09-09 00:00:00.000000") $product->setActive(1);
+           else {
+            $product->setActive(0);
+            $product->setDateupd(new \Datetime());
+          }
+        else {
+          $product->setActive(0);
+          $product->setDateupd(new \Datetime());
+        }
+        $this->doctrine->getManager()->merge($product);
+        $this->doctrine->getManager()->flush();
+        $this->doctrine->getManager()->clear();
+}
+}
+
 }
 
 public function importStock(InputInterface $input, OutputInterface $output, $code=null){
