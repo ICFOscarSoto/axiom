@@ -233,7 +233,7 @@ class ERPStoresManagersOperationsController extends Controller
 			if($consumer->getManager()->getCompany()!=$this->getUser()->getCompany()) return new JsonResponse(["result"=>-3, "text"=> "Operación no autorizada"]);
 			$location=$storeLocationsRepository->findOneBy(["store"=>$store->getStore(), "company"=>$this->getUser()->getCompany(), "active"=>1,"deleted"=>0]);
 			if(!$location) return new JsonResponse(["result"=>-4, "text"=> "No existen ubicación en el almacén gestor"]);
-			$typesRepository=$this->doctrine->getRepository(ERPTypesMovements::class);
+			$typesRepository=$this->getDoctrine()->getRepository(ERPTypesMovements::class);
 			$type=$typesRepository->findOneBy(["name"=>"Salida gestor"]);
 			$worklistProducts=$worklistRepository->findBy(["user"=>$this->getUser(),"deleted"=>0]);
 			if(count($worklistProducts)){
