@@ -68,8 +68,11 @@ class NavisionGetProducts extends ContainerAwareCommand
     $output->writeln('Comenzando sincronizacion Navision');
     $output->writeln('==================================');
     switch($entity){
+      case 'productsChange':{
+        $this->importProduct($input, $output);
+      }
+      break;
       case 'products': {
-        $this->defuseProducts($input, $output);
         $this->importProduct($input, $output);
         //$this->clearEAN13($input, $output);
         $this->importEAN13($input, $output);
@@ -145,10 +148,11 @@ class NavisionGetProducts extends ContainerAwareCommand
 
 public function importProduct(InputInterface $input, OutputInterface $output){
       //------   Create Lock Mutex    ------
+      $fp = null;
       if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-          $fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetProducts-importProduct.lock', 'c');
+          $fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionChangeGetProducts-importProduct.lock', 'c');
       } else {
-          $fp = fopen('/tmp/axiom-navisionGetProducts-importProduct.lock', 'c');
+          $fp = fopen('/tmp/axiom-navisionChangeGetProducts-importProduct.lock', 'c');
       }
       if (!flock($fp, LOCK_EX | LOCK_NB)) {
         $output->writeln('* Fallo al iniciar la sincronizacion de productos: El proceso ya esta en ejecución.');
@@ -156,105 +160,100 @@ public function importProduct(InputInterface $input, OutputInterface $output){
       }
 
       //------   Critical Section START   ------
-      $navisionSyncRepository=$this->doctrine->getRepository(NavisionSync::class);
-      $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"products"]);
-      if ($navisionSync==null) {
-        $navisionSync=new NavisionSync();
-        $navisionSync->setMaxtimestamp(0);
-      }
-      $datetime=new \DateTime();
       $output->writeln('* Sincronizando productos....');
-      $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getProducts.php?from='.$navisionSync->getMaxtimestamp());
+      $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-changeGetProducts.php');
       $objects=json_decode($json, true);
-      $objects=$objects[0];
-      $output->writeln('conseguimos los productos');
-      $repositoryCategory=$this->doctrine->getRepository(ERPCategories::class);
+      $output->writeln('Conseguimos los productos que han cambiado');
+
+      $repositoryProducts=$this->doctrine->getRepository(ERPProducts::class);
+      $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
+      $repositoryCategories=$this->doctrine->getRepository(ERPCategories::class);
       $repositorySupliers=$this->doctrine->getRepository(ERPSuppliers::class);
-      $repository=$this->doctrine->getRepository(ERPProducts::class);
 
       //Disable SQL logger
       $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
 
-      foreach ($objects["class"] as $key=>$object){
-      /*  if($object["code"]=="1028723")
-        {*/
-        $output->writeln('  - '.$object["code"].' - '.$object["Description"]);
-        //if($object["vat"]==null) continue;
-        $obj=$repository->findOneBy(["code"=>$object["code"]]);
-        $oldobj=$obj;
-        if ($obj==null) {
-          $obj=new ERPProducts();
-          $obj->setCode($object["code"]);
-          $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
-          $company=$repositoryCompanies->find(2);
-          $obj->setCompany($company);
-          $obj->setDateadd(new \Datetime());
-          $obj->setDeleted(0);
-          $obj->setName($object["Description"]);
-          $category=$repositoryCategory->findOneBy(["name"=>"Sin Categoria"]);
-          $obj->setCategory($category);
+      foreach ($objects as $key=>$object){
+        $action   = $object['accion'];
+        $code_old = $object['codigo_antiguo'];
+        $code_new = $object['codigo_nuevo'];
+        $product  = null;
+        if (isset($object['producto']))
+          $product=$object['producto'];
+        $oproduct = new ERPProducts();
+        if ($product!=null && isset($product["code"]) && $product["code"]!=null){
+          $output->writeln('  - '.$action.' - '.$code_old.' - '.$code_new.' - '.$product["Description"]);
+          // Borrado de producto
+          if ($action=='D') {
+              $oproduct=$repositoryProducts->findOneBy(["code"=>$code_old]);
+              if ($oproduct!=NULL){
+                $this->doctrine->getManager()->remove($oproduct);
+                $this->doctrine->getManager()->flush();
+                $this->doctrine->getManager()->clear();
+              }
+          }else{
+            // Inserta nuevo producto
+            if ($action=='I') {
+              // Por si existiera
+              $oproduct=$repositoryProducts->findOneBy(["code"=>$code_new]);
+            }else
+            if ($action=='U') {
+              // Si no existe se hace lo mismo que el insert
+              $oproduct=$repositoryProducts->findOneBy(["code"=>$code_old]);
+            }
+            if ($oproduct==null){
+              $oproduct = new ERPProducts();
+              $company=$repositoryCompanies->find(2);
+              $oproduct->setCompany($company);
+              $oproduct->setDateadd(new \Datetime());
+              $oproduct->setDeleted(0);
+              $oproduct->setName($product["Description"]);
+              $category=$repositoryCategories->findOneBy(["name"=>"Sin Categoria"]);
+              $oproduct->setCategory($category);
+            }
+            $oproduct->setCode($product["code"]);
+            $supplier=$repositorySupliers->findOneBy(["code"=>$product["Supplier"]]);
+            if (strlen($product["Description"])>4) $oproduct->setName($product["Description"]);
+            $repositoryTaxes=$this->doctrine->getRepository(GlobaleTaxes::class);
+            $taxes=$repositoryTaxes->find(1);
+            $oproduct->setTaxes($taxes);
+            $oproduct->setCheckweb($product["ProductoWEB"]);
+            $oproduct->setWeight($product["Weight"]);
+            $packing=1;
+            if ($product["Unidad medida precio"]=='C') $packing=100;
+            else if ($product["Unidad medida precio"]=='M') $packing=1000;
+            $oproduct->setPurchasepacking($packing);
+            // Comprobamos si el producto tiene descuentos, si no los tiene se le pone como precio neto.
+            $json3=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getPrices.php?from='.$code_new.'&supplier='.$product["Supplier"]);
+            $prices=json_decode($json3, true);
+            $prices=$prices[0];
+            $oproduct->setnetprice(1);
+            foreach ($prices["class"] as $price){
+              if($price["Discount"]!=0){
+                if ($price["Ending"]["date"]=="1753-01-01 00:00:00.000000") {
+                   $oproduct->setnetprice(0);
+                }
+              }
+            }
+            if (!$oproduct->getnetprice()){
+              $oproduct->setPVPR($product["ShoppingPrice"]/$oproduct->getPurchasepacking());
+              $oproduct->setShoppingPrice($oproduct->getPVPR()*(1-$oproduct->getShoppingDiscount($this->doctrine)/100));
+            } else {
+               $oproduct->setPVPR(0);
+               $oproduct->setShoppingPrice($product["ShoppingPrice"]/$oproduct->getPurchasepacking());
+            }
+            $oproduct->setSupplier($supplier);
+            $oproduct->setDateupd(new \Datetime());
+            $repositoryManufacturers=$this->doctrine->getRepository(ERPManufacturers::class);
+            $manufacturer=$repositoryManufacturers->findOneBy(["code"=>$product["Manufacturer"]]);
+            if($manufacturer!=NULL) $oproduct->setManufacturer($manufacturer);
+            $this->doctrine->getManager()->merge($oproduct);
+            $this->doctrine->getManager()->flush();
+            $oproduct->priceCalculated($this->doctrine);
+            $this->doctrine->getManager()->clear();
+          }
         }
-         $supplier=$repositorySupliers->findOneBy(["code"=>$object["Supplier"]]);
-         if (strlen($object["Description"])>4) $obj->setName($object["Description"]);
-         // Comprobamos si el producto no tiene movimientos desde 2017, en caso de que no tenga lo desactivamos
-         $json2=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-clearProducts.php?from='.$object["code"]);
-         $movs=json_decode($json2, true);
-         $movs=$movs[0];
-         /* Dejamos de desactivar productos desde el 2/10
-
-         if($movs["class"][0]["movimiento"]!=null)
-         if($movs["class"][0]["movimiento"]["date"]>"2019-09-09 00:00:00.000000" and $object["Blocked"]==0)
-            $obj->setActive(1);
-            else $obj->setActive(0);
-         else $obj->setActive(0); */
-         $repositoryTaxes=$this->doctrine->getRepository(GlobaleTaxes::class);
-         $taxes=$repositoryTaxes->find(1);
-         $obj->setTaxes($taxes);
-         $obj->setCode($object["code"]);
-         $obj->setCheckweb($object["ProductoWEB"]);
-         $obj->setWeight($object["Weight"]);
-         $packing=1;
-         if ($object["Unidad medida precio"]=='C') $packing=100;
-         else if ($object["Unidad medida precio"]=='M') $packing=1000;
-         $obj->setPurchasepacking($packing);
-         // Comprobamos si el producto tiene descuentos, si no los tiene se le pone como precio neto.
-         $json3=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getPrices.php?from='.$object["code"].'&supplier='.$object["Supplier"]);
-         $prices=json_decode($json3, true);
-         $prices=$prices[0];
-         $obj->setnetprice(1);
-         foreach ($prices["class"] as $price){
-           if($price["Discount"]!=0){
-             if ($price["Ending"]["date"]=="1753-01-01 00:00:00.000000") {
-               $obj->setnetprice(0);
-             }
-           }
-         }
-         if (!$obj->getnetprice()){
-           $obj->setPVPR($object["ShoppingPrice"]/$obj->getPurchasepacking());
-           $obj->setShoppingPrice($obj->getPVPR()*(1-$obj->getShoppingDiscount($this->doctrine)/100));
-         } else {
-           $obj->setPVPR(0);
-           $obj->setShoppingPrice($object["ShoppingPrice"]/$obj->getPurchasepacking());
-         }
-         $obj->setSupplier($supplier);
-         $obj->setDateupd(new \Datetime());
-         $repositoryManufacturers=$this->doctrine->getRepository(ERPManufacturers::class);
-         $manufacturer=$repositoryManufacturers->findOneBy(["code"=>$object["Manufacturer"]]);
-         if($manufacturer!=NULL) $obj->setManufacturer($manufacturer);
-         $this->doctrine->getManager()->merge($obj);
-         $this->doctrine->getManager()->flush();
-         $obj->priceCalculated($this->doctrine);
-         $this->doctrine->getManager()->clear();
-      /* }*/
       }
-      $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"products"]);
-
-      if ($objects["maxtimestamp"]!=null and $objects["maxtimestamp"]!=0 and $objects["maxtimestamp"]>$navisionSync->getMaxtimestamp()){
-        $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
-        $navisionSync->setLastsync($datetime);
-        $this->doctrine->getManager()->persist($navisionSync);
-      }
-      $this->doctrine->getManager()->flush();
       //------   Critical Section END   ------
       //------   Remove Lock Mutex    ------
       fclose($fp);
