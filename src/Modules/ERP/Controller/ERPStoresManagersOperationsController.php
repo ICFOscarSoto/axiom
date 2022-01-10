@@ -36,6 +36,7 @@ use App\Modules\ERP\Entity\ERPConfiguration;
 use App\Modules\ERP\Entity\ERPCustomerGroups;
 use App\Modules\ERP\Entity\ERPPaymentMethods;
 use App\Modules\ERP\Entity\ERPSeries;
+use App\Modules\ERP\Entity\ERPTypesMovements;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
@@ -232,7 +233,8 @@ class ERPStoresManagersOperationsController extends Controller
 			if($consumer->getManager()->getCompany()!=$this->getUser()->getCompany()) return new JsonResponse(["result"=>-3, "text"=> "Operación no autorizada"]);
 			$location=$storeLocationsRepository->findOneBy(["store"=>$store->getStore(), "company"=>$this->getUser()->getCompany(), "active"=>1,"deleted"=>0]);
 			if(!$location) return new JsonResponse(["result"=>-4, "text"=> "No existen ubicación en el almacén gestor"]);
-
+			$typesRepository=$this->doctrine->getRepository(ERPTypesMovements::class);
+			$type=$typesRepository->findOneBy(["name"=>"Salida gestor"]);
 			$worklistProducts=$worklistRepository->findBy(["user"=>$this->getUser(),"deleted"=>0]);
 			if(count($worklistProducts)){
 					$operation=new ERPStoresManagersOperations();
@@ -266,6 +268,23 @@ class ERPStoresManagersOperationsController extends Controller
 						$this->getDoctrine()->getManager()->flush();
 						//Discount quantities
 						$stock=$stocksRepository->findOneBy(["product"=>$item->getProduct(), "productvariant"=>$item->getVariant(), "company"=>$this->getUser()->getCompany(), "storelocation"=>$location, "active"=>1, "deleted"=>0]);
+
+						$stockHistory=new ERPStockHistory();
+						$stockHistory->setProduct($item->getProduct());
+						$stockHistory->setLocation($location);
+						$stockHistory->setStore($store->getStore());
+						$stockHistory->setUser($this->getUser());
+						$stockHistory->setPreviousqty($stock->getQuantity());
+						$stockHistory->setNewqty($stock->getQuantity()-$item->getQuantity());
+						$stockHistory->setNumOperation($operation->getId());
+						$stockHistory->setType($type);
+						$stockHistory->setDateadd(new \Datetime());
+						$stockHistory->setDateupd(new \Datetime());
+						$stockHistory->setActive(true);
+						$stockHistory->setDeleted(false);
+						$this->getDoctrine()->getManager()->persist($stockHistory);
+						$this->getDoctrine()->getManager()->flush();
+
 						if($stock!=null){
 							$stock->setQuantity($stock->getQuantity()-($item->getQuantity()));
 
@@ -291,19 +310,22 @@ class ERPStoresManagersOperationsController extends Controller
 								$this->getDoctrine()->getManager()->persist($stock);
 								$this->getDoctrine()->getManager()->flush();
 						}
+
+
+
 						//Inform low Stock
-						$infostock=$infostocksRepository->findOneBy(["product"=>$item->getProduct(), "store"=>$store->getStore(), "productvariant"=>$item->getVariant(),"active"=>1, "deleted"=>0]);
+					/*	$infostock=$infostocksRepository->findOneBy(["product"=>$item->getProduct(), "store"=>$store->getStore(), "productvariant"=>$item->getVariant(),"active"=>1, "deleted"=>0]);
 						if($infostock){
 							if($infostock->getMinimumQuantity()>=$stock->getQuantity()){
 								//Inform to discotd channel
 								$manager=$consumer->getManager();
-							/*	if($manager->getDiscordchannel()!=null){
+								if($manager->getDiscordchannel()!=null){
 									$channel=$manager->getDiscordchannel();
 									$msg="Ref: **".$item->getProduct()->getCode()."** - ".$item->getProduct()->getName()." realizar traspaso a **".$store->getStore()->getName()."** - Cantidad: **".($infostock->getMaximunQuantity()-$stock->getQuantity()." unidades.**");
 									file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
-								} */
+								}
 							}
-						}
+						} */
 					}
 
 					//Clear worklist
