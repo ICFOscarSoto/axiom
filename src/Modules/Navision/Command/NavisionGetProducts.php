@@ -1650,8 +1650,8 @@ public function importReferences(InputInterface $input, OutputInterface $output)
               $oreferences->setType(1);
             } else if ($references["Cross-Reference Type"]==1){
               $customer=$repositoryCustomers->findOneBy(["code"=>$references["Cross-Reference Type No."]]);
-              $obj->setCustomer($customer);
-              $obj->setType(2);
+              $oreferences->setCustomer($customer);
+              $oreferences->setType(2);
             }
             $this->doctrine->getManager()->merge($oreferences);
             $this->doctrine->getManager()->flush();
