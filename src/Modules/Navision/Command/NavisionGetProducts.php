@@ -163,7 +163,6 @@ public function importProduct(InputInterface $input, OutputInterface $output){
       $output->writeln('* Sincronizando productos....');
       $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-changeGetProducts.php');
       $objects=json_decode($json, true);
-      $output->writeln('Conseguimos los productos que han cambiado');
 
       $repositoryProducts=$this->doctrine->getRepository(ERPProducts::class);
       $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
@@ -181,18 +180,23 @@ public function importProduct(InputInterface $input, OutputInterface $output){
         $product  = null;
         if (isset($object['producto']))
           $product=$object['producto'];
-        $oproduct = new ERPProducts();
-        if ($product!=null && isset($product["code"]) && $product["code"]!=null){
-          $output->writeln('  - '.$action.' - '.$code_old.' - '.$code_new.' - '.$product["Description"]);
-          // Borrado de producto
-          if ($action=='D') {
-              $oproduct=$repositoryProducts->findOneBy(["code"=>$code_old]);
-              if ($oproduct!=NULL){
+        $oproduct = null;
+        // Borrado de producto
+        if ($action=='D') {
+            $oproduct=$repositoryProducts->findOneBy(["code"=>$code_old]);
+            if ($oproduct!=NULL){
+                $output->writeln($action.' - '.$code_old);
                 $this->doctrine->getManager()->remove($oproduct);
                 $this->doctrine->getManager()->flush();
                 $this->doctrine->getManager()->clear();
-              }
-          }else{
+                // Sumar producto al json para eliminar en tabla de cambios
+                if (isset($object['producto']))
+                  unset($object['producto']);
+                $deleteProductChange[] = $object;
+            }
+        }else{
+        if ($product!=null && isset($product["code"]) && $product["code"]!=null){
+            $output->writeln($action.' - '.$code_old.' - '.$code_new.' - '.$product["Description"]);
             // Inserta nuevo producto
             if ($action=='I') {
               // Por si existiera
@@ -262,6 +266,7 @@ public function importProduct(InputInterface $input, OutputInterface $output){
         }
       }
       // Eliminado de tabla de cambios
+      $output->writeln('Eliminar cambios realizados....');
       $postdata = http_build_query(
           array(
               'deleteProductsChange' => json_encode($deleteProductChange)
@@ -296,74 +301,100 @@ public function importEAN13(InputInterface $input, OutputInterface $output){
       }
 
       //------   Critical Section START   ------
-      $navisionSyncRepository=$this->doctrine->getRepository(NavisionSync::class);
-      $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"EAN13"]);
-      if ($navisionSync==null) {
-        $navisionSync=new NavisionSync();
-        $navisionSync->setMaxtimestamp(0);
-      }
-      $datetime=new \DateTime();
       $output->writeln('* Sincronizando EAN13....');
-      $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getEAN13.php?from='.$navisionSync->getMaxtimestamp());
+      $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-changeGetEAN13.php');
       $objects=json_decode($json, true);
-      $objects=$objects[0];
 
       $repositoryCustomers=$this->doctrine->getRepository(ERPCustomers::class);
       $repositorySupliers=$this->doctrine->getRepository(ERPSuppliers::class);
       $repositoryProducts=$this->doctrine->getRepository(ERPProducts::class);
-      $repository=$this->doctrine->getRepository(ERPEAN13::class);
+      $repositoryEAN13=$this->doctrine->getRepository(ERPEAN13::class);
+
       //Disable SQL logger
       $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
-      $log=fopen("logEAN13.txt", "w");
-      foreach ($objects["class"] as $key=>$object){
-        $nameEAN13=preg_replace('/\D/','',$object["Cross-Reference No."]);
-        $obj=$repository->findOneBy(["name"=>$nameEAN13]);
-        if ($obj==null and $object["idaxiom"]==null) {
-          $output->writeln('  - '.$object["Item No."].' - '.$nameEAN13);
-          $obj=new ERPEAN13();
-          $obj->setName($nameEAN13);
-          $obj->setDateadd(new \Datetime());
-          $obj->setDateupd(new \Datetime());
-          $obj->setDeleted(0);
-          $obj->setActive(1);
-          $customer=$repositoryCustomers->findOneBy(["code"=>$object["Cross-Reference Type No."]]);
-          if ($customer==null){
-            $supplier=$repositorySupliers->findOneBy(["code"=>$object["Cross-Reference Type No."]]);
-            $obj->setSupplier($supplier);
-            $obj->setType(1);
-          } else {$obj->setCustomer($customer);
-            $obj->setType(2);
-          }
-          $product=$repositoryProducts->findOneBy(["code"=>$object["Item No."]]);
-          if ($product!=null) {
-            $obj->setProduct($product);
-            $this->doctrine->getManager()->merge($obj);
-            $this->doctrine->getManager()->flush();
-          }
 
-        } else {
-          $txt;
-          if ($obj==null) {
-            $txt="Este EAN13 no es válido ".$object["Cross-Reference No."] . "\n";
-          } else {
-            $txt="Este EAN13 está duplicado ".$object["Cross-Reference No."] . "\n";
+      $deleteEAN13Change = [];
+      foreach ($objects as $key=>$object){
+        $action   = $object['accion'];
+        $code_old = preg_replace('/\D/','',$object['codigo_antiguo']);
+        $code_new = preg_replace('/\D/','',$object['codigo_nuevo']);
+        $ean13  = null;
+        if (isset($object['ean13']))
+          $ean13=$object['ean13'];
+        $oean13 = null;
+        // Borrado de EAN13
+        if ($action=='D') {
+            $oean13=$repositoryEAN13->findOneBy(["name"=>$code_old]);
+            if ($oean13!=NULL){
+              $output->writeln($action.' - '.$code_old);
+              $this->doctrine->getManager()->remove($oean13);
+              $this->doctrine->getManager()->flush();
+              $this->doctrine->getManager()->clear();
+            }
+        }else
+        if ($ean13!=null && isset($ean13["Cross-Reference No."]) && $ean13["Cross-Reference No."]!=null){
+           $nameEAN13=preg_replace('/\D/','',$ean13["Cross-Reference No."]);
+           $output->writeln($action.' - '.$code_old.' - '.$code_new.' - '.$ean13["Item No."].' - '.$nameEAN13);
+           // Inserta nuevo EAN13
+           if ($action=='I') {
+             // Por si existiera
+             $oean13=$repositoryEAN13->findOneBy(["name"=>$code_new]);
+           }else
+           if ($action=='U') {
+             // Si no existe se hace lo mismo que el insert
+             $oean13=$repositoryEAN13->findOneBy(["name"=>$code_old]);
+           }
+           if ($oean13==null and $ean13["idaxiom"]==null){
+              $oean13=new ERPEAN13();
+              $oean13->setName($nameEAN13);
+              $oean13->setDateadd(new \Datetime());
+              $oean13->setDateupd(new \Datetime());
+              $oean13->setDeleted(0);
+              $oean13->setActive(1);
+              $customer=$repositoryCustomers->findOneBy(["code"=>$ean13["Cross-Reference Type No."]]);
+              if ($customer==null){
+                $supplier=$repositorySupliers->findOneBy(["code"=>$ean13["Cross-Reference Type No."]]);
+                $oean13->setSupplier($supplier);
+                $oean13->setType(1);
+              } else {$obj->setCustomer($customer);
+                $oean13->setType(2);
+              }
+              $product=$repositoryProducts->findOneBy(["code"=>$ean13["Item No."]]);
+              if ($product!=null) {
+                $oean13->setProduct($product);
+                $this->doctrine->getManager()->merge($oean13);
+                $this->doctrine->getManager()->flush();
+                $this->doctrine->getManager()->clear();
+              }
+          }else{
+              if ($ean13==null) {
+                $output->writeln("Este EAN13 no es válido ".$ean13["Cross-Reference No."]);
+              } else {
+                $output->writeln("Este EAN13 está duplicado ".$ean13["Cross-Reference No."]);
+              }
           }
-          fwrite($log, $txt);
         }
-
-        $this->doctrine->getManager()->clear();
-
+        // Sumar EAN13 al json para eliminar en tabla de cambios
+        if (isset($object['ean13']))
+          unset($object['ean13']);
+        $deleteEAN13Change[] = $object;
       }
-      fclose($log);
-      $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"EAN13"]);
-      if ($navisionSync==null) {
-        $navisionSync=new NavisionSync();
-        $navisionSync->setEntity("EAN13");
-      }
-      $navisionSync->setLastsync($datetime);
-      if ($objects["maxtimestamp"]!=0) $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
-      $this->doctrine->getManager()->persist($navisionSync);
-      $this->doctrine->getManager()->flush();
+      // Eliminado de tabla de cambios
+      $output->writeln('Eliminar cambios realizados....');
+      $postdata = http_build_query(
+          array(
+              'deleteEAN13Change' => json_encode($deleteEAN13Change)
+          )
+      );
+      $opts = array('http' =>
+          array(
+              'method'  => 'POST',
+              'header'  => 'Content-Type: application/x-www-form-urlencoded',
+              'content' => $postdata
+          )
+      );
+      $context = stream_context_create($opts);
+      file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-changeGetEAN13Delete.php',false,$context);
       //------   Critical Section END   ------
       //------   Remove Lock Mutex    ------
       fclose($fp);
@@ -1561,74 +1592,104 @@ public function importReferences(InputInterface $input, OutputInterface $output)
   }
 
   //------   Critical Section START   ------
-  $navisionSyncRepository=$this->doctrine->getRepository(NavisionSync::class);
-  $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"References"]);
-  if ($navisionSync==null) {
-    $navisionSync=new NavisionSync();
-    $navisionSync->setMaxtimestamp(0);
-  }
-  $datetime=new \DateTime();
   $output->writeln('* Sincronizando References....');
-  $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getReferences.php?from='.$navisionSync->getMaxtimestamp());
+  $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-changeGetReferences.php');
   $objects=json_decode($json, true);
-  $objects=$objects[0];
 
   $repositoryCustomers=$this->doctrine->getRepository(ERPCustomers::class);
   $repositorySupliers=$this->doctrine->getRepository(ERPSuppliers::class);
   $repositoryProducts=$this->doctrine->getRepository(ERPProducts::class);
-  $repository=$this->doctrine->getRepository(ERPReferences::class);
+  $repositoryReferences=$this->doctrine->getRepository(ERPReferences::class);
+
   //Disable SQL logger
   $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
-  foreach ($objects["class"] as $key=>$object){
-    //$reference=preg_replace('/\D/','',$object["Cross-Reference No."]);
-    $product=$repositoryProducts->findOneBy(["code"=>$object["Item No."]]);
-    if ($product!=null) {
-    $obj=$repository->findOneBy(["name"=>$object["Cross-Reference No."], "product"=>$product->getId()]);
-    if ($obj==null){
-      $output->writeln('  -Añadiendo al producto '.$object["Item No."].' la referencia '.$object["Cross-Reference No."]);
-      $obj=new ERPReferences();
-      $obj->setName($object["Cross-Reference No."]);
-      $obj->setDescription($object["Description"]);
-      $obj->setDateadd(new \Datetime());
-      $obj->setDateupd(new \Datetime());
-        $obj->setProduct($product);
-      $obj->setDeleted(0);
-      $obj->setActive(1);
-      if ($object["Cross-Reference Type"]==2){
-        $supplier=$repositorySupliers->findOneBy(["code"=>$object["Cross-Reference Type No."]]);
-        $obj->setSupplier($supplier);
-        $obj->setType(1);
-      } else if ($object["Cross-Reference Type"]==1){
-        $customer=$repositoryCustomers->findOneBy(["code"=>$object["Cross-Reference Type No."]]);
-        $obj->setCustomer($customer);
-        $obj->setType(2);
+
+  $deleteReferencesChange = [];
+  foreach ($objects as $key=>$object){
+     $action   = $object['accion'];
+     $code_old = $object['codigo_antiguo'];
+     $code_new = $object['codigo_nuevo'];
+     $references  = null;
+     if (isset($object['references']))
+       $references=$object['references'];
+     $oreferences = null;
+     // Borrado de Reference
+     if ($action=='D') {
+         $oreferences=$repositoryReferences->findOneBy(["name"=>$code_old]);
+         if ($oreferences!=NULL){
+           $output->writeln($action.' - '.$code_old);
+           $this->doctrine->getManager()->remove($oreferences);
+           $this->doctrine->getManager()->flush();
+           $this->doctrine->getManager()->clear();
+         }
+     }else{
+        $product=$repositoryProducts->findOneBy(["code"=>$references["Item No."]]);
+        if ($product!=null) {
+          // Inserta nueva Reference
+          if ($action=='I') {
+            // Por si existiera
+            $oreferences=$repositoryReferences->findOneBy(["name"=>$code_new, "product"=>$product->getId()]);
+          }else
+          if ($action=='U') {
+            // Si no existe se hace lo mismo que el insert
+            $oreferences=$repositoryReferences->findOneBy(["name"=>$code_new, "product"=>$product->getId()]);
+          }
+          if ($oreferences==null){
+            $output->writeln('  - Añadiendo al producto '.$references["Item No."].' la referencia '.$references["Cross-Reference No."]);
+            $oreferences=new ERPReferences();
+            $oreferences->setName($references["Cross-Reference No."]);
+            $oreferences->setDescription($references["Description"]);
+            $oreferences->setDateadd(new \Datetime());
+            $oreferences->setDateupd(new \Datetime());
+            $oreferences->setProduct($product);
+            $oreferences->setDeleted(0);
+            $oreferences->setActive(1);
+            if ($references["Cross-Reference Type"]==2){
+              $supplier=$repositorySupliers->findOneBy(["code"=>$references["Cross-Reference Type No."]]);
+              $oreferences->setSupplier($supplier);
+              $oreferences->setType(1);
+            } else if ($references["Cross-Reference Type"]==1){
+              $customer=$repositoryCustomers->findOneBy(["code"=>$references["Cross-Reference Type No."]]);
+              $obj->setCustomer($customer);
+              $obj->setType(2);
+            }
+            $this->doctrine->getManager()->merge($oreferences);
+            $this->doctrine->getManager()->flush();
+            $this->doctrine->getManager()->clear();
+          }else {
+            $output->writeln('  - Modificando la referencia '.$references["Cross-Reference No."].' del producto '.$references["Item No."]);
+            $oreferences->setDescription($references["Description"]);
+            $this->doctrine->getManager()->merge($oreferences);
+            $this->doctrine->getManager()->flush();
+            $this->doctrine->getManager()->clear();
+          }
+        }
       }
-      $this->doctrine->getManager()->merge($obj);
-      $this->doctrine->getManager()->flush();
-      $this->doctrine->getManager()->clear();
+      // Sumar Reference al json para eliminar en tabla de cambios
+      if (isset($object['references']))
+        unset($object['references']);
+      $deleteReferencesChange[] = $object;
     }
-    else {
-      $output->writeln('  -Modificando la referencia '.$object["Cross-Reference No."].' del producto '.$object["Item No."]);
-      $obj->setDescription($object["Description"]);
-      $this->doctrine->getManager()->merge($obj);
-      $this->doctrine->getManager()->flush();
-      $this->doctrine->getManager()->clear();
-    }
+    // Eliminado de tabla de cambios
+    $output->writeln('Eliminar cambios realizados....');
+    $postdata = http_build_query(
+        array(
+            'deleteReferencesChange' => json_encode($deleteReferencesChange)
+        )
+    );
+    $opts = array('http' =>
+        array(
+            'method'  => 'POST',
+            'header'  => 'Content-Type: application/x-www-form-urlencoded',
+            'content' => $postdata
+        )
+    );
+    $context = stream_context_create($opts);
+    file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-changeGetReferencesDelete.php',false,$context);
+    //------   Critical Section END   ------
+    //------   Remove Lock Mutex    ------
+    fclose($fp);
   }
-  }
-  $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"References"]);
-  if ($navisionSync==null) {
-    $navisionSync=new NavisionSync();
-    $navisionSync->setEntity("References");
-  }
-  $navisionSync->setLastsync($datetime);
-  $navisionSync->setMaxtimestamp($objects["maxtimestamp"]);
-  $this->doctrine->getManager()->persist($navisionSync);
-  $this->doctrine->getManager()->flush();
-  //------   Critical Section END   ------
-  //------   Remove Lock Mutex    ------
-  fclose($fp);
-}
 
 public function clearReferences(InputInterface $input, OutputInterface $output){
   if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
