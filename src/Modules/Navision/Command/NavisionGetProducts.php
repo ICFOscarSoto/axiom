@@ -1632,7 +1632,7 @@ public function importReferences(InputInterface $input, OutputInterface $output)
           }else
           if ($action=='U') {
             // Si no existe se hace lo mismo que el insert
-            $oreferences=$repositoryReferences->findOneBy(["name"=>$code_new, "product"=>$product->getId()]);
+            $oreferences=$repositoryReferences->findOneBy(["name"=>$code_old, "product"=>$product->getId()]);
           }
           if ($oreferences==null){
             $output->writeln('  - Añadiendo al producto '.$references["Item No."].' la referencia '.$references["Cross-Reference No."]);
