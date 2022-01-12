@@ -1643,11 +1643,11 @@ public function importReferences(InputInterface $input, OutputInterface $output)
               // Inserta nueva Reference
               if ($action=='I') {
                 // Por si existiera
-                $oreferences=$repositoryReferences->findOneBy(["name"=>$code_new, "product"=>$product, "suplier"=>$suplier, "type"=>2]);
+                $oreferences=$repositoryReferences->findOneBy(["name"=>$code_new, "product"=>$product, "suplier"=>$suplier, "type"=>1]);
               }else
               if ($action=='U') {
                 // Si no existe se hace lo mismo que el insert
-                $oreferences=$repositoryReferences->findOneBy(["name"=>$code_old, "product"=>$product, "suplier"=>$suplier, "type"=>2]);
+                $oreferences=$repositoryReferences->findOneBy(["name"=>$code_old, "product"=>$product, "suplier"=>$suplier, "type"=>1]);
               }
             }else
               $validation = false;
@@ -1658,44 +1658,45 @@ public function importReferences(InputInterface $input, OutputInterface $output)
               // Inserta nueva Reference
               if ($action=='I') {
                 // Por si existiera
-                $oreferences=$repositoryReferences->findOneBy(["name"=>$code_new, "product"=>$product, "customer"=>$customer, "type"=>1]);
+                $oreferences=$repositoryReferences->findOneBy(["name"=>$code_new, "product"=>$product, "customer"=>$customer, "type"=>2]);
               }else
               if ($action=='U') {
                 // Si no existe se hace lo mismo que el insert
-                $oreferences=$repositoryReferences->findOneBy(["name"=>$code_old, "product"=>$product, "customer"=>$customer, "type"=>1]);
+                $oreferences=$repositoryReferences->findOneBy(["name"=>$code_old, "product"=>$product, "customer"=>$customer, "type"=>2]);
               }
             }else
               $validation = false;
           }
 
-          if ($oreferences==null){
-            $output->writeln('  - Añadiendo al producto '.$references["Item No."].' la referencia '.$references["Cross-Reference No."]);
-            $oreferences=new ERPReferences();
-            $oreferences->setName($references["Cross-Reference No."]);
-            $oreferences->setDescription($references["Description"]);
-            $oreferences->setDateadd(new \Datetime());
-            $oreferences->setDateupd(new \Datetime());
-            $oreferences->setProduct($product);
-            $oreferences->setDeleted(0);
-            $oreferences->setActive(1);
-            if ($type==2){
-              $oreferences->setSupplier($supplier);
-              $oreferences->setType(1);
-            } else if ($type==1){
-              $oreferences->setCustomer($customer);
-              $oreferences->setType(2);
+          if ($validation)
+            if ($oreferences==null){
+              $output->writeln('  - Añadiendo al producto '.$references["Item No."].' la referencia '.$references["Cross-Reference No."]);
+              $oreferences=new ERPReferences();
+              $oreferences->setName($references["Cross-Reference No."]);
+              $oreferences->setDescription($references["Description"]);
+              $oreferences->setDateadd(new \Datetime());
+              $oreferences->setDateupd(new \Datetime());
+              $oreferences->setProduct($product);
+              $oreferences->setDeleted(0);
+              $oreferences->setActive(1);
+              if ($type==2){
+                $oreferences->setSupplier($supplier);
+                $oreferences->setType(1);
+              } else if ($type==1){
+                $oreferences->setCustomer($customer);
+                $oreferences->setType(2);
+              }
+              $this->doctrine->getManager()->merge($oreferences);
+              $this->doctrine->getManager()->flush();
+              $this->doctrine->getManager()->clear();
+            }else {
+              $output->writeln('  - Modificando la referencia '.$references["Cross-Reference No."].' del producto '.$references["Item No."]);
+              $oreferences->setDescription($references["Description"]);
+              $this->doctrine->getManager()->merge($oreferences);
+              $this->doctrine->getManager()->flush();
+              $this->doctrine->getManager()->clear();
             }
-            $this->doctrine->getManager()->merge($oreferences);
-            $this->doctrine->getManager()->flush();
-            $this->doctrine->getManager()->clear();
-          }else {
-            $output->writeln('  - Modificando la referencia '.$references["Cross-Reference No."].' del producto '.$references["Item No."]);
-            $oreferences->setDescription($references["Description"]);
-            $this->doctrine->getManager()->merge($oreferences);
-            $this->doctrine->getManager()->flush();
-            $this->doctrine->getManager()->clear();
           }
-        }
       }
       // Sumar Reference al json para eliminar en tabla de cambios
       if ($validation){
