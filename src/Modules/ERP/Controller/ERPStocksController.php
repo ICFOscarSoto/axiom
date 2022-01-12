@@ -325,7 +325,7 @@ class ERPStocksController extends Controller
 		public function getStockHistory($id){
 		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		 $repositoryHistory=$this->getDoctrine()->getRepository(ERPStockHistory::class);
-		 $history=$repositoryHistory->findHistory($id);
+		 $history=$repositoryHistory->findAllHistory($id);
 		 $responseHistory=Array();
 		 foreach($history as $history_line){
 			 $item['product_code']=$history_line['product_code'];
