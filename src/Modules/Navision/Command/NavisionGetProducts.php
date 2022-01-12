@@ -167,7 +167,7 @@ public function importProduct(InputInterface $input, OutputInterface $output){
       $repositoryProducts=$this->doctrine->getRepository(ERPProducts::class);
       $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
       $repositoryCategories=$this->doctrine->getRepository(ERPCategories::class);
-      $repositorySupliers=$this->doctrine->getRepository(ERPSuppliers::class);
+      $repositorySuppliers=$this->doctrine->getRepository(ERPSuppliers::class);
 
       //Disable SQL logger
       $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
@@ -217,7 +217,7 @@ public function importProduct(InputInterface $input, OutputInterface $output){
               $oproduct->setCategory($category);
             }
             $oproduct->setCode($product["code"]);
-            $supplier=$repositorySupliers->findOneBy(["code"=>$product["Supplier"]]);
+            $supplier=$repositorySuppliers->findOneBy(["code"=>$product["Supplier"]]);
             if ($supplier!=null){
               if (strlen($product["Description"])>4) $oproduct->setName($product["Description"]);
               $repositoryTaxes=$this->doctrine->getRepository(GlobaleTaxes::class);
@@ -306,7 +306,7 @@ public function importEAN13(InputInterface $input, OutputInterface $output){
       $objects=json_decode($json, true);
 
       $repositoryCustomers=$this->doctrine->getRepository(ERPCustomers::class);
-      $repositorySupliers=$this->doctrine->getRepository(ERPSuppliers::class);
+      $repositorySuppliers=$this->doctrine->getRepository(ERPSuppliers::class);
       $repositoryProducts=$this->doctrine->getRepository(ERPProducts::class);
       $repositoryEAN13=$this->doctrine->getRepository(ERPEAN13::class);
 
@@ -354,7 +354,7 @@ public function importEAN13(InputInterface $input, OutputInterface $output){
               $oean13->setActive(1);
               $customer=$repositoryCustomers->findOneBy(["code"=>$ean13["Cross-Reference Type No."]]);
               if ($customer==null){
-                $supplier=$repositorySupliers->findOneBy(["code"=>$ean13["Cross-Reference Type No."]]);
+                $supplier=$repositorySuppliers->findOneBy(["code"=>$ean13["Cross-Reference Type No."]]);
                 if ($supplier!=null){
                   $oean13->setSupplier($supplier);
                   $oean13->setType(1);
@@ -475,7 +475,7 @@ public function importPrices(InputInterface $input, OutputInterface $output) {
   $datetime=new \DateTime();
   $output->writeln('* Sincronizando precios....');
   $repositoryCategory=$this->doctrine->getRepository(ERPCategories::class);
-  $repositorySupliers=$this->doctrine->getRepository(ERPSuppliers::class);
+  $repositorySuppliers=$this->doctrine->getRepository(ERPSuppliers::class);
   $repositoryShoppingDiscounts=$this->doctrine->getRepository(ERPShoppingDiscounts::class);
   $repository=$this->doctrine->getRepository(ERPProducts::class);
   $page=5000;
@@ -494,7 +494,7 @@ public function importPrices(InputInterface $input, OutputInterface $output) {
               if ($price) $output->writeln("El producto ".$product->getCode()." tiene el precio ". $price->getDiscount());
               else $output->writeln("El producto ".$product->getCode()." no tiene precio");
               if ($price==null && $product->getCategory()!=null && $product->getSupplier()!=null){
-                $supplier=$repositorySupliers->findOneBy(["id"=>$product->getSupplier()->getId()]);
+                $supplier=$repositorySuppliers->findOneBy(["id"=>$product->getSupplier()->getId()]);
                 $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getPrices.php?from='.$product->getCode().'&supplier='.$supplier->getCode());
                 $objects=json_decode($json, true);
                 $objects=$objects[0];
@@ -639,8 +639,8 @@ public function updateProducts(InputInterface $input, OutputInterface $output){
     $objects=json_decode($json, true);
     if ($objects[0]["class"]==null) continue;
     $object=$objects[0]["class"][0];
-    $repositorySupliers=$this->doctrine->getRepository(ERPSuppliers::class);
-    $supplier=$repositorySupliers->findOneBy(["code"=>$object["Supplier"]]);
+    $repositorySuppliers=$this->doctrine->getRepository(ERPSuppliers::class);
+    $supplier=$repositorySuppliers->findOneBy(["code"=>$object["Supplier"]]);
     // Comprobamos si el producto no tiene movimientos desde 2017, en caso de que no tenga lo desactivamos
     $json2=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-clearProducts.php?from='.$product->getCode());
     $movs=json_decode($json2, true);
@@ -1068,7 +1068,7 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
   $output->writeln('* Sincronizando incrementos....');
   $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
   $repositoryCategory=$this->doctrine->getRepository(ERPCategories::class);
-  $repositorySupliers=$this->doctrine->getRepository(ERPSuppliers::class);
+  $repositorySuppliers=$this->doctrine->getRepository(ERPSuppliers::class);
   $repositoryCustomers=$this->doctrine->getRepository(ERPCustomers::class);
   $repositoryCustomeGroups=$this->doctrine->getRepository(ERPCustomerGroups::class);
   $repositoryIncrements=$this->doctrine->getRepository(ERPIncrements::class);
@@ -1091,7 +1091,7 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
     $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
     $output->writeln($product->getCode().'  - '.$product->getName());
     if ($product->getCategory()!=null && $product->getSupplier()!=null){
-      $supplier=$repositorySupliers->findOneBy(["id"=>$product->getSupplier()->getId()]);
+      $supplier=$repositorySuppliers->findOneBy(["id"=>$product->getSupplier()->getId()]);
       $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getIncrements.php?product='.$product->getCode());
       $objects=json_decode($json, true);
       $objects=$objects[0];
@@ -1606,7 +1606,7 @@ public function importReferences(InputInterface $input, OutputInterface $output)
   $objects=json_decode($json, true);
 
   $repositoryCustomers=$this->doctrine->getRepository(ERPCustomers::class);
-  $repositorySupliers=$this->doctrine->getRepository(ERPSuppliers::class);
+  $repositorySuppliers=$this->doctrine->getRepository(ERPSuppliers::class);
   $repositoryProducts=$this->doctrine->getRepository(ERPProducts::class);
   $repositoryReferences=$this->doctrine->getRepository(ERPReferences::class);
 
@@ -1634,20 +1634,20 @@ public function importReferences(InputInterface $input, OutputInterface $output)
      }else{
         $product=$repositoryProducts->findOneBy(["code"=>$references["Item No."]]);
         if ($product!=null &&  $references!=null) {
-          $suplier  = null;
+          $supplier  = null;
           $customer = null;
           $type     = $references["Cross-Reference Type"]; // 1.- Cliente - 2.- Proveedor
           if ($type==2){
-            $supplier=$repositorySupliers->findOneBy(["code"=>$references["Cross-Reference Type No."]]);
-            if ($suplier!=null){
+            $supplier=$repositorySuppliers->findOneBy(["code"=>$references["Cross-Reference Type No."]]);
+            if ($supplier!=null){
               // Inserta nueva Reference
               if ($action=='I') {
                 // Por si existiera
-                $oreferences=$repositoryReferences->findOneBy(["name"=>$code_new, "product"=>$product, "suplier"=>$suplier, "type"=>1]);
+                $oreferences=$repositoryReferences->findOneBy(["name"=>$code_new, "product"=>$product, "supplier"=>$supplier, "type"=>1]);
               }else
               if ($action=='U') {
                 // Si no existe se hace lo mismo que el insert
-                $oreferences=$repositoryReferences->findOneBy(["name"=>$code_old, "product"=>$product, "suplier"=>$suplier, "type"=>1]);
+                $oreferences=$repositoryReferences->findOneBy(["name"=>$code_old, "product"=>$product, "supplier"=>$supplier, "type"=>1]);
               }
             }else
               $validation = false;
