@@ -314,6 +314,7 @@ public function importEAN13(InputInterface $input, OutputInterface $output){
       $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
 
       $deleteEAN13Change = [];
+      $validation = true;
       foreach ($objects as $key=>$object){
         $action   = $object['accion'];
         $code_old = preg_replace('/\D/','',$object['codigo_antiguo']);
@@ -354,17 +355,23 @@ public function importEAN13(InputInterface $input, OutputInterface $output){
               $customer=$repositoryCustomers->findOneBy(["code"=>$ean13["Cross-Reference Type No."]]);
               if ($customer==null){
                 $supplier=$repositorySupliers->findOneBy(["code"=>$ean13["Cross-Reference Type No."]]);
-                $oean13->setSupplier($supplier);
-                $oean13->setType(1);
-              } else {$obj->setCustomer($customer);
+                if ($supplier!=null){
+                  $oean13->setSupplier($supplier);
+                  $oean13->setType(1);
+                }else
+                  $validation = false;
+              } else {
+                $oean13->setCustomer($customer);
                 $oean13->setType(2);
               }
-              $product=$repositoryProducts->findOneBy(["code"=>$ean13["Item No."]]);
-              if ($product!=null) {
-                $oean13->setProduct($product);
-                $this->doctrine->getManager()->merge($oean13);
-                $this->doctrine->getManager()->flush();
-                $this->doctrine->getManager()->clear();
+              if ($validation){
+                $product=$repositoryProducts->findOneBy(["code"=>$ean13["Item No."]]);
+                if ($product!=null) {
+                  $oean13->setProduct($product);
+                  $this->doctrine->getManager()->merge($oean13);
+                  $this->doctrine->getManager()->flush();
+                  $this->doctrine->getManager()->clear();
+                }
               }
           }else{
               if ($ean13==null) {
@@ -375,9 +382,11 @@ public function importEAN13(InputInterface $input, OutputInterface $output){
           }
         }
         // Sumar EAN13 al json para eliminar en tabla de cambios
-        if (isset($object['ean13']))
-          unset($object['ean13']);
-        $deleteEAN13Change[] = $object;
+        if ($validation){
+          if (isset($object['ean13']))
+            unset($object['ean13']);
+          $deleteEAN13Change[] = $object;
+        }
       }
       // Eliminado de tabla de cambios
       $output->writeln('Eliminar cambios realizados....');
@@ -1603,7 +1612,6 @@ public function importReferences(InputInterface $input, OutputInterface $output)
 
   //Disable SQL logger
   $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
-
   $deleteReferencesChange = [];
   foreach ($objects as $key=>$object){
      $action   = $object['accion'];
@@ -1613,6 +1621,7 @@ public function importReferences(InputInterface $input, OutputInterface $output)
      if (isset($object['references']))
        $references=$object['references'];
      $oreferences = null;
+     $validation = true;
      // Borrado de Reference
      if ($action=='D') {
          $oreferences=$repositoryReferences->findOneBy(["name"=>$code_old]);
@@ -1624,16 +1633,41 @@ public function importReferences(InputInterface $input, OutputInterface $output)
          }
      }else{
         $product=$repositoryProducts->findOneBy(["code"=>$references["Item No."]]);
-        if ($product!=null) {
-          // Inserta nueva Reference
-          if ($action=='I') {
-            // Por si existiera
-            $oreferences=$repositoryReferences->findOneBy(["name"=>$code_new, "product"=>$product->getId()]);
+        if ($product!=null &&  $references!=null) {
+          $suplier  = null;
+          $customer = null;
+          $type     = $references["Cross-Reference Type"]; // 1.- Cliente - 2.- Proveedor
+          if ($type==2){
+            $supplier=$repositorySupliers->findOneBy(["code"=>$references["Cross-Reference Type No."]]);
+            if ($suplier!=null){
+              // Inserta nueva Reference
+              if ($action=='I') {
+                // Por si existiera
+                $oreferences=$repositoryReferences->findOneBy(["name"=>$code_new, "product"=>$product, "suplier"=>$suplier, "type"=>2]);
+              }else
+              if ($action=='U') {
+                // Si no existe se hace lo mismo que el insert
+                $oreferences=$repositoryReferences->findOneBy(["name"=>$code_old, "product"=>$product, "suplier"=>$suplier, "type"=>2]);
+              }
+            }else
+              $validation = false;
           }else
-          if ($action=='U') {
-            // Si no existe se hace lo mismo que el insert
-            $oreferences=$repositoryReferences->findOneBy(["name"=>$code_old, "product"=>$product->getId()]);
+          if ($type==1){
+            $customer=$repositoryCustomers->findOneBy(["code"=>$references["Cross-Reference Type No."]]);
+            if ($customer!=null){
+              // Inserta nueva Reference
+              if ($action=='I') {
+                // Por si existiera
+                $oreferences=$repositoryReferences->findOneBy(["name"=>$code_new, "product"=>$product, "customer"=>$customer, "type"=>1]);
+              }else
+              if ($action=='U') {
+                // Si no existe se hace lo mismo que el insert
+                $oreferences=$repositoryReferences->findOneBy(["name"=>$code_old, "product"=>$product, "customer"=>$customer, "type"=>1]);
+              }
+            }else
+              $validation = false;
           }
+
           if ($oreferences==null){
             $output->writeln('  - Añadiendo al producto '.$references["Item No."].' la referencia '.$references["Cross-Reference No."]);
             $oreferences=new ERPReferences();
@@ -1644,12 +1678,10 @@ public function importReferences(InputInterface $input, OutputInterface $output)
             $oreferences->setProduct($product);
             $oreferences->setDeleted(0);
             $oreferences->setActive(1);
-            if ($references["Cross-Reference Type"]==2){
-              $supplier=$repositorySupliers->findOneBy(["code"=>$references["Cross-Reference Type No."]]);
+            if ($type==2){
               $oreferences->setSupplier($supplier);
               $oreferences->setType(1);
-            } else if ($references["Cross-Reference Type"]==1){
-              $customer=$repositoryCustomers->findOneBy(["code"=>$references["Cross-Reference Type No."]]);
+            } else if ($type==1){
               $oreferences->setCustomer($customer);
               $oreferences->setType(2);
             }
@@ -1666,9 +1698,11 @@ public function importReferences(InputInterface $input, OutputInterface $output)
         }
       }
       // Sumar Reference al json para eliminar en tabla de cambios
-      if (isset($object['references']))
-        unset($object['references']);
-      $deleteReferencesChange[] = $object;
+      if ($validation){
+        if (isset($object['references']))
+          unset($object['references']);
+        $deleteReferencesChange[] = $object;
+      }
     }
     // Eliminado de tabla de cambios
     $output->writeln('Eliminar cambios realizados....');
