@@ -325,7 +325,7 @@ class ERPStocksController extends Controller
 		public function getStockHistory($id){
 		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		 $repositoryHistory=$this->getDoctrine()->getRepository(ERPStockHistory::class);
-		 $history=$repositoryHistory->findAllHistory($id);
+		 $history=$repositoryHistory->findHistory($id);
 		 $responseHistory=Array();
 		 foreach($history as $history_line){
 			 $item['product_code']=$history_line['product_code'];
@@ -369,7 +369,7 @@ class ERPStocksController extends Controller
 			$stockHistory=Array();
 			foreach ($products as $product) {
 				$repositoryHistory=$this->getDoctrine()->getRepository(ERPStockHistory::class);
-				$history=$repositoryHistory->findHistory($product["product_id"]);
+				$history=$repositoryHistory->findAllHistory($product["product_id"]);
 
 				foreach($history as $history_line){
 								 $item['Fecha']=$history_line['dateadd'];
