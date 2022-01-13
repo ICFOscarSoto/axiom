@@ -43,7 +43,7 @@ class EmailGetSubjects extends ContainerAwareCommand
         $connectionString='{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'/novalidate-cert}'.$folder->getName();
         @$inbox = imap_open($connectionString,$emailAccount->getUsername(),$emailAccount->getPassword());
         //if($inbox!==FALSE)$emailsUnseen=imap_search($inbox, 'UNSEEN'); else	$emailsUnseen=FALSE;
-        if($inbox!==FALSE)$emailsUnseen=imap_status ( $inbox , $connectionString , SA_UNSEEN ) ; else	$emailsUnseen=FALSE;
+        if($inbox!==FALSE AND $inbox!==NULL)$emailsUnseen=imap_status ( $inbox , $connectionString , SA_UNSEEN ) ; else	$emailsUnseen=FALSE;
           $count=0;
           if(!$emailsUnseen) $count=0; else $count=$emailsUnseen->unseen;//$count=count($emailsUnseen);
           $countUnseen+=$count;
