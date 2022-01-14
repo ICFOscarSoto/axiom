@@ -450,7 +450,7 @@ public function importEAN13(InputInterface $input, OutputInterface $output){
           )
       );
       $context = stream_context_create($opts);
-      //file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-changeGetEAN13Delete.php',false,$context);
+      file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-changeGetEAN13Delete.php',false,$context);
       //------   Critical Section END   ------
       //------   Remove Lock Mutex    ------
       fclose($fp);
@@ -1832,7 +1832,7 @@ public function importReferences(InputInterface $input, OutputInterface $output)
         )
     );
     $context = stream_context_create($opts);
-//    file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-changeGetReferencesDelete.php',false,$context);
+    file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-changeGetReferencesDelete.php',false,$context);
     //------   Critical Section END   ------
     //------   Remove Lock Mutex    ------
     fclose($fp);
