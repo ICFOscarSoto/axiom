@@ -317,115 +317,117 @@ public function importEAN13(InputInterface $input, OutputInterface $output){
       $validation = true;
       foreach ($objects as $key=>$object){
         $action     = $object['accion'];
-        $adatos_old = explode('~',$object['codigo_antiguo']);
-        $code_old   = null;
-        $product_old = null;
-        $type_old   = null;
-        $supplier_customer_old   = null;
-        if (count($adatos_old)==4){
-          $code_old   = preg_replace('/\D/','',$adatos_old[0]);
-          $product_old = $adatos_old[1];
-          $type_old   = $adatos_old[2];
-          $supplier_customer_old = $adatos_old[3];
-        }
-        $adatos_new = explode('~',$object['codigo_nuevo']);
-        $code_new   = null;
-        $product_new = null;
-        $type_new   = null;
-        $supplier_customer_new   = null;
-        if (count($adatos_new)==4){
-          $code_new   = preg_replace('/\D/','',$adatos_new[0]);
-          $product_new = $adatos_new[1];
-          $type_new   = $adatos_new[2];
-          $supplier_customer_new = $adatos_new[3];
-        }
-        $ean13  = null;
-        if (isset($object['ean13']))
-          $ean13=$object['ean13'];
-        $oean13 = null;
+        if ($object['codigo_antiguo']!=$object['codigo_nuevo']){
+          $adatos_old = explode('~',$object['codigo_antiguo']);
+          $code_old   = null;
+          $product_old = null;
+          $type_old   = null;
+          $supplier_customer_old   = null;
+          if (count($adatos_old)==4){
+            $code_old   = preg_replace('/\D/','',$adatos_old[0]);
+            $product_old = $adatos_old[1];
+            $type_old   = $adatos_old[2];
+            $supplier_customer_old = $adatos_old[3];
+          }
+          $adatos_new = explode('~',$object['codigo_nuevo']);
+          $code_new   = null;
+          $product_new = null;
+          $type_new   = null;
+          $supplier_customer_new   = null;
+          if (count($adatos_new)==4){
+            $code_new   = preg_replace('/\D/','',$adatos_new[0]);
+            $product_new = $adatos_new[1];
+            $type_new   = $adatos_new[2];
+            $supplier_customer_new = $adatos_new[3];
+          }
+          $ean13  = null;
+          if (isset($object['ean13']))
+            $ean13=$object['ean13'];
+          $oean13 = null;
 
-        // Borrado de EAN13
-        if ($action=='D') {
-            $product=$repositoryProducts->findOneBy(["code"=>$product_old]);
-            if ($product!=NULL){
-              $customer=$repositoryCustomers->findOneBy(["code"=>$supplier_customer_old]);
-              if ($customer==null){
-                $supplier=$repositorySuppliers->findOneBy(["code"=>$supplier_customer_old]);
-                if ($supplier!=null)
-                  $oean13=$repositoryEAN13->findOneBy(["name"=>$code_old, "product"=>$product, "supplier"=>$supplier]);
-                else
-                  $oean13=$repositoryEAN13->findOneBy(["name"=>$code_old, "product"=>$product, "supplier"=>null, "customer"=>null]);
-              }else {
-                $oean13=$repositoryEAN13->findOneBy(["name"=>$code_old, "product"=>$product, "customer"=>$customer]);
+          // Borrado de EAN13
+          if ($action=='D') {
+              $product=$repositoryProducts->findOneBy(["code"=>$product_old]);
+              if ($product!=NULL){
+                $customer=$repositoryCustomers->findOneBy(["code"=>$supplier_customer_old]);
+                if ($customer==null){
+                  $supplier=$repositorySuppliers->findOneBy(["code"=>$supplier_customer_old]);
+                  if ($supplier!=null)
+                    $oean13=$repositoryEAN13->findOneBy(["name"=>$code_old, "product"=>$product, "supplier"=>$supplier]);
+                  else
+                    $oean13=$repositoryEAN13->findOneBy(["name"=>$code_old, "product"=>$product, "supplier"=>null, "customer"=>null]);
+                }else {
+                  $oean13=$repositoryEAN13->findOneBy(["name"=>$code_old, "product"=>$product, "customer"=>$customer]);
+                }
+                if ($oean13!=NULL){
+                  $output->writeln($action.' - '.$code_old);
+                  $this->doctrine->getManager()->remove($oean13);
+                  $this->doctrine->getManager()->flush();
+                  $this->doctrine->getManager()->clear();
+                }
               }
-              if ($oean13!=NULL){
-                $output->writeln($action.' - '.$code_old);
-                $this->doctrine->getManager()->remove($oean13);
+          }else{
+             $output->writeln($action.' - '.$code_old.' - '.$code_new.' - '.$product_new.' - '.$supplier_customer_new);
+             // Inserta nuevo EAN13
+             if ($action=='I') {
+               $product=$repositoryProducts->findOneBy(["code"=>$product_old]);
+               if ($product!=NULL){
+                 $customer=$repositoryCustomers->findOneBy(["code"=>$supplier_customer_new]);
+                 if ($customer==null){
+                   $supplier=$repositorySuppliers->findOneBy(["code"=>$supplier_customer_new]);
+                   if ($supplier!=null)
+                     $oean13=$repositoryEAN13->findOneBy(["name"=>$code_new, "product"=>$product, "supplier"=>$supplier]);
+                   else
+                     $oean13=$repositoryEAN13->findOneBy(["name"=>$code_new, "product"=>$product, "supplier"=>null, "customer"=>null]);
+                 }else {
+                   $oean13=$repositoryEAN13->findOneBy(["name"=>$code_new, "product"=>$product, "customer"=>$customer]);
+                 }
+               }
+             }else
+             if ($action=='U') {
+               // Si no existe se hace lo mismo que el insert
+               $product=$repositoryProducts->findOneBy(["code"=>$product_old]);
+               if ($product!=NULL){
+                 $customer=$repositoryCustomers->findOneBy(["code"=>$supplier_customer_old]);
+                 if ($customer==null){
+                   $supplier=$repositorySuppliers->findOneBy(["code"=>$supplier_customer_old]);
+                   if ($supplier!=null)
+                     $oean13=$repositoryEAN13->findOneBy(["name"=>$code_old, "product"=>$product, "supplier"=>$supplier]);
+                   else{
+                     $oean13=$repositoryEAN13->findOneBy(["name"=>$code_old, "product"=>$product, "supplier"=>null, "customer"=>null]);
+                   }
+                 }else {
+                   $oean13=$repositoryEAN13->findOneBy(["name"=>$code_old, "product"=>$product, "customer"=>$customer]);
+                 }
+               }
+             }
+             if ($oean13==null){
+                $oean13=new ERPEAN13();
+                $oean13->setDateadd(new \Datetime());
+             }
+             if ($ean13==null || $ean13["idaxiom"]==null){
+              $oean13->setName($code_new);
+              $oean13->setDateupd(new \Datetime());
+              $oean13->setDeleted(0);
+              $oean13->setActive(1);
+              $customer=$repositoryCustomers->findOneBy(["code"=>$supplier_customer_new]);
+              if ($customer==null){
+                $supplier=$repositorySuppliers->findOneBy(["code"=>$supplier_customer_new]);
+                if ($supplier!=null){
+                  $oean13->setSupplier($supplier);
+                  $oean13->setType(1);
+                }
+              } else {
+                $oean13->setCustomer($customer);
+                $oean13->setType(2);
+              }
+              $product=$repositoryProducts->findOneBy(["code"=>$product_new]);
+              if ($product!=null) {
+                $oean13->setProduct($product);
+                $this->doctrine->getManager()->merge($oean13);
                 $this->doctrine->getManager()->flush();
                 $this->doctrine->getManager()->clear();
               }
-            }
-        }else{
-           $output->writeln($action.' - '.$code_old.' - '.$code_new.' - '.$product_new.' - '.$supplier_customer_new);
-           // Inserta nuevo EAN13
-           if ($action=='I') {
-             $product=$repositoryProducts->findOneBy(["code"=>$product_old]);
-             if ($product!=NULL){
-               $customer=$repositoryCustomers->findOneBy(["code"=>$supplier_customer_new]);
-               if ($customer==null){
-                 $supplier=$repositorySuppliers->findOneBy(["code"=>$supplier_customer_new]);
-                 if ($supplier!=null)
-                   $oean13=$repositoryEAN13->findOneBy(["name"=>$code_new, "product"=>$product, "supplier"=>$supplier]);
-                 else
-                   $oean13=$repositoryEAN13->findOneBy(["name"=>$code_new, "product"=>$product, "supplier"=>null, "customer"=>null]);
-               }else {
-                 $oean13=$repositoryEAN13->findOneBy(["name"=>$code_new, "product"=>$product, "customer"=>$customer]);
-               }
-             }
-           }else
-           if ($action=='U') {
-             // Si no existe se hace lo mismo que el insert
-             $product=$repositoryProducts->findOneBy(["code"=>$product_old]);
-             if ($product!=NULL){
-               $customer=$repositoryCustomers->findOneBy(["code"=>$supplier_customer_old]);
-               if ($customer==null){
-                 $supplier=$repositorySuppliers->findOneBy(["code"=>$supplier_customer_old]);
-                 if ($supplier!=null)
-                   $oean13=$repositoryEAN13->findOneBy(["name"=>$code_old, "product"=>$product, "supplier"=>$supplier]);
-                 else{
-                   $oean13=$repositoryEAN13->findOneBy(["name"=>$code_old, "product"=>$product, "supplier"=>null, "customer"=>null]);
-                 }
-               }else {
-                 $oean13=$repositoryEAN13->findOneBy(["name"=>$code_old, "product"=>$product, "customer"=>$customer]);
-               }
-             }
-           }
-           if ($oean13==null){
-              $oean13=new ERPEAN13();
-              $oean13->setDateadd(new \Datetime());
-           }
-           if ($ean13==null || $ean13["idaxiom"]==null){
-            $oean13->setName($code_new);
-            $oean13->setDateupd(new \Datetime());
-            $oean13->setDeleted(0);
-            $oean13->setActive(1);
-            $customer=$repositoryCustomers->findOneBy(["code"=>$supplier_customer_new]);
-            if ($customer==null){
-              $supplier=$repositorySuppliers->findOneBy(["code"=>$supplier_customer_new]);
-              if ($supplier!=null){
-                $oean13->setSupplier($supplier);
-                $oean13->setType(1);
-              }
-            } else {
-              $oean13->setCustomer($customer);
-              $oean13->setType(2);
-            }
-            $product=$repositoryProducts->findOneBy(["code"=>$product_new]);
-            if ($product!=null) {
-              $oean13->setProduct($product);
-              $this->doctrine->getManager()->merge($oean13);
-              $this->doctrine->getManager()->flush();
-              $this->doctrine->getManager()->clear();
             }
           }
         }
@@ -433,7 +435,6 @@ public function importEAN13(InputInterface $input, OutputInterface $output){
         if (isset($object['ean13']))
           unset($object['ean13']);
           $deleteEAN13Change[] = $object;
-
       }
       // Eliminado de tabla de cambios
       $output->writeln('Eliminar cambios realizados....');
