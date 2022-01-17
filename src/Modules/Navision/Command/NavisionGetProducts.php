@@ -1106,7 +1106,27 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
   }
 
   //------   Critical Section START   ------
-  $navisionSyncRepository=$this->doctrine->getRepository(NavisionSync::class);
+  $output->writeln('* Sincronizando Incrementos....');
+  $output->writeln(' - Obteniendo Categorias/Proveedores/Grupo');
+  $query="SELECT DISTINCT(category_id) AS category_id FROM erpproducts";
+  $params=[];
+  $categories = $this->doctrine->getManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+  // Para cada categoria
+  for($i=0; $i<count($categories); $i++){
+    $query="SELECT id FROM erpproducts WHERE category_id=:category_id";
+    params=["category_id"=>$categories[$i]["category_id"]];
+    $products = $this->doctrine->getManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+    // Para cada producto de la categoría
+    for($j=0; $j<count($products); $j++){
+        $query="SELECT supplier_id FROM erpproducts_suppliers WHERE product_id=:product_id";
+        params=["product_id"=>$products[$j]["product_id"]];
+        $suppliers = $this->doctrine->getManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+        // Para cada proveedor del producto
+    }  
+  }
+
+
+  /*$navisionSyncRepository=$this->doctrine->getRepository(NavisionSync::class);
   $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"increments"]);
   if ($navisionSync==null) {
     $navisionSync=new NavisionSync();
@@ -1285,7 +1305,7 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
 
             $this->doctrine->getManager()->clear();
   }
- }
+}*/
   //------   Critical Section END   ------
   //------   Remove Lock Mutex    ------
   fclose($fp);
