@@ -27,6 +27,7 @@ use App\Modules\ERP\Entity\ERPVariants;
 use App\Modules\ERP\Entity\ERPVariantsValues;
 use App\Modules\ERP\Entity\ERPProductsVariants;
 use App\Modules\ERP\Entity\ERPStockHistory;
+use App\Modules\ERP\Entity\ERPProductsSuppliers;
 use App\Modules\Globale\Entity\GlobaleCompanies;
 use App\Modules\Globale\Entity\GlobaleUsers;
 use App\Modules\Globale\Entity\GlobaleStates;
@@ -84,6 +85,8 @@ class NavisionGetProducts extends ContainerAwareCommand
       case 'names': $this->updateNames($input, $output);
       break;
       case 'ean13': $this->importEAN13($input, $output);
+      break;
+      case 'productsSuppliers': $this->importProductsSuppliers($input, $output);
       break;
       case 'references': $this->importReferences($input, $output);
       break;
@@ -316,125 +319,77 @@ public function importEAN13(InputInterface $input, OutputInterface $output){
       $deleteEAN13Change = [];
       $validation = true;
       foreach ($objects as $key=>$object){
-        $action     = $object['accion'];
-        if ($object['codigo_antiguo']!=$object['codigo_nuevo']){
-          $adatos_old = explode('~',$object['codigo_antiguo']);
-          $code_old   = null;
-          $product_old = null;
-          $type_old   = null;
-          $supplier_customer_old   = null;
-          if (count($adatos_old)==4){
-            $code_old   = preg_replace('/\D/','',$adatos_old[0]);
-            $product_old = $adatos_old[1];
-            $type_old   = $adatos_old[2];
-            $supplier_customer_old = $adatos_old[3];
-          }
-          $adatos_new = explode('~',$object['codigo_nuevo']);
-          $code_new   = null;
-          $product_new = null;
-          $type_new   = null;
-          $supplier_customer_new   = null;
-          if (count($adatos_new)==4){
-            $code_new   = preg_replace('/\D/','',$adatos_new[0]);
-            $product_new = $adatos_new[1];
-            $type_new   = $adatos_new[2];
-            $supplier_customer_new = $adatos_new[3];
-          }
-          $ean13  = null;
-          if (isset($object['ean13']))
-            $ean13=$object['ean13'];
-          $oean13 = null;
-
-          // Borrado de EAN13
-          if ($action=='D') {
-              $product=$repositoryProducts->findOneBy(["code"=>$product_old]);
-              if ($product!=NULL){
-                $customer=$repositoryCustomers->findOneBy(["code"=>$supplier_customer_old]);
-                if ($customer==null){
-                  $supplier=$repositorySuppliers->findOneBy(["code"=>$supplier_customer_old]);
-                  if ($supplier!=null)
-                    $oean13=$repositoryEAN13->findOneBy(["name"=>$code_old, "product"=>$product, "supplier"=>$supplier]);
-                  else
-                    $oean13=$repositoryEAN13->findOneBy(["name"=>$code_old, "product"=>$product, "supplier"=>null, "customer"=>null]);
-                }else {
-                  $oean13=$repositoryEAN13->findOneBy(["name"=>$code_old, "product"=>$product, "customer"=>$customer]);
-                }
-                if ($oean13!=NULL){
-                  $output->writeln($action.' - '.$code_old);
-                  $this->doctrine->getManager()->remove($oean13);
+        $action   = $object['accion'];
+        $code_old = preg_replace('/\D/','',$object['codigo_antiguo']);
+        $code_new = preg_replace('/\D/','',$object['codigo_nuevo']);
+        $ean13  = null;
+        if (isset($object['ean13']))
+          $ean13=$object['ean13'];
+        $oean13 = null;
+        // Borrado de EAN13
+        if ($action=='D') {
+            $oean13=$repositoryEAN13->findOneBy(["name"=>$code_old]);
+            if ($oean13!=NULL){
+              $output->writeln($action.' - '.$code_old);
+              $this->doctrine->getManager()->remove($oean13);
+              $this->doctrine->getManager()->flush();
+              $this->doctrine->getManager()->clear();
+            }
+        }else
+        if ($ean13!=null && isset($ean13["Cross-Reference No."]) && $ean13["Cross-Reference No."]!=null){
+           $nameEAN13=preg_replace('/\D/','',$ean13["Cross-Reference No."]);
+           $output->writeln($action.' - '.$code_old.' - '.$code_new.' - '.$ean13["Item No."].' - '.$nameEAN13);
+           // Inserta nuevo EAN13
+           if ($action=='I') {
+             // Por si existiera
+             $oean13=$repositoryEAN13->findOneBy(["name"=>$code_new]);
+           }else
+           if ($action=='U') {
+             // Si no existe se hace lo mismo que el insert
+             $oean13=$repositoryEAN13->findOneBy(["name"=>$code_old]);
+           }
+           if ($oean13==null and $ean13["idaxiom"]==null){
+              $oean13=new ERPEAN13();
+              $oean13->setName($nameEAN13);
+              $oean13->setDateadd(new \Datetime());
+              $oean13->setDateupd(new \Datetime());
+              $oean13->setDeleted(0);
+              $oean13->setActive(1);
+              $customer=$repositoryCustomers->findOneBy(["code"=>$ean13["Cross-Reference Type No."]]);
+              if ($customer==null){
+                $supplier=$repositorySuppliers->findOneBy(["code"=>$ean13["Cross-Reference Type No."]]);
+                if ($supplier!=null){
+                  $oean13->setSupplier($supplier);
+                  $oean13->setType(1);
+                }else
+                  $validation = false;
+              } else {
+                $oean13->setCustomer($customer);
+                $oean13->setType(2);
+              }
+              if ($validation){
+                $product=$repositoryProducts->findOneBy(["code"=>$ean13["Item No."]]);
+                if ($product!=null) {
+                  $oean13->setProduct($product);
+                  $this->doctrine->getManager()->merge($oean13);
                   $this->doctrine->getManager()->flush();
                   $this->doctrine->getManager()->clear();
                 }
               }
           }else{
-             $output->writeln($action.' - '.$code_old.' - '.$code_new.' - '.$product_new.' - '.$supplier_customer_new);
-             // Inserta nuevo EAN13
-             if ($action=='I') {
-               $product=$repositoryProducts->findOneBy(["code"=>$product_old]);
-               if ($product!=NULL){
-                 $customer=$repositoryCustomers->findOneBy(["code"=>$supplier_customer_new]);
-                 if ($customer==null){
-                   $supplier=$repositorySuppliers->findOneBy(["code"=>$supplier_customer_new]);
-                   if ($supplier!=null)
-                     $oean13=$repositoryEAN13->findOneBy(["name"=>$code_new, "product"=>$product, "supplier"=>$supplier]);
-                   else
-                     $oean13=$repositoryEAN13->findOneBy(["name"=>$code_new, "product"=>$product, "supplier"=>null, "customer"=>null]);
-                 }else {
-                   $oean13=$repositoryEAN13->findOneBy(["name"=>$code_new, "product"=>$product, "customer"=>$customer]);
-                 }
-               }
-             }else
-             if ($action=='U') {
-               // Si no existe se hace lo mismo que el insert
-               $product=$repositoryProducts->findOneBy(["code"=>$product_old]);
-               if ($product!=NULL){
-                 $customer=$repositoryCustomers->findOneBy(["code"=>$supplier_customer_old]);
-                 if ($customer==null){
-                   $supplier=$repositorySuppliers->findOneBy(["code"=>$supplier_customer_old]);
-                   if ($supplier!=null)
-                     $oean13=$repositoryEAN13->findOneBy(["name"=>$code_old, "product"=>$product, "supplier"=>$supplier]);
-                   else{
-                     $oean13=$repositoryEAN13->findOneBy(["name"=>$code_old, "product"=>$product, "supplier"=>null, "customer"=>null]);
-                   }
-                 }else {
-                   $oean13=$repositoryEAN13->findOneBy(["name"=>$code_old, "product"=>$product, "customer"=>$customer]);
-                 }
-               }
-             }
-             if ($oean13==null){
-                $oean13=new ERPEAN13();
-                $oean13->setDateadd(new \Datetime());
-             }
-             if ($ean13==null || $ean13["idaxiom"]==null){
-              $oean13->setName($code_new);
-              $oean13->setDateupd(new \Datetime());
-              $oean13->setDeleted(0);
-              $oean13->setActive(1);
-              $customer=$repositoryCustomers->findOneBy(["code"=>$supplier_customer_new]);
-              if ($customer==null){
-                $supplier=$repositorySuppliers->findOneBy(["code"=>$supplier_customer_new]);
-                if ($supplier!=null){
-                  $oean13->setSupplier($supplier);
-                  $oean13->setType(1);
-                }
+              if ($ean13==null) {
+                $output->writeln("Este EAN13 no es válido ".$ean13["Cross-Reference No."]);
               } else {
-                $oean13->setCustomer($customer);
-                $oean13->setType(2);
+                $output->writeln("Este EAN13 está duplicado ".$ean13["Cross-Reference No."]);
               }
-              $product=$repositoryProducts->findOneBy(["code"=>$product_new]);
-              if ($product!=null) {
-                $oean13->setProduct($product);
-                $this->doctrine->getManager()->merge($oean13);
-                $this->doctrine->getManager()->flush();
-                $this->doctrine->getManager()->clear();
-              }
-            }
           }
         }
         // Sumar EAN13 al json para eliminar en tabla de cambios
-        if (isset($object['ean13']))
-          unset($object['ean13']);
+        if ($validation){
+          if (isset($object['ean13']))
+            unset($object['ean13']);
           $deleteEAN13Change[] = $object;
+        }
       }
       // Eliminado de tabla de cambios
       $output->writeln('Eliminar cambios realizados....');
@@ -678,95 +633,95 @@ public function groupPrices(InputInterface $input, OutputInterface $output){
 }
 
 public function updateProducts(InputInterface $input, OutputInterface $output){
-/*  $repository=$this->doctrine->getRepository(ERPProducts::class);
-  $products=$repository->findBy(['shoppingPrice'=>0]);
-  $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
-  foreach ($products as $product){
-    $output->writeln("Cambiando el producto ".$product->getCode());
-    $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getProduct.php?product='.$product->getCode());
-    $objects=json_decode($json, true);
-    if ($objects[0]["class"]==null) continue;
-    $object=$objects[0]["class"][0];
-    $repositorySuppliers=$this->doctrine->getRepository(ERPSuppliers::class);
-    $supplier=$repositorySuppliers->findOneBy(["code"=>$object["Supplier"]]);
-    // Comprobamos si el producto no tiene movimientos desde 2017, en caso de que no tenga lo desactivamos
-    $json2=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-clearProducts.php?from='.$product->getCode());
-    $movs=json_decode($json2, true);
-    $movs=$movs[0];
-    $repositoryTaxes=$this->doctrine->getRepository(GlobaleTaxes::class);
-    $taxes=$repositoryTaxes->find(1);
-    $product->setTaxes($taxes);
-    $product->setWeight($object["Weight"]);
-    // Comprobamos si el producto tiene descuentos, si no los tiene se le pone como precio neto.
-    $json3=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getPrices.php?from='.$product->getCode().'&supplier='.$object["Supplier"]);
-    $prices=json_decode($json3, true);
-    $prices=$prices[0];
-    $product->setnetprice(1);
-    foreach ($prices["class"] as $price){
-      if($price["Discount"]!=0){
-        if ($price["Ending"]["date"]=="1753-01-01 00:00:00.000000") {
-          $product->setnetprice(0);
-        }
-      }
-    }
-    if (!$product->getnetprice()){
-      if ($product->getPurchasepacking()!=0){
-        $product->setPVPR($object["ShoppingPrice"]/$product->getPurchasepacking());
-        $product->setShoppingPrice(($product->getPVPR()*(1-$product->getShoppingDiscount($this->doctrine)/100))/$product->getPurchasepacking());
-      }
-      $product->setPVPR($object["ShoppingPrice"]);
-      $product->setShoppingPrice($product->getPVPR()*(1-$product->getShoppingDiscount($this->doctrine)/100));
-    } else {
-      $product->setPVPR(0);
-      if ($product->getPurchasepacking()!=0) $product->setShoppingPrice($object["ShoppingPrice"]/$product->getPurchasepacking());
-      else $product->setShoppingPrice($object["ShoppingPrice"]);
-    }
-    $product->setSupplier($supplier);
-    $product->setDateupd(new \Datetime());
-    $repositoryManufacturers=$this->doctrine->getRepository(ERPManufacturers::class);
-    $manufacturer=$repositoryManufacturers->findOneBy(["code"=>$object["Manufacturer"]]);
-    if($manufacturer!=NULL) $product->setManufacturer($manufacturer);
-
-    $product->calculatePVP($this->doctrine);
-    $this->doctrine->getManager()->merge($product);
-    $product=$product->calculateIncrementByProduct($this->doctrine);
-    $product=$product->calculateCustomerIncrementsByProduct($this->doctrine);
-    $this->doctrine->getManager()->merge($product);
-    $this->doctrine->getManager()->flush();
-    $this->doctrine->getManager()->clear();
-    }
-*/
-/*
-  $repository=$this->doctrine->getRepository(ERPProducts::class);
-  $page=5000;
-  $totalProducts=round(intval($repository->totalProducts())/$page);
-  $count=0;
-
-  while($count<$totalProducts){
-      $products=$repository->productsLimit(intval($count*$page),intval($page));
-      $count++;
-      foreach($products as $id) {
-        $product=$repository->findOneBy(["id"=>$id, "company"=>2]);
+    /* $repository=$this->doctrine->getRepository(ERPProducts::class);
+      $products=$repository->findBy(['shoppingPrice'=>0]);
+      $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
+      foreach ($products as $product){
+        $output->writeln("Cambiando el producto ".$product->getCode());
+        $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getProduct.php?product='.$product->getCode());
+        $objects=json_decode($json, true);
+        if ($objects[0]["class"]==null) continue;
+        $object=$objects[0]["class"][0];
+        $repositorySuppliers=$this->doctrine->getRepository(ERPSuppliers::class);
+        $supplier=$repositorySuppliers->findOneBy(["code"=>$object["Supplier"]]);
+        // Comprobamos si el producto no tiene movimientos desde 2017, en caso de que no tenga lo desactivamos
         $json2=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-clearProducts.php?from='.$product->getCode());
         $movs=json_decode($json2, true);
         $movs=$movs[0];
-        // Dejamos de desactivar productos desde el 2/10
-        if($movs["class"][0]["movimiento"]!=null)
-          if($movs["class"][0]["movimiento"]["date"]>"2019-09-09 00:00:00.000000") $product->setActive(1);
-           else {
-            $product->setActive(0);
-            $product->setDateupd(new \Datetime());
+        $repositoryTaxes=$this->doctrine->getRepository(GlobaleTaxes::class);
+        $taxes=$repositoryTaxes->find(1);
+        $product->setTaxes($taxes);
+        $product->setWeight($object["Weight"]);
+        // Comprobamos si el producto tiene descuentos, si no los tiene se le pone como precio neto.
+        $json3=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getPrices.php?from='.$product->getCode().'&supplier='.$object["Supplier"]);
+        $prices=json_decode($json3, true);
+        $prices=$prices[0];
+        $product->setnetprice(1);
+        foreach ($prices["class"] as $price){
+          if($price["Discount"]!=0){
+            if ($price["Ending"]["date"]=="1753-01-01 00:00:00.000000") {
+              $product->setnetprice(0);
+            }
           }
-        else {
-          $product->setActive(0);
-          $product->setDateupd(new \Datetime());
         }
+        if (!$product->getnetprice()){
+          if ($product->getPurchasepacking()!=0){
+            $product->setPVPR($object["ShoppingPrice"]/$product->getPurchasepacking());
+            $product->setShoppingPrice(($product->getPVPR()*(1-$product->getShoppingDiscount($this->doctrine)/100))/$product->getPurchasepacking());
+          }
+          $product->setPVPR($object["ShoppingPrice"]);
+          $product->setShoppingPrice($product->getPVPR()*(1-$product->getShoppingDiscount($this->doctrine)/100));
+        } else {
+          $product->setPVPR(0);
+          if ($product->getPurchasepacking()!=0) $product->setShoppingPrice($object["ShoppingPrice"]/$product->getPurchasepacking());
+          else $product->setShoppingPrice($object["ShoppingPrice"]);
+        }
+        $product->setSupplier($supplier);
+        $product->setDateupd(new \Datetime());
+        $repositoryManufacturers=$this->doctrine->getRepository(ERPManufacturers::class);
+        $manufacturer=$repositoryManufacturers->findOneBy(["code"=>$object["Manufacturer"]]);
+        if($manufacturer!=NULL) $product->setManufacturer($manufacturer);
+
+        $product->calculatePVP($this->doctrine);
+        $this->doctrine->getManager()->merge($product);
+        $product=$product->calculateIncrementByProduct($this->doctrine);
+        $product=$product->calculateCustomerIncrementsByProduct($this->doctrine);
         $this->doctrine->getManager()->merge($product);
         $this->doctrine->getManager()->flush();
         $this->doctrine->getManager()->clear();
+        }
+        */
+        /*
+      $repository=$this->doctrine->getRepository(ERPProducts::class);
+      $page=5000;
+      $totalProducts=round(intval($repository->totalProducts())/$page);
+      $count=0;
+
+      while($count<$totalProducts){
+          $products=$repository->productsLimit(intval($count*$page),intval($page));
+          $count++;
+          foreach($products as $id) {
+            $product=$repository->findOneBy(["id"=>$id, "company"=>2]);
+            $json2=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-clearProducts.php?from='.$product->getCode());
+            $movs=json_decode($json2, true);
+            $movs=$movs[0];
+            // Dejamos de desactivar productos desde el 2/10
+            if($movs["class"][0]["movimiento"]!=null)
+              if($movs["class"][0]["movimiento"]["date"]>"2019-09-09 00:00:00.000000") $product->setActive(1);
+               else {
+                $product->setActive(0);
+                $product->setDateupd(new \Datetime());
+              }
+            else {
+              $product->setActive(0);
+              $product->setDateupd(new \Datetime());
+            }
+            $this->doctrine->getManager()->merge($product);
+            $this->doctrine->getManager()->flush();
+            $this->doctrine->getManager()->clear();
+          }
       }
-  }
-  */
+      */
   $repository=$this->doctrine->getRepository(ERPProducts::class);
   $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-clearProducts.php');
   $objects=json_decode($json, true);
@@ -1091,6 +1046,51 @@ public function updateStocksStoresManaged(InputInterface $input, OutputInterface
 
 
 }
+
+
+public function importProductsSuppliers(InputInterface $input, OutputInterface $output) {
+  $repositoryProductsSuppliers=$this->doctrine->getRepository(ERPProductsSuppliers::class);
+  $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
+  $repositorySuppliers=$this->doctrine->getRepository(ERPSuppliers::class);
+  $repositoryProducts=$this->doctrine->getRepository(ERPProducts::class);
+  $page=5000;
+  $totalProducts=round(intval($repositoryProducts->totalProductsCategory())/$page);
+  $count=0;
+
+  while($count<$totalProducts){
+    $products=$repositoryProducts->productsLimitActive(intval($count*$page),intval($page));
+    $count++;
+    foreach($products as $id) {
+      $product=$repositoryProducts->findOneBy(["id"=>$id, "company"=>2]);
+      $company=$repositoryCompanies->find(2);
+      $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getSuppliersByProduct.php?product='.$product->getCode());
+      $objects=json_decode($json, true);
+      $objects=$objects[0];
+      foreach ($objects["class"] as $supplierCode){
+          if ($supplierCode["No."]==null) continue;
+          $supplier=$repositorySuppliers->findOneBy(["code"=>$supplierCode["No."], "company"=>$company, "active"=>1, "deleted"=>0]);
+          if ($supplier==null) continue;
+          $productsSuppliers=$repositoryProductsSuppliers->findOneBy(["product"=>$product, "supplier"=>$supplier]);
+          if ($productsSuppliers==null) {
+            $output->writeln("Añadiendo el proveedor ".$supplier->getCode()." al producto ".$product->getCode());
+            $obj=new ERPProductsSuppliers();
+            $obj->setProduct($product);
+            $obj->setSupplier($supplier);
+            $obj->setCompany($company);
+            $obj->setActive(1);
+            $obj->setDeleted(0);
+            $obj->setDateadd(new \Datetime());
+            $obj->setDateupd(new \Datetime());
+            $this->doctrine->getManager()->persist($obj);
+            $this->doctrine->getManager()->flush();
+          }
+      }
+      $this->doctrine->getManager()->clear();
+    }
+  }
+}
+
+
 
 public function importIncrements(InputInterface $input, OutputInterface $output) {
   //------   Create Lock Mutex    ------
@@ -1682,154 +1682,89 @@ public function importReferences(InputInterface $input, OutputInterface $output)
   $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
   $deleteReferencesChange = [];
   foreach ($objects as $key=>$object){
+     $action   = $object['accion'];
+     $code_old = $object['codigo_antiguo'];
+     $code_new = $object['codigo_nuevo'];
+     $references  = null;
+     if (isset($object['references']))
+       $references=$object['references'];
+     $oreferences = null;
      $validation = true;
-     // Si no hay cambio no se hace nada
-     if ($object['codigo_antiguo']!=$object['codigo_nuevo']){
-       $action     = $object['accion'];
-       $adatos_old = explode('~',$object['codigo_antiguo']);
-       $code_old   = null;
-       $product_old = null;
-       $type_old   = null;
-       $supplier_customer_old   = null;
-       if (count($adatos_old)==4){
-          $code_old   = $adatos_old[0];
-          $product_old = $adatos_old[1];
-          $type_old   = $adatos_old[2];
-          $supplier_customer_old = $adatos_old[3];
-       }
-       $adatos_new = explode('~',$object['codigo_nuevo']);
-       $code_new   = null;
-       $product_new = null;
-       $type_new   = null;
-       $supplier_customer_new   = null;
-       if (count($adatos_new)==4){
-          $code_new   = $adatos_new[0];
-          $product_new = $adatos_new[1];
-          $type_new   = $adatos_new[2];
-          $supplier_customer_new = $adatos_new[3];
-       }
-       $references  = null;
-       if (isset($object['references']))
-         $references=$object['references'];
-       $oreferences = null;
-
-       // Borrado de Reference
-       if ($action=='D') {
-         $product=$repositoryProducts->findOneBy(["code"=>$product_old]);
-         if ($product!=null){
-           if ($type_old=='1'){
-             $customer=$repositoryCustomers->findOneBy(["code"=>$supplier_customer_old]);
-             if ($customer!=null)
-              $oreferences=$repositoryReferences->findOneBy(["name"=>$code_old, "product"=>$product, "customer"=>$customer]);
-           }
-           else
-           if ($type_old=='2') {
-             $supplier=$repositorySuppliers->findOneBy(["code"=>$supplier_customer_old]);
-             if ($supplier!=null)
-               $oreferences=$repositoryReferences->findOneBy(["name"=>$code_old, "product"=>$product, "supplier"=>$supplier]);
-           }
-           else
-               $oreferences=$repositoryReferences->findOneBy(["name"=>$code_old, "product"=>$product, "supplier"=>null, "customer"=>null]);
-
-           if ($oreferences!=null){
-             $output->writeln($action.' - '.$code_old);
-             $this->doctrine->getManager()->remove($oreferences);
-             $this->doctrine->getManager()->flush();
-             $this->doctrine->getManager()->clear();
-           }
+     // Borrado de Reference
+     if ($action=='D') {
+         $oreferences=$repositoryReferences->findOneBy(["name"=>$code_old]);
+         if ($oreferences!=NULL){
+           $output->writeln($action.' - '.$code_old);
+           $this->doctrine->getManager()->remove($oreferences);
+           $this->doctrine->getManager()->flush();
+           $this->doctrine->getManager()->clear();
          }
-       }else{
-         $code_id               = null;
-         $product_id            = null;
-         $type_id               = null;
-         $supplier_customer_id  = null;
-         if ($action=='I'){
-           $code_id               = $code_new;
-           $product_id            = $product_new;
-           $type_id               = $type_new;
-           $supplier_customer_id  = $supplier_customer_new;
-         }else
-         if ($action=='U'){
-           $code_id               = $code_old;
-           $product_id            = $product_old;
-           $type_id               = $type_old;
-           $supplier_customer_id  = $supplier_customer_old;
-         }
-         $product=$repositoryProducts->findOneBy(["code"=>$product_id]);
-         if ($product!=null) {
-            $supplier  = null;
-            $customer = null;
-            if ($type_id==1){
-              $customer=$repositoryCustomers->findOneBy(["code"=>$supplier_customer_id]);
-              if ($customer!=null){
-                $oreferences=$repositoryReferences->findOneBy(["name"=>$code_id, "product"=>$product, "customer"=>$customer, "type"=>2]);
+     }else{
+        $product=$repositoryProducts->findOneBy(["code"=>$references["Item No."]]);
+        if ($product!=null &&  $references!=null) {
+          $supplier  = null;
+          $customer = null;
+          $type     = $references["Cross-Reference Type"]; // 1.- Cliente - 2.- Proveedor
+          if ($type==2){
+            $supplier=$repositorySuppliers->findOneBy(["code"=>$references["Cross-Reference Type No."]]);
+            if ($supplier!=null){
+              // Inserta nueva Reference
+              if ($action=='I') {
+                // Por si existiera
+                $oreferences=$repositoryReferences->findOneBy(["name"=>$code_new, "product"=>$product, "supplier"=>$supplier, "type"=>1]);
               }else
-                $validation = false;
+              if ($action=='U') {
+                // Si no existe se hace lo mismo que el insert
+                $oreferences=$repositoryReferences->findOneBy(["name"=>$code_old, "product"=>$product, "supplier"=>$supplier, "type"=>1]);
+              }
             }else
-            if ($type_id==2){
-              $supplier=$repositorySuppliers->findOneBy(["code"=>$supplier_customer_id]);
-              if ($supplier!=null){
-                $oreferences=$repositoryReferences->findOneBy(["name"=>$code_id, "product"=>$product, "supplier"=>$supplier, "type"=>1]);
+              $validation = false;
+          }else
+          if ($type==1){
+            $customer=$repositoryCustomers->findOneBy(["code"=>$references["Cross-Reference Type No."]]);
+            if ($customer!=null){
+              // Inserta nueva Reference
+              if ($action=='I') {
+                // Por si existiera
+                $oreferences=$repositoryReferences->findOneBy(["name"=>$code_new, "product"=>$product, "customer"=>$customer, "type"=>2]);
               }else
-                $validation = false;
-            }
+              if ($action=='U') {
+                // Si no existe se hace lo mismo que el insert
+                $oreferences=$repositoryReferences->findOneBy(["name"=>$code_old, "product"=>$product, "customer"=>$customer, "type"=>2]);
+              }
+            }else
+              $validation = false;
+          }
 
-            if ($validation){
-              if ($oreferences==null){
-                if ($type_id==1)
-                  $output->writeln('  - Añadiendo al producto '.$product_new.' la referencia '.$code_new.' del cliente '.$supplier_customer_id);
-                else
-                  $output->writeln('  - Añadiendo al producto '.$product_new.' la referencia '.$code_new.' del proveedor '.$supplier_customer_id);
-                $oreferences=new ERPReferences();
-                $oreferences->setDateadd(new \Datetime());
-              }else {
-                if ($type_id==1)
-                  $output->writeln('  - Modificando al producto '.$product_new.' la referencia '.$code_new.' del cliente '.$supplier_customer_id);
-                else
-                  $output->writeln('  - Modificando al producto '.$product_new.' la referencia '.$code_new.' del proveedor '.$supplier_customer_id);
-              }
-              // Si es modificación hay que obtener los nuevos datos
-              if ($action=='U'){
-                $customer = null;
-                $suppliers = null;
-                $product=$repositoryProducts->findOneBy(["code"=>$product_new]);
-                if ($product!=null) {
-                   if ($type_new==1){
-                     $customer=$repositoryCustomers->findOneBy(["code"=>$supplier_customer_new]);
-                     if ($customer==null)
-                       $validation = false;
-                   }else
-                   if ($type_new==2){
-                     $supplier=$repositorySuppliers->findOneBy(["code"=>$supplier_customer_new]);
-                     if ($supplier==null)
-                       $validation = false;
-                   }
-                }
-              }
-              if ($validation){
-                $oreferences->setName($code_new);
-                if (isset($references["Description"]))
-                  $oreferences->setDescription($references["Description"]);
-                else
-                  $oreferences->setDescription("");
-                $oreferences->setDateupd(new \Datetime());
-                $oreferences->setProduct($product);
-                $oreferences->setDeleted(0);
-                $oreferences->setActive(1);
-                if ($type_new==2){
-                  $oreferences->setType(1);
-                } else if ($type_new==1){
-                  $oreferences->setType(2);
-                }
+          if ($validation)
+            if ($oreferences==null){
+              $output->writeln('  - Añadiendo al producto '.$references["Item No."].' la referencia '.$references["Cross-Reference No."]);
+              $oreferences=new ERPReferences();
+              $oreferences->setName($references["Cross-Reference No."]);
+              $oreferences->setDescription($references["Description"]);
+              $oreferences->setDateadd(new \Datetime());
+              $oreferences->setDateupd(new \Datetime());
+              $oreferences->setProduct($product);
+              $oreferences->setDeleted(0);
+              $oreferences->setActive(1);
+              if ($type==2){
                 $oreferences->setSupplier($supplier);
+                $oreferences->setType(1);
+              } else if ($type==1){
                 $oreferences->setCustomer($customer);
-                $this->doctrine->getManager()->merge($oreferences);
-                $this->doctrine->getManager()->flush();
-                $this->doctrine->getManager()->clear();
+                $oreferences->setType(2);
               }
+              $this->doctrine->getManager()->merge($oreferences);
+              $this->doctrine->getManager()->flush();
+              $this->doctrine->getManager()->clear();
+            }else {
+              $output->writeln('  - Modificando la referencia '.$references["Cross-Reference No."].' del producto '.$references["Item No."]);
+              $oreferences->setDescription($references["Description"]);
+              $this->doctrine->getManager()->merge($oreferences);
+              $this->doctrine->getManager()->flush();
+              $this->doctrine->getManager()->clear();
             }
           }
-        }
       }
       // Sumar Reference al json para eliminar en tabla de cambios
       if ($validation){
