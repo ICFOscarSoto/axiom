@@ -1058,7 +1058,7 @@ public function importProductsSuppliers(InputInterface $input, OutputInterface $
   $count=0;
 
   while($count<$totalProducts){
-    $products=$repositoryProducts->productsLimitActive(intval($count*$page),intval($page));
+    $products=$repositoryProducts->productsLimit(intval($count*$page),intval($page));
     $count++;
     foreach($products as $id) {
       $product=$repositoryProducts->findOneBy(["id"=>$id, "company"=>2]);
