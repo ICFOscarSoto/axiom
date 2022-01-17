@@ -1054,7 +1054,7 @@ public function importProductsSuppliers(InputInterface $input, OutputInterface $
   $repositorySuppliers=$this->doctrine->getRepository(ERPSuppliers::class);
   $repositoryProducts=$this->doctrine->getRepository(ERPProducts::class);
   $page=5000;
-  $totalProducts=round(intval($repositoryProducts->totalProductsCategory())/$page);
+  $totalProducts=round(intval($repositoryProducts->totalProducts())/$page);
   $count=0;
 
   while($count<$totalProducts){
@@ -1114,15 +1114,15 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
   // Para cada categoria
   for($i=0; $i<count($categories); $i++){
     $query="SELECT id FROM erpproducts WHERE category_id=:category_id";
-    params=["category_id"=>$categories[$i]["category_id"]];
+    $params=["category_id"=>$categories[$i]["category_id"]];
     $products = $this->doctrine->getManager()->getConnection()->executeQuery($query, $params)->fetchAll();
     // Para cada producto de la categoría
     for($j=0; $j<count($products); $j++){
         $query="SELECT supplier_id FROM erpproducts_suppliers WHERE product_id=:product_id";
-        params=["product_id"=>$products[$j]["product_id"]];
+        $params=["product_id"=>$products[$j]["product_id"]];
         $suppliers = $this->doctrine->getManager()->getConnection()->executeQuery($query, $params)->fetchAll();
         // Para cada proveedor del producto
-    }  
+    }
   }
 
 
