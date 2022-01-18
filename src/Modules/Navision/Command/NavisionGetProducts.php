@@ -1094,9 +1094,6 @@ public function updateStocksStoresManaged(InputInterface $input, OutputInterface
 
 }
 
-<<<<<<< HEAD
-=======
-
 public function importProductsSuppliers(InputInterface $input, OutputInterface $output) {
   $repositoryProductsSuppliers=$this->doctrine->getRepository(ERPProductsSuppliers::class);
   $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
@@ -1141,7 +1138,6 @@ public function importProductsSuppliers(InputInterface $input, OutputInterface $
 
 
 
->>>>>>> e2aef64471da7d3ea3efdb5e32cf81fe02c1b41e
 public function importIncrements(InputInterface $input, OutputInterface $output) {
   //------   Create Lock Mutex    ------
   //$fp = fopen('/tmp/axiom-navisionGetProducts-importIncrements.lock', 'c');
@@ -1163,7 +1159,6 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
   $params=[];
   $categories = $this->doctrine->getManager()->getConnection()->executeQuery($query, $params)->fetchAll();
   // Para cada categoria
-<<<<<<< HEAD
   for($i=0; $i<10; $i++){
     $output->writeln(' - Categoría - '.$categories[$i]["category_id"].' - '.$categories[$i]["category_name"]);
     $query="SELECT code FROM erpproducts WHERE category_id='".$categories[$i]["category_id"]."'";
@@ -1196,18 +1191,6 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
             }
           }
       }
-=======
-  for($i=0; $i<count($categories); $i++){
-    $query="SELECT id FROM erpproducts WHERE category_id=:category_id";
-    $params=["category_id"=>$categories[$i]["category_id"]];
-    $products = $this->doctrine->getManager()->getConnection()->executeQuery($query, $params)->fetchAll();
-    // Para cada producto de la categoría
-    for($j=0; $j<count($products); $j++){
-        $query="SELECT supplier_id FROM erpproducts_suppliers WHERE product_id=:product_id";
-        $params=["product_id"=>$products[$j]["product_id"]];
-        $suppliers = $this->doctrine->getManager()->getConnection()->executeQuery($query, $params)->fetchAll();
-        // Para cada proveedor del producto
->>>>>>> e2aef64471da7d3ea3efdb5e32cf81fe02c1b41e
     }
   }
   fclose($fpp);
