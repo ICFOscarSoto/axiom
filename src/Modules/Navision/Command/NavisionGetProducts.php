@@ -168,6 +168,7 @@ public function importProduct(InputInterface $input, OutputInterface $output){
       $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
       $repositoryCategories=$this->doctrine->getRepository(ERPCategories::class);
       $repositorySuppliers=$this->doctrine->getRepository(ERPSuppliers::class);
+      $company=$repositoryCompanies->find(2);
 
       //Disable SQL logger
       $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
@@ -210,7 +211,6 @@ public function importProduct(InputInterface $input, OutputInterface $output){
             }
             if ($oproduct==null){
               $oproduct = new ERPProducts();
-              $company=$repositoryCompanies->find(2);
               $oproduct->setCompany($company);
               $oproduct->setDateadd(new \Datetime());
               $oproduct->setDeleted(0);
