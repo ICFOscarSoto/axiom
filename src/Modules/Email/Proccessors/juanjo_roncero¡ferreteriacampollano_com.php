@@ -14,7 +14,7 @@ use PhpOffice\PhpSpreadsheet\Reader;
 class juanjo_roncero¡ferreteriacampollano_com {
 
     public function checkMail($subject, $account, $inbox, $output, $doctrine){
-      $discordchannel="883046233017552956";
+      $discordchannel_critico="883046233017552956";
       $output->writeln([isset($subject->subject)?('Procesando: '.HelperMail::decode_header(imap_utf8($subject->subject))):('Procesando: Correo sin asunto')]);
       $from=HelperMail::decode_header(imap_utf8($subject->from));
       if(strpos($from,"<")!==FALSE){
@@ -41,7 +41,7 @@ class juanjo_roncero¡ferreteriacampollano_com {
             }
 
             if(!$order_attachment){
-              file_get_contents("https://icfbot.ferreteriacampollano.com/message.php?channel=".$discordchannel."&msg=".urlencode(":warning:"."SCRIPT ".basename(__FILE__, '.php').": Posible email de Velilla sin adjunto XLSM"));
+              file_get_contents("https://icfbot.ferreteriacampollano.com/message.php?channel=".$discordchannel_critico."&msg=".urlencode(":warning:"."SCRIPT ".basename(__FILE__, '.php').": Posible email de Velilla sin adjunto XLSM"));
               break;
             }
 
@@ -55,7 +55,7 @@ class juanjo_roncero¡ferreteriacampollano_com {
           }
         break;
         */
-        case 'Joaquin.Martinez@arcos.com':
+        case 'mailer@arcos.com':
           $subjectEmail=isset($subject->subject)?HelperMail::decode_header(imap_utf8($subject->subject)):'';
           if(strpos($subjectEmail,"Stock")!==FALSE){
             $emailUtils = new EmailUtils();
@@ -69,19 +69,15 @@ class juanjo_roncero¡ferreteriacampollano_com {
               }
             }
 
-
-
             if(!$order_attachment){
-              file_get_contents("https://icfbot.ferreteriacampollano.com/message.php?channel=".$discordchannel."&msg=".urlencode(":warning:"."SCRIPT ".basename(__FILE__, '.php').": Posible email de Arcos sin adjunto CSV"));
+              file_get_contents("https://icfbot.ferreteriacampollano.com/message.php?channel=".$discordchannel_critico."&msg=".urlencode(":warning:"."SCRIPT ".basename(__FILE__, '.php').": Posible email de Arcos sin adjunto CSV"));
               break;
             }
 
             $csv=$emailUtils->getAtachment($inbox,$order_attachment["msgno"],$order_attachment["encoding"],$order_attachment["partno"]);
-
-            //$csv=fopen($item->fileSelect,"r");
             HelperArcos::parseStocks($csv, $doctrine, $output);
 
-        }
+          }
         break;
 
 

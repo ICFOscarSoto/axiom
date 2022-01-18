@@ -1094,6 +1094,54 @@ public function updateStocksStoresManaged(InputInterface $input, OutputInterface
 
 }
 
+<<<<<<< HEAD
+=======
+
+public function importProductsSuppliers(InputInterface $input, OutputInterface $output) {
+  $repositoryProductsSuppliers=$this->doctrine->getRepository(ERPProductsSuppliers::class);
+  $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
+  $repositorySuppliers=$this->doctrine->getRepository(ERPSuppliers::class);
+  $repositoryProducts=$this->doctrine->getRepository(ERPProducts::class);
+  $page=5000;
+  $totalProducts=round(intval($repositoryProducts->totalProducts())/$page);
+  $count=0;
+
+  while($count<$totalProducts){
+    $products=$repositoryProducts->productsLimit(intval($count*$page),intval($page));
+    $count++;
+    foreach($products as $id) {
+      $product=$repositoryProducts->findOneBy(["id"=>$id, "company"=>2]);
+      $company=$repositoryCompanies->find(2);
+      $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getSuppliersByProduct.php?product='.$product->getCode());
+      $objects=json_decode($json, true);
+      $objects=$objects[0];
+      foreach ($objects["class"] as $supplierCode){
+          if ($supplierCode["No."]==null) continue;
+          $supplier=$repositorySuppliers->findOneBy(["code"=>$supplierCode["No."], "company"=>$company, "active"=>1, "deleted"=>0]);
+          if ($supplier==null) continue;
+          $productsSuppliers=$repositoryProductsSuppliers->findOneBy(["product"=>$product, "supplier"=>$supplier]);
+          if ($productsSuppliers==null) {
+            $output->writeln("Añadiendo el proveedor ".$supplier->getCode()." al producto ".$product->getCode());
+            $obj=new ERPProductsSuppliers();
+            $obj->setProduct($product);
+            $obj->setSupplier($supplier);
+            $obj->setCompany($company);
+            $obj->setActive(1);
+            $obj->setDeleted(0);
+            $obj->setDateadd(new \Datetime());
+            $obj->setDateupd(new \Datetime());
+            $this->doctrine->getManager()->persist($obj);
+            $this->doctrine->getManager()->flush();
+          }
+      }
+      $this->doctrine->getManager()->clear();
+    }
+  }
+}
+
+
+
+>>>>>>> e2aef64471da7d3ea3efdb5e32cf81fe02c1b41e
 public function importIncrements(InputInterface $input, OutputInterface $output) {
   //------   Create Lock Mutex    ------
   //$fp = fopen('/tmp/axiom-navisionGetProducts-importIncrements.lock', 'c');
@@ -1115,6 +1163,7 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
   $params=[];
   $categories = $this->doctrine->getManager()->getConnection()->executeQuery($query, $params)->fetchAll();
   // Para cada categoria
+<<<<<<< HEAD
   for($i=0; $i<10; $i++){
     $output->writeln(' - Categoría - '.$categories[$i]["category_id"].' - '.$categories[$i]["category_name"]);
     $query="SELECT code FROM erpproducts WHERE category_id='".$categories[$i]["category_id"]."'";
@@ -1147,6 +1196,18 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
             }
           }
       }
+=======
+  for($i=0; $i<count($categories); $i++){
+    $query="SELECT id FROM erpproducts WHERE category_id=:category_id";
+    $params=["category_id"=>$categories[$i]["category_id"]];
+    $products = $this->doctrine->getManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+    // Para cada producto de la categoría
+    for($j=0; $j<count($products); $j++){
+        $query="SELECT supplier_id FROM erpproducts_suppliers WHERE product_id=:product_id";
+        $params=["product_id"=>$products[$j]["product_id"]];
+        $suppliers = $this->doctrine->getManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+        // Para cada proveedor del producto
+>>>>>>> e2aef64471da7d3ea3efdb5e32cf81fe02c1b41e
     }
   }
   fclose($fpp);
