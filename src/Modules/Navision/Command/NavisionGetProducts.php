@@ -27,6 +27,7 @@ use App\Modules\ERP\Entity\ERPVariants;
 use App\Modules\ERP\Entity\ERPVariantsValues;
 use App\Modules\ERP\Entity\ERPProductsVariants;
 use App\Modules\ERP\Entity\ERPStockHistory;
+use App\Modules\ERP\Entity\ERPProductsSuppliers;
 use App\Modules\Globale\Entity\GlobaleCompanies;
 use App\Modules\Globale\Entity\GlobaleUsers;
 use App\Modules\Globale\Entity\GlobaleStates;
@@ -527,31 +528,39 @@ public function importPrices(InputInterface $input, OutputInterface $output) {
   $repositoryCategory=$this->doctrine->getRepository(ERPCategories::class);
   $repositorySuppliers=$this->doctrine->getRepository(ERPSuppliers::class);
   $repositoryShoppingDiscounts=$this->doctrine->getRepository(ERPShoppingDiscounts::class);
+  $productsSuppliersRepository=$this->doctrine->getRepository(ERPProductsSuppliers::class);
   $repository=$this->doctrine->getRepository(ERPProducts::class);
   $page=5000;
-  $totalProducts=round(intval($repository->totalProducts())/$page);
+  $totalProducts=round(intval($repository->totalProductsCategory())/$page);
   $count=0;
 
-  while($count<$totalProducts){
-      $products=$repository->productsLimit(intval($count*$page),intval($page));
+  while($count<1){
+      $products=$repository->productsLimitActive(intval($count*$page),intval($page));
       $count++;
-
-           foreach($products as $id) {
-              $product=$repository->findOneBy(["id"=>$id, "company"=>2]);
-              if ($product->getSupplier()==null or $product->getCategory()==null)  continue;
-              $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
-              $price=$repositoryShoppingDiscounts->findOneBy(["supplier"=>$product->getSupplier(),"category"=>$product->getCategory()]);
-              if ($price) $output->writeln("El producto ".$product->getCode()." tiene el precio ". $price->getDiscount());
-              else $output->writeln("El producto ".$product->getCode()." no tiene precio");
-              if ($price==null && $product->getCategory()!=null && $product->getSupplier()!=null){
-                $supplier=$repositorySuppliers->findOneBy(["id"=>$product->getSupplier()->getId()]);
-                $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getPrices.php?from='.$product->getCode().'&supplier='.$supplier->getCode());
-                $objects=json_decode($json, true);
-                $objects=$objects[0];
-                foreach ($objects["class"] as $prices){
-                  if($prices["Discount"]!=0){
-                    $category=$repositoryCategory->findOneBy(["id"=>$product->getCategory()->getId()]);
-                    $output->writeln(' --> El producto '.$product->getCode().' esta anadiendo el precio '.$prices["Discount"].' al proveedor '.$supplier->getCode().' en la categoria '.$category->getName());
+      //foreach($products as $id) {
+        $product=$repository->findOneBy(["id"=>196899, "company"=>2]);
+        if ($product->getSupplier()==null or $product->getCategory()==null)  continue;
+        $productsSuppliers=$productsSuppliersRepository->findBy(["product"=>$product, "active"=>1, "deleted"=>0]);
+        foreach ($productsSuppliers as $productSupplier){
+          $supplier=$productSupplier->getSupplier();
+          $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
+          $discount=$repositoryShoppingDiscounts->findOneBy(["supplier"=>$supplier,"category"=>$product->getCategory(), "active"=>1, "deleted"=>0]);
+          if ($discount) $output->writeln("El producto ".$product->getCode()." tiene el descuento ". $discount->getDiscount()." para el proveedor ".$supplier->getCode());
+          else $output->writeln("El producto ".$product->getCode()." no tiene descuentos activos");
+          if ($discount==null && $supplier!=null){
+            $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getPrices.php?from='.$product->getCode().'&supplier='.$supplier->getCode());
+            $objects=json_decode($json, true);
+            $objects=$objects[0];
+              foreach ($objects["class"] as $prices){
+                if($prices["Discount"]!=0){
+                  if ($prices["Ending"]["date"]=="1753-01-01 00:00:00.000000") $dateend=null;
+                  else $dateend=date_create_from_format("Y-m-d h:i:s.u",$prices["Ending"]["date"]);
+                  $datestart=date_create_from_format("Y-m-d h:i:s.u",$prices["Starting"]["date"]);
+                  $shoppingDiscount=$repositoryShoppingDiscounts->findOneBy(["supplier"=>$supplier,"category"=>$product->getCategory(), "discount"=>$prices["Discount"], "start"=>$datestart, "end"=>$dateend]);
+                  if ($shoppingDiscount!=null) continue;
+                  $category=$repositoryCategory->findOneBy(["id"=>$product->getCategory()->getId()]);
+                  if ($category==null) $output->writeln(' --> El producto '.$product->getCode().' esta anadiendo el precio '.$prices["Discount"].' al proveedor '.$supplier->getCode());
+                  else $output->writeln(' --> El producto '.$product->getCode().' esta anadiendo el precio '.$prices["Discount"].' al proveedor '.$supplier->getCode().' en la categoria '.$category->getName());
                     $obj=new ERPShoppingDiscounts();
                     $obj->setSupplier($supplier);
                     $obj->setCategory($category);
@@ -561,34 +570,26 @@ public function importPrices(InputInterface $input, OutputInterface $output) {
                     $obj->setDiscount3($prices["Discount3"]);
                     $obj->setDiscount4($prices["Discount4"]);
                     $obj->setQuantity($prices["Quantity"]);
-                    $obj->setStart(date_create_from_format("Y-m-d h:i:s.u",$prices["Starting"]["date"]));
-                    if ($prices["Ending"]["date"]=="1753-01-01 00:00:00.000000") {
-                      $obj->setEnd(null);
-                    } else $obj->setEnd(date_create_from_format("Y-m-d h:i:s.u",$prices["Ending"]["date"]));
+                    $obj->setStart($datestart);
+                    $obj->setEnd($dateend);
                     $obj->setDateadd(new \Datetime());
                     $obj->setDateupd(new \Datetime());
-                    if (strtotime($prices["Ending"]["date"])<strtotime(date("d-m-Y H:i:00",time())) && $prices["Ending"]["date"]!="1753-01-01 00:00:00.000000" ) {
-                      $obj->setActive(0);
-                    } else {
-                      $obj->setActive(1);
-                    }
-                    $obj->setDeleted(0);
-                    $this->doctrine->getManager()->merge($obj);
-                    $this->doctrine->getManager()->flush();
-                    if($obj->getEnd()==null) $obj->setShoppingPrices($this->doctrine);
-                    $this->doctrine->getManager()->clear();
+                  if (strtotime($prices["Ending"]["date"])<strtotime(date("d-m-Y H:i:00",time())) && $prices["Ending"]["date"]!="1753-01-01 00:00:00.000000" ) {
+                    $obj->setActive(0);
+                  } else {
+                    $obj->setActive(1);
+                  }
+                  $obj->setDeleted(0);
+                  $this->doctrine->getManager()->merge($obj);
+                  $this->doctrine->getManager()->flush();
+                  if($obj->getEnd()==null) $obj->setShoppingPrices($this->doctrine, $supplier);
+                  $this->doctrine->getManager()->clear();
                   }
                 }
               }
-
-
+            //}
           }
-          $output->writeln($count);
-  }
-
-
-
-
+        }
   //------   Critical Section END   ------
   //------   Remove Lock Mutex    ------
   fclose($fp);
