@@ -21,19 +21,19 @@ class ERPIncrements
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPSuppliers")
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPSuppliers", fetch="EAGER")
      * @ORM\JoinColumn(onDelete="CASCADE")
      */
     private $supplier;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPCategories")
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPCategories", fetch="EAGER")
      * @ORM\JoinColumn(onDelete="CASCADE")
      */
     private $category;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPCustomerGroups")
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPCustomerGroups", fetch="EAGER")
      * @ORM\JoinColumn(nullable=false,onDelete="CASCADE")
      */
     private $customergroup;
@@ -59,7 +59,7 @@ class ERPIncrements
     private $dateupd;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCompanies")
+     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCompanies", fetch="EAGER")
      * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     private $company;
