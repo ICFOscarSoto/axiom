@@ -28,6 +28,7 @@ use App\Modules\ERP\Entity\ERPProductsVariants;
 use App\Modules\ERP\Entity\ERPInfoStocks;
 use App\Modules\ERP\Entity\ERPStoresManagersUsers;
 use App\Modules\ERP\Entity\ERPStoresManagersUsersStores;
+use App\Modules\ERP\Entity\ERPTypesMovements;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
@@ -1161,8 +1162,25 @@ class ERPProductsController extends Controller
 				 $location=$locationRepository->findOneBy(['store'=>$store->getId()]);
 				 $stockRepository=$this->getDoctrine()->getRepository(ERPStocks::class);
 				 $stock=$stockRepository->findOneBy(['storelocation'=>$location->getId(), 'product'=>$product->getId()]);
+				 $typesRepository=$this->getDoctrine()->getRepository(ERPTypesMovements::class);
+				 $type=$typesRepository->findOneBy(["name"=>"Traspaso recibido"]);
+				 $stockHistory=new ERPStockHistory();
+         $stockHistory->setProduct($product);
+         $stockHistory->setLocation($storeLocation);
+         $stockHistory->setStore($store);
+         $stockHistory->setUser($this->getUser());
+         $stockHistory->setDateadd(new \Datetime());
+         $stockHistory->setDateupd(new \Datetime());
+         $stockHistory->setNumOperation($transfer);
+         $stockHistory->setQuantity($received);
+				 $stockHistory->setPreviousqty($stock->getQuantity());
+				 $stockHistory->setNewqty($stock->getQuantity()+$received);
+         $stockHistory->setType($type);
+         $stockHistory->setActive(true);
+         $stockHistory->setDeleted(false);
 				 $stock->setQuantity($stock->getQuantity()+$received);
 				 $this->getDoctrine()->getManager()->persist($stock);
+				 $this->getDoctrine()->getManager()->persist($stockHistory);
 			 } else return new JsonResponse(["result"=>-6, "text"=>"El almacén de destino (".$store->getName().") no se corresponde con un almacén gestionado"]);
 
 
