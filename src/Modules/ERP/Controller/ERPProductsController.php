@@ -158,6 +158,7 @@ class ERPProductsController extends Controller
 			$tabs=array_merge($tabs,[["name" => "ean13",  "icon"=>"fa fa-users", "caption"=>"EAN13", "route"=>$this->generateUrl("listEAN13",["id"=>$id])],
 			["name" => "references",  "icon"=>"fa fa-users", "caption"=>"References", "route"=>$this->generateUrl("listReferences",["id"=>$id])],
 			["name"=>  "productPrices", "icon"=>"fa fa-money", "caption"=>"Prices","route"=>$this->generateUrl("infoProductPrices",["id"=>$id])],
+			["name"=>  "rates", "icon"=>"fa fa-money", "caption"=>"Rates","route"=>$this->generateUrl("infoProductRates",["id"=>$id])],
 			["name" => "stocks", "icon"=>"fa fa-id-card", "caption"=>"Stocks", "route"=>$this->generateUrl("infoStocks",["id"=>$id])],
 			["name" => "infoStocks", "icon"=>"fa fa-id-card", "caption"=>"InfoStocks", "route"=>$this->generateUrl("listInfoStocks",["id"=>$id])],
 			["name" => "files", "icon"=>"fa fa-cloud", "caption"=>"Files", "route"=>$this->generateUrl("cloudfiles",["id"=>$id, "path"=>"products"])]]);
@@ -544,55 +545,55 @@ class ERPProductsController extends Controller
  * @Route("/{_locale}/admin/ERP/product/printLabel/{id}/{printer}/{copies}/{type}", name="printDirectly", defaults={"copies"=1,"type"=1})
  */
  public function printDirectly($id, $printer, $copies, $type){
-	$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-	$repositoryEAN=$this->getDoctrine()->getRepository(ERPEAN13::class);
-	$repositoryProduct=$this->getDoctrine()->getRepository(ERPProducts::class);
-	$repositoryVariants=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
-	$code="";
-	$barcode="0000000000000";
-	$name="";
-	$noValidate=false;
-	if($type==1){  //Product id barcode
-		$product=$repositoryProduct->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany()]);
-		if($product){
-			$code=$product->getCode();
-			$barcode='P.'.str_pad($product->getId(),8,'0', STR_PAD_LEFT);
-			$name=$product->getName();
-		}
-	}else
-		if($type==2){  //Product EAN barcode
-			$ean=$repositoryEAN->findOneBy(["id"=>$id]);
-			if($ean){
-				$code=$ean->getProduct()->getCode();
-				$barcode=$ean->getName();
-				$name=$ean->getProduct()->getName();
-				if ($ean->getCustomer())
- 			  	if ($ean->getCustomer()->getCode()=='C01448') $noValidate=true;
- 					else $noValidate=false;
- 			else $noValidate=false;
+		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		$repositoryEAN=$this->getDoctrine()->getRepository(ERPEAN13::class);
+		$repositoryProduct=$this->getDoctrine()->getRepository(ERPProducts::class);
+		$repositoryVariants=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
+		$code="";
+		$barcode="0000000000000";
+		$name="";
+		$noValidate=false;
+		if($type==1){  //Product id barcode
+			$product=$repositoryProduct->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany()]);
+			if($product){
+				$code=$product->getCode();
+				$barcode='P.'.str_pad($product->getId(),8,'0', STR_PAD_LEFT);
+				$name=$product->getName();
 			}
-		} else {
-			if($type==3){  //Variant id barcode
-				$variant=$repositoryVariants->findOneBy(["id"=>$id]);
-				if($variant && $variant->getProduct() && $variant->getVariantvalue() && $variant->getVariantname()){
-					$code=$variant->getProduct()->getCode();
-					$barcode='V.'.str_pad($variant->getId(),8,'0', STR_PAD_LEFT);
-					$name=$variant->getProduct()->getName().' - '.$variant->getVariantname()->getName().' '.$variant->getVariantvalue()->getName();
+		}else
+			if($type==2){  //Product EAN barcode
+				$ean=$repositoryEAN->findOneBy(["id"=>$id]);
+				if($ean){
+					$code=$ean->getProduct()->getCode();
+					$barcode=$ean->getName();
+					$name=$ean->getProduct()->getName();
+					if ($ean->getCustomer())
+	 			  	if ($ean->getCustomer()->getCode()=='C01448') $noValidate=true;
+	 					else $noValidate=false;
+	 			else $noValidate=false;
+				}
+			} else {
+				if($type==3){  //Variant id barcode
+					$variant=$repositoryVariants->findOneBy(["id"=>$id]);
+					if($variant && $variant->getProduct() && $variant->getVariantvalue() && $variant->getVariantname()){
+						$code=$variant->getProduct()->getCode();
+						$barcode='V.'.str_pad($variant->getId(),8,'0', STR_PAD_LEFT);
+						$name=$variant->getProduct()->getName().' - '.$variant->getVariantname()->getName().' '.$variant->getVariantvalue()->getName();
+					}
 				}
 			}
+		$params=["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "code"=>$code, "barcode"=>$barcode, "name"=>$name, "user"=>$this->getUser(), "noValidate"=>$noValidate];
+
+		$reportsUtils = new ERPEan13Reports();
+		$tempPath=$this->get('kernel')->getRootDir().DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$this->getUser()->getCompany()->getId().DIRECTORY_SEPARATOR.'printers'.DIRECTORY_SEPARATOR.$printer.DIRECTORY_SEPARATOR;
+
+		if (!file_exists($tempPath) && !is_dir($tempPath)) {
+				mkdir($tempPath, 0775, true);
 		}
-	$params=["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "code"=>$code, "barcode"=>$barcode, "name"=>$name, "user"=>$this->getUser(), "noValidate"=>$noValidate];
-
-	$reportsUtils = new ERPEan13Reports();
-	$tempPath=$this->get('kernel')->getRootDir().DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$this->getUser()->getCompany()->getId().DIRECTORY_SEPARATOR.'printers'.DIRECTORY_SEPARATOR.$printer.DIRECTORY_SEPARATOR;
-
-	if (!file_exists($tempPath) && !is_dir($tempPath)) {
-			mkdir($tempPath, 0775, true);
-	}
-	for($i=0; $i<$copies; $i++){
-		$pdf=$reportsUtils->create($params,'F',$tempPath.$barcode.'-'.$i.'.pdf');
-	}
-	return new JsonResponse(["result"=>1]);
+		for($i=0; $i<$copies; $i++){
+			$pdf=$reportsUtils->create($params,'F',$tempPath.$barcode.'-'.$i.'.pdf');
+		}
+		return new JsonResponse(["result"=>1]);
  }
 
 
@@ -1042,19 +1043,22 @@ class ERPProductsController extends Controller
 			 else $product["category"]='';
 			 $product["netprice"]=$item->getNetprice()==1?"true":"false";
 			 $product["shopping_price"]=$item->getShoppingPrice();
-			 $product["PVP"]=$item->getPVPR();
+
+			 $product["PVP"]=$item->getPVPR()==0 ? $item->getPVP() : $item->getPVPR();
+			 $product["PVP"]=$product["PVP"]==null ? 0 : $product["PVP"];
 			 if ($item->getNetprice()==false) $shoppingDiscounts=$this->getShoppingDiscounts($supplier,$item->getCategory());
 			 else $shoppingDiscounts=null;
 			 if ($shoppingDiscounts!=null) {
 				 $product["discount"]=$shoppingDiscounts->getDiscount();
-				 $product["start"]=$shoppingDiscounts->getStart();
-				 $product["end"]=$shoppingDiscounts->getEnd();
+				 $product["start"]=$shoppingDiscounts->getStart()!=null ? $shoppingDiscounts->getStart()->format('d/m/Y') : '---';
+				 $product["end"]=$shoppingDiscounts->getEnd()!=null ? $shoppingDiscounts->getEnd()->format('d/m/Y') : '---';
 			 }
 			 else {
 				 $product["discount"]=0;
 				 $product["start"]='';
 				 $product["end"]='';
 			 }
+			 $product["quantity"]=0;
 			 $products[]=$product;
 			 if ($item->getNetprice()){
 				 $product["code"]='---';
@@ -1108,7 +1112,7 @@ class ERPProductsController extends Controller
 
 	 public function generateQR(RouterInterface $router,Request $request){
 		 $transfer=$request->query->get('name',null);
-		 $transfer=substr($transfer,3);
+		 //$transfer=substr($transfer,3);
 		 $params["name"]=$transfer;
 		 $printQRUtils = new ERPPrintQR();
 		 $pdf=$printQRUtils->create($params);

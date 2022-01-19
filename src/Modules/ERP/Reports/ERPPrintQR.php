@@ -43,7 +43,10 @@ function create($params){
     $qrcode->render($params['name'], $path);
     $this->pdf->Image($path, 16, 7, 32, 32);
     $this->pdf->SetXY(0,5);
-    $this->pdf->Cell(65, 5.5, $params['name'], 0, 0, 'C');
+
+    if (strpos($params['name'],'TR.') !== null) $txt=substr($params['name'],3);
+    else $txt=$params['name'];
+    $this->pdf->Cell(65, 5.5, $txt, 0, 0, 'C');
     unlink($path);
     return $this->pdf->Output();
 }
