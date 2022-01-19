@@ -26,13 +26,13 @@ class ERPReferences
     private $name;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPCustomers")
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPCustomers", fetch="EAGER")
      * @ORM\JoinColumn(onDelete="CASCADE")
      */
     private $customer;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPProducts")
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPProducts", fetch="EAGER")
      * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     private $product;
@@ -63,7 +63,7 @@ class ERPReferences
     private $type;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPSuppliers")
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPSuppliers", fetch="EAGER")
      * @ORM\JoinColumn(onDelete="CASCADE")
      */
     private $supplier;

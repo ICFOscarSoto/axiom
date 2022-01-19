@@ -209,6 +209,8 @@ public function importProduct(InputInterface $input, OutputInterface $output){
             if ($action=='U') {
               // Si no existe se hace lo mismo que el insert
               $oproduct=$repositoryProducts->findOneBy(["code"=>$code_old]);
+              if ($oproduct==null)
+                $oproduct=$repositoryProducts->findOneBy(["code"=>$code_new]);
             }
             if ($oproduct==null){
               $oproduct = new ERPProducts();
@@ -356,11 +358,11 @@ public function importEAN13(InputInterface $input, OutputInterface $output){
                 if ($customer==null){
                   $supplier=$repositorySuppliers->findOneBy(["code"=>$supplier_customer_old]);
                   if ($supplier!=null)
-                    $oean13=$repositoryEAN13->findOneBy(["name"=>$code_old, "product"=>$product, "supplier"=>$supplier]);
+                    $oean13=$repositoryEAN13->findOneBy(["name"=>$code_old, "product"=>$product, "supplier"=>$supplier, "customer"=>null, "type"=>1]);
                   else
-                    $oean13=$repositoryEAN13->findOneBy(["name"=>$code_old, "product"=>$product, "supplier"=>null, "customer"=>null]);
+                    $oean13=$repositoryEAN13->findOneBy(["name"=>$code_old, "product"=>$product, "supplier"=>null, "customer"=>null, "type"=>null]);
                 }else {
-                  $oean13=$repositoryEAN13->findOneBy(["name"=>$code_old, "product"=>$product, "customer"=>$customer]);
+                  $oean13=$repositoryEAN13->findOneBy(["name"=>$code_old, "product"=>$product, "supplier"=>null, "customer"=>$customer, "type"=>2]);
                 }
                 if ($oean13!=NULL){
                   $output->writeln($action.' - '.$code_old);
@@ -373,17 +375,17 @@ public function importEAN13(InputInterface $input, OutputInterface $output){
              $output->writeln($action.' - '.$code_old.' - '.$code_new.' - '.$product_new.' - '.$supplier_customer_new);
              // Inserta nuevo EAN13
              if ($action=='I') {
-               $product=$repositoryProducts->findOneBy(["code"=>$product_old]);
+               $product=$repositoryProducts->findOneBy(["code"=>$product_new]);
                if ($product!=NULL){
                  $customer=$repositoryCustomers->findOneBy(["code"=>$supplier_customer_new]);
                  if ($customer==null){
                    $supplier=$repositorySuppliers->findOneBy(["code"=>$supplier_customer_new]);
                    if ($supplier!=null)
-                     $oean13=$repositoryEAN13->findOneBy(["name"=>$code_new, "product"=>$product, "supplier"=>$supplier]);
+                     $oean13=$repositoryEAN13->findOneBy(["name"=>$code_new, "product"=>$product, "supplier"=>$supplier, "customer"=>null, "type"=>1]);
                    else
-                     $oean13=$repositoryEAN13->findOneBy(["name"=>$code_new, "product"=>$product, "supplier"=>null, "customer"=>null]);
+                     $oean13=$repositoryEAN13->findOneBy(["name"=>$code_new, "product"=>$product, "supplier"=>null, "customer"=>null, "type"=>null]);
                  }else {
-                   $oean13=$repositoryEAN13->findOneBy(["name"=>$code_new, "product"=>$product, "customer"=>$customer]);
+                   $oean13=$repositoryEAN13->findOneBy(["name"=>$code_new, "product"=>$product, "supplier"=>null, "customer"=>$customer, "type"=>2]);
                  }
                }
              }else
@@ -395,20 +397,35 @@ public function importEAN13(InputInterface $input, OutputInterface $output){
                  if ($customer==null){
                    $supplier=$repositorySuppliers->findOneBy(["code"=>$supplier_customer_old]);
                    if ($supplier!=null)
-                     $oean13=$repositoryEAN13->findOneBy(["name"=>$code_old, "product"=>$product, "supplier"=>$supplier]);
+                     $oean13=$repositoryEAN13->findOneBy(["name"=>$code_old, "product"=>$product, "supplier"=>$supplier, "customer"=>null, "type"=>1]);
                    else{
-                     $oean13=$repositoryEAN13->findOneBy(["name"=>$code_old, "product"=>$product, "supplier"=>null, "customer"=>null]);
+                     $oean13=$repositoryEAN13->findOneBy(["name"=>$code_old, "product"=>$product, "supplier"=>null, "customer"=>null, "type"=>null]);
                    }
                  }else {
-                   $oean13=$repositoryEAN13->findOneBy(["name"=>$code_old, "product"=>$product, "customer"=>$customer]);
+                   $oean13=$repositoryEAN13->findOneBy(["name"=>$code_old, "product"=>$product, "supplier"=>null, "customer"=>$customer, "type"=>2]);
                  }
+                 // Si no existe se busca el nuevo para ver si está
+                if ($oean13==null){
+                  $product=$repositoryProducts->findOneBy(["code"=>$product_new]);
+                  if ($product!=NULL){
+                    $customer=$repositoryCustomers->findOneBy(["code"=>$supplier_customer_new]);
+                    if ($customer==null){
+                      $supplier=$repositorySuppliers->findOneBy(["code"=>$supplier_customer_new]);
+                      if ($supplier!=null)
+                        $oean13=$repositoryEAN13->findOneBy(["name"=>$code_new, "product"=>$product, "supplier"=>$supplier, "customer"=>null, "type"=>1]);
+                      else
+                        $oean13=$repositoryEAN13->findOneBy(["name"=>$code_new, "product"=>$product, "supplier"=>null, "customer"=>null, "type"=>null]);
+                    }else {
+                      $oean13=$repositoryEAN13->findOneBy(["name"=>$code_new, "product"=>$product, "supplier"=>null, "customer"=>$customer, "type"=>2]);
+                    }
+                  }
+                }
                }
              }
              if ($oean13==null){
                 $oean13=new ERPEAN13();
                 $oean13->setDateadd(new \Datetime());
              }
-             if ($ean13==null || $ean13["idaxiom"]==null){
               $oean13->setName($code_new);
               $oean13->setDateupd(new \Datetime());
               $oean13->setDeleted(0);
@@ -418,20 +435,21 @@ public function importEAN13(InputInterface $input, OutputInterface $output){
                 $supplier=$repositorySuppliers->findOneBy(["code"=>$supplier_customer_new]);
                 if ($supplier!=null){
                   $oean13->setSupplier($supplier);
+                  $oean13->setCustomer(null);
                   $oean13->setType(1);
                 }
               } else {
+                $oean13->setSupplier(null);
                 $oean13->setCustomer($customer);
                 $oean13->setType(2);
               }
               $product=$repositoryProducts->findOneBy(["code"=>$product_new]);
               if ($product!=null) {
                 $oean13->setProduct($product);
-                $this->doctrine->getManager()->merge($oean13);
+                $this->doctrine->getManager()->persist($oean13);
                 $this->doctrine->getManager()->flush();
                 $this->doctrine->getManager()->clear();
               }
-            }
           }
         }
         // Sumar EAN13 al json para eliminar en tabla de cambios
@@ -1152,6 +1170,17 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
     exit;
   }
 
+  $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
+  $company=$repositoryCompanies->find(2);
+  $repositoryCategories=$this->doctrine->getRepository(ERPCategories::class);
+  $repositorySuppliers=$this->doctrine->getRepository(ERPSuppliers::class);
+  $repositoryCustomerGroups=$this->doctrine->getRepository(ERPCustomerGroups::class);
+  $customergroups = [];
+  $customergroups[1] = $repositoryCustomerGroups->find(1);
+  $customergroups[2] = $repositoryCustomerGroups->find(2);
+  $customergroups[3] = $repositoryCustomerGroups->find(3);
+  $repositoryIncrements=$this->doctrine->getRepository(ERPIncrements::class);
+
   //------   Critical Section START   ------
   $fpp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-getproductsprices.csv', 'w');
   $output->writeln('* Sincronizando Incrementos....');
@@ -1160,9 +1189,12 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
   $params=[];
   $categories = $this->doctrine->getManager()->getConnection()->executeQuery($query, $params)->fetchAll();
   // Para cada categoria
-  for($i=0; $i<10; $i++){
-    $output->writeln(' - Categoría - '.$categories[$i]["category_id"].' - '.$categories[$i]["category_name"]);
-    $query="SELECT code FROM erpproducts WHERE category_id='".$categories[$i]["category_id"]."'";
+  for($i=0; $i<count($categories); $i++){
+    $category_id    = $categories[$i]["category_id"];
+    $category_name  = $categories[$i]["category_name"];
+    $category       = $repositoryCategories->find($category_id);
+    $output->writeln(' - Categoría - '.$category_id.' - '.$category_name);
+    $query="SELECT code FROM erpproducts WHERE category_id='".$category_id."'";
     $params=[];
     $products = $this->doctrine->getManager()->getConnection()->executeQuery($query, $params)->fetchAll();
     if ($products!=null){
@@ -1187,200 +1219,64 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
           foreach($aproducts_prices['products_prices'] as $product=>$groups){
             foreach($groups as $group=>$increment){
               foreach($increment as $vendor=>$value){
-                fwrite($fpp, '"'.$categories[$i]["category_name"].'";"'.$categories[$i]["category_id"].'";"'.$product.'";"'.$group.'";"'.$vendor.'";"'.str_replace('.',',',$value).'"'.PHP_EOL);
+                fwrite($fpp, '"'.$category_name.'";"'.$category_id.'";"'.$product.'";"'.$group.'";"'.$vendor.'";"'.str_replace('.',',',$value).'"'.PHP_EOL);
               }
             }
           }
-      }
-    }
-  }
-  fclose($fpp);
-
-  /*$navisionSyncRepository=$this->doctrine->getRepository(NavisionSync::class);
-  $navisionSync=$navisionSyncRepository->findOneBy(["entity"=>"increments"]);
-  if ($navisionSync==null) {
-    $navisionSync=new NavisionSync();
-    $navisionSync->setMaxtimestamp(0);
-  }
-  $datetime=new \DateTime();
-  $output->writeln('* Sincronizando incrementos....');
-  $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
-  $repositoryCategory=$this->doctrine->getRepository(ERPCategories::class);
-  $repositorySuppliers=$this->doctrine->getRepository(ERPSuppliers::class);
-  $repositoryCustomers=$this->doctrine->getRepository(ERPCustomers::class);
-  $repositoryCustomeGroups=$this->doctrine->getRepository(ERPCustomerGroups::class);
-  $repositoryIncrements=$this->doctrine->getRepository(ERPIncrements::class);
-  $repositoryCustomerIncrements=$this->doctrine->getRepository(ERPCustomerIncrements::class);
-  $repository=$this->doctrine->getRepository(ERPProducts::class);
-  $repositoryproductprices=$this->doctrine->getRepository(ERPProductPrices::class);
-  $repositorycustomerprices=$this->doctrine->getRepository(ERPCustomerPrices::class);
-  $page=5000;
-  $totalProducts=round(intval($repository->totalProductsCategory())/$page);
-  $count=0;
-
-  while($count<$totalProducts){
-      $products=$repository->productsLimitActive(intval($count*$page),intval($page));
-      $count++;
-
-  //Disable SQL logger
-    foreach($products as $id) {
-    $product=$repository->findOneBy(["id"=>$id, "company"=>2]);
-    $company=$repositoryCompanies->find(2);
-    $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
-    $output->writeln($product->getCode().'  - '.$product->getName());
-    if ($product->getCategory()!=null && $product->getSupplier()!=null){
-      $supplier=$repositorySuppliers->findOneBy(["id"=>$product->getSupplier()->getId()]);
-      $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getIncrements.php?product='.$product->getCode());
-      $objects=json_decode($json, true);
-      $objects=$objects[0];
-      foreach ($objects["class"] as $increment){
-        if($increment["neto"]==0) continue;
-      //grupos de clientes
-      if($increment["type"]==1){
-          $customergroup=$repositoryCustomeGroups->findOneBy(["name"=>$increment["salescode"]]);
-          if($customergroup!=NULL){
-              $incrementaxiom_ID=$repositoryIncrements->getIncrementIdByGroup($product->getSupplier(), $product->getCategory(), $customergroup);
-              //no existe el incremento en axiom
-              if($incrementaxiom_ID==null)  {
-                $output->writeln('Añadimos el incremento para el grupo '.$increment["salescode"]);
-                if($increment["Discount"]!=0 AND $increment["neto"]!=0){
-                    $category=$repositoryCategory->findOneBy(["id"=>$product->getCategory()->getId()]);
-                    $obj=new ERPIncrements();
-                    $obj->setSupplier($supplier);
-                    $obj->setCategory($category);
-                    $obj->setCustomergroup($customergroup);
-                    $obj->setCompany($company);
-                    $pvp=$increment["pvp"];
-                    $dto=$increment["Discount"];
-                    $neto=$increment["neto"];
-                    $precio_con_dto=$pvp-$pvp*($dto/100);
-                    $inc=(($precio_con_dto/$neto)-1)*100;
-                    $obj->setIncrement(round($inc));
-                    $obj->setDateadd(new \Datetime());
-                    $obj->setDateupd(new \Datetime());
-                    $obj->setActive(1);
-                    $obj->setDeleted(0);
-                    $this->doctrine->getManager()->persist($obj);
-                    $this->doctrine->getManager()->flush();
-                    $output->writeln('Actualizamos todos los productos asociados a ese incremento...');
-                    $obj->calculateIncrementsBySupplierCategory($this->doctrine);
+        if (isset($aproducts_prices['increments'])){
+          $increments = $aproducts_prices['increments'];
+          // Obtener proveedores de la categoría
+          $query="SELECT DISTINCT(ps.supplier_id) as supplier_id, s.code as supplier_code FROM erpproducts_suppliers ps LEFT JOIN erpsuppliers s on s.id=ps.supplier_id WHERE ps.product_id in (SELECT id FROM erpproducts WHERE category_id='".$categories[$i]["category_id"]."')";
+          $params=[];
+          $suppliers = $this->doctrine->getManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+          for($j=0; $j<count($suppliers); $j++){
+            // Para cada proveedor/grupo de la categoría se almacena su incremento en el producto
+            $supplier_id    = $suppliers[$j]['supplier_id'];
+            $supplier_code  = $suppliers[$j]['supplier_code'];
+            $supplier       = $repositorySuppliers->find($supplier_id);
+            $increment = null;
+            if (isset($increments[$supplier_code]))
+              $increment = $increments[$supplier_code];
+            else
+            if (isset($increments['default']))
+              $increment = $increments['default'];
+            if ($increment!=null){
+              for($k=1; $k<4; $k++){
+                // Existe el incremento
+                $oincrement=$repositoryIncrements->findOneBy(["category"=>$category, "supplier"=>$supplier, "customergroup"=>$customergroups[$k], "company"=>$company, "deleted"=>0]);
+                if ($oincrement==null){
+                  $oincrement=new ERPIncrements();
+                  $oincrement->setCategory($category);
+                  $oincrement->setSupplier($supplier);
+                  $oincrement->setCustomerGroup($customergroups[$k]);
+                  $oincrement->setCompany($company);
+                  $oincrement->setDeleted(0);
+                  $oincrement->setDateadd(new \Datetime());
                 }
-              }
-              //existe el incremento en axiom, luego hay que editarlo siempre y cuando haya habido alguna modificación
-              else{
-                $output->writeln('Ya existe el incremento de grupo '.$incrementaxiom_ID["id"]);
-                $incrementaxiom=$repositoryIncrements->findOneBy(["id"=>$incrementaxiom_ID]);
-                $pvp=$increment["pvp"];
-                $dto=$increment["Discount"];
-                $neto=$increment["neto"];
-                $precio_con_dto=$pvp-$pvp*($dto/100);
-                $inc=round((($precio_con_dto/$neto)-1)*100,2);
-                //antes de hacer ninguna modificación, comprobamos si ha habido algún cambio en el incremento, de no ser así, no se hace nada.
-                if(round($incrementaxiom->getIncrement(),2)!=$inc){
-                  $output->writeln('Actualizamos el incremento de grupo '.$incrementaxiom_ID["id"]);
-                  $incrementaxiom->setIncrement($inc);
-                  $incrementaxiom->setDateupd(new \Datetime());
-                  $this->doctrine->getManager()->persist($incrementaxiom);
+                $oincrement->setActive(1);
+                $oincrement->setIncrement($increment[$k]);
+                $oincrement->setDateupd(new \Datetime());
+                try{
+                  $this->doctrine->getManager()->persist($oincrement);
                   $this->doctrine->getManager()->flush();
+                  // Actualizar los productos de la categoría
+                  $oincrement->calculateIncrementsBySupplierCategory($this->doctrine);
+                }catch(Exception $e){
+                  $output->writeln(' - Error - '.$category_id.' - '.$category_name);
                 }
-
-              //  $output->writeln(date("Y-m-d"));
-              //  $output->writeln(date("Y-m-d", strtotime($incrementaxiom->getDateupd()->format('Y-m-d'))));
-
-                if(date("Y-m-d")!=date("Y-m-d", strtotime($incrementaxiom->getDateupd()->format('Y-m-d'))))
-                {
-                  $output->writeln('Actualizamos los precios del incremento '.$incrementaxiom_ID["id"]);
-                  $incrementaxiom->calculateIncrementsBySupplierCategory($this->doctrine);
-                }
-                else   $output->writeln('Ya hemos actualizado los productos con este incremento');
               }
             }
           }
-      //cliente concreto
-      else if($increment["type"]==0){
-            $customer=$repositoryCustomers->findOneBy(["code"=>$increment["salescode"]]);
-            if($customer!=NULL){
-                $customerincrementaxiom_ID=$repositoryCustomerIncrements->getIncrementIdByCustomer($product->getSupplier(),$product->getCategory(),$customer);
-                //no existe el incremento para el cliente, luego lo creamos
-                if($customerincrementaxiom_ID==null){
-                  $output->writeln('Añadimos incremento para el cliente '.$increment["salescode"]);
-                  if($increment["Discount"]!=0 AND $increment["neto"]!=0){
-                      $category=$repositoryCategory->findOneBy(["id"=>$product->getCategory()->getId()]);
-                      $obj=new ERPCustomerIncrements();
-                      $obj->setSupplier($supplier);
-                      $obj->setCategory($category);
-                      $obj->setCustomer($customer);
-                      $obj->setCompany($company);
-                      $pvp=$increment["pvp"];
-                      $dto=$increment["Discount"];
-                      $neto=$increment["neto"];
-                      $precio_con_dto=$pvp-$pvp*($dto/100);
-                      $inc=(($precio_con_dto/$neto)-1)*100;
-                      $obj->setIncrement($inc);
-                      $obj->setDateadd(new \Datetime());
-                      $obj->setDateupd(new \Datetime());
-                      $obj->setStart(date_create_from_format("Y-m-d h:i:s.u",$increment["startingdate"]["date"]));
-                      if ($increment["endingdate"]["date"]=="1753-01-01 00:00:00.000000") {
-                        $obj->setEnd(null);
-                      } else $obj->setEnd(date_create_from_format("Y-m-d h:i:s.u",$increment["endingdate"]["date"]));
-                      $obj->setActive(1);
-                      $obj->setDeleted(0);
-                      $this->doctrine->getManager()->persist($obj);
-                      $this->doctrine->getManager()->flush();
-                      $output->writeln('Actualizamos todos los productos asociados a ese incremento...');
-                      $obj->calculateIncrementsBySupplierCategory($this->doctrine);
-                  }
-              }
-              //ya existe el descuento para ese cliente
-              else{
-                $output->writeln('Ya existe el incremento de cliente '.$customerincrementaxiom_ID);
-                $customerincrementaxiom=$repositoryCustomerIncrements->findOneBy(["id"=>$customerincrementaxiom_ID]);
-                $pvp=$increment["pvp"];
-                $dto=$increment["Discount"];
-                $neto=$increment["neto"];
-                $precio_con_dto=$pvp-$pvp*($dto/100);
-                $inc=round((($precio_con_dto/$neto)-1)*100,2);
-                //antes de hacer ninguna modificación, comprobamos si ha habido algún cambio en el incremento, de no ser así, no se hace nada.
-                if(round($customerincrementaxiom->getIncrement(),2)!=$inc){
-                  $output->writeln('Actualizamos el incremento de cliente '.$customerincrementaxiom_ID);
-                  $customerincrementaxiom->setIncrement($inc);
-                  $customerincrementaxiom->setDateupd(new \Datetime());
-                  $customerincrementaxiom->setStart(date_create_from_format("Y-m-d h:i:s.u",$increment["startingdate"]["date"]));
-                  if ($increment["endingdate"]["date"]=="1753-01-01 00:00:00.000000") {
-                    $customerincrementaxiom->setEnd(null);
-                  } else $customerincrementaxiom->setEnd(date_create_from_format("Y-m-d h:i:s.u",$increment["endingdate"]["date"]));
-                  $this->doctrine->getManager()->persist($customerincrementaxiom);
-                  $this->doctrine->getManager()->flush();
-                }
-
-                $output->writeln('Actualizamos los precios del incremento cliente '.$customerincrementaxiom_ID);
-                $customerincrementaxiom->calculateIncrementsBySupplierCategory($this->doctrine);
-
-
-                if(date("Y-m-d")!=date("Y-m-d", strtotime($customerincrementaxiom->getDateupd()->format('Y-m-d'))))
-                {
-                    $output->writeln('Actualizamos los precios del incremento cliente '.$customerincrementaxiom_ID);
-                    $customerincrementaxiom->calculateIncrementsBySupplierCategory($this->doctrine);
-                }
-                else   $output->writeln('Ya hemos actualizado los productos con este incremento');
-              }
-            }
-            $output->writeln('Finalizado el incremento para el cliente');
         }
       }
-
-
     }
-
-
-            $this->doctrine->getManager()->clear();
   }
-}*/
+  $this->doctrine->getManager()->clear();
+  fclose($fpp);
   //------   Critical Section END   ------
   //------   Remove Lock Mutex    ------
   fclose($fp);
 }
-
 
 
 public function importMinimunsQuantity(InputInterface $input, OutputInterface $output){
@@ -1752,7 +1648,6 @@ public function importReferences(InputInterface $input, OutputInterface $output)
   $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
   $deleteReferencesChange = [];
   foreach ($objects as $key=>$object){
-     $validation = true;
      // Si no hay cambio no se hace nada
      if ($object['codigo_antiguo']!=$object['codigo_nuevo']){
        $action     = $object['accion'];
@@ -1789,17 +1684,15 @@ public function importReferences(InputInterface $input, OutputInterface $output)
          if ($product!=null){
            if ($type_old=='1'){
              $customer=$repositoryCustomers->findOneBy(["code"=>$supplier_customer_old]);
-             if ($customer!=null)
-              $oreferences=$repositoryReferences->findOneBy(["name"=>$code_old, "product"=>$product, "customer"=>$customer]);
+             $oreferences=$repositoryReferences->findOneBy(["name"=>$code_old, "product"=>$product, "customer"=>$customer, "supplier"=>null]);
            }
            else
            if ($type_old=='2') {
              $supplier=$repositorySuppliers->findOneBy(["code"=>$supplier_customer_old]);
-             if ($supplier!=null)
-               $oreferences=$repositoryReferences->findOneBy(["name"=>$code_old, "product"=>$product, "supplier"=>$supplier]);
+             $oreferences=$repositoryReferences->findOneBy(["name"=>$code_old, "product"=>$product, "customer"=>null, "supplier"=>$supplier]);
            }
            else
-               $oreferences=$repositoryReferences->findOneBy(["name"=>$code_old, "product"=>$product, "supplier"=>null, "customer"=>null]);
+               $oreferences=$repositoryReferences->findOneBy(["name"=>$code_old, "product"=>$product, "customer"=>null, "supplier"=>null]);
 
            if ($oreferences!=null){
              $output->writeln($action.' - '.$code_old);
@@ -1831,82 +1724,90 @@ public function importReferences(InputInterface $input, OutputInterface $output)
             $customer = null;
             if ($type_id==1){
               $customer=$repositoryCustomers->findOneBy(["code"=>$supplier_customer_id]);
-              if ($customer!=null){
-                $oreferences=$repositoryReferences->findOneBy(["name"=>$code_id, "product"=>$product, "customer"=>$customer, "type"=>2]);
-              }else
-                $validation = false;
+              $oreferences=$repositoryReferences->findOneBy(["name"=>$code_id, "product"=>$product, "customer"=>$customer, "supplier"=>null, "type"=>2]);
+              if ($oreferences==null){
+                $oreferences=$repositoryReferences->findOneBy(["name"=>$code_id, "product"=>$product, "customer"=>null, "supplier"=>null, "type"=>2]);
+              }
             }else
             if ($type_id==2){
               $supplier=$repositorySuppliers->findOneBy(["code"=>$supplier_customer_id]);
-              if ($supplier!=null){
-                $oreferences=$repositoryReferences->findOneBy(["name"=>$code_id, "product"=>$product, "supplier"=>$supplier, "type"=>1]);
-              }else
-                $validation = false;
+              $oreferences=$repositoryReferences->findOneBy(["name"=>$code_id, "product"=>$product, "customer"=>null, "supplier"=>$supplier, "type"=>1]);
+              if ($oreferences==null){
+                $oreferences=$repositoryReferences->findOneBy(["name"=>$code_id, "product"=>$product, "customer"=>null, "supplier"=>null, "type"=>1]);
+              }
             }
 
-            if ($validation){
+            if ($oreferences==null){
+              if ($type_id==1)
+                $output->writeln('  - Añadiendo al producto '.$product_new.' la referencia '.$code_new.' del cliente '.$supplier_customer_id);
+              else
+                $output->writeln('  - Añadiendo al producto '.$product_new.' la referencia '.$code_new.' del proveedor '.$supplier_customer_id);
+              $oreferences=new ERPReferences();
+              $oreferences->setDateadd(new \Datetime());
+            }else {
+              if ($type_id==1)
+                $output->writeln('  - Modificando al producto '.$product_new.' la referencia '.$code_new.' del cliente '.$supplier_customer_id);
+              else
+                $output->writeln('  - Modificando al producto '.$product_new.' la referencia '.$code_new.' del proveedor '.$supplier_customer_id);
+            }
+            // Si es modificación hay que obtener los nuevos datos
+            if ($action=='U'){
+              $customer = null;
+              $suppliers = null;
+              $product=$repositoryProducts->findOneBy(["code"=>$product_new]);
+              if ($product!=null) {
+                 if ($type_new==1){
+                   $customer=$repositoryCustomers->findOneBy(["code"=>$supplier_customer_new]);
+                   if ($oreferences==null){
+                     $oreferences=$repositoryReferences->findOneBy(["name"=>$code_new, "product"=>$product, "customer"=>$customer, "supplier"=>null, "type"=>2]);
+                     if ($oreferences==null){
+                       $oreferences=$repositoryReferences->findOneBy(["name"=>$code_new, "product"=>$product, "customer"=>null, "supplier"=>null, "type"=>2]);
+                     }
+                   }
+                 }else
+                 if ($type_new==2){
+                   $supplier=$repositorySuppliers->findOneBy(["code"=>$supplier_customer_new]);
+                   if ($oreferences==null){
+                     $oreferences=$repositoryReferences->findOneBy(["name"=>$code_new, "product"=>$product, "customer"=>null, "supplier"=>$supplier, "type"=>1]);
+                     if ($oreferences==null){
+                       $oreferences=$repositoryReferences->findOneBy(["name"=>$code_new, "product"=>$product, "customer"=>null, "supplier"=>null, "type"=>1]);
+                     }
+                   }
+                 }
+              }
               if ($oreferences==null){
-                if ($type_id==1)
-                  $output->writeln('  - Añadiendo al producto '.$product_new.' la referencia '.$code_new.' del cliente '.$supplier_customer_id);
-                else
-                  $output->writeln('  - Añadiendo al producto '.$product_new.' la referencia '.$code_new.' del proveedor '.$supplier_customer_id);
                 $oreferences=new ERPReferences();
                 $oreferences->setDateadd(new \Datetime());
-              }else {
-                if ($type_id==1)
-                  $output->writeln('  - Modificando al producto '.$product_new.' la referencia '.$code_new.' del cliente '.$supplier_customer_id);
-                else
-                  $output->writeln('  - Modificando al producto '.$product_new.' la referencia '.$code_new.' del proveedor '.$supplier_customer_id);
               }
-              // Si es modificación hay que obtener los nuevos datos
-              if ($action=='U'){
-                $customer = null;
-                $suppliers = null;
-                $product=$repositoryProducts->findOneBy(["code"=>$product_new]);
-                if ($product!=null) {
-                   if ($type_new==1){
-                     $customer=$repositoryCustomers->findOneBy(["code"=>$supplier_customer_new]);
-                     if ($customer==null)
-                       $validation = false;
-                   }else
-                   if ($type_new==2){
-                     $supplier=$repositorySuppliers->findOneBy(["code"=>$supplier_customer_new]);
-                     if ($supplier==null)
-                       $validation = false;
-                   }
-                }
+            }
+            if ($product!=null){
+              $oreferences->setName($code_new);
+              if (isset($references["Description"]))
+                $oreferences->setDescription($references["Description"]);
+              else
+                $oreferences->setDescription("");
+              $oreferences->setDateupd(new \Datetime());
+              $oreferences->setProduct($product);
+              $oreferences->setDeleted(0);
+              $oreferences->setActive(1);
+              if ($type_new==2){
+                $oreferences->setType(1);
+              } else if ($type_new==1){
+                $oreferences->setType(2);
               }
-              if ($validation){
-                $oreferences->setName($code_new);
-                if (isset($references["Description"]))
-                  $oreferences->setDescription($references["Description"]);
-                else
-                  $oreferences->setDescription("");
-                $oreferences->setDateupd(new \Datetime());
-                $oreferences->setProduct($product);
-                $oreferences->setDeleted(0);
-                $oreferences->setActive(1);
-                if ($type_new==2){
-                  $oreferences->setType(1);
-                } else if ($type_new==1){
-                  $oreferences->setType(2);
-                }
-                $oreferences->setSupplier($supplier);
-                $oreferences->setCustomer($customer);
-                $this->doctrine->getManager()->merge($oreferences);
-                $this->doctrine->getManager()->flush();
-                $this->doctrine->getManager()->clear();
-              }
+              $oreferences->setSupplier($supplier);
+              $oreferences->setCustomer($customer);
+              $this->doctrine->getManager()->persist($oreferences);
+              $this->doctrine->getManager()->flush();
+              $this->doctrine->getManager()->clear();
             }
           }
         }
       }
       // Sumar Reference al json para eliminar en tabla de cambios
-      if ($validation){
-        if (isset($object['references']))
-          unset($object['references']);
-        $deleteReferencesChange[] = $object;
-      }
+      if (isset($object['references']))
+        unset($object['references']);
+      $deleteReferencesChange[] = $object;
     }
     // Eliminado de tabla de cambios
     $output->writeln('Eliminar cambios realizados....');
@@ -1923,7 +1824,7 @@ public function importReferences(InputInterface $input, OutputInterface $output)
         )
     );
     $context = stream_context_create($opts);
-    file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-changeGetReferencesDelete.php',false,$context);
+//    file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-changeGetReferencesDelete.php',false,$context);
     //------   Critical Section END   ------
     //------   Remove Lock Mutex    ------
     fclose($fp);

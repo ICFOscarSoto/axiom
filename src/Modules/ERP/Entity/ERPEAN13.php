@@ -28,19 +28,19 @@ class ERPEAN13
     private $name;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPSuppliers")
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPSuppliers", fetch="EAGER")
      * @ORM\JoinColumn(nullable=true, onDelete="CASCADE")
      */
     private $supplier;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPProducts")
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPProducts", fetch="EAGER")
      * @ORM\JoinColumn(nullable=true,onDelete="CASCADE")
      */
     private $product;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPCustomers")
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPCustomers", fetch="EAGER")
      * @ORM\JoinColumn(nullable=true,onDelete="CASCADE")
      */
     private $customer;
