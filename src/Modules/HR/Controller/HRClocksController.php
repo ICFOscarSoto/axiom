@@ -250,7 +250,7 @@ class HRClocksController extends Controller
 					$notification->setDeleted(0);
 					$this->getDoctrine()->getManager()->persist($notification);
           $this->getDoctrine()->getManager()->flush();
-					$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+					/*$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
 					 $url = $this->generateUrl(
 	            'sendFirebase',
 	            ['id'  => $worker->getUser()->getId(),
@@ -260,9 +260,7 @@ class HRClocksController extends Controller
 					curl_setopt($ch, CURLOPT_URL,$config->host.$url);
 					curl_setopt($ch, CURLOPT_POST, 1);
 					curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-					$result= curl_exec ($ch);
-					//curl_close ($ch);
-					shell_exec("nohup php /var/www/axiom.ferreteriacampollano.com/bin/console HR:changeVoipStatus ".$worker->getId()." 1 &");
+					$result= curl_exec ($ch);*/
 					return new JsonResponse(["result"=>1, "started"=>$lastClock->getStart(), "startedFormat"=>$lastClock->getStart()->format('d/m/Y H:i')]);
 				}else{
 					$lastClock->setEndLatitude($latitude);
@@ -284,7 +282,7 @@ class HRClocksController extends Controller
 					$notification->setDeleted(0);
 					$this->getDoctrine()->getManager()->persist($notification);
           $this->getDoctrine()->getManager()->flush();
-					$url = $this->generateUrl(
+/*					$url = $this->generateUrl(
 						 'sendFirebase',
 						 ['id'  => $worker->getUser()->getId(),
 						'notificationid' => $notification->getId()]
@@ -294,22 +292,24 @@ class HRClocksController extends Controller
 				 curl_setopt($ch, CURLOPT_URL,$config->host.$url);
 				 curl_setopt($ch, CURLOPT_POST, 1);
 				 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-				 $result= curl_exec ($ch);
-				 //curl_close ($ch);
-				 shell_exec("nohup php /var/www/axiom.ferreteriacampollano.com/bin/console HR:changeVoipStatus ".$worker->getId()." 0 &");
+				 $result= curl_exec ($ch);*/
+
 				 return new JsonResponse(["result"=>1]);
 				}
 			}else return new JsonResponse(["result"=>-2]);
  		}
 
+
 		/**
-		 * @Route("/api/HR/voipchangestatus/{id}/{type}", name="voipChangeStatus")
+		 * @Route("/api/HR/notifyclockchange/{id}", name="notifyClockChange")
 		 */
-		 public function voipChangeStatus($id, $type, Request $request){
-			 shell_exec("nohup php /var/www/axiom.ferreteriacampollano.com/bin/console HR:changeVoipStatus ".$id." ".$type." &");
+		 public function notifyClockChange($id, Request $request){
+			 $clocksrepository=$this->getDoctrine()->getRepository(HRClocks::class);
+			 $clock=$clocksrepository->find($id);
+			 if(!$clock) return new JsonResponse(["result"=>-1]);
+			 $clock->postProccess($this->container->get('kernel'), $this->getDoctrine(), null);
 			 return new JsonResponse(["result"=>1]);
 		 }
-
 
 		/**
 		 * @Route("/api/HR/{id}/clocks/export", name="exportWorkerClocks")
