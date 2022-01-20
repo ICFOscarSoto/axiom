@@ -1240,6 +1240,8 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
             if (isset($increments['default']))
               $increment = $increments['default'];
             if ($increment!=null){
+              if ($category->getId()==195 && $supplier->getCode()=='P01488')
+               print_r($increments);
               for($k=1; $k<4; $k++){
                 // Existe el incremento
                 $oincrement=$repositoryIncrements->findOneBy(["category"=>$category, "supplier"=>$supplier, "customergroup"=>$customergroups[$k], "company"=>$company, "deleted"=>0]);
@@ -1823,7 +1825,7 @@ public function importReferences(InputInterface $input, OutputInterface $output)
         )
     );
     $context = stream_context_create($opts);
-//    file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-changeGetReferencesDelete.php',false,$context);
+    file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-changeGetReferencesDelete.php',false,$context);
     //------   Critical Section END   ------
     //------   Remove Lock Mutex    ------
     fclose($fp);
