@@ -223,50 +223,48 @@ public function importProduct(InputInterface $input, OutputInterface $output){
             }
             $oproduct->setCode($product["code"]);
             $supplier=$repositorySuppliers->findOneBy(["code"=>$product["Supplier"]]);
-            if ($supplier!=null){
-              if (strlen($product["Description"])>4) $oproduct->setName($product["Description"]);
-              $repositoryTaxes=$this->doctrine->getRepository(GlobaleTaxes::class);
-              $taxes=$repositoryTaxes->find(1);
-              $oproduct->setTaxes($taxes);
-              $oproduct->setCheckweb($product["ProductoWEB"]);
-              $oproduct->setWeight($product["Weight"]);
-              $packing=1;
-              if ($product["Unidad medida precio"]=='C') $packing=100;
-              else if ($product["Unidad medida precio"]=='M') $packing=1000;
-              $oproduct->setPurchasepacking($packing);
-              // Comprobamos si el producto tiene descuentos, si no los tiene se le pone como precio neto.
-              $json3=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getPrices.php?from='.$code_new.'&supplier='.$product["Supplier"]);
-              $prices=json_decode($json3, true);
-              $prices=$prices[0];
-              $oproduct->setnetprice(1);
-              foreach ($prices["class"] as $price){
-                if($price["Discount"]!=0){
-                  if ($price["Ending"]["date"]=="1753-01-01 00:00:00.000000") {
-                     $oproduct->setnetprice(0);
-                  }
+            if (strlen($product["Description"])>4) $oproduct->setName($product["Description"]);
+            $repositoryTaxes=$this->doctrine->getRepository(GlobaleTaxes::class);
+            $taxes=$repositoryTaxes->find(1);
+            $oproduct->setTaxes($taxes);
+            $oproduct->setCheckweb($product["ProductoWEB"]);
+            $oproduct->setWeight($product["Weight"]);
+            $packing=1;
+            if ($product["Unidad medida precio"]=='C') $packing=100;
+            else if ($product["Unidad medida precio"]=='M') $packing=1000;
+            $oproduct->setPurchasepacking($packing);
+            // Comprobamos si el producto tiene descuentos, si no los tiene se le pone como precio neto.
+            $json3=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getPrices.php?from='.$code_new.'&supplier='.$product["Supplier"]);
+            $prices=json_decode($json3, true);
+            $prices=$prices[0];
+            $oproduct->setnetprice(1);
+            foreach ($prices["class"] as $price){
+              if($price["Discount"]!=0){
+                if ($price["Ending"]["date"]=="1753-01-01 00:00:00.000000") {
+                   $oproduct->setnetprice(0);
                 }
               }
-              if (!$oproduct->getnetprice()){
-                $oproduct->setPVPR($product["ShoppingPrice"]/$oproduct->getPurchasepacking());
-                $oproduct->setShoppingPrice($oproduct->getPVPR()*(1-$oproduct->getShoppingDiscount($this->doctrine)/100));
-              } else {
-                 $oproduct->setPVPR(0);
-                 $oproduct->setShoppingPrice($product["ShoppingPrice"]/$oproduct->getPurchasepacking());
-              }
-              $oproduct->setSupplier($supplier);
-              $oproduct->setDateupd(new \Datetime());
-              $repositoryManufacturers=$this->doctrine->getRepository(ERPManufacturers::class);
-              $manufacturer=$repositoryManufacturers->findOneBy(["code"=>$product["Manufacturer"]]);
-              if($manufacturer!=NULL) $oproduct->setManufacturer($manufacturer);
-              $this->doctrine->getManager()->merge($oproduct);
-              $this->doctrine->getManager()->flush();
-              $oproduct->priceCalculated($this->doctrine);
-              $this->doctrine->getManager()->clear();
-              // Sumar producto al json para eliminar en tabla de cambios
-              if (isset($object['producto']))
-                unset($object['producto']);
-              $deleteProductChange[] = $object;
             }
+            if (!$oproduct->getnetprice()){
+              $oproduct->setPVPR($product["ShoppingPrice"]/$oproduct->getPurchasepacking());
+              $oproduct->setShoppingPrice($oproduct->getPVPR()*(1-$oproduct->getShoppingDiscount($this->doctrine)/100));
+            } else {
+               $oproduct->setPVPR(0);
+               $oproduct->setShoppingPrice($product["ShoppingPrice"]/$oproduct->getPurchasepacking());
+            }
+            $oproduct->setSupplier($supplier);
+            $oproduct->setDateupd(new \Datetime());
+            $repositoryManufacturers=$this->doctrine->getRepository(ERPManufacturers::class);
+            $manufacturer=$repositoryManufacturers->findOneBy(["code"=>$product["Manufacturer"]]);
+            if($manufacturer!=NULL) $oproduct->setManufacturer($manufacturer);
+            $this->doctrine->getManager()->merge($oproduct);
+            $this->doctrine->getManager()->flush();
+            $oproduct->priceCalculated($this->doctrine);
+            $this->doctrine->getManager()->clear();
+            // Sumar producto al json para eliminar en tabla de cambios
+            if (isset($object['producto']))
+              unset($object['producto']);
+            $deleteProductChange[] = $object;
           }
         }
       }
