@@ -3,7 +3,8 @@
 		{
 			"name": "Category data",
 			"fields": [
-				{ "name": "name","cols": 12}
+				{ "name": "parentid","cols": 6},
+				{ "name": "name","cols": 6}
 			]
 		}]
 }]

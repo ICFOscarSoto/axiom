@@ -7,8 +7,10 @@ use \App\Modules\ERP\Entity\ERPManufacturers;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
 use \App\Modules\ERP\Entity\ERPCategories;
 use \App\Modules\ERP\Entity\ERPSuppliers;
+use \App\Modules\ERP\Entity\ERPProductsSuppliers;
 use \App\Modules\ERP\Entity\ERPPrestashopFieldNames;
 use \App\Modules\ERP\Entity\ERPProductPrices;
+use \App\Modules\ERP\Entity\ERPShoppingPrices;
 use \App\Modules\ERP\Utils\ERPPrestashopUtils;
 use \App\Modules\ERP\Entity\ERPCustomerGroups;
 use \App\Modules\HR\Entity\HRWorkers;
@@ -620,28 +622,27 @@ class ERPProducts
     }
 
 
-    public function getShoppingDiscount($doctrine) {
+    public function getShoppingDiscount($doctrine, $supplierProduct) {
       $repository=$doctrine->getRepository(ERPShoppingDiscounts::class);
       //Search in the treeCategories which is the most specific with ShoppingDiscounts
       $repositoryCategory=$doctrine->getRepository(ERPCategories::class);
       $category=$this->category;
-      $shoppingDiscounts=$repository->findOneBy(["supplier"=>$this->supplier,"category"=>$category,"active"=>1,"deleted"=>0]);
+      $shoppingDiscounts=$repository->findOneBy(["supplier"=>$supplierProduct,"category"=>$category,"active"=>1,"deleted"=>0]);
       if ($category!=null)
       while ($category->getParentid()!=null && $shoppingDiscounts==null){
           $category=$category->getParentid();
-          $shoppingDiscounts=$repository->findOneBy(["supplier"=>$this->supplier,"category"=>$category,"active"=>1,"deleted"=>0]);
+          $shoppingDiscounts=$repository->findOneBy(["supplier"=>$supplierProduct,"category"=>$category,"active"=>1,"deleted"=>0]);
       }
       if ($shoppingDiscounts==null)
-          $shoppingDiscounts=$repository->findOneBy(["supplier"=>$this->supplier,"active"=>1,"deleted"=>0]);
+          $shoppingDiscounts=$repository->findOneBy(["supplier"=>$supplierProduct,"active"=>1,"deleted"=>0]);
       return $shoppingDiscounts!=null?$shoppingDiscounts->getDiscount():0;
     }
 
 
     /*permite recalcular el precio de compra y el PVP*/
-    public function priceCalculated($doctrine)
-    {
+    public function priceCalculated($doctrine) {
       $em = $doctrine->getManager();
-      $newShoppingPrice=$this->PVPR*(1-$this->getShoppingDiscount($doctrine)/100);
+      $newShoppingPrice=$this->PVPR*(1-$this->getShoppingDiscount($doctrine, $this->getSupplier())/100);
       $this->setShoppingPrice($newShoppingPrice);
       /*ante un cambio en los precios, si no tenemos almacenado el valor del incremento máximo
       para el producto, tendremos que recalcularlo. En cambio, si ya lo tenemos almacenado, simplemente se recalculará
@@ -664,23 +665,20 @@ class ERPProducts
       $repositoryProductPrices=$doctrine->getRepository(ERPProductPrices::class);
       if ($this->supplier!=null){
         $productprices=$repositoryProductPrices->pricesByProductIdAndSupplier($this->getId(),$this->supplier->getId());
-      foreach($productprices as $productprice)
-      {
+        foreach($productprices as $productprice)
+        {
           $productpriceEntity=$repositoryProductPrices->findOneBy(["id"=>$productprice]);
           $productpriceEntity->setPrice(round($newShoppingPrice*(1+($productpriceEntity->getIncrement()/100)),2));
+        }
       }
-}
     }
 
 
     /*permite recalcular el precio de compra, el incremento y el PVP cuando cambiamos de proveedor principal*/
-    public function priceCalculatedNewMainSupplier($doctrine)
-    {
+    public function priceCalculatedNewMainSupplier($doctrine){
       $em = $doctrine->getManager();
       $newShoppingPrice=$this->PVPR*(1-$this->getShoppingDiscount($doctrine)/100);
       $this->setShoppingPrice($newShoppingPrice);
-
-
       $CustomerGroupsRepository=$doctrine->getRepository(ERPCustomerGroups::class);
       $customergroups=$CustomerGroupsRepository->findBy(["active"=>1,"deleted"=>0]);
       $maxincrement=0;
@@ -688,23 +686,41 @@ class ERPProducts
         $increment=$this->getMaxIncrement($doctrine,$customergroup);
         if($increment>$maxincrement) $maxincrement=$increment;
       }
-
       $this->setPvpincrement($maxincrement);
       $this->setPVP($newShoppingPrice*(1+($maxincrement/100)));
-
       //Una vez recalculado el PVP, tenemos que recalcular el precio para cada incremento de grupo que exista
       $repositoryProduct=$doctrine->getRepository(ERPProducts::class);
       $repositoryProductPrices=$doctrine->getRepository(ERPProductPrices::class);
       $productprices=$repositoryProductPrices->pricesByProductIdAndSupplier($this->getId(),$this->supplier->getId());
-
       foreach($productprices as $productprice)
       {
           $productpriceEntity=$repositoryProductPrices->findOneBy(["id"=>$productprice]);
           $productpriceEntity->setPrice(round($newShoppingPrice*(1+($productpriceEntity->getIncrement()/100)),2));
       }
-
     }
 
+    public function calculateShoppingPrices($doctrine, $supplier){
+      $em = $doctrine->getManager();
+      $shoppingPricesRepository=$doctrine->getRepository(ERPShoppingPrices::class);
+      $productsSuppliersRepository=$doctrine->getRepository(ERPProductsSuppliers::class);
+      $shoppingPrice=$shoppingPricesRepository->findBy(["product"=>$this, "supplier"=>$supplier, "active"=>1,"deleted"=>0]);
+      if ($shoppingPrice==null){
+        $shoppingPrices=new ERPShoppingPrices();
+        $shoppingPrice=$this->PVPR*(1-$this->getShoppingDiscount($doctrine, $supplier)/100);
+        $shoppingPrices->setShoppingPrice($shoppingPrice);
+        $shoppingPrices->setProduct($this);
+        $shoppingPrices->setSupplier($supplier);
+        $shoppingPrices->setQuantity(1);
+        $shoppingPrices->setDateadd(new \Datetime());
+        $shoppingPrices->setDateupd(new \Datetime());
+        $shoppingPrices->setActive(1);
+        $shoppingPrices->setDeleted(0);
+        if ($this->getNetprice()==0) $shoppingPrices->setPVP($this->getPVPr());
+        else $shoppingPrices->setPVP($this->getPVP());
+        $em->merge($shoppingPrices);
+      }
+      $em->flush();
+    }
 
     public function calculatePVP($doctrine){
          $CustomerGroupsRepository=$doctrine->getRepository(ERPCustomerGroups::class);
@@ -728,16 +744,12 @@ class ERPProducts
           $category=$category->getParentid();
           $maxincrement=$repository->getMaxIncrement($this->supplier,$category,$customergroup);
       }
-
       if ($maxincrement==null){
-
           $maxincrement=$repository->getMaxIncrement($this->supplier,null,$customergroup);
-
       }
       if ($maxincrement==null){
           $category=$this->category;
           $maxincrement=$repository->getMaxIncrement(null,$category,$customergroup);
-
           while ($category->getParentid()!=null && $maxincrement==null){
               $category=$category->getParentid();
               $maxincrement=$repository->getMaxIncrement(null,$category,$customergroup);
@@ -756,7 +768,6 @@ class ERPProducts
       //que recalcular el incremento y el PVP en la tabla del producto.
       else if($this->supplier!=$oldobj->getSupplier())
           $this->priceCalculatedNewMainSupplier($doctrine);
-
       if($this->getSalepacking()==NULL or $this->getSalepacking()<1) $this->setSalepacking(1);
 
     }
@@ -779,7 +790,6 @@ class ERPProducts
          if($this->manufacturer==null){
            $fieldErrors["manufacturer"]="This field is required.";
          }*/
-
          if($this->category==null){
            $fieldErrors["category"]="This field is required.";
          }
@@ -789,7 +799,6 @@ class ERPProducts
          /*if($this->shoppingPrice==0){
            $fieldErrors["shoppingPrice"]="This field is required.";
          }*/
-
          if (empty($fieldErrors)) return ["valid"=>true];
            else return ["valid"=>false, "field_errors"=>$fieldErrors];
        }

@@ -24,7 +24,7 @@ class ERPProductsSuppliers
     private $product;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Modules\ERP\Entity\ERPSuppliers")
+     * @ORM\ManyToOne(targetEntity="App\Modules\ERP\Entity\ERPSuppliers", fetch="EAGER")
      * @ORM\JoinColumn(nullable=false,onDelete="CASCADE")
      */
     private $supplier;
