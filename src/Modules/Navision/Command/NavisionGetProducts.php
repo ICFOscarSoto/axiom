@@ -1225,7 +1225,7 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
         if (isset($aproducts_prices['increments'])){
           $increments = $aproducts_prices['increments'];
           // Obtener proveedores de la categoría
-          $query="SELECT DISTINCT(ps.supplier_id) as supplier_id, s.code as supplier_code FROM erpproducts_suppliers ps LEFT JOIN erpsuppliers s on s.id=ps.supplier_id WHERE ps.product_id in (SELECT id FROM erpproducts WHERE category_id='".$categories[$i]["category_id"]."')";
+          $query="SELECT DISTINCT(ps.supplier_id) as supplier_id, s.code as supplier_code FROM erpproducts_suppliers ps LEFT JOIN erpsuppliers s on s.id=ps.supplier_id WHERE ps.product_id in (SELECT id FROM erpproducts WHERE category_id='".$category_id."')";
           $params=[];
           $suppliers = $this->doctrine->getManager()->getConnection()->executeQuery($query, $params)->fetchAll();
           for($j=0; $j<count($suppliers); $j++){
@@ -1240,8 +1240,6 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
             if (isset($increments['default']))
               $increment = $increments['default'];
             if ($increment!=null){
-              if ($category->getId()==195 && $supplier->getCode()=='P01488')
-               print_r($increments);
               for($k=1; $k<4; $k++){
                 // Existe el incremento
                 $oincrement=$repositoryIncrements->findOneBy(["category"=>$category, "supplier"=>$supplier, "customergroup"=>$customergroups[$k], "company"=>$company, "deleted"=>0]);
