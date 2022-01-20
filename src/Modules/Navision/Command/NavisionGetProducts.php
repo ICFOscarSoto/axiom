@@ -1180,16 +1180,21 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
   $repositoryIncrements=$this->doctrine->getRepository(ERPIncrements::class);
 
   //------   Critical Section START   ------
-  $fpp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-getproductsprices.csv', 'w');
+  $fpp = null;
+  if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+      $fpp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-getproductsprices.csv', 'w');
+  } else {
+      $fpp = fopen('/tmp/axiom-getproductsprices.csv', 'w');
+  }
   $output->writeln('* Sincronizando Incrementos....');
   $output->writeln(' - Obteniendo Categorias');
   $query="SELECT DISTINCT(p.category_id) AS category_id, c.name as category_name FROM erpproducts p LEFT JOIN erpcategories c on p.category_id=c.id WHERE category_id<>'' and p.company_id='2'";
   $params=[];
   $categories = $this->doctrine->getManager()->getConnection()->executeQuery($query, $params)->fetchAll();
   // Para cada categoria
-  for($i=0; $i<count($categories); $i++){
+ for($i=0; $i<count($categories); $i++){
     $category_id    = $categories[$i]["category_id"];
-    $category_name  = $categories[$i]["category_name"];
+    $category_name  = $categories[$i]["category_name"];    
     $category       = $repositoryCategories->find($category_id);
     $output->writeln(' - Categoría - '.$category_id.' - '.$category_name);
     $query="SELECT code FROM erpproducts WHERE category_id='".$category_id."'";
