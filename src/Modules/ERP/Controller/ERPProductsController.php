@@ -28,6 +28,7 @@ use App\Modules\ERP\Entity\ERPProductsVariants;
 use App\Modules\ERP\Entity\ERPInfoStocks;
 use App\Modules\ERP\Entity\ERPStoresManagersUsers;
 use App\Modules\ERP\Entity\ERPStoresManagersUsersStores;
+use App\Modules\ERP\Entity\ERPTypesMovements;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
@@ -1132,48 +1133,59 @@ class ERPProductsController extends Controller
 		 $managerUserRepository=$this->getDoctrine()->getRepository(ERPStoresManagersUsers::class);
 		 $managerUser=$managerUserRepository->findOneBy(['user'=>$this->getUser()->getId()]);
 		 if ($managerUser==null) return new JsonResponse(["result"=>-1, "text"=>"El usuario ".$this->getUser()->getName()." no tiene permisos de recepcionar material."]);
-
 		 foreach ($objects as $object){
-		 // buscamos el almacen del traspaso
-		 $storeRepository=$this->getDoctrine()->getRepository(ERPStores::class);
-		 $store=$storeRepository->findOneBy(['code'=>$object["almacen"]]);
-		 $storeUsersRepository=$this->getDoctrine()->getRepository(ERPStoresUsers::class);
-		 $storeUsers=$storeUsersRepository->findOneBy(['user'=>$this->getUser()->getId(),'store'=>$store->getId(), 'active'=>1, 'preferential'=>1]);
-		 if ($storeUsers==null) return new JsonResponse(["result"=>-2, "text"=>"El usuario ".$this->getUser()->getName()." no es gestor del almacén ".$store->getName()]);
-		 // buscamos el producto del traspaso
-		 $productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
-		 $product=$productRepository->findOneBy(['code'=>$object["code"]]);
-		 if ($product==null) return new JsonResponse(["result"=>-3, "text"=>"El producto ".$object["code"]." no existe en la base de datos"]);
-		 // buscamos la fila de los traspasos del producto y del almacén
-		 $infostocksRepository=$this->getDoctrine()->getRepository(ERPInfoStocks::class);
- 		 $infostocks=$infostocksRepository->findOneBy(['store'=>$store->getId(), 'product'=>$product->getId()]);
-		 if ($infostocks==null) {
-			 $infostocks= new ERPInfoStocks();
-			 $infostocks->setDateadd(new \DateTime);
-			 $infostocks->setDateupd(new \DateTime);
-			 $infostocks->setProduct($product);
-			 $infostocks->setStore($store);
-			 $infostocks->setActive(1);
-			 $infostocks->setDeleted(0);
-		 }
-		 // actualizamos el stock del pendiente de recibir
-		 $received=(int)$object["stock"];
-		 $infostocks->setPendingToReceive($infostocks->getPendingToReceive()-$received);
-		 $this->getDoctrine()->getManager()->persist($infostocks);
-		 // si el traspaso se realiza en un almacén que no sea campollano/romica buscamos el stock del producto para modificarlo
-		 // en la ubicación genérica de ese almacén
-		 if ($store->getId()>2){
-			 $locationRepository=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
-			 $location=$locationRepository->findOneBy(['store'=>$store->getId()]);
-			 $stockRepository=$this->getDoctrine()->getRepository(ERPStocks::class);
-			 $stock=$stockRepository->findOneBy(['storelocation'=>$location->getId(), 'product'=>$product->getId()]);
-			 $stock->setQuantity($stock->getQuantity()+$received);
-			 $this->getDoctrine()->getManager()->persist($stock);
-		 } else return new JsonResponse(["result"=>-4, "text"=>"El almacén de destino (".$store->getName().") no se corresponde con un almacén gestionado"]);
+			 // buscamos el almacen del traspaso
+			 $storeRepository=$this->getDoctrine()->getRepository(ERPStores::class);
+			 $store=$storeRepository->findOneBy(['code'=>$object["almacen"]]);
+			 $storeLocationsRepository=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
+			 $storeLocation=$storeLocationsRepository->findOneBy(['name'=>$object["almacen"]]);
+			 $storeUsersRepository=$this->getDoctrine()->getRepository(ERPStoresUsers::class);
+			 $storeUsers=$storeUsersRepository->findOneBy(['user'=>$this->getUser()->getId(),'store'=>$store->getId(), 'active'=>1, 'preferential'=>1]);
+			 if ($storeUsers==null) return new JsonResponse(["result"=>-2, "text"=>"El usuario ".$this->getUser()->getName()." no es gestor del almacén ".$store->getName()]);
+			 // buscamos el producto del traspaso
+			 $productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
+			 $product=$productRepository->findOneBy(['code'=>$object["code"]]);
+			 if ($product==null) return new JsonResponse(["result"=>-3, "text"=>"El producto ".$object["code"]." no existe en la base de datos"]);
+			 // buscamos la fila de los traspasos del producto y del almacén
+			 $stocksRepository=$this->getDoctrine()->getRepository(ERPStocks::class);
+	 		 $stocks=$stocksRepository->findOneBy(['storelocation'=>$storeLocation, 'product'=>$product]);
+			 if ($stocks==null) return new JsonResponse(["result"=>-4, "text"=>"El producto  ".$object["code"]." no está en el almacén ".$store->getName()]);
+			 // actualizamos el stock del pendiente de recibir
+			 $received=(int)$object["stock"];
+			 if ($stocks->getPendingreceive()<$received) return new JsonResponse(["result"=>-5, "text"=>"El producto  ".$object["code"]." no tiene pendiente de recibir tantas unidades "]);
+			 $stocks->setPendingreceive($stocks->getPendingreceive()-$received);
+			 $this->getDoctrine()->getManager()->persist($stocks);
+			 // si el traspaso se realiza en un almacén que no sea campollano/romica buscamos el stock del producto para modificarlo
+			 // en la ubicación genérica de ese almacén
+			 if ($store->getId()>2){
+				 $locationRepository=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
+				 $location=$locationRepository->findOneBy(['store'=>$store->getId()]);
+				 $stockRepository=$this->getDoctrine()->getRepository(ERPStocks::class);
+				 $stock=$stockRepository->findOneBy(['storelocation'=>$location->getId(), 'product'=>$product->getId()]);
+				 $typesRepository=$this->getDoctrine()->getRepository(ERPTypesMovements::class);
+				 $type=$typesRepository->findOneBy(["name"=>"Traspaso recibido"]);
+				 $stockHistory=new ERPStockHistory();
+         $stockHistory->setProduct($product);
+         $stockHistory->setLocation($storeLocation);
+         $stockHistory->setStore($store);
+         $stockHistory->setUser($this->getUser());
+         $stockHistory->setDateadd(new \Datetime());
+         $stockHistory->setDateupd(new \Datetime());
+         $stockHistory->setNumOperation($transfer);
+         $stockHistory->setQuantity($received);
+				 $stockHistory->setPreviousqty($stock->getQuantity());
+				 $stockHistory->setNewqty($stock->getQuantity()+$received);
+         $stockHistory->setType($type);
+         $stockHistory->setActive(true);
+         $stockHistory->setDeleted(false);
+				 $stock->setQuantity($stock->getQuantity()+$received);
+				 $this->getDoctrine()->getManager()->persist($stock);
+				 $this->getDoctrine()->getManager()->persist($stockHistory);
+			 } else return new JsonResponse(["result"=>-6, "text"=>"El almacén de destino (".$store->getName().") no se corresponde con un almacén gestionado"]);
 
 
-		 $this->getDoctrine()->getManager()->flush();
-	 	}
+			 $this->getDoctrine()->getManager()->flush();
+		 	}
 
 		 return new JsonResponse(["result"=>1, "text"=>"Se ha recepcionado la mercancia del traspaso ".$transfer]);
 	 }
