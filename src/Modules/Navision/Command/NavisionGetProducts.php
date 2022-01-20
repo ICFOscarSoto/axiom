@@ -550,11 +550,11 @@ public function importPrices(InputInterface $input, OutputInterface $output) {
   $totalProducts=round(intval($repository->totalProductsCategory())/$page);
   $count=0;
 
-  while($count<1){
-      $products=$repository->productsLimitActive(intval($count*$page),intval($page));
+  while($count<$totalProducts){
+      $products=$repository->productsLimitCategory(intval($count*$page),intval($page));
       $count++;
-      //foreach($products as $id) {
-        $product=$repository->findOneBy(["id"=>196899, "company"=>2]);
+      foreach($products as $id) {
+        $product=$repository->findOneBy(["id"=>$id, "company"=>2]);
         if ($product->getSupplier()==null or $product->getCategory()==null)  continue;
         $productsSuppliers=$productsSuppliersRepository->findBy(["product"=>$product, "active"=>1, "deleted"=>0]);
         foreach ($productsSuppliers as $productSupplier){
@@ -603,7 +603,7 @@ public function importPrices(InputInterface $input, OutputInterface $output) {
                   }
                 }
               }
-            //}
+            }
           }
         }
   //------   Critical Section END   ------
@@ -1194,7 +1194,7 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
   // Para cada categoria
  for($i=0; $i<count($categories); $i++){
     $category_id    = $categories[$i]["category_id"];
-    $category_name  = $categories[$i]["category_name"];    
+    $category_name  = $categories[$i]["category_name"];
     $category       = $repositoryCategories->find($category_id);
     $output->writeln(' - Categoría - '.$category_id.' - '.$category_name);
     $query="SELECT code FROM erpproducts WHERE category_id='".$category_id."'";
