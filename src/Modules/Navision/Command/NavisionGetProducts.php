@@ -98,6 +98,8 @@ class NavisionGetProducts extends ContainerAwareCommand
       break;
       case 'increments': $this->importIncrements($input, $output);
       break;
+      case 'incrementsCustomers': $this->importIncrementsCustomers($input, $output);
+      break;
       case 'offers': $this->importOffers($input, $output);
       break;
       case 'variants': $this->importVariants($input, $output);
@@ -1192,9 +1194,9 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
   $params=[];
   $categories = $this->doctrine->getManager()->getConnection()->executeQuery($query, $params)->fetchAll();
   // Para cada categoria
- for($i=0; $i<count($categories); $i++){
+  for($i=0; $i<count($categories); $i++){
     $category_id    = $categories[$i]["category_id"];
-    $category_name  = $categories[$i]["category_name"];    
+    $category_name  = $categories[$i]["category_name"];
     $category       = $repositoryCategories->find($category_id);
     $output->writeln(' - Categoría - '.$category_id.' - '.$category_name);
     $query="SELECT code FROM erpproducts WHERE category_id='".$category_id."'";
@@ -1240,9 +1242,6 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
             $increment = null;
             if (isset($increments[$supplier_code]))
               $increment = $increments[$supplier_code];
-            else
-            if (isset($increments['default']))
-              $increment = $increments['default'];
             if ($increment!=null){
               for($k=1; $k<4; $k++){
                 // Existe el incremento
@@ -1281,7 +1280,122 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
   fclose($fp);
 }
 
+public function importIncrementsCustomers(InputInterface $input, OutputInterface $output) {
+  //------   Create Lock Mutex    ------
+  //$fp = fopen('/tmp/axiom-navisionGetProducts-importIncrements.lock', 'c');
+  if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+      $fp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-navisionGetProducts-importIncrementsCustomers.lock', 'c');
+  } else {
+      $fp = fopen('/tmp/axiom-navisionGetProducts-importIncrementsCustomers.lock', 'c');
+  }
+  if (!flock($fp, LOCK_EX | LOCK_NB)) {
+    $output->writeln('* Fallo al iniciar la sincronizacion incrementos: El proceso ya esta en ejecución.');
+    exit;
+  }
+  $fpp = null;
+  if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+      $fpp = fopen('C:\xampp\htdocs\axiom\tmp\axiom-getproductspricescustomers.csv', 'w');
+  } else {
+      $fpp = fopen('/tmp/axiom-getproductspricescustomers.csv', 'w');
+  }
 
+  $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
+  $company=$repositoryCompanies->find(2);
+  $repositoryCategories=$this->doctrine->getRepository(ERPCategories::class);
+  $repositorySuppliers=$this->doctrine->getRepository(ERPSuppliers::class);
+  $repositoryCustomers=$this->doctrine->getRepository(ERPCustomers::class);
+  $repositoryCustomerIncrements=$this->doctrine->getRepository(ERPCustomerIncrements::class);
+
+  $output->writeln('* Sincronizando incrementos de clientes ....');
+  $output->writeln(' - Obteniendo Categorias');
+  $query="SELECT DISTINCT(p.category_id) AS category_id, c.name as category_name FROM erpproducts p LEFT JOIN erpcategories c on p.category_id=c.id WHERE category_id<>'' and p.company_id='2'";
+  $params=[];
+  $categories = $this->doctrine->getManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+  // Para cada categoria
+  for($i=0; $i<count($categories); $i++){
+    $category_id    = $categories[$i]["category_id"];
+    $category_name  = $categories[$i]["category_name"];
+    $category       = $repositoryCategories->find($category_id);
+    $output->writeln(' - Categoría - '.$category_id.' - '.$category_name);
+    $query="SELECT code FROM erpproducts WHERE category_id='".$category_id."'";
+    $params=[];
+    $products = $this->doctrine->getManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+    if ($products!=null){
+      $postdata = http_build_query(
+        array(
+                'products' => json_encode($products)
+            )
+      );
+      $opts = array('http' =>
+        array(
+                'method'  => 'POST',
+                'header'  => 'Content-Type: application/x-www-form-urlencoded',
+                'content' => $postdata
+        )
+      );
+      $context = stream_context_create($opts);
+      // Para cada producto obtiene por proveedor y grupo su price de compra y su incremento
+      $products_prices = file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getProductsPricesCustomers.php',false,$context);
+      if ($products_prices!=null){
+        $aproducts_prices=json_decode($products_prices, true);
+        if (isset($aproducts_prices['products_prices']))
+          foreach($aproducts_prices['products_prices'] as $product=>$increment){
+            foreach($increment as $customer=>$value){
+              fwrite($fpp, '"'.$category_name.'";"'.$category_id.'";"'.$product.'";"'.$customer.'";"'.str_replace('.',',',$value['increment']).'"'.PHP_EOL);
+            }
+          }
+        if (isset($aproducts_prices['increments']) && count($aproducts_prices['increments'])>0){
+          $increments = $aproducts_prices['increments'];
+          // Obtener proveedores de la categoría
+          $query="SELECT DISTINCT(ps.supplier_id) as supplier_id, s.code as supplier_code FROM erpproducts_suppliers ps LEFT JOIN erpsuppliers s on s.id=ps.supplier_id WHERE ps.product_id in (SELECT id FROM erpproducts WHERE category_id='".$category_id."')";
+          $params=[];
+          $suppliers = $this->doctrine->getManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+          for($j=0; $j<count($suppliers); $j++){
+            // Para cada proveedor/cliente de la categoría se almacena su incremento
+            $supplier_id    = $suppliers[$j]['supplier_id'];
+            $supplier       = $repositorySuppliers->find($supplier_id);
+            foreach ($increments as $customer_code=>$increment){
+              $customer = $repositoryCustomers->findOneBy(["code"=>$customer_code]);
+              if ($customer!=null && $increment!=null && count($increment)>0){
+                // Existe el incremento
+                $oincrementcustomers=$repositoryCustomerIncrements->findOneBy(["category"=>$category, "supplier"=>$supplier, "customer"=>$customer, "company"=>$company, "deleted"=>0]);
+                if ($oincrementcustomers==null){
+                  $oincrementcustomers=new ERPCustomerIncrements();
+                  $oincrementcustomers->setCategory($category);
+                  $oincrementcustomers->setSupplier($supplier);
+                  $oincrementcustomers->setCustomer($customer);
+                  $oincrementcustomers->setCompany($company);
+                  $oincrementcustomers->setDeleted(0);
+                  $oincrementcustomers->setDateadd(new \Datetime());
+                }
+                $oincrementcustomers->setActive(1);
+                $oincrementcustomers->setIncrement($increment['increment']);
+                $oincrementcustomers->setDateupd(new \Datetime());
+
+                $oincrementcustomers->setStart(($increment['start']=='1753-01-01 12:00:00.000000'?null:date_create_from_format("Y-m-d h:i:s.u",$increment['start'])));
+                $oincrementcustomers->setEnd(($increment['end']=='1753-01-01 12:00:00.000000'?null:date_create_from_format("Y-m-d h:i:s.u",$increment['end'])));
+                try{
+                  $this->doctrine->getManager()->persist($oincrementcustomers);
+                  $this->doctrine->getManager()->flush();
+                  // Actualizar los productos de la categoría
+                  //$oincrementcustomers->getIncrementByCustomer($this->doctrine,);
+                }catch(Exception $e){
+                  $output->writeln(' - Error - '.$category_id.' - '.$category_name);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  $this->doctrine->getManager()->clear();
+  fclose($fpp);
+
+  //------   Critical Section END   ------
+  //------   Remove Lock Mutex    ------
+  fclose($fp);
+}
 public function importMinimunsQuantity(InputInterface $input, OutputInterface $output){
   $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getMinimumsQuantity.php');
   $objects=json_decode($json, true);
