@@ -7,9 +7,9 @@ use App\Modules\Globale\Entity\GlobaleUsers;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass="App\Modules\HR\Repository\HRMeetingsRepository")
+ * @ORM\Entity(repositoryClass="App\Modules\HR\Repository\HRSchedulesWorkersRepository")
  */
-class HRMeetings
+class HRSchedulesWorkers
 {
     /**
      * @ORM\Id()
@@ -17,6 +17,18 @@ class HRMeetings
      * @ORM\Column(type="integer")
      */
     private $id;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Modules\HR\Entity\HRSchedules")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $schedule;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Modules\HR\Entity\HRWorkers")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $worker;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Modules\Globale\Entity\GlobaleCompanies")
@@ -31,32 +43,7 @@ class HRMeetings
     private $author;
 
     /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $name;
-
-    /**
      * @ORM\Column(type="datetime")
-     */
-    private $meetingdate;
-
-    /**
-     * @ORM\Column(type="string", length=128)
-     */
-    private $place;
-
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     */
-    private $agenda;
-
-    /**
-     * @ORM\Column(type="text", nullable=true)
-     */
-    private $report;
-
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
      */
     private $startdate;
 
@@ -78,7 +65,7 @@ class HRMeetings
     /**
      * @ORM\Column(type="boolean")
      */
-    private $active;
+    private $active=1;
 
     /**
      * @ORM\Column(type="boolean")
@@ -88,6 +75,30 @@ class HRMeetings
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getSchedule(): ?HRSchedules
+    {
+        return $this->schedule;
+    }
+
+    public function setSchedule(?HRSchedules $schedule): self
+    {
+        $this->schedule = $schedule;
+
+        return $this;
+    }
+
+    public function getWorker(): ?HRWorkers
+    {
+        return $this->worker;
+    }
+
+    public function setWorker(?HRWorkers $worker): self
+    {
+        $this->worker = $worker;
+
+        return $this;
     }
 
     public function getCompany(): ?GlobaleCompanies
@@ -114,72 +125,12 @@ class HRMeetings
         return $this;
     }
 
-    public function getName(): ?string
-    {
-        return $this->name;
-    }
-
-    public function setName(string $name): self
-    {
-        $this->name = $name;
-
-        return $this;
-    }
-
-    public function getMeetingdate(): ?\DateTimeInterface
-    {
-        return $this->meetingdate;
-    }
-
-    public function setMeetingdate(\DateTimeInterface $meetingdate): self
-    {
-        $this->meetingdate = $meetingdate;
-
-        return $this;
-    }
-
-    public function getPlace(): ?string
-    {
-        return $this->place;
-    }
-
-    public function setPlace(string $place): self
-    {
-        $this->place = $place;
-
-        return $this;
-    }
-
-    public function getAgenda(): ?string
-    {
-        return $this->agenda;
-    }
-
-    public function setAgenda(?string $agenda): self
-    {
-        $this->agenda = $agenda;
-
-        return $this;
-    }
-
-    public function getReport(): ?string
-    {
-        return $this->report;
-    }
-
-    public function setReport(?string $report): self
-    {
-        $this->report = $report;
-
-        return $this;
-    }
-
     public function getStartdate(): ?\DateTimeInterface
     {
         return $this->startdate;
     }
 
-    public function setStartdate(?\DateTimeInterface $startdate): self
+    public function setStartdate(\DateTimeInterface $startdate): self
     {
         $this->startdate = $startdate;
 
@@ -244,9 +195,5 @@ class HRMeetings
         $this->deleted = $deleted;
 
         return $this;
-    }
-
-    public function postProccess($kernel, $doctrine, $user, $params, $oldobj){
-
     }
 }

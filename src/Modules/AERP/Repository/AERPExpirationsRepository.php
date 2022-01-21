@@ -1,5 +1,5 @@
 <?php
-namespace App\Repository\Modules\AERP\Entity;
+namespace App\Modules\AERP\Repository;
 
 use App\Modules\AERP\Entity\AERPExpirations;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;

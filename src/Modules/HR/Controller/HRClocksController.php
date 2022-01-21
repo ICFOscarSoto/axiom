@@ -239,6 +239,7 @@ class HRClocksController extends Controller
 					$lastClock->setDeleted(0);
 					$this->getDoctrine()->getManager()->persist($lastClock);
           $this->getDoctrine()->getManager()->flush();
+					$lastClock->postProccess($this->container->get('kernel'), $this->getDoctrine(), null);
 					$notification=new GlobaleNotifications();
 					$notification->setUser($worker->getUser());
 					setlocale(LC_ALL,"es_ES.utf8");
@@ -271,6 +272,7 @@ class HRClocksController extends Controller
 					$lastClock->setTime(date_timestamp_get($lastClock->getEnd())-date_timestamp_get($lastClock->getStart()));
 					$this->getDoctrine()->getManager()->persist($lastClock);
           $this->getDoctrine()->getManager()->flush();
+					$lastClock->postProccess($this->container->get('kernel'), $this->getDoctrine(), null);
 					$notification=new GlobaleNotifications();
 					$notification->setUser($worker->getUser());
 					setlocale(LC_ALL,"es_ES.utf8");

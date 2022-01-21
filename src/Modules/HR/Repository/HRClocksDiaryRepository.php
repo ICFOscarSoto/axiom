@@ -1,26 +1,26 @@
 <?php
 
-namespace App\Repository\Modules\HR\Entity;
+namespace App\Modules\HR\Repository;
 
-use App\Modules\HR\Entity\HRMeetings;
+use App\Modules\HR\Entity\HRClocksDiary;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
- * @method HRMeetings|null find($id, $lockMode = null, $lockVersion = null)
- * @method HRMeetings|null findOneBy(array $criteria, array $orderBy = null)
- * @method HRMeetings[]    findAll()
- * @method HRMeetings[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method HRClocksDiary|null find($id, $lockMode = null, $lockVersion = null)
+ * @method HRClocksDiary|null findOneBy(array $criteria, array $orderBy = null)
+ * @method HRClocksDiary[]    findAll()
+ * @method HRClocksDiary[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class HRMeetingsRepository extends ServiceEntityRepository
+class HRClocksDiaryRepository extends ServiceEntityRepository
 {
     public function __construct(RegistryInterface $registry)
     {
-        parent::__construct($registry, HRMeetings::class);
+        parent::__construct($registry, HRClocksDiary::class);
     }
 
     // /**
-    //  * @return HRMeetings[] Returns an array of HRMeetings objects
+    //  * @return HRClocksDiary[] Returns an array of HRClocksDiary objects
     //  */
     /*
     public function findByExampleField($value)
@@ -37,7 +37,7 @@ class HRMeetingsRepository extends ServiceEntityRepository
     */
 
     /*
-    public function findOneBySomeField($value): ?HRMeetings
+    public function findOneBySomeField($value): ?HRClocksDiary
     {
         return $this->createQueryBuilder('h')
             ->andWhere('h.exampleField = :val')

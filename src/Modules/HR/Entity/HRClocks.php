@@ -4,6 +4,11 @@ namespace App\Modules\HR\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\HR\Entity\HRWorkers;
+use \App\Modules\HR\Entity\HRClocksDiary;
+use \App\Modules\HR\Entity\HRSchedulesWorkers;
+use \App\Modules\HR\Entity\HRSchedules;
+use \App\Modules\HR\Entity\HRShifts;
+use \App\Modules\HR\Entity\HRPeriods;
 use \App\Modules\Globale\Entity\GlobaleClockDevices;
 
 /**
@@ -286,6 +291,59 @@ class HRClocks
       //$this->time = $this->calculateTime();
       if($this->end!=null) $this->time = date_timestamp_get($this->end)-date_timestamp_get($this->start);
 
+    }
+    public function postProccess($kernel, $doctrine, $user){
+      $clocksrepository=$doctrine->getRepository(HRClocks::class);
+      $clocksDiaryrepository=$doctrine->getRepository(HRClocksDiary::class);
+      $schedulesWorkersRepository=$doctrine->getRepository(HRSchedulesWorkers::class);
+      $schedulesRepository=$doctrine->getRepository(HRSchedules::class);
+      $scheduleShiftsRepository=$doctrine->getRepository(HRShifts::class);
+      $schedulePeriodsRepository=$doctrine->getRepository(HRPeriods::class);
+
+      //Calculate total time worked in day
+      $dayClocks=$clocksrepository->dayClocks($this->worker, $this->start->format('Y/m/d'));
+      $time=0;
+      foreach($dayClocks as $key=>$value){
+        $time+=$value["time"];
+      }
+      //Get current worker estimated scheduled time
+      $schedule=$schedulesWorkersRepository->workerSchedule($this->worker, $this->start->format('Y/m/d'));
+      $schedule=$schedulesRepository->findOneBy(["id"=>$schedule, "company"=>$this->worker->getCompany(), "active"=>1, "deleted"=>0]);
+      if(!$schedule) return;
+      $shifts=$scheduleShiftsRepository->findBy(["schedule"=>$schedule, "active"=>1, "deleted"=>0]);
+      if(!$shifts) return;
+      $shift=null;
+      if(count($shifts)>1){
+          //TODO: calculate what shift applies
+
+      }else{
+        $shift=$shifts[0];
+      }
+      $periods=$schedulePeriodsRepository->datePeriod($shift, $this->start);
+      $estimatedtime=0;
+      foreach($periods as $key=>$value){
+        $periods[$key]["time"]=date_timestamp_get(date_create_from_format('Y-m-d H:i:s',$this->end->format('Y-m-d').' '.$value['end']))-date_timestamp_get(date_create_from_format('Y-m-d H:i:s',$this->start->format('Y-m-d').' '.$value['start']));
+        $estimatedtime+=$periods[$key]["time"];
+      }
+      //TODO: Si no existe el registro de diario crearlo, si existe modificarlo
+      $normalizeddate=date_create_from_format('Y-m-d H:i:s',$this->start->format('Y-m-d').' 00:00:00');
+      $clockdiary=$clocksDiaryrepository->findOneBy(['worker'=>$this->worker, 'date'=>$normalizeddate, 'active'=>1, 'deleted'=>0]);
+      if(!$clockdiary){
+        $clockdiary=new HRClocksDiary();
+        $clockdiary->setWorker($this->worker);
+        $clockdiary->setCompany($this->worker->getCompany());
+        $clockdiary->setDate($normalizeddate);
+        $clockdiary->setExcludedifftime(0);
+        $clockdiary->setDateadd(new \DateTime());
+        $clockdiary->setActive(1);
+        $clockdiary->setDeleted(0);
+      }
+      $clockdiary->setTime($time);
+      $clockdiary->setEstimatedtime($estimatedtime);
+      $clockdiary->setDifftime($time-$estimatedtime);
+      $clockdiary->setDateupd(new \DateTime());
+      $doctrine->getManager()->persist($clockdiary);
+      $doctrine->getManager()->flush();
     }
 
     public function getStartdevice(): ?GlobaleClockDevices

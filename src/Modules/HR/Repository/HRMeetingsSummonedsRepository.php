@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repository\Modules\HR\Entity;
+namespace App\Modules\HR\Repository;
 
 use App\Modules\HR\Entity\HRMeetingsSummoneds;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
