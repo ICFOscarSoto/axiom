@@ -247,7 +247,7 @@ public function importProduct(InputInterface $input, OutputInterface $output){
             }
             if (!$oproduct->getnetprice()){
               $oproduct->setPVPR($product["ShoppingPrice"]/$oproduct->getPurchasepacking());
-              $oproduct->setShoppingPrice($oproduct->getPVPR()*(1-$oproduct->getShoppingDiscount($this->doctrine)/100));
+              $oproduct->setShoppingPrice($oproduct->getPVPR()*(1-$oproduct->getShoppingDiscount($this->doctrine,$oproduct->getSupplier())/100));
             } else {
                $oproduct->setPVPR(0);
                $oproduct->setShoppingPrice($product["ShoppingPrice"]/$oproduct->getPurchasepacking());

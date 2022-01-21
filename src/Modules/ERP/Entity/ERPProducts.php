@@ -677,7 +677,7 @@ class ERPProducts
     /*permite recalcular el precio de compra, el incremento y el PVP cuando cambiamos de proveedor principal*/
     public function priceCalculatedNewMainSupplier($doctrine){
       $em = $doctrine->getManager();
-      $newShoppingPrice=$this->PVPR*(1-$this->getShoppingDiscount($doctrine)/100);
+      $newShoppingPrice=$this->PVPR*(1-$this->getShoppingDiscount($doctrine, $this->getSupplier())/100);
       $this->setShoppingPrice($newShoppingPrice);
       $CustomerGroupsRepository=$doctrine->getRepository(ERPCustomerGroups::class);
       $customergroups=$CustomerGroupsRepository->findBy(["active"=>1,"deleted"=>0]);
