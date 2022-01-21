@@ -69,7 +69,7 @@ class ERPCategoriesController extends Controller
      * @Route("/api/ERP/categories/dragchange", name="categoriesDragChange")
      */
 
-		 // OSCAR: comento el método para que no puedan cambiar categorías de posición 
+		 // OSCAR: comento el método para que no puedan cambiar categorías de posición
     public function categoriesDragChange(RouterInterface $router,Request $request){
 
 		/*	$id = $request->request->get("id");
@@ -92,14 +92,45 @@ class ERPCategoriesController extends Controller
 		}
 
 		/**
-	   * @Route("/{_locale}/ERP/categories/data/{id}/{action}", name="dataCategories", defaults={"id"=0, "action"="read"})
+	   * @Route("/{_locale}/ERP/categories/data/{id}/{parentid_id}/{action}", name="dataCategories", defaults={"id"=0, "parentid_id"=0, "action"="read"})
 	   */
-	   public function data($id, $action, Request $request){
+	   public function data($id, $parentid_id, $action, Request $request){
 	   $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 	   $template=dirname(__FILE__)."/../Forms/Categories.json";
 	   $utils = new GlobaleFormUtils();
-	   $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine());
+		 $utilsObj=new ERPCategoriesUtils();
+		 $categoriesRepository=$this->getDoctrine()->getRepository(ERPCategories::class);
+		 $parent=$categoriesRepository->findOneBy(['id'=>$parentid_id, 'active'=>1, 'deleted'=>0]);
+		 $params= ["doctrine"=>$this->getDoctrine(), "user"=>$this->getUser(), "parentid_id"=>$parent];
+		 if ($parentid_id!=0)  {
+			 dump($params);
+			  $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),
+       method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],
+ 			 method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
+		 }
+		 else $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine());
 	   return $utils->make($id, $this->class, $action, "formCategories", "modal");
 	  }
+
+		/**
+		 * @Route("/{_locale}/ERP/categories/new/{id}/{action}", name="newCategories", defaults={"id"=0, "action"="read"})
+		 */
+		 public function new($id, $action, Request $request){
+		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		 $template=dirname(__FILE__)."/../Forms/Categories.json";
+		 $utils = new GlobaleFormUtils();
+		 $utilsObj=new ERPCategoriesUtils();
+		 $categoriesRepository=$this->getDoctrine()->getRepository(ERPCategories::class);
+		 $parent=$categoriesRepository->findOneBy(['id'=>$id, 'active'=>1, 'deleted'=>0]);
+		 $params= ["doctrine"=>$this->getDoctrine(), "user"=>$this->getUser(), "parentid_id"=>$parent];
+		 if ($id!=0)  {
+				$utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),
+			 method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],
+			 method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
+		 }
+		 else $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine());
+		 return $utils->make(0, $this->class, $action, "formCategories", "modal");
+		}
+
 
 }
