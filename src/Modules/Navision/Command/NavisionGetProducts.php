@@ -1378,7 +1378,7 @@ public function importIncrementsCustomers(InputInterface $input, OutputInterface
                   $this->doctrine->getManager()->persist($oincrementcustomers);
                   $this->doctrine->getManager()->flush();
                   // Actualizar los productos de la categoría
-                  //$oincrementcustomers->getIncrementByCustomer($this->doctrine,);
+                  $oincrementcustomers->calculateIncrementsBySupplierCategory($this->doctrine);
                 }catch(Exception $e){
                   $output->writeln(' - Error - '.$category_id.' - '.$category_name);
                 }
