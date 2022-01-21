@@ -27,7 +27,8 @@ class ERPCategoriesRepository extends ServiceEntityRepository
       ->andWhere('e.active=:val_active')
       ->andWhere('e.deleted=:val_deleted')
       ->andWhere('e.company=:val_company')
-      ->orderBy('e.position', 'ASC')
+      ->orderBy('e.position', 'ASC')      
+      ->orderBy('e.name', 'ASC')
       ->setParameter('val_category', $id_category)
       ->setParameter('val_active', TRUE)
       ->setParameter('val_deleted', FALSE)
@@ -51,6 +52,7 @@ class ERPCategoriesRepository extends ServiceEntityRepository
       ->andWhere('e.deleted=:val_deleted')
       ->andWhere('e.company=:val_company')
       ->orderBy('e.position', 'ASC')
+      ->orderBy('e.name', 'ASC')
       ->setParameter('val_active', TRUE)
       ->setParameter('val_deleted', FALSE)
       ->setParameter('val_company', $user->getCompany())
@@ -77,7 +79,7 @@ class ERPCategoriesRepository extends ServiceEntityRepository
     }
 
 
-    
+
 
     // /**
     //  * @return ERPCategories[] Returns an array of ERPCategories objects
