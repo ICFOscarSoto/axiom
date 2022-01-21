@@ -249,7 +249,7 @@ public function importProduct(InputInterface $input, OutputInterface $output){
             }
             if (!$oproduct->getnetprice()){
               $oproduct->setPVPR($product["ShoppingPrice"]/$oproduct->getPurchasepacking());
-              $oproduct->setShoppingPrice($oproduct->getPVPR()*(1-$oproduct->getShoppingDiscount($this->doctrine)/100));
+              $oproduct->setShoppingPrice($oproduct->getPVPR()*(1-$oproduct->getShoppingDiscount($this->doctrine,$oproduct->getSupplier())/100));
             } else {
                $oproduct->setPVPR(0);
                $oproduct->setShoppingPrice($product["ShoppingPrice"]/$oproduct->getPurchasepacking());
@@ -552,11 +552,11 @@ public function importPrices(InputInterface $input, OutputInterface $output) {
   $totalProducts=round(intval($repository->totalProductsCategory())/$page);
   $count=0;
 
-  while($count<1){
-      $products=$repository->productsLimitActive(intval($count*$page),intval($page));
+  while($count<$totalProducts){
+      $products=$repository->productsLimitCategory(intval($count*$page),intval($page));
       $count++;
-      //foreach($products as $id) {
-        $product=$repository->findOneBy(["id"=>196899, "company"=>2]);
+      foreach($products as $id) {
+        $product=$repository->findOneBy(["id"=>$id, "company"=>2]);
         if ($product->getSupplier()==null or $product->getCategory()==null)  continue;
         $productsSuppliers=$productsSuppliersRepository->findBy(["product"=>$product, "active"=>1, "deleted"=>0]);
         foreach ($productsSuppliers as $productSupplier){
@@ -605,7 +605,7 @@ public function importPrices(InputInterface $input, OutputInterface $output) {
                   }
                 }
               }
-            //}
+            }
           }
         }
   //------   Critical Section END   ------

@@ -62,7 +62,7 @@ class ERPProductsRepository extends ServiceEntityRepository
 
     public function productsBySupplierCategory($supplier,$category){
       if($category!=0) $query="SELECT id from erpproducts
-      where supplier_id=:supplier AND category_id=:category";
+      where id in (select product_id from erpproducts_suppliers where supplier_id=:supplier) AND category_id=:category";
       else $query="SELECT id from erpproducts
       where supplier_id=:supplier";
       $params=['supplier' => $supplier,
@@ -124,6 +124,15 @@ class ERPProductsRepository extends ServiceEntityRepository
     public function productsLimit($start, $page){
       $query='SELECT id FROM erpproducts
               WHERE active!=2
+              ORDER BY code
+              LIMIT '.$start.','.$page.'';
+      $result=$this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
+      return $result;
+    }
+
+    public function productsLimitCategory($start, $page){
+      $query='SELECT id FROM erpproducts
+              where category_id is not null and supplier_id is not null and netprice=0
               ORDER BY code
               LIMIT '.$start.','.$page.'';
       $result=$this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();

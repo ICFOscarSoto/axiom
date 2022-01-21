@@ -54,4 +54,15 @@ class HRPeriodsRepository extends ServiceEntityRepository
       return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetch();
 
     }
+
+    public function datePeriod($shift, $date){
+      $dayofweek=strtolower($date->format('l'));
+      $year=$date->format('Y');
+      $query="SELECT id, start, end from hrperiods h WHERE shift_id = :shift
+	       AND ".$dayofweek." = 1 AND STR_TO_DATE(CONCAT(fromdate,'/',:year),'%d/%m/%Y') <= date(:date)
+	       AND (STR_TO_DATE(CONCAT(todate,'/',:year),'%d/%m/%Y') >= date(:date) or todate IS NULL) AND deleted=0 AND active=1;";
+      $params=['shift' => $shift->getId(), 'year'=> $year, 'dayofweek'=> $dayofweek,'date' => $date->format('Y/m/d') ];
+      return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+    }
+
 }

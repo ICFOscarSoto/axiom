@@ -26,6 +26,15 @@ class ERPShoppingDiscountsRepository extends ServiceEntityRepository
       $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
     }
 
+    public function getShoppingDiscounts($category,$supplier){
+      $query="SELECT quantity, discount from erpshopping_discounts
+      where supplier_id=:supplier AND category_id=:category and active=1 and deleted=0 and dateend>CURDATE()";
+      $params=['supplier' => $supplier,
+              'category' => $category];
+      $result=$this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+      return $result;
+    }
+
     // /**
     //  * @return ERPShoppingDiscounts[] Returns an array of ERPShoppingDiscounts objects
     //  */

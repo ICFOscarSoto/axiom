@@ -50,7 +50,7 @@ class ERPProductsUtils
         'disabled' => true,
         'attr'=> ["readonly"=>true],
         'mapped' => false,
-        'data' => $products->getShoppingDiscount($doctrine)
+        'data' => $products->getShoppingDiscount($doctrine, $products->getSupplier())
       ]],
       ['selectcategory', ButtonType::class, [
         "attr"=> ['disabled' => $readonly, "class"=>"transform-button"]

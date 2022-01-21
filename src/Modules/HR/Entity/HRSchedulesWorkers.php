@@ -1,14 +1,15 @@
 <?php
 
-namespace App\Modules\ERP\Entity;
+namespace App\Modules\HR\Entity;
 
 use App\Modules\Globale\Entity\GlobaleCompanies;
+use App\Modules\Globale\Entity\GlobaleUsers;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPProductsSuppliersRepository")
+ * @ORM\Entity(repositoryClass="App\Modules\HR\Repository\HRSchedulesWorkersRepository")
  */
-class ERPProductsSuppliers
+class HRSchedulesWorkers
 {
     /**
      * @ORM\Id()
@@ -18,22 +19,38 @@ class ERPProductsSuppliers
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Modules\ERP\Entity\ERPProducts")
-     * @ORM\JoinColumn(nullable=false,onDelete="CASCADE")
+     * @ORM\ManyToOne(targetEntity="App\Modules\HR\Entity\HRSchedules")
+     * @ORM\JoinColumn(nullable=false)
      */
-    private $product;
+    private $schedule;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Modules\ERP\Entity\ERPSuppliers", fetch="EAGER")
-     * @ORM\JoinColumn(nullable=false,onDelete="CASCADE")
+     * @ORM\ManyToOne(targetEntity="App\Modules\HR\Entity\HRWorkers")
+     * @ORM\JoinColumn(nullable=false)
      */
-    private $supplier;
+    private $worker;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Modules\Globale\Entity\GlobaleCompanies")
      * @ORM\JoinColumn(nullable=false)
      */
     private $company;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Modules\Globale\Entity\GlobaleUsers")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $author;
+
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $startdate;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $enddate;
 
     /**
      * @ORM\Column(type="datetime")
@@ -53,33 +70,33 @@ class ERPProductsSuppliers
     /**
      * @ORM\Column(type="boolean")
      */
-    private $deleted=0;
+    private $deleted;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getProduct(): ?ERPProducts
+    public function getSchedule(): ?HRSchedules
     {
-        return $this->product;
+        return $this->schedule;
     }
 
-    public function setProduct(?ERPProducts $product): self
+    public function setSchedule(?HRSchedules $schedule): self
     {
-        $this->product = $product;
+        $this->schedule = $schedule;
 
         return $this;
     }
 
-    public function getSupplier(): ?ERPSuppliers
+    public function getWorker(): ?HRWorkers
     {
-        return $this->supplier;
+        return $this->worker;
     }
 
-    public function setSupplier(?ERPSuppliers $supplier): self
+    public function setWorker(?HRWorkers $worker): self
     {
-        $this->supplier = $supplier;
+        $this->worker = $worker;
 
         return $this;
     }
@@ -92,6 +109,42 @@ class ERPProductsSuppliers
     public function setCompany(?GlobaleCompanies $company): self
     {
         $this->company = $company;
+
+        return $this;
+    }
+
+    public function getAuthor(): ?GlobaleUsers
+    {
+        return $this->author;
+    }
+
+    public function setAuthor(?GlobaleUsers $author): self
+    {
+        $this->author = $author;
+
+        return $this;
+    }
+
+    public function getStartdate(): ?\DateTimeInterface
+    {
+        return $this->startdate;
+    }
+
+    public function setStartdate(\DateTimeInterface $startdate): self
+    {
+        $this->startdate = $startdate;
+
+        return $this;
+    }
+
+    public function getEnddate(): ?\DateTimeInterface
+    {
+        return $this->enddate;
+    }
+
+    public function setEnddate(?\DateTimeInterface $enddate): self
+    {
+        $this->enddate = $enddate;
 
         return $this;
     }

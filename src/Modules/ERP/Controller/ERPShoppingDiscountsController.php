@@ -16,6 +16,7 @@ use App\Modules\ERP\Entity\ERPReferences;
 use App\Modules\ERP\Entity\ERPEAN13;
 use App\Modules\ERP\Entity\ERPSuppliers;
 use App\Modules\ERP\Entity\ERPCategories;
+use App\Modules\ERP\Entity\ERPShoppingPrices;
 
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\Globale\Entity\GlobaleCountries;
@@ -56,6 +57,35 @@ class ERPShoppingDiscountsController extends Controller
   }
 
 
+
+  /**
+   * @Route("/{_locale}/productprices/infoProductRates/{id}", name="infoProductRates", defaults={"id"=0})
+   */
+  public function infoProductRates($id, Request $request){
+		$productsRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
+		$product=$productsRepository->findOneBy(["id"=>$id]);
+		$suppliersRepository=$this->getDoctrine()->getRepository(ERPSuppliers::class);
+		$supplier=$suppliersRepository->findOneBy(["id"=>$product->getSupplier()]);
+
+		$shoppingPricesRepository=$this->getDoctrine()->getRepository(ERPShoppingPrices::class);
+    $shoppingDiscountsRepository=$this->getDoctrine()->getRepository(ERPShoppingDiscounts::class);
+    dump($product);
+    dump($supplier);
+		$shoppingPrices=$shoppingPricesRepository->getShoppingPrices($product->getId(),$supplier->getId());
+		$shoppingDiscounts=$shoppingDiscountsRepository->getShoppingDiscounts($product->getId(),$supplier->getId());
+
+		$formUtilsOfferPrices = new GlobaleFormUtils();
+		$formUtilsOfferPrices->initialize($this->getUser(), new ERPOfferPricesUtils(), dirname(__FILE__)."/../Forms/OfferPrices.json", $request, $this, $this->getDoctrine(),$listOfferPrices->getExcludedForm([]),$listOfferPrices->getIncludedForm(["doctrine"=>$this->getDoctrine(), "user"=>$this->getUser(),"id"=>$id, "parent"=>$product]));
+		$forms[]=$formUtilsOfferPrices->formatForm('OfferPrices', true, null, ERPOfferPrices::class);
+
+
+    return $this->render('@ERP/productprices.html.twig', array(
+      'shoppingPrices'=>$shoppingPrices,
+			'shoppingDiscounts'=>$shoppingDiscounts,
+			'id' => $id,
+			'forms' => $forms
+    ));
+  }
 
   /**
   * @Route("/api/ERP/shoppingDiscounts/save", name="saveDiscounts")
@@ -114,12 +144,12 @@ class ERPShoppingDiscountsController extends Controller
         //$update["product_reference"]=$data[1];
         //$update["product_ean"]=$data[2];
         //$update["qty"]=$data[3];
-        $update["shopping_price"]=str_replace(',','.',$data[4]);
+        $update["shopping_price"]=str_replace(',','.',$data[3]);
         //$update["packing"]=$data[5];
         //$update["weight"]=$data[6];
         //$update["manufacturer"]=$data[7];
         //$update["min_qty"]=$data[8];
-        $update["PVP"]=str_replace(',','.',$data[9]);
+        $update["PVP"]=str_replace(',','.',$data[4]);
         $updates[]=$update;
       };
       unlink($item->fileSelect);

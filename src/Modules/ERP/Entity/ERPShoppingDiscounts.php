@@ -188,21 +188,21 @@ class ERPShoppingDiscounts
     $this->setShoppingPrices($doctrine);
     }
 
-    public function setShoppingPrices($doctrine){
+    public function setShoppingPrices($doctrine, $supplier){
       $em = $doctrine->getManager();
       $repositoryProduct=$doctrine->getRepository(ERPProducts::class);
       $repository=$doctrine->getRepository(ERPSuppliers::class);
       $repositoryIncrements=$doctrine->getRepository(ERPIncrements::class);
       if ($this->getCategory()==null) $products=$repository->productsBySupplier($this->supplier->getId());
-      else $products=$repositoryProduct->productsBySupplierCategory($this->supplier->getId(),$this->category->getId());
+      else $products=$repositoryProduct->productsBySupplierCategory($supplier->getId(),$this->category->getId());
       foreach($products as $product){
         $productEntity=$repositoryProduct->findOneBy(["id"=>$product]);
         $productEntity->priceCalculated($doctrine);
         $productEntity->calculateIncrementByProduct($doctrine);
         $productEntity->calculateCustomerIncrementsByProduct($doctrine);
-        $em->persist($productEntity);
+        $productEntity->calculateShoppingPrices($doctrine, $supplier);
+        $em->merge($productEntity);
         $em->flush();
-
       }
     }
 

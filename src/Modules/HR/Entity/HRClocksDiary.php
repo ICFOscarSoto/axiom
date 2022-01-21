@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Modules\ERP\Entity;
+namespace App\Modules\HR\Entity;
 
 use App\Modules\Globale\Entity\GlobaleCompanies;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPProductsSuppliersRepository")
+ * @ORM\Entity(repositoryClass="App\Modules\HR\Repository\HRClocksDiaryRepository")
  */
-class ERPProductsSuppliers
+class HRClocksDiary
 {
     /**
      * @ORM\Id()
@@ -18,22 +18,41 @@ class ERPProductsSuppliers
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Modules\ERP\Entity\ERPProducts")
-     * @ORM\JoinColumn(nullable=false,onDelete="CASCADE")
+     * @ORM\ManyToOne(targetEntity="App\Modules\HR\Entity\HRWorkers")
+     * @ORM\JoinColumn(nullable=false)
      */
-    private $product;
+    private $worker;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Modules\ERP\Entity\ERPSuppliers", fetch="EAGER")
-     * @ORM\JoinColumn(nullable=false,onDelete="CASCADE")
+     * @ORM\Column(type="datetime")
      */
-    private $supplier;
+    private $date;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Modules\Globale\Entity\GlobaleCompanies")
      * @ORM\JoinColumn(nullable=false)
      */
     private $company;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $time;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $estimatedtime;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $difftime;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $excludedifftime;
 
     /**
      * @ORM\Column(type="datetime")
@@ -48,38 +67,38 @@ class ERPProductsSuppliers
     /**
      * @ORM\Column(type="boolean")
      */
-    private $active=1;
+    private $active;
 
     /**
      * @ORM\Column(type="boolean")
      */
-    private $deleted=0;
+    private $deleted;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getProduct(): ?ERPProducts
+    public function getWorker(): ?HRWorkers
     {
-        return $this->product;
+        return $this->worker;
     }
 
-    public function setProduct(?ERPProducts $product): self
+    public function setWorker(?HRWorkers $worker): self
     {
-        $this->product = $product;
+        $this->worker = $worker;
 
         return $this;
     }
 
-    public function getSupplier(): ?ERPSuppliers
+    public function getDate(): ?\DateTimeInterface
     {
-        return $this->supplier;
+        return $this->date;
     }
 
-    public function setSupplier(?ERPSuppliers $supplier): self
+    public function setDate(\DateTimeInterface $date): self
     {
-        $this->supplier = $supplier;
+        $this->date = $date;
 
         return $this;
     }
@@ -92,6 +111,54 @@ class ERPProductsSuppliers
     public function setCompany(?GlobaleCompanies $company): self
     {
         $this->company = $company;
+
+        return $this;
+    }
+
+    public function getTime(): ?int
+    {
+        return $this->time;
+    }
+
+    public function setTime(int $time): self
+    {
+        $this->time = $time;
+
+        return $this;
+    }
+
+    public function getEstimatedtime(): ?int
+    {
+        return $this->estimatedtime;
+    }
+
+    public function setEstimatedtime(?int $estimatedtime): self
+    {
+        $this->estimatedtime = $estimatedtime;
+
+        return $this;
+    }
+
+    public function getDifftime(): ?int
+    {
+        return $this->difftime;
+    }
+
+    public function setDifftime(?int $difftime): self
+    {
+        $this->difftime = $difftime;
+
+        return $this;
+    }
+
+    public function getExcludedifftime(): ?bool
+    {
+        return $this->excludedifftime;
+    }
+
+    public function setExcludedifftime(bool $excludedifftime): self
+    {
+        $this->excludedifftime = $excludedifftime;
 
         return $this;
     }

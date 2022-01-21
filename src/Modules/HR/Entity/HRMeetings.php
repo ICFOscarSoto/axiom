@@ -7,7 +7,7 @@ use App\Modules\Globale\Entity\GlobaleUsers;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\Modules\HR\Entity\HRMeetingsRepository")
+ * @ORM\Entity(repositoryClass="App\Modules\HR\Repository\HRMeetingsRepository")
  */
 class HRMeetings
 {
@@ -247,6 +247,6 @@ class HRMeetings
     }
 
     public function postProccess($kernel, $doctrine, $user, $params, $oldobj){
-      
+
     }
 }

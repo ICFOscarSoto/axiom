@@ -65,8 +65,8 @@
 			<th style="border-bottom: 1px solid #cecece !important;" class="table-header-name table-thead "> PVP </th>
 			<th style="border-bottom: 1px solid #cecece !important;" class="table-header-name table-thead "> Nuevo PVP </th>
 			<th style="border-bottom: 1px solid #cecece !important;" class="table-header-name table-thead "> Cantidad </th>
-			<th style="border-bottom: 1px solid #cecece !important;" class="table-header-name table-thead "> Descuento </th>
-			<th style="border-bottom: 1px solid #cecece !important;" class="table-header-name table-thead "> Nuevo descuento </th>
+			<!-- <th style="border-bottom: 1px solid #cecece !important;" class="table-header-name table-thead "> Descuento </th>
+			<th style="border-bottom: 1px solid #cecece !important;" class="table-header-name table-thead "> Nuevo descuento </th> -->
 			<th style="border-bottom: 1px solid #cecece !important;" class="table-header-name table-thead "> Variación alta </th>
 			<th style="border-bottom: 1px solid #cecece !important;" class="table-header-name table-thead "> Fecha inicial </th>
 			<th style="border-bottom: 1px solid #cecece !important;" class="table-header-name table-thead "> Nueva fecha inicial </th>
@@ -95,30 +95,22 @@
 <script>
 			var updateRates;
 		  $(document).ready(function() {
-		  $('body').on('change', "#supplier-select", function(e) {
-				$("#header-list-products").css("display","block");
-				$("#body-list-products").css("display","block");
-				$("#data").css("display","block");
-				$("#update_rate").css("display","block");
-				$("#categories").css("display","block");
-				getProducts($("#supplier-select").val(),0);
-			  });
-
-
-
-		/*	$('body').on('click','[id^="button-save-"]', function(){
-					update($(this).attr('id'));
-			});
-*/
-			$('body').on('click',"#update_rate", function(){
-				/*var allTDs = document.getElementsByName("row_products");
-					for ( var counter = 0; counter < allTDs.length; counter++ ){
-   				console.log(allTDs[counter]); */
-				$('[attr-id^="row_products-"]').each(function() {
-					update($(this).attr('id'));
+			  $('body').on('change', "#supplier-select", function(e) {
+					$("#header-list-products").css("display","block");
+					$("#body-list-products").css("display","block");
+					$("#data").css("display","block");
+					$("#update_rate").css("display","block");
+					$("#categories").css("display","block");
+					getProducts($("#supplier-select").val(),0);
+				  });
+				/*$('body').on('click','[id^="button-save-"]', function(){
+						update($(this).attr('id'));
+				});*/
+				$('body').on('click',"#update_rate", function(){
+					$('[attr-id^="row_products-"]').each(function() {
+						update($(this).attr('id'));
+					});
 				});
-			});
-
 				$('body').on('click',"#submit-file", function(){
 					var formData = new FormData(document.getElementById('data'));
 					$.ajax({
@@ -135,14 +127,21 @@
 										    var value = obj[key];
 												if (key!='id') {
 													var valor=value;
-													if (key=='shopping_price') {
+													if (key=='shopping_price' && valor!=0) {
 														var old_id=key+'-'+obj['id'];
 														var new_id='new_'+key+'-'+obj['id'];
 														document.getElementById(new_id).value=valor;
 														if (document.getElementById(new_id).value==document.getElementById(old_id).textContent) document.getElementById(obj['id']).style="color:#0087FF";
 														else if (document.getElementById(new_id).value<=document.getElementById(old_id).textContent)	document.getElementById(obj['id']).style="color:#FF0000";
 														else if (document.getElementById(new_id).value>=document.getElementById(old_id).textContent)	document.getElementById(obj['id']).style="color:#0DB400";
-													}
+													} else if (key=='PVP' && valor!=0) {
+															var old_id=key+'-'+obj['id'];
+															var new_id='new_'+key+'-'+obj['id'];
+															document.getElementById(new_id).value=valor;
+															if (document.getElementById(new_id).value==document.getElementById(old_id).textContent) document.getElementById(obj['id']).style="color:#0087FF";
+															else if (document.getElementById(new_id).value<=document.getElementById(old_id).textContent)	document.getElementById(obj['id']).style="color:#FF0000";
+															else if (document.getElementById(new_id).value>=document.getElementById(old_id).textContent)	document.getElementById(obj['id']).style="color:#0DB400";
+													}									
 												}
 										  }
 										}
@@ -155,17 +154,16 @@
 					});
 
 					$('[attr-id^="row_products-"]').each(function() {
-							if ($('#new_PVP-'+$(this).attr('id')).val()=='' && $('#new_shopping_price-'+$(this).attr('id')).val()=='' && $('#new_discount-'+$(this).attr('id')).val()=='')
+							if ($('#new_PVP-'+$(this).attr('id')).val()=='' && $('#new_shopping_price-'+$(this).attr('id')).val()=='')
 							//	document.getElementById("disable-"+$(this).attr('id')).checked=true;
 							$("#disable-"+$(this).attr('id')).parent().addClass('checked');
 					});
-
 				});
 		});
 
 		function update(id){
 			if(document.getElementById('product_netprice-'+id).checked==false && $('#new_PVP-'+id).val()!=0 && $('#new_PVP-'+id).val()!=document.getElementById('PVP-'+id).textContent){
-						savePVP(id,
+					savePVP(id,
 						$('#new_PVP-'+id).val(),
 						$('#supplier-select').val(),
 						$('#discount-'+id).val().
@@ -174,7 +172,7 @@
 						$('#product_netprice-'+id).val());
 				}
 			else if (document.getElementById('product_netprice-'+id).checked==true && $('#new_shopping_price-'+id).val()!=0  && $('#new_shopping_price-'+id).val()!=document.getElementById('shopping_price-'+id).textContent){
-						saveShoppingPrice(id,
+					saveShoppingPrice(id,
 						$('#new_shopping_price-'+id).val(),
 						$('#supplier-select').val(),
 						$('#product_netprice-'+id).val());
@@ -187,7 +185,6 @@
 		function open(fileSelect, supplier){
 			if((++load_wait)==1) $("#load-spinner").fadeIn();
 			var data={fileSelect: fileSelect, supplier : supplier};
-
 			$.ajax({
 				 type: "POST",
 				 dataType: "json",
@@ -273,6 +270,13 @@
 					dataType: "json",
 					url: "/api/erp/getproducts/"+supplier+"/"+category,
 				}).done(function( elements, textStatus, jqXHR ) {
+					// borramos las filas que había en la tabla anterior, excepto la cabecera
+					var elmtTable=document.getElementById('header-list-products');
+					var tableRows=elmtTable.getElementsByTagName('tr');
+					var rowCount=tableRows.length;
+					for (var x=rowCount-1; x>0; x--) {
+   					tableRows[1].parentNode.removeChild(tableRows[1]);
+					}
 					if((--load_wait)==0) $("#load-spinner").fadeOut();
 					 elements.products.forEach( function(valor, indice, array) {
 						// $("#body-list-products").append("<b> eyyy </b>");+
@@ -289,25 +293,24 @@
 								'<td style="border-bottom: 1px solid #cecece !important;" id="shopping_price-'+valor.id+'" value="'+valor.shopping_price+'">'+valor.shopping_price+'</td>' +
 								'<td style="border-bottom: 1px solid #cecece !important;" colspan="3"> <input id="new_shopping_price-'+valor.id+'" value="" type="float" class="form-control"></td>'+
 								'<td style="border-bottom: 1px solid #cecece !important;" id="PVP-'+valor.id+'" value="'+valor.PVP+'"> '+valor.PVP+'</td>' +
-								'<td style="border-bottom: 1px solid #cecece !important;"> <input id="new_PVP-'+valor.id+'" type="float" class="form-control"></td>'+
+								'<td style="border-bottom: 1px solid #cecece !important;"> <input id="new_PVP-'+valor.id+'" value="" type="float" class="form-control"></td>'+
 								'<td style="border-bottom: 1px solid #cecece !important;" id="quantity-'+valor.id+'" value="'+valor.quantity+'"> '+valor.quantity+'</td>' +
-								'<td style="border-bottom: 1px solid #cecece !important;" id="discount-'+valor.id+'" value="'+valor.discount+'"> '+valor.discount+'</td>' +
-								'<td style="border-bottom: 1px solid #cecece !important;"> <input id="new_discount-'+valor.id+'" type="number" class="form-control"></td>'+
+							//	'<td style="border-bottom: 1px solid #cecece !important;" id="discount-'+valor.id+'" value="'+valor.discount+'"> '+valor.discount+'</td>' +
+							//	'<td style="border-bottom: 1px solid #cecece !important;"> <input id="new_discount-'+valor.id+'" type="number" class="form-control"></td>'+
 								'<td style="border-bottom: 1px solid #cecece !important;"> <input id="alert_price-'+valor.id+'" type="checkbox" class="icheck"></td>'+
 								'<td style="border-bottom: 1px solid #cecece !important;" id="start-'+valor.id+'" value="'+valor.start+'"> '+valor.start+'</td>' +
 								'<td style="border-bottom: 1px solid #cecece !important;"> <input id="new_start-'+valor.id+'" type="date" class="form-control"></td>'+
 								'<td style="border-bottom: 1px solid #cecece !important;" id="end-'+valor.id+'" value="'+valor.end+'"> '+valor.end+'</td>' +
 								'<td style="border-bottom: 1px solid #cecece !important;"> <input id="new_end-'+valor.id+'" type="date" class="form-control"></td>'+
-								'<td style="border-bottom: 1px solid #cecece !important;"> <input id="disable-'+valor.id+'" type="checkbox" class="icheck"></td>'+
+							 	'<td style="border-bottom: 1px solid #cecece !important;"> <input id="disable-'+valor.id+'" type="checkbox" class="icheck"></td>'+
 								'<td style="border-bottom: 1px solid #cecece !important;" id="packing-'+valor.id+'" value="'+valor.packing+'"> '+valor.packing+'</td>' +
-								'<td style="border-bottom: 1px solid #cecece !important;"> <input id="new_start-'+valor.packing+'" class="form-control"></td>'+
+								'<td style="border-bottom: 1px solid #cecece !important;"> <input id="new_packing-'+valor.packing+'" class="form-control"></td>'+
 								'<td style="border-bottom: 1px solid #cecece !important;" id="button_save-'+valor.id+'"value="0"> <input id="button-save-'+valor.id+'" attr-id="'+valor.id+'"  type="submit" value="Guardar" class="btn btn-green"></td>' +
 							'</tr>');
-
-							$('input.icheck').iCheck({
-				        checkboxClass: 'icheckbox_flat-blue',
-				        radioClass: 'iradio_flat-blue'
-				      });
+					});
+					$('input.icheck').iCheck({
+						checkboxClass: 'icheckbox_flat-blue',
+						radioClass: 'iradio_flat-blue'
 					});
 			});
 		}

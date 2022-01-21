@@ -22,13 +22,13 @@ class ERPShoppingPrices
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPProducts")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false, onDelete="Cascade")
      */
     private $product;
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPSuppliers")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false, onDelete="Cascade")
      */
     private $supplier;
 
@@ -38,19 +38,9 @@ class ERPShoppingPrices
     private $quantity;
 
     /**
-     * @ORM\Column(type="boolean")
-     */
-    private $netprice;
-
-    /**
      * @ORM\Column(type="float", nullable=true)
      */
-    private $discount;
-
-    /**
-     * @ORM\Column(type="float", nullable=true)
-     */
-    private $price;
+    private $shopping_price;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
@@ -85,22 +75,7 @@ class ERPShoppingPrices
     /**
      * @ORM\Column(type="float", nullable=true)
      */
-    private $discount1;
-
-    /**
-     * @ORM\Column(type="float", nullable=true)
-     */
-    private $discount2;
-
-    /**
-     * @ORM\Column(type="float", nullable=true)
-     */
-    private $discount3;
-
-    /**
-     * @ORM\Column(type="float", nullable=true)
-     */
-    private $discount4;
+    private $pvp;
 
     public function getId(): ?int
     {
@@ -143,38 +118,15 @@ class ERPShoppingPrices
         return $this;
     }
 
-    public function getNetprice(): ?bool
+
+    public function getShoppingPrice(): ?float
     {
-        return $this->netprice;
+        return $this->shopping_price;
     }
 
-    public function setNetprice(bool $netprice): self
+    public function setShoppingPrice(?float $shopping_price): self
     {
-        $this->netprice = $netprice;
-
-        return $this;
-    }
-
-    public function getDiscount(): ?float
-    {
-        return $this->discount;
-    }
-
-    public function setDiscount(?float $discount): self
-    {
-        $this->discount = $discount;
-
-        return $this;
-    }
-
-    public function getPrice(): ?float
-    {
-        return $this->price;
-    }
-
-    public function setPrice(?float $price): self
-    {
-        $this->price = $price;
+        $this->shopping_price = $shopping_price;
 
         return $this;
     }
@@ -251,50 +203,14 @@ class ERPShoppingPrices
         return $this;
     }
 
-    public function getDiscount1(): ?float
+    public function getPvp(): ?float
     {
-        return $this->discount1;
+        return $this->pvp;
     }
 
-    public function setDiscount1(?float $discount1): self
+    public function setPvp(?float $pvp): self
     {
-        $this->discount1 = $discount1;
-
-        return $this;
-    }
-
-    public function getDiscount2(): ?float
-    {
-        return $this->discount2;
-    }
-
-    public function setDiscount2(?float $discount2): self
-    {
-        $this->discount2 = $discount2;
-
-        return $this;
-    }
-
-    public function getDiscount3(): ?float
-    {
-        return $this->discount3;
-    }
-
-    public function setDiscount3(?float $discount3): self
-    {
-        $this->discount3 = $discount3;
-
-        return $this;
-    }
-
-    public function getDiscount4(): ?float
-    {
-        return $this->discount4;
-    }
-
-    public function setDiscount4(?float $discount4): self
-    {
-        $this->discount4 = $discount4;
+        $this->pvp = $pvp;
 
         return $this;
     }
