@@ -29,6 +29,12 @@ class HRSickleavesRepository extends ServiceEntityRepository
       return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetch();
     }
 
+    public function getDiary($worker, $year){
+      $query="SELECT id, DATE(start) start, DATE(end) end, type, justified, workerobservations, companyobservations, days FROM hrsickleaves WHERE worker_id = :worker AND (YEAR(start)=:year OR YEAR(end)=:year) AND deleted=0 AND active=1";
+      $params=['worker' => $worker->getId(), 'year' => $year];
+      return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+    }
+
     // /**
     //  * @return HRSickleaves[] Returns an array of HRSickleaves objects
     //  */

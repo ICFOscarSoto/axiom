@@ -19,6 +19,12 @@ class HRClocksDiaryRepository extends ServiceEntityRepository
         parent::__construct($registry, HRClocksDiary::class);
     }
 
+    public function getDiary($worker, $year){
+
+      $query="SELECT id, DATE(date) start, time, estimatedtime, difftime, excludedifftime FROM hrclocks_diary WHERE worker_id = :worker AND YEAR(date)=:year AND deleted=0 AND active=1";
+      $params=['worker' => $worker->getId(), 'year' => $year];
+      return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+    }
     // /**
     //  * @return HRClocksDiary[] Returns an array of HRClocksDiary objects
     //  */

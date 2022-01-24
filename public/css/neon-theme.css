@@ -5062,7 +5062,7 @@ fieldset[disabled] .calendar-env .calendar-body .fc-content .fc-view table tbody
   font-size: 16px;
 }
 .calendar-env .fc .fc-view-container > .fc-view {
-  border-left: 1px solid #ebebeb;
+  /*border-left: 1px solid #ebebeb;*/
 }
 .calendar-env .fc .fc-view-container .fc-widget-content,
 .calendar-env .fc .fc-view-container .fc-widget-header {

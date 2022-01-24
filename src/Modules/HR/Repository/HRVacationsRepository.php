@@ -20,7 +20,7 @@ class HRVacationsRepository extends ServiceEntityRepository
     }
 
     public function dayVacations($worker, $day){
-      $query="SELECT type from hrvacations
+      $query="SELECT type, start, end, hourslastday from hrvacations
       WHERE worker_id = :worker AND (DATE(:start) BETWEEN DATE(START) AND DATE(END)) AND deleted=0 AND active=1
       AND approved=1
       ORDER BY start ASC LIMIT 1";
@@ -29,6 +29,12 @@ class HRVacationsRepository extends ServiceEntityRepository
       return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetch();
     }
 
+
+    public function getDiary($worker, $year){
+      $query="SELECT id, DATE(start) start, DATE(end) end, type, approved, workerobservations, companyobservations, days, hourslastday FROM hrvacations WHERE worker_id = :worker AND YEAR(start)=:year AND approved=1 AND deleted=0 AND active=1";
+      $params=['worker' => $worker->getId(), 'year' => $year];
+      return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+    }
     // /**
     //  * @return HRVacations[] Returns an array of HRVacations objects
     //  */

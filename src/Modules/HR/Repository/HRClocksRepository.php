@@ -37,7 +37,7 @@ class HRClocksRepository extends ServiceEntityRepository
 
       $query="SELECT hrc.id, hrw.id workerid, hrw.name, hrw.lastname, hrc.start, hrc.end from hrworkers hrw
               LEFT JOIN hrclocks hrc ON hrc.id=(SELECT id FROM hrclocks WHERE worker_id=hrw.id AND active=1 AND deleted=0 AND invalid<>1 ORDER BY start DESC LIMIT 1)
-              WHERE hrw.company_id = :company AND hrw.deleted=0 AND hrw.active=1";        
+              WHERE hrw.company_id = :company AND hrw.deleted=0 AND hrw.active=1";
 
       if($department!=0) $query.=" AND hrw.department_id=".$department;
       if($workcenter!=0) $query.=" AND hrw.workcenters_id=".$workcenter;
@@ -139,7 +139,7 @@ class HRClocksRepository extends ServiceEntityRepository
 
     public function dayClocks($worker, $day){
 
-      $query="SELECT TIME(start) start, TIME(end) end, time, observations, invalid from hrclocks
+      $query="SELECT id, TIME(start) start, TIME(end) end, time, observations, invalid from hrclocks
               WHERE worker_id = :worker AND DATE(start) = :start AND deleted=0 AND active=1 AND invalid<>1
               ORDER BY start ASC";
 

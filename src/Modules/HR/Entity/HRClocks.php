@@ -299,6 +299,7 @@ class HRClocks
       $schedulesRepository=$doctrine->getRepository(HRSchedules::class);
       $scheduleShiftsRepository=$doctrine->getRepository(HRShifts::class);
       $schedulePeriodsRepository=$doctrine->getRepository(HRPeriods::class);
+      $vacationsRepository=$doctrine->getRepository(HRVacations::class);
 
       //Calculate total time worked in day
       $dayClocks=$clocksrepository->dayClocks($this->worker, $this->start->format('Y/m/d'));
@@ -322,11 +323,27 @@ class HRClocks
       $periods=$schedulePeriodsRepository->datePeriod($shift, $this->start);
       $estimatedtime=0;
       foreach($periods as $key=>$value){
-        $periods[$key]["time"]=date_timestamp_get(date_create_from_format('Y-m-d H:i:s',$this->end->format('Y-m-d').' '.$value['end']))-date_timestamp_get(date_create_from_format('Y-m-d H:i:s',$this->start->format('Y-m-d').' '.$value['start']));
+        if($this->end==null){
+          $end=new \DateTime();
+          $start=new \DateTime();
+        }else{
+          $end=$this->end;
+          $start=$this->start;
+        }
+        $periods[$key]["time"]=date_timestamp_get(date_create_from_format('Y-m-d H:i:s',$end->format('Y-m-d').' '.$value['end']))-date_timestamp_get(date_create_from_format('Y-m-d H:i:s',$start->format('Y-m-d').' '.$value['start']));
         $estimatedtime+=$periods[$key]["time"];
       }
-      //TODO: Si no existe el registro de diario crearlo, si existe modificarlo
+
       $normalizeddate=date_create_from_format('Y-m-d H:i:s',$this->start->format('Y-m-d').' 00:00:00');
+      $vacations=$vacationsRepository->dayVacations($this->worker, $normalizeddate->format('Y-m-d'));
+      if($vacations){
+        //check if is lastday of vacations
+         $lastday=date_create_from_format('Y-m-d H:i:s',$vacations["end"]);
+         if($vacations==$normalizeddate && $vacations["ourlastday"]!=0 && $vacations["ourlastday"]!=null){
+             $estimatedtime=$estimatedtime-($vacations["ourlastday"]*3600);
+         }
+       }
+
       $clockdiary=$clocksDiaryrepository->findOneBy(['worker'=>$this->worker, 'date'=>$normalizeddate, 'active'=>1, 'deleted'=>0]);
       if(!$clockdiary){
         $clockdiary=new HRClocksDiary();

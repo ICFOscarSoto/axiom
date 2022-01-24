@@ -1,0 +1,283 @@
+    <div class="calendar-env">
+    			<!-- Calendar Body -->
+    			<div class="">
+    				<div id="calendar"></div>
+    			</div>
+  	</div>
+
+
+	<!-- MODALS  -->
+
+
+
+{% block footer %}
+  <link rel="stylesheet" href="{{ url('index') }}js/fullcalendar-2/fullcalendar.min.css">
+
+	<!-- Imported scripts on this page -->
+	<script src="{{ url('index') }}js/moment.min.js"></script>
+	<script src="{{ url('index') }}js/moment-es.js"></script>
+
+  <script src="{{ url('index') }}js/fullcalendar-2/fullcalendar.min.js"></script>
+	<script src='{{ url('index') }}js/fullcalendar-2/lang/es.js'></script>
+  <script src='{{ url('index') }}js/fullcalendar-2/tooltip.min.js'></script>
+
+  <script>
+  var fullCalendar = fullCalendar || {};
+  var calendar;
+  var calendarobj;
+
+  ;(function($, window, undefined)
+  {
+    "use strict";
+
+    $(document).ready(function(){
+			var load_wait=0;
+      fullCalendar.$container = $(".calendar-env");
+      $.extend(fullCalendar, {
+        isPresent: fullCalendar.$container.length > 0
+      });
+
+      //Container Height fit with the document
+      if(fullCalendar.isPresent){
+        fullCalendar.$sidebar = fullCalendar.$container.find('.calendar-sidebar');
+        fullCalendar.$body = fullCalendar.$container.find('.calendar-body');
+
+        // Checkboxes
+        var $cb = fullCalendar.$body.find('table thead input[type="checkbox"], table tfoot input[type="checkbox"]');
+        $cb.on('click', function(){
+          $cb.attr('checked', this.checked).trigger('change');
+          calendar_toggle_checkbox_status(this.checked);
+        });
+        // Highlight
+        fullCalendar.$body.find('table tbody input[type="checkbox"]').on('change', function(){
+          $(this).closest('tr')[this.checked ? 'addClass' : 'removeClass']('highlight');
+        });
+
+        // Setup Calendar
+        if($.isFunction($.fn.fullCalendar)){
+          calendar = $('#calendar');
+          calendarobj= calendar.fullCalendar({
+            showNonCurrentDates: false,
+            fixedWeekCount: false,
+						eventSources: [],
+            header: {
+              left: 'title',
+              //right: 'year,month,agendaWeek,agendaDay today prev,next'
+              right: 'prev,next'
+            },
+            defaultView: 'year',
+            editable: true,
+            firstDay: 1,
+            height: 600,
+            contentHeight:"auto",
+            droppable: true,
+            showNonCurrentDates: false,
+
+            drop: function(date, allDay) {
+            },
+						eventClick: function(calEvent, jsEvent, view) {
+              console.log(calEvent);
+					  },
+
+            eventDidMount: function(info) {
+                var tooltip = new Tooltip(info.el, {
+                  title: info.event.extendedProps.title,
+                  placement: 'top',
+                  trigger: 'hover',
+                  container: 'body'
+                });
+              },
+						loading: function( isLoading, view ) {
+	            if(isLoading) {//
+	               if((++load_wait)==1) $("#load-spinner").fadeIn();
+	            } else {
+	               if((--load_wait)==0) $("#load-spinner").fadeOut();
+	            }
+        		},
+            viewRender: function (element) {
+              getCalendars();
+            },
+            eventRender: function (event, element, view) {
+              element.find('.fc-title').html(event.title);
+
+            },
+					  eventDrop:function( event, delta, revertFunc, jsEvent, ui, view ){
+						},
+
+						eventResize:function( event, delta, revertFunc, jsEvent, ui, view ) {
+						}
+
+          });
+
+          $("#draggable_events li a").draggable({
+            zIndex: 999,
+            revert: true,
+            revertDuration: 0
+          }).on('click', function(){
+            return false;
+          });
+        }
+        else{
+          alert("Please include full-calendar script!");
+        }
+
+        $("body").on('submit', '#add_event_form', function(ev){
+          fit_calendar_container_height();
+          return false;
+        });
+      }
+
+
+			//Calendars load
+			function getCalendars(){
+				if((++load_wait)==1) $("#load-spinner").fadeIn();
+                var tglCurrent = $('#calendar').fullCalendar('getDate');
+                var date = new Date(tglCurrent);
+                var year = date.getFullYear();
+						$.getJSON("/api/HR/workerdiary/getevents/"+{{worker_id}}+"/"+year, function( data ) {
+              //console.log(data);
+              if(data.result)
+              $.each( data.data, function( key, val ) {
+                $('#calendar').fullCalendar('renderEvent', val);
+              });
+					}).always(function() {
+						if((--load_wait)==0) $("#load-spinner").fadeOut();
+					});
+			}
+
+			//Calendar Enable/Disable
+			/*$('body').on('change', "[id^='chk-calendar-']", function() {
+			    if(this.checked) {
+			        $('#calendar').fullCalendar('addEventSource', $(this).attr("attr-eventUrl"));
+			    }else{
+							$('#calendar').fullCalendar('removeEventSource', $(this).attr("attr-eventUrl"));
+					}
+			});*/
+
+			//Color picker
+			/*$('#calendar-modal-new-calendar').on('shown.bs.modal', function() {
+				$('#calendarColor').colpick({
+            colorScheme:'dark',
+            onChange:function(hsb,hex,rgb,el,bySetColor) {
+                $(el).val('#'+hex);
+            },
+						onSubmit:function(hsb,hex,rgb,el,bySetColor) {
+							 $(el).colpickHide();
+					 }
+        });
+			});*/
+			/*$('#calendar-modal-new-event').on('shown.bs.modal', function() {
+				$('#eventColor').colpick({
+            colorScheme:'dark',
+            onChange:function(hsb,hex,rgb,el,bySetColor) {
+                $(el).val('#'+hex);
+            },
+						onSubmit:function(hsb,hex,rgb,el,bySetColor) {
+							 $(el).colpickHide();
+					 }
+        });
+			});*/
+
+			$('#calendar-modal-new-event').on('shown.bs.modal', function() {
+				replaceCheckboxes();
+			});
+
+			//New Calendar button
+			/*$('body').on('click', "#calendar-modal-new-calendar-button-continue", function() {
+				$('#calendar-modal-new-calendar').modal('toggle');
+				if((++load_wait)==1) $("#load-spinner").fadeIn();
+				$.get('{{ url('calendarSave') }}',$("#calendar-modal-new-calendar-form").serialize(), function( data ){
+					if(data.result){
+							getCalendars('{{url('calendarsList')}}', '');
+							toastr.success("Calendario guardado correctamente", "Confirmación", confirmation);
+						}else toastr.error("No se pudo guardar el calendario", "Confirmación", confirmation);
+				},'json').always(function() {
+						if((--load_wait)==0) $("#load-spinner").fadeOut();
+				});
+			});*/
+			//Edit Calendar
+			/*$('body').on('click', "[id^='calendar-list-edit-']", function() {
+				$.get($(this).attr("attr-url"),'', function( data ){
+					$("#calendarId").val(data.id);
+					$("#calendarName").val(data.name);
+					$("#calendarColor").colpickSetColor(data.color);
+				},'json').always(function() {
+						if((--load_wait)==0) $("#load-spinner").fadeOut();
+						$('#calendar-modal-new-calendar').modal('toggle');
+				});
+			});*/
+
+
+			//Save Event button
+			/*$('body').on('click', "#calendar-modal-new-event-button-continue", function() {
+				$('#calendar-modal-new-event').modal('toggle');
+				if((++load_wait)==1) $("#load-spinner").fadeIn();
+				$.get('{{ url('eventSave') }}',$("#calendar-modal-new-event-form").serialize()+"&description="+encodeURIComponent(tinymce.get('eventDescription').getBody().textContent), function( data ){
+					if(data.result){
+							$('#calendar').fullCalendar('refetchEvents');
+							toastr.success("Evento guardado correctamente", "Confirmación", confirmation);
+						}else toastr.error("No se pudo guardar el evento", "Confirmación", confirmation);
+				},'json').always(function() {
+						if((--load_wait)==0) $("#load-spinner").fadeOut();
+				});
+			});*/
+
+			//Event description
+			/*var wysihtml5Editor = tinymce.init({
+				selector: '#eventDescription',
+				branding: false,
+				height: 225,
+				theme: 'modern',
+				menubar:false,
+    		statusbar: false,
+				toolbar1: 'formatselect | bold italic strikethrough forecolor backcolor | link | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent  | removeformat',
+				language_url : '/js/tiny_mce/langs/es.js',  // site absolute URL
+				image_advtab: false,
+				setup: function (editor) {
+
+				},
+				content_css: [
+					'//fonts.googleapis.com/css?family=Lato:300,300i,400,400i',
+					'//www.tinymce.com/css/codepen.min.css'
+				]
+			 });
+
+			//Initial Load
+      */
+			//getCalendars();
+
+
+
+		});
+  })(jQuery);
+
+  function fit_calendar_container_height(){
+    if(fullCalendar.isPresent){
+      if(fullCalendar.$sidebar.height() < fullCalendar.$body.height()){
+        fullCalendar.$sidebar.height( fullCalendar.$body.height() );
+      }else{
+        var old_height = fullCalendar.$sidebar.height();
+        fullCalendar.$sidebar.height('');
+        if(fullCalendar.$sidebar.height() < fullCalendar.$body.height()){
+          fullCalendar.$sidebar.height(old_height);
+        }
+      }
+    }
+  }
+
+  function reset_calendar_container_height(){
+    if(fullCalendar.isPresent){
+      fullCalendar.$sidebar.height('auto');
+    }
+  }
+
+  function calendar_toggle_checkbox_status(checked){
+    fullCalendar.$body.find('table tbody input[type="checkbox"]' + (checked ? '' : ':checked')).attr('checked',  ! checked).click();
+  }
+
+  </script>
+  {{ include('@Globale/bottom.html.twig') }}
+	<script src="{{ url('index') }}js/selectboxit/jquery.selectBoxIt.min.js"></script>
+	<script src="{{ url('index') }}js/typeahead.min.js"></script>
+{% endblock %}
+</body>

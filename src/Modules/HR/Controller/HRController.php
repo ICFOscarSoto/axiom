@@ -32,6 +32,12 @@ use App\Modules\HR\Entity\HRWorkCalendars;
 use App\Modules\HR\Entity\HRHollidays;
 use App\Modules\HR\Entity\HRSchedules;
 use App\Modules\HR\Entity\HRShifts;
+use App\Modules\HR\Entity\HRClocksDiary;
+use App\Modules\HR\Entity\HRVacations;
+use App\Modules\HR\Entity\HRSickleaves;
+
+
+
 use App\Modules\Globale\Utils\GlobaleListApiUtils;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use App\Modules\Security\Utils\SecurityUtils;
@@ -127,6 +133,7 @@ class HRController extends Controller
 												 /*["name" => "clothes", "icon"=>"fa fa-headphones", "caption"=>"Ropa y EPI"],
 												 ["name" => "paymentroll", "icon"=>"fa fa-eur", "caption"=>"Nóminas"],
 												 ["name" => "contracts", "icon"=>"fa fa-briefcase", "caption"=>"Contratos"],*/
+												 ["name" => "calendar", "icon"=>"fa fa-calendar-o", "caption"=>"Diario", "route"=>$this->generateUrl("workerDiary",["id"=>$id])],
 												 ["name" => "sickleave", "icon"=>"fa fa-hospital-o", "caption"=>"Bajas", "route"=>$this->generateUrl("sickleaves",["id"=>$id])],
 												 ["name" => "vacations", "icon"=>"fa fa-paper-plane", "caption"=>"Vacaciones", "route"=>$this->generateUrl("vacations",["id"=>$id])],
 												 ["name" => "clocks", "icon"=>"fa fa-clock-o", "caption"=>"Fichajes", "route"=>$this->generateUrl("workerClocks",["id"=>$id])],
@@ -147,6 +154,123 @@ class HRController extends Controller
 			));
 		}
 
+
+		/**
+		 * @Route("/api/HR/workerdiary/{id}", name="workerDiary")
+		 */
+		public function workerDiary($id,RouterInterface $router,Request $request){
+			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
+			$locale = $request->getLocale();
+			$this->router = $router;
+
+			$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
+
+			if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+				return $this->render('@HR/workerdiary.html.twig', [
+					'worker_id' => $id,
+					'userData' => $userdata,
+					]);
+			}
+			return new RedirectResponse($this->router->generate('app_login'));
+		}
+
+		/**
+		 * @Route("/api/HR/workerdiary/getevents/{id}/{year}", name="workerDiaryGetEvents")
+		 */
+		 public function workerDiaryGetEvents($id, $year, RouterInterface $router,Request $request){
+		 	$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			$workersrepository=$this->getDoctrine()->getRepository(HRWorkers::class);
+		 	$clocksDiaryrepository=$this->getDoctrine()->getRepository(HRClocksDiary::class);
+			$vacationsRepository=$this->getDoctrine()->getRepository(HRVacations::class);
+			$hollidaysRepository=$this->getDoctrine()->getRepository(HRHollidays::class);
+			$workCalendarsrepository=$this->getDoctrine()->getRepository(HRWorkCalendars::class);
+			$sickleavesRepository=$this->getDoctrine()->getRepository(HRSickleaves::class);
+
+			$marginValid=-300; //5minutos
+			$marginWarning=-900; //15minutos
+			$recoveredBlocks=1800; //30minutos
+			$missingBlocks=300; //5minutos
+			$recoveredTime=0;
+			$balancedYearTime=0;
+
+			$worker=$workersrepository->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany(), "deleted"=>0]);
+			if(!$worker) return new JsonResponse(["result"=>-1, "data"=>[]]);
+
+			//Clocks diary events
+			$clocksDiaryEvents=$clocksDiaryrepository->getDiary($worker, $year);
+			$balancedTimeEvents=[];
+
+			foreach($clocksDiaryEvents as $key=>$event){
+				$clocksDiaryEvents[$key]['id']='cd'.$event['id'];
+				$date=date_create_from_format('Y-m-d',$clocksDiaryEvents[$key]['start']);
+				//$clocksDiaryEvents[$key]['title']='<b><i class="far fa-clock"></i> '.sprintf('%02d:%02d:%02d', ($event['time']/3600),($event['time']/60%60), $event['time']%60).($event['difftime']>=0?' +':' -')."(".sprintf('%02d:%02d:%02d', (abs($event['difftime']/3600)),abs(($event['difftime']/60%60)), abs($event['difftime']%60)).")"."</b>";
+				$tooltip="-------------  ".$date->format('d/m/Y')."  -------------&#10;&#10;Total trabajado: ".sprintf('%02d h %02d m', (abs($event['time']/3600)),abs(($event['time']/60%60))).'&#10;'."Previsto: ".sprintf('%02d h %02d m', (abs($event['estimatedtime']/3600)),abs(($event['estimatedtime']/60%60)));
+				$clocksDiaryEvents[$key]['title']='<b><i class="fa fa-clock-o"></i><a href="javascript:void(null)" style="color:#ffffff" " title="'.$tooltip.'">&nbsp; '.($event['difftime']>=0?' + ':' - ').sprintf('%02d h %02d m', (abs($event['difftime']/3600)),abs(($event['difftime']/60%60)))."</a></b>";
+				$clocksDiaryEvents[$key]['backgroundColor']=$event["difftime"]>$marginValid?'#4cb907':($event["difftime"]>$marginWarning?'#edd001':'#e74d4d');
+				$clocksDiaryEvents[$key]['description']="";
+				$clocksDiaryEvents[$key]['editable']=false;
+				if($event["difftime"]>0){
+					$recoveredDiff=round($event["difftime"]/$recoveredBlocks)*$recoveredBlocks;
+					$balancedYearTime+=$recoveredDiff;
+				}
+				if($event["difftime"]<0){
+					$recoveredDiff=round($event["difftime"]/$missingBlocks)*$missingBlocks;
+					$balancedYearTime+=$recoveredDiff;
+				}
+				$balancedTimeEvents[]=[
+					'id'=>'bte'.$event['id'],
+					'start'=>$clocksDiaryEvents[$key]['start'],
+					'title'=>'<b><i class="fa fa-balance-scale"></i> '.($balancedYearTime>=0?' + ':' - ').sprintf('%02d h %02d m', (abs($balancedYearTime/3600)),abs(($balancedYearTime/60%60)))."</b>",
+					'backgroundColor'=>"#e1e1e1",
+					'description'=>"",
+					'textColor'=>"#000000",
+					'editable'=>false
+				];
+			}
+
+			//Hollidays
+			$hollidays=[];
+			$workCalendar=$workCalendarsrepository->findOneBy(["workcalendargroup"=>$worker->getWorkcalendargroup(),"year"=>$year, "active"=>1, "deleted"=>0]);
+			if($workCalendar!=null){
+				$hollidaysobjs=$hollidaysRepository->findBy(["calendar"=>$workCalendar, "active"=>1, "deleted"=>0]);
+				foreach($hollidaysobjs as $key=>$event){
+					$holliday['id']='h'.$event->getId();
+					$holliday['start']=$event->getDate()->format('Y-m-d');
+					$holliday['title']="<i class='fa fa-glass' aria-hidden='true'></i> Festivo";
+					$holliday['backgroundColor']="#3e3e3e";
+					$holliday['description']="";
+					$holliday['editable']=false;
+					$hollidays[]=$holliday;
+				}
+			}
+
+			//Vacations
+			$vacations=$vacationsRepository->getDiary($worker, $year);
+			foreach($vacations as $key=>$event){
+				$vacations[$key]['id']='v'.$event['id'];
+				$vacations[$key]['title']='<i class="fas fa-umbrella-beach"></i> '."Vacaciones";
+				$vacations[$key]['backgroundColor']="#21a9e1";
+				$vacations[$key]['description']="";
+				$vacations[$key]['editable']=false;
+			}
+
+			//$sickLeaves
+			$sickleaves=$sickleavesRepository->getDiary($worker, $year);
+			foreach($sickleaves as $key=>$event){
+				$sickleaves[$key]['id']='s'.$event['id'];
+				$sickleaves[$key]['title']='<b><i class="far fa-hospital"></i> '."Baja laboral";
+				$sickleaves[$key]['backgroundColor']="#21a9e1";
+				$sickleaves[$key]['description']="";
+				$sickleaves[$key]['editable']=false;
+			}
+			$clocksDiaryEvents=array_merge($clocksDiaryEvents,$balancedTimeEvents);
+			$clocksDiaryEvents=array_merge($clocksDiaryEvents,$vacations);
+			$clocksDiaryEvents=array_merge($clocksDiaryEvents,$hollidays);
+			$clocksDiaryEvents=array_merge($clocksDiaryEvents,$sickleaves);
+
+		 	return new JsonResponse(["result"=>1, "data"=>$clocksDiaryEvents]);
+		 }
 
 
 
