@@ -1262,7 +1262,7 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
                   $this->doctrine->getManager()->persist($oincrement);
                   $this->doctrine->getManager()->flush();
                   // Actualizar los productos de la categoría
-                  $oincrement->calculateIncrementsBySupplierCategory($this->doctrine);
+                  //$oincrement->calculateIncrementsBySupplierCategory($this->doctrine);
                 }catch(Exception $e){
                   $output->writeln(' - Error - '.$category_id.' - '.$category_name);
                 }
@@ -1378,7 +1378,7 @@ public function importIncrementsCustomers(InputInterface $input, OutputInterface
                   $this->doctrine->getManager()->persist($oincrementcustomers);
                   $this->doctrine->getManager()->flush();
                   // Actualizar los productos de la categoría
-                  $oincrementcustomers->calculateIncrementsBySupplierCategory($this->doctrine);
+                  // $oincrementcustomers->calculateIncrementsBySupplierCategory($this->doctrine);
                 }catch(Exception $e){
                   $output->writeln(' - Error - '.$category_id.' - '.$category_name);
                 }
