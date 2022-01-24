@@ -42,12 +42,12 @@
 													'</div>'+
 													'<div attr-id="'+valor.id+'" id="listCategories-field-button-delete-'+valor.id+'" class="dd-edit" onclick="jQuery(\'#{{ listConstructor.id }}-modal-confirm\').modal(\'show\', {backdrop: \'static\'});">'+
 														'<i class="fa fa-trash-o" aria-hidden="true"></i>'+
-													'</div>'+													
+													'</div>'+
 													'<div attr-id="'+valor.id+'" id="listCategories-field-button-add" id="'+valor.id+'" class="dd-edit">'+
 														'<i class="fa fa-plus" aria-hidden="true"></i>'+
 													'</div>'+
 													'<div class="dd-content">'+
-														valor.name+
+														'<a href="http://axiom.ferreteriacampollano.com/es/admin/global/products?s_listProducts_category__name='+valor.name+'&s_listProducts_active=1&start=0" target="_blank">'+valor.name+ '</a>'+
 													'</div>'+
 													((valor.childrens.length>0)?'<ol class="dd-list">':'')+
 													((valor.childrens.length>0)?parseCategory(valor.childrens):'')+
@@ -74,8 +74,11 @@
 												'<div attr-id="'+valor.id+'" id="listCategories-field-button-add" id="'+valor.id+'" class="dd-edit">'+
 													'<i class="fa fa-plus" aria-hidden="true"></i>'+
 												'</div>'+
+												'<div attr-id="'+valor.id+'" id="listCategories-field-button-search" id="'+valor.id+'" class="dd-edit">'+
+													'<i class="fa fa-plus" aria-hidden="true"></i>'+
+												'</div>'+
 												'<div class="dd-content">'+
-													valor.name+
+													'<a href="http://axiom.ferreteriacampollano.com/es/admin/global/products?s_listProducts_category__name='+valor.name+'&s_listProducts_active=1&start=0" target="_blank">'+valor.name+ '</a>'+
 												'</div>'+
 													((valor.childrens.length>0)?'<ol class="dd-list">':'')+
 													((valor.childrens.length>0)?parseCategory(valor.childrens):'')+
