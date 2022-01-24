@@ -78,7 +78,7 @@ class EmailGetSubjects extends ContainerAwareCommand
 
               $class="\App\Modules\\Email\\Proccessors\\".str_replace('.','_',str_replace('@','¡',$emailAccount->getUsername()));
               if(class_exists($class)){
-                  $class::checkMail($emailSubject, $emailAccount, $inbox, $output, $doctrine);
+                  $class::checkMail($emailSubject, $emailAccount, $inbox, $output, $doctrine, $this->getContainer()->get('kernel'));
               }
             }
           }

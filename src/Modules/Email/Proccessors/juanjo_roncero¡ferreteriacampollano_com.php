@@ -8,12 +8,23 @@ use App\Modules\Email\Entity\VelillaReadFilter;
 use App\Modules\Globale\Utils\GlobaleTranslatorUtils;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 //use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-//use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
+use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 use PhpOffice\PhpSpreadsheet\Reader;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
-class juanjo_roncero¡ferreteriacampollano_com {
+class juanjo_roncero¡ferreteriacampollano_com{
 
-    public function checkMail($subject, $account, $inbox, $output, $doctrine){
+    /** string $rootPath */
+     private $rootPath;
+
+     public function __construct(string $rootPath)
+     {
+         $this->rootPath = $rootPath;
+     }
+    public function checkMail($subject, $account, $inbox, $output, $doctrine, $kernel){
       $discordchannel_critico="883046233017552956";
       $output->writeln([isset($subject->subject)?('Procesando: '.HelperMail::decode_header(imap_utf8($subject->subject))):('Procesando: Correo sin asunto')]);
       $from=HelperMail::decode_header(imap_utf8($subject->from));
@@ -25,7 +36,7 @@ class juanjo_roncero¡ferreteriacampollano_com {
 
 
       switch ($from) {
-        /*
+
         case 'informacionvelilla@velillaconfeccion.es':
           $subjectEmail=isset($subject->subject)?HelperMail::decode_header(imap_utf8($subject->subject)):'';
           if(strpos($subjectEmail,"Informe Control de stock Velilla")!==FALSE){
@@ -40,21 +51,39 @@ class juanjo_roncero¡ferreteriacampollano_com {
               }
             }
 
+
             if(!$order_attachment){
               file_get_contents("https://icfbot.ferreteriacampollano.com/message.php?channel=".$discordchannel_critico."&msg=".urlencode(":warning:"."SCRIPT ".basename(__FILE__, '.php').": Posible email de Velilla sin adjunto XLSM"));
               break;
             }
 
+
+
             $xlsm=$emailUtils->getAtachment($inbox,$order_attachment["msgno"],$order_attachment["encoding"],$order_attachment["partno"]);
+            $tempPath=$kernel->getRootDir().DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$account->getUser()->getCompany()->getId().DIRECTORY_SEPARATOR.'temp'.DIRECTORY_SEPARATOR.$account->getUser()->getId().DIRECTORY_SEPARATOR.'Email'.DIRECTORY_SEPARATOR;
+
+            $output->writeln($tempPath);
+
+            if (!file_exists($tempPath) && !is_dir($tempPath)) {
+                mkdir($tempPath, 0775, true);
+            }
 
 
-            $reader = new Xlsx();
-            $reader->setReadDataOnly(true);
-            $spreadsheet = $reader->load($xlsm);
-            HelperVelilla::parseStocks($spreadsheet, $doctrine);
+             $file = fopen($tempPath."archivo.xlsm", "w");
+             fwrite($file,$xlsm);
+
+
+            $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
+            $spreadsheet = $reader->load($tempPath."archivo.xlsm");
+
+            HelperVelilla::parseStocks($spreadsheet, $doctrine, $output);
+            fclose($file);
+            unlink($tempPath."archivo.xlsm");
+
+            //SCP.......
           }
         break;
-        */
+
         case 'mailer@arcos.com':
           $subjectEmail=isset($subject->subject)?HelperMail::decode_header(imap_utf8($subject->subject)):'';
           if(strpos($subjectEmail,"Stock")!==FALSE){
