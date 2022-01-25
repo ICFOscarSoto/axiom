@@ -45,12 +45,12 @@ class ERPShoppingPrices
     /**
      * @ORM\Column(type="datetime", nullable=true)
      */
-    private $datestart;
+    private $start;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
      */
-    private $dateend;
+    private $end;
 
     /**
      * @ORM\Column(type="datetime")
@@ -131,26 +131,26 @@ class ERPShoppingPrices
         return $this;
     }
 
-    public function getDatestart(): ?\DateTimeInterface
+    public function getStart(): ?\DateTimeInterface
     {
-        return $this->datestart;
+        return $this->start;
     }
 
-    public function setDatestart(?\DateTimeInterface $datestart): self
+    public function setStart(?\DateTimeInterface $start): self
     {
-        $this->datestart = $datestart;
+        $this->start = $start;
 
         return $this;
     }
 
-    public function getDateend(): ?\DateTimeInterface
+    public function getEnd(): ?\DateTimeInterface
     {
-        return $this->dateend;
+        return $this->end;
     }
 
-    public function setDateend(?\DateTimeInterface $dateend): self
+    public function setEnd(?\DateTimeInterface $end): self
     {
-        $this->dateend = $dateend;
+        $this->end = $end;
 
         return $this;
     }
