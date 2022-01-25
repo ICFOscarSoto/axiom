@@ -12,6 +12,7 @@
   {
       "name": "dateadd",
       "caption": "dateadd",
+      "type": "date",
       "class": "all"
   },
   {
