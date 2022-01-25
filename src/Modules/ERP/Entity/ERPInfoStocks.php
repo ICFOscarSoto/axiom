@@ -6,6 +6,9 @@ use App\Modules\Globale\Entity\GlobaleUsers;
 use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\ERP\Entity\ERPProducts;
 use \App\Modules\ERP\Entity\ERPStores;
+use \App\Modules\ERP\Entity\ERPStocks;
+use \App\Modules\ERP\Entity\ERPStoreLocations;
+use \App\Modules\Globale\Entity\GlobaleCompanies;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPInfoStocksRepository")
@@ -229,5 +232,29 @@ class ERPInfoStocks
         $this->author = $author;
 
         return $this;
+    }
+
+    public function postProccess($kernel, $doctrine, $user, $params, $oldobj){
+      $em = $doctrine->getManager();
+      $companyRepository=$doctrine->getRepository(GlobaleCompanies::class);
+      $stocksRepository=$doctrine->getRepository(ERPStocks::class);
+      $storeLocationsRepository=$doctrine->getRepository(ERPStoreLocations::class);
+      $company=$companyRepository->find(2);
+      $storeLocation=$storeLocationsRepository->findOneBy(["name"=>$this->getStore()->getCode()]);
+      $stock=$stocksRepository->findOneBy(["product"=>$this->getProduct(),"storelocation"=>$storeLocation, "active"=>1, "deleted"=>0]);
+      if ($stock==null){
+        $obj = new ERPStocks();
+        $obj->setProduct($this->getProduct());
+        $obj->setCompany($company);
+        $obj->setStorelocation($storeLocation);
+        $obj->setQuantity(0);
+        $obj->setActive(1);
+        $obj->setDeleted(0);
+        $obj->setDateupd(new \DateTime());
+        $obj->setDateadd(new \DateTime());
+        $em->merge($obj);
+        $em->flush();
+        $em->clear();
+      }
     }
 }
