@@ -7,8 +7,8 @@ class HelperVelilla {
 
 
   public function parseStocks($spreadsheet, $doctrine, $output){
-    $discordchannel="935430617842196601";
-    $discordchannel="883046233017552956";
+    $discordchannel_web="935430617842196601";
+    $discordchannel_critico="883046233017552956";
     $auth = base64_encode("6TI5549NR221TXMGMLLEHKENMG89C8YV");
     $context = stream_context_create(["http" => ["header" => "Authorization: Basic $auth"]]);
     $sheet=$spreadsheet->getActiveSheet();
@@ -88,14 +88,14 @@ class HelperVelilla {
     $result = json_decode($result,true);
 
     if(json_last_error() !== JSON_ERROR_NONE){
-      file_get_contents("https://icfbot.ferreteriacampollano.com/message.php?channel=".$discordchannel."&msg=".urlencode(":warning:"."SCRIPT ".basename(__FILE__, '.php').": Error valor retornado al procesar stocks de Velilla"));
+      file_get_contents("https://icfbot.ferreteriacampollano.com/message.php?channel=".$discordchannel_critico."&msg=".urlencode(":warning:"."SCRIPT ".basename(__FILE__, '.php').": Error valor retornado al procesar stocks de Velilla"));
     }
     else{
       if($result["result"]!=1){
-        file_get_contents("https://icfbot.ferreteriacampollano.com/message.php?channel=".$discordchannel."&msg=".urlencode(":sos:"."SCRIPT ".basename(__FILE__, '.php').": Ocurrieron errores y no se pudieron procesar los stocks de Velilla"));
+        file_get_contents("https://icfbot.ferreteriacampollano.com/message.php?channel=".$discordchannel_critico."&msg=".urlencode(":sos:"."SCRIPT ".basename(__FILE__, '.php').": Ocurrieron errores y no se pudieron procesar los stocks de Velilla"));
       }
       else{
-        file_get_contents("https://icfbot.ferreteriacampollano.com/message.php?channel=".$discordchannel."&msg=".urlencode(":white_check_mark:"." SCRIPT ".basename(__FILE__, '.php').": Se ha procesado correctamente el archivo diario de Velilla"));
+        file_get_contents("https://icfbot.ferreteriacampollano.com/message.php?channel=".$discordchannel_web."&msg=".urlencode(":white_check_mark:"." SCRIPT ".basename(__FILE__, '.php').": Se ha procesado correctamente el archivo diario de Velilla"));
 
       }
     }
