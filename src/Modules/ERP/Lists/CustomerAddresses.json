@@ -1,9 +1,9 @@
 [ {"name": "id", "caption":""},
-  {"name": "address", "caption":"Dirección", "width" : "50"},
-  {"name": "postcode", "caption":"Código Postal", "width" : "50"},
-  {"name": "city", "caption":"Localidad", "width" : "50"},
-  {"name": "phone", "caption":"Teléfono", "width" : "50"},
-  {"name": "navisioncontact", "caption":"Contacto", "width" : "50"},
+  {"name": "address", "caption":"Dirección"},
+  {"name": "postcode", "caption":"Código Postal"},
+  {"name": "city", "caption":"Localidad"},
+  {"name": "phone", "caption":"Teléfono"},
+  {"name": "navisioncontact", "caption":"Contacto"},
   {"name": "active", "caption":"Estado", "width":"10%" ,"class" : "dt-center", "replace":{
                              "1":{"text":"Activo","html":"<div style=\"min-width: 75px;\" class=\"label label-success\">Activo</div>"},
                              "0":{"text":"Desactivado","html":"<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado</div>"}
