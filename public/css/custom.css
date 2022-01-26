@@ -61,9 +61,28 @@ table {
   text-decoration: underline;
 }
 
+.searchable-view-relation{
+  height: 25px;
+  position: absolute;
+  top: 3px;
+  right: 73px;
+  width: 75px;
+  border: 1px solid #e8e8e8;
+  border-radius: 3px;
+  background: #ffffff;
+  line-height: 24px !important;
+  text-align: center;
+  cursor: pointer;
+  z-index: 999;
+}
+
 .searchable-field{
   background-color: white !important;
   cursor: pointer;
+}
+
+.group-searchable-fields{
+  vertical-align: top !important;
 }
 
 
@@ -297,7 +316,7 @@ table.dataTable.dtr-inline.collapsed > tbody > tr > td:first-child:before, table
     opacity: 1;
 }
 .form-control[readonly]{
-  
+
 }
 
 .form-group .input-success{
@@ -893,6 +912,9 @@ label.error {
   font-size: 50px;
 }
 
+.fc-event{
+    cursor: pointer;
+}
 /*
 .spinner-container {
    position: absolute;

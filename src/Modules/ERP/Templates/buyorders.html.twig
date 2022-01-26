@@ -43,8 +43,8 @@
 			<div id="buyorders-body">
 				{% set formConstructor = form %}
 					{{ include('@ERP/buyorder_form_validation.html.twig') }}
-
 					{{ include('@ERP/buyorders_data.html.twig') }}
+
 
 			</div>
 			{{ include('@ERP/buyorders_search_supplier.html.twig') }}
@@ -56,7 +56,9 @@
 					{{ include('@ERP/buyorders_destination.html.twig') }}
 					{{ include('@ERP/buyorders_search_customer.html.twig') }}
 		</div>
+		{{ include('@ERP/buyorders_lines.html.twig') }}
 </div>
+
 <div class="row">
 		<div style="text-align: left;" class="col-md-6"></div>
 		<div style="text-align: right;margin-bottom:10px;" class="col-md-6">

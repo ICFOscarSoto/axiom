@@ -221,7 +221,12 @@ class ERPBuyOrdersController extends Controller
 						'destinationstates' => $destinationstates,
 						'destinationcountries' => $destinationcountries,
 						'customerslist' => $customerslist,
-						'id' => $id
+						'id' => $id,
+						'include_header' => [["type"=>"css", "path"=>"/js/jexcel/jexcel.css"],
+                                 ["type"=>"js",  "path"=>"/js/jexcel/jexcel.js"],
+																 ["type"=>"css", "path"=>"/js/jsuites/jsuites.css"],
+										             ["type"=>"js",  "path"=>"/js/jsuites/jsuites.js"],
+															 ],
     				]);
     		}
     		return new RedirectResponse($this->router->generate('app_login'));

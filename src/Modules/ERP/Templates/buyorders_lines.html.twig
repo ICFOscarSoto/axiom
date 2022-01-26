@@ -1,0 +1,50 @@
+  <div id="spreadsheet"></div>
+  <script>
+
+  	function addSpreadSheetLine(data, prototipe, numline){
+  		var temp_prototipe = JSON.parse(JSON.stringify(prototipe));
+  		temp_prototipe.forEach(function(value, index, array) {
+  			var find = '#numline#';
+  			var re = new RegExp(find, 'g');
+  			str=prototipe[index]+'';
+  			var str2 = JSON.parse(JSON.stringify(str));
+  			temp_prototipe[index]=str2.replace(re,numline+'');
+  		});
+  		data.push(temp_prototipe);
+  		return data;
+  	}
+
+  	var numlines=20;
+  	var prototipe=['','',0,1,'=C#numline#*D#numline#'];
+  	var data=[];
+    for(i=1;i<=numlines;i++){
+  		data=addSpreadSheetLine(data, prototipe, i);
+  	}
+
+    var test = jspreadsheet(document.getElementById('spreadsheet'), {
+        minDimensions:[5,numlines],
+        defaultColWidth: 100,
+        allowInsertColumn:false,
+        allowInsertRow:true,
+			  data: data,
+        columns: [
+        	/*{ type: 'text', width:'200', title:'Referencia', autocomplete:true, filter:autocompleteFilter },*/
+  				{ type: 'text', width:200, title:'Referencia'},
+          { type: 'text', width:400, title: 'Descripcion'},
+          { type: 'text', width:200, title: 'PCR', locale: 'sp-SP', mask: '#.##0,0000 €', options: { style:'currency', currency: 'EUR' } },
+          { type: 'numeric', width:200, title: 'Cantidad' },
+          { type: 'text', width:200, title: 'Total', readOnly:true, locale: 'sp-SP', mask: '#.##0,0000 €', options: { style:'currency', currency: 'EUR' } }
+        ],
+        contextMenu: function(obj, x, y, e) {
+           var items = [];
+           items.push({
+                   title: 'Borrar línea',
+                   shortcut: 'Ctrl + B',
+                   onclick: function () {
+                       obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
+                   }
+               });
+           return items;
+       }
+    });
+    </script>

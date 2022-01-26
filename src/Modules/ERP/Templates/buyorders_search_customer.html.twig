@@ -6,7 +6,7 @@
         </div>
         <div id="customer-search-modal-form-body" style="height: 520px; padding: 0px 10px;">
           {% set listConstructor = customerslist %}
-          {% set listOrigin = "" %}
+          {% set listOrigin = "genericlist" %}
           {# for know if list.html is invoked directly from controller and we need to make modals inside list#}
           {{ include('@Globale/list.html.twig') }}
         </div>
