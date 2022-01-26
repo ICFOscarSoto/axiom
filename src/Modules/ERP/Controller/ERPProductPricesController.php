@@ -32,31 +32,59 @@ class ERPProductPricesController extends Controller
    * @Route("/{_locale}/productprices/infoProductPrices/{id}", name="infoProductPrices", defaults={"id"=0})
    */
   public function infoProductPrices($id, Request $request){
-		$productsRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
-		$product=$productsRepository->findOneBy(["id"=>$id]);
-		$product_id=$product->getId();
-		$suppliersRepository=$this->getDoctrine()->getRepository(ERPSuppliers::class);
-		$customerPricesRepository=$this->getDoctrine()->getRepository(ERPCustomerPrices::class);
-		$default_supplier=$suppliersRepository->findOneBy(["id"=>$product->getSupplier()]);
-    $productPricesRepository=$this->getDoctrine()->getRepository($this->class);
-		$productPrices=$productPricesRepository->pricesByProductSupplier($product,$default_supplier);
-		$customerPrices=$customerPricesRepository->pricesByProductSupplier($product,$default_supplier);
-		$listOfferPrices = new ERPOfferPricesUtils();
-		$formUtilsOfferPrices = new GlobaleFormUtils();
-		$formUtilsOfferPrices->initialize($this->getUser(), new ERPOfferPricesUtils(), dirname(__FILE__)."/../Forms/OfferPrices.json", $request, $this, $this->getDoctrine(),$listOfferPrices->getExcludedForm([]),$listOfferPrices->getIncludedForm(["doctrine"=>$this->getDoctrine(), "user"=>$this->getUser(),"id"=>$id, "parent"=>$product]));
-		$forms[]=$formUtilsOfferPrices->formatForm('OfferPrices', true, null, ERPOfferPrices::class);
-    foreach($productPrices as $key=>$item){
-      //$productPrices[$key]["Visualizar"]="<a href='/{_locale}/productprices/infoProductPrices/".$id."'>Ir</a>";
-    		$productPrices[$key]["Visualizar"]="<a href='/{_locale}/es/generic/ERP/Increments/index'>Ir</a>";
-		}
+		$productsRepository         = $this->getDoctrine()->getRepository(ERPProducts::class);
+  	$productPricesRepository		= $this->getDoctrine()->getRepository(ERPProductPrices::class);
+		$customerPricesRepository		= $this->getDoctrine()->getRepository(ERPCustomerPrices::class);
 
-    return $this->render('@ERP/productprices.html.twig', array(
-      'productpriceslist'=>$productPrices,
-			'customerprices'=>$customerPrices,
-			'id' => $id,
-			'offerpriceslist' => $listOfferPrices->formatListByProduct($id),
-			'forms' => $forms
-    ));
+		// Producto
+		$product=$productsRepository->find($id);
+		if ($product!=null){
+			if ($product->getSupplier()!=null){
+					$productPrices	= $productPricesRepository->pricesByProductSupplier($this->getUser(), $this->getDoctrine(), $product);
+					$customerPrices	= $customerPricesRepository->pricesByProductSupplier($this->getUser(), $this->getDoctrine(), $product);
+					$listOfferPrices = new ERPOfferPricesUtils();
+					$formUtilsOfferPrices = new GlobaleFormUtils();
+					$formUtilsOfferPrices->initialize($this->getUser(), new ERPOfferPricesUtils(), dirname(__FILE__)."/../Forms/OfferPrices.json", $request, $this, $this->getDoctrine(),$listOfferPrices->getExcludedForm([]),$listOfferPrices->getIncludedForm(["doctrine"=>$this->getDoctrine(), "user"=>$this->getUser(),"id"=>$id, "parent"=>$product]));
+					$forms[]=$formUtilsOfferPrices->formatForm('OfferPrices', true, null, ERPOfferPrices::class);
+					$url_customer = "/es/ERP/customer/form/%s";
+					if ($productPrices!= null)
+				    foreach($productPrices as $key=>$value){
+		          $value["supplier"]='<a href="'. $this->generateUrl('formSupplier',["id"=>$value['supplier_id']]).'">'.$value["supplier"].'</a>';
+							unset($value['supplier_id']);
+							unset($value['preference']);
+							$productPrices[$key] = $value;
+						}
+					if ($customerPrices!= null)
+				    foreach($customerPrices as $key=>$value){
+		          $value["supplier"]='<a href="'.$this->generateUrl('formSupplier',["id"=>$value['supplier_id']]).'" class="external">'.$value["supplier"].'</a>';
+							$value["customer"]='<a href="'.$this->generateUrl('formCustomer',["id"=>$value['customer_id']]).'" class="external">'.$value["customer"].'</a>';
+							if (isset($value['start']) && $value['start']!=null){
+								$start=date_create($value['start']);
+								$value['start'] = date_format($start,'d/m/Y');
+							}
+							if (isset($value['end']) && $value['end']!=null){
+								$end=date_create($value['end']);
+								$value['end'] = date_format($end,'d/m/Y');
+							}
+							unset($value['supplier_id']);
+							unset($value['customer_id']);
+							unset($value['preference']);
+							$customerPrices[$key] = $value;
+						}
+
+			    return $this->render('@ERP/productprices.html.twig',[
+			      'productpriceslist'=>$productPrices,
+						'customerprices'=>$customerPrices,
+						'id' => $id,
+						'offerpriceslist' => $listOfferPrices->formatListByProduct($id),
+						'forms' => $forms
+			    ]);
+			}else{
+				return $this->render('@Globale/error.html.twig', ["error_result"=>-1, "error_text"=>"No existe proveedor preferente para el producto"]);
+			}
+		}else{
+			return $this->render('@Globale/error.html.twig', ["error_result"=>-1, "error_text"=>"No existe el producto"]);
+		}
   }
 
 }

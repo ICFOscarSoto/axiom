@@ -24,6 +24,10 @@
                     "cols": 2
                 },
                 {
+                    "name": "decimals",
+                    "cols": 2
+                },
+                {
                     "name": "irpf",
                     "cols": 2,
                     "change": [{"field": "defaultirpf", "thisval": 0, "targetval":0}]

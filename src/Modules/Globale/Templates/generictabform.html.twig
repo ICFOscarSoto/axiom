@@ -77,6 +77,9 @@
 					$("#tab-body-"+$('#tabs-list li.active').attr("attr-name")).find(':checkbox').not($('[id$=-chkall]')).iCheck({checkboxClass: 'icheckbox_flat-blue', radioClass: 'iradio_flat-blue'});
 					$("#tab-body-"+$('#tabs-list li.active').attr("attr-name")+" select").select2();
 					$("#tab-body-"+$('#tabs-list li.active').attr("attr-name")+" .fileinput").fileinput();
+					$('.external').each(function() {
+					 $( this ).attr("target","_blank");
+					});
 					if((--load_wait)==0) $("#load-spinner").fadeOut();
 			});
 		}

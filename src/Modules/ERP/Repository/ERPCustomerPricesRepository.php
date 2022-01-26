@@ -3,6 +3,7 @@
 namespace App\Modules\ERP\Repository;
 
 use App\Modules\ERP\Entity\ERPCustomerPrices;
+use App\Modules\ERP\Entity\ERPConfiguration;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
@@ -59,18 +60,46 @@ class ERPCustomerPricesRepository extends ServiceEntityRepository
       else return false;
     }
 
-    public function pricesByProductSupplier($product,$supplier){
+    public function pricesByProductSupplier($user, $doctrine, $product){
+      $configurationRepository  = $doctrine->getRepository(ERPConfiguration::class);
+      $company                  = $user->getCompany();
+      $config                   = $configurationRepository->findOneBy(["company"=>$company, "active"=>1, "deleted"=>0]);
 
-      $query="SELECT c.name as Customer, p.increment as Increment, p.price as Price
-              FROM erpcustomer_prices p
-              LEFT JOIN erpcustomers c ON c.id=p.customer_id
-              WHERE p.product_id=:PROD AND p.supplier_id=:SUP AND p.active=TRUE and p.deleted=0";
-      $params=['PROD' => $product->getId(),
-               'SUP'  =>  $supplier->getId()
-              ];
-      $result=$this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+      $product_id = $product->getId();
+      // Proveedor preferente
+      $supplierPreference = 0;
+      if ($product->getSupplier()!=null)
+        $supplierPreference=$product->getSupplier()->getId();
+      // Categoria
+      $category_id = 0;
+      if ($product->getCategory()!=null)
+        $category_id=$product->getCategory()->getId();
+
+      $query="SELECT ps.supplier_id as supplier_id,
+                     concat('(',s.code,')',' ',s.name) as supplier,
+                     concat('(',cu.code,')',' ',cu.name) as customer,
+                     cu.id as customer_id,
+                     i.increment as Increment,
+                     i.start as start,
+                     i.end as end,
+                     round((sp.shopping_price * (1+(i.increment/100))),:decimals) as price,
+                     (case when s.id=:supplier_preference then 1 else 0 end) as preference
+              FROM erpproducts_suppliers ps LEFT JOIN
+                   erpsuppliers s on s.id=ps.supplier_id LEFT JOIN
+                   erpshopping_prices sp on sp.product_id=:product and sp.supplier_id=ps.supplier_id and sp.quantity=1 LEFT JOIN
+                   erpcustomer_increments i on i.supplier_id=ps.supplier_id and i.category_id=:category and i.deleted=0 and i.active=1 LEFT JOIN
+                   erpcustomers cu on cu.id=i.customer_id
+              WHERE ps.product_id=:product and
+                    s.deleted=0 and s.active=1 and
+                    ps.deleted=0 and ps.active=1 and
+                    ps.company_id = :company and
+                    s.company_id = :company and
+                    i.company_id = :company and
+                    cu.company_id = :company
+              ORDER BY preference desc, s.name asc, cu.name asc";
+      $param=["product"=>$product_id, "category"=>$category_id, "supplier_preference"=>$supplierPreference, "company"=>$company->getId(), "decimals"=>$config->getDecimals()];
+      $result = $this->getEntityManager()->getConnection()->executeQuery($query, $param)->fetchAll();
       return $result;
-
     }
 
     public function findCustomersByProduct($product){

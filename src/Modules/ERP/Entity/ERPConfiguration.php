@@ -105,6 +105,11 @@ class ERPConfiguration
      */
     private $register;
 
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $decimals=2;
+
 
     public function __construct($kernel=null, $doctrine=null, $user=null, $company=null)
     {
@@ -345,6 +350,18 @@ class ERPConfiguration
     public function setRegister(?string $register): self
     {
         $this->register = $register;
+
+        return $this;
+    }
+
+    public function getDecimals(): ?int
+    {
+        return $this->decimals;
+    }
+
+    public function setDecimals(int $decimals): self
+    {
+        $this->decimals = $decimals;
 
         return $this;
     }

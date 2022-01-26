@@ -16,6 +16,7 @@ use App\Modules\ERP\Entity\ERPReferences;
 use App\Modules\ERP\Entity\ERPEAN13;
 use App\Modules\ERP\Entity\ERPSuppliers;
 use App\Modules\ERP\Entity\ERPCategories;
+use App\Modules\ERP\Entity\ERPProductsSuppliers;
 use App\Modules\ERP\Entity\ERPShoppingPrices;
 
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
@@ -62,29 +63,40 @@ class ERPShoppingDiscountsController extends Controller
    * @Route("/{_locale}/productprices/infoProductRates/{id}", name="infoProductRates", defaults={"id"=0})
    */
   public function infoProductRates($id, Request $request){
-		$productsRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
-		$product=$productsRepository->findOneBy(["id"=>$id]);
-		$suppliersRepository=$this->getDoctrine()->getRepository(ERPSuppliers::class);
-		$supplier=$suppliersRepository->findOneBy(["id"=>$product->getSupplier()]);
-
-		$shoppingPricesRepository=$this->getDoctrine()->getRepository(ERPShoppingPrices::class);
-    $shoppingDiscountsRepository=$this->getDoctrine()->getRepository(ERPShoppingDiscounts::class);
-    dump($product);
-    dump($supplier);
-		$shoppingPrices=$shoppingPricesRepository->getShoppingPrices($product->getId(),$supplier->getId());
-		$shoppingDiscounts=$shoppingDiscountsRepository->getShoppingDiscounts($product->getId(),$supplier->getId());
-
-		$formUtilsOfferPrices = new GlobaleFormUtils();
-		$formUtilsOfferPrices->initialize($this->getUser(), new ERPOfferPricesUtils(), dirname(__FILE__)."/../Forms/OfferPrices.json", $request, $this, $this->getDoctrine(),$listOfferPrices->getExcludedForm([]),$listOfferPrices->getIncludedForm(["doctrine"=>$this->getDoctrine(), "user"=>$this->getUser(),"id"=>$id, "parent"=>$product]));
-		$forms[]=$formUtilsOfferPrices->formatForm('OfferPrices', true, null, ERPOfferPrices::class);
-
-
-    return $this->render('@ERP/productprices.html.twig', array(
-      'shoppingPrices'=>$shoppingPrices,
-			'shoppingDiscounts'=>$shoppingDiscounts,
-			'id' => $id,
-			'forms' => $forms
-    ));
+		$productsRepository         = $this->getDoctrine()->getRepository(ERPProducts::class);
+    $productsSuppliersRepository= $this->getDoctrine()->getRepository(ERPProductsSuppliers::class);
+    // Producto
+		$product=$productsRepository->find($id);
+    if ($product!=null){
+      // Todos los proveedores del producto
+      $suppliers=$productsSuppliersRepository->getDiscountSuppliersByProduct($this->getUser(), $this->getDoctrine(), $product);
+      if ($suppliers!=null && count($suppliers)>0){
+        // Quitar columnas que no se muestran y formatear fechas
+        foreach ($suppliers as $key=>$value){
+          $value["supplier"]='<a href="'.$this->generateUrl('formSupplier',["id"=>$value['supplier_id']]).'" class="external">'.$value["supplier"].'</a>';
+          if (isset($value['start']) && $value['start']!=null){
+            $start=date_create($value['start']);
+            $value['start'] = date_format($start,'d/m/Y');
+          }
+          if (isset($value['end']) && $value['end']!=null){
+            $end=date_create($value['end']);
+            $value['end'] = date_format($end,'d/m/Y');
+          }
+          unset($value['supplier_id']);
+          unset($value['preference']);
+          $suppliers[$key] = $value;
+        }
+        return $this->render('@ERP/productrates.html.twig', [
+          'productrateslist'=>$suppliers,
+    			'id' => $id,
+    			'forms' => null
+        ]);
+      }else{
+        return $this->render('@Globale/error.html.twig', ["error_result"=>-2, "error_text"=>"No existen proveedores para este producto"]);
+      }
+    }else{
+      return $this->render('@Globale/error.html.twig', ["error_result"=>-1, "error_text"=>"No existe el producto"]);
+    }
   }
 
   /**
