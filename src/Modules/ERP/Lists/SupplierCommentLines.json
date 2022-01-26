@@ -5,7 +5,8 @@
     },
     {
         "name": "dateadd",
-        "caption": "dateadd"
+        "caption": "dateadd",
+        "type": "date"
     },
     {
         "name": "comment",

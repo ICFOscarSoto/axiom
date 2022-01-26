@@ -25,7 +25,8 @@
     },
     {
         "name": "start",
-        "caption": "start"
+        "caption": "start",
+        "type": "date"
     },
     {
         "name": "end",

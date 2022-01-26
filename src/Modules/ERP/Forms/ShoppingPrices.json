@@ -20,11 +20,11 @@
                     "cols": 4
                 },
                 {
-                    "name": "datestart",
+                    "name": "start",
                     "cols": 4
                 },
                 {
-                    "name": "dateend",
+                    "name": "end",
                     "cols": 4
                 },
                 {

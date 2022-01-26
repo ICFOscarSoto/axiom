@@ -266,6 +266,7 @@ class GlobaleListUtils
 		if($searchValue!=""){
         $metadata=$manager->getClassMetadata($classname);
 		  	foreach($metadata->getColumnNames() as $column){
+          if($column=='active') continue;
           $tokensSearchValue=explode('*',$searchValue);
           foreach($tokensSearchValue as $key=>$tokenSearch){
             if($tokenSearch!=''){
@@ -278,30 +279,25 @@ class GlobaleListUtils
               $queryFiltered->setParameter('val_'.$metadata->getFieldName($column).'_'.$key, $starWildcard.$tokenSearch.$endWildcard);
             }
           }
-          /*$query->orWhere('p.'.$metadata->getFieldName($column).' LIKE :val_'.$metadata->getFieldName($column));
-					$query->setParameter('val_'.$metadata->getFieldName($column), '%'.$searchValue.'%');
-					$queryFiltered->andWhere('p.'.$metadata->getFieldName($column).' LIKE :val_'.$metadata->getFieldName($column));
-					$queryFiltered->setParameter('val_'.$metadata->getFieldName($column), '%'.$searchValue.'%');*/
-
-
 			  }
   			//Añadimos los campos de las relaciones
   			foreach($listFields as $field){
-
-
-
-
-
-
-
-
-
-
+          //Quitamos los strings concatenados
+          $fieldNames=explode('_o_',$field["name"]);
+          $name='';
+          foreach($fieldNames as $key=>$fieldName){
+            if(!(strpos($fieldName, '\'')===0 && strpos($fieldName, '\'',1)==(strlen($fieldName)-1))){
+              if($key==(count($fieldNames)-1)) $name.=$fieldName;
+                else $name.=$fieldName.'_o_';
+            }
+            $field["name"]=$name;
+          }
 
 
   				$path=explode('__', $field["name"]);
-  				if(count($path)>1){
 
+          //Solo buscamos en relaciones de 1 grado
+          if(count($path)==2){
             $tokensSearchValue=explode('*',$searchValue);
             foreach($tokensSearchValue as $key=>$tokenSearch){
                   if($tokenSearch!=''){
@@ -313,37 +309,27 @@ class GlobaleListUtils
           					$query->setParameter('val_'.$path[0].'_'.$path[1].'_'.$key, $starWildcard.$tokenSearch.$endWildcard);
                   }
             }
-  					/*$query->orWhere($path[0].'.'.$path[1].' LIKE :val_'.$path[0].'_'.$path[1]);
-  					$query->setParameter('val_'.$path[0].'_'.$path[1], '%'.$searchValue.'%');
-  					$query->orWhere($path[0].'.'.$path[1].' LIKE :val_'.$path[0].'_'.$path[1]);
-  					$query->setParameter('val_'.$path[0].'_'.$path[1], '%'.$searchValue.'%');*/
+
   				}
   			}
 		}
 
 		//Formamos los filtros de busqueda por columna
 		foreach($listFields as $key => $field){
-
         //Solo añadimos los campos de tipo data
        if(!isset($field["type"])||$field["type"]=="data"){
-
-
             $fieldNames=explode('_o_',$field["name"]);
-          //foreach($fieldNames as $fieldName){
-    				$searchValue=$request->query->get('columns');
-
-            /*if(isset($field["replace"])){
-              foreach($field["replace"] as $key=>$replace){
-                dump($replace);
-                if(isset($replace["default"]) && $replace["default"]==true){
-                  $query->andWhere('p.'.$field["name"].' = :val_'.$field["name"]);
-                  $query->setParameter('val_'.$field["name"], $key);
-                  $queryFiltered->andWhere('p.'.$field["name"].' = :val_'.$field["name"]);
-                  $queryFiltered->setParameter('val_'.$field["name"], $key);
-                }
+            //Quitamos los strings concatenados
+            $name='';
+            foreach($fieldNames as $key=>$fieldName){
+              if(!(strpos($fieldName, '\'')===0 && strpos($fieldName, '\'',1)==(strlen($fieldName)-1))){
+                if($key==(count($fieldNames)-1)) $name.=$fieldName;
+                  else $name.=$fieldName.'_o_';
               }
-            }*/
+              $field["name"]=$name;
+            }
 
+    				$searchValue=$request->query->get('columns');
             //Buscar el key del field["name"] en las columnas pasados por parametro
             $keyColumn=$this->searchColumns($searchValue, $field["name"]);
             if(!$keyColumn) continue;
@@ -356,11 +342,16 @@ class GlobaleListUtils
               if(count($fieldNames)>1){ //Si hay que concatenar algo
                 $database_field='concat_ws(\' \',';
                 foreach($fieldNames as $fieldName){
-                    $path=explode('__', $fieldName);  //explotamos las relaciones foraneas
-                    if(count($path)>1){
-                      $database_field.=$path[0].'.'.$path[1].',';  // si viene de otra tabla
+                    //Cadena fija de caracteres
+                    if(strpos($fieldName, '\'')===0 && strpos($fieldName, '\'',1)==(strlen($fieldName)-1)){
+                      $database_field.=$fieldName;
                     }else{
-                      $database_field.='p.'.$path[0].','; // si viene de la misma tabla
+                      $path=explode('__', $fieldName);  //explotamos las relaciones foraneas
+                      if(count($path)>1){
+                        $database_field.=$path[0].'.'.$path[1].',';  // si viene de otra tabla
+                      }else{
+                        $database_field.='p.'.$path[0].','; // si viene de la misma tabla
+                      }
                     }
                 }
                 $database_field=rtrim($database_field,',');
@@ -390,12 +381,6 @@ class GlobaleListUtils
                     }
                 }
               }
-              /*$query->andWhere($database_field.' LIKE :val_'.$field["name"]);
-              $query->setParameter('val_'.$field["name"], '%'.$searchValue.'%');
-              $queryFiltered->andWhere($database_field.' LIKE :val_'.$field["name"]);
-              $queryFiltered->setParameter('val_'.$field["name"], '%'.$searchValue.'%');*/
-
-
     				}else{
               //No hay nada que buscar miramos si tiene un valor por defecto
               if($searchValue!="##ALL##" && isset($field["replace"])){
@@ -459,14 +444,15 @@ class GlobaleListUtils
 			 $order=$request->query->get('order');
          $fields=explode('_o_', $listFields[(($order[0]['column'])-1)*1]["name"]);
          foreach($fields as $field){
-      		 $path=explode('__', $field);
-    			 if(count($path)>1){
-    				$query->addOrderBy($path[0].'.'.$path[1], $order[0]['dir']);
-    			 }else{
-    				$query->addOrderBy('p.'.strtolower($field), $order[0]['dir']);
-    			 }
+           if(!(strpos($field, '\'')===0 && strpos($field, '\'',1)==(strlen($field)-1))){
+        		 $path=explode('__', $field);
+      			 if(count($path)>1){
+      				$query->addOrderBy($path[0].'.'.$path[1], $order[0]['dir']);
+      			 }else{
+      				$query->addOrderBy('p.'.strtolower($field), $order[0]['dir']);
+      			 }
+           }
          }
-
 		}else{
       $query->addOrderBy('p.'.$orderBy);
     }
@@ -480,7 +466,6 @@ class GlobaleListUtils
   				      $query->leftJoin('p.'.$path[0], $path[0]);
   				      $queryFiltered->leftJoin('p.'.$path[0], $path[0]);
                 $definedLeftJoin[]=$path[0];
-
           }
   			}
 		}
@@ -498,13 +483,6 @@ class GlobaleListUtils
       }else{
           $column="p.".$filter["column"];
       }
-
-
-      /*
-      $query->leftJoin('p.user', 'c', 'WITH', 'c.company = :val_company');
-      $query->andWhere('c.company = :val_company');
-      $query->setParameter('val_company',$filter["value"]);
-      */
       if($filter["type"]="and"){
         $query->andWhere($column.' = :val_'.$path[0].'0');
         $query->setParameter('val_'.$path[0].'0', $filter["value"]);
@@ -563,49 +541,59 @@ class GlobaleListUtils
                     default:  //tipo data y otros no establecidos
                               //Si el campo es una propiedad de un objeto hijo buscamos su valor
                               $fieldNames=explode('_o_',$field["name"]);
-                              $name=$field["name"];
+
+
                               $temp_val=null;
+                              $name='';
+                              //Quitamos los strings concatenados
+                              foreach($fieldNames as $key=>$fieldName){
+                                if(!(strpos($fieldName, '\'')===0 && strpos($fieldName, '\'',1)==(strlen($fieldName)-1))){
+                                  if($key==(count($fieldNames)-1)) $name.=$fieldName;
+                                    else $name.=$fieldName.'_o_';
+                                }
+                              }
+
                               foreach($fieldNames as $fieldName){
+                                  $origin=$fieldName;
+                                  $value='';
+                                  $path=explode('__', $origin);
+                                  $obj=$record;
+                                  $obj_id=0;
+                                  foreach($path as $step){
+                                    if(method_exists($obj, "get".ucfirst($step))){
+                                      $obj_id=$obj->getId();
+                                      $obj=$obj->{"get".ucfirst($step)}($doctrine);
 
-                                //if(!isset($field["origins"]) || $field["origins"]=="") $origin=$field["name"];
-                                $origin=$fieldName;
-                                $value='';
-                                $path=explode('__', $origin);
-                                $obj=$record;
-                                $obj_id=0;
-                                foreach($path as $step){
-                                  if(method_exists($obj, "get".ucfirst($step))){
-                                    $obj_id=$obj->getId();
-                                    $obj=$obj->{"get".ucfirst($step)}($doctrine);
-
-                                  }
-                                }
-                                if(!is_object($obj)) {$value= $obj;}
-                                  else {
-                                    if(get_class($obj)=="DateTime"){
-                                      $value=$obj->format('Y-m-d H:i:s');
-                                    }else $value='';
-                                }
-                                $temp_val=$value;
-                                if(strpos($name,'__')!==FALSE) $data_ob[$name."_id"]=$obj_id;
-                                //Aplicamos los replaces
-                                if(isset($field["replace"])){
-
-                                    foreach($field["replace"] as $key=>$replace){
-                                      if($temp_val==NULL) $temp_val=0;
-                                      if(strval($temp_val)==strval($key)){
-                                        $temp_val=array($temp_val,$replace["html"]);
-                                        break;
-                                      }
                                     }
-                                }
-                                //$temp_val=str_replace('´', "'", $temp_val);
-                                $data_ob[$name]=isset($data_ob[$name])?$data_ob[$name]." ".$temp_val:$temp_val;
+                                  }
+                                  if(!is_object($obj)) {$value= $obj;}
+                                    else {
+                                      if(get_class($obj)=="DateTime"){
+                                        $value=$obj->format('Y-m-d H:i:s');
+                                      }else $value='';
+                                  }
+                                  $temp_val=$value;
+                                  if(strpos($name,'__')!==FALSE) $data_ob[$name."_id"]=$obj_id;
+                                  //Aplicamos los replaces
+                                  if(isset($field["replace"])){
+
+                                      foreach($field["replace"] as $key=>$replace){
+                                        if($temp_val==NULL) $temp_val=0;
+                                        if(strval($temp_val)==strval($key)){
+                                          $temp_val=array($temp_val,$replace["html"]);
+                                          break;
+                                        }
+                                      }
+                                  }
+                                  if(strpos($fieldName, '\'')===0 && strpos($fieldName, '\'',1)==(strlen($fieldName)-1)){
+                                    $temp_val=substr($fieldName,1,-1);
+                                  }
+                                  $data_ob[$name]=isset($data_ob[$name])?$data_ob[$name]." ".$temp_val:$temp_val;
+
                               }
                     break;
           }
 			}
-
 			//Tags
 			$tags=array();
       if(method_exists($record, "getDateupd")){
@@ -623,12 +611,10 @@ class GlobaleListUtils
         }
       }
 			$data_ob["_tags"]=$tags;
-
       //Fix for datatables error when single quote
       foreach($data_ob as $key_data=>$value_data){
         $data_ob[$key_data]=str_replace("'", "´", $data_ob[$key_data]);
       }
-
       $return["data"][]=$data_ob;
 		}
 		return $return;

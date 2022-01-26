@@ -8,7 +8,7 @@ use App\Modules\Globale\Utils\GlobaleTranslatorUtils;
 class noreply¡ferreteriacampollano_com {
 
     public function checkMail($subject, $account, $inbox, $output, $doctrine, $kernel){
-      $discordchannel="883046233017552956";
+      $discordchannel="935430617842196601";
       $output->writeln([isset($subject->subject)?('Procesando: '.HelperMail::decode_header(imap_utf8($subject->subject))):('Procesando: Correo sin asunto')]);
       $from=HelperMail::decode_header(imap_utf8($subject->from));
       if(strpos($from,"<")!==FALSE){

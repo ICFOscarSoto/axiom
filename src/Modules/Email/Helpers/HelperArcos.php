@@ -7,7 +7,7 @@ class HelperArcos {
 
   public function parseStocks($csv, $doctrine, $output){
 
-    $discordchannel_sistemas="821033227351097354";
+    $discordchannel="935430617842196601";
     $auth = base64_encode("6TI5549NR221TXMGMLLEHKENMG89C8YV");
     $context = stream_context_create(["http" => ["header" => "Authorization: Basic $auth"]]);
     $url="https://www.ferreteriacampollano.com";
@@ -55,7 +55,7 @@ class HelperArcos {
 
       }
 
-      file_get_contents("https://icfbot.ferreteriacampollano.com/message.php?channel=".$discordchannel_sistemas."&msg=".urlencode(":white_check_mark:"." SCRIPT ".basename(__FILE__, '.php').": Se ha procesado correctamente el archivo diario de Arcos"));
+      file_get_contents("https://icfbot.ferreteriacampollano.com/message.php?channel=".$discordchannel."&msg=".urlencode(":white_check_mark:"." SCRIPT ".basename(__FILE__, '.php').": Se ha procesado correctamente el archivo diario de Arcos"));
   }
 
   public function updateStock($id_stocks_new,$xml, $output){

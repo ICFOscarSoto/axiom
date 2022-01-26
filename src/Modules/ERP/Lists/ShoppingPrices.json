@@ -20,12 +20,14 @@
         "caption": "price"
     },
     {
-        "name": "datestart",
-        "caption": "datestart"
+        "name": "start",
+        "type": "date",
+        "caption": "start"
     },
     {
-        "name": "dateend",
-        "caption": "dateend"
+        "name": "end",
+        "type": "date",
+        "caption": "end"
     },
     {
         "name": "product__name",
