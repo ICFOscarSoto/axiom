@@ -158,8 +158,8 @@ class ERPProductsController extends Controller
 			}
 			$tabs=array_merge($tabs,[["name" => "ean13",  "icon"=>"fa fa-users", "caption"=>"EAN13", "route"=>$this->generateUrl("listEAN13",["id"=>$id])],
 			["name" => "references",  "icon"=>"fa fa-users", "caption"=>"References", "route"=>$this->generateUrl("listReferences",["id"=>$id])],
+			["name"=>  "rates", "icon"=>"fa fa-money", "caption"=>"Rates","route"=>$this->generateUrl("infoProductRates",["id"=>$id])],
 			["name"=>  "productPrices", "icon"=>"fa fa-money", "caption"=>"Prices","route"=>$this->generateUrl("infoProductPrices",["id"=>$id])],
-			//["name"=>  "rates", "icon"=>"fa fa-money", "caption"=>"Rates","route"=>$this->generateUrl("infoProductRates",["id"=>$id])],
 			["name" => "stocks", "icon"=>"fa fa-id-card", "caption"=>"Stocks", "route"=>$this->generateUrl("infoStocks",["id"=>$id])],
 			["name" => "infoStocks", "icon"=>"fa fa-id-card", "caption"=>"InfoStocks", "route"=>$this->generateUrl("listInfoStocks",["id"=>$id])],
 			["name" => "files", "icon"=>"fa fa-cloud", "caption"=>"Files", "route"=>$this->generateUrl("cloudfiles",["id"=>$id, "path"=>"products"])]]);

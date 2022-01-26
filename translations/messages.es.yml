@@ -482,6 +482,7 @@ maximumQuantity: Cantidad Máxima
 Product: Producto
 Select erpproducts: Seleccionar producto
 Quantitytoserve: Cantidad a servir
+Rates: Tarifa
 
 # WEB PRODUCT DATA
 #----------------------------------------------------------------------------------------------------------------------
@@ -497,7 +498,9 @@ Prices: Precios
 Increment: Incremento (%)
 Increments: Incrementos (%)
 increment: Incremento (%)
+discount: Descuento (%)
 price: Precio
+pricecost: Precio coste
 quantity: Unidades
 OfferPrices: Ofertas
 
