@@ -1,7 +1,7 @@
 [ {"name": "id", "caption":""},
   {"name": "code", "caption":"SKU"},
   {"name": "name", "caption":"Nombre"},
-  {"name": "category__name", "caption":"Categoría"},
+  {"name": "category__parentid__name_o_'>'_o_category__name", "caption":"Categoría"},
   {"name": "stockcampollano", "caption":"Stock Campollano"},
   {"name": "dateadd", "caption":"Dateadd", "type": "date"},
   {"name": "supplier__name", "caption":"Supplier"},

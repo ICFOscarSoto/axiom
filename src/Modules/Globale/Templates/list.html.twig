@@ -3,6 +3,28 @@
 		{{ include(template) }}
 	{% endfor %}
 {% endif %}
+
+{# Eliminamos los strings concatenados en los fields del listado #}
+{% set fields = listConstructor.fields %}
+{% set tempFields = [] %}
+{% for keyfield, field in fields %}
+	{% set tokens = field.name|split('_o_') %}
+	{% set colname = '' %}
+		{% for key, token in tokens %}
+			{% if token|first != "'" %}
+				{% if key==tokens|length-1 %}
+					{% set colname = colname ~ token %}
+				{% else %}
+					{% set colname = colname ~ token ~ '_o_' %}
+				{% endif %}
+			{% else %}
+			{% endif %}
+		{% endfor %}
+		{% set field = field|merge({'name': colname}) %}
+		{% set tempFields = tempFields|merge([field]) %}
+{% endfor %}
+{% set fields = tempFields %}
+
   {{ include("@Globale/form_validation.html.twig") }}
 <input type="hidden" id="search_param"/>
 <script>
@@ -96,7 +118,7 @@ var url = new URL(window.location.href);
 					},
 					"searchCols": [
 						null,
-						{% for field in listConstructor.fields %}
+						{% for field in fields %}
 
 							{% if field.type is defined and field.type == "date" %}
 								{% set searchdate='' %}
@@ -136,12 +158,12 @@ var url = new URL(window.location.href);
 					{% if listConstructor.routeParams is defined %}
 						"ajax": {
 								"url" : "{{ url( listConstructor.route, listConstructor.routeParams) }}",
-								"data" : {"fields": "{{ listConstructor.fields|json_encode() }}"}
+								"data" : {"fields": "{{ fields|json_encode() }}"}
 						},
 					{% else %}
 						"ajax": {
 								"url" : "{{ url( listConstructor.route) }}",
-								"data" : {"fields": "{{ listConstructor.fields|json_encode() }}"}
+								"data" : {"fields": "{{ fields|json_encode() }}"}
 						},
 					{% endif %}
 					"language": {
@@ -164,7 +186,8 @@ var url = new URL(window.location.href);
 					"order": [[ {{  listConstructor.orderColumn }}, "{{  listConstructor.orderDirection }}" ]],
 					"columns": [
             { "name": "checkboxes" ,"data": null, defaultContent: '' },
-						{% for field in  listConstructor.fields %}
+						{# Remove concatenated strings #}
+						{% for keyfield, field in fields %}
 							{ "name": "{{ field.name }}" ,"data": "{{ field.name }}" },
 						{% endfor %}
 						{% if listConstructor.fieldButtons|length > 0 %}
@@ -224,7 +247,7 @@ var url = new URL(window.location.href);
 						},
 
 						{% set counter = 1 %}
-						{% for field in listConstructor.fields %}
+						{% for field in fields %}
 								{
 									"targets": {{ counter }},
 									{# only show order field in data type fields#}
@@ -331,7 +354,7 @@ var url = new URL(window.location.href);
 						{% for field in listConstructor.fieldButtons %}
 
 							{
-								"targets": {{ listConstructor.fields|length+counter }},
+								"targets": {{ fields|length+counter }},
 								"orderable": false,
 								"width": "10px",
 								"className": "text-right",
@@ -446,7 +469,7 @@ var url = new URL(window.location.href);
 					$("#search_param").val(jQuery.param(arrayParams));
 				}
 
-				{% for field in listConstructor.fields %}
+				{% for field in fields %}
 
 					{% if field.replace is defined %}
 						$('body').on('change', '#s_{{ listConstructor.id }}_{{ field.name }}', function() {
@@ -521,7 +544,7 @@ var url = new URL(window.location.href);
 						<i class="fa fa-search"></i>
 					</th>
 					{# only show search fields in data type fields#}
-					{% for field in listConstructor.fields %}
+					{% for field in fields %}
 						{% if field.type is not defined or field.type == "data" %}
 							<th class="table-header-search" style="border-bottom: 1px solid #cecece !important;">
 								{% if field.filter is not defined or field.filter == true %}
@@ -637,7 +660,7 @@ var url = new URL(window.location.href);
 						</div>
 						{% endif %}
 					</th>
-					{% for field in listConstructor.fields %}
+					{% for field in fields %}
 						<th style="border-bottom: 1px solid #cecece !important;" class="table-header-name table-thead {% if field.sum is defined and field.sum == true %} sum {% endif %} {% if field.format is defined %} {{field.format}} {% endif %}">{{ (field.caption)|trans }} </th>
 					{% endfor %}
 
@@ -654,7 +677,7 @@ var url = new URL(window.location.href);
 					<b>TOTALES</b>
 				</td>
 				{# only show search fields in data type fields#}
-				{% for field in listConstructor.fields %}
+				{% for field in fields %}
 					{% if field.type is not defined or field.type == "data" %}
 						<td class="table-footer" {% if field.unity is defined %} attr-unity="{{ field.unity }}" {% endif %}></td>
 					{% else %}
@@ -758,7 +781,7 @@ var url = new URL(window.location.href);
 				$("#clear-filters").parent().parent().parent().find('select').select2('val', $(this).find(">:first-child").val());
 				//$('#s_invalid').select2('val', $('#s_invalid option:first-child').val());
 				url = new URL(window.location.href);
-				{% for field in listConstructor.fields %}
+				{% for field in fields %}
 				url.searchParams.delete('s_{{ listConstructor.id }}_{{ field.name }}');
 				{% endfor %}
 				window.history.replaceState(null, null, url);
