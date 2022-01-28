@@ -27,7 +27,7 @@ class ERPInfoStocksUtils
       'id' => 'listInfoStocks',
       'route' => 'infoStockslist',
       'routeParams' => ["id" => $product],
-      'orderColumn' => 8,
+      'orderColumn' => 4,
       'orderDirection' => 'ASC',
       'tagColumn' => 3,
       'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/InfoStocks.json"),true),

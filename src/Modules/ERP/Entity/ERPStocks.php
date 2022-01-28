@@ -41,12 +41,12 @@ class ERPStocks
     /**
      * @ORM\Column(type="float", nullable=true)
      */
-    private $pendingserve;
+    private $pendingserve=0;
 
     /**
      * @ORM\Column(type="float", nullable=true)
      */
-    private $pendingreceive;
+    private $pendingreceive=0;
 
     /**
      * @ORM\Column(type="float", nullable=true)

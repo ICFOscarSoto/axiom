@@ -4,14 +4,6 @@
         "caption": "id"
     },
     {
-        "name": "pendingToReceive",
-        "caption": "pendingToReceive"
-    },
-    {
-        "name": "pendingToServe",
-        "caption": "pendingToServe"
-    },
-    {
         "name": "minimumQuantity",
         "caption": "minimumQuantity"
     },

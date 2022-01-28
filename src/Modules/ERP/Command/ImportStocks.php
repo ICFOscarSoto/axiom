@@ -169,8 +169,6 @@ class ImportStocks extends ContainerAwareCommand
             $infoStocks->setProduct($product);
             $infoStocks->setProductvariant($variant);
             $infoStocks->setStore($store);
-            $infoStocks->setPendingToReceive(0);
-            $infoStocks->setPendingToServe(0);
             $infoStocks->setAuthor($user);
             $infoStocks->setDateadd(new \Datetime());
             $infoStocks->setActive(true);

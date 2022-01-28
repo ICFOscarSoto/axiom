@@ -4,14 +4,6 @@
             "name": "data",
             "fields": [
                 {
-                    "name": "pendingToReceive",
-                    "cols": 4
-                },
-                {
-                    "name": "pendingToServe",
-                    "cols": 4
-                },
-                {
                     "name": "minimumQuantity",
                     "cols": 4
                 },

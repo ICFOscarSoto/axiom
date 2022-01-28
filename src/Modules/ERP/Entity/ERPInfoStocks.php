@@ -37,16 +37,6 @@ class ERPInfoStocks
     /**
      * @ORM\Column(type="float", nullable=true)
      */
-    private $pendingToReceive;
-
-    /**
-     * @ORM\Column(type="float", nullable=true)
-     */
-    private $pendingToServe;
-
-    /**
-     * @ORM\Column(type="float", nullable=true)
-     */
     private $minimumQuantity;
 
     /**
@@ -110,30 +100,6 @@ class ERPInfoStocks
     public function setStore(?ERPStores $store): self
     {
         $this->store = $store;
-
-        return $this;
-    }
-
-    public function getPendingToReceive(): ?float
-    {
-        return $this->pendingToReceive;
-    }
-
-    public function setPendingToReceive(?float $pendingToReceive): self
-    {
-        $this->pendingToReceive = $pendingToReceive;
-
-        return $this;
-    }
-
-    public function getPendingToServe(): ?float
-    {
-        return $this->pendingToServe;
-    }
-
-    public function setPendingToServe(?float $pendingToServe): self
-    {
-        $this->pendingToServe = $pendingToServe;
 
         return $this;
     }
