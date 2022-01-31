@@ -23,10 +23,13 @@
 
 <script>
   $(document).ready(function() {
+    {% if field.typeParams.routeparams is not defined %}{% set routeparams = [] %}{% else %}{% set routeparams = field.typeParams.routeparams %}{% endif %}
+    if($("#form_{{ field.name }}_id").val()!='') $("#form_{{ field.name }}").before("<span id='selection-view-{{formConstructor.name}}-{{ field.name }}' class='searchable-view-relation' style='' attr-url='{{ url(field.typeParams.route, routeparams|merge({"id":'_____'})) }}'><i class='fa fa-file-text-o' aria-hidden='true'></i><span>&nbsp;Ver Ficha</span></span>"); else
+      $("#form_{{ field.name }}").before("<span id='selection-view-{{formConstructor.name}}-{{ field.name }}' class='searchable-view-relation' style='visibility: hidden;' attr-url='{{ url(field.typeParams.route, routeparams|merge({"id":'_____'})) }}'><i class='fa fa-file-text-o' aria-hidden='true'></i><span>&nbsp;Ver Ficha</span></span>");
     element =$('label[for="form_{{ field.name }}"]').detach();
     html=$("#{{formConstructor.name}}-form-body").find("#form_{{ field.name }}").parent().html();
     newHtml='<div class="input-group">'+html+
-            '<div class="input-group-btn">'+
+            '<div class="input-group-btn group-searchable-fields">'+
             '<button type="button" id="{{ field.name }}-form-clear" class="btn btn-white" style="height: 31px;">'+
             '<i class="fas fa-times" aria-hidden="true"></i> </button>'+
             '<button type="button" id="{{ field.name }}-form-search" class="btn btn-white" style="height: 31px;" data-toggle="modal" data-target="#{{formConstructor.name}}-{{ field.name }}-search-modal-form">'+
@@ -45,15 +48,24 @@
       $('#{{formConstructor.name}}-{{ field.name }}-search-modal-form').detach().prependTo('.page-container');
     });
 
+    $(document).on('shown.bs.modal', '#{{formConstructor.name}}-{{ field.name }}-search-modal-form',function (event) {
+      $("#{{formConstructor.name}}-{{ field.name }}-search-modal-form input[type='search']").focus();
+    });
   });
+
 
   $('body').on('click', "#{{ field.name }}-form-clear", function() {
     $("#form_{{ field.name }}").val('');
     $("#form_{{ field.name }}_id").val('');
+    $("#selection-view-{{formConstructor.name}}-{{ field.name }}").hide();
   });
 
   $('body').on('click', "#form_{{ field.name }}", function() {
     $('#{{ field.name }}-form-search').trigger("click");
+  });
+
+  $('body').on('click', "#selection-view-{{formConstructor.name}}-{{ field.name }}", function() {
+
   });
 
   $('body').on('click', "[id^='{{ listConstructor.id }}-field-button-select-']", function() {
@@ -64,6 +76,7 @@
       else if( $("#{{ listConstructor.id }}-name-"+id).length ) value+=$("#{{ listConstructor.id }}-name-"+id).text();
     $("#form_{{ field.name }}").val(value);
     $("#form_{{ field.name }}_id").val(id);
+    $("#selection-view-{{formConstructor.name}}-{{ field.name }}").show();
     $("#{{formConstructor.name}}-{{ field.name }}-search-modal-form").modal('hide');
   });
 
