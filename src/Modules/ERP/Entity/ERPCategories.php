@@ -68,6 +68,16 @@ class ERPCategories
      */
     private $prestashopcategory;
 
+    /**
+     * @ORM\Column(type="string", length=100, nullable=true)
+     */
+    private $pathName;
+
+    /**
+     * @ORM\Column(type="string", length=100, nullable=true)
+     */
+    private $pathId;
+
 
 
     public function getId(): ?int
@@ -179,6 +189,30 @@ class ERPCategories
     public function setPrestashopcategory(?int $prestashopcategory): self
     {
         $this->prestashopcategory = $prestashopcategory;
+
+        return $this;
+    }
+
+    public function getPathName(): ?string
+    {
+        return $this->pathName;
+    }
+
+    public function setPathName(?string $pathName): self
+    {
+        $this->pathName = $pathName;
+
+        return $this;
+    }
+
+    public function getPathId(): ?string
+    {
+        return $this->pathId;
+    }
+
+    public function setPathId(?string $pathId): self
+    {
+        $this->pathId = $pathId;
 
         return $this;
     }
