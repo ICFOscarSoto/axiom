@@ -32,7 +32,6 @@
 				var data='';
 				data+='';
 				element.forEach( function(valor, indice, array) {
-
 												data+='<li class="dd-item" data-id="'+valor.id+'">'+
 													'<div class="dd-handle">'+
 														'<i class="fa fa-arrows" aria-hidden="true"></i>'+
@@ -47,7 +46,7 @@
 														'<i class="fa fa-plus" aria-hidden="true"></i>'+
 													'</div>'+
 													'<div class="dd-content">'+
-														'<a href="http://axiom.ferreteriacampollano.com/es/admin/global/products?s_listProducts_category__parentid__name_o_category__name='+valor.name+'&s_listProducts_active=1&start=0" target="_blank">'+valor.name+ '</a>'+
+														'<a href="http://axiom.ferreteriacampollano.com/es/admin/global/products?s_listProducts_category__pathName='+valor.parentName+'*'+valor.name+'&s_listProducts_active=1&start=0" target="_blank">'+valor.name+ '</a>'+
 													'</div>'+
 													((valor.childrens.length>0)?'<ol class="dd-list">':'')+
 													((valor.childrens.length>0)?parseCategory(valor.childrens):'')+
@@ -75,7 +74,7 @@
 													'<i class="fa fa-plus" aria-hidden="true"></i>'+
 												'</div>'+
 												'<div class="dd-content">'+
-													'<a href="http://axiom.ferreteriacampollano.com/es/admin/global/products?s_listProducts_category__parentid__name_o_category__name='+valor.name+'&s_listProducts_active=1&start=0" target="_blank">'+valor.name+ '</a>'+
+													'<a href="http://axiom.ferreteriacampollano.com/es/admin/global/products?s_listProducts_category__pathName='+valor.name+'&s_listProducts_active=1&start=0" target="_blank">'+valor.name+ '</a>'+
 												'</div>'+
 													((valor.childrens.length>0)?'<ol class="dd-list">':'')+
 													((valor.childrens.length>0)?parseCategory(valor.childrens):'')+

@@ -37,7 +37,7 @@ class ERPCategoriesRepository extends ServiceEntityRepository
       ->getQuery()
       ->getResult();
       foreach($qb as $parent) {
-        $child=["id"=>$parent->getId(),"name"=>addslashes($parent->getName()), "childrens"=>$this->getChildrens($parent->getId(),[], $user)];
+        $child=["id"=>$parent->getId(),"name"=>addslashes($parent->getName()), "childrens"=>$this->getChildrens($parent->getId(),[], $user), "parentName"=>$parent->getParentid()->getName()];
         array_push($temp_childs,$child);
       }
       return $temp_childs;
