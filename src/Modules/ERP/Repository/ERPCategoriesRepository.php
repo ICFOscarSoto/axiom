@@ -27,7 +27,7 @@ class ERPCategoriesRepository extends ServiceEntityRepository
       ->andWhere('e.active=:val_active')
       ->andWhere('e.deleted=:val_deleted')
       ->andWhere('e.company=:val_company')
-      ->orderBy('e.position', 'ASC')      
+      ->orderBy('e.position', 'ASC')
       ->orderBy('e.name', 'ASC')
       ->setParameter('val_category', $id_category)
       ->setParameter('val_active', TRUE)
@@ -80,6 +80,22 @@ class ERPCategoriesRepository extends ServiceEntityRepository
 
 
 
+
+    public function updatePathName($oldname, $name){
+      $query="UPDATE erpcategories
+            SET path_name=(replace (path_name, '".$oldname."', '".$name."'))
+            WHERE path_name like '%".$oldname."%'";
+      $result=$this->getEntityManager()->getConnection()->executeQuery($query);
+      return $result;
+    }
+
+    public function updatePathId($oldid, $id){
+      $query="UPDATE erpcategories
+            SET path_name=(replace (path_name, '|".$oldid."|', '|".$id."|'))
+            WHERE path_name like '|".$oldname."|'";
+      $result=$this->getEntityManager()->getConnection()->executeQuery($query);
+      return $result;
+    }
 
     // /**
     //  * @return ERPCategories[] Returns an array of ERPCategories objects
