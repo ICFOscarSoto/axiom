@@ -218,7 +218,6 @@ class ERPCategories
     }
 
   public function preProccess($kernel, $doctrine, $user, $params, $oldobj){
-    $em = $doctrine->getManager();
     $categoriesRepository=$doctrine->getRepository(ERPCategories::class);
     $pipe='|';
     if ($oldobj->getId()==null) {
@@ -226,13 +225,21 @@ class ERPCategories
         $this->setpathName($this->name);
         $this->pathId=$pipe.$this->id.$pipe;
       } else {
-        $this->pathName=$this->getParentid()->getName().' -> '.$this->name;
-        $this->pathId=$this->getParentid()->getPathId().$this->id.$pipe;
+        $this->pathName=$this->getParentid()->getPathName().' -> '.$this->name;
       }
     } else {
       if ($this->name!=$oldobj->getName()){
         $categoriesRepository->updatePathName($oldobj->getName(),$this->name);
       }
+    }
+  }
+
+  public function postProccess($kernel, $doctrine, $user, $params, $oldobj){
+    $em = $doctrine->getManager();
+    if ($this->pathId==null){
+      $this->pathId=$this->getParentid()->getPathId().$this->id.'|';
+      $em->merge($this);
+      $em->flush();
     }
   }
 
