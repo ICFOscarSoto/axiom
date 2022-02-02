@@ -221,13 +221,13 @@ class ERPCategories
     $em = $doctrine->getManager();
     $categoriesRepository=$doctrine->getRepository(ERPCategories::class);
     $pipe='|';
-    if ($oldobj==null) {
+    if ($oldobj->getId()==null) {
       if ($this->parentid==null) {
-        $this->pathName=$this->name;
+        $this->setpathName($this->name);
         $this->pathId=$pipe.$this->id.$pipe;
       } else {
-        $this->pathName=$this->getParentid->getName().' -> '.$this->name;
-        $this->pathId=$this->getParentid->getPathId().$this->id.$pipe;
+        $this->pathName=$this->getParentid()->getName().' -> '.$this->name;
+        $this->pathId=$this->getParentid()->getPathId().$this->id.$pipe;
       }
     } else {
       if ($this->name!=$oldobj->getName()){
