@@ -20,9 +20,16 @@
       "caption": "Cod. Trabajador"
   },
   {
-      "name": "prueba",
-      "caption": "Suma de precio Venta",
+      "name": "Filtro",
+      "caption": "Filtro",
+      "sum":true,
+      "unity":"€"
+  },
+  {
+      "name": "mesactual",
+      "caption": "Mes actual",
       "sum":true,
       "unity":"€"
   }
+
 ]

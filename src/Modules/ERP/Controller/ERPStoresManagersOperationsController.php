@@ -524,6 +524,73 @@ class ERPStoresManagersOperationsController extends Controller
 			 }
 			 $listConsumersOperationsReports = new ERPStoresManagersOperationsUtils();
 			 $listOperationsLinesReports = new ERPStoresManagersOperationsLinesUtils();
+
+
+			// $start=$today->format("d/m/Y");
+			// $end=$today->format("d/m/Y");
+			 //$today->format('Y-m-d');
+			 $list=[];
+			 $routeparams=[];
+			 $list["id"]="listStoresManagersOperations";
+			 $list["route"]="consumersreportslist";
+			 $routeparams["id"]=$id;
+			 $routeparams["module"]="ERP";
+			 $routeparams["name"]="StoresManagersOperations";
+			 $routeparams["start"]=null;
+			 $routeparams["end"]=null;
+			 $routeparams["store"]=null;
+			 $list["routeParams"]=$routeparams;
+			 $list["orderColumn"]=2;
+			 $list["orderDirection"]="DESC";
+			 $list["tagColumn"]=2;
+			 $list["fields"]=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersConsumersOperationsReports.json"),true);
+			 $list["fieldButtons"]=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersConsumersOperationsReportsFieldButtons.json"),true);
+			 $list["topButtons"]=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersConsumersOperationsReportsTopButtons.json"),true);
+
+		//	 $today=new \Datetime('NOW');
+
+			 $lastmonth=new \Datetime('2021-11-01');
+			 $lastmonth->modify('-1 month');
+			 $months_count=new \Datetime('2021-01-01');
+
+			 //MESES ANTERIORES
+			 $cont=1;
+			 while($lastmonth->format("Y-m-d")>=$months_count->format("Y-m-d")){
+				 $months_count->modify('+1 month');
+				 $arrayFields=[];
+				 $arrayFields["name"]="M".$cont;
+				 $arrayFields["caption"]=$cont;
+				 $arrayFields["sum"]=true;
+				 $arrayFields["unity"]="€";
+				 $list["fields"][]=$arrayFields;
+				 $cont++;
+				}
+
+				//este año
+				$thisyear = date("Y");
+				$arrayFields=[];
+				$arrayFields["name"]="añoactual";
+				$arrayFields["caption"]=$thisyear;
+				$arrayFields["sum"]=true;
+				$arrayFields["unity"]="€";
+				$list["fields"][]=$arrayFields;
+ 			  //$lastyear=date('Y', strtotime('-1 year')) ;
+ 			  //$twoyearsbefore=date('Y', strtotime('-2 year')) ;
+
+				//años anteriores
+				$cont=1;
+				while($cont<3){
+					$year=date('Y', strtotime('-'.$cont.' year'));
+					$arrayFields=[];
+					$arrayFields["name"]="añoanterior".$cont;
+					$arrayFields["caption"]=$year;
+					$arrayFields["sum"]=true;
+					$arrayFields["unity"]="€";
+					$list["fields"][]=$arrayFields;
+					$cont++;
+
+				}
+
 			 //$listConsumersOperationsDetailsReports = new ERPStoresManagersOperationsLinesUtils();
 			 if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 					 return $this->render('@ERP/storesmanagersoperationslocalreports.html.twig', [
@@ -536,7 +603,10 @@ class ERPStoresManagersOperationsController extends Controller
 						 'userData' => $userdata,
 						 'id' => $id,
 						 'stores' => $stores,
-						 'consumersoperationslist' => $listConsumersOperationsReports->formatConsumersReportsList($id,null,null,null),
+						/* 'datefrom' => $today,
+						 'dateto' => $today,*/
+						 /*'consumersoperationslist' => $listConsumersOperationsReports->formatConsumersReportsList($id,null,null,null),*/
+						 'consumersoperationslist' => $list,
 						 'productslist' => $listOperationsLinesReports->formatProductsReportsList($id,null,null,null),
 						 'detailedconsumerlist'=>	$listOperationsLinesReports->formatConsumersReportsDetailedList(null,null,null,null),
 						 'detailedproductlist'=>	$listOperationsLinesReports->formatProductsReportsDetailedList(null,null,null,null)/*,
@@ -626,12 +696,104 @@ class ERPStoresManagersOperationsController extends Controller
 				 $end=$end->format("Y-m-d");
 			 }
 
+		  $array=['o.consumer_id'=>'id','concat(u.name," ",IFNULL(u.lastname,""))'=>'agent__name_o_agent__lastname','concat(c.name," ",c.lastname)'=>'consumer__name_o_consumer__lastname','c.idcard'=>'consumer__idcard','c.code2'=>'consumer__code2','IFNULL(ROUND(SUM(IFNULL(of.price,p.price)*l.quantity),2),0)'=>'Filtro'];
+
 			$listUtils=new GlobaleListUtils();
 			$listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersConsumersOperationsReports.json"),true);
+			$cont=1;
+			$today=new \Datetime('2021-11-11');
+			$thismonth=new \Datetime('2021-11-01');
+			$lastmonth=new \Datetime('2021-11-01');
+			$lastmonth->modify('-1 month');
+		  $months_count=new \Datetime('2021-01-01');
+			$months_count_next=new \Datetime('2021-01-01');
+			$months_count_next->modify('+1 month');
+			$thisyear = new \Datetime('2021-01-01');
+			$lastyear = new \Datetime('2021-01-01');
+			$lastyear->modify('-1 year');
 
-			if($store)
-			{
-			$return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields,ERPStoresManagersOperations::class,['o.consumer_id'=>'id','concat(u.name," ",IFNULL(u.lastname,""))'=>'agent__name_o_agent__lastname','concat(c.name," ",c.lastname)'=>'consumer__name_o_consumer__lastname','c.idcard'=>'consumer__idcard','c.code2'=>'consumer__code2','IFNULL(ROUND(SUM(IFNULL(of.price,p.price)*l.quantity),2),0)'=>'prueba'],
+			if($store){
+				/*MES ACTUAL*/
+					$sql="(SELECT IFNULL(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),0)
+						 FROM erpstores_managers_operations ox
+						 LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
+						 LEFT JOIN erpstores_managers_consumers cx ON cx.id=ox.consumer_id
+						 LEFT JOIN globale_users ux ON ux.id=ox.agent_id
+						 LEFT JOIN erpstores_managers_operations_lines lx ON lx.operation_id=ox.id
+						 LEFT JOIN erpoffer_prices ofx ON ofx.id=lx.product_id AND ofx.customer_id=mx.customer_id
+						 LEFT JOIN erpproduct_prices px ON px.id=lx.product_id
+						 WHERE ox.active=1 AND ox.manager_id=1 AND ox.DATE >= '".$thismonth->format("Y-m-d")."' AND ox.DATE<='".$today->format("Y-m-d")."' AND ox.consumer_id=o.consumer_id AND ox.store_id=o.store_id
+						 GROUP BY(ox.consumer_id))";
+
+			    $array[$sql]="mesactual";
+
+					while($lastmonth->format("Y-m-d")>=$months_count->format("Y-m-d")){
+		 				 $sql="(SELECT IFNULL(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),0)
+		 							FROM erpstores_managers_operations ox
+		 							LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
+		 							LEFT JOIN erpstores_managers_consumers cx ON cx.id=ox.consumer_id
+		 							LEFT JOIN globale_users ux ON ux.id=ox.agent_id
+		 							LEFT JOIN erpstores_managers_operations_lines lx ON lx.operation_id=ox.id
+		 							LEFT JOIN erpoffer_prices ofx ON ofx.id=lx.product_id AND ofx.customer_id=mx.customer_id
+		 							LEFT JOIN erpproduct_prices px ON px.id=lx.product_id
+		 							WHERE ox.active=1 AND ox.manager_id=1 AND ox.DATE >= '".$months_count->format("Y-m-d")."' AND ox.DATE<='".$months_count_next->format("Y-m-d")."' AND ox.consumer_id=o.consumer_id AND ox.store_id=o.store_id
+		 							GROUP BY(ox.consumer_id))";
+
+		 				 $array[$sql]="M".$cont;
+		 				 $months_count->modify('+1 month');
+		 				 $months_count_next->modify('+1 month');
+						 $arrayFields=[];
+						 $arrayFields["name"]="M".$cont;
+						 $arrayFields["caption"]=$cont;
+						 $arrayFields["sum"]=true;
+						 $arrayFields["unity"]="€";
+						 $listFields[]=$arrayFields;
+						 $cont++;
+ 			 	}
+
+
+				/*AÑO ACTUAL*/
+				$sql="(SELECT IFNULL(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),0)
+						 FROM erpstores_managers_operations ox
+						 LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
+						 LEFT JOIN erpstores_managers_consumers cx ON cx.id=ox.consumer_id
+						 LEFT JOIN globale_users ux ON ux.id=ox.agent_id
+						 LEFT JOIN erpstores_managers_operations_lines lx ON lx.operation_id=ox.id
+						 LEFT JOIN erpoffer_prices ofx ON ofx.id=lx.product_id AND ofx.customer_id=mx.customer_id
+						 LEFT JOIN erpproduct_prices px ON px.id=lx.product_id
+						 WHERE ox.active=1 AND ox.manager_id=1 AND ox.DATE >= '".$thisyear->format("Y-m-d")."' AND ox.DATE<='".$today->format("Y-m-d")."' AND ox.consumer_id=o.consumer_id AND ox.store_id=o.store_id
+						 GROUP BY(ox.consumer_id))";
+
+			  $array[$sql]="añoactual";
+
+				$cont=1;
+				while($cont<3){
+
+					$sql="(SELECT IFNULL(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),0)
+							 FROM erpstores_managers_operations ox
+							 LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
+							 LEFT JOIN erpstores_managers_consumers cx ON cx.id=ox.consumer_id
+							 LEFT JOIN globale_users ux ON ux.id=ox.agent_id
+							 LEFT JOIN erpstores_managers_operations_lines lx ON lx.operation_id=ox.id
+							 LEFT JOIN erpoffer_prices ofx ON ofx.id=lx.product_id AND ofx.customer_id=mx.customer_id
+							 LEFT JOIN erpproduct_prices px ON px.id=lx.product_id
+							 WHERE ox.active=1 AND ox.manager_id=1 AND ox.DATE >= '".$lastyear->format("Y-m-d")."' AND ox.DATE<='".$thisyear->format("Y-m-d")."' AND ox.consumer_id=o.consumer_id AND ox.store_id=o.store_id
+							 GROUP BY(ox.consumer_id))";
+
+							$array[$sql]="añoanterior".$cont;
+		 					$thisyear->modify('-1 year');
+		 					$lastyear->modify('-1 year');
+		 					$arrayFields=[];
+		 					$arrayFields["name"]="añoanterior".$cont;
+		 					$arrayFields["caption"]="añoanterior".$cont;
+		 					$arrayFields["sum"]=true;
+		 					$arrayFields["unity"]="€";
+		 					$listFields[]=$arrayFields;
+		 					$cont++;
+
+				}
+
+				$return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields,ERPStoresManagersOperations::class,$array,
 																																	'erpstores_managers_operations o
 																																	LEFT JOIN erpstores_managers m ON m.id=o.manager_id
 																																	LEFT JOIN erpstores_managers_consumers c ON c.id=o.consumer_id
@@ -642,9 +804,93 @@ class ERPStoresManagersOperationsController extends Controller
 																																	'o.active=1 AND o.manager_id='.$id.' AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'" AND o.store_id='.$store.'
 																																	GROUP BY(o.consumer_id)'
 																																	);
-			}
-			else{
-				$return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields,ERPStoresManagersOperations::class,['o.consumer_id'=>'id','concat(u.name," ",IFNULL(u.lastname,""))'=>'agent__name_o_agent__lastname','concat(c.name," ",c.lastname)'=>'consumer__name_o_consumer__lastname','c.idcard'=>'consumer__idcard','c.code2'=>'consumer__code2','IFNULL(ROUND(SUM(IFNULL(of.price,p.price)*l.quantity),2),0)'=>'prueba'],
+		}
+		else{
+
+			/*MES ACTUAL*/
+			$sql="(SELECT IFNULL(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),0)
+						 FROM erpstores_managers_operations ox
+						 LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
+						 LEFT JOIN erpstores_managers_consumers cx ON cx.id=ox.consumer_id
+						 LEFT JOIN globale_users ux ON ux.id=ox.agent_id
+						 LEFT JOIN erpstores_managers_operations_lines lx ON lx.operation_id=ox.id
+						 LEFT JOIN erpoffer_prices ofx ON ofx.id=lx.product_id AND ofx.customer_id=mx.customer_id
+						 LEFT JOIN erpproduct_prices px ON px.id=lx.product_id
+						 WHERE ox.active=1 AND ox.manager_id=1 AND ox.DATE >= '".$thismonth->format("Y-m-d")."' AND ox.DATE<='".$today->format("Y-m-d")."' AND ox.consumer_id=o.consumer_id AND ox.store_id=o.store_id
+						 GROUP BY(ox.consumer_id))";
+			 $array[$sql]="mesactual";
+
+ 			 while($lastmonth->format("Y-m-d")>=$months_count->format("Y-m-d")){
+
+ 				 $sql="(SELECT IFNULL(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),0)
+ 							FROM erpstores_managers_operations ox
+ 							LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
+ 							LEFT JOIN erpstores_managers_consumers cx ON cx.id=ox.consumer_id
+ 							LEFT JOIN globale_users ux ON ux.id=ox.agent_id
+ 							LEFT JOIN erpstores_managers_operations_lines lx ON lx.operation_id=ox.id
+ 							LEFT JOIN erpoffer_prices ofx ON ofx.id=lx.product_id AND ofx.customer_id=mx.customer_id
+ 							LEFT JOIN erpproduct_prices px ON px.id=lx.product_id
+ 							WHERE ox.active=1 AND ox.manager_id=1 AND ox.DATE >= '".$months_count->format("Y-m-d")."' AND ox.DATE<='".$months_count_next->format("Y-m-d")."' AND ox.consumer_id=o.consumer_id
+ 							GROUP BY(ox.consumer_id))";
+					//dump($sql);
+					$array[$sql]="M".$cont;
+					$months_count->modify('+1 month');
+					$months_count_next->modify('+1 month');
+					$arrayFields=[];
+					$arrayFields["name"]="M".$cont;
+					$arrayFields["caption"]=$cont;
+					$arrayFields["sum"]=true;
+					$arrayFields["unity"]="€";
+					$listFields[]=$arrayFields;
+					$cont++;
+
+ 			 }
+
+
+			 /*AÑO ACTUAL*/
+			 $sql="(SELECT IFNULL(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),0)
+						FROM erpstores_managers_operations ox
+						LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
+						LEFT JOIN erpstores_managers_consumers cx ON cx.id=ox.consumer_id
+						LEFT JOIN globale_users ux ON ux.id=ox.agent_id
+						LEFT JOIN erpstores_managers_operations_lines lx ON lx.operation_id=ox.id
+						LEFT JOIN erpoffer_prices ofx ON ofx.id=lx.product_id AND ofx.customer_id=mx.customer_id
+						LEFT JOIN erpproduct_prices px ON px.id=lx.product_id
+						WHERE ox.active=1 AND ox.manager_id=1 AND ox.DATE >= '".$thisyear->format("Y-m-d")."' AND ox.DATE<='".$today->format("Y-m-d")."' AND ox.consumer_id=o.consumer_id
+						GROUP BY(ox.consumer_id))";
+
+			 $array[$sql]="añoactual";
+
+			 //AÑOS ANTERIORES*/
+			 $cont=1;
+			 while($cont<3){
+
+				 $sql="(SELECT IFNULL(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),0)
+							FROM erpstores_managers_operations ox
+							LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
+							LEFT JOIN erpstores_managers_consumers cx ON cx.id=ox.consumer_id
+							LEFT JOIN globale_users ux ON ux.id=ox.agent_id
+							LEFT JOIN erpstores_managers_operations_lines lx ON lx.operation_id=ox.id
+							LEFT JOIN erpoffer_prices ofx ON ofx.id=lx.product_id AND ofx.customer_id=mx.customer_id
+							LEFT JOIN erpproduct_prices px ON px.id=lx.product_id
+							WHERE ox.active=1 AND ox.manager_id=1 AND ox.DATE >= '".$lastyear->format("Y-m-d")."' AND ox.DATE<='".$thisyear->format("Y-m-d")."' AND ox.consumer_id=o.consumer_id
+							GROUP BY(ox.consumer_id))";
+
+						 $array[$sql]="añoanterior".$cont;
+						 $thisyear->modify('-1 year');
+						 $lastyear->modify('-1 year');
+						 $arrayFields=[];
+						 $arrayFields["name"]="añoanterior".$cont;
+						 $arrayFields["caption"]="añoanterior".$cont;
+						 $arrayFields["sum"]=true;
+						 $arrayFields["unity"]="€";
+						 $listFields[]=$arrayFields;
+						 $cont++;
+
+			 }
+
+
+			$return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields,ERPStoresManagersOperations::class,$array,
 																																		'erpstores_managers_operations o
 																																		LEFT JOIN erpstores_managers m ON m.id=o.manager_id
 																																		LEFT JOIN erpstores_managers_consumers c ON c.id=o.consumer_id
@@ -656,7 +902,7 @@ class ERPStoresManagersOperationsController extends Controller
 																																		GROUP BY(o.consumer_id)'
 																																		);
 
-			}
+		  }
 
 			return new JsonResponse($return);
 
