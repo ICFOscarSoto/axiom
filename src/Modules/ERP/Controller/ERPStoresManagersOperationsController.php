@@ -549,9 +549,9 @@ class ERPStoresManagersOperationsController extends Controller
 
 		//	 $today=new \Datetime('NOW');
 
-			 $lastmonth=new \Datetime('2021-11-01');
+			 $lastmonth=new \Datetime('first day of this month');
 			 $lastmonth->modify('-1 month');
-			 $months_count=new \Datetime('2021-01-01');
+			 $months_count=new \Datetime('first day of january this year');
 
 			 //MESES ANTERIORES
 			 $cont=1;
@@ -701,15 +701,15 @@ class ERPStoresManagersOperationsController extends Controller
 			$listUtils=new GlobaleListUtils();
 			$listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersConsumersOperationsReports.json"),true);
 			$cont=1;
-			$today=new \Datetime('2021-11-11');
-			$thismonth=new \Datetime('2021-11-01');
-			$lastmonth=new \Datetime('2021-11-01');
+			$today=new \Datetime('NOW');
+			$thismonth=new \Datetime('first day of this month');
+			$lastmonth=new \Datetime('first day of this month');
 			$lastmonth->modify('-1 month');
-		  $months_count=new \Datetime('2021-01-01');
-			$months_count_next=new \Datetime('2021-01-01');
+		  $months_count=new \Datetime('first day of january this year');
+			$months_count_next=new \Datetime('first day of january this year');
 			$months_count_next->modify('+1 month');
-			$thisyear = new \Datetime('2021-01-01');
-			$lastyear = new \Datetime('2021-01-01');
+			$thisyear = new \Datetime('first day of january this year');
+			$lastyear = new \Datetime('first day of january this year');
 			$lastyear->modify('-1 year');
 
 			if($store){
@@ -861,7 +861,6 @@ class ERPStoresManagersOperationsController extends Controller
 
 			 $array[$sql]="añoactual";
 
-			 //AÑOS ANTERIORES*/
 			 $cont=1;
 			 while($cont<3){
 
@@ -902,7 +901,7 @@ class ERPStoresManagersOperationsController extends Controller
 																																		GROUP BY(o.consumer_id)'
 																																		);
 
-		  }
+		 }
 
 			return new JsonResponse($return);
 
