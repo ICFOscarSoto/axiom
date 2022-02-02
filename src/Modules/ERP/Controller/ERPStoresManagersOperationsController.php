@@ -592,6 +592,14 @@ class ERPStoresManagersOperationsController extends Controller
 
 				}
 
+				//total
+				$arrayFields=[];
+				$arrayFields["name"]="total";
+				$arrayFields["caption"]="Total";
+				$arrayFields["sum"]=true;
+				$arrayFields["unity"]="€";
+				$list["fields"][]=$arrayFields;
+
 			 //$listConsumersOperationsDetailsReports = new ERPStoresManagersOperationsLinesUtils();
 			 if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 					 return $this->render('@ERP/storesmanagersoperationslocalreports.html.twig', [
@@ -794,6 +802,21 @@ class ERPStoresManagersOperationsController extends Controller
 
 				}
 
+				/*TOTAL*/
+				$sql="(SELECT IFNULL(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),0)
+						 FROM erpstores_managers_operations ox
+						 LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
+						 LEFT JOIN erpstores_managers_consumers cx ON cx.id=ox.consumer_id
+						 LEFT JOIN globale_users ux ON ux.id=ox.agent_id
+						 LEFT JOIN erpstores_managers_operations_lines lx ON lx.operation_id=ox.id
+						 LEFT JOIN erpoffer_prices ofx ON ofx.id=lx.product_id AND ofx.customer_id=mx.customer_id
+						 LEFT JOIN erpproduct_prices px ON px.id=lx.product_id
+						 WHERE ox.active=1 AND ox.manager_id=1 AND ox.consumer_id=o.consumer_id AND ox.store_id=o.store_id
+						 GROUP BY(ox.consumer_id))";
+
+				$array[$sql]="total";
+
+
 
 				$return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields,ERPStoresManagersOperations::class,$array,
 																																	'erpstores_managers_operations o
@@ -888,7 +911,21 @@ class ERPStoresManagersOperationsController extends Controller
 						 $cont++;
 
 			 }
-			 
+
+			 /*TOTAL*/
+			 $sql="(SELECT IFNULL(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),0)
+						FROM erpstores_managers_operations ox
+						LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
+						LEFT JOIN erpstores_managers_consumers cx ON cx.id=ox.consumer_id
+						LEFT JOIN globale_users ux ON ux.id=ox.agent_id
+						LEFT JOIN erpstores_managers_operations_lines lx ON lx.operation_id=ox.id
+						LEFT JOIN erpoffer_prices ofx ON ofx.id=lx.product_id AND ofx.customer_id=mx.customer_id
+						LEFT JOIN erpproduct_prices px ON px.id=lx.product_id
+						WHERE ox.active=1 AND ox.manager_id=1 AND ox.consumer_id=o.consumer_id
+						GROUP BY(ox.consumer_id))";
+
+			 $array[$sql]="total";
+
 			$return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields,ERPStoresManagersOperations::class,$array,
 																																		'erpstores_managers_operations o
 																																		LEFT JOIN erpstores_managers m ON m.id=o.manager_id
