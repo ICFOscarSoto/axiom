@@ -547,7 +547,7 @@ class ERPStoresManagersOperationsController extends Controller
 			 $list["fieldButtons"]=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersConsumersOperationsReportsFieldButtons.json"),true);
 			 $list["topButtons"]=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersConsumersOperationsReportsTopButtons.json"),true);
 
-		//	 $today=new \Datetime('NOW');
+			 $today=new \Datetime('NOW');
 
 			 $lastmonth=new \Datetime('first day of this month');
 			 $lastmonth->modify('-1 month');
@@ -603,8 +603,8 @@ class ERPStoresManagersOperationsController extends Controller
 						 'userData' => $userdata,
 						 'id' => $id,
 						 'stores' => $stores,
-						/* 'datefrom' => $today,
-						 'dateto' => $today,*/
+						 'datefrom' => $today->format('d/m/Y'),
+						 'dateto' => $today->format('d/m/Y'),
 						 /*'consumersoperationslist' => $listConsumersOperationsReports->formatConsumersReportsList($id,null,null,null),*/
 						 'consumersoperationslist' => $list,
 						 'productslist' => $listOperationsLinesReports->formatProductsReportsList($id,null,null,null),
@@ -845,7 +845,6 @@ class ERPStoresManagersOperationsController extends Controller
 					$cont++;
 
  			 }
-
 
 			 /*AÑO ACTUAL*/
 			 $sql="(SELECT IFNULL(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),0)

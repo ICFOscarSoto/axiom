@@ -5,7 +5,8 @@
   },
   {
       "name": "date",
-      "caption": "date"
+      "caption": "date",
+      "type": "datetime"
   },
   {
       "name": "code",

@@ -8,12 +8,22 @@
 <div class="row">
   <div class="col-md-2">
     <div class="form-group">
-      <input type="text" id="date-from" name="form[from]" class="datepicker form-control"  placeholder="Fecha de inicio...">
+      <input type="text" value="{{ datefrom }}">
     </div>
   </div>
   <div class="col-md-2">
     <div class="form-group">
-      <input type="text" id="date-to" name="form[to]" class="datepicker form-control" placeholder="Fecha de fin...">
+      <input type="text" value="{{ dateto }}">
+    </div>
+  </div>
+  <div class="col-md-2">
+    <div class="form-group">
+      <input type="text" id="date-from" name="form[from]" class="datepicker form-control"  placeholder="Fecha de inicio..." value="{{ datefrom }}">
+    </div>
+  </div>
+  <div class="col-md-2">
+    <div class="form-group">
+      <input type="text" id="date-to" name="form[to]" class="datepicker form-control" placeholder="Fecha de fin..." value="{{ dateto }}">
     </div>
   </div>
   <div class="col-md-3">
