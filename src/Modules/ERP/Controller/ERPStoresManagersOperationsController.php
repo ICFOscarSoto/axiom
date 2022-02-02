@@ -548,7 +548,8 @@ class ERPStoresManagersOperationsController extends Controller
 			 $list["topButtons"]=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersConsumersOperationsReportsTopButtons.json"),true);
 
 			 $today=new \Datetime('NOW');
-
+			 $yesterday=new \Datetime('NOW');
+			 $yesterday->modify('-1 day');
 			 $lastmonth=new \Datetime('first day of this month');
 			 $lastmonth->modify('-1 month');
 			 $months_count=new \Datetime('first day of january this year');
@@ -603,7 +604,7 @@ class ERPStoresManagersOperationsController extends Controller
 						 'userData' => $userdata,
 						 'id' => $id,
 						 'stores' => $stores,
-						 'datefrom' => $today->format('d/m/Y'),
+						 'datefrom' => $yesterday->format('d/m/Y'),
 						 'dateto' => $today->format('d/m/Y'),
 						 /*'consumersoperationslist' => $listConsumersOperationsReports->formatConsumersReportsList($id,null,null,null),*/
 						 'consumersoperationslist' => $list,
@@ -793,6 +794,7 @@ class ERPStoresManagersOperationsController extends Controller
 
 				}
 
+
 				$return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields,ERPStoresManagersOperations::class,$array,
 																																	'erpstores_managers_operations o
 																																	LEFT JOIN erpstores_managers m ON m.id=o.manager_id
@@ -887,7 +889,7 @@ class ERPStoresManagersOperationsController extends Controller
 
 			 }
 
-
+			 dump($array);
 			$return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields,ERPStoresManagersOperations::class,$array,
 																																		'erpstores_managers_operations o
 																																		LEFT JOIN erpstores_managers m ON m.id=o.manager_id
