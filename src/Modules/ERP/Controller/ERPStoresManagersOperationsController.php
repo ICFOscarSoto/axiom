@@ -888,8 +888,7 @@ class ERPStoresManagersOperationsController extends Controller
 						 $cont++;
 
 			 }
-
-			 dump($array);
+			 
 			$return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields,ERPStoresManagersOperations::class,$array,
 																																		'erpstores_managers_operations o
 																																		LEFT JOIN erpstores_managers m ON m.id=o.manager_id
