@@ -169,6 +169,9 @@ thead th.dt-right{
   height: 25px;
 
 }
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+  line-height: 24px !important;
+}
 
 .table-header-search >.select2-container--default .select2-selection--single .select2-selection__rendered {
     line-height: 24px !important;
@@ -247,15 +250,15 @@ table.dataTable.dtr-inline.collapsed > tbody > tr > td:first-child:before, table
 }
 
 .select2-selection__view {
-      height: 25px;
+      height: 21px;
       position: absolute;
-      top: 25px;
+      top: 20px;
       right: 45px;
       width: 75px;
       border: 1px solid #e8e8e8;
       border-radius: 3px;
       background: #ffffff;
-      line-height: 24px !important;
+      line-height: 21px !important;
       text-align: center;
       cursor: pointer;
       z-index: 999;
@@ -728,15 +731,26 @@ label.form-check-label {
 }
 
 .form-check{
-  height: 50px;
-  padding-top: 27px;
+  height: 25px;
+  /*padding-top: 27px;*/
+  padding-top: 20px;
 }
+.form-group {
+    margin-bottom: 7px !important;
+}
+
+
 .form-control {
   border: 1px solid #cecece !important;
+  height: 27px !important;
 }
 
 .text-area-form{
   min-height: 120px !important;
+}
+
+.select2-container--default .select2-selection--single{
+  height: 26px !important;
 }
 
 .nav-tabs.bordered + .tab-content {
@@ -777,6 +791,7 @@ label.error {
 
 .page-generic-error .error-text p {
     font-size: 15px;
+
 }
 
 .jconfirm-box-container{
@@ -787,6 +802,7 @@ label.error {
   white-space: nowrap !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
+  margin-bottom: 0px !important;
 }
 
 .transform-button{

@@ -206,6 +206,11 @@ class HRWorkers
     */
    private $voipregister;
 
+   /**
+    * @ORM\ManyToOne(targetEntity="App\Modules\HR\Entity\HRProfiles")
+    */
+   private $profile;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -653,6 +658,18 @@ class HRWorkers
     public function setVoipregister(bool $voipregister): self
     {
         $this->voipregister = $voipregister;
+
+        return $this;
+    }
+
+    public function getProfile(): ?HRProfiles
+    {
+        return $this->profile;
+    }
+
+    public function setProfile(?HRProfiles $profile): self
+    {
+        $this->profile = $profile;
 
         return $this;
     }

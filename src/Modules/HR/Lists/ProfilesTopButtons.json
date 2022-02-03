@@ -1,0 +1,4 @@
+[
+  {"id" : "addTopProfilesSummoneds", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"genericdata", "routeParams":{"module":"HR", "name":"Profiles", "type":"modal" }, "modal":"Profiles", "actionType" : "background", "confirm" :false, "tooltip" : "Añadir perfil"}
+
+]

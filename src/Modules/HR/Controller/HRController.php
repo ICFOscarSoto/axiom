@@ -35,7 +35,8 @@ use App\Modules\HR\Entity\HRShifts;
 use App\Modules\HR\Entity\HRClocksDiary;
 use App\Modules\HR\Entity\HRVacations;
 use App\Modules\HR\Entity\HRSickleaves;
-
+use App\Modules\HR\Entity\HRProfiles;
+use App\Modules\Globale\Helpers\Trees;
 
 
 use App\Modules\Globale\Utils\GlobaleListApiUtils;
@@ -153,6 +154,52 @@ class HRController extends Controller
 												]*/
 			));
 		}
+
+		/**
+		 * @Route("/{_locale}/HR/organizationchart", name="organizationChart", defaults={"id"=0})
+		 */
+		 public function organizationChart(Request $request){
+		  $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
+			$menuRepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
+			$profilesRepository=$this->getDoctrine()->getRepository(HRProfiles::class);
+			$workersRepository=$this->getDoctrine()->getRepository(HRWorkers::class);
+
+			$arr=$profilesRepository->getProfiles($this->getUser());
+			foreach($arr as $key=>$item){
+				$workers=$workersRepository->getWorkersByProfile($this->getUser()->getCompany(), $item['id']);
+				$title='';
+				foreach($workers as $workery_key=>$worker){
+					$title.='<div class="profile-info dropdown"><a href="'.$this->generateUrl('formWorker',['id'=> $worker['id']]).'" target="blank"><img src="'.$this->generateUrl('getImage',['id'=> $worker['id'], 'type'=> 'workers', 'size'=> 'thumb']).'" alt="" class="img-circle" width="32px"><text style="font-size:10px">'.$worker['name'].' '.$worker['lastname'].'</text></a><br/></div><br/>';
+				}
+				$item["title"]=$title;
+				$item["name"]='<a href="'.$this->generateUrl('genericindex',['id'=> $worker['id'],'module'=>'HR','name'=>'Profiles']).'" target="blank">'.$item["name"].'</a>';
+				$arr[$key]=$item;
+			}
+			$new = array();
+			foreach ($arr as $a){
+			    $new[$a['parentid']][] = $a;
+			}
+			$tree=[];
+			if(count($arr)){
+				$tree = Trees::createTree($new, array($arr[0]));
+				$tree = $tree[0];
+			}
+
+			$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
+			$breadcrumb=$menuRepository->formatBreadcrumb('organizationChart');
+			return $this->render('@HR/organizationchart.html.twig', [
+				'entity_name' => 'Organization Chart',
+				'controllerName' => 'WorkersController',
+				'interfaceName' => 'Organization Chart',
+				'optionSelected' => 'organizationChart',
+				'menuOptions' =>  $menuRepository->formatOptions($userdata),
+				'breadcrumb' => $breadcrumb,
+				'userData' => $userdata,
+				'profiles' => json_encode($tree)
+			]);
+		}
+
 
 
 		/**
@@ -584,5 +631,7 @@ class HRController extends Controller
 
 			return new JsonResponse($array);
 	 }
+
+
 
 }

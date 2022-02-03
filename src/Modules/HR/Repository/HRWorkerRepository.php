@@ -40,4 +40,10 @@ class HRWorkerRepository extends ServiceEntityRepository
           ->getQuery()
           ->getResult();
     }
+
+    public function getWorkersByProfile($company, $profile){
+      $query="SELECT id, name, lastname from hrworkers WHERE company_id=:company AND profile_id=:profile AND active=1 AND deleted=0";
+      $params=['company' => $company->getId(), 'profile'=>$profile];
+      return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+    }
 }

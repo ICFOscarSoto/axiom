@@ -223,6 +223,29 @@ Select a status...: Seleccionar estado laboral
 Workcalendargroup: Calendario Laboral
 Select hrworkcalendargroups: Seleccionar calendario laboral
 Laboral data: Datos laborales
+Profiles: Perfiles
+birthdate: Fecha nacimiento
+profile: Perfil
+Profile: Perfil
+formation: Formación
+Primaryeducation: Ed. Primaria
+Secondaryeducation: Ed. Secundaria
+Middlegraduate: Titulado medio
+Superiorgraduate: Titulado superior
+Fp1: FP I
+Fp1: FP II
+Driverlicense: Carné conducir
+Speciallicense: Carné especial
+Other: Otros
+Notnecessary: No precisa
+Knowledges: Conocimientos necesarios
+Responsability: Responsabilidades/Tareas
+Experience: Experiencia/Otros datos exigibles
+Select hrprofiles: Seleccionar perfil
+Parent: Padre
+others: Otros
+Organization Chart: Organigrama de la empresa
+
 # HOLLIDAYS
 #----------------------------------------------------------------------------------------------------------------------
 Holliday data: "Datos festivo"

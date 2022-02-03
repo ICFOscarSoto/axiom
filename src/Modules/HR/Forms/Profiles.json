@@ -1,0 +1,90 @@
+[{
+    "sections": [
+        {
+            "name": "profile",
+            "fields": [
+                {
+                    "name": "name",
+                    "cols": 6
+                },
+                {
+                    "name": "department",
+                    "cols": 3
+                },
+                {
+                    "name": "parent",
+                    "cols": 3
+                },
+                {
+                    "name": "knowledges",
+                    "caption": "Conocimientos",
+                    "cols": 12,
+                    "class": "wysiwyg",
+                    "height": "300"
+                }
+            ]
+        },
+        {
+            "name": "formation",
+            "fields": [
+              {
+                  "name": "primaryeducation",
+                  "cols": 3
+              },
+              {
+                  "name": "secondaryeducation",
+                  "cols": 3
+              },
+              {
+                  "name": "middlegraduate",
+                  "cols": 3
+              },
+              {
+                  "name": "superiorgraduate",
+                  "cols": 3
+              },
+              {
+                  "name": "fp1",
+                  "cols": 3
+              },
+              {
+                  "name": "fp2",
+                  "cols": 3
+              },
+              {
+                  "name": "driverlicense",
+                  "cols": 3
+              },
+              {
+                  "name": "speciallicense",
+                  "cols": 3
+              },
+              {
+                  "name": "other",
+                  "cols": 3
+              },
+              {
+                  "name": "notnecessary",
+                  "cols": 3
+              }
+            ]
+        },
+        {
+            "name": "others",
+            "fields": [
+              {
+                  "name": "responsability",
+                  "cols": 6,
+                  "height": "300",
+                  "class": "wysiwyg"
+              },
+              {
+                  "name": "experience",
+                  "cols": 6,
+                  "height": "300",
+                  "class": "wysiwyg"
+              }
+            ]
+        }
+    ]
+}]

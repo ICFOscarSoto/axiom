@@ -16,8 +16,9 @@
 			"name": "Laboral data",
 			"fields": [
 				{	"name": "ss", "cols": 4},
-				{	"name": "status", "cols": 4},
-				{	"name": "dateofemploy", "cols": 2, "type": "date"},
+				{	"name": "status", "cols": 2},
+				{	"name": "profile", "cols": 3},
+				{	"name": "dateofemploy", "cols": 3, "type": "date"},
 				{	"name": "workcenters", "cols": 4, "relation": {"route": "genericdata", "routeparams":{"module":"HR","name":"WorkCenters"}, "type":"modal"}},
 				{	"name": "department", "cols": 4, "relation": {"route": "departmentworkers", "type":"full"}},
 				{	"name": "workcalendargroup", "cols": 4, "relation": {"route": "workcalendars", "type":"full"}},

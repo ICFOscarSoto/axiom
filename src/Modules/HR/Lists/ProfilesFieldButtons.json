@@ -1,0 +1,4 @@
+[
+  {"id": "edit", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"genericdata", "routeParams":{"module":"HR", "name":"Profiles", "type":"modal" }, "modal":"Profiles", "actionType" : "background", "confirm" :false},
+  {"id": "deleteProfiles", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"genericdelete", "routeParams":{"module":"HR", "name":"Profiles"}, "confirm" :true, "undo" :false, "actionType" : "background", "tooltip":""}
+]
