@@ -21,7 +21,7 @@
   },
   {
       "name": "Filtro",
-      "caption": "Filtro",
+      "caption": "Suma precio venta",
       "sum":true,
       "unity":"€"
   },
