@@ -170,7 +170,7 @@ class HRController extends Controller
 				$workers=$workersRepository->getWorkersByProfile($this->getUser()->getCompany(), $item['id']);
 				$title='';
 				foreach($workers as $workery_key=>$worker){
-					$title.='<div class="profile-info dropdown"><a href="'.$this->generateUrl('formWorker',['id'=> $worker['id']]).'" target="blank"><img src="'.$this->generateUrl('getImage',['id'=> $worker['id'], 'type'=> 'workers', 'size'=> 'thumb']).'" alt="" class="img-circle" width="32px"><text style="font-size:10px">'.$worker['name'].' '.$worker['lastname'].'</text></a><br/></div><br/>';
+					$title.='<div class="profile-info dropdown"><a href="'.$this->generateUrl('formWorker',['id'=> $worker['id']]).'" target="blank"><img src="'.$this->generateUrl('getImage',['id'=> $worker['id'], 'type'=> 'workers', 'size'=> 'thumb']).'" alt="" class="img-circle" width="32px" height="32px"><text style="font-size:10px">'.$worker['name'].' '.$worker['lastname'].'</text></a><br/></div><br/>';
 				}
 				$item["title"]=$title;
 				$item["name"]='<a href="'.$this->generateUrl('genericindex',['id'=> $worker['id'],'module'=>'HR','name'=>'Profiles']).'" target="blank">'.$item["name"].'</a>';

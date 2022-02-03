@@ -289,6 +289,8 @@
   color: #333;
   text-overflow: ellipsis;
   white-space: nowrap;
+  text-align: left;
+  padding-left: 7px;
 }
 
 .orgchart.b2t .node .content {
