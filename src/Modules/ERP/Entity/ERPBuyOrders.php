@@ -212,6 +212,86 @@ class ERPBuyOrders
      */
     private $typeofconfirmation;
 
+    /**
+     * @ORM\Column(type="string", length=150)
+     */
+    private $supplieraddress;
+
+    /**
+     * @ORM\Column(type="string", length=12)
+     */
+    private $supplierpostcode;
+
+    /**
+     * @ORM\Column(type="string", length=100)
+     */
+    private $supplierstate;
+
+    /**
+     * @ORM\Column(type="string", length=70)
+     */
+    private $suppliercity;
+
+    /**
+     * @ORM\Column(type="string", length=16)
+     */
+    private $supplierVat;
+
+    /**
+     * @ORM\Column(type="string", length=150)
+     */
+    private $supplierpaymentterms;
+
+    /**
+     * @ORM\Column(type="string", length=150, nullable=true)
+     */
+    private $suppliercontact;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $dateread;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $datesend;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $dateconfirmed;
+
+    /**
+     * @ORM\Column(type="string", length=30, nullable=true)
+     */
+    private $ouroffer;
+
+    /**
+     * @ORM\Column(type="string", length=30, nullable=true)
+     */
+    private $theiroffer;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    private $taxbase;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    private $total;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    private $additionaldiscount;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    private $taxes;
+
 
 
 
@@ -650,6 +730,198 @@ class ERPBuyOrders
     public function setTypeofconfirmation(?int $typeofconfirmation): self
     {
         $this->typeofconfirmation = $typeofconfirmation;
+
+        return $this;
+    }
+
+    public function getSupplieraddress(): ?string
+    {
+        return $this->supplieraddress;
+    }
+
+    public function setSupplieraddress(string $supplieraddress): self
+    {
+        $this->supplieraddress = $supplieraddress;
+
+        return $this;
+    }
+
+    public function getSupplierpostcode(): ?string
+    {
+        return $this->supplierpostcode;
+    }
+
+    public function setSupplierpostcode(string $supplierpostcode): self
+    {
+        $this->supplierpostcode = $supplierpostcode;
+
+        return $this;
+    }
+
+    public function getSupplierstate(): ?string
+    {
+        return $this->supplierstate;
+    }
+
+    public function setSupplierstate(string $supplierstate): self
+    {
+        $this->supplierstate = $supplierstate;
+
+        return $this;
+    }
+
+    public function getSuppliercity(): ?string
+    {
+        return $this->suppliercity;
+    }
+
+    public function setSuppliercity(string $suppliercity): self
+    {
+        $this->suppliercity = $suppliercity;
+
+        return $this;
+    }
+
+    public function getSupplierVat(): ?string
+    {
+        return $this->supplierVat;
+    }
+
+    public function setSupplierVat(string $supplierVat): self
+    {
+        $this->supplierVat = $supplierVat;
+
+        return $this;
+    }
+
+    public function getSupplierpaymentterms(): ?string
+    {
+        return $this->supplierpaymentterms;
+    }
+
+    public function setSupplierpaymentterms(string $supplierpaymentterms): self
+    {
+        $this->supplierpaymentterms = $supplierpaymentterms;
+
+        return $this;
+    }
+
+    public function getSuppliercontact(): ?string
+    {
+        return $this->suppliercontact;
+    }
+
+    public function setSuppliercontact(?string $suppliercontact): self
+    {
+        $this->suppliercontact = $suppliercontact;
+
+        return $this;
+    }
+
+    public function getDateread(): ?\DateTimeInterface
+    {
+        return $this->dateread;
+    }
+
+    public function setDateread(?\DateTimeInterface $dateread): self
+    {
+        $this->dateread = $dateread;
+
+        return $this;
+    }
+
+    public function getDatesend(): ?\DateTimeInterface
+    {
+        return $this->datesend;
+    }
+
+    public function setDatesend(?\DateTimeInterface $datesend): self
+    {
+        $this->datesend = $datesend;
+
+        return $this;
+    }
+
+    public function getDateconfirmed(): ?\DateTimeInterface
+    {
+        return $this->dateconfirmed;
+    }
+
+    public function setDateconfirmed(?\DateTimeInterface $dateconfirmed): self
+    {
+        $this->dateconfirmed = $dateconfirmed;
+
+        return $this;
+    }
+
+    public function getOuroffer(): ?string
+    {
+        return $this->ouroffer;
+    }
+
+    public function setOuroffer(?string $ouroffer): self
+    {
+        $this->ouroffer = $ouroffer;
+
+        return $this;
+    }
+
+    public function getTheiroffer(): ?string
+    {
+        return $this->theiroffer;
+    }
+
+    public function setTheiroffer(?string $theiroffer): self
+    {
+        $this->theiroffer = $theiroffer;
+
+        return $this;
+    }
+
+    public function getTaxbase(): ?float
+    {
+        return $this->taxbase;
+    }
+
+    public function setTaxbase(?float $taxbase): self
+    {
+        $this->taxbase = $taxbase;
+
+        return $this;
+    }
+
+    public function getTotal(): ?float
+    {
+        return $this->total;
+    }
+
+    public function setTotal(?float $total): self
+    {
+        $this->total = $total;
+
+        return $this;
+    }
+
+    public function getAdditionaldiscount(): ?float
+    {
+        return $this->additionaldiscount;
+    }
+
+    public function setAdditionaldiscount(?float $additionaldiscount): self
+    {
+        $this->additionaldiscount = $additionaldiscount;
+
+        return $this;
+    }
+
+    public function getTaxes(): ?float
+    {
+        return $this->taxes;
+    }
+
+    public function setTaxes(?float $taxes): self
+    {
+        $this->taxes = $taxes;
 
         return $this;
     }
