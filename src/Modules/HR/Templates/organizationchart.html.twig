@@ -28,7 +28,7 @@
       var parent = $('#chart-container');
       var child = $('.orgchart');
       child.css("position","absolute");
-			left=((parent.width() - child.outerWidth()) / 2) + parent.scrollLeft() ;
+			left=((parent.width() - child.outerWidth()) / 2) + parent.scrollLeft();
 			if(left<0) left=0;
       child.css("left", left + "px");
       child.css("transform",'matrix(1, 0, 0, 1, 0,0)');

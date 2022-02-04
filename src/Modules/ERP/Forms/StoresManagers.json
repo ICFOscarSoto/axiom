@@ -17,7 +17,7 @@
                     "name": "user",
                     "caption": "Responsable",
                     "type": "searchable",
-                    "typeParams":{"module": "Globale", "name": "Users"},
+                    "typeParams":{"module": "Globale", "name": "Users", "route": "formUser"},
                     "cols": 4
                 },
                 {

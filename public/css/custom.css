@@ -252,8 +252,8 @@ table.dataTable.dtr-inline.collapsed > tbody > tr > td:first-child:before, table
 .select2-selection__view {
       height: 21px;
       position: absolute;
-      top: 20px;
-      right: 45px;
+      top: 21px;
+      right: 20px;
       width: 75px;
       border: 1px solid #e8e8e8;
       border-radius: 3px;
@@ -350,15 +350,15 @@ table.dataTable.dtr-inline.collapsed > tbody > tr > td:first-child:before, table
 }
 
 .input__unity {
-    height: 31px;
+    height: 23px;
     position: absolute;
-    top: 22px;
-    right: 15px;
+    top: 20px;
+    right: 2px;
     width: 32px;
     border: 1px solid #cecece;
     border-radius: 3px;
     background: #ffffff;
-    line-height: 28px !important;
+    line-height: 23px !important;
     text-align: center;
     font-weight: bold;
 
@@ -731,12 +731,15 @@ label.form-check-label {
 }
 
 .form-check{
-  height: 25px;
+  /*height: 25px;*/
   /*padding-top: 27px;*/
-  padding-top: 20px;
+  position: absolute;
+  top: 50%;
 }
 .form-group {
     margin-bottom: 7px !important;
+    position: relative;
+    height: 42px;
 }
 
 
@@ -750,7 +753,7 @@ label.form-check-label {
 }
 
 .select2-container--default .select2-selection--single{
-  height: 26px !important;
+  height: 27px !important;
 }
 
 .nav-tabs.bordered + .tab-content {
@@ -806,7 +809,7 @@ label.error {
 }
 
 .transform-button{
-  margin-top: 22px !important;
+  margin-top: 14px !important;
 }
 
 

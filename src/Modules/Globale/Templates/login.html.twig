@@ -1,5 +1,6 @@
 {% set params = app.request.attributes.get('_route_params')|merge(app.request.query.all()) %}
 {% block header %}
+<head>
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -9,6 +10,7 @@
 	<!-- Imported styles on this page -->
 	<link rel="stylesheet" href="{{ url('index') }}/js/jvectormap/jquery-jvectormap-1.2.2.css">
 	<link rel="stylesheet" href="{{ url('index') }}/js/rickshaw/rickshaw.min.css">
+</head>
 {% endblock %}
 <title>Axiom | Login</title>
 

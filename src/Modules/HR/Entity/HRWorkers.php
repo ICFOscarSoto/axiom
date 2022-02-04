@@ -211,6 +211,21 @@ class HRWorkers
     */
    private $profile;
 
+   /**
+    * @ORM\ManyToOne(targetEntity="App\Modules\HR\Entity\HRProfiles")
+    */
+   private $profile2;
+
+   /**
+    * @ORM\ManyToOne(targetEntity="App\Modules\HR\Entity\HRProfiles")
+    */
+   private $profile3;
+
+   /**
+    * @ORM\ManyToOne(targetEntity="App\Modules\HR\Entity\HRProfiles")
+    */
+   private $profile4;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -670,6 +685,42 @@ class HRWorkers
     public function setProfile(?HRProfiles $profile): self
     {
         $this->profile = $profile;
+
+        return $this;
+    }
+
+    public function getProfile2(): ?HRProfiles
+    {
+        return $this->profile2;
+    }
+
+    public function setProfile2(?HRProfiles $profile2): self
+    {
+        $this->profile2 = $profile2;
+
+        return $this;
+    }
+
+    public function getProfile3(): ?HRProfiles
+    {
+        return $this->profile3;
+    }
+
+    public function setProfile3(?HRProfiles $profile3): self
+    {
+        $this->profile3 = $profile3;
+
+        return $this;
+    }
+
+    public function getProfile4(): ?HRProfiles
+    {
+        return $this->profile4;
+    }
+
+    public function setProfile4(?HRProfiles $profile4): self
+    {
+        $this->profile4 = $profile4;
 
         return $this;
     }
