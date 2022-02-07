@@ -10,17 +10,5 @@
   {
       "name": "name",
       "caption": "name"
-  },
-  {
-      "name": "Filtro",
-      "caption": "Suma precio venta",
-      "sum":true,
-      "unity":"€"
-  },
-  {
-      "name": "mesactual",
-      "caption": "Mes actual",
-      "sum":true,
-      "unity":"€"
   }
 ]

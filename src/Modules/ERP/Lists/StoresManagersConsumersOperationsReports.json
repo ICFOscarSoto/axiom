@@ -18,18 +18,6 @@
   {
       "name": "consumer__code2",
       "caption": "Cod. Trabajador"
-  },
-  {
-      "name": "Filtro",
-      "caption": "Suma precio venta",
-      "sum":true,
-      "unity":"€"
-  },
-  {
-      "name": "mesactual",
-      "caption": "Mes actual",
-      "sum":true,
-      "unity":"€"
   }
 
 ]
