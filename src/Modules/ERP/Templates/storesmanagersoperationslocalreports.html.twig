@@ -22,14 +22,17 @@
 	{{ include('@Globale/sidebar_menu.html.twig') }}
 	<div class="main-content">
 		{{ include('@Globale/head.html.twig') }}
-		<hr />
 		{{ include('@Globale/breadcrumb.html.twig') }}
 		{#}<h2>{{ interfaceName }}</h2>#}
 		<!-- MAIN CONTENT -->
-		<div id="storemanagerslocalreports-body">
-        <div class="panel-heading">
-        </div>
-        <div class="panel-body" style="">
+		 <div class="panel-title">
+					<div class="col-md-12">
+						<div class="panel-title-list">Filtros de búsqueda</div>
+					</div>
+		  </div>
+			<br>
+			<br>
+      <div class="panel-body" style="">
         <div class="row">
 					<div class="col-md-2">
 				    <div class="form-group">
@@ -56,53 +59,34 @@
 				    </div>
 				  </div>
         </div>
-				</br>
-				</br>
-					<hr>
-				<div class="row">
-          <div class="col-md-6">
-<!--
-					</br>
-					<button id="consumeroperations-export" style="display:none;" type="button" class="btn btn-default btn-icon icon-left">Exportar informe<i class="fa fa-download"></i></button>
--->
-					</br>
-					</br>
-						<canvas id="ERPStoresManagersOperationsReports-consumeroperations-{{ id }}" width="100%"></canvas>
-					</div>
-					<div class="col-md-6">
-<!--
-					</br>
-					<button id="bestproducts-export" style="display:none;" type="button" class="btn btn-default btn-icon icon-left">Exportar informe<i class="fa fa-download"></i></button>
--->
-					</br>
-					</br>
-						<canvas id="ERPStoresManagersOperationsReports-bestproducts-{{ id }}" width="100%"></canvas>
-					</div>
-				</div>
-				</br>
-				</br>
-        <div class="row">
-          <div class="col-md-12">
-            <div class="panel-title-list">Consumos personal</div>
-							<div class="col-md-12">
-		            {% if consumersoperationslist is defined %}
-		            {% set listConstructor = consumersoperationslist %}
-		            {{ include('@Globale/list.html.twig') }}
-		            {% endif %}
+				<ul id="tabs-list" class="nav nav-tabs bordered" style="margin-top:0px!important">
+					    <li class="active" id="tab-head-data" style="" attr-id="" attr-name="data">
+					        <a href="#tab-body-consumers" data-toggle="tab">
+					            <span class="visible-xs"><i class="fa fa-id-card" aria-hidden="true"></i></span>
+					            <span class="hidden-xs">Consumidores</span>
+					        </a>
+					    </li>
+							<li id="tab-head-send" attr-id="" attr-name="data" {% if id==0 %}style="display:none;"{% endif %}>
+					        <a href="#tab-body-products" data-toggle="tab">
+					            <span class="visible-xs"><i class="fa fa-id-card" aria-hidden="true"></i></span>
+					            <span class="hidden-xs">Productos</span>
+					        </a>
+					    </li>
+					</ul>
+
+					<div class="tab-content">
+					    <div class="tab-pane active" style="" id="tab-body-consumers">
+								<div id="consumers-body">
+											{{ include('@ERP/storesmanagersoperationslocalreports_consumers.html.twig') }}
+								</div>
+					    </div>
+							 <div class="tab-pane" style="" id="tab-body-products">
+								 	<div id="products-body">
+										{{ include('@ERP/storesmanagersoperationslocalreports_products.html.twig') }}
+									</div>
 							</div>
-          </div>
-        </div>
-			</br>
-			</br>
-				<div class="row">
-					<div class="col-md-12">
-						<div class="panel-title-list">Ranking productos</div>
-						{% if productslist is defined %}
-						{% set listConstructor = productslist %}
-						{{ include('@Globale/list.html.twig') }}
-						{% endif %}
+							{{ include('@ERP/buyorders_lines.html.twig') }}
 					</div>
-			</div>
         </div>
       </div>
     </div>
