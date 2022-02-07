@@ -34,14 +34,12 @@ class ERPInfoStocksRepository extends ServiceEntityRepository
 
     public function getMinimum($store){
       $query='SELECT s.product_id FROM erpstocks s
-      WHERE (s.quantity+s.pendingreceive) <= (SELECT i.minimum_quantity
-                          FROM erpinfo_stocks i
-                          WHERE i.product_id=s.product_id and i.active=1 and deleted=0
-                          AND store_id IN (SELECT id FROM erpstores WHERE CODE=:store))
-      AND storelocation_id IN (SELECT id
-                              FROM erpstore_locations
-                              WHERE store_id IN (SELECT id FROM erpstores WHERE CODE=:store))';
-      $params=['store' => $store];
+	             LEFT JOIN erpinfo_stocks i ON i.product_id=s.product_id AND i.store_id =:store
+                WHERE (s.quantity+s.pendingreceive) <=  i.minimum_quantity
+                AND s.storelocation_id IN (SELECT l.id FROM erpstore_locations l WHERE l.active=1 AND l.deleted=0 AND l.store_id = :store)
+                AND i.active=1 AND i.deleted=0
+                AND s.active=1 AND s.deleted=0';
+      $params=['store' => $store->getId()];
       $result=$this->getEntityManager()->getConnection()->executeQuery($query,$params)->fetchAll();
       return $result;
     }

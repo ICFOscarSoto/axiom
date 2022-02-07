@@ -82,7 +82,7 @@ class StoreManagerTransferRemember extends ContainerAwareCommand
             }
         }*/
 
-        $info_stocks=$infoStocksRepository->getMinimum($store->getCode());
+        $info_stocks=$infoStocksRepository->getMinimum($store);
         if($manager->getDiscordchannel()!=null){
           $channel=$manager->getDiscordchannel();
           $msg="**** ------------------ Los siguientes traspasos son al almacén ** ".$store->getName()." ------------------ ****";
