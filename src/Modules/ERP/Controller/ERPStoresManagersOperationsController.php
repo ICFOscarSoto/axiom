@@ -677,8 +677,8 @@ class ERPStoresManagersOperationsController extends Controller
 							LEFT JOIN erpstores_managers_consumers cx ON cx.id=ox.consumer_id
 							LEFT JOIN globale_users ux ON ux.id=ox.agent_id
 							LEFT JOIN erpstores_managers_operations_lines lx ON lx.operation_id=ox.id
-							LEFT JOIN erpoffer_prices ofx ON ofx.id=lx.product_id AND ofx.customer_id=mx.customer_id
-							LEFT JOIN erpproduct_prices px ON px.id=lx.product_id
+							LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
+							LEFT JOIN erpproduct_prices px ON px.product_id=lx.product_id
 							WHERE ox.active=1 AND ox.manager_id='".$id."' AND ox.DATE >= '".$start."' AND ox.DATE<='".$end."' AND ox.consumer_id=o.consumer_id AND ox.store_id='".$store."'
 							GROUP BY(ox.consumer_id)),0)";
 				$array[$sql]="Filtro";
@@ -691,8 +691,8 @@ class ERPStoresManagersOperationsController extends Controller
 						 LEFT JOIN erpstores_managers_consumers cx ON cx.id=ox.consumer_id
 						 LEFT JOIN globale_users ux ON ux.id=ox.agent_id
 						 LEFT JOIN erpstores_managers_operations_lines lx ON lx.operation_id=ox.id
-						 LEFT JOIN erpoffer_prices ofx ON ofx.id=lx.product_id AND ofx.customer_id=mx.customer_id
-						 LEFT JOIN erpproduct_prices px ON px.id=lx.product_id
+						 LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
+						 LEFT JOIN erpproduct_prices px ON px.product_id=lx.product_id
 						 WHERE ox.active=1 AND ox.manager_id=1 AND ox.DATE >= '".$thismonth->format("Y-m-d")."' AND ox.DATE<='".$today->format("Y-m-d")."' AND ox.consumer_id=o.consumer_id AND ox.store_id=o.store_id
 						 GROUP BY(ox.consumer_id)),0)";
 
@@ -706,8 +706,8 @@ class ERPStoresManagersOperationsController extends Controller
 		 							LEFT JOIN erpstores_managers_consumers cx ON cx.id=ox.consumer_id
 		 							LEFT JOIN globale_users ux ON ux.id=ox.agent_id
 		 							LEFT JOIN erpstores_managers_operations_lines lx ON lx.operation_id=ox.id
-		 							LEFT JOIN erpoffer_prices ofx ON ofx.id=lx.product_id AND ofx.customer_id=mx.customer_id
-		 							LEFT JOIN erpproduct_prices px ON px.id=lx.product_id
+		 							LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
+		 							LEFT JOIN erpproduct_prices px ON px.product_id=lx.product_id
 		 							WHERE ox.active=1 AND ox.manager_id=1 AND ox.DATE >= '".$months_count->format("Y-m-d")."' AND ox.DATE<='".$months_count_next->format("Y-m-d")."' AND ox.consumer_id=o.consumer_id AND ox.store_id=o.store_id
 		 							GROUP BY(ox.consumer_id)),0)";
 
@@ -731,8 +731,8 @@ class ERPStoresManagersOperationsController extends Controller
 						 LEFT JOIN erpstores_managers_consumers cx ON cx.id=ox.consumer_id
 						 LEFT JOIN globale_users ux ON ux.id=ox.agent_id
 						 LEFT JOIN erpstores_managers_operations_lines lx ON lx.operation_id=ox.id
-						 LEFT JOIN erpoffer_prices ofx ON ofx.id=lx.product_id AND ofx.customer_id=mx.customer_id
-						 LEFT JOIN erpproduct_prices px ON px.id=lx.product_id
+						 LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
+						 LEFT JOIN erpproduct_prices px ON px.product_id=lx.product_id
 						 WHERE ox.active=1 AND ox.manager_id=1 AND ox.DATE >= '".$thisyear->format("Y-m-d")."' AND ox.DATE<='".$today->format("Y-m-d")."' AND ox.consumer_id=o.consumer_id AND ox.store_id=o.store_id
 						 GROUP BY(ox.consumer_id)),0)";
 
@@ -748,8 +748,8 @@ class ERPStoresManagersOperationsController extends Controller
 							 LEFT JOIN erpstores_managers_consumers cx ON cx.id=ox.consumer_id
 							 LEFT JOIN globale_users ux ON ux.id=ox.agent_id
 							 LEFT JOIN erpstores_managers_operations_lines lx ON lx.operation_id=ox.id
-							 LEFT JOIN erpoffer_prices ofx ON ofx.id=lx.product_id AND ofx.customer_id=mx.customer_id
-							 LEFT JOIN erpproduct_prices px ON px.id=lx.product_id
+							 LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
+							 LEFT JOIN erpproduct_prices px ON px.product_id=lx.product_id
 							 WHERE ox.active=1 AND ox.manager_id=1 AND ox.DATE >= '".$lastyear->format("Y-m-d")."' AND ox.DATE<='".$thisyear->format("Y-m-d")."' AND ox.consumer_id=o.consumer_id AND ox.store_id=o.store_id
 							 GROUP BY(ox.consumer_id)),0)";
 
@@ -773,8 +773,8 @@ class ERPStoresManagersOperationsController extends Controller
 							LEFT JOIN erpstores_managers_consumers cx ON cx.id=ox.consumer_id
 							LEFT JOIN globale_users ux ON ux.id=ox.agent_id
 							LEFT JOIN erpstores_managers_operations_lines lx ON lx.operation_id=ox.id
-							LEFT JOIN erpoffer_prices ofx ON ofx.id=lx.product_id AND ofx.customer_id=mx.customer_id
-							LEFT JOIN erpproduct_prices px ON px.id=lx.product_id
+							LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
+							LEFT JOIN erpproduct_prices px ON px.product_id=lx.product_id
 							WHERE ox.active=1 AND ox.manager_id='".$id."' AND ox.consumer_id=o.consumer_id AND ox.store_id='".$store."'
 							GROUP BY(ox.consumer_id)),0)";
 				$array[$sql]="Total";
@@ -786,8 +786,8 @@ class ERPStoresManagersOperationsController extends Controller
 																																	LEFT JOIN erpstores_managers_consumers c ON c.id=o.consumer_id
 																																	LEFT JOIN globale_users u ON u.id=o.agent_id
 																																	LEFT JOIN erpstores_managers_operations_lines l ON l.operation_id=o.id
-																																	LEFT JOIN erpoffer_prices of ON of.id=l.product_id AND of.customer_id=m.customer_id
-																																	LEFT JOIN erpproduct_prices p ON p.id=l.product_id',
+																																	LEFT JOIN erpoffer_prices of ON of.product_id=l.product_id AND of.customer_id=m.customer_id
+																																	LEFT JOIN erpproduct_prices p ON p.product_id=l.product_id',
 																																	'o.active=1 AND o.manager_id='.$id.' AND o.store_id='.$store.'
 																																	GROUP BY(o.consumer_id)'
 																																	);
@@ -801,8 +801,8 @@ class ERPStoresManagersOperationsController extends Controller
 						LEFT JOIN erpstores_managers_consumers cx ON cx.id=ox.consumer_id
 						LEFT JOIN globale_users ux ON ux.id=ox.agent_id
 						LEFT JOIN erpstores_managers_operations_lines lx ON lx.operation_id=ox.id
-						LEFT JOIN erpoffer_prices ofx ON ofx.id=lx.product_id AND ofx.customer_id=mx.customer_id
-						LEFT JOIN erpproduct_prices px ON px.id=lx.product_id
+						LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
+						LEFT JOIN erpproduct_prices px ON px.product_id=lx.product_id
 						WHERE ox.active=1 AND ox.manager_id='".$id."' AND ox.DATE >= '".$start."' AND ox.DATE<='".$end."' AND ox.consumer_id=o.consumer_id
 						GROUP BY(ox.consumer_id)),0)";
 			$array[$sql]="Filtro";
@@ -814,8 +814,8 @@ class ERPStoresManagersOperationsController extends Controller
 						 LEFT JOIN erpstores_managers_consumers cx ON cx.id=ox.consumer_id
 						 LEFT JOIN globale_users ux ON ux.id=ox.agent_id
 						 LEFT JOIN erpstores_managers_operations_lines lx ON lx.operation_id=ox.id
-						 LEFT JOIN erpoffer_prices ofx ON ofx.id=lx.product_id AND ofx.customer_id=mx.customer_id
-						 LEFT JOIN erpproduct_prices px ON px.id=lx.product_id
+						 LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
+						 LEFT JOIN erpproduct_prices px ON px.product_id=lx.product_id
 						 WHERE ox.active=1 AND ox.manager_id=1 AND ox.DATE >= '".$thismonth->format("Y-m-d")."' AND ox.DATE<='".$today->format("Y-m-d")."' AND ox.consumer_id=o.consumer_id
 						 GROUP BY(ox.consumer_id)),0)";
 			 $array[$sql]="mesactual";
@@ -829,8 +829,8 @@ class ERPStoresManagersOperationsController extends Controller
  							LEFT JOIN erpstores_managers_consumers cx ON cx.id=ox.consumer_id
  							LEFT JOIN globale_users ux ON ux.id=ox.agent_id
  							LEFT JOIN erpstores_managers_operations_lines lx ON lx.operation_id=ox.id
- 							LEFT JOIN erpoffer_prices ofx ON ofx.id=lx.product_id AND ofx.customer_id=mx.customer_id
- 							LEFT JOIN erpproduct_prices px ON px.id=lx.product_id
+ 							LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
+ 							LEFT JOIN erpproduct_prices px ON px.product_id=lx.product_id
  							WHERE ox.active=1 AND ox.manager_id=1 AND ox.DATE >= '".$months_count->format("Y-m-d")."' AND ox.DATE<='".$months_count_next->format("Y-m-d")."' AND ox.consumer_id=o.consumer_id
  							GROUP BY(ox.consumer_id)),0)";
 					$array[$sql]="M".$cont_meses;
@@ -853,8 +853,8 @@ class ERPStoresManagersOperationsController extends Controller
 						LEFT JOIN erpstores_managers_consumers cx ON cx.id=ox.consumer_id
 						LEFT JOIN globale_users ux ON ux.id=ox.agent_id
 						LEFT JOIN erpstores_managers_operations_lines lx ON lx.operation_id=ox.id
-						LEFT JOIN erpoffer_prices ofx ON ofx.id=lx.product_id AND ofx.customer_id=mx.customer_id
-						LEFT JOIN erpproduct_prices px ON px.id=lx.product_id
+						LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
+						LEFT JOIN erpproduct_prices px ON px.product_id=lx.product_id
 						WHERE ox.active=1 AND ox.manager_id=1 AND ox.DATE >= '".$thisyear->format("Y-m-d")."' AND ox.DATE<='".$today->format("Y-m-d")."' AND ox.consumer_id=o.consumer_id
 						GROUP BY(ox.consumer_id)),0)";
 
@@ -870,8 +870,8 @@ class ERPStoresManagersOperationsController extends Controller
 							LEFT JOIN erpstores_managers_consumers cx ON cx.id=ox.consumer_id
 							LEFT JOIN globale_users ux ON ux.id=ox.agent_id
 							LEFT JOIN erpstores_managers_operations_lines lx ON lx.operation_id=ox.id
-							LEFT JOIN erpoffer_prices ofx ON ofx.id=lx.product_id AND ofx.customer_id=mx.customer_id
-							LEFT JOIN erpproduct_prices px ON px.id=lx.product_id
+							LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
+							LEFT JOIN erpproduct_prices px ON px.product_id=lx.product_id
 							WHERE ox.active=1 AND ox.manager_id=1 AND ox.DATE >= '".$lastyear->format("Y-m-d")."' AND ox.DATE<='".$thisyear->format("Y-m-d")."' AND ox.consumer_id=o.consumer_id
 							GROUP BY(ox.consumer_id)),0)";
 
@@ -895,8 +895,8 @@ class ERPStoresManagersOperationsController extends Controller
 						 LEFT JOIN erpstores_managers_consumers cx ON cx.id=ox.consumer_id
 						 LEFT JOIN globale_users ux ON ux.id=ox.agent_id
 						 LEFT JOIN erpstores_managers_operations_lines lx ON lx.operation_id=ox.id
-						 LEFT JOIN erpoffer_prices ofx ON ofx.id=lx.product_id AND ofx.customer_id=mx.customer_id
-						 LEFT JOIN erpproduct_prices px ON px.id=lx.product_id
+						 LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
+						 LEFT JOIN erpproduct_prices px ON px.product_id=lx.product_id
 						 WHERE ox.active=1 AND ox.manager_id='".$id."' AND ox.consumer_id=o.consumer_id
 						 GROUP BY(ox.consumer_id)),0)";
 			 $array[$sql]="Total";
@@ -907,8 +907,8 @@ class ERPStoresManagersOperationsController extends Controller
 																																		LEFT JOIN erpstores_managers_consumers c ON c.id=o.consumer_id
 																																		LEFT JOIN globale_users u ON u.id=o.agent_id
 																																		LEFT JOIN erpstores_managers_operations_lines l ON l.operation_id=o.id
-																																		LEFT JOIN erpoffer_prices of ON of.id=l.product_id AND of.customer_id=m.customer_id
-																																		LEFT JOIN erpproduct_prices p ON p.id=l.product_id',
+																																		LEFT JOIN erpoffer_prices of ON of.product_id=l.product_id AND of.customer_id=m.customer_id
+																																		LEFT JOIN erpproduct_prices p ON p.product_id=l.product_id',
 																																		'o.active=1 AND o.manager_id='.$id.'
 																																		GROUP BY(o.consumer_id)'
 																																		);
@@ -977,8 +977,8 @@ class ERPStoresManagersOperationsController extends Controller
 					 FROM erpstores_managers_operations_lines lx
 					 LEFT JOIN erpstores_managers_operations ox ON ox.id=lx.operation_id
 					 LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
-					 LEFT JOIN erpoffer_prices ofx ON ofx.id=lx.product_id AND ofx.customer_id=mx.customer_id
-					 LEFT JOIN erpproduct_prices px ON px.id=lx.product_id
+					 LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
+					 LEFT JOIN erpproduct_prices px ON px.product_id=lx.product_id
 					 LEFT JOIN erpstores sx ON sx.id=ox.store_id
 					 WHERE ox.active=1 AND ox.manager_id=".$id." AND ox.DATE >= '".$start."' AND ox.DATE<='".$end."' AND ox.store_id='".$store."' AND lx.product_id=l.product_id
 					 GROUP BY (lx.product_id)),0)";
@@ -990,8 +990,8 @@ class ERPStoresManagersOperationsController extends Controller
 					 FROM erpstores_managers_operations_lines lx
 					 LEFT JOIN erpstores_managers_operations ox ON ox.id=lx.operation_id
 					 LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
-					 LEFT JOIN erpoffer_prices ofx ON ofx.id=lx.product_id AND ofx.customer_id=mx.customer_id
-					 LEFT JOIN erpproduct_prices px ON px.id=lx.product_id
+					 LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
+					 LEFT JOIN erpproduct_prices px ON px.product_id=lx.product_id
 					 LEFT JOIN erpstores sx ON sx.id=ox.store_id
 					 WHERE ox.active=1 AND ox.manager_id=".$id." AND ox.DATE >= '".$thismonth->format("Y-m-d")."' AND ox.DATE<='".$today->format("Y-m-d")."' AND ox.store_id='".$store."'  AND lx.product_id=l.product_id
 					 GROUP BY (lx.product_id)),0)";
@@ -1004,8 +1004,8 @@ class ERPStoresManagersOperationsController extends Controller
 						 FROM erpstores_managers_operations_lines lx
 						 LEFT JOIN erpstores_managers_operations ox ON ox.id=lx.operation_id
 						 LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
-						 LEFT JOIN erpoffer_prices ofx ON ofx.id=lx.product_id AND ofx.customer_id=mx.customer_id
-						 LEFT JOIN erpproduct_prices px ON px.id=lx.product_id
+						 LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
+						 LEFT JOIN erpproduct_prices px ON px.product_id=lx.product_id
 						 LEFT JOIN erpstores sx ON sx.id=ox.store_id
 						 WHERE ox.active=1 AND ox.manager_id=".$id." AND ox.DATE >= '".$months_count->format("Y-m-d")."' AND ox.DATE<='".$months_count_next->format("Y-m-d")."' AND ox.store_id='".$store."'  AND lx.product_id=l.product_id
 						 GROUP BY (lx.product_id)),0)";
@@ -1027,8 +1027,8 @@ class ERPStoresManagersOperationsController extends Controller
 					 FROM erpstores_managers_operations_lines lx
 					 LEFT JOIN erpstores_managers_operations ox ON ox.id=lx.operation_id
 					 LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
-					 LEFT JOIN erpoffer_prices ofx ON ofx.id=lx.product_id AND ofx.customer_id=mx.customer_id
-					 LEFT JOIN erpproduct_prices px ON px.id=lx.product_id
+					 LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
+					 LEFT JOIN erpproduct_prices px ON px.product_id=lx.product_id
 					 LEFT JOIN erpstores sx ON sx.id=ox.store_id
 					 WHERE ox.active=1 AND ox.manager_id=".$id." AND ox.DATE >= '".$thisyear->format("Y-m-d")."' AND ox.DATE<='".$today->format("Y-m-d")."' AND ox.store_id='".$store."'  AND lx.product_id=l.product_id
 					 GROUP BY (lx.product_id)),0)";
@@ -1042,8 +1042,8 @@ class ERPStoresManagersOperationsController extends Controller
 						 FROM erpstores_managers_operations_lines lx
 						 LEFT JOIN erpstores_managers_operations ox ON ox.id=lx.operation_id
 						 LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
-						 LEFT JOIN erpoffer_prices ofx ON ofx.id=lx.product_id AND ofx.customer_id=mx.customer_id
-						 LEFT JOIN erpproduct_prices px ON px.id=lx.product_id
+						 LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
+						 LEFT JOIN erpproduct_prices px ON px.product_id=lx.product_id
 						 LEFT JOIN erpstores sx ON sx.id=ox.store_id
 						 WHERE ox.active=1 AND ox.manager_id=".$id." AND ox.DATE >= '".$lastyear->format("Y-m-d")."' AND ox.DATE<='".$thisyear->format("Y-m-d")."' AND ox.store_id='".$store."'  AND lx.product_id=l.product_id
 						 GROUP BY (lx.product_id)),0)";
@@ -1067,8 +1067,8 @@ class ERPStoresManagersOperationsController extends Controller
 					 FROM erpstores_managers_operations_lines lx
 					 LEFT JOIN erpstores_managers_operations ox ON ox.id=lx.operation_id
 					 LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
-					 LEFT JOIN erpoffer_prices ofx ON ofx.id=lx.product_id AND ofx.customer_id=mx.customer_id
-					 LEFT JOIN erpproduct_prices px ON px.id=lx.product_id
+					 LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
+					 LEFT JOIN erpproduct_prices px ON px.product_id=lx.product_id
 					 LEFT JOIN erpstores sx ON sx.id=ox.store_id
 					 WHERE ox.active=1 AND ox.manager_id=".$id." AND ox.store_id='".$store."' AND lx.product_id=l.product_id
 					 GROUP BY (lx.product_id)),0)";
@@ -1079,8 +1079,8 @@ class ERPStoresManagersOperationsController extends Controller
 																																	'erpstores_managers_operations_lines l
 																																	LEFT JOIN erpstores_managers_operations o ON o.id=l.operation_id
 																																	LEFT JOIN erpstores_managers m ON m.id=o.manager_id
-																																	LEFT JOIN erpoffer_prices of ON of.id=l.product_id AND of.customer_id=m.customer_id
-																																	LEFT JOIN erpproduct_prices p ON p.id=l.product_id
+																																	LEFT JOIN erpoffer_prices of ON of.product_id=l.product_id AND of.customer_id=m.customer_id
+																																	LEFT JOIN erpproduct_prices p ON p.product_id=l.product_id
 																																	LEFT JOIN erpproducts pr ON pr.id=p.product_id',
 																																	'o.active=1 AND o.manager_id='.$id.' AND o.store_id='.$store.'
 																																	GROUP BY (l.product_id)',null
@@ -1094,8 +1094,8 @@ class ERPStoresManagersOperationsController extends Controller
 						 FROM erpstores_managers_operations_lines lx
 						 LEFT JOIN erpstores_managers_operations ox ON ox.id=lx.operation_id
 						 LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
-						 LEFT JOIN erpoffer_prices ofx ON ofx.id=lx.product_id AND ofx.customer_id=mx.customer_id
-						 LEFT JOIN erpproduct_prices px ON px.id=lx.product_id
+						 LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
+						 LEFT JOIN erpproduct_prices px ON px.product_id=lx.product_id
 						 LEFT JOIN erpstores sx ON sx.id=ox.store_id
 						 WHERE ox.active=1 AND ox.manager_id=".$id." AND ox.DATE >= '".$start."' AND ox.DATE<='".$end."' AND lx.product_id=l.product_id
 						 GROUP BY (lx.product_id)),0)";
@@ -1107,8 +1107,8 @@ class ERPStoresManagersOperationsController extends Controller
 						 FROM erpstores_managers_operations_lines lx
 						 LEFT JOIN erpstores_managers_operations ox ON ox.id=lx.operation_id
 						 LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
-						 LEFT JOIN erpoffer_prices ofx ON ofx.id=lx.product_id AND ofx.customer_id=mx.customer_id
-						 LEFT JOIN erpproduct_prices px ON px.id=lx.product_id
+						 LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
+						 LEFT JOIN erpproduct_prices px ON px.product_id=lx.product_id
 						 LEFT JOIN erpstores sx ON sx.id=ox.store_id
 						 WHERE ox.active=1 AND ox.manager_id=".$id." AND ox.DATE >= '".$thismonth->format("Y-m-d")."' AND ox.DATE<='".$today->format("Y-m-d")."' AND lx.product_id=l.product_id
 						 GROUP BY (lx.product_id)),0)";
@@ -1121,8 +1121,8 @@ class ERPStoresManagersOperationsController extends Controller
 							 FROM erpstores_managers_operations_lines lx
 							 LEFT JOIN erpstores_managers_operations ox ON ox.id=lx.operation_id
 							 LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
-							 LEFT JOIN erpoffer_prices ofx ON ofx.id=lx.product_id AND ofx.customer_id=mx.customer_id
-							 LEFT JOIN erpproduct_prices px ON px.id=lx.product_id
+							 LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
+							 LEFT JOIN erpproduct_prices px ON px.product_id=lx.product_id
 							 LEFT JOIN erpstores sx ON sx.id=ox.store_id
 							 WHERE ox.active=1 AND ox.manager_id=".$id." AND ox.DATE >= '".$months_count->format("Y-m-d")."' AND ox.DATE<='".$months_count_next->format("Y-m-d")."' AND lx.product_id=l.product_id
 							 GROUP BY (lx.product_id)),0)";
@@ -1144,8 +1144,8 @@ class ERPStoresManagersOperationsController extends Controller
 						 FROM erpstores_managers_operations_lines lx
 						 LEFT JOIN erpstores_managers_operations ox ON ox.id=lx.operation_id
 						 LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
-						 LEFT JOIN erpoffer_prices ofx ON ofx.id=lx.product_id AND ofx.customer_id=mx.customer_id
-						 LEFT JOIN erpproduct_prices px ON px.id=lx.product_id
+						 LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
+						 LEFT JOIN erpproduct_prices px ON px.product_id=lx.product_id
 						 LEFT JOIN erpstores sx ON sx.id=ox.store_id
 						 WHERE ox.active=1 AND ox.manager_id=".$id." AND ox.DATE >= '".$thisyear->format("Y-m-d")."' AND ox.DATE<='".$today->format("Y-m-d")."' AND lx.product_id=l.product_id
 						 GROUP BY (lx.product_id)),0)";
@@ -1159,8 +1159,8 @@ class ERPStoresManagersOperationsController extends Controller
 							 FROM erpstores_managers_operations_lines lx
 							 LEFT JOIN erpstores_managers_operations ox ON ox.id=lx.operation_id
 							 LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
-							 LEFT JOIN erpoffer_prices ofx ON ofx.id=lx.product_id AND ofx.customer_id=mx.customer_id
-							 LEFT JOIN erpproduct_prices px ON px.id=lx.product_id
+							 LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
+							 LEFT JOIN erpproduct_prices px ON px.product_id=lx.product_id
 							 LEFT JOIN erpstores sx ON sx.id=ox.store_id
 							 WHERE ox.active=1 AND ox.manager_id=".$id." AND ox.DATE >= '".$lastyear->format("Y-m-d")."' AND ox.DATE<='".$thisyear->format("Y-m-d")."' AND lx.product_id=l.product_id
 							 GROUP BY (lx.product_id)),0)";
@@ -1184,8 +1184,8 @@ class ERPStoresManagersOperationsController extends Controller
 						 FROM erpstores_managers_operations_lines lx
 						 LEFT JOIN erpstores_managers_operations ox ON ox.id=lx.operation_id
 						 LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
-						 LEFT JOIN erpoffer_prices ofx ON ofx.id=lx.product_id AND ofx.customer_id=mx.customer_id
-						 LEFT JOIN erpproduct_prices px ON px.id=lx.product_id
+						 LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
+						 LEFT JOIN erpproduct_prices px ON px.product_id=lx.product_id
 						 LEFT JOIN erpstores sx ON sx.id=ox.store_id
 						 WHERE ox.active=1 AND ox.manager_id=".$id." AND lx.product_id=l.product_id
 						 GROUP BY (lx.product_id)),0)";
@@ -1195,8 +1195,8 @@ class ERPStoresManagersOperationsController extends Controller
 																																		'erpstores_managers_operations_lines l
 																																		LEFT JOIN erpstores_managers_operations o ON o.id=l.operation_id
 																																		LEFT JOIN erpstores_managers m ON m.id=o.manager_id
-																																		LEFT JOIN erpoffer_prices of ON of.id=l.product_id AND of.customer_id=m.customer_id
-																																		LEFT JOIN erpproduct_prices p ON p.id=l.product_id
+																																		LEFT JOIN erpoffer_prices of ON of.product_id=l.product_id AND of.customer_id=m.customer_id
+																																		LEFT JOIN erpproduct_prices p ON p.product_id=l.product_id
 																																		LEFT JOIN erpproducts pr ON pr.id=p.product_id',
 																																		'o.active=1 AND o.manager_id='.$id.'
 																																		GROUP BY (l.product_id)',null
@@ -1254,8 +1254,8 @@ class ERPStoresManagersOperationsController extends Controller
 																																			 'erpstores_managers_operations_lines l
 																																			 LEFT JOIN erpstores_managers_operations o ON o.id=l.operation_id
 																																			 LEFT JOIN erpstores_managers m ON m.id=o.manager_id
-																																			 LEFT JOIN erpoffer_prices of ON of.id=l.product_id AND of.customer_id=m.customer_id
- 																																			 LEFT JOIN erpproduct_prices p ON p.id=l.product_id
+																																			 LEFT JOIN erpoffer_prices of ON of.product_id=l.product_id AND of.customer_id=m.customer_id
+ 																																			 LEFT JOIN erpproduct_prices p ON p.product_id=l.product_id
 																																			 LEFT JOIN erpstores s ON s.id=o.store_id',
 																																			 'o.active=1 AND o.consumer_id='.$consumerid.' AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'" AND o.store_id='.$store,null);
 					 }
@@ -1264,8 +1264,8 @@ class ERPStoresManagersOperationsController extends Controller
 																																				 'erpstores_managers_operations_lines l
 																																				 LEFT JOIN erpstores_managers_operations o ON o.id=l.operation_id
 																																				 LEFT JOIN erpstores_managers m ON m.id=o.manager_id
-																																				 LEFT JOIN erpoffer_prices of ON of.id=l.product_id AND of.customer_id=m.customer_id
-																																				 LEFT JOIN erpproduct_prices p ON p.id=l.product_id
+																																				 LEFT JOIN erpoffer_prices of ON of.product_id=l.product_id AND of.customer_id=m.customer_id
+																																				 LEFT JOIN erpproduct_prices p ON p.product_id=l.product_id
 																																				 LEFT JOIN erpstores s ON s.id=o.store_id',
 																																				 'o.active=1 AND o.consumer_id='.$consumerid.' AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'"',null);
 
@@ -1279,8 +1279,8 @@ class ERPStoresManagersOperationsController extends Controller
 																																		'erpstores_managers_operations_lines l
 																																		LEFT JOIN erpstores_managers_operations o ON o.id=l.operation_id
 																																		LEFT JOIN erpstores_managers m ON m.id=o.manager_id
-																																		LEFT JOIN erpoffer_prices of ON of.id=l.product_id AND of.customer_id=m.customer_id
-																																		LEFT JOIN erpproduct_prices p ON p.id=l.product_id
+																																		LEFT JOIN erpoffer_prices of ON of.product_id=l.product_id AND of.customer_id=m.customer_id
+																																		LEFT JOIN erpproduct_prices p ON p.product_id=l.product_id
 																																		LEFT JOIN erpstores s ON s.id=o.store_id',
 																																		'o.active=1 AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'" AND o.store_id='.$store,null);
 				}
@@ -1289,8 +1289,8 @@ class ERPStoresManagersOperationsController extends Controller
 																																			'erpstores_managers_operations_lines l
 																																			LEFT JOIN erpstores_managers_operations o ON o.id=l.operation_id
 																																			LEFT JOIN erpstores_managers m ON m.id=o.manager_id
-																																			LEFT JOIN erpoffer_prices of ON of.id=l.product_id AND of.customer_id=m.customer_id
-																																			LEFT JOIN erpproduct_prices p ON p.id=l.product_id
+																																			LEFT JOIN erpoffer_prices of ON of.product_id=l.product_id AND of.customer_id=m.customer_id
+																																			LEFT JOIN erpproduct_prices p ON p.product_id=l.product_id
 																																			LEFT JOIN erpstores s ON s.id=o.store_id',
 																																			'o.active=1 AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'"',null);
 
@@ -1344,8 +1344,8 @@ class ERPStoresManagersOperationsController extends Controller
 																																				LEFT JOIN erpstores_managers_operations o ON o.id=l.operation_id
 																																				LEFT JOIN erpstores_managers_consumers c ON c.id=o.consumer_id
 																																				LEFT JOIN erpstores_managers m ON m.id=o.manager_id
-																																				LEFT JOIN erpoffer_prices of ON of.id=l.product_id AND of.customer_id=m.customer_id
-																																				LEFT JOIN erpproduct_prices p ON p.id=l.product_id
+																																				LEFT JOIN erpoffer_prices of ON of.product_id=l.product_id AND of.customer_id=m.customer_id
+																																				LEFT JOIN erpproduct_prices p ON p.product_id=l.product_id
 																																				LEFT JOIN erpstores s ON s.id=o.store_id',
 																																				'o.active=1 AND l.product_id='.$productid.' AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'" AND o.store_id='.$store,null);
 						}
@@ -1355,8 +1355,8 @@ class ERPStoresManagersOperationsController extends Controller
 																																					LEFT JOIN erpstores_managers_operations o ON o.id=l.operation_id
 																																					LEFT JOIN erpstores_managers_consumers c ON c.id=o.consumer_id
 																																					LEFT JOIN erpstores_managers m ON m.id=o.manager_id
-																																					LEFT JOIN erpoffer_prices of ON of.id=l.product_id AND of.customer_id=m.customer_id
-																																					 LEFT JOIN erpproduct_prices p ON p.id=l.product_id
+																																					LEFT JOIN erpoffer_prices of ON of.product_id=l.product_id AND of.customer_id=m.customer_id
+																																					 LEFT JOIN erpproduct_prices p ON p.product_id=l.product_id
 																																					LEFT JOIN erpstores s ON s.id=o.store_id',
 																																					'o.active=1 AND l.product_id='.$productid.' AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'"',null);
 
@@ -1370,8 +1370,8 @@ class ERPStoresManagersOperationsController extends Controller
 																																		 LEFT JOIN erpstores_managers_operations o ON o.id=l.operation_id
 																																		 LEFT JOIN erpstores_managers_consumers c ON c.id=o.consumer_id
 																																		 LEFT JOIN erpstores_managers m ON m.id=o.manager_id
-																																		 LEFT JOIN erpoffer_prices of ON of.id=l.product_id AND of.customer_id=m.customer_id
-																																		 LEFT JOIN erpproduct_prices p ON p.id=l.product_id
+																																		 LEFT JOIN erpoffer_prices of ON of.product_id=l.product_id AND of.customer_id=m.customer_id
+																																		 LEFT JOIN erpproduct_prices p ON p.product_id=l.product_id
 																																		 LEFT JOIN erpstores s ON s.id=o.store_id',
 																																		 'o.active=1 AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'" AND o.store_id='.$store,null);
 				 }
@@ -1381,8 +1381,8 @@ class ERPStoresManagersOperationsController extends Controller
 																																			 LEFT JOIN erpstores_managers_operations o ON o.id=l.operation_id
 																																			 LEFT JOIN erpstores_managers_consumers c ON c.id=o.consumer_id
 																																			 LEFT JOIN erpstores_managers m ON m.id=o.manager_id
-																																			 LEFT JOIN erpoffer_prices of ON of.id=l.product_id AND of.customer_id=m.customer_id
-																																			 LEFT JOIN erpproduct_prices p ON p.id=l.product_id
+																																			 LEFT JOIN erpoffer_prices of ON of.product_id=l.product_id AND of.customer_id=m.customer_id
+																																			 LEFT JOIN erpproduct_prices p ON p.product_id=l.product_id
 																																			 LEFT JOIN erpstores s ON s.id=o.store_id',
 																																			 'o.active=1 AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'"',null);
 
