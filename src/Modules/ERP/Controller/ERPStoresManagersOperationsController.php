@@ -465,8 +465,7 @@ class ERPStoresManagersOperationsController extends Controller
 			 $listOperationsLinesReports = new ERPStoresManagersOperationsLinesUtils();
 
 			$today=new \Datetime('NOW');
-			$yesterday=new \Datetime('NOW');
-			$yesterday->modify('-1 day');
+
 
 			$consumeroperationslist=$this->createConsumerOperationsList($id);
 			$productslist=$this->createProductsList($id);
@@ -480,7 +479,7 @@ class ERPStoresManagersOperationsController extends Controller
 						 'userData' => $userdata,
 						 'id' => $id,
 						 'stores' => $stores,
-						 'datefrom' => $yesterday->format('d/m/Y'),
+						 'datefrom' => $today->format('d/m/Y'),
 						 'dateto' => $today->format('d/m/Y'),
 						/*'consumersoperationslist' => $listConsumersOperationsReports->formatConsumersReportsList($id,null,null,null),
 						 'productslist' => $listOperationsLinesReports->formatProductsReportsList($id,null,null,null),*/
@@ -542,8 +541,7 @@ class ERPStoresManagersOperationsController extends Controller
 			 //$today->format('Y-m-d');
 
 			 $today=new \Datetime('NOW');
-			 $yesterday=new \Datetime('NOW');
-			 $yesterday->modify('-1 day');
+
 
 			 $consumeroperationslist=$this->createConsumerOperationsList($id);
 			 $productslist=$this->createProductsList($id);
@@ -560,7 +558,7 @@ class ERPStoresManagersOperationsController extends Controller
 						 'userData' => $userdata,
 						 'id' => $id,
 						 'stores' => $stores,
-						 'datefrom' => $yesterday->format('d/m/Y'),
+						 'datefrom' => $today->format('d/m/Y'),
 						 'dateto' => $today->format('d/m/Y'),
 						 /*'consumersoperationslist' => $listConsumersOperationsReports->formatConsumersReportsList($id,null,null,null),*/
 						 'consumersoperationslist' => $consumeroperationslist,
@@ -641,16 +639,16 @@ class ERPStoresManagersOperationsController extends Controller
 			$datefrom=date_create_from_format('d/m/Y',$start);
 			$end=	$request->query->get("dateto",$request->request->get("dateto"));
 			$dateto=date_create_from_format('d/m/Y',$end);
-			if($datefrom)	$start=$datefrom->format("Y-m-d");
+			if($datefrom)	$start=$datefrom->format("Y-m-d 00:00:00");
 			else{
 				 $start=new \Datetime();
 				 $start->setTimestamp(0);
-				 $start=$start->format("Y-m-d");
+				 $start=$start->format("Y-m-d 00:00:00");
 			}
-			if($dateto)	$end=$dateto->format("Y-m-d");
+			if($dateto)	$end=$dateto->format("Y-m-d 23:59:59");
 			else{
 				 $end=new \Datetime();
-				 $end=$end->format("Y-m-d");
+				 $end=$end->format("Y-m-d 23:59:59");
 			 }
 
 		  $array=['o.consumer_id'=>'id','concat(u.name," ",IFNULL(u.lastname,""))'=>'agent__name_o_agent__lastname','concat(c.name," ",c.lastname)'=>'consumer__name_o_consumer__lastname','c.idcard'=>'consumer__idcard','c.code2'=>'consumer__code2'];
@@ -940,16 +938,16 @@ class ERPStoresManagersOperationsController extends Controller
 			$datefrom=date_create_from_format('d/m/Y',$start);
 			$end=	$request->query->get("dateto",$request->request->get("dateto"));
 			$dateto=date_create_from_format('d/m/Y',$end);
-			if($datefrom)	$start=$datefrom->format("Y-m-d");
+			if($datefrom)	$start=$datefrom->format("Y-m-d 00:00:00");
 			else{
 				 $start=new \Datetime();
 				 $start->setTimestamp(0);
-				 $start=$start->format("Y-m-d");
+				 $start=$start->format("Y-m-d 00:00:00");
 			}
-			if($dateto)	$end=$dateto->format("Y-m-d");
+			if($dateto)	$end=$dateto->format("Y-m-d 23:59:59");
 			else{
 				 $end=new \Datetime();
-				 $end=$end->format("Y-m-d");
+				 $end=$end->format("Y-m-d 23:59:59");
 			 }
 
 
