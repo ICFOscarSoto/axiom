@@ -1413,8 +1413,8 @@ class ERPStoresManagersOperationsController extends Controller
 				$manager=$request->query->get("manager");
 
 				$repository=$this->getDoctrine()->getRepository($this->class);
-				if($store=="-1") $array_consumers=$repository->getOperationsByConsumer($manager,$datefrom,$dateto,null);
-				else $array_consumers=$repository->getOperationsByConsumer($manager,$datefrom,$dateto,$store);
+				if($store=="-1") $array_consumers=$repository->getFullOperationsByConsumer($manager,$datefrom,$dateto,null);
+				else $array_consumers=$repository->getFullOperationsByConsumer($manager,$datefrom,$dateto,$store);
 				$result=$this->csvConsumerOperations($array_consumers,$template);
 				//dump($result);
 			  return $result;
