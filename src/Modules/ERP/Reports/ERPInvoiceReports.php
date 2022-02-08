@@ -46,13 +46,13 @@ class ERPInvoiceReports
     $this->pdf->Cell(34,4,utf8_decode('IMPORTE'),'',0,'C',true);
     $this->pdf->Cell(33,4,utf8_decode('DTO. P.P.'),'',0,'C',true);
     $this->pdf->Cell(35,4,utf8_decode('BASE IMPONIBLE'),'',0,'C',true);
-    $this->pdf->Cell(18,4,utf8_decode('% IVA'),'',0,'C',true);
-    $this->pdf->Cell(37,4,utf8_decode('CTA. IVA'),'',0,'C',true);
+    $typeVat=$invoice['typevat']=='IGIC'?'IGIC':'IVA';
+    $this->pdf->Cell(18,4,utf8_decode('% '.$typeVat),'',0,'C',true);
+    $this->pdf->Cell(37,4,utf8_decode('CTA. '.$typeVat),'',0,'C',true);
     /*$this->pdf->Cell(31,4,utf8_decode('REC. EQUIVALENCIA'),'',0,'C',true);*/
     $this->pdf->Cell(33,4,utf8_decode('TOTAL'),'',0,'C',true);
     $this->pdf->Ln(4.1);
     $this->pdf->SetX(10);
-    //$pdf->SetFillColor(248, 250, 255);
     $this->pdf->SetFillColor(248, 250, 255);
     $this->pdf->SetDrawColor(248, 250, 255);
     $this->pdf->setTextColor(0,0,0);
@@ -66,7 +66,6 @@ class ERPInvoiceReports
     }
     $this->pdf->Cell(18,8,utf8_decode($vat_string),'TB',0,'C',false);
     $this->pdf->Cell(37,8,utf8_decode(number_format($invoice['vattotal'],2,',','.').json_decode('"\u0080"')),'TB',0,'C',true);
-    /*$this->pdf->Cell(31,8,utf8_decode(''),'TB',0,'C',false);*/
     $this->pdf->Cell(33,8,utf8_decode(number_format($invoice['total'],2,',','.').json_decode('"\u0080"')),'TB',0,'C',true);
     $this->pdf->Ln(12);
     $this->pdf->SetX(10);
