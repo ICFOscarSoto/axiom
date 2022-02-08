@@ -67,18 +67,18 @@ class ERPStoresManagersOperationsRepository extends ServiceEntityRepository
       {
 
 
-      if($start) $date_start=$start->format("Y-m-d");
+      if($start) $date_start=$start->format("Y-m-d 00:00:00");
       else{
         $date_start=new \Datetime();
         $date_start->setTimestamp(0);
-        $date_start=$date_start->format("Y-m-d");
+        $date_start=$date_start->format("Y-m-d 00:00:00");
 
       }
 
-      if($end) $date_end=$end->format("Y-m-d");
+      if($end) $date_end=$end->format("Y-m-d 23:59:59");
       else {
         $date_end=new \Datetime();
-        $date_end=$date_end->format("Y-m-d");
+        $date_end=$date_end->format("Y-m-d 23:59:59");
       }
 
 
@@ -144,19 +144,19 @@ class ERPStoresManagersOperationsRepository extends ServiceEntityRepository
     $lastyear->modify('-1 year');
 
 
-    if($start) $date_start=$start->format("Y-m-d");
+    if($start) $date_start=$start->format("Y-m-d 00:00:00");
     else{
       $date_start=new \Datetime();
       $date_start->setTimestamp(0);
-      $date_start=$date_start->format("Y-m-d");
+      $date_start=$date_start->format("Y-m-d 00:00:00");
 
     }
 
 
-    if($end) $date_end=$end->format("Y-m-d");
+    if($end) $date_end=$end->format("Y-m-d 23:59:59");
     else {
       $date_end=new \Datetime();
-      $date_end=$date_end->format("Y-m-d");
+      $date_end=$date_end->format("Y-m-d 23:59:59");
     }
 
 
