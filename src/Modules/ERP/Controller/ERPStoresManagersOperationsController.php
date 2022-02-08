@@ -1406,31 +1406,26 @@ class ERPStoresManagersOperationsController extends Controller
 				$template=dirname(__FILE__)."/../Forms/ConsumerOperations.json";
 
 				$start=$request->query->get("start");
+				$datefrom=date_create_from_format('d/m/Y',$start);
 				$end=$request->query->get("end");
-				$labels=$request->query->get("labels");
-				$data=$request->query->get("data");
+				$dateto=date_create_from_format('d/m/Y',$end);
+				$store=$request->query->get("store");
+				$manager=$request->query->get("manager");
 
-				$labels_array=explode(",",$labels);
-				$data_array=explode(",",$data);
-				$count=sizeof($labels_array);
-
-				$result_array=Array();
-				for($i=0;$i<$count;$i++){
-					$item["trabajador"]=$labels_array[$i];
-					$item["Operaciones"]=$data_array[$i];
-					$result_array[]=$item;
-				}
-
-
-				$result=$this->csvConsumerOperations($result_array,$template);
-				return $result;
+				$repository=$this->getDoctrine()->getRepository($this->class);
+				if($store=="-1") $array_consumers=$repository->getOperationsByConsumer($manager,$datefrom,$dateto,null);
+				else $array_consumers=$repository->getOperationsByConsumer($manager,$datefrom,$dateto,$store);
+				$result=$this->csvConsumerOperations($array_consumers,$template);
+				//dump($result);
+			  return $result;
+			//	return new JsonResponse(["result"=>1]);
 
 			}
 
 
 			public function csvConsumerOperations($list, $template){
 				$this->template=$template;
-				$filename='Operaciones.csv';
+				$filename='Informe_consumidores.csv';
 				$array=$list;
 				//exclude tags column, last
 				$key='_tags';

@@ -355,9 +355,8 @@ function getData(){
 
 
 $('body').on('click', "[id=consumeroperations-export]", function(e) {
-	labels=ConsumerOperationsgraphData.labels;
-	data=ConsumerOperationsData.data;
-	var win = window.open("/api/ERP/storesmanagers/operations/exportconsumeroperations?start="+encodeURI($("#date-from").val())+"&end="+encodeURI($("#date-to").val())+"&labels="+encodeURI(labels)+"&data="+encodeURI(data));
+	id= {{ id }};
+	var win = window.open("/api/ERP/storesmanagers/operations/exportconsumeroperations?start="+encodeURI($("#date-from").val())+"&end="+encodeURI($("#date-to").val())+'&store='+encodeURI($('#stores').val())+'&manager='+encodeURI({{ id }}));
 	win.focus();
 
 });
