@@ -227,7 +227,7 @@ class ERPProducts
         $quantityCampollano=0;
         $stockRepository=$doctrine->getRepository('\App\Modules\ERP\Entity\ERPStocks');
         $stockCampollano=$stockRepository->findStockByProductStore($this->id,1);
-        if ($stockCampollano!=null) $quantityCampollano=$stockCampollano;
+        if ($stockCampollano!=null) $quantityCampollano=$stockCampollano["quantity"];
         return $quantityCampollano;
     }
 
