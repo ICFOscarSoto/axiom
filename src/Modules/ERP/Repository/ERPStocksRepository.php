@@ -130,17 +130,15 @@ class ERPStocksRepository extends ServiceEntityRepository
     }
 
     public function findStockByProductStore($product, $store){
-      $query='SELECT SUM(stk.quantity)
+      $query='SELECT SUM(stk.quantity) as quantity, SUM(stk.pendingreceive) as pendingreceive
       FROM erpstocks stk
       LEFT JOIN erpstore_locations stl
       ON stl.id=stk.storelocation_id
       WHERE stk.product_id='.$product.' AND stl.store_id='.$store.' AND stl.active=1 AND stk.deleted=0';
-      return $this->getEntityManager()->getConnection()->executeQuery($query)->fetchColumn(0);
-
+      return $this->getEntityManager()->getConnection()->executeQuery($query)->fetch();
     }
 
     public function getStocksByProduct($product, $variant, $store){
-
       if($variant==null){
         $query='SELECT stk.quantity as quantity, stl.name as store_location, str.name as store
         FROM erpstocks stk
@@ -162,13 +160,10 @@ class ERPStocksRepository extends ServiceEntityRepository
         WHERE stk.product_id='.$product.' AND stk.productvariant_id='.$variant.' AND stl.store_id='.$store.' AND stk.active=1 AND stk.deleted=0
         AND stl.active=1 AND stl.deleted=0  AND str.active=1 AND str.deleted=0';
         return $this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
-
       }
-
     }
 
     public function getAllStocksByProduct($product, $variant){
-
       if($variant==null){
         $query='SELECT SUM(stk.quantity) AS quantity
         FROM erpstocks stk
@@ -180,20 +175,16 @@ class ERPStocksRepository extends ServiceEntityRepository
         FROM erpstocks stk
         WHERE stk.product_id='.$product.' AND stk.productvariant_id='.$variant.' AND stk.active=1 AND stk.deleted=0';
         return $this->getEntityManager()->getConnection()->executeQuery($query)->fetchColumn(0);
-
       }
-
     }
 
     public function findStockByProductVariantStore($product, $variant, $store){
-      $query='SELECT SUM(stk.quantity) as TOTAL
+      $query='SELECT SUM(stk.quantity) as TOTAL, sum(stk.pengingreceive) as pendingreceive
       FROM erpstocks stk
       LEFT JOIN erpstore_locations stl
       ON stl.id=stk.storelocation_id
       WHERE stk.product_id='.$product.' AND stk.productvariant_id='.$variant.' AND stl.store_id='.$store.' AND stk.active=1 AND stk.deleted=0';
-      return $this->getEntityManager()->getConnection()->executeQuery($query)->fetchColumn(0);
-
-
+      return $this->getEntityManager()->getConnection()->executeQuery($query)->fetch();
     }
 
     public function findLocationsByStoreProduct($store,$product,$variant)
@@ -216,7 +207,6 @@ class ERPStocksRepository extends ServiceEntityRepository
           ON pv.id=s.productvariant_id
           WHERE sl.store_id='.$store.' AND sl.active=1 AND sl.deleted=0 AND s.product_id='.$product.' AND pv.variantvalue_id='.$variant;
           return $this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
-
       }
     }
 }

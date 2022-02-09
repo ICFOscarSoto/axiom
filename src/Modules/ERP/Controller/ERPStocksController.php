@@ -91,14 +91,18 @@ class ERPStocksController extends Controller
 							}
 							$aux2["name"]=$variant["name"];
 							$aux2["type"]=$variant["type"];
-							$aux2["total"]=$stocksRepository->findStockByProductVariantStore($product->getId(),$variant["id"],$store["id"]);
+							$stocks2=$stocksRepository->findStockByProductVariantStore($product->getId(),$variant["id"],$store["id"]);
+							$aux2["total"]=$stocks2["quantity"];
+							$aux2["pendingreceive"]= $stocks2["pendingreceive"];
 							$aux2["locations"]=$item;
 							$item_variants[]=$aux2;
 							$item=[];
 							$aux2=[];
 						}
 						$aux["name"]=$store["name"];
-						$aux["total"]=$stocksRepository->findStockByProductStore($product->getId(),$store["id"]);
+						$stocks=$stocksRepository->findStockByProductStore($product->getId(),$store["id"]);
+						$aux["total"]=$stocks["quantity"];
+						$aux["pendingreceive"]= $stocks["pendingreceive"];
 						$aux["preferential"]=$store["preferential"];
 						$aux["variants"]=$item_variants;
 						$store_locations[]=$aux;
@@ -144,7 +148,9 @@ class ERPStocksController extends Controller
 												//$item["location"]=$item2;
 											}
 								$aux["name"]=$store["name"];
-								$aux["total"]=$stocksRepository->findStockByProductStore($product->getId(),$store["id"]);
+							 	$stocks=$stocksRepository->findStockByProductStore($product->getId(),$store["id"]);
+								$aux["total"]=$stocks["quantity"];
+								$aux["pendingreceive"]= $stocks["pendingreceive"];
 								$aux["preferential"]=$store["preferential"];
 								$aux["locations"]=$item;
 								$store_locations[]=$aux;
