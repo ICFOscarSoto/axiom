@@ -241,7 +241,7 @@ public function getFullOperationsByProduct($manager, $start, $end, $store)
 
       $sql_meses="";
       while($lastmonth->format("Y-m-d")>=$months_count->format("Y-m-d")){
-          $sql_meses=$sql_meses."IFNULL((SELECT IFNULL(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),0)
+          $sql_meses=$sql_meses."IFNULL((SELECT IFNULL(REPLACE(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),'.',','),0)
                FROM erpstores_managers_operations_lines lx
                LEFT JOIN erpstores_managers_operations ox ON ox.id=lx.operation_id
                LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
@@ -259,7 +259,7 @@ public function getFullOperationsByProduct($manager, $start, $end, $store)
       $sql_años="";
       while($cont_años<3){
 
-        $sql_años=$sql_años."IFNULL((SELECT IFNULL(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),0)
+        $sql_años=$sql_años."IFNULL((SELECT IFNULL(REPLACE(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),'.',','),0)
              FROM erpstores_managers_operations_lines lx
              LEFT JOIN erpstores_managers_operations ox ON ox.id=lx.operation_id
              LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
@@ -276,7 +276,7 @@ public function getFullOperationsByProduct($manager, $start, $end, $store)
       }
 
         $query="SELECT l.code,l.name,
-          IFNULL((SELECT IFNULL(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),0)
+          IFNULL((SELECT IFNULL(REPLACE(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),'.',','),0)
   						 FROM erpstores_managers_operations_lines lx
   						 LEFT JOIN erpstores_managers_operations ox ON ox.id=lx.operation_id
   						 LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
@@ -285,7 +285,7 @@ public function getFullOperationsByProduct($manager, $start, $end, $store)
   						 LEFT JOIN erpstores sx ON sx.id=ox.store_id
   						 WHERE ox.active=1 AND ox.manager_id=:MANAGER AND ox.DATE >=:START AND ox.DATE<=:END AND lx.product_id=l.product_id
   						 GROUP BY (lx.product_id)),0) Filtro,
-          IFNULL((SELECT IFNULL(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),0)
+          IFNULL((SELECT IFNULL(REPLACE(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),'.',','),0)
        						 FROM erpstores_managers_operations_lines lx
        						 LEFT JOIN erpstores_managers_operations ox ON ox.id=lx.operation_id
        						 LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
@@ -294,7 +294,7 @@ public function getFullOperationsByProduct($manager, $start, $end, $store)
        						 LEFT JOIN erpstores sx ON sx.id=ox.store_id
        						 WHERE ox.active=1 AND ox.manager_id=:MANAGER AND ox.DATE >= '".$thismonth->format("Y-m-d")."' AND ox.DATE<='".$today->format("Y-m-d")."' AND lx.product_id=l.product_id
        						 GROUP BY (lx.product_id)),0) 'Mes actual',".$sql_meses."
-          IFNULL((SELECT IFNULL(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),0)
+          IFNULL((SELECT IFNULL(REPLACE(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),'.',','),0)
            						 FROM erpstores_managers_operations_lines lx
            						 LEFT JOIN erpstores_managers_operations ox ON ox.id=lx.operation_id
            						 LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
@@ -303,7 +303,7 @@ public function getFullOperationsByProduct($manager, $start, $end, $store)
            						 LEFT JOIN erpstores sx ON sx.id=ox.store_id
            						 WHERE ox.active=1 AND ox.manager_id=:MANAGER AND ox.DATE >= '".$thisyear->format("Y-m-d")."' AND ox.DATE<='".$today->format("Y-m-d")."' AND lx.product_id=l.product_id
            						 GROUP BY (lx.product_id)),0) '".date("Y")."',".$sql_años."
-         IFNULL((SELECT IFNULL(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),0)
+         IFNULL((SELECT IFNULL(REPLACE(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),'.',','),0)
                				 FROM erpstores_managers_operations_lines lx
                				 LEFT JOIN erpstores_managers_operations ox ON ox.id=lx.operation_id
                				 LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
@@ -332,7 +332,7 @@ public function getFullOperationsByProduct($manager, $start, $end, $store)
 
             $sql_meses="";
             while($lastmonth->format("Y-m-d")>=$months_count->format("Y-m-d")){
-                $sql_meses=$sql_meses."IFNULL((SELECT IFNULL(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),0)
+                $sql_meses=$sql_meses."IFNULL((SELECT IFNULL(REPLACE(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),'.',','),0)
                      FROM erpstores_managers_operations_lines lx
                      LEFT JOIN erpstores_managers_operations ox ON ox.id=lx.operation_id
                      LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
@@ -350,7 +350,7 @@ public function getFullOperationsByProduct($manager, $start, $end, $store)
             $sql_años="";
             while($cont_años<3){
 
-              $sql_años=$sql_años."IFNULL((SELECT IFNULL(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),0)
+              $sql_años=$sql_años."IFNULL((SELECT IFNULL(REPLACE(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),'.',','),0)
                    FROM erpstores_managers_operations_lines lx
                    LEFT JOIN erpstores_managers_operations ox ON ox.id=lx.operation_id
                    LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
@@ -367,7 +367,7 @@ public function getFullOperationsByProduct($manager, $start, $end, $store)
             }
 
               $query="SELECT l.code,l.name,
-                IFNULL((SELECT IFNULL(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),0)
+                IFNULL((SELECT IFNULL(REPLACE(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),'.',','),0)
         						 FROM erpstores_managers_operations_lines lx
         						 LEFT JOIN erpstores_managers_operations ox ON ox.id=lx.operation_id
         						 LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
@@ -376,7 +376,7 @@ public function getFullOperationsByProduct($manager, $start, $end, $store)
         						 LEFT JOIN erpstores sx ON sx.id=ox.store_id
         						 WHERE ox.active=1 AND ox.manager_id=:MANAGER AND ox.store_id=:STORE AND ox.DATE >=:START AND ox.DATE<=:END AND lx.product_id=l.product_id
         						 GROUP BY (lx.product_id)),0) Filtro,
-                IFNULL((SELECT IFNULL(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),0)
+                IFNULL((SELECT IFNULL(REPLACE(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),'.',','),0)
              						 FROM erpstores_managers_operations_lines lx
              						 LEFT JOIN erpstores_managers_operations ox ON ox.id=lx.operation_id
              						 LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
@@ -385,7 +385,7 @@ public function getFullOperationsByProduct($manager, $start, $end, $store)
              						 LEFT JOIN erpstores sx ON sx.id=ox.store_id
              						 WHERE ox.active=1 AND ox.manager_id=:MANAGER AND ox.store_id=:STORE AND ox.DATE >= '".$thismonth->format("Y-m-d")."' AND ox.DATE<='".$today->format("Y-m-d")."' AND lx.product_id=l.product_id
              						 GROUP BY (lx.product_id)),0) 'Mes actual',".$sql_meses."
-                IFNULL((SELECT IFNULL(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),0)
+                IFNULL((SELECT IFNULL(REPLACE(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),'.',','),0)
                  						 FROM erpstores_managers_operations_lines lx
                  						 LEFT JOIN erpstores_managers_operations ox ON ox.id=lx.operation_id
                  						 LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
@@ -394,7 +394,7 @@ public function getFullOperationsByProduct($manager, $start, $end, $store)
                  						 LEFT JOIN erpstores sx ON sx.id=ox.store_id
                  						 WHERE ox.active=1 AND ox.manager_id=:MANAGER AND ox.store_id=:STORE AND ox.DATE >= '".$thisyear->format("Y-m-d")."' AND ox.DATE<='".$today->format("Y-m-d")."' AND lx.product_id=l.product_id
                  						 GROUP BY (lx.product_id)),0) '".date("Y")."',".$sql_años."
-               IFNULL((SELECT IFNULL(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),0)
+               IFNULL((SELECT IFNULL(REPLACE(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),'.',','),0)
                      				 FROM erpstores_managers_operations_lines lx
                      				 LEFT JOIN erpstores_managers_operations ox ON ox.id=lx.operation_id
                      				 LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id

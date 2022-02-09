@@ -200,7 +200,7 @@ class ERPStoresManagersOperationsRepository extends ServiceEntityRepository
 
       }
 
-        $query="SELECT c.id, c.NAME, IFNULL(c.lastname,'') lastname,
+        $query="SELECT c.NAME, IFNULL(c.lastname,'') lastname,
         (IFNULL((SELECT IFNULL(REPLACE(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),'.',','),0)
 						 FROM erpstores_managers_operations_lines lx
 						 LEFT JOIN erpstores_managers_operations ox ON ox.id=lx.operation_id
@@ -291,7 +291,7 @@ class ERPStoresManagersOperationsRepository extends ServiceEntityRepository
 
       }
 
-        $query="SELECT c.id, c.NAME, IFNULL(c.lastname,'') lastname,
+        $query="SELECT c.NAME, IFNULL(c.lastname,'') lastname,
         (IFNULL((SELECT IFNULL(REPLACE(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),'.',','),0)
              FROM erpstores_managers_operations_lines lx
              LEFT JOIN erpstores_managers_operations ox ON ox.id=lx.operation_id
