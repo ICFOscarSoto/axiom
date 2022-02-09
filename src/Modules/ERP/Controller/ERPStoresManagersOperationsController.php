@@ -481,8 +481,6 @@ class ERPStoresManagersOperationsController extends Controller
 						 'stores' => $stores,
 						 'datefrom' => $today->format('d/m/Y'),
 						 'dateto' => $today->format('d/m/Y'),
-						/*'consumersoperationslist' => $listConsumersOperationsReports->formatConsumersReportsList($id,null,null,null),
-						 'productslist' => $listOperationsLinesReports->formatProductsReportsList($id,null,null,null),*/
 						 'consumersoperationslist' => $consumeroperationslist,
   					 'productslist' => $productslist,
 						 'detailedconsumerlist'=>	$listOperationsLinesReports->formatConsumersReportsDetailedList(null,null,null,null),
@@ -1470,30 +1468,18 @@ class ERPStoresManagersOperationsController extends Controller
  	 		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
  	 		 $template=dirname(__FILE__)."/../Forms/BestProducts.json";
 
- 	 		 $start=$request->query->get("start");
- 	 		 $end=$request->query->get("end");
- 	 		 $labels=$request->query->get("labels");
- 	 		 $data=$request->query->get("data");
- 			 $codes=$request->query->get("codes");
- 			 $names=$request->query->get("names");
-
- 	 		 $labels_array=explode(",",$labels);
- 	 		 $data_array=explode(",",$data);
- 			 $codes_array=explode(",",$codes);
- 			 $names_array=explode(",",$names);
- 	 		 $count=sizeof($labels_array);
-
- 	 		 $result_array=Array();
- 	 		 for($i=0;$i<$count;$i++){
- 				 $item["Código"]=$codes_array[$i];
- 				 $item["Nombre"]=$names_array[$i];
- 	 			 $item["Producto"]=$labels_array[$i];
- 	 			 $item["Cantidad"]=$data_array[$i];
- 	 		   $result_array[]=$item;
- 	 		 }
+			 $start=$request->query->get("start");
+			 $datefrom=date_create_from_format('d/m/Y',$start);
+			 $end=$request->query->get("end");
+			 $dateto=date_create_from_format('d/m/Y',$end);
+			 $store=$request->query->get("store");
+			 $manager=$request->query->get("manager");
 
 
- 	 		 $result=$this->csvBestProducts($result_array,$template);
+			 $repository=$this->getDoctrine()->getRepository(ERPStoresManagersOperationsLines::class);
+			 if($store=="-1") $array_bestproducts=$repository->getFullOperationsByProduct($manager,$datefrom,$dateto,null);
+			 else $array_bestproducts=$repository->getFullOperationsByProduct($manager,$datefrom,$dateto,$store);
+	 		 $result=$this->csvBestProducts($array_bestproducts,$template);
  	 		 return $result;
 
  	 	 }

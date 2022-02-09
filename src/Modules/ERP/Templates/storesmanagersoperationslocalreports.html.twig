@@ -362,9 +362,10 @@ $('body').on('click', "[id=consumeroperations-export]", function(e) {
 });
 
 $('body').on('click', "[id=bestproducts-export]", function(e) {
-	labels=BestProductgraphData.labels;
-	data=BestProductData.data;
-	var win = window.open("/api/ERP/storesmanagers/operations/exportbestproducts?start="+encodeURI($("#date-from").val())+"&end="+encodeURI($("#date-to").val())+"&labels="+encodeURI(labels)+"&data="+encodeURI(data));
+	id= {{ id }};
+	//labels=BestProductgraphData.labels;
+	//data=BestProductData.data;
+	var win = window.open("/api/ERP/storesmanagers/operations/exportbestproducts?start="+encodeURI($("#date-from").val())+"&end="+encodeURI($("#date-to").val())+'&store='+encodeURI($('#stores').val())+'&manager='+encodeURI({{ id }}));
 	win.focus();
 
 });

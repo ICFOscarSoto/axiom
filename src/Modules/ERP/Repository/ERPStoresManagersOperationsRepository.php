@@ -227,7 +227,7 @@ class ERPStoresManagersOperationsRepository extends ServiceEntityRepository
               						 LEFT JOIN erpproduct_prices px ON px.product_id=lx.product_id
               						 LEFT JOIN erpstores sx ON sx.id=ox.store_id
               						 WHERE ox.active=1 AND ox.manager_id=:MANAGER AND ox.DATE >= '".$thisyear->format("Y-m-d")."' AND ox.DATE<='".$today->format("Y-m-d")."' AND lx.product_id=l.product_id
-              						 GROUP BY (lx.product_id)),0)) 'Año actual',".$sql_años."
+              						 GROUP BY (lx.product_id)),0)) '".date("Y")."',".$sql_años."
         (IFNULL((SELECT IFNULL(REPLACE(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),'.',','),0)
      						 FROM erpstores_managers_operations_lines lx
      						 LEFT JOIN erpstores_managers_operations ox ON ox.id=lx.operation_id
@@ -264,7 +264,7 @@ class ERPStoresManagersOperationsRepository extends ServiceEntityRepository
                LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
                LEFT JOIN erpproduct_prices px ON px.product_id=lx.product_id
                LEFT JOIN erpstores sx ON sx.id=ox.store_id
-               WHERE ox.active=1 AND ox.manager_id=:MANAGER AND ox.DATE >= '".$months_count->format("Y-m-d")."' AND ox.DATE<='".$months_count_next->format("Y-m-d")."' AND lx.product_id=l.product_id AND o.store_id=:STORE
+               WHERE ox.active=1 AND ox.manager_id=:MANAGER AND ox.DATE >= '".$months_count->format("Y-m-d")."' AND ox.DATE<='".$months_count_next->format("Y-m-d")."' AND lx.product_id=l.product_id AND ox.store_id=:STORE
                GROUP BY (lx.product_id)),0)) '".$months_count->format("m")."',";
 
            $months_count->modify('+1 month');
@@ -282,7 +282,7 @@ class ERPStoresManagersOperationsRepository extends ServiceEntityRepository
              LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
              LEFT JOIN erpproduct_prices px ON px.product_id=lx.product_id
              LEFT JOIN erpstores sx ON sx.id=ox.store_id
-             WHERE ox.active=1 AND ox.manager_id=:MANAGER AND ox.DATE >= '".$lastyear->format("Y-m-d")."' AND ox.DATE<='".$thisyear->format("Y-m-d")."' AND lx.product_id=l.product_id AND o.store_id=:STORE
+             WHERE ox.active=1 AND ox.manager_id=:MANAGER AND ox.DATE >= '".$lastyear->format("Y-m-d")."' AND ox.DATE<='".$thisyear->format("Y-m-d")."' AND lx.product_id=l.product_id AND ox.store_id=:STORE
              GROUP BY (lx.product_id)),0) '".$lastyear->format("Y")."',";
 
             $thisyear->modify('-1 year');
@@ -299,7 +299,7 @@ class ERPStoresManagersOperationsRepository extends ServiceEntityRepository
              LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
              LEFT JOIN erpproduct_prices px ON px.product_id=lx.product_id
              LEFT JOIN erpstores sx ON sx.id=ox.store_id
-             WHERE ox.active=1 AND ox.manager_id=:MANAGER AND ox.DATE >= :START AND ox.DATE<=:END AND lx.product_id=l.product_id AND o.store_id=:STORE
+             WHERE ox.active=1 AND ox.manager_id=:MANAGER AND ox.DATE >= :START AND ox.DATE<=:END AND lx.product_id=l.product_id AND ox.store_id=:STORE
              GROUP BY (lx.product_id)),0)) Suma,
         (IFNULL((SELECT IFNULL(REPLACE(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),'.',','),0)
                  FROM erpstores_managers_operations_lines lx
@@ -308,7 +308,7 @@ class ERPStoresManagersOperationsRepository extends ServiceEntityRepository
                  LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
                  LEFT JOIN erpproduct_prices px ON px.product_id=lx.product_id
                  LEFT JOIN erpstores sx ON sx.id=ox.store_id
-                 WHERE ox.active=1 AND ox.manager_id=:MANAGER AND ox.DATE >= '".$thismonth->format("Y-m-d")."' AND ox.DATE<='".$today->format("Y-m-d")."' AND lx.product_id=l.product_id AND o.store_id=:STORE
+                 WHERE ox.active=1 AND ox.manager_id=:MANAGER AND ox.DATE >= '".$thismonth->format("Y-m-d")."' AND ox.DATE<='".$today->format("Y-m-d")."' AND lx.product_id=l.product_id AND ox.store_id=:STORE
                  GROUP BY (lx.product_id)),0)) 'Mes actual',".$sql_meses."
         (IFNULL((SELECT IFNULL(REPLACE(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),'.',','),0)
                            FROM erpstores_managers_operations_lines lx
@@ -317,8 +317,8 @@ class ERPStoresManagersOperationsRepository extends ServiceEntityRepository
                            LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
                            LEFT JOIN erpproduct_prices px ON px.product_id=lx.product_id
                            LEFT JOIN erpstores sx ON sx.id=ox.store_id
-                           WHERE ox.active=1 AND ox.manager_id=:MANAGER AND ox.DATE >= '".$thisyear->format("Y-m-d")."' AND ox.DATE<='".$today->format("Y-m-d")."' AND lx.product_id=l.product_id AND o.store_id=:STORE
-                           GROUP BY (lx.product_id)),0)) 'Año actual',".$sql_años."
+                           WHERE ox.active=1 AND ox.manager_id=:MANAGER AND ox.DATE >= '".$thisyear->format("Y-m-d")."' AND ox.DATE<='".$today->format("Y-m-d")."' AND lx.product_id=l.product_id AND ox.store_id=:STORE
+                           GROUP BY (lx.product_id)),0)) '".date("Y")."',".$sql_años."
         (IFNULL((SELECT IFNULL(REPLACE(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),'.',','),0)
                  FROM erpstores_managers_operations_lines lx
                  LEFT JOIN erpstores_managers_operations ox ON ox.id=lx.operation_id
@@ -391,56 +391,5 @@ class ERPStoresManagersOperationsRepository extends ServiceEntityRepository
       return $result;
 
   }
-/*
-  public function getDetailedOperations($manager, $start, $end, $store)
-  {
-      $date_start=$start->format("Y-m-d 00:00:00");
-      $date_end=$end->format("Y-m-d 23:59:59");
-
-      if($store==null){
-          $query="SELECT l.code, l.name, l.quantity, CONCAT(u.name) agente, CONCAT(c.name, c.lastname) consumidor, s.name almacen, o.date fecha
-                  FROM erpstores_managers_operations_lines l
-                  LEFT JOIN erpstores_managers_operations o
-                  ON o.id=l.operation_id
-                  LEFT JOIN globale_users u
-                  ON u.id=o.agent_id
-                  LEFT JOIN erpstores_managers_consumers c
-                  ON c.id=o.consumer_id
-                  LEFT JOIN erpstores s
-                  ON s.id=o.store_id
-                  WHERE o.active=1 AND o.manager_id=:MANAGER AND DATE(o.date) >= :START AND DATE(o.date)<= :END
-                  ";
-          $params=[ 'MANAGER' => $manager,
-                    'START' => $date_start,
-                    'END' => $date_end
-                   ];
-
-      }
-
-      else{
-
-        $query="SELECT l.code, l.name, l.quantity, CONCAT(u.name) agente, CONCAT(c.name, c.lastname) consumidor, s.name almacen, o.date fecha
-                FROM erpstores_managers_operations_lines l
-                LEFT JOIN erpstores_managers_operations o
-                ON o.id=l.operation_id
-                LEFT JOIN globale_users u
-                ON u.id=o.agent_id
-                LEFT JOIN erpstores_managers_consumers c
-                ON c.id=o.consumer_id
-                LEFT JOIN erpstores s
-                ON s.id=o.store_id
-                WHERE o.active=1 AND o.manager_id=:MANAGER AND DATE(o.date) >= :START AND DATE(o.date)<= :END AND o.store_id=:STORE
-                ";
-        $params=[ 'MANAGER' => $manager,
-                  'START' => $date_start,
-                  'END' => $date_end,
-                  'STORE' => $store
-                 ];
-      }
-
-      $result=$this->getEntityManager()->getConnection()->executeQuery($query,$params)->fetchAll();
-      return $result;
-
-  }*/
 
 }
