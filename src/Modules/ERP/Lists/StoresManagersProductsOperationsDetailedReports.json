@@ -30,7 +30,9 @@
   },
   {
       "name": "price",
-      "caption": "price"
+      "caption": "price",
+      "sum":true,
+      "unity":"€"
   },
     {
       "name": "total",

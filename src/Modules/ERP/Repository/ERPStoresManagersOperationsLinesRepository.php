@@ -89,19 +89,19 @@ class ERPStoresManagersOperationsLinesRepository extends ServiceEntityRepository
 */
 
   public function getBestProducts($manager, $start, $end, $store){
-    if($start) $date_start=$start->format("Y-m-d");
+    if($start) $date_start=$start->format("Y-m-d 00:00:00");
     else{
       $date_start=new \Datetime();
       $date_start->setTimestamp(0);
-      $date_start=$date_start->format("Y-m-d");
+      $date_start=$date_start->format("Y-m-d 00:00:00");
 
     }
 
 
-    if($end)  $date_end=$end->format("Y-m-d");
+    if($end)  $date_end=$end->format("Y-m-d 23:59:00");
     else {
       $date_end=new \Datetime();
-      $date_end=$date_end->format("Y-m-d");
+      $date_end=$date_end->format("Y-m-d 23:59:00");
     }
 
   if($store==null){
@@ -109,8 +109,8 @@ class ERPStoresManagersOperationsLinesRepository extends ServiceEntityRepository
     FROM erpstores_managers_operations_lines l
     LEFT JOIN erpstores_managers_operations o ON l.operation_id=o.id
     LEFT JOIN erpstores_managers m ON m.id=o.manager_id
-    LEFT JOIN erpoffer_prices of ON of.id=l.product_id AND of.customer_id=m.customer_id
-    LEFT JOIN erpproduct_prices p ON p.id=l.product_id
+    LEFT JOIN erpoffer_prices of ON of.product_id=l.product_id AND of.customer_id=m.customer_id
+    LEFT JOIN erpproduct_prices p ON p.product_id=l.product_id
     WHERE o.active=1 AND m.id=:MANAGER AND o.DATE >= :START AND o.DATE<=:END
     GROUP BY(l.code)  ORDER BY total DESC LIMIT 10";
     $params=['MANAGER' => $manager,
@@ -124,8 +124,8 @@ class ERPStoresManagersOperationsLinesRepository extends ServiceEntityRepository
     FROM erpstores_managers_operations_lines l
     LEFT JOIN erpstores_managers_operations o ON l.operation_id=o.id
     LEFT JOIN erpstores_managers m ON m.id=o.manager_id
-    LEFT JOIN erpoffer_prices of ON of.id=l.product_id AND of.customer_id=m.customer_id
-    LEFT JOIN erpproduct_prices p ON p.id=l.product_id
+    LEFT JOIN erpoffer_prices of ON of.product_id=l.product_id AND of.customer_id=m.customer_id
+    LEFT JOIN erpproduct_prices p ON p.product_id=l.product_id
     WHERE o.active=1 AND m.id=:MANAGER AND o.DATE >= :START AND o.DATE<=:END AND o.store_id=:STORE
     GROUP BY(l.code)  ORDER BY total DESC LIMIT 10";
     $params=['MANAGER' => $manager,

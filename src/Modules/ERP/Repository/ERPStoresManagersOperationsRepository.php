@@ -356,10 +356,10 @@ class ERPStoresManagersOperationsRepository extends ServiceEntityRepository
 
   public function getDailyOperations($manager, $start, $end, $store)
   {
-    if($start) $date_start=$start->format("Y-m-d");
+    if($start) $date_start=$start->format("Y-m-d 00:00:00");
     else $date_start=null;
 
-    if($end)  $date_end=$end->format("Y-m-d");
+    if($end)  $date_end=$end->format("Y-m-d 23:59:59");
     else $date_end=null;
 
       if($store==null){
@@ -391,11 +391,11 @@ class ERPStoresManagersOperationsRepository extends ServiceEntityRepository
       return $result;
 
   }
-
+/*
   public function getDetailedOperations($manager, $start, $end, $store)
   {
-      $date_start=$start->format("Y-m-d");
-      $date_end=$end->format("Y-m-d");
+      $date_start=$start->format("Y-m-d 00:00:00");
+      $date_end=$end->format("Y-m-d 23:59:59");
 
       if($store==null){
           $query="SELECT l.code, l.name, l.quantity, CONCAT(u.name) agente, CONCAT(c.name, c.lastname) consumidor, s.name almacen, o.date fecha
@@ -441,6 +441,6 @@ class ERPStoresManagersOperationsRepository extends ServiceEntityRepository
       $result=$this->getEntityManager()->getConnection()->executeQuery($query,$params)->fetchAll();
       return $result;
 
-  }
+  }*/
 
 }
