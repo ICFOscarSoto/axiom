@@ -53,12 +53,13 @@
 							</select>
 						</div>
 					</div>
-				  <div class="col-md-2">
+				  <div class="col-md-3">
 				    <div class="form-group">
 				      <button id="get-reports" type="button" class="btn btn-default btn-icon icon-left" onclick="getData();">Actualizar informes<i class="fa fa-sync"></i></button>
+						<!--	<button id="send-reports" type="button" class="btn btn-default btn-icon icon-left">Enviar<i class="fa fa-envelope" aria-hidden="true"></i></button> -->
 				    </div>
 				  </div>
-        </div>
+				</div>
 				<ul id="tabs-list" class="nav nav-tabs bordered" style="margin-top:0px!important">
 					    <li class="active" id="tab-head-data" style="" attr-id="" attr-name="data">
 					        <a href="#tab-body-consumers" data-toggle="tab">
@@ -201,7 +202,10 @@ var chartConsumerOperationsOptions = {
                     }
 			}
     }]
-  }
+  },
+	responsive: true,
+  maintainAspectRatio: false
+
 };
 
 
@@ -229,7 +233,9 @@ var chartBestProductsOptions = {
                     }
 			}
     }]
-  }
+  },
+	responsive: true,
+	maintainAspectRatio: false
 };
 
 
@@ -431,9 +437,9 @@ $(document).ready(function() {
 
 <script src="{{ url('index') }}js/fileinput.js"></script>
 <script src="{{ url('index') }}js/ol/ol.js"></script>
-	 {{ include('@Globale/bottom.html.twig') }}
-   <link rel="stylesheet" href="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker.min.css">
- 																		<script src="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker.min.js"></script>
- 															<script src="{{ url('index') }}js/jquery.nestable.js"></script>
+{{ include('@Globale/bottom.html.twig') }}
+<link rel="stylesheet" href="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker.min.css">
+<script src="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker.min.js"></script>
+<script src="{{ url('index') }}js/jquery.nestable.js"></script>
 {% endblock %}
 </body>
