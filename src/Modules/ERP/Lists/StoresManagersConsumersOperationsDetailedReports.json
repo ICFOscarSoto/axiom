@@ -4,6 +4,11 @@
       "caption": "id"
   },
   {
+      "name": "consumer__id",
+      "caption": "consumer_id",
+      "class": "hidden"
+  },
+  {
       "name": "date",
       "caption": "date",
       "type": "datetime"
