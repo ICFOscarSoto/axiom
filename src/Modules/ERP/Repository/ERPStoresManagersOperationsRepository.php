@@ -138,6 +138,7 @@ class ERPStoresManagersOperationsRepository extends ServiceEntityRepository
     $months_count_next=new \Datetime('first day of january this year');
     $months_count_next->modify('+1 month');
     $thisyear = new \Datetime('first day of january this year');
+    $thisyearpermanent = new \Datetime('first day of january this year');
     $lastyear = new \Datetime('first day of january this year');
     $lastyear->modify('-1 year');
 
@@ -168,7 +169,6 @@ class ERPStoresManagersOperationsRepository extends ServiceEntityRepository
           FROM erpstores_managers_operations ox
           LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
           LEFT JOIN erpstores_managers_consumers cx ON cx.id=ox.consumer_id
-          LEFT JOIN globale_users ux ON ux.id=ox.agent_id
           LEFT JOIN erpstores_managers_operations_lines lx ON lx.operation_id=ox.id
           LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
           WHERE ox.active=1 AND ox.manager_id=:MANAGER AND ox.DATE >= '".$months_count->format("Y-m-d")."' AND ox.DATE<='".$months_count_next->format("Y-m-d")."' AND ox.consumer_id=o.consumer_id
@@ -186,7 +186,6 @@ class ERPStoresManagersOperationsRepository extends ServiceEntityRepository
         FROM erpstores_managers_operations ox
         LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
         LEFT JOIN erpstores_managers_consumers cx ON cx.id=ox.consumer_id
-        LEFT JOIN globale_users ux ON ux.id=ox.agent_id
         LEFT JOIN erpstores_managers_operations_lines lx ON lx.operation_id=ox.id
         LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
         WHERE ox.active=1 AND ox.manager_id=:MANAGER AND ox.DATE >= '".$lastyear->format("Y-m-d")."' AND ox.DATE<='".$thisyear->format("Y-m-d")."' AND ox.consumer_id=o.consumer_id
@@ -203,7 +202,6 @@ class ERPStoresManagersOperationsRepository extends ServiceEntityRepository
              FROM erpstores_managers_operations ox
              LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
              LEFT JOIN erpstores_managers_consumers cx ON cx.id=ox.consumer_id
-             LEFT JOIN globale_users ux ON ux.id=ox.agent_id
              LEFT JOIN erpstores_managers_operations_lines lx ON lx.operation_id=ox.id
              LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
              WHERE ox.active=1 AND ox.manager_id=:MANAGER AND ox.DATE >= :START AND ox.DATE<=:END AND ox.consumer_id=o.consumer_id
@@ -212,7 +210,6 @@ class ERPStoresManagersOperationsRepository extends ServiceEntityRepository
               FROM erpstores_managers_operations ox
               LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
               LEFT JOIN erpstores_managers_consumers cx ON cx.id=ox.consumer_id
-              LEFT JOIN globale_users ux ON ux.id=ox.agent_id
               LEFT JOIN erpstores_managers_operations_lines lx ON lx.operation_id=ox.id
               LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
               WHERE ox.active=1 AND ox.manager_id=:MANAGER AND ox.DATE >= '".$thismonth->format("Y-m-d")."' AND ox.DATE<='".$today->format("Y-m-d")."' AND ox.consumer_id=o.consumer_id
@@ -221,16 +218,14 @@ class ERPStoresManagersOperationsRepository extends ServiceEntityRepository
               FROM erpstores_managers_operations ox
               LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
               LEFT JOIN erpstores_managers_consumers cx ON cx.id=ox.consumer_id
-              LEFT JOIN globale_users ux ON ux.id=ox.agent_id
               LEFT JOIN erpstores_managers_operations_lines lx ON lx.operation_id=ox.id
               LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
-              WHERE ox.active=1 AND ox.manager_id=:MANAGER AND ox.DATE >= '".$thisyear->format("Y-m-d")."' AND ox.DATE<='".$today->format("Y-m-d")."' AND ox.consumer_id=o.consumer_id
+              WHERE ox.active=1 AND ox.manager_id=:MANAGER AND ox.DATE >= '".$thisyearpermanent->format("Y-m-d")."' AND ox.DATE<='".$today->format("Y-m-d")."' AND ox.consumer_id=o.consumer_id
               GROUP BY(ox.consumer_id)),0)) '".date("Y")."',".$sql_años."
         (IFNULL((SELECT IFNULL(REPLACE(ROUND(SUM(ofx.price*lx.quantity),2),'.',','),0)
               FROM erpstores_managers_operations ox
               LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
               LEFT JOIN erpstores_managers_consumers cx ON cx.id=ox.consumer_id
-              LEFT JOIN globale_users ux ON ux.id=ox.agent_id
               LEFT JOIN erpstores_managers_operations_lines lx ON lx.operation_id=ox.id
               LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
               WHERE ox.active=1 AND ox.manager_id=:MANAGER AND ox.consumer_id=o.consumer_id
@@ -260,7 +255,6 @@ class ERPStoresManagersOperationsRepository extends ServiceEntityRepository
             FROM erpstores_managers_operations ox
             LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
             LEFT JOIN erpstores_managers_consumers cx ON cx.id=ox.consumer_id
-            LEFT JOIN globale_users ux ON ux.id=ox.agent_id
             LEFT JOIN erpstores_managers_operations_lines lx ON lx.operation_id=ox.id
             LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
             WHERE ox.active=1 AND ox.manager_id=:MANAGER AND ox.DATE >= '".$months_count->format("Y-m-d")."' AND ox.DATE<='".$months_count_next->format("Y-m-d")."' AND ox.consumer_id=o.consumer_id AND ox.store_id=:STORE
@@ -278,7 +272,6 @@ class ERPStoresManagersOperationsRepository extends ServiceEntityRepository
           FROM erpstores_managers_operations ox
           LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
           LEFT JOIN erpstores_managers_consumers cx ON cx.id=ox.consumer_id
-          LEFT JOIN globale_users ux ON ux.id=ox.agent_id
           LEFT JOIN erpstores_managers_operations_lines lx ON lx.operation_id=ox.id
           LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
           WHERE ox.active=1 AND ox.manager_id=:MANAGER AND ox.DATE >= '".$lastyear->format("Y-m-d")."' AND ox.DATE<='".$thisyear->format("Y-m-d")."' AND ox.consumer_id=o.consumer_id AND ox.store_id=:STORE
@@ -295,7 +288,6 @@ class ERPStoresManagersOperationsRepository extends ServiceEntityRepository
                FROM erpstores_managers_operations ox
                LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
                LEFT JOIN erpstores_managers_consumers cx ON cx.id=ox.consumer_id
-               LEFT JOIN globale_users ux ON ux.id=ox.agent_id
                LEFT JOIN erpstores_managers_operations_lines lx ON lx.operation_id=ox.id
                LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
                WHERE ox.active=1 AND ox.manager_id=:MANAGER AND ox.DATE >= :START AND ox.DATE<=:END AND ox.consumer_id=o.consumer_id AND ox.store_id=:STORE
@@ -304,7 +296,6 @@ class ERPStoresManagersOperationsRepository extends ServiceEntityRepository
                 FROM erpstores_managers_operations ox
                 LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
                 LEFT JOIN erpstores_managers_consumers cx ON cx.id=ox.consumer_id
-                LEFT JOIN globale_users ux ON ux.id=ox.agent_id
                 LEFT JOIN erpstores_managers_operations_lines lx ON lx.operation_id=ox.id
                 LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
                 WHERE ox.active=1 AND ox.manager_id=:MANAGER AND ox.DATE >= '".$thismonth->format("Y-m-d")."' AND ox.DATE<='".$today->format("Y-m-d")."' AND ox.consumer_id=o.consumer_id AND ox.store_id=:STORE
@@ -313,16 +304,14 @@ class ERPStoresManagersOperationsRepository extends ServiceEntityRepository
                 FROM erpstores_managers_operations ox
                 LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
                 LEFT JOIN erpstores_managers_consumers cx ON cx.id=ox.consumer_id
-                LEFT JOIN globale_users ux ON ux.id=ox.agent_id
                 LEFT JOIN erpstores_managers_operations_lines lx ON lx.operation_id=ox.id
                 LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
-                WHERE ox.active=1 AND ox.manager_id=:MANAGER AND ox.DATE >= '".$thisyear->format("Y-m-d")."' AND ox.DATE<='".$today->format("Y-m-d")."' AND ox.consumer_id=o.consumer_id AND ox.store_id=:STORE
+                WHERE ox.active=1 AND ox.manager_id=:MANAGER AND ox.DATE >= '".$thisyearpermanent->format("Y-m-d")."' AND ox.DATE<='".$today->format("Y-m-d")."' AND ox.consumer_id=o.consumer_id AND ox.store_id=:STORE
                 GROUP BY(ox.consumer_id)),0)) '".date("Y")."',".$sql_años."
           (IFNULL((SELECT IFNULL(REPLACE(ROUND(SUM(ofx.price*lx.quantity),2),'.',','),0)
                 FROM erpstores_managers_operations ox
                 LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
                 LEFT JOIN erpstores_managers_consumers cx ON cx.id=ox.consumer_id
-                LEFT JOIN globale_users ux ON ux.id=ox.agent_id
                 LEFT JOIN erpstores_managers_operations_lines lx ON lx.operation_id=ox.id
                 LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
                 WHERE ox.active=1 AND ox.manager_id=:MANAGER AND ox.consumer_id=o.consumer_id AND ox.store_id=:STORE
