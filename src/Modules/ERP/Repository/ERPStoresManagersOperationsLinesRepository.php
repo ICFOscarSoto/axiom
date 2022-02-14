@@ -105,12 +105,12 @@ class ERPStoresManagersOperationsLinesRepository extends ServiceEntityRepository
     }
 
   if($store==null){
-    $query="SELECT l.product_id, l.code, l.name, IFNULL(ROUND(SUM(IFNULL(of.price,p.price)*l.quantity),2),0) total
+    $query="SELECT l.product_id, l.code, l.name, IFNULL(ROUND(SUM(of.price*l.quantity),2),0) total
     FROM erpstores_managers_operations_lines l
     LEFT JOIN erpstores_managers_operations o ON l.operation_id=o.id
     LEFT JOIN erpstores_managers m ON m.id=o.manager_id
     LEFT JOIN erpoffer_prices of ON of.product_id=l.product_id AND of.customer_id=m.customer_id
-    LEFT JOIN erpproduct_prices p ON p.product_id=l.product_id
+
     WHERE o.active=1 AND m.id=:MANAGER AND o.DATE >= :START AND o.DATE<=:END
     GROUP BY(l.code)  ORDER BY total DESC LIMIT 10";
     $params=['MANAGER' => $manager,
@@ -120,12 +120,12 @@ class ERPStoresManagersOperationsLinesRepository extends ServiceEntityRepository
   }
   else{
 
-    $query="SELECT l.product_id, l.code, l.name, IFNULL(ROUND(SUM(IFNULL(of.price,p.price)*l.quantity),2),0) total
+    $query="SELECT l.product_id, l.code, l.name, IFNULL(ROUND(SUM(of.price*l.quantity),2),0) total
     FROM erpstores_managers_operations_lines l
     LEFT JOIN erpstores_managers_operations o ON l.operation_id=o.id
     LEFT JOIN erpstores_managers m ON m.id=o.manager_id
     LEFT JOIN erpoffer_prices of ON of.product_id=l.product_id AND of.customer_id=m.customer_id
-    LEFT JOIN erpproduct_prices p ON p.product_id=l.product_id
+
     WHERE o.active=1 AND m.id=:MANAGER AND o.DATE >= :START AND o.DATE<=:END AND o.store_id=:STORE
     GROUP BY(l.code)  ORDER BY total DESC LIMIT 10";
     $params=['MANAGER' => $manager,
@@ -161,12 +161,12 @@ public function getOperationsByProduct($manager, $start, $end, $store){
 
   if($store==null){
     $query="SELECT l.product_id,l.code,l.name,
-    IFNULL(ROUND(SUM(IFNULL(of.price,p.price)*l.quantity),2),0)
+    IFNULL(ROUND(SUM(of.price*l.quantity),2),0)
     FROM erpstores_managers_operations_lines l
     LEFT JOIN erpstores_managers_operations o ON o.id=l.operation_id
     LEFT JOIN erpstores_managers m ON m.id=o.manager_id
     LEFT JOIN erpoffer_prices of ON of.product_id=l.product_id AND of.customer_id=m.customer_id
-    LEFT JOIN erpproduct_prices p ON p.product_id=l.product_id
+
     LEFT JOIN erpproducts pr ON pr.id=p.product_id
     WHERE o.active=1 AND o.manager_id=:MANAGER AND o.DATE >= :START AND o.DATE<=:END
     GROUP BY (l.product_id)";
@@ -180,12 +180,12 @@ public function getOperationsByProduct($manager, $start, $end, $store){
   else{
 
       $query="SELECT l.product_id,l.code,l.name,
-      IFNULL(ROUND(SUM(IFNULL(of.price,p.price)*l.quantity),2),0)
+      IFNULL(ROUND(SUM(of.price*l.quantity),2),0)
       FROM erpstores_managers_operations_lines l
       LEFT JOIN erpstores_managers_operations o ON o.id=l.operation_id
       LEFT JOIN erpstores_managers m ON m.id=o.manager_id
       LEFT JOIN erpoffer_prices of ON of.product_id=l.product_id AND of.customer_id=m.customer_id
-      LEFT JOIN erpproduct_prices p ON p.product_id=l.product_id
+
       LEFT JOIN erpproducts pr ON pr.id=p.product_id
       WHERE o.active=1 AND o.manager_id=:MANAGER AND o.DATE >= :START AND o.DATE<=:END AND o.store_id=:STORE
       GROUP BY (l.product_id)";
@@ -316,7 +316,6 @@ public function getFullOperationsByProduct($manager, $start, $end, $store)
           LEFT JOIN erpstores_managers_operations o ON o.id=l.operation_id
           LEFT JOIN erpstores_managers m ON m.id=o.manager_id
           LEFT JOIN erpoffer_prices of ON of.product_id=l.product_id AND of.customer_id=m.customer_id
-          LEFT JOIN erpproduct_prices p ON p.product_id=l.product_id
           LEFT JOIN erpproducts pr ON pr.id=p.product_id
           WHERE o.active=1 AND o.manager_id=:MANAGER
           GROUP BY (l.product_id)";
@@ -407,7 +406,6 @@ public function getFullOperationsByProduct($manager, $start, $end, $store)
                 LEFT JOIN erpstores_managers_operations o ON o.id=l.operation_id
                 LEFT JOIN erpstores_managers m ON m.id=o.manager_id
                 LEFT JOIN erpoffer_prices of ON of.product_id=l.product_id AND of.customer_id=m.customer_id
-                LEFT JOIN erpproduct_prices p ON p.product_id=l.product_id
                 LEFT JOIN erpproducts pr ON pr.id=p.product_id
                 WHERE o.active=1 AND o.manager_id=:MANAGER AND o.store_id=:STORE
                 GROUP BY (l.product_id)";
@@ -443,16 +441,16 @@ public function getFullOperationsByProduct($manager, $start, $end, $store)
 
       if($store){
         $query="
-        SELECT l.product_id,o.consumer_id,o.date,l.code,l.name,s.name,l.quantity,
-        IFNULL(of.price,p.price),IFNULL(ROUND(IFNULL(of.price,p.price)*l.quantity,2),0) Total
+        SELECT DISTINCT l.product_id,o.consumer_id,o.date,l.code,l.name,s.name,l.quantity,
+        of.price,IFNULL(ROUND(of.price*l.quantity,2),0) Total
         FROM erpstores_managers_operations_lines l
         LEFT JOIN erpstores_managers_operations o ON o.id=l.operation_id
         LEFT JOIN erpstores_managers m ON m.id=o.manager_id
         LEFT JOIN erpoffer_prices of ON of.product_id=l.product_id AND of.customer_id=m.customer_id
-        LEFT JOIN erpproduct_prices p ON p.product_id=l.product_id
+
         LEFT JOIN erpstores s ON s.id=o.store_id
         WHERE o.active=1 AND o.consumer_id=:CONSUMER AND o.DATE >=:START AND o.DATE<=:END AND o.store_id=:STORE
-        GROUP BY DATE(o.date),l.product_id";
+        ";
         $params=[
                  'CONSUMER' => $consumer,
                  'START' => $date_start,
@@ -463,16 +461,16 @@ public function getFullOperationsByProduct($manager, $start, $end, $store)
       }
       else{
         $query="
-        SELECT l.product_id,o.consumer_id,o.date,l.code,l.name,s.name,l.quantity,
-        IFNULL(of.price,p.price),IFNULL(ROUND(IFNULL(of.price,p.price)*l.quantity,2),0) Total
+        SELECT DISTINCT l.product_id,o.consumer_id,o.date,l.code,l.name,s.name,l.quantity,
+        of.price,IFNULL(ROUND(of.price*l.quantity,2),0) Total
         FROM erpstores_managers_operations_lines l
         LEFT JOIN erpstores_managers_operations o ON o.id=l.operation_id
         LEFT JOIN erpstores_managers m ON m.id=o.manager_id
         LEFT JOIN erpoffer_prices of ON of.product_id=l.product_id AND of.customer_id=m.customer_id
-        LEFT JOIN erpproduct_prices p ON p.product_id=l.product_id
+
         LEFT JOIN erpstores s ON s.id=o.store_id
         WHERE o.active=1 AND o.consumer_id=:CONSUMER AND o.DATE >=:START AND o.DATE<=:END
-        GROUP BY DATE(o.date),l.product_id";
+        ";
 
         $params=[
                  'CONSUMER' => $consumer,

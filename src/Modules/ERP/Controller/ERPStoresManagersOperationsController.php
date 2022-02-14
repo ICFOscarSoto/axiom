@@ -661,28 +661,26 @@ class ERPStoresManagersOperationsController extends Controller
 			if($store){
 
 				//Filtro
-				$sql="IFNULL((SELECT IFNULL(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),0)
+				$sql="IFNULL((SELECT IFNULL(ROUND(SUM(ofx.price*lx.quantity),2),0)
 							FROM erpstores_managers_operations ox
 							LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
 							LEFT JOIN erpstores_managers_consumers cx ON cx.id=ox.consumer_id
 							LEFT JOIN globale_users ux ON ux.id=ox.agent_id
 							LEFT JOIN erpstores_managers_operations_lines lx ON lx.operation_id=ox.id
 							LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
-							LEFT JOIN erpproduct_prices px ON px.product_id=lx.product_id
 							WHERE ox.active=1 AND ox.manager_id='".$id."' AND ox.DATE >= '".$start."' AND ox.DATE<='".$end."' AND ox.consumer_id=o.consumer_id AND ox.store_id='".$store."'
-							GROUP BY(ox.consumer_id)),0)";
+							),0)";
 				$array[$sql]="Filtro";
 
 
 				/*Mes actual*/
-					$sql="IFNULL((SELECT IFNULL(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),0)
+					$sql="IFNULL((SELECT IFNULL(ROUND(SUM(ofx.price*lx.quantity),2),0)
 						 FROM erpstores_managers_operations ox
 						 LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
 						 LEFT JOIN erpstores_managers_consumers cx ON cx.id=ox.consumer_id
 						 LEFT JOIN globale_users ux ON ux.id=ox.agent_id
 						 LEFT JOIN erpstores_managers_operations_lines lx ON lx.operation_id=ox.id
 						 LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
-						 LEFT JOIN erpproduct_prices px ON px.product_id=lx.product_id
 						 WHERE ox.active=1 AND ox.manager_id=1 AND ox.DATE >= '".$thismonth->format("Y-m-d")."' AND ox.DATE<='".$today->format("Y-m-d")."' AND ox.consumer_id=o.consumer_id AND ox.store_id=o.store_id
 						 GROUP BY(ox.consumer_id)),0)";
 
@@ -690,14 +688,13 @@ class ERPStoresManagersOperationsController extends Controller
 
 					//Meses anteriores
 					while($lastmonth->format("Y-m-d")>=$months_count->format("Y-m-d")){
-		 				 $sql="IFNULL((SELECT IFNULL(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),0)
+		 				 $sql="IFNULL((SELECT IFNULL(ROUND(SUM(ofx.price*lx.quantity),2),0)
 		 							FROM erpstores_managers_operations ox
 		 							LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
 		 							LEFT JOIN erpstores_managers_consumers cx ON cx.id=ox.consumer_id
 		 							LEFT JOIN globale_users ux ON ux.id=ox.agent_id
 		 							LEFT JOIN erpstores_managers_operations_lines lx ON lx.operation_id=ox.id
 		 							LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
-		 							LEFT JOIN erpproduct_prices px ON px.product_id=lx.product_id
 		 							WHERE ox.active=1 AND ox.manager_id=1 AND ox.DATE >= '".$months_count->format("Y-m-d")."' AND ox.DATE<='".$months_count_next->format("Y-m-d")."' AND ox.consumer_id=o.consumer_id AND ox.store_id=o.store_id
 		 							GROUP BY(ox.consumer_id)),0)";
 
@@ -715,14 +712,13 @@ class ERPStoresManagersOperationsController extends Controller
 
 
 				/*Año actual*/
-				$sql="IFNULL((SELECT IFNULL(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),0)
+				$sql="IFNULL((SELECT IFNULL(ROUND(SUM(ofx.price*lx.quantity),2),0)
 						 FROM erpstores_managers_operations ox
 						 LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
 						 LEFT JOIN erpstores_managers_consumers cx ON cx.id=ox.consumer_id
 						 LEFT JOIN globale_users ux ON ux.id=ox.agent_id
 						 LEFT JOIN erpstores_managers_operations_lines lx ON lx.operation_id=ox.id
 						 LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
-						 LEFT JOIN erpproduct_prices px ON px.product_id=lx.product_id
 						 WHERE ox.active=1 AND ox.manager_id=1 AND ox.DATE >= '".$thisyear->format("Y-m-d")."' AND ox.DATE<='".$today->format("Y-m-d")."' AND ox.consumer_id=o.consumer_id AND ox.store_id=o.store_id
 						 GROUP BY(ox.consumer_id)),0)";
 
@@ -732,14 +728,13 @@ class ERPStoresManagersOperationsController extends Controller
 				//Años anteriores
 				while($cont_años<3){
 
-					$sql="IFNULL((SELECT IFNULL(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),0)
+					$sql="IFNULL((SELECT IFNULL(ROUND(SUM(ofx.price*lx.quantity),2),0)
 							 FROM erpstores_managers_operations ox
 							 LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
 							 LEFT JOIN erpstores_managers_consumers cx ON cx.id=ox.consumer_id
 							 LEFT JOIN globale_users ux ON ux.id=ox.agent_id
 							 LEFT JOIN erpstores_managers_operations_lines lx ON lx.operation_id=ox.id
 							 LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
-							 LEFT JOIN erpproduct_prices px ON px.product_id=lx.product_id
 							 WHERE ox.active=1 AND ox.manager_id=1 AND ox.DATE >= '".$lastyear->format("Y-m-d")."' AND ox.DATE<='".$thisyear->format("Y-m-d")."' AND ox.consumer_id=o.consumer_id AND ox.store_id=o.store_id
 							 GROUP BY(ox.consumer_id)),0)";
 
@@ -757,14 +752,13 @@ class ERPStoresManagersOperationsController extends Controller
 				}
 
 				//Total
-				$sql="IFNULL((SELECT IFNULL(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),0)
+				$sql="IFNULL((SELECT IFNULL(ROUND(SUM(ofx.price*lx.quantity),2),0)
 							FROM erpstores_managers_operations ox
 							LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
 							LEFT JOIN erpstores_managers_consumers cx ON cx.id=ox.consumer_id
 							LEFT JOIN globale_users ux ON ux.id=ox.agent_id
 							LEFT JOIN erpstores_managers_operations_lines lx ON lx.operation_id=ox.id
 							LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
-							LEFT JOIN erpproduct_prices px ON px.product_id=lx.product_id
 							WHERE ox.active=1 AND ox.manager_id='".$id."' AND ox.consumer_id=o.consumer_id AND ox.store_id='".$store."'
 							GROUP BY(ox.consumer_id)),0)";
 				$array[$sql]="Total";
@@ -776,8 +770,7 @@ class ERPStoresManagersOperationsController extends Controller
 																																	LEFT JOIN erpstores_managers_consumers c ON c.id=o.consumer_id
 																																	LEFT JOIN globale_users u ON u.id=o.agent_id
 																																	LEFT JOIN erpstores_managers_operations_lines l ON l.operation_id=o.id
-																																	LEFT JOIN erpoffer_prices of ON of.product_id=l.product_id AND of.customer_id=m.customer_id
-																																	LEFT JOIN erpproduct_prices p ON p.product_id=l.product_id',
+																																	LEFT JOIN erpoffer_prices of ON of.product_id=l.product_id AND of.customer_id=m.customer_id',
 																																	'o.active=1 AND o.manager_id='.$id.' AND o.store_id='.$store.'
 																																	GROUP BY(o.consumer_id)'
 																																	);
@@ -785,27 +778,25 @@ class ERPStoresManagersOperationsController extends Controller
 		else{
 
 			//Filtro
-			$sql="IFNULL((SELECT IFNULL(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),0)
+			$sql="IFNULL((SELECT IFNULL(ROUND(SUM(ofx.price*lx.quantity),2),0)
 						FROM erpstores_managers_operations ox
 						LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
 						LEFT JOIN erpstores_managers_consumers cx ON cx.id=ox.consumer_id
 						LEFT JOIN globale_users ux ON ux.id=ox.agent_id
 						LEFT JOIN erpstores_managers_operations_lines lx ON lx.operation_id=ox.id
 						LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
-						LEFT JOIN erpproduct_prices px ON px.product_id=lx.product_id
 						WHERE ox.active=1 AND ox.manager_id='".$id."' AND ox.DATE >= '".$start."' AND ox.DATE<='".$end."' AND ox.consumer_id=o.consumer_id
 						GROUP BY(ox.consumer_id)),0)";
 			$array[$sql]="Filtro";
 
 			/*Mes actual*/
-			$sql="IFNULL((SELECT IFNULL(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),0)
+			$sql="IFNULL((SELECT IFNULL(ROUND(SUM(ofx.price*lx.quantity),2),0)
 						 FROM erpstores_managers_operations ox
 						 LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
 						 LEFT JOIN erpstores_managers_consumers cx ON cx.id=ox.consumer_id
 						 LEFT JOIN globale_users ux ON ux.id=ox.agent_id
 						 LEFT JOIN erpstores_managers_operations_lines lx ON lx.operation_id=ox.id
 						 LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
-						 LEFT JOIN erpproduct_prices px ON px.product_id=lx.product_id
 						 WHERE ox.active=1 AND ox.manager_id=1 AND ox.DATE >= '".$thismonth->format("Y-m-d")."' AND ox.DATE<='".$today->format("Y-m-d")."' AND ox.consumer_id=o.consumer_id
 						 GROUP BY(ox.consumer_id)),0)";
 			 $array[$sql]="mesactual";
@@ -813,14 +804,13 @@ class ERPStoresManagersOperationsController extends Controller
 			 //Meses anteriores
  			 while($lastmonth->format("Y-m-d")>=$months_count->format("Y-m-d")){
 
- 				 $sql="IFNULL((SELECT IFNULL(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),0)
+ 				 $sql="IFNULL((SELECT IFNULL(ROUND(SUM(ofx.price*lx.quantity),2),0)
  							FROM erpstores_managers_operations ox
  							LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
  							LEFT JOIN erpstores_managers_consumers cx ON cx.id=ox.consumer_id
  							LEFT JOIN globale_users ux ON ux.id=ox.agent_id
  							LEFT JOIN erpstores_managers_operations_lines lx ON lx.operation_id=ox.id
  							LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
- 							LEFT JOIN erpproduct_prices px ON px.product_id=lx.product_id
  							WHERE ox.active=1 AND ox.manager_id=1 AND ox.DATE >= '".$months_count->format("Y-m-d")."' AND ox.DATE<='".$months_count_next->format("Y-m-d")."' AND ox.consumer_id=o.consumer_id
  							GROUP BY(ox.consumer_id)),0)";
 					$array[$sql]="M".$cont_meses;
@@ -837,14 +827,13 @@ class ERPStoresManagersOperationsController extends Controller
  			 }
 
 			 /*Año actual*/
-			 $sql="IFNULL((SELECT IFNULL(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),0)
+			 $sql="IFNULL((SELECT IFNULL(ROUND(SUM(ofx.price*lx.quantity),2),0)
 						FROM erpstores_managers_operations ox
 						LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
 						LEFT JOIN erpstores_managers_consumers cx ON cx.id=ox.consumer_id
 						LEFT JOIN globale_users ux ON ux.id=ox.agent_id
 						LEFT JOIN erpstores_managers_operations_lines lx ON lx.operation_id=ox.id
 						LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
-						LEFT JOIN erpproduct_prices px ON px.product_id=lx.product_id
 						WHERE ox.active=1 AND ox.manager_id=1 AND ox.DATE >= '".$thisyear->format("Y-m-d")."' AND ox.DATE<='".$today->format("Y-m-d")."' AND ox.consumer_id=o.consumer_id
 						GROUP BY(ox.consumer_id)),0)";
 
@@ -854,14 +843,13 @@ class ERPStoresManagersOperationsController extends Controller
 			 //Años anteriores
 			 while($cont_años<3){
 
-				 $sql="IFNULL((SELECT IFNULL(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),0)
+				 $sql="IFNULL((SELECT IFNULL(ROUND(SUM(ofx.price*lx.quantity),2),0)
 							FROM erpstores_managers_operations ox
 							LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
 							LEFT JOIN erpstores_managers_consumers cx ON cx.id=ox.consumer_id
 							LEFT JOIN globale_users ux ON ux.id=ox.agent_id
 							LEFT JOIN erpstores_managers_operations_lines lx ON lx.operation_id=ox.id
 							LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
-							LEFT JOIN erpproduct_prices px ON px.product_id=lx.product_id
 							WHERE ox.active=1 AND ox.manager_id=1 AND ox.DATE >= '".$lastyear->format("Y-m-d")."' AND ox.DATE<='".$thisyear->format("Y-m-d")."' AND ox.consumer_id=o.consumer_id
 							GROUP BY(ox.consumer_id)),0)";
 
@@ -879,14 +867,13 @@ class ERPStoresManagersOperationsController extends Controller
 			 }
 
 			 //Total
-			 $sql="IFNULL((SELECT IFNULL(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),0)
+			 $sql="IFNULL((SELECT IFNULL(ROUND(SUM(ofx.price*lx.quantity),2),0)
 						 FROM erpstores_managers_operations ox
 						 LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
 						 LEFT JOIN erpstores_managers_consumers cx ON cx.id=ox.consumer_id
 						 LEFT JOIN globale_users ux ON ux.id=ox.agent_id
 						 LEFT JOIN erpstores_managers_operations_lines lx ON lx.operation_id=ox.id
 						 LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
-						 LEFT JOIN erpproduct_prices px ON px.product_id=lx.product_id
 						 WHERE ox.active=1 AND ox.manager_id='".$id."' AND ox.consumer_id=o.consumer_id
 						 GROUP BY(ox.consumer_id)),0)";
 			 $array[$sql]="Total";
@@ -897,8 +884,7 @@ class ERPStoresManagersOperationsController extends Controller
 																																		LEFT JOIN erpstores_managers_consumers c ON c.id=o.consumer_id
 																																		LEFT JOIN globale_users u ON u.id=o.agent_id
 																																		LEFT JOIN erpstores_managers_operations_lines l ON l.operation_id=o.id
-																																		LEFT JOIN erpoffer_prices of ON of.product_id=l.product_id AND of.customer_id=m.customer_id
-																																		LEFT JOIN erpproduct_prices p ON p.product_id=l.product_id',
+																																		LEFT JOIN erpoffer_prices of ON of.product_id=l.product_id AND of.customer_id=m.customer_id',
 																																		'o.active=1 AND o.manager_id='.$id.'
 																																		GROUP BY(o.consumer_id)'
 																																		);
@@ -963,12 +949,11 @@ class ERPStoresManagersOperationsController extends Controller
 			if($store){
 
 			//Filtro
-			$sql="IFNULL((SELECT IFNULL(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),0)
+			$sql="IFNULL((SELECT IFNULL(ROUND(SUM(ofx.price*lx.quantity),2),0)
 					 FROM erpstores_managers_operations_lines lx
 					 LEFT JOIN erpstores_managers_operations ox ON ox.id=lx.operation_id
 					 LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
 					 LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
-					 LEFT JOIN erpproduct_prices px ON px.product_id=lx.product_id
 					 LEFT JOIN erpstores sx ON sx.id=ox.store_id
 					 WHERE ox.active=1 AND ox.manager_id=".$id." AND ox.DATE >= '".$start."' AND ox.DATE<='".$end."' AND ox.store_id='".$store."' AND lx.product_id=l.product_id
 					 GROUP BY (lx.product_id)),0)";
@@ -976,12 +961,11 @@ class ERPStoresManagersOperationsController extends Controller
 
 
 			//Mes actual
-			 $sql="IFNULL((SELECT IFNULL(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),0)
+			 $sql="IFNULL((SELECT IFNULL(ROUND(SUM(ofx.price*lx.quantity),2),0)
 					 FROM erpstores_managers_operations_lines lx
 					 LEFT JOIN erpstores_managers_operations ox ON ox.id=lx.operation_id
 					 LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
 					 LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
-					 LEFT JOIN erpproduct_prices px ON px.product_id=lx.product_id
 					 LEFT JOIN erpstores sx ON sx.id=ox.store_id
 					 WHERE ox.active=1 AND ox.manager_id=".$id." AND ox.DATE >= '".$thismonth->format("Y-m-d")."' AND ox.DATE<='".$today->format("Y-m-d")."' AND ox.store_id='".$store."'  AND lx.product_id=l.product_id
 					 GROUP BY (lx.product_id)),0)";
@@ -990,12 +974,11 @@ class ERPStoresManagersOperationsController extends Controller
 
 			//Meses anteriores
 			while($lastmonth->format("Y-m-d")>=$months_count->format("Y-m-d")){
-				$sql="IFNULL((SELECT IFNULL(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),0)
+				$sql="IFNULL((SELECT IFNULL(ROUND(SUM(ofx.price*lx.quantity),2),0)
 						 FROM erpstores_managers_operations_lines lx
 						 LEFT JOIN erpstores_managers_operations ox ON ox.id=lx.operation_id
 						 LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
 						 LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
-						 LEFT JOIN erpproduct_prices px ON px.product_id=lx.product_id
 						 LEFT JOIN erpstores sx ON sx.id=ox.store_id
 						 WHERE ox.active=1 AND ox.manager_id=".$id." AND ox.DATE >= '".$months_count->format("Y-m-d")."' AND ox.DATE<='".$months_count_next->format("Y-m-d")."' AND ox.store_id='".$store."'  AND lx.product_id=l.product_id
 						 GROUP BY (lx.product_id)),0)";
@@ -1013,12 +996,11 @@ class ERPStoresManagersOperationsController extends Controller
 		}
 
 			//Año actual
-			$sql="IFNULL((SELECT IFNULL(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),0)
+			$sql="IFNULL((SELECT IFNULL(ROUND(SUM(ofx.price*lx.quantity),2),0)
 					 FROM erpstores_managers_operations_lines lx
 					 LEFT JOIN erpstores_managers_operations ox ON ox.id=lx.operation_id
 					 LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
 					 LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
-					 LEFT JOIN erpproduct_prices px ON px.product_id=lx.product_id
 					 LEFT JOIN erpstores sx ON sx.id=ox.store_id
 					 WHERE ox.active=1 AND ox.manager_id=".$id." AND ox.DATE >= '".$thisyear->format("Y-m-d")."' AND ox.DATE<='".$today->format("Y-m-d")."' AND ox.store_id='".$store."'  AND lx.product_id=l.product_id
 					 GROUP BY (lx.product_id)),0)";
@@ -1028,12 +1010,11 @@ class ERPStoresManagersOperationsController extends Controller
 			//Años anteriores
 			while($cont_años<3){
 
-				$sql="IFNULL((SELECT IFNULL(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),0)
+				$sql="IFNULL((SELECT IFNULL(ROUND(SUM(ofx.price*lx.quantity),2),0)
 						 FROM erpstores_managers_operations_lines lx
 						 LEFT JOIN erpstores_managers_operations ox ON ox.id=lx.operation_id
 						 LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
 						 LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
-						 LEFT JOIN erpproduct_prices px ON px.product_id=lx.product_id
 						 LEFT JOIN erpstores sx ON sx.id=ox.store_id
 						 WHERE ox.active=1 AND ox.manager_id=".$id." AND ox.DATE >= '".$lastyear->format("Y-m-d")."' AND ox.DATE<='".$thisyear->format("Y-m-d")."' AND ox.store_id='".$store."'  AND lx.product_id=l.product_id
 						 GROUP BY (lx.product_id)),0)";
@@ -1053,12 +1034,11 @@ class ERPStoresManagersOperationsController extends Controller
 
 
 			//Total
-			$sql="IFNULL((SELECT IFNULL(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),0)
+			$sql="IFNULL((SELECT IFNULL(ROUND(SUM(ofx.price*lx.quantity),2),0)
 					 FROM erpstores_managers_operations_lines lx
 					 LEFT JOIN erpstores_managers_operations ox ON ox.id=lx.operation_id
 					 LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
 					 LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
-					 LEFT JOIN erpproduct_prices px ON px.product_id=lx.product_id
 					 LEFT JOIN erpstores sx ON sx.id=ox.store_id
 					 WHERE ox.active=1 AND ox.manager_id=".$id." AND ox.store_id='".$store."' AND lx.product_id=l.product_id
 					 GROUP BY (lx.product_id)),0)";
@@ -1069,9 +1049,7 @@ class ERPStoresManagersOperationsController extends Controller
 																																	'erpstores_managers_operations_lines l
 																																	LEFT JOIN erpstores_managers_operations o ON o.id=l.operation_id
 																																	LEFT JOIN erpstores_managers m ON m.id=o.manager_id
-																																	LEFT JOIN erpoffer_prices of ON of.product_id=l.product_id AND of.customer_id=m.customer_id
-																																	LEFT JOIN erpproduct_prices p ON p.product_id=l.product_id
-																																	LEFT JOIN erpproducts pr ON pr.id=p.product_id',
+																																	LEFT JOIN erpoffer_prices of ON of.product_id=l.product_id AND of.customer_id=m.customer_id',
 																																	'o.active=1 AND o.manager_id='.$id.' AND o.store_id='.$store.'
 																																	GROUP BY (l.product_id)',null
 																																	);
@@ -1080,12 +1058,11 @@ class ERPStoresManagersOperationsController extends Controller
 			else{
 
 				//Filtro
-				$sql="IFNULL((SELECT IFNULL(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),0)
+				$sql="IFNULL((SELECT IFNULL(ROUND(SUM(ofx.price*lx.quantity),2),0)
 						 FROM erpstores_managers_operations_lines lx
 						 LEFT JOIN erpstores_managers_operations ox ON ox.id=lx.operation_id
 						 LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
 						 LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
-						 LEFT JOIN erpproduct_prices px ON px.product_id=lx.product_id
 						 LEFT JOIN erpstores sx ON sx.id=ox.store_id
 						 WHERE ox.active=1 AND ox.manager_id=".$id." AND ox.DATE >= '".$start."' AND ox.DATE<='".$end."' AND lx.product_id=l.product_id
 						 GROUP BY (lx.product_id)),0)";
@@ -1093,12 +1070,11 @@ class ERPStoresManagersOperationsController extends Controller
 
 
 				//Mes actual
-				$sql="IFNULL((SELECT IFNULL(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),0)
+				$sql="IFNULL((SELECT IFNULL(ROUND(SUM(ofx.price*lx.quantity),2),0)
 						 FROM erpstores_managers_operations_lines lx
 						 LEFT JOIN erpstores_managers_operations ox ON ox.id=lx.operation_id
 						 LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
 						 LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
-						 LEFT JOIN erpproduct_prices px ON px.product_id=lx.product_id
 						 LEFT JOIN erpstores sx ON sx.id=ox.store_id
 						 WHERE ox.active=1 AND ox.manager_id=".$id." AND ox.DATE >= '".$thismonth->format("Y-m-d")."' AND ox.DATE<='".$today->format("Y-m-d")."' AND lx.product_id=l.product_id
 						 GROUP BY (lx.product_id)),0)";
@@ -1107,12 +1083,11 @@ class ERPStoresManagersOperationsController extends Controller
 
 				//Meses anteriores
 				while($lastmonth->format("Y-m-d")>=$months_count->format("Y-m-d")){
-					$sql="IFNULL((SELECT IFNULL(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),0)
+					$sql="IFNULL((SELECT IFNULL(ROUND(SUM(ofx.price*lx.quantity),2),0)
 							 FROM erpstores_managers_operations_lines lx
 							 LEFT JOIN erpstores_managers_operations ox ON ox.id=lx.operation_id
 							 LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
 							 LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
-							 LEFT JOIN erpproduct_prices px ON px.product_id=lx.product_id
 							 LEFT JOIN erpstores sx ON sx.id=ox.store_id
 							 WHERE ox.active=1 AND ox.manager_id=".$id." AND ox.DATE >= '".$months_count->format("Y-m-d")."' AND ox.DATE<='".$months_count_next->format("Y-m-d")."' AND lx.product_id=l.product_id
 							 GROUP BY (lx.product_id)),0)";
@@ -1130,12 +1105,11 @@ class ERPStoresManagersOperationsController extends Controller
 			}
 
 				//Año actual
-				$sql="IFNULL((SELECT IFNULL(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),0)
+				$sql="IFNULL((SELECT IFNULL(ROUND(SUM(ofx.price*lx.quantity),2),0)
 						 FROM erpstores_managers_operations_lines lx
 						 LEFT JOIN erpstores_managers_operations ox ON ox.id=lx.operation_id
 						 LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
 						 LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
-						 LEFT JOIN erpproduct_prices px ON px.product_id=lx.product_id
 						 LEFT JOIN erpstores sx ON sx.id=ox.store_id
 						 WHERE ox.active=1 AND ox.manager_id=".$id." AND ox.DATE >= '".$thisyear->format("Y-m-d")."' AND ox.DATE<='".$today->format("Y-m-d")."' AND lx.product_id=l.product_id
 						 GROUP BY (lx.product_id)),0)";
@@ -1145,12 +1119,11 @@ class ERPStoresManagersOperationsController extends Controller
 				//Años anteriores
 				while($cont_años<3){
 
-					$sql="IFNULL((SELECT IFNULL(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),0)
+					$sql="IFNULL((SELECT IFNULL(ROUND(SUM(ofx.price*lx.quantity),2),0)
 							 FROM erpstores_managers_operations_lines lx
 							 LEFT JOIN erpstores_managers_operations ox ON ox.id=lx.operation_id
 							 LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
 							 LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
-							 LEFT JOIN erpproduct_prices px ON px.product_id=lx.product_id
 							 LEFT JOIN erpstores sx ON sx.id=ox.store_id
 							 WHERE ox.active=1 AND ox.manager_id=".$id." AND ox.DATE >= '".$lastyear->format("Y-m-d")."' AND ox.DATE<='".$thisyear->format("Y-m-d")."' AND lx.product_id=l.product_id
 							 GROUP BY (lx.product_id)),0)";
@@ -1170,12 +1143,11 @@ class ERPStoresManagersOperationsController extends Controller
 
 
 				//Total
-				$sql="IFNULL((SELECT IFNULL(ROUND(SUM(IFNULL(ofx.price,px.price)*lx.quantity),2),0)
+				$sql="IFNULL((SELECT IFNULL(ROUND(SUM(ofx.price*lx.quantity),2),0)
 						 FROM erpstores_managers_operations_lines lx
 						 LEFT JOIN erpstores_managers_operations ox ON ox.id=lx.operation_id
 						 LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
 						 LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
-						 LEFT JOIN erpproduct_prices px ON px.product_id=lx.product_id
 						 LEFT JOIN erpstores sx ON sx.id=ox.store_id
 						 WHERE ox.active=1 AND ox.manager_id=".$id." AND lx.product_id=l.product_id
 						 GROUP BY (lx.product_id)),0)";
@@ -1185,9 +1157,7 @@ class ERPStoresManagersOperationsController extends Controller
 																																		'erpstores_managers_operations_lines l
 																																		LEFT JOIN erpstores_managers_operations o ON o.id=l.operation_id
 																																		LEFT JOIN erpstores_managers m ON m.id=o.manager_id
-																																		LEFT JOIN erpoffer_prices of ON of.product_id=l.product_id AND of.customer_id=m.customer_id
-																																		LEFT JOIN erpproduct_prices p ON p.product_id=l.product_id
-																																		LEFT JOIN erpproducts pr ON pr.id=p.product_id',
+																																		LEFT JOIN erpoffer_prices of ON of.product_id=l.product_id AND of.customer_id=m.customer_id',
 																																		'o.active=1 AND o.manager_id='.$id.'
 																																		GROUP BY (l.product_id)',null
 																																		);
@@ -1240,23 +1210,21 @@ class ERPStoresManagersOperationsController extends Controller
 			 {
 					 if($store)
 					 {
-					 $return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields,ERPStoresManagersOperationsLines::class,['l.product_id'=>'id','o.consumer_id'=>'consumer__id','o.date'=>'date','l.code'=>'code','l.name'=>'name','s.name'=>'store__name','l.quantity'=>'quantity','IFNULL(of.price,p.price)'=>'price','IFNULL(ROUND(IFNULL(of.price,p.price)*l.quantity,2),0)'=>'total'],
+					 $return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields,ERPStoresManagersOperationsLines::class,['l.product_id'=>'id','o.consumer_id'=>'consumer__id','o.date'=>'date','l.code'=>'code','l.name'=>'name','s.name'=>'store__name','l.quantity'=>'quantity','of.price'=>'price','IFNULL(ROUND(of.price*l.quantity,2),0)'=>'total'],
 																																			 'erpstores_managers_operations_lines l
 																																			 LEFT JOIN erpstores_managers_operations o ON o.id=l.operation_id
 																																			 LEFT JOIN erpstores_managers m ON m.id=o.manager_id
 																																			 LEFT JOIN erpoffer_prices of ON of.product_id=l.product_id AND of.customer_id=m.customer_id
- 																																			 LEFT JOIN erpproduct_prices p ON p.product_id=l.product_id
 																																			 LEFT JOIN erpstores s ON s.id=o.store_id',
 																																			 'o.active=1 AND o.consumer_id='.$consumerid.' AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'" AND o.store_id='.$store.'
 																																			 GROUP BY DATE(o.date),l.product_id',null);
 					 }
 					 else{
-						 $return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields,ERPStoresManagersOperationsLines::class,['l.product_id'=>'id','o.consumer_id'=>'consumer__id','o.date'=>'date','l.code'=>'code','l.name'=>'name','s.name'=>'store__name','l.quantity'=>'quantity','IFNULL(of.price,p.price)'=>'price','IFNULL(ROUND(IFNULL(of.price,p.price)*l.quantity,2),0)'=>'total'],
+						 $return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields,ERPStoresManagersOperationsLines::class,['l.product_id'=>'id','o.consumer_id'=>'consumer__id','o.date'=>'date','l.code'=>'code','l.name'=>'name','s.name'=>'store__name','l.quantity'=>'quantity','of.price'=>'price','IFNULL(ROUND(of.price*l.quantity,2),0)'=>'total'],
 																																				 'erpstores_managers_operations_lines l
 																																				 LEFT JOIN erpstores_managers_operations o ON o.id=l.operation_id
 																																				 LEFT JOIN erpstores_managers m ON m.id=o.manager_id
 																																				 LEFT JOIN erpoffer_prices of ON of.product_id=l.product_id AND of.customer_id=m.customer_id
-																																				 LEFT JOIN erpproduct_prices p ON p.product_id=l.product_id
 																																				 LEFT JOIN erpstores s ON s.id=o.store_id',
 																																				 'o.active=1 AND o.consumer_id='.$consumerid.' AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'"
 																																				 GROUP BY DATE(o.date),l.product_id',null);
@@ -1266,26 +1234,24 @@ class ERPStoresManagersOperationsController extends Controller
 			else{
 
 				if($store){
-				$return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields,ERPStoresManagersOperationsLines::class,['l.product_id'=>'id','o.consumer_id'=>'consumer__id','o.date'=>'date','l.code'=>'code','l.name'=>'name','s.name'=>'store__name','l.quantity'=>'quantity','IFNULL(of.price,p.price)'=>'price','IFNULL(ROUND(IFNULL(of.price,p.price)*l.quantity,2),0)'=>'total'],
+				$return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields,ERPStoresManagersOperationsLines::class,['l.product_id'=>'id','o.consumer_id'=>'consumer__id','o.date'=>'date','l.code'=>'code','l.name'=>'name','s.name'=>'store__name','l.quantity'=>'quantity','of.price'=>'price','IFNULL(ROUND(of.price*l.quantity,2),0)'=>'total'],
 																																		'erpstores_managers_operations_lines l
 																																		LEFT JOIN erpstores_managers_operations o ON o.id=l.operation_id
 																																		LEFT JOIN erpstores_managers m ON m.id=o.manager_id
 																																		LEFT JOIN erpoffer_prices of ON of.product_id=l.product_id AND of.customer_id=m.customer_id
-																																		LEFT JOIN erpproduct_prices p ON p.product_id=l.product_id
 																																		LEFT JOIN erpstores s ON s.id=o.store_id',
 																																		'o.active=1 AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'" AND o.store_id='.$store.'
 																																	  GROUP BY DATE(o.date),l.product_id',null);
 				}
 				else{
-					$return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields,ERPStoresManagersOperationsLines::class,['l.product_id'=>'id','o.consumer_id'=>'consumer__id','o.date'=>'date','l.code'=>'code','l.name'=>'name','s.name'=>'store__name','l.quantity'=>'quantity','IFNULL(of.price,p.price)'=>'price','IFNULL(ROUND(IFNULL(of.price,p.price)*l.quantity,2),0)'=>'total'],
+					$return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields,ERPStoresManagersOperationsLines::class,['l.product_id'=>'id','o.consumer_id'=>'consumer__id','o.date'=>'date','l.code'=>'code','l.name'=>'name','s.name'=>'store__name','l.quantity'=>'quantity','of.price'=>'price','IFNULL(ROUND(of.price*l.quantity,2),0)'=>'total'],
 																																			'erpstores_managers_operations_lines l
 																																			LEFT JOIN erpstores_managers_operations o ON o.id=l.operation_id
 																																			LEFT JOIN erpstores_managers m ON m.id=o.manager_id
 																																			LEFT JOIN erpoffer_prices of ON of.product_id=l.product_id AND of.customer_id=m.customer_id
-																																			LEFT JOIN erpproduct_prices p ON p.product_id=l.product_id
 																																			LEFT JOIN erpstores s ON s.id=o.store_id',
 																																			'o.active=1 AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'"
-																																			GROUP BY DATE(o.date),l.product_id',null);
+																																			',null);
 
 				}
 
@@ -1332,25 +1298,23 @@ class ERPStoresManagersOperationsController extends Controller
 
 				if($productid){
 						if($store){
-						$return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields,ERPStoresManagersOperationsLines::class,['l.product_id'=>'id','o.date'=>'date','l.code'=>'code','l.name'=>'name','concat(c.name," ",c.lastname)'=>'consumer__name_o_consumer__lastname','s.name'=>'store__name','l.quantity'=>'quantity','IFNULL(of.price,p.price)'=>'price','IFNULL(ROUND(IFNULL(of.price,p.price)*l.quantity,2),0)'=>'total'],
+						$return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields,ERPStoresManagersOperationsLines::class,['l.product_id'=>'id','o.date'=>'date','l.code'=>'code','l.name'=>'name','concat(c.name," ",c.lastname)'=>'consumer__name_o_consumer__lastname','s.name'=>'store__name','l.quantity'=>'quantity','of.price'=>'price','IFNULL(ROUND(of.price*l.quantity,2),0)'=>'total'],
 																																				'erpstores_managers_operations_lines l
 																																				LEFT JOIN erpstores_managers_operations o ON o.id=l.operation_id
 																																				LEFT JOIN erpstores_managers_consumers c ON c.id=o.consumer_id
 																																				LEFT JOIN erpstores_managers m ON m.id=o.manager_id
 																																				LEFT JOIN erpoffer_prices of ON of.product_id=l.product_id AND of.customer_id=m.customer_id
-																																				LEFT JOIN erpproduct_prices p ON p.product_id=l.product_id
 																																				LEFT JOIN erpstores s ON s.id=o.store_id',
 																																				'o.active=1 AND l.product_id='.$productid.' AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'" AND o.store_id='.$store.'
 																																				',null);
 						}
 						else{
-							$return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields,ERPStoresManagersOperationsLines::class,['l.product_id'=>'id','o.date'=>'date','l.code'=>'code','l.name'=>'name','concat(c.name," ",c.lastname)'=>'consumer__name_o_consumer__lastname','s.name'=>'store__name','l.quantity'=>'quantity','IFNULL(of.price,p.price)'=>'price','IFNULL(ROUND(IFNULL(of.price,p.price)*l.quantity,2),0)'=>'total'],
+							$return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields,ERPStoresManagersOperationsLines::class,['l.product_id'=>'id','o.date'=>'date','l.code'=>'code','l.name'=>'name','concat(c.name," ",c.lastname)'=>'consumer__name_o_consumer__lastname','s.name'=>'store__name','l.quantity'=>'quantity','of.price'=>'price','IFNULL(ROUND(of.price*l.quantity,2),0)'=>'total'],
 																																					'erpstores_managers_operations_lines l
 																																					LEFT JOIN erpstores_managers_operations o ON o.id=l.operation_id
 																																					LEFT JOIN erpstores_managers_consumers c ON c.id=o.consumer_id
 																																					LEFT JOIN erpstores_managers m ON m.id=o.manager_id
 																																					LEFT JOIN erpoffer_prices of ON of.product_id=l.product_id AND of.customer_id=m.customer_id
-																																					 LEFT JOIN erpproduct_prices p ON p.product_id=l.product_id
 																																					LEFT JOIN erpstores s ON s.id=o.store_id',
 																																					'o.active=1 AND l.product_id='.$productid.' AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'"
 																																				  ',null);
@@ -1360,25 +1324,23 @@ class ERPStoresManagersOperationsController extends Controller
 			 else{
 
 				 if($store){
-				 $return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields,ERPStoresManagersOperationsLines::class,['l.product_id'=>'id','o.date'=>'date','l.code'=>'code','l.name'=>'name','concat(c.name," ",c.lastname)'=>'consumer__name_o_consumer__lastname','s.name'=>'store__name','l.quantity'=>'quantity','IFNULL(of.price,p.price)'=>'price','IFNULL(ROUND(IFNULL(of.price,p.price)*l.quantity,2),0)'=>'total'],
+				 $return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields,ERPStoresManagersOperationsLines::class,['l.product_id'=>'id','o.date'=>'date','l.code'=>'code','l.name'=>'name','concat(c.name," ",c.lastname)'=>'consumer__name_o_consumer__lastname','s.name'=>'store__name','l.quantity'=>'quantity','of.price'=>'price','IFNULL(ROUND(of.price*l.quantity,2),0)'=>'total'],
 																																		 'erpstores_managers_operations_lines l
 																																		 LEFT JOIN erpstores_managers_operations o ON o.id=l.operation_id
 																																		 LEFT JOIN erpstores_managers_consumers c ON c.id=o.consumer_id
 																																		 LEFT JOIN erpstores_managers m ON m.id=o.manager_id
 																																		 LEFT JOIN erpoffer_prices of ON of.product_id=l.product_id AND of.customer_id=m.customer_id
-																																		 LEFT JOIN erpproduct_prices p ON p.product_id=l.product_id
 																																		 LEFT JOIN erpstores s ON s.id=o.store_id',
 																																		 'o.active=1 AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'" AND o.store_id='.$store.'
 																																		 ',null);
 				 }
 				 else{
-					 $return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields,ERPStoresManagersOperationsLines::class,['l.product_id'=>'id','o.date'=>'date','l.code'=>'code','l.name'=>'name','concat(c.name," ",c.lastname)'=>'consumer__name_o_consumer__lastname','s.name'=>'store__name','l.quantity'=>'quantity','IFNULL(of.price,p.price)'=>'price','IFNULL(ROUND(IFNULL(of.price,p.price)*l.quantity,2),0)'=>'total'],
+					 $return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields,ERPStoresManagersOperationsLines::class,['l.product_id'=>'id','o.date'=>'date','l.code'=>'code','l.name'=>'name','concat(c.name," ",c.lastname)'=>'consumer__name_o_consumer__lastname','s.name'=>'store__name','l.quantity'=>'quantity','of.price'=>'price','IFNULL(ROUND(of.price*l.quantity,2),0)'=>'total'],
 																																			 'erpstores_managers_operations_lines l
 																																			 LEFT JOIN erpstores_managers_operations o ON o.id=l.operation_id
 																																			 LEFT JOIN erpstores_managers_consumers c ON c.id=o.consumer_id
 																																			 LEFT JOIN erpstores_managers m ON m.id=o.manager_id
 																																			 LEFT JOIN erpoffer_prices of ON of.product_id=l.product_id AND of.customer_id=m.customer_id
-																																			 LEFT JOIN erpproduct_prices p ON p.product_id=l.product_id
 																																			 LEFT JOIN erpstores s ON s.id=o.store_id',
 																																			 'o.active=1 AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'"
 																																			 ',null);

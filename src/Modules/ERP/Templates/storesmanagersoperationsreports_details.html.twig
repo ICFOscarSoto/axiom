@@ -10,6 +10,7 @@
 							{% if detailedconsumerlist is defined %}
 							{% set listConstructor = detailedconsumerlist %}
 							{{ include('@Globale/list.html.twig') }}
+								<input type="hidden" id="consumerid">
 							{% endif %}
 						</div>
 					</div>
@@ -34,6 +35,7 @@
 							{% if detailedproductlist is defined %}
 							{% set listConstructor = detailedproductlist %}
 							{{ include('@Globale/list.html.twig') }}
+							<input type="hidden" id="productid">
 							{% endif %}
 						</div>
 					</div>
@@ -56,6 +58,7 @@ $('body').on('click', "[id^='listStoresManagersOperations-field-button-consumerD
 		url_list3=updateURLParameter(url_list3,"store",$('#stores').val());
 		$("#{{ detailedconsumerlist.id }}").DataTable().ajax.url(url_list3).load();
 		$("#consumerdetailedreport-modal-form").modal('show');
+		$("#consumerid").val($(this).attr('attr-id'));
 });
 
 $('body').on('click', "[id^='listStoresManagersOperationsLines-field-button-productDetailsButton-']", function(e) {
@@ -66,6 +69,7 @@ $('body').on('click', "[id^='listStoresManagersOperationsLines-field-button-prod
 		url_list4=updateURLParameter(url_list4,"store",$('#stores').val());
 		$("#{{ detailedproductlist.id }}").DataTable().ajax.url(url_list4).load();
 		$("#productdetailedreport-modal-form").modal('show');
+		$("#productid").val($(this).attr('attr-id'));
 });
 
 </script>
