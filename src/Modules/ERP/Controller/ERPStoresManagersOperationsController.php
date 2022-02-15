@@ -533,6 +533,7 @@ class ERPStoresManagersOperationsController extends Controller
 			 }
 			 $listConsumersOperationsReports = new ERPStoresManagersOperationsUtils();
 			 $listOperationsLinesReports = new ERPStoresManagersOperationsLinesUtils();
+			 $listOperationsReports = new ERPStoresManagersOperationsUtils();
 
 			 $today=new \Datetime('NOW');
 			 $consumeroperationslist=$this->createConsumerOperationsList($id);
@@ -555,6 +556,7 @@ class ERPStoresManagersOperationsController extends Controller
 						 'dateto' => $today->format('d/m/Y'),
 						 'consumersoperationslist' => $consumeroperationslist,
 						 'productslist' => $productslist,
+						 'operationslist' => $listOperationsReports->formatCustomizedOperationsList($id,null,null,null),
 						 'detailedconsumerlist'=>	$listOperationsLinesReports->formatConsumersReportsDetailedList(null,null,null,null),
 						 'detailedproductlist'=>	$listOperationsLinesReports->formatProductsReportsDetailedList(null,null,null,null)
 
@@ -607,6 +609,76 @@ class ERPStoresManagersOperationsController extends Controller
 
 
 		 }
+
+		 /**
+ 		 * @Route("/{_locale}/erp/storesmanagers/operations/operationslist", name="operationslist")
+ 		 */
+ 		public function operationslist(RouterInterface $router,Request $request)
+ 		{
+ 			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+ 			$user = $this->getUser();
+ 			$locale = $request->getLocale();
+ 			$this->router = $router;
+ 			$manager = $this->getDoctrine()->getManager();
+ 			$repository = $manager->getRepository($this->class);
+ 			$id=$request->query->get("id",$request->request->get("id"));
+ 			$start=	$request->query->get("datefrom",$request->request->get("datefrom"));
+ 			$store=	$request->query->get("store",$request->request->get("store"));
+ 			if($store=="-1") $store=null;
+
+ 			$datefrom=date_create_from_format('d/m/Y',$start);
+ 			$end=	$request->query->get("dateto",$request->request->get("dateto"));
+ 			$dateto=date_create_from_format('d/m/Y',$end);
+ 			if($datefrom)	$start=$datefrom->format("Y-m-d 00:00:00");
+ 			else{
+ 				 $start=new \Datetime();
+ 				 $start->setTimestamp(0);
+ 				 $start=$start->format("Y-m-d 00:00:00");
+ 			}
+ 			if($dateto)	$end=$dateto->format("Y-m-d 23:59:59");
+ 			else{
+ 				 $end=new \Datetime();
+ 				 $end=$end->format("Y-m-d 23:59:59");
+ 			 }
+
+			 $listUtils=new GlobaleListUtils();
+			 $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersOperations.json"),true);
+
+			 if($store){
+
+				 $return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields,ERPStoresManagersOperations::class,['o.id'=>'id','o.date'=>'date','concat(u.name," ",IFNULL(u.lastname,""))'=>'agent__name_o_agent__lastname','c.code2'=>'consumer__code2','concat(c.name," ",c.lastname)'=>'consumer__name_o_consumer__lastname','s.name'=>'store__name'],
+ 																																	'erpstores_managers_operations o
+ 																																	LEFT JOIN erpstores_managers m ON m.id=o.manager_id
+ 																																	LEFT JOIN erpstores_managers_consumers c ON c.id=o.consumer_id
+ 																																	LEFT JOIN globale_users u ON u.id=o.agent_id
+																																	LEFT JOIN erpstores s ON s.id=o.store_id',
+ 																																	'o.active=1 AND o.manager_id='.$id.' AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'" AND o.store_id='.$store.'
+ 																																	GROUP BY(o.consumer_id)'
+ 																																	);
+			 }
+
+			 else{
+
+				 $return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields,ERPStoresManagersOperations::class,['o.id'=>'id','o.date'=>'date','concat(u.name," ",IFNULL(u.lastname,""))'=>'agent__name_o_agent__lastname','c.code2'=>'consumer__code2','concat(c.name," ",c.lastname)'=>'consumer__name_o_consumer__lastname','s.name'=>'store__name'],
+ 																																	'erpstores_managers_operations o
+ 																																	LEFT JOIN erpstores_managers m ON m.id=o.manager_id
+ 																																	LEFT JOIN erpstores_managers_consumers c ON c.id=o.consumer_id
+ 																																	LEFT JOIN globale_users u ON u.id=o.agent_id
+																																	LEFT JOIN erpstores s ON s.id=o.store_id',
+ 																																	'o.active=1 AND o.manager_id='.$id.' AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'"
+ 																																	GROUP BY(o.consumer_id)'
+ 																																	);
+
+
+			 }
+
+
+			 	return new JsonResponse($return);
+
+		 }
+
+
+
 
 
 
@@ -1520,6 +1592,64 @@ class ERPStoresManagersOperationsController extends Controller
 
  	 	 }
 
+		 /**
+		 * @Route("/api/ERP/storesmanagers/operations/exportcustomizedoperations", name="exportCustomizedOperations")
+		 */
+		 public function exportCustomizedOperations(RouterInterface $router,Request $request)
+		 {
+			 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			 $template=dirname(__FILE__)."/../Forms/StoresManagersOperations.json";
+
+			 $start=$request->query->get("start");
+			 $datefrom=date_create_from_format('d/m/Y',$start);
+			 $end=$request->query->get("end");
+			 $dateto=date_create_from_format('d/m/Y',$end);
+			 $store=$request->query->get("store");
+			 $manager=$request->query->get("manager");
+
+			 $repository=$this->getDoctrine()->getRepository($this->class);
+			 if($store=="-1") $array_operations=$repository->getCustomizedOperations($manager,$datefrom,$dateto,null);
+			 else $array_operations=$repository->getFullOperationsByConsumer($manager,$datefrom,$dateto,$store);
+			 $result=$this->csvCustomizedOperations($array_operations,$template);
+			 return $result;
+
+		 }
+
+
+		 public function csvCustomizedOperations($list, $template){
+			 $this->template=$template;
+			 $filename='Operaciones.csv';
+			 $array=$list;
+			 //exclude tags column, last
+			 $key='_tags';
+			 array_walk($array, function (&$v) use ($key) {
+				unset($v[$key]);
+			 });
+		 //	 $array=$this->applyFormats($array);
+
+			 $fileContent=$this->createCSV($array);
+			 $response = new Response($fileContent);
+			 // Create the disposition of the file
+					$disposition = $response->headers->makeDisposition(
+							ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+							$filename
+				);
+			 // Set the content disposition
+			 $seconds_to_cache = 0;
+			 $ts = gmdate("D, d M Y H:i:s", time() + $seconds_to_cache) . " GMT";
+			 $response->headers->set("Expires", $ts);
+			 $response->headers->set("Pragma", "cache");
+			 $response->headers->set("Cache-Control", "max-age=0, no-cache, must-revalidate, proxy-revalidate");
+			 $response->headers->set('Content-Type', 'application/force-download');
+			 $response->headers->set('Content-Type', 'application/octet-stream');
+			 $response->headers->set('Content-Type', 'application/download');
+			 $response->headers->set('Content-Disposition', $disposition);
+			 // Dispatch request
+			 return $response;
+
+		 }
+
+
 		 private function createCSV(array &$array){
 
 				if (count($array) == 0) {
@@ -1535,6 +1665,8 @@ class ERPStoresManagersOperationsController extends Controller
 				fclose($df);
 				return ob_get_clean();
 		}
+
+
 
 		private function createConsumerOperationsList($id){
 

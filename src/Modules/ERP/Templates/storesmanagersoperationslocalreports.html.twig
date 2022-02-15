@@ -73,6 +73,12 @@
 					            <span class="hidden-xs">Productos</span>
 					        </a>
 					    </li>
+							<li id="tab-head-send" attr-id="" attr-name="data" {% if id==0 %}style="display:none;"{% endif %}>
+									<a href="#tab-body-operations" data-toggle="tab">
+											<span class="visible-xs"><i class="fa fa-id-card" aria-hidden="true"></i></span>
+											<span class="hidden-xs">Operaciones</span>
+									</a>
+							</li>
 					</ul>
 
 					<div class="tab-content">
@@ -86,7 +92,11 @@
 										{{ include('@ERP/storesmanagersoperationslocalreports_products.html.twig') }}
 									</div>
 							</div>
-							{{ include('@ERP/buyorders_lines.html.twig') }}
+							<div class="tab-pane" style="" id="tab-body-operations">
+								 <div id="operations-body">
+									 {{ include('@ERP/storesmanagersoperationslocalreports_operations.html.twig') }}
+								 </div>
+						 </div>
 					</div>
         </div>
       </div>
@@ -304,6 +314,12 @@ function getData(){
 			url_list2=updateURLParameter(url_list2,"store",$('#stores').val());
 		  $("#{{ productslist.id }}").DataTable().ajax.url(url_list2).load();
 
+			var url_list3=$("#{{ operationslist.id }}").DataTable().ajax.url();
+			url_list3=updateURLParameter(url_list3,"datefrom",$('#date-from').val());
+			url_list3=updateURLParameter(url_list3,"dateto",$('#date-to').val());
+			url_list3=updateURLParameter(url_list3,"store",$('#stores').val());
+		  $("#{{ operationslist.id }}").DataTable().ajax.url(url_list3).load();
+
 
 			if((++load_wait)==1) $("#load-spinner").fadeIn();
 	    $.ajax({
@@ -366,6 +382,7 @@ $('body').on('click', "[id=consumeroperations-export-top-button-foreground]", fu
 	win.focus();
 
 });
+
 $('body').on('click', "[id=consumeroperationsdetailed-export-top-button-foreground]", function(e) {
 	id= {{ id }};
 	consumerid=$(this).attr('attr-id');
@@ -382,6 +399,14 @@ $('body').on('click', "[id=bestproducts-export-top-button-foreground]", function
 	win.focus();
 
 });
+
+$('body').on('click', "[id=customizedoperations-export-top-button-foreground]", function(e) {
+	id= {{ id }};
+	var win = window.open("/api/ERP/storesmanagers/operations/exportcustomizedoperations?start="+encodeURI($("#date-from").val())+"&end="+encodeURI($("#date-to").val())+'&store='+encodeURI($('#stores').val())+'&manager='+encodeURI({{ id }}));
+	win.focus();
+
+});
+
 
 function datepicker(){
 

@@ -1,0 +1,27 @@
+[
+    {
+        "name": "id",
+        "caption": "id"
+    },
+    {
+        "name": "date",
+        "caption": "date",
+        "type": "datetime"
+    },
+    {
+        "name": "agent__name_o_agent__lastname",
+        "caption": "Agente"
+    },
+    {
+        "name": "consumer__code2",
+        "caption": "Cod. Trabajador"
+    },
+    {
+        "name": "consumer__name_o_consumer__lastname",
+        "caption": "Trabajador"
+    },
+    {
+        "name": "store__name",
+        "caption": "store"
+    }
+]

@@ -340,6 +340,69 @@ class ERPStoresManagersOperationsRepository extends ServiceEntityRepository
   }
 
 
+  public function getCustomizedOperations($manager, $start, $end, $store)
+  {
+
+  if($start) $date_start=$start->format("Y-m-d 00:00:00");
+  else{
+    $date_start=new \Datetime();
+    $date_start->setTimestamp(0);
+    $date_start=$date_start->format("Y-m-d 00:00:00");
+
+  }
+
+  if($end) $date_end=$end->format("Y-m-d 23:59:59");
+  else {
+    $date_end=new \Datetime();
+    $date_end=$date_end->format("Y-m-d 23:59:59");
+  }
+
+
+
+
+  if($store==null){
+
+      $query="SELECT o.date, concat(u.name,' ',IFNULL(u.lastname,'')), c.code2, concat(c.name,' ',c.lastname), s.name
+            FROM erpstores_managers_operations o
+            LEFT JOIN erpstores_managers m ON m.id=o.manager_id
+            LEFT JOIN erpstores_managers_consumers c ON c.id=o.consumer_id
+            LEFT JOIN globale_users u ON u.id=o.agent_id
+            LEFT JOIN erpstores s ON s.id=o.store_id
+            WHERE o.active=1 AND o.manager_id=:MANAGER AND o.DATE >= :START AND o.DATE<= :END
+            GROUP BY(o.consumer_id)";
+      $params=[
+               'MANAGER' => $manager,
+               'START' => $date_start,
+               'END' => $date_end
+               ];
+
+  }
+  //
+  else{
+
+    $query="SELECT o.date, concat(u.name,' ',IFNULL(u.lastname,'')), c.code2, concat(c.name,' ',c.lastname), s.name
+          FROM erpstores_managers_operations o
+          LEFT JOIN erpstores_managers m ON m.id=o.manager_id
+          LEFT JOIN erpstores_managers_consumers c ON c.id=o.consumer_id
+          LEFT JOIN globale_users u ON u.id=o.agent_id
+          LEFT JOIN erpstores s ON s.id=o.store_id
+          WHERE o.active=1 AND o.manager_id=:MANAGER AND o.DATE >= :START AND o.DATE<= :END AND o.store_id=:STORE
+          GROUP BY(o.consumer_id)";
+        $params=[
+                 'MANAGER' => $manager,
+                 'START' => $date_start,
+                 'END' => $date_end,
+                 'STORE' => $store
+                 ];
+
+
+  }
+
+  $result=$this->getEntityManager()->getConnection()->executeQuery($query,$params)->fetchAll();
+  return $result;
+
+  }
+
 
   public function getDailyOperations($manager, $start, $end, $store)
   {

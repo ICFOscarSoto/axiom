@@ -1,0 +1,12 @@
+
+<div class="row">
+	<div class="col-md-12">
+		<div class="panel-title-list">Operationes</div>
+			<div class="col-md-12">
+				{% if operationslist is defined %}
+				{% set listConstructor = operationslist %}
+				{{ include('@Globale/list.html.twig') }}
+				{% endif %}
+			</div>
+	</div>
+</div>
