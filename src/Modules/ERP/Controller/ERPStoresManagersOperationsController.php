@@ -1432,7 +1432,7 @@ class ERPStoresManagersOperationsController extends Controller
 				$repository=$this->getDoctrine()->getRepository($this->class);
 				if($store=="-1") $array_consumers=$repository->getFullOperationsByConsumer($manager,$datefrom,$dateto,null);
 				else $array_consumers=$repository->getFullOperationsByConsumer($manager,$datefrom,$dateto,$store);
-				$result=$this->csvConsumerOperations($array_consumers,$template);
+				$result=$this->csvConsumerOperations($array_consumers,$template,$datefrom,$dateto);
 				//dump($result);
 			  return $result;
 			//	return new JsonResponse(["result"=>1]);
@@ -1440,9 +1440,10 @@ class ERPStoresManagersOperationsController extends Controller
 			}
 
 
-			public function csvConsumerOperations($list, $template){
+			public function csvConsumerOperations($list, $template, $datefrom, $dateto){
 				$this->template=$template;
-				$filename='Informe_consumidores.csv';
+				if($datefrom->format("dmY")==$dateto->format("dmY"))	 $filename='Informe_consumidores_'.$datefrom->format("dmY").'.csv';
+ 			  else $filename='Informe_consumidores_'.$datefrom->format("dmY").'_'.$dateto->format("dmY").'.csv';
 				$array=$list;
 				//exclude tags column, last
 				$key='_tags';
@@ -1495,15 +1496,16 @@ class ERPStoresManagersOperationsController extends Controller
 				if($store=="-1") $array_consumeroperations=$repository->getOperationsByConsumerDetailed($consumer,$manager,$datefrom,$dateto,null);
 				else $array_consumeroperations=$repository->getOperationsByConsumerDetailed($consumer,$manager,$datefrom,$dateto,$store);
 
-				$result=$this->csvConsumerDetailedOperations($array_consumeroperations,$template);
+				$result=$this->csvConsumerDetailedOperations($array_consumeroperations,$template,$datefrom,$dateto);
 				return $result;
 
 			}
 
 
-			public function csvConsumerDetailedOperations($list, $template){
+			public function csvConsumerDetailedOperations($list, $template,$datefrom,$dateto){
 				$this->template=$template;
-				$filename='Informe_detallado_consumidor.csv';
+				if($datefrom->format("dmY")==$dateto->format("dmY"))	 $filename='Informe_detallado_consumidor_'.$datefrom->format("dmY").'.csv';
+ 			  else $filename='Informe_detallado_consumidor_'.$datefrom->format("dmY").'_'.$dateto->format("dmY").'.csv';
 				$array=$list;
 				//exclude tags column, last
 				$key='_tags';
@@ -1553,16 +1555,17 @@ class ERPStoresManagersOperationsController extends Controller
 			 $repository=$this->getDoctrine()->getRepository(ERPStoresManagersOperationsLines::class);
 			 if($store=="-1") $array_bestproducts=$repository->getFullOperationsByProduct($manager,$datefrom,$dateto,null);
 			 else $array_bestproducts=$repository->getFullOperationsByProduct($manager,$datefrom,$dateto,$store);
-	 		 $result=$this->csvBestProducts($array_bestproducts,$template);
+	 		 $result=$this->csvBestProducts($array_bestproducts,$template,$datefrom,$dateto);
  	 		 return $result;
 
  	 	 }
 
 
- 	 	 public function csvBestProducts($list, $template){
+ 	 	 public function csvBestProducts($list, $template,$datefrom,$dateto){
  	 		 $this->template=$template;
- 	 		 $filename='Productos_mas_utilizados.csv';
- 	 		 $array=$list;
+			 if($datefrom->format("dmY")==$dateto->format("dmY"))	 $filename='Productos_mas_utilizados_'.$datefrom->format("dmY").'.csv';
+			 else $filename='Productos_mas_utilizados_'.$datefrom->format("dmY").'_'.$dateto->format("dmY").'.csv';
+			 $array=$list;
  	 		 //exclude tags column, last
  	 		 $key='_tags';
  	 		 array_walk($array, function (&$v) use ($key) {
