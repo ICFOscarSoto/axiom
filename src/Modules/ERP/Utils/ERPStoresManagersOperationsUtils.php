@@ -39,6 +39,27 @@ class ERPStoresManagersOperationsUtils
     return $list;
   }
 
+
+  public function formatCustomizedOperationsList($id,$start,$end,$store){
+    $list=[
+      'id' => 'listOperations',
+      'route' => 'operationslist',
+      'routeParams' => ["id" => $id,
+                        "module" => $this->module,
+                        "name" => $this->name,
+                        "start" => $start,
+                        "end" => $end,
+                        "store" => $store],
+      'orderColumn' => 2,
+      'orderDirection' => 'DESC',
+      'tagColumn' => 2,
+      'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersCustomizedOperations.json"),true),
+      'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersCustomizedOperationsFieldButtons.json"),true),
+      'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersCustomizedOperationsTopButtons.json"),true)
+    ];
+    return $list;
+  }
+
   public function formatConsumersReportsList($id,$start,$end,$store){
     $list=[
       'id' => 'list'.$this->name,
