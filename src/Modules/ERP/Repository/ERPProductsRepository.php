@@ -224,6 +224,70 @@ class ERPProductsRepository extends ServiceEntityRepository
       return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
     }
 
+    public function getProductsBySupplier($supplier, $q){
+      $result = null;
+      if ($q!=null && $q!=''){
+        $q = urldecode($q);
+        $filter = '';
+        if (substr($q,0,1)=="["){
+          $jsonq = json_decode($q,true);
+          if (count($jsonq)>0){
+            $filter = "and (";
+            for($i=0; $i<count($jsonq); $i++){
+              $filter .= "p.id = ".$jsonq[$i];
+              if ($i<(count($jsonq)-1))
+                $filter .= ' or ';
+            }
+            $filter .= ")";
+          }
+        }else{
+          $q = str_replace(' ','%',$q);
+          $filter = "and (p.code like '%$q%' or p.name like '%$q%')";
+        }
+        $query="SELECT distinct(concat(p.id,'~',p.code)) as id,
+                       p.code as name,
+                       p.name as title
+                FROM erpshopping_prices sp LEFT JOIN
+                     erpproducts p on p.id=sp.product_id
+                WHERE sp.supplier_id=:supplier and
+                      p.active=1 and p.deleted=0 and
+                      sp.active=1 and sp.deleted=0 and
+                      (sp.start is null or sp.start>=now()) and
+                      (sp.end is null or sp.end<=now())
+                      $filter
+                ORDER BY title ASC";
+        $params=["supplier" => $supplier];
+        $result = $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+      }
+      return $result;
+    }
+
+    public function getProductBySupplier($supplier, $quantity, $product){
+      $aproduct = explode('~',$product);
+      if (count($aproduct)>0)
+        $product = $aproduct[0];
+      $query="SELECT concat(p.id,'~',p.code) as 'reference',
+                     p.name as 'description',
+                     sp.pvp as 'pvp',
+                     sd.discount as 'discount',
+                     p.code as 'code'
+              FROM erpshopping_prices sp LEFT JOIN
+                   erpproducts p on p.id=sp.product_id LEFT JOIN
+                   erpshopping_discounts sd on sd.supplier_id=sp.supplier_id and sd.category_id=p.category_id and sd.quantity<=:quantity and
+                    sd.active=1 and sd.deleted=0 and
+                    (sd.start is null or sd.start<=now()) and
+                     (sd.end is null or sd.end>=now())
+              WHERE sp.supplier_id=:supplier and
+                    p.id=:product and
+                    p.active=1 and p.deleted=0 and
+                    sp.active=1 and sp.deleted=0 and
+                    (sp.start is null or sp.start<=now()) and
+                    (sp.end is null or sp.end>=now())
+              ORDER BY p.name ASC, sd.quantity DESC";
+      $params=["supplier" => $supplier, "product" => $product, "quantity"=>$quantity];
+      return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+    }
+
 /*
 dejamos pendiente esta consulta porque falta por añadir en los pedidos de compra algun campo que indique que el material
 de ese pedido ya se ha recibido

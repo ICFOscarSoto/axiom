@@ -1,0 +1,485 @@
+{# TWIG que muestra una tabla en formato cuadrícula tipo excel
+   Parámetros: Array
+   "spreadsheet":{              // Array que contiene todos los parámetros de configuración del twig
+     "name":"",                 // Nombre de la tabla (Obligatorio)
+     "options":{                // Sobrecarga las opciones por defecto del componente
+      "option_x":"value_x"      // Se define como una cadena de texto de atributo:valor separado por comas
+     },
+     "prototipe":"",            // JSOn que define una nueva línea con sus valores por defecto y sus formulas matemáticas
+                                // Ejem: ['','',0,1,'=C#nl#*D#nl#'] Indica que la tabla tendrá filas de 5 columnas siendo las 2 primeras
+                                // vacias por defecto, la 3 y 4 son numéricas con valores 0 y 1 por defecto y la última columna una formula
+                                // que calcula la multiplicación de la columna 3 y 4. (#nl# indica la fila en la que estamos)
+                                // Se puede utilizar la nomenclatura de formulas {nombre_columna|número_de_fila} en vez de XY (donde x es la columna e y la fila)
+                                // ya que realiza el calculo con el contenido de la columna cuyo nombre=nombre_columna sin importar su posición
+                                // También se ha incorporado la posibilidad {nombre_columna} sin fila que indica que se utilice la fila del destinatario
+                                // Ejem: CampoTotal = {unidades}*{precio} -> La columna Campo tatal es la multiplicación de la columna uniddades*precio de esa misma fila
+     "tabs":[                   // Pestañas que contiene la tabla
+        "caption":""            // Título de la pestaña
+        "columns":[             // Muestra el subconjunto de columnas que se muestran en esta pestaña y en el orden que se quieren mostrar
+          {"name":""            // Debe de ser un nombre de columna incluido con las columns generales de la tabla
+           "options":[..]       // Array de opciones especificas de la columna en esta pestaña (No Obligatorio) TODO
+          }
+          ...
+        ]
+        ...
+     ],
+     "columns":{                // JSON que define el tipo de cada una de las columnas de la tabla así como sus atributos
+        ...                     // Debe coincidir el número de columnas con las columnas de cada una de las filas de "data" y "prototipe"
+        {
+          "name":""             // Obligatorio el campo 'name' ya que define el nombre de la columna sin importar su posición
+          "options":{           // Opciones nuevas de esta columna
+              "onchange":{        // Ante un cambio en la columna define la url donde obtener datos y oncomplete acciones posteriores al cambio
+                 "url":""                // Define la url donde recoger los datos para actualizar columnas en caso de cambio en una celda
+                                         // La url tendrá el format /Controlador/#1#/#2#/.../#n# donde #n# serán los parametros que
+                                         // necesite el controlador.
+                                         // Cada parámetro se rellena de la siguiente forma:
+                                         // - De forma directa: si indica un valor directamente desde el controlador (Ej: 35)
+                                         // - #d|field_dom|attr: Indica que la variable se rellena en tiempo real con el contenido del elemento del DOM
+                                         //   que tenga como ID field_dom en el atributo attr (Ej: #form_x_proveedor_id|value)
+                                         // - #c|X|Y: Indica que la variable se sustituye por el valor de la celda de esta misma tabla en la posición XY
+                                         //   X puede ser un nombre de columna.
+                                         //   Si no se indica Y se entiende que es la fila actual.
+                                         // - #w|var_js: Las que empiecen por w son variables javascript generada por alguna función e incluidas
+                                         //   dentro del array (window) que en accesible de forma global.
+                 "oncomplete":""         // Si existe esta variable con contenido javascript se ejecutará una vez acabada el onchange
+              }
+          }
+        }
+     },
+     "data":{                   // JSON con los datos iniciales a cargar en la tabla. Tienen que respetar el formato de prototipe
+                                // Ejem: [['R1''D1',10,10,'=C1*D1'],['R2''D2',10,10,'=C2*D2']]
+                                // Si un valor es de tipo dropdown y el value es distinto del label a mostrar se cargaría como 'value~label'
+        ...
+     },
+     "onload":""                // Código javascript para inicializar variables, refrescar tabla porque cambia un campo del formulario, ocultar columnas ...etc
+   }
+#}
+
+<div id="{{spreadsheet.name}}"></div>
+
+<script>
+function js{{spreadsheet.name}}_create(data){
+  document.getElementById('{{spreadsheet.name}}').innerHTML = '';
+
+  // Tabla excel
+  {% if spreadsheet.tabs is defined %}
+    var js{{spreadsheet.name}}_sheets = [];
+    var js{{spreadsheet.name}}_sheets_create = {{spreadsheet.tabs|raw}};
+    for(var i=0; i<js{{spreadsheet.name}}_sheets_create.length; i++){
+      js{{spreadsheet.name}}_sheets.push({
+        name:'{{spreadsheet.name}}',
+        sheetid:i,
+        sheetName:js{{spreadsheet.name}}_sheets_create[i]['caption'],
+        defaultColWidth: 100,
+        columnDrag: true,
+        allowInsertColumn:false,
+        allowInsertRow:true,
+        {% if spreadsheet.options is defined %}
+          {{spreadsheet.options|raw}},
+        {% endif %}
+        data:[],
+        columnso: {{spreadsheet.columns|raw}},
+        columns: {{spreadsheet.columns|raw}},
+        contextMenu: function(obj, x, y, e) {
+           var items = [];
+           items.push(
+             {
+               title: 'Añadir línea',
+               onclick: function () {
+                 if (typeof(y) === undefined || y==null){
+                  obj.insertRow(1, 0, true);
+                 }else
+                  obj.insertRow(1, parseInt(y));
+               }
+             });
+           items.push(
+             {
+               title: 'Borrar línea',
+               onclick: function () {
+                 if (window.confirm("¿Borrar líneas seleccionadas?")) {
+                   obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
+                 }
+               }
+             });
+           items.push({ type: 'line' });
+           items.push(
+             {
+               title: 'Mostrar columna',
+               onclick: function () {
+
+               }
+             });
+           items.push(
+             {
+               title: 'Ocultar columna',
+               onclick: function () {
+                if (x!=null){
+                   if (window.confirm("¿Ocultar columna seleccionada?")) {
+                     obj.hideColumn(parseInt(x));
+                   }
+                }
+               }
+             });
+           items.push({ type: 'line' });
+           items.push(
+             {
+               title: 'Subir línea',
+               onclick: function () {
+                 if (typeof(y) != 'undefined' && y!=null && parseInt(y)>0){
+                   obj.moveRow(parseInt(y), parseInt(y)-1);
+                 }
+               }
+             });
+           items.push(
+             {
+               title: 'Bajar línea',
+               onclick: function () {
+                 if (typeof(y) != 'undefined' && y!=null && parseInt(y)<obj.getData().length-1){
+                   obj.moveRow(parseInt(y), parseInt(y)+1);
+                 }
+               }
+             });
+           return items;
+       },
+       onchange: function(instance, cell, x, y, value, valueOld, type) {
+        var sheet = instance.jexcel;
+        // Si la celda tiene onchange como options y tiene url o oncomplete (y no estamos en la carga inicial)
+        var options = sheet.options.columns[x].options;
+        if (!sheet.options.loadinit && options !== undefined && options.onchange !== undefined && value!=valueOld){
+          // Obtener url completa con los campos necesarios para la busqueda
+          change = options.onchange;
+          if (change.url !== undefined && value!=undefined){
+            var url = change.url;
+            url = sheet.replaceUrl(url, y);
+            if (url != ''){
+              $.ajax({
+                url: url
+              }).done(function(result) {
+                if (result != null && result != '' && result != '[]'){
+                  // Si hay varios me quedo el primero que es el descuento más ventajoso
+                  // la primera línea de resultado
+                  var oresult = JSON.parse(JSON.stringify(result))[0];
+                  for (var [key, valueq] of Object.entries(oresult)) {
+                    key = JSON.parse(JSON.stringify(key));
+                    if (sheet.getColumnKey(key)!=-1){
+                      sheet.setValueFromKey(key, y, valueq, true);
+                    }else{
+                      // Datos a utilizar en otras columnas
+                      window[key] = valueq;
+                    }
+                  }
+                }
+                if (change.oncomplete !== undefined && change.oncomplete != null && change.oncomplete!=''){
+                  eval(change.oncomplete);
+                }
+              });
+            }
+          }else {
+            if (change.oncomplete !== undefined && change.oncomplete != null && change.oncomplete!=''){
+              eval(change.oncomplete);
+            }
+          }
+        }
+      },
+      oninsertrow: function(instance, rowNumber, numOfRows, records, insertBefore){
+        var sheet = instance.jexcel;
+        var tprototipe = JSON.parse(JSON.stringify({{spreadsheet.prototipe|raw}}));
+        for (const key in tprototipe) {
+          var find = '#nl#';
+          var re = new RegExp(find, 'g');
+          str=tprototipe[key]+'';
+          var valuen = JSON.parse(JSON.stringify(tprototipe[key]+''));
+          if (insertBefore){
+            valuen = valuen.replace(re,(0)+'');
+            valuen = sheet.replaceFormula(valuen, 0);
+            sheet.setValueFromKey(key, 0, valuen, true);
+          }else{
+            valuen = valuen.replace(re,(rowNumber+2)+'');
+            valuen = sheet.replaceFormula(valuen, rowNumber+1);
+            sheet.setValueFromKey(key, rowNumber+1, valuen, true);
+          }
+        }
+      },
+      onmovecolumn: function(instance, o, d){
+        var sheet = instance.jexcel;
+        if (!sheet.options.loadinit){
+          $('#'+sheet.options.name).find('.jexcel_tab_link.saveview.disabled').each(function(){ $(this).removeClass('disabled'); });
+          $('#'+sheet.options.name).find('.jexcel_tab_link.tabnew').each(function(){ $(this).addClass('disabled'); });
+        }
+      },
+      onload: function(instance) {
+        var sheet   = instance.jexcel;
+        var sheetid = sheet.options.sheetid;
+        var tabs    = {{spreadsheet.tabs|raw}};
+        var tab     = tabs[sheetid];
+
+        // Carga de la vista del usuario
+        sheet.options['loadinit'] = true;
+
+        if (sheet.options['sheetnew']){
+          sheet.insertRow();
+          sheet.deleteRow(0, sheet.options.data.length-1);
+        }
+
+        if (typeof(data) != 'undefined' && data!= null && data.length>0){
+          for (var d=0; d<data.length; d++){
+            sheet.insertRow(1, d);
+            for (var [key, value] of Object.entries(data[d])) {
+              value = sheet.replaceFormula(value, d);
+              sheet.setValueFromKey(key, d, value, true);
+            }
+          }
+        }
+
+        // Ocultar y reordenar columnas
+        // Se mueven al principio todas las columnas definidas por el usuario
+        // para esta pestaña
+        if (!sheet.options['sheetnew'])
+          if (typeof(tab) != 'undefined' && typeof(tab.columns) != 'undefined' && tab.columns!= null & tab.columns.length>0){
+            for (var c=0; c<tab.columns.length; c++){
+              var column    = tab['columns'][c]['name'];
+              var columnid  = sheet.getColumnKey(column);
+              sheet.moveColumn(columnid, c);
+            }
+            // Se ocultan las columnas no definidas
+            for (c=0; c<sheet.options.columns.length; c++){
+              column = sheet['options']['columns'][c]['name'];
+              hidecolumn = true;
+              for (d=0; d<tab.columns.length && hidecolumn; d++){
+                if (column==tab['columns'][d]['name'])
+                  hidecolumn = false;
+              }
+              if (hidecolumn)
+                sheet.hideColumnKey(column);
+            }
+          }
+
+        // Una vez creado para ocultar filas...etc
+        {% if spreadsheet.onload is defined %}
+        $( document ).ready(function() {
+          {{spreadsheet.onload|raw}}
+        });
+        {% endif %}
+
+        // Se crea una línea en blanco para poder insertar
+        if (!sheet.options['sheetnew'])
+          sheet.insertRow();
+
+        sheet.options['loadinit'] = false;
+      },
+      text:{
+        noRecordsFound: 'No se encontraron registros',
+        showingPage: 'Mostrando página {0} de {1}',
+        show: 'Buscar ',
+        search: 'Buscar',
+        entries: ' entradas',
+        columnName: 'Nombre de columna',
+        insertANewColumnBefore: 'Insertar una nueva columna antes',
+        insertANewColumnAfter: 'Insertar una nueva columna después de',
+        deleteSelectedColumns: 'Eliminar columnas seleccionadas',
+        renameThisColumn: 'Renombrar esta columna',
+        orderAscending: 'Orden ascendente',
+        orderDescending: 'Orden descendente',
+        insertANewRowBefore: 'Insertar una nueva fila antes',
+        insertANewRowAfter: 'Insertar una nueva fila después de',
+        deleteSelectedRows: 'Eliminar filas seleccionadas',
+        editComments: 'Editar comentarios',
+        addComments: 'Agregar comentarios',
+        comments: 'Comentarios',
+        clearComments: 'Borrar comentarios',
+        copy: 'Copiar...',
+        paste: 'Pegar...',
+        saveAs: 'Guardar como...',
+        about: 'Acerca de',
+        areYouSureToDeleteTheSelectedRows: '¿Está seguro de eliminar las filas seleccionadas?',
+        areYouSureToDeleteTheSelectedColumns: '¿Está seguro de eliminar las columnas seleccionadas?',
+        thisActionWillDestroyAnyExistingMergedCellsAreYouSure: 'Esta acción destruirá todas las celdas combinadas existentes. ¿Está seguro?',
+        thisActionWillClearYourSearchResultsAreYouSure: 'Esta acción borrará los resultados de búsqueda. ¿Está seguro?',
+        thereIsAConflictWithAnotherMergedCell: 'Hay un conflicto con otra celda combinada',
+        invalidMergeProperties: 'Propiedades combinadas no válidas',
+        cellAlreadyMerged: 'Celda ya fusionada',
+        noCellsSelected: 'Ninguna celda seleccionada'
+      }
+    });
+   };
+   jspreadsheet.tabs(document.getElementById('{{spreadsheet.name}}'), js{{spreadsheet.name}}_sheets);
+  {% else %} //------------------------------------------------------------------------------------
+   jspreadsheet(document.getElementById('{{spreadsheet.name}}'),{
+      name:'{{spreadsheet.name}}',
+      defaultColWidth: 100,
+      columnDrag: true,
+      allowInsertColumn:false,
+      allowInsertRow:true,
+      {% if spreadsheet.options is defined %}
+        {{spreadsheet.options|raw}},
+      {% endif %}
+      data:[],
+      columns: {{spreadsheet.columns|raw}},
+      contextMenu: function(obj, x, y, e) {
+         var items = [];
+         items.push(
+           {
+             title: 'Añadir línea',
+             onclick: function () {
+               if (typeof(y) === undefined || y==null){
+                obj.insertRow(1, 0, true);
+               }else
+                obj.insertRow(1, parseInt(y));
+             }
+           });
+         items.push(
+           {
+             title: 'Borrar línea',
+             onclick: function () {
+               if (window.confirm("¿Borrar líneas seleccionadas?")) {
+                 obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
+               }
+             }
+           });
+         items.push({ type: 'line' });
+         items.push(
+           {
+             title: 'Mostrar columna',
+             onclick: function () {
+
+             }
+           });
+         items.push(
+           {
+             title: 'Ocultar columna',
+             onclick: function () {
+              if (x!=null){
+                 if (window.confirm("¿Ocultar columna seleccionada?")) {
+                   obj.hideColumn(parseInt(x));
+                 }
+              }
+             }
+           });
+         return items;
+     },
+     onchange: function(instance, cell, x, y, value, valueOld, type) {
+      var sheet = instance.jexcel;
+      // Si la celda tiene onchange como options y tiene url o oncomplete
+      var options = sheet.options.columns[x].options;
+      if (!sheet.options.loadinit && options !== undefined && options.onchange !== undefined && value!=valueOld){
+        // Obtener url completa con los campos necesarios para la busqueda
+        change = options.onchange;
+        if (change.url !== undefined && value!=undefined){
+          var url = change.url;
+          url = sheet.replaceUrl(url, y);
+          if (url != ''){
+            $.ajax({
+              url: url
+            }).done(function(result) {
+              if (result != null && result != '' && result != '[]'){
+                // Si hay varios me quedo el primero que es el descuento más ventajoso
+                // la primera línea de resultado
+                var oresult = JSON.parse(JSON.stringify(result))[0];
+                for (var [key, valueq] of Object.entries(oresult)) {
+                  key = JSON.parse(JSON.stringify(key));
+                  if (sheet.getColumnKey(key)!=-1){
+                    sheet.setValueFromKey(key, y, valueq, true);
+                  }else{
+                    // Datos a utilizar en otras columnas
+                    window[key] = valueq;
+                  }
+                }
+              }
+              if (change.oncomplete !== undefined && change.oncomplete != null && change.oncomplete!=''){
+                eval(change.oncomplete);
+              }
+            });
+          }
+        }else {
+          if (change.oncomplete !== undefined && change.oncomplete != null && change.oncomplete!=''){
+            eval(change.oncomplete);
+          }
+        }
+      }
+    },
+    oninsertrow: function(instance, rowNumber, numOfRows, records, insertBefore){
+      var sheet = instance.jexcel;
+      var tprototipe = JSON.parse(JSON.stringify({{spreadsheet.prototipe|raw}}));
+      for (const key in tprototipe) {
+        var find = '#nl#';
+        var re = new RegExp(find, 'g');
+        str=tprototipe[key]+'';
+        var valuen = JSON.parse(JSON.stringify(tprototipe[key]+''));
+        if (insertBefore){
+          valuen = valuen.replace(re,(0)+'');
+          valuen = sheet.replaceFormula(valuen, 0);
+          sheet.setValueFromKey(key, 0, valuen, true);
+        }else{
+          valuen = valuen.replace(re,(rowNumber+2)+'');
+          valuen = sheet.replaceFormula(valuen, rowNumber+1);
+          sheet.setValueFromKey(key, rowNumber+1, valuen, true);
+        }
+      }
+    },
+    onload: function(instance) {
+      var sheet = instance.jexcel;
+      sheet.options['loadinit'] = true;
+
+      // Datos desde base de datos sustituidos
+      if (typeof(data) != 'undefined' && data!= null && data.length>0){
+        for (var d=0; d<data.length; d++){
+          sheet.insertRow(1, d);
+          for (var [key, value] of Object.entries(data[d])) {
+            data[d][key] = sheet.replaceFormula(data[d][key], d);
+            sheet.setValueFromKey(key, d, data[d][key], true);
+          }
+        }
+      }
+
+      // Una vez creado para ocultar filas...etc
+      {% if spreadsheet.onload is defined %}
+      $( document ).ready(function() {
+        {{spreadsheet.onload|raw}}
+      });
+      {% endif %}
+
+      // Se crea una línea en blanco para poder insertar
+      sheet.insertRow();
+
+      sheet.options['loadinit'] = false;
+    },
+    text:{
+      noRecordsFound: 'No se encontraron registros',
+      showingPage: 'Mostrando página {0} de {1}',
+      show: 'Buscar ',
+      search: 'Buscar',
+      entries: ' entradas',
+      columnName: 'Nombre de columna',
+      insertANewColumnBefore: 'Insertar una nueva columna antes',
+      insertANewColumnAfter: 'Insertar una nueva columna después de',
+      deleteSelectedColumns: 'Eliminar columnas seleccionadas',
+      renameThisColumn: 'Renombrar esta columna',
+      orderAscending: 'Orden ascendente',
+      orderDescending: 'Orden descendente',
+      insertANewRowBefore: 'Insertar una nueva fila antes',
+      insertANewRowAfter: 'Insertar una nueva fila después de',
+      deleteSelectedRows: 'Eliminar filas seleccionadas',
+      editComments: 'Editar comentarios',
+      addComments: 'Agregar comentarios',
+      comments: 'Comentarios',
+      clearComments: 'Borrar comentarios',
+      copy: 'Copiar...',
+      paste: 'Pegar...',
+      saveAs: 'Guardar como...',
+      about: 'Acerca de',
+      areYouSureToDeleteTheSelectedRows: '¿Está seguro de eliminar las filas seleccionadas?',
+      areYouSureToDeleteTheSelectedColumns: '¿Está seguro de eliminar las columnas seleccionadas?',
+      thisActionWillDestroyAnyExistingMergedCellsAreYouSure: 'Esta acción destruirá todas las celdas combinadas existentes. ¿Está seguro?',
+      thisActionWillClearYourSearchResultsAreYouSure: 'Esta acción borrará los resultados de búsqueda. ¿Está seguro?',
+      thereIsAConflictWithAnotherMergedCell: 'Hay un conflicto con otra celda combinada',
+      invalidMergeProperties: 'Propiedades combinadas no válidas',
+      cellAlreadyMerged: 'Celda ya fusionada',
+      noCellsSelected: 'Ninguna celda seleccionada'
+    }
+  });
+  {% endif %}
+}
+var data    = JSON.parse(JSON.stringify({{spreadsheet.data|raw}}));
+js{{spreadsheet.name}}_create(data);
+
+</script>

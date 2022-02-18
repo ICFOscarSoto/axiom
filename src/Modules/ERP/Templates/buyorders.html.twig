@@ -1,5 +1,6 @@
 {% set params = app.request.attributes.get('_route_params')|merge(app.request.query.all()) %}
 {% block header %}
+<head>
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -9,9 +10,10 @@
 	{{ include('@Globale/header.html.twig') }}
 	<!-- Imported styles on this page -->
 	<link rel="stylesheet" href="{{ url('index') }}css/bootstrap-grid.css">
-		<link rel="stylesheet" href="{{ url('index') }}css/timeline.css">
-	<link rel="stylesheet" href="{{ url('index') }}/js/jvectormap/jquery-jvectormap-1.2.2.css">
-	<link rel="stylesheet" href="{{ url('index') }}/js/rickshaw/rickshaw.min.css">
+	<link rel="stylesheet" href="{{ url('index') }}css/timeline.css">
+	<link rel="stylesheet" href="{{ url('index') }}js/jvectormap/jquery-jvectormap-1.2.2.css">
+	<link rel="stylesheet" href="{{ url('index') }}js/rickshaw/rickshaw.min.css">
+</head>	
 {% endblock %}
 <title>{% block title %}{{ interfaceName|trans }}{% endblock %}</title>
 <body class="page-body" data-url="{{ url('indexAdmin') }}">
@@ -56,7 +58,7 @@
 					{{ include('@ERP/buyorders_destination.html.twig') }}
 					{{ include('@ERP/buyorders_search_customer.html.twig') }}
 		</div>
-		{{ include('@ERP/buyorders_lines.html.twig') }}
+		{{ include('@Globale/form_jspreadsheet_html.twig') }}
 </div>
 
 <div class="row">

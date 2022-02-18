@@ -1190,4 +1190,35 @@ class ERPProductsController extends Controller
 		 return new JsonResponse(["result"=>1, "text"=>"Se ha recepcionado la mercancia del traspaso ".$transfer]);
 	 }
 
+	 /**
+	 * @Route("/api/getWSProductsSupplier/{supplier_id}", name="getWSProductsSupplier", defaults={"supplier_id"=0})
+	 */
+	 public function getWSProductsSupplier(Request $request, $supplier_id)
+	 {
+		 // Listado de productos de un proveedor que tengan precio
+	 	 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		 $productRepository			= $this->getDoctrine()->getRepository(ERPProducts::class);
+		 $result 	 = [];
+		 $q 			 = $request->get('q');
+		 $products = $productRepository->getProductsBySupplier($supplier_id, $q);
+		 if ($products!=null){
+			 $result = $products;
+		 }
+	 	 return new JsonResponse($result);
+	 }
+
+	 /**
+	 * @Route("/api/getWSProductSupplier/{supplier_id}/{product_id}/{quantity}", name="getWSProductSupplier", defaults={"supplier_id"=0, "product_id"=0, "quantity"=1})
+	 */
+	 public function getWSProductSupplier($supplier_id, $product_id, $quantity)
+	 {
+		  $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			$productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
+			$result = [];
+			$product = $productRepository->getProductBySupplier($supplier_id, $product_id, $quantity);
+			if ($product!=null){
+				$result = $product;
+			}
+			return new JsonResponse($result);
+	 }
 }

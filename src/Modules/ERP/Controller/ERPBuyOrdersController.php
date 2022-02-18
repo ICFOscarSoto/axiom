@@ -200,6 +200,76 @@ class ERPBuyOrdersController extends Controller
     	$breadcrumb=$menurepository->formatBreadcrumb('genericindex','ERP','BuyOrders');
     	array_push($breadcrumb,$new_breadcrumb);
 
+			// Líneas
+			$supplier_id = '1304'; // TODO Se carga de base de datos para este pedido
+
+			$spreadsheet = [];
+			$spreadsheet['name']       = "buyorders";
+			$spreadsheet['options']    = "pagination:10, tableOverflow: true";
+		  $spreadsheet['prototipe']  = "{reference:'', description:'', quantity:1, pvp:0, discount:0, shopping_price:'={pvp}-({pvp}*({discount}/100))', total:'={quantity}*{shopping_price}'}";
+			$spreadsheet['tabs']   		 =
+			 "[
+				{ caption:'Datos generales',
+					columns:[
+						{name:'reference'},
+						{name:'quantity'},
+						{name:'discount'},
+						{name:'pvp'},
+						{name:'shopping_price'},
+						{name:'total'}
+					]
+				},
+				{ caption:'Precios',
+					columns:[
+						{name:'reference'},
+						{name:'shopping_price'},
+						{name:'total'}
+					]
+				}
+			  ]
+			 ";
+		  $spreadsheet['columns']    =
+		   "[
+		    { name: 'reference', type: 'dropdown', width:'100px', title:'Referencia', autocomplete:true, url: '/api/getWSProductsSupplier/".$supplier_id."',
+					options: {
+						remoteSearch: true,
+						autocomplete: true,
+						url: '/api/getWSProductsSupplier/#d|supplier-form-id|value|".$supplier_id."',
+						onchange: {
+							url: '/api/getWSProductSupplier/#d|supplier-form-id/#c|quantity/#c|reference',
+							oncomplete: ''
+						}
+					}
+				},
+		    { name: 'description', type: 'text', width:'200px', title: 'Descripcion'},
+		    { name: 'quantity', type: 'numeric', width:'100px', title: 'Cantidad' },
+		    { name: 'pvp', type: 'text', width:'100px', title: 'PVP', locale: 'sp-SP', mask: '#.##0,0000 €', options: { style:'currency', currency: 'EUR' } },
+		    { name: 'discount', type: 'numeric', width:'100px', title: 'Descuento'},
+		    { name: 'shopping_price', type: 'text', width:'100px', title: 'Precio compra', readOnly:true , locale: 'sp-SP', mask: '#.##0,0000 €', options: { style:'currency', currency: 'EUR' } },
+		    { name: 'total', type: 'text', width:'100px', title: 'Total', readOnly:true, locale: 'sp-SP', mask: '#.##0,0000 €', options: { style:'currency', currency: 'EUR' } }
+		   ]";
+			// TODO cargar de base de datos
+		  $spreadsheet['data']       =
+		   "[
+		    {reference:'196899~7401195', description:'LOCTITE 577 sellador roscas 50g tubo uso general', quantity:'10',pvp:'20',discount:'50',shopping_price:'={pvp}-({pvp}*({discount}/100))',total:'={quantity}*{shopping_price}'},
+		    {reference:'173112~741127213',description:'LOCTITE 596 sellador juntas rojo automovil 80ml', quantity:'5',pvp:'20',discount:'20',shopping_price:'={pvp}-({pvp}*({discount}/100))',total:'={quantity}*{shopping_price}'}
+		   ]";
+			$spreadsheet['onload'] 	   =
+				"$('#supplier-form-id').val('".$supplier_id."');
+				 $('#supplier-form-id').on(\"change\", function() {
+ 				 	if (typeof(document.getElementById('".$spreadsheet['name']."').jexcel[0]) == 'undefined'){
+						var sheet = document.getElementById('".$spreadsheet['name']."').jexcel;
+					  sheet.insertRow();
+					  sheet.deleteRow(0, sheet.options.data.length-1);
+					}else{
+						for (var i=0; i<document.getElementById('".$spreadsheet['name']."').jexcel.length; i++){
+							var sheet = document.getElementById('".$spreadsheet['name']."').jexcel[i];
+							sheet.insertRow();
+						  sheet.deleteRow(0, sheet.options.data.length-1);
+						}
+					}
+				 });";
+
       if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
     			return $this->render('@ERP/buyorders.html.twig', [
     				'moduleConfig' => $config,
@@ -222,10 +292,11 @@ class ERPBuyOrdersController extends Controller
 						'destinationcountries' => $destinationcountries,
 						'customerslist' => $customerslist,
 						'id' => $id,
-						'include_header' => [["type"=>"css", "path"=>"/js/jexcel/jexcel.css"],
-                                 ["type"=>"js",  "path"=>"/js/jexcel/jexcel.js"],
-																 ["type"=>"css", "path"=>"/js/jsuites/jsuites.css"],
-										             ["type"=>"js",  "path"=>"/js/jsuites/jsuites.js"],
+						'spreadsheet' => $spreadsheet,
+						'include_header' => [["type"=>"css", "path"=>"js/jexcel/jexcel.css"],
+                                 ["type"=>"js",  "path"=>"js/jexcel/jexcel.js"],
+																 ["type"=>"css", "path"=>"js/jsuites/jsuites.css"],
+										             ["type"=>"js",  "path"=>"js/jsuites/jsuites.js"]
 															 ],
     				]);
     		}

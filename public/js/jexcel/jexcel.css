@@ -4,7 +4,6 @@
 
 .jexcel_container {
     display:inline-block;
-    padding-right:2px;
     box-sizing: border-box;
     overscroll-behavior: contain;
     outline: none;
@@ -37,15 +36,13 @@
 .jexcel_content {
     display:inline-block;
     box-sizing: border-box;
-    padding-right:3px;
-    padding-bottom:3px;
     position:relative;
     scrollbar-width: thin;
     scrollbar-color: #666 transparent;
 }
 
 @supports (-moz-appearance:none) {
-    .jexcel_content { padding-right:10px; } 
+    .jexcel_content { padding-right:10px; }
 }
 
 .jexcel_content::-webkit-scrollbar {
@@ -56,9 +53,9 @@
 .jexcel_content::-webkit-scrollbar-track {
     background: #eee;
 }
- 
+
 .jexcel_content::-webkit-scrollbar-thumb {
-  background: #666; 
+  background: #666;
 }
 
 .jexcel {
@@ -68,7 +65,7 @@
     empty-cells: show;
     border: 0px;
     background-color: #fff;
-    width: 0;
+    width: 100%;
 
     border-top: 1px solid transparent;
     border-left: 1px solid transparent;
@@ -630,7 +627,7 @@
     display:none;
 }
 
-.jexcel_toolbar i.jexcel_toolbar_item 
+.jexcel_toolbar i.jexcel_toolbar_item
 {
     width:24px;
     height:24px;
@@ -639,12 +636,12 @@
     display:inline-block;
 }
 
-.jexcel_toolbar i.jexcel_toolbar_item:hover 
+.jexcel_toolbar i.jexcel_toolbar_item:hover
 {
     background-color:#ddd;
 }
 
-.jexcel_toolbar select.jexcel_toolbar_item 
+.jexcel_toolbar select.jexcel_toolbar_item
 {
     margin-left:2px;
     margin-right:2px;
@@ -690,8 +687,26 @@
     background-color:#ddd;
 }
 
+.jexcel_tabs .jexcel_tab_link.disabled
+{
+    opacity: 0.3 !important; cursor: auto !important;
+}
+.jexcel_tabs .left
+{
+  display:inline !important;
+  position: relative !important;
+  float: left !important;
+}
+.jexcel_tabs .right
+{
+  display:inline !important;
+  position: relative !important;
+  float: right !important;
+  margin-left: auto;
+}
+
 .jexcel_hidden_index > tbody > tr > td:first-child,
-.jexcel_hidden_index > thead > tr > td:first-child, 
+.jexcel_hidden_index > thead > tr > td:first-child,
 .jexcel_hidden_index > tfoot > tr > td:first-child,
 .jexcel_hidden_index > colgroup > col:first-child
 {
