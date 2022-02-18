@@ -92,7 +92,7 @@ class ERPStoresManagersOperationsRepository extends ServiceEntityRepository
           LEFT JOIN erpstores_managers_operations_lines l ON l.operation_id=o.id
           LEFT JOIN erpoffer_prices of ON of.product_id=l.product_id AND of.customer_id=m.customer_id
           WHERE o.active=1 AND o.manager_id=:MANAGER AND o.DATE >= :START AND o.DATE<=:END
-          GROUP BY(o.consumer_id) ORDER BY c.NAME, c.lastname";
+          GROUP BY(o.consumer_id) ORDER BY c.NAME, c.lastname LIMIT 10";
           $params=[
                    'MANAGER' => $manager,
                    'START' => $date_start,
@@ -111,7 +111,7 @@ class ERPStoresManagersOperationsRepository extends ServiceEntityRepository
           LEFT JOIN erpstores_managers_operations_lines l ON l.operation_id=o.id
           LEFT JOIN erpoffer_prices of ON of.product_id=l.product_id AND of.customer_id=m.customer_id
           WHERE o.active=1 AND o.manager_id=:MANAGER AND o.store_id=:STORE AND o.DATE >= :START AND o.DATE<=:END
-          GROUP BY(o.consumer_id) ORDER BY c.NAME, c.lastname";
+          GROUP BY(o.consumer_id) ORDER BY c.NAME, c.lastname LIMIT 10";
           $params=[
                    'MANAGER' => $manager,
                    'STORE' => $store,
