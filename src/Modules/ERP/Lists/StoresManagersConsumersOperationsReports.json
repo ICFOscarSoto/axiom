@@ -5,11 +5,11 @@
   },
   {
       "name": "agent__name_o_agent__lastname",
-      "caption": "Nombre del agente"
+      "caption": "Agente"
   },
   {
       "name": "consumer__name_o_consumer__lastname",
-      "caption": "Nombre del trabajador"
+      "caption": "Trabajador"
   },
   {
       "name": "consumer__idcard",

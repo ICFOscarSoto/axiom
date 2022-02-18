@@ -273,7 +273,7 @@ public function getFullOperationsByProduct($manager, $start, $end, $store)
 
       }
 
-        $query="SELECT l.code,l.name,
+        $query="SELECT l.code Código,l.name Nombre,
           IFNULL((SELECT IFNULL(REPLACE(ROUND(SUM(ofx.price*lx.quantity),2),'.',','),0)
   						 FROM erpstores_managers_operations_lines lx
   						 LEFT JOIN erpstores_managers_operations ox ON ox.id=lx.operation_id
@@ -281,7 +281,7 @@ public function getFullOperationsByProduct($manager, $start, $end, $store)
   						 LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
   						 LEFT JOIN erpstores sx ON sx.id=ox.store_id
   						 WHERE ox.active=1 AND ox.manager_id=:MANAGER AND ox.DATE >=:START AND ox.DATE<=:END AND lx.product_id=l.product_id
-  						 GROUP BY (lx.product_id)),0) Filtro,
+  						 GROUP BY (lx.product_id)),0) 'Rango Fechas',
           IFNULL((SELECT IFNULL(REPLACE(ROUND(SUM(ofx.price*lx.quantity),2),'.',','),0)
        						 FROM erpstores_managers_operations_lines lx
        						 LEFT JOIN erpstores_managers_operations ox ON ox.id=lx.operation_id
@@ -357,7 +357,7 @@ public function getFullOperationsByProduct($manager, $start, $end, $store)
 
             }
 
-              $query="SELECT l.code,l.name,
+              $query="SELECT l.code Código,l.name Nombre,
                 IFNULL((SELECT IFNULL(REPLACE(ROUND(SUM(ofx.price*lx.quantity),2),'.',','),0)
         						 FROM erpstores_managers_operations_lines lx
         						 LEFT JOIN erpstores_managers_operations ox ON ox.id=lx.operation_id
@@ -365,7 +365,7 @@ public function getFullOperationsByProduct($manager, $start, $end, $store)
         						 LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
         						 LEFT JOIN erpstores sx ON sx.id=ox.store_id
         						 WHERE ox.active=1 AND ox.manager_id=:MANAGER AND ox.store_id=:STORE AND ox.DATE >=:START AND ox.DATE<=:END AND lx.product_id=l.product_id
-        						 GROUP BY (lx.product_id)),0) Filtro,
+        						 GROUP BY (lx.product_id)),0) 'Rango Fechas',
                 IFNULL((SELECT IFNULL(REPLACE(ROUND(SUM(ofx.price*lx.quantity),2),'.',','),0)
              						 FROM erpstores_managers_operations_lines lx
              						 LEFT JOIN erpstores_managers_operations ox ON ox.id=lx.operation_id
@@ -428,9 +428,8 @@ public function getFullOperationsByProduct($manager, $start, $end, $store)
       }
 
       if($store){
-        $query="
-        SELECT DISTINCT l.product_id,o.consumer_id,o.date,l.code,l.name,s.name,l.quantity,
-        of.price,IFNULL(ROUND(of.price*l.quantity,2),0) Total
+        $query="SELECT DISTINCT o.date Fecha,l.code Código,l.name Nombre,s.name Almacén,l.quantity Cantidad,
+        REPLACE(of.price,'.',',') Precio,IFNULL(REPLACE(ROUND(of.price*l.quantity,2),'.',','),0) Total
         FROM erpstores_managers_operations_lines l
         LEFT JOIN erpstores_managers_operations o ON o.id=l.operation_id
         LEFT JOIN erpstores_managers m ON m.id=o.manager_id
@@ -447,9 +446,8 @@ public function getFullOperationsByProduct($manager, $start, $end, $store)
 
       }
       else{
-        $query="
-        SELECT DISTINCT l.product_id,o.consumer_id,o.date,l.code,l.name,s.name,l.quantity,
-        of.price,IFNULL(ROUND(of.price*l.quantity,2),0) Total
+        $query="SELECT DISTINCT o.date Fecha,l.code Código,l.name Nombre,s.name Almacén,l.quantity Cantidad,
+        REPLACE(of.price,'.',',') Precio,IFNULL(REPLACE(ROUND(of.price*l.quantity,2),'.',','),0) Total
         FROM erpstores_managers_operations_lines l
         LEFT JOIN erpstores_managers_operations o ON o.id=l.operation_id
         LEFT JOIN erpstores_managers m ON m.id=o.manager_id
@@ -460,6 +458,67 @@ public function getFullOperationsByProduct($manager, $start, $end, $store)
 
         $params=[
                  'CONSUMER' => $consumer,
+                 'START' => $date_start,
+                 'END' => $date_end
+                 ];
+
+      }
+
+
+      $result=$this->getEntityManager()->getConnection()->executeQuery($query,$params)->fetchAll();
+      return $result;
+
+
+    }
+
+
+    public function getOperationsByProductDetailed($product,$manager,$datefrom,$dateto,$store){
+
+      if($datefrom) $date_start=$datefrom->format("Y-m-d 00:00:00");
+      else{
+        $date_start=new \Datetime();
+        $date_start->setTimestamp(0);
+        $date_start=$date_start->format("Y-m-d 00:00:00");
+
+      }
+
+      if($dateto) $date_end=$dateto->format("Y-m-d 23:59:59");
+      else {
+        $date_end=new \Datetime();
+        $date_end=$date_end->format("Y-m-d 23:59:59");
+      }
+
+      if($store){
+        $query="SELECT DISTINCT .o.date Fecha,l.code Código,l.name Nombre,concat(c.name,' ',c.lastname) Trabajador, s.name Almacén, l.quantity Cantidad, REPLACE(of.price,'.',',') Precio, IFNULL(REPLACE(ROUND(of.price*l.quantity,2),'.',','),0) Total
+        FROM erpstores_managers_operations_lines l
+        LEFT JOIN erpstores_managers_operations o ON o.id=l.operation_id
+        LEFT JOIN erpstores_managers_consumers c ON c.id=o.consumer_id
+        LEFT JOIN erpstores_managers m ON m.id=o.manager_id
+        LEFT JOIN erpoffer_prices of ON of.product_id=l.product_id AND of.customer_id=m.customer_id
+        LEFT JOIN erpstores s ON s.id=o.store_id
+        WHERE o.active=1 AND l.product_id=:PRODUCT AND o.DATE >=:START AND o.DATE<=:END AND o.store_id=:STORE";
+
+        $params=[
+                 'PRODUCT' => $product,
+                 'START' => $date_start,
+                 'END' => $date_end,
+                 'STORE' => $store
+                 ];
+
+      }
+      else{
+        $query="SELECT DISTINCT o.date Fecha,l.code Código,l.name Nombre, concat(c.name,' ',c.lastname) Trabajador, s.name Almacén, l.quantity Cantidad, REPLACE(of.price,'.',',') Precio, IFNULL(REPLACE(ROUND(of.price*l.quantity,2),'.',','),0) Total
+        FROM erpstores_managers_operations_lines l
+        LEFT JOIN erpstores_managers_operations o ON o.id=l.operation_id
+        LEFT JOIN erpstores_managers_consumers c ON c.id=o.consumer_id
+        LEFT JOIN erpstores_managers m ON m.id=o.manager_id
+        LEFT JOIN erpoffer_prices of ON of.product_id=l.product_id AND of.customer_id=m.customer_id
+        LEFT JOIN erpstores s ON s.id=o.store_id
+        WHERE o.active=1 AND l.product_id=:PRODUCT AND o.DATE >=:START AND o.DATE<=:END
+        ";
+
+        $params=[
+                 'PRODUCT' => $product,
                  'START' => $date_start,
                  'END' => $date_end
                  ];

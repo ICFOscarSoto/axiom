@@ -1277,7 +1277,7 @@ class ERPStoresManagersOperationsController extends Controller
 																																			 LEFT JOIN erpoffer_prices of ON of.product_id=l.product_id AND of.customer_id=m.customer_id
 																																			 LEFT JOIN erpstores s ON s.id=o.store_id',
 																																			 'o.active=1 AND o.consumer_id='.$consumerid.' AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'" AND o.store_id='.$store.'
-																																			 GROUP BY DATE(o.date),l.product_id',null);
+																																			 ',null);
 					 }
 					 else{
 						 $return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields,ERPStoresManagersOperationsLines::class,['l.product_id'=>'id','o.consumer_id'=>'consumer__id','o.date'=>'date','l.code'=>'code','l.name'=>'name','s.name'=>'store__name','l.quantity'=>'quantity','of.price'=>'price','IFNULL(ROUND(of.price*l.quantity,2),0)'=>'total'],
@@ -1287,7 +1287,7 @@ class ERPStoresManagersOperationsController extends Controller
 																																				 LEFT JOIN erpoffer_prices of ON of.product_id=l.product_id AND of.customer_id=m.customer_id
 																																				 LEFT JOIN erpstores s ON s.id=o.store_id',
 																																				 'o.active=1 AND o.consumer_id='.$consumerid.' AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'"
-																																				 GROUP BY DATE(o.date),l.product_id',null);
+																																				 ',null);
 
 					 }
 		 	 }
@@ -1301,7 +1301,7 @@ class ERPStoresManagersOperationsController extends Controller
 																																		LEFT JOIN erpoffer_prices of ON of.product_id=l.product_id AND of.customer_id=m.customer_id
 																																		LEFT JOIN erpstores s ON s.id=o.store_id',
 																																		'o.active=1 AND o.DATE >= "'.$start.'" AND o.DATE<="'.$end.'" AND o.store_id='.$store.'
-																																	  GROUP BY DATE(o.date),l.product_id',null);
+																																	  ',null);
 				}
 				else{
 					$return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields,ERPStoresManagersOperationsLines::class,['l.product_id'=>'id','o.consumer_id'=>'consumer__id','o.date'=>'date','l.code'=>'code','l.name'=>'name','s.name'=>'store__name','l.quantity'=>'quantity','of.price'=>'price','IFNULL(ROUND(of.price*l.quantity,2),0)'=>'total'],
@@ -1596,6 +1596,63 @@ class ERPStoresManagersOperationsController extends Controller
  	 	 }
 
 		 /**
+			* @Route("/api/ERP/storesmanagers/operations/exportproductoperationsdetailed", name="exportProductOperationsDetailed")
+			*/
+			public function exportProductOperationsDetailed(RouterInterface $router,Request $request)
+			{
+
+				$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+				$start=$request->query->get("start");
+				$datefrom=date_create_from_format('d/m/Y',$start);
+				$end=$request->query->get("end");
+				$dateto=date_create_from_format('d/m/Y',$end);
+				$store=$request->query->get("store");
+				$manager=$request->query->get("manager");
+				$product=$request->query->get("product");
+
+				$repository=$this->getDoctrine()->getRepository(ERPStoresManagersOperationsLines::class);
+				if($store=="-1") $array_productoperations=$repository->getOperationsByProductDetailed($product,$manager,$datefrom,$dateto,null);
+				else $array_productoperations=$repository->getOperationsByProductDetailed($product,$manager,$datefrom,$dateto,$store);
+				$result=$this->csvProductDetailedOperations($array_productoperations,$datefrom,$dateto);
+				return $result;
+
+			}
+
+
+			public function csvProductDetailedOperations($list, $datefrom,$dateto){
+			if($datefrom->format("dmY")==$dateto->format("dmY"))	 $filename='Productos_mas_utilizados_'.$datefrom->format("dmY").'.csv';
+			else $filename='Informe_detallado_producto_'.$datefrom->format("dmY").'_'.$dateto->format("dmY").'.csv';
+			$array=$list;
+				//exclude tags column, last
+				$key='_tags';
+				array_walk($array, function (&$v) use ($key) {
+				 unset($v[$key]);
+				});
+			//	 $array=$this->applyFormats($array);
+
+				$fileContent=$this->createCSV($array);
+				$response = new Response($fileContent);
+				// Create the disposition of the file
+					 $disposition = $response->headers->makeDisposition(
+							 ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+							 $filename
+				 );
+				// Set the content disposition
+				$seconds_to_cache = 0;
+				$ts = gmdate("D, d M Y H:i:s", time() + $seconds_to_cache) . " GMT";
+				$response->headers->set("Expires", $ts);
+				$response->headers->set("Pragma", "cache");
+				$response->headers->set("Cache-Control", "max-age=0, no-cache, must-revalidate, proxy-revalidate");
+				$response->headers->set('Content-Type', 'application/force-download');
+				$response->headers->set('Content-Type', 'application/octet-stream');
+				$response->headers->set('Content-Type', 'application/download');
+				$response->headers->set('Content-Disposition', $disposition);
+				// Dispatch request
+				return $response;
+
+			}
+
+		 /**
 		 * @Route("/api/ERP/storesmanagers/operations/exportcustomizedoperations", name="exportCustomizedOperations")
 		 */
 		 public function exportCustomizedOperations(RouterInterface $router,Request $request)
@@ -1613,15 +1670,16 @@ class ERPStoresManagersOperationsController extends Controller
 			 $repository=$this->getDoctrine()->getRepository($this->class);
 			 if($store=="-1") $array_operations=$repository->getCustomizedOperations($manager,$datefrom,$dateto,null);
 			 else $array_operations=$repository->getFullOperationsByConsumer($manager,$datefrom,$dateto,$store);
-			 $result=$this->csvCustomizedOperations($array_operations,$template);
+			 $result=$this->csvCustomizedOperations($array_operations,$template,$datefrom,$dateto);
 			 return $result;
 
 		 }
 
 
-		 public function csvCustomizedOperations($list, $template){
+		 public function csvCustomizedOperations($list, $template,$datefrom,$dateto){
 			 $this->template=$template;
-			 $filename='Operaciones.csv';
+			 	if($datefrom->format("dmY")==$dateto->format("dmY")) $filename='Operaciones_'.$datefrom->format("dmY").'.csv';
+				else $filename='Operaciones_'.$datefrom->format("dmY").'_'.$dateto->format("dmY").'.csv';
 			 $array=$list;
 			 //exclude tags column, last
 			 $key='_tags';
@@ -1700,7 +1758,7 @@ class ERPStoresManagersOperationsController extends Controller
 			//Filtro
 			$arrayFields=[];
 			$arrayFields["name"]="Filtro";
-			$arrayFields["caption"]="Suma precio venta";
+			$arrayFields["caption"]="Rango Fechas";
 			$arrayFields["sum"]=true;
 			$arrayFields["unity"]="€";
 			$list["fields"][]=$arrayFields;
@@ -1790,7 +1848,7 @@ class ERPStoresManagersOperationsController extends Controller
 			//Filtro
 			$arrayFields=[];
 			$arrayFields["name"]="Filtro";
-			$arrayFields["caption"]="Suma precio venta";
+			$arrayFields["caption"]="Rango Fechas";
 			$arrayFields["sum"]=true;
 			$arrayFields["unity"]="€";
 			$list["fields"][]=$arrayFields;

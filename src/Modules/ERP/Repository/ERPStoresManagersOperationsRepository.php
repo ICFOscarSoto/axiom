@@ -197,7 +197,7 @@ class ERPStoresManagersOperationsRepository extends ServiceEntityRepository
 
       }
 
-        $query="SELECT concat(u.name,' ',IFNULL(u.lastname,'')), concat(c.name,' ',c.lastname), c.idcard, c.code2,
+        $query="SELECT concat(u.name,' ',IFNULL(u.lastname,'')) Agente, concat(c.name,' ',c.lastname) Trabajador, c.idcard DNI, c.code2 'Cod. Trabajador',
         (IFNULL((SELECT IFNULL(REPLACE(ROUND(SUM(ofx.price*lx.quantity),2),'.',','),0)
              FROM erpstores_managers_operations ox
              LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
@@ -205,7 +205,7 @@ class ERPStoresManagersOperationsRepository extends ServiceEntityRepository
              LEFT JOIN erpstores_managers_operations_lines lx ON lx.operation_id=ox.id
              LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
              WHERE ox.active=1 AND ox.manager_id=:MANAGER AND ox.DATE >= :START AND ox.DATE<=:END AND ox.consumer_id=o.consumer_id
-             GROUP BY(ox.consumer_id)),0)) Suma,
+             GROUP BY(ox.consumer_id)),0)) 'Rango Fechas',
         (IFNULL((SELECT IFNULL(REPLACE(ROUND(SUM(ofx.price*lx.quantity),2),'.',','),0)
               FROM erpstores_managers_operations ox
               LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
@@ -283,7 +283,7 @@ class ERPStoresManagersOperationsRepository extends ServiceEntityRepository
 
         }
 
-          $query="SELECT concat(u.name,' ',IFNULL(u.lastname,'')), concat(c.name,' ',c.lastname), c.idcard, c.code2,
+          $query="SELECT concat(u.name,' ',IFNULL(u.lastname,'')) Agente, concat(c.name,' ',c.lastname) Trabajador, c.idcard DNI, c.code2 'Cod. Trabajador',
           (IFNULL((SELECT IFNULL(REPLACE(ROUND(SUM(ofx.price*lx.quantity),2),'.',','),0)
                FROM erpstores_managers_operations ox
                LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
@@ -291,7 +291,7 @@ class ERPStoresManagersOperationsRepository extends ServiceEntityRepository
                LEFT JOIN erpstores_managers_operations_lines lx ON lx.operation_id=ox.id
                LEFT JOIN erpoffer_prices ofx ON ofx.product_id=lx.product_id AND ofx.customer_id=mx.customer_id
                WHERE ox.active=1 AND ox.manager_id=:MANAGER AND ox.DATE >= :START AND ox.DATE<=:END AND ox.consumer_id=o.consumer_id AND ox.store_id=:STORE
-               GROUP BY(ox.consumer_id)),0)) Suma,
+               GROUP BY(ox.consumer_id)),0)) 'Rango Fechas',
           (IFNULL((SELECT IFNULL(REPLACE(ROUND(SUM(ofx.price*lx.quantity),2),'.',','),0)
                 FROM erpstores_managers_operations ox
                 LEFT JOIN erpstores_managers mx ON mx.id=ox.manager_id
@@ -362,7 +362,7 @@ class ERPStoresManagersOperationsRepository extends ServiceEntityRepository
 
   if($store==null){
 
-      $query="SELECT o.date, concat(u.name,' ',IFNULL(u.lastname,'')), c.code2, concat(c.name,' ',c.lastname), s.name
+      $query="SELECT o.date Fecha, concat(u.name,' ',IFNULL(u.lastname,'')) Agente, c.code2 'Cod. Trabajador', concat(c.name,' ',c.lastname) Trabajador, s.name Almacén
             FROM erpstores_managers_operations o
             LEFT JOIN erpstores_managers m ON m.id=o.manager_id
             LEFT JOIN erpstores_managers_consumers c ON c.id=o.consumer_id
@@ -380,7 +380,7 @@ class ERPStoresManagersOperationsRepository extends ServiceEntityRepository
   //
   else{
 
-    $query="SELECT o.date, concat(u.name,' ',IFNULL(u.lastname,'')), c.code2, concat(c.name,' ',c.lastname), s.name
+    $query="SELECT o.date Fecha, concat(u.name,' ',IFNULL(u.lastname,'')) Agente, c.code2 'Cod. Trabajador', concat(c.name,' ',c.lastname) Trabajador, s.name Almacén
           FROM erpstores_managers_operations o
           LEFT JOIN erpstores_managers m ON m.id=o.manager_id
           LEFT JOIN erpstores_managers_consumers c ON c.id=o.consumer_id

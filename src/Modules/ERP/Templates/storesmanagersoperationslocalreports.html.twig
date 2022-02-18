@@ -385,7 +385,6 @@ $('body').on('click', "[id=consumeroperations-export-top-button-foreground]", fu
 
 $('body').on('click', "[id=consumeroperationsdetailed-export-top-button-foreground]", function(e) {
 	id= {{ id }};
-	consumerid=$(this).attr('attr-id');
 	var win = window.open("/api/ERP/storesmanagers/operations/exportconsumeroperationsdetailed?start="+encodeURI($("#date-from").val())+"&end="+encodeURI($("#date-to").val())+'&store='+encodeURI($('#stores').val())+'&manager='+encodeURI({{ id }})+'&consumer='+encodeURI($("#consumerid").val()));
 	win.focus();
 
@@ -396,6 +395,13 @@ $('body').on('click', "[id=bestproducts-export-top-button-foreground]", function
 	//labels=BestProductgraphData.labels;
 	//data=BestProductData.data;
 	var win = window.open("/api/ERP/storesmanagers/operations/exportbestproducts?start="+encodeURI($("#date-from").val())+"&end="+encodeURI($("#date-to").val())+'&store='+encodeURI($('#stores').val())+'&manager='+encodeURI({{ id }}));
+	win.focus();
+
+});
+
+$('body').on('click', "[id=productoperationsdetailed-export-top-button-foreground]", function(e) {
+	id= {{ id }};
+	var win = window.open("/api/ERP/storesmanagers/operations/exportproductoperationsdetailed?start="+encodeURI($("#date-from").val())+"&end="+encodeURI($("#date-to").val())+'&store='+encodeURI($('#stores').val())+'&manager='+encodeURI({{ id }})+'&product='+encodeURI($("#productid").val()));
 	win.focus();
 
 });
