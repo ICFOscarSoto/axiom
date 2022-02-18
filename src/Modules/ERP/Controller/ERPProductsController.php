@@ -1021,60 +1021,61 @@ class ERPProductsController extends Controller
  	 * @Route("/api/erp/getproducts/{supplier}/{category}", name="getProducts")
  	 */
  	public function getProducts($supplier, $category){
- 	 	 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-		 $productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
-		 $referenceRepository=$this->getDoctrine()->getRepository(ERPReferences::class);
-		 $EAN13Repository=$this->getDoctrine()->getRepository(ERPEAN13::class);
-		 $shoppingDiscountRepository=$this->getDoctrine()->getRepository(ERPShoppingDiscounts::class);
-		 $shoppingPricesRepository=$this->getDoctrine()->getRepository(ERPShoppingPrices::class);
-		 $objects=$productRepository->productsBySupplierCategory($supplier,$category);
-		 $products=[];
-		 foreach ($objects as $object){
-			 $item=$productRepository->findOneById($object["id"]);
-			 $product["id"]=$object["id"];
-			 $product["code"]=$item->getCode();
-			 $reference=$referenceRepository->findOneBy(["product"=>$item->getId(),"supplier"=>$supplier, "active"=>1, "deleted"=>0]);
-			 if ($reference!=null) $product["reference"]=$reference->getName();
-			 else $product["reference"]='';
-			 $EAN13=$EAN13Repository->findOneBy(["product"=>$item->getId(),"supplier"=>$supplier, "active"=>1, "deleted"=>0]);
-			 if($EAN13!=null)	 $product["EAN13"]=$EAN13->getName();
-			 else $product["EAN13"]='';
-			 $product["name"]=$item->getName();
-			 if($item->getCategory()!=null)  $product["category"]=$item->getCategory()->getName();
-			 else $product["category"]='';
-			 $product["netprice"]=$item->getNetprice()==1?"true":"false";
-			 $product["shopping_price"]=$item->getShoppingPrice();
-
-			 $product["PVP"]=$item->getPVPR()==0 ? $item->getPVP() : $item->getPVPR();
-			 $product["PVP"]=$product["PVP"]==null ? 0 : $product["PVP"];
-			 if ($item->getNetprice()==false) $shoppingDiscounts=$this->getShoppingDiscounts($supplier,$item->getCategory());
-			 else $shoppingDiscounts=null;
-			 if ($shoppingDiscounts!=null) {
-				 $product["discount"]=$shoppingDiscounts->getDiscount();
-				 $product["start"]=$shoppingDiscounts->getStart()!=null ? $shoppingDiscounts->getStart()->format('d/m/Y') : '---';
-				 $product["end"]=$shoppingDiscounts->getEnd()!=null ? $shoppingDiscounts->getEnd()->format('d/m/Y') : '---';
-			 }
-			 else {
-				 $product["discount"]=0;
-				 $product["start"]='';
-				 $product["end"]='';
-			 }
-			 $product["quantity"]=0;
-			 $products[]=$product;
-			 if ($item->getNetprice()){
-				 $product["code"]='---';
-				 $product["reference"]='---';
-				 $productPrices=$shoppingPricesRepository->getShoppingPrices($object["id"],$supplier);
-				 foreach ($productPrices as $specificPrice){
-					 $product["quantity"]=$specificPrice["quantity"];
-					 $product["shopping_price"]=$specificPrice["price"];
-					 $products[]=$product;
+		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			 $productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
+			 $referenceRepository=$this->getDoctrine()->getRepository(ERPReferences::class);
+			 $EAN13Repository=$this->getDoctrine()->getRepository(ERPEAN13::class);
+			 $shoppingDiscountRepository=$this->getDoctrine()->getRepository(ERPShoppingDiscounts::class);
+			 $shoppingPricesRepository=$this->getDoctrine()->getRepository(ERPShoppingPrices::class);
+			 $objects=$productRepository->productsBySupplierCategory($supplier,$category);
+			 $products=[];
+			 foreach ($objects as $object){
+				 $item=$productRepository->findOneById($object["id"]);
+				 $product["id"]=$object["id"];
+				 $product["code"]='<a href="'.$this->generateUrl('formProduct',["id"=>$object["id"]]).'" class="external">'.$item->getCode().'</a>';
+				 $reference=$referenceRepository->findOneBy(["product"=>$item->getId(),"supplier"=>$supplier, "active"=>1, "deleted"=>0]);
+				 if ($reference!=null) $product["reference"]=$reference->getName();
+				 else $product["reference"]='';
+				 $EAN13=$EAN13Repository->findOneBy(["product"=>$item->getId(),"supplier"=>$supplier, "active"=>1, "deleted"=>0]);
+				 if($EAN13!=null)	 $product["EAN13"]=$EAN13->getName();
+				 else $product["EAN13"]='';
+				 $product["name"]='<a href="'.$this->generateUrl('formProduct',["id"=>$object["id"]]).'" class="external">'.$item->getName().'</a>';
+				 if($item->getCategory()!=null)  $product["category"]=$item->getCategory()->getName();
+				 else $product["category"]='';
+				 $product["netprice"]=$item->getNetprice()==1?"true":"false";
+				 if ($item->getNetprice()==false) $shoppingDiscounts=$this->getShoppingDiscounts($supplier,$item->getCategory());
+				 else $shoppingDiscounts=null;
+				 if ($shoppingDiscounts!=null) {
+					 $product["discount"]=$shoppingDiscounts->getDiscount();
+					 $product["start"]=$shoppingDiscounts->getStart()!=null ? $shoppingDiscounts->getStart()->format('d/m/Y') : '---';
+					 $product["end"]=$shoppingDiscounts->getEnd()!=null ? $shoppingDiscounts->getEnd()->format('d/m/Y') : '---';
 				 }
-			 }
-			 $product=[];
-		 }
+				 else {
+					 $product["discount"]=0;
+					 $product["start"]='';
+					 $product["end"]='';
+				 }
+				 $product["quantity"]=0;
+				 	/* $product["shopping_price"]=$item->getShoppingPrice();
+				 $product["PVP"]=$item->getPVPR()==0 ? $item->getPVP() : $item->getPVPR();
+				 $product["PVP"]=$product["PVP"]==null ? 0 : $product["PVP"];
+				 */
 
-		 return new JsonResponse(["products"=>$products]);
+				 $productPrices=$shoppingPricesRepository->getShoppingPrices($object["id"],$supplier);
+				 if ($item->getNetprice()){
+					 foreach ($productPrices as $specificPrice){
+						 $product["quantity"]=$specificPrice["quantity"];
+						 $product["shopping_price"]=$specificPrice["shopping_price"];
+						 $product["PVPr"]=$specificPrice["pvp"]==null ? '--' : $specificPrice["pvp"];
+						 $products[]=$product;
+						 $product["code"]='---';
+						 $product["reference"]='---';
+					 }
+				 }
+				 $product=[];
+			 }
+
+			 return new JsonResponse(["products"=>$products]);
  	}
 
 		 /**
