@@ -75,7 +75,6 @@ function create($params){
                  ["Destino",$transfers[0]->getDestinationstore()->getName()]
                 ];
       $infoRight=[['',$this->pdf->Image($path, 135, 28, 35, 35)]];
-      dump($path);
       foreach ($transfers as $line){
         $dataTable[]=[
           $line->getProduct()->getCode(),
