@@ -126,15 +126,25 @@ class ERPBuyOrdersReports
       $this->pdf->user=$params["user"];
 
       $this->pdf->AddPage('L');
-
+      $noDataFooter=['-',
+                  '-',
+                  '-',
+                  '-',
+                  '-',
+                  '-',
+                  '-',
+                  'Suma y sigue'
+                  ];
       $result=0;
       while(count($dataTable)){
         $this->pdf->docHeader($nameLeft,$nameRight,$infoLeft, $infoRight, $infoCenter);
-        $this->pdf->docFooter($order,$columnsFooter,$dataFooter);
+        $this->pdf->docFooter($order,$columnsFooter,$noDataFooter);
         $dataTable=$this->pdf->Table($dataTable,$columnsTable,'false');
 
       }
 
+      $this->pdf->docFooter($order,$columnsFooter,$dataFooter);
+//dump($a);
     return $this->pdf->Output('I', $file==null?$order->getCode().".pdf":$file);
   }
 }

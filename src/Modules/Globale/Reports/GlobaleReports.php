@@ -28,6 +28,11 @@ class GlobaleReports extends \FPDF
           return $this->PageGroups[$this->CurrPageGroup];
       }
 
+      function getSize()
+      {
+          return $this->PageGroups;
+      }
+
       // alias of the current page group -- will be replaced by the total number of pages in this group
       function PageGroupAlias()
       {

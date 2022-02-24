@@ -37,8 +37,8 @@ class ERPShoppingPricesRepository extends ServiceEntityRepository
     */
 
     public function getShoppingPrices($product,$supplier){
-      $query="SELECT quantity, shopping_price from erpshopping_prices
-      where supplier_id=:supplier AND product_id=:product and active=1 and deleted=0 and end>CURDATE()";
+      $query="SELECT quantity, shopping_price, pvp from erpshopping_prices
+      where supplier_id=:supplier AND product_id=:product and active=1 and deleted=0 and (end is null or end>CURDATE())";
       $params=['supplier' => $supplier,
               'product' => $product];
       $result=$this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
