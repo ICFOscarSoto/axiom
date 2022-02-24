@@ -1154,6 +1154,7 @@ class ERPProductsController extends Controller
 						 $obj->setDatesend($dateSend);
 						 $obj->setActive(1);
 						 $obj->setDeleted(0);
+						 $obj->setReceived(0);
 						 $this->getDoctrine()->getManager()->persist($obj);
 					 }
 					 $this->getDoctrine()->getManager()->flush();
@@ -1224,6 +1225,7 @@ class ERPProductsController extends Controller
          $stockHistory->setActive(true);
          $stockHistory->setDeleted(false);
 				 $stock->setQuantity($stock->getQuantity()+$received);
+
 				 $this->getDoctrine()->getManager()->persist($stock);
 				 $this->getDoctrine()->getManager()->persist($stockHistory);
 			 } else return new JsonResponse(["result"=>-6, "text"=>"El almacén de destino (".$store->getName().") no se corresponde con un almacén gestionado"]);
@@ -1232,6 +1234,8 @@ class ERPProductsController extends Controller
 			 $this->getDoctrine()->getManager()->flush();
 		 	}
 
+		 $transfersRepository=$this->getDoctrine()->getRepository(NavisionTransfers::class);
+		 $transfersRepository->recivedTransfer($transfer);
 		 return new JsonResponse(["result"=>1, "text"=>"Se ha recepcionado la mercancia del traspaso ".$transfer]);
 	 }
 

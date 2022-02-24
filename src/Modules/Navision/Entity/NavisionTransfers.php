@@ -76,6 +76,11 @@ class NavisionTransfers
      */
     private $company;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $received;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -209,6 +214,18 @@ class NavisionTransfers
     public function setCompany(?GlobaleCompanies $company): self
     {
         $this->company = $company;
+
+        return $this;
+    }
+
+    public function getReceived(): ?bool
+    {
+        return $this->received;
+    }
+
+    public function setReceived(bool $received): self
+    {
+        $this->received = $received;
 
         return $this;
     }

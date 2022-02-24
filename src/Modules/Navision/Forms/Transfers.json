@@ -20,6 +20,10 @@
                     "cols": 4
                 },
                 {
+                    "name": "received",
+                    "cols": 4
+                },
+                {
                     "name": "originstore",
                     "cols": 4
                 },

@@ -46,4 +46,13 @@ class NavisionTransfersRepository extends ServiceEntityRepository
         ;
     }
     */
+
+    public function recivedTransfer ($transfer){
+      $query="UPDATE navision_transfers
+              SET received=1
+              WHERE name= :name";
+      $params=['name' => $transfer];
+      $result=$this->getEntityManager()->getConnection()->executeQuery($query, $params);
+      return $result;
+    }
 }
