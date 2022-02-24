@@ -1,0 +1,46 @@
+[
+    {
+        "name": "id",
+        "caption": "id"
+    },
+    {
+        "name": "name",
+        "caption": "name"
+    },
+    {
+        "name": "datesend",
+        "caption": "datesend"
+    },
+    {
+        "name": "quantity",
+        "caption": "quantity"
+    },
+    {
+        "name": "originstore__name",
+        "caption": "originstore"
+    },
+    {
+        "name": "destinationstore__name",
+        "caption": "destinationstore"
+    },
+    {
+        "name": "product__name",
+        "caption": "product"
+    },
+    {
+        "name": "active",
+        "caption": "Estado",
+        "width": "10%",
+        "class": "dt-center",
+        "replace": {
+            "1": {
+                "text": "Activo",
+                "html": "<div style=\"min-width: 75px;\" class=\"label label-success\">Activo<\/div>"
+            },
+            "0": {
+                "text": "Desactivado",
+                "html": "<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado<\/div>"
+            }
+        }
+    }
+]

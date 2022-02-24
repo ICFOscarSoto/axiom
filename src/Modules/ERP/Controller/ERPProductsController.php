@@ -42,6 +42,7 @@ use App\Modules\Security\Utils\SecurityUtils;
 use App\Modules\ERP\Reports\ERPEan13Reports;
 use App\Modules\ERP\Reports\ERPPrintQR;
 use App\Modules\ERP\Utils\ERPPrestashopUtils;
+use App\Modules\Navision\Entity\NavisionTransfers;
 
 class ERPProductsController extends Controller
 {
@@ -1114,10 +1115,53 @@ class ERPProductsController extends Controller
 
 	 public function generateQR(RouterInterface $router,Request $request){
 		 $transfer=$request->query->get('name',null);
-		 //$transfer=substr($transfer,3);
+		 $params["rootdir"]= $this->get('kernel')->getRootDir();
+		 $params["user"]=$this->getUser();
 		 $params["name"]=$transfer;
 		 $printQRUtils = new ERPPrintQR();
-		 $pdf=$printQRUtils->create($params);
+		 $name=substr($transfer,3);
+		 $repositoryTransfers=$this->getDoctrine()->getRepository(NavisionTransfers::class);
+		 $params["transfers"]=$repositoryTransfers->findBy(["name"=>$name, "active"=>1, "deleted"=>0]);
+		 if (empty($params["transfers"])) {
+			 $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-printTransfer.php?from='.$name);
+			 $objects=json_decode($json, true);
+			 $objects=$objects[0]["class"];
+			 if (empty($objects)){
+				 $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getTransfer.php?from='.$name);
+				 $objects=json_decode($json, true);
+				 $objects=$objects[0]["class"];
+			 }
+			 foreach ($objects as $object){
+				 	$transfersRepository=$this->getDoctrine()->getRepository(NavisionTransfers::class);
+				 	$productsRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
+				 	$storesRepository=$this->getDoctrine()->getRepository(ERPStores::class);
+					 $product=$productsRepository->findOneBy(["code"=>$object["code"]]);
+					 $item=$transfersRepository->findOneBy(["name"=>$name, "product"=>$product, "active"=>1, "deleted"=>0]);
+					 if ($item==null){
+						 if (array_key_exists("Transfer-from Code",$object)) $originStore=$storesRepository->findOneBy(["code"=>$object["Transfer-from Code"]]);
+						 else $originStore=$storesRepository->findOneBy(["code"=>"ALM01"]);
+						 $dateSend=new \DateTime(date('Y-m-d 00:00:00',strtotime($object["dateSend"]["date"])));
+						 $destinationStore=$storesRepository->findOneBy(["code"=>$object["almacen"]]);
+						 $obj=new NavisionTransfers();
+						 $obj->setOriginstore($originStore);
+						 $obj->setDestinationstore($destinationStore);
+						 $obj->setProduct($product);
+						 $obj->setName($name);
+						 $obj->setQuantity((int)$object["stock"]);
+						 $obj->setCompany($this->getUser()->getCompany());
+						 $obj->setDateadd(new \Datetime());
+						 $obj->setDateupd(new \Datetime());
+						 $obj->setDatesend($dateSend);
+						 $obj->setActive(1);
+						 $obj->setDeleted(0);
+						 $this->getDoctrine()->getManager()->persist($obj);
+					 }
+					 $this->getDoctrine()->getManager()->flush();
+				 }
+		 $params["transfers"]=$repositoryTransfers->findBy(["name"=>$name, "active"=>1, "deleted"=>0]);
+		 }
+		 //$pdf=$printQRUtils->create($params);
+		 $pdf=$printQRUtils->transferQR($params);
 		 return new Response("", 200, array('Content-Type' => 'application/pdf'));
 	 }
 

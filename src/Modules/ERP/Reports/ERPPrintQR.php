@@ -9,15 +9,11 @@ use App\Modules\Globale\Entity\MenuOptions;
 use App\Modules\Email\Entity\EmailAccounts;
 use App\Modules\Globale\Utils\FormUtils;
 use App\Modules\Globale\Utils\ListUtils;
-use App\Modules\HR\Entity\HRWorkers;
-use App\Modules\HR\Entity\HRClocks;
-use App\Modules\HR\Entity\HRVacations;
-use App\Modules\HR\Entity\HRSickleaves;
-use App\Modules\HR\Entity\HRHollidays;
 use \FPDF;
 use App\Modules\Globale\Reports\GlobaleReports;
 use chillerlan\QRCode\QROptions;
 use chillerlan\QRCode\QRCode;
+use App\Modules\Navision\Entity\NavisionTransfers;
 
 class ERPPrintQR{
   public $params;
@@ -50,5 +46,57 @@ function create($params){
     unlink($path);
     return $this->pdf->Output();
 }
+
+  function transferQR($params){
+    $this->pdf  = new GlobaleReports();
+    $this->pdf->AliasNbPages();
+    $this->pdf->SetAutoPageBreak(false);
+    $this->pdf->SetFont('Arial','',20);
+    $this->pdf->image_path=$params["rootdir"].DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$params["user"]->getCompany()->getId().DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'company'.DIRECTORY_SEPARATOR;
+    $this->pdf->user=$params["user"];
+    $this->pdf->StartPageGroup();
+    $options = new QROptions([
+      'version'    => 1,
+      'outputType' => QRCode::OUTPUT_IMAGE_PNG,
+      'eccLevel'   => QRCode::ECC_M,
+      'scale' => 26
+    ]);
+
+      $this->pdf->AddPage();
+      $qrcode = new QRCode($options);
+      $path=$params['name'].'.png';
+      $qrcode->render($params['name'], $path);
+
+      //$this->pdf->Image($path, 16, 7, 32, 32);
+      $nameLeft="Traspaso numero ".substr($params['name'],3);
+      $transfers=$params['transfers'];
+      $infoLeft=[["Fecha",$transfers[0]->getDatesend()->format('d/m/Y')],
+                 ["Origen",$transfers[0]->getOriginstore()->getName()],
+                 ["Destino",$transfers[0]->getDestinationstore()->getName()]
+                ];
+      $infoRight=[['',$this->pdf->Image($path, 135, 28, 35, 35)]];
+      dump($path);
+      foreach ($transfers as $line){
+        $dataTable[]=[
+          $line->getProduct()->getCode(),
+          $line->getProduct()->getname(),
+          $line->getQuantity()
+        ];
+      }
+
+      $columnsTable=[["name"=>"Código","width"=>30, "align"=>"L"],
+                    ["name"=>"Descripcion","width"=>80, "align"=>"L"],
+                    ["name"=>"Cantidad","width"=>20, "align"=>"C"]
+      ];
+      while(count($dataTable)){
+        $this->pdf->docHeader($nameLeft,'',$infoLeft, $infoRight);
+        $this->pdf->docFooter('','','');
+        $dataTable=$this->pdf->Table($dataTable,$columnsTable,'false');
+      }
+      unlink($path);
+      return $this->pdf->Output();
+  }
+
+
 
 }
