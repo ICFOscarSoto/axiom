@@ -13,6 +13,7 @@
                                 // ya que realiza el calculo con el contenido de la columna cuyo nombre=nombre_columna sin importar su posición
                                 // También se ha incorporado la posibilidad {nombre_columna} sin fila que indica que se utilice la fila del destinatario
                                 // Ejem: CampoTotal = {unidades}*{precio} -> La columna Campo tatal es la multiplicación de la columna uniddades*precio de esa misma fila
+     "tabsload":""               // Indica si las pestañas de la tabla vienen por defecto o por una vista de base de datos. (0: Defecto, 1: base de datos)
      "tabs":[                   // Pestañas que contiene la tabla
         "caption":""            // Título de la pestaña
         "columns":[             // Muestra el subconjunto de columnas que se muestran en esta pestaña y en el orden que se quieren mostrar
@@ -54,6 +55,18 @@
      "onload":""                // Código javascript para inicializar variables, refrescar tabla porque cambia un campo del formulario, ocultar columnas ...etc
    }
 #}
+<div class="modal fade" tabindex="-1" id="js{{spreadsheet.name}}-showcolumn-modal-form" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content" style="transform: matrix(1, 0, 0, 1, 0, 0);display:inline-block;">
+        <div class="modal-header">
+          <h4 class="modal-title">{{ ('jspreadsheet_showcolumn')|trans }}</h4>
+        </div>
+        <div id="js{{spreadsheet.name}}-showcolumn-modal-form" style="height: 300px; width: 300px; padding: 0px 10px;">
+          Hola mundo
+        </div>
+    </div>
+  </div>
+</div>
 
 <div id="{{spreadsheet.name}}"></div>
 
@@ -69,11 +82,17 @@ function js{{spreadsheet.name}}_create(data){
       js{{spreadsheet.name}}_sheets.push({
         name:'{{spreadsheet.name}}',
         sheetid:i,
+        tabid:i,
+        {% if spreadsheet.tabsload is defined %}
+          tabsload:{{spreadsheet.tabsload}},
+        {% endif %}
         sheetName:js{{spreadsheet.name}}_sheets_create[i]['caption'],
         defaultColWidth: 100,
         columnDrag: true,
+        rowDrag: true,
         allowInsertColumn:false,
         allowInsertRow:true,
+        pagination:1000000,
         {% if spreadsheet.options is defined %}
           {{spreadsheet.options|raw}},
         {% endif %}
@@ -84,7 +103,8 @@ function js{{spreadsheet.name}}_create(data){
            var items = [];
            items.push(
              {
-               title: 'Añadir línea',
+               title: '{{('jspreadsheet_addrow')|trans}}',
+               icon: 'fa fa-plus',
                onclick: function () {
                  if (typeof(y) === undefined || y==null){
                   obj.insertRow(1, 0, true);
@@ -94,9 +114,10 @@ function js{{spreadsheet.name}}_create(data){
              });
            items.push(
              {
-               title: 'Borrar línea',
+               title: '{{('jspreadsheet_deleterow')|trans}}',
+               icon: 'fa fa-remove',
                onclick: function () {
-                 if (window.confirm("¿Borrar líneas seleccionadas?")) {
+                 if (window.confirm("{{('jspreadsheet_deleterow_msg')|trans}}")) {
                    obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
                  }
                }
@@ -104,17 +125,19 @@ function js{{spreadsheet.name}}_create(data){
            items.push({ type: 'line' });
            items.push(
              {
-               title: 'Mostrar columna',
+               title: '{{('jspreadsheet_addcolumn')|trans}}',
+               icon: 'fa fa-eye',
                onclick: function () {
 
                }
              });
            items.push(
              {
-               title: 'Ocultar columna',
+               title: '{{('jspreadsheet_deletecolumn')|trans}}',
+               icon: 'fa fa-eye-slash',
                onclick: function () {
                 if (x!=null){
-                   if (window.confirm("¿Ocultar columna seleccionada?")) {
+                   if (window.confirm("{{('jspreadsheet_deletecolumn_msg')|trans}}")) {
                      obj.hideColumn(parseInt(x));
                    }
                 }
@@ -123,7 +146,8 @@ function js{{spreadsheet.name}}_create(data){
            items.push({ type: 'line' });
            items.push(
              {
-               title: 'Subir línea',
+               title: '{{('jspreadsheet_uprow')|trans}}',
+               icon: 'fa fa-arrow-up',
                onclick: function () {
                  if (typeof(y) != 'undefined' && y!=null && parseInt(y)>0){
                    obj.moveRow(parseInt(y), parseInt(y)-1);
@@ -132,7 +156,8 @@ function js{{spreadsheet.name}}_create(data){
              });
            items.push(
              {
-               title: 'Bajar línea',
+               title: '{{('jspreadsheet_downrow')|trans}}',
+               icon: 'fa fa-arrow-down',
                onclick: function () {
                  if (typeof(y) != 'undefined' && y!=null && parseInt(y)<obj.getData().length-1){
                    obj.moveRow(parseInt(y), parseInt(y)+1);
@@ -145,7 +170,7 @@ function js{{spreadsheet.name}}_create(data){
         var sheet = instance.jexcel;
         // Si la celda tiene onchange como options y tiene url o oncomplete (y no estamos en la carga inicial)
         var options = sheet.options.columns[x].options;
-        if (!sheet.options.loadinit && options !== undefined && options.onchange !== undefined && value!=valueOld){
+        if (!sheet.options.loadinit && !sheet.options.changeinit && !sheet.options.rowinit && options !== undefined && options.onchange !== undefined && value!=valueOld){
           // Obtener url completa con los campos necesarios para la busqueda
           change = options.onchange;
           if (change.url !== undefined && value!=undefined){
@@ -180,9 +205,24 @@ function js{{spreadsheet.name}}_create(data){
             }
           }
         }
+        // Cambio del valor en las otras pestañas
+        var isformula = ((value.length>0 && (''+value)[0]=='='||(''+value)[0]=='#')?true:false);
+        if (!sheet.options.loadinit && !sheet.options.changeinit && !sheet.options.rowinit && !isformula){
+          var tabIdChange = sheet.options.tabid;
+          var sheets      = document.getElementById(sheet.options.name).jexcel;
+          var key         = sheet.getKeyColumn(x);
+          for (var s=0; s<sheets.length; s++){
+            if (sheets[s].options.tabid!=tabIdChange){
+              sheets[s].options['changeinit'] = true;
+              sheets[s].setValueFromKey(key, y, value, true);
+              sheets[s].options['changeinit'] = false;
+            }
+          }
+        }
       },
       oninsertrow: function(instance, rowNumber, numOfRows, records, insertBefore){
         var sheet = instance.jexcel;
+        sheet.options['changeinit'] = true;
         var tprototipe = JSON.parse(JSON.stringify({{spreadsheet.prototipe|raw}}));
         for (const key in tprototipe) {
           var find = '#nl#';
@@ -197,6 +237,49 @@ function js{{spreadsheet.name}}_create(data){
             valuen = valuen.replace(re,(rowNumber+2)+'');
             valuen = sheet.replaceFormula(valuen, rowNumber+1);
             sheet.setValueFromKey(key, rowNumber+1, valuen, true);
+          }
+        }
+        sheet.options['changeinit'] = false;
+        if (!sheet.options.loadinit && !sheet.options.changeinit && !sheet.options.rowinit){
+          var tabIdChange = sheet.options.tabid;
+          var sheets      = document.getElementById(sheet.options.name).jexcel;
+          for (var s=0; s<sheets.length; s++){
+            if (sheets[s].options.tabid!=tabIdChange){
+              sheets[s].options['rowinit'] = true;
+              if (insertBefore)
+               sheets[s].insertRow(1, 0, true);
+              else
+               sheets[s].insertRow(1, parseInt(rowNumber));
+              sheets[s].options['rowinit'] = false;
+            }
+          }
+        }
+      },
+      onmoverow: function(instance, o, d){
+        var sheet = instance.jexcel;
+        if (!sheet.options.loadinit && !sheet.options.changeinit && !sheet.options.rowinit){
+          var tabIdChange = sheet.options.tabid;
+          var sheets      = document.getElementById(sheet.options.name).jexcel;
+          for (var s=0; s<sheets.length; s++){
+            if (sheets[s].options.tabid!=tabIdChange){
+              sheets[s].options['rowinit'] = true;
+              sheets[s].moveRow(o, d, false);
+              sheets[s].options['rowinit'] = false;
+            }
+          }
+        }
+      },
+      ondeleterow: function(instance, rowNumber, numOfRows, rowRecords){
+        var sheet = instance.jexcel;
+        if (!sheet.options.loadinit && !sheet.options.changeinit && !sheet.options.rowinit){
+          var tabIdChange = sheet.options.tabid;
+          var sheets      = document.getElementById(sheet.options.name).jexcel;
+          for (var s=0; s<sheets.length; s++){
+            if (sheets[s].options.tabid!=tabIdChange){
+              sheets[s].options['rowinit'] = true;
+              sheets[s].deleteRow(rowNumber, numOfRows, false);
+              sheets[s].options['rowinit'] = false;
+            }
           }
         }
       },
@@ -217,7 +300,7 @@ function js{{spreadsheet.name}}_create(data){
         sheet.options['loadinit'] = true;
 
         if (sheet.options['sheetnew']){
-          sheet.insertRow();
+          sheet.insertRow(1, sheet.options.data.length);
           sheet.deleteRow(0, sheet.options.data.length-1);
         }
 
@@ -263,7 +346,11 @@ function js{{spreadsheet.name}}_create(data){
 
         // Se crea una línea en blanco para poder insertar
         if (!sheet.options['sheetnew'])
-          sheet.insertRow();
+          sheet.insertRow(1, data.length);
+
+        // Se quita paginación
+        if (parseInt(sheet.options['pagination'])>=1000000)
+          $('#'+sheet.options.name).find('.jexcel_pagination').each(function(){ this.style.display = 'none';});
 
         sheet.options['loadinit'] = false;
       },
@@ -308,8 +395,10 @@ function js{{spreadsheet.name}}_create(data){
       name:'{{spreadsheet.name}}',
       defaultColWidth: 100,
       columnDrag: true,
+      rowDrag: true,
       allowInsertColumn:false,
       allowInsertRow:true,
+      pagination:1000000,
       {% if spreadsheet.options is defined %}
         {{spreadsheet.options|raw}},
       {% endif %}
@@ -319,7 +408,8 @@ function js{{spreadsheet.name}}_create(data){
          var items = [];
          items.push(
            {
-             title: 'Añadir línea',
+             title: '{{('jspreadsheet_addrow')|trans}}',
+             icon: 'fa fa-plus',
              onclick: function () {
                if (typeof(y) === undefined || y==null){
                 obj.insertRow(1, 0, true);
@@ -329,9 +419,10 @@ function js{{spreadsheet.name}}_create(data){
            });
          items.push(
            {
-             title: 'Borrar línea',
+             title: '{{('jspreadsheet_deleterow')|trans}}',
+             icon: 'fa fa-remove',
              onclick: function () {
-               if (window.confirm("¿Borrar líneas seleccionadas?")) {
+               if (window.confirm("{{('jspreadsheet_deleterow_msg')|trans}}")) {
                  obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
                }
              }
@@ -339,20 +430,43 @@ function js{{spreadsheet.name}}_create(data){
          items.push({ type: 'line' });
          items.push(
            {
-             title: 'Mostrar columna',
+             title: '{{('jspreadsheet_addcolumn')|trans}}',
+             icon: 'fa fa-eye',
              onclick: function () {
 
              }
            });
          items.push(
            {
-             title: 'Ocultar columna',
+             title: '{{('jspreadsheet_deletecolumn')|trans}}',
+             icon: 'fa fa-eye-slash',
              onclick: function () {
               if (x!=null){
-                 if (window.confirm("¿Ocultar columna seleccionada?")) {
+                 if (window.confirm("{{('jspreadsheet_deletecolumn_msg')|trans}}")) {
                    obj.hideColumn(parseInt(x));
                  }
               }
+             }
+           });
+         items.push({ type: 'line' });
+         items.push(
+           {
+             title: '{{('jspreadsheet_uprow')|trans}}',
+             icon: 'fa fa-arrow-up',
+             onclick: function () {
+               if (typeof(y) != 'undefined' && y!=null && parseInt(y)>0){
+                 obj.moveRow(parseInt(y), parseInt(y)-1);
+               }
+             }
+           });
+         items.push(
+           {
+             title: '{{('jspreadsheet_downrow')|trans}}',
+             icon: 'fa fa-arrow-down',
+             onclick: function () {
+               if (typeof(y) != 'undefined' && y!=null && parseInt(y)<obj.getData().length-1){
+                 obj.moveRow(parseInt(y), parseInt(y)+1);
+               }
              }
            });
          return items;
@@ -439,7 +553,11 @@ function js{{spreadsheet.name}}_create(data){
       {% endif %}
 
       // Se crea una línea en blanco para poder insertar
-      sheet.insertRow();
+      sheet.insertRow(1, data.length);
+
+      // Se quita paginación
+      if (parseInt(sheet.options['pagination'])>=1000000)
+        $('#'+sheet.options.name).find('.jexcel_pagination').each(function(){ this.style.display = 'none';});
 
       sheet.options['loadinit'] = false;
     },

@@ -255,6 +255,8 @@ class ERPProductsRepository extends ServiceEntityRepository
                       (sp.start is null or sp.start>=now()) and
                       (sp.end is null or sp.end<=now())
                       $filter
+                UNION
+                SELECT '' as id, '' as name, '' as title FROM erpproducts
                 ORDER BY title ASC";
         $params=["supplier" => $supplier];
         $result = $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
@@ -263,29 +265,42 @@ class ERPProductsRepository extends ServiceEntityRepository
     }
 
     public function getProductBySupplier($supplier, $quantity, $product){
-      $aproduct = explode('~',$product);
-      if (count($aproduct)>0)
-        $product = $aproduct[0];
-      $query="SELECT concat(p.id,'~',p.code) as 'reference',
-                     p.name as 'description',
-                     sp.pvp as 'pvp',
-                     sd.discount as 'discount',
-                     p.code as 'code'
-              FROM erpshopping_prices sp LEFT JOIN
-                   erpproducts p on p.id=sp.product_id LEFT JOIN
-                   erpshopping_discounts sd on sd.supplier_id=sp.supplier_id and sd.category_id=p.category_id and sd.quantity<=:quantity and
-                    sd.active=1 and sd.deleted=0 and
-                    (sd.start is null or sd.start<=now()) and
-                     (sd.end is null or sd.end>=now())
-              WHERE sp.supplier_id=:supplier and
-                    p.id=:product and
-                    p.active=1 and p.deleted=0 and
-                    sp.active=1 and sp.deleted=0 and
-                    (sp.start is null or sp.start<=now()) and
-                    (sp.end is null or sp.end>=now())
-              ORDER BY p.name ASC, sd.quantity DESC";
-      $params=["supplier" => $supplier, "product" => $product, "quantity"=>$quantity];
-      return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+      $result = null;
+      if ($product!='|'){
+        $aproduct = explode('~',$product);
+        if (count($aproduct)>0)
+          $product = $aproduct[0];
+        $query="SELECT concat(p.id,'~',p.code) as 'reference',
+                       p.name as 'description',
+                       sp.pvp as 'pvp',
+                       sd.discount as 'discount',
+                       p.code as 'code'
+                FROM erpshopping_prices sp LEFT JOIN
+                     erpproducts p on p.id=sp.product_id LEFT JOIN
+                     erpshopping_discounts sd on sd.supplier_id=sp.supplier_id and sd.category_id=p.category_id and sd.quantity<=:quantity and
+                      sd.active=1 and sd.deleted=0 and
+                      (sd.start is null or sd.start<=now()) and
+                       (sd.end is null or sd.end>=now())
+                WHERE sp.supplier_id=:supplier and
+                      p.id=:product and
+                      p.active=1 and p.deleted=0 and
+                      sp.active=1 and sp.deleted=0 and
+                      (sp.start is null or sp.start<=now()) and
+                      (sp.end is null or sp.end>=now())
+                ORDER BY p.name ASC, sd.quantity DESC";
+        $params=["supplier" => $supplier, "product" => $product, "quantity"=>$quantity];
+        $result = $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+      }
+      if ($result == null || count($result)==0)
+        $result =
+        [[
+            "reference" => "",
+            "description" => "",
+            "pvp" => "0",
+            "discount" => "0",
+            "code" => ""
+        ]];
+      return $result;
     }
 
 /*

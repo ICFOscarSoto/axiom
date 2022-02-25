@@ -389,18 +389,28 @@ ERPMyBackpack:
 
 ERPWorkList:
   resource: 'App\Modules\ERP\Controller\ERPWorkListController'
+  type:      annotation
 
 ERPStoresManagersController:
   resource: 'App\Modules\ERP\Controller\ERPStoresManagersController'
+  type:      annotation
 
 ERPStoresManagersOperationsController:
   resource: 'App\Modules\ERP\Controller\ERPStoresManagersOperationsController'
+  type:      annotation
 
 ERPInfoStocksController:
   resource: 'App\Modules\ERP\Controller\ERPInfoStocksController'
+  type:      annotation
 
 ERPBuyOffersController:
   resource: 'App\Modules\ERP\Controller\ERPBuyOffersController'
+  type:      annotation
 
 ERPShoppingDiscountsController:
   resource: 'App\Modules\ERP\Controller\ERPShoppingDiscountsController'
+  type:      annotation
+
+GlobaleUsersConfigController:
+  resource: 'App\Modules\Globale\Controller\GlobaleUsersConfigController'
+  type:      annotation

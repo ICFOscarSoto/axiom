@@ -5976,12 +5976,20 @@ if (! jSuites && typeof(require) === 'function') {
             // ICF ---
             // Name
             name:'name',
-            // Id Tab
+            // Id Sheet
             sheetid:null,
+            // Id tabs
+            tabid:null,
+            // Tabs load. 0 Default, 1 Database
+            tabsload:0,
             // New sheet
             sheetnew:false,
             // Onload no change
             loadinit:false,
+            // Change no change
+            changeinit:false,
+            // Insert, move and delete row no change
+            rowinit:false,
             // Allow create new tab
             allowtabnew:true,
             // Allow save  view
@@ -6327,9 +6335,12 @@ if (! jSuites && typeof(require) === 'function') {
                 if (window[field_js] !== undefined && window[field_js]!= null)
                   value = window[field_js];
               }
+              if (value=='' && i>0)
+                value='|';
               url_new += value;
               if (i<(aurl_new.length-1))
                 url_new += '/';
+
               /*if (value=='')
                 error = true;*/
             }
@@ -6421,6 +6432,16 @@ if (! jSuites && typeof(require) === 'function') {
                   column = i;
             }
             return column;
+        }
+
+        /**
+          Get key column on position column
+        */
+        obj.getKeyColumn = function(i) {
+            var key = '';
+            if (typeof(obj.options.columns[i].name) != 'undefined')
+              key = obj.options.columns[i].name;
+            return key;
         }
 
         /**
@@ -10444,7 +10465,8 @@ if (! jSuites && typeof(require) === 'function') {
                         // If delete all rows, and set allowDeletingAllRows false, will stay one row
                         if (obj.options.allowDeletingAllRows == false && lastRow + 1 === numOfRows) {
                             numOfRows--;
-                            console.error('Jspreadsheet: It is not possible to delete the last row');
+                            alert('No se permite borrar la última línea');
+                            //console.error('Jspreadsheet: It is not possible to delete the last row');
                         }
 
                         // Remove node
@@ -10486,7 +10508,8 @@ if (! jSuites && typeof(require) === 'function') {
                         obj.dispatch('ondeleterow', el, rowNumber, numOfRows, rowRecords);
                     }
                 } else {
-                    console.error('Jspreadsheet: It is not possible to delete the last row');
+                    alert('No se permite borrar la última línea');
+                    //console.error('Jspreadsheet: It is not possible to delete the last row');
                 }
             }
         }
@@ -14501,13 +14524,14 @@ if (! jSuites && typeof(require) === 'function') {
             var content = tabs.children[2];
         }
 
-        var spreadsheet = []
+        var spreadsheet = [];
         var link = [];
         var linkb = [];
         for (var i = 0; i < result.length; i++) {
             // Spreadsheet container
             spreadsheet[i] = document.createElement('div');
             spreadsheet[i].classList.add('jexcel_tab');
+            spreadsheet[i].setAttribute('data-spreadsheet-content', i);
             var worksheet = jexcel(spreadsheet[i], result[i]);
             content.appendChild(spreadsheet[i]);
             instances[i] = tabs.jexcel.push(worksheet);
@@ -14515,7 +14539,7 @@ if (! jSuites && typeof(require) === 'function') {
             // Tab link
             link[i] = document.createElement('div');
             link[i].classList.add('jexcel_tab_link');
-            link[i].setAttribute('data-spreadsheet', tabs.jexcel.length-1);
+            link[i].setAttribute('data-spreadsheet', i);
             link[i].innerHTML = result[i].sheetName;
             link[i].onclick = function() {
                 for (var j = 0; j < headers.children.length; j++) {
@@ -14523,26 +14547,142 @@ if (! jSuites && typeof(require) === 'function') {
                     content.children[j].style.display = 'none';
                 }
                 var i = this.getAttribute('data-spreadsheet');
-                content.children[i].style.display = 'block';
-                headers.children[i].classList.add('selected')
+                headers.children[i].classList.add('selected');
+                $('#'+result[0].name).find(`[data-spreadsheet-content='${i}']`).each(function(){
+                  this.style.display = 'block';
+                });
+                var headersd = headers.children;
+                if (i==0)
+                  $('#'+result[0].name).find('.jexcel_tab_link.tableft').each(function(){ $(this).addClass('disabled'); });
+                else if (headersd.length>1)
+                  $('#'+result[0].name).find('.jexcel_tab_link.tableft').each(function(){ $(this).removeClass('disabled'); });
+                if (i>=headersd.length-1)
+                  $('#'+result[0].name).find('.jexcel_tab_link.tabright').each(function(){ $(this).addClass('disabled'); });
+                else if (headersd.length>1)
+                  $('#'+result[0].name).find('.jexcel_tab_link.tabright').each(function(){ $(this).removeClass('disabled'); });
             }
             headers.appendChild(link[i]);
         }
         // ICF
         var b = 0;
+        // Move left tab
+        linkb[b] = document.createElement('div');
+        linkb[b].classList.add('jexcel_tab_link');
+        linkb[b].classList.add('tableft');
+        linkb[b].setAttribute("title","Mover pestaña a la izquierda");
+        if (headers.children.length<=1)
+          linkb[b].classList.add('disabled');
+        linkb[b].innerHTML = '<i class="fa fa-arrow-left" aria-hidden="true"></i>&nbsp;';
+        linkb[b].onclick = function() {
+          if (this.getAttribute('class').indexOf('disabled')==-1){
+            var headersd = headers.children;
+            var i = 0;
+            $('#'+result[0].name).find('.jexcel_tab_link.selected').each(function(){
+              i = parseInt($(this).attr('data-spreadsheet'));
+            });
+            if (i>0){
+              var header_move = headersd[i].innerHTML;
+              headersd[i].innerHTML = headersd[i-1].innerHTML;
+              headersd[i-1].innerHTML = header_move;
+              headers.children[i].classList.remove('selected');
+              headers.children[i-1].classList.add('selected');
+              $('#'+result[0].name).find(`[data-spreadsheet-content='${i}']`).each(function(){
+                this.setAttribute("data-spreadsheet-content","tmp");
+              });
+              $('#'+result[0].name).find(`[data-spreadsheet-content='${i-1}']`).each(function(){
+                this.setAttribute("data-spreadsheet-content",i);
+              });
+              $('#'+result[0].name).find(`[data-spreadsheet-content='tmp']`).each(function(){
+                this.setAttribute("data-spreadsheet-content",i-1);
+              });
+              var jexceltabs = document.getElementById(result[0].name).jexcel;
+              for(var m=0; m<jexceltabs.length; m++){
+                if (jexceltabs[m].options.tabid==i) jexceltabs[m].options.tabid = -1;
+                if (jexceltabs[m].options.tabid==i-1) jexceltabs[m].options.tabid = i;
+              }
+              for(var m=0; m<jexceltabs.length; m++){
+                if (jexceltabs[m].options.tabid==-1) jexceltabs[m].options.tabid = i-1;
+              }
+              if (i-1==0 || headersd.length<=1)
+                $('#'+result[0].name).find('.jexcel_tab_link.tableft').each(function(){ $(this).addClass('disabled'); });
+              else
+                $('#'+result[0].name).find('.jexcel_tab_link.tableft').each(function(){ $(this).removeClass('disabled'); });
+              if (i-1>=headersd.length-1 || headersd.length<=1)
+                $('#'+result[0].name).find('.jexcel_tab_link.tabright').each(function(){ $(this).addClass('disabled'); });
+              else
+                $('#'+result[0].name).find('.jexcel_tab_link.tabright').each(function(){ $(this).removeClass('disabled'); });
+            }
+          }
+        }
+        buttons.appendChild(linkb[b]);
+        b++;
+        // Move right tab
+        linkb[b] = document.createElement('div');
+        linkb[b].classList.add('jexcel_tab_link');
+        linkb[b].classList.add('tabright');
+        linkb[b].setAttribute("title","Mover pestaña a la derecha");
+        if (headers.children.length<=1)
+          linkb[b].classList.add('disabled');
+        linkb[b].innerHTML = '<i class="fa fa-arrow-right" aria-hidden="true"></i>&nbsp;';
+        linkb[b].onclick = function() {
+          if (this.getAttribute('class').indexOf('disabled')==-1){
+            var headersd = headers.children;
+            var i = 0;
+            $('#'+result[0].name).find('.jexcel_tab_link.selected').each(function(){
+              i = parseInt($(this).attr('data-spreadsheet'));
+            });
+            if (i<headersd.length-1){
+              var header_move = headersd[i].innerHTML;
+              headersd[i].innerHTML = headersd[i+1].innerHTML;
+              headersd[i+1].innerHTML = header_move;
+              headers.children[i].classList.remove('selected');
+              headers.children[i+1].classList.add('selected');
+              $('#'+result[0].name).find(`[data-spreadsheet-content='${i}']`).each(function(){
+                this.setAttribute("data-spreadsheet-content","tmp");
+              });
+              $('#'+result[0].name).find(`[data-spreadsheet-content='${i+1}']`).each(function(){
+                this.setAttribute("data-spreadsheet-content",i);
+              });
+              $('#'+result[0].name).find(`[data-spreadsheet-content='tmp']`).each(function(){
+                this.setAttribute("data-spreadsheet-content",i+1);
+              });
+              var jexceltabs = document.getElementById(result[0].name).jexcel;
+              for(var m=0; m<jexceltabs.length; m++){
+                if (jexceltabs[m].options.tabid==i) jexceltabs[m].options.tabid = -1;
+                if (jexceltabs[m].options.tabid==i+1) jexceltabs[m].options.tabid = i;
+              }
+              for(var m=0; m<jexceltabs.length; m++){
+                if (jexceltabs[m].options.tabid==-1) jexceltabs[m].options.tabid = i+1;
+              }
+              if (i+1==0 || headersd.length<=1)
+                $('#'+result[0].name).find('.jexcel_tab_link.tableft').each(function(){ $(this).addClass('disabled'); });
+              else
+                $('#'+result[0].name).find('.jexcel_tab_link.tableft').each(function(){ $(this).removeClass('disabled'); });
+              if (i+1>=headersd.length-1 || headersd.length<=1)
+                $('#'+result[0].name).find('.jexcel_tab_link.tabright').each(function(){ $(this).addClass('disabled'); });
+              else
+                $('#'+result[0].name).find('.jexcel_tab_link.tabright').each(function(){ $(this).removeClass('disabled'); });
+            }
+          }
+        }
+        buttons.appendChild(linkb[b]);
+        b++;
+
         if (allowtabnew){
           // Tab new
           linkb[b] = document.createElement('div');
           linkb[b].classList.add('jexcel_tab_link');
           linkb[b].classList.add('tabnew');
+          linkb[b].setAttribute("title","Añadir nueva pestaña");
           linkb[b].innerHTML = '<i class="fa fa-plus" aria-hidden="true"></i>&nbsp;';
           linkb[b].onclick = function() {
             if (this.getAttribute('class').indexOf('disabled')==-1){
               var tabnew = window.prompt('Nombre de la nueva pestaña');
               if (tabnew!=null && tabnew!=''){
-                var position = headers.getElementsByTagName('div').length;
+                var position = headers.children.length;
                 var tab =  result[0];
                 tab['sheetid']  = position;
+                tab['tabid']  = position;
                 tab['sheetnew'] = true;
                 tab['sheetName']= tabnew;
                 tab['columns']  = tab['columnso'];
@@ -14550,6 +14690,7 @@ if (! jSuites && typeof(require) === 'function') {
                 // Se crea la nueva pestaña
                 spreadsheet[position] = document.createElement('div');
                 spreadsheet[position].classList.add('jexcel_tab');
+                spreadsheet[position].setAttribute('data-spreadsheet-content', position);
 
                 var worksheet = jexcel(spreadsheet[position], tab);
                 content.appendChild(spreadsheet[position]);
@@ -14564,7 +14705,9 @@ if (! jSuites && typeof(require) === 'function') {
                         content.children[j].style.display = 'none';
                     }
                     var i = this.getAttribute('data-spreadsheet');
-                    content.children[i].style.display = 'block';
+                    $('#'+result[0].name).find(`[data-spreadsheet-content='${i}']`).each(function(){
+                      this.style.display = 'block';
+                    });
                     headers.children[i].classList.add('selected')
                 }
                 headers.appendChild(link[position]);
@@ -14572,48 +14715,75 @@ if (! jSuites && typeof(require) === 'function') {
                     headers.children[j].classList.remove('selected');
                     content.children[j].style.display = 'none';
                 }
-                content.children[position].style.display = 'block';
+                $('#'+result[0].name).find(`[data-spreadsheet-content='${position}']`).each(function(){
+                  this.style.display = 'block';
+                });
                 headers.children[position].classList.add('selected');
                 $('#'+result[0].name).find('.jexcel_tab_link.saveview.disabled').each(function(){ $(this).removeClass('disabled'); });
                 $('#'+result[0].name).find('.jexcel_tab_link.tabdelete').each(function(){ $(this).removeClass('disabled'); });
                 $('#'+result[0].name).find('.jexcel_tab_link.tabedit').each(function(){ $(this).removeClass('disabled'); });
+                if (headers.children.length>1){
+                  $('#'+result[0].name).find('.jexcel_tab_link.tableft').each(function(){ $(this).removeClass('disabled'); });
+                  $('#'+result[0].name).find('.jexcel_tab_link.tabright').each(function(){ $(this).removeClass('disabled'); });
+                }
               }
             }
           }
           buttons.appendChild(linkb[b]);
           b++;
           // Delete tab
-          // Tab link
           linkb[b] = document.createElement('div');
           linkb[b].classList.add('jexcel_tab_link');
           linkb[b].classList.add('tabdelete');
+          linkb[b].setAttribute("title","Borrar pestaña actual");
           linkb[b].innerHTML = '<i class="fa fa-minus" aria-hidden="true"></i>&nbsp;';
           linkb[b].onclick = function() {
-            if (this.getAttribute('class').indexOf('disabled')==-1 && headers.getElementsByTagName('div').length>0){
+            var headersd = headers.children;
+            if (this.getAttribute('class').indexOf('disabled')==-1 && headersd.length>0){
               if (window.confirm('¿Borrar la pestaña actual?')){
                 var positiondelete = 0;
                 $('#'+result[0].name).find('.jexcel_tab_link.selected').each(function(){
                   positiondelete = $(this).attr('data-spreadsheet');
                 });
-                var contentdelete =  content.children[positiondelete];
-                content.removeChild(contentdelete);
                 var headerdelete =  headers.children[positiondelete];
                 headers.removeChild(headerdelete);
-                for(var c=0; c<headers.getElementsByTagName('div').length; c++){
-                  headers.children[c].setAttribute('data-spreadsheet',c);
+                $('#'+result[0].name).find(`[data-spreadsheet-content='${positiondelete}']`).each(function(){
+                  content.removeChild(this);
+                });
+                var jexceltabs = document.getElementById(result[0].name).jexcel;
+                for(var m=0; m<jexceltabs.length; m++){
+                  if (jexceltabs[m].options.tabid==positiondelete)
+                    jexceltabs.splice(m,1);
                 }
-                document.getElementById(result[0].name).jexcel.splice(positiondelete,1);
-                if (headers.getElementsByTagName('div').length>0){
-                  content.children[0].style.display = 'block';
+                for(var c=0; c<headersd.length+1; c++){
+                  if (c<headersd.length)
+                    headers.children[c].setAttribute('data-spreadsheet',c);
+                  if (c>positiondelete){
+                    $('#'+result[0].name).find(`[data-spreadsheet-content='${c}']`).each(function(){
+                      this.setAttribute("data-spreadsheet-content",c-1);
+                    });
+                    for(var m=0; m<jexceltabs.length; m++){
+                      if (jexceltabs[m].options.tabid==c) jexceltabs[m].options.tabid = c-1;
+                    }
+                  }
+                }
+                if (headersd.length>0){
                   headers.children[0].classList.add('selected');
+                  $('#'+result[0].name).find(`[data-spreadsheet-content='0']`).each(function(){
+                    this.style.display = 'block';
+                  });
                 }else{
                   $('#'+result[0].name).find('.jexcel_tab_link.tabdelete').each(function(){ $(this).addClass('disabled'); });
                   $('#'+result[0].name).find('.jexcel_tab_link.tabedit').each(function(){ $(this).addClass('disabled'); });
                 }
                 $('#'+result[0].name).find('.jexcel_tab_link.saveview.disabled').each(function(){ $(this).removeClass('disabled'); });
+                if (headersd.length<=1){
+                  $('#'+result[0].name).find('.jexcel_tab_link.tableft').each(function(){ $(this).addClass('disabled'); });
+                  $('#'+result[0].name).find('.jexcel_tab_link.tabright').each(function(){ $(this).addClass('disabled'); });
+                }
               }
             }else {
-              if (headers.getElementsByTagName('div').length==0){
+              if (headersd.length==0){
                 alert('No hay pestañas para borrar');
               }
             }
@@ -14621,13 +14791,14 @@ if (! jSuites && typeof(require) === 'function') {
           buttons.appendChild(linkb[b]);
           b++;
           // Edit tab
-          // Tab link
           linkb[b] = document.createElement('div');
           linkb[b].classList.add('jexcel_tab_link');
           linkb[b].classList.add('tabedit');
+          linkb[b].setAttribute("title","Renombrar pestaña actual");
           linkb[b].innerHTML = '<i class="fa fa-edit" aria-hidden="true"></i>&nbsp;';
           linkb[b].onclick = function() {
-            if (this.getAttribute('class').indexOf('disabled')==-1 && headers.getElementsByTagName('div').length>0){
+            var headersd = headers.children;
+            if (this.getAttribute('class').indexOf('disabled')==-1 && headersd.length>0){
               var tab = null;
               $('#'+result[0].name).find('.jexcel_tab_link.selected').each(function(){
                 tab = this;
@@ -14640,7 +14811,7 @@ if (! jSuites && typeof(require) === 'function') {
                 }
               }
             }else {
-              if (headers.getElementsByTagName('div').length==0){
+              if (headersd.length==0){
                 alert('No hay pestañas para editar');
               }
             }
@@ -14648,27 +14819,28 @@ if (! jSuites && typeof(require) === 'function') {
           buttons.appendChild(linkb[b]);
           b++;
         }
-        // Tab save
-        // Spreadsheet container
+        // Tab save and delete view
         if (allowsaveview){
-          // Tab link
           linkb[b] = document.createElement('div');
           linkb[b].classList.add('jexcel_tab_link');
           linkb[b].classList.add('saveview');
           linkb[b].classList.add('disabled');
+          linkb[b].setAttribute("title","Guardar vista");
           linkb[b].innerHTML = '<i class="fa fa-save" aria-hidden="true"></i>&nbsp;';
           linkb[b].onclick = function() {
             if (this.getAttribute('class').indexOf('disabled')==-1){
-              // TODO Guardar vista
               if (window.confirm("¿Guardar vista?")) {
-                this.classList.add('disabled');
-console.log('TODO salvar vista');
+                var jexceltabs = document.getElementById(result[0].name).jexcel;
                 var view = [];
-                for(var v=0; v<headers.getElementsByTagName('div').length; v++){
+                for(var v=0; v<headers.children.length; v++){
                   var tab = {};
                   tab['caption'] = headers.children[v].textContent;
                   tab['columns'] = [];
-                  var columns = document.getElementById(result[0].name).jexcel[v].options.columns;
+                  var columns = [];
+                  for(var m=0; m<jexceltabs.length; m++){
+                    if (jexceltabs[m].options.tabid==v)
+                      columns = jexceltabs[m].options.columns;
+                  }
                   for(var c=0; c<columns.length; c++){
                     var column = {};
                     if (typeof(columns[c]) != 'undefined' &&
@@ -14683,7 +14855,72 @@ console.log('TODO salvar vista');
                   }
                   view.push(tab);
                 }
-console.log(JSON.stringify(view));
+                // Vista de usuario a guardar en BD
+                var userConfigData = {};
+                userConfigData['element']     = result[0].name;
+                userConfigData['view']        = '';
+                userConfigData['attribute']   = 'tabs';
+                userConfigData['value']       = view;
+
+                // Salvado en BD
+                var button_save = this;
+                if((++load_wait)==1) $("#load-spinner").fadeIn();
+                $.ajax({
+                    type: 'post',
+                    url: "/api/global/usersconfig/save",
+                    data: JSON.stringify(userConfigData),
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8"
+                  }).done(function(data, textStatus, jqXHR ) {
+                    if((--load_wait)==0) $("#load-spinner").fadeOut();
+                    if (typeof(data)=='object' && typeof(data['success'])!='undefined' && data['success']=='1'){
+                      // Botones
+                      button_save.classList.add('disabled');
+                      $('#'+result[0].name).find('.jexcel_tab_link.deleteview.disabled').each(function(){ $(this).removeClass('disabled'); });
+                    }
+                  });
+              }
+            }
+          }
+          buttons.appendChild(linkb[b]);
+          b++;
+          linkb[b] = document.createElement('div');
+          linkb[b].classList.add('jexcel_tab_link');
+          linkb[b].classList.add('deleteview');
+          if (result[0].tabsload==0)
+            linkb[b].classList.add('disabled');
+          linkb[b].setAttribute("title","Borrar vista");
+          linkb[b].innerHTML = '<i class="fa fa-remove" aria-hidden="true"></i>&nbsp;';
+          linkb[b].onclick = function() {
+            if (this.getAttribute('class').indexOf('disabled')==-1){
+              if (window.confirm("¿Borrar vista?")) {
+                // Vista de usuario a eliminar en BD
+                var userConfigData = {};
+                userConfigData['element']     = result[0].name;
+                userConfigData['view']        = '';
+                userConfigData['attribute']   = 'tabs';
+                userConfigData['value']       = [];
+
+                // Borrado en BD
+                var button_delete = this;
+                if((++load_wait)==1) $("#load-spinner").fadeIn();
+                $.ajax({
+                    type: 'post',
+                    url: "/api/global/usersconfig/delete",
+                    data: JSON.stringify(userConfigData),
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8"
+                  }).done(function(data, textStatus, jqXHR ) {
+                    if((--load_wait)==0) $("#load-spinner").fadeOut();
+                    if (typeof(data)=='object' && typeof(data['success'])!='undefined' && data['success']=='1'){
+                      // Botones
+                      button_delete.classList.add('disabled');
+                      $('#'+result[0].name).find('.jexcel_tab_link.saveview.disabled').each(function(){ $(this).removeClass('disabled'); });
+                    }else
+                    if (typeof(data)=='object' && typeof(data['error'])!='undefined' && data['error']!=''){
+                      alert(data['error']);
+                    }
+                  });
               }
             }
           }
@@ -14700,7 +14937,14 @@ console.log(JSON.stringify(view));
         //content.children[headers.children.length - 1].style.display = 'block';
         // ICF
         headers.children[0].classList.add('selected');
-        content.children[0].style.display = 'block';
+        $('#'+result[0].name).find(`[data-spreadsheet-content='0']`).each(function(){
+          this.style.display = 'block';
+        });
+        if (allowtabnew){
+          $('#'+result[0].name).find('.jexcel_tab_link.tableft').each(function(){ $(this).addClass('disabled'); });
+          if (headers.children.length<=1)
+            $('#'+result[0].name).find('.jexcel_tab_link.tabright').each(function(){ $(this).addClass('disabled'); });
+        }
         // ICF
         return instances;
     }

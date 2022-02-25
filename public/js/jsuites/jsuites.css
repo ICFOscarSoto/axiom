@@ -10,7 +10,7 @@
  */
 
 :root {
-    --button-color: #298BA8; 
+    --button-color: #298BA8;
     --active-color: #007aff;
 }
 
@@ -49,7 +49,7 @@
 
 .jupload img {
     width: 100%;
-} 
+}
 
 .jupload.input img {
     width: initial;
@@ -79,7 +79,7 @@
 }
 
 .jupload:not(.input):before {
-    content: "\e2c3"; 
+    content: "\e2c3";
     font-family: "Material Icons";
     font-size: 90px;
     color: #eee;
@@ -187,7 +187,7 @@
     0% { left: -100%; }
     100% { left: 0%; }
 }
-    
+
 @keyframes slide-left-out {
     0% { left: 0%; }
     100% { left: -100%; }
@@ -209,7 +209,7 @@
     0% { left: 100%; }
     100% { left: 0%; }
 }
-    
+
 @keyframes slide-right-out {
     0% { left: 0%; }
     100% { left: 100%; }
@@ -230,7 +230,7 @@
     0% { transform: translateY(-100%); }
     100% { -webkit-transform: translateY(0%); }
 }
-    
+
 @keyframes slide-top-out {
     0% { transform: translateY(0%); }
     100% { transform: translateY(-100%); }
@@ -251,7 +251,7 @@
     0% { transform: translateY(100%); }
     100% { -webkit-transform: translateY(0%); }
 }
-    
+
 @keyframes slide-bottom-out {
     0% { transform: translateY(0%); }
     100% { transform: translateY(100%); }
@@ -385,7 +385,7 @@
 
 .jcalendar-months td, .jcalendar-years td {
     height:24px;
-} 
+}
 
 .jcalendar-input {
     padding-right:18px;
@@ -596,7 +596,7 @@
     padding: 0px;
     z-index: 8000;
     display: none;
-    
+
   -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Safari */
      -khtml-user-select: none; /* Konqueror HTML */
@@ -769,7 +769,7 @@
 .jcontextmenu > div {
     box-sizing: border-box;
     display: flex;
-    padding: 8px 8px 8px 32px;
+    padding: 8px 8px 8px 8px;
     width: 250px;
     position: relative;
     cursor: default;
@@ -795,6 +795,13 @@
     position: absolute;
     left: 9px;
 }
+
+/* ICF */
+.jcontextmenu > div i {
+  padding: 0px 5px 0px 5px;
+  width:25px;
+}
+/* ICF */
 
 .jcontextmenu > div a {
     color: #555;
@@ -1860,11 +1867,11 @@
 .jpicker-content::-webkit-scrollbar-track {
     background: #eee;
 }
- 
+
 .jpicker-content::-webkit-scrollbar-thumb {
     background: #888;
 }
- 
+
 .jpicker-content > div {
     padding: 6px;
     padding-left: 15px;
@@ -2005,7 +2012,7 @@
     user-select: none;
     -webkit-align-items: center;
     align-items: center;
-    
+
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
@@ -2081,7 +2088,7 @@
     font-family: 'Material Icons';
     font-size: 30px;
     /* before it was 0px 0px 0px #000 */
-    text-shadow: 0px 0px 6px rgb(56 56 56);    
+    text-shadow: 0px 0px 6px rgb(56 56 56);
     text-align: center;
     cursor: pointer;
 }
@@ -2112,7 +2119,7 @@
     display: flex;
     display: -webkit-flex;
     -webkit-justify-content: center;
-    -webkit-align-items: center;   
+    -webkit-align-items: center;
     -webkit-flex-direction: row;
     justify-content: center;
     align-items: center;
@@ -2476,7 +2483,7 @@
     justify-content: flex-start;
     padding: 2px;
     border: 1px solid #ccc;
-} 
+}
 
 .jtags.jtags-empty:not(.jtags-focus)::before {
     position: absolute;
@@ -2588,7 +2595,7 @@
 
 .jtoolbar-mobile .jtoolbar-item {
     flex:1;
-} 
+}
 
 .jtoolbar .jtoolbar-divisor {
     width: 2px;
@@ -2720,5 +2727,3 @@
     display: flex;
     flex-wrap: wrap;
 }
-
-

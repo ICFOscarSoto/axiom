@@ -14,6 +14,8 @@ use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\Globale\Entity\GlobaleTaxes;
 use App\Modules\Globale\Entity\GlobaleUsers;
 use App\Modules\Globale\Entity\GlobaleStates;
+use App\Modules\Globale\Entity\GlobaleCompanies;
+use App\Modules\Globale\Entity\GlobaleUsersConfig;
 use App\Modules\ERP\Entity\ERPProviders;
 use App\Modules\ERP\Entity\ERPCustomers;
 use App\Modules\ERP\Entity\ERPSuppliers;
@@ -91,7 +93,8 @@ class ERPBuyOrdersController extends Controller
 			$agentsRepository=$this->getDoctrine()->getRepository(GlobaleUsers::class);
 			$destinationstatesRepository=$this->getDoctrine()->getRepository(GlobaleStates::class);
 			$destinationcountriesRepository=$this->getDoctrine()->getRepository(GlobaleCountries::class);
-
+			$usersConfigRepository=$this->getDoctrine()->getRepository(GlobaleUsersConfig::class);
+			$companyRepository=$this->getDoctrine()->getRepository(GlobaleCompanies::class);
 
 			$buyorder=null;
 			$buyorderlines=null;
@@ -200,14 +203,28 @@ class ERPBuyOrdersController extends Controller
     	$breadcrumb=$menurepository->formatBreadcrumb('genericindex','ERP','BuyOrders');
     	array_push($breadcrumb,$new_breadcrumb);
 
-			// Líneas
+			// Líneas -------------------------------
+			// Búsqueda de vista de usuario
+			$user 	 = $this->getUser();
+			$company = $this->getUser()->getCompany();
+			$tabs 	 = null;
+			$tabsUser= $usersConfigRepository->findOneBy(["element"=>"buyorders","view"=>"Defecto","attribute"=>"tabs","active"=>1,"deleted"=>0,"company"=>$company,"user"=>$user]);
+			if ($tabsUser!=null){
+				$tabs = json_encode($tabsUser->getValue());
+			}
+
 			$supplier_id = '1304'; // TODO Se carga de base de datos para este pedido
 
 			$spreadsheet = [];
 			$spreadsheet['name']       = "buyorders";
-			$spreadsheet['options']    = "pagination:10, tableOverflow: true";
+			$spreadsheet['options']    = "pagination:1000000";
 		  $spreadsheet['prototipe']  = "{reference:'', description:'', quantity:1, pvp:0, discount:0, shopping_price:'={pvp}-({pvp}*({discount}/100))', total:'={quantity}*{shopping_price}'}";
-			$spreadsheet['tabs']   		 =
+			if ($tabs!=null){
+				$spreadsheet['tabsload'] = 1;
+				$spreadsheet['tabs']   	 = $tabs;
+			}else{
+				$spreadsheet['tabsload'] = 0;
+				$spreadsheet['tabs']   		 =
 			 "[
 				{ caption:'Datos generales',
 					columns:[
@@ -222,12 +239,14 @@ class ERPBuyOrdersController extends Controller
 				{ caption:'Precios',
 					columns:[
 						{name:'reference'},
+						{name:'pvp'},
 						{name:'shopping_price'},
 						{name:'total'}
 					]
 				}
 			  ]
 			 ";
+		 }
 		  $spreadsheet['columns']    =
 		   "[
 		    { name: 'reference', type: 'dropdown', width:'100px', title:'Referencia', autocomplete:true, url: '/api/getWSProductsSupplier/".$supplier_id."',
@@ -259,12 +278,12 @@ class ERPBuyOrdersController extends Controller
 				 $('#supplier-form-id').on(\"change\", function() {
  				 	if (typeof(document.getElementById('".$spreadsheet['name']."').jexcel[0]) == 'undefined'){
 						var sheet = document.getElementById('".$spreadsheet['name']."').jexcel;
-					  sheet.insertRow();
+					  sheet.insertRow(1, sheet.options.data.length);
 					  sheet.deleteRow(0, sheet.options.data.length-1);
 					}else{
 						for (var i=0; i<document.getElementById('".$spreadsheet['name']."').jexcel.length; i++){
 							var sheet = document.getElementById('".$spreadsheet['name']."').jexcel[i];
-							sheet.insertRow();
+							sheet.insertRow(1, sheet.options.data.length);
 						  sheet.deleteRow(0, sheet.options.data.length-1);
 						}
 					}

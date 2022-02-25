@@ -721,3 +721,14 @@ MeetingsSummoneds: Participantes
 #----------------------------------------------------------------------------------------------------------------------
 Manager data: Datos del gestor
 Reports: Informes
+
+#JSPREADSHEET
+jspreadsheet_showcolumn: Mostrar columna
+jspreadsheet_addrow: Añadir línea
+jspreadsheet_deleterow: Borrar línea
+jspreadsheet_deleterow_msg: ¿Borrar líneas seleccionadas?
+jspreadsheet_addcolumn: Mostrar columna
+jspreadsheet_deletecolumn: Ocultar columna
+jspreadsheet_deletecolumn_msg: ¿Ocultar columna seleccionada?
+jspreadsheet_uprow: Subir línea
+jspreadsheet_downrow: Bajar línea

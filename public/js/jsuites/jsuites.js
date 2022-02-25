@@ -2694,7 +2694,12 @@ jSuites.contextmenu = (function(el, options) {
             }
 
             if (item.icon) {
-                itemContainer.setAttribute('data-icon', item.icon);
+                // itemContainer.setAttribute('data-icon', item.icon);
+                // ICF
+                var itemIcon = document.createElement('i');
+                itemIcon.className = item.icon;
+                itemContainer.appendChild(itemIcon);
+                // ICF
             }
 
             if (item.id) {
