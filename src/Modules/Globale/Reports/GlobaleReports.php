@@ -9,21 +9,28 @@ class GlobaleReports extends \FPDF
   public $image_path;
   public $monthNames=["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Setiembre", "Octubre", "Noviembre", "Diciembre"];
   public $workcenters=null;
+  public $type;
 
   protected $NewPageGroup = false;   // variable indicating whether a new group was requested
   protected $PageGroups = array();   // variable containing the number of pages of the groups
   protected $CurrPageGroup;          // variable containing the alias of the current page group
 
   // create a new page group; call this before calling AddPage()
-      function StartPageGroup()
+      function StartPageGroup($type='Venta')
       {
           $this->NewPageGroup = true;
+          $this->type=$type;
       }
 
       // current page in the group
       function GroupPageNo()
       {
           return $this->PageGroups[$this->CurrPageGroup];
+      }
+
+      function getSize()
+      {
+          return $this->PageGroups;
       }
 
       // alias of the current page group -- will be replaced by the total number of pages in this group
@@ -72,7 +79,7 @@ class GlobaleReports extends \FPDF
       if(class_exists('App\Modules\Globale\Reports\CustomReports\CustomReports_'.$this->user->getCompany()->getId())){
         $customReportClass='App\Modules\Globale\Reports\CustomReports\CustomReports_'.$this->user->getCompany()->getId();
         $customReport=new $customReportClass();
-        $customReport->Header($this);
+        $customReport->Header($this,$this->CurOrientation);
       }else{
         $image_path = $this->image_path.$this->user->getCompany()->getId().'-medium.png';
         if(file_exists($image_path))
@@ -97,6 +104,25 @@ class GlobaleReports extends \FPDF
       }
   }
 
+  function docHeader($nameLeft, $nameRight, $infoLeft=null, $infoRight=null, $infoCenter=null){
+    if(class_exists('App\Modules\Globale\Reports\CustomReports\CustomReports_'.$this->user->getCompany()->getId())){
+      $customReportClass='App\Modules\Globale\Reports\CustomReports\CustomReports_'.$this->user->getCompany()->getId();
+      $customReport=new $customReportClass();
+      $customReport->docHeader($this, $this->CurOrientation, $nameLeft, $nameRight,$infoLeft, $infoRight, $infoCenter);
+    }else {
+
+    }
+  }
+
+  function docFooter($order, $columns=null,$data=null){
+    if(class_exists('App\Modules\Globale\Reports\CustomReports\CustomReports_'.$this->user->getCompany()->getId())){
+      $customReportClass='App\Modules\Globale\Reports\CustomReports\CustomReports_'.$this->user->getCompany()->getId();
+      $customReport=new $customReportClass();
+      $customReport->docFooter($this, $this->CurOrientation, $order, $columns,$data);
+    }else {
+
+    }
+  }
 
   function Footer()
   {
@@ -114,12 +140,12 @@ class GlobaleReports extends \FPDF
     }
   }
 
-  function Table($data, $columns, $associative=false)
+  function Table($data, $columns, $associative=false, $sizeFont=8)
   {
     if(class_exists('App\Modules\Globale\Reports\CustomReports\CustomReports_'.$this->user->getCompany()->getId())){
       $customReportClass='App\Modules\Globale\Reports\CustomReports\CustomReports_'.$this->user->getCompany()->getId();
       $customReport=new $customReportClass();
-      return $customReport->Table($this, $data, $columns, $associative=false);
+      return $customReport->Table($this, $data, $columns, $associative=false, $sizeFont, $this->CurOrientation);
     }else{
       // Header
       $this->SetFont('Arial','B',10);
@@ -131,7 +157,7 @@ class GlobaleReports extends \FPDF
           $this->Cell($columns[$i]["width"],5,utf8_decode(isset($columns[$i]["caption"])?$columns[$i]["caption"]:$columns[$i]["name"]),1,0,'C',true);
       $this->Ln();
       // Data
-      $this->SetFont('Arial','',8);
+      $this->SetFont('Arial','',$sizeFont);
       foreach($data as $key=>$row)
       {
         for($i=0;$i<count($columns);$i++){

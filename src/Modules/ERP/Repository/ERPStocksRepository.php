@@ -179,7 +179,7 @@ class ERPStocksRepository extends ServiceEntityRepository
     }
 
     public function findStockByProductVariantStore($product, $variant, $store){
-      $query='SELECT SUM(stk.quantity) as TOTAL, sum(stk.pengingreceive) as pendingreceive
+      $query='SELECT SUM(stk.quantity) as TOTAL, sum(stk.pendingreceive) as pendingreceive
       FROM erpstocks stk
       LEFT JOIN erpstore_locations stl
       ON stl.id=stk.storelocation_id

@@ -212,10 +212,8 @@ class ERPInvoiceReports
       $result=0;
       while(count($data)){
         $this->docHeader($invoice);
-$this->docFooter($invoice);
-        $this->pdf->SetY(80);
+        $this->docFooter($invoice);
         $data=$this->pdf->Table($data,$columns);
-
       }
 
     }

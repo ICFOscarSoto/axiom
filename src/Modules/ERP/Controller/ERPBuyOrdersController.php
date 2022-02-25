@@ -35,6 +35,7 @@ use App\Modules\ERP\Entity\ERPProducts;
 use App\Modules\ERP\Entity\ERPStores;
 use App\Modules\ERP\Entity\ERPFinancialYears;
 use App\Modules\Security\Utils\SecurityUtils;
+use App\Modules\ERP\Reports\ERPBuyOrdersReports;
 
 class ERPBuyOrdersController extends Controller
 {
@@ -450,6 +451,21 @@ class ERPBuyOrdersController extends Controller
 		$return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, CustomerGroups::class,[["type"=>"and", "column"=>"company", "value"=>$user->getCompany()]]);
 		return new JsonResponse($return);
 	}
+
+	/**
+	 * @Route("/api/buyorders/print/{id}", name="printBuyOrder", defaults={"id"=0})
+	 */
+	 public function navisionPrintInvoice($id, Request $request){
+		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		$reportsUtils = new ERPBuyOrdersReports();
+		$orderRepository=$this->getDoctrine()->getRepository(ERPBuyOrders::class);
+		$orderLinesRepository=$this->getDoctrine()->getRepository(ERPBuyOrdersLines::class);
+		$order=$orderRepository->find($id);
+		$lines=$orderLinesRepository->findBy(["buyorder"=>$order]);
+		$params=["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "id"=>$id, "user"=>$this->getUser(), "order"=>$order, "lines"=>$lines];
+		$report=$reportsUtils->create($params);
+		return new JsonResponse($report);
+	 }
 
 
 }

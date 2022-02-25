@@ -292,6 +292,11 @@ class ERPBuyOrders
      */
     private $taxes;
 
+    /**
+     * @ORM\Column(type="string", length=100, nullable=true)
+     */
+    private $destinationcontact;
+
 
 
 
@@ -922,6 +927,18 @@ class ERPBuyOrders
     public function setTaxes(?float $taxes): self
     {
         $this->taxes = $taxes;
+
+        return $this;
+    }
+
+    public function getDestinationcontact(): ?string
+    {
+        return $this->destinationcontact;
+    }
+
+    public function setDestinationcontact(?string $destinationcontact): self
+    {
+        $this->destinationcontact = $destinationcontact;
 
         return $this;
     }

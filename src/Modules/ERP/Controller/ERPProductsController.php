@@ -42,6 +42,7 @@ use App\Modules\Security\Utils\SecurityUtils;
 use App\Modules\ERP\Reports\ERPEan13Reports;
 use App\Modules\ERP\Reports\ERPPrintQR;
 use App\Modules\ERP\Utils\ERPPrestashopUtils;
+use App\Modules\Navision\Entity\NavisionTransfers;
 
 class ERPProductsController extends Controller
 {
@@ -1021,60 +1022,61 @@ class ERPProductsController extends Controller
  	 * @Route("/api/erp/getproducts/{supplier}/{category}", name="getProducts")
  	 */
  	public function getProducts($supplier, $category){
- 	 	 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-		 $productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
-		 $referenceRepository=$this->getDoctrine()->getRepository(ERPReferences::class);
-		 $EAN13Repository=$this->getDoctrine()->getRepository(ERPEAN13::class);
-		 $shoppingDiscountRepository=$this->getDoctrine()->getRepository(ERPShoppingDiscounts::class);
-		 $shoppingPricesRepository=$this->getDoctrine()->getRepository(ERPShoppingPrices::class);
-		 $objects=$productRepository->productsBySupplierCategory($supplier,$category);
-		 $products=[];
-		 foreach ($objects as $object){
-			 $item=$productRepository->findOneById($object["id"]);
-			 $product["id"]=$object["id"];
-			 $product["code"]=$item->getCode();
-			 $reference=$referenceRepository->findOneBy(["product"=>$item->getId(),"supplier"=>$supplier, "active"=>1, "deleted"=>0]);
-			 if ($reference!=null) $product["reference"]=$reference->getName();
-			 else $product["reference"]='';
-			 $EAN13=$EAN13Repository->findOneBy(["product"=>$item->getId(),"supplier"=>$supplier, "active"=>1, "deleted"=>0]);
-			 if($EAN13!=null)	 $product["EAN13"]=$EAN13->getName();
-			 else $product["EAN13"]='';
-			 $product["name"]=$item->getName();
-			 if($item->getCategory()!=null)  $product["category"]=$item->getCategory()->getName();
-			 else $product["category"]='';
-			 $product["netprice"]=$item->getNetprice()==1?"true":"false";
-			 $product["shopping_price"]=$item->getShoppingPrice();
-
-			 $product["PVP"]=$item->getPVPR()==0 ? $item->getPVP() : $item->getPVPR();
-			 $product["PVP"]=$product["PVP"]==null ? 0 : $product["PVP"];
-			 if ($item->getNetprice()==false) $shoppingDiscounts=$this->getShoppingDiscounts($supplier,$item->getCategory());
-			 else $shoppingDiscounts=null;
-			 if ($shoppingDiscounts!=null) {
-				 $product["discount"]=$shoppingDiscounts->getDiscount();
-				 $product["start"]=$shoppingDiscounts->getStart()!=null ? $shoppingDiscounts->getStart()->format('d/m/Y') : '---';
-				 $product["end"]=$shoppingDiscounts->getEnd()!=null ? $shoppingDiscounts->getEnd()->format('d/m/Y') : '---';
-			 }
-			 else {
-				 $product["discount"]=0;
-				 $product["start"]='';
-				 $product["end"]='';
-			 }
-			 $product["quantity"]=0;
-			 $products[]=$product;
-			 if ($item->getNetprice()){
-				 $product["code"]='---';
-				 $product["reference"]='---';
-				 $productPrices=$shoppingPricesRepository->getShoppingPrices($object["id"],$supplier);
-				 foreach ($productPrices as $specificPrice){
-					 $product["quantity"]=$specificPrice["quantity"];
-					 $product["shopping_price"]=$specificPrice["price"];
-					 $products[]=$product;
+		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			 $productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
+			 $referenceRepository=$this->getDoctrine()->getRepository(ERPReferences::class);
+			 $EAN13Repository=$this->getDoctrine()->getRepository(ERPEAN13::class);
+			 $shoppingDiscountRepository=$this->getDoctrine()->getRepository(ERPShoppingDiscounts::class);
+			 $shoppingPricesRepository=$this->getDoctrine()->getRepository(ERPShoppingPrices::class);
+			 $objects=$productRepository->productsBySupplierCategory($supplier,$category);
+			 $products=[];
+			 foreach ($objects as $object){
+				 $item=$productRepository->findOneById($object["id"]);
+				 $product["id"]=$object["id"];
+				 $product["code"]='<a href="'.$this->generateUrl('formProduct',["id"=>$object["id"]]).'" class="external">'.$item->getCode().'</a>';
+				 $reference=$referenceRepository->findOneBy(["product"=>$item->getId(),"supplier"=>$supplier, "active"=>1, "deleted"=>0]);
+				 if ($reference!=null) $product["reference"]=$reference->getName();
+				 else $product["reference"]='';
+				 $EAN13=$EAN13Repository->findOneBy(["product"=>$item->getId(),"supplier"=>$supplier, "active"=>1, "deleted"=>0]);
+				 if($EAN13!=null)	 $product["EAN13"]=$EAN13->getName();
+				 else $product["EAN13"]='';
+				 $product["name"]='<a href="'.$this->generateUrl('formProduct',["id"=>$object["id"]]).'" class="external">'.$item->getName().'</a>';
+				 if($item->getCategory()!=null)  $product["category"]=$item->getCategory()->getName();
+				 else $product["category"]='';
+				 $product["netprice"]=$item->getNetprice()==1?"true":"false";
+				 if ($item->getNetprice()==false) $shoppingDiscounts=$this->getShoppingDiscounts($supplier,$item->getCategory());
+				 else $shoppingDiscounts=null;
+				 if ($shoppingDiscounts!=null) {
+					 $product["discount"]=$shoppingDiscounts->getDiscount();
+					 $product["start"]=$shoppingDiscounts->getStart()!=null ? $shoppingDiscounts->getStart()->format('d/m/Y') : '---';
+					 $product["end"]=$shoppingDiscounts->getEnd()!=null ? $shoppingDiscounts->getEnd()->format('d/m/Y') : '---';
 				 }
-			 }
-			 $product=[];
-		 }
+				 else {
+					 $product["discount"]=0;
+					 $product["start"]='';
+					 $product["end"]='';
+				 }
+				 $product["quantity"]=0;
+				 	/* $product["shopping_price"]=$item->getShoppingPrice();
+				 $product["PVP"]=$item->getPVPR()==0 ? $item->getPVP() : $item->getPVPR();
+				 $product["PVP"]=$product["PVP"]==null ? 0 : $product["PVP"];
+				 */
 
-		 return new JsonResponse(["products"=>$products]);
+				 $productPrices=$shoppingPricesRepository->getShoppingPrices($object["id"],$supplier);
+				 if ($item->getNetprice()){
+					 foreach ($productPrices as $specificPrice){
+						 $product["quantity"]=$specificPrice["quantity"];
+						 $product["shopping_price"]=$specificPrice["shopping_price"];
+						 $product["PVPr"]=$specificPrice["pvp"]==null ? '--' : $specificPrice["pvp"];
+						 $products[]=$product;
+						 $product["code"]='---';
+						 $product["reference"]='---';
+					 }
+				 }
+				 $product=[];
+			 }
+
+			 return new JsonResponse(["products"=>$products]);
  	}
 
 		 /**
@@ -1113,10 +1115,54 @@ class ERPProductsController extends Controller
 
 	 public function generateQR(RouterInterface $router,Request $request){
 		 $transfer=$request->query->get('name',null);
-		 //$transfer=substr($transfer,3);
+		 $params["rootdir"]= $this->get('kernel')->getRootDir();
+		 $params["user"]=$this->getUser();
 		 $params["name"]=$transfer;
 		 $printQRUtils = new ERPPrintQR();
-		 $pdf=$printQRUtils->create($params);
+		 $name=substr($transfer,3);
+		 $repositoryTransfers=$this->getDoctrine()->getRepository(NavisionTransfers::class);
+		 $params["transfers"]=$repositoryTransfers->findBy(["name"=>$name, "active"=>1, "deleted"=>0]);
+		 if (empty($params["transfers"])) {
+			 $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-printTransfer.php?from='.$name);
+			 $objects=json_decode($json, true);
+			 $objects=$objects[0]["class"];
+			 if (empty($objects)){
+				 $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getTransfer.php?from='.$name);
+				 $objects=json_decode($json, true);
+				 $objects=$objects[0]["class"];
+			 }
+			 foreach ($objects as $object){
+				 	$transfersRepository=$this->getDoctrine()->getRepository(NavisionTransfers::class);
+				 	$productsRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
+				 	$storesRepository=$this->getDoctrine()->getRepository(ERPStores::class);
+					 $product=$productsRepository->findOneBy(["code"=>$object["code"]]);
+					 $item=$transfersRepository->findOneBy(["name"=>$name, "product"=>$product, "active"=>1, "deleted"=>0]);
+					 if ($item==null){
+						 if (array_key_exists("Transfer-from Code",$object)) $originStore=$storesRepository->findOneBy(["code"=>$object["Transfer-from Code"]]);
+						 else $originStore=$storesRepository->findOneBy(["code"=>"ALM01"]);
+						 $dateSend=new \DateTime(date('Y-m-d 00:00:00',strtotime($object["dateSend"]["date"])));
+						 $destinationStore=$storesRepository->findOneBy(["code"=>$object["almacen"]]);
+						 $obj=new NavisionTransfers();
+						 $obj->setOriginstore($originStore);
+						 $obj->setDestinationstore($destinationStore);
+						 $obj->setProduct($product);
+						 $obj->setName($name);
+						 $obj->setQuantity((int)$object["stock"]);
+						 $obj->setCompany($this->getUser()->getCompany());
+						 $obj->setDateadd(new \Datetime());
+						 $obj->setDateupd(new \Datetime());
+						 $obj->setDatesend($dateSend);
+						 $obj->setActive(1);
+						 $obj->setDeleted(0);
+						 $obj->setReceived(0);
+						 $this->getDoctrine()->getManager()->persist($obj);
+					 }
+					 $this->getDoctrine()->getManager()->flush();
+				 }
+		 $params["transfers"]=$repositoryTransfers->findBy(["name"=>$name, "active"=>1, "deleted"=>0]);
+		 }
+		 //$pdf=$printQRUtils->create($params);
+		 $pdf=$printQRUtils->transferQR($params);
 		 return new Response("", 200, array('Content-Type' => 'application/pdf'));
 	 }
 
@@ -1179,6 +1225,7 @@ class ERPProductsController extends Controller
          $stockHistory->setActive(true);
          $stockHistory->setDeleted(false);
 				 $stock->setQuantity($stock->getQuantity()+$received);
+
 				 $this->getDoctrine()->getManager()->persist($stock);
 				 $this->getDoctrine()->getManager()->persist($stockHistory);
 			 } else return new JsonResponse(["result"=>-6, "text"=>"El almacén de destino (".$store->getName().") no se corresponde con un almacén gestionado"]);
@@ -1187,6 +1234,8 @@ class ERPProductsController extends Controller
 			 $this->getDoctrine()->getManager()->flush();
 		 	}
 
+		 $transfersRepository=$this->getDoctrine()->getRepository(NavisionTransfers::class);
+		 $transfersRepository->recivedTransfer($transfer);
 		 return new JsonResponse(["result"=>1, "text"=>"Se ha recepcionado la mercancia del traspaso ".$transfer]);
 	 }
 

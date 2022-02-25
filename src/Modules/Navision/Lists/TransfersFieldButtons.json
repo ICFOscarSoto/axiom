@@ -1,0 +1,8 @@
+[
+  {"id": "editTransfers", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"genericdata", "routeParams":{"module":"Navision", "name":"Transfers", "type":"modal" }, "modal":"Transfers", "actionType" : "background", "confirm" :false, "tooltip":""},
+  {"id": "activation", "type": "option", "options": [
+      {"id": "desactivateTransfers", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"genericdisable", "routeParams":{"module":"Navision", "name":"Transfers"}, "confirm" :true, "actionType" : "background", "tooltip":"" },
+      {"id": "activateTransfers", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "route":"genericenable", "routeParams":{"module":"Navision", "name":"Transfers"}, "confirm" :true, "actionType" : "background", "tooltip":"" }
+  ]},
+  {"id": "deleteTransfers", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"genericdelete", "routeParams":{"module":"Navision", "name":"Transfers"}, "confirm" :true, "undo" :false, "actionType" : "background", "tooltip":""}
+]

@@ -51,7 +51,6 @@ class ERPReferencesRepository extends ServiceEntityRepository
         return $result;
       }
 
-
       public function findProduct($supplier,$reference){
         $query='SELECT product_id FROM erpreferences
                 WHERE active=1 and deleted=0 and supplier_id=:supplier and name like :reference ';
@@ -60,6 +59,15 @@ class ERPReferencesRepository extends ServiceEntityRepository
         return $result;
 
       }
+
+      public function getReferenceByProductSupplier($supplier,$product){
+        $query='SELECT name FROM erpreferences
+                WHERE active=1 and deleted=0 and supplier_id=:supplier and product_id=:product ';
+        $params=['supplier' => $supplier, 'product'=>$product];
+        $result=$this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchColumn(0);
+        return $result;
+      }
+
     // /**
     //  * @return ERPReferences[] Returns an array of ERPReferences objects
     //  */

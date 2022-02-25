@@ -1,0 +1,41 @@
+[{
+    "sections": [
+        {
+            "name": "data",
+            "fields": [
+                {
+                    "name": "name",
+                    "cols": 4
+                },
+                {
+                    "name": "datesend",
+                    "cols": 4
+                },
+                {
+                    "name": "quantity",
+                    "cols": 4
+                },
+                {
+                    "name": "active",
+                    "cols": 4
+                },
+                {
+                    "name": "received",
+                    "cols": 4
+                },
+                {
+                    "name": "originstore",
+                    "cols": 4
+                },
+                {
+                    "name": "destinationstore",
+                    "cols": 4
+                },
+                {
+                    "name": "product",
+                    "cols": 4
+                }
+            ]
+        }
+    ]
+}]
