@@ -55,18 +55,42 @@
      "onload":""                // Código javascript para inicializar variables, refrescar tabla porque cambia un campo del formulario, ocultar columnas ...etc
    }
 #}
-<div class="modal fade" tabindex="-1" id="js{{spreadsheet.name}}-showcolumn-modal-form" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content" style="transform: matrix(1, 0, 0, 1, 0, 0);display:inline-block;">
-        <div class="modal-header">
-          <h4 class="modal-title">{{ ('jspreadsheet_showcolumn')|trans }}</h4>
-        </div>
-        <div id="js{{spreadsheet.name}}-showcolumn-modal-form" style="height: 300px; width: 300px; padding: 0px 10px;">
-          Hola mundo
-        </div>
+<div id="{{spreadsheet.name}}-showcolumn-modal">
+  <div class="modal fade" tabindex="-1" id="{{spreadsheet.name}}-showcolumn-modal-form" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content" style="transform: matrix(1, 0, 0, 1, 0, 0); width: 300px; margin:auto;">
+          <div class="modal-header">
+            <h4 class="modal-title">{{('jspreadsheet_showcolumn')|trans}}</h4>
+          </div>
+          <div id="{{spreadsheet.name}}-showcolumn-modal-form-body" style="height: 400px; padding: 0px 10px; max-height: 400px;"></div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary">{{('Accept')|trans}}</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">{{('Cancel')|trans}}</button>
+          </div>
+      </div>
     </div>
   </div>
 </div>
+
+<div id="{{spreadsheet.name}}-newtab-modal">
+  <div class="modal fade" tabindex="-1" id="{{spreadsheet.name}}-newtab-modal-form" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content" style="transform: matrix(1, 0, 0, 1, 0, 0); width: 400px; margin:auto;">
+          <form id="{{spreadsheet.name}}-newtab-form">
+            <div class="modal-header">
+              <h4 class="modal-title">{{('jspreadsheet_newtab')|trans}}</h4>
+            </div>
+            <div id="{{spreadsheet.name}}-newtab-modal-form-body" style="height: 400px; padding: 0px 10px; max-height: 400px;"></div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-primary">{{('Accept')|trans}}</button>
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">{{('Cancel')|trans}}</button>
+            </div>
+          </form>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 <div id="{{spreadsheet.name}}"></div>
 
@@ -78,8 +102,9 @@ function js{{spreadsheet.name}}_create(data){
   {% if spreadsheet.tabs is defined %}
     var js{{spreadsheet.name}}_sheets = [];
     var js{{spreadsheet.name}}_sheets_create = {{spreadsheet.tabs|raw}};
+    window['js{{spreadsheet.name}}_sheets'] = [];
     for(var i=0; i<js{{spreadsheet.name}}_sheets_create.length; i++){
-      js{{spreadsheet.name}}_sheets.push({
+        window['js{{spreadsheet.name}}_sheets'].push({
         name:'{{spreadsheet.name}}',
         sheetid:i,
         tabid:i,
@@ -127,8 +152,9 @@ function js{{spreadsheet.name}}_create(data){
              {
                title: '{{('jspreadsheet_addcolumn')|trans}}',
                icon: 'fa fa-eye',
-               onclick: function () {
-
+               attr: {
+                 'data-toggle': 'modal',
+                 'data-target': '#{{spreadsheet.name}}-showcolumn-modal-form'
                }
              });
            items.push(
@@ -219,6 +245,8 @@ function js{{spreadsheet.name}}_create(data){
             }
           }
         }
+        if (!sheet.options.loadinit)
+          $('#'+sheet.options.name).find('.jexcel_tab_link.tabnew').each(function(){ $(this).addClass('disabled'); });
       },
       oninsertrow: function(instance, rowNumber, numOfRows, records, insertBefore){
         var sheet = instance.jexcel;
@@ -299,11 +327,6 @@ function js{{spreadsheet.name}}_create(data){
         // Carga de la vista del usuario
         sheet.options['loadinit'] = true;
 
-        if (sheet.options['sheetnew']){
-          sheet.insertRow(1, sheet.options.data.length);
-          sheet.deleteRow(0, sheet.options.data.length-1);
-        }
-
         if (typeof(data) != 'undefined' && data!= null && data.length>0){
           for (var d=0; d<data.length; d++){
             sheet.insertRow(1, d);
@@ -317,7 +340,7 @@ function js{{spreadsheet.name}}_create(data){
         // Ocultar y reordenar columnas
         // Se mueven al principio todas las columnas definidas por el usuario
         // para esta pestaña
-        if (!sheet.options['sheetnew'])
+        if (!sheet.options['sheetnew']){
           if (typeof(tab) != 'undefined' && typeof(tab.columns) != 'undefined' && tab.columns!= null & tab.columns.length>0){
             for (var c=0; c<tab.columns.length; c++){
               var column    = tab['columns'][c]['name'];
@@ -336,6 +359,24 @@ function js{{spreadsheet.name}}_create(data){
                 sheet.hideColumnKey(column);
             }
           }
+        }else{
+          for (var c=0; c<sheet.options.columnsn.length; c++){
+            var column    = sheet['options']['columnsn'][c];
+            var columnid  = sheet.getColumnKey(column);
+            sheet.moveColumn(columnid, c);
+          }
+          // Se ocultan columnas no seleccionadas
+          for (c=0; c<sheet.options.columns.length; c++){
+            column = sheet['options']['columns'][c]['name'];
+            hidecolumn = true;
+            for (d=0; d<sheet.options.columnsn.length && hidecolumn; d++){
+              if (column==sheet['options']['columnsn'][d])
+                hidecolumn = false;
+            }
+            if (hidecolumn)
+              sheet.hideColumnKey(column);
+          }
+        }
 
         // Una vez creado para ocultar filas...etc
         {% if spreadsheet.onload is defined %}
@@ -345,8 +386,7 @@ function js{{spreadsheet.name}}_create(data){
         {% endif %}
 
         // Se crea una línea en blanco para poder insertar
-        if (!sheet.options['sheetnew'])
-          sheet.insertRow(1, data.length);
+        sheet.insertRow(1, data.length);
 
         // Se quita paginación
         if (parseInt(sheet.options['pagination'])>=1000000)
@@ -389,7 +429,7 @@ function js{{spreadsheet.name}}_create(data){
       }
     });
    };
-   jspreadsheet.tabs(document.getElementById('{{spreadsheet.name}}'), js{{spreadsheet.name}}_sheets);
+   jspreadsheet.tabs(document.getElementById('{{spreadsheet.name}}'), window['js{{spreadsheet.name}}_sheets']);
   {% else %} //------------------------------------------------------------------------------------
    jspreadsheet(document.getElementById('{{spreadsheet.name}}'),{
       name:'{{spreadsheet.name}}',
@@ -600,4 +640,180 @@ function js{{spreadsheet.name}}_create(data){
 var data    = JSON.parse(JSON.stringify({{spreadsheet.data|raw}}));
 js{{spreadsheet.name}}_create(data);
 
+$(document).ready(function(){
+  /* Muestra ventana de añadir columnas */
+  $("#{{spreadsheet.name}}-showcolumn-modal-form").on('show.bs.modal', function(){
+    var body = document.getElementById("{{spreadsheet.name}}-showcolumn-modal-form-body");
+    var tab_selected = -1;
+    var body_txt = '';
+    $('#{{spreadsheet.name}}').find('.jexcel_tab_link.selected').each(function(){
+      tab_selected= parseInt($(this).attr('data-spreadsheet'));
+    });
+    if (tab_selected!=-1){
+      var jexceltabs = document.getElementById('{{spreadsheet.name}}').jexcel;
+      var columns = [];
+      for(var m=0; m<jexceltabs.length; m++){
+        if (jexceltabs[m].options.tabid==tab_selected)
+          columns = jexceltabs[m].options.columns;
+      }
+      if (columns.length>0){
+        exists_column = false;
+        for (var c=0; c<columns.length; c++){
+          if (!(typeof(columns[c].options)=='undefined' || typeof(columns[c].options.hide)=='undefined' || !columns[c].options.hide)){
+            body_txt += '<div class="col-sm-12">';
+            body_txt += '<div class="form-group-line">';
+            body_txt += '<div class="form-check">';
+            body_txt += '<input class="icheck" type="checkbox" value="'+columns[c].name+'" name="{{spreadsheet.name}}_show_columns[]"/>';
+            body_txt += '<label for="{{spreadsheet.name}}_show_columns" class="form-check-label">'+columns[c].title+'</label>';
+            body_txt += '</div>';
+            body_txt += '</div>';
+            body_txt += '</div>';
+            exists_column = true;
+          }
+        }
+        if (!exists_column){
+          body_txt += '<div class="row justify-content-center"><div class="col-10"><br/>{{('jspreadsheet_showcolumn_error')|trans}}</div></div>';
+          $("#{{spreadsheet.name}}-showcolumn-modal-form .btn-primary").each(function( index ) {
+            $(this).hide();
+          });
+        }else
+          body_txt =  '<div style="overflow-y:auto; height: 400px; padding: 0px 10px; max-height: 400px;">'+body_txt+'</div>';
+        body.innerHTML = body_txt;
+      }else
+        body.innerHTML = '<div class="row justify-content-center"><div class="col-10"><br/>{{('jspreadsheet_showcolumn_error')|trans}}</div></div>';
+    }else
+      body.innerHTML = '<div class="row justify-content-center"><div class="col-10"><br/>{{('jspreadsheet_showcolumn_error')|trans}}</div></div>';
+    $('input.icheck').iCheck({
+      checkboxClass: 'icheckbox_flat-blue',
+      radioClass: 'iradio_flat-blue'
+    });
+  });
+  /* Realiza la acción de mostrar columnas */
+  $("#{{spreadsheet.name}}-showcolumn-modal-form .btn-primary").on('click', function(){
+    var columns = $("input[name='{{spreadsheet.name}}_show_columns[]']:checked");
+    var tab_selected = -1;
+    $('#{{spreadsheet.name}}').find('.jexcel_tab_link.selected').each(function(){
+      tab_selected= parseInt($(this).attr('data-spreadsheet'));
+    });
+    if (tab_selected!=-1 && columns.length>0){
+      var jexceltabs = document.getElementById('{{spreadsheet.name}}').jexcel;
+      var jexceltab  = null;
+      for(var m=0; m<jexceltabs.length; m++){
+        if (jexceltabs[m].options.tabid==tab_selected)
+          jexceltab = jexceltabs[m];
+      }
+      columns.each(function( index ) {
+        var column_show = $(this).val();
+        if (jexceltab!=null && column_show!=null && column_show!=''){
+          jexceltab.showColumnKey(column_show);
+        }
+      });
+    }
+    $('#{{spreadsheet.name}}-showcolumn-modal-form').modal('hide');
+  });
+  /* Muestra ventana de añadir pestaña */
+  $("#{{spreadsheet.name}}-newtab-modal-form").on('show.bs.modal', function(){
+    var body = document.getElementById("{{spreadsheet.name}}-newtab-modal-form-body");
+    var columns = document.getElementById("{{spreadsheet.name}}").jexcel[0].options.columnso;
+    var body_txt = '';
+    body_txt += '<div style="overflow-y:auto; height: 400px; padding: 15px 10px; max-height: 400px;">';
+    body_txt += '  <div class="col-sm-12">';
+    body_txt += '    <label for="{{spreadsheet.name}}-newtab-name">{{('jspreadsheet_newtab_name')|trans}}:</label>';
+    body_txt += '    <div class="form-group">';
+    body_txt += '      <input type="text" id="{{spreadsheet.name}}-newtab-name" value="" class="form-control" placeholder="{{('jspreadsheet_newtab_name')|trans}}" required/>';
+    body_txt += '    </div>';
+    body_txt += '  </div>';
+    body_txt += '  <div class="col-sm-12">';
+    body_txt += '    <span><b>{{('jspreadsheet_newtab_columns')|trans}}:</b></span>';
+    body_txt += '  </div>';
+    if (columns.length>0){
+      for (var c=0; c<columns.length; c++){
+        body_txt += '<div class="col-sm-12">';
+        body_txt += '<div class="form-group-line">';
+        body_txt += '<div class="form-check">';
+        body_txt += '<input class="icheck" type="checkbox" value="'+columns[c].name+'" name="{{spreadsheet.name}}_newtab_columns[]" checked="checked"/>';
+        body_txt += '<label for="{{spreadsheet.name}}_newtab_columns" class="form-check-label">'+columns[c].title+'</label>';
+        body_txt += '</div>';
+        body_txt += '</div>';
+        body_txt += '</div>';
+      }
+      body_txt +=  '</div';
+      body.innerHTML = body_txt;
+    }else
+      body.innerHTML = '<div class="row justify-content-center"><div class="col-10"><br/>{{('jspreadsheet_newtab_error')|trans}}</div></div>';
+    $('input.icheck').iCheck({
+      checkboxClass: 'icheckbox_flat-blue',
+      radioClass: 'iradio_flat-blue'
+    });
+  });
+  /* Realiza la acción de crear nueva pestaña */
+  $("#{{spreadsheet.name}}-newtab-form").on('submit', function(){
+    var nametab = $('#{{spreadsheet.name}}-newtab-name').val();
+    var columns = $("input[name='{{spreadsheet.name}}_newtab_columns[]']:checked");
+    // Validación del formulario
+    if (nametab!=undefined && nametab!='' && columns.length>0){
+      var headers = document.getElementById("{{spreadsheet.name}}").children[0];
+      var position = headers.children.length;
+      var tab_new = window['js{{spreadsheet.name}}_sheets'][0];
+      var content = document.getElementById("{{spreadsheet.name}}").children[2];
+      var columnsn = [];
+      columns.each(function( index ) {
+        columnsn.push($(this).val());
+      });
+
+      tab_new['sheetid']  = position;
+      tab_new['tabid']    = position;
+      tab_new['sheetnew'] = true;
+      tab_new['sheetName']= nametab;
+      tab_new['columns']  = tab_new['columnso'];
+      tab_new['columnsn'] = columnsn;
+      tab_new['data']     = [];
+
+      // Se crea la nueva pestaña
+      var spreadsheet_new = document.createElement('div');
+      spreadsheet_new.classList.add('jexcel_tab');
+      spreadsheet_new.setAttribute('data-spreadsheet-content', position);
+
+      var worksheet = jexcel(spreadsheet_new, tab_new);
+      content.appendChild(spreadsheet_new);
+      document.getElementById('{{spreadsheet.name}}').jexcel.push(worksheet);
+      link_new = document.createElement('div');
+      link_new.classList.add('jexcel_tab_link');
+      link_new.setAttribute('data-spreadsheet', position);
+      link_new.innerHTML = nametab;
+      link_new.onclick = function() {
+          for (var j = 0; j < headers.children.length; j++) {
+              headers.children[j].classList.remove('selected');
+              content.children[j].style.display = 'none';
+          }
+          var i = this.getAttribute('data-spreadsheet');
+          $('#'+tab_new.name).find(`[data-spreadsheet-content='${i}']`).each(function(){
+            this.style.display = 'block';
+          });
+          headers.children[i].classList.add('selected')
+      }
+      headers.appendChild(link_new);
+      for (var j = 0; j < headers.children.length; j++) {
+          headers.children[j].classList.remove('selected');
+          content.children[j].style.display = 'none';
+      }
+      $('#'+tab_new.name).find(`[data-spreadsheet-content='${position}']`).each(function(){
+        this.style.display = 'block';
+      });
+      headers.children[position].classList.add('selected');
+      $('#'+tab_new.name).find('.jexcel_tab_link.saveview.disabled').each(function(){ $(this).removeClass('disabled'); });
+      $('#'+tab_new.name).find('.jexcel_tab_link.tabdelete').each(function(){ $(this).removeClass('disabled'); });
+      $('#'+tab_new.name).find('.jexcel_tab_link.tabedit').each(function(){ $(this).removeClass('disabled'); });
+      if (headers.children.length>1){
+        $('#'+tab_new.name).find('.jexcel_tab_link.tableft').each(function(){ $(this).removeClass('disabled'); });
+        $('#'+tab_new.name).find('.jexcel_tab_link.tabright').each(function(){ $(this).addClass('disabled'); });
+      }
+
+      $('#{{spreadsheet.name}}-newtab-modal-form').modal('hide');
+    }else{
+      alert('{{('jspreadsheet_newtab_error_validation')|trans}}');
+    }
+    return false;
+  });
+});
 </script>

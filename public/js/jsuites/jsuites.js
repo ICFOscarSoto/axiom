@@ -2689,6 +2689,14 @@ jSuites.contextmenu = (function(el, options) {
             var itemText = document.createElement('a');
             itemText.innerHTML = item.title;
 
+            // ICF
+            if (typeof(item.attr) != 'undefined' && item.attr!=null && Object.keys(item.attr).length>0){
+              Object.entries(item.attr).forEach(([key, value]) => {
+                  itemText.setAttribute(key,value);
+              });
+            }
+            // ICF
+
             if (item.tooltip) {
                 itemContainer.setAttribute('title', item.tooltip);
             }

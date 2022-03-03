@@ -742,6 +742,10 @@ label.form-check-label {
     height: 42px;
 }
 
+.form-group-line {
+    position: relative;
+    height: 33px;
+}
 
 .form-control {
   border: 1px solid #cecece !important;

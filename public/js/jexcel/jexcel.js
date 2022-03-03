@@ -5996,6 +5996,8 @@ if (! jSuites && typeof(require) === 'function') {
             allowsaveview:true,
             // Original columns
             columnso: [],
+            // Columns tab new
+            columnsn: [],
             // ICF ---
             // External data
             url:null,
@@ -14518,6 +14520,7 @@ if (! jSuites && typeof(require) === 'function') {
             div.classList.add('right');
             var buttons = tabs.appendChild(div);
             var div = document.createElement('div');
+            div.classList.add('content');
             var content = tabs.appendChild(div);
         } else {
             var headers = tabs.children[0];
@@ -14611,6 +14614,7 @@ if (! jSuites && typeof(require) === 'function') {
                 $('#'+result[0].name).find('.jexcel_tab_link.tabright').each(function(){ $(this).addClass('disabled'); });
               else
                 $('#'+result[0].name).find('.jexcel_tab_link.tabright').each(function(){ $(this).removeClass('disabled'); });
+              $('#'+result[0].name).find('.jexcel_tab_link.saveview').each(function(){ $(this).removeClass('disabled'); });
             }
           }
         }
@@ -14662,6 +14666,7 @@ if (! jSuites && typeof(require) === 'function') {
                 $('#'+result[0].name).find('.jexcel_tab_link.tabright').each(function(){ $(this).addClass('disabled'); });
               else
                 $('#'+result[0].name).find('.jexcel_tab_link.tabright').each(function(){ $(this).removeClass('disabled'); });
+              $('#'+result[0].name).find('.jexcel_tab_link.saveview').each(function(){ $(this).removeClass('disabled'); });
             }
           }
         }
@@ -14674,10 +14679,12 @@ if (! jSuites && typeof(require) === 'function') {
           linkb[b].classList.add('jexcel_tab_link');
           linkb[b].classList.add('tabnew');
           linkb[b].setAttribute("title","Añadir nueva pestaña");
+          linkb[b].setAttribute("data-toggle","modal");
+          linkb[b].setAttribute("data-target",'#'+result[0].name+'-newtab-modal-form');
           linkb[b].innerHTML = '<i class="fa fa-plus" aria-hidden="true"></i>&nbsp;';
           linkb[b].onclick = function() {
-            if (this.getAttribute('class').indexOf('disabled')==-1){
-              var tabnew = window.prompt('Nombre de la nueva pestaña');
+              // SE HACE TODO EN LA VENTANA MODAL
+              /*var tabnew = window.prompt('Nombre de la nueva pestaña');
               if (tabnew!=null && tabnew!=''){
                 var position = headers.children.length;
                 var tab =  result[0];
@@ -14726,8 +14733,7 @@ if (! jSuites && typeof(require) === 'function') {
                   $('#'+result[0].name).find('.jexcel_tab_link.tableft').each(function(){ $(this).removeClass('disabled'); });
                   $('#'+result[0].name).find('.jexcel_tab_link.tabright').each(function(){ $(this).removeClass('disabled'); });
                 }
-              }
-            }
+              }*/
           }
           buttons.appendChild(linkb[b]);
           b++;
@@ -14772,10 +14778,13 @@ if (! jSuites && typeof(require) === 'function') {
                   $('#'+result[0].name).find(`[data-spreadsheet-content='0']`).each(function(){
                     this.style.display = 'block';
                   });
-                }else{
+                }
+                if (headersd.length==1)
+                  $('#'+result[0].name).find('.jexcel_tab_link.tabdelete').each(function(){ $(this).addClass('disabled'); });
+                /*if (headersd.length==0)
                   $('#'+result[0].name).find('.jexcel_tab_link.tabdelete').each(function(){ $(this).addClass('disabled'); });
                   $('#'+result[0].name).find('.jexcel_tab_link.tabedit').each(function(){ $(this).addClass('disabled'); });
-                }
+                }*/
                 $('#'+result[0].name).find('.jexcel_tab_link.saveview.disabled').each(function(){ $(this).removeClass('disabled'); });
                 if (headersd.length<=1){
                   $('#'+result[0].name).find('.jexcel_tab_link.tableft').each(function(){ $(this).addClass('disabled'); });

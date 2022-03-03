@@ -29,6 +29,9 @@ English: Inglés
 
 #GLOBAL
 #----------------------------------------------------------------------------------------------------------------------
+Accept: Aceptar
+Cancel: Cancelar
+Close: Cerrar
 Save: Guardar
 Edit: Editar
 New: Nuevo
@@ -724,6 +727,11 @@ Reports: Informes
 
 #JSPREADSHEET
 jspreadsheet_showcolumn: Mostrar columna
+jspreadsheet_newtab: Nueva pestaña
+jspreadsheet_newtab_name: Nombre de la nueva pestaña
+jspreadsheet_newtab_columns: Columnas de la pestaña
+jspreadsheet_newtab_error: No existen columnas que mostrar
+jspreadsheet_newtab_error_validation: No se ha definido nombre de la pestaña o no se han seleccionado columnas para mostrar
 jspreadsheet_addrow: Añadir línea
 jspreadsheet_deleterow: Borrar línea
 jspreadsheet_deleterow_msg: ¿Borrar líneas seleccionadas?
@@ -732,3 +740,4 @@ jspreadsheet_deletecolumn: Ocultar columna
 jspreadsheet_deletecolumn_msg: ¿Ocultar columna seleccionada?
 jspreadsheet_uprow: Subir línea
 jspreadsheet_downrow: Bajar línea
+jspreadsheet_showcolumn_error: No quedan columnas que mostrar

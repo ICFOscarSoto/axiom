@@ -261,7 +261,7 @@ class ERPBuyOrdersController extends Controller
 						}
 					}
 				},
-		    { name: 'description', type: 'text', width:'200px', title: 'Descripcion'},
+		    { name: 'description', type: 'text', width:'200px', title: 'Descripción'},
 		    { name: 'quantity', type: 'numeric', width:'100px', title: 'Cantidad' },
 		    { name: 'pvp', type: 'text', width:'100px', title: 'PVP', locale: 'sp-SP', mask: '#.##0,0000 €', options: { style:'currency', currency: 'EUR' } },
 		    { name: 'discount', type: 'numeric', width:'100px', title: 'Descuento'},

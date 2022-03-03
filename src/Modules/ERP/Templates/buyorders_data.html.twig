@@ -1,6 +1,5 @@
 <div class="panel panel-primary panel-shadow" data-collapsed="0" style="-webkit-box-shadow: none; box-shadow:none; margin-bottom: -1px;"><!-- to apply shadow add class "panel-shadow" -->
   <div class="panel-body">
-    <div class="row">
       <div class="col-md-4">
         <label for="supplier-form-code">Código de Proveedor:</label>
         <div class="input-group">
@@ -50,9 +49,9 @@
           <h3>Nº ______________</h3>
       {% endif %}
       </div>
-  </div>
+
   <br>
-  <div class="row">
+
       <div class="col-md-4">
         <label for="supplier-form-name">Nombre del proveedor:</label>
         <div class="form-group">
@@ -84,8 +83,7 @@
           <input type="text" id="supplier-form-deliverynote" value="{{ buyorder.supplierdeliverynote }}"  class="form-control" placeholder="Nº de albarán proveedor">
         </div>
       </div>
-  </div>
-  <div class="row">
+
     <div class="col-md-2">
       <label for="buyorder-form-shippingcharge">Portes:</label>
       <div class="form-group">
@@ -138,7 +136,7 @@
           <label for="buyorder-form-readed">&nbsp; Leído</label>
       </div>
     </div>
-  </div>
+
   <input type="hidden" id="buyorder-form-estimateddelivery-number">
   <input type="hidden" id="supplier-form-id">
 </div>
