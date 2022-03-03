@@ -272,9 +272,8 @@ class ERPProductsRepository extends ServiceEntityRepository
           $product = $aproduct[0];
         $query="SELECT concat(p.id,'~',p.code) as 'reference',
                        p.name as 'description',
-                       sp.pvp as 'pvp',
-                       sd.discount as 'discount',
-                       p.code as 'code'
+                       if (sp.pvp is null, 0, if (sp.pvp='', 0, sp.pvp)) as 'pvp',
+                       if (sd.discount is null, 0, if (sd.discount='', 0, sd.discount)) as 'discount'
                 FROM erpshopping_prices sp LEFT JOIN
                      erpproducts p on p.id=sp.product_id LEFT JOIN
                      erpshopping_discounts sd on sd.supplier_id=sp.supplier_id and sd.category_id=p.category_id and sd.quantity<=:quantity and

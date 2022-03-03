@@ -194,12 +194,14 @@ function js{{spreadsheet.name}}_create(data){
        },
        onchange: function(instance, cell, x, y, value, valueOld, type) {
         var sheet = instance.jexcel;
+        if (typeof(value) === 'undefined' || value == null)
+          value = '';
         // Si la celda tiene onchange como options y tiene url o oncomplete (y no estamos en la carga inicial)
         var options = sheet.options.columns[x].options;
         if (!sheet.options.loadinit && !sheet.options.changeinit && !sheet.options.rowinit && options !== undefined && options.onchange !== undefined && value!=valueOld){
           // Obtener url completa con los campos necesarios para la busqueda
           change = options.onchange;
-          if (change.url !== undefined && value!=undefined){
+          if (change.url !== undefined){
             var url = change.url;
             url = sheet.replaceUrl(url, y);
             if (url != ''){
