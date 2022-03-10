@@ -9,6 +9,7 @@ use \App\Modules\HR\Entity\HRSchedulesWorkers;
 use \App\Modules\HR\Entity\HRSchedules;
 use \App\Modules\HR\Entity\HRShifts;
 use \App\Modules\HR\Entity\HRPeriods;
+use \App\Modules\HR\Helpers\HelperAsterisk;
 use \App\Modules\Globale\Entity\GlobaleClockDevices;
 
 /**
@@ -361,6 +362,12 @@ class HRClocks
       $clockdiary->setDateupd(new \DateTime());
       $doctrine->getManager()->persist($clockdiary);
       $doctrine->getManager()->flush();
+
+      //Registrar o desregistrar de alguna cola de la centralita?
+      if($this->end!=null){
+        HelperAsterisk::unregisterWorker($this->worker);
+      }else HelperAsterisk::registerWorker($this->worker);
+
     }
 
     public function getStartdevice(): ?GlobaleClockDevices

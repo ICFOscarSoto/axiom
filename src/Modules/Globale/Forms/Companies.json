@@ -38,7 +38,9 @@
 		{
 			"name": "Telefonía",
 			"fields": [
-				{	"name": "voipaddress",	"cols": 6, "caption": "IP Central"},
+				{	"name": "voipaddress",	"cols": 2, "caption": "IP Central"},
+				{	"name": "voipuser",	"cols": 2, "caption": "User"},
+				{	"name": "voippassword",	"cols": 2, "caption": "Password"},
 				{	"name": "voipregistercode",	"cols": 2, "caption": "Cod. Registro"},
 				{	"name": "voipunregistercode",	"cols": 2, "caption": "Cod. Desregistro"}
 			]
