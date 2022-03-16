@@ -96,13 +96,12 @@ class Cron extends ContainerAwareCommand
         //Send notifications
         if($company->getId()!=2) continue;
         if(!in_array($clock_element->getWorker()->getId(), $workersIds)){
-          if($clock_element->getWorker()->getUser()!=null && $clock_element->getWorker()->getUser()->getDiscordchannel()!=null && $clock_element->getWorker()->getUser()->getId()==7){
+          if($clock_element->getWorker()->getUser()!=null && $clock_element->getWorker()->getUser()->getDiscordchannel()!=null){
             $msg="Tu jornada laboral ha sido cerrada automáticamente y marcada como ** INCIDENCIA**, para solucionar el problema ponte en contacto con el responsable de \"Recursos Humanos\"";
             file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$clock_element->getWorker()->getUser()->getDiscordchannel().'&msg='.urlencode($msg));
           }
-          $workersIds[]=$clock_element->getWorker()->getId();
+          if($clock_element->getWorker()->getUser()->getId()!=7) $workersIds[]=$clock_element->getWorker()->getId();
         }
-
       }
     }
 
