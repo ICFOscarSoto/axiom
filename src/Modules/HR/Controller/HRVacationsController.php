@@ -15,6 +15,7 @@ use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\Globale\Utils\GlobaleExportUtils;
 use App\Modules\Globale\Utils\GlobalePrintUtils;
+use App\Modules\Cloud\Utils\CloudFilesUtils;
 use App\Modules\HR\Entity\HRWorkers;
 use App\Modules\HR\Entity\HRVacations;
 use App\Modules\HR\Utils\HRVacationsUtils;
@@ -117,7 +118,20 @@ class HRVacationsController extends Controller
      $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "worker"=>$id==0?$worker:$obj->getWorker()];
      $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),
                         method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
-     return $utils->make($id, $this->class, $action, "formworker", "modal");
+
+      //-----------------   CLOUD ----------------------
+      $utilsCloud = new CloudFilesUtils();
+      $path="HRVacations";
+  		$templateLists=["id"=>$path,"list"=>[$utilsCloud->formatList($this->getUser(),$path,$id)], "types"=>["Confirmacion vacaciones", "Otros"], "path"=>$this->generateUrl("cloudUpload",["id"=>$id, "path"=>$path])];
+      //------------------------------------------------
+
+      return $utils->make($id, $this->class, $action, "formworker", "modal", "@Globale/form.html.twig", null, null, ["filesHRSickleaves"=>["template"=>"@Cloud/genericlistfiles.html.twig", "vars"=>[
+        "cloudConstructor"=>$templateLists,
+        "scanner"=>$this->getUser()->getScanner(),
+        'path' => $path,
+        'id' => $id,
+        'module' => "HR"
+        ]]]);
    }
 
    /**
