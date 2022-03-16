@@ -53,7 +53,7 @@ class Cron extends ContainerAwareCommand
     $autoCloseclocksRepository = $this->doctrine->getRepository(HRAutoCloseClocks::class);
     $clocksRepository = $this->doctrine->getRepository(HRClocks::class);
     $CompaniesRepository = $this->doctrine->getRepository(GlobaleCompanies::class);
-    $usersRepository = $doctrine->getRepository(GlobaleUsers::class);
+    $usersRepository = $this->doctrine->getRepository(GlobaleUsers::class);
     $msgRH="";
     $workersIds=[];
     $HRResponsables=[7,10];
