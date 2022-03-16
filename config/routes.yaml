@@ -291,6 +291,10 @@ HRMeetingsController:
    resource: 'App\Modules\HR\Controller\HRMeetingsController'
    type:     annotation
 
+HRWorkerScoresController:
+   resource: 'App\Modules\HR\Controller\HRWorkerScoresController'
+   type:     annotation
+
 Cloud:
    resource: 'App\Modules\Cloud\Controller\CloudController'
    type:     annotation

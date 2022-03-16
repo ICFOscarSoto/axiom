@@ -250,9 +250,9 @@ table.dataTable.dtr-inline.collapsed > tbody > tr > td:first-child:before, table
 }
 
 .select2-selection__view {
-      height: 21px;
+      height: 23px;
       position: absolute;
-      top: 21px;
+      top: 19px;
       right: 20px;
       width: 75px;
       border: 1px solid #e8e8e8;
@@ -290,6 +290,13 @@ table.dataTable.dtr-inline.collapsed > tbody > tr > td:first-child:before, table
 
 .select2-container--default .select2-search--dropdown .select2-search__field {
     border: 1px solid #eaeaea !important;
+}
+
+.table-header-search .select2-selection__view{
+  z-index: 20000;
+  top: 2px;
+  right: 39px !important;
+  width: 64px;
 }
 
 .number-type{
@@ -739,7 +746,7 @@ label.form-check-label {
 .form-group {
     margin-bottom: 7px !important;
     position: relative;
-    height: 42px;
+    min-height: 42px;
 }
 
 .form-group-line {

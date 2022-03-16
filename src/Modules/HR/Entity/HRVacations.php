@@ -4,6 +4,9 @@ namespace App\Modules\HR\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\HR\Entity\HRWorkers;
+use \App\Modules\HR\Helpers\HelperClocks;
+use \App\Modules\HR\Entity\HRClocksDiary;
+
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\HR\Repository\HRVacationsRepository")
@@ -258,26 +261,45 @@ class HRVacations
           else return ["valid"=>true];
     }
 
-    public function preProccess($kernel, $doctrine, $user){
-      $date_end=clone $this->getEnd();
-      $date_start=clone $this->getStart();
-      if($this->end!=null){
-        $this->days = ($date_end->add(new \DateInterval('PT24H')))->diff($date_start)->format('%a');
+    public function preProccess($kernel, $doctrine, $user, $preParams, $obj_old){
+      $clocksDiaryrepository=$doctrine->getRepository(HRClocksDiary::class);
 
-        //Hours
-        if($this->hourslastday!=null || $this->hourslastday){
-          //TODO: calculate daily hours of workers
-          $scheduleRepository=$doctrine->getRepository(HRSchedules::class);
-          $period=$scheduleRepository->hoursDayWork($this->worker, $this->getEnd()->format("Y-m-d"));
-          if($period>0){
-            $journey=$period;
-            $partial_journey=1-round($this->hourslastday/$journey,2);
-            $this->days -= $partial_journey;
-          }else{
-              $this->days=$this->days-1;
-          }
-        }
+      //Check old range if exist for redo clocks diary
+      if($obj_old && ($this->start!=$obj_old->getStart() || $this->end!=$obj_old->getEnd())) {
+
       }
+      //Check new range
+      //Check if there are clocks diaries between start and end if approved == true
+      if($this->approved){
+        $date     =clone $this->start;
+        $date_end =clone $this->end;
+        $date_end->modify('+1 day');
+        $countDays=0;
+        do{
+          //Check every day if must compute for Vacations
+          $estimatedtime=HelperClocks::estimatedTimeDay($date, $this->worker, $doctrine);
+          if(!HelperClocks::isHoliday($date, $this->worker, $doctrine) && !HelperClocks::isSickLeave($date, $this->worker, $doctrine) && $estimatedtime>0){
+            if($this->hourslastday!=0){
+              $countDays=$countDays+round($this->hourslastday/(HelperClocks::estimatedTimeDay($date, $this->worker, $doctrine)/3600),2);
+            }else $countDays++;
+            //check if exist date in ClocksDiary
+            $clockDiary=$clocksDiaryrepository->findOneBy(["date"=>$date, "worker"=>$this->worker, "active"=>1, "deleted"=>0]);
+            if($clockDiary){
+              $clockdiary->setEstimatedtime($estimatedtime);
+              $clockdiary->setDifftime($clockdiary->getTime()-$estimatedtime);
+              $clockdiary->setDateupd(new \DateTime());
+              $doctrine->getManager()->persist($clockdiary);
+              $doctrine->getManager()->flush();
+            }
+          }
+          $date->modify('+1 day');
+        }while($date!=$date_end);
+        $this->days=$countDays;
+      }
+    }
+
+    public function postProccess($kernel, $doctrine, $user){
+
     }
 
     public function getHourslastday(): ?float

@@ -5335,6 +5335,57 @@ fieldset[disabled] .btn-info.focus {
 .label-danger[href]:focus {
   background-color: #a11c1c;
 }
+.label-extpoor {
+  background-color: #910000;
+}
+.label-extpoor[href]:hover,
+.label-extpoor[href]:focus {
+  background-color: #007338;
+}
+.label-verypoor {
+  background-color: #c50000;
+}
+.label-verypoor[href]:hover,
+.label-verypoor[href]:focus {
+  background-color: #007338;
+}
+.label-poor {
+  background-color: #ff0a0a;
+}
+.label-poor[href]:hover,
+.label-poor[href]:focus {
+  background-color: #007338;
+}
+.label-neutral {
+  background-color: #2abaff;
+}
+.label-neutral[href]:hover,
+.label-neutral[href]:focus {
+  background-color: #007338;
+}
+.label-positive {
+  background-color: #9ee74f;
+}
+.label-positive[href]:hover,
+.label-positive[href]:focus {
+  background-color: #007338;
+}
+.label-verypositive {
+  background-color: #7ec72f;
+}
+.label-verypositive[href]:hover,
+.label-verypositive[href]:focus {
+  background-color: #007338;
+}
+.label-extpositive {
+  background-color: #60ab10;
+}
+.label-extpositive[href]:hover,
+.label-extpositive[href]:focus {
+  background-color: #007338;
+}
+
+
 .jumbotron {
   padding: 40px;
   -webkit-border-radius: 3px;

@@ -173,15 +173,25 @@ class GlobaleCompanies
      */
     private $voipunregistercode;
 
+    /**
+     * @ORM\Column(type="string", length=128, nullable=true)
+     */
+    private $voipuser;
+
+    /**
+     * @ORM\Column(type="string", length=128, nullable=true)
+     */
+    private $voippassword;
+
 
 	public function __construct()
-                                        {
-                                            $this->userGroups = new ArrayCollection();
-                                            $this->users = new ArrayCollection();
-                                            $this->menuOptions = new ArrayCollection();
-                                            $this->dateadd = new \Datetime();
-                                            $this->dateupd =  new \Datetime();
-                                        }
+                                                          {
+                                                              $this->userGroups = new ArrayCollection();
+                                                              $this->users = new ArrayCollection();
+                                                              $this->menuOptions = new ArrayCollection();
+                                                              $this->dateadd = new \Datetime();
+                                                              $this->dateupd =  new \Datetime();
+                                                          }
 
     public function getId(): ?int
     {
@@ -684,6 +694,30 @@ class GlobaleCompanies
     public function setVoipunregistercode(?string $voipunregistercode): self
     {
         $this->voipunregistercode = $voipunregistercode;
+
+        return $this;
+    }
+
+    public function getVoipuser(): ?string
+    {
+        return $this->voipuser;
+    }
+
+    public function setVoipuser(?string $voipuser): self
+    {
+        $this->voipuser = $voipuser;
+
+        return $this;
+    }
+
+    public function getVoippassword(): ?string
+    {
+        return $this->voippassword;
+    }
+
+    public function setVoippassword(?string $voippassword): self
+    {
+        $this->voippassword = $voippassword;
 
         return $this;
     }

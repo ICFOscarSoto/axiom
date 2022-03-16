@@ -1,0 +1,32 @@
+[
+    {
+        "name": "id",
+        "caption": "id"
+    },
+    {
+        "name": "score",
+        "width":"150px",
+        "caption": "Score", "class" : "dt-center", "replace":{
+                                   "0":{"text":"Extremadamente negativo","html":"<div style=\"min-width: 75px;\" class=\"label label-extpoor\">Extremadamente negativo (0)</div>"},
+                                   "1":{"text":"Muy negativo","html":"<div style=\"min-width: 75px;\" class=\"label label-verypoor\">Muy negativo (1)</div>"},
+                                   "2":{"text":"Negativo","html":"<div style=\"min-width: 75px;\" class=\"label label-poor\">Negativo (2)</div>"},
+                                   "3":{"text":"Neutro","html":"<div style=\"min-width: 75px;\" class=\"label label-neutral\">Neutro (3)</div>"},
+                                   "4":{"text":"Positivo","html":"<div style=\"min-width: 75px;\" class=\"label label-positive\">Positivo (4)</div>"},
+                                   "5":{"text":"Muy positivo","html":"<div style=\"min-width: 75px;\" class=\"label label-verypositive\">Muy positivo (5)</div>"},
+                                   "6":{"text":"Extremadamente positivo","html":"<div style=\"min-width: 75px;\" class=\"label label-extpositive\">Extremadamente positivo (6)</div>"}
+                                 }
+    },
+    {
+        "name": "text",
+        "caption": "description",
+        "width":"800px"
+    },
+    {
+        "name": "date",
+        "caption": "date",
+        "type": "date",
+        "width":"150px"
+    }
+
+
+]

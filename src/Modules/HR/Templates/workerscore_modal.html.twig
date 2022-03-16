@@ -1,0 +1,126 @@
+<div class="modal fade" tabindex="-1" id="workerscore-modal-form" aria-hidden="true">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content" style="transform: matrix(1, 0, 0, 1, 0, 0);">
+				<div class="modal-header">
+					<h4 class="modal-title">{{ ("Score")|trans }}</h4>
+				</div>
+        <div id="workerscore-modal-form-body">
+					<div class="panel panel-primary panel-shadow" data-collapsed="0" style="-webkit-box-shadow: none; box-shadow:none; margin-bottom: -1px;"><!-- to apply shadow add class "panel-shadow" -->
+					  <div class="panel-body">
+								<input type="hidden" id="form-id" name="form[id]" value="">
+								<input type="hidden" id="worker-id" name="form[worker-id]" value="{{ id }}">
+		 						<div class="col-md-8" style="margin-bottom: 30px;">
+									<label for="form-score">Puntuación:</label>
+									<select id="form-score" name="form[score]" autocomplete="off" class="non-select2" style="display: none;">
+										<option value="0" data-html="Extremadamente negativo">0</option>
+										<option value="1" data-html="Muy negativo">1</option>
+									  <option value="2" data-html="Negativo">2</option>
+									  <option value="3" data-html="Normal">3</option>
+									  <option value="4" data-html="Positivo">4</option>
+									  <option value="5" data-html="Muy positivo">5</option>
+										<option value="6" data-html="Extremadamente positivo">6</option>
+									</select>
+								</div>
+								<div class="col-md-4" style="margin-bottom: 30px;">
+									<label for="form-date">Fecha:</label>
+									<input type="text" id="form-date" name="form[date]" class="datepicker form-control"  placeholder="Fecha" value="">
+								</div>
+					      <div class="col-md-12">
+					        <label for="form-text">Comentario:</label>
+					        <div class="input-group" style="width: 100% !important">
+										<textarea id="form-text" name="form[text]" autocomplete="off" class="form-control" style="height: 120px !important; width: 100% !important"></textarea>
+					      	</div>
+								</div>
+						</div>
+					</div>
+        </div>
+        </br></br>
+        <div id="workerscore-modal-form-footer" class="modal-footer">
+					<button type="button" id="workerscore-modal-save" class="btn btn-success">{{ ("Save")|trans }}</button>
+					<button type="button" class="btn btn-primary" data-dismiss="modal">{{ ("Close")|trans }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+	<script>
+		$(document).ready(function(){
+			$('#form-score').barrating({
+					theme: 'bars-movie',
+					showSelectedRating: true,
+					hoverState: true,
+					initialRating: 3,
+					onSelect: function(value, text) {
+						changeBarratingColor(value,'#form-score');
+					}
+			});
+			changeBarratingColor(3,'#form-score');
+
+		  $('body').on('click', "[id^='listWorkerScores-field-button-editWorkerScore-']", function() {
+				var id=$(this).attr('attr-id');
+				$.ajax({
+			      type: "post",
+			      dataType: "json",
+			      url: "/es/HR/workerscores/data/"+id+"/read",
+			    }).done(function( result, textStatus, jqXHR ) {
+			      if((--load_wait)==0) $("#load-spinner").fadeOut();
+			      if(result.result){
+							$('#form-score').barrating('destroy');
+							$('#form-score').barrating({
+									theme: 'bars-movie',
+									showSelectedRating: true,
+									hoverState: true,
+									initialRating: result.data.score,
+									onSelect: function(value, text) {
+										changeBarratingColor(value,'#form-score');
+									}
+							});
+							$("#form-score").val(result.data.score);
+							changeBarratingColor(result.data.score,'#form-score');
+							$('#form-id').val(result.data.id);
+							$('#form-date').val(result.data.date);
+							$('#form-text').val(result.data.text);
+							$("#workerscore-modal-form").modal('show');
+			      }
+			  });
+			});
+
+			$('body').on('click', "[id='addTop-top-button-foreground']", function() {
+				$('#form-id').val(0);
+				$('#form-date').val('{{ today }}');
+				$('#form-text').val('');
+				$('#form-score').barrating('destroy');
+				$('#form-score').barrating({
+						theme: 'bars-movie',
+						showSelectedRating: true,
+						hoverState: true,
+						initialRating: 3,
+						onSelect: function(value, text) {
+							changeBarratingColor(value,'#form-score');
+						}
+				});
+				changeBarratingColor(3,'#form-score');
+				$("#workerscore-modal-form").modal('show');
+			});
+
+			$('body').on('click', "[id='workerscore-modal-save']", function() {
+				  var data={id: $('#form-id').val(), date: $('#form-date').val(), text: $('#form-text').val(), score: $("#form-score").val(), worker: $("#worker-id").val()};
+				$.ajax({
+						type: "post",
+						dataType: "json",
+						data: JSON.stringify(data),
+						url: "/es/HR/workerscores/data/"+$('#form-id').val()+"/save",
+					}).done(function( result, textStatus, jqXHR ) {
+						if((--load_wait)==0) $("#load-spinner").fadeOut();
+						if(result.result){
+							$("#listWorkerScores").DataTable().ajax.reload();
+							toastr.success("Datos guardados correctamente", "Confirmación", confirmation);
+							$('#form-id').val(result.data.id);
+							$("#workerscore-modal-form").modal('hide');
+							$('#frame-summary').attr( 'src', function ( i, val ) { return val; });
+						}else toastr.error("Ocurrió un error al guardar los datos", "Confirmación", confirmation);
+				});
+			});
+		});
+
+	</script>

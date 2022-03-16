@@ -12,6 +12,7 @@ use \App\Modules\HR\Entity\HRWorkCalendarGroups;
 use \App\Modules\HR\Entity\HRSchedules;
 use \App\Modules\HR\Entity\HRShifts;
 use \App\Helpers\HelperValidators;
+use \App\Modules\HR\Helpers\HelperAsterisk;
 /**
  * @ORM\Entity(repositoryClass="App\Modules\HR\Repository\HRWorkerRepository")
  */
@@ -225,6 +226,11 @@ class HRWorkers
     * @ORM\ManyToOne(targetEntity="App\Modules\HR\Entity\HRProfiles")
     */
    private $profile4;
+
+   /**
+    * @ORM\Column(type="string", length=128, nullable=true)
+    */
+   private $asteriskqueues;
 
     public function getId(): ?int
     {
@@ -567,12 +573,25 @@ class HRWorkers
         return $this;
     }
 
-    public function postProccess($kernel, $doctrine, $user){
+    public function postProccess($kernel, $doctrine, $user, $params, $oldobj){
       //$this->time = $this->calculateTime();
       $this->clockCode='CC'.$this->getId();
       $em=$doctrine->getManager();
       $em->persist($this);
       $em->flush();
+
+      //Changed queues or $voipregister¿?
+      if($this->asteriskqueues!=$oldobj->getAsteriskqueues() || $this->voipregister!=$oldobj->getVoipregister()){
+        HelperAsterisk::registerWorker($this);
+      }
+
+    }
+
+    public function preProccess($kernel, $doctrine, $user, $params, $oldobj){
+      //Changed queues or $voipregister¿?
+      if($this->asteriskqueues!=$oldobj->getAsteriskqueues() || $this->voipregister!=$oldobj->getVoipregister()){
+        HelperAsterisk::unregisterWorker($oldobj);
+      }
 
     }
 
@@ -640,6 +659,7 @@ class HRWorkers
         return ["valid"=>empty($fieldErrors), "field_errors"=>$fieldErrors];
       }
     }
+
 
     public function getExtension(): ?string
     {
@@ -721,6 +741,18 @@ class HRWorkers
     public function setProfile4(?HRProfiles $profile4): self
     {
         $this->profile4 = $profile4;
+
+        return $this;
+    }
+
+    public function getAsteriskqueues(): ?string
+    {
+        return $this->asteriskqueues;
+    }
+
+    public function setAsteriskqueues(?string $asteriskqueues): self
+    {
+        $this->asteriskqueues = $asteriskqueues;
 
         return $this;
     }
