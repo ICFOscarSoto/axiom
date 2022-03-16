@@ -49,6 +49,11 @@ class ERPBuyOrders
     private $code;
 
     /**
+     * @ORM\Column(type="integer")
+     */
+    private $revision=1;
+
+    /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPSuppliers")
      * @ORM\JoinColumn(nullable=false)
      */
@@ -350,6 +355,18 @@ class ERPBuyOrders
     public function setCode(string $code): self
     {
         $this->code = $code;
+
+        return $this;
+    }
+
+    public function getRevision(): ?int
+    {
+        return $this->revision;
+    }
+
+    public function setRevision(int $revision): self
+    {
+        $this->revision = $revision;
 
         return $this;
     }

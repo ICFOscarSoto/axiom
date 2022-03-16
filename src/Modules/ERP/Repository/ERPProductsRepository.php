@@ -224,6 +224,9 @@ class ERPProductsRepository extends ServiceEntityRepository
       return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
     }
 
+    /*
+    * Obtiene los productos de un proveedor acotado por la busqueda solicitada
+    */
     public function getProductsBySupplier($supplier, $q){
       $result = null;
       if ($q!=null && $q!=''){
@@ -264,6 +267,9 @@ class ERPProductsRepository extends ServiceEntityRepository
       return $result;
     }
 
+    /*
+    * Obtiene el producto que tiene un proveedor y su coste en función de la cantidad
+    */
     public function getProductBySupplier($supplier, $quantity, $product){
       $result = null;
       if ($product!='|'){

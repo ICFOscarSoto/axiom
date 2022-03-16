@@ -55,6 +55,7 @@
      "onload":""                // Código javascript para inicializar variables, refrescar tabla porque cambia un campo del formulario, ocultar columnas ...etc
    }
 #}
+{# Modal - Mostrar columnas #}
 <div id="{{spreadsheet.name}}-showcolumn-modal">
   <div class="modal fade" tabindex="-1" id="{{spreadsheet.name}}-showcolumn-modal-form" aria-hidden="true">
       <div class="modal-dialog modal-lg">
@@ -64,14 +65,14 @@
           </div>
           <div id="{{spreadsheet.name}}-showcolumn-modal-form-body" style="height: 400px; padding: 0px 10px; max-height: 400px;"></div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-primary">{{('Accept')|trans}}</button>
             <button type="button" class="btn btn-secondary" data-dismiss="modal">{{('Cancel')|trans}}</button>
+            <button type="button" class="btn btn-primary">{{('Accept')|trans}}</button>
           </div>
       </div>
     </div>
   </div>
 </div>
-
+{# Modal - Nueva pestaña #}
 <div id="{{spreadsheet.name}}-newtab-modal">
   <div class="modal fade" tabindex="-1" id="{{spreadsheet.name}}-newtab-modal-form" aria-hidden="true">
       <div class="modal-dialog modal-lg">
@@ -82,8 +83,8 @@
             </div>
             <div id="{{spreadsheet.name}}-newtab-modal-form-body" style="height: 400px; padding: 0px 10px; max-height: 400px;"></div>
             <div class="modal-footer">
-              <button type="submit" class="btn btn-primary">{{('Accept')|trans}}</button>
               <button type="button" class="btn btn-secondary" data-dismiss="modal">{{('Cancel')|trans}}</button>
+              <button type="submit" class="btn btn-primary">{{('Accept')|trans}}</button>
             </div>
           </form>
       </div>
@@ -91,7 +92,7 @@
   </div>
 </div>
 
-
+{# Div - Tabla Jexcel #}
 <div id="{{spreadsheet.name}}"></div>
 
 <script>

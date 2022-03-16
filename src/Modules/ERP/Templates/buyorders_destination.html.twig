@@ -1,13 +1,12 @@
 <div class="panel panel-primary panel-shadow" id="destination-data" data-collapsed="0" style="-webkit-box-shadow: none; box-shadow:none; margin-bottom: -1px;"><!-- to apply shadow add class "panel-shadow" -->
   <div class="panel-body">
-    <div class="row">
       {% if buyorder.store!=null %}
           <div class="col-md-2">
             <div class="form-group">
               <label for="buyorder-form-store">Almacén destino:</label>
               <select type="text" id="buyorder-form-store" class="form-control select2" required>
                 {% for option in stores %}
-                  <option value="{{ option.id }}" {% if option.id==buyorder.store.id %} selected{% endif %}>{{ option.text }}</option>
+                  <option value="{{ option.id }}" {% if option.id==buyorder.store.id %} selected="selected" {% endif %}>{{ option.text }}</option>
                 {% endfor %}
               </select>
             </div>
@@ -18,22 +17,23 @@
           <label for="buyorder-form-store">Almacén destino:</label>
           <select type="text" id="buyorder-form-store" class="form-control select2" required>
             {% for option in stores %}
-              <option value="{{ option.id }}" {% if option.id==1 %} selected{% endif %}>{{ option.text }}</option>
+              <option value="{{ option.id }}" {% if option.pos==1 %} selected{% endif %}>{{ option.text }}</option>
             {% endfor %}
           </select>
         </div>
       </div>
       {% endif %}
       <div class="col-md-4" id="searching-customer" {% if buyorder.customer==null or id==0 %}style="display:none;"{% endif %}>
-        <label for="destination-form-address">Código de Cliente:</label>
+        <label for="destination-form-customercodename">Cliente:</label>
         <div class="input-group">
-          <input type="text" readonly id="destination-form-customercode" {% if buyorder.customer!=null %} value="{{ buyorder.customer.code }}" {% endif %} class="form-control" placeholder="Selecciona cliente..." data-toggle="modal" data-target="#customer-search-modal-form">
+          <input type="text" readonly id="destination-form-customercodename" {% if buyorder.customer!=null %} value="({{buyorder.customer.code}}) {{buyorder.customer.name}}" {% endif %} class="form-control" placeholder="Selecciona cliente..." data-toggle="modal" data-target="#customer-search-modal-form">
+          <input type="hidden" id="customer-form-id" name="customer-form-id" {% if buyorder.customer!=null %} value="{{buyorder.customer.id}}" {% else %}  value="" {% endif %}/>
           <div class="input-group-btn">
-            <button type="button" id="destination-form-customercode" class="btn btn-white" style="height: 31px;" data-toggle="modal" data-target="#customer-search-modal-form">
-              <i class="fa fa-search"></i> </button>
-            </div>
+            <button type="button" class="btn btn-white" style="height: 27px;" data-toggle="modal" data-target="#customer-search-modal-form">
+            <i class="fa fa-search"></i> </button>
           </div>
         </div>
+      </div>
         <div class="col-md-2">
           <label for="destination-form-name">Nombre:</label>
           <div class="form-group">
@@ -46,8 +46,6 @@
             <input type="text"  id="destination-form-address" value="{{ buyorder.destinationaddress }}"   class="form-control" placeholder="Dirección destino">
           </div>
         </div>
-        </div>
-      <div class="row">
         <div class="col-md-2">
           <label for="destination-form-phone">Teléfono:</label>
           <div class="form-group">
@@ -118,12 +116,12 @@
           </div>
         </div>
         {% endif %}
-        </div>
       </div>
     </div>
 <script>
     $(document).ready(function() {
 
+      {# Cambio de almacén de destino #}
       $('body').on('change', "#buyorder-form-store", function(e) {
         //Almacén de Envíos Directos
         if($("#buyorder-form-store").val()=="6"){
@@ -140,12 +138,8 @@
          }
         else{
           setStoreInfo($(this).val());
-            $("#searching-customer").css("display","none");
-        //  $("#destination-data").css("display","none");
-
+          $("#searching-customer").css("display","none");
         }
-
-
       });
     });
   </script>

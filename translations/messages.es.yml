@@ -663,6 +663,7 @@ Accessibility: Accesible
 Container: Contenedor
 inventorymanager: Gestor de inventarios
 Inventorymanager: Gestor de inventarios
+Payment Method: Métodos de pago
 # VEHICLES
 #----------------------------------------------------------------------------------------------------------------------
 Vehicles: Vehículos
@@ -726,6 +727,7 @@ Manager data: Datos del gestor
 Reports: Informes
 
 #JSPREADSHEET
+#----------------------------------------------------------------------------------------------------------------------
 jspreadsheet_showcolumn: Mostrar columna
 jspreadsheet_newtab: Nueva pestaña
 jspreadsheet_newtab_name: Nombre de la nueva pestaña

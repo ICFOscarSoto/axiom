@@ -14679,61 +14679,10 @@ if (! jSuites && typeof(require) === 'function') {
           linkb[b].classList.add('jexcel_tab_link');
           linkb[b].classList.add('tabnew');
           linkb[b].setAttribute("title","Añadir nueva pestaña");
-          linkb[b].setAttribute("data-toggle","modal");
-          linkb[b].setAttribute("data-target",'#'+result[0].name+'-newtab-modal-form');
           linkb[b].innerHTML = '<i class="fa fa-plus" aria-hidden="true"></i>&nbsp;';
           linkb[b].onclick = function() {
-              // SE HACE TODO EN LA VENTANA MODAL
-              /*var tabnew = window.prompt('Nombre de la nueva pestaña');
-              if (tabnew!=null && tabnew!=''){
-                var position = headers.children.length;
-                var tab =  result[0];
-                tab['sheetid']  = position;
-                tab['tabid']  = position;
-                tab['sheetnew'] = true;
-                tab['sheetName']= tabnew;
-                tab['columns']  = tab['columnso'];
-
-                // Se crea la nueva pestaña
-                spreadsheet[position] = document.createElement('div');
-                spreadsheet[position].classList.add('jexcel_tab');
-                spreadsheet[position].setAttribute('data-spreadsheet-content', position);
-
-                var worksheet = jexcel(spreadsheet[position], tab);
-                content.appendChild(spreadsheet[position]);
-                instances[position] = tabs.jexcel.push(worksheet);
-                link[position] = document.createElement('div');
-                link[position].classList.add('jexcel_tab_link');
-                link[position].setAttribute('data-spreadsheet', position);
-                link[position].innerHTML = tabnew;
-                link[position].onclick = function() {
-                    for (var j = 0; j < headers.children.length; j++) {
-                        headers.children[j].classList.remove('selected');
-                        content.children[j].style.display = 'none';
-                    }
-                    var i = this.getAttribute('data-spreadsheet');
-                    $('#'+result[0].name).find(`[data-spreadsheet-content='${i}']`).each(function(){
-                      this.style.display = 'block';
-                    });
-                    headers.children[i].classList.add('selected')
-                }
-                headers.appendChild(link[position]);
-                for (var j = 0; j < headers.children.length; j++) {
-                    headers.children[j].classList.remove('selected');
-                    content.children[j].style.display = 'none';
-                }
-                $('#'+result[0].name).find(`[data-spreadsheet-content='${position}']`).each(function(){
-                  this.style.display = 'block';
-                });
-                headers.children[position].classList.add('selected');
-                $('#'+result[0].name).find('.jexcel_tab_link.saveview.disabled').each(function(){ $(this).removeClass('disabled'); });
-                $('#'+result[0].name).find('.jexcel_tab_link.tabdelete').each(function(){ $(this).removeClass('disabled'); });
-                $('#'+result[0].name).find('.jexcel_tab_link.tabedit').each(function(){ $(this).removeClass('disabled'); });
-                if (headers.children.length>1){
-                  $('#'+result[0].name).find('.jexcel_tab_link.tableft').each(function(){ $(this).removeClass('disabled'); });
-                  $('#'+result[0].name).find('.jexcel_tab_link.tabright').each(function(){ $(this).removeClass('disabled'); });
-                }
-              }*/
+            if (this.getAttribute('class').indexOf('disabled')==-1)
+              $('#'+result[0].name+'-newtab-modal-form').modal('show');
           }
           buttons.appendChild(linkb[b]);
           b++;

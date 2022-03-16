@@ -573,8 +573,23 @@ var public_vars = public_vars || {};
 		    });
 		}
 
+    // ICF
+    function formatStateImage (opt) {
+        if (!opt.id) {
+            return opt.text;
+        }
 
-
+        var optimage = $(opt.element).attr('data-image');
+        if(!optimage){
+           return opt.text;
+        } else {
+            var $opt = $(
+               '<span><img src="' + optimage + '" class="img-circle" width="22" /> ' + opt.text + '</span>'
+            );
+            return $opt;
+        }
+    };
+    // ICF
 
 		// Select2 Dropdown replacement
 		if($.isFunction($.fn.select2))
@@ -583,8 +598,10 @@ var public_vars = public_vars || {};
 			{
 				var $this = $(el),
 					opts = {
-						allowClear: attrDefault($this, 'allowClear', false)
-					};
+						allowClear: attrDefault($this, 'allowClear', false),
+            templateResult:formatStateImage,
+            templateSelection: formatStateImage
+					};// ICF
 
 				$this.select2(opts);
 				$this.addClass('visible');

@@ -78,143 +78,170 @@ class ERPBuyOrdersController extends Controller
 
 	/**
 	 * @Route("/{_locale}/ERP/buyorders/form/{id}", name="ERPBuyOrdersForm", defaults={"id"=0}))
+	 * Muestra la ficha de un pedido de compra
 	 */
 	public function ERPBuyOrdersForm($id, RouterInterface $router,Request $request)
 	{
+			// El usuario tiene derechos para realizar la acción, sino se va a la página de unauthorized
 	    $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-	    if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
+	    if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine()))
+				return $this->redirect($this->generateUrl('unauthorized'));
 
-	    $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
-			$configrepository=$this->getDoctrine()->getRepository(ERPConfiguration::class);
-			$paymentMethodsrepository=$this->getDoctrine()->getRepository(ERPPaymentMethods::class);
-			$buyordersrepository=$this->getDoctrine()->getRepository(ERPBuyOrders::class);
-			$buyorderslinesrepository=$this->getDoctrine()->getRepository(ERPBuyOrdersLines::class);
-			$buyordersstatesrepository=$this->getDoctrine()->getRepository(ERPBuyOrdersStates::class);
-			$storesRepository=$this->getDoctrine()->getRepository(ERPStores::class);
-			$agentsRepository=$this->getDoctrine()->getRepository(GlobaleUsers::class);
-			$destinationstatesRepository=$this->getDoctrine()->getRepository(GlobaleStates::class);
-			$destinationcountriesRepository=$this->getDoctrine()->getRepository(GlobaleCountries::class);
-			$usersConfigRepository=$this->getDoctrine()->getRepository(GlobaleUsersConfig::class);
-			$companyRepository=$this->getDoctrine()->getRepository(GlobaleCompanies::class);
+			// Variables -----------------
+			// Pedido
+			$buyorder				= null;
+			// Líneas de pedido
+			$buyorderlines	= null;
+			// Código del pedido, por si se ha pasado como parámetro en la petición en vez del ID
+			$code 					= $request->query->get('code',null);
+			// Usuario
+			$user						= $this->getUser();
+			// Compañia
+			$company 				= $this->getUser()->getCompany();
+			// Datos de usuario
+			$userdata				= $this->getUser()->getTemplateData($this, $this->getDoctrine());
+			// Router
+			$this->router 	= $router;
 
-			$buyorder=null;
-			$buyorderlines=null;
+			// Repositorios --------------
+			// Repositorios ERP
+			$erpBuyOrdersRepository						= $this->getDoctrine()->getRepository(ERPBuyOrders::class);
+			$erpBuyOrdersLinesRepository			= $this->getDoctrine()->getRepository(ERPBuyOrdersLines::class);
+			$erpBuyOrdersStatesRepository			= $this->getDoctrine()->getRepository(ERPBuyOrdersStates::class);
+			$erpConfigurationRepository				= $this->getDoctrine()->getRepository(ERPConfiguration::class);
+			$erpPaymentMethodsRepository			= $this->getDoctrine()->getRepository(ERPPaymentMethods::class);
+			$erpStoresRepository							= $this->getDoctrine()->getRepository(ERPStores::class);
+			// Repositorios Globale
+			$globaleMenuOptionsRepository			= $this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
+			$globaleUsersRepository						= $this->getDoctrine()->getRepository(GlobaleUsers::class);
+			$globaleStatesRepository					= $this->getDoctrine()->getRepository(GlobaleStates::class);
+			$globaleCountriesRepository				= $this->getDoctrine()->getRepository(GlobaleCountries::class);
+			$globaleUsersConfigRepository			= $this->getDoctrine()->getRepository(GlobaleUsersConfig::class);
 
-
-			if($id!=0){
-
-			 $buyorder=$buyordersrepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$id, "active"=>1,"deleted"=>0]);
-			 $buyorderlines=$buyorderslinesrepository->findOneBy(["buyorder"=>$buyorder]);
-			}
-
-			if($buyorder==null){
-				$buyorder=new $this->class();
-			//	$buyorderlines=new ERPBuyOrdersLines::class;
-			}
-
-			if($request->query->get('code',null)){
-				$obj = $documentRepository->findOneBy(['code'=>$request->query->get('code',null), 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
-				if($obj) return $this->redirectToRoute($request->get('_route'), ['id' => $obj->getId()]);
-				else return $this->redirectToRoute($request->get('_route'), ['id' => 0]);
-			}
-
-			$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
-			$locale = $request->getLocale();
-			$this->router = $router;
-
-			$config=$configrepository->findOneBy(["company"=>$this->getUser()->getCompany()]);
-
-			//Search Suppliers
+			// Utilidades ----------------
 			$classSuppliersUtils="\App\Modules\ERP\Utils\ERPSuppliersUtils";
-			$suppliersutils = new $classSuppliersUtils();
-			$supplierslist=$suppliersutils->formatListCustomized($this->getUser());
-			$supplierslist["fieldButtons"]=[["id"=>"select", "type" => "success", "default"=>true, "icon" => "fa fa-plus", "name" => "editar", "route" => null, "actionType" => "background", "modal"=>"", "confirm" => false, "tooltip" =>""]];
+			$erpSuppliersUtils = new $classSuppliersUtils();
+			$classCustomersUtils="\App\Modules\ERP\Utils\ERPCustomersUtils";
+			$erpCustomersUtils = new $classCustomersUtils();
+
+			// Si se ha pasado un identificador se busca este y sus líneas
+			if ($id!=0){
+			 $buyorder			= $erpBuyOrdersRepository->findOneBy(["company"=>$company, "id"=>$id, "active"=>1,"deleted"=>0]);
+			 $buyorderlines	= $erpBuyOrdersLinesRepository->findOneBy(["buyorder"=>$buyorder]);
+			}
+			// Busqueda por código de pedido, se redirecciona a su ID correspondiente
+			if($buyorder==null && $code!=null){
+			 $buyorder			= $erpBuyOrdersRepository->findOneBy(["company"=>$company, "code"=>$code, "active"=>1,"deleted"=>0]);
+			 if ($buyorder)
+			 	return $this->redirectToRoute($request->get('_route'), ['id' => $buyorder->getId()]);
+			 else
+			 	return $this->redirectToRoute($request->get('_route'), ['id' => 0]);
+			}
+			// Si id==0, code==null o no se ha encontrado se crea uno nuevo
+			if ($buyorder==null){
+				$buyorder			 = new $this->class();
+				//$buyorderlines = new ERPBuyOrdersLines();
+			}
+
+			// Configuración (nº decimales, color...etc)
+			$config	= $erpConfigurationRepository->findOneBy(["company"=>$company]);
+
+			// Buscador de proveedores
+			$supplierslist=$erpSuppliersUtils->formatListCustomized($user);
+			$supplierslist["fieldButtons"]=[["id"=>"select", "type" => "success", "default"=>true, "icon" => "fa fa-check", "name" => "editar", "route" => null, "actionType" => "background", "modal"=>"", "confirm" => false, "tooltip" =>"Seleccionar"]];
 			$supplierslist["topButtons"]=[];
+			$supplierslist["topButtonReload"]=false;
 			$supplierslist["multiselect"]=false;
+			// Buscador de clientes
+			$customerslist=$erpCustomersUtils->formatListCustomized($user);
+			$customerslist["fieldButtons"]=[["id"=>"select", "type" => "success", "default"=>true, "icon" => "fas fa-check", "name" => "editar", "route" => null, "actionType" => "background", "modal"=>"", "confirm" => false, "tooltip" =>"Seleccionar"]];
+			$customerslist["topButtons"]=[];
+			$supplierslist["topButtonReload"]=false;
+			$customerslist["multiselect"]=false;
 
-
-			//stores
-			$store_objects=$storesRepository->findBy(["active"=>1,"deleted"=>0]);
+			// Almacenes (combo)
+			$ostores=$erpStoresRepository->findBy(["active"=>1,"deleted"=>0]);
 			$stores=[];
-			$option=null;
+			$option=[];
+			$option["pos"]=0;
 			$option["id"]=null;
 			$option["text"]="Selecciona Almacén...";
 			$stores[]=$option;
-			foreach($store_objects as $item){
+			$pos = 1;
+			foreach($ostores as $item){
+				$option=[];
+				$option["pos"]=$pos;
 				$option["id"]=$item->getId();
 				$option["text"]=$item->getName();
 				$stores[]=$option;
+				$pos++;
 			}
-
-			//agents
-			$agent_objects=$agentsRepository->findBy(["active"=>1,"deleted"=>0],["name"=>"ASC"]);
+			// Agentes y usuarios en general (combo)
+			$oagents=$globaleUsersRepository->findBy(["company"=>$company, "active"=>1, "deleted"=>0],["name"=>"ASC"]);
 			$agents=[];
+			$option=[];
+			$option["pos"]=0;
+			$option["id"]=null;
+			$option["text"]="Selecciona Agente...";
 			$agents[]=$option;
-			foreach($agent_objects as $item){
+			$pos = 1;
+
+			foreach($oagents as $item){
+				$option=[];
+				$option["pos"]=$pos;
 				$option["id"]=$item->getId();
 				$option["text"]=$item->getName()." ".$item->getLastname();
 				$agents[]=$option;
+				$pos++;
 			}
-
-
-			//states
-			$objects=$buyordersstatesrepository->findBy(["active"=>1,"deleted"=>0],["name"=>"ASC"]);
+			// Estados del pedido (combo)
+			$obuyordersstates=$erpBuyOrdersStatesRepository->findBy(["active"=>1,"deleted"=>0],["name"=>"ASC"]);
 			$states=[];
-			foreach($objects as $item){
+			$pos = 1;
+			foreach($obuyordersstates as $item){
+				$option["pos"]=$pos;
 				$option["id"]=$item->getId();
 				$option["text"]=$item->getName();
 				$states[]=$option;
+				$pos++;
 			}
-
-			//destination states
-			$objects=$destinationstatesRepository->findBy(["active"=>1,"deleted"=>0],["name"=>"ASC"]);
+			// Estado general - Destinatario (combo)
+			$ostates=$globaleStatesRepository->findBy(["active"=>1,"deleted"=>0],["name"=>"ASC"]);
 			$destinationstates=[];
-			foreach($objects as $item){
+			$pos = 1;
+			foreach($ostates as $item){
+				$option["pos"]=$pos;
 				$option["id"]=$item->getId();
 				$option["text"]=$item->getName();
 				$destinationstates[]=$option;
+				$pos++;
 			}
-
-			//destination countries
-			$objects=$destinationcountriesRepository->findBy(["active"=>1,"deleted"=>0],["name"=>"ASC"]);
+			// Paises generales - Destinatario (combo)
+			$ocountries=$globaleCountriesRepository->findBy(["active"=>1,"deleted"=>0],["name"=>"ASC"]);
 			$destinationcountries=[];
-			foreach($objects as $item){
+			$pos = 1;
+			foreach($ocountries as $item){
+				$option["pos"]=$pos;
 				$option["id"]=$item->getId();
 				$option["text"]=$item->getName();
 				$destinationcountries[]=$option;
+				$pos++;
 			}
 
-			//Search Products
-			$classProductsUtils="\App\Modules\ERP\Utils\ERPProductsUtils";
-			$productsutils = new $classProductsUtils();
-			$productslist=$productsutils->formatList($this->getUser());
-			$productslist["fieldButtons"]=[["id"=>"select", "type" => "default", "default"=>true, "icon" => "fa fa-dot-circle-o", "name" => "editar", "route" => null, "actionType" => "background", "modal"=>"", "confirm" => false, "tooltip" =>""]];
-			$productslist["topButtons"]=[];
-
-
-			//Search Customers
-			$classCustomersUtils="\App\Modules\ERP\Utils\ERPCustomersUtils";
-			$customersutils = new $classCustomersUtils();
-			$customerslist=$customersutils->formatListCustomized($this->getUser());
-			$customerslist["fieldButtons"]=[["id"=>"select", "type" => "success", "default"=>true, "icon" => "fas fa-plus", "name" => "editar", "route" => null, "actionType" => "background", "modal"=>"", "confirm" => false, "tooltip" =>""]];
-			$customerslist["topButtons"]=[];
-			$customerslist["multiselect"]=false;
-
-    	$new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-plus"];
-    	$breadcrumb=$menurepository->formatBreadcrumb('genericindex','ERP','BuyOrders');
-    	array_push($breadcrumb,$new_breadcrumb);
+			// Miga
+    	$nbreadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-plus"];
+    	$breadcrumb=$globaleMenuOptionsRepository->formatBreadcrumb('genericindex','ERP','BuyOrders');
+    	array_push($breadcrumb,$nbreadcrumb);
 
 			// Líneas -------------------------------
 			// Búsqueda de vista de usuario
-			$user 	 = $this->getUser();
-			$company = $this->getUser()->getCompany();
 			$tabs 	 = null;
-			$tabsUser= $usersConfigRepository->findOneBy(["element"=>"buyorders","view"=>"Defecto","attribute"=>"tabs","active"=>1,"deleted"=>0,"company"=>$company,"user"=>$user]);
+			$tabsUser= $globaleUsersConfigRepository->findOneBy(["element"=>"buyorders","view"=>"Defecto","attribute"=>"tabs","active"=>1,"deleted"=>0,"company"=>$company,"user"=>$user]);
 			if ($tabsUser!=null){
 				$tabs = json_encode($tabsUser->getValue());
 			}
 
-			$supplier_id = '1304'; // TODO Se carga de base de datos para este pedido
+			$supplier_id = ($buyorder->getSupplier()?$buyorder->getSupplier()->getId():0);
 
 			$spreadsheet = [];
 			$spreadsheet['name']       = "buyorders";
@@ -297,11 +324,10 @@ class ERPBuyOrdersController extends Controller
     				'interfaceName' => 'BuyOrders',
     				'optionSelected' => 'genericindex',
     				'optionSelectedParams' => ["module"=>"ERP", "name"=>"BuyOrders"],
-    				'menuOptions' =>  $menurepository->formatOptions($userdata),
+    				'menuOptions' =>  $globaleMenuOptionsRepository->formatOptions($userdata),
     				'breadcrumb' =>  $breadcrumb,
     				'userData' => $userdata,
     				'supplierslist' => $supplierslist,
-    				'productslist' => $productslist,
 						'form' => 'buyorder',
 						'buyorder' => $buyorder,
 						'buyorderlines' => $buyorderlines,
@@ -329,22 +355,22 @@ class ERPBuyOrdersController extends Controller
 	*/
 	public function dataBuyOrders($id, $action, Request $request){
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-		$buyordersRepository=$this->getDoctrine()->getRepository(ERPBuyOrders::class);
-		$buyorderslinesRepository=$this->getDoctrine()->getRepository(ERPBuyOrdersLines::class);
+		$erpBuyOrdersRepository=$this->getDoctrine()->getRepository(ERPBuyOrders::class);
+		$erpBuyOrdersLinesRepository=$this->getDoctrine()->getRepository(ERPBuyOrdersLines::class);
 		$buyorderstatesRepository=$this->getDoctrine()->getRepository(ERPBuyOrdersStates::class);
 		$suppliersRepository=$this->getDoctrine()->getRepository(ERPSuppliers::class);
 		$customersRepository=$this->getDoctrine()->getRepository(ERPCustomers::class);
-		$paymentMethodsrepository=$this->getDoctrine()->getRepository(ERPPaymentMethods::class);
-		$storesRepository=$this->getDoctrine()->getRepository(ERPStores::class);
+		$erpPaymentMethodsRepository=$this->getDoctrine()->getRepository(ERPPaymentMethods::class);
+		$erpStoresRepository=$this->getDoctrine()->getRepository(ERPStores::class);
 		$configrepository=$this->getDoctrine()->getRepository(ERPConfiguration::class);
-		$agentsRepository=$this->getDoctrine()->getRepository(GlobaleUsers::class);
+		$globaleUsersRepository=$this->getDoctrine()->getRepository(GlobaleUsers::class);
 		$globalstatesRepository=$this->getDoctrine()->getRepository(GlobaleStates::class);
 		$globalcountriesRepository=$this->getDoctrine()->getRepository(GlobaleCountries::class);
 
 		//Get content of the json reques
 		$fields=json_decode($request->getContent());
 
-		$buyorder=$buyordersRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$id, "deleted"=>0]);
+		$buyorder=$erpBuyOrdersRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$id, "deleted"=>0]);
 		$supplier=$suppliersRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "code"=>$fields->suppliercode, "active"=>1, "deleted"=>0]);
 		$customer=null;
 		if($fields->customercode)	$customer=$customersRepository->findOneBy(["company"=>$this->getUser()->getCompany(), "code"=>$fields->customercode, "active"=>1, "deleted"=>0]);
@@ -352,7 +378,7 @@ class ERPBuyOrdersController extends Controller
 		$products=null;
 		$stores=null;
 
-		$newid=$buyordersRepository->getLastID()+1;
+		$newid=$erpBuyOrdersRepository->getLastID()+1;
 		if(!$buyorder){
 			$buyorder=new ERPBuyOrders();
 			$buyorder->setActive(1);
@@ -388,7 +414,7 @@ class ERPBuyOrdersController extends Controller
 		$buyorder->setEmail($fields->supplieremail);
 		$buyorder->setPhone($fields->supplierphone);
 
-	  $paymentmethod=$paymentMethodsrepository->findOneBy(["name"=>$fields->supplierpaymentmethod, "active"=>1, "deleted"=>0]);;
+	  $paymentmethod=$erpPaymentMethodsRepository->findOneBy(["name"=>$fields->supplierpaymentmethod, "active"=>1, "deleted"=>0]);;
 		$buyorder->setPaymentmethod($paymentmethod);
 
 
@@ -397,7 +423,7 @@ class ERPBuyOrdersController extends Controller
 		$buyorder->setAdditionalcost(floatval($fields->additionalcost));
 		$buyorder->setWeight($fields->weight);
 
-		$store=$storesRepository->findOneBy(["id"=>$fields->store, "active"=>1, "deleted"=>0]);
+		$store=$erpStoresRepository->findOneBy(["id"=>$fields->store, "active"=>1, "deleted"=>0]);
   	$buyorder->setStore($store);
 
 		$buyorder->setPriority($fields->priority);

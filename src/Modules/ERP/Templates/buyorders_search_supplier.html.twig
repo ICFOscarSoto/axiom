@@ -1,3 +1,4 @@
+{# Modal busqueda de proveedor  #}
 <div class="modal fade" tabindex="-1" id="supplier-search-modal-form" aria-hidden="true">
     <div class="modal-dialog modal-lg">
       <div class="modal-content" style="transform: matrix(1, 0, 0, 1, 0, 0);display:inline-block;">
@@ -7,6 +8,7 @@
         <div id="supplier-search-modal-form-body" style="height: 520px; padding: 0px 10px;">
           {% set listConstructor = supplierslist %}
           {% set listOrigin = "" %}
+          {% set hidePageLength = true %}
           {# for know if list.html is invoked directly from controller and we need to make modals inside list#}
           {{ include('@Globale/list.html.twig') }}
         </div>
@@ -15,13 +17,12 @@
 </div>
 
 <script>
-  ///var supplierFields=["supplier-form-id","supplier-form-code","supplier-form-name","supplier-form-email","supplier-form-phone"];
-//  var supplierSearchfields=["id","code","name","email","phone"];
-
-
+  {# Acciones a realizar una vez realizada la busqueda de proveedores #}
   function postSupplierSearch(){
-  //  $("#customer-form-view").attr("attr-id").val($("#customer-form-id").val());
+
   }
+
+  {# Busqueda de proveedores #}
   function SupplierSearch(fields, searchFields){
     if($("#supplier-form-code").val()!=""){
       if((++load_wait)==1) $("#load-spinner").fadeIn();
@@ -47,7 +48,7 @@
     }else clearFields(fields);
   }
 
-
+  {# Costo de envío en función del proveedor #}
   function setShippingCharge(){
       if($("#buyorder-form-freeshipping").val()==0){
          $("#buyorder-form-shippingcharge").val("PAGADOS");
@@ -56,11 +57,12 @@
        }
       else {
          $("#buyorder-form-shippingcharge").val("DEBIDOS");
-          $("#buyorder-form-shippingcharge").addClass("input-danger");
-           $("#buyorder-form-shippingcharge").removeClass("input-success");
+         $("#buyorder-form-shippingcharge").addClass("input-danger");
+         $("#buyorder-form-shippingcharge").removeClass("input-success");
        }
   }
 
+  {# Estimar fecha de entrega en función del proveedor #}
   function setEstimatedDate(){
       var estimated=parseInt($("#buyorder-form-estimateddelivery-number").val());
       var res = new Date();
@@ -77,6 +79,7 @@
       $("#buyorder-form-estimateddelivery").val(datetoday);
   }
 
+  {# Obtener información del almacén #}
   function setStoreInfo(id){
     if((++load_wait)==1) $("#load-spinner").fadeIn();
     $.ajax({
@@ -97,44 +100,31 @@
       });
   }
 
+  {# Cuando se termine de cargar la página #}
   $(document).ready(function() {
-    {# SUPPLIER SEARCH #}
 
-  $('body').on('change', "[id^='supplier-form-name']", function(e) {
-       	$('#supplier-form-view').css('display','block');
-  });
-
+    {# Seleccionar proveedor #}
     $('body').on('click', "[id^='listSupplierswithcode-field-button-select-']", function(e) {
-      $("#supplier-form-id").val($(this).attr('attr-id'));
+      var supplier_id = $(this).attr('attr-id');
+      $("#supplier-form-id").val(supplier_id);
+      $("#supplier-form-code").val($("#listSupplierswithcode-code-"+supplier_id).text());
+      $("#supplier-form-name").val($("#listSupplierswithcode-name-"+supplier_id).text());
+      $("#supplier-form-codename").val('('+$("#supplier-form-code").val()+') '+$("#supplier-form-name").val());
       $("#supplier-form-id").trigger('change');
-      $("#supplier-form-code").val($(this).parent().parent().parent().children('td').eq(1).text());
-      $("#supplier-form-code").trigger('change');
-      $("#supplier-form-name").val($(this).parent().parent().parent().children('td').eq(2).text());
-      $("#supplier-form-name").trigger('change');
-      $("#supplier-form-name").attr("disabled", true);
-      $("#supplier-form-email").val($(this).parent().parent().parent().children('td').eq(3).text());
-      $("#supplier-form-email").trigger('change');
-      $("#supplier-form-email").attr("disabled", true);
-      $("#supplier-form-phone").val($(this).parent().parent().parent().children('td').eq(4).text());
-      $("#supplier-form-phone").trigger('change');
-      $("#supplier-form-phone").attr("disabled", true);
-      $("#supplier-form-paymentmethod").val($(this).parent().parent().parent().children('td').eq(5).text());
-      $("#supplier-form-paymentmethod").trigger('change');
-      $("#supplier-form-paymentmethod").attr("disabled", true);
+
+      $("#supplier-form-email").val($("#listSupplierswithcode-email-"+supplier_id).text());
+      $("#supplier-form-phone").val($("#listSupplierswithcode-phone-"+supplier_id).text());
+      $("#supplier-form-paymentmethod").val($("#listSupplierswithcode-paymentmethod__name-"+supplier_id).text());
 
       $("#buyorder-form-additionalcost").val(0);
       $("#buyorder-form-weight").val(0);
 
-      $("#supplier-form-view").attr("attr-id",$(this).attr("attr-id"));
-      $("#supplier-form-view").css("display","inline-block");
-
-    //  $("#customer-form-view"+$("#customer-search-modal-form").attr("attr-id")).val($(this).parent().parent().parent().children('td').eq(1).text());
       $("#supplier-search-modal-form").modal('toggle');
 
     });
 
-
-    $('body').on('change', "#supplier-form-code", function(e) {
+    {# Evento de cambio de proveedor en el formulario principal #}
+    $('body').on('change', "#supplier-form-id", function(e) {
       code=$("#supplier-form-code").val();
       if((++load_wait)==1) $("#load-spinner").fadeIn();
       $.ajax({
@@ -153,9 +143,7 @@
          setShippingCharge();
          setEstimatedDate();
          setStoreInfo(1);
-
         });
-
     });
   });
   </script>
