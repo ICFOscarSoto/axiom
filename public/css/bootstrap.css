@@ -1134,8 +1134,10 @@ img {
   border-radius: 50%;
 }
 hr {
-  margin-top: 17px;
-  margin-bottom: 17px;
+  /*margin-top: 17px;
+  margin-bottom: 17px;*/
+  margin-top: 1px;
+  margin-bottom: 6px;
   border: 0;
   border-top: 1px solid #eeeeee;
 }
@@ -1212,8 +1214,10 @@ h2,
 .h2,
 h3,
 .h3 {
-  margin-top: 17px;
-  margin-bottom: 8.5px;
+/*  margin-top: 17px;
+  margin-bottom: 8.5px;*/
+  margin-top: -12px;
+  margin-bottom: -11.5px;
 }
 h1 small,
 .h1 small,
@@ -2496,7 +2500,7 @@ legend {
 label {
   display: inline-block;
   max-width: 100%;
-  margin-bottom: 5px;
+  /*margin-bottom: 5px;*/
   font-weight: bold;
 }
 input[type="search"] {

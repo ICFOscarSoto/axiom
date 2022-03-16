@@ -1,5 +1,5 @@
 {# DATE AND TIME FIELDS #}
-  $('.datetimepicker').each(function(index) {
+  $('.datetimepicker:not(:disabled):not([readonly])').each(function(index) {
     var valueField=$(this).val();
     var dateField=moment(valueField, "DD/MM/YYYY HH:mm:ss");
       $(this).datetimepicker({
@@ -16,7 +16,7 @@
       $(this).before("<span id='now-view-{{formConstructor.name}}-"+$(this).attr("id")+"' target='"+$(this).attr("id")+"' class='select2-selection__view"+($(this).is(':disabled')?" disabled":"")+"' style='right: 2px;'><i class='fa fa-clock-o' aria-hidden='true'></i><span>&nbsp;Ahora</span></span>");
   });
 
-  $('.datepicker').each(function(index) {
+  $('.datepicker:not(:disabled):not([readonly])').each(function(index) {
     var valueField=$(this).val();
     var dateField=moment(valueField, "DD/MM/YYYY");
       $(this).datetimepicker({
@@ -33,7 +33,7 @@
       $(this).before("<span id='now-view-{{formConstructor.name}}-"+$(this).attr("id")+"' target='"+$(this).attr("id")+"' class='select2-selection__view"+($(this).is(':disabled')?" disabled":"")+"' style='right: 2px;'><i class='fa fa-clock-o' aria-hidden='true'></i><span>&nbsp;Ahora</span></span>");
   });
 
-  $('.dateshortpicker').each(function(index) {
+  $('.dateshortpicker:not(:disabled):not([readonly])').each(function(index) {
     var valueField=$(this).val();
     var dateField=moment(valueField+'/1970', "DD/MM/YYYY");
       $(this).datetimepicker({
@@ -54,7 +54,7 @@
       $(this).before("<span id='now-view-{{formConstructor.name}}-"+$(this).attr("id")+"' target='"+$(this).attr("id")+"' class='select2-selection__view"+($(this).is(':disabled')?" disabled":"")+"' style='right: 2px;'><i class='fa fa-clock-o' aria-hidden='true'></i><span>&nbsp;Ahora</span></span>");
   });
 
-  $('.timepicker').each(function(index) {
+  $('.timepicker:not(:disabled):not([readonly])').each(function(index) {
     var valueField=$(this).val();
     var dateField=moment(valueField, "HH:mm:ss");
       $(this).datetimepicker({
