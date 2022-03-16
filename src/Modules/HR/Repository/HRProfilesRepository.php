@@ -20,7 +20,7 @@ class HRProfilesRepository extends ServiceEntityRepository
     }
 
     public function getProfiles($user){
-      $query="SELECT id, parent_id as parentid, name from hrprofiles WHERE company_id=:company AND active=1 and deleted=0 ORDER by id, parent_id";
+      $query="SELECT id, parent_id as parentid, name from hrprofiles WHERE company_id=:company AND active=1 and deleted=0 ORDER by parent_id, name";
       $params=['company' => $user->getCompany()->getId()];
       return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
     }
