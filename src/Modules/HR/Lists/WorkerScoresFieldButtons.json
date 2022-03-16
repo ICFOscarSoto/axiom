@@ -1,0 +1,4 @@
+[
+  {"id": "editWorkerScore", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"", "modal":"", "actionType" : "background", "confirm" :false},
+  {"id": "deleteWorkerScore", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"genericdelete", "routeParams":{"module":"HR", "name":"WorkerScores"}, "confirm" :true, "undo" :false, "actionType" : "background", "tooltip":""}
+]

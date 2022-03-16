@@ -185,7 +185,7 @@ var url = new URL(window.location.href);
 
 					"order": [[ {{  listConstructor.orderColumn }}, "{{  listConstructor.orderDirection }}" ]],
 					"columns": [
-            { "name": "checkboxes" ,"data": null, defaultContent: '' },
+            { "name": "checkboxes" ,"data": null, defaultContent: '',"width": "100px" },
 						{# Remove concatenated strings #}
 						{% for keyfield, field in fields %}
 							{ "name": "{{ field.name }}" ,"data": "{{ field.name }}" },

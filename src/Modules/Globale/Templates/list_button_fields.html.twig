@@ -11,12 +11,14 @@
               $('body').on('click', "[id^='{{ listConstructor.id }}-field-button-{{ fieldOption.id }}']", function() {
                 url=$("#{{ listConstructor.id }}-field-button-{{ fieldOption.id }}-url").val();
                 url=url.replace('_____',$(this).attr('attr-id'));
-                {% if field.target is not defined or field.target == "_self" %}
-                    window.location.href=url;
-                {% else %}
-                    var win = window.open(url, '{{ field.target }}');
-                    win.focus();
-                {% endif %}
+								if(url!=""){
+	                {% if field.target is not defined or field.target == "_self" %}
+	                    window.location.href=url;
+	                {% else %}
+	                    var win = window.open(url, '{{ field.target }}');
+	                    win.focus();
+	                {% endif %}
+								}
               });
               {% else %}
               {% endif %}
@@ -25,21 +27,24 @@
                 $('body').on('click', "[id^='{{ listConstructor.id }}-field-button-{{ fieldOption.id }}']", function() {
                   url=$("#{{ listConstructor.id }}-field-button-{{ fieldOption.id }}-url").val();
                   url=url.replace('_____',$(this).attr('attr-id'));
-                  $.getJSON(url, function( data ) {
-                    $.each( data, function( key, val ) {
+									if(url!="")
+	                  $.getJSON(url, function( data ) {
+	                    $.each( data, function( key, val ) {
 
-                    });
-                  }).always(function() {
-                    $("#{{ listConstructor.id }}").DataTable().ajax.reload();
-                  });
+	                    });
+	                  }).always(function() {
+	                    $("#{{ listConstructor.id }}").DataTable().ajax.reload();
+	                  });
                 });
               {% else %}
                 $('body').on('click', "[id^='{{ listConstructor.id }}-field-button-{{ fieldOption.id }}']", function() {
                 url=$("#{{ listConstructor.id }}-field-button-{{ fieldOption.id }}-url").val();
                 url=url.replace('_____',$(this).attr('attr-id'));
-                $('#{{ listConstructor.id }}-modal-button-continue').attr('attr-action',url);
-                $('#{{ listConstructor.id }}-modal-button-continue').attr('attr-action-type','{{ fieldOption.actionType }}');
-                $('#{{ listConstructor.id }}-modal-body').html('¿Está seguro que desea {% if fieldOption.confirm_msg is defined %}{{ fieldOption.confirm_msg }}{% else %}{{fieldOption.name}} este registro{% endif %}? {% if fieldOption.undo is defined and fieldOption.undo==false %} </br><b>¡ATENCIÓN!</b> Esta operación no podrá deshacerse.{% endif %}');
+								if(url!=""){
+                	$('#{{ listConstructor.id }}-modal-button-continue').attr('attr-action',url);
+                	$('#{{ listConstructor.id }}-modal-button-continue').attr('attr-action-type','{{ fieldOption.actionType }}');
+                	$('#{{ listConstructor.id }}-modal-body').html('¿Está seguro que desea {% if fieldOption.confirm_msg is defined %}{{ fieldOption.confirm_msg }}{% else %}{{fieldOption.name}} este registro{% endif %}? {% if fieldOption.undo is defined and fieldOption.undo==false %} </br><b>¡ATENCIÓN!</b> Esta operación no podrá deshacerse.{% endif %}');
+								}
               });
               {% endif %}
             {% endif %}
@@ -52,12 +57,14 @@
               $('body').on('click', "[id^='{{ listConstructor.id }}-field-button-{{ field.id }}']", function() {
                 url=$("#{{ listConstructor.id }}-field-button-{{ field.id }}-url").val();
                 url=url.replace('_____',$(this).attr('attr-id'));
-                {% if field.target is not defined or field.target == "_self" %}
-                    window.location.href=url;
-                {% else %}
-                    var win = window.open(url, '{{ field.target }}');
-                    win.focus();
-                {% endif %}
+								if(url!=""){
+	                {% if field.target is not defined or field.target == "_self" %}
+	                    window.location.href=url;
+	                {% else %}
+	                    var win = window.open(url, '{{ field.target }}');
+	                    win.focus();
+	                {% endif %}
+								}
               });
               {% else %}
               {% endif %}
@@ -67,23 +74,26 @@
                 $('body').on('click', "[id^='{{ listConstructor.id }}-field-button-{{ field.id }}']", function() {
                   url=$("#{{ listConstructor.id }}-field-button-{{ field.id }}-url").val();
                   url=url.replace('_____',$(this).attr('attr-id'));
-                  $.post(url, null,
-                    function(data, status, xhr){
+									if(url!="")
+	                  $.post(url, null,
+	                    function(data, status, xhr){
 
-                        $("#{{field.modal}}-modal-form-body").html(data);
-                        $("#{{field.modal}}-modal-form-body").find(':checkbox').not($('[id$=-chkall]')).iCheck({checkboxClass: 'icheckbox_flat-blue', radioClass: 'iradio_flat-blue'});
-                        $("#{{field.modal}}-modal-form-body select").select2();
-                        $("#{{field.modal}}-modal-form").modal();
+	                        $("#{{field.modal}}-modal-form-body").html(data);
+	                        $("#{{field.modal}}-modal-form-body").find(':checkbox').not($('[id$=-chkall]')).iCheck({checkboxClass: 'icheckbox_flat-blue', radioClass: 'iradio_flat-blue'});
+	                        $("#{{field.modal}}-modal-form-body select").select2();
+	                        $("#{{field.modal}}-modal-form").modal();
 
-                  });
+	                  });
                 });
               {% else %}
                 $('body').on('click', "[id^='{{ listConstructor.id }}-field-button-{{ field.id }}']", function() {
                 url=$("#{{ listConstructor.id }}-field-button-{{ field.id }}-url").val();
                 url=url.replace('_____',$(this).attr('attr-id'));
-                $('#{{ listConstructor.id }}-modal-button-continue').attr('attr-action',url);
-                $('#{{ listConstructor.id }}-modal-button-continue').attr('attr-action-type','{{ field.actionType }}');
-                $('#{{ listConstructor.id }}-modal-body').html('¿Está seguro que desea {% if field.confirm_msg is defined %}{{ field.confirm_msg }}{% else %}{{field.name}} este registro{% endif %}? {% if field.undo is defined and field.undo==false %} </br><b>¡ATENCIÓN!</b> Esta operación no podrá deshacerse.{% endif %}');
+								if(url!=""){
+                	$('#{{ listConstructor.id }}-modal-button-continue').attr('attr-action',url);
+                	$('#{{ listConstructor.id }}-modal-button-continue').attr('attr-action-type','{{ field.actionType }}');
+                	$('#{{ listConstructor.id }}-modal-body').html('¿Está seguro que desea {% if field.confirm_msg is defined %}{{ field.confirm_msg }}{% else %}{{field.name}} este registro{% endif %}? {% if field.undo is defined and field.undo==false %} </br><b>¡ATENCIÓN!</b> Esta operación no podrá deshacerse.{% endif %}');
+								}
               });
               {% endif %}
             {% endif %}

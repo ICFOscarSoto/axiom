@@ -1,0 +1,233 @@
+{% block header %}
+<head>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<meta name="description" content="Axiom Business Management" />
+	<link rel="icon" href="images/favicon.ico">
+	<meta name="author" content="" />
+	{{ include('@Globale/header.html.twig') }}
+	<!-- Imported styles on this page -->
+	<link rel="stylesheet" href="{{ url('index') }}/js/jvectormap/jquery-jvectormap-1.2.2.css">
+	<link rel="stylesheet" href="{{ url('index') }}/js/rickshaw/rickshaw.min.css">
+  <title>{% block title %}{% endblock %}</title>
+</head>
+{% endblock %}
+<body class="page-body" data-url="{{ url('indexAdmin') }}">
+  <div style="margin: 0 25px 0 25px;">
+    <div class="row">
+      <div class="col-md-4">
+        <label for="form-score-thisyear">{{ thisyear_score.label }}</label>
+        <select id="form-score-thisyear" autocomplete="off" class="non-select2" style="display: none;">
+          <option value="0" data-html="Extremadamente negativo">0</option>
+          <option value="1" data-html="Muy negativo">1</option>
+          <option value="2" data-html="Negativo">2</option>
+          <option value="3" data-html="Normal">3</option>
+          <option value="4" data-html="Positivo">4</option>
+          <option value="5" data-html="Muy positivo">5</option>
+          <option value="6" data-html="Extremadamente positivo">6</option>
+        </select>
+      </div>
+      <div class="col-md-4">
+        <label for="form-score-lastyear">{{ lastyear_score.label }}</label>
+        <select id="form-score-lastyear" autocomplete="off" class="non-select2" style="display: none;">
+          <option value="0" data-html="Extremadamente negativo">0</option>
+          <option value="1" data-html="Muy negativo">1</option>
+          <option value="2" data-html="Negativo">2</option>
+          <option value="3" data-html="Normal">3</option>
+          <option value="4" data-html="Positivo">4</option>
+          <option value="5" data-html="Muy positivo">5</option>
+          <option value="6" data-html="Extremadamente positivo">6</option>
+        </select>
+      </div>
+      <div class="col-md-4">
+        <label for="form-score-origin">{{ allyear_score.label }}</label>
+        <select id="form-score-origin" autocomplete="off" class="non-select2" style="display: none;">
+          <option value="0" data-html="Extremadamente negativo">0</option>
+          <option value="1" data-html="Muy negativo">1</option>
+          <option value="2" data-html="Negativo">2</option>
+          <option value="3" data-html="Normal">3</option>
+          <option value="4" data-html="Positivo">4</option>
+          <option value="5" data-html="Muy positivo">5</option>
+          <option value="6" data-html="Extremadamente positivo">6</option>
+        </select>
+      </div>
+    </div>
+    </br>
+    <div class="row">
+    	<canvas id="HRWorkerScores-evolution-{{ id }}" width="800" height="250px"></canvas>
+    </div>
+  </div>
+
+
+<script>
+
+  function changeBarratingColor(value, element){
+    var color_selected='';
+    var color_background='#dddddd';
+    $(element).next().children('.br-widget a').each(function( index ) {
+      $(this).css("background-color", '');
+    });
+
+    switch(Math.round(value*1)){
+      case 0:
+      color_selected = "#910000";
+      //color_background = "#fbbbbb";
+      break;
+      case 1:
+      color_selected = "#c50000";
+      //color_background = "#fbbbbb";
+      break;
+      case 2:
+      color_selected = "#ff0a0a";
+      //color_background = "#fbbbbb";
+      break;
+      case 3:
+      color_selected = "#2abaff";
+      //color_background = "#bed7e3";
+      break;
+      case 4:
+      color_selected = "#9ee74f";
+      //color_background = "#d1fbbb";
+      break;
+      case 5:
+      color_selected = "#7ec72f";
+      //color_background = "#d1fbbb";
+      break;
+      case 6:
+      color_selected = "#60ab10";
+      //color_background = "#d1fbbb";
+      break;
+    }
+    $(element).next().children('.br-theme-bars-movie .br-widget a').css("background-color", color_background);
+    $(element).next().children('.br-widget a.br-selected').css("background-color", color_selected);
+    $(element).next().children('.br-current-rating').css("color", color_selected);
+  }
+
+  $(document).ready(function(){
+
+      $('#form-score-thisyear').barrating({
+          theme: 'bars-movie',
+          showSelectedRating: true,
+          hoverState: false,
+          initialRating: {{ thisyear_score.score }},
+          readonly: true
+
+      });
+      $('#form-score-lastyear').barrating({
+          theme: 'bars-movie',
+          showSelectedRating: true,
+          hoverState: false,
+          initialRating: {{ lastyear_score.score }},
+          readonly: true
+
+      });
+      $('#form-score-origin').barrating({
+          theme: 'bars-movie',
+          showSelectedRating: true,
+          hoverState: false,
+          initialRating: {{ allyear_score.score }},
+          readonly: true
+      });
+      changeBarratingColor({{ thisyear_score.score }},'#form-score-thisyear');
+      changeBarratingColor({{ lastyear_score.score }},'#form-score-lastyear');
+      changeBarratingColor({{ allyear_score.score }},'#form-score-origin');
+
+
+
+      var ctxEvolution = document.getElementById('HRWorkerScores-evolution-{{ id }}');
+      $('#HRWorkerScores-evolution-{{ id }}').attr('width',$('#HRWorkerScores-evolution-{{ id }}').parent().width());
+
+      const datapoints=[{% for item in evolution_graph.scores %} {{ item }} {{ not loop.last ? ',' }} {% endfor %}];
+      const datapointsAvg=[{% for item in evolution_graph.avgscores %} {{ item }} {{ not loop.last ? ',' }} {% endfor %}];
+
+      const labels = [{% for item in evolution_graph.months %} '{{ item }}' {{ not loop.last ? ',' }} {% endfor %}];
+      const data = {
+        labels: labels,
+        datasets: [
+          {
+            label: 'Puntuación {{worker_name}} {{worker_lastname}}',
+            data: datapoints,
+            borderColor: '#83d515',
+            fill: false,
+            cubicInterpolationMode: 'monotone',
+            tension: 0.4
+          },
+          {
+            label: 'Puntuación media trabajadores',
+            data: datapointsAvg,
+            borderColor: '#2abaff',
+            fill: false,
+            cubicInterpolationMode: 'monotone',
+            tension: 0.4
+          },
+        ]
+      };
+
+      lineEvolution = new Chart(ctxEvolution, {
+        type: 'line',
+        data: data,
+        options: {
+          legend: {
+            position:'bottom'
+          },
+          responsive: false,
+          plugins: {
+            title: {
+              display: true,
+              text: 'Evolucion últimos 12 meses'
+            },
+          },
+          interaction: {
+            intersect: false,
+          },
+          scales: {
+            xAxes: {
+              display: true,
+              title: {
+                display: true
+              }
+            },
+            yAxes: [{
+              display: true,
+              scaleLabel: {
+                 show: true
+              },
+              gridLines:{
+                 color:"#ecedef"
+              },
+              ticks: {
+                 beginAtZero:true,
+                 stepSize: 1,
+                 fontColor:"#8f9092",
+                 callback:function(value) {
+                     var x = ["0", "1", "2", "3", "4", "5", "6"];
+                       return x[value | 0];
+                 }
+              }
+           }]
+          }
+        },
+      });
+
+
+  });
+
+</script>
+
+{% block footer %}
+
+	<link rel="stylesheet" href="{{ url('index') }}js/datatables/datatables.css">
+	<link rel="stylesheet" href="{{ url('index') }}js/select2/select2-bootstrap.css">
+	<link rel="stylesheet" href="{{ url('index') }}js/select2/select2.css">
+	<link rel="stylesheet" href="{{ url('index') }}css/custom.css">
+  <link rel="stylesheet" href="{{ url('index') }}js/jquery-barrating/themes/bars-movie.css">
+
+	<!-- Imported scripts on this page -->
+	<script src="{{ url('index') }}js/datatables/datatables.js"></script>
+	<script src="{{ url('index') }}js/select2/select2.min.js"></script>
+  <script src="{{ url('index') }}js/jquery-barrating/jquery.barrating.min.js"></script>
+
+	 {{ include('@Globale/bottom.html.twig') }}
+{% endblock %}
+</body>

@@ -1,0 +1,50 @@
+<iframe id='frame-summary' src="/es/HR/{{ id }}/workerscores/framesummary" width='100%' scrolling="no" style="border:none;" onload="adjustIframe(this)" ></iframe>
+
+<script>
+  function adjustIframe(obj) {
+      obj.style.height = obj.contentWindow.document.body.scrollHeight + 'px';
+  }
+
+  function changeBarratingColor(value, element){
+    var color_selected='';
+    var color_background='#dddddd';
+    $(element).next().children('.br-widget a').each(function( index ) {
+      $(this).css("background-color", '');
+    });
+
+    switch(Math.round(value*1)){
+      case 0:
+      color_selected = "#910000";
+      //color_background = "#fbbbbb";
+      break;
+      case 1:
+      color_selected = "#c50000";
+      //color_background = "#fbbbbb";
+      break;
+      case 2:
+      color_selected = "#ff0a0a";
+      //color_background = "#fbbbbb";
+      break;
+      case 3:
+      color_selected = "#2abaff";
+      //color_background = "#bed7e3";
+      break;
+      case 4:
+      color_selected = "#9ee74f";
+      //color_background = "#d1fbbb";
+      break;
+      case 5:
+      color_selected = "#7ec72f";
+      //color_background = "#d1fbbb";
+      break;
+      case 6:
+      color_selected = "#60ab10";
+      //color_background = "#d1fbbb";
+      break;
+    }
+    $(element).next().children('.br-theme-bars-movie .br-widget a').css("background-color", color_background);
+    $(element).next().children('.br-widget a.br-selected').css("background-color", color_selected);
+    $(element).next().children('.br-current-rating').css("color", color_selected);
+  }
+
+</script>
