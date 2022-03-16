@@ -10,6 +10,7 @@ use App\Modules\HR\Entity\HRClocks;
 use App\Modules\HR\Entity\HRAutoCloseClocks;
 use App\Modules\HR\Entity\HRDepartments;
 use App\Modules\HR\Entity\HRWorkCenters;
+use App\Modules\HR\Entity\HRWorkers;
 use App\Modules\Globale\Entity\GlobaleCompanies;
 use App\Modules\Globale\Entity\GlobaleHistories;
 use App\Modules\Globale\Entity\GlobaleUserSessions;
@@ -53,6 +54,7 @@ class Cron extends ContainerAwareCommand
     $autoCloseclocksRepository = $this->doctrine->getRepository(HRAutoCloseClocks::class);
     $clocksRepository = $this->doctrine->getRepository(HRClocks::class);
     $CompaniesRepository = $this->doctrine->getRepository(GlobaleCompanies::class);
+    $workersRepository = $this->doctrine->getRepository(HRWorkers::class);
     $usersRepository = $this->doctrine->getRepository(GlobaleUsers::class);
     $msgRH="";
     $workersIds=[];
@@ -96,7 +98,6 @@ class Cron extends ContainerAwareCommand
         if(!in_array($clock_element->getWorker()->getId(), $workersIds)){
           if($clock_element->getWorker()->getUser()!=null && $clock_element->getWorker()->getUser()->getDiscordchannel()!=null && $clock_element->getWorker()->getUser()->getId()==7){
             $msg="Tu jornada laboral ha sido cerrada automáticamente y marcada como ** INCIDENCIA**, para solucionar el problema ponte en contacto con el responsable de \"Recursos Humanos\"";
-            $output->writeln(['https://icfbot.ferreteriacampollano.com/message.php?channel='.$clock_element->getWorker()->getUser()->getDiscordchannel().'&msg='.urlencode($msg)]);
             file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$clock_element->getWorker()->getUser()->getDiscordchannel().'&msg='.urlencode($msg));
           }
           $workersIds[]=$clock_element->getWorker()->getId();
@@ -116,7 +117,6 @@ class Cron extends ContainerAwareCommand
           $worker=$workersRepository->find($idowrker);
           if(!$worker) continue;
           $msgRH="  \n   - ".$worker->getLastname().', '.$worker->getName()." -> https://axiom.ferreteriacampollano.com/es/HR/workers/form/".$worker->getId()."?tab=clocks";
-          $output->writeln(['https://icfbot.ferreteriacampollano.com/message.php?channel='.$user->getDiscordchannel().'&msg='.urlencode($msgRH)]);
           file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$user->getDiscordchannel().'&msg='.urlencode($msgRH));
         }
       }
