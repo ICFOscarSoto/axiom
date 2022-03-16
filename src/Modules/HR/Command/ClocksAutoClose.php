@@ -49,6 +49,7 @@ class ClocksAutoClose extends ContainerAwareCommand
      if(!in_array($val->getWorker()->getId(), $workersIds)){
        if($val->getWorker()->getUser()!=null && $val->getWorker()->getUser()->getDiscordchannel()!=null && $val->getWorker()->getUser()->getId()==7){
          $msg="Tu jornada laboral ha sido cerrada automáticamente y marcada como ** INCIDENCIA**, para solucionar el problema ponte en contacto con el responsable de \"Recursos Humanos\"";
+         $output->writeln(['https://icfbot.ferreteriacampollano.com/message.php?channel='.$val->getWorker()->getUser()->getDiscordchannel().'&msg='.urlencode($msg)]);
          file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$val->getWorker()->getUser()->getDiscordchannel().'&msg='.urlencode($msg));
        }
        $workersIds[]=$val->getWorker()->getId();
@@ -66,6 +67,7 @@ class ClocksAutoClose extends ContainerAwareCommand
           $worker=$workersRepository->find($idowrker);
           if(!$worker) continue;
           $msgRH="  \n   - ".$worker->getLastname().', '.$worker->getName()." -> https://axiom.ferreteriacampollano.com/es/HR/workers/form/".$worker->getId()."?tab=clocks";
+          $output->writeln(['https://icfbot.ferreteriacampollano.com/message.php?channel='.$user->getDiscordchannel().'&msg='.urlencode($msgRH)]);
           file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$user->getDiscordchannel().'&msg='.urlencode($msgRH));
         }
       }
