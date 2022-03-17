@@ -90,6 +90,22 @@ function datepicker(){
 $(document).ready(function() {
 	{# Poner el foco en el primer input válido de la ficha #}
 	$('.form-control:visible:enabled:first').focus();
+	{# Poner el foco en input de búsqueda al abrir modal de proveedores #}
+	$('#supplier-search-modal-form').on('shown.bs.modal', function(e){
+		$('#supplier-search-modal-form input:visible:enabled:first').focus();
+	});
+	{# Poner el foco en input de búsqueda al abrir modal de clientes #}
+	$('#customer-search-modal-form').on('shown.bs.modal', function(e){
+		$('#customer-search-modal-form input:visible:enabled:first').focus();
+	});
+	{# Oculta modal de cliente para seleccionar la dirección #}
+	$('#select-addresses-modal-form').on('show.bs.modal', function(e){
+		$('#customer-search-modal-form').modal('hide');
+	});
+	{# Muestra modal de cliente al cerrar la dirección #}
+	$('#select-addresses-modal-form').on('hide.bs.modal', function(e){
+		$('#customer-search-modal-form').modal('show');
+	});
 
 	{# Datepicker #}
   datepicker();

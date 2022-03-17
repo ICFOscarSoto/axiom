@@ -700,7 +700,7 @@ var url = new URL(window.location.href);
 	{{ include('@Globale/list_modal_confirm.html.twig') }}
 
 	<script>
-	$(document).ready(function() {
+	$(document).ready(function() {		
 		$('body').tooltip({ selector: '[data-toggle="tooltip"]' });
 		$('.datetimepicker').each(function(index) {
 			var valueField=$(this).val();

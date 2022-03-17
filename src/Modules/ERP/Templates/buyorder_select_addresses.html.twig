@@ -24,9 +24,7 @@
 
 
 $(document).ready(function() {
-
   $('body').on('click', "[id^='address-form-buttonadd-']", function(e) {
-
       $("#destination-form-address").val($("#address-form-address-"+$(this).attr("attr-id")).val());
       $("#destination-form-address").trigger('change');
       $("#destination-form-postcode").val($("#address-form-postcode-"+$(this).attr("attr-id")).val());
@@ -41,19 +39,9 @@ $(document).ready(function() {
       $("#destination-form-phone").trigger('change');
       $("#destination-form-email").val($("#address-form-email-"+$(this).attr("attr-id")).val());
       $("#destination-form-email").trigger('change');
-
-      $("#destination-form-view").attr("attr-id",$(this).attr("attr-id"));
-      $("#destination-form-view").css("display","inline-block");
-       $("#select-addresses-modal-form").modal('toggle');
+      
+      $("#select-addresses-modal-form").modal('toggle');
       $("#customer-search-modal-form").modal('toggle');
-
-
-      });
-
-
-      $('body').on('click', "#select-address-button-cancel", function(e){
-      //  alert("ey");
-         $("#select-addresses-modal-form").modal('toggle');
-      });
-  });
+    });
+});
 </script>

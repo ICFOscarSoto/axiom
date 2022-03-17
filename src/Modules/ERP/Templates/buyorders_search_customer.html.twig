@@ -48,26 +48,10 @@
   }
 
   $(document).ready(function() {
-    {# CUSTOMER SEARCH #}
-/*
-    $('body').on('keypress', "#customer-form-code", function(e) {
-        var code = e.keyCode || e.which;
-         if(code == 13) {
-           customerSearch(customerFields, customerSearchfields);
-         }
-      });
-
-    $('body').on('change', "#customer-form-code", function(e) {
-         customerSearch(customerFields, customerSearchfields);
-    });
-*/
-  $('body').on('change', "[id^='customer-form-name']", function(e) {
-       	$('#customer-form-view').css('display','block');
-  });
-
+    {# Al seleccionar un cliente se abre otra modal con las direcciones posibles de este cliente #}
     $('body').on('click', "[id^='listCustomerscustomized-field-button-select-']", function(e) {
-
-      $("#customer-form-id").val($(this).attr('attr-id'));
+      var customer_id = $(this).attr('attr-id');
+      $("#customer-form-id").val(customer_id);
       $("#customer-form-id").trigger('change');
       $("#destination-form-customercode").val($(this).parent().parent().parent().children('td').eq(1).text());
       $("#destination-form-customercode").trigger('change');
@@ -75,33 +59,7 @@
       $("#destination-form-name").val($(this).parent().parent().parent().children('td').eq(2).text());
       $("#destination-form-name").trigger('change');
 
-
       getAddresses($(this).attr('attr-id'));
-/*
-      $("#customer-form-id").val($(this).attr('attr-id'));
-      $("#customer-form-id").trigger('change');
-      $("#destination-form-customercode").val($(this).parent().parent().parent().children('td').eq(1).text());
-      $("#destination-form-customercode").trigger('change');
-      $("#destination-form-customercode").attr("disabled", true);
-      $("#destination-form-email").val($(this).parent().parent().parent().children('td').eq(3).text());
-      $("#destination-form-email").trigger('change');
-      $("#destination-form-phone").val($(this).parent().parent().parent().children('td').eq(4).text());
-      $("#destination-form-phone").trigger('change');
-      $("#destination-form-address").val($(this).parent().parent().parent().children('td').eq(5).text());
-      $("#destination-form-address").trigger('change');
-      $("#destination-form-postcode").val($(this).parent().parent().parent().children('td').eq(6).text());
-      $("#destination-form-postcode").trigger('change');
-      $("#destination-form-city").val($(this).parent().parent().parent().children('td').eq(7).text());
-      $("#destination-form-city").trigger('change');
-      $("#destination-form-state").val($(this).parent().parent().parent().children('td').eq(8).text());
-      $("#destination-form-state").trigger('change');
-      $("#destination-form-country").val($(this).parent().parent().parent().children('td').eq(9).text());
-      $("#destination-form-country").trigger('change');
-      $("#destination-form-view").attr("attr-id",$(this).attr("attr-id"));
-      $("#destination-form-view").css("display","inline-block");
-
-      $("#customer-search-modal-form").modal('toggle');
-      */
     });
 
 
@@ -137,7 +95,7 @@
                   '<input type="hidden" id="address-form-country-'+valor.id+'" value="'+valor.countryid+'">'+
                   '<input type="hidden" id="address-form-email-'+valor.id+'" value="'+valor.email+'">'+
                   '<input type="hidden" id="address-form-phone-'+valor.id+'" value="'+valor.phone+'">'+
-                  '<div class="btn-group "><button attr-id="'+valor.id+'" id="address-form-buttonadd-'+valor.id+'" type="button" class="default-action btn btn-success tooltip-primary"><i class="fa fa-plus" aria-hidden="true"></i></button></div>'+
+                  '<div class="btn-group "><button attr-id="'+valor.id+'" id="address-form-buttonadd-'+valor.id+'" type="button" class="default-action btn btn-success tooltip-primary"><i class="fa fa-check" aria-hidden="true"></i></button></div>'+
                   '</div>'
                 );
 
