@@ -16,18 +16,37 @@
       "class": "all"
   },
   {
-      "name": "estimateddelivery",
-      "caption": "Fecha estimada de entrega",
-      "class": "all"
+      "name": "suppliercode",
+      "caption": "suppliercode","class":"min-desktop"
   },
   {
-      "name": "supplier__name",
+      "name": "suppliername",
       "caption": "Proveedor",
       "class": "all"
   },
   {
-      "name": "author__name_o_author__lastname",
-      "caption": "Autor",
+      "name": "estimateddelivery",
+      "caption": "Fecha entrega",
+      "class": "all"
+  },
+  {
+      "name": "agent__name_o_agent__lastname",
+      "caption": "Agente",
+      "class": "all"
+  },
+  {
+      "name": "store__name",
+      "caption": "Store",
+      "class": "all"
+  },
+  {
+      "name": "state_name",
+      "caption": "Status",
+      "class": "all"
+  },
+  {
+      "name": "total",
+      "caption": "Total",
       "class": "all"
   }
 ]

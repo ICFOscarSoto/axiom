@@ -10,9 +10,11 @@ use App\Modules\HR\Entity\HRClocks;
 use App\Modules\HR\Entity\HRAutoCloseClocks;
 use App\Modules\HR\Entity\HRDepartments;
 use App\Modules\HR\Entity\HRWorkCenters;
+use App\Modules\HR\Entity\HRWorkers;
 use App\Modules\Globale\Entity\GlobaleCompanies;
 use App\Modules\Globale\Entity\GlobaleHistories;
 use App\Modules\Globale\Entity\GlobaleUserSessions;
+use App\Modules\Globale\Entity\GlobaleUsers;
 
 class Cron extends ContainerAwareCommand
 {
@@ -38,7 +40,7 @@ class Cron extends ContainerAwareCommand
 
 
   }
-  
+
   function deleteSessionsWithoutData($output){
     $sessionsRepository = $this->doctrine->getRepository(GlobaleUserSessions::class);
     $sessions=$sessionsRepository->findBy(["data"=>'']);
@@ -52,7 +54,11 @@ class Cron extends ContainerAwareCommand
     $autoCloseclocksRepository = $this->doctrine->getRepository(HRAutoCloseClocks::class);
     $clocksRepository = $this->doctrine->getRepository(HRClocks::class);
     $CompaniesRepository = $this->doctrine->getRepository(GlobaleCompanies::class);
-
+    $workersRepository = $this->doctrine->getRepository(HRWorkers::class);
+    $usersRepository = $this->doctrine->getRepository(GlobaleUsers::class);
+    $msgRH="";
+    $workersIds=[];
+    $HRResponsables=[7,10];
     //Search AutoCloseClocks at now time
     $autoCloseclocks=$autoCloseclocksRepository->findByTime(date('H:i'));
     $output->writeln([
@@ -88,12 +94,34 @@ class Cron extends ContainerAwareCommand
         $this->entityManager->persist($history);
         $this->entityManager->flush();
         //Send notifications
-
-
-
-
+        if($company->getId()!=2) continue;
+        if(!in_array($clock_element->getWorker()->getId(), $workersIds)){
+          if($clock_element->getWorker()->getUser()!=null && $clock_element->getWorker()->getUser()->getDiscordchannel()!=null){
+            $msg="Tu jornada laboral ha sido cerrada automáticamente y marcada como ** INCIDENCIA**, para solucionar el problema ponte en contacto con el responsable de \"Recursos Humanos\"";
+            file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$clock_element->getWorker()->getUser()->getDiscordchannel().'&msg='.urlencode($msg));
+          }
+          if($clock_element->getWorker()->getUser()->getId()!=7) $workersIds[]=$clock_element->getWorker()->getId();
+        }
       }
     }
+
+    //Notify HHRR Responsable
+    if(count($workersIds)){
+      foreach($HRResponsables as $iduser){
+        $user=$usersRepository->find($iduser);
+        if(!$user) continue;
+        $msgRH="Los siguientes trabajadores no han cerrado su jornada laboral y se han marcado como ** INCIDENCIA **: \n".$msgRH;
+        file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$user->getDiscordchannel().'&msg='.urlencode($msgRH));
+        foreach($workersIds as $idowrker){
+          $worker=$workersRepository->find($idowrker);
+          if(!$worker) continue;
+          $msgRH="  \n   - ".$worker->getLastname().', '.$worker->getName()." -> https://axiom.ferreteriacampollano.com/es/HR/workers/form/".$worker->getId()."?tab=clocks";
+          file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$user->getDiscordchannel().'&msg='.urlencode($msgRH));
+        }
+      }
+    }
+
+
 
   }
 }

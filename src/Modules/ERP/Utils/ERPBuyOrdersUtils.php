@@ -26,7 +26,7 @@ class ERPBuyOrdersUtils
   public function formatList($user){
     $list=[
       'id' => 'list'.$this->name,
-      'route' => 'buyorderslist',
+      'route' => 'genericlist',
       'routeParams' => ["module" => $this->module,
                         "name" => $this->name],
       'orderColumn' => 2,

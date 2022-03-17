@@ -21,7 +21,7 @@ class ClocksAutoClose extends ContainerAwareCommand
 
   protected function execute(InputInterface $input, OutputInterface $output)
   {
-    $HRResponsables=[7,10];
+    $HRResponsables=[7];
     $doctrine = $this->getContainer()->get('doctrine');
     $entityManager = $doctrine->getManager();
     $clocksRepository = $doctrine->getRepository(HRClocks::class);
@@ -60,6 +60,7 @@ class ClocksAutoClose extends ContainerAwareCommand
       foreach($HRResponsables as $iduser){
         $user=$usersRepository->find($iduser);
         if(!$user) continue;
+        if($user->getDiscordchannel()==null) continue;
         $msgRH="Los siguientes trabajadores no han cerrado su jornada laboral y se han marcado como ** INCIDENCIA **: \n".$msgRH;
         file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$user->getDiscordchannel().'&msg='.urlencode($msgRH));
         foreach($workersIds as $idowrker){

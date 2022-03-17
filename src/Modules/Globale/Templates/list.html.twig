@@ -519,6 +519,7 @@ var url = new URL(window.location.href);
 				{# moved modal confirm #}
 				{% set formConstructor = { name: 'form-list-header' ~ listConstructor.id} %}
 				{{ include("@Globale/form_fields_datetime.html.twig") }}
+				$("input[type='search']").focus();
 			});
 
 			//Top buttons Background or modal
