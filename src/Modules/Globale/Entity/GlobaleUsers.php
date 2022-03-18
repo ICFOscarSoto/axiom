@@ -264,49 +264,60 @@ class GlobaleUsers implements UserInterface
 
 
 	 public function getTemplateData($kernel, $doctrine){
+      // Obtiene los datos del usuario para la personalizacion de la interfaz
       $session = new Session();
-      $connectas=$session->get('as_company',null);
+      $repositoryModules       = $doctrine->getRepository("\App\Modules\Globale\Entity\GlobaleCompaniesModules");
+      $repositoryEmailAccounts = $doctrine->getRepository("\App\Modules\Email\Entity\EmailAccounts");
+      $repositorySubjects      = $doctrine->getRepository("\App\Modules\Email\Entity\EmailSubjects");
+      $repositoryUserConfig    = $doctrine->getRepository("\App\Modules\Globale\Entity\GlobaleUsersConfig");
+      $unseenEmails    = 0;
+      $connectas       = $session->get('as_company',null);
+      $modules         = [];
+      $interfaceConfig = [];
 
-      $modules=[];
-      $repositoryModules=$doctrine->getRepository("\App\Modules\Globale\Entity\GlobaleCompaniesModules");
+      // Obtiene los módulos activos para la empresa del usuario
       $activeModules=$repositoryModules->findBy(["companyown"=>$this->getCompany(), "active"=>1, "deleted"=>0]);
       foreach($activeModules as $module){
         $modules[$module->getModule()->getName()]=$module->getModule();
       }
 
-      $repositoryEmailAccounts=$doctrine->getRepository("\App\Modules\Email\Entity\EmailAccounts");
-      $repositorySubjects=$doctrine->getRepository("\App\Modules\Email\Entity\EmailSubjects");
-      $emailAccounts=$repositoryEmailAccounts->findBy(["user" => $this->id]);
-      $unseenEmails=0;
+      // Datos del correo electronico
+      $emailAccounts = $repositoryEmailAccounts->findBy(["user" => $this->id]);
       foreach($emailAccounts as $email){
         if($email->getInboxFolder()){
-					$folder=$email->getInboxFolder();
-          $subjects=$repositorySubjects->findBy(["folder"=>$folder]);
-          $unseenEmails+=count($subjects);
+					$folder        = $email->getInboxFolder();
+          $subjects      = $repositorySubjects->findBy(["folder"=>$folder]);
+          $unseenEmails  += count($subjects);
         }
-        //$unseenEmails+=$email->getUnseen();
       }
 
+      // Obtenemos los parametros personalizados de la interfaz del usuario
+      $interfaceConfig = $repositoryUserConfig->findOneBy(["user"=>$this,"company"=>$this->company, "element"=>"globale" , "view"=>"default", "attribute"=>"interface", "active"=>1, "deleted"=>0]);
+      if(!$interfaceConfig) $interfaceConfig = '';
+        else $interfaceConfig = $interfaceConfig->getValue();
+
       $filesHelper=new HelperFiles();
-      $data["id"]=$this->getId();
-  		$data["email"]=$this->getEmail();
-  		$data["name"]=$this->getName();
-  		$data["firstname"]=$this->getLastname();
-  		$data["roles"]=$this->getRoles();
-      $data["modules"]=$modules;
-      $data["companyId"]=$connectas==null?$this->getCompany()->getId():$connectas->getId();
-      $data["unseenEmails"]=$unseenEmails;
-      $data["emailAccounts"]=$emailAccounts;
-      $data["permissions"]=SecurityUtils::getZonePermissions($this, $doctrine);
+      $data["id"]              = $this->getId();
+  		$data["email"]           = $this->getEmail();
+  		$data["name"]            = $this->getName();
+  		$data["firstname"]       = $this->getLastname();
+  		$data["roles"]           = $this->getRoles();
+      $data["modules"]         = $modules;
+      $data["companyId"]       = $connectas==null?$this->getCompany()->getId():$connectas->getId();
+      $data["unseenEmails"]    = $unseenEmails;
+      $data["emailAccounts"]   = $emailAccounts;
+      $data["permissions"]     = SecurityUtils::getZonePermissions($this, $doctrine);
+      $data["interfaceConfig"] = $interfaceConfig;
       if(in_array("ROLE_ADMIN",$this->getRoles())){
-        $diskusage=($connectas==null)?$this->getCompany()->getDiskUsages():$connectas->getDiskUsages();
-        $data["diskusage"]["space"]=$filesHelper->formatBytes($diskusage[0]->getDiskspace());
-        $data["diskusage"]["free"]=$filesHelper->formatBytes($diskusage[0]->getDiskspace()-$diskusage[0]->getDiskusage());
-        $data["diskusage"]["used"]=$filesHelper->formatBytes($diskusage[0]->getDiskusage());
-        $data["diskusage"]["free_perc"]=round($diskusage[0]->getDiskusage()*100/$diskusage[0]->getDiskspace(),1);
-        $data["diskusage"]["distribution"]=json_decode($diskusage[0]->getDistribution(),true);
+        $diskusage                         = ($connectas == null)?$this->getCompany()->getDiskUsages():$connectas->getDiskUsages();
+        $data["diskusage"]["space"]        = $filesHelper->formatBytes($diskusage[0]->getDiskspace());
+        $data["diskusage"]["free"]         = $filesHelper->formatBytes($diskusage[0]->getDiskspace()-$diskusage[0]->getDiskusage());
+        $data["diskusage"]["used"]         = $filesHelper->formatBytes($diskusage[0]->getDiskusage());
+        $data["diskusage"]["free_perc"]    = round($diskusage[0]->getDiskusage()*100/$diskusage[0]->getDiskspace(),1);
+        $data["diskusage"]["distribution"] = json_decode($diskusage[0]->getDistribution(),true);
       }
-  		return $data;
+      return $data;
+
   	}
 
     /**
