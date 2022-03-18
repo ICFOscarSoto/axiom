@@ -201,7 +201,7 @@
 $(document).ready(function() {
 	$('body').on('click', ".sidebar-collapse-icon", function() {
 		var collapsedSidebar=true;
-		if($('.page-container').hasClass('sidebar-collapsed')) collapsedSidebar=false;
+		if($('.page-container {% if userData.interfaceConfig.collapsedSidebar is defined and userData.interfaceConfig.collapsedSidebar %}sidebar-collapsed{% endif %}').hasClass('sidebar-collapsed')) collapsedSidebar=false;
 		interfaceConfig.collapsedSidebar=collapsedSidebar;
 		changeUserConfigParameter(interfaceConfig);
 	});

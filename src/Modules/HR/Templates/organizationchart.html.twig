@@ -11,7 +11,7 @@
 {% endblock %}
 <title>{% block title %}{{ interfaceName|trans }}{% endblock %}</title>
 <body class="page-body" data-url="{{ url('indexAdmin') }}">
-<div class="page-container"><!-- add class "sidebar-collapsed" to close sidebar by default, "chat-visible" to make chat appear always -->
+<div class="page-container {% if userData.interfaceConfig.collapsedSidebar is defined and userData.interfaceConfig.collapsedSidebar %}sidebar-collapsed{% endif %}"><!-- add class "sidebar-collapsed" to close sidebar by default, "chat-visible" to make chat appear always -->
 	{{ include('@Globale/sidebar_menu.html.twig') }}
 	<div class="main-content">
 		{{ include('@Globale/head.html.twig') }}
