@@ -82,19 +82,17 @@ class StoreManagerTransferRemember extends ContainerAwareCommand
             }
         }*/
 
-        $output->writeln('ANTES DE INFO_STOCKS');
+
         $info_stocks=$infoStocksRepository->getMinimum($store);
-        $output->writeln('DESPUES DE INFO_STOCKS');
         if($manager->getDiscordchannel()!=null){
           $channel=$manager->getDiscordchannel();
           $msg="**** ------------------ Los siguientes traspasos son al almacén ** ".$store->getName()." ------------------ ****";
           file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
           sleep(1);
         }
-        else $output->writeln('ALGO FALLA AQUI');
+        else $output->writeln($channel);
 
         foreach($info_stocks as $infostock){
-          $output->writeln('ENVIANDO TRASPASOS DE GESTORES');
           //solo mandamos la información de la talla, no del producto agrupado
           if($infostock["grouped"]=="1"){
               if($infostock["variant_name"]!=NULL){
