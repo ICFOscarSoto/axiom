@@ -90,15 +90,33 @@ class StoreManagerTransferRemember extends ContainerAwareCommand
           sleep(1);
         }
         foreach($info_stocks as $infostock){
-          $product=$productsRepository->findOneBy(["id"=>$infostock["product_id"]]);
-          $info=$infoStocksRepository->findOneBy(["product"=>$infostock["product_id"], "store"=>$store->getId()]);
-          if($manager->getDiscordchannel()!=null){
-            $channel=$manager->getDiscordchannel();
-            $msg="Ref: **".$product->getCode()."** - ".$product->getName()." realizar traspaso a **".$store->getName()."** - Cantidad: **".($info->getMaximunQuantity()-$infostock["quantity"]." unidades.**");
-            file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
-            sleep(1);
+          //solo mandamos la información de la talla, no del producto agrupado
+          if($infostock["grouped"]=="1"){
+              if($infostock["variant_name"]!=NULL){
+                $product=$productsRepository->findOneBy(["id"=>$infostock["product_id"]]);
+                $info=$infoStocksRepository->findOneBy(["product"=>$infostock["product_id"], "store"=>$store->getId()]);
+                if($manager->getDiscordchannel()!=null){
+                  $channel=$manager->getDiscordchannel();
+                  $msg="Ref: **".$product->getCode()."** - ".$product->getName()." - Talla: ".$infostock["variant_name"]." realizar traspaso a **".$store->getName()."** - Cantidad: **".($info->getMaximunQuantity()-$infostock["quantity"]." unidades.**");
+                  file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
+                  sleep(1);
+                }
+
+              }
+
           }
-        }
+          else{
+            $product=$productsRepository->findOneBy(["id"=>$infostock["product_id"]]);
+            $info=$infoStocksRepository->findOneBy(["product"=>$infostock["product_id"], "store"=>$store->getId()]);
+            if($manager->getDiscordchannel()!=null){
+              $channel=$manager->getDiscordchannel();
+              $msg="Ref: **".$product->getCode()."** - ".$product->getName()." realizar traspaso a **".$store->getName()."** - Cantidad: **".($info->getMaximunQuantity()-$infostock["quantity"]." unidades.**");
+              file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
+              sleep(1);
+            }
+
+          }
+      }
   }
 }
 ?>
