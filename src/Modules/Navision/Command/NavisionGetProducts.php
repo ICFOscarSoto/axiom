@@ -342,7 +342,7 @@ public function importStocksStoresManaged(InputInterface $input, OutputInterface
       $productVariantId = null;
       $quantity=$new_obj[3];
       $product=$repositoryProducts->findOneBy(["code"=>$new_obj[1]]);
-      $storeLocation=$repositoryStoreLocations->findOneBy(["name"=>$new_obj[5]])
+      $storeLocation=$repositoryStoreLocations->findOneBy(["name"=>$new_obj[5]]);
       $variantvalue=$repositoryVariantsValues->findOneBy(["name"=>$new_obj[2]]);
       $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product->getId(),"variantvalue"=>$variantvalue->getId()]);
       if($productvariant!=null) $productVariantId=$productvariant->getId();
