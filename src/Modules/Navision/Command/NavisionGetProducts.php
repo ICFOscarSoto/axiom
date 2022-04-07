@@ -321,34 +321,33 @@ public function importStocksStoresManaged(InputInterface $input, OutputInterface
     $old_obj=explode('~',$object['codigo_antiguo']);
     $new_obj=explode('~',$object['codigo_nuevo']);
     if ($object['accion']=='U') {
-      $productVariantId = null;
+      $productvariant = null;
       $quantity=intval($new_obj[3])-intval($old_obj[3]);
       $product=$repositoryProducts->findOneBy(["code"=>$new_obj[1]]);
       $variantvalue=$repositoryVariantsValues->findOneBy(["name"=>$new_obj[2]]);
-      $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product->getId(),"variantvalue"=>$variantvalue->getId()]);
+      if($variantvalue!=null) $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product->getId(),"variantvalue"=>$variantvalue->getId()]);
       if($productvariant!=null) $productVariantId=$productvariant->getId();
       $storeLocation=$repositoryStoreLocations->findOneBy(["name"=>$new_obj[5]]);
     }
     else if ($object['accion']=='D'){
-      $productVariantId = null;
+      $productvariant = null;
       $quantity=$old_obj[3];
       $product=$repositoryProducts->findOneBy(["code"=>$old_obj[1]]);
       $variantvalue=$repositoryVariantsValues->findOneBy(["name"=>$new_obj[2]]);
-      $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product->getId(),"variantvalue"=>$variantvalue->getId()]);
-      if($productvariant!=null) $productVariantId=$productvariant->getId();
+      if($variantvalue!=null) $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product->getId(),"variantvalue"=>$variantvalue->getId()]);
       $storeLocation=$repositoryStoreLocations->findOneBy(["name"=>$old_obj[5]]);
     }
     else {
-      $productVariantId = null;
+      $productvariant = null;
+
       $quantity=$new_obj[3];
       $product=$repositoryProducts->findOneBy(["code"=>$new_obj[1]]);
       $storeLocation=$repositoryStoreLocations->findOneBy(["name"=>$new_obj[5]]);
       $variantvalue=$repositoryVariantsValues->findOneBy(["name"=>$new_obj[2]]);
-      $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product->getId(),"variantvalue"=>$variantvalue->getId()]);
-      if($productvariant!=null) $productVariantId=$productvariant->getId();
+      if($variantvalue!=null) $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product->getId(),"variantvalue"=>$variantvalue->getId()]);
     }
 
-    if($productVariantId!=null) $stocks=$repositoryStocks->findOneBy(["product"=>$product,"productvariant"=>$productvariant, "storelocation"=>$storeLocation, "active"=>1, "deleted"=>0]);
+    if($productvariant!=null) $stocks=$repositoryStocks->findOneBy(["product"=>$product,"productvariant"=>$productvariant, "storelocation"=>$storeLocation, "active"=>1, "deleted"=>0]);
     else $stocks=$repositoryStocks->findOneBy(["product"=>$product, "storelocation"=>$storeLocation, "active"=>1, "deleted"=>0]);
     if ($stocks==null){
       $stocks=new ERPStocks();

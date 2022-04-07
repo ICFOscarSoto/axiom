@@ -15,6 +15,8 @@ use App\Modules\ERP\Entity\ERPWebProducts;
 use App\Modules\ERP\Entity\ERPEAN13;
 use App\Modules\ERP\Entity\ERPReferences;
 use App\Modules\ERP\Entity\ERPProductsAttributes;
+use App\Modules\ERP\Entity\ERPVariants;
+use App\Modules\ERP\Entity\ERPVariantsValues;
 use App\Modules\ERP\Entity\ERPManufacturers;
 use App\Modules\ERP\Entity\ERPStocks;
 use App\Modules\ERP\Entity\ERPStockHistory;
@@ -1192,9 +1194,18 @@ class ERPProductsController extends Controller
 			 $productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
 			 $product=$productRepository->findOneBy(['code'=>$object["code"]]);
 			 if ($product==null) return new JsonResponse(["result"=>-3, "text"=>"El producto ".$object["code"]." no existe en la base de datos"]);
+			 //miramos si es una variante de un producto agrupado
+			 $productvariant=null;
+			 $productVariantId = null;
+			 $repositoryVariantsValues=$this->getDoctrine()->getRepository(ERPVariantsValues::class);
+	     $repositoryProductsVariants=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
+			 $variantvalue=$repositoryVariantsValues->findOneBy(["name"=>$object["variant"]]);
+       if($variantvalue!=null) $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product->getId(),"variantvalue"=>$variantvalue->getId()]);
+       if($productvariant!=null) $productVariantId=$productvariant->getId();
 			 // buscamos la fila de los traspasos del producto y del almacén
 			 $stocksRepository=$this->getDoctrine()->getRepository(ERPStocks::class);
-	 		 $stocks=$stocksRepository->findOneBy(['storelocation'=>$storeLocation, 'product'=>$product]);
+			 if($productVariantId!=null) $stocks=$stocksRepository->findOneBy(['storelocation'=>$storeLocation, 'product'=>$product, 'productvariant'=>$productvariant, "active"=>1, "deleted"=>0]);
+	 		 else $stocks=$stocksRepository->findOneBy(['storelocation'=>$storeLocation, 'product'=>$product]);
 			 if ($stocks==null) return new JsonResponse(["result"=>-4, "text"=>"El producto  ".$object["code"]." no está en el almacén ".$store->getName()]);
 			 // actualizamos el stock del pendiente de recibir
 			 $received=(int)$object["stock"];
@@ -1212,6 +1223,7 @@ class ERPProductsController extends Controller
 				 $type=$typesRepository->findOneBy(["name"=>"Traspaso recibido"]);
 				 $stockHistory=new ERPStockHistory();
          $stockHistory->setProduct($product);
+				 if($productVariantId!=null)  $stockHistory->setProductVariant($productvariant);
          $stockHistory->setLocation($storeLocation);
          $stockHistory->setStore($store);
          $stockHistory->setUser($this->getUser());
