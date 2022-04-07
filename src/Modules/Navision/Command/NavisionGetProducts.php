@@ -369,6 +369,7 @@ public function importStocksStoresManaged(InputInterface $input, OutputInterface
     $this->doctrine->getManager()->clear();
 
     // Sumar producto al json para eliminar en tabla de cambios
+      $deleteTransfersChange=null;
       $deleteTransfersChange[] = $object;
   }
 
