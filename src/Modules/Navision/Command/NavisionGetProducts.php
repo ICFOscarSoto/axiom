@@ -375,24 +375,25 @@ public function importStocksStoresManaged(InputInterface $input, OutputInterface
 
 
   // Eliminado de tabla de cambios
-
-  $output->writeln('Eliminar cambios realizados....');
-  $postdata = http_build_query(
-      array(
-          'deleteTransfersChange' => json_encode($deleteTransfersChange)
-      )
-  );
-  $opts = array('http' =>
-      array(
-          'method'  => 'POST',
-          'header'  => 'Content-Type: application/x-www-form-urlencoded',
-          'content' => $postdata
-      )
-  );
-  $context = stream_context_create($opts);
-  file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-changeGetTransfersDelete.php',false,$context);
-  //------   Critical Section END   ------
-  //------   Remove Lock Mutex    ------
+  if($deleteTransfersChange!=null){
+    $output->writeln('Eliminar cambios realizados....');
+    $postdata = http_build_query(
+        array(
+            'deleteTransfersChange' => json_encode($deleteTransfersChange)
+        )
+    );
+    $opts = array('http' =>
+        array(
+            'method'  => 'POST',
+            'header'  => 'Content-Type: application/x-www-form-urlencoded',
+            'content' => $postdata
+        )
+    );
+    $context = stream_context_create($opts);
+    file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-changeGetTransfersDelete.php',false,$context);
+    //------   Critical Section END   ------
+    //------   Remove Lock Mutex    ------
+  }
   fclose($fp);
 
 }
