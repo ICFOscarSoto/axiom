@@ -313,28 +313,43 @@ public function importStocksStoresManaged(InputInterface $input, OutputInterface
   foreach ($objects as $object){
     $repositoryStocks=$this->doctrine->getRepository(ERPStocks::class);
     $repositoryProducts=$this->doctrine->getRepository(ERPProducts::class);
+    $repositoryVariantsValues=$this->doctrine->getRepository(ERPVariantsValues::class);
+    $repositoryProductsVariants=$this->doctrine->getRepository(ERPProductsVariants::class);
     $repositoryStoreLocations=$this->doctrine->getRepository(ERPStoreLocations::class);
     $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
     $company=$repositoryCompanies->find(2);
     $old_obj=explode('~',$object['codigo_antiguo']);
     $new_obj=explode('~',$object['codigo_nuevo']);
     if ($object['accion']=='U') {
-      $quantity=intval($new_obj[2])-intval($old_obj[2]);
+      $productVariantId = null;
+      $quantity=intval($new_obj[3])-intval($old_obj[3]);
       $product=$repositoryProducts->findOneBy(["code"=>$new_obj[1]]);
-      $storeLocation=$repositoryStoreLocations->findOneBy(["name"=>$new_obj[4]]);
+      $variantvalue=$repositoryVariantsValues->findOneBy(["name"=>$new_obj[2]]);
+      $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product->getId(),"variantvalue"=>$variantvalue->getId()]);
+      if($productvariant!=null) $productVariantId=$productvariant->getId();
+      $storeLocation=$repositoryStoreLocations->findOneBy(["name"=>$new_obj[5]]);
     }
     else if ($object['accion']=='D'){
-      $quantity=$old_obj[2];
+      $productVariantId = null;
+      $quantity=$old_obj[3];
       $product=$repositoryProducts->findOneBy(["code"=>$old_obj[1]]);
-      $storeLocation=$repositoryStoreLocations->findOneBy(["name"=>$old_obj[4]]);
+      $variantvalue=$repositoryVariantsValues->findOneBy(["name"=>$new_obj[2]]);
+      $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product->getId(),"variantvalue"=>$variantvalue->getId()]);
+      if($productvariant!=null) $productVariantId=$productvariant->getId();
+      $storeLocation=$repositoryStoreLocations->findOneBy(["name"=>$old_obj[5]]);
     }
     else {
-      $quantity=$new_obj[2];
+      $productVariantId = null;
+      $quantity=$new_obj[3];
       $product=$repositoryProducts->findOneBy(["code"=>$new_obj[1]]);
-      $storeLocation=$repositoryStoreLocations->findOneBy(["name"=>$new_obj[4]]);
+      $storeLocation=$repositoryStoreLocations->findOneBy(["name"=>$new_obj[5]])
+      $variantvalue=$repositoryVariantsValues->findOneBy(["name"=>$new_obj[2]]);
+      $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product->getId(),"variantvalue"=>$variantvalue->getId()]);
+      if($productvariant!=null) $productVariantId=$productvariant->getId();
     }
 
-    $stocks=$repositoryStocks->findOneBy(["product"=>$product, "storelocation"=>$storeLocation, "active"=>1, "deleted"=>0]);
+    if($productVariantId!=null) $stocks=$repositoryStocks->findOneBy(["product"=>$product,"productvariant"=>$productvariant, "storelocation"=>$storeLocation, "active"=>1, "deleted"=>0]);
+    else $stocks=$repositoryStocks->findOneBy(["product"=>$product, "storelocation"=>$storeLocation, "active"=>1, "deleted"=>0]);
     if ($stocks==null){
       $stocks=new ERPStocks();
       $stocks->setProduct($product);
@@ -342,6 +357,7 @@ public function importStocksStoresManaged(InputInterface $input, OutputInterface
       $stocks->setCompany($company);
       $stocks->setQuantity(0);
       $stocks->setPendingreceive($quantity);
+      if($productVariantId!=null)  $stocks->setProductVariant($productvariant);
       $stocks->setDateupd(new \Datetime());
       $stocks->setDateadd(new \Datetime());
       $stocks->setDeleted(0);
@@ -356,7 +372,10 @@ public function importStocksStoresManaged(InputInterface $input, OutputInterface
     // Sumar producto al json para eliminar en tabla de cambios
       $deleteTransfersChange[] = $object;
   }
+
+
   // Eliminado de tabla de cambios
+
   $output->writeln('Eliminar cambios realizados....');
   $postdata = http_build_query(
       array(
