@@ -309,7 +309,8 @@ public function importStocksStoresManaged(InputInterface $input, OutputInterface
   $output->writeln('* Sincronizando traspasos....');
   $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-changeGetTransfers.php');
   $objects=json_decode($json, true);
-
+  $deleteTransfersChange=null;
+  
   foreach ($objects as $object){
     $repositoryStocks=$this->doctrine->getRepository(ERPStocks::class);
     $repositoryProducts=$this->doctrine->getRepository(ERPProducts::class);
@@ -369,7 +370,6 @@ public function importStocksStoresManaged(InputInterface $input, OutputInterface
     $this->doctrine->getManager()->clear();
 
     // Sumar producto al json para eliminar en tabla de cambios
-      $deleteTransfersChange=null;
       $deleteTransfersChange[] = $object;
   }
 
