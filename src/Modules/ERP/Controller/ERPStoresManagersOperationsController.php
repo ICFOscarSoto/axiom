@@ -269,9 +269,10 @@ class ERPStoresManagersOperationsController extends Controller
 						$this->getDoctrine()->getManager()->flush();
 						//Discount quantities
 
+						$productvariant=null;
 						if($item->getVariant())
 							$productvariant=$productVariantRepository->findOneBy(["product"=>$item->getProduct(), "variantvalue"=>$item->getVariant(), "active"=>1, "deleted"=>0]);
-							else $productvariant=null;
+
 						$stock=$stocksRepository->findOneBy(["product"=>$item->getProduct(), "productvariant"=>$productvariant, "company"=>$this->getUser()->getCompany(), "storelocation"=>$location, "active"=>1, "deleted"=>0]);
 						if($stock) $stockQty=$stock->getQuantity();
 							else $stockQty=0;
@@ -284,7 +285,7 @@ class ERPStoresManagersOperationsController extends Controller
 						$stockHistory->setUser($this->getUser());
 						$stockHistory->setQuantity($qty);
 						$stockHistory->setPreviousqty($stockQty);
-						$stockHistory->setProductvariant($item->getVariant());
+						$stockHistory->setProductvariant($productvariant);
 						$stockHistory->setNewqty($stockQty-$item->getQuantity());
 						$stockHistory->setNumOperation($operation->getId());
 						$stockHistory->setType($type);
@@ -303,9 +304,6 @@ class ERPStoresManagersOperationsController extends Controller
 						}else{
 								//Stocks doesnt exist, create it
 								$stock=new ERPStocks();
-								if($item->getVariant())
-									$productvariant=$productVariantRepository->findOneBy(["product"=>$item->getProduct(), "variantvalue"=>$item->getVariant(),"active"=>1, "deleted"=>0]);
-									else $productvariant=null;
 								$stock->setProduct($item->getProduct());
 								$stock->setCompany($this->getUser()->getCompany());
 								$stock->setStorelocation($location);
