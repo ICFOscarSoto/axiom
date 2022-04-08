@@ -310,7 +310,7 @@ public function importStocksStoresManaged(InputInterface $input, OutputInterface
   $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-changeGetTransfers.php');
   $objects=json_decode($json, true);
   $deleteTransfersChange=null;
-  
+
   foreach ($objects as $object){
     $repositoryStocks=$this->doctrine->getRepository(ERPStocks::class);
     $repositoryProducts=$this->doctrine->getRepository(ERPProducts::class);
@@ -321,22 +321,27 @@ public function importStocksStoresManaged(InputInterface $input, OutputInterface
     $company=$repositoryCompanies->find(2);
     $old_obj=explode('~',$object['codigo_antiguo']);
     $new_obj=explode('~',$object['codigo_nuevo']);
+
     if ($object['accion']=='U') {
       $productvariant = null;
       $quantity=intval($new_obj[3])-intval($old_obj[3]);
       $product=$repositoryProducts->findOneBy(["code"=>$new_obj[1]]);
-      $variantvalue=$repositoryVariantsValues->findOneBy(["name"=>$new_obj[2]]);
-      if($variantvalue!=null) $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product->getId(),"variantvalue"=>$variantvalue->getId()]);
-      if($productvariant!=null) $productVariantId=$productvariant->getId();
       $storeLocation=$repositoryStoreLocations->findOneBy(["name"=>$new_obj[5]]);
+      if($new_obj[2]!=""){
+        $variantvalue=$repositoryVariantsValues->findOneBy(["name"=>$new_obj[2]]);
+        if($variantvalue!=null) $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product,"variantvalue"=>$variantvalue]);
+      }
     }
     else if ($object['accion']=='D'){
       $productvariant = null;
       $quantity=$old_obj[3];
       $product=$repositoryProducts->findOneBy(["code"=>$old_obj[1]]);
-      $variantvalue=$repositoryVariantsValues->findOneBy(["name"=>$new_obj[2]]);
-      if($variantvalue!=null) $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product->getId(),"variantvalue"=>$variantvalue->getId()]);
       $storeLocation=$repositoryStoreLocations->findOneBy(["name"=>$old_obj[5]]);
+      if($new_obj[2]!=""){
+        $variantvalue=$repositoryVariantsValues->findOneBy(["name"=>$new_obj[2]]);
+        if($variantvalue!=null) $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product,"variantvalue"=>$variantvalue]);
+      }
+
     }
     else {
       $productvariant = null;
@@ -344,8 +349,10 @@ public function importStocksStoresManaged(InputInterface $input, OutputInterface
       $quantity=$new_obj[3];
       $product=$repositoryProducts->findOneBy(["code"=>$new_obj[1]]);
       $storeLocation=$repositoryStoreLocations->findOneBy(["name"=>$new_obj[5]]);
-      $variantvalue=$repositoryVariantsValues->findOneBy(["name"=>$new_obj[2]]);
-      if($variantvalue!=null) $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product->getId(),"variantvalue"=>$variantvalue->getId()]);
+      if($new_obj[2]!=""){
+        $variantvalue=$repositoryVariantsValues->findOneBy(["name"=>$new_obj[2]]);
+        if($variantvalue!=null) $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product,"variantvalue"=>$variantvalue]);
+      }
     }
 
     if($productvariant!=null) $stocks=$repositoryStocks->findOneBy(["product"=>$product,"productvariant"=>$productvariant, "storelocation"=>$storeLocation, "active"=>1, "deleted"=>0]);
@@ -371,10 +378,12 @@ public function importStocksStoresManaged(InputInterface $input, OutputInterface
 
     // Sumar producto al json para eliminar en tabla de cambios
       $deleteTransfersChange[] = $object;
+
   }
 
 
   // Eliminado de tabla de cambios
+
   if($deleteTransfersChange!=null){
     $output->writeln('Eliminar cambios realizados....');
     $postdata = http_build_query(
@@ -947,7 +956,7 @@ public function importStock(InputInterface $input, OutputInterface $output, $cod
 
       if($product) {
             $productVariantId = null;
-            $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product->getId(),"variantvalue"=>$variantvalue]);
+            $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product,"variantvalue"=>$variantvalue]);
             if($productvariant!=null) {
               $productVariantId=$productvariant->getId();
               $old_stocks=$repositoryStocks->stockVariantUpdate($productvariant->getId(), $stock["almacen"]);
@@ -1040,7 +1049,7 @@ public function importStocks(InputInterface $input, OutputInterface $output) {
 
       if($product) {
             $productVariantId = null;
-            $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product->getId(),"variantvalue"=>$variantvalue]);
+            $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product,"variantvalue"=>$variantvalue]);
             if($productvariant!=null) {
               $productVariantId=$productvariant->getId();
               $old_stocks=$repositoryStocks->stockVariantUpdate($productvariant->getId(), $stock["almacen"]);
@@ -1149,7 +1158,7 @@ public function updateStocksStoresManaged(InputInterface $input, OutputInterface
       $variantvalue=$repositoryVariantsValues->findOneBy(["name"=>$namenameVariantValue]);
 
       if($product) {
-            $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product->getId(),"variantvalue"=>$variantvalue]);
+            $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product,"variantvalue"=>$variantvalue]);
             if($productvariant!=null) {
               $old_stocks=$repositoryStocks->stockVariantUpdate($productvariant->getId(), $stock["almacen"]);
               $output->writeln('El producto '.$product->getId().' tiene la variante '.$stock["variant"]);
@@ -1209,7 +1218,7 @@ public function updateStocksStoresManaged(InputInterface $input, OutputInterface
           }
           else {
           $icon=":warning: ";
-          $msg=" Fallo en el maxEntry de los almacenes gestioandos";
+          $msg=" Fallo en el maxEntry de los almacenes gestinandos";
           //Send notification
           file_get_contents("https://icfbot.ferreteriacampollano.com/message.php?channel=".$this->discordchannel."&msg=".urlencode($icon."Sincronizacion : ".$msg));
         }
