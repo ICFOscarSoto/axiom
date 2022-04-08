@@ -9,6 +9,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use App\Modules\Globale\Entity\GlobaleUsers;
 use App\Modules\ERP\Entity\ERPStoreLocations;
 use App\Modules\ERP\Entity\ERPProductsVariants;
+use App\Modules\ERP\Entity\ERPVariantsValues;
 use App\Modules\ERP\Entity\ERPStocks;
 use App\Modules\ERP\Entity\ERPStockHistory;
 use App\Modules\ERP\Entity\ERPInfoStocks;
@@ -38,6 +39,7 @@ class StoreManagerTransferRemember extends ContainerAwareCommand
         $usersRepository=$doctrine->getRepository(GlobaleUsers::class);
         $locationsRepository=$doctrine->getRepository(ERPStoreLocations::class);
         $productsVariantsRepository=$doctrine->getRepository(ERPProductsVariants::class);
+        $variantsValuesRepository=$doctrine->getRepository(ERPVariantsValues::class);
         $stocksRepository=$doctrine->getRepository(ERPStocks::class);
         $stockHistoryRepository=$doctrine->getRepository(ERPStockHistory::class);
         $infoStocksRepository=$doctrine->getRepository(ERPInfoStocks::class);
@@ -96,14 +98,18 @@ class StoreManagerTransferRemember extends ContainerAwareCommand
           if($infostock["grouped"]=="1"){
               if($infostock["variant_name"]!=NULL){
                 $product=$productsRepository->findOneBy(["id"=>$infostock["product_id"]]);
-                $info=$infoStocksRepository->findOneBy(["product"=>$infostock["product_id"], "store"=>$store->getId()]);
-                if($manager->getDiscordchannel()!=null){
-                  $channel=$manager->getDiscordchannel();
-                  $msg="Ref: **".$product->getCode()."** - ".$product->getName()." - Talla: ".$infostock["variant_name"]." realizar traspaso a **".$store->getName()."** - Cantidad: **".($info->getMaximunQuantity()-$infostock["quantity"]." unidades.**");
-                  file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
-                  sleep(1);
+                $variantvalue=$variantsValuesRepository->findOneBy(["name"=>$infostock["variant_name"]]);
+                $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product->getId(),"variantvalue"=>$variantvalue->getId()]);
+                $info=$infoStocksRepository->findOneBy(["product"=>$infostock["product_id"], "productvariant"=>$productvariant, "store"=>$store->getId()]);
+                $minQuantity=$info->getMinimumQuantity();
+                if($infostock["quantity"]<$minQuantity){
+                  if($manager->getDiscordchannel()!=null){
+                    $channel=$manager->getDiscordchannel();
+                    $msg="Ref: **".$product->getCode()."** - ".$product->getName()." - Talla: ".$infostock["variant_name"]." realizar traspaso a **".$store->getName()."** - Cantidad: **".($info->getMaximunQuantity()-$infostock["quantity"]." unidades.**");
+                    file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
+                    sleep(1);
+                  }
                 }
-
               }
 
           }
