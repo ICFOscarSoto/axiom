@@ -81,11 +81,6 @@ class NavisionTransfers
      */
     private $received;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Modules\ERP\Entity\ERPProductsVariants")
-     */
-    private $productvariant;
-
     public function getId(): ?int
     {
         return $this->id;
@@ -231,18 +226,6 @@ class NavisionTransfers
     public function setReceived(bool $received): self
     {
         $this->received = $received;
-
-        return $this;
-    }
-
-    public function getProductvariant(): ?ERPProductsVariants
-    {
-        return $this->productvariant;
-    }
-
-    public function setProductvariant(?ERPProductsVariants $productvariant): self
-    {
-        $this->productvariant = $productvariant;
 
         return $this;
     }
