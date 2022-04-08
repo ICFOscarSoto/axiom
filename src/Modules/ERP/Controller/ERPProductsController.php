@@ -1134,9 +1134,9 @@ class ERPProductsController extends Controller
 				 $objects=$objects[0]["class"];
 			 }
 			 foreach ($objects as $object){
-				 	$transfersRepository=$this->getDoctrine()->getRepository(NavisionTransfers::class);
-				 	$productsRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
-				 	$storesRepository=$this->getDoctrine()->getRepository(ERPStores::class);
+				 	 $transfersRepository=$this->getDoctrine()->getRepository(NavisionTransfers::class);
+				 	 $productsRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
+				 	 $storesRepository=$this->getDoctrine()->getRepository(ERPStores::class);
 					 $product=$productsRepository->findOneBy(["code"=>$object["code"]]);
 					 $item=$transfersRepository->findOneBy(["name"=>$name, "product"=>$product, "active"=>1, "deleted"=>0]);
 					 if ($item==null){
@@ -1196,15 +1196,14 @@ class ERPProductsController extends Controller
 			 if ($product==null) return new JsonResponse(["result"=>-3, "text"=>"El producto ".$object["code"]." no existe en la base de datos"]);
 			 //miramos si es una variante de un producto agrupado
 			 $productvariant=null;
-			 $productVariantId = null;
+			 $variantvalue=null;
 			 $repositoryVariantsValues=$this->getDoctrine()->getRepository(ERPVariantsValues::class);
 	     $repositoryProductsVariants=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
-			 $variantvalue=$repositoryVariantsValues->findOneBy(["name"=>$object["variant"]]);
-       if($variantvalue!=null) $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product->getId(),"variantvalue"=>$variantvalue->getId()]);
-       if($productvariant!=null) $productVariantId=$productvariant->getId();
+			 if($object["variant"]!="") $variantvalue=$repositoryVariantsValues->findOneBy(["name"=>$object["variant"]]);
+       if($variantvalue!=null) $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product,"variantvalue"=>$variantvalue]);
 			 // buscamos la fila de los traspasos del producto y del almacén
 			 $stocksRepository=$this->getDoctrine()->getRepository(ERPStocks::class);
-			 if($productVariantId!=null) $stocks=$stocksRepository->findOneBy(['storelocation'=>$storeLocation, 'product'=>$product, 'productvariant'=>$productvariant, "active"=>1, "deleted"=>0]);
+			 if($productvariant!=null) $stocks=$stocksRepository->findOneBy(['storelocation'=>$storeLocation, 'product'=>$product, 'productvariant'=>$productvariant, "active"=>1, "deleted"=>0]);
 	 		 else $stocks=$stocksRepository->findOneBy(['storelocation'=>$storeLocation, 'product'=>$product]);
 			 if ($stocks==null) return new JsonResponse(["result"=>-4, "text"=>"El producto  ".$object["code"]." no está en el almacén ".$store->getName()]);
 			 // actualizamos el stock del pendiente de recibir
