@@ -99,6 +99,7 @@ class StoreManagerTransferRemember extends ContainerAwareCommand
               if($infostock["variant_name"]!=NULL){
                 $product=$productsRepository->findOneBy(["id"=>$infostock["product_id"]]);
                 $variantvalue=$variantsValuesRepository->findOneBy(["name"=>$infostock["variant_name"]]);
+                $output->writeln('Variant name:'.$infostock["variant_name"]);
                 $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product->getId(),"variantvalue"=>$variantvalue->getId()]);
                 $info=$infoStocksRepository->findOneBy(["product"=>$infostock["product_id"], "productvariant"=>$productvariant, "store"=>$store->getId()]);
                 $minQuantity=$info->getMinimumQuantity();
