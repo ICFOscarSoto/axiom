@@ -1,0 +1,4 @@
+[
+  {"id": "editUses", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"genericdata", "routeParams":{"module":"Vehicles", "name":"Uses", "type":"modal" }, "modal":"Uses", "actionType" : "background", "confirm" :false, "tooltip":""},
+  {"id": "deleteUses", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"genericdelete", "routeParams":{"module":"Vehicles", "name":"Uses"}, "confirm" :true, "undo" :false, "actionType" : "background", "tooltip":""}
+]

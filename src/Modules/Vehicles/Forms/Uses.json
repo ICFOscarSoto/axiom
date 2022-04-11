@@ -1,0 +1,27 @@
+[{
+    "sections": [
+        {
+            "name": "data",
+            "fields": [
+                {
+                    "name": "worker",
+                    "cols": 4,
+                    "caption": "Worker"
+                },
+                {
+                    "name": "start",
+                    "cols": 4
+                },
+                {
+                    "name": "end",
+                    "cols": 4
+                },
+                {
+                    "name": "observations",
+                    "cols": 12,
+                    "class": "wysiwyg"
+                }
+            ]
+        }
+    ]
+}]

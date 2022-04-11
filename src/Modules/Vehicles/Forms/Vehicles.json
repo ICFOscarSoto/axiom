@@ -13,6 +13,14 @@
                     "cols": 4
                 },
                 {
+                    "name": "fueltype",
+                    "cols": 4
+                },
+                {
+                    "name": "responsible",
+                    "cols": 4
+                },
+                {
                     "name": "licenseplate",
                     "cols": 2
                 },
@@ -48,10 +56,6 @@
                     "name": "km",
                     "cols": 2,
                     "readonly": "noChange"
-                },
-                {
-                    "name": "active",
-                    "cols": 4
                 }
 
             ]

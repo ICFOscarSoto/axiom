@@ -1,0 +1,9 @@
+[
+    {"name": "id", "caption": "id"},
+    {"name": "worker__name_o_worker__lastname", "caption": "Worker"},
+    {"name": "start", "caption": "start", "type": "datetime"},
+    {"name": "start_location", "caption":"", "type": "location", "data": {"latitude": "startlatitude", "longitude": "startlongitude"}},
+    {"name": "end", "caption": "end", "type": "datetime"},
+    {"name": "end_location", "caption":"", "type": "location", "data": {"latitude": "endlatitude", "longitude": "endlongitude"}},
+    {"name": "author__name_o_author__lastname", "caption": "Author"}
+]

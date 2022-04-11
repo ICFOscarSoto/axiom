@@ -12,6 +12,10 @@
         "caption": "Model"
     },
     {
+        "name": "fueltype__name",
+        "caption": "Fuel"
+    },
+    {
         "name": "licenseplate",
         "caption": "Licenseplate"
     },
