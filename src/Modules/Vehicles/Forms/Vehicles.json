@@ -3,7 +3,7 @@
         {
             "name": "data",
             "fields": [
-                { "name": "vehicleImage", "cols": 4,	"type": "gallery", "imageType":"vehicles", "value": "getImage", "width": "100%",	"height": "250px"},
+                { "name": "vehicleImage", "cols": 3,	"type": "gallery", "imageType":"vehicles", "value": "getImage", "width": "100%",	"height": "300px"},
                 {
                     "name": "brand",
                     "cols": 4
