@@ -84,7 +84,7 @@ class VehiclesVehiclesController extends Controller
 	 					'tab' => $request->query->get('tab','data'), //Show initial tab, by default data tab
 	 					'tabs' => [["name" => "data", "caption"=>"Datos vehículo", "icon"=>"fa-address-card-o","active"=>true, "route"=>$this->generateUrl("dataVehicle",["id"=>$id])],
 											 ["name" => "uses", "caption"=>"Usos vehículo", "icon"=>"fa-gas-pump", "route"=>$this->generateUrl("generictablist",["module"=>"Vehicles", "name"=>"Uses", "id"=>$id])],
-											 ["name" => "refuelings", "caption"=>"Repostajes", "icon"=>"fa-gas-pump", "route"=>$this->generateUrl("generictablist",["module"=>"Vehicles", "name"=>"Refuelings", "id"=>$id])],
+											 /*["name" => "refuelings", "caption"=>"Repostajes", "icon"=>"fa-gas-pump", "route"=>$this->generateUrl("generictablist",["module"=>"Vehicles", "name"=>"Refuelings", "id"=>$id])],*/
 											 ["name" => "files", "icon"=>"fa fa-cloud", "caption"=>"Archivos", "route"=>$this->generateUrl("cloudfiles",["id"=>$id, "path"=>"vehicles", "module"=>"Vehicles", "types"=>json_encode(["Permiso circulación","Ficha técnica","Poliza seguro","Resultado inspección","Otros"])])]
 	 										],
 	 					'include_header' => [["type"=>"css", "path"=>"/js/jvectormap/jquery-jvectormap-1.2.2.css"],
