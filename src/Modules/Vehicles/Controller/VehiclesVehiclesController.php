@@ -158,10 +158,14 @@ class VehiclesVehiclesController extends Controller
  			//Comprobamos que el usuario no tenga otro vehiculo en uso
  			$vehicleUse=$vehicleUsesRepository->findOneBy(['worker'=>$worker, 'end'=>null, 'active'=>1, 'deleted'=>0]);
  			if($vehicleUse) return new JsonResponse(['result'=>-1, 'text'=>'Ya hay un vehiculo en uso por el usuario']);
-			//Comprobamos que el vehiculo no este cogido por otro usuario
+			//Comprobamos que existe el vehículo
 			$vehicle=$vehicleRepository->findOneBy(["id"=>$id, "active"=>1, "deleted"=>0]);
 			if(!$vehicle) return new JsonResponse(['result'=>-1, 'text'=>'No existe el vehiculo escaneado']);
- 			if($vehicle->getCompany()!=$this->getUser()->getCompany()) return new JsonResponse(['result'=>-1, 'text'=>'No existe el vehiculo escaneado']);
+			//Comprobamos que el vehiculo no este cogido por otro usuario
+			$vehicleUse=$vehicleUsesRepository->findOneBy(['vehicle'=>$vehicle, 'end'=>null, 'active'=>1, 'deleted'=>0]);
+			if($vehicleUse) return new JsonResponse(['result'=>-1, 'text'=>'Este vehiculo ya esta en uso por otro usuario']);
+
+			if($vehicle->getCompany()!=$this->getUser()->getCompany()) return new JsonResponse(['result'=>-1, 'text'=>'No existe el vehiculo escaneado']);
 			$vehicleUse = new VehiclesUses();
 			$vehicleUse->setStart(new \DateTime());
 			$vehicleUse->setVehicle($vehicle);
