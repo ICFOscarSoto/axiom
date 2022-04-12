@@ -321,8 +321,6 @@ public function importStocksStoresManaged(InputInterface $input, OutputInterface
     $company=$repositoryCompanies->find(2);
     $old_obj=explode('~',$object['codigo_antiguo']);
     $new_obj=explode('~',$object['codigo_nuevo']);
-
-
     if ($object['accion']=='U') {
       $productvariant = null;
       $quantity=intval($new_obj[3])-intval($old_obj[3]);
@@ -346,7 +344,6 @@ public function importStocksStoresManaged(InputInterface $input, OutputInterface
     }
     else {
       $productvariant = null;
-
       $quantity=$new_obj[3];
       $product=$repositoryProducts->findOneBy(["code"=>$new_obj[1]]);
       $storeLocation=$repositoryStoreLocations->findOneBy(["name"=>$new_obj[5]]);
@@ -358,25 +355,27 @@ public function importStocksStoresManaged(InputInterface $input, OutputInterface
 
     if($productvariant!=null) $stocks=$repositoryStocks->findOneBy(["product"=>$product,"productvariant"=>$productvariant, "storelocation"=>$storeLocation, "active"=>1, "deleted"=>0]);
     else $stocks=$repositoryStocks->findOneBy(["product"=>$product, "storelocation"=>$storeLocation, "active"=>1, "deleted"=>0]);
-    if ($stocks==null){
-      $stocks=new ERPStocks();
-      $stocks->setProduct($product);
-      $stocks->setStoreLocation($storeLocation);
-      $stocks->setCompany($company);
-      $stocks->setQuantity(0);
-      $stocks->setPendingreceive($quantity);
-      if($productvariant!=null)  $stocks->setProductVariant($productvariant);
-      $stocks->setDateupd(new \Datetime());
-      $stocks->setDateadd(new \Datetime());
-      $stocks->setDeleted(0);
-      $stocks->setActive(1);
-    } else {
-    $stocks->setPendingreceive($stocks->getPendingreceive()+$quantity);
+    if($product!=null)
+    {
+      if ($stocks==null ){
+        $stocks=new ERPStocks();
+        $stocks->setProduct($product);
+        $stocks->setStoreLocation($storeLocation);
+        $stocks->setCompany($company);
+        $stocks->setQuantity(0);
+        $stocks->setPendingreceive($quantity);
+        if($productvariant!=null)  $stocks->setProductVariant($productvariant);
+        $stocks->setDateupd(new \Datetime());
+        $stocks->setDateadd(new \Datetime());
+        $stocks->setDeleted(0);
+        $stocks->setActive(1);
+      } else {
+      $stocks->setPendingreceive($stocks->getPendingreceive()+$quantity);
+      }
+      $this->doctrine->getManager()->merge($stocks);
+      $this->doctrine->getManager()->flush();
+      $this->doctrine->getManager()->clear();
     }
-    $this->doctrine->getManager()->merge($stocks);
-    $this->doctrine->getManager()->flush();
-    $this->doctrine->getManager()->clear();
-
     // Sumar producto al json para eliminar en tabla de cambios
       $deleteTransfersChange[] = $object;
 
@@ -384,7 +383,7 @@ public function importStocksStoresManaged(InputInterface $input, OutputInterface
 
 
   // Eliminado de tabla de cambios
-
+/*
   if($deleteTransfersChange!=null){
     $output->writeln('Eliminar cambios realizados....');
     $postdata = http_build_query(
@@ -403,7 +402,7 @@ public function importStocksStoresManaged(InputInterface $input, OutputInterface
     file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-changeGetTransfersDelete.php',false,$context);
     //------   Critical Section END   ------
     //------   Remove Lock Mutex    ------
-  }
+  }*/
   fclose($fp);
 
 }
