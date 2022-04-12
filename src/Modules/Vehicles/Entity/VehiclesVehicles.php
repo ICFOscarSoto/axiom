@@ -2,6 +2,8 @@
 
 namespace App\Modules\Vehicles\Entity;
 
+use App\Modules\HR\Entity\HRWorkers;
+use App\Modules\Vehicles\Entity\VehiclesFuels;
 use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
 use \App\Modules\Globale\Entity\GlobaleCountries;
@@ -94,6 +96,17 @@ class VehiclesVehicles
      * @ORM\Column(type="integer")
      */
     private $fuelcapacity;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Modules\Vehicles\Entity\VehiclesFuels")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $fueltype;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Modules\HR\Entity\HRWorkers")
+     */
+    private $responsible;
 
     public function getId(): ?int
     {
@@ -276,6 +289,44 @@ class VehiclesVehicles
     public function setFuelcapacity(int $fuelcapacity): self
     {
         $this->fuelcapacity = $fuelcapacity;
+
+        return $this;
+    }
+
+    public function encodeJson($doctrine){
+      $array['id']=$this->id;
+      $array['brand']=$this->brand;
+      $array['model']=$this->model;
+      $array['licenseplate']=$this->licenseplate;
+      $array['vin']=$this->vin;
+      $array['color']=$this->color;
+      $array['fuelcapacity']=$this->fuelcapacity;
+      if($this->fueltype)
+        $array['fuel']=$this->fueltype->getName();
+        else $array['fuel']='';
+      return $array;
+    }
+
+    public function getFueltype(): ?VehiclesFuels
+    {
+        return $this->fueltype;
+    }
+
+    public function setFueltype(?VehiclesFuels $fueltype): self
+    {
+        $this->fueltype = $fueltype;
+
+        return $this;
+    }
+
+    public function getResponsible(): ?HRWorkers
+    {
+        return $this->responsible;
+    }
+
+    public function setResponsible(?HRWorkers $responsible): self
+    {
+        $this->responsible = $responsible;
 
         return $this;
     }
