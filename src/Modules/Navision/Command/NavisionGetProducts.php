@@ -383,7 +383,7 @@ public function importStocksStoresManaged(InputInterface $input, OutputInterface
 
 
   // Eliminado de tabla de cambios
-/*
+
   if($deleteTransfersChange!=null){
     $output->writeln('Eliminar cambios realizados....');
     $postdata = http_build_query(
@@ -402,7 +402,7 @@ public function importStocksStoresManaged(InputInterface $input, OutputInterface
     file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-changeGetTransfersDelete.php',false,$context);
     //------   Critical Section END   ------
     //------   Remove Lock Mutex    ------
-  }*/
+  }
   fclose($fp);
 
 }
