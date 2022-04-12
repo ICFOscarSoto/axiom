@@ -322,6 +322,7 @@ public function importStocksStoresManaged(InputInterface $input, OutputInterface
     $old_obj=explode('~',$object['codigo_antiguo']);
     $new_obj=explode('~',$object['codigo_nuevo']);
 
+
     if ($object['accion']=='U') {
       $productvariant = null;
       $quantity=intval($new_obj[3])-intval($old_obj[3]);
@@ -364,7 +365,7 @@ public function importStocksStoresManaged(InputInterface $input, OutputInterface
       $stocks->setCompany($company);
       $stocks->setQuantity(0);
       $stocks->setPendingreceive($quantity);
-      if($productVariantId!=null)  $stocks->setProductVariant($productvariant);
+      if($productvariant!=null)  $stocks->setProductVariant($productvariant);
       $stocks->setDateupd(new \Datetime());
       $stocks->setDateadd(new \Datetime());
       $stocks->setDeleted(0);
