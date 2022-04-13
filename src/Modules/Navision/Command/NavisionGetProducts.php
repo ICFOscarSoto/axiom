@@ -355,7 +355,7 @@ public function importStocksStoresManaged(InputInterface $input, OutputInterface
 
     if($productvariant!=null) $stocks=$repositoryStocks->findOneBy(["product"=>$product,"productvariant"=>$productvariant, "storelocation"=>$storeLocation, "active"=>1, "deleted"=>0]);
     else $stocks=$repositoryStocks->findOneBy(["product"=>$product, "storelocation"=>$storeLocation, "active"=>1, "deleted"=>0]);
-    if($product!=null)
+    if($product!=null AND $storeLocation!=null)
     {
       if ($stocks==null ){
         $stocks=new ERPStocks();
@@ -403,6 +403,7 @@ public function importStocksStoresManaged(InputInterface $input, OutputInterface
     //------   Critical Section END   ------
     //------   Remove Lock Mutex    ------
   }
+
   fclose($fp);
 
 }
