@@ -687,7 +687,10 @@ Fueltype: Combustible
 Responsible: Responsable
 Vin: Num. Bastidor
 priceunit: Precio Unidad
+Priceunit: Precio Unidad
+Percentfuel: Porcentaje en deposito
 Select vehiclesfuels: Seleccione combustible
+result: Resultado
 
 #PLAZA VOUCHERS
 #----------------------------------------------------------------------------------------------------------------------
