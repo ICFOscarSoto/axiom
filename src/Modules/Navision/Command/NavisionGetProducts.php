@@ -309,71 +309,101 @@ public function importStocksStoresManaged(InputInterface $input, OutputInterface
   $output->writeln('* Sincronizando traspasos....');
   $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-changeGetTransfers.php');
   $objects=json_decode($json, true);
+  $deleteTransfersChange=null;
 
   foreach ($objects as $object){
     $repositoryStocks=$this->doctrine->getRepository(ERPStocks::class);
     $repositoryProducts=$this->doctrine->getRepository(ERPProducts::class);
+    $repositoryVariantsValues=$this->doctrine->getRepository(ERPVariantsValues::class);
+    $repositoryProductsVariants=$this->doctrine->getRepository(ERPProductsVariants::class);
     $repositoryStoreLocations=$this->doctrine->getRepository(ERPStoreLocations::class);
     $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
     $company=$repositoryCompanies->find(2);
     $old_obj=explode('~',$object['codigo_antiguo']);
     $new_obj=explode('~',$object['codigo_nuevo']);
     if ($object['accion']=='U') {
-      $quantity=intval($new_obj[2])-intval($old_obj[2]);
+      $productvariant = null;
+      $quantity=intval($new_obj[3])-intval($old_obj[3]);
       $product=$repositoryProducts->findOneBy(["code"=>$new_obj[1]]);
-      $storeLocation=$repositoryStoreLocations->findOneBy(["name"=>$new_obj[4]]);
+      $storeLocation=$repositoryStoreLocations->findOneBy(["name"=>$new_obj[5]]);
+      if($new_obj[2]!=""){
+        $variantvalue=$repositoryVariantsValues->findOneBy(["name"=>$new_obj[2]]);
+        if($variantvalue!=null) $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product,"variantvalue"=>$variantvalue]);
+      }
     }
     else if ($object['accion']=='D'){
-      $quantity=$old_obj[2];
+      $productvariant = null;
+      $quantity=$old_obj[3];
       $product=$repositoryProducts->findOneBy(["code"=>$old_obj[1]]);
-      $storeLocation=$repositoryStoreLocations->findOneBy(["name"=>$old_obj[4]]);
+      $storeLocation=$repositoryStoreLocations->findOneBy(["name"=>$old_obj[5]]);
+      if($new_obj[2]!=""){
+        $variantvalue=$repositoryVariantsValues->findOneBy(["name"=>$new_obj[2]]);
+        if($variantvalue!=null) $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product,"variantvalue"=>$variantvalue]);
+      }
+
     }
     else {
-      $quantity=$new_obj[2];
+      $productvariant = null;
+      $quantity=$new_obj[3];
       $product=$repositoryProducts->findOneBy(["code"=>$new_obj[1]]);
-      $storeLocation=$repositoryStoreLocations->findOneBy(["name"=>$new_obj[4]]);
+      $storeLocation=$repositoryStoreLocations->findOneBy(["name"=>$new_obj[5]]);
+      if($new_obj[2]!=""){
+        $variantvalue=$repositoryVariantsValues->findOneBy(["name"=>$new_obj[2]]);
+        if($variantvalue!=null) $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product,"variantvalue"=>$variantvalue]);
+      }
     }
 
-    $stocks=$repositoryStocks->findOneBy(["product"=>$product, "storelocation"=>$storeLocation, "active"=>1, "deleted"=>0]);
-    if ($stocks==null){
-      $stocks=new ERPStocks();
-      $stocks->setProduct($product);
-      $stocks->setStoreLocation($storeLocation);
-      $stocks->setCompany($company);
-      $stocks->setQuantity(0);
-      $stocks->setPendingreceive($quantity);
-      $stocks->setDateupd(new \Datetime());
-      $stocks->setDateadd(new \Datetime());
-      $stocks->setDeleted(0);
-      $stocks->setActive(1);
-    } else {
-    $stocks->setPendingreceive($stocks->getPendingreceive()+$quantity);
+    if($productvariant!=null) $stocks=$repositoryStocks->findOneBy(["product"=>$product,"productvariant"=>$productvariant, "storelocation"=>$storeLocation, "active"=>1, "deleted"=>0]);
+    else $stocks=$repositoryStocks->findOneBy(["product"=>$product, "storelocation"=>$storeLocation, "active"=>1, "deleted"=>0]);
+    if($product!=null AND $storeLocation!=null)
+    {
+      if ($stocks==null ){
+        $stocks=new ERPStocks();
+        $stocks->setProduct($product);
+        $stocks->setStoreLocation($storeLocation);
+        $stocks->setCompany($company);
+        $stocks->setQuantity(0);
+        $stocks->setPendingreceive($quantity);
+        if($productvariant!=null)  $stocks->setProductVariant($productvariant);
+        $stocks->setDateupd(new \Datetime());
+        $stocks->setDateadd(new \Datetime());
+        $stocks->setDeleted(0);
+        $stocks->setActive(1);
+      } else {
+      $stocks->setPendingreceive($stocks->getPendingreceive()+$quantity);
+      }
+      $this->doctrine->getManager()->merge($stocks);
+      $this->doctrine->getManager()->flush();
+      $this->doctrine->getManager()->clear();
     }
-    $this->doctrine->getManager()->merge($stocks);
-    $this->doctrine->getManager()->flush();
-    $this->doctrine->getManager()->clear();
-
     // Sumar producto al json para eliminar en tabla de cambios
       $deleteTransfersChange[] = $object;
+
   }
+
+
   // Eliminado de tabla de cambios
-  $output->writeln('Eliminar cambios realizados....');
-  $postdata = http_build_query(
-      array(
-          'deleteTransfersChange' => json_encode($deleteTransfersChange)
-      )
-  );
-  $opts = array('http' =>
-      array(
-          'method'  => 'POST',
-          'header'  => 'Content-Type: application/x-www-form-urlencoded',
-          'content' => $postdata
-      )
-  );
-  $context = stream_context_create($opts);
-  file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-changeGetTransfersDelete.php',false,$context);
-  //------   Critical Section END   ------
-  //------   Remove Lock Mutex    ------
+
+  if($deleteTransfersChange!=null){
+    $output->writeln('Eliminar cambios realizados....');
+    $postdata = http_build_query(
+        array(
+            'deleteTransfersChange' => json_encode($deleteTransfersChange)
+        )
+    );
+    $opts = array('http' =>
+        array(
+            'method'  => 'POST',
+            'header'  => 'Content-Type: application/x-www-form-urlencoded',
+            'content' => $postdata
+        )
+    );
+    $context = stream_context_create($opts);
+    file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-changeGetTransfersDelete.php',false,$context);
+    //------   Critical Section END   ------
+    //------   Remove Lock Mutex    ------
+  }
+
   fclose($fp);
 
 }
@@ -927,7 +957,7 @@ public function importStock(InputInterface $input, OutputInterface $output, $cod
 
       if($product) {
             $productVariantId = null;
-            $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product->getId(),"variantvalue"=>$variantvalue]);
+            $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product,"variantvalue"=>$variantvalue]);
             if($productvariant!=null) {
               $productVariantId=$productvariant->getId();
               $old_stocks=$repositoryStocks->stockVariantUpdate($productvariant->getId(), $stock["almacen"]);
@@ -1020,7 +1050,7 @@ public function importStocks(InputInterface $input, OutputInterface $output) {
 
       if($product) {
             $productVariantId = null;
-            $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product->getId(),"variantvalue"=>$variantvalue]);
+            $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product,"variantvalue"=>$variantvalue]);
             if($productvariant!=null) {
               $productVariantId=$productvariant->getId();
               $old_stocks=$repositoryStocks->stockVariantUpdate($productvariant->getId(), $stock["almacen"]);
@@ -1129,7 +1159,7 @@ public function updateStocksStoresManaged(InputInterface $input, OutputInterface
       $variantvalue=$repositoryVariantsValues->findOneBy(["name"=>$namenameVariantValue]);
 
       if($product) {
-            $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product->getId(),"variantvalue"=>$variantvalue]);
+            $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product,"variantvalue"=>$variantvalue]);
             if($productvariant!=null) {
               $old_stocks=$repositoryStocks->stockVariantUpdate($productvariant->getId(), $stock["almacen"]);
               $output->writeln('El producto '.$product->getId().' tiene la variante '.$stock["variant"]);
@@ -1189,7 +1219,7 @@ public function updateStocksStoresManaged(InputInterface $input, OutputInterface
           }
           else {
           $icon=":warning: ";
-          $msg=" Fallo en el maxEntry de los almacenes gestioandos";
+          $msg=" Fallo en el maxEntry de los almacenes gestinandos";
           //Send notification
           file_get_contents("https://icfbot.ferreteriacampollano.com/message.php?channel=".$this->discordchannel."&msg=".urlencode($icon."Sincronizacion : ".$msg));
         }

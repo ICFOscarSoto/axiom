@@ -59,7 +59,7 @@
 	<div class="tile-progress tile-default" style="bottom: 0px;">
 		<div class="title menu-expanded" style="padding-bottom: 10px; padding-left:22px">
 				<i class="fa fa-database"></i>
-				<span class="title">Cloud ({{ userData.diskusage.space.value }} {{ userData.diskusage.space.unit }})</span>
+				<span class="title menu-expanded" style="{% if userData.interfaceConfig.collapsedSidebar is defined and userData.interfaceConfig.collapsedSidebar %} display: none;{% endif %}">Cloud ({{ userData.diskusage.space.value }} {{ userData.diskusage.space.unit }})</span>
 		</div>
 		<div class="title menu-collapsed" style="display:none; padding-bottom: 10px; padding-left: 21px;">
 				<i class="fa fa-database"></i>
@@ -69,10 +69,10 @@
 		</div>
 		<div class="tile-footer" style="padding: 10px;">
 			<h4>
-				<span class="menu-expanded">{{ userData.diskusage.free_perc }}% ocupado</span>
+				<span class="menu-expanded" style="{% if userData.interfaceConfig.collapsedSidebar is defined and userData.interfaceConfig.collapsedSidebar %} display: none;{% endif %}">{{ userData.diskusage.free_perc }}% ocupado</span>
 			</h4>
-			<span class="menu-expanded">{{ userData.diskusage.free.value }} {{ userData.diskusage.free.unit }} Libres</span>
-			<span class="title menu-collapsed" style="display:none; text-align: center;">{{ userData.diskusage.space.value }} {{ userData.diskusage.space.unit }}</span>
+			<span class="menu-expanded" style="{% if userData.interfaceConfig.collapsedSidebar is defined and userData.interfaceConfig.collapsedSidebar %} display: none;{% endif %}">{{ userData.diskusage.free.value }} {{ userData.diskusage.free.unit }} Libres</span>
+			<span class="title menu-collapsed" style="{% if userData.interfaceConfig.collapsedSidebar is defined and userData.interfaceConfig.collapsedSidebar %}display: block; {% else %}display: none;{% endif %} text-align: center;">{{ userData.diskusage.space.value }} {{ userData.diskusage.space.unit }}</span>
 		</div>
 	</div>
 </div>

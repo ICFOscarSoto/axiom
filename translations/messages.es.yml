@@ -534,7 +534,6 @@ increment: Incremento (%)
 discount: Descuento (%)
 price: Precio
 pricecost: Precio coste
-quantity: Unidades
 OfferPrices: Ofertas
 
 #Widgets
@@ -684,6 +683,14 @@ Types: Tipos
 Measureunit: Unidad medida
 Measureunitabbreviation: Abreviatura Unidad
 mileage: Kilometraje
+Fueltype: Combustible
+Responsible: Responsable
+Vin: Num. Bastidor
+priceunit: Precio Unidad
+Priceunit: Precio Unidad
+Percentfuel: Porcentaje en deposito
+Select vehiclesfuels: Seleccione combustible
+result: Resultado
 
 #PLAZA VOUCHERS
 #----------------------------------------------------------------------------------------------------------------------

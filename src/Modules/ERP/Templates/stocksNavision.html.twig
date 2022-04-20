@@ -30,7 +30,7 @@
 
 	{% endblock %}
 		<!-- MAIN CONTENT -->
-		<div class="page-container">
+		<div class="page-container {% if userData.interfaceConfig.collapsedSidebar is defined and userData.interfaceConfig.collapsedSidebar %}sidebar-collapsed{% endif %}">
 		<div class="main-content">
 		<div class="principal-content">
 

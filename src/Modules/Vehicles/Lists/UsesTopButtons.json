@@ -1,0 +1,4 @@
+[
+  {"id" : "addTopUses", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"genericdatatab", "routeParams":{"module":"Vehicles", "name":"Uses", "idparent":"id", "type":"modal" }, "modal":"Uses", "actionType" : "background", "confirm" :false, "tooltip" : "Añadir uso vehículo"},
+  {"id" : "deleteTopUses", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true, "tooltip":""}
+]

@@ -45,7 +45,7 @@
     });
 
     $(document).on('show.bs.modal', '#{{formConstructor.name}}-{{ field.name }}-search-modal-form',function (event) {
-      $('#{{formConstructor.name}}-{{ field.name }}-search-modal-form').detach().prependTo('.page-container');
+      $('#{{formConstructor.name}}-{{ field.name }}-search-modal-form').detach().prependTo('.page-container {% if userData.interfaceConfig.collapsedSidebar is defined and userData.interfaceConfig.collapsedSidebar %}sidebar-collapsed{% endif %}');
     });
 
     $(document).on('shown.bs.modal', '#{{formConstructor.name}}-{{ field.name }}-search-modal-form',function (event) {

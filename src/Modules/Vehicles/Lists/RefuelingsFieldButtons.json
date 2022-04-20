@@ -1,8 +1,4 @@
 [
   {"id": "editRefuelings", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"genericdata", "routeParams":{"module":"Vehicles", "name":"Refuelings", "type":"modal" }, "modal":"Refuelings", "actionType" : "background", "confirm" :false, "tooltip":""},
-  {"id": "activation", "type": "option", "options": [
-      {"id": "desactivateRefuelings", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"genericdisable", "routeParams":{"module":"Vehicles", "name":"Refuelings"}, "confirm" :true, "actionType" : "background", "tooltip":"" },
-      {"id": "activateRefuelings", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "route":"genericenable", "routeParams":{"module":"Vehicles", "name":"Refuelings"}, "confirm" :true, "actionType" : "background", "tooltip":"" }
-  ]},
   {"id": "deleteRefuelings", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"genericdelete", "routeParams":{"module":"Vehicles", "name":"Refuelings"}, "confirm" :true, "undo" :false, "actionType" : "background", "tooltip":""}
 ]

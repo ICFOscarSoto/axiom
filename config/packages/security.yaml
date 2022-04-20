@@ -19,6 +19,9 @@ security:
             security: false
         main:
             anonymous: true
+            remember_me:
+                secret:   '%kernel.secret%'
+                lifetime: 7889400
             logout:
                 path:   /logout
                 target: /
