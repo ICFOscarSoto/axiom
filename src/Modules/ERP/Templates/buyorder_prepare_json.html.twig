@@ -1,58 +1,141 @@
 <script>
+  {# Define un objeto con todos los elementos del pedido #}
   function prepare_buyorder_json(){
 
-    var buyorderFields = new Object();
-    var lines=[];
+    var buyorderFields  = new Object();
 
-    buyorderFields.state=$("#buyorder-form-currentstate").val();
-    buyorderFields.estimateddelivery=$("#buyorder-form-estimateddelivery").val();
-    //buyorderFields.agent=$("#buyorder-form-agent").val();
-
-    buyorderFields.suppliercode=$("#supplier-form-code").val();
-    buyorderFields.supplierdeliverynote=$("#supplier-form-deliverynote").val();
-    buyorderFields.supplieremail=$("#supplier-form-email").val();
-    buyorderFields.supplierphone=$("#supplier-form-phone").val();
-    buyorderFields.supplierpaymentmethod=$("#supplier-form-paymentmethod").val();
-    buyorderFields.minorder=$("#buyorder-form-minorder").val();
-    buyorderFields.freeshipping=$("#buyorder-form-freeshipping").val();
-    buyorderFields.additionalcost=$("#buyorder-form-additionalcost").val();
-    buyorderFields.weight=$("#buyorder-form-weight").val();
-    buyorderFields.store=$("#buyorder-form-store").val();
-
-    buyorderFields.typeofconfirmation=$("#buyorder-form-typeofconfirmation").val();
-
-    if($("#buyorder-form-priority").prop('checked')) buyorderFields.priority=1;
-    else buyorderFields.priority=0;
-    if($("#buyorder-form-readed").prop('checked')) buyorderFields.readed=1;
-    else buyorderFields.readed=0;
-    buyorderFields.shippingcharge=$("#buyorder-form-shippingcharge").val();
-  //  buyorderFields.shippingcosts=$("#buyorder-form-shippingcosts").val();
-
-    buyorderFields.customercode=$("#destination-form-customercode").val();
-    buyorderFields.destinationname=$("#destination-form-name").val();
-    buyorderFields.destinationstate=$("#destination-form-state").val();
-    buyorderFields.destinationcountry=$("#destination-form-country").val();
-    buyorderFields.destinationaddress=$("#destination-form-address").val();
-    buyorderFields.destinationphone=$("#destination-form-phone").val();
-    buyorderFields.destinationemail=$("#destination-form-email").val();
-    buyorderFields.destinationpostcode=$("#destination-form-postcode").val();
-    buyorderFields.destinationcity=$("#destination-form-city").val();
-    /*
-    buyorderFields.id=$("#salesticket-form-id").val();
-    salesticketFields.salesticketstate=$("#salesticket-form-states-select").val();
-    salesticketFields.salesticketreason=$("#salesticket-form-reasons-select").val();
-    salesticketFields.salesticketnewagent=$("#salesticket-form-agents-select").val();
-    salesticketFields.salesticketnewdepartment=$("#salesticket-form-departments-select").val();
-    salesticketFields.customername=$("#customer-form-name").val();
-    salesticketFields.customercode=$("#customer-form-code").val();
-    salesticketFields.salesordernumber=$("#salesorder-form-number").val();
-    salesticketFields.externalsalesordernumber=$("#salesorder-form-external").val();
-    salesticketFields.email=$("#customer-form-email").val();
-    salesticketFields.observations=$("#salesticket-form-observations").val();
-    salesticketFields.products=$("#product-references").val();
-    salesticketFields.stores=$("#stores-codes").val();
-    salesticketFields.myself=$("#myself").val();*/
-
+    // Id
+    buyorderFields['id']                 = $("#buyorder-form-id").val();
+    // General
+    buyorderFields['company_id']         = '{{ userData.companyId }}';
+    buyorderFields['author_id']          = $("#buyorder-form-author").val();
+    buyorderFields['agent_id']           = $("#buyorder-form-agent").val();
+    buyorderFields['state_id']            = $("#buyorder-form-currentstate").val();
+    buyorderFields['code']               = $("#buyorder-form-code").val();
+    buyorderFields['theircode']          = $("#buyorder-form-theircode").val();
+    buyorderFields['revision']           = $("#buyorder-form-revision").val();
+    if($("#buyorder-form-priority").prop('checked'))
+      buyorderFields['priority']         = 1;
+    else
+      buyorderFields['priority']         = 0;
+    buyorderFields['observationpriority']= $("#buyorder-form-observationpriority").val();
+    buyorderFields['weight']             = $("#buyorder-form-weight").val();
+    buyorderFields['typeofconfirmation'] = 0;
+    if ($("#buyorder-form-typeofconfirmation").val()=='WEB')
+        buyorderFields['typeofconfirmation'] = 1;
+    buyorderFields['amount']             = $("#buyorder-form-amount").val();
+    buyorderFields['discount']           = $("#buyorder-form-discount").val();
+    buyorderFields['base']               = $("#buyorder-form-base").val();
+    buyorderFields['taxes']              = $("#buyorder-form-taxes").val();
+    buyorderFields['shipping']           = $("#buyorder-form-shipping").val();
+    buyorderFields['total']              = $("#buyorder-form-total").val();
+    buyorderFields['observationpublic']  = $("#buyorder-form-observationpublic").val();
+    // Fechas
+    buyorderFields['dateread']           = $("#buyorder-form-dateread").val();
+    if (buyorderFields['dateread']!=''){
+      buyorderFields['dateread']         = buyorderFields['dateread'].split("/").reverse().join("-");
+    }
+    buyorderFields['datesend']           = $("#buyorder-form-datesend").val();
+    if (buyorderFields['datesend']!=''){
+      buyorderFields['datesend']         = buyorderFields['datesend'].split("/").reverse().join("-");
+    }
+    buyorderFields['dateconfirmed']      = $("#buyorder-form-dateconfirmed").val();
+    if (buyorderFields['dateconfirmed']!=''){
+      buyorderFields['dateconfirmed']    = buyorderFields['dateconfirmed'].split("/").reverse().join("-");
+    }
+    buyorderFields['estimateddelivery']  = $("#buyorder-form-estimateddelivery").val();
+    if (buyorderFields['estimateddelivery']!=''){
+      buyorderFields['estimateddelivery']= buyorderFields['estimateddelivery'].split("/").reverse().join("-");
+    }
+    // Proveedor
+    buyorderFields['supplier_id']        = $("#supplier-form-id").val();
+    buyorderFields['paymentmethod_id']   = $("#supplier-form-paymentmethod-id").val();
+    buyorderFields['suppliercontact_id'] = $("#supplier-form-contact-id").val();
+    buyorderFields['suppliername']       = $("#supplier-form-name").val();
+    buyorderFields['suppliercode']       = $("#supplier-form-code").val();
+    buyorderFields['email']              = $("#supplier-form-email").val();
+    buyorderFields['phone']              = $("#supplier-form-phone").val();
+    buyorderFields['minorder']           = $("#buyorder-form-minorder").val();
+    buyorderFields['freeshipping']       = $("#buyorder-form-freeshipping").val();
+    buyorderFields['shippingcharge']     = 0;
+    if ($("#buyorder-form-shippingcharge").val()=='PAGADOS')
+        buyorderFields['shippingcharge'] = 1;
+    buyorderFields['supplieraddress']    = $("#supplier-form-address").val();
+    buyorderFields['supplierpostcode']   = $("#supplier-form-postcode").val();
+    buyorderFields['supplierstate']      = $("#supplier-form-state").val()
+    buyorderFields['suppliercountry']    = $("#supplier-form-country").val()
+    buyorderFields['suppliercity']       = $("#supplier-form-city").val();
+    buyorderFields['suppliervat']        = $("#supplier-form-vat").val();
+    buyorderFields['supplierpaymentterms']  = $("#supplier-form-paymentterms").val();
+    buyorderFields['suppliercontactname']   = $("#supplier-form-contact-name").val();
+    buyorderFields['suppliercontactemail']  = $("#supplier-form-contact-email").val();
+    buyorderFields['suppliercontactphone']  = $("#supplier-form-contact-phone").val();
+    // Destino y cliente
+    buyorderFields['store_id']           = $("#buyorder-form-store").val();
+    buyorderFields['customer_id']        = $("#customer-form-id").val();
+    buyorderFields['destination_id']     = $("#destination-form-id").val();
+    buyorderFields['destinationstate_id']= $("#destination-form-state").val();
+    buyorderFields['destinationcountry_id'] = $("#destination-form-country").val();
+    buyorderFields['destinationcontact_id'] = $("#destination-form-contact-id").val();
+    buyorderFields['destinationname']    = $("#destination-form-name").val();
+    buyorderFields['destinationaddress'] = $("#destination-form-address").val();
+    buyorderFields['destinationphone']   = $("#destination-form-phone").val();
+    buyorderFields['destinationemail']   = $("#destination-form-email").val();
+    buyorderFields['destinationpostcode']= $("#destination-form-postcode").val();
+    buyorderFields['destinationcity']    = $("#destination-form-city").val();
+    buyorderFields['destinationcontactname']   = $("#destination-form-contact-name").val();
+    buyorderFields['destinationcontactemail']  = $("#destination-form-contact-email").val();
+    buyorderFields['destinationcontactphone']  = $("#destination-form-contact-phone").val();
+    // TODO Offert
+    buyorderFields['offert_id']          = $("#buyorder-form-offert-id").val();
+    // Líneas
+    var sheet   = document.getElementById('{{spreadsheet.name}}').jexcel[0];
+    var data    = sheet.getData();
+    var columns = sheet.options.columns;
+    var lines   = [];
+    if (data.length > 0 && columns.length>0){
+      var linenum = 0;
+      for(var i=0; i<data.length; i++){
+        var line = new Object();
+        line['product_id']      = data[i][sheet.getColumnKey('product_id')].split('~')[0];
+        line['quantity']        = data[i][sheet.getColumnKey('quantity')];
+        if (line['product_id']!=null && line['product_id']!='' && line['product_id']!='0'  && line['product_id']!=0 &&
+            line['quantity']!=null && line['quantity']!='' && line['product_id']!='0'  && line['product_id']!=0){
+          linenum++;
+          line['id']              = data[i][sheet.getColumnKey('id')];
+          // buyorder_id Se recarga al grabar por si era nuevo
+          line['variant_id']      = data[i][sheet.getColumnKey('variant_id')].split('~')[0];
+          line['linenum']         = linenum;
+          line['code']            = data[i][sheet.getColumnKey('product_id')].split('~')[1];
+          line['productname']     = data[i][sheet.getColumnKey('productname')];
+          line['pvp']             = data[i][sheet.getColumnKey('pvp')];
+          line['discount1']       = data[i][sheet.getColumnKey('discount1')];
+          line['discount2']       = data[i][sheet.getColumnKey('discount2')];
+          line['discount3']       = data[i][sheet.getColumnKey('discount3')];
+          line['discount4']       = data[i][sheet.getColumnKey('discount4')];
+          line['discountequivalent'] = data[i][sheet.getColumnKey('discountequivalent')];
+          line['totaldiscount']   = data[i][sheet.getColumnKey('totaldiscount')];
+          line['shoppingprice']   = data[i][sheet.getColumnKey('shoppingprice')];
+          line['store_id']        = data[i][sheet.getColumnKey('store_id')].split('~')[0];
+          line['subtotal']        = data[i][sheet.getColumnKey('subtotal')];
+          line['taxperc']         = data[i][sheet.getColumnKey('taxperc')];
+          line['taxunit']         = data[i][sheet.getColumnKey('taxunit')];
+          line['total']           = data[i][sheet.getColumnKey('total')];
+          line['packing']         = data[i][sheet.getColumnKey('packing')];
+          line['multiplicity']    = data[i][sheet.getColumnKey('multiplicity')];
+          line['minimumquantityofbuy'] = data[i][sheet.getColumnKey('minimumquantityofbuy')];
+          line['purchaseunit']    = data[i][sheet.getColumnKey('purchaseunit')];
+          line['dateestimated']   = data[i][sheet.getColumnKey('dateestimated')];
+          if (line['dateestimated']!=''){
+            line['dateestimated']         = line['dateestimated'].split("/").reverse().join("-");
+          }
+          line['weight']          = data[i][sheet.getColumnKey('weight')];
+          line['purchasemeasure'] = data[i][sheet.getColumnKey('purchasemeasure')];
+          lines.push(line);
+        }
+      }
+    }
+    buyorderFields['lines'] = lines;
     return buyorderFields;
   }
 </script>

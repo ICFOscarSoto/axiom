@@ -1,39 +1,18 @@
+{# Campos obligatorios, y con formato especial, del formulario de pedidod de compra #}
 <script>
   function validate_buyorder(){
-    //$(".error").remove();
-      var valid=true;
-      if($("#supplier-form-code").val()==""){
-        toastr.error("Por favor, selecciona un proveedor", "Confirmación", confirmation);
-         valid=false;
-         return valid;
-
+  // Proveedor obligatorio
+    if ($("#supplier-form-code").val()==""){
+      toastr.error("Por favor, selecciona un proveedor", "Confirmación", confirmation);
+      return false;
+    }
+    // Si es urgente obligatorio poner el motivo de urgencia
+    if ($("#buyorder-form-priority").is(':checked')){
+      if ($("#buyorder-form-observationpriority").val()==""){
+        toastr.error("Por favor, indica el motivo de la urgencia", "Confirmación", confirmation);
+        return false;
       }
-/*
-      if($("#customer-form-code").val()=="" && $("#salesorder-form-number").val()=="")
-      {
-
-       toastr.error("Por favor, selecciona un cliente o un pedido", "Confirmación", confirmation);
-        valid=false;
-        return valid;
-      }
-
-      if($("#salesticket-form-observations").val()=="")
-      {
-        toastr.error("Por favor, añade una observación a la incidencia", "Confirmación", confirmation);
-         valid=false;
-         return valid;
-
-      }
-      if($("#salesticket-form-states-select").val()=="-1")
-      {
-        toastr.error("Por favor, selecciona un estado", "Confirmación", confirmation);
-         valid=false;
-         return valid;
-
-      }
-
-*/
-  return valid;
-
+    }
+    return true;
 }
 </script>

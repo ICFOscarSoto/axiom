@@ -82,11 +82,62 @@ class ERPContactsController extends Controller
     * @Route("/api/global/contact/{id}/get", name="getContact")
     */
     public function getContact($id){
-     $contact = $this->getDoctrine()->getRepository($this->class)->findOneById($id);
+			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+     	$contact = $this->getDoctrine()->getRepository($this->class)->findOneById($id);
       if (!$contact) {
-            throw $this->createNotFoundException('No currency found for id '.$id );
-          }
-          return new JsonResponse($contact->encodeJson());
+        throw $this->createNotFoundException('No contact found for id '.$id );
+      }
+      return new JsonResponse($contact->encodeJson());
+    }
+
+		/**
+    * @Route("/api/global/contactssupplier/{id}", name="getContactsSupplier")
+    */
+    public function getContactsSupplier($id){
+			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			$erpSuppliersRepository	= $this->getDoctrine()->getRepository(ERPSuppliers::class);
+			$supplier 							= $erpSuppliersRepository->find($id);
+     	$ocontacts 							= $this->getDoctrine()->getRepository($this->class)->findBy(["supplier"=>$supplier,"purchaseorder"=>1,"active"=>1,"deleted"=>0],["name"=>"ASC"]);
+			$contacts=[];
+			$option=[];
+			$option["pos"]=0;
+			$option["id"]='';
+			$option["text"]="Selecciona contacto...";
+			$contacts[]=$option;
+			$pos = 1;
+			foreach($ocontacts as $item){
+				$option["pos"]=$pos;
+				$option["id"]=$item->getId();
+				$option["text"]=$item->getName();
+				$contacts[]=$option;
+				$pos++;
+			}
+      return new JsonResponse($contacts);
+    }
+
+		/**
+    * @Route("/api/global/contactscustomer/{id}", name="getContactsCustomer")
+    */
+    public function getContactsCustomer($id){
+			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			$erpCustomersRepository	= $this->getDoctrine()->getRepository(ERPCustomers::class);
+			$customer 							= $erpCustomersRepository->find($id);
+     	$ocontacts 							= $this->getDoctrine()->getRepository($this->class)->findBy(["customer"=>$customer,"saleorder"=>1,"active"=>1,"deleted"=>0],["name"=>"ASC"]);
+			$contacts=[];
+			$option=[];
+			$option["pos"]=0;
+			$option["id"]='';
+			$option["text"]="Selecciona contacto...";
+			$contacts[]=$option;
+			$pos = 1;
+			foreach($ocontacts as $item){
+				$option["pos"]=$pos;
+				$option["id"]=$item->getId();
+				$option["text"]=$item->getName();
+				$contacts[]=$option;
+				$pos++;
+			}
+      return new JsonResponse($contacts);
     }
 
   /**

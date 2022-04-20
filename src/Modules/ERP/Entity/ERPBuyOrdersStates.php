@@ -5,7 +5,7 @@ namespace App\Modules\ERP\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\Modules\ERP\Entity\ERPBuyOrdersStatesRepository")
+ * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPBuyOrdersStatesRepository")
  */
 class ERPBuyOrdersStates
 {

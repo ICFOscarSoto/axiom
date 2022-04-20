@@ -47,10 +47,20 @@ class ERPBuyOrdersRepository extends ServiceEntityRepository
         ;
     }
     */
+    // Último código utilizado
     public function getLastID(){
-      $query='SELECT max(id)
-      FROM erpbuy_orders';
+      $query='SELECT max(id) FROM erpbuy_orders';
       return $this->getEntityManager()->getConnection()->executeQuery($query)->fetchColumn(0);
+    }
 
+    // Obtiene el siguiente código a utilizar en la creación de un pedido de compra
+    public function getNextCode(){
+      $query='SELECT CAST(SUBSTRING(max(CODE),5) AS UNSIGNED) AS result
+      FROM erpbuy_orders WHERE SUBSTRING(CODE,1,2)=SUBSTRING(year(NOW()),3,2)';
+      $id = $this->getEntityManager()->getConnection()->executeQuery($query)->fetchColumn(0);
+      if ($id==null)
+        $id = 0;
+      $id++;
+      return date('y').'PC'.str_pad($id,5,'0',STR_PAD_LEFT);
     }
 }

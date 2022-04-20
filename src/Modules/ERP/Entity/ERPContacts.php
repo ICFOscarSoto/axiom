@@ -373,4 +373,23 @@ class ERPContacts
         return $this;
     }
 
+    public function encodeJson (){
+      $tempArray = array();
+      $vars = get_object_vars ( $this );
+      foreach( $vars as $key=>$var){
+          if(is_object($var)){
+            if(get_class($var)=="DateTime"){
+                $tempArray[$key."-date"] = $var->format('d/m/Y');
+                $tempArray[$key."-time"] = $var->format('H:i:s');;
+            }else{
+              if(method_exists($var,"getId")){
+                $tempArray[$key] = $var->getId();
+              }
+            }
+          }else{
+            $tempArray[$key] = $var;
+          }
+      }
+      return $tempArray;
+    }
 }

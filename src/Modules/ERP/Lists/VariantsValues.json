@@ -8,10 +8,6 @@
         "caption": "name"
     },
     {
-        "name": "increment",
-        "caption": "increment"
-    },
-    {
         "name": "variantname__name",
         "caption": "variantname"
     },

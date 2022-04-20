@@ -58,6 +58,7 @@ class ERPProductsVariants
      */
     private $dateupd;
 
+
     public function getId(): ?int
     {
         return $this->id;

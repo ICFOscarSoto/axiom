@@ -9,6 +9,7 @@
           {% set listConstructor = supplierslist %}
           {% set listOrigin = "" %}
           {% set hidePageLength = true %}
+          {% set hideValidation = true %}
           {# for know if list.html is invoked directly from controller and we need to make modals inside list#}
           {{ include('@Globale/list.html.twig') }}
         </div>
@@ -17,11 +18,6 @@
 </div>
 
 <script>
-  {# Acciones a realizar una vez realizada la busqueda de proveedores #}
-  function postSupplierSearch(){
-
-  }
-
   {# Busqueda de proveedores #}
   function SupplierSearch(fields, searchFields){
     if($("#supplier-form-code").val()!=""){
@@ -38,7 +34,6 @@
                $("#"+fields[i]).val(element[1]);
                i++;
              });
-             postSupplierSearch();
            } else {
              clearFields(fields);
              toastr.error("No se encontro el proveedor introducido", "Confirmación", confirmation);
@@ -54,12 +49,12 @@
          $("#buyorder-form-shippingcharge").val("PAGADOS");
          $("#buyorder-form-shippingcharge").addClass("input-success");
          $("#buyorder-form-shippingcharge").removeClass("input-danger");
-       }
+      }
       else {
          $("#buyorder-form-shippingcharge").val("DEBIDOS");
          $("#buyorder-form-shippingcharge").addClass("input-danger");
          $("#buyorder-form-shippingcharge").removeClass("input-success");
-       }
+      }
   }
 
   {# Estimar fecha de entrega en función del proveedor #}
@@ -85,63 +80,108 @@
     $.ajax({
        type: "GET",
        dataType: "json",
-       url: "/api/ERP/stores/getstoreinfo/"+id,
+       url: "/api/ERP/stores/getstoreinfo/"+id
      }).done(function(elements, textStatus, jqXHR) {
        if((--load_wait)==0) $("#load-spinner").fadeOut();
-        $("#destination-form-name").val(elements.infostore.name);
-        $("#destination-form-address").val(elements.infostore.address);
-        $("#destination-form-city").val(elements.infostore.city);
-        $("#destination-form-postcode").val(elements.infostore.postcode);
-        $("#destination-form-state").val(elements.infostore.stateid);
-        $("#destination-form-state").trigger('change');
-        $("#destination-form-country").val(elements.infostore.countryid);
-        $("#destination-form-phone").val(elements.infostore.phone);
-        $("#tab-head-send").css("display","block");
+        if (elements!=null){
+          $("#destination-form-id").val('');
+          $("#destination-form-name").val(elements.infostore.name);
+          $("#destination-form-address").val(elements.infostore.address);
+          $("#destination-form-phone").val(elements.infostore.phone);
+          $("#destination-form-email").val(elements.infostore.email);
+          $("#destination-form-city").val(elements.infostore.city);
+          $("#destination-form-postcode").val(elements.infostore.postcode);
+          $("#destination-form-state").val(elements.infostore.stateid);
+          $("#destination-form-state").trigger('change');
+          $("#destination-form-country").val(elements.infostore.countryid);
+          $("#destination-form-country").trigger('change');
+          $("#tab-head-send").css("display","block");
+        }
       });
+  }
+
+  {# Obtienen  los contactos del proveedor seleccionado #}
+  function setContactsSupplier(id){
+    if((++load_wait)==1) $("#load-spinner").fadeIn();
+    $.ajax({
+       type: "GET",
+       dataType: "json",
+       url: "/api/global/contactssupplier/"+id
+    }).done(function(elements, textStatus, jqXHR) {
+       if((--load_wait)==0) $("#load-spinner").fadeOut();
+        if (elements!=null){
+          $("#supplier-form-contact-id").html('');
+          elements.forEach( function(valor, indice, array){
+            $("#supplier-form-contact-id").append('<option value="'+valor.id+'">'+valor.text+'</option>');
+          });
+        }
+    });
+    $("#supplier-form-contact-id").val('');
+    $("#supplier-form-contact-id").trigger('change');
   }
 
   {# Cuando se termine de cargar la página #}
   $(document).ready(function() {
 
     {# Seleccionar proveedor #}
-    $('body').on('click', "[id^='listSupplierswithcode-field-button-select-']", function(e) {
+    $('body').on('click', "[id^='listSuppliersBuyOrders-field-button-select-']", function(e) {
       var supplier_id = $(this).attr('attr-id');
       $("#supplier-form-id").val(supplier_id);
-      $("#supplier-form-code").val($("#listSupplierswithcode-code-"+supplier_id).text());
-      $("#supplier-form-name").val($("#listSupplierswithcode-name-"+supplier_id).text());
-      $("#supplier-form-codename").val('('+$("#supplier-form-code").val()+') '+$("#supplier-form-name").val());
       $("#supplier-form-id").trigger('change');
-
-      $("#supplier-form-email").val($("#listSupplierswithcode-email-"+supplier_id).text());
-      $("#supplier-form-phone").val($("#listSupplierswithcode-phone-"+supplier_id).text());
-      $("#supplier-form-paymentmethod").val($("#listSupplierswithcode-paymentmethod__name-"+supplier_id).text());
-
-      $("#buyorder-form-additionalcost").val(0);
-      $("#buyorder-form-weight").val(0);
 
       $("#supplier-search-modal-form").modal('toggle');
     });
 
     {# Evento de cambio de proveedor en el formulario principal #}
     $('body').on('change', "#supplier-form-id", function(e) {
-      code=$("#supplier-form-code").val();
+      var supplier_id=$("#supplier-form-id").val();
       if((++load_wait)==1) $("#load-spinner").fadeIn();
       $.ajax({
           type: "GET",
           dataType: "json",
-          url: "/api/ERP/supplier/orderinfo/"+code+"/get",
+          url: "/api/ERP/supplier/orderinfo/"+supplier_id+"/get"
         }).done(function( elements, textStatus, jqXHR ) {
           if((--load_wait)==0) $("#load-spinner").fadeOut();
-          $("#buyorder-form-minorder").val(elements.minorder);
-          $("#buyorder-form-minorder").trigger('change');
-          $("#buyorder-form-minorder").attr("disabled", true);
-          $("#buyorder-form-freeshipping").val(elements.freeshipping);
-          $("#buyorder-form-freeshipping").trigger('change');
-          $("#buyorder-form-freeshipping").attr("disabled", true);
-          $("#buyorder-form-estimateddelivery-number").val(elements.estimateddelivery);
-         setShippingCharge();
-         setEstimatedDate();
-         setStoreInfo(1);
+          if (elements!=null){
+            $("#buyorder-form-minorder").val(elements.minorder);
+            $("#buyorder-form-freeshipping").val(elements.freeshipping);
+            $("#buyorder-form-estimateddelivery-number").val(elements.estimateddelivery);
+            $("#supplier-form-code").val(elements.suppliercode);
+            $("#supplier-form-name").val(elements.suppliername);
+            $("#supplier-form-codename").val('('+elements.suppliercode+') '+elements.suppliername);
+            $("#supplier-form-email").val(elements.supplieremmail);
+            $("#supplier-form-phone").val(elements.supplierphone);
+            $("#supplier-form-paymentmethod-id").val(elements.supplierpaymentmethod_id);
+            $("#supplier-form-paymentmethod").val(elements.supplierpaymentmethod_name);
+            $("#supplier-form-address").val(elements.supplieraddress);
+            $("#supplier-form-postcode").val(elements.supplierpostcode);
+            $("#supplier-form-state").val(elements.supplierstate);
+            $("#supplier-form-country").val(elements.suppliercountry);
+            $("#supplier-form-city").val(elements.suppliercity);
+
+            $("#supplier-form-vat").val(elements.suppliervat);
+            $("#supplier-form-paymentterms").val(elements.supplierpaymentterms);
+            $("#buyorder-form-weight").val(0);
+
+            $("#buyorder-form-amount").val(0);
+            $("#buyorder-form-discount").val('');
+            $("#buyorder-form-base").val(0);
+            $("#buyorder-form-taxes").val(0);
+            $("#buyorder-form-shipping").val('');
+            $("#buyorder-form-total").val(0);
+            setContactsSupplier(supplier_id);
+            setShippingCharge();
+            setEstimatedDate();
+            // Primer almacén de base de datos
+            {% if stores|length > 1 %}
+              setStoreInfo({{ stores.0.id }});
+              $("#buyorder-form-store").val({{ stores.0.id }});
+            {% else %}
+              setStoreInfo(1);
+              $("#buyorder-form-store").val(1);
+            {% endif %}
+            $("#buyorder-form-store").trigger('change');
+         }
         });
     });
   });

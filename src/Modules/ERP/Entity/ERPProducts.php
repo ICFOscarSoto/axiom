@@ -13,6 +13,7 @@ use \App\Modules\ERP\Entity\ERPProductPrices;
 use \App\Modules\ERP\Entity\ERPShoppingPrices;
 use \App\Modules\ERP\Utils\ERPPrestashopUtils;
 use \App\Modules\ERP\Entity\ERPCustomerGroups;
+use \App\Modules\ERP\Entity\ERPMeasurementUnits;
 use \App\Modules\HR\Entity\HRWorkers;
 use \App\Modules\Globale\Entity\GlobaleTaxes;
 
@@ -130,10 +131,25 @@ class ERPProducts
     private $minimumquantityofsale=1;
 
     /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $minimumquantityofbuy=1;
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $purchaseunit=1;
+
+    /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPManufacturers")
      * @ORM\JoinColumn(onDelete="SET NULL")
      */
     private $manufacturer;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPMeasurementUnits")
+     * @ORM\JoinColumn(onDelete="SET NULL")
+     */
+    private $purchasemeasure;
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCompanies")
@@ -484,6 +500,18 @@ class ERPProducts
     public function setManufacturer(?ERPManufacturers $manufacturer): self
     {
         $this->manufacturer = $manufacturer;
+
+        return $this;
+    }
+
+    public function getPurchasemeasure(): ?ERPMeasurementUnits
+    {
+        return $this->purchasemeasure;
+    }
+
+    public function setPurchasemeasure(?ERPMeasurementUnits $purchasemeasure): self
+    {
+        $this->purchasemeasure = $purchasemeasure;
 
         return $this;
     }
@@ -959,6 +987,30 @@ class ERPProducts
   public function setPurchasepacking(?int $purchasepacking): self
   {
       $this->purchasepacking = $purchasepacking;
+
+      return $this;
+  }
+
+  public function getMinimumquantityofbuy(): ?int
+  {
+      return $this->minimumquantityofbuy;
+  }
+
+  public function setMinimumquantityofbuy(?int $minimumquantityofbuy): self
+  {
+      $this->minimumquantityofbuy = $minimumquantityofbuy;
+
+      return $this;
+  }
+
+  public function getPurchaseunit(): ?int
+  {
+      return $this->purchaseunit;
+  }
+
+  public function setPurchaseunit(?int $purchaseunit): self
+  {
+      $this->purchaseunit = $purchaseunit;
 
       return $this;
   }

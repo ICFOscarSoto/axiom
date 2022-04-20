@@ -24,8 +24,9 @@
 		{% set tempFields = tempFields|merge([field]) %}
 {% endfor %}
 {% set fields = tempFields %}
-
+{% if (hideValidation is not defined or hideValidation==false) %}
   {{ include("@Globale/form_validation.html.twig") }}
+{% endif %}
 <input type="hidden" id="search_param"/>
 <script>
 var url = new URL(window.location.href);
@@ -701,7 +702,7 @@ var url = new URL(window.location.href);
 	{{ include('@Globale/list_modal_confirm.html.twig') }}
 
 	<script>
-	$(document).ready(function() {		
+	$(document).ready(function() {
 		$('body').tooltip({ selector: '[data-toggle="tooltip"]' });
 		$('.datetimepicker').each(function(index) {
 			var valueField=$(this).val();

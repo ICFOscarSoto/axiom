@@ -42,7 +42,7 @@
                                          //   Si no se indica Y se entiende que es la fila actual.
                                          // - #w|var_js: Las que empiecen por w son variables javascript generada por alguna función e incluidas
                                          //   dentro del array (window) que en accesible de forma global.
-                 "oncomplete":""         // Si existe esta variable con contenido javascript se ejecutará una vez acabada el onchange
+                 "oncomplete":""         // Si existe esta variable con un nombre de función se ejecutará una vez acabada el onchange (se pasa x, y, value)
               }
           }
         }
@@ -118,7 +118,6 @@ function js{{spreadsheet.name}}_create(data){
         rowDrag: true,
         allowInsertColumn:false,
         allowInsertRow:true,
-        pagination:1000000,
         {% if spreadsheet.options is defined %}
           {{spreadsheet.options|raw}},
         {% endif %}
@@ -197,11 +196,18 @@ function js{{spreadsheet.name}}_create(data){
         var sheet = instance.jexcel;
         if (typeof(value) === 'undefined' || value == null)
           value = '';
+        if (typeof(type) !== 'undefined' && type!=null && type.length>0 && type.toLowerCase()=='dropdown' && value==''){
+          value=valueOld;
+          sheet.options['changeinit'] = true;
+          sheet.setValueFromCoords(x, y, value, true);
+          sheet.options['changeinit'] = false;
+        }
         // Si la celda tiene onchange como options y tiene url o oncomplete (y no estamos en la carga inicial)
         var options = sheet.options.columns[x].options;
-        if (!sheet.options.loadinit && !sheet.options.changeinit && !sheet.options.rowinit && options !== undefined && options.onchange !== undefined && value!=valueOld){
+        if (!sheet.options.loadinit && !sheet.options.changeinit && !sheet.options.rowinit && typeof(options) !== 'undefined' && typeof(options.onchange) !== 'undefined' && value!=valueOld){
           // Obtener url completa con los campos necesarios para la busqueda
-          change = options.onchange;
+          var change = options.onchange;
+          var oncomplete = change.oncomplete;
           if (change.url !== undefined){
             var url = change.url;
             url = sheet.replaceUrl(url, y);
@@ -210,12 +216,17 @@ function js{{spreadsheet.name}}_create(data){
                 url: url
               }).done(function(result) {
                 if (result != null && result != '' && result != '[]'){
-                  // Si hay varios me quedo el primero que es el descuento más ventajoso
-                  // la primera línea de resultado
+                  // Si hay varios me quedo la primera línea de resultado
                   var oresult = JSON.parse(JSON.stringify(result))[0];
                   for (var [key, valueq] of Object.entries(oresult)) {
                     key = JSON.parse(JSON.stringify(key));
                     if (sheet.getColumnKey(key)!=-1){
+                      // Si es numérico y se ha indicado un número de decimales
+                      var column = sheet.options.columns[sheet.getColumnKey(key)];
+                      if (typeof(column.type) != 'undefined' && column.type!=null && (column.type.toLowerCase() =='numeric' || column.type.toLowerCase() =='number') &&
+                          typeof(column.decimal) != 'undefined' && column.decimal!=null && column.decimal!='' && !isNaN(valueq) && !isNaN(parseFloat(valueq)) && Number.parseFloat(valueq)!=0){
+                            valueq = Number.parseFloat(valueq).toFixed(column.decimal);
+                          }
                       sheet.setValueFromKey(key, y, valueq, true);
                     }else{
                       // Datos a utilizar en otras columnas
@@ -223,20 +234,22 @@ function js{{spreadsheet.name}}_create(data){
                     }
                   }
                 }
-                if (change.oncomplete !== undefined && change.oncomplete != null && change.oncomplete!=''){
-                  eval(change.oncomplete);
+                if (oncomplete !== undefined && oncomplete != null && oncomplete!=''){
+                  if (typeof window[oncomplete] === 'function')
+                    window[oncomplete](sheet,x,y,value);
                 }
               });
             }
           }else {
-            if (change.oncomplete !== undefined && change.oncomplete != null && change.oncomplete!=''){
-              eval(change.oncomplete);
+            if (oncomplete !== undefined && oncomplete != null && oncomplete!=''){
+              if (typeof window[oncomplete] === 'function')
+                window[oncomplete](sheet,x,y,value);
             }
           }
         }
         // Cambio del valor en las otras pestañas
         var isformula = ((value.length>0 && (''+value)[0]=='='||(''+value)[0]=='#')?true:false);
-        if (!sheet.options.loadinit && !sheet.options.changeinit && !sheet.options.rowinit && !isformula){
+        if (!sheet.options.loadinit && !sheet.options.changeinit && !sheet.options.rowinit && !isformula && value!=valueOld){
           var tabIdChange = sheet.options.tabid;
           var sheets      = document.getElementById(sheet.options.name).jexcel;
           var key         = sheet.getKeyColumn(x);
@@ -248,13 +261,13 @@ function js{{spreadsheet.name}}_create(data){
             }
           }
         }
-        if (!sheet.options.loadinit)
+        if (!sheet.options.loadinit && value!=valueOld)
           $('#'+sheet.options.name).find('.jexcel_tab_link.tabnew').each(function(){ $(this).addClass('disabled'); });
       },
       oninsertrow: function(instance, rowNumber, numOfRows, records, insertBefore){
         var sheet = instance.jexcel;
         sheet.options['changeinit'] = true;
-        var tprototipe = JSON.parse(JSON.stringify({{spreadsheet.prototipe|raw}}));
+        var tprototipe = window['js{{spreadsheet.name}}_prototipe'];
         for (const key in tprototipe) {
           var find = '#nl#';
           var re = new RegExp(find, 'g');
@@ -516,11 +529,20 @@ function js{{spreadsheet.name}}_create(data){
      },
      onchange: function(instance, cell, x, y, value, valueOld, type) {
       var sheet = instance.jexcel;
+      if (typeof(value) === 'undefined' || value == null)
+        value = '';
+      if (typeof(type) !== 'undefined' && type!=null && type.length>0 && type.toLowerCase()=='dropdown' && value==''){
+        value=valueOld;
+        sheet.options['changeinit'] = true;
+        sheet.setValueFromCoords(x, y, value, true);
+        sheet.options['changeinit'] = false;
+      }
       // Si la celda tiene onchange como options y tiene url o oncomplete
       var options = sheet.options.columns[x].options;
       if (!sheet.options.loadinit && options !== undefined && options.onchange !== undefined && value!=valueOld){
         // Obtener url completa con los campos necesarios para la busqueda
-        change = options.onchange;
+        var change = options.onchange;
+		    var oncomplete = change.oncomplete;
         if (change.url !== undefined && value!=undefined){
           var url = change.url;
           url = sheet.replaceUrl(url, y);
@@ -529,12 +551,17 @@ function js{{spreadsheet.name}}_create(data){
               url: url
             }).done(function(result) {
               if (result != null && result != '' && result != '[]'){
-                // Si hay varios me quedo el primero que es el descuento más ventajoso
-                // la primera línea de resultado
+                // Si hay varios me quedo la primera línea de resultado
                 var oresult = JSON.parse(JSON.stringify(result))[0];
                 for (var [key, valueq] of Object.entries(oresult)) {
                   key = JSON.parse(JSON.stringify(key));
                   if (sheet.getColumnKey(key)!=-1){
+                    // Si es numérico y se ha indicado un número de decimales
+                    var column = sheet.options.columns[sheet.getColumnKey(key)];
+                    if (typeof(column.type) != 'undefined' && column.type!=null && (column.type.toLowerCase() =='numeric' || column.type.toLowerCase() =='number') &&
+                        typeof(column.decimal) != 'undefined' && column.decimal!=null && column.decimal!='' && !isNaN(valueq) && !isNaN(parseFloat(valueq)) && Number.parseFloat(valueq)!=0){
+                          valueq = Number.parseFloat(valueq).toFixed(column.decimal);
+                    }
                     sheet.setValueFromKey(key, y, valueq, true);
                   }else{
                     // Datos a utilizar en otras columnas
@@ -542,21 +569,23 @@ function js{{spreadsheet.name}}_create(data){
                   }
                 }
               }
-              if (change.oncomplete !== undefined && change.oncomplete != null && change.oncomplete!=''){
-                eval(change.oncomplete);
+              if (oncomplete !== undefined && oncomplete != null && oncomplete!=''){
+                if (typeof window[oncomplete] === 'function')
+                  window[oncomplete](sheet,x,y,value);
               }
             });
           }
         }else {
-          if (change.oncomplete !== undefined && change.oncomplete != null && change.oncomplete!=''){
-            eval(change.oncomplete);
-          }
+          if (oncomplete !== undefined && oncomplete != null && oncomplete!=''){
+      			if (typeof window[oncomplete] === 'function')
+      			  window[oncomplete](sheet,x,y,value);
+		      }
         }
       }
     },
     oninsertrow: function(instance, rowNumber, numOfRows, records, insertBefore){
       var sheet = instance.jexcel;
-      var tprototipe = JSON.parse(JSON.stringify({{spreadsheet.prototipe|raw}}));
+      var tprototipe =  window['js{{spreadsheet.name}}_prototipe'];
       for (const key in tprototipe) {
         var find = '#nl#';
         var re = new RegExp(find, 'g');
@@ -640,8 +669,9 @@ function js{{spreadsheet.name}}_create(data){
   });
   {% endif %}
 }
-var data    = JSON.parse(JSON.stringify({{spreadsheet.data|raw}}));
-js{{spreadsheet.name}}_create(data);
+window['js{{spreadsheet.name}}_prototipe']  = JSON.parse(JSON.stringify({{spreadsheet.prototipe|raw}}));
+var js{{spreadsheet.name}}_data             = JSON.parse(JSON.stringify({{spreadsheet.data|raw}}));
+js{{spreadsheet.name}}_create(js{{spreadsheet.name}}_data);
 
 $(document).ready(function(){
   /* Muestra ventana de añadir columnas */

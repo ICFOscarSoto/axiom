@@ -209,4 +209,62 @@ class ERPStocksRepository extends ServiceEntityRepository
           return $this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
       }
     }
+
+    public function getStock($product_id, $variant_id, $store_id){
+      $query="SELECT sum(stk.quantity) AS 'stock',
+                     sum(stk.minstock) AS 'minstock',
+                     sum(stk.pendingreceive) AS 'stockpedingreceive',
+                     sum(stk.pendingserve) AS 'stockpedingserve',
+                     sum(stk.quantity)+sum(stk.pendingreceive)-sum(stk.pendingserve) as 'stockvirtual'
+      FROM erpstocks stk
+      LEFT JOIN erpstore_locations stl ON stl.id=stk.storelocation_id
+      LEFT JOIN erpstores str ON str.id=stl.store_id
+      WHERE stk.product_id=$product_id AND
+            stk.variant_id".($variant_id==null?" is null":"=".$variant_id)." AND
+            stl.store_id=$store_id AND
+            stk.active=1 AND stk.deleted=0 AND
+            stl.active=1 AND stl.deleted=0 AND
+            str.active=1 AND str.deleted=0
+      GROUP BY stk.product_id";
+      $result = $this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
+      if ($result==null){
+        $result = [];
+        $result['stock'] = 0;
+        $result['minstock'] = 0;
+        $result['stockpedingreceive'] = 0;
+        $result['stockpedingserve'] = 0;
+        $result['stockvirtual'] = 0;
+      }
+      else{
+        $result = $result[0];
+      }
+      $query="SELECT sum(stk.quantity) AS 'stockt',
+                     sum(stk.pendingreceive) AS 'stockpedingreceivet',
+                     sum(stk.pendingserve) AS 'stockpedingservet',
+                     sum(stk.quantity)+sum(stk.pendingreceive)-sum(stk.pendingserve) as 'stockvirtualt'
+      FROM erpstocks stk
+      LEFT JOIN erpstore_locations stl ON stl.id=stk.storelocation_id
+      LEFT JOIN erpstores str ON str.id=stl.store_id
+      WHERE stk.product_id=$product_id AND
+            stk.variant_id".($variant_id==null?" is null":"=".$variant_id)." AND
+            stk.active=1 AND stk.deleted=0 AND
+            stl.active=1 AND stl.deleted=0 AND
+            str.active=1 AND str.deleted=0
+      GROUP BY stk.product_id";
+      $resultt = $this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
+      if ($resultt!=null){
+        $resultt = $resultt[0];
+        $result['stockt']=$resultt['stockt'];
+        $result['stockpedingreceivet']=$resultt['stockpedingreceivet'];
+        $result['stockpedingservet']=$resultt['stockpedingservet'];
+        $result['stockvirtualt']=$resultt['stockvirtualt'];
+      }else{
+        $result['stockt'] = 0;
+        $result['stockpedingreceivet'] = 0;
+        $result['stockpedingservet'] = 0;
+        $result['stockvirtualt'] = 0;
+      }
+
+      return $result;
+    }
 }

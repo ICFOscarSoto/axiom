@@ -12,10 +12,6 @@
                     "cols": 4
                 },
                 {
-                    "name": "increment",
-                    "cols": 4
-                },
-                {
                     "name": "variantname",
                     "cols": 4
                 }

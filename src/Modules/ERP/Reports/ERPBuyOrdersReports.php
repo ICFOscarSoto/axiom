@@ -39,7 +39,9 @@ class ERPBuyOrdersReports
     $doctrine=$params["doctrine"];
     $this->user=$params["user"];
     $order=$params["order"];
-    $numOffer=$order->getTheiroffer()!=null?$order->getTheiroffer():$order->getOuroffer()!=null?$order->getOuroffer():' ';
+    //$numOffer=$order->getTheiroffer()!=null?$order->getTheiroffer():$order->getOuroffer()!=null?$order->getOuroffer():' ';
+    // TODO
+    $numOffer = ' ';
     $type='Compra';
     $infoLeft=[["Fecha",$order->getDateadd()->format('d/m/Y')],
                ["Gestor",($order->getAgent()->getName().' '.$order->getAgent()->getLastname().'  extension ...')],
@@ -112,12 +114,15 @@ class ERPBuyOrdersReports
                   ["name"=>"Total", "bold"=>"B"]
       ];
 
-      $dataFooter=[number_format($order->getTaxbase(),2,',','.').json_decode('"\u0080"'),
-                  number_format($order->getAdditionaldiscount()),
-                  number_format($order->getTaxbase()*(100-$order->getAdditionaldiscount())/100,2,',','.').json_decode('"\u0080"'),
-                  number_format($order->getShippingcosts()+$order->getAdditionalcost(),2,',','.').json_decode('"\u0080"'),
-                  number_format($order->getTaxbase()*(100-$order->getAdditionaldiscount())/100+$order->getShippingcosts()+$order->getAdditionalcost(),2,',','.').json_decode('"\u0080"'),
-                  number_format(21),
+      // TODO Líneas para cada impuesto
+      // TODO Tener en cuanta descuento y portes
+      $tax = 21;
+      $dataFooter=[number_format($tax,2,',','.').json_decode('"\u0080"'),
+                  number_format(0),
+                  number_format($tax*(100-0)/100,2,',','.').json_decode('"\u0080"'),
+                  number_format($order->getShipping()+0,2,',','.').json_decode('"\u0080"'),
+                  number_format($tax*(100-0)/100+$order->getShipping()+0,2,',','.').json_decode('"\u0080"'),
+                  number_format($tax),
                   number_format($order->getTaxes(),2,',','.').json_decode('"\u0080"'),
                   number_format($order->getTotal(),2,',','.').json_decode('"\u0080"')
                   ];

@@ -7,6 +7,7 @@ use \App\Modules\ERP\Entity\ERPProducts;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
 use \App\Modules\ERP\Entity\ERPStoreLocations;
 use \App\Modules\ERP\Entity\ERPProductsVariants;
+use \App\Modules\ERP\Entity\ERPVariantsValues;
 use \App\Modules\Globale\Entity\GlobaleUsers;
 
 /**
@@ -27,6 +28,11 @@ class ERPStocks
      */
     private $product;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPVariantsValues")
+     * @ORM\JoinColumn(onDelete="CASCADE")
+     */
+    private $variant;
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCompanies")
      * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
@@ -257,6 +263,18 @@ class ERPStocks
     public function setProductvariant(?ERPProductsVariants $productvariant): self
     {
         $this->productvariant = $productvariant;
+
+        return $this;
+    }
+
+    public function getvariant(): ?ERPVariantsValues
+    {
+        return $this->variant;
+    }
+
+    public function setVariant(?ERPVariantsValues $variant): self
+    {
+        $this->variant = $variant;
 
         return $this;
     }

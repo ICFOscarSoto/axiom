@@ -484,11 +484,14 @@ class GlobaleListUtils
           $column="p.".$filter["column"];
       }
       if($filter["type"]="and"){
-        $query->andWhere($column.' = :val_'.$path[0].'0');
+        $operator = '=';
+        if (isset($filter['operator']) && $filter['operator']!=null && $filter['operator']!='')
+          $operator = $filter['operator'];
+        $query->andWhere($column.' '.$operator.' :val_'.$path[0].'0');
         $query->setParameter('val_'.$path[0].'0', $filter["value"]);
-        $queryFiltered->andWhere($column.' = :val_'.$path[0].'0');
+        $queryFiltered->andWhere($column.' '.$operator.' :val_'.$path[0].'0');
         $queryFiltered->setParameter('val_'.$path[0].'0', $filter["value"]);
-        $queryTotal->andWhere($column.' = :val_'.$path[0].'0');
+        $queryTotal->andWhere($column.' '.$operator.' :val_'.$path[0].'0');
         $queryTotal->setParameter('val_'.$path[0].'0', $filter["value"]);
       }
     }

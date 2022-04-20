@@ -285,6 +285,26 @@ table.dataTable.dtr-inline.collapsed > tbody > tr > td:first-child:before, table
 .select2-selection__view:hover{
   background: #f1f1f1;
 }
+
+.input-search-selection__view {
+      height: 23px;
+      position: absolute;
+      top: 19px;
+      right: 49px;
+      width: 75px;
+      border: 1px solid #e8e8e8;
+      border-radius: 3px;
+      background: #ffffff;
+      line-height: 21px !important;
+      text-align: center;
+      cursor: pointer;
+      z-index: 999;
+}
+.input-search-selection__view:hover{
+  background: #f1f1f1;
+}
+
+
 .select2-selection__view_tickets {
       height: 25px;
       position: absolute;
@@ -403,7 +423,10 @@ table.dataTable.dtr-inline.collapsed > tbody > tr > td:first-child:before, table
       text-align: center;
       font-weight: bold;
 }
-
+.input__unity i {
+  padding-left: 1px;
+  padding-top: 5px;
+}
 .select2-selection__view_nolabel {
     height: 25px;
     position: absolute;
@@ -791,6 +814,10 @@ label.form-check-label {
 .form-control {
   border: 1px solid #cecece !important;
   height: 27px !important;
+}
+
+.form-control.bold {
+  font-weight: bold;
 }
 
 .text-area-form{

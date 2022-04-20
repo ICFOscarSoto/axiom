@@ -1,16 +1,34 @@
 <div class="panel panel-primary panel-shadow" data-collapsed="0" style="-webkit-box-shadow: none; box-shadow:none; margin-bottom: -1px;"><!-- to apply shadow add class "panel-shadow" -->
   <div class="panel-body">
+      <div class="panel minimal">
+        <div class="panel-heading">
+          <div class="panel-title">Información del pedido</div>
+        </div>
+      </div>
       <div class="col-md-2">
         <label for="buyorder-form-coderevision">Código:</label>
         <div class="form-group">
-          <input type="text" readonly="readonly" id="buyorder-form-coderevision" {% if (buyorder.code!=null) and (buyorder.revision!=null) %} value="{{buyorder.code}}/{{buyorder.revision}}" {% else %}  value="" {% endif %}  disabled="disabled" class="form-control" placeholder="Código..."/>
-          <input type="hidden" id="buyorder-form-id" name="buyorder-form-id" {% if buyorder.id!=null %} value="{{buyorder.id}}" {% else %}  value="" {% endif %}/>
+          <input type="text" readonly="readonly" id="buyorder-form-coderevision" {% if (buyorder.code!=null and buyorder.revision!=null) %} value="{{buyorder.code}}/{{buyorder.revision}}" {% else %}  value="" {% endif %}  disabled="disabled" class="form-control bold" placeholder="Código..."/>
+          <input type="hidden" id="buyorder-form-id" name="buyorder-form-id" {% if buyorder.id!=null %} value="{{buyorder.id}}" {% else %}  value="0" {% endif %}/>
           <input type="hidden" id="buyorder-form-code" name="buyorder-form-code" {% if buyorder.code!=null %} value="{{buyorder.code}}" {% else %}  value="" {% endif %}/>
           <input type="hidden" id="buyorder-form-revision" name="buyorder-form-revision" {% if buyorder.revision!=null %} value="{{buyorder.revision}}" {% else %}  value="" {% endif %}/>
         </div>
       </div>
+      <div class="col-md-2">
+        <label for="buyorder-form-theircode">Nº pedido proveedor:</label>
+        <div class="form-group">
+          <input type="text" id="buyorder-form-theircode" {% if (buyorder.theircode!=null) %} value="{{buyorder.theircode}}" {% else %}  value="" {% endif %}  class="form-control" placeholder="Nº pedido proveedor..."/>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <label for="supplier-form-vat">CIF:</label>
+        <div class="form-group">
+          <input type="text" readonly="readonly" id="supplier-form-vat" {% if (buyorder.suppliervat!=null) %} value="{{buyorder.suppliervat}}" {% else %}  value="" {% endif %}  class="form-control" placeholder="CIF proveedor..."/>
+        </div>
+      </div>
       <div class="col-md-4">
         <label for="supplier-form-codename">Proveedor:</label>
+        <span id="selection-view-{{ formConstructor }}-supplier" class="input-search-selection__view" style="" attr-url="{{ url('formSupplier',{'id':'_____'}) }}"><i class="fa fa-file-text-o" aria-hidden="true"></i><span>&nbsp;Ver Ficha</span></span>
         <div class="form-group">
           <div class="input-group">
             <input type="text" readonly="readonly" id="supplier-form-codename" {% if (buyorder.suppliercode!=null) and (buyorder.suppliername!=null) %} value="({{buyorder.suppliercode}}) {{buyorder.suppliername}}" {% else %}  value="" {% endif %}  disabled="disabled" class="form-control" placeholder="Búsqueda de provedor..." data-toggle="modal" data-target="#supplier-search-modal-form"/>
@@ -47,6 +65,37 @@
           </div>
         </div>
       {% endif %}
+      <div class="col-md-2">
+        <label for="buyorder-form-ouroffer">Nuestra Oferta:</label>
+        <div class="form-group">
+          <input type="hidden" id="buyorder-form-offert-id" name="buyorder-form-offert-id" {% if buyorder.offert!=null %} value="{{ buyorder.offert.id }}" {% else %} value="0" {% endif %} class="form-control" />
+          <input type="text" id="buyorder-form-ouroffer" readonly="readonly" {% if buyorder.offert!=null %} value="{{ buyorder.offert.code }}" {% endif %} class="form-control" />
+        </div>
+      </div>
+      <div class="col-md-2">
+        <label for="buyorder-form-theiroffer">Su oferta relacionada:</label>
+        <div class="form-group">
+          <input type="text" id="buyorder-form-theiroffer" readonly="readonly" {% if buyorder.offert!=null %} value="{{ buyorder.offert.theircode }}" {% endif %} class="form-control" />
+        </div>
+      </div>
+      <div class="col-md-2">
+        <label for="buyorder-form-dateadd">Fecha de creación:</label>
+        <div class="form-group">
+          <div class="input-group">
+            <span class="input-group-addon"><i class="fa fa-calendar" aria-hidden="true"></i></span>
+            <input type="text" id="buyorder-form-dateadd" style="z-index:99 !important;" readonly="readonly" value="{{ buyorder.dateadd|date('d/m/Y') }}" placeholder="{{ buyorder.dateadd|date('d-m-Y') }}" class="datepicker form-control">
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <label for="buyorder-form-dateupd">Fecha de modificación:</label>
+        <div class="form-group">
+          <div class="input-group">
+            <span class="input-group-addon"><i class="fa fa-calendar" aria-hidden="true"></i></span>
+            <input type="text" id="buyorder-form-dateupd" style="z-index:99 !important;" readonly="readonly" value="{{ buyorder.dateupd|date('d/m/Y') }}" placeholder="{{ buyorder.dateupd|date('d-m-Y') }}" class="datepicker form-control">
+          </div>
+        </div>
+      </div>
       {% if buyorder.author!=null %}
         <div class="col-md-2">
           <label for="buyorder-form-author">Autor:</label>
@@ -74,7 +123,7 @@
         <div class="col-md-2">
           <label for="buyorder-form-agent">Agente:</label>
           <div class="form-group">
-            <select type="text" id="buyorder-form-agent" class="form-control select2" required>
+            <select type="text" id="buyorder-form-agent" class="form-control select2" required {% if (userData.id!=buyorder.agent.id and userData.id!=buyorder.author.id) %} disabled="disabled"{% endif %}>
               {% for option in agents %}
                 <option value="{{ option.id }}" {% if option.id==buyorder.agent.id %}selected="selected"{% endif %} data-image="{{ url('index') }}api/user/{{ option.id }}/getimage">{{ option.text }}</option>
               {% endfor %}
@@ -93,24 +142,6 @@
           </div>
         </div>
       {% endif %}
-      <div class="col-md-2">
-        <label for="buyorder-form-dateadd">Fecha de creación:</label>
-        <div class="form-group">
-          <div class="input-group">
-            <span class="input-group-addon"><i class="fa fa-calendar" aria-hidden="true"></i></span>
-            <input type="text" id="buyorder-form-dateadd" style="z-index:99 !important;" readonly="readonly" value="{{ buyorder.dateadd|date('d/m/Y') }}" placeholder="{{ buyorder.dateadd|date('d-m-Y') }}" class="datepicker form-control">
-          </div>
-        </div>
-      </div>
-      <div class="col-md-2">
-        <label for="buyorder-form-dateupd">Fecha de modificación:</label>
-        <div class="form-group">
-          <div class="input-group">
-            <span class="input-group-addon"><i class="fa fa-calendar" aria-hidden="true"></i></span>
-            <input type="text" id="buyorder-form-dateupd" style="z-index:99 !important;" readonly="readonly" value="{{ buyorder.dateupd|date('d/m/Y') }}" placeholder="{{ buyorder.dateupd|date('d-m-Y') }}" class="datepicker form-control">
-          </div>
-        </div>
-      </div>
       <div class="col-md-2">
         <label for="buyorder-form-datesend">Fecha de envio:</label>
         <div class="form-group">
@@ -150,114 +181,273 @@
       <div class="col-md-2">
         <label for="supplier-form-email">Email del proveedor:</label>
         <div class="form-group">
-          <input type="text"  readonly="readonly" id="supplier-form-email" value="{{ buyorder.email }}"  class="form-control" placeholder="Email del proveedor">
+          <input type="text"  readonly="readonly" id="supplier-form-email" value="{{ buyorder.email }}"  class="form-control" />
         </div>
       </div>
       <div class="col-md-2">
         <label for="supplier-form-phone">Teléfono del proveedor:</label>
         <div class="form-group">
-          <input type="text" readonly="readonly" id="supplier-form-phone"  value="{{ buyorder.phone }}"  class="form-control" placeholder="Teléfono del proveedor">
+          <input type="text" readonly="readonly" id="supplier-form-phone"  value="{{ buyorder.phone }}"  class="form-control" />
         </div>
       </div>
-      <div class="col-md-2">
-        <label for="supplier-form-paymentmethod">Método de pago:</label>
+      {% if buyorder.suppliercontact!=null %}
+        <div class="col-md-4">
+          <label for="supplier-form-contact-id">Contacto del proveedor:</label>
+          <div class="form-group">
+            <select type="text" id="supplier-form-contact-id" class="form-control select2">
+              {% for option in suppliercontacts %}
+                <option value="{{ option.id }}" {% if buyorder.suppliercontact.id==option.id %}selected="selected"{% endif %}>{{ option.text }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+      {% else %}
+        <div class="col-md-4">
+          <label for="supplier-form-contact-id">Contacto del proveedor:</label>
+          <div class="form-group">
+            <select type="text" id="supplier-form-contact-id" class="form-control select2">
+              {% for option in suppliercontacts %}
+                <option value="{{ option.id }}" {% if option.pos==0 %}selected="selected"{% endif %}>{{ option.text }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+      {% endif %}
+      <div class="col-md-4">
+        <label for="supplier-form-contact-name">Nombre del contacto:</label>
         <div class="form-group">
-          <input type="text" readonly="readonly" id="supplier-form-paymentmethod" {% if buyorder.paymentmethod!=null %} value="{{ buyorder.paymentmethod.name }}" {% endif %} class="form-control" placeholder="Método de pago">
+          <input type="text" id="supplier-form-contact-name" value="{{ buyorder.suppliercontactname }}" class="form-control"/>
         </div>
       </div>
       <div class="col-md-2">
-        <label for="supplier-form-deliverynote">Nº albarán proveedor:</label>
+        <label for="supplier-form-contact-email">Email del contacto:</label>
         <div class="form-group">
-          <input type="text" id="supplier-form-deliverynote" value="{{ buyorder.supplierdeliverynote }}"  class="form-control" placeholder="Nº de albarán proveedor">
+          <input type="text" id="supplier-form-contact-email" value="{{ buyorder.suppliercontactemail }}" class="form-control"/>
         </div>
       </div>
       <div class="col-md-2">
-        <label for="supplier-form-ouroffer">Nuestra Oferta:</label>
+        <label for="supplier-form-contact-phone">Teléfono del contacto:</label>
         <div class="form-group">
-          <input type="text" id="supplier-form-ouroffer" readonly="readonly" class="form-control" placeholder="Nuestra oferta">
+          <input type="text" id="supplier-form-contact-phone" value="{{ buyorder.suppliercontactphone }}" class="form-control"/>
         </div>
       </div>
       <div class="col-md-2">
-        <label for="supplier-form-theiroffer">Su oferta relacionada:</label>
-        <div class="form-group">
-          <input type="text" id="supplier-form-theiroffer" readonly="readonly" class="form-control" placeholder="Su oferta relacionada">
+        <div class="form-group" >
+          <div class="input-group">
+            <input type="checkbox"  id="buyorder-form-priority" {% if buyorder.priority==1 %} checked {% endif %} class="form-check-input icheck"/>
+            <label for="buyorder-form-priority">&nbsp; Urgente</label>
+          </div>
         </div>
       </div>
-      <div class="col-md-2">
-        <label for="buyorder-form-shippingcharge">Portes:</label>
-        <div class="form-group">
-          <input type="text"  readonly="readonly" id="buyorder-form-shippingcharge" {% if buyorder.shippingcharge=="1" %} class="form-control input-success"  value="PAGADOS" {% else %}  class="form-control input-danger"  value="DEBIDOS"{% endif %} class="form-control" placeholder="Portes...">
+      <div class="col-md-4" id="show-observationpriority" {% if buyorder.priority==0 %}style="display:none;"{% endif %}>
+        <div class="form-group" >
+          <label for="buyorder-form-observationpriority">Motivo de la urgencia:</label>
+          <textarea id="buyorder-form-observationpriority" name="buyorder-form-observationpriority" class="form-control" style="min-height:50px;" >{% if buyorder.observationpriority!=null %}{{ buyorder.observationpriority }}{% endif %}</textarea>
         </div>
       </div>
-      <div class="col-md-2">
-        <label for="buyorder-form-freeshipping">Portes gratis desde:</label>
-        <div class="input-group">
-          <span class="input-group-addon"><i class="fa fa-euro" aria-hidden="true"></i></span>
-          <input type="text"  readonly="readonly" id="buyorder-form-freeshipping" value="{{ buyorder.freeshipping }}" class="form-control"/>
+      <div class="col-md-6">
+        <div class="form-group" >
+          <label for="buyorder-form-observationpublic">Observaciones públicas:</label>
+          <textarea id="buyorder-form-observationpublic" name="buyorder-form-observationpublic" class="form-control" style="min-height:50px;" >{% if buyorder.observationpublic!=null %}{{ buyorder.observationpublic }}{% endif %}</textarea>
         </div>
       </div>
-      <div class="col-md-2">
-        <label for="buyorder-form-minorder">Importe mínimo:</label>
-        <div class="input-group">
-          <span class="input-group-addon"><i class="fa fa-euro" aria-hidden="true"></i></span>
-          <input type="number" readonly="readonly" id="buyorder-form-minorder" value="{{ buyorder.minorder }}" class="form-control"/>
+      <div class="panel minimal" style="clear: left;">
+        <div class="panel-heading">
+          <div class="panel-title">Resumen</div>
+        </div>
+        <div class="panel-body">
+          <div class="col-md-2">
+            <label for="supplier-form-paymentmethod">Método de pago:</label>
+            <div class="form-group">
+              <input type="hidden" id="supplier-form-paymentmethod-id" value="{% if buyorder.paymentmethod!=null %} {{ buyorder.paymentmethod.id }} {% endif %}">
+              <input type="text" readonly="readonly" id="supplier-form-paymentmethod" {% if buyorder.paymentmethod!=null %} value="{{ buyorder.paymentmethod.name }}" {% endif %} class="form-control"/>
+            </div>
+          </div>
+          <div class="col-md-2">
+            <label for="buyorder-form-shippingcharge">Portes:</label>
+            <div class="form-group">
+              <input type="text"  readonly="readonly" id="buyorder-form-shippingcharge" {% if buyorder.shippingcharge=="1" %} class="form-control input-success"  value="PAGADOS" {% else %}  class="form-control input-danger"  value="DEBIDOS"{% endif %} class="form-control" />
+            </div>
+          </div>
+          <div class="col-md-2">
+            <div class="form-group">
+              <label for="buyorder-form-freeshipping">Portes gratis desde:</label>
+              <span id="unity-view-form-buyorder-freeshipping" class="input__unity">
+                <span>€</span>
+              </span>
+              <input type="text" id="buyorder-form-freeshipping" name="buyorder-form-freeshipping" readonly="readonly" autocomplete="off" class="number-type form-control input_parent__unity" value="{{ buyorder.freeshipping}}">
+            </div>
+          </div>
+          <div class="col-md-2">
+            <div class="form-group">
+              <label for="buyorder-form-minorder">Importe mínimo:</label>
+              <span id="unity-view-form-buyorder-minorder" class="input__unity">
+                <span>€</span>
+              </span>
+              <input type="text" id="buyorder-form-minorder" name="buyorder-form-minorder" readonly="readonly" autocomplete="off" class="number-type form-control input_parent__unity" value="{{ buyorder.minorder}}">
+            </div>
+          </div>
+          <div class="col-md-2">
+            <div class="form-group">
+              <label for="buyorder-form-weight">Peso:</label>
+              <span id="unity-view-form-buyorder-weight" class="input__unity">
+                <span><i class="fa fa-balance-scale" aria-hidden="true"></i></span>
+              </span>
+              <input type="text" id="buyorder-form-weight" name="buyorder-form-weight" readonly="readonly" autocomplete="off" class="number-type form-control input_parent__unity" value="{{ buyorder.weight }}">
+            </div>
+          </div>
+          <div class="col-md-2">
+            <label for="buyorder-form-typeofconfirmation">Tipo de confirmación:</label>
+            <div class="form-group">
+              <input type="text" readonly="readonly" id="buyorder-form-typeofconfirmation" {% if buyorder.typeofconfirmation=="1" %} value="WEB" {% else %}  value="CORREO"{% endif %} class="form-control"/>
+            </div>
+          </div>
+          <div class="col-md-2">
+            <div class="form-group">
+              <label for="buyorder-form-amount">Importe:</label>
+              <span id="unity-view-form-buyorder-amount" class="input__unity">
+                <span>€</span>
+              </span>
+              <input type="text" id="buyorder-form-amount" name="buyorder-form-amount" readonly="readonly" autocomplete="off" class="number-type form-control input_parent__unity" value="{{ buyorder.amount|number_format(2)}}">
+            </div>
+          </div>
+          <div class="col-md-2">
+            <div class="form-group">
+              <label for="buyorder-form-discount">Descuento:</label>
+              <span id="unity-view-form-buyorder-discount" class="input__unity">
+                <span>%</span>
+              </span>
+              <input type="text" id="buyorder-form-discount" name="buyorder-form-discount" autocomplete="off" class="number-type form-control input_parent__unity" value="{{ buyorder.discount }}">
+            </div>
+          </div>
+          <div class="col-md-2">
+            <div class="form-group">
+              <label for="buyorder-form-base">Base imponible:</label>
+              <span id="unity-view-form-buyorder-base" class="input__unity">
+                <span>€</span>
+              </span>
+              <input type="text" id="buyorder-form-base" name="buyorder-form-base" readonly="readonly" autocomplete="off" class="number-type form-control input_parent__unity" value="{{ buyorder.base|number_format(2)}}">
+            </div>
+          </div>
+          <div class="col-md-2">
+            <div class="form-group">
+              <label for="buyorder-form-taxes">IVA:</label>
+              <span id="unity-view-form-buyorder-taxes" class="input__unity">
+                <span>€</span>
+              </span>
+              <input type="text" id="buyorder-form-taxes" name="buyorder-form-taxes" readonly="readonly" autocomplete="off" class="number-type form-control input_parent__unity" value="{{ buyorder.taxes|number_format(2)}}">
+            </div>
+          </div>
+          <div class="col-md-2">
+            <div class="form-group">
+              <label for="buyorder-form-shipping">Portes:</label>
+              <span id="unity-view-form-buyorder-shipping" class="input__unity">
+                <span>€</span>
+              </span>
+              <input type="text" id="buyorder-form-shipping" name="buyorder-form-shipping" {% if buyorder.shippingcharge=="1" and buyorder.base!=null and buyorder.base!='' and  buyorder.minorder!=null and  buyorder.minorder!='' and buyorder.base>=buyorder.minorder %} readonly="readonly" {% endif %} autocomplete="off" class="number-type form-control input_parent__unity" value="{{ buyorder.shipping }}">
+            </div>
+          </div>
+          <div class="col-md-2">
+            <div class="form-group">
+              <label for="buyorder-form-total">Total:</label>
+              <span id="unity-view-form-buyorder-total" class="input__unity">
+                <span>€</span>
+              </span>
+              <input type="text" id="buyorder-form-total" name="buyorder-form-total" readonly="readonly" autocomplete="off" class="number-type form-control input_parent__unity" value="{{ buyorder.total|number_format(2)}}">
+            </div>
+          </div>
         </div>
       </div>
-      <div class="col-md-2">
-        <label for="buyorder-form-additionalcost">Gastos extra:</label>
-        <div class="input-group">
-          <span class="input-group-addon"><i class="fa fa-euro" aria-hidden="true"></i></span>
-          <input type="number"  id="buyorder-form-additionalcost"  value="{{ buyorder.additionalcost }}"  class="form-control"/>
-        </div>
-      </div>
-      <div class="col-md-2">
-        <label for="buyorder-form-weight">Peso:</label>
-        <div class="input-group">
-          <span class="input-group-addon"><i class="fa fa-balance-scale" aria-hidden="true"></i></span>
-          <input type="number"  id="buyorder-form-weight" value="{{ buyorder.weight }}" class="form-control"/>
-        </div>
-      </div>
-      <div class="col-md-2">
-        <label for="buyorder-form-typeofconfirmation">Tipo de confirmación:</label>
-        <div class="form-group">
-          <input type="text" readonly="readonly" id="buyorder-form-typeofconfirmation" {% if buyorder.typeofconfirmation=="1" %} value="WEB" {% else %}  value="CORREO"{% endif %} class="form-control"/>
-        </div>
-      </div>
-      <div class="col-md-1">
-        <div class="input-group">
-          <input type="checkbox"  id="buyorder-form-priority" {% if buyorder.priority==1 %} checked {% endif %} class="form-check-input icheck"/>
-          <label for="buyorder-form-priority">&nbsp; Urgente</label>
+      <div class="panel minimal">
+        <div class="panel-heading">
+          <div class="panel-title">Líneas</div>
         </div>
       </div>
       {# OTROS #}
-      {# Indica le número de días en que envia el proveedor #}
+      {# Indica le número de días en que sirve el proveedor #}
       <input type="hidden" id="buyorder-form-estimateddelivery-number">
+      {# Otros datos del proveedor #}
+      <input type="hidden" id="supplier-form-address" value="{{ buyorder.supplieraddress }}">
+      <input type="hidden" id="supplier-form-postcode" value="{{ buyorder.supplierpostcode }}">
+      <input type="hidden" id="supplier-form-state" value="{{ buyorder.supplierstate }}">
+      <input type="hidden" id="supplier-form-country" value="{{ buyorder.suppliercountry }}">
+      <input type="hidden" id="supplier-form-city" value="{{ buyorder.suppliercity }}">
+      <input type="hidden" id="supplier-form-paymentterms" value="{{ buyorder.supplierpaymentterms }}">
     </div>
 </div>
 
 
 <script>
-  $(document).ready(function() {
+  // Restricts input for the given textbox to the given inputFilter.
+  function setInputFilter(textbox, inputFilter) {
+    ["input", "keydown", "keyup", "mousedown", "mouseup", "select", "contextmenu", "drop"].forEach(function(event) {
+      textbox.oldValue = "";
+      textbox.addEventListener(event, function() {
+        if (inputFilter(this.value)) {
+          this.oldValue = this.value;
+          this.oldSelectionStart = this.selectionStart;
+          this.oldSelectionEnd = this.selectionEnd;
+        } else if (this.hasOwnProperty("oldValue")) {
+          this.value = this.oldValue;
+          this.setSelectionRange(this.oldSelectionStart, this.oldSelectionEnd);
+        }
+      });
+    });
+  }
 
-    $('body').on('change', "#buyorder-form-store", function(e) {
-      //Almacén de Envíos Directos
-      if($("#buyorder-form-store").val()=="6"){
-         $("#destination-data").css("display","block");
-         $("#destination-form-name").val('');
-         $("#destination-form-address").val('');
-         $("#destination-form-city").val('');
-         $("#destination-form-postcode").val('');
-         $("#destination-form-state").val('');
-         $("#destination-form-country").val('');
-         $("#destination-form-phone").val('');
-         $("#destination-form-email").val('');
-         $("#searching-customer").css("display","block");
-       }
-      else{
-         setStoreInfo($(this).val());
-         $("#searching-customer").css("display","none");
-      }
+  $(document).ready(function() {
+    // Input de tipo number
+    $( ".number-type" ).each(function( index ) {
+      setInputFilter(document.getElementById($(this).attr('id')), function(value) {
+        // Restrict input to digits and '.' by using a regular expression filter.
+        return /^\d*\.?\d*$/.test(value);
+      });
     });
 
+    {# Cambio de check de urgencia #}
+    $('#buyorder-form-priority').on('ifChanged', function(e){
+      if ($("#buyorder-form-priority").is(':checked')){
+        $("#show-observationpriority").css("display","block");
+      }else{
+        $("#show-observationpriority").css("display","none");
+      }
+    });
+    {# Ficha de proveedores #}
+    $('body').on('click', "#selection-view-{{ formConstructor }}-supplier", function(e){
+      var id=$('#supplier-form-id').val();
+      if(id!=0 && id!=""){
+        url=$(this).attr("attr-url");
+        url=url.replace('_____',id);
+        var win = window.open(url, '_blank');
+        win.focus();
+      }
+    });
+    {# Cambio de contacto del proveedor #}
+    $('body').on('change', "#supplier-form-contact-id", function(e) {
+      contact_id = $("#supplier-form-contact-id").val();
+      if (contact_id=='' || contact_id=='0'){
+        $("#supplier-form-contact-name").val('');
+        $("#supplier-form-contact-email").val('');
+        $("#supplier-form-contact-phone").val('');
+      }else{
+        if((++load_wait)==1) $("#load-spinner").fadeIn();
+        $.ajax({
+           type: "GET",
+           dataType: "json",
+           url: "/api/global/contact/"+contact_id+'/get'
+         }).done(function(elements, textStatus, jqXHR) {
+           if((--load_wait)==0) $("#load-spinner").fadeOut();
+            if (elements!=null){
+              $("#supplier-form-contact-name").val(elements.name);
+              $("#supplier-form-contact-email").val(elements.email);
+              $("#supplier-form-contact-phone").val(elements.phone);
+            }
+        });
+      }
+    });
+    {# Cambio de descuento o portes #}
+    $('body').on('change', "#buyorder-form-discount,#buyorder-form-shipping", function(e) {
+      buyorderstotal(null);
+    });
   });
 </script>

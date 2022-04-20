@@ -1,5 +1,10 @@
 <div class="panel panel-primary panel-shadow" id="destination-data" data-collapsed="0" style="-webkit-box-shadow: none; box-shadow:none; margin-bottom: -1px;"><!-- to apply shadow add class "panel-shadow" -->
   <div class="panel-body">
+    <div class="panel minimal">
+      <div class="panel-heading">
+        <div class="panel-title">Destino</div>
+      </div>
+    </div>
       {% if buyorder.store!=null %}
           <div class="col-md-2">
             <div class="form-group">
@@ -24,22 +29,27 @@
       </div>
       {% endif %}
       <div class="col-md-4" id="searching-customer" {% if buyorder.customer==null or id==0 %}style="display:none;"{% endif %}>
-        <label for="destination-form-customercodename">Cliente:</label>
+        <label for="customer-form-codename">Cliente:</label>
+        <span id="selection-view-{{ formConstructor }}-customer" class="input-search-selection__view" style="" attr-url="{{ url('formCustomer',{'id':'_____'}) }}"><i class="fa fa-file-text-o" aria-hidden="true"></i><span>&nbsp;Ver Ficha</span></span>
         <div class="input-group">
-          <input type="text" readonly id="destination-form-customercodename" {% if buyorder.customer!=null %} value="({{buyorder.customer.code}}) {{buyorder.customer.name}}" {% endif %} class="form-control" placeholder="Selecciona cliente..." data-toggle="modal" data-target="#customer-search-modal-form">
+          <input type="text" readonly id="customer-form-codename" {% if buyorder.customer!=null %} value="({{buyorder.customer.code}}) {{buyorder.customer.name}}" {% endif %} class="form-control" placeholder="Selecciona cliente..." data-toggle="modal" data-target="#customer-search-modal-form">
           <input type="hidden" id="customer-form-id" name="customer-form-id" {% if buyorder.customer!=null %} value="{{buyorder.customer.id}}" {% else %}  value="" {% endif %}/>
+          <input type="hidden" id="customer-form-code" name="customer-form-code" {% if buyorder.customer!=null %} value="{{buyorder.customer.code}}" {% else %}  value="" {% endif %}/>
+          <input type="hidden" id="customer-form-name" name="customer-form-name" {% if buyorder.customer!=null %} value="{{buyorder.customer.name}}" {% else %}  value="" {% endif %}/>
+          <input type="hidden" id="customer-form-id-tmp" name="customer-form-id-tmp" value=""/>
           <div class="input-group-btn">
             <button type="button" class="btn btn-white" style="height: 27px;" data-toggle="modal" data-target="#customer-search-modal-form">
             <i class="fa fa-search"></i> </button>
           </div>
         </div>
       </div>
-        <div class="col-md-2">
-          <label for="destination-form-name">Nombre:</label>
-          <div class="form-group">
-            <input type="text"  id="destination-form-name" value="{{ buyorder.destinationname }}" class="form-control" placeholder="Nombre">
-          </div>
+      <div class="col-md-2">
+        <label for="destination-form-name">Nombre:</label>
+        <div class="form-group">
+          <input type="hidden" id="destination-form-id" name="destination-form-id" {% if buyorder.destination!=null %} value="{{buyorder.destination.id}}" {% else %}  value="" {% endif %}/>
+          <input type="text"  id="destination-form-name" value="{{ buyorder.destinationname }}"  class="form-control" placeholder="Nombre destino">
         </div>
+      </div>
         <div class="col-md-4">
           <label for="destination-form-address">Dirección:</label>
           <div class="form-group">
@@ -116,30 +126,138 @@
           </div>
         </div>
         {% endif %}
+        <div id="show-destinationcontact" style="clear: left; {% if buyorder.customer==null or id==0 %} display:none; {% endif %}">
+          {% if buyorder.destinationcontact!=null %}
+            <div class="col-md-4">
+              <label for="destination-form-contact-id">Contacto del proveedor:</label>
+              <div class="form-group">
+                <select type="text" id="destination-form-contact-id" class="form-control select2">
+                  {% for option in destinationcontacts %}
+                    <option value="{{ option.id }}" {% if buyorder.destinationcontact.id==option.id %}selected="selected"{% endif %}>{{ option.text }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          {% else %}
+            <div class="col-md-4">
+              <label for="destination-form-contact-id">Contacto del proveedor:</label>
+              <div class="form-group">
+                <select type="text" id="destination-form-contact-id" class="form-control select2">
+                  {% for option in destinationcontacts %}
+                    <option value="{{ option.id }}" {% if option.pos==0 %}selected="selected"{% endif %}>{{ option.text }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          {% endif %}
+          <div class="col-md-4">
+            <label for="destination-form-contact-name">Nombre del contacto:</label>
+            <div class="form-group">
+              <input type="text" id="destination-form-contact-name" value="{{ buyorder.destinationcontactname }}" class="form-control"/>
+            </div>
+          </div>
+          <div class="col-md-2">
+            <label for="destination-form-contact-email">Email del contacto:</label>
+            <div class="form-group">
+              <input type="text" id="destination-form-contact-email" value="{{ buyorder.destinationcontactemail }}" class="form-control"/>
+            </div>
+          </div>
+          <div class="col-md-2">
+            <label for="destination-form-contact-phone">Teléfono del contacto:</label>
+            <div class="form-group">
+              <input type="text" id="destination-form-contact-phone" value="{{ buyorder.destinationcontactphone }}" class="form-control"/>
+            </div>
+          </div>
+        </div>
+        <div class="panel minimal"  style="clear: left;">
+          <div class="panel-heading">
+            <div class="panel-title">Líneas</div>
+          </div>
+        </div>
       </div>
     </div>
 <script>
     $(document).ready(function() {
-
       {# Cambio de almacén de destino #}
       $('body').on('change', "#buyorder-form-store", function(e) {
         //Almacén de Envíos Directos
         if($("#buyorder-form-store").val()=="6"){
            $("#destination-data").css("display","block");
+           $("#customer-form-id").val('');
+           $("#customer-form-id-tmp").val('');
+           $("#customer-form-code").val('');
+           $("#customer-form-name").val('');
+           $("#customer-form-codename").val('');
+           $("#destination-form-id").val('');
            $("#destination-form-name").val('');
            $("#destination-form-address").val('');
            $("#destination-form-city").val('');
            $("#destination-form-postcode").val('');
            $("#destination-form-state").val('');
+           $("#destination-form-state").trigger('change');
            $("#destination-form-country").val('');
+           $("#destination-form-country").trigger('change');
            $("#destination-form-phone").val('');
            $("#destination-form-email").val('');
+           $("#destination-form-contact-id").val('');
+           $("#destination-form-contact-id").trigger('change');
+           setContactsCustomer(0);
            $("#searching-customer").css("display","block");
+           $("#show-destinationcontact").css("display","block");
          }
         else{
           setStoreInfo($(this).val());
+          $("#customer-form-id").val('');
+          $("#customer-form-id-tmp").val('');
+          $("#customer-form-code").val('');
+          $("#customer-form-name").val('');
+          $("#customer-form-codename").val('');
+          $("#destination-form-contact-id").val('');
+          $("#destination-form-contact-id").trigger('change');
+          setContactsCustomer(0);
           $("#searching-customer").css("display","none");
+          $("#show-destinationcontact").css("display","none");
+        }
+        // Actualizar prototipe para cuando se cree una línea se asigna este almacén por defecto
+        store_name = $("#buyorder-form-store option:selected").text();
+        store_name = store_name.substring(store_name.indexOf(') - ')+4);
+        window['js{{spreadsheet.name}}_prototipe'].store_id = $("#buyorder-form-store").val()+'~'+store_name;
+      });
+
+      {# Cambio de contacto del cliente #}
+      $('body').on('change', "#destination-form-contact-id", function(e) {
+        contact_id = $("#destination-form-contact-id").val();
+        if (contact_id=='' || contact_id=='0'){
+          $("#destination-form-contact-name").val('');
+          $("#destination-form-contact-email").val('');
+          $("#destination-form-contact-phone").val('');
+        }else{
+          if((++load_wait)==1) $("#load-spinner").fadeIn();
+          $.ajax({
+             type: "GET",
+             dataType: "json",
+             url: "/api/global/contact/"+contact_id+'/get'
+           }).done(function(elements, textStatus, jqXHR) {
+             if((--load_wait)==0) $("#load-spinner").fadeOut();
+              if (elements!=null){
+                $("#destination-form-contact-name").val(elements.name);
+                $("#destination-form-contact-email").val(elements.email);
+                $("#destination-form-contact-phone").val(elements.phone);
+              }
+          });
         }
       });
+
+      {# Ficha de cliente #}
+      $('body').on('click', "#selection-view-{{ formConstructor }}-customer", function(e){
+        var id=$('#customer-form-id').val();
+        if(id!=0 && id!=""){
+          url=$(this).attr("attr-url");
+          url=url.replace('_____',id);
+          var win = window.open(url, '_blank');
+          win.focus();
+        }
+      });
+
     });
   </script>

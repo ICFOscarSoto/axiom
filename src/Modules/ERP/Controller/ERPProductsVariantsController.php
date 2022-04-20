@@ -13,6 +13,7 @@ use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\ERP\Entity\ERPProducts;
 use App\Modules\ERP\Entity\ERPSuppliers;
 use App\Modules\ERP\Entity\ERPProductsVariants;
+use App\Modules\ERP\Entity\ERPStocks;
 use App\Modules\Globale\Entity\GlobaleCountries;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
@@ -154,5 +155,94 @@ class ERPProductsVariantsController extends Controller
     return new JsonResponse(array('result' => $result));
   }
 
+  /**
+  * @Route("/api/getWSProductVariants/{product_id}", name="getWSProductVariants", defaults={"product_id"=0})
+  */
+  public function getWSProductVariants(Request $request, $product_id)
+  {
+    // Variantes de un producto
+    $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+    $productVariantsRepository			= $this->getDoctrine()->getRepository(ERPProductsVariants::class);
+    $result 	 = [];
+    $variants = $productVariantsRepository->getWSProductVariants($product_id);
+    if ($variants!=null){
+      $head = [];
+      $item = [];
+  		$item["id"]			  = '0~Variante...';
+  		$item["name"]		  ='Variante...';
+  		$head[]=$item;
+      $result = $variants;
+      if ($result['data'] != null)
+        $result['data'] = array_merge($head,$result['data']);
+      else
+        $result['data'] = $head;
+    }
+    return new JsonResponse($result);
+  }
 
+  /**
+  * @Route("/api/getWSProductVariantPrice/{supplier_id}/{product_id}/{variant_id}/{quantity}", name="getWSProductVariantPrice", defaults={"supplier_id"=0, "product_id"=0, "variant_id"=0, "quantity"=1})
+  */
+  public function getWSProductVariantPrice($supplier_id, $product_id, $variant_id, $quantity)
+  {
+     $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+     $productVariantsRepository=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
+     $result = [];
+     $product = $productVariantsRepository->getProductVariantBySupplier($supplier_id, $product_id, $variant_id, $quantity);
+     if ($product!=null){
+       $result = $product;
+     }
+     return new JsonResponse($result);
+  }
+
+  /**
+  * @Route("/api/getWSProductVariantPriceStock/{supplier_id}/{product_id}/{variant_id}/{quantity}/{store_id}", name="getWSProductVariantPriceStock", defaults={"supplier_id"=0, "product_id"=0, "variant_id"=0, "quantity"=1, "store_id"=0})
+  */
+  public function getWSProductVariantPriceStock($supplier_id, $product_id, $variant_id, $quantity, $store_id)
+  {
+     $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+     $productVariantsRepository=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
+     $productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
+     $erpStocksRepository = $this->getDoctrine()->getRepository(ERPStocks::class);
+     $result = [];
+     $product = $productVariantsRepository->getProductVariantBySupplier($supplier_id, $product_id, $variant_id, $quantity);
+     if ($product!=null){
+       $result = $product;
+       if ($result!=null && count($result)>0){
+         $aproduct = explode('~',$product_id);
+         if (count($aproduct)>1)
+           $product_id = $aproduct[0];
+         $oproduct = $productRepository->find($product_id);
+         if ($oproduct!=null && $oproduct->getStockcontrol()){
+           $avariant = explode('~',$variant_id);
+           if (count($avariant)>1)
+             $variant_id = $avariant[0];
+           $astore = explode('~',$store_id);
+           if (count($astore)>1)
+             $store_id = $astore[0];
+           $stock = $erpStocksRepository->getStock($product_id,($oproduct->getGrouped()?$variant_id:null), $store_id);
+           for($i=0; $i<count($result); $i++){
+             if ($stock!=null){
+               foreach($stock as $key=>$value){
+                 if ($value==null || $value=='')
+                   $value=0;
+                 $result[$i][$key] = $value;
+               }
+             }else{
+               $result[$i]['stock'] = 0;
+               $result[$i]['minstock'] = 0;
+               $result[$i]['stockpedingreceive'] = 0;
+               $result[$i]['stockpedingserve'] = 0;
+               $result[$i]['stockvirtual'] = 0;
+               $result[$i]['stockt'] = 0;
+               $result[$i]['stockpedingreceivet'] = 0;
+               $result[$i]['stockpedingservet'] = 0;
+               $result[$i]['stockvirtualt'] = 0;
+             }
+           }
+         }
+       }
+     }
+     return new JsonResponse($result);
+  }
 }

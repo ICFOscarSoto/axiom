@@ -202,9 +202,27 @@ class ERPStoresController extends Controller
 		$item["countryid"]=64;
 		$item["countryname"]="España";
 		return new JsonResponse(["infostore"=>$item]);
-
 	}
 
-
-
+	/**
+	 * @Route("/api/getWSProductStores/{product_id}", name="getWSProductStores", defaults={"product_id"=0})
+	 */
+	public function getWSProductStores($product_id, RouterInterface $router,Request $request)
+	{
+		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		$storesRepository=$this->getDoctrine()->getRepository(ERPStores::class);
+		$stores=$storesRepository->getStores($product_id);
+		$result=[];
+		$item = [];
+		$item["id"]			  = '0~Almacen...';
+		$item["name"]		  ='Almacen...';
+		$result[]=$item;
+	  foreach($stores as $store){
+		 $item = [];
+		 $item["id"]			  = $store['id'].'~'.$store['code'];
+		 $item["name"]		  ='('.$store['code'].') - '.$store['name'];
+		 $result[]=$item;
+		}
+	  return new JsonResponse($result);
+	}
 }
