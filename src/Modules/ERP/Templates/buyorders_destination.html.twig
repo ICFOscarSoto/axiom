@@ -220,7 +220,7 @@
         }
         // Actualizar prototipe para cuando se cree una línea se asigna este almacén por defecto
         store_name = $("#buyorder-form-store option:selected").text();
-        store_name = store_name.substring(store_name.indexOf(') - ')+4);
+        store_name = store_name.substring(1,store_name.indexOf(') - '));
         window['js{{spreadsheet.name}}_prototipe'].store_id = $("#buyorder-form-store").val()+'~'+store_name;
       });
 
