@@ -48,11 +48,6 @@ class ERPVariantsValues
      */
     private $dateupd;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
-    private $increment;
-
     public function getId(): ?int
     {
         return $this->id;
@@ -130,15 +125,4 @@ class ERPVariantsValues
         return $this;
     }
 
-    public function getIncrement(): ?int
-    {
-        return $this->increment;
-    }
-
-    public function setIncrement(?int $increment): self
-    {
-        $this->increment = $increment;
-
-        return $this;
-    }
 }

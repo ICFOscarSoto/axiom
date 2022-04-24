@@ -259,7 +259,7 @@ class ERPProductsRepository extends ServiceEntityRepository
                       (sp.end is null or sp.end<=now())
                       $filter
                 UNION
-                SELECT '' as id, '' as name, '' as title FROM erpproducts
+                SELECT '0~Artículo...' as id, 'Artículo...' as name, '' as title FROM erpproducts
                 ORDER BY title ASC";
         $params=["supplier" => $supplier];
         $result = $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
@@ -270,40 +270,74 @@ class ERPProductsRepository extends ServiceEntityRepository
     /*
     * Obtiene el producto que tiene un proveedor y su coste en función de la cantidad
     */
-    public function getProductBySupplier($supplier, $quantity, $product){
+    public function getProductBySupplier($supplier, $product, $quantity){
       $result = null;
       if ($product!='|'){
         $aproduct = explode('~',$product);
-        if (count($aproduct)>0)
+        if (count($aproduct)>1)
           $product = $aproduct[0];
-        $query="SELECT concat(p.id,'~',p.code) as 'reference',
-                       p.name as 'description',
+        $query="SELECT concat(p.id,'~',p.code) as 'product_id',
+                       p.name as 'productname',
                        if (sp.pvp is null, 0, if (sp.pvp='', 0, sp.pvp)) as 'pvp',
-                       if (sd.discount is null, 0, if (sd.discount='', 0, sd.discount)) as 'discount'
+                       if (sd.discount1 is null, 0, if (sd.discount1='', 0, sd.discount1)) as 'discount1',
+                       if (sd.discount2 is null, 0, if (sd.discount2='', 0, sd.discount2)) as 'discount2',
+                       if (sd.discount3 is null, 0, if (sd.discount3='', 0, sd.discount3)) as 'discount3',
+                       if (sd.discount4 is null, 0, if (sd.discount4='', 0, sd.discount4)) as 'discount4',
+                       if (sd.discount is null, 0, if (sd.discount='', 0, sd.discount)) as 'discountequivalent',
+                       if (t.tax is null, 0, if (t.tax='', 0, t.tax)) as 'taxperc',
+                       if (p.weight is null, 0, if (p.weight='', 0, p.weight)) as 'weight',
+                       if (p.purchasepacking is null, 0, if (p.purchasepacking='', 0, p.purchasepacking)) as 'packing',
+                       if (p.multiplicity is null, 0, if (p.multiplicity='', 0, p.multiplicity)) as 'multiplicity',
+                       if (p.minimumquantityofbuy is null, 0, if (p.minimumquantityofbuy='', 0, p.minimumquantityofbuy)) as 'minimumquantityofbuy',
+                       if (p.purchaseunit is null, 0, if (p.purchaseunit='', 0, p.purchaseunit)) as 'purchaseunit',
+                       m.name as 'purchasemeasure'
                 FROM erpshopping_prices sp LEFT JOIN
                      erpproducts p on p.id=sp.product_id LEFT JOIN
+                     erpmeasurement_units m on m.id=p.purchasemeasure_id LEFT JOIN
+                     globale_taxes t on t.id=p.taxes_id LEFT JOIN
                      erpshopping_discounts sd on sd.supplier_id=sp.supplier_id and sd.category_id=p.category_id and sd.quantity<=:quantity and
                       sd.active=1 and sd.deleted=0 and
                       (sd.start is null or sd.start<=now()) and
                        (sd.end is null or sd.end>=now())
                 WHERE sp.supplier_id=:supplier and
                       p.id=:product and
+                      sp.quantity<=:quantity and
+                      sp.variant_id is null and
                       p.active=1 and p.deleted=0 and
                       sp.active=1 and sp.deleted=0 and
                       (sp.start is null or sp.start<=now()) and
                       (sp.end is null or sp.end>=now())
-                ORDER BY p.name ASC, sd.quantity DESC";
+                ORDER BY p.name ASC, sp.quantity DESC, sd.quantity DESC";
         $params=["supplier" => $supplier, "product" => $product, "quantity"=>$quantity];
         $result = $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
       }
       if ($result == null || count($result)==0)
         $result =
         [[
-            "reference" => "",
-            "description" => "",
+            "product_id" => "0~Artículo...",
+            "productname" => "",
             "pvp" => "0",
-            "discount" => "0",
-            "code" => ""
+            "discount1" => "0",
+            "discount2" => "0",
+            "discount3" => "0",
+            "discount4" => "0",
+            "discountequivalent" => "0",
+            "taxperc" => "0",
+            "weight" => "0",
+            "packing" => "1",
+            "multiplicity" => "1",
+            "minimumquantityofbuy" => "1",
+            "purchaseunit" => "1",
+            "purchasemeasure" => "",
+            "stock" => "0",
+            "minstock" => "0",
+            "stockpedingreceive" => "0",
+            "stockpedingserve" => "0",
+            "stockvirtual" => "0",
+            "stockt" => "0",
+            "stockpedingreceivet" => "0",
+            "stockpedingservet" => "0",
+            "stockvirtualt" => "0"
         ]];
       return $result;
     }

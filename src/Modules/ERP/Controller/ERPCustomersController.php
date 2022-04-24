@@ -222,21 +222,26 @@ class ERPCustomersController extends Controller
 	  }
 
 		/**
-		 * @Route("/api/customer/listcustomized", name="customerlistcustomized")
+		 * @Route("/api/customer/listcustomized", name="listCustomersBuyOrders")
 		 */
 		public function indexlistcustomized(RouterInterface $router,Request $request){
 			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 			$user = $this->getUser();
-			$locale = $request->getLocale();
 			$this->router = $router;
 			$manager = $this->getDoctrine()->getManager();
 			$repository = $manager->getRepository($this->class);
 			$listUtils=new GlobaleListUtils();
-			$listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/CustomersCustomized.json"),true);
-			$return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, ERPCustomers::class,[["type"=>"and", "column"=>"company", "value"=>$user->getCompany()]]);
+			$listFields=[
+			 ['name'=> 'id', 'caption'=>''],
+			 ['name'=> 'code', 'caption'=>'Código'],
+			 ['name'=> 'name', 'caption'=>'Nombre'],
+			 ['name'=> 'address', 'caption'=>'Dirección'],
+			 ['name'=> 'city', 'caption'=>'Localidad'],
+			 ['name'=> 'phone', 'caption'=>'Teléfono']
+			];
+			$return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, ERPCustomers::class,[["type"=>"and", "column"=>"company", "value"=>$user->getCompany()],["type"=>"and", "column"=>"code", "operator"=>"<>", "value"=>""]]);
 			return new JsonResponse($return);
 		}
-
 
 
 	/**
@@ -323,21 +328,32 @@ class ERPCustomersController extends Controller
 	$customerRepository=$this->getDoctrine()->getRepository(ERPCustomers::class);
 	$customer=$customerRepository->findOneBy(["id"=>$id]);
 
-//	$repositoryVariants=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
 	$addresses=$customerRepository->getAddresses($customer->getId());
 	$responseAddresses=Array();
 
-	$item['id']="0";
-	$item['name']=$customer->getName();
-	$item['address']=$customer->getAddress();
-	$item['postcode']=$customer->getPostcode();
-	$item['city']=$customer->getCity();
-	$item['phone']=$customer->getPhone();
-	$item['email']=$customer->getEmail();
-	$item['stateid']=$customer->getState()->getId();
-	$item['statename']=$customer->getState()->getName();
-	$item['countryid']=$customer->getCountry()->getId();
-	$item['countryname']=$customer->getCountry()->getName();
+	if ($customer!=null){
+		$item['id']="0";
+		$item['name']=$customer->getName();
+		$item['address']=$customer->getAddress();
+		$item['postcode']=$customer->getPostcode();
+		$item['city']=$customer->getCity();
+		$item['phone']=$customer->getPhone();
+		$item['email']=$customer->getEmail();
+		if ($customer->getState()!=null){
+			$item['stateid']=$customer->getState()->getId();
+			$item['statename']=$customer->getState()->getName();
+		}else{
+			$item['stateid']=0;
+			$item['statename']='';
+		}
+		if ($customer->getCountry()!=null){
+			$item['countryid']=$customer->getCountry()->getId();
+			$item['countryname']=$customer->getCountry()->getName();
+		}else{
+			$item['countryid']=0;
+			$item['countryname']='';
+		}
+	}
 
 	$responseAddresses[]=$item;
 	$item=null;

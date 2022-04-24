@@ -212,21 +212,25 @@ class ERPSuppliersController extends Controller
     return new JsonResponse($return);
   }
 
-
-
 	/**
-	 * @Route("/api/supplier/listwithcode", name="supplierlistcustomized")
+	 * @Route("/api/supplier/listbuyorders", name="listSuppliersBuyOrders")
 	 */
-	public function indexlistcustomized(RouterInterface $router,Request $request){
+	public function indexlistbuyorders(RouterInterface $router,Request $request){
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		$user = $this->getUser();
-		$locale = $request->getLocale();
 		$this->router = $router;
 		$manager = $this->getDoctrine()->getManager();
 		$repository = $manager->getRepository($this->class);
 		$listUtils=new GlobaleListUtils();
-		$listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/SuppliersCustomized.json"),true);
-		$return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, ERPSuppliers::class,[["type"=>"and", "column"=>"company", "value"=>$user->getCompany()]]);
+		$listFields=[
+		 ['name'=> 'id', 'caption'=>''],
+		 ['name'=> 'code', 'caption'=>'Código'],
+		 ['name'=> 'name', 'caption'=>'Nombre'],
+		 ['name'=> 'address', 'caption'=>'Dirección'],
+		 ['name'=> 'city', 'caption'=>'Localidad'],
+		 ['name'=> 'phone', 'caption'=>'Teléfono']
+		];
+		$return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, ERPSuppliers::class,[["type"=>"and", "column"=>"company", "value"=>$user->getCompany()],["type"=>"and", "column"=>"code", "operator"=>"<>", "value"=>""]]);
 		return new JsonResponse($return);
 	}
 
@@ -290,22 +294,55 @@ class ERPSuppliersController extends Controller
 
 
  /**
-* @Route("/api/ERP/supplier/orderinfo/{code}/get", name="getOrderInfo")
+* @Route("/api/ERP/supplier/orderinfo/{id}/get", name="getOrderInfo")
 */
-public function getOrderInfo($code, RouterInterface $router,Request $request){
+public function getOrderInfo($id, RouterInterface $router,Request $request){
  $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+ $result = [];
  $supplierRepository=$this->getDoctrine()->getRepository(ERPSuppliers::class);
- $supplier=$supplierRepository->findOneBy(["code"=>$code]);
-
  $supplierOrdersDataRepository=$this->getDoctrine()->getRepository(ERPSupplierOrdersData::class);
- $supplierordersdata=$supplierOrdersDataRepository->findOneBy(["supplier"=>$supplier]);
-
- $minorder=$supplierordersdata->getMinorder();
- $freeshipping=$supplierordersdata->getFreeshipping();
- $estimateddelivery=$supplierordersdata->getEstimateddelivery();
-
- return new JsonResponse(["minorder"=>$minorder,"freeshipping"=>$freeshipping,"estimateddelivery"=>$estimateddelivery]);
-
+ $supplier					=$supplierRepository->find(["id"=>$id]);
+ if ($supplier!=null){
+	 $result['suppliercode'] 	= $supplier->getCode();
+	 $result['suppliername'] 	= $supplier->getName();
+	 $result['supplieremail'] = $supplier->getEmail();
+	 $result['supplierphone'] = $supplier->getPhone();
+	 if ($supplier->getPaymentmethod()!=null){
+		$result['supplierpaymentmethod_id'] 	= $supplier->getPaymentmethod()->getId();
+	 	$result['supplierpaymentmethod_name'] = $supplier->getPaymentmethod()->getName();
+	 }else{
+		$result['supplierpaymentmethod_id'] 	= 0; 
+	  $result['supplierpaymentmethod_name'] = '';
+	 }
+	 // Otros datos
+	 $result['supplieraddress'] 	= $supplier->getAddress();
+	 $result['supplierpostcode'] 	= $supplier->getPostcode();
+	 if ($supplier->getState()!=null)
+	 	 $result['supplierstate'] 	= $supplier->getState()->getName();
+	 else
+	 	 $result['supplierstate'] 	= '';
+	 if ($supplier->getCountry()!=null)
+		 	$result['suppliercountry'] 	= $supplier->getCountry()->getName();
+		 else
+		 	$result['suppliercountry'] 	= '';
+	 $result['suppliercity'] 	= $supplier->getPostcode();
+	 $result['suppliervat'] 	= $supplier->getVat();
+	 if ($supplier->getPaymentterms()!=null)
+	 	 $result['supplierpaymentterms'] 	= $supplier->getPaymentterms()->getName();
+	 else
+	 	 $result['supplierpaymentterms'] 	= '';
+	 $supplierordersdata=$supplierOrdersDataRepository->findOneBy(["supplier"=>$supplier]);
+	 if ($supplierordersdata!=null){
+		 $result['minorder'] 			= $supplierordersdata->getMinorder();
+		 $result['freeshipping'] 	= $supplierordersdata->getFreeshipping();
+		 $result['estimateddelivery'] 	= $supplierordersdata->getEstimateddelivery();
+	 }else{
+		 $result['minorder'] 			= 0;
+		 $result['freeshipping'] 	= 0;
+		 $result['estimateddelivery'] 	= 0;
+	 }
+ }
+ return new JsonResponse($result);
 }
 
 }

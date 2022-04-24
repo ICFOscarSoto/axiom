@@ -1,26 +1,26 @@
 <?php
 
-namespace App\Repository\Modules\ERP\Entity;
+namespace App\Modules\ERP\Repository;
 
-use App\Modules\ERP\Entity\ERPBuyOrdersLines;
+use App\Modules\ERP\Entity\ERPBuyOrdersStates;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
- * @method ERPBuyOrdersLines|null find($id, $lockMode = null, $lockVersion = null)
- * @method ERPBuyOrdersLines|null findOneBy(array $criteria, array $orderBy = null)
- * @method ERPBuyOrdersLines[]    findAll()
- * @method ERPBuyOrdersLines[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method ERPBuyOrdersStates|null find($id, $lockMode = null, $lockVersion = null)
+ * @method ERPBuyOrdersStates|null findOneBy(array $criteria, array $orderBy = null)
+ * @method ERPBuyOrdersStates[]    findAll()
+ * @method ERPBuyOrdersStates[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class ERPBuyOrdersLinesRepository extends ServiceEntityRepository
+class ERPBuyOrdersStatesRepository extends ServiceEntityRepository
 {
     public function __construct(RegistryInterface $registry)
     {
-        parent::__construct($registry, ERPBuyOrdersLines::class);
+        parent::__construct($registry, ERPBuyOrdersStates::class);
     }
 
     // /**
-    //  * @return ERPBuyOrdersLines[] Returns an array of ERPBuyOrdersLines objects
+    //  * @return ERPBuyOrdersStates[] Returns an array of ERPBuyOrdersStates objects
     //  */
     /*
     public function findByExampleField($value)
@@ -37,7 +37,7 @@ class ERPBuyOrdersLinesRepository extends ServiceEntityRepository
     */
 
     /*
-    public function findOneBySomeField($value): ?ERPBuyOrdersLines
+    public function findOneBySomeField($value): ?ERPBuyOrdersStates
     {
         return $this->createQueryBuilder('e')
             ->andWhere('e.exampleField = :val')

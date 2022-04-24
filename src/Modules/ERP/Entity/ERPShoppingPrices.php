@@ -4,6 +4,7 @@ namespace App\Modules\ERP\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\ERP\Entity\ERPProducts;
+use \App\Modules\ERP\Entity\ERPVariantsValues;
 use \App\Modules\ERP\Entity\ERPSuppliers;
 
 
@@ -25,6 +26,12 @@ class ERPShoppingPrices
      * @ORM\JoinColumn(nullable=false, onDelete="Cascade")
      */
     private $product;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPVariantsValues")
+     * @ORM\JoinColumn(nullable=true)
+     */
+    private $variant;
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPSuppliers")
@@ -90,6 +97,18 @@ class ERPShoppingPrices
     public function setProduct(?ERPProducts $product): self
     {
         $this->product = $product;
+
+        return $this;
+    }
+
+    public function getVariant(): ?ERPVariantsValues
+    {
+        return $this->variant;
+    }
+
+    public function setVariant(?ERPVariantsValues $variant): self
+    {
+        $this->variant = $variant;
 
         return $this;
     }

@@ -6,11 +6,10 @@ use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\ERP\Entity\ERPBuyOrders;
 use \App\Modules\ERP\Entity\ERPProducts;
 use \App\Modules\ERP\Entity\ERPVariantsValues;
-use \App\Modules\ERP\Entity\ERPProductsVariants;
 use \App\Modules\ERP\Entity\ERPStores;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\Modules\ERP\Entity\ERPBuyOrdersLinesRepository")
+ * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPBuyOrdersLinesRepository")
  */
 class ERPBuyOrdersLines
 {
@@ -46,6 +45,16 @@ class ERPBuyOrdersLines
     /**
      * @ORM\Column(type="string", length=32)
      */
+    private $variantname;
+
+    /**
+     * @ORM\Column(type="string", length=32)
+     */
+    private $variantvalue;
+
+    /**
+     * @ORM\Column(type="string", length=32)
+     */
     private $code;
 
     /**
@@ -62,16 +71,6 @@ class ERPBuyOrdersLines
      * @ORM\Column(type="float", nullable=true)
      */
     private $shoppingprice;
-
-    /**
-     * @ORM\Column(type="float", nullable=true)
-     */
-    private $stock;
-
-    /**
-     * @ORM\Column(type="float")
-     */
-    private $virtualstock;
 
     /**
      * @ORM\Column(type="float", nullable=true)
@@ -121,22 +120,17 @@ class ERPBuyOrdersLines
     /**
      * @ORM\Column(type="float", nullable=true)
      */
+    private $discountequivalent;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
     private $totaldiscount;
 
     /**
      * @ORM\Column(type="string", length=32)
      */
     private $supplierreference;
-
-    /**
-     * @ORM\Column(type="string", length=50, nullable=true)
-     */
-    private $productVariant;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPProductsVariants", inversedBy="eRPBuyOrdersLines")
-     */
-    private $variantvalue;
 
     /**
      * @ORM\Column(type="float")
@@ -168,10 +162,6 @@ class ERPBuyOrdersLines
      */
     private $multiplicity;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
-    private $minimunQuantity;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
@@ -208,6 +198,10 @@ class ERPBuyOrdersLines
      * @ORM\Column(type="string", length=100)
      */
     private $storename;
+    /**
+     * @ORM\Column(type="string", length=32)
+     */
+    private $purchasemeasure;
 
     public function getId(): ?int
     {
@@ -306,30 +300,6 @@ class ERPBuyOrdersLines
     public function setShoppingprice(?float $shoppingprice): self
     {
         $this->shoppingprice = $shoppingprice;
-
-        return $this;
-    }
-
-    public function getStock(): ?float
-    {
-        return $this->stock;
-    }
-
-    public function setStock(?float $stock): self
-    {
-        $this->stock = $stock;
-
-        return $this;
-    }
-
-    public function getVirtualstock(): ?float
-    {
-        return $this->virtualstock;
-    }
-
-    public function setVirtualstock(float $virtualstock): self
-    {
-        $this->virtualstock = $virtualstock;
 
         return $this;
     }
@@ -442,6 +412,18 @@ class ERPBuyOrdersLines
         return $this;
     }
 
+    public function getDiscountequivalent(): ?float
+    {
+        return $this->discountequivalent;
+    }
+
+    public function setDiscountequivalent(?float $discountequivalent): self
+    {
+        $this->discountequivalent = $discountequivalent;
+
+        return $this;
+    }
+
     public function getTotaldiscount(): ?float
     {
         return $this->totaldiscount;
@@ -462,30 +444,6 @@ class ERPBuyOrdersLines
     public function setSupplierreference(string $supplierreference): self
     {
         $this->supplierreference = $supplierreference;
-
-        return $this;
-    }
-
-    public function getProductVariant(): ?string
-    {
-        return $this->productVariant;
-    }
-
-    public function setProductVariant(?string $productVariant): self
-    {
-        $this->productVariant = $productVariant;
-
-        return $this;
-    }
-
-    public function getVariantvalue(): ?ERPProductsVariants
-    {
-        return $this->variantvalue;
-    }
-
-    public function setVariantvalue(?ERPProductsVariants $variantvalue): self
-    {
-        $this->variantvalue = $variantvalue;
 
         return $this;
     }
@@ -558,18 +516,6 @@ class ERPBuyOrdersLines
     public function setMultiplicity(?int $multiplicity): self
     {
         $this->multiplicity = $multiplicity;
-
-        return $this;
-    }
-
-    public function getMinimunQuantity(): ?int
-    {
-        return $this->minimunQuantity;
-    }
-
-    public function setMinimunQuantity(?int $minimunQuantity): self
-    {
-        $this->minimunQuantity = $minimunQuantity;
 
         return $this;
     }
@@ -654,6 +600,42 @@ class ERPBuyOrdersLines
     public function setStorename(string $storename): self
     {
         $this->storename = $storename;
+
+        return $this;
+    }
+
+    public function getVariantname(): ?string
+    {
+        return $this->variantname;
+    }
+
+    public function setVariantname(string $variantname): self
+    {
+        $this->variantname = $variantname;
+
+        return $this;
+    }
+
+    public function getVariantvalue(): ?string
+    {
+        return $this->variantvalue;
+    }
+
+    public function setVariantvalue(string $variantvalue): self
+    {
+        $this->variantvalue = $variantvalue;
+
+        return $this;
+    }
+
+    public function getPurchasemeasure(): ?string
+    {
+        return $this->purchasemeasure;
+    }
+
+    public function setPurchasemeasure(string $purchasemeasure): self
+    {
+        $this->purchasemeasure = $purchasemeasure;
 
         return $this;
     }

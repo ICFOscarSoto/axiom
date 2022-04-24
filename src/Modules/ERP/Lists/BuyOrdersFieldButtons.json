@@ -1,4 +1,4 @@
 [
-  {"id": "editBuyOrders", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"ERPBuyOrdersForm", "actionType" : "foreground", "confirm" :false, "tooltip":""},
+  {"id": "editBuyOrders", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"formBuyOrders", "actionType" : "foreground", "confirm" :false, "tooltip":""},
   {"id": "delete", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"genericdelete", "routeParams":{"module":"ERP", "name":"BuyOrders"}, "confirm" :true, "undo" :false, "tooltip":"Borrar pedido", "actionType" : "background"}
 ]

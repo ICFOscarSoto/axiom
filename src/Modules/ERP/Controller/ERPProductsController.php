@@ -1268,17 +1268,92 @@ class ERPProductsController extends Controller
 	 }
 
 	 /**
-	 * @Route("/api/getWSProductSupplier/{supplier_id}/{product_id}/{quantity}", name="getWSProductSupplier", defaults={"supplier_id"=0, "product_id"=0, "quantity"=1})
+	 * @Route("/api/getWSProductSupplier/{supplier_id}/{quantity}/{product_id}/{store_id}", name="getWSProductSupplier", defaults={"supplier_id"=0, "quantity"=1, "product_id"=0, "store_id"=0})
 	 */
-	 public function getWSProductSupplier($supplier_id, $product_id, $quantity)
+	 public function getWSProductSupplier($supplier_id, $quantity, $product_id, $store_id)
 	 {
 		  $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 			$productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
+			$erpStocksRepository = $this->getDoctrine()->getRepository(ERPStocks::class);
 			$result = [];
 			$product = $productRepository->getProductBySupplier($supplier_id, $product_id, $quantity);
 			if ($product!=null){
 				$result = $product;
+				if ($result!=null && count($result)>0){
+					$aproduct = explode('~',$product_id);
+					if (count($aproduct)>1)
+						$product_id = $aproduct[0];
+          $oproduct = $productRepository->find($product_id);
+          if ($oproduct!=null && $oproduct->getStockcontrol()){
+						$astore = explode('~',$store_id);
+		        if (count($astore)>1)
+		          $store_id = $astore[0];
+            $stock = $erpStocksRepository->getStock($product_id,($oproduct->getGrouped()?0:null), $store_id);
+            for($i=0; $i<count($result); $i++){
+							if ($stock!=null){
+                foreach($stock as $key=>$value){
+									if ($value==null || $value=='')
+										$value=0;
+                  $result[$i][$key] = $value;
+								}
+              }else{
+								$result[$i]['stock'] = 0;
+								$result[$i]['minstock'] = 0;
+								$result[$i]['stockpedingreceive'] = 0;
+								$result[$i]['stockpedingserve'] = 0;
+								$result[$i]['stockvirtual'] = 0;
+								$result[$i]['stockt'] = 0;
+								$result[$i]['stockpedingreceivet'] = 0;
+								$result[$i]['stockpedingservet'] = 0;
+								$result[$i]['stockvirtualt'] = 0;
+							}
+            }
+          }
+        }
 			}
+			return new JsonResponse($result);
+	 }
+
+	 /**
+	 * @Route("/api/getWSProductStock/{product_id}/{variant_id}/{store_id}", name="getWSProductStock", defaults={"product_id"=0, "variant_id"=0, "store_id"=0})
+	 */
+	 public function getWSProductStock($product_id, $variant_id, $store_id)
+	 {
+		  $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			$productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
+			$erpStocksRepository = $this->getDoctrine()->getRepository(ERPStocks::class);
+			$result = [];
+			$aproduct = explode('~',$product_id);
+			if (count($aproduct)>1)
+				$product_id = $aproduct[0];
+      $oproduct = $productRepository->find($product_id);
+      if ($oproduct!=null && $oproduct->getStockcontrol()){
+				$avariant = explode('~',$variant_id);
+				if (count($avariant)>1)
+					$variant_id = $avariant[0];
+				$astore = explode('~',$store_id);
+        if (count($astore)>1)
+          $store_id = $astore[0];
+        $stock = $erpStocksRepository->getStock($product_id,($oproduct->getGrouped()?$variant_id:null), $store_id);
+				if ($stock!=null){
+          foreach($stock as $key=>$value){
+						if ($value==null || $value=='')
+							$value=0;
+            $result[0][$key] = $value;
+					}
+        }else{
+					$result[0]['stock'] = 0;
+					$result[0]['minstock'] = 0;
+					$result[0]['stockpedingreceive'] = 0;
+					$result[0]['stockpedingserve'] = 0;
+					$result[0]['stockvirtual'] = 0;
+					$result[0]['stockt'] = 0;
+					$result[0]['stockpedingreceivet'] = 0;
+					$result[0]['stockpedingservet'] = 0;
+					$result[0]['stockvirtualt'] = 0;
+				}
+      }
+
 			return new JsonResponse($result);
 	 }
 }

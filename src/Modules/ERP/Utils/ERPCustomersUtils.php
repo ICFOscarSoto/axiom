@@ -26,7 +26,6 @@ class ERPCustomersUtils
     return $list;
   }
 
-
   public function formatListWithCode($user){
     $list=[
       'id' => 'listCustomerswithcode',
@@ -42,42 +41,26 @@ class ERPCustomersUtils
     return $list;
   }
 
-
-  public function formatListCustomized($user){
-    $list=[
-      'id' => 'listCustomerscustomized',
-      'route' => 'customerlistcustomized',
-      'routeParams' => ["id" => $user->getId()],
-      'orderColumn' => 2,
-      'orderDirection' => 'ASC',
-      'tagColumn' => 3,
-      'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/CustomersCustomized.json"),true),
-      'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/CustomersFieldButtons.json"),true),
-      'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/CustomersTopButtons.json"),true)
-    ];
-    return $list;
-  }
-
   public function getExcludedForm($params){
     return ['customer','maincontact'];
   }
 
   public function getIncludedForm($params){
 
-  $doctrine=$params["doctrine"];
-  $user=$params["user"];
-  $id=$params["id"];
-  $contactsRepository=$doctrine->getRepository(ERPContacts::class);
+    $doctrine=$params["doctrine"];
+    $user=$params["user"];
+    $id=$params["id"];
+    $contactsRepository=$doctrine->getRepository(ERPContacts::class);
 
-  return [['maincontact', ChoiceType::class, [
-    'required' => false,
-    'attr' => ['class' => 'select2'],
-    'choices' => $contactsRepository->findBy(["customer"=>$id]),
-    'placeholder' => 'Select a contact...',
-    'choice_label' => 'name',
-    'choice_value' => 'id'
-  ]
-  ]];
+    return [['maincontact', ChoiceType::class, [
+      'required' => false,
+      'attr' => ['class' => 'select2'],
+      'choices' => $contactsRepository->findBy(["customer"=>$id]),
+      'placeholder' => 'Select a contact...',
+      'choice_label' => 'name',
+      'choice_value' => 'id'
+    ]
+    ]];
 }
 
 

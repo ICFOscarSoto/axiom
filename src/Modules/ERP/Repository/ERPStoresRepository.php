@@ -48,6 +48,15 @@ class ERPStoresRepository extends ServiceEntityRepository
     }
     */
 
+    public function getStores($product_id)
+    {
+      $query='SELECT distinct id, code, name
+        FROM erpstores
+        WHERE active=1 AND deleted=0' ;
+        return $this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
+
+    }
+
     public function getStoresInfo()
     {
       $query='SELECT id, name
@@ -56,7 +65,6 @@ class ERPStoresRepository extends ServiceEntityRepository
         return $this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
 
     }
-
     public function getInventoryStores()
     {
       $query='SELECT *
