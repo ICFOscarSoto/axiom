@@ -247,6 +247,8 @@ class GlobaleDefaultController extends Controller
       */
       public function export($module, $name, Request $request){
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+        $return = [];
+        $list = [];
         //$this->denyAccessUnlessGranted('ROLE_ADMIN');
         $utilsExport = new GlobaleExportUtils();
         $user = $this->getUser();
@@ -255,9 +257,18 @@ class GlobaleDefaultController extends Controller
         $repository = $manager->getRepository($class);
         $listUtils=new GlobaleListUtils();
         $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../../".$module."/Exports/".$name.".json"),true);
-        if(property_exists($class, "user") && !in_array("ROLE_GLOBAL", $user->getRoles()) && !in_array("ROLE_SUPERADMIN", $user->getRoles()) && !in_array("ROLE_ADMIN", $user->getRoles())) $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $class, [["type"=>"and", "column"=>"user", "value"=>$user]],[],-1);
-        else if(property_exists($class, "company")) $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $class, [["type"=>"and", "column"=>"company", "value"=>$user->getCompany()]],[],-1);
-          else $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $class,[],[],-1);
+        $orderby = 'id';
+        for($i=0; $i<count($listFields); $i++){
+          if (isset($listFields[$i]['order']) && $listFields[$i]['order']!='')
+          $orderby = $listFields[$i]['name'];
+        }
+        if(property_exists($class, "user") && !in_array("ROLE_GLOBAL", $user->getRoles()) && !in_array("ROLE_SUPERADMIN", $user->getRoles()) && !in_array("ROLE_ADMIN", $user->getRoles()))
+         $list=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $class, [["type"=>"and", "column"=>"user", "value"=>$user]],[],-1, $orderby);
+        else
+          if(property_exists($class, "company"))
+            $list=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $class, [["type"=>"and", "column"=>"company", "value"=>$user->getCompany()]],[],-1, $orderby);
+          else
+            $list=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $class,[],[],-1, $orderby);          
         $result = $utilsExport->export($list,$listFields);
         return $result;
       }

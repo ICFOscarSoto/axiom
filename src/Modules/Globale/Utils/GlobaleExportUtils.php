@@ -17,7 +17,11 @@ class GlobaleExportUtils
        }
        ob_start();
        $df = fopen("php://output", 'w');
-       fputcsv($df, array_map("utf8_decode",array_keys(reset($array))));
+       $head = [];
+       foreach ($this->template as $key => $value) {
+         array_push($head, (isset($value['caption']) && $value['caption']!=''?$value['caption']:$value['name']));
+       }
+       fputcsv($df, array_map("utf8_decode",$head));
        foreach ($array as $row) {
           fputcsv($df, array_values (array_map("utf8_decode", $row )));
        }
