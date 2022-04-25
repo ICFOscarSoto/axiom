@@ -1,66 +1,86 @@
-<div id="chat" class="fixed" data-current-user="Art Ramadani" data-order-by-status="1" data-max-chat-history="25">
-	
-	<div class="chat-inner">
+{% set current_path = app.request.get('_route') %}
+{% if current_path=='formBuyOrders' %}
 
 
-		<h2 class="chat-header">
-			<a href="#" class="chat-close"><i class="entypo-cancel"></i></a>
-
-			<i class="entypo-users"></i>
-			Chat
-			<span class="badge badge-success is-hidden">0</span>
-		</h2>
-
-
-		<div class="chat-group" id="group-1">
-			<strong>Favorites</strong>
-
-			<a href="#" id="sample-user-123" data-conversation-history="#sample_history"><span class="user-status is-online"></span> <em>Catherine J. Watkins</em></a>
-			<a href="#"><span class="user-status is-online"></span> <em>Nicholas R. Walker</em></a>
-			<a href="#"><span class="user-status is-busy"></span> <em>Susan J. Best</em></a>
-			<a href="#"><span class="user-status is-offline"></span> <em>Brandon S. Young</em></a>
-			<a href="#"><span class="user-status is-idle"></span> <em>Fernando G. Olson</em></a>
+<div id="history-column" class="" style="width: 600px;display: flex;flex-direction: column;right: -600px;position: absolute;background-color: #07080ab3;backdrop-filter: blur(3px);z-index: 999;/*border-left: 4px solid #303641;*/">
+	<div id="history-badge" class="history-badge">
+		<div class="">
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+		<path fill="#aaabae" d="M0 144v224C0 394.5 21.49 416 48 416V96C21.49 96 0 117.5 0 144zM96 96v320c0 26.51 21.49 48 48 48v-416C117.5 48 96 69.49 96 96zM512 0H256C220.7 0 192 28.65 192 64v384c0 35.35 28.65 64 64 64h256c35.35 0 64-28.65 64-64V64C576 28.65 547.3 0 512 0zM528 448c0 8.836-7.164 16-16 16H256c-8.836 0-16-7.164-16-16V64c0-8.838 7.164-16 16-16h256c8.836 0 16 7.162 16 16V448z"/></svg>
 		</div>
-
-
-		<div class="chat-group" id="group-2">
-			<strong>Work</strong>
-
-			<a href="#"><span class="user-status is-offline"></span> <em>Robert J. Garcia</em></a>
-			<a href="#" data-conversation-history="#sample_history_2"><span class="user-status is-offline"></span> <em>Daniel A. Pena</em></a>
-			<a href="#"><span class="user-status is-busy"></span> <em>Rodrigo E. Lozano</em></a>
-		</div>
-
-
-		<div class="chat-group" id="group-3">
-			<strong>Social</strong>
-
-			<a href="#"><span class="user-status is-busy"></span> <em>Velma G. Pearson</em></a>
-			<a href="#"><span class="user-status is-offline"></span> <em>Margaret R. Dedmon</em></a>
-			<a href="#"><span class="user-status is-online"></span> <em>Kathleen M. Canales</em></a>
-			<a href="#"><span class="user-status is-offline"></span> <em>Tracy J. Rodriguez</em></a>
-		</div>
-
 	</div>
-
-	<!-- conversation template -->
-	<div class="chat-conversation">
-
-		<div class="conversation-header">
-			<a href="#" class="conversation-close"><i class="entypo-cancel"></i></a>
-
-			<span class="user-status"></span>
-			<span class="display-name"></span>
-			<small></small>
+	<div class="history-element">
+		<div class="history-element-user">
+			<span><span><img src="http://devaxiom.ferreteriacampollano.com/api/user/7/getimage" class="img-circle" width="22">&nbsp;&nbsp;David Martínez Rentero</span></span>
 		</div>
-
-		<ul class="conversation-body">
-		</ul>
-
-		<div class="chat-textarea">
-			<textarea class="form-control autogrow" placeholder="Type your message"></textarea>
+		<div class="history-element-type">
+			<i class="fa fa-commenting" aria-hidden="true"></i>&nbsp;&nbsp;Comentario
 		</div>
-
+		<div class="history-element-timeago">Hace 2 días</div>
+		<div class="history-element-date">El 23/04/2022 a las 15:35</div>
+		<div class="history-element-content">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc id ante ornare, lobortis felis quis, laoreet leo. Aliquam erat volutpat. Curabitur in leo vel elit malesuada viverra nec tempor neque. Vestibulum vehicula nunc metus, ut egestas ligula lobortis convallis. Nam auctor eros sed ex commodo laoreet. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Cras posuere nunc quis nibh tristique faucibus imperdiet ut ex. Sed tempor id risus ultricies vehicula. Quisque porttitor ullamcorper porttitor. Nunc quis volutpat libero, vel malesuada lorem. Suspendisse potenti. Integer condimentum enim eu vestibulum iaculis.</div>
 	</div>
-
+	<div class="vl"></div>
+	<div class="history-element-action">
+		<div class="history-element-action-user">
+			<span><span><img src="http://devaxiom.ferreteriacampollano.com/api/user/7/getimage" class="img-circle" width="22">&nbsp;&nbsp;David Martínez Rentero</span></span>
+		</div>
+		<div class="history-element-timeago">Hace 4 días</div>
+		<div class="history-element-date">El 21/04/2022 a las 12:48</div>
+		<div class="history-element-content" style="text-align: center;"><i class="fa fa-reply" aria-hidden="true"></i>&nbsp;&nbsp;Confirmó recepción del proveedor</div>
+	</div>
+	<div class="vl"></div>
+	<div class="history-element-action">
+		<div class="history-element-action-user">
+			<span><span><img src="http://devaxiom.ferreteriacampollano.com/api/user/7/getimage" class="img-circle" width="22">&nbsp;&nbsp;David Martínez Rentero</span></span>
+		</div>
+		<div class="history-element-timeago">Hace 4 días</div>
+		<div class="history-element-date">El 21/04/2022 a las 10:30</div>
+		<div class="history-element-content" style="text-align: center;"><i class="fa fa-share" aria-hidden="true"></i>&nbsp;&nbsp;Envió pedido a proveedor</div>
+	</div>
+	<div class="vl"></div>
+	<div class="history-element">
+		<div class="history-element-user">
+			<span><span><img src="http://devaxiom.ferreteriacampollano.com/api/user/124/getimage" class="img-circle" width="22">&nbsp;&nbsp;Antonio Bleda Marti</span></span>
+		</div>
+		<div class="history-element-type">
+		<i class="fa fa-envelope-o" aria-hidden="true"></i>&nbsp;&nbsp;Email
+		</div>
+		<div class="history-element-timeago">Hace 4 días</div>
+		<div class="history-element-date">El 21/04/2022 a las 10:11</div>
+		<div class="history-element-content">Asunto: Lorem ipsum dolor sit amet, consectetur adipiscing elit. </br></br> Proin egestas placerat malesuada. Aenean porttitor justo in arcu volutpat vestibulum. Nulla aliquet, massa vitae fringilla semper, erat nulla consectetur elit, vel efficitur felis odio in elit. Donec imperdiet fermentum justo, quis interdum est pretium eu. Donec aliquet dapibus felis, at pellentesque massa interdum sed. Ut dapibus, augue non viverra scelerisque, felis enim cursus nunc, vitae molestie neque ante sit amet erat. Vestibulum ac elit tempus, gravida lacus id, lobortis augue. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.</div>
+	</div>
+	<div class="vl"></div>
+	<div class="history-element-action">
+		<div class="history-element-action-user">
+			<span><span><img src="http://devaxiom.ferreteriacampollano.com/api/user/7/getimage" class="img-circle" width="22">&nbsp;&nbsp;David Martínez Rentero</span></span>
+		</div>
+		<div class="history-element-timeago">Hace 5 días</div>
+		<div class="history-element-date">El 20/04/2022 a las 14:05</div>
+		<div class="history-element-content" style="text-align: center;"><i class="fa fa-file-text" aria-hidden="true"></i>&nbsp;&nbsp;Creó el documento</div>
+	</div>
 </div>
+
+<script>
+$(document).ready(function(){
+	$(window).scroll(function() {
+	    $('#history-badge').css('top', $(this).scrollTop()+114);
+	});
+
+	//Detectar redimensionamiento dinamico
+	const resizeObserver = new ResizeObserver(entries =>
+		  $('#history-column').css('height',$(document).height())
+	)
+	resizeObserver.observe(document.body)
+	$('#history-column').css('height',$(document).height());
+
+	$("#history-badge").click(function() {
+		 if($("#history-column").css("right")=='-600px')
+		 	$("#history-column").animate({ "right": 0 }, "fast");
+			else $("#history-column").animate({ "right": -600 }, "fast");
+	});
+
+
+});
+</script>
+{% endif %}

@@ -23,7 +23,7 @@
 }
 
 body {
-
+  overflow-x: hidden;
 }
 table {
     font-size: 12px;

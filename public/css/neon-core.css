@@ -9442,10 +9442,10 @@ table {
   right: 0;
   top: 0;
   bottom: 0;
-  width: 280px;
+  width: 400px;
   background: #303641;
   z-index: 5;
-  display: none;
+  /*display: none;*/
 }
 #chat.fixed {
   min-height: 0 !important;
