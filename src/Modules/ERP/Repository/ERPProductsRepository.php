@@ -290,7 +290,7 @@ class ERPProductsRepository extends ServiceEntityRepository
                        if (p.multiplicity is null, 0, if (p.multiplicity='', 0, p.multiplicity)) as 'multiplicity',
                        if (p.minimumquantityofbuy is null, 0, if (p.minimumquantityofbuy='', 0, p.minimumquantityofbuy)) as 'minimumquantityofbuy',
                        if (p.purchaseunit is null, 0, if (p.purchaseunit='', 0, p.purchaseunit)) as 'purchaseunit',
-                       m.name as 'purchasemeasure'
+                       if (m.name is null, '', m.name) as 'purchasemeasure'
                 FROM erpshopping_prices sp LEFT JOIN
                      erpproducts p on p.id=sp.product_id LEFT JOIN
                      erpmeasurement_units m on m.id=p.purchasemeasure_id LEFT JOIN
