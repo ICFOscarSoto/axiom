@@ -284,6 +284,7 @@ class CustomReports_2{
         $width=isset($columns[$i]["width"])?$columns[$i]["width"]:30;
         $widthTable=$widthTable+$width;
       }
+      $x=10;
       if ($orientation=='P') {
         $x=(205-$widthTable)/2;
         if ($x<10) $x=10;

@@ -706,7 +706,7 @@ class ERPBuyOrdersController extends Controller
 										             ["type"=>"js",  "path"=>"js/jsuites/jsuites.js"],
 																 ["type"=>"css", "path"=>"js/dropzone/dropzone.css"],
 																 ["type"=>"js", "path"=>"js/dropzone/dropzone.js"],
-																 ["type"=>"js", "path"=>"js/dropzone/dropzone-es.js"]																
+																 ["type"=>"js", "path"=>"js/dropzone/dropzone-es.js"]
 															 ],
     				]);
     		}
@@ -989,12 +989,19 @@ class ERPBuyOrdersController extends Controller
 	 */
 	 public function navisionPrintInvoice($id, Request $request){
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		$user = $this->getUser();
 		$reportsUtils = new ERPBuyOrdersReports();
 		$orderRepository=$this->getDoctrine()->getRepository(ERPBuyOrders::class);
 		$orderLinesRepository=$this->getDoctrine()->getRepository(ERPBuyOrdersLines::class);
 		$order=$orderRepository->find($id);
-		$lines=$orderLinesRepository->findBy(["buyorder"=>$order]);
-		$params=["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "id"=>$id, "user"=>$this->getUser(), "order"=>$order, "lines"=>$lines];
+		// Decimales
+		$erpConfigurationRepository				= $this->getDoctrine()->getRepository(ERPConfiguration::class);
+		$config	= $erpConfigurationRepository->findOneBy(["company"=>$user->getCompany()]);
+		$ndecimals = 2;
+		if ($config != null && $config->getDecimals()!=null)
+			$ndecimals = $config->getDecimals();
+		$lines=$orderLinesRepository->findBy(["buyorder"=>$order],['linenum'=>'ASC']);
+		$params=["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "id"=>$id, "user"=>$this->getUser(), "order"=>$order, "lines"=>$lines, "decimals"=>$ndecimals];
 		$report=$reportsUtils->create($params);
 		return new JsonResponse($report);
 	 }

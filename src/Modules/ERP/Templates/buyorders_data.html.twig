@@ -308,7 +308,7 @@
               <span id="unity-view-form-buyorder-amount" class="input__unity">
                 <span>€</span>
               </span>
-              <input type="text" id="buyorder-form-amount" name="buyorder-form-amount" readonly="readonly" autocomplete="off" class="number-type form-control input_parent__unity" value="{{ buyorder.amount|number_format(2)}}">
+              <input type="text" id="buyorder-form-amount" name="buyorder-form-amount" readonly="readonly" autocomplete="off" class="number-type form-control input_parent__unity" value="{{ buyorder.amount|number_format(2,'.','')}}">
             </div>
           </div>
           <div class="col-md-2">
@@ -326,7 +326,7 @@
               <span id="unity-view-form-buyorder-base" class="input__unity">
                 <span>€</span>
               </span>
-              <input type="text" id="buyorder-form-base" name="buyorder-form-base" readonly="readonly" autocomplete="off" class="number-type form-control input_parent__unity" value="{{ buyorder.base|number_format(2)}}">
+              <input type="text" id="buyorder-form-base" name="buyorder-form-base" readonly="readonly" autocomplete="off" class="number-type form-control input_parent__unity" value="{{ buyorder.base|number_format(2,'.','')}}">
             </div>
           </div>
           <div class="col-md-2">
@@ -335,7 +335,7 @@
               <span id="unity-view-form-buyorder-taxes" class="input__unity">
                 <span>€</span>
               </span>
-              <input type="text" id="buyorder-form-taxes" name="buyorder-form-taxes" readonly="readonly" autocomplete="off" class="number-type form-control input_parent__unity" value="{{ buyorder.taxes|number_format(2)}}">
+              <input type="text" id="buyorder-form-taxes" name="buyorder-form-taxes" readonly="readonly" autocomplete="off" class="number-type form-control input_parent__unity" value="{{ buyorder.taxes|number_format(2,'.','')}}">
             </div>
           </div>
           <div class="col-md-2">
@@ -353,7 +353,7 @@
               <span id="unity-view-form-buyorder-total" class="input__unity">
                 <span>€</span>
               </span>
-              <input type="text" id="buyorder-form-total" name="buyorder-form-total" readonly="readonly" autocomplete="off" class="number-type form-control input_parent__unity" value="{{ buyorder.total|number_format(2)}}">
+              <input type="text" id="buyorder-form-total" name="buyorder-form-total" readonly="readonly" autocomplete="off" class="number-type form-control input_parent__unity" value="{{ buyorder.total|number_format(2,'.','')}}">
             </div>
           </div>
         </div>

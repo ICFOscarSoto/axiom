@@ -39,6 +39,9 @@ class ERPBuyOrdersReports
     $doctrine=$params["doctrine"];
     $this->user=$params["user"];
     $order=$params["order"];
+    $decimals=$params["decimals"];
+    if ($decimals==null || $decimals=='')
+      $decimals = 2;
     //$numOffer=$order->getTheiroffer()!=null?$order->getTheiroffer():$order->getOuroffer()!=null?$order->getOuroffer():' ';
     // TODO
     $numOffer = ' ';
@@ -57,9 +60,9 @@ class ERPBuyOrdersReports
               ];
     $infoCenter=[["Proveedor",($order->getSuppliercode().' - '.$order->getSuppliername())],
                 ["Términos de pago",$order->getSupplierpaymentterms()],
-                ["Mail",$order->getEmail()],
-                ["Telefono",str_replace(' ','',$order->getPhone())],
-                ["Contacto",$order->getSuppliercontact()]
+                ["Mail",($order->getSuppliercontactemail()!=null && $order->getSuppliercontactemail()!=''?$order->getSuppliercontactemail():$order->getEmail())],
+                ["Telefono",($order->getSuppliercontactphone()!=null && $order->getSuppliercontactphone()!=''?str_replace(' ','',$order->getSuppliercontactphone()):str_replace(' ','',$order->getPhone()))],
+                ["Contacto",($order->getSuppliercontactName()!=null?$order->getSuppliercontactName():'')]
               ];
 
 
@@ -69,19 +72,19 @@ class ERPBuyOrdersReports
     $referencesRepository=$doctrine->getRepository(ERPReferences::class);
     $this->pdf->StartPageGroup($type);
       // ancho 190
-    $columnsTable=[["name"=>"Nº","width"=>6, "align"=>"C"],
+    $columnsTable=[["name"=>"Nº","width"=>6, "align"=>"R"],
                 ["name"=>"Código","width"=>25, "align"=>"L"],
-                ["name"=>"Descripción","width"=>110,"align"=>"L"],
-                ["name"=>"Variante","width"=>10,"align"=>"C"],
-                ["name"=>"Ud compra","width"=>13,"align"=>"C"],
-                ["name"=>"Cantidad","width"=>13,"align"=>"C"],
-                ["name"=>"Precio","width"=>15,"align"=>"C"],
-                ["name"=>"% Dto. 1","width"=>15,"align"=>"C"],
-                ["name"=>"% Dto. 2","width"=>15,"align"=>"C"],
-                ["name"=>"% Dto Total","width"=>15,"align"=>"C"],
-                ["name"=>"Neto","width"=>15,"align"=>"C"],
-                ["name"=>"Importe","width"=>15,"align"=>"C"],
-                ["name"=>"Fecha","width"=>15,"align"=>"R"]
+                ["name"=>"Descripción","width"=>94,"align"=>"L"],
+                ["name"=>"Variante","width"=>17,"align"=>"L"],
+                ["name"=>"Ud compra","width"=>13,"align"=>"R"],
+                ["name"=>"Cantidad","width"=>13,"align"=>"R"],
+                ["name"=>"Precio","width"=>17,"align"=>"R"],
+                ["name"=>"% Dto. 1","width"=>15,"align"=>"R"],
+                ["name"=>"% Dto. 2","width"=>15,"align"=>"R"],
+                ["name"=>"% Dto Total","width"=>15,"align"=>"R"],
+                ["name"=>"Neto","width"=>17,"align"=>"R"],
+                ["name"=>"Importe","width"=>17,"align"=>"R"],
+                ["name"=>"Fecha","width"=>18,"align"=>"R"]
     ];
 
     $dataTable=[];
@@ -91,39 +94,37 @@ class ERPBuyOrdersReports
           $dataTable[]=[$line->getLinenum(),
                   $referenceSupplier,
                   $line->getProductname(),
-                  $line->getProductVariant(),
+                  ($line->getVariant()!=null && $line->getVariant()->getId()!=null && $line->getVariant()->getId()!=0?$line->getVariantname().' - '.$line->getVariantvalue():''),
                   $line->getPurchaseunit(),
                   $line->getQuantity(),
-                  $line->getPvp(),
+                  number_format($line->getPvp(),intval($decimals),',','.'),
                   $line->getDiscount1(),
                   $line->getDiscount2(),
-                  $line->getTotaldiscount(),
-                  $line->getShoppingprice(),
-                  $line->getTotal(),
+                  $line->getDiscountequivalent(),
+                  number_format($line->getShoppingprice(),intval($decimals),',','.'),
+                  number_format($line->getTotal(),intval($decimals),',','.'),
                   $line->getDateestimated()->format('d/m/Y')
                 ];
       }
 
-      $columnsFooter=[["name"=>"Importe"],
-                  ["name"=>"Descuento adicional"],
-                  ["name"=>"Importe total"],
-                  ["name"=>"Gastos de envío"],
-                  ["name"=>"Base imponible"],
-                  ["name"=>"% IVA"],
-                  ["name"=>"IVA"],
-                  ["name"=>"Total", "bold"=>"B"]
+      $columnsFooter=[["name"=>"Importe","width"=>"35"],
+                  ["name"=>"Descuento adicional","width"=>"35"],
+                  ["name"=>"Base imponible","width"=>"35"],
+                  ["name"=>"% IVA","width"=>"35"],
+                  ["name"=>"IVA","width"=>"35"],
+                  ["name"=>"Gastos de envío","width"=>"35"],
+                  ["name"=>"Total","width"=>"35", "bold"=>"B"]
       ];
 
       // TODO Líneas para cada impuesto
       // TODO Tener en cuanta descuento y portes
       $tax = 21;
-      $dataFooter=[number_format($tax,2,',','.').json_decode('"\u0080"'),
-                  number_format(0),
-                  number_format($tax*(100-0)/100,2,',','.').json_decode('"\u0080"'),
-                  number_format($order->getShipping()+0,2,',','.').json_decode('"\u0080"'),
-                  number_format($tax*(100-0)/100+$order->getShipping()+0,2,',','.').json_decode('"\u0080"'),
-                  number_format($tax),
+      $dataFooter=[number_format($order->getAmount(),2,',','.').json_decode('"\u0080"'),
+                  ($order->getDiscount()!=null && $order->getDiscount()!=''?number_format($order->getDiscount(),2,',','.').'%':'0'),
+                  number_format($order->getBase(),2,',','.').json_decode('"\u0080"'),
+                  number_format($tax).'%',
                   number_format($order->getTaxes(),2,',','.').json_decode('"\u0080"'),
+                  ($order->getShipping()!=null && $order->getShipping()!=''?number_format($order->getShipping(),2,',','.').json_decode('"\u0080"'):'0'),
                   number_format($order->getTotal(),2,',','.').json_decode('"\u0080"')
                   ];
 
@@ -132,7 +133,6 @@ class ERPBuyOrdersReports
 
       $this->pdf->AddPage('L');
       $noDataFooter=['-',
-                  '-',
                   '-',
                   '-',
                   '-',

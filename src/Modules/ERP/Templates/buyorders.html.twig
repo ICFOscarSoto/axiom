@@ -26,55 +26,94 @@
 		{#}<h2>{{ interfaceName }}</h2>#}
 		<!-- MAIN CONTENT -->
 		<ul id="tabs-list" class="nav nav-tabs bordered" style="margin-top:0px!important">
-    <li class="active" id="tab-head-data" style="" attr-id="" attr-name="data">
-        <a href="#tab-body-data" id="atab-head-data" data-toggle="tab">
-            <span class="visible-xs"><i class="fa fa-id-card" aria-hidden="true"></i></span>
-            <span class="hidden-xs">Pedido de compra</span>
-        </a>
-    </li>
-		<li id="tab-head-send" attr-id="" attr-name="data" {% if id==0 %}style="display:none;"{% endif %}>
-        <a href="#tab-body-send" id="atab-head-send" data-toggle="tab">
-            <span class="visible-xs"><i class="fa fa-id-card" aria-hidden="true"></i></span>
-            <span class="hidden-xs">Envío-Recepción</span>
-        </a>
-    </li>
-		<li id="tab-head-files" attr-id="{{id}}" attr-name="files" {% if id==0 %}style="display:none;"{% endif %}>
-			<a href="#tab-body-files" id="atab-head-files" data-toggle="tab" aria-expanded="true">
-				<span class="visible-xs"><i class="fa fa-cloud" aria-hidden="true"></i></span>
-				<span class="hidden-xs">Archivos</span>
-			</a>
-		</li>
-</ul>
-<div class="tab-content">
-    <div class="tab-pane active" style="" id="tab-body-data">
-			<div id="buyorders-body">
-				{% set formConstructor = form %}
-				{{ include('@ERP/buyorder_form_validation.html.twig') }}
-				{{ include('@ERP/buyorders_data.html.twig') }}
-			</div>
-			{{ include('@ERP/buyorders_search_supplier.html.twig') }}
-    </div>
-		<div class="tab-pane" style="" id="tab-body-send">
-			  {{ include('@ERP/buyorders_destination.html.twig') }}
+	    <li class="active" id="tab-head-data" style="" attr-id="" attr-name="data">
+	        <a href="#tab-body-data" id="atab-head-data" data-toggle="tab">
+	            <span class="visible-xs"><i class="fa fa-id-card" aria-hidden="true"></i></span>
+	            <span class="hidden-xs">Pedido de compra</span>
+	        </a>
+	    </li>
+			<li id="tab-head-send" attr-id="" attr-name="data" {% if id==0 %}style="display:none;"{% endif %}>
+	        <a href="#tab-body-send" id="atab-head-send" data-toggle="tab">
+	            <span class="visible-xs"><i class="fa fa-id-card" aria-hidden="true"></i></span>
+	            <span class="hidden-xs">Envío-Recepción</span>
+	        </a>
+	    </li>
+			<li id="tab-head-files" attr-id="{{id}}" attr-name="files" {% if id==0 %}style="display:none;"{% endif %}>
+				<a href="#tab-body-files" id="atab-head-files" data-toggle="tab" aria-expanded="true">
+					<span class="visible-xs"><i class="fa fa-cloud" aria-hidden="true"></i></span>
+					<span class="hidden-xs">Archivos</span>
+				</a>
+			</li>
+		</ul>
+		<div class="tab-content">
+	    <div class="tab-pane active" style="" id="tab-body-data">
+				<div class="row">
+					<div style="text-align: left;" class="col-md-6">
+						<div class="btn-group">
+	            <a attr-search="false" attr-href="/api/buyorders/print/1" target="_blank" href="javascript:void(0);" style="font-size: 20px" id="printTop-top-button-foreground" type="button" class="btn tooltip-primary  btn-default">
+	              <i class="fa fa-print" aria-hidden="true"></i>
+	            </a>
+	            <a attr-search="false" attr-href="/es/ERP/BuyOrders/generic/export" target="_blank" href="javascript:void(0);" style="font-size: 20px" id="exportTop-top-button-foreground" type="button" class="btn tooltip-primary  btn-default">
+	              <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+	            </a>
+	            <a attr-search="false" attr-href="" href="javascript:void(0);" style="font-size: 20px" id="sendTop-top-button-foreground" type="button" class="btn tooltip-primary  btn-default">
+	              <i class="fa fa-envelope" aria-hidden="true"></i>
+	            </a>
+            </div>
+					</div>
+					<div style="text-align: right;margin-bottom:10px;" class="col-md-6">
+						<button attr-id="" attr-action="" id="buyorder-button-cancel" type="button" class="btn btn">Cancelar</button>
+						<button attr-id="" attr-action="" id="buyorder-button-save" type="button" class="btn btn-green">Guardar</button>
+					</div>
+				</div>
+				<div id="buyorders-body">
+					{% set formConstructor = form %}
+					{{ include('@ERP/buyorder_form_validation.html.twig') }}
+					{{ include('@ERP/buyorders_data.html.twig') }}
+				</div>
+				{{ include('@ERP/buyorders_search_supplier.html.twig') }}
+	    </div>
+			<div class="tab-pane" style="" id="tab-body-send">
+				<div class="row">
+					<div style="text-align: left;" class="col-md-6">
+						<div class="btn-group">
+	            <a attr-search="false" attr-href="/api/buyorders/print/1" target="_blank" href="javascript:void(0);" style="font-size: 20px" id="printTop-top-button-foreground" type="button" class="btn tooltip-primary  btn-default">
+	              <i class="fa fa-print" aria-hidden="true"></i>
+	            </a>
+	            <a attr-search="false" attr-href="/es/ERP/BuyOrders/generic/export" target="_blank" href="javascript:void(0);" style="font-size: 20px" id="exportTop-top-button-foreground" type="button" class="btn tooltip-primary  btn-default">
+	              <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+	            </a>
+	            <a attr-search="false" attr-href="" href="javascript:void(0);" style="font-size: 20px" id="sendTop-top-button-foreground" type="button" class="btn tooltip-primary  btn-default">
+	              <i class="fa fa-envelope" aria-hidden="true"></i>
+	            </a>
+            </div>
+					</div>
+					<div style="text-align: right;margin-bottom:10px;" class="col-md-6">
+						<button attr-id="" attr-action="" id="buyorder-button-cancel" type="button" class="btn btn">Cancelar</button>
+						<button attr-id="" attr-action="" id="buyorder-button-save" type="button" class="btn btn-green">Guardar</button>
+					</div>
+				</div>
+				{{ include('@ERP/buyorders_destination.html.twig') }}
 				{{ include('@ERP/buyorders_search_customer.html.twig') }}
 				{{ include('@ERP/buyorder_select_addresses.html.twig') }}
+			</div>
+			<div class="tab-pane" style="" id="tab-body-files">
+					{{ include('@Cloud/genericlistfiles.html.twig') }}
+			</div>
+			<div id="jsexcel-buyorder">
+				{{ include('@Globale/form_jspreadsheet_html.twig') }}
+				<br/>
+				<div class="row">
+					<div style="text-align: left;" class="col-md-6"></div>
+					<div style="text-align: right;margin-bottom:10px;" class="col-md-6">
+						<button attr-id="" attr-action="" id="buyorder-button-cancel" type="button" class="btn btn">Cancelar</button>
+						<button attr-id="" attr-action="" id="buyorder-button-save" type="button" class="btn btn-green">Guardar</button>
+					</div>
+				</div>
+			</diV>
 		</div>
-		<div class="tab-pane" style="" id="tab-body-files">
-				{{ include('@Cloud/genericlistfiles.html.twig') }}
-		</div>
-		<div id="jsexcel-buyorder">
-			{{ include('@Globale/form_jspreadsheet_html.twig') }}
-		</diV>
-	</div>
 
-	<div class="row">
-		<div style="text-align: left;" class="col-md-6"></div>
-		<div style="text-align: right;margin-bottom:10px;" class="col-md-6">
-			<button attr-id="" attr-action="" id="buyorder-button-cancel" type="button" class="btn btn">Cancelar</button>
-			<button attr-id="" attr-action="" id="buyorder-button-save" type="button" class="btn btn-green">Guardar</button>
-		</div>
-	</div>
-	{{ include('@ERP/buyorder_prepare_json.html.twig') }}
+		{{ include('@ERP/buyorder_prepare_json.html.twig') }}
 
 	</div>
 </div>
