@@ -58,7 +58,7 @@ class ERPStockHistoryRepository extends ServiceEntityRepository
                 LEFT JOIN erpproducts_variants pv
                 ON pv.id=h.productvariant_id
                 LEFT JOIN erpvariants_values vv
-                ON pv.variantvalue_ud=vv.id
+                ON pv.variantvalue_id=vv.id
                 LEFT JOIN erpstore_locations strl
                 ON strl.id=h.location_id
                 LEFT JOIN erpstores str
