@@ -49,12 +49,16 @@ class ERPStockHistoryRepository extends ServiceEntityRepository
     */
 
     public function findHistory($product){
-      $query="SELECT h.id as id, pr.code as product_code, pr.name as product_name, strl.name as location,
+      $query="SELECT h.id as id, pr.code as product_code,vv.name as variant_name, pr.name as product_name, strl.name as location,
                 str.name as store, CONCAT(u.name,' ',u.lastname) as user,
                 h.previousqty as prevqty, h.newqty as newqty, h.dateadd as dateadd, h.comment AS comment, t.name AS type, h.num_operation AS numOperation, h.quantity as quantity
                 FROM erpstock_history h
                 LEFT JOIN erpproducts pr
                 ON pr.id=h.product_id
+                LEFT JOIN erpproducts_variants pv
+                ON pv.id=h.productvariant_id
+                LEFT JOIN erpvariants_values vv
+                ON pv.variantvalue_ud=vv.id
                 LEFT JOIN erpstore_locations strl
                 ON strl.id=h.location_id
                 LEFT JOIN erpstores str

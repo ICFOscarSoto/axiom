@@ -125,6 +125,7 @@ class ERPStocksController extends Controller
 						$item['Ubicación']=$history_line['location'];
 						$item['Almacén']=$history_line['store'];
 						$item['Comentario']=$history_line['comment'];
+						$item['Variante']=$history_line['variant_name'];
 						$item['Stock Previo']=$history_line['prevqty'];
 						$item['Stock Final']=$history_line['newqty'];
 						$item['Usuario']=$history_line['user'];
