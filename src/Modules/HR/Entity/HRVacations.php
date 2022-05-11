@@ -286,7 +286,7 @@ class HRVacations
             $clockDiary=$clocksDiaryrepository->findOneBy(["date"=>$date, "worker"=>$this->worker, "active"=>1, "deleted"=>0]);
             if($clockDiary){
               $clockDiary->setEstimatedtime($estimatedtime);
-              $clockDiary->setDifftime($clockdiary->getTime()-$estimatedtime);
+              $clockDiary->setDifftime($clockDiary->getTime()-$estimatedtime);
               $clockDiary->setDateupd(new \DateTime());
               $doctrine->getManager()->persist($clockDiary);
               $doctrine->getManager()->flush();
