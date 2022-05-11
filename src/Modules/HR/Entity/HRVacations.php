@@ -285,10 +285,10 @@ class HRVacations
             //check if exist date in ClocksDiary
             $clockDiary=$clocksDiaryrepository->findOneBy(["date"=>$date, "worker"=>$this->worker, "active"=>1, "deleted"=>0]);
             if($clockDiary){
-              $clockdiary->setEstimatedtime($estimatedtime);
-              $clockdiary->setDifftime($clockdiary->getTime()-$estimatedtime);
-              $clockdiary->setDateupd(new \DateTime());
-              $doctrine->getManager()->persist($clockdiary);
+              $clockDiary->setEstimatedtime($estimatedtime);
+              $clockDiary->setDifftime($clockdiary->getTime()-$estimatedtime);
+              $clockDiary->setDateupd(new \DateTime());
+              $doctrine->getManager()->persist($clockDiary);
               $doctrine->getManager()->flush();
             }
           }
