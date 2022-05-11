@@ -43,6 +43,10 @@ Histories:
     resource: 'App\Modules\Globale\Controller\GlobaleHistoriesController'
     type:     annotation
 
+Comments:
+    resource: 'App\Modules\Globale\Controller\GlobaleCommentsController'
+    type:     annotation
+
 Printers:
     resource: 'App\Modules\Globale\Controller\GlobalePrintersController'
     type:     annotation

@@ -1,0 +1,12 @@
+<div class="history-element" id="history-element-comment-{{element.id}}">
+  <div class="history-element-user">
+    <span><span><img src="/api/user/{{ element.user_id }}/getimage" class="img-circle" width="22">&nbsp;&nbsp;{{ element.user_name }} {{ element.user_lastname }}</span></span>
+  </div>
+  <div class="history-element-type">
+    <i class="fa fa-commenting" aria-hidden="true"></i>&nbsp;&nbsp;Comentario
+  </div>
+  <div class="history-element-timeago">{{ element.agodate }}</div>
+  <div class="history-element-date">El {{ element.formateddate }} a las {{ element.formatedtime }}</div>
+  <div class="history-element-content" style="color: white;">{{ element.comment|raw }}</div>
+</div>
+<div class="vl"></div>

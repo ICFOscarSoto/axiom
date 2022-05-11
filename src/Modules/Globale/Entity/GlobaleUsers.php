@@ -574,7 +574,17 @@ class GlobaleUsers implements UserInterface
     public function setDiscordchannel(?string $discordchannel): self
     {
         $this->discordchannel = $discordchannel;
-
         return $this;
     }
+
+    public function preProccess($kernel, $doctrine, $user, $params, $oldobj){
+      if($this->apiToken==null){
+        $token = openssl_random_pseudo_bytes(200);
+        $token = bin2hex($token);
+        $token .= md5(uniqid(time(), true));
+        $this->setApiToken($token);
+      }
+    }
+
+
 }
