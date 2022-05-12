@@ -265,7 +265,15 @@ class HRSickleaves
         return $this;
     }
     public function preProccess($kernel, $doctrine, $user){
-      if($this->end!=null) $this->days = ($this->end->add(new \DateInterval('PT24H')))->diff($this->start)->format('%a');
+      $date     =clone $this->start;
+      $date_end =clone $this->end;
+      $date_end->modify('+1 day');
+      $countDays=0;
+      do{
+        $countDays++;
+        $date->modify('+1 day');
+      }while($date!=$date_end);
+      $this->days=$countDays;
     }
 
     public function postProccess($kernel, $doctrine, $user){
