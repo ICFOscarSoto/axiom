@@ -31,7 +31,7 @@ class HRVacationsRepository extends ServiceEntityRepository
 
 
     public function getDiary($worker, $year){
-      $query="SELECT id, DATE(start) start, DATE(end) end, type, approved, workerobservations, companyobservations, days, hourslastday FROM hrvacations WHERE worker_id = :worker AND YEAR(start)=:year AND approved=1 AND deleted=0 AND active=1";
+      $query="SELECT id, DATE(start) start, DATE_ADD(DATE(end), INTERVAL 1 DAY) end, type, approved, workerobservations, companyobservations, days, hourslastday FROM hrvacations WHERE worker_id = :worker AND YEAR(start)=:year AND approved=1 AND deleted=0 AND active=1";
       $params=['worker' => $worker->getId(), 'year' => $year];
       return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
     }

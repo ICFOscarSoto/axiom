@@ -40,6 +40,7 @@ class CloudFilesUtils
     $user=$params["user"];
     $path=$params["path"];
     $id=$params["id"]; //New Id of the class
+    $delete=[];
     $cloudRepository=$doctrine->getRepository(CloudFiles::class);
     // Identify directories
     $source = $rootDir.'/../cloud/'.$user->getCompany()->getId().'/temp/'.$user->getId().'/'.$path.'/';
