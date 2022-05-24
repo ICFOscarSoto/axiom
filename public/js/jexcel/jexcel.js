@@ -6123,6 +6123,8 @@ if (! jSuites && typeof(require) === 'function') {
             onload:null,
             onchange:null,
             oncomments:null,
+            onmin:null,
+            onmultiplicity:null,
             onbeforechange:null,
             onafterchanges:null,
             onbeforeinsertrow: null,
@@ -6355,6 +6357,7 @@ if (! jSuites && typeof(require) === 'function') {
 
         /**
          * Get dropdown value from key
+         * @param string  key
          */
         obj.getDropDownKeyValue = function(key) {
             var value = '';
@@ -6367,6 +6370,34 @@ if (! jSuites && typeof(require) === 'function') {
                 value = akey[0];
             }
             return value;
+        }
+
+        /**
+        * Set min value
+        */
+        obj.setMin = function(x, y, value){
+          if (value==null && obj.records[y][x].getAttribute('data-min')){
+            obj.records[y][x].removeAttribute('data-min');
+          }else {
+            obj.records[y][x].setAttribute('data-min', value);
+          }
+          var key = obj.getKeyColumn(x);
+          if (key!='')
+            obj.dispatch('onmin', el, value, key, y);
+        }
+
+        /**
+        * Set multiplicity value
+        */
+        obj.setMultiplicity = function(x, y, value){
+          if (value==null && obj.records[y][x].getAttribute('data-multiplicity')){
+            obj.records[y][x].removeAttribute('data-multiplicity');
+          }else {
+            obj.records[y][x].setAttribute('data-multiplicity', value);
+          }
+          var key = obj.getKeyColumn(x);
+          if (key!='')
+            obj.dispatch('onmultiplicity', el, value, key, y);
         }
 
         /**
@@ -6399,13 +6430,15 @@ if (! jSuites && typeof(require) === 'function') {
          * @param string key destination cell name
          * @param int y destination cell
          * @param string value
+         * @param boolean force
+         * @param boolean forcechange
          * @return void
          */
-        obj.setValueFromKey = function(key, y, value, force) {
+        obj.setValueFromKey = function(key, y, value, force, forcechange=false) {
             var records = [];
             // Calculate x column for key
             var x = obj.getColumnKey(key+'');
-            records.push(obj.updateCell(x, y, value, force));
+            records.push(obj.updateCell(x, y, value, force, forcechange));
 
             // Update all formulas in the chain
             obj.updateFormulaChain(x, y, records);
@@ -6807,7 +6840,7 @@ if (! jSuites && typeof(require) === 'function') {
             // Colsgroup
             obj.colgroupContainer = document.createElement('colgroup');
             var tempCol = document.createElement('col');
-            tempCol.setAttribute('width', '50');
+            tempCol.setAttribute('width', '50px');
             obj.colgroupContainer.appendChild(tempCol);
 
             // Nested
@@ -8429,6 +8462,24 @@ if (! jSuites && typeof(require) === 'function') {
                             // ICF
                             else{
                                 value = value.replace(',','.');
+                                value = value.replace(/[^0-9.]/g,'');
+                            }
+                            if (obj.records[y][x].getAttribute('data-min') || obj.records[y][x].getAttribute('data-multiplicity')){
+                              var valueold = obj.edition && obj.edition[1] ? obj.edition[1] : (obj.options.columns[x].allowEmpty ? '' : 0);
+                              var valuef = value;
+                              if (valuef=='')
+                                valuef=0;
+                              valuef = parseFloat(valuef);
+                              if (!isNaN(parseFloat(obj.records[y][x].getAttribute('data-min')))){
+                                var min = parseFloat(obj.records[y][x].getAttribute('data-min'));
+                                if (min<valuef)
+                                  value = valueold;
+                              }
+                              if (!isNaN(parseFloat(obj.records[y][x].getAttribute('data-multiplicity')))){
+                                var multiplicity = parseFloat(obj.records[y][x].getAttribute('data-multiplicity'));
+                                if (valuef%multiplicity!=0)
+                                  value = valueold;
+                              }
                             }
                             // ICF
                         }
@@ -8751,7 +8802,7 @@ if (! jSuites && typeof(require) === 'function') {
          * @param object cell
          * @return void
          */
-        obj.updateCell = function(x, y, value, force) {
+        obj.updateCell = function(x, y, value, force, forcechange=false) {
             // Changing value depending on the column type
             if (obj.records[y][x].classList.contains('readonly') == true && ! force) {
                 // Do nothing
@@ -8877,7 +8928,7 @@ if (! jSuites && typeof(require) === 'function') {
                 }
 
                 // On change
-                obj.dispatch('onchange', el, (obj.records[y] && obj.records[y][x] ? obj.records[y][x] : null), x, y, value, record.oldValue, obj.options.columns[x].type);
+                obj.dispatch('onchange', el, (obj.records[y] && obj.records[y][x] ? obj.records[y][x] : null), x, y, value, record.oldValue, obj.options.columns[x].type, forcechange);
             }
 
             return record;
@@ -10042,7 +10093,12 @@ if (! jSuites && typeof(require) === 'function') {
                 oldValue: oldValue,
             });
             // Set comments
-            obj.dispatch('oncomments', el, comments, title, cell, cell[0], cell[1]);
+            // obj.dispatch('oncomments', el, comments, title, cell, cell[0], cell[1]);
+            // ICF
+            var key = obj.getKeyColumn(cell[0]);
+            if (key!='')
+              obj.dispatch('oncomments', el, comments, title, key, cell[1]);
+            // ICF
         }
 
         /**

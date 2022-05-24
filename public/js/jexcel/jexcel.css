@@ -765,8 +765,6 @@
     -moz-box-shadow: 2px 4px 4px 0.1px #ccc !important;
 }
 
-/* ICF */
-.jexcel_row,
-.jexcel_selectall {
-    max-width: 50px !important;
+.jexcel table {
+  table-layout: auto;
 }
