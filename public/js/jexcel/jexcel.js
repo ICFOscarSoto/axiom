@@ -8481,6 +8481,9 @@ if (! jSuites && typeof(require) === 'function') {
                                   value = valueold;
                               }
                             }
+                            if (obj.options.columns[x].decimal && value!=null && value!=''){
+                              value = Number.parseFloat(value).toFixed(obj.options.columns[x].decimal);
+                            }
                             // ICF
                         }
                         cell.children[0].onblur = null;

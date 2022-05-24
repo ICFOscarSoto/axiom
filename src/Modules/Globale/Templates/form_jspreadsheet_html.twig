@@ -118,6 +118,7 @@ function js{{spreadsheet.name}}_create(data){
         rowDrag: true,
         allowInsertColumn:false,
         allowInsertRow:true,
+        allowComments:true,
         {% if spreadsheet.options is defined %}
           {{spreadsheet.options|raw}},
         {% endif %}
@@ -192,7 +193,7 @@ function js{{spreadsheet.name}}_create(data){
              });
            return items;
        },
-       onchange: function(instance, cell, x, y, value, valueOld, type) {
+       onchange: function(instance, cell, x, y, value, valueOld, type, forcechange=false) {
         var sheet = instance.jexcel;
         if (typeof(value) === 'undefined' || value == null)
           value = '';
@@ -204,7 +205,7 @@ function js{{spreadsheet.name}}_create(data){
         }
         // Si la celda tiene onchange como options y tiene url o oncomplete (y no estamos en la carga inicial)
         var options = sheet.options.columns[x].options;
-        if (!sheet.options.loadinit && !sheet.options.changeinit && !sheet.options.rowinit && typeof(options) !== 'undefined' && typeof(options.onchange) !== 'undefined' && value!=valueOld){
+        if (!sheet.options.loadinit && !sheet.options.changeinit && !sheet.options.rowinit && typeof(options) !== 'undefined' && typeof(options.onchange) !== 'undefined' && (value!=valueOld || forcechange)){
           // Obtener url completa con los campos necesarios para la busqueda
           var change = options.onchange;
           var oncomplete = change.oncomplete;
@@ -220,14 +221,42 @@ function js{{spreadsheet.name}}_create(data){
                   var oresult = JSON.parse(JSON.stringify(result))[0];
                   for (var [key, valueq] of Object.entries(oresult)) {
                     key = JSON.parse(JSON.stringify(key));
+                    action = '';
+                    akey = key.split('__');
+                    if (akey.length>1){
+                      key     = akey[0];
+                      action  = akey[1];
+                    }
                     if (sheet.getColumnKey(key)!=-1){
-                      // Si es numérico y se ha indicado un número de decimales
-                      var column = sheet.options.columns[sheet.getColumnKey(key)];
-                      if (typeof(column.type) != 'undefined' && column.type!=null && (column.type.toLowerCase() =='numeric' || column.type.toLowerCase() =='number') &&
-                          typeof(column.decimal) != 'undefined' && column.decimal!=null && column.decimal!='' && !isNaN(valueq) && !isNaN(parseFloat(valueq)) && Number.parseFloat(valueq)!=0){
-                            valueq = Number.parseFloat(valueq).toFixed(column.decimal);
-                          }
-                      sheet.setValueFromKey(key, y, valueq, true);
+                      if (action==''){
+                        // Si es numérico y se ha indicado un número de decimales
+                        var column = sheet.options.columns[sheet.getColumnKey(key)];
+                        if (typeof(column.type) != 'undefined' && column.type!=null && (column.type.toLowerCase() =='numeric' || column.type.toLowerCase() =='number') &&
+                            typeof(column.decimal) != 'undefined' && column.decimal!=null && column.decimal!='' && !isNaN(valueq) && !isNaN(parseFloat(valueq)) && Number.parseFloat(valueq)!=0){
+                              valueq = Number.parseFloat(valueq).toFixed(column.decimal);
+                            }
+                        sheet.setValueFromKey(key, y, valueq, true);
+                      }else{
+                        keyx = sheet.getColumnKey(key);
+                        // Poner comentario a una casilla
+                        if (action=='comment'){
+                          if (valueq=='')
+                            valueq = null;
+                          sheet.setComments([keyx,y],valueq);
+                        }
+                        // Poner mínimo valor númerico permitido en la casilla
+                        if (action=='min' && typeof(column.type) != 'undefined' && column.type!=null && (column.type.toLowerCase() =='numeric' || column.type.toLowerCase() =='number')){
+                          if (valueq=='')
+                            valueq = null;
+                          sheet.setMin(keyx,y,valueq);
+                        }
+                        // Poner multiplicity valor númerico permitido en la casilla (obligatrorio casilla divisible por multiplicity)
+                        if (action=='multiplicity' && typeof(column.type) != 'undefined' && column.type!=null && (column.type.toLowerCase() =='numeric' || column.type.toLowerCase() =='number')){
+                          if (valueq=='')
+                            valueq = null;
+                          sheet.setMultiplicity(keyx,y,valueq);
+                        }
+                      }
                     }else{
                       // Datos a utilizar en otras columnas
                       window[key] = valueq;
@@ -249,7 +278,7 @@ function js{{spreadsheet.name}}_create(data){
         }
         // Cambio del valor en las otras pestañas
         var isformula = ((value.length>0 && (''+value)[0]=='='||(''+value)[0]=='#')?true:false);
-        if (!sheet.options.loadinit && !sheet.options.changeinit && !sheet.options.rowinit && !isformula && value!=valueOld){
+        if (!sheet.options.loadinit && !sheet.options.changeinit && !sheet.options.rowinit && !isformula && (value!=valueOld || forcechange)){
           var tabIdChange = sheet.options.tabid;
           var sheets      = document.getElementById(sheet.options.name).jexcel;
           var key         = sheet.getKeyColumn(x);
@@ -261,7 +290,7 @@ function js{{spreadsheet.name}}_create(data){
             }
           }
         }
-        if (!sheet.options.loadinit && value!=valueOld)
+        if (!sheet.options.loadinit && (value!=valueOld || forcechange))
           $('#'+sheet.options.name).find('.jexcel_tab_link.tabnew').each(function(){ $(this).addClass('disabled'); });
       },
       oninsertrow: function(instance, rowNumber, numOfRows, records, insertBefore){
@@ -334,6 +363,51 @@ function js{{spreadsheet.name}}_create(data){
           $('#'+sheet.options.name).find('.jexcel_tab_link.tabnew').each(function(){ $(this).addClass('disabled'); });
         }
       },
+      oncomments: function(instance, comments, commentsold, key, y){
+        var sheet = instance.jexcel;
+        if (!sheet.options.loadinit && !sheet.options.changeinit && !sheet.options.rowinit){
+          var tabIdChange = sheet.options.tabid;
+          var sheets      = document.getElementById(sheet.options.name).jexcel;
+          for (var s=0; s<sheets.length; s++){
+            if (sheets[s].options.tabid!=tabIdChange){
+              sheets[s].options['rowinit'] = true;
+              keyx = sheets[s].getColumnKey(key);
+              sheets[s].setComments([keyx,y],comments);
+              sheets[s].options['rowinit'] = false;
+            }
+          }
+        }
+      },
+      onmin: function(instance, value, key, y){
+        var sheet = instance.jexcel;
+        if (!sheet.options.loadinit && !sheet.options.changeinit && !sheet.options.rowinit){
+          var tabIdChange = sheet.options.tabid;
+          var sheets      = document.getElementById(sheet.options.name).jexcel;
+          for (var s=0; s<sheets.length; s++){
+            if (sheets[s].options.tabid!=tabIdChange){
+              sheets[s].options['rowinit'] = true;
+              keyx = sheets[s].getColumnKey(key);
+              sheets[s].setMin(keyx,y,value);
+              sheets[s].options['rowinit'] = false;
+            }
+          }
+        }
+      },
+      onmultiplicity: function(instance, value, key, y){
+        var sheet = instance.jexcel;
+        if (!sheet.options.loadinit && !sheet.options.changeinit && !sheet.options.rowinit){
+          var tabIdChange = sheet.options.tabid;
+          var sheets      = document.getElementById(sheet.options.name).jexcel;
+          for (var s=0; s<sheets.length; s++){
+            if (sheets[s].options.tabid!=tabIdChange){
+              sheets[s].options['rowinit'] = true;
+              keyx = sheets[s].getColumnKey(key);
+              sheets[s].setMultiplicity(keyx,y,value);
+              sheets[s].options['rowinit'] = false;
+            }
+          }
+        }
+      },
       onload: function(instance) {
         var sheet   = instance.jexcel;
         var sheetid = sheet.options.sheetid;
@@ -348,7 +422,43 @@ function js{{spreadsheet.name}}_create(data){
             sheet.insertRow(1, d);
             for (var [key, value] of Object.entries(data[d])) {
               value = sheet.replaceFormula(value, d);
-              sheet.setValueFromKey(key, d, value, true);
+              action = '';
+              akey = key.split('__');
+              if (akey.length>1){
+                key     = akey[0];
+                action  = akey[1];
+              }
+              if (sheet.getColumnKey(key)!=-1){
+                if (action==''){
+                  // Si es numérico y se ha indicado un número de decimales
+                  var column = sheet.options.columns[sheet.getColumnKey(key)];
+                  if (typeof(column.type) != 'undefined' && column.type!=null && (column.type.toLowerCase() =='numeric' || column.type.toLowerCase() =='number') &&
+                      typeof(column.decimal) != 'undefined' && column.decimal!=null && column.decimal!='' && !isNaN(value) && !isNaN(parseFloat(value)) && Number.parseFloat(value)!=0){
+                        value = Number.parseFloat(value).toFixed(column.decimal);
+                      }
+                  sheet.setValueFromKey(key, d, value, true);
+                }else{
+                  keyx = sheet.getColumnKey(key);
+                  // Poner comentario a una casilla
+                  if (action=='comment'){
+                    if (value=='')
+                      value = null;
+                    sheet.setComments([keyx,d],value);
+                  }
+                  // Poner mínimo valor númerico permitido en la casilla
+                  if (action=='min'){
+                    if (value=='')
+                      value = null;
+                    sheet.setMin(keyx,d,value);
+                  }
+                  // Poner multiplicity valor númerico permitido en la casilla (obligatrorio casilla divisible por multiplicity)
+                  if (action=='multiplicity'){
+                    if (value=='')
+                      value = null;
+                    sheet.setMultiplicity(keyx,d,value);
+                  }
+                }
+              }
             }
           }
         }
@@ -454,6 +564,7 @@ function js{{spreadsheet.name}}_create(data){
       rowDrag: true,
       allowInsertColumn:false,
       allowInsertRow:true,
+      allowComments:true,
       pagination:1000000,
       {% if spreadsheet.options is defined %}
         {{spreadsheet.options|raw}},
@@ -527,19 +638,17 @@ function js{{spreadsheet.name}}_create(data){
            });
          return items;
      },
-     onchange: function(instance, cell, x, y, value, valueOld, type) {
+     onchange: function(instance, cell, x, y, value, valueOld, type, forcechange=false) {
       var sheet = instance.jexcel;
       if (typeof(value) === 'undefined' || value == null)
         value = '';
       if (typeof(type) !== 'undefined' && type!=null && type.length>0 && type.toLowerCase()=='dropdown' && value==''){
         value=valueOld;
-        sheet.options['changeinit'] = true;
         sheet.setValueFromCoords(x, y, value, true);
-        sheet.options['changeinit'] = false;
       }
       // Si la celda tiene onchange como options y tiene url o oncomplete
       var options = sheet.options.columns[x].options;
-      if (!sheet.options.loadinit && options !== undefined && options.onchange !== undefined && value!=valueOld){
+      if (!sheet.options.loadinit && options !== undefined && options.onchange !== undefined && (value!=valueOld || forcechange)){
         // Obtener url completa con los campos necesarios para la busqueda
         var change = options.onchange;
 		    var oncomplete = change.oncomplete;
@@ -555,14 +664,42 @@ function js{{spreadsheet.name}}_create(data){
                 var oresult = JSON.parse(JSON.stringify(result))[0];
                 for (var [key, valueq] of Object.entries(oresult)) {
                   key = JSON.parse(JSON.stringify(key));
+                  action = '';
+                  akey = key.split('__');
+                  if (akey.length>1){
+                    key     = akey[0];
+                    action  = akey[1];
+                  }
                   if (sheet.getColumnKey(key)!=-1){
-                    // Si es numérico y se ha indicado un número de decimales
-                    var column = sheet.options.columns[sheet.getColumnKey(key)];
-                    if (typeof(column.type) != 'undefined' && column.type!=null && (column.type.toLowerCase() =='numeric' || column.type.toLowerCase() =='number') &&
-                        typeof(column.decimal) != 'undefined' && column.decimal!=null && column.decimal!='' && !isNaN(valueq) && !isNaN(parseFloat(valueq)) && Number.parseFloat(valueq)!=0){
-                          valueq = Number.parseFloat(valueq).toFixed(column.decimal);
+                    if (action==''){
+                      // Si es numérico y se ha indicado un número de decimales
+                      var column = sheet.options.columns[sheet.getColumnKey(key)];
+                      if (typeof(column.type) != 'undefined' && column.type!=null && (column.type.toLowerCase() =='numeric' || column.type.toLowerCase() =='number') &&
+                          typeof(column.decimal) != 'undefined' && column.decimal!=null && column.decimal!='' && !isNaN(valueq) && !isNaN(parseFloat(valueq)) && Number.parseFloat(valueq)!=0){
+                            valueq = Number.parseFloat(valueq).toFixed(column.decimal);
+                      }
+                      sheet.setValueFromKey(key, y, valueq, true);
+                    }else{
+                      keyx = sheet.getColumnKey(key);
+                      // Poner comentario a una casilla
+                      if (action=='comment'){
+                        if (valueq=='')
+                          valueq = null;
+                        sheet.setComments([keyx,y],valueq);
+                      }
+                      // Poner mínimo valor númerico permitido en la casilla
+                      if (action=='min' && typeof(column.type) != 'undefined' && column.type!=null && (column.type.toLowerCase() =='numeric' || column.type.toLowerCase() =='number')){
+                        if (valueq=='')
+                          valueq = null;
+                        sheet.setMin(keyx,y,valueq);
+                      }
+                      // Poner multiplicity valor númerico permitido en la casilla (obligatrorio casilla divisible por multiplicity)
+                      if (action=='multiplicity' && typeof(column.type) != 'undefined' && column.type!=null && (column.type.toLowerCase() =='numeric' || column.type.toLowerCase() =='number')){
+                        if (valueq=='')
+                          valueq = null;
+                        sheet.setMultiplicity(keyx,y,valueq);
+                      }
                     }
-                    sheet.setValueFromKey(key, y, valueq, true);
                   }else{
                     // Datos a utilizar en otras columnas
                     window[key] = valueq;
@@ -611,12 +748,48 @@ function js{{spreadsheet.name}}_create(data){
         for (var d=0; d<data.length; d++){
           sheet.insertRow(1, d);
           for (var [key, value] of Object.entries(data[d])) {
-            data[d][key] = sheet.replaceFormula(data[d][key], d);
-            sheet.setValueFromKey(key, d, data[d][key], true);
+            value = sheet.replaceFormula(value, d);
+            action = '';
+            akey = key.split('__');
+            if (akey.length>1){
+              key     = akey[0];
+              action  = akey[1];
+            }
+            if (sheet.getColumnKey(key)!=-1){
+              if (action==''){
+                // Si es numérico y se ha indicado un número de decimales
+                var column = sheet.options.columns[sheet.getColumnKey(key)];
+                if (typeof(column.type) != 'undefined' && column.type!=null && (column.type.toLowerCase() =='numeric' || column.type.toLowerCase() =='number') &&
+                    typeof(column.decimal) != 'undefined' && column.decimal!=null && column.decimal!='' && !isNaN(value) && !isNaN(parseFloat(value)) && Number.parseFloat(value)!=0){
+                      value = Number.parseFloat(value).toFixed(column.decimal);
+                    }
+                sheet.setValueFromKey(key, d, value, true);
+              }else{
+                keyx = sheet.getColumnKey(key);
+                // Poner comentario a una casilla
+                if (action=='comment'){
+                  if (value=='')
+                    value = null;
+                  sheet.setComments([keyx,d],value);
+                }
+                // Poner mínimo valor númerico permitido en la casilla
+                if (action=='min'){
+                  if (value=='')
+                    value = null;
+                  sheet.setMin(keyx,d,value);
+                }
+                // Poner multiplicity valor númerico permitido en la casilla (obligatrorio casilla divisible por multiplicity)
+                if (action=='multiplicity'){
+                  if (value=='')
+                    value = null;
+                  sheet.setMultiplicity(keyx,d,value);
+                }
+              }
+            }
           }
         }
       }
-
+      
       // Una vez creado para ocultar filas...etc
       {% if spreadsheet.onload is defined %}
       $( document ).ready(function() {
