@@ -91,7 +91,6 @@
     </div>
   </div>
 </div>
-
 {# Div - Tabla Jexcel #}
 <div id="{{spreadsheet.name}}"></div>
 
@@ -410,6 +409,15 @@ function js{{spreadsheet.name}}_create(data){
 
         sheet.options['loadinit'] = false;
       },
+
+      onchangepage: function(worksheet, pageNumber, oldPageNumber, quantityPerPage) {
+        // Cuando se cambia de página en el jexcel, para cambiar colores, estilos, etc...
+        var sheet = this;
+        {% if spreadsheet.onchangepage is defined %}
+          {{spreadsheet.onchangepage|raw}}
+        {% endif %}
+      },
+
       text:{
         noRecordsFound: 'No se encontraron registros',
         showingPage: 'Mostrando página {0} de {1}',
