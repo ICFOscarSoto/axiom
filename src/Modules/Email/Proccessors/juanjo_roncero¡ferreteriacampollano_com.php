@@ -51,18 +51,15 @@ class juanjo_roncero¡ferreteriacampollano_com{
               }
             }
 
-
             if(!$order_attachment){
               file_get_contents("https://icfbot.ferreteriacampollano.com/message.php?channel=".$discordchannel."&msg=".urlencode(":warning:"."SCRIPT ".basename(__FILE__, '.php').": Posible email de Velilla sin adjunto XLSM"));
               break;
             }
 
-
-
             $xlsm=$emailUtils->getAtachment($inbox,$order_attachment["msgno"],$order_attachment["encoding"],$order_attachment["partno"]);
             $tempPath=$kernel->getRootDir().DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$account->getUser()->getCompany()->getId().DIRECTORY_SEPARATOR.'temp'.DIRECTORY_SEPARATOR.$account->getUser()->getId().DIRECTORY_SEPARATOR.'Email'.DIRECTORY_SEPARATOR;
 
-            $output->writeln($tempPath);
+          //  $output->writeln($tempPath);
 
             if (!file_exists($tempPath) && !is_dir($tempPath)) {
                 mkdir($tempPath, 0775, true);
