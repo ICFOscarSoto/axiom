@@ -81,8 +81,6 @@ class HelperVelilla {
 
         }
 
-        file_get_contents("https://icfbot.ferreteriacampollano.com/message.php?channel=".$discordchannel_web."&msg=".urlencode(":white_check_mark:"." SCRIPT ".basename(__FILE__, '.php').": Se ha procesado correctamente el archivo diario de Velilla"));
-
     }
 
 
@@ -118,6 +116,7 @@ class HelperVelilla {
     }
 
 */
+    file_get_contents("https://icfbot.ferreteriacampollano.com/message.php?channel=".$discordchannel_web."&msg=".urlencode(":white_check_mark:"." SCRIPT ".basename(__FILE__, '.php').": Se ha procesado correctamente el archivo diario de Velilla"));
 
   }
 
