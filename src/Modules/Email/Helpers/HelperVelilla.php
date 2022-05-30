@@ -31,7 +31,7 @@ class HelperVelilla {
         $item=null;
 
 
-/*
+
         //obtenemos el id de product_attribute
         $xml_string_combination=file_get_contents($url."/api/combinations/?display=[id]&filter[reference]=".$EAN, false, $context);
         $xml_combination = simplexml_load_string($xml_string_combination, 'SimpleXMLElement', LIBXML_NOCDATA);
@@ -45,11 +45,14 @@ class HelperVelilla {
 
           $xml_string=file_get_contents($url."/api/stock_availables/".$id_stocks_new, false, $context);
           $xml = simplexml_load_string($xml_string, 'SimpleXMLElement', LIBXML_NOCDATA);
-          if($stock>=15) $xml->stock_available->quantity=15;
-          else if($stock>=10) $xml->stock_available->quantity=10;
+          if($stock>=40) $xml->stock_available->quantity=30;
+          else if($stock>=30) $xml->stock_available->quantity=20;
+          else if($stock>=20) $xml->stock_available->quantity=10;
+          else if($stock>=10) $xml->stock_available->quantity=7;
+          else if($stock>=5) $xml->stock_available->quantity=2;
           else $xml->stock_available->quantity=0;
           $output->writeln("Ponemos stock ".$stock." en la combinación ".$id_combination_new." que tiene EAN ".$EAN);
-        //  updateStock($id_stocks_new,$xml);
+          HelperVelilla::updateStock($id_stocks_new,$xml);
 
         }
         else{
@@ -69,24 +72,36 @@ class HelperVelilla {
 
             $xml_string=file_get_contents($url."/api/stock_availables/".$id_stocks_new, false, $context);
             $xml = simplexml_load_string($xml_string, 'SimpleXMLElement', LIBXML_NOCDATA);
-            if($stock>=15) $xml->stock_available->quantity=15;
+            if($stock>=15) $xml->stock_available->quantixxty=15;
             else if($stock>=10) $xml->stock_available->quantity=10;
             else $xml->stock_available->quantity=0;
             $output->writeln("Ponemos stock ".$stock." en el producto simple ".$id_product_new." que tiene EAN ".$EAN);
-          //  updateStock($id_stocks_new,$xml);
+            HelperVelilla::updateStock($id_stocks_new,$xml);
           }
 
         }
-*/
 
     }
+
+
+/*
     $json=json_encode($stocksArray);
     $postdata = http_build_query(['json' => $json]);
-    $opts = ['http' =>['method'  => 'POST', 'header'  => 'Content-Type: application/x-www-form-urlencoded', 'content' => $postdata]];
+    $opts = [
+      'http' =>['method'  => 'POST',
+      'header'  => 'Content-Type: application/x-www-form-urlencoded',
+      'content' => $postdata,
+      "Cookie: foo=bar\r\n" ,  // check function.stream-context-create on php.net
+      "User-Agent: Mozilla/5.0 (Windows NT 5.1; rv:20.0) Gecko/20100101 Firefox/20.0"
+      ]
+    ];
+
     $context  = stream_context_create($opts);
     $result = file_get_contents('https://www.ferreteriacampollano.com/feeds/diario_velilla.php', false, $context);
     $result = json_decode($result,true);
+*/
 
+/*
     if(json_last_error() !== JSON_ERROR_NONE){
       file_get_contents("https://icfbot.ferreteriacampollano.com/message.php?channel=".$discordchannel_critico."&msg=".urlencode(":warning:"."SCRIPT ".basename(__FILE__, '.php').": Error valor retornado al procesar stocks de Velilla"));
     }
@@ -100,9 +115,12 @@ class HelperVelilla {
       }
     }
 
+*/
+    file_get_contents("https://icfbot.ferreteriacampollano.com/message.php?channel=".$discordchannel_web."&msg=".urlencode(":white_check_mark:"." SCRIPT ".basename(__FILE__, '.php').": Se ha procesado correctamente el archivo diario de Velilla"));
+
   }
 
-/*
+
   public function updateStock($id_stocks_new,$xml){
 
     $auth = base64_encode("6TI5549NR221TXMGMLLEHKENMG89C8YV");
@@ -138,5 +156,5 @@ class HelperVelilla {
     else {  curl_close($ch); }
 
   }
-*/
+
 }
