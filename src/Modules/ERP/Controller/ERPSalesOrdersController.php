@@ -18,6 +18,8 @@ use App\Modules\Globale\Entity\GlobaleCountries;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
+use App\Modules\Globale\Entity\GlobaleUsers;
+use App\Modules\Globale\Entity\GlobaleUsersConfig;
 use App\Modules\ERP\Utils\ERPSalesOrdersUtils;
 use App\Modules\ERP\Entity\ERPConfiguration;
 use App\Modules\ERP\Entity\ERPPaymentMethods;
@@ -520,5 +522,242 @@ class ERPSalesOrdersController extends Controller
 
 		 }
 
+
+		 /**
+		* @Route("/{_locale}/ERP/salesorders/commissions/", name="salesCommissions")
+		* Muestra la ficha de comisiones por vendedor
+		*/
+		public function salesCommissions(RouterInterface $router,Request $request){
+			// El usuario tiene derechos para realizar la acción, sino se va a la página de unauthorized
+			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine()))
+				return $this->redirect($this->generateUrl('unauthorized'));
+
+			$erpConfigurationRepository				= $this->getDoctrine()->getRepository(ERPConfiguration::class);
+
+			$globaleUsersRepository						= $this->getDoctrine()->getRepository(GlobaleUsers::class);
+			$globaleMenuOptionsRepository			= $this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
+			$globaleUsersConfigRepository			= $this->getDoctrine()->getRepository(GlobaleUsersConfig::class);
+
+			// Datos de usuario
+			$userdata				= $this->getUser()->getTemplateData($this, $this->getDoctrine());
+			$company 				= $this->getUser()->getCompany();
+
+			// Configuración (nº decimales, color...etc)
+			$config	= $erpConfigurationRepository->findOneBy(["company"=>$company]);
+
+			// Líneas -------------------------------
+			// Búsqueda de vista de usuario
+			$tabs 	 = null;
+			$tabsUser= $globaleUsersConfigRepository->findOneBy(["element"=>"commissions","view"=>"Defecto","attribute"=>"tabs","active"=>1,"deleted"=>0,"company"=>$company,"user"=>$this->getUser()]);
+			if ($tabsUser!=null){
+				$tabs = json_encode($tabsUser->getValue());
+			}
+
+			// Agentes y usuarios en general (combo)
+			$oagents=$globaleUsersRepository->findBy(["company"=>$company, "active"=>1, "deleted"=>0],["name"=>"ASC"]);
+			$agents=[];
+			$option=[];
+			$option["pos"]=0;
+			$option["id"]=null;
+			$option["text"]="Selecciona Agente...";
+			$agents[]=$option;
+			$pos = 1;
+
+			foreach($oagents as $item){
+				$option=[];
+				$option["pos"]=$pos;
+				$option["id"]=$item->getId();
+				$option["text"]=$item->getName()." ".$item->getLastname();
+				$agents[]=$option;
+				$pos++;
+			}
+
+			// Miga
+			$nbreadcrumb=["rute"=>null, "name"=>"Por Vendedor", "icon"=>"fa fa-edit"];
+			$breadcrumb=$globaleMenuOptionsRepository->formatBreadcrumb('salesCommissions',null,null);
+			array_push($breadcrumb,$nbreadcrumb);
+
+			// Decimales
+			$ndecimals = 2;
+			if ($config != null && $config->getDecimals()!=null)
+				$ndecimals = $config->getDecimals();
+			$decimals = str_repeat('0',$ndecimals);
+
+			$lines=[];
+
+			$spreadsheet = [];
+			$spreadsheet['name']       = "jexcelcommissions";
+			$spreadsheet['options']    = "pagination:500";
+		  $spreadsheet['prototipe']  = "{
+				id:'',
+				deliverynote:'',
+				date:'',
+				productcode:'',
+				productname:'',
+				variant:'',
+				quantity:1,
+				price:'0.$decimals',
+				cost:'0.$decimals',
+				costlastbuy:'0.$decimals',
+				margin:'0.$decimals',
+				commission:'0.$decimals',
+				importcommission:'0.$decimals',
+			}";
+			if ($tabs!=null){
+				$spreadsheet['tabsload'] = 1;
+				$spreadsheet['tabs']   	 = $tabs;
+			}else{
+				$spreadsheet['tabsload'] = 0;
+				$spreadsheet['tabs']   		 =
+			 "[
+				{ caption:'Comisión',
+					columns:[
+						{name:'deliverynote'},
+						{name:'date'},
+						{name:'productcode'},
+						{name:'productname'},
+						{name:'variant'},
+						{name:'quantity'},
+						{name:'price'},
+						{name:'cost'},
+						{name:'costlastbuy'},
+						{name:'margin'},
+						{name:'type'},
+						{name:'commission'},
+						{name:'importcommission'}
+					]
+				}
+				]";
+			}
+			$spreadsheet['columns']    =
+			 "[
+				 { name: 'id', type: 'numeric', width:'40px', title: 'ID', align: 'left'},
+				 { name: 'deliverynote', type: 'text', width:'75px', title: 'Albarán', readOnly:true, align: 'left' },
+				 { name: 'date', type: 'text', width:'75px', title: 'Fecha', readOnly:true, align: 'center' },
+				 { name: 'productcode', type: 'text', width:'75px', title: 'Código', readOnly:true, align: 'left' },
+				 { name: 'productname', type: 'text', width:'300px', title: 'Nombre', readOnly:true, align: 'left' },
+				 { name: 'variant', type: 'text', width:'50px', title: 'Variante', readOnly:true, align: 'left' },
+				 { name: 'quantity', type: 'numeric', width:'50px', title: 'Cantidad', readOnly:true, align: 'right'  },
+				 { name: 'price', type: 'numeric', decimal: '".$ndecimals."', width:'75px', title: 'Precio (€)', readOnly:true, align: 'right'},
+				 { name: 'cost', type: 'numeric', decimal: '".$ndecimals."', width:'75px', title: 'Coste (€)', readOnly:true, align: 'right'},
+				 { name: 'costlastbuy', type: 'numeric', decimal: '".$ndecimals."', width:'75px', title: 'U. Compra (€)', readOnly:true, align: 'right'},
+				 { name: 'margin', type: 'numeric', decimal: '".$ndecimals."', width:'50px', title: 'Margen (%)', readOnly:true, align: 'right'},
+				 { name: 'type', type: 'text', width:'50px', title: 'Tipo', readOnly:true, align: 'center'},
+				 { name: 'commission', type: 'numeric', decimal: '".$ndecimals."', width:'50px', title: 'Porc. Com. (%)', align: 'right',
+				 	options: {
+				 		onchange: {
+				 			oncomplete: 'calculateCommissionsLine'
+				 		}
+				 	}},
+				 { name: 'importcommission', type: 'numeric', decimal: '".$ndecimals."', width:'75px', title: 'Imp. Com.(€)', readOnly:true, align: 'right'}
+			 ]";
+
+			 // Cargar de base de datos
+			 $spreadsheet['data']       = json_encode($lines);
+			 $spreadsheet['onchangepage'] 	   = "
+					var data 		= this.getData();
+					for(i=0; i<data.length; i++){
+						var color = \"initial\";
+						var commission=this.getValueFromKey('commission', i, true);
+						if(commission>=2)	color='#bff0d0';
+							else if (commission>=1.5) color='#f0edbf';
+								else color='#f0bfbf';
+						$(\"[data-x='\"+11+\"'][data-y='\"+i+\"']\").css(\"background-color\",color);
+					}
+			 ";
+			 $spreadsheet['onload'] 	   =
+				 "
+					var sheet = null;
+					if (typeof(document.getElementById('".$spreadsheet['name']."').jexcel[0]) == 'undefined')
+					 sheet = document.getElementById('".$spreadsheet['name']."').jexcel;
+					else
+					 sheet = document.getElementById('".$spreadsheet['name']."').jexcel[0];
+					var data    = sheet.getData();
+					var columns = sheet.options.columns;
+				 ";
+
+
+			if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+					return $this->render('@ERP/sales_commissions.html.twig', [
+						'moduleConfig' => $config,
+						'controllerName' => 'salesOrdersController',
+						'interfaceName' => 'Commissions',
+						'optionSelected' => 'salesCommissions',
+						'optionSelectedParams' => [],
+						'menuOptions' =>  $globaleMenuOptionsRepository->formatOptions($userdata),
+						'breadcrumb' =>  $breadcrumb,
+						'userData' => $userdata,
+						'agents' => $agents,
+						'spreadsheet' => $spreadsheet,
+						'include_header' => [["type"=>"css", "path"=>"js/jexcel/jexcel.css"],
+																 ["type"=>"js",  "path"=>"js/jexcel/jexcel.js"],
+																 ["type"=>"css", "path"=>"js/jsuites/jsuites.css"],
+																 ["type"=>"js",  "path"=>"js/jsuites/jsuites.js"]
+															 	],
+						]);
+				}
+				return new RedirectResponse($this->router->generate('app_login'));
+
+		}
+
+		/**
+	 * @Route("/api/ERP/salesorders/commissions/getvendorsales/{id}", name="getvendorsales")
+	 */
+	 public function getvendorsales($id,RouterInterface $router,Request $request){
+		 // El usuario tiene derechos para realizar la acción, sino se va a la página de unauthorized
+		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		 if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine()))
+			 return $this->redirect($this->generateUrl('unauthorized'));
+
+	   $globaleUsersRepository						= $this->getDoctrine()->getRepository(GlobaleUsers::class);
+		 $erpConfigurationRepository				= $this->getDoctrine()->getRepository(ERPConfiguration::class);
+
+		 // Configuración (nº decimales, color...etc)
+		 $config	= $erpConfigurationRepository->findOneBy(["company"=>$this->getUser()->getCompany()]);
+
+		 $user=$globaleUsersRepository->findOneBy(["id"=>$id, "active"=>1, "deleted"=>0]);
+		 if(!$user) return new JsonResponse(["result"=>-1]);
+
+		 $from=$request->request->get('from');
+		 $to=$request->request->get('to');
+
+		 // Decimales
+		 $ndecimals = 2;
+		 if ($config != null && $config->getDecimals()!=null)
+			 $ndecimals = $config->getDecimals();
+		 $decimals = str_repeat('0',$ndecimals);
+ echo('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-getSalesBySalesperson.php?from='.$from.'&to='.$to.'&salesperson='.$user->getEmail());
+	   $json=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-getSalesBySalesperson.php?from='.$from.'&to='.$to.'&salesperson='.$user->getEmail());
+		 $olines=json_decode($json, true);
+		 if(count($olines)>0)
+		 	$olines=$olines[0];
+		 $lines = [];
+		 if ($olines["class"]!=null){
+			for($i=0; $i<count($olines["class"]); $i++){
+					$lines[$i] = [];
+					$lines[$i]['id'] = $i;
+					$lines[$i]['deliverynote'] = $olines["class"][$i]["deliverynote"];
+					$lines[$i]['date']		= (($olines["class"][$i]["date"]!=null)?substr($olines["class"][$i]["date"]["date"],0,10):"");
+					$lines[$i]['productcode'] = $olines["class"][$i]["code"];
+					$lines[$i]['productname'] = $olines["class"][$i]["description"];
+					$lines[$i]['variant'] = $olines["class"][$i]["variant"];
+					$lines[$i]['quantity'] = round($olines["class"][$i]["qty"],1);
+					$lines[$i]['price'] = round($olines["class"][$i]["price"],$ndecimals);
+					$lines[$i]['cost'] = round($olines["class"][$i]["cost"],$ndecimals);
+					$lines[$i]['costlastbuy'] = round($olines["class"][$i]["purchase_cost"]*$lines[$i]['quantity'],$ndecimals);
+					$lines[$i]['type'] = $olines["class"][$i]["type"];
+					$lines[$i]['margin'] = round((($lines[$i]['price']/$lines[$i]['costlastbuy'])-1)*100,2);
+					//Si el coste es > 0 cogemos el margen sobre el coste en el albaran, si no cogemos el margen sobre el precio de ultima compra
+					//$lines[$i]['margin'] = round($olines["class"][$i]["cost"]>0?$olines["class"][$i]["margincost"]:$olines["class"][$i]["marginlastbuy"],2);
+					//Si el tipo es indirecto siempre y el margen es mayor o igual al 15 1.5%, si es directo: si el margen > 20 -> 2% si esta entre 20 y 15 (incluido) 1.5%, si es menor que 15 el 0%
+					$lines[$i]['commission'] = $lines[$i]['type']=='Directa'?($lines[$i]['margin']>20?2:($lines[$i]['margin']>=15?1.5:0)):($lines[$i]['margin']>=15?1.5:0);
+					$lines[$i]['importcommission'] = 	round($lines[$i]['price'] * ($lines[$i]['commission']/100),$ndecimals);
+			}
+
+			return new JsonResponse(["result"=>1, "data"=>$lines, "topcustomers"=>$olines["topcustomers"]]);
+		 }
+		 return new JsonResponse(["result"=>-2]);
+	 }
 
 }

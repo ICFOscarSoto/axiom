@@ -1,0 +1,439 @@
+{% set params = app.request.attributes.get('_route_params')|merge(app.request.query.all()) %}
+{% block header %}
+<head>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<meta name="description" content="Axiom Business Management" />
+	<meta name="author" content="" />
+	<link rel="icon" href="images/favicon.ico">
+	{{ include('@Globale/header.html.twig') }}
+	<!-- Imported styles on this page -->
+	<link rel="stylesheet" href="{{ url('index') }}css/bootstrap-grid.css">
+	<link rel="stylesheet" href="{{ url('index') }}css/timeline.css">
+	<link rel="stylesheet" href="{{ url('index') }}js/jvectormap/jquery-jvectormap-1.2.2.css">
+	<link rel="stylesheet" href="{{ url('index') }}js/rickshaw/rickshaw.min.css">
+</head>
+{% endblock %}
+<title>{% block title %}{{ interfaceName|trans }}{% endblock %}</title>
+<body class="page-body" data-url="{{ url('indexAdmin') }}">
+<div class="page-container {% if userData.interfaceConfig.collapsedSidebar is defined and userData.interfaceConfig.collapsedSidebar %}sidebar-collapsed{% endif %}"><!-- add class "sidebar-collapsed" to close sidebar by default, "chat-visible" to make chat appear always -->
+	{{ include('@Globale/sidebar_menu.html.twig') }}
+	<div class="main-content">
+		{{ include('@Globale/head.html.twig') }}
+		<hr />
+		{{ include('@Globale/breadcrumb.html.twig') }}
+		{#}<h2>{{ interfaceName }}</h2>#}
+		<!-- MAIN CONTENT -->
+		<ul id="tabs-list" class="nav nav-tabs bordered" style="margin-top:0px!important">
+	    <li class="active" id="tab-head-data" style="" attr-id="" attr-name="data">
+	        <a href="#tab-body-data" id="atab-head-data" data-toggle="tab">
+	            <span class="visible-xs"><i class="fa fa-id-card" aria-hidden="true"></i></span>
+	            <span class="hidden-xs">Comisiones</span>
+	        </a>
+	    </li>
+		</ul>
+		<div class="tab-content">
+	    <div class="tab-pane active" style="" id="tab-body-data">
+				<div class="row">
+					<div style="text-align: left;" class="col-md-6">
+						<div class="btn-group">
+
+            </div>
+					</div>
+					<div style="text-align: right;margin-bottom:10px;" class="col-md-6">
+					</div>
+				</div>
+
+				<div class="panel minimal">
+					<div class="panel-heading">
+						<div class="panel-title">Datos del informe</div>
+					</div>
+					<div class="panel-body">
+						<div class="col-md-4">
+							<label for="commission-form-agent">Agente:</label>
+							<div class="form-group">
+								<select type="text" id="commission-form-agent" class="form-control select2" required>
+									{% for option in agents %}
+										<option value="{{ option.id }}" {% if option.id==userData.id %}selected="selected"{% endif %} data-image="{{ url('index') }}api/user/{{ option.id }}/getimage">{{ option.text }}</option>
+									{% endfor %}
+								</select>
+							</div>
+						</div>
+						<div class="col-md-2">
+			        <label for="commission-form-from">Fecha desde:</label>
+			        <div class="form-group">
+			          <div class="input-group">
+			            <span class="input-group-addon"><i class="fa fa-calendar" aria-hidden="true"></i></span>
+			            <input type="text" id="commission-form-from" style="z-index:99 !important;" value="" placeholder="" class="datepicker form-control">
+			          </div>
+			        </div>
+			      </div>
+						<div class="col-md-2">
+			        <label for="commission-form-to">Fecha hasta:</label>
+			        <div class="form-group">
+			          <div class="input-group">
+			            <span class="input-group-addon"><i class="fa fa-calendar" aria-hidden="true"></i></span>
+			            <input type="text" id="commission-form-to" style="z-index:99 !important;" value="" placeholder="" class="datepicker form-control">
+			          </div>
+			        </div>
+			      </div>
+						<div class="col-md-2">
+							<label for="commission-button-generate">&nbsp;</label>
+							<div class="form-group">
+			          <div class="input-group">
+									<button attr-id="" attr-action="" id="commission-button-generate" type="button" class="btn btn-green">Generar</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="panel minimal">
+					<div class="panel-heading">
+						<div class="panel-title">Análisis</div>
+					</div>
+					<div class="panel-body">
+
+						<div id="commission-analisis-data">
+							<div class="col-md-2">
+		            <div class="form-group">
+		              <label for="commission-form-salestotal">Total Vendido:</label>
+		              <span id="unity-view-form-commission-salestotal" class="input__unity">
+		                <span>€</span>
+		              </span>
+		              <input type="text" id="commission-form-salestotal" name="commission-form-salestotal" readonly="readonly" autocomplete="off" class="number-type form-control input_parent__unity" value="">
+		            </div>
+		          </div>
+							<div class="col-md-2">
+								<div class="form-group">
+									<label for="commission-form-salescosttotal">Total Coste:</label>
+									<span id="unity-view-form-commission-salescosttotal" class="input__unity">
+										<span>€</span>
+									</span>
+									<input type="text" id="commission-form-salescosttotal" name="commission-form-salescosttotal" readonly="readonly" autocomplete="off" class="number-type form-control input_parent__unity" value="">
+								</div>
+							</div>
+							<div class="col-md-1">
+								<div class="form-group">
+									<label for="commission-form-avgmargin">Margen medio:</label>
+									<span id="unity-view-form-commission-avgmargin" class="input__unity">
+										<span>%</span>
+									</span>
+									<input type="text" id="commission-form-avgmargin" name="commission-form-avgmargin" readonly="readonly" autocomplete="off" class="number-type form-control input_parent__unity" value="">
+								</div>
+							</div>
+							<div class="col-md-2">
+								<div class="form-group">
+									<label for="commission-form-commissiontotal">Total Comisión:</label>
+									<span id="unity-view-form-commission-commissiontotal" class="input__unity">
+										<span>€</span>
+									</span>
+									<input type="text" id="commission-form-commissiontotal" name="commission-form-commissiontotal" readonly="readonly" autocomplete="off" class="number-type form-control input_parent__unity" value="">
+								</div>
+							</div>
+							<div class="col-md-1">
+								<div class="form-group">
+									<label for="commission-form-calculatedcommissionpercent">Porc. Comisión:</label>
+									<span id="unity-view-form-commission-calculatedcommissionpercent" class="input__unity">
+										<span>%</span>
+									</span>
+									<input type="text" id="commission-form-calculatedcommissionpercent" name="commission-form-calculatedcommissionpercent" readonly="readonly" autocomplete="off" class="number-type form-control input_parent__unity" value="">
+								</div>
+							</div>
+						</div>
+						<div id="commission-analisis-graph">
+							<div id="commission-analisis-graphs">
+								<div class="col-md-5">
+									<div style="border: 1px solid #e3e3e3;border-radius: 4px;margin-top: 10px;padding: 0px;">
+										<div style="text-align: center;font-weight: bold;padding: 5px;background: #f5f5f5;">Top 10 clientes</div>
+										<canvas id="canvas_salesbycustomer"></canvas>
+									</div>
+								</div>
+								<div class="col-md-7">
+									<div style="border: 1px solid #e3e3e3;border-radius: 4px;margin-top: 10px;padding: 0px;">
+										<div style="text-align: center;font-weight: bold;padding: 5px;background: #f5f5f5;">Margenes del Top 10 clientes</div>
+										<canvas id="canvas_marginbycustomer"></canvas>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="panel minimal">
+					<div class="panel-heading">
+						<div class="panel-title">Lineas</div>
+					</div>
+
+					<div id="jsexcel-commissions">
+						{{ include('@Globale/form_jspreadsheet_html.twig') }}
+						<br/>
+						<div class="row">
+							<div style="text-align: left;" class="col-md-6"></div>
+							<div style="text-align: right;margin-bottom:10px;" class="col-md-6">
+							</div>
+						</div>
+					</diV>
+				</diV>
+		</div>
+
+
+
+	</div>
+		{{ include('@Globale/chat.html.twig') }}
+</div>
+
+<script>
+// Helper calendar
+function datepicker(){
+    $('.datepicker').each(function(index) {
+      var valueField=$(this).val();
+      var dateField=moment(valueField, "DD/MM/YYYY");
+        $(this).datetimepicker({
+        showTodayButton: true,
+        format: 'DD/MM/YYYY',
+        locale:'es',
+        useCurrent: false,
+        tooltips: spanish_tooltips_datetimepicker,
+        date: (dateField.isValid())?dateField:null
+      });
+
+    });
+}
+
+{# Generación de gráficas #}
+{# Resaltar el cuadrante al pasar el raton por encima de su leyenda #}
+function handleHover(evt, item, legend) {
+  legend.chart.data.datasets[0].backgroundColor.forEach((color, index, colors) => {
+    colors[index] = index === item.index || color.length === 9 ? color : color + '4D';
+  });
+  legend.chart.update();
+}
+
+{# Devolver el cuadrante a su formato normal al quitar el raton de su leyenda #}
+function handleLeave(evt, item, legend) {
+  legend.chart.data.datasets[0].backgroundColor.forEach((color, index, colors) => {
+    colors[index] = color.length === 9 ? color.slice(0, -2) : color;
+  });
+  legend.chart.update();
+}
+
+{# Grafica top 10 clientes #}
+function graphCommissionByCustomer(data, label){
+		var config_graph = {
+		type: 'doughnut',
+		data: {
+			datasets: [{
+				data: data,
+				backgroundColor: ['rgb(255, 99, 132)','rgb(75, 192, 192)','#f7c613','#a1d963','#71cbe3','#4864b3','#f7f266','#d9bae9','#3a8197','#a1d963','#5863b3'],
+				label: 'Distribución por cliente'
+			}],
+			labels: label
+		},
+		options: {
+			responsive: true,
+			plugins: {
+				title: {
+					display: true,
+					text: 'Top 10 clientes',
+				},
+				legend: {
+					onHover: handleHover,
+					onLeave: handleLeave
+				}
+			}
+		}
+	};
+	var canvas_graph = document.getElementById('canvas_salesbycustomer').getContext('2d');
+	window.myPie = new Chart(canvas_graph, config_graph);
+}
+
+{# Grafica margen top 10 clientes #}
+function graphMarginByCustomer(data, label){
+		var config_graph = {
+		type: 'bar',
+		data: {
+			datasets: [{
+				data: data,
+				backgroundColor: ['rgb(255, 99, 132)','rgb(75, 192, 192)','#f7c613','#a1d963','#71cbe3','#4864b3','#f7f266','#d9bae9','#3a8197','#a1d963','#5863b3']
+			}],
+			labels: label
+		},
+		options: {
+			responsive: true,
+			plugins: {
+				title: {
+					display: true,
+					text: 'Top 10 clientes',
+				},
+				legend: {
+					onHover: handleHover,
+					onLeave: handleLeave
+				}
+			}
+		}
+	};
+	var canvas_graph = document.getElementById('canvas_marginbycustomer').getContext('2d');
+	window.myPie = new Chart(canvas_graph, config_graph);
+}
+
+{# Actualización de datos #}
+{# Recalcula la fila donde se ha producido un cambio #}
+function calculateCommissionsLine(sheet,x,y,value){
+	if (sheet !== undefined){
+		var commission = sheet.getValueFromKey('commission', y, true);
+		if (commission == null || commission == '' || isNaN(commission) || isNaN(parseFloat(commission))) commission = 0;
+		var price = sheet.getValueFromKey('price', y, true);
+		if (price == null || price == '' || isNaN(price) || isNaN(parseFloat(price))) price = 0;
+		var importcommission = price * (commission/100);
+		importcommission = Number.parseFloat(importcommission).toFixed({{moduleConfig.decimals}});
+		sheet.setValueFromKey('importcommission', y, importcommission, true);
+	/*	var color = "initial";
+		if(commission>=2)	color='#bff0d0';
+			else if (commission>=1.5) color='#f0edbf';
+				else color='#f0bfbf';
+
+		$("[data-x='"+x+"'][data-y='"+y+"']").css("background-color",color);*/
+	}
+	// Recalculo de totales
+	calculateCommissionsTotal(sheet);
+}
+{# Recalcula de totales #}
+function calculateCommissionsTotal(sheet){
+	if (sheet==null)
+		sheet = document.getElementById('{{spreadsheet.name}}').jexcel[0];
+	var data 		= sheet.getData();
+	var salestotal = 0;
+	var salescosttotal = 0;
+	var avgmargin  	= 0;
+	var commissiontotal 		= 0;
+	var calculatedcommissionpercent	= 0;
+	for(i=0; i<data.length; i++){
+		price = sheet.getValueFromKey('price', i, true);
+		if (price == null || price == '' || isNaN(price) || isNaN(parseFloat(price))) price = 0;
+		salestotal=salestotal+(price*1);
+
+		cost = sheet.getValueFromKey('cost', i, true);
+		if (cost == null || cost == '' || isNaN(cost) || isNaN(parseFloat(cost))) cost = 0;
+		costlastbuy = sheet.getValueFromKey('costlastbuy', i, true);
+		if (costlastbuy == null || costlastbuy == '' || isNaN(costlastbuy) || isNaN(parseFloat(costlastbuy))) costlastbuy = 0;
+		salescosttotal=salescosttotal+(Math.min(cost*1,costlastbuy*1));
+
+		margin = sheet.getValueFromKey('margin', i, true);
+		if (margin == null || margin == '' || isNaN(margin) || isNaN(parseFloat(margin))) margin = 0;
+		avgmargin = avgmargin+(margin*1);
+
+		commission = sheet.getValueFromKey('importcommission', i, true);
+		if (commission == null || commission == '' || isNaN(commission) || isNaN(parseFloat(commission))) commission = 0;
+		commissiontotal = commissiontotal+(commission*1);
+
+	}
+	salestotal = Number.parseFloat(salestotal).toFixed({{moduleConfig.decimals}});
+	salescosttotal = Number.parseFloat(salescosttotal).toFixed({{moduleConfig.decimals}});
+	avgmargin = Number.parseFloat(avgmargin/data.length).toFixed(2);
+	commissiontotal = Number.parseFloat(commissiontotal).toFixed(2);
+	calculatedcommissionpercent = Number.parseFloat((commissiontotal*100)/salestotal).toFixed(2);
+
+	$("#commission-form-salestotal").val(salestotal);
+	$("#commission-form-salescosttotal").val(salescosttotal);
+	$("#commission-form-avgmargin").val(avgmargin);
+	$("#commission-form-commissiontotal").val(commissiontotal);
+	$("#commission-form-calculatedcommissionpercent").val(calculatedcommissionpercent);
+
+}
+
+{# Obtener datos de comisiones #}
+function getCommissions(vendor,from,to){
+	if((++load_wait)==1) $("#load-spinner").fadeIn();
+	$.post('/api/ERP/salesorders/commissions/getvendorsales/'+vendor, {"from":from, "to":to},
+		 function(data, status, xhr){
+			 if((--load_wait)==0) $("#load-spinner").fadeOut();
+			 var sheet = document.getElementById('jexcelcommissions').jexcel[0];
+			 if(sheet.options.data.length>1) sheet.deleteRow(1, sheet.options.data.length-1);
+			 if(data.result==1){
+
+				 sheet.insertRow(data.data.length,sheet.options.data.length);
+						 	var i=0;
+							data.data.forEach( function(valor, indice, array){
+						   sheet.setValueFromKey('id', i, valor["productcode"], true);
+							 sheet.setValueFromKey('deliverynote', i, valor["deliverynote"], true);
+							 sheet.setValueFromKey('date', i, valor["date"], true);
+							 sheet.setValueFromKey('productcode', i, valor["productcode"], true);
+							 sheet.setValueFromKey('productname', i, valor["productname"], true);
+							 sheet.setValueFromKey('variant', i, valor["variant"], true);
+							 sheet.setValueFromKey('quantity', i, valor["quantity"], true);
+							 sheet.setValueFromKey('price', i,  Number.parseFloat(valor["price"]).toFixed({{moduleConfig.decimals}}), true);
+							 sheet.setValueFromKey('cost', i, Number.parseFloat(valor["cost"]).toFixed({{moduleConfig.decimals}}), true);
+							 sheet.setValueFromKey('costlastbuy', i, Number.parseFloat(valor["costlastbuy"]).toFixed({{moduleConfig.decimals}}), true);
+							 sheet.setValueFromKey('type', i, valor["type"], true);
+							 sheet.setValueFromKey('margin', i, Number.parseFloat(valor["margin"]).toFixed(2), true);
+							 sheet.setValueFromKey('commission', i, Number.parseFloat(valor["commission"]).toFixed(1), true);
+							 i++;
+						 });
+						 sheet.page(0); {# forzar pintado de colores #}
+
+					 {# Calculos para la generacion de las gráficas #}
+					 var customers=[];
+					 var margins=[];
+					 var total_percent=0;
+					 data.topcustomers.forEach( function(valor, indice, array){
+						 var percent = (valor["price"]*100)/$("#commission-form-salestotal").val();
+						 percent = Math.round(percent*10)/10; {# redondeo con un decimal #}
+						 customers.push(valor["customername"]+"("+percent+"%)");
+						 margins.push(percent);
+						 total_percent+=percent;
+					 });
+					 if(total_percent<100){
+						 var percent = 100-total_percent;
+						 percent = Math.round(percent*10)/10; {# redondeo con un decimal #}
+					 	 customers.push("Otros ("+percent+"%)");
+					 	 margins.push(percent);
+				 		}
+
+						graphCommissionByCustomer(margins,customers);
+						graphMarginByCustomer(margins,customers);
+
+			 }else toastr.error("Ocurrió un error al obtener los datos", "Confirmación", confirmation);
+	 }, "json");
+}
+
+
+
+$(document).ready(function() {
+	{# Poner el foco en el primer input válido de la ficha #}
+	$('.form-control:visible:enabled:first').focus();
+
+	{# Datepicker #}
+  datepicker();
+
+	$('body').on('click', "#commission-button-generate", function(e) {
+		getCommissions($("#commission-form-agent").val(),$("#commission-form-from").val(),$("#commission-form-to").val());
+	});
+
+});
+</script>
+
+{% block footer %}
+<link rel="stylesheet" href="{{ url('index') }}js/datatables/datatables.css">
+<link rel="stylesheet" href="{{ url('index') }}js/select2/select2-bootstrap.css">
+<link rel="stylesheet" href="{{ url('index') }}js/select2/select2.css">
+<link rel="stylesheet" href="{{ url('index') }}css/custom.css">
+<link rel="stylesheet" href="{{ url('index') }}js/ol/ol.css">
+<link rel="stylesheet" href="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker.min.css">
+<link rel="stylesheet" href="{{ url('index') }}js/jodit/jodit.min.css">
+
+<!-- Imported scripts on this page -->
+<script src="{{ url('index') }}js/datatables/datatables.js"></script>
+<script src="{{ url('index') }}js/select2/select2.min.js"></script>
+<script src="{{ url('index') }}js/moment.min.js"></script>
+<script src="{{ url('index') }}js/moment-es.js"></script>
+<script src="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker-es.js"></script>
+<script src="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker.min.js"></script>
+<script src="{{ url('index') }}js/fileinput.js"></script>
+<script src="{{ url('index') }}js/ol/ol.js"></script>
+<script src="{{ url('index') }}js/jodit/jodit.min.js"></script>
+<script src="{{ url('index') }}js/jquery.nestable.js"></script>
+{{ include('@Globale/bottom.html.twig') }}
+{% endblock %}
+</body>
