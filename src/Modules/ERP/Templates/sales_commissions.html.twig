@@ -507,7 +507,26 @@ $(document).ready(function() {
   datepicker();
 
 	$('body').on('click', "#commission-button-generate", function(e) {
-		getCommissions($("#commission-form-agent").val(),$("#commission-form-from").val(),$("#commission-form-to").val());
+		from=moment($('#commission-form-from').val(), 'DD/MM/YYYY');
+		to=moment($('#commission-form-to').val(), 'DD/MM/YYYY');
+		days=to.diff(from, 'days')+1;
+		if(days>31){
+			$.confirm({
+					theme: 'bootstrap',
+					title: 'Calcular comisiones',
+					content: 'Rangos de fechas de mas de un mes pueden demorar mucho tiempo en generarse ¿Esta seguro que desea crear el informe?',
+					buttons: {
+						 confirm: { text: 'Confirmar', btnClass: 'btn-red', action: function(){ getCommissions($("#commission-form-agent").val(),$("#commission-form-from").val(),$("#commission-form-to").val()); } },
+						 cancel: { text: 'Cancelar' }
+					}
+			});
+		}else getCommissions($("#commission-form-agent").val(),$("#commission-form-from").val(),$("#commission-form-to").val());
+	});
+	$("#commission-form-from").on("dp.change", function (e) {
+		$('#commission-form-to').data("DateTimePicker").minDate(e.date);
+	});
+	$("#commission-form-to").on("dp.change", function (e) {
+		$('#commission-form-from').data("DateTimePicker").maxDate(e.date);
 	});
 
 });
