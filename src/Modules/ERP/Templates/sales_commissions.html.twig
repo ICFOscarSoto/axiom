@@ -250,27 +250,28 @@ function graphCommissionByCustomer(data, label){
 }
 
 {# Grafica margen top 10 clientes #}
-function graphMarginByCustomer(data, label){
+function graphMarginByCustomer(data){
 		var config_graph = {
 		type: 'bar',
-		data: {
-			datasets: [{
-				data: data,
-				backgroundColor: ['rgb(255, 99, 132)','rgb(75, 192, 192)','#f7c613','#a1d963','#71cbe3','#4864b3','#f7f266','#d9bae9','#3a8197','#a1d963','#5863b3']
-			}],
-			labels: label
-		},
+		data: data,
 		options: {
 			responsive: true,
-			plugins: {
-				title: {
-					display: true,
-					text: 'Top 10 clientes',
-				},
-				legend: {
-					onHover: handleHover,
-					onLeave: handleLeave
-				}
+			scales: {
+				xAxes: [{
+					barPercentage: 1,
+					categoryPercentage: 0.6,
+					stacked: true
+				}],
+				yAxes: [
+					{
+						id: "y-axis-total",
+						stacked: true
+					},
+					{
+						id: "y-axis-profit",
+						stacked: true
+					}
+			]
 			}
 		}
 	};
@@ -342,6 +343,18 @@ function calculateCommissionsTotal(sheet){
 	$("#commission-form-calculatedcommissionpercent").val(calculatedcommissionpercent);
 
 }
+{# Buscar un cliente en el array de clientes top #}
+function findCustomer(data, customercode){
+	var found=-1;
+	data.every((v, index, array) => {
+ 		if(customercode==v["customercode"]){
+			found=index;
+			return false; {# en every return false es quivalente a break; #}
+		}
+		return true; {# en every return true es quivalente a continue; #}
+  });
+	return found;
+}
 
 {# Obtener datos de comisiones #}
 function getCommissions(vendor,from,to){
@@ -352,6 +365,19 @@ function getCommissions(vendor,from,to){
 			 var sheet = document.getElementById('jexcelcommissions').jexcel[0];
 			 if(sheet.options.data.length>1) sheet.deleteRow(1, sheet.options.data.length-1);
 			 if(data.result==1){
+
+				 var array_salesByCustomer=[];
+				 var array_costByCustomer=[];
+				 var array_commissionByCustomer=[];
+				 var array_profitByCustomer=[];
+				 var array_salesByCustomerLabels=[];
+				 data.topcustomers.forEach( function(valor, indice, array){
+					 	array_salesByCustomer.push(0);
+						array_costByCustomer.push(0);
+						array_commissionByCustomer.push(0);
+						array_profitByCustomer.push(0);
+						array_salesByCustomerLabels.push(valor["customername"]);
+				 });
 
 				 sheet.insertRow(data.data.length,sheet.options.data.length);
 						 	var i=0;
@@ -369,6 +395,17 @@ function getCommissions(vendor,from,to){
 							 sheet.setValueFromKey('type', i, valor["type"], true);
 							 sheet.setValueFromKey('margin', i, Number.parseFloat(valor["margin"]).toFixed(2), true);
 							 sheet.setValueFromKey('commission', i, Number.parseFloat(valor["commission"]).toFixed(1), true);
+
+							 {# Totalizados para grafica de barras de margenes del top 10 clientes #}
+							 var pos=findCustomer(data.topcustomers,valor["customercode"]);
+							 if(pos>-1){
+								 //console.log(pos);
+								 //console.log(valor["customercode"]);
+								 array_salesByCustomer[pos]+=valor["price"];
+								 array_costByCustomer[pos]+=valor["cost"];
+								 array_commissionByCustomer[pos]+=(sheet.getValueFromKey('importcommission', i, true)*1);
+							 }
+
 							 i++;
 						 });
 						 sheet.page(0); {# forzar pintado de colores #}
@@ -383,6 +420,17 @@ function getCommissions(vendor,from,to){
 						 customers.push(valor["customername"]+"("+percent+"%)");
 						 margins.push(percent);
 						 total_percent+=percent;
+
+						 {# Calculo de porcentaje de beneficio en gráfica Margenes del Top clientes #}
+						 var cost=array_costByCustomer[indice]+array_commissionByCustomer[indice];
+						 array_profitByCustomer[indice]=((array_salesByCustomer[indice]-cost)*100)/array_salesByCustomer[indice];
+
+						 {# Redondeo de totales en gráficas #}
+						 array_profitByCustomer[indice]=Number.parseFloat(array_profitByCustomer[indice]).toFixed(1);
+						 array_salesByCustomer[indice]=Number.parseFloat(array_salesByCustomer[indice]).toFixed(2);
+						 array_costByCustomer[indice]=Number.parseFloat(array_costByCustomer[indice]).toFixed(2);
+						 array_commissionByCustomer[indice]=Number.parseFloat(array_commissionByCustomer[indice]).toFixed(2);
+
 					 });
 					 if(total_percent<100){
 						 var percent = 100-total_percent;
@@ -392,7 +440,58 @@ function getCommissions(vendor,from,to){
 				 		}
 
 						graphCommissionByCustomer(margins,customers);
-						graphMarginByCustomer(margins,customers);
+						var graphData = {
+							labels: [],
+							datasets: []
+						};
+						var SalesByCustomerTotalData = {
+							label: 'Ventas netas(€)',
+							data: [],
+							backgroundColor: 'rgba(181, 144, 227, 1)',
+							borderColor: 'rgba(150, 104, 208, 1)',
+							borderWidth: 0,
+							yAxisID: "y-axis-total",
+							stack: 'Stack 0'
+						};
+						var SalesByCustomerTotalCost = {
+							label: 'Costes netos(€)',
+							data: [],
+							backgroundColor: 'rgba(140, 205, 127, 1)',
+							borderColor: 'rgba(107, 180, 93, 1)',
+							borderWidth: 0,
+							yAxisID: "y-axis-total",
+							stack: 'Stack 1'
+						};
+						var SalesByCustomerTotalCommission = {
+							label: 'Comisión(€)',
+							data: [],
+							backgroundColor: 'rgba(102, 207, 233, 1)',
+							borderColor: 'rgba(58, 168, 196, 1)',
+							borderWidth: 0,
+							yAxisID: "y-axis-total",
+							stack: 'Stack 1'
+						};
+						var SalesByCustomerPercentProfit = {
+							type: 'line',
+							label: 'Beneficio(%)',
+							data: [],
+							fill: false,
+							backgroundColor: 'rgb(255, 99, 132)',
+							borderColor: 'rgb(255, 99, 132)',
+							borderWidth: 2,
+							yAxisID: "y-axis-profit",
+						};
+
+							SalesByCustomerTotalData.data=array_salesByCustomer;
+							SalesByCustomerTotalCost.data=array_costByCustomer;
+							SalesByCustomerTotalCommission.data=array_commissionByCustomer;
+							SalesByCustomerPercentProfit.data=array_profitByCustomer;
+
+							graphData.labels = array_salesByCustomerLabels;
+	      			graphData.datasets= [SalesByCustomerPercentProfit, SalesByCustomerTotalCost, SalesByCustomerTotalCommission, SalesByCustomerTotalData];
+
+
+					 	  graphMarginByCustomer(graphData);
 
 			 }else toastr.error("Ocurrió un error al obtener los datos", "Confirmación", confirmation);
 	 }, "json");

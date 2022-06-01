@@ -659,11 +659,18 @@ class ERPSalesOrdersController extends Controller
 					var data 		= this.getData();
 					for(i=0; i<data.length; i++){
 						var color = \"initial\";
+						var colorMargin = \"initial\";
 						var commission=this.getValueFromKey('commission', i, true);
+						if (commission == null || commission == '' || isNaN(commission) || isNaN(parseFloat(commission))) commission = 100;
 						if(commission>=2)	color='#bff0d0';
 							else if (commission>=1.5) color='#f0edbf';
 								else color='#f0bfbf';
 						$(\"[data-x='\"+11+\"'][data-y='\"+i+\"']\").css(\"background-color\",color);
+
+						var margin=this.getValueFromKey('margin', i, true);
+						if (margin == null || margin == '' || isNaN(margin) || isNaN(parseFloat(margin))) margin = 100;
+						if(margin<=0)	colorMargin='#ff6c6c';
+						$(\"[data-x='\"+9+\"'][data-y='\"+i+\"']\").css(\"background-color\",colorMargin);
 					}
 			 ";
 			 $spreadsheet['onload'] 	   =
@@ -727,8 +734,7 @@ class ERPSalesOrdersController extends Controller
 		 if ($config != null && $config->getDecimals()!=null)
 			 $ndecimals = $config->getDecimals();
 		 $decimals = str_repeat('0',$ndecimals);
- echo('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-getSalesBySalesperson.php?from='.$from.'&to='.$to.'&salesperson='.$user->getEmail());
-	   $json=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-getSalesBySalesperson.php?from='.$from.'&to='.$to.'&salesperson='.$user->getEmail());
+ 	   $json=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-getSalesBySalesperson.php?from='.$from.'&to='.$to.'&salesperson='.$user->getEmail());
 		 $olines=json_decode($json, true);
 		 if(count($olines)>0)
 		 	$olines=$olines[0];
@@ -738,6 +744,7 @@ class ERPSalesOrdersController extends Controller
 					$lines[$i] = [];
 					$lines[$i]['id'] = $i;
 					$lines[$i]['deliverynote'] = $olines["class"][$i]["deliverynote"];
+					$lines[$i]['customercode'] = $olines["class"][$i]["customercode"];
 					$lines[$i]['date']		= (($olines["class"][$i]["date"]!=null)?substr($olines["class"][$i]["date"]["date"],0,10):"");
 					$lines[$i]['productcode'] = $olines["class"][$i]["code"];
 					$lines[$i]['productname'] = $olines["class"][$i]["description"];
