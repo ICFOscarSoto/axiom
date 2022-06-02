@@ -1037,7 +1037,7 @@ label.error {
   border-radius: 5px;
   background: #2c313a;
   color: #afafaf;
-  width: 300px;
+  width: 350px;
   margin-left: 150px;
 }
 
@@ -1054,13 +1054,13 @@ label.error {
 .history-element-timeago{
   width: 49%;
   display: inline-table;
-  margin: 12px 0px 12px 0px;
+  margin: 6px 0px 6px 0px;
 }
 .history-element-date{
   width: 49%;
   text-align: right;
   display: inline-table;
-  margin: 12px 0px 12px 0px;
+  margin: 6px 0px 6px 0px;
 }
 
 .history-element-content{

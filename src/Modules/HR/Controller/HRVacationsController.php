@@ -19,6 +19,7 @@ use App\Modules\Cloud\Utils\CloudFilesUtils;
 use App\Modules\HR\Entity\HRWorkers;
 use App\Modules\HR\Entity\HRVacations;
 use App\Modules\HR\Utils\HRVacationsUtils;
+use App\Modules\Security\Utils\SecurityUtils;
 
 class HRVacationsController extends Controller
 {
@@ -150,6 +151,62 @@ class HRVacationsController extends Controller
      $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/Vacations.json"),true);
      $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields,$this->class,[["type"=>"and", "column"=>"worker", "value"=>$worker]]);
      return new JsonResponse($return);
+   }
+
+
+   /**
+  * @Route("/{_locale}/HR/vacationscalendar", name="vacationsCalendar")
+  */
+ public function vacationsCalendar(RouterInterface $router,Request $request){
+   $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+   if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
+
+   $globaleMenuOptionsRepository			= $this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
+
+   $userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
+   $locale = $request->getLocale();
+   $this->router = $router;
+
+   // Miga
+   $breadcrumb=$globaleMenuOptionsRepository->formatBreadcrumb('vacationsCalendar',null,null);
+
+   if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+     return $this->render('@HR/vacationscalendar.html.twig', [
+       'interfaceName' => "Calendario vacaciones",
+       'controllerName' => 'HRVacationsController',
+       'optionSelected' => 'vacationsCalendar',
+       'optionSelectedParams' => [],
+       'menuOptions' =>  $globaleMenuOptionsRepository->formatOptions($userdata),
+       'breadcrumb' =>  $breadcrumb,
+       'userData' => $userdata,
+       ]);
+   }
+   return new RedirectResponse($this->router->generate('app_login'));
+ }
+
+
+    /**
+	 * @Route("/api/HR/vacations/getevents", name="vacationsGetEvents")
+	 */
+	 public function vacationsGetEvents(RouterInterface $router,Request $request){
+	 	$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+    $vacationsRepository=$this->getDoctrine()->getRepository(HRVacations::class);
+
+    $from=$request->request->get('from');
+    $to=$request->request->get('to');
+
+    $events=[];
+    //Vacations
+			$vacations=$vacationsRepository->getByDates($from, $to);
+			foreach($vacations as $key=>$event){
+				$vacations[$key]['id']='v'.$event['id'];
+				$vacations[$key]['title']='<i class="fas fa-umbrella-beach"></i> '." "."<b>".$event['name']." ".$event['lastname']."</b>";
+				$vacations[$key]['backgroundColor']='#'.str_pad(dechex(mt_rand(0, 0xFFFFFF)), 6, '0', STR_PAD_LEFT); //Color aleatorio
+				$vacations[$key]['description']="";
+				$vacations[$key]['editable']=false;
+			}
+    $events=$vacations;
+    return new JsonResponse(["result"=>1, "data"=>$events, "from"=>$from, "to"=>$to]);
    }
 
 

@@ -111,6 +111,8 @@ class ClocksDiary extends ContainerAwareCommand
               }
 
              if($workingDay){
+               
+              //TODO: Check if clockDiary alerady exists
                $clockdiary=new HRClocksDiary();
                $clockdiary->setWorker($schedulesWorker->getWorker());
                $clockdiary->setCompany($schedulesWorker->getWorker()->getCompany());

@@ -3136,6 +3136,14 @@ table > tbody > tr.highlight > th {
   background-color: #fad839;
   color: #fff;
 }
+.badge.badge-orange {
+  background-color: #ff8d00;
+  color: #fff;
+}
+.badge.badge-purple {
+  background-color: #a60082;
+  color: #fff;
+}
 .badge.badge-danger {
   background-color: #cc2424;
   color: #fff;

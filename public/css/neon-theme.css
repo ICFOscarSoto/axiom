@@ -5046,7 +5046,7 @@ fieldset[disabled] .calendar-env .calendar-body .fc-content .fc-view table tbody
 .calendar-env .fc .fc-toolbar .fc-button {
   background: none;
   border: 1px solid #ebebeb;
-  height: auto;
+  height: 30px;
   padding: 5px 10px;
   -moz-box-shadow: none;
   -webkit-box-shadow: none;

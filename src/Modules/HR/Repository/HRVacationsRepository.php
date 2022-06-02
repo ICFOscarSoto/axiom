@@ -35,7 +35,17 @@ class HRVacationsRepository extends ServiceEntityRepository
       $params=['worker' => $worker->getId(), 'year' => $year];
       return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
     }
-    // /**
+
+    public function getByDates($from, $to){
+      $query="SELECT h.id, u.id user_id, w.id worker_id, w.name, w.lastname, DATE(h.start) start, DATE_ADD(DATE(h.end), INTERVAL 1 DAY) end, h.type, h.approved, h.workerobservations, h.companyobservations, h.days, h.hourslastday
+              FROM hrvacations h
+              LEFT JOIN hrworkers w ON w.id=worker_id
+              LEFT JOIN globale_users u ON u.id=user_id
+              WHERE ((h.start BETWEEN :from AND :to) OR (h.end BETWEEN :from AND :to) OR (h.start <= :from AND h.start >= :to))
+              AND h.approved=1 AND h.deleted=0 AND h.active=1";
+      $params=['from' => $from, 'to' => $to];
+      return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+    }
     //  * @return HRVacations[] Returns an array of HRVacations objects
     //  */
     /*
