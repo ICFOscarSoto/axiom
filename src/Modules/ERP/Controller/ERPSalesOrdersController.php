@@ -754,9 +754,7 @@ class ERPSalesOrdersController extends Controller
 					$lines[$i]['cost'] = round($olines["class"][$i]["cost"],$ndecimals);
 					$lines[$i]['costlastbuy'] = round($olines["class"][$i]["purchase_cost"]*$lines[$i]['quantity'],$ndecimals);
 					$lines[$i]['type'] = $olines["class"][$i]["type"];
-					$lines[$i]['margin'] = round((($lines[$i]['price']/$lines[$i]['cost'])-1)*100,2);
-					//Si el coste es > 0 cogemos el margen sobre el coste en el albaran, si no cogemos el margen sobre el precio de ultima compra
-					//$lines[$i]['margin'] = round($olines["class"][$i]["cost"]>0?$olines["class"][$i]["margincost"]:$olines["class"][$i]["marginlastbuy"],2);
+					$lines[$i]['margin'] = round((($lines[$i]['price']/$lines[$i]['costlastbuy'])-1)*100,2);
 					//Si el tipo es indirecto siempre y el margen es mayor o igual al 15 1.5%, si es directo: si el margen > 20 -> 2% si esta entre 20 y 15 (incluido) 1.5%, si es menor que 15 el 0%
 					$lines[$i]['commission'] = $lines[$i]['type']=='Directa'?($lines[$i]['margin']>20?2:($lines[$i]['margin']>=15?1.5:0)):($lines[$i]['margin']>=15?1.5:0);
 					$lines[$i]['importcommission'] = 	round($lines[$i]['price'] * ($lines[$i]['commission']/100),$ndecimals);
