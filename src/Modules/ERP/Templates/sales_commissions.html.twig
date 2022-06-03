@@ -220,6 +220,11 @@ function handleLeave(evt, item, legend) {
 }
 
 {# Grafica top 10 clientes #}
+function resetGraphCommissionByCustomer(){
+	if(window.objGraphCommissionByCustomer != null && window.objGraphCommissionByCustomer!= undefined){
+		window.objGraphCommissionByCustomer.destroy();
+	}
+}
 function graphCommissionByCustomer(data, label){
 		var config_graph = {
 		type: 'doughnut',
@@ -246,10 +251,15 @@ function graphCommissionByCustomer(data, label){
 		}
 	};
 	var canvas_graph = document.getElementById('canvas_salesbycustomer').getContext('2d');
-	window.myPie = new Chart(canvas_graph, config_graph);
+	window.objGraphCommissionByCustomer = new Chart(canvas_graph, config_graph);
 }
 
 {# Grafica margen top 10 clientes #}
+function resetGraphMarginByCustomer(){
+	if(window.objGraphMarginByCustomer != null && window.objGraphMarginByCustomer != undefined){
+		window.objGraphMarginByCustomer.destroy();
+	}
+}
 function graphMarginByCustomer(data){
 		var config_graph = {
 		type: 'bar',
@@ -276,7 +286,7 @@ function graphMarginByCustomer(data){
 		}
 	};
 	var canvas_graph = document.getElementById('canvas_marginbycustomer').getContext('2d');
-	window.myPie = new Chart(canvas_graph, config_graph);
+	window.objGraphMarginByCustomer = new Chart(canvas_graph, config_graph);
 }
 
 {# Actualización de datos #}
@@ -438,7 +448,7 @@ function getCommissions(vendor,from,to){
 					 	 customers.push("Otros ("+percent+"%)");
 					 	 margins.push(percent);
 				 		}
-
+						resetGraphCommissionByCustomer();
 						graphCommissionByCustomer(margins,customers);
 						var graphData = {
 							labels: [],
@@ -490,7 +500,7 @@ function getCommissions(vendor,from,to){
 							graphData.labels = array_salesByCustomerLabels;
 	      			graphData.datasets= [SalesByCustomerPercentProfit, SalesByCustomerTotalCost, SalesByCustomerTotalCommission, SalesByCustomerTotalData];
 
-
+							resetGraphMarginByCustomer();
 					 	  graphMarginByCustomer(graphData);
 
 			 }else toastr.error("Ocurrió un error al obtener los datos", "Confirmación", confirmation);
