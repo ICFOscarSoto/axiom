@@ -35,6 +35,9 @@ use App\Modules\ERP\Reports\ERPSalesOrdersReports;
 use App\Widgets\Entity\WidgetsERPVendorsorders;
 use App\Modules\Globale\Entity\GlobaleUsersWidgets;
 use App\Modules\Security\Utils\SecurityUtils;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\HttpFoundation\File\MimeType\FileinfoMimeTypeGuesser;
 
 
 class ERPSalesOrdersController extends Controller
@@ -764,5 +767,30 @@ class ERPSalesOrdersController extends Controller
 		 }
 		 return new JsonResponse(["result"=>-2]);
 	 }
+
+	 /**
+	* @Route("/{_locale}/ERP/salesdeliverynotes/form/{id}", name="salesdeliverynotes")
+	* Muestra el albaran digitalizado de la venta
+	*/
+ 	public function salesdeliverynotes($id,RouterInterface $router,Request $request){
+		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+ 	 	 $code=$request->query->get('code');
+		 $dir=$this->get('kernel')->getRootDir().DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.'2'.DIRECTORY_SEPARATOR.'ERPSignedDeliveryNotes'.DIRECTORY_SEPARATOR.'20'.substr($code,0,2).DIRECTORY_SEPARATOR;
+		 $iterator = new \RecursiveDirectoryIterator($dir);
+		 foreach(new \RecursiveIteratorIterator($iterator) as $file){
+		     if(substr(basename($file),13)==$code.'.pdf'){
+				 $response = new BinaryFileResponse($file->getPathname());
+				 $mimeTypeGuesser = new FileinfoMimeTypeGuesser();
+				 if($mimeTypeGuesser->isSupported()){
+					$response->headers->set('Content-Type', $mimeTypeGuesser->guess($file->getPathname()));
+				 }else{
+					$response->headers->set('Content-Type', 'text/plain');
+				 }
+				 $response->setContentDisposition(ResponseHeaderBag::DISPOSITION_INLINE,$code.'.pdf');
+				 return $response;
+			 }
+		 }
+		 return new Response('Albarán no encontrado');
+	}
 
 }
