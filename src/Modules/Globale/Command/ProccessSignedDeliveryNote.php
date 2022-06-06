@@ -88,7 +88,6 @@ class ProccessSignedDeliveryNote extends ContainerAwareCommand
             rename ($fileDestDir.$filename, $fileDestDir.'temp_'.$filename);
             //Adjuntamos el pdf al fichero existente
             $cmd = "gs -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile=\"".$fileDestDir.$filename."\" \"".$fileDestDir.'temp_'.$filename."\" \"".$tempDir.$fileinfo->getFilename()."\"";
-            $output->writeln($cmd);
             $result = shell_exec($cmd);
             //Borramos los dos ficheros temporales
             unlink($fileDestDir.'temp_'.$filename);
