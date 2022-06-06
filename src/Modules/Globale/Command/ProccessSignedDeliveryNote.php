@@ -84,9 +84,15 @@ class ProccessSignedDeliveryNote extends ContainerAwareCommand
             mkdir($fileDestDir, 0777, true);
           //Comprobamos si existe ya el fichero en el destino
           if(file_exists($fileDestDir.$filename) && is_file($fileDestDir.$filename)){
+            //Cambiamos el nombre del fichero destino
+            rename ($fileDestDir.$filename, $fileDestDir.'temp_'.$filename);
             //Adjuntamos el pdf al fichero existente
-            $cmd = "gs -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile=$fileDestDir.$filename ".$fileDestDir.$filename." ".$tempDir.$fileinfo->getFilename();
+            $cmd = "gs -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile=\"".$fileDestDir.$filename."\" \"".$fileDestDir.'temp_'.$filename.\"" \"".$tempDir.$fileinfo->getFilename()."\"";
             $output->writeln($cmd);
+            $result = shell_exec($cmd);
+            //Borramos los dos ficheros temporales
+            unlink($fileDestDir.'temp_'.$filename);
+            unlink($tempDir.$fileinfo->getFilename());
           }else{
             //Renombramos y movemos
             rename ($tempDir.$fileinfo->getFilename(), $fileDestDir.$filename);
