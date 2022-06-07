@@ -35,6 +35,7 @@ class ProccessSignedDeliveryNote extends ContainerAwareCommand
     $this->entityManager = $this->doctrine->getManager();
     //Directorios de trabajo
     $tempDir=__DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.'2'.DIRECTORY_SEPARATOR.'temp'.DIRECTORY_SEPARATOR.'ERPSignedDeliveryNotes'.DIRECTORY_SEPARATOR;
+    $failsDir=__DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.'2'.DIRECTORY_SEPARATOR.'temp'.DIRECTORY_SEPARATOR.'ERPSignedDeliveryNotesFails'.DIRECTORY_SEPARATOR;
     $destDir=__DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.'2'.DIRECTORY_SEPARATOR.'ERPSignedDeliveryNotes'.DIRECTORY_SEPARATOR;
 
     //Comprobamos que existan los directorios de trabajo
@@ -68,12 +69,19 @@ class ProccessSignedDeliveryNote extends ContainerAwareCommand
           $deliveryNoteDate=$date->format('Y-m-d');
           //Obtener el numero de documento
           $deliveryNoteNumber=strpos($pdf->getText(),$date->format('y').'ALV');
+          $deliveryReturnNoteNumber=strpos($pdf->getText(),$date->format('y').'DVR');
+          //Nos quedamos el menor de los dos, la primera ocurrencia
+          if($deliveryReturnNoteNumber!==FALSE && $deliveryNoteNumber!==FALSE){
+            $deliveryNoteNumber=min($deliveryReturnNoteNumber, $deliveryNoteNumber);
+          }
+
           if($deliveryNoteNumber!==FALSE){
             $deliveryNoteNumber=substr($pdf->getText(), $deliveryNoteNumber, 12);
             $deliveryNoteNumber = preg_replace("/[^a-zA-Z0-9]+/", "", $deliveryNoteNumber);
           }else{
-            //No se puede leer el numero de albaran borramos el archivo
-            unlink($tempDir.$fileinfo->getFilename());
+            //No se puede leer el numero de albaran movemos a fallidos
+            rename ($tempDir.$fileinfo->getFilename(), $failsDir.$fileinfo->getFilename());
+            file_get_contents("https://icfbot.ferreteriacampollano.com/message.php?msg=".urlencode(":bookmark_tabs: No se pudo detectar el número de albarán en el fichero digitalizado: ".$fileinfo->getFilename()."."));
             continue;
           }
           //Creamos el nombre del fichero normalizado
