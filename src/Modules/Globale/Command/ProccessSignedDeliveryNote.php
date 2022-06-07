@@ -80,8 +80,8 @@ class ProccessSignedDeliveryNote extends ContainerAwareCommand
             $deliveryNoteNumber = preg_replace("/[^a-zA-Z0-9]+/", "", $deliveryNoteNumber);
           }else{
             //No se puede leer el numero de albaran movemos a fallidos
-            rename ($tempDir.$fileinfo->getFilename(), $failsDir.$fileinfo->getFilename());
-            file_get_contents("https://icfbot.ferreteriacampollano.com/message.php?msg=".urlencode(":bookmark_tabs: No se pudo detectar el número de albarán en el fichero digitalizado: ".$fileinfo->getFilename()."."));
+            rename ($tempDir.$fileinfo->getFilename(), $failsDir.$date->format('Y-m-d-His').$fileinfo->getFilename());
+            file_get_contents("https://icfbot.ferreteriacampollano.com/message.php?msg=".urlencode(":bookmark_tabs: No se pudo detectar el número de albarán en el fichero digitalizado: ".$date->format('Y-m-d-His').$fileinfo->getFilename().""));
             continue;
           }
           //Creamos el nombre del fichero normalizado
