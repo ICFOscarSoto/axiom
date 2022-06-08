@@ -96,7 +96,50 @@ class ERPSupplierCommentLinesUtils
     return $list;
   }
 
+  public function formatListBySupplierTypeShippings($type,$parent){;
+    $list=[
+      'id' => 'list'.$this->name.$type,
+      'route' => 'suppliercommentlinesshippingslist',
+      'routeParams' => ["supplierid" => $parent, "type"=>$type],
+      'orderColumn' => 1,
+      'orderDirection' => 'DESC',
+      'tagColumn' => 1,
+      'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/SupplierCommentLinesShippings.json"),true),
+      'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/SupplierCommentLinesShippingsFieldButtons.json"),true),
+      'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/SupplierCommentLinesShippingsTopButtons.json"),true)
+    ];
+    return $list;
+  }
 
+  public function formatListBySupplierTypePayments($type,$parent){;
+    $list=[
+      'id' => 'list'.$this->name.$type,
+      'route' => 'suppliercommentlinespaymentslist',
+      'routeParams' => ["supplierid" => $parent, "type"=>$type],
+      'orderColumn' => 1,
+      'orderDirection' => 'DESC',
+      'tagColumn' => 1,
+      'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/SupplierCommentLinesPayments.json"),true),
+      'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/SupplierCommentLinesPaymentsFieldButtons.json"),true),
+      'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/SupplierCommentLinesPaymentsTopButtons.json"),true)
+    ];
+    return $list;
+  }
+
+  public function formatListBySupplierTypeSpecials($type,$parent){;
+    $list=[
+      'id' => 'list'.$this->name.$type,
+      'route' => 'suppliercommentlinesspecialslist',
+      'routeParams' => ["supplierid" => $parent, "type"=>$type],
+      'orderColumn' => 1,
+      'orderDirection' => 'DESC',
+      'tagColumn' => 1,
+      'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/SupplierCommentLinesSpecials.json"),true),
+      'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/SupplierCommentLinesSpecialsFieldButtons.json"),true),
+      'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/SupplierCommentLinesSpecialsTopButtons.json"),true)
+    ];
+    return $list;
+  }
 
   public function formatList($user){
     $list=[

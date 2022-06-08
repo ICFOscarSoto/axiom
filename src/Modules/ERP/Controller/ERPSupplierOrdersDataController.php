@@ -58,9 +58,20 @@ class ERPSupplierOrdersDataController extends Controller
 	  $formUtils3->initialize($this->getUser(), ERPSupplierCommentLines::class, dirname(__FILE__)."/../Forms/SupplierCommentLinesOrdersDataRappel.json", $request, $this, $this->getDoctrine());
 		$templateForms[]=$formUtils3->formatForm('SupplierCommentLinesOrdersDataRappel', true, null, ERPSupplierCommentLines::class);
 
+		$listSupplierCommentLines = new ERPSupplierCommentLinesUtils();
+		$formUtils4=new GlobaleFormUtils();
+		$formUtils4->initialize($this->getUser(), ERPSupplierCommentLines::class, dirname(__FILE__)."/../Forms/SupplierCommentLinesShippings.json", $request, $this, $this->getDoctrine());
+		$templateForms[]=$formUtils4->formatForm('SupplierCommentLinesShippings', true, null, ERPSupplierCommentLines::class);
 
+		$listSupplierCommentLines = new ERPSupplierCommentLinesUtils();
+		$formUtils5=new GlobaleFormUtils();
+		$formUtils5->initialize($this->getUser(), ERPSupplierCommentLines::class, dirname(__FILE__)."/../Forms/SupplierCommentLinesPayments.json", $request, $this, $this->getDoctrine());
+		$templateForms[]=$formUtils5->formatForm('SupplierCommentLinesPayments', true, null, ERPSupplierCommentLines::class);
 
-
+		$listSupplierCommentLines = new ERPSupplierCommentLinesUtils();
+		$formUtils6=new GlobaleFormUtils();
+		$formUtils6->initialize($this->getUser(), ERPSupplierCommentLines::class, dirname(__FILE__)."/../Forms/SupplierCommentLinesSpecials.json", $request, $this, $this->getDoctrine());
+		$templateForms[]=$formUtils6->formatForm('SupplierCommentLinesSpecials', true, null, ERPSupplierCommentLines::class);
 
 		return $this->render('@ERP/supplierordersdata.html.twig', array(
 			'controllerName' => 'supplierOrdersDataController',
@@ -72,6 +83,9 @@ class ERPSupplierOrdersDataController extends Controller
 			'form' => $formUtils->formatForm('SupplierOrdersData', true, $this_id, $this->class),
 			'suppliercommentsordersdatalist' => $listSupplierCommentLines->formatListBySupplierTypeOrdersData(1,$id),
 			'supplierrappelcommentssordersdatalist'=> $listSupplierCommentLines->formatListBySupplierTypeOrdersDataRappel(3,$id),
+			'suppliercommentsshippingslist' => $listSupplierCommentLines->formatListBySupplierTypeShippings(4,$id),
+			'suppliercommentspaymentslist' => $listSupplierCommentLines->formatListBySupplierTypePayments(5,$id),
+			'suppliercommentsspecialslist' => $listSupplierCommentLines->formatListBySupplierTypeSpecials(6,$id),
 			'forms' => $templateForms,
 			'include_footer' => [["type"=>"css", "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.css"],
 													 ["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.js"],

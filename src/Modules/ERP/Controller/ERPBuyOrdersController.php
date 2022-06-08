@@ -19,6 +19,7 @@ use App\Modules\Globale\Entity\GlobaleUsersConfig;
 use App\Modules\ERP\Entity\ERPProviders;
 use App\Modules\ERP\Entity\ERPCustomers;
 use App\Modules\ERP\Entity\ERPSuppliers;
+use App\Modules\ERP\Entity\ERPSupplierCommentLines;
 use App\Modules\Globale\Entity\GlobaleCountries;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
@@ -26,11 +27,14 @@ use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\ERP\Utils\ERPBuyOrdersUtils;
 use App\Modules\ERP\Entity\ERPConfiguration;
 use App\Modules\ERP\Entity\ERPPaymentMethods;
+use App\Modules\ERP\Entity\ERPPaymentTerms;
+use App\Modules\ERP\Entity\ERPCarriers;
 use App\Modules\ERP\Entity\ERPSeries;
 use App\Modules\ERP\Entity\ERPCustomerGroups;
 use App\Modules\ERP\Entity\ERPBuyOrders;
 use App\Modules\ERP\Entity\ERPBuyOrdersLines;
 use App\Modules\ERP\Entity\ERPBuyOrdersStates;
+use App\Modules\ERP\Entity\ERPBuyOrdersContacts;
 use App\Modules\ERP\Entity\ERPBuyOffert;
 use App\Modules\ERP\Entity\ERPProducts;
 use App\Modules\ERP\Entity\ERPProductsVariants;
@@ -45,6 +49,7 @@ use App\Modules\ERP\Entity\ERPStocks;
 use App\Modules\Security\Utils\SecurityUtils;
 use App\Modules\ERP\Reports\ERPBuyOrdersReports;
 use App\Modules\Cloud\Utils\CloudFilesUtils;
+use App\Modules\Globale\Helpers\HelperHistory;
 
 class ERPBuyOrdersController extends Controller
 {
@@ -117,11 +122,15 @@ class ERPBuyOrdersController extends Controller
 			$erpBuyOrdersRepository						= $this->getDoctrine()->getRepository(ERPBuyOrders::class);
 			$erpBuyOrdersLinesRepository			= $this->getDoctrine()->getRepository(ERPBuyOrdersLines::class);
 			$erpBuyOrdersStatesRepository			= $this->getDoctrine()->getRepository(ERPBuyOrdersStates::class);
+			$erpBuyOrdersContactsRepository		= $this->getDoctrine()->getRepository(ERPBuyOrdersContacts::class);
 			$erpConfigurationRepository				= $this->getDoctrine()->getRepository(ERPConfiguration::class);
 			$erpPaymentMethodsRepository			= $this->getDoctrine()->getRepository(ERPPaymentMethods::class);
+			$erpPaymentTermsRepository				= $this->getDoctrine()->getRepository(ERPPaymentTerms::class);
+			$erpCarriersRepository						= $this->getDoctrine()->getRepository(ERPCarriers::class);
 			$erpStoresRepository							= $this->getDoctrine()->getRepository(ERPStores::class);
 			$erpStocksRepository							= $this->getDoctrine()->getRepository(ERPStocks::class);
 			$erpContactsRepository						= $this->getDoctrine()->getRepository(ERPContacts::class);
+			$supplierCommentLinesRepository		= $this->getDoctrine()->getRepository(ERPSupplierCommentLines::class);
 			// Repositorios Globale
 			$globaleMenuOptionsRepository			= $this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
 			$globaleUsersRepository						= $this->getDoctrine()->getRepository(GlobaleUsers::class);
@@ -133,6 +142,22 @@ class ERPBuyOrdersController extends Controller
 			if ($id!=0){
 			 $buyorder			= $erpBuyOrdersRepository->findOneBy(["company"=>$company, "id"=>$id, "active"=>1,"deleted"=>0]);
 			 $buyorderlines	= $erpBuyOrdersLinesRepository->findOneBy(["buyorder"=>$buyorder]);
+			 // Si el pedido sigue abierto se recargan las cajas de condiciones del proveedor
+			 if ($buyorder!=null && $buyorder->getState()!=null && $buyorder->getState()->getId()==1){
+			 	$supplierCommentLines=$supplierCommentLinesRepository->getCommentByBuyOrder($buyorder->getSupplier());
+				if ($buyorder->getSuppliercomment()!=$supplierCommentLines['suppliercomment'] ||
+					  $buyorder->getSupplierbuyorder()!=$supplierCommentLines['supplierbuyorder'] ||
+						$buyorder->getSuppliershipping()!=$supplierCommentLines['suppliershipping'] ||
+						$buyorder->getSupplierpayment()!=$supplierCommentLines['supplierpayment'] ||
+						$buyorder->getSupplierspecial()!=$supplierCommentLines['supplierspecial']){
+					 	 	$buyorder->setSuppliercomment($supplierCommentLines['suppliercomment']);
+							$buyorder->setSupplierbuyorder($supplierCommentLines['supplierbuyorder']);
+							$buyorder->setSuppliershipping($supplierCommentLines['suppliershipping']);
+							$buyorder->setSupplierpayment($supplierCommentLines['supplierpayment']);
+							$buyorder->setSupplierspecial($supplierCommentLines['supplierspecial']);
+							$erpBuyOrdersRepository->saveComments($id, $supplierCommentLines);
+				 }
+			 }
 			}
 			// Busqueda por código de pedido, se redirecciona a su ID correspondiente
 			if($buyorder==null && $code!=null){
@@ -145,7 +170,6 @@ class ERPBuyOrdersController extends Controller
 			// Si id==0, code==null o no se ha encontrado se crea uno nuevo
 			if ($buyorder==null){
 				$buyorder			 = new $this->class();
-				//$buyorderlines = new ERPBuyOrdersLines();
 			}
 
 			// Configuración (nº decimales, color...etc)
@@ -215,11 +239,10 @@ class ERPBuyOrdersController extends Controller
 			$agents=[];
 			$option=[];
 			$option["pos"]=0;
-			$option["id"]=null;
-			$option["text"]="Selecciona Agente...";
+			$option["id"]=0;
+			$option["text"]="Agente...";
 			$agents[]=$option;
 			$pos = 1;
-
 			foreach($oagents as $item){
 				$option=[];
 				$option["pos"]=$pos;
@@ -244,8 +267,8 @@ class ERPBuyOrdersController extends Controller
 			$destinationstates=[];
 			$option=[];
 			$option["pos"]=0;
-			$option["id"]=null;
-			$option["text"]="Selecciona provincia...";
+			$option["id"]=0;
+			$option["text"]="Provincia...";
 			$destinationstates[]=$option;
 			$pos = 1;
 			foreach($ostates as $item){
@@ -260,8 +283,8 @@ class ERPBuyOrdersController extends Controller
 			$destinationcountries=[];
 			$option=[];
 			$option["pos"]=0;
-			$option["id"]=null;
-			$option["text"]="Selecciona país...";
+			$option["id"]=0;
+			$option["text"]="País...";
 			$destinationcountries[]=$option;
 			$pos = 1;
 			foreach($ocountries as $item){
@@ -272,38 +295,102 @@ class ERPBuyOrdersController extends Controller
 				$pos++;
 			}
 
-			// Contactos de un proveedor - Destinatario (combo)
-			$osuppliercontacts=$erpContactsRepository->findBy(["supplier"=>$buyorder->getSupplier(),"purchaseorder"=>1,"active"=>1,"deleted"=>0],["name"=>"ASC"]);
-			$suppliercontacts=[];
+			// Métododos de pago - Destinatario (combo)
+			$opaymentmethods=$erpPaymentMethodsRepository->findBy(["active"=>1,"deleted"=>0],["name"=>"ASC"]);
+			$paymentmethods=[];
 			$option=[];
 			$option["pos"]=0;
-			$option["id"]=null;
-			$option["text"]="Selecciona contacto...";
-			$suppliercontacts[]=$option;
+			$option["id"]=0;
+			$option["text"]="Método pago...";
+			$paymentmethods[]=$option;
 			$pos = 1;
-			foreach($osuppliercontacts as $item){
+			foreach($opaymentmethods as $item){
 				$option["pos"]=$pos;
 				$option["id"]=$item->getId();
 				$option["text"]=$item->getName();
-				$suppliercontacts[]=$option;
+				$paymentmethods[]=$option;
 				$pos++;
 			}
-			// Contactos de un cliente - Destinatario (combo)
-			$odestinationcontacts=$erpContactsRepository->findBy(["customer"=>$buyorder->getCustomer(),"saleorder"=>1,"active"=>1,"deleted"=>0],["name"=>"ASC"]);
-			$destinationcontacts=[];
+
+			// Terminos de pago (Vencimientos) - Destinatario (combo)
+			$opaymentterms=$erpPaymentTermsRepository->findBy(["active"=>1,"deleted"=>0],["name"=>"ASC"]);
+			$paymentterms=[];
 			$option=[];
 			$option["pos"]=0;
-			$option["id"]=null;
-			$option["text"]="Selecciona contacto...";
-			$destinationcontacts[]=$option;
+			$option["id"]=0;
+			$option["text"]="Termino de pago...";
+			$paymentterms[]=$option;
 			$pos = 1;
-			foreach($odestinationcontacts as $item){
+			foreach($opaymentterms as $item){
 				$option["pos"]=$pos;
 				$option["id"]=$item->getId();
 				$option["text"]=$item->getName();
-				$destinationcontacts[]=$option;
+				$paymentterms[]=$option;
 				$pos++;
 			}
+
+			// Transportistas - Destinatario (combo)
+			$ocarriers=$erpCarriersRepository->findBy(["active"=>1,"deleted"=>0],["name"=>"ASC"]);
+			$carriers=[];
+			$option=[];
+			$option["pos"]=0;
+			$option["id"]=0;
+			$option["text"]="Transportista...";
+			$carriers[]=$option;
+			$pos = 1;
+			foreach($ocarriers as $item){
+				$option["pos"]=$pos;
+				$option["id"]=$item->getId();
+				$option["text"]=$item->getName();
+				$carriers[]=$option;
+				$pos++;
+			}
+
+			// Portes - Destino (combo)
+			$shippings=[];
+			$option=[];
+			$option["pos"]=0;
+			$option["id"]=null;
+			$option["text"]="Portes...";
+			$shippings[]=$option;
+			$option=[];
+			$option["pos"]=1;
+			$option["id"]=0;
+			$option["text"]="DEBIDOS";
+			$shippings[]=$option;
+			$option=[];
+			$option["pos"]=2;
+			$option["id"]=1;
+			$option["text"]="PAGADOS";
+			$shippings[]=$option;
+			$option=[];
+			$option["pos"]=3;
+			$option["id"]=2;
+			$option["text"]="RECOGIDA";
+			$shippings[]=$option;
+
+			// Canal de pedido - Destino (combo)
+			$orderchannel=[];
+			$option=[];
+			$option["pos"]=0;
+			$option["id"]=null;
+			$option["text"]="Canal de pedido...";
+			$orderchannel[]=$option;
+			$option=[];
+			$option["pos"]=1;
+			$option["id"]=0;
+			$option["text"]="CORREO";
+			$orderchannel[]=$option;
+			$option=[];
+			$option["pos"]=2;
+			$option["id"]=1;
+			$option["text"]="WEB";
+			$orderchannel[]=$option;
+			$option=[];
+			$option["pos"]=3;
+			$option["id"]=2;
+			$option["text"]="TELÉFONO";
+			$orderchannel[]=$option;
 
 			// Miga
     	$nbreadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-plus"];
@@ -329,37 +416,195 @@ class ERPBuyOrdersController extends Controller
 			// Almacén por defecto para las líneas
 			$buyorderslinestore_id = ($buyorder->getStore()?$buyorder->getStore()->getId().'~'.$buyorder->getStore()->getCode():'0~Almacén...');
 
-			// Líneas
+			// Contactos de proveedor -----
+			$obuyordercontactssupplier=$erpBuyOrdersContactsRepository->findBy(["buyorder"=>$buyorder, "type"=>0, "active"=>1,"deleted"=>0],["id"=>"ASC"]);
+			$buyordercontactssupplier = [];
+			if ($obuyordercontactssupplier!=null){
+				for($i=0; $i<count($obuyordercontactssupplier); $i++){
+					$buyordercontactssupplier[$i] = [];
+					$buyordercontactssupplier[$i]['id'] 				= (($obuyordercontactssupplier[$i]->getId()!=null)?$obuyordercontactssupplier[$i]->getId():'');
+					$buyordercontactssupplier[$i]['contact_id']	= (($obuyordercontactssupplier[$i]->getContact()!=null)?$obuyordercontactssupplier[$i]->getContact()->getId().'~'.$obuyordercontactssupplier[$i]->getContact()->getName().($obuyordercontactssupplier[$i]->getContact()->getAdditional()!=null && $obuyordercontactssupplier[$i]->getContact()->getAdditional()!=''?' - ('.$obuyordercontactssupplier[$i]->getContact()->getAdditional().')':''):'0~Contacto...');
+					$buyordercontactssupplier[$i]['name'] 			= (($obuyordercontactssupplier[$i]->getName()!=null)?$obuyordercontactssupplier[$i]->getName():'');
+					$buyordercontactssupplier[$i]['email'] 			= (($obuyordercontactssupplier[$i]->getEmail()!=null)?$obuyordercontactssupplier[$i]->getEmail():'');
+					$buyordercontactssupplier[$i]['phone'] 			= (($obuyordercontactssupplier[$i]->getPhone()!=null)?$obuyordercontactssupplier[$i]->getPhone():'');
+				}
+			}
+			$spreadsheetcs = [];
+			$spreadsheetcs['name']       = "buyorderscs";
+			$spreadsheetcs['options']    = "pagination:1000000";
+		  $spreadsheetcs['prototipe']  = "{
+				id:'',
+				contact_id:'0~Contacto...',
+				name:'',
+				email:'',
+				phone:''
+			}";
+			$spreadsheetcs['columns']    =
+		   "[
+				{ name: 'id', type: 'numeric', width:'50px', title: 'ID', align: 'right'},
+				{ name: 'contact_id', type: 'dropdown', width:'300px',
+					title:'Contacto proveedor', autocomplete:true,
+					align:'left',
+					url: '/api/global/contactssupplier/".($buyorder->getSupplier()!=null?$buyorder->getSupplier()->getId():0)."',
+					options: {
+						onchange: {
+							url: '/api/global/contact/#c|contact_id/get'
+						}
+					}
+				},
+				{ name: 'name', type: 'text', width:'250px', title: 'Nombre contacto', align: 'left'},
+				{ name: 'email', type: 'text', width:'150px', title: 'Email contacto', align: 'left'},
+				{ name: 'phone', type: 'text', width:'150px', title: 'Teléfono contacto', align: 'left'}
+		   ]";
+			 // Cargar de base de datos
+ 			$spreadsheetcs['data']       = json_encode($buyordercontactssupplier);
+ 			$spreadsheetcs['onload'] 	   =
+ 				"$('#supplier-form-id').on(\"change\", function() {
+					 var supplier_id = $(this).val();
+					 if (supplier_id=='') supplier_id = 0;
+					 var sheet = document.getElementById('".$spreadsheetcs['name']."').jexcel;
+					 // Resetear contactos
+					 sheet.options['loadinit'] = true;
+					 sheet.insertRow(1, sheet.options.data.length);
+					 sheet.deleteRow(0, sheet.options.data.length-1);
+					 sheet.options['loadinit'] = false;
+					 // Nueva lista de contactos para este proveedor
+	 				 var columns = sheet.options.columns;
+		 			 url = '/api/global/contactssupplier/'+supplier_id;
+		 			 $.ajax({
+		 				 url: url
+		 			 }).done(function(result) {
+		 				 if (result != null && result != ''){
+		 					 var oresult = JSON.parse(JSON.stringify(result));
+		 					 var poscontact_id = sheet.getColumnKey('contact_id');
+		 					 sheet.options.columns[poscontact_id]['source'] = oresult;
+		 				 }
+		 			 });
+ 				 });
+				 var sheet 	 = document.getElementById('".$spreadsheetcs['name']."').jexcel;
+				 sheet.hideColumnKey('id');
+				 ";
+			// Contactos de cliente -----
+ 			$obuyordercontactscustomer=$erpBuyOrdersContactsRepository->findBy(["buyorder"=>$buyorder, "type"=>1, "active"=>1,"deleted"=>0],["id"=>"ASC"]);
+ 			$buyordercontactscustomer = [];
+ 			if ($obuyordercontactscustomer!=null){
+ 				for($i=0; $i<count($obuyordercontactscustomer); $i++){
+ 					$buyordercontactscustomer[$i] = [];
+ 					$buyordercontactscustomer[$i]['id'] 				= (($obuyordercontactscustomer[$i]->getId()!=null)?$obuyordercontactscustomer[$i]->getId():'');
+ 					$buyordercontactscustomer[$i]['contact_id']	= (($obuyordercontactscustomer[$i]->getContact()!=null)?$obuyordercontactscustomer[$i]->getContact()->getId().'~'.$obuyordercontactscustomer[$i]->getContact()->getName().($obuyordercontactscustomer[$i]->getContact()->getAdditional()!=null && $obuyordercontactscustomer[$i]->getContact()->getAdditional()!=''?' - ('.$obuyordercontactscustomer[$i]->getContact()->getAdditional().')':''):'0~Contacto...');
+ 					$buyordercontactscustomer[$i]['name'] 			= (($obuyordercontactscustomer[$i]->getName()!=null)?$obuyordercontactscustomer[$i]->getName():'');
+ 					$buyordercontactscustomer[$i]['email'] 			= (($obuyordercontactscustomer[$i]->getEmail()!=null)?$obuyordercontactscustomer[$i]->getEmail():'');
+ 					$buyordercontactscustomer[$i]['phone'] 			= (($obuyordercontactscustomer[$i]->getPhone()!=null)?$obuyordercontactscustomer[$i]->getPhone():'');
+ 				}
+ 			}
+ 			$spreadsheetcc = [];
+ 			$spreadsheetcc['name']       = "buyorderscc";
+ 			$spreadsheetcc['options']    = "pagination:1000000";
+ 		  $spreadsheetcc['prototipe']  = "{
+ 				id:'',
+ 				contact_id:'0~Contacto...',
+ 				name:'',
+ 				email:'',
+ 				phone:''
+ 			}";
+ 			$spreadsheetcc['columns']    =
+ 		   "[
+ 				{ name: 'id', type: 'numeric', width:'50px', title: 'ID', align: 'right'},
+ 				{ name: 'contact_id', type: 'dropdown', width:'300px',
+ 					title:'Contacto proveedor', autocomplete:true,
+ 					align:'left',
+ 					url: '/api/global/contactscustomer/".($buyorder->getCustomer()!=null?$buyorder->getCustomer()->getId():0)."',
+ 					options: {
+ 						onchange: {
+ 							url: '/api/global/contact/#c|contact_id/get'
+ 						}
+ 					}
+ 				},
+ 				{ name: 'name', type: 'text', width:'250px', title: 'Nombre contacto', align: 'left'},
+ 				{ name: 'email', type: 'text', width:'150px', title: 'Email contacto', align: 'left'},
+ 				{ name: 'phone', type: 'text', width:'150px', title: 'Teléfono contacto', align: 'left'}
+ 		   ]";
+ 			 // Cargar de base de datos
+  			$spreadsheetcc['data']       = json_encode($buyordercontactscustomer);
+  			$spreadsheetcc['onload'] 	   =
+  				"$('#customer-form-id').on(\"change\", function() {
+ 					 var customer_id = $(this).val();
+					 if (customer_id=='') customer_id = 0;
+ 					 var sheet = document.getElementById('".$spreadsheetcc['name']."').jexcel;
+ 					 // Resetear contactos
+ 					 sheet.options['loadinit'] = true;
+ 					 sheet.insertRow(1, sheet.options.data.length);
+ 					 sheet.deleteRow(0, sheet.options.data.length-1);
+ 					 sheet.options['loadinit'] = false;
+ 					 // Nueva lista de contactos para este cliente
+ 	 				 var columns = sheet.options.columns;
+ 		 			 url = '/api/global/contactscustomer/'+customer_id;
+ 		 			 $.ajax({
+ 		 				 url: url
+ 		 			 }).done(function(result) {
+ 		 				 if (result != null && result != ''){
+ 		 					 var oresult = JSON.parse(JSON.stringify(result));
+ 		 					 var poscontact_id = sheet.getColumnKey('contact_id');
+ 		 					 sheet.options.columns[poscontact_id]['source'] = oresult;
+ 		 				 }
+ 		 			 });
+  				 });
+	 				 var sheet 	 = document.getElementById('".$spreadsheetcc['name']."').jexcel;
+	 				 sheet.hideColumnKey('id');
+	 				 ";
+			// Líneas -----------
 			$olines=$erpBuyOrdersLinesRepository->findBy(["buyorder"=>$buyorder, "active"=>1,"deleted"=>0],["linenum"=>"ASC"]);
 			$lines = [];
 			if ($olines!=null){
 				for($i=0; $i<count($olines); $i++){
 					$lines[$i] = [];
 					$lines[$i]['id'] 							= (($olines[$i]->getId()!=null)?$olines[$i]->getId():'');
-					$lines[$i]['product_id'] 			= (($olines[$i]->getProduct()!=null)?$olines[$i]->getProduct()->getId().'~'.$olines[$i]->getProduct()->getCode():'0~Artículo..');
+					$lines[$i]['product_id'] 			= (($olines[$i]->getProduct()!=null)?$olines[$i]->getProduct()->getId().'~'.$olines[$i]->getProduct()->getCode():'0~Artículo...');
 					$lines[$i]['productname']			= (($olines[$i]->getProductname()!=null)?$olines[$i]->getProductname():'');
-					$lines[$i]['variant_id']			= (($olines[$i]->getVariant()!=null)?$olines[$i]->getVariant()->getId().'~'.$olines[$i]->getVariantname().' - '.$olines[$i]->getVariantvalue():'0~Variante...');
+					$lines[$i]['variant_id']			= (($olines[$i]->getVariant()!=null)?$olines[$i]->getVariant()->getId().'~'.$olines[$i]->getVariantname().' - '.$olines[$i]->getVariantvalue():'0~Sin variante');
 					$lines[$i]['quantity']				= (($olines[$i]->getQuantity()!=null)?$olines[$i]->getQuantity():1);
-					$lines[$i]['pvp']							= (($olines[$i]->getPvp()!=null)?number_format($olines[$i]->getPvp(),$ndecimals):0);
-					$lines[$i]['discount1']				= (($olines[$i]->getDiscount1()!=null)?number_format($olines[$i]->getDiscount1(),$ndecimals):0);
-					$lines[$i]['discount2']				= (($olines[$i]->getDiscount2()!=null)?number_format($olines[$i]->getDiscount2(),$ndecimals):0);
-					$lines[$i]['discount3']				= (($olines[$i]->getDiscount3()!=null)?number_format($olines[$i]->getDiscount3(),$ndecimals):0);
-					$lines[$i]['discount4']				= (($olines[$i]->getDiscount4()!=null)?number_format($olines[$i]->getDiscount4(),$ndecimals):0);
-					$lines[$i]['discountequivalent'] = (($olines[$i]->getDiscountequivalent()!=null)?number_format($olines[$i]->getDiscountequivalent(),$ndecimals):0);
-					$lines[$i]['totaldiscount']		= (($olines[$i]->getTotaldiscount()!=null)?number_format($olines[$i]->getTotaldiscount(),$ndecimals):0);
+					$lines[$i]['pvp']							= (($olines[$i]->getPvp()!=null)?number_format($olines[$i]->getPvp(),$ndecimals):'0.'+$decimals);
+					$lines[$i]['discount1']				= (($olines[$i]->getDiscount1()!=null)?number_format($olines[$i]->getDiscount1(),$ndecimals):'0.'.$decimals);
+					$lines[$i]['discount2']				= (($olines[$i]->getDiscount2()!=null)?number_format($olines[$i]->getDiscount2(),$ndecimals):'0.'.$decimals);
+					$lines[$i]['discount3']				= (($olines[$i]->getDiscount3()!=null)?number_format($olines[$i]->getDiscount3(),$ndecimals):'0.'.$decimals);
+					$lines[$i]['discount4']				= (($olines[$i]->getDiscount4()!=null)?number_format($olines[$i]->getDiscount4(),$ndecimals):'0.'.$decimals);
+					$lines[$i]['discountequivalent'] = (($olines[$i]->getDiscountequivalent()!=null)?number_format($olines[$i]->getDiscountequivalent(),$ndecimals):'0.'.$decimals);
+					$lines[$i]['totaldiscount']		= (($olines[$i]->getTotaldiscount()!=null)?number_format($olines[$i]->getTotaldiscount(),$ndecimals):'0.'.$decimals);
 					$lines[$i]['store_id']				= (($olines[$i]->getStore()!=null)?$olines[$i]->getStore()->getId().'~'.$olines[$i]->getStore()->getCode():$buyorderslinestore_id);
-					$lines[$i]['shoppingprice']		= (($olines[$i]->getshoppingprice()!=null)?number_format($olines[$i]->getShoppingprice(),$ndecimals):0);
-					$lines[$i]['subtotal']				= (($olines[$i]->getSubtotal()!=null)?number_format($olines[$i]->getSubtotal(),$ndecimals):0);
-					$lines[$i]['taxperc']					= (($olines[$i]->getTaxperc()!=null)?number_format($olines[$i]->getTaxperc(),$ndecimals):0);
-					$lines[$i]['taxunit']					= (($olines[$i]->getTaxunit()!=null)?number_format($olines[$i]->getTaxunit(),$ndecimals):0);
-					$lines[$i]['total']						= (($olines[$i]->getTotal()!=null)?number_format($olines[$i]->getTotal(),$ndecimals):0);
+					$lines[$i]['shoppingprice']		= (($olines[$i]->getshoppingprice()!=null)?number_format($olines[$i]->getShoppingprice(),$ndecimals):'0.'.$decimals);
+					$lines[$i]['subtotal']				= (($olines[$i]->getSubtotal()!=null)?number_format($olines[$i]->getSubtotal(),$ndecimals):'0.'.$decimals);
+					$lines[$i]['taxperc']					= (($olines[$i]->getTaxperc()!=null)?number_format($olines[$i]->getTaxperc(),$ndecimals):'0.'.$decimals);
+					$lines[$i]['taxunit']					= (($olines[$i]->getTaxunit()!=null)?number_format($olines[$i]->getTaxunit(),$ndecimals):'0.'.$decimals);
+					$lines[$i]['total']						= (($olines[$i]->getTotal()!=null)?number_format($olines[$i]->getTotal(),$ndecimals):'0.'.$decimals);
 					$lines[$i]['packing']					= (($olines[$i]->getPacking()!=null)?$olines[$i]->getPacking():1);
 					$lines[$i]['multiplicity']		= (($olines[$i]->getMultiplicity()!=null)?$olines[$i]->getMultiplicity():1);
 					$lines[$i]['minimumquantityofbuy'] = (($olines[$i]->getminimumquantityofbuy()!=null)?$olines[$i]->getMinimumquantityofbuy():1);
 					$lines[$i]['purchaseunit']		= (($olines[$i]->getPurchaseunit()!=null)?$olines[$i]->getPurchaseunit():1);
 					$lines[$i]['dateestimated']		= (($olines[$i]->getDateestimated()!=null)?$olines[$i]->getDateestimated()->format('Y-m-d'):$dateestimated->format('Y-m-d'));
-					$lines[$i]['weight']					= (($olines[$i]->getWeight()!=null)?number_format($olines[$i]->getWeight(),$ndecimals):0);
+					$lines[$i]['weight']					= (($olines[$i]->getWeight()!=null)?number_format($olines[$i]->getWeight(),$ndecimals):'0.'.$decimals);
 					$lines[$i]['purchasemeasure']	= (($olines[$i]->getPurchasemeasure()!=null)?$olines[$i]->getPurchasemeasure():'');
+					$quantity             = intval($lines[$i]['quantity']);
+          $minimumquantityofbuy = intval($lines[$i]['minimumquantityofbuy']);
+          $multiplicity         = intval($lines[$i]['multiplicity']);
+          $packing              = intval($lines[$i]['packing']);
+          $purchaseunit         = intval($lines[$i]['purchaseunit']);
+          $quantitycomment      = '';
+          // Se muestra el tooltip con los mínimos de compra
+          if ($minimumquantityofbuy>1){
+            $quantitycomment .= "Mínimo de compra: $minimumquantityofbuy\n";
+            $lines[$i]['quantity__min'] = $minimumquantityofbuy;
+          }
+          if ($multiplicity>1){
+            $quantitycomment .= "Multiplicidad: $multiplicity\n";
+            $lines[$i]['quantity__multiplicity'] = $multiplicity;
+          }
+          if ($packing>1){
+            $quantitycomment .= "Packing: $packing\n";
+          }
+          if ($purchaseunit>1){
+            $quantitycomment .= "Unidad de compra: $purchaseunit\n";
+          }
+          $lines[$i]['quantity__comment'] = $quantitycomment;
 
 					$stock = null;
 					if ($olines[$i]->getProduct()!=null && $olines[$i]->getProduct()->getStockcontrol()){
@@ -390,29 +635,29 @@ class ERPBuyOrdersController extends Controller
 					}
 				}
 			}
-
+			// Jexcel de líneas de producto
 			$spreadsheet = [];
 			$spreadsheet['name']       = "buyorders";
-			$spreadsheet['options']    = "pagination:1000000";
+			$spreadsheet['options']    = "pagination:1000000, search: true, loadmasive: true";
 		  $spreadsheet['prototipe']  = "{
 				id:'',
 				product_id:'0~Artículo...',
 				productname:'',
-				variant_id:'0~Variante...',
+				variant_id:'0~Sin variante',
 				quantity:1,
-				pvp:0.$decimals,
-				discount1:0.$decimals,
-				discount2:0.$decimals,
-				discount3:0.$decimals,
-				discount4:0.$decimals,
-				discountequivalent:0.$decimals,
-				totaldiscount:0.$decimals,
+				pvp:'0.$decimals',
+				discount1:'0.$decimals',
+				discount2:'0.$decimals',
+				discount3:'0.$decimals',
+				discount4:'0.$decimals',
+				discountequivalent:'0.$decimals',
+				totaldiscount:'0.$decimals',
 				store_id:'$buyorderslinestore_id',
-				shoppingprice:0.$decimals,
-				subtotal:0.$decimals,
+				shoppingprice:'0.$decimals',
+				subtotal:'0.$decimals',
 				taxperc:0,
-				taxunit:0.$decimals,
-				total:0.$decimals,
+				taxunit:'0.$decimals',
+				total:'0.$decimals',
 				packing:1,
 				multiplicity:1,
 				minimumquantityofbuy:1,
@@ -502,7 +747,7 @@ class ERPBuyOrdersController extends Controller
 		 }
 		  $spreadsheet['columns']    =
 		   "[
-				{ name: 'id', type: 'numeric', width:'50px', title: 'ID', align: 'left'},
+				{ name: 'id', type: 'numeric', width:'50px', title: 'ID', align: 'right'},
 		    { name: 'product_id', type: 'dropdown', width:'100px',
 					title:'Código', autocomplete:true,
 					url: '/api/getWSProductsSupplier/".$supplier_id."',
@@ -615,20 +860,6 @@ class ERPBuyOrdersController extends Controller
 			$spreadsheet['data']       = json_encode($lines);
 			$spreadsheet['onload'] 	   =
 				"$('#supplier-form-id').val('".$supplier_id."');
-				 $('#supplier-form-id').on(\"change\", function() {
- 				 	if (typeof(document.getElementById('".$spreadsheet['name']."').jexcel[0]) == 'undefined'){
-						var sheet = document.getElementById('".$spreadsheet['name']."').jexcel;
-					  sheet.insertRow(1, sheet.options.data.length);
-					  sheet.deleteRow(0, sheet.options.data.length-1);
-
-					}else{
-						for (var i=0; i<document.getElementById('".$spreadsheet['name']."').jexcel.length; i++){
-							var sheet = document.getElementById('".$spreadsheet['name']."').jexcel[i];
-							sheet.insertRow(1, sheet.options.data.length);
-						  sheet.deleteRow(0, sheet.options.data.length-1);
-						}
-					}
-				 });
 				 var sheet = null;
 				 if (typeof(document.getElementById('".$spreadsheet['name']."').jexcel[0]) == 'undefined')
 				 	sheet = document.getElementById('".$spreadsheet['name']."').jexcel;
@@ -657,11 +888,15 @@ class ERPBuyOrdersController extends Controller
 										if (typeof(sheet.options.columnso[3]['sources']) == 'undefined')
 											sheet.options.columnso[3]['sources'] = [];
 										sheet.options.columnso[3]['sources'][result.line] =	oresult;
+										if (sheet.options.columns[posvariant_id]['sources'][result.line].length>1 && sheet.getValueFromKey('variant_id', result.line)=='0~Sin variante')
+										 sheet.setValueFromKey('variant_id', result.line, '0~Variante...', true);
 										for (var i=1; i<document.getElementById('".$spreadsheet['name']."').jexcel.length; i++){
 											var sheetothers = document.getElementById('".$spreadsheet['name']."').jexcel[i];
 											if (!sheetothers.options.columns[sheetothers.getColumnKey('variant_id')].sources)
 												sheetothers.options.columns[sheetothers.getColumnKey('variant_id')].sources = [];
-											sheetothers.options.columns[sheetothers.getColumnKey('variant_id')].sources[result.line] =	oresult;
+											sheetothers.options.columns[sheetothers.getColumnKey('variant_id')]['sources'][result.line] =	oresult;
+											if (sheetothers.options.columns[sheetothers.getColumnKey('variant_id')]['sources'][result.line].length>1 && sheetothers.getValueFromKey('variant_id', result.line)=='0~Sin variante')
+											 sheetothers.setValueFromKey('variant_id', result.line, '0~Variante...', true);
 										}
 				 					}
 				 				});
@@ -669,6 +904,36 @@ class ERPBuyOrdersController extends Controller
 				 		}
 				 	}
 				}";
+			// Jexcel de carga masiva de líneas de producto
+			$spreadsheetcm = [];
+			$spreadsheetcm['name']       = "buyorderscm";
+			$spreadsheetcm['options']    = "pagination:1000000, search: true, allowManualInsertRow: false, allowDeletingAllRows: true";
+		  $spreadsheetcm['prototipe']  = "{
+				id:'',
+				variantid:'',
+				category:'',
+				productcode:'',
+				productname:'',
+				variantname:'0~Sin variante',
+				quantity:0
+			}";
+			$spreadsheetcm['columns']    =
+		   "[
+				{ name: 'id', type: 'numeric', width:'50px', title: 'ID', align: 'right'},
+				{ name: 'variantid', type: 'numeric', width:'50px', title: 'ID', align: 'right'},
+				{ name: 'category', type: 'text', width:'200px', title: 'Categoría', align: 'left', readOnly:true},
+		    { name: 'productcode', type: 'text', width:'80px', title: 'Código', align: 'left', readOnly:true},
+		    { name: 'productname', type: 'text', width:'300px', title: 'Descripción', align: 'left'},
+				{ name: 'variantname', type: 'text', width:'100px',	title:'Variante', align:'left'},
+		    { name: 'quantity', type: 'numeric', width:'50px', title: 'Cantidad', align: 'right'}
+		   ]";
+			$spreadsheetcm['data']       = '[]';
+			$spreadsheetcm['onload'] 	   =
+				"$('#supplier-form-id').val('".$supplier_id."');
+				 var sheet = document.getElementById('".$spreadsheetcm['name']."').jexcel;
+				 sheet.hideColumnKey('id');
+				 sheet.hideColumnKey('variantid');
+				";
 
 			// Files
 			$utilsCloud = new CloudFilesUtils();
@@ -686,20 +951,28 @@ class ERPBuyOrdersController extends Controller
     				'breadcrumb' =>  $breadcrumb,
     				'userData' => $userdata,
     				'supplierslist' => $supplierslist,
-						'suppliercontacts' => $suppliercontacts,
 						'form' => 'buyorder',
 						'buyorder' => $buyorder,
 						'buyorderlines' => $buyorderlines,
 						'stores' => $stores,
 						'agents' => $agents,
 						'states' => $states,
+						'paymentmethods' => $paymentmethods,
+						'paymentterms' => $paymentterms,
+						'carriers' => $carriers,
+						'shippings' => $shippings,
+						'orderchannel' => $orderchannel,
 						'destinationstates' => $destinationstates,
 						'destinationcountries' => $destinationcountries,
-						'destinationcontacts' => $destinationcontacts,
 						'customerslist' => $customerslist,
 						'id' => $id,
-						'spreadsheet' => $spreadsheet,
+						'spreadsheetbuyorderscs' => $spreadsheetcs,
+						'spreadsheetbuyorderscc' => $spreadsheetcc,
+						'spreadsheetbuyorders' => $spreadsheet,
+						'spreadsheetbuyorderscm' => $spreadsheetcm,
 						'cloudConstructor' => $templateLists,
+						'token' => uniqid('sign_').time(),
+						'history' => HelperHistory::createHistory('App\Modules\ERP\Entity\ERPBuyOrders', $id, $this->getUser(), $this->getDoctrine(), true),
 						'include_header' => [["type"=>"css", "path"=>"js/jexcel/jexcel.css"],
                                  ["type"=>"js",  "path"=>"js/jexcel/jexcel.js"],
 																 ["type"=>"css", "path"=>"js/jsuites/jsuites.css"],
@@ -730,18 +1003,21 @@ class ERPBuyOrdersController extends Controller
 			$erpBuyOrdersRepository=$this->getDoctrine()->getRepository(ERPBuyOrders::class);
 			$erpBuyOrdersLinesRepository=$this->getDoctrine()->getRepository(ERPBuyOrdersLines::class);
 			$erpBuyOrdersStatesRepository=$this->getDoctrine()->getRepository(ERPBuyOrdersStates::class);
+			$erpBuyOrdersContactsRepository=$this->getDoctrine()->getRepository(ERPBuyOrdersContacts::class);
 			$erpBuyOffertsRepository=$this->getDoctrine()->getRepository(ERPBuyOffert::class);
 			$erpSuppliersRepository=$this->getDoctrine()->getRepository(ERPSuppliers::class);
 			$erpCustomersRepository=$this->getDoctrine()->getRepository(ERPCustomers::class);
 			$erpPaymentMethodsRepository=$this->getDoctrine()->getRepository(ERPPaymentMethods::class);
+			$erpPaymentTermsRepository=$this->getDoctrine()->getRepository(ERPPaymentTerms::class);
+			$erpCarriersRepository=$this->getDoctrine()->getRepository(ERPCarriers::class);
 			$erpStoresRepository=$this->getDoctrine()->getRepository(ERPStores::class);
-			$erpContactsRepository=$this->getDoctrine()->getRepository(ERPContacts::class);
 			$erpAddressesRepository=$this->getDoctrine()->getRepository(ERPAddresses::class);
 			$erpProductsRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
 			$erpProducsVariantsRepository=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
 			$erpVariantsValuesRepository=$this->getDoctrine()->getRepository(ERPVariantsValues::class);
 			$erpVariantsRepository=$this->getDoctrine()->getRepository(ERPVariants::class);
 			$erpReferencesRepository=$this->getDoctrine()->getRepository(ERPReferences::class);
+			$erpContactsRepository=$this->getDoctrine()->getRepository(ERPContacts::class);
 			// Globales
 			$globaleCompaniesRepository=$this->getDoctrine()->getRepository(GlobaleCompanies::class);
 			$globaleUsersRepository=$this->getDoctrine()->getRepository(GlobaleUsers::class);
@@ -777,7 +1053,10 @@ class ERPBuyOrdersController extends Controller
 			$buyorder->setPriority($ojsbuyorders['priority']);
 			$buyorder->setObservationpriority($ojsbuyorders['observationpriority']);
 			$buyorder->setWeight($ojsbuyorders['weight']);
-			$buyorder->setTypeofconfirmation($ojsbuyorders['typeofconfirmation']);
+			$orderchannel = null;
+			if ($ojsbuyorders['orderchannel']!=null && $ojsbuyorders['orderchannel']!='')
+				$orderchannel = $ojsbuyorders['orderchannel'];
+			$buyorder->setOrderchannel($orderchannel);
 			if ($ojsbuyorders['amount']!='')
 				$buyorder->setAmount(floatval($ojsbuyorders['amount']));
 			else
@@ -821,51 +1100,72 @@ class ERPBuyOrdersController extends Controller
 			else
 				$buyorder->setEstimateddelivery(null);
 			// Proveedor
-			$supplier 			= $erpSuppliersRepository->find($ojsbuyorders['supplier_id']);
-			$paymentmethod 	= $erpPaymentMethodsRepository->find($ojsbuyorders['paymentmethod_id']);
-			$suppliercontact= $erpContactsRepository->find($ojsbuyorders['suppliercontact_id']);
+			$supplier 			= null;
+			if (ctype_digit(strval($ojsbuyorders['supplier_id'])))
+				$supplier 			= $erpSuppliersRepository->find($ojsbuyorders['supplier_id']);
+			$paymentmethod 	= null;
+			if (ctype_digit(strval($ojsbuyorders['paymentmethod_id'])))
+				$paymentmethod 	= $erpPaymentMethodsRepository->find($ojsbuyorders['paymentmethod_id']);
+			$paymentterms 	= null;
+			if (ctype_digit(strval($ojsbuyorders['paymentterms_id'])))
+				$paymentterms 	= $erpPaymentTermsRepository->find($ojsbuyorders['paymentterms_id']);
+			$carrier 	= null;
+			if (ctype_digit(strval($ojsbuyorders['carrier_id'])))
+				$carrier 	= $erpCarriersRepository->find($ojsbuyorders['carrier_id']);
 			$buyorder->setSupplier($supplier);
 			$buyorder->setPaymentmethod($paymentmethod);
-			$buyorder->setSuppliercontact($suppliercontact);
+			$buyorder->setPaymentterms($paymentterms);
+			$buyorder->setCarrier($carrier);
 			$buyorder->setSuppliername($ojsbuyorders['suppliername']);
 			$buyorder->setSuppliercode($ojsbuyorders['suppliercode']);
 			$buyorder->setEmail($ojsbuyorders['email']);
 			$buyorder->setPhone($ojsbuyorders['phone']);
 			$buyorder->setMinorder($ojsbuyorders['minorder']);
 			$buyorder->setFreeshipping($ojsbuyorders['freeshipping']);
-			$buyorder->setShippingcharge($ojsbuyorders['shippingcharge']);
+			$shippingcharge = null;
+			if ($ojsbuyorders['shippingcharge']!=null && $ojsbuyorders['shippingcharge']!='')
+				$shippingcharge = $ojsbuyorders['shippingcharge'];
+			$buyorder->setShippingcharge($shippingcharge);
 			$buyorder->setSupplieraddress($ojsbuyorders['supplieraddress']);
 			$buyorder->setSupplierpostcode($ojsbuyorders['supplierpostcode']);
 			$buyorder->setSupplierstate($ojsbuyorders['supplierstate']);
 			$buyorder->setSuppliercountry($ojsbuyorders['suppliercountry']);
 			$buyorder->setSuppliercity($ojsbuyorders['suppliercity']);
 			$buyorder->setSuppliervat($ojsbuyorders['suppliervat']);
-			$buyorder->setSupplierpaymentterms($ojsbuyorders['supplierpaymentterms']);
-			$buyorder->setSuppliercontactname($ojsbuyorders['suppliercontactname']);
-			$buyorder->setSuppliercontactemail($ojsbuyorders['suppliercontactemail']);
-			$buyorder->setSuppliercontactphone($ojsbuyorders['suppliercontactphone']);
+
+			$buyorder->setSuppliercomment($ojsbuyorders['suppliercomment']);
+			$buyorder->setSupplierbuyorder($ojsbuyorders['supplierbuyorder']);
+			$buyorder->setSuppliershipping($ojsbuyorders['suppliershipping']);
+			$buyorder->setSupplierpayment($ojsbuyorders['supplierpayment']);
+			$buyorder->setSupplierspecial($ojsbuyorders['supplierspecial']);
+
 			// Destino y cliente
-			$store 				= $erpStoresRepository->find($ojsbuyorders['store_id']);
-			$customer 		= $erpCustomersRepository->find($ojsbuyorders['customer_id']);
-			$destination 	= $erpAddressesRepository->find($ojsbuyorders['destination_id']);
-			$destinationstate 	= $globaleStatesRepository->find($ojsbuyorders['destinationstate_id']);
-			$destinationcountry = $globaleCountriesRepository->find($ojsbuyorders['destinationcountry_id']);
-			$destinationcontact = $erpContactsRepository->find($ojsbuyorders['destinationcontact_id']);
+			$store				= null;
+			if (ctype_digit(strval($ojsbuyorders['store_id'])))
+				$store 				= $erpStoresRepository->find($ojsbuyorders['store_id']);
+			$customer 		= null;
+			if (ctype_digit(strval($ojsbuyorders['customer_id'])))
+				$customer 		= $erpCustomersRepository->find($ojsbuyorders['customer_id']);
+			$destination 	= null;
+			if (ctype_digit(strval($ojsbuyorders['destination_id'])))
+				$destination 	= $erpAddressesRepository->find($ojsbuyorders['destination_id']);
+			$destinationstate 	=	null;
+			if (ctype_digit(strval($ojsbuyorders['destinationstate_id'])))
+				$destinationstate 	= $globaleStatesRepository->find($ojsbuyorders['destinationstate_id']);
+			$destinationcountry = null;
+			if (ctype_digit(strval($ojsbuyorders['destinationcountry_id'])))
+				$destinationcountry = $globaleCountriesRepository->find($ojsbuyorders['destinationcountry_id']);
 			$buyorder->setStore($store);
 			$buyorder->setCustomer($customer);
 			$buyorder->setDestination($destination);
 			$buyorder->setDestinationstate($destinationstate);
 			$buyorder->setDestinationcountry($destinationcountry);
-			$buyorder->setDestinationcontact($destinationcontact);
 			$buyorder->setDestinationname($ojsbuyorders['destinationname']);
 			$buyorder->setDestinationaddress($ojsbuyorders['destinationaddress']);
 			$buyorder->setDestinationphone($ojsbuyorders['destinationphone']);
 			$buyorder->setDestinationemail($ojsbuyorders['destinationemail']);
 			$buyorder->setDestinationpostcode($ojsbuyorders['destinationpostcode']);
 			$buyorder->setDestinationcity($ojsbuyorders['destinationcity']);
-			$buyorder->setDestinationcontactname($ojsbuyorders['destinationcontactname']);
-			$buyorder->setDestinationcontactemail($ojsbuyorders['destinationcontactemail']);
-			$buyorder->setDestinationcontactphone($ojsbuyorders['destinationcontactphone']);
 	    // TODO Offert
 			$offert = $erpBuyOffertsRepository->find($ojsbuyorders['offert_id']);
 			$buyorder->setOffert($offert);
@@ -873,6 +1173,78 @@ class ERPBuyOrdersController extends Controller
 			$this->getDoctrine()->getManager()->persist($buyorder);
 			$this->getDoctrine()->getManager()->flush();
 			$result = $buyorder->getId();
+
+			// Contactos del proveedor
+			// Poner todas los contactos con teléfono a '~|/%^%/|~' indicando que no es válido
+			// Si se actualiza se deja el contacto sino se borra
+			// Tipo 0 Contactos proveedor 1 Cliente
+			$erpBuyOrdersContactsRepository->setDeletecontacts($result,0);
+			$lines =  $ojsbuyorders['contactssupplier'];
+			if ($lines!=null && is_array($lines)){
+				for($i=0; $i<count($lines); $i++){
+					$buyordercontact = null;
+					$line 					 = $lines[$i];
+					$id 						 = $line['id'];
+					if ($id!='' && $id!='0' && $id!=0){
+						$buyordercontact	= $erpBuyOrdersContactsRepository->find($id);
+					}
+					if ($buyordercontact==null){
+						$buyordercontact = new ERPBuyOrdersContacts();
+						$buyordercontact->setActive(1);
+						$buyordercontact->setDeleted(0);
+						$buyordercontact->setDateadd(new \DateTime());
+					}
+					$buyordercontact->setBuyOrder($buyorder);
+					$contact 					= $erpContactsRepository->find($line['contact_id']);
+					$buyordercontact->setContact($contact);
+					$buyordercontact->setDateupd(new \DateTime());
+					$buyordercontact->setType(0);
+					$buyordercontact->setName($line['name']);
+					$buyordercontact->setEmail($line['email']);
+					$buyordercontact->setPhone($line['phone']);
+					$this->getDoctrine()->getManager()->persist($buyordercontact);
+					$this->getDoctrine()->getManager()->flush();
+				}
+			}
+			// Elimina los contactos con phone='~|/%^%/|~' del pedido ya que ya no son válidos
+	    // Tipo 0 Contactos proveedor 1 Cliente
+			$erpBuyOrdersContactsRepository->deleteContacts($result, 0);
+
+			// Contactos del cliente
+			// Poner todas los contactos con teléfono a '~|/%^%/|~' indicando que no es válido
+			// Si se actualiza se deja el contacto sino se borra
+			// Tipo 0 Contactos proveedor 1 Cliente
+			$erpBuyOrdersContactsRepository->setDeletecontacts($result,1);
+			$lines =  $ojsbuyorders['contactscustomer'];
+			if ($lines!=null && is_array($lines)){
+				for($i=0; $i<count($lines); $i++){
+					$buyordercontact = null;
+					$line 					 = $lines[$i];
+					$id 						 = $line['id'];
+					if ($id!='' && $id!='0' && $id!=0){
+						$buyordercontact	= $erpBuyOrdersContactsRepository->find($id);
+					}
+					if ($buyordercontact==null){
+						$buyordercontact = new ERPBuyOrdersContacts();
+						$buyordercontact->setActive(1);
+						$buyordercontact->setDeleted(0);
+						$buyordercontact->setDateadd(new \DateTime());
+					}
+					$buyordercontact->setBuyOrder($buyorder);
+					$contact 					= $erpContactsRepository->find($line['contact_id']);
+					$buyordercontact->setContact($contact);
+					$buyordercontact->setDateupd(new \DateTime());
+					$buyordercontact->setType(1);
+					$buyordercontact->setName($line['name']);
+					$buyordercontact->setEmail($line['email']);
+					$buyordercontact->setPhone($line['phone']);
+					$this->getDoctrine()->getManager()->persist($buyordercontact);
+					$this->getDoctrine()->getManager()->flush();
+				}
+			}
+			// Elimina los contactos con phone='~|/%^%/|~' del pedido ya que ya no son válidos
+			// Tipo 0 Contactos proveedor 1 Cliente
+			$erpBuyOrdersContactsRepository->deleteContacts($result, 1);
 
 			// Líneas
 			// Poner todas las líneas de la base de datos a linenum=0
@@ -987,12 +1359,13 @@ class ERPBuyOrdersController extends Controller
 	/**
 	 * @Route("/api/buyorders/print/{id}", name="printBuyOrder", defaults={"id"=0})
 	 */
-	 public function navisionPrintInvoice($id, Request $request){
+	 public function printbuyorder($id, Request $request){
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		$user = $this->getUser();
 		$reportsUtils = new ERPBuyOrdersReports();
 		$orderRepository=$this->getDoctrine()->getRepository(ERPBuyOrders::class);
 		$orderLinesRepository=$this->getDoctrine()->getRepository(ERPBuyOrdersLines::class);
+		$orderContactsRepository=$this->getDoctrine()->getRepository(ERPBuyOrdersContacts::class);
 		$order=$orderRepository->find($id);
 		// Decimales
 		$erpConfigurationRepository				= $this->getDoctrine()->getRepository(ERPConfiguration::class);
@@ -1000,10 +1373,69 @@ class ERPBuyOrdersController extends Controller
 		$ndecimals = 2;
 		if ($config != null && $config->getDecimals()!=null)
 			$ndecimals = $config->getDecimals();
+		// Contactos
+		$contactssupplier=$orderContactsRepository->findBy(["buyorder"=>$order, 'type'=>0],['name'=>'ASC']);
+		$contactscustomer=$orderContactsRepository->findBy(["buyorder"=>$order, 'type'=>1],['name'=>'ASC']);
+		// Líneas
 		$lines=$orderLinesRepository->findBy(["buyorder"=>$order],['linenum'=>'ASC']);
-		$params=["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "id"=>$id, "user"=>$this->getUser(), "order"=>$order, "lines"=>$lines, "decimals"=>$ndecimals];
+		$params=["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "id"=>$id, "user"=>$this->getUser(), "order"=>$order, "lines"=>$lines, "decimals"=>$ndecimals, "contactssupplier"=>$contactssupplier, "contactscustomer"=>$contactscustomer];
 		$report=$reportsUtils->create($params);
 		return new JsonResponse($report);
 	 }
 
+	 /**
+    * @Route("/api/buyorders/pdf/{id}", name="pdfBuyOrder", defaults={"id"=0})
+    */
+    public function pdfbuyorder($id, Request $request){
+			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			$user = $this->getUser();
+			$reportsUtils = new ERPBuyOrdersReports();
+			$orderRepository=$this->getDoctrine()->getRepository(ERPBuyOrders::class);
+			$orderLinesRepository=$this->getDoctrine()->getRepository(ERPBuyOrdersLines::class);
+			$orderContactsRepository=$this->getDoctrine()->getRepository(ERPBuyOrdersContacts::class);
+			$order=$orderRepository->find($id);
+			// Decimales
+			$erpConfigurationRepository				= $this->getDoctrine()->getRepository(ERPConfiguration::class);
+			$config	= $erpConfigurationRepository->findOneBy(["company"=>$user->getCompany()]);
+			$ndecimals = 2;
+			if ($config != null && $config->getDecimals()!=null)
+				$ndecimals = $config->getDecimals();
+			// Contactos
+			$contactssupplier=$orderContactsRepository->findBy(["buyorder"=>$order, 'type'=>0],['name'=>'ASC']);
+			$contactscustomer=$orderContactsRepository->findBy(["buyorder"=>$order, 'type'=>1],['name'=>'ASC']);
+			// Líneas
+			$lines=$orderLinesRepository->findBy(["buyorder"=>$order],['linenum'=>'ASC']);
+			$params=["doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "id"=>$id, "user"=>$this->getUser(), "order"=>$order, "lines"=>$lines, "decimals"=>$ndecimals, "contactssupplier"=>$contactssupplier, "contactscustomer"=>$contactscustomer];
+      $tempPath=$this->get('kernel')->getRootDir().DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$this->getUser()->getCompany()->getId().DIRECTORY_SEPARATOR.'temp'.DIRECTORY_SEPARATOR.$this->getUser()->getId().DIRECTORY_SEPARATOR.'Email'.DIRECTORY_SEPARATOR;
+      if (!file_exists($tempPath) && !is_dir($tempPath)) {
+          mkdir($tempPath, 0775, true);
+      }
+      $pdf=$reportsUtils->create($params,'F',$tempPath.$order->getCode().'.pdf');
+      return new JsonResponse(["result"=>$tempPath]);
+    }
+
+		/**
+     * @Route("/api/buyorders/email/{id}", name="emailBuyOrder", defaults={"id"=0})
+     */
+     public function emailbuyorder($id, Request $request){
+ 			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+ 			$user = $this->getUser();
+ 			$orderRepository=$this->getDoctrine()->getRepository(ERPBuyOrders::class);
+ 			$orderContactsRepository=$this->getDoctrine()->getRepository(ERPBuyOrdersContacts::class);
+ 			$order=$orderRepository->find($id);
+ 			// Contactos
+ 			$contactssupplier=$orderContactsRepository->findBy(["buyorder"=>$order, 'type'=>0],['name'=>'ASC']);
+			$mailaddress = [];
+			if($order!=null &&  $order->getEmail()!=null &&  $order->getEmail()!=""){
+	 		 $mailadress=$order->getSuppliername()." <".$order->getEmail().">";
+	 		 $mailaddress[]=$mailadress;
+		 	}
+		 	foreach($contactssupplier as $contact){
+	 		 if($contact->getEmail()!=""){
+	 			 $mailadress=$contact->getName()." <".$contact->getEmail().">";
+	 			 $mailaddress[]=$mailadress;
+	 		 }
+	 	  }
+		  return new JsonResponse(["addresses"=>$mailaddress]);
+		}
 }

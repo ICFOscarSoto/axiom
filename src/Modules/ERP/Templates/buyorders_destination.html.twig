@@ -126,47 +126,15 @@
           </div>
         </div>
         {% endif %}
-        <div id="show-destinationcontact" style="clear: left; {% if buyorder.customer==null or id==0 %} display:none; {% endif %}">
-          {% if buyorder.destinationcontact!=null %}
-            <div class="col-md-4">
-              <label for="destination-form-contact-id">Contacto del proveedor:</label>
-              <div class="form-group">
-                <select type="text" id="destination-form-contact-id" class="form-control select2">
-                  {% for option in destinationcontacts %}
-                    <option value="{{ option.id }}" {% if buyorder.destinationcontact.id==option.id %}selected="selected"{% endif %}>{{ option.text }}</option>
-                  {% endfor %}
-                </select>
-              </div>
-            </div>
-          {% else %}
-            <div class="col-md-4">
-              <label for="destination-form-contact-id">Contacto del proveedor:</label>
-              <div class="form-group">
-                <select type="text" id="destination-form-contact-id" class="form-control select2">
-                  {% for option in destinationcontacts %}
-                    <option value="{{ option.id }}" {% if option.pos==0 %}selected="selected"{% endif %}>{{ option.text }}</option>
-                  {% endfor %}
-                </select>
-              </div>
-            </div>
-          {% endif %}
-          <div class="col-md-4">
-            <label for="destination-form-contact-name">Nombre del contacto:</label>
-            <div class="form-group">
-              <input type="text" id="destination-form-contact-name" value="{{ buyorder.destinationcontactname }}" class="form-control"/>
+        <div id="buyorders-cc" {% if buyorder.customer==null or id==0 %}style="display:none;"{% endif %}>
+          <div class="panel minimal" style="clear: left;">
+            <div class="panel-heading">
+              <div class="panel-title">Contactos</div>
             </div>
           </div>
-          <div class="col-md-2">
-            <label for="destination-form-contact-email">Email del contacto:</label>
-            <div class="form-group">
-              <input type="text" id="destination-form-contact-email" value="{{ buyorder.destinationcontactemail }}" class="form-control"/>
-            </div>
-          </div>
-          <div class="col-md-2">
-            <label for="destination-form-contact-phone">Teléfono del contacto:</label>
-            <div class="form-group">
-              <input type="text" id="destination-form-contact-phone" value="{{ buyorder.destinationcontactphone }}" class="form-control"/>
-            </div>
+          <div id="jsexcel-buyordercc">
+            {% set spreadsheet = spreadsheetbuyorderscc %}
+            {{ include('@Globale/form_jspreadsheet_html.twig') }}
           </div>
         </div>
         <div class="panel minimal"  style="clear: left;">
@@ -184,6 +152,7 @@
         if($("#buyorder-form-store").val()=="6"){
            $("#destination-data").css("display","block");
            $("#customer-form-id").val('');
+           $("#customer-form-id").trigger('change');
            $("#customer-form-id-tmp").val('');
            $("#customer-form-code").val('');
            $("#customer-form-name").val('');
@@ -199,53 +168,25 @@
            $("#destination-form-country").trigger('change');
            $("#destination-form-phone").val('');
            $("#destination-form-email").val('');
-           $("#destination-form-contact-id").val('');
-           $("#destination-form-contact-id").trigger('change');
-           setContactsCustomer(0);
            $("#searching-customer").css("display","block");
-           $("#show-destinationcontact").css("display","block");
+           $("#buyorders-cc").css("display","block");
+
          }
         else{
           setStoreInfo($(this).val());
           $("#customer-form-id").val('');
+          $("#customer-form-id").trigger('change');
           $("#customer-form-id-tmp").val('');
           $("#customer-form-code").val('');
           $("#customer-form-name").val('');
           $("#customer-form-codename").val('');
-          $("#destination-form-contact-id").val('');
-          $("#destination-form-contact-id").trigger('change');
-          setContactsCustomer(0);
           $("#searching-customer").css("display","none");
-          $("#show-destinationcontact").css("display","none");
+          $("#buyorders-cc").css("display","none");
         }
         // Actualizar prototipe para cuando se cree una línea se asigna este almacén por defecto
         store_name = $("#buyorder-form-store option:selected").text();
         store_name = store_name.substring(1,store_name.indexOf(') - '));
-        window['js{{spreadsheet.name}}_prototipe'].store_id = $("#buyorder-form-store").val()+'~'+store_name;
-      });
-
-      {# Cambio de contacto del cliente #}
-      $('body').on('change', "#destination-form-contact-id", function(e) {
-        contact_id = $("#destination-form-contact-id").val();
-        if (contact_id=='' || contact_id=='0'){
-          $("#destination-form-contact-name").val('');
-          $("#destination-form-contact-email").val('');
-          $("#destination-form-contact-phone").val('');
-        }else{
-          if((++load_wait)==1) $("#load-spinner").fadeIn();
-          $.ajax({
-             type: "GET",
-             dataType: "json",
-             url: "/api/global/contact/"+contact_id+'/get'
-           }).done(function(elements, textStatus, jqXHR) {
-             if((--load_wait)==0) $("#load-spinner").fadeOut();
-              if (elements!=null){
-                $("#destination-form-contact-name").val(elements.name);
-                $("#destination-form-contact-email").val(elements.email);
-                $("#destination-form-contact-phone").val(elements.phone);
-              }
-          });
-        }
+        window['jsbuyorders_prototipe'].store_id = $("#buyorder-form-store").val()+'~'+store_name;
       });
 
       {# Ficha de cliente #}

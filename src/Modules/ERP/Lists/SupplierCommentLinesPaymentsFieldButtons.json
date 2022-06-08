@@ -1,0 +1,8 @@
+[
+  {"id": "editSupplierCommentLinesPayments", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"dataSupplierCommentLinesPayments", "routeParams":{"idparent":"parent","type_comment":"5"}, "modal":"SupplierCommentLinesPayments", "actionType" : "background", "confirm" :false, "tooltip" : ""},
+  {"id": "activation", "type": "option", "options": [
+      {"id": "desactivateSupplierCommentLinesPayments", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"genericdisable", "routeParams":{"module":"ERP", "name":"SupplierCommentLines"}, "confirm" :true, "actionType" : "background", "tooltip":"" },
+      {"id": "activateSupplierCommentLinesPayments", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "route":"genericenable", "routeParams":{"module":"ERP", "name":"SupplierCommentLines"}, "confirm" :true, "actionType" : "background", "tooltip":"" }
+  ]},
+  {"id": "deleteSupplierCommentLinesPayments", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"genericdelete", "routeParams":{"module":"ERP", "name":"SupplierCommentLines"}, "confirm" :true, "undo" :false, "actionType" : "background", "tooltip":""}
+]

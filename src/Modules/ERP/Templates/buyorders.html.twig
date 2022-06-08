@@ -9,10 +9,10 @@
 	<link rel="icon" href="images/favicon.ico">
 	{{ include('@Globale/header.html.twig') }}
 	<!-- Imported styles on this page -->
-	<link rel="stylesheet" href="{{ url('index') }}css/bootstrap-grid.css">
+	<!-- <link rel="stylesheet" href="{{ url('index') }}css/bootstrap-grid.css">
 	<link rel="stylesheet" href="{{ url('index') }}css/timeline.css">
 	<link rel="stylesheet" href="{{ url('index') }}js/jvectormap/jquery-jvectormap-1.2.2.css">
-	<link rel="stylesheet" href="{{ url('index') }}js/rickshaw/rickshaw.min.css">
+	<link rel="stylesheet" href="{{ url('index') }}js/rickshaw/rickshaw.min.css"> -->
 </head>
 {% endblock %}
 <title>{% block title %}{{ interfaceName|trans }}{% endblock %}</title>
@@ -56,7 +56,7 @@
 	            <a attr-search="false" attr-href="/es/ERP/BuyOrdersLines/generic/export" target="_blank" href="javascript:void(0);" style="font-size: 20px" id="exportTop-top-button-foreground" type="button" class="btn tooltip-primary  btn-default">
 	              <i class="fa fa-file-excel-o" aria-hidden="true"></i>
 	            </a>
-	            <a attr-search="false" attr-href="" href="javascript:void(0);" style="font-size: 20px" id="sendTop-top-button-foreground" type="button" class="btn tooltip-primary  btn-default">
+	            <a attr-search="false" attr-href="" href="javascript:void(0);" style="font-size: 20px" id="document-button-email" type="button" class="btn tooltip-primary  btn-default" {% if buyorder.id!=null and  buyorder.id!=0 %} attr-id="{{ buyorder.id }}" attr-code="{{ buyorder.code }}" attr-documenttype="pedido" attr-receiver="proveedor" attr-controller_getdocs="/api/buyorders/pdf" attr-controller_getemails="/api/buyorders/email" {% endif %}>
 	              <i class="fa fa-envelope" aria-hidden="true"></i>
 	            </a>
             </div>
@@ -101,7 +101,37 @@
 					{{ include('@Cloud/genericlistfiles.html.twig') }}
 			</div>
 			<div id="jsexcel-buyorder">
+				{% set spreadsheet = spreadsheetbuyorders %}
 				{{ include('@Globale/form_jspreadsheet_html.twig') }}
+				<div class="panel minimal">
+					<div class="panel-heading">
+						<div class="panel-title">Condiciones</div>
+					</div>
+				</div>
+				<div class="col-md-3">
+	        <div class="form-group" >
+	          <label for="buyorder-form-supplierbuyorder">Pedidos:</label>
+	          <textarea id="buyorder-form-supplierbuyorder" name="buyorder-form-supplierbuyorder" readonly="readonly" class="form-control" style="min-height:80px;" >{% if buyorder.supplierbuyorder!=null %}{{ buyorder.supplierbuyorder }}{% endif %}</textarea>
+	        </div>
+	      </div>
+				<div class="col-md-3">
+	        <div class="form-group" >
+	          <label for="buyorder-form-suppliershipping">Portes:</label>
+	          <textarea id="buyorder-form-suppliershipping" name="buyorder-form-suppliershipping" readonly="readonly" class="form-control" style="min-height:80px;" >{% if buyorder.suppliershipping!=null %}{{ buyorder.suppliershipping }}{% endif %}</textarea>
+	        </div>
+	      </div>
+				<div class="col-md-3">
+	        <div class="form-group" >
+	          <label for="buyorder-form-supplierpayment">Métodos de pago:</label>
+	          <textarea id="buyorder-form-supplierpayment" name="buyorder-form-supplierpayment" readonly="readonly" class="form-control" style="min-height:80px;" >{% if buyorder.supplierpayment!=null %}{{ buyorder.supplierpayment }}{% endif %}</textarea>
+	        </div>
+	      </div>
+				<div class="col-md-3">
+					<div class="form-group" >
+						<label for="buyorder-form-supplierspecial">Condiciones especiales:</label>
+						<textarea id="buyorder-form-supplierspecial" name="buyorder-form-supplierspecial" readonly="readonly" class="form-control" style="min-height:80px;" >{% if buyorder.supplierspecial!=null %}{{ buyorder.supplierspecial }}{% endif %}</textarea>
+					</div>
+				</div>
 				<br/>
 				<div class="row">
 					<div style="text-align: left;" class="col-md-6"></div>
@@ -110,11 +140,13 @@
 						<button attr-id="" attr-action="" id="buyorder-button-save" type="button" class="btn btn-green">Guardar</button>
 					</div>
 				</div>
-			</diV>
+			</div>
+			{% if buyorder.id!=null and  buyorder.id!=0 %}
+				{{ include('@Globale/document_send.html.twig') }}
+			{% endif %}
 		</div>
 
 		{{ include('@ERP/buyorder_prepare_json.html.twig') }}
-
 	</div>
 		{{ include('@Globale/chat.html.twig') }}
 </div>
@@ -154,11 +186,28 @@ function buyordersproduct(sheet,x,y,value){
 						sheet.options.columns[sheet.getColumnKey('variant_id')].sources = [];
 					sheet.options.columns[sheet.getColumnKey('variant_id')].sources[result.line] = oresult;
 				}
+				if (result != null && result != '' && sheet.options.columns[sheet.getColumnKey('variant_id')].sources[result.line].length>1){
+					var exists_variant = false;
+					var variant_id 		 = sheet.getValueFromKey('variant_id', y);
+					if (variant_id!='0~Variante...' && variant_id!='0~Sin variante'){
+						for(i=0; i<sheet.options.columns[sheet.getColumnKey('variant_id')].sources[result.line].length && !exists_variant; i++){
+							if (variant_id==sheet.options.columns[sheet.getColumnKey('variant_id')].sources[result.line][i]['id'])
+								exists_variant = true;
+						}
+					}
+					sheet.setValueFromKey('variant_id', y, '0~Variante...', true);
+					if (exists_variant)
+						sheet.setValueFromKey('variant_id', y, variant_id, true);
+				}else
+					sheet.setValueFromKey('variant_id', y, '0~Sin variante', true);
+				// Recalculo de línea
+				buyordersline(sheet,x,y,value);
 			});
+		}else{
+			sheet.setValueFromKey('variant_id', y, '0~Variante...', true);
+			// Recalculo de línea
+			buyordersline(sheet,x,y,value);
 		}
-		sheet.setValueFromKey('variant_id', y, '0~Variante...', true);
-		// Recalculo de línea
-		buyordersline(sheet,x,y,value);
 	}
 }
 {# Recalcula la fila donde se ha producido un cambio #}
@@ -210,7 +259,7 @@ function buyordersline(sheet,x,y,value){
 {# Recalcula de totales #}
 function buyorderstotal(sheet){
 	if (sheet==null)
-		sheet = document.getElementById('{{spreadsheet.name}}').jexcel[0];
+		sheet = document.getElementById('buyorders').jexcel[0];
 	var data 		= sheet.getData();
 	var weightt = 0;
 	var amountt = 0;
@@ -235,16 +284,16 @@ function buyorderstotal(sheet){
 	if (discount == null || discount == '' || isNaN(discount) || isNaN(parseFloat(discount))) discount = 0;
 	baset = amountt-((amountt*discount)/100);
 	taxt	= taxt-((taxt*discount)/100);
-	shippingcharge = $('#buyorder-form-shippingcharge').val();
+	shippingcharge = $('#supplier-form-shippingcharge').val();
 	freeshipping = $('#buyorder-form-freeshipping').val();
 	if (freeshipping == null || freeshipping == '' || isNaN(freeshipping) || isNaN(parseFloat(freeshipping))) freeshipping = 999999999;
 	shipping = $('#buyorder-form-shipping').val();
 	if (shipping == null || shipping == '' || isNaN(shipping) || isNaN(parseFloat(shipping))) shipping = 0;
 	// Si la base imponible > portes gratis desde y los portes son PAGADOS -> portes = 0
-	if (shippingcharge=='PAGADOS' && baset>=freeshipping){
+	if (shippingcharge=='1' && baset>=freeshipping){
 		shipping = 0;
 		$('#buyorder-form-shipping').val(0);
-		$('#buyorder-form-shipping').attr('readonly','readnonly');
+		$('#buyorder-form-shipping').attr('readonly','readonly');
 	}else{
 		$('#buyorder-form-shipping').removeAttr('readonly');
 	}
@@ -303,6 +352,7 @@ $(document).ready(function() {
 	$('body').on('click', "#buyorder-button-save", function(e) {
 		if(validate_buyorder())
 		{
+			if((++load_wait)==1) $("#load-spinner").fadeIn();
 			$.ajax({
 					 url: '{{ url('saveBuyOrders') }}',
 					 type: 'POST',
@@ -324,6 +374,129 @@ $(document).ready(function() {
 	{# Cancelar edición de pedido #}
 	$('body').on('click', "#buyorder-button-cancel", function(e) {
 		location.href='{{ url('buyorders') }}';
+	});
+
+	{# Carga de todos los productos del proveedor para la carga masiva #}
+	$("#{{spreadsheet.name}}-loadmasive-modal-form").on('show.bs.modal', function(){
+		var sheet 	 = document.getElementById('{{spreadsheet.name}}cm').jexcel;
+		sheet.deleteRow(0,sheet.options.data.length-1);
+		var supplier_id = $('#supplier-form-id').val();
+		if (supplier_id != null && supplier_id!='' && supplier_id!='0'){
+			// Carga de datos
+			if((++load_wait)==1) $("#load-spinner").fadeIn();
+			$.ajax({
+					 url: '/api/getWSProductSupplierMasive/'+supplier_id,
+					 type: 'POST',
+					 dataType: 'json',
+					 success:  function( dataa ) {
+						if((--load_wait)==0) $("#load-spinner").fadeOut();
+						if(dataa){
+							sheet.setData(dataa);
+							// Siempre inserta un blanco en la línea 1 (despues de 0)
+							sheet.deleteRow(1,1);
+							// Carga de variantes
+							for(var i=0; i<dataa.length; i++){
+								// Cantidades
+								var quantitycomment      = '';
+								if (dataa[i]['minimumquantityofbuy']>1){
+									quantitycomment += "Mínimo de compra: "+dataa[i]['minimumquantityofbuy']+"\n";
+									sheet.setMin(sheet.getColumnKey('quantity'), i, dataa[i]['minimumquantityofbuy']);
+								}
+								if (dataa[i]['multiplicity']>1){
+									quantitycomment += "Multiplicidad: "+dataa[i]['multiplicity']+"\n";
+									sheet.setMultiplicity(sheet.getColumnKey('quantity'), i, dataa[i]['multiplicity']);
+								}
+								if (dataa[i]['packing']>1){
+									quantitycomment += "Packing: "+dataa[i]['packing']+"\n";
+								}
+								if (dataa[i]['purchaseunit']>1){
+									quantitycomment += "Unidad de compra: "+dataa[i]['$purchaseunit']+"\n";
+								}
+								if (quantitycomment!=''){
+									sheet.setComments([sheet.getColumnKey('quantity'), i], quantitycomment);
+								}
+							}
+							/*var data    = sheet.getData();
+							var columns = sheet.options.columns;
+							if (data.length > 0 && columns.length>0){
+							 for(var i=0; i<data.length; i++){
+								 product_code = data[i][sheet.getColumnKey('productcode')];
+								 if (product_code!=null && product_code!='' && product_code!='0'  && product_code!=0){
+									 var url = sheet.options.columns[sheet.getColumnKey('variant_id')].url;
+									 if (url !== undefined && url != ''){
+										 // Obtener variantes del producto
+										 url = url.replace('___',i+'~'+product_code);
+										 $.ajax({
+											 url: url
+										 }).done(function(result) {
+											 if (result != null && result != ''){
+												 var oresult = JSON.parse(JSON.stringify(result.data));
+												 var posvariant_id = sheet.getColumnKey('variant_id');
+												 if (typeof(sheet.options.columns[posvariant_id]['sources']) == 'undefined')
+													 sheet.options.columns[posvariant_id]['sources']= [];
+												 sheet.options.columns[posvariant_id]['sources'][result.line] =	oresult;
+												 if (sheet.options.columns[posvariant_id]['sources'][result.line].length>1)
+												 	sheet.setValueFromKey('variant_id', result.line, '0~Variante...', true);
+												 // Cantidades
+				 								 var quantitycomment      = '';
+				 								 if (dataa[result.line]['minimumquantityofbuy']>1){
+				 			             quantitycomment += "Mínimo de compra: "+dataa[result.line]['minimumquantityofbuy']+"\n";
+				 			             sheet.setMin(sheet.getColumnKey('quantity'), result.line, dataa[result.line]['minimumquantityofbuy']);
+				 			           }
+				 			           if (dataa[result.line]['multiplicity']>1){
+													 quantitycomment += "Multiplicidad: "+dataa[result.line]['multiplicity']+"\n";
+				 			             sheet.setMultiplicity(sheet.getColumnKey('quantity'), result.line, dataa[result.line]['multiplicity']);
+				 			           }
+				 			           if (dataa[result.line]['packing']>1){
+				 			             quantitycomment += "Packing: "+dataa[result.line]['packing']+"\n";
+				 			           }
+				 			           if (dataa[result.line]['purchaseunit']>1){
+				 			             quantitycomment += "Unidad de compra: "+dataa[result.line]['$purchaseunit']+"\n";
+				 			           }
+												 if (quantitycomment!=''){
+													 sheet.setComments([sheet.getColumnKey('quantity'), result.line], quantitycomment);
+												 }
+											 }
+										 });
+									 }
+								 }
+							 }
+						 }*/
+						}
+					}
+			});
+		}
+	});
+	/* Realiza la acción de añadir productos */
+	$("#{{spreadsheet.name}}-loadmasive-modal-form .btn-primary").on('click', function(){
+		$('#{{spreadsheet.name}}-loadmasive-modal-form').modal('hide');
+		var sheet	 		= document.getElementById('{{spreadsheet.name}}').jexcel[0];
+		var sheetcm 	= document.getElementById('{{spreadsheet.name}}cm').jexcel;
+		var json 		  = sheetcm.getJson();
+		var lines 		= [];
+		if (json != null){
+			for(i=0; i<json.length; i++){
+				if (json[i]['quantity']!='' && !isNaN(parseFloat(json[i]['quantity'])) && parseFloat(json[i]['quantity'])>0){
+					lines.push(json[i]);
+				}
+			}
+			if (lines.length>0){
+				var pos = sheet.options.data.length;
+				if (sheet.getValueFromKey('id', pos-1, true)==null || sheet.getValueFromKey('id', pos-1, true)=='')
+					pos--;
+				lines.forEach( function(valor, indice, array){
+				 sheet.insertRow(1, pos);
+				 sheet.setValueFromKey('id', pos, valor["id"], true);
+				 sheet.setValueFromKey('productname', pos, valor["productname"], true);
+				 sheet.setValueFromKey('variant_id', pos, valor["variantid"]+'~'+valor["variantname"], true);
+				 sheet.setValueFromKey('quantity', pos, valor["quantity"], true);
+				 // Al final porque calcula con los otros valores
+				 sheet.setValueFromKey('product_id', pos, valor["id"]+'~'+valor["productcode"], true);
+				 pos++;
+			  });
+			}
+		}
+		return false;
 	});
 });
 </script>

@@ -91,6 +91,53 @@ class ERPSupplierCommentLinesController extends Controller
 		 return new JsonResponse($return);
 		}
 
+		/**
+		* @Route("/api/suppliercommentlinesshippings/list/{supplierid}/{type}", name="suppliercommentlinesshippingslist")
+		*/
+		public function suppliercommentlinesshippingslist(RouterInterface $router,Request $request, $supplierid, $type){
+		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		 $user = $this->getUser();
+		 $locale = $request->getLocale();
+		 $this->router = $router;
+		 $manager = $this->getDoctrine()->getManager();
+		 $repository = $manager->getRepository($this->class);
+		 $listUtils=new GlobaleListUtils();
+		 $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/SupplierCommentLinesShippings.json"),true);
+		 $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, ERPSupplierCommentLines::class,[["type"=>"and", "column"=>"supplier", "value"=>$supplierid],["type"=>"and", "column"=>"type", "value"=>$type]]);
+		 return new JsonResponse($return);
+		}
+
+		/**
+		* @Route("/api/suppliercommentlinespayments/list/{supplierid}/{type}", name="suppliercommentlinespaymentslist")
+		*/
+		public function suppliercommentlinespaymentslist(RouterInterface $router,Request $request, $supplierid, $type){
+		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		 $user = $this->getUser();
+		 $locale = $request->getLocale();
+		 $this->router = $router;
+		 $manager = $this->getDoctrine()->getManager();
+		 $repository = $manager->getRepository($this->class);
+		 $listUtils=new GlobaleListUtils();
+		 $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/SupplierCommentLinesPayments.json"),true);
+		 $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, ERPSupplierCommentLines::class,[["type"=>"and", "column"=>"supplier", "value"=>$supplierid],["type"=>"and", "column"=>"type", "value"=>$type]]);
+		 return new JsonResponse($return);
+		}
+
+		/**
+		* @Route("/api/suppliercommentlinesspecials/list/{supplierid}/{type}", name="suppliercommentlinesspecialslist")
+		*/
+		public function suppliercommentlinesspecialslist(RouterInterface $router,Request $request, $supplierid, $type){
+		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		 $user = $this->getUser();
+		 $locale = $request->getLocale();
+		 $this->router = $router;
+		 $manager = $this->getDoctrine()->getManager();
+		 $repository = $manager->getRepository($this->class);
+		 $listUtils=new GlobaleListUtils();
+		 $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/SupplierCommentLinesSpecials.json"),true);
+		 $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, ERPSupplierCommentLines::class,[["type"=>"and", "column"=>"supplier", "value"=>$supplierid],["type"=>"and", "column"=>"type", "value"=>$type]]);
+		 return new JsonResponse($return);
+		}
 
 		/**
 		 * @Route("/{_locale}/suppliercommentlines/data/{id}/{action}/{idparent}/{type_comment}", name="dataSupplierCommentLines", defaults={"id"=0, "idparent"="0", "action"="read", "type_comment"="0"})
@@ -278,6 +325,93 @@ public function supplierincidents($id, RouterInterface $router,Request $request)
 	return $utils->make($id, $this->class, $action, "SupplierCommentLinesIncidents", "modal");
  }
 
+ /**
+  * @Route("/{_locale}/suppliercommentlines/datashippings/{id}/{action}/{idparent}/{type_comment}", name="dataSupplierCommentLinesShippings", defaults={"id"=0, "idparent"="0", "action"="read", "type_comment"="3"})
+  */
+  public function dataSupplierCommentLinesShippings($id, $idparent, $type_comment, $action, Request $request){
+  $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+  $class="\App\Modules\ERP\Entity\ERPSupplierCommentLines";
+  $utils = new GlobaleFormUtils();
+  $classUtils="\App\Modules\ERP\Utils\ERPSupplierCommentLinesUtils";
+  $template=dirname(__FILE__)."/../Forms/SupplierCommentLinesShippings.json";
+  $classRepository=$this->getDoctrine()->getRepository($class);
+  if(class_exists($classUtils)){
+ 	 $utilsObj=new $classUtils();
+  }else $utilsObj=new $class();
+  $parentRepository=$this->getDoctrine()->getRepository(ERPSuppliers::class);
+  $obj=new $class();
+  if($id==0){
+ 	 if($idparent==0 ) $idparent=$request->query->get('idparent');
+ 	 if($idparent==0 || $idparent==null) $idparent=$request->request->get('id-parent',0);
+ 	 $parent = $parentRepository->find($idparent);
+  }	else $obj = $classRepository->find($id);
 
+  $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser()];
 
+  $utils = new GlobaleFormUtils();
+  $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),
+ 													method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[],null,["idparent"=>$idparent,"action"=>$action,"type_comment"=>$type_comment]);
+  if($id==0) $utils->values(["supplier"=>$parent,"type"=>$type_comment]);
+  return $utils->make($id, $this->class, $action, "SupplierCommentLinesShippings", "modal");
+ }
+
+ /**
+  * @Route("/{_locale}/suppliercommentlines/datapayments/{id}/{action}/{idparent}/{type_comment}", name="dataSupplierCommentLinesPayments", defaults={"id"=0, "idparent"="0", "action"="read", "type_comment"="3"})
+  */
+  public function dataSupplierCommentLinesPayments($id, $idparent, $type_comment, $action, Request $request){
+  $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+  $class="\App\Modules\ERP\Entity\ERPSupplierCommentLines";
+  $utils = new GlobaleFormUtils();
+  $classUtils="\App\Modules\ERP\Utils\ERPSupplierCommentLinesUtils";
+  $template=dirname(__FILE__)."/../Forms/SupplierCommentLinesPayments.json";
+  $classRepository=$this->getDoctrine()->getRepository($class);
+  if(class_exists($classUtils)){
+ 	 $utilsObj=new $classUtils();
+  }else $utilsObj=new $class();
+  $parentRepository=$this->getDoctrine()->getRepository(ERPSuppliers::class);
+  $obj=new $class();
+  if($id==0){
+ 	 if($idparent==0 ) $idparent=$request->query->get('idparent');
+ 	 if($idparent==0 || $idparent==null) $idparent=$request->request->get('id-parent',0);
+ 	 $parent = $parentRepository->find($idparent);
+  }	else $obj = $classRepository->find($id);
+
+  $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser()];
+
+  $utils = new GlobaleFormUtils();
+  $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),
+ 													method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[],null,["idparent"=>$idparent,"action"=>$action,"type_comment"=>$type_comment]);
+  if($id==0) $utils->values(["supplier"=>$parent,"type"=>$type_comment]);
+  return $utils->make($id, $this->class, $action, "SupplierCommentLinesPayments", "modal");
+ }
+
+ /**
+  * @Route("/{_locale}/suppliercommentlines/dataspecials/{id}/{action}/{idparent}/{type_comment}", name="dataSupplierCommentLinesSpecials", defaults={"id"=0, "idparent"="0", "action"="read", "type_comment"="3"})
+  */
+  public function dataSupplierCommentLinesSpecials($id, $idparent, $type_comment, $action, Request $request){
+  $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+  $class="\App\Modules\ERP\Entity\ERPSupplierCommentLines";
+  $utils = new GlobaleFormUtils();
+  $classUtils="\App\Modules\ERP\Utils\ERPSupplierCommentLinesUtils";
+  $template=dirname(__FILE__)."/../Forms/SupplierCommentLinesSpecials.json";
+  $classRepository=$this->getDoctrine()->getRepository($class);
+  if(class_exists($classUtils)){
+ 	 $utilsObj=new $classUtils();
+  }else $utilsObj=new $class();
+  $parentRepository=$this->getDoctrine()->getRepository(ERPSuppliers::class);
+  $obj=new $class();
+  if($id==0){
+ 	 if($idparent==0 ) $idparent=$request->query->get('idparent');
+ 	 if($idparent==0 || $idparent==null) $idparent=$request->request->get('id-parent',0);
+ 	 $parent = $parentRepository->find($idparent);
+  }	else $obj = $classRepository->find($id);
+
+  $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser()];
+
+  $utils = new GlobaleFormUtils();
+  $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),
+ 													method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[],null,["idparent"=>$idparent,"action"=>$action,"type_comment"=>$type_comment]);
+  if($id==0) $utils->values(["supplier"=>$parent,"type"=>$type_comment]);
+  return $utils->make($id, $this->class, $action, "SupplierCommentLinesSpecials", "modal");
+ }
 }

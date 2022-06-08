@@ -558,7 +558,7 @@
 .jexcel_filter
 {
     display:flex;
-    justify-content:space-between;
+    justify-content:flex-end;
     margin-bottom:4px;
 }
 
@@ -668,6 +668,17 @@
 .jexcel_tabs .jexcel_tab
 {
     display:none;
+}
+.jexcel_load_masive
+{
+  display:inline-block;
+  padding:10px !important;
+  padding-left:20px !important;
+  padding-right:20px !important;
+  margin-right:5px !important;
+  margin-bottom:1px !important;
+  background-color:#f3f3f3;
+  cursor:pointer;
 }
 
 .jexcel_tabs .jexcel_tab_link

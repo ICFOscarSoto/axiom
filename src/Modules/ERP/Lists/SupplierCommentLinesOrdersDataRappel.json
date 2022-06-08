@@ -10,7 +10,17 @@
     },
     {
         "name": "comment",
-        "caption": "comment"
+        "caption": "Rappel"
+    },
+    {
+        "name": "start",
+        "caption": "start",
+        "type": "date"
+    },
+    {
+        "name": "end",
+        "caption": "end",
+        "type": "date"
     },
     {
         "name": "active",

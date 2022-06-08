@@ -124,6 +124,8 @@ Activities: Actividades
 #CONTACTS
 #----------------------------------------------------------------------------------------------------------------------
 Contacts: Contactos
+additional: Información adicional
+Additional: Información adicional
 
 #LOGIN
 #----------------------------------------------------------------------------------------------------------------------
@@ -382,6 +384,10 @@ Supplier: Proveedor
 supplier: Proveedor
 Supplier data: Datos del proveedor
 Code: Código
+Theircode: Código cliente
+Credentialsurl: URL
+Credentialsuser: Usuario
+Credentialspassword: Contraseña
 Activity: Actividad
 Conditions: Condiciones
 Minorder: Pedido minimo
@@ -400,6 +406,11 @@ Shoppingdiscounts: Descuentos de compra
 Incidents: Incidencias
 incidents: incidencias
 suppliercode: Cod. Proveedor
+SupplierCommentLines: Comentario del proveedor
+SupplierCommentLinesOrdersData: Comentario de pedidos
+SupplierCommentLinesIncidents: Indidencia
+SupplierCommentLinesOrdersDataRappel: Comentario de rappel
+
 
 #PAYMENT TERMS
 #----------------------------------------------------------------------------------------------------------------------
@@ -753,3 +764,4 @@ jspreadsheet_deletecolumn_msg: ¿Ocultar columna seleccionada?
 jspreadsheet_uprow: Subir línea
 jspreadsheet_downrow: Bajar línea
 jspreadsheet_showcolumn_error: No quedan columnas que mostrar
+jspreadsheet_loadmasive: Carga masiva

@@ -157,7 +157,6 @@ class ERPSuppliersController extends Controller
 				$formUtilsSuppliersCommentLines = new GlobaleFormUtils();
 				$formUtilsSuppliersCommentLines->initialize($this->getUser(), new ERPSupplierCommentLines(), dirname(__FILE__)."/../Forms/SupplierCommentLines.json", $request, $this, $this->getDoctrine());
 				$forms[]=$formUtilsSuppliersCommentLines->formatForm('SupplierCommentLines', true, null, ERPSupplierCommentLines::class);
-
 				$supplierRepository=$this->getDoctrine()->getRepository(ERPSuppliers::class);
 				$supplier=$supplierRepository->findOneBy(["id"=>$id, "active"=>1, "deleted"=>0, "company"=>$this->getUser()->getCompany()]);
 
@@ -301,19 +300,28 @@ public function getOrderInfo($id, RouterInterface $router,Request $request){
  $result = [];
  $supplierRepository=$this->getDoctrine()->getRepository(ERPSuppliers::class);
  $supplierOrdersDataRepository=$this->getDoctrine()->getRepository(ERPSupplierOrdersData::class);
+ $supplierCommentLinesRepository=$this->getDoctrine()->getRepository(ERPSupplierCommentLines::class);
  $supplier					=$supplierRepository->find(["id"=>$id]);
  if ($supplier!=null){
 	 $result['suppliercode'] 	= $supplier->getCode();
+	 if ($supplier->getTheircode()!=null){
+		 $result['suppliertheircode'] = $supplier->getTheircode();
+	 }else{
+	 	 $result['suppliertheircode'] = '';
+	 }
 	 $result['suppliername'] 	= $supplier->getName();
 	 $result['supplieremail'] = $supplier->getEmail();
 	 $result['supplierphone'] = $supplier->getPhone();
 	 if ($supplier->getPaymentmethod()!=null){
-		$result['supplierpaymentmethod_id'] 	= $supplier->getPaymentmethod()->getId();
-	 	$result['supplierpaymentmethod_name'] = $supplier->getPaymentmethod()->getName();
+		$result['supplierpaymentmethod'] 	= $supplier->getPaymentmethod()->getId();
 	 }else{
-		$result['supplierpaymentmethod_id'] 	= 0; 
-	  $result['supplierpaymentmethod_name'] = '';
+		$result['supplierpaymentmethod'] 	= 0;
 	 }
+	 if ($supplier->getPaymentterms()!=null)
+	 	 $result['supplierpaymentterms'] 	= $supplier->getPaymentterms()->getId();
+	 else
+	 	 $result['supplierpaymentterms'] 	= 0;
+ 	 $result['suppliercarrier'] 	= 0;
 	 // Otros datos
 	 $result['supplieraddress'] 	= $supplier->getAddress();
 	 $result['supplierpostcode'] 	= $supplier->getPostcode();
@@ -327,10 +335,6 @@ public function getOrderInfo($id, RouterInterface $router,Request $request){
 		 	$result['suppliercountry'] 	= '';
 	 $result['suppliercity'] 	= $supplier->getPostcode();
 	 $result['suppliervat'] 	= $supplier->getVat();
-	 if ($supplier->getPaymentterms()!=null)
-	 	 $result['supplierpaymentterms'] 	= $supplier->getPaymentterms()->getName();
-	 else
-	 	 $result['supplierpaymentterms'] 	= '';
 	 $supplierordersdata=$supplierOrdersDataRepository->findOneBy(["supplier"=>$supplier]);
 	 if ($supplierordersdata!=null){
 		 $result['minorder'] 			= $supplierordersdata->getMinorder();
@@ -341,6 +345,13 @@ public function getOrderInfo($id, RouterInterface $router,Request $request){
 		 $result['freeshipping'] 	= 0;
 		 $result['estimateddelivery'] 	= 0;
 	 }
+	 // Condiciones
+	 $supplierCommentLines=$supplierCommentLinesRepository->getCommentByBuyOrder($supplier);
+	 $result['suppliercomment'] 			= $supplierCommentLines['suppliercomment'];
+	 $result['supplierbuyorder'] 			= $supplierCommentLines['supplierbuyorder'];
+	 $result['suppliershipping'] 			= $supplierCommentLines['suppliershipping'];
+	 $result['supplierpayment'] 			= $supplierCommentLines['supplierpayment'];
+	 $result['supplierspecial'] 			= $supplierCommentLines['supplierspecial'];
  }
  return new JsonResponse($result);
 }

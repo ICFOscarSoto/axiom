@@ -55,42 +55,7 @@
      "onload":""                // Código javascript para inicializar variables, refrescar tabla porque cambia un campo del formulario, ocultar columnas ...etc
    }
 #}
-{# Modal - Mostrar columnas #}
-<div id="{{spreadsheet.name}}-showcolumn-modal">
-  <div class="modal fade" tabindex="-1" id="{{spreadsheet.name}}-showcolumn-modal-form" aria-hidden="true">
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content" style="transform: matrix(1, 0, 0, 1, 0, 0); width: 300px; margin:auto;">
-          <div class="modal-header">
-            <h4 class="modal-title">{{('jspreadsheet_showcolumn')|trans}}</h4>
-          </div>
-          <div id="{{spreadsheet.name}}-showcolumn-modal-form-body" style="height: 400px; padding: 0px 10px; max-height: 400px;"></div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">{{('Cancel')|trans}}</button>
-            <button type="button" class="btn btn-primary">{{('Accept')|trans}}</button>
-          </div>
-      </div>
-    </div>
-  </div>
-</div>
-{# Modal - Nueva pestaña #}
-<div id="{{spreadsheet.name}}-newtab-modal">
-  <div class="modal fade" tabindex="-1" id="{{spreadsheet.name}}-newtab-modal-form" aria-hidden="true">
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content" style="transform: matrix(1, 0, 0, 1, 0, 0); width: 400px; margin:auto;">
-          <form id="{{spreadsheet.name}}-newtab-form">
-            <div class="modal-header">
-              <h4 class="modal-title">{{('jspreadsheet_newtab')|trans}}</h4>
-            </div>
-            <div id="{{spreadsheet.name}}-newtab-modal-form-body" style="height: 400px; padding: 0px 10px; max-height: 400px;"></div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">{{('Cancel')|trans}}</button>
-              <button type="submit" class="btn btn-primary">{{('Accept')|trans}}</button>
-            </div>
-          </form>
-      </div>
-    </div>
-  </div>
-</div>
+
 {# Div - Tabla Jexcel #}
 <div id="{{spreadsheet.name}}"></div>
 
@@ -231,7 +196,7 @@ function js{{spreadsheet.name}}_create(data){
                         // Si es numérico y se ha indicado un número de decimales
                         var column = sheet.options.columns[sheet.getColumnKey(key)];
                         if (typeof(column.type) != 'undefined' && column.type!=null && (column.type.toLowerCase() =='numeric' || column.type.toLowerCase() =='number') &&
-                            typeof(column.decimal) != 'undefined' && column.decimal!=null && column.decimal!='' && !isNaN(valueq) && !isNaN(parseFloat(valueq)) && Number.parseFloat(valueq)!=0){
+                            typeof(column.decimal) != 'undefined' && column.decimal!=null && column.decimal!='' && !isNaN(valueq) && !isNaN(parseFloat(valueq))){
                               valueq = Number.parseFloat(valueq).toFixed(column.decimal);
                             }
                         sheet.setValueFromKey(key, y, valueq, true);
@@ -559,7 +524,8 @@ function js{{spreadsheet.name}}_create(data){
         thereIsAConflictWithAnotherMergedCell: 'Hay un conflicto con otra celda combinada',
         invalidMergeProperties: 'Propiedades combinadas no válidas',
         cellAlreadyMerged: 'Celda ya fusionada',
-        noCellsSelected: 'Ninguna celda seleccionada'
+        noCellsSelected: 'Ninguna celda seleccionada',
+        loadmasive: 'Carga masiva'
       }
     });
    };
@@ -683,7 +649,7 @@ function js{{spreadsheet.name}}_create(data){
                       // Si es numérico y se ha indicado un número de decimales
                       var column = sheet.options.columns[sheet.getColumnKey(key)];
                       if (typeof(column.type) != 'undefined' && column.type!=null && (column.type.toLowerCase() =='numeric' || column.type.toLowerCase() =='number') &&
-                          typeof(column.decimal) != 'undefined' && column.decimal!=null && column.decimal!='' && !isNaN(valueq) && !isNaN(parseFloat(valueq)) && Number.parseFloat(valueq)!=0){
+                          typeof(column.decimal) != 'undefined' && column.decimal!=null && column.decimal!='' && !isNaN(valueq) && !isNaN(parseFloat(valueq))){
                             valueq = Number.parseFloat(valueq).toFixed(column.decimal);
                       }
                       sheet.setValueFromKey(key, y, valueq, true);
@@ -797,7 +763,7 @@ function js{{spreadsheet.name}}_create(data){
           }
         }
       }
-      
+
       // Una vez creado para ocultar filas...etc
       {% if spreadsheet.onload is defined %}
       $( document ).ready(function() {
@@ -845,7 +811,8 @@ function js{{spreadsheet.name}}_create(data){
       thereIsAConflictWithAnotherMergedCell: 'Hay un conflicto con otra celda combinada',
       invalidMergeProperties: 'Propiedades combinadas no válidas',
       cellAlreadyMerged: 'Celda ya fusionada',
-      noCellsSelected: 'Ninguna celda seleccionada'
+      noCellsSelected: 'Ninguna celda seleccionada',
+      loadmasive: 'Carga masiva'
     }
   });
   {% endif %}
@@ -853,7 +820,71 @@ function js{{spreadsheet.name}}_create(data){
 window['js{{spreadsheet.name}}_prototipe']  = JSON.parse(JSON.stringify({{spreadsheet.prototipe|raw}}));
 var js{{spreadsheet.name}}_data             = JSON.parse(JSON.stringify({{spreadsheet.data|raw}}));
 js{{spreadsheet.name}}_create(js{{spreadsheet.name}}_data);
+</script>
 
+{# Modal - Mostrar columnas #}
+<div id="{{spreadsheet.name}}-showcolumn-modal">
+  <div class="modal fade" tabindex="-1" id="{{spreadsheet.name}}-showcolumn-modal-form" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content" style="transform: matrix(1, 0, 0, 1, 0, 0); width: 300px; margin:auto;">
+          <div class="modal-header">
+            <h4 class="modal-title">{{('jspreadsheet_showcolumn')|trans}}</h4>
+          </div>
+          <div id="{{spreadsheet.name}}-showcolumn-modal-form-body" style="height: 400px; padding: 0px 10px; max-height: 400px;"></div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">{{('Cancel')|trans}}</button>
+            <button type="button" class="btn btn-primary">{{('Accept')|trans}}</button>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+{# Modal - Nueva pestaña #}
+<div id="{{spreadsheet.name}}-newtab-modal">
+  <div class="modal fade" tabindex="-1" id="{{spreadsheet.name}}-newtab-modal-form" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content" style="transform: matrix(1, 0, 0, 1, 0, 0); width: 400px; margin:auto;">
+          <form id="{{spreadsheet.name}}-newtab-form">
+            <div class="modal-header">
+              <h4 class="modal-title">{{('jspreadsheet_newtab')|trans}}</h4>
+            </div>
+            <div id="{{spreadsheet.name}}-newtab-modal-form-body" style="height: 400px; padding: 0px 10px; max-height: 400px;"></div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">{{('Cancel')|trans}}</button>
+              <button type="submit" class="btn btn-primary">{{('Accept')|trans}}</button>
+            </div>
+          </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% if 'loadmasive' in spreadsheet.options %}
+{# Modal - Carga masiva #}
+<div id="{{spreadsheet.name}}-loadmasive-modal">
+  <div class="modal fade" tabindex="-1" id="{{spreadsheet.name}}-loadmasive-modal-form" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content" style="transform: matrix(1, 0, 0, 1, 0, 0); display:inline-block;">
+          <form id="{{spreadsheet.name}}-loadmasive-form">
+            <div class="modal-header">
+              <h4 class="modal-title">{{('jspreadsheet_loadmasive')|trans}}</h4>
+            </div>
+            <div id="{{spreadsheet.name}}-loadmasive-modal-form-body" style="overflow-y: auto; height: 550px; padding: 0px 10px; max-height: 550px;">
+              <div id="jsexcel-{{spreadsheet.name}}cm">
+                {% set spreadsheet = _context['spreadsheet' ~ spreadsheet.name ~ 'cm'] %}
+                {{ include('@Globale/form_jspreadsheet_html.twig') }}
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">{{('Cancel')|trans}}</button>
+              <button type="submit" class="btn btn-primary" id="{{spreadsheet.name}}-loadmasive-modal-form-body-accept">{{('Accept')|trans}}</button>
+            </div>
+          </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+<script>
 $(document).ready(function(){
   /* Muestra ventana de añadir columnas */
   $("#{{spreadsheet.name}}-showcolumn-modal-form").on('show.bs.modal', function(){

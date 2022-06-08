@@ -150,6 +150,9 @@
 			<div class="col-md-2">
 			{{ form_row(formConstructor.form['code']) }}
 			</div>
+			<div class="col-md-2">
+			{{ form_row(formConstructor.form['theircode']) }}
+			</div>
 			<div class="col-md-4">
 			{{ form_row(formConstructor.form['socialname']) }}
 			</div>
@@ -198,6 +201,23 @@
 			<div class="col-md-2">
 			{{ form_row(formConstructor.form['postcode']) }}
 			</div>
+		</div>
+	</div>
+</div>
+<div class="panel minimal">
+	<div class="panel-heading">
+		<div class="panel-title">Credenciales</div>
+	</div>
+	<div class="panel-body">
+		<div class="row">
+		<div class="col-md-6">
+		{{ form_row(formConstructor.form['credentialsurl']) }}
+		</div>
+		<div class="col-md-3">
+		{{ form_row(formConstructor.form['credentialsuser']) }}
+		</div>
+		<div class="col-md-3">
+		{{ form_row(formConstructor.form['credentialspassword']) }}
 		</div>
 	</div>
 </div>

@@ -5998,6 +5998,8 @@ if (! jSuites && typeof(require) === 'function') {
             columnso: [],
             // Columns tab new
             columnsn: [],
+            // Allow load masive data
+            loadmasive:false,
             // ICF ---
             // External data
             url:null,
@@ -6198,6 +6200,7 @@ if (! jSuites && typeof(require) === 'function') {
                 invalidMergeProperties: 'Invalid merged properties',
                 cellAlreadyMerged: 'Cell already merged',
                 noCellsSelected: 'No cells selected',
+                loadmasive: 'Load masive',
             },
             // About message
             about: true,
@@ -6968,6 +6971,32 @@ if (! jSuites && typeof(require) === 'function') {
             if (! obj.options.pagination) {
                 obj.pagination.style.display = 'none';
             }
+
+            //ICF
+            if (obj.options.loadmasive == true) {
+                // Load masive data
+                var loadContainer = document.createElement('div');
+                loadContainer.classList.add('jexcel_load_masive');
+                loadContainer.title = obj.options.text.loadmasive;
+                loadContainer.onclick = function() {
+                    $('#'+obj.options.name+'-loadmasive-modal-form').modal('show');
+                }
+                var loadIcon = document.createElement('i');
+                loadIcon.classList.add('fa');
+                loadIcon.classList.add('fa-plus-square-o');
+                loadContainer.appendChild(loadIcon);
+                loadContainer.innerHTML += '&nbsp;';
+                if (obj.options.search == true) {
+                  //filter.insertBefore(loadContainer, filter.firstChild);
+                  filter.appendChild(loadContainer);
+                }else{
+                  filter = document.createElement('div');
+                  filter.classList.add('jexcel_filter');
+                  filter.appendChild(loadContainer);
+                  el.appendChild(filter);
+                }
+            }
+            //ICF
 
             // Append containers to the table
             if (obj.options.search == true) {

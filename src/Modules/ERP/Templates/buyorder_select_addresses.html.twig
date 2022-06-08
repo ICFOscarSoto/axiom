@@ -5,32 +5,13 @@
         <div class="modal-header">
           <h4 class="modal-title">Direcciones del cliente</h4>
         </div>
-        <div id="addresses-body" style="height: 200px; padding: 0px 0px 0px 15px;">
+        <div id="addresses-body" style="height: 200px; padding: 0px 0px 0px 15px; overflow-y: scroll;">
         </div>
     </div>
   </div>
 </div>
 
 <script>
-{# Obtienen  los contactos del cliente seleccionado #}
-function setContactsCustomer(id){
-  if((++load_wait)==1) $("#load-spinner").fadeIn();
-  $.ajax({
-     type: "GET",
-     dataType: "json",
-     url: "/api/global/contactscustomer/"+id
-  }).done(function(elements, textStatus, jqXHR) {
-     if((--load_wait)==0) $("#load-spinner").fadeOut();     
-      if (elements!=null){
-        $("#destination-form-contact-id").html('');
-        elements.forEach( function(valor, indice, array){
-          $("#destination-form-contact-id").append('<option value="'+valor.id+'">'+valor.text+'</option>');
-        });
-      }
-  });
-  $("#destination-form-contact-id").val('');
-  $("#destination-form-contact-id").trigger('change');
-}
 
 $(document).ready(function() {
   $('body').on('click', "[id^='address-form-buttonadd-']", function(e) {
@@ -40,6 +21,7 @@ $(document).ready(function() {
       // El cliente seleccionado se pone como realmente seleccionado una vez seleccionada su dirección
       $("#customer-form-id-tmp").val('');
       $("#customer-form-id").val(customer_id);
+      $("#customer-form-id").trigger('change');
       $("#customer-form-code").val($("#"+customer_form_id+"-code-"+customer_id).text());
       $("#customer-form-name").val($("#"+customer_form_id+"-name-"+customer_id).text());
       $("#customer-form-codename").val("("+$("#"+customer_form_id+"-code-"+customer_id).text()+") "+$("#"+customer_form_id+"-name-"+customer_id).text());
@@ -56,10 +38,8 @@ $(document).ready(function() {
       $("#destination-form-phone").val($("#address-form-phone-"+customer_address_id).val());
       $("#destination-form-email").val($("#address-form-email-"+customer_address_id).val());
 
-      setContactsCustomer(customer_id);
-
       $("#select-addresses-modal-form").modal('toggle');
-      $("#customer-search-modal-form").modal('toggle');
+      $("#customer-search-modal-form").modal('hide');
     });
 });
 </script>

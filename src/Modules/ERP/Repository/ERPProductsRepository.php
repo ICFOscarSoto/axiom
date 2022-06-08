@@ -225,9 +225,44 @@ class ERPProductsRepository extends ServiceEntityRepository
     }
 
     /*
+    * Obtiene los productos de un proveedor
+    */
+    public function getProductsBySupplierMasive($supplier_id){
+      $query="SELECT distinct(concat(p.id,'-',if (vv.id is null,0,vv.id))) as ids,
+                     p.id as id,
+                     if (vv.id is null,0,vv.id) as variantid,
+                     c.path_name as category,
+                     p.code as productcode,
+                     p.name as productname,
+                     if (vv.id is null,'Sin variante',concat(v.name, ' - ',vv.name)) as variantname,
+                     0 as quantity,
+                     if (p.purchasepacking is null, 1, if (p.purchasepacking='', 1, p.purchasepacking)) as 'packing',
+                     if (p.multiplicity is null, 1, if (p.multiplicity='', 1, p.multiplicity)) as 'multiplicity',
+                     if (p.minimumquantityofbuy is null, 1, if (p.minimumquantityofbuy='', 1, p.minimumquantityofbuy)) as 'minimumquantityofbuy',
+                     if (p.purchaseunit is null, 1, if (p.purchaseunit='',1, p.purchaseunit)) as 'purchaseunit'
+              FROM erpshopping_prices sp LEFT JOIN
+                   erpproducts p on p.id=sp.product_id LEFT JOIN
+                   erpcategories c on c.id=p.category_id LEFT JOIN
+                   erpproducts_variants pv on pv.product_id=p.id LEFT JOIN
+                   erpvariants_values vv on pv.variantvalue_id=vv.id LEFT JOIN
+                   erpvariants v on vv.variantname_id=v.id
+              WHERE sp.supplier_id=:supplier_id and
+                    p.active=1 and p.deleted=0 and
+                    sp.active=1 and sp.deleted=0 and
+                    (sp.start is null or sp.start>=now()) and
+                    (sp.end is null or sp.end<=now()) and
+                    p.code is not null and p.code <> ''
+              GROUP BY id, variantid
+              ORDER BY category ASC, productname ASC, variantname ASC";
+      $params=["supplier_id" => $supplier_id];
+      $result = $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+      return $result;
+    }
+
+    /*
     * Obtiene los productos de un proveedor acotado por la busqueda solicitada
     */
-    public function getProductsBySupplier($supplier, $q){
+    public function getProductsBySupplier($supplier_id, $q){
       $result = null;
       if ($q!=null && $q!=''){
         $q = urldecode($q);
@@ -252,7 +287,7 @@ class ERPProductsRepository extends ServiceEntityRepository
                        p.name as title
                 FROM erpshopping_prices sp LEFT JOIN
                      erpproducts p on p.id=sp.product_id
-                WHERE sp.supplier_id=:supplier and
+                WHERE sp.supplier_id=:supplier_id and
                       p.active=1 and p.deleted=0 and
                       sp.active=1 and sp.deleted=0 and
                       (sp.start is null or sp.start>=now()) and
@@ -261,7 +296,7 @@ class ERPProductsRepository extends ServiceEntityRepository
                 UNION
                 SELECT '0~Artículo...' as id, 'Artículo...' as name, '' as title FROM erpproducts
                 ORDER BY title ASC";
-        $params=["supplier" => $supplier];
+        $params=["supplier_id" => $supplier_id];
         $result = $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
       }
       return $result;
@@ -286,10 +321,10 @@ class ERPProductsRepository extends ServiceEntityRepository
                        if (sd.discount is null, 0, if (sd.discount='', 0, sd.discount)) as 'discountequivalent',
                        if (t.tax is null, 0, if (t.tax='', 0, t.tax)) as 'taxperc',
                        if (p.weight is null, 0, if (p.weight='', 0, p.weight)) as 'weight',
-                       if (p.purchasepacking is null, 0, if (p.purchasepacking='', 0, p.purchasepacking)) as 'packing',
-                       if (p.multiplicity is null, 0, if (p.multiplicity='', 0, p.multiplicity)) as 'multiplicity',
-                       if (p.minimumquantityofbuy is null, 0, if (p.minimumquantityofbuy='', 0, p.minimumquantityofbuy)) as 'minimumquantityofbuy',
-                       if (p.purchaseunit is null, 0, if (p.purchaseunit='', 0, p.purchaseunit)) as 'purchaseunit',
+                       if (p.purchasepacking is null, 1, if (p.purchasepacking='', 1, p.purchasepacking)) as 'packing',
+                       if (p.multiplicity is null, 1, if (p.multiplicity='', 1, p.multiplicity)) as 'multiplicity',
+                       if (p.minimumquantityofbuy is null, 1, if (p.minimumquantityofbuy='', 1, p.minimumquantityofbuy)) as 'minimumquantityofbuy',
+                       if (p.purchaseunit is null, 1, if (p.purchaseunit='',1, p.purchaseunit)) as 'purchaseunit',
                        if (m.name is null, '', m.name) as 'purchasemeasure'
                 FROM erpshopping_prices sp LEFT JOIN
                      erpproducts p on p.id=sp.product_id LEFT JOIN
@@ -311,7 +346,7 @@ class ERPProductsRepository extends ServiceEntityRepository
         $params=["supplier" => $supplier, "product" => $product, "quantity"=>$quantity];
         $result = $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
       }
-      if ($result == null || count($result)==0)
+      if ($result == null || count($result)==0){
         $result =
         [[
             "product_id" => "0~Artículo...",
@@ -337,8 +372,79 @@ class ERPProductsRepository extends ServiceEntityRepository
             "stockt" => "0",
             "stockpedingreceivet" => "0",
             "stockpedingservet" => "0",
-            "stockvirtualt" => "0"
+            "stockvirtualt" => "0",
+            "quantitycomment" => ""
         ]];
+      }else{
+          // Cálculo de mínimo de cantidad max(minimumquantityofbuy,multiplicity,packing,purchaseunit) > quantity sino quantity
+          $quantity             = intval($quantity);
+          $minimumquantityofbuy = intval($result[0]['minimumquantityofbuy']);
+          $multiplicity         = intval($result[0]['multiplicity']);
+          $packing              = intval($result[0]['packing']);
+          $purchaseunit         = intval($result[0]['purchaseunit']);
+          $changequantity       = false;
+          $quantitycomment      = '';
+          if ($minimumquantityofbuy>$quantity){
+            $quantity = $minimumquantityofbuy;
+            $changequantity = true;
+          }
+          if ($multiplicity>$quantity){
+            $quantity = $multiplicity;
+            $changequantity = true;
+          }
+          if ($packing>$quantity){
+            $quantity = $packing;
+            $changequantity = true;
+          }
+          if ($purchaseunit>$quantity){
+            $quantity = $purchaseunit;
+            $changequantity = true;
+          }
+          if ($changequantity){
+            $result[0]['quantity'] = $quantity;
+          }
+          // Se muestra el tooltip con los mínimos de compra
+          if ($minimumquantityofbuy>1){
+            $quantitycomment .= "Mínimo de compra: $minimumquantityofbuy\n";
+            $result[0]['quantity__min'] = $minimumquantityofbuy;
+          }
+          if ($multiplicity>1){
+            $quantitycomment .= "Multiplicidad: $multiplicity\n";
+            $result[0]['quantity__multiplicity'] = $multiplicity;
+          }
+          if ($packing>1){
+            $quantitycomment .= "Packing: $packing\n";
+          }
+          if ($purchaseunit>1){
+            $quantitycomment .= "Unidad de compra: $purchaseunit\n";
+          }
+          // Dtos por Cantidad
+          $query="SELECT distinct(sd.id) as 'id',
+                         if (sd.discount is null, 0, if (sd.discount='', 0, sd.discount)) as 'discountequivalent',
+                         if (sd.quantity is null, 1, if (sd.quantity='', 1, sd.quantity)) as 'quantity'
+                  FROM erpshopping_prices sp LEFT JOIN
+                       erpproducts p on p.id=sp.product_id LEFT JOIN
+                       erpshopping_discounts sd on sd.supplier_id=sp.supplier_id and sd.category_id=p.category_id and sd.quantity>1 and
+                        sd.active=1 and sd.deleted=0 and
+                        (sd.start is null or sd.start<=now()) and
+                         (sd.end is null or sd.end>=now())
+                  WHERE sp.supplier_id=:supplier and
+                        p.id=:product and
+                        p.active=1 and p.deleted=0 and
+                        sp.active=1 and sp.deleted=0 and
+                        (sp.start is null or sp.start<=now()) and
+                        (sp.end is null or sp.end>=now())
+                  ORDER BY p.name ASC, sp.quantity DESC, sd.quantity DESC";
+          $params=["supplier" => $supplier, "product" => $product];
+          $resultdto = $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+          if ($resultdto!=null && count($resultdto)>0){
+            $quantitycomment .= "Dtos por cantidad:\n";
+            for($i=0; $i<count($resultdto); $i++){
+              $quantitycomment .= ">= ".$resultdto[$i]['quantity']." -> Dto equivalente: ".$resultdto[$i]['discountequivalent']."%\n";
+            }
+          }
+          $result[0]['quantity__comment'] = $quantitycomment;
+      }
       return $result;
     }
 

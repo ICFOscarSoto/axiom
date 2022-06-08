@@ -13,6 +13,16 @@
         "caption": "comment"
     },
     {
+        "name": "start",
+        "caption": "start",
+        "type": "date"
+    },
+    {
+        "name": "end",
+        "caption": "end",
+        "type": "date"
+    },
+    {
         "name": "active",
         "caption": "Estado",
         "width": "10%",

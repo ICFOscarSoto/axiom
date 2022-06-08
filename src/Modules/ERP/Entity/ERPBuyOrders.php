@@ -9,12 +9,13 @@ use \App\Modules\ERP\Entity\ERPSuppliers;
 use \App\Modules\ERP\Entity\ERPPaymentMethods;
 use \App\Modules\ERP\Entity\ERPStores;
 use \App\Modules\ERP\Entity\ERPBuyOrdersStates;
+use \App\Modules\ERP\Entity\ERPPaymentTerms;
+use \App\Modules\ERP\Entity\ERPCarriers;
 use \App\Modules\Globale\Entity\GlobaleStates;
 use \App\Modules\Globale\Entity\GlobaleCountries;
 use \App\Modules\ERP\Entity\ERPCustomers;
 use \App\Modules\ERP\Entity\ERPAddresses;
 use \App\Modules\ERP\Entity\ERPBuyOffert;
-use \App\Modules\ERP\Entity\ERPContacts;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPBuyOrdersRepository")
@@ -89,9 +90,15 @@ class ERPBuyOrders
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPPaymentMethods")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=true)
      */
     private $paymentmethod;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPPaymentTerms")
+     * @ORM\JoinColumn(nullable=true)
+     */
+    private $paymentterms;
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
@@ -148,6 +155,12 @@ class ERPBuyOrders
      * @ORM\Column(type="smallint", nullable=true)
      */
     private $shippingcharge;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPCarriers")
+     * @ORM\JoinColumn(nullable=true)
+     */
+    private $carrier;
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPBuyOrdersStates")
@@ -207,30 +220,9 @@ class ERPBuyOrders
     private $destinationname;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPContacts")
-     */
-    private $destinationcontact;
-
-    /**
-     * @ORM\Column(type="string", length=100)
-     */
-    private $destinationcontactname;
-
-
-    /**
-     * @ORM\Column(type="string", length=180)
-     */
-    private $destinationcontactemail;
-
-    /**
-     * @ORM\Column(type="string", length=32)
-     */
-    private $destinationcontactphone;
-
-    /**
      * @ORM\Column(type="smallint", nullable=true)
      */
-    private $typeofconfirmation;
+    private $orderchannel;
 
     /**
      * @ORM\Column(type="string", length=150)
@@ -261,31 +253,6 @@ class ERPBuyOrders
      * @ORM\Column(type="string", length=16)
      */
     private $suppliervat;
-
-    /**
-     * @ORM\Column(type="string", length=150)
-     */
-    private $supplierpaymentterms;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPContacts")
-     */
-    private $suppliercontact;
-
-    /**
-     * @ORM\Column(type="string", length=100)
-     */
-    private $suppliercontactname;
-
-    /**
-     * @ORM\Column(type="string", length=180)
-     */
-    private $suppliercontactemail;
-
-    /**
-     * @ORM\Column(type="string", length=32)
-     */
-    private $suppliercontactphone;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
@@ -347,6 +314,30 @@ class ERPBuyOrders
      */
     private $total;
 
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $suppliercomment;
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $supplierbuyorder;
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $suppliershipping;
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $supplierpayment;
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $supplierspecial;
 
     public function getId(): ?int
     {
@@ -497,6 +488,18 @@ class ERPBuyOrders
         return $this;
     }
 
+    public function getPaymentterms(): ?ERPPaymentTerms
+    {
+        return $this->paymentterms;
+    }
+
+    public function setPaymentterms(?ERPPaymentTerms $paymentterms): self
+    {
+        $this->paymentterms = $paymentterms;
+
+        return $this;
+    }
+
     public function getPriority(): ?bool
     {
         return $this->priority;
@@ -625,6 +628,18 @@ class ERPBuyOrders
     public function setShippingcharge(?int $shippingcharge): self
     {
         $this->shippingcharge = $shippingcharge;
+
+        return $this;
+    }
+
+    public function getCarrier(): ?ERPCarriers
+    {
+        return $this->carrier;
+    }
+
+    public function setCarrier(?ERPCarriers $carrier): self
+    {
+        $this->carrier = $carrier;
 
         return $this;
     }
@@ -773,14 +788,14 @@ class ERPBuyOrders
         return $this;
     }
 
-    public function getTypeofconfirmation(): ?int
+    public function getOrderchannel(): ?int
     {
-        return $this->typeofconfirmation;
+        return $this->orderchannel;
     }
 
-    public function setTypeofconfirmation(?int $typeofconfirmation): self
+    public function setOrderchannel(?int $orderchannel): self
     {
-        $this->typeofconfirmation = $typeofconfirmation;
+        $this->orderchannel = $orderchannel;
 
         return $this;
     }
@@ -841,30 +856,6 @@ class ERPBuyOrders
     public function setSuppliervat(string $suppliervat): self
     {
         $this->suppliervat = $suppliervat;
-
-        return $this;
-    }
-
-    public function getSupplierpaymentterms(): ?string
-    {
-        return $this->supplierpaymentterms;
-    }
-
-    public function setSupplierpaymentterms(string $supplierpaymentterms): self
-    {
-        $this->supplierpaymentterms = $supplierpaymentterms;
-
-        return $this;
-    }
-
-    public function getSuppliercontact(): ?ERPContacts
-    {
-        return $this->suppliercontact;
-    }
-
-    public function setSuppliercontact(?ERPContacts $suppliercontact): self
-    {
-        $this->suppliercontact = $suppliercontact;
 
         return $this;
     }
@@ -979,18 +970,6 @@ class ERPBuyOrders
         return $this;
     }
 
-    public function getDestinationcontact(): ?ERPContacts
-    {
-        return $this->destinationcontact;
-    }
-
-    public function setDestinationcontact(?ERPContacts $destinationcontact): self
-    {
-        $this->destinationcontact = $destinationcontact;
-
-        return $this;
-    }
-
     public function getObservationpriority(): ?string
     {
         return $this->observationpriority;
@@ -1027,74 +1006,62 @@ class ERPBuyOrders
         return $this;
     }
 
-    public function getSuppliercontactname(): ?string
+    public function getSuppliercomment(): ?string
     {
-        return $this->suppliercontactname;
+        return $this->suppliercomment;
     }
 
-    public function setSuppliercontactname(string $suppliercontactname): self
+    public function setSuppliercomment(?string $suppliercomment): self
     {
-        $this->suppliercontactname = $suppliercontactname;
+        $this->suppliercomment = $suppliercomment;
 
         return $this;
     }
 
-    public function getSuppliercontactemail(): ?string
+    public function getSupplierbuyorder(): ?string
     {
-        return $this->suppliercontactemail;
+        return $this->supplierbuyorder;
     }
 
-    public function setSuppliercontactemail(string $suppliercontactemail): self
+    public function setSupplierbuyorder(?string $supplierbuyorder): self
     {
-        $this->suppliercontactemail = $suppliercontactemail;
+        $this->supplierbuyorder = $supplierbuyorder;
 
         return $this;
     }
 
-    public function getSuppliercontactphone(): ?string
+    public function getSuppliershipping(): ?string
     {
-        return $this->suppliercontactphone;
+        return $this->suppliershipping;
     }
 
-    public function setSuppliercontactphone(string $suppliercontactphone): self
+    public function setSuppliershipping(?string $suppliershipping): self
     {
-        $this->suppliercontactphone = $suppliercontactphone;
+        $this->suppliershipping = $suppliershipping;
 
         return $this;
     }
 
-    public function getDestinationcontactname(): ?string
+    public function getSupplierpayment(): ?string
     {
-        return $this->destinationcontactname;
+        return $this->supplierpayment;
     }
 
-    public function setDestinationcontactname(string $destinationcontactname): self
+    public function setSupplierpayment(?string $supplierpayment): self
     {
-        $this->destinationcontactname = $destinationcontactname;
+        $this->supplierpayment = $supplierpayment;
 
         return $this;
     }
 
-    public function getDestinationcontactemail(): ?string
+    public function getSupplierspecial(): ?string
     {
-        return $this->destinationcontactemail;
+        return $this->supplierspecial;
     }
 
-    public function setDestinationcontactemail(string $destinationcontactemail): self
+    public function setSupplierspecial(?string $supplierspecial): self
     {
-        $this->destinationcontactemail = $destinationcontactemail;
-
-        return $this;
-    }
-
-    public function getDestinationcontactphone(): ?string
-    {
-        return $this->destinationcontactphone;
-    }
-
-    public function setDestinationcontactphone(string $destinationcontactphone): self
-    {
-        $this->destinationcontactphone = $destinationcontactphone;
+        $this->supplierspecial = $supplierspecial;
 
         return $this;
     }

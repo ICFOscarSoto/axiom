@@ -5,11 +5,23 @@
             "fields": [
                 {
                     "name": "comment",
-                    "cols": 4
+                    "caption":"Comentario",
+                    "cols": 12,
+                    "class": "text-area-form"
+                },
+                {
+                    "name": "start",
+                    "caption":"Fecha inicio",
+                    "cols": 3
+                },
+                {
+                    "name": "end",
+                    "caption":"Fecha fin",
+                    "cols": 3
                 },
                 {
                     "name": "active",
-                    "cols": 4
+                    "cols": 3
                 }
             ]
         }

@@ -46,7 +46,6 @@ function productSearch(id, val, fields, searchFields){
             {
               jQuery.each( data.data.locations, function( i, val ) {
                 $("#product-form-location-"+id).append(new Option(val.name, val.id));
-                console.log(val.name);
               });
             }
 

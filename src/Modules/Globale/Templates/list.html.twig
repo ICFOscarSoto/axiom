@@ -325,21 +325,28 @@ var url = new URL(window.location.href);
 												{# if field is datetime convert it to spanish date format #}
 												{% if field.type is defined %}
 													{% if field.type == "datetime" %}
+
 														if(text!=null && text!=""){
 															var date=moment(text, "YYYY-MM-DD HH:mm:ss");
 															text=date.format('DD/MM/YYYY HH:mm:ss');
+														}else {
+															text = "";
 														}
 													{% else %}
 														{% if field.type == "date" %}
-															if(text!=null){
+															if(text!=null && text!=""){
 																var date=moment(text, "YYYY-MM-DD");
 																text=date.format('DD/MM/YYYY');
+															}else {
+																text = "";
 															}
 															{% else %}
 																{% if field.type == "dateshort" %}
-																	if(text!=null){
+																	if(text!=null && text!=""){
 																		var date=moment(text+'/1970', "DD/MM/YYYY");
 																		text=date.format('DD/MM');
+																	}else {
+																		text = "";
 																	}
 																{% endif %}
 														{% endif %}

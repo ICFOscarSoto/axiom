@@ -13,6 +13,7 @@
 				{ "name": "email","cols": 4},
 				{ "name": "position","cols": 4},
 				{ "name": "department","cols": 4},
+				{ "name": "additional","cols": 5},
 				{ "name": "active","cols": 2}
 			]
 		}]

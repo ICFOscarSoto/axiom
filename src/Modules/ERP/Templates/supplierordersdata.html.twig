@@ -57,6 +57,33 @@
 		  </div>
 		</div>
 		<div class="row">
+		  <div class="col-md-12">
+		    <div class="panel-title-list">Comentarios de portes</div>
+		    {% if suppliercommentsshippingslist is defined %}
+		    {% set listConstructor = suppliercommentsshippingslist %}
+		    {{ include('@Globale/list.html.twig') }}
+		    {% endif %}
+		  </div>
+		</div>
+		<div class="row">
+		  <div class="col-md-12">
+		    <div class="panel-title-list">Métodos de pago</div>
+		    {% if suppliercommentspaymentslist is defined %}
+		    {% set listConstructor = suppliercommentspaymentslist %}
+		    {{ include('@Globale/list.html.twig') }}
+		    {% endif %}
+		  </div>
+		</div>
+		<div class="row">
+		  <div class="col-md-12">
+		    <div class="panel-title-list">Condiciones especiales</div>
+		    {% if suppliercommentsspecialslist is defined %}
+		    {% set listConstructor = suppliercommentsspecialslist %}
+		    {{ include('@Globale/list.html.twig') }}
+		    {% endif %}
+		  </div>
+		</div>
+		<div class="row">
 			<div class="col-md-12">
 				<div class="panel-title-list">Comentarios de rappel</div>
 				{% if supplierrappelcommentssordersdatalist is defined %}

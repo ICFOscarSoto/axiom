@@ -31,7 +31,7 @@ class ERPBuyOrdersReports
     return sprintf("%02d", $hours).":".sprintf("%02d", $minutes).":".sprintf("%02d", $seconds);
   }
 
-  function create($params,  $file=null){
+  function create($params, $dest='I', $file=null){
     setlocale( LC_NUMERIC, 'es_ES' );
     $this->pdf  = new GlobaleReports();
     $this->pdf->AliasNbPages();
@@ -40,6 +40,8 @@ class ERPBuyOrdersReports
     $this->user=$params["user"];
     $order=$params["order"];
     $decimals=$params["decimals"];
+    $contactssupplier=$params["contactssupplier"];
+    $contactscustomer=$params["contactscustomer"];
     if ($decimals==null || $decimals=='')
       $decimals = 2;
     //$numOffer=$order->getTheiroffer()!=null?$order->getTheiroffer():$order->getOuroffer()!=null?$order->getOuroffer():' ';
@@ -55,16 +57,19 @@ class ERPBuyOrdersReports
     $shipment=$order->getFreeshipping()==1?' Portes pagado':' Portes debidos';
     $direct=$order->getStore()->getId()==6?'Envío directo. Albarán sin valorar.':'';
     $infoRight=[ ["Condiciones",$direct.$shipment],
-                ["Direccion",($order->getDestinationname().' - '.$order->getDestinationaddress().' - '.$order->getDestinationcity().' - '.$order->getDestinationpostcode().' - '.$order->getDestinationstate()->getName())],
-                ["Contacto", ($order->getDestinationcontact().' - '.$order->getDestinationphone())]
+                ["Direccion",($order->getDestinationname().' - '.$order->getDestinationaddress().' - '.$order->getDestinationcity().' - '.$order->getDestinationpostcode().' - '.$order->getDestinationstate()->getName())]
               ];
+    if ($contactscustomer!=null){
+      for($i=0; $i<count($contactscustomer);$i++){
+        array_push($infoRight, ["Contacto", ($contactscustomer[$i]->getName().' - '.$contactscustomer[$i]->getPhone())]);
+      }
+    }
     $infoCenter=[["Proveedor",($order->getSuppliercode().' - '.$order->getSuppliername())],
-                ["Términos de pago",$order->getSupplierpaymentterms()],
-                ["Mail",($order->getSuppliercontactemail()!=null && $order->getSuppliercontactemail()!=''?$order->getSuppliercontactemail():$order->getEmail())],
-                ["Telefono",($order->getSuppliercontactphone()!=null && $order->getSuppliercontactphone()!=''?str_replace(' ','',$order->getSuppliercontactphone()):str_replace(' ','',$order->getPhone()))],
-                ["Contacto",($order->getSuppliercontactName()!=null?$order->getSuppliercontactName():'')]
+                ["Términos de pago",($order->getPaymentterms()!=null?$order->getPaymentterms()->getName():'')],
+                ["Mail",($contactssupplier!=null && count($contactssupplier)>0 && $contactssupplier[0]->getEmail()!=null &&  $contactssupplier[0]->getEmail()!=''?$contactssupplier[0]->getEmail():$order->getEmail())],
+                ["Telefono",($contactssupplier!=null && count($contactssupplier)>0 && $contactssupplier[0]->getPhone()!=null &&  $contactssupplier[0]->getPhone()!=''?str_replace(' ','',$contactssupplier[0]->getPhone()):str_replace(' ','',$order->getPhone()))],
+                ["Contacto",($contactssupplier!=null && count($contactssupplier)>0 && $contactssupplier[0]->getName()!=null &&  $contactssupplier[0]->getName()!=''?$contactssupplier[0]->getName():'')]
               ];
-
 
     $lines=$params["lines"];
     $nameLeft='Pedido de compra '.$order->getCode();
@@ -149,7 +154,7 @@ class ERPBuyOrdersReports
       }
 
       $this->pdf->docFooter($order,$columnsFooter,$dataFooter);
-//dump($a);
-    return $this->pdf->Output('I', $file==null?$order->getCode().".pdf":$file);
+
+      return $this->pdf->Output($dest, $file==null?$order->getCode().".pdf":$file);
   }
 }

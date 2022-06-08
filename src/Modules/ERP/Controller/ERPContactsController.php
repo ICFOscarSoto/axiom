@@ -83,11 +83,24 @@ class ERPContactsController extends Controller
     */
     public function getContact($id){
 			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			$result = [];
+			$result[0] = [];
+			$aid = explode('~',$id);
+			if (count($aid)>1)
+				$id = $aid[0];
      	$contact = $this->getDoctrine()->getRepository($this->class)->findOneById($id);
-      if (!$contact) {
-        throw $this->createNotFoundException('No contact found for id '.$id );
+      if ($contact) {
+				$result[0]['contact_id'] 	= $contact->getId().'~'.($contact->getName()!=null?$contact->getName():'').($contact->getAdditional()!=null && $contact->getAdditional()!=''?' - ('.$contact->getAdditional().')':'');
+				$result[0]['name'] 	= ($contact->getName()!=null?$contact->getName():'');
+				$result[0]['email'] = ($contact->getEmail()!=null?$contact->getEmail():'');
+				$result[0]['phone'] = ($contact->getPhone()!=null?$contact->getPhone():'');
+			}else{
+				$result[0]['contact_id'] 	= '0~Contacto...';
+        $result[0]['name'] 	= '';
+				$result[0]['email'] = '';
+				$result[0]['phone'] = '';
       }
-      return new JsonResponse($contact->encodeJson());
+      return new JsonResponse($result);
     }
 
 		/**
@@ -100,17 +113,13 @@ class ERPContactsController extends Controller
      	$ocontacts 							= $this->getDoctrine()->getRepository($this->class)->findBy(["supplier"=>$supplier,"purchaseorder"=>1,"active"=>1,"deleted"=>0],["name"=>"ASC"]);
 			$contacts=[];
 			$option=[];
-			$option["pos"]=0;
-			$option["id"]='';
-			$option["text"]="Selecciona contacto...";
+			$option["id"]='0~Contacto...';
+			$option["name"]="Contacto...";
 			$contacts[]=$option;
-			$pos = 1;
 			foreach($ocontacts as $item){
-				$option["pos"]=$pos;
-				$option["id"]=$item->getId();
-				$option["text"]=$item->getName();
+				$option["id"]=$item->getId().'~'.$item->getName().($item->getAdditional()!=null && $item->getAdditional()!=''?' - ('.$item->getAdditional().')':'');
+				$option["name"]=$item->getName().($item->getAdditional()!=null && $item->getAdditional()!=''?' - ('.$item->getAdditional().')':'');
 				$contacts[]=$option;
-				$pos++;
 			}
       return new JsonResponse($contacts);
     }
@@ -125,17 +134,13 @@ class ERPContactsController extends Controller
      	$ocontacts 							= $this->getDoctrine()->getRepository($this->class)->findBy(["customer"=>$customer,"saleorder"=>1,"active"=>1,"deleted"=>0],["name"=>"ASC"]);
 			$contacts=[];
 			$option=[];
-			$option["pos"]=0;
-			$option["id"]='';
-			$option["text"]="Selecciona contacto...";
+			$option["id"]='0~Contacto...';
+			$option["name"]="Contacto...";
 			$contacts[]=$option;
-			$pos = 1;
 			foreach($ocontacts as $item){
-				$option["pos"]=$pos;
-				$option["id"]=$item->getId();
-				$option["text"]=$item->getName();
+				$option["id"]=$item->getId().'~'.$item->getName().($item->getAdditional()!=null && $item->getAdditional()!=''?' - ('.$item->getAdditional().')':'');
+				$option["name"]=$item->getName().($item->getAdditional()!=null && $item->getAdditional()!=''?' - ('.$item->getAdditional().')':'');
 				$contacts[]=$option;
-				$pos++;
 			}
       return new JsonResponse($contacts);
     }

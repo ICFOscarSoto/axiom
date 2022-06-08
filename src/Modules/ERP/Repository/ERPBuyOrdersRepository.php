@@ -5,6 +5,7 @@ namespace App\Modules\ERP\Repository;
 use App\Modules\ERP\Entity\ERPBuyOrders;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
+use App\Modules\ERP\Entity\ERPSupplierCommentLines;
 
 /**
  * @method ERPBuyOrders|null find($id, $lockMode = null, $lockVersion = null)
@@ -62,5 +63,19 @@ class ERPBuyOrdersRepository extends ServiceEntityRepository
         $id = 0;
       $id++;
       return date('y').'PC'.str_pad($id,5,'0',STR_PAD_LEFT);
+    }
+
+    // Actualiza los comentarios del proveedor del pedido si sigue en estado abierto
+    public function saveComments($buyorder_id, $comments){
+      $query="update erpbuy_orders set
+                suppliercomment='".$comments['suppliercomment']."',
+                supplierbuyorder='".$comments['supplierbuyorder']."',
+                suppliershipping='".$comments['suppliershipping']."',
+                supplierpayment='".$comments['supplierpayment']."',
+                supplierspecial='".$comments['supplierspecial']."'
+              where id=$buyorder_id";
+      $this->getEntityManager()->getConnection()->executeQuery($query);
+
+      return true;
     }
 }

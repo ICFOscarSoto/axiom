@@ -1,0 +1,9 @@
+[
+  {"id" : "addTopSupplierCommentLinesShippings", "type" : "btn-primary", "icon" : "fa fa-plus",
+    "name" : "", "route":"dataSupplierCommentLinesShippings",
+    "routeParams":{"idparent":"parent","type_comment":"4"},
+    "modal":"SupplierCommentLinesShippings", "actionType" : "background", "confirm" :false, "tooltip" : ""},
+  {"id" : "deleteTopSupplierCommentLinesShippings", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true, "tooltip":""},
+  {"id" : "printTopSupplierCommentLinesShippings", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false, "tooltip":""},
+  {"id" : "exportTopSupplierCommentLinesShippings", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"genericexport", "routeParams":{"module":"ERP", "name":"SupplierCommentLines"}, "confirm" :false, "tooltip":""}
+]

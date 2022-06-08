@@ -1315,6 +1315,21 @@ class ERPProductsController extends Controller
 	 }
 
 	 /**
+	 * @Route("/api/getWSProductSupplierMasive/{supplier_id}", name="getWSProductSupplierMasive", defaults={"supplier_id"=0})
+	 */
+	 public function getWSProductSupplierMasive($supplier_id)
+	 {
+		  $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			$productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
+			$result = [];
+			if ($supplier_id!= null){
+				$products = $productRepository->getProductsBySupplierMasive($supplier_id);
+				if ($products!=null)
+        	$result = $products;
+			}
+			return new JsonResponse($result);
+	 }
+	 /**
 	 * @Route("/api/getWSProductStock/{product_id}/{variant_id}/{store_id}", name="getWSProductStock", defaults={"product_id"=0, "variant_id"=0, "store_id"=0})
 	 */
 	 public function getWSProductStock($product_id, $variant_id, $store_id)

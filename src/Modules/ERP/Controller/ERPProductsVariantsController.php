@@ -174,8 +174,11 @@ class ERPProductsVariantsController extends Controller
       $result = $variants;
       if ($result['data'] != null)
         $result['data'] = array_merge($head,$result['data']);
-      else
+      else{
+        $head[0]['id'] = '0~Sin variante';
+        $head[0]['name'] = 'Sin variante';
         $result['data'] = $head;
+      }
     }
     return new JsonResponse($result);
   }

@@ -16,6 +16,18 @@
     </div>
   </div>
 </div>
+{# Error al cambiar el proveedor  #}
+<div class="modal fade" tabindex="-1" id="supplier-search-error-modal-form" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content" style="transform: matrix(1, 0, 0, 1, 0, 0);display:inline-block;">
+        <div class="modal-header">
+          <h4 class="modal-title">Proveedor no compatible</h4>
+        </div>
+        <div id="supplier-search_error-modal-form-body" style="height: 400px; padding: 0px 10px; overflow-y:scroll;">
+        </div>
+    </div>
+  </div>
+</div>
 
 <script>
   {# Busqueda de proveedores #}
@@ -41,20 +53,6 @@
          }
        });
     }else clearFields(fields);
-  }
-
-  {# Costo de envío en función del proveedor #}
-  function setShippingCharge(){
-      if($("#buyorder-form-freeshipping").val()==0){
-         $("#buyorder-form-shippingcharge").val("PAGADOS");
-         $("#buyorder-form-shippingcharge").addClass("input-success");
-         $("#buyorder-form-shippingcharge").removeClass("input-danger");
-      }
-      else {
-         $("#buyorder-form-shippingcharge").val("DEBIDOS");
-         $("#buyorder-form-shippingcharge").addClass("input-danger");
-         $("#buyorder-form-shippingcharge").removeClass("input-success");
-      }
   }
 
   {# Estimar fecha de entrega en función del proveedor #}
@@ -100,24 +98,11 @@
       });
   }
 
-  {# Obtienen  los contactos del proveedor seleccionado #}
-  function setContactsSupplier(id){
-    if((++load_wait)==1) $("#load-spinner").fadeIn();
-    $.ajax({
-       type: "GET",
-       dataType: "json",
-       url: "/api/global/contactssupplier/"+id
-    }).done(function(elements, textStatus, jqXHR) {
-       if((--load_wait)==0) $("#load-spinner").fadeOut();
-        if (elements!=null){
-          $("#supplier-form-contact-id").html('');
-          elements.forEach( function(valor, indice, array){
-            $("#supplier-form-contact-id").append('<option value="'+valor.id+'">'+valor.text+'</option>');
-          });
-        }
-    });
-    $("#supplier-form-contact-id").val('');
-    $("#supplier-form-contact-id").trigger('change');
+  {# Obtener contenido de una URL #}
+  function httpGet(xmlhttp, theUrl) {
+      xmlhttp.open("GET", theUrl, false);
+      xmlhttp.send();
+      return xmlhttp.response;
   }
 
   {# Cuando se termine de cargar la página #}
@@ -126,10 +111,60 @@
     {# Seleccionar proveedor #}
     $('body').on('click', "[id^='listSuppliersBuyOrders-field-button-select-']", function(e) {
       var supplier_id = $(this).attr('attr-id');
-      $("#supplier-form-id").val(supplier_id);
-      $("#supplier-form-id").trigger('change');
-
-      $("#supplier-search-modal-form").modal('toggle');
+      {# Comprobar que los productos del listado también los suministra el nuevo proveedor sino error #}
+      var sheet   = document.getElementById('buyorders').jexcel[0];
+      var data    = sheet.getData();
+      var columns = sheet.options.columns;
+      var lines_error   = '';
+      if (data.length > 0 && columns.length>0){
+        if((++load_wait)==1) $("#load-spinner").fadeIn();
+        var xmlhttp;
+        if (window.XMLHttpRequest) { // code for IE7+, Firefox, Chrome, Opera, Safari
+            xmlhttp=new XMLHttpRequest();
+        } else { // code for IE6, IE5
+            xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+        }
+        xmlhttp.onreadystatechange=function() {
+            if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+                return xmlhttp.responseText;
+            }
+        }
+        for(var i=0; i<data.length; i++){
+          var product_id      = data[i][sheet.getColumnKey('product_id')].split('~')[0];
+          var variant_id      = data[i][sheet.getColumnKey('variant_id')].split('~')[0];
+          var quantity        = data[i][sheet.getColumnKey('quantity')];
+          var store_id        = data[i][sheet.getColumnKey('store_id')].split('~')[0];
+          if (product_id!=null && product_id!='' && product_id!='0'  && product_id!=0 &&
+              quantity!=null && quantity!='' && quantity!='0'  && quantity!=0){
+              // Comprobar que hay precio para este producto con el nuevo proveedor
+              elements = httpGet(xmlhttp, "/api/getWSProductVariantPriceStock/"+supplier_id+"/"+product_id+"/"+variant_id+"/"+quantity+"/"+store_id);
+              elements = JSON.parse(elements);
+              if (elements.length>0 && parseFloat(elements[0]['pvp'])>0){
+                // Ok
+              }else{
+                lines_error += "Línea "+(i+1)+": Producto o variante no compatible con el proveedor seleccionado. <br/>";
+              }
+          }
+        }
+        $("#supplier-search-modal-form").modal('toggle');
+        if (lines_error==''){
+          $("#supplier-form-id").val(supplier_id);
+          $("#supplier-form-id").trigger('change');
+          // Se actualizan los precios a los del nuevo proveedor
+          for(var i=0; i<data.length; i++){
+            var product_id      = data[i][sheet.getColumnKey('product_id')];
+            var quantity        = data[i][sheet.getColumnKey('quantity')];
+            if (product_id!=null && product_id!='' && product_id!='0'  && product_id!=0 &&
+                quantity!=null && quantity!='' && quantity!='0'  && quantity!=0){
+                sheet.setValueFromKey('quantity', i, quantity, true, true);
+            }
+          }
+        }else{
+          $("#supplier-search_error-modal-form-body").html(lines_error);
+          $("#supplier-search-error-modal-form").modal('show');
+        }
+        if((--load_wait)==0) $("#load-spinner").fadeOut();
+      }
     });
 
     {# Evento de cambio de proveedor en el formulario principal #}
@@ -151,26 +186,39 @@
             $("#supplier-form-codename").val('('+elements.suppliercode+') '+elements.suppliername);
             $("#supplier-form-email").val(elements.supplieremmail);
             $("#supplier-form-phone").val(elements.supplierphone);
-            $("#supplier-form-paymentmethod-id").val(elements.supplierpaymentmethod_id);
-            $("#supplier-form-paymentmethod").val(elements.supplierpaymentmethod_name);
+            $("#supplier-form-paymentmethod").val(elements.supplierpaymentmethod);
+            $("#supplier-form-paymentmethod").trigger('change');
+            $("#supplier-form-paymentterms").val(elements.supplierpaymentterms);
+            $("#supplier-form-shippingcharge").val((elements.freeshipping==0?0:1));
+            $("#supplier-form-shippingcharge").trigger('change');
+            $("#supplier-form-carrier").val(elements.suppliercarrier);
+            $("#supplier-form-carrier").trigger('change');
             $("#supplier-form-address").val(elements.supplieraddress);
             $("#supplier-form-postcode").val(elements.supplierpostcode);
             $("#supplier-form-state").val(elements.supplierstate);
             $("#supplier-form-country").val(elements.suppliercountry);
             $("#supplier-form-city").val(elements.suppliercity);
 
+            $("#supplier-form-theircode").val(elements.suppliertheircode);
+            $("#supplier-form-credentialsurl").val(elements.suppliercredentialsurl);
+            $("#supplier-form-credentialsuser").val(elements.suppliercredentialsuser);
+            $("#supplier-form-credentialspassword").val(elements.suppliercredentialspassword);
             $("#supplier-form-vat").val(elements.suppliervat);
-            $("#supplier-form-paymentterms").val(elements.supplierpaymentterms);
             $("#buyorder-form-weight").val(0);
+
+            $("#buyorder-form-suppliercomment").val(elements.suppliercomment);
+            $("#buyorder-form-supplierbuyorder").val(elements.supplierbuyorder);
+            $("#buyorder-form-suppliershipping").val(elements.suppliershipping);
+            $("#buyorder-form-supplierpayment").val(elements.supplierpayment);
+            $("#buyorder-form-supplierspecial").val(elements.supplierspecial);            
 
             $("#buyorder-form-amount").val(0);
             $("#buyorder-form-discount").val('');
             $("#buyorder-form-base").val(0);
             $("#buyorder-form-taxes").val(0);
             $("#buyorder-form-shipping").val('');
+            $('#buyorder-form-shipping').removeAttr('readonly');
             $("#buyorder-form-total").val(0);
-            setContactsSupplier(supplier_id);
-            setShippingCharge();
             setEstimatedDate();
             // Primer almacén de base de datos
             {% if stores|length > 1 %}

@@ -5,13 +5,19 @@
           <div class="panel-title">Información del pedido</div>
         </div>
       </div>
-      <div class="col-md-2">
+      <div class="col-md-1">
         <label for="buyorder-form-coderevision">Código:</label>
         <div class="form-group">
           <input type="text" readonly="readonly" id="buyorder-form-coderevision" {% if (buyorder.code!=null and buyorder.revision!=null) %} value="{{buyorder.code}}/{{buyorder.revision}}" {% else %}  value="" {% endif %}  disabled="disabled" class="form-control bold" placeholder="Código..."/>
           <input type="hidden" id="buyorder-form-id" name="buyorder-form-id" {% if buyorder.id!=null %} value="{{buyorder.id}}" {% else %}  value="0" {% endif %}/>
           <input type="hidden" id="buyorder-form-code" name="buyorder-form-code" {% if buyorder.code!=null %} value="{{buyorder.code}}" {% else %}  value="" {% endif %}/>
           <input type="hidden" id="buyorder-form-revision" name="buyorder-form-revision" {% if buyorder.revision!=null %} value="{{buyorder.revision}}" {% else %}  value="" {% endif %}/>
+        </div>
+      </div>
+      <div class="col-md-1">
+        <label for="supplier-form-theircode">Nº cliente:</label>
+        <div class="form-group">
+          <input type="text" readonly="readonly" id="supplier-form-theircode" {% if (buyorder.supplier!=null and buyorder.supplier.theircode!=null) %} value="{{buyorder.supplier.theircode}}" {% else %}  value="" {% endif %}  class="form-control" placeholder="Nº Cliente..."/>
         </div>
       </div>
       <div class="col-md-2">
@@ -190,47 +196,6 @@
           <input type="text" readonly="readonly" id="supplier-form-phone"  value="{{ buyorder.phone }}"  class="form-control" />
         </div>
       </div>
-      {% if buyorder.suppliercontact!=null %}
-        <div class="col-md-4">
-          <label for="supplier-form-contact-id">Contacto del proveedor:</label>
-          <div class="form-group">
-            <select type="text" id="supplier-form-contact-id" class="form-control select2">
-              {% for option in suppliercontacts %}
-                <option value="{{ option.id }}" {% if buyorder.suppliercontact.id==option.id %}selected="selected"{% endif %}>{{ option.text }}</option>
-              {% endfor %}
-            </select>
-          </div>
-        </div>
-      {% else %}
-        <div class="col-md-4">
-          <label for="supplier-form-contact-id">Contacto del proveedor:</label>
-          <div class="form-group">
-            <select type="text" id="supplier-form-contact-id" class="form-control select2">
-              {% for option in suppliercontacts %}
-                <option value="{{ option.id }}" {% if option.pos==0 %}selected="selected"{% endif %}>{{ option.text }}</option>
-              {% endfor %}
-            </select>
-          </div>
-        </div>
-      {% endif %}
-      <div class="col-md-4">
-        <label for="supplier-form-contact-name">Nombre del contacto:</label>
-        <div class="form-group">
-          <input type="text" id="supplier-form-contact-name" value="{{ buyorder.suppliercontactname }}" class="form-control"/>
-        </div>
-      </div>
-      <div class="col-md-2">
-        <label for="supplier-form-contact-email">Email del contacto:</label>
-        <div class="form-group">
-          <input type="text" id="supplier-form-contact-email" value="{{ buyorder.suppliercontactemail }}" class="form-control"/>
-        </div>
-      </div>
-      <div class="col-md-2">
-        <label for="supplier-form-contact-phone">Teléfono del contacto:</label>
-        <div class="form-group">
-          <input type="text" id="supplier-form-contact-phone" value="{{ buyorder.suppliercontactphone }}" class="form-control"/>
-        </div>
-      </div>
       <div class="col-md-2">
         <div class="form-group" >
           <div class="input-group">
@@ -251,24 +216,126 @@
           <textarea id="buyorder-form-observationpublic" name="buyorder-form-observationpublic" class="form-control" style="min-height:50px;" >{% if buyorder.observationpublic!=null %}{{ buyorder.observationpublic }}{% endif %}</textarea>
         </div>
       </div>
+      <div class="col-md-8" style="clear: left;">
+        <div class="panel minimal" >
+          <div class="panel-heading">
+            <div class="panel-title">Contactos</div>
+          </div>
+        </div>
+        <div id="jsexcel-buyordercs">
+          {% set spreadsheet = spreadsheetbuyorderscs %}
+          {{ include('@Globale/form_jspreadsheet_html.twig') }}
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="panel minimal" >
+          <div class="panel-heading">
+            <div class="panel-title">Comentarios proveedor</div>
+          </div>
+        </div>
+        <div class="col-md-12">
+          <div class="form-group">
+            <textarea id="buyorder-form-suppliercomment" name="buyorder-form-suppliercomment" readonly="readonly" class="form-control" style="min-height:50px;" >{% if buyorder.suppliercomment!=null %}{{ buyorder.suppliercomment }}{% endif %}</textarea>
+          </div>
+        </div>
+      </div>
       <div class="panel minimal" style="clear: left;">
         <div class="panel-heading">
           <div class="panel-title">Resumen</div>
         </div>
         <div class="panel-body">
-          <div class="col-md-2">
-            <label for="supplier-form-paymentmethod">Método de pago:</label>
-            <div class="form-group">
-              <input type="hidden" id="supplier-form-paymentmethod-id" value="{% if buyorder.paymentmethod!=null %} {{ buyorder.paymentmethod.id }} {% endif %}">
-              <input type="text" readonly="readonly" id="supplier-form-paymentmethod" {% if buyorder.paymentmethod!=null %} value="{{ buyorder.paymentmethod.name }}" {% endif %} class="form-control"/>
+          {% if buyorder.paymentmethod!=null %}
+            <div class="col-md-2">
+              <label for="supplier-form-paymentmethod">Método de pago:</label>
+              <div class="form-group">
+                <select type="text" id="supplier-form-paymentmethod" class="form-control select2" required>
+                  {% for option in paymentmethods %}
+                    <option value="{{ option.id }}" {% if buyorder.paymentmethod.id==option.id %}selected="selected"{% endif %}>{{ option.text }}</option>
+                  {% endfor %}
+                </select>
+              </div>
             </div>
-          </div>
-          <div class="col-md-2">
-            <label for="buyorder-form-shippingcharge">Portes:</label>
-            <div class="form-group">
-              <input type="text"  readonly="readonly" id="buyorder-form-shippingcharge" {% if buyorder.shippingcharge=="1" %} class="form-control input-success"  value="PAGADOS" {% else %}  class="form-control input-danger"  value="DEBIDOS"{% endif %} class="form-control" />
+          {% else %}
+            <div class="col-md-2">
+              <label for="supplier-form-paymentmethod">Método de pago:</label>
+              <div class="form-group">
+                <select type="text" id="supplier-form-paymentmethod" class="form-control select2" required>
+                  {% for option in paymentmethods %}
+                    <option value="{{ option.id }}" {% if option.pos==0 %}selected="selected"{% endif %}>{{ option.text }}</option>
+                  {% endfor %}
+                </select>
+              </div>
             </div>
-          </div>
+          {% endif %}
+          {% if buyorder.paymentterms!=null %}
+            <div class="col-md-2">
+              <label for="supplier-form-paymentterms">Términos de pago:</label>
+              <div class="form-group">
+                <select type="text" id="supplier-form-paymentterms" class="form-control select2" required>
+                  {% for option in paymentterms %}
+                    <option value="{{ option.id }}" {% if buyorder.paymentterms.id==option.id %}selected="selected"{% endif %}>{{ option.text }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          {% else %}
+            <div class="col-md-2">
+              <label for="supplier-form-paymentterms">Terminos de pago:</label>
+              <div class="form-group">
+                <select type="text" id="supplier-form-paymentterms" class="form-control select2" required>
+                  {% for option in paymentterms %}
+                    <option value="{{ option.id }}" {% if option.pos==0 %}selected="selected"{% endif %}>{{ option.text }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          {% endif %}
+          {% if (buyorder.shippingcharge!=null or buyorder.shippingcharge==0) %}
+            <div class="col-md-2">
+              <label for="supplier-form-shippingcharge">Portes: </label>
+              <div class="form-group">
+                <select type="text" id="supplier-form-shippingcharge" class="form-control select2" required>
+                  {% for option in shippings %}
+                    <option value="{{ option.id }}" {% if buyorder.shippingcharge==option.id %}selected="selected"{% endif %}>{{ option.text }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          {% else %}
+            <div class="col-md-2">
+              <label for="supplier-form-shippingcharge">Portes: </label>
+              <div class="form-group">
+                <select type="text" id="supplier-form-shippingcharge" class="form-control select2" required>
+                  {% for option in shippings %}
+                    <option value="{{ option.id }}" {% if option.pos==0 %}selected="selected"{% endif %}>{{ option.text }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          {% endif %}
+          {% if buyorder.carrier!=null %}
+            <div class="col-md-2" id="supplier-form-carrier-div" {% if (buyorder.shippingcharge==null or buyorder.shippingcharge!=2) %}style="display:none;"{% endif %}>
+              <label for="supplier-form-carrier">Transportista:</label>
+              <div class="form-group">
+                <select type="text" id="supplier-form-carrier" class="form-control select2" required>
+                  {% for option in carriers %}
+                    <option value="{{ option.id }}" {% if buyorder.carrier.id==option.id %}selected="selected"{% endif %}>{{ option.text }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          {% else %}
+            <div class="col-md-2" id="supplier-form-carrier-div" {% if (buyorder.shippingcharge==null or buyorder.shippingcharge!=2) %}style="display:none;"{% endif %}>
+              <label for="supplier-form-carrier">Transportista:</label>
+              <div class="form-group">
+                <select type="text" id="supplier-form-carrier" class="form-control select2" required>
+                  {% for option in carriers %}
+                    <option value="{{ option.id }}" {% if option.pos==0 %}selected="selected"{% endif %}>{{ option.text }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          {% endif %}
           <div class="col-md-2">
             <div class="form-group">
               <label for="buyorder-form-freeshipping">Portes gratis desde:</label>
@@ -296,13 +363,35 @@
               <input type="text" id="buyorder-form-weight" name="buyorder-form-weight" readonly="readonly" autocomplete="off" class="number-type form-control input_parent__unity" value="{{ buyorder.weight }}">
             </div>
           </div>
-          <div class="col-md-2">
-            <label for="buyorder-form-typeofconfirmation">Tipo de confirmación:</label>
-            <div class="form-group">
-              <input type="text" readonly="readonly" id="buyorder-form-typeofconfirmation" {% if buyorder.typeofconfirmation=="1" %} value="WEB" {% else %}  value="CORREO"{% endif %} class="form-control"/>
+          {% if (buyorder.orderchannel!=null or buyorder.orderchannel==0) %}
+            <div class="col-md-2">
+              <label for="supplier-form-orderchannel">Canal de pedido:</label>
+              <div class="form-group">
+                <select type="text" id="supplier-form-orderchannel" class="form-control select2" required>
+                  {% for option in orderchannel %}
+                    <option value="{{ option.id }}" {% if buyorder.orderchannel==option.id %}selected="selected"{% endif %}>{{ option.text }}</option>
+                  {% endfor %}
+                </select>
+              </div>
             </div>
+          {% else %}
+            <div class="col-md-2">
+              <label for="supplier-form-orderchannel">Canal de pedido:</label>
+              <div class="form-group">
+                <select type="text" id="supplier-form-orderchannel" class="form-control select2" required>
+                  {% for option in orderchannel %}
+                    <option value="{{ option.id }}" {% if option.pos==0 %}selected="selected"{% endif %}>{{ option.text }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          {% endif %}
+          <div class="col-md-4" id="supplier-form-credentials" {% if (buyorder.orderchannel==null or buyorder.orderchannel!=1 or buyorder.supplier==null or buyorder.supplier.credentialsurl==null or buyorder.supplier.credentialsurl=='') %}style="display:none;"{% endif %}>
+            {% if (buyorder.supplier!=null and buyorder.supplier.credentialsurl!=null and buyorder.supplier.credentialsurl!=null) %}<a href="{{ buyorder.supplier.credentialsurl }}" style="font-weight: bold; text-decoration: underline;" target="_blank">{{ buyorder.supplier.credentialsurl }}</a>{% endif %}
+            {% if (buyorder.supplier!=null and buyorder.supplier.credentialsuser!=null and buyorder.supplier.credentialsuser!=null) %}<br/>Usuario: {{buyorder.supplier.credentialsuser}}{% endif %}
+            {% if (buyorder.supplier!=null and buyorder.supplier.credentialspassword!=null and buyorder.supplier.credentialspassword!=null) %} | Contraseña: {{buyorder.supplier.credentialspassword}}{% endif %}
           </div>
-          <div class="col-md-2">
+          <div class="col-md-2" style="clear: left;">
             <div class="form-group">
               <label for="buyorder-form-amount">Importe:</label>
               <span id="unity-view-form-buyorder-amount" class="input__unity">
@@ -372,7 +461,6 @@
       <input type="hidden" id="supplier-form-state" value="{{ buyorder.supplierstate }}">
       <input type="hidden" id="supplier-form-country" value="{{ buyorder.suppliercountry }}">
       <input type="hidden" id="supplier-form-city" value="{{ buyorder.suppliercity }}">
-      <input type="hidden" id="supplier-form-paymentterms" value="{{ buyorder.supplierpaymentterms }}">
     </div>
 </div>
 
@@ -422,32 +510,29 @@
         win.focus();
       }
     });
-    {# Cambio de contacto del proveedor #}
-    $('body').on('change', "#supplier-form-contact-id", function(e) {
-      contact_id = $("#supplier-form-contact-id").val();
-      if (contact_id=='' || contact_id=='0'){
-        $("#supplier-form-contact-name").val('');
-        $("#supplier-form-contact-email").val('');
-        $("#supplier-form-contact-phone").val('');
+    {# Cambio de descuento o portes #}
+    $('body').on('change', "#supplier-form-shippingcharge,#buyorder-form-discount,#buyorder-form-shipping", function(e) {
+      buyorderstotal(null);
+    });
+    {# Si los portes son a recogida por nuestros medios se muestra el desplegable de transportistas, sino se oculta y se resetea #}
+    $('body').on('change', "#supplier-form-shippingcharge", function(e) {
+      var shippingcharge = $(this).val();
+      if (shippingcharge=='2'){
+        $('#supplier-form-carrier-div').css("display","block");
       }else{
-        if((++load_wait)==1) $("#load-spinner").fadeIn();
-        $.ajax({
-           type: "GET",
-           dataType: "json",
-           url: "/api/global/contact/"+contact_id+'/get'
-         }).done(function(elements, textStatus, jqXHR) {
-           if((--load_wait)==0) $("#load-spinner").fadeOut();
-            if (elements!=null){
-              $("#supplier-form-contact-name").val(elements.name);
-              $("#supplier-form-contact-email").val(elements.email);
-              $("#supplier-form-contact-phone").val(elements.phone);
-            }
-        });
+        $('#supplier-form-carrier').val(0);
+        $("#supplier-form-carrier").trigger('change');
+        $('#supplier-form-carrier-div').css("display","none");
       }
     });
-    {# Cambio de descuento o portes #}
-    $('body').on('change', "#buyorder-form-discount,#buyorder-form-shipping", function(e) {
-      buyorderstotal(null);
+    {# Si los el canal de pedido es WEB se muestra sus acreditaciones #}
+    $('body').on('change', "#supplier-form-orderchannel", function(e) {
+      var orderchannel = $(this).val();
+      if (orderchannel=='1'){
+        $('#supplier-form-credentials').css("display","block");
+      }else{
+        $('#supplier-form-credentials').css("display","none");
+      }
     });
   });
 </script>

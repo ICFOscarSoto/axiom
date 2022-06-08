@@ -142,6 +142,24 @@ class ERPSuppliers
      */
     private $invoiceday;
 
+    /**
+     * @ORM\Column(type="string", length=20, nullable=true)
+     */
+    private $theircode;
+
+    /**
+     * @ORM\Column(type="string", length=256, nullable=true)
+     */
+    private $credentialsurl;
+    /**
+     * @ORM\Column(type="string", length=32, nullable=true)
+     */
+    private $credentialsuser;
+    /**
+     * @ORM\Column(type="string", length=32, nullable=true)
+     */
+    private $credentialspassword;
+
     public $newSeconds=1296000;
     public $updatedSeconds=1296000;
 
@@ -484,6 +502,54 @@ class ERPSuppliers
     public function setWorkactivity(?ERPSupplierActivities $workactivity): self
     {
         $this->workactivity = $workactivity;
+
+        return $this;
+    }
+
+    public function getTheircode(): ?string
+    {
+        return $this->theircode;
+    }
+
+    public function setTheircode(string $theircode): self
+    {
+        $this->theircode = $theircode;
+
+        return $this;
+    }
+
+    public function getCredentialsurl(): ?string
+    {
+        return $this->credentialsurl;
+    }
+
+    public function setCredentialsurl(string $credentialsurl): self
+    {
+        $this->credentialsurl = $credentialsurl;
+
+        return $this;
+    }
+
+    public function getCredentialsuser(): ?string
+    {
+        return $this->credentialsuser;
+    }
+
+    public function setCredentialsuser(string $credentialsuser): self
+    {
+        $this->credentialsuser = $credentialsuser;
+
+        return $this;
+    }
+
+    public function getCredentialspassword(): ?string
+    {
+        return $this->credentialspassword;
+    }
+
+    public function setCredentialspassword(string $credentialspassword): self
+    {
+        $this->credentialspassword = $credentialspassword;
 
         return $this;
     }

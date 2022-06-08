@@ -128,6 +128,11 @@ class ERPContacts
      */
     private $state;
 
+    /**
+     * @ORM\Column(type="string", length=128, nullable=true)
+     */
+    private $additional;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -369,6 +374,18 @@ class ERPContacts
     public function setState(?GlobaleStates $state): self
     {
         $this->state = $state;
+
+        return $this;
+    }
+
+    public function getAdditional(): ?string
+    {
+        return $this->additional;
+    }
+
+    public function setAdditional(?string $additional): self
+    {
+        $this->additional = $additional;
 
         return $this;
     }

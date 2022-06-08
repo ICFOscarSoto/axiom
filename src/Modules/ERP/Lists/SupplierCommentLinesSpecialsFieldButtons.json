@@ -1,0 +1,8 @@
+[
+  {"id": "editSupplierCommentLinesSpecials", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"dataSupplierCommentLinesSpecials", "routeParams":{"idparent":"parent","type_comment":"6"}, "modal":"SupplierCommentLinesSpecials", "actionType" : "background", "confirm" :false, "tooltip" : ""},
+  {"id": "activation", "type": "option", "options": [
+      {"id": "desactivateSupplierCommentLinesSpecials", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"genericdisable", "routeParams":{"module":"ERP", "name":"SupplierCommentLines"}, "confirm" :true, "actionType" : "background", "tooltip":"" },
+      {"id": "activateSupplierCommentLinesSpecials", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "route":"genericenable", "routeParams":{"module":"ERP", "name":"SupplierCommentLines"}, "confirm" :true, "actionType" : "background", "tooltip":"" }
+  ]},
+  {"id": "deleteSupplierCommentLinesSpecials", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"genericdelete", "routeParams":{"module":"ERP", "name":"SupplierCommentLines"}, "confirm" :true, "undo" :false, "actionType" : "background", "tooltip":""}
+]

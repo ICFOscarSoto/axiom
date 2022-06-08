@@ -5,7 +5,7 @@
             "fields": [
                 {
                     "name": "comment",
-                    "caption":"Comentario de pedido",
+                    "caption":"Comentario de portes",
                     "cols": 12,
                     "class": "text-area-form"
                 },
@@ -27,3 +27,4 @@
         }
     ]
 }]
+

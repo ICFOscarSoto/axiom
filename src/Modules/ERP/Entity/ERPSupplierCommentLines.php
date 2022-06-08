@@ -57,6 +57,15 @@ class ERPSupplierCommentLines
      * @ORM\Column(type="text", nullable=true)
      */
     private $solution;
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $start;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $end;
 
     public function getId(): ?int
     {
@@ -158,4 +167,28 @@ class ERPSupplierCommentLines
 
         return $this;
     }
+
+    public function getStart(): ?\DateTimeInterface
+    {
+        return $this->start;
+    }
+
+    public function setStart(?\DateTimeInterface $start): self
+    {
+        $this->start = $start;
+
+        return $this;
+    }
+
+    public function getEnd(): ?\DateTimeInterface
+    {
+        return $this->end;
+    }
+
+    public function setEnd(?\DateTimeInterface $end): self
+    {
+        $this->end = $end;
+
+        return $this;
+    }    
 }
