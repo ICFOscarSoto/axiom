@@ -35,7 +35,7 @@ class CheckSignedDeliveryNote extends ContainerAwareCommand
     $output->writeln('');
     $output->writeln('Obteniendo albaranes de ventas que deberian estar firmados y digitalizados');
     $output->writeln('==========================================================================');
-    $date=new \DateTime();
+    $date=new \DateTime("2022-06-07");
     $destDir=__DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.'2'.DIRECTORY_SEPARATOR.'ERPSignedDeliveryNotes'.DIRECTORY_SEPARATOR;
     $destDir=$destDir.$date->format('Y').DIRECTORY_SEPARATOR.$date->format('m').DIRECTORY_SEPARATOR.$date->format('d').DIRECTORY_SEPARATOR;
     $json=file_get_contents('http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-getSignedDeliveryNotes.php?date='.urlencode($date->format('d/m/Y')));
