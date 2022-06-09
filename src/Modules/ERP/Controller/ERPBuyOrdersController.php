@@ -929,8 +929,7 @@ class ERPBuyOrdersController extends Controller
 		   ]";
 			$spreadsheetcm['data']       = '[]';
 			$spreadsheetcm['onload'] 	   =
-				"$('#supplier-form-id').val('".$supplier_id."');
-				 var sheet = document.getElementById('".$spreadsheetcm['name']."').jexcel;
+				"var sheet = document.getElementById('".$spreadsheetcm['name']."').jexcel;
 				 sheet.hideColumnKey('id');
 				 sheet.hideColumnKey('variantid');
 				";
