@@ -206,7 +206,7 @@ class GlobaleCommentsController extends Controller
         $tempDir=$this->get('kernel')->getRootDir().DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.'2'.DIRECTORY_SEPARATOR.'temp'.DIRECTORY_SEPARATOR.'ERPCalls'.DIRECTORY_SEPARATOR;
         $tempDir=$tempDir.$date->format('Y').DIRECTORY_SEPARATOR.$date->format('m').DIRECTORY_SEPARATOR.$date->format('d').DIRECTORY_SEPARATOR;
 
-        if(!file_exists($tempDir)) return new JsonResponse(["result"=>-1]);
+        if(!file_exists($tempDir)) return new JsonResponse(["result"=>-1 , "dir"=>$tempDir]);
 
         //Obtenemos el trabajador asociado al usuario
 
