@@ -12,7 +12,7 @@ use App\Modules\Globale\Config\GlobaleConfigVars;
 class GlobaleUsersUtils
 {
 
-  public function proccess($form,$user,$obj,$request,$entityManager,$encoder){
+  public function proccess($form,$user,$obj,$request,$entityManager,$encoder,$doctrine){
     //if changed Password
     $userRoles = $obj->getRoles();
     $form->handleRequest($request);
@@ -48,7 +48,7 @@ class GlobaleUsersUtils
       }
       $obj->setDateupd(new \DateTime());
       try{
-        if(method_exists($obj,'preProccess')) $obj->{'preProccess'}($this->controller->get('kernel'), null, $this->user);
+        if(method_exists($obj,'preProccess')) $obj->{'preProccess'}(null, $doctrine, $user, null, null);
         $entityManager->persist($obj);
         $entityManager->flush();
         if(method_exists($obj,'postProccess')) $obj->{'postProccess'}($this->controller->get('kernel'));
