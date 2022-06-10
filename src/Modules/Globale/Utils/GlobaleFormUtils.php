@@ -313,7 +313,7 @@ class GlobaleFormUtils extends Controller
            $validation=[];
            if($utilsClass!=null && method_exists($utilsClass, 'proccess')){
              $utils=new $utilsClass();
-					   $this->obj=$utils->proccess($form,$this->user,$this->obj,$this->request,$this->entityManager,$this->encoder);
+					   $this->obj=$utils->proccess($form,$this->user,$this->obj,$this->request,$this->entityManager,$this->encoder,$this->doctrine);
            }else{
            //Si no, ejecutamos el process estandar del formutils
              $proccess=$this->proccess2($form,$this->obj);
