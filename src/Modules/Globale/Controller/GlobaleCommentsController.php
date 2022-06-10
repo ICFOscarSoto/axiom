@@ -202,16 +202,17 @@ class GlobaleCommentsController extends Controller
 
         $date = new \DateTime();
         //$tempDir='Z:\Grabaciones\\';
-        $tempDir=__DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.'2'.DIRECTORY_SEPARATOR.'temp'.DIRECTORY_SEPARATOR.'ERPCalls'.DIRECTORY_SEPARATOR;
+
+        $tempDir=$this->get('kernel')->getRootDir().'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.'2'.DIRECTORY_SEPARATOR.'temp'.DIRECTORY_SEPARATOR.'ERPCalls'.DIRECTORY_SEPARATOR;
         $tempDir=$tempDir.$date->format('Y').DIRECTORY_SEPARATOR.$date->format('m').DIRECTORY_SEPARATOR.$date->format('d').DIRECTORY_SEPARATOR;
         if(!file_exists($tempDir)) return new JsonResponse(["result"=>-1]);
 
         //Obtenemos el trabajador asociado al usuario
 
         $worker=$workersRepository->findOneBy(["user"=>$this->getUser(),"active"=>1,"deleted"=>0]);
-        if(!$worker) return new JsonResponse(["result"=>-1]);
+        if(!$worker) return new JsonResponse(["result"=>-2]);
         //Si el usuario no tiene extension configurada abortamos
-        if($worker->getExtension()==null) return new JsonResponse(["result"=>-1]);
+        if($worker->getExtension()==null) return new JsonResponse(["result"=>-3]);
         $extension=$worker->getExtension();
         //Obtenemos los ficheros del directorio temporal
         $dir = new \DirectoryIterator($tempDir);
@@ -278,12 +279,12 @@ class GlobaleCommentsController extends Controller
       $tempDir='';
       if($type=='temp'){
         //$tempDir='Z:\Grabaciones\\';
-        $tempDir=__DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.'2'.DIRECTORY_SEPARATOR.'temp'.DIRECTORY_SEPARATOR.'ERPCalls'.DIRECTORY_SEPARATOR;
+        $tempDir=$this->get('kernel')->getRootDir().'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.'2'.DIRECTORY_SEPARATOR.'temp'.DIRECTORY_SEPARATOR.'ERPCalls'.DIRECTORY_SEPARATOR;
         $date = new \DateTime();
         $tempDir=$tempDir.$date->format('Y').DIRECTORY_SEPARATOR.$date->format('m').DIRECTORY_SEPARATOR.$date->format('d').DIRECTORY_SEPARATOR;
       }else{
         //$tempDir='A:\var\www\axiom.ferreteriacampollano.com\cloud\2\ERPCalls\\';
-        $tempDir=__DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.'2'.DIRECTORY_SEPARATOR.'ERPCalls'.DIRECTORY_SEPARATOR;
+        $tempDir=$this->get('kernel')->getRootDir().'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.'2'.DIRECTORY_SEPARATOR.'ERPCalls'.DIRECTORY_SEPARATOR;
       }
       $response = new BinaryFileResponse($tempDir.$filename);
       $mimeTypeGuesser = new FileinfoMimeTypeGuesser();
@@ -305,8 +306,8 @@ class GlobaleCommentsController extends Controller
         $date = new \DateTime();
         //$tempDir='Z:\Grabaciones\\';
         //$destDir='A:\var\www\axiom.ferreteriacampollano.com\cloud\2\ERPCalls\\';
-        $tempDir=__DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.'2'.DIRECTORY_SEPARATOR.'temp'.DIRECTORY_SEPARATOR.'ERPCalls'.DIRECTORY_SEPARATOR;
-        $destDir=__DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.'2'.DIRECTORY_SEPARATOR.'ERPCalls'.DIRECTORY_SEPARATOR;
+        $tempDir=$this->get('kernel')->getRootDir().'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.'2'.DIRECTORY_SEPARATOR.'temp'.DIRECTORY_SEPARATOR.'ERPCalls'.DIRECTORY_SEPARATOR;
+        $destDir=$this->get('kernel')->getRootDir().'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.'2'.DIRECTORY_SEPARATOR.'ERPCalls'.DIRECTORY_SEPARATOR;
         $tempDir=$tempDir.$date->format('Y').DIRECTORY_SEPARATOR.$date->format('m').DIRECTORY_SEPARATOR.$date->format('d').DIRECTORY_SEPARATOR;
 
         if(!file_exists($tempDir)) return new JsonResponse(["result"=>-1]);
@@ -411,7 +412,7 @@ class GlobaleCommentsController extends Controller
   	      $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
           $commentCallRepository	= $this->getDoctrine()->getRepository(GlobaleCommentsCalls::class);
           //$destDir='A:\var\www\axiom.ferreteriacampollano.com\cloud\2\ERPCalls\\';
-          $destDir=__DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.'2'.DIRECTORY_SEPARATOR.'ERPCalls'.DIRECTORY_SEPARATOR;
+          $destDir=$this->get('kernel')->getRootDir().'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.'2'.DIRECTORY_SEPARATOR.'ERPCalls'.DIRECTORY_SEPARATOR;
 
           $call = null;
           if($id!=0){
