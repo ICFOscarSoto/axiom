@@ -203,10 +203,10 @@ class GlobaleCommentsController extends Controller
         $date = new \DateTime();
         //$tempDir='Z:\Grabaciones\\';
 
-        $tempDir=$this->get('kernel')->getRootDir().'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.'2'.DIRECTORY_SEPARATOR.'temp'.DIRECTORY_SEPARATOR.'ERPCalls'.DIRECTORY_SEPARATOR;
+        $tempDir=$this->get('kernel')->getRootDir().DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.'2'.DIRECTORY_SEPARATOR.'temp'.DIRECTORY_SEPARATOR.'ERPCalls'.DIRECTORY_SEPARATOR;
         $tempDir=$tempDir.$date->format('Y').DIRECTORY_SEPARATOR.$date->format('m').DIRECTORY_SEPARATOR.$date->format('d').DIRECTORY_SEPARATOR;
 
-        if(!file_exists($tempDir)) return new JsonResponse(["result"=>-1 , "dir"=>$tempDir]);
+        if(!file_exists($tempDir)) return new JsonResponse(["result"=>-1]);
 
         //Obtenemos el trabajador asociado al usuario
 
@@ -280,12 +280,12 @@ class GlobaleCommentsController extends Controller
       $tempDir='';
       if($type=='temp'){
         //$tempDir='Z:\Grabaciones\\';
-        $tempDir=$this->get('kernel')->getRootDir().'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.'2'.DIRECTORY_SEPARATOR.'temp'.DIRECTORY_SEPARATOR.'ERPCalls'.DIRECTORY_SEPARATOR;
+        $tempDir=$this->get('kernel')->getRootDir().DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.'2'.DIRECTORY_SEPARATOR.'temp'.DIRECTORY_SEPARATOR.'ERPCalls'.DIRECTORY_SEPARATOR;
         $date = new \DateTime();
         $tempDir=$tempDir.$date->format('Y').DIRECTORY_SEPARATOR.$date->format('m').DIRECTORY_SEPARATOR.$date->format('d').DIRECTORY_SEPARATOR;
       }else{
         //$tempDir='A:\var\www\axiom.ferreteriacampollano.com\cloud\2\ERPCalls\\';
-        $tempDir=$this->get('kernel')->getRootDir().'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.'2'.DIRECTORY_SEPARATOR.'ERPCalls'.DIRECTORY_SEPARATOR;
+        $tempDir=$this->get('kernel')->getRootDir().DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.'2'.DIRECTORY_SEPARATOR.'ERPCalls'.DIRECTORY_SEPARATOR;
       }
       $response = new BinaryFileResponse($tempDir.$filename);
       $mimeTypeGuesser = new FileinfoMimeTypeGuesser();
@@ -307,8 +307,8 @@ class GlobaleCommentsController extends Controller
         $date = new \DateTime();
         //$tempDir='Z:\Grabaciones\\';
         //$destDir='A:\var\www\axiom.ferreteriacampollano.com\cloud\2\ERPCalls\\';
-        $tempDir=$this->get('kernel')->getRootDir().'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.'2'.DIRECTORY_SEPARATOR.'temp'.DIRECTORY_SEPARATOR.'ERPCalls'.DIRECTORY_SEPARATOR;
-        $destDir=$this->get('kernel')->getRootDir().'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.'2'.DIRECTORY_SEPARATOR.'ERPCalls'.DIRECTORY_SEPARATOR;
+        $tempDir=$this->get('kernel')->getRootDir().DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.'2'.DIRECTORY_SEPARATOR.'temp'.DIRECTORY_SEPARATOR.'ERPCalls'.DIRECTORY_SEPARATOR;
+        $destDir=$this->get('kernel')->getRootDir().DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.'2'.DIRECTORY_SEPARATOR.'ERPCalls'.DIRECTORY_SEPARATOR;
         $tempDir=$tempDir.$date->format('Y').DIRECTORY_SEPARATOR.$date->format('m').DIRECTORY_SEPARATOR.$date->format('d').DIRECTORY_SEPARATOR;
 
         if(!file_exists($tempDir)) return new JsonResponse(["result"=>-1]);
@@ -413,7 +413,7 @@ class GlobaleCommentsController extends Controller
   	      $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
           $commentCallRepository	= $this->getDoctrine()->getRepository(GlobaleCommentsCalls::class);
           //$destDir='A:\var\www\axiom.ferreteriacampollano.com\cloud\2\ERPCalls\\';
-          $destDir=$this->get('kernel')->getRootDir().'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.'2'.DIRECTORY_SEPARATOR.'ERPCalls'.DIRECTORY_SEPARATOR;
+          $destDir=$this->get('kernel')->getRootDir().DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.'2'.DIRECTORY_SEPARATOR.'ERPCalls'.DIRECTORY_SEPARATOR;
 
           $call = null;
           if($id!=0){
