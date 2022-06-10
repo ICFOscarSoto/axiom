@@ -19,10 +19,11 @@
 			<a attr-search="false" href="javascript:void(0)" style="font-size: 20px" id="button-add-call" type="button" class="btn tooltip-primary btn-primary">
 				 <i class="fa fa-phone" aria-hidden="true"></i>
 			</a>
+			{% if app.user.emailDefaultAccount is defined and app.user.emailDefaultAccount != null and app.user.emailDefaultAccount.inboxFolder != null and app.user.emailDefaultAccount.inboxFolder.id > 0 %}
 			<a attr-search="false" href="javascript:void(0)" style="font-size: 20px" id="button-add-email" type="button" class="btn tooltip-primary btn-primary">
 				 <i class="fa fa-envelope" aria-hidden="true"></i>
 			</a>
-
+			{% endif %}
 		</div>
 		<div id="history-column-button-bar" class="btn-group" style="padding: 5px 15px;display: flex;justify-content: end; width: 50%;">
 			<a attr-search="false" href="javascript:void(0)" style="font-size: 20px" id="button-close-history-column" type="button" class="btn tooltip-primary btn-red">

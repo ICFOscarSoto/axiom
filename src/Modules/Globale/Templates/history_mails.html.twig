@@ -51,7 +51,7 @@
 	</div>
 </div>
 
-{% if app.user.emailDefaultAccount is defined and app.user.emailDefaultAccount.id > 0 %}
+{% if app.user.emailDefaultAccount is defined and app.user.emailDefaultAccount != null and app.user.emailDefaultAccount.id > 0 %}
 var mailAccount={{app.user.emailDefaultAccount.id}};
 {% else %}
 var mailAccount=0;
@@ -60,7 +60,7 @@ var mailAccount=0;
 {{ include('@Email/email_list_listevents.html.twig') }}
 <script>
 
-{% if app.user.emailDefaultAccount is defined and app.user.emailDefaultAccount.inboxFolder != null and app.user.emailDefaultAccount.inboxFolder.id > 0 %}
+{% if app.user.emailDefaultAccount is defined and app.user.emailDefaultAccount != null and app.user.emailDefaultAccount.inboxFolder != null and app.user.emailDefaultAccount.inboxFolder.id > 0 %}
 var mailFolder={{app.user.emailDefaultAccount.inboxFolder.id}};
 {% else %}
 var mailFolder=0;
