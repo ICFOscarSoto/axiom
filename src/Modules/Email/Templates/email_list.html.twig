@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<meta name="description" content="Axiom Business Management" />
 	<meta name="author" content="" />
-	<link rel="icon" href="images/favicon.ico">
+	
 	{{ include('@Globale/header.html.twig') }}
 
 {% endblock %}
@@ -20,41 +20,12 @@
 		<h2>{{ interfaceName }}</h2>
 		</br>
 		<!-- MAIN CONTENT -->
+
+		{{ include('@Email/email_list_getemails.html.twig') }}
 		<script>
 					$(document).ready(function(){
 						var load_wait=0;
 
-						function getEmails(url, params){
-							if((++load_wait)==1) $("#load-spinner").fadeIn();
-							$("#list-messages").html('');
-							$.getJSON(url+params, function( data ) {
-								if ('messages' in data){
-									$("[id^='mail-pagination-']").html('<strong>'+(data.start)+'-'+(((data.start+data.limit)<=data.recordsFiltered)?(data.start+data.limit-1):data.recordsFiltered)+'</strong> <span>de '+data.recordsFiltered+'</span>');
-									((data.start<data.limit)?'disabled':'')
-									$("[id^='mail-pagination-']").append('<div class="btn-group"><a id="mail-pagination-button-previous" attr-url="'+url+'" attr-limit="'+data.limit+'" attr-start="'+(data.start-data.limit)+'" href="javascript:void(0);" class="'+((data.start<=data.limit)?'disabled ':'')+'btn btn-sm btn-white"><i class="entypo-left-open"></i></a>'+
-																											 '<a id="mail-pagination-button-next" href="javascript:void(0);" attr-url="'+url+'" attr-limit="'+data.limit+'" attr-start="'+(data.start+data.limit)+'" class="'+(((data.recordsFiltered-data.start)<=data.limit-1)?'disabled ':'')+'btn btn-sm btn-white"><i class="entypo-right-open"></i></a></div>')
-									$("#mail-folder-name").text(data.folderName+' ('+data.unseen+')');
-									$("#email-modal-button-continue").attr("attr-action",data.urlEmpty);
-									$("#email-modal-button-continue").attr("attr-success",data.url);
-									$("#email-modal-delete-button-continue").attr("attr-success",data.url);
-									var links = "<div class='btn-group'>";
-									if(data.empty) $("#mail-links").html(links+"<a href='javascript:void(0);' id='email-empty' class='btn btn-primary btn-icon'>Vaciar<i class='entypo-cup'></i></a>"+"</div>");
-										else $("#mail-links").html(links+"<a href='javascript:void(0);' id='email-delete' class='btn btn-danger btn-icon'>Borrar<i class='entypo-trash'></i></a>"+"</div>");
-									$.each( data.messages, function( keyAccount, valAccount ) {
-										var message='';
-										message+='<tr class="'+((valAccount.seen)?'':'unread')+'"><td style="width:5%;><div class="checkbox checkbox-replace"><input attr-delete="'+valAccount.urlDelete+'" id="email-selection-'+valAccount.id+'" attr-id="'+valAccount.id+'" type="checkbox" /></div></td>';
-										message+='<td class="col-name" style="width:1%;"><a attr-url-flagged="'+valAccount.urlFlagged+'" attr-url-unflagged="'+valAccount.urlUnFlagged+'" id="flagged-star-'+valAccount.id+'" href="javascript:void(0);" class="star'+((valAccount.flagged)?' stared':'')+'"><i class="entypo-star"></i></a>';
-										message+='<td class="col-name" style="width:1%;"><a href="javascript:void(0);">'+((valAccount.attachments>0)?'<i class="entypo-attach"></i>':'')+'</a>';
-										message+='<td style="width:20%;"><a href="'+valAccount.url+'" class="col-name">'+valAccount.from+'</a></td>';
-										message+='<td class="col-subject" style="width:40%;"><a href="'+valAccount.url+'">'+valAccount.subject+'</a></td>';
-										message+='<td class="col-options" style="width:23%;"></td><td class="col-time">'+moment(valAccount.date.date).from()+'</td></tr>';
-										$("#list-messages").append(message);
-									});
-								}
-							}).always(function() {
-								if((--load_wait)==0) $("#load-spinner").fadeOut();
-							});
-						}
 						if((++load_wait)==1) $("#load-spinner").fadeIn();
 						$.getJSON('{{ url('foldersList') }}', function( data ) {
 							var account ="";
@@ -159,86 +130,7 @@
 					</div>
 
 
-					<!-- Mail Body -->
-					<div class="mail-body">
-
-						<div class="mail-header">
-							<!-- title -->
-							<h3 id="mail-folder-name" class="mail-title">
-								Inbox
-								<span id="mail-unreaded-count" class="count">(6)</span>
-							</h3>
-
-							<!-- search -->
-							<form id="mail-search" class="mail-search">
-								<div class="input-group">
-									<input type="text" class="form-control" id="mail-search-query" name="s" placeholder="Buscar" value="{{ q }}"/>
-									<div class="input-group-addon">
-										<i class="entypo-search"></i>
-									</div>
-									<div id="mail-links" style="float: right;" class="mail-links">
-									</div>
-								</div>
-							</form>
-						</div>
-
-
-						<!-- mail table -->
-						<table class="table mail-table">
-							<!-- mail table header -->
-							<thead>
-								<tr>
-									<th width="5%">
-										<div class="checkbox checkbox-replace">
-											<input type="checkbox" />
-										</div>
-									</th>
-									<th colspan="6">
-
-										<div class="mail-select-options">Marcar como leido</div>
-
-										<div id="mail-pagination-top"  class="mail-pagination" colspan="2">
-											<strong>1-30</strong> <span>of 789</span>
-
-											<div class="btn-group">
-												<a href="#" class="btn btn-sm btn-white"><i class="entypo-left-open"></i></a>
-												<a href="#" class="btn btn-sm btn-white"><i class="entypo-right-open"></i></a>
-											</div>
-										</div>
-									</th>
-								</tr>
-							</thead>
-
-							<!-- email list -->
-							<tbody id="list-messages">
-								<!-- MESSAGES -->
-
-								<!-- END MESSAGES -->
-							</tbody>
-
-							<!-- mail table footer -->
-							<tfoot>
-								<tr>
-									<th width="5%">
-										<div class="checkbox checkbox-replace">
-											<input type="checkbox" />
-										</div>
-									</th>
-									<th colspan="6">
-
-										<div id="mail-pagination-bottom" class="mail-pagination" colspan="2">
-											<strong>1-30</strong> <span>of 789</span>
-
-											<div class="btn-group">
-												<a href="#" class="btn btn-sm btn-white"><i class="entypo-left-open"></i></a>
-												<a href="#" class="btn btn-sm btn-white"><i class="entypo-right-open"></i></a>
-											</div>
-										</div>
-									</th>
-								</tr>
-							</tfoot>
-						</table>
-					</div>
+					{{ include('@Email/email_list_listemails.html.twig') }}
 
 					<!-- Sidebar -->
 					<div class="mail-sidebar">

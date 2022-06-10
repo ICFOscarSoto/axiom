@@ -1,0 +1,180 @@
+<div class="modal fade" id="mails-modal" data-backdrop="static" style="display: none;">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">Añadir correo electrónico</h4>
+			</div>
+			<div id="mails-modal-body" class="modal-body">
+				<input type="hidden" id="folderid" value="63" />
+					{% set q = '' %}
+					{{ include('@Email/email_list_listselectemailswithpreview.html.twig') }}
+			</div>
+			<div id="mails-modal-footer" class="modal-footer">
+				<button type="button" class="btn btn-primary" data-dismiss="modal">Cancelar</button>
+				<button attr-action="" id="mails-modal-button-save" type="button" class="btn btn-success">Añadir correo</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="mails-modal-viewer" data-backdrop="static" style="display: none;">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">Correo electrónico</h4>
+			</div>
+			<div id="mails-modal-body" class="modal-body">
+				<iframe id="mails-modal-body-iframe-preview-message" style="border: none;width: 100%;height: 500px;">
+	      </iframe>
+			</div>
+			<div id="mails-modal-footer" class="modal-footer">
+				<button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="mails-modal-attachments" data-backdrop="static" style="display: none;">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">Ficheros adjuntos</h4>
+			</div>
+			<div style="padding: 10px; font-size: 12px; text-align: center;">¿Desea añadir algún fichero adjunto a los archivos?</div>
+			<div id="mails-modal-attachments-body" class="modal-body">
+			</div>
+			<div id="mails-modal-footer" class="modal-footer">
+				<button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
+				<button attr-action="" id="mails-modal-attachments-button-save" type="button" class="btn btn-success">Añadir seleccionados</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+{% if app.user.emailDefaultAccount is defined and app.user.emailDefaultAccount.id > 0 %}
+var mailAccount={{app.user.emailDefaultAccount.id}};
+{% else %}
+var mailAccount=0;
+{% endif %}
+{{ include('@Email/email_list_getemailswithpreview.html.twig') }}
+{{ include('@Email/email_list_listevents.html.twig') }}
+<script>
+
+{% if app.user.emailDefaultAccount is defined and app.user.emailDefaultAccount.inboxFolder != null and app.user.emailDefaultAccount.inboxFolder.id > 0 %}
+var mailFolder={{app.user.emailDefaultAccount.inboxFolder.id}};
+{% else %}
+var mailFolder=0;
+{% endif %}
+
+function addMail(id, userid, username, userlastname, content){
+	html='<div class="history-element" id="history-element-email-'+id+'" attr-id="'+id+'" style="display: none;">'+
+			 '  <div class="history-element-user">'+
+			 '	    <span><span><img src="/api/user/'+userid+'/getimage" class="img-circle" width="22">&nbsp;&nbsp;'+username+' '+userlastname+'</span></span>'+
+			 '	</div>'+
+			 '	<div class="history-element-type">'+
+       '    <a attr-search="false" href="javascript:void(0)" style="font-size: 10px;margin-right: 20px" attr-id="'+id+'" id="button-remove-email-'+id+'" type="button" class="btn tooltip-primary btn-primary">'+
+       '         <i class="fa fa-trash" aria-hidden="true"></i>&nbsp;Borrar'+
+       '    </a>'+
+			 '	    <i class="fa fa-envelope-open" aria-hidden="true"></i>&nbsp;&nbsp;Email'+
+			 '	  </div>'+
+			 '	  <div class="history-element-timeago">Ahora mismo</div>'+
+			 '	  <div class="history-element-date">El '+moment(new Date()).format("DD/MM/YYYY")+' a las '+moment(new Date()).format("hh:mm")+'</div>'+
+			 '	  <div class="history-element-content" id="history-element-content-'+id+'" style="color: white;">'+content+'...<a style="color: #ffffff" attr-id="'+id+'" id="history-element-emailread-'+id+'" href="javascript:void(0)">+ Leer más</a></div>'+
+			 '	</div>'+
+			 '	<div class="vl"></div>';
+	$("#history-column-content").html(html+$("#history-column-content").html());
+	$("#history-element-email-"+id).slideDown();
+}
+
+$(document).ready(function(){
+  $("#button-add-email").click(function() {
+		$("#mails-modal-mailid").val(0);
+		getEmails('/api/emails/list/'+mailFolder,'');
+		$("#mails-modal").modal('toggle');
+	});
+
+  $('body').on('click', "[id^='button-remove-email-']", function(event) {
+    var idmail=$(this).attr("attr-id");
+    $.confirm({
+        theme: 'bootstrap',
+        title: 'Confirmación',
+        content: '¿Esta seguro que desea borrar este correo electrónico?',
+        buttons: {
+           confirm: { text: 'Borrar', btnClass: 'btn-red', action: function(){
+						 if(load_wait<0) load_wait=0; if((++load_wait)==1) $("#load-spinner").fadeIn();
+						 $.post('/api/globale/removeemail/'+idmail, {},
+						 	function(data, status, xhr){
+							 if((--load_wait)==0) $("#load-spinner").fadeOut();
+									 if(data.result==1){
+										 toastr.success("Email borrado correctamente", "Confirmación", confirmation);
+											 $("#history-element-email-"+idmail).slideUp();
+											 {# Borrar espaciado #}
+											 $("#history-element-email-"+idmail).next().remove();
+											 {# Actualizar budge #}
+											 $("#history-column-badge-emails").text(($("#history-column-badge-emails").text()*1)-1);
+									 }else toastr.error("Ocurrió un error al borrar el email", "Confirmación", confirmation);
+							 }, "json");
+					 } },
+           cancel: { text: 'Cancelar' }
+        }
+    });
+  });
+
+	$("#mails-modal-button-save").click(function() {
+		if(load_wait<0) load_wait=0; if((++load_wait)==1) $("#load-spinner").fadeIn();
+		$.post('/api/emailcomment/'+mailFolder+'/'+mailId+'/save', {entity: $("#newcomment-modal-entity").val(), entity_id: $("#newcomment-modal-entityid").val(), comment: $("#newcomment-modal-comment").val()},
+				function(data, status, xhr){
+					if((--load_wait)==0) $("#load-spinner").fadeOut();
+					if(data.result==1){
+						toastr.success("Correo electrónico guardado correctamente", "Confirmación", confirmation);
+            addMail(data.id, $("#newcomment-modal-userid").val(), $("#newcomment-modal-username").val(), $("#newcomment-modal-userlastname").val(), data.shortcontent);
+ 					  {# Actualizar budge #}
+						$("#history-column-badge-emails").text(($("#history-column-badge-emails").text()*1)+1);
+						$("#mails-modal").modal('hide');
+						{# Cargamos los adjuntos en la modal #}
+						html='';
+						$('a[id^="mail-attachment-element-id-"]').each(function () {
+							url='/api/email/getattachment/'+$(this).attr('attr-account')+'/'+$(this).attr('attr-folder')+'/'+$(this).attr('attr-mail')+'/get'+"?file="+encodeURI($(this).attr('attr-filename'))+"&encoding="+$(this).attr('attr-encoding')+"&part="+$(this).attr('attr-partno');
+							html+='<div class="row" style="padding-left: 24px; margin-bottom: 10px;"><input type="checkbox" id="chk-attachment-element-id-'+$(this).attr('attr-id')+'" attr-filename="'+$(this).attr('attr-filename')+'" attr-encoding="'+$(this).attr('attr-encoding')+'"  attr-partno="'+$(this).attr('attr-partno')+'" attr-account="'+$(this).attr('attr-account')+'" attr-folder="'+$(this).attr('attr-folder')+'" attr-mail="'+$(this).attr('attr-mail')+'" name=""><img width="32px" src="'+$(this).attr('attr-icon')+'" class="img-rounded" style="margin-left: 12px;"/><a href="'+url+'" class="name">'+$(this).attr('attr-filename')+'</a></div>';
+						});
+						$("#mails-modal-attachments-body").html(html);
+						$('[id^="chk-attachment-element-id-"]').iCheck({
+			        checkboxClass: 'icheckbox_flat-blue',
+			        radioClass: 'iradio_flat-blue'
+			      });
+						if($("#mail-attachments").html()!="") $("#mails-modal-attachments").modal('toggle');
+					}else toastr.error("Ocurrió un error al guardar los datos", "Confirmación", confirmation);
+			}, "json");
+	});
+
+	$('body').on('click', "[id^='history-element-emailread-']", function(event) {
+		if(load_wait<0) load_wait=0; if((++load_wait)==1) $("#load-spinner").fadeIn();
+		$.post('/api/emailcomment/read/'+$(this).attr("attr-id"), {entity: $("#newcomment-modal-entity").val(), entity_id: $("#newcomment-modal-entityid").val(), comment: $("#newcomment-modal-comment").val()},
+				function(data, status, xhr){
+					if((--load_wait)==0) $("#load-spinner").fadeOut();
+					if(data.result==1){
+						$("#mails-modal-body-iframe-preview-message").attr("srcdoc",data.content);
+						$("#mails-modal-viewer").modal('toggle');
+					}else toastr.error("Ocurrió un error al leer los datos", "Confirmación", confirmation);
+			}, "json");
+	});
+
+	$('body').on('click', "#mails-modal-attachments-button-save", function(event) {
+		if(load_wait<0) load_wait=0; if((++load_wait)==1) $("#load-spinner").fadeIn();
+		$("#mails-modal-attachments-body").find(':checkbox:checked').each(function () {
+			console.log($(this).attr("id"));
+			filename=$(this).attr('attr-filename');
+			$.post('/api/email/attachmenttocloud/'+$(this).attr('attr-account')+'/'+$(this).attr('attr-folder')+'/'+$(this).attr('attr-mail')+'/get', {entity: 'ERPBuyOrders', entity_id: $("#newcomment-modal-entityid").val(), file: $(this).attr('attr-filename'), encoding: $(this).attr('attr-encoding'), part: $(this).attr('attr-partno')},
+					function(data, status, xhr){
+						if((--load_wait)==0) $("#load-spinner").fadeOut();
+						if(data.result==1){
+							toastr.success("Archivo '"+filename+"' descargado correctamente", "Confirmación", confirmation);
+						}else toastr.error("Ocurrió un error al descargar el archivo '"+filename+"'", "Confirmación", confirmation);
+				}, "json");
+		});
+		$("#mails-modal-attachments").modal('hide');
+
+	});
+
+});
+</script>

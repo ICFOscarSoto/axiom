@@ -13,6 +13,7 @@ use App\Modules\Email\Entity\EmailAccounts;
 use App\Modules\Email\Entity\EmailFolders;
 use App\Modules\Email\Entity\EmailSubjects;
 use App\Modules\Email\Utils\EmailUtils;
+use App\Modules\Cloud\Entity\CloudFiles;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
 use Symfony\Component\Validator\Constraints\DateTime;
@@ -446,6 +447,8 @@ class EmailController extends Controller
 						foreach($emailSubjects as $emailSubject){
 							$subject=array();
 							$subject["id"]						=$emailSubject->uid;
+							$subject["folderId"]			=$emailFolder->getId();
+							$subject["accountId"]			=$emailAccount->getId();
 							$subject["subject"]				=isset($emailSubject->subject)?HelperMail::decode_header(imap_utf8($emailSubject->subject)):'';
 						  $subject["from"]					=isset($emailSubject->from)?HelperMail::decode_header(imap_utf8($emailSubject->from)):'';
 							$subject["to"]						=isset($emailSubject->to)?HelperMail::decode_header(imap_utf8($emailSubject->to)):'';
@@ -628,48 +631,13 @@ class EmailController extends Controller
 				"user" => $this->getUser()->getId()
 			]);
 			if(!$emailAccount) return new JsonResponse(array("result"=> -1));
-			$connectionString='{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'/novalidate-cert}'.$emailFolder->getName();
-			$inbox = imap_open($connectionString,$emailAccount->getUsername() ,$emailAccount->getPassword());
-			if(!$inbox) return new JsonResponse(array("result"=> 0));
-			$subject=imap_fetch_overview ($inbox, $id, 0);
-			if(!count($subject)) return new JsonResponse(array("result"=> 0));
-			$emailSubject=$subject[0];
-
-
 			$emailUtils = new EmailUtils();
 			$emailUtils->container=$this->container;
-			$emailUtils->getmsg($inbox,$emailSubject->msgno);
-
-			$message["id"]						=$emailSubject->uid;
-			$message["folder"]				=$folder;
-			$message["subject"]				=isset($emailSubject->subject)?HelperMail::decode_header(imap_utf8($emailSubject->subject)):'';
-			$message["from"]					=isset($emailSubject->from)?HelperMail::decode_header(imap_utf8($emailSubject->from)):'';
-			$message["to"]						=isset($emailSubject->to)?HelperMail::decode_header(imap_utf8($emailSubject->to)):'';
-			$message["message_id"]		=isset($emailSubject->message_id)?$emailSubject->message_id:'';
-			$message["imgFrom"]			  =substr($this->generateUrl('getUserImage', array('id' => 0)),1); //TODO Buscar foto del contacto en la agenda
-			$message["content"]		  	=($emailUtils->htmlmsg!=null)?(preg_match('!!u', $emailUtils->htmlmsg)?$emailUtils->htmlmsg:utf8_encode($emailUtils->htmlmsg)):$emailUtils->plainmsg;
-			$message["signature"]			=$emailAccount->getSignature();
-			$message["attachments"]		=$emailUtils->attachments;
-			$message["size"]					=$emailSubject->size;
-			$message["uid"]						=$emailSubject->uid;
-			$message["msgno"]					=$emailSubject->msgno;
-			$message["recent"]				=$emailSubject->recent;
-			$message["flagged"]				=$emailSubject->flagged;
-			$message["answered"]			=$emailSubject->answered;
-			$message["deleted"]				=$emailSubject->deleted;
-			$message["seen"]					=$emailSubject->seen;
-			$message["draft"]					=$emailSubject->draft;
-			$message["date"]					=new \DateTime(date('Y-m-d H:i:s',$emailSubject->udate));
-			$message["timestamp"]			=$message["date"]->getTimestamp();
-			$message["url"]						=$this->generateUrl('emailView', array('folder'=>$emailFolder->getId(), 'id' => $emailSubject->msgno));
-			$message["urlDelete"]			=$this->generateUrl('emailMove', array('id' => $emailSubject->uid, "origin"=> $emailFolder->getId(), "destination"=>$emailAccount->getTrashFolder()->getId()));
-			$message["urlRead"]				=$this->generateUrl('emailSetFlag', array('id' => $emailSubject->uid, 'flag' => 'Seen', 'value' => 1));
-			$message["urlFlagged"]		=$this->generateUrl('emailSetFlag', array('id' => $emailSubject->uid, 'flag' => 'Flagged', 'value' => 1));
-			$message["urlUnRead"]			=$this->generateUrl('emailSetFlag', array('id' => $emailSubject->uid, 'flag' => 'Seen', 'value' => 0));
-			$message["urlUnFlagged"]	=$this->generateUrl('emailSetFlag', array('id' => $emailSubject->uid, 'flag' => 'Flagged', 'value' => 0));
+			$message=$emailUtils->readEmail($emailAccount, $emailFolder, $this->container, $id, $router);
+			$message["folder"]=$folder;
 
 			//Check if is a new mail
-			$subject=$emailSubjectRepository->findOneBy(["uid"=>$emailSubject->uid, "folder"=>$emailFolder]);
+			$subject=$emailSubjectRepository->findOneBy(["uid"=>$message["uid"], "folder"=>$emailFolder]);
 			if($subject!=null){
 				$entityManager->remove($subject);
 				$emailFolder->setUnseen($emailFolder->getUnseen()>0?$emailFolder->getUnseen()-1:0);
@@ -891,6 +859,66 @@ class EmailController extends Controller
 		$entityUtils=new GlobaleEntityUtils();
 		$result=$entityUtils->deleteObject($id, $this->class, $this->getDoctrine());
 		return new JsonResponse(array('result' => $result));
+	}
+
+	/**
+	 * @Route("/api/email/attachmenttocloud/{account}/{folder}/{id}/get", name="emailAttachmentToCloud")
+	 */
+	public function emailAttachmentToCloud($id, $folder, $account, RouterInterface $router,Request $request){
+		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			$emailAccountRepository = $this->getDoctrine()->getRepository(EmailAccounts::class);
+			$emailFolderRepository = $this->getDoctrine()->getRepository(EmailFolders::class);
+
+			//Obtenemos datos por post
+			$entity=$request->request->get('entity');
+			$entity_id=$request->request->get('entity_id');
+			$filename = $request->request->get('file');
+			$encoding=$request->request->getInt('encoding', 3);
+			$part=$request->request->getInt('part', 0);
+
+			$uploadDir=$this->get('kernel')->getRootDir() . '/../cloud/'.$this->getUser()->getCompany()->getId().'/'.$entity.'/'.$entity_id.'/';
+			$destFileName = date("YmdHis").'_'.md5(uniqid());
+			//Creamos la estructura de directorios si fuese necesario
+			if (!file_exists($uploadDir) && !is_dir($uploadDir)) {
+					mkdir($uploadDir, 0775, true);
+			}
+
+			$emailAccount = $emailAccountRepository->findOneBy(["id"=>$account]);
+			if(!$emailAccount) return new JsonResponse(["result"=>-1]);
+			$emailFolder = $emailFolderRepository->findOneBy(["id"=>$folder]);
+			if(!$emailFolder) return new JsonResponse(["result"=>-2]);
+
+			if($filename!=null){
+				if($emailAccount->getUser()->getId()==$this->getUser()->getId()){
+					//Descargamos el fichero
+					$connectionString='{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'/novalidate-cert}'.$emailFolder->getName();
+					$inbox = imap_open($connectionString,$emailAccount->getUsername() ,$emailAccount->getPassword());
+					$emailUtils = new EmailUtils();
+					$data=$emailUtils->getAtachment($inbox,$id,$encoding,$part);
+					//Salvamos los datos obtenidos en base64
+					file_put_contents($uploadDir.$destFileName, $data);
+					//Creamos objeto Cloud
+					$cloudFile=new CloudFiles();
+					$cloudFile->setCompany($this->getUser()->getCompany());
+					$cloudFile->setUser($this->getUser());
+					$cloudFile->setName($filename);
+					$cloudFile->setType('Adjunto email');
+					$cloudFile->setHashname($destFileName);
+					$cloudFile->setSize(filesize($uploadDir.$destFileName));
+					$cloudFile->setPath($entity);
+					$cloudFile->setIdclass($entity_id);
+					$cloudFile->setPublic(true);
+					$cloudFile->setDateupd(new \DateTime());
+					$cloudFile->setDateadd(new \DateTime());
+					$cloudFile->setActive(true);
+					$cloudFile->setDeleted(false);
+					$this->getDoctrine()->getManager()->persist($cloudFile);
+					$this->getDoctrine()->getManager()->flush();
+
+					return new JsonResponse(["result"=>1]);
+				}
+			}
+		 return new JsonResponse(["result"=>-3]);
 	}
 
 }

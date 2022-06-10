@@ -1,0 +1,80 @@
+<!-- Mail Body -->
+<div class="mail-body">
+
+  <div class="mail-header">
+    <!-- title -->
+    <h3 id="mail-folder-name" class="mail-title">
+      Inbox
+      <span id="mail-unreaded-count" class="count">(6)</span>
+    </h3>
+
+    <!-- search -->
+    <form id="mail-search" class="mail-search">
+      <div class="input-group">
+        <input type="text" class="form-control" id="mail-search-query" name="s" placeholder="Buscar" value="{{ q }}"/>
+        <div class="input-group-addon">
+          <i class="entypo-search"></i>
+        </div>
+        <div id="mail-links" style="float: right;" class="mail-links">
+        </div>
+      </div>
+    </form>
+  </div>
+
+
+  <!-- mail table -->
+  <table class="table mail-table">
+    <!-- mail table header -->
+    <thead>
+      <tr>
+        <th width="5%">
+          <div class="checkbox checkbox-replace">
+            <input type="checkbox" />
+          </div>
+        </th>
+        <th colspan="6">
+
+          <div class="mail-select-options">Marcar como leido</div>
+
+          <div id="mail-pagination-top"  class="mail-pagination" colspan="2">
+            <strong>1-30</strong> <span>of 789</span>
+
+            <div class="btn-group">
+              <a href="#" class="btn btn-sm btn-white"><i class="entypo-left-open"></i></a>
+              <a href="#" class="btn btn-sm btn-white"><i class="entypo-right-open"></i></a>
+            </div>
+          </div>
+        </th>
+      </tr>
+    </thead>
+
+    <!-- email list -->
+    <tbody id="list-messages">
+      <!-- MESSAGES -->
+
+      <!-- END MESSAGES -->
+    </tbody>
+
+    <!-- mail table footer -->
+    <tfoot>
+      <tr>
+        <th width="5%">
+          <div class="checkbox checkbox-replace">
+            <input type="checkbox" />
+          </div>
+        </th>
+        <th colspan="6">
+
+          <div id="mail-pagination-bottom" class="mail-pagination" colspan="2">
+            <strong>1-30</strong> <span>of 789</span>
+
+            <div class="btn-group">
+              <a href="#" class="btn btn-sm btn-white"><i class="entypo-left-open"></i></a>
+              <a href="#" class="btn btn-sm btn-white"><i class="entypo-right-open"></i></a>
+            </div>
+          </div>
+        </th>
+      </tr>
+    </tfoot>
+  </table>
+</div>

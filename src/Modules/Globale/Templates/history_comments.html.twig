@@ -1,0 +1,114 @@
+<div class="modal fade" id="newcomment-modal" data-backdrop="static" style="display: none;">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">Añadir comentario</h4>
+			</div>
+			<div id="newcomment-modal-body" class="modal-body">
+				  <input type="hidden" id="newcomment-modal-commentid" value="" />
+					<input type="hidden" id="newcomment-modal-userid" value="{{ history.userid }}" />
+					<input type="hidden" id="newcomment-modal-username" value="{{ history.username }}" />
+					<input type="hidden" id="newcomment-modal-userlastname" value="{{ history.userlastname }}" />
+					<input type="hidden" id="newcomment-modal-entity" value="{{ history.entity }}" />
+					<input type="hidden" id="newcomment-modal-entityid" value="{{ history.entity_id }}" />
+					<textarea id="newcomment-modal-comment"></textarea>
+			</div>
+			<div id="newcomment-modal-footer" class="modal-footer">
+				<button type="button" class="btn btn-primary" data-dismiss="modal">Cancelar</button>
+				<button attr-action="" id="newcomment-modal-button-save" type="button" class="btn btn-success">Guardar</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+function addComment(id, userid, username, userlastname, comment){
+	html='<div class="history-element" id="history-element-comment-'+id+'" attr-id="'+id+'" style="display: none;">'+
+			 '  <div class="history-element-user">'+
+			 '	    <span><span><img src="/api/user/'+userid+'/getimage" class="img-circle" width="22">&nbsp;&nbsp;'+username+' '+userlastname+'</span></span>'+
+			 '	</div>'+
+			 '	<div class="history-element-type">'+
+       '    <a attr-search="false" href="javascript:void(0)" style="font-size: 10px;margin-right: 5px" attr-id="'+id+'" id="button-edit-comment-'+id+'" type="button" class="btn tooltip-primary btn-primary">'+
+       '				 <i class="fa fa-pencil" aria-hidden="true"></i>&nbsp;Editar'+
+   		 '    </a>'+
+       '    <a attr-search="false" href="javascript:void(0)" style="font-size: 10px;margin-right: 20px" attr-id="'+id+'" id="button-remove-comment-'+id+'" type="button" class="btn tooltip-primary btn-primary">'+
+       '         <i class="fa fa-trash" aria-hidden="true"></i>&nbsp;Borrar'+
+       '    </a>'+
+			 '	    <i class="fa fa-commenting" aria-hidden="true"></i>&nbsp;&nbsp;Comentario'+
+			 '	  </div>'+
+			 '	  <div class="history-element-timeago">Ahora mismo</div>'+
+			 '	  <div class="history-element-date">El '+moment(new Date()).format("DD/MM/YYYY")+' a las '+moment(new Date()).format("hh:mm")+'</div>'+
+			 '	  <div class="history-element-content" id="history-element-content-'+id+'" style="color: white;">'+comment+'</div>'+
+			 '	</div>'+
+			 '	<div class="vl"></div>';
+	$("#history-column-content").html(html+$("#history-column-content").html());
+	$("#history-element-comment-"+id).slideDown();
+}
+
+$(document).ready(function(){
+	var newcomment_editor = new Jodit("#newcomment-modal-comment",{});
+
+  $("#button-add-comment").click(function() {
+		newcomment_editor.value='';
+		$("#newcomment-modal-commentid").val(0);
+	  $("#newcomment-modal").modal('toggle');
+	});
+
+  $('body').on('click', "[id^='button-edit-comment-']", function(event) {
+		newcomment_editor.value=$("#history-element-content-"+$(this).attr("attr-id")).html();
+		$("#newcomment-modal-commentid").val($(this).attr("attr-id"));
+	  $("#newcomment-modal").modal('toggle');
+	});
+
+  $('body').on('click', "[id^='button-remove-comment-']", function(event) {
+    var idcomment=$(this).attr("attr-id");
+    $.confirm({
+        theme: 'bootstrap',
+        title: 'Confirmación',
+        content: '¿Esta seguro que desea borrar este comentario?',
+        buttons: {
+           confirm: { text: 'Borrar', btnClass: 'btn-red', action: function(){
+             $.post('/api/globale/removecomment/'+idcomment, {},
+       					function(data, status, xhr){
+       						if((--load_wait)==0) $("#load-spinner").fadeOut();
+       						if(data.result==1){
+       							toastr.success("Comentario borrado correctamente", "Confirmación", confirmation);
+                     	$("#history-element-comment-"+idcomment).slideUp();
+                      {# Borrar espaciado #}
+                      $("#history-element-comment-"+idcomment).next().remove();
+                      {# Actualizar budge #}
+                      $("#history-column-badge-comments").text(($("#history-column-badge-comments").text()*1)-1);
+       						}else toastr.error("Ocurrió un error al borrar el comentario", "Confirmación", confirmation);
+       				}, "json");
+           } },
+           cancel: { text: 'Cancelar' }
+        }
+    });
+  });
+
+	$("#newcomment-modal-button-save").click(function() {
+		if(newcomment_editor.value!=''){
+			if((++load_wait)==1) $("#load-spinner").fadeIn();
+			$.post('/api/globale/savecomment/'+$("#newcomment-modal-commentid").val(), {entity: $("#newcomment-modal-entity").val(), entity_id: $("#newcomment-modal-entityid").val(), comment: $("#newcomment-modal-comment").val()},
+					function(data, status, xhr){
+						if((--load_wait)==0) $("#load-spinner").fadeOut();
+						if(data.result==1){
+							toastr.success("Comentario guardado correctamente", "Confirmación", confirmation);
+              {# Comprobar si es nueva insercion o edicion #}
+              if($("#newcomment-modal-commentid").val()==0){
+							       addComment(data.id, $("#newcomment-modal-userid").val(), $("#newcomment-modal-username").val(), $("#newcomment-modal-userlastname").val(), newcomment_editor.value);
+                     {# Actualizar budge #}
+                     $("#history-column-badge-comments").text(($("#history-column-badge-comments").text()*1)+1);
+              }else{
+                    $("#history-element-content-"+$("#newcomment-modal-commentid").val()).html(newcomment_editor.value);
+              }
+              $("#newcomment-modal").modal('hide');
+							newcomment_editor.value='';
+						}else toastr.error("Ocurrió un error al guardar los datos", "Confirmación", confirmation);
+				}, "json");
+		}else{
+			alert('Debe escribir algo en el comentario para guardarlo.');
+		}
+	});
+});
+</script>

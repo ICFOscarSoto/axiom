@@ -1,0 +1,74 @@
+<!-- Mail Body -->
+<div class="mail-body">
+  <div class="row">
+    <!-- search -->
+      <div class="col-md-6">
+        <form id="mail-search" class="mail-search">
+          <div class="input-group">
+            <input type="text" class="form-control" id="mail-search-query" name="s" placeholder="Buscar" value="{{ q }}"/>
+            <div class="input-group-addon" style="height: 20px; padding: 0px 5px;">
+              <i class="entypo-search" style="font-size: 10px;"></i>
+            </div>
+            <div id="mail-links" style="float: right;" class="mail-links">
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="col-md-4">
+      </div>
+      <div class="col-md-2">
+        <div id="mail-pagination-top" class="mail-pagination"></div>
+      </div>
+
+  </div>
+    <div id="list-messages" style="height: 300px;overflow-y: auto;overflow-x: hidden;">
+      <!-- MESSAGES -->
+      <!-- END MESSAGES -->
+    </div>
+    <div id="preview-message" style="height: 300px;">
+      <iframe id="iframe-preview-message" style="border: 1px solid #e5e5e5;margin-top: 5px;width: 100%;height: 300px;">
+      </iframe>
+      <div style="display: contents;">
+        <div style="display: inline-flex;margin-top: 20px;" id="mail-attachments"></div>
+      </div>
+    </div>
+</div>
+
+<script>
+      var mailId=-1;
+      $(document).ready(function(){
+        $('body').on('click', "[id^='mail-element-']", function() {
+          if((++load_wait)==1) $("#load-spinner").fadeIn();
+          mailId=$(this).attr('attr-id');
+          folderId=$(this).attr('attr-folder');
+          accountId=$(this).attr('attr-account');
+          $.getJSON('/api/emails/'+$(this).attr('attr-folder')+'/'+$(this).attr('attr-id')+'/get', function( data ){
+            $.getJSON(data.urlRead, function( data2 ){});
+            //data.content=data.content.replace(new RegExp('<style','g'), '<style scoped');
+            $("#iframe-preview-message").attr("srcdoc",data.content);
+            /*$("#mail-subject").html(data.subject);
+            $("#mail-from").html('<img src="{{ url('index') }}'+data.imgFrom+'" class="img-circle" width="30" /><span></span>');
+            $("#mail-from > span").text(data.from);
+            $("#mail-date").text(moment(data.timestamp*1000).format('llll'));
+            $("#email-modal-button-continue").attr("attr-action",data.urlDelete);*/
+            //$("#mail-attachments-count").text(data.attachments.length);
+            $("#mail-attachments").html('');
+              $.each( data.attachments, function(key,val){
+                url=$("#mail-attachments").attr('attr-url');
+                url='/api/email/getattachment/'+accountId+'/'+folderId+'/'+mailId+'/get'+"?file="+encodeURI(val.filename)+"&encoding="+val.encoding+"&part="+val.partno;
+                  $("#mail-attachments").append('<div><a id="mail-attachment-element-id-'+key+'" href="'+url+'" class="thumb" attr-id="'+key+'" attr-icon="'+val.icon+'" attr-filename="'+val.filename+'" attr-encoding="'+val.encoding+'"  attr-partno="'+val.partno+'" attr-account="'+accountId+'" attr-folder="'+folderId+'" attr-mail="'+mailId+'"><img width="32px" src="'+val.icon+'" class="img-rounded" /></a>'+
+                  '<a href="'+url+'" class="name">'+val.filename+'</a></div>');
+              });
+          }).always(function() {
+            if((--load_wait)==0) $("#load-spinner").fadeOut();
+          });
+        });
+
+        //search
+        $( "#mail-search" ).on( "submit", function( event ) {
+          event.preventDefault();
+          getEmails('/api/emails/list/'+mailFolder,'?query='+$("#mail-search-query").val());
+        });
+
+      });
+</script>

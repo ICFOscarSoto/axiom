@@ -1,14 +1,14 @@
 {% if history is defined %}
-<div id="history-column" class="" style="width: 600px;display: flex;flex-direction: column;right: -600px;position: absolute;background-color: #07080ab3;backdrop-filter: blur(3px);z-index: 999;/*border-left: 4px solid #303641;*/">
+<div id="history-column" class="" style="width: 600px;display: flex;flex-direction: column;right: -600px;position: absolute;background-color: #07080ab3;backdrop-filter: blur(3px);z-index: 999;/*border-left: 4px solid #303641;*/" oncontextmenu="return false;">
 	<div id="history-badge" class="history-badge">
 		<div class="">
-		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
-		<path fill="#aaabae" d="M0 144v224C0 394.5 21.49 416 48 416V96C21.49 96 0 117.5 0 144zM96 96v320c0 26.51 21.49 48 48 48v-416C117.5 48 96 69.49 96 96zM512 0H256C220.7 0 192 28.65 192 64v384c0 35.35 28.65 64 64 64h256c35.35 0 64-28.65 64-64V64C576 28.65 547.3 0 512 0zM528 448c0 8.836-7.164 16-16 16H256c-8.836 0-16-7.164-16-16V64c0-8.838 7.164-16 16-16h256c8.836 0 16 7.162 16 16V448z"/></svg>
-		<div style="display: inline-flex;position: relative;top: 5px;left: -22px;">
-			<span id="history-column-badge-comments" class="badge badge-info" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Número de comentarios">0</span>
-			<span id="history-column-badge-calls" class="badge badge-success" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Número de llamadas">0</span>
-			<span id="history-column-badge-emails" class="badge badge-warning" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Número de correos electrónicos">0</span>
-		</div>
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+			<path fill="#aaabae" d="M0 144v224C0 394.5 21.49 416 48 416V96C21.49 96 0 117.5 0 144zM96 96v320c0 26.51 21.49 48 48 48v-416C117.5 48 96 69.49 96 96zM512 0H256C220.7 0 192 28.65 192 64v384c0 35.35 28.65 64 64 64h256c35.35 0 64-28.65 64-64V64C576 28.65 547.3 0 512 0zM528 448c0 8.836-7.164 16-16 16H256c-8.836 0-16-7.164-16-16V64c0-8.838 7.164-16 16-16h256c8.836 0 16 7.162 16 16V448z"/></svg>
+			<div style="position: relative;top: -34px;left: -27px;">
+				<span id="history-column-badge-comments" class="badge badge-info" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Número de comentarios">{{ history.budgets.comments }}</span>
+				<span id="history-column-badge-calls" class="badge badge-purple" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Número de llamadas">{{ history.budgets.calls }}</span>
+				<span id="history-column-badge-emails" class="badge badge-orange" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Número de correos electrónicos">{{ history.budgets.emails }}</span>
+			</div>
 		</div>
 	</div>
 	<div style="padding: 5px 15px; display: inline-flex;">
@@ -16,7 +16,7 @@
 			<a attr-search="false" href="javascript:void(0)" style="font-size: 20px" id="button-add-comment" type="button" class="btn tooltip-primary btn-primary">
 				 <i class="fa fa-comment" aria-hidden="true"></i>
 			</a>
-			<a attr-search="false" href="javascript:void(0)" style="font-size: 20px" id="button-add-callphone" type="button" class="btn tooltip-primary btn-primary">
+			<a attr-search="false" href="javascript:void(0)" style="font-size: 20px" id="button-add-call" type="button" class="btn tooltip-primary btn-primary">
 				 <i class="fa fa-phone" aria-hidden="true"></i>
 			</a>
 			<a attr-search="false" href="javascript:void(0)" style="font-size: 20px" id="button-add-email" type="button" class="btn tooltip-primary btn-primary">
@@ -34,6 +34,12 @@
 		{% for key, element in history.elements %}
 			{% if element.type == 'comment' %}
 				  {{ include('@Globale/history_comment_item.html.twig') }}
+					{% elseif element.type == 'email' %}
+						{{ include('@Globale/history_email_item.html.twig') }}
+						{% elseif element.type == 'call' %}
+							{{ include('@Globale/history_call_item.html.twig') }}
+							{% elseif element.type == 'history' %}
+								{{ include('@Globale/history_history_item.html.twig') }}
 			{% endif %}
 		{% endfor %}
 	</div>
@@ -89,28 +95,10 @@
 	</div>#}
 </div>
 
-<div class="modal fade" id="newcomment-modal" data-backdrop="static" style="display: none;">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h4 class="modal-title">Añadir comentario</h4>
-			</div>
-			<div id="newcomment-modal-body" class="modal-body">
-				  <input type="hidden" id="newcomment-modal-commentid" value="" />
-					<input type="hidden" id="newcomment-modal-userid" value="{{ history.userid }}" />
-					<input type="hidden" id="newcomment-modal-username" value="{{ history.username }}" />
-					<input type="hidden" id="newcomment-modal-userlastname" value="{{ history.userlastname }}" />
-					<input type="hidden" id="newcomment-modal-entity" value="{{ history.entity }}" />
-					<input type="hidden" id="newcomment-modal-entityid" value="{{ history.entity_id }}" />
-					<textarea id="newcomment-modal-comment"></textarea>
-			</div>
-			<div id="newcomment-modal-footer" class="modal-footer">
-				<button type="button" class="btn btn-primary" data-dismiss="modal">Cancelar</button>
-				<button attr-action="" id="newcomment-modal-button-save" type="button" class="btn btn-success">Guardar</button>
-			</div>
-		</div>
-	</div>
-</div>
+{{ include('@Globale/history_calls.html.twig') }}
+{{ include('@Globale/history_comments.html.twig') }}
+{{ include('@Globale/history_mails.html.twig') }}
+
 
 <script>
 function adjustHistoryColumnHeight(){
@@ -127,23 +115,6 @@ function openHistoryColumn(){
 	$("#history-column").animate({ "right": 0 }, "fast");
 }
 
-function addComment(id, userid, username, userlastname, comment){
-	html='<div class="history-element" id="history-element-comment-'+id+'" style="display: none;">'+
-			 '  <div class="history-element-user">'+
-			 '	    <span><span><img src="/api/user/'+userid+'/getimage" class="img-circle" width="22">&nbsp;&nbsp;'+username+' '+userlastname+'</span></span>'+
-			 '	</div>'+
-			 '	<div class="history-element-type">'+
-			 '	    <i class="fa fa-commenting" aria-hidden="true"></i>&nbsp;&nbsp;Comentario'+
-			 '	  </div>'+
-			 '	  <div class="history-element-timeago">Ahora mismo</div>'+
-			 '	  <div class="history-element-date">El '+moment(new Date()).format("DD/MM/YYYY")+' a las '+moment(new Date()).format("hh:mm")+'</div>'+
-			 '	  <div class="history-element-content" style="color: white;">'+comment+'</div>'+
-			 '	</div>'+
-			 '	<div class="vl"></div>';
-	$("#history-column-content").html(html+$("#history-column-content").html());
-	$("#history-element-comment-"+id).slideDown();
-}
-
 $(document).ready(function(){
 	$(window).scroll(function() {
 			$('#history-column').css('top', $(this).scrollTop());
@@ -154,8 +125,6 @@ $(document).ready(function(){
 		 adjustHistoryColumnHeight()
 	)
 	resizeObserver.observe(document.body)
-	var newcomment_editor = new Jodit("#newcomment-modal-comment",{});
-
 	adjustHistoryColumnHeight();
 
 	$("#history-badge").click(function() {
@@ -166,31 +135,6 @@ $(document).ready(function(){
 
 	$("#button-close-history-column").click(function() {
 		closeHistoryColumn();
-	});
-
-	$("#button-add-comment").click(function() {
-		newcomment_editor.value='';
-		$("#newcomment-modal-commentid").val(0);
-	  $("#newcomment-modal").modal('toggle');
-	});
-
-	$("#newcomment-modal-button-save").click(function() {
-		if(newcomment_editor.value!=''){
-			if((++load_wait)==1) $("#load-spinner").fadeIn();
-			$.post('/api/globale/savecomment/'+$("#newcomment-modal-commentid").val(), {entity: $("#newcomment-modal-entity").val(), entity_id: $("#newcomment-modal-entityid").val(), comment: $("#newcomment-modal-comment").val()},
-					function(data, status, xhr){
-						if((--load_wait)==0) $("#load-spinner").fadeOut();
-						console.log(data.result);
-						if(data.result==1){
-							toastr.success("Comentario guardado correctamente", "Confirmación", confirmation);
-							addComment(data.id, $("#newcomment-modal-userid").val(), $("#newcomment-modal-username").val(), $("#newcomment-modal-userlastname").val(), newcomment_editor.value);
-							$("#newcomment-modal").modal('hide');
-							newcomment_editor.value='';
-						}else toastr.error("Ocurrió un error al guardar los datos", "Confirmación", confirmation);
-				}, "json");
-		}else{
-			alert('Debe escribir algo en el comentario para guardarlo.');
-		}
 	});
 
 });

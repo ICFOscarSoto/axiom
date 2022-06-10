@@ -1,0 +1,130 @@
+<div class="modal fade" id="calls-modal" data-backdrop="static" oncontextmenu="return false;" style="display: none;">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">Llamadas disponibles</h4>
+			</div>
+			<div id="calls-modal-body" class="modal-body">
+			</div>
+			<div id="calls-modal-footer" class="modal-footer">
+				<button type="button" class="btn btn-primary" data-dismiss="modal">Cancelar</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+
+
+function addCall(id, userid, username, userlastname, file, calltype, extension, remote){
+	html='<div class="history-element" id="history-element-call-'+id+'" attr-id="'+id+'">'+
+			'	  <div class="history-element-user">'+
+			'	    <span><span><img src="/api/user/'+userid+'/getimage" class="img-circle" width="22">&nbsp;&nbsp;'+username+' '+userlastname+'</span></span>'+
+			'	  </div>'+
+			'	  <div class="history-element-type">'+
+			'	      <a attr-search="false" href="javascript:void(0)" style="font-size: 10px;margin-right: 20px" attr-id="'+id+'" id="button-remove-call-'+id+'" type="button" class="btn tooltip-primary btn-primary">'+
+			'	        <i class="fa fa-trash" aria-hidden="true"></i>&nbsp;Borrar'+
+			'	      </a>'+
+			'	    <i class="fa fa-phone-square" aria-hidden="true"></i>&nbsp;&nbsp;LLamada'+
+			'	  </div>'+
+			'	  <div class="history-element-timeago">Ahora mismo</div>'+
+			'	  <div class="history-element-date">El '+moment(new Date()).format("DD/MM/YYYY")+' a las '+moment(new Date()).format("hh:mm")+'</div>'+
+			'	  <div class="history-element-content" id="history-element-content-'+id+'" style="color: #d9d9d9;">'+
+			'	    <div class="row" style="padding-right: 85px;">'+
+			'	      <div class="col-md-6">'+
+			'	        <div>Tipo: '+calltype+'</div>'+
+			'	        <div>Extensión: '+extension+'</div>'+
+			'	        <div>Remoto: '+remote+'</div>'+
+			'	      </div>'+
+			'	      <div class="col-md-6">'+
+			'	        <audio id="audio-" preload="auto" controls controlsList="nodownload noplaybackrate"><source src="/api/globale/previewcallrecord/final/'+file+'"></audio>'+
+			'	      </div>'+
+			'	    </div>'+
+			'	  </div>'+
+			'	</div>'+
+			'	<div class="vl"></div>';
+	$("#history-column-content").html(html+$("#history-column-content").html());
+	$("#history-element-call-"+id).slideDown();
+}
+
+function getCalls(){
+	if(load_wait<0) load_wait=0; if((++load_wait)==1) $("#load-spinner").fadeIn();
+	$.post('/api/globale/getavailablecallrecords', {},
+		function(data, status, xhr){
+		 if((--load_wait)==0) $("#load-spinner").fadeOut();
+				 if(data.result==1){
+					 	html='';
+					 	$.each( data.data, function( key, val ) {
+							if(key%2) color="#f8f8f8"; else color="#ffffff";
+							html+="<div class=\"row align-items-center\" style='display: flex;margin-bottom: 5px; background-color: "+color+";'>";
+							html+="<div class='col-md-2' style='display: flex;align-content: center;justify-content: center;flex-direction: column;'>"+val.type+"</div>";
+							html+="<div class='col-md-2' style='display: flex;align-content: center;justify-content: center;flex-direction: column;'>"+val.remote+"</div>";
+							html+="<div class='col-md-2' style='display: flex;align-content: center;justify-content: center;flex-direction: column;'>"+val.dateadd+"</div>";
+							html+="<div class='col-md-4' style='display: flex;align-content: center;justify-content: center;flex-direction: column;'>"+
+										"<audio id=\"audio-"+key+"\" preload=\"auto\" controls controlsList=\"nodownload noplaybackrate\">"+
+												"<source src=\"/api/globale/previewcallrecord/temp/"+val.filename+"\">"+
+										"</audio></div>";
+							html+="<div class='col-md-2' style='display: flex;align-content: center;justify-content: center;flex-direction: column;'><button type=\"button\" id='calls-modal-button-save-"+key+"' class=\"btn btn-success\" attr-file='"+val.filename+"'>Añadir</button></div></div>";
+
+						});
+						$("#calls-modal-body").html(html);
+						$("#calls-modal").modal('toggle');
+				 }else toastr.error("Ocurrió un error al obtener las llamadas teléfonicas", "Confirmación", confirmation);
+		 }, "json").always(function() {
+    	if((--load_wait)==0) $("#load-spinner").fadeOut();
+  	});
+}
+
+$(document).ready(function(){
+  $("#button-add-call").click(function() {
+		getCalls();
+	});
+
+  $('body').on('click', "[id^='button-remove-call-']", function(event) {
+    var idcall=$(this).attr("attr-id");
+    $.confirm({
+        theme: 'bootstrap',
+        title: 'Confirmación',
+        content: '¿Esta seguro que desea borrar esta llamada?',
+        buttons: {
+           confirm: { text: 'Borrar', btnClass: 'btn-red', action: function(){
+						 if(load_wait<0) load_wait=0; if((++load_wait)==1) $("#load-spinner").fadeIn();
+						 $.post('/api/globale/removecall/'+idcall, {},
+						 	function(data, status, xhr){
+							 if((--load_wait)==0) $("#load-spinner").fadeOut();
+									 if(data.result==1){
+										 toastr.success("Llamada borrada correctamente", "Confirmación", confirmation);
+											 $("#history-element-call-"+idcall).slideUp();
+											 {# Borrar espaciado #}
+											 $("#history-element-call-"+idcall).next().remove();
+											 {# Actualizar budge #}
+											 $("#history-column-badge-calls").text(($("#history-column-badge-calls").text()*1)-1);
+									 }else toastr.error("Ocurrió un error al borrar la llamada", "Confirmación", confirmation);
+							 }, "json");
+					 } },
+           cancel: { text: 'Cancelar' }
+        }
+    });
+  });
+
+	$('body').on('click', "[id^='calls-modal-button-save-']", function(event) {
+		if(load_wait<0) load_wait=0; if((++load_wait)==1) $("#load-spinner").fadeIn();
+		$.post('/api/globale/callcomment/save', {entity: $("#newcomment-modal-entity").val(), entity_id: $("#newcomment-modal-entityid").val(), file: $(this).attr('attr-file')},
+				function(data, status, xhr){
+					if((--load_wait)==0) $("#load-spinner").fadeOut();
+					if(data.result==1){
+						toastr.success("Llamada guardada correctamente", "Confirmación", confirmation);
+            addCall(data.id, $("#newcomment-modal-userid").val(), $("#newcomment-modal-username").val(), $("#newcomment-modal-userlastname").val(), data.file, data.calltype, data.extension, data.remote);
+ 					  {# Actualizar budge #}
+						$("#history-column-badge-calls").text(($("#history-column-badge-calls").text()*1)+1);
+						$("#calls-modal").modal('hide');
+					}else{
+						console.log(data.result);
+						 toastr.error("Ocurrió un error al guardar los datos", "Confirmación", confirmation);
+					 }
+			}, "json");
+	});
+
+
+});
+</script>

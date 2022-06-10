@@ -8,6 +8,47 @@ class EmailUtils{
   public $attachments=array();
   public $container=null;
 
+  function readEmail($emailAccount, $emailFolder, $container, $id, $router){
+    //$emailUtils = new EmailUtils();
+    $connectionString='{'.$emailAccount->getServer().':'.$emailAccount->getPort().'/imap/'.$emailAccount->getProtocol().'/novalidate-cert}'.$emailFolder->getName();
+    $inbox = imap_open($connectionString,$emailAccount->getUsername() ,$emailAccount->getPassword());
+    if(!$inbox) return null;
+    $subject=imap_fetch_overview ($inbox, $id, 0);
+    if(!count($subject)) return null;
+    $emailSubject=$subject[0];
+
+    $this->container=$this->container;
+    $this->getmsg($inbox,$emailSubject->msgno);
+    $message["id"]						=$emailSubject->uid;
+    $message["subject"]				=isset($emailSubject->subject)?HelperMail::decode_header(imap_utf8($emailSubject->subject)):'';
+    $message["from"]					=isset($emailSubject->from)?HelperMail::decode_header(imap_utf8($emailSubject->from)):'';
+    $message["to"]						=isset($emailSubject->to)?HelperMail::decode_header(imap_utf8($emailSubject->to)):'';
+    $message["message_id"]		=isset($emailSubject->message_id)?$emailSubject->message_id:'';
+    $message["imgFrom"]			  =substr($router->generate('getUserImage', array('id' => 0)),1); //TODO Buscar foto del contacto en la agenda
+    $message["content"]		  	=($this->htmlmsg!=null)?(preg_match('!!u', $this->htmlmsg)?$this->htmlmsg:utf8_encode($this->htmlmsg)):$this->plainmsg;
+    $message["signature"]			=$emailAccount->getSignature();
+    $message["attachments"]		=$this->attachments;
+    $message["size"]					=$emailSubject->size;
+    $message["uid"]						=$emailSubject->uid;
+    $message["msgno"]					=$emailSubject->msgno;
+    $message["recent"]				=$emailSubject->recent;
+    $message["flagged"]				=$emailSubject->flagged;
+    $message["answered"]			=$emailSubject->answered;
+    $message["deleted"]				=$emailSubject->deleted;
+    $message["seen"]					=$emailSubject->seen;
+    $message["draft"]					=$emailSubject->draft;
+    $message["date"]					=new \DateTime(date('Y-m-d H:i:s',$emailSubject->udate));
+    $message["timestamp"]			=$message["date"]->getTimestamp();
+    $message["url"]						=$router->generate('emailView', array('folder'=>$emailFolder->getId(), 'id' => $emailSubject->msgno));
+    $message["urlDelete"]			=$router->generate('emailMove', array('id' => $emailSubject->uid, "origin"=> $emailFolder->getId(), "destination"=>$emailAccount->getTrashFolder()->getId()));
+    $message["urlRead"]				=$router->generate('emailSetFlag', array('id' => $emailSubject->uid, 'flag' => 'Seen', 'value' => 1));
+    $message["urlFlagged"]		=$router->generate('emailSetFlag', array('id' => $emailSubject->uid, 'flag' => 'Flagged', 'value' => 1));
+    $message["urlUnRead"]			=$router->generate('emailSetFlag', array('id' => $emailSubject->uid, 'flag' => 'Seen', 'value' => 0));
+    $message["urlUnFlagged"]	=$router->generate('emailSetFlag', array('id' => $emailSubject->uid, 'flag' => 'Flagged', 'value' => 0));
+    return $message;
+  }
+
+
   function getMsg($mbox,$mid) {
       // input $mbox = IMAP stream, $mid = message id
       // output all the following:

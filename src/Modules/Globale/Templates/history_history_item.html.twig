@@ -1,0 +1,26 @@
+<div class="history-element-action" id="history-element-comment-{{element.id}}" attr-id="{{element.id}}">
+  <div class="history-element-user" style="width: 63%">
+    <span><span><img src="/api/user/{{ element.user_id }}/getimage" class="img-circle" width="22">&nbsp;&nbsp;{{ element.user_name }} {{ element.user_lastname }}</span></span>
+  </div>
+  <div class="history-element-type"  style="width: 35%">
+    <i class="fa fa-pencil-square" aria-hidden="true"></i>&nbsp;&nbsp;Acción
+  </div>
+  <div class="history-element-timeago">{{ element.agodate }}</div>
+  <div class="history-element-date">El {{ element.formateddate }} a las {{ element.formatedtime }}</div>
+  <div class="history-element-content" style="color: #d9d9d9;">
+    {#{% if element.changes.description is defined %}{{ element.changes.description }}{% else %}Modificó el documento{% endif %}#}
+     {% if element.changes|length == 0 %}
+        <i class="fa fa-asterisk" aria-hidden="true"></i>&nbsp;&nbsp;Creó el documento
+     {% else %}
+       {% for key, item in element.changes %}
+         {% if item.description is defined and item.description !="" %}
+             {{ item.description }}</br>
+         {% else %}
+             Cambio "{{ item.attribute }}" a {{ item.newvalue }}</br>
+         {% endif %}
+       {% endfor %}
+     {% endif %}
+  </div>
+
+</div>
+<div class="vl"></div>

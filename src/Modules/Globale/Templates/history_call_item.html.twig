@@ -1,0 +1,28 @@
+<div class="history-element" id="history-element-call-{{element.id}}" attr-id="{{element.id}}">
+  <div class="history-element-user">
+    <span><span><img src="/api/user/{{ element.user_id }}/getimage" class="img-circle" width="22">&nbsp;&nbsp;{{ element.user_name }} {{ element.user_lastname }}</span></span>
+  </div>
+  <div class="history-element-type">
+    {% if history.userid == element.user_id %}
+      <a attr-search="false" href="javascript:void(0)" style="font-size: 10px;margin-right: 20px" attr-id="{{element.id}}" id="button-remove-call-{{element.id}}" type="button" class="btn tooltip-primary btn-primary">
+        <i class="fa fa-trash" aria-hidden="true"></i>&nbsp;Borrar
+      </a>
+    {% endif %}
+    <i class="fa fa-phone-square" aria-hidden="true"></i>&nbsp;&nbsp;LLamada
+  </div>
+  <div class="history-element-timeago">{{ element.agodate }}</div>
+  <div class="history-element-date">El {{ element.formateddate }} a las {{ element.formatedtime }}</div>
+  <div class="history-element-content" id="history-element-content-{{element.id}}" style="color: #d9d9d9;">
+    <div class="row" style="padding-right: 85px;">
+      <div class="col-md-6">
+        <div>Tipo: {{ element.calltype }}</div>
+        <div>Extensión: {{ element.extension }}</div>
+        <div>Remoto: {{ element.remote }}</div>
+      </div>
+      <div class="col-md-6">
+        <audio id="audio-" preload="auto" controls controlsList="nodownload noplaybackrate"><source src="/api/globale/previewcallrecord/final/{{ element.filename }}"></audio>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="vl"></div>

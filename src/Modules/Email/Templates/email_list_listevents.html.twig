@@ -1,0 +1,8 @@
+<script>
+      $(document).ready(function(){
+        $('body').on('click', "[id^='mail-pagination-button-']", function() {
+          url=$(this).attr('attr-url');
+          getEmails(url,'?limit='+$(this).attr('attr-limit')+'&start='+$(this).attr('attr-start'));
+        });
+      });
+</script>

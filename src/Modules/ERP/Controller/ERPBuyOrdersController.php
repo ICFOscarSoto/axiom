@@ -936,7 +936,7 @@ class ERPBuyOrdersController extends Controller
 
 			// Files
 			$utilsCloud = new CloudFilesUtils();
-			$path="Buyorders";
+			$path="ERPBuyOrders";
 			$templateLists=["id"=>$path,"list"=>[$utilsCloud->formatList($this->getUser(),$path,$id)],"types"=>["Otros"], "path"=>$this->generateUrl("cloudUpload",["id"=>$id, "path"=>$path])];
 
       if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {

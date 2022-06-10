@@ -1,6 +1,6 @@
 [{"name": "id", "caption":""},
  {"name": "icon", "caption":"", "type":"image", "width":"45px"},
- {"name": "name","caption":"Nombre","width":"30%"},
- {"name": "type","caption":"Tipo"},
- {"name": "size","caption":"Tamaño"}
+ {"name": "name","caption":"Nombre"},
+ {"name": "type","caption":"Tipo","width":"250px"},
+ {"name": "size","caption":"Tamaño","width":"70px"}
 ]

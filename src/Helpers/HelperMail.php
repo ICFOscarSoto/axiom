@@ -60,6 +60,7 @@ class HelperMail {
                 case "UTF-8":
                     break;
                 default:
+                  $data=utf8_encode($data);
                     /* Here's where you should handle other character sets! */
                     //throw new Exception("Unknown charset in header - time to write some code.");
             }
