@@ -73,3 +73,6 @@ services:
 
     App\Modules\Globale\Command\ProccessSignedDeliveryNote:
             arguments: ["%config.paths%"]
+
+    App\Modules\Globale\Command\OcrSignedDeliveryNote:
+            arguments: ["%config.paths%"]
