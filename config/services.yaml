@@ -27,14 +27,20 @@ parameters:
         db_password: %env(string:DATABASE_PASS)%
         db_host: %env(string:DATABASE_HOST)%
         db_base: %env(string:DATABASE_BASE)%
-
+    #Configuracion de los PATH globales
+    config.paths:
+      signedDeliveryNotes_temp: %env(string:SIGNEDDELIVERYNOTES_TEMP_PATH)%
+      signedDeliveryNotes: %env(string:SIGNEDDELIVERYNOTES_PATH)%
+      signedDeliveryNotes_fail: %env(string:SIGNEDDELIVERYNOTES_FAIL_PATH)%
+      signedDeliveryNotes_preOCR: %env(string:SIGNEDDELIVERYNOTES_PREOCR_PATH)%
+      callrecords: %env(string:CALLRECORDS_PATH)%
 
 services:
     # default configuration for services in *this* file
     _defaults:
-        autowire: true      # Automatically injects dependencies in your services.
-        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
-        public: false       # Allows optimizing the container by removing unused services; this also means
+      autowire: true      # Automatically injects dependencies in your services.
+      autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+      public: false       # Allows optimizing the container by removing unused services; this also means
                             # fetching services directly from the container via $container->get() won't work.
                             # The best practice is to be explicit about your dependencies anyway.
 
@@ -43,6 +49,8 @@ services:
     App\:
         resource: '../src/*'
         exclude: '../src/{DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
+
+
 
     # controllers are imported separately to make sure services can be injected
     # as action arguments even if you don't extend any base controller class
@@ -62,3 +70,6 @@ services:
     session.storage.custom:
             class: App\Modules\Globale\Services\SessionHandler
             arguments: ["%pdo.db_options%", '@security.token_storage', '@doctrine.orm.entity_manager']
+
+    App\Modules\Globale\Command\ProccessSignedDeliveryNote:
+            arguments: ["%config.paths%"]

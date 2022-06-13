@@ -16,14 +16,25 @@ use App\Modules\Globale\Entity\GlobaleHistories;
 use \App\Helpers\HelperFiles;
 use App\Modules\Globale\Helpers\PdfParser\Parser;
 use App\Modules\Globale\Helpers\PdfParser\Config;
-
+use App\Service\ContainerParametersHelper;
 
 class ProccessSignedDeliveryNote extends ContainerAwareCommand
 {
 
   private $doctrine;
   private $entityManager;
+  private $configpaths;
+
+  public function __construct(array $configpaths)
+   {
+      $this->configpaths=$configpaths;
+       parent::__construct();
+   }
+
+
+
   protected function configure(){
+      //$this->pathHelpers = $paths;
         $this
             ->setName('signeddeliverynote:proccess')
             ->setDescription('Programmed tasks of Axiom')
@@ -36,9 +47,9 @@ class ProccessSignedDeliveryNote extends ContainerAwareCommand
     $this->doctrine = $this->getContainer()->get('doctrine');
     $this->entityManager = $this->doctrine->getManager();
     //Directorios de trabajo
-    $tempDir=__DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.'2'.DIRECTORY_SEPARATOR.'temp'.DIRECTORY_SEPARATOR.'ERPSignedDeliveryNotes'.DIRECTORY_SEPARATOR;
-    $failsDir=__DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.'2'.DIRECTORY_SEPARATOR.'temp'.DIRECTORY_SEPARATOR.'ERPSignedDeliveryNotesFails'.DIRECTORY_SEPARATOR;
-    $destDir=__DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.'2'.DIRECTORY_SEPARATOR.'ERPSignedDeliveryNotes'.DIRECTORY_SEPARATOR;
+    $tempDir=$this->configpaths["signedDeliveryNotes_temp"];
+    $failsDir=$this->configpaths["signedDeliveryNotes_fail"];
+    $destDir=$this->configpaths["signedDeliveryNotes"];
 
     //Comprobamos que existan los directorios de trabajo
     if(!file_exists($tempDir) || !is_dir($tempDir))
