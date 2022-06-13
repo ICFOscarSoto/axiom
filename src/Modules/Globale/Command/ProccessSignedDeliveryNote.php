@@ -20,6 +20,7 @@ use App\Modules\Globale\Helpers\PdfParser\Config;
 
 class ProccessSignedDeliveryNote extends ContainerAwareCommand
 {
+
   private $doctrine;
   private $entityManager;
   protected function configure(){
@@ -28,6 +29,7 @@ class ProccessSignedDeliveryNote extends ContainerAwareCommand
             ->setDescription('Programmed tasks of Axiom')
         ;
   }
+
 
   protected function execute(InputInterface $input, OutputInterface $output)
   {
@@ -56,36 +58,41 @@ class ProccessSignedDeliveryNote extends ContainerAwareCommand
         if (!$fileinfo->isDot()) {
           $pdf = $parser->parseFile($tempDir.$fileinfo->getFilename());
           //Obtener la fecha del documento
-          $deliveryNoteDate=strpos($pdf->getText(),'FECHA');
-          if($deliveryNoteDate!==FALSE){
-            //A partir del primer numero despues de la palabra FECHA
-            $deliveryNoteDate=substr($pdf->getText(), $deliveryNoteDate+strcspn($pdf->getText(),'0123456789',$deliveryNoteDate), 8);
-            $date = \DateTime::createFromFormat('d/m/y', $deliveryNoteDate);
+          preg_match('/([0-9]{2})\/([0-9]{2})\/([0-9]{2})/', $pdf->getText(), $matches, PREG_OFFSET_CAPTURE);
+          if(count($matches)>0) $documentDate=$matches[0][1]; else $documentDate=FALSE;
+          if($documentDate!==FALSE){
+            $documentDate=substr($pdf->getText(), $documentDate+strcspn($pdf->getText(),'0123456789',$documentDate), 8);
+            $date = \DateTime::createFromFormat('d/m/y', $documentDate);
             if($date===false) $date = new \DateTime();
           }else{
             //No se encuentra la palabra fecha, por defecto usamos la fecha actual
             $date = new \DateTime();
           }
-          $deliveryNoteDate=$date->format('Y-m-d');
-          //Obtener el numero de documento
-          $deliveryNoteNumber=strpos($pdf->getText(),$date->format('y').'ALV');
-          $deliveryReturnNoteNumber=strpos($pdf->getText(),$date->format('y').'DVR');
-          //Nos quedamos el menor de los dos, la primera ocurrencia
-          if($deliveryReturnNoteNumber!==FALSE && $deliveryNoteNumber!==FALSE){
-            $deliveryNoteNumber=min($deliveryReturnNoteNumber, $deliveryNoteNumber);
-          }
+          $documentDate=$date->format('Y-m-d');
+          //Obtener las posiciones de los patrones de numero de documento
+          preg_match('/([0-9]{2})ALV([0-9]{6})/', $pdf->getText(), $matches, PREG_OFFSET_CAPTURE);
+          if(count($matches)>0) $deliveryNoteNumber=$matches[0][1]; else $deliveryNoteNumber=9223372036854775807;
+          preg_match('/([0-9]{2})FC([0-9]{6})/', $pdf->getText(), $matches, PREG_OFFSET_CAPTURE);
+          if(count($matches)>0) $invoiceNumber=$matches[0][1]; else $invoiceNumber=9223372036854775807;
+          preg_match('/([0-9]{2})TI([0-9]{6})/', $pdf->getText(), $matches, PREG_OFFSET_CAPTURE);
+          if(count($matches)>0) $ticketNumber=$matches[0][1]; else $ticketNumber=9223372036854775807;
+          preg_match('/([0-9]{2})DVR([0-9]{6})/', $pdf->getText(), $matches, PREG_OFFSET_CAPTURE);
+          if(count($matches)>0) $deliveryReturnNoteNumber=$matches[0][1]; else $deliveryReturnNoteNumber=9223372036854775807;
 
-          if($deliveryNoteNumber!==FALSE){
-            $deliveryNoteNumber=substr($pdf->getText(), $deliveryNoteNumber, 12);
-            $deliveryNoteNumber = preg_replace("/[^a-zA-Z0-9]+/", "", $deliveryNoteNumber);
-          }else{
+          //Elegimos el tipo de documento que primero aparezca en el archivo
+          $type=array_keys([$deliveryNoteNumber, $invoiceNumber, $ticketNumber, $deliveryReturnNoteNumber], min([$deliveryNoteNumber, $invoiceNumber, $ticketNumber, $deliveryReturnNoteNumber]));
+          $position=min($deliveryNoteNumber, $invoiceNumber, $ticketNumber, $deliveryReturnNoteNumber);
+          if($position==9223372036854775807){
             //No se puede leer el numero de albaran movemos a fallidos
             rename ($tempDir.$fileinfo->getFilename(), $failsDir.$date->format('Y-m-d-His').$fileinfo->getFilename());
-            file_get_contents("https://icfbot.ferreteriacampollano.com/message.php?msg=".urlencode(":bookmark_tabs: No se pudo detectar el número de albarán en el fichero digitalizado: ".$date->format('Y-m-d-His').$fileinfo->getFilename().""));
+            file_get_contents("https://icfbot.ferreteriacampollano.com/message.php?msg=".urlencode(":bookmark_tabs: No se pudo detectar el número de documento en el fichero digitalizado: ".$date->format('Y-m-d-His').$fileinfo->getFilename().""));
             continue;
           }
+          $documentNumber=substr($pdf->getText(), $position, 12);
+          //Limpiamos cualquier cosa que no sea letras y numeros
+          $documentNumber = preg_replace("/[^a-zA-Z0-9]+/", "", $documentNumber);
           //Creamos el nombre del fichero normalizado
-          $filename=$deliveryNoteDate.' - '.$deliveryNoteNumber.'.pdf';
+          $filename=$documentDate.' - '.$documentNumber.'.pdf';
           //Crear estructura de carpetas final
           $fileDestDir=$destDir.$date->format('Y').DIRECTORY_SEPARATOR.$date->format('m').DIRECTORY_SEPARATOR.$date->format('d').DIRECTORY_SEPARATOR;
           if(!file_exists($fileDestDir) || !is_dir($fileDestDir))
