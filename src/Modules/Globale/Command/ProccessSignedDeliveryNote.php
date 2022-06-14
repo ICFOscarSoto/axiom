@@ -110,6 +110,7 @@ class ProccessSignedDeliveryNote extends ContainerAwareCommand
           //Limpiamos cualquier cosa que no sea letras y numeros
           $documentNumber = preg_replace("/[^a-zA-Z0-9]+/", "", $documentNumber);
           //Segun el tipo realizamos operaciones adicionales
+          echo($type);
           switch($type){
             case 4:
               $documentNumber=preg_replace('/T1/', 'TI', $documentNumber, 1);
@@ -121,6 +122,7 @@ class ProccessSignedDeliveryNote extends ContainerAwareCommand
               $documentNumber=preg_replace('/711/', 'TI', $documentNumber, 1);
             break;
           }
+
           //Creamos el nombre del fichero normalizado
           $filename=$documentDate.' - '.$documentNumber.'.pdf';
           //Crear estructura de carpetas final
