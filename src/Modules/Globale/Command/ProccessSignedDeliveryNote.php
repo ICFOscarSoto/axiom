@@ -89,10 +89,17 @@ class ProccessSignedDeliveryNote extends ContainerAwareCommand
           if(count($matches)>0) $ticketNumber=$matches[0][1]; else $ticketNumber=9223372036854775807;
           preg_match('/([0-9]{2})DVR([0-9]{5})/', $pdf->getText(), $matches, PREG_OFFSET_CAPTURE);
           if(count($matches)>0) $deliveryReturnNoteNumber=$matches[0][1]; else $deliveryReturnNoteNumber=9223372036854775807;
+          preg_match('/([0-9]{2})T1([0-9]{6})/', $pdf->getText(), $matches, PREG_OFFSET_CAPTURE); //ERROR tipico en OCR 1
+          if(count($matches)>0) $ticketNumberError1=$matches[0][1]; else $ticketNumberError1=9223372036854775807;
+          preg_match('/([0-9]{2})11([0-9]{6})/', $pdf->getText(), $matches, PREG_OFFSET_CAPTURE); //ERROR tipico en OCR 2
+          if(count($matches)>0) $ticketNumberError2=$matches[0][1]; else $ticketNumberError2=9223372036854775807;
+          preg_match('/([0-9]{2})711([0-9]{6})/', $pdf->getText(), $matches, PREG_OFFSET_CAPTURE); //ERROR tipico en OCR 3
+          if(count($matches)>0) $ticketNumberError3=$matches[0][1]; else $ticketNumberError3=9223372036854775807;
+
 
           //Elegimos el tipo de documento que primero aparezca en el archivo
-          $type=array_keys([$deliveryNoteNumber, $invoiceNumber, $ticketNumber, $deliveryReturnNoteNumber], min([$deliveryNoteNumber, $invoiceNumber, $ticketNumber, $deliveryReturnNoteNumber]));
-          $position=min($deliveryNoteNumber, $invoiceNumber, $ticketNumber, $deliveryReturnNoteNumber);
+          $type=array_keys([$deliveryNoteNumber, $invoiceNumber, $ticketNumber, $deliveryReturnNoteNumber, $ticketNumberError1, $ticketNumberError2, $ticketNumberError3], min([$deliveryNoteNumber, $invoiceNumber, $ticketNumber, $deliveryReturnNoteNumber, $ticketNumberError1, $ticketNumberError2, $ticketNumberError3]));
+          $position=min($deliveryNoteNumber, $invoiceNumber, $ticketNumber, $deliveryReturnNoteNumber, $ticketNumberError1, $ticketNumberError2, $ticketNumberError3);
           if($position==9223372036854775807){
             //No se puede leer el numero de albaran movemos a fallidos
             rename ($tempDir.$fileinfo->getFilename(), $failsDir.$date->format('Y-m-d-His').$fileinfo->getFilename());
