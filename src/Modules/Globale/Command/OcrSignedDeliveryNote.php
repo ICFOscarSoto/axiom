@@ -57,7 +57,7 @@ class OcrSignedDeliveryNote extends ContainerAwareCommand
     foreach ($dir as $fileinfo) {
         if (!$fileinfo->isDot()) {
           //Obtener el numero de páginas del pfg
-          $result=shell_exec("qpdf --show-npages  \"".$ocrDir.$fileinfo->getFilename())."\"");
+          $result=shell_exec("qpdf --show-npages  \"".$ocrDir.$fileinfo->getFilename()."\"");
           $pages=intval($result);
           if($pages>1){
             //Partir el fichero en archivos de una unica hoja
