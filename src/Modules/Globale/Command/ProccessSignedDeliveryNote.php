@@ -87,7 +87,7 @@ class ProccessSignedDeliveryNote extends ContainerAwareCommand
           if(count($matches)>0) $invoiceNumber=$matches[0][1]; else $invoiceNumber=9223372036854775807;
           preg_match('/([0-9]{2})TI([0-9]{6})/', $pdf->getText(), $matches, PREG_OFFSET_CAPTURE);
           if(count($matches)>0) $ticketNumber=$matches[0][1]; else $ticketNumber=9223372036854775807;
-          preg_match('/([0-9]{2})DVR([0-9]{6})/', $pdf->getText(), $matches, PREG_OFFSET_CAPTURE);
+          preg_match('/([0-9]{2})DVR([0-9]{5})/', $pdf->getText(), $matches, PREG_OFFSET_CAPTURE);
           if(count($matches)>0) $deliveryReturnNoteNumber=$matches[0][1]; else $deliveryReturnNoteNumber=9223372036854775807;
 
           //Elegimos el tipo de documento que primero aparezca en el archivo

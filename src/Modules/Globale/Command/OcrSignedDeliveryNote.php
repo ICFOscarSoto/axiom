@@ -52,12 +52,25 @@ class OcrSignedDeliveryNote extends ContainerAwareCommand
       die();
 
     //Recorremos todos los archivos en el directorio
+    $date=new \DateTime();
     $dir = new \DirectoryIterator($ocrDir);
     foreach ($dir as $fileinfo) {
         if (!$fileinfo->isDot()) {
-          $result=shell_exec("ocrmypdf -l spa -r --force-ocr --rotate-pages-threshold 5 ".$ocrDir.$fileinfo->getFilename()." ".$tempDir.$fileinfo->getFilename());
-          echo($result);
-          unlink($ocrDir.$fileinfo->getFilename());
+          //Obtener el numero de páginas del pfg
+          $result=shell_exec("qpdf --show-npages  \"".$ocrDir.$fileinfo->getFilename()."\"");
+          $pages=intval($result);
+          echo("Páginas: ".$pages);
+          if($pages>1){
+            //Partir el fichero en archivos de una unica hoja
+            echo("CMD: "."gs -o \"".$ocrDir.basename($fileinfo->getFilename(), '.pdf')."_%04d.pdf\" -sDEVICE=pdfwrite \"".$ocrDir.$fileinfo->getFilename()."\"");
+            $result=shell_exec("gs -o \"".$ocrDir.basename($fileinfo->getFilename(), '.pdf')."_%04d.pdf\" -sDEVICE=pdfwrite \"".$ocrDir.$fileinfo->getFilename()."\"");
+            unlink($ocrDir.$fileinfo->getFilename());
+          }elseif($pages==1){
+            //Pasar OCR y convertir en PDF buscables
+            $result=shell_exec("ocrmypdf -l spa -r --force-ocr --rotate-pages-threshold 5 ".$ocrDir.$fileinfo->getFilename()." ".$tempDir.$fileinfo->getFilename());
+            echo($result);
+            unlink($ocrDir.$fileinfo->getFilename());
+          }
           $output->writeln($fileinfo->getFilename());
         }
     }
