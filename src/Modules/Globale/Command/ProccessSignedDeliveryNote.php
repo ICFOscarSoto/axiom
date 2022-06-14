@@ -110,7 +110,7 @@ class ProccessSignedDeliveryNote extends ContainerAwareCommand
           //Limpiamos cualquier cosa que no sea letras y numeros
           $documentNumber = preg_replace("/[^a-zA-Z0-9]+/", "", $documentNumber);
           //Segun el tipo realizamos operaciones adicionales
-          echo($type);
+          dump($type);
           switch($type){
             case 4:
               $documentNumber=preg_replace('/T1/', 'TI', $documentNumber, 1);
