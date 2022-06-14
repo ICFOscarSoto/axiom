@@ -62,8 +62,8 @@ class OcrSignedDeliveryNote extends ContainerAwareCommand
           echo("Páginas: ".$pages);
           if($pages>1){
             //Partir el fichero en archivos de una unica hoja
-            echo("CMD: "."gs -o \"".$ocrDir.basename($fileinfo->getFilename(), '.pdf')."_%04d.pdf\" -sDEVICE=\"".$ocrDir.$fileinfo->getFilename()."\"");
-            $result=shell_exec("gs -o \"".$ocrDir.basename($fileinfo->getFilename(), '.pdf')."_%04d.pdf\" -sDEVICE=\"".$ocrDir.$fileinfo->getFilename()."\"");
+            echo("CMD: "."gs -o \"".$ocrDir.basename($fileinfo->getFilename(), '.pdf')."_%04d.pdf\" -sDEVICE=pdfwrite \"".$ocrDir.$fileinfo->getFilename()."\"");
+            $result=shell_exec("gs -o \"".$ocrDir.basename($fileinfo->getFilename(), '.pdf')."_%04d.pdf\" -sDEVICE=pdfwrite \"".$ocrDir.$fileinfo->getFilename()."\"");
             unlink($ocrDir.$fileinfo->getFilename());
           }elseif($pages==1){
             //Pasar OCR y convertir en PDF buscables
