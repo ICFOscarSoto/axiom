@@ -106,25 +106,26 @@ class ProccessSignedDeliveryNote extends ContainerAwareCommand
             file_get_contents("https://icfbot.ferreteriacampollano.com/message.php?msg=".urlencode(":bookmark_tabs: No se pudo detectar el número de documento en el fichero digitalizado: ".$date->format('Y-m-d-His').$fileinfo->getFilename().""));
             continue;
           }
-          $documentNumberLength=12;
+          $documentNumber=substr($pdf->getText(), $position, 12);
+          //Limpiamos cualquier cosa que no sea letras y numeros
+          $documentNumber = preg_replace("/[^a-zA-Z0-9]+/", "", $documentNumber);
+
           //Segun el tipo realizamos operaciones adicionales
           switch($type[0]){
             case 4:
               $documentNumber=preg_replace('/T1/', 'TI', $documentNumber, 1);
-              $documentNumberLength=11;
+              $documentNumber=substr($documentNumber, 0, -1); //Eliminamos el ultimo caracter
             break;
             case 5:
               $documentNumber=preg_replace('/11/', 'TI', $documentNumber, 1);
-              $documentNumberLength=11;
+              $documentNumber=substr($documentNumber, 0, -1); //Eliminamos el ultimo caracter
             break;
             case 6:
               $documentNumber=preg_replace('/711/', 'TI', $documentNumber, 1);
             break;
           }
 
-          $documentNumber=substr($pdf->getText(), $position, $documentNumberLength);
-          //Limpiamos cualquier cosa que no sea letras y numeros
-          $documentNumber = preg_replace("/[^a-zA-Z0-9]+/", "", $documentNumber);
+
 
           //Creamos el nombre del fichero normalizado
           $filename=$documentDate.' - '.$documentNumber.'.pdf';
