@@ -251,7 +251,7 @@ class CloudController extends Controller
 								 	else $obj=$classRepository->findOneBy(["id"=>$id]);
 								 if($obj){
 									 if(method_exists($obj, 'postUploadCloudFile')){
-										 $obj->postUploadCloudFile($cloudFile, $this->getDoctrine());
+										 $obj->postUploadCloudFile($cloudFile, $this->get('kernel'), $this->getDoctrine(), $this->getUser());
 									 }
 								 }
 							 }

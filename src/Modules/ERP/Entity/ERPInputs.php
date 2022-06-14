@@ -310,10 +310,13 @@ class ERPInputs
     }
 
     //Called automatically when a file is uploaded or scanned
-    public function postUploadCloudFile($cloudFile, $doctrine){
+    public function postUploadCloudFile($cloudFile, $kernel, $doctrine, $user){
       if($cloudFile->getCompany()->getId()==2 && $cloudFile->getType()=="Albarán Proveedor" && $this->inputdate!=""){
+        //Procesar OCR en el fichero
+        $dir=$kernel->getRootDir() . DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$user->getCompany()->getId().DIRECTORY_SEPARATOR.$cloudFile->getPath().DIRECTORY_SEPARATOR.$this->id.DIRECTORY_SEPARATOR;
+        $result=shell_exec("nohup ocrmypdf -l spa -r --force-ocr --rotate-pages-threshold 5 \"".$dir.$cloudFile->getHashname()."\" \"".$dir.$cloudFile->getHashname()."\" >/dev/null 2>&1");
         sleep(1);
-        $this->discordNotify($cloudFile);
+        //$this->discordNotify($cloudFile);
       }
     }
 
