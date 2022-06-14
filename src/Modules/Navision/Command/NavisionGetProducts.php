@@ -213,8 +213,14 @@ public function importProduct(InputInterface $input, OutputInterface $output){
             if ($action=='U') {
               // Si no existe se hace lo mismo que el insert
               $oproduct=$repositoryProducts->findOneBy(["code"=>$code_old]);
-              if ($oproduct==null)
+              if ($oproduct==null){
                 $oproduct=$repositoryProducts->findOneBy(["code"=>$code_new]);
+              }else{
+                // Si ya existe el código nuevo se usa este
+                $oproduct_new=$repositoryProducts->findOneBy(["code"=>$code_new]);
+                if ($oproduct_new!=null)
+                  $oproduct = $oproduct_new;
+              }
             }
             if ($oproduct==null){
               $oproduct = new ERPProducts();
