@@ -16,11 +16,12 @@ use App\Modules\Globale\Entity\GlobaleUsers;
 use App\Modules\Globale\Entity\GlobaleStates;
 use App\Modules\Globale\Entity\GlobaleCompanies;
 use App\Modules\Globale\Entity\GlobaleUsersConfig;
+use App\Modules\Globale\Entity\GlobaleCountries;
+use App\Modules\Globale\Entity\GlobaleHistories;
 use App\Modules\ERP\Entity\ERPProviders;
 use App\Modules\ERP\Entity\ERPCustomers;
 use App\Modules\ERP\Entity\ERPSuppliers;
 use App\Modules\ERP\Entity\ERPSupplierCommentLines;
-use App\Modules\Globale\Entity\GlobaleCountries;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
@@ -739,7 +740,8 @@ class ERPBuyOrdersController extends Controller
 						{name:'purchaseunit'},
 						{name:'packing'},
 						{name:'multiplicity'},
-						{name:'minimumquantityofbuy'}
+						{name:'minimumquantityofbuy'},
+						{name:'weight'}
 					]
 				}
 			  ]
@@ -1043,8 +1045,9 @@ class ERPBuyOrdersController extends Controller
 				$buyorder->setDateadd(new \DateTime());
 			}
 			// Generales
-			$agent 	= $globaleUsersRepository->find($ojsbuyorders['agent_id']);
-			$state 	= $erpBuyOrdersStatesRepository->find($ojsbuyorders['state_id']);
+			$agent 			= $globaleUsersRepository->find($ojsbuyorders['agent_id']);
+			$state_old 	= $buyorder->getState();
+			$state 			= $erpBuyOrdersStatesRepository->find($ojsbuyorders['state_id']);
 			$buyorder->setAgent($agent);
 			$buyorder->setState($state);
 			$buyorder->setDateupd(new \DateTime());
@@ -1098,6 +1101,7 @@ class ERPBuyOrdersController extends Controller
 				$buyorder->setEstimateddelivery(new \DateTime($ojsbuyorders['estimateddelivery']));
 			else
 				$buyorder->setEstimateddelivery(null);
+
 			// Proveedor
 			$supplier 			= null;
 			if (ctype_digit(strval($ojsbuyorders['supplier_id'])))
@@ -1172,6 +1176,45 @@ class ERPBuyOrdersController extends Controller
 			$this->getDoctrine()->getManager()->persist($buyorder);
 			$this->getDoctrine()->getManager()->flush();
 			$result = $buyorder->getId();
+
+			// Histórico de cambios y fechas
+			if ($state_old!=$state && $state!=null){
+				$globaleHistoriesRepository		= $this->getDoctrine()->getRepository(GlobaleHistories::class);
+				$date = date('Y-m-d H:i:s');
+				switch ($state->getId()) {
+				    case 1:
+							// 1.- Abierto
+							if ($state_old==null)
+								$globaleHistoriesRepository->addHistory('App\Modules\ERP\Entity\ERPBuyOrders', $result, $buyorder->getCompany(),  $this->getUser(), '[]');
+			        break;
+				    case 2:
+							// 2.- Lanzado
+							$globaleHistoriesRepository->addHistory('App\Modules\ERP\Entity\ERPBuyOrders', $result, $buyorder->getCompany(),  $this->getUser(), '[{"description": "Se ha lanzado el pedido"},{"description":"Se cambio la fecha de envio a '.date('d/m/Y').'", "attribute": "datesend", "oldvalue": "'.($buyorder->getDatesend()==null?'':$buyorder->getDatesend()->format('Y-m-d H:i:s')).'", "newvalue":"'.$date.'"}]');
+							$buyorder->setDatesend(new \DateTime());
+							$this->getDoctrine()->getManager()->persist($buyorder);
+							$this->getDoctrine()->getManager()->flush();
+							break;
+						case 3:
+							// 3.- Confirmado
+							$globaleHistoriesRepository->addHistory('App\Modules\ERP\Entity\ERPBuyOrders', $result, $buyorder->getCompany(),  $this->getUser(), '[{"description": "Se ha confirmado el pedido"},{"description":"Se cambio la fecha de confirmación a '.date('d/m/Y').'", "attribute": "dateconfirmed", "oldvalue": "'.($buyorder->getDateconfirmed()==null?'':$buyorder->getDateconfirmed()->format('Y-m-d H:i:s')).'", "newvalue":"'.$date.'"}]');
+							$buyorder->setDateconfirmed(new \DateTime());
+							$this->getDoctrine()->getManager()->persist($buyorder);
+							$this->getDoctrine()->getManager()->flush();
+							break;
+						case 4:
+							// 4.- Recibido incompleto
+							$globaleHistoriesRepository->addHistory('App\Modules\ERP\Entity\ERPBuyOrders', $result, $buyorder->getCompany(),  $this->getUser(), '[{"description": "Recibido incompleto"}]');
+			        break;
+						case 5:
+							// 5.- Recibido
+							$globaleHistoriesRepository->addHistory('App\Modules\ERP\Entity\ERPBuyOrders', $result, $buyorder->getCompany(),  $this->getUser(), '[{"description": "Recibido"}]');
+							break;
+						case 6:
+							// 4.- Cancelado
+							$globaleHistoriesRepository->addHistory('App\Modules\ERP\Entity\ERPBuyOrders', $result, $buyorder->getCompany(),  $this->getUser(), '[{"description": "Cancelado"}]');
+							break;
+				}
+			}
 
 			// Contactos del proveedor
 			// Poner todas los contactos con teléfono a '~|/%^%/|~' indicando que no es válido

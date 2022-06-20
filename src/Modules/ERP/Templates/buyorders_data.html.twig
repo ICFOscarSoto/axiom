@@ -202,21 +202,22 @@
             <input type="checkbox"  id="buyorder-form-priority" {% if buyorder.priority==1 %} checked {% endif %} class="form-check-input icheck"/>
             <label for="buyorder-form-priority">&nbsp; Urgente</label>
           </div>
-        </div>
-      </div>
-      <div class="col-md-4" id="show-observationpriority" {% if buyorder.priority==0 %}style="display:none;"{% endif %}>
-        <div class="form-group" >
-          <label for="buyorder-form-observationpriority">Motivo de la urgencia:</label>
-          <textarea id="buyorder-form-observationpriority" name="buyorder-form-observationpriority" class="form-control" style="min-height:50px;" >{% if buyorder.observationpriority!=null %}{{ buyorder.observationpriority }}{% endif %}</textarea>
+          <textarea id="buyorder-form-observationpriority" name="buyorder-form-observationpriority" class="form-control" style="min-height:97px;{% if buyorder.priority==0 %}display:none;{% endif %}" >{% if buyorder.observationpriority!=null %}{{ buyorder.observationpriority }}{% endif %}</textarea>
         </div>
       </div>
       <div class="col-md-6">
         <div class="form-group" >
           <label for="buyorder-form-observationpublic">Observaciones públicas:</label>
-          <textarea id="buyorder-form-observationpublic" name="buyorder-form-observationpublic" class="form-control" style="min-height:50px;" >{% if buyorder.observationpublic!=null %}{{ buyorder.observationpublic }}{% endif %}</textarea>
+          <textarea id="buyorder-form-observationpublic" name="buyorder-form-observationpublic" class="form-control" style="min-height:100px;" >{% if buyorder.observationpublic!=null %}{{ buyorder.observationpublic }}{% endif %}</textarea>
         </div>
       </div>
-      <div class="col-md-8" style="clear: left;">
+      <div class="col-md-4">
+        <div class="form-group">
+          <label for="buyorder-form-observationpublic">Comentarios proveedor:</label>
+          <textarea id="buyorder-form-suppliercomment" name="buyorder-form-suppliercomment" readonly="readonly" class="form-control">{% if buyorder.suppliercomment!=null %}{{ buyorder.suppliercomment }}{% endif %}</textarea>
+        </div>
+      </div>
+      <div class="col-md-12">
         <div class="panel minimal" >
           <div class="panel-heading">
             <div class="panel-title">Contactos</div>
@@ -227,19 +228,7 @@
           {{ include('@Globale/form_jspreadsheet_html.twig') }}
         </div>
       </div>
-      <div class="col-md-4">
-        <div class="panel minimal" >
-          <div class="panel-heading">
-            <div class="panel-title">Comentarios proveedor</div>
-          </div>
-        </div>
-        <div class="col-md-12">
-          <div class="form-group">
-            <textarea id="buyorder-form-suppliercomment" name="buyorder-form-suppliercomment" readonly="readonly" class="form-control" style="min-height:50px;" >{% if buyorder.suppliercomment!=null %}{{ buyorder.suppliercomment }}{% endif %}</textarea>
-          </div>
-        </div>
-      </div>
-      <div class="panel minimal" style="clear: left;">
+      <div class="panel minimal">
         <div class="panel-heading">
           <div class="panel-title">Resumen</div>
         </div>
@@ -388,8 +377,8 @@
           {% endif %}
           <div class="col-md-4" id="supplier-form-credentials" {% if (buyorder.orderchannel==null or buyorder.orderchannel!=1 or buyorder.supplier==null or buyorder.supplier.credentialsurl==null or buyorder.supplier.credentialsurl=='') %}style="display:none;"{% endif %}>
             {% if (buyorder.supplier!=null and buyorder.supplier.credentialsurl!=null and buyorder.supplier.credentialsurl!=null) %}<a href="{{ buyorder.supplier.credentialsurl }}" style="font-weight: bold; text-decoration: underline;" target="_blank">{{ buyorder.supplier.credentialsurl }}</a>{% endif %}
-            {% if (buyorder.supplier!=null and buyorder.supplier.credentialsuser!=null and buyorder.supplier.credentialsuser!=null) %}<br/>Usuario: {{buyorder.supplier.credentialsuser}}{% endif %}
-            {% if (buyorder.supplier!=null and buyorder.supplier.credentialspassword!=null and buyorder.supplier.credentialspassword!=null) %} | Contraseña: {{buyorder.supplier.credentialspassword}}{% endif %}
+            {% if (buyorder.supplier!=null and buyorder.supplier.credentialsuser!=null and buyorder.supplier.credentialsuser!=null) %}<br/>Usuario: <span id="buyorder_credentialsuser">{{buyorder.supplier.credentialsuser}}</span> <a href="javascript:copyToClipboard('buyorder_credentialsuser');" title="Copiar"><i class="fa fa-copy" aria-hidden="true"></i></a>{% endif %}
+            {% if (buyorder.supplier!=null and buyorder.supplier.credentialspassword!=null and buyorder.supplier.credentialspassword!=null) %} | Contraseña: <span id="buyorder_credentialspassword">{{buyorder.supplier.credentialspassword}}</span> <a href="javascript:copyToClipboard('buyorder_credentialspassword');" title="Copiar"><i class="fa fa-copy" aria-hidden="true"></i></a>{% endif %}
           </div>
           <div class="col-md-2" style="clear: left;">
             <div class="form-group">
@@ -483,7 +472,24 @@
     });
   }
 
+  // Copy to clipboard
+  function copyToClipboard(id_element) {
+    var aux = document.createElement("input");
+    aux.setAttribute("value", document.getElementById(id_element).innerHTML);
+    document.body.appendChild(aux);
+    aux.select();
+    document.execCommand("copy");
+    document.body.removeChild(aux);
+    toastr.success("Copiado al portapapeles", "Confirmación", confirmation);
+  }
+
   $(document).ready(function() {
+    // Cajas readonly
+    new Jodit("#buyorder-form-suppliercomment",{ "height": 100, "minHeight": 100, "maxHeight": 100, "readonly": true, "showCharsCounter": false, "showWordsCounter": false, "showXPathInStatusbar": false,"toolbarAdaptive" : false, "buttons": "fullsize"});
+    new Jodit("#buyorder-form-supplierbuyorder",{ "height": 150, "minHeight": 150, "maxHeight": 150, "readonly": true, "showCharsCounter": false, "showWordsCounter": false, "showXPathInStatusbar": false,"toolbarAdaptive" : false, "buttons": "fullsize"});
+    new Jodit("#buyorder-form-suppliershipping",{ "minHeight": 150, "maxHeight": 150, "readonly": true, "showCharsCounter": false, "showWordsCounter": false, "showXPathInStatusbar": false,"toolbarAdaptive" : false, "buttons": "fullsize"});
+    new Jodit("#buyorder-form-supplierpayment",{ "minHeight": 150, "maxHeight": 150, "readonly": true, "showCharsCounter": false, "showWordsCounter": false, "showXPathInStatusbar": false,"toolbarAdaptive" : false, "buttons": "fullsize"});
+    new Jodit("#buyorder-form-supplierspecial",{ "minHeight": 150, "maxHeight": 150, "readonly": true, "showCharsCounter": false, "showWordsCounter": false, "showXPathInStatusbar": false,"toolbarAdaptive" : false, "buttons": "fullsize"});
     // Input de tipo number
     $( ".number-type" ).each(function( index ) {
       setInputFilter(document.getElementById($(this).attr('id')), function(value) {
@@ -491,13 +497,12 @@
         return /^\d*\.?\d*$/.test(value);
       });
     });
-
     {# Cambio de check de urgencia #}
     $('#buyorder-form-priority').on('ifChanged', function(e){
       if ($("#buyorder-form-priority").is(':checked')){
-        $("#show-observationpriority").css("display","block");
+        $("#buyorder-form-observationpriority").css("display","block");
       }else{
-        $("#show-observationpriority").css("display","none");
+        $("#buyorder-form-observationpriority").css("display","none");
       }
     });
     {# Ficha de proveedores #}

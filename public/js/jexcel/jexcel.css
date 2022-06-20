@@ -779,3 +779,9 @@
 .jexcel table {
   table-layout: auto;
 }
+
+/* ICF */
+.jexcel > tbody > tr.selected
+{
+    background-color:#f3f3f3;
+}

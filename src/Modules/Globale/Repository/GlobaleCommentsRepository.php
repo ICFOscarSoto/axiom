@@ -28,6 +28,30 @@ class GlobaleCommentsRepository extends ServiceEntityRepository
       $params=['entity' => $entity, 'entity_id' => $entity_id, 'company' => $company->getId()];
       return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
     }
+
+    public function addComment($entity, $entity_id, $company, $user, $comment_text){
+      //Comprobar que existe la entidad y el objeto
+      if(!class_exists('\\'.$entity)) return -1;
+      $repository	= $this->getEntityManager()->getRepository('\\'.$entity);
+      if(!$repository) return -1;
+      $obj = $repository->find($entity_id);
+      if(!$obj) return -1;
+
+      $comment= new GlobaleComments();
+      $comment->setCompany($company);
+      $comment->setUser($user);
+      $comment->setEntity($entity);
+      $comment->setEntityId($entity_id);
+      $comment->setActive(1);
+      $comment->setDeleted(0);
+      $comment->setDateadd(new \DateTime());
+      $comment->setComment($comment_text);
+      $comment->setDateupd(new \DateTime());
+      $this->getEntityManager()->persist($comment);
+      $this->getEntityManager()->flush();
+      return $comment->getId();
+    }
+
     // /**
     //  * @return GlobaleComments[] Returns an array of GlobaleComments objects
     //  */

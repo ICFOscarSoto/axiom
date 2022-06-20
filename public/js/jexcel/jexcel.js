@@ -10563,11 +10563,14 @@ if (! jSuites && typeof(require) === 'function') {
                         // Clear any search
                         if (obj.options.search == true) {
                             if (obj.results && obj.results.length != obj.rows.length) {
-                                if (confirm(obj.options.text.thisActionWillClearYourSearchResultsAreYouSure)) {
+                                /*if (confirm(obj.options.text.thisActionWillClearYourSearchResultsAreYouSure)) {
                                     obj.resetSearch();
                                 } else {
                                     return false;
-                                }
+                                }*/
+                                //ICF
+                                obj.resetSearch();
+                                //ICF
                             }
 
                             obj.results = null;
@@ -12211,6 +12214,12 @@ if (! jSuites && typeof(require) === 'function') {
             // Query
             if (query) {
                 var query = query.toLowerCase();
+                // ICF
+                if (query.length>0 && query.indexOf('*')>=0){
+                  query = query.replace('*','.*');
+                  query = new RegExp(query);
+                }
+                // ICF
             }
 
             // Reset any filter

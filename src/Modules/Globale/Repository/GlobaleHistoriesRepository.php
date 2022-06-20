@@ -28,4 +28,26 @@ class GlobaleHistoriesRepository extends ServiceEntityRepository
       return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
     }
 
+    public function addHistory($entity, $entity_id, $company, $user, $change){
+      //Comprobar que existe la entidad y el objeto
+      if(!class_exists('\\'.$entity)) return -1;
+      $repository	= $this->getEntityManager()->getRepository('\\'.$entity);
+      if(!$repository) return -1;
+      $obj = $repository->find($entity_id);
+      if(!$obj) return -1;
+
+      $history= new GlobaleHistories();
+      $history->setCompany($company);
+      $history->setUser($user);
+      $history->setEntity($entity);
+      $history->setEntityId($entity_id);
+      $history->setActive(1);
+      $history->setDeleted(0);
+      $history->setDateadd(new \DateTime());
+      $history->setDateupd(new \DateTime());
+      $history->setChanges($change);
+      $this->getEntityManager()->persist($history);
+      $this->getEntityManager()->flush();
+      return $history->getId();
+    }
 }

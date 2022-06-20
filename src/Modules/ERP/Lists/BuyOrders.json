@@ -40,7 +40,7 @@
       "class": "all"
   },
   {
-      "name": "state_name",
+      "name": "state__name",
       "caption": "Status",
       "class": "all"
   },

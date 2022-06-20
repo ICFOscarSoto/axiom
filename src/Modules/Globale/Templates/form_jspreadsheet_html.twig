@@ -858,32 +858,6 @@ js{{spreadsheet.name}}_create(js{{spreadsheet.name}}_data);
     </div>
   </div>
 </div>
-{% if 'loadmasive' in spreadsheet.options %}
-{# Modal - Carga masiva #}
-<div id="{{spreadsheet.name}}-loadmasive-modal">
-  <div class="modal fade" tabindex="-1" id="{{spreadsheet.name}}-loadmasive-modal-form" aria-hidden="true">
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content" style="transform: matrix(1, 0, 0, 1, 0, 0); display:inline-block;">
-          <form id="{{spreadsheet.name}}-loadmasive-form">
-            <div class="modal-header">
-              <h4 class="modal-title">{{('jspreadsheet_loadmasive')|trans}}</h4>
-            </div>
-            <div id="{{spreadsheet.name}}-loadmasive-modal-form-body" style="overflow-y: auto; height: 550px; padding: 0px 10px; max-height: 550px;">
-              <div id="jsexcel-{{spreadsheet.name}}cm">
-                {% set spreadsheet = _context['spreadsheet' ~ spreadsheet.name ~ 'cm'] %}
-                {{ include('@Globale/form_jspreadsheet_html.twig') }}
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">{{('Cancel')|trans}}</button>
-              <button type="submit" class="btn btn-primary" id="{{spreadsheet.name}}-loadmasive-modal-form-body-accept">{{('Accept')|trans}}</button>
-            </div>
-          </form>
-      </div>
-    </div>
-  </div>
-</div>
-{% endif %}
 <script>
 $(document).ready(function(){
   /* Muestra ventana de añadir columnas */
@@ -1062,3 +1036,29 @@ $(document).ready(function(){
   });
 });
 </script>
+{% if 'loadmasive' in spreadsheet.options %}
+{# Modal - Carga masiva #}
+<div id="{{spreadsheet.name}}-loadmasive-modal">
+  <div class="modal fade" tabindex="-1" id="{{spreadsheet.name}}-loadmasive-modal-form" aria-hidden="true">
+      <div class="modal-dialog modal-85">
+        <div class="modal-content" style="transform: matrix(1, 0, 0, 1, 0, 0); display:inline-block;">
+          <form id="{{spreadsheet.name}}-loadmasive-form">
+            <div class="modal-header">
+              <h4 class="modal-title">{{('jspreadsheet_loadmasive')|trans}}</h4>
+            </div>
+            <div id="{{spreadsheet.name}}-loadmasive-modal-form-body" style="overflow-y: auto; height: 550px; padding: 0px 10px; max-height: 550px;">
+              <div id="jsexcel-{{spreadsheet.name}}cm">
+                {% set spreadsheet = _context['spreadsheet' ~ spreadsheet.name ~ 'cm'] %}
+                {{ include('@Globale/form_jspreadsheet_html.twig') }}
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">{{('Cancel')|trans}}</button>
+              <button type="submit" class="btn btn-primary" id="{{spreadsheet.name}}-loadmasive-modal-form-body-accept">{{('Accept')|trans}}</button>
+            </div>
+          </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
