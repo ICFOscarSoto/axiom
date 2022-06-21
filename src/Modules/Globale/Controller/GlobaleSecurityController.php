@@ -12,9 +12,11 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use App\Modules\Globale\Entity\GlobaleCompanies;
 use App\Modules\Globale\Entity\GlobaleUsers;
 use App\Modules\Globale\Entity\GlobaleUsersCards;
+use Symfony\Component\Routing\RouterInterface;
 use App\Modules\HR\Entity\HRWorkers;
 use App\Modules\Globale\Controller\UserInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class GlobaleSecurityController extends Controller
 {
@@ -32,8 +34,13 @@ class GlobaleSecurityController extends Controller
 	/**
      * @Route("/{_locale}/login", name="app_login")
      */
-	public function login(Request $request, AuthenticationUtils $authenticationUtils)
+	public function login(RouterInterface $router, Request $request, AuthenticationUtils $authenticationUtils)
 	{
+		$securityContext = $this->container->get('security.authorization_checker');
+		if ($securityContext->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+	   	return new RedirectResponse($router->generate('dashboard'));
+		}
+
 		 $error = $authenticationUtils->getLastAuthenticationError();
         // last username entered by the user
         $lastUsername = $authenticationUtils->getLastUsername();
