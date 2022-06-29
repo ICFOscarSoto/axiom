@@ -758,8 +758,13 @@ class ERPSalesOrdersController extends Controller
 					$lines[$i]['costlastbuy'] = round($olines["class"][$i]["purchase_cost"]*$lines[$i]['quantity'],$ndecimals);
 					$lines[$i]['type'] = $olines["class"][$i]["type"];
 					$lines[$i]['margin'] = round((($lines[$i]['price']/$lines[$i]['costlastbuy'])-1)*100,2);
-					//Si el tipo es indirecto siempre y el margen es mayor o igual al 15 1.5%, si es directo: si el margen > 20 -> 2% si esta entre 20 y 15 (incluido) 1.5%, si es menor que 15 el 0%
-					$lines[$i]['commission'] = $lines[$i]['type']=='Directa'?($lines[$i]['margin']>20?2:($lines[$i]['margin']>=15?1.5:0)):($lines[$i]['margin']>=15?1.5:0);
+
+					if($user->getEmail()=="juanjo.molina@ferreteriacampollano.com"){
+						$lines[$i]['commission'] = $lines[$i]['type']=='Directa'?($lines[$i]['margin']>20?1.5:($lines[$i]['margin']>=15?1.5:0)):($lines[$i]['margin']>=15?1.5:0);
+					}else{
+						//Si el tipo es indirecto siempre y el margen es mayor o igual al 15 1.5%, si es directo: si el margen > 20 -> 2% si esta entre 20 y 15 (incluido) 1.5%, si es menor que 15 el 0%
+						$lines[$i]['commission'] = $lines[$i]['type']=='Directa'?($lines[$i]['margin']>20?2:($lines[$i]['margin']>=15?1.5:0)):($lines[$i]['margin']>=15?1.5:0);
+					}
 					$lines[$i]['importcommission'] = 	round($lines[$i]['price'] * ($lines[$i]['commission']/100),$ndecimals);
 			}
 
@@ -792,5 +797,26 @@ class ERPSalesOrdersController extends Controller
 		 }
 		 return new Response('Albarán no encontrado');
 	}
+
+	/**
+ * @Route("/{_locale}/ERP/salesorders/signeddeliverynotesfails/", name="signeddeliverynotesfails")
+ * Muestra el listado de fallos en el escaneo de albaranes firmados
+ */
+ public function signeddeliverynotesfails(RouterInterface $router,Request $request){
+	 // El usuario tiene derechos para realizar la acción, sino se va a la página de unauthorized
+	 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+	 if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine()))
+		 return $this->redirect($this->generateUrl('unauthorized'));
+
+	 $erpConfigurationRepository				= $this->getDoctrine()->getRepository(ERPConfiguration::class);
+
+	 $globaleUsersRepository						= $this->getDoctrine()->getRepository(GlobaleUsers::class);
+	 $globaleMenuOptionsRepository			= $this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
+	 $globaleUsersConfigRepository			= $this->getDoctrine()->getRepository(GlobaleUsersConfig::class);
+
+	 // Datos de usuario
+	 $userdata				= $this->getUser()->getTemplateData($this, $this->getDoctrine());
+	 $company 				= $this->getUser()->getCompany();
+}
 
 }
