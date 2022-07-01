@@ -1019,8 +1019,10 @@ public function signeddeliverynotesfails_save($deliverynote, $file, RouterInterf
 	$newname=$date->format('Y').'-'.$date->format('m').'-'.$date->format('d').' - '.$deliverynote.'.pdf';
 	//Si el fichero de destino existe, lo anexamos
 	if(file_exists($final_dir.$newname)){
-		$cmd = "gs -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile=\"".$final_dir.$newname."\" \"".$final_dir.$newname."\" \"".$dir.$file."\"";
+		rename($final_dir.$newname, $final_dir.'temp_'.$newname);
+		$cmd = "gs -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile=\"".$final_dir.$newname."\" \"".$final_dir.'temp_'.$newname."\" \"".$dir.$file."\"";
 		$result = shell_exec($cmd);
+		unlink($final_dir.'temp_'.$newname);
 		if(unlink($dir.$file)){
 			return new JsonResponse(["result"=>1]);
 		}
