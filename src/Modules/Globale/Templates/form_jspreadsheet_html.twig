@@ -493,6 +493,14 @@ function js{{spreadsheet.name}}_create(data){
         {% endif %}
       },
 
+      onselection: function(instance, x1, y1, x2, y2, origin) {
+        // Cuando se cambia la seleccion en el jexcel
+        var sheet = this;
+        {% if spreadsheet.onselection is defined %}
+          {{spreadsheet.onselection|raw}}
+        {% endif %}
+      },
+
       text:{
         noRecordsFound: 'No se encontraron registros',
         showingPage: 'Mostrando página {0} de {1}',

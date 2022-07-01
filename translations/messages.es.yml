@@ -622,6 +622,7 @@ Orders: Pedidos
 SalesOrders: Pedidos
 DeliveryNotes: Albaranes
 SalesDeliveryNotes: Albaranes
+Signed delivery notes fails: Fallos en albaranes firmados
 Invoices: Facturas
 Invoice: Factura
 SalesInvoices: Facturas
@@ -740,6 +741,10 @@ Summoneds: Participantes
 witness: Asiste
 sendedSummon: Enviada convocatoria
 MeetingsSummoneds: Participantes
+
+#COMMISSIONS
+#----------------------------------------------------------------------------------------------------------------------
+Commissions: Comisiones
 
 
 #STORE MANAGERS

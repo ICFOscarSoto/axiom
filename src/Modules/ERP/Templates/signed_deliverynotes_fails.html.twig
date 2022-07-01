@@ -1,0 +1,178 @@
+{% set params = app.request.attributes.get('_route_params')|merge(app.request.query.all()) %}
+{% block header %}
+<head>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<meta name="description" content="Axiom Business Management" />
+	<meta name="author" content="" />
+
+	{{ include('@Globale/header.html.twig') }}
+	<!-- Imported styles on this page -->
+	<link rel="stylesheet" href="{{ url('index') }}css/bootstrap-grid.css">
+	<link rel="stylesheet" href="{{ url('index') }}css/timeline.css">
+	<link rel="stylesheet" href="{{ url('index') }}js/jvectormap/jquery-jvectormap-1.2.2.css">
+	<link rel="stylesheet" href="{{ url('index') }}js/rickshaw/rickshaw.min.css">
+</head>
+{% endblock %}
+<title>{% block title %}{{ interfaceName|trans }}{% endblock %}</title>
+<body class="page-body" data-url="{{ url('indexAdmin') }}">
+<div class="page-container {% if userData.interfaceConfig.collapsedSidebar is defined and userData.interfaceConfig.collapsedSidebar %}sidebar-collapsed{% endif %}"><!-- add class "sidebar-collapsed" to close sidebar by default, "chat-visible" to make chat appear always -->
+	{{ include('@Globale/sidebar_menu.html.twig') }}
+	<div class="main-content">
+		{{ include('@Globale/head.html.twig') }}
+		<hr />
+		{{ include('@Globale/breadcrumb.html.twig') }}
+		{#}<h2>{{ interfaceName }}</h2>#}
+		<!-- MAIN CONTENT -->
+		<ul id="tabs-list" class="nav nav-tabs bordered" style="margin-top:0px!important">
+	    <li class="active" id="tab-head-data" style="" attr-id="" attr-name="data">
+	        <a href="#tab-body-data" id="atab-head-data" data-toggle="tab">
+	            <span class="visible-xs"><i class="fa fa-id-card" aria-hidden="true"></i></span>
+	            <span class="hidden-xs">Escaneos</span>
+	        </a>
+	    </li>
+		</ul>
+		<div class="tab-content">
+	    <div class="tab-pane active" style="" id="tab-body-data">
+				<div class="row">
+					<div style="text-align: left;" class="col-md-6">
+						<div class="btn-group">
+
+            </div>
+					</div>
+					<div style="text-align: right;margin-bottom:10px;" class="col-md-6">
+					</div>
+				</div>
+
+				<div class="panel minimal">
+					<div class="panel-heading">
+						<div class="panel-title">Archivos con errores</div>
+					</div>
+					<div class="panel-body">
+						<div class="col-md-5">
+							<div id="jsexcel-signeddeliverynotesfails">
+								{{ include('@Globale/form_jspreadsheet_html.twig') }}
+								<br/>
+								<div class="row">
+									<div style="text-align: left;" class="col-md-6"></div>
+									<div style="text-align: right;margin-bottom:10px;" class="col-md-6">
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-7">
+							Vista previa:
+							<input type="hidden" id="signeddeliverynotesfails-row-id" value=""/>
+							<iframe src="" id="signeddeliverynotesfails-iframe" width="100%" height="600px" style="border: 1px #efefef solid;">
+							</iframe>
+						</div>
+					</div>
+				</div>
+		</div>
+
+
+
+	</div>
+		{{ include('@Globale/chat.html.twig') }}
+</div>
+
+<script>
+// Helper calendar
+function datepicker(){
+    $('.datepicker').each(function(index) {
+      var valueField=$(this).val();
+      var dateField=moment(valueField, "DD/MM/YYYY");
+        $(this).datetimepicker({
+        showTodayButton: true,
+        format: 'DD/MM/YYYY',
+        locale:'es',
+        useCurrent: false,
+        tooltips: spanish_tooltips_datetimepicker,
+        date: (dateField.isValid())?dateField:null
+      });
+
+    });
+}
+
+function test(){
+	console.log('TEST');
+}
+
+$(document).ready(function() {
+	$('body').tooltip({ selector: '[data-toggle="tooltip"]' });
+	{# Poner el foco en el primer input válido de la ficha #}
+	$('.form-control:visible:enabled:first').focus();
+
+	{# Datepicker #}
+  datepicker();
+
+	$('body').on('click', "[id^='signeddeliverynotesfails-deletefile-']", function(e) {
+		file=$(this).attr('attr-file');
+		id_row=$(this).attr('attr-id');
+		var sheet = document.getElementById('jexcelsigneddeliverynotesfails').jexcel[0];
+		$.confirm({
+				theme: 'bootstrap',
+				title: 'Confirmación',
+				content: '¿Esta seguro que desea borrar este archivo?',
+				buttons: {
+					 confirm: { text: 'Borrar', btnClass: 'btn-red', action: function(){
+						 if((++load_wait)==1) $("#load-spinner").fadeIn();
+						 $.post('/api/ERP/salesorders/signeddeliverynotesfails/remove/'+file, {},
+								function(data, status, xhr){
+									if((--load_wait)==0) $("#load-spinner").fadeOut();
+									if(data.result==1){
+										toastr.success("Archivo borrado correctamente", "Confirmación", confirmation);
+											sheet.deleteRow(id_row,1);
+											sheet.page(($('.jexcel_page_selected').html()*1)-1);
+									}else toastr.error("Ocurrió un error al borrar el archivo", "Confirmación", confirmation);
+							}, "json");
+					 } },
+					 cancel: { text: 'Cancelar' }
+				}
+		});
+	});
+
+	$('body').on('click', "[id^='signeddeliverynotesfails-savefile-']", function(e) {
+		file=$(this).attr('attr-file');
+		id_row=$(this).attr('attr-id');
+
+		var sheet = document.getElementById('jexcelsigneddeliverynotesfails').jexcel[0];
+		if((++load_wait)==1) $("#load-spinner").fadeIn();
+		$.post('/api/ERP/salesorders/signeddeliverynotesfails/save/'+sheet.getValueFromKey('deliverynote', id_row, true)+'/'+file, {},
+				function(data, status, xhr){
+					if((--load_wait)==0) $("#load-spinner").fadeOut();
+					if(data.result==1){
+						toastr.success("Archivo guardado correctamente", "Confirmación", confirmation);
+							sheet.deleteRow(id_row,1);
+							sheet.page(($('.jexcel_page_selected').html()*1)-1);
+					}else toastr.error("Ocurrió un error al guardar el archivo", "Confirmación", confirmation);
+			}, "json");
+	});
+
+});
+</script>
+
+{% block footer %}
+<link rel="stylesheet" href="{{ url('index') }}js/datatables/datatables.css">
+<link rel="stylesheet" href="{{ url('index') }}js/select2/select2-bootstrap.css">
+<link rel="stylesheet" href="{{ url('index') }}js/select2/select2.css">
+<link rel="stylesheet" href="{{ url('index') }}css/custom.css">
+<link rel="stylesheet" href="{{ url('index') }}js/ol/ol.css">
+<link rel="stylesheet" href="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker.min.css">
+<link rel="stylesheet" href="{{ url('index') }}js/jodit/jodit.min.css">
+
+<!-- Imported scripts on this page -->
+<script src="{{ url('index') }}js/datatables/datatables.js"></script>
+<script src="{{ url('index') }}js/select2/select2.min.js"></script>
+<script src="{{ url('index') }}js/moment.min.js"></script>
+<script src="{{ url('index') }}js/moment-es.js"></script>
+<script src="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker-es.js"></script>
+<script src="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker.min.js"></script>
+<script src="{{ url('index') }}js/fileinput.js"></script>
+<script src="{{ url('index') }}js/ol/ol.js"></script>
+<script src="{{ url('index') }}js/jodit/jodit.min.js"></script>
+<script src="{{ url('index') }}js/jquery.nestable.js"></script>
+{{ include('@Globale/bottom.html.twig') }}
+{% endblock %}
+</body>

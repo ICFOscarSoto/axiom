@@ -798,6 +798,8 @@ class ERPSalesOrdersController extends Controller
 		 return new Response('Albarán no encontrado');
 	}
 
+
+
 	/**
  * @Route("/{_locale}/ERP/salesorders/signeddeliverynotesfails/", name="signeddeliverynotesfails")
  * Muestra el listado de fallos en el escaneo de albaranes firmados
@@ -809,14 +811,233 @@ class ERPSalesOrdersController extends Controller
 		 return $this->redirect($this->generateUrl('unauthorized'));
 
 	 $erpConfigurationRepository				= $this->getDoctrine()->getRepository(ERPConfiguration::class);
-
 	 $globaleUsersRepository						= $this->getDoctrine()->getRepository(GlobaleUsers::class);
 	 $globaleMenuOptionsRepository			= $this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
 	 $globaleUsersConfigRepository			= $this->getDoctrine()->getRepository(GlobaleUsersConfig::class);
 
+	 // Configuración (nº decimales, color...etc)
+	 $config	= $erpConfigurationRepository->findOneBy(["company"=>$this->getUser()->getCompany()]);
+
+	 // Miga
+	 $nbreadcrumb=["rute"=>null, "name"=>"Archivos", "icon"=>"fa fa-edit"];
+	 $breadcrumb=$globaleMenuOptionsRepository->formatBreadcrumb('signeddeliverynotesfails',null,null);
+	 array_push($breadcrumb,$nbreadcrumb);
+
 	 // Datos de usuario
 	 $userdata				= $this->getUser()->getTemplateData($this, $this->getDoctrine());
 	 $company 				= $this->getUser()->getCompany();
+
+	 //Obtener ficheros de escaneo con errores
+	 $dir=$_ENV['SIGNEDDELIVERYNOTES_FAIL_PATH'];
+	 $files=[];
+	 if(!file_exists($dir) || !is_dir($dir)){
+		 return $this->render('@Globale/genericerror.html.twig', [
+				 'interfaceName' => 'Signed delivery notes fails',
+				 'userData' => $userdata,
+				 'optionSelected' => 'signeddeliverynotesfails',
+				 'menuOptions' =>   $globaleMenuOptionsRepository->formatOptions($userdata),
+				 'breadcrumb' =>  $breadcrumb,
+				 "error"=>["symbol"=> "entypo-attention",
+									 "title" => "Error de archivos",
+									 "description"=>"No existe el directorio de trabajo"
+								 ]
+			 ]);
+	 }
+
+	 //Recorremos todos los archivos en el directorio
+	 $filesIterator = new \DirectoryIterator($dir);
+	 $i=0;
+	 foreach ($filesIterator as $fileinfo) {
+			 if (!$fileinfo->isDot()) {
+				 $file["id"]=$i++;
+				 $file["file"]=$fileinfo->getFilename();
+				 $file["deliverynote"]="";
+				 $file["options"]="";
+				 $files[]=$file;
+			 }
+		}
+
+		$lines=[];
+
+		$spreadsheet = [];
+		$spreadsheet['name']       = "jexcelsigneddeliverynotesfails";
+		$spreadsheet['options']    = "pagination:25";
+		$spreadsheet['prototipe']  = "{
+			id:'',
+			file:'',
+			deliverynote:'',
+			options:''
+		}";
+
+		$spreadsheet['tabsload'] = 0;
+		$spreadsheet['tabs']   		 =
+	 "[
+		{ caption:'Fallos',
+			columns:[
+				{name:'file'},
+				{name:'deliverynote'},
+				{name:'options'}
+			]
+		}
+		]";
+
+		$spreadsheet['columns']    =
+		 "[
+			 { name: 'id', type: 'numeric', width:'40px', title: 'ID', align: 'left'},
+			 { name: 'file', type: 'text', width:'120px', title: 'Archivo', readOnly:true, align: 'left' },
+			 { name: 'deliverynote', type: 'text', width:'75px', title: 'Albarán', readOnly:false, align: 'left' },
+			 { name: 'options', type: 'text', width:'75px', title: 'Operaciones', readOnly:true, align: 'center'},
+		 ]";
+
+		 // Cargar de base de datos
+		 $spreadsheet['data']       = json_encode($files);
+		 $spreadsheet['onselection'] 	   = "
+		 		if(y1==y2){
+						$('".'#'."signeddeliverynotesfails-row-id').val(y1);
+						$('".'#'."signeddeliverynotesfails-iframe').attr('src', '/api/ERP/salesorders/signeddeliverynotesfails/preview/'+sheet.getValueFromKey('file', y1, true)+'#toolbar=0');
+				}
+		 ";
+		 $spreadsheet['onload'] 	   =
+			 "
+				var sheet = null;
+				if (typeof(document.getElementById('".$spreadsheet['name']."').jexcel[0]) == 'undefined')
+				 sheet = document.getElementById('".$spreadsheet['name']."').jexcel;
+				else
+				 sheet = document.getElementById('".$spreadsheet['name']."').jexcel[0];
+				var data    = sheet.getData();
+				var columns = sheet.options.columns;
+				$('".'#'."jexcelsigneddeliverynotesfails').find('td[data-x=\"2\"]').each(function( index ) {
+					if($(this).attr('data-y')>=0){
+						$(this).html('<div class=\"btn-group\">	<button attr-id=\"'+$(this).attr('data-y')+'\" attr-file=\"'+sheet.getValueFromKey('file', $(this).attr('data-y'), true)+'\" id=\"signeddeliverynotesfails-savefile-'+$(this).attr('data-y')+'\" type=\"button\" class=\"btn btn-default tooltip-primary\" data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\" Editar entrada \"><i class=\"fa fa-check-square-o\" aria-hidden=\"true\"></i></button><button attr-id=\"'+$(this).attr('data-y')+'\" attr-file=\"'+sheet.getValueFromKey('file', $(this).attr('data-y'), true)+'\" id=\"signeddeliverynotesfails-deletefile-'+$(this).attr('data-y')+'\" type=\"button\" class=\"btn btn-danger tooltip-primary\" data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\" Borrar archivo \"><i class=\"fa fa-trash\" aria-hidden=\"true\"></i></button></div>');
+					}
+				});
+			 ";
+
+			 $spreadsheet['onchangepage'] 	   = "
+					var data 		= this.getData();
+					$('".'#'."jexcelsigneddeliverynotesfails').find('td[data-x=\"2\"]').each(function( index ) {
+						if($(this).attr('data-y')>=0){
+	  					$(this).html('<div class=\"btn-group\">	<button attr-id=\"'+$(this).attr('data-y')+'\" attr-file=\"'+sheet.getValueFromKey('file', $(this).attr('data-y'), true)+'\" id=\"signeddeliverynotesfails-savefile-'+$(this).attr('data-y')+'\" type=\"button\" class=\"btn btn-default tooltip-primary\" data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\" Editar entrada \"><i class=\"fa fa-check-square-o\" aria-hidden=\"true\"></i></button><button attr-id=\"'+$(this).attr('data-y')+'\" attr-file=\"'+sheet.getValueFromKey('file', $(this).attr('data-y'), true)+'\" id=\"signeddeliverynotesfails-deletefile-'+$(this).attr('data-y')+'\" type=\"button\" class=\"btn btn-danger tooltip-primary\" data-toggle=\"tooltip\" data-placement=\"bottom\" title=\"\" data-original-title=\" Borrar archivo \"><i class=\"fa fa-trash\" aria-hidden=\"true\"></i></button></div>');
+						}
+					});
+			 ";
+
+
+	 if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+			 return $this->render('@ERP/signed_deliverynotes_fails.html.twig', [
+				 'moduleConfig' => $config,
+				 'controllerName' => 'salesOrdersController',
+				 'interfaceName' => 'Signed delivery notes fails',
+				 'optionSelected' => 'signeddeliverynotesfails',
+				 'optionSelectedParams' => [],
+				 'menuOptions' =>  $globaleMenuOptionsRepository->formatOptions($userdata),
+				 'breadcrumb' =>  $breadcrumb,
+				 'userData' => $userdata,
+				 'files' => $files,
+				 'spreadsheet' => $spreadsheet,
+				 'include_header' => [["type"=>"css", "path"=>"js/jexcel/jexcel.css"],
+															["type"=>"js",  "path"=>"js/jexcel/jexcel.js"],
+															["type"=>"css", "path"=>"js/jsuites/jsuites.css"],
+															["type"=>"js",  "path"=>"js/jsuites/jsuites.js"]
+														 ],
+				 ]);
+		 }
+		 return new RedirectResponse($this->router->generate('app_login'));
 }
+
+
+/**
+* @Route("/api/ERP/salesorders/signeddeliverynotesfails/preview/{file}", name="signeddeliverynotesfails_preview")
+* Previsualiza el pdf de un archivo de fallo
+*/
+public function signeddeliverynotesfails_preview($file, RouterInterface $router,Request $request){
+	// El usuario tiene derechos para realizar la acción, sino se va a la página de unauthorized
+	$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+	if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine()))
+		return $this->redirect($this->generateUrl('unauthorized'));
+
+	$dir=$_ENV['SIGNEDDELIVERYNOTES_FAIL_PATH'];
+	if(file_exists($dir.$file)){
+		$response = new BinaryFileResponse($dir.$file);
+		$mimeTypeGuesser = new FileinfoMimeTypeGuesser();
+		if($mimeTypeGuesser->isSupported()){
+		 $response->headers->set('Content-Type', $mimeTypeGuesser->guess($dir.$file));
+		}else{
+		 $response->headers->set('Content-Type', 'text/plain');
+		}
+		$response->setContentDisposition(ResponseHeaderBag::DISPOSITION_INLINE,$file);
+		return $response;
+	}
+	return new Response('Albarán no encontrado');
+}
+
+/**
+* @Route("/api/ERP/salesorders/signeddeliverynotesfails/remove/{file}", name="signeddeliverynotesfails_remove")
+* Previsualiza el pdf de un archivo de fallo
+*/
+public function signeddeliverynotesfails_remove($file, RouterInterface $router,Request $request){
+	// El usuario tiene derechos para realizar la acción, sino se va a la página de unauthorized
+	$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+	if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine()))
+		return $this->redirect($this->generateUrl('unauthorized'));
+
+	$dir=$_ENV['SIGNEDDELIVERYNOTES_FAIL_PATH'];
+	if(file_exists($dir.$file)){
+		if(unlink($dir.$file)){
+			return new JsonResponse(["result"=>1]);
+		}
+	}
+	return new JsonResponse(["result"=>-1]);
+}
+
+/**
+* @Route("/api/ERP/salesorders/signeddeliverynotesfails/save/{deliverynote}/{file}", name="signeddeliverynotesfails_save")
+* Mueve el fichero escaneado a su ubicacion definitiva
+*/
+public function signeddeliverynotesfails_save($deliverynote, $file, RouterInterface $router,Request $request){
+	// El usuario tiene derechos para realizar la acción, sino se va a la página de unauthorized
+	$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+	if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine()))
+		return $this->redirect($this->generateUrl('unauthorized'));
+
+	$dir=$_ENV['SIGNEDDELIVERYNOTES_FAIL_PATH'];
+	$final_dir=$_ENV['SIGNEDDELIVERYNOTES_PATH'];
+
+	$deliverynote=trim($deliverynote);
+	$deliverynote=strtoupper($deliverynote);
+
+	//Comprobamos que exista el fichero en la carpeta de fallos
+	if(!file_exists($dir.$file)) return new JsonResponse(["result"=>-1]);
+	//Obtenemos la fecha del documento y comprobamos que exista
+	$url='http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-getDeliveryNoteDate.php?deliverynote='.$deliverynote;
+	$content=file_get_contents($url);
+	$json=json_decode($content, true);
+	if($json===null) return new JsonResponse(["result"=>-1]);
+	$date=\DateTime::createFromFormat('Y-m-d H:i:s.u', $json["date"]["date"]);
+	if(!$date) return new JsonResponse(["result"=>-1]);
+  $final_dir.=$date->format('Y').DIRECTORY_SEPARATOR.$date->format('m').DIRECTORY_SEPARATOR.$date->format('d').DIRECTORY_SEPARATOR;
+	$newname=$date->format('Y').'-'.$date->format('m').'-'.$date->format('d').' - '.$deliverynote.'.pdf';
+	//Si el fichero de destino existe, lo anexamos
+	if(file_exists($final_dir.$newname)){
+		$cmd = "gs -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile=\"".$final_dir.$newname."\" \"".$final_dir.$newname."\" \"".$dir.$file."\"";
+		$result = shell_exec($cmd);
+		if(unlink($dir.$file)){
+			return new JsonResponse(["result"=>1]);
+		}
+	}else{
+		//Si no existe en destino, movemos el fichero
+		if(rename($dir.$file, $final_dir.$newname)){
+				return new JsonResponse(["result"=>1]);
+		}
+	}
+	return new JsonResponse(["result"=>-1]);
+}
+
+
+
+
+
+
+
 
 }
