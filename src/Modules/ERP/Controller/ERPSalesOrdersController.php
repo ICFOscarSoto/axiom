@@ -1012,9 +1012,9 @@ public function signeddeliverynotesfails_save($deliverynote, $file, RouterInterf
 	$url='http://192.168.1.250:9000/navisionExport/axiom/do-NAVISION-getDeliveryNoteDate.php?deliverynote='.$deliverynote;
 	$content=file_get_contents($url);
 	$json=json_decode($content, true);
-	if($json===null) return new JsonResponse(["result"=>-1]);
+	if($json===null) return new JsonResponse(["result"=>-2]);
 	$date=\DateTime::createFromFormat('Y-m-d H:i:s.u', $json["date"]["date"]);
-	if(!$date) return new JsonResponse(["result"=>-1]);
+	if(!$date) return new JsonResponse(["result"=>-3]);
   $final_dir.=$date->format('Y').DIRECTORY_SEPARATOR.$date->format('m').DIRECTORY_SEPARATOR.$date->format('d').DIRECTORY_SEPARATOR;
 	$newname=$date->format('Y').'-'.$date->format('m').'-'.$date->format('d').' - '.$deliverynote.'.pdf';
 	//Si el fichero de destino existe, lo anexamos
@@ -1032,7 +1032,7 @@ public function signeddeliverynotesfails_save($deliverynote, $file, RouterInterf
 				return new JsonResponse(["result"=>1]);
 		}
 	}
-	return new JsonResponse(["result"=>-1]);
+	return new JsonResponse(["result"=>-4]);
 }
 
 

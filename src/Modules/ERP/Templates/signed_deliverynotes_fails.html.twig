@@ -95,10 +95,6 @@ function datepicker(){
     });
 }
 
-function test(){
-	console.log('TEST');
-}
-
 $(document).ready(function() {
 	$('body').tooltip({ selector: '[data-toggle="tooltip"]' });
 	{# Poner el foco en el primer input válido de la ficha #}
@@ -146,7 +142,10 @@ $(document).ready(function() {
 						toastr.success("Archivo guardado correctamente", "Confirmación", confirmation);
 							sheet.deleteRow(id_row,1);
 							sheet.page(($('.jexcel_page_selected').html()*1)-1);
-					}else toastr.error("Ocurrió un error al guardar el archivo", "Confirmación", confirmation);
+					}else{
+						console.log(data.result);
+						toastr.error("Ocurrió un error al guardar el archivo", "Confirmación", confirmation);
+					}
 			}, "json");
 	});
 
