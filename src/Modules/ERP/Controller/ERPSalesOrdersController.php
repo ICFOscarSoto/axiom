@@ -1025,12 +1025,12 @@ public function signeddeliverynotesfails_save($deliverynote, $file, RouterInterf
 		unlink($final_dir.'temp_'.$newname);
 		if(unlink($dir.$file)){
 			return new JsonResponse(["result"=>1]);
-		}
+		}else return new JsonResponse(["result"=>-5]);
 	}else{
 		//Si no existe en destino, movemos el fichero
 		if(rename($dir.$file, $final_dir.$newname)){
 				return new JsonResponse(["result"=>1]);
-		}
+		}else return new JsonResponse(["result"=>-6]);
 	}
 	return new JsonResponse(["result"=>-4]);
 }
