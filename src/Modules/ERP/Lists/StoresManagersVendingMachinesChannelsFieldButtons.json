@@ -1,0 +1,8 @@
+[
+  {"id": "editStoresManagersVendingMachineChannels", "type" : "default", "icon" : "fa fa-edit", "name" : "editar","route":"dataVendingmachinechannels", "routeParams":{"idvendingmachine":"entity_id"}, "modal":"StoresManagersVendingMachinesChannels", "actionType" : "background", "confirm" :false, "tooltip":"Configuración canal"},
+  {"id": "activation", "type": "option", "options": [
+      {"id": "desactivateStoresManagersVendingMachinesChannels", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"genericdisable", "routeParams":{"module":"ERP", "name":"StoresManagersVendingMachinesChannels"}, "confirm" :true, "actionType" : "background", "tooltip":"Desactivar canal" },
+      {"id": "activateStoresManagersVendingMachinesChannels", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "route":"genericenable", "routeParams":{"module":"ERP", "name":"StoresManagersVendingMachinesChannels"}, "confirm" :true, "actionType" : "background", "tooltip":"Activar canal" }
+  ]},
+  {"id": "deleteStoresManagersVendingMachinesChannels", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"genericdelete", "routeParams":{"module":"ERP", "name":"StoresManagersVendingMachinesChannels"}, "confirm" :true, "undo" :false, "actionType" : "background", "tooltip":"Borrar canal"}
+]

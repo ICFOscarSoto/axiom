@@ -24,6 +24,8 @@ use App\Modules\ERP\Entity\ERPStores;
 use App\Modules\ERP\Entity\ERPStoresManagers;
 use App\Modules\ERP\Entity\ERPStoresManagersConsumers;
 use App\Modules\ERP\Entity\ERPStoresManagersProducts;
+use App\Modules\ERP\Entity\ERPStoresManagersVendingMachines;
+use App\Modules\ERP\Entity\ERPStoresManagersVendingMachinesChannels;
 use App\Modules\ERP\Entity\ERPStoresManagersUsers;
 use App\Modules\ERP\Entity\ERPStoresManagersOperations;
 use App\Modules\ERP\Entity\ERPStoresManagersOperationsLines;
@@ -38,6 +40,8 @@ use App\Modules\ERP\Utils\ERPProductsUtils;
 use App\Modules\ERP\Utils\ERPStoresManagersConsumersUtils;
 use App\Modules\ERP\Utils\ERPStoresManagersProductsUtils;
 use App\Modules\ERP\Utils\ERPStoresManagersUsersUtils;
+use App\Modules\ERP\Utils\ERPStoresManagersVendingMachinesUtils;
+use App\Modules\ERP\Utils\ERPStoresManagersVendingMachinesChannelsUtils;
 use App\Modules\ERP\Utils\ERPEAN13Utils;
 use App\Modules\ERP\Utils\ERPReferencesUtils;
 use App\Modules\ERP\Utils\ERPStocksUtils;
@@ -67,12 +71,13 @@ class ERPStoresManagersController extends Controller
 			$template=dirname(__FILE__)."/../Forms/StoresManagers.json";
 			$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
 			$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
-			$breadcrumb=$menurepository->formatBreadcrumb('genericindex','HR','Meetings');
+			$breadcrumb=$menurepository->formatBreadcrumb('genericindex','ERP','StoresManagers');
 			array_push($breadcrumb, $new_breadcrumb);
 			$repository=$this->getDoctrine()->getRepository($this->class);
 
 			$tabs=[
 				["name" => "data", "icon"=>"fa fa-id-card", "caption"=>"Manager data", "active"=>true, "route"=>$this->generateUrl("dataStoresManagers",["id"=>$id])],
+				["name" => "storesmanagersvendingmachines", "caption"=>"Expendedoras", "icon"=>"fa-th","route"=>$this->generateUrl("listStoresManagersVendingMachines",["id"=>$id])],
 				["name" => "storesmanagersproducts", "caption"=>"Products", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("listStoresManagersProducts",["id"=>$id])],
 				["name" => "storesmanagersusers", "caption"=>"Users", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("listStoresManagersUsers",["id"=>$id])],
 				["name" => "storesmanagersconsumers", "caption"=>"Consumidores", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("listStoresManagersConsumers",["id"=>$id])],
@@ -169,6 +174,44 @@ class ERPStoresManagersController extends Controller
 
 
 	/**
+	 * @Route("/{_locale}/erp/storesmanagers/{id}/vendingmachines", name="listStoresManagersVendingMachines")
+	 */
+	public function listStoresManagersVendingMachines($id,RouterInterface $router,Request $request)
+	{
+	$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+	if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
+	$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
+	$locale = $request->getLocale();
+	$this->router = $router;
+
+	$repository=$this->getDoctrine()->getRepository($this->class);
+	$obj=$repository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$id, "deleted"=>0]);
+
+	$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
+	$utils = new ERPStoresManagersUtils();
+
+	$templateLists=$utils->formatVendingMachinesList($id);
+	$formUtils=new GlobaleFormUtils();
+
+	$utilsObj=new ERPStoresManagersVendingMachinesUtils();
+	$params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "parent"=>$obj];
+	$formUtils->initialize($this->getUser(), new ERPStoresManagersVendingMachines(), dirname(__FILE__)."/../Forms/StoresManagersVendingMachines.json", $request, $this, $this->getDoctrine(),method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
+	$templateForms[]=$formUtils->formatForm('StoresManagersVendingMachines', true, $id, ERPStoresManagersVendingMachines::class);
+
+		return $this->render('@Globale/list.html.twig', [
+			'id' => $id,
+			'listConstructor' => $templateLists,
+			'forms' => $templateForms,
+			'userData' => $userdata,
+			]);
+
+	return new RedirectResponse($this->router->generate('app_login'));
+	}
+
+
+
+
+	/**
 	 * @Route("/{_locale}/erp/storesmanagers/{id}/consumers", name="listStoresManagersConsumers")
 	 */
 	public function listStoresManagersConsumers($id,RouterInterface $router,Request $request)
@@ -243,6 +286,26 @@ class ERPStoresManagersController extends Controller
 	}
 
 	/**
+	 * @Route("/{_locale}/erp/storesmanagersvendingmachines/{id}/list", name="StoresManagersVendingMachineslist")
+	 */
+	public function StoresManagersVendingMachineslist($id, RouterInterface $router,Request $request)
+	{
+		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		$user = $this->getUser();
+		$locale = $request->getLocale();
+		$this->router = $router;
+		$manager = $this->getDoctrine()->getManager();
+		$repository = $manager->getRepository($this->class);
+		$repositoryVendingMachines = $manager->getRepository(ERPStoresManagersVendingMachines::class);
+		$listUtils=new GlobaleListUtils();
+		$obj=$repository->findBy(["company"=>$this->getUser()->getCompany(), "deleted"=>0, "id"=>$id]);
+		$listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersVendingMachines.json"),true);
+		$return=$listUtils->getRecords($user,$repositoryVendingMachines,$request,$manager,$listFields, ERPStoresManagersVendingMachines::class,[["type"=>"and", "column"=>"manager", "value"=>$obj]]);
+		return new JsonResponse($return);
+	}
+
+
+	/**
 	 * @Route("/{_locale}/erp/storesmanagers/{id}/users", name="listStoresManagersUsers")
 	 */
 	public function listStoresManagersUsers($id,RouterInterface $router,Request $request)
@@ -307,9 +370,12 @@ class ERPStoresManagersController extends Controller
 		$manager = $this->getDoctrine()->getManager();
 		$repository = $manager->getRepository($this->class);
 		$repositoryConsumers = $manager->getRepository(ERPStoresManagersConsumers::class);
+		$repositoryStoresManagersUsers = $manager->getRepository(ERPStoresManagersUsers::class);
+		$managerUser=$repositoryStoresManagersUsers->findOneBy(["user"=>$this->getUser(),"active"=>1,"deleted"=>0]);
+		if(!$managerUser) return new JsonResponse(array('result' => -3, 'text'=>"Usuario no asignado a gestor"));
 		if($nfcid!=-1)
-			$obj=$repositoryConsumers->findOneBy(["active"=>1, "deleted"=>0, "nfcid"=>$nfcid]);
-		else $obj=$repositoryConsumers->findOneBy(["active"=>1, "deleted"=>0, "id"=>$request->request->get('id',-1)]);
+			$obj=$repositoryConsumers->findOneBy(["active"=>1, "manager"=> $managerUser,"deleted"=>0, "nfcid"=>$nfcid]);
+		else $obj=$repositoryConsumers->findOneBy(["active"=>1, "manager"=> $managerUser, "deleted"=>0, "id"=>$request->request->get('id',-1)]);
 
 		if(!$obj) return new JsonResponse(array('result' => -1, 'text'=>"No existe este usuario"));
 		if($obj->getManager()->getCompany()!=$this->getUser()->getCompany()) return new JsonResponse(array('result' => -2, 'text'=>"No existe este usuario"));
@@ -363,5 +429,124 @@ class ERPStoresManagersController extends Controller
 		return new JsonResponse(["result"=>1]);
 	}
 
+
+	/**
+	 * @Route("/{_locale}/ERP/storesmanagers/vendingmachines/{id}/channels", name="StoresManagersVendingMachinesChannels", defaults={"id"=0})
+	 */
+		public function StoresManagersVendingMachinesChannels($id, RouterInterface $router,Request $request){
+			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
+			//$this->denyAccessUnlessGranted('ROLE_ADMIN');
+			$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
+			$locale = $request->getLocale();
+			$this->router = $router;
+			$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
+			$utils = new ERPStoresManagersVendingMachinesChannelsUtils();
+			$formUtils=new GlobaleFormUtils();
+			$formUtils->initialize($this->getUser(), new ERPStoresManagersVendingMachinesChannels(), dirname(__FILE__)."/../Forms/StoresManagersVendingMachinesChannels.json", $request, $this, $this->getDoctrine());
+			$templateLists[]=$utils->formatList($id);
+
+			$new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-new"];
+			$breadcrumb=$menurepository->formatBreadcrumb('genericindex','ERP', 'StoresManagers');
+			array_push($breadcrumb, ["rute"=>null, "name"=>"Canales Expendedora", "icon"=>"fa fa-calendar-check-o"], $new_breadcrumb);
+
+			$repository=$this->getDoctrine()->getRepository(ERPStoresManagersVendingMachines::class);
+			$obj = $repository->findOneBy(['id'=>$id, 'deleted'=>0]);
+			if($id!=0 && $obj==null){
+					return $this->render('@Globale/notfound.html.twig',[
+						"status_code"=>404,
+						"status_text"=>"Objeto no encontrado"
+					]);
+			}
+			$entity_name=$obj?$obj->getName():'';
+
+			$templateForms[]=$formUtils->formatForm('StoresManagersVendingMachinesChannels', true, $id, ERPStoresManagersVendingMachinesChannels::class, null);
+			if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+				return $this->render('@Globale/genericlist.html.twig', [
+					'entity_name' => $entity_name,
+					'controllerName' => 'ERPStoresManagersController',
+					'interfaceName' => 'Canales máquina expendedora',
+					'optionSelected' => 'schedules',
+					'menuOptions' =>  $menurepository->formatOptions($userdata),
+					'breadcrumb' =>  $breadcrumb,
+					'userData' => $userdata,
+					'lists' => $templateLists,
+					'forms' => $templateForms,
+					'entity_id' => $id,
+					'shift' => $id,
+					'include_header' => [["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker-es.js"]],
+					'include_footer' => [["type"=>"css", "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.css"],
+															 ["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.js"]]
+					]);
+			}
+			return new RedirectResponse($this->router->generate('app_login'));
+		}
+
+		/**
+		 * @Route("/api/ERP/storesmanagers/vendingmachines/channels/{id}/list", name="vendingmachinechannels")
+		*/
+		public function vendingmachinechannels($id, RouterInterface $router,Request $request){
+			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			$user = $this->getUser();
+			$shiftsRepository=$this->getDoctrine()->getRepository(ERPStoresManagersVendingMachines::class);
+			$shift = $shiftsRepository->find($id);
+			$locale = $request->getLocale();
+			$this->router = $router;
+			$manager = $this->getDoctrine()->getManager();
+			$repository = $manager->getRepository(ERPStoresManagersVendingMachinesChannels::class);
+			$listUtils=new GlobaleListUtils();
+			$listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersVendingMachinesChannels.json"),true);
+			$return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields,ERPStoresManagersVendingMachines::class,[["type"=>"and", "column"=>"vendingmachine", "value"=>$shift]]);
+			return new JsonResponse($return);
+		}
+
+		/**
+		 * @Route("/{_locale}/ERP/storesmanagers/vendingmachines/channels/data/{id}/{action}/{idvendingmachine}", name="dataVendingmachinechannels", defaults={"id"=0, "action"="read", "idvendingmachine"=0})
+		 */
+		 public function dataVendingmachinechannels($id, $idvendingmachine, $action, Request $request){
+			 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			 $template=dirname(__FILE__)."/../Forms/StoresManagersVendingMachinesChannels.json";
+			 $utils = new GlobaleFormUtils();
+			 $utilsObj=new ERPStoresManagersVendingMachinesChannelsUtils();
+			 $repositoryVendingMachinesChannels=$this->getDoctrine()->getRepository(ERPStoresManagersVendingMachinesChannels::class);
+			 $repositoryVendingMachines=$this->getDoctrine()->getRepository(ERPStoresManagersVendingMachines::class);
+
+			 if($id==0){
+				 if($idvendingmachine==0 ) $idvendingmachine=$request->query->get('vendingmachine');
+				 if($idvendingmachine==0 || $idvendingmachine==null) $idvendingmachine=$request->request->get('form',[])["vendingmachine"];
+				 $vendingmachine = $repositoryVendingMachines->find($idvendingmachine);
+			 }	else $obj = $repositoryVendingMachinesChannels->find($id);
+
+			 $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "vendingmachine"=>$id==0?$vendingmachine:$obj->getVendingmachine()];
+			 $utils->initialize($this->getUser(), new ERPStoresManagersVendingMachinesChannels(), $template, $request, $this, $this->getDoctrine(),
+													method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
+			 if($id==0) $utils->values(["vendingmachine"=>$vendingmachine]);
+			 return $utils->make($id, ERPStoresManagersVendingMachinesChannels::class, $action, "StoresManagersVendingMachinesChannels", "modal");
+		}
+
+
+		/**
+		 * @Route("/api/ERP/storesmanagers/vendingmachines/channel/get/{id}/{channel}", name="getStoresManagerVendingMachineChannel", defaults={"channel"=-1})
+		 */
+		public function getStoresManagerVendingMachineChannel($id, $channel, RouterInterface $router,Request $request)
+		{
+			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			$manager = $this->getDoctrine()->getManager();
+			$repository = $manager->getRepository($this->class);
+			$repositoryVendingMachines = $manager->getRepository(ERPStoresManagersVendingMachines::class);
+			$repositoryVendingMachinesChannels = $manager->getRepository(ERPStoresManagersVendingMachinesChannels::class);
+			$vendingmachine=$repositoryVendingMachines->findOneBy(["id"=>$id,"active"=>1,"deleted"=>0]);
+			if(!$vendingmachine) return new JsonResponse(array('result' => -1, 'text'=>"Máquina expendedora incorrecta"));
+			if(strlen($channel)!=2) return new JsonResponse(array('result' => -1, 'text'=>"Canal incorrecto"));
+			$channel=$repositoryVendingMachinesChannels->findOneBy(["vendingmachine"=>$vendingmachine,"row"=>substr($channel,0,1),"col"=>substr($channel,1,1),"active"=>1,"deleted"=>0]);
+			if(!$channel) return new JsonResponse(array('result' => -1, 'text'=>"Canal no configurado"));
+			if(!$channel->getProduct()) return new JsonResponse(array('result' => -1, 'text'=>"Canal sin producto configurado"));
+			$result["id"]=$channel->getId();
+			$result["name"]=$channel->getName();
+			$result["product_code"]=$channel->getProduct()->getCode();
+			$result["product_name"]=$channel->getProduct()->getName();
+			return new JsonResponse($result);
+
+		}
 
 }

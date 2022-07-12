@@ -770,3 +770,9 @@ jspreadsheet_uprow: Subir línea
 jspreadsheet_downrow: Bajar línea
 jspreadsheet_showcolumn_error: No quedan columnas que mostrar
 jspreadsheet_loadmasive: Carga masiva
+
+#VENDING MACHINES
+#----------------------------------------------------------------------------------------------------------------------
+Lastcheck: Última conexión
+StoresManagersVendingMachines: Máquinas Expendedoras
+StoresManagersVendingMachinesChannels: Canales máquina expendedora

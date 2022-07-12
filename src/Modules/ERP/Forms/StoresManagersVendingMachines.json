@@ -1,0 +1,30 @@
+[{
+    "sections": [
+        {
+            "name": "data",
+            "fields": [
+                {
+                    "name": "name",
+                    "cols": 9
+                },
+                {
+                    "name": "brand",
+                    "cols": 6
+                },
+                {
+                    "name": "model",
+                    "cols": 6
+                },
+                {
+                    "name": "serial",
+                    "cols": 8
+                },
+                {
+                    "name": "lastcheck",
+                    "cols": 4,
+                    "readonly": true
+                }
+            ]
+        }
+    ]
+}]

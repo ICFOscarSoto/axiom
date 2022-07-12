@@ -1,0 +1,54 @@
+[
+    {
+        "name": "id",
+        "caption": "id"
+    },
+    {
+      "name": "name",
+      "caption": "Nombre canal"
+    },
+    {
+      "name": "row",
+      "caption": "Num. bandeja"
+    },
+    {
+      "name": "col",
+      "caption": "Num. fila"
+    },
+    {
+        "name": "product__code",
+        "caption": "Cod. producto"
+    },
+    {
+        "name": "product__name",
+        "caption": "Producto"
+    },
+    {
+        "name": "minquantity",
+        "caption": "Uds. mínimas"
+    },
+    {
+        "name": "maxquantity",
+        "caption": "Uds. máximas"
+    },
+    {
+        "name": "quantity",
+        "caption": "Stock"
+    },
+    {
+        "name": "active",
+        "caption": "Estado",
+        "width": "10%",
+        "class": "dt-center",
+        "replace": {
+            "1": {
+                "text": "Activo",
+                "html": "<div style=\"min-width: 75px;\" class=\"label label-success\">Activo<\/div>"
+            },
+            "0": {
+                "text": "Desactivado",
+                "html": "<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado<\/div>"
+            }
+        }
+    }
+]

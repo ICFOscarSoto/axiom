@@ -78,7 +78,7 @@ label {
 }
 
 .searchable-view-relation{
-  height: 25px;
+  height: 21px;
   position: absolute;
   top: 3px;
   right: 73px;
@@ -86,7 +86,7 @@ label {
   border: 1px solid #e8e8e8;
   border-radius: 3px;
   background: #ffffff;
-  line-height: 24px !important;
+  line-height: 21px !important;
   text-align: center;
   cursor: pointer;
   z-index: 999;

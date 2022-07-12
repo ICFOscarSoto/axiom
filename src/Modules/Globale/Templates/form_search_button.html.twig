@@ -30,9 +30,9 @@
     html=$("#{{formConstructor.name}}-form-body").find("#form_{{ field.name }}").parent().html();
     newHtml='<div class="input-group">'+html+
             '<div class="input-group-btn group-searchable-fields">'+
-            '<button type="button" id="{{ field.name }}-form-clear" class="btn btn-white" style="height: 31px;">'+
+            '<button type="button" id="{{ field.name }}-form-clear" class="btn btn-white" style="height: 27px;">'+
             '<i class="fas fa-times" aria-hidden="true"></i> </button>'+
-            '<button type="button" id="{{ field.name }}-form-search" class="btn btn-white" style="height: 31px;" data-toggle="modal" data-target="#{{formConstructor.name}}-{{ field.name }}-search-modal-form">'+
+            '<button type="button" id="{{ field.name }}-form-search" class="btn btn-white" style="height: 27px;" data-toggle="modal" data-target="#{{formConstructor.name}}-{{ field.name }}-search-modal-form">'+
             '<i class="fa fa-search" aria-hidden="true"></i> </button>'+
             '</div></div>';
     $("#{{formConstructor.name}}-form-body").find("#form_{{ field.name }}").parent().html(newHtml);
