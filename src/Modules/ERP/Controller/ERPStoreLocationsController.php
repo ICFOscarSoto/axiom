@@ -142,7 +142,7 @@ class ERPStoreLocationsController extends Controller
 					$locitem["id"]=$loc->getId();
 					$locitem["name"]=$loc->getName();
 					$locitem["store_id"]=$loc->getStore()->getId();
-					if(isset($locitem["orientation"])) $locitem["orientation"]=$loc->getOrientation(); else $locitem["orientation"]=0;
+					if(null!==$loc->getOrientation()) $locitem["orientation"]=$loc->getOrientation(); else $locitem["orientation"]=0;
 					if($loc) $locations[]=$locitem;
 				}
 			$params=["type"=>$type, "doctrine"=>$this->getDoctrine(), "rootdir"=> $this->get('kernel')->getRootDir(), "locations"=>$locations, "user"=>$this->getUser()];
