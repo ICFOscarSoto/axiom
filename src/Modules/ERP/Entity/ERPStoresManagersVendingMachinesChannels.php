@@ -46,12 +46,12 @@ class ERPStoresManagersVendingMachinesChannels
     /**
      * @ORM\Column(type="integer")
      */
-    private $quantity;
+    private $quantity=0;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $minquantity;
+    private $minquantity=0;
 
     /**
      * @ORM\Column(type="integer")
@@ -77,6 +77,16 @@ class ERPStoresManagersVendingMachinesChannels
      * @ORM\Column(type="datetime")
      */
     private $dateupd;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $multiplier=1;
+
+    /**
+     * @ORM\Column(type="date", nullable=true)
+     */
+    private $expirydate;
 
     public function getId(): ?int
     {
@@ -223,6 +233,30 @@ class ERPStoresManagersVendingMachinesChannels
     public function setDateupd(\DateTimeInterface $dateupd): self
     {
         $this->dateupd = $dateupd;
+
+        return $this;
+    }
+
+    public function getMultiplier(): ?int
+    {
+        return $this->multiplier;
+    }
+
+    public function setMultiplier(?int $multiplier): self
+    {
+        $this->multiplier = $multiplier;
+
+        return $this;
+    }
+
+    public function getExpirydate(): ?\DateTimeInterface
+    {
+        return $this->expirydate;
+    }
+
+    public function setExpirydate(?\DateTimeInterface $expirydate): self
+    {
+        $this->expirydate = $expirydate;
 
         return $this;
     }

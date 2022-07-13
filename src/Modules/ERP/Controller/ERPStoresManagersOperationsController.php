@@ -26,6 +26,8 @@ use App\Modules\ERP\Entity\ERPStoresManagers;
 use App\Modules\ERP\Entity\ERPStoresManagersConsumers;
 use App\Modules\ERP\Entity\ERPStoresManagersUsers;
 use App\Modules\ERP\Entity\ERPStoresManagersUsersStores;
+use App\Modules\ERP\Entity\ERPStoresManagersVendingMachines;
+use App\Modules\ERP\Entity\ERPStoresManagersVendingMachinesChannels;
 use App\Modules\ERP\Entity\ERPStoresUsers;
 use App\Modules\ERP\Entity\ERPCategories;
 use App\Modules\ERP\Entity\ERPProductsVariants;
@@ -343,6 +345,68 @@ class ERPStoresManagersOperationsController extends Controller
 			return new JsonResponse(["result"=>1]);
 			}else return new JsonResponse(["result"=>-1, "text"=> "No hay productos para realizar la operación"]);
 		}
+
+
+
+		/**
+		 * @Route("/api/erp/storesmanagers/vendingmachines/operations/create/{id}/{channel}/{nfcid}", name="createVendingMachineOperations", defaults={"id"=0, "channel"=0, "nfcid"="null"})
+		 */
+		 public function createVendingMachineOperations($id, $channel, $nfcid, Request $request){
+			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
+			$managerRepository=$this->getDoctrine()->getRepository(ERPStoresManagers::class);
+			$consumerRepository=$this->getDoctrine()->getRepository(ERPStoresManagersConsumers::class);
+			$repositoryVendingMachines = $this->getDoctrine()->getRepository(ERPStoresManagersVendingMachines::class);
+			$repositoryVendingMachinesChannels = $this->getDoctrine()->getRepository(ERPStoresManagersVendingMachinesChannels::class);
+			$productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
+			$productVariantRepository=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
+
+			$consumer=$consumerRepository->findOneBy(["nfcid"=>$nfcid,"active"=>1,"deleted"=>0]);
+			if(!$consumer) return new JsonResponse(["result"=>-2, "text"=> "El usuario no existe"]);
+			if($consumer->getManager()->getCompany()!=$this->getUser()->getCompany()) return new JsonResponse(["result"=>-3, "text"=> "Operación no autorizada"]);
+
+			$vendingmachine=$repositoryVendingMachines->findOneBy(["id"=>$id,"active"=>1,"deleted"=>0]);
+			if(!$vendingmachine) return new JsonResponse(array('result' => -1, 'text'=>"Máquina expendedora incorrecta"));
+			$channel=$repositoryVendingMachinesChannels->findOneBy(["vendingmachine"=>$vendingmachine,"row"=>substr($channel,0,1),"col"=>substr($channel,1,1),"active"=>1,"deleted"=>0]);
+			if(!$channel) return new JsonResponse(array('result' => -1, 'text'=>"Canal no configurado"));
+
+
+			if($channel->getProduct()){
+					$operation=new ERPStoresManagersOperations();
+					$operation->setCompany($this->getUser()->getCompany());
+					$operation->setManager($consumer->getManager());
+					$operation->setAgent($this->getUser());
+					$operation->setConsumer($consumer);
+					$operation->setStore(null);
+					$operation->setDate(new \Datetime());
+					$operation->setDateadd(new \Datetime());
+					$operation->setDateupd(new \Datetime());
+					$operation->setActive(true);
+					$operation->setDeleted(false);
+					$this->getDoctrine()->getManager()->persist($operation);
+					$this->getDoctrine()->getManager()->flush();
+
+					$line=new ERPStoresManagersOperationsLines();
+					$line->setOperation($operation);
+					$line->setProduct($channel->getProduct());
+					$line->setQuantity($channel->getMultiplier()?($channel->getMultiplier()==0?1:$channel->getMultiplier()):1);
+					$line->setCode($channel->getProduct()->getCode());
+					$line->setName($channel->getProduct()->getName());
+					$line->setVariant(null);
+					$line->setLocation(null);
+					$line->setDateadd(new \Datetime());
+					$line->setDateupd(new \Datetime());
+					$line->setActive(true);
+					$line->setDeleted(false);
+					$this->getDoctrine()->getManager()->persist($line);
+					$this->getDoctrine()->getManager()->flush();
+
+					return new JsonResponse(["result"=>1]);
+			}else return new JsonResponse(["result"=>-1, "text"=> "No hay productos para realizar la operación"]);
+		}
+
+
+
 
 		/**
 	  * @Route("/{_locale}/erp/storesmanagers/operations/{id}/delete", name="deleteOperation")

@@ -8,20 +8,18 @@
       "caption": "Nombre canal"
     },
     {
-      "name": "row",
-      "caption": "Num. bandeja"
+      "name": "row_o_col",
+      "caption": "Canal"
     },
     {
-      "name": "col",
-      "caption": "Num. fila"
-    },
-    {
-        "name": "product__code",
-        "caption": "Cod. producto"
-    },
-    {
-        "name": "product__name",
+        "name": "product__code_o_product__name",
         "caption": "Producto"
+    },
+  
+    {
+        "name": "expirydate",
+        "caption": "Caducidad",
+        "type": "date"
     },
     {
         "name": "minquantity",

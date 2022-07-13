@@ -31,6 +31,17 @@
                     "cols": 6
                 },
                 {
+                    "name": "multiplier",
+                    "caption": "Multiplicador",
+                    "cols": 3
+                },
+                {
+                    "name": "expirydate",
+                    "caption": "Fecha Caducidad",
+                    "type": "date",
+                    "cols": 3
+                },
+                {
                     "name": "minquantity",
                     "caption": "Stock Mínimo",
                     "cols": 3

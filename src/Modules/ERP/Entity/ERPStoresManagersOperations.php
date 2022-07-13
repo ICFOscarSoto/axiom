@@ -44,7 +44,7 @@ class ERPStoresManagersOperations
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Modules\ERP\Entity\ERPStores")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=true)
      */
     private $store;
 
