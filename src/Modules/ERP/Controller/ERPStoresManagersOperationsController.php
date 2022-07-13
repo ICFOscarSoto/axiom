@@ -353,7 +353,6 @@ class ERPStoresManagersOperationsController extends Controller
 		 */
 		 public function createVendingMachineOperations($id, $channel, $nfcid, Request $request){
 			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-			if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
 			$managerRepository=$this->getDoctrine()->getRepository(ERPStoresManagers::class);
 			$consumerRepository=$this->getDoctrine()->getRepository(ERPStoresManagersConsumers::class);
 			$repositoryVendingMachines = $this->getDoctrine()->getRepository(ERPStoresManagersVendingMachines::class);
@@ -401,6 +400,8 @@ class ERPStoresManagersOperationsController extends Controller
 					$this->getDoctrine()->getManager()->persist($line);
 					$this->getDoctrine()->getManager()->flush();
 					$channel->setQuantity($channel->getQuantity()-$line->getQuantity());
+					$this->getDoctrine()->getManager()->persist($channel);
+					$this->getDoctrine()->getManager()->flush();
 
 					return new JsonResponse(["result"=>1]);
 			}else return new JsonResponse(["result"=>-1, "text"=> "No hay productos para realizar la operación"]);
