@@ -400,6 +400,7 @@ class ERPStoresManagersOperationsController extends Controller
 					$line->setDeleted(false);
 					$this->getDoctrine()->getManager()->persist($line);
 					$this->getDoctrine()->getManager()->flush();
+					$channel->setQuantity($channel->getQuantity()-$line->getQuantity());
 
 					return new JsonResponse(["result"=>1]);
 			}else return new JsonResponse(["result"=>-1, "text"=> "No hay productos para realizar la operación"]);
