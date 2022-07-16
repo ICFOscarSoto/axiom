@@ -4,10 +4,6 @@
         "caption": "id"
     },
     {
-        "name": "manager__name",
-        "caption": "Manager"
-    },
-    {
         "name": "name",
         "caption": "Name"
     },
@@ -18,6 +14,11 @@
     {
         "name": "model",
         "caption": "Model"
+    },
+    {
+      "name": "lastcheck",
+      "caption": "Lastcheck",
+      "type": "datetime"
     },
     {
         "name": "active",

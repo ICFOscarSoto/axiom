@@ -551,4 +551,96 @@ class ERPStoresManagersController extends Controller
 
 		}
 
+
+		/**
+	 * @Route("/{_locale}/ERP/storesmanagers/vendingmachines/vendingmachines/replenishment/{id}", name="replenishmentManagerVendingMachine",  defaults={"id"=0})
+	 */
+	 public function salesCommissions($id, RouterInterface $router,Request $request){
+		 // El usuario tiene derechos para realizar la acción, sino se va a la página de unauthorized
+		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		 if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine()))
+			 return $this->redirect($this->generateUrl('unauthorized'));
+
+		 $globaleMenuOptionsRepository			= $this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
+
+		 // Datos de usuario
+		 $userdata				= $this->getUser()->getTemplateData($this, $this->getDoctrine());
+
+		 // Miga
+		 $nbreadcrumb=["rute"=>null, "name"=>"Por Vendedor", "icon"=>"fa fa-edit"];
+		 $breadcrumb=$globaleMenuOptionsRepository->formatBreadcrumb('salesCommissions',null,null);
+		 array_push($breadcrumb,$nbreadcrumb);
+
+		 if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+				 return $this->render('@ERP/storesmanagersreplenishmentvendingmachine.html.twig', [
+					 'controllerName' => 'salesOrdersController',
+					 'interfaceName' => 'Commissions',
+					 'optionSelected' => 'salesCommissions',
+					 'optionSelectedParams' => [],
+					 'menuOptions' =>  $globaleMenuOptionsRepository->formatOptions($userdata),
+					 'breadcrumb' =>  $breadcrumb,
+					 'userData' => $userdata,
+					 'id' => $id,
+					 'include_header' => []
+					 ]);
+			 }
+			 return new RedirectResponse($this->router->generate('app_login'));
+
+	 }
+
+
+
+		/**
+		 * @Route("/api/ERP/storesmanagers/vendingmachines/replenishment/channels/get/{id}", name="replenishmentManagerVendingMachineGetChannel", defaults={"id"=0})
+		 */
+		public function replenishmentManagerVendingMachineGetChannel($id, RouterInterface $router,Request $request)
+		{
+			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
+			$manager = $this->getDoctrine()->getManager();
+			$repositoryVendingMachines = $manager->getRepository(ERPStoresManagersVendingMachines::class);
+			$repositoryVendingMachinesChannels = $manager->getRepository(ERPStoresManagersVendingMachinesChannels::class);
+			$vendingmachine=$repositoryVendingMachines->findOneBy(["id"=>$id,"active"=>1,"deleted"=>0]);
+			if(!$vendingmachine) return new JsonResponse(array('result' => -1, 'text'=>"Máquina expendedora incorrecta"));
+			$channels=$repositoryVendingMachinesChannels->findBy(["vendingmachine"=>$vendingmachine,"deleted"=>0],["row"=>"ASC", "col"=>"ASC"]);
+			$maxCol=0;
+			$result["result"]="";
+			$result["maxCol"]="";
+				foreach($channels as $channel){
+					$channelData=[];
+					$channelData["id"]=$channel->getId();
+					$channelData["row"]=$channel->getRow();
+					$channelData["col"]=$channel->getCol();
+					$channelData["size"]=$channel->getSize()?$channel->getSize():1;
+					$channelData["name"]=$channel->getName();
+					$channelData["product_id"]=$channel->getProduct()?$channel->getProduct()->getId():"0";
+					$channelData["product_code"]=$channel->getProduct()?$channel->getProduct()->getCode():"";
+					$channelData["product_name"]=$channel->getProduct()?$channel->getProduct()->getName():"";
+					$channelData["quantity"]=$channel->getQuantity();
+					$channelData["minquantity"]=$channel->getMinquantity();
+					$channelData["maxquantity"]=$channel->getMaxquantity();
+					$channelData["multiplier"]=$channel->getMultiplier()?$channel->getMultiplier():1;
+
+					$color="#e94646"; //Rojo
+					if($channel->getActive() && $channel->getProduct() && $channel->getQuantity()>$channel->getMinquantity()){
+						$color="#589b4b"; //Verde
+					}else{
+						if($channel->getQuantity()<=$channel->getMinquantity() && $channel->getActive() && $channel->getProduct()){
+								$color="#fba234"; //Naranja
+						}else{
+							if(!$channel->getActive() || !$channel->getProduct()){
+								$color="#a1a1a1"; //Gris
+							}
+						}
+					}
+					$channelData["color"]=$color;
+					$result["data"][]=$channelData;
+					if($channel->getCol()>$maxCol) $maxCol=$channel->getCol();
+				}
+			$result["result"]=1;
+			$result["maxCol"]=$maxCol;
+			return new JsonResponse($result);
+
+		}
+
 }

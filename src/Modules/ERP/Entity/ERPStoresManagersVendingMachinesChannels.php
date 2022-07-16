@@ -260,4 +260,5 @@ class ERPStoresManagersVendingMachinesChannels
 
         return $this;
     }
+
 }
