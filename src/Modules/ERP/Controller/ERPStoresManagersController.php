@@ -611,7 +611,6 @@ class ERPStoresManagersController extends Controller
 					$channelData["id"]=$channel->getId();
 					$channelData["row"]=$channel->getRow();
 					$channelData["col"]=$channel->getCol();
-					$channelData["size"]=$channel->getSize()?$channel->getSize():1;
 					$channelData["name"]=$channel->getName();
 					$channelData["product_id"]=$channel->getProduct()?$channel->getProduct()->getId():"0";
 					$channelData["product_code"]=$channel->getProduct()?$channel->getProduct()->getCode():"";
