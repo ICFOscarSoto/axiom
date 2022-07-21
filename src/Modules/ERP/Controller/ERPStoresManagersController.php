@@ -672,4 +672,30 @@ class ERPStoresManagersController extends Controller
 			return new JsonResponse(["result"=>1]);
 		}
 
+		/**
+		 * @Route("/api/ERP/storesmanagers/vendingmachines/consumers/get/{id}/{nfcid}", name="getStoresManagerVendingMachineConsumer", defaults={"id"=0, "nfcid"=-1})
+		 */
+		public function getStoresManagerVendingMachineConsumer($id, $nfcid, RouterInterface $router,Request $request)
+		{
+			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			$manager = $this->getDoctrine()->getManager();
+			$repository = $manager->getRepository($this->class);
+			$repositoryVendingMachines = $manager->getRepository(ERPStoresManagersVendingMachines::class);
+			$repositoryConsumers = $manager->getRepository(ERPStoresManagersConsumers::class);
+			$vendingmachine=$repositoryVendingMachines->findOneBy(["id"=>$id, "active"=>1, "deleted"=>0]);
+			if(!$vendingmachine) return new JsonResponse(['result' => -1, 'text'=>"Error de acceso"]);
+			$obj=$repositoryConsumers->findOneBy(["active"=>1, "deleted"=>0, "nfcid"=>$nfcid, "manager"=>$vendingmachine->getManager()]);
+			if(!$obj) return new JsonResponse(['result' => -1, 'text'=>"No existe este usuario"]);
+			$result["id"]=$obj->getId();
+			$result["name"]=$obj->getName();
+			$result["lastname"]=$obj->getLastname();
+			$result["nfcid"]=$obj->getNfcid();
+			$result["idcard"]=$obj->getIdcard();
+			$result["code2"]=$obj->getCode2();
+			$result["active"]=$obj->getActive();
+
+			return new JsonResponse($result);
+
+		}
+
 }
