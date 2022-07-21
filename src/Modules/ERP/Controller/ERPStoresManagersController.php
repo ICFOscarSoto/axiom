@@ -26,6 +26,7 @@ use App\Modules\ERP\Entity\ERPStoresManagersConsumers;
 use App\Modules\ERP\Entity\ERPStoresManagersProducts;
 use App\Modules\ERP\Entity\ERPStoresManagersVendingMachines;
 use App\Modules\ERP\Entity\ERPStoresManagersVendingMachinesChannels;
+use App\Modules\ERP\Entity\ERPStoresManagersVendingMachinesChannelsReplenishment;
 use App\Modules\ERP\Entity\ERPStoresManagersUsers;
 use App\Modules\ERP\Entity\ERPStoresManagersOperations;
 use App\Modules\ERP\Entity\ERPStoresManagersOperationsLines;
@@ -567,16 +568,16 @@ class ERPStoresManagersController extends Controller
 		 $userdata				= $this->getUser()->getTemplateData($this, $this->getDoctrine());
 
 		 // Miga
-		 $nbreadcrumb=["rute"=>null, "name"=>"Por Vendedor", "icon"=>"fa fa-edit"];
-		 $breadcrumb=$globaleMenuOptionsRepository->formatBreadcrumb('salesCommissions',null,null);
+		 $nbreadcrumb=["rute"=>null, "name"=>"Configuración máquina", "icon"=>"fa fa-edit"];
+		 $breadcrumb=$globaleMenuOptionsRepository->formatBreadcrumb('genericindex','ERP','StoresManagersVendingMachines');
 		 array_push($breadcrumb,$nbreadcrumb);
 
 		 if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 				 return $this->render('@ERP/storesmanagersreplenishmentvendingmachine.html.twig', [
 					 'controllerName' => 'salesOrdersController',
-					 'interfaceName' => 'Commissions',
-					 'optionSelected' => 'salesCommissions',
-					 'optionSelectedParams' => [],
+					 'interfaceName' => 'Reaprovisionamiento Expendedoras',
+					 'optionSelected' => 'genericindex',
+					 'optionSelectedParams' => ["module"=>'ERP',"name"=>'StoresManagersVendingMachines'],
 					 'menuOptions' =>  $globaleMenuOptionsRepository->formatOptions($userdata),
 					 'breadcrumb' =>  $breadcrumb,
 					 'userData' => $userdata,
@@ -593,8 +594,7 @@ class ERPStoresManagersController extends Controller
 		/**
 		 * @Route("/api/ERP/storesmanagers/vendingmachines/replenishment/channels/get/{id}", name="replenishmentManagerVendingMachineGetChannel", defaults={"id"=0})
 		 */
-		public function replenishmentManagerVendingMachineGetChannel($id, RouterInterface $router,Request $request)
-		{
+		public function replenishmentManagerVendingMachineGetChannel($id, RouterInterface $router,Request $request){
 			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 			if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
 			$manager = $this->getDoctrine()->getManager();
@@ -640,6 +640,36 @@ class ERPStoresManagersController extends Controller
 			$result["maxCol"]=$maxCol;
 			return new JsonResponse($result);
 
+		}
+
+		/**
+		 * @Route("/api/ERP/storesmanagers/vendingmachines/replenishment/channels/add/{id}/{qty}", name="addReplenishmentManagerVendingMachineGetChannel", defaults={"id"=0})
+		 */
+		public function addReplenishmentManagerVendingMachineGetChannel($id,$qty, RouterInterface $router,Request $request){
+			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
+			$repositoryVendingMachinesChannels = $this->getDoctrine()->getManager()->getRepository(ERPStoresManagersVendingMachinesChannels::class);
+			$repositoryVendingMachinesChannelsReplenishment = $this->getDoctrine()->getManager()->getRepository(ERPStoresManagersVendingMachinesChannelsReplenishment::class);
+			$channel=$repositoryVendingMachinesChannels->findOneBy(["id"=>$id,"active"=>1,"deleted"=>0]);
+			if(!$channel) return new JsonResponse(["result"=>-1, "text"=>"Canal incorrecto"]);
+			if($channel->getProduct()==null && $channel->getProductcode()==null) return new JsonResponse(["result"=>-2, "text"=>"Canal no configurado"]);
+			$replenishment = new ERPStoresManagersVendingMachinesChannelsReplenishment();
+			$replenishment->setChannel($channel);
+			$replenishment->setProduct($channel->getProduct());
+			$replenishment->setProductcode($channel->getProductcode());
+			$replenishment->setProductname($channel->getProductname());
+			$replenishment->setQuantity($qty);
+			$replenishment->setDateadd(new \Datetime());
+			$replenishment->setDateupd(new \Datetime());
+			$replenishment->setActive(1);
+			$replenishment->setDeleted(0);
+			$this->getDoctrine()->getManager()->persist($replenishment);
+			$this->getDoctrine()->getManager()->flush();
+
+			$channel->setQuantity($channel->getQuantity()+$qty);
+			$this->getDoctrine()->getManager()->persist($channel);
+			$this->getDoctrine()->getManager()->flush();
+			return new JsonResponse(["result"=>1]);
 		}
 
 }

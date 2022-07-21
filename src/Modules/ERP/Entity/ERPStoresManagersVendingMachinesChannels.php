@@ -88,6 +88,16 @@ class ERPStoresManagersVendingMachinesChannels
      */
     private $expirydate;
 
+    /**
+     * @ORM\Column(type="string", length=32, nullable=true)
+     */
+    private $productcode;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $productname;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -259,6 +269,38 @@ class ERPStoresManagersVendingMachinesChannels
         $this->expirydate = $expirydate;
 
         return $this;
+    }
+
+    public function getProductcode(): ?string
+    {
+        return $this->productcode;
+    }
+
+    public function setProductcode(string $productcode): self
+    {
+        $this->productcode = $productcode;
+
+        return $this;
+    }
+
+    public function getProductname(): ?string
+    {
+        return $this->productname;
+    }
+
+    public function setProductname(?string $productname): self
+    {
+        $this->productname = $productname;
+
+        return $this;
+    }
+
+    public function preProccess($kernel, $doctrine, $user, $params, $oldobj)
+    {
+      if($this->product!=null){
+        $this->productcode=$this->product->getCode();
+        $this->productname=$this->product->getName();
+      }
     }
 
 }

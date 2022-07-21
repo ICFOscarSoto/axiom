@@ -25,12 +25,40 @@
 		{{ include('@Globale/breadcrumb.html.twig') }}
 		{#}<h2>{{ interfaceName }}</h2>#}
 		<!-- MAIN CONTENT -->
-    <div id="channels-container" style="width:100%; overflow-x: scroll; overflow-y: hidden;">
+    <div id="channels-container" style="width:100%; overflow-x: scroll; height: 80vh;">
     </div>
 		{{ include('@Globale/chat.html.twig') }}
 </div>
 
 <script>
+function replenishQty(channel, qty){
+	if((++load_wait)==1) $("#load-spinner").fadeIn();
+  $.post('/api/ERP/storesmanagers/vendingmachines/replenishment/channels/add/'+channel+'/'+qty, {},
+		function(data, status, xhr){
+			if((--load_wait)==0) $("#load-spinner").fadeOut();
+			if(data.result==1){
+				$("#input-stock-"+channel).val(($("#input-stock-"+channel).val()*1)+(qty*1));
+				toastr.success("Reaprovisionamiento del canal completado", "Confirmación", confirmation);
+				$("#input-op-"+channel).val(0);
+			}else toastr.error("Ocurrio un error al reaprovisionar el canal", "Confirmación", confirmation);
+		}
+	);
+}
+
+function replenishSetQty(channel, qty){
+	var newqty=qty-$("#input-stock-"+channel).val();
+	if((++load_wait)==1) $("#load-spinner").fadeIn();
+  $.post('/api/ERP/storesmanagers/vendingmachines/replenishment/channels/add/'+channel+'/'+newqty, {},
+		function(data, status, xhr){
+			if((--load_wait)==0) $("#load-spinner").fadeOut();
+			if(data.result==1){
+				$("#input-stock-"+channel).val(($("#input-stock-"+channel).val()*1)+(newqty*1));
+				toastr.success("Reaprovisionamiento del canal completado", "Confirmación", confirmation);
+				$("#input-op-"+channel).val(0);
+			}else toastr.error("Ocurrio un error al reaprovisionar el canal", "Confirmación", confirmation);
+		}
+	);
+}
 
 function getVendingmachineChannels(){
   if((++load_wait)==1) $("#load-spinner").fadeIn();
@@ -54,21 +82,20 @@ function getVendingmachineChannels(){
                colspan=(data.maxCol-colsArray[index]["col"])+1;
              }
            }else colspan=1;
-           html+="<div attr-name='"+colsArray[index]["name"]+"' style='width: "+(292*colspan)+"px; height: 200px; padding:4px;'>"+
+           html+="<div attr-name='"+colsArray[index]["name"]+"' style='width: "+(265*colspan)+"px; height: 200px; padding:4px;'>"+
                   "<div style='border: 1px #ddd solid; background-color:#f9f9f9;width: 100%;height: 100%;border-radius: 5px;'>"+
                   "<div style='position: relative;background: "+colsArray[index]["color"]+";display: inline-block;top: 5px;left: 10px;font-size: 12px;padding: 5px;font-weight: bold;width: 40px;text-align: center;border-radius: 8px;height: 40px;color: #fff;align-items: center;justify-content: center;align-content: center;border: 2px #bdbcbc solid;'><div style='position: relative;font-size: 16px;top: 3px;'>"+colsArray[index]["name"]+"</div></div>"+
-                  "<textarea rows='3' wrap='soft' style='position: relative; background: #ebebeb; display: inline-block; top: 5px; left: 5px; font-size: 12px; padding: 5px; font-weight: bold; right: 5px; float: right; margin-right: 10px; border: 1px #cbcbcb solid; border-radius: 4px; color: #726a6a; height: 39px;width: "+(223*colspan)+"px;overflow-wrap: anywhere;' disabled>"+colsArray[index]["product_code"]+" "+colsArray[index]["product_name"]+"</textarea>"+
+                  "<textarea rows='3' wrap='soft' style='position: relative; background: #ebebeb; display: inline-block; top: 5px; left: 5px; font-size: 12px; padding: 5px; font-weight: bold; right: 5px; float: right; margin-right: 10px; border: 1px #cbcbcb solid; border-radius: 4px; color: #726a6a; height: 39px;width: "+(197*colspan)+"px;overflow-wrap: anywhere;' disabled>"+colsArray[index]["product_code"]+" "+colsArray[index]["product_name"]+"</textarea>"+
                   "<div class='' style='margin-top: 15px;'><div class='col-md-4'><img src='/api/products/"+colsArray[index]["product_id"]+"/large/getimage' width='125' style='max-height: 128px; border: 1px #cbcbcb solid; border-radius: 5px;'/></div>"+
-                  "<div class='col-md-8' style='text-align: right;'><label for='stock-"+colsArray[index]["name"]+"'>Stock:</label><input name='stock-"+colsArray[index]["name"]+"' type='text' value='"+colsArray[index]["quantity"]+"' size='4' style='font-weight: 900; text-align: right;' disabled></br>"+
-                  "<label for='min-"+colsArray[index]["name"]+"'>Min:</label><input name='min-"+colsArray[index]["name"]+"' type='text' value='"+colsArray[index]["minquantity"]+"' size='4' style='margin-top: 2px; text-align: right;' disabled></br>"+
-                  "<label for='max-"+colsArray[index]["name"]+"'>Max:</label><input name='min-"+colsArray[index]["name"]+"' type='text' value='"+colsArray[index]["maxquantity"]+"' size='4' style='margin-top: 2px; text-align: right;' disabled></br>"+
-                  "<label for='op-"+colsArray[index]["name"]+"'></label><input name='op-"+colsArray[index]["name"]+"' type='text' value='0' size='3' style='margin-top: 20px; text-align: right;'>"+
-                  "<div class='btn-group'><button attr-id='1' id='listStoresManagersVendingMachinesChannels-field-button-editStoresManagersVendingMachineChannels-1' type='button' class='btn btn-default' title='Recargar unidades indicadas en canal "+colsArray[index]["name"]+"'><i class='fa fa-arrow-circle-o-up' aria-hidden='true'></i></button><button attr-id='1' id='listStoresManagersVendingMachinesChannels-field-button-editStoresManagersVendingMachineChannels-1' type='button' class='btn btn-default' title='Establecer stock del canal "+colsArray[index]["name"]+" en la cantidad especificada'><i class='fa fa-repeat' aria-hidden='true'></i></button></div>"+
+                  "<div class='col-md-8' style='text-align: right;'><label for='stock-"+colsArray[index]["name"]+"'>Stock:</label><input id='input-stock-"+colsArray[index]["id"]+"' name='input-stock-"+colsArray[index]["id"]+"' type='text' value='"+colsArray[index]["quantity"]+"' size='4' style='font-weight: 900; text-align: right;' readonly></br>"+
+                  "<label for='min-"+colsArray[index]["name"]+"'>Min:</label><input name='min-"+colsArray[index]["name"]+"' type='text' value='"+colsArray[index]["minquantity"]+"' size='4' style='margin-top: 2px; text-align: right;' readonly></br>"+
+                  "<label for='max-"+colsArray[index]["name"]+"'>Max:</label><input name='min-"+colsArray[index]["name"]+"' type='text' value='"+colsArray[index]["maxquantity"]+"' size='4' style='margin-top: 2px; text-align: right;' readonly></br>"+
+                  "<label for='op-"+colsArray[index]["name"]+"'></label><input id='input-op-"+colsArray[index]["id"]+"' name='input-op-"+colsArray[index]["id"]+"' type='text' value='0' size='3' style='margin-top: 20px; text-align: right;'>"+
+                  "<div class='btn-group'><button attr-id='"+colsArray[index]["id"]+"' id='channelAddQtyButton-"+colsArray[index]["id"]+"' type='button' class='btn btn-default' title='Recargar unidades indicadas en canal "+colsArray[index]["name"]+"'><i class='fa fa-arrow-circle-o-up' aria-hidden='true'></i></button><button attr-id='"+colsArray[index]["id"]+"' id='channelSetQtyButton-"+colsArray[index]["id"]+"' type='button' style='display:none;' class='btn btn-default' title='Establecer stock del canal "+colsArray[index]["name"]+" en la cantidad especificada'><i class='fa fa-repeat' aria-hidden='true'></i></button></div>"+
                   "</div>"+
                   "</div></div></div>";
          });
          $("#channels-container").html(html+"</div>");
-         console.log(data.data);
        }
      }
    );
@@ -80,6 +107,13 @@ $(document).ready(function() {
 	$('.form-control:visible:enabled:first').focus();
   getVendingmachineChannels();
 
+	$('body').on('click', "[id^='channelAddQtyButton-']", function(e) {
+		replenishQty($(this).attr('attr-id'), $("#input-op-"+$(this).attr('attr-id')).val());
+	});
+
+	$('body').on('click', "[id^='channelSetQtyButton-']", function(e) {
+		replenishSetQty($(this).attr('attr-id'), $("#input-op-"+$(this).attr('attr-id')).val());
+	});
 
 });
 </script>
