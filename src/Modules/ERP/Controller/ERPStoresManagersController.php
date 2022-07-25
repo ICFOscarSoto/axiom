@@ -541,7 +541,8 @@ class ERPStoresManagersController extends Controller
 			$vendingmachine=$repositoryVendingMachines->findOneBy(["id"=>$id,"active"=>1,"deleted"=>0]);
 			if(!$vendingmachine) return new JsonResponse(array('result' => -1, 'text'=>"Máquina expendedora incorrecta"));
 			if(strlen($channel)!=2) return new JsonResponse(array('result' => -1, 'text'=>"Canal incorrecto"));
-			$channel=$repositoryVendingMachinesChannels->findOneBy(["vendingmachine"=>$vendingmachine,"row"=>substr($channel,0,1),"col"=>substr($channel,1,1),"active"=>1,"deleted"=>0]);
+			//$channel=$repositoryVendingMachinesChannels->findOneBy(["vendingmachine"=>$vendingmachine,"row"=>substr($channel,0,1),"col"=>substr($channel,1,1),"active"=>1,"deleted"=>0]);
+			$channel=$repositoryVendingMachinesChannels->findOneBy(["vendingmachine"=>$vendingmachine,"channel"=>$channel,"active"=>1,"deleted"=>0]);
 			if(!$channel) return new JsonResponse(array('result' => -1, 'text'=>"Canal no configurado"));
 			if(!$channel->getProduct()) return new JsonResponse(array('result' => -1, 'text'=>"Canal sin producto configurado"));
 			$result["id"]=$channel->getId();
@@ -611,6 +612,7 @@ class ERPStoresManagersController extends Controller
 					$channelData["id"]=$channel->getId();
 					$channelData["row"]=$channel->getRow();
 					$channelData["col"]=$channel->getCol();
+					$channelData["channel"]=$channel->getChannel();
 					$channelData["name"]=$channel->getName();
 					$channelData["product_id"]=$channel->getProduct()?$channel->getProduct()->getId():"0";
 					$channelData["product_code"]=$channel->getProduct()?$channel->getProduct()->getCode():"";

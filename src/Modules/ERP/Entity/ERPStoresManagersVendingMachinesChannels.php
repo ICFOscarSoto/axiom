@@ -98,6 +98,11 @@ class ERPStoresManagersVendingMachinesChannels
      */
     private $productname;
 
+    /**
+     * @ORM\Column(type="string", length=4, nullable=true)
+     */
+    private $channel;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -301,6 +306,18 @@ class ERPStoresManagersVendingMachinesChannels
         $this->productcode=$this->product->getCode();
         $this->productname=$this->product->getName();
       }
+    }
+
+    public function getChannel(): ?string
+    {
+        return $this->channel;
+    }
+
+    public function setChannel(string $channel): self
+    {
+        $this->channel = $channel;
+
+        return $this;
     }
 
 }
