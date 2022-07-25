@@ -755,9 +755,9 @@ class ERPSalesOrdersController extends Controller
 					$lines[$i]['quantity'] = round($olines["class"][$i]["qty"],1);
 					$lines[$i]['price'] = round($olines["class"][$i]["price"],$ndecimals);
 					$lines[$i]['cost'] = round($olines["class"][$i]["cost"],$ndecimals);
-					$lines[$i]['costlastbuy'] = round($olines["class"][$i]["purchase_cost"]*$lines[$i]['quantity'],$ndecimals);
+					$lines[$i]['costlastbuy'] = floatval(round(floatval($olines["class"][$i]["purchase_cost"])*floatval($lines[$i]['quantity']),$ndecimals));
 					$lines[$i]['type'] = $olines["class"][$i]["type"];
-					$lines[$i]['margin'] = round((($lines[$i]['price']/$lines[$i]['costlastbuy'])-1)*100,2);
+					$lines[$i]['margin'] = $lines[$i]['costlastbuy']==0?0:round((($lines[$i]['price']/$lines[$i]['costlastbuy'])-1)*100,2);
 
 					if($user->getEmail()=="juanjo.molina@ferreteriacampollano.com"){
 						$lines[$i]['commission'] = $lines[$i]['type']=='Directa'?($lines[$i]['margin']>20?1.5:($lines[$i]['margin']>=15?1.5:0)):($lines[$i]['margin']>=15?1.5:0);
