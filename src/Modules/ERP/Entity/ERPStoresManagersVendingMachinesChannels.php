@@ -103,6 +103,11 @@ class ERPStoresManagersVendingMachinesChannels
      */
     private $channel;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $gaps;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -316,6 +321,18 @@ class ERPStoresManagersVendingMachinesChannels
     public function setChannel(string $channel): self
     {
         $this->channel = $channel;
+
+        return $this;
+    }
+
+    public function getGaps(): ?int
+    {
+        return $this->gaps;
+    }
+
+    public function setGaps(?int $gaps): self
+    {
+        $this->gaps = $gaps;
 
         return $this;
     }
