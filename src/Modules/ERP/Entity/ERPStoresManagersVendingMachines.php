@@ -3,6 +3,7 @@
 namespace App\Modules\ERP\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use App\Modules\IoT\Entity\IoTDevices;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPStoresManagersVendingMachinesRepository")
@@ -66,6 +67,11 @@ class ERPStoresManagersVendingMachines
      * @ORM\Column(type="boolean")
      */
     private $deleted;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Modules\IoT\Entity\IoTDevices")
+     */
+    private $iotdevice;
 
     public function getId(): ?int
     {
@@ -190,5 +196,41 @@ class ERPStoresManagersVendingMachines
         $this->deleted = $deleted;
 
         return $this;
+    }
+
+    public function getIotdevice(): ?\App\Modules\IoT\Entity\IoTDevices
+    {
+        return $this->iotdevice;
+    }
+
+    public function setIotdevice(?\App\Modules\IoT\Entity\IoTDevices $iotdevice): self
+    {
+        $this->iotdevice = $iotdevice;
+
+        return $this;
+    }
+
+    public function postProccess($kernel, $doctrine, $user, $params, $oldobj){
+      $em = $doctrine->getManager();
+      $iotDevices=$doctrine->getRepository(IoTDevices::class);
+      if(!$this->iotdevice){
+        //Creamos el dispositivo IoT asociado para la recepcion de datos de telemetría
+        $iotdevice = new IoTDevices();
+        $iotdevice->setCompany($this->manager->getCompany());
+        $iotdevice->setName($this->manager->getName().'-'.$this->name);
+        $token = openssl_random_pseudo_bytes(200);
+        $token = bin2hex($token);
+        $token .= md5(uniqid(time(), true));
+        $iotdevice->setToken($token);
+        $iotdevice->setDateadd(new \DateTime());
+        $iotdevice->setDateupd(new \DateTime());
+        $iotdevice->setActive(1);
+        $iotdevice->setDeleted(0);
+        $doctrine->getManager()->persist($iotdevice);
+        $doctrine->getManager()->flush();
+        $this->iotdevice=$iotdevice;
+        $doctrine->getManager()->persist($this);
+        $doctrine->getManager()->flush();
+      }
     }
 }

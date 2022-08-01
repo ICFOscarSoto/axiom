@@ -14,7 +14,7 @@ class ERPStoresManagersVendingMachinesUtils
   public $parentClass="\App\Modules\ERP\Entity\ERPStoresManagers";
   public $parentField="manager";
   public function getExcludedForm($params){
-    return ['manager'];
+    return ['manager', 'iotdevice'];
   }
 
   public function getIncludedForm($params){
