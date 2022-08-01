@@ -221,7 +221,7 @@ class ERPStoresManagersVendingMachines
         $token = openssl_random_pseudo_bytes(200);
         $token = bin2hex($token);
         $token .= md5(uniqid(time(), true));
-        $iotdevice->setToken($token);
+        $iotdevice->setToken(substr($token,0,255));
         $iotdevice->setDateadd(new \DateTime());
         $iotdevice->setDateupd(new \DateTime());
         $iotdevice->setActive(1);
