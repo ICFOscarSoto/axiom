@@ -49,6 +49,7 @@ class StoresManagersVendingMachinesTransfersRemember extends ContainerAwareComma
                       $announced=true;
                       $msg="** ------------------ REAPROVISIONAMIENTO EXPENDEDORA ".$machine->getName()." (GESTOR ".$machine->getManager()->getName().") ------------------ **";
                       file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$machine->getManager()->getDiscordchannel().'&msg='.urlencode($msg));
+                      sleep(1);
                   }
                   $msg="Canal: **".$channel->getName()."** Ref: **".$channel->getProductcode()."** - ".$channel->getProductname()." - Cantidad: **".($channel->getMaxquantity()-$channel->getQuantity()." unidades.**");
                   file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$machine->getManager()->getDiscordchannel().'&msg='.urlencode($msg));
@@ -58,6 +59,7 @@ class StoresManagersVendingMachinesTransfersRemember extends ContainerAwareComma
               if($announced){
                 $msg="** ------------------ FIN EXPENDEDORA ".$machine->getName()." (GESTOR ".$machine->getManager()->getName().") ------------------ **";
                 file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$machine->getManager()->getDiscordchannel().'&msg='.urlencode($msg));
+                sleep(1);
               }
 
           }
