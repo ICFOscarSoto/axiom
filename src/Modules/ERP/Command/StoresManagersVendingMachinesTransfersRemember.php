@@ -42,7 +42,7 @@ class StoresManagersVendingMachinesTransfersRemember extends ContainerAwareComma
               $output->writeln("  - Comprobando máquina ".$machine->getName());
               $channels=$vendingMachinesChannelsRepository->findBy(["vendingmachine"=> $machine,"active"=>1, "deleted"=>0]);
               foreach($channels as $channel){
-                if(($channel->getQuantity()<$channel->getMinquantity()) && $channel->getProductcode()!=null){
+                if(($channel->getQuantity()<=$channel->getMinquantity()) && $channel->getProductcode()!=null){
                   //Comunicamos la cantidad que hay que reaprovisionar en esta maquina
                   if(!$announced){
                       //Si no hemos mostrado otro reaprovisionamiento de esta maquina antes mostramos sus datos
@@ -52,6 +52,7 @@ class StoresManagersVendingMachinesTransfersRemember extends ContainerAwareComma
                   }
                   $msg="Canal: **".$channel->getName()."** Ref: **".$channel->getProductcode()."** - ".$channel->getProductname()." - Cantidad: **".($channel->getMaxquantity()-$channel->getQuantity()." unidades.**");
                   file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$machine->getManager()->getDiscordchannel().'&msg='.urlencode($msg));
+                  sleep(1);
                 }
               }
               if($announced){
