@@ -697,7 +697,31 @@ class ERPStoresManagersController extends Controller
 			$result["active"]=$obj->getActive();
 
 			return new JsonResponse($result);
-
 		}
 
+		/**
+		 * @Route("/api/ERP/storesmanagers/vendingmachines/config/get/{id}", name="getStoresManagerVendingMachineConfig", defaults={"id"=0})
+		 */
+		 public function getStoresManagerVendingMachineConfig($id, RouterInterface $router,Request $request)
+		 {
+			 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			 $manager = $this->getDoctrine()->getManager();
+			 $repositoryVendingMachines = $manager->getRepository(ERPStoresManagersVendingMachines::class);
+ 			 $repositoryVendingMachinesChannels = $manager->getRepository(ERPStoresManagersVendingMachinesChannels::class);
+ 			 $vendingmachine=$repositoryVendingMachines->findOneBy(["id"=>$id,"active"=>1,"deleted"=>0]);
+ 			 if(!$vendingmachine) return new JsonResponse(array('result' => -1, 'text'=>"Máquina expendedora incorrecta"));
+			 $channels=$repositoryVendingMachinesChannels->findBy(["vendingmachine"=>$vendingmachine, "active"=>1, "deleted"=>0]);
+			 $result=["result"=>1, "data"=>[]];
+			 foreach($channels as $channel){
+				 $item["id"]=$channel->getId();
+				 $item["name"]=$channel->getName();
+				 $item["channel"]=$channel->getChannel();
+				 $item["minquantity"]=$channel->getMinquantity();
+				 $item["maxquantity"]=$channel->getMaxquantity();
+				 $item["gaps"]=$channel->getGaps();
+				 $result["data"][]=$item;
+			 }
+			 return new JsonResponse($result);
+
+		 }
 }
