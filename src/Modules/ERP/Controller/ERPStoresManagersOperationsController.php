@@ -381,7 +381,7 @@ class ERPStoresManagersOperationsController extends Controller
 					$operation->setDate(new \Datetime());
 					$operation->setVendingmachine($vendingmachine);
 					$operation->setDateupd(new \Datetime());
-					$operation->setDateupd(new \Datetime());
+					$operation->setDateadd(new \Datetime());
 					$operation->setActive(true);
 					$operation->setDeleted(false);
 					$this->getDoctrine()->getManager()->persist($operation);
