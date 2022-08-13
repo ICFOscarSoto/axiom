@@ -73,6 +73,11 @@ class ERPStoresManagersVendingMachines
      */
     private $iotdevice;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Modules\ERP\Entity\ERPStoreLocations")
+     */
+    private $storelocation;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -232,5 +237,17 @@ class ERPStoresManagersVendingMachines
         $doctrine->getManager()->persist($this);
         $doctrine->getManager()->flush();
       }
+    }
+
+    public function getStorelocation(): ?ERPStoreLocations
+    {
+        return $this->storelocation;
+    }
+
+    public function setStorelocation(?ERPStoreLocations $storelocation): self
+    {
+        $this->storelocation = $storelocation;
+
+        return $this;
     }
 }

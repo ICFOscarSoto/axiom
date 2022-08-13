@@ -617,7 +617,7 @@ class ERPStoresManagersController extends Controller
 					$channelData["product_id"]=$channel->getProduct()?$channel->getProduct()->getId():"0";
 					$channelData["product_code"]=$channel->getProduct()?$channel->getProduct()->getCode():"";
 					$channelData["product_name"]=$channel->getProduct()?$channel->getProduct()->getName():"";
-					$channelData["quantity"]=$channel->getQuantity();
+					$channelData["quantity"]=$channel->getQuantity()/($channel->getMultiplier()?$channel->getMultiplier():1);
 					$channelData["minquantity"]=$channel->getMinquantity();
 					$channelData["maxquantity"]=$channel->getMaxquantity();
 					$channelData["multiplier"]=$channel->getMultiplier()?$channel->getMultiplier():1;
@@ -652,25 +652,40 @@ class ERPStoresManagersController extends Controller
 			if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
 			$repositoryVendingMachinesChannels = $this->getDoctrine()->getManager()->getRepository(ERPStoresManagersVendingMachinesChannels::class);
 			$repositoryVendingMachinesChannelsReplenishment = $this->getDoctrine()->getManager()->getRepository(ERPStoresManagersVendingMachinesChannelsReplenishment::class);
+			$repositoryStocks = $this->getDoctrine()->getManager()->getRepository(ERPStocks::class);
+
 			$channel=$repositoryVendingMachinesChannels->findOneBy(["id"=>$id,"active"=>1,"deleted"=>0]);
 			if(!$channel) return new JsonResponse(["result"=>-1, "text"=>"Canal incorrecto"]);
 			if($channel->getProduct()==null && $channel->getProductcode()==null) return new JsonResponse(["result"=>-2, "text"=>"Canal no configurado"]);
+			//Crear entidad de reaprovisionamiento
 			$replenishment = new ERPStoresManagersVendingMachinesChannelsReplenishment();
 			$replenishment->setChannel($channel);
 			$replenishment->setProduct($channel->getProduct());
 			$replenishment->setProductcode($channel->getProductcode());
 			$replenishment->setProductname($channel->getProductname());
-			$replenishment->setQuantity($qty);
+			$replenishment->setQuantity($qty*($channel->getMultiplier()?$channel->getMultiplier():1));
 			$replenishment->setDateadd(new \Datetime());
 			$replenishment->setDateupd(new \Datetime());
 			$replenishment->setActive(1);
 			$replenishment->setDeleted(0);
 			$this->getDoctrine()->getManager()->persist($replenishment);
 			$this->getDoctrine()->getManager()->flush();
-
-			$channel->setQuantity($channel->getQuantity()+$qty);
+			//Incrementar el stock en la maquina
+			$channel->setQuantity($channel->getQuantity()+($qty*($channel->getMultiplier()?$channel->getMultiplier():1)));
 			$this->getDoctrine()->getManager()->persist($channel);
 			$this->getDoctrine()->getManager()->flush();
+			//Decrementar el stock en la ubicacion asociada a la maquina si esta existe y el producto esta en ella para evitar errores pero...:
+			//TODO: A futuro deberiamos no permitir la recarga si esta información no esta disponible
+			//TODO: Añadir soporte para variantes
+			if($channel->getVendingmachine()->getStorelocation()){
+				$stock=$repositoryStocks->findOneBy(["product"=>$channel->getProduct(), "storelocation"=>$channel->getVendingmachine()->getStorelocation(), "active"=>1, "deleted"=>0]);
+				if($stock){
+					$stock->setQuantity($stock->getQuantity()-($qty*($channel->getMultiplier()?$channel->getMultiplier():1)));
+					$this->getDoctrine()->getManager()->persist($stock);
+					$this->getDoctrine()->getManager()->flush();
+				}
+			}
+
 			return new JsonResponse(["result"=>1]);
 		}
 
@@ -716,6 +731,7 @@ class ERPStoresManagersController extends Controller
 				 $item["id"]=$channel->getId();
 				 $item["name"]=$channel->getName();
 				 $item["channel"]=$channel->getChannel();
+				 $item["multiplier"]=$channel->getMultiplier();
 				 $item["minquantity"]=$channel->getMinquantity();
 				 $item["maxquantity"]=$channel->getMaxquantity();
 				 $item["gaps"]=$channel->getGaps();
