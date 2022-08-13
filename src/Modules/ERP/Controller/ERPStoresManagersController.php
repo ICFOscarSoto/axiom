@@ -728,14 +728,16 @@ class ERPStoresManagersController extends Controller
 			 $channels=$repositoryVendingMachinesChannels->findBy(["vendingmachine"=>$vendingmachine, "active"=>1, "deleted"=>0]);
 			 $result=["result"=>1, "data"=>[]];
 			 foreach($channels as $channel){
-				 $item["id"]=$channel->getId();
-				 $item["name"]=$channel->getName();
-				 $item["channel"]=$channel->getChannel();
-				 $item["multiplier"]=$channel->getMultiplier();
-				 $item["minquantity"]=$channel->getMinquantity();
-				 $item["maxquantity"]=$channel->getMaxquantity();
-				 $item["gaps"]=$channel->getGaps();
-				 $result["data"][]=$item;
+				 if($channel->getProduct()!=null || $channel->getProductcode()!=null){
+					 $item["id"]=$channel->getId();
+					 $item["name"]=$channel->getName();
+					 $item["channel"]=$channel->getChannel();
+					 $item["multiplier"]=$channel->getMultiplier();
+					 $item["minquantity"]=$channel->getMinquantity();
+					 $item["maxquantity"]=$channel->getMaxquantity();
+					 $item["gaps"]=$channel->getGaps();
+					 $result["data"][]=$item;
+			 	 }
 			 }
 			 return new JsonResponse($result);
 
