@@ -776,3 +776,5 @@ jspreadsheet_loadmasive: Carga masiva
 Lastcheck: Última conexión
 StoresManagersVendingMachines: Máquinas Expendedoras
 StoresManagersVendingMachinesChannels: Canales máquina expendedora
+Replenishmentnotifytype: Tipo notificacion recarga
+Replenishmentnotifyaddress: Dirección notificacion recarga

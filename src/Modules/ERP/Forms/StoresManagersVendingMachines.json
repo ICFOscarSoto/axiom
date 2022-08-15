@@ -19,6 +19,16 @@
                     "name": "serial",
                     "cols": 8
                 },
+                { "name": "replenishmentnotifytype", "cols": 4,
+                  "transform": {
+                      "type":"option",
+                      "options": {"Discord":"0", "Email": "1"}
+                  }
+                },
+                {
+                    "name": "replenishmentnotifyaddress",
+                    "cols": 8
+                },
                 {
                     "name": "lastcheck",
                     "cols": 4,

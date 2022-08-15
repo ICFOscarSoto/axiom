@@ -78,6 +78,17 @@ class ERPStoresManagersVendingMachines
      */
     private $storelocation;
 
+    /**
+     * @ORM\Column(type="smallint", nullable=true)
+     */
+    private $replenishmentnotifytype=0;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $replenishmentnotifyaddress;
+
+
     public function getId(): ?int
     {
         return $this->id;
@@ -250,4 +261,29 @@ class ERPStoresManagersVendingMachines
 
         return $this;
     }
+
+    public function getReplenishmentnotifytype(): ?int
+    {
+        return $this->replenishmentnotifytype;
+    }
+
+    public function setReplenishmentnotifytype(?int $replenishmentnotifytype): self
+    {
+        $this->replenishmentnotifytype = $replenishmentnotifytype;
+
+        return $this;
+    }
+
+    public function getReplenishmentnotifyaddress(): ?string
+    {
+        return $this->replenishmentnotifyaddress;
+    }
+
+    public function setReplenishmentnotifyaddress(?string $replenishmentnotifyaddress): self
+    {
+        $this->replenishmentnotifyaddress = $replenishmentnotifyaddress;
+
+        return $this;
+    }
+
 }
