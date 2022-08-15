@@ -98,7 +98,7 @@ class StoresManagersVendingMachinesTransfersRemember extends ContainerAwareComma
                         ];
                 $context = stream_context_create($opts);
                 $output->writeln("  - Enviando email de reaprovisionamiento");
-                $file = file_get_contents('http://devaxiom.ferreteriacampollano.com/api/emails/send', false, $context);
+                $file = file_get_contents('https://axiom.ferreteriacampollano.com/api/emails/send', false, $context);
               }
           }
 
