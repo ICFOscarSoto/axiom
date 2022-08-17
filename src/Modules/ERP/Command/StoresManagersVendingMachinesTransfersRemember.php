@@ -52,7 +52,7 @@ class StoresManagersVendingMachinesTransfersRemember extends ContainerAwareComma
                       file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$machine->getReplenishmentnotifyaddress().'&msg='.urlencode($msg));
                       sleep(1);
                   }
-                  $msg="Canal: **".$channel->getName()."** Ref: **".$channel->getProductcode()."** - ".$channel->getProductname()." - Cantidad: **".($channel->getMaxquantity()-$channel->getQuantity()." unidades.**");
+                  $msg="Canal: **".$channel->getName()."** Ref: **".$channel->getProductcode()."** - ".$channel->getProductname()." - Cantidad: **".(floor(($channel->getMaxquantity()-$channel->getQuantity())/$channel->getMultiplier())." unidades.**");
                   file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$machine->getReplenishmentnotifyaddress().'&msg='.urlencode($msg));
                   sleep(1);
                 }
@@ -73,7 +73,7 @@ class StoresManagersVendingMachinesTransfersRemember extends ContainerAwareComma
               foreach($channels as $channel){
                 if(($channel->getQuantity()<=$channel->getMinquantity()) && $channel->getProductcode()!=null){
                   //Comunicamos la cantidad que hay que reaprovisionar en esta maquina
-                  $msg.="<li>Canal: <b>".$channel->getName()."</b> (Num. canal: <b>".str_pad($channel->getChannel(),3,'0',STR_PAD_LEFT)."</b>) Ref: <b>".$channel->getProductcode()."</b> - ".$channel->getProductname()." - Cantidad: <b>".($channel->getMaxquantity()-$channel->getQuantity()." unidades.</b></li>");
+                  $msg.="<li>Canal: <b>".$channel->getName()."</b> (Num. canal: <b>".str_pad($channel->getChannel(),3,'0',STR_PAD_LEFT)."</b>) Ref: <b>".$channel->getProductcode()."</b> - ".$channel->getProductname()." - Cantidad: <b>".(floor(($channel->getMaxquantity()-$channel->getQuantity())/$channel->getMultiplier())." unidades.</b></li>");
                   $send=true;
                 }
               }
