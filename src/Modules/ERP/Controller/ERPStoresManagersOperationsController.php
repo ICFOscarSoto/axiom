@@ -401,6 +401,34 @@ class ERPStoresManagersOperationsController extends Controller
 					$line->setDeleted(false);
 					$this->getDoctrine()->getManager()->persist($line);
 					$this->getDoctrine()->getManager()->flush();
+					// Añadimos la salida al historico
+					$typesRepository=$this->getDoctrine()->getRepository(ERPTypesMovements::class);
+					$type=$typesRepository->findOneBy(["name"=>"Salida expendedora"]);
+					$stockHistory= new ERPStockHistory();
+					$stockHistory->setProduct($channel->getProduct());
+					if ($channel->getVendingmachine()->getStorelocation()!=null) {
+							$stockHistory->setLocation($channel->getVendingmachine()->getStorelocation());
+							$stockHistory->setStore($channel->getVendingmachine()->getStorelocation()->getStore());
+						}
+						else {
+							$locationRepository=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
+							$storeLocation=$locationRepository->findOneBy(["name"=>"EXPEND ALM"]);
+							$stockHistory->setLocation($storeLocation);
+							$stockHistory->setStore($storeLocation->getStore());
+					}
+					$stockHistory->setUser($this->getUser());
+					$stockHistory->setPreviousqty($channel->getQuantity());
+					$stockHistory->setNewqty($channel->getQuantity()-($channel->getMultiplier()?($channel->getMultiplier()==0?1:$channel->getMultiplier()):1));
+					$stockHistory->setType($type);
+					$stockHistory->setComment($channel->getVendingmachine()->getName());
+					$stockHistory->setQuantity(-($channel->getMultiplier()?($channel->getMultiplier()==0?1:$channel->getMultiplier()):1));
+					$stockHistory->setActive(1);
+					$stockHistory->setDeleted(0);
+					$stockHistory->setDateupd(new \DateTime());
+					$stockHistory->setDateadd(new \DateTime());
+					$this->getDoctrine()->getManager()->persist($stockHistory);
+					$this->getDoctrine()->getManager()->flush();
+
 					$channel->setQuantity($channel->getQuantity()-$line->getQuantity());
 					$this->getDoctrine()->getManager()->persist($channel);
 					$this->getDoctrine()->getManager()->flush();

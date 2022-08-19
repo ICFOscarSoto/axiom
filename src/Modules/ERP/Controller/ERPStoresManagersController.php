@@ -696,7 +696,6 @@ class ERPStoresManagersController extends Controller
 			$stockHistory->setDeleted(0);
 			$stockHistory->setDateupd(new \DateTime());
 			$stockHistory->setDateadd(new \DateTime());
-			$manager=$this->getDoctrine()->getManager();
 			$this->getDoctrine()->getManager()->persist($stockHistory);
 			$this->getDoctrine()->getManager()->flush();
 			//Incrementar el stock en la maquina
