@@ -464,13 +464,15 @@ class ERPStoresManagersController extends Controller
 			}
 			$entity_name=$obj?$obj->getName():'';
 
+
 			$templateForms[]=$formUtils->formatForm('StoresManagersVendingMachinesChannels', true, $id, ERPStoresManagersVendingMachinesChannels::class, null);
 			if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 				return $this->render('@Globale/genericlist.html.twig', [
 					'entity_name' => $entity_name,
 					'controllerName' => 'ERPStoresManagersController',
 					'interfaceName' => 'Canales máquina expendedora',
-					'optionSelected' => 'schedules',
+					'optionSelected' => 'genericindex',
+					'optionSelectedParams' => ["module"=>"ERP", "name"=>"StoresManagers"],
 					'menuOptions' =>  $menurepository->formatOptions($userdata),
 					'breadcrumb' =>  $breadcrumb,
 					'userData' => $userdata,

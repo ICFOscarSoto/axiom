@@ -108,6 +108,13 @@ class ERPStoresManagersVendingMachinesChannels
      */
     private $gaps;
 
+    public function getLacks($doctrine): ?int
+    {
+            $lacks=$this->minquantity-$this->quantity;
+            if ($lacks>0) return $lacks;
+            return 0;
+    }
+
     public function getId(): ?int
     {
         return $this->id;

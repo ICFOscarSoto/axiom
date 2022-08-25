@@ -1,0 +1,3 @@
+[
+  {"id": "deleteStockHistory", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"genericdelete", "routeParams":{"module":"ERP", "name":"StockHistory"}, "confirm" :true, "undo" :false, "actionType" : "background", "tooltip":""}
+]
