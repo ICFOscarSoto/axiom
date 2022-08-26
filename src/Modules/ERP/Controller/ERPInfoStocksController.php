@@ -139,6 +139,7 @@ class ERPInfoStocksController extends Controller
         $stockHistory->setLocation($storeLocation);
         $stockHistory->setStore($store);
         $stockHistory->setUser($user);
+        $stockHistory->setCompany($user->getCompany());
         $stockHistory->setPreviousqty($stock->getQuantity());
         $stockHistory->setNewqty($quantity);
         $stockHistory->setDateadd(new \Datetime());
@@ -162,6 +163,7 @@ class ERPInfoStocksController extends Controller
         $stockHistory->setLocation($storeLocation);
         $stockHistory->setStore($store);
         $stockHistory->setUser($user);
+        $stockHistory->setCompany($user->getCompany());
         $stockHistory->setPreviousqty($stock->getQuantity());
         $stockHistory->setNewqty($quantity);
         $stockHistory->setDateadd(new \Datetime());

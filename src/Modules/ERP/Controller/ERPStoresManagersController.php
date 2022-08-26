@@ -689,6 +689,7 @@ class ERPStoresManagersController extends Controller
 					$stockHistory->setStore($storeLocation->getStore());
 			}
 			$stockHistory->setUser($this->getUser());
+			$stockHistory->setCompany($this->getUser()->getCompany());
 			$stockHistory->setPreviousqty($channel->getQuantity());
 			$stockHistory->setNewqty($channel->getQuantity()+($qty*($channel->getMultiplier()?$channel->getMultiplier():1)));
 			$stockHistory->setType($type);

@@ -285,6 +285,7 @@ class ERPStoresManagersOperationsController extends Controller
 						$stockHistory->setLocation($location);
 						$stockHistory->setStore($store->getStore());
 						$stockHistory->setUser($this->getUser());
+	 				 	$stockHistory->setCompany($this->getUser()->getCompany());
 						$stockHistory->setQuantity($qty);
 						$stockHistory->setPreviousqty($stockQty);
 						$stockHistory->setProductvariant($productvariant);
@@ -417,6 +418,7 @@ class ERPStoresManagersOperationsController extends Controller
 							$stockHistory->setStore($storeLocation->getStore());
 					}
 					$stockHistory->setUser($this->getUser());
+ 				 	$stockHistory->setCompany($this->getUser()->getCompany());
 					$stockHistory->setPreviousqty($channel->getQuantity());
 					$stockHistory->setNewqty($channel->getQuantity()-($channel->getMultiplier()?($channel->getMultiplier()==0?1:$channel->getMultiplier()):1));
 					$stockHistory->setType($type);
