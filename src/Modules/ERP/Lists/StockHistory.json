@@ -40,6 +40,12 @@
         "caption": "user"
     },
     {
+        "name": "dateadd",
+        "caption": "dateadd",
+        "type": "date",
+        "class": "all"
+    },
+    {
         "name": "type__name",
         "caption": "type"
     }
