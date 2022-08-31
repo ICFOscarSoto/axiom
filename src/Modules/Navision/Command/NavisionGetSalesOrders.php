@@ -404,7 +404,7 @@ class NavisionGetSalesOrders extends ContainerAwareCommand
            $obj->setSalesbudget($salesBudget);
 
            $author=$repositoryUsers->findOneBy(["email"=>$object["author"]]);
-           if($author==NULL) $author=$repositoryUsers->findOneBy(["name"=>"Administrador"]);
+           if($author==NULL) $author=$repositoryUsers->findOneBy(["name"=>"Sistemas Ferretería Campollano"]);
 
            if($object["ship"]==1) $obj->setShipmentdate(date_create_from_format("Y-m-d H:i:s.u",$object["shipmentdate"]["date"])); else $obj->setShipmentdate(null);
            $obj->setWebsale($object["web"]);
