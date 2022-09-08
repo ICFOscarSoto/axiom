@@ -741,7 +741,6 @@ class ERPStoresManagersController extends Controller
 			$result["idcard"]=$obj->getIdcard();
 			$result["code2"]=$obj->getCode2();
 			$result["active"]=$obj->getActive();
-
 			return new JsonResponse($result);
 		}
 
@@ -771,6 +770,67 @@ class ERPStoresManagersController extends Controller
 			 	 }
 			 }
 			 return new JsonResponse($result);
+		 }
+
+
+
+		 /**
+	  * @Route("/{_locale}/ERP/storesmanagers/vendingmachines/status/{id}", name="statusManagerVendingMachine",  defaults={"id"=0})
+	  */
+	  public function statusManagerVendingMachine($id, RouterInterface $router,Request $request){
+	 	 // El usuario tiene derechos para realizar la acción, sino se va a la página de unauthorized
+	 	 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+	 	 if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine()))
+	 		 return $this->redirect($this->generateUrl('unauthorized'));
+
+	 	 $globaleMenuOptionsRepository			= $this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
+		 $repositoryVendingMachines 				= $this->getDoctrine()->getRepository(ERPStoresManagersVendingMachines::class);
+
+	 	 // Datos de usuario
+	 	 $userdata				= $this->getUser()->getTemplateData($this, $this->getDoctrine());
+
+	 	 // Miga
+	 	 $nbreadcrumb=["rute"=>null, "name"=>"Estado máquina", "icon"=>"fa fa-edit"];
+	 	 $breadcrumb=$globaleMenuOptionsRepository->formatBreadcrumb('genericindex','ERP','StoresManagersVendingMachines');
+	 	 array_push($breadcrumb,$nbreadcrumb);
+
+		 //Obtener datos de la Expendedora
+		 $vendingmachine=$repositoryVendingMachines->findOneBy(["id"=>$id,"active"=>1,"deleted"=>0]);
+		 if(!$vendingmachine) {
+			 	//TODO: Dirigir a pagina de error
+			}
+
+	 	 if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+	 			 return $this->render('@ERP/storesmanagersstatusvendingmachine.html.twig', [
+	 				 'controllerName' => 'salesOrdersController',
+	 				 'interfaceName' => 'Estado Expendedora',
+	 				 'optionSelected' => 'genericindex',
+	 				 'optionSelectedParams' => ["module"=>'ERP',"name"=>'StoresManagersVendingMachines'],
+	 				 'menuOptions' =>  $globaleMenuOptionsRepository->formatOptions($userdata),
+	 				 'breadcrumb' =>  $breadcrumb,
+	 				 'userData' => $userdata,
+	 				 'id' => $id,
+	 				 'include_header' => []
+	 				 ]);
+	 		 }
+	 		 return new RedirectResponse($this->router->generate('app_login'));
+
+	  }
+
+		/**
+	 * @Route("/api/ERP/storesmanagers/vendingmachines/getstatus/{id}", name="getStatusManagerVendingMachine",  defaults={"id"=0})
+	 */
+	 public function getStatusManagerVendingMachine($id, RouterInterface $router,Request $request){
+		 // El usuario tiene derechos para realizar la acción, sino se va a la página de unauthorized
+		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		 $manager = $this->getDoctrine()->getManager();
+	 	 $repositoryVendingMachines = $manager->getRepository(ERPStoresManagersVendingMachines::class);
+	 	 $vendingmachine=$repositoryVendingMachines->findOneBy(["id"=>$id,"active"=>1,"deleted"=>0]);
+	 	 if(!$vendingmachine) return new JsonResponse(array('result' => -1, 'text'=>"Máquina expendedora incorrecta"));
+		 $response=shell_exec("ssh -p 2222 root@10.0.9.8 \"python3 /etc/vendingmachine/commands/status.py\"");
+		 return new Response($response);
+	 	
 
 		 }
+
 }
