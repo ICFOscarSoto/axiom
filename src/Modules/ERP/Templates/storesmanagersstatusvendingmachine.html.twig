@@ -267,7 +267,7 @@ $(document).ready(function() {
         buttons: {
            confirm: { text: 'Si', btnClass: 'btn-green', action: function(){
                      if((++load_wait)==1) $("#load-spinner").fadeIn();
-                     $.post('/api/ERP/storesmanagers/vendingmachines/command/resetservice/{{id}}', {},
+                     $.post('/api/ERP/storesmanagers/vendingmachines/command/servicereset/{{id}}', {},
                        function(data, status, xhr){
                          if((--load_wait)==0) $("#load-spinner").fadeOut();
                          if(data.result==1 && data.data.result==1){
