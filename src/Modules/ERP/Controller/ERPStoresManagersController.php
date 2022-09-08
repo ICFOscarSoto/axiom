@@ -810,12 +810,14 @@ class ERPStoresManagersController extends Controller
 	 				 'breadcrumb' =>  $breadcrumb,
 	 				 'userData' => $userdata,
 	 				 'id' => $id,
+					 'vendingmachine' => $vendingmachine,
 	 				 'include_header' => []
 	 				 ]);
 	 		 }
 	 		 return new RedirectResponse($this->router->generate('app_login'));
 
 	  }
+
 
 		 /**
 		* @Route("/api/ERP/storesmanagers/vendingmachines/command/{command}/{id}", name="commandManagerVendingMachine",  defaults={"id"=0})
@@ -833,6 +835,8 @@ class ERPStoresManagersController extends Controller
 			if(json_last_error() === JSON_ERROR_NONE){
 				return new JsonResponse(["result"=>1,"data"=>$response_json]);
 			}else return new JsonResponse(["result"=>-1]);
+
+			//return new JsonResponse(["result"=>1, "data"=> json_decode('{"R1": 0, "R2": 0, "READER": 1, "LED": "GREEN", "T1": "29.62", "C1": "1", "C2": "1", "REPLENISHMENT_IFACE": 0, "SERVICE": 1, "TCORE0": 47.0}', true)]);
 		}
 
 }
