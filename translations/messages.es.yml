@@ -778,3 +778,13 @@ StoresManagersVendingMachines: Máquinas Expendedoras
 StoresManagersVendingMachinesChannels: Canales máquina expendedora
 Replenishmentnotifytype: Tipo notificacion recarga
 Replenishmentnotifyaddress: Dirección notificacion recarga
+Simoperator: Operador SIM
+Simnumber: Numero tarjeta
+Simpin: PIN tarjeta
+Vpnuser: Usuario VPN
+Vpnpassword: Contraseña VPN
+Vpnip: IP VPN
+Localuser: Usuario local
+Modembrand: Marca modem
+Modemmodel: Modelo
+Modemserial: Num Serie

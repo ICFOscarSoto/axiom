@@ -300,7 +300,7 @@ class ERPStoresManagersController extends Controller
 		$repositoryVendingMachines = $manager->getRepository(ERPStoresManagersVendingMachines::class);
 		$listUtils=new GlobaleListUtils();
 		$obj=$repository->findBy(["company"=>$this->getUser()->getCompany(), "deleted"=>0, "id"=>$id]);
-		$listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersVendingMachines.json"),true);
+		$listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersVendingMachinesTab.json"),true);
 		$return=$listUtils->getRecords($user,$repositoryVendingMachines,$request,$manager,$listFields, ERPStoresManagersVendingMachines::class,[["type"=>"and", "column"=>"manager", "value"=>$obj]]);
 		return new JsonResponse($return);
 	}

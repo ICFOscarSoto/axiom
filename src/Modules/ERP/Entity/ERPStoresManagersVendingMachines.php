@@ -88,6 +88,55 @@ class ERPStoresManagersVendingMachines
      */
     private $replenishmentnotifyaddress;
 
+    /**
+     * @ORM\Column(type="string", length=128, nullable=true)
+     */
+    private $simoperator;
+    /**
+     * @ORM\Column(type="string", length=16, nullable=true)
+     */
+    private $simnumber;
+
+    /**
+     * @ORM\Column(type="string", length=6, nullable=true)
+     */
+    private $simpin;
+
+    /**
+     * @ORM\Column(type="string", length=64, nullable=true)
+     */
+    private $vpnuser;
+
+    /**
+     * @ORM\Column(type="string", length=32, nullable=true)
+     */
+    private $vpnpassword;
+
+    /**
+     * @ORM\Column(type="string", length=64, nullable=true)
+     */
+    private $vpnip;
+
+    /**
+     * @ORM\Column(type="string", length=128, nullable=true)
+     */
+    private $modembrand;
+
+    /**
+     * @ORM\Column(type="string", length=128, nullable=true)
+     */
+    private $modemmodel;
+
+    /**
+     * @ORM\Column(type="string", length=128, nullable=true)
+     */
+    private $modemserial;
+
+    /**
+     * @ORM\Column(type="string", length=128, nullable=true)
+     */
+    private $localuser;
+
 
     public function getId(): ?int
     {
@@ -282,6 +331,125 @@ class ERPStoresManagersVendingMachines
     public function setReplenishmentnotifyaddress(?string $replenishmentnotifyaddress): self
     {
         $this->replenishmentnotifyaddress = $replenishmentnotifyaddress;
+
+        return $this;
+    }
+    public function getSimoperator(): ?string
+    {
+        return $this->simoperator;
+    }
+
+    public function setSimoperator(?string $simoperator): self
+    {
+        $this->simoperator = $simoperator;
+
+        return $this;
+    }
+
+    public function getSimnumber(): ?string
+    {
+        return $this->simnumber;
+    }
+
+    public function setSimnumber(?string $simnumber): self
+    {
+        $this->simnumber = $simnumber;
+
+        return $this;
+    }
+
+    public function getSimpin(): ?string
+    {
+        return $this->simpin;
+    }
+
+    public function setSimpin(?string $simpin): self
+    {
+        $this->simpin = $simpin;
+
+        return $this;
+    }
+
+    public function getVpnuser(): ?string
+    {
+        return $this->vpnuser;
+    }
+
+    public function setVpnuser(?string $vpnuser): self
+    {
+        $this->vpnuser = $vpnuser;
+
+        return $this;
+    }
+
+    public function getVpnpassword(): ?string
+    {
+        return $this->vpnpassword;
+    }
+
+    public function setVpnpassword(?string $vpnpassword): self
+    {
+        $this->vpnpassword = $vpnpassword;
+
+        return $this;
+    }
+
+    public function getVpnip(): ?string
+    {
+        return $this->vpnip;
+    }
+
+    public function setVpnip(?string $vpnip): self
+    {
+        $this->vpnip = $vpnip;
+
+        return $this;
+    }
+
+    public function getModembrand(): ?string
+    {
+        return $this->modembrand;
+    }
+
+    public function setModembrand(?string $modembrand): self
+    {
+        $this->modembrand = $modembrand;
+
+        return $this;
+    }
+
+    public function getModemmodel(): ?string
+    {
+        return $this->modemmodel;
+    }
+
+    public function setModemmodel(?string $modemmodel): self
+    {
+        $this->modemmodel = $modemmodel;
+
+        return $this;
+    }
+
+    public function getModemserial(): ?string
+    {
+        return $this->modemserial;
+    }
+
+    public function setModemserial(?string $modemserial): self
+    {
+        $this->modemserial = $modemserial;
+
+        return $this;
+    }
+
+    public function getLocaluser(): ?string
+    {
+        return $this->localuser;
+    }
+
+    public function setLocaluser(?string $localuser): self
+    {
+        $this->localuser = $localuser;
 
         return $this;
     }

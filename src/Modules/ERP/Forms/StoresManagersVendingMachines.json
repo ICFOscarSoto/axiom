@@ -1,7 +1,7 @@
 [{
     "sections": [
         {
-            "name": "data",
+            "name": "Maquina",
             "fields": [
                 {
                     "name": "name",
@@ -18,23 +18,85 @@
                 {
                     "name": "serial",
                     "cols": 8
-                },
-                { "name": "replenishmentnotifytype", "cols": 4,
-                  "transform": {
-                      "type":"option",
-                      "options": {"Discord":"0", "Email": "1"}
-                  }
-                },
-                {
-                    "name": "replenishmentnotifyaddress",
-                    "cols": 8
-                },
-                {
-                    "name": "lastcheck",
-                    "cols": 4,
-                    "readonly": true
                 }
             ]
+        },
+        {
+          "name": "Conexión",
+          "fields": [
+            {
+                "name": "simoperator",
+                "cols": 5
+            },
+            {
+                "name": "simnumber",
+                "cols": 4
+            },
+            {
+                "name": "simpin",
+                "cols": 3
+            },
+            {
+                "name": "vpnuser",
+                "cols": 3
+            },
+            {
+                "name": "vpnpassword",
+                "cols": 3
+            },
+            {
+                "name": "vpnip",
+                "cols": 4
+            },
+            {
+                "name": "localuser",
+                "cols": 4
+            },
+            {
+                "name": "lastcheck",
+                "cols": 4,
+                "readonly": true
+            }
+          ]
+        },
+        {
+          "name": "Modem",
+          "fields": [
+            {
+                "name": "modembrand",
+                "cols": 4
+            },
+            {
+                "name": "modemmodel",
+                "cols": 4
+            },
+            {
+                "name": "modemserial",
+                "cols": 4
+            }
+          ]
+        },
+        {
+          "name": "Recarga",
+          "fields": [
+            { "name": "replenishmentnotifytype", "cols": 4,
+              "transform": {
+                  "type":"option",
+                  "options": {"Discord":"0", "Email": "1"}
+              }
+            },
+            {
+                "name": "replenishmentnotifyaddress",
+                "cols": 8
+            },
+            {
+                "name": "storelocation",
+                "caption": "Ubicación recarga",
+                "type": "searchable",
+                "typeParams":{"module": "ERP", "name": "StoreLocations", "route": "genericdata", "routeparams":{"module":"ERP","name":"StoreLocations"}, "type":"modal"},
+                "cols": 4
+            }
+          ]
         }
     ]
 }]

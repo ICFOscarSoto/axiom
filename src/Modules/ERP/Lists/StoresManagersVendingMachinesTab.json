@@ -16,6 +16,14 @@
         "caption": "Model"
     },
     {
+        "name": "serial",
+        "caption": "Serial"
+    },
+    {
+        "name": "vpnip",
+        "caption": "IP"
+    },
+    {
       "name": "lastcheck",
       "caption": "Lastcheck",
       "type": "datetime"
