@@ -27,9 +27,12 @@
 		<!-- MAIN CONTENT -->
     <div id="channels-container" style="width:100%; overflow-x: scroll; height: 80vh;">
       <div class="col-md-6">
-        <div class="row"><div class="col-md-12" style=" background-color: #4e535d; color: #fff; font-size: 15px; text-align: center; padding: 5px;">Expendedora Albacete</div></div>
+        <div class="row"><div class="col-md-12" style=" background-color: #4e535d; color: #fff; font-size: 15px; text-align: center; padding: 5px;">{{ vendingmachine.name }}</div></div>
         <div class="row" style="font-size: 13px; padding: 5px;"><div class="col-md-4"><i class="fas fa-cogs"></i>&nbsp;Máquina</div><div id="machine_power" class="col-md-4"></div><div id="machine_power_buttons" style="text-align: right;" class="col-md-4"></div></div>
-        <div class="row" style="font-size: 13px; padding: 5px; background-color: whitesmoke;"><div class="col-md-4"><i class="fas fa-microchip"></i>&nbsp;Electrónica</div><div class="col-md-8"></div></div>
+        <div class="row" style="font-size: 13px; padding: 5px; background-color: whitesmoke;"><div class="col-md-4"><i class="fas fa-server"></i>&nbsp;Controlador</div><div id="controller_power" class="col-md-4"></div><div id="controller_power_buttons" style="text-align: right;" class="col-md-4"></div></div>
+        <div class="row" style="font-size: 13px; padding: 5px;"><div class="col-md-4"><i class="fas fa-running"></i>&nbsp;Servicio</div><div id="service_power" class="col-md-4"></div><div id="service_power_buttons" style="text-align: right;" class="col-md-4"></div></div>
+        <div class="row" style="font-size: 13px; padding: 5px; background-color: whitesmoke;"><div class="col-md-4"><i class="fas fa-microchip"></i>&nbsp;Lector</div><div id="reader_power" class="col-md-4"></div><div id="reader_power_buttons" style="text-align: right;" class="col-md-4"></div></div>
+        <div class="row" style="font-size: 13px; padding: 5px;"><div class="col-md-4"><i class="fas fa-light-switch"></i>&nbsp;Relé Aux</div><div id="machine_auxrelay" class="col-md-4"></div><div id="machine_auxrelay_buttons" style="text-align: right;" class="col-md-4"></div></div>
       </div>
       <div class="col-md-6">
       </div>
@@ -38,11 +41,19 @@
 </div>
 
 <script>
-var tag_offmachine='<div style="padding: 2px 14px;background: #ee4749;color: #ffffff;text-align: center;display: inline;border-radius: 6px;">APAGADA</div>';
-var tag_onmachine='<div style="padding: 2px 14px;background: #47b147;color: #ffffff;text-align: center;display: inline;border-radius: 6px;">ENCENDIDA</div>';
+var tag_off='<div style="padding: 2px 14px;background: #ee4749;color: #ffffff;text-align: center;display: inline;border-radius: 6px;">APAGADO</div>';
+var tag_on='<div style="padding: 2px 14px;background: #47b147;color: #ffffff;text-align: center;display: inline;border-radius: 6px;">ENCENDIDO</div>';
 var button_offmachine='<button id="machine_button_poweroff" type="button" class=" btn btn-danger tooltip-primary" title="Apagar máquina"><i class="fas fa-power-off"></i></button>';
 var button_onmachine='<button id="machine_button_poweron" type="button" class=" btn btn-success tooltip-primary" title="Encender máquina"><i class="fas fa-power-off"></i></button>';
 var button_resetmachine='<button id="machine_button_reset" type="button" class=" btn btn-info tooltip-primary" title="Reiniciar máquina"><i class="fas fa-redo"></i></button>';
+var button_offauxrelay='<button id="machine_auxrelay_button_poweroff" type="button" class=" btn btn-danger tooltip-primary" title="Apagar Relé Auxiliar"><i class="fas fa-power-off"></i></button>';
+var button_onauxrelay='<button id="machine_auxrelay_button_poweron" type="button" class=" btn btn-success tooltip-primary" title="Encender Relé Auxilia"><i class="fas fa-power-off"></i></button>';
+var button_resetcontroller='<button id="controller_button_reset" type="button" class=" btn btn-info tooltip-primary" title="Reiniciar controlador"><i class="fas fa-redo"></i></button>';
+var button_offservice='<button id="service_button_poweroff" type="button" class=" btn btn-danger tooltip-primary" title="Parar servicio"><i class="fas fa-power-off"></i></button>';
+var button_onservice='<button id="service_button_poweron" type="button" class=" btn btn-success tooltip-primary" title="Arrancar servicio"><i class="fas fa-power-off"></i></button>';
+var button_resetservice='<button id="service_button_reset" type="button" class=" btn btn-info tooltip-primary" title="Reiniciar servicio"><i class="fas fa-redo"></i></button>';
+var button_offreader='<button id="reader_button_poweroff" type="button" class=" btn btn-danger tooltip-primary" title="Parar lector"><i class="fas fa-power-off"></i></button>';
+var button_onreader='<button id="reader_button_poweron" type="button" class=" btn btn-success tooltip-primary" title="Arrancar lector"><i class="fas fa-power-off"></i></button>';
 function getStatus(){
   if((++load_wait)==1) $("#load-spinner").fadeIn();
   $.post('/api/ERP/storesmanagers/vendingmachines/command/status/{{id}}', {},
@@ -51,12 +62,36 @@ function getStatus(){
 			if(data.result==1){
         {# Check machine power #}
 				if(data.data.R1=="0"){
-          $("#machine_power").html(tag_onmachine);
-          $("#machine_power_buttons").html(button_offmachine+"&nbsp;&nbsp;"+button_resetmachine);
+          $("#machine_power").html(tag_on);
+          $("#machine_power_buttons").html(button_resetmachine+"&nbsp;&nbsp;"+button_offmachine);
         }else{
-          $("#machine_power").html(tag_offmachine);
+          $("#machine_power").html(tag_off);
           $("#machine_power_buttons").html(button_onmachine);
         }
+        if(data.data.R2=="0"){
+          $("#machine_auxrelay").html(tag_off);
+          $("#machine_auxrelay_buttons").html(button_onauxrelay);
+        }else{
+          $("#machine_auxrelay").html(tag_on);
+          $("#machine_auxrelay_buttons").html(button_offauxrelay);
+        }
+        $("#controller_power").html(tag_on);
+        $("#controller_power_buttons").html(button_resetcontroller);
+        if(data.data.SERVICE=="1"){
+          $("#service_power").html(tag_on);
+          $("#service_power_buttons").html(button_resetservice+"&nbsp;&nbsp;"+button_offservice);
+        }else{
+          $("#service_power").html(tag_off);
+          $("#service_power_buttons").html(button_onservice);
+        }
+        if(data.data.READER=="1"){
+          $("#reader_power").html(tag_on);
+          $("#reader_power_buttons").html(button_offreader);
+        }else{
+          $("#reader_power").html(tag_off);
+          $("#reader_power_buttons").html(button_onreader);
+        }
+
 			}else toastr.error("Ocurrio un error al obtener el estado de la máquina expendedora", "Confirmación", confirmation);
 		}
 	);
@@ -79,7 +114,7 @@ $(document).ready(function() {
                        function(data, status, xhr){
                          if((--load_wait)==0) $("#load-spinner").fadeOut();
                          if(data.result==1 && data.data.result==1){
-                           $("#machine_power").html(tag_offmachine);
+                           $("#machine_power").html(tag_off);
                            $("#machine_power_buttons").html(button_onmachine);
                            toastr.success("Comando enviado correctamente", "Confirmación", confirmation);
                          }else toastr.error("Ocurrio un error al intentar apagar la máquina expendedora", "Confirmación", confirmation);
@@ -106,8 +141,8 @@ $(document).ready(function() {
                        function(data, status, xhr){
                          if((--load_wait)==0) $("#load-spinner").fadeOut();
                          if(data.result==1 && data.data.result==1){
-                           $("#machine_power").html(tag_onmachine);
-                           $("#machine_power_buttons").html(button_offmachine+"&nbsp;&nbsp;"+button_resetmachine);
+                           $("#machine_power").html(tag_on);
+                           $("#machine_power_buttons").html(button_resetmachine+"&nbsp;&nbsp;"+button_offmachine);
                            toastr.success("Comando enviado correctamente", "Confirmación", confirmation);
                          }else toastr.error("Ocurrio un error al intentar encender la máquina expendedora", "Confirmación", confirmation);
                        }
@@ -134,7 +169,110 @@ $(document).ready(function() {
                          if((--load_wait)==0) $("#load-spinner").fadeOut();
                          if(data.result==1 && data.data.result==1){
                            toastr.success("Comando enviado correctamente", "Confirmación", confirmation);
-                         }else toastr.error("Ocurrio un error al intentar encender la máquina expendedora", "Confirmación", confirmation);
+                         }else toastr.error("Ocurrio un error al intentar reiniciar la máquina expendedora", "Confirmación", confirmation);
+                       }
+                     );
+                  }
+
+                  },
+           cancel: { text: 'No', btnClass: 'btn-red', action: function(){}
+         }
+       }
+    });
+  });
+
+  $('body').on('click', "#button_resetcontroller", function(e) {
+    $.confirm({
+        theme: 'bootstrap',
+        title: '',
+        content: '¿Seguro que desea reiniciar el controlador?',
+        buttons: {
+           confirm: { text: 'Si', btnClass: 'btn-green', action: function(){
+                     if((++load_wait)==1) $("#load-spinner").fadeIn();
+                     $.post('/api/ERP/storesmanagers/vendingmachines/command/resetcontroller/{{id}}', {},
+                       function(data, status, xhr){
+                         if((--load_wait)==0) $("#load-spinner").fadeOut();
+                         if(data.result==1 && data.data.result==1){
+                           toastr.success("Comando enviado correctamente", "Confirmación", confirmation);
+                         }else toastr.error("Ocurrio un error al intentar reiniciar el controlador", "Confirmación", confirmation);
+                       }
+                     );
+                  }
+
+                  },
+           cancel: { text: 'No', btnClass: 'btn-red', action: function(){}
+         }
+       }
+    });
+  });
+
+  $('body').on('click', "#service_button_poweroff", function(e) {
+    $.confirm({
+        theme: 'bootstrap',
+        title: '',
+        content: '¿Seguro que desea parar el servicio?',
+        buttons: {
+           confirm: { text: 'Si', btnClass: 'btn-green', action: function(){
+                     if((++load_wait)==1) $("#load-spinner").fadeIn();
+                     $.post('/api/ERP/storesmanagers/vendingmachines/command/servicepoweroff/{{id}}', {},
+                       function(data, status, xhr){
+                         if((--load_wait)==0) $("#load-spinner").fadeOut();
+                         if(data.result==1 && data.data.result==1){
+                           $("#service_power").html(tag_off);
+                           $("#service_power_buttons").html(button_onservice);
+                           toastr.success("Comando enviado correctamente", "Confirmación", confirmation);
+                         }else toastr.error("Ocurrio un error al intentar parar el servicio", "Confirmación", confirmation);
+                       }
+                     );
+                  }
+                  },
+           cancel: { text: 'No', btnClass: 'btn-red', action: function(){}
+         }
+       }
+    });
+  });
+
+  $('body').on('click', "#service_button_poweron", function(e) {
+    $.confirm({
+        theme: 'bootstrap',
+        title: '',
+        content: '¿Seguro que desea arrancar el servicio?',
+        buttons: {
+           confirm: { text: 'Si', btnClass: 'btn-green', action: function(){
+                     if((++load_wait)==1) $("#load-spinner").fadeIn();
+                     $.post('/api/ERP/storesmanagers/vendingmachines/command/servicepoweron/{{id}}', {},
+                       function(data, status, xhr){
+                         if((--load_wait)==0) $("#load-spinner").fadeOut();
+                         if(data.result==1 && data.data.result==1){
+                           $("#service_power").html(tag_on);
+                           $("#service_power_buttons").html(button_resetservice+"&nbsp;&nbsp;"+button_offservice);
+                           toastr.success("Comando enviado correctamente", "Confirmación", confirmation);
+                         }else toastr.error("Ocurrio un error al intentar arrancar el servicio", "Confirmación", confirmation);
+                       }
+                     );
+                  }
+
+                  },
+           cancel: { text: 'No', btnClass: 'btn-red', action: function(){}
+         }
+       }
+    });
+  });
+
+  $('body').on('click', "#service_button_reset", function(e) {
+    $.confirm({
+        theme: 'bootstrap',
+        title: '',
+        content: '¿Seguro que desea reiniciar el servicio?',
+        buttons: {
+           confirm: { text: 'Si', btnClass: 'btn-green', action: function(){
+                     if((++load_wait)==1) $("#load-spinner").fadeIn();
+                     $.post('/api/ERP/storesmanagers/vendingmachines/command/resetservice/{{id}}', {},
+                       function(data, status, xhr){
+                         if((--load_wait)==0) $("#load-spinner").fadeOut();
+                         if(data.result==1 && data.data.result==1){
+                           toastr.success("Comando enviado correctamente", "Confirmación", confirmation);
+                         }else toastr.error("Ocurrio un error al intentar reiniciar el servicio", "Confirmación", confirmation);
                        }
                      );
                   }
