@@ -38,7 +38,7 @@
 </div>
 
 <script>
-var tag_offmachine='<div style="padding: 2px 14px;background: #47b147;color: #ffffff;text-align: center;display: inline;border-radius: 6px;">APAGADA</div>';
+var tag_offmachine='<div style="padding: 2px 14px;background: #ee4749;color: #ffffff;text-align: center;display: inline;border-radius: 6px;">APAGADA</div>';
 var tag_onmachine='<div style="padding: 2px 14px;background: #47b147;color: #ffffff;text-align: center;display: inline;border-radius: 6px;">ENCENDIDA</div>';
 var button_offmachine='<button id="machine_button_poweroff" type="button" class=" btn btn-danger tooltip-primary" title="Apagar máquina"><i class="fas fa-power-off"></i></button>';
 var button_onmachine='<button id="machine_button_poweron" type="button" class=" btn btn-success tooltip-primary" title="Encender máquina"><i class="fas fa-power-off"></i></button>';
@@ -55,7 +55,7 @@ function getStatus(){
           $("#machine_power_buttons").html(button_offmachine+"&nbsp;&nbsp;"+button_resetmachine);
         }else{
           $("#machine_power").html(tag_offmachine);
-          $("#machine_power_buttons").html(button_on);
+          $("#machine_power_buttons").html(button_onmachine);
         }
 			}else toastr.error("Ocurrio un error al obtener el estado de la máquina expendedora", "Confirmación", confirmation);
 		}
@@ -80,7 +80,8 @@ $(document).ready(function() {
                          if((--load_wait)==0) $("#load-spinner").fadeOut();
                          if(data.result==1 && data.data.result==1){
                            $("#machine_power").html(tag_offmachine);
-                           $("#machine_power_buttons").html(button_on);
+                           $("#machine_power_buttons").html(button_onmachine);
+                           toastr.success("Comando enviado correctamente", "Confirmación", confirmation);
                          }else toastr.error("Ocurrio un error al intentar apagar la máquina expendedora", "Confirmación", confirmation);
                        }
                      );
@@ -107,6 +108,32 @@ $(document).ready(function() {
                          if(data.result==1 && data.data.result==1){
                            $("#machine_power").html(tag_onmachine);
                            $("#machine_power_buttons").html(button_offmachine+"&nbsp;&nbsp;"+button_resetmachine);
+                           toastr.success("Comando enviado correctamente", "Confirmación", confirmation);
+                         }else toastr.error("Ocurrio un error al intentar encender la máquina expendedora", "Confirmación", confirmation);
+                       }
+                     );
+                  }
+
+                  },
+           cancel: { text: 'No', btnClass: 'btn-red', action: function(){}
+         }
+       }
+    });
+  });
+
+  $('body').on('click', "#machine_button_reset", function(e) {
+    $.confirm({
+        theme: 'bootstrap',
+        title: '',
+        content: '¿Seguro que desea reiniciar esta máquina?',
+        buttons: {
+           confirm: { text: 'Si', btnClass: 'btn-green', action: function(){
+                     if((++load_wait)==1) $("#load-spinner").fadeIn();
+                     $.post('/api/ERP/storesmanagers/vendingmachines/command/reset/{{id}}', {},
+                       function(data, status, xhr){
+                         if((--load_wait)==0) $("#load-spinner").fadeOut();
+                         if(data.result==1 && data.data.result==1){
+                           toastr.success("Comando enviado correctamente", "Confirmación", confirmation);
                          }else toastr.error("Ocurrio un error al intentar encender la máquina expendedora", "Confirmación", confirmation);
                        }
                      );
