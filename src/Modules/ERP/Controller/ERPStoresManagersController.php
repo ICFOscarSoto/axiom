@@ -34,6 +34,7 @@ use App\Modules\ERP\Entity\ERPStoresManagersUsersStores;
 use App\Modules\ERP\Entity\ERPStoresUsers;
 use App\Modules\ERP\Entity\ERPCategories;
 use App\Modules\ERP\Entity\ERPProductsVariants;
+use App\Modules\ERP\Entity\ERPTypesMovements;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
@@ -463,13 +464,15 @@ class ERPStoresManagersController extends Controller
 			}
 			$entity_name=$obj?$obj->getName():'';
 
+
 			$templateForms[]=$formUtils->formatForm('StoresManagersVendingMachinesChannels', true, $id, ERPStoresManagersVendingMachinesChannels::class, null);
 			if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 				return $this->render('@Globale/genericlist.html.twig', [
 					'entity_name' => $entity_name,
 					'controllerName' => 'ERPStoresManagersController',
 					'interfaceName' => 'Canales máquina expendedora',
-					'optionSelected' => 'schedules',
+					'optionSelected' => 'genericindex',
+					'optionSelectedParams' => ["module"=>"ERP", "name"=>"StoresManagers"],
 					'menuOptions' =>  $menurepository->formatOptions($userdata),
 					'breadcrumb' =>  $breadcrumb,
 					'userData' => $userdata,
@@ -669,6 +672,34 @@ class ERPStoresManagersController extends Controller
 			$replenishment->setActive(1);
 			$replenishment->setDeleted(0);
 			$this->getDoctrine()->getManager()->persist($replenishment);
+			$this->getDoctrine()->getManager()->flush();
+			//Añadimos la carga al histórico de operaciones
+			$typesRepository=$this->getDoctrine()->getRepository(ERPTypesMovements::class);
+			$type=$typesRepository->findOneBy(["name"=>"Carga expendedora"]);
+			$stockHistory= new ERPStockHistory();
+			$stockHistory->setProduct($channel->getProduct());
+			if ($channel->getVendingmachine()->getStorelocation()!=null) {
+					$stockHistory->setLocation($channel->getVendingmachine()->getStorelocation());
+					$stockHistory->setStore($channel->getVendingmachine()->getStorelocation()->getStore());
+				}
+				else {
+					$locationRepository=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
+					$storeLocation=$locationRepository->findOneBy(["name"=>"EXPEND ALM"]);
+					$stockHistory->setLocation($storeLocation);
+					$stockHistory->setStore($storeLocation->getStore());
+			}
+			$stockHistory->setUser($this->getUser());
+			$stockHistory->setCompany($this->getUser()->getCompany());
+			$stockHistory->setPreviousqty($channel->getQuantity());
+			$stockHistory->setNewqty($channel->getQuantity()+($qty*($channel->getMultiplier()?$channel->getMultiplier():1)));
+			$stockHistory->setType($type);
+			$stockHistory->setComment($channel->getVendingmachine()->getName());
+			$stockHistory->setQuantity($qty*($channel->getMultiplier()?$channel->getMultiplier():1));
+			$stockHistory->setActive(1);
+			$stockHistory->setDeleted(0);
+			$stockHistory->setDateupd(new \DateTime());
+			$stockHistory->setDateadd(new \DateTime());
+			$this->getDoctrine()->getManager()->persist($stockHistory);
 			$this->getDoctrine()->getManager()->flush();
 			//Incrementar el stock en la maquina
 			$channel->setQuantity($channel->getQuantity()+($qty*($channel->getMultiplier()?$channel->getMultiplier():1)));

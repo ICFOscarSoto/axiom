@@ -15,7 +15,7 @@
         "name": "product__code_o_product__name",
         "caption": "Producto"
     },
-  
+
     {
         "name": "expirydate",
         "caption": "Caducidad",
@@ -32,6 +32,10 @@
     {
         "name": "quantity",
         "caption": "Stock"
+    },
+    {
+        "name": "lacks",
+        "caption": "Lacks"
     },
     {
         "name": "active",
