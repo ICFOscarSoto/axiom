@@ -828,8 +828,11 @@ class ERPStoresManagersController extends Controller
 	 	 $vendingmachine=$repositoryVendingMachines->findOneBy(["id"=>$id,"active"=>1,"deleted"=>0]);
 	 	 if(!$vendingmachine) return new JsonResponse(array('result' => -1, 'text'=>"Máquina expendedora incorrecta"));
 		 $response=shell_exec("ssh -p 2222 root@10.0.9.8 \"python3 /etc/vendingmachine/commands/status.py\"");
-		 return new Response($response);
-	 	
+		 $response_json=json_decode($response, true);
+		 if(json_last_error() === JSON_ERROR_NONE){
+			 return new JsonResponse(["result"=>1,"data"=>$response_json])
+		 }else return new JsonResponse(["result"=>-1]);
+
 
 		 }
 
