@@ -830,7 +830,7 @@ class ERPStoresManagersController extends Controller
 		 $response=shell_exec("ssh -p 2222 root@10.0.9.8 \"python3 /etc/vendingmachine/commands/status.py\"");
 		 $response_json=json_decode($response, true);
 		 if(json_last_error() === JSON_ERROR_NONE){
-			 return new JsonResponse(["result"=>1,"data"=>$response_json])
+			 return new JsonResponse(["result"=>1,"data"=>$response_json]);
 		 }else return new JsonResponse(["result"=>-1]);
 
 
