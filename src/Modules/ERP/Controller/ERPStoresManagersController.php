@@ -817,23 +817,22 @@ class ERPStoresManagersController extends Controller
 
 	  }
 
-		/**
-	 * @Route("/api/ERP/storesmanagers/vendingmachines/getstatus/{id}", name="getStatusManagerVendingMachine",  defaults={"id"=0})
-	 */
-	 public function getStatusManagerVendingMachine($id, RouterInterface $router,Request $request){
-		 // El usuario tiene derechos para realizar la acción, sino se va a la página de unauthorized
-		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-		 $manager = $this->getDoctrine()->getManager();
-	 	 $repositoryVendingMachines = $manager->getRepository(ERPStoresManagersVendingMachines::class);
-	 	 $vendingmachine=$repositoryVendingMachines->findOneBy(["id"=>$id,"active"=>1,"deleted"=>0]);
-	 	 if(!$vendingmachine) return new JsonResponse(array('result' => -1, 'text'=>"Máquina expendedora incorrecta"));
-		 $response=shell_exec("ssh -p 2222 root@10.0.9.8 \"python3 /etc/vendingmachine/commands/status.py\"");
-		 $response_json=json_decode($response, true);
-		 if(json_last_error() === JSON_ERROR_NONE){
-			 return new JsonResponse(["result"=>1,"data"=>$response_json]);
-		 }else return new JsonResponse(["result"=>-1]);
-
-
-		 }
+		 /**
+		* @Route("/api/ERP/storesmanagers/vendingmachines/command/{command}/{id}", name="commandManagerVendingMachine",  defaults={"id"=0})
+		*/
+		public function commandManagerVendingMachine($id, $command, RouterInterface $router,Request $request){
+			// El usuario tiene derechos para realizar la acción, sino se va a la página de unauthorized
+			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			$manager = $this->getDoctrine()->getManager();
+			$repositoryVendingMachines = $manager->getRepository(ERPStoresManagersVendingMachines::class);
+			$vendingmachine=$repositoryVendingMachines->findOneBy(["id"=>$id,"active"=>1,"deleted"=>0]);
+			if(!$vendingmachine) return new JsonResponse(array('result' => -1, 'text'=>"Máquina expendedora incorrecta"));
+			if(!$vendingmachine->getVpnip()) return new JsonResponse(array('result' => -2, 'text'=>"Máquina expendedora no configurada correctamente"));
+			$response=shell_exec("ssh -p 2222 root@".$vendingmachine->getVpnip()." \"python3 /etc/vendingmachine/commands/".$command.".py\"");
+			$response_json=json_decode($response, true);
+			if(json_last_error() === JSON_ERROR_NONE){
+				return new JsonResponse(["result"=>1,"data"=>$response_json]);
+			}else return new JsonResponse(["result"=>-1]);
+		}
 
 }

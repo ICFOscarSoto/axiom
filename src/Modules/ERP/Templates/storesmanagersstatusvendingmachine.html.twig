@@ -1,0 +1,147 @@
+{% set params = app.request.attributes.get('_route_params')|merge(app.request.query.all()) %}
+{% block header %}
+<head>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<meta name="description" content="Axiom Business Management" />
+	<meta name="author" content="" />
+
+	{{ include('@Globale/header.html.twig') }}
+	<!-- Imported styles on this page -->
+	<link rel="stylesheet" href="{{ url('index') }}css/bootstrap-grid.css">
+	<link rel="stylesheet" href="{{ url('index') }}css/timeline.css">
+	<link rel="stylesheet" href="{{ url('index') }}js/jvectormap/jquery-jvectormap-1.2.2.css">
+	<link rel="stylesheet" href="{{ url('index') }}js/rickshaw/rickshaw.min.css">
+</head>
+{% endblock %}
+<title>{% block title %}{{ interfaceName|trans }}{% endblock %}</title>
+<body class="page-body" data-url="{{ url('indexAdmin') }}">
+<div class="page-container {% if userData.interfaceConfig.collapsedSidebar is defined and userData.interfaceConfig.collapsedSidebar %}sidebar-collapsed{% endif %}"><!-- add class "sidebar-collapsed" to close sidebar by default, "chat-visible" to make chat appear always -->
+	{{ include('@Globale/sidebar_menu.html.twig') }}
+	<div class="main-content">
+		{{ include('@Globale/head.html.twig') }}
+		<hr />
+		{{ include('@Globale/breadcrumb.html.twig') }}
+		{#}<h2>{{ interfaceName }}</h2>#}
+		<!-- MAIN CONTENT -->
+    <div id="channels-container" style="width:100%; overflow-x: scroll; height: 80vh;">
+      <div class="col-md-6">
+        <div class="row"><div class="col-md-12" style=" background-color: #4e535d; color: #fff; font-size: 15px; text-align: center; padding: 5px;">Expendedora Albacete</div></div>
+        <div class="row" style="font-size: 13px; padding: 5px;"><div class="col-md-4"><i class="fas fa-cogs"></i>&nbsp;Máquina</div><div id="machine_power" class="col-md-4"></div><div id="machine_power_buttons" style="text-align: right;" class="col-md-4"></div></div>
+        <div class="row" style="font-size: 13px; padding: 5px; background-color: whitesmoke;"><div class="col-md-4"><i class="fas fa-microchip"></i>&nbsp;Electrónica</div><div class="col-md-8"></div></div>
+      </div>
+      <div class="col-md-6">
+      </div>
+    </div>
+		{{ include('@Globale/chat.html.twig') }}
+</div>
+
+<script>
+var tag_offmachine='<div style="padding: 2px 14px;background: #47b147;color: #ffffff;text-align: center;display: inline;border-radius: 6px;">APAGADA</div>';
+var tag_onmachine='<div style="padding: 2px 14px;background: #47b147;color: #ffffff;text-align: center;display: inline;border-radius: 6px;">ENCENDIDA</div>';
+var button_offmachine='<button id="machine_button_poweroff" type="button" class=" btn btn-danger tooltip-primary" title="Apagar máquina"><i class="fas fa-power-off"></i></button>';
+var button_onmachine='<button id="machine_button_poweron" type="button" class=" btn btn-success tooltip-primary" title="Encender máquina"><i class="fas fa-power-off"></i></button>';
+var button_resetmachine='<button id="machine_button_reset" type="button" class=" btn btn-info tooltip-primary" title="Reiniciar máquina"><i class="fas fa-redo"></i></button>';
+function getStatus(){
+  if((++load_wait)==1) $("#load-spinner").fadeIn();
+  $.post('/api/ERP/storesmanagers/vendingmachines/command/status/{{id}}', {},
+		function(data, status, xhr){
+			if((--load_wait)==0) $("#load-spinner").fadeOut();
+			if(data.result==1){
+        {# Check machine power #}
+				if(data.data.R1=="0"){
+          $("#machine_power").html(tag_onmachine);
+          $("#machine_power_buttons").html(button_offmachine+"&nbsp;&nbsp;"+button_resetmachine);
+        }else{
+          $("#machine_power").html(tag_offmachine);
+          $("#machine_power_buttons").html(button_on);
+        }
+			}else toastr.error("Ocurrio un error al obtener el estado de la máquina expendedora", "Confirmación", confirmation);
+		}
+	);
+}
+
+$(document).ready(function() {
+	{# Poner el foco en el primer input válido de la ficha #}
+	$('.form-control:visible:enabled:first').focus();
+  getStatus();
+
+  $('body').on('click', "#machine_button_poweroff", function(e) {
+    $.confirm({
+        theme: 'bootstrap',
+        title: '',
+        content: '¿Seguro que desea apagar esta máquina?',
+        buttons: {
+           confirm: { text: 'Si', btnClass: 'btn-green', action: function(){
+                     if((++load_wait)==1) $("#load-spinner").fadeIn();
+                     $.post('/api/ERP/storesmanagers/vendingmachines/command/poweroff/{{id}}', {},
+                       function(data, status, xhr){
+                         if((--load_wait)==0) $("#load-spinner").fadeOut();
+                         if(data.result==1 && data.data.result==1){
+                           $("#machine_power").html(tag_offmachine);
+                           $("#machine_power_buttons").html(button_on);
+                         }else toastr.error("Ocurrio un error al intentar apagar la máquina expendedora", "Confirmación", confirmation);
+                       }
+                     );
+                  }
+
+                  },
+           cancel: { text: 'No', btnClass: 'btn-red', action: function(){}
+         }
+       }
+    });
+  });
+
+  $('body').on('click', "#machine_button_poweron", function(e) {
+    $.confirm({
+        theme: 'bootstrap',
+        title: '',
+        content: '¿Seguro que desea encender esta máquina?',
+        buttons: {
+           confirm: { text: 'Si', btnClass: 'btn-green', action: function(){
+                     if((++load_wait)==1) $("#load-spinner").fadeIn();
+                     $.post('/api/ERP/storesmanagers/vendingmachines/command/poweron/{{id}}', {},
+                       function(data, status, xhr){
+                         if((--load_wait)==0) $("#load-spinner").fadeOut();
+                         if(data.result==1 && data.data.result==1){
+                           $("#machine_power").html(tag_onmachine);
+                           $("#machine_power_buttons").html(button_offmachine+"&nbsp;&nbsp;"+button_resetmachine);
+                         }else toastr.error("Ocurrio un error al intentar encender la máquina expendedora", "Confirmación", confirmation);
+                       }
+                     );
+                  }
+
+                  },
+           cancel: { text: 'No', btnClass: 'btn-red', action: function(){}
+         }
+       }
+    });
+  });
+
+});
+</script>
+
+{% block footer %}
+<link rel="stylesheet" href="{{ url('index') }}js/datatables/datatables.css">
+<link rel="stylesheet" href="{{ url('index') }}js/select2/select2-bootstrap.css">
+<link rel="stylesheet" href="{{ url('index') }}js/select2/select2.css">
+<link rel="stylesheet" href="{{ url('index') }}css/custom.css">
+<link rel="stylesheet" href="{{ url('index') }}js/ol/ol.css">
+<link rel="stylesheet" href="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker.min.css">
+<link rel="stylesheet" href="{{ url('index') }}js/jodit/jodit.min.css">
+
+<!-- Imported scripts on this page -->
+<script src="{{ url('index') }}js/datatables/datatables.js"></script>
+<script src="{{ url('index') }}js/select2/select2.min.js"></script>
+<script src="{{ url('index') }}js/moment.min.js"></script>
+<script src="{{ url('index') }}js/moment-es.js"></script>
+<script src="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker-es.js"></script>
+<script src="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker.min.js"></script>
+<script src="{{ url('index') }}js/fileinput.js"></script>
+<script src="{{ url('index') }}js/ol/ol.js"></script>
+<script src="{{ url('index') }}js/jodit/jodit.min.js"></script>
+<script src="{{ url('index') }}js/jquery.nestable.js"></script>
+{{ include('@Globale/bottom.html.twig') }}
+{% endblock %}
+</body>
