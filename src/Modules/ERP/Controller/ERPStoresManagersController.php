@@ -836,7 +836,24 @@ class ERPStoresManagersController extends Controller
 				return new JsonResponse(["result"=>1,"data"=>$response_json]);
 			}else return new JsonResponse(["result"=>-1]);
 
-			//return new JsonResponse(["result"=>1, "data"=> json_decode('{"R1": 0, "R2": 0, "READER": 1, "LED": "GREEN", "T1": "29.62", "C1": "1", "C2": "1", "REPLENISHMENT_IFACE": 0, "SERVICE": 1, "TCORE0": 47.0}', true)]);
+			//return new JsonResponse(["result"=>1, "data"=> json_decode('{"R1": "1", "R2": 0, "READER": 1, "LED": "GREEN", "T1": "29.56", "C1": "1", "C2": "1", "REPLENISHMENT_IFACE": 0, "SERVICE": 1, "TCORE0": 50.0, "OPERATOR": "O2", "NETTYPE": "FDD LTE", "SIGNAL": "23asu (-67dBm)", "TIMEON": "0 d\u00edas, 15:04:56"}', true)]);
 		}
+
+
+		/**
+	 * @Route("/api/ERP/storesmanagers/vendingmachines/keepalive/{id}", name="keepaliveManagerVendingMachine",  defaults={"id"=0})
+	 */
+	 public function keepaliveManagerVendingMachine($id,RouterInterface $router,Request $request){
+		 // El usuario tiene derechos para realizar la acción, sino se va a la página de unauthorized
+		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		 $manager = $this->getDoctrine()->getManager();
+		 $repositoryVendingMachines = $manager->getRepository(ERPStoresManagersVendingMachines::class);
+		 $vendingmachine=$repositoryVendingMachines->findOneBy(["id"=>$id,"active"=>1,"deleted"=>0]);
+		 if(!$vendingmachine) return new JsonResponse(array('result' => -1, 'text'=>"Máquina expendedora incorrecta"));
+		 $vendingmachine->setLastcheck(new \DateTime());
+		 $this->getDoctrine()->getManager()->persist($vendingmachine);
+		 $this->getDoctrine()->getManager()->flush();
+		 return new JsonResponse(["result"=>1]);
+	 }
 
 }
