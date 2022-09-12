@@ -25,16 +25,25 @@
 		{{ include('@Globale/breadcrumb.html.twig') }}
 		{#}<h2>{{ interfaceName }}</h2>#}
 		<!-- MAIN CONTENT -->
-    <div id="channels-container" style="width:100%; overflow-x: scroll; height: 80vh;">
-      <div class="col-md-6">
-        <div class="row"><div class="col-md-12" style=" background-color: #4e535d; color: #fff; font-size: 15px; text-align: center; padding: 5px;">{{ vendingmachine.name }}</div></div>
-        <div class="row" style="font-size: 13px; padding: 5px;"><div class="col-md-4"><i class="fas fa-cogs"></i>&nbsp;Máquina</div><div id="machine_power" class="col-md-4"></div><div id="machine_power_buttons" style="text-align: right;" class="col-md-4"></div></div>
-        <div class="row" style="font-size: 13px; padding: 5px; background-color: whitesmoke;"><div class="col-md-4"><i class="fas fa-server"></i>&nbsp;Controlador</div><div id="controller_power" class="col-md-4"></div><div id="controller_power_buttons" style="text-align: right;" class="col-md-4"></div></div>
-        <div class="row" style="font-size: 13px; padding: 5px;"><div class="col-md-4"><i class="fas fa-running"></i>&nbsp;Servicio</div><div id="service_power" class="col-md-4"></div><div id="service_power_buttons" style="text-align: right;" class="col-md-4"></div></div>
-        <div class="row" style="font-size: 13px; padding: 5px; background-color: whitesmoke;"><div class="col-md-4"><i class="fas fa-microchip"></i>&nbsp;Lector</div><div id="reader_power" class="col-md-4"></div><div id="reader_power_buttons" style="text-align: right;" class="col-md-4"></div></div>
-        <div class="row" style="font-size: 13px; padding: 5px;"><div class="col-md-4"><i class="fas fa-light-switch"></i>&nbsp;Relé Aux</div><div id="machine_auxrelay" class="col-md-4"></div><div id="machine_auxrelay_buttons" style="text-align: right;" class="col-md-4"></div></div>
+    <div id="channels-container" style="width:100%">
+      <div class="col-lg-4 col-md-6 col-sm-12">
+        <div class="row"><div class="col-sm-12" style=" background-color: #4e535d; color: #fff; font-size: 15px; text-align: center; padding: 5px;">{{ vendingmachine.name }}</div></div>
+        <div class="row" style="font-size: 13px; padding: 5px;"><div class="col-sm-4"><i class="fas fa-cogs"></i>&nbsp;Máquina</div><div id="machine_power" class="col-md-4"></div><div id="machine_power_buttons" style="text-align: right;" class="col-md-4"></div></div>
+        <div class="row" style="font-size: 13px; padding: 5px; background-color: whitesmoke;"><div class="col-sm-4"><i class="fas fa-server"></i>&nbsp;Controlador</div><div id="controller_power" class="col-md-4"></div><div id="controller_power_buttons" style="text-align: right;" class="col-md-4"></div></div>
+        <div class="row" style="font-size: 13px; padding: 5px;"><div class="col-sm-4"><i class="fas fa-running"></i>&nbsp;Servicio</div><div id="service_power" class="col-md-4"></div><div id="service_power_buttons" style="text-align: right;" class="col-md-4"></div></div>
+        <div class="row" style="font-size: 13px; padding: 5px; background-color: whitesmoke;"><div class="col-sm-4"><i class="fas fa-microchip"></i>&nbsp;Lector</div><div id="reader_power" class="col-md-4"></div><div id="reader_power_buttons" style="text-align: right;" class="col-md-4"></div></div>
+        <div class="row" style="font-size: 13px; padding: 5px;"><div class="col-sm-4"><i class="fa fa-toggle-on"></i>&nbsp;Relé Aux</div><div id="machine_auxrelay" class="col-md-4"></div><div id="machine_auxrelay_buttons" style="text-align: right;" class="col-md-4"></div></div>
+				<div class="row" style="font-size: 13px; padding: 5px; background-color: whitesmoke;"><div class="col-sm-4"><i class="fas fa-keyboard"></i>&nbsp;Interfaz Recarga</div><div id="replenishment_status" class="col-md-4"></div></div>
+				<div class="row" style="font-size: 13px; padding: 5px;"><div class="col-sm-4"><i class="fas fa-door-open"></i>&nbsp;Puerta Producto</div><div id="door1_status" class="col-md-4"></div></div>
+        <div class="row" style="font-size: 13px; padding: 5px; background-color: whitesmoke;"><div class="col-sm-4"><i class="fas fa-door-open"></i>&nbsp;Puerta Control</div><div id="door2_status" class="col-md-4"></div></div>
+				<div class="row" style="font-size: 13px; padding: 5px;"><div class="col-sm-4"><i class="fas fa-temperature-low"></i>&nbsp;Temp. Prod</div><div id="product_temp" class="col-md-4"></div></div>
+				<div class="row" style="font-size: 13px; padding: 5px; background-color: whitesmoke;"><div class="col-sm-4"><i class="fas fa-temperature-low"></i>&nbsp;Temp. Controlador</div><div id="controller_temp" class="col-md-4"></div></div>
+				<div class="row" style="font-size: 13px; padding: 5px;"><div class="col-sm-4"><i class="fas fa-sim-card"></i>&nbsp;Operador Red</div><div id="net_operator" class="col-md-4"></div></div>
+				<div class="row" style="font-size: 13px; padding: 5px; background-color: whitesmoke;"><div class="col-sm-4"><i class="fas fa-broadcast-tower"></i>&nbsp;Tipo de Red</div><div id="net_type" class="col-md-4"></div></div>
+				<div class="row" style="font-size: 13px; padding: 5px;"><div class="col-sm-4"><i class="fas fa-signal"></i>&nbsp;Señal</div><div id="net_signal" class="col-md-4"></div></div>
+				<div class="row" style="font-size: 13px; padding: 5px; background-color: whitesmoke;"><div class="col-sm-4"><i class="fas fa-clock"></i>&nbsp;Tiempo activo</div><div id="alive_time" class="col-md-4"></div></div>
       </div>
-      <div class="col-md-6">
+      <div class="col-lg-8 col-md-6 col-sm-12">
       </div>
     </div>
 		{{ include('@Globale/chat.html.twig') }}
@@ -43,6 +52,10 @@
 <script>
 var tag_off='<div style="padding: 2px 14px;background: #ee4749;color: #ffffff;text-align: center;display: inline;border-radius: 6px;">APAGADO</div>';
 var tag_on='<div style="padding: 2px 14px;background: #47b147;color: #ffffff;text-align: center;display: inline;border-radius: 6px;">ENCENDIDO</div>';
+var tag_disconnected='<div style="padding: 2px 14px;background: #ee4749;color: #ffffff;text-align: center;display: inline;border-radius: 6px;">DESCONECTADO</div>';
+var tag_connected='<div style="padding: 2px 14px;background: #47b147;color: #ffffff;text-align: center;display: inline;border-radius: 6px;">CONECTADO</div>';
+var tag_open='<div style="padding: 2px 14px;background: #ee4749;color: #ffffff;text-align: center;display: inline;border-radius: 6px;">ABIERTO</div>';
+var tag_closed='<div style="padding: 2px 14px;background: #47b147;color: #ffffff;text-align: center;display: inline;border-radius: 6px;">CERRADO</div>';
 var button_offmachine='<button id="machine_button_poweroff" type="button" class=" btn btn-danger tooltip-primary" title="Apagar máquina"><i class="fas fa-power-off"></i></button>';
 var button_onmachine='<button id="machine_button_poweron" type="button" class=" btn btn-success tooltip-primary" title="Encender máquina"><i class="fas fa-power-off"></i></button>';
 var button_resetmachine='<button id="machine_button_reset" type="button" class=" btn btn-info tooltip-primary" title="Reiniciar máquina"><i class="fas fa-redo"></i></button>';
@@ -55,10 +68,8 @@ var button_resetservice='<button id="service_button_reset" type="button" class="
 var button_offreader='<button id="reader_button_poweroff" type="button" class=" btn btn-danger tooltip-primary" title="Parar lector"><i class="fas fa-power-off"></i></button>';
 var button_onreader='<button id="reader_button_poweron" type="button" class=" btn btn-success tooltip-primary" title="Arrancar lector"><i class="fas fa-power-off"></i></button>';
 function getStatus(){
-  if((++load_wait)==1) $("#load-spinner").fadeIn();
   $.post('/api/ERP/storesmanagers/vendingmachines/command/status/{{id}}', {},
 		function(data, status, xhr){
-			if((--load_wait)==0) $("#load-spinner").fadeOut();
 			if(data.result==1){
         {# Check machine power #}
 				if(data.data.R1=="0"){
@@ -91,6 +102,27 @@ function getStatus(){
           $("#reader_power").html(tag_off);
           $("#reader_power_buttons").html(button_onreader);
         }
+				if(data.data.C1=="1"){
+          $("#door1_status").html(tag_closed);
+        }else{
+          $("#door1_status").html(tag_open);
+        }
+				if(data.data.C2=="1"){
+          $("#door2_status").html(tag_closed);
+        }else{
+          $("#door2_status").html(tag_open);
+        }
+				if(data.data.REPLENISHMENT_IFACE=="1"){
+          $("#replenishment_status").html(tag_connected);
+        }else{
+          $("#replenishment_status").html(tag_disconnected);
+        }
+				$("#product_temp").html(data.data.T1+" °C");
+				$("#controller_temp").html(data.data.TCORE0+" °C");
+				$("#net_operator").html(data.data.OPERATOR);
+				$("#net_type").html(data.data.NETTYPE);
+				$("#net_signal").html(data.data.SIGNAL);
+				$("#alive_time").html(data.data.TIMEON);
 
 			}else toastr.error("Ocurrio un error al obtener el estado de la máquina expendedora", "Confirmación", confirmation);
 		}
@@ -101,6 +133,9 @@ $(document).ready(function() {
 	{# Poner el foco en el primer input válido de la ficha #}
 	$('.form-control:visible:enabled:first').focus();
   getStatus();
+	window.setInterval(function(){
+		getStatus();
+	}, 30000);
 
   $('body').on('click', "#machine_button_poweroff", function(e) {
     $.confirm({
