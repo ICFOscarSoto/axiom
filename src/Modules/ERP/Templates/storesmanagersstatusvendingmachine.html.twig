@@ -102,12 +102,12 @@ function getStatus(){
           $("#reader_power").html(tag_off);
           $("#reader_power_buttons").html(button_onreader);
         }
-				if(data.data.C1=="1"){
+				if(data.data.C1=="0"){
           $("#door1_status").html(tag_closed);
         }else{
           $("#door1_status").html(tag_open);
         }
-				if(data.data.C2=="1"){
+				if(data.data.C2=="0"){
           $("#door2_status").html(tag_closed);
         }else{
           $("#door2_status").html(tag_open);
