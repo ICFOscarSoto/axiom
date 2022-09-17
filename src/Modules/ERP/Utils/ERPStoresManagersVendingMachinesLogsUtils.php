@@ -24,15 +24,15 @@ class ERPStoresManagersVendingMachinesLogsUtils
 
   public function formatList($user, $id){
     $list=[
-      /*'id' => $this->name,
-      'route' => 'StoresManagersVendingMachineLogslist',
-      'routeParams' => ["id" => $id],*/
       'id' => $this->name,
+      'route' => 'StoresManagersVendingMachineLogslist',
+      'routeParams' => ["id" => $id],
+      /*'id' => $this->name,
       'route' => 'genericlist',
       'routeParams' => ["module" => $this->module,
                         "name" => $this->name,
                         "id" => $id
-                      ],
+                      ],*/
       'orderColumn' => 2,
       'orderDirection' => 'ASC',
       'tagColumn' => 1,
