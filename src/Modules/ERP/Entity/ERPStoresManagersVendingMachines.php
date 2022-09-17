@@ -137,6 +137,16 @@ class ERPStoresManagersVendingMachines
      */
     private $localuser;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $alertnotifyaddress;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $connectionlostnotified;
+
 
     public function getId(): ?int
     {
@@ -450,6 +460,30 @@ class ERPStoresManagersVendingMachines
     public function setLocaluser(?string $localuser): self
     {
         $this->localuser = $localuser;
+
+        return $this;
+    }
+
+    public function getAlertnotifyaddress(): ?string
+    {
+        return $this->alertnotifyaddress;
+    }
+
+    public function setAlertnotifyaddress(?string $alertnotifyaddress): self
+    {
+        $this->alertnotifyaddress = $alertnotifyaddress;
+
+        return $this;
+    }
+
+    public function getConnectionlostnotified(): ?bool
+    {
+        return $this->connectionlostnotified;
+    }
+
+    public function setConnectionlostnotified(bool $connectionlostnotified): self
+    {
+        $this->connectionlostnotified = $connectionlostnotified;
 
         return $this;
     }

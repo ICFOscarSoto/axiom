@@ -26,6 +26,7 @@ use App\Modules\ERP\Entity\ERPStoresManagersConsumers;
 use App\Modules\ERP\Entity\ERPStoresManagersProducts;
 use App\Modules\ERP\Entity\ERPStoresManagersVendingMachines;
 use App\Modules\ERP\Entity\ERPStoresManagersVendingMachinesChannels;
+use App\Modules\ERP\Entity\ERPStoresManagersVendingMachinesLogs;
 use App\Modules\ERP\Entity\ERPStoresManagersVendingMachinesChannelsReplenishment;
 use App\Modules\ERP\Entity\ERPStoresManagersUsers;
 use App\Modules\ERP\Entity\ERPStoresManagersOperations;
@@ -48,6 +49,7 @@ use App\Modules\ERP\Utils\ERPEAN13Utils;
 use App\Modules\ERP\Utils\ERPReferencesUtils;
 use App\Modules\ERP\Utils\ERPStocksUtils;
 use App\Modules\ERP\Utils\ERPProductsAttributesUtils;
+use App\Modules\ERP\Utils\ERPStoresManagersVendingMachinesLogsUtils;
 use App\Modules\Security\Utils\SecurityUtils;
 use App\Modules\ERP\Reports\ERPEan13Reports;
 use App\Modules\ERP\Utils\ERPStoresManagersUtils;
@@ -800,6 +802,14 @@ class ERPStoresManagersController extends Controller
 			 	//TODO: Dirigir a pagina de error
 			}
 
+			$utils = new ERPStoresManagersVendingMachinesLogsUtils();
+  		$logList=$utils->formatList($this->getUser(), $vendingmachine->getId());
+			$formUtils=new GlobaleFormUtils();
+			$template=dirname(__FILE__)."/../Forms/StoresManagersVendingMachinesLogs.json";
+			$formUtils->initialize($this->getUser(), new ERPStoresManagersVendingMachinesLogsUtils(), $template, $request, $this, $this->getDoctrine(),$utils->getExcludedForm([]),$utils->getIncludedForm(["doctrine"=>$this->getDoctrine(), "user"=>$this->getUser(), "id"=>$id]));
+			$templateForms[]=$formUtils->formatForm('StoresManagersVendingMachinesLogs', true, null, ERPStoresManagersVendingMachinesLogs::class);
+			$logList["topButtonReload"]=false;
+
 	 	 if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
 	 			 return $this->render('@ERP/storesmanagersstatusvendingmachine.html.twig', [
 	 				 'controllerName' => 'salesOrdersController',
@@ -811,12 +821,62 @@ class ERPStoresManagersController extends Controller
 	 				 'userData' => $userdata,
 	 				 'id' => $id,
 					 'vendingmachine' => $vendingmachine,
+					 'listConstructor' => $logList,
+					 'forms' => $templateForms,
 	 				 'include_header' => []
 	 				 ]);
 	 		 }
 	 		 return new RedirectResponse($this->router->generate('app_login'));
 
 	  }
+
+
+		/**
+		 * @Route("/{_locale}/erp/storesmanagers/vendingmachines/logs/{id}/list", name="StoresManagersVendingMachineLogslist")
+		 */
+		public function StoresManagersVendingMachineLogslist($id, RouterInterface $router,Request $request)
+		{
+			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			$user = $this->getUser();
+			$locale = $request->getLocale();
+			$this->router = $router;
+
+			$repositoryVendingMachines 				= $this->getDoctrine()->getRepository(ERPStoresManagersVendingMachines::class);
+			$repositoryVendingMachinesLogs 		= $this->getDoctrine()->getRepository(ERPStoresManagersVendingMachinesLogs::class);
+			//Obtener datos de la Expendedora
+	 	  $vendingmachine=$repositoryVendingMachines->findOneBy(["id"=>$id,"active"=>1,"deleted"=>0]);
+	 	  if(!$vendingmachine) {
+	 			 return new JsonResponse([]);
+	 		}
+			//TODO: Comprobar si la expendedora pertenece a la empresa del usuario actual
+
+			$listUtils=new GlobaleListUtils();
+			$listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersVendingMachinesLogs.json"),true);
+			$return=$listUtils->getRecords($user,$repositoryVendingMachinesLogs,$request,$this->getDoctrine()->getManager(),$listFields, ERPStoresManagersProducts::class,[["type"=>"and", "column"=>"vendingmachine", "value"=>$vendingmachine]]);
+			return new JsonResponse($return);
+		}
+
+
+		/**
+		 * @Route("/{_locale}/erp/storesmanagers/vendingmachines/logs/data/{id}/{action}", name="dataVendingmachinelogs", defaults={"id"=0, "action"="read"})
+		 */
+		 public function dataVendingmachinelogs($id, $action, Request $request){
+		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		 $template=dirname(__FILE__)."/../Forms/StoresManagersVendingMachinesLogs.json";
+		 $utils = new GlobaleFormUtils();
+
+		 $repository=$this->getDoctrine()->getRepository(ERPStoresManagersVendingMachinesLogs::class);
+		 $obj = $repository->findOneBy(['id'=>$id, 'deleted'=>0]);
+		 if($id!=0 && $obj==null){
+				return $this->render('@Globale/notfound.html.twig',[]);
+		 }
+		 $classUtils=new ERPStoresManagersVendingMachinesLogsUtils();
+		 $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "obj"=>$obj];
+		 $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),$classUtils->getExcludedForm($params),$classUtils->getIncludedForm($params));
+		 $make = $utils->make($id, ERPStoresManagersVendingMachinesLogs::class, $action, "StoresManagersVendingMachinesLogs", "modal");
+		 return $make;
+		}
+
 
 
 		 /**
@@ -828,15 +888,15 @@ class ERPStoresManagersController extends Controller
 			$manager = $this->getDoctrine()->getManager();
 			$repositoryVendingMachines = $manager->getRepository(ERPStoresManagersVendingMachines::class);
 			$vendingmachine=$repositoryVendingMachines->findOneBy(["id"=>$id,"active"=>1,"deleted"=>0]);
-			if(!$vendingmachine) return new JsonResponse(array('result' => -1, 'text'=>"Máquina expendedora incorrecta"));
+	/*			if(!$vendingmachine) return new JsonResponse(array('result' => -1, 'text'=>"Máquina expendedora incorrecta"));
 			if(!$vendingmachine->getVpnip()) return new JsonResponse(array('result' => -2, 'text'=>"Máquina expendedora no configurada correctamente"));
-			$response=shell_exec("ssh -p 2222 root@".$vendingmachine->getVpnip()." \"python3 /etc/vendingmachine/commands/".$command.".py\"");
+		$response=shell_exec("ssh -p 2222 root@".$vendingmachine->getVpnip()." \"python3 /etc/vendingmachine/commands/".$command.".py\"");
 			$response_json=json_decode($response, true);
 			if(json_last_error() === JSON_ERROR_NONE){
 				return new JsonResponse(["result"=>1,"data"=>$response_json]);
 			}else return new JsonResponse(["result"=>-1]);
-
-			//return new JsonResponse(["result"=>1, "data"=> json_decode('{"R1": "1", "R2": 0, "READER": 1, "LED": "GREEN", "T1": "29.56", "C1": "1", "C2": "1", "REPLENISHMENT_IFACE": 0, "SERVICE": 1, "TCORE0": 50.0, "OPERATOR": "O2", "NETTYPE": "FDD LTE", "SIGNAL": "23asu (-67dBm)", "TIMEON": "0 d\u00edas, 15:04:56"}', true)]);
+*/
+			return new JsonResponse(["result"=>1, "data"=> json_decode('{"R1": "1", "R2": 0, "READER": 1, "LED": "GREEN", "T1": "29.56", "C1": "1", "C2": "1", "REPLENISHMENT_IFACE": 0, "SERVICE": 1, "TCORE0": 50.0, "OPERATOR": "O2", "NETTYPE": "FDD LTE", "SIGNAL": "23asu (-67dBm)", "TIMEON": "0 d\u00edas, 15:04:56"}', true)]);
 		}
 
 
@@ -855,5 +915,40 @@ class ERPStoresManagersController extends Controller
 		 $this->getDoctrine()->getManager()->flush();
 		 return new JsonResponse(["result"=>1]);
 	 }
+
+	 /**
+ 	* @Route("/api/erp/storesmanagers/vendingmachines/logs/add/{id}", name="addLogsManagerVendingMachine")
+ 	*/
+ 	public function addLogsManagerVendingMachine($id, Request $request){
+ 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		$manager = $this->getDoctrine()->getManager();
+		$repositoryVendingMachines = $manager->getRepository(ERPStoresManagersVendingMachines::class);
+		$vendingmachine=$repositoryVendingMachines->findOneBy(["id"=>$id,"active"=>1,"deleted"=>0]);
+		if(!$vendingmachine) return new JsonResponse(array('result' => -1, 'text'=>"Máquina expendedora incorrecta"));
+ 		$type=$request->request->get('type',0);
+		$description=$request->request->get('description','');
+		$vendingMachineLog= new ERPStoresManagersVendingMachinesLogs();
+		$vendingMachineLog->setVendingmachine($vendingmachine);
+		$vendingMachineLog->setType($type);
+		$vendingMachineLog->setDescription($description);
+		$vendingMachineLog->setDateadd(new \DateTime());
+		$vendingMachineLog->setDateupd(new \DateTime());
+		$vendingMachineLog->setActive(1);
+		$vendingMachineLog->setDeleted(0);
+		$this->getDoctrine()->getManager()->persist($vendingMachineLog);
+		$this->getDoctrine()->getManager()->flush();
+		if($type==2){
+				if($vendingmachine->getAlertnotifyaddress()!=null){
+					$msg=$vendingmachine->getName().": ".$description;
+					file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$vendingmachine->getAlertnotifyaddress().'&msg='.urlencode($msg));
+					sleep(1);
+				}
+		}
+
+
+ 		return new JsonResponse(["result"=>1]);
+ 	}
+
+
 
 }

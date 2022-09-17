@@ -97,6 +97,16 @@
                 "cols": 4
             }
           ]
+        },
+        {
+          "name": "Alertas",
+          "fields": [
+            {
+                "name": "alertnotifyaddress",
+                "caption": "Dirección notificacion alertas",
+                "cols": 8
+            }
+          ]
         }
     ]
 }]

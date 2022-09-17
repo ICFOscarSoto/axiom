@@ -1,0 +1,3 @@
+[
+  {"id" : "addStoresManagersVendingMachineLogs", "style": "display: none;", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"dataVendingmachinelogs",  "modal":"StoresManagersVendingMachinesLogs", "actionType" : "background", "confirm" :false, "tooltip" : ""}
+]

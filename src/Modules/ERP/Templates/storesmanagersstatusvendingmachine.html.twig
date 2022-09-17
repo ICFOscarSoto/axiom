@@ -23,11 +23,13 @@
 		{{ include('@Globale/head.html.twig') }}
 		<hr />
 		{{ include('@Globale/breadcrumb.html.twig') }}
-		{#}<h2>{{ interfaceName }}</h2>#}
+		<h2>{{ vendingmachine.name }}</h2>&nbsp;
 		<!-- MAIN CONTENT -->
+
     <div id="channels-container" style="width:100%">
-      <div class="col-lg-4 col-md-6 col-sm-12">
-        <div class="row"><div class="col-sm-12" style=" background-color: #4e535d; color: #fff; font-size: 15px; text-align: center; padding: 5px;">{{ vendingmachine.name }}</div></div>
+
+      <div class="col-lg-4 col-md-12 col-sm-12">
+        <div class="row"><div class="col-sm-12" style=" background-color: #4e535d; color: #fff; font-size: 15px; text-align: center; padding: 2px; margin-bottom: 10px;">Datos actuales</div></div>
         <div class="row" style="font-size: 13px; padding: 5px;"><div class="col-sm-4"><i class="fas fa-cogs"></i>&nbsp;Máquina</div><div id="machine_power" class="col-md-4"></div><div id="machine_power_buttons" style="text-align: right;" class="col-md-4"></div></div>
         <div class="row" style="font-size: 13px; padding: 5px; background-color: whitesmoke;"><div class="col-sm-4"><i class="fas fa-server"></i>&nbsp;Controlador</div><div id="controller_power" class="col-md-4"></div><div id="controller_power_buttons" style="text-align: right;" class="col-md-4"></div></div>
         <div class="row" style="font-size: 13px; padding: 5px;"><div class="col-sm-4"><i class="fas fa-running"></i>&nbsp;Servicio</div><div id="service_power" class="col-md-4"></div><div id="service_power_buttons" style="text-align: right;" class="col-md-4"></div></div>
@@ -43,11 +45,17 @@
 				<div class="row" style="font-size: 13px; padding: 5px;"><div class="col-sm-4"><i class="fas fa-signal"></i>&nbsp;Señal</div><div id="net_signal" class="col-md-4"></div></div>
 				<div class="row" style="font-size: 13px; padding: 5px; background-color: whitesmoke;"><div class="col-sm-4"><i class="fas fa-clock"></i>&nbsp;Tiempo activo</div><div id="alive_time" class="col-md-4"></div></div>
       </div>
-      <div class="col-lg-8 col-md-6 col-sm-12">
+      <div class="col-lg-8 col-md-12 col-sm-12" style="padding-left: 30px">
+				{% set hidePageLength=true %}
+				{% set hideTopSearch=true %}
+				{% set hideCheckBoxes=true %}
+				<div class="row"><div class="col-sm-12" style=" background-color: #4e535d; color: #fff; font-size: 15px; text-align: center; padding: 2px; margin-bottom: -15px;">Registro eventos</div></div>
+				{{ include('@Globale/list.html.twig') }}
       </div>
     </div>
 		{{ include('@Globale/chat.html.twig') }}
 </div>
+
 
 <script>
 var tag_off='<div style="padding: 2px 14px;background: #ee4749;color: #ffffff;text-align: center;display: inline;border-radius: 6px;">APAGADO</div>';
@@ -130,8 +138,6 @@ function getStatus(){
 }
 
 $(document).ready(function() {
-	{# Poner el foco en el primer input válido de la ficha #}
-	$('.form-control:visible:enabled:first').focus();
   getStatus();
 	window.setInterval(function(){
 		getStatus();

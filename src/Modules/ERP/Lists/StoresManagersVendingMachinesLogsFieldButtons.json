@@ -1,0 +1,3 @@
+[
+  {"id": "editStoresManagersVendingMachineLogs", "type" : "default", "icon" : "fa fa-edit", "name" : "editar","route":"dataVendingmachinelogs", "modal":"StoresManagersVendingMachinesLogs", "actionType" : "background", "confirm" :false, "tooltip":"Editar Log"}
+]
