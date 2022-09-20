@@ -57,6 +57,7 @@ use \DateTime;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\MimeType\FileinfoMimeTypeGuesser;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use App\Modules\Globale\Helpers\XLSXWriter\XLSXWriter;
 
 
 class ERPStoresManagersController extends Controller
@@ -85,7 +86,8 @@ class ERPStoresManagersController extends Controller
 				["name" => "storesmanagersproducts", "caption"=>"Products", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("listStoresManagersProducts",["id"=>$id])],
 				["name" => "storesmanagersusers", "caption"=>"Users", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("listStoresManagersUsers",["id"=>$id])],
 				["name" => "storesmanagersconsumers", "caption"=>"Consumidores", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("listStoresManagersConsumers",["id"=>$id])],
-				["name" => "storesmanagersoperationsreports", "caption"=>"Reports", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("storesManagersOperationsReports",["id"=>$id])]
+				["name" => "storesmanagersoperationsreports", "caption"=>"Reports", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("storesManagersOperationsReports",["id"=>$id])],
+				["name" => "uploadsreports", "caption"=>"Upload", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("storesManagersUploadsReports",["id"=>$id])]
 			];
 			$obj = $repository->findOneBy(['id'=>$id, 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
 			$obj_name=$obj?$obj->getName():'';
@@ -250,6 +252,23 @@ class ERPStoresManagersController extends Controller
 
 	return new RedirectResponse($this->router->generate('app_login'));
 	}
+
+	/**
+		* @Route("/{_locale}/erp/storesmanagers/{id}/uploads", name="storesManagersUploadsReports")
+		*/
+		public function storesManagersUploadsReports($id,RouterInterface $router,Request $request){
+			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
+			$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
+			$locale = $request->getLocale();
+			$this->router = $router;
+	  	$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
+			$machinesRepository=$this->getDoctrine()->getRepository(ERPStoresManagersVendingMachines::class);
+			return $this->render('@ERP/storesManagersUploadsReports.html.twig', [
+				'vendingmachines' => $machinesRepository->findBy(["active"=>1,"deleted"=>0, "manager"=>$id],["name"=>"ASC"]),
+			]);
+
+		}
 
 	/**
 	 * @Route("/{_locale}/erp/storesmanagersproducts/{id}/list", name="StoresManagersProductslist")
@@ -491,6 +510,58 @@ class ERPStoresManagersController extends Controller
 		}
 
 		/**
+			* @Route("/{_locale}/ERP/storesmanagers/vendingmachines/{id}/lacks", name="StoresManagersVendingMachineLacks", defaults={"id"=0})
+		*/
+		public function ListStoresManagersVendingMachineLacks($id, RouterInterface $router,Request $request){
+			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
+			//$this->denyAccessUnlessGranted('ROLE_ADMIN');
+			$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
+			$locale = $request->getLocale();
+			$this->router = $router;
+			$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
+	 		$utils = new ERPStoresManagersVendingMachinesChannelsUtils();
+			$formUtils=new GlobaleFormUtils();
+			$formUtils->initialize($this->getUser(), new ERPStoresManagersVendingMachinesChannels(), dirname(__FILE__)."/../Forms/StoresManagersVendingMachinesChannels.json", $request, $this, $this->getDoctrine());
+			$templateForms[]=$formUtils->formatForm('StoresManagersVendingMachinesChannels', true, $id, ERPStoresManagersVendingMachinesChannels::class, null);
+			$templateLists[]=$utils->formatListLacks($id);
+
+			$new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-new"];
+			$breadcrumb=$menurepository->formatBreadcrumb('genericindex','ERP', 'StoresManagers');
+			array_push($breadcrumb, ["rute"=>null, "name"=>"Canales Expendedora", "icon"=>"fa fa-calendar-check-o"], $new_breadcrumb);
+
+			$repository=$this->getDoctrine()->getRepository(ERPStoresManagersVendingMachines::class);
+				$obj = $repository->findOneBy(['id'=>$id, 'deleted'=>0]);
+				if($id!=0 && $obj==null){
+					return $this->render('@Globale/notfound.html.twig',[
+						"status_code"=>404,
+						"status_text"=>"Objeto no encontrado"
+					]);
+				}
+				$entity_name=$obj?$obj->getName():'';
+				if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+					return $this->render('@Globale/genericlist.html.twig', [
+						'entity_name' => $entity_name,
+						'controllerName' => 'ERPStoresManagersController',
+						'interfaceName' => 'Canales máquina expendedora',
+						'optionSelected' => 'genericindex',
+						'optionSelectedParams' => ["module"=>"ERP", "name"=>"StoresManagers"],
+						'menuOptions' =>  $menurepository->formatOptions($userdata),
+						'breadcrumb' =>  $breadcrumb,
+						'userData' => $userdata,
+						'lists' => $templateLists,
+						'forms' => $templateForms,
+						'entity_id' => $id,
+						'shift' => $id,
+						'include_header' => [["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker-es.js"]],
+						'include_footer' => [["type"=>"css", "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.css"],
+															 	["type"=>"js",  "path"=>"/js/datetimepicker/bootstrap-datetimepicker.min.js"]]
+					  ]);
+					}
+				return new RedirectResponse($this->router->generate('app_login'));
+		}
+
+		/**
 		 * @Route("/api/ERP/storesmanagers/vendingmachines/channels/{id}/list", name="vendingmachinechannels")
 		*/
 		public function vendingmachinechannels($id, RouterInterface $router,Request $request){
@@ -507,6 +578,23 @@ class ERPStoresManagersController extends Controller
 			$return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields,ERPStoresManagersVendingMachines::class,[["type"=>"and", "column"=>"vendingmachine", "value"=>$shift]]);
 			return new JsonResponse($return);
 		}
+
+		/**
+			* @Route("/api/ERP/storesmanagers/vendingmachines/channels/{id}/listlacks", name="vendingmachinechannelslacks")
+		*/
+		public function vendingmachinechannelslacks($id, RouterInterface $router,Request $request){
+			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			$user = $this->getUser();
+			$shiftsRepository=$this->getDoctrine()->getRepository(ERPStoresManagersVendingMachines::class);
+			$channelsRepository=$this->getDoctrine()->getRepository(ERPStoresManagersVendingMachinesChannels::class);
+			$shift = $shiftsRepository->find($id);
+			$lacks=$channelsRepository->getLacks($shift);
+			$result["recordsTotal"]=count($lacks);
+			$result["recordsFiltered"]=count($lacks);
+			$result["data"]=$lacks;
+			return new JsonResponse($result);
+		}
+
 
 		/**
 		 * @Route("/{_locale}/ERP/storesmanagers/vendingmachines/channels/data/{id}/{action}/{idvendingmachine}", name="dataVendingmachinechannels", defaults={"id"=0, "action"="read", "idvendingmachine"=0})
@@ -949,6 +1037,43 @@ class ERPStoresManagersController extends Controller
  		return new JsonResponse(["result"=>1]);
  	}
 
+	/**
+	* @Route("/{_locale}/erp/storesmanagers/vendingmachines/exportchannels", name="exportchannels")
+	*/
+	public function exportchannels(Request $request){
+		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		$channelsRepository=$this->getDoctrine()->getRepository(ERPStoresManagersVendingMachinesChannels::class);
+		$ids=$request->query->get('ids');
+		//$ids=explode(",",$ids);
+		$uploadDir=$this->get('kernel')->getRootDir() . '/../cloud/'.$this->getUser()->getCompany()->getId().'/temp/'.$this->getUser()->getId().'/';
+		if (!file_exists($uploadDir) && !is_dir($uploadDir)) {
+				mkdir($uploadDir, 0775, true);
+		}
+		$filename = date("YmdHis").'_'.md5(uniqid()).'.xlsx';
+		$errorstyle[] = array('fill'=>"#AA0000");
+
+		$writer = new XLSXWriter();
+		$header = array("string","string","string","string");
+		$writer->setAuthor($this->getUser()->getName().' '.$this->getUser()->getLastname());
+		$writer->writeSheetHeader('Hoja1', $header, $col_options = ['suppress_row'=>true] );
+		$writer->writeSheetRow('Hoja1', ["NOMBRE CANAL", "CANAL", "PRODUCTO", "CANTIDAD", "FALTAS", "MINIMO","MAXIMO"]);
+		$row_number=1;
+		if($ids!=null){
+			$lines=$channelsRepository->getChannels($ids);
+			foreach($lines as $line){
+				if ($line["lacks"]>=0) $row=[$line["name"], $line["channel"], $line["productname"], $line["quantity"], '',  $line["minquantity"], $line["maxquantity"]];
+				else $row=[$line["name"], $line["channel"], $line["productname"], $line["quantity"],  -$line["lacks"], $line["minquantity"],$line["maxquantity"]];
+				$writer->writeSheetRow('Hoja1', $row);
+				$row_number++;
+			}
+		}
+
+		$writer->writeToFile($uploadDir.$filename);
+		$response = new BinaryFileResponse($uploadDir.$filename);
+		$response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+		$response->setContentDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT,'exported_operations.xlsx');
+		return $response;
+	}
 
 
 }

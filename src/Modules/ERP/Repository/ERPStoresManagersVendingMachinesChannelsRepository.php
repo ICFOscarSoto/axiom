@@ -47,4 +47,23 @@ class ERPStoresManagersVendingMachinesChannelsRepository extends ServiceEntityRe
         ;
     }
     */
+
+    public function getLacks($vendingmachine){
+      $query='SELECT id, name, productname, (quantity-minquantity) as lacks, quantity, minquantity, maxquantity
+      FROM erpstores_managers_vending_machines_channels
+      WHERE vendingmachine_id=:vendingmachine AND quantity<minquantity';
+      $params=['vendingmachine' => $vendingmachine->getId()];
+      return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+    }
+
+
+    public function getChannels($array_ids)
+    {
+      $query="SELECT name, channel, productname, quantity, (quantity-minquantity) as lacks, minquantity, maxquantity
+              	FROM erpstores_managers_vending_machines_channels
+              	WHERE active = 1 AND deleted= 0
+                AND id IN ($array_ids)";
+      $result=$this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
+      return $result;
+    }
 }

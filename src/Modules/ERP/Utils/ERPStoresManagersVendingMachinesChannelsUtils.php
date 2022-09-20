@@ -41,4 +41,21 @@ class ERPStoresManagersVendingMachinesChannelsUtils
 
     return $list;
   }
+
+  public function formatListLacks($vendingmachine){
+    $list=[
+      'id' => 'list'.$this->name,
+      'route' => 'vendingmachinechannelslacks',
+      'routeParams' => ["id" => $vendingmachine],
+      'orderColumn' => 2,
+      'orderDirection' => 'ASC',
+      'tagColumn' => 2,
+      'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersVendingMachinesChannelsLacks.json"),true),
+      'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/".$this->name."FieldButtons.json"),true),
+      'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/".$this->name."TopButtons.json"),true)
+    ];
+
+    return $list;
+  }
+
 }
