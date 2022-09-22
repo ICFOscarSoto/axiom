@@ -56,7 +56,6 @@ class ERPStoresManagersVendingMachinesChannelsRepository extends ServiceEntityRe
       return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
     }
 
-
     public function getChannels($array_ids)
     {
       $query="SELECT name, channel, productname, quantity, (quantity-minquantity) as lacks, minquantity, maxquantity
@@ -65,5 +64,23 @@ class ERPStoresManagersVendingMachinesChannelsRepository extends ServiceEntityRe
                 AND id IN ($array_ids)";
       $result=$this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
       return $result;
+    }
+
+    public function getLoadsMachine($id){
+      $query='SELECT date(dateadd) as date FROM erpstores_managers_vending_machines_channels_replenishment WHERE
+              channel_id IN (SELECT id FROM erpstores_managers_vending_machines_channels WHERE vendingmachine_id=:vendingmachine)
+              GROUP BY date(dateadd)
+              ORDER by date(dateadd) DESC
+              LIMIT 10';
+      $params=['vendingmachine' => $id];
+      return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+    }
+
+
+    public function getLoadsMachineDate($id,$date){
+      $query='SELECT productcode, productname, quantity FROM erpstores_managers_vending_machines_channels_replenishment WHERE date(dateadd)=:date
+          AND channel_id  IN (SELECT id FROM erpstores_managers_vending_machines_channels WHERE vendingmachine_id=:vendingmachine)';
+      $params=['vendingmachine' => $id, 'date'=>$date];
+      return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
     }
 }

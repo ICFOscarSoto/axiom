@@ -97,5 +97,43 @@ function create($params){
   }
 
 
+  function loadMachine($params){
+    $this->pdf  = new GlobaleReports();
+    $this->pdf->AliasNbPages();
+    $this->pdf->SetAutoPageBreak(false);
+    $this->pdf->SetFont('Arial','',20);
+    $this->pdf->image_path=$params["rootdir"].DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$params["user"]->getCompany()->getId().DIRECTORY_SEPARATOR.'images'.DIRECTORY_SEPARATOR.'company'.DIRECTORY_SEPARATOR;
+    $this->pdf->user=$params["user"];
+    $this->pdf->StartPageGroup();
+
+    $this->pdf->AddPage();
+      //$this->pdf->Image($path, 16, 7, 32, 32);
+    $nameLeft="Carga de productos ";
+    $infoLeft=[["Fecha", $params['date']],
+               ["Origen", "Almacén Expendedoras"],
+               ["Destino", $params['machine']]
+              ];
+    $lines=$params['lines'];
+    dump($params);
+    foreach ($lines as $line){
+      $dataTable[]=[
+        $line['productcode'],
+        $line['productname'],
+        $line['quantity']
+      ];
+    }
+
+    $columnsTable=[["name"=>"Código","width"=>30, "align"=>"L"],
+                  ["name"=>"Descripcion","width"=>80, "align"=>"L"],
+                  ["name"=>"Cantidad","width"=>20, "align"=>"C"]
+    ];
+    while(count($dataTable)){
+      $this->pdf->docHeader($nameLeft,'',$infoLeft, '');
+      $this->pdf->docFooter('','','');
+      $dataTable=$this->pdf->Table($dataTable,$columnsTable,'false');
+    }
+    return $this->pdf->Output();
+  }
+
 
 }

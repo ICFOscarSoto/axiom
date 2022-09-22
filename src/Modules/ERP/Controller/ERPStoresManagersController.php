@@ -52,6 +52,7 @@ use App\Modules\ERP\Utils\ERPProductsAttributesUtils;
 use App\Modules\ERP\Utils\ERPStoresManagersVendingMachinesLogsUtils;
 use App\Modules\Security\Utils\SecurityUtils;
 use App\Modules\ERP\Reports\ERPEan13Reports;
+use App\Modules\ERP\Reports\ERPPrintQR;
 use App\Modules\ERP\Utils\ERPStoresManagersUtils;
 use \DateTime;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -87,7 +88,7 @@ class ERPStoresManagersController extends Controller
 				["name" => "storesmanagersusers", "caption"=>"Users", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("listStoresManagersUsers",["id"=>$id])],
 				["name" => "storesmanagersconsumers", "caption"=>"Consumidores", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("listStoresManagersConsumers",["id"=>$id])],
 				["name" => "storesmanagersoperationsreports", "caption"=>"Reports", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("storesManagersOperationsReports",["id"=>$id])],
-				["name" => "uploadsreports", "caption"=>"Upload", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("storesManagersUploadsReports",["id"=>$id])]
+				["name" => "loadsreports", "caption"=>"Loads", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("storesManagersLoadReports",["id"=>$id])]
 			];
 			$obj = $repository->findOneBy(['id'=>$id, 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
 			$obj_name=$obj?$obj->getName():'';
@@ -254,9 +255,9 @@ class ERPStoresManagersController extends Controller
 	}
 
 	/**
-		* @Route("/{_locale}/erp/storesmanagers/{id}/uploads", name="storesManagersUploadsReports")
+		* @Route("/{_locale}/erp/storesmanagers/{id}/loads", name="storesManagersLoadReports")
 		*/
-		public function storesManagersUploadsReports($id,RouterInterface $router,Request $request){
+		public function storesManagersLoadReports($id,RouterInterface $router,Request $request){
 			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 			if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
 			$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
@@ -264,11 +265,12 @@ class ERPStoresManagersController extends Controller
 			$this->router = $router;
 	  	$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
 			$machinesRepository=$this->getDoctrine()->getRepository(ERPStoresManagersVendingMachines::class);
-			return $this->render('@ERP/storesManagersUploadsReports.html.twig', [
+			return $this->render('@ERP/storesManagersLoadReports.html.twig', [
 				'vendingmachines' => $machinesRepository->findBy(["active"=>1,"deleted"=>0, "manager"=>$id],["name"=>"ASC"]),
 			]);
 
 		}
+
 
 	/**
 	 * @Route("/{_locale}/erp/storesmanagersproducts/{id}/list", name="StoresManagersProductslist")
@@ -1074,6 +1076,53 @@ class ERPStoresManagersController extends Controller
 		$response->setContentDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT,'exported_operations.xlsx');
 		return $response;
 	}
+
+
+
+		/**
+		* @Route("/{_locale}/erp/storesmanagers/vendingmachines/pruebas/{id}/{date}", name="pruebasCargas")
+		*/
+		public function pruebasCargas(Request $request){
+
+
+
+
+		}
+
+			/**
+				* @Route("/api/erp/getloads/{id}", name="getLoads")
+				*/
+			public function getLoads($id, RouterInterface $router,Request $request){
+				$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+				$loadsRepository=$this->getDoctrine()->getRepository(ERPStoresManagersVendingMachinesChannels::class);
+				$machineRepository=$this->getDoctrine()->getRepository(ERPStoresManagersVendingMachines::class);
+				$objects=$loadsRepository->getLoadsMachine($id);
+				$loads=[];
+				foreach ($objects as $object){
+					$load["vendingmachine"]=$machineRepository->findOneBy(["id"=>$id, "deleted"=>0])->getName();
+					$load["date"]=$object["date"];
+					$loads[]=$load;
+				}
+				return new JsonResponse(["loads"=>$loads]);
+			}
+
+			/**
+		  * @Route("/api/ERP/downloadLoads/{id}/{date}", name="downloadLoads")
+		  */
+		  public function downloadLoads($id, $date, RouterInterface $router,Request $request){
+		    $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		    $new_item=json_decode($request->getContent());
+				$loadRepository=$this->getDoctrine()->getRepository(ERPStoresManagersVendingMachinesChannels::class);
+				$machineRepository=$this->getDoctrine()->getRepository(ERPStoresManagersVendingMachines::class);
+				$params["rootdir"]= $this->get('kernel')->getRootDir();
+		 		$params["user"]=$this->getUser();
+				$params["machine"]=$machineRepository->findOneBy(["id"=>$id, "deleted"=>0])->getName();
+				$params["date"]=$date;
+				$params["lines"]=$loadRepository->getLoadsMachineDate($id,$date);
+				$printQRUtils = new ERPPrintQR();
+ 		 		$pdf=$printQRUtils->loadMachine($params);
+ 		 		return new Response("", 200, array('Content-Type' => 'application/pdf'));
+		  }
 
 
 }
