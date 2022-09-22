@@ -114,7 +114,6 @@ function create($params){
                ["Destino", $params['machine']]
               ];
     $lines=$params['lines'];
-    dump($params);
     foreach ($lines as $line){
       $dataTable[]=[
         $line['productcode'],
