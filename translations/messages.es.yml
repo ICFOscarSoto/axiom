@@ -751,7 +751,8 @@ Commissions: Comisiones
 #----------------------------------------------------------------------------------------------------------------------
 Manager data: Datos del gestor
 Reports: Informes
-
+Loads: Cargas expendedora
+Lacks: Faltas
 #JSPREADSHEET
 #----------------------------------------------------------------------------------------------------------------------
 jspreadsheet_showcolumn: Mostrar columna

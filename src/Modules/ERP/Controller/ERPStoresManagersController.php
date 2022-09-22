@@ -545,7 +545,7 @@ class ERPStoresManagersController extends Controller
 					return $this->render('@Globale/genericlist.html.twig', [
 						'entity_name' => $entity_name,
 						'controllerName' => 'ERPStoresManagersController',
-						'interfaceName' => 'Canales máquina expendedora',
+						'interfaceName' => 'Faltas máquina expendedora',
 						'optionSelected' => 'genericindex',
 						'optionSelectedParams' => ["module"=>"ERP", "name"=>"StoresManagers"],
 						'menuOptions' =>  $menurepository->formatOptions($userdata),

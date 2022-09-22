@@ -49,7 +49,7 @@ class ERPStoresManagersVendingMachinesChannelsRepository extends ServiceEntityRe
     */
 
     public function getLacks($vendingmachine){
-      $query='SELECT id, name, productname, (quantity-minquantity) as lacks, quantity, minquantity, maxquantity
+      $query='SELECT id, name, productname, -(quantity-minquantity) as lacks, quantity, minquantity, maxquantity
       FROM erpstores_managers_vending_machines_channels
       WHERE vendingmachine_id=:vendingmachine AND quantity<minquantity';
       $params=['vendingmachine' => $vendingmachine->getId()];
