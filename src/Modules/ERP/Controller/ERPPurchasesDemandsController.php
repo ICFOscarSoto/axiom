@@ -21,11 +21,10 @@ use App\Modules\ERP\Entity\ERPConfiguration;
 use App\Modules\ERP\Entity\ERPSeries;
 use App\Modules\ERP\Entity\ERPProducts;
 use App\Modules\ERP\Entity\ERPSuppliers;
-use App\Modules\ERP\Entity\ERPVariantsValues;
+use App\Modules\ERP\Entity\ERPVariants;
 use App\Modules\ERP\Entity\ERPPurchasesDemands;
 use App\Modules\ERP\Entity\ERPPurchasesDemandsReasons;
 use App\Modules\ERP\Entity\ERPStores;
-use App\Modules\ERP\Entity\ERPStocks;
 use App\Modules\ERP\Entity\ERPStoreLocations;
 use App\Modules\Globale\Entity\GlobaleUsersWidgets;
 use App\Modules\Globale\Entity\GlobaleUsers;
@@ -114,7 +113,7 @@ class ERPPurchasesDemandsController extends Controller
 		$purchasesdemandsRepository=$this->getDoctrine()->getRepository(ERPPurchasesDemands::class);
 		$productsRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
 		$suppliersRepository=$this->getDoctrine()->getRepository(ERPSuppliers::class);
-		$variantsRepository=$this->getDoctrine()->getRepository(ERPVariantsValues::class);
+		$variantsRepository=$this->getDoctrine()->getRepository(ERPVariants::class);
 		$reasonsRepository=$this->getDoctrine()->getRepository(ERPPurchasesDemandsReasons::class);
 
 

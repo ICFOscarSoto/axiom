@@ -17,11 +17,12 @@ class ERPProductsSuppliers
      */
     private $id;
 
+
     /**
-     * @ORM\ManyToOne(targetEntity="App\Modules\ERP\Entity\ERPProducts")
+     * @ORM\ManyToOne(targetEntity="App\Modules\ERP\Entity\ERPproductsVariants", fetch="EAGER")
      * @ORM\JoinColumn(nullable=false,onDelete="CASCADE")
      */
-    private $product;
+    private $productvariant;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Modules\ERP\Entity\ERPSuppliers", fetch="EAGER")
@@ -55,19 +56,44 @@ class ERPProductsSuppliers
      */
     private $deleted=0;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $multiplicity;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $minimumquantityofbuy=1;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $purchaseunit=1;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $stock;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $stockdate;
+
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getProduct(): ?ERPProducts
+    public function getProductVariant(): ?ERPProductsVariants
     {
-        return $this->product;
+        return $this->productvariant;
     }
 
-    public function setProduct(?ERPProducts $product): self
+    public function setProductVariant(?ERPProductsVariants $productvariant): self
     {
-        $this->product = $product;
+        $this->productvariant = $productvariant;
 
         return $this;
     }
@@ -140,6 +166,66 @@ class ERPProductsSuppliers
     public function setDeleted(bool $deleted): self
     {
         $this->deleted = $deleted;
+
+        return $this;
+    }
+
+    public function getMultiplicity(): ?int
+    {
+        return $this->multiplicity;
+    }
+
+    public function setMultiplicity(?int $multiplicity): self
+    {
+        $this->multiplicity = $multiplicity;
+
+        return $this;
+    }
+
+    public function getMinimumquantityofbuy(): ?int
+    {
+        return $this->minimumquantityofbuy;
+    }
+
+    public function setMinimumquantityofbuy(?int $minimumquantityofbuy): self
+    {
+        $this->minimumquantityofbuy = $minimumquantityofbuy;
+
+        return $this;
+    }
+
+    public function getPurchaseunit(): ?int
+    {
+        return $this->purchaseunit;
+    }
+
+    public function setPurchaseunit(?int $purchaseunit): self
+    {
+        $this->purchaseunit = $purchaseunit;
+
+        return $this;
+    }
+
+    public function getStock(): ?int
+    {
+        return $this->stock;
+    }
+
+    public function setStock(?int $stock): self
+    {
+        $this->stock = $stock;
+
+        return $this;
+    }
+
+    public function getStockdate(): ?\DateTimeInterface
+    {
+        return $this->stockdate;
+    }
+
+    public function setStockdate(\DateTimeInterface $stockdate): self
+    {
+        $this->stockdate = $stockdate;
 
         return $this;
     }

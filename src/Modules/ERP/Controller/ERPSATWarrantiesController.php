@@ -15,7 +15,7 @@ use App\Modules\Globale\Entity\GlobaleTaxes;
 use App\Modules\Globale\Entity\GlobaleUsers;
 use App\Modules\ERP\Entity\ERPConfiguration;
 use App\Modules\ERP\Entity\ERPProducts;
-use App\Modules\ERP\Entity\ERPVariantsValues;
+use App\Modules\ERP\Entity\ERPVariants;
 use App\Modules\ERP\Entity\ERPStores;
 use App\Modules\ERP\Entity\ERPCarriers;
 use App\Modules\ERP\Entity\ERPCustomers;
@@ -200,7 +200,7 @@ class ERPSATWarrantiesController extends Controller
 		 $satwarrantiesRepository=$this->getDoctrine()->getRepository(ERPSATWarranties::class);
 		 $productsRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
 		 $customersRepository=$this->getDoctrine()->getRepository(ERPCustomers::class);
-		 $variantsRepository=$this->getDoctrine()->getRepository(ERPVariantsValues::class);
+		 $variantsRepository=$this->getDoctrine()->getRepository(ERPVariants::class);
 		 $satwarrantiessstatesRepository=$this->getDoctrine()->getRepository(ERPSATWarrantiesStates::class);
 		 $storesRepository=$this->getDoctrine()->getRepository(ERPStores::class);
 		 $carriersRepository=$this->getDoctrine()->getRepository(ERPCarriers::class);

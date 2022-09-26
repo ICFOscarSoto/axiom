@@ -407,16 +407,12 @@ ERPStoresManagersOperationsController:
   resource: 'App\Modules\ERP\Controller\ERPStoresManagersOperationsController'
   type:      annotation
 
-ERPInfoStocksController:
-  resource: 'App\Modules\ERP\Controller\ERPInfoStocksController'
-  type:      annotation
-
 ERPBuyOffersController:
   resource: 'App\Modules\ERP\Controller\ERPBuyOffersController'
   type:      annotation
 
-ERPShoppingDiscountsController:
-  resource: 'App\Modules\ERP\Controller\ERPShoppingDiscountsController'
+ERPProductsSuppliersDiscountsController:
+  resource: 'App\Modules\ERP\Controller\ERPProductsSuppliersDiscountsController'
   type:      annotation
 
 GlobaleUsersConfigController:

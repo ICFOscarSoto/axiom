@@ -10,14 +10,13 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-use App\Modules\ERP\Entity\ERPShoppingDiscounts;
+use App\Modules\ERP\Entity\ERPProductsSuppliersDiscounts;
 use App\Modules\ERP\Entity\ERPProducts;
 use App\Modules\ERP\Entity\ERPReferences;
 use App\Modules\ERP\Entity\ERPEAN13;
 use App\Modules\ERP\Entity\ERPSuppliers;
 use App\Modules\ERP\Entity\ERPCategories;
 use App\Modules\ERP\Entity\ERPProductsSuppliers;
-use App\Modules\ERP\Entity\ERPShoppingPrices;
 
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\Globale\Entity\GlobaleCountries;
@@ -27,7 +26,7 @@ use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\ERP\Utils\ERPTransfersUtils;
 use App\Modules\Security\Utils\SecurityUtils;
 
-class ERPShoppingDiscountsController extends Controller
+class ERPProductsSuppliersDiscountsController extends Controller
 {
 
   private $module='ERP';
@@ -43,7 +42,7 @@ class ERPShoppingDiscountsController extends Controller
     $suppliersRepository=$this->getDoctrine()->getRepository(ERPSuppliers::class);
     $categoryRepository=$this->getDoctrine()->getRepository(ERPCategories::class);
     $info[]="Elige el proveedor";
-    return $this->render('@ERP/shoppingDiscounts.html.twig',[
+    return $this->render('@ERP/productsuppliersdiscounts.html.twig',[
       'optionSelected' => 'genericindex',
       'optionSelectedParams' => ["module"=>"ERP", "name"=>"Suppliers"],
       'menuOptions' =>  $menurepository->formatOptions($userdata),
@@ -53,7 +52,7 @@ class ERPShoppingDiscountsController extends Controller
       'suppliers' => $suppliersRepository->findBy(["active"=>1,"deleted"=>0],["name"=>"ASC"]),
       'category' => $categoryRepository->findBy(["active"=>1,"deleted"=>0],["name"=>"ASC"]),
       'info' => $info,
-      'tempPath' => str_replace("\\","\\\\", $this->get('kernel')->getRootDir() . DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$this->getUser()->getCompany()->getId().DIRECTORY_SEPARATOR.'temp'.DIRECTORY_SEPARATOR.$this->getUser()->getId().DIRECTORY_SEPARATOR.'shoppingDiscount'.DIRECTORY_SEPARATOR)
+      'tempPath' => str_replace("\\","\\\\", $this->get('kernel')->getRootDir() . DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'cloud'.DIRECTORY_SEPARATOR.$this->getUser()->getCompany()->getId().DIRECTORY_SEPARATOR.'temp'.DIRECTORY_SEPARATOR.$this->getUser()->getId().DIRECTORY_SEPARATOR.'productsuppliersdiscounts'.DIRECTORY_SEPARATOR)
     ]);
   }
 
@@ -100,12 +99,12 @@ class ERPShoppingDiscountsController extends Controller
   }
 
   /**
-  * @Route("/api/ERP/shoppingDiscounts/save", name="saveDiscounts")
+  * @Route("/api/ERP/productsuppliersdiscounts/save", name="saveDiscounts")
   */
   public function saveDiscounts(RouterInterface $router,Request $request){
     $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
     $new_item=json_decode($request->getContent());
-    $shoppingDiscountsRepository=$this->getDoctrine()->getRepository(ERPShoppingDiscounts::class);
+    $productsuppliersdiscountsRepository=$this->getDoctrine()->getRepository(ERPProductsSuppliersDiscounts::class);
     $productsRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
     $product=$productsRepository->findOneById($new_item->id);
     if ($new_item->netprice) {
@@ -130,7 +129,7 @@ class ERPShoppingDiscountsController extends Controller
   }
 
     /**
-    * @Route("/api/ERP/shoppingDiscounts/readcsv", name="readcsv")
+    * @Route("/api/ERP/productsuppliersdiscounts/readcsv", name="readcsv")
     */
     public function readCSV(RouterInterface $router,Request $request){
       $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');

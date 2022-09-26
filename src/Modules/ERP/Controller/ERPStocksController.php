@@ -11,7 +11,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\ERP\Entity\ERPStocks;
-use App\Modules\ERP\Entity\ERPStockHistory;
+use App\Modules\ERP\Entity\ERPStocksHistory;
 use App\Modules\ERP\Entity\ERPStores;
 use App\Modules\ERP\Entity\ERPStoreLocations;
 use App\Modules\ERP\Entity\ERPStoresUsers;
@@ -69,9 +69,9 @@ class ERPStocksController extends Controller
 		}
 
 		/**
-		 * @Route("/{_locale}/stocks/infoStocks/{id}", name="infoStocks", defaults={"id"=0})
+		 * @Route("/{_locale}/stocks/stock/{id}", name="istock", defaults={"id"=0})
 		 */
-		public function infoStocks($id, Request $request){
+		public function istock($id, Request $request){
 			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 			$stores_usersRepository=$this->getDoctrine()->getRepository(ERPStoresUsers::class);
 			$stores_by_user=$stores_usersRepository->getStoreByUser($this->getUser()->getId());
@@ -111,7 +111,7 @@ class ERPStocksController extends Controller
 					}
 
 					$stocks=$stocksRepository->stocksByStores($id);
-	 			  $repositoryHistory=$this->getDoctrine()->getRepository(ERPStockHistory::class);
+	 			  $repositoryHistory=$this->getDoctrine()->getRepository(ERPStocksHistory::class);
 					$history=$repositoryHistory->findHistory($id);
 					$stockHistory=Array();
 
@@ -132,7 +132,7 @@ class ERPStocksController extends Controller
 						$stockHistory[]=$item;
 					}
 
-					return $this->render('@ERP/infoStocks.html.twig', array(
+					return $this->render('@ERP/stocks.html.twig', array(
 										'storelist'=>$store_locations,
 										'id'=>$id,
 										'variantes' => $variants,
@@ -161,7 +161,7 @@ class ERPStocksController extends Controller
 							}
 
 					$stocks=$stocksRepository->stocksByStores($id);
-	 			  $repositoryHistory=$this->getDoctrine()->getRepository(ERPStockHistory::class);
+	 			  $repositoryHistory=$this->getDoctrine()->getRepository(ERPStocksHistory::class);
 					$history=$repositoryHistory->findHistory($id);
 					$stockHistory=Array();
 
@@ -181,7 +181,7 @@ class ERPStocksController extends Controller
 						 			 $stockHistory[]=$item;
 					}
 
-					return $this->render('@ERP/infoStocks.html.twig', array(
+					return $this->render('@ERP/stocks.html.twig', array(
 										'storelist'=>$store_locations,
 										'id'=>$id,
 										'variantes' => null,
@@ -273,15 +273,16 @@ class ERPStocksController extends Controller
 			  $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 			  $stock_object=json_decode($request->getContent());
 				$repositoryProducts=$this->getDoctrine()->getRepository(ERPProducts::class);
+				$repositoryProductsVariants=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
 				$product=$repositoryProducts->findOneBy(["code"=>$stock_object->product_code, "company"=>$this->getUser()->getCompany()]);
+				$productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product, "variant"=>null]);
 				$repositoryStoreLocations=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
 				$storelocation=$repositoryStoreLocations->findOneBy(["name"=>$stock_object->location, "company"=>$this->getUser()->getCompany()]);
 				$repositoryStores=$this->getDoctrine()->getRepository(ERPStores::class);
 				$store=$repositoryStores->findOneBy(["id"=>$storelocation->getStore(), "company"=>$this->getUser()->getCompany()]);
-				$StockHistory= new ERPStockHistory();
-				$StockHistory->setProduct($product);
+				$StockHistory= new ERPStocksHistory();
+				$StockHistory->setProductVariant($productvariant);
 				$StockHistory->setLocation($storelocation);
-				$StockHistory->setStore($store);
 				$StockHistory->setUser($this->getUser());
 				$StockHistory->setPreviousqty($stock_object->prevqty);
 				$StockHistory->setNewqty($stock_object->nextqty);
@@ -331,7 +332,7 @@ class ERPStocksController extends Controller
 		*/
 		public function getStockHistory($id){
 		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-		 $repositoryHistory=$this->getDoctrine()->getRepository(ERPStockHistory::class);
+		 $repositoryHistory=$this->getDoctrine()->getRepository(ERPStocksHistory::class);
 		 $history=$repositoryHistory->findHistory($id);
 		 $responseHistory=Array();
 		 foreach($history as $history_line){
@@ -375,7 +376,7 @@ class ERPStocksController extends Controller
 
 			$stockHistory=Array();
 			foreach ($products as $product) {
-				$repositoryHistory=$this->getDoctrine()->getRepository(ERPStockHistory::class);
+				$repositoryHistory=$this->getDoctrine()->getRepository(ERPStocksHistory::class);
 				$history=$repositoryHistory->findAllHistory($product["product_id"]);
 
 				foreach($history as $history_line){
@@ -395,7 +396,7 @@ class ERPStocksController extends Controller
 				}
 			}
 
-			return $this->render('@ERP/infoStocks.html.twig', array(
+			return $this->render('@ERP/stocks.html.twig', array(
 								'storelist'=>$store_locations,
 								'id'=>null,
 								'variantes' => null,
@@ -433,6 +434,7 @@ class ERPStocksController extends Controller
 			 //TODO: Comprobar que el usuario tiene permisos para hacer inventarios
 
 			 $repositoryProducts=$this->getDoctrine()->getRepository(ERPProducts::class);
+			 $repositoryProductsVariants=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
 			 $repositoryStoreLocations=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
 			 $repositoryStores=$this->getDoctrine()->getRepository(ERPStores::class);
 			 $repositoryType=$this->getDoctrine()->getRepository(ERPTypesMovements::class);
@@ -444,8 +446,7 @@ class ERPStocksController extends Controller
 			 $product_obj=$repositoryProducts->findOneBy(["id"=>$product, "company"=>$this->getUser()->getCompany(), "deleted"=>0]);
 			 if(!$product_obj) return new JsonResponse(["result"=>-2, "text"=>"Producto no encontrado"]);
 
-			 //TODO: Aceptar variante de producto
-			 $variant=null;
+			 $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product, "variant"=>$variant, "deleted"=>0]);
 
 			 $storelocation=$repositoryStoreLocations->findOneBy(["id"=>$location, "company"=>$this->getUser()->getCompany(), "deleted"=>0]);
 			 if(!$storelocation) return new JsonResponse(["result"=>-3, "text"=>"Ubicación no encontrada"]);
@@ -453,11 +454,11 @@ class ERPStocksController extends Controller
 			 if(!$store) return new JsonResponse(["result"=>-4, "text"=>"Almacén no encontrado"]);
 			 $movementType=$repositoryType->findOneBy(["id"=>$type, "active"=>1, "deleted"=>0]);
 			 if(!$movementType) return new JsonResponse(["result"=>-5, "text"=>"Tipo de movimiento no soportado"]);
-			 $stock=$repository->findOneBy(["storelocation"=>$storelocation,"product"=>$product_obj, "company"=>$this->getUser()->getCompany(), "deleted"=>0]);
+			 $stock=$repository->findOneBy(["storelocation"=>$storelocation,"productvariant"=>$productvariant, "company"=>$this->getUser()->getCompany(), "deleted"=>0]);
 
 			 if(!$stock){
 			 	$stock = new ERPStocks();
-			 	$stock->setProduct($product_obj);
+			 	$stock->setProductVariant($productvariant);
 			 	$stock->setCompany($this->getUser()->getCompany());
 			 	$stock->setStorelocation($storelocation);
 			 	$stock->setDateadd(new \DateTime());
@@ -475,10 +476,9 @@ class ERPStocksController extends Controller
 			  $manager->flush();
 
 		 if($prev_stock!=$qty){
-				 $StockHistory= new ERPStockHistory();
-				 $StockHistory->setProduct($product_obj);
+				 $StockHistory= new ERPStocksHistory();
+				 $StockHistory->setProductVariant($productvariant);
 				 $StockHistory->setLocation($storelocation);
-				 $StockHistory->setStore($store);
 				 $StockHistory->setUser($this->getUser());
 				 $StockHistory->setPreviousqty($prev_stock);
 				 $StockHistory->setNewqty($qty);
@@ -620,15 +620,15 @@ class ERPStocksController extends Controller
 	 $result["storeName"]=$location->getStore()->getName();
 	 foreach($products as $item){
 		 $obj=$item->getProduct();
-		 $variant=$item->getProductvariant();
+		 $variant=$item->getProductVariant();
 		 //$stocks=$Stocksrepository->findBy(["product"=>$obj, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
 		 $eans=$EAN13repository->findBy(["product"=>$obj, "productvariant"=>$variant?$variant:null, "active"=>1, "deleted"=>0]);
 		 $result_prod["id"]=$item->getId();
 		 $result_prod["id_product"]=$obj->getId();
 		 $result_prod["code"]=$obj->getCode();
 		 $result_prod["variant_id"]=$variant?$variant->getId():0;
-		 $result_prod["variant_name"]=$variant?$variant->getVariantname()->getName():"";
-		 $result_prod["variant_value"]=$variant?$variant->getVariantvalue()->getName():"";
+		 $result_prod["variant_name"]=$variant?$variant->getVariant()-getVarianttype()->getName():"";
+		 $result_prod["variant_value"]=$variant?$variant->getVariant()->getName():"";
 		 $result_prod["variant_active"]=$variant?$variant->getActive():true;
 		 $result_prod["stock"]=$item->getQuantity();
 		 $result_prod["code"]=$obj->getCode();
@@ -660,8 +660,8 @@ class ERPStocksController extends Controller
 		 $result["variants"]=[];
 		 foreach($variants as $variant){
 			 $variant_item["id"]=$variant->getId();
-			 $variant_item["name"]=$variant->getVariantname()->getName();
-			 $variant_item["value"]=$variant->getVariantvalue()->getName();
+			 $variant_item["name"]=$variant->getVariant()->getVarianttype()->getName();
+			 $variant_item["value"]=$variant->getVariant()->getName();
 			 $eans=$EAN13repository->findBy(["product"=>$obj, "productvariant"=>$variant, "active"=>1, "deleted"=>0]);
 			 $variant_item["eans"]=[];
 			 foreach($eans as $ean){
@@ -721,5 +721,82 @@ class ERPStocksController extends Controller
 
 	 return new JsonResponse($result);
  }
+
+ /**
+	* @Route("/{_locale}/updateStocksManageds", name="updateStocksManageds")
+	* store => codigo del almacén en AXIOM
+	* date => fecha de inicio de los movimientos en formato dd/mm/aaaa
+	* date2 => fecha de inicio de los movimientos en formato aaaa/mm/dd
+	*/
+	 public function updateStocksManageds(RouterInterface $router,Request $request){
+		 $storeName=$request->query->get('store',null);
+		 $date=$request->query->get('date',null);
+		 $date2=$request->query->get('date2',null);
+		 $usersRepository=$this->getDoctrine()->getRepository(GlobaleUsers::class);
+		 $user=$usersRepository->findOneBy(["email"=>"oscar.soto@ferreteriacampollano.com", "deleted"=>0]);
+		 $productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
+		 $productVariantRepository=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
+		 $storeLocationsRepository=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
+		 $storeRepository=$this->getDoctrine()->getRepository(ERPStores::class);
+		 $stockRepository=$this->getDoctrine()->getRepository(ERPStocks::class);
+		 $storeLocation=null;
+		 $stocks = array();
+		 if ($storeName=='ALI') {
+			 $storeLocation=$storeLocationsRepository->findOneBy(["name"=>"GESTOR ALI"]);
+			 $store=$storeRepository->findOneBy(["code"=>"GESTOR ALI"]);
+			 $stocks=$stockRepository->getOperations("GESTOR ALI",$date2);
+		 }
+		 else {
+			 $storeLocation=$storeLocationsRepository->findOneBy(["name"=>$storeName]);
+			 $store=$storeRepository->findOneBy(["code"=>$storeName]);
+			 $stocks=$stockRepository->getOperations($storeName,$date2);
+		 }
+		 foreach($stocks as $istock){
+			 $product=$productRepository->findOneBy(["code"=>$istock["code"]]);
+			 $productvariant=$productVariantRepository->findOneBy(["product"=>$product, "variant"=>null]);
+			 $stock=$stockRepository->findOneBy(["storelocation"=>$storeLocation, "productvariant"=>$productvariant]);
+			 if ($stock==NULL) continue;
+			 $quantity=$stock->getQuantity()-$istock["vendido"];
+			 $stockHistory=new ERPStocksHistory();
+			 $stockHistory->setProductVariant($productvariant);
+			 $stockHistory->setLocation($storeLocation);
+			 $stockHistory->setUser($user);
+			 $stockHistory->setPreviousqty($stock->getQuantity());
+			 $stockHistory->setNewqty($quantity);
+			 $stockHistory->setDateadd(new \Datetime());
+			 $stockHistory->setDateupd(new \Datetime());
+			 $stockHistory->setActive(true);
+			 $stockHistory->setDeleted(false);
+			 $this->getDoctrine()->getManager()->persist($stockHistory);
+			 $stock->setQuantity($quantity);
+			 $this->getDoctrine()->getManager()->persist($stock);
+		 }
+		 $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getTransfersByStore.php?store='.$storeName.'&date='.$date);
+		 $objects=json_decode($json, true);
+		 $objects=$objects[0]["class"];
+		 foreach ($objects as $object){
+			 $product=$productRepository->findOneBy(["code"=>$object["code"]]);
+			 $productvariant=$productVariantRepository->findOneBy(["product"=>$product, "variant"=>null]);
+			 $stock=$stockRepository->findOneBy(["storelocation"=>$storeLocation, "productvariant"=>$productvariant]);
+			 if ($stock!=null){
+			 $quantity=$stock->getQuantity()+$object["stock"];
+			 $stockHistory=new ERPStocksHistory();
+			 $stockHistory->setProductVariant($productvariant);
+			 $stockHistory->setLocation($storeLocation);
+			 $stockHistory->setUser($user);
+			 $stockHistory->setPreviousqty($stock->getQuantity());
+			 $stockHistory->setNewqty($quantity);
+			 $stockHistory->setDateadd(new \Datetime());
+			 $stockHistory->setDateupd(new \Datetime());
+			 $stockHistory->setActive(true);
+			 $stockHistory->setDeleted(false);
+			 $this->getDoctrine()->getManager()->persist($stockHistory);
+			 $stock->setQuantity($quantity);
+			 $this->getDoctrine()->getManager()->persist($stock);}
+		 }
+
+		 $this->getDoctrine()->getManager()->flush();
+		 return new JsonResponse(["result"=>1, "text"=>"Se ha ajustado el stock"]);
+	 }
 
 }

@@ -23,7 +23,7 @@ use App\Modules\ERP\Entity\ERPStores;
 use App\Modules\ERP\Entity\ERPStoreLocations;
 use App\Modules\ERP\Entity\ERPStoresUsers;
 use App\Modules\ERP\Entity\ERPProducts;
-use App\Modules\ERP\Entity\ERPVariantsValues;
+use App\Modules\ERP\Entity\ERPVariants;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
@@ -228,7 +228,7 @@ class ERPStoreTicketsController extends Controller
 			 $storeticketsRepository=$this->getDoctrine()->getRepository(ERPStoreTickets::class);
 			 $salesticketsRepository=$this->getDoctrine()->getRepository(ERPSalesTickets::class);
 			 $productsRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
-			 $variantsRepository=$this->getDoctrine()->getRepository(ERPVariantsValues::class);
+			 $variantsRepository=$this->getDoctrine()->getRepository(ERPVariants::class);
 			 $storeticketsstatesRepository=$this->getDoctrine()->getRepository(ERPStoreTicketsStates::class);
 			 $storeticketsreasonsRepository=$this->getDoctrine()->getRepository(ERPStoreTicketsReasons::class);
 			 $storesRepository=$this->getDoctrine()->getRepository(ERPStores::class);

@@ -7,7 +7,7 @@ use \App\Modules\Globale\Entity\GlobaleUsers;
 use \App\Modules\ERP\Entity\ERPStoreTicketsReasons;
 use \App\Modules\ERP\Entity\ERPStoreTicketsStates;
 use \App\Modules\ERP\Entity\ERPProducts;
-use \App\Modules\ERP\Entity\ERPVariantsValues;
+use \App\Modules\ERP\Entity\ERPVariants;
 use \App\Modules\ERP\Entity\ERPStores;
 use \App\Modules\ERP\Entity\ERPStoreLocations;
 use \App\Modules\HR\Entity\HRDepartments;
@@ -56,7 +56,7 @@ class ERPStoreTickets
     private $product;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPVariantsValues")
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPVariants")
      */
     private $variant;
 
@@ -188,12 +188,12 @@ class ERPStoreTickets
         return $this;
     }
 
-    public function getVariant(): ?ERPVariantsValues
+    public function getVariant(): ?ERPVariants
     {
         return $this->variant;
     }
 
-    public function setVariant(?ERPVariantsValues $variant): self
+    public function setVariant(?ERPVariants $variant): self
     {
         $this->variant = $variant;
 

@@ -7,8 +7,10 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use App\Modules\Globale\Entity\GlobaleUsers;
-use App\Modules\ERP\Entity\ERPShoppingPrices;
 use App\Modules\ERP\Entity\ERPProducts;
+use App\Modules\ERP\Entity\ERPProductsVariants;
+use App\Modules\ERP\Entity\ERPProductsSuppliers;
+use App\Modules\ERP\Entity\ERPProductsSuppliersPrices;
 use App\Modules\Globale\Entity\GlobaleCompanies;
 
 
@@ -42,25 +44,32 @@ class Prices extends ContainerAwareCommand
   public function getNetPrices(InputInterface $input, OutputInterface $output){
     $repositoryProducts=$this->doctrine->getRepository(ERPProducts::class);
     $products=$repositoryProducts->findBy(["netprice"=>1, "deleted"=>0]);
-    $output->writeln('Añadiendo precios netos a la tabla ShoppingPrice....');
+    $output->writeln('Añadiendo precios netos a la tabla ProductsSuppliersPrices....');
     foreach ($products as $product) {
-      $repositoryShoppingPrices=$this->doctrine->getRepository(ERPShoppingPrices::class);
-      $shoppingPrices=$repositoryShoppingPrices->findOneBy(["product"=>$product, "supplier"=>$product->getSupplier(), "deleted"=>0, "active"=>1]);
-      if ($shoppingPrices==null and $product->getSupplier()!=null){
-        $output->writeln('Añadiendo el precio neto '.$product->getShoppingPrice().' al producto '.$product->getCode());
-        $obj = new ERPShoppingPrices();
-        $obj->setProduct($product);
-        $obj->setSupplier($product->getSupplier());
-        $obj->setQuantity(1);
-        $obj->setDateadd(new \Datetime());
-        $obj->setDateupd(new \Datetime());
-        $obj->setActive(1);
-        $obj->setDeleted(0);
-        $obj->setShoppingPrice($product->getShoppingPrice());
-        $this->doctrine->getManager()->merge($obj);
-        $this->doctrine->getManager()->flush();
+      $repositoryProductsVariants=$this->doctrine->getRepository(ERPProductsVariants::class);
+      $productvariant = $repositoryProductsVariants->findOneBy(["product"=>$product, "variant"=>null, "deleted"=>0, "active"=>1]);
+      if ($productvariant!=null){
+        $repositoryProductsSuppliers=$this->doctrine->getRepository(ERPProductsSuppliers::class);
+        $productsupplier = $repositoryProductsVariants->findOneBy(["productvariant"=>$productvariant, "supplier"=>$product->getSupplier(), "deleted"=>0, "active"=>1]);
+        if ($productsupplier!=null){
+          $repositoryProductsSuppliersPrices=$this->doctrine->getRepository(ERPProductsSuppliersPrices::class);
+          $productsupplierprice=$repositoryProductsSuppliersPrices->findOneBy(["productsupplier"=>$productsupplier, "deleted"=>0, "active"=>1]);
+          if ($productsupplierprice==null and $product->getSupplier()!=null){
+            $output->writeln('Añadiendo el precio neto '.$product->getShoppingPrice().' al producto '.$product->getCode());
+            $obj = new ERPProductsSuppliersPrices();
+            $obj->setProductSupplier($productsupplier);
+            $obj->setQuantity(1);
+            $obj->setDateadd(new \Datetime());
+            $obj->setDateupd(new \Datetime());
+            $obj->setActive(1);
+            $obj->setDeleted(0);
+            $obj->setPrice($product->getShoppingPrice());
+            $this->doctrine->getManager()->merge($obj);
+            $this->doctrine->getManager()->flush();
+          }
+          $this->doctrine->getManager()->clear();
+        }
       }
-      $this->doctrine->getManager()->clear();
     }
   }
 

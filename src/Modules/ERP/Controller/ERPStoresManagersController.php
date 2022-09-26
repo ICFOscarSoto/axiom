@@ -17,8 +17,6 @@ use App\Modules\ERP\Entity\ERPEAN13;
 use App\Modules\ERP\Entity\ERPReferences;
 use App\Modules\ERP\Entity\ERPProductsAttributes;
 use App\Modules\ERP\Entity\ERPManufacturers;
-use App\Modules\ERP\Entity\ERPStocks;
-use App\Modules\ERP\Entity\ERPStockHistory;
 use App\Modules\ERP\Entity\ERPStoreLocations;
 use App\Modules\ERP\Entity\ERPStores;
 use App\Modules\ERP\Entity\ERPStoresManagers;
@@ -40,7 +38,6 @@ use App\Modules\ERP\Utils\ERPStoresManagersProductsUtils;
 use App\Modules\ERP\Utils\ERPStoresManagersUsersUtils;
 use App\Modules\ERP\Utils\ERPEAN13Utils;
 use App\Modules\ERP\Utils\ERPReferencesUtils;
-use App\Modules\ERP\Utils\ERPStocksUtils;
 use App\Modules\ERP\Utils\ERPProductsAttributesUtils;
 use App\Modules\Security\Utils\SecurityUtils;
 use App\Modules\ERP\Reports\ERPEan13Reports;
@@ -67,7 +64,7 @@ class ERPStoresManagersController extends Controller
 			$template=dirname(__FILE__)."/../Forms/StoresManagers.json";
 			$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
 			$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
-			$breadcrumb=$menurepository->formatBreadcrumb('genericindex','HR','Meetings');
+			$breadcrumb=$menurepository->formatBreadcrumb('genericindex','ERP','StoresManagers');
 			array_push($breadcrumb, $new_breadcrumb);
 			$repository=$this->getDoctrine()->getRepository($this->class);
 
@@ -83,7 +80,7 @@ class ERPStoresManagersController extends Controller
 			/*$tabs=array_merge($tabs,[["name" => "ean13",  "icon"=>"fa fa-users", "caption"=>"EAN13", "route"=>$this->generateUrl("listEAN13",["id"=>$id])],
 			["name" => "references",  "icon"=>"fa fa-users", "caption"=>"References", "route"=>$this->generateUrl("listReferences",["id"=>$id])],
 			["name"=>  "productPrices", "icon"=>"fa fa-money", "caption"=>"Prices","route"=>$this->generateUrl("infoProductPrices",["id"=>$id])],
-			["name" => "stocks", "icon"=>"fa fa-id-card", "caption"=>"Stocks", "route"=>$this->generateUrl("infoStocks",["id"=>$id])],
+			["name" => "stocks", "icon"=>"fa fa-id-card", "caption"=>"Stocks", "route"=>$this->generateUrl("istocks",["id"=>$id])],
 			["name" => "files", "icon"=>"fa fa-cloud", "caption"=>"Files", "route"=>$this->generateUrl("cloudfiles",["id"=>$id, "path"=>"products"])]]);*/
 
 				return $this->render('@Globale/generictabform.html.twig', array(

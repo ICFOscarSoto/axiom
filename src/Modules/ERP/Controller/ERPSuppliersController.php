@@ -14,14 +14,13 @@ use App\Modules\ERP\Entity\ERPSuppliers;
 use App\Modules\ERP\Entity\ERPSupplierOrdersData;
 use App\Modules\ERP\Entity\ERPSupplierActivities;
 use App\Modules\ERP\Entity\ERPSupplierCommentLines;
-use App\Modules\ERP\Entity\ERPShoppingDiscounts;
+use App\Modules\ERP\Entity\ERPProductsSuppliersDiscounts;
 use App\Modules\Globale\Entity\GlobaleCountries;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\ERP\Utils\ERPSuppliersUtils;
 use App\Modules\ERP\Utils\ERPSupplierCommentLinesUtils;
-use App\Modules\ERP\Utils\ERPShoppingDiscountsUtils;
 use App\Modules\Security\Utils\SecurityUtils;
 
 class ERPSuppliersController extends Controller
@@ -121,7 +120,7 @@ class ERPSuppliersController extends Controller
 											/*	["name" => "addresses", "icon"=>"fa fa-location-arrow", "caption"=>"Shipping addresses", "route"=>$this->generateUrl("addresses",["id"=>$id, "type"=>"supplier"])],*/
 												["name" => "contacts",  "icon"=>"fa fa-users", "caption"=>"Contacts", "route"=>$this->generateUrl("generictablist",["function"=>"formatList","module"=>"ERP","name"=>"Contacts","id"=>$id])],
 												["name" => "bankaccounts", "icon"=>"fa fa-money", "caption"=>"Bank Accounts", "route"=>$this->generateUrl("bankaccounts",["id"=>$id])],
-												["name"=>"prices", "icon"=>"fa fa-money", "caption"=>"Shopping Discounts","route"=>$this->generateUrl("generictablist",["module"=>"ERP", "name"=>"ShoppingDiscounts", "id"=>$id])],
+												["name"=>"prices", "icon"=>"fa fa-money", "caption"=>"Shopping Discounts","route"=>$this->generateUrl("generictablist",["module"=>"ERP", "name"=>"productsuppliersdiscountss", "id"=>$id])],
 												["name"=>"increments", "icon"=>"fa fa-money", "caption"=>"Increments","route"=>$this->generateUrl("generictablist",["module"=>"ERP", "name"=>"Increments", "id"=>$id])],
 												["name" => "incidents", "icon"=>"fa fa-money", "caption"=>"Incidents", "route"=>$this->generateUrl("supplierincidents",["id"=>$id])],
 											],

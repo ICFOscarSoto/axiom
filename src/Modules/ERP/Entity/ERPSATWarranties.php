@@ -12,7 +12,7 @@ use \App\Modules\ERP\Entity\ERPStoreLocations;
 use \App\Modules\ERP\Entity\ERPSATWarrantiesStates;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
 use \App\Modules\ERP\Entity\ERPCustomers;
-use \App\Modules\ERP\Entity\ERPVariantsValues;
+use \App\Modules\ERP\Entity\ERPVariants;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPSATWarrantiesRepository")
@@ -116,7 +116,7 @@ class ERPSATWarranties
     private $customer;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPVariantsValues")
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPVariants")
      */
     private $variant;
 
@@ -331,12 +331,12 @@ class ERPSATWarranties
         return $this;
     }
 
-    public function getVariant(): ?ERPVariantsValues
+    public function getVariant(): ?ERPVariants
     {
         return $this->variant;
     }
 
-    public function setVariant(?ERPVariantsValues $variant): self
+    public function setVariant(?ERPVariants $variant): self
     {
         $this->variant = $variant;
 

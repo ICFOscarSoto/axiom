@@ -10,9 +10,9 @@ use \App\Modules\Globale\Entity\GlobaleUsers;
 use \App\Modules\ERP\Entity\ERPTypesMovements;
 
 /**
- * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPStockHistoryRepository")
+ * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPStocksHistoryRepository")
  */
-class ERPStockHistory
+class ERPStocksHistory
 {
     /**
      * @ORM\Id()
@@ -22,22 +22,11 @@ class ERPStockHistory
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPProducts")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $product;
-
-    /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPStoreLocations")
      * @ORM\JoinColumn(nullable=false)
      */
     private $location;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPStores")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $store;
 
     /**
      * @ORM\Column(type="float", nullable=true)
@@ -105,17 +94,6 @@ class ERPStockHistory
         return $this->id;
     }
 
-    public function getProduct(): ?ERPProducts
-    {
-        return $this->product;
-    }
-
-    public function setProduct(?ERPProducts $product): self
-    {
-        $this->product = $product;
-
-        return $this;
-    }
 
     public function getLocation(): ?ERPStoreLocations
     {
@@ -129,17 +107,6 @@ class ERPStockHistory
         return $this;
     }
 
-    public function getStore(): ?ERPStores
-    {
-        return $this->store;
-    }
-
-    public function setStore(?ERPStores $store): self
-    {
-        $this->store = $store;
-
-        return $this;
-    }
 
     public function getPreviousqty(): ?float
     {

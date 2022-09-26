@@ -2,25 +2,25 @@
 
 namespace App\Modules\ERP\Repository;
 
-use App\Modules\ERP\Entity\ERPStockHistory;
+use App\Modules\ERP\Entity\ERPStocksHistory;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
- * @method ERPStockHistory|null find($id, $lockMode = null, $lockVersion = null)
- * @method ERPStockHistory|null findOneBy(array $criteria, array $orderBy = null)
- * @method ERPStockHistory[]    findAll()
- * @method ERPStockHistory[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method ERPStocksHistory|null find($id, $lockMode = null, $lockVersion = null)
+ * @method ERPStocksHistory|null findOneBy(array $criteria, array $orderBy = null)
+ * @method ERPStocksHistory[]    findAll()
+ * @method ERPStocksHistory[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class ERPStockHistoryRepository extends ServiceEntityRepository
+class ERPStocksHistoryRepository extends ServiceEntityRepository
 {
     public function __construct(RegistryInterface $registry)
     {
-        parent::__construct($registry, ERPStockHistory::class);
+        parent::__construct($registry, ERPStocksHistory::class);
     }
 
     // /**
-    //  * @return ERPStockHistory[] Returns an array of ERPStockHistory objects
+    //  * @return ERPStocksHistory[] Returns an array of ERPStocksHistory objects
     //  */
     /*
     public function findByExampleField($value)
@@ -37,7 +37,7 @@ class ERPStockHistoryRepository extends ServiceEntityRepository
     */
 
     /*
-    public function findOneBySomeField($value): ?ERPStockHistory
+    public function findOneBySomeField($value): ?ERPStocksHistory
     {
         return $this->createQueryBuilder('e')
             ->andWhere('e.exampleField = :val')
@@ -52,13 +52,13 @@ class ERPStockHistoryRepository extends ServiceEntityRepository
       $query="SELECT h.id as id, pr.code as product_code,vv.name as variant_name, pr.name as product_name, strl.name as location,
                 str.name as store, CONCAT(u.name,' ',u.lastname) as user,
                 h.previousqty as prevqty, h.newqty as newqty, h.dateadd as dateadd, h.comment AS comment, t.name AS type, h.num_operation AS numOperation, h.quantity as quantity
-                FROM erpstock_history h
+                FROM erpstocks_history h
                 LEFT JOIN erpproducts pr
                 ON pr.id=h.product_id
                 LEFT JOIN erpproducts_variants pv
                 ON pv.id=h.productvariant_id
-                LEFT JOIN erpvariants_values vv
-                ON pv.variantvalue_id=vv.id
+                LEFT JOIN erpvariants vv
+                ON pv.variant_id=vv.id
                 LEFT JOIN erpstore_locations strl
                 ON strl.id=h.location_id
                 LEFT JOIN erpstores str
@@ -77,7 +77,7 @@ class ERPStockHistoryRepository extends ServiceEntityRepository
       $query="SELECT h.id as id, pr.code as product_code, pr.name as product_name, strl.name as location,
                 str.name as store, CONCAT(u.name,' ',u.lastname) as user,
                 h.previousqty as prevqty, h.newqty as newqty, h.dateadd as dateadd, h.comment AS comment, t.name AS type, h.num_operation AS numOperation, h.quantity as quantity
-                FROM erpstock_history h
+                FROM erpstocks_history h
                 LEFT JOIN erpproducts pr
                 ON pr.id=h.product_id
                 LEFT JOIN erpstore_locations strl

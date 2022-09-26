@@ -121,7 +121,7 @@ class ERPProductsVariantsController extends Controller
 
 
     //comprobamos si existe la variante en Prestashop
-    $xml_string_variant=file_get_contents($this_url."/api/product_option_values/?display=[id]&filter[name]=".$productsVariant->getVariantvalue()->getName(), false, $context);
+    $xml_string_variant=file_get_contents($this_url."/api/product_option_values/?display=[id]&filter[name]=".$productsVariant->getVariant()->getName(), false, $context);
     $xml_variant = simplexml_load_string($xml_string_variant, 'SimpleXMLElement', LIBXML_NOCDATA);
     $id_attribute=$xml_variant->product_option_values->product_option_value->id;
     //la variante sí que existe en prestashop, luego hay que comprobar si la combinación variante-producto también existe y borrarla

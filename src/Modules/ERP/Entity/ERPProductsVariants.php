@@ -4,7 +4,6 @@ namespace App\Modules\ERP\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\ERP\Entity\ERPProducts;
-use \App\Modules\ERP\Entity\ERPVariantsValues;
 use \App\Modules\ERP\Entity\ERPVariants;
 use \App\Modules\ERP\Utils\ERPPrestashopUtils;
 
@@ -27,16 +26,20 @@ class ERPProductsVariants
     private $product;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPVariantsValues")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPVariants")
+     * @ORM\JoinColumn(nullable=true)
      */
-    private $variantvalue;
+    private $variant;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPVariants")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\Column(type="float", nullable=true)
      */
-    private $variantname;
+    private $weight;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $purchasepacking;
 
     /**
      * @ORM\Column(type="boolean")
@@ -76,29 +79,18 @@ class ERPProductsVariants
         return $this;
     }
 
-    public function getVariantvalue(): ?ERPVariantsValues
+    public function getVariant(): ?ERPVariants
     {
-        return $this->variantvalue;
+        return $this->variant;
     }
 
-    public function setVariantvalue(?ERPVariantsValues $variantvalue): self
+    public function setVariant(?ERPVariants $variant): self
     {
-        $this->variantvalue = $variantvalue;
+        $this->variant = $variant;
 
         return $this;
     }
 
-    public function getVariantname(): ?ERPVariants
-    {
-        return $this->variantname;
-    }
-
-    public function setVariantname(?ERPVariants $variantname): self
-    {
-        $this->variantname = $variantname;
-
-        return $this;
-    }
 
     public function getActive(): ?bool
     {
@@ -148,13 +140,37 @@ class ERPProductsVariants
         return $this;
     }
 
+    public function getWeight(): ?float
+    {
+        return $this->weight;
+    }
+
+    public function setWeight(?float $weight): self
+    {
+        $this->weight = $weight;
+
+        return $this;
+    }
+
+    public function getPurchasepacking(): ?int
+    {
+        return $this->purchasepacking;
+    }
+
+    public function setPurchasepacking(?int $purchasepacking): self
+    {
+        $this->purchasepacking = $purchasepacking;
+
+        return $this;
+    }    
+
     public function postProccess($kernel, $doctrine, $user, $params, $oldobj){
 
 
       $array_new_data = [];
-      $array_new_data["variants"]["type"]=$this->getVariantname()->getName();
-      $array_new_data["variants"]["new"]=$this->getVariantvalue()->getName();
-      if($oldobj->getVariantvalue()) $array_new_data["variants"]["old"]=$oldobj->getVariantvalue()->getName();
+      $array_new_data["variants"]["type"]=$this->getVariant()->getVarianttype()->getName();
+      $array_new_data["variants"]["new"]=$this->getVariant()->getName();
+      if($oldobj->getVariant()) $array_new_data["variants"]["old"]=$oldobj->getVariant()->getName();
       else $array_new_data["variants"]["old"]=null;
 
       //dump($this);

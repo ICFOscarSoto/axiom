@@ -10,8 +10,7 @@ use App\Modules\Globale\Entity\GlobaleUsers;
 use App\Modules\ERP\Entity\ERPStoreLocations;
 use App\Modules\ERP\Entity\ERPProductsVariants;
 use App\Modules\ERP\Entity\ERPStocks;
-use App\Modules\ERP\Entity\ERPStockHistory;
-use App\Modules\ERP\Entity\ERPInfoStocks;
+use App\Modules\ERP\Entity\ERPStocksHistory;
 use App\Modules\ERP\Entity\ERPSalesTickets;
 use App\Modules\ERP\Entity\ERPStores;
 use App\Modules\ERP\Entity\ERPProducts;
@@ -41,8 +40,7 @@ class ImportStocks extends ContainerAwareCommand
         $locationsRepository=$doctrine->getRepository(ERPStoreLocations::class);
         $productsVariantsRepository=$doctrine->getRepository(ERPProductsVariants::class);
         $stocksRepository=$doctrine->getRepository(ERPStocks::class);
-        $stockHistoryRepository=$doctrine->getRepository(ERPStockHistory::class);
-        $infoStocksRepository=$doctrine->getRepository(ERPInfoStocks::class);
+        $stockHistoryRepository=$doctrine->getRepository(ERPStocksHistory::class);
         $storesRepository=$doctrine->getRepository(ERPStores::class);
         $productsRepository=$doctrine->getRepository(ERPProducts::class);
         $companiesrepository=$doctrine->getRepository(GlobaleCompanies::class);
@@ -103,9 +101,10 @@ class ImportStocks extends ContainerAwareCommand
             }
           }
           $variant=null;
-          if((isset($data[$map["variantname"]]) && $data[$map["variantname"]]!=null) || (isset($data[$map["variantvalue"]]) && $data[$map["variantvalue"]]!=null)){
-            //TODO: SELECT VARIANT
+          if(isset($data[$map["variantvalue"]]) && $data[$map["variantvalue"]]!=null){
+            $variant=$variantsRepository->find($data[$map["variantvalue"]]);
           }
+          $productvariant = $productsVariantsRepository->findOneBy(["product"=>$product, "variant"=>$variant, "deleted"=>0]);
 
           $store=$storesRepository->findOneBy(["code"=>$data[$map["store"]],"deleted"=>0]);
           if(!$store) {
@@ -120,12 +119,11 @@ class ImportStocks extends ContainerAwareCommand
           }
           $output->writeln('   -> '.$data[$map["sku"]]);
 
-          $stock=$stocksRepository->findOneBy(["product"=>$product, "productvariant"=>$variant, "storelocation"=>$location, "deleted"=>0]);
+          $stock=$stocksRepository->findOneBy(["productvariant"=>$productvariant, "storelocation"=>$location, "deleted"=>0]);
           if($map["qty"]!==false && $data[$map["qty"]]!=null){
             if(!$stock){
               $stock=new ERPStocks();
-              $stock->setProduct($product);
-              $stock->setProductvariant($variant);
+              $stock->setProductvariant($productvariant);
               $stock->setCompany($company);
               $stock->setStorelocation($location);
               $stock->setAuthor($user);
@@ -136,11 +134,9 @@ class ImportStocks extends ContainerAwareCommand
 
               if($stock->getQuantity()!=($data[$map["qty"]]*1)){
                 //Save Stock History
-                $stockHistory=new ERPStockHistory();
-                $stockHistory->setProduct($product);
-                $stockHistory->setProductvariant($variant);
+                $stockHistory=new ERPStocksHistory();
+                $stockHistory->setProductvariant($productvariant);
                 $stockHistory->setLocation($location);
-                $stockHistory->setStore($store);
                 $stockHistory->setUser($user);
                 $stockHistory->setPreviousqty($stock->getQuantity());
                 $stockHistory->setNewqty($data[$map["qty"]]*1);
@@ -155,30 +151,13 @@ class ImportStocks extends ContainerAwareCommand
             $stock->setQuantity($data[$map["qty"]]);
             $stock->setLastinventorydate(new \Datetime());
             $stock->setDateupd(new \Datetime());
+            if ($map["minstock"])
+              $stock->setMinstock($data[$map["minstock"]]?$data[$map["minstock"]]:0);
+            if ($map["maxstock"])
+            $stock->setMaxstock($data[$map["maxstock"]]?$data[$map["maxstock"]]:0);
             $doctrine->getManager()->persist($stock);
             $doctrine->getManager()->flush();
           }
-
-
-          //INFO Stock
-          if(!$map["minstock"] || !$map["maxstock"]) continue;
-          if(!((isset($data[$map["minstock"]]) && $data[$map["minstock"]]!=null) || (isset($data[$map["maxstock"]]) && $data[$map["maxstock"]]!=null))) continue;
-          $infoStocks=$infoStocksRepository->findOneBy(["product"=>$product,"productvariant"=>$variant,"store"=>$store, "deleted"=>0]);
-          if(!$infoStocks){
-            $infoStocks=new ERPInfoStocks();
-            $infoStocks->setProduct($product);
-            $infoStocks->setProductvariant($variant);
-            $infoStocks->setStore($store);
-            $infoStocks->setAuthor($user);
-            $infoStocks->setDateadd(new \Datetime());
-            $infoStocks->setActive(true);
-            $infoStocks->setDeleted(false);
-          }
-          $infoStocks->setMinimumQuantity($data[$map["minstock"]]?$data[$map["minstock"]]:0);
-          $infoStocks->setMaximunQuantity($data[$map["maxstock"]]?$data[$map["maxstock"]]:0);
-          $infoStocks->setDateupd(new \Datetime());
-          $doctrine->getManager()->persist($infoStocks);
-          $doctrine->getManager()->flush();
         }
 
 

@@ -217,9 +217,9 @@ class ERPStoreLocationsController extends Controller
 	 $result["storeName"]=$location->getStore()->getName();
 	 $result["inventory"]=[];
 	 foreach($products as $product){
-		 if($product->getProduct()->getActive() && !$product->getProduct()->getDeleted()){
-			 $result_product["id"]=$product->getProduct()->getId();
-			 $result_product["name"]=$product->getProduct()->getName();
+		 if($product->getProductVariant()->getProduct()->getActive() && !$product->getProductVariant()->getProduct()->getDeleted()){
+			 $result_product["id"]=$product->getProductVariant()->getProduct()->getId();
+			 $result_product["name"]=$product->getProductVariant()->getProduct()->getName();
 			 $result_product["quantity"]=$product->getQuantity();
 			 $result["inventory"][]=$result_product;
 		 }

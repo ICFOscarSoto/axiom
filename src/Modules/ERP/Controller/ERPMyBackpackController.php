@@ -10,8 +10,6 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
-use App\Modules\ERP\Entity\ERPStocks;
-use App\Modules\ERP\Entity\ERPStockHistory;
 use App\Modules\ERP\Entity\ERPStores;
 use App\Modules\ERP\Entity\ERPStoreLocations;
 use App\Modules\ERP\Entity\ERPStoresUsers;
@@ -22,7 +20,6 @@ use App\Modules\ERP\Entity\ERPProductsVariants;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
-use App\Modules\ERP\Utils\ERPStocksUtils;
 use App\Modules\Security\Utils\SecurityUtils;
 
 class ERPMyBackpackController extends Controller
@@ -41,7 +38,7 @@ class ERPMyBackpackController extends Controller
   		$locale = $request->getLocale();
   		$this->router = $router;
 
-			
+
 
   		return new Response('');
     }

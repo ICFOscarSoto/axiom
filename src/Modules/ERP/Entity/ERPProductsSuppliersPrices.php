@@ -3,16 +3,14 @@
 namespace App\Modules\ERP\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use \App\Modules\ERP\Entity\ERPProducts;
-use \App\Modules\ERP\Entity\ERPVariantsValues;
-use \App\Modules\ERP\Entity\ERPSuppliers;
+use \App\Modules\ERP\Entity\ERPProductsSuppliers;
 
 
 /**
- * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPShoppingPricesRepository")
+ * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPProductsSuppliersPricesRepository")
  */
 
-class ERPShoppingPrices
+class ERPProductsSuppliersPrices
 {
     /**
      * @ORM\Id()
@@ -22,22 +20,10 @@ class ERPShoppingPrices
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPProducts")
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPProductsSuppliers")
      * @ORM\JoinColumn(nullable=false, onDelete="Cascade")
      */
-    private $product;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPVariantsValues")
-     * @ORM\JoinColumn(nullable=true)
-     */
-    private $variant;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPSuppliers")
-     * @ORM\JoinColumn(nullable=false, onDelete="Cascade")
-     */
-    private $supplier;
+    private $productsupplier;
 
     /**
      * @ORM\Column(type="integer")
@@ -47,7 +33,7 @@ class ERPShoppingPrices
     /**
      * @ORM\Column(type="float", nullable=true)
      */
-    private $shopping_price;
+    private $price;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
@@ -89,38 +75,14 @@ class ERPShoppingPrices
         return $this->id;
     }
 
-    public function getProduct(): ?ERPProducts
+    public function getProductSupplier(): ?ERPProductsSuppliers
     {
-        return $this->product;
+        return $this->productsupplier;
     }
 
-    public function setProduct(?ERPProducts $product): self
+    public function setProductSupplier(?ERPProductsSuppliers $productsupplier): self
     {
-        $this->product = $product;
-
-        return $this;
-    }
-
-    public function getVariant(): ?ERPVariantsValues
-    {
-        return $this->variant;
-    }
-
-    public function setVariant(?ERPVariantsValues $variant): self
-    {
-        $this->variant = $variant;
-
-        return $this;
-    }
-
-    public function getSupplier(): ?ERPSuppliers
-    {
-        return $this->supplier;
-    }
-
-    public function setSupplier(?ERPSuppliers $supplier): self
-    {
-        $this->supplier = $supplier;
+        $this->productsupplier = $productsupplier;
 
         return $this;
     }
@@ -138,14 +100,14 @@ class ERPShoppingPrices
     }
 
 
-    public function getShoppingPrice(): ?float
+    public function getPrice(): ?float
     {
-        return $this->shopping_price;
+        return $this->price;
     }
 
-    public function setShoppingPrice(?float $shopping_price): self
+    public function setPrice(?float $price): self
     {
-        $this->shopping_price = $shopping_price;
+        $this->price = $price;
 
         return $this;
     }

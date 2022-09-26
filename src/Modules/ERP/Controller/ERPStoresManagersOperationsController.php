@@ -18,8 +18,7 @@ use App\Modules\ERP\Entity\ERPReferences;
 use App\Modules\ERP\Entity\ERPProductsAttributes;
 use App\Modules\ERP\Entity\ERPManufacturers;
 use App\Modules\ERP\Entity\ERPStocks;
-use App\Modules\ERP\Entity\ERPInfoStocks;
-use App\Modules\ERP\Entity\ERPStockHistory;
+use App\Modules\ERP\Entity\ERPStocksHistory;
 use App\Modules\ERP\Entity\ERPStoreLocations;
 use App\Modules\ERP\Entity\ERPStores;
 use App\Modules\ERP\Entity\ERPStoresManagers;
@@ -29,7 +28,7 @@ use App\Modules\ERP\Entity\ERPStoresManagersUsersStores;
 use App\Modules\ERP\Entity\ERPStoresUsers;
 use App\Modules\ERP\Entity\ERPCategories;
 use App\Modules\ERP\Entity\ERPProductsVariants;
-use App\Modules\ERP\Entity\ERPVariantsValues;
+use App\Modules\ERP\Entity\ERPVariants;
 use App\Modules\ERP\Entity\ERPStoresManagersOperations;
 use App\Modules\ERP\Entity\ERPStoresManagersOperationsLines;
 use App\Modules\ERP\Entity\ERPWorkList;
@@ -225,7 +224,6 @@ class ERPStoresManagersOperationsController extends Controller
 			$storeRepository=$this->getDoctrine()->getRepository(ERPStoresUsers::class);
 			$storeLocationsRepository=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
 			$stocksRepository=$this->getDoctrine()->getRepository(ERPStocks::class);
-			$infostocksRepository=$this->getDoctrine()->getRepository(ERPInfoStocks::class);
 			$productVariantRepository=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
 			$store=$storeRepository->findOneBy(["user"=>$this->getUser(),"preferential"=>1,"active"=>1,"deleted"=>0]);
 			if(!$store) return new JsonResponse(["result"=>-4, "text"=> "El usuario no tiene almacén preferente"]);
@@ -271,17 +269,15 @@ class ERPStoresManagersOperationsController extends Controller
 
 						$productvariant=null;
 						if($item->getVariant())
-							$productvariant=$productVariantRepository->findOneBy(["product"=>$item->getProduct(), "variantvalue"=>$item->getVariant(), "active"=>1, "deleted"=>0]);
+							$productvariant=$productVariantRepository->findOneBy(["product"=>$item->getProduct(), "variant"=>$item->getVariant(), "active"=>1, "deleted"=>0]);
 
-						$stock=$stocksRepository->findOneBy(["product"=>$item->getProduct(), "productvariant"=>$productvariant, "company"=>$this->getUser()->getCompany(), "storelocation"=>$location, "active"=>1, "deleted"=>0]);
+						$stock=$stocksRepository->findOneBy(["productvariant"=>$productvariant, "company"=>$this->getUser()->getCompany(), "storelocation"=>$location, "active"=>1, "deleted"=>0]);
 						if($stock) $stockQty=$stock->getQuantity();
 							else $stockQty=0;
 
 						$qty=-(int)$item->getQuantity();
-						$stockHistory=new ERPStockHistory();
-						$stockHistory->setProduct($item->getProduct());
+						$stockHistory=new ERPStocksHistory();
 						$stockHistory->setLocation($location);
-						$stockHistory->setStore($store->getStore());
 						$stockHistory->setUser($this->getUser());
 						$stockHistory->setQuantity($qty);
 						$stockHistory->setPreviousqty($stockQty);
@@ -304,7 +300,7 @@ class ERPStoresManagersOperationsController extends Controller
 						}else{
 								//Stocks doesnt exist, create it
 								$stock=new ERPStocks();
-								$stock->setProduct($item->getProduct());
+								$stock->setProductVariant($productvariant);
 								$stock->setCompany($this->getUser()->getCompany());
 								$stock->setStorelocation($location);
 								$stock->setQuantity(0-($item->getQuantity()));
@@ -319,19 +315,7 @@ class ERPStoresManagersOperationsController extends Controller
 
 
 
-						//Inform low Stock
-					/*	$infostock=$infostocksRepository->findOneBy(["product"=>$item->getProduct(), "store"=>$store->getStore(), "productvariant"=>$item->getVariant(),"active"=>1, "deleted"=>0]);
-						if($infostock){
-							if($infostock->getMinimumQuantity()>=$stock->getQuantity()){
-								//Inform to discotd channel
-								$manager=$consumer->getManager();
-								if($manager->getDiscordchannel()!=null){
-									$channel=$manager->getDiscordchannel();
-									$msg="Ref: **".$item->getProduct()->getCode()."** - ".$item->getProduct()->getName()." realizar traspaso a **".$store->getStore()->getName()."** - Cantidad: **".($infostock->getMaximunQuantity()-$stock->getQuantity()." unidades.**");
-									file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
-								}
-							}
-						} */
+
 					}
 
 					//Clear worklist
@@ -359,8 +343,10 @@ class ERPStoresManagersOperationsController extends Controller
 		 $location=$storeLocationsRepository->findOneBy(["store"=>$operation->getStore(), "company"=>$this->getUser()->getCompany(), "active"=>1,"deleted"=>0]);
 		 if(!$location) return new JsonResponse(["result"=>-4, "text"=> "No existen ubicación en el almacén gestor"]);
 		 $operationsLines=$documentLinesRepository->findBy(["operation"=>$operation, "deleted"=>0]);
+		 $productVariantRepository=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
 		 foreach($operationsLines as $line){
-			 $stock=$stocksRepository->findOneBy(["product"=>$line->getProduct(), "productvariant"=>$line->getVariant(), "company"=>$this->getUser()->getCompany(), "storelocation"=>$location, "active"=>1, "deleted"=>0]);
+			 $productvariant = $productVariantRepository->findOneBy(["product"=>$line->getProduct(), "variant"=>$line->getVariant(), "active"=>1,"deleted"=>0]);
+			 $stock=$stocksRepository->findOneBy(["productvariant"=>$productvariant, "company"=>$this->getUser()->getCompany(), "storelocation"=>$location, "active"=>1, "deleted"=>0]);
 			 if(!$stock) continue;
 			 $stock->setQuantity($stock->getQuantity()+($line->getQuantity()));
 			 $this->getDoctrine()->getManager()->persist($stock);
@@ -378,7 +364,7 @@ class ERPStoresManagersOperationsController extends Controller
 			$operationsRepository=$this->getDoctrine()->getRepository(ERPStoresManagersOperations::class);
 			$productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
 			$productVariantRepository=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
-			$variantValuesRepository=$this->getDoctrine()->getRepository(ERPVariantsValues::class);
+			$variantRepository=$this->getDoctrine()->getRepository(ERPVariants::class);
 			$ids=$request->query->get('ids');
 
 			//$ids=explode(",",$ids);
@@ -405,10 +391,10 @@ class ERPStoresManagersOperationsController extends Controller
 							 $product=$productRepository->findOneBy(["id"=>$line["id"], "company"=> $this->getUser()->getCompany(),"deleted"=>0]);
 							 if(!$product) $barcode='P.'.str_pad($line["id"],8,'0', STR_PAD_LEFT);
 							 else{
-								 $variantValue=$variantValuesRepository->findOneBy(["id"=>$line["variant_id"], "deleted"=>0]);
-								 if(!$variantValue) $barcode='P.'.str_pad($line["id"],8,'0', STR_PAD_LEFT);
+								 $variant=$variantRepository->findOneBy(["id"=>$line["variant_id"], "deleted"=>0]);
+								 if(!$variant) $barcode='P.'.str_pad($line["id"],8,'0', STR_PAD_LEFT);
 								 else{
-							 		$variant=$productVariantRepository->findOneBy(["product"=>$product, "variantvalue"=> $variantValue, "deleted"=>0]);
+							 		$variant=$productVariantRepository->findOneBy(["product"=>$product, "variant"=> $variant, "deleted"=>0]);
 									if(!$variant) $barcode='P.'.str_pad($line["id"],8,'0', STR_PAD_LEFT);
 									else $barcode='V.'.str_pad($variant->getId(),8,'0', STR_PAD_LEFT);
 								}
@@ -451,6 +437,7 @@ class ERPStoresManagersOperationsController extends Controller
 
 			 $storesmanagersusersstoresRepository=$this->getDoctrine()->getRepository(ERPStoresManagersUsersStores::class);
 			 $store_objects=$storesmanagersusersstoresRepository->findBy(["manageruser"=>$storemanageruser,"active"=>1,"deleted"=>0]);
+dump($store_objects);
 			 $stores=[];
 			 $option=null;
 			 $option["id"]=null;
@@ -499,7 +486,7 @@ class ERPStoresManagersOperationsController extends Controller
 		/**
 		 * @Route("/{_locale}/erp/storesmanagers/operations/localreports", name="storesManagersOperationsLocalReports")
 		 */
-		 public function storesManagersOperationsLocalReports(RouterInterface $router, Request $request)
+		 /*public function storesManagersOperationsLocalReports(RouterInterface $router, Request $request)
 		 {
 
 			 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
@@ -564,6 +551,83 @@ class ERPStoresManagersOperationsController extends Controller
 						 'detailedconsumerlist'=>	$listOperationsLinesReports->formatConsumersReportsDetailedList(null,null,null,null),
 						 'detailedproductlist'=>	$listOperationsLinesReports->formatProductsReportsDetailedList(null,null,null,null)
 
+						 ]);
+				 }
+				 return new RedirectResponse($this->router->generate('app_login'));
+		}*/
+
+
+		/**
+		 * @Route("/{_locale}/erp/storesmanagers/operations/localreports", name="storesManagersOperationsLocalReports")
+		 */
+		 public function storesManagersOperationsLocalReports(RouterInterface $router, Request $request)
+		 {
+
+			 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			 if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
+			 $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
+			 $userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
+			 $locale = $request->getLocale();
+			 $this->router = $router;
+
+			 $id=null;
+			 $storemanageruser=null;
+			 $storeManagersUsersRepository=$this->getDoctrine()->getRepository(ERPStoresManagersUsers::class);
+			 $storemanageruser=$storeManagersUsersRepository->findOneBy(["user"=>$this->getUser(), "isadmin"=>1]);
+			 if(!$storemanageruser)		 return new RedirectResponse($this->router->generate('app_login'));
+			 else $id=$storemanageruser->getManager()->getId();
+			 $new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-plus"];
+			 $breadcrumb=$menurepository->formatBreadcrumb('genericindex','ERP','StoresManagesOperations');
+			 array_push($breadcrumb,$new_breadcrumb);
+
+			 $storesmanagersusersstoresRepository=$this->getDoctrine()->getRepository(ERPStoresManagersUsersStores::class);
+			 $store_objects=$storesmanagersusersstoresRepository->findBy(["manageruser"=>$storemanageruser,"active"=>1,"deleted"=>0]);
+
+			 // Almacenes para este gestor y usuario
+			 $stores=[];
+			 $option=null;
+			 $option["id"]=null;
+			 $option["text"]="Selecciona Almacén...";
+			 $stores[]=$option;
+			 $option=null;
+			 $option["id"]=-1;
+			 $option["text"]="Todos los almacenes";
+			 $stores[]=$option;
+			 foreach($store_objects as $item){
+				 $option["id"]=$item->getStore()->getId();
+				 $option["text"]=$item->getName();
+				 $stores[]=$option;
+			 }
+
+			 $listConsumersOperationsReports = new ERPStoresManagersOperationsUtils();
+			 $listOperationsLinesReports = new ERPStoresManagersOperationsLinesUtils();
+			 $listOperationsReports = new ERPStoresManagersOperationsUtils();
+
+			 $today=new \Datetime('NOW');
+			 $consumeroperationslist=$this->createConsumerOperationsList($id);
+			 $productslist=$this->createProductsList($id);
+
+			 //$listConsumersOperationsDetailsReports = new ERPStoresManagersOperationsLinesUtils();
+			 if ($this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+					 return $this->render('@ERP/storesmanagersoperationslocalreportsn.html.twig', [
+						 'controllerName' => 'storesManagersOperationsController',
+						 'form' => 'StoresManagersOperationsLocal',
+						 'interfaceName' => 'Informe de gestores',
+						 'optionSelected' => 'genericindex',
+						 'optionSelectedParams' => ["module"=>"ERP", "name"=>"StoresManagersOperationsReports"],
+						 'menuOptions' =>  $menurepository->formatOptions($userdata),
+						 'breadcrumb' =>  $breadcrumb,
+						 'userData' => $userdata,
+						 'id' => $id,
+						 'stores' => $stores,
+						 'token' => uniqid('sign_').time(),
+						 'datefrom' =>null,
+						 'dateto' => $today->format('d/m/Y'),
+						 'consumersoperationslist' => $consumeroperationslist,
+						 'productslist' => $productslist,
+						 'operationslist' => $listOperationsReports->formatCustomizedOperationsList($id,null,null,null),
+						 'detailedconsumerlist'=>	$listOperationsLinesReports->formatConsumersReportsDetailedList(null,null,null,null),
+						 'detailedproductlist'=>	$listOperationsLinesReports->formatProductsReportsDetailedList(null,null,null,null)
 						 ]);
 				 }
 				 return new RedirectResponse($this->router->generate('app_login'));

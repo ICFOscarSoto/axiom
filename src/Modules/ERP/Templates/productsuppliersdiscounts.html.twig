@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<meta name="description" content="Axiom Business Management" />
 	<meta name="author" content="" />
-	
+
 	{{ include('@Globale/header.html.twig') }}
 	<!-- Imported styles on this page -->
 <!--	<link rel="stylesheet" href="{{ url('index') }}css/bootstrap-grid.css"> -->
@@ -114,7 +114,7 @@
 				$('body').on('click',"#submit-file", function(){
 					var formData = new FormData(document.getElementById('data'));
 					$.ajax({
-							url: "/api/cloud/files/shoppingDiscount/0/upload/shoppingDiscount",
+							url: "/api/cloud/files/productsuppliersdiscounts/0/upload/productsuppliersdiscounts",
 							type: 'POST',
 							data: formData,
 							async: false,
@@ -141,7 +141,7 @@
 															if (document.getElementById(new_id).value==document.getElementById(old_id).textContent) document.getElementById(obj['id']).style="color:#0087FF";
 															else if (document.getElementById(new_id).value<=document.getElementById(old_id).textContent)	document.getElementById(obj['id']).style="color:#FF0000";
 															else if (document.getElementById(new_id).value>=document.getElementById(old_id).textContent)	document.getElementById(obj['id']).style="color:#0DB400";
-													}									
+													}
 												}
 										  }
 										}
@@ -190,7 +190,7 @@
 				 dataType: "json",
 				 data: JSON.stringify(data),
 				 async: false,
-				 url: "/api/ERP/shoppingDiscounts/readcsv",
+				 url: "/api/ERP/productsuppliersdiscounts/readcsv",
 			 }).done(function(data, textStatus, jqXHR) {
 				 if((--load_wait)==0) $("#load-spinner").fadeOut();
 				 if(data.result>0) {
@@ -240,7 +240,7 @@
 				 type: "POST",
 				 dataType: "json",
 				 data: JSON.stringify(data),
-	       url: "/api/ERP/shoppingDiscounts/save",
+	       url: "/api/ERP/productsuppliersdiscounts/save",
 			 }).done(function(data, textStatus, jqXHR) {
 				 if((--load_wait)==0) $("#load-spinner").fadeOut();
 				 if(data.result>0) toastr.success("Datos guardados correctamente", "Confirmación", confirmation);
@@ -255,7 +255,7 @@
 				 type: "POST",
 				 dataType: "json",
 				 data: JSON.stringify(data),
-				 url: "/api/ERP/shoppingDiscounts/save",
+				 url: "/api/ERP/productsuppliersdiscounts/save",
 			 }).done(function(data, textStatus, jqXHR) {
 				 if((--load_wait)==0) $("#load-spinner").fadeOut();
 				 if(data.result>0) toastr.success("Datos guardados correctamente ", "Confirmación", confirmation);

@@ -9,7 +9,6 @@ use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\Email\Entity\EmailAccounts;
-use App\Modules\ERP\Entity\ERPShoppingDiscounts;
 use App\Modules\ERP\Entity\ERPProducts;
 use App\Modules\Security\Utils\SecurityUtils;
 

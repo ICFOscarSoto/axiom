@@ -22,7 +22,7 @@ use App\Modules\ERP\Entity\ERPSeries;
 use App\Modules\ERP\Entity\ERPProducts;
 use App\Modules\ERP\Entity\ERPEAN13;
 use App\Modules\ERP\Entity\ERPProductsVariants;
-use App\Modules\ERP\Entity\ERPVariantsValues;
+use App\Modules\ERP\Entity\ERPVariants;
 use App\Modules\ERP\Entity\ERPWorkList;
 use App\Modules\ERP\Entity\ERPStores;
 use App\Modules\ERP\Entity\ERPStoresUsers;
@@ -127,7 +127,7 @@ class ERPWorkListController extends Controller
     $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
     $worklistRepository=$this->getDoctrine()->getRepository(ERPWorkList::class);
     $productsRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
-		$variantsRepository=$this->getDoctrine()->getRepository(ERPVariantsValues::class);
+		$variantsRepository=$this->getDoctrine()->getRepository(ERPVariants::class);
 		$productsVariantsRepository=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
 		$storesRepository=$this->getDoctrine()->getRepository(ERPStores::class);
 		$storeLocationsRepository=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
@@ -153,7 +153,7 @@ class ERPWorkListController extends Controller
 					$line=$worklistRepository->findOneBy(["product"=>$product,"user"=>$this->getUser(),"variant"=>$variant,"deleted"=>0]);
 				}elseif(isset($value->variant_id) AND $value->variant_id!="-1"){
 					$product_variant=$productsVariantsRepository->findOneBy(["id"=>$value->variant_id,"deleted"=>0]);
-					$variant=$product_variant->getVariantvalue();
+					$variant=$product_variant->getVariant();
 					$line=$worklistRepository->findOneBy(["product"=>$product,"user"=>$this->getUser(),"variant"=>$variant,"deleted"=>0]);
 				}else{
 	      	$line=$worklistRepository->findOneBy(["product"=>$product,"user"=>$this->getUser(),"deleted"=>0]);
@@ -178,7 +178,7 @@ class ERPWorkListController extends Controller
 						  $line->setVariant($variant);
 					 }elseif(isset($value->variant_id) AND $value->variant_id!="-1"){
 	 					$product_variant=$productsVariantsRepository->findOneBy(["id"=>$value->variant_id,"deleted"=>0]);
-	 					$variant=$product_variant->getVariantvalue();
+	 					$variant=$product_variant->getVariant();
 	 					$line->setVariant($variant);
 					}
 					 if(isset($value->store)){
@@ -209,12 +209,12 @@ class ERPWorkListController extends Controller
 					$product_item["quantity"]=$line->getQuantity();
 
 					$stock_items=[];
-					$stocks=$Stocksrepository->findBy(["product"=>$product, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
+					$stocks=$Stocksrepository->findBy(["productvariant"=>$product_variant, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
 					foreach($stocks as $stock){
 						$storeUser=$StoreUsersrepository->findOneBy(["user"=>$this->getUser(), "store"=>$stock->getStorelocation()->getStore(), "active"=>1, "deleted"=>0]);
 						if($storeUser){
 							$stock_item["id"]=$stock->getId();
-							$stock_item["variant_id"]=!$stock->getProductvariant()?0:$stock->getProductvariant()->getId();
+							$stock_item["variant_id"]=!$stock->getProductVariant()?0:$stock->getProductVariant()->getId();
 							$stock_item["warehouse_code"]=$stock->getStorelocation()->getStore()->getCode();
 							$stock_item["warehouse"]=$stock->getStorelocation()->getStore()->getName();
 							$stock_item["warehouse_id"]=$stock->getStorelocation()->getStore()->getId();
@@ -260,7 +260,7 @@ class ERPWorkListController extends Controller
 	$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 	$stocksRepository=$this->getDoctrine()->getRepository(ERPStocks::class);
   $productsRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
-	$variantsRepository=$this->getDoctrine()->getRepository(ERPVariantsValues::class);
+	$variantsRepository=$this->getDoctrine()->getRepository(ERPVariants::class);
 	$product_object=$productsRepository->findOneBy(["code"=>$product]);
 	if($variant!=0 AND $variant!="-1")
 	{
@@ -270,7 +270,6 @@ class ERPWorkListController extends Controller
 	}
 	else {
 		$storeLocations=$stocksRepository->findLocationsByStoreProduct($store, $product_object->getId(),null);
-
 	}
 
 	$response=Array();
@@ -328,7 +327,7 @@ public function getWorkListProducts(Request $request){
 		$variant=null;
 		$obj=$item->getProduct();
 		if($item->getVariant()!==null){
-			$variant=$Variantsrepository->findOneBy(["variantvalue"=>$item->getVariant(), "product"=>$item->getProduct()]);
+			$variant=$Variantsrepository->findOneBy(["variant"=>$item->getVariant(), "product"=>$item->getProduct()]);
 		}
 		//$stocks=$Stocksrepository->findBy(["product"=>$obj, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
 		$eans=$EAN13repository->findBy(["product"=>$obj, "productvariant"=>$variant?$variant:null, "active"=>1, "deleted"=>0]);
@@ -336,19 +335,19 @@ public function getWorkListProducts(Request $request){
 		$result_prod["id_product"]=$obj->getId();
 		$result_prod["code"]=$obj->getCode();
 		$result_prod["variant_id"]=$variant?$variant->getId():0;
-		$result_prod["variant_name"]=$variant?$variant->getVariantname()->getName():"";
-		$result_prod["variant_value"]=$variant?$variant->getVariantvalue()->getName():"";
+		$result_prod["variant_name"]=$variant?$variant->getVariant()->getVarianttype()->getName():"";
+		$result_prod["variant_value"]=$variant?$variant->getVariant()->getName():"";
 		$result_prod["variant_active"]=$variant?$variant->getActive():true;
 		$result_prod["quantity"]=$item->getQuantity();
 
 
 		$stock_items=[];
-		$stocks=$Stocksrepository->findBy(["product"=>$obj, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
+		$stocks=$Stocksrepository->findBy(["productvariant"=>$variant, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
 		foreach($stocks as $stock){
 			$storeUser=$StoreUsersrepository->findOneBy(["user"=>$this->getUser(), "store"=>$stock->getStorelocation()->getStore(), "active"=>1, "deleted"=>0]);
 			if($storeUser){
 				$stock_item["id"]=$stock->getId();
-				$stock_item["variant_id"]=!$stock->getProductvariant()?0:$stock->getProductvariant()->getId();
+				$stock_item["variant_id"]=!$stock->getProductVariant()?0:$stock->getProductVariant()->getId();
 				$stock_item["warehouse_code"]=$stock->getStorelocation()->getStore()->getCode();
 				$stock_item["warehouse"]=$stock->getStorelocation()->getStore()->getName();
 				$stock_item["warehouse_id"]=$stock->getStorelocation()->getStore()->getId();

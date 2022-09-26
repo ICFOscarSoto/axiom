@@ -5,7 +5,7 @@ namespace App\Modules\ERP\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\Globale\Entity\GlobaleUsers;
 use \App\Modules\ERP\Entity\ERPProducts;
-use \App\Modules\ERP\Entity\ERPVariantsValues;
+use \App\Modules\ERP\Entity\ERPVariants;
 use \App\Modules\ERP\Entity\ERPPurchasesDemandsReasons;
 use \App\Modules\ERP\Entity\ERPSuppliers;
 /**
@@ -69,7 +69,7 @@ class ERPPurchasesDemands
     private $deleted;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPVariantsValues")
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPVariants")
      */
     private $variant;
 
@@ -198,12 +198,12 @@ class ERPPurchasesDemands
         return $this;
     }
 
-    public function getVariant(): ?ERPVariantsValues
+    public function getVariant(): ?ERPVariants
     {
         return $this->variant;
     }
 
-    public function setVariant(?ERPVariantsValues $variant): self
+    public function setVariant(?ERPVariants $variant): self
     {
         $this->variant = $variant;
 

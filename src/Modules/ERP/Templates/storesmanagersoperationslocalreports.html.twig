@@ -6,7 +6,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<meta name="description" content="Axiom Business Management" />
 	<meta name="author" content="" />
-	
+
 	{{ include('@Globale/header.html.twig') }}
   <script src="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker-es.js"></script>
   <link rel="stylesheet" href="{{ url('index') }}js/rickshaw/rickshaw.min.css">
@@ -36,12 +36,18 @@
         <div class="row">
 					<div class="col-md-2">
 				    <div class="form-group">
-				      <input type="text" id="date-from" name="form[from]" class="datepicker form-control"  placeholder="Fecha de inicio..." value="{{ datefrom }}">
+							<div class="input-group">
+								<span class="input-group-addon"><i class="fa fa-calendar" aria-hidden="true"></i></span>
+					      <input type="text" id="date-from" style="z-index:99 !important;" name="form[from]" class="datepicker form-control"  placeholder="Fecha de inicio..." value="{{ datefrom }}">
+							</div>
 				    </div>
 				  </div>
 				  <div class="col-md-2">
 				    <div class="form-group">
-				      <input type="text" id="date-to" name="form[to]" class="datepicker form-control" placeholder="Fecha de fin..." value="{{ dateto }}">
+							<div class="input-group">
+								<span class="input-group-addon"><i class="fa fa-calendar" aria-hidden="true"></i></span>
+					      <input type="text" id="date-to" style="z-index:99 !important;" name="form[to]" class="datepicker form-control" placeholder="Fecha de fin..." value="{{ dateto }}">
+							</div>
 				    </div>
 				  </div>
 					<div class="col-md-3">
@@ -56,7 +62,6 @@
 				  <div class="col-md-3">
 				    <div class="form-group">
 				      <button id="get-reports" type="button" class="btn btn-default btn-icon icon-left" onclick="getData();">Actualizar informes<i class="fa fa-sync"></i></button>
-						<!--	<button id="send-reports" type="button" class="btn btn-default btn-icon icon-left">Enviar<i class="fa fa-envelope" aria-hidden="true"></i></button> -->
 				    </div>
 				  </div>
 				</div>

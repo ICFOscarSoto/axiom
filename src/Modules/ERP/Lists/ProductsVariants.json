@@ -8,12 +8,12 @@
         "caption": "product"
     },
     {
-        "name": "variantvalue__name",
-        "caption": "variantvalue"
+        "name": "variant__name",
+        "caption": "variant"
     },
     {
-        "name": "variantname__name",
-        "caption": "variantname"
+        "name": "varianttype__name",
+        "caption": "varianttype"
     },
     {
         "name": "active",

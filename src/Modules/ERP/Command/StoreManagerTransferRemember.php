@@ -9,10 +9,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 use App\Modules\Globale\Entity\GlobaleUsers;
 use App\Modules\ERP\Entity\ERPStoreLocations;
 use App\Modules\ERP\Entity\ERPProductsVariants;
-use App\Modules\ERP\Entity\ERPVariantsValues;
+use App\Modules\ERP\Entity\ERPVariants;
 use App\Modules\ERP\Entity\ERPStocks;
-use App\Modules\ERP\Entity\ERPStockHistory;
-use App\Modules\ERP\Entity\ERPInfoStocks;
 use App\Modules\ERP\Entity\ERPSalesTickets;
 use App\Modules\ERP\Entity\ERPStores;
 use App\Modules\ERP\Entity\ERPProducts;
@@ -39,11 +37,10 @@ class StoreManagerTransferRemember extends ContainerAwareCommand
         $usersRepository=$doctrine->getRepository(GlobaleUsers::class);
         $locationsRepository=$doctrine->getRepository(ERPStoreLocations::class);
         $productsVariantsRepository=$doctrine->getRepository(ERPProductsVariants::class);
-        $variantsValuesRepository=$doctrine->getRepository(ERPVariantsValues::class);
+        $variantsRepository=$doctrine->getRepository(ERPVariants::class);
         $stocksRepository=$doctrine->getRepository(ERPStocks::class);
-        $stockHistoryRepository=$doctrine->getRepository(ERPStockHistory::class);
-        $infoStocksRepository=$doctrine->getRepository(ERPInfoStocks::class);
         $storesRepository=$doctrine->getRepository(ERPStores::class);
+        $storeLocationsRepository=$doctrine->getRepository(ERPStoreLocations::class);
         $productsRepository=$doctrine->getRepository(ERPProducts::class);
         $companiesrepository=$doctrine->getRepository(GlobaleCompanies::class);
         $managerepository=$doctrine->getRepository(ERPStoresManagers::class);
@@ -63,29 +60,8 @@ class StoreManagerTransferRemember extends ContainerAwareCommand
         if(!$store) {
           die(' - Gestor no encontrado');
         }
-       /*$info_stocks=$infoStocksRepository->findBy(["store"=>$store, "active"=>1, "deleted"=>0]);
-        foreach($info_stocks as $infostock){
-            $location=$locationsRepository->findOneBy(["name"=>$store->getCode(), "active"=>1, "deleted"=>0]);
-            if(!$location) {
-              die(' - Ubicación no encontrada');
-            }
-            $stock=$stocksRepository->findOneBy(["product"=>$infostock->getProduct(), "productvariant"=>$infostock->getProductvariant(), "storelocation"=>$location, "active"=>1, "deleted"=>0]);
-            if(!$location) {
-                $output->writeln(' - Stock no encontrado');
-                continue;
-            }
-            if($infostock->getMinimumQuantity()>=$stock->getQuantity()){
-              //Inform to discotd channel
-              if($manager->getDiscordchannel()!=null){
-                $channel=$manager->getDiscordchannel();
-                $msg="Ref: **".$infostock->getProduct()->getCode()."** - ".$infostock->getProduct()->getName()." realizar traspaso a **".$store->getName()."** - Cantidad: **".($infostock->getMaximunQuantity()-$stock->getQuantity()." unidades.**");
-                file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
-              }
-            }
-        }*/
 
-
-        $info_stocks=$infoStocksRepository->getMinimum($store);
+        $stocks=$stocksRepository->getMinimum($store);
         if($manager->getDiscordchannel()!=null){
           $channel=$manager->getDiscordchannel();
           $msg="**** ------------------ Los siguientes traspasos son al almacén ** ".$store->getName()." ------------------ ****";
@@ -93,34 +69,41 @@ class StoreManagerTransferRemember extends ContainerAwareCommand
           sleep(1);
         }
 
-        foreach($info_stocks as $infostock){
+        foreach($stocks as $stock){
           //solo mandamos la información de la talla, no del producto agrupado
-          if($infostock["grouped"]=="1"){
-              if($infostock["variant_name"]!=NULL){
-                $product=$productsRepository->findOneBy(["id"=>$infostock["product_id"]]);
-                $variantvalue=$variantsValuesRepository->findOneBy(["name"=>$infostock["variant_name"]]);
-                $productvariant=$productsVariantsRepository->findOneBy(["product"=>$product,"variantvalue"=>$variantvalue]);
-                $info=$infoStocksRepository->findOneBy(["product"=>$infostock["product_id"], "productvariant"=>$productvariant, "store"=>$store->getId()]);
-                $minQuantity=$info->getMinimumQuantity();
-                if($infostock["quantity"]<$minQuantity){
-                  if($manager->getDiscordchannel()!=null){
-                    $channel=$manager->getDiscordchannel();
-                    $msg="Ref: **".$product->getCode()."** - ".$product->getName()." - Talla: ".$infostock["variant_name"]." realizar traspaso a **".$store->getName()."** - Cantidad: **".($info->getMaximunQuantity()-$infostock["quantity"]." unidades.**");
-                    file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
-                    sleep(1);
+          if($stock["grouped"]=="1"){
+              if($stock["variant_name"]!=NULL){
+                $product=$productsRepository->findOneBy(["id"=>$stock["product_id"]]);
+                $variant=$variantsRepository->findOneBy(["name"=>$stock["variant_name"]]);
+                $productvariant=$productsVariantsRepository->findOneBy(["product"=>$product,"variant"=>$variant]);
+                $storelocation=$storeLocationsRepository->findOneBy(["store"=>$store]);
+                foreach($storelocation as $location){
+                  $istock=$stocksRepository->findOneBy(["productvariant"=>$productvariant, "storelocation"=>$location]);
+                  $minstock=$istock->getMinimumQuantity();
+                  if($stock["quantity"]<$minstock){
+                    if($manager->getDiscordchannel()!=null){
+                      $channel=$manager->getDiscordchannel();
+                      $msg="Ref: **".$product->getCode()."** - ".$product->getName()." - Talla: ".$stock["variant_name"]." realizar traspaso a **".$store->getName()."** - Cantidad: **".($istock->getMaxstock()-$stock["quantity"]." unidades.**");
+                      file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
+                      sleep(1);
+                    }
                   }
                 }
               }
 
           }
           else{
-            $product=$productsRepository->findOneBy(["id"=>$infostock["product_id"]]);
-            $info=$infoStocksRepository->findOneBy(["product"=>$infostock["product_id"], "store"=>$store->getId()]);
-            if($manager->getDiscordchannel()!=null){
-              $channel=$manager->getDiscordchannel();
-              $msg="Ref: **".$product->getCode()."** - ".$product->getName()." realizar traspaso a **".$store->getName()."** - Cantidad: **".($info->getMaximunQuantity()-$infostock["quantity"]." unidades.**");
-              file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
-              sleep(1);
+            $product=$productsRepository->findOneBy(["id"=>$stock["product_id"]]);
+            $productvariant=$productsVariantsRepository->findOneBy(["product"=>$product,"variant"=>null]);
+            $storelocation=$storeLocationsRepository->findOneBy(["store"=>$store]);
+            foreach($storelocation as $location){
+              $istock=$stocksRepository->findOneBy(["productvariant"=>$productvariant, "storelocation"=>$location]);
+              if($manager->getDiscordchannel()!=null){
+                $channel=$manager->getDiscordchannel();
+                $msg="Ref: **".$product->getCode()."** - ".$product->getName()." realizar traspaso a **".$store->getName()."** - Cantidad: **".($istock->getMaxstock()-$stock["quantity"]." unidades.**");
+                file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
+                sleep(1);
+              }
             }
 
           }

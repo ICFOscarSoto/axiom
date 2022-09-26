@@ -15,7 +15,7 @@ use App\Modules\ERP\Entity\ERPManufacturers;
 use App\Modules\ERP\Entity\ERPProductPrices;
 use App\Modules\ERP\Entity\ERPEAN13;
 use App\Modules\ERP\Entity\ERPReferences;
-use App\Modules\ERP\Entity\ERPShoppingDiscounts;
+use App\Modules\ERP\Entity\ERPProductsSuppliersDiscounts;
 use App\Modules\ERP\Entity\ERPStocks;
 use App\Modules\ERP\Entity\ERPStores;
 use App\Modules\ERP\Entity\ERPStoreLocations;
@@ -23,10 +23,10 @@ use App\Modules\ERP\Entity\ERPIncrements;
 use App\Modules\ERP\Entity\ERPOfferPrices;
 use App\Modules\ERP\Entity\ERPCustomerIncrements;
 use App\Modules\ERP\Entity\ERPCustomerPrices;
+use App\Modules\ERP\Entity\ERPVariantsTypes;
 use App\Modules\ERP\Entity\ERPVariants;
-use App\Modules\ERP\Entity\ERPVariantsValues;
 use App\Modules\ERP\Entity\ERPProductsVariants;
-use App\Modules\ERP\Entity\ERPStockHistory;
+use App\Modules\ERP\Entity\ERPStocksHistory;
 use App\Modules\ERP\Entity\ERPProductsSuppliers;
 use App\Modules\Globale\Entity\GlobaleCompanies;
 use App\Modules\Globale\Entity\GlobaleUsers;
@@ -238,11 +238,12 @@ public function importProduct(InputInterface $input, OutputInterface $output){
             $taxes=$repositoryTaxes->find(1);
             $oproduct->setTaxes($taxes);
             $oproduct->setCheckweb($product["ProductoWEB"]);
-            $oproduct->setWeight($product["Weight"]);
+            /*$oproduct->setWeight($product["Weight"]);
             $packing=1;
             if ($product["Unidad medida precio"]=='C') $packing=100;
             else if ($product["Unidad medida precio"]=='M') $packing=1000;
-            $oproduct->setPurchasepacking($packing);
+            $oproduct->setPurchasepacking($packing);*/
+            // TODO ERPProductsVariants tiene weight y purchasepacking
             // Comprobamos si el producto tiene descuentos, si no los tiene se le pone como precio neto.
             $json3=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getPrices.php?from='.$code_new.'&supplier='.$product["Supplier"]);
             $prices=json_decode($json3, true);
@@ -320,7 +321,7 @@ public function importStocksStoresManaged(InputInterface $input, OutputInterface
   foreach ($objects as $object){
     $repositoryStocks=$this->doctrine->getRepository(ERPStocks::class);
     $repositoryProducts=$this->doctrine->getRepository(ERPProducts::class);
-    $repositoryVariantsValues=$this->doctrine->getRepository(ERPVariantsValues::class);
+    $repositoryVariants=$this->doctrine->getRepository(ERPVariants::class);
     $repositoryProductsVariants=$this->doctrine->getRepository(ERPProductsVariants::class);
     $repositoryStoreLocations=$this->doctrine->getRepository(ERPStoreLocations::class);
     $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
@@ -333,8 +334,8 @@ public function importStocksStoresManaged(InputInterface $input, OutputInterface
       $product=$repositoryProducts->findOneBy(["code"=>$new_obj[1]]);
       $storeLocation=$repositoryStoreLocations->findOneBy(["name"=>$new_obj[5]]);
       if($new_obj[2]!=""){
-        $variantvalue=$repositoryVariantsValues->findOneBy(["name"=>$new_obj[2]]);
-        if($variantvalue!=null) $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product,"variantvalue"=>$variantvalue]);
+        $variant=$repositoryVariants->findOneBy(["name"=>$new_obj[2]]);
+        if($variant!=null) $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product,"variant"=>$variant]);
       }
     }
     else if ($object['accion']=='D'){
@@ -343,8 +344,8 @@ public function importStocksStoresManaged(InputInterface $input, OutputInterface
       $product=$repositoryProducts->findOneBy(["code"=>$old_obj[1]]);
       $storeLocation=$repositoryStoreLocations->findOneBy(["name"=>$old_obj[5]]);
       if($new_obj[2]!=""){
-        $variantvalue=$repositoryVariantsValues->findOneBy(["name"=>$new_obj[2]]);
-        if($variantvalue!=null) $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product,"variantvalue"=>$variantvalue]);
+        $variant=$repositoryVariants->findOneBy(["name"=>$new_obj[2]]);
+        if($variant!=null) $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product,"variant"=>$variant]);
       }
 
     }
@@ -354,23 +355,21 @@ public function importStocksStoresManaged(InputInterface $input, OutputInterface
       $product=$repositoryProducts->findOneBy(["code"=>$new_obj[1]]);
       $storeLocation=$repositoryStoreLocations->findOneBy(["name"=>$new_obj[5]]);
       if($new_obj[2]!=""){
-        $variantvalue=$repositoryVariantsValues->findOneBy(["name"=>$new_obj[2]]);
-        if($variantvalue!=null) $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product,"variantvalue"=>$variantvalue]);
+        $variant=$repositoryVariants->findOneBy(["name"=>$new_obj[2]]);
+        if($variant!=null) $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product,"variant"=>$variant]);
       }
     }
 
-    if($productvariant!=null) $stocks=$repositoryStocks->findOneBy(["product"=>$product,"productvariant"=>$productvariant, "storelocation"=>$storeLocation, "active"=>1, "deleted"=>0]);
-    else $stocks=$repositoryStocks->findOneBy(["product"=>$product, "storelocation"=>$storeLocation, "active"=>1, "deleted"=>0]);
+    $stocks=$repositoryStocks->findOneBy(["productvariant"=>$productvariant, "storelocation"=>$storeLocation, "active"=>1, "deleted"=>0]);
     if($product!=null AND $storeLocation!=null)
     {
       if ($stocks==null ){
         $stocks=new ERPStocks();
-        $stocks->setProduct($product);
+        $stocks->setProductVariant($productvariant);
         $stocks->setStoreLocation($storeLocation);
         $stocks->setCompany($company);
         $stocks->setQuantity(0);
         $stocks->setPendingreceive($quantity);
-        if($productvariant!=null)  $stocks->setProductVariant($productvariant);
         $stocks->setDateupd(new \Datetime());
         $stocks->setDateadd(new \Datetime());
         $stocks->setDeleted(0);
@@ -668,7 +667,8 @@ public function importPrices(InputInterface $input, OutputInterface $output) {
   $output->writeln('* Sincronizando precios....');
   $repositoryCategory=$this->doctrine->getRepository(ERPCategories::class);
   $repositorySuppliers=$this->doctrine->getRepository(ERPSuppliers::class);
-  $repositoryShoppingDiscounts=$this->doctrine->getRepository(ERPShoppingDiscounts::class);
+  $repositoryProductsuppliersdiscounts=$this->doctrine->getRepository(ERPProductsSuppliersDiscounts::class);
+  $productsVariantsRepository=$this->doctrine->getRepository(ERPproductsVariants::class);
   $productsSuppliersRepository=$this->doctrine->getRepository(ERPProductsSuppliers::class);
   $repository=$this->doctrine->getRepository(ERPProducts::class);
   $page=5000;
@@ -680,12 +680,13 @@ public function importPrices(InputInterface $input, OutputInterface $output) {
       $count++;
       foreach($products as $id) {
         $product=$repository->findOneBy(["id"=>$id, "company"=>2]);
+        $productvariant=$productsVariantsRepository->findOneBy(["product"=>$product, "variant"=>null]);
         if ($product->getSupplier()==null or $product->getCategory()==null)  continue;
-        $productsSuppliers=$productsSuppliersRepository->findBy(["product"=>$product, "active"=>1, "deleted"=>0]);
+        $productsSuppliers=$productsSuppliersRepository->findBy(["productvariant"=>$productvariant, "active"=>1, "deleted"=>0]);
         foreach ($productsSuppliers as $productSupplier){
           $supplier=$productSupplier->getSupplier();
           $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
-          $discount=$repositoryShoppingDiscounts->findOneBy(["supplier"=>$supplier,"category"=>$product->getCategory(), "active"=>1, "deleted"=>0]);
+          $discount=$repositoryProductsuppliersdiscounts->findOneBy(["supplier"=>$supplier,"category"=>$product->getCategory(), "active"=>1, "deleted"=>0]);
           if ($discount) $output->writeln("El producto ".$product->getCode()." tiene el descuento ". $discount->getDiscount()." para el proveedor ".$supplier->getCode());
           else $output->writeln("El producto ".$product->getCode()." no tiene descuentos activos");
           if ($discount==null && $supplier!=null){
@@ -697,12 +698,12 @@ public function importPrices(InputInterface $input, OutputInterface $output) {
                   if ($prices["Ending"]["date"]=="1753-01-01 00:00:00.000000") $dateend=null;
                   else $dateend=date_create_from_format("Y-m-d h:i:s.u",$prices["Ending"]["date"]);
                   $datestart=date_create_from_format("Y-m-d h:i:s.u",$prices["Starting"]["date"]);
-                  $shoppingDiscount=$repositoryShoppingDiscounts->findOneBy(["supplier"=>$supplier,"category"=>$product->getCategory(), "discount"=>$prices["Discount"], "start"=>$datestart, "end"=>$dateend]);
-                  if ($shoppingDiscount!=null) continue;
+                  $productsuppliersdiscounts=$repositoryProductsuppliersdiscounts->findOneBy(["supplier"=>$supplier,"category"=>$product->getCategory(), "discount"=>$prices["Discount"], "start"=>$datestart, "end"=>$dateend]);
+                  if ($productsuppliersdiscounts!=null) continue;
                   $category=$repositoryCategory->findOneBy(["id"=>$product->getCategory()->getId()]);
                   if ($category==null) $output->writeln(' --> El producto '.$product->getCode().' esta anadiendo el precio '.$prices["Discount"].' al proveedor '.$supplier->getCode());
                   else $output->writeln(' --> El producto '.$product->getCode().' esta anadiendo el precio '.$prices["Discount"].' al proveedor '.$supplier->getCode().' en la categoria '.$category->getName());
-                    $obj=new ERPShoppingDiscounts();
+                    $obj=new ERPProductsSuppliersDiscounts();
                     $obj->setSupplier($supplier);
                     $obj->setCategory($category);
                     $obj->setDiscount($prices["Discount"]);
@@ -747,10 +748,11 @@ public function updatePrices(InputInterface $input, OutputInterface $output){
     $productsRepository=$this->doctrine->getRepository(ERPProducts::class);
     $product=$productsRepository->findOneBy(["code"=>$object["code"]]);
     $output->writeln("Comprobando precio del producto ".$product->getCode());
-    $packing=1;
+    /*$packing=1;
     if ($object["Unidad medida precio"]=='C') $packing=100;
     else if ($object["Unidad medida precio"]=='M') $packing=1000;
-    $product->setPurchasepacking($packing);
+    $product->setPurchasepacking($packing);*/
+    // TODO ERPProductsVariants tiene el purchasepacking
     $this->doctrine->getManager()->merge($product);
     $this->doctrine->getManager()->flush();
     $this->doctrine->getManager()->clear();
@@ -776,24 +778,24 @@ public function updatePrices(InputInterface $input, OutputInterface $output){
 public function groupPrices(InputInterface $input, OutputInterface $output){
   $repository=$this->doctrine->getRepository(ERPCategories::class);
   $repositorySuppliers=$this->doctrine->getRepository(ERPSuppliers::class);
-  $repositoryShopping=$this->doctrine->getRepository(ERPShoppingDiscounts::class);
+  $repositoryProductsuppliersdiscounts=$this->doctrine->getRepository(ERPProductsSuppliersDiscounts::class);
 
   $suppliers=$repositorySuppliers->findBy(['id'=>1082]);
   foreach($suppliers as $supplier){
-    $prices=$repositoryShopping->findBy(['supplier'=>$supplier, 'active'=>1]);
+    $prices=$repositoryProductsuppliersdiscounts->findBy(['supplier'=>$supplier, 'active'=>1]);
     foreach ($prices as $price){
       if ($price->getCategory()==null or $price->getCategory()->getParentid()==null) continue;
       $categories=$repository->findSisters($price->getCategory()->getParentid()->getId());
       $count=0;
       foreach($categories as $category){
-        $shoppingDiscount=$repositoryShopping->findOneBy(['supplier'=>$supplier,'category'=>$category, 'active'=>1]);
-        if ($shoppingDiscount==null or $shoppingDiscount->getDiscount()==$price->getDiscount()) continue;
+        $productsuppliersdiscounts=$repositoryProductsuppliersdiscounts->findOneBy(['supplier'=>$supplier,'category'=>$category, 'active'=>1]);
+        if ($productsuppliersdiscounts==null or $productsuppliersdiscounts->getDiscount()==$price->getDiscount()) continue;
         else $count=1;
       }
-      $newshoppingDiscount=$repositoryShopping->findOneBy(['supplier'=>$supplier,'category'=>$price->getCategory()->getParentid(), 'active'=>1]);
-      if ($count==0 and $newshoppingDiscount==null) {
+      $newproductsuppliersdiscounts=$repositoryProductsuppliersdiscounts->findOneBy(['supplier'=>$supplier,'category'=>$price->getCategory()->getParentid(), 'active'=>1]);
+      if ($count==0 and $newsproductsuppliersdiscounts==null) {
         $output->writeln("Agrupo en ".$price->getCategory()->getParentid()->getName()." cuyo id es ".$price->getCategory()->getParentid()->getId());
-        $obj=new ERPShoppingDiscounts();
+        $obj=new ERPProductsSuppliersDiscounts();
         $obj->setSupplier($supplier);
         $obj->setCategory($price->getCategory()->getParentid());
         $obj->setDiscount($price->getDiscount());
@@ -814,8 +816,8 @@ public function groupPrices(InputInterface $input, OutputInterface $output){
         $this->doctrine->getManager()->clear();
         // delete delete delete
         foreach($categories as $category){
-          /*$shoppingDiscount=$repositoryShopping->findOneBy(['supplier'=>$supplier,'category'=>$category, 'active'=>1]);
-          if ($shoppingDiscount!=null) {  $output->writeln("Elimino ".$shoppingDiscount->getId());$repositoryShopping->deleteShoppingDiscount($shoppingDiscount->getId());}*/
+          /*$productsuppliersdiscounts=$repositoryProductsuppliersdiscounts->findOneBy(['supplier'=>$supplier,'category'=>$category, 'active'=>1]);
+          if ($productsuppliersdiscounts!=null) {  $output->writeln("Elimino ".$productsuppliersdiscounts->getId());$repositoryProductsuppliersdiscounts->deleteShoppingDiscount($productsuppliersdiscounts->getId());}*/
         }
       }
     }
@@ -946,7 +948,7 @@ public function importStock(InputInterface $input, OutputInterface $output, $cod
   $repositoryStocks=$this->doctrine->getRepository(ERPStocks::class);
   $repositoryStoreLocations=$this->doctrine->getRepository(ERPStoreLocations::class);
   $repositoryProducts=$this->doctrine->getRepository(ERPProducts::class);
-  $repositoryVariantsValues=$this->doctrine->getRepository(ERPVariantsValues::class);
+  $repositoryVariants=$this->doctrine->getRepository(ERPVariants::class);
   $repositoryProductsVariants=$this->doctrine->getRepository(ERPProductsVariants::class);
   $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getStocks.php?product='.$code);
   $objects=json_decode($json, true);
@@ -956,20 +958,19 @@ public function importStock(InputInterface $input, OutputInterface $output, $cod
       $company=$repositoryCompanies->find(2);
       foreach ($objects["class"] as $stock){
       $product=$repositoryProducts->findOneBy(["code"=>$stock["code"]]);
-      $namenameVariantValue=$this->variantColor($stock["variant"]);
-      $variantvalue=$repositoryVariantsValues->findOneBy(["name"=>$namenameVariantValue]);
+      $namenamevariant=$this->variantColor($stock["variant"]);
+      $variant=$repositoryVariants->findOneBy(["name"=>$namenamevariant]);
       $storeRepository=$this->doctrine->getRepository(ERPStores::class);
       $store=$storeRepository->findOneBy(["code"=>$stock["almacen"]]);
 
       if($product) {
             $productVariantId = null;
-            $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product,"variantvalue"=>$variantvalue]);
+            $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product,"variant"=>$variant]);
             if($productvariant!=null) {
               $productVariantId=$productvariant->getId();
               $old_stocks=$repositoryStocks->stockVariantUpdate($productvariant->getId(), $stock["almacen"]);
               $output->writeln('El producto '.$product->getId().' tiene la variante '.$stock["variant"]);
             }
-            else $old_stocks=$repositoryStocks->stockUpdate($product->getId(), $stock["almacen"]);
             if($old_stocks!=null) {
               if ($old_stocks[0]["id"]!=null){
               $stock_old=$repositoryStocks->findOneBy(["id"=>$old_stocks[0]["id"], "deleted"=>0]);
@@ -990,7 +991,6 @@ public function importStock(InputInterface $input, OutputInterface $output, $cod
               $output->writeln('Vamos a añadir una linea de stock al producto '.$product->getId().' en el almacen '.$stock["almacen"]);
               $obj=new ERPStocks();
               $obj->setCompany($company);
-              $obj->setProduct($product);
               $obj->setDateadd(new \Datetime());
               $obj->setDateupd(new \Datetime());
               $obj->setStoreLocation($location);
@@ -1039,7 +1039,7 @@ public function importStocks(InputInterface $input, OutputInterface $output) {
   $repositoryStocks=$this->doctrine->getRepository(ERPStocks::class);
   $repositoryStoreLocations=$this->doctrine->getRepository(ERPStoreLocations::class);
   $repositoryProducts=$this->doctrine->getRepository(ERPProducts::class);
-  $repositoryVariantsValues=$this->doctrine->getRepository(ERPVariantsValues::class);
+  $repositoryVariants=$this->doctrine->getRepository(ERPVariants::class);
   $repositoryProductsVariants=$this->doctrine->getRepository(ERPProductsVariants::class);
   $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getStocks.php?from='.$navisionSync->getMaxtimestamp());
   $objects=json_decode($json, true);
@@ -1049,21 +1049,19 @@ public function importStocks(InputInterface $input, OutputInterface $output) {
       $company=$repositoryCompanies->find(2);
       foreach ($objects["class"] as $stock){
       $product=$repositoryProducts->findOneBy(["code"=>$stock["code"]]);
-      $namenameVariantValue=$this->variantColor($stock["variant"]);
-      $variantvalue=$repositoryVariantsValues->findOneBy(["name"=>$namenameVariantValue]);
+      $namenamevariant=$this->variantColor($stock["variant"]);
+      $variant=$repositoryVariants->findOneBy(["name"=>$namenamevariant]);
       $storeRepository=$this->doctrine->getRepository(ERPStores::class);
       $store=$storeRepository->findOneBy(["code"=>$stock["almacen"]]);
 
       if($product) {
             $productVariantId = null;
-            $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product,"variantvalue"=>$variantvalue]);
+            $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product,"variant"=>$variant]);
             if($productvariant!=null) {
               $productVariantId=$productvariant->getId();
               $old_stocks=$repositoryStocks->stockVariantUpdate($productvariant->getId(), $stock["almacen"]);
               $output->writeln('El producto '.$product->getId().' tiene la variante '.$stock["variant"]);
             }
-            else $old_stocks=$repositoryStocks->stockUpdate($product->getId(), $stock["almacen"]);
-
             if($old_stocks[0]["id"]!=null) {
               $stock_old=$repositoryStocks->findOneBy(["id"=>$old_stocks[0]["id"], "deleted"=>0]);
               $output->writeln('Vamos a actualizar la linea '.$old_stocks[0]["id"].' del producto '.$product->getId().' en el almacen '.$stock["almacen"]);
@@ -1081,7 +1079,6 @@ public function importStocks(InputInterface $input, OutputInterface $output) {
               if($location!=null){
               $obj=new ERPStocks();
               $obj->setCompany($company);
-              $obj->setProduct($product);
               $obj->setDateadd(new \Datetime());
               $obj->setDateupd(new \Datetime());
               $obj->setStoreLocation($location);
@@ -1147,7 +1144,7 @@ public function updateStocksStoresManaged(InputInterface $input, OutputInterface
   $datetime=new \DateTime();
   $output->writeln('* Sincronizando almacenes gestionados....');
   $repositoryProducts=$this->doctrine->getRepository(ERPProducts::class);
-  $repositoryVariantsValues=$this->doctrine->getRepository(ERPVariantsValues::class);
+  $repositoryVariants=$this->doctrine->getRepository(ERPVariants::class);
   $repositoryProductsVariants=$this->doctrine->getRepository(ERPProductsVariants::class);
   $repositoryStocks=$this->doctrine->getRepository(ERPStocks::class);
   $storeLocationsRepository=$this->doctrine->getRepository(ERPStoreLocations::class);
@@ -1161,16 +1158,15 @@ public function updateStocksStoresManaged(InputInterface $input, OutputInterface
     $company=$repositoryCompanies->find(2);
     foreach ($objects["class"] as $stock){
       $product=$repositoryProducts->findOneBy(["code"=>$stock["code"]]);
-      $namenameVariantValue=$this->variantColor($stock["variant"]);
-      $variantvalue=$repositoryVariantsValues->findOneBy(["name"=>$namenameVariantValue]);
+      $namenamevariant=$this->variantColor($stock["variant"]);
+      $variant=$repositoryVariants->findOneBy(["name"=>$namenamevariant]);
 
       if($product) {
-            $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product,"variantvalue"=>$variantvalue]);
+            $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product,"variant"=>$variant]);
             if($productvariant!=null) {
               $old_stocks=$repositoryStocks->stockVariantUpdate($productvariant->getId(), $stock["almacen"]);
               $output->writeln('El producto '.$product->getId().' tiene la variante '.$stock["variant"]);
             }
-            else $old_stocks=$repositoryStocks->stockUpdate($product->getId(), $stock["almacen"]);
             if($old_stocks[0]["id"]!=null) {
               $stock_old=$repositoryStocks->findOneBy(["id"=>$old_stocks[0]["id"], "deleted"=>0]);
               $output->writeln('Vamos a actualizar la linea '.$old_stocks[0]["id"].' del producto '.$product->getId().' en el almacen '.$stock["almacen"]);
@@ -1178,10 +1174,9 @@ public function updateStocksStoresManaged(InputInterface $input, OutputInterface
               $storeLocation=$storeLocationsRepository->findOneBy(["name"=>$stock["almacen"]]);
               $store=$storeRepository->findOneBy(["code"=>$stock["almacen"]]);
               $user=$userRepository->findOneBy(["email"=>"josemiguel.pardo@ferreteriacampollano.com"]);
-              $stockHistory=new ERPStockHistory();
-              $stockHistory->setProduct($product);
+              $stockHistory=new ERPStocksHistory();
+              $stockHistory->setProductVariant($productvariant);
               $stockHistory->setLocation($storeLocation);
-              $stockHistory->setStore($store);
               $stockHistory->setUser($user);
               $stockHistory->setPreviousqty($stock_old->getQuantity());
               $stockHistory->setNewqty($stock_old->getQuantity()+((int)$stock["stock"]));
@@ -1201,7 +1196,6 @@ public function updateStocksStoresManaged(InputInterface $input, OutputInterface
               $location=$repositoryStoreLocations->findOneBy(["name"=>$stock["almacen"]]);
               if($location!=null){
               $obj=new ERPStocks();$obj->setCompany($company);
-              $obj->setProduct($product);
               $obj->setDateadd(new \Datetime());
               $obj->setDateupd(new \Datetime());
               $obj->setStoreLocation($location);
@@ -1238,6 +1232,7 @@ public function updateStocksStoresManaged(InputInterface $input, OutputInterface
 }
 
 public function importProductsSuppliers(InputInterface $input, OutputInterface $output) {
+  $repositoryProductsVariants=$this->doctrine->getRepository(ERPProductsVariants::class);
   $repositoryProductsSuppliers=$this->doctrine->getRepository(ERPProductsSuppliers::class);
   $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
   $repositorySuppliers=$this->doctrine->getRepository(ERPSuppliers::class);
@@ -1251,6 +1246,7 @@ public function importProductsSuppliers(InputInterface $input, OutputInterface $
     $count++;
     foreach($products as $id) {
       $product=$repositoryProducts->findOneBy(["id"=>$id, "company"=>2]);
+      $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product, "variant"=>null]);
       $company=$repositoryCompanies->find(2);
       $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getSuppliersByProduct.php?product='.$product->getCode());
       $objects=json_decode($json, true);
@@ -1259,11 +1255,11 @@ public function importProductsSuppliers(InputInterface $input, OutputInterface $
           if ($supplierCode["No."]==null) continue;
           $supplier=$repositorySuppliers->findOneBy(["code"=>$supplierCode["No."], "company"=>$company, "active"=>1, "deleted"=>0]);
           if ($supplier==null) continue;
-          $productsSuppliers=$repositoryProductsSuppliers->findOneBy(["product"=>$product, "supplier"=>$supplier]);
+          $productsSuppliers=$repositoryProductsSuppliers->findOneBy(["productvariant"=>$productvariant, "supplier"=>$supplier]);
           if ($productsSuppliers==null) {
             $output->writeln("Añadiendo el proveedor ".$supplier->getCode()." al producto ".$product->getCode());
             $obj=new ERPProductsSuppliers();
-            $obj->setProduct($product);
+            $obj->setProductVariant($productvariant);
             $obj->setSupplier($supplier);
             $obj->setCompany($company);
             $obj->setActive(1);
@@ -1353,7 +1349,7 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
         if (isset($aproducts_prices['increments'])){
           $increments = $aproducts_prices['increments'];
           // Obtener proveedores de la categoría
-          $query="SELECT DISTINCT(ps.supplier_id) as supplier_id, s.code as supplier_code FROM erpproducts_suppliers ps LEFT JOIN erpsuppliers s on s.id=ps.supplier_id WHERE ps.product_id in (SELECT id FROM erpproducts WHERE category_id='".$category_id."')";
+          $query="SELECT DISTINCT(ps.supplier_id) as supplier_id, s.code as supplier_code FROM erpproducts_suppliers ps left join erpproducts_variants pv on pv.id=ps.productvariant_id left join erpproducts p on p.id=pv.product_id LEFT JOIN erpsuppliers s on s.id=ps.supplier_id WHERE p.id in (SELECT id FROM erpproducts WHERE category_id='".$category_id."')";
           $params=[];
           $suppliers = $this->doctrine->getManager()->getConnection()->executeQuery($query, $params)->fetchAll();
           for($j=0; $j<count($suppliers); $j++){
@@ -1469,7 +1465,7 @@ public function importIncrementsCustomers(InputInterface $input, OutputInterface
         if (isset($aproducts_prices['increments']) && count($aproducts_prices['increments'])>0){
           $increments = $aproducts_prices['increments'];
           // Obtener proveedores de la categoría
-          $query="SELECT DISTINCT(ps.supplier_id) as supplier_id, s.code as supplier_code FROM erpproducts_suppliers ps LEFT JOIN erpsuppliers s on s.id=ps.supplier_id WHERE ps.product_id in (SELECT id FROM erpproducts WHERE category_id='".$category_id."')";
+          $query="SELECT DISTINCT(ps.supplier_id) as supplier_id, s.code as supplier_code FROM erpproducts_suppliers ps left join erpproducts_variants pv on pv.id=ps.productvariant_id left join erpproducts p on p.id=pv.product_id LEFT JOIN erpsuppliers s on s.id=ps.supplier_id WHERE p.id in (SELECT id FROM erpproducts WHERE category_id='".$category_id."')";
           $params=[];
           $suppliers = $this->doctrine->getManager()->getConnection()->executeQuery($query, $params)->fetchAll();
           for($j=0; $j<count($suppliers); $j++){
@@ -1685,29 +1681,29 @@ public function importVariants(InputInterface $input, OutputInterface $output){
   }
 
   //------   Critical Section START   ------
-  $repository=$this->doctrine->getRepository(ERPVariantsValues::class);
+  $repository=$this->doctrine->getRepository(ERPVariants::class);
   $output->writeln('* Importando variantes....');
   $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
-  $repositoryVariant=$this->doctrine->getRepository(ERPVariants::class);
-  $variants=$repositoryVariant->findAll();
-  foreach ($variants as $variant){
-      $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getVariants.php?variant='.$variant->getName());
-      $output->writeln('        -Importando valores de la variante '.$variant->getName());
+  $repositoryVariantTypes=$this->doctrine->getRepository(ERPVariantsTypes::class);
+  $variantstypes=$repositoryVariantTypes->findAll();
+  foreach ($variantstypes as $varianttype){
+      $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getVariants.php?variant='.$varianttype->getName());
+      $output->writeln('        -Importando valores de la variante '.$varianttype->getName());
       $objects=json_decode($json, true);
       $objects=$objects[0]["class"];
       //Disable SQL logger
       $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
       foreach ($objects as $object){
-        $variantValue;
-        if ($variant->getName()=="Color") $variantValue=$this->variantColor($object["value"]);
-        else if ($variant->getName()=="Fragancia") $variantValue=$this->variantFragrance($object["value"]);
-        else $variantValue=$object["value"];
+        $variant;
+        if ($varianttype->getName()=="Color") $variant=$this->variantColor($object["value"]);
+        else if ($varianttype->getName()=="Fragancia") $variant=$this->variantFragrance($object["value"]);
+        else $variant=$object["value"];
 
-        $obj=$repository->findOneBy(["name"=>$variantValue]);
+        $obj=$repository->findOneBy(["name"=>$variant]);
         if ($obj==null){
-          $obj=new ERPVariantsValues();
-          $obj->setVariantName($variant);
-          $obj->setName($variantValue);
+          $obj=new ERPVariants();
+          $obj->setVariantType($varianttype);
+          $obj->setName($variant);
           $obj->setDateadd(new \Datetime());
           $obj->setDateupd(new \Datetime());
           $obj->setDeleted(0);
@@ -1739,34 +1735,33 @@ public function importProductsVariants(InputInterface $input, OutputInterface $o
   $output->writeln('* Importando productos agrupados....');
   $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
   $this->importVariants($input, $output);
-  $repositoryVariant=$this->doctrine->getRepository(ERPVariants::class);
-  $variants=$repositoryVariant->findAll();
-  foreach($variants as $variant){
-      $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getProductsVariants.php?variant='.$variant->getName());
+  $repositoryVariantTypes=$this->doctrine->getRepository(ERPVariantsTypes::class);
+  $variantstypes=$repositoryVariantTypes->findAll();
+  foreach($variantstypes as $varianttype){
+      $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getProductsVariants.php?variant='.$varianttype->getName());
       $objects=json_decode($json, true);
       $objects=$objects[0]["class"];
       $this->doctrine->getManager()->getConnection()->getConfiguration()->setSQLLogger(null);
-      $output->writeln('* Importando productos agrupados por '.$variant->getName());
+      $output->writeln('* Importando productos agrupados por '.$varianttype->getName());
       foreach ($objects as $object){
         $repositoryProduct=$this->doctrine->getRepository(ERPProducts::class);
         $product=$repositoryProduct->findOneBy(["code"=>$object["product"]]);
-        $repositoryVariantValue=$this->doctrine->getRepository(ERPVariantsValues::class);
-        $nameVariantValue;
+        $repositoryvariant=$this->doctrine->getRepository(ERPVariants::class);
+        $namevariant;
         //$output->writeln('       - Añadiendo variante a '.$object["product"]);
-        if ($variant->getName()=="Color") $nameVariantValue=$this->variantColor($object["Code"]);
-        else if ($variant->getName()=="Fragancia") $nameVariantValue=$this->variantFragrance($object["Code"]);
-        else $nameVariantValue=$object["Code"];
+        if ($varianttype->getName()=="Color") $namevariant=$this->variantColor($object["Code"]);
+        else if ($varianttype->getName()=="Fragancia") $namevariant=$this->variantFragrance($object["Code"]);
+        else $namevariant=$object["Code"];
 
 
-        $variantValue=$repositoryVariantValue->findOneBy(["variantname"=>$variant, "name"=>$nameVariantValue]);
-        $obj=$repository->findOneBy(["variantvalue"=>$variantValue, "product"=>$product]);
+        $variant=$repositoryvariant->findOneBy(["varianttype"=>$varianttype, "name"=>$namevariant]);
+        $obj=$repository->findOneBy(["variant"=>$variant, "product"=>$product]);
         if ($obj==null and $product!=null){
             $output->writeln('* Asignando la variante '.$object["Code"].' al producto '.$object["product"]);
             if ($product->getGrouped()==0) $product->setGrouped(1);
             $obj=new ERPProductsVariants();
             $obj->setProduct($product);
-            $obj->setVariantvalue($variantValue);
-            $obj->setVariantname($variant);
+            $obj->setVariant($variant);
             $obj->setDateadd(new \Datetime());
             $obj->setDateupd(new \Datetime());
             $obj->setDeleted(0);
@@ -1784,65 +1779,65 @@ public function importProductsVariants(InputInterface $input, OutputInterface $o
       fclose($fp);
 }
 
-public function variantFragrance($nameVariantValue){
-  if ($nameVariantValue=="BLUE SILVE") $nameVariantValue="Blue Silver";
-  if ($nameVariantValue=="FOREVER YO") $nameVariantValue="Forever Young";
-  if ($nameVariantValue=="NEUTRALIZA") $nameVariantValue="Neutralizador";
-  else $nameVariantValue=ucwords(strtolower($nameVariantValue));
-  return $nameVariantValue;
+public function variantFragrance($namevariant){
+  if ($namevariant=="BLUE SILVE") $namevariant="Blue Silver";
+  if ($namevariant=="FOREVER YO") $namevariant="Forever Young";
+  if ($namevariant=="NEUTRALIZA") $namevariant="Neutralizador";
+  else $namevariant=ucwords(strtolower($namevariant));
+  return $namevariant;
 }
 
-public function variantColor($nameVariantValue){
-  if ($nameVariantValue=="AMARILLO C") $nameVariantValue="Amarillo Claro";
-  else if ($nameVariantValue=="AMARILLO F") $nameVariantValue="Amarillo Fluor";
-  else if ($nameVariantValue=="AMARILLO L") $nameVariantValue="Amarillo Limon";
-  else if ($nameVariantValue=="AMARILLO R") $nameVariantValue="Amarillo Real";
-  else if ($nameVariantValue=="ARENA VIGO") $nameVariantValue="Arena Vigore";
-  else if ($nameVariantValue=="AZUL COBAL") $nameVariantValue="Azul Cobalto";
-  else if ($nameVariantValue=="AZUL LUMIN") $nameVariantValue="Azul Luminoso";
-  else if ($nameVariantValue=="AZUL MARIN") $nameVariantValue="Azul Marino";
-  else if ($nameVariantValue=="AZUL ULTA") $nameVariantValue="Azul Ultramar";
-  else if ($nameVariantValue=="BEIGE 585" or $nameVariantValue=="BEIGE") $nameVariantValue="Beige";
-  else if ($nameVariantValue=="BLANCO 501" or $nameVariantValue=="BLANCO" or $nameVariantValue=="BLANCA") $nameVariantValue="Blanco";
-  else if ($nameVariantValue=="BLANCO BRI") $nameVariantValue="Blanco Brillo";
-  else if ($nameVariantValue=="BLANCOPERL") $nameVariantValue="Blanco Perla";
-  else if ($nameVariantValue=="CREMA 586" or $nameVariantValue=="CREMA") $nameVariantValue="Crema";
-  else if ($nameVariantValue=="GAMUZA 543" or $nameVariantValue=="GAMUZA") $nameVariantValue="Gamuza";
-  else if ($nameVariantValue=="GRIS AZULA") $nameVariantValue="Gris Azulado";
-  else if ($nameVariantValue=="GRIS OSCUR") $nameVariantValue="Gris Oscuro";
-  else if ($nameVariantValue=="GRIS VIGOR") $nameVariantValue="Gris Vigore";
-  else if ($nameVariantValue=="MALVA MAST") $nameVariantValue="Malva Master";
-  else if ($nameVariantValue=="MARFIL 528" or $nameVariantValue=="MARFIL") $nameVariantValue="Marfil";
-  else if ($nameVariantValue=="MARRON TAB") $nameVariantValue="Marron Tabaco";
-  else if ($nameVariantValue=="MARRONVINT") $nameVariantValue="Marron Vintage";
-  else if ($nameVariantValue=="NARANJA CL") $nameVariantValue="Naranja Claro";
-  else if ($nameVariantValue=="NARANJA FL") $nameVariantValue="Naranja Fluor";
-  else if ($nameVariantValue=="NEGRO 567" or $nameVariantValue=="NEGRO") $nameVariantValue="Negro";
-  else if ($nameVariantValue=="VERDE CARR") $nameVariantValue="Verde Carruajes";
-  else if ($nameVariantValue=="NEGRO BRIL") $nameVariantValue="Negro Brillo";
-  else if ($nameVariantValue=="OCRE" or $nameVariantValue=="OCRE 587") $nameVariantValue="Ocre";
-  else if ($nameVariantValue=="PARDO" or $nameVariantValue=="PARDO 517") $nameVariantValue="Pardo";
-  else if ($nameVariantValue=="RAYAS GRAN") $nameVariantValue="Rayas Granate";
-  else if ($nameVariantValue=="RAYAS NEGR") $nameVariantValue="Rayas Negras";
-  else if ($nameVariantValue=="ROJO BURDE") $nameVariantValue="Rojo Burdeos";
-  else if ($nameVariantValue=="ROJO CARRU") $nameVariantValue="Rojo Carruaje";
-  else if ($nameVariantValue=="ROJO INGLE") $nameVariantValue="Rojo Ingles";
-  else if ($nameVariantValue=="ROJOIMPERI") $nameVariantValue="Rojo Imperial";
-  else if ($nameVariantValue=="ROSA PALID") $nameVariantValue="Rosa Palido";
-  else if ($nameVariantValue=="SALMON OSC") $nameVariantValue="Salmon Oscuro";
-  else if ($nameVariantValue=="TURQUESA C") $nameVariantValue="Turquesa Claro";
-  else if ($nameVariantValue=="VERDE BOSQ") $nameVariantValue="Verde Bosque";
-  else if ($nameVariantValue=="VERDE CLAR") $nameVariantValue="Verde Claro";
-  else if ($nameVariantValue=="VERDE FRON") $nameVariantValue="Verde Fronton";
-  else if ($nameVariantValue=="VERDE HIER") $nameVariantValue="Verde Hierba";
-  else if ($nameVariantValue=="VERDE PIST") $nameVariantValue="Verde Pistacho";
-  else if ($nameVariantValue=="VERDE PRIM") $nameVariantValue="Verde Primavera";
-  else if ($nameVariantValue=="VINTAGE RO") $nameVariantValue="Vintage Rose";
-  else if ($nameVariantValue=="NEGRO/BLN") $nameVariantValue="Negro y blanco";
-  else if ($nameVariantValue=="ROJO/BLN") $nameVariantValue="Rojo y blanco";
-  else if ($nameVariantValue=="ROYAL/BLN") $nameVariantValue="Azul royal y blanco";
-  else $nameVariantValue=ucwords(strtolower($nameVariantValue));
-  return $nameVariantValue;
+public function variantColor($namevariant){
+  if ($namevariant=="AMARILLO C") $namevariant="Amarillo Claro";
+  else if ($namevariant=="AMARILLO F") $namevariant="Amarillo Fluor";
+  else if ($namevariant=="AMARILLO L") $namevariant="Amarillo Limon";
+  else if ($namevariant=="AMARILLO R") $namevariant="Amarillo Real";
+  else if ($namevariant=="ARENA VIGO") $namevariant="Arena Vigore";
+  else if ($namevariant=="AZUL COBAL") $namevariant="Azul Cobalto";
+  else if ($namevariant=="AZUL LUMIN") $namevariant="Azul Luminoso";
+  else if ($namevariant=="AZUL MARIN") $namevariant="Azul Marino";
+  else if ($namevariant=="AZUL ULTA") $namevariant="Azul Ultramar";
+  else if ($namevariant=="BEIGE 585" or $namevariant=="BEIGE") $namevariant="Beige";
+  else if ($namevariant=="BLANCO 501" or $namevariant=="BLANCO" or $namevariant=="BLANCA") $namevariant="Blanco";
+  else if ($namevariant=="BLANCO BRI") $namevariant="Blanco Brillo";
+  else if ($namevariant=="BLANCOPERL") $namevariant="Blanco Perla";
+  else if ($namevariant=="CREMA 586" or $namevariant=="CREMA") $namevariant="Crema";
+  else if ($namevariant=="GAMUZA 543" or $namevariant=="GAMUZA") $namevariant="Gamuza";
+  else if ($namevariant=="GRIS AZULA") $namevariant="Gris Azulado";
+  else if ($namevariant=="GRIS OSCUR") $namevariant="Gris Oscuro";
+  else if ($namevariant=="GRIS VIGOR") $namevariant="Gris Vigore";
+  else if ($namevariant=="MALVA MAST") $namevariant="Malva Master";
+  else if ($namevariant=="MARFIL 528" or $namevariant=="MARFIL") $namevariant="Marfil";
+  else if ($namevariant=="MARRON TAB") $namevariant="Marron Tabaco";
+  else if ($namevariant=="MARRONVINT") $namevariant="Marron Vintage";
+  else if ($namevariant=="NARANJA CL") $namevariant="Naranja Claro";
+  else if ($namevariant=="NARANJA FL") $namevariant="Naranja Fluor";
+  else if ($namevariant=="NEGRO 567" or $namevariant=="NEGRO") $namevariant="Negro";
+  else if ($namevariant=="VERDE CARR") $namevariant="Verde Carruajes";
+  else if ($namevariant=="NEGRO BRIL") $namevariant="Negro Brillo";
+  else if ($namevariant=="OCRE" or $namevariant=="OCRE 587") $namevariant="Ocre";
+  else if ($namevariant=="PARDO" or $namevariant=="PARDO 517") $namevariant="Pardo";
+  else if ($namevariant=="RAYAS GRAN") $namevariant="Rayas Granate";
+  else if ($namevariant=="RAYAS NEGR") $namevariant="Rayas Negras";
+  else if ($namevariant=="ROJO BURDE") $namevariant="Rojo Burdeos";
+  else if ($namevariant=="ROJO CARRU") $namevariant="Rojo Carruaje";
+  else if ($namevariant=="ROJO INGLE") $namevariant="Rojo Ingles";
+  else if ($namevariant=="ROJOIMPERI") $namevariant="Rojo Imperial";
+  else if ($namevariant=="ROSA PALID") $namevariant="Rosa Palido";
+  else if ($namevariant=="SALMON OSC") $namevariant="Salmon Oscuro";
+  else if ($namevariant=="TURQUESA C") $namevariant="Turquesa Claro";
+  else if ($namevariant=="VERDE BOSQ") $namevariant="Verde Bosque";
+  else if ($namevariant=="VERDE CLAR") $namevariant="Verde Claro";
+  else if ($namevariant=="VERDE FRON") $namevariant="Verde Fronton";
+  else if ($namevariant=="VERDE HIER") $namevariant="Verde Hierba";
+  else if ($namevariant=="VERDE PIST") $namevariant="Verde Pistacho";
+  else if ($namevariant=="VERDE PRIM") $namevariant="Verde Primavera";
+  else if ($namevariant=="VINTAGE RO") $namevariant="Vintage Rose";
+  else if ($namevariant=="NEGRO/BLN") $namevariant="Negro y blanco";
+  else if ($namevariant=="ROJO/BLN") $namevariant="Rojo y blanco";
+  else if ($namevariant=="ROYAL/BLN") $namevariant="Azul royal y blanco";
+  else $namevariant=ucwords(strtolower($namevariant));
+  return $namevariant;
 }
 
 public function disableBlocked(InputInterface $input, OutputInterface $output){

@@ -8,12 +8,12 @@
                     "cols": 4
                 },
                 {
-                    "name": "variantname",
+                    "name": "varianttype",
                     "cols": 4
                 },
-                { "name": "variantvalue","cols": 2, "trigger":{"field":"variantname", "route":"generictrigger",
-          				"moduleTrigger":"ERP", "classTrigger":"ERPVariants",
-          				"module":"ERP", "class":"ERPVariantsValues", "relationParameter":"variantname"}}
+                { "name": "variant","cols": 2, "trigger":{"field":"varianttype", "route":"generictrigger",
+          				"moduleTrigger":"ERP", "classTrigger":"ERPVariantsTypes",
+          				"module":"ERP", "class":"ERPVariants", "relationParameter":"varianttype"}}
             ]
         }
     ]

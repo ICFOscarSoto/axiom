@@ -5,7 +5,7 @@ namespace App\Modules\ERP\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\ERP\Entity\ERPBuyOrders;
 use \App\Modules\ERP\Entity\ERPProducts;
-use \App\Modules\ERP\Entity\ERPVariantsValues;
+use \App\Modules\ERP\Entity\ERPVariants;
 use \App\Modules\ERP\Entity\ERPStores;
 
 /**
@@ -38,7 +38,7 @@ class ERPBuyOrdersLines
     private $product;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPVariantsValues")
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPVariants")
      */
     private $variant;
 
@@ -244,12 +244,12 @@ class ERPBuyOrdersLines
         return $this;
     }
 
-    public function getVariant(): ?ERPVariantsValues
+    public function getVariant(): ?ERPVariants
     {
         return $this->variant;
     }
 
-    public function setVariant(?ERPVariantsValues $variant): self
+    public function setVariant(?ERPVariants $variant): self
     {
         $this->variant = $variant;
 

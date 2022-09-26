@@ -1,0 +1,174 @@
+
+{% set params = app.request.attributes.get('_route_params')|merge(app.request.query.all()) %}
+{% set formConstructor = {"name":form} %}
+{% block header %}
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<meta name="description" content="Axiom Business Management" />
+	<meta name="author" content="" />
+
+	{{ include('@Globale/header.html.twig') }}
+  <script src="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker-es.js"></script>
+  <link rel="stylesheet" href="{{ url('index') }}js/rickshaw/rickshaw.min.css">
+	<!-- Imported styles on this page -->
+	<link rel="stylesheet" href="{{ url('index') }}css/bootstrap-grid.css">
+		<link rel="stylesheet" href="{{ url('index') }}css/timeline.css">
+	<link rel="stylesheet" href="{{ url('index') }}/js/jvectormap/jquery-jvectormap-1.2.2.css">
+	<link rel="stylesheet" href="{{ url('index') }}/js/rickshaw/rickshaw.min.css">
+{% endblock %}
+<title>{% block title %}{{ interfaceName|trans }}{% endblock %}</title>
+<body class="page-body" data-url="{{ url('indexAdmin') }}">
+<div class="page-container {% if userData.interfaceConfig.collapsedSidebar is defined and userData.interfaceConfig.collapsedSidebar %}sidebar-collapsed{% endif %}"><!-- add class "sidebar-collapsed" to close sidebar by default, "chat-visible" to make chat appear always -->
+	{{ include('@Globale/sidebar_menu.html.twig') }}
+	<div class="main-content">
+		{{ include('@Globale/head.html.twig') }}
+		{{ include('@Globale/breadcrumb.html.twig') }}
+		{#}<h2>{{ interfaceName }}</h2>#}
+		<!-- MAIN CONTENT -->
+		 <div class="panel-title">
+					<div class="col-md-12">
+						<div class="panel-title-list">Filtros de búsqueda</div>
+					</div>
+		  </div>
+			<br>
+			<br>
+      <div class="panel-body" style="">
+        <div class="row">
+					<div class="col-md-2">
+				    <div class="form-group">
+							<div class="input-group">
+								<span class="input-group-addon"><i class="fa fa-calendar" aria-hidden="true"></i></span>
+					      <input type="text" id="date-from" style="z-index:99 !important;" name="form[from]" class="datepicker form-control"  placeholder="Fecha de inicio..." value="{{ datefrom }}">
+							</div>
+				    </div>
+				  </div>
+				  <div class="col-md-2">
+				    <div class="form-group">
+							<div class="input-group">
+								<span class="input-group-addon"><i class="fa fa-calendar" aria-hidden="true"></i></span>
+					      <input type="text" id="date-to" style="z-index:99 !important;" name="form[to]" class="datepicker form-control" placeholder="Fecha de fin..." value="{{ dateto }}">
+							</div>
+				    </div>
+				  </div>
+					<div class="col-md-3">
+						<div class="form-group">
+							<select type="text" id="stores" class="form-control select2" required>
+								{% for option in stores %}
+									<option value="{{ option.id }}" {% if option.id=="-1" %}selected{% endif %}>{{ option.text }}</option>
+								{% endfor %}
+							</select>
+						</div>
+					</div>
+				  <div class="col-md-3">
+				    <div class="form-group">
+				      <button id="get-reports" type="button" class="btn btn-default btn-icon icon-left" onclick="getData();">Actualizar informes<i class="fa fa-sync"></i></button>
+				    </div>
+				  </div>
+				</div>
+				<ul id="tabs-list" class="nav nav-tabs bordered" style="margin-top:0px!important">
+					    <li class="active" id="tab-head-data" style="" attr-id="" attr-name="data">
+					        <a href="#tab-body-consumers" data-toggle="tab">
+					            <span class="visible-xs"><i class="fa fa-id-card" aria-hidden="true"></i></span>
+					            <span class="hidden-xs">Consumidores</span>
+					        </a>
+					    </li>
+							<li id="tab-head-send" attr-id="" attr-name="data" {% if id==0 %}style="display:none;"{% endif %}>
+					        <a href="#tab-body-products" data-toggle="tab">
+					            <span class="visible-xs"><i class="fa fa-id-card" aria-hidden="true"></i></span>
+					            <span class="hidden-xs">Productos</span>
+					        </a>
+					    </li>
+							<li id="tab-head-send" attr-id="" attr-name="data" {% if id==0 %}style="display:none;"{% endif %}>
+									<a href="#tab-body-operations" data-toggle="tab">
+											<span class="visible-xs"><i class="fa fa-id-card" aria-hidden="true"></i></span>
+											<span class="hidden-xs">Operaciones</span>
+									</a>
+							</li>
+					</ul>
+
+					<div class="tab-content">
+					    <div class="tab-pane active" style="" id="tab-body-consumers">
+								<div id="consumers-body">
+											{{ include('@ERP/storesmanagersoperationslocalreportsn_consumers.html.twig') }}
+								</div>
+					    </div>
+							 <div class="tab-pane" style="" id="tab-body-products">
+								 	<div id="products-body">
+										{{ include('@ERP/storesmanagersoperationslocalreportsn_products.html.twig') }}
+									</div>
+							</div>
+							<div class="tab-pane" style="" id="tab-body-operations">
+								 <div id="operations-body">
+									 {{ include('@ERP/storesmanagersoperationslocalreportsn_operations.html.twig') }}
+								 </div>
+						 </div>
+					</div>
+        </div>
+      </div>
+    </div>
+</div>
+{{ include('@ERP/storesmanagersoperationsreports_validation.html.twig') }}
+<script>
+
+function getData(){
+	if(validate_report())
+	{
+			if((++load_wait)==1) $("#load-spinner").fadeIn();
+	    $.ajax({
+	     url: '{{ url('storesManagersOperationsGetReports', {"id": id}) }}',
+	     type: 'POST',
+	     data: 'start='+$("#date-from").val()+'&end='+$("#date-to").val()+'&store='+$('#stores').val(),
+	     success:  function( data ) {
+	       if((--load_wait)==0) $("#load-spinner").fadeOut();
+console.log(data);
+			 }
+			});
+ }
+}
+
+function datepicker(){
+    $('.datepicker').each(function(index) {
+      var valueField=$(this).val();
+      var dateField=moment(valueField, "DD/MM/YYYY");
+        $(this).datetimepicker({
+        showTodayButton: true,
+        format: 'DD/MM/YYYY',
+        locale:'es',
+        useCurrent: false,
+        tooltips: spanish_tooltips_datetimepicker,
+        date: (dateField.isValid())?dateField:null
+      });
+
+      if($(this).attr("minDate")!="" && typeof $(this).attr("minDate")!==typeof undefined) $(this).data("DatePicker").minDate(moment($(this).attr("minDate"), "YYYY-MM-DD"));
+      if($(this).attr("maxDate")!="" && typeof $(this).attr("maxDate")!==typeof undefined) $(this).data("DatePicker").maxDate(moment($(this).attr("maxDate"), "YYYY-MM-DD"));
+
+    });
+}
+
+$(document).ready(function() {
+	{{ include('@Globale/form_fields_datetime.html.twig') }}
+  datepicker();
+	getData();
+});
+</script>
+
+<!-- END MODALS -->
+{% block footer %}
+
+<link rel="stylesheet" href="{{ url('index') }}js/datatables/datatables.css">
+<link rel="stylesheet" href="{{ url('index') }}js/select2/select2-bootstrap.css">
+<link rel="stylesheet" href="{{ url('index') }}js/select2/select2.css">
+<link rel="stylesheet" href="{{ url('index') }}css/custom.css">
+<link rel="stylesheet" href="{{ url('index') }}js/ol/ol.css">
+<link rel="stylesheet" href="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker.min.css">
+<!-- Imported scripts on this page -->
+<script src="{{ url('index') }}js/datatables/datatables.js"></script>
+<script src="{{ url('index') }}js/select2/select2.min.js"></script>
+<script src="{{ url('index') }}js/fileinput.js"></script>
+<script src="{{ url('index') }}js/ol/ol.js"></script>
+{{ include('@Globale/bottom.html.twig') }}
+<script src="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker.min.js"></script>
+<script src="{{ url('index') }}js/jquery.nestable.js"></script>
+{% endblock %}
+</body>

@@ -9,7 +9,6 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\ERP\Entity\ERPProducts;
 use App\Modules\ERP\Entity\ERPOfferPrices;
-use App\Modules\ERP\Entity\ERPShoppingDiscounts;
 
 class ERPOfferPricesUtils
 {

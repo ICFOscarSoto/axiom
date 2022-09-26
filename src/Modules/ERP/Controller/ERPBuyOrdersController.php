@@ -43,9 +43,9 @@ use App\Modules\ERP\Entity\ERPStores;
 use App\Modules\ERP\Entity\ERPFinancialYears;
 use App\Modules\ERP\Entity\ERPContacts;
 use App\Modules\ERP\Entity\ERPAddresses;
-use App\Modules\ERP\Entity\ERPVariantsValues;
-use App\Modules\ERP\Entity\ERPReferences;
 use App\Modules\ERP\Entity\ERPVariants;
+use App\Modules\ERP\Entity\ERPReferences;
+use App\Modules\ERP\Entity\ERPVariantsTypes;
 use App\Modules\ERP\Entity\ERPStocks;
 use App\Modules\Security\Utils\SecurityUtils;
 use App\Modules\ERP\Reports\ERPBuyOrdersReports;
@@ -945,7 +945,7 @@ class ERPBuyOrdersController extends Controller
     			return $this->render('@ERP/buyorders.html.twig', [
     				'moduleConfig' => $config,
     				'controllerName' => 'buyordersController',
-    				'interfaceName' => 'BuyOrders',
+    				'interfaceName' => 'Pedidos',
     				'optionSelected' => 'genericindex',
     				'optionSelectedParams' => ["module"=>"ERP", "name"=>"BuyOrders"],
     				'menuOptions' =>  $globaleMenuOptionsRepository->formatOptions($userdata),
@@ -1015,7 +1015,6 @@ class ERPBuyOrdersController extends Controller
 			$erpAddressesRepository=$this->getDoctrine()->getRepository(ERPAddresses::class);
 			$erpProductsRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
 			$erpProducsVariantsRepository=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
-			$erpVariantsValuesRepository=$this->getDoctrine()->getRepository(ERPVariantsValues::class);
 			$erpVariantsRepository=$this->getDoctrine()->getRepository(ERPVariants::class);
 			$erpReferencesRepository=$this->getDoctrine()->getRepository(ERPReferences::class);
 			$erpContactsRepository=$this->getDoctrine()->getRepository(ERPContacts::class);
@@ -1308,18 +1307,15 @@ class ERPBuyOrdersController extends Controller
 					}
 					// Generales
 					$product 					= $erpProductsRepository->find($line['product_id']);
-					$variantvalue			= $erpVariantsValuesRepository->find($line['variant_id']);
-					$productvariant 	= $erpProducsVariantsRepository->findOneBy(["product"=>$product,"variantvalue"=>$variantvalue,"active"=>"1","deleted"=>"0"]);
-					$variant 					= null;
-					if ($variantvalue!=null)
-						$variant 				= $erpVariantsRepository->find($variantvalue->getVariantname());
+					$variant					= $erpVariantsRepository->find($line['variant_id']);
+					$productvariant 	= $erpProducsVariantsRepository->findOneBy(["product"=>$product,"variant"=>$variant,"active"=>"1","deleted"=>"0"]);
 					$store 						= $erpStoresRepository->find($line['store_id']);
 					$reference				= $erpReferencesRepository->findOneBy(["supplier"=>$supplier,"product"=>$product, "productvariant"=>$productvariant,"active"=>"1","deleted"=>"0"]);
 					if ($reference==null)
 							$reference= $erpReferencesRepository->findOneBy(["supplier"=>$supplier,"product"=>$product,"active"=>"1","deleted"=>"0"]);
 					$buyorderline->setBuyOrder($buyorder);
 					$buyorderline->setProduct($product);
-					$buyorderline->setVariant($variantvalue);
+					$buyorderline->setVariant($variant);
 					$buyorderline->setDateupd(new \DateTime());
 					$buyorderline->setLinenum($line['linenum']);
 					$buyorderline->setCode($line['code']);
@@ -1360,13 +1356,13 @@ class ERPBuyOrdersController extends Controller
 						$buyorderline->setStorecode('');
 						$buyorderline->setStorename('');
 					}
-					if ($variant!=null){
-						$buyorderline->setVariantname($variant->getName());
+					if ($variant!=null && $variant->getVarianttype()!=null){
+						$buyorderline->setVariantname($variant->getVarianttype()->getName());
 					}else{
 						$buyorderline->setVariantname('');
 					}
-					if ($variantvalue!=null){
-						$buyorderline->setVariantvalue($variantvalue->getName());
+					if ($variant!=null){
+						$buyorderline->setVariantvalue($variant->getName());
 					}else{
 						$buyorderline->setVariantvalue('');
 					}

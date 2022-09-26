@@ -3,12 +3,12 @@
 namespace App\Modules\ERP\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use \App\Modules\ERP\Entity\ERPVariants;
+use \App\Modules\Globale\Entity\GlobaleCompanies;
 
 /**
- * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPVariantsValuesRepository")
+ * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPVariantsTypesRepository")
  */
-class ERPVariantsValues
+class ERPVariantsTypes
 {
     /**
      * @ORM\Id()
@@ -21,12 +21,6 @@ class ERPVariantsValues
      * @ORM\Column(type="string", length=32)
      */
     private $name;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPVariants")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $variantname;
 
     /**
      * @ORM\Column(type="boolean")
@@ -48,6 +42,12 @@ class ERPVariantsValues
      */
     private $dateupd;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCompanies")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $company;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -61,18 +61,6 @@ class ERPVariantsValues
     public function setName(string $name): self
     {
         $this->name = $name;
-
-        return $this;
-    }
-
-    public function getVariantname(): ?ERPVariants
-    {
-        return $this->variantname;
-    }
-
-    public function setVariantname(?ERPVariants $variantname): self
-    {
-        $this->variantname = $variantname;
 
         return $this;
     }
@@ -125,4 +113,15 @@ class ERPVariantsValues
         return $this;
     }
 
+    public function getCompany(): ?GlobaleCompanies
+    {
+        return $this->company;
+    }
+
+    public function setCompany(?GlobaleCompanies $company): self
+    {
+        $this->company = $company;
+
+        return $this;
+    }
 }

@@ -7,7 +7,7 @@ use \App\Modules\ERP\Entity\ERPProducts;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
 use \App\Modules\ERP\Entity\ERPStoreLocations;
 use \App\Modules\ERP\Entity\ERPProductsVariants;
-use \App\Modules\ERP\Entity\ERPVariantsValues;
+use \App\Modules\ERP\Entity\ERPVariants;
 use \App\Modules\Globale\Entity\GlobaleUsers;
 
 /**
@@ -22,17 +22,6 @@ class ERPStocks
      */
     private $id;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPProducts")
-     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
-     */
-    private $product;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPVariantsValues")
-     * @ORM\JoinColumn(onDelete="CASCADE")
-     */
-    private $variant;
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCompanies")
      * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
@@ -58,6 +47,11 @@ class ERPStocks
      * @ORM\Column(type="float", nullable=true)
      */
     private $minstock;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    private $maxstock;
 
     /**
      * @ORM\Column(type="float")
@@ -109,18 +103,6 @@ class ERPStocks
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getProduct(): ?ERPProducts
-    {
-        return $this->product;
-    }
-
-    public function setProduct(?ERPProducts $product): self
-    {
-        $this->product = $product;
-
-        return $this;
     }
 
     public function getCompany(): ?GlobaleCompanies
@@ -179,6 +161,18 @@ class ERPStocks
     public function setMinstock(?float $minstock): self
     {
         $this->minstock = $minstock;
+
+        return $this;
+    }
+
+    public function getMaxstock(): ?float
+    {
+        return $this->maxstock;
+    }
+
+    public function setMaxstock(?float $maxstock): self
+    {
+        $this->maxstock = $maxstock;
 
         return $this;
     }
@@ -263,18 +257,6 @@ class ERPStocks
     public function setProductvariant(?ERPProductsVariants $productvariant): self
     {
         $this->productvariant = $productvariant;
-
-        return $this;
-    }
-
-    public function getvariant(): ?ERPVariantsValues
-    {
-        return $this->variant;
-    }
-
-    public function setVariant(?ERPVariantsValues $variant): self
-    {
-        $this->variant = $variant;
 
         return $this;
     }

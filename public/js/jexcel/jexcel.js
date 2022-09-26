@@ -6334,6 +6334,8 @@ if (! jSuites && typeof(require) === 'function') {
                     value = obj.getValueFromKey(cell_x, cell_y);
                 }else
                   error = true;
+                if (value!='')
+                  value = value.toString().replace('/','-');
               }
               else
               // Variable contenida en el array window global

@@ -7,10 +7,12 @@ use \App\Modules\ERP\Entity\ERPManufacturers;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
 use \App\Modules\ERP\Entity\ERPCategories;
 use \App\Modules\ERP\Entity\ERPSuppliers;
-use \App\Modules\ERP\Entity\ERPProductsSuppliers;
 use \App\Modules\ERP\Entity\ERPPrestashopFieldNames;
 use \App\Modules\ERP\Entity\ERPProductPrices;
-use \App\Modules\ERP\Entity\ERPShoppingPrices;
+use \App\Modules\ERP\Entity\ERPProductsVariants;
+use \App\Modules\ERP\Entity\ERPProductsSuppliers;
+use \App\Modules\ERP\Entity\ERPProductsSuppliersPrices;
+use \App\Modules\ERP\Entity\ERPProductsSuppliersDiscounts;
 use \App\Modules\ERP\Utils\ERPPrestashopUtils;
 use \App\Modules\ERP\Entity\ERPCustomerGroups;
 use \App\Modules\ERP\Entity\ERPMeasurementUnits;
@@ -54,11 +56,6 @@ class ERPProducts
      * @ORM\Column(type="boolean")
      */
     private $onbuy=1;
-
-    /**
-     * @ORM\Column(type="float", nullable=true)
-     */
-    private $weight;
 
     /**
      * @ORM\Column(type="boolean")
@@ -131,15 +128,6 @@ class ERPProducts
     private $minimumquantityofsale=1;
 
     /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
-    private $minimumquantityofbuy=1;
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
-    private $purchaseunit=1;
-
-    /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPManufacturers")
      * @ORM\JoinColumn(onDelete="SET NULL")
      */
@@ -183,10 +171,6 @@ class ERPProducts
      */
     private $salepacking;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
-    private $multiplicity;
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
@@ -233,10 +217,6 @@ class ERPProducts
      */
     private $checkweb;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
-    private $purchasepacking;
 
     public function getStockcampollano($doctrine): ?int
     {
@@ -308,18 +288,6 @@ class ERPProducts
     public function setOnbuy(bool $onbuy): self
     {
         $this->onbuy = $onbuy;
-
-        return $this;
-    }
-
-    public function getWeight(): ?float
-    {
-        return $this->weight;
-    }
-
-    public function setWeight(?float $weight): self
-    {
-        $this->weight = $weight;
 
         return $this;
     }
@@ -577,18 +545,6 @@ class ERPProducts
         return $this;
     }
 
-    public function getMultiplicity(): ?int
-    {
-        return $this->multiplicity;
-    }
-
-    public function setMultiplicity(?int $multiplicity): self
-    {
-        $this->multiplicity = $multiplicity;
-
-        return $this;
-    }
-
     public function getPromotion(): ?bool
     {
         return $this->promotion;
@@ -651,19 +607,19 @@ class ERPProducts
 
 
     public function getShoppingDiscount($doctrine, $supplierProduct) {
-      $repository=$doctrine->getRepository(ERPShoppingDiscounts::class);
-      //Search in the treeCategories which is the most specific with ShoppingDiscounts
+      $repository=$doctrine->getRepository(ERPProductsSuppliersDiscounts::class);
+      //Search in the treeCategories which is the most specific with productsuppliersdiscounts
       $repositoryCategory=$doctrine->getRepository(ERPCategories::class);
       $category=$this->category;
-      $shoppingDiscounts=$repository->findOneBy(["supplier"=>$supplierProduct,"category"=>$category,"active"=>1,"deleted"=>0]);
+      $productsuppliersdiscounts=$repository->findOneBy(["supplier"=>$supplierProduct,"category"=>$category,"active"=>1,"deleted"=>0]);
       if ($category!=null)
-      while ($category->getParentid()!=null && $shoppingDiscounts==null){
+      while ($category->getParentid()!=null && $productsuppliersdiscounts==null){
           $category=$category->getParentid();
-          $shoppingDiscounts=$repository->findOneBy(["supplier"=>$supplierProduct,"category"=>$category,"active"=>1,"deleted"=>0]);
+          $productsuppliersdiscounts=$repository->findOneBy(["supplier"=>$supplierProduct,"category"=>$category,"active"=>1,"deleted"=>0]);
       }
-      if ($shoppingDiscounts==null)
-          $shoppingDiscounts=$repository->findOneBy(["supplier"=>$supplierProduct,"active"=>1,"deleted"=>0]);
-      return $shoppingDiscounts!=null?$shoppingDiscounts->getDiscount():0;
+      if ($productsuppliersdiscounts==null)
+          $productsuppliersdiscounts=$repository->findOneBy(["supplier"=>$supplierProduct,"active"=>1,"deleted"=>0]);
+      return $productsuppliersdiscounts!=null?$productsuppliersdiscounts->getDiscount():0;
     }
 
 
@@ -729,25 +685,31 @@ class ERPProducts
 
     public function calculateShoppingPrices($doctrine, $supplier){
       $em = $doctrine->getManager();
-      $shoppingPricesRepository=$doctrine->getRepository(ERPShoppingPrices::class);
+      $productsVariantsRepository=$doctrine->getRepository(ERPProductsVariants::class);
       $productsSuppliersRepository=$doctrine->getRepository(ERPProductsSuppliers::class);
-      $shoppingPrice=$shoppingPricesRepository->findBy(["product"=>$this, "supplier"=>$supplier, "active"=>1,"deleted"=>0]);
-      if ($shoppingPrice==null){
-        $shoppingPrices=new ERPShoppingPrices();
-        $shoppingPrice=$this->PVPR*(1-$this->getShoppingDiscount($doctrine, $supplier)/100);
-        $shoppingPrices->setShoppingPrice($shoppingPrice);
-        $shoppingPrices->setProduct($this);
-        $shoppingPrices->setSupplier($supplier);
-        $shoppingPrices->setQuantity(1);
-        $shoppingPrices->setDateadd(new \Datetime());
-        $shoppingPrices->setDateupd(new \Datetime());
-        $shoppingPrices->setActive(1);
-        $shoppingPrices->setDeleted(0);
-        if ($this->getNetprice()==0) $shoppingPrices->setPVP($this->getPVPr());
-        else $shoppingPrices->setPVP($this->getPVP());
-        $em->merge($shoppingPrices);
+      $productsSuppliersPricesRepository=$doctrine->getRepository(ERPProductsSuppliersPrices::class);
+      $productvariant=$productsVariantsRepository->findBy(["product"=>$this, "variant"=>null, "active"=>1,"deleted"=>0]);
+      if ($productvariant!=null){
+        $productsupplier=$productsSuppliersRepository->findBy(["productvariant"=>$productvariant, "supplier"=>$supplier, "active"=>1,"deleted"=>0]);
+        if ($productsupplier!=null){
+          $productsupplierprice=$productsSuppliersPricesRepository->findBy(["productsupplier"=>$productsupplier, "active"=>1,"deleted"=>0]);
+          if ($productsupplierprice==null){
+            $productsupplierprice=new ERPProductsSuppliersPrices();
+            $price=$this->PVPR*(1-$this->getShoppingDiscount($doctrine, $supplier)/100);
+            $productsupplierprice->setPrice($price);
+            $productsupplierprice->setProductSupplier($productsupplier);
+            $productsupplierprice->setQuantity(1);
+            $productsupplierprice->setDateadd(new \Datetime());
+            $productsupplierprice->setDateupd(new \Datetime());
+            $productsupplierprice->setActive(1);
+            $productsupplierprice->setDeleted(0);
+            if ($this->getNetprice()==0) $productsupplierprice->setPVP($this->getPVPr());
+            else $productsupplierprice->setPVP($this->getPVP());
+            $em->merge($productsupplierprice);
+          }
+          $em->flush();
+        }
       }
-      $em->flush();
     }
 
     public function calculatePVP($doctrine){
@@ -975,42 +937,6 @@ class ERPProducts
   public function setCheckweb(?bool $checkweb): self
   {
       $this->checkweb = $checkweb;
-
-      return $this;
-  }
-
-  public function getPurchasepacking(): ?int
-  {
-      return $this->purchasepacking;
-  }
-
-  public function setPurchasepacking(?int $purchasepacking): self
-  {
-      $this->purchasepacking = $purchasepacking;
-
-      return $this;
-  }
-
-  public function getMinimumquantityofbuy(): ?int
-  {
-      return $this->minimumquantityofbuy;
-  }
-
-  public function setMinimumquantityofbuy(?int $minimumquantityofbuy): self
-  {
-      $this->minimumquantityofbuy = $minimumquantityofbuy;
-
-      return $this;
-  }
-
-  public function getPurchaseunit(): ?int
-  {
-      return $this->purchaseunit;
-  }
-
-  public function setPurchaseunit(?int $purchaseunit): self
-  {
-      $this->purchaseunit = $purchaseunit;
 
       return $this;
   }

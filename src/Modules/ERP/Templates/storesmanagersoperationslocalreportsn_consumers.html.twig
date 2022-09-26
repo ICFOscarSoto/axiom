@@ -1,0 +1,11 @@
+<div class="row">
+	<div class="col-md-12">
+		<div class="panel-title-list">Consumos por trabajador </div>
+		<div class="col-md-12">
+		{% if consumersoperationslist is defined %}
+		{% set listConstructor = consumersoperationslist %}
+		{{ include('@Globale/list.html.twig') }}
+		{% endif %}
+		</div>
+	</div>
+</div>

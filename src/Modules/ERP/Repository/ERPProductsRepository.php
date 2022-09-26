@@ -62,7 +62,7 @@ class ERPProductsRepository extends ServiceEntityRepository
 
     public function productsBySupplierCategory($supplier,$category){
       if($category!=0) $query="SELECT id from erpproducts
-      where id in (select product_id from erpproducts_suppliers where supplier_id=:supplier) AND category_id=:category";
+      where id in (select p.product_id from erpproducts p left join erpproducts_variants pv on pv.product_id=p.id left join erpproducts_suppliers ps on ps.productvariant_id=pv.id and pv.variant_id is null where ps.supplier_id=:supplier) AND p.category_id=:category";
       else $query="SELECT id from erpproducts
       where supplier_id=:supplier";
       $params=['supplier' => $supplier,
@@ -73,25 +73,21 @@ class ERPProductsRepository extends ServiceEntityRepository
     }
 
     public function getVariants($product){
-        $query='SELECT pv.id as id,v.name as type, vv.name as name
+        $query='SELECT v.id as id, vt.name as type, v.name as name
         FROM erpproducts_variants pv
-        LEFT JOIN erpvariants_values vv
-        ON pv.variantvalue_id=vv.id
-        LEFT JOIN erpvariants v
-        ON pv.variantname_id=v.id
-        WHERE pv.product_id=:product AND pv.active=1 AND pv.deleted=0 ORDER BY name ASC';
+        LEFT JOIN erpvariants v ON v.id=pv.variant_id
+        LEFT JOIN erpvariants_types vt ON vt.id=v.varianttype_id
+        WHERE pv.product_id=:product AND pv.variant_id is not null AND pv.active=1 AND pv.deleted=0 ORDER BY name ASC';
         $params=['product' => $product];
         return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
     }
 
-    public function getVariantValues($product){
-        $query='SELECT vv.id as id, vv.name as name
+    public function getvariant($product){
+        $query='SELECT v.id as id, v.name as name
         FROM erpproducts_variants pv
-        LEFT JOIN erpvariants_values vv
-        ON pv.variantvalue_id=vv.id
-        LEFT JOIN erpvariants v
-        ON pv.variantname_id=v.id
-        WHERE pv.product_id=:product AND pv.active=1 AND pv.deleted=0 ORDER BY name ASC';
+        LEFT JOIN erpvariants v ON v.id=pv.variant_id
+        LEFT JOIN erpvariants_types vt ON vt.id=v.varianttype_id
+        WHERE pv.product_id=:product AND pv.variant_id is not null AND pv.active=1 AND pv.deleted=0 ORDER BY name ASC';
         $params=['product' => $product];
         return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
     }
@@ -236,22 +232,21 @@ class ERPProductsRepository extends ServiceEntityRepository
                      p.name as productname,
                      if (vv.id is null,'Sin variante',concat(v.name, ' - ',vv.name)) as variantname,
                      0 as quantity,
-                     if (p.purchasepacking is null, 1, if (p.purchasepacking='', 1, p.purchasepacking)) as 'packing',
-                     if (p.multiplicity is null, 1, if (p.multiplicity='', 1, p.multiplicity)) as 'multiplicity',
-                     if (p.minimumquantityofbuy is null, 1, if (p.minimumquantityofbuy='', 1, p.minimumquantityofbuy)) as 'minimumquantityofbuy',
-                     if (p.purchaseunit is null, 1, if (p.purchaseunit='',1, p.purchaseunit)) as 'purchaseunit'
-              FROM erpshopping_prices sp LEFT JOIN
-                   erpproducts p on p.id=sp.product_id LEFT JOIN
+                     if (pv.purchasepacking is null, 1, if (pv.purchasepacking='', 1, pv.purchasepacking)) as 'packing',
+                     if (ps.multiplicity is null, 1, if (ps.multiplicity='', 1, ps.multiplicity)) as 'multiplicity',
+                     if (ps.minimumquantityofbuy is null, 1, if (ps.minimumquantityofbuy='', 1, ps.minimumquantityofbuy)) as 'minimumquantityofbuy',
+                     if (ps.purchaseunit is null, 1, if (ps.purchaseunit='',1, ps.purchaseunit)) as 'purchaseunit'
+              FROM erpproducts_suppliers ps LEFT JOIN
+                   erpproducts_variants pv on pv.id=ps.productvariant_id LEFT JOIN
+                   erpproducts p on p.id=pv.product_id LEFT JOIN
                    erpcategories c on c.id=p.category_id LEFT JOIN
-                   erpproducts_variants pv on pv.product_id=p.id LEFT JOIN
-                   erpvariants_values vv on pv.variantvalue_id=vv.id LEFT JOIN
-                   erpvariants v on vv.variantname_id=v.id
-              WHERE sp.supplier_id=:supplier_id and
+                   erpvariants vv on vv.id=pv.variant_id LEFT JOIN
+                   erpvariants_types v on v.id=vv.varianttype_id
+              WHERE ps.supplier_id=:supplier_id and
                     p.active=1 and p.deleted=0 and
-                    sp.active=1 and sp.deleted=0 and
-                    (sp.start is null or sp.start>=now()) and
-                    (sp.end is null or sp.end<=now()) and
-                    p.code is not null and p.code <> ''
+                    ps.active=1 and ps.deleted=0 and
+                    p.code is not null and p.code <> '' and
+                    (vv.id is not null or (vv.id is null and (select count(*) from erpproducts_variants pv2 left join erpproducts_suppliers ps2 on pv2.id=ps2.productvariant_id where pv2.product_id=p.id and pv2.variant_id is not null and ps2.supplier_id=ps.supplier_id)=0))
               GROUP BY id, variantid
               ORDER BY category ASC, productname ASC, variantname ASC";
       $params=["supplier_id" => $supplier_id];
@@ -285,13 +280,13 @@ class ERPProductsRepository extends ServiceEntityRepository
         $query="SELECT distinct(concat(p.id,'~',p.code)) as id,
                        p.code as name,
                        p.name as title
-                FROM erpshopping_prices sp LEFT JOIN
-                     erpproducts p on p.id=sp.product_id
-                WHERE sp.supplier_id=:supplier_id and
-                      p.active=1 and p.deleted=0 and
-                      sp.active=1 and sp.deleted=0 and
-                      (sp.start is null or sp.start>=now()) and
-                      (sp.end is null or sp.end<=now())
+                FROM erpproducts_suppliers ps LEFT JOIN
+                     erpproducts_variants pv on pv.id=ps.productvariant_id LEFT JOIN
+                     erpproducts p on p.id=pv.product_id
+                WHERE ps.supplier_id=:supplier_id and
+                      pv.variant_id is null and
+                      pv.active=1 and pv.deleted=0 and
+                      p.active=1 and p.deleted=0
                       $filter
                 UNION
                 SELECT '0~Artículo...' as id, 'Artículo...' as name, '' as title FROM erpproducts
@@ -313,36 +308,38 @@ class ERPProductsRepository extends ServiceEntityRepository
           $product = $aproduct[0];
         $query="SELECT concat(p.id,'~',p.code) as 'product_id',
                        p.name as 'productname',
-                       if (sp.pvp is null, 0, if (sp.pvp='', 0, sp.pvp)) as 'pvp',
+                       if (psp.pvp is null, 0, if (psp.pvp='', 0, psp.pvp)) as 'pvp',
                        if (sd.discount1 is null, 0, if (sd.discount1='', 0, sd.discount1)) as 'discount1',
                        if (sd.discount2 is null, 0, if (sd.discount2='', 0, sd.discount2)) as 'discount2',
                        if (sd.discount3 is null, 0, if (sd.discount3='', 0, sd.discount3)) as 'discount3',
                        if (sd.discount4 is null, 0, if (sd.discount4='', 0, sd.discount4)) as 'discount4',
                        if (sd.discount is null, 0, if (sd.discount='', 0, sd.discount)) as 'discountequivalent',
                        if (t.tax is null, 0, if (t.tax='', 0, t.tax)) as 'taxperc',
-                       if (p.weight is null, 0, if (p.weight='', 0, p.weight)) as 'weight',
-                       if (p.purchasepacking is null, 1, if (p.purchasepacking='', 1, p.purchasepacking)) as 'packing',
-                       if (p.multiplicity is null, 1, if (p.multiplicity='', 1, p.multiplicity)) as 'multiplicity',
-                       if (p.minimumquantityofbuy is null, 1, if (p.minimumquantityofbuy='', 1, p.minimumquantityofbuy)) as 'minimumquantityofbuy',
-                       if (p.purchaseunit is null, 1, if (p.purchaseunit='',1, p.purchaseunit)) as 'purchaseunit',
+                       if (pv.weight is null, 0, if (pv.weight='', 0, pv.weight)) as 'weight',
+                       if (pv.purchasepacking is null, 1, if (pv.purchasepacking='', 1, pv.purchasepacking)) as 'packing',
+                       if (ps.multiplicity is null, 1, if (ps.multiplicity='', 1, ps.multiplicity)) as 'multiplicity',
+                       if (ps.minimumquantityofbuy is null, 1, if (ps.minimumquantityofbuy='', 1, ps.minimumquantityofbuy)) as 'minimumquantityofbuy',
+                       if (ps.purchaseunit is null, 1, if (ps.purchaseunit='',1, ps.purchaseunit)) as 'purchaseunit',
                        if (m.name is null, '', m.name) as 'purchasemeasure'
-                FROM erpshopping_prices sp LEFT JOIN
-                     erpproducts p on p.id=sp.product_id LEFT JOIN
+                FROM erpproducts_suppliers_prices psp LEFT JOIN
+                     erpproducts_suppliers ps on ps.id=psp.productsupplier_id LEFT JOIN
+                     erpproducts_variants pv on pv.id=ps.productvariant_id LEFT JOIN
+                     erpproducts p on p.id=pv.product_id LEFT JOIN
                      erpmeasurement_units m on m.id=p.purchasemeasure_id LEFT JOIN
                      globale_taxes t on t.id=p.taxes_id LEFT JOIN
-                     erpshopping_discounts sd on sd.supplier_id=sp.supplier_id and sd.category_id=p.category_id and sd.quantity<=:quantity and
+                     erpproducts_suppliers_discounts sd on sd.supplier_id=ps.supplier_id and sd.category_id=p.category_id and sd.quantity<=:quantity and
                       sd.active=1 and sd.deleted=0 and
                       (sd.start is null or sd.start<=now()) and
                        (sd.end is null or sd.end>=now())
-                WHERE sp.supplier_id=:supplier and
+                WHERE ps.supplier_id=:supplier and
                       p.id=:product and
-                      sp.quantity<=:quantity and
-                      sp.variant_id is null and
+                      psp.quantity<=:quantity and
+                      pv.variant_id is null and
                       p.active=1 and p.deleted=0 and
-                      sp.active=1 and sp.deleted=0 and
-                      (sp.start is null or sp.start<=now()) and
-                      (sp.end is null or sp.end>=now())
-                ORDER BY p.name ASC, sp.quantity DESC, sd.quantity DESC";
+                      psp.active=1 and psp.deleted=0 and
+                      (psp.start is null or psp.start<=now()) and
+                      (psp.end is null or psp.end>=now())
+                ORDER BY p.name ASC, psp.quantity DESC, sd.quantity DESC";
         $params=["supplier" => $supplier, "product" => $product, "quantity"=>$quantity];
         $result = $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
       }
@@ -422,19 +419,22 @@ class ERPProductsRepository extends ServiceEntityRepository
           $query="SELECT distinct(sd.id) as 'id',
                          if (sd.discount is null, 0, if (sd.discount='', 0, sd.discount)) as 'discountequivalent',
                          if (sd.quantity is null, 1, if (sd.quantity='', 1, sd.quantity)) as 'quantity'
-                  FROM erpshopping_prices sp LEFT JOIN
-                       erpproducts p on p.id=sp.product_id LEFT JOIN
-                       erpshopping_discounts sd on sd.supplier_id=sp.supplier_id and sd.category_id=p.category_id and sd.quantity>1 and
+                  FROM erpproducts_suppliers_prices psp LEFT JOIN
+                       erpproducts_suppliers ps on ps.id=psp.productsupplier_id LEFT JOIN
+                       erpproducts_variants pv on pv.id=ps.productvariant_id LEFT JOIN
+                       erpproducts p on p.id=pv.product_id LEFT JOIN
+                       erpproducts_suppliers_discounts sd on sd.supplier_id=ps.supplier_id and sd.category_id=p.category_id and sd.quantity>1 and
                         sd.active=1 and sd.deleted=0 and
                         (sd.start is null or sd.start<=now()) and
                          (sd.end is null or sd.end>=now())
-                  WHERE sp.supplier_id=:supplier and
+                  WHERE ps.supplier_id=:supplier and
                         p.id=:product and
                         p.active=1 and p.deleted=0 and
-                        sp.active=1 and sp.deleted=0 and
-                        (sp.start is null or sp.start<=now()) and
-                        (sp.end is null or sp.end>=now())
-                  ORDER BY p.name ASC, sp.quantity DESC, sd.quantity DESC";
+                        pv.variant_id is null and
+                        psp.active=1 and psp.deleted=0 and
+                        (psp.start is null or psp.start<=now()) and
+                        (psp.end is null or psp.end>=now())
+                  ORDER BY p.name ASC, psp.quantity DESC, sd.quantity DESC";
           $params=["supplier" => $supplier, "product" => $product];
           $resultdto = $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
           if ($resultdto!=null && count($resultdto)>0){

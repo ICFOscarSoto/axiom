@@ -1,8 +1,0 @@
-[
-  {"id": "editShoppingPrices", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"genericdata", "routeParams":{"module":"ERP", "name":"ShoppingPrices", "type":"modal" }, "modal":"ShoppingPrices", "actionType" : "background", "confirm" :false, "tooltip":""},
-  {"id": "activation", "type": "option", "options": [
-      {"id": "desactivateShoppingPrices", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"genericdisable", "routeParams":{"module":"ERP", "name":"ShoppingPrices"}, "confirm" :true, "actionType" : "background", "tooltip":"" },
-      {"id": "activateShoppingPrices", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "route":"genericenable", "routeParams":{"module":"ERP", "name":"ShoppingPrices"}, "confirm" :true, "actionType" : "background", "tooltip":"" }
-  ]},
-  {"id": "deleteShoppingPrices", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"genericdelete", "routeParams":{"module":"ERP", "name":"ShoppingPrices"}, "confirm" :true, "undo" :false, "actionType" : "background", "tooltip":""}
-]

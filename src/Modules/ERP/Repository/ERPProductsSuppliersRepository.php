@@ -70,18 +70,21 @@ class ERPProductsSuppliersRepository extends ServiceEntityRepository
                      sd.quantity as quantity,
                      sd.start as start,
                      sd.end as end,
-                     round(sp.pvp,2) as PVPR,
-                     round(sp.shopping_price,:decimals) as price,
+                     round(psp.pvp,2) as PVPR,
+                     round(psp.price,:decimals) as price,
                      (case when s.id=:supplier_preference then 1 else 0 end) as preference
-              FROM erpproducts_suppliers ps LEFT JOIN
-                   erpsuppliers s on s.id=ps.supplier_id LEFT JOIN
-                   erpshopping_discounts sd on sd.supplier_id=ps.supplier_id and sd.category_id=:category and sd.deleted=0 and sd.active=1 LEFT JOIN
-                   erpshopping_prices sp on sp.product_id=:product and sp.supplier_id=ps.supplier_id and (sp.quantity=sd.quantity or sd.quantity is null)
-              WHERE ps.product_id=:product and
+              FROM erpproducts_suppliers_prices psp LEFT JOIN
+                   erpproducts_suppliers ps on ps.id=psp.productsupplier_id LEFT JOIN
+                   erpproducts_variants pv on pv.id=ps.productvariant_id LEFT JOIN
+                   erpproducts p on p.id=pv.product_id LEFT JOIN
+                   erpproducts_suppliers_discounts sd on sd.supplier_id=ps.supplier_id and sd.category_id=:category and sd.deleted=0 and sd.active=1
+              WHERE pv.product_id=:product and
+                    pv.variant_id is null and
                     s.deleted=0 and s.active=1 and
                     ps.deleted=0 and ps.active=1 and
                     ps.company_id = :company and
-                    s.company_id = :company
+                    s.company_id = :company and
+                    (psp.quantity=sd.quantity or sd.quantity is null)
               ORDER BY preference desc, supplier asc";
       $param=["product"=>$product_id, "category"=>$category_id, "supplier_preference"=>$supplierPreference, "company"=>$company->getId(), "decimals"=>$config->getDecimals()];
       $suppliers = $this->getEntityManager()->getConnection()->executeQuery($query, $param)->fetchAll();

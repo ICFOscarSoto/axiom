@@ -4,6 +4,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use App\Modules\Globale\Entity\MenuOptions;
 use App\Modules\ERP\Entity\ERPWebProducts;
 use App\Modules\ERP\Entity\ERPProducts;
+use App\Modules\ERP\Entity\ERPProductsVariants;
 use App\Modules\ERP\Entity\ERPPrestashopFieldNames;
 use App\Modules\ERP\Entity\ERPOfferPrices;
 
@@ -21,6 +22,7 @@ class ERPPrestashopUtils
     try{
 
          $repositoryPrestashopFieldNames=$doctrine->getRepository(ERPPrestashopFieldNames::class);
+         $repositoryProductsVariants=$doctrine->getRepository(ERPProductsVariants::class);
 
          //lo primero que hacemos es comprobar si se ha modificado el campo checkweb. Este campo lo tenemos que tratar independientemente del resto y darle prioridad.
          if(array_key_exists("checkweb",$array_new_data)){
@@ -177,9 +179,12 @@ class ERPPrestashopUtils
 
                        //para indicar en la web la cantidad mínima de venta, normalmente cogemos el valor minquantityofsaleweb.
                        //no obstante, si tenemos una unidad de embalaje de compra puesta y ésta es menor, lo priorizamos y subimos este valor.
-                       if($product->getPurchasepacking()<$valor AND $product->getPurchasepacking()>0) $xml->product->cantidad_pedido_minimo=$product->getPurchasepacking();
-                       else if($valor>0) $xml->product->cantidad_pedido_minimo=$valor;
-                          $this->callWSUpdateProduct($id_prestashop,$xml);
+                       $productvariant=$repositoryProductsVariants->findAll(["product"=>$product]);
+                       if ($productvariant!=null && count($productvariant)>0){
+                         if($productvariant[0]->getPurchasepacking()<$valor AND $productvariant[0]->getPurchasepacking()>0) $xml->product->cantidad_pedido_minimo=$productvariant[0]->getPurchasepacking();
+                         else if($valor>0) $xml->product->cantidad_pedido_minimo=$valor;
+                            $this->callWSUpdateProduct($id_prestashop,$xml);
+                       }
                      }
 
                      else if($xml->product->$psname->language) {

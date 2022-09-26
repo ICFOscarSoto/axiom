@@ -1,8 +1,0 @@
-[
-  {"id": "edit", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"dataInfoStocks", "modal":"infoStocks", "actionType" : "background", "confirm" :false},
-  {"id": "activation", "type": "option", "options": [
-      {"id": "desactivateInfoStocks", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"genericdisable", "routeParams":{"module":"ERP", "name":"InfoStocks"}, "confirm" :true, "actionType" : "background", "tooltip":"" },
-      {"id": "activateInfoStocks", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "route":"genericenable", "routeParams":{"module":"ERP", "name":"InfoStocks"}, "confirm" :true, "actionType" : "background", "tooltip":"" }
-  ]},
-  {"id": "deleteInfoStocks", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"genericdelete", "routeParams":{"module":"ERP", "name":"InfoStocks"}, "confirm" :true, "undo" :false, "actionType" : "background", "tooltip":""}
-]

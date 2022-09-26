@@ -82,14 +82,16 @@ class ERPCustomerPricesRepository extends ServiceEntityRepository
                      i.increment as Increment,
                      i.start as start,
                      i.end as end,
-                     round((sp.shopping_price * (1+(i.increment/100))),:decimals) as price,
+                     round((psp.price * (1+(i.increment/100))),:decimals) as price,
                      (case when s.id=:supplier_preference then 1 else 0 end) as preference
               FROM erpproducts_suppliers ps LEFT JOIN
+                   erpproducts_variants pv on pv.id=ps.productvariant_id LEFT JOIN
                    erpsuppliers s on s.id=ps.supplier_id LEFT JOIN
-                   erpshopping_prices sp on sp.product_id=:product and sp.supplier_id=ps.supplier_id and sp.quantity=1 LEFT JOIN
+                   erpproducts_suppliers_prices psp on psp.productsupplier_id=ps.id and psp.quantity=1 LEFT JOIN
                    erpcustomer_increments i on i.supplier_id=ps.supplier_id and i.category_id=:category and i.deleted=0 and i.active=1 LEFT JOIN
                    erpcustomers cu on cu.id=i.customer_id
-              WHERE ps.product_id=:product and
+              WHERE pv.product_id=:product and
+                    pv.variant_id is null and
                     s.deleted=0 and s.active=1 and
                     ps.deleted=0 and ps.active=1 and
                     ps.company_id = :company and

@@ -15,19 +15,18 @@ use App\Modules\ERP\Entity\ERPWebProducts;
 use App\Modules\ERP\Entity\ERPEAN13;
 use App\Modules\ERP\Entity\ERPReferences;
 use App\Modules\ERP\Entity\ERPProductsAttributes;
+use App\Modules\ERP\Entity\ERPVariantsTypes;
 use App\Modules\ERP\Entity\ERPVariants;
-use App\Modules\ERP\Entity\ERPVariantsValues;
 use App\Modules\ERP\Entity\ERPManufacturers;
 use App\Modules\ERP\Entity\ERPStocks;
-use App\Modules\ERP\Entity\ERPStockHistory;
+use App\Modules\ERP\Entity\ERPStocksHistory;
 use App\Modules\ERP\Entity\ERPStoreLocations;
 use App\Modules\ERP\Entity\ERPStores;
 use App\Modules\ERP\Entity\ERPStoresUsers;
-use App\Modules\ERP\Entity\ERPShoppingDiscounts;
-use App\Modules\ERP\Entity\ERPShoppingPrices;
+use App\Modules\ERP\Entity\ERPProductsSuppliersDiscounts;
+use App\Modules\ERP\Entity\ERPProductsSuppliersPrices;
 use App\Modules\ERP\Entity\ERPCategories;
 use App\Modules\ERP\Entity\ERPProductsVariants;
-use App\Modules\ERP\Entity\ERPInfoStocks;
 use App\Modules\ERP\Entity\ERPStoresManagersUsers;
 use App\Modules\ERP\Entity\ERPStoresManagersUsersStores;
 use App\Modules\ERP\Entity\ERPTypesMovements;
@@ -163,8 +162,7 @@ class ERPProductsController extends Controller
 			["name" => "references",  "icon"=>"fa fa-users", "caption"=>"References", "route"=>$this->generateUrl("listReferences",["id"=>$id])],
 			["name"=>  "rates", "icon"=>"fa fa-money", "caption"=>"Rates","route"=>$this->generateUrl("infoProductRates",["id"=>$id])],
 			["name"=>  "productPrices", "icon"=>"fa fa-money", "caption"=>"Prices","route"=>$this->generateUrl("infoProductPrices",["id"=>$id])],
-			["name" => "stocks", "icon"=>"fa fa-id-card", "caption"=>"Stocks", "route"=>$this->generateUrl("infoStocks",["id"=>$id])],
-			["name" => "infoStocks", "icon"=>"fa fa-id-card", "caption"=>"InfoStocks", "route"=>$this->generateUrl("listInfoStocks",["id"=>$id])],
+			["name" => "stocks", "icon"=>"fa fa-id-card", "caption"=>"Stocks", "route"=>$this->generateUrl("istock",["id"=>$id])],
 			["name" => "files", "icon"=>"fa fa-cloud", "caption"=>"Files", "route"=>$this->generateUrl("cloudfiles",["id"=>$id, "path"=>"products"])]]);
 			if ($obj && $obj->getCheckweb()) {
 				$tabs[]=["name" => "c", "icon"=>"fa fa-id-card", "caption"=>"Web", "route"=>$this->generateUrl("infoWebProducts",["id"=>$id])];
@@ -237,13 +235,13 @@ class ERPProductsController extends Controller
 			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 			$EAN13repository=$this->getDoctrine()->getRepository(ERPEAN13::class);
 			$Productrepository=$this->getDoctrine()->getRepository(ERPProducts::class);
-			$Variantsrepository=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
+			$ProductsVariantsrepository=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
 			$Stocksrepository=$this->getDoctrine()->getRepository(ERPStocks::class);
 			$StoreUsersrepository=$this->getDoctrine()->getRepository(ERPStoresUsers::class);
 			$StoreLocationsrepository=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
 			$Storesrepository=$this->getDoctrine()->getRepository(ERPStores::class);
 			$obj=null;
-			$variant=null;
+			$productvariant=null;
 			if($id!=0){
 				$obj = $this->getDoctrine()->getRepository($this->class)->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
 			}else{
@@ -251,21 +249,22 @@ class ERPProductsController extends Controller
 						if(substr(strtoupper($request->request->get('barcode')),0,2)=="P."){
 							$product=$Productrepository->findOneBy(["id"=>intval(substr($request->request->get('barcode'),2)), "company"=>$this->getUser()->getCompany(), "deleted"=>0]);
 							$obj=$product;
+							$productvariant=$ProductsVariantsrepository->findOneBy(["product"=>$product, $variant=>null, "deleted"=>0]);
 						}else{
 							if(substr(strtoupper($request->request->get('barcode')),0,2)=="V."){
-								$variant=$Variantsrepository->findOneBy(["id"=>intval(substr($request->request->get('barcode'),2)), "deleted"=>0]);
-								if($variant) $obj=$variant->getProduct();
+								$productvariant=$ProductsVariantsrepository->findOneBy(["id"=>intval(substr($request->request->get('barcode'),2)), "deleted"=>0]);
+								if($productvariant) $obj=$productvariant->getProduct();
 							}else{
 								$EAN13=$EAN13repository->findOneBy(["name"=>$request->request->get('barcode',null), "deleted"=>0]);
 								if($EAN13){
 								 	$obj=$EAN13->getProduct();
-									$variant=$EAN13->getProductvariant();
+									$productvariant=$EAN13->getProductVariant();
 								}else{
 									//Try with a lead 0 at start of $barcode
 									$EAN13=$EAN13repository->findOneBy(["name"=>'0'.$request->request->get('barcode',null), "deleted"=>0]);
 									if($EAN13){
 									 	$obj=$EAN13->getProduct();
-										$variant=$EAN13->getProductvariant();
+										$productvariant=$EAN13->getProductVariant();
 									}
 								}
 							}
@@ -274,14 +273,14 @@ class ERPProductsController extends Controller
 				}
 			}
 			if($obj){
-				$stocks=$Stocksrepository->findBy(["product"=>$obj, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
-				$eans=$EAN13repository->findBy(["product"=>$obj, "productvariant"=>null, "active"=>1, "deleted"=>0]);
+				$stocks=$Stocksrepository->findBy(["productvariant"=>$productvariant, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
+				$eans=$EAN13repository->findBy(["productvariant"=>$productvariant,  "active"=>1, "deleted"=>0]);
 				$result["id"]=$obj->getId();
 				$result["code"]=$obj->getCode();
-				$result["variant_id"]=$variant?$variant->getId():0;
-				$result["variant_name"]=$variant?$variant->getVariantname()->getName():"";
-				$result["variant_value"]=$variant?$variant->getVariantvalue()->getName():"";
-				$result["variant_active"]=$variant?$variant->getActive():true;
+				$result["variant_id"]=$productvariant?$productvariant->getId():0;
+				$result["variant_name"]=$productvariant?$productvariant->getVarianttype()->getName():"";
+				$result["variant_value"]=$productvariant?$productvariant->getVariant()->getName():"";
+				$result["variant_active"]=$productvariant?$productvariant->getActive():true;
 
 				$result["code"]=$obj->getCode();
 				$result["name"]=$obj->getName();
@@ -308,12 +307,12 @@ class ERPProductsController extends Controller
 					$result["eans"][]=$ean_item;
 				}
 
-				$variants=$Variantsrepository->findBy(["product"=>$obj, "active"=>1, "deleted"=>0]);
+				$variants=$ProductsVariantsrepository->findBy(["product"=>$obj, "active"=>1, "deleted"=>0]);
 				$result["variants"]=[];
 				foreach($variants as $variant){
 					$variant_item["id"]=$variant->getId();
-					$variant_item["name"]=$variant->getVariantname()->getName();
-					$variant_item["value"]=$variant->getVariantvalue()->getName();
+					$variant_item["name"]=$variant->getVarianttype()->getName();
+					$variant_item["value"]=$variant->getVariant()->getName();
 					$eans=$EAN13repository->findBy(["product"=>$obj, "productvariant"=>$variant, "active"=>1, "deleted"=>0]);
 					$variant_item["eans"]=[];
 					foreach($eans as $ean){
@@ -348,7 +347,7 @@ class ERPProductsController extends Controller
 					$storeUser=$StoreUsersrepository->findOneBy(["user"=>$this->getUser(), "store"=>$stock->getStorelocation()->getStore(), "active"=>1, "deleted"=>0]);
 					if($storeUser){
 						$stock_item["id"]=$stock->getId();
-						$stock_item["variant_id"]=!$stock->getProductvariant()?0:$stock->getProductvariant()->getId();
+						$stock_item["variant_id"]=!$stock->getProductVariant()?0:$stock->getProductVariant()->getId();
 						$stock_item["warehouse_code"]=$stock->getStorelocation()->getStore()->getCode();
 						$stock_item["warehouse"]=$stock->getStorelocation()->getStore()->getName();
 						$stock_item["warehouse_id"]=$stock->getStorelocation()->getStore()->getId();
@@ -579,10 +578,10 @@ class ERPProductsController extends Controller
 			} else {
 				if($type==3){  //Variant id barcode
 					$variant=$repositoryVariants->findOneBy(["id"=>$id]);
-					if($variant && $variant->getProduct() && $variant->getVariantvalue() && $variant->getVariantname()){
+					if($variant && $variant->getProduct() && $variant->getVariant()){
 						$code=$variant->getProduct()->getCode();
 						$barcode='V.'.str_pad($variant->getId(),8,'0', STR_PAD_LEFT);
-						$name=$variant->getProduct()->getName().' - '.$variant->getVariantname()->getName().' '.$variant->getVariantvalue()->getName();
+						$name=$variant->getProduct()->getName().' - '.$variant->getVariant()-getVarianttype()->getName().' '.$variant->getVariant()->getName();
 					}
 				}
 			}
@@ -706,7 +705,7 @@ class ERPProductsController extends Controller
 		 $repositoryStoreLocations=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
 		 $repositoryStores=$this->getDoctrine()->getRepository(ERPStores::class);
 		 $repositoryStocks=$this->getDoctrine()->getRepository(ERPStocks::class);
-		 $repositoryVariants=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
+		 $repositoryProductsVariants=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
 		 $location=$request->request->get('loc',null);
 		 //Get Store ID
 		 $storeId=1;
@@ -719,14 +718,15 @@ class ERPProductsController extends Controller
 		 		 $store=$repositoryStores->findOneBy(["id"=>$storeId, "company"=>$this->getUser()->getCompany()]);
 		 if($store==null) return new JsonResponse(["result"=>-4, "text"=> "Almacén no encontrado"]);
 
-		 $variant=null;
+		 $productvariant=null;
 		 if($type==1){
 			 	$product=$repositoryProducts->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany(), "deleted"=>0]);
 			 	if($product==null || $location==null) return new JsonResponse(["result"=>-1, "text"=> "Producto no encontrado"]);
+				$productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product, "variant"=>null, "deleted"=>0]);
 		 }else{
-				$variant=$repositoryVariants->findOneBy(["id"=>$id, "deleted"=>0]);
-				if($variant==null || $location==null) return new JsonResponse(["result"=>-2, "text"=> "Variante no encontrada"]);
-				$product=$variant->getProduct();
+				$productvariant=$repositoryProductsVariants->findOneBy(["id"=>$id, "deleted"=>0]);
+				if($productvariant==null || $location==null) return new JsonResponse(["result"=>-2, "text"=> "Variante no encontrada"]);
+				$product=$productvariant->getProduct();
 				if($product->getCompany()!=$this->getUser()->getCompany()) $product=null;
 			 	if($product==null || $location==null) return new JsonResponse(["result"=>-1, "text"=> "Producto no encontrado"]);
 		 }
@@ -734,9 +734,7 @@ class ERPProductsController extends Controller
 		 $storelocation=$repositoryStoreLocations->findOneBy(["name"=>$location, "store"=>$store, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
 		 if($storelocation==null) return new JsonResponse(["result"=>-3, "text"=> "Ubicación no encontrada"]);
 
-		 if($type==1)
-		 	$stock=$repositoryStocks->findOneBy(["product"=>$product, "storelocation"=>$storelocation, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
-			else $stock=$repositoryStocks->findOneBy(["product"=>$product, "productvariant"=>$variant, "storelocation"=>$storelocation, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
+		 $stock=$repositoryStocks->findOneBy(["productvariant"=>$productvariant, "storelocation"=>$storelocation, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
 
 		 if(!$stock){
 			 //Try to find in generic ALM01 or ALM02
@@ -744,9 +742,7 @@ class ERPProductsController extends Controller
 			 	$genericALM=$repositoryStoreLocations->findOneBy(["name"=>"ALM01", "store"=>$store, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
 				else $genericALM=$repositoryStoreLocations->findOneBy(["name"=>"ALM02", "store"=>$store, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
 
-			 if($type==1)
-			 	$stock=$repositoryStocks->findOneBy(["product"=>$product, "storelocation"=>$genericALM, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
-				else $stock=$repositoryStocks->findOneBy(["product"=>$product, "productvariant"=>$variant, "storelocation"=>$genericALM, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
+				$stock=$repositoryStocks->findOneBy(["productvariant"=>$productvariant, "storelocation"=>$genericALM, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
 
 				 //return new JsonResponse(["result"=>0, "text"=> $product->getId()]);
 		 }
@@ -756,8 +752,7 @@ class ERPProductsController extends Controller
 			 $stock->setDateadd(new \DateTime);
 			 $stock->setLastinventorydate(new \DateTime);
 			 $stock->setCompany($this->getUser()->getCompany());
-			 $stock->setProduct($product);
-			 $stock->setProductvariant($variant);
+			 $stock->setProductvariant($productvariant);
 			 $stock->setQuantity(0);
 			 $stock->setActive(1);
 			 $stock->setDeleted(0);
@@ -777,10 +772,10 @@ class ERPProductsController extends Controller
 	  public function moveProductLocation($id, $type, RouterInterface $router,Request $request){
 	 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 	 		$repositoryProducts=$this->getDoctrine()->getRepository(ERPProducts::class);
+			$repositoryProductsVariants=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
 	 		$repositoryStoreLocations=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
 	 		$repositoryStores=$this->getDoctrine()->getRepository(ERPStores::class);
 	 		$repositoryStocks=$this->getDoctrine()->getRepository(ERPStocks::class);
-	 		$repositoryVariants=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
 	 		$locationSource=$request->request->get('locsrc',null);
 			$locationDestination=$request->request->get('locdst',null);
 			$qty=$request->request->get('qty',null);
@@ -802,14 +797,15 @@ class ERPProductsController extends Controller
 			$store=$repositoryStores->findOneBy(["id"=>$storeId, "company"=>$this->getUser()->getCompany()]);
 			if($store==null) return new JsonResponse(["result"=>-4, "text"=> "Almacén no encontrado"]);
 
-			$variant=null;
+			$productvariant=null;
 			if($type==1){
 				 $product=$repositoryProducts->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany(), "deleted"=>0]);
 				 if($product==null || $locationSource==null) return new JsonResponse(["result"=>-1, "text"=> "Producto no encontrado"]);
+				 	$productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product, "variant"=>null, "deleted"=>0]);
 			}else{
-				 $variant=$repositoryVariants->findOneBy(["id"=>$id, "deleted"=>0]);
-				 if($variant==null || $locationSource==null) return new JsonResponse(["result"=>-2, "text"=> "Variante no encontrada"]);
-				 $product=$variant->getProduct();
+				 $productvariant=$repositoryProductsVariants->findOneBy(["id"=>$id, "deleted"=>0]);
+				 if($productvariant==null || $locationSource==null) return new JsonResponse(["result"=>-2, "text"=> "Variante no encontrada"]);
+				 $product=$productvariant->getProduct();
 				 if($product->getCompany()!=$this->getUser()->getCompany()) $product=null;
 				 if($product==null || $locationSource==null) return new JsonResponse(["result"=>-1, "text"=> "Producto no encontrado"]);
 			}
@@ -822,13 +818,8 @@ class ERPProductsController extends Controller
 
 			if($storelocation==$storedstlocation) return new JsonResponse(["result"=>1, "text"=> "No se han realizado cambios"]);
 
-			if($type==1){
-			 $stock=$repositoryStocks->findOneBy(["product"=>$product, "storelocation"=>$storelocation, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
-			 $stockdst=$repositoryStocks->findOneBy(["product"=>$product, "storelocation"=>$storedstlocation, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
-		  }else{
-			  $stock=$repositoryStocks->findOneBy(["product"=>$product, "productvariant"=>$variant, "storelocation"=>$storelocation, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
-				$stockdst=$repositoryStocks->findOneBy(["product"=>$product, "productvariant"=>$variant, "storelocation"=>$storedstlocation, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
-			}
+		  $stock=$repositoryStocks->findOneBy(["productvariant"=>$productvariant, "storelocation"=>$storelocation, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
+			$stockdst=$repositoryStocks->findOneBy(["productvariant"=>$productvariant, "storelocation"=>$storedstlocation, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
 
 			if($stock){
 
@@ -839,10 +830,9 @@ class ERPProductsController extends Controller
 			 		 	 	$stock->setDateupd(new \DateTime);
 			 			 	$stock->setStorelocation($storedstlocation);
 
-							$StockHistory= new ERPStockHistory();
-							$StockHistory->setProduct($product);
+							$StockHistory= new ERPStocksHistory();
+							$StockHistory->setProductVariant($productvariant);
 							$StockHistory->setLocation($storelocation);
-							$StockHistory->setStore($store);
 							$StockHistory->setUser($this->getUser());
 							$StockHistory->setPreviousqty($stock->getQuantity());
 							$StockHistory->setNewqty(0);
@@ -864,8 +854,7 @@ class ERPProductsController extends Controller
 				 			$newStock->setDateadd(new \DateTime);
 				 			$newStock->setLastinventorydate(new \DateTime);
 				 			$newStock->setCompany($this->getUser()->getCompany());
-				 			$newStock->setProduct($product);
-				 			$newStock->setProductvariant($variant);
+				 			$newStock->setProductvariant($productvariant);
 				 			$newStock->setQuantity($qty);
 				 			$newStock->setActive(1);
 				 			$newStock->setDeleted(0);
@@ -883,10 +872,9 @@ class ERPProductsController extends Controller
 						$stockdst->setDateupd(new \DateTime);
 						$stockdst->setQuantity($stockdst->getQuantity()+$qty);
 
-						$StockHistory= new ERPStockHistory();
-						$StockHistory->setProduct($product);
+						$StockHistory= new ERPStocksHistory();
+						$StockHistory->setProductVariant($productvariant);
 						$StockHistory->setLocation($storelocation);
-						$StockHistory->setStore($store);
 						$StockHistory->setUser($this->getUser());
 						$StockHistory->setPreviousqty($stock->getQuantity());
 						$StockHistory->setNewqty(0);
@@ -980,7 +968,7 @@ class ERPProductsController extends Controller
 	 	  $product=$productRepository->findOneBy(["code"=>$code]);
 
 		//	$repositoryVariants=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
-			$variants=$productRepository->getVariantValues($product->getId());
+			$variants=$productRepository->getvariant($product->getId());
 	 		$responseVariants=Array();
 
 	 		foreach($variants as $variant){
@@ -1028,8 +1016,7 @@ class ERPProductsController extends Controller
 			 $productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
 			 $referenceRepository=$this->getDoctrine()->getRepository(ERPReferences::class);
 			 $EAN13Repository=$this->getDoctrine()->getRepository(ERPEAN13::class);
-			 $shoppingDiscountRepository=$this->getDoctrine()->getRepository(ERPShoppingDiscounts::class);
-			 $shoppingPricesRepository=$this->getDoctrine()->getRepository(ERPShoppingPrices::class);
+			 $productsSuppliersPricesRepository=$this->getDoctrine()->getRepository(ERPProductsSuppliersPrices::class);
 			 $objects=$productRepository->productsBySupplierCategory($supplier,$category);
 			 $products=[];
 			 foreach ($objects as $object){
@@ -1046,12 +1033,12 @@ class ERPProductsController extends Controller
 				 if($item->getCategory()!=null)  $product["category"]=$item->getCategory()->getName();
 				 else $product["category"]='';
 				 $product["netprice"]=$item->getNetprice()==1?"true":"false";
-				 if ($item->getNetprice()==false) $shoppingDiscounts=$this->getShoppingDiscounts($supplier,$item->getCategory());
-				 else $shoppingDiscounts=null;
-				 if ($shoppingDiscounts!=null) {
-					 $product["discount"]=$shoppingDiscounts->getDiscount();
-					 $product["start"]=$shoppingDiscounts->getStart()!=null ? $shoppingDiscounts->getStart()->format('d/m/Y') : '---';
-					 $product["end"]=$shoppingDiscounts->getEnd()!=null ? $shoppingDiscounts->getEnd()->format('d/m/Y') : '---';
+				 if ($item->getNetprice()==false) $productssuppliersdiscounts=$this->getShoppingDiscounts($supplier,$item->getCategory());
+				 else $productssuppliersdiscounts=null;
+				 if ($productssuppliersdiscounts!=null) {
+					 $product["discount"]=$productssuppliersdiscounts->getDiscount();
+					 $product["start"]=$productssuppliersdiscounts->getStart()!=null ? $productssuppliersdiscounts->getStart()->format('d/m/Y') : '---';
+					 $product["end"]=$productssuppliersdiscounts->getEnd()!=null ? $productssuppliersdiscounts->getEnd()->format('d/m/Y') : '---';
 				 }
 				 else {
 					 $product["discount"]=0;
@@ -1064,11 +1051,11 @@ class ERPProductsController extends Controller
 				 $product["PVP"]=$product["PVP"]==null ? 0 : $product["PVP"];
 				 */
 
-				 $productPrices=$shoppingPricesRepository->getShoppingPrices($object["id"],$supplier);
+				 $productPrices=$productsSuppliersPricesRepository->getProductsSuppliersPrices($object["id"],$supplier);
 				 if ($item->getNetprice()){
 					 foreach ($productPrices as $specificPrice){
 						 $product["quantity"]=$specificPrice["quantity"];
-						 $product["shopping_price"]=$specificPrice["shopping_price"];
+						 $product["shopping_price"]=$specificPrice["price"];
 						 $product["PVPr"]=$specificPrice["pvp"]==null ? '--' : $specificPrice["pvp"];
 						 $products[]=$product;
 						 $product["code"]='---';
@@ -1097,18 +1084,18 @@ class ERPProductsController extends Controller
 
 	 public function getShoppingDiscounts($supplier, $category){
 		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-		 $repositoryShoppingDiscounts=$this->getDoctrine()->getRepository(ERPShoppingDiscounts::class);
-		 //Search in the treeCategories which is the most specific with ShoppingDiscounts
+		 $repositoryproductssuppliersdiscounts=$this->getDoctrine()->getRepository(ERPProductsSuppliersDiscounts::class);
+		 //Search in the treeCategories which is the most specific with productssuppliersdiscounts
 		 $repositoryCategory=$this->getDoctrine()->getRepository(ERPCategories::class);
-		 $shoppingDiscounts=$repositoryShoppingDiscounts->findOneBy(["supplier"=>$supplier,"category"=>$category,"active"=>1,"deleted"=>0]);
+		 $productssuppliersdiscounts=$repositoryproductssuppliersdiscounts->findOneBy(["supplier"=>$supplier,"category"=>$category,"active"=>1,"deleted"=>0]);
 		 if ($category!=null)
-		 while ($category->getParentid()!=null && $shoppingDiscounts==null){
+		 while ($category->getParentid()!=null && $productssuppliersdiscounts==null){
 				 $category=$category->getParentid();
-				 $shoppingDiscounts=$repositoryShoppingDiscounts->findOneBy(["supplier"=>$supplier,"category"=>$category,"active"=>1,"deleted"=>0]);
+				 $productssuppliersdiscounts=$repositoryproductssuppliersdiscounts->findOneBy(["supplier"=>$supplier,"category"=>$category,"active"=>1,"deleted"=>0]);
 		 }
-		 if ($shoppingDiscounts==null)
-				 $shoppingDiscounts=$repositoryShoppingDiscounts->findOneBy(["supplier"=>$supplier,"active"=>1,"deleted"=>0]);
-		 return $shoppingDiscounts!=null?$shoppingDiscounts:0;
+		 if ($productssuppliersdiscounts==null)
+				 $productssuppliersdiscounts=$repositoryproductssuppliersdiscounts->findOneBy(["supplier"=>$supplier,"active"=>1,"deleted"=>0]);
+		 return $productssuppliersdiscounts!=null?$productssuppliersdiscounts:0;
 	 }
 
 	 /**
@@ -1196,15 +1183,14 @@ class ERPProductsController extends Controller
 			 if ($product==null) return new JsonResponse(["result"=>-3, "text"=>"El producto ".$object["code"]." no existe en la base de datos"]);
 			 //miramos si es una variante de un producto agrupado
 			 $productvariant=null;
-			 $variantvalue=null;
-			 $repositoryVariantsValues=$this->getDoctrine()->getRepository(ERPVariantsValues::class);
+			 $variant=null;
+			 $repositoryVariants=$this->getDoctrine()->getRepository(ERPVariants::class);
 	     $repositoryProductsVariants=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
-			 if($object["variant"]!="") $variantvalue=$repositoryVariantsValues->findOneBy(["name"=>$object["variant"]]);
-       if($variantvalue!=null) $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product,"variantvalue"=>$variantvalue]);
+			 if($object["variant"]!="") $variant=$repositoryVariants->findOneBy(["name"=>$object["variant"]]);
+       $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product,"variant"=>$variant]);
 			 // buscamos la fila de los traspasos del producto y del almacén
 			 $stocksRepository=$this->getDoctrine()->getRepository(ERPStocks::class);
-			 if($productvariant!=null) $stocks=$stocksRepository->findOneBy(['storelocation'=>$storeLocation, 'product'=>$product, 'productvariant'=>$productvariant, "active"=>1, "deleted"=>0]);
-	 		 else $stocks=$stocksRepository->findOneBy(['storelocation'=>$storeLocation, 'product'=>$product]);
+			 $stocks=$stocksRepository->findOneBy(['storelocation'=>$storeLocation, 'productvariant'=>$productvariant, "active"=>1, "deleted"=>0]);
 			 if ($stocks==null) return new JsonResponse(["result"=>-4, "text"=>"El producto  ".$object["code"]." no está en el almacén ".$store->getName()]);
 			 // actualizamos el stock del pendiente de recibir
 			 $received=(int)$object["stock"];
@@ -1220,11 +1206,9 @@ class ERPProductsController extends Controller
 				 $stock=$stockRepository->findOneBy(['storelocation'=>$location->getId(), 'product'=>$product->getId()]);
 				 $typesRepository=$this->getDoctrine()->getRepository(ERPTypesMovements::class);
 				 $type=$typesRepository->findOneBy(["name"=>"Traspaso recibido"]);
-				 $stockHistory=new ERPStockHistory();
-         $stockHistory->setProduct($product);
-				 if($productVariantId!=null)  $stockHistory->setProductVariant($productvariant);
+				 $stockHistory=new ERPStocksHistory();
+				 $stockHistory->setProductVariant($productvariant);
          $stockHistory->setLocation($storeLocation);
-         $stockHistory->setStore($store);
          $stockHistory->setUser($this->getUser());
          $stockHistory->setDateadd(new \Datetime());
          $stockHistory->setDateupd(new \Datetime());

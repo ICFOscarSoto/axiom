@@ -8,9 +8,9 @@ use \App\Modules\ERP\Entity\ERPCategories;
 use \App\Modules\ERP\Entity\ERPIncrements;
 
 /**
- * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPShoppingDiscountsRepository")
+ * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPProductsSuppliersDiscountsRepository")
  */
-class ERPShoppingDiscounts
+class ERPProductsSuppliersDiscounts
 {
     /**
      * @ORM\Id()
