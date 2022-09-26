@@ -88,15 +88,11 @@ class ERPStoresManagersController extends Controller
 				["name" => "storesmanagersusers", "caption"=>"Users", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("listStoresManagersUsers",["id"=>$id])],
 				["name" => "storesmanagersconsumers", "caption"=>"Consumidores", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("listStoresManagersConsumers",["id"=>$id])],
 				["name" => "storesmanagersoperationsreports", "caption"=>"Reports", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("storesManagersOperationsReports",["id"=>$id])],
-				["name" => "loadsreports", "caption"=>"Loads", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("storesManagersLoadReports",["id"=>$id])]
+				["name" => "loadsreports", "caption"=>"Loads", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("storesManagersLoadReports",["id"=>$id])],
+				["name" => "loadslist", "caption"=>"Loads List", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("storesManagersLoadLists",["id"=>$id])]
 			];
 			$obj = $repository->findOneBy(['id'=>$id, 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
 			$obj_name=$obj?$obj->getName():'';
-			/*$tabs=array_merge($tabs,[["name" => "ean13",  "icon"=>"fa fa-users", "caption"=>"EAN13", "route"=>$this->generateUrl("listEAN13",["id"=>$id])],
-			["name" => "references",  "icon"=>"fa fa-users", "caption"=>"References", "route"=>$this->generateUrl("listReferences",["id"=>$id])],
-			["name"=>  "productPrices", "icon"=>"fa fa-money", "caption"=>"Prices","route"=>$this->generateUrl("infoProductPrices",["id"=>$id])],
-			["name" => "stocks", "icon"=>"fa fa-id-card", "caption"=>"Stocks", "route"=>$this->generateUrl("infoStocks",["id"=>$id])],
-			["name" => "files", "icon"=>"fa fa-cloud", "caption"=>"Files", "route"=>$this->generateUrl("cloudfiles",["id"=>$id, "path"=>"products"])]]);*/
 
 				return $this->render('@Globale/generictabform.html.twig', array(
 									'entity_name' => $obj_name,
@@ -1077,18 +1073,6 @@ class ERPStoresManagersController extends Controller
 		return $response;
 	}
 
-
-
-		/**
-		* @Route("/{_locale}/erp/storesmanagers/vendingmachines/pruebas/{id}/{date}", name="pruebasCargas")
-		*/
-		public function pruebasCargas(Request $request){
-
-
-
-
-		}
-
 			/**
 				* @Route("/api/erp/getloads/{id}", name="getLoads")
 				*/
@@ -1124,5 +1108,52 @@ class ERPStoresManagersController extends Controller
  		 		return new Response("", 200, array('Content-Type' => 'application/pdf'));
 		  }
 
+
+			/**
+				* @Route("/{_locale}/erp/storesmanagers/{id}/loadslist", name="storesManagersLoadLists")
+				*/
+				public function storesManagersLoadLists($id,RouterInterface $router,Request $request){
+					$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+					if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
+					$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
+					$locale = $request->getLocale();
+					$this->router = $router;
+			  	$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
+					$loadsRepository=$this->getDoctrine()->getRepository(ERPStoresManagersVendingMachinesChannels::class);
+					$machinesRepository=$this->getDoctrine()->getRepository(ERPStoresManagersVendingMachines::class);
+					$machines=$machinesRepository->findBy(["active"=>1,"deleted"=>0, "manager"=>$id],["name"=>"ASC"]);
+					$loads=[];
+					foreach ($machines as $machine) {
+							$dates=$loadsRepository->getLoadsMachine($machine->getId());
+							foreach ($dates as $date) {
+								$load["machine"]=$machine->getName();
+								$load["date"]=$date["date"];
+								$load["loads"]=$machinesRepository->getLoadsList($machine->getId(), $date["date"]);
+								$loads[]=$load;
+							}
+					}
+					$index=[];
+					$machine=[];
+					$date=[];
+					$loadsss=[];
+					foreach ($loads as $row) {
+						$index[] = $row;
+						$machine[]=$row['machine'];
+						$date[]=$row['date'];
+						$loadsss[]=$row['loads'];
+					}
+					array_multisort(
+						$date, SORT_DESC,
+						$machine,
+						$index,
+						$loadsss,
+						$loads
+					);
+					return $this->render('@ERP/storesManagersLoadLists.html.twig', [
+						'vendingmachines' => $machines,
+						'date' => $dates,
+						'loads' => $loads,
+					]);
+				}
 
 }
