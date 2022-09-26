@@ -1,0 +1,99 @@
+<body class="page-body" data-url="{{ url('indexAdmin') }}">
+<div class="page-container {% if userData.interfaceConfig.collapsedSidebar is defined and userData.interfaceConfig.collapsedSidebar %}sidebar-collapsed{% endif %}"><!-- add class "sidebar-collapsed" to close sidebar by default, "chat-visible" to make chat appear always -->
+
+	<div class="main-content">
+			<!-- MAIN CONTENT -->
+	<div class="row">
+		<div class="col-md-3 float-right">
+			<div class="form-group">
+				<input type="hidden" id="vendingmachine" class="form-control">
+					<select type="text" id="vendingmachine-select" class="form-control select2" required>
+					<option value="-1">Elige máquina...</option>
+						{% for option in vendingmachines %}
+							<option value="{{ option.id }}">{{ option.name }}</option>
+						{% endfor %}
+					</select>
+			</div>
+		</div>
+
+		<form id="data" name="data" method="post" enctype="multipart/form-data" style="display:none;">
+				<button type="button" id="submit-file" class="btn btn-primary">Download file</button>
+			</form>
+
+
+			<table id="header-list-loads" class="table table-bordered table-responsive-md table-striped text-center" style="display:none; width: 100%">
+			<thead class="table-thead">
+				<th style="border-bottom: 1px solid #cecece !important;" class="table-header-name table-thead "> Expendedora </th>
+				<th style="border-bottom: 1px solid #cecece !important;" class="table-header-name table-thead "> Fecha </th>
+				<th style="border-bottom: 1px solid #cecece !important;" class="table-header-name table-thead "> Descarga </th>
+			</thead>
+			</table>
+		<!-- END MAIN CONTENT -->
+
+
+		{% block footer %}
+
+		<link rel="stylesheet" href="{{ url('index') }}js/datatables/datatables.css">
+		<link rel="stylesheet" href="{{ url('index') }}js/select2/select2-bootstrap.css">
+		<link rel="stylesheet" href="{{ url('index') }}js/select2/select2.css">
+		<link rel="stylesheet" href="{{ url('index') }}css/custom.css">
+		<link rel="stylesheet" href="{{ url('index') }}js/ol/ol.css">
+		<link rel="stylesheet" href="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker.min.css">
+		<link rel="stylesheet" href="{{ url('index') }}js/jodit/jodit.min.css">
+
+		<!-- Imported scripts on this page -->
+		<script src="{{ url('index') }}js/datatables/datatables.js"></script>
+		<script src="{{ url('index') }}js/select2/select2.min.js"></script>
+		<script src="{{ url('index') }}js/moment.min.js"></script>
+		<script src="{{ url('index') }}js/moment-es.js"></script>
+		<script src="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker-es.js"></script>
+		<script src="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker.min.js"></script>
+		<script src="{{ url('index') }}js/fileinput.js"></script>
+		<script src="{{ url('index') }}js/jodit/jodit.min.js"></script>
+		<script src="{{ url('index') }}js/jquery.nestable.js"></script>
+		{{ include('@Globale/bottom.html.twig') }}
+		{% endblock %}
+
+
+
+	<script>
+		$(document).ready(function() {
+			$('body').on('change', "#vendingmachine-select", function(e) {
+				$("#header-list-loads").css("display","block");
+				getLoads($("#vendingmachine-select").val(),0);
+			});
+
+		});
+
+		$('body').on('click','[id^="button-download-"]', function(){
+			var win = window.open("/api/ERP/downloadLoads/"+$("#vendingmachine-select").val()+"/"+$(this).attr('attr-id'));
+			win.focus();
+		});
+
+		function getLoads(vendingmachine){
+			$.ajax({
+					type: "GET",
+					dataType: "json",
+					url: "/api/erp/getloads/"+vendingmachine,
+				}).done(function( elements, textStatus, jqXHR ) {
+					// borramos las filas que había en la tabla anterior, excepto la cabecera
+					var elmtTable=document.getElementById('header-list-loads');
+					var tableRows=elmtTable.getElementsByTagName('tr');
+					var rowCount=tableRows.length;
+					for (var x=rowCount-1; x>0; x--) {
+						tableRows[1].parentNode.removeChild(tableRows[1]);
+					}
+					 elements.loads.forEach( function(valor, indice, array) {
+						$("#header-list-loads").append(
+							'<tr attr-id="loads-'+valor.id+'" id="'+valor.id+'">'+
+								'<td style="border-bottom: 1px solid #cecece !important;" id="loads_machine-'+valor.id+'" value="'+valor.vendingmachine+'"> '+valor.vendingmachine+'</td>' +
+								'<td style="border-bottom: 1px solid #cecece !important;" id="loads_date-'+valor.id+'" value="'+valor.date+'"> '+valor.date+'</td>' +
+								'<td style="border-bottom: 1px solid #cecece !important;" id="loads_download-'+valor.date+' "value="'+valor.date+'"> <input id="button-download-'+valor.date+'" attr-id="'+valor.date+'"  type="submit" value="Descargar" class="btn btn-green"></td>' +
+							'</tr>');
+					});
+			});
+		}
+
+
+	</script>
+</body>

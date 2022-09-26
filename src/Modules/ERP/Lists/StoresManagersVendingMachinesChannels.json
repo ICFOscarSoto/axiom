@@ -1,0 +1,56 @@
+[
+    {
+        "name": "id",
+        "caption": "id"
+    },
+    {
+      "name": "name",
+      "caption": "Nombre canal"
+    },
+    {
+      "name": "row_o_col",
+      "caption": "Canal"
+    },
+    {
+        "name": "product__code_o_product__name",
+        "caption": "Producto"
+    },
+
+    {
+        "name": "expirydate",
+        "caption": "Caducidad",
+        "type": "date"
+    },
+    {
+        "name": "minquantity",
+        "caption": "Uds. mínimas"
+    },
+    {
+        "name": "maxquantity",
+        "caption": "Uds. máximas"
+    },
+    {
+        "name": "quantity",
+        "caption": "Stock"
+    },
+    {
+        "name": "lacks",
+        "caption": "Lacks"
+    },
+    {
+        "name": "active",
+        "caption": "Estado",
+        "width": "10%",
+        "class": "dt-center",
+        "replace": {
+            "1": {
+                "text": "Activo",
+                "html": "<div style=\"min-width: 75px;\" class=\"label label-success\">Activo<\/div>"
+            },
+            "0": {
+                "text": "Desactivado",
+                "html": "<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado<\/div>"
+            }
+        }
+    }
+]

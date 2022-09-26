@@ -1,0 +1,9 @@
+[{
+	"sections": [
+		{
+			"name": "data",
+			"fields": [
+				{ "name": "comments","cols": 12, "class": "text-area-form"}
+			]
+		}]
+}]

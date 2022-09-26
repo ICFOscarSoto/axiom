@@ -1,0 +1,3 @@
+[
+  {"id": "editStoresManagersChannelsVendingMachine", "type" : "default", "icon" : "fa fa-list-ol", "name" : "editar", "route":"replenishmentManagerVendingMachine",  "actionType" : "foreground", "confirm" :false, "tooltip":"Canales de la maquina"}
+]

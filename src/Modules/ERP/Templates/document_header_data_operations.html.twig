@@ -9,7 +9,7 @@
        <input type="text" id="document-form-consumer" class="form-control" placeholder="Empleado" value="({% if document.consumer.code2 is null %}{{ document.consumer.idcard }}{% else %}{{ document.consumer.code2 }}{% endif %}) {{ document.consumer.lastname }}, {{ document.consumer.name }}">
       </div> </div>
       <div class="col-6 col-sm-2"> <div class="form-group">
-         <input type="text" id="document-form-consumer" class="form-control" placeholder="Gestor" value="{{ document.store.name }}">
+         <input type="text" id="document-form-consumer" class="form-control" placeholder="Gestor" value="{% if document.store is not null %}{{ document.store.name }}{% endif %}">
       </div> </div>
 
     </div>

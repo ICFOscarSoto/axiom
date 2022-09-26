@@ -834,6 +834,7 @@ class ERPProductsController extends Controller
 							$StockHistory->setProductVariant($productvariant);
 							$StockHistory->setLocation($storelocation);
 							$StockHistory->setUser($this->getUser());
+			        $StockHistory->setCompany($this->getUser()->getCompany());
 							$StockHistory->setPreviousqty($stock->getQuantity());
 							$StockHistory->setNewqty(0);
 							$StockHistory->setActive(1);
@@ -876,6 +877,7 @@ class ERPProductsController extends Controller
 						$StockHistory->setProductVariant($productvariant);
 						$StockHistory->setLocation($storelocation);
 						$StockHistory->setUser($this->getUser());
+						$StockHistory->setCompany($this->getUser()->getCompany());
 						$StockHistory->setPreviousqty($stock->getQuantity());
 						$StockHistory->setNewqty(0);
 						$StockHistory->setActive(1);
@@ -1210,6 +1212,7 @@ class ERPProductsController extends Controller
 				 $stockHistory->setProductVariant($productvariant);
          $stockHistory->setLocation($storeLocation);
          $stockHistory->setUser($this->getUser());
+				 $stockHistory->setCompany($this->getUser()->getCompany());
          $stockHistory->setDateadd(new \Datetime());
          $stockHistory->setDateupd(new \Datetime());
          $stockHistory->setNumOperation($transfer);

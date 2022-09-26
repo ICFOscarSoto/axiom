@@ -151,7 +151,7 @@ class NavisionGetPurchasesOrders extends ContainerAwareCommand
          $obj->setPurchasesbudget($purchasesBudget);
 
          $author=$repositoryUsers->findOneBy(["email"=>$object["author"]]);
-         if($author==NULL) $author=$repositoryUsers->findOneBy(["name"=>"Administrador"]);
+         if($author==NULL) $author=$repositoryUsers->findOneBy(["name"=>"Sistemas Ferretería Campollano"]);
 
          $agent=$repositoryUsers->findOneBy(["email"=>$object["agent"]]);
          if($agent==NULL) $agent=$author;

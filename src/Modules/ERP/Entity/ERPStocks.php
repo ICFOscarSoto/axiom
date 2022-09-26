@@ -100,6 +100,11 @@ class ERPStocks
      */
     private $author;
 
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    private $maxstock;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -269,6 +274,18 @@ class ERPStocks
     public function setAuthor(?GlobaleUsers $author): self
     {
         $this->author = $author;
+
+        return $this;
+    }
+
+    public function getMaxstock(): ?float
+    {
+        return $this->maxstock;
+    }
+
+    public function setMaxstock(?float $maxstock): self
+    {
+        $this->maxstock = $maxstock;
 
         return $this;
     }

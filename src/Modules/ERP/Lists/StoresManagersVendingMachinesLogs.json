@@ -1,0 +1,40 @@
+[
+    {
+      "name": "id",
+      "caption": "id"
+    },
+    {
+      "name": "dateadd",
+      "caption": "Fecha",
+      "type": "datetime",
+      "width": "200"
+    },
+    {
+        "name": "type",
+        "caption": "Tipo",
+        "width": "100",
+        "class": "dt-center",
+        "replace": {
+            "2": {
+                "text": "Crítico",
+                "html": "<div style=\"min-width: 75px;\" class=\"label label-danger\">Crítico<\/div>"
+            },
+            "1": {
+                "text": "Alerta",
+                "html": "<div style=\"min-width: 75px;\" class=\"label label-warning\">Alerta<\/div>"
+            },
+            "0": {
+                "text": "Información",
+                "html": "<div style=\"min-width: 75px;\" class=\"label label-info\">Información<\/div>"
+            }
+        }
+    },
+    {
+      "name": "description",
+      "caption": "Descripción"
+    },
+    {
+        "name": "comments",
+        "caption": "Comentarios"
+    }
+]

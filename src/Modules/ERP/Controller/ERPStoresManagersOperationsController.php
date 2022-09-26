@@ -25,6 +25,8 @@ use App\Modules\ERP\Entity\ERPStoresManagers;
 use App\Modules\ERP\Entity\ERPStoresManagersConsumers;
 use App\Modules\ERP\Entity\ERPStoresManagersUsers;
 use App\Modules\ERP\Entity\ERPStoresManagersUsersStores;
+use App\Modules\ERP\Entity\ERPStoresManagersVendingMachines;
+use App\Modules\ERP\Entity\ERPStoresManagersVendingMachinesChannels;
 use App\Modules\ERP\Entity\ERPStoresUsers;
 use App\Modules\ERP\Entity\ERPCategories;
 use App\Modules\ERP\Entity\ERPProductsVariants;
@@ -279,6 +281,7 @@ class ERPStoresManagersOperationsController extends Controller
 						$stockHistory=new ERPStocksHistory();
 						$stockHistory->setLocation($location);
 						$stockHistory->setUser($this->getUser());
+	 				 	$stockHistory->setCompany($this->getUser()->getCompany());
 						$stockHistory->setQuantity($qty);
 						$stockHistory->setPreviousqty($stockQty);
 						$stockHistory->setProductvariant($productvariant);
@@ -327,6 +330,101 @@ class ERPStoresManagersOperationsController extends Controller
 			return new JsonResponse(["result"=>1]);
 			}else return new JsonResponse(["result"=>-1, "text"=> "No hay productos para realizar la operación"]);
 		}
+
+
+
+		/**
+		 * @Route("/api/erp/storesmanagers/vendingmachines/operations/create/{id}/{channel}/{nfcid}", name="createVendingMachineOperations", defaults={"id"=0, "channel"=0, "nfcid"="null"})
+		 */
+		 public function createVendingMachineOperations($id, $channel, $nfcid, Request $request){
+			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			$managerRepository=$this->getDoctrine()->getRepository(ERPStoresManagers::class);
+			$consumerRepository=$this->getDoctrine()->getRepository(ERPStoresManagersConsumers::class);
+			$repositoryVendingMachines = $this->getDoctrine()->getRepository(ERPStoresManagersVendingMachines::class);
+			$repositoryVendingMachinesChannels = $this->getDoctrine()->getRepository(ERPStoresManagersVendingMachinesChannels::class);
+			$productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
+			$productVariantRepository=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
+
+			$consumer=$consumerRepository->findOneBy(["nfcid"=>$nfcid,"active"=>1,"deleted"=>0]);
+			if(!$consumer) return new JsonResponse(["result"=>-2, "text"=> "El usuario no existe"]);
+			if($consumer->getManager()->getCompany()!=$this->getUser()->getCompany()) return new JsonResponse(["result"=>-3, "text"=> "Operación no autorizada"]);
+
+			$vendingmachine=$repositoryVendingMachines->findOneBy(["id"=>$id,"active"=>1,"deleted"=>0]);
+			if(!$vendingmachine) return new JsonResponse(array('result' => -1, 'text'=>"Máquina expendedora incorrecta"));
+			//$channel=$repositoryVendingMachinesChannels->findOneBy(["vendingmachine"=>$vendingmachine,"row"=>substr($channel,0,1),"col"=>substr($channel,1,1),"active"=>1,"deleted"=>0]);
+			$channel=$repositoryVendingMachinesChannels->findOneBy(["vendingmachine"=>$vendingmachine,"channel"=>$channel,"active"=>1,"deleted"=>0]);
+			if(!$channel) return new JsonResponse(array('result' => -1, 'text'=>"Canal no configurado"));
+
+
+			if($channel->getProduct()){
+					$operation=new ERPStoresManagersOperations();
+					$operation->setCompany($this->getUser()->getCompany());
+					$operation->setManager($consumer->getManager());
+					$operation->setAgent($this->getUser());
+					$operation->setConsumer($consumer);
+					$operation->setStore(null);
+					$operation->setDate(new \Datetime());
+					$operation->setVendingmachine($vendingmachine);
+					$operation->setDateupd(new \Datetime());
+					$operation->setDateadd(new \Datetime());
+					$operation->setActive(true);
+					$operation->setDeleted(false);
+					$this->getDoctrine()->getManager()->persist($operation);
+					$this->getDoctrine()->getManager()->flush();
+
+					$line=new ERPStoresManagersOperationsLines();
+					$line->setOperation($operation);
+					$line->setProduct($channel->getProduct());
+					$line->setQuantity($channel->getMultiplier()?($channel->getMultiplier()==0?1:$channel->getMultiplier()):1);
+					$line->setCode($channel->getProduct()->getCode());
+					$line->setName($channel->getProduct()->getName());
+					$line->setVariant(null);
+					$line->setLocation(null);
+					$line->setDateadd(new \Datetime());
+					$line->setDateupd(new \Datetime());
+					$line->setActive(true);
+					$line->setDeleted(false);
+					$this->getDoctrine()->getManager()->persist($line);
+					$this->getDoctrine()->getManager()->flush();
+					// Añadimos la salida al historico
+					$typesRepository=$this->getDoctrine()->getRepository(ERPTypesMovements::class);
+					$type=$typesRepository->findOneBy(["name"=>"Salida expendedora"]);
+					$stockHistory= new ERPStockHistory();
+					$stockHistory->setProduct($channel->getProduct());
+					if ($channel->getVendingmachine()->getStorelocation()!=null) {
+							$stockHistory->setLocation($channel->getVendingmachine()->getStorelocation());
+							$stockHistory->setStore($channel->getVendingmachine()->getStorelocation()->getStore());
+						}
+						else {
+							$locationRepository=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
+							$storeLocation=$locationRepository->findOneBy(["name"=>"EXPEND ALM"]);
+							$stockHistory->setLocation($storeLocation);
+							$stockHistory->setStore($storeLocation->getStore());
+					}
+					$stockHistory->setUser($this->getUser());
+ 				 	$stockHistory->setCompany($this->getUser()->getCompany());
+					$stockHistory->setPreviousqty($channel->getQuantity());
+					$stockHistory->setNewqty($channel->getQuantity()-($channel->getMultiplier()?($channel->getMultiplier()==0?1:$channel->getMultiplier()):1));
+					$stockHistory->setType($type);
+					$stockHistory->setComment($channel->getVendingmachine()->getName());
+					$stockHistory->setQuantity(-($channel->getMultiplier()?($channel->getMultiplier()==0?1:$channel->getMultiplier()):1));
+					$stockHistory->setActive(1);
+					$stockHistory->setDeleted(0);
+					$stockHistory->setDateupd(new \DateTime());
+					$stockHistory->setDateadd(new \DateTime());
+					$this->getDoctrine()->getManager()->persist($stockHistory);
+					$this->getDoctrine()->getManager()->flush();
+
+					$channel->setQuantity($channel->getQuantity()-$line->getQuantity());
+					$this->getDoctrine()->getManager()->persist($channel);
+					$this->getDoctrine()->getManager()->flush();
+
+					return new JsonResponse(["result"=>1]);
+			}else return new JsonResponse(["result"=>-1, "text"=> "No hay productos para realizar la operación"]);
+		}
+
+
+
 
 		/**
 	  * @Route("/{_locale}/erp/storesmanagers/operations/{id}/delete", name="deleteOperation")

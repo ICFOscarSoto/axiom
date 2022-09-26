@@ -138,6 +138,7 @@ class ImportStocks extends ContainerAwareCommand
                 $stockHistory->setProductvariant($productvariant);
                 $stockHistory->setLocation($location);
                 $stockHistory->setUser($user);
+                $stockHistory->setCompany($user->getCompany());
                 $stockHistory->setPreviousqty($stock->getQuantity());
                 $stockHistory->setNewqty($data[$map["qty"]]*1);
                 $stockHistory->setDateadd(new \Datetime());

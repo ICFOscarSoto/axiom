@@ -8,6 +8,7 @@ use \App\Modules\ERP\Entity\ERPStoreLocations;
 use \App\Modules\ERP\Entity\ERPStores;
 use \App\Modules\Globale\Entity\GlobaleUsers;
 use \App\Modules\ERP\Entity\ERPTypesMovements;
+use \App\Modules\Globale\Entity\GlobaleCompanies;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPStocksHistoryRepository")
@@ -88,6 +89,11 @@ class ERPStocksHistory
      * @ORM\Column(type="float", nullable=true)
      */
     private $quantity;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCompanies")
+     */
+    private $company;
 
     public function getId(): ?int
     {
@@ -248,6 +254,18 @@ class ERPStocksHistory
     public function setQuantity(?float $quantity): self
     {
         $this->quantity = $quantity;
+
+        return $this;
+    }
+
+    public function getCompany(): ?GlobaleCompanies
+    {
+        return $this->company;
+    }
+
+    public function setCompany(?GlobaleCompanies $company): self
+    {
+        $this->company = $company;
 
         return $this;
     }

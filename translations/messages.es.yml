@@ -754,7 +754,8 @@ Commissions: Comisiones
 #----------------------------------------------------------------------------------------------------------------------
 Manager data: Datos del gestor
 Reports: Informes
-
+Loads: Cargas expendedora
+Lacks: Faltas
 #JSPREADSHEET
 #----------------------------------------------------------------------------------------------------------------------
 jspreadsheet_showcolumn: Mostrar columna
@@ -773,3 +774,22 @@ jspreadsheet_uprow: Subir línea
 jspreadsheet_downrow: Bajar línea
 jspreadsheet_showcolumn_error: No quedan columnas que mostrar
 jspreadsheet_loadmasive: Carga masiva
+
+#VENDING MACHINES
+#----------------------------------------------------------------------------------------------------------------------
+Lastcheck: Última conexión
+StoresManagersVendingMachines: Máquinas Expendedoras
+StoresManagersVendingMachinesChannels: Canales máquina expendedora
+Replenishmentnotifytype: Tipo notificacion recarga
+Replenishmentnotifyaddress: Dirección notificacion recarga
+Simoperator: Operador SIM
+Simnumber: Numero tarjeta
+Simpin: PIN tarjeta
+Vpnuser: Usuario VPN
+Vpnpassword: Contraseña VPN
+Vpnip: IP VPN
+Localuser: Usuario local
+Modembrand: Marca modem
+Modemmodel: Modelo
+Modemserial: Num Serie
+StoresManagersVendingMachinesLogs: Registro eventos

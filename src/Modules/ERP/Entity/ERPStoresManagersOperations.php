@@ -44,7 +44,7 @@ class ERPStoresManagersOperations
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Modules\ERP\Entity\ERPStores")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=true)
      */
     private $store;
 
@@ -72,6 +72,11 @@ class ERPStoresManagersOperations
      * @ORM\Column(type="boolean")
      */
     private $deleted;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Modules\ERP\Entity\ERPStoresManagersVendingMachines")
+     */
+    private $vendingmachine;
 
 
     public function getId(): ?int
@@ -195,6 +200,18 @@ class ERPStoresManagersOperations
     public function setManager(?ERPStoresManagers $manager): self
     {
         $this->manager = $manager;
+
+        return $this;
+    }
+
+    public function getVendingmachine(): ?ERPStoresManagersVendingMachines
+    {
+        return $this->vendingmachine;
+    }
+
+    public function setVendingmachine(?ERPStoresManagersVendingMachines $vendingmachine): self
+    {
+        $this->vendingmachine = $vendingmachine;
 
         return $this;
     }

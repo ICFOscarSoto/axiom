@@ -117,6 +117,9 @@ var url = new URL(window.location.href);
 					"oClasses":{
 						"sLengthSelect": "select2"
 					},
+					{% if hideTopSearch is defined and hideTopSearch == true %}
+						"bFilter": false,
+					{% endif %}
 					"searchCols": [
 						null,
 						{% for field in fields %}
@@ -186,7 +189,11 @@ var url = new URL(window.location.href);
 
 					"order": [[ {{  listConstructor.orderColumn }}, "{{  listConstructor.orderDirection }}" ]],
 					"columns": [
-            { "name": "checkboxes" ,"data": null, defaultContent: '',"width": "100px" },
+						{% if hideCheckBoxes is defined and hideCheckBoxes == true %}
+            	{ "name": "checkboxes" , "visible": false, "data": null, defaultContent: '',"width": "100px" },
+						{% else %}
+							{ "name": "checkboxes" ,"data": null, defaultContent: '',"width": "100px" },
+						{% endif %}
 						{# Remove concatenated strings #}
 						{% for keyfield, field in fields %}
 							{ "name": "{{ field.name }}" ,"data": "{{ field.name }}" },
@@ -549,119 +556,122 @@ var url = new URL(window.location.href);
 	{% endif %}
 
 	<table id="{{ listConstructor.id }}" class="table table-bordered hover stripe compact datatable" style="width: 100%">
+
 			<thead class="table-thead">
-				<tr>
-					<th class="table-header-search" style="border-bottom: 1px solid #cecece !important;vertical-align: middle;text-align: center;font-size: 22px;color: #cececece;">
-						<i class="fa fa-search"></i>
-					</th>
-					{# only show search fields in data type fields#}
-					{% for field in fields %}
-						{% if field.type is not defined or field.type == "data" %}
-							<th class="table-header-search" style="border-bottom: 1px solid #cecece !important;">
-								{% if field.filter is not defined or field.filter == true %}
-									{% if field.replace is defined %}
-									  {# Show combo box on replaces #}
-										<select id="s_{{ listConstructor.id }}_{{ field.name }}" attr-list-id="{{ listConstructor.id }}" class="form-control table-header-search-input select2 select2-use">
-											<option value="##ALL##" {% if app.request.get('s_' ~ listConstructor.id ~ '_' ~ field.name)!=null and app.request.get('s_' ~ listConstructor.id ~ '_' ~ field.name)=='##ALL##' %} selected="selected" {% endif %}>Todos</option>
-											{% for key,option in field.replace %}
-												<option value="{{ key }}"{% if app.request.get('s_' ~ listConstructor.id ~ '_' ~ field.name)!=null %}{% if app.request.get('s_' ~ listConstructor.id ~ '_' ~ field.name) == (key ~ '') %} selected="selected" {% endif %}{% else %}{% if option.default is defined and option.default == true%} attr-default="true" selected="selected" {% endif %}{% endif %}>{{ option.text }}</option>
-											{% endfor %}
+				{% if hideColumnSearch is not defined or hideColumnSearch == false %}
+					<tr>
+						<th class="table-header-search" style="border-bottom: 1px solid #cecece !important;vertical-align: middle;text-align: center;font-size: 22px;color: #cececece;">
+							<i class="fa fa-search"></i>
+						</th>
+						{# only show search fields in data type fields#}
+						{% for field in fields %}
+							{% if field.type is not defined or field.type == "data" %}
+								<th class="table-header-search" style="border-bottom: 1px solid #cecece !important;">
+									{% if field.filter is not defined or field.filter == true %}
+										{% if field.replace is defined %}
+										  {# Show combo box on replaces #}
+											<select id="s_{{ listConstructor.id }}_{{ field.name }}" attr-list-id="{{ listConstructor.id }}" class="form-control table-header-search-input select2 select2-use">
+												<option value="##ALL##" {% if app.request.get('s_' ~ listConstructor.id ~ '_' ~ field.name)!=null and app.request.get('s_' ~ listConstructor.id ~ '_' ~ field.name)=='##ALL##' %} selected="selected" {% endif %}>Todos</option>
+												{% for key,option in field.replace %}
+													<option value="{{ key }}"{% if app.request.get('s_' ~ listConstructor.id ~ '_' ~ field.name)!=null %}{% if app.request.get('s_' ~ listConstructor.id ~ '_' ~ field.name) == (key ~ '') %} selected="selected" {% endif %}{% else %}{% if option.default is defined and option.default == true%} attr-default="true" selected="selected" {% endif %}{% endif %}>{{ option.text }}</option>
+												{% endfor %}
 
-										</select>
-										<script>
-											$(document).ready(function() {
-												$("#s_{{ listConstructor.id }}_{{ field.name }}").select2({dropdownCssClass : 'select2-bigdrop'});
-											});
-										</script>
-									{% else %}
-										{% if '__' in field.name %}
-											{# Relations #}
+											</select>
+											<script>
+												$(document).ready(function() {
+													$("#s_{{ listConstructor.id }}_{{ field.name }}").select2({dropdownCssClass : 'select2-bigdrop'});
+												});
+											</script>
+										{% else %}
+											{% if '__' in field.name %}
+												{# Relations #}
 
-												{#<select id="s_{{ field.name }}" class="form-control table-header-search-input select2 select2-use">
+													{#<select id="s_{{ field.name }}" class="form-control table-header-search-input select2 select2-use">
 
-														<option value="##ALL##" selected> -- Todos -- </option>
-														<option value="##NULL##"> -- Ninguno -- </option>
+															<option value="##ALL##" selected> -- Todos -- </option>
+															<option value="##NULL##"> -- Ninguno -- </option>
 
-												</select>
-												<script>
-													$(document).ready(function() {
-														$("#s_{{ field.name }}").select2({dropdownCssClass : 'select2-bigdrop'});
-													});
-												</script>#}
-													<input id="s_{{ listConstructor.id }}_{{ field.name }}" attr-list-id="{{ listConstructor.id }}" type="text" class="table-header-search-input form-control" placeholder="Buscar {{ (field.caption)|trans }}"  autocomplete="off"/>
+													</select>
 													<script>
 														$(document).ready(function() {
-														if(url.searchParams.get('s_{{ listConstructor.id }}_{{ field.name }}')!=null)
-															$("#s_{{ listConstructor.id }}_{{ field.name }}").val(url.searchParams.get('s_{{ listConstructor.id }}_{{ field.name }}'));
+															$("#s_{{ field.name }}").select2({dropdownCssClass : 'select2-bigdrop'});
 														});
-													</script>
-										{% else %}
-									   	{# Other fields show inputs #}
+													</script>#}
+														<input id="s_{{ listConstructor.id }}_{{ field.name }}" attr-list-id="{{ listConstructor.id }}" type="text" class="table-header-search-input form-control" placeholder="Buscar {{ (field.caption)|trans }}"  autocomplete="off"/>
+														<script>
+															$(document).ready(function() {
+															if(url.searchParams.get('s_{{ listConstructor.id }}_{{ field.name }}')!=null)
+																$("#s_{{ listConstructor.id }}_{{ field.name }}").val(url.searchParams.get('s_{{ listConstructor.id }}_{{ field.name }}'));
+															});
+														</script>
+											{% else %}
+										   	{# Other fields show inputs #}
 
-											<input id="s_{{ listConstructor.id }}_{{ field.name }}" attr-list-id="{{ listConstructor.id }}" type="text" class="table-header-search-input form-control" placeholder="Buscar {{ (field.caption)|trans }}"  autocomplete="off"/>
-											<script>
-													if(url.searchParams.get('s_{{ listConstructor.id }}_{{ field.name }}')!=null)
-														$(document).ready(function() {
-															$("#s_{{ listConstructor.id }}_{{ field.name }}").val(url.searchParams.get('s_{{ listConstructor.id }}_{{ field.name }}'));
-														});
-											</script>
+												<input id="s_{{ listConstructor.id }}_{{ field.name }}" attr-list-id="{{ listConstructor.id }}" type="text" class="table-header-search-input form-control" placeholder="Buscar {{ (field.caption)|trans }}"  autocomplete="off"/>
+												<script>
+														if(url.searchParams.get('s_{{ listConstructor.id }}_{{ field.name }}')!=null)
+															$(document).ready(function() {
+																$("#s_{{ listConstructor.id }}_{{ field.name }}").val(url.searchParams.get('s_{{ listConstructor.id }}_{{ field.name }}'));
+															});
+												</script>
+											{% endif %}
 										{% endif %}
 									{% endif %}
-								{% endif %}
-							</th>
-						{% else %}
-							<th class="table-header-search" style="border-bottom: 1px solid #cecece !important;">
-								{% if field.type == "datetime" %}
-									<div><div style="z-index: 5 !important;" class='input-group date'>
-												<input id="s_{{ listConstructor.id }}_{{ field.name }}_from" attr-list-id="{{ listConstructor.id }}" attr-group="{{ field.name }}" attr-max="s_{{ listConstructor.id }}_{{ field.name }}_to" type="text" class="datetimepicker table-header-search-input form-control" placeholder="{{ (field.caption)|trans }} desde" value="{% if app.request.get('s_' ~ listConstructor.id ~ '_' ~ field.name ~ '_from')!=null %}{{ app.request.get('s_' ~ listConstructor.id ~ '_' ~ field.name ~ '_from')|date("d/m/Y H:i:s") }}{% endif %}" autocomplete="off"/>
-												<span class="input-group-addon">
-                        	<span class="glyphicon glyphicon-calendar"></span>
-                    		</span>
-										</div></div>
-									<div style="height: 5px;"></div>
-									<div><div style="z-index: 2 !important;" class='input-group date'>
-										<input id="s_{{ listConstructor.id }}_{{ field.name }}_to" attr-list-id="{{ listConstructor.id }}" attr-group="{{ field.name }}" attr-min="s_{{ listConstructor.id }}_{{ field.name }}_from" type="text" class="datetimepicker table-header-search-input form-control" placeholder="{{ (field.caption)|trans }} hasta" value="{% if app.request.get('s_' ~ listConstructor.id ~ '_' ~ field.name ~ '_to')!=null %}{{ app.request.get('s_' ~ listConstructor.id ~ '_' ~ field.name ~ '_to')|date("d/m/Y H:i:s") }}{% endif %}" autocomplete="off"/>
-										<span class="input-group-addon">
-											<span class="glyphicon glyphicon-calendar"></span>
-										</span>
-									</div></div>
-
-									{% else %}
-									{% if field.type == "date" %}
+								</th>
+							{% else %}
+								<th class="table-header-search" style="border-bottom: 1px solid #cecece !important;">
+									{% if field.type == "datetime" %}
 										<div><div style="z-index: 5 !important;" class='input-group date'>
-													<input id="s_{{ listConstructor.id }}_{{ field.name }}_from" attr-list-id="{{ listConstructor.id }}" attr-group="{{ field.name }}" attr-max="s_{{ listConstructor.id }}_{{ field.name }}_to" type="text" class="datepicker table-header-search-input form-control" placeholder="{{ (field.caption)|trans }} desde" value="{% if app.request.get('s_' ~ listConstructor.id ~ '_' ~ field.name ~ '_from')!=null %}{{ app.request.get('s_' ~ listConstructor.id ~ '_' ~ field.name ~ '_from')|date("d/m/Y") }}{% endif %}" autocomplete="off"/>
+													<input id="s_{{ listConstructor.id }}_{{ field.name }}_from" attr-list-id="{{ listConstructor.id }}" attr-group="{{ field.name }}" attr-max="s_{{ listConstructor.id }}_{{ field.name }}_to" type="text" class="datetimepicker table-header-search-input form-control" placeholder="{{ (field.caption)|trans }} desde" value="{% if app.request.get('s_' ~ listConstructor.id ~ '_' ~ field.name ~ '_from')!=null %}{{ app.request.get('s_' ~ listConstructor.id ~ '_' ~ field.name ~ '_from')|date("d/m/Y H:i:s") }}{% endif %}" autocomplete="off"/>
 													<span class="input-group-addon">
-														<span class="glyphicon glyphicon-calendar"></span>
-													</span>
+	                        	<span class="glyphicon glyphicon-calendar"></span>
+	                    		</span>
 											</div></div>
 										<div style="height: 5px;"></div>
 										<div><div style="z-index: 2 !important;" class='input-group date'>
-											<input id="s_{{ listConstructor.id }}_{{ field.name }}_to" attr-list-id="{{ listConstructor.id }}" attr-group="{{ field.name }}" attr-min="s_{{ listConstructor.id }}_{{ field.name }}_from" type="text" class="datepicker table-header-search-input form-control" placeholder="{{ (field.caption)|trans }} hasta" value="{% if app.request.get('s_' ~ listConstructor.id ~ '_' ~ field.name ~ '_to')!=null %}{{ app.request.get('s_' ~ listConstructor.id ~ '_' ~ field.name ~ '_to')|date("d/m/Y") }}{% endif %}" autocomplete="off"/>
+											<input id="s_{{ listConstructor.id }}_{{ field.name }}_to" attr-list-id="{{ listConstructor.id }}" attr-group="{{ field.name }}" attr-min="s_{{ listConstructor.id }}_{{ field.name }}_from" type="text" class="datetimepicker table-header-search-input form-control" placeholder="{{ (field.caption)|trans }} hasta" value="{% if app.request.get('s_' ~ listConstructor.id ~ '_' ~ field.name ~ '_to')!=null %}{{ app.request.get('s_' ~ listConstructor.id ~ '_' ~ field.name ~ '_to')|date("d/m/Y H:i:s") }}{% endif %}" autocomplete="off"/>
 											<span class="input-group-addon">
 												<span class="glyphicon glyphicon-calendar"></span>
 											</span>
 										</div></div>
 
+										{% else %}
+										{% if field.type == "date" %}
+											<div><div style="z-index: 5 !important;" class='input-group date'>
+														<input id="s_{{ listConstructor.id }}_{{ field.name }}_from" attr-list-id="{{ listConstructor.id }}" attr-group="{{ field.name }}" attr-max="s_{{ listConstructor.id }}_{{ field.name }}_to" type="text" class="datepicker table-header-search-input form-control" placeholder="{{ (field.caption)|trans }} desde" value="{% if app.request.get('s_' ~ listConstructor.id ~ '_' ~ field.name ~ '_from')!=null %}{{ app.request.get('s_' ~ listConstructor.id ~ '_' ~ field.name ~ '_from')|date("d/m/Y") }}{% endif %}" autocomplete="off"/>
+														<span class="input-group-addon">
+															<span class="glyphicon glyphicon-calendar"></span>
+														</span>
+												</div></div>
+											<div style="height: 5px;"></div>
+											<div><div style="z-index: 2 !important;" class='input-group date'>
+												<input id="s_{{ listConstructor.id }}_{{ field.name }}_to" attr-list-id="{{ listConstructor.id }}" attr-group="{{ field.name }}" attr-min="s_{{ listConstructor.id }}_{{ field.name }}_from" type="text" class="datepicker table-header-search-input form-control" placeholder="{{ (field.caption)|trans }} hasta" value="{% if app.request.get('s_' ~ listConstructor.id ~ '_' ~ field.name ~ '_to')!=null %}{{ app.request.get('s_' ~ listConstructor.id ~ '_' ~ field.name ~ '_to')|date("d/m/Y") }}{% endif %}" autocomplete="off"/>
+												<span class="input-group-addon">
+													<span class="glyphicon glyphicon-calendar"></span>
+												</span>
+											</div></div>
+
+										{% endif %}
 									{% endif %}
-								{% endif %}
+								</th>
+							{% endif %}
+						{% endfor %}
+
+						{#{% for field in listConstructor.fieldButtons %}#}
+						{% if listConstructor.fieldButtons|length > 0 %}
+						{% set buttons = listConstructor.fieldButtons|length %}
+							<th class="table-thead-search text-right" colspan="{{ buttons }}" style="border-bottom: 1px solid #cecece !important;">
+									<div class="btn-group ">
+										<button id="clear-filters" type="button" class="btn btn-default tooltip-primary" style="border-color: #8a8a8a !important; line-height: 13px;">
+											<i class="fa fa-eraser"></i>&nbsp;Limpiar filtros
+										</button>
+									</div>
 							</th>
+						{#{% endfor %}#}
 						{% endif %}
-					{% endfor %}
 
-					{#{% for field in listConstructor.fieldButtons %}#}
-					{% if listConstructor.fieldButtons|length > 0 %}
-					{% set buttons = listConstructor.fieldButtons|length %}
-						<th class="table-thead-search text-right" colspan="{{ buttons }}" style="border-bottom: 1px solid #cecece !important;">
-								<div class="btn-group ">
-									<button id="clear-filters" type="button" class="btn btn-default tooltip-primary" style="border-color: #8a8a8a !important; line-height: 13px;">
-										<i class="fa fa-eraser"></i>&nbsp;Limpiar filtros
-									</button>
-								</div>
-						</th>
-					{#{% endfor %}#}
-					{% endif %}
-
-				</tr>
+					</tr>
+				{% endif %}
 					<th class="table-header-name table-thead" style="border-bottom: 1px solid #cecece !important;">
 						{% if listConstructor.multiselect is defined and listConstructor.multiselect==false %}
 
@@ -681,7 +691,8 @@ var url = new URL(window.location.href);
 
 					{% endfor %}
 
-			</thead>
+				</thead>
+
 		<tfoot id="{{ listConstructor.id }}-footer" style="display:none">
 			<tr>
 				<td class="table-footer">

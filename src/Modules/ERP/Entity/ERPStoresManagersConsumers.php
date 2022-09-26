@@ -195,7 +195,7 @@ class ERPStoresManagersConsumers
     public function formValidation($kernel, $doctrine, $user, $validationParams){
       $repository=$doctrine->getRepository(ERPStoresManagersConsumers::class);
       $fieldErrors=[];
-      $obj=$repository->findOneBy(["nfcid"=>$this->nfcid,"deleted"=>0]);
+      $obj=$repository->findOneBy(["nfcid"=>$this->nfcid,"deleted"=>0, "manager"=>$this->manager]);
       if($obj!=null && $obj->getId()!=$this->getId() && $this->nfcid!=null){
         return ["valid"=>false, "global_errors"=>["La tarjeta NFC ya esta asignada a otro trabajador."]];
       }else {

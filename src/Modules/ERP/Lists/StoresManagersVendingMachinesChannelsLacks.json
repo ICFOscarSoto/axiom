@@ -1,0 +1,30 @@
+[
+    {
+        "name": "id",
+        "caption": "id"
+    },
+    {
+      "name": "name",
+      "caption": "Nombre canal"
+    },
+    {
+        "name": "productname",
+        "caption": "Producto"
+    },
+    {
+        "name": "lacks",
+        "caption": "Lacks"
+    },
+    {
+        "name": "quantity",
+        "caption": "Stock"
+    },
+    {
+        "name": "minquantity",
+        "caption": "Uds. mínimas"
+    },
+    {
+        "name": "maxquantity",
+        "caption": "Uds. máximas"
+    }
+]
