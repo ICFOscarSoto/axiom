@@ -25,6 +25,10 @@
         "caption": "store"
     },
     {
+        "name": "vendingmachine__name",
+        "caption": "Máquina Exp."
+    },
+    {
         "name": "active",
         "caption": "Estado",
         "width": "10%",
