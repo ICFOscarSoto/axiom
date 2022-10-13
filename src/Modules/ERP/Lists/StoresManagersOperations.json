@@ -9,6 +9,10 @@
         "type": "datetime"
     },
     {
+        "name": "manager__name",
+        "caption": "Gestor"
+    },
+    {
         "name": "agent__name_o_agent__lastname",
         "caption": "Agente"
     },
@@ -23,6 +27,10 @@
     {
         "name": "store__name",
         "caption": "store"
+    },
+    {
+        "name": "vendingmachine__name",
+        "caption": "Máquina Exp."
     },
     {
         "name": "active",
