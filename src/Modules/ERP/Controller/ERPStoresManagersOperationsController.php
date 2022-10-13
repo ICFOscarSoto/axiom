@@ -372,7 +372,6 @@ class ERPStoresManagersOperationsController extends Controller
 					$line->setQuantity($channel->getMultiplier()?($channel->getMultiplier()==0?1:$channel->getMultiplier()):1);
 					$line->setCode($channel->getProduct()->getCode());
 					$line->setName($channel->getProduct()->getName());
-					$line->setVariant(null);
 					$line->setLocation(null);
 					$line->setDateadd(new \Datetime());
 					$line->setDateupd(new \Datetime());
