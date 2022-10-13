@@ -350,6 +350,7 @@ class ERPStoresManagersOperationsController extends Controller
 
 
 			if($channel->getProduct()){
+					$productvariant = $productVariantRepository->findOneBy(["product"=>$channel->getProduct(), "variant"=>null, "active"=>1,"deleted"=>0]);
 					$operation=new ERPStoresManagersOperations();
 					$operation->setCompany($this->getUser()->getCompany());
 					$operation->setManager($consumer->getManager());
@@ -367,7 +368,7 @@ class ERPStoresManagersOperationsController extends Controller
 
 					$line=new ERPStoresManagersOperationsLines();
 					$line->setOperation($operation);
-					$line->setProduct($channel->getProduct());
+					$line->setProductvariant($productvariant);
 					$line->setQuantity($channel->getMultiplier()?($channel->getMultiplier()==0?1:$channel->getMultiplier()):1);
 					$line->setCode($channel->getProduct()->getCode());
 					$line->setName($channel->getProduct()->getName());
@@ -383,7 +384,7 @@ class ERPStoresManagersOperationsController extends Controller
 					$typesRepository=$this->getDoctrine()->getRepository(ERPTypesMovements::class);
 					$type=$typesRepository->findOneBy(["name"=>"Salida expendedora"]);
 					$stockHistory= new ERPStockHistory();
-					$stockHistory->setProduct($channel->getProduct());
+					$stockHistory->setProductvariant($productvariant);
 					if ($channel->getVendingmachine()->getStorelocation()!=null) {
 							$stockHistory->setLocation($channel->getVendingmachine()->getStorelocation());
 							$stockHistory->setStore($channel->getVendingmachine()->getStorelocation()->getStore());
