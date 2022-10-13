@@ -765,6 +765,25 @@ class ERPProducts
       $this->calculateIncrementByProduct($doctrine);
       $this->calculateCustomerIncrementsByProduct($doctrine);
       if($this->getCheckweb()) $this->checkWebProduct($doctrine,$oldobj);
+      // Creación de variante generica con null en caso de nuevo producto
+      if ($oldobj==null || $oldobj->getId()==null || $oldobj->getId()==0){
+        $repositoryProductsVariants=$doctrine->getRepository(ERPProductsVariants::class);
+        $oproductvariant = $repositoryProductsVariants->findOneBy(["product"=>$this, "variant"=>null]);
+        if ($oproductvariant==null){
+          $oproductvariant = new ERPProductsVariants();
+          $oproductvariant->setProduct($this);
+          $oproductvariant->setVariant(null);
+          $oproductvariant->setDateadd(new \Datetime());
+        }
+        $oproductvariant->setActive(1);
+        $oproductvariant->setDeleted(0);
+        $oproductvariant->setDateupd(new \Datetime());
+        $oproductvariant->setWeight(null);
+        $oproductvariant->setPurchasepacking(1);
+        $doctrine->getManager()->merge($oproductvariant);
+        $doctrine->getManager()->flush();
+        $doctrine->getManager()->clear();
+      }
     }
 
      public function formValidation($kernel, $doctrine, $user, $validationParams){

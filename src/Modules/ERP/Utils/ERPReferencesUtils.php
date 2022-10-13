@@ -44,16 +44,19 @@ private $name="References";
     $productvariant=$params["productvariant"];
     $productsvariantsRepository=$doctrine->getRepository(ERPProductsVariants::class);
     $suppliersRepository=$doctrine->getRepository(ERPSuppliers::class);
+    $choices = $productsvariantsRepository->getVariants($product, $user);
+    if (count($choices)==1)
+      $productvariant = $choices[0];
+
     return [
     ['productvariant', ChoiceType::class, [
       'required' => false,
       'disabled' => false,
       'attr' => ['class' => 'select2', 'readonly' => true],
-      'choices' => $product?$productsvariantsRepository->findBy(["product"=>$product->getId()]):null,
+      'choices' => $choices,
       'placeholder' => 'Select a product',
       'choice_label' => function($obj, $key, $index) {
-
-          return $obj->getVariantvalue()->getName();
+          return $obj->getVariant()->getName();
       },
       'choice_value' => 'id',
       'data' => $productvariant

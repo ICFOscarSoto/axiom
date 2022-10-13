@@ -40,7 +40,7 @@ class ERPEAN13Controller extends Controller
     $repository = $manager->getRepository($class);
     $listUtils=new GlobaleListUtils();
     $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/EAN13.json"),true);
-    $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $class, [["type"=>"and","column"=>"product", "value"=>$product]]);
+    $return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $class, [["type"=>"and","column"=>"productvariant.product", "value"=>$product]]);
     return new JsonResponse($return);
   }
 
@@ -53,30 +53,34 @@ class ERPEAN13Controller extends Controller
    $template=dirname(__FILE__)."/../Forms/EAN13.json";
    $utils = new GlobaleFormUtils();
    $utilsObj=new ERPEAN13Utils();
-   $defaultProduct=$this->getDoctrine()->getRepository(ERPProducts::class);
+   $productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
    $EAN13Repository=$this->getDoctrine()->getRepository(ERPEAN13::class);
-   $obj=new ERPEAN13();
+   $product=new ERPProducts();
+   $ean13=new ERPEAN13();
    if($id==0){
     if($idproduct==0 ) $idproduct=$request->query->get('idproduct');
     if($idproduct==0 || $idproduct==null) $idproduct=$request->request->get('id-parent',0);
-
-    $product = $defaultProduct->find($idproduct);
-   }else $obj = $EAN13Repository->find($id);
-   $supplier=$id==0?$product->getSupplier():$obj->getProduct()->getSupplier();
+    $product = $productRepository->find($idproduct);
+   }else{
+    $ean13 = $EAN13Repository->find($id);
+    if ($ean13->getProductvariant())
+      $product = $ean13->getProductvariant()->getProduct();
+   }
+   $supplier=$id==0?$product->getSupplier():$ean13->getSupplier();
    $defaultSupplier=$this->getDoctrine()->getRepository(ERPSuppliers::class);
    //$default=$defaultSupplier->findOneBy(['id'=>$supplier->getId()]);
-   if($obj->getSupplier()==null) $default=$defaultSupplier->findOneBy(['id'=>$supplier->getId()]);
-    else $default=$obj->getSupplier();
-
+   if($ean13->getSupplier()==null) $default=$defaultSupplier->findOneBy(['id'=>$supplier->getId()]);
+    else $default=$ean13->getSupplier();
 
    $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(),
-   "supplier"=>$default, "product"=>$id==0?$product:$obj->getProduct(),
-   "productvariant"=>$id==0?null:$obj->getProductVariant()];
+   "supplier"=>$default,
+   "product"=>$product,
+   "productvariant"=>$id==0?null:$ean13->getProductvariant()];
 
-   $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),
+   $utils->initialize($this->getUser(), $ean13, $template, $request, $this, $this->getDoctrine(),
                           method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],
                           method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
-  if($id==0) $utils->values(["product"=>$product]);
+   if($id==0) $utils->values(["product"=>$product]);
    $make=$utils->make($id, ERPEAN13::class, $action, "EAN13", "modal");
 
    return $make;
@@ -107,17 +111,24 @@ class ERPEAN13Controller extends Controller
     $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
   	$repositoryEAN=$this->getDoctrine()->getRepository(ERPEAN13::class);
   	$repositoryProduct=$this->getDoctrine()->getRepository(ERPProducts::class);
-    $Variantsrepository=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
+    $ProductsVariantsrepository=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
     $barcode=$request->request->get('barcode',null);
     if($barcode===false) return new JsonResponse(["result"=>-2, "text"=>"El código de barras no puede ser nulo"]);
     //check if product exists
-    if($type==1)
+    $product = null;
+    $variant = null;
+    $productvariant = null;
+    if($type==1){
       $product=$repositoryProduct->findOneBy(["id"=>$id, "company"=> $this->getUser()->getCompany(), "deleted"=>0]);
-      else{
-        $variant=$Variantsrepository->findOneBy(["id"=>$id, "deleted"=>0]);
-        if($variant) $product=$variant->getProduct();
-          else return new JsonResponse(["result"=>-1, "text"=>"El producto no existe"]);
+      $productvariant=$ProductsVariantsrepository->findOneBy(["product"=>$product, "variant"=>null, "deleted"=>0]);
+    }else{
+      $productvariant=$ProductsVariantsrepository->findOneBy(["id"=>$id, "deleted"=>0]);
+      if($productvariant) {
+        $product=$productvariant->getProduct();
+        $variant=$productvariant->getVariant();
       }
+      else return new JsonResponse(["result"=>-1, "text"=>"El producto no existe"]);
+    }
     if(!$product) return new JsonResponse(["result"=>-1, "text"=>"El producto no existe"]);
     if($product->getCompany()!=$this->getUser()->getCompany()) return new JsonResponse(["result"=>-1, "text"=>"El producto no existe"]);
     //check if barcode exists
@@ -128,7 +139,7 @@ class ERPEAN13Controller extends Controller
 
     $newBarcode=new ERPEAN13();
     $newBarcode->setSupplier($product->getSupplier());
-    $newBarcode->setProduct($product);
+    $newBarcode->setProductvariant($productvariant);
     $newBarcode->setName($barcode);
     $newBarcode->setAuthor($this->getUser());
     $newBarcode->setDateadd(new \Datetime());
@@ -136,8 +147,6 @@ class ERPEAN13Controller extends Controller
     $newBarcode->setActive(1);
     $newBarcode->setDeleted(0);
     $newBarcode->setType(1);
-    if($type==2)
-      $newBarcode->setProductvariant($variant);
 
     $this->getDoctrine()->getManager()->persist($newBarcode);
     $this->getDoctrine()->getManager()->flush();
@@ -162,20 +171,19 @@ class ERPEAN13Controller extends Controller
     $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
     $repositoryEAN=$this->getDoctrine()->getRepository(ERPEAN13::class);
     $repositoryProduct=$this->getDoctrine()->getRepository(ERPProducts::class);
-    $Variantsrepository=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
+    $ProductVariantsrepository=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
     $barcode=$request->request->get('barcode',null);
     if($barcode===false) return new JsonResponse(["result"=>-1, "text"=>"El código de barras no puede ser nulo"]);
     $product=$repositoryProduct->findOneBy(["id"=>$id, "company"=> $this->getUser()->getCompany(), "deleted"=>0]);
     if(!$product) return new JsonResponse(["result"=>-2, "text"=>"El producto no existe"]);
-    $variant=$Variantsrepository->findOneBy(["id"=>$idvariant, "product"=>$product, "deleted"=>0]);
-    if(!$variant) return new JsonResponse(["result"=>-3, "text"=>"La variante no existe"]);
-    $ean=$repositoryEAN->findOneBy(["name"=>$barcode, "product"=>$product, "deleted"=>0]);
+    $productvariant=$ProductVariantsrepository->findOneBy(["id"=>$idvariant, "deleted"=>0]);
+    if(!$productvariant) return new JsonResponse(["result"=>-3, "text"=>"La variante no existe"]);
+    $ean=$repositoryEAN->findOneBy(["name"=>$barcode, "productvariant"=>$productvariant, "deleted"=>0]);
     if(!$ean) return new JsonResponse(["result"=>-4, "text"=>"Codigo de barras incorrecto"]);
-    $ean->setProductvariant($variant);
+    $ean->setProductvariant($productvariant);
     $this->getDoctrine()->getManager()->persist($ean);
     $this->getDoctrine()->getManager()->flush();
     return new JsonResponse(["result"=>1, "text"=>""]);
-
   }
 
   /**

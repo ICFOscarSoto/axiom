@@ -5,6 +5,7 @@ namespace App\Modules\ERP\Repository;
 use App\Modules\ERP\Entity\ERPProductsVariants;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
+use App\Modules\ERP\Entity\ERPVariants;
 
 /**
  * @method ERPProductsVariants|null find($id, $lockMode = null, $lockVersion = null)
@@ -130,5 +131,41 @@ class ERPProductsVariantsRepository extends ServiceEntityRepository
             "v" => "0"
         ]];
       return $result;
+    }
+
+    /* Obtiene las variantes de un producto, si existen, quitando la variante null o solo la variante null si solo existe esta */
+    public function getVariants($product, $user){
+      $productsvariants = [];
+      if ($product!=null){
+        if ($product->getCompany()==$user->getCompany()){
+          $query="SELECT pv.id as id, v.id as variant_id
+                  FROM erpproducts_variants pv
+                  LEFT JOIN erpproducts p on p.id=pv.product_id
+                  LEFT JOIN erpvariants v on v.id=pv.variant_id
+                  WHERE p.id=:product and
+                        pv.active=1 and pv.deleted=0 and
+                        p.active=1 and p.deleted=0
+                  ORDER BY v.name ASC
+                 ";
+          $params=["product" => $product->getId()];
+          $productsvariants = $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+          if ($productsvariants!=null && count($productsvariants)>0){
+            if (count($productsvariants)>1){
+              $productsvariants_aux = [];
+              foreach ($productsvariants as $key => $value) {
+                if ($productsvariants[$key]['variant_id']!=null)
+                  array_push($productsvariants_aux, $this->find($productsvariants[$key]['id']));
+              }
+              $productsvariants = $productsvariants_aux;
+            }else{
+              $productsvariants[0] = $this->find($productsvariants[0]['id']);
+              $novariant = new ERPVariants();
+              $productsvariants[0]->setVariant($novariant);
+              $productsvariants[0]->getVariant()->setName('Sin variante');
+            }
+          }else $productsvariants=[];
+        }
+      }
+      return $productsvariants;
     }
 }

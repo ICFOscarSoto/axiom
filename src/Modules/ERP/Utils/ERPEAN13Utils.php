@@ -45,6 +45,9 @@ class ERPEAN13Utils
     $productvariant=$params["productvariant"];
     $productsvariantsRepository=$doctrine->getRepository(ERPProductsVariants::class);
     $suppliersRepository=$doctrine->getRepository(ERPSuppliers::class);
+    $choices = $productsvariantsRepository->getVariants($product, $user);
+    if (count($choices)==1)
+      $productvariant = $choices[0];
     return [
     ['productvariant', ChoiceType::class, [
       'required' => false,
@@ -53,8 +56,7 @@ class ERPEAN13Utils
       'choices' => $product?$productsvariantsRepository->findBy(["product"=>$product->getId()]):null,
       'placeholder' => 'Select a product',
       'choice_label' => function($obj, $key, $index) {
-
-          return $obj->getVariantvalue()->getName();
+          return ($obj?($obj->getVariant()?$obj->getVariant()->getName():''):'');
       },
       'choice_value' => 'id',
       'data' => $productvariant

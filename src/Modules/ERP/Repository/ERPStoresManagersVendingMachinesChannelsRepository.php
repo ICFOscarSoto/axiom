@@ -78,11 +78,8 @@ class ERPStoresManagersVendingMachinesChannelsRepository extends ServiceEntityRe
 
 
     public function getLoadsMachineDate($id,$date){
-      $query='SELECT cr.productcode, cr.productname, cr.quantity,  cr.quantity/vc.multiplier AS upload,  vc.multiplier
-              FROM erpstores_managers_vending_machines_channels_replenishment cr, erpstores_managers_vending_machines_channels vc
-              WHERE date(cr.dateadd)=:date
-              AND cr.channel_id  IN (SELECT id FROM erpstores_managers_vending_machines_channels WHERE vendingmachine_id=:vendingmachine)
-              AND cr.channel_id=vc.id';
+      $query='SELECT productcode, productname, quantity FROM erpstores_managers_vending_machines_channels_replenishment WHERE date(dateadd)=:date
+          AND channel_id  IN (SELECT id FROM erpstores_managers_vending_machines_channels WHERE vendingmachine_id=:vendingmachine)';
       $params=['vendingmachine' => $id, 'date'=>$date];
       return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
     }

@@ -102,11 +102,11 @@ class ERPStoresManagersOperationsController extends Controller
 		$customerslist["topButtons"]=[];
 
 		//Search Products
-		$classProductsUtils="\App\Modules\ERP\Utils\ERPProductsUtils";
-		$productsutils = new $classProductsUtils();
-		$productslist=$productsutils->formatList($this->getUser());
-		$productslist["fieldButtons"]=[["id"=>"select", "type" => "default", "default"=>true, "icon" => "fa fa-dot-circle-o", "name" => "editar", "route" => null, "actionType" => "background", "modal"=>"", "confirm" => false, "tooltip" =>""]];
-		$productslist["topButtons"]=[];
+		$classProductsVariantsUtils="\App\Modules\ERP\Utils\ERPProductsVariantsUtils";
+		$productsvariantsutils = new $classProductsVariantsUtils();
+		$productsvariantslist=$productsvariantsutils->formatList($this->getUser());
+		$productsvariantslist["fieldButtons"]=[["id"=>"select", "type" => "default", "default"=>true, "icon" => "fa fa-dot-circle-o", "name" => "editar", "route" => null, "actionType" => "background", "modal"=>"", "confirm" => false, "tooltip" =>""]];
+		$productsvariantslist["topButtons"]=[];
 
 		//Customer groups combo
 		$objects=$customerGroupsrepository->findBy(["company"=>$this->getUser()->getCompany(),"active"=>1,"deleted"=>0]);
@@ -193,7 +193,7 @@ class ERPStoresManagersOperationsController extends Controller
 				'breadcrumb' =>  $breadcrumb,
 				'userData' => $userdata,
 				'customerslist' => $customerslist,
-				'productslist' => $productslist,
+				'productsvariantslist' => $productsvariantslist,
 				'customerGroups' => $customerGroups,
 				'paymentMethods' => $paymentMethods,
 				'series' => $series,
@@ -255,11 +255,10 @@ class ERPStoresManagersOperationsController extends Controller
 					foreach($worklistProducts as $item){
 						$line=new ERPStoresManagersOperationsLines();
 						$line->setOperation($operation);
-						$line->setProduct($item->getProduct());
+						$line->setProductvariant($item->getProductvariant());
 						$line->setQuantity($item->getQuantity());
 						$line->setCode($item->getCode());
 						$line->setName($item->getName());
-						$line->setVariant($item->getVariant());
 						$line->setLocation($item->getLocation());
 						$line->setDateadd(new \Datetime());
 						$line->setDateupd(new \Datetime());
@@ -269,9 +268,7 @@ class ERPStoresManagersOperationsController extends Controller
 						$this->getDoctrine()->getManager()->flush();
 						//Discount quantities
 
-						$productvariant=null;
-						if($item->getVariant())
-							$productvariant=$productVariantRepository->findOneBy(["product"=>$item->getProduct(), "variant"=>$item->getVariant(), "active"=>1, "deleted"=>0]);
+						$productvariant=$item->getProductvariant();
 
 						$stock=$stocksRepository->findOneBy(["productvariant"=>$productvariant, "company"=>$this->getUser()->getCompany(), "storelocation"=>$location, "active"=>1, "deleted"=>0]);
 						if($stock) $stockQty=$stock->getQuantity();
@@ -311,13 +308,9 @@ class ERPStoresManagersOperationsController extends Controller
 								$stock->setDateupd(new \Datetime());
 								$stock->setActive(true);
 								$stock->setDeleted(false);
-								$stock->setProductvariant($productvariant);
 								$this->getDoctrine()->getManager()->persist($stock);
 								$this->getDoctrine()->getManager()->flush();
 						}
-
-
-
 
 					}
 

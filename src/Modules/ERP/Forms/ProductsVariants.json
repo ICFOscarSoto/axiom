@@ -4,16 +4,25 @@
             "name": "data",
             "fields": [
                 {
-                    "name": "active",
-                    "cols": 4
+                    "name": "type",
+                    "cols": 4,
+                    "disabled":"('#f|variant|'!='' || '#f|id|'=='0')?false:true"
                 },
-                {
-                    "name": "varianttype",
-                    "cols": 4
+                {   "name": "variant",
+                    "cols": 4,
+                    "trigger":{"field":"type", "route":"getVariantsOnType", "module":"ERP", "class":"ERPVariants", "relationParameter":"variant__varianttype__id", "generic":false},
+                    "disabled":"('#f|variant|'!='' || '#f|id|'=='0')?false:true"
                 },
-                { "name": "variant","cols": 2, "trigger":{"field":"varianttype", "route":"generictrigger",
-          				"moduleTrigger":"ERP", "classTrigger":"ERPVariantsTypes",
-          				"module":"ERP", "class":"ERPVariants", "relationParameter":"varianttype"}}
+                {   "name": "weight",
+                    "class": "number-type",
+                    "unity":"kg",
+                    "cols": 2
+                },
+                {   "name": "purchasepacking",
+                    "class": "number-type",
+                    "unity":"Uds.",
+                    "cols": 2
+                }
             ]
         }
     ]

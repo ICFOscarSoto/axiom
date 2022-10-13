@@ -19,10 +19,6 @@ class ERPStoresManagersVendingMachinesRepository extends ServiceEntityRepository
         parent::__construct($registry, ERPStoresManagersVendingMachines::class);
     }
 
-    public function findDeadMachines(){
-
-    }
-
     // /**
     //  * @return ERPStoresManagersVendingMachines[] Returns an array of ERPStoresManagersVendingMachines objects
     //  */
@@ -62,11 +58,5 @@ class ERPStoresManagersVendingMachinesRepository extends ServiceEntityRepository
               AND DATE(dateadd)=:date';
       $params=['vendingmachine' => $vendingmachine, 'date' => $date];
       return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
-    }
-
-    public function getConnectionLostVendingMachines(){
-      $query='SELECT id, name FROM erpstores_managers_vending_machines
-                WHERE lastcheck <= DATE_SUB(NOW(), INTERVAL 5 MINUTE) AND connectionlostnotified = 0 AND active = 1 AND deleted = 0';
-      return $this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
     }
 }

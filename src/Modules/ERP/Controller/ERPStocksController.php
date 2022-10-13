@@ -88,32 +88,32 @@ class ERPStocksController extends Controller
 						$item=[];
 						foreach($locations_array as $location){
 								$item[]=$location;
-							}
-							$aux2["name"]=$variant["name"];
-							$aux2["type"]=$variant["type"];
-							$stocks2=$stocksRepository->findStockByProductVariantStore($product->getId(),$variant["id"],$store["id"]);
-							$aux2["total"]=$stocks2["quantity"];
-							$aux2["pendingreceive"]= $stocks2["pendingreceive"];
-							$aux2["locations"]=$item;
-							$item_variants[]=$aux2;
-							$item=[];
-							$aux2=[];
 						}
-						$aux["name"]=$store["name"];
-						$stocks=$stocksRepository->findStockByProductStore($product->getId(),$store["id"]);
-						$aux["total"]=$stocks["quantity"];
-						$aux["pendingreceive"]= $stocks["pendingreceive"];
-						$aux["preferential"]=$store["preferential"];
-						$aux["variants"]=$item_variants;
-						$store_locations[]=$aux;
-						$item_variants=[];
-						$aux=[];
+						$aux2["name"]=$variant["name"];
+						$aux2["type"]=$variant["type"];
+						$stocks2=$stocksRepository->findStockByProductVariantStore($product->getId(),$variant["id"],$store["id"]);
+						$aux2["total"]=$stocks2["quantity"];
+						$aux2["pendingreceive"]= $stocks2["pendingreceive"];
+						$aux2["locations"]=$item;
+						$item_variants[]=$aux2;
+						$item=[];
+						$aux2=[];
 					}
+					$aux["name"]=$store["name"];
+					$stocks=$stocksRepository->findStockByProductStore($product->getId(),$store["id"]);
+					$aux["total"]=$stocks["quantity"];
+					$aux["pendingreceive"]= $stocks["pendingreceive"];
+					$aux["preferential"]=$store["preferential"];
+					$aux["variants"]=$item_variants;
+					$store_locations[]=$aux;
+					$item_variants=[];
+					$aux=[];
+				}
 
-					$stocks=$stocksRepository->stocksByStores($id);
-	 			  $repositoryHistory=$this->getDoctrine()->getRepository(ERPStocksHistory::class);
-					$history=$repositoryHistory->findHistory($id);
-					$stockHistory=Array();
+				$stocks=$stocksRepository->stocksByStores($id);
+ 			  $repositoryHistory=$this->getDoctrine()->getRepository(ERPStocksHistory::class);
+				$history=$repositoryHistory->findHistory($id);
+				$stockHistory=Array();
 
 					foreach($history as $history_line){
 						$item['Fecha']=$history_line['dateadd'];

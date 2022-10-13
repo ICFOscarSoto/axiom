@@ -4,31 +4,24 @@
         "caption": "id"
     },
     {
-        "name": "product__name",
-        "caption": "product"
+        "name": "variant__varianttype__name",
+        "caption": "varianttype"
     },
     {
         "name": "variant__name",
         "caption": "variant"
     },
     {
-        "name": "varianttype__name",
-        "caption": "varianttype"
+        "name": "weight",
+        "caption": "weight",
+        "unity":"kg",
+        "conditional":{
+          "value":""
+        }
     },
     {
-        "name": "active",
-        "caption": "Estado",
-        "width": "10%",
-        "class": "dt-center",
-        "replace": {
-            "1": {
-                "text": "Activo",
-                "html": "<div style=\"min-width: 75px;\" class=\"label label-success\">Activo<\/div>"
-            },
-            "0": {
-                "text": "Desactivado",
-                "html": "<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado<\/div>"
-            }
-        }
+        "name": "purchasepacking",
+        "caption": "purchasepacking",
+        "unity":"Uds."
     }
 ]

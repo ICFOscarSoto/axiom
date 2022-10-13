@@ -34,12 +34,12 @@ class ERPProductsVariants
     /**
      * @ORM\Column(type="float", nullable=true)
      */
-    private $weight;
+    private $weight=0;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
      */
-    private $purchasepacking;
+    private $purchasepacking=1;
 
     /**
      * @ORM\Column(type="boolean")
@@ -162,25 +162,36 @@ class ERPProductsVariants
         $this->purchasepacking = $purchasepacking;
 
         return $this;
-    }    
+    }
+
+    public function formValidation($kernel, $doctrine, $user, $params){
+      $result                   = ["valid"=>true];
+      $productVariantRepository = $doctrine->getRepository(ERPProductsVariants::class);
+
+      // Se comprueba que no este duplicado
+      $productvariant = $productVariantRepository->findOneBy(["product"=>$this->getProduct(), "variant"=>$this->getVariant(), "deleted"=>0]);
+      if ($productvariant && $productvariant->getId()!=$this->getId()){
+        // Errores de todo el formulario
+        $result=["valid"=>false, "global_errors"=>["Variante duplicada"]];
+      }
+      // Validación a nivel de campo
+      //$result=["valid"=>false, "field_error"=>["dni"=>"Ejemplo DNI incorrecto"]];
+      return $result;
+    }
 
     public function postProccess($kernel, $doctrine, $user, $params, $oldobj){
-
-
       $array_new_data = [];
-      $array_new_data["variants"]["type"]=$this->getVariant()->getVarianttype()->getName();
-      $array_new_data["variants"]["new"]=$this->getVariant()->getName();
-      if($oldobj->getVariant()) $array_new_data["variants"]["old"]=$oldobj->getVariant()->getName();
-      else $array_new_data["variants"]["old"]=null;
+      if ($this->getVariant()){
+        /*$array_new_data["variants"]["type"]=$this->getVariant()->getVarianttype()->getName();
+        $array_new_data["variants"]["new"]=$this->getVariant()->getName();
+        if($oldobj->getVariant()) $array_new_data["variants"]["old"]=$oldobj->getVariant()->getName();
+        else $array_new_data["variants"]["old"]=null;
 
-      //dump($this);
-    //  dump($array_new_data);
+        $webproductRepository=$doctrine->getRepository(ERPWebProducts::class);
+        $webproduct=$webproductRepository->findOneBy(["product"=>$this->getProduct()]);
 
-      $webproductRepository=$doctrine->getRepository(ERPWebProducts::class);
-      $webproduct=$webproductRepository->findOneBy(["product"=>$this->getProduct()]);
-
-      $prestashopUtils= new ERPPrestashopUtils();
-      $prestashopUtils->updateWebProduct($doctrine,$array_new_data,$this->getProduct(),$webproduct);
-
+        $prestashopUtils= new ERPPrestashopUtils();
+        $prestashopUtils->updateWebProduct($doctrine,$array_new_data,$this->getProduct(),$webproduct);*/
+      }
     }
 }

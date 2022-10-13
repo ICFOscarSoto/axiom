@@ -579,7 +579,7 @@ class ERPBuyOrdersController extends Controller
 					$lines[$i]['total']						= (($olines[$i]->getTotal()!=null)?number_format($olines[$i]->getTotal(),$ndecimals):'0.'.$decimals);
 					$lines[$i]['packing']					= (($olines[$i]->getPacking()!=null)?$olines[$i]->getPacking():1);
 					$lines[$i]['multiplicity']		= (($olines[$i]->getMultiplicity()!=null)?$olines[$i]->getMultiplicity():1);
-					$lines[$i]['minimumquantityofbuy'] = (($olines[$i]->getminimumquantityofbuy()!=null)?$olines[$i]->getMinimumquantityofbuy():1);
+					$lines[$i]['minimumquantityofbuy'] = (($olines[$i]->getMinimumquantityofbuy()!=null)?$olines[$i]->getMinimumquantityofbuy():1);
 					$lines[$i]['purchaseunit']		= (($olines[$i]->getPurchaseunit()!=null)?$olines[$i]->getPurchaseunit():1);
 					$lines[$i]['dateestimated']		= (($olines[$i]->getDateestimated()!=null)?$olines[$i]->getDateestimated()->format('Y-m-d'):$dateestimated->format('Y-m-d'));
 					$lines[$i]['weight']					= (($olines[$i]->getWeight()!=null)?number_format($olines[$i]->getWeight(),$ndecimals):'0.'.$decimals);

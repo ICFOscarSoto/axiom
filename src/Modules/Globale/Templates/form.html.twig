@@ -18,12 +18,25 @@
   </div>
   {% endif %}
   {{ include("@Globale/form_validation.html.twig") }}
+  {{ include('@Globale/jseval.html.twig') }}
 
   {% if include_pre_templates is defined %}
   	{% for template in include_pre_templates %}
   		{{ include(template) }}
   	{% endfor %}
   {% endif %}
+
+  <script>
+    var form_data = [];
+    form_data['id'] = '{{ formConstructor.id_object }}';
+    {% for section in formConstructor.template.0.sections %}
+      {% for field in section.fields %}
+        {% if formConstructor.form[field.name] is defined and formConstructor.form[field.name].vars is defined and formConstructor.form[field.name].vars.value is not iterable %}
+          form_data['{{ field.name }}'] = "{{ formConstructor.form[field.name].vars.value|raw|replace({'\n':'<br/>'}) }}";
+        {% endif %}
+      {% endfor %}
+    {% endfor %}
+  </script>
 
   {% for section in formConstructor.template.0.sections %}
       {% if userData.permissions[formConstructor.name ~ '_section_' ~ section.name] is not defined or (userData.permissions[formConstructor.name ~ '_section_' ~ section.name] is defined and userData.permissions[formConstructor.name ~ '_section_' ~ section.name].allowaccess == true) %}
@@ -43,6 +56,21 @@
             </script>
           {% for field in section.fields %}
             <div class="col-md-{{ field.cols }}">
+                <div id="div_form_field_{{ field.name }}">
+                <script>
+                var classDisabled='';
+                {% if field.disabled is defined %}
+                  evalAttr = "{{ field.disabled }}";
+                  evalAttr = replaceEval(evalAttr, form_data);
+                  if (evalAttr==true){
+                    classDisabled = 'form_disabled';
+                  }
+                {% endif %}
+                if (classDisabled!=''){
+                  $('#div_form_field_{{ field.name }}').addClass(classDisabled);
+                  $("#div_form_field_{{ field.name }} :input").attr("disabled", true);
+                }
+                </script>
                 {% if field.type is defined and field.type == 'image' %}
                   {# Image component of the form #}
                   {{ include("@Globale/form_fields_image.html.twig") }}
@@ -84,6 +112,7 @@
                   {# Check if field has a codeproduct #}
                   {{ include("@Globale/form_fields_code_product.html.twig") }}
                 {% endif %}
+              </div>
             </div>
             {% set counter = counter +1 %}
           {% endfor %}

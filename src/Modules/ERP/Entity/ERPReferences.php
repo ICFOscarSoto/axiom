@@ -32,12 +32,6 @@ class ERPReferences
     private $customer;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPProducts", fetch="EAGER")
-     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
-     */
-    private $product;
-
-    /**
      * @ORM\Column(type="datetime")
      */
     private $dateadd;
@@ -108,17 +102,6 @@ class ERPReferences
         return $this;
     }
 
-    public function getProduct(): ?ERPProducts
-    {
-        return $this->product;
-    }
-
-    public function setProduct(?ERPProducts $product): self
-    {
-        $this->product = $product;
-
-        return $this;
-    }
 
     public function getDateadd(): ?\DateTimeInterface
     {

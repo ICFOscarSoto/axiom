@@ -1,0 +1,6 @@
+[
+  {"id" : "addTopStocksHistory", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"genericdata", "routeParams":{"module":"ERP", "name":"StocksHistory", "type":"modal" }, "modal":"StocksHistory", "actionType" : "background", "confirm" :false, "tooltip" : ""},
+  {"id" : "deleteTopStocskHistory", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true, "tooltip":""},
+  {"id" : "printTopStocksHistory", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false, "tooltip":""},
+  {"id" : "exportTopStocksHistory", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"genericexport", "routeParams":{"module":"ERP", "name":"StocksHistory"}, "confirm" :false, "tooltip":""}
+]

@@ -27,6 +27,7 @@
 {% if (hideValidation is not defined or hideValidation==false) %}
   {{ include("@Globale/form_validation.html.twig") }}
 {% endif %}
+{{ include('@Globale/jseval.html.twig') }}
 <input type="hidden" id="search_param"/>
 <script>
 var url = new URL(window.location.href);
@@ -243,7 +244,7 @@ var url = new URL(window.location.href);
 							{% if hideCheckBoxes is defined and hideCheckBoxes %}
 								"visible": false,
 							{% endif %}
-							"render": function(data, type, row, meta){
+							"render": function(data, type, row, meta){								
 									{% if listConstructor.multiselect is defined and listConstructor.multiselect==false %}
 									return ''
 									{% else %}
@@ -289,10 +290,13 @@ var url = new URL(window.location.href);
 											"render": function(data, type, row, meta){
 													//var date = new Date(data*1000);
 													//return ("0" + date.getHours()).slice(-2)+':'+("0" + date.getMinutes()).slice(-2)+':'+("0" + date.getSeconds()).slice(-2);;
-													if(data!=null){
+													if(data!=null && data!=''){
 														//return data.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 														return parseFloat(data).toLocaleString('es'){% if field.unity is defined %}+' {{ field.unity }}'{% endif %};
-													}else return '0';
+													}else if (data=='')
+														return '';
+													else
+														return '0';
 											},
 											"sortFunc": (a, b, order) => {
 											    if (order === 'asc') {
@@ -359,7 +363,7 @@ var url = new URL(window.location.href);
 														{% endif %}
 													{% endif %}
 													{% endif %}
-												return '<div id="{{ listConstructor.id }}-{{ field.name}}-'+row['id']+'">'+text{% if field.unity is defined %}+' {{ field.unity }}'{% endif %}+'</div>';
+												return '<div id="{{ listConstructor.id }}-{{ field.name}}-'+row['id']+'">'+text{% if field.unity is defined %}+(text!=null & text!=''?' {{ field.unity }}':''){% endif %}+'</div>';
 										},
 										{% endif %}
 								},
@@ -376,18 +380,28 @@ var url = new URL(window.location.href);
 								"render": function(data, type, row, meta){
 										var buttons='';
 										{% if userData.permissions[listConstructor.id ~ '_field_' ~ field.id] is not defined or (userData.permissions[listConstructor.id ~ '_field_' ~ field.id] is defined and userData.permissions[listConstructor.id ~ '_field_' ~ field.id].allowaccess == true) %}
+										var disabled='';
+										var classDisabled='';
+										{% if field.disabled is defined %}
+											evalAttr = "{{ field.disabled }}";
+											evalAttr = replaceEval(evalAttr, row);
+											if (evalAttr==true){
+												disabled = ' disabled="disabled"';
+												classDisabled = 'disabled';
+											}
+										{% endif %}
 										{% if field.type is defined and field.type=="option" %}
 											{% for fieldOption in field.options %}
 												if(Array.isArray(row["{{ fieldOption.condition }}"]))
-												buttons+='<div class="btn-group {% if fieldOption.condition is defined %}'+((row["{{ fieldOption.condition }}"][0]*1 != "{{ fieldOption.conditionValue }}"*1) ? 'hide' : '')+'{% endif %}">	<button attr-id="'+row['id']+'" id="{{ listConstructor.id }}-field-button-{{ fieldOption.id }}-'+row['id']+'" type="button" class="{% if field.default is defined and field.default==true %}default-action{% endif %} btn btn-{{ fieldOption.type }} tooltip-primary" {% if field.tooltip is defined %} data-toggle="tooltip" data-placement="bottom" title="" data-original-title=" {{ field.tooltip }} {% endif %}';
+												buttons+='<div class="btn-group {% if fieldOption.condition is defined %}'+((row["{{ fieldOption.condition }}"][0]*1 != "{{ fieldOption.conditionValue }}"*1) ? 'hide' : '')+'{% endif %}">	<button '+disabled+'attr-id="'+row['id']+'" id="{{ listConstructor.id }}-field-button-{{ fieldOption.id }}-'+row['id']+'" type="button" class="'+classDisabled+'{% if field.default is defined and field.default==true %}default-action{% endif %} btn btn-{{ fieldOption.type }} tooltip-primary" {% if field.tooltip is defined %} data-toggle="tooltip" data-placement="bottom" title="" data-original-title=" {{ field.tooltip }} {% endif %}';
 												else
-												buttons+='<div class="btn-group {% if fieldOption.condition is defined %}'+((row["{{ fieldOption.condition }}"]*1 != "{{ fieldOption.conditionValue }}"*1) ? 'hide' : '')+'{% endif %}">	<button attr-id="'+row['id']+'" id="{{ listConstructor.id }}-field-button-{{ fieldOption.id }}-'+row['id']+'" type="button" class="{% if field.default is defined and field.default==true %}default-action{% endif %} btn btn-{{ fieldOption.type }} tooltip-primary"';
+												buttons+='<div class="btn-group {% if fieldOption.condition is defined %}'+((row["{{ fieldOption.condition }}"]*1 != "{{ fieldOption.conditionValue }}"*1) ? 'hide' : '')+'{% endif %}">	<button '+disabled+'attr-id="'+row['id']+'" id="{{ listConstructor.id }}-field-button-{{ fieldOption.id }}-'+row['id']+'" type="button" class="'+classDisabled+'{% if field.default is defined and field.default==true %}default-action{% endif %} btn btn-{{ fieldOption.type }} tooltip-primary"';
 												buttons+='{% if fieldOption.tooltip is defined and fieldOption.tooltip != "" %} data-toggle="tooltip" data-placement="bottom" title="" data-original-title=" {{ fieldOption.tooltip }} {% endif %}"';
 												buttons+='{% if fieldOption.confirm is defined %}{% if fieldOption.confirm == true %}  onclick="jQuery(\'#{{ listConstructor.id }}-modal-confirm\').modal(\'show\', {backdrop: \'static\'});" {% endif %}{% endif %}>';
 												buttons+='<i class="{{ fieldOption.icon }}"></i></button></div>	';
 										{% endfor %}
 										{% else %}
-											buttons+='<div class="btn-group {% if field.condition is defined %}'+((row["{{ field.condition }}"]*1 != "{{ field.conditionValue }}"*1) ? 'hide' : '')+'{% endif %}">	<button attr-id="'+row['id']+'" id="{{ listConstructor.id }}-field-button-{{ field.id }}-'+row['id']+'" type="button" class="{% if field.default is defined and field.default==true %}default-action{% endif %} btn btn-{{ field.type }} tooltip-primary"';
+											buttons+='<div class="btn-group {% if field.condition is defined %}'+((row["{{ field.condition }}"]*1 != "{{ field.conditionValue }}"*1) ? 'hide' : '')+'{% endif %}">	<button '+disabled+'attr-id="'+row['id']+'" id="{{ listConstructor.id }}-field-button-{{ field.id }}-'+row['id']+'" type="button" class="'+classDisabled+'{% if field.default is defined and field.default==true %}default-action{% endif %} btn btn-{{ field.type }} tooltip-primary"';
 											buttons+='{% if field.tooltip is defined and field.tooltip != "" %} data-toggle="tooltip" data-placement="bottom" title="" data-original-title=" {{ field.tooltip }} {% endif %}"';
 											buttons+='{% if field.confirm is defined %}{% if field.confirm == true %}  onclick="jQuery(\'#{{ listConstructor.id }}-modal-confirm\').modal(\'show\', {backdrop: \'static\'});" {% endif %}{% endif %}>';
 											buttons+='<i class="{{ field.icon }}"></i></button></div>	';
@@ -510,8 +524,6 @@ var url = new URL(window.location.href);
 							 clearTimeout(typingTimer);
 						});
 					{% endif %}
-
-
 
 				{% endfor %}
 
@@ -812,13 +824,6 @@ var url = new URL(window.location.href);
 
 		});
 
-
-
-
-		/*$("[id$='_to']").on("dp.change", function (e) {
-				$('#'+$(this).attr('attr-min')).data("DateTimePicker").maxDate(e.date);
-				console.log("Cambio");
-		});*/
 	});
 	</script>
 

@@ -66,7 +66,7 @@ class ERPStocksHistory
     private $dateupd;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Modules\ERP\Entity\ERPProductsVariants")
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPProductsVariants")
      */
     private $productvariant;
 

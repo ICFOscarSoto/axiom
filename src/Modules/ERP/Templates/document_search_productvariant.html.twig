@@ -1,0 +1,87 @@
+<div class="modal fade" tabindex="-1" id="productvariant-search-modal-form" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content" style="transform: matrix(1, 0, 0, 1, 0, 0);">
+        <div class="modal-header">
+          <h4 class="modal-title">{{ ('Search')|trans }}&nbsp;{{ ('productos')|trans }}</h4>
+        </div>
+        <div id="productvariant-search-modal-form-body" style="height: 520px; padding: 0px 10px;">
+          {% set listConstructor = productsvariantslist %}
+          {% set listOrigin = "" %}
+          {# for know if list.html is invoked directly from controller and we need to make modals inside list#}
+          {{ include('@Globale/list.html.twig') }}
+        </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+var productvariantFields=["productvariant-form-id","productvariant-form-code","productvariant-form-name","productvariant-form-price","productvariant-form-tax", "productvariant-form-surcharge-perc"];
+var productvariantSearchfields=["id","code","name","price","tax","surcharge"];
+
+function postproductvariantSearch(id){
+  if($("#customer-form-surcharge").val()=="true") $("#productvariant-form-surcharge-"+id).val($("#productvariant-form-surcharge-perc-"+id).val()); else $("#productvariant-form-surcharge-"+id).val(0);
+  calculateDocumentRow(id);
+}
+
+function productvariantSearch(id, val, fields, searchFields){
+  if(val!=""){
+    if((++load_wait)==1) $("#load-spinner").fadeIn();
+    $.ajax({
+       //url: ' {#{{ url('productvariantsearch',{'field':'code'}) }}#}/'+val+'/'+$("#customer-form-customergroup-select").val(),
+       url:'',
+       type: 'POST',
+       data: JSON.stringify(searchFields),
+       success:  function( data ) {
+         if((--load_wait)==0) $("#load-spinner").fadeOut();
+         if(data.result){
+
+           var i=0;
+           Object.entries(data.data).forEach(function(element) {
+             $("#"+fields[i]+"-"+id).val(element[1]);
+             i++;
+           });
+
+           var element =  document.getElementById("productvariant-form-location-"+id);
+            if (typeof(element) != 'undefined' && element != null)
+            {
+              jQuery.each( data.data.locations, function( i, val ) {
+                $("#productvariant-form-location-"+id).append(new Option(val.name, val.id));
+              });
+            }
+
+
+           postproductvariantSearch(id);
+         } else {
+           clearFields(fields);
+           //toastr.warning("No se encontro el producto introducido", "Confirmación", confirmation);
+         }
+       }
+     });
+   }else clearFields(fields);
+}
+
+$(document).ready(function() {
+  {# PRODUCT SEARCH #}
+  $('body').on('click', "[id^='productvariant-search-button-']", function(e) {
+    $("#productvariant-search-modal-form").attr("attr-id",$(this).attr("attr-id"));
+    $("#productvariant-search-modal-form").modal('show');
+  });
+
+  $('body').on('keypress', "[id^='productvariant-form-code-']", function(e) {
+      var code = e.keyCode || e.which;
+       if(code == 13) {
+         productvariantSearch($(this).attr("attr-id"), $(this).val(), productvariantFields, productvariantSearchfields);
+       }
+    });
+  $('body').on('change', "[id^='productvariant-form-code-']", function(e) {
+       productvariantSearch($(this).attr("attr-id"), $(this).val(), productvariantFields, productvariantSearchfields);
+  });
+
+  $('body').on('click', "[id^='listproductvariants-field-button-select-']", function(e) {
+    $("#productvariant-form-code-"+$("#productvariant-search-modal-form").attr("attr-id")).val($(this).parent().parent().parent().children('td').eq(1).text());
+    $("#productvariant-form-code-"+$("#productvariant-search-modal-form").attr("attr-id")).trigger('change');
+    $("#productvariant-search-modal-form").modal('toggle');
+  });
+});
+</script>

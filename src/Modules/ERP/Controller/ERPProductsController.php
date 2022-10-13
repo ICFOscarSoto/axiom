@@ -244,27 +244,32 @@ class ERPProductsController extends Controller
 			$productvariant=null;
 			if($id!=0){
 				$obj = $this->getDoctrine()->getRepository($this->class)->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
+				$productvariant=$ProductsVariantsrepository->findOneBy(["product"=>$obj, "variant"=>null, "deleted"=>0]);
 			}else{
 				if($request->request->get('barcode',null)){
+						// Busqueda de producto por su ID de base de datos (P.)
 						if(substr(strtoupper($request->request->get('barcode')),0,2)=="P."){
 							$product=$Productrepository->findOneBy(["id"=>intval(substr($request->request->get('barcode'),2)), "company"=>$this->getUser()->getCompany(), "deleted"=>0]);
 							$obj=$product;
-							$productvariant=$ProductsVariantsrepository->findOneBy(["product"=>$product, $variant=>null, "deleted"=>0]);
+							$productvariant=$ProductsVariantsrepository->findOneBy(["product"=>$product, "variant"=>null, "deleted"=>0]);
 						}else{
+							// Busqueda de producto por su ID de productvariant de base de datos (V.)
 							if(substr(strtoupper($request->request->get('barcode')),0,2)=="V."){
 								$productvariant=$ProductsVariantsrepository->findOneBy(["id"=>intval(substr($request->request->get('barcode'),2)), "deleted"=>0]);
 								if($productvariant) $obj=$productvariant->getProduct();
 							}else{
 								$EAN13=$EAN13repository->findOneBy(["name"=>$request->request->get('barcode',null), "deleted"=>0]);
 								if($EAN13){
-								 	$obj=$EAN13->getProduct();
 									$productvariant=$EAN13->getProductVariant();
+									if ($productvariant)
+										$obj=$EAN13->getProductVariant()->getProduct();
 								}else{
 									//Try with a lead 0 at start of $barcode
 									$EAN13=$EAN13repository->findOneBy(["name"=>'0'.$request->request->get('barcode',null), "deleted"=>0]);
 									if($EAN13){
-									 	$obj=$EAN13->getProduct();
 										$productvariant=$EAN13->getProductVariant();
+										if ($productvariant)
+											$obj=$EAN13->getProductVariant()->getProduct();
 									}
 								}
 							}
@@ -275,11 +280,12 @@ class ERPProductsController extends Controller
 			if($obj){
 				$stocks=$Stocksrepository->findBy(["productvariant"=>$productvariant, "company"=>$this->getUser()->getCompany(), "active"=>1, "deleted"=>0]);
 				$eans=$EAN13repository->findBy(["productvariant"=>$productvariant,  "active"=>1, "deleted"=>0]);
+
 				$result["id"]=$obj->getId();
 				$result["code"]=$obj->getCode();
-				$result["variant_id"]=$productvariant?$productvariant->getId():0;
-				$result["variant_name"]=$productvariant?$productvariant->getVarianttype()->getName():"";
-				$result["variant_value"]=$productvariant?$productvariant->getVariant()->getName():"";
+				$result["variant_id"]=$productvariant?($productvariant->getVariant()?$productvariant->getId():0):0;
+				$result["variant_name"]=$productvariant?($productvariant->getVariant()?($productvariant->getVariant()->getVarianttype()?$productvariant->getVariant()->getVarianttype()->getName():""):""):"";
+				$result["variant_value"]=$productvariant?($productvariant->getVariant()?$productvariant->getVariant()->getName():""):"";
 				$result["variant_active"]=$productvariant?$productvariant->getActive():true;
 
 				$result["code"]=$obj->getCode();
@@ -307,13 +313,14 @@ class ERPProductsController extends Controller
 					$result["eans"][]=$ean_item;
 				}
 
-				$variants=$ProductsVariantsrepository->findBy(["product"=>$obj, "active"=>1, "deleted"=>0]);
+				$productsvariants=$ProductsVariantsrepository->findBy(["product"=>$obj, "active"=>1, "deleted"=>0]);
 				$result["variants"]=[];
-				foreach($variants as $variant){
-					$variant_item["id"]=$variant->getId();
-					$variant_item["name"]=$variant->getVarianttype()->getName();
-					$variant_item["value"]=$variant->getVariant()->getName();
-					$eans=$EAN13repository->findBy(["product"=>$obj, "productvariant"=>$variant, "active"=>1, "deleted"=>0]);
+				foreach($productsvariants as $productvariant){
+					if (!$productvariant->getVariant()) continue;
+					$variant_item["id"]=$productvariant?($productvariant->getVariant()?$productvariant->getId():0):0;
+					$variant_item["name"]=$productvariant?($productvariant->getVariant()?($productvariant->getVariant()->getVarianttype()?$productvariant->getVariant()->getVarianttype()->getName():""):""):"";
+					$variant_item["value"]=$productvariant?($productvariant->getVariant()?$productvariant->getVariant()->getName():""):"";
+					$eans=$EAN13repository->findBy(["productvariant"=>$productvariant, "active"=>1, "deleted"=>0]);
 					$variant_item["eans"]=[];
 					foreach($eans as $ean){
 						$ean_item["id"]=$ean->getId();
@@ -388,7 +395,7 @@ class ERPProductsController extends Controller
 			}else{
 				if($request->request->get('barcode',null)){
 						$EAN13=$EAN13repository->findOneBy(["name"=>$request->request->get('barcode',null), "active"=>1, "deleted"=>0]);
-						if($EAN13) $obj=$EAN13->getProduct();
+						if($EAN13) $obj=$EAN13->getProductvariant()->getProduct();
 				}
 			}
 			if($obj){
@@ -521,9 +528,9 @@ class ERPProductsController extends Controller
 	 if($type==1){
 		 $ean=$repository->findOneBy(["id"=>$id]);
 		 if($ean){
-			 $code=$ean->getProduct()->getCode();
+			 $code=$ean->getProductvariant()->getProduct()->getCode();
 			 $barcode=$ean->getName();
-			 $name=$ean->getProduct()->getName();
+			 $name=$ean->getProductvariant()->getProduct()->getName();
 			 if ($ean->getCustomer())
 			  	if ($ean->getCustomer()->getCode()=='C01448') $noValidate=true;
 					else $noValidate=false;
@@ -567,9 +574,9 @@ class ERPProductsController extends Controller
 			if($type==2){  //Product EAN barcode
 				$ean=$repositoryEAN->findOneBy(["id"=>$id]);
 				if($ean){
-					$code=$ean->getProduct()->getCode();
+					$code=$ean->getProductvariant()->getProduct()->getCode();
 					$barcode=$ean->getName();
-					$name=$ean->getProduct()->getName();
+					$name=$ean->getProductvariant()->getProduct()->getName();
 					if ($ean->getCustomer())
 	 			  	if ($ean->getCustomer()->getCode()=='C01448') $noValidate=true;
 	 					else $noValidate=false;
@@ -577,11 +584,11 @@ class ERPProductsController extends Controller
 				}
 			} else {
 				if($type==3){  //Variant id barcode
-					$variant=$repositoryVariants->findOneBy(["id"=>$id]);
-					if($variant && $variant->getProduct() && $variant->getVariant()){
-						$code=$variant->getProduct()->getCode();
-						$barcode='V.'.str_pad($variant->getId(),8,'0', STR_PAD_LEFT);
-						$name=$variant->getProduct()->getName().' - '.$variant->getVariant()-getVarianttype()->getName().' '.$variant->getVariant()->getName();
+					$productvariant=$repositoryVariants->findOneBy(["id"=>$id]);
+					if($productvariant && $productvariant->getProduct() && $productvariant->getVariant()){
+						$code=$productvariant->getProduct()->getCode();
+						$barcode='V.'.str_pad($productvariant->getId(),8,'0', STR_PAD_LEFT);
+						$name=$productvariant->getProduct()->getName().' - '.$productvariant->getVariant()-getVarianttype()->getName().' '.$productvariant->getVariant()->getName();
 					}
 				}
 			}

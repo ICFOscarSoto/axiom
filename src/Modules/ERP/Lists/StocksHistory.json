@@ -1,0 +1,56 @@
+[
+    {
+        "name": "id",
+        "caption": "id"
+    },
+    {
+        "name": "productvariant__product__name",
+        "caption": "product"
+    },
+    {
+        "name": "productvariant__variant__name",
+        "caption": "variant"
+    },
+    {
+        "name": "location__store__name",
+        "caption": "store"
+    },
+    {
+        "name": "location__name",
+        "caption": "location"
+    },
+    {
+        "name": "quantity",
+        "caption": "quantity"
+    },
+    {
+        "name": "previousqty",
+        "caption": "previousqty"
+    },
+    {
+        "name": "newqty",
+        "caption": "newqty"
+    },
+    {
+        "name": "comment",
+        "caption": "comment"
+    },
+    {
+        "name": "numOperation",
+        "caption": "numOperation"
+    },
+    {
+        "name": "user__name_o_user__lastname",
+        "caption": "user"
+    },
+    {
+        "name": "dateadd",
+        "caption": "dateadd",
+        "type": "date",
+        "class": "all"
+    },
+    {
+        "name": "type__name",
+        "caption": "type"
+    }
+]

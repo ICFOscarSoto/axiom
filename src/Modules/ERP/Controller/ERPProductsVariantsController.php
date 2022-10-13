@@ -11,6 +11,8 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\ERP\Entity\ERPProducts;
+use App\Modules\ERP\Entity\ERPVariants;
+use App\Modules\ERP\Entity\ERPVariantsTypes;
 use App\Modules\ERP\Entity\ERPSuppliers;
 use App\Modules\ERP\Entity\ERPProductsVariants;
 use App\Modules\ERP\Entity\ERPStocks;
@@ -55,24 +57,36 @@ class ERPProductsVariantsController extends Controller
    public function data($id, $action, $idproduct, Request $request)
    {
    $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-   $template=dirname(__FILE__)."/../Forms/ProductsVariants.json";
-   $utils = new GlobaleFormUtils();
-   $utilsObj=new ERPProductsVariantsUtils();
-   $defaultProduct=$this->getDoctrine()->getRepository(ERPProducts::class);
-   $productsVariantsRepository=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
-   $obj=new ERPProductsVariants();
+   $template  = dirname(__FILE__)."/../Forms/ProductsVariants.json";
+   $utils     = new GlobaleFormUtils();
+   $utilsObj  = new ERPProductsVariantsUtils();
+   $productRepository         = $this->getDoctrine()->getRepository(ERPProducts::class);
+   $variantsRepository        = $this->getDoctrine()->getRepository(ERPVariants::class);
+   $productsVariantsRepository= $this->getDoctrine()->getRepository(ERPProductsVariants::class);
+   $productvariant            = new ERPProductsVariants();
+   $form                      = $request->request->get('form',null);
+   $oproduct                  = null;
+   $ovariant                  = null;
+   $form                      = $request->request->get('form',null);
+   if ($form && isset($form['variant']))
+     $ovariant                = $variantsRepository->find($form['variant']);
    if($id==0){
     if($idproduct==0 ) $idproduct=$request->query->get('idproduct');
     if($idproduct==0 || $idproduct==null) $idproduct=$request->request->get('id-parent',0);
+    $oproduct = $productRepository->find($idproduct);
+   }else {
+    $productvariant = $productsVariantsRepository->find($id);
+    if ($productvariant){
+      $oproduct = $productvariant->getProduct();
+      $ovariant = $productvariant->getVariant();
+    }
+   }
 
-    $product = $defaultProduct->find($idproduct);
-   }else $obj = $productsVariantsRepository->find($id);
+   $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(),"product"=>$oproduct,"variant"=>$ovariant];
 
-   $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(),"product"=>$id==0?$product:$obj->getProduct()];
-
-   $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),
+   $utils->initialize($this->getUser(), $productvariant, $template, $request, $this, $this->getDoctrine(),
                           method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
-   if($id==0) $utils->values(["product"=>$product]);
+   if($id==0) $utils->values(["product"=>$oproduct, "variant"=>$ovariant]);
 
    $make=$utils->make($id, ERPProductsVariants::class, $action, "ProductsVariants", "modal");
 
@@ -85,12 +99,13 @@ class ERPProductsVariantsController extends Controller
   public function listProductsVariants($id, Request $request){
     $listProductsVariants = new ERPProductsVariantsUtils();
     $formUtils=new GlobaleFormUtils();
-    $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "product"=>null];
+    $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "product"=>null, "variant"=>null];
     $formUtils->initialize($this->getUser(), ERPProductsVariants::class, dirname(__FILE__)."/../Forms/ProductsVariants.json", $request, $this, $this->getDoctrine(),method_exists($listProductsVariants,'getExcludedForm')?$listProductsVariants->getExcludedForm($params):[],method_exists($listProductsVariants,'getIncludedForm')?$listProductsVariants->getIncludedForm($params):[]);
 		$templateForms[]=$formUtils->formatForm('ProductsVariants', true, null, ERPProductsVariants::class);
     $userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
+    $listProductVariants = $listProductsVariants->formatListByProduct($id);   
     return $this->render('@Globale/list.html.twig', array(
-      'listConstructor' => $listProductsVariants->formatListByProduct($id),
+      'listConstructor' => $listProductVariants,
       'id_object'=>$id,
       'userData' => $userdata,
       'forms' => $templateForms
@@ -102,6 +117,7 @@ class ERPProductsVariantsController extends Controller
   */
   public function delete($id){
     $this->denyAccessUnlessGranted('ROLE_GLOBAL');
+
     $entityUtils=new GlobaleEntityUtils();
     $result=$entityUtils->deleteObject($id, $this->class, $this->getDoctrine());
 
@@ -121,37 +137,36 @@ class ERPProductsVariantsController extends Controller
 
 
     //comprobamos si existe la variante en Prestashop
-    $xml_string_variant=file_get_contents($this_url."/api/product_option_values/?display=[id]&filter[name]=".$productsVariant->getVariant()->getName(), false, $context);
-    $xml_variant = simplexml_load_string($xml_string_variant, 'SimpleXMLElement', LIBXML_NOCDATA);
-    $id_attribute=$xml_variant->product_option_values->product_option_value->id;
-    //la variante sí que existe en prestashop, luego hay que comprobar si la combinación variante-producto también existe y borrarla
-    if($id_attribute!=NULL)
-    {
-      //obtenemos todas las combinaciones asociadas al producto.
-      $xml_string_product_combinations=file_get_contents($this_url."/api/combinations/?display=[id]&filter[id_product]=".$id_prestashop, false, $context);
-      $xml_product_combinations = simplexml_load_string($xml_string_product_combinations, 'SimpleXMLElement', LIBXML_NOCDATA);
-
-    //  dump($xml_product_combinations);
-      foreach($xml_product_combinations->combinations->combination as $comb)
+    if ($productsVariant->getVariant()){
+      $xml_string_variant=file_get_contents($this_url."/api/product_option_values/?display=[id]&filter[name]=".$productsVariant->getVariant()->getName(), false, $context);
+      $xml_variant = simplexml_load_string($xml_string_variant, 'SimpleXMLElement', LIBXML_NOCDATA);
+      $id_attribute=$xml_variant->product_option_values->product_option_value->id;
+      //la variante sí que existe en prestashop, luego hay que comprobar si la combinación variante-producto también existe y borrarla
+      if($id_attribute!=NULL)
       {
-        $array=array_unique((array) $comb);
+        //obtenemos todas las combinaciones asociadas al producto.
+        $xml_string_product_combinations=file_get_contents($this_url."/api/combinations/?display=[id]&filter[id_product]=".$id_prestashop, false, $context);
+        $xml_product_combinations = simplexml_load_string($xml_string_product_combinations, 'SimpleXMLElement', LIBXML_NOCDATA);
 
-        //obtenemos cada combinación por el ID.
-        $xml_string_product_combination=file_get_contents($this_url."/api/combinations/".$array["id"], false, $context);
-        $xml_product_combination = simplexml_load_string($xml_string_product_combination, 'SimpleXMLElement', LIBXML_NOCDATA);
-        $id_attribute_ps=$xml_product_combination->combination->associations->product_option_values->product_option_value;
-        $array_id_attribute=array_unique((array) $id_attribute_ps);
-    //    dump($array_id_attribute["id"]."--".$id_attribute);
-        if($array_id_attribute["id"]==$id_attribute){
-          $prestashopUtils= new ERPPrestashopUtils();
-          $prestashopUtils->deleteCombination($xml_product_combination,$array["id"]);
-          continue;
-        }
+      //  dump($xml_product_combinations);
+        foreach($xml_product_combinations->combinations->combination as $comb)
+        {
+          $array=array_unique((array) $comb);
+
+          //obtenemos cada combinación por el ID.
+          $xml_string_product_combination=file_get_contents($this_url."/api/combinations/".$array["id"], false, $context);
+          $xml_product_combination = simplexml_load_string($xml_string_product_combination, 'SimpleXMLElement', LIBXML_NOCDATA);
+          $id_attribute_ps=$xml_product_combination->combination->associations->product_option_values->product_option_value;
+          $array_id_attribute=array_unique((array) $id_attribute_ps);
+      //    dump($array_id_attribute["id"]."--".$id_attribute);
+          if(isset($array_id_attribute["id"]) && $array_id_attribute["id"]==$id_attribute){
+            $prestashopUtils= new ERPPrestashopUtils();
+            $prestashopUtils->deleteCombination($xml_product_combination,$array["id"]);
+            continue;
+          }
+      }
+      }
     }
-    }
-
-
-
     return new JsonResponse(array('result' => $result));
   }
 
@@ -248,4 +263,31 @@ class ERPProductsVariantsController extends Controller
      }
      return new JsonResponse($result);
   }
+
+
+  /**
+  * @Route("/api/getVariantsOnType", name="getVariantsOnType")
+  */
+  public function getVariantsOnType(Request $request)
+  {
+    //$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+    $id = $request->request->get('id',0);
+    $variantsRepository=$this->getDoctrine()->getRepository(ERPVariants::class);
+    $variantsTypesRepository=$this->getDoctrine()->getRepository(ERPVariantsTypes::class);
+    $varianttype = $variantsTypesRepository->find($id);
+    $result = [];
+    if ($varianttype){
+      $result = $variantsRepository->findBy(["varianttype"=>$varianttype, "active"=>1, "deleted"=>0], ['name' => 'ASC']);
+      if ($result){
+        $resultf = [];
+        foreach ($result as $key => $value) {
+          $resultf[] = ["id"=>$value->getId(),"text"=>$value->getName()];
+        }
+        $result = $resultf;
+      }else
+        $result = [];
+    }
+    return new JsonResponse($result);
+  }
+
 }

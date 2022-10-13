@@ -53,21 +53,21 @@ class ERPStocksHistoryRepository extends ServiceEntityRepository
                 str.name as store, CONCAT(u.name,' ',u.lastname) as user,
                 h.previousqty as prevqty, h.newqty as newqty, h.dateadd as dateadd, h.comment AS comment, t.name AS type, h.num_operation AS numOperation, h.quantity as quantity
                 FROM erpstocks_history h
-                LEFT JOIN erpproducts pr
-                ON pr.id=h.product_id
                 LEFT JOIN erpproducts_variants pv
                 ON pv.id=h.productvariant_id
+                LEFT JOIN erpproducts pr
+                ON pr.id=pv.product_id
                 LEFT JOIN erpvariants vv
                 ON pv.variant_id=vv.id
                 LEFT JOIN erpstore_locations strl
                 ON strl.id=h.location_id
                 LEFT JOIN erpstores str
-                ON str.id=h.store_id
+                ON str.id=strl.store_id
                 LEFT JOIN globale_users u
                 ON u.id=h.user_id
                 LEFT JOIN erptypes_movements t
                 ON t.id=h.type_id
-                WHERE h.product_id=:product AND h.deleted=0 AND h.active=1 ";
+                WHERE pv.product_id=:product AND h.deleted=0 AND h.active=1 ";
       $query.=" ORDER BY h.dateadd DESC LIMIT 50";
       $params=['product' => $product];
       return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
@@ -78,17 +78,19 @@ class ERPStocksHistoryRepository extends ServiceEntityRepository
                 str.name as store, CONCAT(u.name,' ',u.lastname) as user,
                 h.previousqty as prevqty, h.newqty as newqty, h.dateadd as dateadd, h.comment AS comment, t.name AS type, h.num_operation AS numOperation, h.quantity as quantity
                 FROM erpstocks_history h
+                LEFT JOIN erpproducts_variants pv
+                ON pv.id=h.productvariant_id
                 LEFT JOIN erpproducts pr
-                ON pr.id=h.product_id
+                ON pr.id=pv.product_id
                 LEFT JOIN erpstore_locations strl
                 ON strl.id=h.location_id
                 LEFT JOIN erpstores str
-                ON str.id=h.store_id
+                ON str.id=strl.store_id
                 LEFT JOIN globale_users u
                 ON u.id=h.user_id
                 LEFT JOIN erptypes_movements t
                 ON t.id=h.type_id
-                WHERE h.product_id=:product AND h.deleted=0 AND h.active=1 ";
+                WHERE pv.product_id=:product AND h.deleted=0 AND h.active=1 ";
       $params=['product' => $product];
       return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
     }

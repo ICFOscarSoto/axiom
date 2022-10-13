@@ -11,6 +11,7 @@ use App\Modules\ERP\Entity\ERPCustomers;
 use App\Modules\ERP\Entity\ERPCustomerGroups;
 use App\Modules\ERP\Entity\ERPSuppliers;
 use App\Modules\ERP\Entity\ERPProducts;
+use App\Modules\ERP\Entity\ERPProductsVariants;
 use App\Modules\ERP\Entity\ERPManufacturers;
 use App\Modules\ERP\Entity\ERPProductPrices;
 use App\Modules\ERP\Entity\ERPEAN13;
@@ -25,7 +26,6 @@ use App\Modules\ERP\Entity\ERPCustomerIncrements;
 use App\Modules\ERP\Entity\ERPCustomerPrices;
 use App\Modules\ERP\Entity\ERPVariantsTypes;
 use App\Modules\ERP\Entity\ERPVariants;
-use App\Modules\ERP\Entity\ERPProductsVariants;
 use App\Modules\ERP\Entity\ERPStocksHistory;
 use App\Modules\ERP\Entity\ERPProductsSuppliers;
 use App\Modules\Globale\Entity\GlobaleCompanies;
@@ -170,6 +170,7 @@ public function importProduct(InputInterface $input, OutputInterface $output){
       $objects=json_decode($json, true);
 
       $repositoryProducts=$this->doctrine->getRepository(ERPProducts::class);
+      $repositoryProductsVariants=$this->doctrine->getRepository(ERPProductsVariants::class);
       $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
       $repositoryCategories=$this->doctrine->getRepository(ERPCategories::class);
       $repositorySuppliers=$this->doctrine->getRepository(ERPSuppliers::class);
@@ -238,12 +239,7 @@ public function importProduct(InputInterface $input, OutputInterface $output){
             $taxes=$repositoryTaxes->find(1);
             $oproduct->setTaxes($taxes);
             $oproduct->setCheckweb($product["ProductoWEB"]);
-            /*$oproduct->setWeight($product["Weight"]);
-            $packing=1;
-            if ($product["Unidad medida precio"]=='C') $packing=100;
-            else if ($product["Unidad medida precio"]=='M') $packing=1000;
-            $oproduct->setPurchasepacking($packing);*/
-            // TODO ERPProductsVariants tiene weight y purchasepacking
+
             // Comprobamos si el producto tiene descuentos, si no los tiene se le pone como precio neto.
             $json3=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getPrices.php?from='.$code_new.'&supplier='.$product["Supplier"]);
             $prices=json_decode($json3, true);
@@ -256,12 +252,15 @@ public function importProduct(InputInterface $input, OutputInterface $output){
                 }
               }
             }
+            $packing=1;
+            if ($product["Unidad medida precio"]=='C') $packing=100;
+            else if ($product["Unidad medida precio"]=='M') $packing=1000;
             if (!$oproduct->getnetprice()){
-              $oproduct->setPVPR($product["ShoppingPrice"]/$oproduct->getPurchasepacking());
+              $oproduct->setPVPR($product["ShoppingPrice"]/$packing);
               $oproduct->setShoppingPrice($oproduct->getPVPR()*(1-$oproduct->getShoppingDiscount($this->doctrine,$oproduct->getSupplier())/100));
             } else {
                $oproduct->setPVPR(0);
-               $oproduct->setShoppingPrice($product["ShoppingPrice"]/$oproduct->getPurchasepacking());
+               $oproduct->setShoppingPrice($product["ShoppingPrice"]/$packing);
             }
             $oproduct->setSupplier($supplier);
             $oproduct->setDateupd(new \Datetime());
@@ -272,6 +271,26 @@ public function importProduct(InputInterface $input, OutputInterface $output){
             $this->doctrine->getManager()->flush();
             $oproduct->priceCalculated($this->doctrine);
             $this->doctrine->getManager()->clear();
+
+            // ERPProductsVariants tiene weight y purchasepacking se crea siempre para la variante null (es decir la de por defecto del producto)
+            // y si ya existiera se modifica
+            $weight = ($product["Weight"]!='')?$product["Weight"]:null;
+            $oproductvariant = $repositoryProductsVariants->findOneBy(["product"=>$oproduct, "variant"=>null]);
+            if ($oproductvariant==null){
+              $oproductvariant = new ERPProductsVariants();
+              $oproductvariant->setProduct($oproduct);
+              $oproductvariant->setVariant(null);
+              $oproductvariant->setDateadd(new \Datetime());
+            }
+            $oproductvariant->setActive(1);
+            $oproductvariant->setDeleted(0);
+            $oproductvariant->setDateupd(new \Datetime());
+            $oproductvariant->setWeight($weight);
+            $oproductvariant->setPurchasepacking($packing);
+            $this->doctrine->getManager()->merge($oproductvariant);
+            $this->doctrine->getManager()->flush();
+            $this->doctrine->getManager()->clear();
+
             // Sumar producto al json para eliminar en tabla de cambios
             if (isset($object['producto']))
               unset($object['producto']);
@@ -328,45 +347,36 @@ public function importStocksStoresManaged(InputInterface $input, OutputInterface
     $company=$repositoryCompanies->find(2);
     $old_obj=explode('~',$object['codigo_antiguo']);
     $new_obj=explode('~',$object['codigo_nuevo']);
+    $productvariant = null;
+    $product=null;
+    $variant=null;
+    $storelocation=null;
     if ($object['accion']=='U') {
-      $productvariant = null;
       $quantity=intval($new_obj[3])-intval($old_obj[3]);
       $product=$repositoryProducts->findOneBy(["code"=>$new_obj[1]]);
-      $storeLocation=$repositoryStoreLocations->findOneBy(["name"=>$new_obj[5]]);
-      if($new_obj[2]!=""){
-        $variant=$repositoryVariants->findOneBy(["name"=>$new_obj[2]]);
-        if($variant!=null) $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product,"variant"=>$variant]);
-      }
+      $storelocation=$repositoryStoreLocations->findOneBy(["name"=>$new_obj[5]]);
     }
     else if ($object['accion']=='D'){
-      $productvariant = null;
       $quantity=$old_obj[3];
       $product=$repositoryProducts->findOneBy(["code"=>$old_obj[1]]);
-      $storeLocation=$repositoryStoreLocations->findOneBy(["name"=>$old_obj[5]]);
-      if($new_obj[2]!=""){
-        $variant=$repositoryVariants->findOneBy(["name"=>$new_obj[2]]);
-        if($variant!=null) $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product,"variant"=>$variant]);
-      }
-
+      $storelocation=$repositoryStoreLocations->findOneBy(["name"=>$old_obj[5]]);
     }
     else {
-      $productvariant = null;
       $quantity=$new_obj[3];
       $product=$repositoryProducts->findOneBy(["code"=>$new_obj[1]]);
-      $storeLocation=$repositoryStoreLocations->findOneBy(["name"=>$new_obj[5]]);
-      if($new_obj[2]!=""){
-        $variant=$repositoryVariants->findOneBy(["name"=>$new_obj[2]]);
-        if($variant!=null) $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product,"variant"=>$variant]);
-      }
+      $storelocation=$repositoryStoreLocations->findOneBy(["name"=>$new_obj[5]]);
     }
+    if($new_obj[2]!="")
+      $variant=$repositoryVariants->findOneBy(["name"=>$new_obj[2]]);
+    $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product,"variant"=>$variant]);
 
-    $stocks=$repositoryStocks->findOneBy(["productvariant"=>$productvariant, "storelocation"=>$storeLocation, "active"=>1, "deleted"=>0]);
-    if($product!=null AND $storeLocation!=null)
+    $stocks=$repositoryStocks->findOneBy(["productvariant"=>$productvariant, "storelocation"=>$storelocation, "active"=>1, "deleted"=>0]);
+    if($product!=null AND $storelocation!=null)
     {
       if ($stocks==null ){
         $stocks=new ERPStocks();
         $stocks->setProductVariant($productvariant);
-        $stocks->setStoreLocation($storeLocation);
+        $stocks->setStoreLocation($storelocation);
         $stocks->setCompany($company);
         $stocks->setQuantity(0);
         $stocks->setPendingreceive($quantity);
@@ -434,7 +444,9 @@ public function importEAN13(InputInterface $input, OutputInterface $output){
 
       $repositoryCustomers=$this->doctrine->getRepository(ERPCustomers::class);
       $repositorySuppliers=$this->doctrine->getRepository(ERPSuppliers::class);
+      $repositoryProductsVariants=$this->doctrine->getRepository(ERPProductsVariants::class);
       $repositoryProducts=$this->doctrine->getRepository(ERPProducts::class);
+      $repositoryVariants=$this->doctrine->getRepository(ERPVariants::class);
       $repositoryEAN13=$this->doctrine->getRepository(ERPEAN13::class);
 
       //Disable SQL logger
@@ -448,24 +460,28 @@ public function importEAN13(InputInterface $input, OutputInterface $output){
           $adatos_old = explode('~',$object['codigo_antiguo']);
           $code_old   = null;
           $product_old = null;
+          $variant_old = null;
           $type_old   = null;
           $supplier_customer_old   = null;
-          if (count($adatos_old)==4){
+          if (count($adatos_old)==5){
             $code_old   = preg_replace('/\D/','',$adatos_old[0]);
             $product_old = $adatos_old[1];
             $type_old   = $adatos_old[2];
             $supplier_customer_old = $adatos_old[3];
+            $variant_old = $adatos_old[4];
           }
           $adatos_new = explode('~',$object['codigo_nuevo']);
           $code_new   = null;
           $product_new = null;
+          $variant_new = null;
           $type_new   = null;
           $supplier_customer_new   = null;
-          if (count($adatos_new)==4){
+          if (count($adatos_new)==5){
             $code_new   = preg_replace('/\D/','',$adatos_new[0]);
             $product_new = $adatos_new[1];
             $type_new   = $adatos_new[2];
             $supplier_customer_new = $adatos_new[3];
+            $variant_new = $adatos_old[4];
           }
           $ean13  = null;
           if (isset($object['ean13']))
@@ -474,19 +490,24 @@ public function importEAN13(InputInterface $input, OutputInterface $output){
 
           // Borrado de EAN13
           if ($action=='D') {
-              $product=$repositoryProducts->findOneBy(["code"=>$product_old]);
-              if ($product!=NULL){
+              $oproduct=$repositoryProducts->findOneBy(["code"=>$product_old]);
+              $ovariant=null;
+              if ($variant_old!='')
+                $ovariant=$repositoryVariants->findOneBy(["name"=>$variant_old]);
+              $oproductvariant = $repositoryProductsVariants->findOneBy(["product"=>$oproduct, "variant"=>$ovariant]);
+
+              if ($oproductvariant!=null){
                 $customer=$repositoryCustomers->findOneBy(["code"=>$supplier_customer_old]);
                 if ($customer==null){
                   $supplier=$repositorySuppliers->findOneBy(["code"=>$supplier_customer_old]);
                   if ($supplier!=null)
-                    $oean13=$repositoryEAN13->findOneBy(["name"=>$code_old, "product"=>$product, "supplier"=>$supplier, "customer"=>null, "type"=>1]);
+                    $oean13=$repositoryEAN13->findOneBy(["name"=>$code_old, "productvariant"=>$oproductvariant, "supplier"=>$supplier, "customer"=>null, "type"=>1]);
                   else
-                    $oean13=$repositoryEAN13->findOneBy(["name"=>$code_old, "product"=>$product, "supplier"=>null, "customer"=>null, "type"=>null]);
+                    $oean13=$repositoryEAN13->findOneBy(["name"=>$code_old, "productvariant"=>$oproductvariant, "supplier"=>null, "customer"=>null, "type"=>null]);
                 }else {
-                  $oean13=$repositoryEAN13->findOneBy(["name"=>$code_old, "product"=>$product, "supplier"=>null, "customer"=>$customer, "type"=>2]);
+                  $oean13=$repositoryEAN13->findOneBy(["name"=>$code_old, "productvariant"=>$oproductvariant, "supplier"=>null, "customer"=>$customer, "type"=>2]);
                 }
-                if ($oean13!=NULL){
+                if ($oean13!=null){
                   $output->writeln($action.' - '.$code_old);
                   $this->doctrine->getManager()->remove($oean13);
                   $this->doctrine->getManager()->flush();
@@ -497,48 +518,63 @@ public function importEAN13(InputInterface $input, OutputInterface $output){
              $output->writeln($action.' - '.$code_old.' - '.$code_new.' - '.$product_new.' - '.$supplier_customer_new);
              // Inserta nuevo EAN13
              if ($action=='I') {
-               $product=$repositoryProducts->findOneBy(["code"=>$product_new]);
-               if ($product!=NULL){
+               $oproduct=$repositoryProducts->findOneBy(["code"=>$product_new]);
+               $ovariant=null;
+               if ($variant_new!='')
+                 $ovariant=$repositoryVariants->findOneBy(["name"=>$variant_new]);
+               $oproductvariant = $repositoryProductsVariants->findOneBy(["product"=>$oproduct, "variant"=>$ovariant]);
+
+               if ($oproductvariant!=null){
                  $customer=$repositoryCustomers->findOneBy(["code"=>$supplier_customer_new]);
                  if ($customer==null){
                    $supplier=$repositorySuppliers->findOneBy(["code"=>$supplier_customer_new]);
                    if ($supplier!=null)
-                     $oean13=$repositoryEAN13->findOneBy(["name"=>$code_new, "product"=>$product, "supplier"=>$supplier, "customer"=>null, "type"=>1]);
+                     $oean13=$repositoryEAN13->findOneBy(["name"=>$code_new, "productvariant"=>$oproductvariant, "supplier"=>$supplier, "customer"=>null, "type"=>1]);
                    else
-                     $oean13=$repositoryEAN13->findOneBy(["name"=>$code_new, "product"=>$product, "supplier"=>null, "customer"=>null, "type"=>null]);
+                     $oean13=$repositoryEAN13->findOneBy(["name"=>$code_new, "productvariant"=>$oproductvariant, "supplier"=>null, "customer"=>null, "type"=>null]);
                  }else {
-                   $oean13=$repositoryEAN13->findOneBy(["name"=>$code_new, "product"=>$product, "supplier"=>null, "customer"=>$customer, "type"=>2]);
+                   $oean13=$repositoryEAN13->findOneBy(["name"=>$code_new, "productvariant"=>$oproductvariant, "supplier"=>null, "customer"=>$customer, "type"=>2]);
                  }
                }
              }else
              if ($action=='U') {
                // Si no existe se hace lo mismo que el insert
-               $product=$repositoryProducts->findOneBy(["code"=>$product_old]);
-               if ($product!=NULL){
+               $oproduct=$repositoryProducts->findOneBy(["code"=>$product_old]);
+               $ovariant=null;
+               if ($variant_old!='')
+                 $ovariant=$repositoryVariants->findOneBy(["name"=>$variant_old]);
+               $oproductvariant = $repositoryProductsVariants->findOneBy(["product"=>$oproduct, "variant"=>$ovariant]);
+
+               if ($oproductvariant!=null){
                  $customer=$repositoryCustomers->findOneBy(["code"=>$supplier_customer_old]);
                  if ($customer==null){
                    $supplier=$repositorySuppliers->findOneBy(["code"=>$supplier_customer_old]);
                    if ($supplier!=null)
-                     $oean13=$repositoryEAN13->findOneBy(["name"=>$code_old, "product"=>$product, "supplier"=>$supplier, "customer"=>null, "type"=>1]);
+                     $oean13=$repositoryEAN13->findOneBy(["name"=>$code_old, "productvariant"=>$oproductvariant, "supplier"=>$supplier, "customer"=>null, "type"=>1]);
                    else{
-                     $oean13=$repositoryEAN13->findOneBy(["name"=>$code_old, "product"=>$product, "supplier"=>null, "customer"=>null, "type"=>null]);
+                     $oean13=$repositoryEAN13->findOneBy(["name"=>$code_old, "productvariant"=>$oproductvariant, "supplier"=>null, "customer"=>null, "type"=>null]);
                    }
                  }else {
-                   $oean13=$repositoryEAN13->findOneBy(["name"=>$code_old, "product"=>$product, "supplier"=>null, "customer"=>$customer, "type"=>2]);
+                   $oean13=$repositoryEAN13->findOneBy(["name"=>$code_old, "productvariant"=>$oproductvariant, "supplier"=>null, "customer"=>$customer, "type"=>2]);
                  }
                  // Si no existe se busca el nuevo para ver si está
                 if ($oean13==null){
-                  $product=$repositoryProducts->findOneBy(["code"=>$product_new]);
-                  if ($product!=NULL){
+                  $oproduct=$repositoryProducts->findOneBy(["code"=>$product_new]);
+                  $ovariant=null;
+                  if ($variant_new!='')
+                    $ovariant=$repositoryVariants->findOneBy(["name"=>$variant_new]);
+                  $oproductvariant = $repositoryProductsVariants->findOneBy(["product"=>$oproduct, "variant"=>$ovariant]);
+
+                  if ($oproductvariant!=null){
                     $customer=$repositoryCustomers->findOneBy(["code"=>$supplier_customer_new]);
                     if ($customer==null){
                       $supplier=$repositorySuppliers->findOneBy(["code"=>$supplier_customer_new]);
                       if ($supplier!=null)
-                        $oean13=$repositoryEAN13->findOneBy(["name"=>$code_new, "product"=>$product, "supplier"=>$supplier, "customer"=>null, "type"=>1]);
+                        $oean13=$repositoryEAN13->findOneBy(["name"=>$code_new, "productvariant"=>$oproductvariant, "supplier"=>$supplier, "customer"=>null, "type"=>1]);
                       else
-                        $oean13=$repositoryEAN13->findOneBy(["name"=>$code_new, "product"=>$product, "supplier"=>null, "customer"=>null, "type"=>null]);
+                        $oean13=$repositoryEAN13->findOneBy(["name"=>$code_new, "productvariant"=>$oproductvariant, "supplier"=>null, "customer"=>null, "type"=>null]);
                     }else {
-                      $oean13=$repositoryEAN13->findOneBy(["name"=>$code_new, "product"=>$product, "supplier"=>null, "customer"=>$customer, "type"=>2]);
+                      $oean13=$repositoryEAN13->findOneBy(["name"=>$code_new, "productvariant"=>$oproductvariant, "supplier"=>null, "customer"=>$customer, "type"=>2]);
                     }
                   }
                 }
@@ -565,9 +601,13 @@ public function importEAN13(InputInterface $input, OutputInterface $output){
                 $oean13->setCustomer($customer);
                 $oean13->setType(2);
               }
-              $product=$repositoryProducts->findOneBy(["code"=>$product_new]);
-              if ($product!=null) {
-                $oean13->setProduct($product);
+              $oproduct=$repositoryProducts->findOneBy(["code"=>$product_new]);
+              $ovariant=null;
+              if ($variant_new!='')
+                $ovariant=$repositoryVariants->findOneBy(["name"=>$variant_new]);
+              $oproductvariant = $repositoryProductsVariants->findOneBy(["product"=>$oproduct, "variant"=>$ovariant]);
+              if ($oproductvariant!=null) {
+                $oean13->setProductvariant($oproductvariant);
                 $this->doctrine->getManager()->persist($oean13);
                 $this->doctrine->getManager()->flush();
                 $this->doctrine->getManager()->clear();
@@ -1880,6 +1920,8 @@ public function importReferences(InputInterface $input, OutputInterface $output)
   $repositoryCustomers=$this->doctrine->getRepository(ERPCustomers::class);
   $repositorySuppliers=$this->doctrine->getRepository(ERPSuppliers::class);
   $repositoryProducts=$this->doctrine->getRepository(ERPProducts::class);
+  $repositoryVariants=$this->doctrine->getRepository(ERPVariants::class);
+  $repositoryProductsVariants=$this->doctrine->getRepository(ERPProductsVariants::class);
   $repositoryReferences=$this->doctrine->getRepository(ERPReferences::class);
 
   //Disable SQL logger
@@ -1892,17 +1934,20 @@ public function importReferences(InputInterface $input, OutputInterface $output)
        $adatos_old = explode('~',$object['codigo_antiguo']);
        $code_old   = null;
        $product_old = null;
+       $variant_old = null;
        $type_old   = null;
        $supplier_customer_old   = null;
-       if (count($adatos_old)==4){
+       if (count($adatos_old)==5){
           $code_old   = $adatos_old[0];
           $product_old = $adatos_old[1];
           $type_old   = $adatos_old[2];
           $supplier_customer_old = $adatos_old[3];
+          $variant_old = $adatos_old[4];
        }
        $adatos_new = explode('~',$object['codigo_nuevo']);
        $code_new   = null;
        $product_new = null;
+       $variant_new = null;
        $type_new   = null;
        $supplier_customer_new   = null;
        if (count($adatos_new)==4){
@@ -1910,6 +1955,7 @@ public function importReferences(InputInterface $input, OutputInterface $output)
           $product_new = $adatos_new[1];
           $type_new   = $adatos_new[2];
           $supplier_customer_new = $adatos_new[3];
+          $variant_new = $adatos_new[4];
        }
        $references  = null;
        if (isset($object['references']))
@@ -1919,18 +1965,23 @@ public function importReferences(InputInterface $input, OutputInterface $output)
        // Borrado de Reference
        if ($action=='D') {
          $product=$repositoryProducts->findOneBy(["code"=>$product_old]);
-         if ($product!=null){
+         $ovariant=null;
+         if ($variant_old!='')
+          $ovariant=$repositoryVariants->findOneBy(["name"=>$variant_old]);
+         $oproductvariant = $repositoryProductsVariants->findOneBy(["product"=>$oproduct, "variant"=>$ovariant]);
+
+         if ($oproductvariant!=null){
            if ($type_old=='1'){
              $customer=$repositoryCustomers->findOneBy(["code"=>$supplier_customer_old]);
-             $oreferences=$repositoryReferences->findOneBy(["name"=>$code_old, "product"=>$product, "customer"=>$customer, "supplier"=>null]);
+             $oreferences=$repositoryReferences->findOneBy(["name"=>$code_old, "productvariant"=>$oproductvariant, "customer"=>$customer, "supplier"=>null]);
            }
            else
            if ($type_old=='2') {
              $supplier=$repositorySuppliers->findOneBy(["code"=>$supplier_customer_old]);
-             $oreferences=$repositoryReferences->findOneBy(["name"=>$code_old, "product"=>$product, "customer"=>null, "supplier"=>$supplier]);
+             $oreferences=$repositoryReferences->findOneBy(["name"=>$code_old, "productvariant"=>$oproductvariant, "customer"=>null, "supplier"=>$supplier]);
            }
            else
-               $oreferences=$repositoryReferences->findOneBy(["name"=>$code_old, "product"=>$product, "customer"=>null, "supplier"=>null]);
+               $oreferences=$repositoryReferences->findOneBy(["name"=>$code_old, "productvariant"=>$oproductvariant, "customer"=>null, "supplier"=>null]);
 
            if ($oreferences!=null){
              $output->writeln($action.' - '.$code_old);
@@ -1942,36 +1993,43 @@ public function importReferences(InputInterface $input, OutputInterface $output)
        }else{
          $code_id               = null;
          $product_id            = null;
+         $variant_id            = null;
          $type_id               = null;
          $supplier_customer_id  = null;
          if ($action=='I'){
            $code_id               = $code_new;
            $product_id            = $product_new;
+           $variant_id            = $variant_new;
            $type_id               = $type_new;
            $supplier_customer_id  = $supplier_customer_new;
          }else
          if ($action=='U'){
            $code_id               = $code_old;
            $product_id            = $product_old;
+           $variant_id            = $variant_old;
            $type_id               = $type_old;
            $supplier_customer_id  = $supplier_customer_old;
          }
-         $product=$repositoryProducts->findOneBy(["code"=>$product_id]);
-         if ($product!=null) {
+         $oproduct=$repositoryProducts->findOneBy(["code"=>$product_id]);
+         if ($variant_id!=null)
+          $ovariant=$repositoryVariants->findOneBy(["name"=>$variant_id]);
+         $oproductvariant = $repositoryProductsVariants->findOneBy(["product"=>$oproduct, "variant"=>$ovariant]);
+
+         if ($oproductvariant!=null) {
             $supplier  = null;
             $customer = null;
             if ($type_id==1){
               $customer=$repositoryCustomers->findOneBy(["code"=>$supplier_customer_id]);
-              $oreferences=$repositoryReferences->findOneBy(["name"=>$code_id, "product"=>$product, "customer"=>$customer, "supplier"=>null, "type"=>2]);
+              $oreferences=$repositoryReferences->findOneBy(["name"=>$code_id, "productvariant"=>$oproductvariant, "customer"=>$customer, "supplier"=>null, "type"=>2]);
               if ($oreferences==null){
-                $oreferences=$repositoryReferences->findOneBy(["name"=>$code_id, "product"=>$product, "customer"=>null, "supplier"=>null, "type"=>2]);
+                $oreferences=$repositoryReferences->findOneBy(["name"=>$code_id, "productvariant"=>$oproductvariant, "customer"=>null, "supplier"=>null, "type"=>2]);
               }
             }else
             if ($type_id==2){
               $supplier=$repositorySuppliers->findOneBy(["code"=>$supplier_customer_id]);
-              $oreferences=$repositoryReferences->findOneBy(["name"=>$code_id, "product"=>$product, "customer"=>null, "supplier"=>$supplier, "type"=>1]);
+              $oreferences=$repositoryReferences->findOneBy(["name"=>$code_id, "productvariant"=>$oproductvariant, "customer"=>null, "supplier"=>$supplier, "type"=>1]);
               if ($oreferences==null){
-                $oreferences=$repositoryReferences->findOneBy(["name"=>$code_id, "product"=>$product, "customer"=>null, "supplier"=>null, "type"=>1]);
+                $oreferences=$repositoryReferences->findOneBy(["name"=>$code_id, "productvariant"=>$oproductvariant, "customer"=>null, "supplier"=>null, "type"=>1]);
               }
             }
 
@@ -1992,23 +2050,26 @@ public function importReferences(InputInterface $input, OutputInterface $output)
             if ($action=='U'){
               $customer = null;
               $suppliers = null;
-              $product=$repositoryProducts->findOneBy(["code"=>$product_new]);
-              if ($product!=null) {
+              $oproduct=$repositoryProducts->findOneBy(["code"=>$product_new]);
+              if ($variant_id!=null)
+               $ovariant=$repositoryVariants->findOneBy(["name"=>$variant_new]);
+              $oproductvariant = $repositoryProductsVariants->findOneBy(["product"=>$oproduct, "variant"=>$ovariant]);
+              if ($oproductvariant!=null) {
                  if ($type_new==1){
                    $customer=$repositoryCustomers->findOneBy(["code"=>$supplier_customer_new]);
                    if ($oreferences==null){
-                     $oreferences=$repositoryReferences->findOneBy(["name"=>$code_new, "product"=>$product, "customer"=>$customer, "supplier"=>null, "type"=>2]);
+                     $oreferences=$repositoryReferences->findOneBy(["name"=>$code_new, "productvariant"=>$oproductvariant, "customer"=>$customer, "supplier"=>null, "type"=>2]);
                      if ($oreferences==null){
-                       $oreferences=$repositoryReferences->findOneBy(["name"=>$code_new, "product"=>$product, "customer"=>null, "supplier"=>null, "type"=>2]);
+                       $oreferences=$repositoryReferences->findOneBy(["name"=>$code_new, "productvariant"=>$oproductvariant, "customer"=>null, "supplier"=>null, "type"=>2]);
                      }
                    }
                  }else
                  if ($type_new==2){
                    $supplier=$repositorySuppliers->findOneBy(["code"=>$supplier_customer_new]);
                    if ($oreferences==null){
-                     $oreferences=$repositoryReferences->findOneBy(["name"=>$code_new, "product"=>$product, "customer"=>null, "supplier"=>$supplier, "type"=>1]);
+                     $oreferences=$repositoryReferences->findOneBy(["name"=>$code_new, "productvariant"=>$oproductvariant, "customer"=>null, "supplier"=>$supplier, "type"=>1]);
                      if ($oreferences==null){
-                       $oreferences=$repositoryReferences->findOneBy(["name"=>$code_new, "product"=>$product, "customer"=>null, "supplier"=>null, "type"=>1]);
+                       $oreferences=$repositoryReferences->findOneBy(["name"=>$code_new, "productvariant"=>$oproductvariant, "customer"=>null, "supplier"=>null, "type"=>1]);
                      }
                    }
                  }
@@ -2018,14 +2079,14 @@ public function importReferences(InputInterface $input, OutputInterface $output)
                 $oreferences->setDateadd(new \Datetime());
               }
             }
-            if ($product!=null){
+            if ($productvariant!=null){
               $oreferences->setName($code_new);
               if (isset($references["Description"]))
                 $oreferences->setDescription($references["Description"]);
               else
                 $oreferences->setDescription("");
               $oreferences->setDateupd(new \Datetime());
-              $oreferences->setProduct($product);
+              $oreferences->setProductvariant($productvariant);
               $oreferences->setDeleted(0);
               $oreferences->setActive(1);
               if ($type_new==2){

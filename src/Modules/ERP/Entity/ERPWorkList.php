@@ -4,9 +4,7 @@ namespace App\Modules\ERP\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\Globale\Entity\GlobaleUsers;
-use \App\Modules\ERP\Entity\ERPProducts;
 use \App\Modules\ERP\Entity\ERPProductsVariants;
-use \App\Modules\ERP\Entity\ERPVariants;
 use \App\Modules\ERP\Entity\ERPStores;
 use \App\Modules\ERP\Entity\ERPStoreLocations;
 
@@ -54,12 +52,6 @@ class ERPWorkList
     private $deleted;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPProducts")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $product;
-
-    /**
      * @ORM\Column(type="string", length=20)
      */
     private $code;
@@ -75,11 +67,6 @@ class ERPWorkList
     private $linenum;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPVariants")
-     */
-    private $variant;
-
-    /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPStores")
      */
     private $store;
@@ -88,7 +75,11 @@ class ERPWorkList
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPStoreLocations")
      */
     private $location;
-
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPProductsVariants")
+     * @ORM\JoinColumn(onDelete="CASCADE")
+     */
+    private $productvariant;
 
 
     public function getId(): ?int
@@ -168,18 +159,6 @@ class ERPWorkList
         return $this;
     }
 
-    public function getProduct(): ?ERPProducts
-    {
-        return $this->product;
-    }
-
-    public function setProduct(?ERPProducts $product): self
-    {
-        $this->product = $product;
-
-        return $this;
-    }
-
     public function getCode(): ?string
     {
         return $this->code;
@@ -216,18 +195,6 @@ class ERPWorkList
         return $this;
     }
 
-    public function getVariant(): ?ERPVariants
-    {
-        return $this->variant;
-    }
-
-    public function setVariant(?ERPVariants $variant): self
-    {
-        $this->variant = $variant;
-
-        return $this;
-    }
-
     public function getStore(): ?ERPStores
     {
         return $this->store;
@@ -252,5 +219,15 @@ class ERPWorkList
         return $this;
     }
 
+    public function getProductvariant(): ?ERPProductsVariants
+    {
+        return $this->productvariant;
+    }
 
+    public function setProductvariant(?ERPProductsVariants $productvariant): self
+    {
+        $this->productvariant = $productvariant;
+
+        return $this;
+    }
 }

@@ -24,11 +24,6 @@ class ERPStoresManagersOperationsLines
      */
     private $operation;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Modules\ERP\Entity\ERPProducts")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $product;
 
     /**
      * @ORM\Column(type="integer")
@@ -45,10 +40,6 @@ class ERPStoresManagersOperationsLines
      */
     private $name;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPVariants")
-     */
-    private $variant;
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPStoreLocations")
@@ -75,21 +66,15 @@ class ERPStoresManagersOperationsLines
      */
     private $deleted;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPProductsVariants")
+     * @ORM\JoinColumn(onDelete="CASCADE")
+     */
+    private $productvariant;
+
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getProduct(): ?ERPProducts
-    {
-        return $this->product;
-    }
-
-    public function setProduct(?ERPProducts $product): self
-    {
-        $this->product = $product;
-
-        return $this;
     }
 
     public function getQuantity(): ?int
@@ -128,17 +113,6 @@ class ERPStoresManagersOperationsLines
         return $this;
     }
 
-    public function getVariant(): ?ERPVariants
-    {
-        return $this->variant;
-    }
-
-    public function setVariant(?ERPVariants $variant): self
-    {
-        $this->variant = $variant;
-
-        return $this;
-    }
 
     public function getLocation(): ?ERPStoreLocations
     {
@@ -208,6 +182,18 @@ class ERPStoresManagersOperationsLines
     public function setOperation(?ERPStoresManagersOperations $operation): self
     {
         $this->operation = $operation;
+
+        return $this;
+    }
+
+    public function getProductvariant(): ?ERPProductsVariants
+    {
+        return $this->productvariant;
+    }
+
+    public function setProductvariant(?ERPProductsVariants $productvariant): self
+    {
+        $this->productvariant = $productvariant;
 
         return $this;
     }

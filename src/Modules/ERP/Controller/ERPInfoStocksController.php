@@ -16,7 +16,7 @@ use App\Modules\ERP\Entity\ERPInfoStocks;
 use App\Modules\ERP\Entity\ERPStoreLocations;
 use App\Modules\ERP\Entity\ERPStocks;
 use App\Modules\ERP\Entity\ERPStores;
-use App\Modules\ERP\Entity\ERPStockHistory;
+use App\Modules\ERP\Entity\ERPStocksHistory;
 use App\Modules\Globale\Entity\GlobaleCountries;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
@@ -134,7 +134,7 @@ class ERPInfoStocksController extends Controller
         $stock=$stockRepository->findOneBy(["storelocation"=>$storeLocation->getId(), "product"=>$product->getId()]);
         if ($stock==NULL) continue;
         $quantity=$stock->getQuantity()-$infoStock["vendido"];
-        $stockHistory=new ERPStockHistory();
+        $stockHistory=new ERPStocksHistory();
         $stockHistory->setProduct($product);
         $stockHistory->setLocation($storeLocation);
         $stockHistory->setStore($store);
@@ -158,7 +158,7 @@ class ERPInfoStocksController extends Controller
         $stock=$stockRepository->findOneBy(["storelocation"=>$storeLocation->getId(), "product"=>$product->getId()]);
         if ($stock!=null){
         $quantity=$stock->getQuantity()+$object["stock"];
-        $stockHistory=new ERPStockHistory();
+        $stockHistory=new ERPStocksHistory();
         $stockHistory->setProduct($product);
         $stockHistory->setLocation($storeLocation);
         $stockHistory->setStore($store);

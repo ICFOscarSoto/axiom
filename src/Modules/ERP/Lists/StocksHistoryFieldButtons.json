@@ -1,0 +1,3 @@
+[
+  {"id": "editStocksHistory", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"genericdata", "routeParams":{"module":"ERP", "name":"StocksHistory", "type":"modal" }, "modal":"StocksHistory", "actionType" : "background", "confirm" :false, "tooltip":""}
+]

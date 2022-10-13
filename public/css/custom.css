@@ -156,6 +156,16 @@ label {
   cursor: not-allowed !important;
 }
 
+button.disabled{
+  cursor: not-allowed !important;
+  opacity: 0.2 !important;
+}
+
+div.form_disabled{
+  cursor: not-allowed !important;
+  opacity: 0.5 !important;
+}
+
 .nested-list.custom-drag-button .dd-handle {
   width: 30px !important;
   padding-left: 7px !important;

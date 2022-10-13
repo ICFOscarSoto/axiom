@@ -75,6 +75,7 @@ class ERPProductsSuppliersRepository extends ServiceEntityRepository
                      (case when s.id=:supplier_preference then 1 else 0 end) as preference
               FROM erpproducts_suppliers_prices psp LEFT JOIN
                    erpproducts_suppliers ps on ps.id=psp.productsupplier_id LEFT JOIN
+                   erpsuppliers s on s.id=ps.supplier_id LEFT JOIN
                    erpproducts_variants pv on pv.id=ps.productvariant_id LEFT JOIN
                    erpproducts p on p.id=pv.product_id LEFT JOIN
                    erpproducts_suppliers_discounts sd on sd.supplier_id=ps.supplier_id and sd.category_id=:category and sd.deleted=0 and sd.active=1

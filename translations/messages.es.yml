@@ -261,6 +261,7 @@ Queues: Colas
 #----------------------------------------------------------------------------------------------------------------------
 Holliday data: "Datos festivo"
 Type: Tipo
+type: Tipo
 Date: Fecha
 
 
@@ -478,6 +479,10 @@ Select HRShifts: Seleccionar grupo horario
 #STOCKS
 #----------------------------------------------------------------------------------------------------------------------
 Quantity: Cantidad
+quantity: Cantidad
+previousqty: Cantidad previa
+newqty: Cantidad nueva
+numOperation: Nº operación
 Store: Almacen
 Stores: Almacenes
 Stocks: Cantidades
@@ -502,6 +507,7 @@ Grouped: Agrupado
 Expiration: Caducidad
 Minimumquantityofsale: Cantidad minima de venta
 Weight: Peso
+weight: Peso
 Onsale: En venta
 Salepacking: Embalaje de venta
 Taxes: Impuestos
@@ -518,9 +524,12 @@ Select erpmanufacturers: Seleccionar marca
 Onbuy: Se compra
 Netprice: Neto
 ShoppingPrice: Precio de compra
+ProductsVariants: Variantes del producto
 Variants: Variantes
 variant: Variante
+Variant: Variante
 varianttype: Tipo de variante
+Select ERPVariants: Seleccionar
 Checkweb: Producto Web
 pendingToReceive: Pendiente de Recibir
 pendingToServe: Pendiente de Servir
@@ -601,6 +610,8 @@ Select aerppaymentmethods: Seleccionar método pago
 Select aerpwarehouselocations: Seleccionar ubicación
 Price: Precio
 Purchaseprice: Precio compra
+Purchasepacking: Packing compra
+purchasepacking: Packing compra
 Onpurchase: Se compra
 code: Código
 StockControl: Control stock

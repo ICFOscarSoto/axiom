@@ -18,6 +18,7 @@ use Symfony\Component\Form\CallbackTransformer;
 use App\Modules\Globale\Entity\GlobaleCompanies;
 use App\Modules\Globale\Entity\GlobaleHistories;
 use App\Modules\Globale\Entity\GlobaleUsers;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class GlobaleFormUtils extends Controller
 {
@@ -259,7 +260,10 @@ class GlobaleFormUtils extends Controller
           }
         }else{
           //$form->add($value['fieldName'], TextType::class, ["attr"=>["attr-module"=>$field["module"],"attr-name"=>$field["nameClass"]]]);
-          $form->add($value['fieldName'], ChoiceType::class, $this->choiceRelationTrigger($field, $value['fieldName'],$nullable, $route, $routeType));
+          $generic = true;
+          if(isset($field["trigger"]['generic']))
+            $generic = $field["trigger"]['generic'];
+          $form->add($value['fieldName'], ChoiceType::class, $this->choiceRelationTrigger($field, $value['fieldName'],$nullable, $route, $routeType,$generic));
         }
       }
     }
@@ -587,31 +591,67 @@ class GlobaleFormUtils extends Controller
   }
 
 
-public function choiceRelationTrigger($field, $name, $nullable, $route=null, $routeType=null){
-  $class="\App\Modules\\".$field["trigger"]["module"]."\\Entity\\".$field["trigger"]["class"];
-  $classTrigger="\App\Modules\\".$field["trigger"]["moduleTrigger"]."\\Entity\\".$field["trigger"]["classTrigger"];
+public function choiceRelationTrigger($field, $name, $nullable, $route=null, $routeType=null,$generic=true){
   $form=$this->request->request->get('form', null);
-  $filter=[];
-  if($form!=null){
-    //select options of the trigger value selected
-    //Check options for trigger FIELDS
-    $triggerValue=$this->doctrine->getRepository($classTrigger)->findOneBy(['id'=>$form[$field["trigger"]["field"]]]);
-    $filter=[$field["trigger"]["relationParameter"]=>$triggerValue];
-  }else{
-    //get selected option or null options if not set
-    if($this->obj!=null) {
-      $triggerValue=$this->doctrine->getRepository($classTrigger)->findOneBy(['id'=>$this->obj->{'get'.ucfirst($field["trigger"]["relationParameter"])}()]);
+  $class="\App\Modules\\".$field["trigger"]["module"]."\\Entity\\".$field["trigger"]["class"];
+  $choices=[];
+
+  if ($generic){
+    $classTrigger="\App\Modules\\".$field["trigger"]["moduleTrigger"]."\\Entity\\".$field["trigger"]["classTrigger"];
+    $filter=[];
+    if($form!=null){
+      //select options of the trigger value selected
+      //Check options for trigger FIELDS
+      $triggerValue=$this->doctrine->getRepository($classTrigger)->findOneBy(['id'=>$form[$field["trigger"]["field"]]]);
       $filter=[$field["trigger"]["relationParameter"]=>$triggerValue];
     }else{
-      $filter=["id"=>0];
+      //get selected option or null options if not set
+      if($this->obj!=null) {
+        $triggerValue=$this->doctrine->getRepository($classTrigger)->findOneBy(['id'=>$this->obj->{'get'.ucfirst($field["trigger"]["relationParameter"])}()]);
+        $filter=[$field["trigger"]["relationParameter"]=>$triggerValue];
+      }else{
+        $filter=["id"=>0];
+      }
     }
-  }
-  if(property_exists($class,'company')){ //If class has attribute company apply filter
-    $choices=$this->doctrine->getRepository($class)->findBy(array_merge($filter,['company'=>$this->user->getCompany(),'active'=>true, 'deleted'=>false]));
+    if(property_exists($class,'company')){ //If class has attribute company apply filter
+      $choices=$this->doctrine->getRepository($class)->findBy(array_merge($filter,['company'=>$this->user->getCompany(),'active'=>true, 'deleted'=>false]));
+    }else{
+      if(property_exists($class,'active')){
+        $choices= $this->doctrine->getRepository($class)->findBy(array_merge($filter,['active'=>true, 'deleted'=>false]));
+      }else $choices= $this->doctrine->getRepository($class)->findAll();
+    }
   }else{
-    if(property_exists($class,'active')){
-      $choices= $this->doctrine->getRepository($class)->findBy(array_merge($filter,['active'=>true, 'deleted'=>false]));
-    }else $choices= $this->doctrine->getRepository($class)->findAll();
+    $value = isset($form[$field["trigger"]["field"]])?$form[$field["trigger"]["field"]]:0;
+    if ($value==0){
+      $relationParameter = $field["trigger"]["relationParameter"];
+      if ($relationParameter){
+        $arelationParameter = explode('__',$relationParameter);
+        $relation = $this->obj;
+        $error = false;
+        for($i=0; $i<count($arelationParameter) && !$error; $i++){
+          if (method_exists($relation, 'get'.ucfirst($arelationParameter[$i])))
+            $relation = $relation->{'get'.ucfirst($arelationParameter[$i])}();
+          else
+            $error=true;
+        }
+        if (!$error)
+          $value = $relation;
+      }
+    }
+
+    $params = http_build_query(["id"=>$value]);
+    $opts = ["http" => [
+                          "method" => "POST",
+                          "header" => "Content-Type: application/x-www-form-urlencoded",
+                          "content" => $params
+                        ]
+                      ];
+    $context = stream_context_create($opts);
+    $result = file_get_contents($this->controller->generateUrl($field["trigger"]["route"],[], UrlGeneratorInterface::ABSOLUTE_URL),false,$context);
+    $result = json_decode($result, true);
+    foreach ($result as $key => $value) {
+      $choices[] = $this->doctrine->getRepository($class)->find($value['id']);
+    }
   }
 
   if(isset($this->permissions["permissions"][$this->name."_field_".$name]) && $this->permissions["permissions"][$this->name."_field_".$name]['allowaccess']==false) {
@@ -640,4 +680,5 @@ public function choiceRelationTrigger($field, $name, $nullable, $route=null, $ro
 
   return $result;
 }
+
 }

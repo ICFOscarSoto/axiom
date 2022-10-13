@@ -2,8 +2,8 @@
 {% if field.trigger.field is defined and field.trigger.route is defined %}
 <script>
   $(document).ready(function() {
-      $("#form_{{ field.trigger.field }}").select2();
-      $("#form_{{ field.name }}").select2();
+     $("#form_{{ field.trigger.field }}").select2();
+     $("#form_{{ field.name }}").select2();
 
      $("#form_{{ field.trigger.field }}").on("change", function (e) {
        if($("#form_{{ field.trigger.field }}").select2('data').length>0){
@@ -13,14 +13,17 @@
             dataType: "json",
             url: '{{ url(field.trigger.route) }}',
             type: 'POST',
-            data: {id: value, mod: '{{field.trigger.module}}', name: '{{field.trigger.class}}', modtrg:'{{field.trigger.moduleTrigger}}', nametrg:'{{field.trigger.classTrigger}}', prm:'{{field.trigger.relationParameter}}'},
+            {% if field.trigger.generic is defined and field.trigger.generic == false %}
+              data: {id: value},
+            {% else %}
+              data: {id: value, mod: '{{field.trigger.module}}', name: '{{field.trigger.class}}', modtrg:'{{field.trigger.moduleTrigger}}', nametrg:'{{field.trigger.classTrigger}}', prm:'{{field.trigger.relationParameter}}'},
+            {% endif %}
             success:  function( data ) {
-              console.log(data);
               var html='<option value>Seleccionar </option>';
               $.each( data, function( key, val ) {
                 html+='<option value="'+val.id+'" class="'+val.id+'">'+val.text+'</option>';
               });
-               $("#form_{{ field.name }}").html(html);
+              $("#form_{{ field.name }}").html(html);
             }
           });
        }

@@ -266,17 +266,14 @@ class HRSickleaves
     }
     public function preProccess($kernel, $doctrine, $user){
       $date     =clone $this->start;
-      if ($this->end==null) $this->days=0;
-      else {
-        $date_end =clone $this->end;
-        $date_end->modify('+1 day');
-        $countDays=0;
-        do{
-          $countDays++;
-          $date->modify('+1 day');
-        }while($date!=$date_end);
-        $this->days=$countDays;
-      }
+      $date_end =clone $this->end;
+      $date_end->modify('+1 day');
+      $countDays=0;
+      do{
+        $countDays++;
+        $date->modify('+1 day');
+      }while($date!=$date_end);
+      $this->days=$countDays;
     }
 
     public function postProccess($kernel, $doctrine, $user){

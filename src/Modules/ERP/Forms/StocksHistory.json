@@ -1,0 +1,51 @@
+[{
+    "sections": [
+        {
+            "name": "data",
+            "fields": [
+                {
+                    "name": "previousqty",
+                    "cols": 4
+                },
+                {
+                    "name": "newqty",
+                    "cols": 4
+                },
+                {
+                    "name": "active",
+                    "cols": 4
+                },
+                {
+                    "name": "comment",
+                    "cols": 4
+                },
+                {
+                    "name": "numOperation",
+                    "cols": 4
+                },
+                {
+                    "name": "quantity",
+                    "cols": 4
+                },
+                {
+                    "name": "location",
+                    "cols": 4
+                },
+                {
+                    "name": "user",
+                    "cols": 4
+                },
+                {
+                    "name": "productvariant",
+                    "cols": 4,
+                    "type": "searchable",
+                    "typeParams":{"module": "ERP", "name": "Productvariant", "route": "formProductvariant"}
+                },
+                {
+                    "name": "type",
+                    "cols": 4
+                }
+            ]
+        }
+    ]
+}]

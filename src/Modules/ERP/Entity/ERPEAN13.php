@@ -4,7 +4,6 @@ namespace App\Modules\ERP\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\ERP\Entity\ERPSuppliers;
-use \App\Modules\ERP\Entity\ERPProducts;
 use \App\Modules\ERP\Entity\ERPCustomers;
 use \App\Modules\ERP\Entity\ERPProductsVariants;
 use \App\Modules\Globale\Entity\GlobaleUsers;
@@ -32,12 +31,6 @@ class ERPEAN13
      * @ORM\JoinColumn(nullable=true, onDelete="CASCADE")
      */
     private $supplier;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPProducts", fetch="EAGER")
-     * @ORM\JoinColumn(nullable=true,onDelete="CASCADE")
-     */
-    private $product;
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPCustomers", fetch="EAGER")
@@ -105,18 +98,6 @@ class ERPEAN13
     public function setSupplier(?ERPSuppliers $supplier): self
     {
         $this->supplier = $supplier;
-
-        return $this;
-    }
-
-    public function getProduct(): ?ERPProducts
-    {
-        return $this->product;
-    }
-
-    public function setProduct(?ERPProducts $product): self
-    {
-        $this->product = $product;
 
         return $this;
     }
