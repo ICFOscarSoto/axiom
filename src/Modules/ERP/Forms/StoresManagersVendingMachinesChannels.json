@@ -15,6 +15,11 @@
                 },
                 {
                     "name": "col",
+                    "caption": "Num. Columna",
+                    "cols": 3
+                },
+                {
+                    "name": "channel",
                     "caption": "Num. Canal",
                     "cols": 3
                 },
