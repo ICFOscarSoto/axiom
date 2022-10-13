@@ -386,13 +386,11 @@ class ERPStoresManagersOperationsController extends Controller
 					$stockHistory->setProductvariant($productvariant);
 					if ($channel->getVendingmachine()->getStorelocation()!=null) {
 							$stockHistory->setLocation($channel->getVendingmachine()->getStorelocation());
-							$stockHistory->setStore($channel->getVendingmachine()->getStorelocation()->getStore());
 						}
 						else {
 							$locationRepository=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
 							$storeLocation=$locationRepository->findOneBy(["name"=>"EXPEND ALM"]);
 							$stockHistory->setLocation($storeLocation);
-							$stockHistory->setStore($storeLocation->getStore());
 					}
 					$stockHistory->setUser($this->getUser());
  				 	$stockHistory->setCompany($this->getUser()->getCompany());
