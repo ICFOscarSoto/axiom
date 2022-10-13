@@ -178,8 +178,17 @@ class ERPEAN13Controller extends Controller
     if(!$product) return new JsonResponse(["result"=>-2, "text"=>"El producto no existe"]);
     $productvariant=$ProductVariantsrepository->findOneBy(["id"=>$idvariant, "deleted"=>0]);
     if(!$productvariant) return new JsonResponse(["result"=>-3, "text"=>"La variante no existe"]);
-    $ean=$repositoryEAN->findOneBy(["name"=>$barcode, "productvariant"=>$productvariant, "deleted"=>0]);
-    if(!$ean) {
+
+    $ean=$repositoryEAN->findOneBy(["name"=>$barcode, "deleted"=>0]);
+    if ($ean){
+      $productvariantbd = $ean->getProductvariant();
+      if ($productvariantbd->getProduct()==$product){
+        $ean->setDateupd(new \Datetime());
+        $ean->setProductvariant($productvariant);
+      }else{
+        return new JsonResponse(["result"=>-4, "text"=>"El código de barras ya está asignado a otro producto"]);
+      }
+    }else{
       $ean=new ERPEAN13();
       $ean->setName($barcode);
       $ean->setActive(1);
@@ -187,9 +196,9 @@ class ERPEAN13Controller extends Controller
       $ean->setDateadd(new \Datetime());
       $ean->setType(1);
       $ean->setSupplier($product->getSupplier());
-    }
-    $ean->setDateupd(new \Datetime());
-    $ean->setProductvariant($productvariant);
+      $ean->setDateupd(new \Datetime());
+      $ean->setProductvariant($productvariant);
+    }  
     $this->getDoctrine()->getManager()->persist($ean);
     $this->getDoctrine()->getManager()->flush();
     return new JsonResponse(["result"=>1, "text"=>""]);
