@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\Globale\Entity\GlobaleUsers;
 use App\Modules\ERP\Entity\ERPProducts;
+use App\Modules\ERP\Entity\ERPProductsVariants;
 use App\Modules\ERP\Entity\ERPInfoStocks;
 use App\Modules\ERP\Entity\ERPStoreLocations;
 use App\Modules\ERP\Entity\ERPStocks;
@@ -116,6 +117,7 @@ class ERPInfoStocksController extends Controller
       $user=$usersRepository->findOneBy(["email"=>"oscar.soto@ferreteriacampollano.com", "deleted"=>0]);
       $infoRepository=$this->getDoctrine()->getRepository(ERPInfoStocks::class);
       $productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
+      $productVariantRepository=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
       $storeLocationsRepository=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
       $storeRepository=$this->getDoctrine()->getRepository(ERPStores::class);
       $stockRepository=$this->getDoctrine()->getRepository(ERPStocks::class);
@@ -131,13 +133,13 @@ class ERPInfoStocksController extends Controller
       }
       foreach($infoStocks as $infoStock){
         $product=$productRepository->findOneBy(["code"=>$infoStock["code"]]);
-        $stock=$stockRepository->findOneBy(["storelocation"=>$storeLocation->getId(), "product"=>$product->getId()]);
+        $productvariant=$productVariantRepository->findOneBy(["product"=>$product, "variant"=>null, "active"=>1, "deleted"=>0]);
+        $stock=$stockRepository->findOneBy(["storelocation"=>$storeLocation->getId(), "productvariant"=>$productvariant]);
         if ($stock==NULL) continue;
         $quantity=$stock->getQuantity()-$infoStock["vendido"];
         $stockHistory=new ERPStocksHistory();
-        $stockHistory->setProduct($product);
+        $stockHistory->setProductvariant($productvariant);
         $stockHistory->setLocation($storeLocation);
-        $stockHistory->setStore($store);
         $stockHistory->setUser($user);
         $stockHistory->setCompany($user->getCompany());
         $stockHistory->setPreviousqty($stock->getQuantity());
@@ -155,13 +157,13 @@ class ERPInfoStocksController extends Controller
       $objects=$objects[0]["class"];
       foreach ($objects as $object){
         $product=$productRepository->findOneBy(["code"=>$object["code"]]);
-        $stock=$stockRepository->findOneBy(["storelocation"=>$storeLocation->getId(), "product"=>$product->getId()]);
+          $productvariant=$productVariantRepository->findOneBy(["product"=>$product, "variant"=>null, "active"=>1, "deleted"=>0]);
+        $stock=$stockRepository->findOneBy(["storelocation"=>$storeLocation->getId(), "productvariant"=>$productvariant]);
         if ($stock!=null){
         $quantity=$stock->getQuantity()+$object["stock"];
         $stockHistory=new ERPStocksHistory();
-        $stockHistory->setProduct($product);
+        $stockHistory->setProductvariant($productvariant);
         $stockHistory->setLocation($storeLocation);
-        $stockHistory->setStore($store);
         $stockHistory->setUser($user);
         $stockHistory->setCompany($user->getCompany());
         $stockHistory->setPreviousqty($stock->getQuantity());

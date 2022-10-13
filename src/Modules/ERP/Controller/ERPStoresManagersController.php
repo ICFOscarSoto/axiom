@@ -741,6 +741,7 @@ class ERPStoresManagersController extends Controller
 			$repositoryVendingMachinesChannels = $this->getDoctrine()->getManager()->getRepository(ERPStoresManagersVendingMachinesChannels::class);
 			$repositoryVendingMachinesChannelsReplenishment = $this->getDoctrine()->getManager()->getRepository(ERPStoresManagersVendingMachinesChannelsReplenishment::class);
 			$repositoryStocks = $this->getDoctrine()->getManager()->getRepository(ERPStocks::class);
+			$repositoryProductVariant = $this->getDoctrine()->getManager()->getRepository(ERPProductsVariants::class);
 
 			$channel=$repositoryVendingMachinesChannels->findOneBy(["id"=>$id,"active"=>1,"deleted"=>0]);
 			if(!$channel) return new JsonResponse(["result"=>-1, "text"=>"Canal incorrecto"]);
@@ -762,16 +763,15 @@ class ERPStoresManagersController extends Controller
 			$typesRepository=$this->getDoctrine()->getRepository(ERPTypesMovements::class);
 			$type=$typesRepository->findOneBy(["name"=>"Carga expendedora"]);
 			$stockHistory= new ERPStocksHistory();
-			$stockHistory->setProduct($channel->getProduct());
+			$productvariant = $repositoryProductVariant->findOneBy(["product"=>$channel->getProduct(),"variant"=>null]);
+			$stockHistory->setProductvariant($productvariant);
 			if ($channel->getVendingmachine()->getStorelocation()!=null) {
 					$stockHistory->setLocation($channel->getVendingmachine()->getStorelocation());
-					$stockHistory->setStore($channel->getVendingmachine()->getStorelocation()->getStore());
 				}
 				else {
 					$locationRepository=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
 					$storeLocation=$locationRepository->findOneBy(["name"=>"EXPEND ALM"]);
 					$stockHistory->setLocation($storeLocation);
-					$stockHistory->setStore($storeLocation->getStore());
 			}
 			$stockHistory->setUser($this->getUser());
 			$stockHistory->setCompany($this->getUser()->getCompany());
