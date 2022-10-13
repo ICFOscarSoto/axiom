@@ -382,7 +382,7 @@ class ERPStoresManagersOperationsController extends Controller
 					// Añadimos la salida al historico
 					$typesRepository=$this->getDoctrine()->getRepository(ERPTypesMovements::class);
 					$type=$typesRepository->findOneBy(["name"=>"Salida expendedora"]);
-					$stockHistory= new ERPStockHistory();
+					$stockHistory= new ERPStocksHistory();
 					$stockHistory->setProductvariant($productvariant);
 					if ($channel->getVendingmachine()->getStorelocation()!=null) {
 							$stockHistory->setLocation($channel->getVendingmachine()->getStorelocation());
