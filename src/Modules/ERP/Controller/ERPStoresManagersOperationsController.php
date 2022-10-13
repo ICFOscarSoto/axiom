@@ -436,7 +436,7 @@ class ERPStoresManagersOperationsController extends Controller
 		 $operationsLines=$documentLinesRepository->findBy(["operation"=>$operation, "deleted"=>0]);
 		 $productVariantRepository=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
 		 foreach($operationsLines as $line){
-			 $productvariant = $productVariantRepository->findOneBy(["product"=>$line->getProduct(), "variant"=>$line->getVariant(), "active"=>1,"deleted"=>0]);
+			 $productvariant = $line->getProductvariant();
 			 $stock=$stocksRepository->findOneBy(["productvariant"=>$productvariant, "company"=>$this->getUser()->getCompany(), "storelocation"=>$location, "active"=>1, "deleted"=>0]);
 			 if(!$stock) continue;
 			 $stock->setQuantity($stock->getQuantity()+($line->getQuantity()));
