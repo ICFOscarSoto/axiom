@@ -179,7 +179,16 @@ class ERPEAN13Controller extends Controller
     $productvariant=$ProductVariantsrepository->findOneBy(["id"=>$idvariant, "deleted"=>0]);
     if(!$productvariant) return new JsonResponse(["result"=>-3, "text"=>"La variante no existe"]);
     $ean=$repositoryEAN->findOneBy(["name"=>$barcode, "productvariant"=>$productvariant, "deleted"=>0]);
-    if(!$ean) return new JsonResponse(["result"=>-4, "text"=>"Codigo de barras incorrecto"]);
+    if(!$ean) {
+      $ean=new ERPEAN13();
+      $ean->setName($barcode);
+      $ean->setActive(1);
+      $ean->setDeleted(0);
+      $ean->setDateadd(new \Datetime());
+      $ean->setType(1);
+      $ean->setSupplier($product->getSupplier());
+    }
+    $ean->setDateupd(new \Datetime());
     $ean->setProductvariant($productvariant);
     $this->getDoctrine()->getManager()->persist($ean);
     $this->getDoctrine()->getManager()->flush();
