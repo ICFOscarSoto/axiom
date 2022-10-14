@@ -1,0 +1,67 @@
+<body class="page-body" data-url="{{ url('indexAdmin') }}">
+<div class="page-container {% if userData.interfaceConfig.collapsedSidebar is defined and userData.interfaceConfig.collapsedSidebar %}sidebar-collapsed{% endif %}"><!-- add class "sidebar-collapsed" to close sidebar by default, "chat-visible" to make chat appear always -->
+
+	<div class="main-content">
+			<!-- MAIN CONTENT -->
+			<table id="header-list-loads" class="table table-bordered table-responsive-md table-striped text-center" style="width: 100%">
+			<thead class="table-thead">
+				<td style="border-bottom: 1px solid #cecece !important; width:15%" class="table-header-name table-thead "> Fecha </td>
+				<td style="border-bottom: 1px solid #cecece !important; width:15%" class="table-header-name table-thead "> Traspaso </td>
+				<td style="border-bottom: 1px solid #cecece !important; width:15%" class="table-header-name table-thead "> Almacén </td>
+				<td style="border-bottom: 1px solid #cecece !important; width:70%" class="table-header-name table-thead "> Productos </td>
+			</thead>
+
+			{% for transfer in  transfers %}
+				<tr>
+					<td style="border-bottom: 1px solid #cecece !important;">  {{ transfer.date }} </td>
+					<td style="border-bottom: 1px solid #cecece !important;"> {{ transfer.name }} </td>
+					<td style="border-bottom: 1px solid #cecece !important;"> {{ transfer.store }} </td>
+					<td style="border-bottom: 1px solid #cecece !important;">
+						<table id="header-list-products" class="table table-bordered table-responsive-md table-striped text-center" style="width: 100%">
+						<thead class="table-thead">
+							<td style="border-bottom: 1px solid #cecece !important; width:20%; text-align:left">Código</td>
+							<td style="border-bottom: 1px solid #cecece !important; width:70%; text-align:left">Nombre</td>
+							<td style="border-bottom: 1px solid #cecece !important; width:10%">Cantidad</td>
+							<td style="border-bottom: 1px solid #cecece !important; width:10%">Dispensada</td>
+							<td style="border-bottom: 1px solid #cecece !important; width:10%">Multiplicador</td>
+						</thead>
+						{% for line in  transfer.lines %}
+							<tr>
+								<td style="border-bottom: 1px solid #cecece !important; width:20%; text-align:left"> {{line.product}} </td>
+								<td style="border-bottom: 1px solid #cecece !important; width:70%; text-align:left"> {{line.name}} </td>
+								<td style="border-bottom: 1px solid #cecece !important; width:10%"> {{line.quantity}} </td>
+								<td style="border-bottom: 1px solid #cecece !important; width:10%"> - </td>
+								<td style="border-bottom: 1px solid #cecece !important; width:10%"> - </td>
+							</tr>
+						{% endfor %}
+						</table>
+					</td>
+				</tr>
+			{% endfor %}
+		</table>
+
+		<!-- END MAIN CONTENT -->
+
+		{% block footer %}
+		<link rel="stylesheet" href="{{ url('index') }}js/datatables/datatables.css">
+		<link rel="stylesheet" href="{{ url('index') }}js/select2/select2-bootstrap.css">
+		<link rel="stylesheet" href="{{ url('index') }}js/select2/select2.css">
+		<link rel="stylesheet" href="{{ url('index') }}css/custom.css">
+		<link rel="stylesheet" href="{{ url('index') }}js/ol/ol.css">
+		<link rel="stylesheet" href="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker.min.css">
+		<link rel="stylesheet" href="{{ url('index') }}js/jodit/jodit.min.css">
+
+		<!-- Imported scripts on this page -->
+		<script src="{{ url('index') }}js/datatables/datatables.js"></script>
+		<script src="{{ url('index') }}js/select2/select2.min.js"></script>
+		<script src="{{ url('index') }}js/moment.min.js"></script>
+		<script src="{{ url('index') }}js/moment-es.js"></script>
+		<script src="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker-es.js"></script>
+		<script src="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker.min.js"></script>
+		<script src="{{ url('index') }}js/fileinput.js"></script>
+		<script src="{{ url('index') }}js/jodit/jodit.min.js"></script>
+		<script src="{{ url('index') }}js/jquery.nestable.js"></script>
+		{{ include('@Globale/bottom.html.twig') }}
+		{% endblock %}
+
+</body>

@@ -17,6 +17,8 @@ use App\Modules\ERP\Entity\ERPEAN13;
 use App\Modules\ERP\Entity\ERPReferences;
 use App\Modules\ERP\Entity\ERPProductsAttributes;
 use App\Modules\ERP\Entity\ERPManufacturers;
+use App\Modules\ERP\Entity\ERPStocks;
+use App\Modules\ERP\Entity\ERPStockHistory;
 use App\Modules\ERP\Entity\ERPStoreLocations;
 use App\Modules\ERP\Entity\ERPStores;
 use App\Modules\ERP\Entity\ERPStoresManagers;
@@ -45,17 +47,21 @@ use App\Modules\ERP\Utils\ERPStoresManagersVendingMachinesUtils;
 use App\Modules\ERP\Utils\ERPStoresManagersVendingMachinesChannelsUtils;
 use App\Modules\ERP\Utils\ERPEAN13Utils;
 use App\Modules\ERP\Utils\ERPReferencesUtils;
+use App\Modules\ERP\Utils\ERPStocksUtils;
 use App\Modules\ERP\Utils\ERPProductsAttributesUtils;
 use App\Modules\ERP\Utils\ERPStoresManagersVendingMachinesLogsUtils;
 use App\Modules\Security\Utils\SecurityUtils;
 use App\Modules\ERP\Reports\ERPEan13Reports;
 use App\Modules\ERP\Reports\ERPPrintQR;
 use App\Modules\ERP\Utils\ERPStoresManagersUtils;
+use App\Modules\IoT\Entity\IoTSensors;
+use App\Modules\IoT\Entity\IoTData;
 use \DateTime;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\MimeType\FileinfoMimeTypeGuesser;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use App\Modules\Globale\Helpers\XLSXWriter\XLSXWriter;
+use App\Modules\Navision\Entity\NavisionTransfers;
 
 
 class ERPStoresManagersController extends Controller
@@ -86,7 +92,8 @@ class ERPStoresManagersController extends Controller
 				["name" => "storesmanagersconsumers", "caption"=>"Consumidores", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("listStoresManagersConsumers",["id"=>$id])],
 				["name" => "storesmanagersoperationsreports", "caption"=>"Reports", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("storesManagersOperationsReports",["id"=>$id])],
 				["name" => "loadsreports", "caption"=>"Loads", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("storesManagersLoadReports",["id"=>$id])],
-				["name" => "loadslist", "caption"=>"Loads List", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("storesManagersLoadLists",["id"=>$id])]
+				["name" => "loadslist", "caption"=>"Loads List", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("storesManagersLoadLists",["id"=>$id])],
+				["name" => "transferlist", "caption"=>"Transfer List", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("storesManagersTransferLists",["id"=>$id])]
 			];
 			$obj = $repository->findOneBy(['id'=>$id, 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
 			$obj_name=$obj?$obj->getName():'';
@@ -1069,87 +1076,128 @@ class ERPStoresManagersController extends Controller
 		return $response;
 	}
 
-			/**
-				* @Route("/api/erp/getloads/{id}", name="getLoads")
-				*/
-			public function getLoads($id, RouterInterface $router,Request $request){
-				$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-				$loadsRepository=$this->getDoctrine()->getRepository(ERPStoresManagersVendingMachinesChannels::class);
-				$machineRepository=$this->getDoctrine()->getRepository(ERPStoresManagersVendingMachines::class);
-				$objects=$loadsRepository->getLoadsMachine($id);
-				$loads=[];
-				foreach ($objects as $object){
-					$load["vendingmachine"]=$machineRepository->findOneBy(["id"=>$id, "deleted"=>0])->getName();
-					$load["date"]=$object["date"];
-					$loads[]=$load;
-				}
-				return new JsonResponse(["loads"=>$loads]);
+	/**
+		* @Route("/api/erp/getloads/{id}", name="getLoads")
+		*/
+	public function getLoads($id, RouterInterface $router,Request $request){
+		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		$loadsRepository=$this->getDoctrine()->getRepository(ERPStoresManagersVendingMachinesChannels::class);
+		$machineRepository=$this->getDoctrine()->getRepository(ERPStoresManagersVendingMachines::class);
+		$objects=$loadsRepository->getLoadsMachine($id);
+		$loads=[];
+		foreach ($objects as $object){
+			$load["vendingmachine"]=$machineRepository->findOneBy(["id"=>$id, "deleted"=>0])->getName();
+			$load["date"]=$object["date"];
+			$loads[]=$load;
+		}
+		return new JsonResponse(["loads"=>$loads]);
+	}
+
+	/**
+	 	* @Route("/api/ERP/downloadLoads/{id}/{date}", name="downloadLoads")
+		*/
+	 public function downloadLoads($id, $date, RouterInterface $router,Request $request){
+	  $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+	  $new_item=json_decode($request->getContent());
+		$loadRepository=$this->getDoctrine()->getRepository(ERPStoresManagersVendingMachinesChannels::class);
+		$machineRepository=$this->getDoctrine()->getRepository(ERPStoresManagersVendingMachines::class);
+		$params["rootdir"]= $this->get('kernel')->getRootDir();
+		$params["user"]=$this->getUser();
+		$params["machine"]=$machineRepository->findOneBy(["id"=>$id, "deleted"=>0])->getName();
+		$params["date"]=$date;
+		$params["lines"]=$loadRepository->getLoadsMachineDate($id,$date);
+		$printQRUtils = new ERPPrintQR();
+ 		$pdf=$printQRUtils->loadMachine($params);
+ 		return new Response("", 200, array('Content-Type' => 'application/pdf'));
+  }
+
+
+	/**
+		* @Route("/{_locale}/erp/storesmanagers/{id}/loadslist", name="storesManagersLoadLists")
+		*/
+	public function storesManagersLoadLists($id,RouterInterface $router,Request $request){
+		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
+		$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
+		$locale = $request->getLocale();
+		$this->router = $router;
+		$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
+		$loadsRepository=$this->getDoctrine()->getRepository(ERPStoresManagersVendingMachinesChannels::class);
+		$machinesRepository=$this->getDoctrine()->getRepository(ERPStoresManagersVendingMachines::class);
+		$machines=$machinesRepository->findBy(["active"=>1,"deleted"=>0, "manager"=>$id],["name"=>"ASC"]);
+		$loads=[];
+		foreach ($machines as $machine) {
+			$dates=$loadsRepository->getLoadsMachine($machine->getId());
+			foreach ($dates as $date) {
+				$load["machine"]=$machine->getName();
+				$load["date"]=$date["date"];
+				$load["loads"]=$machinesRepository->getLoadsList($machine->getId(), $date["date"]);
+				$loads[]=$load;
 			}
+		}
+		$index=[];
+		$machine=[];
+		$date=[];
+		$loadsss=[];
+		foreach ($loads as $row) {
+			$index[] = $row;
+			$machine[]=$row['machine'];
+			$date[]=$row['date'];
+			$loadsss[]=$row['loads'];
+		}
+		array_multisort(
+			$date, SORT_DESC,
+			$machine,
+			$index,
+			$loadsss,
+			$loads
+		);
+		return $this->render('@ERP/storesManagersLoadLists.html.twig', [
+			'vendingmachines' => $machines,
+			'date' => $dates,
+			'loads' => $loads,
+		]);
+	}
 
-			/**
-		  * @Route("/api/ERP/downloadLoads/{id}/{date}", name="downloadLoads")
-		  */
-		  public function downloadLoads($id, $date, RouterInterface $router,Request $request){
-		    $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-		    $new_item=json_decode($request->getContent());
-				$loadRepository=$this->getDoctrine()->getRepository(ERPStoresManagersVendingMachinesChannels::class);
-				$machineRepository=$this->getDoctrine()->getRepository(ERPStoresManagersVendingMachines::class);
-				$params["rootdir"]= $this->get('kernel')->getRootDir();
-		 		$params["user"]=$this->getUser();
-				$params["machine"]=$machineRepository->findOneBy(["id"=>$id, "deleted"=>0])->getName();
-				$params["date"]=$date;
-				$params["lines"]=$loadRepository->getLoadsMachineDate($id,$date);
-				$printQRUtils = new ERPPrintQR();
- 		 		$pdf=$printQRUtils->loadMachine($params);
- 		 		return new Response("", 200, array('Content-Type' => 'application/pdf'));
-		  }
-
-
-			/**
-				* @Route("/{_locale}/erp/storesmanagers/{id}/loadslist", name="storesManagersLoadLists")
-				*/
-				public function storesManagersLoadLists($id,RouterInterface $router,Request $request){
-					$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-					if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
-					$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
-					$locale = $request->getLocale();
-					$this->router = $router;
-			  	$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
-					$loadsRepository=$this->getDoctrine()->getRepository(ERPStoresManagersVendingMachinesChannels::class);
-					$machinesRepository=$this->getDoctrine()->getRepository(ERPStoresManagersVendingMachines::class);
-					$machines=$machinesRepository->findBy(["active"=>1,"deleted"=>0, "manager"=>$id],["name"=>"ASC"]);
-					$loads=[];
-					foreach ($machines as $machine) {
-							$dates=$loadsRepository->getLoadsMachine($machine->getId());
-							foreach ($dates as $date) {
-								$load["machine"]=$machine->getName();
-								$load["date"]=$date["date"];
-								$load["loads"]=$machinesRepository->getLoadsList($machine->getId(), $date["date"]);
-								$loads[]=$load;
-							}
-					}
-					$index=[];
-					$machine=[];
-					$date=[];
-					$loadsss=[];
-					foreach ($loads as $row) {
-						$index[] = $row;
-						$machine[]=$row['machine'];
-						$date[]=$row['date'];
-						$loadsss[]=$row['loads'];
-					}
-					array_multisort(
-						$date, SORT_DESC,
-						$machine,
-						$index,
-						$loadsss,
-						$loads
-					);
-					return $this->render('@ERP/storesManagersLoadLists.html.twig', [
-						'vendingmachines' => $machines,
-						'date' => $dates,
-						'loads' => $loads,
-					]);
-				}
+	/**
+		* @Route("/api/ERP/storesmanagers/{id}/transferLists", name="storesManagersTransferLists")
+		*/
+	public function storesManagersTransferLists($id,RouterInterface $router,Request $request){
+		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
+		$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
+		$locale = $request->getLocale();
+		$storesRepository=$this->getDoctrine()->getRepository(ERPStores::class);
+		$locationsRepository=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
+		$machinesRepository=$this->getDoctrine()->getRepository(ERPStoresManagersVendingMachines::class);
+		$transfersRepository=$this->getDoctrine()->getRepository(NavisionTransfers::class);
+		$productsRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
+		$channelsRepository=$this->getDoctrine()->getRepository(ERPStoresManagersVendingMachinesChannels::class);
+		$lines=[];
+		$trans=[];
+		$transfers=$transfersRepository->getTransfersManageds();
+		foreach ($transfers as $transfer){
+			$store=$storesRepository->findOneBy(["id"=>$transfer["store"]]);
+			$location=$locationsRepository->findOneBy(["store"=>$store]);
+			$machine=$machinesRepository->findOneBy(["storelocation"=>$location]);
+			$header["name"]=$transfer["name"];
+			$header["date"]=$transfer["send"];
+			$header["store"]=$store->getName();
+			$products=$transfersRepository->getTransferLines($transfer);
+			foreach ($products as $product) {
+				$obj=$productsRepository->findOneBy(["id"=>$product["product_id"]]);
+				$line["product"]=$obj->getCode();
+				$line["name"]=$obj->getName();
+				$line["quantity"]=$product["quantity"];
+				$lines[]=$line;
+			}
+			$header["lines"]=$lines;
+			$trans[]=$header;
+			$lines=[];
+		}
+		return $this->render('@ERP/storesManagersTransferLists.html.twig', [
+			'transfers' => $trans,
+		]);
+	}
 
 }

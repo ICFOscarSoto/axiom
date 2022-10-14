@@ -55,4 +55,33 @@ class NavisionTransfersRepository extends ServiceEntityRepository
       $result=$this->getEntityManager()->getConnection()->executeQuery($query, $params);
       return $result;
     }
+
+    public function getTransfersByStore($storeId){
+      $query='SELECT product_id, date(datesend) as send, quantity
+              from navision_transfers
+              where destinationstore_id= :storeId';
+      $params=['storeId' => $storeId];
+      $result=$this->getEntityManager()->getConnection()->executeQuery($query, $params);
+      return $result;
+    }
+
+    public function getTransfersManageds(){
+      $query='SELECT name, date(datesend) as send, destinationstore_id as store
+              from navision_transfers
+              where destinationstore_id in (SELECT id FROM erpstores
+                                            WHERE code IN ("EXPEALICAN", "LISBOAEXPE", "SALAMAEXPE", "INAEGESALB", "GESTOR ALI", "SALAMGESTO", "LISBOAGEST"))
+              group by name
+              order by date(datesend) desc';
+      $result=$this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
+      return $result;
+    }
+
+    public function getTransferLines($transfer){
+      $query='SELECT product_id, quantity
+              from navision_transfers
+              where name= :transfer';
+      $params=['transfer' => $transfer["name"]];
+      $result=$this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+      return $result;
+    }
 }

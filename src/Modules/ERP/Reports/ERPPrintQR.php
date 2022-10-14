@@ -118,13 +118,17 @@ function create($params){
       $dataTable[]=[
         $line['productcode'],
         $line['productname'],
-        $line['quantity']
+        $line['quantity'],
+        intval($line['upload']),
+        $line['multiplier']
       ];
     }
 
     $columnsTable=[["name"=>"Código","width"=>30, "align"=>"L"],
                   ["name"=>"Descripcion","width"=>80, "align"=>"L"],
-                  ["name"=>"Cantidad","width"=>20, "align"=>"C"]
+                  ["name"=>"Cantidad","width"=>20, "align"=>"C"],
+                  ["name"=>"Dispensada","width"=>20, "align"=>"C"],
+                  ["name"=>"Multiplicador","width"=>20, "align"=>"C"]
     ];
     while(count($dataTable)){
       $this->pdf->docHeader($nameLeft,'',$infoLeft, '');

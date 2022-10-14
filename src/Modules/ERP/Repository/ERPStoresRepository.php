@@ -48,30 +48,25 @@ class ERPStoresRepository extends ServiceEntityRepository
     }
     */
 
-    public function getStores($product_id)
-    {
+    public function getStores($product_id){
       $query='SELECT distinct id, code, name
-        FROM erpstores
-        WHERE active=1 AND deleted=0' ;
-        return $this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
-
+              FROM erpstores
+              WHERE active=1 AND deleted=0';
+      return $this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
     }
 
-    public function getStoresInfo()
-    {
+    public function getStoresInfo(){
       $query='SELECT id, name
-        FROM erpstores
-        WHERE active=1 AND deleted=0' ;
-        return $this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
-
+              FROM erpstores
+              WHERE active=1 AND deleted=0' ;
+      return $this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
     }
-    public function getInventoryStores()
-    {
-      $query='SELECT *
-        FROM erpstores
-        WHERE active=1 AND deleted=0 AND inventorymanager_id is not null
-        ORDER BY code ASC';
-        return $this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
 
+    public function getInventoryStores(){
+      $query='SELECT *
+              FROM erpstores
+              WHERE active=1 AND deleted=0 AND inventorymanager_id is not null
+              ORDER BY code ASC';
+      return $this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
     }
 }
