@@ -63,12 +63,18 @@ class MigrateInfoStocks extends ContainerAwareCommand
           $stock = $statement->fetchAll();
           if($stock && count($stock)>0){
             $id = $stock[0]['id'];
-            $minstock = intval($value['minstock']);
+            $minstock = 'null';
+            $maxstock = 'null';       
+            if ($value['minstock'])
+              $minstock = $value['minstock'];
+            if ($value['maxstock'])
+              $maxstock = $value['maxstock'];
+            /*$minstock = intval($value['minstock']);
             $maxstock = intval($value['maxstock']);
             if (intval($stock[0]['minstock'])>$minstock)
               $minstock = intval($stock[0]['minstock']);
             if (intval($stock[0]['maxstock'])<$maxstock)
-                $maxstock = intval($stock[0]['maxstock']);
+                $maxstock = intval($stock[0]['maxstock']);*/
             $query ="update erpstocks set minstock=".$minstock.", maxstock=".$maxstock." where id=".$id.";";
             $statement = $em->getConnection()->prepare($query);
             $rows =$statement->execute();
