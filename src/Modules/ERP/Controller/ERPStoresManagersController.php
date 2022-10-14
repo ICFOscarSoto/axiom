@@ -392,10 +392,9 @@ class ERPStoresManagersController extends Controller
 		$managerUser=$repositoryStoresManagersUsers->findOneBy(["user"=>$this->getUser(),"active"=>1,"deleted"=>0]);
 		if(!$managerUser) return new JsonResponse(array('result' => -3, 'text'=>"Usuario no asignado a gestor"));
 		if($nfcid!=-1)
-		/*	$obj=$repositoryConsumers->findOneBy(["active"=>1, "deleted"=>0, "nfcid"=>$nfcid]);
-			else $obj=$repositoryConsumers->findOneBy(["active"=>1, "deleted"=>0, "id"=>$request->request->get('id',-1)]);*/
-			$obj=$repositoryConsumers->findOneBy(["active"=>1, "manager"=> $managerUser,"deleted"=>0, "nfcid"=>$nfcid]);
-		else $obj=$repositoryConsumers->findOneBy(["active"=>1, "manager"=> $managerUser, "deleted"=>0, "id"=>$request->request->get('id',-1)]);
+			$obj=$repositoryConsumers->findOneBy(["active"=>1, "manager"=> $managerUser->getManager(),"deleted"=>0, "nfcid"=>$nfcid]);
+		else
+			$obj=$repositoryConsumers->findOneBy(["active"=>1, "manager"=> $managerUser->getManager(), "deleted"=>0, "id"=>$request->request->get('id',-1)]);
 
 		if(!$obj) return new JsonResponse(array('result' => -1, 'text'=>"No existe este usuario"));
 		if($obj->getManager()->getCompany()!=$this->getUser()->getCompany()) return new JsonResponse(array('result' => -2, 'text'=>"No existe este usuario"));
