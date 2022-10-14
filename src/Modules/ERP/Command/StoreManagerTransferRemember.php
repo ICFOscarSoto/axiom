@@ -77,8 +77,7 @@ class StoreManagerTransferRemember extends ContainerAwareCommand
                 $variant=$variantsRepository->findOneBy(["name"=>$stock["variant_name"]]);
                 $productvariant=$productsVariantsRepository->findOneBy(["product"=>$product,"variant"=>$variant]);
                 $storelocation=$storeLocationsRepository->findOneBy(["store"=>$store]);
-                foreach($storelocation as $location){
-                  $istock=$stocksRepository->findOneBy(["productvariant"=>$productvariant, "storelocation"=>$location]);
+                  $istock=$stocksRepository->findOneBy(["productvariant"=>$productvariant, "storelocation"=>$storelocation]);
                   $minstock=$istock->getMinimumQuantity();
                   if($stock["quantity"]<$minstock){
                     if($manager->getDiscordchannel()!=null){
@@ -88,7 +87,6 @@ class StoreManagerTransferRemember extends ContainerAwareCommand
                       sleep(1);
                     }
                   }
-                }
               }
 
           }
@@ -96,15 +94,13 @@ class StoreManagerTransferRemember extends ContainerAwareCommand
             $product=$productsRepository->findOneBy(["id"=>$stock["product_id"]]);
             $productvariant=$productsVariantsRepository->findOneBy(["product"=>$product,"variant"=>null]);
             $storelocation=$storeLocationsRepository->findOneBy(["store"=>$store]);
-            foreach($storelocation as $location){
-              $istock=$stocksRepository->findOneBy(["productvariant"=>$productvariant, "storelocation"=>$location]);
+              $istock=$stocksRepository->findOneBy(["productvariant"=>$productvariant, "storelocation"=>$storelocation]);
               if($manager->getDiscordchannel()!=null){
                 $channel=$manager->getDiscordchannel();
                 $msg="Ref: **".$product->getCode()."** - ".$product->getName()." realizar traspaso a **".$store->getName()."** - Cantidad: **".($istock->getMaxstock()-$stock["quantity"]." unidades.**");
                 file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
                 sleep(1);
               }
-            }
 
           }
       }
