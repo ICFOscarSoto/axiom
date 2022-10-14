@@ -295,7 +295,6 @@ class ERPStocksRepository extends ServiceEntityRepository
               ON p.id=pv.product_id
               WHERE (s.quantity+s.pendingreceive) <=  s.minstock
               AND s.storelocation_id IN (SELECT l.id FROM erpstore_locations l WHERE l.active=1 AND l.deleted=0 AND l.store_id =:store)
-              AND i.active=1 AND i.deleted=0
               AND s.active=1 AND s.deleted=0';
       $params=['store' => $store->getId()];
       $result=$this->getEntityManager()->getConnection()->executeQuery($query,$params)->fetchAll();
