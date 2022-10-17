@@ -1,8 +1,6 @@
 <body class="page-body" data-url="{{ url('indexAdmin') }}">
 <div class="page-container {% if userData.interfaceConfig.collapsedSidebar is defined and userData.interfaceConfig.collapsedSidebar %}sidebar-collapsed{% endif %}"><!-- add class "sidebar-collapsed" to close sidebar by default, "chat-visible" to make chat appear always -->
 
-	<div class="main-content">
-			<!-- MAIN CONTENT -->
 	<div class="row">
 			<table id="header-list-loads" class="table table-bordered table-responsive-md table-striped text-center" style="display:block; width: 100%">
 			<thead class="table-thead">
@@ -19,15 +17,19 @@
 		<td style="border-bottom: 1px solid #cecece !important;" id="products" value="'+valor.date+'">
 			<table id="header-list-products" class="table table-bordered table-responsive-md table-striped text-center" style="display:block; width: 100%">
 			<thead class="table-thead">
-				<th style="border-bottom: 1px solid #cecece !important;" class="table-header-name table-thead "> Codigo </th>
-				<th style="border-bottom: 1px solid #cecece !important;" class="table-header-name table-thead "> Nombre </th>
-				<th style="border-bottom: 1px solid #cecece !important;" class="table-header-name table-thead "> Cantidad </th>
+				<td style="border-bottom: 1px solid #cecece !important; width:20%; text-align:left">Código</td>
+				<td style="border-bottom: 1px solid #cecece !important; width:70%; text-align:left">Nombre</td>
+				<td style="border-bottom: 1px solid #cecece !important; width:10%">Cantidad</td>
+				<td style="border-bottom: 1px solid #cecece !important; width:10%">Dispensada</td>
+				<td style="border-bottom: 1px solid #cecece !important; width:10%">Multiplicador</td>
 			</thead>
 			{% for loadrow in  load.loads %}
 				<tr attr-id="loads-'+valor.id+'" id="'+valor.id+'">
-					<td style="border-bottom: 1px solid #cecece !important;" id="loads_download-'+valor.date+' "value="'+valor.date+'">  {{ loadrow.productcode }} </td>
-					<td style="border-bottom: 1px solid #cecece !important;" id="loads_download-'+valor.date+' "value="'+valor.date+'">  {{ loadrow.productname }} </td>
-					<td style="border-bottom: 1px solid #cecece !important;" id="loads_download-'+valor.date+' "value="'+valor.date+'">  {{ loadrow.quantity }} </td>
+					<td style="border-bottom: 1px solid #cecece !important; width:20%; text-align:left">{{ loadrow.productcode }}</td>
+					<td style="border-bottom: 1px solid #cecece !important; width:70%; text-align:left">{{ loadrow.productname }}</td>
+					<td style="border-bottom: 1px solid #cecece !important;">  {{ loadrow.quantity }} </td>
+					<td style="border-bottom: 1px solid #cecece !important;">  {{ loadrow.upload }} </td>
+					<td style="border-bottom: 1px solid #cecece !important;">  {{ loadrow.multiplier }} </td>
 				</tr>
 			{% endfor %}
 			</table>
