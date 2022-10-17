@@ -429,7 +429,10 @@ class ERPStoresManagersOperationsController extends Controller
 		 $storeLocationsRepository=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
 		 $operation=$documentRepository->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany(), "deleted"=>false]);
 		 if(!$operation) return new JsonResponse(['result' => -1]);
-		 $location=$storeLocationsRepository->findOneBy(["store"=>$operation->getStore(), "company"=>$this->getUser()->getCompany(), "active"=>1,"deleted"=>0]);
+		 if ($operation->getStore()!=null)
+		 	$location=$storeLocationsRepository->findOneBy(["store"=>$operation->getStore(), "company"=>$this->getUser()->getCompany(), "active"=>1,"deleted"=>0]);
+		 else
+		   $location=$operation->getVendingmachine()->getStorelocation();
 		 if(!$location) return new JsonResponse(["result"=>-4, "text"=> "No existen ubicación en el almacén gestor"]);
 		 $operationsLines=$documentLinesRepository->findBy(["operation"=>$operation, "deleted"=>0]);
 		 $productVariantRepository=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
