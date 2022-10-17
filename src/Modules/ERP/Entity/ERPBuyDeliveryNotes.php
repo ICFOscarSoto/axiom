@@ -218,12 +218,12 @@ class ERPBuyDeliveryNotes
         return $this;
     }
 
-    public function getInput(): ?ERPInput
+    public function getInput(): ?ERPInputs
     {
         return $this->input;
     }
 
-    public function setInput(?ERPInput $input): self
+    public function setInput(?ERPInputs $input): self
     {
         $this->input = $input;
 
