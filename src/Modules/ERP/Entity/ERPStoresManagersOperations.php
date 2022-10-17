@@ -225,15 +225,6 @@ class ERPStoresManagersOperations
       $em = $doctrine->getManager();
       $userRepository=$doctrine->getRepository(GlobaleUsers::class);
       $user=$userRepository->findOneBy(["email"=>"paco.cano@ferreteriacampollano.com"]);
-      $historyRepository=$doctrine->getRepository(ERPStocksHistory::class);
-      $historys=$historyRepository->findBy(["numOperation"=>$this->getId()]);
-      foreach ($historys as $history){
-        $history->setActive(0);
-        $history->setDateupd(new \Datetime());
-        $history->setDeleted(1);
-        $em->persist($history);
-        $em->flush();
-      }
       $linesRepository=$doctrine->getRepository(ERPStoresManagersOperationsLines::class);
       $lines=$linesRepository->findBy(["operation"=>$this]);
       foreach ($lines as $line){
