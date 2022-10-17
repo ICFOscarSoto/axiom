@@ -463,11 +463,13 @@ public function importEAN13(InputInterface $input, OutputInterface $output){
           $variant_old = null;
           $type_old   = null;
           $supplier_customer_old   = null;
-          if (count($adatos_old)==5){
+          if (count($adatos_old)>=4){
             $code_old   = preg_replace('/\D/','',$adatos_old[0]);
             $product_old = $adatos_old[1];
             $type_old   = $adatos_old[2];
             $supplier_customer_old = $adatos_old[3];
+          }
+          if (count($adatos_old)==5){
             $variant_old = $adatos_old[4];
           }
           $adatos_new = explode('~',$object['codigo_nuevo']);
@@ -476,12 +478,14 @@ public function importEAN13(InputInterface $input, OutputInterface $output){
           $variant_new = null;
           $type_new   = null;
           $supplier_customer_new   = null;
-          if (count($adatos_new)==5){
+          if (count($adatos_new)>=4){
             $code_new   = preg_replace('/\D/','',$adatos_new[0]);
             $product_new = $adatos_new[1];
             $type_new   = $adatos_new[2];
             $supplier_customer_new = $adatos_new[3];
-            $variant_new = $adatos_old[4];
+          }
+          if (count($adatos_new)==5){
+            $variant_new = $adatos_new[4];
           }
           $ean13  = null;
           if (isset($object['ean13']))
@@ -1937,11 +1941,13 @@ public function importReferences(InputInterface $input, OutputInterface $output)
        $variant_old = null;
        $type_old   = null;
        $supplier_customer_old   = null;
-       if (count($adatos_old)==5){
+       if (count($adatos_old)>=4){
           $code_old   = $adatos_old[0];
           $product_old = $adatos_old[1];
           $type_old   = $adatos_old[2];
           $supplier_customer_old = $adatos_old[3];
+       }
+       if (count($adatos_old)==5){
           $variant_old = $adatos_old[4];
        }
        $adatos_new = explode('~',$object['codigo_nuevo']);
@@ -1950,11 +1956,13 @@ public function importReferences(InputInterface $input, OutputInterface $output)
        $variant_new = null;
        $type_new   = null;
        $supplier_customer_new   = null;
-       if (count($adatos_new)==4){
+       if (count($adatos_new)>=4){
           $code_new   = $adatos_new[0];
           $product_new = $adatos_new[1];
           $type_new   = $adatos_new[2];
           $supplier_customer_new = $adatos_new[3];
+       }
+       if (count($adatos_new)==5){
           $variant_new = $adatos_new[4];
        }
        $references  = null;
