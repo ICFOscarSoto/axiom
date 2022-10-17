@@ -78,14 +78,11 @@ class StoreManagerTransferRemember extends ContainerAwareCommand
                 $productvariant=$productsVariantsRepository->findOneBy(["product"=>$product,"variant"=>$variant]);
                 $storelocation=$storeLocationsRepository->findOneBy(["store"=>$store]);
                   $istock=$stocksRepository->findOneBy(["productvariant"=>$productvariant, "storelocation"=>$storelocation]);
-                  $minstock=$istock->getMinimumQuantity();
-                  if($stock["quantity"]<$minstock){
-                    if($manager->getDiscordchannel()!=null){
-                      $channel=$manager->getDiscordchannel();
-                      $msg="Ref: **".$product->getCode()."** - ".$product->getName()." - Talla: ".$stock["variant_name"]." realizar traspaso a **".$store->getName()."** - Cantidad: **".($istock->getMaxstock()-$stock["quantity"]." unidades.**");
-                      file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
-                      sleep(1);
-                    }
+                  if($manager->getDiscordchannel()!=null){
+                    $channel=$manager->getDiscordchannel();
+                    $msg="Ref: **".$product->getCode()."** - ".$product->getName()." - Talla: ".$stock["variant_name"]." realizar traspaso a **".$store->getName()."** - Cantidad: **".($istock->getMaxstock()-$stock["quantity"]." unidades.**");
+                    file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$channel.'&msg='.urlencode($msg));
+                    sleep(1);
                   }
               }
 

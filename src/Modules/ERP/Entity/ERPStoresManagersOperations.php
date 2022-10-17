@@ -4,6 +4,11 @@ namespace App\Modules\ERP\Entity;
 
 use App\Modules\Globale\Entity\GlobaleCompanies;
 use App\Modules\Globale\Entity\GlobaleUsers;
+use \App\Modules\ERP\Entity\ERPStoresManagersOperationsLines;
+use \App\Modules\ERP\Entity\ERPStocksHistory;
+use \App\Modules\ERP\Entity\ERPStocks;
+use \App\Modules\ERP\Entity\ERPStoreLocations;
+use \App\Modules\ERP\Entity\ERPTypesMovements;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -215,4 +220,47 @@ class ERPStoresManagersOperations
 
         return $this;
     }
+
+    public function delete($doctrine){
+      $em = $doctrine->getManager();
+      $userRepository=$doctrine->getRepository(GlobaleUsers::class);
+      $user=$userRepository->findOneBy(["email"=>"paco.cano@ferreteriacampollano.com"]);
+      $linesRepository=$doctrine->getRepository(ERPStoresManagersOperationsLines::class);
+      $stocksRepository=$doctrine->getRepository(ERPStocks::class);
+      $storeLocationsRepository=$doctrine->getRepository(ERPStoreLocations::class);
+      $typesRepository=$doctrine->getRepository(ERPTypesMovements::class);
+      $lines=$linesRepository->findBy(["operation"=>$this]);
+      foreach ($lines as $line){
+        $line->setActive(0);
+        $line->setDeleted(1);
+        $line->setDateupd(new \Datetime());
+        $stockHistory=new ERPStocksHistory();
+        $stockHistory->setUser($user);
+        $stockHistory->setCompany($user->getCompany());
+        $stockHistory->setQuantity($line->getQuantity());
+        if ($this->getStore()!=null) {
+          $location=$storeLocationsRepository->findOneBy(["store"=>$this->getStore(), "company"=>$user->getCompany(), "active"=>1,"deleted"=>0]);
+        }
+        else {
+          $location=$this->getVendingmachine()->getStorelocation();
+          $stockHistory->setComment($this->getVendingmachine()->getName());
+        }
+        $stock=$stocksRepository->findOneBy(["productvariant"=>$line->getProductvariant(), "company"=>$user->getCompany(), "storelocation"=>$location, "active"=>1, "deleted"=>0]);
+        $stockHistory->setLocation($location);
+        $stockHistory->setPreviousqty($stock->getQuantity());
+        $stockHistory->setProductvariant($line->getProductvariant());
+        $stockHistory->setNewqty($stock->getQuantity()+$line->getQuantity());
+        $stockHistory->setNumOperation('DO-'.$this->getId());
+        $type=$typesRepository->findOneBy(["name"=>"Ajuste de inventario"]);
+        $stockHistory->setType($type);
+        $stockHistory->setDateadd(new \Datetime());
+        $stockHistory->setDateupd(new \Datetime());
+        $stockHistory->setActive(true);
+        $stockHistory->setDeleted(false);
+        $em->persist($stockHistory);
+        $em->persist($line);
+        $em->flush();
+      }
+    }
+
 }
