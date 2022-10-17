@@ -226,6 +226,9 @@ class ERPStoresManagersOperations
       $userRepository=$doctrine->getRepository(GlobaleUsers::class);
       $user=$userRepository->findOneBy(["email"=>"paco.cano@ferreteriacampollano.com"]);
       $linesRepository=$doctrine->getRepository(ERPStoresManagersOperationsLines::class);
+      $stocksRepository=$doctrine->getRepository(ERPStocks::class);
+      $storeLocationsRepository=$doctrine->getRepository(ERPStoreLocations::class);
+      $typesRepository=$doctrine->getRepository(ERPTypesMovements::class);
       $lines=$linesRepository->findBy(["operation"=>$this]);
       foreach ($lines as $line){
         $line->setActive(0);
@@ -235,8 +238,6 @@ class ERPStoresManagersOperations
         $stockHistory->setUser($user);
         $stockHistory->setCompany($user->getCompany());
         $stockHistory->setQuantity($line->getQuantity());
-        $stocksRepository=$doctrine->getRepository(ERPStocks::class);
-        $storeLocationsRepository=$doctrine->getRepository(ERPStoreLocations::class);
         if ($this->getStore()!=null) {
           $location=$storeLocationsRepository->findOneBy(["store"=>$this->getStore(), "company"=>$user->getCompany(), "active"=>1,"deleted"=>0]);
         }
@@ -250,7 +251,6 @@ class ERPStoresManagersOperations
         $stockHistory->setProductvariant($line->getProductvariant());
         $stockHistory->setNewqty($stock->getQuantity()+$line->getQuantity());
         $stockHistory->setNumOperation('DO-'.$this->getId());
-        $typesRepository=$doctrine->getRepository(ERPTypesMovements::class);
         $type=$typesRepository->findOneBy(["name"=>"Ajuste de inventario"]);
         $stockHistory->setType($type);
         $stockHistory->setDateadd(new \Datetime());
@@ -258,8 +258,6 @@ class ERPStoresManagersOperations
         $stockHistory->setActive(true);
         $stockHistory->setDeleted(false);
         $em->persist($stockHistory);
-        $stock->setQuantity($stock->getQuantity()+$line->getQuantity());
-        $em->persist($stock);
         $em->persist($line);
         $em->flush();
       }
