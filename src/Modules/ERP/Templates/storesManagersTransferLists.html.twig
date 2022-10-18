@@ -8,6 +8,7 @@
 				<td style="border-bottom: 1px solid #cecece !important; width:15%" class="table-header-name table-thead "> Fecha </td>
 				<td style="border-bottom: 1px solid #cecece !important; width:15%" class="table-header-name table-thead "> Traspaso </td>
 				<td style="border-bottom: 1px solid #cecece !important; width:15%" class="table-header-name table-thead "> Almacén </td>
+				<td style="border-bottom: 1px solid #cecece !important; width:15%" class="table-header-name table-thead "> Descarga </td>
 				<td style="border-bottom: 1px solid #cecece !important; width:70%" class="table-header-name table-thead "> Productos </td>
 			</thead>
 
@@ -16,6 +17,8 @@
 					<td style="border-bottom: 1px solid #cecece !important;">  {{ transfer.date }} </td>
 					<td style="border-bottom: 1px solid #cecece !important;"> {{ transfer.name }} </td>
 					<td style="border-bottom: 1px solid #cecece !important;"> {{ transfer.store }} </td>
+					<td style="border-bottom: 1px solid #cecece !important;" id="transfer_downloads-'{{ transfer.name }}'" value='{{ transfer.name }}'>
+						<input id="button-download-"'{{ transfer.name }}' attr-id='{{ transfer.name }}' type="submit" value="Descargar" class="btn btn-green"></td>
 					<td style="border-bottom: 1px solid #cecece !important;">
 						<table id="header-list-products" class="table table-bordered table-responsive-md table-striped text-center" style="width: 100%">
 						<thead class="table-thead">
@@ -30,8 +33,8 @@
 								<td style="border-bottom: 1px solid #cecece !important; width:20%; text-align:left"> {{line.product}} </td>
 								<td style="border-bottom: 1px solid #cecece !important; width:70%; text-align:left"> {{line.name}} </td>
 								<td style="border-bottom: 1px solid #cecece !important; width:10%"> {{line.quantity}} </td>
-								<td style="border-bottom: 1px solid #cecece !important; width:10%"> - </td>
-								<td style="border-bottom: 1px solid #cecece !important; width:10%"> - </td>
+								<td style="border-bottom: 1px solid #cecece !important; width:10%"> {{line.load}} </td>
+								<td style="border-bottom: 1px solid #cecece !important; width:10%"> {{line.multiplier}} </td>
 							</tr>
 						{% endfor %}
 						</table>
@@ -64,4 +67,10 @@
 		{{ include('@Globale/bottom.html.twig') }}
 		{% endblock %}
 
+		<script>
+			$('body').on('click','[id^="button-download-"]', function(){
+				var win = window.open("/api/ERP/downloadTransfer/"+$(this).attr('attr-id'));
+				win.focus();
+			});
+		</script>
 </body>

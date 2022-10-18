@@ -18,7 +18,7 @@ use App\Modules\ERP\Entity\ERPReferences;
 use App\Modules\ERP\Entity\ERPProductsAttributes;
 use App\Modules\ERP\Entity\ERPManufacturers;
 use App\Modules\ERP\Entity\ERPStocks;
-use App\Modules\ERP\Entity\ERPStockHistory;
+use App\Modules\ERP\Entity\ERPStocksHistory;
 use App\Modules\ERP\Entity\ERPStoreLocations;
 use App\Modules\ERP\Entity\ERPStores;
 use App\Modules\ERP\Entity\ERPStoresManagers;
@@ -1189,6 +1189,14 @@ class ERPStoresManagersController extends Controller
 				$line["product"]=$obj->getCode();
 				$line["name"]=$obj->getName();
 				$line["quantity"]=$product["quantity"];
+				if ($machine!=null) {
+					$channel=$channelsRepository->findOneBy(["vendingmachine"=>$machine, "product"=>$obj]);
+					$line["load"]=intval($product["quantity"]/$channel->getMultiplier());
+					$line["multiplier"]=$channel->getMultiplier();
+				} else {
+					$line["load"]='-';
+					$line["multiplier"]='-';
+				}
 				$lines[]=$line;
 			}
 			$header["lines"]=$lines;
@@ -1199,5 +1207,45 @@ class ERPStoresManagersController extends Controller
 			'transfers' => $trans,
 		]);
 	}
+
+	/**
+		* @Route("/api/ERP/downloadTransfer/{name}", name="downloadTransfer")
+		*/
+	public function downloadTransfer($name,RouterInterface $router,Request $request){
+		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		$new_item=json_decode($request->getContent());
+		$channelsRepository=$this->getDoctrine()->getRepository(ERPStoresManagersVendingMachinesChannels::class);
+		$machineRepository=$this->getDoctrine()->getRepository(ERPStoresManagersVendingMachines::class);
+		$transfersRepository=$this->getDoctrine()->getRepository(NavisionTransfers::class);
+		$locationsRepository=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
+		$location=$locationsRepository->findOneBy(["name"=>$transfersRepository->findOneBy(["name"=>$name, "active"=>1, "deleted"=>0])->getDestinationstore()->getCode()]);
+		$machine=$machineRepository->findOneBy(["storelocation"=>$location]);
+		$params["rootdir"]= $this->get('kernel')->getRootDir();
+		$params["user"]=$this->getUser();
+		$transfers=$transfersRepository->findBy(["name"=>$name, "active"=>1, "deleted"=>0]);
+		$params["machine"]=$transfersRepository->findOneBy(["name"=>$name, "active"=>1, "deleted"=>0])->getDestinationstore()->getName();
+		$params["date"]=$transfersRepository->findOneBy(["name"=>$name, "active"=>1, "deleted"=>0])->getDateadd()->format('Y-m-d');
+		$lines=[];
+		foreach ($transfers as $transfer) {
+			$line['productcode']=$transfer->getProduct()->getCode();
+			$line['productname']=$transfer->getProduct()->getName();
+			$line['quantity']=$transfer->getQuantity();
+			if ($machine!=null) {
+				$channel=$channelsRepository->findOneBy(["vendingmachine"=>$machine, "product"=>$transfer->getProduct()]);
+				$line["upload"]=intval($transfer->getQuantity()/$channel->getMultiplier());
+				$line["multiplier"]=$channel->getMultiplier();
+			} else {
+				$line["upload"]='-';
+				$line["multiplier"]='-';
+			}
+			$lines[]=$line;
+		}
+		$params["lines"]=$lines;
+		$printQRUtils = new ERPPrintQR();
+		$pdf=$printQRUtils->loadMachine($params);
+		return new Response("", 200, array('Content-Type' => 'application/pdf'));
+	}
+
+
 
 }

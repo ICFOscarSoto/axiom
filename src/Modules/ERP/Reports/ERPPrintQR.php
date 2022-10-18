@@ -115,11 +115,13 @@ function create($params){
               ];
     $lines=$params['lines'];
     foreach ($lines as $line){
+      if ($line['upload']!='-') $upload=intval($line['upload']);
+      else  $upload='-';
       $dataTable[]=[
         $line['productcode'],
         $line['productname'],
         $line['quantity'],
-        intval($line['upload']),
+        $upload,
         $line['multiplier']
       ];
     }
