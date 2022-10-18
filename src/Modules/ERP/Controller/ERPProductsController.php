@@ -1212,7 +1212,7 @@ class ERPProductsController extends Controller
 				 $locationRepository=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
 				 $location=$locationRepository->findOneBy(['store'=>$store->getId()]);
 				 $stockRepository=$this->getDoctrine()->getRepository(ERPStocks::class);
-				 $stock=$stockRepository->findOneBy(['storelocation'=>$location->getId(), 'product'=>$product->getId()]);
+				 $stock=$stockRepository->findOneBy(['storelocation'=>$location->getId(), 'productvariant'=>$productvariant]);
 				 $typesRepository=$this->getDoctrine()->getRepository(ERPTypesMovements::class);
 				 $type=$typesRepository->findOneBy(["name"=>"Traspaso recibido"]);
 				 $stockHistory=new ERPStocksHistory();
