@@ -82,7 +82,9 @@ class ERPStoresManagersVendingMachinesChannelsRepository extends ServiceEntityRe
               FROM erpstores_managers_vending_machines_channels_replenishment cr, erpstores_managers_vending_machines_channels c
 		          WHERE date(cr.dateadd)=:date
               AND cr.channel_id  IN (SELECT id FROM erpstores_managers_vending_machines_channels WHERE vendingmachine_id=:vendingmachine)
-              AND cr.channel_id=c.id';
+              AND cr.channel_id=c.id
+              AND cr.active=1
+              AND cr.deleted=0';
       $params=['vendingmachine' => $id, 'date'=>$date];
       return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
     }
