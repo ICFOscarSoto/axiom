@@ -34,7 +34,7 @@ class StoresManagersVendingMachinesCheckConnectionLost extends ContainerAwareCom
         $output->writeln('===================================================');
 
         $machines = $repositoryVendingMachines->getConnectionLostVendingMachines();
-        dump($machines);
+
         foreach($machines as $machine){
           $machine=$repositoryVendingMachines->find($machine['id']);
           $type=2;

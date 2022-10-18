@@ -1000,10 +1000,91 @@ class ERPStoresManagersController extends Controller
 		 $vendingmachine=$repositoryVendingMachines->findOneBy(["id"=>$id,"active"=>1,"deleted"=>0]);
 		 if(!$vendingmachine) return new JsonResponse(array('result' => -1, 'text'=>"Máquina expendedora incorrecta"));
 		 $vendingmachine->setLastcheck(new \DateTime());
+
+		 //Notificar reestablecimiento de la comunicacion si procede
+ 		 if($vendingmachine->getConnectionlostnotified()){
+ 			 $vendingmachine->setConnectionlostnotified(false);
+ 			 $date=new \DateTime();
+ 			 $description='Conexión reestablecida el '.$date->format('d/m/Y').' a las '.$date->format('H:i:s');
+ 			 $vendingMachineLog= new ERPStoresManagersVendingMachinesLogs();
+ 			 $vendingMachineLog->setVendingmachine($vendingmachine);
+ 			 $vendingMachineLog->setType(2);
+ 			 $vendingMachineLog->setDescription($description);
+ 			 $vendingMachineLog->setDateadd($date);
+ 			 $vendingMachineLog->setDateupd($date);
+ 			 $vendingMachineLog->setActive(1);
+ 			 $vendingMachineLog->setDeleted(0);
+ 			 $this->getDoctrine()->getManager()->persist($vendingMachineLog);
+ 			 $this->getDoctrine()->getManager()->flush();
+ 			 if($vendingmachine->getAlertnotifyaddress()!=null){
+ 			 	file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$vendingmachine->getAlertnotifyaddress().'&msg='.urlencode('Máquina '.$vendingmachine->getName().': '.$description));
+ 			 }
+ 		 }
+
 		 $this->getDoctrine()->getManager()->persist($vendingmachine);
 		 $this->getDoctrine()->getManager()->flush();
 		 return new JsonResponse(["result"=>1]);
 	 }
+
+
+	 /**
+	 	* @Route("/api/ERP/storesmanagers/vendingmachines/sensors/{id}", name="sensorsVendingMachine",  defaults={"id"=0})
+	 	*/
+	 	public function sensorsManagerVendingMachine($id,RouterInterface $router,Request $request){	
+	 		// El usuario tiene derechos para realizar la acción, sino se va a la página de unauthorized
+	 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+	 		$manager = $this->getDoctrine()->getManager();
+	 		$repositoryVendingMachines = $manager->getRepository(ERPStoresManagersVendingMachines::class);
+	 		$repositoryIotSensors = $manager->getRepository(IoTSensors::class);
+	 		$vendingmachine=$repositoryVendingMachines->findOneBy(["id"=>$id,"active"=>1,"deleted"=>0]);
+	 		if(!$vendingmachine) return new JsonResponse(array('result' => -1, 'text'=>"Máquina expendedora incorrecta"));
+	 		$sensorid=$request->request->get('sensor');
+	 		$value=$request->request->get('value');
+	 		$iotdevice=$vendingmachine->getIotdevice();
+	 		if(!$iotdevice) return new JsonResponse(["result"=>-2]);
+	 		$iotsensor=$repositoryIotSensors->findOneBy(["device"=>$iotdevice, "name"=> $sensorid, "active"=>1, "deleted"=>0]);
+	 		if(!$iotsensor) return new JsonResponse(["result"=>-3]);
+	 		$iotdata = new IoTData();
+	 		$iotdata->setSensor($iotsensor);
+	 		$iotdata->setData($value);
+	 		$iotdata->setCounter(1);
+	 		$iotdata->setDateadd(new \DateTime());
+	 		$iotdata->setDateupd(new \DateTime());
+	 		$iotdata->setActive(1);
+	 		$iotdata->setDeleted(1);
+	 		$this->getDoctrine()->getManager()->persist($iotdata);
+	 		$this->getDoctrine()->getManager()->flush();
+	 		if($sensorid=="C2"){ //Puerta de controlador
+	 			$notify=false;
+	 			if($value!=$vendingmachine->getOpencontrollerdoornotified(0)){
+	 				$notify=true;
+	 				$vendingmachine->setOpencontrollerdoornotified(intval($value));
+	 				$this->getDoctrine()->getManager()->persist($vendingmachine);
+	 				$this->getDoctrine()->getManager()->flush();
+	 			}
+	 			$date=new \DateTime();
+	 			if($value==0){ //Puerta cerrada
+	 				$description="Puerta de controlador cerrada el ".$date->format('d/m/Y').' a las '.$date->format('H:i:s');
+	 			}else{ //Puerta abierta
+	 				$description="Puerta de controlador abierta el ".$date->format('d/m/Y').' a las '.$date->format('H:i:s');
+	 			}
+	 			if($notify){
+	 				$vendingMachineLog= new ERPStoresManagersVendingMachinesLogs();
+	 				$vendingMachineLog->setVendingmachine($vendingmachine);
+	 				$vendingMachineLog->setType(2);
+	 				$vendingMachineLog->setDescription($description);
+	 				$vendingMachineLog->setDateadd($date);
+	 				$vendingMachineLog->setDateupd($date);
+	 				$vendingMachineLog->setActive(1);
+	 				$vendingMachineLog->setDeleted(0);
+	 				$this->getDoctrine()->getManager()->persist($vendingMachineLog);
+	 				$this->getDoctrine()->getManager()->flush();
+	 				file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$vendingmachine->getAlertnotifyaddress().'&msg='.urlencode('Máquina '.$vendingmachine->getName().': '.$description));
+	 			}
+	 		}
+	 		return new JsonResponse(["result"=>1]);
+	 	}
+
 
 	 /**
  	* @Route("/api/erp/storesmanagers/vendingmachines/logs/add/{id}", name="addLogsManagerVendingMachine")
