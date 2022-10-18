@@ -19,35 +19,6 @@ class ERPStoresManagersVendingMachinesRepository extends ServiceEntityRepository
         parent::__construct($registry, ERPStoresManagersVendingMachines::class);
     }
 
-    // /**
-    //  * @return ERPStoresManagersVendingMachines[] Returns an array of ERPStoresManagersVendingMachines objects
-    //  */
-    /*
-    public function findByExampleField($value)
-    {
-        return $this->createQueryBuilder('e')
-            ->andWhere('e.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('e.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?ERPStoresManagersVendingMachines
-    {
-        return $this->createQueryBuilder('e')
-            ->andWhere('e.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
-
     public function getLoadsList($vendingmachine, $date) {
        $query='SELECT r.productcode, r.productname, r.quantity, cast(r.quantity/vc.multiplier AS INTEGER) AS upload,  vc.multiplier
          FROM erpstores_managers_vending_machines_channels_replenishment r, erpstores_managers_vending_machines_channels vc
@@ -60,4 +31,10 @@ class ERPStoresManagersVendingMachinesRepository extends ServiceEntityRepository
        $params=['vendingmachine' => $vendingmachine, 'date' => $date];
        return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
      }
+
+     public function getConnectionLostVendingMachines(){
+      $query='SELECT id, name FROM erpstores_managers_vending_machines
+                WHERE lastcheck <= DATE_SUB(NOW(), INTERVAL 5 MINUTE) AND connectionlostnotified = 0 AND active = 1 AND deleted = 0';
+      return $this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
+    }
 }
