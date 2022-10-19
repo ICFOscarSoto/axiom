@@ -769,6 +769,8 @@ class ERPStoresManagersController extends Controller
 			$typesRepository=$this->getDoctrine()->getRepository(ERPTypesMovements::class);
 			$type=$typesRepository->findOneBy(["name"=>"Carga expendedora"]);
 			$stockHistory= new ERPStocksHistory();
+
+
 			$productvariant = $repositoryProductVariant->findOneBy(["product"=>$channel->getProduct(),"variant"=>null]);
 			$stockHistory->setProductvariant($productvariant);
 			if ($channel->getVendingmachine()->getStorelocation()!=null) {
@@ -800,7 +802,7 @@ class ERPStoresManagersController extends Controller
 			//TODO: A futuro deberiamos no permitir la recarga si esta información no esta disponible
 			//TODO: Añadir soporte para variantes
 			if($channel->getVendingmachine()->getStorelocation()){
-				$stock=$repositoryStocks->findOneBy(["product"=>$channel->getProduct(), "storelocation"=>$channel->getVendingmachine()->getStorelocation(), "active"=>1, "deleted"=>0]);
+				$stock=$repositoryStocks->findOneBy(["productvariant"=>$productvariant, "storelocation"=>$channel->getVendingmachine()->getStorelocation(), "active"=>1, "deleted"=>0]);
 				if($stock){
 					$stock->setQuantity($stock->getQuantity()-($qty*($channel->getMultiplier()?$channel->getMultiplier():1)));
 					$this->getDoctrine()->getManager()->persist($stock);
@@ -1030,7 +1032,7 @@ class ERPStoresManagersController extends Controller
 	 /**
 	 	* @Route("/api/ERP/storesmanagers/vendingmachines/sensors/{id}", name="sensorsVendingMachine",  defaults={"id"=0})
 	 	*/
-	 	public function sensorsManagerVendingMachine($id,RouterInterface $router,Request $request){	
+	 	public function sensorsManagerVendingMachine($id,RouterInterface $router,Request $request){
 	 		// El usuario tiene derechos para realizar la acción, sino se va a la página de unauthorized
 	 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 	 		$manager = $this->getDoctrine()->getManager();
