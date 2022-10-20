@@ -147,6 +147,12 @@ class ERPStoresManagersVendingMachines
      */
     private $connectionlostnotified;
 
+    /**
+    * @ORM\Column(type="boolean")
+    */
+    private $opencontrollerdoornotified;
+
+
 
     public function getId(): ?int
     {
@@ -484,6 +490,18 @@ class ERPStoresManagersVendingMachines
     public function setConnectionlostnotified(bool $connectionlostnotified): self
     {
         $this->connectionlostnotified = $connectionlostnotified;
+
+        return $this;
+    }
+
+    public function getOpencontrollerdoornotified(): ?bool
+    {
+        return $this->opencontrollerdoornotified;
+    }
+
+    public function setOpencontrollerdoornotified(bool $opencontrollerdoornotified): self
+    {
+        $this->opencontrollerdoornotified = $opencontrollerdoornotified;
 
         return $this;
     }
