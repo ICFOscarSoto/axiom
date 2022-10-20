@@ -424,26 +424,39 @@ class ERPStoresManagersOperationsController extends Controller
 	 	 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 	 	 $entityUtils=new GlobaleEntityUtils();
 		 $documentRepository=$this->getDoctrine()->getRepository(ERPStoresManagersOperations::class);
+		 $channelRepository=$this->getDoctrine()->getRepository(ERPStoresManagersVendingMachinesChannels::class);
 		 $documentLinesRepository=$this->getDoctrine()->getRepository(ERPStoresManagersOperationsLines::class);
 		 $stocksRepository=$this->getDoctrine()->getRepository(ERPStocks::class);
 		 $storeLocationsRepository=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
+		 $productVariantRepository=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
 		 $operation=$documentRepository->findOneBy(["id"=>$id, "company"=>$this->getUser()->getCompany(), "deleted"=>false]);
 		 if(!$operation) return new JsonResponse(['result' => -1]);
-		 if ($operation->getStore()!=null)
-		 	$location=$storeLocationsRepository->findOneBy(["store"=>$operation->getStore(), "company"=>$this->getUser()->getCompany(), "active"=>1,"deleted"=>0]);
-		 else
-		   $location=$operation->getVendingmachine()->getStorelocation();
-		 if(!$location) return new JsonResponse(["result"=>-4, "text"=> "No existen ubicación en el almacén gestor"]);
 		 $operationsLines=$documentLinesRepository->findBy(["operation"=>$operation, "deleted"=>0]);
-		 $productVariantRepository=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
-		 foreach($operationsLines as $line){
-			 $productvariant = $line->getProductvariant();
-			 $stock=$stocksRepository->findOneBy(["productvariant"=>$productvariant, "company"=>$this->getUser()->getCompany(), "storelocation"=>$location, "active"=>1, "deleted"=>0]);
-			 if(!$stock) continue;
-			 $stock->setQuantity($stock->getQuantity()+($line->getQuantity()));
-			 $this->getDoctrine()->getManager()->persist($stock);
-			 $this->getDoctrine()->getManager()->flush();
-		 }
+
+		 if ($operation->getStore()!=null){
+		 		$location=$storeLocationsRepository->findOneBy(["store"=>$operation->getStore(), "company"=>$this->getUser()->getCompany(), "active"=>1,"deleted"=>0]);
+		  	if(!$location) return new JsonResponse(["result"=>-4, "text"=> "No existen ubicación en el almacén gestor"]);
+				foreach($operationsLines as $line){
+ 				 $productvariant = $line->getProductvariant();
+ 				 $stock=$stocksRepository->findOneBy(["productvariant"=>$productvariant, "company"=>$this->getUser()->getCompany(), "storelocation"=>$location, "active"=>1, "deleted"=>0]);
+ 				 if(!$stock) continue;
+ 				 $stock->setQuantity($stock->getQuantity()+($line->getQuantity()));
+ 				 $this->getDoctrine()->getManager()->persist($stock);
+ 				 $this->getDoctrine()->getManager()->flush();
+ 			 }
+		 } else if ($operation->getVendingmachine()==null)
+		 		return new JsonResponse(["result"=>-4, "text"=> "No existen ubicación ni máquina en la operacion"]);
+			 else {
+				foreach($operationsLines as $line){
+					$product = $line->getProductvariant()->getProduct();
+					$channel=$channelRepository->findOneBy(["vendingmachine"=>$operation->getVendingmachine(), "product"=>$product, "active"=>1,"deleted"=>0]);
+					if(!$channel) continue;
+					$channel->setQuantity($channel->getQuantity()+($line->getQuantity()));
+					$this->getDoctrine()->getManager()->persist($channel);
+					$this->getDoctrine()->getManager()->flush();
+				}
+			}
+
 		 $result=$entityUtils->deleteObject($id, $this->class, $this->getDoctrine());
 	 	 return new JsonResponse(array('result' => $result));
 	  }

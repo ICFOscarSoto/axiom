@@ -767,6 +767,8 @@ Manager data: Datos del gestor
 Reports: Informes
 Loads: Cargas expendedora
 Lacks: Faltas
+Loads List: Listado de cargas
+Transfer List: Listado de traspasos
 #JSPREADSHEET
 #----------------------------------------------------------------------------------------------------------------------
 jspreadsheet_showcolumn: Mostrar columna

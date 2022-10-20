@@ -229,35 +229,32 @@ class ERPStoresManagersOperations
       $stocksRepository=$doctrine->getRepository(ERPStocks::class);
       $storeLocationsRepository=$doctrine->getRepository(ERPStoreLocations::class);
       $typesRepository=$doctrine->getRepository(ERPTypesMovements::class);
+      $channelsRepository=$doctrine->getRepository(ERPStoresManagersVendingMachinesChannels::class);
       $lines=$linesRepository->findBy(["operation"=>$this]);
       foreach ($lines as $line){
         $line->setActive(0);
         $line->setDeleted(1);
         $line->setDateupd(new \Datetime());
-        $stockHistory=new ERPStocksHistory();
-        $stockHistory->setUser($user);
-        $stockHistory->setCompany($user->getCompany());
-        $stockHistory->setQuantity($line->getQuantity());
         if ($this->getStore()!=null) {
+          $stockHistory=new ERPStocksHistory();
+          $stockHistory->setUser($user);
+          $stockHistory->setCompany($user->getCompany());
+          $stockHistory->setQuantity($line->getQuantity());
           $location=$storeLocationsRepository->findOneBy(["store"=>$this->getStore(), "company"=>$user->getCompany(), "active"=>1,"deleted"=>0]);
+          $stock=$stocksRepository->findOneBy(["productvariant"=>$line->getProductvariant(), "company"=>$user->getCompany(), "storelocation"=>$location, "active"=>1, "deleted"=>0]);
+          $stockHistory->setLocation($location);
+          $stockHistory->setPreviousqty($stock->getQuantity());
+          $stockHistory->setProductvariant($line->getProductvariant());
+          $stockHistory->setNewqty($stock->getQuantity()+$line->getQuantity());
+          $stockHistory->setNumOperation('DO-'.$this->getId());
+          $type=$typesRepository->findOneBy(["name"=>"Ajuste de inventario"]);
+          $stockHistory->setType($type);
+          $stockHistory->setDateadd(new \Datetime());
+          $stockHistory->setDateupd(new \Datetime());
+          $stockHistory->setActive(true);
+          $stockHistory->setDeleted(false);
+          $em->persist($stockHistory);
         }
-        else {
-          $location=$this->getVendingmachine()->getStorelocation();
-          $stockHistory->setComment($this->getVendingmachine()->getName());
-        }
-        $stock=$stocksRepository->findOneBy(["productvariant"=>$line->getProductvariant(), "company"=>$user->getCompany(), "storelocation"=>$location, "active"=>1, "deleted"=>0]);
-        $stockHistory->setLocation($location);
-        $stockHistory->setPreviousqty($stock->getQuantity());
-        $stockHistory->setProductvariant($line->getProductvariant());
-        $stockHistory->setNewqty($stock->getQuantity()+$line->getQuantity());
-        $stockHistory->setNumOperation('DO-'.$this->getId());
-        $type=$typesRepository->findOneBy(["name"=>"Ajuste de inventario"]);
-        $stockHistory->setType($type);
-        $stockHistory->setDateadd(new \Datetime());
-        $stockHistory->setDateupd(new \Datetime());
-        $stockHistory->setActive(true);
-        $stockHistory->setDeleted(false);
-        $em->persist($stockHistory);
         $em->persist($line);
         $em->flush();
       }
