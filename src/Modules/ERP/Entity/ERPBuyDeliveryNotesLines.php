@@ -25,13 +25,13 @@ class ERPBuyDeliveryNotesLines
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPBuyDeliveryNotes")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $deliverynote;
+    private $buydeliverynote;
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPBuyDeliveryNotesLines")
      * @ORM\JoinColumn(nullable=true)
      */
-    private $deliverynoteline;
+    private $buydeliverynoteline;
 
     /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPProductsVariants")
@@ -155,26 +155,26 @@ class ERPBuyDeliveryNotesLines
         return $this->id;
     }
 
-    public function getDeliverynote(): ?ERPBuyDeliveryNotes
+    public function getBuydeliverynote(): ?ERPBuyDeliveryNotes
     {
-        return $this->deliverynote;
+        return $this->buydeliverynote;
     }
 
-    public function setDeliverynote(?ERPBuyDeliveryNotes $deliverynote): self
+    public function setBuydeliverynote(?ERPBuyDeliveryNotes $buydeliverynote): self
     {
-        $this->deliverynote = $deliverynote;
+        $this->buydeliverynote = $buydeliverynote;
 
         return $this;
     }
 
-    public function getDeliverynoteline(): ?ERPBuyDeliveryNotesLines
+    public function getBuydeliverynoteline(): ?ERPBuyDeliveryNotesLines
     {
-        return $this->deliverynote;
+        return $this->buydeliverynoteline;
     }
 
-    public function setDeliverynoteline(?ERPBuyDeliveryNotesLines $deliverynoteline): self
+    public function setBuydeliverynoteline(?ERPBuyDeliveryNotesLines $buydeliverynoteline): self
     {
-        $this->deliverynoteline = $deliverynoteline;
+        $this->buydeliverynoteline = $buydeliverynoteline;
 
         return $this;
     }
