@@ -1177,25 +1177,6 @@ class ERPStoresManagersController extends Controller
 	}
 
 	/**
-	 	* @Route("/api/ERP/downloadLoads/{id}/{date}", name="downloadLoads")
-		*/
-	 public function downloadLoads($id, $date, RouterInterface $router,Request $request){
-	  $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-	  $new_item=json_decode($request->getContent());
-		$loadRepository=$this->getDoctrine()->getRepository(ERPStoresManagersVendingMachinesChannels::class);
-		$machineRepository=$this->getDoctrine()->getRepository(ERPStoresManagersVendingMachines::class);
-		$params["rootdir"]= $this->get('kernel')->getRootDir();
-		$params["user"]=$this->getUser();
-		$params["machine"]=$machineRepository->findOneBy(["id"=>$id, "deleted"=>0])->getName();
-		$params["date"]=$date;
-		$params["lines"]=$loadRepository->getLoadsMachineDate($id,$date);
-		$printQRUtils = new ERPPrintQR();
- 		$pdf=$printQRUtils->loadMachine($params);
- 		return new Response("", 200, array('Content-Type' => 'application/pdf'));
-  }
-
-
-	/**
 		* @Route("/{_locale}/erp/storesmanagers/{id}/loadslist", name="storesManagersLoadLists")
 		*/
 	public function storesManagersLoadLists($id,RouterInterface $router,Request $request){
@@ -1241,6 +1222,24 @@ class ERPStoresManagersController extends Controller
 			'loads' => $loads,
 		]);
 	}
+
+		/**
+		 	* @Route("/api/ERP/downloadLoads/{name}/{date}", name="downloadLoads")
+			*/
+		 public function downloadLoads($name, $date, RouterInterface $router,Request $request){
+		  $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		  $new_item=json_decode($request->getContent());
+			$loadRepository=$this->getDoctrine()->getRepository(ERPStoresManagersVendingMachinesChannels::class);
+			$machineRepository=$this->getDoctrine()->getRepository(ERPStoresManagersVendingMachines::class);
+			$params["rootdir"]= $this->get('kernel')->getRootDir();
+			$params["user"]=$this->getUser();
+			$params["machine"]=$name;
+			$params["date"]=$date;
+			$params["lines"]=$loadRepository->getLoadsMachineDate($machineRepository->findOneBy(["name"=>$name, "deleted"=>0])->getId(),$date);
+			$printQRUtils = new ERPPrintQR();
+	 		$pdf=$printQRUtils->loadMachine($params);
+	 		return new Response("", 200, array('Content-Type' => 'application/pdf'));
+	  }
 
 	/**
 		* @Route("/api/ERP/storesmanagers/{id}/transferLists", name="storesManagersTransferLists")
