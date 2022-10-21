@@ -91,7 +91,7 @@ class ERPStoresManagersController extends Controller
 				["name" => "storesmanagersusers", "caption"=>"Users", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("listStoresManagersUsers",["id"=>$id])],
 				["name" => "storesmanagersconsumers", "caption"=>"Consumidores", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("listStoresManagersConsumers",["id"=>$id])],
 				["name" => "storesmanagersoperationsreports", "caption"=>"Reports", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("storesManagersOperationsReports",["id"=>$id])],
-				["name" => "loadsreports", "caption"=>"Loads", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("storesManagersLoadReports",["id"=>$id])],
+			//	["name" => "loadsreports", "caption"=>"Loads", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("storesManagersLoadReports",["id"=>$id])],
 				["name" => "loadslist", "caption"=>"Loads List", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("storesManagersLoadLists",["id"=>$id])],
 				["name" => "transferlist", "caption"=>"Transfer List", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("storesManagersTransferLists",["id"=>$id])]
 			];
