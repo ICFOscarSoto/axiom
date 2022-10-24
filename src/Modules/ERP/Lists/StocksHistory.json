@@ -4,8 +4,12 @@
         "caption": "id"
     },
     {
-        "name": "productvariant__product__name",
+        "name": "productname",
         "caption": "product"
+    },
+    {
+        "name": "productcode",
+        "caption": "code"
     },
     {
         "name": "productvariant__variant__name",
