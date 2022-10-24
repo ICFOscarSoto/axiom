@@ -281,6 +281,8 @@ class ERPStocksController extends Controller
 				$repositoryStores=$this->getDoctrine()->getRepository(ERPStores::class);
 				$store=$repositoryStores->findOneBy(["id"=>$storelocation->getStore(), "company"=>$this->getUser()->getCompany()]);
 				$StockHistory= new ERPStocksHistory();
+        $StockHistory->setProductcode($productvariant->getProduct()->getCode());
+        $StockHistory->setProductname($productvariant->getProduct()->getName());
 				$StockHistory->setProductVariant($productvariant);
 				$StockHistory->setLocation($storelocation);
 				$StockHistory->setUser($this->getUser());
@@ -478,6 +480,8 @@ class ERPStocksController extends Controller
 
 		 if($prev_stock!=$qty){
 				 $StockHistory= new ERPStocksHistory();
+         $StockHistory->setProductcode($productvariant->getProduct()->getCode());
+         $StockHistory->setProductname($productvariant->getProduct()->getName());
 				 $StockHistory->setProductVariant($productvariant);
 				 $StockHistory->setLocation($storelocation);
 				 $StockHistory->setUser($this->getUser());
@@ -760,6 +764,8 @@ class ERPStocksController extends Controller
 			 if ($stock==NULL) continue;
 			 $quantity=$stock->getQuantity()-$istock["vendido"];
 			 $stockHistory=new ERPStocksHistory();
+			 $stockHistory->setProductcode($productvariant->getProduct()->getCode());
+			 $stockHistory->setProductname($productvariant->getProduct()->getName());
 			 $stockHistory->setProductVariant($productvariant);
 			 $stockHistory->setLocation($storeLocation);
 			 $stockHistory->setUser($user);
@@ -783,6 +789,8 @@ class ERPStocksController extends Controller
 			 if ($stock!=null){
 			 $quantity=$stock->getQuantity()+$object["stock"];
 			 $stockHistory=new ERPStocksHistory();
+			 $stockHistory->setProductcode($productvariant->getProduct()->getCode());
+			 $stockHistory->setProductname($productvariant->getProduct()->getName());
 			 $stockHistory->setProductVariant($productvariant);
 			 $stockHistory->setLocation($storeLocation);
 			 $stockHistory->setUser($user);

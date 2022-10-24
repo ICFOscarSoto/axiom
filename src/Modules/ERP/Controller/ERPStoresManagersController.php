@@ -769,9 +769,9 @@ class ERPStoresManagersController extends Controller
 			$typesRepository=$this->getDoctrine()->getRepository(ERPTypesMovements::class);
 			$type=$typesRepository->findOneBy(["name"=>"Carga expendedora"]);
 			$stockHistory= new ERPStocksHistory();
-
-
 			$productvariant = $repositoryProductVariant->findOneBy(["product"=>$channel->getProduct(),"variant"=>null]);
+			$stockHistory->setProductcode($productvariant->getProduct()->getCode());
+			$stockHistory->setProductname($productvariant->getProduct()->getName());
 			$stockHistory->setProductvariant($productvariant);
 			if ($channel->getVendingmachine()->getStorelocation()!=null) {
 					$stockHistory->setLocation($channel->getVendingmachine()->getStorelocation());
@@ -781,6 +781,7 @@ class ERPStoresManagersController extends Controller
 					$storeLocation=$locationRepository->findOneBy(["name"=>"EXPEND ALM"]);
 					$stockHistory->setLocation($storeLocation);
 			}
+			$stockHistory->setVendingmachinechannel($channel);
 			$stockHistory->setUser($this->getUser());
 			$stockHistory->setCompany($this->getUser()->getCompany());
 			$stockHistory->setPreviousqty($channel->getQuantity());
@@ -804,6 +805,31 @@ class ERPStoresManagersController extends Controller
 			if($channel->getVendingmachine()->getStorelocation()){
 				$stock=$repositoryStocks->findOneBy(["productvariant"=>$productvariant, "storelocation"=>$channel->getVendingmachine()->getStorelocation(), "active"=>1, "deleted"=>0]);
 				if($stock){
+					$stockHistory= new ERPStocksHistory();
+					$productvariant = $repositoryProductVariant->findOneBy(["product"=>$channel->getProduct(),"variant"=>null]);
+	        $stockHistory->setProductcode($productvariant->getProduct()->getCode());
+	        $stockHistory->setProductname($productvariant->getProduct()->getName());
+					$stockHistory->setProductvariant($productvariant);
+					if ($channel->getVendingmachine()->getStorelocation()!=null) {
+							$stockHistory->setLocation($channel->getVendingmachine()->getStorelocation());
+						}
+						else {
+							$locationRepository=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
+							$storeLocation=$locationRepository->findOneBy(["name"=>"EXPEND ALM"]);
+							$stockHistory->setLocation($storeLocation);
+					}
+					$stockHistory->setUser($this->getUser());
+					$stockHistory->setCompany($this->getUser()->getCompany());
+					$stockHistory->setPreviousqty($stock->getQuantity());
+					$stockHistory->setNewqty($stock->getQuantity()-($qty*($channel->getMultiplier()?$channel->getMultiplier():1)));
+					$stockHistory->setType($type);
+					$stockHistory->setQuantity(-($qty*($channel->getMultiplier()?$channel->getMultiplier():1)));
+					$stockHistory->setActive(1);
+					$stockHistory->setDeleted(0);
+					$stockHistory->setDateupd(new \DateTime());
+					$stockHistory->setDateadd(new \DateTime());
+					$this->getDoctrine()->getManager()->persist($stockHistory);
+					$this->getDoctrine()->getManager()->flush();
 					$stock->setQuantity($stock->getQuantity()-($qty*($channel->getMultiplier()?$channel->getMultiplier():1)));
 					$this->getDoctrine()->getManager()->persist($stock);
 					$this->getDoctrine()->getManager()->flush();

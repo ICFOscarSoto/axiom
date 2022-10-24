@@ -9,6 +9,7 @@ use \App\Modules\ERP\Entity\ERPStores;
 use \App\Modules\Globale\Entity\GlobaleUsers;
 use \App\Modules\ERP\Entity\ERPTypesMovements;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
+use \App\Modules\ERP\Entity\ERPStoresManagersVendingMachinesChannels;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPStocksHistoryRepository")
@@ -104,6 +105,11 @@ class ERPStocksHistory
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $productname;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPStoresManagersVendingMachinesChannels")
+     */
+    private $vendingmachinechannel;
 
     public function getId(): ?int
     {
@@ -300,6 +306,18 @@ class ERPStocksHistory
     public function setProductname(?string $productname): self
     {
         $this->productname = $productname;
+
+        return $this;
+    }
+
+    public function getVendingmachinechannel(): ?ERPStoresManagersVendingMachinesChannels
+    {
+        return $this->vendingmachinechannel;
+    }
+
+    public function setVendingmachinechannel(?ERPStoresManagersVendingMachinesChannels $vendingmachinechannel): self
+    {
+        $this->vendingmachinechannel = $vendingmachinechannel;
 
         return $this;
     }

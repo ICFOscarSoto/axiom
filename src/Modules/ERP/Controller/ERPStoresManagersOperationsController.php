@@ -281,6 +281,8 @@ class ERPStoresManagersOperationsController extends Controller
 	 				 	$stockHistory->setCompany($this->getUser()->getCompany());
 						$stockHistory->setQuantity($qty);
 						$stockHistory->setPreviousqty($stockQty);
+		        $stockHistory->setProductcode($productvariant->getProduct()->getCode());
+		        $stockHistory->setProductname($productvariant->getProduct()->getName());
 						$stockHistory->setProductvariant($productvariant);
 						$stockHistory->setNewqty($stockQty-$item->getQuantity());
 						$stockHistory->setNumOperation($operation->getId());
@@ -383,6 +385,8 @@ class ERPStoresManagersOperationsController extends Controller
 					$typesRepository=$this->getDoctrine()->getRepository(ERPTypesMovements::class);
 					$type=$typesRepository->findOneBy(["name"=>"Salida expendedora"]);
 					$stockHistory= new ERPStocksHistory();
+	        $stockHistory->setProductcode($productvariant->getProduct()->getCode());
+	        $stockHistory->setProductname($productvariant->getProduct()->getName());
 					$stockHistory->setProductvariant($productvariant);
 					if ($channel->getVendingmachine()->getStorelocation()!=null) {
 							$stockHistory->setLocation($channel->getVendingmachine()->getStorelocation());
