@@ -396,6 +396,7 @@ class ERPStoresManagersOperationsController extends Controller
 							$storeLocation=$locationRepository->findOneBy(["name"=>"EXPEND ALM"]);
 							$stockHistory->setLocation($storeLocation);
 					}
+					$stockHistory->setVendingmachinechannel($channel);
 					$stockHistory->setUser($this->getUser());
  				 	$stockHistory->setCompany($this->getUser()->getCompany());
 					$stockHistory->setPreviousqty($channel->getQuantity());
