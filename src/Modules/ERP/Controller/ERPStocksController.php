@@ -21,11 +21,16 @@ use App\Modules\ERP\Entity\ERPEAN13;
 use App\Modules\ERP\Entity\ERPStoresManagers;
 use App\Modules\ERP\Entity\ERPTypesMovements;
 use App\Modules\ERP\Entity\ERPProductsVariants;
+use App\Modules\Globale\Entity\GlobaleUsers;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\ERP\Utils\ERPStocksUtils;
 use App\Modules\Security\Utils\SecurityUtils;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\File\MimeType\FileinfoMimeTypeGuesser;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use App\Modules\Globale\Helpers\XLSXWriter\XLSXWriter;
 
 class ERPStocksController extends Controller
 {
@@ -807,6 +812,45 @@ class ERPStocksController extends Controller
 
 		 $this->getDoctrine()->getManager()->flush();
 		 return new JsonResponse(["result"=>1, "text"=>"Se ha ajustado el stock"]);
+	 }
+
+	 /**
+	 * @Route("/{_locale}/erp/StocksHistory/exportHistory", name="exportHistory")
+	 */
+	 public function exportHistory(Request $request){
+		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		 $historyRepository=$this->getDoctrine()->getRepository(ERPStocksHistory::class);
+		 $userRepository=$this->getDoctrine()->getRepository(GlobaleUsers::class);
+		 $typeRepository=$this->getDoctrine()->getRepository(ERPTypesMovements::class);
+		 $ids=$request->query->get('ids');
+		 $uploadDir=$this->get('kernel')->getRootDir() . '/../cloud/'.$this->getUser()->getCompany()->getId().'/temp/'.$this->getUser()->getId().'/';
+		 if (!file_exists($uploadDir) && !is_dir($uploadDir)) {
+				 mkdir($uploadDir, 0775, true);
+		 }
+		 $filename = date("YmdHis").'_'.md5(uniqid()).'.xlsx';
+		 $errorstyle[] = array('fill'=>"#AA0000");
+
+		 $writer = new XLSXWriter();
+		 $header = array("string","string","string","string");
+		 $writer->setAuthor($this->getUser()->getName().' '.$this->getUser()->getLastname());
+		 $writer->writeSheetHeader('Hoja1', $header, $col_options = ['suppress_row'=>true] );
+		 $writer->writeSheetRow('Hoja1', ["Nombre producto", "Código", "Cantidad previa", "Cantidad operacion", "Cantidad nueva", "Máquina", "Traspaso", "Usuario", "Fecha", "Tipo"]);
+		 $row_number=1;
+		 if($ids!=null){
+			 $lines=$historyRepository->getMovements($ids);
+			 foreach($lines as $line){
+				 $row=[$line["productname"], $line["productcode"], $line["quantity"], $line["previousqty"], $line["newqty"], $line["comment"],
+				 				$line["num_operation"], $userRepository->findOneBy(["id"=>$line["user_id"]])->getName(), $line["date"], $typeRepository->findOneBy(["id"=>$line["type_id"]])->getName()];
+				 $writer->writeSheetRow('Hoja1', $row);
+				 $row_number++;
+			 }
+		 }
+
+		 $writer->writeToFile($uploadDir.$filename);
+		 $response = new BinaryFileResponse($uploadDir.$filename);
+		 $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+		 $response->setContentDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT,'history.xlsx');
+		 return $response;
 	 }
 
 }
