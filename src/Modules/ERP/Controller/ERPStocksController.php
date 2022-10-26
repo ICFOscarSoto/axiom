@@ -834,12 +834,12 @@ class ERPStocksController extends Controller
 		 $header = array("string","string","string","string");
 		 $writer->setAuthor($this->getUser()->getName().' '.$this->getUser()->getLastname());
 		 $writer->writeSheetHeader('Hoja1', $header, $col_options = ['suppress_row'=>true] );
-		 $writer->writeSheetRow('Hoja1', ["Nombre producto", "Código", "Cantidad operacion", "Cantidad previa",  "Cantidad nueva", "Máquina", "Traspaso", "Usuario", "Fecha", "Tipo"]);
+		 $writer->writeSheetRow('Hoja1', ["Nombre producto", "Código", "Cantidad previa", "Cantidad operacion",   "Cantidad nueva", "Máquina", "Traspaso", "Usuario", "Fecha", "Tipo"]);
 		 $row_number=1;
 		 if($ids!=null){
 			 $lines=$historyRepository->getMovements($ids);
 			 foreach($lines as $line){
-				 $row=[$line["productname"], $line["productcode"], $line["quantity"], $line["previousqty"], $line["newqty"], $line["comment"],
+				 $row=[$line["productname"], $line["productcode"], $line["previousqty"], $line["quantity"],  $line["newqty"], $line["comment"],
 				 				$line["num_operation"], $userRepository->findOneBy(["id"=>$line["user_id"]])->getName(), $line["date"], $typeRepository->findOneBy(["id"=>$line["type_id"]])->getName()];
 				 $writer->writeSheetRow('Hoja1', $row);
 				 $row_number++;
