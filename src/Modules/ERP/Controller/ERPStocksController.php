@@ -834,7 +834,7 @@ class ERPStocksController extends Controller
 		 $header = array("string","string","string","string");
 		 $writer->setAuthor($this->getUser()->getName().' '.$this->getUser()->getLastname());
 		 $writer->writeSheetHeader('Hoja1', $header, $col_options = ['suppress_row'=>true] );
-		 $writer->writeSheetRow('Hoja1', ["Nombre producto", "Código", "Cantidad previa", "Cantidad operacion", "Cantidad nueva", "Máquina", "Traspaso", "Usuario", "Fecha", "Tipo"]);
+		 $writer->writeSheetRow('Hoja1', ["Nombre producto", "Código", "Cantidad operacion", "Cantidad previa",  "Cantidad nueva", "Máquina", "Traspaso", "Usuario", "Fecha", "Tipo"]);
 		 $row_number=1;
 		 if($ids!=null){
 			 $lines=$historyRepository->getMovements($ids);
