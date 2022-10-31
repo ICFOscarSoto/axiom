@@ -21,13 +21,13 @@ class ERPStoresManagersOperationsRepository extends ServiceEntityRepository
 
     public function getOperationsProducts($user, $array_ids)
     {
-      $query="SELECT p.id, p.code, l.variant_id, p.name, SUM(l.quantity) qty, IFNULL(p.minimumquantityofsale,1) minimumquantityofsale
+      $query="SELECT p.id, p.code, l.productvariant_id, p.name, SUM(l.quantity) qty, IFNULL(p.minimumquantityofsale,1) minimumquantityofsale
               	FROM erpstores_managers_operations_lines l
-              	LEFT JOIN erpproducts p ON p.id = l.product_id
+              	LEFT JOIN erpproducts p ON p.id in (select pv.product_id from erpproducts_variants pv where pv.id=l.productvariant_id)
                 LEFT JOIN erpstores_managers_operations o ON o.id = l.operation_id
               	WHERE l.active = 1 AND l.deleted= 0 AND o.active = 1 AND o.deleted= 0
                 AND o.id IN ($array_ids)
-              	GROUP BY p.code, l.variant_id
+              	GROUP BY p.code, l.productvariant_id
                 HAVING qty>0";
       $result=$this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
       return $result;

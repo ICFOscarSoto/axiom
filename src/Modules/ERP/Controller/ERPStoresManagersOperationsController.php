@@ -495,7 +495,7 @@ class ERPStoresManagersOperationsController extends Controller
 				$lines=$operationsRepository->getOperationsProducts($this->getUser(),$ids);
 				foreach($lines as $line){
 					$error=null;
-					if($line["variant_id"]==null)
+					if($productVariantRepository->findOneBy(["id"=>$line["productvariant_id"]])->getVariant()==null)
 						$barcode='P.'.str_pad($line["id"],8,'0', STR_PAD_LEFT);
 						else{
 							 $product=$productRepository->findOneBy(["id"=>$line["id"], "company"=> $this->getUser()->getCompany(),"deleted"=>0]);
@@ -547,7 +547,6 @@ class ERPStoresManagersOperationsController extends Controller
 
 			 $storesmanagersusersstoresRepository=$this->getDoctrine()->getRepository(ERPStoresManagersUsersStores::class);
 			 $store_objects=$storesmanagersusersstoresRepository->findBy(["manageruser"=>$storemanageruser,"active"=>1,"deleted"=>0]);
-dump($store_objects);
 			 $stores=[];
 			 $option=null;
 			 $option["id"]=null;
