@@ -489,13 +489,13 @@ class ERPStoresManagersOperationsController extends Controller
 			$header = array("string","string","string","string");
 			$writer->setAuthor($this->getUser()->getName().' '.$this->getUser()->getLastname());
 			$writer->writeSheetHeader('Hoja1', $header, $col_options = ['suppress_row'=>true] );
-			$writer->writeSheetRow('Hoja1', ["CODIGO DE BARRAS", "CODIGO", "", "", "CANTIDAD","DESCRIPCION","CANTIDAD MIN","ERROR"]);
+			$writer->writeSheetRow('Hoja1', ["CODIGO", "", "", "CANTIDAD","DESCRIPCION","CANTIDAD MIN","ERROR"]);
 			$row_number=1;
 			if($ids!=null){
 				$lines=$operationsRepository->getOperationsProducts($this->getUser(),$ids);
 				foreach($lines as $line){
 					$error=null;
-					if($productVariantRepository->findOneBy(["id"=>$line["productvariant_id"]])->getVariant()==null)
+					/*if($productVariantRepository->findOneBy(["id"=>$line["productvariant_id"]])->getVariant()==null)
 						$barcode='P.'.str_pad($line["id"],8,'0', STR_PAD_LEFT);
 						else{
 							 $product=$productRepository->findOneBy(["id"=>$line["id"], "company"=> $this->getUser()->getCompany(),"deleted"=>0]);
@@ -509,9 +509,9 @@ class ERPStoresManagersOperationsController extends Controller
 									else $barcode='V.'.str_pad($variant->getId(),8,'0', STR_PAD_LEFT);
 								}
 						 	 }
-						 }
-					if($line["qty"]<$line["minimumquantityofsale"]) $error="Cantidad minima";
-					$row=[$barcode, $line["code"], "", "", $line["qty"],$line["name"],$line["minimumquantityofsale"],$error];
+						 }*/
+					if($line["qty"]<$productRepository->findOneBy(["code"=>$line["code"]])->getMinimumquantityofsale()) $error="Cantidad minima";
+					$row=[$line["code"], "", "", $line["qty"],$line["name"],$productRepository->findOneBy(["code"=>$line["code"]])->getMinimumquantityofsale(),$error];
 					if(!$error)	$writer->writeSheetRow('Hoja1', $row);
 						else $writer->writeSheetRow('Hoja1', $row, array('fill'=>"#AA0000", "color"=>"#ffffff"));
 					$row_number++;
