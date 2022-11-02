@@ -12,10 +12,6 @@
         "caption": "code"
     },
     {
-        "name": "productvariant__variant__name",
-        "caption": "variant"
-    },
-    {
         "name": "location__store__name",
         "caption": "store"
     },
@@ -26,10 +22,6 @@
     {
         "name": "quantity",
         "caption": "quantity"
-    },
-    {
-        "name": "previousqty",
-        "caption": "previousqty"
     },
     {
         "name": "newqty",
