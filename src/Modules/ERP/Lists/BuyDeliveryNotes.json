@@ -1,0 +1,47 @@
+[
+  {
+      "name": "id",
+      "caption": "id",
+      "class": "hidden"
+  },
+  {
+      "name": "code",
+      "caption": "code",
+      "class": "all"
+  },
+  {
+      "name": "dateadd",
+      "caption": "dateadd",
+      "type": "date",
+      "class": "all"
+  },
+  {
+      "name": "suppliercode",
+      "caption": "suppliercode","class":"min-desktop"
+  },
+  {
+      "name": "suppliername",
+      "caption": "Proveedor",
+      "class": "all"
+  },
+  {
+      "name": "agent__name_o_agent__lastname",
+      "caption": "Agente",
+      "class": "all"
+  },
+  {
+      "name": "store__name",
+      "caption": "Store",
+      "class": "all"
+  },
+  {
+      "name": "state__name",
+      "caption": "Status",
+      "class": "all"
+  },
+  {
+      "name": "total",
+      "caption": "Total",
+      "class": "all"
+  }
+]

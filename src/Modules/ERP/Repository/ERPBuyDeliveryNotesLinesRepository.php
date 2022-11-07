@@ -49,13 +49,13 @@ class ERPBuyDeliveryNotesLinesRepository extends ServiceEntityRepository
     */
     // Pone linenum=0 a todas las líneas del pedido indicado
     public function setLinenum($buyorder_id){
-      $query='update erpbuy_delivery_notes_lines set linenum=0 where deliverynote_id='.$buyorder_id;
+      $query='update erpbuy_delivery_notes_lines set linenum=0 where buydeliverynote_id='.$buyorder_id;
       $this->getEntityManager()->getConnection()->executeQuery($query);
       return true;
     }
     // Elimina las líneas con linenum=0 del pedido indicado
     public function deleteLinenum($buyorder_id){
-      $query='delete from erpbuy_delivery_notes_lines where linenum=0 and deliverynote_id='.$buyorder_id;
+      $query='delete from erpbuy_delivery_notes_lines where linenum=0 and buydeliverynote_id='.$buyorder_id;
       $this->getEntityManager()->getConnection()->executeQuery($query);
       return true;
     }

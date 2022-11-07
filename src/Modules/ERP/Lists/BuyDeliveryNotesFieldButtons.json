@@ -1,0 +1,4 @@
+[
+  {"id": "editBuyDeliveryNotes", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"formBuyDeliveryNotes", "actionType" : "foreground", "confirm" :false, "tooltip":""},
+  {"id": "delete", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"genericdelete", "routeParams":{"module":"ERP", "name":"BuyDeliveryNotes"}, "confirm" :true, "undo" :false, "tooltip":"Borrar albarán", "actionType" : "background"}
+]

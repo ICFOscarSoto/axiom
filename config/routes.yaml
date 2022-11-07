@@ -418,3 +418,11 @@ ERPProductsSuppliersDiscountsController:
 GlobaleUsersConfigController:
   resource: 'App\Modules\Globale\Controller\GlobaleUsersConfigController'
   type:      annotation
+
+ERPBuyDeliveryNotesController:
+  resource: 'App\Modules\ERP\Controller\ERPBuyDeliveryNotesController'
+  type:      annotation
+
+ERPInventoryController:
+  resource: 'App\Modules\ERP\Controller\ERPInventoryController'
+  type:      annotation
