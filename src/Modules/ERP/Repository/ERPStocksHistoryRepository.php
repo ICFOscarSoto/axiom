@@ -95,5 +95,15 @@ class ERPStocksHistoryRepository extends ServiceEntityRepository
       return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
     }
 
+    public function getMovements($array_ids)
+    {
+      $query="SELECT productname, productcode, quantity, previousqty, newqty, comment, num_operation, user_id, date(dateadd) as date, type_id
+              	FROM erpstocks_history
+              	WHERE active = 1 AND deleted= 0
+                AND id IN ($array_ids)";
+      $result=$this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
+      return $result;
+    }
+
 
 }

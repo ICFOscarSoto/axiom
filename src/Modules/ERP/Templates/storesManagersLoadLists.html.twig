@@ -6,40 +6,41 @@
 			<thead class="table-thead">
 				<th style="border-bottom: 1px solid #cecece !important;" class="table-header-name table-thead "> Expendedora </th>
 				<th style="border-bottom: 1px solid #cecece !important;" class="table-header-name table-thead "> Fecha </th>
+				<th style="border-bottom: 1px solid #cecece !important;" class="table-header-name table-thead "> Descarga </th>
 				<th style="border-bottom: 1px solid #cecece !important;" class="table-header-name table-thead "> Productos </th>
 			</thead>
-
-		<!-- END MAIN CONTENT -->
-{% for load in  loads %}
-	<tr attr-id="loads-'+valor.id+'" id="'+valor.id+'">
-		<td style="border-bottom: 1px solid #cecece !important;" id="loads_date-'+valor.id+'" value="'+valor.date+'">  {{ load.date }}</td>
-		<td style="border-bottom: 1px solid #cecece !important;" id="loads_machine-'+valor.id+'" value="'+valor.vendingmachine+'"> {{ load.machine }}</td>
-		<td style="border-bottom: 1px solid #cecece !important;" id="products" value="'+valor.date+'">
-			<table id="header-list-products" class="table table-bordered table-responsive-md table-striped text-center" style="display:block; width: 100%">
-			<thead class="table-thead">
-				<td style="border-bottom: 1px solid #cecece !important; width:20%; text-align:left">Código</td>
-				<td style="border-bottom: 1px solid #cecece !important; width:70%; text-align:left">Nombre</td>
-				<td style="border-bottom: 1px solid #cecece !important; width:10%">Cantidad</td>
-				<td style="border-bottom: 1px solid #cecece !important; width:10%">Dispensada</td>
-				<td style="border-bottom: 1px solid #cecece !important; width:10%">Multiplicador</td>
-			</thead>
-			{% for loadrow in  load.loads %}
+					<!-- END MAIN CONTENT -->
+			{% for load in  loads %}
 				<tr attr-id="loads-'+valor.id+'" id="'+valor.id+'">
-					<td style="border-bottom: 1px solid #cecece !important; width:20%; text-align:left">{{ loadrow.productcode }}</td>
-					<td style="border-bottom: 1px solid #cecece !important; width:70%; text-align:left">{{ loadrow.productname }}</td>
-					<td style="border-bottom: 1px solid #cecece !important;">  {{ loadrow.quantity }} </td>
-					<td style="border-bottom: 1px solid #cecece !important;">  {{ loadrow.upload }} </td>
-					<td style="border-bottom: 1px solid #cecece !important;">  {{ loadrow.multiplier }} </td>
+					<td style="border-bottom: 1px solid #cecece !important;" id="loads_date-'{{ load.date }}'" value="'+valor.date+'">  {{ load.date }}</td>
+					<td style="border-bottom: 1px solid #cecece !important;" id="loads_machine-'{{ load.machine }}'" value="'+valor.vendingmachine+'"> {{ load.machine }}</td>
+					<td style="border-bottom: 1px solid #cecece !important;" id="transfer_downloads-'{{ load.date }}'">
+						<input id="button-download-'{{ load.date }}'" name='{{ load.machine }}' attr-id='{{ load.date }}' value="Descargar" type="submit" class="btn btn-green">  </td>
+					<td style="border-bottom: 1px solid #cecece !important;" id="products" value="'+valor.date+'">
+						<table id="header-list-products" class="table table-bordered table-responsive-md table-striped text-center" style="display:block; width: 100%">
+						<thead class="table-thead">
+							<td style="border-bottom: 1px solid #cecece !important; width:20%; text-align:left">Código</td>
+							<td style="border-bottom: 1px solid #cecece !important; width:70%; text-align:left">Nombre</td>
+							<td style="border-bottom: 1px solid #cecece !important; width:10%">Cantidad</td>
+							<td style="border-bottom: 1px solid #cecece !important; width:10%">Dispensada</td>
+							<td style="border-bottom: 1px solid #cecece !important; width:10%">Multiplicador</td>
+						</thead>
+						{% for loadrow in  load.loads %}
+							<tr attr-id="loads-'+valor.id+'" id="'+valor.id+'">
+								<td style="border-bottom: 1px solid #cecece !important; width:20%; text-align:left">{{ loadrow.productcode }}</td>
+								<td style="border-bottom: 1px solid #cecece !important; width:70%; text-align:left">{{ loadrow.productname }}</td>
+								<td style="border-bottom: 1px solid #cecece !important;">  {{ loadrow.quantity }} </td>
+								<td style="border-bottom: 1px solid #cecece !important;">  {{ loadrow.upload }} </td>
+								<td style="border-bottom: 1px solid #cecece !important;">  {{ loadrow.multiplier }} </td>
+							</tr>
+						{% endfor %}
+						</table>
+					</td>
 				</tr>
 			{% endfor %}
-			</table>
-		</td>
-	</tr>
-{% endfor %}
 		</table>
 
-		{% block footer %}
-
+	{% block footer %}
 		<link rel="stylesheet" href="{{ url('index') }}js/datatables/datatables.css">
 		<link rel="stylesheet" href="{{ url('index') }}js/select2/select2-bootstrap.css">
 		<link rel="stylesheet" href="{{ url('index') }}js/select2/select2.css">
@@ -47,7 +48,6 @@
 		<link rel="stylesheet" href="{{ url('index') }}js/ol/ol.css">
 		<link rel="stylesheet" href="{{ url('index') }}js/datetimepicker/bootstrap-datetimepicker.min.css">
 		<link rel="stylesheet" href="{{ url('index') }}js/jodit/jodit.min.css">
-
 		<!-- Imported scripts on this page -->
 		<script src="{{ url('index') }}js/datatables/datatables.js"></script>
 		<script src="{{ url('index') }}js/select2/select2.min.js"></script>
@@ -59,6 +59,12 @@
 		<script src="{{ url('index') }}js/jodit/jodit.min.js"></script>
 		<script src="{{ url('index') }}js/jquery.nestable.js"></script>
 		{{ include('@Globale/bottom.html.twig') }}
-		{% endblock %}
+	{% endblock %}
 
+	<script>
+		$('body').on('click','[id^="button-download-"]', function(){
+			var win = window.open("/api/ERP/downloadLoads/"+$(this).attr('name')+"/"+$(this).attr('attr-id'));
+			win.focus();
+		});
+	</script>
 </body>

@@ -4,12 +4,12 @@
         "caption": "id"
     },
     {
-        "name": "productvariant__product__name",
+        "name": "productname",
         "caption": "product"
     },
     {
-        "name": "productvariant__variant__name",
-        "caption": "variant"
+        "name": "productcode",
+        "caption": "code"
     },
     {
         "name": "location__store__name",
@@ -22,10 +22,6 @@
     {
         "name": "quantity",
         "caption": "quantity"
-    },
-    {
-        "name": "previousqty",
-        "caption": "previousqty"
     },
     {
         "name": "newqty",

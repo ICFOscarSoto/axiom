@@ -138,6 +138,8 @@ class ERPInfoStocksController extends Controller
         if ($stock==NULL) continue;
         $quantity=$stock->getQuantity()-$infoStock["vendido"];
         $stockHistory=new ERPStocksHistory();
+        $stockHistory->setProductcode($productvariant->getProduct()->getCode());
+        $stockHistory->setProductname($productvariant->getProduct()->getName());
         $stockHistory->setProductvariant($productvariant);
         $stockHistory->setLocation($storeLocation);
         $stockHistory->setUser($user);
@@ -161,7 +163,9 @@ class ERPInfoStocksController extends Controller
         $stock=$stockRepository->findOneBy(["storelocation"=>$storeLocation->getId(), "productvariant"=>$productvariant]);
         if ($stock!=null){
         $quantity=$stock->getQuantity()+$object["stock"];
-        $stockHistory=new ERPStocksHistory();
+        $stockHistory=new ERPStocksHistory();        
+        $stockHistory->setProductcode($productvariant->getProduct()->getCode());
+        $stockHistory->setProductname($productvariant->getProduct()->getName());
         $stockHistory->setProductvariant($productvariant);
         $stockHistory->setLocation($storeLocation);
         $stockHistory->setUser($user);

@@ -91,7 +91,7 @@ class ERPStoresManagersController extends Controller
 				["name" => "storesmanagersusers", "caption"=>"Users", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("listStoresManagersUsers",["id"=>$id])],
 				["name" => "storesmanagersconsumers", "caption"=>"Consumidores", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("listStoresManagersConsumers",["id"=>$id])],
 				["name" => "storesmanagersoperationsreports", "caption"=>"Reports", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("storesManagersOperationsReports",["id"=>$id])],
-				["name" => "loadsreports", "caption"=>"Loads", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("storesManagersLoadReports",["id"=>$id])],
+			//	["name" => "loadsreports", "caption"=>"Loads", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("storesManagersLoadReports",["id"=>$id])],
 				["name" => "loadslist", "caption"=>"Loads List", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("storesManagersLoadLists",["id"=>$id])],
 				["name" => "transferlist", "caption"=>"Transfer List", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("storesManagersTransferLists",["id"=>$id])]
 			];
@@ -769,9 +769,9 @@ class ERPStoresManagersController extends Controller
 			$typesRepository=$this->getDoctrine()->getRepository(ERPTypesMovements::class);
 			$type=$typesRepository->findOneBy(["name"=>"Carga expendedora"]);
 			$stockHistory= new ERPStocksHistory();
-
-
 			$productvariant = $repositoryProductVariant->findOneBy(["product"=>$channel->getProduct(),"variant"=>null]);
+			$stockHistory->setProductcode($productvariant->getProduct()->getCode());
+			$stockHistory->setProductname($productvariant->getProduct()->getName());
 			$stockHistory->setProductvariant($productvariant);
 			if ($channel->getVendingmachine()->getStorelocation()!=null) {
 					$stockHistory->setLocation($channel->getVendingmachine()->getStorelocation());
@@ -781,6 +781,7 @@ class ERPStoresManagersController extends Controller
 					$storeLocation=$locationRepository->findOneBy(["name"=>"EXPEND ALM"]);
 					$stockHistory->setLocation($storeLocation);
 			}
+			$stockHistory->setVendingmachinechannel($channel);
 			$stockHistory->setUser($this->getUser());
 			$stockHistory->setCompany($this->getUser()->getCompany());
 			$stockHistory->setPreviousqty($channel->getQuantity());
@@ -804,6 +805,31 @@ class ERPStoresManagersController extends Controller
 			if($channel->getVendingmachine()->getStorelocation()){
 				$stock=$repositoryStocks->findOneBy(["productvariant"=>$productvariant, "storelocation"=>$channel->getVendingmachine()->getStorelocation(), "active"=>1, "deleted"=>0]);
 				if($stock){
+					$stockHistory= new ERPStocksHistory();
+					$productvariant = $repositoryProductVariant->findOneBy(["product"=>$channel->getProduct(),"variant"=>null]);
+	        $stockHistory->setProductcode($productvariant->getProduct()->getCode());
+	        $stockHistory->setProductname($productvariant->getProduct()->getName());
+					$stockHistory->setProductvariant($productvariant);
+					if ($channel->getVendingmachine()->getStorelocation()!=null) {
+							$stockHistory->setLocation($channel->getVendingmachine()->getStorelocation());
+						}
+						else {
+							$locationRepository=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
+							$storeLocation=$locationRepository->findOneBy(["name"=>"EXPEND ALM"]);
+							$stockHistory->setLocation($storeLocation);
+					}
+					$stockHistory->setUser($this->getUser());
+					$stockHistory->setCompany($this->getUser()->getCompany());
+					$stockHistory->setPreviousqty($stock->getQuantity());
+					$stockHistory->setNewqty($stock->getQuantity()-($qty*($channel->getMultiplier()?$channel->getMultiplier():1)));
+					$stockHistory->setType($type);
+					$stockHistory->setQuantity(-($qty*($channel->getMultiplier()?$channel->getMultiplier():1)));
+					$stockHistory->setActive(1);
+					$stockHistory->setDeleted(0);
+					$stockHistory->setDateupd(new \DateTime());
+					$stockHistory->setDateadd(new \DateTime());
+					$this->getDoctrine()->getManager()->persist($stockHistory);
+					$this->getDoctrine()->getManager()->flush();
 					$stock->setQuantity($stock->getQuantity()-($qty*($channel->getMultiplier()?$channel->getMultiplier():1)));
 					$this->getDoctrine()->getManager()->persist($stock);
 					$this->getDoctrine()->getManager()->flush();
@@ -1177,25 +1203,6 @@ class ERPStoresManagersController extends Controller
 	}
 
 	/**
-	 	* @Route("/api/ERP/downloadLoads/{id}/{date}", name="downloadLoads")
-		*/
-	 public function downloadLoads($id, $date, RouterInterface $router,Request $request){
-	  $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-	  $new_item=json_decode($request->getContent());
-		$loadRepository=$this->getDoctrine()->getRepository(ERPStoresManagersVendingMachinesChannels::class);
-		$machineRepository=$this->getDoctrine()->getRepository(ERPStoresManagersVendingMachines::class);
-		$params["rootdir"]= $this->get('kernel')->getRootDir();
-		$params["user"]=$this->getUser();
-		$params["machine"]=$machineRepository->findOneBy(["id"=>$id, "deleted"=>0])->getName();
-		$params["date"]=$date;
-		$params["lines"]=$loadRepository->getLoadsMachineDate($id,$date);
-		$printQRUtils = new ERPPrintQR();
- 		$pdf=$printQRUtils->loadMachine($params);
- 		return new Response("", 200, array('Content-Type' => 'application/pdf'));
-  }
-
-
-	/**
 		* @Route("/{_locale}/erp/storesmanagers/{id}/loadslist", name="storesManagersLoadLists")
 		*/
 	public function storesManagersLoadLists($id,RouterInterface $router,Request $request){
@@ -1241,6 +1248,24 @@ class ERPStoresManagersController extends Controller
 			'loads' => $loads,
 		]);
 	}
+
+		/**
+		 	* @Route("/api/ERP/downloadLoads/{name}/{date}", name="downloadLoads")
+			*/
+		 public function downloadLoads($name, $date, RouterInterface $router,Request $request){
+		  $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		  $new_item=json_decode($request->getContent());
+			$loadRepository=$this->getDoctrine()->getRepository(ERPStoresManagersVendingMachinesChannels::class);
+			$machineRepository=$this->getDoctrine()->getRepository(ERPStoresManagersVendingMachines::class);
+			$params["rootdir"]= $this->get('kernel')->getRootDir();
+			$params["user"]=$this->getUser();
+			$params["machine"]=$name;
+			$params["date"]=$date;
+			$params["lines"]=$loadRepository->getLoadsMachineDate($machineRepository->findOneBy(["name"=>$name, "deleted"=>0])->getId(),$date);
+			$printQRUtils = new ERPPrintQR();
+	 		$pdf=$printQRUtils->loadMachine($params);
+	 		return new Response("", 200, array('Content-Type' => 'application/pdf'));
+	  }
 
 	/**
 		* @Route("/api/ERP/storesmanagers/{id}/transferLists", name="storesManagersTransferLists")

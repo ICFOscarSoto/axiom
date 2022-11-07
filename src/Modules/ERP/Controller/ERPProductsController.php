@@ -838,6 +838,8 @@ class ERPProductsController extends Controller
 			 			 	$stock->setStorelocation($storedstlocation);
 
 							$StockHistory= new ERPStocksHistory();
+			        $StockHistory->setProductcode($productvariant->getProduct()->getCode());
+			        $StockHistory->setProductname($productvariant->getProduct()->getName());
 							$StockHistory->setProductVariant($productvariant);
 							$StockHistory->setLocation($storelocation);
 							$StockHistory->setUser($this->getUser());
@@ -879,8 +881,9 @@ class ERPProductsController extends Controller
 					if($stock->getQuantity()-$qty==0){
 						$stockdst->setDateupd(new \DateTime);
 						$stockdst->setQuantity($stockdst->getQuantity()+$qty);
-
 						$StockHistory= new ERPStocksHistory();
+		        $StockHistory->setProductcode($productvariant->getProduct()->getCode());
+		        $StockHistory->setProductname($productvariant->getProduct()->getName());
 						$StockHistory->setProductVariant($productvariant);
 						$StockHistory->setLocation($storelocation);
 						$StockHistory->setUser($this->getUser());
@@ -1216,6 +1219,8 @@ class ERPProductsController extends Controller
 				 $typesRepository=$this->getDoctrine()->getRepository(ERPTypesMovements::class);
 				 $type=$typesRepository->findOneBy(["name"=>"Traspaso recibido"]);
 				 $stockHistory=new ERPStocksHistory();
+         $stockHistory->setProductcode($productvariant->getProduct()->getCode());
+         $stockHistory->setProductname($productvariant->getProduct()->getName());
 				 $stockHistory->setProductVariant($productvariant);
          $stockHistory->setLocation($storeLocation);
          $stockHistory->setUser($this->getUser());
