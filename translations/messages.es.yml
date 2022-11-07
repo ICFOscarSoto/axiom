@@ -635,6 +635,8 @@ Budgets: Presupuestos
 Orders: Pedidos
 SalesOrders: Pedidos
 DeliveryNotes: Albaranes
+BuyOrders: Pedidos compra
+BuyDeliveryNotes: Albaranes compra
 SalesDeliveryNotes: Albaranes
 Signed delivery notes fails: Fallos en albaranes firmados
 Invoices: Facturas
