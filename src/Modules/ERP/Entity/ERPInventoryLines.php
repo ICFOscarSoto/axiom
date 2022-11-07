@@ -3,6 +3,7 @@
 namespace App\Modules\ERP\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use \App\Modules\Globale\Entity\GlobaleUsers;
 use \App\Modules\ERP\Entity\ERPInventory;
 use \App\Modules\ERP\Entity\ERPProductsVariants;
 use \App\Modules\ERP\Entity\ERPStoreLocations;
