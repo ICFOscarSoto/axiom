@@ -48,4 +48,14 @@ class ERPInventoryRepository extends ServiceEntityRepository
         ;
     }
     */
+
+    public function getInventoryByStore($store_id){
+      $query='SELECT id
+              FROM erpinventory
+              WHERE store_id=:store_id AND dateend is null AND active=1 AND deleted=0';
+      $params=['store_id' => $store_id];
+      $id = $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchColumn(0);
+      return $id;
+    }
+
 }

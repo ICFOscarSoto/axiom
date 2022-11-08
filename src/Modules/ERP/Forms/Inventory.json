@@ -1,0 +1,33 @@
+[{
+    "sections": [
+        {
+            "name": "data",
+            "fields": [
+                {
+                    "name": "observation",
+                    "cols": 4
+                },
+                {
+                    "name": "datebegin",
+                    "cols": 4
+                },
+                {
+                    "name": "dateend",
+                    "cols": 4
+                },
+                {
+                    "name": "active",
+                    "cols": 4
+                },
+                {
+                    "name": "author",
+                    "cols": 4
+                },
+                {
+                    "name": "store",
+                    "cols": 4
+                }
+            ]
+        }
+    ]
+}]
