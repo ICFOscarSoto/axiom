@@ -1,5 +1,5 @@
 [
-  {"id": "editInventory", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"genericdata", "routeParams":{"module":"ERP", "name":"Inventory", "type":"modal" }, "modal":"Inventory", "actionType" : "background", "confirm" :false, "tooltip":""},
+  {"id": "editInventory", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"formERPInventory", "actionType" : "foreground", "confirm" :false},
   {"id": "activation", "type": "option", "options": [
       {"id": "desactivateInventory", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"genericdisable", "routeParams":{"module":"ERP", "name":"Inventory"}, "confirm" :true, "actionType" : "background", "tooltip":"" },
       {"id": "activateInventory", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "route":"genericenable", "routeParams":{"module":"ERP", "name":"Inventory"}, "confirm" :true, "actionType" : "background", "tooltip":"" }
