@@ -1,0 +1,8 @@
+[
+  {"id": "editInventory", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"formERPInventory", "actionType" : "foreground", "confirm" :false},
+  {"id": "activation", "type": "option", "options": [
+      {"id": "desactivateInventory", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"genericdisable", "routeParams":{"module":"ERP", "name":"Inventory"}, "confirm" :true, "actionType" : "background", "tooltip":"" },
+      {"id": "activateInventory", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "route":"genericenable", "routeParams":{"module":"ERP", "name":"Inventory"}, "confirm" :true, "actionType" : "background", "tooltip":"" }
+  ]},
+  {"id": "deleteInventory", "type" : "danger", "icon" : "fa fa-trash","name" : "borrar", "route":"genericdelete", "routeParams":{"module":"ERP", "name":"Inventory"}, "confirm" :true, "undo" :false, "actionType" : "background", "tooltip":""}
+]

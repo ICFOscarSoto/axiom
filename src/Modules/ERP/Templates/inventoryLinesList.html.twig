@@ -1,0 +1,76 @@
+{% set params = app.request.attributes.get('_route_params')|merge(app.request.query.all()) %}
+{% block header %}
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<meta name="description" content="Axiom Business Management" />
+	<meta name="author" content="" />
+	{{ include('@Globale/header.html.twig') }}
+	<!-- Imported styles on this page -->
+	<link rel="stylesheet" href="{{ url('index') }}/js/jvectormap/jquery-jvectormap-1.2.2.css">
+	<link rel="stylesheet" href="{{ url('index') }}/js/rickshaw/rickshaw.min.css">
+{% endblock %}
+<title>{% block title %}{{ interfaceName }}{% endblock %}</title>
+<body class="page-body" data-url="{{ url('indexAdmin') }}">
+<div class="page-container {% if userData.interfaceConfig.collapsedSidebar is defined and userData.interfaceConfig.collapsedSidebar %}sidebar-collapsed{% endif %}"><!-- add class "sidebar-collapsed" to close sidebar by default, "chat-visible" to make chat appear always -->
+	{{ include('@Globale/sidebar_menu.html.twig') }}
+	<div class="main-content">
+		{{ include('@Globale/head.html.twig') }}
+		<hr />
+		{{ include('@Globale/breadcrumb.html.twig') }}
+		<!-- MAIN CONTENT -->
+		<div class="principal-content">
+      <ul id="tabs-list" class="nav nav-tabs bordered" style="margin-top:0px!important">
+  	    <li class="active" id="tab-head-data" style="" attr-id="" attr-name="data">
+  	        <a href="#tab-body-data" id="atab-head-data" data-toggle="tab">
+  	            <span class="visible-xs"><i class="fa fa-id-card" aria-hidden="true"></i></span>
+  	            <span class="hidden-xs">Inventario {{inventory.id}} </span>
+  	        </a>
+  	    </li>
+      </ul>
+      <div class="col-md-1">
+        <label for="buyorder-form-coderevision">Almacén:</label>
+        <div class="form-group">
+          <input type="text" readonly="readonly" id="inventory-form-store" {% if (inventory.store!=null) %}
+          value="{{inventory.store.name}}" {% else %}  value="" {% endif %}  disabled="disabled" class="form-control bold" placeholder="Código..."/>
+        </div>
+      </div>
+    </div>
+		<!-- END MAIN CONTENT -->
+		{{ include('@Globale/footer.html.twig') }}
+	</div>
+	{{ include('@Globale/chat.html.twig') }}
+	<!-- Chat Histories -->
+	{{ include('@Globale/chat_histories.html.twig') }}
+</div>
+	<!-- MODALS  -->
+	{% if forms is defined %}
+		{% for form in forms %}
+		  {% set formConstructor = form %}
+			{{ include('@Globale/genericajaxform.html.twig') }}
+		{% endfor %}
+	{% endif %}
+
+	<!-- END MODALS -->
+{# MODAL LOCATIONS #}
+{{ include("@Globale/location.html.twig") }}
+{% block footer %}
+
+	<link rel="stylesheet" href="{{ url('index') }}js/datatables/datatables.css">
+	<link rel="stylesheet" href="{{ url('index') }}js/select2/select2-bootstrap.css">
+	<link rel="stylesheet" href="{{ url('index') }}js/select2/select2.css">
+	<link rel="stylesheet" href="{{ url('index') }}css/custom.css">
+	<link rel="stylesheet" href="{{ url('index') }}js/ol/ol.css">
+	<link rel="stylesheet" href="{{ url('index') }}js/jodit/jodit.min.css">
+
+	<!-- Imported scripts on this page -->
+	<script src="{{ url('index') }}js/datatables/datatables.js"></script>
+	<script src="{{ url('index') }}js/select2/select2.min.js"></script>
+	<script src="{{ url('index') }}js/moment.min.js"></script>
+	<script src="{{ url('index') }}js/moment-es.js"></script>
+	<script src="{{ url('index') }}js/moment-duration-format.min.js"></script>
+	<script src="{{ url('index') }}js/ol/ol.js"></script>
+	<script src="{{ url('index') }}js/jodit/jodit.min.js"></script>
+	 {{ include('@Globale/bottom.html.twig') }}
+{% endblock %}
+</body>

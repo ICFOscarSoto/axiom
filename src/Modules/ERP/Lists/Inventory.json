@@ -1,0 +1,42 @@
+[
+    {
+        "name": "id",
+        "caption": "id"
+    },
+    {
+        "name": "observation",
+        "caption": "observation"
+    },
+    {
+        "name": "datebegin",
+        "caption": "datebegin"
+    },
+    {
+        "name": "dateend",
+        "caption": "dateend"
+    },
+    {
+        "name": "author__name_o_author__lastname",
+        "caption": "author"
+    },
+    {
+        "name": "store__name",
+        "caption": "store"
+    },
+    {
+        "name": "active",
+        "caption": "Estado",
+        "width": "10%",
+        "class": "dt-center",
+        "replace": {
+            "1": {
+                "text": "Activo",
+                "html": "<div style=\"min-width: 75px;\" class=\"label label-success\">Activo<\/div>"
+            },
+            "0": {
+                "text": "Desactivado",
+                "html": "<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado<\/div>"
+            }
+        }
+    }
+]
