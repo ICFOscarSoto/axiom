@@ -21,12 +21,6 @@ class ERPInventoryLocation
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCompanies")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $company;
-
-    /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleUsers")
      * @ORM\JoinColumn(nullable=false)
      */
@@ -78,18 +72,6 @@ class ERPInventoryLocation
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getCompany(): ?GlobaleCompanies
-    {
-        return $this->company;
-    }
-
-    public function setCompany(?GlobaleCompanies $company): self
-    {
-        $this->company = $company;
-
-        return $this;
     }
 
     public function getAuthor(): ?GlobaleUsers
