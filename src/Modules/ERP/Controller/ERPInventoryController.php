@@ -32,7 +32,7 @@ class ERPInventoryController extends Controller
 		private $utilsClass=ERPInventoryUtils::class;
 
 	/**
-	  * @Route("/api/inventory/{action}/{id}", name="inventory", defaults={"action"="info","id"=0})
+	  * @Route("/api/inventory/{action}/{id}", name="inventoryws", defaults={"action"="info","id"=0})
    */
   public function inventory($action, $id, RouterInterface $router,Request $request){
     $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
