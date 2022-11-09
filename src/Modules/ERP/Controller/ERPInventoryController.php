@@ -21,6 +21,7 @@ use App\Modules\ERP\Entity\ERPInventoryLines;
 use App\Modules\ERP\Entity\ERPInventoryLocation;
 use App\Modules\ERP\Entity\ERPStores;
 use App\Modules\ERP\Entity\ERPStoreLocations;
+use App\Modules\ERP\Entity\ERPProductsVariants;
 use App\Modules\ERP\Entity\ERPStocks;
 use App\Modules\ERP\Entity\ERPStocksHistory;
 use App\Modules\Security\Utils\SecurityUtils;
@@ -56,6 +57,7 @@ class ERPInventoryController extends Controller
 		$erpInventoryLocationRepository= $this->getDoctrine()->getRepository(ERPInventoryLocation::class);
 		$erpStoresRepository				= $this->getDoctrine()->getRepository(ERPStores::class);
 		$erpStoreLocationsRepository= $this->getDoctrine()->getRepository(ERPStoreLocations::class);
+		$erpProductsVariantsRepository= $this->getDoctrine()->getRepository(ERPProductsVariants::class);
 		$globaleCompaniesRepository	= $this->getDoctrine()->getRepository(GlobaleCompanies::class);
 		$globaleUsersRepository			= $this->getDoctrine()->getRepository(GlobaleUsers::class);
 
@@ -177,10 +179,11 @@ class ERPInventoryController extends Controller
 			case 'locations':
 				// Parámetros adicionales
 				$location_id 	= $request->request->get('location_id');
+				$location_name= $request->request->get('location_name');
 				$oinventory		= $erpInventoryRepository->findOneBy(["id"=>$id, "deleted"=>0]);
 				if ($oinventory!=null){
 					// Todas
-					if ($location_id==null){
+					if ($location_id==null && $location_name==null){
 						$oinventorylocation		= $erpInventoryLocationRepository->findBy(["inventory"=>$oinventory, "active"=>1, "deleted"=>0],['dateadd' => 'ASC']);
 						$return['result'] = 1;
 						$return['data'] 	= [];
@@ -192,7 +195,11 @@ class ERPInventoryController extends Controller
 					// Comprueba si la ubicación es válida para este inventario sino -1 y mensaje
 					// Si es válida pero no esta la base de datos de inventarios/ubicaciones se pone 1 pero data vacio
 					// Si existe se devuelve en data
-						$ostorelocation			= $erpStoreLocationsRepository->findOneBy(["id"=>$location_id, "deleted"=>0]);
+						$ostorelocation = null;
+						if ($location_id)
+							$ostorelocation			= $erpStoreLocationsRepository->findOneBy(["id"=>$location_id, "deleted"=>0]);
+						else
+							$ostorelocation			= $erpStoreLocationsRepository->findOneBy(["store"=>$oinventory->getStore(), "name"=>$location_name, "deleted"=>0]);
 						if ($ostorelocation){
 							// Comprobar si es una ubicación válida para este inventario
 							if ($ostorelocation->getStore()->getId()==$id){
@@ -211,6 +218,62 @@ class ERPInventoryController extends Controller
 					$return = ["result"=>-1, "text"=>'Inventario - Identificador no válido'];
 				break;
 
+			// add -> Para el identificador de inventario pasado como argumento
+			//				suma o actualiza una línea de producto dentro del inventario
+			// 				Si la ubicación no se ha abierto para este inventario se abre
+			case 'add':
+				// Parámetros adicionales obligatorios
+				// Modo de inserción:
+				// -  increment - Si no existe línea para este inventario/ubicación/producto se crea sino se suman las cantidades a las que hubiera
+				// -  new - Tnato si existe, como sino, la línea para este inventario/ubicación/producto se crea
+				$mode					= $request->request->get('mode');
+				$location_id 	= $request->request->get('location_id');
+				$productvariant_id 	= $request->request->get('productvariant_id');
+				$quantityconfirmed 	= $request->request->get('quantityconfirmed');
+				$oinventory		= $erpInventoryRepository->findOneBy(["id"=>$id, "deleted"=>0]);
+				if ($mode && ($mode=='increment'||$mode=='new')){
+					if ($oinventory!=null){
+						// Comprueba si la ubicación es válida para este inventario sino -1 y mensaje
+						// Si es válida pero no esta la base de datos de inventarios/ubicaciones se pone 1 pero data vacio
+						// Si existe se devuelve en data
+						$ostorelocation			= $erpStoreLocationsRepository->findOneBy(["id"=>$location_id, "deleted"=>0]);
+						if ($ostorelocation){
+							// Comprobar si es una ubicación válida para este inventario
+							if ($ostorelocation->getStore()->getId()==$id){
+								// Comprobar que el product y variante existen
+								$oproductvariant = $erpProductsVariantsRepository->findOneBy(["id"=>$productvariant_id, "deleted"=>0]);
+								if ($oproductvariant){
+									if ($quantityconfirmed && ctype_digit(strval($quantityconfirmed)) && intval($quantityconfirmed)>=0){
+										// Se comprueba si existe ubicación dada de alta para este inventario
+										$oinventorylocation		= $erpInventoryLocationRepository->findOneBy(["inventory"=>$oinventory, "location"=>$ostorelocation, "active"=>1, "deleted"=>0],['dateadd' => 'ASC']);
+										if ($oinventorylocation==null){
+											$oinventorylocation = new ERPInventoryLocation();
+											$oauthor 						= $globaleUsersRepository->find($author_id);
+											$oinventorylocation->setAuthor($oauthor);
+											$oinventorylocation->setInventory($oinventory);
+											$oinventorylocation->setLocation($ostorelocation);
+											$oinventorylocation->setDatebegin(new \DateTime());
+											$oinventorylocation->setActive(1);
+											$oinventorylocation->setDeleted(0);
+											$oinventorylocation->setDateadd(new \DateTime());
+											$oinventorylocation->setDateupd(new \DateTime());
+											$this->getDoctrine()->getManager()->persist($oinventorylocation);
+										}
+
+										$this->getDoctrine()->getManager()->flush();
+									}else
+										$return = ["result"=>-1, "text"=>'Inventario - Cantidad de producto no válida'];
+								}else
+									$return = ["result"=>-1, "text"=>'Inventario - Producto o variante no válida'];
+							}else
+								$return = ["result"=>-1, "text"=>'Inventario - Ubicación no válida para el inventario'];
+						}else
+							$return = ["result"=>-1, "text"=>'Inventario - Ubicación - Identificador no válido'];
+					}else
+						$return = ["result"=>-1, "text"=>'Inventario - Identificador no válido'];
+				}else
+					$return = ["result"=>-1, "text"=>'Inventario - Modo de registro de línea de producto no indicado: increment o new'];
+				break;
 			// Acción no válida
 			default:
 				$return = ["result"=>-1, "text"=>'Inventario - Acción no válida'];
