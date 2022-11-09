@@ -1,0 +1,26 @@
+[
+    {
+        "name": "id",
+        "caption": "id"
+    },
+    {
+        "name": "productvariant__product__name",
+        "caption": "productvariant"
+    },
+    {
+        "name": "quantityconfirmed",
+        "caption": "quantityconfirmed"
+    },
+    {
+        "name": "stockold",
+        "caption": "stockold"
+    },
+    {
+        "name": "author__name_o_author__lastname",
+        "caption": "author"
+    },
+    {
+        "name": "location__name",
+        "caption": "location"
+    }
+]

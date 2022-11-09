@@ -1,0 +1,37 @@
+[{
+    "sections": [
+        {
+            "name": "data",
+            "fields": [
+                {
+                    "name": "quantityconfirmed",
+                    "cols": 4
+                },
+                {
+                    "name": "stockold",
+                    "cols": 4
+                },
+                {
+                    "name": "active",
+                    "cols": 4
+                },
+                {
+                    "name": "inventory",
+                    "cols": 4
+                },
+                {
+                    "name": "productvariant",
+                    "cols": 4
+                },
+                {
+                    "name": "location",
+                    "cols": 4
+                },
+                {
+                    "name": "author",
+                    "cols": 4
+                }
+            ]
+        }
+    ]
+}]
