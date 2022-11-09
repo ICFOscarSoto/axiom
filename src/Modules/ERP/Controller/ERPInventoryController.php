@@ -18,6 +18,7 @@ use App\Modules\ERP\Entity\ERPInventory;
 use App\Modules\ERP\Entity\ERPInventoryLines;
 use App\Modules\ERP\Entity\ERPInventoryLocation;
 use App\Modules\ERP\Entity\ERPStores;
+use App\Modules\ERP\Entity\ERPStoreLocations;
 use App\Modules\ERP\Entity\ERPStocks;
 use App\Modules\ERP\Entity\ERPStocksHistory;
 
@@ -46,10 +47,12 @@ class ERPInventoryController extends Controller
 		$company_id			= $this->getUser()->getCompany();
 
 		// Repositorios ------------------------------------
-		$erpInventoryRepository=$this->getDoctrine()->getRepository(ERPInventory::class);
-		$erpStoresRepository=$this->getDoctrine()->getRepository(ERPStores::class);
-		$globaleCompaniesRepository=$this->getDoctrine()->getRepository(GlobaleCompanies::class);
-		$globaleUsersRepository=$this->getDoctrine()->getRepository(GlobaleUsers::class);
+		$erpInventoryRepository			= $this->getDoctrine()->getRepository(ERPInventory::class);
+		$erpInventoryLinesRepository= $this->getDoctrine()->getRepository(ERPInventoryLines::class);
+		$erpStoresRepository				= $this->getDoctrine()->getRepository(ERPStores::class);
+		$erpStoreLocationsRepository= $this->getDoctrine()->getRepository(ERPStoreLocations::class);
+		$globaleCompaniesRepository	= $this->getDoctrine()->getRepository(GlobaleCompanies::class);
+		$globaleUsersRepository			= $this->getDoctrine()->getRepository(GlobaleUsers::class);
 
 		// Acciones ----------------------------------------
 		$return = [];
@@ -130,6 +133,39 @@ class ERPInventoryController extends Controller
 				$return['text'] 	= "Inventario - Todos los Inventarios";
 				break;
 
+			// lines -> Para el identificador de inventario pasado como argumento
+			//					obtiene los productos
+			case 'lines':
+				// Parámetros adicionales
+				$location_id 	= $request->request->get('location_id');
+				$oinventory		= $erpInventoryRepository->findOneBy(["id"=>$id, "deleted"=>0]);
+				if ($oinventory!=null){
+					// Todos
+					if ($location_id==null){
+						$oinventorylines		= $erpInventoryLinesRepository->findBy(["inventory"=>$oinventory, "active"=>1, "deleted"=>0],['dateadd' => 'ASC']);
+						$return['result'] = 1;
+						$return['data'] 	= [];
+						foreach ($oinventorylines as $key => $value) {
+							array_push($return['data'],$this->getInventoryLinesResult($value));
+						}
+						$return['text'] 	= "Inventario - Ubicación - Todos los productos";
+					}else{
+						$ostorelocation			= $erpStoreLocationsRepository->findOneBy(["id"=>$location_id, "deleted"=>0]);
+						if ($ostorelocation){
+							$oinventorylines		= $erpInventoryLinesRepository->findBy(["inventory"=>$oinventory, "location"=>$ostorelocation, "active"=>1, "deleted"=>0],['dateadd' => 'ASC']);
+							$return['result'] = 1;
+							$return['data'] 	= [];
+							foreach ($oinventorylines as $key => $value) {
+								array_push($return['data'],$this->getInventoryLinesResult($value));
+							}
+							$return['text'] 	= "Inventario - Ubicación - Productos de la ubicación: ".$ostorelocation->getName();
+						}else
+							$return = ["result"=>-1, "text"=>'Inventario - Ubicación - Identificador no válido'];
+					}
+				}else
+					$return = ["result"=>-1, "text"=>'Inventario - Identificador no válido'];
+				break;
+
 			// Acción no válida
 			default:
 				$return = ["result"=>-1, "text"=>'Inventario - Acción no válida'];
@@ -157,6 +193,29 @@ class ERPInventoryController extends Controller
 		$return['deleted'] = $oinventory->getDeleted();
 		$return['dateadd'] = ($oinventory->getDateadd()!=null?date_format($oinventory->getDateadd(), "Y/m/d H:i:s"):'');
 		$return['dateupd'] = ($oinventory->getDateupd()!=null?date_format($oinventory->getDateupd(), "Y/m/d H:i:s"):'');
+		return $return;
+	}
+
+	private function getInventoryLinesResult(ERPInventoryLines $oinventorylines){
+		$return = [];
+		$return['id'] = $oinventorylines->getId();
+		$return['inventory_id'] = $oinventorylines->getInventory()->getId();
+		$return['inventory_name'] = $oinventorylines->getInventory()->getObservation();
+		$return['location_id'] = $oinventorylines->getLocation()->getId();
+		$return['location_name'] = $oinventorylines->getLocation()->getName();
+		$return['author_id'] = $oinventorylines->getAuthor()->getId();
+		$return['author_name'] = $oinventorylines->getAuthor()->getName().' '.$oinventorylines->getAuthor()->getLastname();
+		$return['productvariant_id'] = $oinventorylines->getProductvariant()->getId();
+		$return['product_id'] = $oinventorylines->getProductvariant()->getProduct()->getId();
+		$return['product_name'] = $oinventorylines->getProductvariant()->getProduct()->getName();
+		$return['variant_id'] = ($oinventorylines->getProductvariant()->getVariant()?$oinventorylines->getProductvariant()->getVariant()->getId():'');
+		$return['variant_name'] = ($oinventorylines->getProductvariant()->getVariant()?$oinventorylines->getProductvariant()->getVariant()->getName():'');
+		$return['quantityconfirmed'] = $oinventorylines->getQuantityconfirmed();
+		$return['stockold'] = $oinventorylines->getStockold();
+		$return['active'] = $oinventorylines->getActive();
+		$return['deleted'] = $oinventorylines->getDeleted();
+		$return['dateadd'] = ($oinventorylines->getDateadd()!=null?date_format($oinventorylines->getDateadd(), "Y/m/d H:i:s"):'');
+		$return['dateupd'] = ($oinventorylines->getDateupd()!=null?date_format($oinventorylines->getDateupd(), "Y/m/d H:i:s"):'');
 		return $return;
 	}
 }
