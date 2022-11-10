@@ -293,7 +293,8 @@ class ERPInventoryController extends Controller
 
 					if ($ostorelocation){
 						// Comprobar si es una ubicación válida para este inventario
-						if ($ostorelocation->getStore()->getId()==$id){
+						// CORREGIDO if ($ostorelocation->getStore()->getId()==$id){
+						if ($ostorelocation->getStore()->getId()==$oinventory->getStore()->getId()){
 							// Se comprueba si existe ubicación dada de alta para este inventario
 							$oinventorylocation		= $erpInventoryLocationRepository->findOneBy(["inventory"=>$oinventory, "location"=>$ostorelocation, "active"=>1, "deleted"=>0]);
 							if ($oinventorylocation==null){
