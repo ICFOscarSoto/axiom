@@ -47,4 +47,15 @@ class ERPInventoryLinesRepository extends ServiceEntityRepository
         ;
     }
     */
+
+    public function getInventoryLinesGroup($inventory_id, $storelocation_id){
+      $query="SELECT il.productvariant_id as productvariant_id, sum(il.quantityconfirmed) as quantityconfirmed, sum(if(il.stockold,il.stockold,0)) as stockold
+              FROM erpinventory_lines il
+              WHERE il.inventory_id=:inventory and il.location_id=:storelocation and il.active=1 and il.deleted=0
+              GROUP BY il.productvariant_id
+              ORDER BY productvariant_id";
+      $params=['inventory' => $inventory_id, 'storelocation' => $storelocation_id];
+      $result=$this->getEntityManager()->getConnection()->executeQuery($query,$params)->fetchAll();
+      return $result;
+    }
 }

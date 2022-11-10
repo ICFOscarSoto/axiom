@@ -312,4 +312,17 @@ class ERPStocksRepository extends ServiceEntityRepository
       $result=$this->getEntityManager()->getConnection()->executeQuery($query,$params)->fetchAll();
       return $result;
     }
+
+    public function getProductByLocation($storelocation_id){
+      $query="SELECT s.id as stock_id, if(s.quantity,s.quantity,0) as quantity, s.productvariant_id as productvariant_id, concat(p.name,if(v.name,concat(' - ',v.name),'')) as productvariant_name
+              FROM erpstocks s LEFT JOIN
+              erpproducts_variants pv ON pv.id=s.productvariant_id LEFT JOIN
+              erpproducts p ON p.id=pv.product_id LEFT JOIN
+              erpvariants v ON v.id=pv.variant_id
+              WHERE s.storelocation_id=:storelocation and s.active=1 and s.deleted=0
+              ORDER BY productvariant_name";
+      $params=['storelocation' => $storelocation_id];
+      $result=$this->getEntityManager()->getConnection()->executeQuery($query,$params)->fetchAll();
+      return $result;
+    }
 }

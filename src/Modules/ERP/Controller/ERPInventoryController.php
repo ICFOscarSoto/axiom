@@ -146,10 +146,11 @@ class ERPInventoryController extends Controller
 			case 'lines':
 				// Parámetros adicionales
 				$location_id 	= $request->request->get('location_id');
+				$location_name= $request->request->get('location_name');
 				$oinventory		= $erpInventoryRepository->findOneBy(["id"=>$id, "deleted"=>0]);
 				if ($oinventory!=null){
 					// Todos
-					if ($location_id==null){
+					if ($location_id==null && $location_name==null){
 						$oinventorylines		= $erpInventoryLinesRepository->findBy(["inventory"=>$oinventory, "active"=>1, "deleted"=>0],['dateadd' => 'ASC']);
 						$return['result'] = 1;
 						$return['data'] 	= [];
@@ -159,7 +160,11 @@ class ERPInventoryController extends Controller
 						$return['text'] 	= "Inventario - Todos los productos";
 					}else{
 					// De una ubicación
-						$ostorelocation			= $erpStoreLocationsRepository->findOneBy(["id"=>$location_id, "deleted"=>0]);
+						$ostorelocation = null;
+						if ($location_id)
+							$ostorelocation			= $erpStoreLocationsRepository->findOneBy(["id"=>$location_id, "deleted"=>0]);
+						else
+							$ostorelocation			= $erpStoreLocationsRepository->findOneBy(["store"=>$oinventory->getStore(), "name"=>$location_name, "deleted"=>0]);
 						if ($ostorelocation){
 							$oinventorylines		= $erpInventoryLinesRepository->findBy(["inventory"=>$oinventory, "location"=>$ostorelocation, "active"=>1, "deleted"=>0],['dateadd' => 'ASC']);
 							$return['result'] = 1;
@@ -171,6 +176,45 @@ class ERPInventoryController extends Controller
 						}else
 							$return = ["result"=>-1, "text"=>'Inventario - Ubicación - Identificador no válido'];
 					}
+				}else
+					$return = ["result"=>-1, "text"=>'Inventario - Identificador no válido'];
+				break;
+
+			// nolines -> Para el identificador de inventario pasado como argumento
+			//					obtiene los productos que no se han inventariado pero que existian en stock
+			//					para la ubicación pasada
+			case 'nolines':
+				// Parámetros adicionales
+				$location_id 	= $request->request->get('location_id');
+				$location_name= $request->request->get('location_name');
+				$oinventory		= $erpInventoryRepository->findOneBy(["id"=>$id, "deleted"=>0]);
+				if ($oinventory!=null){
+					if ($location_id)
+						$ostorelocation			= $erpStoreLocationsRepository->findOneBy(["id"=>$location_id, "deleted"=>0]);
+					else
+						$ostorelocation			= $erpStoreLocationsRepository->findOneBy(["store"=>$oinventory->getStore(), "name"=>$location_name, "deleted"=>0]);
+					if ($ostorelocation){
+						// Todos los productos definidos para la ubicación en stock
+						$ostocks					= $erpStocksRepository->getProductByLocation($ostorelocation->getId());
+						// Todos los productos inventariados de la ubicación
+						$oinventorylines	= $erpInventoryLinesRepository->getInventoryLinesGroup($oinventory->getId(), $ostorelocation->getId());
+
+						$anolines = [];
+						foreach($ostocks as $key=>$ostock){
+							$existsline = false;
+							for($i=0; $i<count($oinventorylines) && !$existsline; $i++){
+								if ($ostock['productvariant_id']==$oinventorylines[$i]['productvariant_id'])
+									$existsline=true;
+							}
+							if (!$existsline)
+								array_push($anolines, $ostock);
+						}
+
+						$return['result'] = 1;
+						$return['data'] 	= $anolines;
+						$return['text'] 	= "Inventario - Ubicación - Líneas en stock no inventariadas";
+					}else
+						$return = ["result"=>-1, "text"=>'Inventario - Ubicación no válida'];
 				}else
 					$return = ["result"=>-1, "text"=>'Inventario - Identificador no válido'];
 				break;
@@ -318,6 +362,75 @@ class ERPInventoryController extends Controller
 				}else
 					$return = ["result"=>-1, "text"=>'Inventario - Identificador no válido'];
 				break;
+
+
+			// close -> Para el identificador de inventario pasado como argumento
+			//				Cierra una ubicación de un inventario, si se ha indicado, o todas las ubicaciones abiertas si no se especifica
+			// 				El cierre de uan ubicación actualiza el stock con todas las líneas de producto invnetariadas y
+			//				los pone a 0 a los demás productos de la ubicación
+			//				Se guardan todos los movimientos en el stockhistory
+			case 'close':
+				// Parámetros adicionales opcionales
+				$location_id 				= $request->request->get('location_id');
+				$location_name 			= $request->request->get('location_name'); // Una de las 2
+
+				$oinventory		= $erpInventoryRepository->findOneBy(["id"=>$id, "dateend"=>null, "deleted"=>0]);
+				if ($oinventory!=null){
+					// Comprueba si la ubicación es válida para este inventario sino -1 y mensaje
+					// Si es válida pero no esta la base de datos de inventarios/ubicaciones se pone 1 pero data vacio
+					// Si existe se devuelve en data
+					$ostorelocation				= null;
+					$oinventorylocations	= [];
+					if ($location_id)
+						$ostorelocation			= $erpStoreLocationsRepository->findOneBy(["id"=>$location_id, "deleted"=>0]);
+					else
+					if ($location_name)
+						$ostorelocation			= $erpStoreLocationsRepository->findOneBy(["store"=>$oinventory->getStore(), "name"=>$location_name, "deleted"=>0]);
+
+					if ($ostorelocation)
+						$oinventorylocations		= $erpInventoryLocationRepository->findBy(["inventory"=>$oinventory, "dateend"=>null, "location"=>$ostorelocation, "active"=>1, "deleted"=>0]);
+					else
+					if ($location_id==null && $location_name==null)
+						$oinventorylocations		= $erpInventoryLocationRepository->findBy(["inventory"=>$oinventory, "dateend"=>null, "active"=>1, "deleted"=>0]);
+
+					if (is_array($oinventorylocations)){
+						foreach($oinventorylocations as $key=>$value){
+							$oslocation = $value->getLocation();
+							// Todos los productos definidos para la ubicación en stock
+							$ostocks					= $erpStocksRepository->getProductByLocation($oslocation->getId());
+							// Todos los productos inventariados de la ubicación
+							$oinventorylines	= $erpInventoryLinesRepository->getInventoryLinesGroup($oinventory->getId(), $ostorelocation->getId());
+
+							$anolines = [];
+							foreach($ostocks as $key=>$ostock){
+								$existsline = false;
+								for($i=0; $i<count($oinventorylines) && !$existsline; $i++){
+									if ($ostock['productvariant_id']==$oinventorylines[$i]['productvariant_id'])
+										$existsline=true;
+								}
+								if (!$existsline)
+									array_push($anolines, $ostock);
+							}
+
+						}
+					}
+
+					// Cierre del inventario
+/*					if ($location_id==null && $location_name==null){
+						$oinventory->setDateend(new \DateTime());
+						$oinventory->setDateupd(new \DateTime());
+						$this->getDoctrine()->getManager()->persist($oinventory);
+						$this->getDoctrine()->getManager()->flush();
+						$return = ["result"=>1, "text"=>'Inventario - Cerrado - Ubicaciones cerradas: '.(is_array($oinventorylocations)?count($oinventorylocations):0)];
+					}else{
+						if ($ostorelocation && !($oinventorylocations && count($oinventorylocations)>0))
+							$return = ["result"=>-1, "text"=>'Inventario - La ubicación indicada ya esta cerrada'];
+					}
+					*/
+				}else
+					$return = ["result"=>-1, "text"=>'Inventario - Identificador no válido o ya cerrado'];
+				break;
+
 			// Acción no válida
 			default:
 				$return = ["result"=>-1, "text"=>'Inventario - Acción no válida'];
