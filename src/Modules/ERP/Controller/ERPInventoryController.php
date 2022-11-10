@@ -25,6 +25,10 @@ use App\Modules\ERP\Entity\ERPProductsVariants;
 use App\Modules\ERP\Entity\ERPStocks;
 use App\Modules\ERP\Entity\ERPStocksHistory;
 use App\Modules\Security\Utils\SecurityUtils;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\File\MimeType\FileinfoMimeTypeGuesser;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use App\Modules\Globale\Helpers\XLSXWriter\XLSXWriter;
 
 class ERPInventoryController extends Controller
 {
@@ -434,7 +438,14 @@ class ERPInventoryController extends Controller
 		$repository = $manager->getRepository($class);
 		$listUtils=new GlobaleListUtils();
 		$listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/InventoryLines.json"),true);
-		$return=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $class, [["type"=>"and","column"=>"inventory", "value"=>$id]]);
+		$return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields,$class,
+							['p.name'=>'productname', 'SUM(il.quantityconfirmed)'=>'quantityconfirmed', 'il.stockold'=>'stockold', 'concat(u.name," ",u.lastname)'=>'authorname', 'st.name '=>'location'],
+							'erpinventory_lines il
+							LEFT JOIN erpproducts_variants pv ON il.productvariant_id=pv.id
+							LEFT JOIN erpproducts p ON p.id=pv.product_id
+							LEFT JOIN erpstore_locations st ON  il.location_id=st.id
+							LEFT JOIN globale_users u ON il.author_id=u.id',
+							'il.inventory_id='.$id.' and il.active=1 and il.deleted=0 GROUP BY il.productvariant_id, il.location_id');
 		return new JsonResponse($return);
 	}
 
@@ -467,4 +478,47 @@ class ERPInventoryController extends Controller
 			'linesInventory' => $templateLists
 		]);
 	 }
+
+	/**
+	 * @Route("/api/exportInventory/{id}", name="exportInventoryId")
+	 */
+	 public function exportInventoryId($id, Request $request){
+		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+		 $inventoryRepository=$this->getDoctrine()->getRepository(ERPInventory::class);
+		 $linesRepository=$this->getDoctrine()->getRepository(ERPInventoryLines::class);
+		 $productsVariantsRepository=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
+		 $uploadDir=$this->get('kernel')->getRootDir() . '/../cloud/'.$this->getUser()->getCompany()->getId().'/temp/'.$this->getUser()->getId().'/';
+		 if (!file_exists($uploadDir) && !is_dir($uploadDir)) {
+				 mkdir($uploadDir, 0775, true);
+		 }
+		 $filename = date("YmdHis").'_'.md5(uniqid()).'.xlsx';
+		 $errorstyle[] = array('fill'=>"#AA0000");
+		 $writer = new XLSXWriter();
+		 $header = array("string","string","string","string");
+		 $writer->setAuthor($this->getUser()->getName().' '.$this->getUser()->getLastname());
+		 $writer->writeSheetHeader('Hoja1', $header, $col_options = ['suppress_row'=>true] );
+		 $writer->writeSheetRow('Hoja1', ["CODIGO", "", "", "CANTIDAD","DESCRIPCION"]);
+		 $row_number=1;
+		 $lines=$linesRepository->getLines($id);
+		 	 foreach($lines as $line){
+				 if ($line["quantity"]-$line["oldquantity"]<0){
+					 $row=["id"=>$line["productcode"], "", "", $line["quantity"]-$line["oldquantity"],$line["productname"]];
+					 $writer->writeSheetRow('Hoja1', $row);
+					 $row_number++;
+				 }
+
+			 }
+
+		 $writer->writeToFile($uploadDir.$filename);
+		 $response = new BinaryFileResponse($uploadDir.$filename);
+		 $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+		 $response->setContentDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT,'exported_operations.xlsx');
+		 return $response;
+	 }
+
+
+
+
+
+
 }

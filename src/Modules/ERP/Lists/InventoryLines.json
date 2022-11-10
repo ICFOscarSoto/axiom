@@ -4,7 +4,7 @@
         "caption": "id"
     },
     {
-        "name": "productvariant__product__name",
+        "name": "productname",
         "caption": "productvariant"
     },
     {
@@ -16,11 +16,11 @@
         "caption": "stockold"
     },
     {
-        "name": "author__name_o_author__lastname",
+        "name": "authorname",
         "caption": "author"
     },
     {
-        "name": "location__name",
+        "name": "location",
         "caption": "location"
     }
 ]
