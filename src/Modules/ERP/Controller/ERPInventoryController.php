@@ -58,6 +58,7 @@ class ERPInventoryController extends Controller
 		$erpStoresRepository				= $this->getDoctrine()->getRepository(ERPStores::class);
 		$erpStoreLocationsRepository= $this->getDoctrine()->getRepository(ERPStoreLocations::class);
 		$erpProductsVariantsRepository= $this->getDoctrine()->getRepository(ERPProductsVariants::class);
+		$erpStocksRepository				= $this->getDoctrine()->getRepository(ERPStocks::class);
 		$globaleCompaniesRepository	= $this->getDoctrine()->getRepository(GlobaleCompanies::class);
 		$globaleUsersRepository			= $this->getDoctrine()->getRepository(GlobaleUsers::class);
 
@@ -203,7 +204,7 @@ class ERPInventoryController extends Controller
 						if ($ostorelocation){
 							// Comprobar si es una ubicación válida para este inventario
 							if ($ostorelocation->getStore()->getId()==$id){
-								$oinventorylocation		= $erpInventoryLocationRepository->findOneBy(["inventory"=>$oinventory, "location"=>$ostorelocation, "active"=>1, "deleted"=>0],['dateadd' => 'ASC']);
+								$oinventorylocation		= $erpInventoryLocationRepository->findOneBy(["inventory"=>$oinventory, "location"=>$ostorelocation, "active"=>1, "deleted"=>0]);
 								$return['result'] = 1;
 								$return['data'] 	= [];
 								if ($oinventorylocation!= null)
@@ -223,56 +224,91 @@ class ERPInventoryController extends Controller
 			// 				Si la ubicación no se ha abierto para este inventario se abre
 			case 'add':
 				// Parámetros adicionales obligatorios
-				// Modo de inserción:
-				// -  increment - Si no existe línea para este inventario/ubicación/producto se crea sino se suman las cantidades a las que hubiera
-				// -  new - Tnato si existe, como sino, la línea para este inventario/ubicación/producto se crea
-				$mode					= $request->request->get('mode');
-				$location_id 	= $request->request->get('location_id');
+				$location_id 				= $request->request->get('location_id');
+				$location_name 			= $request->request->get('location_name'); // Una de las 2
 				$productvariant_id 	= $request->request->get('productvariant_id');
 				$quantityconfirmed 	= $request->request->get('quantityconfirmed');
-				$oinventory		= $erpInventoryRepository->findOneBy(["id"=>$id, "deleted"=>0]);
-				if ($mode && ($mode=='increment'||$mode=='new')){
-					if ($oinventory!=null){
-						// Comprueba si la ubicación es válida para este inventario sino -1 y mensaje
-						// Si es válida pero no esta la base de datos de inventarios/ubicaciones se pone 1 pero data vacio
-						// Si existe se devuelve en data
-						$ostorelocation			= $erpStoreLocationsRepository->findOneBy(["id"=>$location_id, "deleted"=>0]);
-						if ($ostorelocation){
-							// Comprobar si es una ubicación válida para este inventario
-							if ($ostorelocation->getStore()->getId()==$id){
-								// Comprobar que el product y variante existen
-								$oproductvariant = $erpProductsVariantsRepository->findOneBy(["id"=>$productvariant_id, "deleted"=>0]);
-								if ($oproductvariant){
-									if ($quantityconfirmed && ctype_digit(strval($quantityconfirmed)) && intval($quantityconfirmed)>=0){
-										// Se comprueba si existe ubicación dada de alta para este inventario
-										$oinventorylocation		= $erpInventoryLocationRepository->findOneBy(["inventory"=>$oinventory, "location"=>$ostorelocation, "active"=>1, "deleted"=>0],['dateadd' => 'ASC']);
-										if ($oinventorylocation==null){
-											$oinventorylocation = new ERPInventoryLocation();
-											$oauthor 						= $globaleUsersRepository->find($author_id);
-											$oinventorylocation->setAuthor($oauthor);
-											$oinventorylocation->setInventory($oinventory);
-											$oinventorylocation->setLocation($ostorelocation);
-											$oinventorylocation->setDatebegin(new \DateTime());
-											$oinventorylocation->setActive(1);
-											$oinventorylocation->setDeleted(0);
-											$oinventorylocation->setDateadd(new \DateTime());
-											$oinventorylocation->setDateupd(new \DateTime());
-											$this->getDoctrine()->getManager()->persist($oinventorylocation);
-										}
+				// Parámetro adicional opcional
+				$inventoryline_id 	= $request->request->get('inventoryline_id');
 
-										$this->getDoctrine()->getManager()->flush();
-									}else
-										$return = ["result"=>-1, "text"=>'Inventario - Cantidad de producto no válida'];
+				$oinventory		= $erpInventoryRepository->findOneBy(["id"=>$id, "deleted"=>0]);
+				if ($oinventory!=null){
+					// Comprueba si la ubicación es válida para este inventario sino -1 y mensaje
+					// Si es válida pero no esta la base de datos de inventarios/ubicaciones se pone 1 pero data vacio
+					// Si existe se devuelve en data
+					$ostorelocation			= null;
+					if ($location_id)
+						$ostorelocation			= $erpStoreLocationsRepository->findOneBy(["id"=>$location_id, "deleted"=>0]);
+					else
+					if ($location_name)
+						$ostorelocation			= $erpStoreLocationsRepository->findOneBy(["store"=>$oinventory->getStore(), "name"=>$location_name, "deleted"=>0]);
+
+					if ($ostorelocation){
+						// Comprobar si es una ubicación válida para este inventario
+						if ($ostorelocation->getStore()->getId()==$id){
+							// Comprobar que el product y variante existen
+							$oproductvariant = $erpProductsVariantsRepository->findOneBy(["id"=>$productvariant_id, "deleted"=>0]);
+							if ($oproductvariant){
+								if ($quantityconfirmed && ctype_digit(strval($quantityconfirmed)) && intval($quantityconfirmed)>=0){
+									// Se comprueba si existe ubicación dada de alta para este inventario
+									$oinventorylocation		= $erpInventoryLocationRepository->findOneBy(["inventory"=>$oinventory, "location"=>$ostorelocation, "active"=>1, "deleted"=>0]);
+									if ($oinventorylocation==null){
+										$oinventorylocation = new ERPInventoryLocation();
+										$oauthor 						= $globaleUsersRepository->find($author_id);
+										$oinventorylocation->setAuthor($oauthor);
+										$oinventorylocation->setInventory($oinventory);
+										$oinventorylocation->setLocation($ostorelocation);
+										$oinventorylocation->setDatebegin(new \DateTime());
+										$oinventorylocation->setActive(1);
+										$oinventorylocation->setDeleted(0);
+										$oinventorylocation->setDateadd(new \DateTime());
+										$oinventorylocation->setDateupd(new \DateTime());
+										$this->getDoctrine()->getManager()->persist($oinventorylocation);
+									}
+									// Se intenta recuperar la línea de producto y si no existe o código incorrecto se crea una nueva línea
+									$oinventoryline	= null;
+									if ($inventoryline_id && ctype_digit(strval($inventoryline_id)) && intval($inventoryline_id)>=0)
+										$oinventoryline	= $erpInventoryLinesRepository->find($inventoryline_id);
+									if ($oinventoryline==null){
+										$oinventoryline = new ERPInventoryLines();
+										$oauthor 						= $globaleUsersRepository->find($author_id);
+										$oinventoryline->setAuthor($oauthor);
+										$oinventoryline->setInventory($oinventory);
+										$oinventoryline->setLocation($ostorelocation);
+										$oinventoryline->setProductvariant($oproductvariant);
+										$oinventoryline->setActive(1);
+										$oinventoryline->setDeleted(0);
+										$oinventoryline->setDateadd(new \DateTime());
+										// Stock antiguo si no tiene una línea antigua, sino es null
+										$oinventorylineold	= $erpInventoryLinesRepository->findOneBy(["inventory"=>$oinventory, "location"=>$ostorelocation, "productvariant"=>$oproductvariant, "active"=>1, "deleted"=>0]);
+										if ($oinventorylineold==null){
+											$stockold = 0;
+											$ocompany = $globaleCompaniesRepository->find($company_id);
+											$ostock = $erpStocksRepository->findOneBy(["company"=>$ocompany, "storelocation"=>$ostorelocation, "productvariant"=>$oproductvariant, "active"=>1, "deleted"=>0]);
+											if ($ostock)
+												$stockold = $ostock->getQuantity();
+											$oinventoryline->setStockold($stockold);
+										}
+									}
+									$oinventoryline->setDateupd(new \DateTime());
+									$oinventoryline->setQuantityconfirmed($quantityconfirmed);
+									$this->getDoctrine()->getManager()->persist($oinventoryline);
+									$this->getDoctrine()->getManager()->flush();
+									$return['result'] = 1;
+									$return['data'] 	= [];
+									if ($oinventoryline!= null)
+										$return['data'] = $this->getInventoryLinesResult($oinventoryline);
+									$return['text'] 	= "Inventario - Línea de producto";
 								}else
-									$return = ["result"=>-1, "text"=>'Inventario - Producto o variante no válida'];
+									$return = ["result"=>-1, "text"=>'Inventario - Cantidad de producto no válida'];
 							}else
-								$return = ["result"=>-1, "text"=>'Inventario - Ubicación no válida para el inventario'];
+								$return = ["result"=>-1, "text"=>'Inventario - Producto o variante no válida'];
 						}else
-							$return = ["result"=>-1, "text"=>'Inventario - Ubicación - Identificador no válido'];
+							$return = ["result"=>-1, "text"=>'Inventario - Ubicación no válida para el inventario'];
 					}else
-						$return = ["result"=>-1, "text"=>'Inventario - Identificador no válido'];
+						$return = ["result"=>-1, "text"=>'Inventario - Ubicación - Identificador no válido'];
 				}else
-					$return = ["result"=>-1, "text"=>'Inventario - Modo de registro de línea de producto no indicado: increment o new'];
+					$return = ["result"=>-1, "text"=>'Inventario - Identificador no válido'];
 				break;
 			// Acción no válida
 			default:
@@ -319,7 +355,7 @@ class ERPInventoryController extends Controller
 		$return['variant_id'] = ($oinventorylines->getProductvariant()->getVariant()?$oinventorylines->getProductvariant()->getVariant()->getId():'');
 		$return['variant_name'] = ($oinventorylines->getProductvariant()->getVariant()?$oinventorylines->getProductvariant()->getVariant()->getName():'');
 		$return['quantityconfirmed'] = $oinventorylines->getQuantityconfirmed();
-		$return['stockold'] = $oinventorylines->getStockold();
+		$return['stockold'] = ($oinventorylines->getStockold()!=null?$oinventorylines->getStockold():'');
 		$return['active'] = $oinventorylines->getActive();
 		$return['deleted'] = $oinventorylines->getDeleted();
 		$return['dateadd'] = ($oinventorylines->getDateadd()!=null?date_format($oinventorylines->getDateadd(), "Y/m/d H:i:s"):'');
