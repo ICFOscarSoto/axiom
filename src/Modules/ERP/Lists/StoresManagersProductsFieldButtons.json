@@ -1,5 +1,5 @@
 [
-  {"id": "editStoresManagersProducts", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"genericdatatab", "routeParams":{"module":"ERP", "name":"StoresManagersProducts", "type":"modal" }, "modal":"StoresManagersProducts", "actionType" : "background", "confirm" :false, "tooltip":""},
+  {"id": "editStoresManagersProducts", "type" : "default", "icon" : "fa fa-edit", "name" : "editar", "route":"dataStoresManagersProducts",  "modal":"StoresManagersProducts", "actionType" : "background", "confirm" :false, "tooltip":""},
   {"id": "activation", "type": "option", "options": [
       {"id": "desactivateStoresManagersProducts", "type" : "info", "condition": "active", "conditionValue" :true , "icon" : "fa fa-eye-slash","name" : "desactivar", "route":"genericdisable", "routeParams":{"module":"ERP", "name":"StoresManagersProducts"}, "confirm" :true, "actionType" : "background", "tooltip":"" },
       {"id": "activateStoresManagersProducts", "type" : "info", "condition": "active", "conditionValue" :false, "icon" : "fa fa-eye","name" : "activar", "route":"genericenable", "routeParams":{"module":"ERP", "name":"StoresManagersProducts"}, "confirm" :true, "actionType" : "background", "tooltip":"" }

@@ -58,4 +58,17 @@ class ERPInventoryLinesRepository extends ServiceEntityRepository
       $result=$this->getEntityManager()->getConnection()->executeQuery($query,$params)->fetchAll();
       return $result;
     }
+
+    public function getLines($id){
+      $query="SELECT p.name AS productname, p.code AS productcode, st.name AS location, SUM(il.quantityconfirmed) AS quantity,  il.stockold AS oldquantity,  concat(u.name,' ',u.lastname) AS name
+              	FROM erpinventory_lines il
+              	LEFT JOIN erpproducts_variants pv ON il.productvariant_id=pv.id
+              	LEFT JOIN erpproducts p ON p.id=pv.product_id
+              	LEFT JOIN erpstore_locations st ON  il.location_id=st.id
+              	LEFT JOIN globale_users u ON il.author_id=u.id
+              	WHERE il.inventory_id=:inventory and  il.active=1 and  il.deleted=0
+              	GROUP BY il.productvariant_id, il.location_id ";
+      $params=['inventory' => $id];
+      return $this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+    }
 }
