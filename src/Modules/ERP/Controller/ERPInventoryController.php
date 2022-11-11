@@ -437,7 +437,8 @@ class ERPInventoryController extends Controller
 
 							// Procesar líneas
 							foreach($alines as $key=>$line){
-								$erpStocksRepository->processInventoryLine($line);
+								//$erpStocksRepository->processInventoryLine($author_id, $line);
+dump($alines);								
 							}
 							// Resetear stock a 0 de productos no inventariados
 
