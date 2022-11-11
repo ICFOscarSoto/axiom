@@ -32,6 +32,11 @@ class ERPInventory
     private $author;
 
     /**
+     * @ORM\Column(type="string", length=20, nullable=true)
+     */
+    private $code;
+
+    /**
      * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPStores")
      * @ORM\JoinColumn(nullable=false)
      */
@@ -98,6 +103,18 @@ class ERPInventory
     public function setAuthor(?GlobaleUsers $author): self
     {
         $this->author = $author;
+
+        return $this;
+    }
+
+    public function getCode(): ?string
+    {
+        return $this->code;
+    }
+
+    public function setCode(string $code): self
+    {
+        $this->code = $code;
 
         return $this;
     }

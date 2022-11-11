@@ -314,20 +314,20 @@ class ERPStocksRepository extends ServiceEntityRepository
     }
 
     public function getProductByLocation($storelocation_id){
-      $query="SELECT s.id as stock_id, if(s.quantity,s.quantity,0) as quantity, s.productvariant_id as productvariant_id, p.code as productcode, concat(p.name,if(v.name,concat(' - ',vt.name,' - ',v.name),'')) as productvariant_name
+      $query="SELECT s.id as stock_id, if(s.quantity,s.quantity,0) as quantity, s.productvariant_id as productvariant_id, p.code as productcode, p.name as productname, if(v.name,v.name,'') as variantname, if(vt.name,vt.name,'') as varianttype, s.storelocation_id as location_id
               FROM erpstocks s LEFT JOIN
               erpproducts_variants pv ON pv.id=s.productvariant_id LEFT JOIN
               erpproducts p ON p.id=pv.product_id LEFT JOIN
               erpvariants v ON v.id=pv.variant_id LEFT JOIN
               erpvariants_types vt ON vt.id=v.varianttype_id
               WHERE s.storelocation_id=:storelocation and s.active=1 and s.deleted=0
-              ORDER BY productvariant_name";
+              ORDER BY productname, variantname";
       $params=['storelocation' => $storelocation_id];
       $result=$this->getEntityManager()->getConnection()->executeQuery($query,$params)->fetchAll();
       return $result;
     }
 
-    public function processInventoryLine($user, $line){
+    public function processInventoryLine($inventarycode, $user, $line){
       $result=0;
       $diferent = floatval($line['quantityconfirmed'])-floatval($line['stockold']);
       if ($diferent!=0){
@@ -340,10 +340,10 @@ class ERPStocksRepository extends ServiceEntityRepository
         $params=['stock_id' => $line['stock_id']];
         $result=$this->getEntityManager()->getConnection()->executeQuery($query, $params);
         // StockHistory
-        $query="INSERT INTO erpstock_history
+/*        $query="INSERT INTO erpstock_history
                 ('id', 'company_id', 'location_id', 'productvariant_id', 'productcode', 'productname', 'user_id', 'previousqty', 'newqty', 'active', 'deleted', 'dateadd', 'dateupd', 'type_id', 'comment', 'num_operation', 'quantity', 'vendingmachinechannel_id') VALUES
-                (null, ".$company_id.",".$line." )";
-        $params=['stock_id' => $line['stock_id']];
+                (null, ".$company_id.",".$line['location_id'].",".$line['productvariant_id'].",'".$line['productcode']."','".$line['productname'].($line['variantname']!=''?' - '.$line['varianttype'].' '.$line['variantname'])."',".$user->getId().",".$line['quantity'].",".($line['quantity']+$diferent).",1,0,now(),now(),5,'','".$inventarycode."')";
+        $params=['stock_id' => $line['stock_id']];*/
         $result=$this->getEntityManager()->getConnection()->executeQuery($query, $params);
       }
       return $result;

@@ -99,6 +99,8 @@ class ERPInventoryController extends Controller
 							$ocompany 	= $globaleCompaniesRepository->find($company_id);
 							$oauthor 		= $globaleUsersRepository->find($author_id);
 							$oinventory	= new ERPInventory();
+							$code = $erpInventoryRepository->getNextCode();
+							$oinventory->setCode($code);
 							$oinventory->setStore($ostore);
 							$oinventory->setCompany($ocompany);
 							$oinventory->setAuthor($oauthor);
@@ -437,8 +439,8 @@ class ERPInventoryController extends Controller
 
 							// Procesar líneas
 							foreach($alines as $key=>$line){
-								//$erpStocksRepository->processInventoryLine($author_id, $line);
-dump($alines);								
+								//$erpStocksRepository->processInventoryLine($oinventory->getCode(), $author_id, $line);
+dump($alines);
 							}
 							// Resetear stock a 0 de productos no inventariados
 
