@@ -308,6 +308,7 @@ class ERPInventoryController extends Controller
 								$oinventorylocation->setDateadd(new \DateTime());
 								$oinventorylocation->setDateupd(new \DateTime());
 								$this->getDoctrine()->getManager()->persist($oinventorylocation);
+								$this->getDoctrine()->getManager()->flush();
 							}
 
 							// Si se indica producto y cantidad se registra línea sino significa que solo era crear la ubicación
@@ -357,7 +358,6 @@ class ERPInventoryController extends Controller
 									$return = ["result"=>-1, "text"=>'Inventario - Producto o variante no válida'];
 							}else{
 								$return = ["result"=>1, "text"=>'Inventario - Ubicación creada para vaciar su inventario'];
-								$this->getDoctrine()->getManager()->flush();
 							}
 						}else
 							$return = ["result"=>-1, "text"=>'Inventario - Ubicación no válida para el inventario'];
@@ -405,17 +405,38 @@ class ERPInventoryController extends Controller
 							// Todos los productos inventariados de la ubicación
 							$oinventorylines	= $erpInventoryLinesRepository->getInventoryLinesGroup($oinventory->getId(), $ostorelocation->getId());
 
+							// Líneas a actualizar
+							$alines 	= [];
+							// Líneas de stock no inventariadas
 							$anolines = [];
 							foreach($ostocks as $key=>$ostock){
 								$existsline = false;
 								for($i=0; $i<count($oinventorylines) && !$existsline; $i++){
-									if ($ostock['productvariant_id']==$oinventorylines[$i]['productvariant_id'])
+									if ($ostock['productvariant_id']==$oinventorylines[$i]['productvariant_id']){
 										$existsline=true;
+										$ostock['quantityconfirmed'] = $oinventorylines[$i]['quantityconfirmed'];
+										$ostock['stockold'] = $oinventorylines[$i]['stockold'];
+									}
 								}
 								if (!$existsline)
 									array_push($anolines, $ostock);
+								else
+									array_push($alines, $ostock);
 							}
-
+							// Líneas inventarias no incluidas en stock
+							$anostock = [];
+							foreach($oinventorylines as $key=>$oinventoryline){
+								$existsline = false;
+								for($i=0; $i<count($ostocks) && !$existsline; $i++){
+									if ($oinventoryline['productvariant_id']==$ostocks[$i]['productvariant_id'])
+										$existsline=true;
+								}
+								if (!$existsline)
+									array_push($anostock, $oinventoryline);
+							}
+dump($alines);
+dump($anolines);
+dump($anostock);
 						}
 					}
 
