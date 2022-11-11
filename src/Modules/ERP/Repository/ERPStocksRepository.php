@@ -330,7 +330,7 @@ class ERPStocksRepository extends ServiceEntityRepository
     public function processInventoryLine($line){
       $result=0;
       $diferent = floatval($line['quantityconfirmed'])-floatval($line['stockold']);
-      if ($diferent!=0){}
+      if ($diferent!=0){
         $query="UPDATE FROM erpstock SET
                 lastinventorydate=now(),
                 quantity=quantity+".$diferent.",
