@@ -251,7 +251,7 @@ class ERPInventoryController extends Controller
 							$ostorelocation			= $erpStoreLocationsRepository->findOneBy(["store"=>$oinventory->getStore(), "name"=>$location_name, "deleted"=>0]);
 						if ($ostorelocation){
 							// Comprobar si es una ubicación válida para este inventario
-							if ($ostorelocation->getStore()->getId()==$id){
+							if ($ostorelocation->getStore()->getId()==$oinventory->getStore()->getId()){
 								$oinventorylocation		= $erpInventoryLocationRepository->findOneBy(["inventory"=>$oinventory, "location"=>$ostorelocation, "active"=>1, "deleted"=>0]);
 								$return['result'] = 1;
 								$return['data'] 	= [];
@@ -293,7 +293,6 @@ class ERPInventoryController extends Controller
 
 					if ($ostorelocation){
 						// Comprobar si es una ubicación válida para este inventario
-						// CORREGIDO if ($ostorelocation->getStore()->getId()==$id){
 						if ($ostorelocation->getStore()->getId()==$oinventory->getStore()->getId()){
 							// Se comprueba si existe ubicación dada de alta para este inventario
 							$oinventorylocation		= $erpInventoryLocationRepository->findOneBy(["inventory"=>$oinventory, "location"=>$ostorelocation, "active"=>1, "deleted"=>0]);
@@ -317,7 +316,7 @@ class ERPInventoryController extends Controller
 								// Comprobar que el product y variante existen
 								$oproductvariant = $erpProductsVariantsRepository->findOneBy(["id"=>$productvariant_id, "deleted"=>0]);
 								if ($oproductvariant){
-									if ($quantityconfirmed && ctype_digit(strval($quantityconfirmed)) && intval($quantityconfirmed)>=0){
+									if ($quantityconfirmed && floatval($quantityconfirmed)>=0){
 
 										// Se intenta recuperar la línea de producto y si no existe o código incorrecto se crea una nueva línea
 										$oinventoryline	= null;
@@ -435,9 +434,18 @@ class ERPInventoryController extends Controller
 								if (!$existsline)
 									array_push($anostock, $oinventoryline);
 							}
-dump($alines);
-dump($anolines);
-dump($anostock);
+
+							// Procesar líneas
+							foreach($alines as $key=>$line){
+								$erpStocksRepository->processInventoryLine($line);
+							}
+							// Resetear stock a 0 de productos no inventariados
+
+							// Insertar nuevas líneas de stock con productos inventariados y no existentes en stock
+
+							// Cierre de la ubicación
+
+
 						}
 					}
 
@@ -451,6 +459,8 @@ dump($anostock);
 					}else{
 						if ($ostorelocation && !($oinventorylocations && count($oinventorylocations)>0))
 							$return = ["result"=>-1, "text"=>'Inventario - La ubicación indicada ya esta cerrada'];
+						else
+							$return = ["result"=>-1, "text"=>'Inventario - Ubicación cerrada: '.$oinventorylocations[0]->getLocation()->getName()];
 					}
 					*/
 				}else
