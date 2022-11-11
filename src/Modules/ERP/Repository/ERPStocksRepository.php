@@ -365,4 +365,42 @@ class ERPStocksRepository extends ServiceEntityRepository
       }
       return $result;
     }
+
+    public function processInventoryLineNoStock($inventorycode, $user, $line){
+      $result=0;
+      // Si se ha procesado esta línea previamente ya no se tiene en cuenta
+      $query="SELECT count(*) as ncount from erpstocks_history where company_id=:company and location_id=:location and productvariant_id=:productvariant and num_operation=:code";
+      $params=['company' => $user->getCompany()->getId(),
+               'location' => intval($line['location_id']),
+               'productvariant' => intval($line['productvariant_id']),
+               'code' => $inventorycode];
+      $result=$this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchColumn(0);
+      if (!$result){
+        $query="INSERT INTO erpstocks
+                (id, company_id, storelocation_id, productvariant_id, lastinventorydate, pendingserve, pendingreceive, minstock, maxstock, quantity, active, deleted, dateadd, dateupd, author_id) VALUES
+                (null, :company, :location, :productvariant, now(), null, null, null, null, :quantity, 1, 0, now(), now(), :user)";
+        $params=['company' => $user->getCompany()->getId(),
+                 'productvariant' => intval($line['productvariant_id']),
+                 'location' => intval($line['location_id']),
+                 'user' => $user->getId(),
+                 'quantity' => floatval($line['quantityconfirmed'])];
+        $result=$this->getEntityManager()->getConnection()->executeQuery($query, $params);
+        // StockHistory
+        $query="INSERT INTO erpstocks_history
+                (id, company_id, location_id, productvariant_id, productcode, productname, user_id, previousqty, newqty, active, deleted, dateadd, dateupd, type_id, comment, num_operation, quantity, vendingmachinechannel_id) VALUES
+                (null, :company, :location, :productvariant, :productcode, :productname, :user, :previous, :new, 1, 0, now(), now(), 5, '', :code, :diferent, null)";
+        $params=['company' => $user->getCompany()->getId(),
+                 'location' => intval($line['location_id']),
+                 'productvariant' => intval($line['productvariant_id']),
+                 'productcode' => $line['productcode'],
+                 'productname' => $line['productname'].($line['variantname']!=''?' - '.$line['varianttype'].' '.$line['variantname']:''),
+                 'user' => $user->getId(),
+                 'previous' => 0,
+                 'new' => floatval($line['quantityconfirmed']),
+                 'code' => $inventorycode,
+                 'diferent' => floatval($line['quantityconfirmed'])];
+        $result=$this->getEntityManager()->getConnection()->executeQuery($query, $params);
+      }
+      return $result;
+    }
 }

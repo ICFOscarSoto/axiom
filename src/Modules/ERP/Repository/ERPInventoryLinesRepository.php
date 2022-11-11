@@ -49,8 +49,14 @@ class ERPInventoryLinesRepository extends ServiceEntityRepository
     */
 
     public function getInventoryLinesGroup($inventory_id, $storelocation_id){
-      $query="SELECT il.id as inventoryline_id, il.productvariant_id as productvariant_id, sum(il.quantityconfirmed) as quantityconfirmed, sum(if(il.stockold,il.stockold,0)) as stockold
-              FROM erpinventory_lines il
+      $query="SELECT il.id as inventoryline_id, il.productvariant_id as productvariant_id, il.location_id as location_id,
+              sum(il.quantityconfirmed) as quantityconfirmed, sum(if(il.stockold,il.stockold,0)) as stockold,
+              p.code as productcode, p.name as productname, if(v.name,v.name,'') as variantname, if(vt.name,vt.name,'') as varianttype
+              FROM erpinventory_lines il LEFT JOIN
+              erpproducts_variants pv ON pv.id=il.productvariant_id LEFT JOIN
+              erpproducts p ON p.id=pv.product_id LEFT JOIN
+              erpvariants v ON v.id=pv.variant_id LEFT JOIN
+              erpvariants_types vt ON vt.id=v.varianttype_id
               WHERE il.inventory_id=:inventory and il.location_id=:storelocation and il.active=1 and il.deleted=0
               GROUP BY il.productvariant_id
               ORDER BY productvariant_id";

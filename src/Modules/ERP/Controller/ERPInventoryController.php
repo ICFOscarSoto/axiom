@@ -417,8 +417,8 @@ class ERPInventoryController extends Controller
 					// Líneas inventarias no incluidas en stock
 					$anostock = [];
 					if (is_array($oinventorylocations)){
-						foreach($oinventorylocations as $key=>$value){
-							$oslocation = $value->getLocation();
+						foreach($oinventorylocations as $key=>$oinventorylocation){
+							$oslocation = $oinventorylocation->getLocation();
 							// Todos los productos definidos para la ubicación en stock
 							$ostocks					= $erpStocksRepository->getProductByLocation($oslocation->getId());
 							// Todos los productos inventariados de la ubicación
@@ -435,7 +435,7 @@ class ERPInventoryController extends Controller
 								}
 								if (!$existsline){
 									$ostock['quantityconfirmed'] = 0;
-									$ostock['stockold'] = $ostock['quantity"'];
+									$ostock['stockold'] = $ostock['quantity'];
 									array_push($anolines, $ostock);
 								}else{
 									array_push($alines, $ostock);
@@ -460,11 +460,15 @@ class ERPInventoryController extends Controller
 							foreach($anolines as $key=>$line){
 								$erpStocksRepository->processInventoryLine($oinventory->getCode(), $author_id, $line);
 							}
-
 							// Insertar nuevas líneas de stock con productos inventariados y no existentes en stock
-
+							foreach($anostock as $key=>$line){
+								$erpStocksRepository->processInventoryLineNoStock($oinventory->getCode(), $author_id, $line);
+							}
 							// Cierre de la ubicación
-
+							$oinventorylocation->setDateend(new \DateTime());
+							$oinventorylocation->setDateupd(new \DateTime());
+							$this->getDoctrine()->getManager()->persist($oinventorylocation);
+							$this->getDoctrine()->getManager()->flush();
 
 						}
 					}
