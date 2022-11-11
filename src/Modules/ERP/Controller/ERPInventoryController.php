@@ -21,9 +21,11 @@ use App\Modules\ERP\Entity\ERPInventoryLines;
 use App\Modules\ERP\Entity\ERPInventoryLocation;
 use App\Modules\ERP\Entity\ERPStores;
 use App\Modules\ERP\Entity\ERPStoreLocations;
+use App\Modules\ERP\Entity\ERPProducts;
 use App\Modules\ERP\Entity\ERPProductsVariants;
 use App\Modules\ERP\Entity\ERPStocks;
 use App\Modules\ERP\Entity\ERPStocksHistory;
+use App\Modules\ERP\Entity\ERPEAN13;
 use App\Modules\Security\Utils\SecurityUtils;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\MimeType\FileinfoMimeTypeGuesser;
@@ -277,6 +279,7 @@ class ERPInventoryController extends Controller
 				$location_id 				= $request->request->get('location_id');
 				$location_name 			= $request->request->get('location_name'); // Una de las 2
 				$productvariant_id 	= $request->request->get('productvariant_id');
+				$productbarcode 		= $request->request->get('productbarcode');
 				$quantityconfirmed 	= $request->request->get('quantityconfirmed');
 				// Parámetro adicional opcional
 				$inventoryline_id 	= $request->request->get('inventoryline_id');
@@ -311,6 +314,14 @@ class ERPInventoryController extends Controller
 								$oinventorylocation->setDateupd(new \DateTime());
 								$this->getDoctrine()->getManager()->persist($oinventorylocation);
 								$this->getDoctrine()->getManager()->flush();
+							}
+
+							// Si viene por barcode
+							if ($productvariant_id==null){
+								$oproductvariant = $this->getProductVAriantByBarcode($productbarcode);
+								if ($oproductvariant){
+									$productvariant_id = $oproductvariant->getId();
+								}
 							}
 
 							// Si se indica producto y cantidad se registra línea sino significa que solo era crear la ubicación
@@ -399,6 +410,12 @@ class ERPInventoryController extends Controller
 					if ($location_id==null && $location_name==null)
 						$oinventorylocations		= $erpInventoryLocationRepository->findBy(["inventory"=>$oinventory, "dateend"=>null, "active"=>1, "deleted"=>0]);
 
+					// Líneas a actualizar
+					$alines 	= [];
+					// Líneas de stock no inventariadas
+					$anolines = [];
+					// Líneas inventarias no incluidas en stock
+					$anostock = [];
 					if (is_array($oinventorylocations)){
 						foreach($oinventorylocations as $key=>$value){
 							$oslocation = $value->getLocation();
@@ -407,10 +424,6 @@ class ERPInventoryController extends Controller
 							// Todos los productos inventariados de la ubicación
 							$oinventorylines	= $erpInventoryLinesRepository->getInventoryLinesGroup($oinventory->getId(), $ostorelocation->getId());
 
-							// Líneas a actualizar
-							$alines 	= [];
-							// Líneas de stock no inventariadas
-							$anolines = [];
 							foreach($ostocks as $key=>$ostock){
 								$existsline = false;
 								for($i=0; $i<count($oinventorylines) && !$existsline; $i++){
@@ -420,13 +433,15 @@ class ERPInventoryController extends Controller
 										$ostock['stockold'] = $oinventorylines[$i]['stockold'];
 									}
 								}
-								if (!$existsline)
+								if (!$existsline){
+									$ostock['quantityconfirmed'] = 0;
+									$ostock['stockold'] = $ostock['quantity"'];
 									array_push($anolines, $ostock);
-								else
+								}else{
 									array_push($alines, $ostock);
+								}
 							}
-							// Líneas inventarias no incluidas en stock
-							$anostock = [];
+
 							foreach($oinventorylines as $key=>$oinventoryline){
 								$existsline = false;
 								for($i=0; $i<count($ostocks) && !$existsline; $i++){
@@ -439,10 +454,12 @@ class ERPInventoryController extends Controller
 
 							// Procesar líneas
 							foreach($alines as $key=>$line){
-								//$erpStocksRepository->processInventoryLine($oinventory->getCode(), $author_id, $line);
-dump($alines);
+								$erpStocksRepository->processInventoryLine($oinventory->getCode(), $author_id, $line);
 							}
-							// Resetear stock a 0 de productos no inventariados
+							// Resetear stock a 0 de productos no inventariado
+							foreach($anolines as $key=>$line){
+								$erpStocksRepository->processInventoryLine($oinventory->getCode(), $author_id, $line);
+							}
 
 							// Insertar nuevas líneas de stock con productos inventariados y no existentes en stock
 
@@ -453,7 +470,7 @@ dump($alines);
 					}
 
 					// Cierre del inventario
-/*					if ($location_id==null && $location_name==null){
+					if ($location_id==null && $location_name==null){
 						$oinventory->setDateend(new \DateTime());
 						$oinventory->setDateupd(new \DateTime());
 						$this->getDoctrine()->getManager()->persist($oinventory);
@@ -463,9 +480,8 @@ dump($alines);
 						if ($ostorelocation && !($oinventorylocations && count($oinventorylocations)>0))
 							$return = ["result"=>-1, "text"=>'Inventario - La ubicación indicada ya esta cerrada'];
 						else
-							$return = ["result"=>-1, "text"=>'Inventario - Ubicación cerrada: '.$oinventorylocations[0]->getLocation()->getName()];
+							$return = ["result"=>-1, 	"data"=> $anolines, "text"=>'Inventario - Ubicación cerrada: '.$oinventorylocations[0]->getLocation()->getName()];
 					}
-					*/
 				}else
 					$return = ["result"=>-1, "text"=>'Inventario - Identificador no válido o ya cerrado'];
 				break;
@@ -539,6 +555,37 @@ dump($alines);
 		$return['dateadd'] = ($oinventorylocation->getDateadd()!=null?date_format($oinventorylocation->getDateadd(), "Y/m/d H:i:s"):'');
 		$return['dateupd'] = ($oinventorylocation->getDateupd()!=null?date_format($oinventorylocation->getDateupd(), "Y/m/d H:i:s"):'');
 		return $return;
+	}
+
+	private function getProductVAriantByBarcode($barcode){
+		$productvariant = null;
+		if($barcode){
+			$EAN13repository=$this->getDoctrine()->getRepository(ERPEAN13::class);
+			$Productrepository=$this->getDoctrine()->getRepository(ERPProducts::class);
+			$ProductsVariantsrepository=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
+			// Busqueda de producto por su ID de base de datos (P.)
+			if(substr(strtoupper($barcode),0,2)=="P."){
+				$product=$Productrepository->findOneBy(["id"=>intval(substr($barcode,2)), "deleted"=>0]);
+				$productvariant=$ProductsVariantsrepository->findOneBy(["product"=>$product, "variant"=>null, "deleted"=>0]);
+			}else{
+				// Busqueda de producto por su ID de productvariant de base de datos (V.)
+				if(substr(strtoupper($barcode),0,2)=="V."){
+					$productvariant=$ProductsVariantsrepository->findOneBy(["id"=>intval(substr($barcode,2)), "deleted"=>0]);
+				}else{
+					$EAN13=$EAN13repository->findOneBy(["name"=>$barcode, "deleted"=>0]);
+					if($EAN13){
+						$productvariant=$EAN13->getProductVariant();
+					}else{
+						//Try with a lead 0 at start of $barcode
+						$EAN13=$EAN13repository->findOneBy(["name"=>'0'.$barcode, "deleted"=>0]);
+						if($EAN13){
+							$productvariant=$EAN13->getProductVariant();
+						}
+					}
+				}
+			}
+		}
+		return $productvariant;
 	}
 
 	/**

@@ -32,7 +32,7 @@ class ERPInventory
     private $author;
 
     /**
-     * @ORM\Column(type="string", length=20, nullable=true)
+     * @ORM\Column(type="string", length=20)
      */
     private $code;
 

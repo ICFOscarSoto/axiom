@@ -327,26 +327,42 @@ class ERPStocksRepository extends ServiceEntityRepository
       return $result;
     }
 
-    public function processInventoryLine($inventarycode, $user, $line){
+    public function processInventoryLine($inventorycode, $user, $line){
       $result=0;
       $diferent = floatval($line['quantityconfirmed'])-floatval($line['stockold']);
       if ($diferent!=0){
-        $company_id			= $user->getCompany()->getId();
-        $query="UPDATE FROM erpstock SET
-                lastinventorydate=now(),
-                quantity=quantity+".$diferent.",
-                dateupd=now()
-                WHERE id=:stock_id";
-        $params=['stock_id' => $line['stock_id']];
-        $result=$this->getEntityManager()->getConnection()->executeQuery($query, $params);
-        // StockHistory
-/*        $query="INSERT INTO erpstock_history
-                ('id', 'company_id', 'location_id', 'productvariant_id', 'productcode', 'productname', 'user_id', 'previousqty', 'newqty', 'active', 'deleted', 'dateadd', 'dateupd', 'type_id', 'comment', 'num_operation', 'quantity', 'vendingmachinechannel_id') VALUES
-                (null, ".$company_id.",".$line['location_id'].",".$line['productvariant_id'].",'".$line['productcode']."','".$line['productname'].($line['variantname']!=''?' - '.$line['varianttype'].' '.$line['variantname'])."',".$user->getId().",".$line['quantity'].",".($line['quantity']+$diferent).",1,0,now(),now(),5,'','".$inventarycode."')";
-        $params=['stock_id' => $line['stock_id']];*/
-        $result=$this->getEntityManager()->getConnection()->executeQuery($query, $params);
+        // Si se ha procesado esta línea previamente ya no se tiene en cuenta
+        $query="SELECT count(*) as ncount from erpstocks_history where company_id=:company and location_id=:location and productvariant_id=:productvariant and num_operation=:code";
+        $params=['company' => $user->getCompany()->getId(),
+                 'location' => intval($line['location_id']),
+                 'productvariant' => intval($line['productvariant_id']),
+                 'code' => $inventorycode];
+        $result=$this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchColumn(0);
+        if (!$result){
+          $query="UPDATE erpstocks SET
+                  lastinventorydate=now(),
+                  quantity=quantity+".$diferent.",
+                  dateupd=now()
+                  WHERE id=:stock_id";
+          $params=['stock_id' => $line['stock_id']];
+          $result=$this->getEntityManager()->getConnection()->executeQuery($query, $params);
+          // StockHistory
+          $query="INSERT INTO erpstocks_history
+                  (id, company_id, location_id, productvariant_id, productcode, productname, user_id, previousqty, newqty, active, deleted, dateadd, dateupd, type_id, comment, num_operation, quantity, vendingmachinechannel_id) VALUES
+                  (null, :company, :location, :productvariant, :productcode, :productname, :user, :previous, :new, 1, 0, now(), now(), 5, '', :code, :diferent, null)";
+          $params=['company' => $user->getCompany()->getId(),
+                   'location' => intval($line['location_id']),
+                   'productvariant' => intval($line['productvariant_id']),
+                   'productcode' => $line['productcode'],
+                   'productname' => $line['productname'].($line['variantname']!=''?' - '.$line['varianttype'].' '.$line['variantname']:''),
+                   'user' => $user->getId(),
+                   'previous' => floatval($line['quantity']),
+                   'new' => ($line['quantity']+$diferent),
+                   'code' => $inventorycode,
+                   'diferent' => $diferent];
+          $result=$this->getEntityManager()->getConnection()->executeQuery($query, $params);
+        }
       }
       return $result;
     }
-
 }
