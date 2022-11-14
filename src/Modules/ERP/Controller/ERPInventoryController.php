@@ -380,6 +380,52 @@ class ERPInventoryController extends Controller
 					$return = ["result"=>-1, "text"=>'Inventario - Identificador no válido'];
 				break;
 
+				// delete -> Para el identificador de inventario pasado como argumento
+				//				borra la línea pasada y si esta era la que tenía el sotck antiguo
+				// 				Se pasa a la siguiente línea
+				case 'delete':
+					// Parámetro adicional obligatorio
+					$inventoryline_id 	= $request->request->get('inventoryline_id');
+					$oinventory		= $erpInventoryRepository->findOneBy(["id"=>$id, "deleted"=>0]);
+					if ($oinventory!=null){
+						// Se compruebba que el inventario no este cerrado
+						if ($oinventory->getDateend()==null){
+							// Comprueba que exista la línea y sea de este inventario
+							$oinventoryline	= null;
+							if ($inventoryline_id && ctype_digit(strval($inventoryline_id)) && intval($inventoryline_id)>=0)
+								$oinventoryline	= $erpInventoryLinesRepository->find($inventoryline_id);
+							if ($oinventoryline!=null){
+								// Comprobar que la ubicación no este cerrada
+								$oinventorylocation		= $erpInventoryLocationRepository->findOneBy(["inventory"=>$oinventory, "location"=>$oinventoryline->getLocation(), "active"=>1, "deleted"=>0]);
+								if ($oinventorylocation && $oinventorylocation->getDateend()==null){
+									if ($oinventoryline->getStockold()!=null){
+										// Comprobar si existe más lineas del mismo producto para esta ubicación
+										$oinventorylines	= $erpInventoryLinesRepository->findBy(["inventory"=>$oinventory,"location"=>$oinventoryline->getLocation(), "productvariant"=>$oinventoryline->getProductvariant(), "active"=>1, "deleted"=>0],["id"=>"ASC"]);
+										if ($oinventorylines && count($oinventorylines)>1){
+											$changestock = false;
+											for($i=0; $i<count($oinventorylines) && !$changestock; $i++){
+												$oinventorylineo = $oinventorylines[$i];
+												if ($oinventorylineo->getId()!=$oinventoryline->getId()){
+													$oinventorylineo->setStockold($oinventoryline->getStockold());
+													$this->getDoctrine()->getManager()->persist($oinventorylineo);
+													$this->getDoctrine()->getManager()->flush();
+													$changestock = true;
+												}
+											}
+										}
+									}
+									// Borrado de la línea
+									$erpInventoryLinesRepository->deleteLine($oinventoryline->getId());
+									$return = ["result"=>1, "text"=>'Inventario - Línea borrada correctamente'];
+								}else
+									$return = ["result"=>-1, "text"=>'Inventario - Ubicación cerrada - borrado no válido'];
+							}else
+								$return = ["result"=>-1, "text"=>'Inventario - Línea no válida'];
+						}else
+							$return = ["result"=>-1, "text"=>'Inventario cerrado - borrado no válido'];
+					}else
+						$return = ["result"=>-1, "text"=>'Inventario - Identificador no válido'];
+					break;
 
 			// close -> Para el identificador de inventario pasado como argumento
 			//				Cierra una ubicación de un inventario, si se ha indicado, o todas las ubicaciones abiertas si no se especifica

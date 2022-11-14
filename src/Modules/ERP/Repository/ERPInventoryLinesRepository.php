@@ -47,6 +47,11 @@ class ERPInventoryLinesRepository extends ServiceEntityRepository
         ;
     }
     */
+    public function deleteLine($id){
+      $query="DELETE FROM erpinventory_lines WHERE id=:id";
+      $params=['id' => $id];
+      $result=$this->getEntityManager()->getConnection()->executeQuery($query, $params);
+    }
 
     public function getInventoryLinesGroup($inventory_id, $storelocation_id){
       $query="SELECT il.id as inventoryline_id, il.productvariant_id as productvariant_id, il.location_id as location_id,
