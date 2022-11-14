@@ -414,9 +414,12 @@ class ERPInventoryController extends Controller
 											}
 										}
 									}
+									$return = ["result"=>1, "text"=>'Inventario - Línea borrada correctamente'];
+									if ($oinventoryline!= null)
+										$return['data'] = $this->getInventoryLinesResult($oinventoryline);
 									// Borrado de la línea
 									$erpInventoryLinesRepository->deleteLine($oinventoryline->getId());
-									$return = ["result"=>1, "text"=>'Inventario - Línea borrada correctamente'];
+
 								}else
 									$return = ["result"=>-1, "text"=>'Inventario - Ubicación cerrada - borrado no válido'];
 							}else
