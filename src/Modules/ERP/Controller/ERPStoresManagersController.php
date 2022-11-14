@@ -639,6 +639,26 @@ class ERPStoresManagersController extends Controller
 			$channel=$repositoryVendingMachinesChannels->findOneBy(["vendingmachine"=>$vendingmachine,"channel"=>$channel,"active"=>1,"deleted"=>0]);
 			if(!$channel) return new JsonResponse(array('result' => -1, 'text'=>"Canal no configurado"));
 			if(!$channel->getProduct()) return new JsonResponse(array('result' => -1, 'text'=>"Canal sin producto configurado"));
+			//Modificación BABCOCK 14/11/2022 -- No autorizar operacion cuando no hay stock
+			//-------------------------------------------------------------------------------------------------
+			if($channel->getQuantity()<=0){
+				$date=new \DateTime();
+	 			$description="Operación no autorizada por falta de stock en canal ".$channel->getName();
+ 				$vendingMachineLog= new ERPStoresManagersVendingMachinesLogs();
+ 				$vendingMachineLog->setVendingmachine($vendingmachine);
+ 				$vendingMachineLog->setType(2);
+ 				$vendingMachineLog->setDescription($description);
+ 				$vendingMachineLog->setDateadd($date);
+ 				$vendingMachineLog->setDateupd($date);
+ 				$vendingMachineLog->setActive(1);
+ 				$vendingMachineLog->setDeleted(0);
+ 				$this->getDoctrine()->getManager()->persist($vendingMachineLog);
+ 				$this->getDoctrine()->getManager()->flush();
+				if($vendingmachine->getAlertnotifyaddress())
+ 					file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$vendingmachine->getAlertnotifyaddress().'&msg='.urlencode('Máquina '.$vendingmachine->getName().': '.$description));
+				return new JsonResponse(array('result' => -1, 'text'=>"Canal sin stock en el sistema"));
+			}
+			//-------------------------------------------------------------------------------------------------
 			$result["id"]=$channel->getId();
 			$result["name"]=$channel->getName();
 			$result["product_code"]=$channel->getProduct()->getCode();
