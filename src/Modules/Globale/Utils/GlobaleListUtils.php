@@ -26,8 +26,7 @@ class GlobaleListUtils
       }else if($maxResults>=0){
           $start=$request->query->getInt('start', 0);
           $length=$maxResults;
-      }
-
+      } else if ($maxResults<0) $length=-1;
       //Formamos el orden de los datos
   		if($request->query->has('order')){
   			 $order=$request->query->get('order');

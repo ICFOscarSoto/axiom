@@ -693,7 +693,9 @@ class ERPInventoryController extends Controller
 							LEFT JOIN erpproducts p ON p.id=pv.product_id
 							LEFT JOIN erpstore_locations st ON  il.location_id=st.id
 							LEFT JOIN globale_users u ON il.author_id=u.id',
-							'il.inventory_id='.$id.' and il.active=1 and il.deleted=0 GROUP BY il.productvariant_id, il.location_id');
+							'il.inventory_id='.$id.' and il.active=1 and il.deleted=0 GROUP BY il.productvariant_id, il.location_id',
+							-1,
+							'il.id');
 		return new JsonResponse($return);
 	}
 
