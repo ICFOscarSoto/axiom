@@ -1,6 +1,5 @@
 [
   {"id" : "addTopInventory", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"genericdata", "routeParams":{"module":"ERP", "name":"Inventory", "type":"modal" }, "modal":"Inventory", "actionType" : "background", "confirm" :false, "tooltip" : ""},
   {"id" : "deleteTopInventory", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true, "tooltip":""},
-  {"id" : "printTopInventory", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false, "tooltip":""},
-  {"id" : "exportTopInventory", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"exportInventory", "confirm" :false, "tooltip":""}
+  {"id" : "printTopInventory", "type" : "", "icon" : "fa fa-print","name" : "", "route":"", "confirm" :false, "tooltip":""}
 ]
