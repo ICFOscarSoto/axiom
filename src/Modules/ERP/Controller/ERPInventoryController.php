@@ -745,16 +745,13 @@ class ERPInventoryController extends Controller
 		 $header = array("string","string","string","string");
 		 $writer->setAuthor($this->getUser()->getName().' '.$this->getUser()->getLastname());
 		 $writer->writeSheetHeader('Hoja1', $header, $col_options = ['suppress_row'=>true] );
-		 $writer->writeSheetRow('Hoja1', ["CODIGO", "", "", "CANTIDAD","DESCRIPCION"]);
+		 $writer->writeSheetRow('Hoja1', ["Código", "", "", "Variación","Descripción","Cantidad previa", "Cantidad contada"]);
 		 $row_number=1;
 		 $lines=$linesRepository->getLines($id);
 		 	 foreach($lines as $line){
-				 if ($line["quantity"]-$line["oldquantity"]<0){
-					 $row=["id"=>$line["productcode"], "", "", $line["quantity"]-$line["oldquantity"],$line["productname"]];
-					 $writer->writeSheetRow('Hoja1', $row);
-					 $row_number++;
-				 }
-
+				$row=["id"=>$line["productcode"], "", "", $line["quantity"]-$line["oldquantity"],$line["productname"],$line["oldquantity"],$line["quantity"]];
+				$writer->writeSheetRow('Hoja1', $row);
+				$row_number++;
 			 }
 
 		 $writer->writeToFile($uploadDir.$filename);
