@@ -43,7 +43,7 @@ class StoresManagersVendingMachinesTransfersRemember extends ContainerAwareComma
               $output->writeln("  - Comprobando máquina ".$machine->getName());
               $channels=$vendingMachinesChannelsRepository->findBy(["vendingmachine"=> $machine,"active"=>1, "deleted"=>0]);
               foreach($channels as $channel){
-                if(($channel->getQuantity()<=$channel->getMinquantity()) && $channel->getProductcode()!=null){
+                if(($channel->getQuantity()<=$channel->getMinquantity()) && $channel->getProductcode()!=null && floor(($channel->getMaxquantity()-$channel->getQuantity())/$channel->getMultiplier())>0){
                   //Comunicamos la cantidad que hay que reaprovisionar en esta maquina
                   if(!$announced){
                       //Si no hemos mostrado otro reaprovisionamiento de esta maquina antes mostramos sus datos
