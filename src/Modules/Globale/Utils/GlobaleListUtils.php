@@ -223,9 +223,7 @@ class GlobaleListUtils
       $result=$manager->getConnection()->executeQuery($sql_records)->fetchAll();
       $result_total=$manager->getConnection()->executeQuery($sql_total)->fetchAll();
       $result_filter=$manager->getConnection()->executeQuery($sql_filter)->fetchAll();
-dump($sql_records);
-dump($sql_total);
-dump($sql_records);
+
       $tags=array();
       if (count($result_total)>1)
         $return['recordsTotal']=count($result_total);
