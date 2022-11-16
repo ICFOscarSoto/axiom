@@ -471,7 +471,7 @@ class ERPInventoryController extends Controller
 							// Todos los productos definidos para la ubicación en stock
 							$ostocks					= $erpStocksRepository->getProductByLocation($oslocation->getId());
 							// Todos los productos inventariados de la ubicación
-							$oinventorylines	= $erpInventoryLinesRepository->getInventoryLinesGroup($oinventory->getId(), $ostorelocation->getId());
+							$oinventorylines	= $erpInventoryLinesRepository->getInventoryLinesGroup($oinventory->getId(), $oslocation->getId());
 
 							foreach($ostocks as $key=>$ostock){
 								$existsline = false;
