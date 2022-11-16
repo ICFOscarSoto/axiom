@@ -54,7 +54,7 @@ private $name="References";
       'disabled' => false,
       'attr' => ['class' => 'select2', 'readonly' => true],
       'choices' => $choices,
-      'placeholder' => 'Select a product',
+      'placeholder' => 'Selecciona variante',
       'choice_label' => function($obj, $key, $index) {
           return $obj->getVariant()->getName();
       },
@@ -66,7 +66,7 @@ private $name="References";
       'disabled' => false,
       'attr' => ['class' => 'select2', 'readonly' => true],
       'choices' => $product?$suppliersRepository->findBy(["company"=>$user->getCompany()]):null,
-      'placeholder' => 'Select a supplier',
+      'placeholder' => 'Selecciona proveedor',
       'choice_label' => function($obj, $key, $index) {
           return $obj->getName();
       },

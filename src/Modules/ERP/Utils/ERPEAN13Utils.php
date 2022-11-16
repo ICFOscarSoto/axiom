@@ -53,8 +53,8 @@ class ERPEAN13Utils
       'required' => false,
       'disabled' => false,
       'attr' => ['class' => 'select2', 'readonly' => true],
-      'choices' => $product?$productsvariantsRepository->findBy(["product"=>$product->getId()]):null,
-      'placeholder' => 'Select a product',
+      'choices' => $product?$productsvariantsRepository->findBy(["product"=>$product]):null,
+      'placeholder' => 'Selecciona variante',
       'choice_label' => function($obj, $key, $index) {
           return ($obj?($obj->getVariant()?$obj->getVariant()->getName():''):'');
       },
@@ -66,7 +66,7 @@ class ERPEAN13Utils
       'disabled' => false,
       'attr' => ['class' => 'select2', 'readonly' => true],
       'choices' => $product?$suppliersRepository->findBy(["company"=>$user->getCompany()]):null,
-      'placeholder' => 'Select a supplier',
+      'placeholder' => 'Selecciona proveedor',
       'choice_label' => function($obj, $key, $index) {
           return $obj->getName();
       },

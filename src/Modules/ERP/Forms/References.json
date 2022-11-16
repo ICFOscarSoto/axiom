@@ -3,8 +3,9 @@
 		{
 			"name": "Reference data",
 			"fields": [
-				{ "name": "name","cols": 2},
-				{ "name": "description","cols": 4},
+				{ "name": "name","cols": 3},
+				{ "name": "productvariant","cols": 3},
+				{ "name": "description","cols": 6},
 				{ "name": "type", "cols": 3,
 					"transform": {
 							"type":"option",

@@ -198,4 +198,13 @@ class ERPReferences
 
         return $this;
     }
+
+    public function preProccess($kernel, $doctrine, $user, $params, $oldobj){
+      if ($this->getProductvariant()!=null && $this->getProductvariant()->getVariant()!=null && $this->getProductvariant()->getVariant()->getId()==null)
+        $this->getProductvariant()->setVariant(null);
+      if ($this->getType()==1)
+        $this->setCustomer(null);
+      else
+        $this->setSupplier(null);
+    }
 }

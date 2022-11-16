@@ -54,28 +54,37 @@ class ERPEAN13Controller extends Controller
    $utils = new GlobaleFormUtils();
    $utilsObj=new ERPEAN13Utils();
    $productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
+   $productVariantRepository=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
    $EAN13Repository=$this->getDoctrine()->getRepository(ERPEAN13::class);
-   $product=new ERPProducts();
+   $product=null;
+   $productvariant=null;
    $ean13=new ERPEAN13();
    if($id==0){
-    if($idproduct==0 ) $idproduct=$request->query->get('idproduct');
-    if($idproduct==0 || $idproduct==null) $idproduct=$request->request->get('id-parent',0);
-    $product = $productRepository->find($idproduct);
+    $form = $request->request->get('form');
+    if ($form && $form['productvariant'])
+      $productvariant = $productVariantRepository->findOneBy(['id'=>$form['productvariant']]);
+    if ($productvariant==null){
+      if($idproduct==null || $idproduct==0)
+        $idproduct=$request->query->get('idproduct');
+      if($idproduct==null || $idproduct==0)
+        $idproduct=$request->request->get('id-parent',0);
+      $product = $productRepository->find($idproduct);
+      $productvariant = $productVariantRepository->findOneBy(['product'=>$product, 'variant'=>null]);
+    }else
+      $product = $productvariant->getProduct();
    }else{
     $ean13 = $EAN13Repository->find($id);
-    if ($ean13->getProductvariant())
-      $product = $ean13->getProductvariant()->getProduct();
+    $productvariant = $ean13->getProductvariant();
+    $product = $productvariant->getProduct();
    }
    $supplier=$id==0?$product->getSupplier():$ean13->getSupplier();
-   $defaultSupplier=$this->getDoctrine()->getRepository(ERPSuppliers::class);
-   //$default=$defaultSupplier->findOneBy(['id'=>$supplier->getId()]);
-   if($ean13->getSupplier()==null) $default=$defaultSupplier->findOneBy(['id'=>$supplier->getId()]);
-    else $default=$ean13->getSupplier();
+   $customer=$id==0?null:$ean13->getCustomer();
 
    $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(),
-   "supplier"=>$default,
+   "supplier"=>$supplier,
+   "customer"=>$customer,
    "product"=>$product,
-   "productvariant"=>$id==0?null:$ean13->getProductvariant()];
+   "productvariant"=>$productvariant];
 
    $utils->initialize($this->getUser(), $ean13, $template, $request, $this, $this->getDoctrine(),
                           method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],
@@ -198,7 +207,7 @@ class ERPEAN13Controller extends Controller
       $ean->setSupplier($product->getSupplier());
       $ean->setDateupd(new \Datetime());
       $ean->setProductvariant($productvariant);
-    }  
+    }
     $this->getDoctrine()->getManager()->persist($ean);
     $this->getDoctrine()->getManager()->flush();
     return new JsonResponse(["result"=>1, "text"=>""]);

@@ -230,4 +230,9 @@ class ERPWorkList
 
         return $this;
     }
+
+    public function preProccess($kernel, $doctrine, $user, $params, $oldobj){
+      if ($this->getProductvariant()!=null && $this->getProductvariant()->getVariant()!=null && $this->getProductvariant()->getVariant()->getId()==null)
+        $this->getProductvariant()->setVariant(null);
+    }
 }

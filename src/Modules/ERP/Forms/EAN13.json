@@ -3,7 +3,8 @@
 		{
 			"name": "EAN13 data",
 			"fields": [
-				{ "name": "name","cols": 2},
+				{ "name": "name","cols": 3},
+				{ "name": "productvariant","cols": 3},
 				{ "name": "type", "cols": 3,
           "transform": {
               "type":"option",

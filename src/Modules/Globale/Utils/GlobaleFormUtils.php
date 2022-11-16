@@ -475,9 +475,9 @@ class GlobaleFormUtils extends Controller
          if(method_exists($obj,'formValidation')) $validation=$obj->{'formValidation'}($this->controller->get('kernel'), $this->doctrine, $this->user, $this->preParams);
          if($validation["valid"]==false) //Abort proccess
           return ["obj"=>false, "validation"=>$validation];
+
          //if object has a preproccess run it
          if(method_exists($obj,'preProccess')) $obj->{'preProccess'}($this->controller->get('kernel'), $this->doctrine, $this->user, $this->preParams, $this->obj_old);
-
          $this->entityManager->persist($obj);
          $this->entityManager->flush();
          if(method_exists($obj,'postProccess')) $obj->{'postProccess'}($this->controller->get('kernel'), $this->doctrine, $this->user, $this->postParams, $this->obj_old);

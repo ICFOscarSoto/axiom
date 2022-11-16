@@ -229,4 +229,9 @@ class ERPProductsSuppliers
 
         return $this;
     }
+
+    public function preProccess($kernel, $doctrine, $user, $params, $oldobj){
+      if ($this->getProductVariant()!=null && $this->getProductVariant()->getVariant()!=null && $this->getProductVariant()->getVariant()->getId()==null)
+        $this->getProductVariant()->setVariant(null);
+    }
 }

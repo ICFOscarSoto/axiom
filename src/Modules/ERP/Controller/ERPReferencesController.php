@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\ERP\Entity\ERPReferences;
 use App\Modules\ERP\Entity\ERPProducts;
+use App\Modules\ERP\Entity\ERPProductsVariants;
 use App\Modules\ERP\Entity\ERPSuppliers;
 use App\Modules\Globale\Entity\GlobaleCountries;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
@@ -53,24 +54,39 @@ class ERPReferencesController extends Controller
      $template=dirname(__FILE__)."/../Forms/References.json";
      $utils = new GlobaleFormUtils();
      $utilsObj=new ERPReferencesUtils();
-     $defaultProduct=$this->getDoctrine()->getRepository(ERPProducts::class);
+     $productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
+     $productVariantRepository=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
      $referencesRepository=$this->getDoctrine()->getRepository(ERPReferences::class);
-     $obj=new ERPReferences();
+     $product=null;
+     $productvariant=null;
+     $reference=new ERPReferences();
      if($id==0){
-      if($idproduct==0 ) $idproduct=$request->query->get('idproduct');
-      if($idproduct==0 || $idproduct==null) $idproduct=$request->request->get('id-parent',0);
-      $product = $defaultProduct->find($idproduct);
-    }else $obj = $referencesRepository->find($id);
-     $supplier=$id==0?$product->getSupplier():$obj->getProduct()->getSupplier();
-     $defaultSupplier=$this->getDoctrine()->getRepository(ERPSuppliers::class);
-
-     if($obj->getSupplier()==null) $default=$defaultSupplier->findOneBy(['id'=>$supplier->getId()]);
-     else $default=$obj->getSupplier();
+      $form = $request->request->get('form');
+      if ($form && $form['productvariant'])
+        $productvariant = $productVariantRepository->findOneBy(['id'=>$form['productvariant']]);
+      if ($productvariant==null){
+        if($idproduct==null || $idproduct==0)
+          $idproduct=$request->query->get('idproduct');
+        if($idproduct==null || $idproduct==0)
+          $idproduct=$request->request->get('id-parent',0);
+        $product = $productRepository->find($idproduct);
+        $productvariant = $productVariantRepository->findOneBy(['product'=>$product, 'variant'=>null]);
+      }else
+        $product = $productvariant->getProduct();
+     }else{
+      $reference = $referencesRepository->find($id);
+      $productvariant = $reference->getProductvariant();
+      $product = $productvariant->getProduct();
+     }
+     $supplier=$id==0?$product->getSupplier():$reference->getSupplier();
+     $customer=$id==0?null:$reference->getCustomer();
 
      $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(),
-     "supplier"=>$default, "product"=>$id==0?$product:$obj->getProduct(),
-     "productvariant"=>$id==0?null:$obj->getProductVariant()];
-     $utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),
+     "supplier"=>$supplier,
+     "customer"=>$customer,
+     "product"=>$product,
+     "productvariant"=>$productvariant];
+     $utils->initialize($this->getUser(), $reference, $template, $request, $this, $this->getDoctrine(),
                             method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],
                             method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
      if($id==0) $utils->values(["product"=>$product]);
