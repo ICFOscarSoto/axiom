@@ -15,7 +15,7 @@ class GlobaleListUtils
       return null;
     }
 
-    public function getRecordsSQL($user,$repository,$request,$manager,$listFields,$classname,$select_fields,$from,$where,$maxResults=null,$orderBy="id"): array{
+    public function getRecordsSQL($user,$repository,$request,$manager,$listFields,$classname,$select_fields,$from,$where,$maxResults=null,$orderBy="id",$groupBy=null): array{
       $listName=$request->attributes->get('name');
       $return=array();
       $start=0;
@@ -94,7 +94,12 @@ class GlobaleListUtils
               if(count($path)>1){
                 $database_field=$path[0].'.'.$path[1];
               }else{
-                $database_field='p.'.$field["name"];
+                foreach($select_fields as $fieldas=>$as){
+                  if ($field["name"]==$as)
+                    $database_field=$fieldas;
+                }
+                if( $database_field==null)
+                  $database_field='p.'.$field["name"];
               }
             }
             $tokensSearchValue=explode('*',$searchValue);
@@ -149,7 +154,12 @@ class GlobaleListUtils
                   if(count($path)>1){
                     $database_field=$path[0].'.'.$path[1];
                   }else{
-                    $database_field='p.'.$field["name"];
+                    foreach($select_fields as $fieldas=>$as){
+                      if ($field["name"]==$as)
+                        $database_field=$fieldas;
+                    }
+                    if( $database_field==null)
+                      $database_field='p.'.$field["name"];
                   }
                 }
 
@@ -200,17 +210,33 @@ class GlobaleListUtils
       $sql_total.=' WHERE '.$where;
       $sql_filter.=' WHERE '.$filter_where;
       $sql_records.=' WHERE '.$filter_where;
+
+      if ($groupBy){
+        $sql_total.=' GROUP BY '.$groupBy;
+        $sql_filter.=' GROUP BY '.$groupBy;
+        $sql_records.=' GROUP BY '.$groupBy;
+      }
+
       $sql_records.=' ORDER BY '.$order.' '.$orderDir;
 
       if($length!=-1) $sql_records.=' LIMIT '.$start.', '.$length;
-
       $result=$manager->getConnection()->executeQuery($sql_records)->fetchAll();
-      $result_total=$manager->getConnection()->executeQuery($sql_total)->fetch();
-      $result_filter=$manager->getConnection()->executeQuery($sql_filter)->fetch();
-
+      $result_total=$manager->getConnection()->executeQuery($sql_total)->fetchAll();
+      $result_filter=$manager->getConnection()->executeQuery($sql_filter)->fetchAll();
+dump($sql_records);
+dump($sql_total);
+dump($sql_records);
       $tags=array();
-      $return['recordsTotal']=$result_total["total"];
-      $return['recordsFiltered']=$result_filter["total"];
+      if (count($result_total)>1)
+        $return['recordsTotal']=count($result_total);
+      else
+        $return['recordsTotal']=$result_total[0]["total"];
+
+      if (count($result_filter)>1)
+        $return['recordsFiltered']=count($result_filter);
+      else
+        $return['recordsFiltered']=$result_filter[0]["total"];
+
       $return['data']=[];
       foreach($result as $key=>$row){
         $return['data'][]=$row;
