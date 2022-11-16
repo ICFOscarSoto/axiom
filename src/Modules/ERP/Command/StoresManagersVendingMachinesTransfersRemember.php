@@ -71,7 +71,7 @@ class StoresManagersVendingMachinesTransfersRemember extends ContainerAwareComma
               $send=false;
               $msg.="<ul>";
               foreach($channels as $channel){
-                if(($channel->getQuantity()<=$channel->getMinquantity()) && $channel->getProductcode()!=null){
+                if(($channel->getQuantity()<=$channel->getMinquantity()) && $channel->getProductcode()!=null && floor(($channel->getMaxquantity()-$channel->getQuantity())/$channel->getMultiplier())>0){
                   //Comunicamos la cantidad que hay que reaprovisionar en esta maquina
                   $msg.="<li>Canal: <b>".$channel->getName()."</b> (Num. canal: <b>".str_pad($channel->getChannel(),3,'0',STR_PAD_LEFT)."</b>) Ref: <b>".$channel->getProductcode()."</b> - ".$channel->getProductname()." - Cantidad: <b>".(floor(($channel->getMaxquantity()-$channel->getQuantity())/$channel->getMultiplier())." unidades.</b></li>");
                   $send=true;
