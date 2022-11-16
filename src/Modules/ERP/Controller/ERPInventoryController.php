@@ -581,6 +581,7 @@ class ERPInventoryController extends Controller
 		$return['productvariant_id'] = $oinventorylines->getProductvariant()->getId();
 		$return['product_id'] = $oinventorylines->getProductvariant()->getProduct()->getId();
 		$return['product_name'] = $oinventorylines->getProductvariant()->getProduct()->getName();
+		$return['product_code'] = $oinventorylines->getProductvariant()->getProduct()->getCode();
 		$return['variant_id'] = ($oinventorylines->getProductvariant()->getVariant()?$oinventorylines->getProductvariant()->getVariant()->getId():'');
 		$return['variant_name'] = ($oinventorylines->getProductvariant()->getVariant()?$oinventorylines->getProductvariant()->getVariant()->getName():'');
 		$return['quantityconfirmed'] = $oinventorylines->getQuantityconfirmed();
@@ -694,7 +695,7 @@ class ERPInventoryController extends Controller
 							LEFT JOIN erpstore_locations st ON  il.location_id=st.id
 							LEFT JOIN globale_users u ON il.author_id=u.id',
 							'il.inventory_id='.$id.' and il.active=1 and il.deleted=0 GROUP BY il.productvariant_id, il.location_id',
-							-1,
+							20,
 							'il.id');
 		return new JsonResponse($return);
 	}
