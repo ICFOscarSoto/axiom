@@ -26,6 +26,9 @@ use App\Modules\ERP\Entity\ERPProductsVariants;
 use App\Modules\ERP\Entity\ERPStocks;
 use App\Modules\ERP\Entity\ERPStocksHistory;
 use App\Modules\ERP\Entity\ERPEAN13;
+use App\Modules\ERP\Entity\ERPStoresManagersVendingMachines;
+use App\Modules\ERP\Entity\ERPStoresManagersVendingMachinesChannels;
+use App\Modules\ERP\Entity\ERPTypesMovements;
 use App\Modules\Security\Utils\SecurityUtils;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\MimeType\FileinfoMimeTypeGuesser;
@@ -772,7 +775,54 @@ class ERPInventoryController extends Controller
 	 }
 
 
+	 /**
+ 	 * @Route("/api/inventoryVengingMachine/{id}", name="inventoryVengingMachine")
+ 	 */
+ 	 public function inventoryVengingMachine($id, Request $request){
+		$numChannel=$request->request->get('channel');
+		$channelRepository=$this->getDoctrine()->getRepository(ERPStoresManagersVendingMachinesChannels::class);
+		$vendingmachineRepository=$this->getDoctrine()->getRepository(ERPStoresManagersVendingMachines::class);
+		$productvariantRepository=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
+		$vendingmachine=$vendingmachineRepository->findOneBy(["id"=>$id, "active"=>1, "deleted"=>0]);
+		$channel=$channelRepository->findOneBy(["vendingmachine"=>$vendingmachine, "channel"=>$numChannel, "active"=>1, "deleted"=>0]);
+		if ($channel){
+			$newStock=$request->request->get('newStock')*$channel->getMultiplier();
+			$typesRepository=$this->getDoctrine()->getRepository(ERPTypesMovements::class);
+			$type=$typesRepository->findOneBy(["name"=>"Ajuste de inventario en maquina"]);
+			$stockHistory=new ERPStocksHistory();
+			$stockHistory->setProductcode($channel->getProduct()->getCode());
+			$stockHistory->setProductname($channel->getProduct()->getName());
+			$productvariant=$productvariantRepository->findOneBy(["product"=>$channel->getProduct(), "variant"=>null]);
+			$stockHistory->setProductVariant($productvariant);
+			if ($channel->getVendingmachine()->getStorelocation()!=null) {
+					$stockHistory->setLocation($channel->getVendingmachine()->getStorelocation());
+				}
+				else {
+					$locationRepository=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
+					$storeLocation=$locationRepository->findOneBy(["name"=>"EXPEND ALM"]);
+					$stockHistory->setLocation($storeLocation);
+			}
+			$stockHistory->setVendingmachinechannel($channel);
+			$stockHistory->setUser($this->getUser());
+			$stockHistory->setCompany($this->getUser()->getCompany());
+			$stockHistory->setDateadd(new \Datetime());
+			$stockHistory->setDateupd(new \Datetime());
+			$stockHistory->setQuantity($newStock-($channel->getQuantity()));
+			$stockHistory->setPreviousqty($channel->getQuantity());
+			$stockHistory->setNewqty($newStock);
+			$stockHistory->setType($type);
+			$stockHistory->setActive(true);
+			$stockHistory->setDeleted(false);
+			$this->getDoctrine()->getManager()->persist($stockHistory);
+			$channel->setQuantity($newStock);
+			$this->getDoctrine()->getManager()->persist($channel);
+			$this->getDoctrine()->getManager()->flush();
+			$response=["result"=>1, "text"=>'Inventario - Guardado con éxito'];
+		}
+		else $response=["result"=>-1, "text"=>'No existe el canal en la máquina'];
 
+		return new JsonResponse($response);
+	 }
 
 
 
