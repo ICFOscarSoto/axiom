@@ -4,11 +4,11 @@
         "caption": "id"
     },
     {
-          "name": "product__code",
+          "name": "productvariant__product__code",
           "caption": "code"
     },
     {
-        "name": "product__name",
+        "name": "productvariant__product__name",
         "caption": "name"
     },
     {

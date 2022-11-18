@@ -24,10 +24,10 @@ class ERPStoresManagersProducts
     private $manager;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Modules\ERP\Entity\ERPProducts")
+     * @ORM\ManyToOne(targetEntity="App\Modules\ERP\Entity\ERPProductsVariants")
      * @ORM\JoinColumn(nullable=false)
      */
-    private $product;
+    private $productvariant;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Modules\Globale\Entity\GlobaleUsers")
@@ -77,14 +77,14 @@ class ERPStoresManagersProducts
         return $this;
     }
 
-    public function getProduct(): ?ERPProducts
+    public function getProductvariant(): ?ERPProductsVariants
     {
-        return $this->product;
+        return $this->productvariant;
     }
 
-    public function setProduct(?ERPProducts $product): self
+    public function setProductvariant(?ERPProductsVariants $productvariant): self
     {
-        $this->product = $product;
+        $this->productvariant = $productvariant;
 
         return $this;
     }
