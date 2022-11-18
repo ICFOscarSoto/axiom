@@ -1376,4 +1376,20 @@ class ERPStoresManagersController extends Controller
 
 
 
+		/**
+			* @Route("/api/ERP/dataStoresManagersProducts/{id}/{action}", name="dataStoresManagersProducts", defaults={"id"=0, "action"="read"})
+			*/
+		public function dataStoresManagersProducts($id,$action, RouterInterface $router,Request $request){
+			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			$template=dirname(__FILE__)."/../Forms/StoresManagersProducts.json";
+			$utils = new GlobaleFormUtils();
+	 	 	$utilsObj = new ERPStoresManagersProductsUtils();
+			$repository=$this->getDoctrine()->getRepository(ERPStoresManagersProducts::class);
+			$obj = $repository->findOneBy(['id'=>$id, 'active'=>1, 'deleted'=>0]);
+			$params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "obj"=>$obj];
+			$utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),$utilsObj->getExcludedForm($params),$utilsObj->getIncludedForm($params));
+			$make = $utils->make($obj->getId(), ERPStoresManagersProducts::class, $action, "formStoresManagersProducts", "modal", "@ERP/storesManagersProducts.html.twig");
+			return $make;
+		}
+
 }
