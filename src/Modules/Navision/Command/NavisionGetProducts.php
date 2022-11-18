@@ -343,6 +343,7 @@ public function importStocksStoresManaged(InputInterface $input, OutputInterface
     $repositoryVariants=$this->doctrine->getRepository(ERPVariants::class);
     $repositoryProductsVariants=$this->doctrine->getRepository(ERPProductsVariants::class);
     $repositoryStoreLocations=$this->doctrine->getRepository(ERPStoreLocations::class);
+    $repositoryStores=$this->doctrine->getRepository(ERPStores::class);
     $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
     $company=$repositoryCompanies->find(2);
     $old_obj=explode('~',$object['codigo_antiguo']);
@@ -351,25 +352,26 @@ public function importStocksStoresManaged(InputInterface $input, OutputInterface
     $product=null;
     $variant=null;
     $storelocation=null;
+    $store=null;
     if ($object['accion']=='U') {
       $quantity=intval($new_obj[3])-intval($old_obj[3]);
       $product=$repositoryProducts->findOneBy(["code"=>$new_obj[1]]);
-      $storelocation=$repositoryStoreLocations->findOneBy(["name"=>$new_obj[5]]);
+      $store=$repositoryStores->findOneBy(["name"=>$new_obj[5]]);
     }
     else if ($object['accion']=='D'){
       $quantity=$old_obj[3];
       $product=$repositoryProducts->findOneBy(["code"=>$old_obj[1]]);
-      $storelocation=$repositoryStoreLocations->findOneBy(["name"=>$old_obj[5]]);
+      $store=$repositoryStores->findOneBy(["name"=>$old_obj[5]]);
     }
     else {
       $quantity=$new_obj[3];
       $product=$repositoryProducts->findOneBy(["code"=>$new_obj[1]]);
-      $storelocation=$repositoryStoreLocations->findOneBy(["name"=>$new_obj[5]]);
+      $store=$repositoryStores->findOneBy(["name"=>$new_obj[5]]);
     }
     if($new_obj[2]!="")
       $variant=$repositoryVariants->findOneBy(["name"=>$new_obj[2]]);
     $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product,"variant"=>$variant]);
-
+    $storelocation=$repositoryStoreLocations->findOneBy(["store_id"=>$store->getId()]);
     $stocks=$repositoryStocks->findOneBy(["productvariant"=>$productvariant, "storelocation"=>$storelocation, "active"=>1, "deleted"=>0]);
     if($product!=null AND $storelocation!=null)
     {
