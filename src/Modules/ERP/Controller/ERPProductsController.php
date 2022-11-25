@@ -1136,6 +1136,9 @@ class ERPProductsController extends Controller
 				 	 $transfersRepository=$this->getDoctrine()->getRepository(NavisionTransfers::class);
 				 	 $productsRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
 				 	 $storesRepository=$this->getDoctrine()->getRepository(ERPStores::class);
+				 	 $stocksRepository=$this->getDoctrine()->getRepository(ERPStocks::class);
+					 $repositoryStoreLocations=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
+				 	 $repositoryProductsVariants=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
 					 $product=$productsRepository->findOneBy(["code"=>$object["code"]]);
 					 $item=$transfersRepository->findOneBy(["name"=>$name, "product"=>$product, "active"=>1, "deleted"=>0]);
 					 if ($item==null){
@@ -1143,6 +1146,9 @@ class ERPProductsController extends Controller
 						 else $originStore=$storesRepository->findOneBy(["code"=>"ALM01"]);
 						 $dateSend=new \DateTime(date('Y-m-d 00:00:00',strtotime($object["dateSend"]["date"])));
 						 $destinationStore=$storesRepository->findOneBy(["code"=>$object["almacen"]]);
+						 $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product,"variant"=>null]);
+				     $storelocation=$repositoryStoreLocations->findOneBy(["store"=>$destinationStore]);
+						 $stocks=$stocksRepository->findOneBy(["productvariant"=>$productvariant, "storelocation"=>$storelocation, "active"=>1, "deleted"=>0]);
 						 $obj=new NavisionTransfers();
 						 $obj->setOriginstore($originStore);
 						 $obj->setDestinationstore($destinationStore);
@@ -1157,6 +1163,23 @@ class ERPProductsController extends Controller
 						 $obj->setDeleted(0);
 						 $obj->setReceived(0);
 						 $this->getDoctrine()->getManager()->persist($obj);
+						 if ($stocks==null ){
+				         $stocks=new ERPStocks();
+				         $stocks->setProductVariant($productvariant);
+				         $stocks->setStoreLocation($storelocation);
+				         $stocks->setCompany($this->getUser()->getCompany());
+				         $stocks->setQuantity(0);
+				         $stocks->setPendingreceive((int)$object["stock"]);
+				         $stocks->setDateupd(new \Datetime());
+				         $stocks->setDateadd(new \Datetime());
+				         $stocks->setDeleted(0);
+				         $stocks->setActive(1);
+				       } else
+							{
+				       $stocks->setPendingreceive($stocks->getPendingreceive()+(int)$object["stock"]);
+				      }
+
+							$this->getDoctrine()->getManager()->persist($stocks);
 					 }
 					 $this->getDoctrine()->getManager()->flush();
 				 }
@@ -1209,6 +1232,7 @@ class ERPProductsController extends Controller
 			 if ($stocks->getPendingreceive()<$received) return new JsonResponse(["result"=>-5, "text"=>"El producto  ".$object["code"]." no tiene pendiente de recibir tantas unidades "]);
 			 $stocks->setPendingreceive($stocks->getPendingreceive()-$received);
 			 $this->getDoctrine()->getManager()->persist($stocks);
+			 $stockHistoryRepository=$this->getDoctrine()->getRepository(ERPStockHistory::class);
 			 // si el traspaso se realiza en un almacén que no sea campollano/romica buscamos el stock del producto para modificarlo
 			 // en la ubicación genérica de ese almacén
 			 if ($store->getId()>2){
@@ -1218,6 +1242,9 @@ class ERPProductsController extends Controller
 				 $stock=$stockRepository->findOneBy(['storelocation'=>$location->getId(), 'productvariant'=>$productvariant]);
 				 $typesRepository=$this->getDoctrine()->getRepository(ERPTypesMovements::class);
 				 $type=$typesRepository->findOneBy(["name"=>"Traspaso recibido"]);
+				 // comprobamos que la linea no exista ya en el histórico
+				 $oldstockHistory=$stockHistoryRepository->findOneBy(["productvariant"=>$productvariant, "numOperation"=>$transfer]);
+				 if ($oldstockHistory) return new JsonResponse(["result"=>-6, "text"=>"El traspaso  ".$transfer." ya ha sido recepcionado con anterioridad."]);		 
 				 $stockHistory=new ERPStocksHistory();
          $stockHistory->setProductcode($productvariant->getProduct()->getCode());
          $stockHistory->setProductname($productvariant->getProduct()->getName());
@@ -1238,7 +1265,7 @@ class ERPProductsController extends Controller
 
 				 $this->getDoctrine()->getManager()->persist($stock);
 				 $this->getDoctrine()->getManager()->persist($stockHistory);
-			 } else return new JsonResponse(["result"=>-6, "text"=>"El almacén de destino (".$store->getName().") no se corresponde con un almacén gestionado"]);
+			 } else return new JsonResponse(["result"=>-7, "text"=>"El almacén de destino (".$store->getName().") no se corresponde con un almacén gestionado"]);
 
 
 			 $this->getDoctrine()->getManager()->flush();
