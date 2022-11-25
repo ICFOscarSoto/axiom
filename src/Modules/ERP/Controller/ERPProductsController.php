@@ -1232,7 +1232,7 @@ class ERPProductsController extends Controller
 			 if ($stocks->getPendingreceive()<$received) return new JsonResponse(["result"=>-5, "text"=>"El producto  ".$object["code"]." no tiene pendiente de recibir tantas unidades "]);
 			 $stocks->setPendingreceive($stocks->getPendingreceive()-$received);
 			 $this->getDoctrine()->getManager()->persist($stocks);
-			 $stockHistoryRepository=$this->getDoctrine()->getRepository(ERPStockHistory::class);
+			 $stockHistoryRepository=$this->getDoctrine()->getRepository(ERPStocksHistory::class);
 			 // si el traspaso se realiza en un almacén que no sea campollano/romica buscamos el stock del producto para modificarlo
 			 // en la ubicación genérica de ese almacén
 			 if ($store->getId()>2){
@@ -1244,7 +1244,7 @@ class ERPProductsController extends Controller
 				 $type=$typesRepository->findOneBy(["name"=>"Traspaso recibido"]);
 				 // comprobamos que la linea no exista ya en el histórico
 				 $oldstockHistory=$stockHistoryRepository->findOneBy(["productvariant"=>$productvariant, "numOperation"=>$transfer]);
-				 if ($oldstockHistory) return new JsonResponse(["result"=>-6, "text"=>"El traspaso  ".$transfer." ya ha sido recepcionado con anterioridad."]);		 
+				 if ($oldstockHistory) return new JsonResponse(["result"=>-6, "text"=>"El traspaso  ".$transfer." ya ha sido recepcionado con anterioridad."]);
 				 $stockHistory=new ERPStocksHistory();
          $stockHistory->setProductcode($productvariant->getProduct()->getCode());
          $stockHistory->setProductname($productvariant->getProduct()->getName());
