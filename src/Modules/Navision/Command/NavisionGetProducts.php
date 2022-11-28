@@ -356,17 +356,17 @@ public function importStocksStoresManaged(InputInterface $input, OutputInterface
     if ($object['accion']=='U') {
       $quantity=intval($new_obj[3])-intval($old_obj[3]);
       $product=$repositoryProducts->findOneBy(["code"=>$new_obj[1]]);
-      $store=$repositoryStores->findOneBy(["name"=>$new_obj[5]]);
+      $store=$repositoryStores->findOneBy(["code"=>$new_obj[5]]);
     }
     else if ($object['accion']=='D'){
       $quantity=$old_obj[3];
       $product=$repositoryProducts->findOneBy(["code"=>$old_obj[1]]);
-      $store=$repositoryStores->findOneBy(["name"=>$old_obj[5]]);
+      $store=$repositoryStores->findOneBy(["code"=>$old_obj[5]]);
     }
     else {
       $quantity=$new_obj[3];
       $product=$repositoryProducts->findOneBy(["code"=>$new_obj[1]]);
-      $store=$repositoryStores->findOneBy(["name"=>$new_obj[5]]);
+      $store=$repositoryStores->findOneBy(["code"=>$new_obj[5]]);
     }
     if($new_obj[2]!="")
       $variant=$repositoryVariants->findOneBy(["name"=>$new_obj[2]]);
