@@ -1346,7 +1346,8 @@ class ERPStoresManagersController extends Controller
 		$machineRepository=$this->getDoctrine()->getRepository(ERPStoresManagersVendingMachines::class);
 		$transfersRepository=$this->getDoctrine()->getRepository(NavisionTransfers::class);
 		$locationsRepository=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
-		$location=$locationsRepository->findOneBy(["name"=>$transfersRepository->findOneBy(["name"=>$name, "active"=>1, "deleted"=>0])->getDestinationstore()->getCode()]);
+		$storeRepository=$this->getDoctrine()->getRepository(ERPStores::class);
+		$location=$locationsRepository->findOneBy(["store"=>$transfersRepository->findOneBy(["name"=>$name, "active"=>1, "deleted"=>0])->getDestinationstore()]);
 		$machine=$machineRepository->findOneBy(["storelocation"=>$location]);
 		$params["rootdir"]= $this->get('kernel')->getRootDir();
 		$params["user"]=$this->getUser();
