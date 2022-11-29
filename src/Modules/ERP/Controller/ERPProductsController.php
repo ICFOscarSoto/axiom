@@ -1227,9 +1227,12 @@ class ERPProductsController extends Controller
 			 $stocksRepository=$this->getDoctrine()->getRepository(ERPStocks::class);
 			 $stocks=$stocksRepository->findOneBy(['storelocation'=>$storeLocation, 'productvariant'=>$productvariant, "active"=>1, "deleted"=>0]);
 			 if ($stocks==null) return new JsonResponse(["result"=>-4, "text"=>"El producto  ".$object["code"]." no está en el almacén ".$store->getName()]);
+			 // comprobamos que la linea no exista ya en el histórico
+			 $oldstockHistory=$stockHistoryRepository->findOneBy(["productvariant"=>$productvariant, "numOperation"=>$transfer]);
+			 if ($oldstockHistory) return new JsonResponse(["result"=>-5, "text"=>"El traspaso  ".$transfer." ya ha sido recepcionado con anterioridad."]);
 			 // actualizamos el stock del pendiente de recibir
 			 $received=(int)$object["stock"];
-			 if ($stocks->getPendingreceive()<$received) return new JsonResponse(["result"=>-5, "text"=>"El producto  ".$object["code"]." no tiene pendiente de recibir tantas unidades "]);
+			 if ($stocks->getPendingreceive()<$received) return new JsonResponse(["result"=>-6, "text"=>"El producto  ".$object["code"]." no tiene pendiente de recibir tantas unidades "]);
 			 $stocks->setPendingreceive($stocks->getPendingreceive()-$received);
 			 $this->getDoctrine()->getManager()->persist($stocks);
 			 $stockHistoryRepository=$this->getDoctrine()->getRepository(ERPStocksHistory::class);
@@ -1242,9 +1245,6 @@ class ERPProductsController extends Controller
 				 $stock=$stockRepository->findOneBy(['storelocation'=>$location->getId(), 'productvariant'=>$productvariant]);
 				 $typesRepository=$this->getDoctrine()->getRepository(ERPTypesMovements::class);
 				 $type=$typesRepository->findOneBy(["name"=>"Traspaso recibido"]);
-				 // comprobamos que la linea no exista ya en el histórico
-				 $oldstockHistory=$stockHistoryRepository->findOneBy(["productvariant"=>$productvariant, "numOperation"=>$transfer]);
-				 if ($oldstockHistory) return new JsonResponse(["result"=>-6, "text"=>"El traspaso  ".$transfer." ya ha sido recepcionado con anterioridad."]);
 				 $stockHistory=new ERPStocksHistory();
          $stockHistory->setProductcode($productvariant->getProduct()->getCode());
          $stockHistory->setProductname($productvariant->getProduct()->getName());
