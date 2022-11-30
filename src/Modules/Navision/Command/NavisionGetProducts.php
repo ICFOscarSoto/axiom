@@ -353,45 +353,62 @@ public function importStocksStoresManaged(InputInterface $input, OutputInterface
     $variant=null;
     $storelocation=null;
     $store=null;
+    if($new_obj[2]!="") $variant=$repositoryVariants->findOneBy(["name"=>$new_obj[2]]);
     if ($object['accion']=='U') {
       $quantity=intval($new_obj[3])-intval($old_obj[3]);
       $product=$repositoryProducts->findOneBy(["code"=>$new_obj[1]]);
       $store=$repositoryStores->findOneBy(["code"=>$new_obj[5]]);
+      $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product,"variant"=>$variant]);
+      $storelocation=$repositoryStoreLocations->findOneBy(["store"=>$store]);
+      $stocks=$repositoryStocks->findOneBy(["productvariant"=>$productvariant, "storelocation"=>$storelocation, "active"=>1, "deleted"=>0]);
+      if($product!=null AND $storelocation!=null)
+      {
+        if ($stocks==null ){
+          $stocks=new ERPStocks();
+          $stocks->setProductVariant($productvariant);
+          $stocks->setStoreLocation($storelocation);
+          $stocks->setCompany($company);
+          $stocks->setQuantity(0);
+          $stocks->setPendingreceive($quantity);
+          $stocks->setDateupd(new \Datetime());
+          $stocks->setDateadd(new \Datetime());
+          $stocks->setDeleted(0);
+          $stocks->setActive(1);
+        } else {
+        $stocks->setPendingreceive($stocks->getPendingreceive()-intval($old_obj[3])+$new_obj[3]));
+        }
+        $this->doctrine->getManager()->merge($stocks);
+        $this->doctrine->getManager()->flush();
+        $this->doctrine->getManager()->clear();
+      }
     }
     else if ($object['accion']=='D'){
       $quantity=$old_obj[3];
       $product=$repositoryProducts->findOneBy(["code"=>$old_obj[1]]);
       $store=$repositoryStores->findOneBy(["code"=>$old_obj[5]]);
-    }
-    else {
-      $quantity=$new_obj[3];
-      $product=$repositoryProducts->findOneBy(["code"=>$new_obj[1]]);
-      $store=$repositoryStores->findOneBy(["code"=>$new_obj[5]]);
-    }
-    if($new_obj[2]!="")
-      $variant=$repositoryVariants->findOneBy(["name"=>$new_obj[2]]);
-    $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product,"variant"=>$variant]);
-    $storelocation=$repositoryStoreLocations->findOneBy(["store"=>$store]);
-    $stocks=$repositoryStocks->findOneBy(["productvariant"=>$productvariant, "storelocation"=>$storelocation, "active"=>1, "deleted"=>0]);
-    if($product!=null AND $storelocation!=null)
-    {
-      if ($stocks==null ){
-        $stocks=new ERPStocks();
-        $stocks->setProductVariant($productvariant);
-        $stocks->setStoreLocation($storelocation);
-        $stocks->setCompany($company);
-        $stocks->setQuantity(0);
-        $stocks->setPendingreceive($quantity);
-        $stocks->setDateupd(new \Datetime());
-        $stocks->setDateadd(new \Datetime());
-        $stocks->setDeleted(0);
-        $stocks->setActive(1);
-      } else {
-      $stocks->setPendingreceive($stocks->getPendingreceive()+$quantity);
+      $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product,"variant"=>$variant]);
+      $storelocation=$repositoryStoreLocations->findOneBy(["store"=>$store]);
+      $stocks=$repositoryStocks->findOneBy(["productvariant"=>$productvariant, "storelocation"=>$storelocation, "active"=>1, "deleted"=>0]);
+      if($product!=null AND $storelocation!=null)
+      {
+        if ($stocks==null ){
+          $stocks=new ERPStocks();
+          $stocks->setProductVariant($productvariant);
+          $stocks->setStoreLocation($storelocation);
+          $stocks->setCompany($company);
+          $stocks->setQuantity(0);
+          $stocks->setPendingreceive($quantity);
+          $stocks->setDateupd(new \Datetime());
+          $stocks->setDateadd(new \Datetime());
+          $stocks->setDeleted(0);
+          $stocks->setActive(1);
+        } else {
+        $stocks->setPendingreceive($stocks->getPendingreceive()-$quantity);
+        }
+        $this->doctrine->getManager()->merge($stocks);
+        $this->doctrine->getManager()->flush();
+        $this->doctrine->getManager()->clear();
       }
-      $this->doctrine->getManager()->merge($stocks);
-      $this->doctrine->getManager()->flush();
-      $this->doctrine->getManager()->clear();
     }
     // Sumar producto al json para eliminar en tabla de cambios
       $deleteTransfersChange[] = $object;
