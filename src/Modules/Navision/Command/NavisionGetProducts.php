@@ -684,7 +684,7 @@ public function clearEAN13(InputInterface $input, OutputInterface $output){
       $EAN13s=$repository->EAN13Limit(intval($count*$page),intval($page));
       $count++;
       foreach ($EAN13s as $id) {
-        $EAN13=$repository->findOneBy(["id"=>$id, "company"=>2]);
+        $EAN13=$repository->findOneBy(["id"=>$id, "company"=>$this->company]);
         if ($EAN13->getType()==1)
         $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-searchEAN13.php?EAN13='.$EAN13->getName().'$crossReferenceNo='.$EAN13->getSupplier()->getCode().'$item='.$EAN13->getProduct()->getCode());
         else if ($EAN13->getType()==2)
@@ -740,7 +740,7 @@ public function importPrices(InputInterface $input, OutputInterface $output) {
       $products=$repository->productsLimitCategory(intval($count*$page),intval($page));
       $count++;
       foreach($products as $id) {
-        $product=$repository->findOneBy(["id"=>$id, "company"=>2]);
+        $product=$repository->findOneBy(["id"=>$id, "company"=>$this->company]);
         $productvariant=$productsVariantsRepository->findOneBy(["product"=>$product, "variant"=>null]);
         if ($product->getSupplier()==null or $product->getCategory()==null)  continue;
         $productsSuppliers=$productsSuppliersRepository->findBy(["productvariant"=>$productvariant, "active"=>1, "deleted"=>0]);
@@ -814,9 +814,9 @@ public function updatePrices(InputInterface $input, OutputInterface $output){
     else if ($object["Unidad medida precio"]=='M') $packing=1000;
     $product->setPurchasepacking($packing);*/
     // TODO ERPProductsVariants tiene el purchasepacking
-    $this->doctrine->getManager()->persist($product);
+    /*$this->doctrine->getManager()->persist($product);
     $this->doctrine->getManager()->flush();
-    $this->doctrine->getManager()->clear();
+    $this->doctrine->getManager()->clear();*/
     /*$product=$productsRepository->findOneBy(["code"=>$object["code"]]);
     $output->writeln("  -> Packing ".$packing);
     if ($product->getNetprice()==0)  $product->setShoppingPrice($product->getPVPR()*(1-$product->getShoppingDiscount($this->doctrine)/100));
@@ -954,7 +954,7 @@ public function updateProducts(InputInterface $input, OutputInterface $output){
         $products=$repository->productsLimit(intval($count*$page),intval($page));
         $count++;
         foreach($products as $id) {
-          $product=$repository->findOneBy(["id"=>$id, "company"=>2]);
+          $product=$repository->findOneBy(["id"=>$id, "company"=>$this->company]);
           $json2=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-clearProducts.php?from='.$product->getCode());
           $movs=json_decode($json2, true);
           $movs=$movs[0];
@@ -980,7 +980,7 @@ public function updateProducts(InputInterface $input, OutputInterface $output){
   $objects=json_decode($json, true);
   $objects=$objects[0];
   foreach ($objects["class"] as $key=>$object) {
-    $product=$repository->findOneBy(["code"=>$object["No."], "company"=>2]);
+    $product=$repository->findOneBy(["code"=>$object["No."], "company"=>$this->company]);
     if ($product!=null){
       $output->writeln('Desactivando el producto '.$object["No."]);
       $product->setActive(0);
@@ -1299,7 +1299,7 @@ public function importProductsSuppliers(InputInterface $input, OutputInterface $
     $products=$repositoryProducts->productsLimit(intval($count*$page),intval($page));
     $count++;
     foreach($products as $id) {
-      $product=$repositoryProducts->findOneBy(["id"=>$id, "company"=>2]);
+      $product=$repositoryProducts->findOneBy(["id"=>$id, "company"=>$this->company]);
       $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product, "variant"=>null]);
       $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getSuppliersByProduct.php?product='.$product->getCode());
       $objects=json_decode($json, true);
@@ -2162,7 +2162,7 @@ public function clearReferences(InputInterface $input, OutputInterface $output){
       $references=$repository->referencesLimit(intval($count*$page),intval($page));
       $count++;
       foreach ($references as $id) {
-        $reference=$repository->findOneBy(["id"=>$id, "company"=>2]);
+        $reference=$repository->findOneBy(["id"=>$id, "company"=>$this->company]);
         if ($reference->getType()==1)
         $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getReference.php?reference='.$reference->getName().'$crossReferenceNo='.$reference->getSupplier()->getCode());
         else if ($reference->getType()==2)
@@ -2431,7 +2431,7 @@ public function defuseProducts(InputInterface $input, OutputInterface $output){
       $products=$repository->productsLimit(intval($count*$page),intval($page));
       $count++;
       foreach ($products as $id) {
-        $product=$repository->findOneBy(["id"=>$id, "company"=>2]);
+        $product=$repository->findOneBy(["id"=>$id, "company"=>$this->company]);
         $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getProduct.php?product='.$product->getCode());
         $objects=json_decode($json, true);
         if ($objects[0]["class"]!=null) continue;
