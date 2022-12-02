@@ -172,6 +172,6 @@ class GlobaleDiskUsages
     }
 
     public function __toString(){
-      return ($this->id?$this->id:'nulo');
+      return ($this->id?'ID:'.$this->id:'ID:Nulo');
     }
 }
