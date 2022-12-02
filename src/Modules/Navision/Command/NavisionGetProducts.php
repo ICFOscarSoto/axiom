@@ -195,7 +195,7 @@ public function importProduct(InputInterface $input, OutputInterface $output){
                 $output->writeln($action.' - '.$code_old);
                 /*$oproduct->setDeleted(1);
                 $oproduct->setActive(0);
-                $this->doctrine->getManager()->merge($oproduct);
+                $this->doctrine->getManager()->persist($oproduct);
                 $this->doctrine->getManager()->flush();
                 $this->doctrine->getManager()->clear();*/
                 // Sumar producto al json para eliminar en tabla de cambios
@@ -267,7 +267,7 @@ public function importProduct(InputInterface $input, OutputInterface $output){
             $repositoryManufacturers=$this->doctrine->getRepository(ERPManufacturers::class);
             $manufacturer=$repositoryManufacturers->findOneBy(["code"=>$product["Manufacturer"]]);
             if($manufacturer!=NULL) $oproduct->setManufacturer($manufacturer);
-            $this->doctrine->getManager()->merge($oproduct);
+            $this->doctrine->getManager()->persist($oproduct);
             $this->doctrine->getManager()->flush();
             $oproduct->priceCalculated($this->doctrine);
             $this->doctrine->getManager()->clear();
@@ -289,7 +289,7 @@ public function importProduct(InputInterface $input, OutputInterface $output){
             $oproductvariant->setPurchasepacking($packing);
             if ($oproductvariant->getVariant()!=null && $oproductvariant->getVariant()->getId()==null)
               $oproductvariant->setVariant(null);
-            $this->doctrine->getManager()->merge($oproductvariant);
+            $this->doctrine->getManager()->persist($oproductvariant);
             $this->doctrine->getManager()->flush();
             $this->doctrine->getManager()->clear();
 
@@ -379,7 +379,7 @@ public function importStocksStoresManaged(InputInterface $input, OutputInterface
         } else {
         $stocks->setPendingreceive($stocks->getPendingreceive()-intval($old_obj[3])+$new_obj[3]);
         }
-        $this->doctrine->getManager()->merge($stocks);
+        $this->doctrine->getManager()->persist($stocks);
         $this->doctrine->getManager()->flush();
         $this->doctrine->getManager()->clear();
       }
@@ -407,7 +407,7 @@ public function importStocksStoresManaged(InputInterface $input, OutputInterface
         } else {
         $stocks->setPendingreceive($stocks->getPendingreceive()-$quantity);
         }
-        $this->doctrine->getManager()->merge($stocks);
+        $this->doctrine->getManager()->persist($stocks);
         $this->doctrine->getManager()->flush();
         $this->doctrine->getManager()->clear();
       }
@@ -700,7 +700,7 @@ public function clearEAN13(InputInterface $input, OutputInterface $output){
 
         $reference->setActive(0);
         $reference->setDeleted(1);
-        $this->doctrine->getManager()->merge($reference);
+        $this->doctrine->getManager()->persist($reference);
         $this->doctrine->getManager()->flush();
         $this->doctrine->getManager()->clear();
       }
@@ -788,7 +788,7 @@ public function importPrices(InputInterface $input, OutputInterface $output) {
                     $obj->setActive(1);
                   }
                   $obj->setDeleted(0);
-                  $this->doctrine->getManager()->merge($obj);
+                  $this->doctrine->getManager()->persist($obj);
                   $this->doctrine->getManager()->flush();
                   if($obj->getEnd()==null) $obj->setShoppingPrices($this->doctrine, $supplier);
                   $this->doctrine->getManager()->clear();
@@ -818,7 +818,7 @@ public function updatePrices(InputInterface $input, OutputInterface $output){
     else if ($object["Unidad medida precio"]=='M') $packing=1000;
     $product->setPurchasepacking($packing);*/
     // TODO ERPProductsVariants tiene el purchasepacking
-    $this->doctrine->getManager()->merge($product);
+    $this->doctrine->getManager()->persist($product);
     $this->doctrine->getManager()->flush();
     $this->doctrine->getManager()->clear();
     /*$product=$productsRepository->findOneBy(["code"=>$object["code"]]);
@@ -833,7 +833,7 @@ public function updatePrices(InputInterface $input, OutputInterface $output){
 
     $product=$product->calculateIncrementByProduct($this->doctrine);
     $product=$product->calculateCustomerIncrementsByProduct($this->doctrine);
-    $this->doctrine->getManager()->merge($product);
+    $this->doctrine->getManager()->persist($product);
     $this->doctrine->getManager()->flush();
     $this->doctrine->getManager()->clear();
     $output->writeln("  -> Packing ".$product->getPurchasepacking());*/
@@ -875,7 +875,7 @@ public function groupPrices(InputInterface $input, OutputInterface $output){
         $obj->setDateupd(new \Datetime());
         $obj->setActive(1);
         $obj->setDeleted(0);
-        $this->doctrine->getManager()->merge($obj);
+        $this->doctrine->getManager()->persist($obj);
         $this->doctrine->getManager()->flush();
         if($obj->getEnd()==null) $obj->setShoppingPrices($this->doctrine);
         $this->doctrine->getManager()->clear();
@@ -940,10 +940,10 @@ public function updateProducts(InputInterface $input, OutputInterface $output){
       if($manufacturer!=NULL) $product->setManufacturer($manufacturer);
 
       $product->calculatePVP($this->doctrine);
-      $this->doctrine->getManager()->merge($product);
+      $this->doctrine->getManager()->persist($product);
       $product=$product->calculateIncrementByProduct($this->doctrine);
       $product=$product->calculateCustomerIncrementsByProduct($this->doctrine);
-      $this->doctrine->getManager()->merge($product);
+      $this->doctrine->getManager()->persist($product);
       $this->doctrine->getManager()->flush();
       $this->doctrine->getManager()->clear();
       }
@@ -973,7 +973,7 @@ public function updateProducts(InputInterface $input, OutputInterface $output){
             $product->setActive(0);
             $product->setDateupd(new \Datetime());
           }
-          $this->doctrine->getManager()->merge($product);
+          $this->doctrine->getManager()->persist($product);
           $this->doctrine->getManager()->flush();
           $this->doctrine->getManager()->clear();
         }
@@ -989,7 +989,7 @@ public function updateProducts(InputInterface $input, OutputInterface $output){
       $output->writeln('Desactivando el producto '.$object["No."]);
       $product->setActive(0);
       $product->setDateupd(new \Datetime());
-      $this->doctrine->getManager()->merge($product);
+      $this->doctrine->getManager()->persist($product);
       $this->doctrine->getManager()->flush();
       $this->doctrine->getManager()->clear();
     }
@@ -1046,7 +1046,7 @@ public function importStock(InputInterface $input, OutputInterface $output, $cod
                 $updateStocks=$repositoryStocks->setZeroStocks($product->getId(), $store->getId(),$stock_old->getId(),$productVariantId);
                 $stock_old->setQuantity(!$quantity?0:$quantity);
                 $stock_old->setDateupd(new \Datetime());
-                $this->doctrine->getManager()->merge($stock_old);
+                $this->doctrine->getManager()->persist($stock_old);
               }
               }
             }
@@ -1065,7 +1065,7 @@ public function importStock(InputInterface $input, OutputInterface $output, $cod
               $obj->setQuantity(!$quantity?0:$quantity);
               $obj->setActive(1);
               $obj->setDeleted(0);
-              $this->doctrine->getManager()->merge($obj);
+              $this->doctrine->getManager()->persist($obj);
             }
             }
             $this->doctrine->getManager()->flush();
@@ -1136,7 +1136,7 @@ public function importStocks(InputInterface $input, OutputInterface $output) {
                 $updateStocks=$repositoryStocks->setZeroStocks($product->getId(), $store->getId(),$stock_old->getId(),$productVariantId);
                 $stock_old->setQuantity(!$quantity?0:$quantity);
                 $stock_old->setDateupd(new \Datetime());
-                $this->doctrine->getManager()->merge($stock_old);
+                $this->doctrine->getManager()->persist($stock_old);
               }
             }
             else {
@@ -1153,7 +1153,7 @@ public function importStocks(InputInterface $input, OutputInterface $output) {
               $obj->setQuantity(!$quantity?0:$quantity);
               $obj->setActive(1);
               $obj->setDeleted(0);
-              $this->doctrine->getManager()->merge($obj);}
+              $this->doctrine->getManager()->persist($obj);}
             }
             $this->doctrine->getManager()->flush();
             $this->doctrine->getManager()->clear();
@@ -1251,10 +1251,10 @@ public function updateStocksStoresManaged(InputInterface $input, OutputInterface
               $stockHistory->setQuantity((int)$stock["stock"]);
               $stockHistory->setActive(true);
               $stockHistory->setDeleted(false);
-              $this->doctrine->getManager()->merge($stockHistory);
+              $this->doctrine->getManager()->persist($stockHistory);
               $stock_old->setQuantity($stock_old->getQuantity()+((int)$stock["stock"]));
               $stock_old->setDateupd(new \Datetime());
-              $this->doctrine->getManager()->merge($stock_old);
+              $this->doctrine->getManager()->persist($stock_old);
             }
             }
             else {
@@ -1271,7 +1271,7 @@ public function updateStocksStoresManaged(InputInterface $input, OutputInterface
               $obj->setActive(1);
               $obj->setDeleted(0);
               $output->writeln('Vamos a crear la linea del producto '.$product->getId().' en el almacen '.$stock["almacen"]);
-              $this->doctrine->getManager()->merge($obj);}
+              $this->doctrine->getManager()->persist($obj);}
             }
             $this->doctrine->getManager()->flush();
             //$this->doctrine->getManager()->clear();
@@ -1774,7 +1774,7 @@ public function importVariants(InputInterface $input, OutputInterface $output){
           $obj->setDeleted(0);
           $obj->setActive(1);
         }
-        $this->doctrine->getManager()->merge($obj);
+        $this->doctrine->getManager()->persist($obj);
         $this->doctrine->getManager()->flush();
         $this->doctrine->getManager()->clear();
       }
@@ -1831,8 +1831,8 @@ public function importProductsVariants(InputInterface $input, OutputInterface $o
             $obj->setDateupd(new \Datetime());
             $obj->setDeleted(0);
             $obj->setActive(1);
-            $this->doctrine->getManager()->merge($obj);
-            $this->doctrine->getManager()->merge($product);
+            $this->doctrine->getManager()->persist($obj);
+            $this->doctrine->getManager()->persist($product);
         }
 
           $this->doctrine->getManager()->flush();
@@ -1918,7 +1918,7 @@ public function disableBlocked(InputInterface $input, OutputInterface $output){
     $product=$repositoryProduct->findOneBy(["code"=>$object["code"]]);
     $product->setActive(0);
     $output->writeln('* Bloqueando....'.$product);
-    $this->doctrine->getManager()->merge($product);
+    $this->doctrine->getManager()->persist($product);
   }*/
   $this->doctrine->getManager()->flush();
   $this->doctrine->getManager()->clear();
@@ -2190,7 +2190,7 @@ public function clearReferences(InputInterface $input, OutputInterface $output){
 
         $reference->setActive(0);
         $reference->setDeleted(1);
-        $this->doctrine->getManager()->merge($reference);
+        $this->doctrine->getManager()->persist($reference);
         $this->doctrine->getManager()->flush();
         $this->doctrine->getManager()->clear();
       }
@@ -2284,7 +2284,7 @@ public function updateNames(InputInterface $input, OutputInterface $output){
       $objects2=$objects2[0];
       if (!empty($objects2["class"]) and strlen($objects2["class"][0]["Description"])) $product->setName($objects2["class"][0]["Description"]);
       $product->setDateupd(new \Datetime());
-      $this->doctrine->getManager()->merge($product);
+      $this->doctrine->getManager()->persist($product);
       $this->doctrine->getManager()->flush();
       $this->doctrine->getManager()->clear();
     }
@@ -2333,7 +2333,7 @@ public function updateManufacturers(InputInterface $input, OutputInterface $outp
       $manufacturer=$manufacturersRepository->findOneBy(["code"=>$marca_new]);
       $product->setManufacturer($manufacturer);
       $product->setDateupd(new \Datetime());
-      $this->doctrine->getManager()->merge($product);
+      $this->doctrine->getManager()->persist($product);
       $this->doctrine->getManager()->flush();
       $this->doctrine->getManager()->clear();
     }
@@ -2455,7 +2455,7 @@ public function defuseProducts(InputInterface $input, OutputInterface $output){
         $repository->deleteRelations($product->getId());
         $product->setActive(0);
         $product->setDeleted(1);
-        $this->doctrine->getManager()->merge($product);
+        $this->doctrine->getManager()->persist($product);
         $this->doctrine->getManager()->flush();
         $this->doctrine->getManager()->clear();
       }
