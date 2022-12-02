@@ -365,7 +365,7 @@ public function importStocksStoresManaged(InputInterface $input, OutputInterface
       {
         if ($stocks==null ){
           $stocks=new ERPStocks();
-          $stocks->setProductVariant($productvariant);
+          $stocks->setProductVariant($productvariant); 
           $stocks->setStoreLocation($storelocation);
           $stocks->setCompany($company);
           $stocks->setQuantity(0);
@@ -375,7 +375,7 @@ public function importStocksStoresManaged(InputInterface $input, OutputInterface
           $stocks->setDeleted(0);
           $stocks->setActive(1);
         } else {
-        $stocks->setPendingreceive($stocks->getPendingreceive()-intval($old_obj[3])+$new_obj[3]));
+        $stocks->setPendingreceive($stocks->getPendingreceive()-intval($old_obj[3])+$new_obj[3]);
         }
         $this->doctrine->getManager()->merge($stocks);
         $this->doctrine->getManager()->flush();
