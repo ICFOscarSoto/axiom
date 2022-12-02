@@ -171,5 +171,7 @@ class GlobaleDiskUsages
       return $value;
     }
 
-
+    public function __toString(){
+      return ($this->id?$this->id:'nulo');
+    }
 }
