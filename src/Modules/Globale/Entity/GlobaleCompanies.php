@@ -722,4 +722,7 @@ class GlobaleCompanies
         return $this;
     }
 
+    public function __toString(){
+      return print_r($this, true);
+    }
 }
