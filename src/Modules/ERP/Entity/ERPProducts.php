@@ -140,7 +140,7 @@ class ERPProducts
     private $purchasemeasure;
 
     /**
-     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCompanies")
+     * @ORM\ManyToOne(targetEntity="\App\Modules\Globale\Entity\GlobaleCompanies", fetch="EAGER")
      * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     private $company;
