@@ -1210,7 +1210,7 @@ class ERPProductsController extends Controller
 			 $storeLocationsRepository=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
 			 $storeLocation=$storeLocationsRepository->findOneBy(['store'=>$store]);
 			 $storeUsersRepository=$this->getDoctrine()->getRepository(ERPStoresUsers::class);
-			 $storeUsers=$storeUsersRepository->findOneBy(['user'=>$this->getUser()->getId(),'store'=>$store->getId(), 'active'=>1, 'preferential'=>1]);
+			 $storeUsers=$storeUsersRepository->findOneBy(['user'=>$this->getUser()->getId(),'store'=>$store->getId(), 'active'=>1]);
 			 if ($storeUsers==null) return new JsonResponse(["result"=>-2, "text"=>"El usuario ".$this->getUser()->getName()." no es gestor del almacén ".$store->getName()]);
 			 // buscamos el producto del traspaso
 			 $productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
