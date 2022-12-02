@@ -723,6 +723,6 @@ class GlobaleCompanies
     }
 
     public function __toString(){
-      return $this->id;
+      return ($this->id?$this->id.' '.$this->name:'nulo');
     }
 }
