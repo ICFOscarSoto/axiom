@@ -723,6 +723,6 @@ class GlobaleCompanies
     }
 
     public function __toString(){
-      return print_r($this, true);
+      return $this->id;
     }
 }
