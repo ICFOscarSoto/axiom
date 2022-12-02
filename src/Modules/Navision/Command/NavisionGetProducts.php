@@ -223,7 +223,8 @@ public function importProduct(InputInterface $input, OutputInterface $output){
             }
             if ($oproduct==null){
               $oproduct = new ERPProducts();
-              $oproduct->setCompany($this->company);
+              $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
+              $oproduct->setCompany($repositoryCompanies->find(2));
               $oproduct->setDateadd(new \Datetime());
               $oproduct->setDeleted(0);
               $oproduct->setName($product["Description"]);
