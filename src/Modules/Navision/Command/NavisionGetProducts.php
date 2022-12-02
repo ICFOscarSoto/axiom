@@ -287,6 +287,8 @@ public function importProduct(InputInterface $input, OutputInterface $output){
             $oproductvariant->setDateupd(new \Datetime());
             $oproductvariant->setWeight($weight);
             $oproductvariant->setPurchasepacking($packing);
+            if ($oproductvariant->getVariant()!=null && $oproductvariant->getVariant()->getId()==null)
+              $oproductvariant->setVariant(null);
             $this->doctrine->getManager()->merge($oproductvariant);
             $this->doctrine->getManager()->flush();
             $this->doctrine->getManager()->clear();
@@ -365,7 +367,7 @@ public function importStocksStoresManaged(InputInterface $input, OutputInterface
       {
         if ($stocks==null ){
           $stocks=new ERPStocks();
-          $stocks->setProductVariant($productvariant); 
+          $stocks->setProductVariant($productvariant);
           $stocks->setStoreLocation($storelocation);
           $stocks->setCompany($company);
           $stocks->setQuantity(0);
