@@ -2040,6 +2040,7 @@ public function importReferences(InputInterface $input, OutputInterface $output)
            $supplier_customer_id  = $supplier_customer_old;
          }
          $oproduct=$repositoryProducts->findOneBy(["code"=>$product_id]);
+         $ovariant = null;
          if ($variant_id!=null)
           $ovariant=$repositoryVariants->findOneBy(["name"=>$variant_id]);
          $oproductvariant = $repositoryProductsVariants->findOneBy(["product"=>$oproduct, "variant"=>$ovariant]);
@@ -2080,6 +2081,7 @@ public function importReferences(InputInterface $input, OutputInterface $output)
               $customer = null;
               $suppliers = null;
               $oproduct=$repositoryProducts->findOneBy(["code"=>$product_new]);
+              $ovariant = null;
               if ($variant_id!=null)
                $ovariant=$repositoryVariants->findOneBy(["name"=>$variant_new]);
               $oproductvariant = $repositoryProductsVariants->findOneBy(["product"=>$oproduct, "variant"=>$ovariant]);
@@ -2108,14 +2110,14 @@ public function importReferences(InputInterface $input, OutputInterface $output)
                 $oreferences->setDateadd(new \Datetime());
               }
             }
-            if ($productvariant!=null){
+            if ($oproductvariant!=null){
               $oreferences->setName($code_new);
               if (isset($references["Description"]))
                 $oreferences->setDescription($references["Description"]);
               else
                 $oreferences->setDescription("");
               $oreferences->setDateupd(new \Datetime());
-              $oreferences->setProductvariant($productvariant);
+              $oreferences->setProductvariant($oproductvariant);
               $oreferences->setDeleted(0);
               $oreferences->setActive(1);
               if ($type_new==2){
