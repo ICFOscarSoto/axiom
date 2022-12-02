@@ -119,7 +119,7 @@ class GlobaleCompanies
     private $menuOptions;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Modules\Globale\Entity\GlobaleDiskUsages", mappedBy="companyown", fetch="EAGER")
+     * @ORM\OneToMany(targetEntity="App\Modules\Globale\Entity\GlobaleDiskUsages", mappedBy="companyown", fetch="EAGER", cascade={"persist"})
      */
     private $diskUsages;
 
