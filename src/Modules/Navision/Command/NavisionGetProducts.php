@@ -266,10 +266,10 @@ public function importProduct(InputInterface $input, OutputInterface $output){
             $repositoryManufacturers=$this->doctrine->getRepository(ERPManufacturers::class);
             $manufacturer=$repositoryManufacturers->findOneBy(["code"=>$product["Manufacturer"]]);
             if($manufacturer!=NULL) $oproduct->setManufacturer($manufacturer);
-            $this->doctrine->getManager()->persist($oproduct);
-            $this->doctrine->getManager()->flush();
             $oproduct->priceCalculated($this->doctrine);
-            $this->doctrine->getManager()->clear();
+            $this->doctrine->getManager()->persist($oproduct);
+            //$this->doctrine->getManager()->flush();
+            //$this->doctrine->getManager()->clear();
 
             // ERPProductsVariants tiene weight y purchasepacking se crea siempre para la variante null (es decir la de por defecto del producto)
             // y si ya existiera se modifica
