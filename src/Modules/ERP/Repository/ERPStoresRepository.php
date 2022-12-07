@@ -69,4 +69,34 @@ class ERPStoresRepository extends ServiceEntityRepository
               ORDER BY code ASC';
       return $this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
     }
+
+
+    public function getStoresManagers($manager){
+    $query='SELECT * FROM erpstores
+            WHERE id IN (SELECT store_id FROM erpstores_users
+					               WHERE managed=1 and user_id IN (SELECT user_id FROM erpstores_managers_users
+											                                   WHERE manager_id IN (SELECT id FROM erpstores_managers
+																		                                         WHERE NAME=:manager)))';
+    $params=['manager' => $manager];
+    $result=$this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+    return $result;
+    }
+
+
+    public function getUnreceivedTransfers($manager){
+    $query='SELECT name FROM navision_transfers
+            WHERE destinationstore_id IN (SELECT id FROM erpstores
+                        WHERE id IN (SELECT store_id FROM erpstores_users
+            					               WHERE managed=1 and user_id IN (SELECT user_id FROM erpstores_managers_users
+            											                                   WHERE manager_id IN (SELECT id FROM erpstores_managers
+            																		                                         WHERE NAME=:manager))))
+            AND received=0 AND ACTIVE=1 AND deleted=0
+            AND dateadd<date_sub(CURTIME(), INTERVAL 4 DAY)
+            GROUP BY NAME	';
+    $params=['manager' => $manager];
+    $result=$this->getEntityManager()->getConnection()->executeQuery($query, $params)->fetchAll();
+    return $result;
+    }
+
+
 }

@@ -65,6 +65,11 @@ class ERPStoresManagers
      */
     private $discordchannel;
 
+    /**
+     * @ORM\Column(type="string", length=125, nullable=true)
+     */
+    private $incidentchannel;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -174,6 +179,18 @@ class ERPStoresManagers
     public function setDiscordchannel(?string $discordchannel): self
     {
         $this->discordchannel = $discordchannel;
+
+        return $this;
+    }
+
+    public function getIncidentchannel(): ?string
+    {
+        return $this->incidentchannel;
+    }
+
+    public function setIncidentchannel(?string $incidentchannel): self
+    {
+        $this->incidentchannel = $incidentchannel;
 
         return $this;
     }
