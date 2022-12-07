@@ -412,7 +412,8 @@ SupplierCommentLines: Comentario del proveedor
 SupplierCommentLinesOrdersData: Comentario de pedidos
 SupplierCommentLinesIncidents: Indidencia
 SupplierCommentLinesOrdersDataRappel: Comentario de rappel
-
+Invoicesupplier: Proveedor de facturación
+Workactivity: Actividad
 
 #PAYMENT TERMS
 #----------------------------------------------------------------------------------------------------------------------

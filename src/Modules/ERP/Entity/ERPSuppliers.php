@@ -11,6 +11,7 @@ use \App\Modules\ERP\Entity\ERPPaymentMethods;
 use \App\Modules\Globale\Entity\GlobaleStates;
 use \App\Modules\ERP\Entity\ERPPaymentTerms;
 use \App\Modules\ERP\Entity\ERPSupplierActivities;
+use \App\Modules\ERP\Entity\ERPSuppliers;
 use \App\Modules\Carrier\Entity\CarrierCarriers;
 use \App\Modules\Carrier\Entity\CarrierShippingConditions;
 
@@ -180,6 +181,11 @@ class ERPSuppliers
      */
     private $workactivity;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPSuppliers")
+     * @ORM\JoinColumn(nullable=true)
+     */
+    private $invoicesupplier;
 
     public function getId(): ?int
     {
@@ -553,6 +559,19 @@ class ERPSuppliers
 
         return $this;
     }
+
+    public function getInvoicesupplier(): ?ERPSuppliers
+    {
+        return $this->invoicesupplier;
+    }
+
+    public function setInvoicesupplier(?ERPSuppliers $invoicesupplier): self
+    {
+        $this->invoicesupplier = $invoicesupplier;
+
+        return $this;
+    }
+
   /*
     public function postProccess($kernel, $doctrine, $user, $params, $oldobj){
 
