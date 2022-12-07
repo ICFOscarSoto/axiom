@@ -47,7 +47,7 @@ class StoreManagerWaitingReceive extends ContainerAwareCommand
         $manager=$managerepository->findOneBy(["name"=>$var_manager]);
         foreach ($unreceivedTransfers as $name){
           $transfer=$transfersRepository->findOneBy(["name"=>$name["name"]]);
-          $msg="**** ------------------ El traspaso ".$transfer->getName()." esta pendiente de recibir en el almacen ".$transfer->getDestinationstore()->getName()." desde que se envío el día ".date_format($transfer->getDateadd(), "Y/m/d");
+          $msg="El traspaso ".$transfer->getName()." esta pendiente de recibir en el almacen ".$transfer->getDestinationstore()->getName()." desde que se envío el día ".date_format($transfer->getDateadd(), "d/m/Y");
           if ($manager->getIncidentchannel()!=null) file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$manager->getIncidentchannel().'&msg='.urlencode($msg));
           sleep(1);
         }
