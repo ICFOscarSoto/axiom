@@ -1451,7 +1451,6 @@ class ERPStoresManagersController extends Controller
 				$transferInfo["lines"]=$lines;
 				$params["transfers"][]=$transferInfo;
 			}
-			dump($params);
 			$printQRUtils = new ERPPrintQR();
 			$pdf=$printQRUtils->downloadTransfers($params);
 			return new Response("", 200, array('Content-Type' => 'application/pdf'));
