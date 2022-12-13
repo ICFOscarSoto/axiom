@@ -1,0 +1,6 @@
+[
+  {"id" : "addTopStoresManagersVendingMachinesChannelsReplenishment", "type" : "btn-primary", "icon" : "fa fa-plus", "name" : "", "route":"genericdata", "routeParams":{"module":"ERP", "name":"StoresManagersVendingMachinesChannelsReplenishment", "type":"modal" }, "modal":"StoresManagersVendingMachinesChannelsReplenishment", "actionType" : "background", "confirm" :false, "tooltip" : ""},
+  {"id" : "deleteTopStoresManagersVendingMachinesChannelsReplenishment", "type" : "btn-red", "icon" : "fa fa-trash","name" : "", "route":"", "confirm" :true, "tooltip":""},
+  {"id" : "printTopStoresManagersVendingMachinesChannelsReplenishment", "type" : "", "icon" : "fa fa-print","name" : "", "route":"downloadReplenishments", "confirm" :false, "tooltip":""},
+  {"id" : "exportTopStoresManagersVendingMachinesChannelsReplenishment", "type" : "", "icon" : "fa fa-file-excel-o","name" : "", "route":"genericexport", "routeParams":{"module":"ERP", "name":"StoresManagersVendingMachinesChannelsReplenishment"}, "confirm" :false, "tooltip":""}
+]

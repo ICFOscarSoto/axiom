@@ -158,39 +158,44 @@ function create($params){
     foreach ($params["transfers"] as $key=>$transfer) {
       $this->pdf->AddPage();
       $qrcode = new QRCode($options);
-      $path=$transfer['name'].'.png';
-      $qrcode->render($transfer['name'], $path);
-
+      if (array_key_exists("name",$transfer)){
+        $path=$transfer['name'].'.png';
+        $qrcode->render($transfer['name'], $path);
+        $nameLeft="Traspaso número ".$transfer['name'];
+        $infoRight=[['',$this->pdf->Image($path, 135, 28, 35, 35)]];
+      }
+      else {
+        $nameLeft="Carga de máquina";
+        $infoRight=[];
+      }
       //$this->pdf->Image($path, 16, 7, 32, 32);
-      $nameLeft="Traspaso número ".$transfer['name'];
       $lines=$transfer['lines'];
       $infoLeft=[["Fecha",$transfer["datesend"]],
                  ["Origen",$transfer["origin"]],
                  ["Destino",$transfer["destination"]]
                 ];
-      $infoRight=[['',$this->pdf->Image($path, 135, 28, 35, 35)]];
       foreach ($lines as $line){
         $dataTable[]=[
           $line["productcode"],
           $line["productname"],
-          $line["quantity"],
           $line["upload"],
-          $line["multiplier"]
+          $line["multiplier"],
+          $line["quantity"]
         ];
       }
 
       $columnsTable=[["name"=>"Código","width"=>30, "align"=>"L"],
                     ["name"=>"Descripcion","width"=>80, "align"=>"L"],
-                    ["name"=>"Cantidad","width"=>20, "align"=>"C"],
                     ["name"=>"Paquetes","width"=>20, "align"=>"C"],
-                    ["name"=>"Multiplos","width"=>20, "align"=>"C"]
+                    ["name"=>"Envase","width"=>20, "align"=>"C"],
+                    ["name"=>"Unidades","width"=>20, "align"=>"C"],
       ];
       while(count($dataTable)){
         $this->pdf->docHeader($nameLeft,'',$infoLeft, $infoRight);
         $this->pdf->docFooter('','','');
         $dataTable=$this->pdf->Table($dataTable,$columnsTable,'false');
       }
-        unlink($path);
+      if (array_key_exists("name",$transfer))  unlink($path);
     }
     return $this->pdf->Output();
   }

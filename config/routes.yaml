@@ -426,3 +426,7 @@ ERPBuyDeliveryNotesController:
 ERPInventoryController:
   resource: 'App\Modules\ERP\Controller\ERPInventoryController'
   type:      annotation
+
+ERPStoresManagersVendingMachinesChannelsReplenishmentController:
+  resource: 'App\Modules\ERP\Controller\ERPStoresManagersVendingMachinesChannelsReplenishmentController'
+  type:      annotation
