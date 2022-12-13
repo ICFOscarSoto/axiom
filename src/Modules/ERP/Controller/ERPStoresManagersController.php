@@ -93,7 +93,9 @@ class ERPStoresManagersController extends Controller
 				["name" => "storesmanagersoperationsreports", "caption"=>"Reports", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("storesManagersOperationsReports",["id"=>$id])],
 			//	["name" => "loadsreports", "caption"=>"Loads", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("storesManagersLoadReports",["id"=>$id])],
 				["name" => "loadslist", "caption"=>"Loads List", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("storesManagersLoadLists",["id"=>$id])],
-				["name" => "transferlist", "caption"=>"Transfer List", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("storesManagersTransferLists",["id"=>$id])]
+			//	["name" => "transferlist", "caption"=>"Transfer List", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("storesManagersTransferLists",["id"=>$id])],
+				["name" => "transfers", "caption"=>"Transfers", "icon"=>"fa-address-card-o", "route"=>$this->generateUrl("generictablist",["function"=>"formatList","module"=>"Navision","name"=>"Transfers"])],
+				["name" => "loads", "caption"=>"Loads", "icon"=>"fa-address-card-o", "route"=>$this->generateUrl("generictablist",["function"=>"formatList","module"=>"ERP","name"=>"StoresManagersVendingMachinesChannelsReplenishment"])]
 			];
 			$obj = $repository->findOneBy(['id'=>$id, 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
 			$obj_name=$obj?$obj->getName():'';
@@ -1319,8 +1321,10 @@ class ERPStoresManagersController extends Controller
 				$line["quantity"]=$product["quantity"];
 				if ($machine!=null) {
 					$channel=$channelsRepository->findOneBy(["vendingmachine"=>$machine, "product"=>$obj]);
-					$line["load"]=intval($product["quantity"]/$channel->getMultiplier());
-					$line["multiplier"]=$channel->getMultiplier();
+					if ($channel!=null) {
+						$line["load"]=intval($product["quantity"]/$channel->getMultiplier());
+						$line["multiplier"]=$channel->getMultiplier();
+					}
 				} else {
 					$line["load"]='-';
 					$line["multiplier"]='-';
@@ -1391,6 +1395,66 @@ class ERPStoresManagersController extends Controller
 			$utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),$utilsObj->getExcludedForm($params),$utilsObj->getIncludedForm($params));
 			$make = $utils->make($obj->getId(), ERPStoresManagersProducts::class, $action, "formStoresManagersProducts", "modal", "@ERP/storesManagersProducts.html.twig");
 			return $make;
+		}
+
+
+		/**
+			* @Route("/api/ERP/downloadTransfers", name="downloadTransfers")
+			*/
+		public function downloadTransfers(RouterInterface $router,Request $request){
+			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			$channelsRepository=$this->getDoctrine()->getRepository(ERPStoresManagersVendingMachinesChannels::class);
+			$machineRepository=$this->getDoctrine()->getRepository(ERPStoresManagersVendingMachines::class);
+			$transfersRepository=$this->getDoctrine()->getRepository(NavisionTransfers::class);
+			$locationsRepository=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
+			$storeRepository=$this->getDoctrine()->getRepository(ERPStores::class);
+			$ids=$request->query->get('ids');
+			if ($ids==null) return new Response();
+			$ids=explode(",",$ids);
+			$names=[];
+			$params=[];
+			$params["rootdir"]= $this->get('kernel')->getRootDir();
+			$params["user"]=$this->getUser();
+			foreach($ids as $id){
+				$lineTransfer=$transfersRepository->findOneBy(["id"=>$id]);
+				if ($lineTransfer==null) continue;
+				$name=$lineTransfer->getName();
+				if (array_search($name,$names)) continue;
+				$names[]=$name;
+				$location=$locationsRepository->findOneBy(["store"=>$transfersRepository->findOneBy(["name"=>$name, "active"=>1, "deleted"=>0])->getDestinationstore()]);
+				$machine=$machineRepository->findOneBy(["storelocation"=>$location]);
+				$transfers=$transfersRepository->findBy(["name"=>$name, "active"=>1, "deleted"=>0]);
+				$transferInfo["name"]=$name;
+				$transferInfo["origin"]=$transfersRepository->findOneBy(["name"=>$name, "active"=>1, "deleted"=>0])->getOriginstore()->getName();
+				$transferInfo["destination"]=$transfersRepository->findOneBy(["name"=>$name, "active"=>1, "deleted"=>0])->getDestinationstore()->getName();
+				$transferInfo["datesend"]=$transfersRepository->findOneBy(["name"=>$name, "active"=>1, "deleted"=>0])->getDateadd()->format('d-m-Y');
+				$lines=[];
+				foreach ($transfers as $transfer) {
+					$line['productcode']=$transfer->getProduct()->getCode();
+					$line['productname']=$transfer->getProduct()->getName();
+					$line['quantity']=$transfer->getQuantity();
+					if ($machine!=null) {
+						$channel=$channelsRepository->findOneBy(["vendingmachine"=>$machine, "product"=>$transfer->getProduct()]);
+						if ($channel!=null) {
+							$line["upload"]=intval($transfer->getQuantity()/$channel->getMultiplier());
+							$line["multiplier"]=$channel->getMultiplier();
+						} else {
+							$line["upload"]='-';
+							$line["multiplier"]='-';
+						 }
+					} else {
+						$line["upload"]='-';
+						$line["multiplier"]='-';
+					}
+					$lines[]=$line;
+				}
+				$transferInfo["lines"]=$lines;
+				$params["transfers"][]=$transferInfo;
+			}
+			dump($params);
+			$printQRUtils = new ERPPrintQR();
+			$pdf=$printQRUtils->downloadTransfers($params);
+			return new Response("", 200, array('Content-Type' => 'application/pdf'));
 		}
 
 }

@@ -8,7 +8,8 @@
                     "cols": 4
                 },
                 {
-                    "name": "datesend",
+                    "name": "datesend",                    
+                    "type": "date",
                     "cols": 4
                 },
                 {

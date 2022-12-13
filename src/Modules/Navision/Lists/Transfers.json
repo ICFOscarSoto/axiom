@@ -9,7 +9,12 @@
     },
     {
         "name": "datesend",
-        "caption": "datesend"
+        "caption": "datesend",
+        "type": "date"
+    },
+    {
+        "name": "product__name",
+        "caption": "product"
     },
     {
         "name": "quantity",
@@ -22,10 +27,6 @@
     {
         "name": "destinationstore__name",
         "caption": "destinationstore"
-    },
-    {
-        "name": "product__name",
-        "caption": "product"
     },
     {
         "name": "received",
