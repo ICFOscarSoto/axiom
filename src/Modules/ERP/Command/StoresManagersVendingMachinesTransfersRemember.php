@@ -52,7 +52,8 @@ class StoresManagersVendingMachinesTransfersRemember extends ContainerAwareComma
                       file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$machine->getReplenishmentnotifyaddress().'&msg='.urlencode($msg));
                       sleep(1);
                   }
-                  $msg="Canal: **".$channel->getName()."** Ref: **".$channel->getProductcode()."** - ".$channel->getProductname()." - Cantidad: **".(floor(($channel->getMaxquantity()-$channel->getQuantity())/$channel->getMultiplier())." unidades.**");
+                  if ($channel->getMultiplier()>1) $msg="Canal: **".$channel->getName()."** Ref: **".$channel->getProductcode()."** - ".$channel->getProductname()." - Cantidad: **".(floor(($channel->getMaxquantity()-$channel->getQuantity())/$channel->getMultiplier())." paquetes de ".$channel->getMultiplier()." unidades cada paquete**");
+                  else $msg="Canal: **".$channel->getName()."** Ref: **".$channel->getProductcode()."** - ".$channel->getProductname()." - Cantidad: **".(floor(($channel->getMaxquantity()-$channel->getQuantity())/$channel->getMultiplier())." unidades.**");
                   file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$machine->getReplenishmentnotifyaddress().'&msg='.urlencode($msg));
                   sleep(1);
                 }
