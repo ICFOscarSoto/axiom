@@ -97,13 +97,13 @@ class ERPStoresManagersVendingMachinesChannelsReplenishmentController extends Co
     $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersVendingMachinesChannelsReplenishment.json"),true);
     //$user,$repository,$request,$manager,$listFields,$classname,$select_fields,$from,$where,$maxResults=null,$orderBy="id",$groupBy=null)
     $return=$listUtils->getRecordsSQL($user,$repositoryReplenishment,$request,$manager,$listFields, ERPStoresManagersProducts::class,
-                                    ['r.dateadd'=>'date', 'vm.name'=>'vendingmachine', 'c.name'=>'channel', 'r.productcode'=>'productcode', 'r.productname'=>'productname', 'r.quantity'=>'quantity', 'r.active'=>'active'],
+                                    ['r.id'=>'id', 'r.dateadd'=>'date', 'vm.name'=>'vendingmachine', 'c.name'=>'channel', 'r.productcode'=>'productcode', 'r.productname'=>'productname', 'r.quantity'=>'quantity', 'r.active'=>'active'],
                                     'erpstores_managers_vending_machines_channels_replenishment r
                                     LEFT JOIN erpstores_managers_vending_machines_channels c ON c.id=r.channel_id
                                     LEFT JOIN erpstores_managers_vending_machines vm ON vm.id=c.vendingmachine_id',
                                     'vm.manager_id='.$id.' and r.active=1 and r.deleted=0',
                                     20,
-                                    'r.id',
+                                    'r.date DESC, vm.vendingmachine',
                                   );
     return new JsonResponse($return);
   }
