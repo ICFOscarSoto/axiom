@@ -22,7 +22,7 @@ class ERPStoresManagersVendingMachinesChannelsReplenishmentUtils
     return [];
   }
 
-  public function formatList($user){
+  /*public function formatList($user){
     $list=[
       'id' => 'list'.$this->name,
       'route' => 'genericlist',
@@ -33,6 +33,21 @@ class ERPStoresManagersVendingMachinesChannelsReplenishmentUtils
       'tagColumn' => 2,
       'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/".$this->name.".json"),true),
       'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/".$this->name."FieldButtons.json"),true),
+      'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/".$this->name."TopButtons.json"),true)
+    ];
+    return $list;
+  }
+*/
+  public function formatList($id){
+    $list=[
+      'id' => 'listStoresManagersReplenishment',
+      'route' => 'StoresManagersReplenishmentlist',
+      'routeParams' => ["id" => $id],
+      'orderColumn' => 2,
+      'orderDirection' => 'DESC',
+      'tagColumn' => 2,
+      'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/".$this->name.".json"),true),
+      'fieldButtons' => [],
       'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/".$this->name."TopButtons.json"),true)
     ];
     return $list;

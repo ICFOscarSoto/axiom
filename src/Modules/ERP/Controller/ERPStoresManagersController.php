@@ -95,7 +95,7 @@ class ERPStoresManagersController extends Controller
 				["name" => "loadslist", "caption"=>"Loads List", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("storesManagersLoadLists",["id"=>$id])],
 			//	["name" => "transferlist", "caption"=>"Transfer List", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("storesManagersTransferLists",["id"=>$id])],
 				["name" => "transfers", "caption"=>"Transfers", "icon"=>"fa-address-card-o", "route"=>$this->generateUrl("generictablist",["function"=>"formatList","module"=>"Navision","name"=>"Transfers"])],
-				["name" => "loads", "caption"=>"Loads", "icon"=>"fa-address-card-o", "route"=>$this->generateUrl("generictablist",["function"=>"formatList","module"=>"ERP","name"=>"StoresManagersVendingMachinesChannelsReplenishment"])]
+				["name" => "loads", "caption"=>"Loads", "icon"=>"fa-address-card-o", "route"=>$this->generateUrl("listStoresManagersReplenishment",["id"=>$id])]
 			];
 			$obj = $repository->findOneBy(['id'=>$id, 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
 			$obj_name=$obj?$obj->getName():'';

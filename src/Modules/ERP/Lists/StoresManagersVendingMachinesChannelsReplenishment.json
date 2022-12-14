@@ -4,16 +4,16 @@
         "caption": "id"
     },
     {
-        "name": "dateadd",
+        "name": "date",
         "caption": "date",
         "type": "date"
     },
     {
-        "name": "channel__vendingmachine__name",
+        "name": "vendingmachine",
         "caption": "vendingmachine"
     },
     {
-        "name": "channel__name",
+        "name": "channel",
         "caption": "channel"
     },
     {
@@ -27,21 +27,5 @@
     {
         "name": "quantity",
         "caption": "quantity"
-    },
-    {
-        "name": "active",
-        "caption": "Estado",
-        "width": "10%",
-        "class": "dt-center",
-        "replace": {
-            "1": {
-                "text": "Activo",
-                "html": "<div style=\"min-width: 75px;\" class=\"label label-success\">Activo<\/div>"
-            },
-            "0": {
-                "text": "Desactivado",
-                "html": "<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado<\/div>"
-            }
-        }
     }
 ]

@@ -21,7 +21,9 @@ use App\Modules\ERP\Entity\ERPStoresManagersVendingMachines;
 use App\Modules\ERP\Entity\ERPStoresManagersVendingMachinesChannels;
 use App\Modules\ERP\Entity\ERPStoresManagersVendingMachinesChannelsReplenishment;
 use App\Modules\ERP\Reports\ERPPrintQR;
+use App\Modules\ERP\Utils\ERPStoresManagersVendingMachinesChannelsReplenishmentUtils;
 use \DateTime;
+use App\Modules\Security\Utils\SecurityUtils;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\MimeType\FileinfoMimeTypeGuesser;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
@@ -80,30 +82,61 @@ class ERPStoresManagersVendingMachinesChannelsReplenishmentController extends Co
   }
 
   /**
-   * @Route("/{_locale}/ERP/storesmanagersreplenishment/{id}/list", name="StoresManagersReplenishment")
-*
-*  public function StoresManagersReplenishment($id, RouterInterface $router,Request $request)
-*  {
-*    $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-*    $user = $this->getUser();
-*    $locale = $request->getLocale();
-*    $this->router = $router;
-*    $manager = $this->getDoctrine()->getManager();
-*    $repositoryReplenishment = $manager->getRepository(ERPStoresManagersVendingMachinesChannelsReplenishment::class);
-*    $listUtils=new GlobaleListUtils();
-*    $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersVendingMachinesChannelsReplenishment.json"),true);
-*    //$user,$repository,$request,$manager,$listFields,$classname,$select_fields,$from,$where,$maxResults=null,$orderBy="id",$groupBy=null)
-*    $return=$listUtils->getRecordsSQL($user,$repositoryReplenishment,$request,$manager,$listFields, ERPStoresManagersProducts::class,
-*                                    ['r.date'=>'date', 'vm.name'=>'vendingmachine', 'c.name'=>'channel', 'r.productcode'=>'productcode', 'r.productname'=>'productname', 'r.quantity'=>'quantity'],
-*                                    'erpstores_managers_vending_machines_channels_replenishment r
-*                                    LEFT JOIN erpstores_managers_vending_machines_channels c ON c.id=r.channel_id
-*                                    LEFT JOINerpstores_managers_vending_machines vm ON vm.',
-*                                    ,
-*                                    20,
-*                                    'r.id',
-*                                    ,
-*                              );
-*    return new JsonResponse($return);
-*  }
- */
+   * @Route("/{_locale}/ERP/storesmanagersreplenishment/{id}/list", name="StoresManagersReplenishmentlist")
+   *
+   */
+  public function StoresManagersReplenishmentlist($id, RouterInterface $router,Request $request)
+  {
+    $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+    $user = $this->getUser();
+    $locale = $request->getLocale();
+    $this->router = $router;
+    $manager = $this->getDoctrine()->getManager();
+    $repositoryReplenishment = $manager->getRepository(ERPStoresManagersVendingMachinesChannelsReplenishment::class);
+    $listUtils=new GlobaleListUtils();
+    $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersVendingMachinesChannelsReplenishment.json"),true);
+    //$user,$repository,$request,$manager,$listFields,$classname,$select_fields,$from,$where,$maxResults=null,$orderBy="id",$groupBy=null)
+    $return=$listUtils->getRecordsSQL($user,$repositoryReplenishment,$request,$manager,$listFields, ERPStoresManagersProducts::class,
+                                    ['r.dateadd'=>'date', 'vm.name'=>'vendingmachine', 'c.name'=>'channel', 'r.productcode'=>'productcode', 'r.productname'=>'productname', 'r.quantity'=>'quantity', 'r.active'=>'active'],
+                                    'erpstores_managers_vending_machines_channels_replenishment r
+                                    LEFT JOIN erpstores_managers_vending_machines_channels c ON c.id=r.channel_id
+                                    LEFT JOIN erpstores_managers_vending_machines vm ON vm.id=c.vendingmachine_id',
+                                    'vm.manager_id='.$id.' and r.active=1 and r.deleted=0',
+                                    20,
+                                    'r.id',
+                                  );
+    return new JsonResponse($return);
+  }
+
+  /**
+   * @Route("/{_locale}/erp/storesmanagersreplenishment/{id}/replenishments", name="listStoresManagersReplenishment")
+   */
+  public function listStoresManagersReplenishment($id,RouterInterface $router,Request $request)
+  {
+  $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+  if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
+  $userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
+  $locale = $request->getLocale();
+  $this->router = $router;
+  $repository=$this->getDoctrine()->getRepository($this->class);
+  $obj=$repository->findOneBy(["id"=>$id, "deleted"=>0]);
+  $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
+  $utils=new ERPStoresManagersVendingMachinesChannelsReplenishmentUtils();
+
+  $templateLists=$utils->formatList($id);
+/*  $formUtils=new GlobaleFormUtils();
+  $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "parent"=>$obj];
+  $formUtils->initialize($this->getUser(), new ERPStoresManagersConsumers(), dirname(__FILE__)."/../Forms/StoresManagersConsumers.json", $request, $this, $this->getDoctrine(),method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
+*/
+  $templateForms=[];
+
+    return $this->render('@Globale/list.html.twig', [
+      'id' => $id,
+      'listConstructor' => $templateLists,
+      'forms' => $templateForms,
+      'userData' => $userdata,
+      ]);
+
+  return new RedirectResponse($this->router->generate('app_login'));
+  }
 }
