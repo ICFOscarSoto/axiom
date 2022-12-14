@@ -114,7 +114,6 @@ class ERPStoresManagersVendingMachinesChannelsReplenishmentController extends Co
   public function listStoresManagersReplenishment($id,RouterInterface $router,Request $request)
   {
   $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-  if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
   $userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
   $locale = $request->getLocale();
   $this->router = $router;

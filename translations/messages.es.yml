@@ -779,6 +779,10 @@ vendingmachine: Máquina Expendedora
 channel: Canal
 productcode: Código de producto
 productname: Nombre del producto
+datesend: Fecha de envío
+originstore: Almacén de origen
+destinationstore: Almacén de destino
+received: Recibido
 #JSPREADSHEET
 #----------------------------------------------------------------------------------------------------------------------
 jspreadsheet_showcolumn: Mostrar columna
