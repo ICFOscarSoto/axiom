@@ -11,6 +11,9 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
+use App\Modules\Globale\Utils\GlobaleEntityUtils;
+use App\Modules\Globale\Utils\GlobaleListUtils;
+use App\Modules\Globale\Utils\GlobaleFormUtils;
 use App\Modules\ERP\Entity\ERPProducts;
 use App\Modules\ERP\Entity\ERPStores;
 use App\Modules\ERP\Entity\ERPStoreLocations;
@@ -71,11 +74,36 @@ class ERPStoresManagersVendingMachinesChannelsReplenishmentController extends Co
       $replenishmentInfo["lines"]=$lines;
       $params["transfers"][]=$replenishmentInfo;
     }
-    dump($params);
     $printQRUtils = new ERPPrintQR();
     $pdf=$printQRUtils->downloadTransfers($params);
     return new Response("", 200, array('Content-Type' => 'application/pdf'));
-    return new Response();
   }
 
+  /**
+   * @Route("/{_locale}/ERP/storesmanagersreplenishment/{id}/list", name="StoresManagersReplenishment")
+*
+*  public function StoresManagersReplenishment($id, RouterInterface $router,Request $request)
+*  {
+*    $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+*    $user = $this->getUser();
+*    $locale = $request->getLocale();
+*    $this->router = $router;
+*    $manager = $this->getDoctrine()->getManager();
+*    $repositoryReplenishment = $manager->getRepository(ERPStoresManagersVendingMachinesChannelsReplenishment::class);
+*    $listUtils=new GlobaleListUtils();
+*    $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersVendingMachinesChannelsReplenishment.json"),true);
+*    //$user,$repository,$request,$manager,$listFields,$classname,$select_fields,$from,$where,$maxResults=null,$orderBy="id",$groupBy=null)
+*    $return=$listUtils->getRecordsSQL($user,$repositoryReplenishment,$request,$manager,$listFields, ERPStoresManagersProducts::class,
+*                                    ['r.date'=>'date', 'vm.name'=>'vendingmachine', 'c.name'=>'channel', 'r.productcode'=>'productcode', 'r.productname'=>'productname', 'r.quantity'=>'quantity'],
+*                                    'erpstores_managers_vending_machines_channels_replenishment r
+*                                    LEFT JOIN erpstores_managers_vending_machines_channels c ON c.id=r.channel_id
+*                                    LEFT JOINerpstores_managers_vending_machines vm ON vm.',
+*                                    ,
+*                                    20,
+*                                    'r.id',
+*                                    ,
+*                              );
+*    return new JsonResponse($return);
+*  }
+ */
 }
