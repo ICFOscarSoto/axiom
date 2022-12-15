@@ -37,4 +37,20 @@ class ERPStocksHistoryUtils
     ];
     return $list;
   }
+
+  public function formatListVMbyManager($manager){
+    $list=[
+      'id' => 'listStocksHistoryVM',
+      'route' => 'StocksHistoryVMlist',
+      'routeParams' => ["storemanager" => $manager],
+      'orderColumn' => 3,
+      'orderDirection' => 'DESC',
+      'tagColumn' => 2,
+      'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StocksHistoryVM.json"),true),
+      'fieldButtons' => [],
+      'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/".$this->name."TopButtons.json"),true)
+    ];
+    return $list;
+  }
+
 }

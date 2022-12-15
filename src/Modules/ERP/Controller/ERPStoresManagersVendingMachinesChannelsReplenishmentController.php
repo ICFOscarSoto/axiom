@@ -102,8 +102,8 @@ class ERPStoresManagersVendingMachinesChannelsReplenishmentController extends Co
                                     LEFT JOIN erpstores_managers_vending_machines_channels c ON c.id=r.channel_id
                                     LEFT JOIN erpstores_managers_vending_machines vm ON vm.id=c.vendingmachine_id',
                                     'vm.manager_id='.$id.' and r.active=1 and r.deleted=0',
-                                    20,
-                                    'r.date DESC, vm.vendingmachine',
+                                    null,
+                                    'r.dateadd',
                                   );
     return new JsonResponse($return);
   }

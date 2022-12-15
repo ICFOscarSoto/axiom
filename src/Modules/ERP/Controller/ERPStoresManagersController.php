@@ -92,10 +92,11 @@ class ERPStoresManagersController extends Controller
 				["name" => "storesmanagersconsumers", "caption"=>"Consumidores", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("listStoresManagersConsumers",["id"=>$id])],
 				["name" => "storesmanagersoperationsreports", "caption"=>"Reports", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("storesManagersOperationsReports",["id"=>$id])],
 			//	["name" => "loadsreports", "caption"=>"Loads", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("storesManagersLoadReports",["id"=>$id])],
-				["name" => "loadslist", "caption"=>"Loads List", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("storesManagersLoadLists",["id"=>$id])],
+			//	["name" => "loadslist", "caption"=>"Loads List", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("storesManagersLoadLists",["id"=>$id])],
 			//	["name" => "transferlist", "caption"=>"Transfer List", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("storesManagersTransferLists",["id"=>$id])],
 				["name" => "transfers", "caption"=>"Transfers", "icon"=>"fa-address-card-o", "route"=>$this->generateUrl("generictablist",["function"=>"formatList","module"=>"Navision","name"=>"Transfers"])],
-				["name" => "loads", "caption"=>"Loads", "icon"=>"fa-address-card-o", "route"=>$this->generateUrl("listStoresManagersReplenishment",["id"=>$id])]
+				["name" => "loads", "caption"=>"Loads", "icon"=>"fa-address-card-o", "route"=>$this->generateUrl("listStoresManagersReplenishment",["id"=>$id])],
+				["name" => "historyVM", "caption"=>"historyVendingMachines", "icon"=>"fa-address-card-o", "route"=>$this->generateUrl("listStocksHistoryVM",["manager"=>$id])]
 			];
 			$obj = $repository->findOneBy(['id'=>$id, 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
 			$obj_name=$obj?$obj->getName():'';

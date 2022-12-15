@@ -783,6 +783,9 @@ datesend: Fecha de envío
 originstore: Almacén de origen
 destinationstore: Almacén de destino
 received: Recibido
+departure: Salida
+dateoperation: Fecha de operación
+historyVendingMachines: Histórico de expendedoras
 #JSPREADSHEET
 #----------------------------------------------------------------------------------------------------------------------
 jspreadsheet_showcolumn: Mostrar columna

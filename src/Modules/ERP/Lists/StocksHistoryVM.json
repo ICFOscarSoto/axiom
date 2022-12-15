@@ -1,0 +1,47 @@
+[
+  {
+        "name": "id",
+        "caption": "id"
+    },
+    {
+        "name": "type",
+        "caption": "type"
+    },
+    {
+        "name": "departure",
+        "caption": "departure"
+    },
+    {
+        "name": "dateoperation",
+        "caption": "dateoperation",
+        "type": "date"
+    },
+    {
+        "name": "vendingmachine",
+        "caption": "vendingmachine"
+    },
+    {
+        "name": "channel",
+        "caption": "channel"
+    },
+    {
+        "name": "productcode",
+        "caption": "productcode"
+    },
+    {
+        "name": "productname",
+        "caption": "productname"
+    },
+    {
+        "name": "quantity",
+        "caption": "quantity"
+    },
+    {
+        "name": "previousqty",
+        "caption": "previousqty"
+    },
+    {
+        "name": "newqty",
+        "caption": "newqty"
+    }
+]
