@@ -786,6 +786,7 @@ received: Recibido
 departure: Salida
 dateoperation: Fecha de operación
 historyVendingMachines: Histórico de expendedoras
+historyManager: Histórico
 #JSPREADSHEET
 #----------------------------------------------------------------------------------------------------------------------
 jspreadsheet_showcolumn: Mostrar columna

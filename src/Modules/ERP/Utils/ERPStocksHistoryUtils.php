@@ -53,4 +53,18 @@ class ERPStocksHistoryUtils
     return $list;
   }
 
+    public function formatListByManager($manager){
+      $list=[
+        'id' => 'listStocksHistoryManager',
+        'route' => 'StocksHistoryManagerlist',
+        'routeParams' => ["storemanager" => $manager],
+        'orderColumn' => 2,
+        'orderDirection' => 'DESC',
+        'tagColumn' => 2,
+        'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StocksHistoryManager.json"),true),
+        'fieldButtons' => [],
+        'topButtons' => []
+      ];
+      return $list;
+    }
 }

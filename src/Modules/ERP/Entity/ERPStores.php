@@ -7,6 +7,7 @@ use \App\Modules\Globale\Entity\GlobaleStates;
 use \App\Modules\Globale\Entity\GlobaleCountries;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
 use \App\Modules\Globale\Entity\GlobaleUsers;
+use \App\Modules\ERP\Entity\ERPStoresManagers;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\ERP\Repository\ERPStoresRepository")
@@ -100,6 +101,11 @@ class ERPStores
      * @ORM\Column(type="boolean", nullable=true)
      */
     private $managed;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPStoresManagers")
+     */
+    private $managedBy;
 
     public function getId(): ?int
     {
@@ -282,6 +288,18 @@ class ERPStores
     public function setManaged(?bool $managed): self
     {
         $this->managed = $managed;
+
+        return $this;
+    }
+
+    public function getManagedBy(): ?ERPStoresManagers
+    {
+        return $this->managedBy;
+    }
+
+    public function setManagedBy(?ERPStoresManagers $managedBy): self
+    {
+        $this->managedBy = $managedBy;
 
         return $this;
     }
