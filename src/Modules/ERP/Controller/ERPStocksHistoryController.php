@@ -101,7 +101,7 @@ class ERPStocksHistoryController extends Controller
     //$user,$repository,$request,$manager,$listFields,$classname,
     //$select_fields,$from,$where,$maxResults=null,$orderBy="id",$groupBy=null)
     $return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields, ERPStocksHistory::class,
-                                    ['tm.name'=>'type', 'sh.dateadd'=>'dateoperation', 'sh.num_operation'=>'transfer', 'st.name'=>'store', 'vm.name'=>'vendingmachine', 'c.name'=>'channel',
+                                    ['tm.name'=>'type', 'sh.dateadd'=>'dateoperation', 'sh.num_operation'=>'numOperation', 'st.name'=>'store', 'vm.name'=>'vendingmachine', 'c.name'=>'channel',
                                       'sh.productcode'=>'productcode', 'sh.productname'=>'productname', 'sh.quantity'=>'quantity', 'sh.previousqty'=>'previousqty', 'sh.newqty'=>'newqty', 'sh.id'=>'id'],
                                     'erpstocks_history sh
                                     LEFT JOIN erptypes_movements tm ON tm.id=sh.type_id
