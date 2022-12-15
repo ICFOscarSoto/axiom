@@ -13,8 +13,8 @@
         "type": "date"
     },
     {
-        "name": "transfer",
-        "caption": "transfer"
+        "name": "numOperation",
+        "caption": "numOperation"
     },
     {
         "name": "vendingmachine",
