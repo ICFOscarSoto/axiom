@@ -1123,68 +1123,69 @@ class ERPProductsController extends Controller
 		 $name=substr($transfer,3);
 		 $repositoryTransfers=$this->getDoctrine()->getRepository(NavisionTransfers::class);
 		 $params["transfers"]=$repositoryTransfers->findBy(["name"=>$name, "active"=>1, "deleted"=>0]);
-		 if (empty($params["transfers"])) {
-			 $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-printTransfer.php?from='.$name);
+		 $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-printTransfer.php?from='.$name);
+		 $objects=json_decode($json, true);
+		 $objects=$objects[0]["class"];
+		 if (empty($objects)){
+			 $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getTransfer.php?from='.$name);
 			 $objects=json_decode($json, true);
 			 $objects=$objects[0]["class"];
-			 if (empty($objects)){
-				 $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getTransfer.php?from='.$name);
-				 $objects=json_decode($json, true);
-				 $objects=$objects[0]["class"];
-			 }
-			 foreach ($objects as $object){
-				 	 $transfersRepository=$this->getDoctrine()->getRepository(NavisionTransfers::class);
-				 	 $productsRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
-				 	 $storesRepository=$this->getDoctrine()->getRepository(ERPStores::class);
-				 	 $stocksRepository=$this->getDoctrine()->getRepository(ERPStocks::class);
-					 $repositoryStoreLocations=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
-				 	 $repositoryProductsVariants=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
-					 $product=$productsRepository->findOneBy(["code"=>$object["code"]]);
-					 $item=$transfersRepository->findOneBy(["name"=>$name, "product"=>$product, "active"=>1, "deleted"=>0]);
-					 if ($item==null){
-						 if (array_key_exists("Transfer-from Code",$object)) $originStore=$storesRepository->findOneBy(["code"=>$object["Transfer-from Code"]]);
-						 else $originStore=$storesRepository->findOneBy(["code"=>"ALM01"]);
-						 $dateSend=new \DateTime(date('Y-m-d 00:00:00',strtotime($object["dateSend"]["date"])));
-						 $destinationStore=$storesRepository->findOneBy(["code"=>$object["almacen"]]);
-						 $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product,"variant"=>null]);
-				     $storelocation=$repositoryStoreLocations->findOneBy(["store"=>$destinationStore]);
-						 $stocks=$stocksRepository->findOneBy(["productvariant"=>$productvariant, "storelocation"=>$storelocation, "active"=>1, "deleted"=>0]);
-						 $obj=new NavisionTransfers();
-						 $obj->setOriginstore($originStore);
-						 $obj->setDestinationstore($destinationStore);
-						 $obj->setProduct($product);
-						 $obj->setName($name);
-						 $obj->setQuantity((int)$object["stock"]);
-						 $obj->setCompany($this->getUser()->getCompany());
-						 $obj->setDateadd(new \Datetime());
-						 $obj->setDateupd(new \Datetime());
-						 $obj->setDatesend($dateSend);
-						 $obj->setActive(1);
-						 $obj->setDeleted(0);
-						 $obj->setReceived(0);
-						 $this->getDoctrine()->getManager()->persist($obj);
-						 if ($stocks==null ){
-				         $stocks=new ERPStocks();
-				         $stocks->setProductVariant($productvariant);
-				         $stocks->setStoreLocation($storelocation);
-				         $stocks->setCompany($this->getUser()->getCompany());
-				         $stocks->setQuantity(0);
-				         $stocks->setPendingreceive((int)$object["stock"]);
-				         $stocks->setDateupd(new \Datetime());
-				         $stocks->setDateadd(new \Datetime());
-				         $stocks->setDeleted(0);
-				         $stocks->setActive(1);
-				       } else
-							{
-				       $stocks->setPendingreceive($stocks->getPendingreceive()+(int)$object["stock"]);
-				      }
-
-							$this->getDoctrine()->getManager()->persist($stocks);
-					 }
-					 $this->getDoctrine()->getManager()->flush();
-				 }
-		 $params["transfers"]=$repositoryTransfers->findBy(["name"=>$name, "active"=>1, "deleted"=>0]);
 		 }
+		 foreach ($objects as $object){
+		 	 $transfersRepository=$this->getDoctrine()->getRepository(NavisionTransfers::class);
+		 	 $productsRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
+		 	 $storesRepository=$this->getDoctrine()->getRepository(ERPStores::class);
+		 	 $stocksRepository=$this->getDoctrine()->getRepository(ERPStocks::class);
+			 $repositoryStoreLocations=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
+		 	 $repositoryProductsVariants=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
+			 $product=$productsRepository->findOneBy(["code"=>$object["code"]]);
+			 $item=$transfersRepository->findOneBy(["name"=>$name, "product"=>$product, "active"=>1, "deleted"=>0]);
+			 if ($item==null){
+				 if (array_key_exists("Transfer-from Code",$object)) $originStore=$storesRepository->findOneBy(["code"=>$object["Transfer-from Code"]]);
+				 else $originStore=$storesRepository->findOneBy(["code"=>"ALM01"]);
+				 $dateSend=new \DateTime(date('Y-m-d 00:00:00',strtotime($object["dateSend"]["date"])));
+	 		 	 $destinationStore=$storesRepository->findOneBy(["code"=>$object["almacen"]]);
+				 if($object["variant"]!=null) $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product,"variant"=>$object["variant"]]);
+				 else $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product,"variant"=>null]);
+				 $storelocation=$repositoryStoreLocations->findOneBy(["store"=>$destinationStore]);
+				 $stocks=$stocksRepository->findOneBy(["productvariant"=>$productvariant, "storelocation"=>$storelocation, "active"=>1, "deleted"=>0]);
+				 $obj=new NavisionTransfers();
+				 $obj->setOriginstore($originStore);
+				 $obj->setDestinationstore($destinationStore);
+				 $obj->setProduct($product);
+				 $obj->setName($name);
+				 $obj->setQuantity((int)$object["stock"]);
+				 $obj->setCompany($this->getUser()->getCompany());
+				 $obj->setDateadd(new \Datetime());
+				 $obj->setDateupd(new \Datetime());
+				 $obj->setDatesend($dateSend);
+				 $obj->setActive(1);
+				 $obj->setDeleted(0);
+				 $obj->setReceived(0);
+				 $this->getDoctrine()->getManager()->persist($obj);
+				 if ($stocks==null ){
+		         $stocks=new ERPStocks();
+		         $stocks->setProductVariant($productvariant);
+		         $stocks->setStoreLocation($storelocation);
+		         $stocks->setCompany($this->getUser()->getCompany());
+		         $stocks->setQuantity(0);
+		         $stocks->setPendingreceive((int)$object["stock"]);
+		         $stocks->setDateupd(new \Datetime());
+		         $stocks->setDateadd(new \Datetime());
+		         $stocks->setDeleted(0);
+		         $stocks->setActive(1);
+		       } else {
+		       		$stocks->setPendingreceive($stocks->getPendingreceive()+(int)$object["stock"]);
+		      }
+					$this->getDoctrine()->getManager()->persist($stocks);
+				} else {
+					$item=setQuantity((int)$object["stock"]);
+ 				  $item->setDateupd(new \Datetime());
+ 				 	$this->getDoctrine()->getManager()->persist($item);
+				}
+				$this->getDoctrine()->getManager()->flush();
+			}
+		 $params["transfers"]=$repositoryTransfers->findBy(["name"=>$name, "active"=>1, "deleted"=>0]);
 		 //$pdf=$printQRUtils->create($params);
 		 $pdf=$printQRUtils->transferQR($params);
 		 return new Response("", 200, array('Content-Type' => 'application/pdf'));
@@ -1262,17 +1263,20 @@ class ERPProductsController extends Controller
          $stockHistory->setActive(true);
          $stockHistory->setDeleted(false);
 				 $stock->setQuantity($stock->getQuantity()+$received);
-
+				 $transfersRepository=$this->getDoctrine()->getRepository(NavisionTransfers::class);
+				 $lineTransfer=$transfersRepository->findOneBy(['name'=>$transfer, 'product'=>$productvariant->getProduct(), 'active'=>1, 'deleted'=>'0']);
+				 $lineTransfer->setReceived(1);
+				 $lineTransfer->setDateupd(new \Datetime());
 				 $this->getDoctrine()->getManager()->persist($stock);
 				 $this->getDoctrine()->getManager()->persist($stockHistory);
+				 $this->getDoctrine()->getManager()->persist($lineTransfer);
 			 } else return new JsonResponse(["result"=>-7, "text"=>"El almacén de destino (".$store->getName().") no se corresponde con un almacén gestionado"]);
 
 
 			 $this->getDoctrine()->getManager()->flush();
 		 	}
 
-		 $transfersRepository=$this->getDoctrine()->getRepository(NavisionTransfers::class);
-		 $transfersRepository->recivedTransfer($transfer);
+
 		 return new JsonResponse(["result"=>1, "text"=>"Se ha recepcionado la mercancia del traspaso ".$transfer]);
 	 }
 
