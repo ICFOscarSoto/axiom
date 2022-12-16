@@ -6,6 +6,7 @@ use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
+use App\Modules\ERP\Entity\ERPProductsVariants;
 
 class ERPStoresManagersProductsUtils
 {
@@ -14,14 +15,30 @@ class ERPStoresManagersProductsUtils
   public $parentClass="\App\Modules\ERP\Entity\ERPStoresManagers";
   public $parentField="manager";
   public function getExcludedForm($params){
-    return ['manager'];
+    return ['manager','productvariant'];
   }
 
   public function getIncludedForm($params){
     $doctrine=$params["doctrine"];
     $id=$params["id"];
     $user=$params["user"];
-    return [];
+    $productvariant=$params["productvariant"];
+    $product=$params["product"];
+    $productsvariantsRepository=$doctrine->getRepository(ERPProductsVariants::class);
+    $choices = $productsvariantsRepository->getVariants($product, $user);
+    return [
+    ['productvariant', ChoiceType::class, [
+      'required' => false,
+      'disabled' => false,
+      'attr' => ['class' => 'select2', 'readonly' => true],
+      'choices' => $product?$productsvariantsRepository->findBy(["product"=>$product]):null,
+      'placeholder' => 'Selecciona variante',
+      'choice_label' => function($obj, $key, $index) {
+          return ($obj?($obj->getVariant()?$obj->getVariant()->getName():''):'');
+      },
+      'choice_value' => 'id',
+      'data' => $productvariant
+    ]]];
   }
 
   public function formatList($user){

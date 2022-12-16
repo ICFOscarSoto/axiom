@@ -24,7 +24,7 @@ class ERPStoresManagersProducts
     private $manager;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Modules\ERP\Entity\ERPProductsVariants")
+     * @ORM\ManyToOne(targetEntity="App\Modules\ERP\Entity\ERPProductsVariants", fetch="EAGER")
      * @ORM\JoinColumn(nullable=false)
      */
     private $productvariant;

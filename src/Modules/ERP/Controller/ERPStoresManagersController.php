@@ -150,24 +150,23 @@ class ERPStoresManagersController extends Controller
 	public function listStoresManagersProducts($id,RouterInterface $router,Request $request)
 	{
 	$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-	if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
 	$userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
 	$locale = $request->getLocale();
 	$this->router = $router;
-
 	$repository=$this->getDoctrine()->getRepository($this->class);
 	$repositoryProducts=$this->getDoctrine()->getRepository(ERPStoresManagersProducts::class);
 	$obj=$repository->findOneBy(["company"=>$this->getUser()->getCompany(), "id"=>$id, "deleted"=>0]);
-
 	$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
 	$utils = new ERPStoresManagersUtils();
-
 	$templateLists=$utils->formatProductsList($id);
 	$formUtils=new GlobaleFormUtils();
-
 	$utilsObj=new ERPStoresManagersProductsUtils();
-	$params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "parent"=>$obj];
-	$formUtils->initialize($this->getUser(), new ERPStoresManagersProducts(), dirname(__FILE__)."/../Forms/StoresManagersProducts.json", $request, $this, $this->getDoctrine(),method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
+	$params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "parent"=>$obj,
+	"product"=>null,
+	"productvariant"=>null];
+	$formUtils->initialize($this->getUser(), new ERPStoresManagersProducts(), dirname(__FILE__)."/../Forms/StoresManagersProducts.json",
+	$request, $this, $this->getDoctrine(),method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],
+	method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
 	$templateForms[]=$formUtils->formatForm('StoresManagersProducts', true, $id, ERPStoresManagersProducts::class);
 
 		return $this->render('@Globale/list.html.twig', [
@@ -178,6 +177,25 @@ class ERPStoresManagersController extends Controller
 			]);
 
 	return new RedirectResponse($this->router->generate('app_login'));
+	}
+
+	/**
+	* @Route("/{_locale}/erp/storesmanagersproducts/{id}/list", name="StoresManagersProductslist")
+	*/
+	public function StoresManagersProductslist($id, RouterInterface $router,Request $request)
+	{
+	$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+	$user = $this->getUser();
+	$locale = $request->getLocale();
+	$this->router = $router;
+	$manager = $this->getDoctrine()->getManager();
+	$repository = $manager->getRepository($this->class);
+	$repositoryConsumers = $manager->getRepository(ERPStoresManagersProducts::class);
+	$listUtils=new GlobaleListUtils();
+	$obj=$repository->findBy(["company"=>$this->getUser()->getCompany(), "deleted"=>0, "id"=>$id]);
+	$listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersProducts.json"),true);
+	$return=$listUtils->getRecords($user,$repositoryConsumers,$request,$manager,$listFields, ERPStoresManagersProducts::class,[["type"=>"and", "column"=>"manager", "value"=>$obj]]);
+	return new JsonResponse($return);
 	}
 
 
@@ -271,27 +289,6 @@ class ERPStoresManagersController extends Controller
 			]);
 
 		}
-
-
-	/**
-	 * @Route("/{_locale}/erp/storesmanagersproducts/{id}/list", name="StoresManagersProductslist")
-	 */
-	public function StoresManagersProductslist($id, RouterInterface $router,Request $request)
-	{
-		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-		$user = $this->getUser();
-		$locale = $request->getLocale();
-		$this->router = $router;
-		$manager = $this->getDoctrine()->getManager();
-		$repository = $manager->getRepository($this->class);
-		$repositoryConsumers = $manager->getRepository(ERPStoresManagersProducts::class);
-		$listUtils=new GlobaleListUtils();
-		$obj=$repository->findBy(["company"=>$this->getUser()->getCompany(), "deleted"=>0, "id"=>$id]);
-		$listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersProducts.json"),true);
-		$return=$listUtils->getRecords($user,$repositoryConsumers,$request,$manager,$listFields, ERPStoresManagersProducts::class,[["type"=>"and", "column"=>"manager", "value"=>$obj]]);
-		return new JsonResponse($return);
-	}
-
 	/**
 	 * @Route("/{_locale}/erp/storesmanagersconsumers/{id}/list", name="StoresManagersConsumerslist")
 	 */
@@ -1387,12 +1384,16 @@ class ERPStoresManagersController extends Controller
 			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 			$template=dirname(__FILE__)."/../Forms/StoresManagersProducts.json";
 			$utils = new GlobaleFormUtils();
-	 	 	$utilsObj = new ERPStoresManagersProductsUtils();
 			$repository=$this->getDoctrine()->getRepository(ERPStoresManagersProducts::class);
 			$obj = $repository->findOneBy(['id'=>$id, 'active'=>1, 'deleted'=>0]);
-			$params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "obj"=>$obj];
-			$utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),$utilsObj->getExcludedForm($params),$utilsObj->getIncludedForm($params));
-			$make = $utils->make($obj->getId(), ERPStoresManagersProducts::class, $action, "formStoresManagersProducts", "modal", "@ERP/storesManagersProducts.html.twig");
+	 	 	$utilsObj = new ERPStoresManagersProductsUtils();
+			$params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(),
+			"product"=>$obj->getProductvariant()->getProduct(),
+			"productvariant"=>$obj->getProductvariant()];
+			$utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),
+	                           method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],
+	                           method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
+			$make = $utils->make($obj->getId(), ERPStoresManagersProducts::class, $action, "StoresManagersProducts", "modal");
 			return $make;
 		}
 
