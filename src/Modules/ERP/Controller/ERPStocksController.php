@@ -21,6 +21,7 @@ use App\Modules\ERP\Entity\ERPEAN13;
 use App\Modules\ERP\Entity\ERPStoresManagers;
 use App\Modules\ERP\Entity\ERPTypesMovements;
 use App\Modules\ERP\Entity\ERPProductsVariants;
+use App\Modules\ERP\Entity\ERPStoresManagersProducts;
 use App\Modules\Globale\Entity\GlobaleUsers;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
@@ -49,7 +50,7 @@ class ERPStocksController extends Controller
   		$locale = $request->getLocale();
   		$this->router = $router;
     	$utils = new ERPStocksUtils;
-  		$templateLists=$utils->formatList($id);
+  		$templateLists=$utils->formatListByProduct($id);
 			$formUtils=new GlobaleFormUtils();
 			$formUtils->initialize($this->getUser(), new $this->class(), dirname(__FILE__)."/../Forms/Stocks.json", $request, $this, $this->getDoctrine());
 			$templateForms[]=$formUtils->formatForm('stocks', true, $id, $this->class, "dataStocks", ["id"=>$id, "action"=>"save"]);
@@ -69,7 +70,11 @@ class ERPStocksController extends Controller
 		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		 $template=dirname(__FILE__)."/../Forms/Stocks.json";
 		 $utils = new GlobaleFormUtils();
-		 $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine());
+		 $repository=$this->getDoctrine()->getRepository($this->class);
+		 $obj = $repository->findOneBy(['id'=>$id, 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
+		 $classUtils=new ERPStocksUtils();
+		 $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "obj"=>$obj];
+		 $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),$classUtils->getExcludedForm($params));
 		 return $utils->make($id, $this->class, $action, "formStocks", "modal");
 		}
 
@@ -556,6 +561,34 @@ class ERPStocksController extends Controller
 		return new JsonResponse($return);
   }
 
+
+	/**
+   * @Route("/api/stocksmanaged/{product}/{storemanager}/list", name="stocksmanagedlist")
+   */
+  public function stocksmanagedlist($product,$storemanager,RouterInterface $router,Request $request){
+    $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+    $user = $this->getUser();
+		$productRepository=$this->getDoctrine()->getRepository(ERPStoresManagersProducts::class);
+    $product = $productRepository->find($product)->getProductvariant();
+		$locale = $request->getLocale();
+    $this->router = $router;
+    $manager = $this->getDoctrine()->getManager();
+    $repository = $manager->getRepository(ERPStocks::class);
+    $listUtils=new GlobaleListUtils();
+    $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StocksManaged.json"),true);
+		//$user,$repository,$request,$manager,$listFields,$classname,$select_fields,$from,$where,$maxResults=null,$orderBy="id",$groupBy=null)
+    $return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields, ERPStocks::class,
+																				['str.name'=>'store','stk.quantity'=>'quantity', 'stk.pendingreceive'=>'pendingreceive', 'stk.minstock'=>'minstock',
+																				'stk.maxstock'=>'maxstock', 'stk.lastinventorydate'=>'lastinventorydate', 'stk.dateupd'=>'dateupd', 'stk.id'=>'id'],
+																				'erpstocks stk
+																				LEFT JOIN erpstore_locations sl ON sl.id=stk.storelocation_id
+																				LEFT JOIN erpstores str ON str.id=sl.store_id',
+																				'str.managed_by_id='.$storemanager.' and stk.deleted=0 and stk.productvariant_id='.$product->getId(),
+																				null,
+																				'stk.id',
+																			);
+		return new JsonResponse($return);
+  }
 	/**
    * @Route("/api/stock/list/{id}", name="stockproductlist")
    */

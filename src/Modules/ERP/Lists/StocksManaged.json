@@ -1,0 +1,9 @@
+[ {"name": "id", "caption":""},
+  {"name": "store", "caption":"Almacén", "width" : "50"},
+  {"name": "quantity", "caption":"Cantidad", "width" : "50"},
+  {"name": "minstock","caption":"Stock Mínimo", "width" : "50"},
+  {"name": "maxstock","caption":"Stock Máximo", "width" : "50"},
+  {"name": "pendingreceive","caption":"Pendiente de recibir", "width" : "50"},
+  {"name": "lastinventorydate", "caption":"Fecha de último inventario", "width" : "90"},
+  {"name": "dateupd", "caption":"Fecha de última actualización", "width" : "90"}
+]

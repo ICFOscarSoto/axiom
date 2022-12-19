@@ -36,6 +36,7 @@ use App\Modules\ERP\Entity\ERPStoresUsers;
 use App\Modules\ERP\Entity\ERPCategories;
 use App\Modules\ERP\Entity\ERPProductsVariants;
 use App\Modules\ERP\Entity\ERPTypesMovements;
+use App\Modules\ERP\Controller\ERPStocksController;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
@@ -1397,6 +1398,28 @@ class ERPStoresManagersController extends Controller
 			return $make;
 		}
 
+		/**
+			* @Route("/api/ERP/formStoresManagersProducts/{id}", name="formStoresManagersProducts", defaults={"id"=0})
+			*/
+		public function formStoresManagersProducts($id,RouterInterface $router,Request $request){
+			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			$user = $this->getUser();
+			$this->router = $router;
+			$repositoryManagersProducts=$this->getDoctrine()->getRepository(ERPStoresManagersProducts::class);
+			$managersProducts=$repositoryManagersProducts->findOneBy(["id"=>$id, "deleted"=>0]);
+			$repositoryStocks=$this->getDoctrine()->getRepository(ERPStocks::class);
+			$controllerStocks= new ERPStocksController;
+			//$listStocks=$repositoryStocks->getManagersStocksByProduct($managersProducts->getManager()->getId(), $managersProducts->getProductvariant()->getId());
+	    $manager = $this->getDoctrine()->getManager();
+	    $repository = $manager->getRepository(ERPStocks::class);
+	    $listUtils=new ERPStocksUtils();
+	    $listStocks=$listUtils->formatListProductsManagers($id,$managersProducts->getManager()->getId());
+
+			return $this->render('@ERP/storesManagersProducts.html.twig', [
+				'product' => $managersProducts->getProductvariant()->getProduct()->getName(),
+				'listStocks' => 	$listStocks,
+			]);
+		}
 
 		/**
 			* @Route("/api/ERP/downloadTransfers", name="downloadTransfers")

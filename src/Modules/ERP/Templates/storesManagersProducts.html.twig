@@ -1,0 +1,7 @@
+  <div class="row">
+    {{ product }}
+  </div>
+  {% if listStocks is defined %}
+    {% set listConstructor = listStocks %}
+    {{ include('@Globale/list.html.twig') }}
+  {% endif %}

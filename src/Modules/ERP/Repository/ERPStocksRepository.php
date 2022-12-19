@@ -364,7 +364,7 @@ class ERPStocksRepository extends ServiceEntityRepository
           $result=$this->getEntityManager()->getConnection()->executeQuery($query, $params);
         }
       }
-      
+
       return $result;
     }
 
@@ -404,5 +404,13 @@ class ERPStocksRepository extends ServiceEntityRepository
         $result=$this->getEntityManager()->getConnection()->executeQuery($query, $params);
       }
       return $result;
+    }
+
+    public function getManagersStocksByProduct ($manager, $productvariant){
+      $query='SELECT pendingreceive, quantity, minstock, maxstock, lastinventorydate, dateupd
+              FROM erpstocks
+              WHERE storelocation_id in (Select id from erpstore_locations where store_id in (SELECT id from erpstores where managed_by_id='.$manager.'))
+              and productvariant_id='.$productvariant.' and active=1 and deleted=0';
+      return $this->getEntityManager()->getConnection()->executeQuery($query)->fetchAll();
     }
 }
