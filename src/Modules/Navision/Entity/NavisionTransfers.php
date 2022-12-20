@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use \App\Modules\Globale\Entity\GlobaleCompanies;
 use \App\Modules\ERP\Entity\ERPStores;
 use \App\Modules\ERP\Entity\ERPProducts;
+use \App\Modules\ERP\Entity\ERPProductsVariants;
 
 /**
  * @ORM\Entity(repositoryClass="App\Modules\Navision\Repository\NavisionTransfersRepository")
@@ -80,6 +81,11 @@ class NavisionTransfers
      * @ORM\Column(type="boolean")
      */
     private $received;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="\App\Modules\ERP\Entity\ERPProductsVariants")
+     */
+    private $productvariant;
 
     public function getId(): ?int
     {
@@ -226,6 +232,18 @@ class NavisionTransfers
     public function setReceived(bool $received): self
     {
         $this->received = $received;
+
+        return $this;
+    }
+
+    public function getProductvariant(): ?ERPProductsVariants
+    {
+        return $this->productvariant;
+    }
+
+    public function setProductvariant(?ERPProductsVariants $productvariant): self
+    {
+        $this->productvariant = $productvariant;
 
         return $this;
     }

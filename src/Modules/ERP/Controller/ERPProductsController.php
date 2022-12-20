@@ -1138,6 +1138,7 @@ class ERPProductsController extends Controller
 		 	 $stocksRepository=$this->getDoctrine()->getRepository(ERPStocks::class);
 			 $repositoryStoreLocations=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
 		 	 $repositoryProductsVariants=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
+		 	 $repositoryVariants=$this->getDoctrine()->getRepository(ERPVariants::class);
 			 $product=$productsRepository->findOneBy(["code"=>$object["code"]]);
 			 $item=$transfersRepository->findOneBy(["name"=>$name, "product"=>$product, "active"=>1, "deleted"=>0]);
 			 if ($item==null){
@@ -1145,7 +1146,10 @@ class ERPProductsController extends Controller
 				 else $originStore=$storesRepository->findOneBy(["code"=>"ALM01"]);
 				 $dateSend=new \DateTime(date('Y-m-d 00:00:00',strtotime($object["dateSend"]["date"])));
 	 		 	 $destinationStore=$storesRepository->findOneBy(["code"=>$object["almacen"]]);
-				 if($object["variant"]!=null) $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product,"variant"=>$object["variant"]]);
+				 if($object["variant"]!=null) {
+					$variant=$repositoryVariants->findOneBy(["name"=>$object["variant"]]);
+				 	$productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product,"variant"=>$variant]);
+			 	 }
 				 else $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product,"variant"=>null]);
 				 $storelocation=$repositoryStoreLocations->findOneBy(["store"=>$destinationStore]);
 				 $stocks=$stocksRepository->findOneBy(["productvariant"=>$productvariant, "storelocation"=>$storelocation, "active"=>1, "deleted"=>0]);
@@ -1162,6 +1166,7 @@ class ERPProductsController extends Controller
 				 $obj->setActive(1);
 				 $obj->setDeleted(0);
 				 $obj->setReceived(0);
+				 $obj->setProductvariant($productvariant);
 				 $this->getDoctrine()->getManager()->persist($obj);
 				 if ($stocks==null ){
 		         $stocks=new ERPStocks();
@@ -1179,7 +1184,7 @@ class ERPProductsController extends Controller
 		      }
 					$this->getDoctrine()->getManager()->persist($stocks);
 				} else {
-					$item=setQuantity((int)$object["stock"]);
+					$item->setQuantity((int)$object["stock"]);
  				  $item->setDateupd(new \Datetime());
  				 	$this->getDoctrine()->getManager()->persist($item);
 				}
@@ -1187,8 +1192,9 @@ class ERPProductsController extends Controller
 			}
 		 $params["transfers"]=$repositoryTransfers->findBy(["name"=>$name, "active"=>1, "deleted"=>0]);
 		 //$pdf=$printQRUtils->create($params);
-		 $pdf=$printQRUtils->transferQR($params);
-		 return new Response("", 200, array('Content-Type' => 'application/pdf'));
+		 //$pdf=$printQRUtils->transferQR($params);
+		 //return new Response("", 200, array('Content-Type' => 'application/pdf'));
+		 return new Response();
 	 }
 
 
