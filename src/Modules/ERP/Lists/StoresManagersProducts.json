@@ -4,31 +4,15 @@
         "caption": "id"
     },
     {
-          "name": "productvariant__product__code",
+          "name": "code",
           "caption": "code"
     },
     {
-        "name": "productvariant__product__name",
+        "name": "name",
         "caption": "name"
     },
     {
       "name": "quantitytoserve",
       "caption": "Cantidad servir"
-    },
-    {
-        "name": "active",
-        "caption": "Estado",
-        "width": "10%",
-        "class": "dt-center",
-        "replace": {
-            "1": {
-                "text": "Activo",
-                "html": "<div style=\"min-width: 75px;\" class=\"label label-success\">Activo<\/div>"
-            },
-            "0": {
-                "text": "Desactivado",
-                "html": "<div style=\"min-width: 75px;\" class=\"label label-danger\">Desactivado<\/div>"
-            }
-        }
     }
 ]

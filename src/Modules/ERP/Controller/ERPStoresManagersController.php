@@ -195,7 +195,16 @@ class ERPStoresManagersController extends Controller
 	$listUtils=new GlobaleListUtils();
 	$obj=$repository->findBy(["company"=>$this->getUser()->getCompany(), "deleted"=>0, "id"=>$id]);
 	$listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersProducts.json"),true);
-	$return=$listUtils->getRecords($user,$repositoryConsumers,$request,$manager,$listFields, ERPStoresManagersProducts::class,[["type"=>"and", "column"=>"manager", "value"=>$obj]]);
+	//$user,$repository,$request,$manager,$listFields,$classname,$select_fields,$from,$where,$maxResults=null,$orderBy="id",$groupBy=null)
+	$return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields, ERPStocks::class,
+																			['pm.id'=>'id','p.name'=>'name','p.code'=>'code', 'pm.quantitytoserve'=>'quantitytoserve'],
+																			'erpstores_managers_products pm
+																			LEFT JOIN erpproducts_variants pv ON pv.id=pm.productvariant_id
+																			LEFT JOIN erpproducts p ON p.id=pv.product_id',
+																			'pm.manager_id='.$id.' and pm.deleted=0',
+																			null,
+																			'pm.id',
+																		);
 	return new JsonResponse($return);
 	}
 
