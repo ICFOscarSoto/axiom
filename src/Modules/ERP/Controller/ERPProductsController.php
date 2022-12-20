@@ -1191,10 +1191,8 @@ class ERPProductsController extends Controller
 				$this->getDoctrine()->getManager()->flush();
 			}
 		 $params["transfers"]=$repositoryTransfers->findBy(["name"=>$name, "active"=>1, "deleted"=>0]);
-		 //$pdf=$printQRUtils->create($params);
-		 //$pdf=$printQRUtils->transferQR($params);
-		 //return new Response("", 200, array('Content-Type' => 'application/pdf'));
-		 return new Response();
+		 $pdf=$printQRUtils->transferQR($params);
+		 return new Response("", 200, array('Content-Type' => 'application/pdf'));
 	 }
 
 
