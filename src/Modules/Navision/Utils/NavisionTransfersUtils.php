@@ -12,7 +12,7 @@ class NavisionTransfersUtils
   private $module="Navision";
   private $name="Transfers";
   public function getExcludedForm($params){
-    return [];
+    return ['productvariant'];
   }
 
   public function getIncludedForm($params){
