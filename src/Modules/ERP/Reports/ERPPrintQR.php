@@ -160,7 +160,7 @@ function create($params){
       $qrcode = new QRCode($options);
       if (array_key_exists("name",$transfer)){
         $path=$transfer['name'].'.png';
-        $qrcode->render($transfer['name'], $path);
+        $qrcode->render('TR.'.$transfer['name'], $path);
         $nameLeft="Traspaso número ".$transfer['name'];
         $infoRight=[['',$this->pdf->Image($path, 135, 28, 35, 35)]];
       }
