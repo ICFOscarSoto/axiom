@@ -1202,43 +1202,37 @@ class ERPProductsController extends Controller
 
 	 public function receiveTransfer($transfer, RouterInterface $router,Request $request){
 		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-		 $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getTransfer.php?from='.$transfer);
+		 /*$json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getTransfer.php?from='.$transfer);
 		 $objects=json_decode($json, true);
-		 $objects=$objects[0]["class"];
+		 $objects=$objects[0]["class"];*/
 		 $managerUserRepository=$this->getDoctrine()->getRepository(ERPStoresManagersUsers::class);
 		 $managerUser=$managerUserRepository->findOneBy(['user'=>$this->getUser()->getId()]);
 		 if ($managerUser==null) return new JsonResponse(["result"=>-1, "text"=>"El usuario ".$this->getUser()->getName()." no tiene permisos de recepcionar material."]);
-		 foreach ($objects as $object){
+		 $transfersRepository=$this->getDoctrine()->getRepository(NavisionTransfers::class);
+		 $transferLines=$transfersRepository->findBy(["name"=>$transfer, "active"=>1, "deleted"=>0]);
+		 foreach ($transferLines as $line){
 			 // buscamos el almacen del traspaso
-			 $storeRepository=$this->getDoctrine()->getRepository(ERPStores::class);
-			 $store=$storeRepository->findOneBy(['code'=>$object["almacen"]]);
+			 $store=$line->getDestinationstore();
 			 $storeLocationsRepository=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
 			 $storeLocation=$storeLocationsRepository->findOneBy(['store'=>$store]);
 			 $storeUsersRepository=$this->getDoctrine()->getRepository(ERPStoresUsers::class);
 			 $storeUsers=$storeUsersRepository->findOneBy(['user'=>$this->getUser()->getId(),'store'=>$store->getId(), 'active'=>1]);
 			 if ($storeUsers==null) return new JsonResponse(["result"=>-2, "text"=>"El usuario ".$this->getUser()->getName()." no es gestor del almacén ".$store->getName()]);
 			 // buscamos el producto del traspaso
-			 $productRepository=$this->getDoctrine()->getRepository(ERPProducts::class);
-			 $product=$productRepository->findOneBy(['code'=>$object["code"]]);
-			 if ($product==null) return new JsonResponse(["result"=>-3, "text"=>"El producto ".$object["code"]." no existe en la base de datos"]);
+			 $product=$line->getProduct();
 			 //miramos si es una variante de un producto agrupado
-			 $productvariant=null;
-			 $variant=null;
-			 $repositoryVariants=$this->getDoctrine()->getRepository(ERPVariants::class);
-	     $repositoryProductsVariants=$this->getDoctrine()->getRepository(ERPProductsVariants::class);
-			 if($object["variant"]!="") $variant=$repositoryVariants->findOneBy(["name"=>$object["variant"]]);
-       $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product,"variant"=>$variant]);
+       $productvariant=$line->getProductvariant();
 			 // buscamos la fila de los traspasos del producto y del almacén
 			 $stocksRepository=$this->getDoctrine()->getRepository(ERPStocks::class);
 			 $stocks=$stocksRepository->findOneBy(['storelocation'=>$storeLocation, 'productvariant'=>$productvariant, "active"=>1, "deleted"=>0]);
-			 if ($stocks==null) return new JsonResponse(["result"=>-4, "text"=>"El producto  ".$object["code"]." no está en el almacén ".$store->getName()]);
+			 if ($stocks==null) return new JsonResponse(["result"=>-4, "text"=>"El producto  ".$product->getCode()." no está en el almacén ".$store->getName()]);
 			 // comprobamos que la linea no exista ya en el histórico
 			 $stockHistoryRepository=$this->getDoctrine()->getRepository(ERPStocksHistory::class);
 			 $oldstockHistory=$stockHistoryRepository->findOneBy(["productvariant"=>$productvariant, "numOperation"=>$transfer]);
 			 if ($oldstockHistory) return new JsonResponse(["result"=>-5, "text"=>"El traspaso  ".$transfer." ya ha sido recepcionado con anterioridad."]);
 			 // actualizamos el stock del pendiente de recibir
-			 $received=(int)$object["stock"];
-			 if ($stocks->getPendingreceive()<$received) return new JsonResponse(["result"=>-6, "text"=>"El producto  ".$object["code"]." no tiene pendiente de recibir tantas unidades "]);
+			 $received=$line->getQuantity();
+			 if ($stocks->getPendingreceive()<$received) return new JsonResponse(["result"=>-6, "text"=>"El producto  ".$product->getCode()." no tiene pendiente de recibir tantas unidades "]);
 			 $stocks->setPendingreceive($stocks->getPendingreceive()-$received);
 			 $this->getDoctrine()->getManager()->persist($stocks);
 			 // si el traspaso se realiza en un almacén que no sea campollano/romica buscamos el stock del producto para modificarlo
@@ -1268,12 +1262,11 @@ class ERPProductsController extends Controller
          $stockHistory->setDeleted(false);
 				 $stock->setQuantity($stock->getQuantity()+$received);
 				 $transfersRepository=$this->getDoctrine()->getRepository(NavisionTransfers::class);
-				 $lineTransfer=$transfersRepository->findOneBy(['name'=>$transfer, 'product'=>$productvariant->getProduct(), 'active'=>1, 'deleted'=>'0']);
-				 $lineTransfer->setReceived(1);
-				 $lineTransfer->setDateupd(new \Datetime());
+				 $line->setReceived(1);
+				 $line->setDateupd(new \Datetime());
 				 $this->getDoctrine()->getManager()->persist($stock);
 				 $this->getDoctrine()->getManager()->persist($stockHistory);
-				 $this->getDoctrine()->getManager()->persist($lineTransfer);
+				 $this->getDoctrine()->getManager()->persist($line);
 			 } else return new JsonResponse(["result"=>-7, "text"=>"El almacén de destino (".$store->getName().") no se corresponde con un almacén gestionado"]);
 
 
