@@ -366,7 +366,8 @@ public function importStocksStoresManaged(InputInterface $input, OutputInterface
           $stocks=new ERPStocks();
           $stocks->setProductVariant($productvariant);
           $stocks->setStoreLocation($storelocation);
-          $stocks->setCompany($this->company);
+          $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
+          $stocks->setCompany($repositoryCompanies->find(2));
           $stocks->setQuantity(0);
           $stocks->setPendingreceive($quantity);
           $stocks->setDateupd(new \Datetime());
@@ -394,7 +395,8 @@ public function importStocksStoresManaged(InputInterface $input, OutputInterface
           $stocks=new ERPStocks();
           $stocks->setProductVariant($productvariant);
           $stocks->setStoreLocation($storelocation);
-          $stocks->setCompany($this->company);
+          $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
+          $stocks->setCompany($repositoryCompanies->find(2));
           $stocks->setQuantity(0);
           $stocks->setPendingreceive($quantity);
           $stocks->setDateupd(new \Datetime());
@@ -1050,7 +1052,8 @@ public function importStock(InputInterface $input, OutputInterface $output, $cod
               if($location!=null){
               $output->writeln('Vamos a añadir una linea de stock al producto '.$product->getId().' en el almacen '.$stock["almacen"]);
               $obj=new ERPStocks();
-              $obj->setCompany($this->company);
+              $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
+              $obj->setCompany($repositoryCompanies->find(2));
               $obj->setDateadd(new \Datetime());
               $obj->setDateupd(new \Datetime());
               $obj->setStoreLocation($location);
@@ -1136,7 +1139,8 @@ public function importStocks(InputInterface $input, OutputInterface $output) {
               $location=$repositoryStoreLocations->findOneBy(["name"=>$stock["almacen"]]);
               if($location!=null){
               $obj=new ERPStocks();
-              $obj->setCompany($this->company);
+              $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
+              $obj->setCompany($repositoryCompanies->find(2));
               $obj->setDateadd(new \Datetime());
               $obj->setDateupd(new \Datetime());
               $obj->setStoreLocation($location);
@@ -1251,7 +1255,9 @@ public function updateStocksStoresManaged(InputInterface $input, OutputInterface
             else {
               $location=$repositoryStoreLocations->findOneBy(["name"=>$stock["almacen"]]);
               if($location!=null){
-              $obj=new ERPStocks();$obj->setCompany($this->company);
+              $obj=new ERPStocks();
+              $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
+              $obj->setCompany($repositoryCompanies->find(2));
               $obj->setDateadd(new \Datetime());
               $obj->setDateupd(new \Datetime());
               $obj->setStoreLocation($location);
@@ -1315,7 +1321,8 @@ public function importProductsSuppliers(InputInterface $input, OutputInterface $
             $obj=new ERPProductsSuppliers();
             $obj->setProductVariant($productvariant);
             $obj->setSupplier($supplier);
-            $obj->setCompany($this->company);
+            $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
+            $obj->setCompany($repositoryCompanies->find(2));
             $obj->setActive(1);
             $obj->setDeleted(0);
             $obj->setDateadd(new \Datetime());
@@ -1421,7 +1428,8 @@ public function importIncrements(InputInterface $input, OutputInterface $output)
                   $oincrement->setCategory($category);
                   $oincrement->setSupplier($supplier);
                   $oincrement->setCustomerGroup($customergroups[$k]);
-                  $oincrement->setCompany($this->company);
+                  $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
+                  $oincrement->setCompany($repositoryCompanies->find(2));
                   $oincrement->setDeleted(0);
                   $oincrement->setDateadd(new \Datetime());
                 }
@@ -1532,7 +1540,8 @@ public function importIncrementsCustomers(InputInterface $input, OutputInterface
                   $oincrementcustomers->setCategory($category);
                   $oincrementcustomers->setSupplier($supplier);
                   $oincrementcustomers->setCustomer($customer);
-                  $oincrementcustomers->setCompany($this->company);
+                  $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
+                  $oincrementcustomers->setCompany($repositoryCompanies->find(2));
                   $oincrementcustomers->setDeleted(0);
                   $oincrementcustomers->setDateadd(new \Datetime());
                 }
@@ -1645,7 +1654,8 @@ public function importOffers(InputInterface $input, OutputInterface $output) {
               $obj=new ERPOfferPrices();
               $obj->setProduct($product);
               $obj->setCustomer($customer);
-              $obj->setCompany($this->company);
+              $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
+              $obj->setCompany($repositoryCompanies->find(2));
               $obj->setType(2);
               $obj->setPrice($offer["price"]);
               $obj->setQuantity($offer["quantity"]);
@@ -1684,7 +1694,8 @@ public function importOffers(InputInterface $input, OutputInterface $output) {
             else{
               $obj=new ERPOfferPrices();
               $obj->setProduct($product);
-              $obj->setCompany($this->company);
+              $repositoryCompanies=$this->doctrine->getRepository(GlobaleCompanies::class);
+              $obj->setCompany($repositoryCompanies->find(2));
               $obj->setType(2);
               $obj->setPrice($offer["price"]);
               $obj->setQuantity($offer["quantity"]);
