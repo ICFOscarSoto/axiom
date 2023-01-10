@@ -1115,7 +1115,7 @@ public function importStocks(InputInterface $input, OutputInterface $output) {
       $storeRepository=$this->doctrine->getRepository(ERPStores::class);
       $store=$storeRepository->findOneBy(["code"=>$stock["almacen"]]);
 
-      if($product) {
+      if($product && $store) {
             $productVariantId = null;
             $productvariant=$repositoryProductsVariants->findOneBy(["product"=>$product,"variant"=>$variant]);
             if($productvariant!=null) {
