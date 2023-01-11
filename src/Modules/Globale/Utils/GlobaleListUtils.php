@@ -196,11 +196,22 @@ class GlobaleListUtils
                 $searchValue=explode("#", $searchValue);
                 $date_from=$searchValue[0];
                 $date_to=isset($searchValue[1])?$searchValue[1]:"2999-12-30 23:59:59";
+                $database_field_date = $field["name"];
+                foreach($select_fields as $fieldas=>$as){
+                  if ($database_field_date==$as)
+                    $database_field_date=$fieldas;
+                }
                 if($date_from!=''){
-                  $filter_where.=" AND p.".$field["name"]." >= '".$date_from."'";
+                  if (strpos($sql_records, "p.".$database_field_date)!==false)
+                    $filter_where.=" AND p.".$database_field_date." >= '".$date_from."'";
+                  else
+                    $filter_where.=" AND ".$database_field_date." >= '".$date_from."'";
                 }
                 if($date_to!=''){
-                  $filter_where.=" AND p.".$field["name"]." <= '".$date_to."'";
+                  if (strpos($sql_records, "p.".$database_field_date)!==false)
+                    $filter_where.=" AND p.".$database_field_date." <= '".$date_to."'";
+                  else
+                    $filter_where.=" AND ".$database_field_date." <= '".$date_to."'";
                 }
               }
             }
@@ -239,7 +250,7 @@ class GlobaleListUtils
       foreach($result as $key=>$row){
         $return['data'][]=$row;
       }
-      //dump(json_encode($sql_records));
+//dump(json_encode($sql_records));
       $return["_tags"]=$tags;
       return $return;
       }
