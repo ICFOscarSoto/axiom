@@ -11,6 +11,7 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
+use App\Modules\Globale\Entity\GlobaleUsers;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
@@ -128,12 +129,7 @@ class ERPStocksHistoryController extends Controller
     $obj=$repository->findOneBy(["id"=>$manager, "deleted"=>0]);
     $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
     $utils=new ERPStocksHistoryUtils();
-
     $templateLists=$utils->formatListbyManager($manager);
-  /*  $formUtils=new GlobaleFormUtils();
-    $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "parent"=>$obj];
-    $formUtils->initialize($this->getUser(), new ERPStoresManagersConsumers(), dirname(__FILE__)."/../Forms/StoresManagersConsumers.json", $request, $this, $this->getDoctrine(),method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
-  */
     $templateForms=[];
     return $this->render('@Globale/list.html.twig', [
       'id' => $manager,
@@ -142,6 +138,61 @@ class ERPStocksHistoryController extends Controller
       'userData' => $userdata,
       ]);
     return new RedirectResponse($this->router->generate('app_login'));
+  }
+
+  /**
+   * @Route("/{_locale}/erp/listStocksHistoryManagerByUser/{idUser}", name="listStocksHistoryManagerByUser")
+   */
+  public function listStocksHistoryManagerByUser($idUser,RouterInterface $router,Request $request){
+    $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+    $userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
+    $locale = $request->getLocale();
+    $this->router = $router;
+    $repository=$this->getDoctrine()->getRepository($this->class);
+    $obj=$repository->findOneBy(["id"=>$idUser, "deleted"=>0]);
+    $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
+    $utils=new ERPStocksHistoryUtils();
+    $templateLists=$utils->formatListbyUser($idUser);
+    $templateForms=[];
+    return $this->render('@Globale/list.html.twig', [
+      'id' => $idUser,
+      'listConstructor' => $templateLists,
+      'forms' => $templateForms,
+      'userData' => $userdata,
+      ]);
+    return new RedirectResponse($this->router->generate('app_login'));
+  }
+  /**
+   * @Route("/{_locale}/erp/stockshistorymanagerbyuser/{idUser}/list", name="StocksHistoryByUserlist")
+   *
+   */
+  public function StocksHistoryByUserlist($idUser, RouterInterface $router,Request $request){
+    $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+    $locale = $request->getLocale();
+    $this->router = $router;
+    $manager = $this->getDoctrine()->getManager();
+    $userrepository= $manager->getRepository(GlobaleUsers::class);
+    $user = $userrepository->findOneBy(["id"=>$idUser, "active"=>1, "deleted"=>0]);
+    $repository = $manager->getRepository(ERPStocksHistory::class);
+    $listUtils=new GlobaleListUtils();
+    $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StocksHistoryManager.json"),true);
+    //$user,$repository,$request,$manager,$listFields,$classname,
+    //$select_fields,$from,$where,$maxResults=null,$orderBy="id",$groupBy=null)
+    $return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields, ERPStocksHistory::class,
+                                    ['tm.name'=>'type', 'sh.dateadd'=>'dateoperation', 'sh.num_operation'=>'numOperation', 'st.name'=>'store', 'vm.name'=>'vendingmachine', 'c.name'=>'channel',
+                                      'sh.productcode'=>'productcode', 'sh.productname'=>'productname', 'sh.quantity'=>'quantity', 'sh.previousqty'=>'previousqty', 'sh.newqty'=>'newqty', 'sh.id'=>'id'],
+                                    'erpstocks_history sh
+                                    LEFT JOIN erptypes_movements tm ON tm.id=sh.type_id
+                                    LEFT JOIN erpstores_managers_vending_machines_channels c ON c.id=sh.vendingmachinechannel_id
+                                    LEFT JOIN erpstores_managers_vending_machines vm ON vm.id=c.vendingmachine_id
+                                    LEFT JOIN erpstore_locations sl ON sl.id=sh.location_id
+                                    LEFT JOIN erpstores st ON st.id=sl.store_id
+                                    LEFT JOIN erpstores_users su ON su.user_id='.$idUser,
+                                    'sh.active=1 and sh.deleted=0 and st.id=su.store_id',
+                                    50,
+                                    'sh.dateadd',
+                                  );
+    return new JsonResponse($return);
   }
 
 }
