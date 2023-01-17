@@ -434,3 +434,7 @@ ERPStoresManagersVendingMachinesChannelsReplenishmentController:
 ERPStocksHistoryController:
   resource: 'App\Modules\ERP\Controller\ERPStocksHistoryController'
   type:      annotation
+
+ERPStoreManagersInterfaceController:
+  resource: 'App\Modules\ERP\Controller\ERPStoreManagersInterfaceController'
+  type:      annotation
