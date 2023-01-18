@@ -84,7 +84,15 @@ class GlobaleListUtils
                 //check if start with
                 if($tokenSearch[0]=='^'){ $starWildcard =''; $tokenSearch=substr($tokenSearch, 1);} else $starWildcard ='%';
                 if($tokenSearch[strlen($tokenSearch)-1]=='^'){ $endWildcard =''; $tokenSearch=substr($tokenSearch, 0, -1);}else $endWildcard ='%';
-                $global_filter.=' OR '.'p.'.$metadata->getFieldName($column).' LIKE \''.$starWildcard.$tokenSearch.$endWildcard.'\'';
+                $database_field=null;
+                foreach($select_fields as $fieldas=>$as){
+                  if ($metadata->getFieldName($column)==$as)
+                    $database_field=$fieldas;
+                }
+                /*if( $database_field==null)
+                  $database_field='p.'.$metadata->getFieldName($column);*/
+                if( $database_field!=null)
+                  $global_filter.=' OR '.$database_field.' LIKE \''.$starWildcard.$tokenSearch.$endWildcard.'\'';
               }
             }
 
@@ -131,7 +139,7 @@ class GlobaleListUtils
       }
       $global_filter=ltrim($global_filter, ' OR');
       if($global_filter!='')
-        $global_filter="AND (".$global_filter.")";
+        $global_filter=" AND (".$global_filter.")";
       $filter_where.=$global_filter;
       //++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
