@@ -58,4 +58,20 @@ class ERPStoresManagersVendingMachinesUtils
     ];
     return $list;
   }
+
+  public function formatListByUser($idUser){
+    $list=[
+      'id' => 'listStoresManagersVendingMachinesByUser',
+      'route' => 'StoresManagersVendingMachinesByUserlist',
+      'routeParams' => ["idUser" => $idUser],
+      'orderColumn' => 2,
+      'orderDirection' => 'DESC',
+      'tagColumn' => 2,
+      'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersVendingMachinesTab.json"),true),
+      'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersVendingMachinesFieldButtonsTab.json"),true),
+      'topButtons' => [],
+      'topButtonReload' => false
+    ];
+    return $list;
+  }
 }

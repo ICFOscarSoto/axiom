@@ -162,6 +162,7 @@ class ERPStocksHistoryController extends Controller
       ]);
     return new RedirectResponse($this->router->generate('app_login'));
   }
+
   /**
    * @Route("/{_locale}/erp/stockshistorymanagerbyuser/{idUser}/list", name="StocksHistoryByUserlist")
    *

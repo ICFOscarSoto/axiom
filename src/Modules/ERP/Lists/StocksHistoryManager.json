@@ -37,12 +37,12 @@
         "caption": "productname"
     },
     {
-        "name": "quantity",
-        "caption": "quantity"
-    },
-    {
         "name": "previousqty",
         "caption": "previousqty"
+    },
+    {
+        "name": "quantity",
+        "caption": "quantity"
     },
     {
         "name": "newqty",
