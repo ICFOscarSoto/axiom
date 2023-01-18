@@ -103,8 +103,7 @@ class ERPCategoriesController extends Controller
 		 $parent=$categoriesRepository->findOneBy(['id'=>$parentid_id, 'active'=>1, 'deleted'=>0]);
 		 $params= ["doctrine"=>$this->getDoctrine(), "user"=>$this->getUser(), "parentid_id"=>$parent];
 		 if ($parentid_id!=0)  {
-			 dump($params);
-			  $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),
+		   $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),
        method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],
  			 method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
 		 }

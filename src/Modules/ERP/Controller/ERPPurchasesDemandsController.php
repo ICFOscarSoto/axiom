@@ -122,7 +122,6 @@ class ERPPurchasesDemandsController extends Controller
 
 		//Get content of the json reques
 		$fields=json_decode($request->getContent());
-			dump($fields);
 		$linenumIds=[];
 		foreach ($fields->lines as $key => $value) {
 			if($value->code!=null)

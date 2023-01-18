@@ -15,6 +15,22 @@ class GlobaleListUtils
       return null;
     }
 
+    private function clearData($data){
+      if (is_null($data))
+        $data = '';
+      else
+      if (is_array($data)){
+        foreach ($data as $key => $value) {
+          if (is_array($data[$key]))
+            $data[$key] = $this->clearData($data[$key]);
+          else
+          if (is_null($value))
+            $data[$key] = '';
+        }
+      }
+      return $data;
+    }
+
     public function getRecordsSQL($user,$repository,$request,$manager,$listFields,$classname,$select_fields,$from,$where,$maxResults=null,$orderBy="id",$groupBy=null): array{
       $listName=$request->attributes->get('name');
       $return=array();
@@ -252,6 +268,7 @@ class GlobaleListUtils
       }
 //dump(json_encode($sql_records));
       $return["_tags"]=$tags;
+      $return = $this->clearData($return);
       return $return;
       }
 
@@ -654,8 +671,10 @@ class GlobaleListUtils
       }
       $return["data"][]=$data_ob;
 		}
+    $return = $this->clearData($return);
 		return $return;
     }
+
 }
 
 ?>

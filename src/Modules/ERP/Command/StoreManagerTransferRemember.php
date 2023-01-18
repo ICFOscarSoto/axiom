@@ -88,7 +88,6 @@ class StoreManagerTransferRemember extends ContainerAwareCommand
             }
           }
           else{
-            dump($stock["product_id"]);
             $product=$productsRepository->findOneBy(["id"=>$stock["product_id"], "active"=>1, "deleted"=>0]);
             if ($product==null) continue;
             $productvariant=$productsVariantsRepository->findOneBy(["product"=>$product,"variant"=>null, "active"=>1, "deleted"=>0]);
