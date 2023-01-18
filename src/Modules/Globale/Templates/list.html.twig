@@ -244,7 +244,7 @@ var url = new URL(window.location.href);
 							{% if hideCheckBoxes is defined and hideCheckBoxes %}
 								"visible": false,
 							{% endif %}
-							"render": function(data, type, row, meta){								
+							"render": function(data, type, row, meta){
 									{% if listConstructor.multiselect is defined and listConstructor.multiselect==false %}
 									return ''
 									{% else %}

@@ -1,6 +1,6 @@
-  <div class="row">
-    {{ product }}
-  </div>
+<script>
+    var modal_title = '{{ product }}';
+</script>
   {% if listStocks is defined %}
     {% set listConstructor = listStocks %}
     {{ include('@Globale/list.html.twig') }}

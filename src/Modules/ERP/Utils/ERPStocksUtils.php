@@ -39,7 +39,8 @@ class ERPStocksUtils
       'tagColumn' => 3,
       'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StocksManaged.json"),true),
       'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StocksManagersFieldButtons.json"),true),
-      'topButtons' => []
+      'topButtons' => [],
+      'topButtonReload' => false
     ];
     return $list;
   }

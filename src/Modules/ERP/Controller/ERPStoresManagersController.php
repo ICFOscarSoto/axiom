@@ -170,7 +170,7 @@ class ERPStoresManagersController extends Controller
 	method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
 	$templateForms[]=$formUtils->formatForm('StoresManagersProducts', true, $id, ERPStoresManagersProducts::class);
 
-		return $this->render('@Globale/list.html.twig', [
+	return $this->render('@Globale/list.html.twig', [
 			'id' => $id,
 			'listConstructor' => $templateLists,
 			'forms' => $templateForms,

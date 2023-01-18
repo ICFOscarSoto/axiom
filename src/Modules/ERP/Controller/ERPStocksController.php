@@ -75,7 +75,8 @@ class ERPStocksController extends Controller
 		 $classUtils=new ERPStocksUtils();
 		 $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "obj"=>$obj];
 		 $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),$classUtils->getExcludedForm($params));
-		 return $utils->make($id, $this->class, $action, "formStocks", "modal");
+		 $form = $utils->make($id, $this->class, $action, "formStocks", "modal");
+		 return $form;
 		}
 
 		/**

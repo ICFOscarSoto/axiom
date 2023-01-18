@@ -2,7 +2,7 @@
 		<div class="modal-dialog modal-lg">
 			<div class="modal-content" style="transform: matrix(1, 0, 0, 1, 0, 0);">
 				<div class="modal-header">
-					<h4 class="modal-title">{{ (form.name)|trans }}</h4>
+					<h4 class="modal-title" id="{{ form.id }}-modal-title">{{ (form.name)|trans }}</h4>
 				</div>
         <div id="{{ form.id }}-modal-form-body">
           	{#{{ include('@Globale/form.html.twig') }}#}
