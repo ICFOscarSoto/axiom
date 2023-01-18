@@ -78,7 +78,8 @@ class ERPStocksHistoryUtils
         'tagColumn' => 2,
         'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StocksHistoryManager.json"),true),
         'fieldButtons' => [],
-        'topButtons' => []
+        'topButtons' => [],
+        'topButtonReload' => false
       ];
       return $list;
     }

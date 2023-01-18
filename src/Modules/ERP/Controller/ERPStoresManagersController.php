@@ -40,6 +40,7 @@ use App\Modules\ERP\Controller\ERPStocksController;
 use App\Modules\Globale\Utils\GlobaleEntityUtils;
 use App\Modules\Globale\Utils\GlobaleListUtils;
 use App\Modules\Globale\Utils\GlobaleFormUtils;
+use App\Modules\Globale\Entity\GlobaleUsers;
 use App\Modules\ERP\Utils\ERPProductsUtils;
 use App\Modules\ERP\Utils\ERPStoresManagersConsumersUtils;
 use App\Modules\ERP\Utils\ERPStoresManagersProductsUtils;
@@ -245,6 +246,57 @@ class ERPStoresManagersController extends Controller
 	}
 
 
+	/**
+	 * @Route("/{_locale}/erp/vendingmachinesbyuser/{idUser}", name="listStoresManagersVendingMachinesByUser")
+	 */
+	public function listStoresManagersVendingMachinesByUser($idUser,RouterInterface $router,Request $request)
+	{
+		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+    $userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
+    $locale = $request->getLocale();
+    $this->router = $router;
+    $repository=$this->getDoctrine()->getRepository($this->class);
+    $obj=$repository->findOneBy(["id"=>$idUser, "deleted"=>0]);
+    $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
+    $utils=new ERPStoresManagersVendingMachinesUtils();
+    $templateLists=$utils->formatListbyUser($idUser);
+    $templateForms=[];
+    return $this->render('@Globale/list.html.twig', [
+      'id' => $idUser,
+      'listConstructor' => $templateLists,
+      'forms' => $templateForms,
+      'userData' => $userdata,
+      ]);
+    return new RedirectResponse($this->router->generate('app_login'));
+	}
+
+	/**
+   * @Route("/{_locale}/erp/vendingmachinesbyuser/{idUser}/list", name="StoresManagersVendingMachinesByUserlist")
+   *
+   */
+  public function StoresManagersVendingMachinesByUserlist($idUser, RouterInterface $router,Request $request){
+    $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+    $locale = $request->getLocale();
+    $this->router = $router;
+    $manager = $this->getDoctrine()->getManager();
+    $userrepository= $manager->getRepository(GlobaleUsers::class);
+    $user = $userrepository->findOneBy(["id"=>$idUser, "active"=>1, "deleted"=>0]);
+    $repository = $manager->getRepository(ERPStocksHistory::class);
+    $listUtils=new GlobaleListUtils();
+    $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersVendingMachinesTab.json"),true);
+    //$select_fields,$from,$where,$maxResults=null,$orderBy="id",$groupBy=null)
+    $return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields, ERPStocksHistory::class,
+                                    ['vm.id'=>'id', 'vm.name'=>'name', 'vm.brand'=>'brand', 'vm.model'=>'model', 'vm.serial'=>'serial', 'vm.vpnip'=>'vpnip', 'vm.lastcheck'=>'lastcheck', 'vm.active'=>'active'],
+                                    'erpstores_managers_vending_machines vm
+                                    LEFT JOIN erpstore_locations sl ON sl.id=vm.storelocation_id
+                                    LEFT JOIN erpstores st ON st.id=sl.store_id
+                                    LEFT JOIN erpstores_users su ON su.user_id='.$idUser,
+                                    'vm.active=1 and vm.deleted=0 and st.id=su.store_id',
+                                    50,
+                                    'vm.id',
+                                  );
+    return new JsonResponse($return);
+  }
 
 
 	/**

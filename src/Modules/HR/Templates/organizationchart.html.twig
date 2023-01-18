@@ -5,12 +5,12 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<meta name="description" content="Axiom Business Management" />
 	<meta name="author" content="" />
-	
+
 	{{ include('@Globale/header.html.twig') }}
 
 {% endblock %}
 <title>{% block title %}{{ interfaceName|trans }}{% endblock %}</title>
-<body class="page-body" data-url="{{ url('indexAdmin') }}">
+<body class="page-body" data-url="{{ url('indexAdmin') }}" style="overflow-x: visible !important;">
 <div class="page-container {% if userData.interfaceConfig.collapsedSidebar is defined and userData.interfaceConfig.collapsedSidebar %}sidebar-collapsed{% endif %}"><!-- add class "sidebar-collapsed" to close sidebar by default, "chat-visible" to make chat appear always -->
 	{{ include('@Globale/sidebar_menu.html.twig') }}
 	<div class="main-content">

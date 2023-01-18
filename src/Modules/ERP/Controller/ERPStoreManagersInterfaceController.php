@@ -87,7 +87,7 @@ class ERPStoreManagersInterfaceController extends Controller
 
     $tabs=[
       ["name" => "history", "caption"=>"historyManager", "icon"=>"fa-address-card-o", "route"=>$this->generateUrl("listStocksHistoryManagerByUser",["idUser"=>$this->getUser()->getId()])],
-    //  ["name" => "storesmanagersvendingmachines", "caption"=>"Expendedoras", "icon"=>"fa-th","route"=>$this->generateUrl("listStoresManagersVendingMachinesByUser",["idUser"=>$this->getUser()->getId()])],
+      ["name" => "storesmanagersvendingmachines", "caption"=>"Expendedoras", "icon"=>"fa-th","route"=>$this->generateUrl("listStoresManagersVendingMachinesByUser",["idUser"=>$this->getUser()->getId()])],
       //["name" => "storesmanagersconsumers", "caption"=>"Consumidores", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("listStoresManagersConsumers",["user"=>$this->getUser()->getId()])],
       //["name" => "transfers", "caption"=>"Transfers", "icon"=>"fa-address-card-o", "route"=>$this->generateUrl("generictablist",["function"=>"formatList","module"=>"Navision","name"=>"Transfers"])],
       //["name" => "loads", "caption"=>"Loads List", "icon"=>"fa-address-card-o", "route"=>$this->generateUrl("listStoresManagersReplenishment",["user"=>$this->getUser()->getId()])],

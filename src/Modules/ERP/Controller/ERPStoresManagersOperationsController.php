@@ -404,6 +404,7 @@ class ERPStoresManagersOperationsController extends Controller
 					$stockHistory->setType($type);
 					$stockHistory->setComment($channel->getVendingmachine()->getName());
 					$stockHistory->setQuantity(-($channel->getMultiplier()?($channel->getMultiplier()==0?1:$channel->getMultiplier()):1));
+					$stockHistory->setNumOperation($operation->getId());
 					$stockHistory->setActive(1);
 					$stockHistory->setDeleted(0);
 					$stockHistory->setDateupd(new \DateTime());
