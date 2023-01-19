@@ -163,13 +163,12 @@ class ERPStoresManagersController extends Controller
 	$templateLists=$utils->formatProductsList($id);
 	$formUtils=new GlobaleFormUtils();
 	$utilsObj=new ERPStoresManagersProductsUtils();
-	$params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "parent"=>$obj,
-	"product"=>null,
-	"productvariant"=>null];
+	$params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "parent"=>$obj,	"product"=>null, "productvariant"=>null];
 	$formUtils->initialize($this->getUser(), new ERPStoresManagersProducts(), dirname(__FILE__)."/../Forms/StoresManagersProducts.json",
 	$request, $this, $this->getDoctrine(),method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],
 	method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
 	$templateForms[]=$formUtils->formatForm('StoresManagersProducts', true, $id, ERPStoresManagersProducts::class);
+  $templateForms[0]['showSave']=false;
 
 	return $this->render('@Globale/list.html.twig', [
 			'id' => $id,
@@ -1450,12 +1449,12 @@ class ERPStoresManagersController extends Controller
 			$obj = $repository->findOneBy(['id'=>$id, 'active'=>1, 'deleted'=>0]);
 	 	 	$utilsObj = new ERPStoresManagersProductsUtils();
 			$params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(),
-			"product"=>$obj->getProductvariant()->getProduct(),
-			"productvariant"=>$obj->getProductvariant()];
+			"product"=>$obj?$obj->getProductvariant()->getProduct():null,
+			"productvariant"=>$obj?$obj->getProductvariant():null];
 			$utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),
 	                           method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],
 	                           method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
-			$make = $utils->make($obj->getId(), ERPStoresManagersProducts::class, $action, "StoresManagersProducts", "modal");
+			$make = $utils->make($obj?$obj->getId():0, ERPStoresManagersProducts::class, $action, "StoresManagersProducts", "modal");
 			return $make;
 		}
 
@@ -1472,13 +1471,16 @@ class ERPStoresManagersController extends Controller
 			$controllerStocks= new ERPStocksController;
 			//$listStocks=$repositoryStocks->getManagersStocksByProduct($managersProducts->getManager()->getId(), $managersProducts->getProductvariant()->getId());
 	    $manager = $this->getDoctrine()->getManager();
-	    $repository = $manager->getRepository(ERPStocks::class);
 	    $listUtils=new ERPStocksUtils();
 	    $listStocks=$listUtils->formatListProductsManagers($id,$managersProducts->getManager()->getId());
 
-			return $this->render('@ERP/storesManagersProducts.html.twig', [
-				'product' => $managersProducts->getProductvariant()->getProduct()->getName(),
-				'listStocks' => 	$listStocks,
+			$formUtils=new GlobaleFormUtils();
+			$formUtils->initialize($this->getUser(), null, dirname(__FILE__)."/../Forms/Stocks.json",$request, $this, $this->getDoctrine());
+			$templateForms[]=$formUtils->formatForm('stocks', true, $id, $this->class, 'dataStocks', ["id"=>$id, "action"=>"save"]);
+
+			return $this->render('@Globale/list.html.twig', [
+				'forms' => $templateForms,
+				'listConstructor' => 	$listStocks
 			]);
 		}
 

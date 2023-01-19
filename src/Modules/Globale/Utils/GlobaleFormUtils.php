@@ -125,6 +125,7 @@ class GlobaleFormUtils extends Controller
     $formView=$form->createView();
     //Aply convesion functions from controller to view
     $formView=$this->conversionView($formView);
+
     return ["id"=>$name, "id_object"=>!$this->obj->getId()?0:$this->obj->getId(), "name"=>$caption, "form" => $formView, "post"=>$this->controller->generateUrl(($route!=null)?$route:$this->request->get('_route'),$routeParams), "template" => json_decode(file_get_contents ($this->template))];
   }
 
