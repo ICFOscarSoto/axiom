@@ -33,6 +33,7 @@ class GlobaleListUtils
 
     public function getRecordsSQL($user,$repository,$request,$manager,$listFields,$classname,$select_fields,$from,$where,$maxResults=null,$orderBy="id",$groupBy=null): array{
       $listName=$request->attributes->get('name');
+      $replaceFields=[];
       $return=array();
       $start=0;
       $length=20;
@@ -99,6 +100,8 @@ class GlobaleListUtils
           }
           //Añadimos los campos de las relaciones
           foreach($listFields as $field){
+
+
             $database_field=null;
             $fieldNames=explode('_o_',$field["name"]); //explotamos los campos concatenados
             if(count($fieldNames)>1){ //Si hay que concatenar algo
@@ -146,8 +149,12 @@ class GlobaleListUtils
       //Formamos los filtros de busqueda por columna
       //--------------------------------------------------------
   		foreach($listFields as $key => $field){
+        //Comprobamos si es un campo de replace, y lo añadimos al array para su posterior tratamiento
+        if(isset($field["replace"])){
+          $replaceFields[]=$field;
+        }
 
-          //Solo añadimos los campos de tipo data
+         //Solo añadimos los campos de tipo data
          if(!isset($field["type"])||$field["type"]=="data"){
               $fieldNames=explode('_o_',$field["name"]);
               $searchValue=$request->query->get('columns');
@@ -199,16 +206,18 @@ class GlobaleListUtils
                       }
                   }
                 }
-      				}else{
+      				}
+              //ELIMINADO EL 18/01/2023, aparentemente no es necesario este fragmento de codigo y produce un error con los replaces
+              /*else{
                 //No hay nada que buscar miramos si tiene un valor por defecto
                 if($searchValue!="##ALL##" && isset($field["replace"])){
                   foreach($field["replace"] as $key=>$replace){
                     if(isset($replace["default"]) && $replace["default"]==true){
-                      $filter_where.=" AND ".$field["name"]." = '".$key."'";
+                    //  $filter_where.=" AND ".$field["name"]." = '".$key."'";
                     }
                   }
                 }
-              }
+              }*/
           }else{
             //If field is datetime type or date
             if($field["type"]=="datetime" || $field["type"]=="date"){
@@ -272,9 +281,19 @@ class GlobaleListUtils
 
       $return['data']=[];
       foreach($result as $key=>$row){
+        //Buscamos los campos que hay que reemplazar
+        foreach($replaceFields as $field)
+          foreach($field["replace"] as $key=>$replace){
+            $temp_val=$row[$field['name']];
+            if($temp_val==NULL) $temp_val=0;
+            if(strval($temp_val)==strval($key)){
+              $temp_val=array($temp_val,$replace["html"]);
+              $row[$field['name']]=$temp_val;
+              break;
+            }
+          }
         $return['data'][]=$row;
       }
-//dump(json_encode($sql_records));
       $return["_tags"]=$tags;
       $return = $this->clearData($return);
       return $return;
