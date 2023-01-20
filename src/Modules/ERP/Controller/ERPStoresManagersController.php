@@ -661,7 +661,7 @@ class ERPStoresManagersController extends Controller
 		 */
 		 public function dataVendingmachinechannels($id, $idvendingmachine, $action, Request $request){
 			 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
- 			 if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
+ 			 //if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
 			 $template=dirname(__FILE__)."/../Forms/StoresManagersVendingMachinesChannels.json";
 			 $utils = new GlobaleFormUtils();
 			 $utilsObj=new ERPStoresManagersVendingMachinesChannelsUtils();
