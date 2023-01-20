@@ -5,7 +5,16 @@
     },
     {
         "name": "type",
-        "caption": "type"
+        "caption": "type", "width":"10%" ,"class" : "dt-center", "replace":{
+                                   "Traspaso enviado":{"text":"Traspaso enviado","html":"<div style=\"min-width: 75px;\" class=\"label label-blue1\">Traspaso enviado</div>"},
+                                   "Traspaso recibido":{"text":"Traspaso recibido","html":"<div style=\"min-width: 75px;\" class=\"label label-green1\">Traspaso recibido</div>"},
+                                   "Operacion gestor":{"text":"Operacion gestor","html":"<div style=\"min-width: 75px;\" class=\"label label-blue1\">Operacion gestor</div>"},
+                                   "Salida gestor":{"text":"Salida gestor","html":"<div style=\"min-width: 75px;\" class=\"label label-blue1\">Salida gestor</div>"},
+                                   "Ajuste de inventario":{"text":"Ajuste de inventario","html":"<div style=\"min-width: 75px;\" class=\"label label-orange\">Ajuste de inventario</div>"},
+                                   "Carga expendedora":{"text":"Carga expendedora","html":"<div style=\"min-width: 75px;\" class=\"label label-green2\">Carga expendedora</div>"},
+                                   "Salida expendedora":{"text":"Salida expendedora","html":"<div style=\"min-width: 75px;\" class=\"label label-blue2\">Salida expendedora</div>"},
+                                   "Ajuste de inventario en maquina":{"text":"Ajuste de inventario en maquina","html":"<div style=\"min-width: 75px;\" class=\"label label-orange\">Ajuste de inventario en maquina</div>"}
+                                 }
     },
     {
         "name": "dateoperation",

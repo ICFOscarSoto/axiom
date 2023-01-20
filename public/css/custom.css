@@ -1100,6 +1100,28 @@ label.error {
   height: 25px;*/
   height: 15px;
 }
+
+.label-green1{
+  background-color: rgb(10, 175, 0);
+}
+
+.label-green2{
+  background-color: rgb(35, 200, 25);
+}
+
+.label-orange{
+  background-color: rgb(255, 109, 0);
+}
+
+.label-blue1{
+  background-color: rgb(0, 75, 255);
+}
+
+.label-blue2{
+  background-color: rgb(0, 125, 255);
+}
+
+
 /*
 .spinner-container {
    position: absolute;
