@@ -68,7 +68,7 @@ class ERPStoresManagersVendingMachinesUtils
       'orderDirection' => 'DESC',
       'tagColumn' => 2,
       'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersVendingMachinesTab.json"),true),
-      'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersVendingMachinesFieldButtonsTab.json"),true),
+      'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersVendingMachinesByUserFieldButtonsTab.json"),true),
       'topButtons' => [],
       'topButtonReload' => false
     ];
