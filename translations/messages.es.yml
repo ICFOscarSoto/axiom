@@ -487,6 +487,13 @@ numOperation: Nº operación
 Store: Almacen
 Stores: Almacenes
 Stocks: Cantidades
+Stocks data: Stocks
+Storelocation: Localización
+Lastinventorydate: Último inventario
+Minstock: Stock mínimo
+Maxstock: Stock máximo
+Pendingserve: Pendiente de servir
+Pendingreceive: Pendiente de recibir
 
 #PRODUCTS
 #----------------------------------------------------------------------------------------------------------------------

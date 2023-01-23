@@ -107,14 +107,18 @@
 																	$("#"+$('#'+$('#{{field.modal}}-modal-form').attr('modal_parent')).attr('modal_parent_button')).click();
 															}
 														})
+														{% if field.modal is defined and field.modal|length and (_context['button_continue_' ~ field.modal] is not defined or _context['button_continue_' ~ field.modal]==false)%}
+											        {{ include("@Globale/list_button_continue.html.twig") }}
+											        {% set _context=_context|merge({('button_continue_' ~ field.modal) : true}) %}
+											      {% endif %}
 		                        $("#{{field.modal}}-modal-form").modal();
 														if((--load_wait_modal)==0) $("#load-spinner").fadeOut();
-
 		                  });
 										else
 											if((--load_wait_modal)==0) $("#load-spinner").fadeOut();
 									}
                 });
+
               {% else %}
                 $('body').on('click', "[id^='{{ listConstructor.id }}-field-button-{{ field.id }}']", function() {
                 url=$("#{{ listConstructor.id }}-field-button-{{ field.id }}-url").val();
