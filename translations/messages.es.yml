@@ -787,6 +787,8 @@ departure: Salida
 dateoperation: Fecha de operación
 historyVendingMachines: Histórico de expendedoras
 historyManager: Histórico
+transfer: Traspaso
+state: Estado
 #JSPREADSHEET
 #----------------------------------------------------------------------------------------------------------------------
 jspreadsheet_showcolumn: Mostrar columna

@@ -13,6 +13,7 @@ use App\Modules\Globale\Entity\GlobaleMenuOptions;
 use App\Modules\AERP\Entity\AERPCustomers;
 use App\Modules\AERP\Entity\AERPCustomerGroups;
 use App\Modules\Globale\Entity\GlobaleCountries;
+use App\Modules\Globale\Entity\GlobaleUsers;
 use App\Modules\Globale\Entity\GlobaleStates;
 use App\Modules\Globale\Entity\GlobaleCurrencies;
 use App\Modules\Globale\Entity\GlobaleCompanies;
@@ -30,7 +31,9 @@ use App\Modules\ERP\Entity\ERPEAN13;
 use App\Modules\ERP\Entity\ERPAttributeNames;
 use App\Modules\ERP\Entity\ERPAttributesValues;
 use App\Modules\ERP\Entity\ERPProductsAttributes;
+use App\Modules\ERP\Entity\ERPStocksHistory;
 use App\Modules\Navision\Entity\NavisionSync;
+use App\Modules\Navision\Utils\NavisionTransfersUtils;
 use App\Modules\Security\Utils\SecurityUtils;
 use \DateTime;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -489,6 +492,55 @@ class NavisionController extends Controller
 
      }
 
+     /**
+      * @Route("/{_locale}/navision/transfersbyuser/{idUser}", name="listTransfersByUser")
+      */
+     public function listTransfersByUser($idUser,RouterInterface $router,Request $request)
+     {
+       $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+        $userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
+        $locale = $request->getLocale();
+        $this->router = $router;
+        $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
+        $utils=new NavisionTransfersUtils();
+        $templateLists=$utils->formatListbyUser($idUser);
+        $templateForms=[];
+        return $this->render('@Globale/list.html.twig', [
+          'id' => $idUser,
+          'listConstructor' => $templateLists,
+          'forms' => $templateForms,
+          'userData' => $userdata,
+          ]);
+        return new RedirectResponse($this->router->generate('app_login'));
+     }
 
+     /**
+       * @Route("/{_locale}/navision/transfersbyuser/{idUser}/list", name="transfersByUserList")
+       *
+       */
+      public function transfersByUserList($idUser, RouterInterface $router,Request $request){
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+        $locale = $request->getLocale();
+        $this->router = $router;
+        $manager = $this->getDoctrine()->getManager();
+        $userrepository= $manager->getRepository(GlobaleUsers::class);
+        $user = $userrepository->findOneBy(["id"=>$idUser, "active"=>1, "deleted"=>0]);
+        $repository = $manager->getRepository(ERPStocksHistory::class);
+        $listUtils=new GlobaleListUtils();
+        $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/TransfersManagers.json"),true);
+        //$select_fields,$from,$where,$maxResults=null,$orderBy="id",$groupBy=null)
+        $return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields, ERPStocksHistory::class,
+                                        ['st.name'=>'destination', 'nt.name'=>'transfer', 'nt.datesend'=>'datesend', 'nt.quantity'=>'quantity', 'p.name'=>'productname', 'p.code'=>'productcode', 'nt.received'=>'state', 'nt.id'=>'id'],
+                                        'navision_transfers nt
+                                        LEFT JOIN erpproducts_variants pv ON pv.id=nt.productvariant_id
+                                        LEFT JOIN erpproducts p ON p.id=pv.product_id
+                                        LEFT JOIN erpstores_users su ON su.user_id='.$idUser.'
+                                        LEFT JOIN erpstores st ON st.id=su.store_id',
+                                        'nt.active=1 and nt.deleted=0 and st.id=su.store_id',
+                                        50,
+                                        'nt.id',
+                                      );
+        return new JsonResponse($return);
+      }
 
 }

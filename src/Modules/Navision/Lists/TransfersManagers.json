@@ -1,0 +1,43 @@
+[
+    {
+        "name": "id",
+        "caption": "id"
+    },
+    {
+        "name": "transfer",
+        "caption": "transfer"
+    },
+    {
+        "name": "destination",
+        "caption": "destinationstore"
+    },
+    {
+        "name": "datesend",
+        "caption": "datesend",
+        "type": "date"
+    },
+    {
+        "name": "productname",
+        "caption": "product"
+    },
+    {
+        "name": "quantity",
+        "caption": "quantity"
+    },
+    {
+        "name": "state",
+        "caption": "state",
+        "width": "10%",
+          "class": "dt-center",
+          "replace": {
+              "1": {
+                  "text": "Recibido",
+                  "html": "<div style=\"min-width: 75px;\" class=\"label label-success\">Recibido<\/div>"
+              },
+              "0": {
+                  "text": "Pendiente",
+                  "html": "<div style=\"min-width: 75px;\" class=\"label label-warning\">Pendiente<\/div>"
+              }
+          }
+    }
+]

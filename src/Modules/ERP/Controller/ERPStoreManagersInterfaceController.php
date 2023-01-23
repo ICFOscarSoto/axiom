@@ -63,6 +63,7 @@ use Symfony\Component\HttpFoundation\File\MimeType\FileinfoMimeTypeGuesser;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use App\Modules\Globale\Helpers\XLSXWriter\XLSXWriter;
 use App\Modules\Navision\Entity\NavisionTransfers;
+use App\Modules\Navision\Controller\NavisionController;
 
 
 
@@ -88,13 +89,8 @@ class ERPStoreManagersInterfaceController extends Controller
     $tabs=[
       ["name" => "history", "caption"=>"historyManager", "icon"=>"fa-address-card-o", "route"=>$this->generateUrl("listStocksHistoryManagerByUser",["idUser"=>$this->getUser()->getId()])],
       ["name" => "storesmanagersvendingmachines", "caption"=>"Expendedoras", "icon"=>"fa-th","route"=>$this->generateUrl("listStoresManagersVendingMachinesByUser",["idUser"=>$this->getUser()->getId()])],
-      //["name" => "storesmanagersconsumers", "caption"=>"Consumidores", "icon"=>"fa-address-card-o","route"=>$this->generateUrl("listStoresManagersConsumers",["user"=>$this->getUser()->getId()])],
-      //["name" => "transfers", "caption"=>"Transfers", "icon"=>"fa-address-card-o", "route"=>$this->generateUrl("generictablist",["function"=>"formatList","module"=>"Navision","name"=>"Transfers"])],
-      //["name" => "loads", "caption"=>"Loads List", "icon"=>"fa-address-card-o", "route"=>$this->generateUrl("listStoresManagersReplenishment",["user"=>$this->getUser()->getId()])],
-      //["name" => "historyVM", "caption"=>"historyVendingMachines", "icon"=>"fa-address-card-o", "route"=>$this->generateUrl("listStocksHistoryVM",["user"=>$this->getUser()->getId()])],
+      ["name" => "transfers", "caption"=>"Transfers", "icon"=>"fa-address-card-o", "route"=>$this->generateUrl("listTransfersByUser",["idUser"=>$this->getUser()->getId()])],
     ];
-    //$obj = $repository->findOneBy(['id'=>$id, 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
-    //$obj_name=$obj?$obj->getName():'';
 
       return $this->render('@Globale/generictabform.html.twig', array(
                 'entity_name' => $this->getUser()->getName(),
