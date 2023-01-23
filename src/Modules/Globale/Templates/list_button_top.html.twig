@@ -19,11 +19,16 @@
         {% if field.modal is defined and field.modal|length  %}
             //if route has params...
             modal_title = $(this).attr('modal_title');
+            modal_save  = $(this).attr('modal_save');
             $.post('{{ url(field.route, routeParams) }}', null,
               function(data, status, xhr){
                 $("#{{field.modal}}-modal-form-body").html(data);
                 if (typeof modal_title !== 'undefined')
                   $("#{{field.modal}}-modal-title").html(modal_title);
+                if (typeof modal_save !== 'undefined' &&  modal_save=='false')
+                    $("#{{field.modal}}-button-continue").css('display', 'none');
+                else
+                    $("#{{field.modal}}-button-continue").css('display', 'inline-block');
                 $("#{{field.modal}}-modal-form-body").find(':checkbox').not($('[id$=-chkall]')).iCheck({checkboxClass: 'icheckbox_flat-blue', radioClass: 'iradio_flat-blue'});
                 $("#{{field.modal}}-modal-form-body select").not('.hidden, .noselect2').select2();
                 $("#{{field.modal}}-modal-form").modal();

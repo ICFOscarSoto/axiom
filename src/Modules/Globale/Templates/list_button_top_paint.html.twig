@@ -4,7 +4,7 @@
   {% for field in listConstructor.topButtons %}
     {% if userData.permissions[listConstructor.id ~ '_field_' ~ field.id] is not defined or (userData.permissions[listConstructor.id ~ '_field_' ~ field.id] is defined and userData.permissions[listConstructor.id ~ '_field_' ~ field.id].allowaccess == true) %}
         {% if field.actionType is defined and field.actionType=="background" %}
-        <a style="font-size: 20px; {% if field.style is defined %} {{field.style}} {% endif %}" id="{{ field.id }}-top-button" type="button" class="btn tooltip-primary {{ field.type }}" {% if field.tooltip is defined and field.tooltip != "" %} data-toggle="tooltip" data-placement="bottom" title="" data-original-title=" {{ field.tooltip }} "{% endif %} {% if field.modal_title is defined %}modal_title="{{field.modal_title}}"{% else %}{% if field.modal is defined %}{{ (field.modal)|trans }}{% endif %}{% endif %}>
+        <a style="font-size: 20px; {% if field.style is defined %} {{field.style}} {% endif %}" id="{{ field.id }}-top-button" type="button" class="btn tooltip-primary {{ field.type }}" {% if field.tooltip is defined and field.tooltip != "" %} data-toggle="tooltip" data-placement="bottom" title="" data-original-title=" {{ field.tooltip }} "{% endif %} {% if field.modal_title is defined %}modal_title="{{field.modal_title}}"{% else %}{% if field.modal is defined %}{{ (field.modal)|capitalize|trans }}{% endif %}{% endif %} {% if field.modal_save is defined %}modal_save="{{field.modal_save}}"{% endif %}>
           <i class="{{ field.icon }}"></i>
         </a>
         {% else %}
