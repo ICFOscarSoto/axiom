@@ -851,11 +851,6 @@ var url = new URL(window.location.href);
 
 {% if listOrigin is not defined %}
 <!-- MODALS  -->
-<script>
-  if ($('#modal_container').length == 0){
-		$('body').append('<div id="modal_container"></div>');
-	}
-</script>
 	{% if forms is defined %}
 		{% for form in forms %}
 			{% set formConstructor = form %}
