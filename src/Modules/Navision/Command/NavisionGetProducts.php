@@ -1746,7 +1746,6 @@ public function importVariants(InputInterface $input, OutputInterface $output){
   $repositoryVariantTypes=$this->doctrine->getRepository(ERPVariantsTypes::class);
   $variantstypes=$repositoryVariantTypes->findAll();
   foreach ($variantstypes as $varianttype){
-dump($varianttype);
       $json=file_get_contents($this->url.'navisionExport/axiom/do-NAVISION-getVariants.php?variant='.$varianttype->getName());
       $output->writeln('        -Importando valores de la variante '.$varianttype->getName());
       $objects=json_decode($json, true);
@@ -1770,7 +1769,6 @@ dump($varianttype);
           $obj->setActive(1);
           $this->doctrine->getManager()->persist($obj);
         }
-dump($obj);
       }
     }
     $this->doctrine->getManager()->flush();
