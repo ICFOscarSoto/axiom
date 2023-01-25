@@ -12,8 +12,10 @@
 				{	"name": "phone", "cols": 4},
 				{	"name": "country", "cols": 4},
 				{	"name": "inventorymanager", "cols": 4},
+				{	"name": "transfernotifyaddress", "caption":"Notificaciones de traspasos", "cols": 6},
 				{	"name": "managed", "caption":"Gestor", "cols": 2},
-				{	"name": "active", "cols": 2}
+				{	"name": "active", "cols": 2},
+				{ "name": "managedBy", "cols": 4}
 			]
 		}]
 }]
