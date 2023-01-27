@@ -391,6 +391,7 @@ var url = new URL(window.location.href);
 											}
 										{% endif %}
 										var modal_title='';
+										var modal_save ='';
 										{% if field.modal_title is defined %}
 											if (typeof row["{{field.modal_title }}"] !== 'undefined')
 											 	modal_title=' modal_title="'+row["{{field.modal_title }}"]+'"';
@@ -398,8 +399,11 @@ var url = new URL(window.location.href);
 										 		modal_title=' modal_title="{{field.modal_title}}"';
 										{% else %}
 											{% if field.modal is defined %}
-												modal_title=' modal_title="{{(field.modal)|trans}}"';
+												modal_title=' modal_title="{{(field.modal)|capitalize|trans}}"';
 											{% endif %}
+										{% endif %}
+										{% if field.modal_save is defined and field.modal_save==false %}
+										 		modal_save=' modal_save="false"';
 										{% endif %}
 
 										{% if field.type is defined and field.type=="option" %}
@@ -409,13 +413,13 @@ var url = new URL(window.location.href);
 												else
 												buttons+='<div class="btn-group {% if fieldOption.condition is defined %}'+((row["{{ fieldOption.condition }}"]*1 != "{{ fieldOption.conditionValue }}"*1) ? 'hide' : '')+'{% endif %}">	<button '+disabled+'attr-id="'+row['id']+'" id="{{ listConstructor.id }}-field-button-{{ fieldOption.id }}-'+row['id']+'" type="button" class="'+classDisabled+'{% if field.default is defined and field.default==true %}default-action{% endif %} btn btn-{{ fieldOption.type }} tooltip-primary"';
 												buttons+='{% if fieldOption.tooltip is defined and fieldOption.tooltip != "" %} data-toggle="tooltip" data-placement="bottom" title="" data-original-title=" {{ fieldOption.tooltip }} "{% endif %}';
-												buttons+='{% if fieldOption.confirm is defined %}{% if fieldOption.confirm == true %}  onclick="jQuery(\'#{{ listConstructor.id }}-modal-confirm\').modal(\'show\', {backdrop: \'static\'});" {% endif %}{% endif %}'+modal_title+'>';
+												buttons+='{% if fieldOption.confirm is defined %}{% if fieldOption.confirm == true %}  onclick="jQuery(\'#{{ listConstructor.id }}-modal-confirm\').modal(\'show\', {backdrop: \'static\'});" {% endif %}{% endif %}'+modal_title+modal_save+'>';
 												buttons+='<i class="{{ fieldOption.icon }}"></i></button></div>	';
 										{% endfor %}
 										{% else %}
 											buttons+='<div class="btn-group {% if field.condition is defined %}'+((row["{{ field.condition }}"]*1 != "{{ field.conditionValue }}"*1) ? 'hide' : '')+'{% endif %}">	<button '+disabled+'attr-id="'+row['id']+'" id="{{ listConstructor.id }}-field-button-{{ field.id }}-'+row['id']+'" type="button" class="'+classDisabled+'{% if field.default is defined and field.default==true %}default-action{% endif %} btn btn-{{ field.type }} tooltip-primary"';
 											buttons+='{% if field.tooltip is defined and field.tooltip != "" %} data-toggle="tooltip" data-placement="bottom" title="" data-original-title=" {{ field.tooltip }} " {% endif %}';
-											buttons+='{% if field.confirm is defined %}{% if field.confirm == true %}  onclick="jQuery(\'#{{ listConstructor.id }}-modal-confirm\').modal(\'show\', {backdrop: \'static\'});" {% endif %}{% endif %}'+modal_title+'>';
+											buttons+='{% if field.confirm is defined %}{% if field.confirm == true %}  onclick="jQuery(\'#{{ listConstructor.id }}-modal-confirm\').modal(\'show\', {backdrop: \'static\'});" {% endif %}{% endif %}'+modal_title+modal_save+'>';
 											buttons+='<i class="{{ field.icon }}"></i></button></div>	';
 										{% endif %}
 										{% endif %}

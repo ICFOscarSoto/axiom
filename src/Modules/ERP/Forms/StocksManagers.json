@@ -1,0 +1,13 @@
+[{
+	"sections": [
+		{
+			"name": "Stocks data",
+			"fields": [
+				{ "name": "lastinventorydate","cols": 4,"readonly":true},
+				{	"name": "pendingreceive", "cols": 4,"readonly":true},
+				{ "name": "quantity","cols": 4,"readonly":true},
+				{ "name": "minstock","cols": 4},
+				{ "name": "maxstock","cols": 4}
+			]
+		}]
+}]

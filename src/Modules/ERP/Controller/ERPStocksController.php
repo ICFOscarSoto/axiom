@@ -66,15 +66,33 @@ class ERPStocksController extends Controller
 		/**
 		 * @Route("/{_locale}/stocks/data/{id}/{action}", name="dataStocks", defaults={"id"=0, "action"="read"})
 		 */
-		 public function data($id, $action, Request $request){
+		public function data($id, $action, Request $request){
 		 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-		 $template=dirname(__FILE__)."/../Forms/Stocks.json";
-		 $utils = new GlobaleFormUtils();
-		 $repository=$this->getDoctrine()->getRepository($this->class);
-		 $obj = $repository->findOneBy(['id'=>$id, 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
 		 $classUtils=new ERPStocksUtils();
-		 $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "obj"=>$obj];
-		 $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),$classUtils->getExcludedForm($params));
+		 $utils = new GlobaleFormUtils();
+	 	 $repository=$this->getDoctrine()->getRepository($this->class);
+		 $obj = $repository->findOneBy(['id'=>$id, 'company'=>$this->getUser()->getCompany(), 'deleted'=>0]);
+		 $referer = $request->headers->get('referer'); // get the referer, it can be empty!
+		 $template = null;
+     if (!\is_string($referer) || !$referer) {
+       $template=dirname(__FILE__)."/../Forms/Stocks.json";
+			 $params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "obj"=>$obj];
+			 $excludedForm=$classUtils->getExcludedForm($params);
+     }else{
+			 $refererPathInfo = Request::create($referer)->getPathInfo();
+			 $routeInfos = $this->get('router')->match($refererPathInfo);
+			 $refererRoute = $routeInfos['_route'] ?? '';
+			 if ($refererRoute=='formStoresManagers'){
+			 	$template=dirname(__FILE__)."/../Forms/StocksManagers.json";
+				$excludedForm=['storelocation','productvariant'];
+			 }else{
+			  $template=dirname(__FILE__)."/../Forms/Stocks.json";
+				$params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "obj"=>$obj];
+				$excludedForm=$classUtils->getExcludedForm($params);
+			 }
+		 }
+
+		 $utils->initialize($this->getUser(), new $this->class(), $template, $request, $this, $this->getDoctrine(),$excludedForm);
 		 $form = $utils->make($id, $this->class, $action, "formStocks", "modal");
 		 return $form;
 		}

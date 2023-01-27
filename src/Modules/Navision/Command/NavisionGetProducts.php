@@ -1767,12 +1767,12 @@ public function importVariants(InputInterface $input, OutputInterface $output){
           $obj->setDateupd(new \Datetime());
           $obj->setDeleted(0);
           $obj->setActive(1);
+          $this->doctrine->getManager()->persist($obj);
         }
-        $this->doctrine->getManager()->persist($obj);
-        $this->doctrine->getManager()->flush();
-        $this->doctrine->getManager()->clear();
       }
     }
+    $this->doctrine->getManager()->flush();
+    $this->doctrine->getManager()->clear();
     //------   Critical Section END   ------
     //------   Remove Lock Mutex    ------
     fclose($fp);

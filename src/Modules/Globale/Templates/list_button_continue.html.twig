@@ -1,0 +1,59 @@
+// CONTINUE BUTTON FOR MODAL FORMS
+$('body').on('click', "#{{ field.modal }}-button-continue", function(event) {
+      event.stopImmediatePropagation();
+      if($("#{{field.modal}}-modal-form-body").find('form').valid()){
+        if((++load_wait)==1) $("#load-spinner").fadeIn();
+        var id_parent='';
+        if (typeof $('#id-parent').val() !== 'undefined') {
+          id_parent=encodeURI('&id-parent='+$('#id-parent').val());
+        }
+        $.post($("#{{field.modal}}-modal-form-body").find('form').find('#post-url').val(), $("#{{field.modal}}-modal-form-body").find('form').serialize()+id_parent,
+            function(data, status, xhr){
+              if((--load_wait)==0) $("#load-spinner").fadeOut();
+              {# VALIDATION ON PROCCESS #}
+              {# FIELD_ERRORS #}
+              if(typeof data.validation !== 'undefined' && data.validation.valid==false && typeof data.validation.field_errors !== 'undefined'){
+                Object.keys(data.validation.field_errors).forEach(function(index){
+                  $("#{{field.modal}}-modal-form-body #form_"+index).parent().append("<label id='form_period-error' class='error' for='form_period'>"+data.validation.field_errors[index]+"</label>");
+                });
+              }
+              {# GLOBAL_ERRORS #}
+              if(typeof data.validation !== 'undefined' && data.validation.valid==false && typeof data.validation.global_errors){
+                var errors="";
+                Object.keys(data.validation.global_errors).forEach(function(index){
+                  errors+="<li>"+data.validation.global_errors[index]+"</li>";
+                });
+                $("#{{field.modal}}-modal-form-body #validation-errors-list").html(errors);
+                $("#{{field.modal}}-modal-form-body [id$='-validation-error']").slideDown();
+              }
+              {# GLOBAL_WARNINGS #}
+              var warnings="";
+              if(typeof data.validation !== 'undefined' && typeof data.validation.global_warnings !== 'undefined'){
+                Object.keys(data.validation.global_warnings).forEach(function(index){
+                  warnings+="<li>"+data.validation.global_warnings[index]+"</li>";
+                });
+                $("#{{field.modal}}-modal-form-body #validation-warnings-list").html(warnings);
+                $("#{{field.modal}}-modal-form-body [id$='-validation-warning']").slideDown();
+              }
+              if(data.result){
+                $("#{{ listConstructor.id }}").DataTable().ajax.reload();
+
+                {% if listConstructor.events.save is defined %}
+                  {% for event in listConstructor.events.save %}
+                    {{ event | raw }}(data.id);
+                  {% endfor %}
+                {% endif %}
+
+                toastr.success("Datos guardados correctamente", "Confirmación", confirmation);
+
+
+                if(warnings=="") $("#{{ field.modal }}-modal-form").modal('hide');
+                $("#{{field.modal}}-modal-form-body").find('form').trigger("reset");
+                $("#{{field.modal}}-modal-form-body").find('form').validate({ lang: 'es' }).resetForm();
+              }
+                else toastr.error("Ocurrió un error al guardar los datos", "Confirmación", confirmation);
+
+
+          }, "json");
+        }
+});

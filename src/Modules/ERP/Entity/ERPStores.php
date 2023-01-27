@@ -107,6 +107,11 @@ class ERPStores
      */
     private $managedBy;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $transfernotifyaddress;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -300,6 +305,18 @@ class ERPStores
     public function setManagedBy(?ERPStoresManagers $managedBy): self
     {
         $this->managedBy = $managedBy;
+
+        return $this;
+    }
+
+    public function getTransfernotifyaddress(): ?string
+    {
+        return $this->transfernotifyaddress;
+    }
+
+    public function setTransfernotifyaddress(?string $transfernotifyaddress): self
+    {
+        $this->transfernotifyaddress = $transfernotifyaddress;
 
         return $this;
     }

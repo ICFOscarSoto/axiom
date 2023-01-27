@@ -22,7 +22,7 @@
 					{% endfor %}
 					{% endif %}
 					<button type="button" class="btn btn-primary" data-dismiss="modal">{{ ("Cancelar")|trans }}</button>
-					  {% if (form.showSave is not defined or form.showSave==true) and (userData.permissions[formConstructor.name ~ '_save'] is not defined or (userData.permissions[formConstructor.name ~ '_save'] is defined and userData.permissions[formConstructor.name ~ '_save'].allowaccess == true)) %}
+					  {% if (userData.permissions[formConstructor.name ~ '_save'] is not defined or (userData.permissions[formConstructor.name ~ '_save'] is defined and userData.permissions[formConstructor.name ~ '_save'].allowaccess == true)) %}
 							<button attr-id="" attr-action="" id="{{ form.id }}-button-continue" type="button" class="btn btn-red">{{ ("Guardar")|trans }}</button>
 						{% endif %}
 				</div>
@@ -70,5 +70,10 @@
 			});
 		{% endfor %}
 		{% endif %}
+
+		// Mover modales
+		$('#modal_container > #{{ form.id }}-modal-form').detach();
+		var modal = $('#{{ form.id }}-modal-form').detach();
+		$('#modal_container').append(modal);
 	});
 </script>

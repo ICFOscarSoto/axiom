@@ -72,21 +72,53 @@
               {# Get data and open modal form #}
               {% if field.confirm is not defined or field.confirm == false %}
                 $('body').on('click', "[id^='{{ listConstructor.id }}-field-button-{{ field.id }}']", function() {
-                  url=$("#{{ listConstructor.id }}-field-button-{{ field.id }}-url").val();
-                  url=url.replace('_____',$(this).attr('attr-id'));
-									modal_title = $(this).attr('modal_title');
-									if(url!="")
-	                  $.post(url, null,
-	                    function(data, status, xhr){
-	                        $("#{{field.modal}}-modal-form-body").html(data);
-													if (typeof modal_title !== 'undefined')
-														$("#{{field.modal}}-modal-title").html(modal_title);
-	                        $("#{{field.modal}}-modal-form-body").find(':checkbox').not($('[id$=-chkall]')).iCheck({checkboxClass: 'icheckbox_flat-blue', radioClass: 'iradio_flat-blue'});
-	                        $("#{{field.modal}}-modal-form-body select").select2();
-	                        $("#{{field.modal}}-modal-form").modal();
-
-	                  });
+									if((load_wait_modal)==0) {
+										++load_wait_modal;
+										$("#load-spinner").fadeIn();
+	                  url=$("#{{ listConstructor.id }}-field-button-{{ field.id }}-url").val();
+	                  url=url.replace('_____',$(this).attr('attr-id'));
+										modal_parent_button = $(this).attr('id');
+										modal_title = $(this).attr('modal_title');
+										modal_save 	= $(this).attr('modal_save');
+										if(url!="")
+		                  $.post(url, null,
+		                    function(data, status, xhr){
+														modal_parent = '';
+														$("#modal_container").children('.modal').each(function () {
+															if ($(this).hasClass('in'))
+																modal_parent = $(this).attr('id');
+															// Cerrar otras modales
+	    												$(this).modal('hide');
+														});
+		                        $("#{{field.modal}}-modal-form-body").html(data);
+														if (typeof modal_title !== 'undefined')
+															$("#{{field.modal}}-modal-title").html(modal_title);
+						                if (typeof modal_save !== 'undefined' && modal_save=='false')
+						                    $("#{{field.modal}}-button-continue").css('display', 'none');
+						                else
+						                    $("#{{field.modal}}-button-continue").css('display', 'inline-block');
+		                        $("#{{field.modal}}-modal-form-body").find(':checkbox').not($('[id$=-chkall]')).iCheck({checkboxClass: 'icheckbox_flat-blue', radioClass: 'iradio_flat-blue'});
+		                        $("#{{field.modal}}-modal-form-body select").select2();
+														$("#{{field.modal}}-modal-form").attr('modal_parent',modal_parent);
+														$("#{{field.modal}}-modal-form").attr('modal_parent_button',modal_parent_button);
+														$('#{{field.modal}}-modal-form').on('hidden.bs.modal', function (e) {
+														  if ($('#{{field.modal}}-modal-form').attr('modal_parent')!=''){
+																	// Lanzar boton del padre
+																	$("#"+$('#'+$('#{{field.modal}}-modal-form').attr('modal_parent')).attr('modal_parent_button')).click();
+															}
+														})
+														{% if field.modal is defined and field.modal|length and (_context['button_continue_' ~ field.modal] is not defined or _context['button_continue_' ~ field.modal]==false)%}
+											        {{ include("@Globale/list_button_continue.html.twig") }}
+											        {% set _context=_context|merge({('button_continue_' ~ field.modal) : true}) %}
+											      {% endif %}
+		                        $("#{{field.modal}}-modal-form").modal();
+														if((--load_wait_modal)==0) $("#load-spinner").fadeOut();
+		                  });
+										else
+											if((--load_wait_modal)==0) $("#load-spinner").fadeOut();
+									}
                 });
+
               {% else %}
                 $('body').on('click', "[id^='{{ listConstructor.id }}-field-button-{{ field.id }}']", function() {
                 url=$("#{{ listConstructor.id }}-field-button-{{ field.id }}-url").val();

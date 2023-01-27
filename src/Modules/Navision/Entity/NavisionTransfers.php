@@ -87,6 +87,11 @@ class NavisionTransfers
      */
     private $productvariant;
 
+    /**
+     * @ORM\Column(type="string", length=32, nullable=true)
+     */
+    private $hash;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -244,6 +249,18 @@ class NavisionTransfers
     public function setProductvariant(?ERPProductsVariants $productvariant): self
     {
         $this->productvariant = $productvariant;
+
+        return $this;
+    }
+
+    public function getHash(): ?string
+    {
+        return $this->hash;
+    }
+
+    public function setHash(?string $hash): self
+    {
+        $this->hash = $hash;
 
         return $this;
     }

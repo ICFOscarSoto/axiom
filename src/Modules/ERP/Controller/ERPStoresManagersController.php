@@ -168,7 +168,6 @@ class ERPStoresManagersController extends Controller
 	$request, $this, $this->getDoctrine(),method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],
 	method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
 	$templateForms[]=$formUtils->formatForm('StoresManagersProducts', true, $id, ERPStoresManagersProducts::class);
-  $templateForms[0]['showSave']=false;
 
 	return $this->render('@Globale/list.html.twig', [
 			'id' => $id,
