@@ -377,6 +377,9 @@ class ERPStoresManagersOperationsController extends Controller
 						$this->getDoctrine()->getManager()->flush();
 						$this->getDoctrine()->getManager()->clear('App\Modules\ERP\Entity\ERPStoresManagersVendingMachinesChannels');
 						$channel=$repositoryVendingMachinesChannels->findOneBy(["vendingmachine"=>$vendingmachine,"channel"=>$channel_num,"active"=>1,"deleted"=>0]);
+						//Informamos de la venta por debajo de stock
+						$description="Operación realizada por debajo de stock en canal ".$channel->getName()." ";
+						file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$vendingmachine->getAlertnotifyaddress().'&msg='.urlencode('Máquina '.$vendingmachine->getName().': '.$description));
 					}
 					$productvariant = $productVariantRepository->findOneBy(["product"=>$channel->getProduct(), "variant"=>null, "active"=>1,"deleted"=>0]);
 					$operation=new ERPStoresManagersOperations();
