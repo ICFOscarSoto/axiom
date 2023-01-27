@@ -345,7 +345,8 @@ table.dataTable.dtr-inline.collapsed > tbody > tr > td:first-child:before, table
   z-index: 20000;
   top: 2px;
   right: 39px !important;
-  width: 64px;
+  width: 30px;
+  padding: 5px;
 }
 
 .number-type{
