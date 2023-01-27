@@ -726,9 +726,6 @@ class ERPStoresManagersController extends Controller
 					if($vendingmachine->getAlertnotifyaddress())
 	 					file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$vendingmachine->getAlertnotifyaddress().'&msg='.urlencode('Máquina '.$vendingmachine->getName().': '.$description));
 					return new JsonResponse(array('result' => -1, 'text'=>"Canal sin stock en el sistema"));
-				}else{
-					$description="Operación autorizada por debajo de stock en canal ".$channel->getName()." ";
-					file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$vendingmachine->getAlertnotifyaddress().'&msg='.urlencode('Máquina '.$vendingmachine->getName().': '.$description));
 				}
 			}
 			//-------------------------------------------------------------------------------------------------
