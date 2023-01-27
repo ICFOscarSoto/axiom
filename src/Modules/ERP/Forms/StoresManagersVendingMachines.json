@@ -18,6 +18,10 @@
                 {
                     "name": "serial",
                     "cols": 8
+                },
+                {
+                    "name": "operationunderstock",
+                    "cols": 4
                 }
             ]
         },

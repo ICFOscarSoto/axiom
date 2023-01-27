@@ -329,9 +329,9 @@ class ERPStoresManagersOperationsController extends Controller
 
 
 		/**
-		 * @Route("/api/erp/storesmanagers/vendingmachines/operations/create/{id}/{channel}/{nfcid}", name="createVendingMachineOperations", defaults={"id"=0, "channel"=0, "nfcid"="null"})
+		 * @Route("/api/erp/storesmanagers/vendingmachines/operations/create/{id}/{channel_num}/{nfcid}", name="createVendingMachineOperations", defaults={"id"=0, "channel"=0, "nfcid"="null"})
 		 */
-		 public function createVendingMachineOperations($id, $channel, $nfcid, Request $request){
+		 public function createVendingMachineOperations($id, $channel_num, $nfcid, Request $request){
 			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 			$managerRepository=$this->getDoctrine()->getRepository(ERPStoresManagers::class);
 			$consumerRepository=$this->getDoctrine()->getRepository(ERPStoresManagersConsumers::class);
@@ -347,11 +347,37 @@ class ERPStoresManagersOperationsController extends Controller
 			$vendingmachine=$repositoryVendingMachines->findOneBy(["id"=>$id,"active"=>1,"deleted"=>0]);
 			if(!$vendingmachine) return new JsonResponse(array('result' => -1, 'text'=>"Máquina expendedora incorrecta"));
 			//$channel=$repositoryVendingMachinesChannels->findOneBy(["vendingmachine"=>$vendingmachine,"row"=>substr($channel,0,1),"col"=>substr($channel,1,1),"active"=>1,"deleted"=>0]);
-			$channel=$repositoryVendingMachinesChannels->findOneBy(["vendingmachine"=>$vendingmachine,"channel"=>$channel,"active"=>1,"deleted"=>0]);
+			$channel=$repositoryVendingMachinesChannels->findOneBy(["vendingmachine"=>$vendingmachine,"channel"=>$channel_num,"active"=>1,"deleted"=>0]);
 			if(!$channel) return new JsonResponse(array('result' => -1, 'text'=>"Canal no configurado"));
 
-
 			if($channel->getProduct()){
+
+					//Modificación 26/01/2023 -- Permitir operaciones sin stock si la máquina esta configurada para permitirlo y el almacenillo tiene stock del producto
+					//----------------------------------------------------------------------------------------------------------------------------------------------------
+					//TODO: Comprobar si la salida es en negativo, en caso afirmativo hacer un traspaso de 1 una unidad
+					if($channel->getQuantity()<=0){
+						if(!$this->getUser()->getApiToken()) return new JsonResponse(array('result' => -1, 'text'=>"El usuario no puede realizar esta acción"));
+						$postdata = http_build_query(['X-AUTH-DOMAIN' => 'ferreteriacampollano.com', 'X-AUTH-TOKEN' => $this->getUser()->getApiToken()]);
+						$opts = [
+				      'http' =>['method'  => 'POST',
+				      'header'  => 'Content-Type: application/x-www-form-urlencoded',
+				      'content' => $postdata,
+				      "User-Agent: Mozilla/5.0 (Windows NT 5.1; rv:20.0) Gecko/20100101 Firefox/20.0"
+				      ]
+				    ];
+				    $context  = stream_context_create($opts);
+				    $result = file_get_contents($request->getSchemeAndHttpHost().'/api/ERP/storesmanagers/vendingmachines/replenishment/channels/add/'.$channel->getId().'/'.($channel->getMultiplier()?$channel->getMultiplier():1), false, $context);
+						$result = json_decode($result,true);
+						if(json_last_error() != JSON_ERROR_NONE || $result["result"]!=1){
+								//Hay algun problema al realizar la recarga en la expendedora, informamos
+								$description="Error en recarga automatica en canal ".$channel->getName();
+								file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$vendingmachine->getAlertnotifyaddress().'&msg='.urlencode('Máquina '.$vendingmachine->getName().': '.$description));
+						}
+						//Refrescamos el objeto channel
+						$this->getDoctrine()->getManager()->flush();
+						$this->getDoctrine()->getManager()->clear('App\Modules\ERP\Entity\ERPStoresManagersVendingMachinesChannels');
+						$channel=$repositoryVendingMachinesChannels->findOneBy(["vendingmachine"=>$vendingmachine,"channel"=>$channel_num,"active"=>1,"deleted"=>0]);
+					}
 					$productvariant = $productVariantRepository->findOneBy(["product"=>$channel->getProduct(), "variant"=>null, "active"=>1,"deleted"=>0]);
 					$operation=new ERPStoresManagersOperations();
 					$operation->setCompany($this->getUser()->getCompany());
@@ -381,6 +407,8 @@ class ERPStoresManagersOperationsController extends Controller
 					$line->setDeleted(false);
 					$this->getDoctrine()->getManager()->persist($line);
 					$this->getDoctrine()->getManager()->flush();
+
+
 					// Añadimos la salida al historico
 					$typesRepository=$this->getDoctrine()->getRepository(ERPTypesMovements::class);
 					$type=$typesRepository->findOneBy(["name"=>"Salida expendedora"]);

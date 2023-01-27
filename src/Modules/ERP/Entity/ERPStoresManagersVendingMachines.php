@@ -152,7 +152,10 @@ class ERPStoresManagersVendingMachines
     */
     private $opencontrollerdoornotified;
 
-
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $operationunderstock;
 
     public function getId(): ?int
     {
@@ -505,5 +508,18 @@ class ERPStoresManagersVendingMachines
 
         return $this;
     }
+
+    public function getOperationunderstock(): ?bool
+    {
+        return $this->operationunderstock;
+    }
+
+    public function setOperationunderstock(bool $operationunderstock): self
+    {
+        $this->operationunderstock = $operationunderstock;
+
+        return $this;
+    }
+
 
 }

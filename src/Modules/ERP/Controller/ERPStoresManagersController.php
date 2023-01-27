@@ -692,6 +692,8 @@ class ERPStoresManagersController extends Controller
 			$repository = $manager->getRepository($this->class);
 			$repositoryVendingMachines = $manager->getRepository(ERPStoresManagersVendingMachines::class);
 			$repositoryVendingMachinesChannels = $manager->getRepository(ERPStoresManagersVendingMachinesChannels::class);
+			$repositoryProductVariant = $this->getDoctrine()->getManager()->getRepository(ERPProductsVariants::class);
+			$repositoryStocks = $this->getDoctrine()->getManager()->getRepository(ERPStocks::class);
 			$vendingmachine=$repositoryVendingMachines->findOneBy(["id"=>$id,"active"=>1,"deleted"=>0]);
 			if(!$vendingmachine) return new JsonResponse(array('result' => -1, 'text'=>"Máquina expendedora incorrecta"));
 			if(strlen($channel)!=2) return new JsonResponse(array('result' => -1, 'text'=>"Canal incorrecto"));
@@ -702,21 +704,30 @@ class ERPStoresManagersController extends Controller
 			//Modificación BABCOCK 14/11/2022 -- No autorizar operacion cuando no hay stock
 			//-------------------------------------------------------------------------------------------------
 			if($channel->getQuantity()<=0){
-				$date=new \DateTime();
-	 			$description="Operación no autorizada por falta de stock en canal ".$channel->getName();
- 				$vendingMachineLog= new ERPStoresManagersVendingMachinesLogs();
- 				$vendingMachineLog->setVendingmachine($vendingmachine);
- 				$vendingMachineLog->setType(2);
- 				$vendingMachineLog->setDescription($description);
- 				$vendingMachineLog->setDateadd($date);
- 				$vendingMachineLog->setDateupd($date);
- 				$vendingMachineLog->setActive(1);
- 				$vendingMachineLog->setDeleted(0);
- 				$this->getDoctrine()->getManager()->persist($vendingMachineLog);
- 				$this->getDoctrine()->getManager()->flush();
-				if($vendingmachine->getAlertnotifyaddress())
- 					file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$vendingmachine->getAlertnotifyaddress().'&msg='.urlencode('Máquina '.$vendingmachine->getName().': '.$description));
-				return new JsonResponse(array('result' => -1, 'text'=>"Canal sin stock en el sistema"));
+				//Modificación 26/01/2023 -- Permitir operaciones sin stock si la máquina esta configurada para permitirlo y el almacenillo tiene stock del producto
+				//----------------------------------------------------------------------------------------------------------------------------------------------------
+				$productvariant = $repositoryProductVariant->findOneBy(["product"=>$channel->getProduct(),"variant"=>null]);
+				if(!$productvariant) return new JsonResponse(array('result' => -1, 'text'=>"Error, no existe el producto"));
+				$stock=$repositoryStocks->findOneBy(["productvariant"=>$productvariant, "storelocation"=>$vendingmachine->getStorelocation(), "active"=>1, "deleted"=>0]);
+				if(!$stock) return new JsonResponse(array('result' => -1, 'text'=>"Error, no existe stock en el almacén de recarga"));
+				$multiplier=$channel->getMultiplier()?$channel->getMultiplier():1;
+				if($vendingmachine->getOperationunderstock()!=true || !$vendingmachine->getStorelocation() || $stock->getQuantity()<$multiplier){
+					$date=new \DateTime();
+		 			$description="Operación no autorizada por falta de stock en canal ".$channel->getName();
+	 				$vendingMachineLog= new ERPStoresManagersVendingMachinesLogs();
+	 				$vendingMachineLog->setVendingmachine($vendingmachine);
+	 				$vendingMachineLog->setType(2);
+	 				$vendingMachineLog->setDescription($description);
+	 				$vendingMachineLog->setDateadd($date);
+	 				$vendingMachineLog->setDateupd($date);
+	 				$vendingMachineLog->setActive(1);
+	 				$vendingMachineLog->setDeleted(0);
+	 				$this->getDoctrine()->getManager()->persist($vendingMachineLog);
+	 				$this->getDoctrine()->getManager()->flush();
+					if($vendingmachine->getAlertnotifyaddress())
+	 					file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$vendingmachine->getAlertnotifyaddress().'&msg='.urlencode('Máquina '.$vendingmachine->getName().': '.$description));
+					return new JsonResponse(array('result' => -1, 'text'=>"Canal sin stock en el sistema"));
+				}
 			}
 			//-------------------------------------------------------------------------------------------------
 			$result["id"]=$channel->getId();
@@ -915,7 +926,7 @@ class ERPStoresManagersController extends Controller
 					$this->getDoctrine()->getManager()->flush();
 				}
 			}
-
+			$this->getDoctrine()->getManager()->clear();
 			return new JsonResponse(["result"=>1]);
 		}
 

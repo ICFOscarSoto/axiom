@@ -789,6 +789,7 @@ historyVendingMachines: Histórico de expendedoras
 historyManager: Histórico
 transfer: Traspaso
 state: Estado
+Operationunderstock: Operaciones sin stock
 #JSPREADSHEET
 #----------------------------------------------------------------------------------------------------------------------
 jspreadsheet_showcolumn: Mostrar columna
