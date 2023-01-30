@@ -357,9 +357,9 @@ class ERPStoresManagersOperationsController extends Controller
 					//TODO: Comprobar si la salida es en negativo, en caso afirmativo hacer un traspaso de 1 una unidad
 					if($channel->getQuantity()<=0){
 						if(!$this->getUser()->getApiToken()){
-							 return new JsonResponse(array('result' => -1, 'text'=>"El usuario no puede realizar esta acción"));
 							 $description="No se puede realizar operacion sin stock, el usuario no tiene API token asignado";
 							 file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$vendingmachine->getAlertnotifyaddress().'&msg='.urlencode('Máquina '.$vendingmachine->getName().': '.$description));
+							 return new JsonResponse(array('result' => -1, 'text'=>"El usuario no puede realizar esta acción"));
 						 }
 						$postdata = http_build_query(['X-AUTH-DOMAIN' => 'ferreteriacampollano.com', 'X-AUTH-TOKEN' => $this->getUser()->getApiToken()]);
 						$opts = [
