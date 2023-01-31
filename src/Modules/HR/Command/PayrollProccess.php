@@ -41,7 +41,7 @@ class PayrollProccess extends ContainerAwareCommand
   {
     $this->doctrine = $this->getContainer()->get('doctrine');
     $this->entityManager = $this->doctrine->getManager();
-    $workersRepository=$doctrine->getRepository(HRWorkers::class);
+    $workersRepository=$this->doctrine->getRepository(HRWorkers::class);
 
     //Directorios de trabajo
     $ocrDir=$this->configpaths["payroll_preOCR"];
