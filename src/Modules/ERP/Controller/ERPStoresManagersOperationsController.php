@@ -381,9 +381,32 @@ class ERPStoresManagersOperationsController extends Controller
 						$this->getDoctrine()->getManager()->flush();
 						$this->getDoctrine()->getManager()->clear('App\Modules\ERP\Entity\ERPStoresManagersVendingMachinesChannels');
 						$channel=$repositoryVendingMachinesChannels->findOneBy(["vendingmachine"=>$vendingmachine,"channel"=>$channel_num,"active"=>1,"deleted"=>0]);
-						//Informamos de la venta por debajo de stock
+						//Informamos de la venta por debajo de stock en el canal de discord
 						$description="Operación realizada por debajo de stock en canal ".$channel->getName()." ";
 						file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$vendingmachine->getAlertnotifyaddress().'&msg='.urlencode('Máquina '.$vendingmachine->getName().': '.$description));
+
+						// Informamos de la venta por debajo de stock por correo electronico
+						$msg="La máquina ".$vendingmachine->getName()." ha realizado una operación con stock 0. Hay que revisar y ajustar el stock del siguiente canal: ";
+						$msg.="<ul>";
+						$msg.="<li>Canal: <b>".$channel->getName()."</b> (Num. canal: <b>".str_pad($channel->getChannel(),3,'0',STR_PAD_LEFT)."</b>) Ref: <b>".$channel->getProductcode()."</b> - ".$channel->getProductname().".</li>";
+						$postdata = http_build_query([
+										'from' => '14',
+										'to' => $vendingmachine->getReplenishmentnotifyaddress(),
+										'cc' => '',
+										'bcc' =>'',
+										'subject' =>'Error en la máquina '.$vendingmachine->getName().' operacion por debajo de 0.' ,
+										'files' => '{}',
+										'text_content' =>'',
+										'html_content' => $msg
+									]);
+						$opts = ["http" => [
+												"method" => "POST",
+												"header" => "Content-Type: application/x-www-form-urlencoded\r\nX-AUTH-TOKEN: a052732c94ac72ea4ec62ad9b2b61910ea4cb1448f2302895c871ba88cc6f5a2130f5686f6c181df81f69b6b3c354037389ec7a388f86798a98cb914bcd19bb528538d2cc796a9e47130883f57ceb4ffeeb32dc99a4cccb4fbb02f33be53e1765781ac611c48590c5b5e0915c82bff1952575ed750966f54adbc8074f3ad41fe92feb85affe60698f73088fc7afb5c77037863ccf6836c621304492888fcfbd7919c5e80181155ed3a0ea95421a6a990ab01f89aca9f9a4c22d9cbfa6d2729932060f597960e8683c5d3015060868b5bf6d39f0fd50cda7e\r\nX-AUTH-DOMAIN: ferreteriacampollano.com",
+												"content" => $postdata
+											]
+										];
+						$context = stream_context_create($opts);
+						$file = file_get_contents('https://axiom.ferreteriacampollano.com/api/emails/send', false, $context);
 					}
 					$productvariant = $productVariantRepository->findOneBy(["product"=>$channel->getProduct(), "variant"=>null, "active"=>1,"deleted"=>0]);
 					$operation=new ERPStoresManagersOperations();

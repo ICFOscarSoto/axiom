@@ -52,9 +52,9 @@ class StoreManagerWaitingReceive extends ContainerAwareCommand
       $msg="El traspaso ".$transfer->getName()." esta pendiente de recibir en el almacen ".$transfer->getDestinationstore()->getName()." desde que se envío el día ".date_format($transfer->getDateadd(), "d/m/Y");
       if ($manager->getIncidentchannel()!=null) file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$manager->getIncidentchannel().'&msg='.urlencode($msg));
       sleep(1);
-      /* Enviamos avisos al canal de discord con los traspasos que faltan */
-      $msg="El traspaso <b>".$transfer->getName()."</b> no ha sido recepcionado en el almacén ".$transfer->getDestinationstore()->getName()." <br/><br/>";
-      $msg="Puedes descargar el traspaso en el siguiente enlace <a href='https://axiom.ferreteriacampollano.com/es/ERP/generateQR?hash=".$transfer->getHash()."&userId=".$transfer->getDestinationstore()->getManagedBy()->getUser()->getId()."'>descargar aquí</a>.";
+      /* Enviamos por correo los traspasos que faltan */
+      $msg="El traspaso ".$transfer->getName()." esta pendiente de recibir en el almacen ".$transfer->getDestinationstore()->getName()." desde que se envío el día ".date_format($transfer->getDateadd(), "d/m/Y");
+      $msg.="Puedes descargar el traspaso en el siguiente enlace <a href='https://axiom.ferreteriacampollano.com/es/ERP/generateQR?hash=".$transfer->getHash()."&userId=".$transfer->getDestinationstore()->getManagedBy()->getUser()->getId()."'>descargar aquí</a>.";
       $msg.="</ul><br/><br/>Por favor, no responda a este mensaje, ha sido generado de forma automática. Si desea ponerse en contacto con nosotros para comentarnos alguna incidencia o mejora de este servicio, por favor, contacte con su comercial o escríbanos a <a href='mailto:sistemas@ferreteriacampollano.com'>sistemas@ferreteriacampollano.com</a>.";
       $postdata = http_build_query([
               'from' => '14',

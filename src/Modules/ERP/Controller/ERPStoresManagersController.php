@@ -528,8 +528,9 @@ class ERPStoresManagersController extends Controller
 			$utils = new ERPStoresManagersVendingMachinesChannelsUtils();
 			$formUtils=new GlobaleFormUtils();
 			$formUtils->initialize($this->getUser(), new ERPStoresManagersVendingMachinesChannels(), dirname(__FILE__)."/../Forms/StoresManagersVendingMachinesChannels.json", $request, $this, $this->getDoctrine());
-			$templateLists[]=$utils->formatList($id);
-
+			if (null!==($request->query->get('buttons',null))) {
+				$templateLists[]=$utils->formatList($id,$request->query->get('buttons',null));}
+			else $templateLists[]=$utils->formatList($id);
 			$new_breadcrumb=["rute"=>null, "name"=>$id?"Editar":"Nuevo", "icon"=>$id?"fa fa-edit":"fa fa-new"];
 			$breadcrumb=$menurepository->formatBreadcrumb('genericindex','ERP', 'StoresManagers');
 			array_push($breadcrumb, ["rute"=>null, "name"=>"Canales Expendedora", "icon"=>"fa fa-calendar-check-o"], $new_breadcrumb);

@@ -1,4 +1,4 @@
 [
   {"id": "listStoresManagersVendingMachineLacks", "type" : "default", "icon" : "fa fa-arrow-right", "name" : "editar", "route":"StoresManagersVendingMachineLacks",   "actionType" : "foreground", "confirm" :false, "target":"_blank", "tooltip":"Faltas de la máquina"},
-  {"id": "editStoresManagersChannelsVendingMachine", "type" : "default", "icon" : "fa fa-list-ol", "name" : "channels", "route":"StoresManagersVendingMachinesChannels",  "actionType" : "foreground", "confirm" :false, "target":"_blank", "tooltip":"Canales de la maquina"}
+  {"id": "editStoresManagersChannelsVendingMachine", "type" : "default", "icon" : "fa fa-list-ol", "name" : "channels", "route":"StoresManagersVendingMachinesChannels", "routeParams" : {"buttons" : "false"}, "actionType" : "foreground", "confirm" :false, "target":"_blank", "tooltip":"Canales de la maquina"}
 ]
