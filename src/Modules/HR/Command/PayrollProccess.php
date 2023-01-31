@@ -64,10 +64,11 @@ class PayrollProccess extends ContainerAwareCommand
     $dir = new \DirectoryIterator($tempDir);
     foreach ($dir as $fileinfo) {
       //Añadir formato corporativo
-      $result=shell_exec("pdftk \"".$tempDir.$fileinfo->getFilename()."\" stamp /home/operador/nominas/plantilla_nominas.pdf output \"format_".$tempDir.$fileinfo->getFilename()."\"");
+      $ocrDir.basename($fileinfo->getFilename(), '.pdf')."_%04d.pdf
+      $result=shell_exec("pdftk \"".$tempDir.$fileinfo->getFilename()."\" stamp /home/operador/nominas/plantilla_nominas.pdf output \"".$tempDir.basename($fileinfo->getFilename(), '.pdf')."_%04format.pdf."\"");
       unlink($tempDir.$fileinfo->getFilename());
       //Firmar documentos
-      
+      //pdftk file63d91db71abef_0046.pdf stamp /home/operador/nominas/plantilla_nominas.pdf output format_file63d91db71abef_0046.pdf
     }
     //Borrar archivo original
     unlink($sourceFile);
