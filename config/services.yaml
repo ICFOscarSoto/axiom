@@ -78,3 +78,6 @@ services:
 
     App\Modules\Globale\Command\OcrSignedDeliveryNote:
             arguments: ["%config.paths%"]
+
+    App\Modules\HR\Command\PayrollProccess:
+            arguments: ["%config.paths%"]
