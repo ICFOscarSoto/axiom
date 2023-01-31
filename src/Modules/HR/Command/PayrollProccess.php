@@ -41,6 +41,8 @@ class PayrollProccess extends ContainerAwareCommand
   {
     $this->doctrine = $this->getContainer()->get('doctrine');
     $this->entityManager = $this->doctrine->getManager();
+    $workersRepository=$doctrine->getRepository(HRWorkers::class);
+
     //Directorios de trabajo
     $ocrDir=$this->configpaths["payroll_preOCR"];
     $tempDir=$this->configpaths["payroll_temp"];
@@ -71,14 +73,17 @@ class PayrollProccess extends ContainerAwareCommand
         $result=shell_exec("pdftk ".$tempDir.$fileinfo->getFilename()." stamp /home/operador/nominas/plantilla_nominas.pdf output ".$tempDir.basename($fileinfo->getFilename(), '.pdf')."_format.pdf");
         unlink($tempDir.$fileinfo->getFilename());
         //Firmar documentos
-        $result=shell_exec("AutoFirma sign -i ".$tempDir.basename($fileinfo->getFilename(), '.pdf')."_format.pdf -o ".$tempDir.$fileinfo->getFilename()." -store pkcs12:/home/operador/nominas/representacion_olivia.p12 -alias 47057442v_olivia_sanchez__r:_b02290443_ -password Edin1Icf");
+        @$result=shell_exec("AutoFirma sign -i ".$tempDir.basename($fileinfo->getFilename(), '.pdf')."_format.pdf -o ".$tempDir.$fileinfo->getFilename()." -store pkcs12:/home/operador/nominas/representacion_olivia.p12 -alias 47057442v_olivia_sanchez__r:_b02290443_ -password Edin1Icf");
         unlink($tempDir.basename($fileinfo->getFilename(), '.pdf')."_format.pdf");
         //Buscar numero DNI
         $pdf = $parser->parseFile($tempDir.$fileinfo->getFilename());
         preg_match('/([0-9]{8})([A-Z]{1})/', $pdf->getText(), $matches, PREG_OFFSET_CAPTURE);
         if(count($matches)>0) $nif=substr($pdf->getText(), $matches[0][1], 9); else $nif=null;
+        $worker=$workersRepository->findOneBy('idcard'=>$nif, 'deleted'=>0);
+        if(!$worker) continue;
+        if($worker->getEmail()==null || $worker->getEmail()=='') continue;
+        $output->writeln('DNI: '.$nif.' enviar mail a '.$worker->getEmail());
 
-        $output->writeln('DNI: '.$nif);
       }
     }
     //Borrar archivo original
