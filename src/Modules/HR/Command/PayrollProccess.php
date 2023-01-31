@@ -55,7 +55,10 @@ class PayrollProccess extends ContainerAwareCommand
     if(!file_exists($sourceFile))
       die();
 
-    //Recorremos todos los archivos en el directorio
+    $config = new Config();
+    $config->setHorizontalOffset("\t");
+    $parser = new Parser([], $config);
+
     $date=new \DateTime();
     //Obtener el numero de páginas del pdf
     $result=shell_exec("qpdf --show-npages  \"".$sourceFile."\"");
@@ -63,17 +66,22 @@ class PayrollProccess extends ContainerAwareCommand
     $result=shell_exec("gs -o \"".$tempDir.uniqid("file")."_%04d.pdf\" -sDEVICE=pdfwrite \"".$sourceFile."\"");
     $dir = new \DirectoryIterator($tempDir);
     foreach ($dir as $fileinfo) {
-      if (!$fileinfo->isDot()) {
+      if(!$fileinfo->isDot()){
         //Añadir formato corporativo
         $result=shell_exec("pdftk ".$tempDir.$fileinfo->getFilename()." stamp /home/operador/nominas/plantilla_nominas.pdf output ".$tempDir.basename($fileinfo->getFilename(), '.pdf')."_format.pdf");
         unlink($tempDir.$fileinfo->getFilename());
         //Firmar documentos
         $result=shell_exec("AutoFirma sign -i ".$tempDir.basename($fileinfo->getFilename(), '.pdf')."_format.pdf -o ".$tempDir.$fileinfo->getFilename()." -store pkcs12:/home/operador/nominas/representacion_olivia.p12 -alias 47057442v_olivia_sanchez__r:_b02290443_ -password Edin1Icf");
         unlink($tempDir.basename($fileinfo->getFilename(), '.pdf')."_format.pdf");
+        //Buscar numero DNI
+        $pdf = $parser->parseFile($tempDir.$fileinfo->getFilename());
+        dump($pdf->getText());
+        //preg_match('/([0-9]{2})ALV([0-9]{6})/', $pdf->getText(), $matches, PREG_OFFSET_CAPTURE);
+        //if(count($matches)>0) $deliveryNoteNumber=$matches[0][1]; else $deliveryNoteNumber=9223372036854775807;
       }
     }
     //Borrar archivo original
-    unlink($sourceFile);
+    //unlink($sourceFile);
 
 
   }
