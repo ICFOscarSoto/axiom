@@ -581,7 +581,7 @@ class ERPBuyOrdersController extends Controller
 					$lines[$i]['multiplicity']		= (($olines[$i]->getMultiplicity()!=null)?$olines[$i]->getMultiplicity():1);
 					$lines[$i]['minimumquantityofbuy'] = (($olines[$i]->getMinimumquantityofbuy()!=null)?$olines[$i]->getMinimumquantityofbuy():1);
 					$lines[$i]['purchaseunit']		= (($olines[$i]->getPurchaseunit()!=null)?$olines[$i]->getPurchaseunit():1);
-					$lines[$i]['dateestimated']		= (($olines[$i]->getDateestimated()!=null)?$olines[$i]->getDateestimated()->format('Y-m-d'):$dateestimated->format('Y-m-d'));
+					$lines[$i]['dateestimated']		= (($olines[$i]->getDateestimated()!=null)?$olines[$i]->getDateestimated()->format('Y-m-d'):$dateestimated);
 					$lines[$i]['weight']					= (($olines[$i]->getWeight()!=null)?number_format($olines[$i]->getWeight(),$ndecimals):'0.'.$decimals);
 					$lines[$i]['purchasemeasure']	= (($olines[$i]->getPurchasemeasure()!=null)?$olines[$i]->getPurchasemeasure():'');
 					$quantity             = intval($lines[$i]['quantity']);
@@ -1310,9 +1310,7 @@ class ERPBuyOrdersController extends Controller
 					$variant					= $erpVariantsRepository->find($line['variant_id']);
 					$productvariant 	= $erpProducsVariantsRepository->findOneBy(["product"=>$product,"variant"=>$variant,"active"=>"1","deleted"=>"0"]);
 					$store 						= $erpStoresRepository->find($line['store_id']);
-					$reference				= $erpReferencesRepository->findOneBy(["supplier"=>$supplier,"product"=>$product, "productvariant"=>$productvariant,"active"=>"1","deleted"=>"0"]);
-					if ($reference==null)
-							$reference= $erpReferencesRepository->findOneBy(["supplier"=>$supplier,"product"=>$product,"active"=>"1","deleted"=>"0"]);
+					$reference				= $erpReferencesRepository->findOneBy(["supplier"=>$supplier,"productvariant"=>$productvariant,"active"=>"1","deleted"=>"0"]);
 					$buyorderline->setBuyOrder($buyorder);
 					$buyorderline->setProduct($product);
 					$buyorderline->setVariant($variant);
