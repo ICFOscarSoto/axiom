@@ -8,6 +8,8 @@
         </div>
         <div id="{{formConstructor.name}}-{{ field.name }}-search-modal-form-body" style="height: 520px; padding: 0px 10px;">
           {% set listConstructor = searchables[field.name] %}
+          {% set listConstructor = searchables[field.name] %}
+          {% set listConstructor = listConstructor|merge({'topButtonReload' : false}) %}
           {% set listOrigin = "" %}
           {% set hidePageLength = true %}
           {% set hideCheckBoxes = true %}
