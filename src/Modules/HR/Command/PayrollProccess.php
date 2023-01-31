@@ -75,7 +75,6 @@ class PayrollProccess extends ContainerAwareCommand
         unlink($tempDir.basename($fileinfo->getFilename(), '.pdf')."_format.pdf");
         //Buscar numero DNI
         $pdf = $parser->parseFile($tempDir.$fileinfo->getFilename());
-        dump($pdf->getText());
         preg_match('/([0-9]{8})([A-Z]{1})/', $pdf->getText(), $matches, PREG_OFFSET_CAPTURE);
         if(count($matches)>0) $nif=$matches[0][1]; else $nif=null;
         $output->writeln('DNI: '.$nif);
