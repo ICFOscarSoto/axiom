@@ -536,7 +536,7 @@ class NavisionController extends Controller
                                         LEFT JOIN erpproducts p ON p.id=pv.product_id
                                         LEFT JOIN erpstores_users su ON su.user_id='.$idUser.'
                                         LEFT JOIN erpstores st ON st.id=su.store_id',
-                                        'nt.active=1 and nt.deleted=0 and st.id=su.store_id',
+                                        'nt.active=1 and nt.deleted=0 and st.id=nt.destinationstore_id',
                                         50,
                                         'nt.id',
                                       );
