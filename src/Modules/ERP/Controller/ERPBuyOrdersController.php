@@ -1476,4 +1476,46 @@ class ERPBuyOrdersController extends Controller
 	 	  }
 		  return new JsonResponse(["addresses"=>$mailaddress]);
 		}
+
+		/**
+		 * @Route("/api/buyorders/getjson/{id}", name="getBuyOrderJson", defaults={"id"=0})
+		 */
+		 public function getBuyOrderJson($id, Request $request){
+			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			$user = $this->getUser();
+			$orderRepository=$this->getDoctrine()->getRepository(ERPBuyOrders::class);
+			$orderLinesRepository=$this->getDoctrine()->getRepository(ERPBuyOrdersLines::class);
+			$order=$orderRepository->findOneBy(["id"=>$id, "active"=>1, "deleted"=>0]);
+			if(!$order) return new JsonResponse(["result"=>-1]);
+			// Lineas
+			$lines=$orderLinesRepository->findBy(["buyorder"=>$order, "active"=>1, "deleted"=>0]);
+			$data=[];
+			$data["id"]=$order->getId();
+			$data["code"]=$order->getCode();
+			$data["lines"]=[];
+			foreach($lines as $line){
+				$dataLine=[];
+				$dataLine["id"]=$line->getId();
+				$dataLine["linenum"]=$line->getLinenum();
+				$dataLine["name"]=$line->getProductname();
+				$dataLine["variantname"]=$line->getVariantname();
+				$dataLine["variantvalue"]=$line->getVariantvalue();
+				$dataLine["quantity"]=$line->getQuantity();
+				$dataLine["shoppingprice"]=$line->getShoppingprice();
+				$dataLine["total"]=$line->getTotal();
+				$dataLine["discount1"]=$line->getDiscount1();
+				$dataLine["discount2"]=$line->getDiscount2();
+				$dataLine["discount3"]=$line->getDiscount3();
+				$dataLine["discount4"]=$line->getDiscount4();
+				$dataLine["discountequivalent"]=$line->getDiscountequivalent();
+				$dataLine["totaldiscount"]=$line->getTotaldiscount();
+				$dataLine["pvp"]=$line->getPvp();
+				$dataLine["subtotal"]=$line->getSubtotal();
+				$dataLine["taxperc"]=$line->getTaxperc();
+				$dataLine["taxunit"]=$line->getTaxunit();
+				$dataLine["storecode"]=$line->getStorecode();
+				$data["lines"][]=$dataLine;
+			}
+			return new JsonResponse(["result"=>1, "data"=>$data]);
+		}
 }
