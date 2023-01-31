@@ -79,7 +79,7 @@ class PayrollProccess extends ContainerAwareCommand
         $pdf = $parser->parseFile($tempDir.$fileinfo->getFilename());
         preg_match('/([0-9]{8})([A-Z]{1})/', $pdf->getText(), $matches, PREG_OFFSET_CAPTURE);
         if(count($matches)>0) $nif=substr($pdf->getText(), $matches[0][1], 9); else $nif=null;
-        $worker=$workersRepository->findOneBy('idcard'=>$nif, 'deleted'=>0);
+        $worker=$workersRepository->findOneBy(['idcard'=>$nif, 'deleted'=>0]);
         if(!$worker) continue;
         if($worker->getEmail()==null || $worker->getEmail()=='') continue;
         $output->writeln('DNI: '.$nif.' enviar mail a '.$worker->getEmail());
