@@ -33,8 +33,8 @@ parameters:
       signedDeliveryNotes: %env(string:SIGNEDDELIVERYNOTES_PATH)%
       signedDeliveryNotes_fail: %env(string:SIGNEDDELIVERYNOTES_FAIL_PATH)%
       signedDeliveryNotes_preOCR: %env(string:SIGNEDDELIVERYNOTES_PREOCR_PATH)%
-      payroll_preOCR: %env(string:payroll_preOCR)%
-      payroll_temp: %env(string:payroll_temp)%
+      payroll_preOCR: %env(string:PAYROLL_PREOCR_PATH)%
+      payroll_temp: %env(string:PAYROLL_TEMP_PATH)%
       callrecords: %env(string:CALLRECORDS_PATH)%
 
 services:
