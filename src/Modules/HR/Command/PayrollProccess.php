@@ -60,9 +60,15 @@ class PayrollProccess extends ContainerAwareCommand
     //Obtener el numero de páginas del pdf
     $result=shell_exec("qpdf --show-npages  \"".$sourceFile."\"");
     //Partir el fichero en archivos de una unica hoja
-    echo("CMD: "."gs -o \"".$tempDir.uniqid("file")."_%04d.pdf\" -sDEVICE=pdfwrite \"".$sourceFile."\"");
     $result=shell_exec("gs -o \"".$tempDir.uniqid("file")."_%04d.pdf\" -sDEVICE=pdfwrite \"".$sourceFile."\"");
-
+    $dir = new \DirectoryIterator($tempDir);
+    foreach ($dir as $fileinfo) {
+      //Añadir formato corporativo
+      $result=shell_exec("pdftk \"".$tempDir.$fileinfo->getFilename()."\" stamp /home/operador/nominas/plantilla_nominas.pdf output \"format_".$tempDir.$fileinfo->getFilename()."\"");
+      unlink($tempDir.$fileinfo->getFilename());
+      //Firmar documentos
+      
+    }
     //Borrar archivo original
     unlink($sourceFile);
 
