@@ -163,7 +163,7 @@ class ERPStoresManagersController extends Controller
 	$templateLists=$utils->formatProductsList($id);
 	$formUtils=new GlobaleFormUtils();
 	$utilsObj=new ERPStoresManagersProductsUtils();
-	$params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "parent"=>$obj,	"product"=>null, "productvariant"=>null];
+	$params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(), "parent"=>$obj,	"productvariant"=>null];
 	$formUtils->initialize($this->getUser(), new ERPStoresManagersProducts(), dirname(__FILE__)."/../Forms/StoresManagersProducts.json",
 	$request, $this, $this->getDoctrine(),method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],
 	method_exists($utilsObj,'getIncludedForm')?$utilsObj->getIncludedForm($params):[]);
@@ -196,7 +196,7 @@ class ERPStoresManagersController extends Controller
 	$listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersProducts.json"),true);
 	//$user,$repository,$request,$manager,$listFields,$classname,$select_fields,$from,$where,$maxResults=null,$orderBy="id",$groupBy=null)
 	$return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields, ERPStocks::class,
-																			['pm.id'=>'id','p.name'=>'name','p.code'=>'code', 'pm.quantitytoserve'=>'quantitytoserve'],
+																			['pm.id'=>'id','p.name'=>'name','p.code'=>'code', 'pm.quantitytoserve'=>'quantitytoserve', 'pm.active'=>'active'],
 																			'erpstores_managers_products pm
 																			LEFT JOIN erpproducts_variants pv ON pv.id=pm.productvariant_id
 																			LEFT JOIN erpproducts p ON p.id=pv.product_id',
@@ -1459,8 +1459,9 @@ class ERPStoresManagersController extends Controller
 			$repository=$this->getDoctrine()->getRepository(ERPStoresManagersProducts::class);
 			$obj = $repository->findOneBy(['id'=>$id, 'active'=>1, 'deleted'=>0]);
 	 	 	$utilsObj = new ERPStoresManagersProductsUtils();
+			$idparent=$request->query->get('idparent');
 			$params=["doctrine"=>$this->getDoctrine(), "id"=>$id, "user"=>$this->getUser(),
-			"product"=>$obj?$obj->getProductvariant()->getProduct():null,
+			"manager_id"=>$idparent,
 			"productvariant"=>$obj?$obj->getProductvariant():null];
 			$utils->initialize($this->getUser(), $obj, $template, $request, $this, $this->getDoctrine(),
 	                           method_exists($utilsObj,'getExcludedForm')?$utilsObj->getExcludedForm($params):[],

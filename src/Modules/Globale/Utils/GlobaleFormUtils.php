@@ -117,7 +117,7 @@ class GlobaleFormUtils extends Controller
 			}
     $this->obj_old=clone $this->obj;
     foreach($this->values as $key => $val){
-       if(method_exists($this->obj,'set'.lcfirst($key))) $this->obj->{'set'.lcfirst($key)}($val);
+       if(method_exists($this->obj,'set'.ucfirst($key))) $this->obj->{'set'.ucfirst($key)}($val);
     }
     $form=$this->createFromEntity2(!$ajax)->getForm();
     $caption=ucfirst($name);
@@ -132,12 +132,13 @@ class GlobaleFormUtils extends Controller
   public function createFromEntity2($includeSave=true){
     $this->ignoredAttributes=array_merge($this->ignoredAttributes, $this->excludedAttributes);
     $class=get_class($this->obj);
+
     $form = $this->controller->createFormBuilder($this->obj);
+
     //Get class attributes
     foreach($this->entityManager->getClassMetadata($class)->fieldMappings as $key=>$value){
       if(!in_array($value['fieldName'],$this->ignoredAttributes)){ //Check if field is not excluded and not ignored
         if($this->searchTemplateField($value['fieldName'])!==false){ //Check if field is in template, otherwise skip it
-
           //$readonly=false;
           if(isset($this->permissions["permissions"][$this->name."_field_".$value['fieldName']]) && $this->permissions["permissions"][$this->name."_field_".$value['fieldName']]['allowaccess']==false) {
             $readonly=true;
@@ -219,6 +220,8 @@ class GlobaleFormUtils extends Controller
                      default:
                       $form->add($value['fieldName'],null,['label'=>$label, 'disabled' => $readonly, 'attr'=>['autocomplete' => 'off', 'readonly' => $readonly,'class'=>isset($field["class"])?$field["class"]:'']]);
                    }
+                  if ($field['type']=='searchable')
+                    $form->add($value['fieldName'].'_id', HiddenType::class, ['mapped'=>false, 'required' => isset($field["nullable"])?!$field["nullable"]:'false', 'attr'=>['attr-attribute' => $value['fieldName'], 'class' => '']]);
                  }else{
                    $form->add($value['fieldName'],null,['label'=>$label, 'disabled' => $readonly, 'attr'=>['autocomplete' => 'off', 'readonly' => $readonly,'class'=>isset($field["class"])?$field["class"]:'']]);
                  }
@@ -232,6 +235,9 @@ class GlobaleFormUtils extends Controller
     //Add included attributes
     foreach ($this->includedAttributes as $key => $value) {
       $form->add($value[0], $value[1], $value[2]);
+      $field=$this->searchTemplateField($value[0]);
+      if ($field && isset($field['type']) && $field['type']=='searchable')
+        $form->add($value[0].'_id', HiddenType::class, ['mapped'=>false, 'required' => isset($field["nullable"])?!$field["nullable"]:'false', 'attr'=>['attr-attribute' => $value[0], 'class' => ''], 'data' =>(isset($value[2]['attr']['data_id'])?$value[2]['attr']['data_id']:null)]);
     }
     //Get class relations
     foreach($this->entityManager->getClassMetadata($class)->associationMappings as $key=>$value){
@@ -310,7 +316,19 @@ class GlobaleFormUtils extends Controller
       $this->setDefaults();
       $this->obj_old=clone $this->obj;
 
-			$form=$this->createFromEntity2(false)->getForm();
+      $builder = $this->createFromEntity2(false);
+      $builder->addEventListener('form.bind', function ($event) {
+        $form = $event->getForm();
+        foreach($form->all() as $key => $val){
+          $config = $val->getConfig();
+          $attributes = $config->getAttributes();
+          if (isset($attributes['data_collector/passed_options']) && isset($attributes['data_collector/passed_options']['attr'])
+           && isset($attributes['data_collector/passed_options']['attr']['ajax']) && $attributes['data_collector/passed_options']['attr']['ajax'])
+           $form->add($key, ChoiceType::class, ['choices'=>null,'attr'=>$attributes['data_collector/passed_options']['attr']]);
+        }
+      });
+
+      $form=$builder->getForm();
 
 			switch($action){
 				 case 'save':
@@ -364,8 +382,8 @@ class GlobaleFormUtils extends Controller
       foreach ($valueSection['fields'] as $keyField => $valueField) {
         if(isset($valueField['conversion']["view"])){
           if(method_exists(get_class($formView->vars["value"]), $valueField['conversion']["view"])){
-            $formView->children[$valueField["name"]]->vars["value"]=$formView->vars["value"]->{$valueField['conversion']["view"]}($formView->vars["value"]->{'get'.lcfirst($valueField["name"])}());
-            $formView->vars["value"]->{'set'.lcfirst($valueField["name"])}($formView->vars["value"]->{$valueField['conversion']["view"]}($formView->vars["value"]->{'get'.lcfirst($valueField["name"])}()));
+            $formView->children[$valueField["name"]]->vars["value"]=$formView->vars["value"]->{$valueField['conversion']["view"]}($formView->vars["value"]->{'get'.ucfirst($valueField["name"])}());
+            $formView->vars["value"]->{'set'.ucfirst($valueField["name"])}($formView->vars["value"]->{$valueField['conversion']["view"]}($formView->vars["value"]->{'get'.ucfirst($valueField["name"])}()));
           }
         }
       }
@@ -379,20 +397,28 @@ class GlobaleFormUtils extends Controller
       foreach ($valueSection['fields'] as $keyField => $valueField) {
         if(isset($valueField['type']) && $valueField['type']=='searchable'){
             $class="\App\Modules\\".$valueField['typeParams']["module"]."\Entity\\".$valueField['typeParams']["module"].$valueField['typeParams']["name"];
+            $obj = $formView->vars["value"];
+            $method = 'get'.ucfirst($valueField["name"]);
             $value="";
-            if(method_exists($class, 'getCode') && $formView->vars["value"]->{'get'.lcfirst($valueField["name"])}()!==null) $value.='('.$formView->vars["value"]->{'get'.lcfirst($valueField["name"])}()->getCode().') ';
-            if(method_exists($class, 'getName') && $formView->vars["value"]->{'get'.lcfirst($valueField["name"])}()!==null) $value=$value.$formView->vars["value"]->{'get'.lcfirst($valueField["name"])}()->getName();
-            if(method_exists($class, 'getLastname') && $formView->vars["value"]->{'get'.lcfirst($valueField["name"])}()!==null) $value=$value.' '.$formView->vars["value"]->{'get'.lcfirst($valueField["name"])}()->getLastname();
+            if (isset($valueField['parent']) && $valueField['parent']!=null && $valueField['parent']!='' &&
+                method_exists($obj,'get'.ucfirst($valueField["parent"])))
+              $obj = $obj->{'get'.ucfirst($valueField["parent"])}();
 
+            if(method_exists($class, 'getCode') && method_exists($obj,$method) && $obj->{$method}()!==null) $value.='('.$obj->{$method}()->getCode().') ';
+            if(method_exists($class, 'getName') && method_exists($obj,$method) && $obj->{$method}()!==null) $value=$value.$obj->{$method}()->getName();
+            if(method_exists($class, 'getLastname') && method_exists($obj,$method) && $obj->{$method}()!==null) $value=$value.' '.$obj->{$method}()->getLastname();
 
             $formView->children[$valueField["name"]]->vars["value"]=$value;
-            if($formView->vars["value"]->{'get'.lcfirst($valueField["name"])}()!==null)
-              $formView->children[$valueField["name"].'_id']->vars["value"]=$formView->vars["value"]->{'get'.lcfirst($valueField["name"])}()->getId();
+            if(method_exists($obj,$method) && $obj->{$method}()!==null)
+              $formView->children[$valueField["name"].'_id']->vars["value"]=$obj->{$method}()->getId();
+/*            else
+              $formView->children[$valueField["name"].'_id']->vars["value"]='';*/
         }
       }
     }
     return $formView;
   }
+
   private function getSearchables($form){
     $searchables=[];
     foreach ($this->templateArray[0]['sections'] as $keySection => $valueSection) {
@@ -431,7 +457,7 @@ class GlobaleFormUtils extends Controller
      foreach ($valueSection['fields'] as $keyField => $valueField) {
        if(isset($valueField['conversion']["controller"]) && (!isset($valueField['readonly']) || $valueField['readonly']==false )){
          if(method_exists(get_class($obj), $valueField['conversion']["controller"])){
-           $obj->{'set'.lcfirst($valueField["name"])}($obj->{$valueField['conversion']["controller"]}($obj->{'get'.lcfirst($valueField["name"])}()));
+           $obj->{'set'.ucfirst($valueField["name"])}($obj->{$valueField['conversion']["controller"]}($obj->{'get'.ucfirst($valueField["name"])}()));
          }
        }
      }
@@ -450,16 +476,29 @@ class GlobaleFormUtils extends Controller
        $obj = $this->conversionController($obj);
        //definimos los valores predefinidos
        foreach($this->values as $key => $val){
-            if(method_exists($obj,'set'.lcfirst($key))) $obj->{'set'.lcfirst($key)}($val);
+            if(method_exists($obj,'set'.ucfirst($key))) $obj->{'set'.ucfirst($key)}($val);
        }
 
-      foreach($form->getIterator()->getIterator() as $key => $val){   //2021-11-26 - Added for searchables relationship fields
+       foreach($form->getIterator()->getIterator() as $key => $val){   //2021-11-26 - Added for searchables relationship fields
+         $parentField = null;
+         $childrenId = null;
          if(strpos($key,'_id')!==false){
            $parentField=str_replace('_id','',$key);
+           $childrenId = $form->getIterator()->offsetGet($key)->getData();
+         }else{
+           $config = $val->getConfig();
+           $attributes = $config->getAttributes();
+           if (isset($attributes['data_collector/passed_options']) && isset($attributes['data_collector/passed_options']['attr'])
+            && isset($attributes['data_collector/passed_options']['attr']['ajax']) && $attributes['data_collector/passed_options']['attr']['ajax']){
+              $parentField=$key;
+              $childrenId = $this->request->request->get("form")[$key];
+           }
+         }
+         if ($parentField && method_exists($obj,'set'.ucfirst($parentField))){
            $targetEntity=$this->entityManager->getClassMetadata($form->getConfig()->getDataClass())->associationMappings[$parentField]['targetEntity'];
            $relationRepository=$this->doctrine->getRepository($targetEntity);
-           $relationObj=$relationRepository->findOneBy(['id'=>$form->getIterator()->offsetGet($key)->getData()]);
-           if(method_exists($obj,'set'.lcfirst($parentField))) $obj->{'set'.lcfirst($parentField)}($relationObj);
+           $relationObj=$relationRepository->findOneBy(['id'=>$childrenId]);
+           $obj->{'set'.ucfirst($parentField)}($relationObj);
          }
        }
 
@@ -502,18 +541,18 @@ class GlobaleFormUtils extends Controller
         if($this->searchTemplateField($value['fieldName'])!==false){ //Check if field is in template, only compare visible fields
           switch($value['type']){
             case 'datetime':
-            if(method_exists($old,'get'.lcfirst($value['fieldName']))){
-              if(($old->{'get'.lcfirst($value['fieldName'])}()!=NULL?$old->{'get'.lcfirst($value['fieldName'])}()->format('Y-m-d H:i:s'):NULL) != ($new->{'get'.lcfirst($value['fieldName'])}()!=NULL?$new->{'get'.lcfirst($value['fieldName'])}()->format('Y-m-d H:i:s'):NULL)){
+            if(method_exists($old,'get'.ucfirst($value['fieldName']))){
+              if(($old->{'get'.ucfirst($value['fieldName'])}()!=NULL?$old->{'get'.ucfirst($value['fieldName'])}()->format('Y-m-d H:i:s'):NULL) != ($new->{'get'.ucfirst($value['fieldName'])}()!=NULL?$new->{'get'.ucfirst($value['fieldName'])}()->format('Y-m-d H:i:s'):NULL)){
                 //Attribute changed store it
-                $changes[]=["attribute"=>$value['fieldName'],"oldvalue"=>($old->{'get'.lcfirst($value['fieldName'])}()!=NULL?$old->{'get'.lcfirst($value['fieldName'])}()->format('Y-m-d H:i:s'):NULL),"newvalue"=>($new->{'get'.lcfirst($value['fieldName'])}()!=NULL?$new->{'get'.lcfirst($value['fieldName'])}()->format('Y-m-d H:i:s'):NULL)];
+                $changes[]=["attribute"=>$value['fieldName'],"oldvalue"=>($old->{'get'.ucfirst($value['fieldName'])}()!=NULL?$old->{'get'.ucfirst($value['fieldName'])}()->format('Y-m-d H:i:s'):NULL),"newvalue"=>($new->{'get'.ucfirst($value['fieldName'])}()!=NULL?$new->{'get'.ucfirst($value['fieldName'])}()->format('Y-m-d H:i:s'):NULL)];
               }
             }
             break;
             default:
-              if(method_exists($old,'get'.lcfirst($value['fieldName']))){
-                if($old->{'get'.lcfirst($value['fieldName'])}() != $new->{'get'.lcfirst($value['fieldName'])}()){
+              if(method_exists($old,'get'.ucfirst($value['fieldName']))){
+                if($old->{'get'.ucfirst($value['fieldName'])}() != $new->{'get'.ucfirst($value['fieldName'])}()){
                   //Attribute changed store it
-                  $changes[]=["attribute"=>$value['fieldName'],"oldvalue"=>$old->{'get'.lcfirst($value['fieldName'])}(), "newvalue"=>$new->{'get'.lcfirst($value['fieldName'])}()];
+                  $changes[]=["attribute"=>$value['fieldName'],"oldvalue"=>$old->{'get'.ucfirst($value['fieldName'])}(), "newvalue"=>$new->{'get'.ucfirst($value['fieldName'])}()];
                 }
               }
             break;

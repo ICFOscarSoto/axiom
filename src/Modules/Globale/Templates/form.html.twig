@@ -32,7 +32,7 @@
     {% for section in formConstructor.template.0.sections %}
       {% for field in section.fields %}
         {% if formConstructor.form[field.name] is defined and formConstructor.form[field.name].vars is defined and formConstructor.form[field.name].vars.value is not iterable %}
-          form_data['{{ field.name }}'] = "{{ formConstructor.form[field.name].vars.value|raw|replace({'\n':''})|replace({'\r':''}) }}";           
+          form_data['{{ field.name }}'] = "{{ formConstructor.form[field.name].vars.value|raw|replace({'\n':''})|replace({'\r':''}) }}";
         {% endif %}
       {% endfor %}
     {% endfor %}

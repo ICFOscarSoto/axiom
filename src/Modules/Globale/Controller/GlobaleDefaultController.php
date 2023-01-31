@@ -268,7 +268,7 @@ class GlobaleDefaultController extends Controller
           if(property_exists($class, "company"))
             $list=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $class, [["type"=>"and", "column"=>"company", "value"=>$user->getCompany()]],[],-1, $orderby);
           else
-            $list=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $class,[],[],-1, $orderby);          
+            $list=$listUtils->getRecords($user,$repository,$request,$manager,$listFields, $class,[],[],-1, $orderby);
         $result = $utilsExport->export($list,$listFields);
         return $result;
       }
@@ -344,18 +344,51 @@ class GlobaleDefaultController extends Controller
         $triggermodule = $request->request->get("modtrg");
         $triggername = $request->request->get("nametrg");
         $relationParameter = $request->request->get("prm");
+        $chil = $request->request->get("chil");
+        $chilnull = $request->request->get("chilnull");
+        $order = $request->request->get("order");
+        $orderDir = ($request->request->get("orderdir")?strtolower($request->request->get("orderdir")):'asc');
    		 	$triggerRepository = $this->getDoctrine()->getRepository("\App\Modules\\".$triggermodule."\Entity\\".$triggername);
    			$repository = $this->getDoctrine()->getRepository("\App\Modules\\".$module."\Entity\\".$class);
         if(property_exists($class,'company'))
-   			$triggerObj=$triggerRepository->findOneBy(["id"=>$id, "active"=>1,"deleted"=>0, "company"=>$this->getUser()->getCompany()]);
-        else 	$triggerObj=$triggerRepository->findOneBy(["id"=>$id, "active"=>1,"deleted"=>0]);
+   			  $triggerObj=$triggerRepository->findOneBy(["id"=>$id, "deleted"=>0, "company"=>$this->getUser()->getCompany()]);
+        else
+          $triggerObj=$triggerRepository->findOneBy(["id"=>$id, "deleted"=>0]);
    			$objects=$repository->findBy([$relationParameter=>$triggerObj,"active"=>1,"deleted"=>0]);
    			$return=[];
    			foreach($objects as $item){
-   				$option["id"]=$item->getId();
-   				$option["text"]=$item->getName();
-   				$return[]=$option;
+          if ($chil){
+            if(method_exists($item, "get".ucfirst($chil))){
+              $ochildren = $item->{'get'.ucfirst($chil)}();
+              $option["id"]=$item->getId();
+              if ($ochildren){
+         				$option["text"]=$ochildren->getName();
+                // Ordenación
+                if ($order && $order!='' && method_exists($ochildren, "get".ucfirst($order)))
+                  $option["order__"]=$ochildren->{'get'.ucfirst($order)}();
+         				$return[]=$option;
+              }else{
+                if ($chilnull && count($objects)==1){
+                  $option["text"]=$chilnull;
+                  if ($order && $order!='')
+                    $option["order__"]=0;
+                  $return[]=$option;
+                }
+              }
+            }
+          }else{
+     				$option["id"]=$item->getId();
+     				$option["text"]=$item->getName();
+            // Ordenación
+            if ($order && $order!='' && method_exists($item, "get".ucfirst($order)))
+                $option["order__"]=0;
+     				$return[]=$option;
+          }
    			}
+        if ($order && $order!='' && count($return)>0){
+          $column_order = array_column($return, 'order__');
+          array_multisort($column_order, ($orderDir=='asc'?SORT_ASC:SORT_DESC),SORT_REGULAR,$return);
+        }
    			return new JsonResponse($return);
    	 	}else{
    			return new JsonResponse([]);

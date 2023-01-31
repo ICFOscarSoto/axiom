@@ -24,8 +24,7 @@
 <script>
   $(document).ready(function() {
     {% if field.typeParams.routeparams is not defined %}{% set routeparams = [] %}{% else %}{% set routeparams = field.typeParams.routeparams %}{% endif %}
-    if($("#form_{{ field.name }}_id").val()!='') $("#form_{{ field.name }}").before("<span id='selection-view-{{formConstructor.name}}-{{ field.name }}' class='searchable-view-relation' style='' attr-url='{{ url(field.typeParams.route, routeparams|merge({"id":'_____'})) }}'><i class='fa fa-file-text-o' aria-hidden='true'></i><span>&nbsp;Ver Ficha</span></span>"); else
-      $("#form_{{ field.name }}").before("<span id='selection-view-{{formConstructor.name}}-{{ field.name }}' class='searchable-view-relation' style='visibility: hidden;' attr-url='{{ url(field.typeParams.route, routeparams|merge({"id":'_____'})) }}'><i class='fa fa-file-text-o' aria-hidden='true'></i><span>&nbsp;Ver Ficha</span></span>");
+    $("#form_{{ field.name }}").before("<span id='selection-view-{{formConstructor.name}}-{{ field.name }}' class='searchable-view-relation' style='visibility: hidden;' attr-url='{{ url(field.typeParams.route, routeparams|merge({"id":'_____'})) }}'><i class='fa fa-file-text-o' aria-hidden='true'></i><span>&nbsp;Ver Ficha</span></span>");
     element =$('label[for="form_{{ field.name }}"]').detach();
     html=$("#{{formConstructor.name}}-form-body").find("#form_{{ field.name }}").parent().html();
     newHtml='<div class="input-group">'+html+
@@ -75,11 +74,10 @@
     if( $("#{{ listConstructor.id }}-name_o_lastname-"+id).length ) value+=$("#{{ listConstructor.id }}-name_o_lastname-"+id).text();
       else if( $("#{{ listConstructor.id }}-name-"+id).length ) value+=$("#{{ listConstructor.id }}-name-"+id).text();
     $("#form_{{ field.name }}").val(value);
-    $("#form_{{ field.name }}_id").val(id);
+    $("#form_{{ field.name }}_id").val(id).trigger('change');
     $("#selection-view-{{formConstructor.name}}-{{ field.name }}").show();
     $("#{{formConstructor.name}}-{{ field.name }}-search-modal-form").modal('hide');
   });
-
 </script>
 
 {% endif %}

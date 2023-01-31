@@ -1,13 +1,51 @@
 {# Check if field has trigger #}
 {% if field.trigger.field is defined and field.trigger.route is defined %}
+{% set type_trigger = '' %}
+{% for field_trigger in section.fields %}
+  {% if field_trigger.type is defined and field_trigger.name==field.trigger.field %}
+    {% set type_trigger = field_trigger.type %}
+  {% endif %}
+{% endfor %}
 <script>
-  $(document).ready(function() {
-     $("#form_{{ field.trigger.field }}").select2();
-     $("#form_{{ field.name }}").select2();
+  {% if type_trigger != 'searchable' %}
+    $(document).ready(function() {
+       $("#form_{{ field.trigger.field }}").select2();
+       $("#form_{{ field.name }}").select2();
 
-     $("#form_{{ field.trigger.field }}").on("change", function (e) {
+       $("#form_{{ field.trigger.field }}").on("change", function (e) {
+         if($("#form_{{ field.trigger.field }}").select2('data').length>0){
+           var value=$("#form_{{ field.trigger.field }}").select2('data')[0]["element"]["className"];
+           $("#form_{{ field.name }}").html('');
+           $.ajax({
+              dataType: "json",
+              url: '{{ url(field.trigger.route) }}',
+              type: 'POST',
+              {% if field.trigger.generic is defined and field.trigger.generic == false %}
+                data: {id: value},
+              {% else %}
+                data: {id: value, mod: '{{field.trigger.module}}', name: '{{field.trigger.class}}', modtrg:'{{field.trigger.moduleTrigger}}', nametrg:'{{field.trigger.classTrigger}}', prm:'{{field.trigger.relationParameter}}'},
+              {% endif %}
+              success:  function( data ) {
+                var html='<option value>Seleccionar </option>';
+                $.each( data, function( key, val ) {
+                  html+='<option value="'+val.id+'" class="'+val.id+'">'+val.text+'</option>';
+                });
+                $("#form_{{ field.name }}").html(html);
+              }
+            });
+         }
+       });
+
        if($("#form_{{ field.trigger.field }}").select2('data').length>0){
          var value=$("#form_{{ field.trigger.field }}").select2('data')[0]["element"]["className"];
+       }
+    });
+  {% else %}
+    $(document).ready(function() {
+      $("#form_{{ field.name }}").select2();
+
+       $("#form_{{ field.trigger.field }}_id").on("change", function (e) {
+         var value=$("#form_{{ field.trigger.field }}_id").val();
          $("#form_{{ field.name }}").html('');
          $.ajax({
             dataType: "json",
@@ -16,22 +54,21 @@
             {% if field.trigger.generic is defined and field.trigger.generic == false %}
               data: {id: value},
             {% else %}
-              data: {id: value, mod: '{{field.trigger.module}}', name: '{{field.trigger.class}}', modtrg:'{{field.trigger.moduleTrigger}}', nametrg:'{{field.trigger.classTrigger}}', prm:'{{field.trigger.relationParameter}}'},
+              data: {id: value, mod: '{{field.trigger.module}}', name: '{{field.trigger.class}}', modtrg:'{{field.trigger.moduleTrigger}}', nametrg:'{{field.trigger.classTrigger}}', prm:'{{field.trigger.relationParameter}}'{% if field.trigger.children is defined %} , chil:'{{field.trigger.children}}'{% if field.trigger.childrenNull is defined %} , chilnull:'{{field.trigger.childrenNull}}'{% endif %}{% endif %}{% if field.trigger.order is defined %} , order:'{{field.trigger.order}}'{% endif %}{% if field.trigger.orderDir is defined %} , orderdir:'{{field.trigger.orderDir}}'{% endif %}},
             {% endif %}
             success:  function( data ) {
-              var html='<option value>Seleccionar </option>';
+              var html='';
+              if (Array.isArray(data) && data.length>1){
+                html+='<option value>Seleccionar </option>';
+              }
               $.each( data, function( key, val ) {
                 html+='<option value="'+val.id+'" class="'+val.id+'">'+val.text+'</option>';
               });
               $("#form_{{ field.name }}").html(html);
             }
-          });
-       }
-     });
-
-     if($("#form_{{ field.trigger.field }}").select2('data').length>0){
-       var value=$("#form_{{ field.trigger.field }}").select2('data')[0]["element"]["className"];
-     }
-  });
+         });
+       });
+    });
+  {% endif %}
 </script>
 {% endif %}

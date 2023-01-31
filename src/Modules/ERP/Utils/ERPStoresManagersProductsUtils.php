@@ -5,7 +5,10 @@ use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use App\Modules\Globale\Entity\GlobaleMenuOptions;
+use App\Modules\ERP\Entity\ERPProducts;
 use App\Modules\ERP\Entity\ERPProductsVariants;
 
 class ERPStoresManagersProductsUtils
@@ -20,25 +23,46 @@ class ERPStoresManagersProductsUtils
 
   public function getIncludedForm($params){
     $doctrine=$params["doctrine"];
-    $id=$params["id"];
+    $manager_id=(isset($params["manager_id"])?$params["manager_id"]:null);
     $user=$params["user"];
+    $product=null;
     $productvariant=$params["productvariant"];
-    $product=$params["product"];
-    $productsvariantsRepository=$doctrine->getRepository(ERPProductsVariants::class);
-    $choices = $productsvariantsRepository->getVariants($product, $user);
+
+    if ($productvariant!=null){
+      $product=$productvariant->getProduct();
+      $productsvariantsRepository=$doctrine->getRepository(ERPProductsVariants::class);
+      $choices = $productsvariantsRepository->getVariants($product, $user);
+      if (count($choices)==1)
+        $productvariant = $choices[0];
+    }
+
     return [
+    ['product', TextType::class, [
+        'required' => true,
+        'disabled' => false,
+        'attr'=> ["readonly"=>false, "data_id"=>($product?$product->getId():''), 'value' => ($product?'('.$product->getCode().') '.$product->getName():'')],
+        'mapped' => false
+
+    ]],
     ['productvariant', ChoiceType::class, [
-      'required' => false,
+      'required' => true,
       'disabled' => false,
-      'attr' => ['class' => 'select2', 'readonly' => true],
-      'choices' => $product?$productsvariantsRepository->findBy(["product"=>$product]):null,
-      'placeholder' => 'Selecciona variante',
+      'mapped' => false,
+      'attr' => ['class' => 'select2', 'readonly' => true, 'ajax'=>true],
+      'choices' => $productvariant?$productsvariantsRepository->getVariants($product, $user):null,
+      'placeholder' => 'Seleccionar',
       'choice_label' => function($obj, $key, $index) {
           return ($obj?($obj->getVariant()?$obj->getVariant()->getName():''):'');
       },
       'choice_value' => 'id',
       'data' => $productvariant
-    ]]];
+    ]],
+    ['manager_id', HiddenType::class, [
+        'required' => true,
+        'mapped' => false,
+        'data' => $manager_id
+    ]]
+    ];
   }
 
   public function formatList($user){

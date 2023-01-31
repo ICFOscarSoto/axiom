@@ -4,15 +4,22 @@
             "name": "data",
             "fields": [
                 {
+                    "name": "product",
+                    "parent": "productvariant",
+                    "type": "searchable" ,
+                    "typeParams":{"module": "ERP", "name": "Products", "route": "genericdata", "routeparams":{"module":"ERP","name":"Products"}, "type":"modal"},
+                    "cols": 7
+                },
+                {
                     "name": "productvariant",
-                    "cols": 8
+                    "cols": 3,
+                    "trigger":{
+                      "field":"product", "route":"generictrigger",
+              				"moduleTrigger":"ERP", "classTrigger":"ERPProducts", "children":"variant", "childrenNull":"Sin variante", "order":"name", "orderDir":"asc",
+              				"module":"ERP", "class":"ERPProductsVariants", "relationParameter":"product"}
                 },
                 {
                     "name": "quantitytoserve",
-                    "cols": 2
-                },
-                {
-                    "name": "active",
                     "cols": 2
                 }
             ]
