@@ -65,7 +65,7 @@ class PayrollProccess extends ContainerAwareCommand
     foreach ($dir as $fileinfo) {
       if (!$fileinfo->isDot()) {
         //Añadir formato corporativo
-        $result=shell_exec("pdftk ".$tempDir.$fileinfo->getFilename()." stamp /home/operador/nominas/plantilla_nominas.pdf output ".$ocrDir.'format_'.basename($fileinfo->getFilename(), '.pdf')."_%04d.pdf");
+        $result=shell_exec("pdftk ".$tempDir.$fileinfo->getFilename()." stamp /home/operador/nominas/plantilla_nominas.pdf output ".$tempDir.basename($fileinfo->getFilename(), '.pdf')."_format.pdf");
         unlink($tempDir.$fileinfo->getFilename());
         //Firmar documentos
         //pdftk file63d91db71abef_0046.pdf stamp /home/operador/nominas/plantilla_nominas.pdf output format_file63d91db71abef_0046.pdf
