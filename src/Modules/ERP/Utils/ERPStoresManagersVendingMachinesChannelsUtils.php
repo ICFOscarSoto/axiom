@@ -26,18 +26,33 @@ class ERPStoresManagersVendingMachinesChannelsUtils
     ];
   }
 
-  public function formatList($vendingmachine){
-    $list=[
-      'id' => 'list'.$this->name,
-      'route' => 'vendingmachinechannels',
-      'routeParams' => ["id" => $vendingmachine],
-      'orderColumn' => 2,
-      'orderDirection' => 'ASC',
-      'tagColumn' => 2,
-      'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/".$this->name.".json"),true),
-      'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/".$this->name."FieldButtons.json"),true),
-      'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/".$this->name."TopButtons.json"),true)
-    ];
+  public function formatList($vendingmachine, $buttons=null){
+    if ($buttons==null){
+      $list=[
+        'id' => 'list'.$this->name,
+        'route' => 'vendingmachinechannels',
+        'routeParams' => ["id" => $vendingmachine],
+        'orderColumn' => 2,
+        'orderDirection' => 'ASC',
+        'tagColumn' => 2,
+        'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/".$this->name.".json"),true),
+        'fieldButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/".$this->name."FieldButtons.json"),true),
+        'topButtons' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/".$this->name."TopButtons.json"),true)
+      ];
+    } else {
+      $list=[
+        'id' => 'list'.$this->name,
+        'route' => 'vendingmachinechannels',
+        'routeParams' => ["id" => $vendingmachine],
+        'orderColumn' => 2,
+        'orderDirection' => 'ASC',
+        'tagColumn' => 2,
+        'fields' => json_decode(file_get_contents (dirname(__FILE__)."/../Lists/".$this->name.".json"),true),
+        'fieldButtons' => [],
+        'topButtons' => [],
+        'topButtonReload' => false
+      ];
+    }
 
     return $list;
   }
