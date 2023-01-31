@@ -58,7 +58,7 @@ class PayrollProccess extends ContainerAwareCommand
     //Recorremos todos los archivos en el directorio
     $date=new \DateTime();
     //Obtener el numero de páginas del pdf
-    $result=shell_exec("qpdf --show-npages  \"".$ocrDir.$fileinfo->getFilename()."\"");
+    $result=shell_exec("qpdf --show-npages  \"".$sourceFile."\"");
     //Partir el fichero en archivos de una unica hoja
     echo("CMD: "."gs -o \"".$tempDir.uniqid("file")."_%04d.pdf\" -sDEVICE=pdfwrite \"".$sourceFile."\"");
     $result=shell_exec("gs -o \"".$tempDir.uniqid("file")."_%04d.pdf\" -sDEVICE=pdfwrite \"".$sourceFile."\"");
