@@ -90,7 +90,7 @@ class PayrollProccess extends ContainerAwareCommand
         //Enviar correo electronico
         $msg="Prueba de correo";
         $postdata = http_build_query([
-                'from' => $user->getEmail(),
+                'from' => $user->getId(),
                 'to' => $worker->getEmail(),
                 'cc' => '',
                 'bcc' =>'',
