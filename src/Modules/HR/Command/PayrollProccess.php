@@ -95,7 +95,7 @@ class PayrollProccess extends ContainerAwareCommand
                 'cc' => '',
                 'bcc' =>'',
                 'subject' =>'Nómina de '.$month.' Ferretería Campollano',
-                'files' => '{}',
+                'files' => json_encode(['Nomina_'.$month.'_'.$nif.'.pdf']),
                 'text_content' =>'',
                 'html_content' => $msg
               ]);
