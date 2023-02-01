@@ -7,6 +7,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use App\Modules\HR\Entity\HRWorkers;
+use App\Modules\Globale\Entity\GlobaleUsers;
 use App\Modules\Globale\Entity\GlobaleCompanies;
 use \App\Helpers\HelperFiles;
 use App\Modules\Globale\Helpers\PdfParser\Parser;
@@ -29,6 +30,7 @@ class PayrollProccess extends ContainerAwareCommand
         $this
             ->setName('payroll:send')
             ->setDescription('Proccess payroll file')
+            ->addArgument('month', InputArgument::REQUIRED, '¿Mes de la remesa de nóminas?')
         ;
   }
 
@@ -37,6 +39,11 @@ class PayrollProccess extends ContainerAwareCommand
     $this->doctrine = $this->getContainer()->get('doctrine');
     $this->entityManager = $this->doctrine->getManager();
     $workersRepository=$this->doctrine->getRepository(HRWorkers::class);
+    $usersRepository=$this->doctrine->getRepository(GlobaleUsers::class);
+    $month = $input->getArgument('month');
+    //Buscamos el usuario Olivia
+    $user=$usersRepository->findOneBy(['email'=>'olivia.sanchez@ferreteriacampollano.com']);
+    if(!$user) continue;
 
     //Directorios de trabajo
     $ocrDir=$this->configpaths["payroll_preOCR"];
@@ -76,9 +83,11 @@ class PayrollProccess extends ContainerAwareCommand
         if(count($matches)>0) $nif=substr($pdf->getText(), $matches[0][1], 9); else $nif=null;
         $worker=$workersRepository->findOneBy(['idcard'=>$nif, 'deleted'=>0]);
         if(!$worker) continue;
-        //if($worker->getEmail()==null || $worker->getEmail()=='') continue;
+        if($worker->getEmail()==null || $worker->getEmail()=='') continue;
         $output->writeln('DNI: '.$nif.' enviar mail a '.$worker->getEmail());
-
+        //Mover archivo a temporales de Email
+        rename ($tempDir.$fileinfo->getFilename(), $tempDir.'../'.$user->getId().'/Email/Nomina_'.$month.'_'.$nif.'.pdf');
+        //Enviar correo electronico
       }
     }
     //Borrar archivo original
