@@ -44,7 +44,7 @@ class PayrollProccess extends ContainerAwareCommand
     //Buscamos el usuario Olivia
     $user=$usersRepository->findOneBy(['email'=>'olivia.sanchez@ferreteriacampollano.com']);
     if(!$user) return 0;
-
+    if(!$user->getEmailDefaultAccount()) return 0;
     //Directorios de trabajo
     $ocrDir=$this->configpaths["payroll_preOCR"];
     $tempDir=$this->configpaths["payroll_temp"];
@@ -90,7 +90,7 @@ class PayrollProccess extends ContainerAwareCommand
         //Enviar correo electronico
         $msg="Prueba de correo";
         $postdata = http_build_query([
-                'from' => $user->getId(),
+                'from' => $user->getEmailDefaultAccount()->getId(),
                 'to' => $worker->getEmail(),
                 'cc' => '',
                 'bcc' =>'',
