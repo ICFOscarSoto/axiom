@@ -43,7 +43,7 @@ class PayrollProccess extends ContainerAwareCommand
     $month = $input->getArgument('month');
     //Buscamos el usuario Olivia
     $user=$usersRepository->findOneBy(['email'=>'olivia.sanchez@ferreteriacampollano.com']);
-    if(!$user) continue;
+    if(!$user) return 0;
 
     //Directorios de trabajo
     $ocrDir=$this->configpaths["payroll_preOCR"];
