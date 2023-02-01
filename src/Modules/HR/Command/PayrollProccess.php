@@ -108,7 +108,7 @@ class PayrollProccess extends ContainerAwareCommand
         $context = stream_context_create($opts);
         $output->writeln("  - Enviando correo...");
         $file = file_get_contents('https://axiom.ferreteriacampollano.com/api/emails/send', false, $context);
-
+        unlink($tempDir.'../'.$user->getId().'/Email/Nomina_'.$month.'_'.$nif.'.pdf');
       }
     }
     //Borrar archivo original
