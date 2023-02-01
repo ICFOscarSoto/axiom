@@ -101,7 +101,7 @@ class PayrollProccess extends ContainerAwareCommand
               ]);
         $opts = ["http" => [
                     "method" => "POST",
-                    "header" => "Content-Type: application/x-www-form-urlencoded\r\nX-AUTH-TOKEN: ".$user->getToken()."\r\nX-AUTH-DOMAIN: ferreteriacampollano.com",
+                    "header" => "Content-Type: application/x-www-form-urlencoded\r\nX-AUTH-TOKEN: ".$user->getApiToken()."\r\nX-AUTH-DOMAIN: ferreteriacampollano.com",
                     "content" => $postdata
                   ]
                 ];
