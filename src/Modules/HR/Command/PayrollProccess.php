@@ -88,7 +88,7 @@ class PayrollProccess extends ContainerAwareCommand
         //Mover archivo a temporales de Email
         rename ($tempDir.$fileinfo->getFilename(), $tempDir.'../'.$user->getId().'/Email/Nomina_'.$month.'_'.$nif.'.pdf');
         //Enviar correo electronico
-        $msg="Buenos días,<br/>te adjunto la nómina correspondiente al mes de ".$month.'<br/><br/>Un saludo.<br/>';
+        $msg="Buenos días,<br/>te adjunto la nómina correspondiente al mes de ".$month.'.<br/><br/>Un saludo.<br/>';
         $postdata = http_build_query([
                 'from' => $user->getEmailDefaultAccount()->getId(),
                 'to' => $worker->getEmail(),
@@ -113,8 +113,6 @@ class PayrollProccess extends ContainerAwareCommand
     }
     //Borrar archivo original
     //unlink($sourceFile);
-
-
   }
 
 
