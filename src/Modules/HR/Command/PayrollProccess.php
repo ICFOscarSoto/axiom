@@ -112,7 +112,7 @@ class PayrollProccess extends ContainerAwareCommand
       }
     }
     //Borrar archivo original
-    //unlink($sourceFile);
+    unlink($sourceFile);
   }
 
 
