@@ -59,13 +59,11 @@ class InventoryRemember extends ContainerAwareCommand
         //Check if the user has a worker associated
         $worker=$workersRepository->findOneBy(["user"=>$agent, "active"=>1, "deleted"=>0]);
         // 2023-07-02 - Quitamos la comprobación de que el trabajador haya fichado para mandar los inventarios antes de las 8.00
-        /*
-          if($worker){
+        /*if($worker){
           //Check if worker is working now
           if(!$workersRepository->isWorking($worker)){
           $output->writeln('   - El trabajador no esta trabajando ahora');
-        }*/
-        else{
+        } else {*/
           $msg_title=":bell: INVENTARIO ".$store["name"]." (".$date->format("d/m/Y").") :bell:\n¡Hola ".$agent->getName()."! Te paso el listado diario de referencias que hay que inventariar en ".$store["name"]." :";
           $msg_products1="";
           $msg_products2="";
@@ -127,7 +125,6 @@ class InventoryRemember extends ContainerAwareCommand
             file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel=822001670623199262&msg='.urlencode($msg));
           }
           $output->writeln('   - Notificación recordatorio enviada al gestor de '.$store["name"]);
-          }
         }
       }
     }
