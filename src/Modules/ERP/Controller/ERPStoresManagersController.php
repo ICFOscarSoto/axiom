@@ -975,6 +975,9 @@ class ERPStoresManagersController extends Controller
 					 $item["multiplier"]=$channel->getMultiplier();
 					 $item["minquantity"]=$channel->getMinquantity();
 					 $item["maxquantity"]=$channel->getMaxquantity();
+					 $item["quantity"]=$channel->getQuantity();
+					 $item["product_id"]=$channel->getProduct()?$channel->getProduct()->getId():null;
+					 $item["product_name"]=$channel->getProduct()?$channel->getProduct()->getName():null;
 					 $item["gaps"]=$channel->getGaps();
 					 $result["data"][]=$item;
 			 	 }
