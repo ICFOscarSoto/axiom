@@ -102,8 +102,8 @@ class ERPStocksHistoryController extends Controller
     //$user,$repository,$request,$manager,$listFields,$classname,
     //$select_fields,$from,$where,$maxResults=null,$orderBy="id",$groupBy=null)
     $return=$listUtils->getRecordsSQL($user,$repository,$request,$manager,$listFields, ERPStocksHistory::class,
-                                    ['tm.name'=>'type', 'sh.dateadd'=>'dateoperation', 'sh.num_operation'=>'numOperation', 'st.name'=>'store', 'vm.name'=>'vendingmachine', 'c.name'=>'channel',
-                                      'sh.productcode'=>'productcode', 'sh.productname'=>'productname', 'sh.quantity'=>'quantity', 'sh.previousqty'=>'previousqty', 'sh.newqty'=>'newqty', 'sh.id'=>'id'],
+                                    ['tm.name'=>'type', 'sh.dateadd'=>'dateoperation', 'sh.num_operation'=>'numOperation', 'st.name'=>'store', 'concat (vm.name, \' \', c.name)'=>'vendingmachine',
+                                      'concat (sh.productcode, \' \', sh.productname)'=>'product', 'sh.quantity'=>'quantity', 'sh.previousqty'=>'previousqty', 'sh.newqty'=>'newqty', 'sh.id'=>'id'],
                                     'erpstocks_history sh
                                     LEFT JOIN erptypes_movements tm ON tm.id=sh.type_id
                                     LEFT JOIN erpstores_managers_vending_machines_channels c ON c.id=sh.vendingmachinechannel_id
@@ -141,21 +141,21 @@ class ERPStocksHistoryController extends Controller
   }
 
   /**
-   * @Route("/{_locale}/erp/listStocksHistoryManagerByUser/{idUser}", name="listStocksHistoryManagerByUser")
+   * @Route("/{_locale}/erp/listStocksHistoryManagerByUser/{userId}", name="listStocksHistoryManagerByUser")
    */
-  public function listStocksHistoryManagerByUser($idUser,RouterInterface $router,Request $request){
+  public function listStocksHistoryManagerByUser($userId,RouterInterface $router,Request $request){
     $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
     $userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
     $locale = $request->getLocale();
     $this->router = $router;
     $repository=$this->getDoctrine()->getRepository($this->class);
-    $obj=$repository->findOneBy(["id"=>$idUser, "deleted"=>0]);
+    $obj=$repository->findOneBy(["id"=>$userId, "deleted"=>0]);
     $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
     $utils=new ERPStocksHistoryUtils();
-    $templateLists=$utils->formatListbyUser($idUser);
+    $templateLists=$utils->formatListbyUser($userId);
     $templateForms=[];
     return $this->render('@Globale/list.html.twig', [
-      'id' => $idUser,
+      'id' => $userId,
       'listConstructor' => $templateLists,
       'forms' => $templateForms,
       'userData' => $userdata,
@@ -164,16 +164,16 @@ class ERPStocksHistoryController extends Controller
   }
 
   /**
-   * @Route("/{_locale}/erp/stockshistorymanagerbyuser/{idUser}/list", name="StocksHistoryByUserlist")
+   * @Route("/{_locale}/erp/stockshistorymanagerbyuser/{userId}/list", name="StocksHistoryByUserlist")
    *
    */
-  public function StocksHistoryByUserlist($idUser, RouterInterface $router,Request $request){
+  public function StocksHistoryByUserlist($userId, RouterInterface $router,Request $request){
     $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
     $locale = $request->getLocale();
     $this->router = $router;
     $manager = $this->getDoctrine()->getManager();
     $userrepository= $manager->getRepository(GlobaleUsers::class);
-    $user = $userrepository->findOneBy(["id"=>$idUser, "active"=>1, "deleted"=>0]);
+    $user = $userrepository->findOneBy(["id"=>$userId, "active"=>1, "deleted"=>0]);
     $repository = $manager->getRepository(ERPStocksHistory::class);
     $listUtils=new GlobaleListUtils();
     $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StocksHistoryManager.json"),true);
@@ -188,7 +188,7 @@ class ERPStocksHistoryController extends Controller
                                     LEFT JOIN erpstores_managers_vending_machines vm ON vm.id=c.vendingmachine_id
                                     LEFT JOIN erpstore_locations sl ON sl.id=sh.location_id
                                     LEFT JOIN erpstores st ON st.id=sl.store_id
-                                    LEFT JOIN erpstores_users su ON su.user_id='.$idUser,
+                                    LEFT JOIN erpstores_users su ON su.user_id='.$userId,
                                     'sh.active=1 and sh.deleted=0 and st.id=su.store_id',
                                     50,
                                     'sh.dateadd',

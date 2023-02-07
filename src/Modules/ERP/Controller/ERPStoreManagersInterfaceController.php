@@ -87,9 +87,9 @@ class ERPStoreManagersInterfaceController extends Controller
     $repository=$this->getDoctrine()->getRepository($this->class);
 
     $tabs=[
-      ["name" => "history", "caption"=>"historyManager", "icon"=>"fa-address-card-o", "route"=>$this->generateUrl("listStocksHistoryManagerByUser",["idUser"=>$this->getUser()->getId()])],
-      ["name" => "storesmanagersvendingmachines", "caption"=>"Expendedoras", "icon"=>"fa-th","route"=>$this->generateUrl("listStoresManagersVendingMachinesByUser",["idUser"=>$this->getUser()->getId()])],
-      ["name" => "transfers", "caption"=>"Transfers", "icon"=>"fa-address-card-o", "route"=>$this->generateUrl("listTransfersByUser",["idUser"=>$this->getUser()->getId()])],
+      ["name" => "history", "caption"=>"historyManager", "icon"=>"fa-address-card-o", "route"=>$this->generateUrl("listStocksHistoryManagerByUser",["userId"=>$this->getUser()->getId()])],
+      ["name" => "storesmanagersvendingmachines", "caption"=>"Expendedoras", "icon"=>"fa-th","route"=>$this->generateUrl("listStoresManagersVendingMachinesByUser",["userId"=>$this->getUser()->getId()])],
+      ["name" => "transfers", "caption"=>"Transfers", "icon"=>"fa-address-card-o", "route"=>$this->generateUrl("listTransfersByUser",["userId"=>$this->getUser()->getId()])],
     ];
 
       return $this->render('@Globale/generictabform.html.twig', array(

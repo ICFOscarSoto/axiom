@@ -38,11 +38,11 @@ class NavisionTransfersUtils
     return $list;
   }
 
-  public function formatListbyUser($idUser){
+  public function formatListbyUser($userId){
     $list=[
       'id' => 'listTransfersByUser',
       'route' => 'transfersByUserList',
-      'routeParams' => ["idUser" => $idUser],
+      'routeParams' => ["userId" => $userId],
       'orderColumn' => 3,
       'orderDirection' => 'DESC',
       'tagColumn' => 2,
