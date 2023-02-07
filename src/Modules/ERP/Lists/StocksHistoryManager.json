@@ -19,7 +19,7 @@
     {
         "name": "dateoperation",
         "caption": "dateoperation",
-        "type": "date"
+        "type": "datetime"
     },
     {
         "name": "numOperation",
@@ -34,16 +34,8 @@
         "caption": "store"
     },
     {
-        "name": "channel",
-        "caption": "channel"
-    },
-    {
-        "name": "productcode",
-        "caption": "productcode"
-    },
-    {
-        "name": "productname",
-        "caption": "productname"
+        "name": "product",
+        "caption": "product"
     },
     {
         "name": "previousqty",

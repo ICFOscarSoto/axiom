@@ -30,10 +30,10 @@ class ERPStoresManagersUsersUtils
     $repository=$doctrine->getRepository(ERPStoresManagersUsers::class);
     $repositoryUser=$doctrine->getRepository(GlobaleUsers::class);
     $parent=$params["parent"];
-    $idsusers=$repository->getElegibleUsers($params["parent"], $user);
+    $usersIds=$repository->getElegibleUsers($params["parent"], $user);
     $users=[];
-    foreach($idsusers as $iduser){
-      $users[]=$repositoryUser->findOneBy(["id"=>$iduser]);
+    foreach($usersIds as $userId){
+      $users[]=$repositoryUser->findOneBy(["id"=>$userId]);
     }
     //dump($users);
     return [['user', ChoiceType::class, [

@@ -59,11 +59,11 @@ class ERPStoresManagersVendingMachinesUtils
     return $list;
   }
 
-  public function formatListByUser($idUser){
+  public function formatListByUser($userId){
     $list=[
       'id' => 'listStoresManagersVendingMachinesByUser',
       'route' => 'StoresManagersVendingMachinesByUserlist',
-      'routeParams' => ["idUser" => $idUser],
+      'routeParams' => ["userId" => $userId],
       'orderColumn' => 2,
       'orderDirection' => 'DESC',
       'tagColumn' => 2,

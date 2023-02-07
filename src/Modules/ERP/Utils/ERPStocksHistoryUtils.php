@@ -68,11 +68,11 @@ class ERPStocksHistoryUtils
       return $list;
     }
 
-    public function formatListByUser($idUser){
+    public function formatListByUser($userId){
       $list=[
         'id' => 'listStocksHistoryByUser',
         'route' => 'StocksHistoryByUserlist',
-        'routeParams' => ["idUser" => $idUser],
+        'routeParams' => ["userId" => $userId],
         'orderColumn' => 2,
         'orderDirection' => 'DESC',
         'tagColumn' => 2,

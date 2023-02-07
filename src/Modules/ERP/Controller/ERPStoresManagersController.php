@@ -245,22 +245,22 @@ class ERPStoresManagersController extends Controller
 
 
 	/**
-	 * @Route("/{_locale}/erp/vendingmachinesbyuser/{idUser}", name="listStoresManagersVendingMachinesByUser")
+	 * @Route("/{_locale}/erp/vendingmachinesbyuser/{userId}", name="listStoresManagersVendingMachinesByUser")
 	 */
-	public function listStoresManagersVendingMachinesByUser($idUser,RouterInterface $router,Request $request)
+	public function listStoresManagersVendingMachinesByUser($userId,RouterInterface $router,Request $request)
 	{
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
     $userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
     $locale = $request->getLocale();
     $this->router = $router;
     $repository=$this->getDoctrine()->getRepository($this->class);
-    $obj=$repository->findOneBy(["id"=>$idUser, "deleted"=>0]);
+    $obj=$repository->findOneBy(["id"=>$userId, "deleted"=>0]);
     $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
     $utils=new ERPStoresManagersVendingMachinesUtils();
-    $templateLists=$utils->formatListbyUser($idUser);
+    $templateLists=$utils->formatListbyUser($userId);
     $templateForms=[];
     return $this->render('@Globale/list.html.twig', [
-      'id' => $idUser,
+      'id' => $userId,
       'listConstructor' => $templateLists,
       'forms' => $templateForms,
       'userData' => $userdata,
@@ -269,16 +269,16 @@ class ERPStoresManagersController extends Controller
 	}
 
 	/**
-   * @Route("/{_locale}/erp/vendingmachinesbyuser/{idUser}/list", name="StoresManagersVendingMachinesByUserlist")
+   * @Route("/{_locale}/erp/vendingmachinesbyuser/{userId}/list", name="StoresManagersVendingMachinesByUserlist")
    *
    */
-  public function StoresManagersVendingMachinesByUserlist($idUser, RouterInterface $router,Request $request){
+  public function StoresManagersVendingMachinesByUserlist($userId, RouterInterface $router,Request $request){
     $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
     $locale = $request->getLocale();
     $this->router = $router;
     $manager = $this->getDoctrine()->getManager();
     $userrepository= $manager->getRepository(GlobaleUsers::class);
-    $user = $userrepository->findOneBy(["id"=>$idUser, "active"=>1, "deleted"=>0]);
+    $user = $userrepository->findOneBy(["id"=>$userId, "active"=>1, "deleted"=>0]);
     $repository = $manager->getRepository(ERPStocksHistory::class);
     $listUtils=new GlobaleListUtils();
     $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/StoresManagersVendingMachinesTab.json"),true);
@@ -288,7 +288,7 @@ class ERPStoresManagersController extends Controller
                                     'erpstores_managers_vending_machines vm
                                     LEFT JOIN erpstore_locations sl ON sl.id=vm.storelocation_id
                                     LEFT JOIN erpstores st ON st.id=sl.store_id
-                                    LEFT JOIN erpstores_users su ON su.user_id='.$idUser,
+                                    LEFT JOIN erpstores_users su ON su.user_id='.$userId,
                                     'vm.active=1 and vm.deleted=0 and st.id=su.store_id',
                                     50,
                                     'vm.id',

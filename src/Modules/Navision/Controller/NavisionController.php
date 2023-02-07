@@ -493,9 +493,9 @@ class NavisionController extends Controller
      }
 
      /**
-      * @Route("/{_locale}/navision/transfersbyuser/{idUser}", name="listTransfersByUser")
+      * @Route("/{_locale}/navision/transfersbyuser/{userId}", name="listTransfersByUser")
       */
-     public function listTransfersByUser($idUser,RouterInterface $router,Request $request)
+     public function listTransfersByUser($userId,RouterInterface $router,Request $request)
      {
        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
         $userdata=$this->getUser()->getTemplateData($this, $this->getDoctrine());
@@ -503,10 +503,10 @@ class NavisionController extends Controller
         $this->router = $router;
         $menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
         $utils=new NavisionTransfersUtils();
-        $templateLists=$utils->formatListbyUser($idUser);
+        $templateLists=$utils->formatListbyUser($userId);
         $templateForms=[];
         return $this->render('@Globale/list.html.twig', [
-          'id' => $idUser,
+          'id' => $userId,
           'listConstructor' => $templateLists,
           'forms' => $templateForms,
           'userData' => $userdata,
@@ -515,16 +515,16 @@ class NavisionController extends Controller
      }
 
      /**
-       * @Route("/{_locale}/navision/transfersbyuser/{idUser}/list", name="transfersByUserList")
+       * @Route("/{_locale}/navision/transfersbyuser/{userId}/list", name="transfersByUserList")
        *
        */
-      public function transfersByUserList($idUser, RouterInterface $router,Request $request){
+      public function transfersByUserList($userId, RouterInterface $router,Request $request){
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
         $locale = $request->getLocale();
         $this->router = $router;
         $manager = $this->getDoctrine()->getManager();
         $userrepository= $manager->getRepository(GlobaleUsers::class);
-        $user = $userrepository->findOneBy(["id"=>$idUser, "active"=>1, "deleted"=>0]);
+        $user = $userrepository->findOneBy(["id"=>$userId, "active"=>1, "deleted"=>0]);
         $repository = $manager->getRepository(ERPStocksHistory::class);
         $listUtils=new GlobaleListUtils();
         $listFields=json_decode(file_get_contents (dirname(__FILE__)."/../Lists/TransfersManagers.json"),true);
@@ -534,7 +534,7 @@ class NavisionController extends Controller
                                         'navision_transfers nt
                                         LEFT JOIN erpproducts_variants pv ON pv.id=nt.productvariant_id
                                         LEFT JOIN erpproducts p ON p.id=pv.product_id
-                                        LEFT JOIN erpstores_users su ON su.user_id='.$idUser.'
+                                        LEFT JOIN erpstores_users su ON su.user_id='.$userId.'
                                         LEFT JOIN erpstores st ON st.id=su.store_id',
                                         'nt.active=1 and nt.deleted=0 and st.id=nt.destinationstore_id',
                                         50,
