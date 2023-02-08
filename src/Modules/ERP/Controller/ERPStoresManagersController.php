@@ -930,6 +930,102 @@ class ERPStoresManagersController extends Controller
 			return new JsonResponse(["result"=>1]);
 		}
 
+
+		/**
+		 * @Route("/api/ERP/storesmanagers/vendingmachines/regularize/channels/add/{id}/{qty}", name="addRegularizeManagerVendingMachineGetChannel", defaults={"id"=0})
+		 */
+		public function addRegularizeManagerVendingMachineGetChannel($id,$qty, RouterInterface $router,Request $request){
+			$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+			if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
+			$repositoryVendingMachinesChannels = $this->getDoctrine()->getManager()->getRepository(ERPStoresManagersVendingMachinesChannels::class);
+			$repositoryStocks = $this->getDoctrine()->getManager()->getRepository(ERPStocks::class);
+			$repositoryProductVariant = $this->getDoctrine()->getManager()->getRepository(ERPProductsVariants::class);
+
+			$channel=$repositoryVendingMachinesChannels->findOneBy(["id"=>$id,"active"=>1,"deleted"=>0]);
+			if(!$channel) return new JsonResponse(["result"=>-1, "text"=>"Canal incorrecto"]);
+			if($channel->getProduct()==null && $channel->getProductcode()==null) return new JsonResponse(["result"=>-2, "text"=>"Canal no configurado"]);
+			//Obtener ubicacion del almacen expendedora
+			$location=null;
+			if ($channel->getVendingmachine()->getStorelocation()!=null) {
+				$location=$channel->getVendingmachine()->getStorelocation();
+			}
+			else {
+				$locationRepository=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
+				$location=$locationRepository->findOneBy(["name"=>"EXPEND ALM"]);
+			}
+			//Comprobar si tenemos que cargar la maquina o traspasar al almacén
+			if($channel->getQuantity()==($qty*($channel->getMultiplier()?$channel->getMultiplier():1))) return new JsonResponse(["result"=>-1, "text"=>"No hay cambio de stock"]);
+			
+			$diff = ($qty*($channel->getMultiplier()?$channel->getMultiplier():1)) - $channel->getQuantity();
+			//diff es positivo si hay que cargar la maquina y negativo si hay que sacar de la maquina
+			//Añadimos la carga al histórico de operaciones
+			$typesRepository=$this->getDoctrine()->getRepository(ERPTypesMovements::class);
+			$type=$typesRepository->findOneBy(["name"=>"Regularización cliente"]);
+			$stockHistory= new ERPStocksHistory();
+			$productvariant = $repositoryProductVariant->findOneBy(["product"=>$channel->getProduct(),"variant"=>null]);
+			$stockHistory->setProductcode($productvariant->getProduct()->getCode());
+			$stockHistory->setProductname($productvariant->getProduct()->getName());
+			$stockHistory->setProductvariant($productvariant);
+			$stockHistory->setLocation($location);
+			$stockHistory->setVendingmachinechannel($channel);
+			$stockHistory->setUser($this->getUser());
+			$stockHistory->setCompany($this->getUser()->getCompany());
+			$stockHistory->setPreviousqty($channel->getQuantity());
+			$stockHistory->setNewqty($qty*($channel->getMultiplier()?$channel->getMultiplier():1));
+			$stockHistory->setType($type);
+			$stockHistory->setComment($channel->getVendingmachine()->getName());
+			$stockHistory->setQuantity($diff);
+			$stockHistory->setActive(1);
+			$stockHistory->setDeleted(0);
+			$stockHistory->setDateupd(new \DateTime());
+			$stockHistory->setDateadd(new \DateTime());
+			$this->getDoctrine()->getManager()->persist($stockHistory);
+			$this->getDoctrine()->getManager()->flush();
+			//Setear el stock en la maquina
+			$channel->setQuantity($qty);
+			$this->getDoctrine()->getManager()->persist($channel);
+			$this->getDoctrine()->getManager()->flush();
+			//Decrementar o incrementamos el stock en la ubicacion asociada a la maquina si esta existe y el producto esta en ella para evitar errores pero...:
+			//TODO: A futuro deberiamos no permitir la recarga si esta información no esta disponible
+			//TODO: Añadir soporte para variantes
+			if($channel->getVendingmachine()->getStorelocation()){
+				$stock=$repositoryStocks->findOneBy(["productvariant"=>$productvariant, "storelocation"=>$channel->getVendingmachine()->getStorelocation(), "active"=>1, "deleted"=>0]);
+				if($stock){
+					$stockHistory= new ERPStocksHistory();
+					$productvariant = $repositoryProductVariant->findOneBy(["product"=>$channel->getProduct(),"variant"=>null]);
+	        		$stockHistory->setProductcode($productvariant->getProduct()->getCode());
+	        		$stockHistory->setProductname($productvariant->getProduct()->getName());
+					$stockHistory->setProductvariant($productvariant);
+					if ($channel->getVendingmachine()->getStorelocation()!=null) {
+							$stockHistory->setLocation($channel->getVendingmachine()->getStorelocation());
+						}
+						else {
+							$locationRepository=$this->getDoctrine()->getRepository(ERPStoreLocations::class);
+							$storeLocation=$locationRepository->findOneBy(["name"=>"EXPEND ALM"]);
+							$stockHistory->setLocation($storeLocation);
+					}
+					$stockHistory->setUser($this->getUser());
+					$stockHistory->setCompany($this->getUser()->getCompany());
+					$stockHistory->setPreviousqty($stock->getQuantity());
+					$stockHistory->setNewqty($stock->getQuantity()-$diff);
+					$stockHistory->setType($type);
+					$stockHistory->setQuantity(-$diff);
+					$stockHistory->setActive(1);
+					$stockHistory->setDeleted(0);
+					$stockHistory->setDateupd(new \DateTime());
+					$stockHistory->setDateadd(new \DateTime());
+					$this->getDoctrine()->getManager()->persist($stockHistory);
+					$this->getDoctrine()->getManager()->flush();
+					$stock->setQuantity($stock->getQuantity()-$diff);
+					$this->getDoctrine()->getManager()->persist($stock);
+					$this->getDoctrine()->getManager()->flush();
+				}
+			}
+			$this->getDoctrine()->getManager()->clear();
+			return new JsonResponse(["result"=>1]);
+		}
+
+
 		/**
 		 * @Route("/api/ERP/storesmanagers/vendingmachines/consumers/get/{id}/{nfcid}", name="getStoresManagerVendingMachineConsumer", defaults={"id"=0, "nfcid"=-1})
 		 */

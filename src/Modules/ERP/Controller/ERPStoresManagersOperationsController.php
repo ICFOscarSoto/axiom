@@ -73,7 +73,6 @@ class ERPStoresManagersOperationsController extends Controller
 	{
 		$this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 		if(!SecurityUtils::checkRoutePermissions($this->module,$request->get('_route'),$this->getUser(), $this->getDoctrine())) return $this->redirect($this->generateUrl('unauthorized'));
-
 		$menurepository=$this->getDoctrine()->getRepository(GlobaleMenuOptions::class);
 		$configrepository=$this->getDoctrine()->getRepository(ERPConfiguration::class);
 		$customerGroupsrepository=$this->getDoctrine()->getRepository(ERPCustomerGroups::class);
@@ -354,7 +353,6 @@ class ERPStoresManagersOperationsController extends Controller
 
 					//Modificación 26/01/2023 -- Permitir operaciones sin stock si la máquina esta configurada para permitirlo y el almacenillo tiene stock del producto
 					//----------------------------------------------------------------------------------------------------------------------------------------------------
-					//TODO: Comprobar si la salida es en negativo, en caso afirmativo hacer un traspaso de 1 una unidad
 					if($channel->getQuantity()<=0){
 						if(!$this->getUser()->getApiToken()){
 							 $description="No se puede realizar operacion sin stock, el usuario no tiene API token asignado";

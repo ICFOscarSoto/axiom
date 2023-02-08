@@ -8,7 +8,8 @@
         "caption": "type", "width":"10%" ,"class" : "dt-center", "replace":{
                                    "Carga expendedora":{"text":"Carga expendedora","html":"<div style=\"min-width: 75px;\" class=\"label label-green2\">Carga expendedora</div>"},
                                    "Salida expendedora":{"text":"Salida expendedora","html":"<div style=\"min-width: 75px;\" class=\"label label-blue2\">Salida expendedora</div>"},
-                                   "Ajuste de inventario en maquina":{"text":"Ajuste de inventario en maquina","html":"<div style=\"min-width: 75px;\" class=\"label label-orange\">Ajuste de inventario en maquina</div>"}
+                                   "Ajuste de inventario en maquina":{"text":"Ajuste de inventario en maquina","html":"<div style=\"min-width: 75px;\" class=\"label label-orange\">Ajuste de inventario en maquina</div>"},
+                                   "Regularización cliente":{"text":"Regularización cliente","html":"<div style=\"min-width: 75px;\" class=\"label label-violet\">Regularización cliente</div>"}
                                  }
     },
     {

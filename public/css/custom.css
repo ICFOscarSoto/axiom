@@ -1122,6 +1122,10 @@ label.error {
   background-color: rgb(0, 125, 255);
 }
 
+.label-violet{
+  background-color: rgb(84, 0, 105);
+}
+
 
 /*
 .spinner-container {
