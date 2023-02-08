@@ -301,6 +301,23 @@ class ERPStocksRepository extends ServiceEntityRepository
       return $result;
     }
 
+    public function getAll($store){
+      $query='SELECT pv.product_id, vv.name variant_name, p.grouped, (s.quantity+s.pendingreceive) quantity
+              FROM erpstocks s
+              LEFT JOIN erpproducts_variants pv
+              ON pv.id=s.productvariant_id
+              LEFT JOIN erpvariants vv
+              ON vv.id=pv.variant_id
+              LEFT JOIN erpproducts p
+              ON p.id=pv.product_id
+              WHERE (s.quantity+s.pendingreceive) <=  s.maxstock
+              AND s.storelocation_id IN (SELECT l.id FROM erpstore_locations l WHERE l.active=1 AND l.deleted=0 AND l.store_id =:store)
+              AND s.active=1 AND s.deleted=0';
+      $params=['store' => $store->getId()];
+      $result=$this->getEntityManager()->getConnection()->executeQuery($query,$params)->fetchAll();
+      return $result;
+    }
+
     public function getOperations($store, $date){
       $query='SELECT SUM(quantity) vendido, code, product_id
               FROM erpstores_managers_operations_lines
