@@ -14,6 +14,7 @@ use App\Modules\ERP\Entity\ERPStocksHistory;
 use App\Modules\ERP\Entity\ERPSalesTickets;
 use App\Modules\ERP\Entity\ERPStores;
 use App\Modules\ERP\Entity\ERPProducts;
+use App\Modules\ERP\Entity\ERPVariants;
 use App\Modules\Globale\Entity\GlobaleCompanies;
 
 
@@ -43,6 +44,7 @@ class ImportStocks extends ContainerAwareCommand
         $stockHistoryRepository=$doctrine->getRepository(ERPStocksHistory::class);
         $storesRepository=$doctrine->getRepository(ERPStores::class);
         $productsRepository=$doctrine->getRepository(ERPProducts::class);
+        $variantsRepository=$doctrine->getRepository(ERPVariants::class);
         $companiesrepository=$doctrine->getRepository(GlobaleCompanies::class);
 
         $output->writeln('');
