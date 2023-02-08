@@ -112,6 +112,11 @@ class ERPStores
      */
     private $transfernotifyaddress;
 
+    /**
+     * @ORM\Column(type="smallint", nullable=true)
+     */
+    private $typeofnotifications;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -317,6 +322,18 @@ class ERPStores
     public function setTransfernotifyaddress(?string $transfernotifyaddress): self
     {
         $this->transfernotifyaddress = $transfernotifyaddress;
+
+        return $this;
+    }
+
+    public function getTypeofnotifications(): ?int
+    {
+        return $this->typeofnotifications;
+    }
+
+    public function setTypeofnotifications(?int $typeofnotifications): self
+    {
+        $this->typeofnotifications = $typeofnotifications;
 
         return $this;
     }

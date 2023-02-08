@@ -384,7 +384,7 @@ class ERPStoresManagersOperationsController extends Controller
 						file_get_contents('https://icfbot.ferreteriacampollano.com/message.php?channel='.$vendingmachine->getAlertnotifyaddress().'&msg='.urlencode('Máquina '.$vendingmachine->getName().': '.$description));
 
 						// Informamos de la venta por debajo de stock por correo electronico
-						$msg="La máquina ".$vendingmachine->getName()." ha realizado una operación con stock 0. Hay que revisar y ajustar el stock del siguiente canal: ";
+						$msg="La máquina ".$vendingmachine->getName()." ha realizado una operación con stock 0. Hay que revisar y regularizar el stock del siguiente canal: ";
 						$msg.="<ul>";
 						$msg.="<li>Canal: <b>".$channel->getName()."</b> (Num. canal: <b>".str_pad($channel->getChannel(),3,'0',STR_PAD_LEFT)."</b>) Ref: <b>".$channel->getProductcode()."</b> - ".$channel->getProductname().".</li>";
 						$postdata = http_build_query([
