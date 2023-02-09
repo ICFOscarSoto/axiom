@@ -43,7 +43,7 @@ class StoreManagerTransferRemember extends ContainerAwareCommand
     if(!$manager && $manager->getDiscordchannel()==null) {
       die(' - Gestor no encontrado');
     }
-    $stores=$storesRepository->findBy(["managed_by"=>$manager, "active"=>1, "deleted"=>0]);
+    $stores=$storesRepository->findBy(["managedBy"=>$manager, "active"=>1, "deleted"=>0]);
     foreach ($stores as $store){
       $channel=$manager->getDiscordchannel();
       $msg="**** ------------------ Los siguientes traspasos son al almacén ** ".$store->getName()." ------------------ ****";
