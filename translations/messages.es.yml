@@ -797,6 +797,7 @@ historyManager: Histórico
 transfer: Traspaso
 state: Estado
 Operationunderstock: Operaciones sin stock
+StoresManagersInterface: Interfaz de gestores
 #JSPREADSHEET
 #----------------------------------------------------------------------------------------------------------------------
 jspreadsheet_showcolumn: Mostrar columna

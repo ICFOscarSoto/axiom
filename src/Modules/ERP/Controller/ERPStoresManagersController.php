@@ -1582,9 +1582,9 @@ class ERPStoresManagersController extends Controller
 			$repositoryStocks=$this->getDoctrine()->getRepository(ERPStocks::class);
 			$controllerStocks= new ERPStocksController;
 			//$listStocks=$repositoryStocks->getManagersStocksByProduct($managersProducts->getManager()->getId(), $managersProducts->getProductvariant()->getId());
-	    $manager = $this->getDoctrine()->getManager();
-	    $listUtils=new ERPStocksUtils();
-	    $listStocks=$listUtils->formatListProductsManagers($id,$managersProducts->getManager()->getId());
+			$manager = $this->getDoctrine()->getManager();
+			$listUtils=new ERPStocksUtils();
+			$listStocks=$listUtils->formatListProductsManagers($id,$managersProducts->getManager()->getId());
 
 			$formUtils=new GlobaleFormUtils();
 			$formUtils->initialize($this->getUser(), null, dirname(__FILE__)."/../Forms/Stocks.json",$request, $this, $this->getDoctrine());
