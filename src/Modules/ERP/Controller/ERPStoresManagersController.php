@@ -981,7 +981,7 @@ class ERPStoresManagersController extends Controller
 			$this->getDoctrine()->getManager()->persist($stockHistory);
 			$this->getDoctrine()->getManager()->flush();
 			//Setear el stock en la maquina
-			$channel->setQuantity($qty);
+			$channel->setQuantity($qty*($channel->getMultiplier()?$channel->getMultiplier():1));
 			$this->getDoctrine()->getManager()->persist($channel);
 			$this->getDoctrine()->getManager()->flush();
 			//Decrementar o incrementamos el stock en la ubicacion asociada a la maquina si esta existe y el producto esta en ella para evitar errores pero...:
